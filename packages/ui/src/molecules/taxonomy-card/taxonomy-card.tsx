@@ -21,25 +21,17 @@ export type TTaxonomyCardProps = IWithClassName &
   IWithDataTestId & {
     title: string;
     description?: string;
-    /** Post count, pre-formatted and pluralized by the app (e.g. "5 posts", "1 post"). */
     postCountLabel: string;
     href: string;
-    /** Heading depth for `title` — the caller decides based on where the card sits in the page outline. */
     headingLevel: THeadingLevel;
-    /** Joins `title` and `postCountLabel` in the link's accessible name. Defaults to `', '`; override for scripts where that punctuation reads wrong. */
     accessibleNameSeparator?: string;
-    /** Component the card's link renders as — pass the app router's Link for client-side navigation. Defaults to a plain `<a>`. Also applied to `TaxonomyCard.Posts`' links. */
     linkAs?: TAnchorElementType;
     children?: TCompoundChildren<typeof TaxonomyCardParts>;
   };
 
 const s = taxonomyCardVariants();
 
-/**
- * TaxonomyCard — summary card for a taxonomy entry (topic or tag) in a listing:
- * title, optional description, and post count, linking to the entry's archive.
- * Composes an optional `TaxonomyCard.Posts` slot.
- */
+/** Summary card for a taxonomy entry (topic or tag) in a listing: title, optional description, and post count, linking to the entry's archive. */
 const TaxonomyCardRoot = ({
   title,
   description,

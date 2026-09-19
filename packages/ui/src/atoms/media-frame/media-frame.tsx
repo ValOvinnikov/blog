@@ -12,11 +12,7 @@ export type TMediaFrameProps = IWithClassName &
     children?: ReactNode;
   };
 
-/**
- * Positioning context for a Next.js `<Image fill />` child.
- * Use the `ratio` prop for common presets, or pass an arbitrary aspect-ratio
- * class via `className` for one-off sizes.
- */
+/** Positioning context for a Next.js `<Image fill />` child. */
 export const MediaFrame = ({
   ratio,
   className,

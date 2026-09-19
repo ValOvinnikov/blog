@@ -4,10 +4,6 @@ export type TKvListProps = {
   tokens: TToken[];
 };
 
-/**
- * Name/value list for tokens whose declared value is the useful signal
- * (layout, motion). Key and value share a baseline so they read as a row.
- */
 export const KvList = ({ tokens }: TKvListProps) => (
   <dl className="space-y-2">
     {tokens.map((token) => (

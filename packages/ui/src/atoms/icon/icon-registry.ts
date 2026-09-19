@@ -135,12 +135,7 @@ export type TIconRegistryEntry = {
   url: string;
 };
 
-/**
- * Maps every `TIconName` to both its SVGR React component (for rendering)
- * and its raw asset URL (for non-React uses like favicons/OG images). The
- * `Icon` atom only reads `component`; `url` exists for future asset-URL
- * consumers.
- */
+/** `Icon` only reads `component`; `url` exists for future non-React uses (favicons, OG images). */
 export const ICON_REGISTRY: Record<TIconName, TIconRegistryEntry> = {
   [ICONS.SUN]: { component: SunComponent, url: SunUrl },
   [ICONS.MOON]: { component: MoonComponent, url: MoonUrl },

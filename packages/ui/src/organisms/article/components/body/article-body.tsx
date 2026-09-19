@@ -8,11 +8,7 @@ export type TArticleBodyProps = IWithClassName &
     children: ReactNode;
   };
 
-/**
- * Article.Body — reading-content wrapper for a post detail's body
- * (e.g. a `PortableTextRenderer`). Width-agnostic — the consuming app
- * applies the reading measure (`max-w-measure`) around it, same as `Prose`.
- */
+/** Reading-content wrapper for a post detail's body (e.g. a `PortableTextRenderer`). */
 export const ArticleBody = ({
   children,
   className,

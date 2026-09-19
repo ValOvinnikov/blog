@@ -10,10 +10,7 @@ export type TTextProps = IWithClassName &
     children?: ReactNode;
   };
 
-/**
- * Text — the body-copy paragraph primitive: applies a `variant` from the type
- * scale to a `<p>`. Use for prose and captions; headings belong to `Heading`.
- */
+/** The body-copy paragraph primitive: applies a `variant` from the type scale to a `<p>`. */
 export const Text = ({
   variant,
   className,

@@ -40,13 +40,7 @@ const getInitials = (name: string): string => {
   return localPart.slice(0, 2).toUpperCase();
 };
 
-/**
- * Avatar atom — renders a provided image, or an initials badge derived
- * from `name` when no image is supplied. `onImageError` forwards the
- * native `<img>` load-failure event so a stateful caller can swap `src`
- * to `undefined` and trigger the same initials fallback on a runtime
- * load failure.
- */
+/** Renders a provided image, or an initials badge derived from `name` when no image is supplied. */
 export const Avatar = ({
   src,
   alt,

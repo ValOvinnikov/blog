@@ -11,20 +11,14 @@ import { cardMetaVariants } from './card-meta-variants';
 
 export type TCardMetaProps = IWithClassName &
   IWithDataTestId & {
-    /** ISO-8601 date string placed in `<time dateTime>`. */
     dateValue: string;
-    /** Human-readable date string, pre-formatted by the web layer. */
     dateLabel: string;
-    /** Optional reading time (e.g. "9 min"). Omitting hides the segment and its separator. */
     readingTime?: string;
   };
 
 const s = cardMetaVariants();
 
-/**
- * CardMeta — compact metadata row for cards.
- * Renders: ❯ date [· readingTime]
- */
+/** Compact metadata row for cards. */
 export const CardMeta = ({
   dateValue,
   dateLabel,

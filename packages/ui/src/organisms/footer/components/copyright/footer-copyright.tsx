@@ -5,14 +5,10 @@ import { footerCopyrightVariants } from './footer-copyright-variants';
 export type TFooterCopyrightProps = IWithClassName &
   IWithDataTestId & {
     title: string;
-    /** The year shown in "© {year} {title}", computed by the caller. */
     year: number;
   };
 
-/**
- * FooterCopyright — the copyright line in the site `Footer`, rendering
- * "© {year} {title}".
- */
+/** The copyright line in the site `Footer`, rendering "© {year} {title}". */
 export const FooterCopyright = ({
   title,
   year,

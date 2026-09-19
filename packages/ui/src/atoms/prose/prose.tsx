@@ -9,12 +9,7 @@ export type TProseProps = IWithClassName &
     children?: ReactNode;
   };
 
-/**
- * Typography wrapper for long-form body text. Applies consistent font,
- * color, line-height, and size to whatever rich-text markup a consumer
- * (e.g. a `PortableTextRenderer` in `apps/web`) renders as `children`.
- * Width-agnostic — the consuming app applies `max-w-measure` around it.
- */
+/** Typography wrapper for long-form body text. */
 export const Prose = ({
   size,
   className,

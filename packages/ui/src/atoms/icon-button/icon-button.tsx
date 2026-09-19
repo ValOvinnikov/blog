@@ -19,22 +19,14 @@ export type TIconButtonProps = IWithClassName &
     onClick?: MouseEventHandler<HTMLButtonElement>;
     isDisabled?: boolean;
     isInert?: boolean;
-    /** Section-ground hover for the `control` variant; unused by the others. Defaults to the PRIMARY/SECONDARY tint hover. */
     tone?: TBrandVariant;
     'aria-expanded'?: AriaAttributes['aria-expanded'];
     'aria-controls'?: AriaAttributes['aria-controls'];
     'aria-haspopup'?: AriaAttributes['aria-haspopup'];
-    /** Forwarded to the underlying `<button>` so a caller composing this component (or managing focus directly) can reach the real node. */
     ref?: Ref<HTMLButtonElement>;
   };
 
-/**
- * A compact button for icon, labelled, or avatar-triggered actions: a 22×22
- * icon-only default, a `bordered` variant sized to its text label, a 32×32
- * circular `avatar` variant, and a 36×36 outlined `control` variant for a
- * standalone control (e.g. carousel navigation). Pass `ariaLabel` — no
- * hardcoded accessible name.
- */
+/** A compact button for icon, labelled, or avatar-triggered actions: a 22×22 icon-only default, a `bordered` variant sized to its text label, a 32×32 circular `avatar` variant, and a 36×36 outlined `control` variant for a standalone control (e.g. carousel navigation). */
 export const IconButton = ({
   ariaLabel,
   title,

@@ -12,10 +12,7 @@ export type THeroSocialProps = IWithClassName &
     children?: ReactNode;
   };
 
-/**
- * HeroSocial — the trailing slot of a `Hero`, rendered after `Hero.Cta`; a
- * styled `<div>` for the caller's own social links, typically a labelled list.
- */
+/** The trailing slot of a `Hero`, rendered after `Hero.Cta`; a styled `<div>` for the caller's own social links, typically a labelled list. */
 export const HeroSocial = ({
   contentAlignment,
   className,

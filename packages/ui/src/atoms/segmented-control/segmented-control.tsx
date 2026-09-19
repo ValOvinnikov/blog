@@ -22,25 +22,7 @@ export type TSegmentedControlProps<TValue extends string = string> =
 
 const s = segmentedControlVariants();
 
-/**
- * SegmentedControl — a fully controlled switch between a small, mutually
- * exclusive set of views (e.g. a reader's chosen depth for an article). The
- * root is a `div[role="radiogroup"]`, not a labelable element, so it must
- * never be paired with `<label htmlFor>` — the accessible name comes
- * entirely from the required `ariaLabel` prop.
- *
- * @example
- * <SegmentedControl
- *   ariaLabel="Reading depth"
- *   options={[
- *     { value: DEPTH.SKIM, label: '30s' },
- *     { value: DEPTH.READ, label: 'Read' },
- *     { value: DEPTH.DEEP, label: 'Deep' },
- *   ]}
- *   value={depth}
- *   onChange={setDepth}
- * />
- */
+/** A fully controlled switch between a small, mutually exclusive set of views (e.g. a reader's chosen depth for an article). */
 export const SegmentedControl = <TValue extends string = string>({
   options,
   value,

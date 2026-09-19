@@ -2,11 +2,7 @@ import type { EmblaCarouselType } from 'embla-carousel';
 import useEmblaCarousel from 'embla-carousel-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-/**
- * Owns the Embla instance behind `Carousel` — the enhancement state, the
- * previous/next disabled flags, the scroll-position handoff on mount, and
- * the focus handling that keeps a disabling nav button from dropping focus.
- */
+/** Owns the Embla instance behind `Carousel`, including the focus handoff that keeps a disabling nav button from dropping focus. */
 export const useCarousel = () => {
   const [isEnhanced, setIsEnhanced] = useState(false);
   const [isPreviousDisabled, setIsPreviousDisabled] = useState(true);

@@ -22,13 +22,9 @@ export interface INavItem {
 }
 
 export type TPrimaryNavigationMobileToggleProps = {
-  /** Whether the mobile dropdown panel is currently open — drives `aria-expanded` on the toggle button, the toggle icon, and the panel's visibility. The caller (`apps/web`) owns the open/closed state. */
   isOpen: boolean;
-  /** Click handler wired to the toggle button — the caller owns the state transition. */
   onToggle: () => void;
-  /** Accessible name for the toggle button — never hardcoded here. */
   ariaLabel: string;
-  /** Shared id linking the toggle's `aria-controls` to the dropdown panel's `id`. */
   panelId: string;
 };
 
@@ -37,19 +33,11 @@ export type TPrimaryNavigationProps = IWithClassName &
     links: INavItem[];
     actions?: ReactNode;
     ariaLabel?: string;
-    /** Component each NavLink renders as — defaults to a plain `<a>`. Pass the app router's Link to get client-side navigation. */
     linkAs?: TAnchorElementType;
-    /** Enables the responsive mobile toggle + dropdown panel below the `lg` breakpoint: the inline links hide, a hamburger toggle appears, and a dropdown panel holding the same links shows/hides with `isOpen`. Omit to keep links always inline (today's behaviour). */
     mobileToggle?: TPrimaryNavigationMobileToggleProps;
   };
 
-/**
- * PrimaryNavigation — top-level `<nav>` landmark composing `NavLink` items
- * with an optional trailing `actions` slot (e.g. a theme toggle or menu
- * button). Pass `mobileToggle` to collapse the links behind a hamburger
- * toggle + dropdown panel below the `lg` breakpoint — purely presentational,
- * the caller owns the open/closed state.
- */
+/** Top-level `<nav>` landmark composing `NavLink` items with an optional trailing `actions` slot (e.g. a theme toggle or menu button). */
 export const PrimaryNavigation = ({
   links,
   actions,

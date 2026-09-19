@@ -13,17 +13,7 @@ export type TAsideProps = IWithClassName &
 
 const s = asideVariants();
 
-/**
- * Aside molecule — an inline deep-dive digression rendered alongside a
- * post's body copy, visually set apart from the surrounding prose. `kind`
- * selects which flavour of digression it is; `label` and `children` are
- * supplied by the caller.
- *
- * @example
- * <Aside kind={ASIDE_KIND.DIGRESSION} label="Digression">
- *   <p>...</p>
- * </Aside>
- */
+/** An inline deep-dive digression rendered alongside a post's body copy, visually set apart from the surrounding prose. */
 export const Aside = ({
   kind,
   label,

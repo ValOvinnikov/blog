@@ -31,26 +31,16 @@ export type TNewsletterSignupFullProps = IWithClassName &
     headingId?: string;
     supportingText?: string;
     errorMessage?: string;
-    /** Caller-generated so two instances on one page never collide. */
     errorMessageId?: string;
     successMessage?: string;
     submitLabel: string;
     emailAriaLabel: string;
     placeholder?: string;
-    /** Reassurance row (e.g. "no spam", "unsubscribe in one line") rendered under the pitch copy. Omit to skip the row entirely. */
     trustCues?: INewsletterSignupTrustCue[];
-    /** Horizontal alignment of the pitch pane's heading, supporting text, and trust cues. Defaults to left. */
     align?: TNewsletterSignupVariants['align'];
   };
 
-/**
- * `NewsletterSignup.Full` — the rich, tinted panel signup form used
- * by the site footer and the CMS page-builder module. Pure and controlled:
- * it holds no state of its own and performs no email validation (the caller
- * supplies `errorMessage` for any invalid/duplicate/server failure), driven
- * entirely by the `status` prop. Splits into a pitch pane and a form pane
- * side by side on desktop, stacking to one column on mobile.
- */
+/** The rich, tinted panel signup form used by the site footer and the CMS page-builder module. */
 export const NewsletterSignupFull = ({
   email,
   onChange,

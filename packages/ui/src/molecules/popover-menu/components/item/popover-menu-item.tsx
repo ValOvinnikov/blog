@@ -16,12 +16,7 @@ type TPopoverMenuItemOwnProps = TPopoverMenuItemVariants & {
 export type TPopoverMenuItemProps<C extends ElementType = 'button'> =
   TPolymorphicProps<C, TPopoverMenuItemOwnProps> & IWithDataTestId;
 
-/**
- * PopoverMenuItem — a single rounded-rectangle row inside a `PopoverMenu.Panel`
- * (`role="menuitem"`). Renders as a `<button>` by default (e.g. "Copy link");
- * pass `as` for a link-style item (e.g. `as="a"` or a router `Link` for
- * "Share on X"/"Share on LinkedIn").
- */
+/** A single rounded-rectangle row inside a `PopoverMenu.Panel` (`role="menuitem"`). */
 export const PopoverMenuItem = <C extends ElementType = 'button'>({
   as,
   icon,

@@ -6,11 +6,6 @@ export type TColorTableProps = {
   tokens: TToken[];
 };
 
-/**
- * Table of colour tokens: `token · role · light · dark`. Each swatch renders
- * the token via `var()` inside the matching theme scope, so both modes show
- * their true colour side by side (no live `getComputedStyle` needed).
- */
 export const ColorTable = ({ tokens }: TColorTableProps) => (
   <table className="w-full text-left">
     <thead>

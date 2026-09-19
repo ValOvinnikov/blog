@@ -30,9 +30,7 @@ export const newsletterSignupVariants = tv({
     spinner: ['text-brand-primary-contrast'],
     label: ['font-mono text-copy text-text'],
     alert: [],
-    // `prefix` + `label` group for `compact` — kept in its own inline-flex
-    // wrapper so the two never split across rows under the root's own
-    // `flex-col`/`sm:flex-row` stacking.
+    // Its own inline-flex wrapper so `prefix` + `label` never split across rows under the root's own `flex-col`/`sm:flex-row` stacking.
     promptGroup: ['inline-flex shrink-0 items-center gap-1'],
   },
   variants: {

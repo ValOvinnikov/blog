@@ -20,13 +20,7 @@ export type TBookmarkToggleProps = IWithClassName &
     isDisabled?: boolean;
   };
 
-/**
- * BookmarkToggle — a pure, controlled icon+label toggle for saving a post to
- * read later. The consumer owns the bookmarked state and its persistence;
- * this component only reflects it (`aria-pressed`, icon fill, visible
- * `label` text) and reports the reader's intent (`onToggle`). The outline
- * glyph fills solid when bookmarked, no separate icon asset is swapped.
- */
+/** A pure, controlled icon+label toggle for saving a post to read later. */
 export const BookmarkToggle = ({
   isBookmarked,
   onToggle,

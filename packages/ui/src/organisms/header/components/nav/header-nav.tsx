@@ -9,10 +9,7 @@ export type THeaderNavProps = IWithClassName &
     children?: ReactNode;
   };
 
-/**
- * HeaderNav — the primary navigation region of the site `Header`; a labelled
- * `<nav>` wrapping the header links.
- */
+/** The primary navigation region of the site `Header`; a labelled `<nav>` wrapping the header links. */
 export const HeaderNav = ({
   className,
   ariaLabel,

@@ -28,15 +28,7 @@ export type TPopoverMenuProps = IWithClassName &
     children?: TCompoundChildren<typeof PopoverMenuSlotParts>;
   };
 
-/**
- * PopoverMenu — positioned trigger + non-modal menu panel primitive
- * (`PopoverMenu.Trigger`, `PopoverMenu.Panel`, `PopoverMenu.Item`,
- * `PopoverMenu.Separator`). Pure
- * structure/ARIA/styling: open/closed state, focus trap, and Escape/
- * outside-click dismissal are the caller's responsibility, since `@blog/ui`
- * never carries client-side state or a `"use client"` directive. `apps/web`
- * composes a client wrapper around this that owns that behaviour.
- */
+/** Positioned trigger + non-modal menu panel primitive (`PopoverMenu.Trigger`, `PopoverMenu.Panel`, `PopoverMenu.Item`, `PopoverMenu.Separator`). */
 const PopoverMenuRoot = ({
   children,
   className,

@@ -8,11 +8,7 @@ export type TInlineCodeProps = IWithClassName &
     children?: ReactNode;
   };
 
-/**
- * InlineCode atom — a single `<code>` token styled for inline use within
- * running text (e.g. Portable Text `code` marks). For fenced/multi-line code
- * blocks, use a dedicated block-level component instead.
- */
+/** A single `<code>` token styled for inline use within running text (e.g. Portable Text `code` marks). */
 export const InlineCode = ({
   className,
   children,

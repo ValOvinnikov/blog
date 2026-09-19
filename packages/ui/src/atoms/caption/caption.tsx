@@ -8,10 +8,7 @@ export type TCaptionProps = IWithClassName &
     children?: ReactNode;
   };
 
-/**
- * Accessible caption for a media element. Renders as `<figcaption>` and should
- * be placed inside a `<figure>` alongside `MediaFrame`.
- */
+/** Accessible caption for a media element. */
 export const Caption = ({ className, children, dataTestId }: TCaptionProps) => {
   return (
     <figcaption

@@ -136,8 +136,7 @@ export const ctaModuleVariants = tv({
       position: CONTENT_ALIGNMENT.RIGHT,
       class: { body: ['md:order-2'] },
     },
-    // A centered Callout still reads lists left-aligned within the centered
-    // block — a fully centered list separates markers from their text.
+    // A centered Callout still reads lists left-aligned within the centered block — a fully centered list separates markers from their text.
     {
       variant: CTA_VARIANT.CALLOUT,
       alignment: CONTENT_ALIGNMENT.CENTER,

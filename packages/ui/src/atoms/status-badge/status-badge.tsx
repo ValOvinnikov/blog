@@ -12,11 +12,7 @@ export type TStatusBadgeProps = IWithClassName &
     children?: ReactNode;
   };
 
-/**
- * StatusBadge — a small inline pill signalling a state such as "subscribed",
- * "pending confirmation", or "not linked". Colour is never the only signal —
- * pair it with adjacent text carrying the same meaning.
- */
+/** A small inline pill signalling a state such as "subscribed", "pending confirmation", or "not linked". */
 export const StatusBadge = ({
   tone,
   className,

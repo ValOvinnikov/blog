@@ -11,17 +11,11 @@ interface ITagListItem {
 
 export type TTagListProps = IWithClassName &
   IWithDataTestId & {
-    /** Plain labels render as spans; pass `{ label, href }` to make a tag a link. */
     tags: (string | ITagListItem)[];
-    /** Component linked tags render as — pass the app router's Link for client-side navigation. */
     linkAs?: TAnchorElementType;
   };
 
-/**
- * TagList — renders a row of `Tag`s from a mixed list of plain labels and
- * `{ label, href }` links; pass `linkAs` (e.g. the app router's `Link`) for
- * client-side navigation on the linked ones. Renders nothing when `tags` is empty.
- */
+/** Renders a row of `Tag`s from a mixed list of plain labels and `{ label, href }` links; pass `linkAs` (e.g. the app router's `Link`) for client-side navigation on the linked ones. */
 export const TagList = ({
   tags,
   linkAs,

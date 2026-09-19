@@ -14,12 +14,7 @@ export type TProseLinkProps<C extends ElementType = 'a'> = TPolymorphicProps<
   TProseLinkOwnProps
 >;
 
-/**
- * ProseLink atom — the accent/underline treatment for inline links inside
- * Portable Text article body copy. Inherits the surrounding font size and
- * stays inline (no forced block display); polymorphic via `as` so `apps/web`
- * can pass `SmartLink` for internal navigation.
- */
+/** The accent/underline treatment for inline links inside Portable Text article body copy. */
 export const ProseLink = <C extends ElementType = 'a'>({
   className,
   dataTestId,

@@ -20,10 +20,8 @@ export type TNewsletterSignupCompactProps = IWithClassName &
     status: TFormStatus;
     heading: string;
     headingId?: string;
-    /** Decorative glyph or icon rendered ahead of `heading`, e.g. a `$` prompt — rendered as-is; the caller owns its wrapper, styling, and accessibility. */
     prefix?: ReactNode;
     errorMessage?: string;
-    /** Caller-generated so two instances on one page never collide. */
     errorMessageId?: string;
     successMessage?: string;
     submitLabel: string;
@@ -31,13 +29,7 @@ export type TNewsletterSignupCompactProps = IWithClassName &
     placeholder?: string;
   };
 
-/**
- * `NewsletterSignup.Compact` — a slim single-row subscribe strip for the end
- * of every article. Shares the same idle/submitting/success/error state
- * machine as `NewsletterSignup.Full`, driven entirely by the `status` prop;
- * has no room for a description. `prefix` and `heading` stay visible through
- * every state, including success.
- */
+/** A slim single-row subscribe strip for the end of every article. */
 export const NewsletterSignupCompact = ({
   email,
   onChange,

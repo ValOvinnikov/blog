@@ -9,19 +9,10 @@ import {
 export type TContentModuleProps = IWithClassName &
   IWithDataTestId & {
     children: ReactNode;
-    /**
-     * Drops this component's own top margin. Set when a parent (e.g. `Section`)
-     * already owns the vertical spacing around it, so the two don't stack.
-     */
     isWrapped?: TContentModuleVariants['wrapped'];
   };
 
-/**
- * ContentModule — page-builder organism rendering a portable-text content
- * block. Renders no heading of its own — `body` is free-form rich text that
- * can carry its own headings, so a separate structured heading field would
- * just be a second way to do the same thing.
- */
+/** Page-builder organism rendering a portable-text content block. */
 export const ContentModule = ({
   children,
   className,

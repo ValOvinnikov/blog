@@ -20,10 +20,7 @@ export type TFooterProps = IWithClassName &
     children?: TCompoundChildren<typeof FooterParts>;
   };
 
-/**
- * Footer — the site footer shell; composes `Footer.Nav` and `Footer.Copyright`
- * slots into a `<footer>`. Structure only — each slot owns its own content.
- */
+/** The site footer shell; composes `Footer.Nav` and `Footer.Copyright` slots into a `<footer>`. */
 const FooterRoot = ({ children, className, dataTestId }: TFooterProps) => {
   const { slots, unmatched } = mapCompoundSlots(children, FooterParts);
   return (

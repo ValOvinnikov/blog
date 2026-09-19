@@ -7,17 +7,12 @@ import { mediaCardTitleVariants } from './media-card-title-variants';
 
 export type TMediaCardTitleProps = IWithClassName &
   IWithDataTestId & {
-    /** Heading depth for the title — the caller decides based on where the card sits in the page outline. */
     level: THeadingLevel;
-    /** Set by `MediaCard` on lead cards — renders the title at display size instead of the standard card size. */
     isLead?: boolean;
     children?: ReactNode;
   };
 
-/**
- * MediaCardTitle — the heading inside a `MediaCard`, rendered at the
- * caller-specified heading depth with the card title's visual treatment.
- */
+/** The heading inside a `MediaCard`, rendered at the caller-specified heading depth with the card title's visual treatment. */
 export const MediaCardTitle = ({
   level,
   isLead,

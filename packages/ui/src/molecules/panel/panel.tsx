@@ -20,12 +20,7 @@ export type TPanelProps = IWithClassName &
     children?: TCompoundChildren<typeof PanelSlotParts>;
   };
 
-/**
- * Panel — a bordered, rounded surface with a titled header bar above a
- * padded body, framing a self-contained feature (auth, account settings,
- * bookmarks, newsletter) as one distinct block on the page. Composes
- * `Panel.Header` and `Panel.Body`.
- */
+/** A bordered, rounded surface with a titled header bar above a padded body, framing a self-contained feature (auth, account settings, bookmarks, newsletter) as one distinct block on the page. */
 const PanelRoot = ({ children, className, dataTestId }: TPanelProps) => {
   const { slots, unmatched } = mapCompoundSlots(children, PanelSlotParts);
 

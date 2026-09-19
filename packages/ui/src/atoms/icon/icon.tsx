@@ -12,15 +12,7 @@ export type TIconProps = IWithClassName &
     'aria-hidden'?: AriaAttributes['aria-hidden'];
   };
 
-/**
- * Icon — renders any icon from the bespoke icon set by name. Each SVG
- * already carries its own fill/stroke/currentColor styling and stroke-width
- * — this component has no stroke-vs-fill branching, it just looks up and
- * renders the matching SVGR component from the registry. Decorative by
- * default: with no `aria-label`, it renders `aria-hidden="true"` so callers
- * don't have to remember it; pass `aria-label` for a meaningful icon, or
- * `aria-hidden` explicitly to override either default.
- */
+/** Renders any icon from the bespoke icon set by name. */
 export const Icon = ({
   name,
   size,

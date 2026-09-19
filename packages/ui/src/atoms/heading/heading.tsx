@@ -23,17 +23,7 @@ const defaultSizes: Record<THeadingLevel, TSize> = {
   4: SIZE.MD,
 };
 
-/**
- * Semantic heading — `level` picks the rendered `h1`–`h4` tag for the page
- * outline, independently of `visual`, which drives the rendered size instead
- * (e.g. a deep Portable Text heading can still read as subordinate to the
- * page's title).
- *
- * @example
- * <Heading level={2} visual="prose-h2">{block.text}</Heading>
- * <Heading level={3} visual="prose-h3">{block.text}</Heading>
- * <Heading level={4} visual="prose-h4">{block.text}</Heading>
- */
+/** Semantic heading — `level` picks the rendered `h1`–`h4` tag for the page outline, independently of `visual`, which drives the rendered size instead (e.g. a deep Portable Text heading can still read as subordinate to the page's title). */
 export const Heading = ({
   level,
   visual,

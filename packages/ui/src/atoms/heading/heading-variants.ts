@@ -10,9 +10,7 @@ export const headingVariants = tv({
       post: ['text-post-title leading-[1.07] tracking-tight-display'],
       card: ['text-card-title leading-[1.2] tracking-tight-card'],
       section: ['text-title-2xl leading-[1.2] tracking-tight-display'],
-      // Deliberately smaller than `post` (text-post-title) at every viewport
-      // width — roughly 0.3–0.6rem of headroom throughout — so an
-      // in-article body h2 never outsizes the page's own post title.
+      // Deliberately smaller than `post` at every viewport width, so an in-article body h2 never outsizes the page's own post title.
       'prose-h2': ['text-prose-h2 leading-[1.15] tracking-[-0.015em]'],
       'prose-h3': ['text-prose-h3 leading-[1.2] tracking-[-0.01em]'],
       'prose-h4': ['text-prose-h4 leading-[1.3] tracking-[-0.005em]'],

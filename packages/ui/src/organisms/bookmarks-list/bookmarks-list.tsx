@@ -7,9 +7,7 @@ import { bookmarksListVariants } from './bookmarks-list-variants';
 
 export interface IBookmarkRow {
   id: string;
-  /** Pre-formatted by web, e.g. "Aug 01". */
   formattedDate: string;
-  /** e.g. "static-first-rendering.md" — web derives this from the post slug. */
   filename: string;
   href: string;
 }
@@ -18,19 +16,12 @@ export type TBookmarksListProps = IWithClassName &
   IWithDataTestId & {
     rows: IBookmarkRow[];
     emptyMessage: string;
-    /** Summary line rendered below the listing when `rows` isn't empty, e.g. "3 saved". */
     hint?: string;
-    /** Arbitrary node rendered before each row's date, e.g. a `drwx`-style permission string or icon — rendered as-is with no wrapper, so the caller owns its element, styling, and accessibility. Same content for every row; omitted when not supplied. */
     prefix?: ReactNode;
-    /** Component each row's filename link renders as — defaults to a plain `<a>`. Pass the app router's Link for client-side navigation. */
     linkAs?: TAnchorElementType;
   };
 
-/**
- * BookmarksList — renders a reader's saved posts as one row per bookmark,
- * each with a date and a link to the post, or `emptyMessage` when there are
- * none.
- */
+/** Renders a reader's saved posts as one row per bookmark, each with a date and a link to the post, or `emptyMessage` when there are none. */
 export const BookmarksList = ({
   rows,
   emptyMessage,

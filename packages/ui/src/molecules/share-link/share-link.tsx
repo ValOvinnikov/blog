@@ -12,18 +12,10 @@ export interface IShareLinkItem extends IWithIcon {
 export type TShareLinkProps = IShareLinkItem &
   IWithClassName &
   IWithDataTestId & {
-    /** Component this share link renders as — defaults to a plain `<a>`. Pass the app router's Link to get client-side navigation. */
     as?: TAnchorElementType;
   };
 
-/**
- * ShareLink molecule — a single external share action (e.g. "Share on X"),
- * rendered through `LinkButton` with `target="_blank"` and
- * `rel="noopener noreferrer"` baked in, since every share link opens the
- * target platform in a new tab. Used by the author page for a person's social
- * links. It never builds the `href` itself — `apps/web` constructs the
- * platform-specific share URL and passes it in as plain data.
- */
+/** A single external share action (e.g. "Share on X"), rendered through `LinkButton` with `target="_blank"` and `rel="noopener noreferrer"` baked in, since every share link opens the target platform in a new tab. */
 export const ShareLink = ({
   href,
   label,
@@ -32,11 +24,7 @@ export const ShareLink = ({
   dataTestId,
   as,
 }: TShareLinkProps) => {
-  // Widened for LinkButton's `as` slot: the restricted `TAnchorElementType`
-  // union (no `rel`) would otherwise reject the `rel` prop below. The clean
-  // fix is adding `rel` to `TAnchorElementType`
-  // (packages/config/src/react/polymorphic.ts), but that's a config-layer
-  // change left as a follow-up.
+  // Widened for LinkButton's `as` slot: the restricted `TAnchorElementType` union (no `rel`) would otherwise reject the `rel` prop below.
   const asElement = as as ElementType | undefined;
 
   return (

@@ -11,35 +11,20 @@ import { articleHeaderVariants } from './article-header-variants';
 
 export interface IArticleHeaderTopic {
   label: string;
-  /** Link target for the topic label — omit to render plain (non-linked) text. */
   href?: string;
-  /** Component the topic link renders as — pass the app router's Link for client-side navigation. Defaults to a plain `<a>`. */
   linkAs?: TAnchorElementType;
 }
 
 export type TArticleHeaderProps = IWithClassName &
   IWithDataTestId & {
     title: string;
-    /**
-     * Topic eyebrow rendered above the title as non-heading markup (a `<p>`,
-     * or a link when `href` is given) — never an `<h*>`, so it can't compete
-     * with the post's `<h1>`. Omit to render no eyebrow.
-     */
     topic?: IArticleHeaderTopic;
-    /** Lead paragraph rendered below the title, inside the heading column. Omit to render no lead. */
     lead?: string;
-    /** Forwarded to `PostMeta` as-is (author, publishedAt, formattedDate, readingTimeMinutes?, share?). Rendered inside the heading column, below the lead paragraph. Omit to render no `PostMeta` strip. */
     meta?: Omit<TPostMetaProps, 'className' | 'dataTestId'>;
-    /** Opaque cover media slot (e.g. a wrapped `SanityImage`), rendered below the metadata strip, capped at `max-w-page` (1120px). Omit to render no cover media. */
     coverMedia?: ReactNode;
   };
 
-/**
- * Article.Header — post detail heading area: topic eyebrow, title,
- * lead paragraph, metadata strip, and an optional wide cover media slot.
- * Breadcrumb navigation stays a separate, page-composed concern — the
- * eyebrow here is a visual topic label, not a nav landmark.
- */
+/** Post detail heading area: topic eyebrow, title, lead paragraph, metadata strip, and an optional wide cover media slot. */
 export const ArticleHeader = ({
   title,
   topic,

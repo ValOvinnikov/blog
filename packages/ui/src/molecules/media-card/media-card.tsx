@@ -33,10 +33,7 @@ export type TMediaCardProps = IWithClassName &
     children?: TCompoundChildren<typeof MediaCardParts>;
   };
 
-/**
- * MediaCard — a media-led summary card for any linked item, rendered as an
- * `<article>`.
- */
+/** A media-led summary card for any linked item, rendered as an `<article>`. */
 const MediaCardRoot = ({
   excerpt,
   tags,
