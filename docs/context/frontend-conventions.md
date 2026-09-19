@@ -52,7 +52,7 @@ configured:
 - **Next.js/Turbopack** (`configs/next/preset.ts`, the `createNextConfig`
   preset both apps' `next.config.ts` call) — `turbopack.rules` with
   `@svgr/webpack`, split by a `condition.query` match on `?url`. `@blog/ui`
-  ships from source (`apps/web`'s `transpilePackages`), so Turbopack sees
+  ships from source (each app's `transpilePackages`), so Turbopack sees
   these imports directly wherever `@blog/ui` is consumed.
 - **Storybook** (`packages/ui/.storybook/main.ts`, `apps/web/.storybook/main.ts`)
   and **Vitest** (`packages/ui/vitest.config.ts`, `apps/web/vitest.config.ts`)
