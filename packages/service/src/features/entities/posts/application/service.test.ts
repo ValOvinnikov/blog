@@ -29,21 +29,6 @@ vi.mock(
 const tenant = makeTenant();
 
 describe(createPostsService, () => {
-  it('exposes v1.getPostsByIds as a function', () => {
-    const svc = createPostsService();
-    expect(typeof svc.v1.getPostsByIds).toBe('function');
-  });
-
-  it('exposes v1.getAllPublishedPosts as a function', () => {
-    const svc = createPostsService();
-    expect(typeof svc.v1.getAllPublishedPosts).toBe('function');
-  });
-
-  it('exposes v1.getPublishedPostsByTag as a function', () => {
-    const svc = createPostsService();
-    expect(typeof svc.v1.getPublishedPostsByTag).toBe('function');
-  });
-
   it('threads tenant context through to the id-list loader', async () => {
     vi.mocked(getPostsByIds).mockResolvedValue([]);
 

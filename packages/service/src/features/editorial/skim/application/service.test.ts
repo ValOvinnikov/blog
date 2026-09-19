@@ -12,16 +12,6 @@ const mockSaveSkimDraft = vi.mocked(saveSkimDraft);
 const tenant = makeTenant();
 
 describe('createSkimService', () => {
-  it('exposes v1.getPublishedPostBody as a function', () => {
-    const svc = createSkimService();
-    expect(typeof svc.v1.getPublishedPostBody).toBe('function');
-  });
-
-  it('exposes v1.saveSkimDraft as a function', () => {
-    const svc = createSkimService();
-    expect(typeof svc.v1.saveSkimDraft).toBe('function');
-  });
-
   describe('v1.getPublishedPostBody', () => {
     it('resolves ok:true with the loader data on success', async () => {
       mockGetPublishedPostBody.mockResolvedValue([]);

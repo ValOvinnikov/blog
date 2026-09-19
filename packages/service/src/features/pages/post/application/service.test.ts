@@ -10,16 +10,6 @@ const mockGetPost = vi.mocked(getPost);
 const tenant = makeTenant();
 
 describe('createPostService', () => {
-  it('exposes v1.getPost as a function', () => {
-    const svc = createPostService();
-    expect(typeof svc.v1.getPost).toBe('function');
-  });
-
-  it('exposes v1.getPostParams as a function', () => {
-    const svc = createPostService();
-    expect(typeof svc.v1.getPostParams).toBe('function');
-  });
-
   describe('v1.getPost', () => {
     it('resolves ok:true with the loader data on success', async () => {
       const post = { title: 'Hello' } as unknown as TPostDetail;
