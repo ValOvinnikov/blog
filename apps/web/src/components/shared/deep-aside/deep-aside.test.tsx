@@ -9,11 +9,6 @@ const setup = customRender(DeepAside, {
   children: <p>Because Y.</p>,
 });
 
-// The DEEP-only visibility gate is pure presentation (a static Tailwind
-// class pair, never data/state-driven from this component's own props) —
-// no unit-test surface per `testing-practices`; covered visually via
-// `BlogPostPage`'s depth-toggle behaviour and Storybook, not a class
-// assertion here.
 describe(`<${DeepAside.name}/>`, () => {
   it('renders the Aside molecule with its label and content', () => {
     setup();

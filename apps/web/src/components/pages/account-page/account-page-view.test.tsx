@@ -3,11 +3,6 @@ import { makeAccountPageView } from '@web/testing/pages/account-page/fixtures';
 
 import { AccountPageView } from './account-page-view';
 
-// `makeAccountPageView`'s default fixture composes the real
-// `IdentitySectionView`/`NewsletterSectionView`, imported via their
-// section's barrel — which also re-exports the wrapper (`IdentitySection`/
-// `NewsletterSection`), so loading it evaluates the wrapper's `auth()`
-// import too.
 vi.mock('@web/server/auth/auth', () => ({ auth: vi.fn() }));
 
 vi.mock('@web/components/shared/delete-account-control', () => ({

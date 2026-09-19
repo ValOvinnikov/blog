@@ -13,9 +13,6 @@ const {
   routerRefreshMock: vi.fn(),
   signInMock: vi.fn(),
   unlinkProviderActionMock: vi.fn(),
-  // Mirrors the real `toast.promise`'s contract closely enough for these
-  // tests: it forwards the given promise unchanged, so awaiting/rejecting it
-  // in the component under test behaves the same as the real store.
   toastPromiseMock: vi.fn((promise: Promise<unknown>) => promise),
 }));
 
@@ -24,10 +21,6 @@ type TToastPromiseCallArgs = [
   messages: { error: (error: unknown) => { message: string } },
 ];
 
-// `next/navigation` is already globally mocked (`vitest-setup.ts`), but its
-// default `useRouter` stub returns a brand-new `refresh: vi.fn()` on every
-// call — this override pins a stable `refresh` mock this suite can assert
-// against.
 vi.mocked(useRouter).mockReturnValue({
   push: vi.fn(),
   replace: vi.fn(),

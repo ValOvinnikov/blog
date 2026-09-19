@@ -17,11 +17,6 @@ export type TLandingBreadcrumbsProps = {
   tenant: string;
 };
 
-/**
- * LandingBreadcrumbs — the standalone `/{slug}` page's Home trail,
- * rendered alongside its `BreadcrumbList` JSON-LD. Fetches the cached page
- * and its own `breadcrumbs` copy.
- */
 export const LandingBreadcrumbs = async ({
   slug,
   tenant,

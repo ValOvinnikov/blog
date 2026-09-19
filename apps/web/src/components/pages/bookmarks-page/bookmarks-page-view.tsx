@@ -28,10 +28,8 @@ export interface IBookmarksPageViewProps {
 }
 
 /**
- * Pure view for `BookmarksPage`: the page heading plus a `Panel` framing the
- * resolved bookmark list. `posts` is the already auth/tenant/db-resolved,
- * post-joined bookmark list — this component has no knowledge of auth,
- * tenant, or the db layer.
+ * `posts` is the already auth/tenant/db-resolved, post-joined bookmark
+ * list — this component has no knowledge of auth, tenant, or the db layer.
  */
 export const BookmarksPageView = ({
   heading,

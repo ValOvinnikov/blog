@@ -15,19 +15,11 @@ import { useEffect, useState, useTransition } from 'react';
 import { bookmarkButtonVariants } from './bookmark-button-variants';
 
 export type TBookmarkButtonProps = {
-  /** The post's Sanity `_id` — `blog-post-page` threads this through from its existing `service.pages.post.v1.getPost` fetch, no separate lookup. */
   postId: string;
   className?: string;
 };
 
 /**
- * The article header meta strip's "save for later" client island, composed
- * beside `PostShare` in `PostMeta`'s `share` slot. Wraps the pure
- * `BookmarkToggle` atom; renders nothing when logged out or while the
- * session resolves, and once authenticated toggles optimistically —
- * flipping its own state immediately, then rolling back and showing an
- * error toast on failure.
- *
  * The save/remove toast carries an `undo` action (`performUndo`) that
  * re-applies the opposite value and confirms with its own async-revert-can-
  * fail `info`/`error` toast; that secondary error toast carries no further
@@ -78,13 +70,9 @@ export const BookmarkButton = ({ postId, className }: TBookmarkButtonProps) => {
 
   if (sessionResult.status === 'unauthenticated') return null;
 
-  // The async, can-fail counterpart to `undo` (design doc §4.5) — reverts
-  // the optimistic flip back to whatever it was before `committedValue`, and
-  // confirms via its own `info`/`error` toast. That secondary error toast
-  // carries no `retry` action, so a failed undo can't chain into an
-  // unbounded retry-of-a-retry loop.
   const performUndo = (committedValue: boolean) => {
     const reverted = !committedValue;
+
     setIsBookmarked(reverted);
 
     startTransition(async () => {

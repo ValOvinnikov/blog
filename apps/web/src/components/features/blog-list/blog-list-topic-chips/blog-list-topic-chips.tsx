@@ -6,7 +6,6 @@ export type TBlogListTopicChipsProps = {
   tenant: string;
 };
 
-/** BlogListTopicChips — the blog index's topic-archive navigation row. */
 export const BlogListTopicChips = async ({
   tenant,
 }: TBlogListTopicChipsProps) => {

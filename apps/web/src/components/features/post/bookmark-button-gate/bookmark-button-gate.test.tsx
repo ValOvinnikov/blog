@@ -10,9 +10,6 @@ vi.mock('@web/server/settings-features/is-capability-enabled', () => ({
   isCapabilityEnabled: isCapabilityEnabledMock,
 }));
 
-// `BookmarkButton` calls `useSession()`/`useToast()` unconditionally — a
-// signed-out session (the default here) renders nothing, so a minimal stub
-// mock is enough to prove `BookmarkButtonGate` mounts it at all.
 vi.mock('@web/components/shared/bookmark-button', () => ({
   BookmarkButton: ({ postId }: { postId: string }) => (
     <div data-testid="bookmark-button">{postId}</div>

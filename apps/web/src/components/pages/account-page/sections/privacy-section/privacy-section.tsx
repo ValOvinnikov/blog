@@ -16,8 +16,7 @@ export interface IPrivacySectionProps {
 }
 
 /**
- * PrivacySection — pure, prop-driven: the `/account` "privacy & data"
- * export/delete panel. Needs no wrapper/view split since it does no data
+ * Needs no wrapper/view split since it does no data
  * fetching of its own; `AccountPage` resolves the session-derived `handle`
  * and every translated string and passes them straight in.
  */

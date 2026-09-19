@@ -17,31 +17,16 @@ import { useEffect, useId, useState } from 'react';
 const TRUST_CUE_ICONS = [ICONS.SHIELD_CHECK, ICONS.CLOSE];
 
 type TNewsletterFormProps = {
-  /** `full` (Blog index page-builder module) vs `compact` (post page foot) — see `NewsletterSignup`'s two densities. */
   variant: 'full' | 'compact';
   heading: string;
-  /** Forwarded to the rendered heading's `id`, so an outer landmark's `aria-labelledby` can resolve to it. */
   headingId?: string;
-  /** Ignored for `variant="compact"` — that density has no room for supporting copy. */
   supportingText?: string;
-  /**
-   * Ignored for `variant="compact"` — that density has no room for trust
-   * cues. Absent or empty renders no trust cues; each authored label is
-   * paired with a fixed icon by position (there are never more than two).
-   */
   trustCues?: string[];
-  /** Horizontal alignment of the pitch pane. Ignored for `variant="compact"` — Compact has no alignment control. */
   align?: TContentAlignment;
   className?: string;
 };
 
 /**
- * The double opt-in newsletter signup island, composed into the Blog
- * index page's `module_newsletter` page-builder module and every post
- * page's foot. `heading`/`supportingText`/`trustCues` are always
- * CMS-sourced by the caller — this component never falls back to i18n
- * copy for them.
- *
  * Subscription isn't tied to a session (a signed-out reader can subscribe),
  * so there's no account-based way to know a reader already subscribed;
  * `subscribeToNewsletterAction` sets a long-lived cookie instead, and this

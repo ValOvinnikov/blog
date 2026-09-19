@@ -38,10 +38,6 @@ export interface IBlogListModuleRendererProps {
   children?: ReactNode;
 }
 
-/**
- * BlogListModuleRenderer — the blog list page's own hero and heading
- * fallback, followed by the modules its schema allows.
- */
 export const BlogListModuleRenderer = async ({
   hero,
   headingBlock,

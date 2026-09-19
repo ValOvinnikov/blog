@@ -6,11 +6,8 @@ import { useEffect, useRef, useState } from 'react';
 export type TEmailStep = 'collapsed' | 'expanded' | 'submitting' | 'sent';
 
 /**
- * useEmailSignIn — the email (magic-link) sub-flow's state machine for
- * `SignInMenu`'s inline-expanding "Continue with email" item: its own step
- * state, form field, error, focus-on-expand, and submit handling. `open`
- * (the parent popover's own open/close state) is passed in as a parameter
- * rather than read here, since it's owned by `AuthMenu`'s single
+ * `open` (the parent popover's own open/close state) is passed in as a
+ * parameter rather than read here, since it's owned by `AuthMenu`'s single
  * `usePopover()` call, not by this hook.
  */
 export const useEmailSignIn = (open: boolean) => {

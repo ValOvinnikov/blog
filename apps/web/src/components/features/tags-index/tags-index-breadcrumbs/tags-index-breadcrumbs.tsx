@@ -14,10 +14,6 @@ export type TTagsIndexBreadcrumbsProps = {
   tenant: string;
 };
 
-/**
- * TagsIndexBreadcrumbs — the tags index's Home › Tags trail, rendered
- * alongside its `BreadcrumbList` JSON-LD.
- */
 export const TagsIndexBreadcrumbs = async ({
   tenant,
 }: TTagsIndexBreadcrumbsProps) => {

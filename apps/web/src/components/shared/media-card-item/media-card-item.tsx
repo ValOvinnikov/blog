@@ -20,15 +20,12 @@ export interface IMediaCardData {
   formattedDate: string;
   readingTime?: string;
   topic: IMediaCardTopicData;
-  /** Pre-rendered image node the web layer builds; never a URL for this component to resolve. */
   image?: ReactNode;
 }
 
 export type TMediaCardItemProps = IWithDataTestId & {
   item: IMediaCardData;
-  /** Renders a `MediaCard.Media` region — the empty frame when `item.image` is absent. Omit to render no media region at all. */
   hasImage?: boolean;
-  /** Heading depth for the card's title — the caller decides based on where the listing sits in the page outline. Defaults to `3`. */
   headingLevel?: THeadingLevel;
   isLead?: boolean;
   isSplit?: boolean;
@@ -36,11 +33,6 @@ export type TMediaCardItemProps = IWithDataTestId & {
 
 const s = mediaCardItemVariants();
 
-/**
- * MediaCardItem — the one post-to-card mapping every listing in `apps/web`
- * renders: an `IMediaCardData` item into `MediaCard`'s `Media`/`Meta`/`Title`/
- * `Footer` slots, titled via `SmartLink`.
- */
 export const MediaCardItem = ({
   item,
   hasImage,
