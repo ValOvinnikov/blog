@@ -7,10 +7,11 @@ import type { NextResponse } from 'next/server';
 import { getLocale, getTranslations } from 'next-intl/server';
 
 import {
-  renderConfirmResponse,
   renderResultResponse,
   type TResultPageCopy,
-} from './unsubscribe-page';
+} from '../newsletter-result-page';
+
+import { renderConfirmResponse } from './unsubscribe-page';
 
 /**
  * `GET /api/newsletter/unsubscribe?token=…` renders a confirmation page
