@@ -1,7 +1,7 @@
 import type {
   IBookmarkedPost,
   IBookmarksPageViewProps,
-} from '@web/components/pages/bookmarks-page';
+} from '@web/components/pages/bookmarks-page/bookmarks-page-view';
 
 const makeBookmarkedPost = (
   overrides: Partial<IBookmarkedPost> = {},

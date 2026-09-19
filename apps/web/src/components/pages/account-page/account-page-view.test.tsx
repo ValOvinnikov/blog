@@ -3,8 +3,6 @@ import { makeAccountPageView } from '@web/testing/pages/account-page/fixtures';
 
 import { AccountPageView } from './account-page-view';
 
-vi.mock('@web/server/auth/auth', () => ({ auth: vi.fn() }));
-
 vi.mock('@web/components/shared/delete-account-control', () => ({
   DeleteAccountControl: ({ handle }: { handle: string }) => (
     <div data-testid="delete-account-control">{handle}</div>

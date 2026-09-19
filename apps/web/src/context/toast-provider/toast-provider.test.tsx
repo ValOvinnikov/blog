@@ -7,7 +7,6 @@ import {
 } from '@web/testing/custom-render';
 
 import { ToastProvider, useToast } from './toast-provider';
-import { TOAST_EXIT_ANIMATION_MS } from './toast-store';
 
 const successAction = vi.fn();
 
@@ -137,7 +136,7 @@ describe(`<${ToastProvider.name}/>`, () => {
       screen.getByRole('button', { name: 'Dismiss notification' }),
     );
     act(() => {
-      vi.advanceTimersByTime(TOAST_EXIT_ANIMATION_MS);
+      vi.runOnlyPendingTimers();
     });
 
     expect(screen.queryByText('Saved to bookmarks')).not.toBeInTheDocument();
@@ -153,7 +152,7 @@ describe(`<${ToastProvider.name}/>`, () => {
     fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
     fireEvent.click(screen.getByRole('button', { name: /^Undo/ }));
     act(() => {
-      vi.advanceTimersByTime(TOAST_EXIT_ANIMATION_MS);
+      vi.runOnlyPendingTimers();
     });
 
     expect(successAction).toHaveBeenCalledTimes(1);
@@ -182,7 +181,10 @@ describe(`<${ToastProvider.name}/>`, () => {
 
     fireEvent.mouseLeave(toastEl);
     act(() => {
-      vi.advanceTimersByTime(2600 + TOAST_EXIT_ANIMATION_MS);
+      vi.runOnlyPendingTimers();
+    });
+    act(() => {
+      vi.runOnlyPendingTimers();
     });
 
     expect(screen.queryByText('Saved to bookmarks')).not.toBeInTheDocument();
@@ -216,7 +218,10 @@ describe(`<${ToastProvider.name}/>`, () => {
       dismissButton.blur();
     });
     act(() => {
-      vi.advanceTimersByTime(3600 + TOAST_EXIT_ANIMATION_MS);
+      vi.runOnlyPendingTimers();
+    });
+    act(() => {
+      vi.runOnlyPendingTimers();
     });
     expect(screen.queryByText('Saved to bookmarks')).not.toBeInTheDocument();
   });
@@ -247,7 +252,7 @@ describe(`<${ToastProvider.name}/>`, () => {
 
     fireEvent.keyDown(document, { key: 'Escape' });
     act(() => {
-      vi.advanceTimersByTime(TOAST_EXIT_ANIMATION_MS);
+      vi.runOnlyPendingTimers();
     });
 
     expect(screen.queryByText('Saved to bookmarks')).not.toBeInTheDocument();
@@ -272,7 +277,7 @@ describe(`<${ToastProvider.name}/>`, () => {
     });
     fireEvent.keyDown(document, { key: 'Escape' });
     act(() => {
-      vi.advanceTimersByTime(TOAST_EXIT_ANIMATION_MS);
+      vi.runOnlyPendingTimers();
     });
 
     expect(screen.queryByText("couldn't save")).not.toBeInTheDocument();

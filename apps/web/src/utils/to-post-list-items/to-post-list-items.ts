@@ -4,11 +4,6 @@ import type { IMediaCardData } from '@web/components/shared/media-card-item';
 import { getFormatter } from 'next-intl/server';
 import type { ReactNode } from 'react';
 
-/**
- * Structural source shape accepted by `toPostListItems` — satisfied by both
- * `TPostCard` (post detail's related posts, the post-list module) and the
- * leaner `TArchivePostCard` (blog/topic/tag archive pages).
- */
 type TPostListItemSource = {
   id: string;
   slug: string;
