@@ -97,6 +97,31 @@ describe(`<${ActionGroup.name}/>`, () => {
     },
   );
 
+  it('gives a CONTAINED action a full-width phone layout and a minimum width from sm up', () => {
+    setup();
+
+    const className = screen.getByRole('link', {
+      name: 'Subscribe now',
+    }).className;
+    expect(className).toContain('w-full');
+    expect(className).toContain('sm:w-auto');
+    expect(className).toContain('sm:min-w-32');
+  });
+
+  it('exempts an INLINE appearance action from the minimum width', () => {
+    const inlineSetup = customRender(ActionGroup, {
+      actions: [{ ...primaryAction, appearance: CTA_ACTION_APPEARANCE.INLINE }],
+      isOnDark: undefined,
+    });
+    inlineSetup();
+
+    const className = screen.getByRole('link', {
+      name: 'Subscribe now',
+    }).className;
+    expect(className).toContain('sm:min-w-0');
+    expect(className).not.toContain('sm:min-w-32');
+  });
+
   it('reverses a non-primary action styling on a dark background', () => {
     const darkSetup = customRender(ActionGroup, {
       actions: [secondaryAction],

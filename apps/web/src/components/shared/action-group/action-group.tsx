@@ -56,6 +56,7 @@ export const ActionGroup = ({ actions, isOnDark }: IActionGroupProps) => (
           variant={variant}
           className={actionGroupVariants({
             isOnDark: toIsReversedOnDark(isOnDark, variant),
+            isInline: variant === 'link',
           })}
         >
           {action.link.label}
