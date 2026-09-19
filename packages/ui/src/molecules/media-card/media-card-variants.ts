@@ -4,10 +4,9 @@ import type { VariantProps } from 'tailwind-variants';
 export const mediaCardVariants = tv({
   slots: {
     root: [
-      'relative flex h-full flex-col overflow-hidden',
+      'group relative flex h-full flex-col overflow-hidden',
       'bg-surface border-l-2 border-brand-primary',
       'transition-colors duration-base ease-smooth',
-      'hover:bg-brand-primary-muted focus-within:bg-brand-primary-muted',
       'motion-reduce:transition-none',
     ],
     media: [],
@@ -34,6 +33,17 @@ export const mediaCardVariants = tv({
         content: ['items-center text-center'],
       },
     },
+    isInteractive: {
+      true: {
+        root: [
+          'hover:bg-brand-primary-muted focus-within:bg-brand-primary-muted',
+        ],
+      },
+      false: {},
+    },
+  },
+  defaultVariants: {
+    isInteractive: true,
   },
 });
 

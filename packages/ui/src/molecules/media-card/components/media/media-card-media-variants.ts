@@ -12,6 +12,7 @@ export const mediaCardMediaVariants = tv({
       icon: [
         'flex size-12 shrink-0 items-center justify-center rounded-md mt-card-y',
         'bg-brand-primary-muted text-brand-primary',
+        'group-hover:bg-surface group-focus-within:bg-surface',
       ],
     },
     isLead: {

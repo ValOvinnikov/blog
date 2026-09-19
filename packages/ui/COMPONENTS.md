@@ -192,8 +192,8 @@ Props: className?: string _(extends IWithDataTestId, VariantProps<typeof buttonV
 ### MediaCard — `molecules/media-card/media-card.tsx`
 
 A media-led summary card for any linked item, rendered as an `<article>`.
-Props: excerpt?: string · tags?: string[] · isSplit?: TMediaCardVariants['isSplit'] · isLead?: TMediaCardVariants['isLead'] · align?: TMediaCardVariants['align'] · children?: TCompoundChildren<typeof MediaCardParts> _(extends IWithClassName, IWithDataTestId)_
-Variants: isSplit: (boolean) · isLead: (boolean) · align: left|center
+Props: excerpt?: string · tags?: string[] · isSplit?: TMediaCardVariants['isSplit'] · isLead?: TMediaCardVariants['isLead'] · align?: TMediaCardVariants['align'] · isInteractive?: TMediaCardVariants['isInteractive'] · children?: TCompoundChildren<typeof MediaCardParts> _(extends IWithClassName, IWithDataTestId)_
+Variants: isSplit: (boolean) · isLead: (boolean) · align: left|center · isInteractive: (boolean)
 
 Slots:
 
