@@ -65,17 +65,12 @@ describe(`<${NavLink.name}/>`, () => {
   it('visually hides the label text when hasLabel is false', () => {
     setup({ hasLabel: false, children: 'RSS feed' });
 
-    // `sr-only` is the sole observable that the label text is kept for
-    // accessibility rather than shown alongside the icon.
     expect(screen.getByText('RSS feed')).toHaveClass('sr-only');
   });
 
   it('renders the label without a wrapper when hasLabel is not set', () => {
     setup({ children: 'RSS feed' });
 
-    // `sr-only` is the sole observable here: jsdom doesn't apply real layout,
-    // so there's no other way to assert the label renders as plain visible
-    // text rather than wrapped in the visually-hidden span.
     expect(screen.getByText('RSS feed')).not.toHaveClass('sr-only');
   });
 

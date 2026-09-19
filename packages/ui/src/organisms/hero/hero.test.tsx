@@ -12,12 +12,44 @@ import {
   screen,
 } from '@blog/ui/testing/custom-render';
 
-import { Hero } from './hero';
+import { Hero, type THeroProps } from './hero';
 
-const setup = customRender(Hero, {
-  title: 'Building a Design System',
-  titleId: 'hero-title',
-});
+const heroTitle = 'Building a Design System';
+const heroTitleId = 'hero-title';
+
+const setup = customRender(Hero, { title: heroTitle, titleId: heroTitleId });
+
+const renderHero = (
+  props: Partial<THeroProps> = {},
+  children?: THeroProps['children'],
+) =>
+  renderElement(
+    <Hero title={heroTitle} titleId={heroTitleId} {...props}>
+      {children}
+    </Hero>,
+  );
+
+const expectFollows = (before: Element, after: Element) => {
+  expect(
+    before.compareDocumentPosition(after) & Node.DOCUMENT_POSITION_FOLLOWING,
+  ).toBeTruthy();
+};
+
+const heroCta = (
+  <Hero.Cta>
+    <a href="/posts/design-system">Read more</a>
+  </Hero.Cta>
+);
+
+const heroSocial = (
+  <Hero.Social>
+    <ul aria-label="Find Jane elsewhere">
+      <li>
+        <a href="https://github.com/janedoe">GitHub</a>
+      </li>
+    </ul>
+  </Hero.Social>
+);
 
 describe(`<${Hero.name}/>`, () => {
   it('renders the title', () => {
@@ -42,13 +74,7 @@ describe(`<${Hero.name}/>`, () => {
   });
 
   it('renders Hero.Cta children', () => {
-    renderElement(
-      <Hero title="Building a Design System" titleId="hero-title">
-        <Hero.Cta>
-          <a href="/posts/design-system">Read more</a>
-        </Hero.Cta>
-      </Hero>,
-    );
+    renderHero(undefined, heroCta);
     expect(screen.getByRole('link')).toHaveAttribute(
       'href',
       '/posts/design-system',
@@ -57,13 +83,7 @@ describe(`<${Hero.name}/>`, () => {
   });
 
   it('nests the CTA inside the copy column, alongside the heading', () => {
-    renderElement(
-      <Hero title="Building a Design System" titleId="hero-title">
-        <Hero.Cta>
-          <a href="/posts/design-system">Read more</a>
-        </Hero.Cta>
-      </Hero>,
-    );
+    renderHero(undefined, heroCta);
     const copyColumn = screen.getByTestId('hero-copy');
     expect(copyColumn).toContainElement(
       screen.getByRole('heading', { name: 'Building a Design System' }),
@@ -77,12 +97,11 @@ describe(`<${Hero.name}/>`, () => {
   });
 
   it('renders Hero.Media content', () => {
-    renderElement(
-      <Hero title="Building a Design System" titleId="hero-title">
-        <Hero.Media>
-          <img src="/img/hero.jpg" alt="Hero cover photo" />
-        </Hero.Media>
-      </Hero>,
+    renderHero(
+      undefined,
+      <Hero.Media>
+        <img src="/img/hero.jpg" alt="Hero cover photo" />
+      </Hero.Media>,
     );
     expect(screen.getByAltText('Hero cover photo')).toBeVisible();
   });
@@ -106,12 +125,11 @@ describe(`<${Hero.name}/>`, () => {
   });
 
   it('defaults mediaOrder to LAST for a caller that sets none of the layout props', () => {
-    renderElement(
-      <Hero title="Building a Design System" titleId="hero-title">
-        <Hero.Media>
-          <img src="/img/hero.jpg" alt="Hero cover photo" />
-        </Hero.Media>
-      </Hero>,
+    renderHero(
+      undefined,
+      <Hero.Media>
+        <img src="/img/hero.jpg" alt="Hero cover photo" />
+      </Hero.Media>,
     );
 
     const media = screen.getByTestId('hero-media');
@@ -119,84 +137,46 @@ describe(`<${Hero.name}/>`, () => {
     expect(media).not.toHaveClass('lg:order-none');
   });
 
-  it('keeps copy before media in the DOM at the mobile-collapsed order (mediaOrder FIRST)', () => {
-    renderElement(
-      <Hero
-        title="Building a Design System"
-        titleId="hero-title"
-        variant={HERO_VARIANT.SPLIT}
-        mediaOrder={MEDIA_ORDER.FIRST}
-      >
-        <Hero.Media>
-          <img src="/img/hero.jpg" alt="Hero cover photo" />
-        </Hero.Media>
-      </Hero>,
+  it.each([
+    {
+      name: 'keeps copy before media in the DOM at the mobile-collapsed order (mediaOrder FIRST)',
+      props: { variant: HERO_VARIANT.SPLIT, mediaOrder: MEDIA_ORDER.FIRST },
+    },
+    {
+      name: 'keeps copy before media in the DOM at the two-column order (contentPosition RIGHT)',
+      props: {
+        variant: HERO_VARIANT.SPLIT,
+        contentPosition: CONTENT_ALIGNMENT.RIGHT,
+      },
+    },
+    {
+      name: 'keeps copy before media in the DOM on Banner, even though the media is a background',
+      props: { variant: HERO_VARIANT.BANNER },
+    },
+  ])('$name', ({ props }) => {
+    renderHero(
+      props,
+      <Hero.Media>
+        <img src="/img/hero.jpg" alt="Hero cover photo" />
+      </Hero.Media>,
     );
 
     const heading = screen.getByRole('heading');
     const media = screen.getByTestId('hero-media');
 
-    expect(
-      heading.compareDocumentPosition(media) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
-  });
-
-  it('keeps copy before media in the DOM at the two-column order (contentPosition RIGHT)', () => {
-    renderElement(
-      <Hero
-        title="Building a Design System"
-        titleId="hero-title"
-        variant={HERO_VARIANT.SPLIT}
-        contentPosition={CONTENT_ALIGNMENT.RIGHT}
-      >
-        <Hero.Media>
-          <img src="/img/hero.jpg" alt="Hero cover photo" />
-        </Hero.Media>
-      </Hero>,
-    );
-
-    const heading = screen.getByRole('heading');
-    const media = screen.getByTestId('hero-media');
-
-    expect(
-      heading.compareDocumentPosition(media) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
-  });
-
-  it('keeps copy before media in the DOM on Banner, even though the media is a background', () => {
-    renderElement(
-      <Hero
-        title="Building a Design System"
-        titleId="hero-title"
-        variant={HERO_VARIANT.BANNER}
-      >
-        <Hero.Media>
-          <img src="/img/hero.jpg" alt="Hero cover photo" />
-        </Hero.Media>
-      </Hero>,
-    );
-
-    const heading = screen.getByRole('heading');
-    const media = screen.getByTestId('hero-media');
-
-    expect(
-      heading.compareDocumentPosition(media) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
+    expectFollows(heading, media);
   });
 
   it('applies the two-column swap on Split independently of text alignment', () => {
-    renderElement(
-      <Hero
-        title="Building a Design System"
-        titleId="hero-title"
-        variant={HERO_VARIANT.SPLIT}
-        contentPosition={CONTENT_ALIGNMENT.RIGHT}
-        contentAlignment={CONTENT_ALIGNMENT.LEFT}
-      >
-        <Hero.Media>
-          <img src="/img/hero.jpg" alt="Hero cover photo" />
-        </Hero.Media>
-      </Hero>,
+    renderHero(
+      {
+        variant: HERO_VARIANT.SPLIT,
+        contentPosition: CONTENT_ALIGNMENT.RIGHT,
+        contentAlignment: CONTENT_ALIGNMENT.LEFT,
+      },
+      <Hero.Media>
+        <img src="/img/hero.jpg" alt="Hero cover photo" />
+      </Hero.Media>,
     );
 
     const copyColumn = screen.getByTestId('hero-copy');
@@ -206,58 +186,42 @@ describe(`<${Hero.name}/>`, () => {
     expect(copyColumn).not.toHaveClass('text-right');
   });
 
-  it('applies STACKED media order at every width, not just below a breakpoint', () => {
-    renderElement(
-      <Hero
-        title="Building a Design System"
-        titleId="hero-title"
-        variant={HERO_VARIANT.STACKED}
-        mediaOrder={MEDIA_ORDER.FIRST}
-      >
-        <Hero.Media>
-          <img src="/img/hero.jpg" alt="Hero cover photo" />
-        </Hero.Media>
-      </Hero>,
+  it.each([
+    {
+      name: 'applies STACKED media order at every width, not just below a breakpoint',
+      variant: HERO_VARIANT.STACKED,
+      hasClasses: ['order-first'],
+      lacksClasses: ['lg:order-none'],
+    },
+    {
+      name: 'ignores mediaOrder on Banner — its media is a background, not a reordered sibling',
+      variant: HERO_VARIANT.BANNER,
+      hasClasses: ['absolute', 'inset-0'],
+      lacksClasses: ['order-first'],
+    },
+  ])('$name', ({ variant, hasClasses, lacksClasses }) => {
+    renderHero(
+      { variant, mediaOrder: MEDIA_ORDER.FIRST },
+      <Hero.Media>
+        <img src="/img/hero.jpg" alt="Hero cover photo" />
+      </Hero.Media>,
     );
 
     const media = screen.getByTestId('hero-media');
 
-    expect(media).toHaveClass('order-first');
-    expect(media).not.toHaveClass('lg:order-none');
-  });
-
-  it('ignores mediaOrder on Banner — its media is a background, not a reordered sibling', () => {
-    renderElement(
-      <Hero
-        title="Building a Design System"
-        titleId="hero-title"
-        variant={HERO_VARIANT.BANNER}
-        mediaOrder={MEDIA_ORDER.FIRST}
-      >
-        <Hero.Media>
-          <img src="/img/hero.jpg" alt="Hero cover photo" />
-        </Hero.Media>
-      </Hero>,
-    );
-
-    const media = screen.getByTestId('hero-media');
-
-    expect(media).not.toHaveClass('order-first');
-    expect(media).toHaveClass('absolute', 'inset-0');
+    expect(media).toHaveClass(...hasClasses);
+    for (const className of lacksClasses) {
+      expect(media).not.toHaveClass(className);
+    }
   });
 
   it('keeps Split and Stacked media framed by MediaFrame', () => {
     for (const variant of [HERO_VARIANT.SPLIT, HERO_VARIANT.STACKED]) {
-      const { unmount } = renderElement(
-        <Hero
-          title="Building a Design System"
-          titleId="hero-title"
-          variant={variant}
-        >
-          <Hero.Media>
-            <img src="/img/hero.jpg" alt="Hero cover photo" />
-          </Hero.Media>
-        </Hero>,
+      const { unmount } = renderHero(
+        { variant },
+        <Hero.Media>
+          <img src="/img/hero.jpg" alt="Hero cover photo" />
+        </Hero.Media>,
       );
 
       const wrapper = screen.getByTestId('hero-media');
@@ -275,16 +239,11 @@ describe(`<${Hero.name}/>`, () => {
   });
 
   it('renders Banner media unframed and edge-to-edge, with no MediaFrame chrome', () => {
-    renderElement(
-      <Hero
-        title="Building a Design System"
-        titleId="hero-title"
-        variant={HERO_VARIANT.BANNER}
-      >
-        <Hero.Media>
-          <img src="/img/hero.jpg" alt="Hero cover photo" />
-        </Hero.Media>
-      </Hero>,
+    renderHero(
+      { variant: HERO_VARIANT.BANNER },
+      <Hero.Media>
+        <img src="/img/hero.jpg" alt="Hero cover photo" />
+      </Hero.Media>,
     );
 
     const wrapper = screen.getByTestId('hero-media');
@@ -297,94 +256,68 @@ describe(`<${Hero.name}/>`, () => {
 
   it('renders all three variants without throwing', () => {
     for (const variant of Object.values(HERO_VARIANT)) {
-      const { unmount } = renderElement(
-        <Hero
-          title="Building a Design System"
-          titleId="hero-title"
-          variant={variant}
-        >
-          <Hero.Media>
-            <img src="/img/hero.jpg" alt="Hero cover photo" />
-          </Hero.Media>
-        </Hero>,
+      const { unmount } = renderHero(
+        { variant },
+        <Hero.Media>
+          <img src="/img/hero.jpg" alt="Hero cover photo" />
+        </Hero.Media>,
       );
       expect(screen.getByRole('heading')).toBeVisible();
       unmount();
     }
   });
 
-  it('renders an aria-hidden AZURE_SCRIM overlay on Banner with BRAND_PRIMARY tone', () => {
-    renderElement(
-      <Hero
-        title="Building a Design System"
-        titleId="hero-title"
-        variant={HERO_VARIANT.BANNER}
-        tone={BRAND_VARIANT.BRAND_PRIMARY}
-      >
-        <Hero.Media>
-          <img src="/img/hero.jpg" alt="Hero cover photo" />
-        </Hero.Media>
-      </Hero>,
-    );
-
-    const overlay = screen.getByTestId('hero-overlay');
-    expect(overlay).toHaveAttribute('aria-hidden', 'true');
-    expect(overlay).toHaveClass(AZURE_SCRIM);
-    expect(overlay).not.toHaveClass(NEUTRAL_SCRIM);
-  });
-
-  it('defaults to a NEUTRAL_SCRIM overlay on Banner when tone is omitted', () => {
-    renderElement(
-      <Hero
-        title="Building a Design System"
-        titleId="hero-title"
-        variant={HERO_VARIANT.BANNER}
-      >
-        <Hero.Media>
-          <img src="/img/hero.jpg" alt="Hero cover photo" />
-        </Hero.Media>
-      </Hero>,
-    );
-
-    const overlay = screen.getByTestId('hero-overlay');
-    expect(overlay).toHaveClass(NEUTRAL_SCRIM);
-    expect(overlay).not.toHaveClass(AZURE_SCRIM);
-  });
-
-  it.each([BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY])(
-    'renders a NEUTRAL_SCRIM overlay on Banner with %s tone',
-    (tone) => {
-      renderElement(
-        <Hero
-          title="Building a Design System"
-          titleId="hero-title"
-          variant={HERO_VARIANT.BANNER}
-          tone={tone}
-        >
-          <Hero.Media>
-            <img src="/img/hero.jpg" alt="Hero cover photo" />
-          </Hero.Media>
-        </Hero>,
-      );
-
-      const overlay = screen.getByTestId('hero-overlay');
-      expect(overlay).toHaveClass(NEUTRAL_SCRIM);
-      expect(overlay).not.toHaveClass(AZURE_SCRIM);
+  it.each([
+    {
+      name: 'renders an aria-hidden AZURE_SCRIM overlay on Banner with BRAND_PRIMARY tone',
+      tone: BRAND_VARIANT.BRAND_PRIMARY,
+      expectedScrim: AZURE_SCRIM,
+      otherScrim: NEUTRAL_SCRIM,
+      checkAriaHidden: true,
     },
-  );
+    {
+      name: 'defaults to a NEUTRAL_SCRIM overlay on Banner when tone is omitted',
+      tone: undefined,
+      expectedScrim: NEUTRAL_SCRIM,
+      otherScrim: AZURE_SCRIM,
+      checkAriaHidden: false,
+    },
+    {
+      name: 'renders a NEUTRAL_SCRIM overlay on Banner with PRIMARY tone',
+      tone: BRAND_VARIANT.PRIMARY,
+      expectedScrim: NEUTRAL_SCRIM,
+      otherScrim: AZURE_SCRIM,
+      checkAriaHidden: false,
+    },
+    {
+      name: 'renders a NEUTRAL_SCRIM overlay on Banner with SECONDARY tone',
+      tone: BRAND_VARIANT.SECONDARY,
+      expectedScrim: NEUTRAL_SCRIM,
+      otherScrim: AZURE_SCRIM,
+      checkAriaHidden: false,
+    },
+  ])('$name', ({ tone, expectedScrim, otherScrim, checkAriaHidden }) => {
+    renderHero(
+      { variant: HERO_VARIANT.BANNER, tone },
+      <Hero.Media>
+        <img src="/img/hero.jpg" alt="Hero cover photo" />
+      </Hero.Media>,
+    );
+
+    const overlay = screen.getByTestId('hero-overlay');
+    if (checkAriaHidden) {
+      expect(overlay).toHaveAttribute('aria-hidden', 'true');
+    }
+    expect(overlay).toHaveClass(expectedScrim);
+    expect(overlay).not.toHaveClass(otherScrim);
+  });
 
   it('moves Banner media behind the overlay in the stacking order', () => {
-    renderElement(
-      <Hero
-        title="Building a Design System"
-        titleId="hero-title"
-        variant={HERO_VARIANT.BANNER}
-        tone={BRAND_VARIANT.PRIMARY}
-      >
-        <Hero.Media>
-          <img src="/img/hero.jpg" alt="Hero cover photo" />
-        </Hero.Media>
-      </Hero>,
+    renderHero(
+      { variant: HERO_VARIANT.BANNER, tone: BRAND_VARIANT.PRIMARY },
+      <Hero.Media>
+        <img src="/img/hero.jpg" alt="Hero cover photo" />
+      </Hero.Media>,
     );
 
     expect(screen.getByTestId('hero-media')).toHaveClass('-z-20');
@@ -393,17 +326,11 @@ describe(`<${Hero.name}/>`, () => {
 
   it('renders no overlay on Split or Stacked, regardless of tone', () => {
     for (const variant of [HERO_VARIANT.SPLIT, HERO_VARIANT.STACKED]) {
-      const { unmount } = renderElement(
-        <Hero
-          title="Building a Design System"
-          titleId="hero-title"
-          variant={variant}
-          tone={BRAND_VARIANT.BRAND_PRIMARY}
-        >
-          <Hero.Media>
-            <img src="/img/hero.jpg" alt="Hero cover photo" />
-          </Hero.Media>
-        </Hero>,
+      const { unmount } = renderHero(
+        { variant, tone: BRAND_VARIANT.BRAND_PRIMARY },
+        <Hero.Media>
+          <img src="/img/hero.jpg" alt="Hero cover photo" />
+        </Hero.Media>,
       );
 
       expect(screen.queryByTestId('hero-overlay')).not.toBeInTheDocument();
@@ -412,88 +339,49 @@ describe(`<${Hero.name}/>`, () => {
     }
   });
 
-  it('leaves Split rendering unaffected by tone', () => {
-    const { unmount: unmountWithTone, container: withTone } = renderElement(
-      <Hero
-        title="Building a Design System"
-        titleId="hero-title"
-        variant={HERO_VARIANT.SPLIT}
-        tone={BRAND_VARIANT.BRAND_PRIMARY}
-      >
-        <Hero.Media>
-          <img src="/img/hero.jpg" alt="Hero cover photo" />
-        </Hero.Media>
-      </Hero>,
+  it.each([
+    {
+      name: 'leaves Split rendering unaffected by tone',
+      variant: HERO_VARIANT.SPLIT,
+      tone: BRAND_VARIANT.BRAND_PRIMARY,
+    },
+    {
+      name: 'leaves Stacked rendering unaffected by tone',
+      variant: HERO_VARIANT.STACKED,
+      tone: BRAND_VARIANT.SECONDARY,
+    },
+  ])('$name', ({ variant, tone }) => {
+    const { unmount: unmountWithTone, container: withTone } = renderHero(
+      { variant, tone },
+      <Hero.Media>
+        <img src="/img/hero.jpg" alt="Hero cover photo" />
+      </Hero.Media>,
     );
     const withToneHtml = withTone.innerHTML;
     unmountWithTone();
 
-    const { container: withoutTone } = renderElement(
-      <Hero
-        title="Building a Design System"
-        titleId="hero-title"
-        variant={HERO_VARIANT.SPLIT}
-      >
-        <Hero.Media>
-          <img src="/img/hero.jpg" alt="Hero cover photo" />
-        </Hero.Media>
-      </Hero>,
-    );
-
-    expect(withToneHtml).toBe(withoutTone.innerHTML);
-  });
-
-  it('leaves Stacked rendering unaffected by tone', () => {
-    const { unmount: unmountWithTone, container: withTone } = renderElement(
-      <Hero
-        title="Building a Design System"
-        titleId="hero-title"
-        variant={HERO_VARIANT.STACKED}
-        tone={BRAND_VARIANT.SECONDARY}
-      >
-        <Hero.Media>
-          <img src="/img/hero.jpg" alt="Hero cover photo" />
-        </Hero.Media>
-      </Hero>,
-    );
-    const withToneHtml = withTone.innerHTML;
-    unmountWithTone();
-
-    const { container: withoutTone } = renderElement(
-      <Hero
-        title="Building a Design System"
-        titleId="hero-title"
-        variant={HERO_VARIANT.STACKED}
-      >
-        <Hero.Media>
-          <img src="/img/hero.jpg" alt="Hero cover photo" />
-        </Hero.Media>
-      </Hero>,
+    const { container: withoutTone } = renderHero(
+      { variant },
+      <Hero.Media>
+        <img src="/img/hero.jpg" alt="Hero cover photo" />
+      </Hero.Media>,
     );
 
     expect(withToneHtml).toBe(withoutTone.innerHTML);
   });
 
   it('renders Hero.Avatar before the eyebrow in the DOM', () => {
-    renderElement(
-      <Hero
-        title="Building a Design System"
-        titleId="hero-title"
-        eyebrow="Senior frontend engineer"
-      >
-        <Hero.Avatar>
-          <img src="/img/jane.jpg" alt="Portrait of Jane Doe" />
-        </Hero.Avatar>
-      </Hero>,
+    renderHero(
+      { eyebrow: 'Senior frontend engineer' },
+      <Hero.Avatar>
+        <img src="/img/jane.jpg" alt="Portrait of Jane Doe" />
+      </Hero.Avatar>,
     );
 
     const avatar = screen.getByAltText('Portrait of Jane Doe');
     const eyebrowText = screen.getByText('Senior frontend engineer');
 
-    expect(
-      avatar.compareDocumentPosition(eyebrowText) &
-        Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
+    expectFollows(avatar, eyebrowText);
   });
 
   it('does not render avatar content when Hero.Avatar is omitted', () => {
@@ -504,12 +392,11 @@ describe(`<${Hero.name}/>`, () => {
   });
 
   it('renders arbitrary children inside Hero.Avatar, not just an image', () => {
-    renderElement(
-      <Hero title="Building a Design System" titleId="hero-title">
-        <Hero.Avatar>
-          <Avatar alt="Jane Doe" name="Jane Doe" />
-        </Hero.Avatar>
-      </Hero>,
+    renderHero(
+      undefined,
+      <Hero.Avatar>
+        <Avatar alt="Jane Doe" name="Jane Doe" />
+      </Hero.Avatar>,
     );
 
     expect(screen.getByText('JD')).toBeVisible();
@@ -522,16 +409,11 @@ describe(`<${Hero.name}/>`, () => {
   ])(
     'aligns Hero.Avatar to %s under contentAlignment',
     (alignment, expectedClass) => {
-      renderElement(
-        <Hero
-          title="Building a Design System"
-          titleId="hero-title"
-          contentAlignment={alignment}
-        >
-          <Hero.Avatar>
-            <img src="/img/jane.jpg" alt="Portrait of Jane Doe" />
-          </Hero.Avatar>
-        </Hero>,
+      renderHero(
+        { contentAlignment: alignment },
+        <Hero.Avatar>
+          <img src="/img/jane.jpg" alt="Portrait of Jane Doe" />
+        </Hero.Avatar>,
       );
 
       expect(
@@ -541,16 +423,11 @@ describe(`<${Hero.name}/>`, () => {
   );
 
   it('centers Hero.Avatar by default on Stacked, where contentAlignment defaults to CENTER', () => {
-    renderElement(
-      <Hero
-        title="Building a Design System"
-        titleId="hero-title"
-        variant={HERO_VARIANT.STACKED}
-      >
-        <Hero.Avatar>
-          <img src="/img/jane.jpg" alt="Portrait of Jane Doe" />
-        </Hero.Avatar>
-      </Hero>,
+    renderHero(
+      { variant: HERO_VARIANT.STACKED },
+      <Hero.Avatar>
+        <img src="/img/jane.jpg" alt="Portrait of Jane Doe" />
+      </Hero.Avatar>,
     );
 
     expect(
@@ -559,36 +436,26 @@ describe(`<${Hero.name}/>`, () => {
   });
 
   it('renders Hero.Social after Hero.Cta in the DOM', () => {
-    renderElement(
-      <Hero title="Building a Design System" titleId="hero-title">
-        <Hero.Cta>
-          <a href="/posts/design-system">Read more</a>
-        </Hero.Cta>
-        <Hero.Social>
-          <ul aria-label="Find Jane elsewhere">
-            <li>
-              <a href="https://github.com/janedoe">GitHub</a>
-            </li>
-          </ul>
-        </Hero.Social>
-      </Hero>,
+    renderHero(
+      undefined,
+      <>
+        {heroCta}
+        {heroSocial}
+      </>,
     );
 
     const cta = screen.getByRole('link', { name: 'Read more' });
     const social = screen.getByRole('link', { name: 'GitHub' });
 
-    expect(
-      cta.compareDocumentPosition(social) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
+    expectFollows(cta, social);
   });
 
   it('renders arbitrary children inside Hero.Social, not just a list', () => {
-    renderElement(
-      <Hero title="Building a Design System" titleId="hero-title">
-        <Hero.Social>
-          <a href="https://github.com/janedoe">GitHub</a>
-        </Hero.Social>
-      </Hero>,
+    renderHero(
+      undefined,
+      <Hero.Social>
+        <a href="https://github.com/janedoe">GitHub</a>
+      </Hero.Social>,
     );
 
     expect(screen.getByRole('link', { name: 'GitHub' })).toBeVisible();
@@ -606,20 +473,15 @@ describe(`<${Hero.name}/>`, () => {
   ])(
     'justifies Hero.Social to %s under contentAlignment',
     (alignment, expectedClass) => {
-      renderElement(
-        <Hero
-          title="Building a Design System"
-          titleId="hero-title"
-          contentAlignment={alignment}
-        >
-          <Hero.Social dataTestId="hero-social">
-            <ul aria-label="Find Jane elsewhere">
-              <li>
-                <a href="https://github.com/janedoe">GitHub</a>
-              </li>
-            </ul>
-          </Hero.Social>
-        </Hero>,
+      renderHero(
+        { contentAlignment: alignment },
+        <Hero.Social dataTestId="hero-social">
+          <ul aria-label="Find Jane elsewhere">
+            <li>
+              <a href="https://github.com/janedoe">GitHub</a>
+            </li>
+          </ul>
+        </Hero.Social>,
       );
 
       expect(screen.getByTestId('hero-social')).toHaveClass(expectedClass);
@@ -627,12 +489,11 @@ describe(`<${Hero.name}/>`, () => {
   );
 
   it('defaults Hero.Media to the 16:9 video ratio when omitted', () => {
-    renderElement(
-      <Hero title="Building a Design System" titleId="hero-title">
-        <Hero.Media>
-          <img src="/img/hero.jpg" alt="Hero cover photo" />
-        </Hero.Media>
-      </Hero>,
+    renderHero(
+      undefined,
+      <Hero.Media>
+        <img src="/img/hero.jpg" alt="Hero cover photo" />
+      </Hero.Media>,
     );
 
     const frame = screen.getByAltText('Hero cover photo').parentElement;
@@ -641,16 +502,11 @@ describe(`<${Hero.name}/>`, () => {
   });
 
   it('passes a square ratio through Hero.Media to MediaFrame', () => {
-    renderElement(
-      <Hero
-        title="Building a Design System"
-        titleId="hero-title"
-        variant={HERO_VARIANT.SPLIT}
-      >
-        <Hero.Media ratio="square">
-          <img src="/img/jane.jpg" alt="Portrait of Jane Doe" />
-        </Hero.Media>
-      </Hero>,
+    renderHero(
+      { variant: HERO_VARIANT.SPLIT },
+      <Hero.Media ratio="square">
+        <img src="/img/jane.jpg" alt="Portrait of Jane Doe" />
+      </Hero.Media>,
     );
 
     const frame = screen.getByAltText('Portrait of Jane Doe').parentElement;
@@ -662,28 +518,19 @@ describe(`<${Hero.name}/>`, () => {
   it.each(Object.values(BRAND_VARIANT))(
     'renders a Stacked hero portrait above the eyebrow and a labelled link list after the actions, on %s tone',
     (tone) => {
-      const { unmount } = renderElement(
-        <Hero
-          title="Building a Design System"
-          titleId="hero-title"
-          eyebrow="Senior frontend engineer"
-          variant={HERO_VARIANT.STACKED}
-          tone={tone}
-        >
+      const { unmount } = renderHero(
+        {
+          eyebrow: 'Senior frontend engineer',
+          variant: HERO_VARIANT.STACKED,
+          tone,
+        },
+        <>
           <Hero.Avatar>
             <img src="/img/jane.jpg" alt="Portrait of Jane Doe" />
           </Hero.Avatar>
-          <Hero.Cta>
-            <a href="/posts/design-system">Read more</a>
-          </Hero.Cta>
-          <Hero.Social>
-            <ul aria-label="Find Jane elsewhere">
-              <li>
-                <a href="https://github.com/janedoe">GitHub</a>
-              </li>
-            </ul>
-          </Hero.Social>
-        </Hero>,
+          {heroCta}
+          {heroSocial}
+        </>,
       );
 
       const avatar = screen.getByAltText('Portrait of Jane Doe');
@@ -691,13 +538,8 @@ describe(`<${Hero.name}/>`, () => {
       const cta = screen.getByRole('link', { name: 'Read more' });
       const social = screen.getByRole('list', { name: 'Find Jane elsewhere' });
 
-      expect(
-        avatar.compareDocumentPosition(eyebrowText) &
-          Node.DOCUMENT_POSITION_FOLLOWING,
-      ).toBeTruthy();
-      expect(
-        cta.compareDocumentPosition(social) & Node.DOCUMENT_POSITION_FOLLOWING,
-      ).toBeTruthy();
+      expectFollows(avatar, eyebrowText);
+      expectFollows(cta, social);
 
       unmount();
     },

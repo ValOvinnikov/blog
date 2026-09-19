@@ -114,38 +114,25 @@ describe(`<${CtaModule.name}/>`, () => {
     expect(screen.getByTestId('cta-module')).toBeVisible();
   });
 
-  it('places the image after the heading in the DOM for Callout, even though it renders above it visually', () => {
+  it.each([
+    {
+      name: 'places the image after the heading in the DOM for Callout, even though it renders above it visually',
+      props: { variant: CTA_VARIANT.CALLOUT },
+    },
+    {
+      name: 'places the image after the heading in the DOM for Split with contentPosition RIGHT',
+      props: {
+        variant: CTA_VARIANT.SPLIT,
+        contentPosition: CONTENT_ALIGNMENT.RIGHT,
+      },
+    },
+    {
+      name: 'places the image after the heading in the DOM for Banner, even though it is positioned as a background',
+      props: { variant: CTA_VARIANT.BANNER },
+    },
+  ])('$name', ({ props }) => {
     setup({
-      variant: CTA_VARIANT.CALLOUT,
-      image: <img src="/cta.jpg" alt="" data-testid="cta-image" />,
-    });
-
-    const heading = screen.getByRole('heading');
-    const image = screen.getByTestId('cta-image');
-
-    expect(
-      heading.compareDocumentPosition(image) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
-  });
-
-  it('places the image after the heading in the DOM for Split with contentPosition RIGHT', () => {
-    setup({
-      variant: CTA_VARIANT.SPLIT,
-      contentPosition: CONTENT_ALIGNMENT.RIGHT,
-      image: <img src="/cta.jpg" alt="" data-testid="cta-image" />,
-    });
-
-    const heading = screen.getByRole('heading');
-    const image = screen.getByTestId('cta-image');
-
-    expect(
-      heading.compareDocumentPosition(image) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
-  });
-
-  it('places the image after the heading in the DOM for Banner, even though it is positioned as a background', () => {
-    setup({
-      variant: CTA_VARIANT.BANNER,
+      ...props,
       image: <img src="/cta.jpg" alt="" data-testid="cta-image" />,
     });
 

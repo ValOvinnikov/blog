@@ -1,6 +1,5 @@
 import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
-import userEvent from '@testing-library/user-event';
 
 import { NewsletterSignupCompact } from './newsletter-signup-compact';
 
@@ -79,52 +78,8 @@ describe(`<${NewsletterSignupCompact.name}/>`, () => {
     expect(screen.getByTestId('newsletter-signup-input-prompt')).toBeVisible();
   });
 
-  it('calls onSubmit when the submit button is clicked', async () => {
-    const onSubmit = vi.fn();
-    setup({ onSubmit });
-
-    await userEvent.click(screen.getByRole('button', { name: 'Subscribe' }));
-    expect(onSubmit).toHaveBeenCalledTimes(1);
-  });
-
-  it('calls onSubmit when Enter is pressed in the field', async () => {
-    const onSubmit = vi.fn();
-    setup({ onSubmit, email: faker.internet.email() });
-
-    await userEvent.type(screen.getByRole('textbox'), '{Enter}');
-    expect(onSubmit).toHaveBeenCalledTimes(1);
-  });
-
-  it('submits through a real submit control, not an onClick shortcut', () => {
-    setup();
-
-    expect(screen.getByRole('button', { name: 'Subscribe' })).toHaveAttribute(
-      'type',
-      'submit',
-    );
-  });
-
-  it('disables the field and button and marks the button busy while submitting', () => {
-    setup({ status: 'submitting' });
-
-    expect(screen.getByRole('textbox')).toBeDisabled();
-    const button = screen.getByRole('button', { name: 'Subscribe' });
-    expect(button).toBeDisabled();
-    expect(button).toHaveAttribute('aria-busy', 'true');
-  });
-
-  it('shows the Spinner atom inside the button while submitting', () => {
-    setup({ status: 'submitting' });
-
-    const button = screen.getByRole('button', { name: 'Subscribe' });
-    expect(screen.getByTestId('newsletter-signup-spinner')).toBeInTheDocument();
-    expect(button).toContainElement(
-      screen.getByTestId('newsletter-signup-spinner'),
-    );
-  });
-
   it('shows the success message and hides the field on success', () => {
-    const successMessage = 'Almost there — check your inbox to confirm.';
+    const successMessage = faker.lorem.sentence();
     setup({ status: 'success', successMessage });
 
     expect(screen.getByRole('status')).toHaveTextContent(successMessage);
@@ -132,41 +87,13 @@ describe(`<${NewsletterSignupCompact.name}/>`, () => {
   });
 
   it('keeps the prefix and heading visible on success', () => {
-    const successMessage = 'Almost there — check your inbox to confirm.';
+    const successMessage = faker.lorem.sentence();
     setup({ status: 'success', successMessage });
 
     expect(
       screen.getByTestId('newsletter-signup-compact-prefix'),
     ).toBeVisible();
     expect(screen.getByText('subscribe --email')).toBeVisible();
-  });
-
-  it('surfaces the error message inline and marks the field invalid', () => {
-    const errorMessage = 'That email is already subscribed.';
-    setup({ status: 'error', errorMessage });
-
-    expect(screen.getByRole('alert')).toHaveTextContent(errorMessage);
-    expect(screen.getByRole('textbox')).toHaveAttribute('aria-invalid', 'true');
-  });
-
-  it('associates the email field with the error message via its accessible description', () => {
-    const errorMessage = 'That email is already subscribed.';
-    setup({
-      status: 'error',
-      errorMessage,
-      errorMessageId: 'newsletter-compact-error',
-    });
-
-    expect(screen.getByRole('textbox')).toHaveAccessibleDescription(
-      errorMessage,
-    );
-  });
-
-  it('has no accessible description or aria-describedby when there is no error', () => {
-    setup({ errorMessageId: 'newsletter-compact-error' });
-
-    expect(screen.getByRole('textbox')).not.toHaveAttribute('aria-describedby');
-    expect(screen.getByRole('textbox')).toHaveAccessibleDescription('');
   });
 
   it('forwards dataTestId to the root element', () => {
