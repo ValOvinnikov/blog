@@ -4,9 +4,6 @@ import type { NextAuthConfig } from 'next-auth';
 
 import { buildAuthConfig } from './config';
 
-// Real `DrizzleAdapter` output is an opaque `Adapter` object (methods, no
-// inspectable table references) — mocked so the "bound to the right tables"
-// test below can assert on the call args instead.
 vi.mock('@auth/drizzle-adapter', () => ({
   DrizzleAdapter: vi.fn(() => ({})),
 }));
@@ -19,9 +16,6 @@ vi.mock('@blog/auth/events/consume-pending-invites-on-sign-in', () => ({
   consumePendingInvitesOnSignIn: consumePendingInvitesOnSignInMock,
 }));
 
-// `env.ts` validates AUTH_SECRET eagerly on import, so the one test that
-// changes it needs a fresh module instance via resetModules + dynamic import
-// (same pattern as utils/env/env.test.ts).
 async function importBuildAuthConfig(): Promise<typeof buildAuthConfig> {
   vi.resetModules();
   return (await import('./config')).buildAuthConfig;
@@ -90,8 +84,6 @@ describe(buildAuthConfig, () => {
 
   function providerIdsOf(config: NextAuthConfig): unknown[] {
     return config.providers.map((provider) => {
-      // A provider entry is either a config object or a factory returning
-      // one — `id` sits on the object form every provider here resolves to.
       const resolved = typeof provider === 'function' ? provider() : provider;
       return resolved.id;
     });

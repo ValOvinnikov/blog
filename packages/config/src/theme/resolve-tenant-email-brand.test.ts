@@ -19,11 +19,6 @@ beforeEach(async () => {
   mockedWcagContrastRatio.mockImplementation(actual.wcagContrastRatio);
 });
 
-// The light-mode L/C recipe `apps/web/src/utils/build-theme-style-block/
-// build-theme-style-block.ts:64-79` emits as `oklch()` CSS for the same
-// accent and logo token families — hue is the only value that varies per
-// tenant, so reproducing it here (rather than hardcoding expected hex)
-// fails if either side's recipe drifts from the other.
 const expectedAccentAndLogoHex = (hue: number) => ({
   brandPrimary: oklchToHex(0.53, 0.17, hue),
   brandPrimarySolid: oklchToHex(0.55, 0.17, hue),

@@ -5,9 +5,6 @@ export type TSignInEventUser = {
   email?: string | null;
 };
 
-/**
- * Auth.js `events.signIn` handler that attaches a signed-in user's pending membership invites to real `memberships` rows.
- */
 export async function consumePendingInvitesOnSignIn({
   user,
 }: {

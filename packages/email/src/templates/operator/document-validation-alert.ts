@@ -8,7 +8,6 @@ export type TDocumentValidationAlertInput = {
   isCritical: boolean;
 };
 
-/** Operator alert for a tenant with newly failing Sanity document validation. */
 export function buildDocumentValidationAlertEmail({
   tenantName,
   tenantId,
