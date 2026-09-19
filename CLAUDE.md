@@ -1217,6 +1217,34 @@ same pass, check the ticket against the `cloud-ok` criteria (same section)
 and include that label when it qualifies — cloud-eligibility is assessed
 at creation, not discovered later.
 
+**Read the body against the skills before dispatching it.** A ticket body
+is the whole brief for whoever executes it — a cloud session has no
+reviewer and no orchestrator, and a layer agent's dispatch prompt is
+sourced from it — so anything the body prescribes that a skill forbids
+ships exactly as written. Before dispatch, check every `## Scope` line and
+acceptance criterion against `testing-practices` → "What not to test" and
+the "Comments default to zero" rule above:
+
+- **Acceptance criteria state behaviour, never a test's shape.** "Two
+  labels render the same minimum width from `sm` up" is a criterion;
+  "`action-group.test.tsx` — the classes per appearance" is an instruction
+  to write the class assertion `testing-practices` bans, and a cloud
+  session will write it.
+- **A styling-only change says so.** Spacing, sizing, tokens, borders and
+  layout have no unit-test surface: the body names the story that covers
+  the change, `## Scope` lists no test file, and the ticket carries
+  `no-tests-needed` from creation rather than the PR earning it later.
+- **The same check covers every other rule** a body can quietly
+  prescribe: a test that asserts a schema's field list or a constant's
+  value back at itself, a `Name — does X` doc block, a hand-edit to
+  `packages/config/src/sanity/generated/`, a schema change with no
+  migration decision.
+
+Adopted 2026-09-19 after #3413 shipped PR #3445 with two Tailwind-class
+assertions because its `cloud-ok` body told it to; deleting the tests fixed
+the PR and nothing else. A body that fails this check is rewritten before
+dispatch — never dispatched and corrected in review.
+
 ### Issue body template
 
 **An issue body is a work item in fixed sections, not a design document.** A
