@@ -46,12 +46,7 @@ export function createVitestConfig(overrides: TNextAppVitestOverrides) {
     preset,
     defineConfig({
       ...overrides,
-      // web and platform can both pull in @blog/ui's icon registry
-      // transitively (it resolves to source via the caller's own alias), so
-      // both need the same `.svg` -> React component handling as
-      // packages/ui's own Vitest config; `?url` isn't matched by this
-      // filter, so it falls through to Vite's built-in asset-URL handling
-      // untouched.
+      // @blog/ui ships raw .svg imports from source, so both apps' tests need the same SVGR handling as its own Vitest config.
       plugins: [
         svgr({
           include: '**/*.svg',
@@ -71,28 +66,13 @@ export function createVitestConfig(overrides: TNextAppVitestOverrides) {
       test: {
         environment: 'jsdom',
         setupFiles: ['./src/vitest-setup.ts'],
-        // next-intl's client `createNavigation` ships pre-built ESM with no
-        // extension — Node's own ESM resolver can't load that extensionless
-        // subpath when Vitest externalizes the dependency. Inlining it
-        // forces Vite's bundler-style resolver (which does resolve it)
-        // instead.
+        // next-intl's client createNavigation ships extensionless ESM that Vitest's default externalized resolver can't load — inline forces Vite's bundler resolver instead.
         server: {
           deps: {
             inline: ['next-intl'],
           },
         },
-        // Constructing a jsdom environment is the single most expensive
-        // thing this suite does — each isolated test file re-imports the
-        // jsdom module (~1-10s), while the DOM it then builds costs ~0.2s.
-        // Only the files that render need it, so `.ts` tests run on `node`
-        // and `.tsx` tests on `jsdom`. The handful of `.ts` files that still
-        // need a DOM opt back in with their own `@vitest-environment jsdom`
-        // docblock.
-        //
-        // Split via `exclude`, not `include`: a project's `include` is
-        // merged with the inherited one rather than replacing it, so an
-        // `include` here would widen each project to the whole suite
-        // instead of narrowing it.
+        // jsdom costs ~1-10s per file to construct, so only .tsx tests use it; exclude (not include, which would widen rather than narrow) splits by extension.
         projects: [
           {
             extends: true,

@@ -20,9 +20,7 @@ export default createVitestConfig({
       blogPackageAlias('config', import.meta.url),
       blogPackageAlias('utils', import.meta.url),
       blogPackageAlias('email', import.meta.url),
-      // `import 'server-only'` throws outside a react-server bundle; stub it
-      // to a no-op for the jsdom test env (the real guard still runs in the
-      // Next.js build). Same pattern as packages/db and packages/service.
+      // import 'server-only' throws outside a react-server bundle; stub it to a no-op for tests — the real guard still runs at build time.
       {
         find: /^server-only$/,
         replacement: fileURLToPath(
