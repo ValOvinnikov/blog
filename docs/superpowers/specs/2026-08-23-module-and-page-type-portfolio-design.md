@@ -1134,18 +1134,18 @@ logo wall. Preview: the quote, subtitle `name — role`, the photo as media.
 
 ### Fields
 
-| Field              | Type                                                            | Notes                                                                           |
-| ------------------ | --------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| `title`            | `titleField()`                                                  | Editor-facing name, never rendered                                              |
-| `brandVariant`     | `brandVariantField({ list: FULL_BRAND_VARIANT_LIST })`          |                                                                                 |
-| `headingBlock`     | `headingBlockField()`                                           | Required heading, optional supporting text                                      |
-| `testimonials`     | array of references → `block_testimonial`, `unique()`, 1–8      | Authored order is display order                                                 |
-| `ctaButtons`       | `ctaButtonsField()`                                             | 0–2 actions under the quotes — "Read the case studies", "Work with me"          |
-| `showImages`       | `showImagesField()`, titled "Show Photos"                       | Off hides the photos and initials                                               |
-| `displayMode`      | `displayModeField()`                                            | Grid or Carousel; ignored for a single quote                                    |
-| `contentAlignment` | `alignmentFields([])`, titled "Content Alignment"               | Moves the heading, supporting text and actions together, as on the feature list |
-| `cardAlignment`    | `CONTENT_ALIGNMENT` `LEFT` / `CENTER`, required, initial `LEFT` | Moves the quote and the person inside each card                                 |
-| `layout`           | `layoutField`                                                   |                                                                                 |
+| Field              | Type                                                            | Notes                                                                                |
+| ------------------ | --------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `title`            | `titleField()`                                                  | Editor-facing name, never rendered                                                   |
+| `brandVariant`     | `brandVariantField({ list: [PRIMARY, SECONDARY] })`             | The post modules' list — Brand Primary is a `Section` tint, not the CTA's solid band |
+| `headingBlock`     | `headingBlockField()`                                           | Required heading, optional supporting text                                           |
+| `testimonials`     | array of references → `block_testimonial`, `unique()`, 1–8      | Authored order is display order                                                      |
+| `ctaButtons`       | `ctaButtonsField()`                                             | 0–2 actions under the quotes — "Read the case studies", "Work with me"               |
+| `showImages`       | `showImagesField()`, titled "Show Photos"                       | Off hides the photos and initials                                                    |
+| `displayMode`      | `displayModeField()`                                            | Grid or Carousel; ignored for a single quote                                         |
+| `contentAlignment` | `alignmentFields([])`, titled "Content Alignment"               | Moves the heading, supporting text and actions together, as on the feature list      |
+| `cardAlignment`    | `CONTENT_ALIGNMENT` `LEFT` / `CENTER`, required, initial `LEFT` | Moves the quote and the person inside each card                                      |
+| `layout`           | `layoutField`                                                   |                                                                                      |
 
 **One quote is a spotlight — derived, not a field.** The most common
 testimonial treatment on a landing page is a single large quote. A count of
@@ -1245,8 +1245,8 @@ and tests; `COMPONENTS.md` regenerated.
 
 `apps/web/src/modules/testimonial/` — `TestimonialModule` (loader + view,
 the `feature-list` shape) and `TestimonialModuleView`: `Section` with
-`brandVariant` and `layout`; `ModuleHeading` at the caller's level with
-`contentAlignment`, which also aligns the `ActionGroup`; then one of a
+`brandVariant` and `layout`; `ModuleHeading variant="section"` at the
+caller's level with `contentAlignment`, which also aligns the `ActionGroup`; then one of a
 single `QuoteCard isSpotlight` (count 1), a `CardGrid` with the derived
 column count, or a `CardCarousel` (#3318) of `QuoteCard`s; `ActionGroup`
 under the quotes when there are buttons. Each item composes `QuoteCard`
