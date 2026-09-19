@@ -1,17 +1,21 @@
 import { tagIndexPageSchema } from '@blog/studio/schema-types/documents/pages/tag-index/tag-index';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
+import { seoSchema } from '@blog/studio/schema-types/objects/seo/seo';
 import {
   assertSatisfiesRequiredFields,
   type TExemptField,
 } from '@blog/studio/testing/assert-satisfies-required-fields';
+import { getRecordedBounds } from '@blog/studio/testing/create-mock-validation-rule';
+import { getField } from '@blog/studio/testing/get-field';
 import { createIfNotExists } from 'sanity/migrate';
 
 import { PAGE_TAG_INDEX_ID, TAXONOMY_LIST_TAGS_ID } from './ids';
 
 import migration from './index';
 
-const SEO_META_TITLE_MIN_LENGTH = 30;
-const SEO_META_TITLE_MAX_LENGTH = 60;
+const metaTitleBounds = getRecordedBounds(getField(seoSchema, 'metaTitle'));
+const SEO_META_TITLE_MIN_LENGTH = metaTitleBounds.min!;
+const SEO_META_TITLE_MAX_LENGTH = metaTitleBounds.max!;
 
 const TAXONOMY_LIST_HEADING_BLOCK_EXEMPTION: TExemptField[] = [
   {
