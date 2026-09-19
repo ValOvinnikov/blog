@@ -34,15 +34,11 @@ export interface ISanityImage {
 export interface ILink {
   label: string;
   href: string;
-  /** '_blank' for external links opting into a new tab, else undefined. */
   target: TMaybeUndefined<'_blank'>;
-  /** Social platform key (set on footer social links). */
   platform: TMaybeUndefined<TSocialPlatform>;
-  /** Accessible name override, passed through to the rendered link's `aria-label` when `label` alone isn't descriptive enough. */
   ariaLabel: TMaybeUndefined<string>;
 }
 
-/** A `bodyImage` Portable Text block with its asset resolved to a view-model image. */
 export interface IBodyImageBlock {
   _type: 'bodyImage';
   _key: string;

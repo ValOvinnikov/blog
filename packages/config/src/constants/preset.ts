@@ -43,8 +43,8 @@ export const DENSITY = {
 export type TDensity = TValueOf<typeof DENSITY>;
 
 export type TThemeTokens = {
-  accentHue: number; // OKLCH hue channel driving --brand-primary*
-  logoHue?: number; // OKLCH hue channel for --logo-1/2/3 only; defaults to accentHue when unset
+  accentHue: number;
+  logoHue?: number;
   headingFont: TFontChoice;
   bodyFont: TFontChoice;
   radiusScale: TRadiusScale;

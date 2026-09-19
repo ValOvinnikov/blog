@@ -11,16 +11,11 @@ import type { TResolvedTenantEmailIdentity } from './resolve-tenant-email-identi
 
 export type TMagicLinkInviteEmailInput = {
   url: string;
-  /** The sending host's resolved tenant, if any — see `resolveTenantEmailIdentity`. */
   tenantIdentity?: TResolvedTenantEmailIdentity;
-  /** The names of the tenant(s) inviting this address — rendered structurally, never through the authored body. */
   tenantNames?: string[];
-  /** The resolved (authored-over-default) subject and body — see `resolveMagicLinkEmailSettings`. */
   subject: string;
   body: TPortableTextContent;
-  /** The resolved tenant or per-template logo — see `resolveMagicLinkEmailSettings`. */
   logoImageUrl?: string;
-  /** The tenant's configured footer postal address — see `resolveMagicLinkEmailSettings`. */
   footerPostalAddress?: string;
 };
 

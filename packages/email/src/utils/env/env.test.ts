@@ -17,8 +17,6 @@ function restoreEnv(): void {
   }
 }
 
-// `env.ts` validates eagerly on import (createEnv runs at module evaluation),
-// so each case needs a fresh module instance via resetModules + dynamic import.
 async function importEnv(): Promise<typeof import('./env')> {
   vi.resetModules();
   return import('./env');
