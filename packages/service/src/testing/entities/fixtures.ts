@@ -1,9 +1,12 @@
 import type { TRawFeedPost } from '@blog/service/features/entities/posts/adaptor/all-published/transformer';
-import type { TRawTagWithPostCount } from '@blog/service/features/entities/tags/adaptor/transformer';
-import type { TRawTopicWithPostCount } from '@blog/service/features/entities/topics/adaptor/transformer';
+import type { toTags } from '@blog/service/features/entities/tags/adaptor/transformer';
+import type { toTopics } from '@blog/service/features/entities/topics/adaptor/transformer';
 import type { TRawTag } from '@blog/service/shared/transformers/to-tag';
 import type { TRawTopic } from '@blog/service/shared/transformers/to-topic';
 import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
+
+type TRawTagWithPostCount = Parameters<typeof toTags>[0][number];
+type TRawTopicWithPostCount = Parameters<typeof toTopics>[0][number];
 
 export function makeRawTopic(overrides: Partial<TRawTopic> = {}): TRawTopic {
   return {

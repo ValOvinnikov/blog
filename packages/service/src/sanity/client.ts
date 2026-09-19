@@ -90,8 +90,3 @@ export function getPlatformSanityContext(): TTenantSanityContext {
     token: env.SANITY_API_READ_TOKEN ?? '',
   };
 }
-
-/** `getClient(getPlatformSanityContext())` — reuses the same tenant-keyed cache, never a client per call. */
-export function getPlatformClient(): TSanityClient {
-  return getClient(getPlatformSanityContext());
-}

@@ -4,7 +4,7 @@ import type { InferResultType } from 'groqd';
 import type { tagsQuery } from './query';
 import type { TTagsList, TTagWithPostCount } from './types';
 
-export type TRawTagWithPostCount = InferResultType<typeof tagsQuery>[number];
+type TRawTagWithPostCount = InferResultType<typeof tagsQuery>[number];
 
 function toTagWithPostCount(raw: TRawTagWithPostCount): TTagWithPostCount {
   return {

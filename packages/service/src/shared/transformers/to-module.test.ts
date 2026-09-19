@@ -1,13 +1,8 @@
 import type { THeroModuleType } from '@blog/config';
 
-import {
-  InvalidHeroModuleTypeError,
-  toHeroSlot,
-  toModule,
-  type TRawModule,
-} from './to-module';
+import { toHeroSlot, toModule, type TRawModule } from './to-module';
 
-describe('toModule', () => {
+describe(toModule, () => {
   it('maps a raw module reference to its id/type', () => {
     expect(toModule({ _id: 'cta-1', _type: 'module_cta' })).toEqual({
       id: 'cta-1',
@@ -16,7 +11,7 @@ describe('toModule', () => {
   });
 });
 
-describe('toHeroSlot', () => {
+describe(toHeroSlot, () => {
   it('maps a module_hero* reference to a hero slot', () => {
     expect(toHeroSlot({ _id: 'hero-1', _type: 'module_hero' })).toEqual({
       id: 'hero-1',
@@ -24,13 +19,15 @@ describe('toHeroSlot', () => {
     });
   });
 
-  it('throws InvalidHeroModuleTypeError when the reference is not a hero type', () => {
+  it('throws when the reference is not a hero type', () => {
     const nonHeroModule = {
       _id: 'cta-1',
       _type: 'module_cta',
     } as unknown as TRawModule<THeroModuleType>;
 
-    expect(() => toHeroSlot(nonHeroModule)).toThrow(InvalidHeroModuleTypeError);
+    expect(() => toHeroSlot(nonHeroModule)).toThrow(
+      'is not a module_hero* type',
+    );
   });
 
   it('returns undefined when the reference is null', () => {

@@ -6,7 +6,6 @@ import type { TRawTagPage } from '@blog/service/features/pages/tag/adaptor/detai
 import type { TRawTagIndexPage } from '@blog/service/features/pages/tag-index/adaptor/transformer';
 import type { TRawTopicPage } from '@blog/service/features/pages/topic/adaptor/detail-page/transformer';
 import type { TRawTopicIndexPage } from '@blog/service/features/pages/topic-index/adaptor/transformer';
-import type { TRawArchivePostCard } from '@blog/service/shared/transformers/to-archive-post-card';
 import type { TRawPostCard } from '@blog/service/shared/transformers/to-post-card';
 import {
   makeRawTag,
@@ -51,29 +50,6 @@ export function makeRawPostCard(
       image: makeRawSanityImage('Jane avatar'),
       profilePage: null,
     },
-    topic: {
-      _id: 'topic-1',
-      title: 'Engineering',
-      slug: 'engineering',
-      description: 'Engineering posts',
-    },
-    wordCount: 400,
-    ...overrides,
-  };
-}
-
-// Archive-listing cards render text-only — no heroImage/featured/author
-// fields to override, unlike `makeRawPostCard`.
-export function makeRawArchivePostCard(
-  overrides: Partial<TRawArchivePostCard> = {},
-): TRawArchivePostCard {
-  return {
-    _id: 'post-1',
-    headingBlock: makeRawHeadingBlock('Hello World', {
-      supportingText: 'A sufficiently long excerpt for the card.',
-    }),
-    slug: 'hello-world',
-    publishedAt: '2026-01-15T00:00:00Z',
     topic: {
       _id: 'topic-1',
       title: 'Engineering',
