@@ -77,10 +77,6 @@ describe(getSettingsFeaturesOrDefaults, () => {
 
     const result = await getSettingsFeaturesOrDefaults('tenant-1');
 
-    // EDITORIAL's featureDefaults are the same values as CONSOLE's today,
-    // but this asserts the preset actually read is EDITORIAL's, not a
-    // hardcoded CONSOLE fallback — proven by getSiteConfig having been
-    // consulted at all.
     expect(getSiteConfigMock).toHaveBeenCalledWith('tenant-1');
     expect(result).toEqual({
       commentsEnabled: true,

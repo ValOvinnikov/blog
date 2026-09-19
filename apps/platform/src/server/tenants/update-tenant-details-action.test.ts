@@ -282,8 +282,6 @@ describe('updateTenantDetailsAction', () => {
       error:
         "This tenant's owner has already signed in, so their email can no longer be corrected here — this would transfer ownership instead.",
     });
-    // Distinct from the generic couldn't-save message thrown errors map to
-    // below — never the same string.
     expect(result.ok).toBe(false);
     if (!result.ok) {
       expect(result.error).not.toBe(

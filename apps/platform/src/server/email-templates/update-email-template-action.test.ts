@@ -40,7 +40,6 @@ vi.mock('@blog/db', () => ({
   },
 }));
 
-/** The shared happy-path arrangement: a resolved membership, plus whatever `upsertEmailTemplateMock` should resolve to for that test. */
 const mockMembershipAndUpsert = (
   upsertResult: Partial<{
     tenantId: string;

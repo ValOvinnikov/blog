@@ -30,18 +30,11 @@ const restoreEnv = (): void => {
   }
 };
 
-// `env.ts` validates eagerly on import (createEnv runs at module evaluation),
-// so each case needs a fresh module instance via resetModules + dynamic import.
 const importEnv = async (): Promise<typeof import('./env')> => {
   vi.resetModules();
   return import('./env');
 };
 
-// The test environment is jsdom (a `window` global is present), so
-// `env-nextjs` treats the module as running on the client and throws for
-// server-only keys — this is the server/client boundary working as intended.
-// `isServer` is decided once, at `createEnv()` (i.e. at import time), so
-// simulating a server context requires removing `window` before importing.
 const importEnvOnServer = async (): Promise<typeof import('./env')> => {
   const originalWindow = globalThis.window;
   // @ts-expect-error -- simulate a server (non-browser) runtime for this import
@@ -54,8 +47,6 @@ const importEnvOnServer = async (): Promise<typeof import('./env')> => {
 };
 
 describe('env', () => {
-  // Required regardless of which optional var a given case exercises — set
-  // once here so every case below stays focused on the var it names.
   beforeEach(() => {
     process.env['AUTH_SECRET'] = 'test-auth-secret';
   });
