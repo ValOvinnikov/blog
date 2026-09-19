@@ -24,11 +24,6 @@ export type TSettingsFormShellProps = {
   children: ReactNode;
 };
 
-/**
- * The header + Save button + archived notice + error alert shell shared by
- * every tenant settings tab (Features, Voice, …) — each tab supplies its own
- * body as `children`.
- */
 export const SettingsFormShell = ({
   title,
   description,

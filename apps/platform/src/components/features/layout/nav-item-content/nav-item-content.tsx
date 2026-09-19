@@ -1,10 +1,11 @@
 import { SIZE, type TIconName } from '@blog/config';
-import { sidebarVariants } from '@platform/components/features/layout/sidebar';
 import { Icon } from '@platform/components/shared/icon';
 import {
   StatusBadge,
   type TStatusBadgeProps,
 } from '@platform/components/shared/status-badge';
+
+import { navItemContentVariants } from './nav-item-content-variants';
 
 export type TNavItemContentProps = {
   icon: TIconName;
@@ -24,7 +25,7 @@ export const NavItemContent = ({
   badge,
 }: TNavItemContentProps) => {
   const { rowIcon, rowBody, rowLabel, rowReason, badgeSlot } =
-    sidebarVariants();
+    navItemContentVariants();
 
   return (
     <>

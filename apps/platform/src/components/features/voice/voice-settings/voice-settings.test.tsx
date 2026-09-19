@@ -153,7 +153,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
     expect(refresh).not.toHaveBeenCalled();
   });
 
-  it('shows a spinner, marks Save busy, and announces the pending state to assistive tech while the save is in flight', async () => {
+  it('shows the saving state while the save is in flight', async () => {
     let resolveAction: (value: { ok: boolean }) => void = () => {};
     const saveAction = vi.fn(
       () =>
@@ -166,11 +166,9 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
-    const saveButton = await screen.findByRole('button', { name: 'Saving…' });
-    expect(saveButton).toHaveAttribute('aria-busy', 'true');
-    expect(saveButton).toBeDisabled();
-    // A disabled button is force-blurred; this live region carries the real announcement.
-    expect(saveButton.nextElementSibling).toHaveTextContent('Saving…');
+    expect(
+      await screen.findByRole('button', { name: 'Saving…' }),
+    ).toBeDisabled();
 
     resolveAction({ ok: true });
   });

@@ -133,6 +133,7 @@ export const AssetUploadField = ({
               fill={true}
               sizes="48px"
               className={thumbImage()}
+              // A vector source has no raster grid to resample, and skipping it avoids needing `images.dangerouslyAllowSVG` in next.config.ts.
               unoptimized={currentUrl.endsWith('.svg')}
             />
           ) : (
