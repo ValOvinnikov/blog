@@ -2,32 +2,22 @@ import { routes } from '@blog/config';
 import { escapeXml } from '@web/utils/escape-xml';
 import { NextResponse } from 'next/server';
 
-export type TConfirmPageCopy = {
+export type TResultPageCopy = {
   lang: string;
   title: string;
   message: string;
-  confirmButtonLabel: string;
   returnHomeLabel: string;
-  actionUrl: string;
 };
 
-/**
- * The GET-rendered confirmation page: a plain, JavaScript-free `<form>`
- * whose submit `POST`s to the same URL rather than acting on this `GET`.
- */
-const renderConfirmPage = ({
+const renderResultPage = ({
   lang,
   title,
   message,
-  confirmButtonLabel,
   returnHomeLabel,
-  actionUrl,
-}: TConfirmPageCopy): string => {
+}: TResultPageCopy): string => {
   const safeTitle = escapeXml(title);
   const safeMessage = escapeXml(message);
-  const safeButtonLabel = escapeXml(confirmButtonLabel);
   const safeReturnHomeLabel = escapeXml(returnHomeLabel);
-  const safeActionUrl = escapeXml(actionUrl);
   const homeHref = routes.home();
 
   return `<!doctype html>
@@ -40,17 +30,17 @@ const renderConfirmPage = ({
   <body>
     <h1>${safeTitle}</h1>
     <p>${safeMessage}</p>
-    <form method="post" action="${safeActionUrl}">
-      <button type="submit">${safeButtonLabel}</button>
-    </form>
     <p><a href="${homeHref}">${safeReturnHomeLabel}</a></p>
   </body>
 </html>`;
 };
 
-export const renderConfirmResponse = (copy: TConfirmPageCopy): NextResponse => {
-  return new NextResponse(renderConfirmPage(copy), {
-    status: 200,
+export const renderResultResponse = (
+  copy: TResultPageCopy,
+  status: number,
+): NextResponse => {
+  return new NextResponse(renderResultPage(copy), {
+    status,
     headers: { 'Content-Type': 'text/html; charset=utf-8' },
   });
 };
