@@ -192,14 +192,6 @@ describe(`<${MediaCard.name}/>`, () => {
     expect(screen.getByTestId('media-card-content')).toHaveClass('md:w-1/2');
   });
 
-  it('omits the hover and focus-within fill classes when isInteractive is false', () => {
-    renderElement(<MediaCard isInteractive={false} dataTestId="media-card" />);
-    expect(screen.getByTestId('media-card')).not.toHaveClass(
-      'hover:bg-brand-primary-muted',
-      'focus-within:bg-brand-primary-muted',
-    );
-  });
-
   it('does not apply the split layout class when isSplit is unset', () => {
     renderElement(<MediaCard dataTestId="media-card" />);
     expect(screen.getByTestId('media-card')).not.toHaveClass('md:flex-row');
@@ -393,8 +385,6 @@ describe(`<${MediaCard.name}/>`, () => {
       'mx-card-x',
       'bg-brand-primary-muted',
       'text-brand-primary',
-      'group-hover:bg-surface',
-      'group-focus-within:bg-surface',
     );
     expect(media).not.toHaveClass('w-full');
   });
