@@ -498,14 +498,13 @@ delete-don't-shorten rule. It is not restated here; follow it as written.
 
 - Vitest + Testing Library (jsdom), co-located `*.test.tsx`. See the
   `testing-practices` skill (`.claude/skills/testing-practices/SKILL.md`).
-- **Assert a class only when it is prop-driven.** A class that changes with a
-  prop, variant, or state is part of the primitive's contract and may be
-  asserted directly. A class the component applies unconditionally (layout,
-  color, typography, radius, shadow) must not be — it never varies with input,
-  so the test restates the source and breaks on any restyle. Prefer the
-  semantic or behavioral observable where one exists (rendered text, ARIA
-  state, disabled/focus behavior, a callback firing with the right value);
-  fall back to the class when it is the only thing the prop actually changes.
+- **Never assert a class — prop-driven or not.** Assert the semantic or
+  behavioral observable (rendered text, ARIA state, disabled/focus behavior,
+  a callback firing with the right value). When a prop's only effect is
+  styling, the change has no unit-test surface — Storybook and
+  `no-tests-needed`. The `no-class-assertions` lint rule fails
+  `toHaveClass` and class reads in test files; see `testing-practices` →
+  "What not to test".
 - Mock `@blog/db` query/mutation functions; assert that fetched data renders and
   that a form submission calls the action with the values the user entered.
 - **A mutation that records an audit event gets a test that it is _not_

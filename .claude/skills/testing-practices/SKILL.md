@@ -99,9 +99,8 @@ export default mergeConfig(
 
 - **`@blog/ui`** — behaviour and contract, not markup snapshots. Query by role/
   text (`getByRole("button", { name: ... })`), assert rendered props and
-  interactions via `@testing-library/user-event`. A class that toggles with a
-  prop, variant, or state **is** part of the contract and may be asserted; a
-  class the component always applies is not (see "What not to test").
+  interactions via `@testing-library/user-event`. Never a class — not even
+  one a prop toggles (see "What not to test").
 - **`@blog/service`** — pure logic: GROQ result → domain mapping, `urlForImage`
   output, error/empty handling. **Mock the Sanity client** (`vi.mock`); never
   hit the network. No `revalidate` timing tests.
@@ -312,25 +311,27 @@ export default mergeConfig(
   A test file that repeats an arrangement it already contains is fixed in
   the same change, not later; two files that need the same arrangement share
   a builder in `testing/` (see "Where tests live").
-- **Never assert a class the component applies unconditionally.** If a utility
-  never varies with the component's input — layout (`w-full`, `max-w-page`,
-  `grid`, `flex`), spacing (`mt-*`/`px-*`/`gap-*`), colour/background/border
-  (`text-accent`, `bg-bg`, `border-t`), typography (`text-copy`, `font-mono`),
-  radius/shadow, an icon's `size` — then asserting it only restates the source
-  and turns every restyle into a failing test. "This class used to be X, now
-  it's Y" (a restyle, a token swap, an added/removed wrapper `<div>`) is never
-  a reason to add an assertion.
-- **A class that varies with a prop, variant, or state may be asserted.** That
-  is the component's contract rather than its decoration: an `align` prop
-  producing `text-center`, a `variant` producing its tint, an item reflecting
-  active navigation state, a control reflecting disabled/error state. Assert
-  it directly — mocking a child component purely to inspect the prop you just
-  passed it is more indirection, not more rigour. Where the component exposes
-  a semantic or ARIA equivalent (`aria-current`, `aria-disabled`, `role`,
-  visible text), prefer that: it survives a restyle and the class does not.
-- Assert behaviour, semantics, and rendered output; never static styling. A
-  restyle that changes no prop-driven behaviour has no unit-test surface —
-  Storybook + `no-tests-needed`.
+- **Never assert a class — unconditional or prop-driven, no exceptions.** A
+  Tailwind utility is the source restated: the expected value is a string
+  copied out of the `*-variants.ts` file under test, so the test fails on
+  every restyle (a token swap, `text-center` → `justify-center`, a wrapper
+  `<div>`) and passes on every visual regression that keeps the class name.
+  "The class only appears when the prop is set" does not change that — it is
+  still the variants map read back, and it is the case agents reach for most
+  (`toHaveClass('hover:bg-brand-primary-muted')` gated on `link`). What a
+  prop-driven style _means_ has a semantic observable: `aria-current` for the
+  active item, `aria-disabled`/`disabled` for the disabled control, `role`
+  and the rendered element for a link-vs-article card, visible text for
+  copy. Assert that. When the prop's only effect is styling, the change has
+  no unit-test surface: Storybook covers it and the ticket carries
+  `no-tests-needed`. The forwarded `className` is not an exception either —
+  it is a one-line `cn()` call, and a test for it restates that line.
+  Mechanically enforced: the `no-class-assertions` rule in
+  `configs/eslint/base.js` fails `toHaveClass`, `.className`/`.classList`
+  reads and `class`-attribute assertions in every `*.test.{ts,tsx}`. The
+  violations that predate the rule are listed in each workspace's
+  `eslint-suppressions.json` and drained by the per-workspace sweep tickets;
+  a new one is a lint failure, not a judgement call.
 - **No comments in a test file — none.** The `describe` and `it` titles are
   the documentation: a "why this case exists" belongs in the `it` title, a
   "why this mock" belongs in the helper's name, and a "the other route is
