@@ -278,6 +278,24 @@ Each step feeds the next:
    - `pnpm test` — runs all test suites. Per-package checks already ran during
      implementation; this is the integration pass.
 
+**Hook/script changes need a local shellcheck + guard-test pass too.** When
+the diff touches `.claude/hooks/**` or `scripts/*.sh`, run this before
+commit — it mirrors `hooks.yml`'s required `Shellcheck + guard tests` job:
+
+```
+shellcheck .claude/hooks/*.sh scripts/*.sh
+bash .claude/hooks/read-only-agent-guard.test.sh
+sh .claude/hooks/gate-bypass-guard.test.sh
+sh .claude/hooks/pre-bash-worktree-install-guard.test.sh
+bash .claude/hooks/test-writer-scope-guard.test.sh
+bash .claude/hooks/pre-agent-gate0-guard.test.sh
+sh scripts/vercel-ignore-affected.test.sh
+```
+
+Such a diff is not docs-only (the exemption in `CLAUDE.md`'s gate step 4
+covers `.claude/**/*.md`, not scripts), so it still gets the `reviewer`
+dispatch in step 6 in addition to this local pass.
+
 **No local `build` step.** CI's `ci.yml` runs a dedicated `build` job (Next.js
 build + Sanity Studio build) gating every PR — a local re-run duplicates it.
 Measured cost of adding it to the local loop: +~65% tokens and +~4.6× wall

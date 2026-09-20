@@ -164,9 +164,13 @@ and its actual merge commit message, not just the former.
 - **Never push (Gate 3) before the `reviewer` subagent has returned
   `APPROVE` on the final diff.** New changes after an APPROVE invalidate it —
   re-review before pushing again. A **docs-only** diff (nothing outside
-  `docs/**`, `SPEC.md`, `README.md`, `CLAUDE.md`, `.claude/**`) is the one
-  exception: it takes the inline identifier check `CLAUDE.md`'s delivery
-  gate step 4 describes instead of a `reviewer` dispatch.
+  `docs/**`, `SPEC.md`, `README.md`, `CLAUDE.md`, `.claude/**/*.md`) is the
+  one exception: it takes the inline identifier check `CLAUDE.md`'s delivery
+  gate step 4 describes instead of a `reviewer` dispatch. A `.sh`/`.js` file
+  under `.claude/` (a hook, a guard script) is not covered by this exemption
+  — it is executable tooling, not prose, and still requires the `reviewer`
+  dispatch plus the local `shellcheck`/guard-test pass in `develop-feature`
+  §5.
 - **Never merge.** Merging is the human's call only.
 - **Never deploy.** `sanity deploy` and Vercel deploys are human-run only.
 - **Never set `--assignee` or `--reviewer` on the PR.** The repo owner cannot
