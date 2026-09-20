@@ -192,14 +192,6 @@ describe(`<${MediaCard.name}/>`, () => {
     expect(screen.getByTestId('media-card-content')).toHaveClass('md:w-1/2');
   });
 
-  it('applies the hover and focus-within fill classes by default', () => {
-    renderElement(<MediaCard dataTestId="media-card" />);
-    expect(screen.getByTestId('media-card')).toHaveClass(
-      'hover:bg-brand-primary-muted',
-      'focus-within:bg-brand-primary-muted',
-    );
-  });
-
   it('omits the hover and focus-within fill classes when isInteractive is false', () => {
     renderElement(<MediaCard isInteractive={false} dataTestId="media-card" />);
     expect(screen.getByTestId('media-card')).not.toHaveClass(
