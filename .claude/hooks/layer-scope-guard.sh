@@ -29,6 +29,10 @@
 # Wired in each layer agent's frontmatter with its own `LAYER_PATHS`, so the
 # same script carries every layer's scope without a lookup table here.
 #
+# Edit/Write is the only surface this covers: a layer agent's Bash can still
+# `mv`/`cp` across the boundary, and unlike test-writer nothing closes that
+# half — accepted residual gap, documented rather than guarded.
+#
 # Fails open when `jq` is missing or `LAYER_PATHS` is unset/empty — an
 # unconfigured guard stays out of the way rather than denying everything, the
 # same stance as test-writer-scope-guard.sh and the read-only guard. A missing

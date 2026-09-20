@@ -464,7 +464,10 @@ file` are all denied alike) — an earlier version only handled the
     **Fails open** when `jq` is missing or `LAYER_PATHS` is unset/empty —
     an unconfigured guard stays out of the way rather than denying
     everything, same stance as `test-writer-scope-guard.sh`; a missing
-    `file_path` passes too. `packages/config/src/sanity/generated/` needs no
+    `file_path` passes too. `Edit`/`Write` is the only surface it covers: a
+    layer agent's Bash can still `mv`/`cp` across the boundary, and unlike
+    `test-writer` nothing closes that half — an accepted, documented gap.
+    `packages/config/src/sanity/generated/` needs no
     entry: it is already deny-listed for `Edit`/`Write` in `settings.json`,
     and typegen writes it through `pnpm`, not through this tool surface.
     `layer-scope-guard.test.sh` pins the deny/allow matrix against throwaway
