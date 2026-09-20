@@ -162,6 +162,13 @@ Run these checks **once, after all work is complete**:
   report, not a judgment call to make silently
 - Any env var added or renamed, and whether the docs table was updated
 
+**Commit your work before you report.** Stage the specific files you changed
+(`git add <path> …` — never `git add -A`) and commit with a conventional
+message scoped to this layer (`feat(auth): …`, `fix(auth): …`). Open your
+final message with the commit SHA: the orchestrator lands your work by
+merging that commit, and a `SubagentStop` hook blocks a worktree with
+uncommitted changes from ending its turn at all.
+
 ## Reuse before you create
 
 Before adding a function, type, schema definition, field helper or constant,

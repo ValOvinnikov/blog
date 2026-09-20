@@ -203,6 +203,14 @@ Run these checks **once, after all work is complete**:
 - Any downstream work needed in `studio`/`service`/`ui`/`web`, described
   precisely enough that the next agent can act without re-reading this layer
 
+**Commit your work before you report.** Stage the specific files you changed
+(`git add <path> …` — never `git add -A`, your worktree may hold files that
+are not yours to commit) and commit with a conventional message scoped to this
+layer (`feat(config): …`, `fix(config): …`). Open your final message with the
+commit SHA: the orchestrator lands your work by merging that commit, and a
+`SubagentStop` hook blocks a worktree with uncommitted changes from ending
+its turn at all.
+
 ## Reuse before you create
 
 Before adding a function, type, schema definition, field helper or constant,

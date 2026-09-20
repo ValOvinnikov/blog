@@ -328,6 +328,14 @@ postId, value): Promise<TRatingSummary>`)
 - Any downstream work needed in `web` or `platform-app`, described precisely
   enough that the next agent can act without re-reading this layer
 
+**Commit your work before you report.** Stage the specific files you changed
+— schema, queries, tests, and the generated SQL migration plus its snapshot
+under `packages/db/migrations/` (`git add <path> …` — never `git add -A`) —
+and commit with a conventional message scoped to this layer (`feat(db): …`,
+`fix(db): …`). Open your final message with the commit SHA: the orchestrator
+lands your work by merging that commit, and a `SubagentStop` hook blocks a
+worktree with uncommitted changes from ending its turn at all.
+
 ## Reuse before you create
 
 Before adding a function, type, schema definition, field helper or constant,

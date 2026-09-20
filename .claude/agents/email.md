@@ -126,6 +126,31 @@ in every consumer you touch.
 source for comment rules, including the three-step test and the
 delete-don't-shorten rule. It is not restated here; follow it as written.
 
+## Definition of done
+
+- `pnpm --filter @blog/email type-check`, `lint`, and `test` pass.
+- No workspace dependency beyond `@blog/utils` in
+  `packages/email/package.json`; no `@blog/insight`, `@blog/db`, `@blog/auth`,
+  `@blog/service`, app or Sanity import anywhere in `src/`.
+- Every consumer you touched has the alias wiring `## When a consumer
+changes` above requires.
+
+**Report back to the orchestrator** with:
+
+- The exported surface — template builders, `escapeHtml`, `sendEmail`, and
+  any supporting types
+- Exactly what each consuming app (and `@blog/auth`) must now do to use it,
+  precisely enough that the next agent can act without re-reading this layer
+- Any copy that moved between the tenant-editable and never-editable sides of
+  the trust boundary, and why
+
+**Commit your work before you report.** Stage the specific files you changed
+(`git add <path> …` — never `git add -A`) and commit with a conventional
+message scoped to this layer (`feat(email): …`, `fix(email): …`). Open your
+final message with the commit SHA: the orchestrator lands your work by
+merging that commit, and a `SubagentStop` hook blocks a worktree with
+uncommitted changes from ending its turn at all.
+
 ## Reuse before you create
 
 Before adding a function, type, schema definition, field helper or constant,
