@@ -310,6 +310,15 @@ Run these checks **once, after all schema work is complete**:
 
 Do not run `sanity deploy` — deployment is a human-gated step.
 
+**Commit your work before you report.** Stage the specific files you changed
+— the schema files, any migration, and the regenerated
+`packages/config/src/sanity/generated/` pair from the typegen contract above
+(`git add <path> …` — never `git add -A`) — and commit with a conventional
+message scoped to this layer (`feat(studio): …`, `fix(studio): …`). Open your
+final message with the commit SHA: the orchestrator lands your work by merging
+that commit, and a `SubagentStop` hook blocks a worktree with uncommitted
+changes from ending its turn at all.
+
 ## Reuse before you create
 
 Before adding a function, type, schema definition, field helper or constant,

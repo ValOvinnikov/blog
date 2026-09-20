@@ -166,6 +166,17 @@
           }
         ]
       }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "^(config|studio|service|ui|web|db|auth|platform-app|email|insight)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/subagent-stop-commit-guard.sh"
+          }
+        ]
+      }
     ]
   }
 }

@@ -170,6 +170,14 @@ Run these checks **once, after all work is complete**:
 - Any improvements flagged during the existing-component review that were
   not addressed in this task (so the orchestrator can track them)
 
+**Commit your work before you report.** Stage the specific files you changed
+— component, test, story, barrel (`git add <path> …` — never `git add -A`;
+the pre-commit hook regenerates and stages `COMPONENTS.md` itself) — and
+commit with a conventional message scoped to this layer (`feat(ui): …`,
+`fix(ui): …`). Open your final message with the commit SHA: the orchestrator
+lands your work by merging that commit, and a `SubagentStop` hook blocks a
+worktree with uncommitted changes from ending its turn at all.
+
 ## Reuse before you create
 
 Before adding a function, type, schema definition, field helper or constant,

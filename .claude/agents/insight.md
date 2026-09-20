@@ -126,6 +126,13 @@ delete-don't-shorten rule. It is not restated here; follow it as written.
 - Anything that should change in `packages/utils`'s copy of the sanitizer if
   you found a discrepancy while duplicating it
 
+**Commit your work before you report.** Stage the specific files you changed
+(`git add <path> …` — never `git add -A`) and commit with a conventional
+message scoped to this layer (`feat(insight): …`, `fix(insight): …`). Open
+your final message with the commit SHA: the orchestrator lands your work by
+merging that commit, and a `SubagentStop` hook blocks a worktree with
+uncommitted changes from ending its turn at all.
+
 ## Reuse before you create
 
 Before adding a function, type, schema definition, field helper or constant,

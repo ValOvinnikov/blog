@@ -297,6 +297,7 @@ sh .claude/hooks/gate-bypass-guard.test.sh
 sh .claude/hooks/pre-bash-worktree-install-guard.test.sh
 bash .claude/hooks/test-writer-scope-guard.test.sh
 bash .claude/hooks/pre-agent-gate0-guard.test.sh
+bash .claude/hooks/subagent-stop-commit-guard.test.sh
 sh scripts/vercel-ignore-affected.test.sh
 ```
 
