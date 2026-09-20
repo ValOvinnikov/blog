@@ -85,8 +85,9 @@ contracts:
     _shorten_ an over-long comment rather than delete it, which is why comment
     density kept growing while the rule said otherwise.
   - `verify-runner` — read-only, Haiku-model runner for the integration
-    verify pass (`develop-feature` §5: `type-check`/`lint`/`test`,
-    the exact scenario-specific sequence it's given). `build` is not part of
+    verify pass (`develop-feature` §5: `pnpm verify` — the root `&&` chain
+    over `type-check`, `lint`, `test`, `knip` and the gating scripts — or
+    whatever exact sequence it's given). `build` is not part of
     the routine sequence — CI's `ci.yml` `build` job gates every PR, so a
     local re-run would just duplicate it; `verify-runner` still runs `build`
     on request when reproducing an actual CI build failure

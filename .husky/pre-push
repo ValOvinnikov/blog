@@ -1,1 +1,1 @@
-pnpm type-check && pnpm lint
+pnpm type-check && pnpm lint && pnpm knip && pnpm check:client-graph && pnpm check:revalidate-tags-sync && pnpm check:turbo-env-sync && pnpm check:migration-index && pnpm gen:ui-index:check

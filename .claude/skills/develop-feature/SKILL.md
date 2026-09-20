@@ -226,8 +226,8 @@ was already written first, TDD-style, by the owning layer agent in step 3;
 
 ## 5. Verify
 
-**Every scenario below opens with `git fetch origin && git merge origin/main`**
-(or a rebase onto it), before anything is verified. Verifying a branch that
+**The sequence opens with `git fetch origin && git merge origin/main`** (or a
+rebase onto it), before anything is verified. Verifying a branch that
 is behind `main` proves nothing about what CI will run: #3144 verified green,
 merged `main` in afterwards, and CI's Test job failed a minute later on a
 schema type that had landed on `main` in between. The same rule runs the
@@ -238,16 +238,16 @@ push ask.
 
 Dispatch the **`verify-runner` subagent** (`.claude/agents/verify-runner.md`)
 to run the integration verify pass instead of running it inline yourself —
-`turbo run type-check`/`lint`/`test` output across up to 11 packages
-is purely mechanical (a compiler/test runner either succeeds or fails; no
-interpretation is needed to know which), so it belongs in the subagent's
-disposable Haiku context, not this session's. **Dispatch it in the background
+`pnpm verify` output across up to 11 packages is purely mechanical (a
+compiler/test runner either succeeds or fails; no interpretation is needed
+to know which), so it belongs in the subagent's disposable Haiku context,
+not this session's. **Dispatch it in the background
 (`run_in_background: true`), same as every other subagent** — verify is a
 blocking prerequisite before `reviewer` can run in step 6, but that ordering
 holds regardless: the orchestrator resumes on `verify-runner`'s completion
 notification and dispatches `reviewer` then, without sitting blocked and
-unable to respond to the user meanwhile. Give it the exact ordered command
-sequence for the scenario at hand; it does not decide or guess scope.
+unable to respond to the user meanwhile. Give it `pnpm verify` as the exact
+command; it does not decide or guess scope.
 
 **The dispatch's first command is `cd <absolute path of the checkout to
 verify>`, and every later command is prefixed with the same `cd … &&`.**
@@ -262,41 +262,29 @@ report that names no commit is rejected the same way.
 **`pnpm typegen` never goes to `verify-runner`.** It mutates
 `packages/config/src/sanity/generated/` in place — that is a write, not a
 read-only verify step, and `verify-runner`'s `read-only-agent-guard.sh` hook
-denies it same as it would for `reviewer`/`explore`/`ci-watcher`. Whenever a
-scenario below calls for typegen, run it yourself, inline, in this session
-_before_ dispatching `verify-runner` for the remaining checks.
+denies it same as it would for `reviewer`/`explore`/`ci-watcher`. When the
+schema changed, run it yourself, inline, in this session _before_
+dispatching `verify-runner`.
 
-**Single-package task, no schema change** (e.g. service query added, ui component added):
+**One sequence, whatever the task touched:**
 
-- Dispatch `verify-runner` with: `pnpm --filter <pkg> type-check`,
-  `pnpm --filter <pkg> lint`, `pnpm --filter <pkg> test` (stop-on-first-failure).
-- All three must pass before moving to self-review.
-
-**Studio-only task (schema changed)**:
-
-1. Run `pnpm typegen` yourself, inline — regenerates the types in
-   `packages/config/src/sanity/generated/` from the updated schema. Typegen
-   can be non-deterministic — re-run until the diff is minimal.
-2. Dispatch `verify-runner` with: `pnpm --filter @blog/studio type-check`,
-   `pnpm --filter @blog/studio lint` (stop-on-first-failure) — verify the studio
-   itself is clean.
-
-- No web build needed; downstream packages are unchanged.
-
-**Multi-layer task** (more than one package touched, or schema change with downstream effects):
-Each step feeds the next:
-
-1. Run `pnpm typegen` yourself, inline — regenerates the types in
-   `packages/config/src/sanity/generated/` from the current schema.
+1. **Schema changed?** Run `pnpm typegen` yourself, inline — regenerates the
+   types in `packages/config/src/sanity/generated/` from the current schema
    (`sanity schema extract` overwrites `schema.json` in place, so no manual
-   clean is needed first. Typegen can be non-deterministic — re-run until the
-   diff is minimal.)
-2. Dispatch `verify-runner` with this exact sequence, in order,
-   stop-on-first-failure:
-   - `pnpm type-check` — checks all packages against the freshly generated types.
-   - `pnpm lint` — runs across all packages.
-   - `pnpm test` — runs all test suites. Per-package checks already ran during
-     implementation; this is the integration pass.
+   clean is needed first). Typegen can be non-deterministic — re-run until
+   the diff is minimal. Skip this step when no schema file changed.
+2. Dispatch `verify-runner` with `pnpm verify` — the root script chains
+   `type-check`, `lint`, `test`, `knip`, `check:client-graph`,
+   `check:revalidate-tags-sync`, `check:turbo-env-sync`,
+   `check:migration-index` and `gen:ui-index:check` with `&&`, so it stops at
+   the first failure and mirrors every required or gating CI check that has a
+   local equivalent (`docs/context/ci-automation.md` has the mapping).
+
+There is no per-package or studio-only variant. Turbo caches the packages a
+diff never touched, so a scoped `--filter` run saved little — and it is how
+the `@blog/db` type error on #2876 and the `Revalidate tags sync`,
+`Migration index`, `Client graph`, `Turbo env sync` and `UI index` failures
+on other branches reached CI without ever running locally.
 
 **Hook/script changes need a local shellcheck + guard-test pass too.** When
 the diff touches `.claude/hooks/**` or `scripts/*.sh`, run this before
