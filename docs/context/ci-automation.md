@@ -156,6 +156,28 @@ decision (#1580) to leave it unrecognized as an accepted warning; #1882
 revisited that call and declared the type instead, since the job being
 advisory doesn't make an avoidable warning worth carrying indefinitely.
 
+**The Test job caps turbo at two suites at a time** (#3364):
+`pnpm turbo run test --concurrency=2`, in the workflow only — the root
+`pnpm test` script and `turbo.json` keep turbo's default of 10, so local runs
+are unchanged. At the default, every workspace's vitest spawns its own worker
+pool at once and the runner is oversubscribed: the symptom is a hook or test
+timeout in whichever heavy suite (`@blog/db`'s per-file PGlite setup, `web`,
+`platform`, `@blog/studio`) lost the scheduling race, and the failure set
+changes between otherwise identical runs, which is the tell that it is
+contention rather than code. 13 of the last 150 failed `Test` runs were of
+that class, and the same suites pass when rerun standalone. Measured locally on
+an 8-core machine with `--force` (cache bypassed): default concurrency
+8m55s wall, `--concurrency=2` 7m08s, `--concurrency=50%` (4 there; 2 on
+`ubuntu-latest`'s 4 vCPUs) 7m07s — the cap costs no wall time because the
+big four suites stop contending and each finish in under half the time.
+`2` rather than `50%` because it resolves to the same number on the hosted
+runner and a literal does not silently change with the runner size. Note
+the flag sits on `turbo run` directly: pnpm forwards `pnpm test --
+--concurrency=2` verbatim, so the `--` would hand the flag to vitest, not
+turbo. The ticket's acceptance criterion — ten consecutive `Test` runs on an
+unchanged branch with no timeout-class failure — is observable only on CI
+after merge, so it is the thing to watch, not something this change proved.
+
 **Lighthouse CI and Playwright smoke stay advisory by design, and both run
 only on push to `main`, not on every PR push.** Playwright smoke is still a
 structural no-op — it depends on a preview/smoke URL this repo doesn't
