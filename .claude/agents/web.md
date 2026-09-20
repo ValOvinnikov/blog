@@ -8,6 +8,12 @@ description: >-
 tools: Read, Edit, Write, Grep, Glob, Bash, mcp__plugin_context7_context7__resolve-library-id, mcp__plugin_context7_context7__query-docs
 model: sonnet
 isolation: worktree
+hooks:
+  PreToolUse:
+    - matcher: 'Edit|MultiEdit|Write'
+      hooks:
+        - type: command
+          command: 'LAYER_PATHS=apps/web "$CLAUDE_PROJECT_DIR"/.claude/hooks/layer-scope-guard.sh'
 ---
 
 You are the frontend engineer. Your workspace is `apps/web` (package `web`), a
@@ -413,6 +419,11 @@ delete-don't-shorten rule. It is not restated here; follow it as written.
 
 ## Testing
 
+- **A bugfix's regression test is TDD, written by you, first:** per
+  `superpowers:test-driven-development`, write the failing test before the
+  fix and make it pass; new-feature coverage instead comes from
+  `test-writer`'s pass after your implementation lands.
+
 - Component/route tests with Vitest + Testing Library (jsdom). Mock `service`
   functions; assert that fetched data renders. See the `testing-practices`
   skill (`.claude/skills/testing-practices/SKILL.md`).
@@ -444,6 +455,13 @@ Run these checks **once, after all work is complete**:
 - Metadata wired (title, description, OG, canonical)
 - Any ISR tags consumed from the service layer
 - Any framework-coupled components added to `src/components/`
+
+**Commit your work before you report.** Stage the specific files you changed
+(`git add <path> …` — never `git add -A`) and commit with a conventional
+message scoped to this layer (`feat(web): …`, `fix(web): …`). Open your final
+message with the commit SHA: the orchestrator lands your work by merging that
+commit, and a `SubagentStop` hook blocks a worktree with uncommitted changes
+from ending its turn at all.
 
 ## Reuse before you create
 

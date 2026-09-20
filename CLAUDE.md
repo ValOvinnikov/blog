@@ -720,8 +720,12 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   list, an option list, a default), editor-facing copy (a `description`, a
   label, a placeholder) and a `??` precedence are all the same mistake: the
   expected value is a literal copied out of the file under test, so the only
-  change that can fail it is a deliberate edit. One rule, one home —
-  `testing-practices` → "What not to test".
+  change that can fail it is a deliberate edit. **A Tailwind class is the
+  same mistake, prop-driven or not** — `toHaveClass('hover:bg-…')` gated on
+  a prop is the variants map read back, and the case agents write most; the
+  `no-class-assertions` lint rule fails it in every `*.test.{ts,tsx}`, so a
+  styling-only change gets a story and `no-tests-needed`, never a test. One
+  rule, one home — `testing-practices` → "What not to test".
 - After a schema change: `pnpm typegen`, then commit the regenerated files in
   `packages/config/src/sanity/generated/`. Typegen can be non-deterministic —
   re-run until the diff is minimal.
@@ -751,18 +755,29 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   gate as Sanity's. Full mechanism in `.claude/agents/db.md`'s "Migrations"
   section. Never hand-edit a migration file once it has been applied
   anywhere shared (dev or prod) — write a new corrective migration instead.
-- Verify with `pnpm type-check`, `pnpm lint`, `pnpm test` from root. `pnpm build`
-  is not part of the local loop — CI's `ci.yml` `build` job gates every PR;
-  only reproduce it locally when diagnosing an actual CI build failure
+- Verify with `pnpm verify` from root — one `&&` chain over `type-check`,
+  `lint`, `test`, `knip` and the five gating scripts (`check:client-graph`,
+  `check:revalidate-tags-sync`, `check:turbo-env-sync`,
+  `check:migration-index`, `gen:ui-index:check`), so it stops at the first
+  failure and mirrors every required or gating CI check that has a local
+  equivalent (`docs/context/ci-automation.md` maps them). `pnpm build` is not
+  part of the local loop — CI's `ci.yml` `build` job gates every PR; only
+  reproduce it locally when diagnosing an actual CI build failure
   (`open-pull-request` Gate 5a).
-- **Edit-time format + lint feedback:** checked-in `PostToolUse` hooks
-  (`.claude/hooks/post-edit-prettier.sh` then `.claude/hooks/post-edit-lint.sh`,
-  chained as one command in `.claude/settings.json` since matching hooks
-  otherwise run in parallel) format every edited/written file with Prettier,
-  then lint every `.ts`/`.tsx` file on the formatted content and feed errors —
-  including layer-boundary violations — straight back to the agent in the
-  same turn. Prettier is silent and always exits 0 (formatting, not review);
-  lint stays report-only (never `--fix`); commit-time gates stay authoritative.
+- **Edit-time format + lint feedback:** one checked-in `PostToolUse` hook
+  (`.claude/hooks/post-edit.sh`, which feeds the same stdin payload to
+  `post-edit-prettier.sh` then `post-edit-lint.sh` — a single entry in
+  `.claude/settings.json` since matching hooks otherwise run in parallel,
+  and a wrapper rather than an `&&` chain since the first script's stdin
+  read would starve the second) formats every edited/written file with
+  Prettier, then lints every `.ts`/`.tsx` file on the formatted content from
+  its own workspace and feeds errors — including layer-boundary violations —
+  straight back to the agent in the same turn, in a few seconds. Prettier
+  is silent and always exits 0 (formatting, not review); lint stays
+  report-only (never `--fix`); commit-time gates stay authoritative — and
+  lint-staged's ESLint pass is report-only as well, so a commit never
+  changes content beyond Prettier formatting and the reviewed diff is the
+  committed diff.
 - **Conventional commits, one concern per PR — mechanically enforced.**
   `.husky/commit-msg` runs commitlint (`commitlint.config.mjs`) on every
   local commit — the only place this is enforced, so a commit that bypasses
@@ -1065,11 +1080,13 @@ gates, is unchanged.)
 
 1. Set issue → In Progress on the board
 2. Checkout branch from `main`
-3. Do the work + run quality gates
+3. Do the work + run quality gates — merge `origin/main` in before verify
+   (`develop-feature` §5).
 4. **Dispatch the `reviewer` subagent** (`.claude/agents/reviewer.md`) over the
    full diff — fix blocking findings and re-dispatch until it returns
    `APPROVE`. Never **push** without an `APPROVE` on the diff as it
-   stands; new changes invalidate a prior `APPROVE`.
+   stands; new changes invalidate a prior `APPROVE`, including a later merge
+   from `origin/main`.
 
    **A docs-only diff skips the `reviewer` and gets an inline identifier
    check instead.** When the diff touches nothing outside `docs/**`,
@@ -1265,7 +1282,7 @@ A sub-issue, in this order and no other sections:
 - [ ] <observable outcome, not an implementation step>
 
 ## Verify
-pnpm type-check && pnpm lint && pnpm test && pnpm knip
+pnpm verify
 
 ## Design
 <link to the spec doc, or "none — the criteria above are the whole design">
@@ -1352,18 +1369,19 @@ when it is all of:
 
 - **single-layer** — one workspace, one owning agent's domain;
 - **self-contained** — the body alone carries exact files, acceptance
-  criteria, and the verification commands (`pnpm type-check && pnpm lint &&
-pnpm test && pnpm knip`), assuming the reader has only the ticket. Add
-  `pnpm gen:ui-index:check` when the ticket touches `packages/ui`, and
-  `pnpm check:turbo-env-sync` when it touches env vars or `turbo.json`.
+  criteria, and the verification command (`pnpm verify`), assuming the
+  reader has only the ticket.
 
-  **Why these and not just the first three.** A cloud session has no `gh`
-  (see "Solo-session mode" below), so it cannot read a red check after it
-  pushes — a CI failure is invisible to it both before the push, if the
-  command isn't in the ticket, and after. Every command above runs locally,
-  is deterministic, and gates a check that a single-layer change can
-  plausibly break; `knip` is unconditional because any new exported symbol
-  in any workspace can trip it. The rest of CI stays out of reach on
+  **Why `pnpm verify` and not just type-check/lint/test.** A cloud session
+  has no `gh` (see "Solo-session mode" below), so it cannot read a red check
+  after it pushes — a CI failure is invisible to it both before the push, if
+  the command isn't in the ticket, and after. Every command `pnpm verify`
+  chains runs locally, is deterministic, and gates a check that a
+  single-layer change can plausibly break — `knip` because any new exported
+  symbol in any workspace can trip it, `gen:ui-index:check` for
+  `packages/ui`, `check:turbo-env-sync` for env vars and `turbo.json`, and
+  the other three for the tag, client-graph and migration-index drifts a
+  scoped run used to miss. The rest of CI stays out of reach on
   purpose: `build` is CI-only by the rule above, typegen drift needs
   `pnpm typegen` (orchestrator-only, it mutates generated files), actionlint
   / zizmor / shellcheck only fire on workflow or shell changes a `cloud-ok`
@@ -1374,7 +1392,15 @@ pnpm test && pnpm knip`), assuming the reader has only the ticket. Add
 
 - **free of human gates** — no Sanity or Drizzle migration, no console
   config, no production-dataset touch;
-- **small** — roughly ≤5 files touched.
+- **small** — roughly ≤5 files touched;
+- **outside `.claude/**`** — the GitHub Actions `@claude` runner refuses
+  every `Edit`/`Write` under `.claude/` as a sensitive path, independently
+  of `.claude/settings.json`'s allow-list. On 2026-09-19 four agent-tooling
+  tickets (#3355, #3358, #3359, #3361) each ran to completion, hit that
+  refusal, and left their `.claude/**` half for a local session — the
+  `cloud-ok` label had cost a run each and delivered nothing. Root
+  `CLAUDE.md` and `docs/**` are writable; a ticket whose scope names an
+  agent, skill or hook file is a local ticket.
 
 **Solo-session mode.** When running as a single cloud session — a Claude
 Code web/remote session, the same environment `board-keeper.md`'s

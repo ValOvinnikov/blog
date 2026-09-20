@@ -116,6 +116,12 @@ Hand each layer's work to its agent (use the Agent tool, or state which agent
 owns it). Do them in dependency order; later steps depend on earlier output.
 **Skip any agent whose layer has no changes** — don't invoke it at all.
 
+**A bugfix is TDD, done by the layer agent itself:** it writes the failing
+regression test before the fix and makes it pass, per
+`superpowers:test-driven-development`; new feature code carries no
+self-written tests at this step — that coverage is `test-writer`'s pass in
+step 4.
+
 **Land each agent's commit onto your current local branch before dispatching
 the next one.** Every layer agent carries `isolation: worktree`, and
 `worktree.baseRef: "head"` in `.claude/settings.json` means the _next_
@@ -175,6 +181,10 @@ agent rules and skill.
 
 ## 4. Test
 
+**This step covers new-feature coverage only** — a bugfix's regression test
+was already written first, TDD-style, by the owning layer agent in step 3;
+`test-writer` never touches an already-passing bugfix test.
+
 - **Land every layer agent's commit onto your current local branch before
   dispatching `test-writer`** (#1796) — `worktree.baseRef: "head"` in
   `.claude/settings.json` means `test-writer`'s own worktree branches from
@@ -216,57 +226,85 @@ agent rules and skill.
 
 ## 5. Verify
 
+**The sequence opens with `git fetch origin && git merge origin/main`** (or a
+rebase onto it), before anything is verified. Verifying a branch that
+is behind `main` proves nothing about what CI will run: #3144 verified green,
+merged `main` in afterwards, and CI's Test job failed a minute later on a
+schema type that had landed on `main` in between. The same rule runs the
+other way — a merge from `origin/main` **after** `verify-runner` or
+`reviewer` has already run invalidates both, exactly like any other new
+change: re-run the verify sequence and re-dispatch `reviewer` before the
+push ask.
+
 Dispatch the **`verify-runner` subagent** (`.claude/agents/verify-runner.md`)
 to run the integration verify pass instead of running it inline yourself —
-`turbo run type-check`/`lint`/`test` output across up to 11 packages
-is purely mechanical (a compiler/test runner either succeeds or fails; no
-interpretation is needed to know which), so it belongs in the subagent's
-disposable Haiku context, not this session's. **Dispatch it in the background
+`pnpm verify` output across up to 11 packages is purely mechanical (a
+compiler/test runner either succeeds or fails; no interpretation is needed
+to know which), so it belongs in the subagent's disposable Haiku context,
+not this session's. **Dispatch it in the background
 (`run_in_background: true`), same as every other subagent** — verify is a
 blocking prerequisite before `reviewer` can run in step 6, but that ordering
 holds regardless: the orchestrator resumes on `verify-runner`'s completion
 notification and dispatches `reviewer` then, without sitting blocked and
-unable to respond to the user meanwhile. Give it the exact ordered command
-sequence for the scenario at hand; it does not decide or guess scope.
+unable to respond to the user meanwhile. Give it `pnpm verify` as the exact
+command; it does not decide or guess scope.
+
+**The dispatch's first command is `cd <absolute path of the checkout to
+verify>`, and every later command is prefixed with the same `cd … &&`.**
+`verify-runner` is not worktree-isolated, so without it the run lands in
+whatever directory its shell starts in — on 2026-08-20 that was the stale
+main checkout, reporting 3 files / 25 tests for a diff whose worktree held
+4 / 29. Its report opens with `pwd` and `git rev-parse HEAD`; **compare that
+SHA with your own `git rev-parse HEAD` before dispatching `reviewer`**, and
+reject the report — re-dispatch with the path corrected — if they differ. A
+report that names no commit is rejected the same way.
 
 **`pnpm typegen` never goes to `verify-runner`.** It mutates
 `packages/config/src/sanity/generated/` in place — that is a write, not a
 read-only verify step, and `verify-runner`'s `read-only-agent-guard.sh` hook
-denies it same as it would for `reviewer`/`explore`/`ci-watcher`. Whenever a
-scenario below calls for typegen, run it yourself, inline, in this session
-_before_ dispatching `verify-runner` for the remaining checks.
+denies it same as it would for `reviewer`/`explore`/`ci-watcher`. When the
+schema changed, run it yourself, inline, in this session _before_
+dispatching `verify-runner`.
 
-**Single-package task, no schema change** (e.g. service query added, ui component added):
+**One sequence, whatever the task touched:**
 
-- Dispatch `verify-runner` with: `pnpm --filter <pkg> type-check`,
-  `pnpm --filter <pkg> lint`, `pnpm --filter <pkg> test` (stop-on-first-failure).
-- All three must pass before moving to self-review.
-
-**Studio-only task (schema changed)**:
-
-1. Run `pnpm typegen` yourself, inline — regenerates the types in
-   `packages/config/src/sanity/generated/` from the updated schema. Typegen
-   can be non-deterministic — re-run until the diff is minimal.
-2. Dispatch `verify-runner` with: `pnpm --filter @blog/studio type-check`,
-   `pnpm --filter @blog/studio lint` (stop-on-first-failure) — verify the studio
-   itself is clean.
-
-- No web build needed; downstream packages are unchanged.
-
-**Multi-layer task** (more than one package touched, or schema change with downstream effects):
-Each step feeds the next:
-
-1. Run `pnpm typegen` yourself, inline — regenerates the types in
-   `packages/config/src/sanity/generated/` from the current schema.
+1. **Schema changed?** Run `pnpm typegen` yourself, inline — regenerates the
+   types in `packages/config/src/sanity/generated/` from the current schema
    (`sanity schema extract` overwrites `schema.json` in place, so no manual
-   clean is needed first. Typegen can be non-deterministic — re-run until the
-   diff is minimal.)
-2. Dispatch `verify-runner` with this exact sequence, in order,
-   stop-on-first-failure:
-   - `pnpm type-check` — checks all packages against the freshly generated types.
-   - `pnpm lint` — runs across all packages.
-   - `pnpm test` — runs all test suites. Per-package checks already ran during
-     implementation; this is the integration pass.
+   clean is needed first). Typegen can be non-deterministic — re-run until
+   the diff is minimal. Skip this step when no schema file changed.
+2. Dispatch `verify-runner` with `pnpm verify` — the root script chains
+   `type-check`, `lint`, `test`, `knip`, `check:client-graph`,
+   `check:revalidate-tags-sync`, `check:turbo-env-sync`,
+   `check:migration-index` and `gen:ui-index:check` with `&&`, so it stops at
+   the first failure and mirrors every required or gating CI check that has a
+   local equivalent (`docs/context/ci-automation.md` has the mapping).
+
+There is no per-package or studio-only variant. Turbo caches the packages a
+diff never touched, so a scoped `--filter` run saved little — and it is how
+the `@blog/db` type error on #2876 and the `Revalidate tags sync`,
+`Migration index`, `Client graph`, `Turbo env sync` and `UI index` failures
+on other branches reached CI without ever running locally.
+
+**Hook/script changes need a local shellcheck + guard-test pass too.** When
+the diff touches `.claude/hooks/**` or `scripts/*.sh`, run this before
+commit — it mirrors `hooks.yml`'s required `Shellcheck + guard tests` job:
+
+```
+shellcheck .claude/hooks/*.sh scripts/*.sh
+bash .claude/hooks/read-only-agent-guard.test.sh
+sh .claude/hooks/gate-bypass-guard.test.sh
+sh .claude/hooks/pre-bash-worktree-install-guard.test.sh
+bash .claude/hooks/test-writer-scope-guard.test.sh
+bash .claude/hooks/pre-agent-gate0-guard.test.sh
+bash .claude/hooks/subagent-stop-commit-guard.test.sh
+bash .claude/hooks/layer-scope-guard.test.sh
+sh scripts/vercel-ignore-affected.test.sh
+```
+
+Such a diff is not docs-only (the exemption in `CLAUDE.md`'s gate step 4
+covers `.claude/**/*.md`, not scripts), so it still gets the `reviewer`
+dispatch in step 6 in addition to this local pass.
 
 **No local `build` step.** CI's `ci.yml` runs a dedicated `build` job (Next.js
 build + Sanity Studio build) gating every PR — a local re-run duplicates it.
@@ -285,8 +323,18 @@ red check.
 
 ## 6. Review (blocking — Gate 2 must not be offered until this passes)
 
+Before dispatching **any** reviewer (`reviewer`, `a11y-reviewer`,
+`seo-auditor`), run `git fetch origin` to refresh the ref — a worktree
+session's local `main` can go stale relative to what actually merged (#2739:
+a stale ref showed the reviewer 87 files instead of 18). The read-only guard
+denies these subagents `git fetch`, so only the orchestrator can refresh it.
+Every dispatch prompt names the base ref as `origin/main` (never bare
+`main`) and states the expected file count
+(`git diff origin/main...HEAD --name-only | wc -l`, plus any dirty
+working-tree files) so the subagent can flag a mismatch itself.
+
 - Dispatch the **`reviewer` subagent** (`.claude/agents/reviewer.md`) over the
-  full diff (`main...HEAD` + working tree). It applies `code-review-practices`
+  full diff (`origin/main...HEAD` + working tree). It applies `code-review-practices`
   — mechanical scan, contract pass, general pass — with fresh eyes and reports
   a verdict.
 - **If the diff touches `packages/ui`, `apps/web`, or `apps/platform` components**, also dispatch

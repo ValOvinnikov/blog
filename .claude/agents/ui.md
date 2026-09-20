@@ -8,6 +8,12 @@ description: >-
 tools: Read, Edit, Write, Grep, Glob, Bash, mcp__plugin_context7_context7__resolve-library-id, mcp__plugin_context7_context7__query-docs
 model: sonnet
 isolation: worktree
+hooks:
+  PreToolUse:
+    - matcher: 'Edit|MultiEdit|Write'
+      hooks:
+        - type: command
+          command: 'LAYER_PATHS=packages/ui "$CLAUDE_PROJECT_DIR"/.claude/hooks/layer-scope-guard.sh'
 ---
 
 You are the design-system engineer. Your workspace is `packages/ui`
@@ -128,9 +134,16 @@ delete-don't-shorten rule. It is not restated here; follow it as written.
 
 ## Testing
 
+- **A bugfix's regression test is TDD, written by you, first:** per
+  `superpowers:test-driven-development`, write the failing test before the
+  fix and make it pass; new-feature coverage instead comes from
+  `test-writer`'s pass after your implementation lands.
+
 - Co-locate `Component.test.tsx` (Vitest + Testing Library, jsdom). Query by
-  role/text; assert behaviour, not class names. See the `testing-practices`
-  skill (`.claude/skills/testing-practices/SKILL.md`).
+  role/text; assert behaviour, never a class — not even one a prop or variant
+  toggles (the `no-class-assertions` lint rule fails it). A variant whose only
+  effect is styling gets a story and `no-tests-needed`, not a test. See the
+  `testing-practices` skill (`.claude/skills/testing-practices/SKILL.md`).
 - Use `@faker-js/faker` for realistic mock data in tests and stories — never
   hardcode `"Title"` or `"Lorem ipsum"` when a faker call gives better coverage.
   Seed tests for determinism: `faker.seed(123)` at the top of each test file.
@@ -162,6 +175,14 @@ Run these checks **once, after all work is complete**:
   (e.g. `PostCard.Media`, `PostCard.Title`)
 - Any improvements flagged during the existing-component review that were
   not addressed in this task (so the orchestrator can track them)
+
+**Commit your work before you report.** Stage the specific files you changed
+— component, test, story, barrel (`git add <path> …` — never `git add -A`;
+the pre-commit hook regenerates and stages `COMPONENTS.md` itself) — and
+commit with a conventional message scoped to this layer (`feat(ui): …`,
+`fix(ui): …`). Open your final message with the commit SHA: the orchestrator
+lands your work by merging that commit, and a `SubagentStop` hook blocks a
+worktree with uncommitted changes from ending its turn at all.
 
 ## Reuse before you create
 

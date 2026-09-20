@@ -90,8 +90,8 @@ Props: separator?: string _(extends IWithClassName, IWithDataTestId)_
 ### NavLink — `atoms/nav-link/nav-link.tsx`
 
 A chrome-level navigation link (header/footer nav items).
-Props: className?: string · isActive?: TNavLinkVariants['isActive'] · hasLabel?: boolean _(extends IWithIcon, IWithDataTestId)_
-Variants: isActive: (boolean)
+Props: className?: string · isActive?: TNavLinkVariants['isActive'] · variant?: TNavLinkVariants['variant'] · hasLabel?: boolean _(extends IWithIcon, IWithDataTestId)_
+Variants: isActive: (boolean) · variant: plain|outlined
 
 ### Prose — `atoms/prose/prose.tsx`
 
@@ -192,8 +192,8 @@ Props: className?: string _(extends IWithDataTestId, VariantProps<typeof buttonV
 ### MediaCard — `molecules/media-card/media-card.tsx`
 
 A media-led summary card for any linked item, rendered as an `<article>`.
-Props: excerpt?: string · tags?: string[] · isSplit?: TMediaCardVariants['isSplit'] · isLead?: TMediaCardVariants['isLead'] · align?: TMediaCardVariants['align'] · children?: TCompoundChildren<typeof MediaCardParts> _(extends IWithClassName, IWithDataTestId)_
-Variants: isSplit: (boolean) · isLead: (boolean) · align: left|center
+Props: excerpt?: string · tags?: string[] · isSplit?: TMediaCardVariants['isSplit'] · isLead?: TMediaCardVariants['isLead'] · align?: TMediaCardVariants['align'] · isInteractive?: TMediaCardVariants['isInteractive'] · children?: TCompoundChildren<typeof MediaCardParts> _(extends IWithClassName, IWithDataTestId)_
+Variants: isSplit: (boolean) · isLead: (boolean) · align: left|center · isInteractive: (boolean)
 
 Slots:
 
@@ -339,7 +339,7 @@ Slots:
 
 - **Hero.Avatar** — The portrait slot of a `Hero`, rendered before the eyebrow; a styled `<div>` for the caller's own `Avatar` or image. Props: contentAlignment?: THeroAvatarVariants['contentAlignment'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: contentAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT
 - **Hero.Media** — The media slot of a `Hero`; frames its content via `MediaFrame`, at a configurable ratio (16:9 by default). Props: isFramed?: boolean · ratio?: TMediaFrameRatio · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: ratio: video|square|portrait|classic
-- **Hero.Cta** — The call-to-action slot of a `Hero`; a styled `<div>` for the hero's buttons or links. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Hero.Cta** — The call-to-action slot of a Hero. Props: contentAlignment?: THeroCtaVariants['contentAlignment'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: contentAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT
 - **Hero.Social** — The trailing slot of a `Hero`, rendered after `Hero.Cta`; a styled `<div>` for the caller's own social links, typically a labelled list. Props: contentAlignment?: THeroSocialVariants['contentAlignment'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: contentAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT
 
 ### NewsletterSignup — `organisms/newsletter-signup/newsletter-signup.tsx`

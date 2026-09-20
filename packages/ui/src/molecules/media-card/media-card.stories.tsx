@@ -261,6 +261,31 @@ export const IconMedia: TStory = {
   },
 };
 
+export const Static: TStory = {
+  args: {
+    isInteractive: false,
+  },
+};
+
+export const IconHovered: TStory = {
+  args: {
+    excerpt: 'Ship features faster with a shared, token-driven component set.',
+    tags: undefined,
+    children: (
+      <>
+        <MediaCard.Media shape="icon">
+          <Icon name={ICONS.ROCKET} size={SIZE.MD} />
+        </MediaCard.Media>
+        <MediaCard.Title level={3}>
+          <a href="/features/design-system" autoFocus={true}>
+            Built for speed
+          </a>
+        </MediaCard.Title>
+      </>
+    ),
+  },
+};
+
 export const CenterAligned: TStory = {
   args: {
     align: 'center',

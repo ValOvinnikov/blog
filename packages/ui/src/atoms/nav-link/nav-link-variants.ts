@@ -18,8 +18,16 @@ export const navLinkVariants = tv({
       true: { root: ['text-brand-primary'] },
       false: { root: ['text-muted'] },
     },
+    variant: {
+      plain: { root: [] },
+      outlined: {
+        root: [
+          'size-9 shrink-0 justify-center rounded-full border border-current',
+        ],
+      },
+    },
   },
-  defaultVariants: { isActive: false },
+  defaultVariants: { isActive: false, variant: 'plain' },
 });
 
 export type TNavLinkVariants = VariantProps<typeof navLinkVariants>;

@@ -39,9 +39,12 @@ tools rather than rephrasing the shell command.
 
 ## Input you receive
 
-The orchestrator's prompt tells you the base ref (usually `main`) and a
-one-sentence summary of the intended change. If the base ref is missing, use
-`main`. Diff the full range (`git diff <base>...HEAD` plus working tree) —
+The orchestrator's prompt tells you the base ref (default `origin/main`), the
+expected file count, and a one-sentence summary of the intended change. If
+the base ref is missing, use `origin/main` — the read-only guard denies you
+`git fetch`, so only the orchestrator can refresh a stale local `main`; it
+does so before every dispatch. Diff the full range
+(`git diff <base>...HEAD` plus working tree) —
 do not review only the files named in the prompt; a route change can leave
 `sitemap.ts`/`rss.xml` stale without touching them. If the prompt instead
 pins you to an explicit, closed commit or range (e.g. auditing a historical
@@ -90,6 +93,12 @@ contract. Then walk the diff against this checklist:
    client call from `apps/web`.
 
 ## Report format
+
+Open your report with the file count reviewed — `Reviewed N files against
+origin/main` — before anything else. If N doesn't match the count the
+orchestrator gave you at dispatch, that mismatch is itself a blocking
+finding: report it and stop rather than reviewing whatever the wrong ref
+turned up.
 
 Report back to the orchestrator with exactly these sections, matching
 `reviewer`'s format:

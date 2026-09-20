@@ -10,6 +10,12 @@ description: >-
 tools: Read, Edit, Write, Grep, Glob, Bash, mcp__plugin_context7_context7__resolve-library-id, mcp__plugin_context7_context7__query-docs
 model: sonnet
 isolation: worktree
+hooks:
+  PreToolUse:
+    - matcher: 'Edit|MultiEdit|Write'
+      hooks:
+        - type: command
+          command: 'LAYER_PATHS=packages/email LAYER_FILES=tsconfig.json:vitest.config.ts "$CLAUDE_PROJECT_DIR"/.claude/hooks/layer-scope-guard.sh'
 ---
 
 You own every email this product sends. Your workspace is `packages/email`
@@ -100,6 +106,10 @@ asking nicely.
   `packages/insight`/`packages/utils`.
 - Co-locate `*.test.ts`. A test must fail without the implementation; never one
   that passes against a stub.
+- **A bugfix's regression test is TDD, written by you, first:** per
+  `superpowers:test-driven-development`, write the failing test before the
+  fix and make it pass; new-feature coverage instead comes from
+  `test-writer`'s pass after your implementation lands.
 - Key/value-pair consts are UPPERCASE key === UPPERCASE value, `as const`, and
   live in `@blog/config` — email copy is not this layer's persisted vocabulary,
   so it does not earn the storage-layer exception. Note you do **not** depend on
@@ -121,6 +131,31 @@ in every consumer you touch.
 `CLAUDE.md` → `## Conventions` → "Comments default to zero" is the single
 source for comment rules, including the three-step test and the
 delete-don't-shorten rule. It is not restated here; follow it as written.
+
+## Definition of done
+
+- `pnpm --filter @blog/email type-check`, `lint`, and `test` pass.
+- No workspace dependency beyond `@blog/utils` in
+  `packages/email/package.json`; no `@blog/insight`, `@blog/db`, `@blog/auth`,
+  `@blog/service`, app or Sanity import anywhere in `src/`.
+- Every consumer you touched has the alias wiring `## When a consumer
+changes` above requires.
+
+**Report back to the orchestrator** with:
+
+- The exported surface — template builders, `escapeHtml`, `sendEmail`, and
+  any supporting types
+- Exactly what each consuming app (and `@blog/auth`) must now do to use it,
+  precisely enough that the next agent can act without re-reading this layer
+- Any copy that moved between the tenant-editable and never-editable sides of
+  the trust boundary, and why
+
+**Commit your work before you report.** Stage the specific files you changed
+(`git add <path> …` — never `git add -A`) and commit with a conventional
+message scoped to this layer (`feat(email): …`, `fix(email): …`). Open your
+final message with the commit SHA: the orchestrator lands your work by
+merging that commit, and a `SubagentStop` hook blocks a worktree with
+uncommitted changes from ending its turn at all.
 
 ## Reuse before you create
 

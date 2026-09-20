@@ -163,10 +163,15 @@ and its actual merge commit message, not just the former.
   Committing is local and reversible; the human gates are push and PR.
 - **Never push (Gate 3) before the `reviewer` subagent has returned
   `APPROVE` on the final diff.** New changes after an APPROVE invalidate it —
-  re-review before pushing again. A **docs-only** diff (nothing outside
-  `docs/**`, `SPEC.md`, `README.md`, `CLAUDE.md`, `.claude/**`) is the one
-  exception: it takes the inline identifier check `CLAUDE.md`'s delivery
-  gate step 4 describes instead of a `reviewer` dispatch.
+  re-review before pushing again — and a merge from `origin/main` is a new
+  change: it re-runs verify and review the same as an edit would. A **docs-only** diff (nothing outside
+  `docs/**`, `SPEC.md`, `README.md`, `CLAUDE.md`, `.claude/**/*.md`) is the
+  one exception: it takes the inline identifier check `CLAUDE.md`'s delivery
+  gate step 4 describes instead of a `reviewer` dispatch. A `.sh`/`.js` file
+  under `.claude/` (a hook, a guard script) is not covered by this exemption
+  — it is executable tooling, not prose, and still requires the `reviewer`
+  dispatch plus the local `shellcheck`/guard-test pass in `develop-feature`
+  §5.
 - **Never merge.** Merging is the human's call only.
 - **Never deploy.** `sanity deploy` and Vercel deploys are human-run only.
 - **Never set `--assignee` or `--reviewer` on the PR.** The repo owner cannot
@@ -230,10 +235,13 @@ Work through these gates in order. **Committing is free; stop at the push and PR
 ### Gate 1 — Do the work
 
 - Follow `develop-feature` for implementation and per-layer delegation.
-- Run the verify step from `develop-feature` § 5 — single-package, CMS-only,
-  or multi-layer sequence depending on what changed. Do not use the simplified
-  `pnpm type-check && pnpm lint && pnpm test` shortcut — it misses typegen and
-  the web build where required.
+- Merge `origin/main` in first (`git fetch origin && git merge origin/main`,
+  or rebase), then run the verify step from `develop-feature` § 5 —
+  `pnpm typegen` inline when the schema changed, then `verify-runner` with
+  `pnpm verify`. A merge from `main` done later, after verify or review,
+  sends the branch back to this bullet: both are re-run. Do not use the
+  `pnpm type-check && pnpm lint && pnpm test` shortcut — it misses typegen
+  and the six gating scripts `pnpm verify` chains after `test`.
 - Dispatch the **`reviewer` subagent** (`.claude/agents/reviewer.md`) over the
   final diff — it applies `code-review-practices` (mechanical scan + contract
   pass + general pass). Fix any blocking findings, re-verify, and re-dispatch

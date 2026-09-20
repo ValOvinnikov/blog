@@ -63,6 +63,30 @@ jobs:
         # reached. Hermetic — stubs `gh` on PATH, no network.
         run: bash .claude/hooks/pre-agent-gate0-guard.test.sh
 
+      - name: post-edit.sh format-then-lint matrix
+        # #3356: pins that one stdin payload reaches both post-edit scripts
+        # (an `a && b` chain starved the second), that ESLint runs from the
+        # file's workspace, and that the CLAUDE_PROJECT_DIR fallback works.
+        # Hermetic — fake prettier/eslint in a temp git repo, no node_modules.
+        run: bash .claude/hooks/post-edit.test.sh
+
+      - name: subagent-stop-commit-guard.sh block/pass matrix
+        # #3354: pins that a dirty agent worktree (modified or untracked-only)
+        # blocks the stop, a clean one passes, and a cwd outside
+        # `.claude/worktrees/agent-*` — the main checkout, a session worktree
+        # — is never checked. Hermetic — throwaway git repos under a
+        # worktree-shaped path, no live session state.
+        run: bash .claude/hooks/subagent-stop-commit-guard.test.sh
+
+      - name: layer-scope-guard.sh deny/allow matrix
+        # #3360: pins that a layer agent's Edit/Write stays inside its own
+        # checkout (the payload's cwd, never the primary checkout by absolute
+        # path) and under its `LAYER_PATHS` prefixes — including the
+        # `packages/ui` vs `packages/ui-foo` boundary, relative-path
+        # resolution, `LAYER_FILES` suffixes, and the fail-open cases.
+        # Hermetic — throwaway directories under a worktree-shaped path.
+        run: bash .claude/hooks/layer-scope-guard.test.sh
+
       - name: vercel-ignore-affected.sh base-resolution matrix
         # #1712: pins which commit the Vercel ignoreCommand diffs against in
         # each situation. A wrong base here silently stops a project

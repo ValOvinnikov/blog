@@ -1,7 +1,8 @@
 #!/bin/sh
 # PostToolUse hook: format the file an agent just edited/wrote with Prettier,
 # so working-tree diffs stay clean continuously instead of being reformatted
-# at commit by lint-staged.
+# at commit by lint-staged. Runs via post-edit.sh, which feeds this and
+# post-edit-lint.sh the same payload in that order.
 #
 # Contract (Claude Code hooks):
 #   stdin  — JSON payload; the edited file is .tool_input.file_path
@@ -9,12 +10,6 @@
 #            hook formats, it doesn't review. Unsupported/missing files,
 #            absent node_modules, and .prettierignore'd files are silent
 #            no-ops because Prettier itself already treats them that way.
-#
-# Wired in settings.json as `post-edit-prettier.sh && post-edit-lint.sh` in
-# ONE command string, not as a second entry in the same matcher's `hooks`
-# array: Claude Code runs all hooks matching an event in parallel, so two
-# array entries would race and ESLint could lint pre-format content. Chaining
-# with `&&` inside a single handler is the only way to guarantee order.
 set -u
 
 payload=$(cat)
@@ -35,16 +30,24 @@ file_path=$(printf '%s' "$payload" | node -e '
 # File may have been renamed/deleted later in the same turn.
 [ -f "$file_path" ] || exit 0
 
+case "$file_path" in
+  /*) ;;
+  *) file_path="$PWD/$file_path" ;;
+esac
+
+project_dir=${CLAUDE_PROJECT_DIR:-$(git -C "$(dirname "$file_path")" rev-parse --show-toplevel 2>/dev/null)}
+[ -n "$project_dir" ] || exit 0
+
 # Worktrees fresh from checkout may not have node_modules yet — skip, the
 # commit-time gates (lint-staged, pre-push, CI) still cover them.
-[ -x "$CLAUDE_PROJECT_DIR/node_modules/.bin/prettier" ] || exit 0
+[ -x "$project_dir/node_modules/.bin/prettier" ] || exit 0
 
-cd "$CLAUDE_PROJECT_DIR" || exit 0
+cd "$project_dir" || exit 0
 
 # Prettier resolves the nearest prettier.config.* by walking up from the
 # target file, so each workspace's config applies. It already no-ops on
 # files it can't parse and on .prettierignore'd paths; --log-level silent
 # plus the redirect keep any of that from ever reaching the agent.
-"$CLAUDE_PROJECT_DIR/node_modules/.bin/prettier" --write --log-level silent "$file_path" >/dev/null 2>&1
+"$project_dir/node_modules/.bin/prettier" --write --log-level silent "$file_path" >/dev/null 2>&1
 
 exit 0

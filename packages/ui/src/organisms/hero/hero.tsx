@@ -109,7 +109,10 @@ const HeroRoot = ({
               {excerpt}
             </Text>
           )}
-          {slots.Cta}
+          {slots.Cta &&
+            cloneElement(slots.Cta, {
+              contentAlignment: resolvedAlignment,
+            })}
           {slots.Social &&
             cloneElement(slots.Social, {
               contentAlignment: resolvedAlignment,

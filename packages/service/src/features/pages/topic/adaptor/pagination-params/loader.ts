@@ -3,9 +3,9 @@ import {
   runQuery,
   type TTenantSanityContext,
 } from '@blog/service/sanity/query';
+import { toPaginationParams } from '@blog/service/shared/transformers/to-pagination-params';
 
 import { topicPaginationParamsQuery } from './query';
-import { toTopicPaginationParams } from './transformer';
 
 export async function getTopicPaginationParams(
   tenant: TTenantSanityContext,
@@ -17,5 +17,5 @@ export async function getTopicPaginationParams(
       tenant.projectId,
     ),
   });
-  return toTopicPaginationParams(topicPages);
+  return toPaginationParams(topicPages);
 }

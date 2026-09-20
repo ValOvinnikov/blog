@@ -85,14 +85,20 @@ contracts:
     _shorten_ an over-long comment rather than delete it, which is why comment
     density kept growing while the rule said otherwise.
   - `verify-runner` — read-only, Haiku-model runner for the integration
-    verify pass (`develop-feature` §5: `type-check`/`lint`/`test`,
-    the exact scenario-specific sequence it's given). `build` is not part of
+    verify pass (`develop-feature` §5: `pnpm verify` — the root `&&` chain
+    over `type-check`, `lint`, `test`, `knip` and the gating scripts — or
+    whatever exact sequence it's given). `build` is not part of
     the routine sequence — CI's `ci.yml` `build` job gates every PR, so a
     local re-run would just duplicate it; `verify-runner` still runs `build`
     on request when reproducing an actual CI build failure
     (`open-pull-request` Gate 5a). Dispatched in the background, like every
     other subagent, right before step 6's review — the orchestrator resumes
-    on its completion notification rather than waiting synchronously. Runs
+    on its completion notification rather than waiting synchronously. It is
+    not worktree-isolated, so the dispatch's first command is
+    `cd <absolute path>` and every later one is prefixed with it (#3355);
+    a missing `cd` stops the run, and every report opens with `pwd` and
+    `git rev-parse HEAD` so the orchestrator can reject one whose SHA is not
+    its own before dispatching `reviewer`. Runs
     each command in order,
     stops at the first failure, and reports which command failed plus
     trimmed output — no root-cause diagnosis or fix suggestion. Never given
@@ -102,7 +108,12 @@ contracts:
     orchestrator's own turn, which put `turbo run type-check`/`lint`/`test`
     output across up to 11 packages permanently into its context for a
     purely mechanical pass/fail job.
-  - `reviewer` — read-only pre-commit review of the full diff; gates the
+  - `reviewer` — read-only pre-commit review of the full diff against
+    `origin/main` (never bare `main` — the guard denies it `git fetch`, so
+    the orchestrator refreshes the ref and states the expected file count
+    before dispatch; the report opens with the count reviewed and a
+    mismatch is a blocking finding, #3358 — the same holds for
+    `a11y-reviewer` and `seo-auditor`); gates the
     commit ask on an `APPROVE` verdict. Trusts `verify-runner`'s already-passed
     `type-check`/`lint`/`test` result rather than re-running it. Not
     dispatched for a docs-only diff — those get the orchestrator's inline
@@ -117,7 +128,13 @@ contracts:
     corrected. The greps were added after every module on `main` was found
     carrying an identical `XModule — fetches module_x and hands it to
 XModuleView` block that the rule already forbade and no review had
-    flagged.
+    flagged. A merge from `origin/main` after either `verify-runner` or
+    `reviewer` has already run invalidates both, same as any other new
+    change — re-run verify and re-dispatch `reviewer`
+    (`develop-feature` §5, `open-pull-request`'s ABSOLUTE RULES). This is
+    what #3144 shipped without: it verified green, merged `main` in
+    afterward, and CI's Test job failed a minute later on a schema type that
+    had landed on `main` in between.
   - `a11y-reviewer` — read-only accessibility audit of
     `packages/ui`/`apps/web`/`apps/platform` diffs against
     `ui-library-practices`' non-negotiable rules; dispatched alongside
@@ -269,20 +286,44 @@ file` are all denied alike) — an earlier version only handled the
   false-positive cost.
 
 - **Hooks** (`.claude/hooks/`):
-  - `post-edit-prettier.sh` → `post-edit-lint.sh` — `PostToolUse` hooks (wired
-    in `.claude/settings.json` as a single chained command,
-    `post-edit-prettier.sh && post-edit-lint.sh`) so every agent-edited/written
-    file is Prettier-formatted, then linted on the formatted content, in the
-    same turn. They're chained rather than two entries under the same
-    matcher because Claude Code runs all hooks matching an event in
-    parallel — two array entries would race and ESLint could see pre-format
-    content. `post-edit-prettier.sh` always exits 0 and gives no agent
-    feedback (formatting, not review); unsupported/missing files and
-    `.prettierignore`'d paths are silent no-ops via Prettier itself.
-    `post-edit-lint.sh` lints every agent-edited `.ts`/`.tsx` file and feeds
-    errors — including layer-boundary `no-restricted-imports` violations —
-    back to the agent. Report-only (never `--fix`); the commit-time gates
-    (lint-staged) stay authoritative.
+  - `post-edit.sh` → `post-edit-prettier.sh` → `post-edit-lint.sh` — the one
+    `PostToolUse` hook (`Edit|MultiEdit|Write`, `timeout: 120`) so every
+    agent-edited/written file is Prettier-formatted, then linted on the
+    formatted content, in the same turn. `post-edit.sh` reads the stdin
+    payload once and pipes it to each script in order. It is one entry
+    rather than two under the same matcher because Claude Code runs all
+    hooks matching an event in parallel — two array entries would race and
+    ESLint could see pre-format content — and it is a wrapper rather than
+    the earlier `prettier.sh && lint.sh` chain because both scripts
+    `$(cat)` stdin, so the chain's second command always read an empty
+    payload and no-opped: until #3356 the lint half had never actually fired
+    (`post-edit.test.sh` pins this). `post-edit-prettier.sh` always exits 0
+    and gives no agent feedback (formatting, not review); unsupported/missing
+    files and `.prettierignore`'d paths are silent no-ops via Prettier
+    itself. `post-edit-lint.sh` lints every agent-edited `.ts`/`.tsx` file
+    and feeds errors — including layer-boundary `no-restricted-imports`
+    violations — back to the agent. It runs ESLint from the workspace that
+    owns the file (the nearest ancestor with an `eslint.config.*`), the way
+    `pnpm lint` does, which keeps `@next/eslint-plugin-next`'s "Pages
+    directory cannot be found" line out of the feedback. Report-only (never
+    `--fix`); the commit-time gates (lint-staged) stay authoritative. Both
+    scripts fall back to `git rev-parse --show-toplevel` (from the file's
+    directory) when `CLAUDE_PROJECT_DIR` is unset.
+
+    lint-staged's own ESLint pass (`.husky/pre-commit`, root `package.json`)
+    is report-only too — bare `eslint`, never `eslint --fix` — so a lint
+    error blocks the commit and Prettier is the only thing that rewrites a
+    staged file. It runs after `reviewer` has approved the diff, and a fix
+    pass there would commit content nobody reviewed: the reviewed diff is
+    the committed diff (#3363).
+
+    No ESLint preset in `configs/eslint` is type-aware (no `projectService`,
+    no `*TypeChecked` config), so a single-file lint is ~2s and there is no
+    "fast mode" — the full workspace ruleset runs on every edit, the same
+    one lint-staged and `pnpm lint` apply. The `timeout: 120` (up from the
+    60s default) is headroom for a loaded machine: several sessions running
+    turbo in parallel have pushed the same ~2s lint past 20s.
+
   - `pre-bash-worktree-install-guard.sh` — `PreToolUse` hook that blocks
     dependency-mutating pnpm commands inside a shared-deps agent worktree
     (see below) before pnpm can write anything.
@@ -293,7 +334,17 @@ file` are all denied alike) — an earlier version only handled the
     that skip the husky gates or rewrite pushed history: a literal
     `--no-verify`/`-n` on `commit`/`push`/`merge`, a literal
     `--force`/`-f`/`--force-with-lease`/`+refspec` on `push`, and
-    `core.hooksPath` on `git config`. A quote-aware tokenizer (not a regex
+    `core.hooksPath` on `git config` — plus, since #3362, the literal
+    destructive forms that have actually lost uncommitted agent work here:
+    `git reset --hard`, `git clean -f`/`--force` (any short-flag cluster
+    containing `f` — `-fd`, `-fdx`, `-df` — since that is the everyday
+    spelling, not an obfuscation), `git checkout -- <path>`, and
+    `git restore <path>` without `--staged`/`-S` (or with `--worktree`/`-W`
+    alongside it). The non-destructive siblings stay allowed: `reset` with
+    `--soft`/`--mixed`/a ref/a file, `clean -n`, `checkout` of a branch or
+    `-b`, and `restore --staged`. The deny reason names the command, says it
+    discards uncommitted work, and points at committing first or at
+    `git stash push -u -m <tag>`. A quote-aware tokenizer (not a regex
     over the raw string) keeps a quoted commit message — including this
     repo's own multi-line `-m "$(cat <<'EOF' ... EOF)"` convention — as one
     value token that can never be misread as a flag; that distinction is
@@ -362,6 +413,83 @@ file` are all denied alike) — an earlier version only handled the
     because it gets removed. `pre-agent-gate0-guard.test.sh` pins the matrix
     with a stubbed `gh` on `PATH`, so it is hermetic — no network, no
     dependence on live board state.
+
+  - `subagent-stop-commit-guard.sh` — `SubagentStop` hook wired in
+    `settings.json` with a `matcher` on the subagent type, restricted to the
+    ten layer agents
+    (`^(config|studio|service|ui|web|db|auth|platform-app|email|insight)$`);
+    the script re-checks the payload's `agent_type` against the same list,
+    so a widened matcher can't silently widen the guard. Blocks a layer agent
+    from ending its turn while its worktree has uncommitted work: when the
+    stop payload's `cwd` (falling back to `$PWD`) is inside
+    `.claude/worktrees/agent-*` and `git status --porcelain` there is
+    non-empty — a modified file or an untracked one alike — it returns
+    `{"decision":"block","reason":…}` telling the agent to stage the files it
+    changed and commit with a conventional message. Backs the "Commit your
+    work" step that closes every layer agent's Definition of done: the
+    orchestrator lands an agent's work by merging its **commit**, so an agent
+    that reports done with the files only on disk looks finished while its
+    branch still sits at the base (#2437–#2439 all ended that way).
+
+    The agent-type scope is load-bearing, not tidiness: `test-writer` also
+    runs with `isolation: worktree`, but `read-only-agent-guard.sh` denies it
+    `git add`/`git commit`, so a block it can never satisfy would loop its
+    stop forever. Read-only agents (`reviewer`, `explore`, `verify-runner`,
+    …) never match the matcher either, and the cwd test additionally keeps
+    the main checkout and a session's own `agents-*` worktree out. **Fails
+    open** when `git` is missing or the cwd is no longer a repo; a missing
+    `jq` only loses the payload — the cwd falls back to `$PWD` and the
+    `agent_type` check is skipped, with the `matcher` still doing that job.
+    `subagent-stop-commit-guard.test.sh` pins the block/pass matrix against
+    throwaway repos under worktree-shaped paths — hermetic, no live session
+    state.
+
+  - `layer-scope-guard.sh` — `PreToolUse` hook on `Edit`/`MultiEdit`/`Write`,
+    wired in the frontmatter of each of the ten layer agents
+    (`config`/`studio`/`service`/`ui`/`web`/`db`/`auth`/`platform-app`/
+    `email`/`insight`) with that layer's own scope (#3360). Denies a target
+    that fails either of two checks: it must sit inside the agent's **own
+    checkout** — the git toplevel of the payload's `cwd` (falling back to
+    `$PWD`), never `$CLAUDE_PROJECT_DIR`, which names the _session's_ project
+    dir and so, for a worktree-isolated agent, is exactly the primary
+    checkout the check keeps it out of — and its checkout-relative path must
+    sit under one of the layer's allowed prefixes. A relative `file_path`
+    resolves against `cwd`; `..` segments are normalised before matching, so
+    climbing out of the worktree is caught the same as an absolute path in.
+    The deny message names the agent, the offending path and the allowed
+    prefixes, and says to report the change as a finding for the owning
+    layer agent. Closes the gap memory records the `db` agent falling into
+    on #1732 and three agents repeating during #2144: `isolation: worktree`
+    is cwd-only, so an absolute `/Users/…/Projects/blog/packages/db/…` typed
+    from habit edited the primary checkout with nothing to stop it.
+
+    **The contract is two env vars set on the hook command**, so one script
+    carries every layer's scope without a lookup table:
+
+    - `LAYER_PATHS` (required) — colon-separated repo-relative directory
+      prefixes, e.g. `packages/ui` or
+      `packages/config:packages/utils:configs`. A prefix matches that
+      directory and its descendants only (`packages/ui` never matches
+      `packages/ui-foo`).
+    - `LAYER_FILES` (optional) — colon-separated path suffixes allowed
+      anywhere in the checkout, e.g. `tsconfig.json:vitest.config.ts`. Set
+      only on `config` and `email`, whose docs send them into every
+      consumer's alias wiring (`config.md` "Cross-workspace alias wiring",
+      `email.md` "When a consumer changes"); every other layer's prefixes
+      are exactly its own workspace.
+
+    **Fails open** when `jq` is missing or `LAYER_PATHS` is unset/empty —
+    an unconfigured guard stays out of the way rather than denying
+    everything, same stance as `test-writer-scope-guard.sh`; a missing
+    `file_path` passes too. `Edit`/`Write` is the only surface it covers: a
+    layer agent's Bash can still `mv`/`cp` across the boundary, and unlike
+    `test-writer` nothing closes that half — an accepted, documented gap.
+    `packages/config/src/sanity/generated/` needs no
+    entry: it is already deny-listed for `Edit`/`Write` in `settings.json`,
+    and typegen writes it through `pnpm`, not through this tool surface.
+    `layer-scope-guard.test.sh` pins the deny/allow matrix against throwaway
+    directories under a worktree-shaped path — hermetic, no live session
+    state.
 - **Repo-specific ESLint rules** (`configs/eslint/`) — `no-prop-spread.js` and
   `boolean-prop-prefix.js` are the repo's only hand-written rules (with a
   `create()` visitor). They sit alongside two `no-restricted-imports` helpers

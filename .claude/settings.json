@@ -162,7 +162,19 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/post-edit-prettier.sh && \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/post-edit-lint.sh"
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/post-edit.sh",
+            "timeout": 120
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "^(config|studio|service|ui|web|db|auth|platform-app|email|insight)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/subagent-stop-commit-guard.sh"
           }
         ]
       }

@@ -5,6 +5,7 @@ import prettier from 'eslint-config-prettier/flat';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
+import { noClassAssertionsRule } from './no-class-assertions.js';
 import { noVitestGlobalsImportPath } from './no-vitest-globals-import.js';
 
 /** @type {import("eslint").Linter.Config[]} */
@@ -69,9 +70,15 @@ export default [
     // scripts, e2e specs) live in their own layer preset — `files` here
     // resolves relative to each consuming workspace, so a repo-root path
     // like `packages/insight/src/**` would never match from this shared file.
+    // Own namespace: registering a second rules object under `blog` throws
+    // "Cannot redefine plugin".
     files: ['**/*.test.{ts,tsx}'],
+    plugins: {
+      'blog-test': { rules: { 'no-class-assertions': noClassAssertionsRule } },
+    },
     rules: {
       'no-console': 'off',
+      'blog-test/no-class-assertions': 'error',
     },
   },
   {
