@@ -194,6 +194,15 @@ describe(`<${Carousel.name}/>`, () => {
     expect(viewport).not.toHaveClass('overflow-hidden');
   });
 
+  it('keeps both nav buttons mounted, disabled, before Embla initializes', () => {
+    currentApi = undefined;
+    renderCarousel();
+
+    const { previous, next } = getNavButtons();
+    expect(previous).toBeDisabled();
+    expect(next).toBeDisabled();
+  });
+
   it('swaps to the enhanced (Embla-driven) viewport classes once Embla initializes', () => {
     currentApi = undefined;
     const { rerender } = renderCarousel({ dataTestId: 'carousel' });

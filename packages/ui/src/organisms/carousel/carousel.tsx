@@ -71,7 +71,7 @@ export const Carousel = <T,>({
           ))}
         </ul>
       </div>
-      {!(isPreviousDisabled && isNextDisabled) && (
+      {(!isEnhanced || !(isPreviousDisabled && isNextDisabled)) && (
         <div className={s.controls()}>
           <IconButton
             ref={previousButtonRef}
