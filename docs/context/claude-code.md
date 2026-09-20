@@ -327,7 +327,17 @@ file` are all denied alike) — an earlier version only handled the
     that skip the husky gates or rewrite pushed history: a literal
     `--no-verify`/`-n` on `commit`/`push`/`merge`, a literal
     `--force`/`-f`/`--force-with-lease`/`+refspec` on `push`, and
-    `core.hooksPath` on `git config`. A quote-aware tokenizer (not a regex
+    `core.hooksPath` on `git config` — plus, since #3362, the literal
+    destructive forms that have actually lost uncommitted agent work here:
+    `git reset --hard`, `git clean -f`/`--force` (any short-flag cluster
+    containing `f` — `-fd`, `-fdx`, `-df` — since that is the everyday
+    spelling, not an obfuscation), `git checkout -- <path>`, and
+    `git restore <path>` without `--staged`/`-S` (or with `--worktree`/`-W`
+    alongside it). The non-destructive siblings stay allowed: `reset` with
+    `--soft`/`--mixed`/a ref/a file, `clean -n`, `checkout` of a branch or
+    `-b`, and `restore --staged`. The deny reason names the command, says it
+    discards uncommitted work, and points at committing first or at
+    `git stash push -u -m <tag>`. A quote-aware tokenizer (not a regex
     over the raw string) keeps a quoted commit message — including this
     repo's own multi-line `-m "$(cat <<'EOF' ... EOF)"` convention — as one
     value token that can never be misread as a flag; that distinction is

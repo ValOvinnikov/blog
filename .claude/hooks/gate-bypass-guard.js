@@ -18,7 +18,12 @@
 // .claude/hooks/read-only-agent-guard.sh). It catches only LITERAL,
 // unobfuscated forms: a real `--no-verify`/`-n`/`--force`/`-f` token passed
 // to `git`, or `core.hooksPath` passed to `git config` as a write, not a
-// `--get`-style read (#454). It deliberately does NOT chase, and a future
+// `--get`-style read (#454), plus the literal destructive forms that have
+// actually lost uncommitted agent work here (#3362): `git reset --hard`,
+// `git clean -f` (in any short-flag cluster — `-fd`/`-fdx`/`-df` IS the
+// everyday spelling, not an obfuscation, so `clean` is the one subcommand
+// whose clusters are inspected), `git checkout -- <path>`, and `git restore`
+// without `--staged`/`-S`. It deliberately does NOT chase, and a future
 // edit should not try to add:
 //   - `git -c core.hooksPath=...` (a transient per-invocation override)
 //   - GIT_CONFIG_KEY_n / env var indirection
@@ -26,7 +31,7 @@
 //   - case-insensitive filesystem tricks (`GIT push --force`)
 //   - path-qualified binaries (`/usr/bin/git`)
 //   - wrapper commands (`sudo`/`env`/`xargs`/`command` before `git`)
-//   - clustered short flags (`-nm`, `-uf`, `-an`)
+//   - clustered short flags (`-nm`, `-uf`, `-an`) — except on `clean`, above
 //   - quote-split flags — a backslash-escaped quote INSIDE a `$(...)`
 //     substitution (`$(echo \"abc\)\") --no-verify` — #454 round 2) opens a
 //     real, standalone `--no-verify` token there; the same trick at the
@@ -291,6 +296,9 @@ function gitSubcommand(seg) {
   return { sub: null, args: [] };
 }
 
+const STASH_HINT =
+  'Commit first, or set the work aside with `git stash push -u -m <tag>` and restore it with `git stash apply <sha>`.';
+
 function check(seg) {
   const g = gitSubcommand(seg);
   if (!g) {
@@ -340,6 +348,29 @@ function check(seg) {
   ) {
     return 'Changing core.hooksPath disables the husky gates.';
   }
+  if (sub === 'reset' && has('--hard')) {
+    return `git reset --hard discards every uncommitted change in the working tree and index. ${STASH_HINT}`;
+  }
+  if (
+    sub === 'clean' &&
+    (has('--force') || args.some((a) => /^-[a-zA-Z]*f/.test(a)))
+  ) {
+    return `git clean -f deletes untracked files, which no git command can recover. ${STASH_HINT}`;
+  }
+  const pathSeparator = args.indexOf('--');
+  if (
+    sub === 'checkout' &&
+    pathSeparator > -1 &&
+    pathSeparator < args.length - 1
+  ) {
+    return `git checkout -- <path> overwrites uncommitted changes to those paths. ${STASH_HINT}`;
+  }
+  if (
+    sub === 'restore' &&
+    (!(has('--staged') || has('-S')) || has('--worktree') || has('-W'))
+  ) {
+    return `git restore without --staged/-S overwrites uncommitted changes to those paths. ${STASH_HINT}`;
+  }
   return null;
 }
 
@@ -360,7 +391,7 @@ process.stdin.on('end', () => {
     if (reason) {
       process.stderr.write(`${reason}\n`);
       process.stderr.write(
-        'Blocked: this bypasses a repo gate (#397). If it is genuinely needed, ask the human to run it.\n',
+        'Blocked: this bypasses a repo gate or discards uncommitted work (#397, #3362). If it is genuinely needed, ask the human to run it.\n',
       );
       process.exit(2);
     }
