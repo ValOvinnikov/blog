@@ -248,6 +248,45 @@ of the listed paths moves.
 Everything outside a project's triggers skips, so an unrelated PR builds
 neither Storybook.
 
+## Local mirror of the required checks: `pnpm verify`
+
+Root `pnpm verify` is one `&&` chain over every required or gating CI check
+that has a local equivalent, in this order: `type-check`, `lint`, `test`,
+`knip`, `check:client-graph`, `check:revalidate-tags-sync`,
+`check:turbo-env-sync`, `check:migration-index`, `gen:ui-index:check`. The
+chain stops at the first failure, so a red step is reported once rather than
+buried under later output. It is the sequence `develop-feature` §5 hands to
+`verify-runner`, the `## Verify` line of every issue body, and — minus
+`test`, to keep a push fast — the `.husky/pre-push` hook (the non-test tail
+measured 13s on one machine against a warm Turbo cache, well under the
+threshold at which it would have stayed out).
+
+| CI check                             | Local mirror                                                                                                                                                                                                                                                                                                                                             |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Type-check** (required)            | `pnpm type-check` — in `pnpm verify`.                                                                                                                                                                                                                                                                                                                    |
+| **Lint** (required)                  | `pnpm lint` — in `pnpm verify`.                                                                                                                                                                                                                                                                                                                          |
+| **Test** (required)                  | `pnpm test` — in `pnpm verify`; the only step `.husky/pre-push` skips.                                                                                                                                                                                                                                                                                   |
+| **Knip** (required)                  | `pnpm knip` — in `pnpm verify`. CI adds `--treat-config-hints-as-errors`, so a stale ignore rule in `knip.json` is red there and only a hint locally.                                                                                                                                                                                                    |
+| **Typegen** (required)               | `pnpm typegen`, then `git status --porcelain -- packages/config/src/sanity/generated/` must print nothing. Not in `pnpm verify`: typegen mutates generated files, so it runs inline in the orchestrator's session, never under `verify-runner`'s read-only guard (`develop-feature` §5). Re-run until the diff is minimal; typegen is non-deterministic. |
+| **Client graph** (gating)            | `pnpm check:client-graph` — in `pnpm verify`.                                                                                                                                                                                                                                                                                                            |
+| **Revalidate tags sync** (gating)    | `pnpm check:revalidate-tags-sync` — in `pnpm verify`.                                                                                                                                                                                                                                                                                                    |
+| **Turbo env sync** (gating)          | `pnpm check:turbo-env-sync` — in `pnpm verify`.                                                                                                                                                                                                                                                                                                          |
+| **Migration index** (gating)         | `pnpm check:migration-index` — in `pnpm verify`. Compares against the local `origin/main` ref and never fetches, so it is only as current as the `git fetch origin` that opens `develop-feature` §5.                                                                                                                                                     |
+| **UI index** (gating)                | `pnpm gen:ui-index:check` — in `pnpm verify`. CI also runs `pnpm gen:ui-index:test`, the generator's own fixture tests; those only change when `scripts/gen-ui-index.mjs` does.                                                                                                                                                                          |
+| **Build** (required)                 | No routine mirror — `pnpm build` is CI-only by `CLAUDE.md`'s rule; run it locally only to reproduce an actual CI build failure (`open-pull-request` Gate 5a).                                                                                                                                                                                            |
+| **Shellcheck + guard tests** (Hooks) | No `pnpm` script. When the diff touches `.claude/hooks/**` or `scripts/*.sh`, run the shellcheck + guard-test block in `develop-feature` §5 by hand.                                                                                                                                                                                                     |
+| **Migrations** (required)            | None — needs the dataset. `pnpm migrate:dry` in `packages/studio` is the nearest rehearsal, and it also targets a live dataset.                                                                                                                                                                                                                          |
+| **CodeQL** (required)                | None — GitHub's default setup, runs only on PRs into `main`.                                                                                                                                                                                                                                                                                             |
+| **Dependency Review** (required)     | None — reads the PR's dependency diff against GitHub's advisory database.                                                                                                                                                                                                                                                                                |
+| **Zizmor** (required)                | None — static analysis of the workflow files. Runs on every PR, but only a `.github/workflows/**` change can turn it red.                                                                                                                                                                                                                                |
+| **Actionlint** (required)            | None — same scope as Zizmor.                                                                                                                                                                                                                                                                                                                             |
+| **Required env** (matrix, advisory)  | `pnpm check:required-env` runs the classification half locally with no credentials; the per-environment presence half reads the repository secrets and has no local mirror. Not in `pnpm verify` — not a required check. See "Required env vars" below.                                                                                                  |
+
+The checks with no local mirror are why a local session still owns the CI
+tail after any PR opens: `ci-watcher` reports them, and a red one is
+diagnosed from the run log rather than reproduced (`open-pull-request` Gate
+5a).
+
 ## The Vercel CLI pin tracks the pinned Node version
 
 Both deploy workflows pin the CLI by exact version (`VERCEL_CLI_VERSION`, run

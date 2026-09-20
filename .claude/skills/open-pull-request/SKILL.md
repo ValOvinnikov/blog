@@ -237,11 +237,11 @@ Work through these gates in order. **Committing is free; stop at the push and PR
 - Follow `develop-feature` for implementation and per-layer delegation.
 - Merge `origin/main` in first (`git fetch origin && git merge origin/main`,
   or rebase), then run the verify step from `develop-feature` § 5 —
-  single-package, CMS-only, or multi-layer sequence depending on what
-  changed. A merge from `main` done later, after verify or review, sends
-  the branch back to this bullet: both are re-run. Do not use the simplified
-  `pnpm type-check && pnpm lint && pnpm test` shortcut — it misses typegen and
-  the web build where required.
+  `pnpm typegen` inline when the schema changed, then `verify-runner` with
+  `pnpm verify`. A merge from `main` done later, after verify or review,
+  sends the branch back to this bullet: both are re-run. Do not use the
+  `pnpm type-check && pnpm lint && pnpm test` shortcut — it misses typegen
+  and the six gating scripts `pnpm verify` chains after `test`.
 - Dispatch the **`reviewer` subagent** (`.claude/agents/reviewer.md`) over the
   final diff — it applies `code-review-practices` (mechanical scan + contract
   pass + general pass). Fix any blocking findings, re-verify, and re-dispatch
