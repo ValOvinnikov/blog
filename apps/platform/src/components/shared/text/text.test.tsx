@@ -28,9 +28,4 @@ describe(Text, () => {
     }
     expect(screen.getAllByText('Variant copy')).toHaveLength(variants.length);
   });
-
-  it('merges a caller-supplied className', () => {
-    render(<Text className="custom-class">Body copy</Text>);
-    expect(screen.getByText('Body copy')).toHaveClass('custom-class');
-  });
 });

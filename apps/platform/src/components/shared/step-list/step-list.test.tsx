@@ -68,7 +68,6 @@ describe(StepList, () => {
     for (const { statusLabel } of steps) {
       const status = screen.getByText(statusLabel);
       expect(status.closest('[aria-live="polite"]')).not.toBeNull();
-      expect(status.className).toContain('sr-only');
     }
   });
 

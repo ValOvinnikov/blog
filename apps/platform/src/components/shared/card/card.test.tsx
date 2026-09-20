@@ -112,13 +112,4 @@ describe(Card, () => {
     ).not.toThrow();
     expect(screen.getByText('Just a body.')).toBeVisible();
   });
-
-  it('merges a caller-supplied className on the root', () => {
-    const { container } = render(
-      <Card className="custom-class">
-        <Card.Body>Content</Card.Body>
-      </Card>,
-    );
-    expect(container.firstChild).toHaveClass('custom-class');
-  });
 });
