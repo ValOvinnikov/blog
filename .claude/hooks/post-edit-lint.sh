@@ -2,6 +2,7 @@
 # PostToolUse hook: lint the TypeScript file an agent just edited/wrote so
 # lint failures — including the layer-boundary no-restricted-imports rules —
 # surface in the same turn instead of at commit time (lint-staged/pre-push).
+# Runs via post-edit.sh, after post-edit-prettier.sh has formatted the file.
 #
 # Contract (Claude Code hooks):
 #   stdin  — JSON payload; the edited file is .tool_input.file_path
@@ -33,16 +34,30 @@ esac
 # File may have been renamed/deleted later in the same turn.
 [ -f "$file_path" ] || exit 0
 
+case "$file_path" in
+  /*) ;;
+  *) file_path="$PWD/$file_path" ;;
+esac
+
+project_dir=${CLAUDE_PROJECT_DIR:-$(git -C "$(dirname "$file_path")" rev-parse --show-toplevel 2>/dev/null)}
+[ -n "$project_dir" ] || exit 0
+
 # Worktrees fresh from checkout may not have node_modules yet — skip, the
 # commit-time gates (lint-staged, pre-push, CI) still cover them.
-[ -x "$CLAUDE_PROJECT_DIR/node_modules/.bin/eslint" ] || exit 0
+eslint="$project_dir/node_modules/.bin/eslint"
+[ -x "$eslint" ] || exit 0
 
-cd "$CLAUDE_PROJECT_DIR" || exit 0
+# Run from the workspace that owns the file, the way `pnpm lint` does:
+# @next/eslint-plugin-next prints a "Pages directory cannot be found" line
+# from any other cwd, and it would reach the agent as if it were a finding.
+workspace_dir=$(dirname "$file_path")
+until [ "$workspace_dir" = "$project_dir" ] || [ "$workspace_dir" = "/" ] || ls "$workspace_dir"/eslint.config.* >/dev/null 2>&1; do
+  workspace_dir=$(dirname "$workspace_dir")
+done
 
-# Flat config resolves upward from the linted file, so the matching
-# workspace's eslint.config.js applies. --no-warn-ignored keeps ignored
-# files (e.g. generated types) silent instead of warning.
-output=$("$CLAUDE_PROJECT_DIR/node_modules/.bin/eslint" --no-warn-ignored "$file_path" 2>&1)
+cd "$workspace_dir" || exit 0
+
+output=$("$eslint" --no-warn-ignored "$file_path" 2>&1)
 status=$?
 
 # ESLint exit codes: 0 = clean, 1 = lint problems, >=2 = fatal (e.g. no
