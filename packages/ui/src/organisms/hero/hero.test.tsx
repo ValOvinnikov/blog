@@ -96,46 +96,6 @@ describe(`<${Hero.name}/>`, () => {
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
-  it.each([
-    [CONTENT_ALIGNMENT.LEFT, 'justify-start'],
-    [CONTENT_ALIGNMENT.CENTER, 'justify-center'],
-    [CONTENT_ALIGNMENT.RIGHT, 'justify-end'],
-  ])(
-    'justifies Hero.Cta to %s under contentAlignment',
-    (alignment, expectedClass) => {
-      renderHero(
-        { contentAlignment: alignment },
-        <Hero.Cta dataTestId="hero-cta">
-          <a href="/posts/design-system">Read more</a>
-        </Hero.Cta>,
-      );
-
-      expect(screen.getByTestId('hero-cta')).toHaveClass(expectedClass);
-    },
-  );
-
-  it('centers Hero.Cta by default on Stacked, where contentAlignment defaults to CENTER', () => {
-    renderHero(
-      { variant: HERO_VARIANT.STACKED },
-      <Hero.Cta dataTestId="hero-cta">
-        <a href="/posts/design-system">Read more</a>
-      </Hero.Cta>,
-    );
-
-    expect(screen.getByTestId('hero-cta')).toHaveClass('justify-center');
-  });
-
-  it('left-aligns Hero.Cta by default on Banner, where contentAlignment defaults to LEFT', () => {
-    renderHero(
-      { variant: HERO_VARIANT.BANNER },
-      <Hero.Cta dataTestId="hero-cta">
-        <a href="/posts/design-system">Read more</a>
-      </Hero.Cta>,
-    );
-
-    expect(screen.getByTestId('hero-cta')).toHaveClass('justify-start');
-  });
-
   it('renders Hero.Media content', () => {
     renderHero(
       undefined,

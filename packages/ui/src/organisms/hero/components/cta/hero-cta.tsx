@@ -9,7 +9,7 @@ export type THeroCtaProps = IWithClassName &
     children?: ReactNode;
   };
 
-/** The call-to-action slot of a `Hero`; a styled `<div>` for the hero's buttons or links. */
+/** The call-to-action slot of a Hero. */
 export const HeroCta = ({
   contentAlignment,
   className,

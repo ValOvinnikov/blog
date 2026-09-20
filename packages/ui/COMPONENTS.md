@@ -339,7 +339,7 @@ Slots:
 
 - **Hero.Avatar** — The portrait slot of a `Hero`, rendered before the eyebrow; a styled `<div>` for the caller's own `Avatar` or image. Props: contentAlignment?: THeroAvatarVariants['contentAlignment'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: contentAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT
 - **Hero.Media** — The media slot of a `Hero`; frames its content via `MediaFrame`, at a configurable ratio (16:9 by default). Props: isFramed?: boolean · ratio?: TMediaFrameRatio · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: ratio: video|square|portrait|classic
-- **Hero.Cta** — The call-to-action slot of a `Hero`; a styled `<div>` for the hero's buttons or links. Props: contentAlignment?: THeroCtaVariants['contentAlignment'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: contentAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT
+- **Hero.Cta** — The call-to-action slot of a Hero. Props: contentAlignment?: THeroCtaVariants['contentAlignment'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: contentAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT
 - **Hero.Social** — The trailing slot of a `Hero`, rendered after `Hero.Cta`; a styled `<div>` for the caller's own social links, typically a labelled list. Props: contentAlignment?: THeroSocialVariants['contentAlignment'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: contentAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT
 
 ### NewsletterSignup — `organisms/newsletter-signup/newsletter-signup.tsx`
