@@ -18,11 +18,11 @@ env vars, or the content model, `SPEC.md` must be updated in the same PR.
 ## 0. Mechanical pass (blocking — run the commands, don't eyeball)
 
 Checklist prose gets skimmed; commands don't miss. Run each of these over the
-**full diff** (`git diff main...HEAD`, plus `git diff` if the tree is dirty)
+**full diff** (`git diff origin/main...HEAD`, plus `git diff` if the tree is dirty)
 and treat every hit as a blocking finding unless explicitly allowed:
 
 ```bash
-BASE=main
+BASE=origin/main
 D() { git diff "$BASE"...HEAD; git diff; }
 
 # Debug artifacts — no bare console.* lands in app or package source.

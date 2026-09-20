@@ -313,8 +313,18 @@ red check.
 
 ## 6. Review (blocking — Gate 2 must not be offered until this passes)
 
+Before dispatching **any** reviewer (`reviewer`, `a11y-reviewer`,
+`seo-auditor`), run `git fetch origin` to refresh the ref — a worktree
+session's local `main` can go stale relative to what actually merged (#2739:
+a stale ref showed the reviewer 87 files instead of 18). The read-only guard
+denies these subagents `git fetch`, so only the orchestrator can refresh it.
+Every dispatch prompt names the base ref as `origin/main` (never bare
+`main`) and states the expected file count
+(`git diff origin/main...HEAD --name-only | wc -l`, plus any dirty
+working-tree files) so the subagent can flag a mismatch itself.
+
 - Dispatch the **`reviewer` subagent** (`.claude/agents/reviewer.md`) over the
-  full diff (`main...HEAD` + working tree). It applies `code-review-practices`
+  full diff (`origin/main...HEAD` + working tree). It applies `code-review-practices`
   — mechanical scan, contract pass, general pass — with fresh eyes and reports
   a verdict.
 - **If the diff touches `packages/ui`, `apps/web`, or `apps/platform` components**, also dispatch
