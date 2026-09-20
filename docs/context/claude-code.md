@@ -426,6 +426,50 @@ file` are all denied alike) — an earlier version only handled the
     `subagent-stop-commit-guard.test.sh` pins the block/pass matrix against
     throwaway repos under worktree-shaped paths — hermetic, no live session
     state.
+
+  - `layer-scope-guard.sh` — `PreToolUse` hook on `Edit`/`MultiEdit`/`Write`,
+    wired in the frontmatter of each of the ten layer agents
+    (`config`/`studio`/`service`/`ui`/`web`/`db`/`auth`/`platform-app`/
+    `email`/`insight`) with that layer's own scope (#3360). Denies a target
+    that fails either of two checks: it must sit inside the agent's **own
+    checkout** — the git toplevel of the payload's `cwd` (falling back to
+    `$PWD`), never `$CLAUDE_PROJECT_DIR`, which names the _session's_ project
+    dir and so, for a worktree-isolated agent, is exactly the primary
+    checkout the check keeps it out of — and its checkout-relative path must
+    sit under one of the layer's allowed prefixes. A relative `file_path`
+    resolves against `cwd`; `..` segments are normalised before matching, so
+    climbing out of the worktree is caught the same as an absolute path in.
+    The deny message names the agent, the offending path and the allowed
+    prefixes, and says to report the change as a finding for the owning
+    layer agent. Closes the gap memory records the `db` agent falling into
+    on #1732 and three agents repeating during #2144: `isolation: worktree`
+    is cwd-only, so an absolute `/Users/…/Projects/blog/packages/db/…` typed
+    from habit edited the primary checkout with nothing to stop it.
+
+    **The contract is two env vars set on the hook command**, so one script
+    carries every layer's scope without a lookup table:
+
+    - `LAYER_PATHS` (required) — colon-separated repo-relative directory
+      prefixes, e.g. `packages/ui` or
+      `packages/config:packages/utils:configs`. A prefix matches that
+      directory and its descendants only (`packages/ui` never matches
+      `packages/ui-foo`).
+    - `LAYER_FILES` (optional) — colon-separated path suffixes allowed
+      anywhere in the checkout, e.g. `tsconfig.json:vitest.config.ts`. Set
+      only on `config` and `email`, whose docs send them into every
+      consumer's alias wiring (`config.md` "Cross-workspace alias wiring",
+      `email.md` "When a consumer changes"); every other layer's prefixes
+      are exactly its own workspace.
+
+    **Fails open** when `jq` is missing or `LAYER_PATHS` is unset/empty —
+    an unconfigured guard stays out of the way rather than denying
+    everything, same stance as `test-writer-scope-guard.sh`; a missing
+    `file_path` passes too. `packages/config/src/sanity/generated/` needs no
+    entry: it is already deny-listed for `Edit`/`Write` in `settings.json`,
+    and typegen writes it through `pnpm`, not through this tool surface.
+    `layer-scope-guard.test.sh` pins the deny/allow matrix against throwaway
+    directories under a worktree-shaped path — hermetic, no live session
+    state.
 - **Repo-specific ESLint rules** (`configs/eslint/`) — `no-prop-spread.js` and
   `boolean-prop-prefix.js` are the repo's only hand-written rules (with a
   `create()` visitor). They sit alongside two `no-restricted-imports` helpers
