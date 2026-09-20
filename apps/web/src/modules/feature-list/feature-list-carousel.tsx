@@ -11,7 +11,6 @@ import { Carousel } from '@blog/ui/organisms/carousel';
 import { useTranslations } from 'next-intl';
 
 import { FeatureListCard } from './feature-list-card';
-import { featureListCarouselVariants } from './feature-list-carousel-variants';
 
 export interface IFeatureListCarouselProps
   extends IWithClassName, IWithDataTestId {
@@ -22,8 +21,6 @@ export interface IFeatureListCarouselProps
   title: string;
   tone?: TBrandVariant;
 }
-
-const s = featureListCarouselVariants();
 
 export const FeatureListCarousel = ({
   items,
@@ -50,7 +47,6 @@ export const FeatureListCarousel = ({
         />
       )}
       getItemKey={({ item }) => item.id}
-      slideClassName={s.slide()}
       ariaLabel={t('regionLabel', { title })}
       previousLabel={t('previousAriaLabel')}
       nextLabel={t('nextAriaLabel')}
