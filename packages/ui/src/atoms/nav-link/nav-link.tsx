@@ -8,6 +8,7 @@ import { navLinkVariants, type TNavLinkVariants } from './nav-link-variants';
 type TNavLinkOwnProps = {
   className?: string;
   isActive?: TNavLinkVariants['isActive'];
+  variant?: TNavLinkVariants['variant'];
   hasLabel?: boolean;
 } & IWithIcon &
   IWithDataTestId;
@@ -20,6 +21,7 @@ export type TNavLinkProps<C extends ElementType = 'a'> = TPolymorphicProps<
 /** A chrome-level navigation link (header/footer nav items). */
 export const NavLink = <C extends ElementType = 'a'>({
   isActive = false,
+  variant = 'plain',
   className,
   dataTestId,
   as,
@@ -29,7 +31,7 @@ export const NavLink = <C extends ElementType = 'a'>({
   ...rest
 }: TNavLinkProps<C>) => {
   const Component = resolveComponent(as, 'a');
-  const { root, label } = navLinkVariants({ isActive });
+  const { root, label } = navLinkVariants({ isActive, variant });
   const title =
     !hasLabel && typeof children === 'string' ? children : undefined;
 
