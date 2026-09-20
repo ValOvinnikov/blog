@@ -63,6 +63,15 @@ check_json_cwd() {
   run_and_assert "$payload" "$root" "$expected" "$label"
 }
 
+# Same, with `agent_type` set as the harness sends it for a subagent.
+check_agent_type() {
+  local agent=$1 dir=$2 expected=$3 label=$4
+  local payload
+  payload=$(jq -n --arg cwd "$dir" --arg agent "$agent" \
+    '{hook_event_name: "SubagentStop", cwd: $cwd, agent_type: $agent}')
+  run_and_assert "$payload" "$root" "$expected" "$label"
+}
+
 # Runs the guard with no `cwd` field, from inside $1, so only the $PWD
 # fallback can locate the worktree.
 check_pwd_fallback() {
@@ -95,6 +104,14 @@ check_json_cwd "$agent_clean" pass "clean worktree passes"
 check_json_cwd "$agent_dirty" block "modified tracked file blocks"
 check_json_cwd "$agent_untracked" block "untracked-only file blocks"
 check_json_cwd "$agent_nested/packages/ui" block "cwd nested inside the worktree still blocks"
+
+echo "Agent type, dirty agent worktree:"
+check_agent_type ui "$agent_dirty" block "layer agent (ui) blocks"
+check_agent_type platform-app "$agent_untracked" block "layer agent (platform-app) blocks"
+check_agent_type test-writer "$agent_dirty" pass "test-writer passes — it cannot commit"
+check_agent_type reviewer "$agent_dirty" pass "reviewer passes"
+check_agent_type "plugin:some-plugin:ui" "$agent_dirty" pass "plugin-scoped name is not a layer agent"
+check_agent_type "" "$agent_dirty" block "empty agent_type keeps the cwd-only behaviour"
 
 echo "Not an agent worktree:"
 check_json_cwd "$plain_repo" pass "dirty main checkout passes"

@@ -169,6 +169,7 @@
     ],
     "SubagentStop": [
       {
+        "matcher": "^(config|studio|service|ui|web|db|auth|platform-app|email|insight)$",
         "hooks": [
           {
             "type": "command",

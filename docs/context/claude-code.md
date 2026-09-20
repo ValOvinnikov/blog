@@ -379,10 +379,14 @@ file` are all denied alike) — an earlier version only handled the
     with a stubbed `gh` on `PATH`, so it is hermetic — no network, no
     dependence on live board state.
 
-  - `subagent-stop-commit-guard.sh` — `SubagentStop` hook (wired in
-    `settings.json`, so it sees every subagent's stop, not one agent's).
-    Blocks a subagent from ending its turn while its worktree has uncommitted
-    work: when the stop payload's `cwd` (falling back to `$PWD`) is inside
+  - `subagent-stop-commit-guard.sh` — `SubagentStop` hook wired in
+    `settings.json` with a `matcher` on the subagent type, restricted to the
+    ten layer agents
+    (`^(config|studio|service|ui|web|db|auth|platform-app|email|insight)$`);
+    the script re-checks the payload's `agent_type` against the same list,
+    so a widened matcher can't silently widen the guard. Blocks a layer agent
+    from ending its turn while its worktree has uncommitted work: when the
+    stop payload's `cwd` (falling back to `$PWD`) is inside
     `.claude/worktrees/agent-*` and `git status --porcelain` there is
     non-empty — a modified file or an untracked one alike — it returns
     `{"decision":"block","reason":…}` telling the agent to stage the files it
@@ -392,13 +396,18 @@ file` are all denied alike) — an earlier version only handled the
     that reports done with the files only on disk looks finished while its
     branch still sits at the base (#2437–#2439 all ended that way).
 
-    Narrow by construction: the cwd test is the whole scope, so read-only
-    agents (`reviewer`, `explore`, `verify-runner`, …), which don't
-    self-isolate and run in the main checkout, and a session's own
-    `agents-*` worktree never match. **Fails open** when `git`/`jq` is
-    missing or the cwd is no longer a repo. `subagent-stop-commit-guard.test.sh`
-    pins the block/pass matrix against throwaway repos under
-    worktree-shaped paths — hermetic, no live session state.
+    The agent-type scope is load-bearing, not tidiness: `test-writer` also
+    runs with `isolation: worktree`, but `read-only-agent-guard.sh` denies it
+    `git add`/`git commit`, so a block it can never satisfy would loop its
+    stop forever. Read-only agents (`reviewer`, `explore`, `verify-runner`,
+    …) never match the matcher either, and the cwd test additionally keeps
+    the main checkout and a session's own `agents-*` worktree out. **Fails
+    open** when `git` is missing or the cwd is no longer a repo; a missing
+    `jq` only loses the payload — the cwd falls back to `$PWD` and the
+    `agent_type` check is skipped, with the `matcher` still doing that job.
+    `subagent-stop-commit-guard.test.sh` pins the block/pass matrix against
+    throwaway repos under worktree-shaped paths — hermetic, no live session
+    state.
 - **Repo-specific ESLint rules** (`configs/eslint/`) — `no-prop-spread.js` and
   `boolean-prop-prefix.js` are the repo's only hand-written rules (with a
   `create()` visitor). They sit alongside two `no-restricted-imports` helpers

@@ -132,8 +132,8 @@ delete-don't-shorten rule. It is not restated here; follow it as written.
 - No workspace dependency beyond `@blog/utils` in
   `packages/email/package.json`; no `@blog/insight`, `@blog/db`, `@blog/auth`,
   `@blog/service`, app or Sanity import anywhere in `src/`.
-- Every consumer you touched has `@blog/email` in both its `tsconfig.json`
-  `paths` and its `vitest.config.ts` `resolve.alias`.
+- Every consumer you touched has the alias wiring `## When a consumer
+changes` above requires.
 
 **Report back to the orchestrator** with:
 
