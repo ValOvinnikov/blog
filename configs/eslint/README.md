@@ -45,6 +45,9 @@
   so it applies to every workspace. Co-located `no-class-assertions.test.js`.
   Per `testing-practices` → "What not to test": assert the semantic
   observable instead, or cover styling in a story with `no-tests-needed`.
+  Known gap: it flags any `.className`/`.classList` member read in a test
+  file, not only inside `expect(…)`, and can't see a class asserted
+  indirectly through `objectContaining` in a `toHaveBeenCalledWith`.
 
   Pre-existing violations in `packages/ui`, `apps/web`, and `apps/platform`
   are baselined via ESLint's bulk-suppressions feature

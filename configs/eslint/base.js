@@ -70,11 +70,8 @@ export default [
     // scripts, e2e specs) live in their own layer preset — `files` here
     // resolves relative to each consuming workspace, so a repo-root path
     // like `packages/insight/src/**` would never match from this shared file.
-    // `blog-test` (not `blog`) is its own plugin namespace: `ui.js`/`web.js`/
-    // `platform.js` already register `blog` over the broader `**/*.{ts,tsx}`,
-    // and ESLint's flat-config plugin merge throws `Cannot redefine plugin`
-    // when two matching config objects register the same plugin key with a
-    // different rules object.
+    // Own namespace: registering a second rules object under `blog` throws
+    // "Cannot redefine plugin".
     files: ['**/*.test.{ts,tsx}'],
     plugins: {
       'blog-test': { rules: { 'no-class-assertions': noClassAssertionsRule } },

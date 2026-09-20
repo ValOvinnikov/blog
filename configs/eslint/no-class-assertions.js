@@ -24,11 +24,6 @@ function isClassAttributeCall(node) {
   return firstArg?.type === 'Literal' && firstArg.value === 'class';
 }
 
-/**
- * Bans asserting a DOM class in a test — `toHaveClass`, `toHaveAttribute('class', …)`,
- * `getAttribute('class')`, and reads of `.className`/`.classList` — per
- * `testing-practices` → "What not to test".
- */
 export const noClassAssertionsRule = {
   meta: {
     type: 'problem',
