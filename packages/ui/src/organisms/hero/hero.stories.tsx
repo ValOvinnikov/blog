@@ -302,6 +302,19 @@ export const StackedProfileToneSecondary: TStory = {
   },
 };
 
+export const CenteredActions: TStory = {
+  args: {
+    variant: HERO_VARIANT.STACKED,
+    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    children: (
+      <Hero.Cta>
+        <NavLink href="/posts/design-system">Read more</NavLink>
+        <NavLink href="/about">About the author</NavLink>
+      </Hero.Cta>
+    ),
+  },
+};
+
 export const SplitSquarePortrait: TStory = {
   args: {
     variant: HERO_VARIANT.SPLIT,

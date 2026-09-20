@@ -113,7 +113,9 @@ prune: note them as a finding.
 ## Per-layer conventions (from testing-practices — read it, this is a pointer not a summary)
 
 - **`@blog/ui`** components: Testing Library, query by role/text, assert
-  behaviour/props/variants — never class names or snapshots.
+  behaviour/props/variants — never class names or snapshots, not even a
+  class a prop toggles (the `no-class-assertions` lint rule fails it); a
+  prop whose only effect is styling gets no test.
 - **`@blog/service`** mappers/loaders: mock the Sanity client, test
   transformer/loader mapping and `urlForImage`, no network.
 - **`apps/web`** routes: mock `service` functions, assert data renders and

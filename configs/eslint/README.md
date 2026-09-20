@@ -34,6 +34,37 @@
   at runtime but isn't caught, since the rule only inspects the syntactic
   annotation shape — flagging it would require type-aware linting, which
   this repo's ESLint setup doesn't run.
+- `no-class-assertions.js` — bans asserting a DOM class in a test:
+  `toHaveClass`/`.not.toHaveClass`, `toHaveAttribute('class', …)`,
+  `getAttribute('class')`, and reads of `.className`/`.classList`. Registered
+  in `base.js` under its own `blog-test` plugin namespace (not `blog` —
+  `ui.js`/`web.js`/`platform.js` already register `blog` over the broader
+  `**/*.{ts,tsx}`, and ESLint's flat-config plugin merge throws
+  `Cannot redefine plugin` when two matching config objects register the same
+  plugin key with a different rules object), scoped to `**/*.test.{ts,tsx}`
+  so it applies to every workspace. Co-located `no-class-assertions.test.js`.
+  Per `testing-practices` → "What not to test": assert the semantic
+  observable instead, or cover styling in a story with `no-tests-needed`.
+  Known gap: it flags any `.className`/`.classList` member read in a test
+  file, not only inside `expect(…)`, and can't see a class asserted
+  indirectly through `objectContaining` in a `toHaveBeenCalledWith`.
+
+  Pre-existing violations in `packages/ui`, `apps/web`, and `apps/platform`
+  are baselined via ESLint's bulk-suppressions feature
+  (`eslint-suppressions.json` at each workspace root, read automatically by
+  that workspace's `"lint": "eslint ."` script) rather than fixed inline —
+  126/71/8 violations respectively. That file is a baseline being drained by
+  sweep tickets, not a permanent allowlist: fixing a suppressed violation
+  without pruning its entry makes ESLint exit non-zero with an "unused
+  suppressions" error, so removing a class assertion forces the prune in the
+  same change. Prune after fixing one with:
+
+  ```
+  eslint . --prune-suppressions
+  ```
+
+  Never add a suppression for anything but `blog-test/no-class-assertions`.
+
 - `func-style` — enforces arrow-function expressions (`'error', 'expression',
 { allowArrowFunctions: true }`) over function declarations. Registered only
   in `web.js`, scoped to `apps/web/**/*.{ts,tsx}`, with an override turning it
