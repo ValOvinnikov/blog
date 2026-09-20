@@ -1,0 +1,32 @@
+{
+  "src/components/features/layout/admin-shell/components/shell-frame/shell-frame.test.tsx": {
+    "blog-test/no-class-assertions": {
+      "count": 3
+    }
+  },
+  "src/components/features/look/look-preview/preview-sample/preview-sample.test.tsx": {
+    "blog-test/no-class-assertions": {
+      "count": 1
+    }
+  },
+  "src/components/shared/card/card.test.tsx": {
+    "blog-test/no-class-assertions": {
+      "count": 1
+    }
+  },
+  "src/components/shared/page-header/page-header.test.tsx": {
+    "blog-test/no-class-assertions": {
+      "count": 1
+    }
+  },
+  "src/components/shared/step-list/step-list.test.tsx": {
+    "blog-test/no-class-assertions": {
+      "count": 1
+    }
+  },
+  "src/components/shared/text/text.test.tsx": {
+    "blog-test/no-class-assertions": {
+      "count": 1
+    }
+  }
+}

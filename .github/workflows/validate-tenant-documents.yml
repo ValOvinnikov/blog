@@ -2,7 +2,7 @@ name: Validate Tenant Documents
 
 # Fans `sanity documents validate` (read-only) out across every ACTIVE,
 # non-deprovisioned tenant's own Sanity project/dataset — the console
-# project is validated separately by ci.yml's `document-validation` job.
+# project is validated separately by the daily document-validation.yml.
 # Drift is persisted as `findings` rows (see
 # `packages/db/scripts/validate-tenant-documents/`) via
 # `db.queries.findings.openFinding`/`resolveFinding`, surfaced on the

@@ -134,8 +134,10 @@ delete-don't-shorten rule. It is not restated here; follow it as written.
   `test-writer`'s pass after your implementation lands.
 
 - Co-locate `Component.test.tsx` (Vitest + Testing Library, jsdom). Query by
-  role/text; assert behaviour, not class names. See the `testing-practices`
-  skill (`.claude/skills/testing-practices/SKILL.md`).
+  role/text; assert behaviour, never a class — not even one a prop or variant
+  toggles (the `no-class-assertions` lint rule fails it). A variant whose only
+  effect is styling gets a story and `no-tests-needed`, not a test. See the
+  `testing-practices` skill (`.claude/skills/testing-practices/SKILL.md`).
 - Use `@faker-js/faker` for realistic mock data in tests and stories — never
   hardcode `"Title"` or `"Lorem ipsum"` when a faker call gives better coverage.
   Seed tests for determinism: `faker.seed(123)` at the top of each test file.
