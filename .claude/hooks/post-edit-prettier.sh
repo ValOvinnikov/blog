@@ -30,6 +30,11 @@ file_path=$(printf '%s' "$payload" | node -e '
 # File may have been renamed/deleted later in the same turn.
 [ -f "$file_path" ] || exit 0
 
+case "$file_path" in
+  /*) ;;
+  *) file_path="$PWD/$file_path" ;;
+esac
+
 project_dir=${CLAUDE_PROJECT_DIR:-$(git -C "$(dirname "$file_path")" rev-parse --show-toplevel 2>/dev/null)}
 [ -n "$project_dir" ] || exit 0
 

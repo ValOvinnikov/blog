@@ -100,8 +100,15 @@ expect "malformed payload is a silent no-op" 0 "" ""
 
 run_hook "$(payload_for "apps/web/src/dirty.ts")"
 expect "relative path resolves against the cwd" 2 \
-  "prettier cwd=$project file=apps/web/src/dirty.ts
+  "prettier cwd=$project file=$dirty
 eslint cwd=$project/apps/web file=$dirty" "no-console"
+
+cd "$project/apps" || exit 1
+run_hook "$(payload_for "web/src/dirty.ts")"
+expect "relative path from a cwd below the project dir is absolutised for both tools" 2 \
+  "prettier cwd=$project file=$dirty
+eslint cwd=$project/apps/web file=$dirty" "no-console"
+cd "$project" || exit 1
 
 unset CLAUDE_PROJECT_DIR
 run_hook "$(payload_for "$dirty")"
