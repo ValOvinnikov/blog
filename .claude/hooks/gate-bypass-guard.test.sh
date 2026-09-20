@@ -102,6 +102,29 @@ block 'git commit -m $(echo "(") --no-verify'
 # shellcheck disable=SC2016
 block 'git commit -m $(echo `echo )`) --no-verify'
 
+# --- must BLOCK: the literal destructive forms that have lost agent work (#3362)
+block 'git reset --hard'
+block 'git reset --hard HEAD'
+block 'git reset --hard origin/main'
+block 'git -C /tmp/wt reset --hard'
+block 'git --no-pager reset --hard HEAD~1'
+block 'git clean -f'
+block 'git clean -fd'
+block 'git clean -fdx'
+block 'git clean -df'
+block 'git clean -xdf'
+block 'git clean --force'
+block 'git clean -f -d'
+block 'git checkout -- .'
+block 'git checkout -- src/index.ts'
+block 'git checkout main -- src/index.ts'
+block 'git restore src/index.ts'
+block 'git restore .'
+block 'git restore --source=HEAD~1 src/index.ts'
+block 'git restore --staged --worktree src/index.ts'
+block 'git restore -S -W src/index.ts'
+block 'git fetch origin && git reset --hard origin/main'
+
 # --- must ALLOW: the repo's own workflow (from ecc1092's ALLOW bank) --------
 allow 'git commit -q -m "chore: x"'
 allow 'git -C /tmp status'
@@ -147,6 +170,32 @@ allow 'git commit -m "revert --force push"'
 # A message that names a whole git command is still just a message.
 allow 'git commit -m "fix the git push --force bug"'
 allow 'bash -c "pnpm build"'
+
+# --- must ALLOW: the non-destructive siblings of the #3362 forms -----------
+# reset without --hard keeps the working tree; clean -n only lists; checkout
+# of a branch (no `--`) carries local changes across; restore --staged / -S
+# only unstages.
+allow 'git reset --soft HEAD~1'
+allow 'git reset HEAD~1'
+allow 'git reset src/index.ts'
+allow 'git reset'
+allow 'git reset --mixed origin/main'
+allow 'git clean -n'
+allow 'git clean -nd'
+allow 'git clean --dry-run'
+allow 'git clean -e foo -n'
+allow 'git checkout main'
+allow 'git checkout -b feat/x'
+allow 'git checkout -B feat/x origin/main'
+allow 'git checkout feat/x --'
+allow 'git restore --staged src/index.ts'
+allow 'git restore -S src/index.ts'
+allow 'git restore --staged .'
+allow 'git commit -m "git reset --hard is never the answer"'
+allow 'git commit -m "run git clean -fdx before rebuilding"'
+allow 'git commit -m "git checkout -- . lost work; use stash"'
+allow 'git stash push -u -m "wip"'
+allow 'git stash apply abc123'
 
 # --- must ALLOW: this repo's own multi-line commit convention --------------
 # The realistic case that broke the discarded attempt twice: a commit body
