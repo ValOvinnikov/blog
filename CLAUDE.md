@@ -720,8 +720,12 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   list, an option list, a default), editor-facing copy (a `description`, a
   label, a placeholder) and a `??` precedence are all the same mistake: the
   expected value is a literal copied out of the file under test, so the only
-  change that can fail it is a deliberate edit. One rule, one home —
-  `testing-practices` → "What not to test".
+  change that can fail it is a deliberate edit. **A Tailwind class is the
+  same mistake, prop-driven or not** — `toHaveClass('hover:bg-…')` gated on
+  a prop is the variants map read back, and the case agents write most; the
+  `no-class-assertions` lint rule fails it in every `*.test.{ts,tsx}`, so a
+  styling-only change gets a story and `no-tests-needed`, never a test. One
+  rule, one home — `testing-practices` → "What not to test".
 - After a schema change: `pnpm typegen`, then commit the regenerated files in
   `packages/config/src/sanity/generated/`. Typegen can be non-deterministic —
   re-run until the diff is minimal.
