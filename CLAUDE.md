@@ -764,14 +764,17 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   part of the local loop — CI's `ci.yml` `build` job gates every PR; only
   reproduce it locally when diagnosing an actual CI build failure
   (`open-pull-request` Gate 5a).
-- **Edit-time format + lint feedback:** checked-in `PostToolUse` hooks
-  (`.claude/hooks/post-edit-prettier.sh` then `.claude/hooks/post-edit-lint.sh`,
-  chained as one command in `.claude/settings.json` since matching hooks
-  otherwise run in parallel) format every edited/written file with Prettier,
-  then lint every `.ts`/`.tsx` file on the formatted content and feed errors —
-  including layer-boundary violations — straight back to the agent in the
-  same turn. Prettier is silent and always exits 0 (formatting, not review);
-  lint stays report-only (never `--fix`); commit-time gates stay authoritative.
+- **Edit-time format + lint feedback:** one checked-in `PostToolUse` hook
+  (`.claude/hooks/post-edit.sh`, which feeds the same stdin payload to
+  `post-edit-prettier.sh` then `post-edit-lint.sh` — a single entry in
+  `.claude/settings.json` since matching hooks otherwise run in parallel,
+  and a wrapper rather than an `&&` chain since the first script's stdin
+  read would starve the second) formats every edited/written file with
+  Prettier, then lints every `.ts`/`.tsx` file on the formatted content from
+  its own workspace and feeds errors — including layer-boundary violations —
+  straight back to the agent in the same turn, in a few seconds. Prettier
+  is silent and always exits 0 (formatting, not review); lint stays
+  report-only (never `--fix`); commit-time gates stay authoritative.
 - **Conventional commits, one concern per PR — mechanically enforced.**
   `.husky/commit-msg` runs commitlint (`commitlint.config.mjs`) on every
   local commit — the only place this is enforced, so a commit that bypasses

@@ -286,20 +286,37 @@ file` are all denied alike) — an earlier version only handled the
   false-positive cost.
 
 - **Hooks** (`.claude/hooks/`):
-  - `post-edit-prettier.sh` → `post-edit-lint.sh` — `PostToolUse` hooks (wired
-    in `.claude/settings.json` as a single chained command,
-    `post-edit-prettier.sh && post-edit-lint.sh`) so every agent-edited/written
-    file is Prettier-formatted, then linted on the formatted content, in the
-    same turn. They're chained rather than two entries under the same
-    matcher because Claude Code runs all hooks matching an event in
-    parallel — two array entries would race and ESLint could see pre-format
-    content. `post-edit-prettier.sh` always exits 0 and gives no agent
-    feedback (formatting, not review); unsupported/missing files and
-    `.prettierignore`'d paths are silent no-ops via Prettier itself.
-    `post-edit-lint.sh` lints every agent-edited `.ts`/`.tsx` file and feeds
-    errors — including layer-boundary `no-restricted-imports` violations —
-    back to the agent. Report-only (never `--fix`); the commit-time gates
-    (lint-staged) stay authoritative.
+  - `post-edit.sh` → `post-edit-prettier.sh` → `post-edit-lint.sh` — the one
+    `PostToolUse` hook (`Edit|MultiEdit|Write`, `timeout: 120`) so every
+    agent-edited/written file is Prettier-formatted, then linted on the
+    formatted content, in the same turn. `post-edit.sh` reads the stdin
+    payload once and pipes it to each script in order. It is one entry
+    rather than two under the same matcher because Claude Code runs all
+    hooks matching an event in parallel — two array entries would race and
+    ESLint could see pre-format content — and it is a wrapper rather than
+    the earlier `prettier.sh && lint.sh` chain because both scripts
+    `$(cat)` stdin, so the chain's second command always read an empty
+    payload and no-opped: until #3356 the lint half had never actually fired
+    (`post-edit.test.sh` pins this). `post-edit-prettier.sh` always exits 0
+    and gives no agent feedback (formatting, not review); unsupported/missing
+    files and `.prettierignore`'d paths are silent no-ops via Prettier
+    itself. `post-edit-lint.sh` lints every agent-edited `.ts`/`.tsx` file
+    and feeds errors — including layer-boundary `no-restricted-imports`
+    violations — back to the agent. It runs ESLint from the workspace that
+    owns the file (the nearest ancestor with an `eslint.config.*`), the way
+    `pnpm lint` does, which keeps `@next/eslint-plugin-next`'s "Pages
+    directory cannot be found" line out of the feedback. Report-only (never
+    `--fix`); the commit-time gates (lint-staged) stay authoritative. Both
+    scripts fall back to `git rev-parse --show-toplevel` (from the file's
+    directory) when `CLAUDE_PROJECT_DIR` is unset.
+
+    No ESLint preset in `configs/eslint` is type-aware (no `projectService`,
+    no `*TypeChecked` config), so a single-file lint is ~2s and there is no
+    "fast mode" — the full workspace ruleset runs on every edit, the same
+    one lint-staged and `pnpm lint` apply. The `timeout: 120` (up from the
+    60s default) is headroom for a loaded machine: several sessions running
+    turbo in parallel have pushed the same ~2s lint past 20s.
+
   - `pre-bash-worktree-install-guard.sh` — `PreToolUse` hook that blocks
     dependency-mutating pnpm commands inside a shared-deps agent worktree
     (see below) before pnpm can write anything.
