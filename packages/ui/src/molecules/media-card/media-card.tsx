@@ -30,6 +30,7 @@ export type TMediaCardProps = IWithClassName &
     isSplit?: TMediaCardVariants['isSplit'];
     isLead?: TMediaCardVariants['isLead'];
     align?: TMediaCardVariants['align'];
+    isInteractive?: TMediaCardVariants['isInteractive'];
     children?: TCompoundChildren<typeof MediaCardParts>;
   };
 
@@ -40,6 +41,7 @@ const MediaCardRoot = ({
   isSplit,
   isLead,
   align,
+  isInteractive,
   children,
   className,
   dataTestId,
@@ -47,7 +49,12 @@ const MediaCardRoot = ({
   const { slots, unmatched } = mapCompoundSlots(children, MediaCardParts);
   const hasMedia = Boolean(slots.Media);
   const isSplitLayout = Boolean(isSplit) && hasMedia;
-  const s = mediaCardVariants({ isSplit: isSplitLayout, isLead, align });
+  const s = mediaCardVariants({
+    isSplit: isSplitLayout,
+    isLead,
+    align,
+    isInteractive,
+  });
 
   const media =
     slots.Media && (isLead || align === 'center')
