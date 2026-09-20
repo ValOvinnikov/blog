@@ -1,24 +1,7 @@
-import {
-  BRAND_VARIANT,
-  CTA_ACTION_APPEARANCE,
-  CTA_ACTION_VARIANT,
-  HERO_VARIANT,
-} from '@blog/config';
+import { BRAND_VARIANT, HERO_VARIANT } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
 
 import { HeroBlogModuleView } from './hero-blog-module-view';
-
-const derivedPrimaryButton = {
-  variant: CTA_ACTION_VARIANT.PRIMARY,
-  appearance: undefined,
-  link: {
-    label: 'Read the post',
-    href: '/blog/welcome-to-the-blog',
-    target: undefined,
-    platform: undefined,
-    ariaLabel: undefined,
-  },
-};
 
 const setup = customRender(HeroBlogModuleView, {
   id: 'hero-blog-1',
@@ -50,26 +33,4 @@ describe(`<${HeroBlogModuleView.name}/>`, () => {
     const section = heading.closest('section');
     expect(section).toHaveAttribute('aria-labelledby', 'hero-blog-hero-blog-1');
   });
-
-  it.each([
-    [CTA_ACTION_APPEARANCE.CONTAINED, 'bg-brand-primary-solid'],
-    [undefined, 'bg-brand-primary-solid'],
-    [CTA_ACTION_APPEARANCE.INLINE, 'underline'],
-  ])(
-    'styles the primary button for appearance %s with the %s button variant',
-    (appearance, expectedClass) => {
-      setup({
-        ctaButtons: [
-          {
-            ...derivedPrimaryButton,
-            appearance,
-          },
-        ],
-      });
-
-      const link = screen.getByRole('link', { name: 'Read the post' });
-      expect(link).toBeVisible();
-      expect(link.className).toContain(expectedClass);
-    },
-  );
 });

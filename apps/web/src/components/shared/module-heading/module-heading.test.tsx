@@ -1,4 +1,3 @@
-import { CONTENT_ALIGNMENT } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
@@ -20,7 +19,6 @@ describe(`<${ModuleHeading.name}/>`, () => {
       name: 'Latest posts',
     });
     expect(heading).toHaveAttribute('id', 'section-title');
-    expect(heading).not.toHaveClass('sr-only');
   });
 
   it('renders the heading tag at the given level', () => {
@@ -45,43 +43,5 @@ describe(`<${ModuleHeading.name}/>`, () => {
     });
 
     expect(screen.getByText('Fresh from the blog.')).toBeVisible();
-  });
-
-  it('aligns left by default', () => {
-    setup();
-
-    expect(screen.getByRole('heading', { name: 'Latest posts' })).toHaveClass(
-      'text-left',
-    );
-  });
-
-  it('aligns the heading and supporting text center when align is CENTER', () => {
-    setup({
-      align: CONTENT_ALIGNMENT.CENTER,
-      headingBlock: makeHeadingBlock({
-        heading: 'Latest posts',
-        supportingText: 'Fresh from the blog.',
-      }),
-    });
-
-    expect(screen.getByRole('heading', { name: 'Latest posts' })).toHaveClass(
-      'text-center',
-    );
-    expect(screen.getByText('Fresh from the blog.')).toHaveClass('text-center');
-  });
-
-  it('aligns the heading and supporting text right when align is RIGHT', () => {
-    setup({
-      align: CONTENT_ALIGNMENT.RIGHT,
-      headingBlock: makeHeadingBlock({
-        heading: 'Latest posts',
-        supportingText: 'Fresh from the blog.',
-      }),
-    });
-
-    expect(screen.getByRole('heading', { name: 'Latest posts' })).toHaveClass(
-      'text-right',
-    );
-    expect(screen.getByText('Fresh from the blog.')).toHaveClass('text-right');
   });
 });

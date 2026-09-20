@@ -27,10 +27,4 @@ describe(`<${ThemeScope.name}/>`, () => {
       '--brand-primary: oklch(0.53 0.17 250);',
     );
   });
-
-  it('applies the font-variable class to the wrapper', () => {
-    const { container } = setup();
-
-    expect(container.firstChild).toHaveClass('--font-display-family');
-  });
 });

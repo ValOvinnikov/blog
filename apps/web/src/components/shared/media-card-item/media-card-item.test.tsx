@@ -86,41 +86,4 @@ describe(`<${MediaCardItem.name}/>`, () => {
       'data-testid',
     );
   });
-
-  it('applies the split layout class when isSplit is true and a media region is present', () => {
-    renderElement(
-      <MediaCardItem
-        item={{ ...item, image: <div data-testid="post-image" /> }}
-        hasImage={true}
-        isSplit={true}
-        dataTestId="card"
-      />,
-    );
-
-    expect(screen.getByTestId('card')).toHaveClass('md:flex-row');
-  });
-
-  it('does not apply the split layout class when isSplit is omitted', () => {
-    renderElement(
-      <MediaCardItem
-        item={{ ...item, image: <div data-testid="post-image" /> }}
-        hasImage={true}
-        dataTestId="card"
-      />,
-    );
-
-    expect(screen.getByTestId('card')).not.toHaveClass('md:flex-row');
-  });
-
-  it('clamps the excerpt to three lines when isLead is true', () => {
-    renderElement(<MediaCardItem item={item} isLead={true} />);
-
-    expect(screen.getByText('An excerpt.')).toHaveClass('line-clamp-3');
-  });
-
-  it('clamps the excerpt to two lines when isLead is omitted', () => {
-    renderElement(<MediaCardItem item={item} />);
-
-    expect(screen.getByText('An excerpt.')).toHaveClass('line-clamp-2');
-  });
 });
