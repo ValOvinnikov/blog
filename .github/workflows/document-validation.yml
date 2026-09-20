@@ -1,0 +1,60 @@
+name: Document Validation
+
+# Checks every existing document in the console project's live dataset
+# against the current Studio schema. It used to be an advisory job inside
+# ci.yml, but content drifts out of validity independently of any PR's
+# diff, so it was red on 113 of the last 150 failed ci.yml runs and every
+# PR looked broken to `ci-watcher`. A daily schedule surfaces the same
+# drift without attaching it to unrelated PRs. Tenant datasets are covered
+# by validate-tenant-documents.yml, which this workflow never touches.
+on:
+  schedule:
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A Sanity read is cheap to repeat, but there is no reason to run two
+# validations of the same dataset at once — queue, don't overlap.
+concurrency:
+  group: document-validation
+  cancel-in-progress: false
+
+env:
+  PNPM_VERSION: 11.21.0
+  NODE_VERSION: '24'
+  # Same repo-level Variables ci.yml reads — the Studio/CLI config resolves
+  # the project/dataset from SANITY_STUDIO_* at load time.
+  SANITY_STUDIO_PROJECT_ID: ${{ vars.SANITY_STUDIO_PROJECT_ID }}
+  SANITY_STUDIO_DATASET: ${{ vars.SANITY_STUDIO_DATASET }}
+
+jobs:
+  document-validation:
+    name: Document validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SANITY_READ_TOKEN: ${{ secrets.SANITY_API_READ_TOKEN }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup
+        with:
+          pnpm-version: ${{ env.PNPM_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+
+      # Read-only: `sanity documents validate` downloads every document in the
+      # configured dataset and checks it against the Studio schema — it never
+      # writes. Same guard + token as ci.yml's Migrations dry-run step (a read
+      # scope is sufficient for validation, so no separate secret is needed).
+      # `--yes` skips the interactive confirmation prompt, which CI has no TTY
+      # for.
+      - name: Validate documents against schema (read-only; requires SANITY_API_READ_TOKEN)
+        if: ${{ env.SANITY_READ_TOKEN != '' }}
+        working-directory: packages/studio
+        env:
+          SANITY_AUTH_TOKEN: ${{ env.SANITY_READ_TOKEN }}
+        run: pnpm exec sanity documents validate --yes

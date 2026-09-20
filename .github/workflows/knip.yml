@@ -58,7 +58,7 @@ jobs:
     # ADVISORY — not a required check, and the step below always exits 0 so
     # the check itself stays green: `continue-on-error` alone keeps the *run*
     # green but still reports the job as failed, which is the exact noise
-    # `document-validation` in ci.yml is being moved out of (every PR looks
+    # `document-validation` was moved out of ci.yml to escape (every PR looked
     # broken to ci-watcher). The github-actions reporter still annotates each
     # finding in the PR's Files-changed view. `--production` drops test files,
     # stories and other dev entries from the import graph, so what it reports
