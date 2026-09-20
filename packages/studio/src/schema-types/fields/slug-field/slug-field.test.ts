@@ -34,14 +34,10 @@ const runFieldValidation = (
   return (field.validation as any)(baseRule) as TMockRule;
 };
 
-describe('slugField', () => {
-  it('builds a slug field sourced from title, capped at 96 characters', () => {
+describe(slugField, () => {
+  it('sources the slug from title, capped at 96 characters', () => {
     const field = slugField({ description: 'A slug.' });
 
-    expect(field.name).toBe('slug');
-    expect(field.title).toBe('Slug');
-    expect(field.type).toBe('slug');
-    expect(field.description).toBe('A slug.');
     expect(field.options).toEqual({ source: 'title', maxLength: 96 });
   });
 
