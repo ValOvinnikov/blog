@@ -53,7 +53,12 @@ export const FeatureListCard = ({
     : 'icon';
 
   return (
-    <MediaCard excerpt={supportingText} align={align} dataTestId={dataTestId}>
+    <MediaCard
+      excerpt={supportingText}
+      align={align}
+      isInteractive={Boolean(item.link)}
+      dataTestId={dataTestId}
+    >
       <MediaCard.Media
         shape={mediaShape}
         align={align}

@@ -117,4 +117,30 @@ describe(`<${FeatureListCard.name}/>`, () => {
 
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
+
+  it('does not apply the link hover fill when the item has no link', () => {
+    setup();
+
+    expect(screen.getByRole('article')).not.toHaveClass(
+      'hover:bg-brand-primary-muted',
+    );
+  });
+
+  it('applies the link hover fill when the item has a link', () => {
+    setup({
+      item: makeFeatureListItem({
+        link: {
+          label: 'Learn more',
+          href: '/features/fast',
+          target: undefined,
+          platform: undefined,
+          ariaLabel: undefined,
+        },
+      }),
+    });
+
+    expect(screen.getByRole('article')).toHaveClass(
+      'hover:bg-brand-primary-muted',
+    );
+  });
 });
