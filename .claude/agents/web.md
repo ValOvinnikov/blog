@@ -450,6 +450,13 @@ Run these checks **once, after all work is complete**:
 - Any ISR tags consumed from the service layer
 - Any framework-coupled components added to `src/components/`
 
+**Commit your work before you report.** Stage the specific files you changed
+(`git add <path> …` — never `git add -A`) and commit with a conventional
+message scoped to this layer (`feat(web): …`, `fix(web): …`). Open your final
+message with the commit SHA: the orchestrator lands your work by merging that
+commit, and a `SubagentStop` hook blocks a worktree with uncommitted changes
+from ending its turn at all.
+
 ## Reuse before you create
 
 Before adding a function, type, schema definition, field helper or constant,

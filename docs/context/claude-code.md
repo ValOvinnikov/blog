@@ -378,6 +378,27 @@ file` are all denied alike) — an earlier version only handled the
     because it gets removed. `pre-agent-gate0-guard.test.sh` pins the matrix
     with a stubbed `gh` on `PATH`, so it is hermetic — no network, no
     dependence on live board state.
+
+  - `subagent-stop-commit-guard.sh` — `SubagentStop` hook (wired in
+    `settings.json`, so it sees every subagent's stop, not one agent's).
+    Blocks a subagent from ending its turn while its worktree has uncommitted
+    work: when the stop payload's `cwd` (falling back to `$PWD`) is inside
+    `.claude/worktrees/agent-*` and `git status --porcelain` there is
+    non-empty — a modified file or an untracked one alike — it returns
+    `{"decision":"block","reason":…}` telling the agent to stage the files it
+    changed and commit with a conventional message. Backs the "Commit your
+    work" step that closes every layer agent's Definition of done: the
+    orchestrator lands an agent's work by merging its **commit**, so an agent
+    that reports done with the files only on disk looks finished while its
+    branch still sits at the base (#2437–#2439 all ended that way).
+
+    Narrow by construction: the cwd test is the whole scope, so read-only
+    agents (`reviewer`, `explore`, `verify-runner`, …), which don't
+    self-isolate and run in the main checkout, and a session's own
+    `agents-*` worktree never match. **Fails open** when `git`/`jq` is
+    missing or the cwd is no longer a repo. `subagent-stop-commit-guard.test.sh`
+    pins the block/pass matrix against throwaway repos under
+    worktree-shaped paths — hermetic, no live session state.
 - **Repo-specific ESLint rules** (`configs/eslint/`) — `no-prop-spread.js` and
   `boolean-prop-prefix.js` are the repo's only hand-written rules (with a
   `create()` visitor). They sit alongside two `no-restricted-imports` helpers

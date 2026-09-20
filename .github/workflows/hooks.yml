@@ -63,6 +63,14 @@ jobs:
         # reached. Hermetic — stubs `gh` on PATH, no network.
         run: bash .claude/hooks/pre-agent-gate0-guard.test.sh
 
+      - name: subagent-stop-commit-guard.sh block/pass matrix
+        # #3354: pins that a dirty agent worktree (modified or untracked-only)
+        # blocks the stop, a clean one passes, and a cwd outside
+        # `.claude/worktrees/agent-*` — the main checkout, a session worktree
+        # — is never checked. Hermetic — throwaway git repos under a
+        # worktree-shaped path, no live session state.
+        run: bash .claude/hooks/subagent-stop-commit-guard.test.sh
+
       - name: vercel-ignore-affected.sh base-resolution matrix
         # #1712: pins which commit the Vercel ignoreCommand diffs against in
         # each situation. A wrong base here silently stops a project
