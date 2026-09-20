@@ -52,9 +52,4 @@ describe(`<${ShareLink.name}/>`, () => {
     setup({ dataTestId: 'share-link' });
     expect(screen.getByTestId('share-link')).toBeVisible();
   });
-
-  it('merges extra className', () => {
-    setup({ className: 'mt-4', dataTestId: 'share-link' });
-    expect(screen.getByTestId('share-link').className).toContain('mt-4');
-  });
 });

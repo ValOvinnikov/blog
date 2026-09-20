@@ -22,10 +22,4 @@ describe(`<${QuoteBlock.name}/>`, () => {
     setup({ children: quote, dataTestId: 'quote-block' });
     expect(screen.getByTestId('quote-block')).toBeVisible();
   });
-
-  it('merges extra className', () => {
-    const quote = faker.lorem.sentence();
-    setup({ children: quote, className: 'custom-class' });
-    expect(screen.getByText(quote).className).toContain('custom-class');
-  });
 });

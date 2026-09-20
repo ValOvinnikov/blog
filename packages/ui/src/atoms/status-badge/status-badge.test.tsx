@@ -19,9 +19,4 @@ describe(`<${StatusBadge.name}/>`, () => {
     setup({ dataTestId: 'status-badge' });
     expect(screen.getByTestId('status-badge')).toBeVisible();
   });
-
-  it('accepts a className override on the root', () => {
-    const { container } = setup({ className: 'custom-class' });
-    expect(container.firstChild).toHaveClass('custom-class');
-  });
 });

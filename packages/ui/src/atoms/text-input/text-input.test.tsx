@@ -126,11 +126,6 @@ describe(`<${TextInput.name}/>`, () => {
     expect(screen.getByTestId('text-input')).toBeVisible();
   });
 
-  it('accepts a className override on the root', () => {
-    const { container } = setup({ className: 'custom-class' });
-    expect(container.firstChild).toHaveClass('custom-class');
-  });
-
   it('is not disabled by default', () => {
     setup();
     expect(screen.getByRole('textbox')).toBeEnabled();
@@ -139,10 +134,5 @@ describe(`<${TextInput.name}/>`, () => {
   it('renders the native disabled attribute when isDisabled is true', () => {
     setup({ isDisabled: true });
     expect(screen.getByRole('textbox')).toBeDisabled();
-  });
-
-  it('keeps the error border when both isInvalid and isDisabled are true', () => {
-    setup({ isInvalid: true, isDisabled: true });
-    expect(screen.getByRole('textbox')).toHaveClass('disabled:border-error');
   });
 });

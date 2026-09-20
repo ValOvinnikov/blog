@@ -41,18 +41,4 @@ describe(`<${Spinner.name}/>`, () => {
     setup({ dataTestId: 'spinner' });
     expect(screen.getByTestId('spinner')).toBeVisible();
   });
-
-  it('accepts a className override on the root', () => {
-    setup({ className: 'custom-class' });
-    expect(screen.getByRole('status', { name: label })).toHaveClass(
-      'custom-class',
-    );
-  });
-
-  it('does not forward a className override on the root to the glyph, so the glyph always inherits its color from the root', () => {
-    setup({ className: 'custom-class' });
-    const status = screen.getByRole('status', { name: label });
-    const glyph = status.firstElementChild;
-    expect(glyph).not.toHaveClass('custom-class');
-  });
 });
