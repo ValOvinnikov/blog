@@ -121,7 +121,7 @@
   },
   "src/organisms/carousel/carousel.test.tsx": {
     "blog-test/no-class-assertions": {
-      "count": 14
+      "count": 13
     }
   },
   "src/organisms/cta-module/cta-module.test.tsx": {
