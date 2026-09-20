@@ -12,7 +12,7 @@ export default function storybookConfig(packageJsonPath) {
       // option with `path.resolve()` against `process.cwd()`, not the linted
       // file's directory — so it silently breaks whenever ESLint runs from a
       // different cwd than this package (e.g. lint-staged's pre-commit hook,
-      // which invokes `eslint --fix` from the repo root). Passing an absolute
+      // which invokes `eslint` from the repo root). Passing an absolute
       // path here makes it cwd-independent.
       files: ['.storybook/main.@(js|cjs|mjs|ts)'],
       rules: {

@@ -310,6 +310,13 @@ file` are all denied alike) — an earlier version only handled the
     scripts fall back to `git rev-parse --show-toplevel` (from the file's
     directory) when `CLAUDE_PROJECT_DIR` is unset.
 
+    lint-staged's own ESLint pass (`.husky/pre-commit`, root `package.json`)
+    is report-only too — bare `eslint`, never `eslint --fix` — so a lint
+    error blocks the commit and Prettier is the only thing that rewrites a
+    staged file. It runs after `reviewer` has approved the diff, and a fix
+    pass there would commit content nobody reviewed: the reviewed diff is
+    the committed diff (#3363).
+
     No ESLint preset in `configs/eslint` is type-aware (no `projectService`,
     no `*TypeChecked` config), so a single-file lint is ~2s and there is no
     "fast mode" — the full workspace ruleset runs on every edit, the same
