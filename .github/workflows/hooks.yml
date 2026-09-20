@@ -69,6 +69,7 @@ jobs:
         # file's workspace, and that the CLAUDE_PROJECT_DIR fallback works.
         # Hermetic — fake prettier/eslint in a temp git repo, no node_modules.
         run: bash .claude/hooks/post-edit.test.sh
+
       - name: subagent-stop-commit-guard.sh block/pass matrix
         # #3354: pins that a dirty agent worktree (modified or untracked-only)
         # blocks the stop, a clean one passes, and a cwd outside
