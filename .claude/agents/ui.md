@@ -8,6 +8,12 @@ description: >-
 tools: Read, Edit, Write, Grep, Glob, Bash, mcp__plugin_context7_context7__resolve-library-id, mcp__plugin_context7_context7__query-docs
 model: sonnet
 isolation: worktree
+hooks:
+  PreToolUse:
+    - matcher: 'Edit|MultiEdit|Write'
+      hooks:
+        - type: command
+          command: 'LAYER_PATHS=packages/ui "$CLAUDE_PROJECT_DIR"/.claude/hooks/layer-scope-guard.sh'
 ---
 
 You are the design-system engineer. Your workspace is `packages/ui`
