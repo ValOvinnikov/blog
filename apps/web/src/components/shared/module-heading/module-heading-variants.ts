@@ -3,13 +3,21 @@ import { tv } from 'tailwind-variants';
 
 export const moduleHeadingVariants = tv({
   slots: {
-    label: [
-      'font-mono text-label font-normal uppercase tracking-label text-subtle',
-      'm-0 mb-3',
-    ],
-    supportingText: ['font-body text-prose text-muted', 'm-0 mb-5'],
+    label: ['m-0 mb-3'],
+    supportingText: ['font-body text-prose text-muted max-w-prose', 'm-0 mb-5'],
   },
   variants: {
+    variant: {
+      label: {
+        label: [
+          'font-mono text-label font-normal uppercase tracking-label text-subtle',
+        ],
+      },
+      section: {
+        label: ['m-0'],
+        supportingText: ['mt-3'],
+      },
+    },
     align: {
       [CONTENT_ALIGNMENT.LEFT]: {
         label: ['text-left'],
@@ -17,13 +25,13 @@ export const moduleHeadingVariants = tv({
       },
       [CONTENT_ALIGNMENT.CENTER]: {
         label: ['text-center'],
-        supportingText: ['text-center'],
+        supportingText: ['text-center', 'mx-auto'],
       },
       [CONTENT_ALIGNMENT.RIGHT]: {
         label: ['text-right'],
-        supportingText: ['text-right'],
+        supportingText: ['text-right', 'ml-auto'],
       },
     },
   },
-  defaultVariants: { align: CONTENT_ALIGNMENT.LEFT },
+  defaultVariants: { variant: 'label', align: CONTENT_ALIGNMENT.LEFT },
 });
