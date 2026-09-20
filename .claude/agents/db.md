@@ -280,6 +280,11 @@ delete-don't-shorten rule. It is not restated here; follow it as written.
 
 ## Testing
 
+- **A bugfix's regression test is TDD, written by you, first:** per
+  `superpowers:test-driven-development`, write the failing test before the
+  fix and make it pass; new-feature coverage instead comes from
+  `test-writer`'s pass after your implementation lands.
+
 - Co-locate `*.test.ts` (Vitest, `node` environment). Test query/mutation
   logic against a real or lightly-mocked Postgres — prefer exercising actual
   SQL over mocking the driver where practical, since a mocked query builder

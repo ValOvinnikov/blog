@@ -268,6 +268,11 @@ delete-don't-shorten rule. It is not restated here; follow it as written.
 
 ## Testing
 
+- **A bugfix's regression test is TDD, written by you, first:** per
+  `superpowers:test-driven-development`, write the failing test before the
+  fix and make it pass; new-feature coverage instead comes from
+  `test-writer`'s pass after your implementation lands.
+
 - Co-locate `*.test.ts` (Vitest, `node` environment). Test query-result mapping
   (transformer/loader) and `urlForImage` output. Mock the client; don't hit the
   network. See the `testing-practices` skill

@@ -413,6 +413,11 @@ delete-don't-shorten rule. It is not restated here; follow it as written.
 
 ## Testing
 
+- **A bugfix's regression test is TDD, written by you, first:** per
+  `superpowers:test-driven-development`, write the failing test before the
+  fix and make it pass; new-feature coverage instead comes from
+  `test-writer`'s pass after your implementation lands.
+
 - Component/route tests with Vitest + Testing Library (jsdom). Mock `service`
   functions; assert that fetched data renders. See the `testing-practices`
   skill (`.claude/skills/testing-practices/SKILL.md`).

@@ -491,6 +491,11 @@ delete-don't-shorten rule. It is not restated here; follow it as written.
 
 ## Testing
 
+- **A bugfix's regression test is TDD, written by you, first:** per
+  `superpowers:test-driven-development`, write the failing test before the
+  fix and make it pass; new-feature coverage instead comes from
+  `test-writer`'s pass after your implementation lands.
+
 - Vitest + Testing Library (jsdom), co-located `*.test.tsx`. See the
   `testing-practices` skill (`.claude/skills/testing-practices/SKILL.md`).
 - **Assert a class only when it is prop-driven.** A class that changes with a

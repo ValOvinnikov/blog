@@ -116,6 +116,12 @@ Hand each layer's work to its agent (use the Agent tool, or state which agent
 owns it). Do them in dependency order; later steps depend on earlier output.
 **Skip any agent whose layer has no changes** — don't invoke it at all.
 
+**A bugfix is TDD, done by the layer agent itself:** it writes the failing
+regression test before the fix and makes it pass, per
+`superpowers:test-driven-development`; new feature code carries no
+self-written tests at this step — that coverage is `test-writer`'s pass in
+step 4.
+
 **Land each agent's commit onto your current local branch before dispatching
 the next one.** Every layer agent carries `isolation: worktree`, and
 `worktree.baseRef: "head"` in `.claude/settings.json` means the _next_
@@ -174,6 +180,10 @@ If you do a layer yourself instead of delegating, still apply that layer's
 agent rules and skill.
 
 ## 4. Test
+
+**This step covers new-feature coverage only** — a bugfix's regression test
+was already written first, TDD-style, by the owning layer agent in step 3;
+`test-writer` never touches an already-passing bugfix test.
 
 - **Land every layer agent's commit onto your current local branch before
   dispatching `test-writer`** (#1796) — `worktree.baseRef: "head"` in

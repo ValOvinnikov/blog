@@ -100,6 +100,10 @@ asking nicely.
   `packages/insight`/`packages/utils`.
 - Co-locate `*.test.ts`. A test must fail without the implementation; never one
   that passes against a stub.
+- **A bugfix's regression test is TDD, written by you, first:** per
+  `superpowers:test-driven-development`, write the failing test before the
+  fix and make it pass; new-feature coverage instead comes from
+  `test-writer`'s pass after your implementation lands.
 - Key/value-pair consts are UPPERCASE key === UPPERCASE value, `as const`, and
   live in `@blog/config` — email copy is not this layer's persisted vocabulary,
   so it does not earn the storage-layer exception. Note you do **not** depend on
