@@ -8,15 +8,6 @@ export type TRawPaginationParamsPage = {
 
 export type TPaginationParam = { slug: string; page: string };
 
-/**
- * Raw per-page slug + post count + first list module's page size → the
- * `{ slug, page }` array for pages 2…N (page 1 is the route's own slug page).
- *
- * A page with no list module in `modules[]` contributes no entries here
- * rather than failing the whole call — the caller's query spans every page
- * of its kind in one round-trip, so one unfinished page must not block the
- * rest.
- */
 export function toPaginationParams(
   pages: TRawPaginationParamsPage[],
 ): TPaginationParam[] {
