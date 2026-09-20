@@ -3,9 +3,9 @@ import {
   runQuery,
   type TTenantSanityContext,
 } from '@blog/service/sanity/query';
+import { toPaginationParams } from '@blog/service/shared/transformers/to-pagination-params';
 
 import { tagPaginationParamsQuery } from './query';
-import { toTagPaginationParams } from './transformer';
 
 export async function getTagPaginationParams(
   tenant: TTenantSanityContext,
@@ -14,5 +14,5 @@ export async function getTagPaginationParams(
     tenant,
     ...isr(['page_tag', 'modules:postList', 'posts', 'tag'], tenant.projectId),
   });
-  return toTagPaginationParams(tagPages);
+  return toPaginationParams(tagPages);
 }
