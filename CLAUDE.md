@@ -1374,7 +1374,15 @@ pnpm test && pnpm knip`), assuming the reader has only the ticket. Add
 
 - **free of human gates** — no Sanity or Drizzle migration, no console
   config, no production-dataset touch;
-- **small** — roughly ≤5 files touched.
+- **small** — roughly ≤5 files touched;
+- **outside `.claude/**`** — the GitHub Actions `@claude` runner refuses
+  every `Edit`/`Write` under `.claude/` as a sensitive path, independently
+  of `.claude/settings.json`'s allow-list. On 2026-09-19 four agent-tooling
+  tickets (#3355, #3358, #3359, #3361) each ran to completion, hit that
+  refusal, and left their `.claude/**` half for a local session — the
+  `cloud-ok` label had cost a run each and delivered nothing. Root
+  `CLAUDE.md` and `docs/**` are writable; a ticket whose scope names an
+  agent, skill or hook file is a local ticket.
 
 **Solo-session mode.** When running as a single cloud session — a Claude
 Code web/remote session, the same environment `board-keeper.md`'s
