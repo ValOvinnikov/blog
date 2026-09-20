@@ -239,6 +239,16 @@ notification and dispatches `reviewer` then, without sitting blocked and
 unable to respond to the user meanwhile. Give it the exact ordered command
 sequence for the scenario at hand; it does not decide or guess scope.
 
+**The dispatch's first command is `cd <absolute path of the checkout to
+verify>`, and every later command is prefixed with the same `cd … &&`.**
+`verify-runner` is not worktree-isolated, so without it the run lands in
+whatever directory its shell starts in — on 2026-08-20 that was the stale
+main checkout, reporting 3 files / 25 tests for a diff whose worktree held
+4 / 29. Its report opens with `pwd` and `git rev-parse HEAD`; **compare that
+SHA with your own `git rev-parse HEAD` before dispatching `reviewer`**, and
+reject the report — re-dispatch with the path corrected — if they differ. A
+report that names no commit is rejected the same way.
+
 **`pnpm typegen` never goes to `verify-runner`.** It mutates
 `packages/config/src/sanity/generated/` in place — that is a write, not a
 read-only verify step, and `verify-runner`'s `read-only-agent-guard.sh` hook
