@@ -90,8 +90,8 @@ Props: separator?: string _(extends IWithClassName, IWithDataTestId)_
 ### NavLink — `atoms/nav-link/nav-link.tsx`
 
 A chrome-level navigation link (header/footer nav items).
-Props: className?: string · isActive?: TNavLinkVariants['isActive'] · hasLabel?: boolean _(extends IWithIcon, IWithDataTestId)_
-Variants: isActive: (boolean)
+Props: className?: string · isActive?: TNavLinkVariants['isActive'] · variant?: TNavLinkVariants['variant'] · hasLabel?: boolean _(extends IWithIcon, IWithDataTestId)_
+Variants: isActive: (boolean) · variant: plain|outlined
 
 ### Prose — `atoms/prose/prose.tsx`
 

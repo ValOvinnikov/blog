@@ -13,6 +13,10 @@ const meta: Meta<typeof NavLink> = {
     isActive: {
       control: 'boolean',
     },
+    variant: {
+      control: 'select',
+      options: ['plain', 'outlined'],
+    },
   },
 };
 export default meta;
@@ -38,6 +42,15 @@ export const WithIcon: TStory = {
 
 export const IconOnly: TStory = {
   args: {
+    children: 'RSS feed',
+    icon: <Icon name={ICONS.RSS} size={SIZE.SM} />,
+    hasLabel: false,
+  },
+};
+
+export const Outlined: TStory = {
+  args: {
+    variant: 'outlined',
     children: 'RSS feed',
     icon: <Icon name={ICONS.RSS} size={SIZE.SM} />,
     hasLabel: false,
