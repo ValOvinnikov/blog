@@ -92,7 +92,12 @@ contracts:
     on request when reproducing an actual CI build failure
     (`open-pull-request` Gate 5a). Dispatched in the background, like every
     other subagent, right before step 6's review — the orchestrator resumes
-    on its completion notification rather than waiting synchronously. Runs
+    on its completion notification rather than waiting synchronously. It is
+    not worktree-isolated, so the dispatch's first command is
+    `cd <absolute path>` and every later one is prefixed with it (#3355);
+    a missing `cd` stops the run, and every report opens with `pwd` and
+    `git rev-parse HEAD` so the orchestrator can reject one whose SHA is not
+    its own before dispatching `reviewer`. Runs
     each command in order,
     stops at the first failure, and reports which command failed plus
     trimmed output — no root-cause diagnosis or fix suggestion. Never given
@@ -102,7 +107,12 @@ contracts:
     orchestrator's own turn, which put `turbo run type-check`/`lint`/`test`
     output across up to 11 packages permanently into its context for a
     purely mechanical pass/fail job.
-  - `reviewer` — read-only pre-commit review of the full diff; gates the
+  - `reviewer` — read-only pre-commit review of the full diff against
+    `origin/main` (never bare `main` — the guard denies it `git fetch`, so
+    the orchestrator refreshes the ref and states the expected file count
+    before dispatch; the report opens with the count reviewed and a
+    mismatch is a blocking finding, #3358 — the same holds for
+    `a11y-reviewer` and `seo-auditor`); gates the
     commit ask on an `APPROVE` verdict. Trusts `verify-runner`'s already-passed
     `type-check`/`lint`/`test` result rather than re-running it. Not
     dispatched for a docs-only diff — those get the orchestrator's inline

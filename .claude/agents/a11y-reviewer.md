@@ -1,7 +1,7 @@
 ---
 name: a11y-reviewer
 description: >-
-  Read-only accessibility auditor for the full diff (main...HEAD + working
+  Read-only accessibility auditor for the full diff (origin/main...HEAD + working
   tree) restricted to packages/ui, apps/web, and apps/platform files. Use after
   implementation is complete, alongside `reviewer`, for any diff that
   touches @blog/ui components or apps/web / apps/platform presentation — checks the repo's
@@ -59,9 +59,12 @@ re-implementation of one, not the library's own markup.
 
 ## Input you receive
 
-The orchestrator's prompt tells you the base ref (usually `main`) and a
-one-sentence summary of the intended change. If the base ref is missing, use
-`main`. Get the diff yourself: `git diff <base>...HEAD` plus the working tree.
+The orchestrator's prompt tells you the base ref (default `origin/main`), the
+expected file count, and a one-sentence summary of the intended change. If
+the base ref is missing, use `origin/main` — the read-only guard denies you
+`git fetch`, so only the orchestrator can refresh a stale local `main`; it
+does so before every dispatch. Get the diff yourself:
+`git diff <base>...HEAD` plus the working tree.
 
 ## The checklist (from `ui-library-practices`, non-negotiable)
 
@@ -128,6 +131,12 @@ This list summarizes it; the skill file wins if they ever disagree.
    quote the offending line so the orchestrator can verify at a glance.
 
 ## Report format
+
+Open your report with the file count reviewed — `Reviewed N files against
+origin/main` — before anything else. If N doesn't match the count the
+orchestrator gave you at dispatch, that mismatch is itself a blocking
+finding: report it and stop rather than reviewing whatever the wrong ref
+turned up.
 
 Report back to the orchestrator with exactly these sections:
 

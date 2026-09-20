@@ -116,6 +116,12 @@ Hand each layer's work to its agent (use the Agent tool, or state which agent
 owns it). Do them in dependency order; later steps depend on earlier output.
 **Skip any agent whose layer has no changes** — don't invoke it at all.
 
+**A bugfix is TDD, done by the layer agent itself:** it writes the failing
+regression test before the fix and makes it pass, per
+`superpowers:test-driven-development`; new feature code carries no
+self-written tests at this step — that coverage is `test-writer`'s pass in
+step 4.
+
 **Land each agent's commit onto your current local branch before dispatching
 the next one.** Every layer agent carries `isolation: worktree`, and
 `worktree.baseRef: "head"` in `.claude/settings.json` means the _next_
@@ -175,6 +181,10 @@ agent rules and skill.
 
 ## 4. Test
 
+**This step covers new-feature coverage only** — a bugfix's regression test
+was already written first, TDD-style, by the owning layer agent in step 3;
+`test-writer` never touches an already-passing bugfix test.
+
 - **Land every layer agent's commit onto your current local branch before
   dispatching `test-writer`** (#1796) — `worktree.baseRef: "head"` in
   `.claude/settings.json` means `test-writer`'s own worktree branches from
@@ -229,6 +239,16 @@ notification and dispatches `reviewer` then, without sitting blocked and
 unable to respond to the user meanwhile. Give it the exact ordered command
 sequence for the scenario at hand; it does not decide or guess scope.
 
+**The dispatch's first command is `cd <absolute path of the checkout to
+verify>`, and every later command is prefixed with the same `cd … &&`.**
+`verify-runner` is not worktree-isolated, so without it the run lands in
+whatever directory its shell starts in — on 2026-08-20 that was the stale
+main checkout, reporting 3 files / 25 tests for a diff whose worktree held
+4 / 29. Its report opens with `pwd` and `git rev-parse HEAD`; **compare that
+SHA with your own `git rev-parse HEAD` before dispatching `reviewer`**, and
+reject the report — re-dispatch with the path corrected — if they differ. A
+report that names no commit is rejected the same way.
+
 **`pnpm typegen` never goes to `verify-runner`.** It mutates
 `packages/config/src/sanity/generated/` in place — that is a write, not a
 read-only verify step, and `verify-runner`'s `read-only-agent-guard.sh` hook
@@ -268,6 +288,24 @@ Each step feeds the next:
    - `pnpm test` — runs all test suites. Per-package checks already ran during
      implementation; this is the integration pass.
 
+**Hook/script changes need a local shellcheck + guard-test pass too.** When
+the diff touches `.claude/hooks/**` or `scripts/*.sh`, run this before
+commit — it mirrors `hooks.yml`'s required `Shellcheck + guard tests` job:
+
+```
+shellcheck .claude/hooks/*.sh scripts/*.sh
+bash .claude/hooks/read-only-agent-guard.test.sh
+sh .claude/hooks/gate-bypass-guard.test.sh
+sh .claude/hooks/pre-bash-worktree-install-guard.test.sh
+bash .claude/hooks/test-writer-scope-guard.test.sh
+bash .claude/hooks/pre-agent-gate0-guard.test.sh
+sh scripts/vercel-ignore-affected.test.sh
+```
+
+Such a diff is not docs-only (the exemption in `CLAUDE.md`'s gate step 4
+covers `.claude/**/*.md`, not scripts), so it still gets the `reviewer`
+dispatch in step 6 in addition to this local pass.
+
 **No local `build` step.** CI's `ci.yml` runs a dedicated `build` job (Next.js
 build + Sanity Studio build) gating every PR — a local re-run duplicates it.
 Measured cost of adding it to the local loop: +~65% tokens and +~4.6× wall
@@ -285,8 +323,18 @@ red check.
 
 ## 6. Review (blocking — Gate 2 must not be offered until this passes)
 
+Before dispatching **any** reviewer (`reviewer`, `a11y-reviewer`,
+`seo-auditor`), run `git fetch origin` to refresh the ref — a worktree
+session's local `main` can go stale relative to what actually merged (#2739:
+a stale ref showed the reviewer 87 files instead of 18). The read-only guard
+denies these subagents `git fetch`, so only the orchestrator can refresh it.
+Every dispatch prompt names the base ref as `origin/main` (never bare
+`main`) and states the expected file count
+(`git diff origin/main...HEAD --name-only | wc -l`, plus any dirty
+working-tree files) so the subagent can flag a mismatch itself.
+
 - Dispatch the **`reviewer` subagent** (`.claude/agents/reviewer.md`) over the
-  full diff (`main...HEAD` + working tree). It applies `code-review-practices`
+  full diff (`origin/main...HEAD` + working tree). It applies `code-review-practices`
   — mechanical scan, contract pass, general pass — with fresh eyes and reports
   a verdict.
 - **If the diff touches `packages/ui`, `apps/web`, or `apps/platform` components**, also dispatch
