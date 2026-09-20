@@ -1,0 +1,97 @@
+{
+  "src/components/shared/action-group/action-group.test.tsx": {
+    "blog-test/no-class-assertions": {
+      "count": 5
+    }
+  },
+  "src/components/shared/auth-menu/auth-menu.test.tsx": {
+    "blog-test/no-class-assertions": {
+      "count": 12
+    }
+  },
+  "src/components/shared/auth-menu/components/account-menu/account-menu.test.tsx": {
+    "blog-test/no-class-assertions": {
+      "count": 6
+    }
+  },
+  "src/components/shared/card-carousel/card-carousel.test.tsx": {
+    "blog-test/no-class-assertions": {
+      "count": 1
+    }
+  },
+  "src/components/shared/media-card-item/media-card-item.test.tsx": {
+    "blog-test/no-class-assertions": {
+      "count": 4
+    }
+  },
+  "src/components/shared/module-heading/module-heading.test.tsx": {
+    "blog-test/no-class-assertions": {
+      "count": 6
+    }
+  },
+  "src/components/shared/page-heading/page-heading.test.tsx": {
+    "blog-test/no-class-assertions": {
+      "count": 16
+    }
+  },
+  "src/components/shared/portable-text-renderer/code-block.test.tsx": {
+    "blog-test/no-class-assertions": {
+      "count": 2
+    }
+  },
+  "src/components/shared/sanity-image/sanity-image.test.tsx": {
+    "blog-test/no-class-assertions": {
+      "count": 1
+    }
+  },
+  "src/components/shared/theme-scope/theme-scope.test.tsx": {
+    "blog-test/no-class-assertions": {
+      "count": 1
+    }
+  },
+  "src/components/shared/topic-chip-list/topic-chip-list.test.tsx": {
+    "blog-test/no-class-assertions": {
+      "count": 2
+    }
+  },
+  "src/modules/feature-list/feature-list-card.test.tsx": {
+    "blog-test/no-class-assertions": {
+      "count": 2
+    }
+  },
+  "src/modules/feature-list/feature-list-module-view.test.tsx": {
+    "blog-test/no-class-assertions": {
+      "count": 1
+    }
+  },
+  "src/modules/hero-blog/hero-blog-module-view.test.tsx": {
+    "blog-test/no-class-assertions": {
+      "count": 1
+    }
+  },
+  "src/modules/hero-profile/hero-profile-module-view.test.tsx": {
+    "blog-test/no-class-assertions": {
+      "count": 1
+    }
+  },
+  "src/modules/hero-shared/hero-module-shell.test.tsx": {
+    "blog-test/no-class-assertions": {
+      "count": 2
+    }
+  },
+  "src/modules/post-featured/post-featured-module-view.test.tsx": {
+    "blog-test/no-class-assertions": {
+      "count": 6
+    }
+  },
+  "src/utils/render-post-card-image/render-post-card-image.test.tsx": {
+    "blog-test/no-class-assertions": {
+      "count": 1
+    }
+  },
+  "src/utils/render-post-lead-image/render-post-lead-image.test.tsx": {
+    "blog-test/no-class-assertions": {
+      "count": 1
+    }
+  }
+}
