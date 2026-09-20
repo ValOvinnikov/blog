@@ -163,7 +163,8 @@ and its actual merge commit message, not just the former.
   Committing is local and reversible; the human gates are push and PR.
 - **Never push (Gate 3) before the `reviewer` subagent has returned
   `APPROVE` on the final diff.** New changes after an APPROVE invalidate it —
-  re-review before pushing again. A **docs-only** diff (nothing outside
+  re-review before pushing again — and a merge from `origin/main` is a new
+  change: it re-runs verify and review the same as an edit would. A **docs-only** diff (nothing outside
   `docs/**`, `SPEC.md`, `README.md`, `CLAUDE.md`, `.claude/**/*.md`) is the
   one exception: it takes the inline identifier check `CLAUDE.md`'s delivery
   gate step 4 describes instead of a `reviewer` dispatch. A `.sh`/`.js` file
@@ -234,8 +235,11 @@ Work through these gates in order. **Committing is free; stop at the push and PR
 ### Gate 1 — Do the work
 
 - Follow `develop-feature` for implementation and per-layer delegation.
-- Run the verify step from `develop-feature` § 5 — single-package, CMS-only,
-  or multi-layer sequence depending on what changed. Do not use the simplified
+- Merge `origin/main` in first (`git fetch origin && git merge origin/main`,
+  or rebase), then run the verify step from `develop-feature` § 5 —
+  single-package, CMS-only, or multi-layer sequence depending on what
+  changed. A merge from `main` done later, after verify or review, sends
+  the branch back to this bullet: both are re-run. Do not use the simplified
   `pnpm type-check && pnpm lint && pnpm test` shortcut — it misses typegen and
   the web build where required.
 - Dispatch the **`reviewer` subagent** (`.claude/agents/reviewer.md`) over the
