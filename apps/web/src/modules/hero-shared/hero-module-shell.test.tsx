@@ -119,4 +119,11 @@ describe(`<${HeroModuleShell.name}/>`, () => {
     expect(img.getAttribute('src')).toContain('h=675');
     expect(img).toHaveAttribute('fetchpriority', 'high');
   });
+
+  it('gives the hero image an empty alt on Banner, since it renders as a decorative backdrop there', () => {
+    const { container } = setup({ variant: HERO_VARIANT.BANNER, sanityImage });
+
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    expect(container.querySelector('img')).toHaveAttribute('alt', '');
+  });
 });
