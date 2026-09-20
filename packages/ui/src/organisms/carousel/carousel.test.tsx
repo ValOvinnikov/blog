@@ -179,17 +179,6 @@ describe(`<${Carousel.name}/>`, () => {
     expect(screen.getAllByRole('listitem')).toHaveLength(2);
   });
 
-  it('applies slideClassName to every slide', () => {
-    renderCarousel({
-      items: ['Slide one', 'Slide two'],
-      slideClassName: 'basis-full',
-    });
-
-    for (const slide of screen.getAllByRole('listitem')) {
-      expect(slide).toHaveClass('basis-full');
-    }
-  });
-
   it('forwards data-testid to the root element', () => {
     renderCarousel({ dataTestId: 'posts-carousel' });
 
@@ -296,6 +285,32 @@ describe(`<${Carousel.name}/>`, () => {
 
     expect(getNavButtons().previous).toBeEnabled();
     expect(getNavButtons().next).toBeDisabled();
+  });
+
+  it('renders neither nav button when nothing can scroll in either direction', () => {
+    emblaApi.canScrollPrev.mockReturnValue(false);
+    emblaApi.canScrollNext.mockReturnValue(false);
+    renderCarousel();
+
+    expect(
+      screen.queryByRole('button', { name: previousLabel }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: nextLabel }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('brings the nav buttons back once a direction becomes scrollable again', () => {
+    emblaApi.canScrollPrev.mockReturnValue(false);
+    emblaApi.canScrollNext.mockReturnValue(false);
+    renderCarousel();
+
+    emblaApi.canScrollNext.mockReturnValue(true);
+    emitEvent('select');
+
+    const { previous, next } = getNavButtons();
+    expect(previous).toBeDisabled();
+    expect(next).toBeEnabled();
   });
 
   it('re-reads the disabled flags on reInit', () => {
