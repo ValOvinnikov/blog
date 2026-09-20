@@ -226,6 +226,16 @@ was already written first, TDD-style, by the owning layer agent in step 3;
 
 ## 5. Verify
 
+**Every scenario below opens with `git fetch origin && git merge origin/main`**
+(or a rebase onto it), before anything is verified. Verifying a branch that
+is behind `main` proves nothing about what CI will run: #3144 verified green,
+merged `main` in afterwards, and CI's Test job failed a minute later on a
+schema type that had landed on `main` in between. The same rule runs the
+other way — a merge from `origin/main` **after** `verify-runner` or
+`reviewer` has already run invalidates both, exactly like any other new
+change: re-run the verify sequence and re-dispatch `reviewer` before the
+push ask.
+
 Dispatch the **`verify-runner` subagent** (`.claude/agents/verify-runner.md`)
 to run the integration verify pass instead of running it inline yourself —
 `turbo run type-check`/`lint`/`test` output across up to 11 packages
