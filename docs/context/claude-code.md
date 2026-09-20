@@ -117,7 +117,13 @@ contracts:
     corrected. The greps were added after every module on `main` was found
     carrying an identical `XModule — fetches module_x and hands it to
 XModuleView` block that the rule already forbade and no review had
-    flagged.
+    flagged. A merge from `origin/main` after either `verify-runner` or
+    `reviewer` has already run invalidates both, same as any other new
+    change — re-run verify and re-dispatch `reviewer`
+    (`develop-feature` §5, `open-pull-request`'s ABSOLUTE RULES). This is
+    what #3144 shipped without: it verified green, merged `main` in
+    afterward, and CI's Test job failed a minute later on a schema type that
+    had landed on `main` in between.
   - `a11y-reviewer` — read-only accessibility audit of
     `packages/ui`/`apps/web`/`apps/platform` diffs against
     `ui-library-practices`' non-negotiable rules; dispatched alongside
