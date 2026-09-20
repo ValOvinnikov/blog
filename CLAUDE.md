@@ -774,7 +774,10 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   its own workspace and feeds errors — including layer-boundary violations —
   straight back to the agent in the same turn, in a few seconds. Prettier
   is silent and always exits 0 (formatting, not review); lint stays
-  report-only (never `--fix`); commit-time gates stay authoritative.
+  report-only (never `--fix`); commit-time gates stay authoritative — and
+  lint-staged's ESLint pass is report-only as well, so a commit never
+  changes content beyond Prettier formatting and the reviewed diff is the
+  committed diff.
 - **Conventional commits, one concern per PR — mechanically enforced.**
   `.husky/commit-msg` runs commitlint (`commitlint.config.mjs`) on every
   local commit — the only place this is enforced, so a commit that bypasses

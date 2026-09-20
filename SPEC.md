@@ -1307,7 +1307,8 @@ Full checklist:
   advisory jobs (Test Presence, Claude Code Review, Lighthouse CI, Playwright
   smoke). Full workflow-by-workflow breakdown:
   [`docs/context/ci-automation.md`](./docs/context/ci-automation.md).
-- Hooks: husky + lint-staged (eslint --fix + prettier on staged files).
+- Hooks: husky + lint-staged (report-only eslint + prettier on staged files;
+  a lint error blocks the commit, nothing is rewritten beyond formatting).
 - Conventional commits; one concern per PR.
 
 ## 12. Delivery process
