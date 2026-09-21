@@ -1010,6 +1010,8 @@ export type Module_heroProfile = {
     } & CtaButton
   >;
   showSocialLinks?: boolean;
+  showRole?: boolean;
+  showBio?: boolean;
   variant?: 'SPLIT' | 'STACKED' | 'BANNER';
   contentPositionSplit?: 'LEFT' | 'RIGHT';
   contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
