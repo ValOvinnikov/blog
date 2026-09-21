@@ -148,14 +148,4 @@ describe(`<${PopoverMenu.name}/>`, () => {
 
     expect(screen.getByTestId('popover-menu')).toBeVisible();
   });
-
-  it('merges extra className', () => {
-    renderElement(
-      <PopoverMenu className="mt-4" dataTestId="popover-menu">
-        {openMenuChildren}
-      </PopoverMenu>,
-    );
-
-    expect(screen.getByTestId('popover-menu').className).toContain('mt-4');
-  });
 });

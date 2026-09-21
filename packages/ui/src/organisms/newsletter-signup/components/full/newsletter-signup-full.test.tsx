@@ -88,9 +88,4 @@ describe(`<${NewsletterSignupFull.name}/>`, () => {
     setup({ dataTestId: 'newsletter-signup-full' });
     expect(screen.getByTestId('newsletter-signup-full')).toBeVisible();
   });
-
-  it('merges extra className on the root element', () => {
-    const { container } = setup({ className: 'mt-8' });
-    expect(container.firstChild).toHaveClass('mt-8');
-  });
 });

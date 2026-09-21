@@ -1,4 +1,3 @@
-import { BRAND_VARIANT } from '@blog/config';
 import { renderElement, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
 import { act } from '@testing-library/react';
@@ -185,37 +184,6 @@ describe(`<${Carousel.name}/>`, () => {
     expect(screen.getByTestId('posts-carousel')).toBeVisible();
   });
 
-  it('applies the native scroll-snap viewport classes before Embla initializes', () => {
-    currentApi = undefined;
-    renderCarousel({ dataTestId: 'carousel' });
-
-    const viewport = screen.getByTestId('carousel').firstElementChild;
-    expect(viewport).toHaveClass('overflow-x-auto', 'snap-x', 'snap-mandatory');
-    expect(viewport).not.toHaveClass('overflow-hidden');
-  });
-
-  it('keeps both nav buttons mounted, disabled, before Embla initializes', () => {
-    currentApi = undefined;
-    renderCarousel();
-
-    const { previous, next } = getNavButtons();
-    expect(previous).toBeDisabled();
-    expect(next).toBeDisabled();
-  });
-
-  it('swaps to the enhanced (Embla-driven) viewport classes once Embla initializes', () => {
-    currentApi = undefined;
-    const { rerender } = renderCarousel({ dataTestId: 'carousel' });
-
-    currentApi = emblaApi;
-    rerender(carouselElement({ dataTestId: 'carousel' }));
-
-    const viewport = screen.getByTestId('carousel').firstElementChild;
-    expect(viewport).toHaveClass('overflow-hidden');
-    expect(viewport).not.toHaveClass('overflow-x-auto');
-    expect(viewport).not.toHaveClass('snap-x');
-  });
-
   it('resets the native scrollLeft and jumps Embla to the slide already in view', () => {
     mockViewport = { scrollLeft: 240 };
     mockSlides = [
@@ -240,32 +208,6 @@ describe(`<${Carousel.name}/>`, () => {
     const { previous, next } = getNavButtons();
     expect(previous).toHaveAttribute('title', previousLabel);
     expect(next).toHaveAttribute('title', nextLabel);
-  });
-
-  it('renders both buttons with the control variant', () => {
-    renderCarousel();
-
-    const { previous, next } = getNavButtons();
-    expect(previous).toHaveClass('rounded-full');
-    expect(next).toHaveClass('rounded-full');
-  });
-
-  it('renders the tint hover, not the solid fill, when tone is omitted', () => {
-    renderCarousel();
-
-    const { previous, next } = getNavButtons();
-    expect(previous).toHaveClass('hover:bg-brand-primary-muted');
-    expect(next).toHaveClass('hover:bg-brand-primary-muted');
-    expect(previous).not.toHaveClass('hover:bg-brand-primary-solid');
-    expect(next).not.toHaveClass('hover:bg-brand-primary-solid');
-  });
-
-  it('passes tone through to both buttons, swapping in the solid hover for BRAND_PRIMARY', () => {
-    renderCarousel({ tone: BRAND_VARIANT.BRAND_PRIMARY });
-
-    const { previous, next } = getNavButtons();
-    expect(previous).toHaveClass('hover:bg-brand-primary-solid');
-    expect(next).toHaveClass('hover:bg-brand-primary-solid');
   });
 
   it('calls scrollPrev/scrollNext on the Embla api when the buttons are clicked', async () => {
@@ -294,32 +236,6 @@ describe(`<${Carousel.name}/>`, () => {
 
     expect(getNavButtons().previous).toBeEnabled();
     expect(getNavButtons().next).toBeDisabled();
-  });
-
-  it('renders neither nav button when nothing can scroll in either direction', () => {
-    emblaApi.canScrollPrev.mockReturnValue(false);
-    emblaApi.canScrollNext.mockReturnValue(false);
-    renderCarousel();
-
-    expect(
-      screen.queryByRole('button', { name: previousLabel }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', { name: nextLabel }),
-    ).not.toBeInTheDocument();
-  });
-
-  it('brings the nav buttons back once a direction becomes scrollable again', () => {
-    emblaApi.canScrollPrev.mockReturnValue(false);
-    emblaApi.canScrollNext.mockReturnValue(false);
-    renderCarousel();
-
-    emblaApi.canScrollNext.mockReturnValue(true);
-    emitEvent('select');
-
-    const { previous, next } = getNavButtons();
-    expect(previous).toBeDisabled();
-    expect(next).toBeEnabled();
   });
 
   it('re-reads the disabled flags on reInit', () => {

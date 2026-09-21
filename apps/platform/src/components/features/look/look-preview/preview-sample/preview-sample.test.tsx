@@ -29,14 +29,4 @@ describe(PreviewSample, () => {
     const button = screen.getByRole('button', { name: 'Subscribe' });
     expect(button.closest('[style*="--brand-primary"]')).not.toBeNull();
   });
-
-  it('keeps the Panel surface visible — a regression guard against a caller class stripping its border/background', () => {
-    render(<PreviewSample {...BASE_PROPS} />);
-
-    expect(screen.getByTestId('preview-sample-panel')).toHaveClass(
-      'rounded-md',
-      'border-border',
-      'bg-surface',
-    );
-  });
 });

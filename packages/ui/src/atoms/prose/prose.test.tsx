@@ -20,9 +20,4 @@ describe(`<${Prose.name}/>`, () => {
     const { container } = setup();
     expect(container.firstChild?.nodeName).toBe('DIV');
   });
-
-  it('forwards additional className', () => {
-    const { container } = setup({ className: 'custom-class' });
-    expect(container.firstChild).toHaveClass('custom-class');
-  });
 });

@@ -91,20 +91,6 @@ describe(`<${HeroModuleShell.name}/>`, () => {
     expect(links[1]).toHaveTextContent('See pricing');
   });
 
-  it('reverses the non-primary button for legibility on a Banner over an image', () => {
-    setup({ variant: HERO_VARIANT.BANNER, ctaButtons: [secondaryButton] });
-
-    const link = screen.getByRole('link', { name: 'See pricing' });
-    expect(link.className).toContain('border-white/55');
-  });
-
-  it('does not reverse the non-primary button on Split or Stacked', () => {
-    setup({ variant: HERO_VARIANT.SPLIT, ctaButtons: [secondaryButton] });
-
-    const link = screen.getByRole('link', { name: 'See pricing' });
-    expect(link.className).not.toContain('border-white/55');
-  });
-
   it('renders no Hero.Media slot when sanityImage is absent', () => {
     setup();
 

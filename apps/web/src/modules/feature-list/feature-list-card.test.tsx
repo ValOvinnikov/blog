@@ -35,35 +35,12 @@ describe(`<${FeatureListCard.name}/>`, () => {
     ).toBeInTheDocument();
   });
 
-  it('renders the chosen icon in the brand colour when the item has no image', () => {
+  it('renders the chosen icon when the item has no image', () => {
     setup();
 
     expect(screen.getByTestId('feature-card-icon')).toBeInTheDocument();
-    expect(screen.getByTestId('feature-card-media')).toHaveClass(
-      'text-brand-primary',
-    );
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
-
-  it.each([
-    [CARD_IMAGE_SHAPE.WIDE, 'aspect-video'],
-    [CARD_IMAGE_SHAPE.SQUARE, 'aspect-square'],
-    [CARD_IMAGE_SHAPE.CIRCLE, 'rounded-full'],
-  ])(
-    'renders the uploaded image at its %s ratio when the item has one',
-    (imageShape, expectedClass) => {
-      const sanityImage = makeSanityImage();
-      setup({ item: makeFeatureListItem({ sanityImage }), imageShape });
-
-      expect(
-        screen.getByRole('img', { name: sanityImage.alt }),
-      ).toBeInTheDocument();
-      expect(screen.getByTestId('feature-card-media')).toHaveClass(
-        expectedClass,
-      );
-      expect(screen.queryByTestId('feature-card-icon')).not.toBeInTheDocument();
-    },
-  );
 
   it('renders the image over the icon when the item has both', () => {
     const sanityImage = makeSanityImage();

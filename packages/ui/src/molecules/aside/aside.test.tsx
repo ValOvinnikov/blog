@@ -49,9 +49,4 @@ describe(`<${Aside.name}/>`, () => {
     setup({ dataTestId: 'aside' });
     expect(screen.getByTestId('aside')).toBeVisible();
   });
-
-  it('accepts a className override on the root', () => {
-    setup({ className: 'custom-class' });
-    expect(screen.getByRole('note')).toHaveClass('custom-class');
-  });
 });

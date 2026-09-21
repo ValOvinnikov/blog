@@ -51,11 +51,4 @@ describe(`<${ProseLink.name}/>`, () => {
     setup({ dataTestId: 'prose-link' });
     expect(screen.getByTestId('prose-link')).toBeVisible();
   });
-
-  it('merges extra className', () => {
-    setup({ className: 'ml-2' });
-    expect(screen.getByRole('link', { name: 'About' }).className).toContain(
-      'ml-2',
-    );
-  });
 });

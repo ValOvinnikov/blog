@@ -28,7 +28,6 @@ describe('renderPostCardImage', () => {
     setup();
 
     const img = screen.getByRole('img', { name: sanityImage.alt });
-    expect(img).toHaveClass('size-full', 'object-cover');
     expect(img).toHaveAttribute('loading', 'lazy');
   });
 

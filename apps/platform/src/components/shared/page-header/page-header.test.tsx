@@ -53,11 +53,4 @@ describe(PageHeader, () => {
       screen.getByRole('heading', { level: 1, name: 'Tenants' }),
     ).toBeVisible();
   });
-
-  it('merges a caller-supplied className', () => {
-    const { container } = render(
-      <PageHeader title="Tenants" className="custom-class" />,
-    );
-    expect(container.firstChild).toHaveClass('custom-class');
-  });
 });

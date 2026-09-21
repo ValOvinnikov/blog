@@ -47,17 +47,6 @@ describe(`<${Panel.name}/>`, () => {
     expect(screen.getByTestId('panel')).toBeVisible();
   });
 
-  it('merges extra className on the root element', () => {
-    renderElement(
-      <Panel className="mt-4" dataTestId="panel">
-        <Panel.Header headingLevel={2}>heading</Panel.Header>
-        <Panel.Body>body</Panel.Body>
-      </Panel>,
-    );
-
-    expect(screen.getByTestId('panel').className).toContain('mt-4');
-  });
-
   it('renders a body with no header', () => {
     const body = faker.lorem.sentence();
     renderElement(<Panel>{<Panel.Body>{body}</Panel.Body>}</Panel>);

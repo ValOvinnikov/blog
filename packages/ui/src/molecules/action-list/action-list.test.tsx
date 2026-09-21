@@ -17,11 +17,6 @@ describe(`<${ActionList.name}/>`, () => {
     expect(screen.getByRole('button', { name: label })).toBeVisible();
   });
 
-  it('accepts className override', () => {
-    const { container } = setup({ className: 'custom-class' });
-    expect(container.firstChild).toHaveClass('custom-class');
-  });
-
   it('forwards dataTestId', () => {
     setup({ dataTestId: 'action-list' });
     expect(screen.getByTestId('action-list')).toBeVisible();

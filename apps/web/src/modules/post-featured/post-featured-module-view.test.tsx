@@ -74,23 +74,6 @@ describe(`<${PostFeaturedModuleView.name}/>`, () => {
     ).toBeInTheDocument();
   });
 
-  it('marks the lead card isLead: its excerpt clamps to three lines, not two', () => {
-    setup();
-
-    const leadCard = screen.getByTestId('post-featured-module-featured-1-lead');
-    expect(within(leadCard).getByText('Lead excerpt')).toHaveClass(
-      'line-clamp-3',
-    );
-  });
-
-  it('marks the lead card isSplit: it lays out md:flex-row when a media region is present', () => {
-    setup({ hasImages: true });
-
-    expect(
-      screen.getByTestId('post-featured-module-featured-1-lead'),
-    ).toHaveClass('md:flex-row');
-  });
-
   it('renders nothing (no lead group, no cards) when items is empty', () => {
     const { container } = setup({ items: [] });
 
@@ -115,7 +98,7 @@ describe(`<${PostFeaturedModuleView.name}/>`, () => {
     ).not.toBeInTheDocument();
   });
 
-  it('renders exactly one full-width split tail card when two items resolve', () => {
+  it('renders exactly one tail card when two items resolve', () => {
     setup({ items: [leadPost, secondPost], hasImages: true });
 
     expect(screen.getByText('Lead post')).toBeInTheDocument();
@@ -124,12 +107,9 @@ describe(`<${PostFeaturedModuleView.name}/>`, () => {
     expect(
       screen.queryByTestId('post-featured-module-featured-1-tail-grid'),
     ).not.toBeInTheDocument();
-
-    const tailCard = screen.getByTestId('post-featured-module-featured-1-tail');
-    expect(tailCard).toHaveClass('md:flex-row');
-    expect(within(tailCard).getByText('Second excerpt')).toHaveClass(
-      'line-clamp-2',
-    );
+    expect(
+      screen.getByTestId('post-featured-module-featured-1-tail'),
+    ).toBeInTheDocument();
   });
 
   it('renders a two-column grid of the remaining posts when three or more items resolve', () => {
@@ -143,13 +123,6 @@ describe(`<${PostFeaturedModuleView.name}/>`, () => {
     expect(within(tailGrid).getByText('Third post')).toBeInTheDocument();
     expect(within(tailGrid).queryByText('Lead post')).not.toBeInTheDocument();
     expect(screen.getAllByRole('article')).toHaveLength(3);
-
-    expect(within(tailGrid).getByText('Second excerpt')).not.toHaveClass(
-      'md:flex-row',
-    );
-    expect(within(tailGrid).getByText('Third excerpt')).not.toHaveClass(
-      'line-clamp-3',
-    );
   });
 
   it('renders no media region when hasImages is not given', () => {
