@@ -109,6 +109,38 @@ describe(toHeroProfileModule, () => {
 
       expect(hero.sanityImage).toBeUndefined();
     });
+
+    it('on Banner, leaves sanityImage undefined when only the author has a photo', () => {
+      const raw = makeRawHeroProfileModule({
+        variant: HERO_VARIANT.BANNER,
+        image: null,
+        author: {
+          name: 'Jamie Rivera',
+          image: makeRawSanityImage('Author photo'),
+          socialLinks: null,
+        },
+      });
+
+      const hero = toHeroProfileModule(raw);
+
+      expect(hero.sanityImage).toBeUndefined();
+    });
+
+    it('on Banner, keeps the custom image', () => {
+      const raw = makeRawHeroProfileModule({
+        variant: HERO_VARIANT.BANNER,
+        image: makeRawSanityImage('Custom alt'),
+        author: {
+          name: 'Jamie Rivera',
+          image: makeRawSanityImage('Author photo'),
+          socialLinks: null,
+        },
+      });
+
+      const hero = toHeroProfileModule(raw);
+
+      expect(hero.sanityImage?.alt).toBe('Custom alt');
+    });
   });
 
   describe('social links', () => {

@@ -1,4 +1,8 @@
-import type { ISanityImage, TMaybeUndefined } from '@blog/config';
+import {
+  HERO_VARIANT,
+  type ISanityImage,
+  type TMaybeUndefined,
+} from '@blog/config';
 import { toCtaButtons } from '@blog/service/shared/transformers/to-cta-buttons';
 import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import { toHeroPresentation } from '@blog/service/shared/transformers/to-hero-presentation';
@@ -16,6 +20,8 @@ export type TRawHeroProfileModule = InferResultType<
 >;
 
 function toImage(raw: TRawHeroProfileModule): TMaybeUndefined<ISanityImage> {
+  if (raw.variant === HERO_VARIANT.BANNER) return toSanityImage(raw.image);
+
   return toSanityImage(raw.image) ?? toSanityImage(raw.author.image);
 }
 
