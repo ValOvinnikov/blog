@@ -72,6 +72,32 @@ describe(`<${Hero.name}/>`, () => {
     ).not.toBeInTheDocument();
   });
 
+  it('renders Hero.Body between the excerpt and Hero.Cta in the DOM', () => {
+    renderHero(
+      { excerpt: 'A walkthrough of Atomic Design with Tailwind.' },
+      <>
+        <Hero.Body>
+          <p>Full bio goes here.</p>
+        </Hero.Body>
+        {heroCta}
+      </>,
+    );
+
+    const excerpt = screen.getByText(
+      'A walkthrough of Atomic Design with Tailwind.',
+    );
+    const body = screen.getByText('Full bio goes here.');
+    const cta = screen.getByRole('link', { name: 'Read more' });
+
+    expectFollows(excerpt, body);
+    expectFollows(body, cta);
+  });
+
+  it('does not render body content when Hero.Body is omitted', () => {
+    setup();
+    expect(screen.queryByText('Full bio goes here.')).not.toBeInTheDocument();
+  });
+
   it('renders Hero.Cta children', () => {
     renderHero(undefined, heroCta);
     expect(screen.getByRole('link')).toHaveAttribute(

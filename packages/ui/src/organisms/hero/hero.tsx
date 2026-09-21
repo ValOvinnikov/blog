@@ -20,6 +20,7 @@ import {
 import { cloneElement, Fragment, type ElementType } from 'react';
 
 import { HeroAvatar } from './components/avatar/hero-avatar';
+import { HeroBody } from './components/body/hero-body';
 import { HeroCta } from './components/cta/hero-cta';
 import { HeroMedia } from './components/media/hero-media';
 import { HeroSocial } from './components/social/hero-social';
@@ -28,6 +29,7 @@ import { heroVariants } from './hero-variants';
 const HeroParts = {
   Avatar: HeroAvatar,
   Media: HeroMedia,
+  Body: HeroBody,
   Cta: HeroCta,
   Social: HeroSocial,
 } satisfies Record<string, ElementType>;
@@ -46,7 +48,7 @@ export type THeroProps = IWithClassName &
     children?: TCompoundChildren<typeof HeroParts>;
   };
 
-/** The page-top hero band shared by every hero kind: renders `title` as an `<h1>` with optional `eyebrow`/`excerpt`, plus `Hero.Avatar`, `Hero.Cta`, `Hero.Media`, and `Hero.Social` slots. */
+/** The page-top hero band shared by every hero kind: renders `title` as an `<h1>` with optional `eyebrow`/`excerpt`, plus `Hero.Avatar`, `Hero.Body`, `Hero.Cta`, `Hero.Media`, and `Hero.Social` slots. */
 const HeroRoot = ({
   title,
   titleId,
@@ -109,6 +111,11 @@ const HeroRoot = ({
               {excerpt}
             </Text>
           )}
+          {slots.Body &&
+            cloneElement(slots.Body, {
+              contentAlignment: resolvedAlignment,
+              className: s.body(),
+            })}
           {slots.Cta &&
             cloneElement(slots.Cta, {
               contentAlignment: resolvedAlignment,

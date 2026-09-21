@@ -42,6 +42,14 @@ const profileContent = (
         size={SIZE.XXL}
       />
     </Hero.Avatar>
+    <Hero.Body>
+      <p>
+        Jane leads platform engineering, with a decade of shipping design
+        systems used across fintech and retail. She writes about the boring
+        parts that make software fast: caching, build graphs, and saying no to
+        abstractions.
+      </p>
+    </Hero.Body>
     <Hero.Cta>
       <NavLink href="/posts/design-system">Read more</NavLink>
     </Hero.Cta>
@@ -185,6 +193,35 @@ export const BannerContentLeft: TStory = {
     contentPosition: CONTENT_ALIGNMENT.LEFT,
     contentAlignment: CONTENT_ALIGNMENT.LEFT,
     children: bannerContent('Bright mountain sunrise'),
+  },
+};
+
+export const BannerWithBody: TStory = {
+  args: {
+    variant: HERO_VARIANT.BANNER,
+    tone: BRAND_VARIANT.BRAND_PRIMARY,
+    contentPosition: CONTENT_ALIGNMENT.LEFT,
+    contentAlignment: CONTENT_ALIGNMENT.LEFT,
+    children: (
+      <>
+        <Hero.Media>
+          <img
+            src="https://images.unsplash.com/photo-1500534623283-312aade485b7?w=1600&h=900&fit=crop"
+            alt="Bright mountain sunrise"
+            className="size-full object-cover"
+          />
+        </Hero.Media>
+        <Hero.Body>
+          <p>
+            Six months building this system in public — every decision, every
+            rollback, every lesson that didn&apos;t make the changelog.
+          </p>
+        </Hero.Body>
+        <Hero.Cta>
+          <NavLink href="/posts/design-system">Read more</NavLink>
+        </Hero.Cta>
+      </>
+    ),
   },
 };
 
