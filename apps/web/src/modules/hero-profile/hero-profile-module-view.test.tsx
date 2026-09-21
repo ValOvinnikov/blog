@@ -1,9 +1,18 @@
 import { BRAND_VARIANT, HERO_VARIANT, SOCIAL_PLATFORMS } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
+import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import {
+  richTextBlock,
+  richTextSpan,
+} from '@web/testing/shared/portable-text-renderer/fixtures';
 
 import { HeroProfileModuleView } from './hero-profile-module-view';
+
+const bio = [
+  richTextBlock('normal', [richTextSpan('Jane writes about design systems.')]),
+];
 
 const sanityImage = makeSanityImage();
 
@@ -130,5 +139,37 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
     const list = screen.getByRole('list', { name: 'Profiles' });
     expect(list).toBeVisible();
     expect(screen.getByRole('link', { name: 'GitHub profile' })).toBeVisible();
+  });
+
+  it('renders no bio text when bio is undefined', () => {
+    setup({ bio: undefined });
+
+    expect(
+      screen.queryByText('Jane writes about design systems.'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders the bio after the supporting text and before the actions', () => {
+    setup({
+      headingBlock: makeHeadingBlock({
+        heading,
+        supportingText: 'Building better products.',
+      }),
+      bio,
+      ctaButtons: ctaActionsDemo,
+    });
+
+    const supportingText = screen.getByText('Building better products.');
+    const bioText = screen.getByText('Jane writes about design systems.');
+    const action = screen.getByRole('link', { name: 'Subscribe now' });
+
+    expect(
+      supportingText.compareDocumentPosition(bioText) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(
+      bioText.compareDocumentPosition(action) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   });
 });

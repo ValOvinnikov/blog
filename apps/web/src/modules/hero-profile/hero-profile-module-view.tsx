@@ -1,7 +1,8 @@
 import { HERO_VARIANT, SIZE } from '@blog/config';
-import type { THeroProfileModule } from '@blog/service';
+import type { THeroProfileModule, TPortableTextBody } from '@blog/service';
 import { Avatar } from '@blog/ui/atoms/avatar';
 import { Hero } from '@blog/ui/organisms/hero';
+import { PortableTextRenderer } from '@web/components/shared/portable-text-renderer';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SocialLinks } from '@web/components/shared/social-links';
 import { HeroModuleShell } from '@web/modules/hero-shared';
@@ -24,6 +25,7 @@ export const HeroProfileModuleView = ({
   headingBlock,
   avatarName,
   sanityImage,
+  bio,
   socialLinks,
   ctaButtons,
   contentPosition,
@@ -109,6 +111,13 @@ export const HeroProfileModuleView = ({
             </div>
           )}
         </Hero.Media>
+      )}
+
+      {bio && bio.length > 0 && (
+        <Hero.Body>
+          {/* `proseText`'s block style (bio) allows h1/h5/h6, a wider range than the `richText` (post body) `PortableTextRenderer` is typed against, though both share the same block/link shape. */}
+          <PortableTextRenderer value={bio as TPortableTextBody} />
+        </Hero.Body>
       )}
 
       {socialLinks.length > 0 && (
