@@ -21,7 +21,16 @@ export const modulesSection: TStructureSection = {
   icon: Blocks,
   groups: [
     {
-      title: 'Post modules',
+      title: 'Heroes',
+      items: [
+        { schema: heroBlogSchema },
+        { schema: heroStatementSchema },
+        { schema: heroProfileSchema },
+        { schema: heroSchema },
+      ],
+    },
+    {
+      title: 'Posts',
       items: [
         { schema: postListSchema },
         { schema: postLatestSchema },
@@ -31,18 +40,16 @@ export const modulesSection: TStructureSection = {
       ],
     },
     {
-      title: 'Content modules',
+      title: 'Sections',
       items: [
-        { schema: heroSchema },
-        { schema: heroBlogSchema },
-        { schema: heroStatementSchema },
-        { schema: heroProfileSchema },
         { schema: contentSchema },
-        { schema: ctaSchema },
-        { schema: newsletterSchema },
         { schema: featureListSchema },
         { schema: testimonialSchema },
       ],
+    },
+    {
+      title: 'Conversion',
+      items: [{ schema: ctaSchema }, { schema: newsletterSchema }],
     },
   ],
 };
