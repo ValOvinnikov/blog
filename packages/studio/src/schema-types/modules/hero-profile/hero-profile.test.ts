@@ -1,4 +1,17 @@
+import { getField } from '@blog/studio/testing/get-field';
+import { getHidden } from '@blog/studio/testing/get-field-hidden';
+
 import { heroProfileSchema } from './hero-profile';
+
+describe('heroProfileSchema eyebrow field', () => {
+  it('is hidden unless Show Role is off', () => {
+    const hidden = getHidden(getField(heroProfileSchema, 'eyebrow'));
+
+    expect(hidden({ parent: { showRole: true } })).toBe(true);
+    expect(hidden({ parent: { showRole: undefined } })).toBe(true);
+    expect(hidden({ parent: { showRole: false } })).toBe(false);
+  });
+});
 
 describe('heroProfileSchema preview', () => {
   const prepare = heroProfileSchema.preview?.prepare;
