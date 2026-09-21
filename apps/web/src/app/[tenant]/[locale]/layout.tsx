@@ -177,8 +177,6 @@ export default async function LocaleLayout({ children, params }: TProps) {
   const brandLogoUrl = brand.logo
     ? urlForSanityImage(brand.logo, tenantContext)
     : undefined;
-  const footerSocialLinks = await SocialLinks({ profiles: social });
-
   return (
     // `<html>` (owned by the tenant-independent root layout above) has no
     // tenant to resolve theme tokens from, so `ThemeScope` establishes them
@@ -227,7 +225,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
                   <Footer dataTestId="site-footer">
                     <Footer.Copyright title={brand.name} year={currentYear} />
                     <Footer.Nav>
-                      {footerSocialLinks}
+                      <SocialLinks profiles={social} />
                       <NavLink
                         as={SmartLink}
                         href={routes.rssFeed()}

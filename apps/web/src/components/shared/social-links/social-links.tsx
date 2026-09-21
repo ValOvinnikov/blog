@@ -1,45 +1,27 @@
-import {
-  SIZE,
-  SOCIAL_PLATFORM_ICON,
-  SOCIAL_PLATFORM_LABEL,
-} from '@blog/config';
 import type { TSocialProfile } from '@blog/service';
-import { Icon } from '@blog/ui/atoms/icon';
-import { NavLink } from '@blog/ui/atoms/nav-link';
-import { SmartLink } from '@web/components/shared/smart-link';
-import { getTranslations } from 'next-intl/server';
+import { useTranslations } from 'next-intl';
+
+import { SocialLink } from './social-link';
+import { socialLinksVariants } from './social-links-variants';
 
 export type TSocialLinksProps = {
   profiles: TSocialProfile[];
+  variant?: 'plain' | 'outlined';
 };
 
-export const SocialLinks = async ({ profiles }: TSocialLinksProps) => {
-  const t = await getTranslations('socialLinks');
+export const SocialLinks = ({
+  profiles,
+  variant = 'plain',
+}: TSocialLinksProps) => {
+  const t = useTranslations('socialLinks');
 
   return (
-    <>
-      {profiles.map(({ platform, link }) => {
-        const platformLabel = SOCIAL_PLATFORM_LABEL[platform];
-
-        return (
-          <NavLink
-            key={link.href}
-            as={SmartLink}
-            href={link.href}
-            target={link.target}
-            icon={
-              <Icon
-                name={SOCIAL_PLATFORM_ICON[platform]}
-                size={SIZE.SM}
-                dataTestId={`social-icon-${platform}`}
-              />
-            }
-            hasLabel={false}
-          >
-            {t('linkAriaLabel', { platform: platformLabel })}
-          </NavLink>
-        );
-      })}
-    </>
+    <ul aria-label={t('listAriaLabel')} className={socialLinksVariants()}>
+      {profiles.map((profile) => (
+        <li key={profile.link.href}>
+          <SocialLink {...profile} variant={variant} />
+        </li>
+      ))}
+    </ul>
   );
 };
