@@ -393,14 +393,22 @@ page's own required `headingBlock` heading becomes the `<h1>`. **`module_heroSta
 member — a headline, a line of support and up to two actions, with nothing
 derived from anything — and is the hero a marketing, agency, product or
 consultant home page opens with. **`module_heroProfile`** is the person
-hero: it references a `blog_author` for a photo and social profiles only,
-and authors all of its own copy, so nothing is derived from the author's
-`name`, `role` or `bio`.
+hero: it references a `blog_author` for a photo, social profiles and — each
+behind its own toggle — the author's `role` and `bio`, and authors the rest
+of its copy itself; nothing is ever derived from the author's `name`.
 
 `module_heroProfile`'s fields are `title`, `brandVariant`, the shared
 `headingBlock`, an optional `eyebrow`, a **required** `author` reference to
-`blog_author`, an optional `image`, the shared `ctaButtons`, and a
-`showSocialLinks` toggle defaulting on, before its composed tail. **The
+`blog_author`, an optional `image`, the shared `ctaButtons`, and three
+toggles defaulting on — `showSocialLinks`, `showRole` and `showBio` —
+before its composed tail. `showRole` renders the author's `role` as the
+hero's eyebrow and hides the authored `eyebrow` field while on, so the two
+never compete for the slot; `showBio` renders the author's `bio` in
+`Hero.Body`, beneath the supporting text, through the same
+`InlineTextRenderer` the CTA module uses — `bio` is `proseText`, which
+allows only `normal` blocks with bold, italic and `linkRef`, the
+`inlineText` shape without lists, so a bio can never carry a heading into
+the hero. **The
 photo resolves by precedence, not by a mode**: the module's own `image`
 when set, otherwise the author's, otherwise neither — and the view then
 renders initials through `Avatar`, exactly as the author page does.
@@ -409,9 +417,9 @@ supported state rather than a failure, which is why the schema declares
 **no document-level validation at all**: it validates what the editor
 cannot see, not what they just chose. The photo is placed by variant — a
 round `Hero.Avatar` on Stacked, a square `Hero.Media` on Split, the
-background on Banner — its actions render in `Hero.Cta`, and the author's
-profiles in `Hero.Social`. Those four slots are the `Hero` organism's whole
-surface. `Hero.Social` imposes no semantics of its own — it is a container,
+background on Banner — its actions render in `Hero.Cta`, the bio in
+`Hero.Body`, and the author's profiles in `Hero.Social`. Those five slots
+are the `Hero` organism's whole surface. `Hero.Social` imposes no semantics of its own — it is a container,
 and the shared `SocialLinks` renders the labelled list inside it (its
 `outlined` variant there, plain in the footer).
 
