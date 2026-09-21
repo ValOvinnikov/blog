@@ -1,10 +1,15 @@
 import { BRAND_VARIANT } from '@blog/config';
+import { Avatar } from '@blog/ui/atoms/avatar';
 import { objectKeys } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
+import { quoteCardNameVariants } from './components/name/quote-card-name-variants';
 import { QuoteCard, type TQuoteCardProps } from './quote-card';
 import { quoteCardVariants } from './quote-card-variants';
+
+const NAME = faker.person.fullName();
+const AVATAR_SRC = faker.image.avatar();
 
 const meta = {
   title: 'Molecules/QuoteCard',
@@ -18,15 +23,23 @@ const meta = {
     },
     tone: {
       control: 'select',
-      options: objectKeys(quoteCardVariants.variants.tone),
+      options: objectKeys(quoteCardNameVariants.variants.tone),
     },
   },
   args: {
     quote: faker.lorem.sentences(2),
-    name: faker.person.fullName(),
     role: `${faker.person.jobTitle()}, ${faker.company.name()}`,
-    avatarSrc: faker.image.avatar(),
     tone: BRAND_VARIANT.PRIMARY,
+    children: (
+      <>
+        <QuoteCard.Avatar>
+          <Avatar src={AVATAR_SRC} alt={NAME} name={NAME} />
+        </QuoteCard.Avatar>
+        <QuoteCard.Name>
+          <span>{NAME}</span>
+        </QuoteCard.Name>
+      </>
+    ),
   },
 } satisfies Meta<typeof QuoteCard>;
 
@@ -40,11 +53,28 @@ export const Centered: TStory = {
 };
 
 export const NoPhoto: TStory = {
-  args: { avatarSrc: undefined },
+  args: {
+    children: (
+      <QuoteCard.Name>
+        <span>{NAME}</span>
+      </QuoteCard.Name>
+    ),
+  },
 };
 
 export const Linked: TStory = {
-  args: { href: 'https://example.com/case-studies/customer' },
+  args: {
+    children: (
+      <>
+        <QuoteCard.Avatar>
+          <Avatar src={AVATAR_SRC} alt={NAME} name={NAME} />
+        </QuoteCard.Avatar>
+        <QuoteCard.Name>
+          <a href="https://example.com/case-studies/customer">{NAME}</a>
+        </QuoteCard.Name>
+      </>
+    ),
+  },
 };
 
 export const Spotlight: TStory = {

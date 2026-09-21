@@ -237,9 +237,14 @@ Variants: collapsible: (boolean)
 
 ### QuoteCard — `molecules/quote-card/quote-card.tsx`
 
-A testimonial quote rendered as a figure, with the person's photo or initials and an optional link on their name.
-Props: quote: string · name: string · role?: string · avatarSrc?: string · avatarAlt?: string · hasAvatar?: boolean · align?: TQuoteCardVariants['align'] · isSpotlight?: boolean · tone: TBrandVariantOf<'PRIMARY' | 'SECONDARY'> · href?: string · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
-Variants: align: left|center · isSpotlight: (boolean) · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY
+A testimonial quote rendered as a figure; composes a caller-supplied `QuoteCard.Avatar` and `QuoteCard.Name` for the quoted person.
+Props: quote: string · role?: string · align?: TQuoteCardVariants['align'] · isSpotlight?: boolean · tone: TBrandVariantOf<'PRIMARY' | 'SECONDARY'> · children?: TCompoundChildren<typeof QuoteCardParts> _(extends IWithClassName, IWithDataTestId)_
+Variants: align: left|center · isSpotlight: (boolean)
+
+Slots:
+
+- **QuoteCard.Avatar** — The avatar slot of a `QuoteCard`; positions the caller's own `Avatar` element beside the quoted person's name. Props: children: ReactNode
+- **QuoteCard.Name** — The name slot of a `QuoteCard`; applies the quoted person's link/text treatment to whatever plain element or link the caller supplies. Props: isSpotlight?: TQuoteCardNameVariants['isSpotlight'] · tone?: TQuoteCardNameVariants['tone'] · children: ReactElement<{ className?: string }> · Variants: isSpotlight: (boolean) · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY
 
 ### SettingRow — `molecules/setting-row/setting-row.tsx`
 

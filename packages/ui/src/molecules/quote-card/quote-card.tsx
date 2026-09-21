@@ -5,52 +5,51 @@ import {
   type IWithDataTestId,
   type TBrandVariantOf,
 } from '@blog/config';
-import type { TAnchorElementType } from '@blog/config/react';
-import { Avatar } from '@blog/ui/atoms/avatar';
 import { Icon } from '@blog/ui/atoms/icon';
-import { resolveComponent } from '@blog/ui/lib/react';
+import {
+  mapCompoundSlots,
+  type TCompoundChildren,
+  type TCompoundComponent,
+} from '@blog/ui/lib/react';
+import { cloneElement, Fragment, type ElementType } from 'react';
 
+import { QuoteCardAvatar } from './components/avatar/quote-card-avatar';
+import { QuoteCardName } from './components/name/quote-card-name';
 import {
   quoteCardVariants,
   type TQuoteCardVariants,
 } from './quote-card-variants';
 
+const QuoteCardParts = {
+  Avatar: QuoteCardAvatar,
+  Name: QuoteCardName,
+} satisfies Record<string, ElementType>;
+
 export type TQuoteCardProps = IWithClassName &
   IWithDataTestId & {
     quote: string;
-    name: string;
     role?: string;
-    avatarSrc?: string;
-    avatarAlt?: string;
-    hasAvatar?: boolean;
     align?: TQuoteCardVariants['align'];
     isSpotlight?: boolean;
     tone: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
-    href?: string;
-    linkAs?: TAnchorElementType;
+    children?: TCompoundChildren<typeof QuoteCardParts>;
   };
 
-/** A testimonial quote rendered as a figure, with the person's photo or initials and an optional link on their name. */
-export const QuoteCard = ({
+/** A testimonial quote rendered as a figure; composes a caller-supplied `QuoteCard.Avatar` and `QuoteCard.Name` for the quoted person. */
+const QuoteCardRoot = ({
   quote,
-  name,
   role,
-  avatarSrc,
-  avatarAlt,
-  hasAvatar = true,
   align,
   isSpotlight = false,
   tone,
-  href,
-  linkAs,
+  children,
   className,
   dataTestId,
 }: TQuoteCardProps) => {
-  const LinkComponent = resolveComponent(linkAs, 'a');
+  const { slots, unmatched } = mapCompoundSlots(children, QuoteCardParts);
   const s = quoteCardVariants({
     align: isSpotlight ? 'center' : align,
     isSpotlight,
-    tone,
   });
 
   return (
@@ -58,26 +57,20 @@ export const QuoteCard = ({
       <Icon name={ICONS.QUOTE} size={SIZE.LG} className={s.quoteMark()} />
       <blockquote className={s.quote()}>{quote}</blockquote>
       <figcaption className={s.caption()}>
-        {hasAvatar && (
-          <Avatar
-            src={avatarSrc}
-            alt={avatarAlt ?? name}
-            name={name}
-            size={isSpotlight ? SIZE.LG : SIZE.MD}
-          />
-        )}
+        {slots.Avatar}
         <div className={s.person()}>
-          {href ? (
-            // eslint-disable-next-line react-hooks/static-components -- resolveComponent returns `linkAs`/fallback verbatim, so the reference stays stable across renders
-            <LinkComponent href={href} className={s.name()}>
-              {name}
-            </LinkComponent>
-          ) : (
-            <span className={s.name()}>{name}</span>
-          )}
+          {slots.Name && cloneElement(slots.Name, { isSpotlight, tone })}
           {role && <span className={s.role()}>{role}</span>}
         </div>
       </figcaption>
+      {unmatched.map((node, i) => (
+        <Fragment key={i}>{node}</Fragment>
+      ))}
     </figure>
   );
 };
+
+export const QuoteCard: TCompoundComponent<
+  typeof QuoteCardRoot,
+  typeof QuoteCardParts
+> = Object.assign(QuoteCardRoot, QuoteCardParts);
