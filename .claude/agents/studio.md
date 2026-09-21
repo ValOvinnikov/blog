@@ -153,6 +153,21 @@ document type to the desk — singleton or list — is one entry in a section's
 group, never a hand-built `S.listItem()…child(S.document())` chain in the
 entry file; Settings used to be exactly that exception and it is gone.
 
+**The Modules section has four fixed groups, and every module schema is
+placed by the job it does on the page — never appended to a catch-all.**
+`src/structure/sections/modules-section.ts` groups are: **Heroes** (the
+`hero` slot's family — `module_hero*`; never placeable in `modules[]`),
+**Posts** (blog listings fed by post/taxonomy queries — `module_post*`,
+`module_taxonomy*`; a second content type with listings, e.g. projects, gets
+its own sibling group), **Sections** (page-body bands presenting authored
+content — content, features, testimonials, logo wall, stats, team, timeline,
+gallery, FAQ, pricing, embed, location), and **Conversion** (bands whose point
+is a click or a signup — call to action, newsletter, contact form). A new
+module's ticket names its group in `## Scope`; a module that fits none is a
+design question to raise, not a fifth group to invent. Adopted 2026-09-21
+(#3509), when eight modules had accreted into "Content modules" with the
+heroes mixed in.
+
 **The desk never restates a schema's name, title or icon.** `schema.name`,
 `schema.title` and `schema.icon` are the single source; `src/structure/*`
 reads them off the schema rather than retyping them. Retyping is what let the
