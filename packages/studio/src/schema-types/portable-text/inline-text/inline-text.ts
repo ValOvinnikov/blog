@@ -1,5 +1,22 @@
 import { linkRefSchema } from '@blog/studio/schema-types/objects/link-ref/link-ref';
-import { defineArrayMember, defineType } from 'sanity';
+import {
+  defineArrayMember,
+  defineType,
+  type BlockMarksDefinition,
+  type BlockStyleDefinition,
+} from 'sanity';
+
+export const inlineTextStyles: BlockStyleDefinition[] = [
+  { title: 'Normal', value: 'normal' },
+];
+
+export const inlineTextMarks: BlockMarksDefinition = {
+  decorators: [
+    { title: 'Bold', value: 'strong' },
+    { title: 'Italic', value: 'em' },
+  ],
+  annotations: [{ type: linkRefSchema.name }],
+};
 
 export const inlineTextSchema = defineType({
   name: 'inlineText',
@@ -10,18 +27,12 @@ export const inlineTextSchema = defineType({
   of: [
     defineArrayMember({
       type: 'block',
-      styles: [{ title: 'Normal', value: 'normal' }],
+      styles: inlineTextStyles,
       lists: [
         { title: 'Bullet', value: 'bullet' },
         { title: 'Numbered', value: 'number' },
       ],
-      marks: {
-        decorators: [
-          { title: 'Bold', value: 'strong' },
-          { title: 'Italic', value: 'em' },
-        ],
-        annotations: [{ type: linkRefSchema.name }],
-      },
+      marks: inlineTextMarks,
     }),
   ],
   validation: (rule) => rule.max(6),
