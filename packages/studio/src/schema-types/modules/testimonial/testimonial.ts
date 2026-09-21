@@ -49,7 +49,8 @@ export const testimonialSchema = defineType({
     ctaButtonsField(),
     showImagesField({
       title: 'Show Photos',
-      description: "Show each person's photo (or initials) beside their name.",
+      description:
+        "Show each person's photo beside their name. Turned off, cards show initials instead.",
     }),
     displayModeField({
       description:
