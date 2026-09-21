@@ -1,26 +1,30 @@
-import { cloneElement, type ReactElement } from 'react';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import type { ReactNode } from 'react';
 
 import {
   quoteCardNameVariants,
   type TQuoteCardNameVariants,
 } from './quote-card-name-variants';
 
-export type TQuoteCardNameProps = {
-  isSpotlight?: TQuoteCardNameVariants['isSpotlight'];
-  tone?: TQuoteCardNameVariants['tone'];
-  children: ReactElement<{ className?: string }>;
-};
+export type TQuoteCardNameProps = IWithClassName &
+  IWithDataTestId & {
+    isSpotlight?: TQuoteCardNameVariants['isSpotlight'];
+    tone?: TQuoteCardNameVariants['tone'];
+    children: ReactNode;
+  };
 
-/** The name slot of a `QuoteCard`; applies the quoted person's link/text treatment to whatever plain element or link the caller supplies. */
+/** The name slot of a `QuoteCard`; wraps the quoted person's link or text in the tone-matched link/focus treatment, on an element the component itself owns rather than the caller's link or text. */
 export const QuoteCardName = ({
   isSpotlight,
   tone,
+  className,
+  dataTestId,
   children,
-}: TQuoteCardNameProps) =>
-  cloneElement(children, {
-    className: quoteCardNameVariants({
-      isSpotlight,
-      tone,
-      class: children.props.className,
-    }),
-  });
+}: TQuoteCardNameProps) => (
+  <span
+    className={quoteCardNameVariants({ isSpotlight, tone, class: className })}
+    data-testid={dataTestId}
+  >
+    {children}
+  </span>
+);

@@ -243,8 +243,8 @@ Variants: align: left|center · isSpotlight: (boolean)
 
 Slots:
 
-- **QuoteCard.Avatar** — The avatar slot of a `QuoteCard`; positions the caller's own `Avatar` element beside the quoted person's name. Props: children: ReactNode
-- **QuoteCard.Name** — The name slot of a `QuoteCard`; applies the quoted person's link/text treatment to whatever plain element or link the caller supplies. Props: isSpotlight?: TQuoteCardNameVariants['isSpotlight'] · tone?: TQuoteCardNameVariants['tone'] · children: ReactElement<{ className?: string }> · Variants: isSpotlight: (boolean) · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY
+- **QuoteCard.Avatar** — The avatar slot of a `QuoteCard`; positions the caller's own `Avatar` element beside the quoted person's name. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **QuoteCard.Name** — The name slot of a `QuoteCard`; wraps the quoted person's link or text in the tone-matched link/focus treatment, on an element the component itself owns rather than the caller's link or text. Props: isSpotlight?: TQuoteCardNameVariants['isSpotlight'] · tone?: TQuoteCardNameVariants['tone'] · children: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: isSpotlight: (boolean) · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY
 
 ### SettingRow — `molecules/setting-row/setting-row.tsx`
 

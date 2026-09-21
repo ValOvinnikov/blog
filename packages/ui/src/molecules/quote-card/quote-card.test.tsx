@@ -160,6 +160,48 @@ describe(`<${QuoteCard.name}/>`, () => {
     expect(screen.getByTestId('custom-link')).toBeVisible();
   });
 
+  it('wraps a custom link component that ignores className in its own focus-treatment element, instead of relying on the child to forward it', () => {
+    const CustomLink = ({
+      href,
+      children,
+    }: {
+      href: string;
+      children?: ReactNode;
+    }) => (
+      <a href={href} data-testid="custom-link">
+        {children}
+      </a>
+    );
+    renderElement(
+      <QuoteCard quote={faker.lorem.sentence()} tone={BRAND_VARIANT.PRIMARY}>
+        <QuoteCard.Name dataTestId="quote-card-name">
+          <CustomLink href="/case-studies/ada">
+            {faker.person.fullName()}
+          </CustomLink>
+        </QuoteCard.Name>
+      </QuoteCard>,
+    );
+    const wrapper = screen.getByTestId('quote-card-name');
+    const link = screen.getByTestId('custom-link');
+    expect(link.parentElement).toBe(wrapper);
+  });
+
+  it('keeps figcaption as the last child of the figure even when duplicate slot content is unmatched', () => {
+    renderElement(
+      <QuoteCard quote={faker.lorem.sentence()} tone={BRAND_VARIANT.PRIMARY}>
+        <QuoteCard.Name>
+          <span>{faker.person.fullName()}</span>
+        </QuoteCard.Name>
+        <QuoteCard.Name>
+          <span>{faker.person.fullName()}</span>
+        </QuoteCard.Name>
+      </QuoteCard>,
+    );
+    const figure = screen.getByRole('figure');
+    const figcaption = figure.querySelector('figcaption');
+    expect(figure.lastElementChild).toBe(figcaption);
+  });
+
   it('forwards data-testid to the root element', () => {
     renderElement(
       <QuoteCard

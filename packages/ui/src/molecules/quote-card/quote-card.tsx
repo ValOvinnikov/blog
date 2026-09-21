@@ -56,6 +56,9 @@ const QuoteCardRoot = ({
     <figure className={s.root({ class: className })} data-testid={dataTestId}>
       <Icon name={ICONS.QUOTE} size={SIZE.LG} className={s.quoteMark()} />
       <blockquote className={s.quote()}>{quote}</blockquote>
+      {unmatched.map((node, i) => (
+        <Fragment key={i}>{node}</Fragment>
+      ))}
       <figcaption className={s.caption()}>
         {slots.Avatar}
         <div className={s.person()}>
@@ -63,9 +66,6 @@ const QuoteCardRoot = ({
           {role && <span className={s.role()}>{role}</span>}
         </div>
       </figcaption>
-      {unmatched.map((node, i) => (
-        <Fragment key={i}>{node}</Fragment>
-      ))}
     </figure>
   );
 };
