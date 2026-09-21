@@ -56,7 +56,7 @@ const meta = {
   argTypes: {
     brandVariant: {
       control: 'select',
-      options: Object.values(BRAND_VARIANT),
+      options: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
     },
     contentAlignment: {
       control: 'select',
