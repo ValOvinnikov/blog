@@ -20,7 +20,7 @@
     "@blog/tailwind-config": "workspace:*",
     "@blog/utils": "workspace:*",
     "embla-carousel-react": "^8.6.0",
-    "tailwind-merge": "^3.6.0",
+    "tailwind-merge": "^3.7.0",
     "tailwind-variants": "^3.2.2"
   },
   "peerDependencies": {

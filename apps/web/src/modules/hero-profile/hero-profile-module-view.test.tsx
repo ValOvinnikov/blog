@@ -1,4 +1,4 @@
-import { BRAND_VARIANT, HERO_VARIANT } from '@blog/config';
+import { BRAND_VARIANT, HERO_VARIANT, SOCIAL_PLATFORMS } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
@@ -7,11 +7,18 @@ import { HeroProfileModuleView } from './hero-profile-module-view';
 
 const sanityImage = makeSanityImage();
 
-const socialLinksItems = (
-  <li>
-    <a href="https://github.com/example">GitHub profile</a>
-  </li>
-);
+const socialLinks = [
+  {
+    platform: SOCIAL_PLATFORMS.GITHUB,
+    link: {
+      label: 'GitHub',
+      href: 'https://github.com/example',
+      target: '_blank' as const,
+      platform: undefined,
+      ariaLabel: undefined,
+    },
+  },
+];
 
 const heading = 'Building better products';
 const avatarName = 'Jamie Rivera';
@@ -24,8 +31,7 @@ const setup = customRender(HeroProfileModuleView, {
   headingBlock: makeHeadingBlock({ heading }),
   avatarName,
   sanityImage: undefined,
-  socialLinksItems: undefined,
-  socialLinksAriaLabel: 'Profiles',
+  socialLinks: [],
   ctaButtons: [],
   contentPosition: undefined,
   contentAlignment: undefined,
@@ -112,13 +118,13 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
   });
 
   it('renders no Hero.Social slot when there are no social links', () => {
-    setup({ socialLinksItems: undefined });
+    setup({ socialLinks: [] });
 
     expect(screen.queryByRole('list')).not.toBeInTheDocument();
   });
 
-  it('renders a labelled list carrying the resolved social link items', () => {
-    setup({ socialLinksItems });
+  it('renders SocialLinks inside Hero.Social carrying the resolved profiles', () => {
+    setup({ socialLinks });
 
     const list = screen.getByRole('list', { name: 'Profiles' });
     expect(list).toBeVisible();

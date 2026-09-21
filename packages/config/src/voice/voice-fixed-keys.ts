@@ -16,6 +16,7 @@ export const VOICE_FIXED_KEYS = [
   'siteNavigation.toggleMenu',
   'brandLockupLink.ariaLabel',
   'socialLinks.linkAriaLabel',
+  'socialLinks.listAriaLabel',
   'topicChipList.ariaLabel',
   'blogListPage.paginationAriaLabel',
   'blogPostPage.depthToggle.ariaLabel',
@@ -38,7 +39,6 @@ export const VOICE_FIXED_KEYS = [
   'carousel.previousAriaLabel',
   'carousel.nextAriaLabel',
   'carousel.regionLabel',
-  'hero.socialLinksAriaLabel',
 
   'breadcrumbs.home',
   'breadcrumbs.topics',
