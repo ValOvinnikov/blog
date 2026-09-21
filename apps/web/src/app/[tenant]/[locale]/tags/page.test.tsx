@@ -1,26 +1,26 @@
 import { CONTENT_ROUTE_REVALIDATE_SECONDS } from '@blog/config';
 
-import TagsIndexPage, { generateMetadata, revalidate } from './page';
+import TagIndexRoute, { generateMetadata, revalidate } from './page';
 
-vi.mock('@web/metadata/tags-metadata', () => ({
-  buildTagsMetadata: vi.fn().mockResolvedValue({ title: 'Tags' }),
+vi.mock('@web/metadata/tag-index-metadata', () => ({
+  buildTagIndexMetadata: vi.fn().mockResolvedValue({ title: 'Tags' }),
 }));
 
-vi.mock('@web/components/pages/tags-page', () => ({
-  TagsPage: ({ locale, tenant }: { locale: string; tenant: string }) => (
-    <div data-testid="tags-page">
+vi.mock('@web/components/pages/tag-index-page', () => ({
+  TagIndexPage: ({ locale, tenant }: { locale: string; tenant: string }) => (
+    <div data-testid="tag-index-page">
       {locale}:{tenant}
     </div>
   ),
 }));
 
-describe('TagsIndexPage', () => {
+describe('TagIndexRoute', () => {
   it('declares the shared content-route revalidate backstop', () => {
     expect(revalidate).toBe(CONTENT_ROUTE_REVALIDATE_SECONDS);
   });
 
   describe('generateMetadata', () => {
-    it('delegates to buildTagsMetadata with the resolved tenant', async () => {
+    it('delegates to buildTagIndexMetadata with the resolved tenant', async () => {
       const metadata = await generateMetadata({
         params: Promise.resolve({ tenant: 'tenant-1', locale: 'EN' }),
       });
@@ -29,8 +29,8 @@ describe('TagsIndexPage', () => {
     });
   });
 
-  it('renders TagsPage with the resolved locale and tenant', async () => {
-    const ui = await TagsIndexPage({
+  it('renders TagIndexPage with the resolved locale and tenant', async () => {
+    const ui = await TagIndexRoute({
       params: Promise.resolve({ tenant: 'tenant-1', locale: 'EN' }),
     });
 

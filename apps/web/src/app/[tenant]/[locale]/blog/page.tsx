@@ -1,6 +1,6 @@
 import type { ITenantLocalizedParams } from '@blog/config';
-import { BlogListPage } from '@web/components/pages/blog-list-page';
-import { buildBlogListMetadata } from '@web/metadata/blog-list-metadata';
+import { PostIndexPage } from '@web/components/pages/post-index-page';
+import { buildPostIndexMetadata } from '@web/metadata/post-index-metadata';
 import type { Metadata } from 'next';
 import { setRequestLocale } from 'next-intl/server';
 
@@ -13,12 +13,12 @@ export const revalidate = 21600;
 
 export async function generateMetadata({ params }: TProps): Promise<Metadata> {
   const { tenant } = await params;
-  return buildBlogListMetadata(1, tenant);
+  return buildPostIndexMetadata(1, tenant);
 }
 
-export default async function BlogIndexPage({ params }: TProps) {
+export default async function PostIndexRoute({ params }: TProps) {
   const { locale, tenant } = await params;
   setRequestLocale(locale);
 
-  return <BlogListPage page={1} locale={locale} tenant={tenant} />;
+  return <PostIndexPage page={1} locale={locale} tenant={tenant} />;
 }
