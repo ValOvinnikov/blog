@@ -51,12 +51,7 @@ export const QuoteCard = ({
 
   return (
     <figure className={s.root({ class: className })} data-testid={dataTestId}>
-      <Icon
-        name={ICONS.QUOTE}
-        size={SIZE.LG}
-        aria-hidden={true}
-        className={s.quoteMark()}
-      />
+      <Icon name={ICONS.QUOTE} size={SIZE.LG} className={s.quoteMark()} />
       <blockquote className={s.quote()}>{quote}</blockquote>
       <figcaption className={s.caption()}>
         {hasAvatar && (

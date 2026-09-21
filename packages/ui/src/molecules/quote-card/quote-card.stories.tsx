@@ -2,7 +2,7 @@ import { objectKeys } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import { QuoteCard } from './quote-card';
+import { QuoteCard, type TQuoteCardProps } from './quote-card';
 import { quoteCardVariants } from './quote-card-variants';
 
 const meta = {
@@ -45,25 +45,33 @@ export const Spotlight: TStory = {
   args: { isSpotlight: true },
 };
 
+const BRAND_BANDS = [
+  'bg-primary',
+  'bg-secondary',
+  'bg-brand-primary-muted',
+] as const;
+
+const OnEveryBand = (args: TQuoteCardProps) => (
+  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem' }}>
+    {BRAND_BANDS.map((band) => (
+      <div
+        key={band}
+        className={band}
+        style={{ maxWidth: 360, padding: '1.5rem' }}
+      >
+        <QuoteCard {...args} />
+      </div>
+    ))}
+  </div>
+);
+
 export const OnEveryBrandVariant: TStory = {
   name: 'On every brand variant',
-  render: (args) => (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem' }}>
-      <div className="bg-primary" style={{ maxWidth: 360, padding: '1.5rem' }}>
-        <QuoteCard {...args} />
-      </div>
-      <div
-        className="bg-secondary"
-        style={{ maxWidth: 360, padding: '1.5rem' }}
-      >
-        <QuoteCard {...args} />
-      </div>
-      <div
-        className="bg-brand-primary-muted"
-        style={{ maxWidth: 360, padding: '1.5rem' }}
-      >
-        <QuoteCard {...args} />
-      </div>
-    </div>
-  ),
+  render: OnEveryBand,
+};
+
+export const SpotlightOnEveryBrandVariant: TStory = {
+  name: 'Spotlight — on every brand variant',
+  args: { isSpotlight: true },
+  render: OnEveryBand,
 };
