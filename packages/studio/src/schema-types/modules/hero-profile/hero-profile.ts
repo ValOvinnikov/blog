@@ -46,7 +46,7 @@ export const heroProfileSchema = defineType({
       title: 'Image',
       type: imageWithAltSchema.name,
       description:
-        "Upload an image to use it here. Leave empty to use the author's own photo.",
+        "Upload an image to use it here. Stacked and Split fall back to the author's photo; the Banner shows the brand band without one.",
     }),
     ctaButtonsField(),
     defineField({
