@@ -755,10 +755,13 @@ ignores it.
 
 **There is no image-shape field and no columns field.** The photo is the
 person, sized to the byline and always a round portrait, so the feature list's
-`imageShape` question never arises. `showImages` ("Show Photos") stays, and
-turning it off hides the photo _and_ the initials — the fallback exists for a
-person without a photo while photos are on, not as a second thing to switch
-off. `contentAlignment` moves the heading, supporting text and actions
+`imageShape` question never arises. **The avatar always renders**: it shows
+the person's photo when one has been added and their initials otherwise, so
+`showImages` ("Show Photos") turned off swaps photographs for initials rather
+than removing the avatar. A row of quotes therefore stays even whether or not
+anyone supplied a portrait, and the initials fallback serves both the
+photo-less person and the switched-off module rather than existing for only
+one of them. `contentAlignment` moves the heading, supporting text and actions
 together; `cardAlignment` moves the quote and the person inside each card.
 
 **`QuoteCard` is a new `@blog/ui` molecule rather than a reshaped
