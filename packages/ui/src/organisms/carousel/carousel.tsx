@@ -17,19 +17,17 @@ export interface ICarouselProps<T> extends IWithClassName, IWithDataTestId {
   items: readonly T[];
   renderItem: (args: { item: T; index: number }) => ReactNode;
   getItemKey?: (args: { item: T; index: number }) => Key;
-  slideClassName?: string;
   ariaLabel: string;
   previousLabel: string;
   nextLabel: string;
   tone?: TBrandVariant;
 }
 
-/** A generic swipeable row of slides. */
+/** Scrolls through a row of items, revealing more of them as the viewport widens. */
 export const Carousel = <T,>({
   items,
   renderItem,
   getItemKey,
-  slideClassName,
   ariaLabel,
   previousLabel,
   nextLabel,
@@ -66,37 +64,39 @@ export const Carousel = <T,>({
           {items.map((item, index) => (
             <li
               key={getItemKey ? getItemKey({ item, index }) : index}
-              className={s.slide({ class: slideClassName })}
+              className={s.slide()}
             >
               {renderItem({ item, index })}
             </li>
           ))}
         </ul>
       </div>
-      <div className={s.controls()}>
-        <IconButton
-          ref={previousButtonRef}
-          ariaLabel={previousLabel}
-          title={previousLabel}
-          onClick={scrollPrev}
-          isDisabled={isPreviousDisabled}
-          variant="control"
-          tone={tone}
-        >
-          <Icon name={ICONS.CHEVRON_LEFT} size={SIZE.SM} />
-        </IconButton>
-        <IconButton
-          ref={nextButtonRef}
-          ariaLabel={nextLabel}
-          title={nextLabel}
-          onClick={scrollNext}
-          isDisabled={isNextDisabled}
-          variant="control"
-          tone={tone}
-        >
-          <Icon name={ICONS.CHEVRON_RIGHT} size={SIZE.SM} />
-        </IconButton>
-      </div>
+      {(!isEnhanced || !(isPreviousDisabled && isNextDisabled)) && (
+        <div className={s.controls()}>
+          <IconButton
+            ref={previousButtonRef}
+            ariaLabel={previousLabel}
+            title={previousLabel}
+            onClick={scrollPrev}
+            isDisabled={isPreviousDisabled}
+            variant="control"
+            tone={tone}
+          >
+            <Icon name={ICONS.CHEVRON_LEFT} size={SIZE.SM} />
+          </IconButton>
+          <IconButton
+            ref={nextButtonRef}
+            ariaLabel={nextLabel}
+            title={nextLabel}
+            onClick={scrollNext}
+            isDisabled={isNextDisabled}
+            variant="control"
+            tone={tone}
+          >
+            <Icon name={ICONS.CHEVRON_RIGHT} size={SIZE.SM} />
+          </IconButton>
+        </div>
+      )}
     </div>
   );
 };

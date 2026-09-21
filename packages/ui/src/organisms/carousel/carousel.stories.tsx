@@ -60,7 +60,6 @@ const meta = {
     nextLabel: 'Next slide',
     items: buildItems(3),
     renderItem: renderSampleItem,
-    slideClassName: 'basis-[85%] sm:basis-1/2 md:basis-1/3',
   },
 } satisfies Meta<typeof Carousel<TSampleItem>>;
 
@@ -75,12 +74,17 @@ export const RowThatScrolls: TStory = {
   },
 };
 
+export const FewerItemsThanFit: TStory = {
+  args: {
+    items: buildItems(2),
+  },
+};
+
 export const WithPlainImages: TStory = {
   render: () => (
     <Carousel
       items={buildImageItems(6)}
       renderItem={renderImageItem}
-      slideClassName="basis-full"
       ariaLabel="Latest posts"
       previousLabel="Previous slide"
       nextLabel="Next slide"

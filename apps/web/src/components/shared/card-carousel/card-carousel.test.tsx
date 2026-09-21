@@ -9,7 +9,6 @@ import { makePostListItem } from '@web/testing/modules/post-list/fixtures';
 import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { CardCarousel } from './card-carousel';
-import { cardCarouselVariants } from './card-carousel-variants';
 
 vi.mock('@web/components/shared/smart-link', () => ({
   SmartLink: SmartLinkMock,
@@ -69,13 +68,6 @@ describe(`<${CardCarousel.name}/>`, () => {
     items.forEach((item, index) => {
       expect(getItemKey?.({ item, index })).toBe(item.id);
     });
-  });
-
-  it('passes the slide column-width classes through slideClassName', () => {
-    setup();
-
-    const s = cardCarouselVariants();
-    expect(getCarouselProps().slideClassName).toBe(s.slide());
   });
 
   it('passes tone through to Carousel unchanged', () => {
