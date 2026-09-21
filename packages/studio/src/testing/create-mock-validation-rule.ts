@@ -76,13 +76,6 @@ const asValidationFn = (
   return source.validation as (rule: never) => unknown;
 };
 
-/**
- * Exercises a field's or document's `validation` builder against a minimal
- * chainable mock `Rule` and records each `custom()` callback in registration
- * order, along with its severity — a validator defaults to `'error'` and
- * only becomes `'warning'` when `.warning()` is chained onto that same
- * `.custom()` call.
- */
 export const getRecordedValidators = <TFn>(
   source: TValidatedSource | undefined,
 ): TRecordedValidator<TFn>[] => {
@@ -95,10 +88,9 @@ export const getRecordedValidators = <TFn>(
 };
 
 /**
- * Same as `getRecordedValidators`, but returns whether `.required()`/
- * `.unique()` were chained and the numeric arguments passed to
- * `.min()`/`.max()` — for asserting behaviour against a schema's real rules
- * instead of a value copied out of the schema file.
+ * Same as `getRecordedValidators`, but returns the recorded bounds — for
+ * asserting behaviour against a schema's real rules instead of a value
+ * copied out of the schema file.
  */
 export const getRecordedBounds = (
   source: TValidatedSource | undefined,

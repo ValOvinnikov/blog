@@ -1,7 +1,8 @@
-import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config/constants';
+import { BRAND_VARIANT } from '@blog/config/constants';
 import { blockTestimonialSchema } from '@blog/studio/schema-types/documents/blocks/testimonial/testimonial';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { cardAlignmentField } from '@blog/studio/schema-types/fields/card-alignment-field/card-alignment-field';
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { displayModeField } from '@blog/studio/schema-types/fields/display-mode-field/display-mode-field';
 import { showImagesField } from '@blog/studio/schema-types/fields/show-images-field/show-images-field';
@@ -9,7 +10,6 @@ import { titleField } from '@blog/studio/schema-types/fields/title-field/title-f
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
-import { toTitleCase } from '@blog/utils/primitives';
 import { MessageSquareQuote } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
@@ -60,19 +60,8 @@ export const testimonialSchema = defineType({
       description:
         'Horizontal alignment of the heading, supporting text and actions. Cards have their own alignment.',
     }),
-    defineField({
-      name: 'cardAlignment',
-      title: 'Card Alignment',
-      type: 'string',
+    cardAlignmentField({
       description: 'Aligns the quote and the person inside each card.',
-      options: {
-        layout: 'dropdown',
-        list: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER].map(
-          (value) => ({ title: toTitleCase(value), value }),
-        ),
-      },
-      initialValue: CONTENT_ALIGNMENT.LEFT,
-      validation: (rule) => rule.required(),
     }),
     layoutField,
   ],
