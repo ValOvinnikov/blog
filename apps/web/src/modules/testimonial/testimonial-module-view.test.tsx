@@ -31,7 +31,6 @@ const setup = customRender(TestimonialModuleView, {
   headingBlock: makeHeadingBlock({ heading: 'What our clients say' }),
   testimonials,
   ctaButtons: [],
-  showImages: true,
   displayMode: DISPLAY_MODE.GRID,
   contentAlignment: undefined,
   cardAlignment: CONTENT_ALIGNMENT.LEFT,
@@ -113,18 +112,6 @@ describe(`<${TestimonialModuleView.name}/>`, () => {
       testimonials: [
         makeTestimonialCardItem({ id: 'testimonial-1', name: 'Ada Lovelace' }),
       ],
-    });
-
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
-    expect(screen.getByText('AL')).toBeInTheDocument();
-  });
-
-  it('shows initials, never hides the avatar, when Show Photos is off', () => {
-    setup({
-      testimonials: [
-        makeTestimonialCardItem({ id: 'testimonial-1', name: 'Ada Lovelace' }),
-      ],
-      showImages: false,
     });
 
     expect(screen.queryByRole('img')).not.toBeInTheDocument();

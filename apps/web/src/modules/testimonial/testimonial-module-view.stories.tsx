@@ -63,7 +63,6 @@ const meta = {
     headingBlock: makeHeadingBlock({ heading: 'What our clients say' }),
     testimonials,
     ctaButtons: [],
-    showImages: true,
     displayMode: DISPLAY_MODE.GRID,
     contentAlignment: undefined,
     cardAlignment: CONTENT_ALIGNMENT.LEFT,

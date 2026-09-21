@@ -12,7 +12,7 @@ import { testimonialModuleViewVariants } from './testimonial-module-view-variant
 
 export interface ITestimonialModuleViewProps extends Omit<
   TTestimonialModule,
-  'testimonials'
+  'testimonials' | 'showImages'
 > {
   testimonials: TTestimonialCardItem[];
   titleId: string;
