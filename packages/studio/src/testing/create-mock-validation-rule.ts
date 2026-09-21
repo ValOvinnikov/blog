@@ -87,11 +87,6 @@ export const getRecordedValidators = <TFn>(
   return recorded;
 };
 
-/**
- * Same as `getRecordedValidators`, but returns the recorded bounds — for
- * asserting behaviour against a schema's real rules instead of a value
- * copied out of the schema file.
- */
 export const getRecordedBounds = (
   source: TValidatedSource | undefined,
 ): TRecordedBounds => {
