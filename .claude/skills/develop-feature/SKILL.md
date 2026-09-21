@@ -34,13 +34,19 @@ each requiring explicit user approval. Never bundle them. See
   `board-keeper` dispatch). Working an _existing_ issue that already spans
   layers doesn't retroactively need this — it only applies when you're the one
   filing the ticket.
-- **Prefer one PR per layer** (`config → studio → service → ui → web` when config
-  changes are involved, otherwise `studio → service → ui → web`; dependency
-  order) so each review stays small — **but split only when each layer merges
-  to `main` green on its own** (typically additive changes). Keep a single PR
-  when a partial merge would break the build: e.g. renaming a shared `_type`
-  or generated type that downstream consumes reds `type-check` until every
-  layer lands. Split only if possible.
+- **One PR per layer, shipped one at a time** (`config → studio → service →
+ui → web` when config changes are involved, otherwise `studio → service →
+ui → web`; dependency order) so each review stays small — **and each
+  layer's PR is approved and merged before the next layer's work starts.**
+  Steps 1–8 below run to completion for one layer, then start over for the
+  next, on a branch cut from the `main` that now contains the previous layer.
+  Only two things change that: the user says to stack (then `gh stack`, per
+  `open-pull-request`), or the layers cannot be split at all — **split only
+  when each layer merges to `main` green on its own** (typically additive
+  changes). Keep a single PR when a partial merge would break the build: e.g.
+  renaming a shared `_type` or generated type that downstream consumes reds
+  `type-check` until every layer lands. The orchestrator never stacks on its
+  own initiative. Full rule: `CLAUDE.md` → "One layer at a time".
 
 ## 1. Investigate + set status (main session)
 
@@ -115,6 +121,14 @@ each requiring explicit user approval. Never bundle them. See
 Hand each layer's work to its agent (use the Agent tool, or state which agent
 owns it). Do them in dependency order; later steps depend on earlier output.
 **Skip any agent whose layer has no changes** — don't invoke it at all.
+
+**One layer per pass.** Under the default split (§0) this step dispatches
+only the layer whose PR is next — the following layer's agent is not
+dispatched until that PR has merged, and then it starts from a fresh branch
+off `main`. Dispatching two layers' agents back to back is only right inside
+a single PR: a supporting package (`config`, `utils`, `db`, …) riding along
+with the main workspace that needs it, or layers combined because the split
+would red `main`. The commit-landing discipline below is for those cases.
 
 **A bugfix is TDD, done by the layer agent itself:** it writes the failing
 regression test before the fix and makes it pass, per

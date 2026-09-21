@@ -16,17 +16,23 @@ this skill says how to _ship it for review_.
 Split a multi-layer feature into separate PRs per layer (`config → studio →
 service → ui → web` when config changes are involved, otherwise `studio →
 service → ui → web`; dependency order) — smaller diffs review faster.
-**Split only when each layer's PR merges to `main` green on its own**
-(typically additive changes).
+**Ship them one at a time: each layer's PR runs the full gate sequence
+below, including the merge, before the next layer's work starts**, on a
+branch cut from the `main` that now contains it. Nothing below the current
+layer is open, nothing above it exists yet. **Split only when each layer's
+PR merges to `main` green on its own** (typically additive changes).
 Keep it a single PR when a partial merge breaks the build — e.g. renaming a
 shared `_type`/generated type that downstream references reds `type-check` until
-all layers land. One concern per PR still holds either way.
+all layers land. One concern per PR still holds either way. Rule of record:
+`CLAUDE.md` → "One layer at a time — merged before the next starts".
 
-### Stacked PRs — use `gh stack`
+### Stacked PRs — only on the user's say-so, then `gh stack`
 
-The `github/gh-stack` extension is installed (`gh extension list` →
-`gh stack`). Use it rather than hand-rolling bases with
-`gh pr create --base <branch>`:
+A stack is the user's call, never the orchestrator's: the default above is
+sequential, and "the next layer is ready" or "the wait is long" does not
+change it. When the user says to stack, the `github/gh-stack` extension is
+installed (`gh extension list` → `gh stack`). Use it rather than hand-rolling
+bases with `gh pr create --base <branch>`:
 
 ```bash
 gh stack init                 # start a stack targeting main

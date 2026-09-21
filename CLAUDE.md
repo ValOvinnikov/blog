@@ -140,6 +140,46 @@ not reasons to combine.
 This strengthens "Prefer per-layer PRs" below from a preference into a
 requirement; the green-alone test is the same test.
 
+### One layer at a time — merged before the next starts
+
+**The chunks ship in dependency order, and each one is approved and merged
+before work on the next one begins.** For a feature that touches every main
+workspace that is `studio → service → ui → web` (`config` first when it
+changes, `db → auth → platform-app` for the platform side); a feature that
+skips a layer skips that step. The next layer's branch is cut from a `main`
+that already contains the previous layer, so its agent builds against the
+merged shape rather than a local guess at it — and every review is of one
+layer, against `main`, with nothing open above or below it.
+
+The sequence is: dispatch the current layer's agent → verify → review →
+commit → push and PR (each gate approved separately) → wait for the merge →
+only then dispatch the next layer. "Waiting for the merge" is idle time on
+this feature, not a cue to start the next layer on a branch off the open PR;
+that is a stack, and a stack is not the default.
+
+**Two exceptions, and only two:**
+
+- **The user says to stack.** Then, and only then, the next layer's branch
+  is cut from the previous layer's branch and the chain ships through
+  `gh stack` (mechanics in "Stacked PRs" below and in `open-pull-request`).
+  The orchestrator never chooses to stack on its own — not to save a wait,
+  not because the layers are small, not because the next one is "obvious".
+- **A hard dependency that prevents the split.** When the green-alone test
+  above fails — the earlier layer cannot merge to `main` without the later
+  one, as with a rename every consumer reads — the affected layers are one
+  PR, per "Combine chunks only when splitting them would break". That is a
+  combination, not a stack: still one branch, one review, one merge.
+
+Neither exception is the orchestrator's to invoke silently: the stacking one
+needs the user's instruction, and the hard-dependency one is stated in the
+split put to the user (next section) before the first dispatch.
+
+Adopted 2026-09-21. Until then a multi-layer feature could have every layer's
+agent dispatched back to back, its commits chained locally, and its PRs
+opened as a stack or a burst — which put three or four reviews in flight at
+once and let a later layer bake in a shape the earlier layer's review then
+changed.
+
 ### Split by surface too, not only by workspace
 
 Workspace is one axis; **consumers are the other**. When a feature introduces
@@ -172,6 +212,9 @@ state plainly:
 
 - **Parts touched** — every workspace, not just the obvious one.
 - **Dependencies** — what must land before what, what can run in parallel.
+  Within one feature the layers never run in parallel: each is merged before
+  the next starts ("One layer at a time" above). Parallel here means
+  independent tickets, not the layers of one ticket.
 - **Constraints** — migrations, human gates, anything that cannot be split.
 - **Doubts** — including scope you suspect but have not yet confirmed.
 
@@ -802,7 +845,11 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   Split a multi-layer feature into separate PRs per
   layer (`config → studio → service → ui → web` when config changes are involved,
   otherwise `studio → service → ui → web`; dependency order) so each review stays
-  small and focused. **Split only when each layer's PR merges to `main` green
+  small and focused, **and ship them one at a time: a layer's PR is merged
+  before the next layer's work starts** ("One layer at a time" above). The
+  next layer branches from the `main` that contains the previous one. Never
+  branch it from the open PR — that is a stack, which only the user calls
+  for. **Split only when each layer's PR merges to `main` green
   on its own** (typically additive changes). Keep it a single PR when a partial
   merge would break the build — e.g. renaming a shared `_type` or generated
   type that downstream consumes reds `type-check` until every layer lands.
@@ -813,7 +860,11 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   wording rule and the board-Status gotcha if an issue is auto-closed
   prematurely.
 
-- **Stacked PRs — use `gh stack`.** The `github/gh-stack`
+- **Stacked PRs — only when the user asks, and then use `gh stack`.** A
+  stack is not the default way to ship a multi-layer feature; the default is
+  one layer merged before the next starts ("One layer at a time" above). The
+  orchestrator never opens a stack on its own initiative — it stacks when the
+  user says to. When they do, the `github/gh-stack`
   extension is installed; use it (`init` / `add` / `submit` / `sync`) rather
   than hand-rolling bases with `gh pr create --base`. `sync` restacks
   automatically when a lower PR merges, which is the step most easily
@@ -966,7 +1017,10 @@ decided, because it is by definition the lane of tickets that depend on another
 — but dependency alone does not make a chain stackable. The test is the one in
 "Stacked PRs" below: the **bottom** PR targets `main` and must be green there
 on its own, so a chain whose first link cannot compile alone is sequential, and
-marking it `⛓` sends the whole stack into a permanent `BLOCKED` state.
+marking it `⛓` sends the whole stack into a permanent `BLOCKED` state. The
+marker is an offer to the user, not a plan: an unmarked or marked 🔵 row alike
+ships sequentially, merged before the next, unless the user says to stack it
+("One layer at a time" above).
 
 That is why 2988 above is unmarked — a repo-wide rename reds `type-check` until
 every consumer lands, so it is one PR that waits, not a stack bottom. A `⛓`

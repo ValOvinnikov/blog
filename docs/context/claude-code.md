@@ -769,7 +769,10 @@ file` are all denied alike) — an earlier version only handled the
   stacked pull requests, and is the supported way to create them: `init`,
   `add`, `submit`, `sync`, `view`. Prefer it over hand-rolling bases with
   `gh pr create --base <branch>`, mainly for `sync`, which restacks the
-  branches above a PR once it merges. Stacking makes a per-layer split viable
+  branches above a PR once it merges. A stack is opened only when the user
+  asks for one — the default for a multi-layer feature is one layer's PR
+  merged before the next layer starts (`CLAUDE.md` → "One layer at a time",
+  adopted 2026-09-21). Stacking makes a per-layer split viable
   for the PRs _above_ the bottom one, since those target their predecessor
   rather than `main`. The bottom PR still targets `main` and still inherits
   its ruleset, so it must be green alone; if the first layer cannot compile
