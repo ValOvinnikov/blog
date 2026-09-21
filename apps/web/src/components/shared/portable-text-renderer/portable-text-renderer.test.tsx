@@ -7,6 +7,7 @@ import {
 } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import {
+  proseTextBlock,
   richTextBlock,
   richTextSpan,
   type TRichTextBlock,
@@ -415,7 +416,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
         _type: 'aside',
         _key: 'aside-1',
         kind: ASIDE_KIND.WHY_NOT,
-        body: [richTextBlock('normal', [richTextSpan('Because Y.')])],
+        body: [proseTextBlock([richTextSpan('Because Y.')])],
       },
     ];
 
@@ -432,7 +433,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
         _type: 'aside',
         _key: 'aside-1',
         kind: ASIDE_KIND.DIGRESSION,
-        body: [richTextBlock('normal', [richTextSpan('A tangent.')])],
+        body: [proseTextBlock([richTextSpan('A tangent.')])],
       },
     ];
 
@@ -446,7 +447,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
       {
         _type: 'aside',
         _key: 'aside-1',
-        body: [richTextBlock('normal', [richTextSpan('Some context.')])],
+        body: [proseTextBlock([richTextSpan('Some context.')])],
       },
     ];
 
@@ -462,8 +463,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
         _key: 'aside-1',
         kind: ASIDE_KIND.CONTEXT,
         body: [
-          richTextBlock(
-            'normal',
+          proseTextBlock(
             [richTextSpan('a nested link', ['link-1'])],
             [
               {
@@ -490,8 +490,7 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
         _key: 'aside-1',
         kind: ASIDE_KIND.CONTEXT,
         body: [
-          richTextBlock(
-            'normal',
+          proseTextBlock(
             [richTextSpan('incomplete nested link', ['link-1'])],
             [{ _type: 'linkRef', _key: 'link-1', link: undefined }],
           ),

@@ -4,20 +4,19 @@ import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
-  richTextBlock,
+  proseTextBlock,
   richTextSpan,
 } from '@web/testing/shared/portable-text-renderer/fixtures';
 
 import { HeroProfileModuleView } from './hero-profile-module-view';
 
 const bioDemo = [
-  richTextBlock('normal', [
+  proseTextBlock([
     richTextSpan(
       'Jane has spent the last decade designing developer tools, with a focus on making complex systems feel approachable.',
     ),
   ]),
-  richTextBlock(
-    'normal',
+  proseTextBlock(
     [
       richTextSpan('Outside of work, she writes about design systems on '),
       richTextSpan('her blog', ['link-1']),

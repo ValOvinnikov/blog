@@ -4,14 +4,14 @@ import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
-  richTextBlock,
+  proseTextBlock,
   richTextSpan,
 } from '@web/testing/shared/portable-text-renderer/fixtures';
 
 import { HeroProfileModuleView } from './hero-profile-module-view';
 
 const bio = [
-  richTextBlock('normal', [richTextSpan('Jane writes about design systems.')]),
+  proseTextBlock([richTextSpan('Jane writes about design systems.')]),
 ];
 
 const sanityImage = makeSanityImage();
