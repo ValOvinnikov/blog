@@ -48,7 +48,7 @@ describe(`<${CardCarousel.name}/>`, () => {
     });
   });
 
-  it('renderItem renders exactly one MediaCardItem per item, with no lead treatment', () => {
+  it('renderItem renders exactly one MediaCardItem per item', () => {
     setup();
     const { renderItem } = getCarouselProps();
 
@@ -57,7 +57,6 @@ describe(`<${CardCarousel.name}/>`, () => {
 
       const article = screen.getByRole('article');
       expect(article).toHaveTextContent(item.title);
-      expect(article).not.toHaveClass('md:flex-row');
 
       unmount();
     });

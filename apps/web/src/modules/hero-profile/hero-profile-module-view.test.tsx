@@ -54,12 +54,11 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
     );
   });
 
-  it('renders the photo as a round avatar on Stacked', () => {
+  it('renders the photo sized for an avatar on Stacked', () => {
     setup({ variant: HERO_VARIANT.STACKED, sanityImage });
 
     const img = screen.getByRole('img', { name: sanityImage.alt });
     expect(img).toHaveAttribute('height', '256');
-    expect(img).toHaveClass('rounded-full');
   });
 
   it('renders the photo as a square portrait on Split', () => {

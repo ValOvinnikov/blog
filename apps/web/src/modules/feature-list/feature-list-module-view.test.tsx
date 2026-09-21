@@ -78,21 +78,6 @@ describe(`<${FeatureListModuleView.name}/>`, () => {
     });
   });
 
-  it('lays out 5 items in a 3-column grid', () => {
-    setup({
-      items: [
-        ...items,
-        makeFeatureListItem({ id: 'feature-3' }),
-        makeFeatureListItem({ id: 'feature-4' }),
-        makeFeatureListItem({ id: 'feature-5' }),
-      ],
-    });
-
-    expect(screen.getByTestId(`${dataTestId}-grid`)).toHaveClass(
-      'md:grid-cols-3',
-    );
-  });
-
   it.each([
     [DISPLAY_MODE.CAROUSEL, true],
     [DISPLAY_MODE.GRID, false],

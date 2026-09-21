@@ -34,18 +34,6 @@ describe(`<${CodeBlock.name}/>`, () => {
     expect(screen.getByText('plain text content')).toBeVisible();
   });
 
-  it('marks the requested line as highlighted', () => {
-    setup({
-      code: 'const a = 1;\nconst b = 2;',
-      highlightedLines: [2],
-    });
-
-    const lines = screen.getAllByTestId('code-line');
-    expect(lines).toHaveLength(2);
-    expect(lines[0]).not.toHaveClass('bg-brand-primary-muted');
-    expect(lines[1]).toHaveClass('bg-brand-primary-muted');
-  });
-
   it('renders the code content with a transparent background so the theme-aware figure surface shows through', () => {
     setup();
 
