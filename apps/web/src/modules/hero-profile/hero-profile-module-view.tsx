@@ -1,4 +1,4 @@
-import { HERO_VARIANT, SIZE } from '@blog/config';
+import { HERO_VARIANT } from '@blog/config';
 import type { THeroProfileModule } from '@blog/service';
 import { Avatar } from '@blog/ui/atoms/avatar';
 import { Hero } from '@blog/ui/organisms/hero';
@@ -9,7 +9,7 @@ import { HeroModuleShell } from '@web/modules/hero-shared';
 import {
   heroProfileAvatarFallbackVariants,
   heroProfileAvatarVariants,
-  heroProfileMediaFallbackVariants,
+  heroProfilePortraitVariants,
 } from './hero-profile-module-view-variants';
 
 export interface IHeroProfileModuleViewProps extends THeroProfileModule {
@@ -49,6 +49,7 @@ export const HeroProfileModuleView = ({
       layout={layout}
       dataTestId={`hero-profile-module-${id}`}
       ctaButtons={ctaButtons}
+      ctaClassName="mt-0"
       sanityImage={undefined}
     >
       {variant === HERO_VARIANT.STACKED && (
@@ -70,44 +71,29 @@ export const HeroProfileModuleView = ({
         </Hero.Avatar>
       )}
 
-      {variant === HERO_VARIANT.SPLIT && (
-        <Hero.Media ratio="square">
-          {sanityImage ? (
-            <SanityImage
-              image={sanityImage}
-              width={900}
-              height={900}
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              className="size-full object-cover"
-            />
-          ) : (
-            <div className={heroProfileMediaFallbackVariants()}>
-              <Avatar alt={avatarName} name={avatarName} size={SIZE.XXL} />
-            </div>
-          )}
+      {variant === HERO_VARIANT.SPLIT && sanityImage && (
+        <Hero.Media ratio="square" className={heroProfilePortraitVariants()}>
+          <SanityImage
+            image={sanityImage}
+            width={900}
+            height={900}
+            sizes="(min-width: 1024px) 50vw, 100vw"
+            className="size-full object-cover"
+          />
         </Hero.Media>
       )}
 
-      {isBanner && (
+      {isBanner && sanityImage && (
         <Hero.Media>
-          {sanityImage ? (
-            <SanityImage
-              image={sanityImage}
-              width={1200}
-              height={675}
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              priority={true}
-              className="size-full object-cover"
-              alt=""
-            />
-          ) : (
-            <div
-              aria-hidden="true"
-              className={heroProfileMediaFallbackVariants()}
-            >
-              <Avatar alt={avatarName} name={avatarName} size={SIZE.XXL} />
-            </div>
-          )}
+          <SanityImage
+            image={sanityImage}
+            width={1200}
+            height={675}
+            sizes="(min-width: 1024px) 50vw, 100vw"
+            priority={true}
+            className="size-full object-cover"
+            alt=""
+          />
         </Hero.Media>
       )}
 
