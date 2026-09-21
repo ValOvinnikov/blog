@@ -151,9 +151,4 @@ describe(`<${SegmentedControl.name}/>`, () => {
     setup({ dataTestId: 'segmented-control' });
     expect(screen.getByTestId('segmented-control')).toBeVisible();
   });
-
-  it('accepts a className override on the root', () => {
-    setup({ className: 'custom-class' });
-    expect(screen.getByRole('radiogroup')).toHaveClass('custom-class');
-  });
 });

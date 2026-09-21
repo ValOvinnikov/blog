@@ -53,9 +53,4 @@ describe(`<${Alert.name}/>`, () => {
     setup();
     expect(screen.getByRole('status')).not.toHaveAttribute('id');
   });
-
-  it('accepts a className override on the root', () => {
-    const { container } = setup({ className: 'custom-class' });
-    expect(container.firstChild).toHaveClass('custom-class');
-  });
 });

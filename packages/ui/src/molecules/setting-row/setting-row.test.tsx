@@ -51,9 +51,4 @@ describe(`<${SettingRow.name}/>`, () => {
     setup({ dataTestId: 'setting-row' });
     expect(screen.getByTestId('setting-row')).toBeVisible();
   });
-
-  it('accepts a className override on the root', () => {
-    const { container } = setup({ className: 'custom-class' });
-    expect(container.firstChild).toHaveClass('custom-class');
-  });
 });

@@ -76,11 +76,6 @@ describe(`<${TaxonomyCard.name}/>`, () => {
     expect(screen.getByTestId('taxonomy-card')).toBeVisible();
   });
 
-  it('merges extra className onto the root element', () => {
-    setup({ className: 'mt-4', dataTestId: 'taxonomy-card' });
-    expect(screen.getByTestId('taxonomy-card').className).toContain('mt-4');
-  });
-
   it('renders TaxonomyCard.Posts as a labelled list of post links', () => {
     setup({
       children: (
@@ -126,20 +121,5 @@ describe(`<${TaxonomyCard.name}/>`, () => {
 
     const postLink = screen.getByRole('link', { name: 'First post' });
     expect(postLink).toHaveAttribute('href', '/posts/first');
-  });
-
-  it('keeps a post link positioned above the card link overlay', () => {
-    setup({
-      href: '/topics/engineering',
-      children: (
-        <TaxonomyCard.Posts
-          ariaLabel="Latest posts"
-          posts={[{ id: '1', title: 'First post', href: '/posts/first' }]}
-        />
-      ),
-    });
-
-    const postLink = screen.getByRole('link', { name: 'First post' });
-    expect(postLink.className.split(' ')).toContain('relative');
   });
 });

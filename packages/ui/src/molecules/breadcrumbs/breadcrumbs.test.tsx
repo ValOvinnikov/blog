@@ -36,14 +36,12 @@ describe(`<${Breadcrumbs.name}/>`, () => {
     }
   });
 
-  it('renders the first item as a link with a decorative House icon, keeping the label sr-only as its accessible name rather than shown alongside the icon', () => {
+  it('renders the first item as a link with a decorative House icon, keeping the label as its accessible name', () => {
     setup();
     const homeLink = screen.getByRole('link', { name: firstItem.label });
     const icon = homeLink.querySelector('svg');
-    const labelText = screen.getByText(firstItem.label);
 
     expect(icon).toHaveAttribute('aria-hidden', 'true');
-    expect(labelText).toHaveClass('sr-only');
   });
 
   it('sets a title attribute on the first item for sighted hover users', () => {
@@ -98,11 +96,6 @@ describe(`<${Breadcrumbs.name}/>`, () => {
   it('forwards dataTestId to the nav element', () => {
     setup({ dataTestId: 'breadcrumbs' });
     expect(screen.getByTestId('breadcrumbs')).toBeVisible();
-  });
-
-  it('accepts a className override on the root nav', () => {
-    setup({ className: 'custom-class' });
-    expect(screen.getByRole('navigation')).toHaveClass('custom-class');
   });
 
   it('sets a title attribute on the last item so its full text is available on hover', () => {

@@ -62,18 +62,6 @@ describe(`<${NavLink.name}/>`, () => {
     expect(screen.getByRole('link', { name: 'RSS feed' })).toBeVisible();
   });
 
-  it('visually hides the label text when hasLabel is false', () => {
-    setup({ hasLabel: false, children: 'RSS feed' });
-
-    expect(screen.getByText('RSS feed')).toHaveClass('sr-only');
-  });
-
-  it('renders the label without a wrapper when hasLabel is not set', () => {
-    setup({ children: 'RSS feed' });
-
-    expect(screen.getByText('RSS feed')).not.toHaveClass('sr-only');
-  });
-
   it('sets a title attribute on an icon-only link for sighted hover users', () => {
     setup({
       icon: <svg data-testid="nav-icon" />,

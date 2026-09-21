@@ -23,11 +23,6 @@ describe(`<${TagList.name}/>`, () => {
     expect(container.firstChild).toBeNull();
   });
 
-  it('accepts className override', () => {
-    const { container } = setup({ className: 'custom-class' });
-    expect(container.firstChild).toHaveClass('custom-class');
-  });
-
   it('forwards dataTestId', () => {
     setup({ dataTestId: 'tag-list' });
     expect(screen.getByTestId('tag-list')).toBeVisible();

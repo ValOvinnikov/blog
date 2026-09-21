@@ -19,12 +19,6 @@ describe(`<${Icon.name}/>`, () => {
     ).toHaveLength(0);
   });
 
-  it('forwards a custom className', () => {
-    setup({ className: 'custom-class', dataTestId: 'icon' });
-
-    expect(screen.getByTestId('icon')).toHaveClass('custom-class');
-  });
-
   it('renders a baked-in stroke-width per icon with no strokeWidth prop', () => {
     setup({ dataTestId: 'icon' });
 

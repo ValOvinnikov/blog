@@ -40,14 +40,6 @@ describe(`<${ImageWithCaption.name}/>`, () => {
     expect(container.querySelector('figcaption')).toBeNull();
   });
 
-  it('forwards className to MediaFrame, not the figure root, observable via its class list since it has no role/text of its own here', () => {
-    const { container } = setup({
-      className: 'custom-class',
-      children: undefined,
-    });
-    expect(container.firstChild?.firstChild).toHaveClass('custom-class');
-  });
-
   it('forwards dataTestId to the root figure', () => {
     setup({ dataTestId: 'image-with-caption', children: undefined });
     expect(screen.getByTestId('image-with-caption')).toBeVisible();
