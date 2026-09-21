@@ -411,8 +411,9 @@ cannot see, not what they just chose. The photo is placed by variant — a
 round `Hero.Avatar` on Stacked, a square `Hero.Media` on Split, the
 background on Banner — its actions render in `Hero.Cta`, and the author's
 profiles in `Hero.Social`. Those four slots are the `Hero` organism's whole
-surface. `Hero.Social` imposes no semantics of its own, so the view
-supplies its own labelled list around the shared `SocialLinks`.
+surface. `Hero.Social` imposes no semantics of its own — it is a container,
+and the shared `SocialLinks` renders the labelled list inside it (its
+`outlined` variant there, plain in the footer).
 
 `module_heroStatement`'s own content fields are `title` (Studio's list
 label, never rendered), an optional `eyebrow` (max 40), a **required**
