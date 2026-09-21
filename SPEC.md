@@ -248,7 +248,7 @@ no faked defaults), the module-registry mechanism, and the editorial write path:
 Source of truth: `packages/studio/src/schema-types/` — documents (`post`, `author`,
 `topic`, `tag`, `link`, page documents, singletons), standalone `module_*`
 page-builder documents, `block_*` documents those modules compose
-(`block_feature`), and shared objects (`linkRef`, `ctaButton`,
+(`block_feature`, `block_testimonial`), and shared objects (`linkRef`, `ctaButton`,
 `socialProfile`, `imageWithAlt`, `bodyImage`,
 `seo`, `aside`, `postTakeaways`, …). Naming convention `{group}_{name}` is being applied
 incrementally (#251).
@@ -301,7 +301,7 @@ point at. Because the destination is no longer knowably a landing page,
 Every `module_*` document also carries a **required** `brandVariant` field
 (stored values from `@blog/config`'s `BRAND_VARIANT` const —
 `PRIMARY`/`SECONDARY` for `module_content`/`module_newsletter`/
-`module_postLatest`/`module_postFeatured`/`module_taxonomyList`; `module_hero`, `module_cta` and
+`module_postLatest`/`module_postFeatured`/`module_taxonomyList`/`module_testimonial`; `module_hero`, `module_cta` and
 `module_postList` additionally allow `BRAND_PRIMARY` — on `module_cta` this
 field means the card's own fill tone (Banner/Split/Callout below) rather
 than the full-bleed band tone every other module uses it for, which that
@@ -311,7 +311,7 @@ object (`spacingTop`/`spacingBottom`, `containerWidth` (not on
 `dividerBottom` — stored values from `SPACING_SCALE`/`CONTAINER_WIDTH`
 consts; there is no `align` field on `layout` — alignment is its own
 module-level field, below).
-`module_cta`/`module_postList`/`module_postLatest`/`module_postFeatured`/`module_postRelated`/`module_taxonomyList`/`module_newsletter`
+`module_cta`/`module_postList`/`module_postLatest`/`module_postFeatured`/`module_postRelated`/`module_taxonomyList`/`module_newsletter`/`module_testimonial`
 additionally carry a `headingBlock` object (`heading` and `supportingText`
 only). There is **one registered `headingBlock` type**, and requiredness is
 enforced at **two levels**, because Sanity never descends into an absent
@@ -714,6 +714,71 @@ validation never applies to a document written outside Studio — so
 whenever the authored array is absent, empty, or below two, matching how
 `postTakeaways` degrades below its own `min(3)`. The view returns `null` on an
 empty array, so the page loses the section instead of the render.
+
+**A testimonial is a document too, for the same reason a feature card is.**
+`block_testimonial` carries a `quote` (required, warning past 280 characters),
+a `name` (required), an optional `role`, an optional `photo` (`imageWithAlt`)
+and an optional `link` reference. A quote is written once and shown on the
+home page and any landing page, and a published module's reference keeps it
+from being deleted. The Studio groups it under **Blocks → Testimonials**,
+beside Cards and Links.
+
+**`role` is one line, not `role` plus `company`.** It renders as a single line
+under the name, so the editor owns the separator — "Head of Design, Acme"
+reads differently from "Head of Design at Acme", and a schema that splits the
+two has to pick one. A company's logo belongs to the logo wall, not here.
+
+`module_testimonial` ("Testimonials") references those quotes through a
+`testimonials` array, `unique()` and validated `min(1).max(8)`. One is the
+floor because a single quote is the most common landing-page treatment rather
+than a degenerate case; eight is the ceiling for the same balance reason the
+feature list caps there. It carries the usual module furniture — `title`,
+`brandVariant` (the two-value `PRIMARY`/`SECONDARY` list, so Brand Primary is
+a `Section` tint rather than the CTA's solid band), `headingBlock`, `layout`,
+`ctaButtons` — plus `displayMode`, `showImages`, `contentAlignment` from
+`alignmentFields([])`, and a `cardAlignment` of its own. It is allowed in
+`page_home.modules[]` and `page_landing.modules[]` only.
+
+**One quote is a spotlight, and that is derived rather than authored.** A
+count of one renders `QuoteCard isSpotlight` — no surface, no accent rule,
+larger type, centred, with the heading and actions centred alongside it — and
+`displayMode` and `cardAlignment` are ignored, which the field descriptions
+say. There is no third display mode and no authored switch, because the count
+already answers the question.
+
+**Columns are derived from the count and cap at three** — 2→2, 3→3, 4→2, 5→3,
+6→3, 7→3, 8→2. A quote needs roughly forty characters a line to stay
+readable, which four columns cannot give at any usable measure, so this rule
+stops where the feature list's goes on to four.
+`toTestimonialGridColumns` in `apps/web` is the whole rule; the carousel
+ignores it.
+
+**There is no image-shape field and no columns field.** The photo is the
+person, sized to the byline and always a round portrait, so the feature list's
+`imageShape` question never arises. `showImages` ("Show Photos") stays, and
+turning it off hides the photo _and_ the initials — the fallback exists for a
+person without a photo while photos are on, not as a second thing to switch
+off. `contentAlignment` moves the heading, supporting text and actions
+together; `cardAlignment` moves the quote and the person inside each card.
+
+**`QuoteCard` is a new `@blog/ui` molecule rather than a reshaped
+`MediaCard`.** It renders `<figure>` › `<blockquote>` › `<figcaption>`, with a
+decorative opening quote mark, an `Avatar` that falls back to initials, the
+name, and the role. `MediaCard` is an `<article>` whose slots assume a title,
+and a testimonial has none; forcing the quote through it would cost the
+semantics and gain nothing. `QuoteCard` does borrow `MediaCard`'s surface,
+accent rule and `align` variant so the two sit together on a page, and the
+name links through the polymorphic `linkAs` — a linked testimonial links the
+name, not the card, because the target is the person or their case study.
+
+**`QuoteCard` takes a required `tone`, which is a correctness prop rather
+than a cosmetic one.** `isSpotlight` sets `bg-transparent`, so the card
+disclaims its own background and the focus ring's `ring-offset-*` has to
+match whichever `Section` band the consumer composed it onto. Banding here is
+static utility classes, not remapped custom properties, so a fixed offset is
+correct on exactly one of the three bands. Making `tone` required — as
+`CtaModule` already does, and unlike `Hero`'s optional one — turns a forgotten
+band into a type error instead of a mismatched halo nobody notices.
 
 `service.modules.<type>.v1` projects `brandVariant` as a required
 `TBrandVariantOf<...>` (narrowed per module to exactly the options its
