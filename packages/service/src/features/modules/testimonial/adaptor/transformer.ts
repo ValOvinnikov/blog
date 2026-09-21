@@ -27,8 +27,7 @@ function toTestimonialItem(raw: TRawTestimonialItem): TTestimonialItem {
   };
 }
 
-// Mirrors the schema's own `min(1)` testimonials rule — an absent array
-// degrades to an empty list rather than failing the whole module.
+// Schema `min(1)` isn't enforced on documents written outside Studio, so an absent array degrades to empty rather than throwing.
 function toTestimonialItems(
   raw: TRawTestimonialModule['testimonials'],
 ): TTestimonialItem[] {
