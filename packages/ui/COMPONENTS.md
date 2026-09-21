@@ -2,7 +2,7 @@
 
 # @blog/ui component index
 
-_54 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
+_55 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
 
 ## Atoms
 
@@ -234,6 +234,12 @@ Props: author: { name: string; imageUrl?: string; href?: string; } · publishedA
 Top-level `<nav>` landmark composing `NavLink` items with an optional trailing `actions` slot (e.g. a theme toggle or menu button).
 Props: links: INavItem[] · actions?: ReactNode · ariaLabel?: string · linkAs?: TAnchorElementType · mobileToggle?: TPrimaryNavigationMobileToggleProps _(extends IWithClassName, IWithDataTestId)_
 Variants: collapsible: (boolean)
+
+### QuoteCard — `molecules/quote-card/quote-card.tsx`
+
+A testimonial quote rendered as a figure, with the person's photo or initials and an optional link on their name.
+Props: quote: string · name: string · role?: string · avatarSrc?: string · avatarAlt?: string · hasAvatar?: boolean · align?: TQuoteCardVariants['align'] · isSpotlight?: boolean · href?: string · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
+Variants: align: left|center · isSpotlight: (boolean)
 
 ### SettingRow — `molecules/setting-row/setting-row.tsx`
 
