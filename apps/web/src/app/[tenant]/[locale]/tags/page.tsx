@@ -1,6 +1,6 @@
 import type { ITenantLocalizedParams } from '@blog/config';
-import { TagsPage } from '@web/components/pages/tags-page';
-import { buildTagsMetadata } from '@web/metadata/tags-metadata';
+import { TagIndexPage } from '@web/components/pages/tag-index-page';
+import { buildTagIndexMetadata } from '@web/metadata/tag-index-metadata';
 import type { Metadata } from 'next';
 import { setRequestLocale } from 'next-intl/server';
 
@@ -13,12 +13,12 @@ export const revalidate = 21600;
 
 export async function generateMetadata({ params }: TProps): Promise<Metadata> {
   const { tenant } = await params;
-  return buildTagsMetadata(tenant);
+  return buildTagIndexMetadata(tenant);
 }
 
-export default async function TagsIndexPage({ params }: TProps) {
+export default async function TagIndexRoutePage({ params }: TProps) {
   const { locale, tenant } = await params;
   setRequestLocale(locale);
 
-  return <TagsPage locale={locale} tenant={tenant} />;
+  return <TagIndexPage locale={locale} tenant={tenant} />;
 }

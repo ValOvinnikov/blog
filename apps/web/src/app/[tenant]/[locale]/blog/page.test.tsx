@@ -2,13 +2,13 @@ import { CONTENT_ROUTE_REVALIDATE_SECONDS } from '@blog/config';
 
 import BlogIndexPage, { generateMetadata, revalidate } from './page';
 
-vi.mock('@web/metadata/blog-list-metadata', () => ({
-  buildBlogListMetadata: vi.fn().mockResolvedValue({ title: 'Blog' }),
+vi.mock('@web/metadata/post-index-metadata', () => ({
+  buildPostIndexMetadata: vi.fn().mockResolvedValue({ title: 'Blog' }),
 }));
 
-vi.mock('@web/components/pages/blog-list-page', () => ({
-  BlogListPage: ({ page }: { page: number }) => (
-    <div data-testid="blog-list-page">{page}</div>
+vi.mock('@web/components/pages/post-index-page', () => ({
+  PostIndexPage: ({ page }: { page: number }) => (
+    <div data-testid="post-index-page">{page}</div>
   ),
 }));
 
@@ -18,7 +18,7 @@ describe('BlogIndexPage', () => {
   });
 
   describe('generateMetadata', () => {
-    it('delegates to buildBlogListMetadata for page 1', async () => {
+    it('delegates to buildPostIndexMetadata for page 1', async () => {
       const metadata = await generateMetadata({
         params: Promise.resolve({ tenant: 'tenant-1', locale: 'EN' }),
       });
@@ -27,7 +27,7 @@ describe('BlogIndexPage', () => {
     });
   });
 
-  it('renders BlogListPage for page 1', async () => {
+  it('renders PostIndexPage for page 1', async () => {
     const ui = await BlogIndexPage({
       params: Promise.resolve({ tenant: 'tenant-1', locale: 'EN' }),
     });

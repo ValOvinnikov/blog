@@ -1,0 +1,61 @@
+import type {
+  THeadingBlock,
+  TMaybeUndefined,
+  TPagePostIndexType,
+} from '@blog/config';
+import type { TModule } from '@blog/service';
+import { PageHeading } from '@web/components/shared/page-heading';
+import { CtaModule } from '@web/modules/cta/cta-module';
+import { HeroBlogModule } from '@web/modules/hero-blog/hero-blog-module';
+import {
+  renderHeroModule,
+  renderModules,
+  type TModuleComponent,
+  type TModuleComponentProps,
+} from '@web/modules/module-renderer';
+import { NewsletterModule } from '@web/modules/newsletter/newsletter-module';
+import { PostFeaturedModule } from '@web/modules/post-featured/post-featured-module';
+import { PostListModule } from '@web/modules/post-list/post-list-module';
+import { TaxonomyListModule } from '@web/modules/taxonomy-list/taxonomy-list-module';
+import type { ReactNode } from 'react';
+
+const POST_INDEX_MAP: Partial<Record<TPagePostIndexType, TModuleComponent>> = {
+  module_heroBlog: HeroBlogModule,
+  module_postList: PostListModule,
+  module_taxonomyList: TaxonomyListModule,
+  module_cta: CtaModule,
+  module_newsletter: NewsletterModule,
+  module_postFeatured: PostFeaturedModule,
+};
+
+export interface IPostIndexModuleRendererProps {
+  hero: TMaybeUndefined<TModule<TPagePostIndexType>>;
+  headingBlock: THeadingBlock;
+  modules: TModule<TPagePostIndexType>[];
+  locale: string;
+  tenant: string;
+  context?: TModuleComponentProps['context'];
+  children?: ReactNode;
+}
+
+export const PostIndexModuleRenderer = async ({
+  hero,
+  headingBlock,
+  modules,
+  locale,
+  tenant,
+  context,
+  children,
+}: IPostIndexModuleRendererProps): Promise<ReactNode> => {
+  const heroNode = hero
+    ? await renderHeroModule({ hero, map: POST_INDEX_MAP, locale, tenant })
+    : null;
+
+  return (
+    <>
+      {heroNode ?? <PageHeading headingBlock={headingBlock} />}
+      {children}
+      {renderModules({ modules, map: POST_INDEX_MAP, locale, tenant, context })}
+    </>
+  );
+};

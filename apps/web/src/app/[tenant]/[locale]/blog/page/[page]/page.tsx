@@ -1,7 +1,7 @@
 import { routes, type ITenantLocalizedParams } from '@blog/config';
-import { BlogListPage } from '@web/components/pages/blog-list-page';
+import { PostIndexPage } from '@web/components/pages/post-index-page';
 import { permanentRedirect } from '@web/i18n/navigation';
-import { buildBlogListMetadata } from '@web/metadata/blog-list-metadata';
+import { buildPostIndexMetadata } from '@web/metadata/post-index-metadata';
 import { parsePageParam } from '@web/utils/parse-page-param/parse-page-param';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -22,10 +22,10 @@ export async function generateMetadata({ params }: TProps): Promise<Metadata> {
   const { tenant, page: rawPage } = await params;
   const page = parsePageParam(rawPage);
   if (page === null || page < 2) return {};
-  return buildBlogListMetadata(page, tenant);
+  return buildPostIndexMetadata(page, tenant);
 }
 
-export default async function BlogListNumberedPage({ params }: TProps) {
+export default async function PostIndexNumberedPage({ params }: TProps) {
   const { locale, tenant, page: rawPage } = await params;
   setRequestLocale(locale);
 
@@ -41,5 +41,5 @@ export default async function BlogListNumberedPage({ params }: TProps) {
     permanentRedirect({ href: routes.blogIndex(1), locale });
   }
 
-  return <BlogListPage page={page} locale={locale} tenant={tenant} />;
+  return <PostIndexPage page={page} locale={locale} tenant={tenant} />;
 }

@@ -2,7 +2,7 @@ import { CONTENT_ROUTE_REVALIDATE_SECONDS } from '@blog/config';
 import { customRenderAsync } from '@web/testing/custom-render';
 import { notFound } from 'next/navigation';
 
-import BlogListNumberedPage, { revalidate } from './page';
+import PostIndexNumberedPage, { revalidate } from './page';
 
 const { permanentRedirectMock } = vi.hoisted(() => ({
   permanentRedirectMock: vi.fn(() => {
@@ -26,11 +26,11 @@ vi.mock('@web/i18n/navigation', () => ({
   permanentRedirect: permanentRedirectMock,
 }));
 
-const setup = customRenderAsync(BlogListNumberedPage, {
+const setup = customRenderAsync(PostIndexNumberedPage, {
   params: Promise.resolve({ tenant: 'tenant-1', locale: 'EN', page: '1' }),
 });
 
-describe('BlogListNumberedPage', () => {
+describe('PostIndexNumberedPage', () => {
   it('declares the shared content-route revalidate backstop', () => {
     expect(revalidate).toBe(CONTENT_ROUTE_REVALIDATE_SECONDS);
   });
