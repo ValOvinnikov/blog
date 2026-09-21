@@ -1,4 +1,5 @@
-import { BRAND_VARIANT } from '@blog/config';
+import { BRAND_VARIANT, SIZE } from '@blog/config';
+import { Avatar } from '@blog/ui/atoms/avatar';
 import { customRender, screen } from '@web/testing/custom-render';
 import { makeTestimonialCardItem } from '@web/testing/modules/testimonial/fixtures';
 import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
@@ -8,6 +9,11 @@ import { TestimonialCard } from './testimonial-card';
 vi.mock('@web/components/shared/smart-link', () => ({
   SmartLink: SmartLinkMock,
 }));
+
+vi.mock('@blog/ui/atoms/avatar', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@blog/ui/atoms/avatar')>();
+  return { ...actual, Avatar: vi.fn(actual.Avatar) };
+});
 
 const item = makeTestimonialCardItem();
 
@@ -83,5 +89,23 @@ describe(`<${TestimonialCard.name}/>`, () => {
 
     const link = screen.getByRole('link', { name: item.name });
     expect(link).toHaveAttribute('target', '_blank');
+  });
+
+  it('renders the grid avatar at SIZE.MD', () => {
+    setup();
+
+    expect(vi.mocked(Avatar)).toHaveBeenLastCalledWith(
+      expect.objectContaining({ size: SIZE.MD }),
+      undefined,
+    );
+  });
+
+  it('renders the spotlight avatar at SIZE.LG', () => {
+    setup({ isSpotlight: true });
+
+    expect(vi.mocked(Avatar)).toHaveBeenLastCalledWith(
+      expect.objectContaining({ size: SIZE.LG }),
+      undefined,
+    );
   });
 });

@@ -4,11 +4,11 @@ import { CardGrid } from '@blog/ui/organisms/card-grid';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';
+import { cardGridModuleViewVariants } from '@web/modules/card-grid-module-shared';
 import { toFeatureGridColumns } from '@web/utils/to-feature-grid-columns';
 
 import { FeatureListCard } from './feature-list-card';
 import { FeatureListCarousel } from './feature-list-carousel';
-import { featureListModuleViewVariants } from './feature-list-module-view-variants';
 
 const GRID_IMAGE_SIZES: Record<1 | 2 | 3 | 4, string> = {
   1: '100vw',
@@ -43,7 +43,7 @@ export const FeatureListModuleView = ({
   const cardAlign =
     cardAlignment === CONTENT_ALIGNMENT.CENTER ? 'center' : 'left';
   const columns = toFeatureGridColumns(items.length);
-  const s = featureListModuleViewVariants({ align: contentAlignment });
+  const s = cardGridModuleViewVariants({ align: contentAlignment });
 
   return (
     <Section

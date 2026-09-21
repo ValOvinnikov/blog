@@ -35,8 +35,8 @@ export const TestimonialModule = async ({
   if (!result.ok) return null;
   if (result.data.testimonials.length === 0) return null;
 
-  const { showImages } = result.data;
-  const testimonials: TTestimonialCardItem[] = result.data.testimonials.map(
+  const { showImages, testimonials, ...testimonialModuleData } = result.data;
+  const testimonialCardItems: TTestimonialCardItem[] = testimonials.map(
     ({ photo, ...item }) => ({
       ...item,
       avatarSrc:
@@ -53,8 +53,8 @@ export const TestimonialModule = async ({
 
   return (
     <TestimonialModuleView
-      {...result.data}
-      testimonials={testimonials}
+      {...testimonialModuleData}
+      testimonials={testimonialCardItems}
       titleId={`testimonial-${id}`}
       dataTestId={`testimonial-module-${id}`}
     />
