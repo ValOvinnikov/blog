@@ -1,9 +1,4 @@
-import {
-  BRAND_VARIANT,
-  CARD_IMAGE_SHAPE,
-  CONTENT_ALIGNMENT,
-  FULL_BRAND_VARIANT_LIST,
-} from '@blog/config/constants';
+import { CARD_IMAGE_SHAPE, CONTENT_ALIGNMENT } from '@blog/config/constants';
 import { featureBlockSchema } from '@blog/studio/schema-types/documents/blocks/feature/feature';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
@@ -26,10 +21,7 @@ export const featureListSchema = defineType({
   icon: Grid2x2,
   fields: [
     titleField(),
-    brandVariantField({
-      list: FULL_BRAND_VARIANT_LIST,
-      initialValue: BRAND_VARIANT.PRIMARY,
-    }),
+    brandVariantField(),
     headingBlockField(),
     defineField({
       name: 'features',
