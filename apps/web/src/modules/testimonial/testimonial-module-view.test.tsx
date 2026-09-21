@@ -119,20 +119,16 @@ describe(`<${TestimonialModuleView.name}/>`, () => {
     expect(screen.getByText('AL')).toBeInTheDocument();
   });
 
-  it('hides the avatar entirely, image and initials, when Show Photos is off', () => {
+  it('shows initials, never hides the avatar, when Show Photos is off', () => {
     setup({
       testimonials: [
-        makeTestimonialCardItem({
-          id: 'testimonial-1',
-          name: 'Ada Lovelace',
-          avatarSrc: 'https://cdn.example.com/ada-112.jpg',
-        }),
+        makeTestimonialCardItem({ id: 'testimonial-1', name: 'Ada Lovelace' }),
       ],
       showImages: false,
     });
 
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
-    expect(screen.queryByText('AL')).not.toBeInTheDocument();
+    expect(screen.getByText('AL')).toBeInTheDocument();
   });
 
   it('links a testimonial name through SmartLink when the item has a link', () => {

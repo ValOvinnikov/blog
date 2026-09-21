@@ -24,7 +24,6 @@ export const TestimonialModuleView = ({
   headingBlock,
   testimonials,
   ctaButtons,
-  showImages,
   displayMode,
   contentAlignment,
   cardAlignment,
@@ -61,7 +60,6 @@ export const TestimonialModuleView = ({
       {isSpotlight ? (
         <TestimonialCard
           item={spotlightItem}
-          hasAvatar={showImages}
           align="center"
           tone={brandVariant}
           isSpotlight={true}
@@ -70,7 +68,6 @@ export const TestimonialModuleView = ({
       ) : displayMode === DISPLAY_MODE.CAROUSEL ? (
         <TestimonialCarousel
           items={testimonials}
-          hasAvatar={showImages}
           align={cardAlign}
           tone={brandVariant}
           title={headingBlock.heading}
@@ -85,7 +82,6 @@ export const TestimonialModuleView = ({
             <TestimonialCard
               key={item.id}
               item={item}
-              hasAvatar={showImages}
               align={cardAlign}
               tone={brandVariant}
             />

@@ -10,7 +10,6 @@ export type TTestimonialCardItem = Omit<TTestimonialItem, 'photo'> & {
 
 export interface ITestimonialCardProps extends IWithDataTestId {
   item: TTestimonialCardItem;
-  hasAvatar: boolean;
   align: 'left' | 'center';
   tone: TBrandVariant;
   isSpotlight?: boolean;
@@ -18,7 +17,6 @@ export interface ITestimonialCardProps extends IWithDataTestId {
 
 export const TestimonialCard = ({
   item,
-  hasAvatar,
   align,
   tone,
   isSpotlight,
@@ -30,7 +28,6 @@ export const TestimonialCard = ({
     role={item.role}
     avatarSrc={item.avatarSrc}
     avatarAlt={item.avatarAlt}
-    hasAvatar={hasAvatar}
     align={align}
     isSpotlight={isSpotlight}
     tone={tone}

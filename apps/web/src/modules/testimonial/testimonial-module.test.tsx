@@ -145,4 +145,24 @@ describe(`<${TestimonialModule.name}/>`, () => {
     );
     expect(screen.getByRole('img')).toHaveAttribute('src', expectedUrl);
   });
+
+  it('does not resolve the photo URL when Show Photos is off, so the testimonial falls back to initials', async () => {
+    const photo = makeSanityImage();
+    const testimonials = [
+      makeTestimonialItem({
+        id: 'testimonial-1',
+        name: 'Ada Lovelace',
+        photo,
+      }),
+    ];
+    getTestimonialModuleMock.mockResolvedValue({
+      ok: true,
+      data: { ...baseModule, showImages: false, testimonials },
+    });
+
+    await setup();
+
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    expect(screen.getByText('AL')).toBeInTheDocument();
+  });
 });

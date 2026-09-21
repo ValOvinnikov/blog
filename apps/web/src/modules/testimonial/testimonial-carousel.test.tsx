@@ -25,7 +25,6 @@ const items = [
 
 const setup = customRender(TestimonialCarousel, {
   items,
-  hasAvatar: true,
   align: 'left',
   tone: BRAND_VARIANT.PRIMARY,
   title: 'What our clients say',

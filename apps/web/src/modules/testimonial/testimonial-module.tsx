@@ -35,13 +35,19 @@ export const TestimonialModule = async ({
   if (!result.ok) return null;
   if (result.data.testimonials.length === 0) return null;
 
+  const { showImages } = result.data;
   const testimonials: TTestimonialCardItem[] = result.data.testimonials.map(
     ({ photo, ...item }) => ({
       ...item,
-      avatarSrc: photo
-        ? urlForSanityImage(photo, tenantContext, TESTIMONIAL_AVATAR_TRANSFORM)
-        : undefined,
-      avatarAlt: photo?.alt,
+      avatarSrc:
+        showImages && photo
+          ? urlForSanityImage(
+              photo,
+              tenantContext,
+              TESTIMONIAL_AVATAR_TRANSFORM,
+            )
+          : undefined,
+      avatarAlt: showImages ? photo?.alt : undefined,
     }),
   );
 

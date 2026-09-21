@@ -13,7 +13,6 @@ const item = makeTestimonialCardItem();
 
 const setup = customRender(TestimonialCard, {
   item,
-  hasAvatar: true,
   align: 'left',
   tone: BRAND_VARIANT.PRIMARY,
 });
@@ -26,7 +25,7 @@ describe(`<${TestimonialCard.name}/>`, () => {
     expect(screen.getAllByText(item.name).length).toBeGreaterThan(0);
   });
 
-  it('renders initials when hasAvatar is true and there is no avatarSrc', () => {
+  it('renders initials when there is no avatarSrc', () => {
     setup();
 
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
@@ -44,18 +43,6 @@ describe(`<${TestimonialCard.name}/>`, () => {
       'src',
       'https://cdn.example.com/ada-112.jpg',
     );
-  });
-
-  it('renders neither an image nor initials when hasAvatar is false', () => {
-    setup({
-      hasAvatar: false,
-      item: makeTestimonialCardItem({
-        avatarSrc: 'https://cdn.example.com/ada-112.jpg',
-      }),
-    });
-
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
-    expect(screen.queryByText('AL')).not.toBeInTheDocument();
   });
 
   it('renders no link when the item has none', () => {

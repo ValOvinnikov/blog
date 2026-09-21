@@ -97,8 +97,13 @@ export const CenterAligned: TStory = {
   },
 };
 
-export const PhotosOff: TStory = {
-  args: { showImages: false },
+export const WithPhotos: TStory = {
+  args: {
+    testimonials: testimonials.map((testimonial, index) => ({
+      ...testimonial,
+      avatarSrc: `https://i.pravatar.cc/112?img=${index + 1}`,
+    })),
+  },
 };
 
 export const FiveTestimonials: TStory = {

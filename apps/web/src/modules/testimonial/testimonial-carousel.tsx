@@ -13,7 +13,6 @@ import { TestimonialCard, type TTestimonialCardItem } from './testimonial-card';
 export interface ITestimonialCarouselProps
   extends IWithClassName, IWithDataTestId {
   items: TTestimonialCardItem[];
-  hasAvatar: boolean;
   align: 'left' | 'center';
   tone: TBrandVariant;
   title: string;
@@ -21,7 +20,6 @@ export interface ITestimonialCarouselProps
 
 export const TestimonialCarousel = ({
   items,
-  hasAvatar,
   align,
   tone,
   title,
@@ -34,12 +32,7 @@ export const TestimonialCarousel = ({
     <Carousel
       items={items}
       renderItem={({ item }) => (
-        <TestimonialCard
-          item={item}
-          hasAvatar={hasAvatar}
-          align={align}
-          tone={tone}
-        />
+        <TestimonialCard item={item} align={align} tone={tone} />
       )}
       getItemKey={({ item }) => item.id}
       ariaLabel={t('regionLabel', { title })}
