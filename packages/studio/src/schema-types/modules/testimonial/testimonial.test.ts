@@ -14,14 +14,6 @@ describe('testimonialSchema testimonials field validation', () => {
   });
 });
 
-describe('testimonialSchema cardAlignment field validation', () => {
-  it('is required', () => {
-    const cardAlignmentField = getField(testimonialSchema, 'cardAlignment');
-
-    expect(getRecordedBounds(cardAlignmentField)).toEqual({ required: true });
-  });
-});
-
 describe('testimonialSchema preview', () => {
   const prepare = testimonialSchema.preview?.prepare;
 

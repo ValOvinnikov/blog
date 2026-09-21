@@ -1,11 +1,9 @@
-import { BRAND_VARIANT } from '@blog/config/constants';
+import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config/constants';
 import { blockTestimonialSchema } from '@blog/studio/schema-types/documents/blocks/testimonial/testimonial';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
-import { cardAlignmentField } from '@blog/studio/schema-types/fields/card-alignment-field/card-alignment-field';
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { displayModeField } from '@blog/studio/schema-types/fields/display-mode-field/display-mode-field';
-import { showImagesField } from '@blog/studio/schema-types/fields/show-images-field/show-images-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
@@ -47,22 +45,25 @@ export const testimonialSchema = defineType({
           .error('A testimonials module holds at most eight quotes.'),
     }),
     ctaButtonsField(),
-    showImagesField({
-      title: 'Show Photos',
-      description:
-        "Show each person's photo beside their name. Turned off, cards show initials instead.",
-    }),
     displayModeField({
       description:
         'Grid lays the cards out in rows. Carousel puts them in a single row the reader can swipe or step through. Ignored for a single quote.',
     }),
-    ...alignmentFields([], {
-      description:
-        'Horizontal alignment of the heading, supporting text and actions. Cards have their own alignment.',
-    }),
-    cardAlignmentField({
-      description: 'Aligns the quote and the person inside each card.',
-    }),
+    ...alignmentFields(
+      [
+        {
+          name: 'cardAlignment',
+          title: 'Card Alignment',
+          description: 'Aligns the quote and the person inside each card.',
+          allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
+          initialValue: CONTENT_ALIGNMENT.LEFT,
+        },
+      ],
+      {
+        description:
+          'Horizontal alignment of the heading, supporting text and actions. Cards have their own alignment.',
+      },
+    ),
     layoutField,
   ],
   preview: {

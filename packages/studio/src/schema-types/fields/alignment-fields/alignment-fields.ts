@@ -47,7 +47,7 @@ type TAlignmentFieldExtra = {
   description: string;
   allow: readonly TContentAlignment[];
   initialValue?: TContentAlignment;
-  hidden: StringDefinition['hidden'];
+  hidden?: StringDefinition['hidden'];
   fieldset?: string;
 };
 

@@ -1,8 +1,7 @@
-import { CARD_IMAGE_SHAPE } from '@blog/config/constants';
+import { CARD_IMAGE_SHAPE, CONTENT_ALIGNMENT } from '@blog/config/constants';
 import { featureBlockSchema } from '@blog/studio/schema-types/documents/blocks/feature/feature';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
-import { cardAlignmentField } from '@blog/studio/schema-types/fields/card-alignment-field/card-alignment-field';
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { displayModeField } from '@blog/studio/schema-types/fields/display-mode-field/display-mode-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
@@ -68,9 +67,20 @@ export const featureListSchema = defineType({
       description:
         'Horizontal alignment of the heading, supporting text and actions. Cards have their own alignment.',
     }),
-    cardAlignmentField({
+    defineField({
+      name: 'cardAlignment',
+      title: 'Card Alignment',
+      type: 'string',
       description:
         'Horizontal alignment of the heading and text within each feature card.',
+      options: {
+        layout: 'dropdown',
+        list: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER].map(
+          (value) => ({ title: toTitleCase(value), value }),
+        ),
+      },
+      initialValue: CONTENT_ALIGNMENT.LEFT,
+      validation: (rule) => rule.required(),
     }),
     layoutField,
   ],

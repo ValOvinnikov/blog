@@ -11,11 +11,10 @@ export const blocksSection: TStructureSection = {
   groups: [
     {
       title: 'Cards',
-      items: [{ schema: featureBlockSchema }],
-    },
-    {
-      title: 'Testimonials',
-      items: [{ schema: blockTestimonialSchema }],
+      items: [
+        { schema: featureBlockSchema },
+        { schema: blockTestimonialSchema },
+      ],
     },
     {
       title: 'Links',
