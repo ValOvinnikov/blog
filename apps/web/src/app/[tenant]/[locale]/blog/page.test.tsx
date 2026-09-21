@@ -1,6 +1,6 @@
 import { CONTENT_ROUTE_REVALIDATE_SECONDS } from '@blog/config';
 
-import BlogIndexPage, { generateMetadata, revalidate } from './page';
+import PostIndexRoute, { generateMetadata, revalidate } from './page';
 
 vi.mock('@web/metadata/post-index-metadata', () => ({
   buildPostIndexMetadata: vi.fn().mockResolvedValue({ title: 'Blog' }),
@@ -12,7 +12,7 @@ vi.mock('@web/components/pages/post-index-page', () => ({
   ),
 }));
 
-describe('BlogIndexPage', () => {
+describe('PostIndexRoute', () => {
   it('declares the shared content-route revalidate backstop', () => {
     expect(revalidate).toBe(CONTENT_ROUTE_REVALIDATE_SECONDS);
   });
@@ -28,7 +28,7 @@ describe('BlogIndexPage', () => {
   });
 
   it('renders PostIndexPage for page 1', async () => {
-    const ui = await BlogIndexPage({
+    const ui = await PostIndexRoute({
       params: Promise.resolve({ tenant: 'tenant-1', locale: 'EN' }),
     });
 

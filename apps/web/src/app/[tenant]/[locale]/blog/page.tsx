@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: TProps): Promise<Metadata> {
   return buildPostIndexMetadata(1, tenant);
 }
 
-export default async function BlogIndexPage({ params }: TProps) {
+export default async function PostIndexRoute({ params }: TProps) {
   const { locale, tenant } = await params;
   setRequestLocale(locale);
 

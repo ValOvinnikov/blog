@@ -1,6 +1,6 @@
 import { CONTENT_ROUTE_REVALIDATE_SECONDS } from '@blog/config';
 
-import TopicIndexRoutePage, { generateMetadata, revalidate } from './page';
+import TopicIndexRoute, { generateMetadata, revalidate } from './page';
 
 vi.mock('@web/metadata/topic-index-metadata', () => ({
   buildTopicIndexMetadata: vi.fn().mockResolvedValue({ title: 'Topics' }),
@@ -14,7 +14,7 @@ vi.mock('@web/components/pages/topic-index-page', () => ({
   ),
 }));
 
-describe('TopicIndexRoutePage', () => {
+describe('TopicIndexRoute', () => {
   it('declares the shared content-route revalidate backstop', () => {
     expect(revalidate).toBe(CONTENT_ROUTE_REVALIDATE_SECONDS);
   });
@@ -30,7 +30,7 @@ describe('TopicIndexRoutePage', () => {
   });
 
   it('renders TopicIndexPage with the resolved locale and tenant', async () => {
-    const ui = await TopicIndexRoutePage({
+    const ui = await TopicIndexRoute({
       params: Promise.resolve({ tenant: 'tenant-1', locale: 'EN' }),
     });
 

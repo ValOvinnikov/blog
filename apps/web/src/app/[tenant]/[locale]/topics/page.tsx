@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: TProps): Promise<Metadata> {
   return buildTopicIndexMetadata(tenant);
 }
 
-export default async function TopicIndexRoutePage({ params }: TProps) {
+export default async function TopicIndexRoute({ params }: TProps) {
   const { locale, tenant } = await params;
   setRequestLocale(locale);
 
