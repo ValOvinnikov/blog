@@ -15,6 +15,7 @@ export const heroVariants = tv({
     title: ['mt-2.5 mb-3'],
     heading: [],
     excerpt: ['m-0', 'max-w-[52ch]'],
+    body: [],
     media: [],
     overlay: [],
   },
@@ -32,6 +33,7 @@ export const heroVariants = tv({
         eyebrow: ['text-white'],
         heading: ['text-white'],
         excerpt: ['text-white/85'],
+        body: ['text-white/85'],
       },
     },
     hasMedia: {
