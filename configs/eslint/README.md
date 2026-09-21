@@ -75,8 +75,24 @@
   similar; `testing-library/prefer-screen-queries` bans destructuring a
   query off `render()`'s return value instead of using `screen`.
 
+  The plugin's "which calls count as a render" detection is aggressive
+  (name-based: any identifier containing `render`) by default, but this
+  repo's `setup(...)` helper convention (a curried `customRender`/
+  `customRenderAsync` factory bound to `setup` — see each workspace's
+  `src/testing/custom-render.tsx`) doesn't contain `render` and is invisible
+  to it. The `testing-library/custom-renders` setting fixes that, but
+  switches the aggressive name heuristic off entirely in favour of an exact
+  list — so every render helper actually called directly in a test file has
+  to be listed, not just `setup`: `customRender`, `customRenderAsync`,
+  `renderElement`, `renderWithIntl`. (A local helper that only wraps one of
+  these — e.g. a per-file `renderHydrated` — needs no separate entry; the
+  wrapped call is what the rule sees.) Verify any change to this list against
+  a full suppression regen with no regressions (`git diff` the three
+  `eslint-suppressions.json` files — counts must only grow, never shrink,
+  for a file that already had entries).
+
   Pre-existing violations in `packages/ui`, `apps/web`, and `apps/platform`
-  are baselined the same way as `no-class-assertions` — 5/91/132 violations
+  are baselined the same way as `no-class-assertions` — 17/131/132 violations
   respectively across the three rules combined. Prune after fixing one with:
 
   ```

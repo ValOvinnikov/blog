@@ -78,6 +78,15 @@ export default [
       'blog-test': { rules: { 'no-class-assertions': noClassAssertionsRule } },
       'testing-library': testingLibrary,
     },
+    settings: {
+      'testing-library/custom-renders': [
+        'setup',
+        'customRender',
+        'customRenderAsync',
+        'renderElement',
+        'renderWithIntl',
+      ],
+    },
     rules: {
       'no-console': 'off',
       'blog-test/no-class-assertions': 'error',
