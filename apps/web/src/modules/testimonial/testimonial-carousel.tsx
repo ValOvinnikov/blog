@@ -3,7 +3,7 @@
 import type {
   IWithClassName,
   IWithDataTestId,
-  TBrandVariant,
+  TBrandVariantOf,
 } from '@blog/config';
 import { Carousel } from '@blog/ui/organisms/carousel';
 import { useTranslations } from 'next-intl';
@@ -14,7 +14,7 @@ export interface ITestimonialCarouselProps
   extends IWithClassName, IWithDataTestId {
   items: TTestimonialCardItem[];
   align: 'left' | 'center';
-  tone: TBrandVariant;
+  tone: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
   title: string;
 }
 

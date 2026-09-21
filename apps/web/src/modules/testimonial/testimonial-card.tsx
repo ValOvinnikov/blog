@@ -1,5 +1,6 @@
-import type { IWithDataTestId, TBrandVariant } from '@blog/config';
+import { SIZE, type IWithDataTestId, type TBrandVariantOf } from '@blog/config';
 import type { TTestimonialItem } from '@blog/service';
+import { Avatar } from '@blog/ui/atoms/avatar';
 import { QuoteCard } from '@blog/ui/molecules/quote-card';
 import { SmartLink } from '@web/components/shared/smart-link';
 
@@ -11,7 +12,7 @@ export type TTestimonialCardItem = Omit<TTestimonialItem, 'photo'> & {
 export interface ITestimonialCardProps extends IWithDataTestId {
   item: TTestimonialCardItem;
   align: 'left' | 'center';
-  tone: TBrandVariant;
+  tone: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
   isSpotlight?: boolean;
 }
 
@@ -24,15 +25,32 @@ export const TestimonialCard = ({
 }: ITestimonialCardProps) => (
   <QuoteCard
     quote={item.quote}
-    name={item.name}
     role={item.role}
-    avatarSrc={item.avatarSrc}
-    avatarAlt={item.avatarAlt}
     align={align}
     isSpotlight={isSpotlight}
     tone={tone}
-    href={item.link?.href}
-    linkAs={SmartLink}
     dataTestId={dataTestId}
-  />
+  >
+    <QuoteCard.Avatar>
+      <Avatar
+        src={item.avatarSrc}
+        alt={item.avatarAlt ?? item.name}
+        name={item.name}
+        size={isSpotlight ? SIZE.LG : SIZE.MD}
+      />
+    </QuoteCard.Avatar>
+    <QuoteCard.Name>
+      {item.link ? (
+        <SmartLink
+          href={item.link.href}
+          target={item.link.target}
+          aria-label={item.link.ariaLabel}
+        >
+          {item.name}
+        </SmartLink>
+      ) : (
+        <span>{item.name}</span>
+      )}
+    </QuoteCard.Name>
+  </QuoteCard>
 );

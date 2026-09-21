@@ -67,4 +67,21 @@ describe(`<${TestimonialCard.name}/>`, () => {
     const link = screen.getByRole('link', { name: item.name });
     expect(link).toHaveAttribute('href', '/case-studies/ada');
   });
+
+  it('forwards the link target to SmartLink when the item opens in a new tab', () => {
+    setup({
+      item: makeTestimonialCardItem({
+        link: {
+          label: 'Read the case study',
+          href: '/case-studies/ada',
+          target: '_blank',
+          platform: undefined,
+          ariaLabel: undefined,
+        },
+      }),
+    });
+
+    const link = screen.getByRole('link', { name: item.name });
+    expect(link).toHaveAttribute('target', '_blank');
+  });
 });
