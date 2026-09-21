@@ -2,6 +2,7 @@ import js from '@eslint/js';
 import checkFile from 'eslint-plugin-check-file';
 import importX from 'eslint-plugin-import-x';
 import prettier from 'eslint-config-prettier/flat';
+import testingLibrary from 'eslint-plugin-testing-library';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
@@ -75,10 +76,14 @@ export default [
     files: ['**/*.test.{ts,tsx}'],
     plugins: {
       'blog-test': { rules: { 'no-class-assertions': noClassAssertionsRule } },
+      'testing-library': testingLibrary,
     },
     rules: {
       'no-console': 'off',
       'blog-test/no-class-assertions': 'error',
+      'testing-library/no-container': 'error',
+      'testing-library/no-node-access': 'error',
+      'testing-library/prefer-screen-queries': 'error',
     },
   },
   {

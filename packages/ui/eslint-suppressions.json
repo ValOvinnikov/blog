@@ -1,0 +1,12 @@
+{
+  "src/atoms/theme-toggle/theme-toggle.test.tsx": {
+    "testing-library/no-node-access": {
+      "count": 3
+    }
+  },
+  "src/molecules/quote-card/quote-card.test.tsx": {
+    "testing-library/no-container": {
+      "count": 2
+    }
+  }
+}

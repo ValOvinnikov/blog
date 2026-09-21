@@ -65,6 +65,24 @@
 
   Never add a suppression for anything but `blog-test/no-class-assertions`.
 
+- `eslint-plugin-testing-library` — registered in `base.js`'s
+  `**/*.test.{ts,tsx}` override alongside `blog-test/no-class-assertions`,
+  with exactly three rules as `error` (no `recommended` preset):
+  `testing-library/no-container` bans `container.querySelector`/
+  `container.querySelectorAll` in favor of a `screen` query;
+  `testing-library/no-node-access` bans reaching into the DOM/React-element
+  tree with `.parentElement`/`.closest()`/`.children`/`.firstChild` and
+  similar; `testing-library/prefer-screen-queries` bans destructuring a
+  query off `render()`'s return value instead of using `screen`.
+
+  Pre-existing violations in `packages/ui`, `apps/web`, and `apps/platform`
+  are baselined the same way as `no-class-assertions` — 5/91/132 violations
+  respectively across the three rules combined. Prune after fixing one with:
+
+  ```
+  eslint . --prune-suppressions
+  ```
+
 - `func-style` — enforces arrow-function expressions (`'error', 'expression',
 { allowArrowFunctions: true }`) over function declarations. Registered only
   in `web.js`, scoped to `apps/web/**/*.{ts,tsx}`, with an override turning it
