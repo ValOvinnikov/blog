@@ -100,6 +100,7 @@ export const HeroProfileModuleView = ({
             priority={true}
             className="size-full object-cover"
             alt=""
+            dataTestId="hero-profile-banner-photo"
           />
         </Hero.Media>
       )}

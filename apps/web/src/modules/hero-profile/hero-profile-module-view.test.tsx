@@ -75,10 +75,10 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
   });
 
   it('renders the photo as a legible, prioritized background on Banner, with no accessible name since it is a decorative backdrop there', () => {
-    const { container } = setup({ variant: HERO_VARIANT.BANNER, sanityImage });
+    setup({ variant: HERO_VARIANT.BANNER, sanityImage });
 
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
-    const img = container.querySelector('img');
+    const img = screen.getByTestId('hero-profile-banner-photo');
     expect(img).toHaveAttribute('alt', '');
     expect(img).toHaveAttribute('height', '675');
     expect(img).toHaveAttribute('fetchpriority', 'high');
@@ -96,13 +96,13 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
   });
 
   it('renders no media on Split when no image resolves', () => {
-    const { container } = setup({
+    setup({
       variant: HERO_VARIANT.SPLIT,
       sanityImage: undefined,
     });
 
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
-    expect(container.querySelector('[data-testid="hero-media"]')).toBeNull();
+    expect(screen.queryByTestId('hero-media')).not.toBeInTheDocument();
   });
 
   it('still announces the profile name to a screen reader on a photo-less Split, with no initials tile shown', () => {
@@ -116,13 +116,13 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
   });
 
   it('renders no media on Banner when no image resolves', () => {
-    const { container } = setup({
+    setup({
       variant: HERO_VARIANT.BANNER,
       sanityImage: undefined,
     });
 
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
-    expect(container.querySelector('[data-testid="hero-media"]')).toBeNull();
+    expect(screen.queryByTestId('hero-media')).not.toBeInTheDocument();
   });
 
   it('renders no Hero.Social slot when there are no social links', () => {

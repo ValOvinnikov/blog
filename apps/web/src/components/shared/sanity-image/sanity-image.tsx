@@ -16,6 +16,7 @@ export interface ISanityImageProps {
   priority?: boolean;
   className?: string;
   alt?: string;
+  dataTestId?: string;
 }
 
 /**
@@ -46,6 +47,7 @@ export const SanityImage = ({
   priority = false,
   className,
   alt,
+  dataTestId,
 }: ISanityImageProps) => {
   const baseUrl = useSanityImageBaseUrl();
 
@@ -64,6 +66,7 @@ export const SanityImage = ({
       fetchPriority={priority ? 'high' : undefined}
       className={className}
       alt={alt ?? image.alt}
+      data-testid={dataTestId}
     />
   );
 };
