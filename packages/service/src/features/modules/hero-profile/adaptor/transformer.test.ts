@@ -38,20 +38,135 @@ describe(toHeroProfileModule, () => {
     });
   });
 
-  it('leaves eyebrow undefined when unset', () => {
-    const raw = makeRawHeroProfileModule({ eyebrow: null });
+  describe('eyebrow', () => {
+    it('resolves to the author role when showRole is on, ignoring a stale typed eyebrow', () => {
+      const raw = makeRawHeroProfileModule({
+        showRole: true,
+        eyebrow: 'Field notes',
+        author: {
+          name: 'Jamie Rivera',
+          image: null,
+          role: 'Staff Engineer',
+          bio: null,
+          socialLinks: null,
+        },
+      });
 
-    const hero = toHeroProfileModule(raw);
+      const hero = toHeroProfileModule(raw);
 
-    expect(hero.eyebrow).toBeUndefined();
+      expect(hero.eyebrow).toBe('Staff Engineer');
+    });
+
+    it('falls back to the typed eyebrow when showRole is off', () => {
+      const raw = makeRawHeroProfileModule({
+        showRole: false,
+        eyebrow: 'Field notes',
+        author: {
+          name: 'Jamie Rivera',
+          image: null,
+          role: 'Staff Engineer',
+          bio: null,
+          socialLinks: null,
+        },
+      });
+
+      const hero = toHeroProfileModule(raw);
+
+      expect(hero.eyebrow).toBe('Field notes');
+    });
+
+    it('leaves eyebrow undefined when showRole is off and no eyebrow is typed', () => {
+      const raw = makeRawHeroProfileModule({ showRole: false, eyebrow: null });
+
+      const hero = toHeroProfileModule(raw);
+
+      expect(hero.eyebrow).toBeUndefined();
+    });
+
+    it('leaves eyebrow undefined when showRole is on and the author has no role', () => {
+      const raw = makeRawHeroProfileModule({
+        showRole: true,
+        eyebrow: null,
+        author: {
+          name: 'Jamie Rivera',
+          image: null,
+          role: null,
+          bio: null,
+          socialLinks: null,
+        },
+      });
+
+      const hero = toHeroProfileModule(raw);
+
+      expect(hero.eyebrow).toBeUndefined();
+    });
   });
 
-  it('maps an authored eyebrow untouched', () => {
-    const raw = makeRawHeroProfileModule({ eyebrow: 'Field notes' });
+  describe('bio', () => {
+    it('maps the author bio blocks when showBio is on', () => {
+      const raw = makeRawHeroProfileModule({
+        showBio: true,
+        author: {
+          name: 'Jamie Rivera',
+          image: null,
+          role: null,
+          bio: [
+            {
+              _type: 'block',
+              _key: 'bio-block-1',
+              markDefs: null,
+            },
+          ],
+          socialLinks: null,
+        },
+      });
 
-    const hero = toHeroProfileModule(raw);
+      const hero = toHeroProfileModule(raw);
 
-    expect(hero.eyebrow).toBe('Field notes');
+      expect(hero.bio).toEqual([
+        { _type: 'block', _key: 'bio-block-1', markDefs: undefined },
+      ]);
+    });
+
+    it('leaves bio undefined when showBio is off, even if the author has one', () => {
+      const raw = makeRawHeroProfileModule({
+        showBio: false,
+        author: {
+          name: 'Jamie Rivera',
+          image: null,
+          role: null,
+          bio: [
+            {
+              _type: 'block',
+              _key: 'bio-block-1',
+              markDefs: null,
+            },
+          ],
+          socialLinks: null,
+        },
+      });
+
+      const hero = toHeroProfileModule(raw);
+
+      expect(hero.bio).toBeUndefined();
+    });
+
+    it('leaves bio undefined when showBio is on and the author has none', () => {
+      const raw = makeRawHeroProfileModule({
+        showBio: true,
+        author: {
+          name: 'Jamie Rivera',
+          image: null,
+          role: null,
+          bio: null,
+          socialLinks: null,
+        },
+      });
+
+      const hero = toHeroProfileModule(raw);
+
+      expect(hero.bio).toBeUndefined();
+    });
   });
 
   it("maps avatarName from the author's name, straight through", () => {
@@ -59,6 +174,8 @@ describe(toHeroProfileModule, () => {
       author: {
         name: 'Alex Chen',
         image: null,
+        role: null,
+        bio: null,
         socialLinks: null,
       },
     });
@@ -75,6 +192,8 @@ describe(toHeroProfileModule, () => {
         author: {
           name: 'Jamie Rivera',
           image: makeRawSanityImage('Author photo'),
+          role: null,
+          bio: null,
           socialLinks: null,
         },
       });
@@ -90,6 +209,8 @@ describe(toHeroProfileModule, () => {
         author: {
           name: 'Jamie Rivera',
           image: makeRawSanityImage('Author photo'),
+          role: null,
+          bio: null,
           socialLinks: null,
         },
       });
@@ -102,7 +223,13 @@ describe(toHeroProfileModule, () => {
     it('leaves sanityImage undefined when neither the hero nor the author has a photo (a supported state)', () => {
       const raw = makeRawHeroProfileModule({
         image: null,
-        author: { name: 'Jamie Rivera', image: null, socialLinks: null },
+        author: {
+          name: 'Jamie Rivera',
+          image: null,
+          role: null,
+          bio: null,
+          socialLinks: null,
+        },
       });
 
       const hero = toHeroProfileModule(raw);
@@ -117,6 +244,8 @@ describe(toHeroProfileModule, () => {
         author: {
           name: 'Jamie Rivera',
           image: makeRawSanityImage('Author photo'),
+          role: null,
+          bio: null,
           socialLinks: null,
         },
       });
@@ -133,6 +262,8 @@ describe(toHeroProfileModule, () => {
         author: {
           name: 'Jamie Rivera',
           image: makeRawSanityImage('Author photo'),
+          role: null,
+          bio: null,
           socialLinks: null,
         },
       });
@@ -150,6 +281,8 @@ describe(toHeroProfileModule, () => {
         author: {
           name: 'Jamie Rivera',
           image: null,
+          role: null,
+          bio: null,
           socialLinks: [
             {
               platform: SOCIAL_PLATFORMS.GITHUB,
@@ -184,6 +317,8 @@ describe(toHeroProfileModule, () => {
         author: {
           name: 'Jamie Rivera',
           image: null,
+          role: null,
+          bio: null,
           socialLinks: [
             {
               platform: SOCIAL_PLATFORMS.GITHUB,
@@ -201,7 +336,13 @@ describe(toHeroProfileModule, () => {
     it('returns an empty array when showSocialLinks is on and the author has none (a supported state)', () => {
       const raw = makeRawHeroProfileModule({
         showSocialLinks: true,
-        author: { name: 'Jamie Rivera', image: null, socialLinks: null },
+        author: {
+          name: 'Jamie Rivera',
+          image: null,
+          role: null,
+          bio: null,
+          socialLinks: null,
+        },
       });
 
       const hero = toHeroProfileModule(raw);
@@ -215,6 +356,8 @@ describe(toHeroProfileModule, () => {
         author: {
           name: 'Jamie Rivera',
           image: null,
+          role: null,
+          bio: null,
           socialLinks: [
             {
               platform: SOCIAL_PLATFORMS.GITHUB,

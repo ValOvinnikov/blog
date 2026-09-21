@@ -31,6 +31,7 @@ const setup = customRender(HeroProfileModuleView, {
   headingBlock: makeHeadingBlock({ heading }),
   avatarName,
   sanityImage: undefined,
+  bio: undefined,
   socialLinks: [],
   ctaButtons: [],
   contentPosition: undefined,

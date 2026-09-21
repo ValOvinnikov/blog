@@ -7,6 +7,7 @@ import { toCtaButtons } from '@blog/service/shared/transformers/to-cta-buttons';
 import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import { toHeroPresentation } from '@blog/service/shared/transformers/to-hero-presentation';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
+import { toPortableTextBlockWithResolvedLinks } from '@blog/service/shared/transformers/to-portable-text-mark-def';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
 import type { TSocialProfile } from '@blog/service/shared/transformers/to-social-profile';
 import { toSocialProfiles } from '@blog/service/shared/transformers/to-social-profiles';
@@ -31,6 +32,18 @@ function toSocialLinks(raw: TRawHeroProfileModule): TSocialProfile[] {
   return toSocialProfiles(raw.author.socialLinks);
 }
 
+function toEyebrow(raw: TRawHeroProfileModule): TMaybeUndefined<string> {
+  if (raw.showRole) return raw.author.role ?? undefined;
+
+  return raw.eyebrow ?? undefined;
+}
+
+function toBio(raw: TRawHeroProfileModule): THeroProfileModule['bio'] {
+  if (!raw.showBio) return undefined;
+
+  return raw.author.bio?.map(toPortableTextBlockWithResolvedLinks) ?? undefined;
+}
+
 export function toHeroProfileModule(
   raw: TRawHeroProfileModule,
 ): THeroProfileModule {
@@ -45,9 +58,10 @@ export function toHeroProfileModule(
     brandVariant: raw.brandVariant,
     variant: raw.variant,
     headingBlock: toHeadingBlock(raw.headingBlock),
-    eyebrow: raw.eyebrow ?? undefined,
+    eyebrow: toEyebrow(raw),
     avatarName: raw.author.name,
     sanityImage: toImage(raw),
+    bio: toBio(raw),
     socialLinks: toSocialLinks(raw),
     ctaButtons: toCtaButtons(raw.ctaButtons),
     contentPosition,

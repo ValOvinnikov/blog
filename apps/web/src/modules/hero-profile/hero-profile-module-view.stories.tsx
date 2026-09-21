@@ -55,6 +55,7 @@ const meta = {
     }),
     avatarName: 'Jane Cooper',
     sanityImage: makeSanityImage(),
+    bio: undefined,
     socialLinks,
     ctaButtons: ctaActionsDemo.slice(0, 1),
     contentPosition: undefined,
