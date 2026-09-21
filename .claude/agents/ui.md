@@ -141,7 +141,11 @@ delete-don't-shorten rule. It is not restated here; follow it as written.
 
 - Co-locate `Component.test.tsx` (Vitest + Testing Library, jsdom). Query by
   role/text; assert behaviour, never a class — not even one a prop or variant
-  toggles (the `no-class-assertions` lint rule fails it). A variant whose only
+  toggles (the `no-class-assertions` lint rule fails it). Query through
+  `screen`, never `container.querySelector` or a node walk
+  (`testing-library/no-container`, `no-node-access`, `prefer-screen-queries`
+  fail those); a roleless internal element gets a fixed `data-testid` like
+  `hero-media`. A variant whose only
   effect is styling gets a story and `no-tests-needed`, not a test. See the
   `testing-practices` skill (`.claude/skills/testing-practices/SKILL.md`).
 - Use `@faker-js/faker` for realistic mock data in tests and stories — never

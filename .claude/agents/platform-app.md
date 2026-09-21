@@ -511,6 +511,11 @@ delete-don't-shorten rule. It is not restated here; follow it as written.
   `no-tests-needed`. The `no-class-assertions` lint rule fails
   `toHaveClass` and class reads in test files; see `testing-practices` →
   "What not to test".
+- **Query through `screen`, never the DOM.** `container.querySelector`, a
+  node walk (`.parentElement`, `.children`) and queries destructured from
+  `render()` fail lint (`testing-library/no-container`, `no-node-access`,
+  `prefer-screen-queries`); a roleless element gets a fixed `data-testid`
+  on the component and `screen.getByTestId`.
 - Mock `@blog/db` query/mutation functions; assert that fetched data renders and
   that a form submission calls the action with the values the user entered.
 - **A mutation that records an audit event gets a test that it is _not_
