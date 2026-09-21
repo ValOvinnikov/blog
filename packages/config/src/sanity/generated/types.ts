@@ -153,7 +153,7 @@ export type Module_featureList = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY';
   headingBlock?: HeadingBlock;
   features?: Array<
     {
