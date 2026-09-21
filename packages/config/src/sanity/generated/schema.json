@@ -6063,6 +6063,20 @@
         },
         "optional": true
       },
+      "showRole": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
+        },
+        "optional": true
+      },
+      "showBio": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
+        },
+        "optional": true
+      },
       "variant": {
         "type": "objectAttribute",
         "value": {

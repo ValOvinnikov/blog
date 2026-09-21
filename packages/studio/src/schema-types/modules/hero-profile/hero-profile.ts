@@ -30,6 +30,8 @@ export const heroProfileSchema = defineType({
       title: 'Eyebrow',
       type: 'string',
       description: 'Short line above the heading.',
+      hidden: ({ parent }) =>
+        (parent as { showRole?: boolean } | undefined)?.showRole !== false,
     }),
     defineField({
       name: 'author',
@@ -55,6 +57,21 @@ export const heroProfileSchema = defineType({
       type: 'boolean',
       description:
         "Whether to display the author's social profile links in this hero.",
+      initialValue: true,
+    }),
+    defineField({
+      name: 'showRole',
+      title: 'Show Role',
+      type: 'boolean',
+      description:
+        "Use the author's role as the line above the heading. Turn off to type your own, or to show none.",
+      initialValue: true,
+    }),
+    defineField({
+      name: 'showBio',
+      title: 'Show Bio',
+      type: 'boolean',
+      description: "Show the author's bio under the supporting text.",
       initialValue: true,
     }),
     heroVariantField(),
