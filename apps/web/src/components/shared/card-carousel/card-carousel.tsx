@@ -12,16 +12,12 @@ import {
 } from '@web/components/shared/media-card-item';
 import { useTranslations } from 'next-intl';
 
-import { cardCarouselVariants } from './card-carousel-variants';
-
 export interface ICardCarouselProps extends IWithClassName, IWithDataTestId {
   items: IMediaCardData[];
   hasImages?: boolean;
   title: string;
   tone?: TBrandVariant;
 }
-
-const s = cardCarouselVariants();
 
 /**
  * `renderItem` is defined here rather than in a Server Component view
@@ -46,7 +42,6 @@ export const CardCarousel = ({
         <MediaCardItem item={item} hasImage={hasImages} />
       )}
       getItemKey={({ item }) => item.id}
-      slideClassName={s.slide()}
       ariaLabel={t('regionLabel', { title })}
       previousLabel={t('previousAriaLabel')}
       nextLabel={t('nextAriaLabel')}

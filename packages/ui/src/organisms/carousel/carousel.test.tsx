@@ -238,6 +238,40 @@ describe(`<${Carousel.name}/>`, () => {
     expect(getNavButtons().next).toBeDisabled();
   });
 
+  it('keeps both nav buttons mounted, disabled, before Embla initializes', () => {
+    currentApi = undefined;
+    renderCarousel();
+
+    const { previous, next } = getNavButtons();
+    expect(previous).toBeDisabled();
+    expect(next).toBeDisabled();
+  });
+
+  it('renders neither nav button when nothing can scroll in either direction', () => {
+    emblaApi.canScrollPrev.mockReturnValue(false);
+    emblaApi.canScrollNext.mockReturnValue(false);
+    renderCarousel();
+
+    expect(
+      screen.queryByRole('button', { name: previousLabel }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: nextLabel }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('brings the nav buttons back once a direction becomes scrollable again', () => {
+    emblaApi.canScrollPrev.mockReturnValue(false);
+    emblaApi.canScrollNext.mockReturnValue(false);
+    renderCarousel();
+
+    emblaApi.canScrollNext.mockReturnValue(true);
+    emitEvent('select');
+
+    expect(getNavButtons().previous).toBeDisabled();
+    expect(getNavButtons().next).toBeEnabled();
+  });
+
   it('re-reads the disabled flags on reInit', () => {
     renderCarousel();
 
