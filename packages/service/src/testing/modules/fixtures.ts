@@ -117,9 +117,13 @@ export function makeRawHeroProfileModule(
     headingBlock: makeRawHeadingBlock('Profile heading'),
     image: null,
     showSocialLinks: true,
+    showRole: true,
+    showBio: true,
     author: {
       name: 'Jamie Rivera',
       image: null,
+      role: null,
+      bio: null,
       socialLinks: null,
     },
     ctaButtons: null,

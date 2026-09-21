@@ -1,5 +1,6 @@
 import type {
   ISanityImage,
+  ProseText,
   TContentAlignment,
   TFullBrandVariant,
   THeadingBlock,
@@ -9,6 +10,7 @@ import type {
   TMediaOrder,
 } from '@blog/config';
 import type { TCtaButton } from '@blog/service/shared/transformers/to-cta-button';
+import type { TPortableTextBlockWithResolvedLinks } from '@blog/service/shared/transformers/to-portable-text-mark-def';
 import type { TSocialProfile } from '@blog/service/shared/transformers/to-social-profile';
 
 export type THeroProfileModule = {
@@ -18,6 +20,9 @@ export type THeroProfileModule = {
   eyebrow: TMaybeUndefined<string>;
   avatarName: string;
   sanityImage: TMaybeUndefined<ISanityImage>;
+  bio: TMaybeUndefined<
+    Array<TPortableTextBlockWithResolvedLinks<ProseText[number]>>
+  >;
   socialLinks: TSocialProfile[];
   ctaButtons: TCtaButton[];
   contentPosition: TMaybeUndefined<TContentAlignment>;
