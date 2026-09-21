@@ -11,6 +11,7 @@ import { postLatestSchema } from './post-latest/post-latest';
 import { postListSchema } from './post-list/post-list';
 import { postRelatedSchema } from './post-related/post-related';
 import { taxonomyListSchema } from './taxonomy-list/taxonomy-list';
+import { testimonialSchema } from './testimonial/testimonial';
 
 export const modules = [
   heroSchema,
@@ -23,6 +24,7 @@ export const modules = [
   postRelatedSchema,
   taxonomyListSchema,
   featureListSchema,
+  testimonialSchema,
   contentSchema,
   ctaSchema,
   newsletterSchema,

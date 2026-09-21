@@ -11,6 +11,7 @@ import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/
 import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
 import { postRelatedSchema } from '@blog/studio/schema-types/modules/post-related/post-related';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
+import { testimonialSchema } from '@blog/studio/schema-types/modules/testimonial/testimonial';
 import type { TStructureSection } from '@blog/studio/structure/build-section/build-section';
 import { Blocks } from 'lucide-react';
 
@@ -40,6 +41,7 @@ export const modulesSection: TStructureSection = {
         { schema: ctaSchema },
         { schema: newsletterSchema },
         { schema: featureListSchema },
+        { schema: testimonialSchema },
       ],
     },
   ],
