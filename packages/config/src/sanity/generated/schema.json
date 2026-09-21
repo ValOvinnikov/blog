@@ -1035,13 +1035,6 @@
         },
         "optional": true
       },
-      "showImages": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "boolean"
-        },
-        "optional": true
-      },
       "displayMode": {
         "type": "objectAttribute",
         "value": {
@@ -1054,6 +1047,23 @@
             {
               "type": "string",
               "value": "CAROUSEL"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "cardAlignment": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "LEFT"
+            },
+            {
+              "type": "string",
+              "value": "CENTER"
             }
           ]
         },
@@ -1075,23 +1085,6 @@
             {
               "type": "string",
               "value": "RIGHT"
-            }
-          ]
-        },
-        "optional": true
-      },
-      "cardAlignment": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "LEFT"
-            },
-            {
-              "type": "string",
-              "value": "CENTER"
             }
           ]
         },
@@ -3795,7 +3788,7 @@
           "type": "string"
         }
       },
-      "quote": {
+      "title": {
         "type": "objectAttribute",
         "value": {
           "type": "string"
@@ -3809,6 +3802,14 @@
         },
         "optional": true
       },
+      "quote": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "inlineText"
+        },
+        "optional": true
+      },
       "role": {
         "type": "objectAttribute",
         "value": {
@@ -3816,7 +3817,7 @@
         },
         "optional": true
       },
-      "photo": {
+      "image": {
         "type": "objectAttribute",
         "value": {
           "type": "inline",

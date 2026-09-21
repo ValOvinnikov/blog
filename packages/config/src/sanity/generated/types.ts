@@ -165,10 +165,9 @@ export type Module_testimonial = {
       _key: string;
     } & CtaButton
   >;
-  showImages?: boolean;
   displayMode?: 'GRID' | 'CAROUSEL';
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   cardAlignment?: 'LEFT' | 'CENTER';
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   layout?: Layout;
 };
 
@@ -565,10 +564,11 @@ export type Block_testimonial = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  quote?: string;
+  title?: string;
   name?: string;
+  quote?: InlineText;
   role?: string;
-  photo?: ImageWithAlt;
+  image?: ImageWithAlt;
   link?: LinkReference;
 };
 
