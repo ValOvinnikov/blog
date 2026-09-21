@@ -68,7 +68,6 @@ export const quoteCardVariants = tv({
   defaultVariants: {
     align: 'left',
     isSpotlight: false,
-    tone: BRAND_VARIANT.PRIMARY,
   },
 });
 

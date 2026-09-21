@@ -25,7 +25,7 @@ export type TQuoteCardProps = IWithClassName &
     hasAvatar?: boolean;
     align?: TQuoteCardVariants['align'];
     isSpotlight?: boolean;
-    tone?: TBrandVariant;
+    tone: TBrandVariant;
     href?: string;
     linkAs?: TAnchorElementType;
   };

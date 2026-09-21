@@ -26,6 +26,7 @@ const meta = {
     name: faker.person.fullName(),
     role: `${faker.person.jobTitle()}, ${faker.company.name()}`,
     avatarSrc: faker.image.avatar(),
+    tone: BRAND_VARIANT.PRIMARY,
   },
 } satisfies Meta<typeof QuoteCard>;
 

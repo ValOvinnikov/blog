@@ -1,3 +1,4 @@
+import { BRAND_VARIANT } from '@blog/config';
 import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
 import type { ReactNode } from 'react';
@@ -9,6 +10,7 @@ faker.seed(123);
 const setup = customRender(QuoteCard, {
   quote: faker.lorem.sentence(),
   name: faker.person.fullName(),
+  tone: BRAND_VARIANT.PRIMARY,
 });
 
 describe(`<${QuoteCard.name}/>`, () => {
