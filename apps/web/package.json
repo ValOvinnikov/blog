@@ -52,7 +52,7 @@
     "@blog/prettier-config": "workspace:*",
     "@blog/tsconfig": "workspace:*",
     "@blog/vitest-config": "workspace:*",
-    "@playwright/test": "^1.61.1",
+    "@playwright/test": "^1.63.0",
     "@storybook/addon-docs": "^10.6.0",
     "@storybook/nextjs-vite": "10.6.0",
     "@svgr/webpack": "^8.1.0",
