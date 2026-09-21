@@ -4,7 +4,7 @@ import type { VariantProps } from 'tailwind-variants';
 export const mediaCardVariants = tv({
   slots: {
     root: [
-      'group relative flex h-full flex-col overflow-hidden',
+      'relative flex h-full flex-col overflow-hidden',
       'bg-surface border-l-2 border-brand-primary',
       'transition-colors duration-base ease-smooth',
       'motion-reduce:transition-none',
@@ -36,7 +36,7 @@ export const mediaCardVariants = tv({
     isInteractive: {
       true: {
         root: [
-          'hover:bg-brand-primary-muted focus-within:bg-brand-primary-muted',
+          'group hover:bg-brand-primary-muted focus-within:bg-brand-primary-muted',
         ],
       },
       false: {},

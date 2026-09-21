@@ -23,7 +23,11 @@ export const heroVariants = tv({
       [HERO_VARIANT.SPLIT]: {},
       [HERO_VARIANT.STACKED]: {},
       [HERO_VARIANT.BANNER]: {
-        root: ['relative isolate overflow-hidden rounded-xl', 'min-h-[360px]'],
+        root: [
+          'relative isolate overflow-hidden',
+          'left-1/2 w-screen max-w-none -translate-x-1/2 rounded-none',
+          'min-h-[360px]',
+        ],
         grid: ['relative z-0 items-center', 'p-8 sm:p-10'],
         eyebrow: ['text-white'],
         heading: ['text-white'],
@@ -59,6 +63,14 @@ export const heroVariants = tv({
       hasMedia: true,
       class: {
         grid: ['lg:grid-cols-[minmax(0,1.15fr)_minmax(180px,0.85fr)]'],
+      },
+    },
+    {
+      variant: HERO_VARIANT.SPLIT,
+      hasMedia: true,
+      position: CONTENT_ALIGNMENT.RIGHT,
+      class: {
+        grid: ['lg:grid-cols-[minmax(180px,0.85fr)_minmax(0,1.15fr)]'],
       },
     },
     {
