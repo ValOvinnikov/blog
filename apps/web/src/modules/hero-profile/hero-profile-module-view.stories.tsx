@@ -1,6 +1,4 @@
-import { BRAND_VARIANT, HERO_VARIANT, ICONS, SIZE } from '@blog/config';
-import { Icon } from '@blog/ui/atoms/icon';
-import { NavLink } from '@blog/ui/atoms/nav-link';
+import { BRAND_VARIANT, HERO_VARIANT, SOCIAL_PLATFORMS } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
@@ -8,28 +6,28 @@ import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { HeroProfileModuleView } from './hero-profile-module-view';
 
-const socialLinksItems = (
-  <>
-    <li>
-      <NavLink
-        href="https://github.com/example"
-        icon={<Icon name={ICONS.GITHUB} size={SIZE.SM} />}
-        hasLabel={false}
-      >
-        GitHub profile
-      </NavLink>
-    </li>
-    <li>
-      <NavLink
-        href="https://linkedin.com/in/example"
-        icon={<Icon name={ICONS.LINKEDIN} size={SIZE.SM} />}
-        hasLabel={false}
-      >
-        LinkedIn profile
-      </NavLink>
-    </li>
-  </>
-);
+const socialLinks = [
+  {
+    platform: SOCIAL_PLATFORMS.GITHUB,
+    link: {
+      label: 'GitHub',
+      href: 'https://github.com/example',
+      target: '_blank' as const,
+      platform: undefined,
+      ariaLabel: undefined,
+    },
+  },
+  {
+    platform: SOCIAL_PLATFORMS.LINKEDIN,
+    link: {
+      label: 'LinkedIn',
+      href: 'https://linkedin.com/in/example',
+      target: '_blank' as const,
+      platform: undefined,
+      ariaLabel: undefined,
+    },
+  },
+];
 
 const meta = {
   title: 'Modules/HeroProfileModule',
@@ -57,8 +55,7 @@ const meta = {
     }),
     avatarName: 'Jane Cooper',
     sanityImage: makeSanityImage(),
-    socialLinksItems,
-    socialLinksAriaLabel: 'Profiles',
+    socialLinks,
     ctaButtons: ctaActionsDemo.slice(0, 1),
     contentPosition: undefined,
     contentAlignment: undefined,
@@ -107,6 +104,6 @@ export const BannerNoPhoto: TStory = {
 
 export const NoSocialLinks: TStory = {
   args: {
-    socialLinksItems: undefined,
+    socialLinks: [],
   },
 };

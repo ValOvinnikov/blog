@@ -3,8 +3,8 @@ import type { THeroProfileModule } from '@blog/service';
 import { Avatar } from '@blog/ui/atoms/avatar';
 import { Hero } from '@blog/ui/organisms/hero';
 import { SanityImage } from '@web/components/shared/sanity-image';
+import { SocialLinks } from '@web/components/shared/social-links';
 import { HeroModuleShell } from '@web/modules/hero-shared';
-import type { ReactNode } from 'react';
 
 import {
   heroProfileAvatarFallbackVariants,
@@ -12,13 +12,8 @@ import {
   heroProfileMediaFallbackVariants,
 } from './hero-profile-module-view-variants';
 
-export interface IHeroProfileModuleViewProps extends Omit<
-  THeroProfileModule,
-  'socialLinks'
-> {
+export interface IHeroProfileModuleViewProps extends THeroProfileModule {
   id: string;
-  socialLinksItems?: ReactNode;
-  socialLinksAriaLabel: string;
 }
 
 export const HeroProfileModuleView = ({
@@ -29,8 +24,7 @@ export const HeroProfileModuleView = ({
   headingBlock,
   avatarName,
   sanityImage,
-  socialLinksItems,
-  socialLinksAriaLabel,
+  socialLinks,
   ctaButtons,
   contentPosition,
   contentAlignment,
@@ -117,11 +111,11 @@ export const HeroProfileModuleView = ({
         </Hero.Media>
       )}
 
-      {socialLinksItems ? (
+      {socialLinks.length > 0 && (
         <Hero.Social>
-          <ul aria-label={socialLinksAriaLabel}>{socialLinksItems}</ul>
+          <SocialLinks profiles={socialLinks} variant="outlined" />
         </Hero.Social>
-      ) : undefined}
+      )}
     </HeroModuleShell>
   );
 };
