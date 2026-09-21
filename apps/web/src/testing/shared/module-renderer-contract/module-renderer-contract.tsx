@@ -91,6 +91,22 @@ export const testFeatureListModule = ({
   });
 };
 
+export const testTestimonialModule = ({
+  setup,
+  loggerWarnMock,
+}: IWithSetup & { loggerWarnMock: Mock }) => {
+  it('renders a module_testimonial module via the map', async () => {
+    await setup({
+      modules: [{ id: 'testimonial-1', type: 'module_testimonial' }],
+    });
+
+    expect(screen.getByTestId('stub-testimonial')).toHaveTextContent(
+      'testimonial-1',
+    );
+    expect(loggerWarnMock).not.toHaveBeenCalled();
+  });
+};
+
 export const testWarnsForUnknownModule = ({
   setup,
   loggerWarnMock,
