@@ -3,7 +3,7 @@ import {
   SIZE,
   type IWithClassName,
   type IWithDataTestId,
-  type TBrandVariant,
+  type TBrandVariantOf,
 } from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
 import { Avatar } from '@blog/ui/atoms/avatar';
@@ -25,7 +25,7 @@ export type TQuoteCardProps = IWithClassName &
     hasAvatar?: boolean;
     align?: TQuoteCardVariants['align'];
     isSpotlight?: boolean;
-    tone: TBrandVariant;
+    tone: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
     href?: string;
     linkAs?: TAnchorElementType;
   };

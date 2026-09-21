@@ -54,7 +54,6 @@ export const Spotlight: TStory = {
 const BRAND_BANDS = [
   { className: 'bg-primary', tone: BRAND_VARIANT.PRIMARY },
   { className: 'bg-secondary', tone: BRAND_VARIANT.SECONDARY },
-  { className: 'bg-brand-primary-muted', tone: BRAND_VARIANT.BRAND_PRIMARY },
 ] as const;
 
 const OnEveryBand = (args: TQuoteCardProps) => (

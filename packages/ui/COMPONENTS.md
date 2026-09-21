@@ -238,8 +238,8 @@ Variants: collapsible: (boolean)
 ### QuoteCard — `molecules/quote-card/quote-card.tsx`
 
 A testimonial quote rendered as a figure, with the person's photo or initials and an optional link on their name.
-Props: quote: string · name: string · role?: string · avatarSrc?: string · avatarAlt?: string · hasAvatar?: boolean · align?: TQuoteCardVariants['align'] · isSpotlight?: boolean · tone: TBrandVariant · href?: string · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
-Variants: align: left|center · isSpotlight: (boolean) · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY|BRAND_VARIANT.BRAND_PRIMARY
+Props: quote: string · name: string · role?: string · avatarSrc?: string · avatarAlt?: string · hasAvatar?: boolean · align?: TQuoteCardVariants['align'] · isSpotlight?: boolean · tone: TBrandVariantOf<'PRIMARY' | 'SECONDARY'> · href?: string · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
+Variants: align: left|center · isSpotlight: (boolean) · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY
 
 ### SettingRow — `molecules/setting-row/setting-row.tsx`
 
