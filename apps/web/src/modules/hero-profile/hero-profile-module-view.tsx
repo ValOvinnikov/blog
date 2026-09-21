@@ -9,6 +9,7 @@ import { HeroModuleShell } from '@web/modules/hero-shared';
 import {
   heroProfileAvatarFallbackVariants,
   heroProfileAvatarVariants,
+  heroProfileNameVariants,
   heroProfilePortraitVariants,
 } from './hero-profile-module-view-variants';
 
@@ -81,6 +82,12 @@ export const HeroProfileModuleView = ({
             className="size-full object-cover"
           />
         </Hero.Media>
+      )}
+
+      {variant === HERO_VARIANT.SPLIT && !sanityImage && (
+        <Hero.Avatar className="mb-0">
+          <span className={heroProfileNameVariants()}>{avatarName}</span>
+        </Hero.Avatar>
       )}
 
       {isBanner && sanityImage && (

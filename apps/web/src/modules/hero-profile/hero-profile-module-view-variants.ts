@@ -11,3 +11,7 @@ export const heroProfileAvatarFallbackVariants = tv({
 export const heroProfilePortraitVariants = tv({
   base: ['max-w-80 rounded-xl'],
 });
+
+export const heroProfileNameVariants = tv({
+  base: ['sr-only'],
+});

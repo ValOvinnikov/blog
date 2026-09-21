@@ -105,6 +105,16 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
     expect(container.querySelector('[data-testid="hero-media"]')).toBeNull();
   });
 
+  it('still announces the profile name to a screen reader on a photo-less Split, with no initials tile shown', () => {
+    setup({ variant: HERO_VARIANT.SPLIT, sanityImage: undefined });
+
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    expect(screen.queryByText('JR')).not.toBeInTheDocument();
+    expect(
+      screen.getByText(avatarName).closest('[aria-hidden="true"]'),
+    ).toBeNull();
+  });
+
   it('renders no media on Banner when no image resolves', () => {
     const { container } = setup({
       variant: HERO_VARIANT.BANNER,
