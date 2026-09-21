@@ -6,11 +6,12 @@ import {
 import type { TSocialProfile } from '@blog/service';
 import { Icon } from '@blog/ui/atoms/icon';
 import { NavLink } from '@blog/ui/atoms/nav-link';
+import type { TNavLinkVariants } from '@blog/ui/atoms/nav-link/nav-link-variants';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { useTranslations } from 'next-intl';
 
 export type TSocialLinkProps = TSocialProfile & {
-  variant?: 'plain' | 'outlined';
+  variant?: TNavLinkVariants['variant'];
 };
 
 export const SocialLink = ({ platform, link, variant }: TSocialLinkProps) => {

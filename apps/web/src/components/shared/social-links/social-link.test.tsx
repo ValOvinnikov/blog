@@ -33,35 +33,39 @@ const setup = customRender(SocialLink, {
 });
 
 describe(`<${SocialLink.name}/>`, () => {
-  it('derives the accessible name for a mapped platform from SOCIAL_PLATFORM_LABEL, not a naive title-case', () => {
-    setup();
+  it.each([
+    {
+      description:
+        'a mapped platform from SOCIAL_PLATFORM_LABEL, not a naive title-case',
+      platform: SOCIAL_PLATFORMS.LINKEDIN,
+      link: linkedInLink,
+      expectedName: 'LinkedIn profile',
+    },
+    {
+      description: 'GitHub with corrected casing',
+      platform: SOCIAL_PLATFORMS.GITHUB,
+      link: githubLink,
+      expectedName: 'GitHub profile',
+    },
+    {
+      description: 'a platform outside the original 6-key set, translated',
+      platform: SOCIAL_PLATFORMS.MASTODON,
+      link: mastodonLink,
+      expectedName: 'Mastodon profile',
+    },
+  ])(
+    'derives the accessible name for $description',
+    ({ platform, link, expectedName }) => {
+      setup({ platform, link });
 
-    const link = screen.getByRole('link', { name: 'LinkedIn profile' });
+      const socialLink = screen.getByRole('link', { name: expectedName });
 
-    expect(link).toHaveAttribute('href', 'https://www.linkedin.com/in/example');
-    expect(
-      within(link).getByTestId(`social-icon-${SOCIAL_PLATFORMS.LINKEDIN}`),
-    ).toBeVisible();
-  });
-
-  it('derives the accessible name for GitHub with corrected casing', () => {
-    setup({ platform: SOCIAL_PLATFORMS.GITHUB, link: githubLink });
-
-    expect(
-      screen.getByRole('link', { name: 'GitHub profile' }),
-    ).toHaveAttribute('href', 'https://github.com/example');
-  });
-
-  it('renders an icon and the translated accessible name for a platform outside the original 6-key set', () => {
-    setup({ platform: SOCIAL_PLATFORMS.MASTODON, link: mastodonLink });
-
-    const link = screen.getByRole('link', { name: 'Mastodon profile' });
-
-    expect(link).toHaveAttribute('href', 'https://mastodon.social/@example');
-    expect(
-      within(link).getByTestId(`social-icon-${SOCIAL_PLATFORMS.MASTODON}`),
-    ).toBeVisible();
-  });
+      expect(socialLink).toHaveAttribute('href', link.href);
+      expect(
+        within(socialLink).getByTestId(`social-icon-${platform}`),
+      ).toBeVisible();
+    },
+  );
 
   it('honours the authored target', () => {
     setup();
