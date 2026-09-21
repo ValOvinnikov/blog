@@ -3,6 +3,7 @@ import {
   SIZE,
   type IWithClassName,
   type IWithDataTestId,
+  type TBrandVariant,
 } from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
 import { Avatar } from '@blog/ui/atoms/avatar';
@@ -24,6 +25,7 @@ export type TQuoteCardProps = IWithClassName &
     hasAvatar?: boolean;
     align?: TQuoteCardVariants['align'];
     isSpotlight?: boolean;
+    tone?: TBrandVariant;
     href?: string;
     linkAs?: TAnchorElementType;
   };
@@ -38,6 +40,7 @@ export const QuoteCard = ({
   hasAvatar = true,
   align,
   isSpotlight = false,
+  tone,
   href,
   linkAs,
   className,
@@ -47,6 +50,7 @@ export const QuoteCard = ({
   const s = quoteCardVariants({
     align: isSpotlight ? 'center' : align,
     isSpotlight,
+    tone,
   });
 
   return (

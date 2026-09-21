@@ -1,3 +1,4 @@
+import { BRAND_VARIANT } from '@blog/config';
 import { tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
@@ -35,17 +36,39 @@ export const quoteCardVariants = tv({
         root: ['mx-auto max-w-[52ch] border-l-0 bg-transparent px-0 py-0'],
         quoteMark: ['size-10'],
         quote: ['text-prose-h4'],
-        name: ['focus-visible:ring-offset-primary'],
       },
       false: {
         quote: ['text-prose'],
         name: ['focus-visible:ring-offset-surface'],
       },
     },
+    tone: {
+      [BRAND_VARIANT.PRIMARY]: {},
+      [BRAND_VARIANT.SECONDARY]: {},
+      [BRAND_VARIANT.BRAND_PRIMARY]: {},
+    },
   },
+  compoundVariants: [
+    {
+      isSpotlight: true,
+      tone: BRAND_VARIANT.PRIMARY,
+      class: { name: ['focus-visible:ring-offset-primary'] },
+    },
+    {
+      isSpotlight: true,
+      tone: BRAND_VARIANT.SECONDARY,
+      class: { name: ['focus-visible:ring-offset-secondary'] },
+    },
+    {
+      isSpotlight: true,
+      tone: BRAND_VARIANT.BRAND_PRIMARY,
+      class: { name: ['focus-visible:ring-offset-brand-primary-muted'] },
+    },
+  ],
   defaultVariants: {
     align: 'left',
     isSpotlight: false,
+    tone: BRAND_VARIANT.PRIMARY,
   },
 });
 

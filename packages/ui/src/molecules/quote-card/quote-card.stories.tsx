@@ -1,3 +1,4 @@
+import { BRAND_VARIANT } from '@blog/config';
 import { objectKeys } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -14,6 +15,10 @@ const meta = {
     align: {
       control: 'select',
       options: objectKeys(quoteCardVariants.variants.align),
+    },
+    tone: {
+      control: 'select',
+      options: objectKeys(quoteCardVariants.variants.tone),
     },
   },
   args: {
@@ -46,20 +51,20 @@ export const Spotlight: TStory = {
 };
 
 const BRAND_BANDS = [
-  'bg-primary',
-  'bg-secondary',
-  'bg-brand-primary-muted',
+  { className: 'bg-primary', tone: BRAND_VARIANT.PRIMARY },
+  { className: 'bg-secondary', tone: BRAND_VARIANT.SECONDARY },
+  { className: 'bg-brand-primary-muted', tone: BRAND_VARIANT.BRAND_PRIMARY },
 ] as const;
 
 const OnEveryBand = (args: TQuoteCardProps) => (
   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem' }}>
-    {BRAND_BANDS.map((band) => (
+    {BRAND_BANDS.map(({ className, tone }) => (
       <div
-        key={band}
-        className={band}
+        key={className}
+        className={className}
         style={{ maxWidth: 360, padding: '1.5rem' }}
       >
-        <QuoteCard {...args} />
+        <QuoteCard {...args} tone={tone} />
       </div>
     ))}
   </div>
