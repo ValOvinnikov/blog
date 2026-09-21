@@ -2,7 +2,7 @@
 
 # @blog/ui component index
 
-_54 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
+_55 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
 
 ## Atoms
 
@@ -234,6 +234,17 @@ Props: author: { name: string; imageUrl?: string; href?: string; } · publishedA
 Top-level `<nav>` landmark composing `NavLink` items with an optional trailing `actions` slot (e.g. a theme toggle or menu button).
 Props: links: INavItem[] · actions?: ReactNode · ariaLabel?: string · linkAs?: TAnchorElementType · mobileToggle?: TPrimaryNavigationMobileToggleProps _(extends IWithClassName, IWithDataTestId)_
 Variants: collapsible: (boolean)
+
+### QuoteCard — `molecules/quote-card/quote-card.tsx`
+
+A testimonial quote rendered as a figure; composes a caller-supplied `QuoteCard.Avatar` and `QuoteCard.Name` for the quoted person.
+Props: quote: string · role?: string · align?: TQuoteCardVariants['align'] · isSpotlight?: boolean · tone: TBrandVariantOf<'PRIMARY' | 'SECONDARY'> · children?: TCompoundChildren<typeof QuoteCardParts> _(extends IWithClassName, IWithDataTestId)_
+Variants: align: left|center · isSpotlight: (boolean)
+
+Slots:
+
+- **QuoteCard.Avatar** — The avatar slot of a `QuoteCard`; positions the caller's own `Avatar` element beside the quoted person's name. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **QuoteCard.Name** — The name slot of a `QuoteCard`; wraps the quoted person's link or text in the tone-matched link/focus treatment, on an element the component itself owns rather than the caller's link or text. Props: isSpotlight?: TQuoteCardNameVariants['isSpotlight'] · tone?: TQuoteCardNameVariants['tone'] · children: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: isSpotlight: (boolean) · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY
 
 ### SettingRow — `molecules/setting-row/setting-row.tsx`
 
