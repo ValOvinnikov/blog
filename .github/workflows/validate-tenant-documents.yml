@@ -21,9 +21,15 @@ name: Validate Tenant Documents
 #     tenant finishes provisioning — catches a tenant seeded already-invalid
 #     by `starter-content.ts` immediately, rather than waiting for the next
 #     scheduled sweep.
+# TEMPORARY: the cron is parked. It resolves credentials from the `production`
+# Environment, which has no single-name `TENANT_REGISTRY_DATABASE_URL` secret
+# while production is paused (#2456/#2497 closed as superseded on 2026-09-02),
+# so every scheduled run failed in `createEnv` before its first query. Manual
+# dispatch still works. Re-enable by uncommenting `schedule:` once that secret
+# exists in the `production` Environment (#3479).
 on:
-  schedule:
-    - cron: '0 6 * * 1'
+  # schedule:
+  #   - cron: '0 6 * * 1'
   workflow_dispatch:
     inputs:
       tenantId:
