@@ -14,7 +14,7 @@ export const buildTagIndexMetadata = async (
   ]);
 
   if (!result.ok) {
-    logger.error('tags_metadata.fetch_failed', { error: result.error });
+    logger.error('tag_index_metadata.fetch_failed', { error: result.error });
     return {};
   }
 

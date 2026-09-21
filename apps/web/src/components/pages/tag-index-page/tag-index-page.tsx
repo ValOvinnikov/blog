@@ -11,7 +11,7 @@ export const TagIndexPage = async ({ locale, tenant }: TTagIndexPageProps) => {
   const result = await getTagIndexPage(tenant);
   const { headingBlock, hero, modules } = guardPageLoaderResult(
     result,
-    'tags_page.fetch_failed',
+    'tag_index_page.fetch_failed',
   );
 
   return (

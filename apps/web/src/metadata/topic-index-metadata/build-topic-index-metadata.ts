@@ -14,7 +14,7 @@ export const buildTopicIndexMetadata = async (
   ]);
 
   if (!result.ok) {
-    logger.error('topics_metadata.fetch_failed', { error: result.error });
+    logger.error('topic_index_metadata.fetch_failed', { error: result.error });
     return {};
   }
 

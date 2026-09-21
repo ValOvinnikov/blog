@@ -14,7 +14,7 @@ export const TopicIndexPage = async ({
   const result = await getTopicIndexPage(tenant);
   const { headingBlock, hero, modules } = guardPageLoaderResult(
     result,
-    'topics_page.fetch_failed',
+    'topic_index_page.fetch_failed',
   );
 
   return (

@@ -25,7 +25,7 @@ export const buildPostIndexMetadata = async (
   ]);
 
   if (!result.ok) {
-    logger.error('blog_list_metadata.fetch_failed', {
+    logger.error('post_index_metadata.fetch_failed', {
       page,
       error: result.error,
     });

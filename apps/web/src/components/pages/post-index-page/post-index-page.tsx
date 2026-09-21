@@ -14,7 +14,10 @@ export const PostIndexPage = async ({
   tenant,
 }: TPostIndexPageProps) => {
   const result = await getPostIndexPage(tenant);
-  const pageData = guardPageLoaderResult(result, 'blog_list_page.fetch_failed');
+  const pageData = guardPageLoaderResult(
+    result,
+    'post_index_page.fetch_failed',
+  );
   const { headingBlock, hero, modules } = pageData;
 
   return (
