@@ -10,6 +10,8 @@ type TValidatedSource = { validation?: unknown; name?: string };
 export type TRecordedBounds = {
   min?: number;
   max?: number;
+  required?: boolean;
+  unique?: boolean;
 };
 
 type TMockValidationRule<TFn> = {
@@ -38,8 +40,14 @@ const createRecordingRule = <TFn>(
       return rule;
     },
     error: () => rule,
-    required: () => rule,
-    unique: () => rule,
+    required: () => {
+      bounds.required = true;
+      return rule;
+    },
+    unique: () => {
+      bounds.unique = true;
+      return rule;
+    },
     integer: () => rule,
     min: (value) => {
       bounds.min = value;
@@ -87,9 +95,10 @@ export const getRecordedValidators = <TFn>(
 };
 
 /**
- * Same as `getRecordedValidators`, but returns the numeric arguments passed
- * to `.min()`/`.max()` in the chain — for asserting behaviour against a
- * schema's real bound instead of a value copied out of the schema file.
+ * Same as `getRecordedValidators`, but returns whether `.required()`/
+ * `.unique()` were chained and the numeric arguments passed to
+ * `.min()`/`.max()` — for asserting behaviour against a schema's real rules
+ * instead of a value copied out of the schema file.
  */
 export const getRecordedBounds = (
   source: TValidatedSource | undefined,

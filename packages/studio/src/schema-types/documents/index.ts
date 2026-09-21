@@ -1,4 +1,5 @@
 import { featureBlockSchema } from './blocks/feature/feature';
+import { blockTestimonialSchema } from './blocks/testimonial/testimonial';
 import { authorSchema } from './blog/author/author';
 import { tagSchema } from './blog/tag/tag';
 import { topicSchema } from './blog/topic/topic';
@@ -23,6 +24,7 @@ export const documents = [
   topicSchema,
   tagSchema,
   featureBlockSchema,
+  blockTestimonialSchema,
   linkSchema,
   landingPageSchema,
   homePageSchema,
