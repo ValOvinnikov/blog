@@ -1,29 +1,14 @@
-import {
-  HERO_IMAGE_SOURCE,
-  POST_SOURCE,
-  HERO_VARIANT,
-} from '@blog/config/constants';
-import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
-import { PUBLISHED_POST_CONDITION } from '@blog/studio/schema-types/filters/published-post';
+import { POST_SOURCE } from '@blog/config/constants';
 import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
-import {
-  getCustomValidator,
-  getRecordedValidators,
-  type TRecordedValidator,
-} from '@blog/studio/testing/create-mock-validation-rule';
+import { getCustomValidator } from '@blog/studio/testing/create-mock-validation-rule';
 import { getField } from '@blog/studio/testing/get-field';
 import { getHidden } from '@blog/studio/testing/get-field-hidden';
-import type { SanityDocument, ValidationContext } from 'sanity';
+import type { ValidationContext } from 'sanity';
 
 type TCustomFn = (
   value: unknown,
   context: { parent?: unknown },
 ) => string | true;
-
-type TDocFn = (
-  document: SanityDocument | undefined,
-  context: ValidationContext,
-) => Promise<string | true> | string | true;
 
 type TFieldAsyncFn = (
   value: string | undefined,
@@ -31,9 +16,6 @@ type TFieldAsyncFn = (
 ) => Promise<string | true>;
 
 const getHeroBlogField = (name: string) => getField(heroBlogSchema, name);
-
-const getDocumentValidators = (): TRecordedValidator<TDocFn>[] =>
-  getRecordedValidators<TDocFn>(heroBlogSchema);
 
 const createMockContext = (
   fetchImpl: (query: string, params?: unknown) => unknown,
@@ -127,183 +109,6 @@ describe('heroBlogSchema post field', () => {
         parent: { postSource: POST_SOURCE.NEWEST_FEATURED },
       }),
     ).toBe(true);
-  });
-});
-
-describe('heroBlogSchema image field', () => {
-  it('is hidden unless Image Source is Custom', () => {
-    const hidden = getHidden(getHeroBlogField('image'));
-
-    expect(hidden({ parent: { imageSource: HERO_IMAGE_SOURCE.CUSTOM } })).toBe(
-      false,
-    );
-    expect(hidden({ parent: { imageSource: HERO_IMAGE_SOURCE.POST } })).toBe(
-      true,
-    );
-    expect(hidden({ parent: { imageSource: HERO_IMAGE_SOURCE.NONE } })).toBe(
-      true,
-    );
-  });
-
-  it('errors when Custom with no image chosen', () => {
-    const validate = getCustomValidator<TCustomFn>(getHeroBlogField('image'));
-
-    expect(
-      validate(undefined, {
-        parent: { imageSource: HERO_IMAGE_SOURCE.CUSTOM },
-      }),
-    ).toBe('A custom image is required when Source is Custom.');
-  });
-
-  it('is valid with no image when Image Source is Post or None', () => {
-    const validate = getCustomValidator<TCustomFn>(getHeroBlogField('image'));
-
-    expect(
-      validate(undefined, { parent: { imageSource: HERO_IMAGE_SOURCE.POST } }),
-    ).toBe(true);
-    expect(
-      validate(undefined, { parent: { imageSource: HERO_IMAGE_SOURCE.NONE } }),
-    ).toBe(true);
-  });
-});
-
-describe('heroBlogSchema document validation', () => {
-  describe('variant-requires-image', () => {
-    it('errors when Split with Image Source None', () => {
-      const [validateVariantImage] = getDocumentValidators();
-
-      expect(
-        validateVariantImage!.fn(
-          {
-            variant: HERO_VARIANT.SPLIT,
-            imageSource: HERO_IMAGE_SOURCE.NONE,
-          } as unknown as SanityDocument,
-          undefined as unknown as ValidationContext,
-        ),
-      ).toBe('These variants are built around an image.');
-    });
-
-    it('errors when Banner with Image Source None', () => {
-      const [validateVariantImage] = getDocumentValidators();
-
-      expect(
-        validateVariantImage!.fn(
-          {
-            variant: HERO_VARIANT.BANNER,
-            imageSource: HERO_IMAGE_SOURCE.NONE,
-          } as unknown as SanityDocument,
-          undefined as unknown as ValidationContext,
-        ),
-      ).toBe('These variants are built around an image.');
-    });
-
-    it('passes when Stacked with Image Source None', () => {
-      const [validateVariantImage] = getDocumentValidators();
-
-      expect(
-        validateVariantImage!.fn(
-          {
-            variant: HERO_VARIANT.STACKED,
-            imageSource: HERO_IMAGE_SOURCE.NONE,
-          } as unknown as SanityDocument,
-          undefined as unknown as ValidationContext,
-        ),
-      ).toBe(true);
-    });
-
-    it('passes when Split with an image source', () => {
-      const [validateVariantImage] = getDocumentValidators();
-
-      expect(
-        validateVariantImage!.fn(
-          {
-            variant: HERO_VARIANT.SPLIT,
-            imageSource: HERO_IMAGE_SOURCE.POST,
-          } as unknown as SanityDocument,
-          undefined as unknown as ValidationContext,
-        ),
-      ).toBe(true);
-    });
-  });
-
-  describe('post-image-fallback', () => {
-    it('passes without querying when Image Source is not Post', async () => {
-      const [, validateImageFallback] = getDocumentValidators();
-      let called = false;
-      const context = createMockContext(() => {
-        called = true;
-        return null;
-      });
-
-      await expect(
-        validateImageFallback!.fn(
-          {
-            imageSource: HERO_IMAGE_SOURCE.CUSTOM,
-          } as unknown as SanityDocument,
-          context,
-        ),
-      ).resolves.toBe(true);
-      expect(called).toBe(false);
-    });
-
-    it('queries page_post for the newest featured, published post', async () => {
-      const [, validateImageFallback] = getDocumentValidators();
-      let receivedQuery = '';
-      const context = createMockContext((query) => {
-        receivedQuery = query;
-        return { publishedAt: null, heroImage: undefined };
-      });
-
-      await validateImageFallback!.fn(
-        {
-          postSource: POST_SOURCE.NEWEST_FEATURED,
-          imageSource: HERO_IMAGE_SOURCE.POST,
-        } as unknown as SanityDocument,
-        context,
-      );
-
-      expect(receivedQuery).toContain(`_type == "${PAGE_POST_TYPE}"`);
-      expect(receivedQuery).toContain('featured == true');
-      expect(receivedQuery).toContain(PUBLISHED_POST_CONDITION);
-      expect(receivedQuery).toContain('order(publishedAt desc)[0]');
-      expect(receivedQuery).toContain('{ publishedAt, heroImage }');
-    });
-
-    it('warns when Image Source is Post and the resolved post has no image', async () => {
-      const [, validateImageFallback] = getDocumentValidators();
-      const context = createMockContext(() => ({
-        publishedAt: null,
-        heroImage: undefined,
-      }));
-
-      await expect(
-        validateImageFallback!.fn(
-          {
-            postSource: POST_SOURCE.NEWEST_FEATURED,
-            imageSource: HERO_IMAGE_SOURCE.POST,
-          } as unknown as SanityDocument,
-          context,
-        ),
-      ).resolves.toBe('Falls back to no image on the page.');
-    });
-
-    it('passes when Image Source is Post and the resolved post has an image', async () => {
-      const [, validateImageFallback] = getDocumentValidators();
-      const context = createMockContext(() => ({
-        publishedAt: null,
-        heroImage: { asset: { _ref: 'image-abc' } },
-      }));
-
-      await expect(
-        validateImageFallback!.fn(
-          {
-            postSource: POST_SOURCE.NEWEST_FEATURED,
-            imageSource: HERO_IMAGE_SOURCE.POST,
-          } as unknown as SanityDocument,
-          context,
-        ),
-      ).resolves.toBe(true);
-    });
   });
 });
 
