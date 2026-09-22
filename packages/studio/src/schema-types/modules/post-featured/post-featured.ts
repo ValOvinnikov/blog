@@ -5,60 +5,20 @@ import { brandVariantField } from '@blog/studio/schema-types/fields/brand-varian
 import { displayModeField } from '@blog/studio/schema-types/fields/display-mode-field/display-mode-field';
 import { showImagesField } from '@blog/studio/schema-types/fields/show-images-field/show-images-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { publishedPostFilter } from '@blog/studio/schema-types/filters/published-post';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
-import { getDraftsClient } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
 import { validateNewestFeaturedHasCandidate } from '@blog/studio/schema-types/validation/validate-newest-featured-has-candidate/validate-newest-featured-has-candidate';
 import { toTitleCase } from '@blog/utils/primitives';
 import { Pin } from 'lucide-react';
-import {
-  defineArrayMember,
-  defineField,
-  defineType,
-  type SanityDocument,
-  type ValidationContext,
-} from 'sanity';
+import { defineArrayMember, defineField, defineType } from 'sanity';
 
 const POSTS_FIELDSET = 'posts';
 
 type TPostFeaturedDocument = {
   postSource?: TPostSource;
   posts?: { _ref?: string }[];
-};
-
-const asPostFeaturedDocument = (
-  document: SanityDocument | undefined,
-): TPostFeaturedDocument | undefined =>
-  document as TPostFeaturedDocument | undefined;
-
-const validatePinnedPostsPublishDate = async (
-  document: SanityDocument | undefined,
-  context: ValidationContext,
-): Promise<string | true> => {
-  const doc = asPostFeaturedDocument(document);
-
-  if (doc?.postSource !== POST_SOURCE.PINNED) return true;
-
-  const refs = (doc.posts ?? [])
-    .map((post) => post._ref)
-    .filter((ref): ref is string => Boolean(ref));
-
-  if (refs.length === 0) return true;
-
-  const client = getDraftsClient(context);
-  const resolved = await client.fetch<{ publishedAt: string | null }[]>(
-    `*[_id in $ids]{ publishedAt }`,
-    { ids: refs },
-  );
-
-  const hasFuturePost = resolved.some(
-    (post) => post.publishedAt && new Date(post.publishedAt) > new Date(),
-  );
-
-  return hasFuturePost
-    ? 'This post publishes later. The spotlight skips it until then.'
-    : true;
 };
 
 export const postFeaturedSchema = defineType({
@@ -68,10 +28,6 @@ export const postFeaturedSchema = defineType({
   description:
     'A spotlight on up to three posts, with the first shown larger as the lead. Pin the posts yourself, or let it pick the newest ones marked Featured.',
   icon: Pin,
-  validation: (rule) => [
-    rule.custom(validateNewestFeaturedHasCandidate('spotlight')),
-    rule.custom(validatePinnedPostsPublishDate).warning(),
-  ],
   fieldsets: [
     {
       name: POSTS_FIELDSET,
@@ -98,7 +54,8 @@ export const postFeaturedSchema = defineType({
         })),
       },
       initialValue: POST_SOURCE.PINNED,
-      validation: (rule) => rule.required(),
+      validation: (rule) =>
+        rule.required().custom(validateNewestFeaturedHasCandidate('spotlight')),
     }),
     defineField({
       name: 'posts',
@@ -110,6 +67,7 @@ export const postFeaturedSchema = defineType({
         defineArrayMember({
           type: 'reference',
           to: [{ type: PAGE_POST_TYPE }],
+          options: { filter: publishedPostFilter },
         }),
       ],
       hidden: ({ parent }) =>
