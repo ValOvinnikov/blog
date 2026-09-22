@@ -22,6 +22,7 @@ describe('page module type unions', () => {
       | 'module_taxonomyList'
       | 'module_postFeatured'
       | 'module_featureList'
+      | 'module_logoWall'
       | 'module_testimonial'
     >();
   });
@@ -44,6 +45,7 @@ describe('page module type unions', () => {
       | 'module_newsletter'
       | 'module_taxonomyList'
       | 'module_featureList'
+      | 'module_logoWall'
       | 'module_testimonial'
     >();
   });
