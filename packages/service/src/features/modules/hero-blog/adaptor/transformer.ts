@@ -63,7 +63,7 @@ function toSecondaryButton(
   return raw ? toCtaButton(raw) : undefined;
 }
 
-function toCtaButtons(
+function toHeroBlogButtons(
   raw: TRawHeroBlogModule,
   post: TPostCard | undefined,
 ): THeroBlogButton[] {
@@ -83,7 +83,7 @@ export function toHeroBlogModule(raw: TRawHeroBlogModule): THeroBlogModule {
     eyebrow: raw.eyebrow ?? post?.topic?.title,
     supportingText: post?.excerpt,
     sanityImage: toImage(raw, post),
-    ctaButtons: toCtaButtons(raw, post),
+    ctaButtons: toHeroBlogButtons(raw, post),
     contentPosition,
     contentAlignment: raw.contentAlignment ?? undefined,
     mediaOrder,
