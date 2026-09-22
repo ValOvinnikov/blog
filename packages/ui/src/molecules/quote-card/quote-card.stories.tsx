@@ -33,7 +33,7 @@ const meta = {
     children: (
       <>
         <QuoteCard.Avatar>
-          <Avatar src={AVATAR_SRC} alt={NAME} name={NAME} />
+          <Avatar src={AVATAR_SRC} alt="" name={NAME} />
         </QuoteCard.Avatar>
         <QuoteCard.Name>
           <span>{NAME}</span>
@@ -67,7 +67,7 @@ export const Linked: TStory = {
     children: (
       <>
         <QuoteCard.Avatar>
-          <Avatar src={AVATAR_SRC} alt={NAME} name={NAME} />
+          <Avatar src={AVATAR_SRC} alt="" name={NAME} />
         </QuoteCard.Avatar>
         <QuoteCard.Name>
           <a href="https://example.com/case-studies/customer">{NAME}</a>

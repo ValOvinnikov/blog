@@ -67,7 +67,7 @@ export const Avatar = ({
       ) : (
         <>
           <span aria-hidden="true">{initials}</span>
-          <span className={avatarNameVariants()}>{name}</span>
+          {alt && <span className={avatarNameVariants()}>{alt}</span>}
         </>
       )}
     </span>

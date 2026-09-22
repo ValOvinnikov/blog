@@ -55,7 +55,7 @@ describe(`<${QuoteCard.name}/>`, () => {
     renderElement(
       <QuoteCard quote={faker.lorem.sentence()} tone={BRAND_VARIANT.PRIMARY}>
         <QuoteCard.Avatar>
-          <Avatar name="Ada Lovelace" alt="Ada Lovelace" />
+          <Avatar name="Ada Lovelace" alt="" />
         </QuoteCard.Avatar>
         <QuoteCard.Name>
           <span>Ada Lovelace</span>
@@ -72,7 +72,7 @@ describe(`<${QuoteCard.name}/>`, () => {
         <QuoteCard.Avatar>
           <Avatar
             name="Ada Lovelace"
-            alt="Ada Lovelace"
+            alt=""
             src="https://example.com/avatar.jpg"
           />
         </QuoteCard.Avatar>
@@ -81,10 +81,24 @@ describe(`<${QuoteCard.name}/>`, () => {
         </QuoteCard.Name>
       </QuoteCard>,
     );
-    expect(screen.getByRole('img')).toHaveAttribute(
+    expect(screen.getByRole('presentation')).toHaveAttribute(
       'src',
       'https://example.com/avatar.jpg',
     );
+  });
+
+  it('announces the quoted person once when the caller-supplied Avatar sits beside QuoteCard.Name', () => {
+    renderElement(
+      <QuoteCard quote={faker.lorem.sentence()} tone={BRAND_VARIANT.PRIMARY}>
+        <QuoteCard.Avatar>
+          <Avatar name="Ada Lovelace" alt="" />
+        </QuoteCard.Avatar>
+        <QuoteCard.Name>
+          <span>Ada Lovelace</span>
+        </QuoteCard.Name>
+      </QuoteCard>,
+    );
+    expect(screen.getAllByText('Ada Lovelace')).toHaveLength(1);
   });
 
   it('renders neither an image nor initials when QuoteCard.Avatar is omitted', () => {
