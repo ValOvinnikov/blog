@@ -1,4 +1,4 @@
-import { customRender } from '@blog/ui/testing/custom-render';
+import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
 
 import { Prose } from './prose';
@@ -12,8 +12,8 @@ const setup = customRender(Prose, {
 describe(`<${Prose.name}/>`, () => {
   it('renders children', () => {
     const body = faker.lorem.paragraph();
-    const { getByText } = setup({ children: body });
-    expect(getByText(body)).toBeVisible();
+    setup({ children: body });
+    expect(screen.getByText(body)).toBeVisible();
   });
 
   it('renders as a <div>', () => {

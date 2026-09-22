@@ -49,16 +49,13 @@ describe(`<${ThemeToggle.name}/>`, () => {
 
   it('renders the placeholder and no icon when isMounted is false', () => {
     setup({ isMounted: false });
-    const button = screen.getByRole('button');
-    expect(button.querySelector('svg')).not.toBeInTheDocument();
-    expect(
-      button.querySelector('span[aria-hidden="true"]'),
-    ).toBeInTheDocument();
+    expect(screen.queryByTestId('theme-toggle-icon')).not.toBeInTheDocument();
+    expect(screen.getByTestId('theme-toggle-placeholder')).toBeVisible();
   });
 
   it('renders the icon when isMounted is true', () => {
     setup({ isMounted: true });
-    expect(screen.getByRole('button').querySelector('svg')).toBeInTheDocument();
+    expect(screen.getByTestId('theme-toggle-icon')).toBeVisible();
   });
 });
 

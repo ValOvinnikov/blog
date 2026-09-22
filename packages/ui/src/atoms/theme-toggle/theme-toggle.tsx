@@ -40,12 +40,24 @@ export const ThemeToggle = ({
     >
       {isMounted ? (
         isDark ? (
-          <Icon name={ICONS.SUN} size={SIZE.MD} />
+          <Icon
+            name={ICONS.SUN}
+            size={SIZE.MD}
+            dataTestId="theme-toggle-icon"
+          />
         ) : (
-          <Icon name={ICONS.MOON} size={SIZE.MD} />
+          <Icon
+            name={ICONS.MOON}
+            size={SIZE.MD}
+            dataTestId="theme-toggle-icon"
+          />
         )
       ) : (
-        <span className={themeTogglePlaceholderVariants()} aria-hidden="true" />
+        <span
+          className={themeTogglePlaceholderVariants()}
+          aria-hidden="true"
+          data-testid="theme-toggle-placeholder"
+        />
       )}
     </IconButton>
   );

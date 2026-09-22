@@ -10,6 +10,8 @@ type TValidatedSource = { validation?: unknown; name?: string };
 export type TRecordedBounds = {
   min?: number;
   max?: number;
+  required?: boolean;
+  unique?: boolean;
 };
 
 type TMockValidationRule<TFn> = {
@@ -38,8 +40,14 @@ const createRecordingRule = <TFn>(
       return rule;
     },
     error: () => rule,
-    required: () => rule,
-    unique: () => rule,
+    required: () => {
+      bounds.required = true;
+      return rule;
+    },
+    unique: () => {
+      bounds.unique = true;
+      return rule;
+    },
     integer: () => rule,
     min: (value) => {
       bounds.min = value;
@@ -68,13 +76,6 @@ const asValidationFn = (
   return source.validation as (rule: never) => unknown;
 };
 
-/**
- * Exercises a field's or document's `validation` builder against a minimal
- * chainable mock `Rule` and records each `custom()` callback in registration
- * order, along with its severity — a validator defaults to `'error'` and
- * only becomes `'warning'` when `.warning()` is chained onto that same
- * `.custom()` call.
- */
 export const getRecordedValidators = <TFn>(
   source: TValidatedSource | undefined,
 ): TRecordedValidator<TFn>[] => {
@@ -86,11 +87,6 @@ export const getRecordedValidators = <TFn>(
   return recorded;
 };
 
-/**
- * Same as `getRecordedValidators`, but returns the numeric arguments passed
- * to `.min()`/`.max()` in the chain — for asserting behaviour against a
- * schema's real bound instead of a value copied out of the schema file.
- */
 export const getRecordedBounds = (
   source: TValidatedSource | undefined,
 ): TRecordedBounds => {

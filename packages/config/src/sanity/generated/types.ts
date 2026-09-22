@@ -139,6 +139,38 @@ export type RichText = Array<
     } & Aside)
 >;
 
+export type Block_testimonialReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'block_testimonial';
+};
+
+export type Module_testimonial = {
+  _id: string;
+  _type: 'module_testimonial';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  headingBlock?: HeadingBlock;
+  testimonials?: Array<
+    {
+      _key: string;
+    } & Block_testimonialReference
+  >;
+  ctaButtons?: Array<
+    {
+      _key: string;
+    } & CtaButton
+  >;
+  displayMode?: 'GRID' | 'CAROUSEL';
+  cardAlignment?: 'LEFT' | 'CENTER';
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  layout?: Layout;
+};
+
 export type Block_featureReference = {
   _ref: string;
   _type: 'reference';
@@ -526,6 +558,20 @@ export type Settings_site = {
   brand?: Brand;
 };
 
+export type Block_testimonial = {
+  _id: string;
+  _type: 'block_testimonial';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  name?: string;
+  quote?: InlineText;
+  role?: string;
+  image?: ImageWithAlt;
+  link?: LinkReference;
+};
+
 export type Block_feature = {
   _id: string;
   _type: 'block_feature';
@@ -908,6 +954,13 @@ export type Module_featureListReference = {
   [internalGroqTypeReferenceTo]?: 'module_featureList';
 };
 
+export type Module_testimonialReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_testimonial';
+};
+
 export type Page_landing = {
   _id: string;
   _type: 'page_landing';
@@ -943,6 +996,9 @@ export type Page_landing = {
     | ({
         _key: string;
       } & Module_featureListReference)
+    | ({
+        _key: string;
+      } & Module_testimonialReference)
   >;
   seo?: Seo;
 };
@@ -981,6 +1037,9 @@ export type Page_home = {
     | ({
         _key: string;
       } & Module_featureListReference)
+    | ({
+        _key: string;
+      } & Module_testimonialReference)
   >;
   seo?: Seo;
 };
@@ -1262,6 +1321,8 @@ export type AllSanitySchemaTypes =
   | ImageWithAlt
   | Module_content
   | RichText
+  | Block_testimonialReference
+  | Module_testimonial
   | Block_featureReference
   | Module_featureList
   | Module_postRelated
@@ -1295,6 +1356,7 @@ export type AllSanitySchemaTypes =
   | Settings_footer
   | Settings_navigation
   | Settings_site
+  | Block_testimonial
   | Block_feature
   | Blog_author
   | Page_homeReference
@@ -1323,6 +1385,7 @@ export type AllSanitySchemaTypes =
   | Module_heroProfileReference
   | Module_contentReference
   | Module_featureListReference
+  | Module_testimonialReference
   | Page_landing
   | Page_home
   | Blog_authorReference

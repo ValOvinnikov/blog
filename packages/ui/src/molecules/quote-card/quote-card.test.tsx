@@ -1,6 +1,6 @@
 import { BRAND_VARIANT } from '@blog/config';
 import { Avatar } from '@blog/ui/atoms/avatar';
-import { renderElement, screen } from '@blog/ui/testing/custom-render';
+import { renderElement, screen, within } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
 import type { ReactNode } from 'react';
 
@@ -9,10 +9,10 @@ import { QuoteCard } from './quote-card';
 faker.seed(123);
 
 describe(`<${QuoteCard.name}/>`, () => {
-  it('renders a figure containing a blockquote and a figcaption', () => {
+  it('renders a figure containing the quote and the name', () => {
     const quote = faker.lorem.sentence();
     const name = faker.person.fullName();
-    const { container } = renderElement(
+    renderElement(
       <QuoteCard quote={quote} tone={BRAND_VARIANT.PRIMARY}>
         <QuoteCard.Name>
           <span>{name}</span>
@@ -21,12 +21,8 @@ describe(`<${QuoteCard.name}/>`, () => {
     );
 
     const figure = screen.getByRole('figure');
-    const blockquote = container.querySelector('blockquote');
-    const figcaption = container.querySelector('figcaption');
-
-    expect(figure).toContainElement(blockquote);
-    expect(figure).toContainElement(figcaption);
-    expect(blockquote).toHaveTextContent(quote);
+    expect(within(figure).getByText(quote)).toBeVisible();
+    expect(within(figure).getByText(name)).toBeVisible();
   });
 
   it('renders the role text when provided', () => {
