@@ -19,6 +19,9 @@ describe(`<${BrandLockupLink.name}/>`, () => {
     setup({ logoUrl: undefined });
 
     expect(screen.queryByRole('presentation')).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'Home' }),
+    ).not.toBeEmptyDOMElement();
   });
 
   it('passes the tagline through to the brand lockup when set', () => {

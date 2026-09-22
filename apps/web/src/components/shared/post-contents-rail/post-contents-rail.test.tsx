@@ -158,6 +158,9 @@ describe(`<${PostContentsRail.name}/>`, () => {
 
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
     expect(screen.getAllByRole('link')).toHaveLength(mockPostHeadings.length);
+    expect(
+      screen.getAllByRole('list', { hidden: true }).at(-1),
+    ).not.toBeVisible();
   });
 
   it('marks the active heading link with aria-current="location", and no other', () => {

@@ -1,6 +1,5 @@
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { errorBoundaryCopy } from '@web/components/shared/error-boundary-copy';
 import { customRender, screen } from '@web/testing/custom-render';
 
 import { ErrorPage } from './error-page';
@@ -60,13 +59,16 @@ describe(`<${ErrorPage.name}/>`, () => {
   it('announces the error to assistive technology after mount', () => {
     setup();
 
-    expect(screen.getByText(errorBoundaryCopy.announcement)).toBeVisible();
+    expect(
+      screen.getByText('Something went wrong. You can try again, or go home.'),
+    ).toBeVisible();
   });
 
   it('names both available actions in the announcement, matching the rendered controls', () => {
     setup();
 
-    const announcement = errorBoundaryCopy.announcement.toLowerCase();
+    const announcement =
+      'Something went wrong. You can try again, or go home.'.toLowerCase();
     const tryAgainLabel =
       screen.getByRole('button', { name: 'Try again' }).textContent ?? '';
     const goHomeLabel =
@@ -79,10 +81,9 @@ describe(`<${ErrorPage.name}/>`, () => {
   it('sets aria-atomic on the live region', () => {
     setup();
 
-    expect(screen.getByText(errorBoundaryCopy.announcement)).toHaveAttribute(
-      'aria-atomic',
-      'true',
-    );
+    expect(
+      screen.getByText('Something went wrong. You can try again, or go home.'),
+    ).toHaveAttribute('aria-atomic', 'true');
   });
 
   it('does not re-report or re-announce on a re-render with the same error', () => {
