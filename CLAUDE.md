@@ -507,6 +507,9 @@ silently unindexed). Never hand-edit it; fix the source and regenerate. A future
 - `develop-feature` at the start of any non-trivial task (lifecycle + delegation).
 - `add-content-type` when a change spans more than one workspace.
 - `studio-schema-practices` when touching `packages/studio` schemas or migrations.
+- `react-component-practices` when writing or changing any React component
+  in `packages/ui`, `apps/web` or `apps/platform` — the shared rules the
+  layer skills below build on.
 - `ui-library-practices` when touching `packages/ui`.
 - `web-component-practices` when building or editing an interactive component in
   `apps/web` (popover/menu/disclosure/clipboard/focus) or composing `@blog/ui`

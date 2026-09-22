@@ -299,6 +299,92 @@ export default mergeConfig(
   a pure styling fix (borders/spacing/tokens) with no behavioural surface, which
   gets the `no-tests-needed` label instead of a class assertion.
 
+## Writing a component test
+
+The shape of every `@blog/ui`, `apps/web` and `apps/platform` component test.
+A test proves what the user sees and does through the accessibility tree;
+it never reads state, props, handlers or markup shape.
+
+- **Query ladder — decided 2026-09-22, in this order, no skipping down:**
+  1. `screen.getByRole(role, { name })` for anything that has a role — a
+     button, link, heading, textbox, list, img, dialog. Always with the
+     accessible name; a role query without a name is the second-worst query
+     on this list. A button is `getByRole('button', { name: 'Save' })`,
+     never `getByText('Save')` — `getByText` on an interactive element hides
+     a missing accessible name, and that is the review finding.
+  2. `screen.getByText` for static copy that has no role — a paragraph, a
+     caption, a `<dd>`.
+  3. `screen.getByTestId` last, only when neither reaches the element, via a
+     fixed `data-testid` literal on the roleless element in the component
+     (`hero-media`). A test that needs a test id for a button or a link is
+     reporting a markup bug (`react-component-practices` → "Accessible by
+     construction"), not a missing id.
+
+  Everything goes through `screen` (or `within(element)` to scope);
+  `container`, `baseElement`, a node walk and queries destructured from
+  `render()` are lint errors — see "Never drop to a raw DOM query".
+
+- **Presence is `.toBeVisible()`, absence is `screen.queryBy*` +
+  `.not.toBeInTheDocument()`.** Never `.toBeInTheDocument()` for presence
+  (hidden still passes) and never `getBy*` for absence (it throws before the
+  matcher runs).
+- **Interaction is `userEvent`, set up once per test.** Create it with
+  `userEvent.setup()`, then `await user.click(…)`, `user.type(…)`,
+  `user.keyboard('{Escape}')` — it dispatches the whole event sequence a
+  real user produces. `fireEvent` is reserved for an event `userEvent` cannot
+  produce, such as an outside `mousedown` on `document.body`; a `fireEvent.click`
+  is a finding.
+- **Async is `findBy*` or `waitFor`, never a manual `act` or a `setTimeout`.**
+  `await screen.findByRole(…)` for something that appears; `waitFor` around
+  the expectation for a state that settles. An `act` warning is a missing `await`
+  on a `userEvent` call or a `findBy`, not a reason to wrap in `act`.
+- **One behaviour per `it`, arranged by a module-level `setup`.** `setup` is
+  the workspace's `customRender(Component, defaultProps)` bound once at the
+  top of the file; each case calls `setup(overrides)` and never keeps its
+  return value — there is no `container` to reach into. Sibling cases that
+  differ only in input and expectation are `it.each`. The title states the
+  behaviour and, for a structural claim that needs an `eslint-disable-next-line`,
+  the reason — never a comment.
+- **Assert the observable the prop changes.** A prop that toggles
+  `aria-current`, `disabled`, a rendered element or visible text is tested on
+  that; a prop whose only effect is styling has no test surface — a story and
+  `no-tests-needed` ("What not to test"). Never a snapshot.
+
+```tsx
+const setup = customRender(SubscribeForm, {
+  heading: 'Get new posts by email',
+  onSubscribe: vi.fn(),
+});
+
+describe(`<${SubscribeForm.name}/>`, () => {
+  it('subscribes the entered email', async () => {
+    const onSubscribe = vi.fn();
+    const user = userEvent.setup();
+    setup({ onSubscribe });
+
+    await user.type(
+      screen.getByRole('textbox', { name: 'Email' }),
+      'jane@example.com',
+    );
+    await user.click(screen.getByRole('button', { name: 'Subscribe' }));
+
+    expect(onSubscribe).toHaveBeenCalledWith('jane@example.com');
+  });
+
+  it('replaces the form with the confirmation once the subscription resolves', async () => {
+    const user = userEvent.setup();
+    setup({ onSubscribe: vi.fn().mockResolvedValue(undefined) });
+
+    await user.click(screen.getByRole('button', { name: 'Subscribe' }));
+
+    expect(await screen.findByText('Check your inbox')).toBeVisible();
+    expect(
+      screen.queryByRole('button', { name: 'Subscribe' }),
+    ).not.toBeInTheDocument();
+  });
+});
+```
+
 ## What not to test
 
 - **Never assert the source back at itself.** A schema's field list,
