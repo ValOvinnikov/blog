@@ -1,4 +1,8 @@
 import { q } from '@blog/service/sanity/query';
+import {
+  POST_COUNT_EXPRESSION,
+  postCountParser,
+} from '@blog/service/shared/fragments/post-count';
 
 export const topicFragment = q
   .fragmentForType<'blog_topic'>()
@@ -7,4 +11,11 @@ export const topicFragment = q
     title: sub.field('title').notNull(),
     slug: sub.field('slug.current').notNull(),
     description: sub.field('description').nullable(true),
+  }));
+
+export const topicWithPostCountFragment = q
+  .fragmentForType<'blog_topic'>()
+  .project((sub) => ({
+    ...topicFragment,
+    postCount: sub.raw(POST_COUNT_EXPRESSION, postCountParser),
   }));
