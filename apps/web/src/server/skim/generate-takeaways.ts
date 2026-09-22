@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod';
-import type { RichText } from '@blog/config';
+import type { ArticleText } from '@blog/config';
 import { z } from 'zod';
 
 /** Model id for both the Anthropic call and the `skim.model` value persisted via `saveSkimDraft` — one source of truth, per `cms-schema-practices`' "no repeated literals". */
@@ -16,7 +16,7 @@ const takeawaysSchema = z.object({
 });
 
 /** Flattens a post body's text-bearing blocks to plain text for the generation prompt — code/image/aside blocks are skipped, they carry no prose to summarize. */
-const bodyToPlainText = (body: RichText): string => {
+const bodyToPlainText = (body: ArticleText): string => {
   return body
     .filter((block) => block._type === 'block')
     .map((block) =>
@@ -48,7 +48,7 @@ const buildPrompt = (plainText: string): string => {
  * path — this only ever runs from the publish-time pipeline route.
  */
 export const generateTakeaways = async (
-  body: RichText,
+  body: ArticleText,
   apiKey: string,
 ): Promise<string[]> => {
   const client = new Anthropic({ apiKey });

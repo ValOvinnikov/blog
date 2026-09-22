@@ -1,10 +1,10 @@
-import type { RichText } from '@blog/config';
+import type { ArticleText } from '@blog/config';
 import { q } from '@blog/service/sanity/query';
 import { bodyImageFragment } from '@blog/service/shared/fragments/image';
 import { portableTextMarkDefFragment } from '@blog/service/shared/fragments/portable-text-mark-def';
 
 export const portableTextBodyItemFragment = q
-  .fragment<RichText[number]>()
+  .fragment<ArticleText[number]>()
   .project((sub) => ({
     '...': true,
     ...sub.conditionalByType({

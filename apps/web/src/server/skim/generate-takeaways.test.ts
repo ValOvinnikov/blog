@@ -1,4 +1,4 @@
-import type { RichText } from '@blog/config';
+import type { ArticleText } from '@blog/config';
 
 const { parseMock, anthropicCtorMock } = vi.hoisted(() => ({
   parseMock: vi.fn(),
@@ -14,7 +14,7 @@ vi.mock('@anthropic-ai/sdk', () => ({
   },
 }));
 
-const body: RichText = [
+const body: ArticleText = [
   {
     _type: 'block',
     _key: 'b1',

@@ -1,7 +1,7 @@
 import {
   PORTABLE_TEXT_BLOCK_TYPE,
+  type ArticleText,
   type IBodyImageBlock,
-  type RichText,
   type TMaybeUndefined,
   type TPortableTextBlock,
 } from '@blog/config';
@@ -30,7 +30,7 @@ type TResolvedAsideBlock = Omit<TRawAsideBlock, 'body'> & {
 export type TPortableTextBody = Array<
   | TPortableTextBlock
   | IBodyImageBlock
-  | Extract<RichText[number], { _type: 'code' }>
+  | Extract<ArticleText[number], { _type: 'code' }>
   | TResolvedAsideBlock
 >;
 
@@ -62,7 +62,7 @@ export function toPortableTextBody(
       case 'block':
         return toPortableText(block);
       default:
-        return block as Extract<RichText[number], { _type: 'code' }>;
+        return block as Extract<ArticleText[number], { _type: 'code' }>;
     }
   });
 }

@@ -46,7 +46,7 @@ export type Module_cta = {
   headingBlock?: HeadingBlock;
   eyebrow?: string;
   image?: ImageWithAlt;
-  content?: InlineText;
+  content?: ListedText;
   ctaButtons?: Array<
     {
       _key: string;
@@ -62,7 +62,7 @@ export type Module_cta = {
   layout?: Layout;
 };
 
-export type InlineText = Array<{
+export type ListedText = Array<{
   children?: Array<{
     marks?: Array<string>;
     text?: string;
@@ -105,11 +105,11 @@ export type Module_content = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  body?: RichText;
+  body?: ArticleText;
   layout?: Layout;
 };
 
-export type RichText = Array<
+export type ArticleText = Array<
   | {
       children?: Array<{
         marks?: Array<string>;
@@ -347,7 +347,7 @@ export type InlineLink = {
     | 'RSS';
 };
 
-export type ProseText = Array<{
+export type ParagraphText = Array<{
   children?: Array<{
     marks?: Array<string>;
     text?: string;
@@ -445,7 +445,7 @@ export type LinkRef = {
 export type Aside = {
   _type: 'aside';
   kind?: 'WHY_NOT' | 'DIGRESSION' | 'CONTEXT';
-  body?: ProseText;
+  body?: ParagraphText;
 };
 
 export type BodyImage = {
@@ -566,7 +566,7 @@ export type Block_testimonial = {
   _rev: string;
   title?: string;
   name?: string;
-  quote?: InlineText;
+  quote?: ListedText;
   role?: string;
   image?: ImageWithAlt;
   link?: LinkReference;
@@ -624,7 +624,7 @@ export type Blog_author = {
   _rev: string;
   name?: string;
   image?: ImageWithAlt;
-  bio?: ProseText;
+  bio?: ParagraphText;
   role?: string;
   socialLinks?: Array<
     {
@@ -1145,7 +1145,7 @@ export type Page_post = {
   slug?: Slug;
   headingBlock?: HeadingBlock;
   heroImage?: ImageWithAlt;
-  content?: RichText;
+  content?: ArticleText;
   featured?: boolean;
   author?: Blog_authorReference;
   topic?: Blog_topicReference;
@@ -1315,11 +1315,11 @@ export type AllSanitySchemaTypes =
   | Module_newsletter
   | HeadingBlock
   | Module_cta
-  | InlineText
+  | ListedText
   | SanityImageAssetReference
   | ImageWithAlt
   | Module_content
-  | RichText
+  | ArticleText
   | Block_testimonialReference
   | Module_testimonial
   | Block_featureReference
@@ -1334,7 +1334,7 @@ export type AllSanitySchemaTypes =
   | Page_landingReference
   | Page_postIndexReference
   | InlineLink
-  | ProseText
+  | ParagraphText
   | PostTakeaways
   | Brand
   | BrandTagline

@@ -7,7 +7,7 @@ import { toTitleCase } from '@blog/utils/primitives';
 import { defineField, defineType } from 'sanity';
 
 /**
- * Image type used only inside `richTextSchema`'s body array. Composes the
+ * Image type used only inside `articleTextSchema`'s body array. Composes the
  * same `alt` field as `imageWithAltSchema` (shared, not duplicated — see
  * `helpers/image-alt-field`) plus a `layout` choice that is meaningful for
  * body content but not for hero/avatar/brand/OG/site-settings images, which

@@ -1,7 +1,7 @@
 import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
 import { socialProfileSchema } from '@blog/studio/schema-types/objects/social-profile/social-profile';
-import { proseTextSchema } from '@blog/studio/schema-types/portable-text/prose-text/prose-text';
+import { paragraphTextSchema } from '@blog/studio/schema-types/portable-text/paragraph-text/paragraph-text';
 import { UserRound } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
@@ -30,7 +30,7 @@ export const authorSchema = defineType({
     defineField({
       name: 'bio',
       title: 'Bio',
-      type: proseTextSchema.name,
+      type: paragraphTextSchema.name,
       description: 'Short biography displayed on the author page.',
     }),
     defineField({
