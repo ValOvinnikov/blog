@@ -223,9 +223,11 @@ src/schema-types/modules/hero-blog/
   the schemas: `fields/` for field factories (`x-field.ts` → `xField()`
   returns one `defineField`, `x-fields.ts` → `xFields()` returns an array —
   no `define` prefix), `validation/` for `validate-*.ts` and
-  `get-drafts-client.ts`, `inputs/` for custom form input components. There
-  is no `helpers/`: a folder that can't be defined is a folder that collects
-  mixed things.
+  `get-drafts-client.ts`, `filters/` for reference-picker filters
+  (`x.ts` → `xFilter()` returns `ReferenceFilterSearchOptions`, so a call
+  site can pass `params` alongside the `filter`), `inputs/` for custom form
+  input components. There is no `helpers/`: a folder that can't be defined
+  is a folder that collects mixed things.
 
 ## Content model (see SPEC.md §6 for the current model)
 
