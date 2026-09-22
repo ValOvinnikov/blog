@@ -1,5 +1,4 @@
 import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
-import { imageHotspotOptions } from '@blog/studio/schema-types/fields/image-alt-field/image-alt-field';
 import { Building2 } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
@@ -25,7 +24,6 @@ export const logoBlockSchema = defineType({
       type: 'image',
       description:
         'SVG or PNG with a transparent background, trimmed to the mark. Shown at 36px tall, as uploaded.',
-      options: imageHotspotOptions,
       validation: (rule) => rule.required().error('Upload the logo.'),
     }),
     defineField({
