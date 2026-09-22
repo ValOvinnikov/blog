@@ -96,26 +96,34 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
     ).toBeNull();
   });
 
-  it('renders initials derived from the author name (never the heading) instead of an empty media area when no image resolves on Split, exposing the full name to the accessibility tree', () => {
+  it('renders no media on Split when no image resolves', () => {
+    setup({
+      variant: HERO_VARIANT.SPLIT,
+      sanityImage: undefined,
+    });
+
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('hero-media')).not.toBeInTheDocument();
+  });
+
+  it('still announces the profile name to a screen reader on a photo-less Split, with no initials tile shown', () => {
     setup({ variant: HERO_VARIANT.SPLIT, sanityImage: undefined });
 
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
-    expect(screen.getByText('JR')).toBeVisible();
-    expect(screen.queryByText('BB')).not.toBeInTheDocument();
+    expect(screen.queryByText('JR')).not.toBeInTheDocument();
     expect(
       screen.getByText(avatarName).closest('[aria-hidden="true"]'),
     ).toBeNull();
   });
 
-  it('renders initials derived from the author name (never the heading) instead of an empty media area when no image resolves on Banner, but hides the fallback from the accessibility tree since the media is a decorative backdrop there', () => {
-    setup({ variant: HERO_VARIANT.BANNER, sanityImage: undefined });
+  it('renders no media on Banner when no image resolves', () => {
+    setup({
+      variant: HERO_VARIANT.BANNER,
+      sanityImage: undefined,
+    });
 
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
-    expect(screen.getByText('JR')).toBeVisible();
-    expect(screen.queryByText('BB')).not.toBeInTheDocument();
-    expect(
-      screen.getByText(avatarName).closest('[aria-hidden="true"]'),
-    ).not.toBeNull();
+    expect(screen.queryByTestId('hero-media')).not.toBeInTheDocument();
   });
 
   it('renders no Hero.Social slot when there are no social links', () => {

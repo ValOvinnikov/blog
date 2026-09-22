@@ -27,6 +27,7 @@ export interface IHeroModuleShellProps extends IWithDataTestId {
   mediaOrder: TMaybeUndefined<TMediaOrder>;
   layout: TMaybeUndefined<TLayout>;
   ctaButtons: TCtaButton[];
+  ctaClassName?: string;
   sanityImage: TMaybeUndefined<ISanityImage>;
   children?: THeroProps['children'];
 }
@@ -44,12 +45,13 @@ export const HeroModuleShell = ({
   layout,
   dataTestId,
   ctaButtons,
+  ctaClassName,
   sanityImage,
   children,
 }: IHeroModuleShellProps) => {
   const heroChildren = [
     ctaButtons.length > 0 && (
-      <Hero.Cta>
+      <Hero.Cta className={ctaClassName}>
         <ActionGroup
           actions={ctaButtons}
           isOnDark={variant === HERO_VARIANT.BANNER}

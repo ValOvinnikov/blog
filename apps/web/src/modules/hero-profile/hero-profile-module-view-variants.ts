@@ -8,6 +8,10 @@ export const heroProfileAvatarFallbackVariants = tv({
   base: ['size-24 text-2xl sm:size-32 sm:text-3xl'],
 });
 
-export const heroProfileMediaFallbackVariants = tv({
-  base: ['flex size-full items-center justify-center bg-surface-2'],
+export const heroProfilePortraitVariants = tv({
+  base: ['max-w-80 rounded-xl'],
+});
+
+export const heroProfileNameVariants = tv({
+  base: ['sr-only'],
 });
