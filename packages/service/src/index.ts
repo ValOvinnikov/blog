@@ -1,6 +1,7 @@
 // Public surface of the data layer. web imports `service` — never the raw client.
 
 import { createSkimService } from './features/editorial/skim';
+import { createModulesService } from './features/entities/modules';
 import { createPostsService } from './features/entities/posts';
 import { createTagsService } from './features/entities/tags';
 import { createTopicsService } from './features/entities/topics';
@@ -64,6 +65,7 @@ export const service = {
     topics: createTopicsService(),
     tags: createTagsService(),
     posts: createPostsService(),
+    modules: createModulesService(),
   },
   global: {
     siteSettings: createSiteSettingsService(),
