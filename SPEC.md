@@ -401,17 +401,31 @@ and authors all of its own copy, so nothing is derived from the author's
 `headingBlock`, an optional `eyebrow`, a **required** `author` reference to
 `blog_author`, an optional `image`, the shared `ctaButtons`, and a
 `showSocialLinks` toggle defaulting on, before its composed tail. **The
-photo resolves by precedence, not by a mode**: the module's own `image`
-when set, otherwise the author's, otherwise neither — and the view then
-renders initials through `Avatar`, exactly as the author page does.
+photo resolves by precedence, and the precedence is per variant**: Stacked
+and Split take the module's own `image` when set and fall back to the
+author's, while **Banner takes the module's own image or nothing**. An
+author's photo is sized for a portrait; stretched across a full-bleed band
+it reads as a blur, so the Banner never inherits one.
 `blog_author.image` is optional by design, so a photoless author is a
 supported state rather than a failure, which is why the schema declares
 **no document-level validation at all**: it validates what the editor
-cannot see, not what they just chose. The photo is placed by variant — a
-round `Hero.Avatar` on Stacked, a square `Hero.Media` on Split, the
-background on Banner — its actions render in `Hero.Cta`, and the author's
-profiles in `Hero.Social`. Those four slots are the `Hero` organism's whole
-surface. `Hero.Social` imposes no semantics of its own — it is a container,
+cannot see, not what they just chose. **What each variant does without a
+photo differs too**: Stacked renders initials through `Avatar`, exactly as
+the author page does; Split renders no media at all and lays out
+single-column; Banner renders no media and stands as its tone scrim band
+alone, which is what the Studio field's description promises the editor.
+Split keeps the profile's name in an `sr-only` element when it has no
+photo — the initials tile it used to render exposed that name to assistive
+technology as a side effect of `Avatar`'s fallback, and dropping the tile
+without replacing it would have left nothing saying whose hero it is. The
+photo is placed by variant — a round `Hero.Avatar` on Stacked, a
+`Hero.Media` square capped at 20rem on Split, the background on Banner —
+its actions render in `Hero.Cta`, and the author's profiles in
+`Hero.Social`. Those four slots are the `Hero` organism's whole surface.
+The cap and the shell's optional `ctaClassName` (which this view sets to
+clear `Hero.Cta`'s `mt-auto`) exist for the same reason: an uncapped square
+filled its column, stretched the copy column to match, and left the actions
+pinned to the foot of it under a band of empty space. `Hero.Social` imposes no semantics of its own — it is a container,
 and the shared `SocialLinks` renders the labelled list inside it (its
 `outlined` variant there, plain in the footer).
 
@@ -772,6 +786,26 @@ apply on `BANNER` unconditionally, and white copy over an unscrimmed
 photograph is less legible than no treatment at all. Each hero view passes
 `isOnDark` to its `ActionGroup` on Banner, so the actions are painted for a
 dark ground too.
+
+**And it breaks out the same way**, for the same reason a scrim is needed at
+all: a band that stops at `Section`'s inner container is a card, not a band.
+`Hero`'s Banner carries the identical `left-1/2 w-screen max-w-none
+-translate-x-1/2` breakout with square corners. That technique lands flush
+to the viewport inside any horizontally symmetric container — `Section`'s
+inner `<div>` is `mx-auto` with equal `px-gutter` on both sides, so the
+percentage offset and the translate cancel at every width, and nothing
+overflows. It does **not** carry `CtaModule`'s accompanying
+`mx-0`/`border-0`/`shadow-none`: those cancel base classes `CtaModule` sets
+on itself, and `Hero`'s root has none of them, so copying them across would
+add three dead classes. What both share and neither solves is `100vw` on a
+platform whose scrollbar takes layout space; that is tracked against both
+organisms together rather than fixed in one.
+
+**Split's column template follows `contentPosition`.** The copy takes the
+wide column and the media the narrow one on either side, so content on the
+right no longer hands the photo the wide column and grows it. Only the
+template flips — DOM order is unchanged, and the existing `lg:order-2` on
+the copy slot is what reverses the visual order.
 
 **Theme-as-content** (Phase 2 of the configurability epic, #1285/#1287,
 storage cut over to Postgres by the config-to-Postgres transition's E5): a
