@@ -3,8 +3,34 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import {
+  proseTextBlock,
+  richTextSpan,
+} from '@web/testing/shared/portable-text-renderer/fixtures';
 
 import { HeroProfileModuleView } from './hero-profile-module-view';
+
+const bioDemo = [
+  proseTextBlock([
+    richTextSpan(
+      'Jane has spent the last decade designing developer tools, with a focus on making complex systems feel approachable.',
+    ),
+  ]),
+  proseTextBlock(
+    [
+      richTextSpan('Outside of work, she writes about design systems on '),
+      richTextSpan('her blog', ['link-1']),
+      richTextSpan('.'),
+    ],
+    [
+      {
+        _type: 'linkRef',
+        _key: 'link-1',
+        link: { href: 'https://example.com', target: undefined },
+      },
+    ],
+  ),
+];
 
 const socialLinks = [
   {
@@ -55,7 +81,7 @@ const meta = {
     }),
     avatarName: 'Jane Cooper',
     sanityImage: makeSanityImage(),
-    bio: undefined,
+    bio: bioDemo,
     socialLinks,
     ctaButtons: ctaActionsDemo.slice(0, 1),
     contentPosition: undefined,
@@ -106,5 +132,11 @@ export const BannerNoPhoto: TStory = {
 export const NoSocialLinks: TStory = {
   args: {
     socialLinks: [],
+  },
+};
+
+export const NoBio: TStory = {
+  args: {
+    bio: undefined,
   },
 };

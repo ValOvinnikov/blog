@@ -1,4 +1,7 @@
-import { linkRefSchema } from '@blog/studio/schema-types/objects/link-ref/link-ref';
+import {
+  inlineTextMarks,
+  inlineTextStyles,
+} from '@blog/studio/schema-types/portable-text/inline-text/inline-text';
 import { defineArrayMember, defineType } from 'sanity';
 
 export const proseTextSchema = defineType({
@@ -10,9 +13,9 @@ export const proseTextSchema = defineType({
   of: [
     defineArrayMember({
       type: 'block',
-      marks: {
-        annotations: [{ type: linkRefSchema.name }],
-      },
+      styles: inlineTextStyles,
+      lists: [],
+      marks: inlineTextMarks,
     }),
   ],
 });
