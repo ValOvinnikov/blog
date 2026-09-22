@@ -30,13 +30,11 @@ describe(`<${ImageWithCaption.name}/>`, () => {
     expect(screen.getByText(caption)).toBeVisible();
   });
 
-  it('does not render a <figcaption> when caption is an empty string', () => {
-    setup({ caption: '', children: undefined });
-    expect(screen.getByRole('figure')).not.toHaveAccessibleName();
-  });
-
-  it('does not render a <figcaption> when caption is omitted', () => {
-    setup({ caption: undefined, children: undefined });
+  it.each([
+    ['an empty string', ''],
+    ['omitted', undefined],
+  ])('does not render a <figcaption> when caption is %s', (_, captionValue) => {
+    setup({ caption: captionValue, children: undefined });
     expect(screen.getByRole('figure')).not.toHaveAccessibleName();
   });
 
