@@ -9,7 +9,7 @@ import type {
   TMediaOrder,
   TPortableTextBlock,
 } from '@blog/config';
-import type { TCtaButton } from '@blog/service/shared/transformers/to-cta-button';
+import type { TCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button/to-cta-button';
 
 export type TCtaModule = {
   variant: TCtaVariant;

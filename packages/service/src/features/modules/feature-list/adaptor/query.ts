@@ -1,13 +1,13 @@
 import { q } from '@blog/service/sanity/query';
-import { ctaButtonFragment } from '@blog/service/shared/fragments/cta-button';
 import {
   DISPLAY_MODE_EXPRESSION,
   displayModeParser,
-} from '@blog/service/shared/fragments/display-mode';
-import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
-import { sanityImageFragment } from '@blog/service/shared/fragments/image';
-import { layoutFragment } from '@blog/service/shared/fragments/layout';
-import { linkDocumentFragment } from '@blog/service/shared/fragments/link-document';
+} from '@blog/service/shared/expressions/display-mode';
+import { ctaButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
+import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
+import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
+import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document/link-document';
 
 export const featureListModuleQuery = q
   .parameters<{ id: string }>()

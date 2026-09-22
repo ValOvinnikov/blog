@@ -1,6 +1,6 @@
 import { q } from '@blog/service/sanity/query';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/published-post';
-import { postCardFragment } from '@blog/service/shared/fragments/post';
+import { postCardFragment } from '@blog/service/shared/fragments/post/post';
 
 /**
  * Newest posts for a post-latest teaser module, unscoped (no topic/tag

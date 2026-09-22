@@ -1,8 +1,8 @@
 import { q } from '@blog/service/sanity/query';
-import { sanityImageFragment } from '@blog/service/shared/fragments/image';
-import { inlineLinkFragment } from '@blog/service/shared/fragments/inline-link';
-import { heroLayoutFragment } from '@blog/service/shared/fragments/layout';
-import { postCardFragment } from '@blog/service/shared/fragments/post';
+import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
+import { heroLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { inlineLinkFragment } from '@blog/service/shared/fragments/link/inline-link';
+import { postCardFragment } from '@blog/service/shared/fragments/post/post';
 
 export const heroModuleQuery = q
   .parameters<{ id: string }>()

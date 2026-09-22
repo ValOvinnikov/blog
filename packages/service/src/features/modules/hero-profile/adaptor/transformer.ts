@@ -3,14 +3,14 @@ import {
   type ISanityImage,
   type TMaybeUndefined,
 } from '@blog/config';
-import { toCtaButtons } from '@blog/service/shared/transformers/to-cta-buttons';
-import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
-import { toHeroPresentation } from '@blog/service/shared/transformers/to-hero-presentation';
-import { toLayout } from '@blog/service/shared/transformers/to-layout';
-import { toPortableText } from '@blog/service/shared/transformers/to-portable-text-mark-def';
-import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
-import type { TSocialProfile } from '@blog/service/shared/transformers/to-social-profile';
-import { toSocialProfiles } from '@blog/service/shared/transformers/to-social-profiles';
+import { toCtaButtons } from '@blog/service/shared/transformers/cta/to-cta-buttons/to-cta-buttons';
+import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block/to-heading-block';
+import { toHeroPresentation } from '@blog/service/shared/transformers/hero/to-hero-presentation/to-hero-presentation';
+import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image/to-sanity-image';
+import { toLayout } from '@blog/service/shared/transformers/layout/to-layout/to-layout';
+import { toPortableText } from '@blog/service/shared/transformers/portable-text/to-portable-text-mark-def/to-portable-text-mark-def';
+import type { TSocialProfile } from '@blog/service/shared/transformers/social-profile/to-social-profile';
+import { toSocialProfiles } from '@blog/service/shared/transformers/social-profile/to-social-profiles/to-social-profiles';
 import type { InferResultType } from 'groqd';
 
 import type { heroProfileModuleQuery } from './query';

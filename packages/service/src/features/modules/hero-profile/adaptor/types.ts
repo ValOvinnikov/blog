@@ -9,8 +9,8 @@ import type {
   TMediaOrder,
   TPortableTextBlock,
 } from '@blog/config';
-import type { TCtaButton } from '@blog/service/shared/transformers/to-cta-button';
-import type { TSocialProfile } from '@blog/service/shared/transformers/to-social-profile';
+import type { TCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button/to-cta-button';
+import type { TSocialProfile } from '@blog/service/shared/transformers/social-profile/to-social-profile';
 
 export type THeroProfileModule = {
   brandVariant: TFullBrandVariant;

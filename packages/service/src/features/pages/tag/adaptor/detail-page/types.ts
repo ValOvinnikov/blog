@@ -3,8 +3,8 @@ import type {
   TMaybeUndefined,
   TPageTagType,
 } from '@blog/config';
-import type { TSeoResolved } from '@blog/service/shared/transformers/resolve-seo';
-import type { TModule } from '@blog/service/shared/transformers/to-module';
+import type { TModule } from '@blog/service/shared/transformers/module/to-module/to-module';
+import type { TSeoResolved } from '@blog/service/shared/transformers/seo/resolve-seo/resolve-seo';
 
 // The tag page's own richer tag shape — `description` on top of the minimal
 // `{id,title,slug}` chip shape `TTag` provides for the post-detail tags

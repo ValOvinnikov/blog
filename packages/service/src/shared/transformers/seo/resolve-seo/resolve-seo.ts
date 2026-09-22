@@ -1,0 +1,24 @@
+import type { ISanityImage, TMaybeUndefined } from '@blog/config';
+import type { seoFragment } from '@blog/service/shared/fragments/seo/seo';
+import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image/to-sanity-image';
+import type { InferFragmentType } from 'groqd';
+
+export type TRawSeo = InferFragmentType<typeof seoFragment>;
+
+export type TSeoResolved = {
+  title: string;
+  description: TMaybeUndefined<string>;
+  ogTitle: TMaybeUndefined<string>;
+  ogDescription: TMaybeUndefined<string>;
+  ogImage: TMaybeUndefined<ISanityImage>;
+};
+
+export function resolveSeo(authored: TRawSeo): TSeoResolved {
+  return {
+    title: authored.metaTitle,
+    description: authored.metaDescription ?? undefined,
+    ogTitle: authored.openGraph?.ogTitle ?? undefined,
+    ogDescription: authored.openGraph?.ogDescription ?? undefined,
+    ogImage: toSanityImage(authored.openGraph?.ogImage),
+  };
+}

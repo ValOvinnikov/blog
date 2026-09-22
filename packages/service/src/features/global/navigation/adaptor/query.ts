@@ -1,5 +1,5 @@
 import { q } from '@blog/service/sanity/query';
-import { linkDocumentFragment } from '@blog/service/shared/fragments/link-document';
+import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document/link-document';
 
 export const navigationQuery = q.star
   .filterByType('settings_navigation')

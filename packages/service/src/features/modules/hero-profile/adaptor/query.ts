@@ -1,9 +1,9 @@
 import { q } from '@blog/service/sanity/query';
-import { authorDetailFragment } from '@blog/service/shared/fragments/author';
-import { ctaButtonFragment } from '@blog/service/shared/fragments/cta-button';
-import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
-import { sanityImageFragment } from '@blog/service/shared/fragments/image';
-import { heroLayoutFragment } from '@blog/service/shared/fragments/layout';
+import { authorDetailFragment } from '@blog/service/shared/fragments/author/author';
+import { ctaButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
+import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
+import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
+import { heroLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { z } from 'zod';
 
 export const heroProfileModuleQuery = q

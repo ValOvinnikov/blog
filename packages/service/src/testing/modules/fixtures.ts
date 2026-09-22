@@ -28,7 +28,7 @@ import type { TRawPostLatestModule } from '@blog/service/features/modules/post-l
 import type { TRawPostListModule } from '@blog/service/features/modules/post-list/adaptor/transformer';
 import type { TRawPostRelatedModule } from '@blog/service/features/modules/post-related/adaptor/transformer';
 import type { TRawTaxonomyListModule } from '@blog/service/features/modules/taxonomy-list/adaptor/transformer';
-import type { TRawCtaButton } from '@blog/service/shared/transformers/to-cta-button';
+import type { TRawCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button/to-cta-button';
 import {
   makeRawHeadingBlock,
   makeRawPortableTextMarkDef,

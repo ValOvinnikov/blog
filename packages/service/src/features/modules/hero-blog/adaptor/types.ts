@@ -7,7 +7,7 @@ import type {
   TMaybeUndefined,
   TMediaOrder,
 } from '@blog/config';
-import type { TCtaButton } from '@blog/service/shared/transformers/to-cta-button';
+import type { TCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button/to-cta-button';
 
 export type THeroBlogButton = TCtaButton;
 

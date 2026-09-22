@@ -5,7 +5,7 @@ import type {
   TMaybeUndefined,
   THeadingBlock,
 } from '@blog/config';
-import type { TPostCard } from '@blog/service/shared/transformers/to-post-card';
+import type { TPostCard } from '@blog/service/shared/transformers/post/to-post-card/to-post-card';
 
 export type TPostListModule = {
   brandVariant: TFullBrandVariant;

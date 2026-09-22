@@ -1,5 +1,5 @@
 import { BRAND_TAGLINE_SEPARATOR_CHARS } from '@blog/config';
-import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
+import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image/to-sanity-image';
 import type { InferResultType } from 'groqd';
 
 import type { siteSettingsQuery } from './query';
