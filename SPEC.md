@@ -1246,6 +1246,19 @@ so the page at the old URL stays stale until the route-level backstop below
 expires it. Anything without a precise derivation yet falls back to a logged
 whole-site purge.
 
+The webhook also purges **by reverse lookup**. On every publish of a type that
+carries tags of its own, it resolves which page-builder modules reach the
+published document — directly, or through a `link` document's
+`internalReference` — and purges each one's `module:<id>` tag. A module's
+cached markup embeds its CTA's resolved target slug, so renaming that target
+would otherwise leave a dead link behind until the route-level backstop
+expired it, while tagging every page type a link may point at instead purges
+every module of that kind on every publish. The resolution happens at webhook
+time because a fetch's cache tags are fixed before its response exists, so the
+target's id is not knowable when `isr()` runs. It is best-effort: a failed
+lookup is logged once by `apps/web`, and the tags already resolved are still
+purged.
+
 That purge is best-effort, and the backstop behind it is a time-based
 expiry declared per content route: `export const revalidate = 21600` (6 hours)
 on each of the eleven `[tenant]/[locale]` content routes, excluding
