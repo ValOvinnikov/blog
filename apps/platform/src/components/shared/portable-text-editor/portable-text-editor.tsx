@@ -1,6 +1,6 @@
 'use client';
 
-import type { TPortableTextBlock } from '@blog/db/schema/email-templates';
+import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
 import { sanitizeHref } from '@blog/email/html';
 import { EMAIL_PORTABLE_TEXT_SCHEMA } from '@platform/utils/portable-text-schema/portable-text-schema';
 import {
@@ -17,8 +17,8 @@ import { PortableTextEditorToolbar } from './components/toolbar/portable-text-ed
 import { portableTextEditorVariants } from './portable-text-editor-variants';
 
 export type TPortableTextEditorProps = {
-  initialValue: TPortableTextBlock[];
-  onChange: (value: TPortableTextBlock[]) => void;
+  initialValue: TEmailTemplateBlock[];
+  onChange: (value: TEmailTemplateBlock[]) => void;
   ariaLabel: string;
   isDisabled?: boolean;
 };
@@ -81,7 +81,7 @@ export const PortableTextEditor = ({
         <EventListenerPlugin
           on={(event) => {
             if (event.type === 'mutation') {
-              onChange((event.value ?? []) as TPortableTextBlock[]);
+              onChange((event.value ?? []) as TEmailTemplateBlock[]);
             }
           }}
         />

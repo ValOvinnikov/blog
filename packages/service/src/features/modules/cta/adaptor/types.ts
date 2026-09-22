@@ -7,7 +7,7 @@ import type {
   TLayout,
   TMaybeUndefined,
   TMediaOrder,
-  TPortableText,
+  TPortableTextBlock,
 } from '@blog/config';
 import type { TCtaButton } from '@blog/service/shared/transformers/to-cta-button';
 
@@ -17,7 +17,7 @@ export type TCtaModule = {
   bandTone: TFullBrandVariant;
   eyebrow: TMaybeUndefined<string>;
   headingBlock: THeadingBlock;
-  content: TMaybeUndefined<TPortableText[]>;
+  content: TMaybeUndefined<TPortableTextBlock[]>;
   image: TMaybeUndefined<ISanityImage>;
   contentPosition: TMaybeUndefined<TContentAlignment>;
   contentAlignment: TMaybeUndefined<TContentAlignment>;

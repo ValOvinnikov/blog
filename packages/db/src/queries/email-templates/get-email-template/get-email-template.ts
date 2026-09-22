@@ -3,7 +3,7 @@ import { getDb } from '@blog/db/client';
 import { EMAIL_TEMPLATE_DEFAULT_COPY } from '@blog/db/constants';
 import {
   emailTemplates,
-  type TPortableTextBlock,
+  type TEmailTemplateBlock,
 } from '@blog/db/schema/email-templates';
 import { and, eq } from 'drizzle-orm';
 
@@ -11,13 +11,13 @@ export type TEmailTemplateResult = {
   tenantId: string;
   templateType: TEmailTemplateType;
   subject: string;
-  body: TPortableTextBlock[];
+  body: TEmailTemplateBlock[];
   logoAssetUrl: string | undefined;
 };
 
 type TAuthoredEmailTemplateFields = {
   subject: string | null;
-  body: TPortableTextBlock[] | null;
+  body: TEmailTemplateBlock[] | null;
   logoAssetUrl: string | null;
 };
 

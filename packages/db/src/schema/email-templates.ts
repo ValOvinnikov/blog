@@ -13,7 +13,7 @@ import { tenants } from './tenants';
 // A Portable Text block, typed loosely on purpose — this package never
 // interprets its contents (the email-HTML serializer that does lives in
 // `@blog/email`), it only stores and returns whatever shape was authored.
-export type TPortableTextBlock = {
+export type TEmailTemplateBlock = {
   _type: string;
   _key: string;
   [key: string]: unknown;
@@ -36,7 +36,7 @@ export const emailTemplates = pgTable(
       .references(() => tenants.id, { onDelete: 'cascade' }),
     templateType: text('template_type').notNull().$type<TEmailTemplateType>(),
     subject: text('subject'),
-    body: jsonb('body').$type<TPortableTextBlock[]>(),
+    body: jsonb('body').$type<TEmailTemplateBlock[]>(),
     logoAssetUrl: text('logo_asset_url'),
     createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { mode: 'date' })
