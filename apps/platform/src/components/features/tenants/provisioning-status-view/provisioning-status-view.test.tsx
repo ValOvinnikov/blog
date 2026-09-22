@@ -1289,7 +1289,7 @@ describe(ProvisioningStatusView, () => {
       );
 
       expect(
-        within(screen.getByRole('complementary')).getByTestId('disclosure'),
+        within(screen.getByRole('complementary')).getByRole('group'),
       ).toHaveAttribute('open');
     });
 
@@ -1315,7 +1315,7 @@ describe(ProvisioningStatusView, () => {
       );
 
       expect(
-        within(screen.getByRole('complementary')).getByTestId('disclosure'),
+        within(screen.getByRole('complementary')).getByRole('group'),
       ).not.toHaveAttribute('open');
     });
 
@@ -1350,7 +1350,7 @@ describe(ProvisioningStatusView, () => {
       );
 
       const sidebar = screen.getByRole('complementary');
-      const disclosure = within(sidebar).getByTestId('disclosure');
+      const disclosure = within(sidebar).getByRole('group');
       expect(disclosure).toHaveAttribute('open');
 
       await act(async () => {

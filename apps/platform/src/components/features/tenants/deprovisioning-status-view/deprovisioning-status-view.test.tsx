@@ -250,7 +250,7 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
       });
       render(<Wrapper tenant={tenant} />);
 
-      expect(screen.getByTestId('disclosure')).toHaveAttribute('open');
+      expect(screen.getByRole('group')).toHaveAttribute('open');
     });
 
     it('is collapsed by default once every step is already done on mount', () => {
@@ -265,7 +265,7 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
       });
       render(<Wrapper tenant={tenant} />);
 
-      expect(screen.getByTestId('disclosure')).not.toHaveAttribute('open');
+      expect(screen.getByRole('group')).not.toHaveAttribute('open');
     });
 
     it('auto-collapses once the run completes, and a later re-render does not undo a user-initiated reopen', async () => {
@@ -290,22 +290,22 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
       const user = userEvent.setup();
       render(<Wrapper tenant={tenant} />);
 
-      expect(screen.getByTestId('disclosure')).toHaveAttribute('open');
+      expect(screen.getByRole('group')).toHaveAttribute('open');
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
       });
 
-      expect(screen.getByTestId('disclosure')).not.toHaveAttribute('open');
+      expect(screen.getByRole('group')).not.toHaveAttribute('open');
 
       await user.click(screen.getByText('Deprovisioning progress'));
-      expect(screen.getByTestId('disclosure')).toHaveAttribute('open');
+      expect(screen.getByRole('group')).toHaveAttribute('open');
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(60_000);
       });
 
-      expect(screen.getByTestId('disclosure')).toHaveAttribute('open');
+      expect(screen.getByRole('group')).toHaveAttribute('open');
     });
   });
 });

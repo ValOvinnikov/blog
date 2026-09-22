@@ -19,6 +19,10 @@ const makeEvent = (overrides: Partial<TAuditEvent> = {}): TAuditEvent => ({
 });
 
 describe(RecentActivityCard, () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it("nests the card's title one level under the page's own h1", () => {
     render(<RecentActivityCard events={[]} />);
 
@@ -49,8 +53,6 @@ describe(RecentActivityCard, () => {
     for (const time of activityTimes) {
       expect(time).toHaveAttribute('dateTime', '2026-08-24T12:00:00.000Z');
     }
-
-    vi.useRealTimers();
   });
 
   it('shows an empty state when there is no recorded activity', () => {

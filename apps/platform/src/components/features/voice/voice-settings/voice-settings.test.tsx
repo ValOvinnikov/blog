@@ -37,7 +37,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
   it('starts the Advanced section collapsed', () => {
     setup();
 
-    expect(screen.getByTestId('disclosure')).not.toHaveAttribute('open');
+    expect(screen.getByRole('group')).not.toHaveAttribute('open');
     expect(screen.getByText('404 page')).not.toBeVisible();
   });
 
@@ -55,7 +55,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
     await openAdvanced(user);
 
-    expect(screen.getByTestId('disclosure')).toHaveAttribute('open');
+    expect(screen.getByRole('group')).toHaveAttribute('open');
     expect(screen.getByText('404 page')).toBeVisible();
   });
 
