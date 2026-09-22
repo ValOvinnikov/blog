@@ -570,15 +570,21 @@ fragment asserts `.notNull()` only over what it projects:
 
 - `headingBlock.heading` or `slug` — projected by every post fragment (as is
   `publishedAt`, bar `postLinkFragment`), so the parse throws wherever the
-  document appears. `safeAsync` converts the throw to `{ ok: false }` and the
-  app layer 404s the whole page, so one malformed document takes down each
-  listing carrying it.
+  document appears.
 - `author` or `topic` — projected by `postCardFragment` but not by
   `feedPostFragment` or `postLinkFragment`, so card listings break while the
   feeds and taxonomy post links render normally.
 - `content` or `seo.metaTitle` — projected only by `postDetailFragment`. No
   listing is affected; the document surfaces as a card whose link resolves
   not-found.
+
+What the reader then sees is the consumer's choice, not the query's.
+`safeAsync` turns the throw into `{ ok: false }`, and each caller decides:
+a route-level listing calls `notFound()`, so the page 404s, while a
+module-embedded listing returns `null`, so that module simply disappears
+from an otherwise normal page. The second kind fails silently in both
+senses — those callers do not log either, so a malformed document can
+remove a module from a page with nothing recorded anywhere.
 
 Until this was reduced, the filter also asserted `defined()` on each required
 field, which closed the gap entirely. It was narrowed because those clauses
