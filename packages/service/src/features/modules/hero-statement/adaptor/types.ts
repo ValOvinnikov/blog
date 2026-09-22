@@ -1,7 +1,7 @@
 import type {
   ISanityImage,
+  TBrandVariant,
   TContentAlignment,
-  TFullBrandVariant,
   THeadingBlock,
   THeroVariant,
   TLayout,
@@ -11,7 +11,7 @@ import type {
 import type { TCtaButton } from '@blog/service/shared/transformers/to-cta-button';
 
 export type THeroStatementModule = {
-  brandVariant: TFullBrandVariant;
+  brandVariant: TBrandVariant;
   variant: THeroVariant;
   headingBlock: THeadingBlock;
   eyebrow: TMaybeUndefined<string>;
