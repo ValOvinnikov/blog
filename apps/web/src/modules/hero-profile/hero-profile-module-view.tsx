@@ -2,6 +2,7 @@ import { HERO_VARIANT } from '@blog/config';
 import type { THeroProfileModule } from '@blog/service';
 import { Avatar } from '@blog/ui/atoms/avatar';
 import { Hero } from '@blog/ui/organisms/hero';
+import { InlineTextRenderer } from '@web/components/shared/inline-text-renderer';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SocialLinks } from '@web/components/shared/social-links';
 import { HeroModuleShell } from '@web/modules/hero-shared';
@@ -25,6 +26,7 @@ export const HeroProfileModuleView = ({
   headingBlock,
   avatarName,
   sanityImage,
+  bio,
   socialLinks,
   ctaButtons,
   contentPosition,
@@ -102,6 +104,12 @@ export const HeroProfileModuleView = ({
             alt=""
           />
         </Hero.Media>
+      )}
+
+      {bio && bio.length > 0 && (
+        <Hero.Body>
+          <InlineTextRenderer value={bio} />
+        </Hero.Body>
       )}
 
       {socialLinks.length > 0 && (

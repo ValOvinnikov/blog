@@ -393,19 +393,26 @@ page's own required `headingBlock` heading becomes the `<h1>`. **`module_heroSta
 member — a headline, a line of support and up to two actions, with nothing
 derived from anything — and is the hero a marketing, agency, product or
 consultant home page opens with. **`module_heroProfile`** is the person
-hero: it references a `blog_author` for a photo and social profiles only,
-and authors all of its own copy, so nothing is derived from the author's
-`name`, `role` or `bio`.
+hero: it references a `blog_author` for a photo, social profiles and — each
+behind its own toggle — the author's `role` and `bio`, and authors the rest
+of its copy itself; nothing is ever derived from the author's `name`.
 
 `module_heroProfile`'s fields are `title`, `brandVariant`, the shared
 `headingBlock`, an optional `eyebrow`, a **required** `author` reference to
-`blog_author`, an optional `image`, the shared `ctaButtons`, and a
-`showSocialLinks` toggle defaulting on, before its composed tail. **The
-photo resolves by precedence, and the precedence is per variant**: Stacked
-and Split take the module's own `image` when set and fall back to the
-author's, while **Banner takes the module's own image or nothing**. An
-author's photo is sized for a portrait; stretched across a full-bleed band
-it reads as a blur, so the Banner never inherits one.
+`blog_author`, an optional `image`, the shared `ctaButtons`, and three
+toggles defaulting on — `showSocialLinks`, `showRole` and `showBio` —
+before its composed tail. `showRole` renders the author's `role` as the
+hero's eyebrow and hides the authored `eyebrow` field while on, so the two
+never compete for the slot; `showBio` renders the author's `bio` in
+`Hero.Body`, beneath the supporting text, through the same
+`InlineTextRenderer` the CTA module uses — `bio` is `proseText`, which
+allows only `normal` blocks with bold, italic and `linkRef`, the
+`inlineText` shape without lists, so a bio can never carry a heading into
+the hero. **The photo resolves by precedence, and the precedence is per
+variant**: Stacked and Split take the module's own `image` when set and
+fall back to the author's, while **Banner takes the module's own image or
+nothing**. An author's photo is sized for a portrait; stretched across a
+full-bleed band it reads as a blur, so the Banner never inherits one.
 `blog_author.image` is optional by design, so a photoless author is a
 supported state rather than a failure, which is why the schema declares
 **no document-level validation at all**: it validates what the editor
@@ -420,12 +427,13 @@ technology as a side effect of `Avatar`'s fallback, and dropping the tile
 without replacing it would have left nothing saying whose hero it is. The
 photo is placed by variant — a round `Hero.Avatar` on Stacked, a
 `Hero.Media` square capped at 20rem on Split, the background on Banner —
-its actions render in `Hero.Cta`, and the author's profiles in
-`Hero.Social`. Those four slots are the `Hero` organism's whole surface.
-The cap and the shell's optional `ctaClassName` (which this view sets to
-clear `Hero.Cta`'s `mt-auto`) exist for the same reason: an uncapped square
-filled its column, stretched the copy column to match, and left the actions
-pinned to the foot of it under a band of empty space. `Hero.Social` imposes no semantics of its own — it is a container,
+its actions render in `Hero.Cta`, the bio in `Hero.Body`, and the author's
+profiles in `Hero.Social`. Those five slots are the `Hero` organism's whole
+surface. The cap and the shell's optional `ctaClassName` (which this view
+sets to clear `Hero.Cta`'s `mt-auto`) exist for the same reason: an
+uncapped square filled its column, stretched the copy column to match, and
+left the actions pinned to the foot of it under a band of empty space.
+`Hero.Social` imposes no semantics of its own — it is a container,
 and the shared `SocialLinks` renders the labelled list inside it (its
 `outlined` variant there, plain in the footer).
 

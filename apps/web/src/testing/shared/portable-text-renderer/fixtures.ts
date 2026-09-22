@@ -1,5 +1,8 @@
-import { IMAGE_LAYOUT } from '@blog/config';
-import type { TPortableTextBody } from '@blog/service';
+import { IMAGE_LAYOUT, type ProseText } from '@blog/config';
+import type {
+  TPortableTextBlockWithResolvedLinks,
+  TPortableTextBody,
+} from '@blog/service';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 
 export type TRichTextBlock = Extract<
@@ -29,6 +32,21 @@ export const richTextBlock = (
   _type: 'block',
   _key: nextKey('block'),
   style,
+  children,
+  markDefs,
+});
+
+export type TProseTextBlock = TPortableTextBlockWithResolvedLinks<
+  ProseText[number]
+>;
+
+export const proseTextBlock = (
+  children: TRichTextSpan[],
+  markDefs?: TProseTextBlock['markDefs'],
+): TProseTextBlock => ({
+  _type: 'block',
+  _key: nextKey('block'),
+  style: 'normal',
   children,
   markDefs,
 });
