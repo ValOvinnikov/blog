@@ -206,9 +206,13 @@ describe(`<${PortableText.name}/>`, () => {
 
     const { container } = setup({ value });
 
+    // eslint-disable-next-line testing-library/no-node-access
     expect(container.children).toHaveLength(3);
+    // eslint-disable-next-line testing-library/no-node-access
     expect(container.children[0]?.tagName).toBe('H2');
+    // eslint-disable-next-line testing-library/no-node-access
     expect(container.children[1]?.tagName).toBe('P');
+    // eslint-disable-next-line testing-library/no-node-access
     expect(container.children[2]?.tagName).toBe('P');
   });
 

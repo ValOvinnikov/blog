@@ -17,6 +17,8 @@ import { SanityImage } from '@web/components/shared/sanity-image';
 import { CodeBlock } from '../components/code-block';
 import { portableTextVariants } from '../portable-text-variants';
 
+import { FULL_BLEED_DATA_ATTR } from './full-bleed';
+
 const s = portableTextVariants();
 
 export type TAsideKindLabels = Partial<Record<TAsideKind, string>>;
@@ -46,7 +48,7 @@ const renderBodyImage = (block: IBodyImageBlock) => {
   // text measure, so this wrapper's `ImageWithCaption` can reach its own
   // `FULL_BLEED` breakout width instead of being capped to the text column.
   return block.layout === IMAGE_LAYOUT.FULL_BLEED ? (
-    <div data-full-bleed="">{image}</div>
+    <div {...{ [FULL_BLEED_DATA_ATTR]: '' }}>{image}</div>
   ) : (
     image
   );

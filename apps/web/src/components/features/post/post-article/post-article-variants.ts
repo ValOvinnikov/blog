@@ -1,3 +1,4 @@
+import { proseMeasureCapSlot } from '@web/components/shared/portable-text/config/full-bleed';
 import { tv } from 'tailwind-variants';
 
 export const postArticleVariants = tv({
@@ -10,17 +11,8 @@ export const postArticleVariants = tv({
       'group-data-[depth=SKIM]/depth:hidden',
     ],
     content: ['w-full', 'lg:col-start-2 lg:row-start-1'],
-    // The cap sits on the children, not the box: a `data-full-bleed` child's
-    // `min(100vw, var(--container-page))` must resolve against `content`'s width.
-    prose: [
-      '[&>*:not([data-full-bleed])]:mx-auto',
-      '[&>*:not([data-full-bleed])]:max-w-measure',
-      '[&>*:not([data-full-bleed])]:lg:mx-0',
-      '[&>*+*]:mt-6',
-    ],
-    // `text-prose` matches `Prose`'s font-size, since `ch` resolves against
-    // font-size and `max-w-measure`'s `68ch` must land at the same px width
-    // as `Prose`'s own text.
+    prose: proseMeasureCapSlot,
+    // `text-prose` matches `Prose`'s font-size so `max-w-measure`'s `ch` lines up with it.
     rail: [
       'mx-auto max-w-measure text-prose',
       'lg:col-start-1 lg:row-start-1 lg:row-span-2 lg:mx-0 lg:max-w-none',
@@ -43,10 +35,7 @@ export const postArticleVariants = tv({
     withRail: {
       true: {
         body: ['lg:max-w-page', 'lg:grid lg:grid-cols-[220px_1fr] lg:gap-x-10'],
-        // Scopes `ImageWithCaption`'s `FULL_BLEED` breakout (`min(100vw,
-        // var(--container-page))`) to this column's own width instead of the
-        // page-wide cap, so it doesn't bleed into the rail; `lg:`-scoped
-        // since the grid (and rail) only exist at `lg:` and up.
+        // Scopes the full-bleed breakout to this column instead of the page width; `lg:`-scoped since the grid only exists there.
         content: ['lg:[--container-page:100%]'],
       },
       false: {

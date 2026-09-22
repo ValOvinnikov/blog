@@ -98,8 +98,6 @@ export const richTextDemo: TPortableTextBody = [
     _type: 'bodyImage',
     _key: nextKey('image'),
     image: makeSanityImage({ alt: 'A scenic mountain range at sunset' }),
-    // FLOAT_LEFT (not the more common INLINE) so this fixture also
-    // exercises the floated width/wrap treatment.
     layout: IMAGE_LAYOUT.FLOAT_LEFT,
   },
   portableTextBlock(
