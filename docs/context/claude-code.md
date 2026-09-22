@@ -686,7 +686,7 @@ file` are all denied alike) — an earlier version only handled the
   - `add-content-type` — end-to-end recipe spanning all layers (schema → types → service → ui → web).
   - `studio-schema-practices` — Sanity schema quality bar + content-migration workflow.
   - `ui-library-practices` — building pure, prop-driven design-system components.
-  - `web-component-practices` — building interactive `apps/web` components (compose `@blog/ui` via slots, client behaviour in ref-based hooks).
+  - `web-component-practices` — building interactive `apps/web` components (compose `@blog/ui` via slots, client behaviour in ref-based hooks, merge Portable Text component maps rather than spreading them).
   - `ui-storybook` / `web-storybook` — Storybook conventions per workspace.
   - `testing-practices` — Vitest + Testing Library conventions.
   - `seo-and-metadata` — per-route metadata, JSON-LD, sitemap/robots/RSS.

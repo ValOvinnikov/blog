@@ -5,8 +5,9 @@ description: Use when building or editing an interactive component in apps/web �
 
 # Web component practices (apps/web)
 
-`apps/web` is where pure `@blog/ui` meets client interactivity. Two rules keep
-that boundary clean; both were violated on the share-popover branch (#620).
+`apps/web` is where pure `@blog/ui` meets client interactivity. The rules below
+keep that boundary clean; each was written after a real failure, the first two
+on the share-popover branch (#620).
 
 ## Rule 1 — slot in, never wrap
 
@@ -178,6 +179,34 @@ the atom's actual prop type before assuming it can't do what you need.
   <span className={placeholderLabel()}>{t('signIn')}</span>
 </Button>
 ```
+
+## Rule 5 — merge Portable Text component maps, never spread them
+
+A Portable Text component in `apps/web` owns the design-system component map,
+and any caller-supplied overrides combine with it rather than replacing it.
+Every combination — the library's defaults, ours, and a caller's overrides —
+goes through `mergeComponents` from `@portabletext/react`. **Object spread is
+banned here outright, at every layer.**
+
+```tsx
+// ✅ merges per category: overriding marks.linkRef keeps marks.strong and marks.em
+mergeComponents(mergeComponents(defaultComponents, OWN_COMPONENTS), overrides)
+
+// ❌ replaces the whole category: a caller passing any `marks` silently
+//    drops strong, em and linkRef
+{ ...OWN_COMPONENTS, ...overrides }
+{ marks: { ...OWN_COMPONENTS.marks, ...overrides.marks } }  // same bug, hand-built
+```
+
+The second form is the dangerous one because **nothing fails**. Every field on
+`PortableTextComponents` is optional, so dropping `marks.strong` type-checks,
+passes lint, and passes every existing test — it surfaces only as unstyled
+text in production. Type-checking cannot catch this class of bug, so the
+coverage has to be behavioural: a test that overrides **one** entry in a
+category and asserts the **other** entries in that same category still render.
+
+Hand-building a single category counts as spreading. Nest `mergeComponents`
+calls instead of flattening them.
 
 ## Also
 
