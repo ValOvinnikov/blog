@@ -1,8 +1,9 @@
-import type {
-  IBodyImageBlock,
-  RichText,
-  TMaybeUndefined,
-  TPortableTextBlock,
+import {
+  PORTABLE_TEXT_BLOCK_TYPE,
+  type IBodyImageBlock,
+  type RichText,
+  type TMaybeUndefined,
+  type TPortableTextBlock,
 } from '@blog/config';
 import type { portableTextBodyItemFragment } from '@blog/service/shared/fragments/portable-text-body';
 import { toPortableText } from '@blog/service/shared/transformers/to-portable-text-mark-def';
@@ -15,9 +16,12 @@ export type TRawPortableTextBody = Array<
 
 type TRawBodyImageBlock = Extract<
   TRawPortableTextBody[number],
-  { _type: 'bodyImage' }
+  { _type: typeof PORTABLE_TEXT_BLOCK_TYPE.BODY_IMAGE }
 >;
-type TRawAsideBlock = Extract<TRawPortableTextBody[number], { _type: 'aside' }>;
+type TRawAsideBlock = Extract<
+  TRawPortableTextBody[number],
+  { _type: typeof PORTABLE_TEXT_BLOCK_TYPE.ASIDE }
+>;
 
 type TResolvedAsideBlock = Omit<TRawAsideBlock, 'body'> & {
   body: TMaybeUndefined<TPortableTextBlock[]>;
@@ -32,7 +36,7 @@ export type TPortableTextBody = Array<
 
 function toBodyImageBlock(raw: TRawBodyImageBlock): IBodyImageBlock {
   return {
-    _type: 'bodyImage',
+    _type: PORTABLE_TEXT_BLOCK_TYPE.BODY_IMAGE,
     _key: raw._key,
     layout: raw.layout ?? undefined,
     image: toSanityImage(raw),
@@ -51,9 +55,9 @@ export function toPortableTextBody(
 ): TPortableTextBody {
   return raw.map((block) => {
     switch (block._type) {
-      case 'bodyImage':
+      case PORTABLE_TEXT_BLOCK_TYPE.BODY_IMAGE:
         return toBodyImageBlock(block);
-      case 'aside':
+      case PORTABLE_TEXT_BLOCK_TYPE.ASIDE:
         return toAsideBlock(block);
       case 'block':
         return toPortableText(block);

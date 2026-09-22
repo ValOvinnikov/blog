@@ -1,4 +1,4 @@
-import type { TMaybeUndefined } from '@blog/config';
+import { PORTABLE_TEXT_BLOCK_TYPE, type TMaybeUndefined } from '@blog/config';
 import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
 import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import { toLinkDocument } from '@blog/service/shared/transformers/to-link-document';
@@ -58,7 +58,9 @@ export function toPostDetail(raw: TRawPostDetail): TPostDetail {
     featured: raw.featured ?? false,
     body: toPortableTextBody(raw.body),
     postTakeaways: toPostTakeaways(raw.postTakeaways),
-    hasAsides: raw.body.some((block) => block._type === 'aside'),
+    hasAsides: raw.body.some(
+      (block) => block._type === PORTABLE_TEXT_BLOCK_TYPE.ASIDE,
+    ),
     seo: resolveSeo(raw.seo),
     author: toPostDetailAuthor(raw.author),
     topic: toTopic(raw.topic),

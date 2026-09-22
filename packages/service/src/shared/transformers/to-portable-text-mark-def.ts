@@ -1,4 +1,8 @@
-import type { IPortableTextLinkMark, TPortableTextBlock } from '@blog/config';
+import {
+  PORTABLE_TEXT_BLOCK_TYPE,
+  type IPortableTextLinkMark,
+  type TPortableTextBlock,
+} from '@blog/config';
 import type { portableTextMarkDefFragment } from '@blog/service/shared/fragments/portable-text-mark-def';
 import { toLinkDocument } from '@blog/service/shared/transformers/to-link-document';
 import type { InferFragmentType } from 'groqd';
@@ -21,7 +25,7 @@ function toPortableTextMarkDef(
 
   return {
     _key: raw._key,
-    _type: 'linkRef',
+    _type: PORTABLE_TEXT_BLOCK_TYPE.LINK_REF,
     link: link && { href: link.href, target: link.target },
   };
 }
