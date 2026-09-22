@@ -1,6 +1,5 @@
 import {
   CTA_ACTION_VARIANT,
-  HERO_IMAGE_SOURCE,
   routes,
   type ISanityImage,
   type TMaybeUndefined,
@@ -28,14 +27,7 @@ function toImage(
   raw: TRawHeroBlogModule,
   post: TPostCard | undefined,
 ): TMaybeUndefined<ISanityImage> {
-  switch (raw.imageSource) {
-    case HERO_IMAGE_SOURCE.CUSTOM:
-      return toSanityImage(raw.image);
-    case HERO_IMAGE_SOURCE.NONE:
-      return undefined;
-    case HERO_IMAGE_SOURCE.POST:
-      return post?.heroImage;
-  }
+  return toSanityImage(raw.image) ?? post?.heroImage;
 }
 
 function toPrimaryButton(

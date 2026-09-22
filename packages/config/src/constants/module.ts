@@ -44,11 +44,3 @@ export const POST_SOURCE = {
 } as const;
 
 export type TPostSource = TValueOf<typeof POST_SOURCE>;
-
-export const HERO_IMAGE_SOURCE = {
-  POST: 'POST',
-  CUSTOM: 'CUSTOM',
-  NONE: 'NONE',
-} as const;
-
-export type THeroImageSource = TValueOf<typeof HERO_IMAGE_SOURCE>;

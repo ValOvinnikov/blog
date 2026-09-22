@@ -34,7 +34,6 @@ export const heroBlogModuleQuery = q
       )
       .nullable(true),
     eyebrow: sub.field('eyebrow').nullable(true),
-    imageSource: sub.field('imageSource').notNull(),
     image: sub.field('image').project(sanityImageFragment).nullable(true),
     primaryActionLabel: sub.field('primaryActionLabel').notNull(),
     primaryActionAppearance: sub.field('primaryActionAppearance').notNull(),
