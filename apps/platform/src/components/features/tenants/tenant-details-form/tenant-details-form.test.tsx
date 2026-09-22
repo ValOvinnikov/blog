@@ -134,9 +134,9 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
     });
     expect(submitButton).toBeDisabled();
     expect(submitButton).toHaveAttribute('aria-busy', 'true');
-    expect(
-      screen.getByRole('textbox', { name: 'Tenant name' }).closest('[inert]'),
-    ).not.toBeNull();
+    expect(screen.getByTestId('tenant-details-form-inert')).toHaveAttribute(
+      'inert',
+    );
 
     resolveAction({ ok: false });
     await waitFor(() =>

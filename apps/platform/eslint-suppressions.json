@@ -1,27 +1,4 @@
 {
-  "src/components/features/tenants/recent-activity-card/recent-activity-card.test.tsx": {
-    "testing-library/no-container": {
-      "count": 1
-    }
-  },
-  "src/components/features/tenants/tenant-details-form/tenant-details-form.test.tsx": {
-    "testing-library/no-node-access": {
-      "count": 1
-    }
-  },
-  "src/components/features/tenants/tenant-details-panel/tenant-details-panel.test.tsx": {
-    "testing-library/no-container": {
-      "count": 3
-    },
-    "testing-library/no-node-access": {
-      "count": 17
-    }
-  },
-  "src/components/features/tenants/tenant-details-panel/use-lock-state-change.test.tsx": {
-    "testing-library/no-node-access": {
-      "count": 6
-    }
-  },
   "src/components/features/voice/voice-settings/voice-settings.test.tsx": {
     "testing-library/no-node-access": {
       "count": 6

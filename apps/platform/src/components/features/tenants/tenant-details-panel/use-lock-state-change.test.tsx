@@ -56,7 +56,7 @@ describe(useLockStateChange, () => {
     render(<Harness fieldLocks={NO_LOCKS} />);
 
     expect(screen.getByTestId('live-region')).toHaveTextContent('');
-    expect(document.activeElement).toBe(document.body);
+    expect(document.body).toHaveFocus();
   });
 
   it('announces a lock once a field newly locks, not on an unrelated re-render', () => {
@@ -115,12 +115,11 @@ describe(useLockStateChange, () => {
 
     const insideInput = screen.getByRole('textbox', { name: 'inside' });
     insideInput.focus();
-    expect(document.activeElement).toBe(insideInput);
+    expect(insideInput).toHaveFocus();
 
     rerender(<Harness fieldLocks={NAME_LOCKED} />);
 
-    const fieldsContainer = screen.getByRole('group');
-    expect(document.activeElement).toBe(fieldsContainer);
+    expect(screen.getByRole('group')).toHaveFocus();
   });
 
   it('does not steal focus when a locking transition fires while focus was outside', () => {
@@ -128,11 +127,11 @@ describe(useLockStateChange, () => {
 
     const outsideButton = screen.getByRole('button', { name: 'outside' });
     outsideButton.focus();
-    expect(document.activeElement).toBe(outsideButton);
+    expect(outsideButton).toHaveFocus();
 
     rerender(<OutsideHarness fieldLocks={NAME_LOCKED} />);
 
-    expect(document.activeElement).toBe(outsideButton);
+    expect(outsideButton).toHaveFocus();
   });
 
   it('does not move focus on an unrelated re-render while the locked set stays the same', () => {
@@ -143,6 +142,6 @@ describe(useLockStateChange, () => {
 
     rerender(<Harness fieldLocks={NO_LOCKS} />);
 
-    expect(document.activeElement).toBe(insideInput);
+    expect(insideInput).toHaveFocus();
   });
 });

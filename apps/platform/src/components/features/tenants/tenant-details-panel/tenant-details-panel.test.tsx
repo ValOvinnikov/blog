@@ -792,7 +792,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       });
       expect(saveButton).toBeDisabled();
       expect(saveButton).toHaveAttribute('aria-busy', 'true');
-      expect(saveButton.nextElementSibling).toHaveTextContent('Saving…');
+      expect(screen.getByRole('status')).toHaveTextContent('Saving…');
 
       resolveAction({
         ok: true,
@@ -848,7 +848,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
   describe('lock transition announcement', () => {
     it('announces a lock once a field newly locks — not on mount, not on an unrelated re-render', () => {
       const tenant = makeTenant();
-      const { container, rerender } = rtlRender(
+      const { rerender } = rtlRender(
         withIntl(
           <TenantDetailsPanel
             tenant={tenant}
@@ -858,13 +858,9 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         ),
       );
 
-      const liveRegion = container.querySelector('[aria-live="assertive"]');
-      expect(liveRegion).not.toBeNull();
+      const liveRegion = screen.getByTestId('lock-announcement-live');
       expect(liveRegion).toHaveTextContent('');
 
-      // A re-render that leaves the locked field set unchanged (e.g. a
-      // fresh tenant reference from an unrelated prop update) must not fire
-      // it.
       rerender(
         withIntl(
           <TenantDetailsPanel
@@ -889,7 +885,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         'Some tenant detail fields are now locked.',
       );
 
-      // A further re-render with the same locked set must not re-fire it.
       rerender(
         withIntl(
           <TenantDetailsPanel
@@ -906,7 +901,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
     it('announces an unlock once a field becomes editable again', () => {
       const tenant = makeTenant();
-      const { container, rerender } = rtlRender(
+      const { rerender } = rtlRender(
         withIntl(
           <TenantDetailsPanel
             tenant={tenant}
@@ -916,7 +911,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         ),
       );
 
-      const liveRegion = container.querySelector('[aria-live="assertive"]');
+      const liveRegion = screen.getByTestId('lock-announcement-live');
       expect(liveRegion).toHaveTextContent('');
 
       rerender(
@@ -938,7 +933,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         name: { kind: 'step', step: TENANT_PROVISIONING_STEP.SANITY_PROJECT },
       };
       const tenant = makeTenant();
-      const { container, rerender } = rtlRender(
+      const { rerender } = rtlRender(
         withIntl(
           <TenantDetailsPanel
             tenant={tenant}
@@ -948,11 +943,9 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         ),
       );
 
-      const liveRegion = container.querySelector('[aria-live="assertive"]');
+      const liveRegion = screen.getByTestId('lock-announcement-live');
       expect(liveRegion).toHaveTextContent('');
 
-      // The domain unlocks as name locks, in the same render — the
-      // locked-field count stays 1, but the set genuinely changed.
       rerender(
         withIntl(
           <TenantDetailsPanel
@@ -1076,7 +1069,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         ),
       );
 
-      expect(document.activeElement).toBe(document.body);
+      expect(document.body).toHaveFocus();
     });
 
     it('moves focus to the fields container when a field newly locks while focus was inside the panel', () => {
@@ -1093,7 +1086,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
       const nameInput = screen.getByRole('textbox', { name: 'Name' });
       nameInput.focus();
-      expect(document.activeElement).toBe(nameInput);
+      expect(nameInput).toHaveFocus();
 
       rerender(
         withIntl(
@@ -1105,12 +1098,10 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         ),
       );
 
-      const fieldsContainer = screen
-        .getByRole('textbox', { name: 'Name' })
-        .closest('[tabindex="-1"]');
-      expect(fieldsContainer).not.toBeNull();
-      expect(document.activeElement).toBe(fieldsContainer);
-      expect(document.activeElement).not.toBe(document.body);
+      expect(
+        screen.getByRole('group', { name: 'Tenant detail fields' }),
+      ).toHaveFocus();
+      expect(document.body).not.toHaveFocus();
     });
 
     it('does not steal focus when a locking transition fires while focus was outside the panel', () => {
@@ -1129,7 +1120,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         name: 'Outside control',
       });
       outsideControl.focus();
-      expect(document.activeElement).toBe(outsideControl);
+      expect(outsideControl).toHaveFocus();
 
       rerender(
         withIntl(
@@ -1141,7 +1132,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         ),
       );
 
-      expect(document.activeElement).toBe(outsideControl);
+      expect(outsideControl).toHaveFocus();
     });
 
     it('does not move focus on an unrelated re-render while the locked field set stays the same', () => {
@@ -1158,7 +1149,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
       const nameInput = screen.getByRole('textbox', { name: 'Name' });
       nameInput.focus();
-      expect(document.activeElement).toBe(nameInput);
+      expect(nameInput).toHaveFocus();
 
       rerender(
         withIntl(
@@ -1170,7 +1161,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         ),
       );
 
-      expect(document.activeElement).toBe(nameInput);
+      expect(nameInput).toHaveFocus();
     });
   });
 });

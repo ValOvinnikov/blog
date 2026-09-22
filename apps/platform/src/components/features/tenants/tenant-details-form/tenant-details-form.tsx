@@ -109,7 +109,11 @@ export const TenantDetailsForm = () => {
       {formError && <Alert type={ALERT_TYPE.ERROR} title={formError} />}
 
       <div className={cardWrap()}>
-        <div className={cardInert()} inert={isPending}>
+        <div
+          className={cardInert()}
+          inert={isPending}
+          data-testid="tenant-details-form-inert"
+        >
           <Card>
             <Card.Header
               title={t('heading')}
