@@ -14,9 +14,6 @@ type TRawPortableTextSpan = {
   marks?: string[];
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export type TPortableTextBlockWithResolvedLinks<TBlock> = TPortableText;
-
 function toPortableTextMarkDef(
   raw: TRawPortableTextMarkDef,
 ): IPortableTextLinkMark {

@@ -126,7 +126,9 @@ prune: note them as a finding.
   prop whose only effect is styling gets no test. Query through `screen`,
   never `container.querySelector`, a node walk (`.parentElement`) or
   queries destructured from `render()` — `testing-library/no-container`,
-  `no-node-access` and `prefer-screen-queries` fail those; a roleless
+  `no-node-access` and `prefer-screen-queries` fail those — except a
+  chained walk (`container.children[0]`), which passes lint and is still
+  banned; a roleless
   element gets a fixed `data-testid` on the component (report it as a
   product-code finding, you cannot add it yourself).
 - **`@blog/service`** mappers/loaders: mock the Sanity client, test

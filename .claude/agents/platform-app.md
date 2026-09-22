@@ -523,7 +523,8 @@ delete-don't-shorten rule. It is not restated here; follow it as written.
 - **Query through `screen`, never the DOM.** `container.querySelector`, a
   node walk (`.parentElement`, `.children`) and queries destructured from
   `render()` fail lint (`testing-library/no-container`, `no-node-access`,
-  `prefer-screen-queries`); a roleless element gets a fixed `data-testid`
+  `prefer-screen-queries`) — a chained walk like `container.children[0]`
+  slips past lint and is banned all the same; a roleless element gets a fixed `data-testid`
   on the component and `screen.getByTestId`.
 - Mock `@blog/db` query/mutation functions; assert that fetched data renders and
   that a form submission calls the action with the values the user entered.
