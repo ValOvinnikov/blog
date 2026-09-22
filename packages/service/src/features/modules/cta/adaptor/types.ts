@@ -1,8 +1,8 @@
 import type {
   ISanityImage,
+  TBrandVariant,
   TContentAlignment,
   TCtaVariant,
-  TFullBrandVariant,
   THeadingBlock,
   TLayout,
   TMaybeUndefined,
@@ -13,8 +13,8 @@ import type { TCtaButton } from '@blog/service/shared/transformers/cta/to-cta-bu
 
 export type TCtaModule = {
   variant: TCtaVariant;
-  brandVariant: TFullBrandVariant;
-  bandTone: TFullBrandVariant;
+  brandVariant: TBrandVariant;
+  bandTone: TBrandVariant;
   eyebrow: TMaybeUndefined<string>;
   headingBlock: THeadingBlock;
   content: TMaybeUndefined<TPortableTextBlock[]>;

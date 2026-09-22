@@ -271,7 +271,7 @@ export type Module_postList = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY';
   headingBlock?: HeadingBlock;
   pageSize?: number;
   showImages?: boolean;

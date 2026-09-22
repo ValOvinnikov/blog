@@ -1,7 +1,7 @@
 import type {
   ISanityImage,
+  TBrandVariant,
   TContentAlignment,
-  TFullBrandVariant,
   THeadingBlock,
   THeroVariant,
   TLayout,
@@ -13,7 +13,7 @@ import type { TCtaButton } from '@blog/service/shared/transformers/cta/to-cta-bu
 import type { TSocialProfile } from '@blog/service/shared/transformers/social-profile/to-social-profile';
 
 export type THeroProfileModule = {
-  brandVariant: TFullBrandVariant;
+  brandVariant: TBrandVariant;
   variant: THeroVariant;
   headingBlock: THeadingBlock;
   eyebrow: TMaybeUndefined<string>;

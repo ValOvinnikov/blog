@@ -16,14 +16,23 @@ import { Hero, type THeroProps } from './hero';
 const heroTitle = 'Building a Design System';
 const heroTitleId = 'hero-title';
 
-const setup = customRender(Hero, { title: heroTitle, titleId: heroTitleId });
+const setup = customRender(Hero, {
+  title: heroTitle,
+  titleId: heroTitleId,
+  tone: BRAND_VARIANT.PRIMARY,
+});
 
 const renderHero = (
   props: Partial<THeroProps> = {},
   children?: THeroProps['children'],
 ) =>
   renderElement(
-    <Hero title={heroTitle} titleId={heroTitleId} {...props}>
+    <Hero
+      title={heroTitle}
+      titleId={heroTitleId}
+      tone={BRAND_VARIANT.PRIMARY}
+      {...props}
+    >
       {children}
     </Hero>,
   );
