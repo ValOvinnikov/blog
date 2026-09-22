@@ -1,11 +1,14 @@
 import { LINK_TYPE, SOCIAL_PLATFORMS } from '@blog/config';
+import type { postLinkFragment } from '@blog/service/shared/fragments/post-link';
 import type { TRawSeo } from '@blog/service/shared/transformers/resolve-seo';
 import type { TRawHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import type { TRawLinkDocument } from '@blog/service/shared/transformers/to-link-document';
 import type { TRawPortableTextMarkDef } from '@blog/service/shared/transformers/to-portable-text-mark-def';
-import type { TRawPostLink } from '@blog/service/shared/transformers/to-post-link';
 import type { TRawSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
 import type { TRawSocialProfile } from '@blog/service/shared/transformers/to-social-profile';
+import type { InferFragmentType } from 'groqd';
+
+type TRawPostLink = InferFragmentType<typeof postLinkFragment>;
 
 export function makeRawExternalLinkDocument(
   overrides: Partial<TRawLinkDocument> = {},
