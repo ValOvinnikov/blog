@@ -34,15 +34,13 @@ export const sanityImageFragment = q
       .notNull(),
   }));
 
-// Same asset resolution as `sanityImageFragment`, and the same required
-// `alt` (both types compose `imageAltField()`). Only `asset` stays nullable,
-// so a body-image block whose asset was never selected or points at a
-// deleted document degrades gracefully instead of failing the whole
-// document.
+// Same asset resolution as `sanityImageFragment`, but both `asset` and
+// `alt` stay nullable so a malformed body-image block degrades gracefully
+// instead of failing the whole document.
 export const bodyImageFragment = q
   .fragmentForType<typeof PORTABLE_TEXT_BLOCK_TYPE.BODY_IMAGE>()
   .project((sub) => ({
-    alt: sub.field('alt').notNull(),
+    alt: sub.field('alt').nullable(true),
     hotspot: true,
     crop: true,
     asset: sub
