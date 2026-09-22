@@ -179,7 +179,7 @@ relative paths only within a single slice (`./query`, `./types`).
     hand-roll a plural locally.
 
 - **Put something in `shared/` only if it's reused now or clearly will be**
-  (e.g. SEO — there's a `seo-and-metadata` skill, so `seoFragment`/`toSeoMeta`
+  (e.g. SEO — there's a `seo-and-metadata` skill, so `seoFragment`/`resolveSeo`
   stay shared even at one current use). If it's used in exactly one place with no
   foreseeable reuse, inline the projection/type in that feature (or as a local,
   non-exported fragment) instead of creating a shared file. Don't overload files.
