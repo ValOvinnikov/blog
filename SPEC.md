@@ -726,8 +726,9 @@ guaranteed instead of testing for its absence.
 array, `unique()` and validated `min(2).max(8)`. Two is the floor because a
 lone card is a statement rather than a grid; eight is the ceiling because the
 column rule below stops producing balanced rows past it. It carries the usual
-module furniture — `title`, `brandVariant` (the full three-value list,
-defaulting to `PRIMARY`), `headingBlock`, `layout`, `ctaButtons` — plus
+module furniture — `title`, `brandVariant` (the default
+`PRIMARY`/`SECONDARY` list, defaulting to `PRIMARY`), `headingBlock`,
+`layout`, `ctaButtons` — plus
 `displayMode` (grid or carousel), `contentAlignment` from `alignmentFields([])`
 with no position axis, and two fields of its own: `imageShape` and
 `cardAlignment`. It is allowed in `page_home.modules[]` and
