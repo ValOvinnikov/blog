@@ -319,7 +319,7 @@ string>> }` so the page can show them inline.
   `VoiceRichProvider` holding the resolved rich map (override, else the
   catalog string wrapped as one paragraph). A server accessor
   (`getVoiceRich(id)`) and a client hook (`useVoiceRich(id)`) return Portable
-  Text, rendered by the existing `InlineTextRenderer`. Consumers: empty
+  Text, rendered by the existing `PortableText`. Consumers: empty
   states, the not-found and error pages' supporting text, account section
   descriptions.
 - `error-boundary-copy.ts`, `error-page.tsx` strings move into the catalog
