@@ -555,25 +555,35 @@ are optional on both.
 `publishedAt <= now()`, so a `page_post` dated in the future never appears in
 a listing and resolves as not-found on its own URL until its date arrives.
 
-**Completeness is enforced by Studio, not by the query.** `content`, `author`,
-`topic` and `publishedAt` carry `required()` on `page_post`, so the Studio
-refuses to publish a document missing any of them. Measured on the
-development dataset (2026-09-22), every `page_post` satisfies the date gate
-and the full required set alike.
+**Completeness is enforced by Studio, not by the query.** The fields the
+paragraph above calls required carry `required()` on `page_post`, so the
+Studio refuses to publish a document missing any of them.
 
 That leaves a deliberate, accepted gap, recorded here so it is not
 rediscovered as a bug. Three paths bypass Studio validation — a content
 migration, a direct API write, and any future mandatory field, which by
 convention cannot carry `required()` because `initialValue` never backfills
 and would strand already-published documents. A document arriving by one of
-those routes and missing a required field **will** reach listings, and the
-`.notNull()` projection in `postCardFragment` throws at parse time rather
-than dropping one card: `safeAsync` converts the throw to `{ ok: false }` and
-the app layer 404s the whole page. One malformed document therefore takes
-down every listing it appears in. Until 2026-09-22 the filter also asserted
-`defined()` on each required field, which closed that gap; it was reduced
-because the clauses excluded nothing in practice and made a one-clause rule
-read as a six-clause one.
+those routes now reaches every query the old `defined()` clauses excluded it
+from, and what happens next depends on which field is absent, because each
+fragment asserts `.notNull()` only over what it projects:
+
+- `headingBlock.heading` or `slug` — projected by every post fragment (as is
+  `publishedAt`, bar `postLinkFragment`), so the parse throws wherever the
+  document appears. `safeAsync` converts the throw to `{ ok: false }` and the
+  app layer 404s the whole page, so one malformed document takes down each
+  listing carrying it.
+- `author` or `topic` — projected by `postCardFragment` but not by
+  `feedPostFragment` or `postLinkFragment`, so card listings break while the
+  feeds and taxonomy post links render normally.
+- `content` or `seo.metaTitle` — projected only by `postDetailFragment`. No
+  listing is affected; the document surfaces as a card whose link resolves
+  not-found.
+
+Until this was reduced, the filter also asserted `defined()` on each required
+field, which closed the gap entirely. It was narrowed because those clauses
+excluded nothing in practice and made a one-clause rule read as a six-clause
+one.
 
 Absent values are still never substituted — an **exclusion, not a fallback**.
 Every consumer of these fields structurally needs a value: RSS `<title>`, the
