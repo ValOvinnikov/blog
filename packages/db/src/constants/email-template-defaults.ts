@@ -2,14 +2,14 @@ import {
   EMAIL_TEMPLATE_TYPE,
   type TEmailTemplateType,
 } from '@blog/config/constants';
-import type { TPortableTextBlock } from '@blog/db/schema/email-templates';
+import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
 
 export type TEmailTemplateDefaultCopy = {
   subject: string;
-  body: TPortableTextBlock[];
+  body: TEmailTemplateBlock[];
 };
 
-function paragraph(key: string, text: string): TPortableTextBlock {
+function paragraph(key: string, text: string): TEmailTemplateBlock {
   return {
     _type: 'block',
     _key: key,

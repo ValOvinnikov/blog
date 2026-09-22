@@ -2,7 +2,7 @@ import type { TEmailTemplateType } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import {
   emailTemplates,
-  type TPortableTextBlock,
+  type TEmailTemplateBlock,
 } from '@blog/db/schema/email-templates';
 import { z } from 'zod';
 
@@ -41,7 +41,7 @@ function presentFields(
 
   if (parsed.subject !== undefined) fields.subject = parsed.subject;
   if (parsed.body !== undefined) {
-    fields.body = parsed.body as TPortableTextBlock[] | null;
+    fields.body = parsed.body as TEmailTemplateBlock[] | null;
   }
   if (parsed.logoAssetUrl !== undefined) {
     fields.logoAssetUrl = parsed.logoAssetUrl;
