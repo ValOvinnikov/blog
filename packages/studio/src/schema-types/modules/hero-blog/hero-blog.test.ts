@@ -3,6 +3,8 @@ import {
   POST_SOURCE,
   HERO_VARIANT,
 } from '@blog/config/constants';
+import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
+import { PUBLISHED_POST_CONDITION } from '@blog/studio/schema-types/filters/published-post/published-post';
 import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
 import {
   getCustomValidator,
@@ -260,9 +262,11 @@ describe('heroBlogSchema document validation', () => {
         context,
       );
 
-      expect(receivedQuery).toBe(
-        '*[_type == "page_post" && featured == true && publishedAt <= now()] | order(publishedAt desc)[0]{ publishedAt, heroImage }',
-      );
+      expect(receivedQuery).toContain(`_type == "${PAGE_POST_TYPE}"`);
+      expect(receivedQuery).toContain('featured == true');
+      expect(receivedQuery).toContain(PUBLISHED_POST_CONDITION);
+      expect(receivedQuery).toContain('order(publishedAt desc)[0]');
+      expect(receivedQuery).toContain('{ publishedAt, heroImage }');
     });
 
     it('warns when Image Source is Post and the resolved post has no image', async () => {

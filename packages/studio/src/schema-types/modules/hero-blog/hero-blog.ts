@@ -20,7 +20,7 @@ import { titleField } from '@blog/studio/schema-types/fields/title-field/title-f
 import {
   PUBLISHED_POST_CONDITION,
   publishedPostFilter,
-} from '@blog/studio/schema-types/filters/published-post';
+} from '@blog/studio/schema-types/filters/published-post/published-post';
 import { heroFieldsets } from '@blog/studio/schema-types/modules/hero-fieldsets/hero-fieldsets';
 import { ctaSecondaryButtonSchema } from '@blog/studio/schema-types/objects/cta-button/cta-button';
 import { heroLayoutField } from '@blog/studio/schema-types/objects/hero-layout/hero-layout-field';
