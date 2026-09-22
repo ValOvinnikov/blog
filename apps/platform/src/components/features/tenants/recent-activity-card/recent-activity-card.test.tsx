@@ -19,6 +19,10 @@ const makeEvent = (overrides: Partial<TAuditEvent> = {}): TAuditEvent => ({
 });
 
 describe(RecentActivityCard, () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it("nests the card's title one level under the page's own h1", () => {
     render(<RecentActivityCard events={[]} />);
 
@@ -28,7 +32,10 @@ describe(RecentActivityCard, () => {
   });
 
   it('renders recent activity events with actor email and a generic per-action label', () => {
-    const { container } = render(
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-08-24T12:05:00.000Z'));
+
+    render(
       <RecentActivityCard
         events={[
           makeEvent({ action: AUDIT_ACTION.SETTINGS_UPDATED }),
@@ -41,13 +48,11 @@ describe(RecentActivityCard, () => {
     expect(screen.getByText('Tenant created')).toBeVisible();
     expect(screen.getAllByText('vo@valstack.dev')).toHaveLength(2);
 
-    const activityTimeElements = Array.from(
-      container.querySelectorAll('time'),
-    ).filter(
-      (element) =>
-        element.getAttribute('dateTime') === '2026-08-24T12:00:00.000Z',
-    );
-    expect(activityTimeElements).toHaveLength(2);
+    const activityTimes = screen.getAllByText('5m ago');
+    expect(activityTimes).toHaveLength(2);
+    for (const time of activityTimes) {
+      expect(time).toHaveAttribute('dateTime', '2026-08-24T12:00:00.000Z');
+    }
   });
 
   it('shows an empty state when there is no recorded activity', () => {

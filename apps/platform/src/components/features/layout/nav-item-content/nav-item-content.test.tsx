@@ -5,12 +5,10 @@ import { NavItemContent } from './nav-item-content';
 
 describe(`<${NavItemContent.name}/>`, () => {
   it('renders the icon and label', () => {
-    const { container } = render(
-      <NavItemContent icon={ICONS.GRID} label="Tenants" />,
-    );
+    render(<NavItemContent icon={ICONS.GRID} label="Tenants" />);
 
     expect(screen.getByText('Tenants')).toBeVisible();
-    expect(container.querySelector('svg')).not.toBeNull();
+    expect(screen.getByTestId('icon')).toBeInTheDocument();
   });
 
   it('renders a disabled reason only when given one', () => {
@@ -30,14 +28,12 @@ describe(`<${NavItemContent.name}/>`, () => {
   });
 
   it('renders no badge when none is given', () => {
-    const { container } = render(
-      <NavItemContent icon={ICONS.GRID} label="Tenants" />,
-    );
-    expect(container.querySelector('span[aria-hidden="true"]')).toBeNull();
+    render(<NavItemContent icon={ICONS.GRID} label="Tenants" />);
+    expect(screen.queryByTestId('status-badge-dot')).not.toBeInTheDocument();
   });
 
   it('renders the badge label and tone dot by default', () => {
-    const { container } = render(
+    render(
       <NavItemContent
         icon={ICONS.GRID}
         label="Tenants"
@@ -46,11 +42,11 @@ describe(`<${NavItemContent.name}/>`, () => {
     );
 
     expect(screen.getByText('this milestone')).toBeVisible();
-    expect(container.querySelector('span[aria-hidden="true"]')).not.toBeNull();
+    expect(screen.getByTestId('status-badge-dot')).toBeInTheDocument();
   });
 
   it('omits the tone dot when the badge sets hasDot to false', () => {
-    const { container } = render(
+    render(
       <NavItemContent
         icon={ICONS.GRID}
         label="Platform"
@@ -59,6 +55,6 @@ describe(`<${NavItemContent.name}/>`, () => {
     );
 
     expect(screen.getByText('platform')).toBeVisible();
-    expect(container.querySelector('span[aria-hidden="true"]')).toBeNull();
+    expect(screen.queryByTestId('status-badge-dot')).not.toBeInTheDocument();
   });
 });

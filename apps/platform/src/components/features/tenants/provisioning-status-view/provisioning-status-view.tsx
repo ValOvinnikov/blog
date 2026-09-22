@@ -128,7 +128,11 @@ export const ProvisioningStatusView = ({
   );
 
   const overallStatusBadgeLive = (
-    <span className={overallStatusLive()} aria-live="polite">
+    <span
+      className={overallStatusLive()}
+      aria-live="polite"
+      data-testid="run-status-live"
+    >
       {overallStatusBadge}
     </span>
   );

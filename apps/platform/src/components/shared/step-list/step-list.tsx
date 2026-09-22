@@ -66,7 +66,11 @@ export const StepList = ({ steps, className }: TStepListProps) => {
                   {isDone ? '✓' : isFailed ? '!' : index + 1}
                 </span>
                 {!isLast && (
-                  <span className={connector({ isDone })} aria-hidden="true" />
+                  <span
+                    className={connector({ isDone })}
+                    aria-hidden="true"
+                    data-testid="step-connector"
+                  />
                 )}
               </div>
               <div className={stepBody()}>
@@ -74,7 +78,11 @@ export const StepList = ({ steps, className }: TStepListProps) => {
                 {/* The circle glyph is decorative (`aria-hidden`); this
                     visually-hidden text is what actually carries the step's
                     status to assistive tech, inside a stable live region. */}
-                <span className={stepStatusLive()} aria-live="polite">
+                <span
+                  className={stepStatusLive()}
+                  aria-live="polite"
+                  data-testid={`step-status-live-${key}`}
+                >
                   <span className={visuallyHidden()}>{statusLabel}</span>
                 </span>
               </div>

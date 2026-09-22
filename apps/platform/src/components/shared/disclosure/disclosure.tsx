@@ -40,6 +40,7 @@ export const Disclosure = ({
       className={root({ class: className })}
       open={open}
       onToggle={handleToggle}
+      data-testid="disclosure"
     >
       <summary className={summarySlot()}>
         {summary}

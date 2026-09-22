@@ -246,7 +246,11 @@ export const TenantDetailsPanel = ({
         <Card.Header title={t('heading')} headingLevel={2} />
         <Card.Body>
           <div className={bodyStack()}>
-            <span className={lockAnnouncementLive()} aria-live="assertive">
+            <span
+              className={lockAnnouncementLive()}
+              aria-live="assertive"
+              data-testid="lock-announcement-live"
+            >
               {lockAnnouncement}
             </span>
 

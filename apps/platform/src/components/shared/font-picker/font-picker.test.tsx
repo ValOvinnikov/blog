@@ -64,9 +64,11 @@ describe(FontPicker, () => {
       />,
     );
 
-    const inter = screen.getByRole('radio', { name: 'Inter' });
-    expect(inter).toHaveAttribute('aria-disabled', 'true');
-    expect(inter.closest('[role="radiogroup"]')).toHaveAttribute(
+    expect(screen.getByRole('radio', { name: 'Inter' })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+    expect(screen.getByRole('radiogroup')).toHaveAttribute(
       'aria-describedby',
       'archived-notice',
     );

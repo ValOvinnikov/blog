@@ -43,7 +43,7 @@ describe(Toast, () => {
         phase="visible"
       />,
     );
-    expect(document.querySelector('strong')).not.toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent(/^✓Saved×$/);
   });
 
   it('renders an assertive alert role for the ERROR type', () => {

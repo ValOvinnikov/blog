@@ -50,16 +50,16 @@ describe(StepList, () => {
   });
 
   it('renders a connector after every step except the last', () => {
-    const { container } = render(<StepList steps={steps} />);
+    render(<StepList steps={steps} />);
 
-    const hiddenSpans = Array.from(
-      container.querySelectorAll('span[aria-hidden="true"]'),
+    expect(
+      screen.getAllByText((content) => content.length > 0, {
+        selector: 'span[aria-hidden="true"]',
+      }),
+    ).toHaveLength(steps.length);
+    expect(screen.getAllByTestId('step-connector')).toHaveLength(
+      steps.length - 1,
     );
-    const connectors = hiddenSpans.filter((span) => span.textContent === '');
-    const glyphs = hiddenSpans.filter((span) => span.textContent !== '');
-
-    expect(glyphs).toHaveLength(steps.length);
-    expect(connectors).toHaveLength(steps.length - 1);
   });
 
   it('carries each step status to assistive tech in a visually-hidden aria-live region', () => {

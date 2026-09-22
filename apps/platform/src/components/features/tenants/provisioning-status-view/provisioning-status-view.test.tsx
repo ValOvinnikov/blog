@@ -44,10 +44,6 @@ vi.mock(
   }),
 );
 
-// `useProvisioningPoll` still imports this module for a caller that passes a
-// real domain status (`TenantOverviewView`) — mocked here purely to keep this
-// component's render test from loading that chain, same reasoning as
-// `deprovision-tenant-control.test.tsx` does for its own imports.
 vi.mock(
   '@platform/server/provisioning/get-domain-verification-status-action',
   () => ({
@@ -56,10 +52,6 @@ vi.mock(
 );
 
 describe(ProvisioningStatusView, () => {
-  // Most tests render a non-terminal `provisioningStatus`, which starts a
-  // real `setInterval` poll loop that can outlive this test's cleanup under
-  // `pool: 'forks'` load and fire against a torn-down file. Faking
-  // setInterval/clearInterval closes that off.
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
     retryProvisioningStepActionMock.mockReset();
@@ -140,17 +132,14 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    const heading = screen.getByRole('heading', {
-      level: 1,
-      name: 'Provisioning',
-    });
     expect(
-      within(heading.parentElement as HTMLElement).queryByText('Running…'),
+      within(screen.getByRole('heading', { name: 'Provisioning' })).queryByText(
+        'Running…',
+      ),
     ).not.toBeInTheDocument();
-
-    const runHeading = screen.getByRole('heading', { level: 2, name: 'Run' });
-    const runHeader = runHeading.parentElement?.parentElement as HTMLElement;
-    expect(within(runHeader).getByText('Running…')).toBeVisible();
+    expect(
+      within(screen.getByTestId('run-status-live')).getByText('Running…'),
+    ).toBeVisible();
   });
 
   it('shows the invited-pending owner badge when the tenant has no resolved owner email', () => {
@@ -298,7 +287,6 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    // No spinner anywhere — the badge text is the sole accessible source now.
     expect(screen.queryAllByRole('status')).toHaveLength(0);
 
     for (const text of ['Not started', 'Running…', 'Complete', 'Failed']) {
@@ -307,8 +295,6 @@ describe(ProvisioningStatusView, () => {
       }
     }
 
-    // Every circle glyph is aria-hidden regardless of status — it's purely
-    // decorative now that the badge carries the announcement.
     expect(
       screen.getByText('1', { selector: 'span[aria-hidden="true"]' }),
     ).toBeVisible();
@@ -347,9 +333,6 @@ describe(ProvisioningStatusView, () => {
         name: 'Retry provisioning',
       }),
     ).not.toBeInTheDocument();
-    // One "Failed" per the failed step's visually-hidden sidebar
-    // announcement, one for the overall status badge (this tenant has no
-    // run yet, so the badge renders in the fallback Run-card header).
     expect(screen.getAllByText('Failed')).toHaveLength(2);
   });
 
@@ -607,8 +590,6 @@ describe(ProvisioningStatusView, () => {
       screen.getByRole('button', { name: 'Start provisioning' }),
     );
 
-    // Still pending — the dispatch promise hasn't resolved yet, but the
-    // operator already sees it's running rather than a frozen page.
     expect(
       screen.queryByRole('button', { name: 'Start provisioning' }),
     ).not.toBeInTheDocument();
@@ -634,24 +615,14 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    const runHeading = screen.getByRole('heading', { level: 2, name: 'Run' });
-    const runHeader = runHeading.parentElement?.parentElement as HTMLElement;
-    const liveRegionBefore = within(runHeader)
-      .getByText('Not started')
-      .closest('[aria-live="polite"]');
-    expect(liveRegionBefore).not.toBeNull();
+    const liveRegion = screen.getByTestId('run-status-live');
+    expect(within(liveRegion).getByText('Not started')).toBeVisible();
 
     await user.click(
       screen.getByRole('button', { name: 'Start provisioning' }),
     );
 
-    // The live region present before the click is the same node now showing
-    // the transition — never one mounted at the same moment as this text,
-    // which some screen readers fail to announce.
-    const liveRegionAfter = within(runHeader)
-      .getByText('Running…')
-      .closest('[aria-live="polite"]');
-    expect(liveRegionAfter).toBe(liveRegionBefore);
+    expect(within(liveRegion).getByText('Running…')).toBeVisible();
 
     await act(async () => {
       resolveDispatch?.({ outcome: 'dispatched' });
@@ -721,8 +692,6 @@ describe(ProvisioningStatusView, () => {
         'A provisioning run is already in progress for this tenant — this page will update automatically once it finishes.',
       ),
     ).toBeVisible();
-    // A non-error notice uses the `status` live region, not `alert` — it
-    // must not read to assistive tech as a failure.
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
@@ -902,23 +871,16 @@ describe(ProvisioningStatusView, () => {
         />,
       );
 
-      const sidebar = screen.getByRole('complementary');
-      const liveRegionBefore = within(sidebar)
-        .getByText('Running…')
-        .closest('[aria-live="polite"]');
-      expect(liveRegionBefore).not.toBeNull();
+      const liveRegion = screen.getByTestId(
+        `step-status-live-${TENANT_PROVISIONING_STEP.SANITY_PROJECT}`,
+      );
+      expect(within(liveRegion).getByText('Running…')).toBeVisible();
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
       });
 
-      // The new status text is announced by the same live region — not a
-      // freshly mounted one, which some screen readers announce on mount
-      // regardless of content, defeating the point of a targeted update.
-      const liveRegionAfter = within(sidebar)
-        .getByText('Complete')
-        .closest('[aria-live="polite"]');
-      expect(liveRegionAfter).toBe(liveRegionBefore);
+      expect(within(liveRegion).getByText('Complete')).toBeVisible();
     });
 
     it('stops polling once the tenant reaches a terminal status', async () => {
@@ -977,9 +939,6 @@ describe(ProvisioningStatusView, () => {
         },
       });
       getTenantProvisioningStatusActionMock.mockResolvedValue({
-        // `provisioningStatus` only ever settles on the *last* step, so a
-        // step 1 failure genuinely leaves it non-terminal — this is the bug
-        // this test guards against regressing.
         provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
         provisioningSteps: {
           ...idleProvisioningSteps(),
@@ -1005,8 +964,6 @@ describe(ProvisioningStatusView, () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS * 3);
       });
 
-      // No further calls — the action is not called again once the failure
-      // with nothing running has been observed.
       expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledTimes(1);
     });
 
@@ -1062,18 +1019,11 @@ describe(ProvisioningStatusView, () => {
         />,
       );
 
-      // Confirm it's genuinely stopped on mount — a step already failed with
-      // nothing running must never schedule a poll in the first place.
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS * 2);
       });
       expect(getTenantProvisioningStatusActionMock).not.toHaveBeenCalled();
 
-      // A real GitHub Actions dispatch only acknowledges GitHub's receipt of
-      // the request — it does not wait for a runner to actually pick up the
-      // job, which routinely takes longer than one poll interval. Model
-      // that: the very next tick after Retry still reports the exact same
-      // failed-and-nothing-running snapshot as before the click.
       getTenantProvisioningStatusActionMock.mockResolvedValueOnce({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
         provisioningSteps: failedSteps,
@@ -1094,16 +1044,11 @@ describe(ProvisioningStatusView, () => {
         );
       });
 
-      // First tick after Retry: still the stale, unchanged snapshot.
-      // Polling must NOT stop on this — it hasn't yet observed the retry
-      // taking effect.
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
       });
       expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledTimes(1);
 
-      // Second tick: the retried workflow has now actually started —
-      // polling picks up the change.
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
       });
@@ -1124,9 +1069,6 @@ describe(ProvisioningStatusView, () => {
         provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
         provisioningSteps: failedSteps,
       });
-      // Models a retry whose dispatched workflow never actually starts —
-      // every tick reports the exact same failed-and-nothing-running
-      // snapshot forever.
       getTenantProvisioningStatusActionMock.mockResolvedValue({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
         provisioningSteps: failedSteps,
@@ -1144,18 +1086,12 @@ describe(ProvisioningStatusView, () => {
         );
       });
 
-      // Advance well past the cap, one tick's worth of real time at a time
-      // (rather than in a single large jump) so each tick's resulting state
-      // change — including the interval being torn down once the cap
-      // fires — is actually committed before the next tick is simulated.
       for (let tick = 0; tick < RETRY_BASELINE_MAX_TICKS + 5; tick += 1) {
         await act(async () => {
           await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
         });
       }
 
-      // Polling must have stopped once the cap was reached — it never grew
-      // past that regardless of how much further time was simulated.
       expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledTimes(
         RETRY_BASELINE_MAX_TICKS,
       );
@@ -1210,8 +1146,6 @@ describe(ProvisioningStatusView, () => {
         />,
       );
 
-      // A handful of stale ticks first — still well short of the cap — then
-      // the workflow genuinely starts.
       getTenantProvisioningStatusActionMock.mockResolvedValue({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
         provisioningSteps: failedSteps,
@@ -1247,8 +1181,6 @@ describe(ProvisioningStatusView, () => {
       const sidebar = screen.getByRole('complementary');
       expect(within(sidebar).getByText('Running…')).toBeVisible();
 
-      // Polling keeps going normally past the transition — it wasn't
-      // waiting on the cap to notice the change.
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS * 2);
       });
@@ -1306,7 +1238,6 @@ describe(ProvisioningStatusView, () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
       });
 
-      // Last-known state stays visible — a rejected tick never clears it.
       expect(within(sidebar).getByText('Running…')).toBeVisible();
       expect(
         screen.getByText(
@@ -1357,10 +1288,9 @@ describe(ProvisioningStatusView, () => {
         />,
       );
 
-      const details = screen
-        .getByRole('complementary')
-        .querySelector('details');
-      expect(details).toHaveAttribute('open');
+      expect(
+        within(screen.getByRole('complementary')).getByRole('group'),
+      ).toHaveAttribute('open');
     });
 
     it('is collapsed by default once every step is already done on mount', () => {
@@ -1384,10 +1314,9 @@ describe(ProvisioningStatusView, () => {
         />,
       );
 
-      const details = screen
-        .getByRole('complementary')
-        .querySelector('details');
-      expect(details).not.toHaveAttribute('open');
+      expect(
+        within(screen.getByRole('complementary')).getByRole('group'),
+      ).not.toHaveAttribute('open');
     });
 
     it('auto-collapses once the run completes, and a later re-render does not undo a user-initiated reopen', async () => {
@@ -1421,27 +1350,23 @@ describe(ProvisioningStatusView, () => {
       );
 
       const sidebar = screen.getByRole('complementary');
-      const details = sidebar.querySelector('details') as HTMLDetailsElement;
-      expect(details).toHaveAttribute('open');
+      const disclosure = within(sidebar).getByRole('group');
+      expect(disclosure).toHaveAttribute('open');
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
       });
 
-      expect(details).not.toHaveAttribute('open');
+      expect(disclosure).not.toHaveAttribute('open');
 
       fireEvent.click(within(sidebar).getByText('Steps'));
-      expect(details).toHaveAttribute('open');
+      expect(disclosure).toHaveAttribute('open');
 
-      // Polling itself has already stopped (the run is terminal), but
-      // `useRelativeTimeTick` keeps forcing a periodic re-render regardless
-      // — an uncontrolled `Disclosure` writing `open` from `isDefaultOpen`
-      // on every render would slam this back shut here.
       await act(async () => {
         await vi.advanceTimersByTimeAsync(60_000);
       });
 
-      expect(details).toHaveAttribute('open');
+      expect(disclosure).toHaveAttribute('open');
     });
   });
 
@@ -1488,14 +1413,17 @@ describe(ProvisioningStatusView, () => {
           },
         },
       });
-      const { container } = render(
+      render(
         <ProvisioningStatusView
           tenant={tenant}
           ownerEmail="owner@example.com"
         />,
       );
 
-      const liveRegions = container.querySelectorAll('[aria-live="polite"]');
+      const liveRegions = [
+        ...screen.getAllByTestId(/^step-status-live-/),
+        screen.getByTestId('run-status-live'),
+      ];
       expect(liveRegions.length).toBeGreaterThan(0);
       for (const region of liveRegions) {
         expect(region).not.toHaveTextContent('6m ago');

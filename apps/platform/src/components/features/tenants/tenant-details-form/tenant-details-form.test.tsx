@@ -43,7 +43,6 @@ const clickConfirmInviteOwner = async (
   );
 };
 
-/** Queues the first submit's "unregistered owner" confirmation, then a second-submit success — the shared arrangement of every confirm-and-resubmit test below. */
 const mockOwnerInviteConfirmation = (overrides: {
   email: string;
   token?: string;
@@ -134,9 +133,9 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
     });
     expect(submitButton).toBeDisabled();
     expect(submitButton).toHaveAttribute('aria-busy', 'true');
-    expect(
-      screen.getByRole('textbox', { name: 'Tenant name' }).closest('[inert]'),
-    ).not.toBeNull();
+    expect(screen.getByTestId('tenant-details-form-inert')).toHaveAttribute(
+      'inert',
+    );
 
     resolveAction({ ok: false });
     await waitFor(() =>

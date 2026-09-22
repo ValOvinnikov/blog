@@ -34,8 +34,6 @@ const DOMAIN_LOCKED: TTenantFieldLocks = {
   primaryDomain: { kind: 'step', step: TENANT_PROVISIONING_STEP.MAP_DOMAIN },
 };
 
-// Applies the same wrapper on mount and on every `rerender()` call, so the
-// live region's node identity is preserved across rerenders.
 const withIntl = (ui: ReactElement) => {
   return (
     <NextIntlClientProvider locale={LOCALE_ISO_CODES.EN} messages={messages}>
@@ -44,9 +42,6 @@ const withIntl = (ui: ReactElement) => {
   );
 };
 
-// A sibling control outside the panel entirely, standing in for an unrelated
-// field or the adjacent steps list that a background poll must not steal
-// focus from.
 const PanelWithOutsideControl = (props: TTenantDetailsPanelProps) => {
   return (
     <>
@@ -108,7 +103,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       expect(ownerEmailInput).toHaveValue('owner@example.com');
       expect(ownerEmailInput).toHaveAttribute('type', 'email');
 
-      // Nothing has been edited yet, so Save has nothing to submit.
       expect(
         screen.getByRole('button', { name: 'Save changes' }),
       ).toBeDisabled();
@@ -124,16 +118,10 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         />,
       );
 
-      // SegmentedControl's root has no id a `for` could ever reference, so
-      // the "Plan" label text must render as a plain span rather than a
-      // <label htmlFor> — a <label for="tenant-detail-plan"> here would
-      // never associate with anything and is the regression this guards.
       const planLabelText = screen.getByText('Plan');
       expect(planLabelText.tagName).toBe('SPAN');
       expect(planLabelText).not.toHaveAttribute('for');
 
-      // The accessible name still resolves correctly — via SegmentedControl's
-      // own required `ariaLabel` prop, not a label association.
       expect(screen.getByRole('group', { name: 'Plan' })).toBeVisible();
     });
 
@@ -287,7 +275,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       expect(domainInput).toBeInvalid();
       expect(domainInput).toHaveAccessibleDescription('Enter a valid domain.');
 
-      // Fields with no error of their own stay valid and undescribed.
       const localeInput = screen.getByRole('textbox', { name: 'Locale' });
       expect(localeInput).not.toBeInvalid();
       expect(localeInput).toHaveAccessibleDescription('');
@@ -317,9 +304,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
       expect(await screen.findByText('Tenant details saved.')).toBeVisible();
 
-      // Unlike the old inline alert (tied to `showSaveSuccess`, cleared on
-      // any edit), a toast's lifecycle is independent of the form — it must
-      // not disappear just because editing resumed.
       await user.type(screen.getByRole('textbox', { name: 'Name' }), ' again');
       expect(screen.getByText('Tenant details saved.')).toBeVisible();
     });
@@ -404,8 +388,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         "This tenant's owner has already signed in, so their email can no longer be corrected here — this would transfer ownership instead.",
       );
       expect(message).toBeVisible();
-      // Distinct from the generic "couldn't save, try again" copy — it
-      // never appears alongside the specific explanation.
       expect(screen.queryByText(/couldn.?t save/i)).not.toBeInTheDocument();
       expect(refreshMock).not.toHaveBeenCalled();
     });
@@ -528,7 +510,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
           'tenant-1',
           expect.objectContaining({
             primaryDomain: 'new-domain.example.com',
-            // The locked field's original value is submitted unchanged.
             name: tenant.name,
           }),
         );
@@ -664,8 +645,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         screen.getByRole('textbox', { name: 'Primary domain' }),
       ).toHaveValue('unsaved-domain.example.com');
 
-      // A background poll discovers a step has completed, locking the
-      // domain — while the operator's unsaved edit above is still showing.
       rerender(
         withIntl(
           <TenantDetailsPanel
@@ -792,7 +771,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       });
       expect(saveButton).toBeDisabled();
       expect(saveButton).toHaveAttribute('aria-busy', 'true');
-      expect(saveButton.nextElementSibling).toHaveTextContent('Saving…');
+      expect(screen.getByRole('status')).toHaveTextContent('Saving…');
 
       resolveAction({
         ok: true,
@@ -827,8 +806,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
       await waitFor(() => expect(refreshMock).toHaveBeenCalled());
 
-      // Stands in for `router.refresh()` causing the parent Server Component
-      // to re-fetch and pass down the now-persisted tenant.
       rerender(
         withIntl(
           <TenantDetailsPanel
@@ -848,7 +825,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
   describe('lock transition announcement', () => {
     it('announces a lock once a field newly locks — not on mount, not on an unrelated re-render', () => {
       const tenant = makeTenant();
-      const { container, rerender } = rtlRender(
+      const { rerender } = rtlRender(
         withIntl(
           <TenantDetailsPanel
             tenant={tenant}
@@ -858,13 +835,9 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         ),
       );
 
-      const liveRegion = container.querySelector('[aria-live="assertive"]');
-      expect(liveRegion).not.toBeNull();
+      const liveRegion = screen.getByTestId('lock-announcement-live');
       expect(liveRegion).toHaveTextContent('');
 
-      // A re-render that leaves the locked field set unchanged (e.g. a
-      // fresh tenant reference from an unrelated prop update) must not fire
-      // it.
       rerender(
         withIntl(
           <TenantDetailsPanel
@@ -889,7 +862,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         'Some tenant detail fields are now locked.',
       );
 
-      // A further re-render with the same locked set must not re-fire it.
       rerender(
         withIntl(
           <TenantDetailsPanel
@@ -906,7 +878,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
     it('announces an unlock once a field becomes editable again', () => {
       const tenant = makeTenant();
-      const { container, rerender } = rtlRender(
+      const { rerender } = rtlRender(
         withIntl(
           <TenantDetailsPanel
             tenant={tenant}
@@ -916,7 +888,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         ),
       );
 
-      const liveRegion = container.querySelector('[aria-live="assertive"]');
+      const liveRegion = screen.getByTestId('lock-announcement-live');
       expect(liveRegion).toHaveTextContent('');
 
       rerender(
@@ -938,7 +910,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         name: { kind: 'step', step: TENANT_PROVISIONING_STEP.SANITY_PROJECT },
       };
       const tenant = makeTenant();
-      const { container, rerender } = rtlRender(
+      const { rerender } = rtlRender(
         withIntl(
           <TenantDetailsPanel
             tenant={tenant}
@@ -948,11 +920,9 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         ),
       );
 
-      const liveRegion = container.querySelector('[aria-live="assertive"]');
+      const liveRegion = screen.getByTestId('lock-announcement-live');
       expect(liveRegion).toHaveTextContent('');
 
-      // The domain unlocks as name locks, in the same render — the
-      // locked-field count stays 1, but the set genuinely changed.
       rerender(
         withIntl(
           <TenantDetailsPanel
@@ -1076,7 +1046,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         ),
       );
 
-      expect(document.activeElement).toBe(document.body);
+      expect(document.body).toHaveFocus();
     });
 
     it('moves focus to the fields container when a field newly locks while focus was inside the panel', () => {
@@ -1093,7 +1063,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
       const nameInput = screen.getByRole('textbox', { name: 'Name' });
       nameInput.focus();
-      expect(document.activeElement).toBe(nameInput);
+      expect(nameInput).toHaveFocus();
 
       rerender(
         withIntl(
@@ -1105,12 +1075,10 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         ),
       );
 
-      const fieldsContainer = screen
-        .getByRole('textbox', { name: 'Name' })
-        .closest('[tabindex="-1"]');
-      expect(fieldsContainer).not.toBeNull();
-      expect(document.activeElement).toBe(fieldsContainer);
-      expect(document.activeElement).not.toBe(document.body);
+      expect(
+        screen.getByRole('group', { name: 'Tenant detail fields' }),
+      ).toHaveFocus();
+      expect(document.body).not.toHaveFocus();
     });
 
     it('does not steal focus when a locking transition fires while focus was outside the panel', () => {
@@ -1129,7 +1097,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         name: 'Outside control',
       });
       outsideControl.focus();
-      expect(document.activeElement).toBe(outsideControl);
+      expect(outsideControl).toHaveFocus();
 
       rerender(
         withIntl(
@@ -1141,7 +1109,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         ),
       );
 
-      expect(document.activeElement).toBe(outsideControl);
+      expect(outsideControl).toHaveFocus();
     });
 
     it('does not move focus on an unrelated re-render while the locked field set stays the same', () => {
@@ -1158,7 +1126,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
       const nameInput = screen.getByRole('textbox', { name: 'Name' });
       nameInput.focus();
-      expect(document.activeElement).toBe(nameInput);
+      expect(nameInput).toHaveFocus();
 
       rerender(
         withIntl(
@@ -1170,7 +1138,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         ),
       );
 
-      expect(document.activeElement).toBe(nameInput);
+      expect(nameInput).toHaveFocus();
     });
   });
 });

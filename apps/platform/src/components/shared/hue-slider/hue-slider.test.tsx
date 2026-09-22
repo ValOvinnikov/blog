@@ -36,12 +36,7 @@ describe(HueSlider, () => {
       />,
     );
 
-    // The accessible "slider" role lands on Base UI's native <input>, nested
-    // inside the Thumb; its grandparent is the Track.
-    const thumb = screen.getByRole('slider', { name: 'Accent hue' })
-      .parentElement as HTMLElement;
-    const track = thumb.parentElement;
-    expect(track).toHaveStyle({
+    expect(screen.getByTestId('hue-slider-track')).toHaveStyle({
       background: 'linear-gradient(90deg, red, blue)',
     });
   });

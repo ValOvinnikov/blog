@@ -13,9 +13,6 @@ mockRouterRefresh();
 const ADVANCED_SUMMARY = 'Advanced — 8 curated strings, 2 groups';
 const ARCHIVED_AT = new Date('2026-08-26T00:00:00.000Z');
 
-// Advanced starts collapsed (matching the Look tab) — every test that reads
-// or interacts with a curated field opens it first, same as a real user
-// would have to.
 const openAdvanced = async (user: ReturnType<typeof userEvent.setup>) => {
   await user.click(screen.getByText(ADVANCED_SUMMARY));
 };
@@ -33,26 +30,23 @@ describe(`<${VoiceSettings.name}/>`, () => {
     expect(screen.getByRole('heading', { name: 'Basic' })).toBeVisible();
     expect(screen.getByText(/Nothing required here\./)).toBeVisible();
     expect(
-      within(
-        screen.getByRole('heading', { name: 'Basic' }).parentElement!,
-      ).queryAllByRole('textbox'),
+      within(screen.getByTestId('voice-basic-card')).queryAllByRole('textbox'),
     ).toHaveLength(0);
   });
 
   it('starts the Advanced section collapsed', () => {
     setup();
 
-    expect(
-      screen.getByText(ADVANCED_SUMMARY).closest('details'),
-    ).not.toHaveAttribute('open');
+    expect(screen.getByRole('group')).not.toHaveAttribute('open');
     expect(screen.getByText('404 page')).not.toBeVisible();
   });
 
   it('shows a chevron affordance on the Advanced disclosure toggle', () => {
     setup();
 
-    const summary = screen.getByText(ADVANCED_SUMMARY).closest('summary');
-    expect(summary?.querySelector('svg')).not.toBeNull();
+    expect(
+      within(screen.getByText(ADVANCED_SUMMARY)).getByTestId('icon'),
+    ).toBeInTheDocument();
   });
 
   it('expands the Advanced section on click', async () => {
@@ -61,9 +55,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
     await openAdvanced(user);
 
-    expect(
-      screen.getByText(ADVANCED_SUMMARY).closest('details'),
-    ).toHaveAttribute('open');
+    expect(screen.getByRole('group')).toHaveAttribute('open');
     expect(screen.getByText('404 page')).toBeVisible();
   });
 

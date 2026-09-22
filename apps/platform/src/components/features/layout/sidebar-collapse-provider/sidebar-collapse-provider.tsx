@@ -59,6 +59,7 @@ export const SidebarCollapseProvider = ({
     <SidebarCollapseContext.Provider value={value}>
       <div
         data-collapsed={isCollapsed ? 'true' : undefined}
+        data-testid="sidebar-collapse-root"
         className={sidebarCollapseProviderVariants()}
       >
         {children}

@@ -1,6 +1,6 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import realMessages from '@platform/i18n/messages/en.json';
-import { customRenderAsync } from '@platform/testing/custom-render';
+import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { notFound } from 'next/navigation';
 
 import LocaleLayout, { generateStaticParams } from './layout';
@@ -55,8 +55,8 @@ describe('LocaleLayout', () => {
   });
 
   it('renders children', async () => {
-    const { getByText } = await setup();
+    await setup();
 
-    expect(getByText('content')).toBeVisible();
+    expect(screen.getByText('content')).toBeVisible();
   });
 });

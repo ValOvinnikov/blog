@@ -19,54 +19,51 @@ describe(Disclosure, () => {
   });
 
   it('is closed by default', () => {
-    const { container } = render(
+    render(
       <Disclosure summary="Advanced">
         <p>Body</p>
       </Disclosure>,
     );
 
-    const details = container.querySelector('details');
-    expect(details).not.toHaveAttribute('open');
+    expect(screen.getByRole('group')).not.toHaveAttribute('open');
   });
 
   it('opens by default when isDefaultOpen is set', () => {
-    const { container } = render(
+    render(
       <Disclosure summary="Advanced" isDefaultOpen={true}>
         <p>Body</p>
       </Disclosure>,
     );
 
-    const details = container.querySelector('details');
-    expect(details).toHaveAttribute('open');
+    expect(screen.getByRole('group')).toHaveAttribute('open');
   });
 
   it('toggles open on click, keeping the state announced via the native open attribute', async () => {
     const user = userEvent.setup();
-    const { container } = render(
+    render(
       <Disclosure summary="Advanced">
         <p>Body</p>
       </Disclosure>,
     );
 
-    const details = container.querySelector('details');
-    expect(details).not.toHaveAttribute('open');
+    expect(screen.getByRole('group')).not.toHaveAttribute('open');
 
     await user.click(screen.getByText('Advanced'));
 
-    expect(details).toHaveAttribute('open');
+    expect(screen.getByRole('group')).toHaveAttribute('open');
   });
 
   it('renders a native summary that receives focus without any extra tabIndex wiring', () => {
-    const { container } = render(
+    render(
       <Disclosure summary="Advanced">
         <p>Body</p>
       </Disclosure>,
     );
 
-    const summary = container.querySelector('summary');
-    summary?.focus();
+    const summary = screen.getByText('Advanced');
+    summary.focus();
 
-    expect(document.activeElement).toBe(summary);
+    expect(summary).toHaveFocus();
   });
 
   it('renders with no children without throwing', () => {
@@ -94,14 +91,13 @@ describe(Disclosure, () => {
 
   describe('controlled mode', () => {
     it('reflects isOpen rather than internal state', () => {
-      const { container, rerender } = render(
+      const { rerender } = render(
         <Disclosure summary="Advanced" isOpen={false} onOpenChange={vi.fn()}>
           <p>Body</p>
         </Disclosure>,
       );
 
-      const details = container.querySelector('details');
-      expect(details).not.toHaveAttribute('open');
+      expect(screen.getByRole('group')).not.toHaveAttribute('open');
 
       rerender(
         <Disclosure summary="Advanced" isOpen={true} onOpenChange={vi.fn()}>
@@ -109,7 +105,7 @@ describe(Disclosure, () => {
         </Disclosure>,
       );
 
-      expect(details).toHaveAttribute('open');
+      expect(screen.getByRole('group')).toHaveAttribute('open');
     });
 
     it('calls onOpenChange with the next value when toggled', async () => {
@@ -144,13 +140,12 @@ describe(Disclosure, () => {
           </Disclosure>
         );
       };
-      const { container } = render(<ControlledDisclosure />);
-      const details = container.querySelector('details');
-      expect(details).not.toHaveAttribute('open');
+      render(<ControlledDisclosure />);
+      expect(screen.getByRole('group')).not.toHaveAttribute('open');
 
       await user.click(screen.getByText('Advanced'));
 
-      expect(details).toHaveAttribute('open');
+      expect(screen.getByRole('group')).toHaveAttribute('open');
     });
   });
 });

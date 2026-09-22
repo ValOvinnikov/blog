@@ -44,7 +44,7 @@ describe(PresetPicker, () => {
 
     const editorial = screen.getByRole('radio', { name: 'Editorial' });
     expect(editorial).toHaveAttribute('aria-disabled', 'true');
-    expect(editorial.closest('[role="radiogroup"]')).toHaveAttribute(
+    expect(screen.getByRole('radiogroup')).toHaveAttribute(
       'aria-describedby',
       'archived-notice',
     );

@@ -5,11 +5,8 @@ import { Icon } from './icon';
 
 describe(Icon, () => {
   it('is decorative by default', () => {
-    const { container } = render(<Icon name={ICONS.GRID} />);
-    expect(container.querySelector('svg')).toHaveAttribute(
-      'aria-hidden',
-      'true',
-    );
+    render(<Icon name={ICONS.GRID} />);
+    expect(screen.getByTestId('icon')).toHaveAttribute('aria-hidden', 'true');
   });
 
   it('exposes an accessible name when one is given', () => {
@@ -36,8 +33,8 @@ describe(Icon, () => {
       ICONS.WARNING,
     ];
     for (const name of used) {
-      const { container, unmount } = render(<Icon name={name} />);
-      expect(container.querySelector('svg')).not.toBeNull();
+      const { unmount } = render(<Icon name={name} />);
+      expect(screen.getByTestId('icon')).toBeInTheDocument();
       unmount();
     }
   });

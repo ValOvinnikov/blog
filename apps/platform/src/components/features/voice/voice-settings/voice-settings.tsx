@@ -92,12 +92,14 @@ export const VoiceSettings = ({
       hasError={status === 'error'}
       errorTitle={t('alertError')}
     >
-      <Card>
-        <Card.Header title={t('basicHeading')} headingLevel={2} />
-        <Card.Body>
-          <Alert type={ALERT_TYPE.INFO} title={t('basicAlert')} />
-        </Card.Body>
-      </Card>
+      <div data-testid="voice-basic-card">
+        <Card>
+          <Card.Header title={t('basicHeading')} headingLevel={2} />
+          <Card.Body>
+            <Alert type={ALERT_TYPE.INFO} title={t('basicAlert')} />
+          </Card.Body>
+        </Card>
+      </div>
 
       <Disclosure summary={t('advancedSummary')}>
         <div className={advancedBody()}>

@@ -22,6 +22,7 @@ export const Icon = ({ name, size, ariaLabel, className }: TIconProps) => {
       aria-label={ariaLabel}
       aria-hidden={ariaLabel ? undefined : true}
       className={iconVariants({ size, class: className })}
+      data-testid="icon"
     />
   );
 };
