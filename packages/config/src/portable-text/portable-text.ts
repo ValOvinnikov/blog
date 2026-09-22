@@ -13,7 +13,7 @@ export interface IPortableTextLinkMark extends PortableTextMarkDefinition {
   link: TMaybeUndefined<TPortableTextLink>;
 }
 
-export type TPortableText = PortableTextBlock<
+export type TPortableTextBlock = PortableTextBlock<
   IPortableTextLinkMark,
   PortableTextSpan
 > & { _type: 'block'; _key: string };
