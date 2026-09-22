@@ -1,6 +1,6 @@
 import { q } from '@blog/service/sanity/query';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/published-post';
-import { feedPostFragment } from '@blog/service/shared/fragments/feed-post';
+import { postFeedFragment } from '@blog/service/shared/fragments/post-feed';
 
 /**
  * Every published post tagged with `$tagId`, newest first — the tag-scoped
@@ -16,4 +16,4 @@ export const tagScopedPublishedPostsQuery = q
   .filterRaw(PUBLISHED_POST_FILTER)
   .filterRaw('references($tagId)')
   .order('publishedAt desc')
-  .project(feedPostFragment);
+  .project(postFeedFragment);

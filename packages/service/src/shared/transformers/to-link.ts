@@ -4,10 +4,10 @@ import {
   type ILink,
   type TMaybeUndefined,
 } from '@blog/config';
-import type { linkFragment } from '@blog/service/shared/fragments/link';
+import type { inlineLinkFragment } from '@blog/service/shared/fragments/inline-link';
 import type { InferFragmentType } from 'groqd';
 
-export type TRawLink = InferFragmentType<typeof linkFragment>;
+export type TRawLink = InferFragmentType<typeof inlineLinkFragment>;
 
 type TInternalReference = NonNullable<TRawLink['internalReference']>;
 

@@ -1,6 +1,6 @@
 import { q } from '@blog/service/sanity/query';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/published-post';
-import { feedPostFragment } from '@blog/service/shared/fragments/feed-post';
+import { postFeedFragment } from '@blog/service/shared/fragments/post-feed';
 
 /**
  * Every published post, newest first, for the RSS/Atom feeds — no
@@ -11,4 +11,4 @@ export const allPublishedPostsQuery = q.star
   .filterByType('page_post')
   .filterRaw(PUBLISHED_POST_FILTER)
   .order('publishedAt desc')
-  .project(feedPostFragment);
+  .project(postFeedFragment);
