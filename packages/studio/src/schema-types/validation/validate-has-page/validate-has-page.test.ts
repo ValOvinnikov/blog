@@ -55,6 +55,13 @@ describe('validateHasPage', () => {
     expect(withConfigCalls).toEqual([{ perspective: 'drafts' }]);
   });
 
+  it('resolves to true, not a warning, when the fetch rejects', async () => {
+    const { context } = createMockCountContext(new Error('network down'));
+    const document = asDocument({ _id: 'tag-1', _type: 'blog_tag' });
+
+    await expect(validate(document, context)).resolves.toBe(true);
+  });
+
   it('interpolates the given reference field name into the query', async () => {
     const { context, fetchCalls } = createMockCountContext(0);
     const validateTopic = validateHasPage(

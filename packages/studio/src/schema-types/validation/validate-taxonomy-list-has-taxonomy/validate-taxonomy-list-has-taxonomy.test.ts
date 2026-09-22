@@ -9,7 +9,7 @@ type TCandidate = {
   taxonomy?: string | null;
 };
 
-const createMockContext = (candidates: TCandidate[]) => {
+const createMockContext = (candidates: TCandidate[] | Error) => {
   const fetchCalls: { query: string; params: unknown }[] = [];
 
   const context = {
@@ -17,6 +17,7 @@ const createMockContext = (candidates: TCandidate[]) => {
       withConfig: () => ({
         fetch: async (query: string, params: unknown) => {
           fetchCalls.push({ query, params });
+          if (candidates instanceof Error) throw candidates;
           return candidates;
         },
       }),
@@ -88,6 +89,17 @@ describe('validateTaxonomyListHasTaxonomy', () => {
     ).resolves.toBe(
       "Choose whether the 'Untitled' module lists topics or tags.",
     );
+  });
+
+  it('resolves to true, not an error, when the fetch rejects', async () => {
+    const { context } = createMockContext(new Error('network down'));
+    const modules: TModuleReference[] = [
+      { _type: taxonomyListSchema.name, _ref: 'taxonomy-list-1' },
+    ];
+
+    await expect(
+      validateTaxonomyListHasTaxonomy(modules, context),
+    ).resolves.toBe(true);
   });
 
   it('only queries referenced taxonomyList modules', async () => {

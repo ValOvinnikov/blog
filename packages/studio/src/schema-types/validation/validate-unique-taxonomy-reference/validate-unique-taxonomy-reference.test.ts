@@ -19,6 +19,7 @@ const createMockContext = (fetchResult: unknown, documentId = 'page-tag-1') => {
       return {
         fetch: async (query: string, params: unknown) => {
           fetchCalls.push({ query, params });
+          if (fetchResult instanceof Error) throw fetchResult;
           return fetchResult;
         },
       };
@@ -60,6 +61,12 @@ describe('validateUniqueTaxonomyReference', () => {
     await expect(validate()({ _ref: 'tag-1' }, context)).resolves.toBe(
       UNIQUENESS_ERROR,
     );
+  });
+
+  it('resolves to true, not the uniqueness error, when the fetch rejects', async () => {
+    const { context } = createMockContext(new Error('network down'));
+
+    await expect(validate()({ _ref: 'tag-1' }, context)).resolves.toBe(true);
   });
 
   it('excludes both the draft and published id of the current document', async () => {
