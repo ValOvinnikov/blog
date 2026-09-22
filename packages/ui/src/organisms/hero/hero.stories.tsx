@@ -113,6 +113,7 @@ const meta = {
     excerpt:
       'A deep dive into Atomic Design principles, Tailwind CSS v4, and class-variance-authority — all working together in a portable component library.',
     titleId: 'hero-title',
+    tone: BRAND_VARIANT.PRIMARY,
     children: (
       <>
         <Hero.Media>

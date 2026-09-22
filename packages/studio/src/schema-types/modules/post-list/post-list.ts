@@ -1,4 +1,3 @@
-import { FULL_BRAND_VARIANT_LIST } from '@blog/config/constants';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { showImagesField } from '@blog/studio/schema-types/fields/show-images-field/show-images-field';
@@ -18,7 +17,7 @@ export const postListSchema = defineType({
   icon: List,
   fields: [
     titleField(),
-    brandVariantField({ list: FULL_BRAND_VARIANT_LIST }),
+    brandVariantField(),
     headingBlockField(),
     defineField({
       name: 'pageSize',

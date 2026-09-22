@@ -207,15 +207,13 @@ Work through these gates in order. **Committing is free; stop at the push and PR
 
    This single dispatch replaces two `gh api graphql` calls this step used to
    run inline (added in commit `be0c1fc`, then regressed once in practice
-   when an orchestrating session jumped straight from a cached
-   `reference_project_item_ids.md` lookup to the status mutation without
-   walking the rest of Gate 0 — inline prose is easy to skip; a named
-   subagent dispatch is not).
+   when an orchestrating session jumped straight to the status mutation
+   without walking the rest of Gate 0 — inline prose is easy to skip; a
+   named subagent dispatch is not).
 
-   If the report includes a newly discovered item ID (for the issue or its
-   parent), append it to `memory/reference_project_item_ids.md` using the
-   Edit tool — keep it in context, it's reused at Gate 5 without another
-   lookup.
+   Project item IDs are not worth keeping. `board-keeper` resolves one per
+   dispatch in a single query, and a remembered ID addresses nothing once an
+   item has been removed and re-added to the board.
 
 2. Checkout a new branch from up-to-date `main`:
 

@@ -2,8 +2,8 @@ import {
   HERO_VARIANT,
   type ISanityImage,
   type IWithDataTestId,
+  type TBrandVariant,
   type TContentAlignment,
-  type TFullBrandVariant,
   type THeroVariant,
   type TLayout,
   type TMaybeUndefined,
@@ -16,7 +16,7 @@ import { SanityImage } from '@web/components/shared/sanity-image';
 import { Section } from '@web/components/shared/section';
 
 export interface IHeroModuleShellProps extends IWithDataTestId {
-  brandVariant: TFullBrandVariant;
+  brandVariant: TBrandVariant;
   variant: THeroVariant;
   eyebrow: TMaybeUndefined<string>;
   title: string;

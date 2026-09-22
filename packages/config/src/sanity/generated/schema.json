@@ -1815,10 +1815,6 @@
           "of": [
             {
               "type": "string",
-              "value": "BRAND_PRIMARY"
-            },
-            {
-              "type": "string",
               "value": "PRIMARY"
             },
             {

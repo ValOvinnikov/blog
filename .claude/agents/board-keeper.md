@@ -440,9 +440,8 @@ Skip this step entirely for any other trigger.
 Replaces the two manual `gh api graphql` calls `open-pull-request/SKILL.md`'s
 Gate 0 used to run inline (commit `be0c1fc` added the parent-check there; it
 later regressed once in practice because inline prose is easy to skip when an
-orchestrating session jumps straight from a cached
-`memory/reference_project_item_ids.md` lookup to the status mutation without
-walking the rest of Gate 0). Doing both writes here instead makes them one
+orchestrating session jumps straight to the status mutation without walking
+the rest of Gate 0). Doing both writes here instead makes them one
 discoverable dispatch instead of a paragraph to remember.
 
 **Batch dispatches.** When the orchestrator is about to start parallel work on
@@ -459,10 +458,11 @@ checks, not N full dispatches — four issues starting together as four separate
 synchronous dispatches was the exact inefficiency this batch form exists to
 avoid.
 
-1. Look up issue `#<n>`'s project item ID — memory first
-   (`memory/reference_project_item_ids.md`), then the Step 1 query if it
-   isn't cached. Report any newly discovered ID in Step 5 like any other
-   trigger.
+1. Look up issue `#<n>`'s project item ID with the Step 1 query. Resolve it
+   every time; never carry one forward from a previous run. An item removed
+   and re-added to the board gets a **new** ID, so a remembered one addresses
+   nothing and the mutation fails silently — the exact failure this agent
+   exists to catch.
 2. Check its current board status first. If it's Todo or blank, set it → In
    Progress the same way Step 4 applies and re-verifies any other write. If
    it's already In Progress (this trigger re-run, or the orchestrator started
@@ -475,7 +475,7 @@ avoid.
    `issue_number: <n>`) — per the "Tool preference" section above, this
    replaces the old `gh api graphql` parent query. If it returns no parent,
    stop here — nothing more to do.
-4. If a parent exists, look up its item ID (memory first, then API) and check
+4. If a parent exists, look up its item ID the same way and check
    its current board status. If it's Todo or blank, promote it to In Progress
    the same way Step 4 applies and re-verifies any other safe forward-only
    transition (the same case Step 1c's first bullet already covers for the
@@ -496,12 +496,13 @@ git ls-remote --heads origin | grep -oE '(claude/issue-[0-9]+-[^[:space:]]+|[a-z
 The `labels` field on the two open-item queries feeds Step 3a's hygiene
 check below — no separate query needed.
 
-**`--limit 200` on `gh issue list` is a verified-sufficient number for this
-repo's current issue count (37 open), not an assumed-safe constant** — the
-unset default (30) already dropped a real open issue, #76, in a past sweep.
-Re-check the real count against `gh issue list --state open --limit 200
---json number | jq length` if this guidance is ever revisited and it's
-close to 200.
+**`--limit 200` on `gh issue list` is a measured number, not an assumed-safe
+constant** — the unset default (30) already dropped a real open issue, #76,
+in a past sweep. The repo was at 111 open issues on 2026-09-22, so 200 still
+clears it, but that headroom is the thing to re-measure rather than trust:
+run `gh issue list --state open --limit 200 --json number | jq length` at
+the start of a sweep, and raise the limit if the answer is anywhere near
+it. A truncated list produces a sweep that reports on issues it never saw.
 
 **Don't fetch a bulk merged-PR list at all** — this repo has 250+ merged
 PRs and growing, so any fixed `--limit` on that query silently truncates
@@ -629,12 +630,17 @@ the ones that come back with `total > 0`:
 gh api graphql -f query='{ repository(owner:"ValOvinnikov", name:"blog") {
   issues(states: OPEN, first: 100) { nodes {
     number state subIssuesSummary { total completed }
-  } } } }'
+  } pageInfo { hasNextPage endCursor } } } }'
 ```
 
-`first: 100` is verified-sufficient for this repo's current open-issue count
-(37), same caveat as Step 2's `--limit 200` on `gh issue list` — re-check
-the real count if it's ever close to 100 and add pagination if so.
+**Paginate — one page is not the whole repo.** `first: 100` is the API's
+per-page maximum, not a sufficient count: this repo passed 100 open issues
+in September 2026 and sits well above it now. Read `pageInfo`, and while
+`hasNextPage` is true re-run with `after: "<endCursor>"`, accumulating the
+nodes. A single unpaginated page silently drops every open issue past the
+first 100 — the sweep then reports a clean board it never actually looked
+at, which is worse than failing. Never treat the first page as complete
+because the count "looks about right".
 
 Then for each hit, resolve its sub-issue list via `mcp__github__issue_read`
 (`method: get_sub_issues`, `issue_number: <n>`, paginate with `page`/`perPage`
@@ -785,13 +791,13 @@ Structure your response exactly like this:
    (missing title/body/label/parent) — name exactly which field was
    missing, don't invent one. Each with the reasoning an orchestrator needs
    to decide without re-doing your queries.
-4. **Newly discovered item IDs** — any issue → item ID pair you had to resolve
-   that isn't already cached. Format as rows ready to paste into
-   `memory/reference_project_item_ids.md`:
-   ```
-   | #<n>  | PVTI_…      |
-   ```
-   so the orchestrator can append them without a second lookup.
+   Do **not** report the project item IDs you resolved. They are addresses for
+   this dispatch's mutations and nothing else — an ID is one query away whenever
+   it is next needed, and it goes stale the moment an item is removed and
+   re-added to the board. A cache of them was kept until 2026-09-22 and deleted:
+   it reached 1100 entries against 111 open issues, was never actually read back,
+   and once let a session skip Gate 0's parent-check by jumping straight to a
+   remembered ID.
 
 An empty repo-side query (e.g. `gh pr list` returning nothing when PRs
 obviously exist) is itself worth flagging — don't silently treat a failed

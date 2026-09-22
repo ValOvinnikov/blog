@@ -4,8 +4,8 @@ import {
   MEDIA_ORDER,
   type IWithClassName,
   type IWithDataTestId,
+  type TBrandVariant,
   type TContentAlignment,
-  type TFullBrandVariant,
   type THeroVariant,
   type TMediaOrder,
 } from '@blog/config';
@@ -44,7 +44,7 @@ export type THeroProps = IWithClassName &
     contentPosition?: TContentAlignment;
     contentAlignment?: TContentAlignment;
     mediaOrder?: TMediaOrder;
-    tone?: TFullBrandVariant;
+    tone: TBrandVariant;
     children?: TCompoundChildren<typeof HeroParts>;
   };
 

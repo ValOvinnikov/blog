@@ -164,35 +164,40 @@ page and a module, and takes no option to override it.
 A description repeated verbatim across call sites is the same duplication
 problem as any other repeated literal.
 
-### Option lists — dropdown by default, radio when the field is required
+### Option lists — `required()` is the guard, the layout is presentation
 
-`dropdown` is Sanity's default for a `list`; `layout: 'radio'` is an explicit
-opt-out. The choice turns on one documented behaviour: **a dropdown always
-renders a blank option for the unset state, and it cannot be removed or
-renamed.** Neither `initialValue` nor `validation` suppresses it.
+A dropdown always renders a blank option for the unset state, and it cannot be
+removed or renamed. Neither `initialValue` nor `validation` suppresses it.
 
-So the test is:
+**That blank is not a trap, and it is not a reason to pick a layout.**
+`required()` marks the field invalid the moment it is blank: the Studio shows
+the error inline on the field, and publish is blocked until it is set. The
+editor cannot ship a document in that state whichever layout is used — and a
+radio has an unset state too, it just renders as "no button selected" instead
+of an empty row.
 
-- **`required()` → radio.** The blank is a selectable trap that passes
-  unnoticed in the form and only surfaces as an error at publish. Radio is the
-  documented way to avoid it. A required field that also drives other fields'
-  `hidden:` predicates is the strongest case of all — the editor flips it to
-  reveal the rest of the form, and wants every option visible at once.
-- **Not required → dropdown.** Blank is already a legal value, so the
-  dropdown's blank costs nothing and buys a compact, scannable form. This
-  holds whether or not the field has an `initialValue`: a default value does
-  not make blank invalid.
+So `required()` decides nothing about layout. Choose by how the field reads in
+the form:
 
-Option count is not the test. A 4-option optional field is a dropdown and a
-3-option required one is a radio; more options only reinforce a conclusion the
-`required()` check has already reached.
+- **Dropdown** — the default, and the right call for most fields. Compact, and
+  it keeps a long form scannable.
+- **Radio** — when the editor benefits from seeing every option at once
+  without opening anything. The strongest case is a field driving other
+  fields' `hidden:` predicates: they flip it to reveal the rest of the form,
+  so the available choices should be visible while they decide.
+
+Option count is not the test either, though a list long enough to need
+scrolling argues against radio on its own terms.
+
+**Put `required()` on the field whenever blank is not a legal value** — that
+is the part that matters, and it is independent of the layout. `heroVariantField`
+is the model: `layout: 'dropdown'`, an `initialValue`, and `rule.required()`.
 
 **State the layout explicitly either way** rather than relying on the default,
 so a reader can tell a decision was made from the code alone.
 
-The `modeFieldPair` factory above keeps `layout: 'radio'` under this rule, not
-in spite of it: its mode field is `required()` and gates a conditional custom
-field.
+The `modeFieldPair` factory above keeps `layout: 'radio'` because its mode
+field gates a conditional custom field, not because it is `required()`.
 
 ## Migration quality
 
@@ -223,9 +228,8 @@ Beyond the studio agent's checklist:
 - No stored-value literal repeated across files.
 - Every new type and field has a description, written for an editor, restating
   no validation.
-- Every new `options.list` states its `layout`, chosen by the `required()`
-  test — and a radio on a field that is not required is justified in the
-  report, or changed.
+- Every new `options.list` states its `layout`, and carries `required()`
+  wherever blank is not a legal value — two independent decisions.
 - Restructure PRs state explicitly which constraints moved, were added, or
   were dropped — and why.
 - Migration has its test and both guards.

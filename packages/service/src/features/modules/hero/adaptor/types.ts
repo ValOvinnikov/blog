@@ -1,14 +1,14 @@
 import type {
   ILink,
   ISanityImage,
-  TFullBrandVariant,
+  TBrandVariant,
   TLayout,
   TMaybeUndefined,
 } from '@blog/config';
 import type { THeroPrimaryAction } from '@blog/service/shared/transformers/hero/to-hero-primary-action';
 
 export type THeroModule = {
-  brandVariant: TFullBrandVariant;
+  brandVariant: TBrandVariant;
   eyebrow: TMaybeUndefined<string>;
   title: TMaybeUndefined<string>;
   subtitle: TMaybeUndefined<string>;
