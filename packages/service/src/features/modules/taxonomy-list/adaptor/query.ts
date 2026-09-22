@@ -3,13 +3,9 @@ import { q } from '@blog/service/sanity/query';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/published-post';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
 import { layoutFragment } from '@blog/service/shared/fragments/layout';
-import {
-  POST_COUNT_EXPRESSION,
-  postCountParser,
-} from '@blog/service/shared/fragments/post-count';
 import { postLinkFragment } from '@blog/service/shared/fragments/post-link';
-import { tagFragment } from '@blog/service/shared/fragments/tag';
-import { topicFragment } from '@blog/service/shared/fragments/topic';
+import { tagWithPostCountFragment } from '@blog/service/shared/fragments/tag';
+import { topicWithPostCountFragment } from '@blog/service/shared/fragments/topic';
 import { z } from 'zod';
 
 const LATEST_POSTS_LIMIT = 2;
@@ -29,8 +25,7 @@ const topicEntriesQuery = q.star
   .filterByType('blog_topic')
   .order('title asc')
   .project((sub) => ({
-    ...topicFragment,
-    postCount: sub.raw(POST_COUNT_EXPRESSION, postCountParser),
+    ...topicWithPostCountFragment,
     latestPosts: sub.star
       .filterByType('page_post')
       .filterRaw('references(^._id)')
@@ -44,9 +39,7 @@ const tagEntriesQuery = q.star
   .filterByType('blog_tag')
   .order('title asc')
   .project((sub) => ({
-    ...tagFragment,
-    description: sub.field('description').nullable(true),
-    postCount: sub.raw(POST_COUNT_EXPRESSION, postCountParser),
+    ...tagWithPostCountFragment,
     latestPosts: sub.star
       .filterByType('page_post')
       .filterRaw('references(^._id)')
