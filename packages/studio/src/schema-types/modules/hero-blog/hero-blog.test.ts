@@ -4,7 +4,7 @@ import {
   HERO_VARIANT,
 } from '@blog/config/constants';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
-import { PUBLISHED_POST_CONDITION } from '@blog/studio/schema-types/filters/published-post/published-post';
+import { PUBLISHED_POST_CONDITION } from '@blog/studio/schema-types/filters/published-post';
 import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
 import {
   getCustomValidator,

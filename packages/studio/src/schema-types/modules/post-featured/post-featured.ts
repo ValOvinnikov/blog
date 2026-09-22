@@ -5,7 +5,7 @@ import { brandVariantField } from '@blog/studio/schema-types/fields/brand-varian
 import { displayModeField } from '@blog/studio/schema-types/fields/display-mode-field/display-mode-field';
 import { showImagesField } from '@blog/studio/schema-types/fields/show-images-field/show-images-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { publishedPostFilter } from '@blog/studio/schema-types/filters/published-post/published-post';
+import { publishedPostFilter } from '@blog/studio/schema-types/filters/published-post';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
