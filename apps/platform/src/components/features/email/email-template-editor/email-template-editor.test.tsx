@@ -171,7 +171,7 @@ describe(`<${EmailTemplateEditor.name}/>`, () => {
     });
     expect(saveButton).toBeDisabled();
     expect(saveButton).toHaveAttribute('aria-busy', 'true');
-    expect(saveButton.nextElementSibling).toHaveTextContent('Saving…');
+    expect(screen.getByRole('status')).toHaveTextContent('Saving…');
 
     resolveAction({ ok: true });
   });

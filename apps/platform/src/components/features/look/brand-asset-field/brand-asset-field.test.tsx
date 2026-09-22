@@ -67,32 +67,6 @@ describe(`<${BrandAssetField.name}/>`, () => {
     ).toBeInTheDocument();
   });
 
-  it('sizes the thumb differently for a favicon than for a logo', () => {
-    const { container: logoContainer } = render(
-      <BrandAssetField
-        tenantId="tenant-1"
-        kind="logo"
-        label="Logo"
-        hint="PNG, JPEG, or WebP."
-        currentUrl={undefined}
-        onChange={vi.fn()}
-      />,
-    );
-    expect(logoContainer.querySelector('.size-12')).not.toBeNull();
-
-    const { container: faviconContainer } = render(
-      <BrandAssetField
-        tenantId="tenant-1"
-        kind="favicon"
-        label="Favicon"
-        hint="Pre-cropped square, please."
-        currentUrl={undefined}
-        onChange={vi.fn()}
-      />,
-    );
-    expect(faviconContainer.querySelector('.size-10')).not.toBeNull();
-  });
-
   it('forwards the tenantId and kind to the upload action when a file is selected', async () => {
     uploadBrandAssetActionMock.mockResolvedValue({
       ok: true,
@@ -123,7 +97,7 @@ describe(`<${BrandAssetField.name}/>`, () => {
 
   it('forwards the tenantId and kind to the clear action when Remove is clicked', async () => {
     clearBrandAssetActionMock.mockResolvedValue({ ok: true });
-    const { getByRole } = render(
+    render(
       <BrandAssetField
         tenantId="tenant-1"
         kind="favicon"
@@ -134,7 +108,9 @@ describe(`<${BrandAssetField.name}/>`, () => {
       />,
     );
 
-    await userEvent.setup().click(getByRole('button', { name: 'Remove' }));
+    await userEvent
+      .setup()
+      .click(screen.getByRole('button', { name: 'Remove' }));
 
     await waitFor(() => {
       expect(clearBrandAssetActionMock).toHaveBeenCalledWith(

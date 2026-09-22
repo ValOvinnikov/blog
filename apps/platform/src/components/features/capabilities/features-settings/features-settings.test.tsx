@@ -79,10 +79,12 @@ describe(`<${FeaturesSettings.name}/>`, () => {
     setup({ entitledCapabilities: FREE_ENTITLED });
 
     const lockedSwitch = screen.getByRole('switch', { name: 'Newsletter' });
+    // eslint-disable-next-line testing-library/no-node-access
     const lockedWrapper = lockedSwitch.closest('div');
     expect(lockedWrapper?.getAttribute('inert')).toBe('');
 
     const entitledSwitch = screen.getByRole('switch', { name: 'Comments' });
+    // eslint-disable-next-line testing-library/no-node-access
     const entitledWrapper = entitledSwitch.closest('div');
     expect(entitledWrapper?.hasAttribute('inert')).toBe(false);
   });

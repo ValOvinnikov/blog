@@ -36,9 +36,10 @@ describe(SidebarCollapseProvider, () => {
     );
 
     expect(screen.getByText('collapsed')).toBeVisible();
-    expect(
-      screen.getByText('collapsed').closest('[data-collapsed]'),
-    ).toHaveAttribute('data-collapsed', 'true');
+    expect(screen.getByTestId('sidebar-collapse-root')).toHaveAttribute(
+      'data-collapsed',
+      'true',
+    );
   });
 
   it('omits data-collapsed once expanded', () => {
@@ -48,9 +49,9 @@ describe(SidebarCollapseProvider, () => {
       </SidebarCollapseProvider>,
     );
 
-    expect(
-      screen.getByText('expanded').closest('.group\\/shell'),
-    ).not.toHaveAttribute('data-collapsed');
+    expect(screen.getByTestId('sidebar-collapse-root')).not.toHaveAttribute(
+      'data-collapsed',
+    );
   });
 
   it('flips state and persists the new value to the sidebar-collapsed cookie on toggle', async () => {

@@ -20,7 +20,13 @@ export const StatusBadge = ({
 
   return (
     <span className={root({ class: className })}>
-      {hasDot && <span className={dot()} aria-hidden="true" />}
+      {hasDot && (
+        <span
+          className={dot()}
+          aria-hidden="true"
+          data-testid="status-badge-dot"
+        />
+      )}
       {children}
     </span>
   );

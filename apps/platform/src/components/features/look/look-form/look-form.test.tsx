@@ -64,9 +64,8 @@ describe(`<${LookForm.name}/>`, () => {
     setup();
 
     expect(screen.getByRole('heading', { name: 'Basic' })).toBeVisible();
-    const summary = screen.getByText('Advanced').closest('summary');
-    expect(summary).not.toBeNull();
-    expect(summary?.closest('details')).not.toHaveAttribute('open');
+    expect(screen.getByText('Advanced')).toBeVisible();
+    expect(screen.getByTestId('disclosure')).not.toHaveAttribute('open');
   });
 
   it('shows the favicon square requirement before any file is chosen', () => {
@@ -154,7 +153,7 @@ describe(`<${LookForm.name}/>`, () => {
     const saveButton = await screen.findByRole('button', { name: 'Saving…' });
     expect(saveButton).toHaveAttribute('aria-busy', 'true');
     expect(saveButton).toBeDisabled();
-    expect(saveButton.nextElementSibling).toHaveTextContent('Saving…');
+    expect(screen.getByRole('status')).toHaveTextContent('Saving…');
 
     resolveAction({ ok: true });
   });
