@@ -1,10 +1,10 @@
-import type { TMaybeUndefined } from '@blog/config';
+import { PORTABLE_TEXT_BLOCK_TYPE, type TMaybeUndefined } from '@blog/config';
 import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
+import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import { toLinkDocument } from '@blog/service/shared/transformers/to-link-document';
 import { toModule } from '@blog/service/shared/transformers/to-module';
 import { toPortableTextBody } from '@blog/service/shared/transformers/to-portable-text-body';
 import { toPortableText } from '@blog/service/shared/transformers/to-portable-text-mark-def';
-import { toPostHeading } from '@blog/service/shared/transformers/to-post-heading';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
 import { toSocialProfiles } from '@blog/service/shared/transformers/to-social-profiles';
 import { toTag } from '@blog/service/shared/transformers/to-tag';
@@ -44,7 +44,9 @@ function toPostTakeaways(
 }
 
 export function toPostDetail(raw: TRawPostDetail): TPostDetail {
-  const { title, excerpt } = toPostHeading(raw.headingBlock);
+  const { heading: title, supportingText: excerpt } = toHeadingBlock(
+    raw.headingBlock,
+  );
 
   return {
     id: raw._id,
@@ -56,7 +58,9 @@ export function toPostDetail(raw: TRawPostDetail): TPostDetail {
     featured: raw.featured ?? false,
     body: toPortableTextBody(raw.body),
     postTakeaways: toPostTakeaways(raw.postTakeaways),
-    hasAsides: raw.body.some((block) => block._type === 'aside'),
+    hasAsides: raw.body.some(
+      (block) => block._type === PORTABLE_TEXT_BLOCK_TYPE.ASIDE,
+    ),
     seo: resolveSeo(raw.seo),
     author: toPostDetailAuthor(raw.author),
     topic: toTopic(raw.topic),

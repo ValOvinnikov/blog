@@ -1,3 +1,4 @@
+import type { PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config';
 import { q } from '@blog/service/sanity/query';
 
 const sanityImageAssetFragment = q
@@ -37,7 +38,7 @@ export const sanityImageFragment = q
 // `alt` stay nullable so a malformed body-image block degrades gracefully
 // instead of failing the whole document.
 export const bodyImageFragment = q
-  .fragmentForType<'bodyImage'>()
+  .fragmentForType<typeof PORTABLE_TEXT_BLOCK_TYPE.BODY_IMAGE>()
   .project((sub) => ({
     alt: sub.field('alt').nullable(true),
     hotspot: true,

@@ -7,6 +7,7 @@ export const portableTextMarkDefFragment = q
   .project((sub) => ({
     _key: true,
     _type: true,
+    // Nullable despite `linkRef.link` being required at authoring time: the referenced link document can be deleted afterward, leaving a dangling reference that the transformer degrades to plain text.
     link: sub
       .field('link')
       .deref()
