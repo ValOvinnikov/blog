@@ -21,14 +21,7 @@ export const authorCardFragment = q
 export const authorDetailFragment = q
   .fragmentForType<'blog_author'>()
   .project((sub) => ({
-    _id: true,
-    name: sub.field('name').notNull(),
-    image: sub.field('image').project(sanityImageFragment).nullable(true),
-    profilePage: sub
-      .field('profilePage')
-      .deref()
-      .project(linkDocumentFragment)
-      .nullable(true),
+    ...authorCardFragment,
     role: sub.field('role').nullable(true),
     bio: sub
       .field('bio[]')

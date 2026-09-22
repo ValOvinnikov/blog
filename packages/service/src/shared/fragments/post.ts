@@ -43,18 +43,8 @@ export const postCardFragment = q
 export const postDetailFragment = q
   .fragmentForType<'page_post'>()
   .project((sub) => ({
-    _id: true,
-    headingBlock: sub
-      .field('headingBlock')
-      .project(headingBlockFragment)
-      .notNull(),
-    slug: sub.field('slug.current').notNull(),
-    publishedAt: sub.field('publishedAt').notNull(),
-    heroImage: sub
-      .field('heroImage')
-      .project(sanityImageFragment)
-      .nullable(true),
-    featured: sub.field('featured').nullable(true),
+    ...postCardFragment,
+    author: sub.field('author').deref().project(authorDetailFragment).notNull(),
     body: sub
       .field('content[]')
       .project(portableTextBodyItemFragment)
@@ -64,8 +54,6 @@ export const postDetailFragment = q
       .project(postTakeawaysFragment)
       .nullable(true),
     seo: sub.field('seo').project(seoFragment).notNull(),
-    author: sub.field('author').deref().project(authorDetailFragment).notNull(),
-    topic: sub.field('topic').deref().project(topicFragment).notNull(),
     tags: sub.field('tags[]').deref().project(tagFragment).nullable(true),
     modules: sub
       .field('modules[]')
@@ -73,5 +61,4 @@ export const postDetailFragment = q
       .project(moduleFragment)
       .as<TRawModule<TPagePostType>[]>()
       .nullable(),
-    wordCount: sub.raw(WORD_COUNT_EXPRESSION, wordCountParser),
   }));
