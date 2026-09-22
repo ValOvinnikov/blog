@@ -1,8 +1,8 @@
-import { toCtaButtons } from '@blog/service/shared/transformers/cta/to-cta-buttons/to-cta-buttons';
-import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block/to-heading-block';
-import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image/to-sanity-image';
-import { toLayout } from '@blog/service/shared/transformers/layout/to-layout/to-layout';
-import { toLinkDocument } from '@blog/service/shared/transformers/link/to-link-document/to-link-document';
+import { toCtaButtons } from '@blog/service/shared/transformers/cta/to-cta-buttons';
+import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
+import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image';
+import { toLayout } from '@blog/service/shared/transformers/layout/to-layout';
+import { toLinkDocument } from '@blog/service/shared/transformers/link/to-link-document';
 import type { InferResultType } from 'groqd';
 
 import type { featureListModuleQuery } from './query';

@@ -1,6 +1,6 @@
-import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block/to-heading-block';
-import { toLayout } from '@blog/service/shared/transformers/layout/to-layout/to-layout';
-import { toPostCard } from '@blog/service/shared/transformers/post/to-post-card/to-post-card';
+import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
+import { toLayout } from '@blog/service/shared/transformers/layout/to-layout';
+import { toPostCard } from '@blog/service/shared/transformers/post/to-post-card';
 import type { InferResultType } from 'groqd';
 
 import type { postListModulePaginatedPostsQuery } from './posts.query';

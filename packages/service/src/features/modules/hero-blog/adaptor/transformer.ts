@@ -4,14 +4,14 @@ import {
   type ISanityImage,
   type TMaybeUndefined,
 } from '@blog/config';
-import { toCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button/to-cta-button';
-import { toHeroPresentation } from '@blog/service/shared/transformers/hero/to-hero-presentation/to-hero-presentation';
-import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image/to-sanity-image';
-import { toLayout } from '@blog/service/shared/transformers/layout/to-layout/to-layout';
+import { toCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button';
+import { toHeroPresentation } from '@blog/service/shared/transformers/hero/to-hero-presentation';
+import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image';
+import { toLayout } from '@blog/service/shared/transformers/layout/to-layout';
 import {
   toPostCard,
   type TPostCard,
-} from '@blog/service/shared/transformers/post/to-post-card/to-post-card';
+} from '@blog/service/shared/transformers/post/to-post-card';
 import type { InferResultType } from 'groqd';
 
 import type { heroBlogModuleQuery } from './query';

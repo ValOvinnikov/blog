@@ -7,7 +7,7 @@ import { ctaButtonFragment } from '@blog/service/shared/fragments/cta/cta-button
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
 import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
-import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document/link-document';
+import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document';
 
 export const featureListModuleQuery = q
   .parameters<{ id: string }>()

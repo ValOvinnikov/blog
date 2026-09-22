@@ -1,5 +1,5 @@
 import type { TMaybeUndefined } from '@blog/config';
-import type { TTag } from '@blog/service/shared/transformers/tag/to-tag/to-tag';
+import type { TTag } from '@blog/service/shared/transformers/tag/to-tag';
 
 export type TTagWithPostCount = TTag & {
   description: TMaybeUndefined<string>;

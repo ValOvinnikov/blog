@@ -6,8 +6,8 @@ import {
   type TPortableTextBlock,
 } from '@blog/config';
 import type { portableTextBodyItemFragment } from '@blog/service/shared/fragments/portable-text/portable-text-body-item';
-import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image/to-sanity-image';
-import { toPortableText } from '@blog/service/shared/transformers/portable-text/to-portable-text-mark-def/to-portable-text-mark-def';
+import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image';
+import { toPortableText } from '@blog/service/shared/transformers/portable-text/to-portable-text-mark-def';
 import type { InferFragmentType } from 'groqd';
 
 export type TRawPortableTextBody = Array<

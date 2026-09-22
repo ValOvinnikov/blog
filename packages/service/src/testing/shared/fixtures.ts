@@ -1,10 +1,10 @@
 import { LINK_TYPE, SOCIAL_PLATFORMS } from '@blog/config';
-import type { postLinkFragment } from '@blog/service/shared/fragments/post/post-link/post-link';
-import type { TRawHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block/to-heading-block';
-import type { TRawSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image/to-sanity-image';
-import type { TRawLinkDocument } from '@blog/service/shared/transformers/link/to-link-document/to-link-document';
-import type { TRawPortableTextMarkDef } from '@blog/service/shared/transformers/portable-text/to-portable-text-mark-def/to-portable-text-mark-def';
-import type { TRawSeo } from '@blog/service/shared/transformers/seo/resolve-seo/resolve-seo';
+import type { postLinkFragment } from '@blog/service/shared/fragments/post/post-link';
+import type { TRawHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
+import type { TRawSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image';
+import type { TRawLinkDocument } from '@blog/service/shared/transformers/link/to-link-document';
+import type { TRawPortableTextMarkDef } from '@blog/service/shared/transformers/portable-text/to-portable-text-mark-def';
+import type { TRawSeo } from '@blog/service/shared/transformers/seo/resolve-seo';
 import type { TRawSocialProfile } from '@blog/service/shared/transformers/social-profile/to-social-profile';
 import type { InferFragmentType } from 'groqd';
 

@@ -1,5 +1,5 @@
-import { toLayout } from '@blog/service/shared/transformers/layout/to-layout/to-layout';
-import { toPortableTextBody } from '@blog/service/shared/transformers/portable-text/to-portable-text-body/to-portable-text-body';
+import { toLayout } from '@blog/service/shared/transformers/layout/to-layout';
+import { toPortableTextBody } from '@blog/service/shared/transformers/portable-text/to-portable-text-body';
 import type { InferResultType } from 'groqd';
 
 import type { contentModuleQuery } from './query';

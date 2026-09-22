@@ -4,7 +4,7 @@ import {
   type TCtaActionAppearance,
   type TMaybeUndefined,
 } from '@blog/config';
-import type { TPostCard } from '@blog/service/shared/transformers/post/to-post-card/to-post-card';
+import type { TPostCard } from '@blog/service/shared/transformers/post/to-post-card';
 
 const DEFAULT_PRIMARY_ACTION_LABEL = 'Read more';
 

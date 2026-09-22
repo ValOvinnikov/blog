@@ -1,5 +1,5 @@
 import { CTA_ACTION_APPEARANCE } from '@blog/config';
-import { toPostCard } from '@blog/service/shared/transformers/post/to-post-card/to-post-card';
+import { toPostCard } from '@blog/service/shared/transformers/post/to-post-card';
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
 
 import { toHeroPrimaryAction } from './to-hero-primary-action';

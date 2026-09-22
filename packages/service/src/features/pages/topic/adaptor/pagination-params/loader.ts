@@ -3,7 +3,7 @@ import {
   runQuery,
   type TTenantSanityContext,
 } from '@blog/service/sanity/query';
-import { toPaginationParams } from '@blog/service/shared/transformers/pagination/to-pagination-params/to-pagination-params';
+import { toPaginationParams } from '@blog/service/shared/transformers/pagination/to-pagination-params';
 
 import { topicPaginationParamsQuery } from './query';
 

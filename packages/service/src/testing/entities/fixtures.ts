@@ -1,8 +1,8 @@
 import type { TRawFeedPost } from '@blog/service/features/entities/posts/adaptor/all-published/transformer';
 import type { toTags } from '@blog/service/features/entities/tags/adaptor/transformer';
 import type { toTopics } from '@blog/service/features/entities/topics/adaptor/transformer';
-import type { TRawTag } from '@blog/service/shared/transformers/tag/to-tag/to-tag';
-import type { TRawTopic } from '@blog/service/shared/transformers/topic/to-topic/to-topic';
+import type { TRawTag } from '@blog/service/shared/transformers/tag/to-tag';
+import type { TRawTopic } from '@blog/service/shared/transformers/topic/to-topic';
 import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 
 type TRawTagWithPostCount = Parameters<typeof toTags>[0][number];

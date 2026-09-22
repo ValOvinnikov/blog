@@ -1,6 +1,6 @@
 import { q } from '@blog/service/sanity/query';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
-import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document/link-document';
+import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document';
 import { portableTextMarkDefFragment } from '@blog/service/shared/fragments/portable-text/portable-text-mark-def';
 import { socialProfileFragment } from '@blog/service/shared/fragments/social-profile/social-profile';
 

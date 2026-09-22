@@ -6,7 +6,7 @@ import type { TRawTagPage } from '@blog/service/features/pages/tag/adaptor/detai
 import type { TRawTagIndexPage } from '@blog/service/features/pages/tag-index/adaptor/transformer';
 import type { TRawTopicPage } from '@blog/service/features/pages/topic/adaptor/detail-page/transformer';
 import type { TRawTopicIndexPage } from '@blog/service/features/pages/topic-index/adaptor/transformer';
-import type { TRawPostCard } from '@blog/service/shared/transformers/post/to-post-card/to-post-card';
+import type { TRawPostCard } from '@blog/service/shared/transformers/post/to-post-card';
 import {
   makeRawTag,
   makeRawTopic,

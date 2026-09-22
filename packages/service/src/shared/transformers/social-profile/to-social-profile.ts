@@ -1,6 +1,6 @@
 import type { ILink, TMaybeUndefined, TSocialPlatform } from '@blog/config';
 import type { socialProfileFragment } from '@blog/service/shared/fragments/social-profile/social-profile';
-import { toLinkDocument } from '@blog/service/shared/transformers/link/to-link-document/to-link-document';
+import { toLinkDocument } from '@blog/service/shared/transformers/link/to-link-document';
 import type { InferFragmentType } from 'groqd';
 
 export type TRawSocialProfile = InferFragmentType<typeof socialProfileFragment>;

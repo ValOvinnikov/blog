@@ -3,7 +3,7 @@ import { q } from '@blog/service/sanity/query';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
 import { moduleFragment } from '@blog/service/shared/fragments/module/module';
 import { seoFragment } from '@blog/service/shared/fragments/seo/seo';
-import type { TRawModule } from '@blog/service/shared/transformers/module/to-module/to-module';
+import type { TRawModule } from '@blog/service/shared/transformers/module/to-module';
 
 export const topicIndexPageQuery = q.star
   .filterByType('page_topicIndex')

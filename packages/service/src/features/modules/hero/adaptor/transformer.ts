@@ -1,9 +1,9 @@
 import { HERO_FIELD_MODE } from '@blog/config';
-import { toHeroPrimaryAction } from '@blog/service/shared/transformers/hero/to-hero-primary-action/to-hero-primary-action';
-import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image/to-sanity-image';
-import { toLayout } from '@blog/service/shared/transformers/layout/to-layout/to-layout';
-import { toLink } from '@blog/service/shared/transformers/link/to-link/to-link';
-import { toPostCard } from '@blog/service/shared/transformers/post/to-post-card/to-post-card';
+import { toHeroPrimaryAction } from '@blog/service/shared/transformers/hero/to-hero-primary-action';
+import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image';
+import { toLayout } from '@blog/service/shared/transformers/layout/to-layout';
+import { toLink } from '@blog/service/shared/transformers/link/to-link';
+import { toPostCard } from '@blog/service/shared/transformers/post/to-post-card';
 import type { InferResultType } from 'groqd';
 
 import type { heroFallbackFeaturedPostQuery } from './featured-post.query';

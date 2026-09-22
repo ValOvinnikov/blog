@@ -1,4 +1,4 @@
-import { toLinkDocument } from '@blog/service/shared/transformers/link/to-link-document/to-link-document';
+import { toLinkDocument } from '@blog/service/shared/transformers/link/to-link-document';
 import type { InferResultType } from 'groqd';
 
 import type { navigationQuery } from './query';

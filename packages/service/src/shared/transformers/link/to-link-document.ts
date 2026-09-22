@@ -4,7 +4,7 @@ import {
   type ILink,
   type TMaybeUndefined,
 } from '@blog/config';
-import type { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document/link-document';
+import type { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document';
 import type { InferFragmentType } from 'groqd';
 
 export type TRawLinkDocument = InferFragmentType<typeof linkDocumentFragment>;

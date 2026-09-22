@@ -15,7 +15,7 @@ import { portableTextBodyItemFragment } from '@blog/service/shared/fragments/por
 import { seoFragment } from '@blog/service/shared/fragments/seo/seo';
 import { tagFragment } from '@blog/service/shared/fragments/tag/tag';
 import { topicFragment } from '@blog/service/shared/fragments/topic/topic';
-import type { TRawModule } from '@blog/service/shared/transformers/module/to-module/to-module';
+import type { TRawModule } from '@blog/service/shared/transformers/module/to-module';
 
 const postTakeawaysFragment = q
   .fragmentForType<'postTakeaways'>()

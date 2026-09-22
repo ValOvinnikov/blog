@@ -1,6 +1,6 @@
 import type { ISanityImage, TMaybeUndefined } from '@blog/config';
 import type { seoFragment } from '@blog/service/shared/fragments/seo/seo';
-import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image/to-sanity-image';
+import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image';
 import type { InferFragmentType } from 'groqd';
 
 export type TRawSeo = InferFragmentType<typeof seoFragment>;

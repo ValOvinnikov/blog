@@ -1,10 +1,10 @@
-import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block/to-heading-block';
+import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
 import {
   toHeroSlot,
   toModule,
-} from '@blog/service/shared/transformers/module/to-module/to-module';
-import { resolveSeo } from '@blog/service/shared/transformers/seo/resolve-seo/resolve-seo';
-import { toTopic } from '@blog/service/shared/transformers/topic/to-topic/to-topic';
+} from '@blog/service/shared/transformers/module/to-module';
+import { resolveSeo } from '@blog/service/shared/transformers/seo/resolve-seo';
+import { toTopic } from '@blog/service/shared/transformers/topic/to-topic';
 import type { InferResultType } from 'groqd';
 
 import type { topicPageQuery } from './query';

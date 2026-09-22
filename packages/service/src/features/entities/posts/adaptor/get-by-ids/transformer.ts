@@ -1,7 +1,7 @@
 import {
   toPostCard,
   type TPostCard,
-} from '@blog/service/shared/transformers/post/to-post-card/to-post-card';
+} from '@blog/service/shared/transformers/post/to-post-card';
 import type { InferResultType } from 'groqd';
 
 import type { postsByIdsQuery } from './query';

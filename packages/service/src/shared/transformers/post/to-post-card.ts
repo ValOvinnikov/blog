@@ -1,8 +1,8 @@
 import type { ISanityImage, TMaybeUndefined } from '@blog/config';
 import type { postCardFragment } from '@blog/service/shared/fragments/post/post';
-import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block/to-heading-block';
-import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image/to-sanity-image';
-import { toLinkDocument } from '@blog/service/shared/transformers/link/to-link-document/to-link-document';
+import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
+import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image';
+import { toLinkDocument } from '@blog/service/shared/transformers/link/to-link-document';
 import { toReadingTimeMinutes } from '@blog/utils';
 import type { InferFragmentType } from 'groqd';
 

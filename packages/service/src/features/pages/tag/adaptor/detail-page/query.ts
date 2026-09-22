@@ -4,7 +4,7 @@ import { headingBlockFragment } from '@blog/service/shared/fragments/heading-blo
 import { moduleFragment } from '@blog/service/shared/fragments/module/module';
 import { seoFragment } from '@blog/service/shared/fragments/seo/seo';
 import { tagFragment } from '@blog/service/shared/fragments/tag/tag';
-import type { TRawModule } from '@blog/service/shared/transformers/module/to-module/to-module';
+import type { TRawModule } from '@blog/service/shared/transformers/module/to-module';
 
 export const tagPageQuery = q
   .parameters<TSlugParams>()

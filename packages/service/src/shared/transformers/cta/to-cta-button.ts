@@ -8,7 +8,7 @@ import type {
   ctaButtonFragment,
   ctaSecondaryButtonFragment,
 } from '@blog/service/shared/fragments/cta/cta-button';
-import { toLinkDocument } from '@blog/service/shared/transformers/link/to-link-document/to-link-document';
+import { toLinkDocument } from '@blog/service/shared/transformers/link/to-link-document';
 import type { InferFragmentType } from 'groqd';
 
 export type TRawCtaButton = InferFragmentType<typeof ctaButtonFragment>;
