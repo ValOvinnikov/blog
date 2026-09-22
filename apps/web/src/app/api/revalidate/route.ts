@@ -1,10 +1,12 @@
 import { queries } from '@blog/db';
+import type { TTenantSanityContext } from '@blog/service';
 import { isValidSignature, SIGNATURE_HEADER_NAME } from '@sanity/webhook';
 import {
   deriveRevalidatePaths,
   isDerivableRevalidateType,
   POST_TYPE,
 } from '@web/server/revalidate/derive-revalidate-paths';
+import { resolveReferencingModuleTags } from '@web/server/revalidate/resolve-referencing-module-tags';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
 import { getRevalidateTagsForType } from '@web/utils/revalidate-tags';
@@ -56,6 +58,7 @@ const resolveDerivedRevalidatePaths = async (
   type: string,
   id: string,
   tenantId: string | undefined,
+  tenant: TTenantSanityContext | undefined,
 ): Promise<TResolvedRevalidatePaths> => {
   if (!tenantId) {
     return { ok: false, reason: 'tenant_unresolved' };
@@ -63,25 +66,7 @@ const resolveDerivedRevalidatePaths = async (
   if (!isDerivableRevalidateType(type)) {
     return { ok: false, reason: 'unsupported_type' };
   }
-
-  let tenant;
-  try {
-    tenant = await queries.tenants.getTenantSanityCredentials(tenantId);
-  } catch (error) {
-    logger.error('revalidate.tenant_sanity_credentials_fetch_threw', {
-      type,
-      id,
-      tenantId,
-      error,
-    });
-    return { ok: false, reason: 'fetch_failed' };
-  }
   if (!tenant) {
-    logger.error('revalidate.tenant_sanity_credentials_missing', {
-      type,
-      id,
-      tenantId,
-    });
     return { ok: false, reason: 'fetch_failed' };
   }
 
@@ -182,9 +167,43 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
 
   const baseTags = getRevalidateTagsForType(type, id);
+
+  // Fetched once — the module lookup and the path derivation both need it, and fetching twice would report one failure as two.
+  let tenantSanity;
+  if (tenantId && baseTags.length > 0) {
+    try {
+      tenantSanity = await queries.tenants.getTenantSanityCredentials(tenantId);
+      if (!tenantSanity) {
+        logger.error('revalidate.tenant_sanity_credentials_missing', {
+          type,
+          id,
+          tenantId,
+        });
+      }
+    } catch (error) {
+      logger.error('revalidate.tenant_sanity_credentials_fetch_threw', {
+        type,
+        id,
+        tenantId,
+        error,
+      });
+    }
+  }
+
+  const moduleTags =
+    tenantId && tenantSanity
+      ? await resolveReferencingModuleTags({
+          type,
+          id,
+          tenantId,
+          tenant: tenantSanity,
+        })
+      : [];
+
+  const allTags = [...baseTags, ...moduleTags];
   const revalidated = tenantProjectId
-    ? [...baseTags, ...baseTags.map((tag) => `t:${tenantProjectId}:${tag}`)]
-    : baseTags;
+    ? [...allTags, ...allTags.map((tag) => `t:${tenantProjectId}:${tag}`)]
+    : allTags;
 
   for (const tag of revalidated) {
     // `{ expire: 0 }` forces immediate expiration — the next request blocks
@@ -201,7 +220,12 @@ export async function POST(request: Request): Promise<NextResponse> {
   // tenant's request, never one tenant's alone.
   const pathPurged = revalidated.length > 0;
   if (pathPurged) {
-    const derived = await resolveDerivedRevalidatePaths(type, id, tenantId);
+    const derived = await resolveDerivedRevalidatePaths(
+      type,
+      id,
+      tenantId,
+      tenantSanity,
+    );
     if (derived.ok) {
       for (const path of derived.paths) {
         revalidatePath(path);

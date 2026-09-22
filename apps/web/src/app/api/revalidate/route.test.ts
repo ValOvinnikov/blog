@@ -61,6 +61,14 @@ vi.mock('@web/server/revalidate/derive-revalidate-paths', () => ({
   deriveRevalidatePaths: deriveRevalidatePathsMock,
 }));
 
+const { resolveReferencingModuleTagsMock } = vi.hoisted(() => ({
+  resolveReferencingModuleTagsMock: vi.fn(),
+}));
+
+vi.mock('@web/server/revalidate/resolve-referencing-module-tags', () => ({
+  resolveReferencingModuleTags: resolveReferencingModuleTagsMock,
+}));
+
 const { loggerErrorMock, loggerWarnMock } = vi.hoisted(() => ({
   loggerErrorMock: vi.fn(),
   loggerWarnMock: vi.fn(),
@@ -104,6 +112,8 @@ describe('POST /api/revalidate', () => {
     isDerivableRevalidateTypeMock.mockReset();
     isDerivableRevalidateTypeMock.mockReturnValue(false);
     deriveRevalidatePathsMock.mockReset();
+    resolveReferencingModuleTagsMock.mockReset();
+    resolveReferencingModuleTagsMock.mockResolvedValue([]);
     loggerErrorMock.mockReset();
     loggerWarnMock.mockReset();
   });
@@ -686,12 +696,129 @@ describe('POST /api/revalidate', () => {
       );
       await POST(request);
 
-      expect(getTenantSanityCredentialsMock).not.toHaveBeenCalled();
       expect(loggerWarnMock).toHaveBeenCalledWith(
         'revalidate.path_purge_fallback',
         expect.objectContaining({ reason: 'unsupported_type' }),
       );
       expect(revalidatePathMock).toHaveBeenCalledWith('/', 'layout');
+    });
+
+    it('still resolves tenant credentials for a type without a precise derivation, since the module lookup needs them', async () => {
+      isValidSignatureMock.mockResolvedValue(true);
+      getTenantIdBySanityProjectIdMock.mockResolvedValue('tenant-uuid-1');
+      isDerivableRevalidateTypeMock.mockReturnValue(false);
+      const { POST } = await import('./route');
+
+      const request = makeRequest(
+        { _type: 'blog_author', _id: 'author-1' },
+        't=1,v=valid-signature',
+        { [SANITY_PROJECT_ID_HEADER]: 'tenant-a-project' },
+      );
+      await POST(request);
+
+      expect(getTenantSanityCredentialsMock).toHaveBeenCalledWith(
+        'tenant-uuid-1',
+      );
+    });
+  });
+
+  describe('referencing module purge', () => {
+    const withTenant = async (type: string, id: string) => {
+      isValidSignatureMock.mockResolvedValue(true);
+      getTenantIdBySanityProjectIdMock.mockResolvedValue('tenant-uuid-1');
+      getTenantSanityCredentialsMock.mockResolvedValue({
+        projectId: 'tenant-a-project',
+        dataset: 'production',
+        token: 'tok',
+      });
+      const { POST } = await import('./route');
+
+      return POST(
+        makeRequest({ _type: type, _id: id }, 't=1,v=valid-signature', {
+          [SANITY_PROJECT_ID_HEADER]: 'tenant-a-project',
+        }),
+      );
+    };
+
+    it('purges a module tag for every module reaching the published document', async () => {
+      resolveReferencingModuleTagsMock.mockResolvedValue([
+        'module:hero-1',
+        'module:cta-2',
+      ]);
+
+      const response = await withTenant('page_topic', 'topic-1');
+      const json = await response.json();
+
+      expect(json.revalidated).toContain('module:hero-1');
+      expect(json.revalidated).toContain('module:cta-2');
+      expect(revalidateTagMock).toHaveBeenCalledWith('module:hero-1', {
+        expire: 0,
+      });
+      expect(revalidateTagMock).toHaveBeenCalledWith('module:cta-2', {
+        expire: 0,
+      });
+    });
+
+    it('purges the tenant-scoped form of each module tag alongside the bare one', async () => {
+      resolveReferencingModuleTagsMock.mockResolvedValue(['module:hero-1']);
+
+      await withTenant('page_topic', 'topic-1');
+
+      expect(revalidateTagMock).toHaveBeenCalledWith(
+        't:tenant-a-project:module:hero-1',
+        { expire: 0 },
+      );
+    });
+
+    it('threads the published document id and tenant context into the lookup', async () => {
+      await withTenant('page_topic', 'topic-1');
+
+      expect(resolveReferencingModuleTagsMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'page_topic',
+          id: 'topic-1',
+          tenantId: 'tenant-uuid-1',
+          tenant: expect.objectContaining({ projectId: 'tenant-a-project' }),
+        }),
+      );
+    });
+
+    it('still purges the document own tags when the lookup resolves nothing', async () => {
+      resolveReferencingModuleTagsMock.mockResolvedValue([]);
+
+      const response = await withTenant('page_topic', 'topic-1');
+      const json = await response.json();
+
+      expect(json.revalidated).toContain('page_topic');
+      expect(revalidateTagMock).toHaveBeenCalledWith('page_topic', {
+        expire: 0,
+      });
+    });
+
+    it('never runs the lookup for a type that purges no tags of its own', async () => {
+      await withTenant('settings_voice', 'voice-1');
+
+      expect(resolveReferencingModuleTagsMock).not.toHaveBeenCalled();
+    });
+
+    it('never runs the lookup when tenant credentials cannot be resolved', async () => {
+      isValidSignatureMock.mockResolvedValue(true);
+      getTenantIdBySanityProjectIdMock.mockResolvedValue('tenant-uuid-1');
+      getTenantSanityCredentialsMock.mockResolvedValue(undefined);
+      const { POST } = await import('./route');
+
+      await POST(
+        makeRequest(
+          { _type: 'page_topic', _id: 'topic-1' },
+          't=1,v=valid-signature',
+          { [SANITY_PROJECT_ID_HEADER]: 'tenant-a-project' },
+        ),
+      );
+
+      expect(resolveReferencingModuleTagsMock).not.toHaveBeenCalled();
+      expect(revalidateTagMock).toHaveBeenCalledWith('page_topic', {
+        expire: 0,
+      });
     });
   });
 
