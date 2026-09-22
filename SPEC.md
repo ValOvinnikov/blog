@@ -571,20 +571,22 @@ fragment asserts `.notNull()` only over what it projects:
 - `headingBlock.heading` or `slug` — projected by every post fragment (as is
   `publishedAt`, bar `postLinkFragment`), so the parse throws wherever the
   document appears.
-- `author` or `topic` — projected by `postCardFragment` but not by
-  `feedPostFragment` or `postLinkFragment`, so card listings break while the
-  feeds and taxonomy post links render normally.
+- `author` or `topic` — projected by `postCardFragment` and
+  `postDetailFragment`, but not by `feedPostFragment` or `postLinkFragment`,
+  so card listings and the detail page break while the feeds and taxonomy
+  post links render normally.
 - `content` or `seo.metaTitle` — projected only by `postDetailFragment`. No
   listing is affected; the document surfaces as a card whose link resolves
   not-found.
 
-What the reader then sees is the consumer's choice, not the query's.
-`safeAsync` turns the throw into `{ ok: false }`, and each caller decides:
-a route-level listing calls `notFound()`, so the page 404s, while a
-module-embedded listing returns `null`, so that module simply disappears
-from an otherwise normal page. The second kind fails silently in both
-senses — those callers do not log either, so a malformed document can
-remove a module from a page with nothing recorded anywhere.
+Where the parse throws is the query layer's business and ends there.
+`safeAsync` turns the throw into `{ ok: false }`, and the consequence is
+whatever the caller decides — 404 the page, drop the failing module and
+render the rest, or degrade to an empty but valid response. The query is
+neutral between them, and no single rule predicts which a given caller
+picks. Several currently decide without logging, which is tracked
+separately; a caller that swallows a `{ ok: false }` silently is a defect
+against §17 rather than a shape this section endorses.
 
 Until this was reduced, the filter also asserted `defined()` on each required
 field, which closed the gap entirely. It was narrowed because those clauses
