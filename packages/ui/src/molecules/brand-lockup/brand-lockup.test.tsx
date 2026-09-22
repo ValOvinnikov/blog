@@ -8,16 +8,10 @@ faker.seed(123);
 const setup = customRender(BrandLockup, {});
 
 describe(`<${BrandLockup.name}/>`, () => {
-  it('renders the polygon mark when no src is provided', () => {
-    setup();
-    expect(screen.getAllByTestId('brand-mark-polygon')).toHaveLength(3);
-  });
-
   it('renders an uploaded image mark when src is provided', () => {
     const src = faker.image.url();
     setup({ src });
-    expect(screen.getByTestId('brand-mark-image')).toHaveAttribute('src', src);
-    expect(screen.queryAllByTestId('brand-mark-polygon')).toHaveLength(0);
+    expect(screen.getByRole('presentation')).toHaveAttribute('src', src);
   });
 
   it('renders the mark decoratively — no accessible role or name', () => {

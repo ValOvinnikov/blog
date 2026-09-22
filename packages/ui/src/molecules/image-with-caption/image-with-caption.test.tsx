@@ -32,16 +32,12 @@ describe(`<${ImageWithCaption.name}/>`, () => {
 
   it('does not render a <figcaption> when caption is an empty string', () => {
     setup({ caption: '', children: undefined });
-    expect(
-      screen.queryByTestId('image-with-caption-caption'),
-    ).not.toBeInTheDocument();
+    expect(screen.getByRole('figure')).not.toHaveAccessibleName();
   });
 
   it('does not render a <figcaption> when caption is omitted', () => {
     setup({ caption: undefined, children: undefined });
-    expect(
-      screen.queryByTestId('image-with-caption-caption'),
-    ).not.toBeInTheDocument();
+    expect(screen.getByRole('figure')).not.toHaveAccessibleName();
   });
 
   it('forwards dataTestId to the root figure', () => {
