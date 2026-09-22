@@ -5,7 +5,7 @@
 
 /*
  * Syntax-highlighting token colors for the Portable Text code block
- * (`src/components/shared/portable-text-renderer/code-block-syntax-theme.ts`).
+ * (`src/components/shared/portable-text/components/code-block/code-block-syntax-theme.ts`).
  * Kept web-local rather than in `@blog/tailwind-config/theme.css` since
  * `react-syntax-highlighter` is a web-only dependency with no consumer
  * outside `apps/web` (#862). The code block's own background reuses the

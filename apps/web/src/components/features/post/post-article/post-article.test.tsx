@@ -6,10 +6,7 @@ import {
   mockPostDetail,
   POST_DETAIL_AUTHOR_IMAGE,
 } from '@web/testing/pages/blog-post-page/fixtures';
-import {
-  richTextBlock,
-  richTextSpan,
-} from '@web/testing/shared/portable-text-renderer/fixtures';
+import { portableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
@@ -224,10 +221,10 @@ describe(`<${PostArticle.name}/>`, () => {
 
   it('renders PostContentsRail once the body has 3+ H2 headings', async () => {
     const body: TPortableTextBody = [
-      richTextBlock('h2', [richTextSpan('Getting started')]),
-      richTextBlock('normal', [richTextSpan('Intro.')]),
-      richTextBlock('h2', [richTextSpan('Configuration')]),
-      richTextBlock('h2', [richTextSpan('Deployment')]),
+      portableTextBlock('Getting started', { style: 'h2' }),
+      portableTextBlock('Intro.'),
+      portableTextBlock('Configuration', { style: 'h2', key: 'configuration' }),
+      portableTextBlock('Deployment', { style: 'h2' }),
     ];
     getPostPageMock.mockResolvedValue({
       ok: true,

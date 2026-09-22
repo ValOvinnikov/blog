@@ -122,7 +122,7 @@ describe(`<${CtaModuleView.name}/>`, () => {
     expect(screen.queryAllByRole('link')).toHaveLength(0);
   });
 
-  it('renders the optional content field via InlineTextRenderer', () => {
+  it('renders the optional content field via PortableText', () => {
     setup({ content: ctaContentDemo });
 
     expect(screen.getByText('14-day trial')).toBeVisible();

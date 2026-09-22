@@ -1,5 +1,5 @@
 import type { TVoicePortableText } from '@blog/config';
-import { InlineTextRenderer } from '@web/components/shared/inline-text-renderer';
+import { PortableText } from '@web/components/shared/portable-text';
 import { customRender, screen } from '@web/testing/custom-render';
 
 import { voicePortableTextToInlineText } from './voice-portable-text-to-inline-text';
@@ -34,8 +34,8 @@ describe(voicePortableTextToInlineText, () => {
     expect(result[0]?.children).toEqual(VOICE_VALUE[0]?.children);
   });
 
-  it('produces a value InlineTextRenderer renders as a working anchor', () => {
-    const setup = customRender(InlineTextRenderer, {
+  it('produces a value PortableText renders as a working anchor', () => {
+    const setup = customRender(PortableText, {
       value: voicePortableTextToInlineText(VOICE_VALUE),
     });
 

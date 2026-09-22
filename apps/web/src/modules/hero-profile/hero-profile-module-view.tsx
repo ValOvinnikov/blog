@@ -2,7 +2,7 @@ import { HERO_VARIANT } from '@blog/config';
 import type { THeroProfileModule } from '@blog/service';
 import { Avatar } from '@blog/ui/atoms/avatar';
 import { Hero } from '@blog/ui/organisms/hero';
-import { InlineTextRenderer } from '@web/components/shared/inline-text-renderer';
+import { PortableText } from '@web/components/shared/portable-text';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SocialLinks } from '@web/components/shared/social-links';
 import { HeroModuleShell } from '@web/modules/hero-shared';
@@ -108,7 +108,7 @@ export const HeroProfileModuleView = ({
 
       {bio && bio.length > 0 && (
         <Hero.Body>
-          <InlineTextRenderer value={bio} />
+          <PortableText value={bio} />
         </Hero.Body>
       )}
 

@@ -4,31 +4,31 @@ import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
-  proseTextBlock,
-  richTextSpan,
-} from '@web/testing/shared/portable-text-renderer/fixtures';
+  portableTextBlock,
+  portableTextSpan,
+} from '@web/testing/shared/portable-text/fixtures';
 
 import { HeroProfileModuleView } from './hero-profile-module-view';
 
 const bioDemo = [
-  proseTextBlock([
-    richTextSpan(
-      'Jane has spent the last decade designing developer tools, with a focus on making complex systems feel approachable.',
-    ),
-  ]),
-  proseTextBlock(
+  portableTextBlock(
+    'Jane has spent the last decade designing developer tools, with a focus on making complex systems feel approachable.',
+  ),
+  portableTextBlock(
     [
-      richTextSpan('Outside of work, she writes about design systems on '),
-      richTextSpan('her blog', ['link-1']),
-      richTextSpan('.'),
+      portableTextSpan('Outside of work, she writes about design systems on '),
+      portableTextSpan('her blog', ['link-1']),
+      portableTextSpan('.'),
     ],
-    [
-      {
-        _type: 'linkRef',
-        _key: 'link-1',
-        link: { href: 'https://example.com', target: undefined },
-      },
-    ],
+    {
+      markDefs: [
+        {
+          _type: 'linkRef',
+          _key: 'link-1',
+          link: { href: 'https://example.com', target: undefined },
+        },
+      ],
+    },
   ),
 ];
 
