@@ -14,7 +14,7 @@ export const postArticleVariants = tv({
     // The breakout-safe column — fills whatever width its own container
     // makes available (`body`'s own measure/page cap below `lg:`, or the
     // grid's column-2 track at `lg:` once `withRail` is true), with no
-    // measure cap of its own. `PortableTextRenderer`'s own `Prose` root owns
+    // measure cap of its own. `PostBody`'s own `Prose` root owns
     // the reading-measure cap now (nested inside this box, around each text
     // run), so a `FULL_BLEED` image — rendered as `Prose`'s sibling, not its
     // child — can fill this box's full width outright. See the `withRail`
@@ -41,7 +41,7 @@ export const postArticleVariants = tv({
     // `text-prose` is load-bearing, not typography: `max-w-measure` is
     // `68ch` (`configs/tailwind/theme.css`), and `ch` resolves against the
     // font-size of the element it's applied to. `footerInRail` and
-    // `PortableTextRenderer`'s `Prose` root are grid siblings (neither
+    // `PostBody`'s `Prose` root are grid siblings (neither
     // nests inside the other), so nothing arbitrates a shared width between
     // them — `Prose` renders its `68ch` at its own `text-prose` (17px), so
     // without a matching override here `footerInRail` would compute its

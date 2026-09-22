@@ -1,4 +1,5 @@
 import type { RichText } from '@blog/config';
+import { portableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 
 const { parseMock, anthropicCtorMock } = vi.hoisted(() => ({
   parseMock: vi.fn(),
@@ -15,12 +16,7 @@ vi.mock('@anthropic-ai/sdk', () => ({
 }));
 
 const body: RichText = [
-  {
-    _type: 'block',
-    _key: 'b1',
-    style: 'normal',
-    children: [{ _type: 'span', _key: 's1', text: 'A post about testing.' }],
-  },
+  portableTextBlock('A post about testing.', { key: 'b1' }),
 ];
 
 describe('generateTakeaways', () => {

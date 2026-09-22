@@ -31,13 +31,13 @@ export const PostContentsRail = ({
     trapFocus: false,
     closeOnFocusOut: true,
   });
-  const activeId = useActiveHeadingId(headings.map((heading) => heading.id));
+  const activeKey = useActiveHeadingId(headings.map((heading) => heading.key));
   const label = t('label');
   // Falls back to the first heading before the reader has scrolled past any —
   // shared by the selector display and the list highlight so they agree.
-  const activeHeadingId = activeId ?? headings[0]?.id;
+  const activeHeadingKey = activeKey ?? headings[0]?.key;
   const activeHeading = headings.find(
-    (heading) => heading.id === activeHeadingId,
+    (heading) => heading.key === activeHeadingKey,
   );
 
   // `onNavigate` closes the mobile panel before the anchor jump — a click
@@ -45,15 +45,15 @@ export const PostContentsRail = ({
   const renderList = (onNavigate?: () => void, inPanel = false) => (
     <ol className={s.list({ inPanel })}>
       {headings.map((heading) => {
-        const isActive = heading.id === activeHeadingId;
+        const isActive = heading.key === activeHeadingKey;
 
         return (
           <li
-            key={heading.id}
+            key={heading.key}
             className={s.item({ isSubheading: heading.level === 3 })}
           >
             <SmartLink
-              href={`#${heading.id}`}
+              href={`#${heading.key}`}
               className={s.link({ isActive, inPanel })}
               aria-current={isActive ? 'location' : undefined}
               onClick={onNavigate}

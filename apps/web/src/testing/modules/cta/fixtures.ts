@@ -1,5 +1,13 @@
-import { CTA_ACTION_APPEARANCE, CTA_ACTION_VARIANT } from '@blog/config';
-import type { TCtaButton, TResolvedCtaContentBlock } from '@blog/service';
+import {
+  CTA_ACTION_APPEARANCE,
+  CTA_ACTION_VARIANT,
+  type TPortableText,
+} from '@blog/config';
+import type { TCtaButton } from '@blog/service';
+import {
+  portableTextBlock,
+  portableTextSpan,
+} from '@web/testing/shared/portable-text/fixtures';
 
 export const ctaActionsDemo: TCtaButton[] = [
   {
@@ -26,49 +34,16 @@ export const ctaActionsDemo: TCtaButton[] = [
   },
 ];
 
-export const ctaContentDemo: TResolvedCtaContentBlock[] = [
-  {
-    _type: 'block',
-    _key: 'cta-content-b1',
-    style: 'normal',
-    children: [
-      {
-        _type: 'span',
-        _key: 'cta-content-s1',
-        text: 'Cancel anytime — no credit card required to start your ',
-      },
-      {
-        _type: 'span',
-        _key: 'cta-content-s2',
-        text: '14-day trial',
-        marks: ['strong'],
-      },
-      { _type: 'span', _key: 'cta-content-s3', text: '.' },
-    ],
-    markDefs: undefined,
-  },
-  {
-    _type: 'block',
-    _key: 'cta-content-b2',
-    style: 'normal',
+export const ctaContentDemo: TPortableText[] = [
+  portableTextBlock([
+    portableTextSpan('Cancel anytime — no credit card required to start your '),
+    portableTextSpan('14-day trial', ['strong']),
+    portableTextSpan('.'),
+  ]),
+  portableTextBlock([portableTextSpan('Unlimited posts and drafts')], {
     listItem: 'bullet',
-    children: [
-      {
-        _type: 'span',
-        _key: 'cta-content-s4',
-        text: 'Unlimited posts and drafts',
-      },
-    ],
-    markDefs: undefined,
-  },
-  {
-    _type: 'block',
-    _key: 'cta-content-b3',
-    style: 'normal',
+  }),
+  portableTextBlock([portableTextSpan('Priority support')], {
     listItem: 'bullet',
-    children: [
-      { _type: 'span', _key: 'cta-content-s5', text: 'Priority support' },
-    ],
-    markDefs: undefined,
-  },
+  }),
 ];

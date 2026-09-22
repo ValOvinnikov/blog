@@ -1,6 +1,6 @@
 import type { TContentModule } from '@blog/service';
 import { ContentModule as ContentModuleUi } from '@blog/ui/organisms/content-module';
-import { PortableTextRenderer } from '@web/components/shared/portable-text-renderer';
+import { PostBody } from '@web/components/shared/post-body';
 import { Section } from '@web/components/shared/section';
 
 export interface IContentModuleViewProps extends TContentModule {
@@ -25,7 +25,7 @@ export const ContentModuleView = ({
       dataTestId={`content-module-${id}`}
     >
       <ContentModuleUi isWrapped={true}>
-        <PortableTextRenderer value={body} />
+        <PostBody value={body} />
       </ContentModuleUi>
     </Section>
   );

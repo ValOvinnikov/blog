@@ -2,7 +2,7 @@ import { ASIDE_KIND, routes, type TAsideKind } from '@blog/config';
 import { type TImageTransformOptions, urlForSanityImage } from '@blog/service';
 import { Article } from '@blog/ui/organisms/article';
 import { BookmarkButtonGate } from '@web/components/features/post/bookmark-button-gate';
-import { PortableTextRenderer } from '@web/components/shared/portable-text-renderer';
+import { PostBody } from '@web/components/shared/post-body';
 import { PostContentsRail } from '@web/components/shared/post-contents-rail';
 import { PostShareLinks } from '@web/components/shared/post-share-links';
 import { SanityImage } from '@web/components/shared/sanity-image';
@@ -131,19 +131,11 @@ export const PostArticle = async ({ slug, tenant }: TPostArticleProps) => {
           <>
             <PostContentsRail className={s.rail()} headings={headings} />
             <div className={s.content({ withRail: true })}>
-              <PortableTextRenderer
-                value={body}
-                headings={headings}
-                asideKindLabels={asideKindLabels}
-              />
+              <PostBody value={body} asideKindLabels={asideKindLabels} />
             </div>
           </>
         ) : (
-          <PortableTextRenderer
-            value={body}
-            headings={headings}
-            asideKindLabels={asideKindLabels}
-          />
+          <PostBody value={body} asideKindLabels={asideKindLabels} />
         )}
         <Article.Footer
           className={hasContentsRail ? s.footerInRail() : s.footer()}

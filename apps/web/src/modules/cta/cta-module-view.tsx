@@ -2,7 +2,7 @@ import { CTA_VARIANT } from '@blog/config';
 import type { TCtaModule } from '@blog/service';
 import { CtaModule as CtaModuleUi } from '@blog/ui/organisms/cta-module';
 import { ActionGroup } from '@web/components/shared/action-group';
-import { InlineTextRenderer } from '@web/components/shared/inline-text-renderer';
+import { PortableText } from '@web/components/shared/portable-text';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { Section } from '@web/components/shared/section';
 
@@ -48,7 +48,7 @@ export const CtaModuleView = ({
         heading={heading}
         headingId={titleId}
         supportingText={supportingText}
-        content={content ? <InlineTextRenderer value={content} /> : undefined}
+        content={content ? <PortableText value={content} /> : undefined}
         image={
           image ? (
             <SanityImage

@@ -1,3 +1,4 @@
+import type { TPortableText } from '@blog/config';
 import type { TPortableTextBody } from '@blog/service';
 
 /** A post needs at least this many H2 headings before a table-of-contents rail earns its place. */
@@ -6,31 +7,21 @@ export const MIN_H2_HEADINGS_FOR_RAIL = 3;
 type TPostHeadingLevel = 2 | 3;
 
 export type TPostHeading = {
-  id: string;
   text: string;
   level: TPostHeadingLevel;
   key: string;
 };
 
-type TRichTextBlock = Extract<TPortableTextBody[number], { _type: 'block' }>;
-
 const isHeadingBlock = (
   node: TPortableTextBody[number],
-): node is TRichTextBlock & { style: 'h2' | 'h3' } =>
+): node is TPortableText & { style: 'h2' | 'h3' } =>
   node._type === 'block' && (node.style === 'h2' || node.style === 'h3');
 
-const blockText = (block: TRichTextBlock): string =>
+const blockText = (block: TPortableText): string =>
   (block.children ?? [])
     .map((child) => child.text ?? '')
     .join('')
     .trim();
-
-const slugify = (text: string): string =>
-  text
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
 
 /**
  * Returns the ordered h2/h3 outline of a post body, gated to the same
@@ -41,7 +32,7 @@ export const extractPostHeadings = (
 ): TPostHeading[] => {
   if (!body) return [];
 
-  const rawHeadings = body
+  const headings = body
     .filter(isHeadingBlock)
     .map((block) => ({
       key: block._key,
@@ -50,17 +41,8 @@ export const extractPostHeadings = (
     }))
     .filter((heading) => heading.text.length > 0);
 
-  const h2Count = rawHeadings.filter((heading) => heading.level === 2).length;
+  const h2Count = headings.filter((heading) => heading.level === 2).length;
   if (h2Count < MIN_H2_HEADINGS_FOR_RAIL) return [];
 
-  const slugCounts = new Map<string, number>();
-
-  return rawHeadings.map(({ key, level, text }) => {
-    const base = slugify(text) || 'section';
-    const seen = slugCounts.get(base) ?? 0;
-    slugCounts.set(base, seen + 1);
-    const id = seen === 0 ? base : `${base}-${seen + 1}`;
-
-    return { id, text, level, key };
-  });
+  return headings;
 };

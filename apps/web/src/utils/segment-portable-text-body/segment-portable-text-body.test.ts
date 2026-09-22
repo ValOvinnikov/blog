@@ -1,10 +1,7 @@
 import { IMAGE_LAYOUT, type IBodyImageBlock } from '@blog/config';
 import type { TPortableTextBody } from '@blog/service';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
-import {
-  richTextBlock,
-  richTextSpan,
-} from '@web/testing/shared/portable-text-renderer/fixtures';
+import { portableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 
 import { segmentPortableTextBody } from './segment-portable-text-body';
 
@@ -20,8 +17,8 @@ const fullBleedImage = (key: string): IBodyImageBlock => {
 describe('segmentPortableTextBody', () => {
   it('collapses a body with no FULL_BLEED image into a single PROSE segment holding every block, in order', () => {
     const value: TPortableTextBody = [
-      richTextBlock('h2', [richTextSpan('Heading')]),
-      richTextBlock('normal', [richTextSpan('Paragraph')]),
+      portableTextBlock('Heading', { style: 'h2' }),
+      portableTextBlock('Paragraph'),
       {
         _type: 'bodyImage',
         _key: 'inline-1',
@@ -40,9 +37,9 @@ describe('segmentPortableTextBody', () => {
   });
 
   it('splits a FULL_BLEED image out into its own BREAKOUT segment, between the surrounding PROSE runs', () => {
-    const before = richTextBlock('normal', [richTextSpan('Before')]);
+    const before = portableTextBlock('Before');
     const image = fullBleedImage('image-1');
-    const after = richTextBlock('normal', [richTextSpan('After')]);
+    const after = portableTextBlock('After');
     const value: TPortableTextBody = [before, image, after];
 
     expect(segmentPortableTextBody(value)).toEqual([
@@ -54,7 +51,7 @@ describe('segmentPortableTextBody', () => {
 
   it('emits a leading BREAKOUT segment with no preceding PROSE run when the body opens with a FULL_BLEED image', () => {
     const image = fullBleedImage('image-1');
-    const after = richTextBlock('normal', [richTextSpan('After')]);
+    const after = portableTextBlock('After');
 
     expect(segmentPortableTextBody([image, after])).toEqual([
       { kind: 'BREAKOUT', block: image },
@@ -63,7 +60,7 @@ describe('segmentPortableTextBody', () => {
   });
 
   it('emits a trailing BREAKOUT segment with no following PROSE run when the body ends with a FULL_BLEED image', () => {
-    const before = richTextBlock('normal', [richTextSpan('Before')]);
+    const before = portableTextBlock('Before');
     const image = fullBleedImage('image-1');
 
     expect(segmentPortableTextBody([before, image])).toEqual([
@@ -89,10 +86,7 @@ describe('segmentPortableTextBody', () => {
       image: makeSanityImage({ alt: 'Floated' }),
       layout: IMAGE_LAYOUT.FLOAT_LEFT,
     };
-    const value: TPortableTextBody = [
-      richTextBlock('normal', [richTextSpan('Text')]),
-      floatImage,
-    ];
+    const value: TPortableTextBody = [portableTextBlock('Text'), floatImage];
 
     expect(segmentPortableTextBody(value)).toEqual([
       { kind: 'PROSE', blocks: value },

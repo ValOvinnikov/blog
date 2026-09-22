@@ -1,0 +1,75 @@
+import {
+  ASIDE_KIND,
+  type Code,
+  type IBodyImageBlock,
+  type TAsideKind,
+} from '@blog/config';
+import type { TPortableTextBody } from '@blog/service';
+import { ImageWithCaption } from '@blog/ui/molecules/image-with-caption';
+import {
+  PortableText as PortableTextRoot,
+  type PortableTextReactComponents,
+} from '@portabletext/react';
+import { DeepAside } from '@web/components/shared/deep-aside';
+import { SanityImage } from '@web/components/shared/sanity-image';
+
+import { CodeBlock } from '../components/code-block';
+import { portableTextVariants } from '../portable-text-variants';
+
+const s = portableTextVariants();
+
+export type TAsideKindLabels = Partial<Record<TAsideKind, string>>;
+
+type TResolvedAsideBlock = Extract<
+  TPortableTextBody[number],
+  { _type: 'aside' }
+>;
+
+export const renderBodyImage = (block: IBodyImageBlock) => {
+  if (!block.image) return null;
+
+  return (
+    <ImageWithCaption layout={block.layout}>
+      <SanityImage
+        image={block.image}
+        width={1200}
+        sizes="(min-width: 1024px) 800px, 100vw"
+        loading="lazy"
+        className={s.image()}
+      />
+    </ImageWithCaption>
+  );
+};
+
+export const bodyImageTypeComponent = ({ value }: { value: IBodyImageBlock }) =>
+  renderBodyImage(value);
+
+export const codeTypeComponent = ({ value }: { value: Code }) => (
+  <CodeBlock
+    code={value.code ?? ''}
+    language={value.language}
+    filename={value.filename}
+    highlightedLines={value.highlightedLines}
+  />
+);
+
+export const makeAsideTypeComponent = (
+  baseComponents: PortableTextReactComponents,
+  asideKindLabels?: TAsideKindLabels,
+) => {
+  const AsideType = ({ value }: { value: TResolvedAsideBlock }) => {
+    const kind = value.kind ?? ASIDE_KIND.CONTEXT;
+    const label = asideKindLabels?.[kind] ?? kind;
+
+    return (
+      <DeepAside kind={kind} label={label}>
+        <PortableTextRoot
+          value={value.body ?? []}
+          components={baseComponents}
+        />
+      </DeepAside>
+    );
+  };
+
+  return AsideType;
+};

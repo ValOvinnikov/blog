@@ -8,7 +8,7 @@ export const postContentsRailVariants = tv({
     // height. `top-20` (80px) adds a 16px gap below `top-16`'s Header-height
     // match, so a sliver of page background separates the stuck bar from the
     // Header (`shadow-md` alone reads flush against it). `headingAnchor`'s
-    // mobile `scroll-mt-44` (in `portable-text-renderer-variants.ts`) tracks
+    // mobile `scroll-mt-44` (in `portable-text-variants.ts`) tracks
     // this offset plus this bar's own rendered height, so a TOC jump never
     // lands a heading under it.
     root: [

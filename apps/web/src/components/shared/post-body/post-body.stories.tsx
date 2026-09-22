@@ -1,17 +1,17 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { richTextDemo } from '@web/testing/shared/portable-text-renderer/fixtures';
+import { richTextDemo } from '@web/testing/shared/portable-text/fixtures';
 
-import { PortableTextRenderer } from './portable-text-renderer';
+import { PostBody } from './post-body';
 
 const meta = {
-  title: 'Components/PortableTextRenderer',
-  component: PortableTextRenderer,
+  title: 'Components/PostBody',
+  component: PostBody,
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
   args: {
     value: richTextDemo,
   },
-} satisfies Meta<typeof PortableTextRenderer>;
+} satisfies Meta<typeof PostBody>;
 
 export default meta;
 type TStory = StoryObj<typeof meta>;

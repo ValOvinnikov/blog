@@ -1,8 +1,5 @@
 import type { TPortableTextBody } from '@blog/service';
-import {
-  richTextBlock,
-  richTextSpan,
-} from '@web/testing/shared/portable-text-renderer/fixtures';
+import { portableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 
 import { extractPostHeadings } from './extract-post-headings';
 
@@ -13,8 +10,8 @@ describe(extractPostHeadings, () => {
 
   it('returns an empty array when the body has zero H2 headings', () => {
     const body: TPortableTextBody = [
-      richTextBlock('normal', [richTextSpan('Just a paragraph.')]),
-      richTextBlock('h3', [richTextSpan('A stray subsection')]),
+      portableTextBlock('Just a paragraph.'),
+      portableTextBlock('A stray subsection', { style: 'h3' }),
     ];
 
     expect(extractPostHeadings(body)).toEqual([]);
@@ -22,9 +19,9 @@ describe(extractPostHeadings, () => {
 
   it('returns an empty array when the body has fewer than 3 H2 headings', () => {
     const body: TPortableTextBody = [
-      richTextBlock('h2', [richTextSpan('First section')]),
-      richTextBlock('normal', [richTextSpan('Some text.')]),
-      richTextBlock('h2', [richTextSpan('Second section')]),
+      portableTextBlock('First section', { style: 'h2' }),
+      portableTextBlock('Some text.'),
+      portableTextBlock('Second section', { style: 'h2' }),
     ];
 
     expect(extractPostHeadings(body)).toEqual([]);
@@ -32,82 +29,27 @@ describe(extractPostHeadings, () => {
 
   it('returns the ordered heading list, including nested H3s, once the body has 3+ H2 headings', () => {
     const body: TPortableTextBody = [
-      richTextBlock('h2', [richTextSpan('Getting started')]),
-      richTextBlock('normal', [richTextSpan('Intro text.')]),
-      richTextBlock('h3', [richTextSpan('Prerequisites')]),
-      richTextBlock('h2', [richTextSpan('Configuration')]),
-      richTextBlock('h2', [richTextSpan('Deployment')]),
+      portableTextBlock('Getting started', { style: 'h2', key: 'k1' }),
+      portableTextBlock('Intro text.'),
+      portableTextBlock('Prerequisites', { style: 'h3', key: 'k2' }),
+      portableTextBlock('Configuration', { style: 'h2', key: 'k3' }),
+      portableTextBlock('Deployment', { style: 'h2', key: 'k4' }),
     ];
 
     expect(extractPostHeadings(body)).toEqual([
-      {
-        id: 'getting-started',
-        text: 'Getting started',
-        level: 2,
-        key: expect.any(String),
-      },
-      {
-        id: 'prerequisites',
-        text: 'Prerequisites',
-        level: 3,
-        key: expect.any(String),
-      },
-      {
-        id: 'configuration',
-        text: 'Configuration',
-        level: 2,
-        key: expect.any(String),
-      },
-      {
-        id: 'deployment',
-        text: 'Deployment',
-        level: 2,
-        key: expect.any(String),
-      },
-    ]);
-  });
-
-  it('produces stable, URL-safe slugs from heading text (lower-cased, punctuation stripped, spaces hyphenated)', () => {
-    const body: TPortableTextBody = [
-      richTextBlock('h2', [richTextSpan('One')]),
-      richTextBlock('h2', [richTextSpan('Two')]),
-      richTextBlock('h2', [richTextSpan("What's New? (v2.0!)")]),
-    ];
-
-    const headings = extractPostHeadings(body);
-
-    expect(headings.map((heading) => heading.id)).toEqual([
-      'one',
-      'two',
-      'what-s-new-v2-0',
-    ]);
-    headings.forEach((heading) => {
-      expect(heading.id).toMatch(/^[a-z0-9-]+$/);
-    });
-  });
-
-  it('dedupes identical heading text with a numeric suffix', () => {
-    const body: TPortableTextBody = [
-      richTextBlock('h2', [richTextSpan('Overview')]),
-      richTextBlock('h2', [richTextSpan('Overview')]),
-      richTextBlock('h2', [richTextSpan('Overview')]),
-    ];
-
-    const headings = extractPostHeadings(body);
-
-    expect(headings.map((heading) => heading.id)).toEqual([
-      'overview',
-      'overview-2',
-      'overview-3',
+      { key: 'k1', text: 'Getting started', level: 2 },
+      { key: 'k2', text: 'Prerequisites', level: 3 },
+      { key: 'k3', text: 'Configuration', level: 2 },
+      { key: 'k4', text: 'Deployment', level: 2 },
     ]);
   });
 
   it('ignores non-block nodes (images, code) and non-heading block styles', () => {
     const body: TPortableTextBody = [
-      richTextBlock('h2', [richTextSpan('Section one')]),
-      richTextBlock('h2', [richTextSpan('Section two')]),
-      richTextBlock('h2', [richTextSpan('Section three')]),
-      richTextBlock('blockquote', [richTextSpan('A quote.')]),
+      portableTextBlock('Section one', { style: 'h2' }),
+      portableTextBlock('Section two', { style: 'h2' }),
+      portableTextBlock('Section three', { style: 'h2' }),
+      portableTextBlock('A quote.', { style: 'blockquote' }),
       { _type: 'code', _key: 'code-1', code: 'const x = 1;' },
     ];
 

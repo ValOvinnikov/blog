@@ -3,16 +3,11 @@ import { customRender, screen } from '@web/testing/custom-render';
 import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import {
-  proseTextBlock,
-  richTextSpan,
-} from '@web/testing/shared/portable-text-renderer/fixtures';
+import { portableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 
 import { HeroProfileModuleView } from './hero-profile-module-view';
 
-const bio = [
-  proseTextBlock([richTextSpan('Jane writes about design systems.')]),
-];
+const bio = [portableTextBlock('Jane writes about design systems.')];
 
 const sanityImage = makeSanityImage();
 

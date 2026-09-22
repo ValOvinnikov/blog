@@ -7,7 +7,7 @@ export type TPortableTextSegment =
 
 /**
  * Splits a Portable Text body into alternating PROSE and BREAKOUT
- * (`FULL_BLEED` `bodyImage`) runs, so `PortableTextRenderer` can render each
+ * (`FULL_BLEED` `bodyImage`) runs, so `PostBody` can render each
  * `FULL_BLEED` image as a sibling of `Prose` rather than nested inside it.
  */
 export const segmentPortableTextBody = (
