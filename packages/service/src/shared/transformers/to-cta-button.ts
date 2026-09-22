@@ -24,7 +24,7 @@ export type TCtaButton = {
 
 export function toCtaButton(
   raw: TRawCtaButton | TRawCtaSecondaryButton,
-): TCtaButton | undefined {
+): TMaybeUndefined<TCtaButton> {
   const link = toLinkDocument(raw.link);
   if (!link) return undefined;
 

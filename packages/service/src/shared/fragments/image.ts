@@ -1,8 +1,5 @@
 import { q } from '@blog/service/sanity/query';
 
-// Exposes the fields `sanity-image` needs from a dereferenced asset
-// (asset id, blur placeholder, dimensions). Shared by every fragment below
-// that derefs an image asset, whether or not the reference itself is required.
 const sanityImageAssetFragment = q
   .fragmentForType<'sanity.imageAsset'>()
   .project((sub) => ({
@@ -23,9 +20,6 @@ const sanityImageAssetFragment = q
       .nullable(true),
   }));
 
-// Dereferences the asset to expose the fields `sanity-image` needs alongside
-// `alt`/`hotspot`/`crop`. Used where the image field, once present, is
-// expected to always carry a resolved asset (hero, avatar, brand, OG).
 export const sanityImageFragment = q
   .fragmentForType<'imageWithAlt'>()
   .project((sub) => ({

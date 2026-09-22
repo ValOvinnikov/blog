@@ -8,7 +8,7 @@ import type {
 import type { sanityImageFragment } from '@blog/service/shared/fragments/image';
 import type { InferFragmentType } from 'groqd';
 
-type TRawSanityImage = InferFragmentType<typeof sanityImageFragment>;
+export type TRawSanityImage = InferFragmentType<typeof sanityImageFragment>;
 
 // Same shape as `TRawSanityImage`, but the asset and alt are nullable —
 // accepted so a `bodyImage` block whose asset was never selected, points at
