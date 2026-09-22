@@ -13,7 +13,8 @@ describe(`<${QuoteCard.name}/>`, () => {
     const quote = faker.lorem.sentence();
     const name = faker.person.fullName();
     renderElement(
-      <QuoteCard quote={quote} tone={BRAND_VARIANT.PRIMARY}>
+      <QuoteCard tone={BRAND_VARIANT.PRIMARY}>
+        <QuoteCard.Quote>{quote}</QuoteCard.Quote>
         <QuoteCard.Name>
           <span>{name}</span>
         </QuoteCard.Name>
@@ -25,13 +26,24 @@ describe(`<${QuoteCard.name}/>`, () => {
     expect(within(figure).getByText(name)).toBeVisible();
   });
 
+  it('renders the quote slot content inside the blockquote', () => {
+    const quote = faker.lorem.sentence();
+    renderElement(
+      <QuoteCard tone={BRAND_VARIANT.PRIMARY}>
+        <QuoteCard.Quote>{quote}</QuoteCard.Quote>
+        <QuoteCard.Name>
+          <span>{faker.person.fullName()}</span>
+        </QuoteCard.Name>
+      </QuoteCard>,
+    );
+
+    expect(screen.getByRole('blockquote')).toHaveTextContent(quote);
+  });
+
   it('renders the role text when provided', () => {
     renderElement(
-      <QuoteCard
-        quote={faker.lorem.sentence()}
-        tone={BRAND_VARIANT.PRIMARY}
-        role="Head of Product"
-      >
+      <QuoteCard tone={BRAND_VARIANT.PRIMARY} role="Head of Product">
+        <QuoteCard.Quote>{faker.lorem.sentence()}</QuoteCard.Quote>
         <QuoteCard.Name>
           <span>{faker.person.fullName()}</span>
         </QuoteCard.Name>
@@ -42,7 +54,8 @@ describe(`<${QuoteCard.name}/>`, () => {
 
   it('does not render a role element when omitted', () => {
     renderElement(
-      <QuoteCard quote={faker.lorem.sentence()} tone={BRAND_VARIANT.PRIMARY}>
+      <QuoteCard tone={BRAND_VARIANT.PRIMARY}>
+        <QuoteCard.Quote>{faker.lorem.sentence()}</QuoteCard.Quote>
         <QuoteCard.Name>
           <span>{faker.person.fullName()}</span>
         </QuoteCard.Name>
@@ -53,7 +66,8 @@ describe(`<${QuoteCard.name}/>`, () => {
 
   it('renders the caller-supplied Avatar with its initials fallback', () => {
     renderElement(
-      <QuoteCard quote={faker.lorem.sentence()} tone={BRAND_VARIANT.PRIMARY}>
+      <QuoteCard tone={BRAND_VARIANT.PRIMARY}>
+        <QuoteCard.Quote>{faker.lorem.sentence()}</QuoteCard.Quote>
         <QuoteCard.Avatar>
           <Avatar name="Ada Lovelace" alt="Ada Lovelace" />
         </QuoteCard.Avatar>
@@ -68,7 +82,8 @@ describe(`<${QuoteCard.name}/>`, () => {
 
   it('renders the caller-supplied Avatar image when given a src', () => {
     renderElement(
-      <QuoteCard quote={faker.lorem.sentence()} tone={BRAND_VARIANT.PRIMARY}>
+      <QuoteCard tone={BRAND_VARIANT.PRIMARY}>
+        <QuoteCard.Quote>{faker.lorem.sentence()}</QuoteCard.Quote>
         <QuoteCard.Avatar>
           <Avatar
             name="Ada Lovelace"
@@ -89,7 +104,8 @@ describe(`<${QuoteCard.name}/>`, () => {
 
   it('renders neither an image nor initials when QuoteCard.Avatar is omitted', () => {
     renderElement(
-      <QuoteCard quote={faker.lorem.sentence()} tone={BRAND_VARIANT.PRIMARY}>
+      <QuoteCard tone={BRAND_VARIANT.PRIMARY}>
+        <QuoteCard.Quote>{faker.lorem.sentence()}</QuoteCard.Quote>
         <QuoteCard.Name>
           <span>Ada Lovelace</span>
         </QuoteCard.Name>
@@ -101,7 +117,8 @@ describe(`<${QuoteCard.name}/>`, () => {
 
   it('renders the name as plain text, not a link, when the caller supplies a span', () => {
     renderElement(
-      <QuoteCard quote={faker.lorem.sentence()} tone={BRAND_VARIANT.PRIMARY}>
+      <QuoteCard tone={BRAND_VARIANT.PRIMARY}>
+        <QuoteCard.Quote>{faker.lorem.sentence()}</QuoteCard.Quote>
         <QuoteCard.Name>
           <span>{faker.person.fullName()}</span>
         </QuoteCard.Name>
@@ -113,7 +130,8 @@ describe(`<${QuoteCard.name}/>`, () => {
   it('renders the name as a link with whatever attributes the caller supplies', () => {
     const name = faker.person.fullName();
     renderElement(
-      <QuoteCard quote={faker.lorem.sentence()} tone={BRAND_VARIANT.PRIMARY}>
+      <QuoteCard tone={BRAND_VARIANT.PRIMARY}>
+        <QuoteCard.Quote>{faker.lorem.sentence()}</QuoteCard.Quote>
         <QuoteCard.Name>
           <a
             href="https://example.com/team/ada"
@@ -145,7 +163,8 @@ describe(`<${QuoteCard.name}/>`, () => {
       </a>
     );
     renderElement(
-      <QuoteCard quote={faker.lorem.sentence()} tone={BRAND_VARIANT.PRIMARY}>
+      <QuoteCard tone={BRAND_VARIANT.PRIMARY}>
+        <QuoteCard.Quote>{faker.lorem.sentence()}</QuoteCard.Quote>
         <QuoteCard.Name>
           <CustomLink href="/case-studies/ada">
             {faker.person.fullName()}
@@ -169,7 +188,8 @@ describe(`<${QuoteCard.name}/>`, () => {
       </a>
     );
     renderElement(
-      <QuoteCard quote={faker.lorem.sentence()} tone={BRAND_VARIANT.PRIMARY}>
+      <QuoteCard tone={BRAND_VARIANT.PRIMARY}>
+        <QuoteCard.Quote>{faker.lorem.sentence()}</QuoteCard.Quote>
         <QuoteCard.Name dataTestId="quote-card-name">
           <CustomLink href="/case-studies/ada">
             {faker.person.fullName()}
@@ -184,7 +204,8 @@ describe(`<${QuoteCard.name}/>`, () => {
 
   it('keeps figcaption as the last child of the figure even when duplicate slot content is unmatched', () => {
     renderElement(
-      <QuoteCard quote={faker.lorem.sentence()} tone={BRAND_VARIANT.PRIMARY}>
+      <QuoteCard tone={BRAND_VARIANT.PRIMARY}>
+        <QuoteCard.Quote>{faker.lorem.sentence()}</QuoteCard.Quote>
         <QuoteCard.Name>
           <span>{faker.person.fullName()}</span>
         </QuoteCard.Name>
@@ -200,11 +221,8 @@ describe(`<${QuoteCard.name}/>`, () => {
 
   it('forwards data-testid to the root element', () => {
     renderElement(
-      <QuoteCard
-        quote={faker.lorem.sentence()}
-        tone={BRAND_VARIANT.PRIMARY}
-        dataTestId="quote-card"
-      >
+      <QuoteCard tone={BRAND_VARIANT.PRIMARY} dataTestId="quote-card">
+        <QuoteCard.Quote>{faker.lorem.sentence()}</QuoteCard.Quote>
         <QuoteCard.Name>
           <span>{faker.person.fullName()}</span>
         </QuoteCard.Name>
