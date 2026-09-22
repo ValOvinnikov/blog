@@ -1,5 +1,6 @@
 import { service, type TPostCard } from '@blog/service';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { logger } from '@web/utils/logger/logger';
 import { renderPostCardImage } from '@web/utils/render-post-card-image';
 import { renderPostLeadImage } from '@web/utils/render-post-lead-image';
 import { toPostListItems } from '@web/utils/to-post-list-items';
@@ -22,7 +23,13 @@ export const PostFeaturedModule = async ({
     tenantContext,
   );
 
-  if (!result.ok) return null;
+  if (!result.ok) {
+    logger.error('post_featured_module.fetch_failed', {
+      id,
+      error: result.error,
+    });
+    return null;
+  }
 
   const {
     brandVariant,

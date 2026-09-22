@@ -1,5 +1,6 @@
 import { service } from '@blog/service';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { logger } from '@web/utils/logger/logger';
 
 import { ContentModuleView } from './content-module-view';
 
@@ -13,7 +14,13 @@ export const ContentModule = async ({ id, tenant }: IContentModuleProps) => {
   const tenantContext = await getTenantSanityContext(tenant);
   const result = await service.modules.content.v1.getContent(id, tenantContext);
 
-  if (!result.ok) return null;
+  if (!result.ok) {
+    logger.error('content_module.fetch_failed', {
+      id,
+      error: result.error,
+    });
+    return null;
+  }
 
   return <ContentModuleView id={id} {...result.data} />;
 };
