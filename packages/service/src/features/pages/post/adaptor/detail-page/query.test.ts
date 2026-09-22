@@ -157,7 +157,7 @@ describe('postPageQuery', () => {
     });
   });
 
-  it('allows a bodyImage body block with no alt text', () => {
+  it('throws when a bodyImage body block has no alt text', () => {
     const raw = makeRawPostDetail({
       body: [
         {
@@ -174,15 +174,11 @@ describe('postPageQuery', () => {
           crop: null,
           alt: null,
           layout: 'FLOAT_LEFT',
-        },
+        } as unknown as TRawPostDetail['body'][number],
       ],
     });
 
-    expect(() => postPageQuery.parse(raw)).not.toThrow();
-    expect(postPageQuery.parse(raw)?.body?.[0]).toMatchObject({
-      _type: 'bodyImage',
-      alt: null,
-    });
+    expect(() => postPageQuery.parse(raw)).toThrow();
   });
 
   it('keeps every field of a rich text block intact', () => {
