@@ -27,9 +27,9 @@ const pngFile = () => new File(['bytes'], 'logo.png', { type: 'image/png' });
 
 describe(`<${AssetUploadField.name}/>`, () => {
   it('shows no thumbnail or Remove control before any value is set', () => {
-    const { container } = render(<AssetUploadField {...baseProps} />);
+    render(<AssetUploadField {...baseProps} />);
 
-    expect(container.querySelector('img')).toBeNull();
+    expect(screen.queryByAltText('Current logo')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Upload logo' })).toBeVisible();
     expect(
       screen.queryByRole('button', { name: 'Remove' }),

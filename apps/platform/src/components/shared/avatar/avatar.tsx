@@ -30,6 +30,7 @@ const getInitials = (name: string): string => {
 export const Avatar = ({ name, variant, className }: TAvatarProps) => (
   <span
     aria-hidden="true"
+    data-testid="avatar"
     className={avatarVariants({ variant, class: className })}
   >
     {getInitials(name)}

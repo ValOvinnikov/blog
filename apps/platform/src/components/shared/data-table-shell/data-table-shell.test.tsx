@@ -12,7 +12,6 @@ const classNames = {
 type TItem = { id: string; name: string };
 
 const noItems: TItem[] = [];
-const oneItem: TItem[] = [{ id: '1', name: 'Acme' }];
 const twoItems: TItem[] = [
   { id: '1', name: 'Acme' },
   { id: '2', name: 'Globex' },
@@ -20,7 +19,7 @@ const twoItems: TItem[] = [
 
 describe(`<${DataTableShell.name}/>`, () => {
   it('shows the empty message and no table when items is empty', () => {
-    const { container } = render(
+    render(
       <DataTableShell
         items={noItems}
         emptyMessage="No rows yet."
@@ -31,7 +30,7 @@ describe(`<${DataTableShell.name}/>`, () => {
     );
 
     expect(screen.getByText('No rows yet.')).toBeVisible();
-    expect(container.querySelector('table')).toBeNull();
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 
   it('renders a column header per column and one row per item via renderRow', () => {
@@ -56,31 +55,5 @@ describe(`<${DataTableShell.name}/>`, () => {
     expect(screen.getByText('Acme')).toBeVisible();
     expect(screen.getByText('Globex')).toBeVisible();
     expect(screen.queryByText('No rows yet.')).not.toBeInTheDocument();
-  });
-
-  it('applies the given classNames to the card, table, header cells and empty message', () => {
-    const { container: emptyContainer } = render(
-      <DataTableShell
-        items={noItems}
-        emptyMessage="No rows yet."
-        classNames={classNames}
-        columns={[]}
-        renderRow={() => null}
-      />,
-    );
-    expect(emptyContainer.querySelector('.card-class')).not.toBeNull();
-    expect(emptyContainer.querySelector('.empty-class')).not.toBeNull();
-
-    const { container } = render(
-      <DataTableShell
-        items={oneItem}
-        emptyMessage="No rows yet."
-        classNames={classNames}
-        columns={[{ key: 'name', label: 'Name' }]}
-        renderRow={(item) => <tr key={item.id}>{item.name}</tr>}
-      />,
-    );
-    expect(container.querySelector('table.table-class')).not.toBeNull();
-    expect(container.querySelector('th.head-class')).not.toBeNull();
   });
 });

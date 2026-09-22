@@ -46,9 +46,7 @@ describe(FormField, () => {
       </FormField>,
     );
 
-    expect(
-      document.getElementById('tenant-slug-error'),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByTestId('form-field-error')).not.toBeInTheDocument();
   });
 
   it('renders the error with a predictable id derived from htmlFor, for aria-describedby wiring', () => {
