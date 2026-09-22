@@ -1,5 +1,5 @@
 import { q } from '@blog/service/sanity/query';
-import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-post';
+import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/published-post';
 
 // Keyed by `_id` (the webhook payload's document id), not slug — this is the
 // read half of the publish-time skim pipeline, not a page-render query.

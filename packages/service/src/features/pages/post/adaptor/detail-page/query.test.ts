@@ -110,25 +110,25 @@ describe('postPageQuery', () => {
     expect(parsed?.headingBlock?.supportingText).toBeNull();
   });
 
-  it('throws when a post has no headingBlock, relying on PUBLISHED_POST_FILTER to keep such a document out of this query', () => {
+  it('throws when a post has no headingBlock', () => {
     const raw = { ...makeRawPostDetail(), headingBlock: null };
 
     expect(() => postPageQuery.parse(raw)).toThrow();
   });
 
-  it('throws when a post has no author, relying on PUBLISHED_POST_FILTER to keep such a document out of this query', () => {
+  it('throws when a post has no author', () => {
     const raw = { ...makeRawPostDetail(), author: null };
 
     expect(() => postPageQuery.parse(raw)).toThrow();
   });
 
-  it('throws when a post has no topic, relying on PUBLISHED_POST_FILTER to keep such a document out of this query', () => {
+  it('throws when a post has no topic', () => {
     const raw = { ...makeRawPostDetail(), topic: null };
 
     expect(() => postPageQuery.parse(raw)).toThrow();
   });
 
-  it('throws when a post has no content, relying on PUBLISHED_POST_FILTER to keep such a document out of this query', () => {
+  it('throws when a post has no content', () => {
     const raw = { ...makeRawPostDetail(), body: null };
 
     expect(() => postPageQuery.parse(raw)).toThrow();
