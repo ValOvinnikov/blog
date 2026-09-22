@@ -1,10 +1,9 @@
 import { q } from '@blog/service/sanity/query';
+import { authorDetailFragment } from '@blog/service/shared/fragments/author';
 import { ctaButtonFragment } from '@blog/service/shared/fragments/cta-button';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image';
 import { heroLayoutFragment } from '@blog/service/shared/fragments/layout';
-import { portableTextMarkDefFragment } from '@blog/service/shared/fragments/portable-text-mark-def';
-import { socialProfileFragment } from '@blog/service/shared/fragments/social-profile';
 import { z } from 'zod';
 
 export const heroProfileModuleQuery = q
@@ -24,32 +23,7 @@ export const heroProfileModuleQuery = q
     showSocialLinks: sub.raw('coalesce(showSocialLinks, true)', z.boolean()),
     showRole: sub.raw('coalesce(showRole, true)', z.boolean()),
     showBio: sub.raw('coalesce(showBio, true)', z.boolean()),
-    author: sub
-      .field('author')
-      .deref()
-      .project((authorSub) => ({
-        name: authorSub.field('name').notNull(),
-        image: authorSub
-          .field('image')
-          .project(sanityImageFragment)
-          .nullable(true),
-        role: authorSub.field('role').nullable(true),
-        bio: authorSub
-          .field('bio[]')
-          .project((blockSub) => ({
-            '...': true,
-            markDefs: blockSub
-              .field('markDefs[]')
-              .project(portableTextMarkDefFragment)
-              .nullable(true),
-          }))
-          .nullable(true),
-        socialLinks: authorSub
-          .field('socialLinks[]')
-          .project(socialProfileFragment)
-          .nullable(true),
-      }))
-      .notNull(),
+    author: sub.field('author').deref().project(authorDetailFragment).notNull(),
     ctaButtons: sub
       .field('ctaButtons[]')
       .project(ctaButtonFragment)
