@@ -11,7 +11,7 @@ export {
 } from './html';
 export {
   serializePortableText,
-  type TPortableTextBlock,
+  type TEmailBlock,
   type TPortableTextContent,
   type TPortableTextMarkDef,
   type TPortableTextNode,

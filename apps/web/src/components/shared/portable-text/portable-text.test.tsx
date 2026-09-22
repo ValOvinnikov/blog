@@ -1,4 +1,4 @@
-import { ASIDE_KIND, type TPortableText } from '@blog/config';
+import { ASIDE_KIND, type TPortableTextBlock } from '@blog/config';
 import type { TPortableTextBody } from '@blog/service';
 import {
   customRender,
@@ -60,7 +60,7 @@ describe(`<${PortableText.name}/>`, () => {
     it(`renders an h${level}-style block as a level ${level} heading`, () => {
       const value: TPortableTextBody = [
         portableTextBlock(`Heading ${level}`, {
-          style: `h${level}` as TPortableText['style'],
+          style: `h${level}` as TPortableTextBlock['style'],
         }),
       ];
 

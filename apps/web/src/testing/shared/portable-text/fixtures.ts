@@ -1,8 +1,8 @@
-import { IMAGE_LAYOUT, type TPortableText } from '@blog/config';
+import { IMAGE_LAYOUT, type TPortableTextBlock } from '@blog/config';
 import type { TPortableTextBody } from '@blog/service';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 
-export type TPortableTextSpan = TPortableText['children'][number];
+export type TPortableTextSpan = TPortableTextBlock['children'][number];
 
 let keySeq = 0;
 const nextKey = (prefix: string) => `${prefix}-${keySeq++}`;
@@ -18,18 +18,18 @@ export const portableTextSpan = (
 });
 
 export type TPortableTextBlockOptions = {
-  style?: TPortableText['style'];
+  style?: TPortableTextBlock['style'];
   marks?: string[];
-  markDefs?: TPortableText['markDefs'];
-  listItem?: TPortableText['listItem'];
-  level?: TPortableText['level'];
+  markDefs?: TPortableTextBlock['markDefs'];
+  listItem?: TPortableTextBlock['listItem'];
+  level?: TPortableTextBlock['level'];
   key?: string;
 };
 
 export const portableTextBlock = (
   text: string | TPortableTextSpan[],
   options: TPortableTextBlockOptions = {},
-): TPortableText => ({
+): TPortableTextBlock => ({
   _type: 'block',
   _key: options.key ?? nextKey('block'),
   style: options.style ?? 'normal',

@@ -2,7 +2,7 @@ import {
   CTA_VARIANT,
   type TContentAlignment,
   type TMaybeUndefined,
-  type TPortableText,
+  type TPortableTextBlock,
 } from '@blog/config';
 import { toCtaButtons } from '@blog/service/shared/transformers/to-cta-buttons';
 import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
@@ -18,7 +18,7 @@ export type TRawCtaModule = InferResultType<typeof ctaModuleQuery>;
 
 function toContent(
   raw: TRawCtaModule['content'],
-): TMaybeUndefined<TPortableText[]> {
+): TMaybeUndefined<TPortableTextBlock[]> {
   if (!raw || raw.length === 0) return undefined;
   return raw.map(toPortableText);
 }

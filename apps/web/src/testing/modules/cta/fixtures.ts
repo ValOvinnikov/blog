@@ -1,7 +1,7 @@
 import {
   CTA_ACTION_APPEARANCE,
   CTA_ACTION_VARIANT,
-  type TPortableText,
+  type TPortableTextBlock,
 } from '@blog/config';
 import type { TCtaButton } from '@blog/service';
 import {
@@ -34,7 +34,7 @@ export const ctaActionsDemo: TCtaButton[] = [
   },
 ];
 
-export const ctaContentDemo: TPortableText[] = [
+export const ctaContentDemo: TPortableTextBlock[] = [
   portableTextBlock([
     portableTextSpan('Cancel anytime — no credit card required to start your '),
     portableTextSpan('14-day trial', ['strong']),

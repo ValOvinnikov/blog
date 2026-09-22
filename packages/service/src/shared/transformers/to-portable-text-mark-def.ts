@@ -1,4 +1,4 @@
-import type { IPortableTextLinkMark, TPortableText } from '@blog/config';
+import type { IPortableTextLinkMark, TPortableTextBlock } from '@blog/config';
 import type { portableTextMarkDefFragment } from '@blog/service/shared/fragments/portable-text-mark-def';
 import { toLinkDocument } from '@blog/service/shared/transformers/to-link-document';
 import type { InferFragmentType } from 'groqd';
@@ -33,7 +33,7 @@ export function toPortableText<
     children?: TRawPortableTextSpan[] | null;
     markDefs?: TRawPortableTextMarkDef[] | null;
   },
->(raw: TBlock): TPortableText {
+>(raw: TBlock): TPortableTextBlock {
   return {
     ...raw,
     _type: 'block',

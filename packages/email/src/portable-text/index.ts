@@ -1,6 +1,6 @@
 export { serializePortableText } from './serialize-portable-text';
 export type {
-  TPortableTextBlock,
+  TEmailBlock,
   TPortableTextContent,
   TPortableTextMarkDef,
   TPortableTextNode,

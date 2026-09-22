@@ -120,8 +120,10 @@ export function makeRawHeroProfileModule(
     showRole: true,
     showBio: true,
     author: {
+      _id: 'author-1',
       name: 'Jamie Rivera',
       image: null,
+      profilePage: null,
       role: null,
       bio: null,
       socialLinks: null,

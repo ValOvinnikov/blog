@@ -2,7 +2,7 @@ import type {
   IBodyImageBlock,
   RichText,
   TMaybeUndefined,
-  TPortableText,
+  TPortableTextBlock,
 } from '@blog/config';
 import type { portableTextBodyItemFragment } from '@blog/service/shared/fragments/portable-text-body';
 import { toPortableText } from '@blog/service/shared/transformers/to-portable-text-mark-def';
@@ -20,11 +20,11 @@ type TRawBodyImageBlock = Extract<
 type TRawAsideBlock = Extract<TRawPortableTextBody[number], { _type: 'aside' }>;
 
 type TResolvedAsideBlock = Omit<TRawAsideBlock, 'body'> & {
-  body: TMaybeUndefined<TPortableText[]>;
+  body: TMaybeUndefined<TPortableTextBlock[]>;
 };
 
 export type TPortableTextBody = Array<
-  | TPortableText
+  | TPortableTextBlock
   | IBodyImageBlock
   | Extract<RichText[number], { _type: 'code' }>
   | TResolvedAsideBlock

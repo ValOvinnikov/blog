@@ -1,4 +1,4 @@
-import type { TPortableText, TVoicePortableText } from '@blog/config';
+import type { TPortableTextBlock, TVoicePortableText } from '@blog/config';
 
 /**
  * Adapts a Voice rich-text value for `PortableText` by wrapping each `link`
@@ -6,7 +6,7 @@ import type { TPortableText, TVoicePortableText } from '@blog/config';
  */
 export const voicePortableTextToInlineText = (
   value: TVoicePortableText,
-): TPortableText[] =>
+): TPortableTextBlock[] =>
   value.map((block) => ({
     ...block,
     markDefs: block.markDefs?.map(({ href, _key }) => ({

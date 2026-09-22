@@ -1,4 +1,4 @@
-import type { TPortableText } from '@blog/config';
+import type { TPortableTextBlock } from '@blog/config';
 import type { TPortableTextBody } from '@blog/service';
 
 /** A post needs at least this many H2 headings before a table-of-contents rail earns its place. */
@@ -14,10 +14,10 @@ export type TPostHeading = {
 
 const isHeadingBlock = (
   node: TPortableTextBody[number],
-): node is TPortableText & { style: 'h2' | 'h3' } =>
+): node is TPortableTextBlock & { style: 'h2' | 'h3' } =>
   node._type === 'block' && (node.style === 'h2' || node.style === 'h3');
 
-const blockText = (block: TPortableText): string =>
+const blockText = (block: TPortableTextBlock): string =>
   (block.children ?? [])
     .map((child) => child.text ?? '')
     .join('')

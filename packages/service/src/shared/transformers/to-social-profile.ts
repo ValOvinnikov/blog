@@ -1,4 +1,4 @@
-import type { ILink, TSocialPlatform } from '@blog/config';
+import type { ILink, TMaybeUndefined, TSocialPlatform } from '@blog/config';
 import type { socialProfileFragment } from '@blog/service/shared/fragments/social-profile';
 import { toLinkDocument } from '@blog/service/shared/transformers/to-link-document';
 import type { InferFragmentType } from 'groqd';
@@ -12,7 +12,7 @@ export type TSocialProfile = {
 
 export function toSocialProfile(
   raw: TRawSocialProfile,
-): TSocialProfile | undefined {
+): TMaybeUndefined<TSocialProfile> {
   const link = toLinkDocument(raw.link);
   if (!link) return undefined;
 
