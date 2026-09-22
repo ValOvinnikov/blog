@@ -31,6 +31,8 @@ function toPortableTextMarkDef(
 
 export function toPortableText<
   TBlock extends {
+    _type: 'block';
+    _key: string;
     children?: TRawPortableTextSpan[] | null;
     markDefs?: TRawPortableTextMarkDef[] | null;
   },
