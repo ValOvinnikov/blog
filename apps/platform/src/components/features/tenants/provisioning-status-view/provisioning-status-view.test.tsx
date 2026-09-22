@@ -140,17 +140,12 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    const heading = screen.getByRole('heading', {
-      level: 1,
-      name: 'Provisioning',
-    });
     expect(
-      within(heading.parentElement as HTMLElement).queryByText('Running…'),
+      within(screen.getByTestId('page-header')).queryByText('Running…'),
     ).not.toBeInTheDocument();
-
-    const runHeading = screen.getByRole('heading', { level: 2, name: 'Run' });
-    const runHeader = runHeading.parentElement?.parentElement as HTMLElement;
-    expect(within(runHeader).getByText('Running…')).toBeVisible();
+    expect(
+      within(screen.getByTestId('run-status-live')).getByText('Running…'),
+    ).toBeVisible();
   });
 
   it('shows the invited-pending owner badge when the tenant has no resolved owner email', () => {
@@ -634,24 +629,14 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    const runHeading = screen.getByRole('heading', { level: 2, name: 'Run' });
-    const runHeader = runHeading.parentElement?.parentElement as HTMLElement;
-    const liveRegionBefore = within(runHeader)
-      .getByText('Not started')
-      .closest('[aria-live="polite"]');
-    expect(liveRegionBefore).not.toBeNull();
+    const liveRegion = screen.getByTestId('run-status-live');
+    expect(within(liveRegion).getByText('Not started')).toBeVisible();
 
     await user.click(
       screen.getByRole('button', { name: 'Start provisioning' }),
     );
 
-    // The live region present before the click is the same node now showing
-    // the transition — never one mounted at the same moment as this text,
-    // which some screen readers fail to announce.
-    const liveRegionAfter = within(runHeader)
-      .getByText('Running…')
-      .closest('[aria-live="polite"]');
-    expect(liveRegionAfter).toBe(liveRegionBefore);
+    expect(within(liveRegion).getByText('Running…')).toBeVisible();
 
     await act(async () => {
       resolveDispatch?.({ outcome: 'dispatched' });
@@ -902,23 +887,16 @@ describe(ProvisioningStatusView, () => {
         />,
       );
 
-      const sidebar = screen.getByRole('complementary');
-      const liveRegionBefore = within(sidebar)
-        .getByText('Running…')
-        .closest('[aria-live="polite"]');
-      expect(liveRegionBefore).not.toBeNull();
+      const liveRegion = screen.getByTestId(
+        `step-status-live-${TENANT_PROVISIONING_STEP.SANITY_PROJECT}`,
+      );
+      expect(within(liveRegion).getByText('Running…')).toBeVisible();
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
       });
 
-      // The new status text is announced by the same live region — not a
-      // freshly mounted one, which some screen readers announce on mount
-      // regardless of content, defeating the point of a targeted update.
-      const liveRegionAfter = within(sidebar)
-        .getByText('Complete')
-        .closest('[aria-live="polite"]');
-      expect(liveRegionAfter).toBe(liveRegionBefore);
+      expect(within(liveRegion).getByText('Complete')).toBeVisible();
     });
 
     it('stops polling once the tenant reaches a terminal status', async () => {
@@ -1357,10 +1335,9 @@ describe(ProvisioningStatusView, () => {
         />,
       );
 
-      const details = screen
-        .getByRole('complementary')
-        .querySelector('details');
-      expect(details).toHaveAttribute('open');
+      expect(
+        within(screen.getByRole('complementary')).getByTestId('disclosure'),
+      ).toHaveAttribute('open');
     });
 
     it('is collapsed by default once every step is already done on mount', () => {
@@ -1384,10 +1361,9 @@ describe(ProvisioningStatusView, () => {
         />,
       );
 
-      const details = screen
-        .getByRole('complementary')
-        .querySelector('details');
-      expect(details).not.toHaveAttribute('open');
+      expect(
+        within(screen.getByRole('complementary')).getByTestId('disclosure'),
+      ).not.toHaveAttribute('open');
     });
 
     it('auto-collapses once the run completes, and a later re-render does not undo a user-initiated reopen', async () => {
@@ -1421,27 +1397,23 @@ describe(ProvisioningStatusView, () => {
       );
 
       const sidebar = screen.getByRole('complementary');
-      const details = sidebar.querySelector('details') as HTMLDetailsElement;
-      expect(details).toHaveAttribute('open');
+      const disclosure = within(sidebar).getByTestId('disclosure');
+      expect(disclosure).toHaveAttribute('open');
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
       });
 
-      expect(details).not.toHaveAttribute('open');
+      expect(disclosure).not.toHaveAttribute('open');
 
       fireEvent.click(within(sidebar).getByText('Steps'));
-      expect(details).toHaveAttribute('open');
+      expect(disclosure).toHaveAttribute('open');
 
-      // Polling itself has already stopped (the run is terminal), but
-      // `useRelativeTimeTick` keeps forcing a periodic re-render regardless
-      // — an uncontrolled `Disclosure` writing `open` from `isDefaultOpen`
-      // on every render would slam this back shut here.
       await act(async () => {
         await vi.advanceTimersByTimeAsync(60_000);
       });
 
-      expect(details).toHaveAttribute('open');
+      expect(disclosure).toHaveAttribute('open');
     });
   });
 
@@ -1488,14 +1460,17 @@ describe(ProvisioningStatusView, () => {
           },
         },
       });
-      const { container } = render(
+      render(
         <ProvisioningStatusView
           tenant={tenant}
           ownerEmail="owner@example.com"
         />,
       );
 
-      const liveRegions = container.querySelectorAll('[aria-live="polite"]');
+      const liveRegions = [
+        ...screen.getAllByTestId(/^step-status-live-/),
+        screen.getByTestId('run-status-live'),
+      ];
       expect(liveRegions.length).toBeGreaterThan(0);
       for (const region of liveRegions) {
         expect(region).not.toHaveTextContent('6m ago');

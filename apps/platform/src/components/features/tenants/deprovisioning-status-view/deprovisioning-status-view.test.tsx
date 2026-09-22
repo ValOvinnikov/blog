@@ -178,9 +178,10 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
     const tenant = makeTenant({ deprovisioningSteps: null });
     render(<Wrapper tenant={tenant} />);
 
-    const runHeading = screen.getByRole('heading', { level: 2, name: 'Run' });
-    const runHeader = runHeading.parentElement?.parentElement as HTMLElement;
-    expect(runHeader).toHaveTextContent('Starting…');
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Run' }),
+    ).toBeVisible();
+    expect(screen.getByText('Starting…')).toBeVisible();
   });
 
   describe('a failed step', () => {
@@ -247,9 +248,9 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
           run: { startedAt: '2026-08-12T14:18:00.000Z' },
         },
       });
-      const { container } = render(<Wrapper tenant={tenant} />);
+      render(<Wrapper tenant={tenant} />);
 
-      expect(container.querySelector('details')).toHaveAttribute('open');
+      expect(screen.getByTestId('disclosure')).toHaveAttribute('open');
     });
 
     it('is collapsed by default once every step is already done on mount', () => {
@@ -262,9 +263,9 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
           },
         },
       });
-      const { container } = render(<Wrapper tenant={tenant} />);
+      render(<Wrapper tenant={tenant} />);
 
-      expect(container.querySelector('details')).not.toHaveAttribute('open');
+      expect(screen.getByTestId('disclosure')).not.toHaveAttribute('open');
     });
 
     it('auto-collapses once the run completes, and a later re-render does not undo a user-initiated reopen', async () => {
@@ -287,29 +288,24 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
         deprovisionedAt: new Date('2026-08-12T14:20:00.000Z'),
       });
       const user = userEvent.setup();
-      const { container } = render(<Wrapper tenant={tenant} />);
+      render(<Wrapper tenant={tenant} />);
 
-      const details = container.querySelector('details') as HTMLDetailsElement;
-      expect(details).toHaveAttribute('open');
+      expect(screen.getByTestId('disclosure')).toHaveAttribute('open');
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
       });
 
-      expect(details).not.toHaveAttribute('open');
+      expect(screen.getByTestId('disclosure')).not.toHaveAttribute('open');
 
       await user.click(screen.getByText('Deprovisioning progress'));
-      expect(details).toHaveAttribute('open');
+      expect(screen.getByTestId('disclosure')).toHaveAttribute('open');
 
-      // Polling has already stopped (the run is terminal), but
-      // `useRelativeTimeTick` keeps forcing a periodic re-render regardless
-      // — an uncontrolled `Disclosure` writing `open` from `isDefaultOpen`
-      // on every render would slam this back shut here.
       await act(async () => {
         await vi.advanceTimersByTimeAsync(60_000);
       });
 
-      expect(details).toHaveAttribute('open');
+      expect(screen.getByTestId('disclosure')).toHaveAttribute('open');
     });
   });
 });

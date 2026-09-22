@@ -36,7 +36,7 @@ export const PreviewSample = ({
     previewSampleVariants({ isDark });
 
   return (
-    <div style={tokenStyle}>
+    <div style={tokenStyle} data-testid="preview-sample-tokens">
       <Panel className={surface()} dataTestId="preview-sample-panel">
         <Panel.Body>
           <div className={brandRow()}>

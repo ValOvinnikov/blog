@@ -28,7 +28,7 @@ export const PageHeader = ({
   } = pageHeaderVariants();
 
   return (
-    <div className={root({ class: className })}>
+    <div className={root({ class: className })} data-testid="page-header">
       <div className={titleGroup()}>
         <div className={titleRow()}>
           <Heading level={1} size="pageTitle">

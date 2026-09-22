@@ -26,11 +26,7 @@ describe(LookPreview, () => {
   it('applies the accent hue as a live CSS custom property on the preview surface', () => {
     render(<LookPreview {...BASE_PROPS} accentHue={28} />);
 
-    const button = screen.getByRole('button', { name: 'Subscribe' });
-    const previewSurface = button.closest('[style*="--brand-primary"]');
-
-    expect(previewSurface).not.toBeNull();
-    expect(previewSurface).toHaveStyle({
+    expect(screen.getByTestId('preview-sample-tokens')).toHaveStyle({
       '--brand-primary-solid': 'oklch(0.55 0.17 28)',
     });
   });
@@ -48,10 +44,7 @@ describe(LookPreview, () => {
 
     await user.click(screen.getByRole('button', { name: 'Dark' }));
 
-    const button = screen.getByRole('button', { name: 'Subscribe' });
-    const previewSurface = button.closest('[style*="--brand-primary"]');
-
-    expect(previewSurface).toHaveStyle({
+    expect(screen.getByTestId('preview-sample-tokens')).toHaveStyle({
       '--brand-primary-solid': 'oklch(0.7 0.16 28)',
     });
   });

@@ -1,25 +1,4 @@
 {
-  "src/components/features/look/look-preview/look-preview.test.tsx": {
-    "testing-library/no-node-access": {
-      "count": 4
-    }
-  },
-  "src/components/features/tenants/deprovisioning-status-view/deprovisioning-status-view.test.tsx": {
-    "testing-library/no-container": {
-      "count": 3
-    },
-    "testing-library/no-node-access": {
-      "count": 6
-    }
-  },
-  "src/components/features/tenants/provisioning-status-view/provisioning-status-view.test.tsx": {
-    "testing-library/no-container": {
-      "count": 1
-    },
-    "testing-library/no-node-access": {
-      "count": 21
-    }
-  },
   "src/components/features/tenants/recent-activity-card/recent-activity-card.test.tsx": {
     "testing-library/no-container": {
       "count": 1
