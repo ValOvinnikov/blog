@@ -1114,7 +1114,6 @@ export type Module_heroBlog = {
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
   postSource?: 'PINNED' | 'NEWEST_FEATURED';
   post?: Page_postReference;
-  imageSource?: 'POST' | 'CUSTOM' | 'NONE';
   image?: ImageWithAlt;
   eyebrow?: string;
   primaryActionLabel?: string;
