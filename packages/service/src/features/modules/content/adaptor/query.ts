@@ -1,6 +1,6 @@
 import { q } from '@blog/service/sanity/query';
 import { layoutFragment } from '@blog/service/shared/fragments/layout';
-import { portableTextBodyItemFragment } from '@blog/service/shared/fragments/portable-text-body';
+import { portableTextBodyItemFragment } from '@blog/service/shared/fragments/portable-text-body-item';
 
 export const contentModuleQuery = q
   .parameters<{ id: string }>()

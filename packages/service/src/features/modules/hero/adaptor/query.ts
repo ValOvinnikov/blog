@@ -1,7 +1,7 @@
 import { q } from '@blog/service/sanity/query';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image';
+import { inlineLinkFragment } from '@blog/service/shared/fragments/inline-link';
 import { heroLayoutFragment } from '@blog/service/shared/fragments/layout';
-import { linkFragment } from '@blog/service/shared/fragments/link';
 import { postCardFragment } from '@blog/service/shared/fragments/post';
 
 export const heroModuleQuery = q
@@ -30,7 +30,7 @@ export const heroModuleQuery = q
     primaryActionLabel: sub.field('primaryActionLabel').nullable(true),
     secondaryAction: sub
       .field('secondaryAction')
-      .project(linkFragment)
+      .project(inlineLinkFragment)
       .nullable(true),
     layout: sub.field('layout').project(heroLayoutFragment).nullable(true),
   }))

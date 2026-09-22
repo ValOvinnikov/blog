@@ -4,7 +4,7 @@ import type {
   TMaybeUndefined,
   TPortableTextBlock,
 } from '@blog/config';
-import type { portableTextBodyItemFragment } from '@blog/service/shared/fragments/portable-text-body';
+import type { portableTextBodyItemFragment } from '@blog/service/shared/fragments/portable-text-body-item';
 import { toPortableText } from '@blog/service/shared/transformers/to-portable-text-mark-def';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
 import type { InferFragmentType } from 'groqd';
