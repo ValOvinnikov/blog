@@ -44,6 +44,8 @@ describe(toHeroProfileModule, () => {
         showRole: true,
         eyebrow: 'Field notes',
         author: {
+          _id: 'author-1',
+          profilePage: null,
           name: 'Jamie Rivera',
           image: null,
           role: 'Staff Engineer',
@@ -62,6 +64,8 @@ describe(toHeroProfileModule, () => {
         showRole: false,
         eyebrow: 'Field notes',
         author: {
+          _id: 'author-1',
+          profilePage: null,
           name: 'Jamie Rivera',
           image: null,
           role: 'Staff Engineer',
@@ -88,6 +92,8 @@ describe(toHeroProfileModule, () => {
         showRole: true,
         eyebrow: null,
         author: {
+          _id: 'author-1',
+          profilePage: null,
           name: 'Jamie Rivera',
           image: null,
           role: null,
@@ -107,6 +113,8 @@ describe(toHeroProfileModule, () => {
       const raw = makeRawHeroProfileModule({
         showBio: true,
         author: {
+          _id: 'author-1',
+          profilePage: null,
           name: 'Jamie Rivera',
           image: null,
           role: null,
@@ -137,6 +145,8 @@ describe(toHeroProfileModule, () => {
       const raw = makeRawHeroProfileModule({
         showBio: false,
         author: {
+          _id: 'author-1',
+          profilePage: null,
           name: 'Jamie Rivera',
           image: null,
           role: null,
@@ -160,6 +170,8 @@ describe(toHeroProfileModule, () => {
       const raw = makeRawHeroProfileModule({
         showBio: true,
         author: {
+          _id: 'author-1',
+          profilePage: null,
           name: 'Jamie Rivera',
           image: null,
           role: null,
@@ -177,6 +189,8 @@ describe(toHeroProfileModule, () => {
   it("maps avatarName from the author's name, straight through", () => {
     const raw = makeRawHeroProfileModule({
       author: {
+        _id: 'author-1',
+        profilePage: null,
         name: 'Alex Chen',
         image: null,
         role: null,
@@ -195,6 +209,8 @@ describe(toHeroProfileModule, () => {
       const raw = makeRawHeroProfileModule({
         image: makeRawSanityImage('Custom alt'),
         author: {
+          _id: 'author-1',
+          profilePage: null,
           name: 'Jamie Rivera',
           image: makeRawSanityImage('Author photo'),
           role: null,
@@ -212,6 +228,8 @@ describe(toHeroProfileModule, () => {
       const raw = makeRawHeroProfileModule({
         image: null,
         author: {
+          _id: 'author-1',
+          profilePage: null,
           name: 'Jamie Rivera',
           image: makeRawSanityImage('Author photo'),
           role: null,
@@ -229,6 +247,8 @@ describe(toHeroProfileModule, () => {
       const raw = makeRawHeroProfileModule({
         image: null,
         author: {
+          _id: 'author-1',
+          profilePage: null,
           name: 'Jamie Rivera',
           image: null,
           role: null,
@@ -247,6 +267,8 @@ describe(toHeroProfileModule, () => {
         variant: HERO_VARIANT.BANNER,
         image: null,
         author: {
+          _id: 'author-1',
+          profilePage: null,
           name: 'Jamie Rivera',
           image: makeRawSanityImage('Author photo'),
           role: null,
@@ -265,6 +287,8 @@ describe(toHeroProfileModule, () => {
         variant: HERO_VARIANT.BANNER,
         image: makeRawSanityImage('Custom alt'),
         author: {
+          _id: 'author-1',
+          profilePage: null,
           name: 'Jamie Rivera',
           image: makeRawSanityImage('Author photo'),
           role: null,
@@ -284,6 +308,8 @@ describe(toHeroProfileModule, () => {
       const raw = makeRawHeroProfileModule({
         showSocialLinks: true,
         author: {
+          _id: 'author-1',
+          profilePage: null,
           name: 'Jamie Rivera',
           image: null,
           role: null,
@@ -320,6 +346,8 @@ describe(toHeroProfileModule, () => {
       const raw = makeRawHeroProfileModule({
         showSocialLinks: false,
         author: {
+          _id: 'author-1',
+          profilePage: null,
           name: 'Jamie Rivera',
           image: null,
           role: null,
@@ -342,6 +370,8 @@ describe(toHeroProfileModule, () => {
       const raw = makeRawHeroProfileModule({
         showSocialLinks: true,
         author: {
+          _id: 'author-1',
+          profilePage: null,
           name: 'Jamie Rivera',
           image: null,
           role: null,
@@ -359,6 +389,8 @@ describe(toHeroProfileModule, () => {
       const raw = makeRawHeroProfileModule({
         showSocialLinks: true,
         author: {
+          _id: 'author-1',
+          profilePage: null,
           name: 'Jamie Rivera',
           image: null,
           role: null,
