@@ -1,5 +1,6 @@
 import { service } from '@blog/service';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { logger } from '@web/utils/logger/logger';
 
 import { HeroStatementModuleView } from './hero-statement-module-view';
 
@@ -19,7 +20,13 @@ export const HeroStatementModule = async ({
     tenantContext,
   );
 
-  if (!result.ok) return null;
+  if (!result.ok) {
+    logger.error('hero_statement_module.fetch_failed', {
+      id,
+      error: result.error,
+    });
+    return null;
+  }
 
   return <HeroStatementModuleView id={id} {...result.data} />;
 };

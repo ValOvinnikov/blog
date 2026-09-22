@@ -31,7 +31,14 @@ export const PostRelatedModule = async ({
     tenantContext,
   );
 
-  if (!result.ok) return null;
+  if (!result.ok) {
+    logger.error('post_related_module.fetch_failed', {
+      id,
+      postId,
+      error: result.error,
+    });
+    return null;
+  }
 
   const {
     brandVariant,

@@ -17,7 +17,13 @@ export const HeroBlogModule = async ({ id, tenant }: IHeroBlogModuleProps) => {
     tenantContext,
   );
 
-  if (!result.ok) return null;
+  if (!result.ok) {
+    logger.error('hero_blog_module.fetch_failed', {
+      id,
+      error: result.error,
+    });
+    return null;
+  }
 
   const { data } = result;
 

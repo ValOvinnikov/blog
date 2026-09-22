@@ -1,5 +1,6 @@
 import { service } from '@blog/service';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { logger } from '@web/utils/logger/logger';
 
 import { FeatureListModuleView } from './feature-list-module-view';
 
@@ -19,7 +20,13 @@ export const FeatureListModule = async ({
     tenantContext,
   );
 
-  if (!result.ok) return null;
+  if (!result.ok) {
+    logger.error('feature_list_module.fetch_failed', {
+      id,
+      error: result.error,
+    });
+    return null;
+  }
   if (result.data.items.length === 0) return null;
 
   return (
