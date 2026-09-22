@@ -1,4 +1,5 @@
 import { featureBlockSchema } from '@blog/studio/schema-types/documents/blocks/feature/feature';
+import { logoBlockSchema } from '@blog/studio/schema-types/documents/blocks/logo/logo';
 import { blockTestimonialSchema } from '@blog/studio/schema-types/documents/blocks/testimonial/testimonial';
 import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
 import type { TStructureSection } from '@blog/studio/structure/build-section/build-section';
@@ -19,6 +20,10 @@ export const blocksSection: TStructureSection = {
     {
       title: 'Links',
       items: [{ schema: linkSchema }],
+    },
+    {
+      title: 'Logos',
+      items: [{ schema: logoBlockSchema }],
     },
   ],
 };

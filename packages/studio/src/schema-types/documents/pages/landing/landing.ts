@@ -11,6 +11,7 @@ import { featureListSchema } from '@blog/studio/schema-types/modules/feature-lis
 import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
 import { heroProfileSchema } from '@blog/studio/schema-types/modules/hero-profile/hero-profile';
 import { heroStatementSchema } from '@blog/studio/schema-types/modules/hero-statement/hero-statement';
+import { logoWallSchema } from '@blog/studio/schema-types/modules/logo-wall/logo-wall';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
@@ -72,6 +73,7 @@ export const landingPageSchema = defineType({
         newsletterSchema.name,
         taxonomyListSchema.name,
         featureListSchema.name,
+        logoWallSchema.name,
         testimonialSchema.name,
       ],
       validateCustom: (rule) =>
