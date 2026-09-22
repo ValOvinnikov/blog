@@ -4,7 +4,7 @@ import { PageShell } from './page-shell';
 
 describe(`<${PageShell.name}/>`, () => {
   it('renders Breadcrumbs content outside the main landmark, before it', () => {
-    const { container } = renderElement(
+    renderElement(
       <PageShell>
         <PageShell.Breadcrumbs>
           <div data-testid="crumbs">Crumbs</div>
@@ -15,9 +15,9 @@ describe(`<${PageShell.name}/>`, () => {
       </PageShell>,
     );
 
-    const order = Array.from(
-      container.querySelectorAll<HTMLElement>('[data-testid]'),
-    ).map((el) => el.getAttribute('data-testid'));
+    const order = screen
+      .getAllByTestId(/.+/)
+      .map((el) => el.getAttribute('data-testid'));
 
     expect(order).toEqual(['crumbs', 'content']);
     expect(screen.getByTestId('crumbs').closest('main')).toBeNull();
@@ -83,7 +83,7 @@ describe(`<${PageShell.name}/>`, () => {
   });
 
   it('renders unmatched children after Content, not dropped', () => {
-    const { container } = renderElement(
+    renderElement(
       <PageShell>
         <PageShell.Content>
           <p data-testid="content">Body</p>
@@ -92,9 +92,9 @@ describe(`<${PageShell.name}/>`, () => {
       </PageShell>,
     );
 
-    const order = Array.from(
-      container.querySelectorAll<HTMLElement>('[data-testid]'),
-    ).map((el) => el.getAttribute('data-testid'));
+    const order = screen
+      .getAllByTestId(/.+/)
+      .map((el) => el.getAttribute('data-testid'));
 
     expect(order).toEqual(['content', 'stray']);
   });

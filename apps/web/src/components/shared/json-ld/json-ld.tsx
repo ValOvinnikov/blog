@@ -35,6 +35,7 @@ export const JsonLd = ({ schema }: TJsonLdProps) => {
   return (
     <script
       type="application/ld+json"
+      data-testid="json-ld-script"
       dangerouslySetInnerHTML={{ __html: serialized }}
     />
   );

@@ -11,7 +11,13 @@ export type TPostShareLinksProps = {
 export const PostShareLinks = ({ url, title }: TPostShareLinksProps) => {
   const shareLinks = buildShareLinks({ url, title }).map((link) => ({
     ...link,
-    icon: <Icon name={SOCIAL_PLATFORM_ICON[link.platform]} size={SIZE.SM} />,
+    icon: (
+      <Icon
+        name={SOCIAL_PLATFORM_ICON[link.platform]}
+        size={SIZE.SM}
+        dataTestId={`share-icon-${link.platform}`}
+      />
+    ),
   }));
 
   return <PostShare url={url} title={title} links={shareLinks} />;

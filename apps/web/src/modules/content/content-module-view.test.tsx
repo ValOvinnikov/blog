@@ -1,5 +1,5 @@
 import { BRAND_VARIANT } from '@blog/config';
-import { customRender } from '@web/testing/custom-render';
+import { customRender, screen } from '@web/testing/custom-render';
 
 import { ContentModuleView } from './content-module-view';
 
@@ -12,9 +12,10 @@ const setup = customRender(ContentModuleView, {
 
 describe(`<${ContentModuleView.name}/>`, () => {
   it('renders the body content, with no accessible name on the section landmark', () => {
-    const { container } = setup();
+    setup();
 
-    const section = container.querySelector('section');
-    expect(section).not.toHaveAttribute('aria-labelledby');
+    expect(screen.getByTestId('content-module-content-1')).not.toHaveAttribute(
+      'aria-labelledby',
+    );
   });
 });

@@ -85,10 +85,10 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
   });
 
   it('renders the photo as a legible, prioritized background on Banner, with no accessible name since it is a decorative backdrop there', () => {
-    const { container } = setup({ variant: HERO_VARIANT.BANNER, sanityImage });
+    setup({ variant: HERO_VARIANT.BANNER, sanityImage });
 
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
-    const img = container.querySelector('img');
+    const img = screen.getByRole('presentation');
     expect(img).toHaveAttribute('alt', '');
     expect(img).toHaveAttribute('height', '675');
     expect(img).toHaveAttribute('fetchpriority', 'high');

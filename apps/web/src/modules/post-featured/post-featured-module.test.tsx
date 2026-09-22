@@ -100,7 +100,6 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
     const { container } = await setup();
 
     expect(container).toBeEmptyDOMElement();
-    expect(container.querySelector('section')).not.toBeInTheDocument();
   });
 
   it('renders the first post as a lead card and the rest in a tail grid', async () => {
@@ -120,13 +119,13 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
       },
     });
 
-    const { container } = await setup();
+    await setup();
 
     expect(screen.getByText('Lead post')).toBeInTheDocument();
     expect(screen.getByText('Second post')).toBeInTheDocument();
     expect(screen.getByText('Third post')).toBeInTheDocument();
-    const tailGrid = container.querySelector(
-      '[data-testid="post-featured-module-post-featured-1-tail-grid"]',
+    const tailGrid = screen.getByTestId(
+      'post-featured-module-post-featured-1-tail-grid',
     );
     expect(tailGrid).toBeInTheDocument();
     expect(tailGrid).not.toHaveTextContent('Lead post');

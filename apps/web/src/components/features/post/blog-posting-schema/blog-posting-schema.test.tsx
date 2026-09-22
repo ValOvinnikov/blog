@@ -1,4 +1,4 @@
-import { customRenderAsync } from '@web/testing/custom-render';
+import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockPostDetail } from '@web/testing/pages/blog-post-page/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
@@ -62,13 +62,11 @@ describe(`<${BlogPostingSchema.name}/>`, () => {
   it('renders the JSON-LD BlogPosting schema script', async () => {
     getPostPageMock.mockResolvedValue({ ok: true, data: mockPostDetail });
 
-    const { container } = await setup();
+    await setup();
 
-    const script = container.querySelector(
-      'script[type="application/ld+json"]',
-    );
-    expect(script).not.toBeNull();
-    expect(script?.textContent).toContain('"@type":"BlogPosting"');
+    const script = screen.getByTestId('json-ld-script');
+    expect(script).toHaveAttribute('type', 'application/ld+json');
+    expect(script.textContent).toContain('"@type":"BlogPosting"');
   });
 
   it('renders nothing when the tenant base URL fails to resolve', async () => {

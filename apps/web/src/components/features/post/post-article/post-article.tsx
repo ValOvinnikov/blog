@@ -87,6 +87,7 @@ export const PostArticle = async ({ slug, tenant }: TPostArticleProps) => {
     <Article>
       <Article.Header
         className={s.hero()}
+        dataTestId="post-article-header"
         title={title}
         topic={{
           label: topic.title,

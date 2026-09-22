@@ -49,7 +49,7 @@ describe(`<${DepthProvider.name}/>`, () => {
   });
 
   it('defaults to DEPTH.READ and stamps it as data-depth on the wrapper', async () => {
-    const { container } = renderElement(
+    renderElement(
       <DepthProvider hasSkim={true} hasDeep={true}>
         <ReadDepth />
       </DepthProvider>,
@@ -58,7 +58,7 @@ describe(`<${DepthProvider.name}/>`, () => {
     await waitFor(() =>
       expect(screen.getByTestId('depth')).toHaveTextContent(DEPTH.READ),
     );
-    expect(container.querySelector('[data-depth]')).toHaveAttribute(
+    expect(screen.getByTestId('depth-root')).toHaveAttribute(
       'data-depth',
       DEPTH.READ,
     );
@@ -67,7 +67,7 @@ describe(`<${DepthProvider.name}/>`, () => {
   it('restores a stored DEEP depth on mount when the post has asides', async () => {
     localStorage.setItem(DEPTH_STORAGE_KEY, DEPTH.DEEP);
 
-    const { container } = renderElement(
+    renderElement(
       <DepthProvider hasSkim={false} hasDeep={true}>
         <ReadDepth />
       </DepthProvider>,
@@ -76,7 +76,7 @@ describe(`<${DepthProvider.name}/>`, () => {
     await waitFor(() =>
       expect(screen.getByTestId('depth')).toHaveTextContent(DEPTH.DEEP),
     );
-    expect(container.querySelector('[data-depth]')).toHaveAttribute(
+    expect(screen.getByTestId('depth-root')).toHaveAttribute(
       'data-depth',
       DEPTH.DEEP,
     );
@@ -161,7 +161,7 @@ describe(`<${DepthProvider.name}/>`, () => {
   });
 
   it('never renders the bootstrap script on a plain client-side mount with no server-rendered markup to hydrate against — e.g. an App Router client-side navigation into this route segment for the first time in the tab. React never executes a client-rendered <script> tag anyway, so this is a pure no-op mount that used to render — and get console-warned about — for nothing', async () => {
-    const { container } = renderElement(
+    renderElement(
       <DepthProvider hasSkim={true} hasDeep={true}>
         <ReadDepth />
       </DepthProvider>,
@@ -171,11 +171,13 @@ describe(`<${DepthProvider.name}/>`, () => {
       expect(screen.getByTestId('depth')).toHaveTextContent(DEPTH.READ),
     );
 
-    expect(container.querySelector('script')).toBeNull();
+    expect(
+      screen.queryByTestId('depth-bootstrap-script'),
+    ).not.toBeInTheDocument();
   });
 
   it('omits the bootstrap script on a client-side re-render of the same instance — it must never re-render on navigation, since React never executes a script tag it renders client-side (only a console warning would result)', async () => {
-    const { container, rerender } = renderHydrated(
+    const { rerender } = renderHydrated(
       <DepthProvider hasSkim={false} hasDeep={true}>
         <ReadDepth />
       </DepthProvider>,
@@ -184,7 +186,9 @@ describe(`<${DepthProvider.name}/>`, () => {
     await waitFor(() =>
       expect(screen.getByTestId('depth')).toHaveTextContent(DEPTH.READ),
     );
-    expect(container.querySelector('script')).toBeNull();
+    expect(
+      screen.queryByTestId('depth-bootstrap-script'),
+    ).not.toBeInTheDocument();
 
     rerender(
       <DepthProvider hasSkim={true} hasDeep={false}>
@@ -192,12 +196,14 @@ describe(`<${DepthProvider.name}/>`, () => {
       </DepthProvider>,
     );
 
-    expect(container.querySelector('script')).toBeNull();
+    expect(
+      screen.queryByTestId('depth-bootstrap-script'),
+    ).not.toBeInTheDocument();
   });
 
   it('setDepth persists the choice to localStorage and updates data-depth', async () => {
     const user = userEvent.setup();
-    const { container } = renderElement(
+    renderElement(
       <DepthProvider hasSkim={false} hasDeep={true}>
         <ReadDepth />
       </DepthProvider>,
@@ -207,7 +213,7 @@ describe(`<${DepthProvider.name}/>`, () => {
 
     expect(localStorage.getItem(DEPTH_STORAGE_KEY)).toBe(DEPTH.DEEP);
     await waitFor(() =>
-      expect(container.querySelector('[data-depth]')).toHaveAttribute(
+      expect(screen.getByTestId('depth-root')).toHaveAttribute(
         'data-depth',
         DEPTH.DEEP,
       ),

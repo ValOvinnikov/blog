@@ -13,9 +13,19 @@ import { VoiceRichProvider } from '@web/context/voice-rich-provider';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
-import type { ReactNode } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 
 import LocaleLayout, { generateMetadata, generateStaticParams } from './layout';
+
+type TAnyElement = ReactElement<Record<string, unknown>>;
+
+const childrenOf = (node: TAnyElement): TAnyElement[] => {
+  const props = node.props as { children?: TAnyElement | TAnyElement[] };
+  return [props.children ?? []].flat();
+};
+
+const firstChildOf = (node: TAnyElement): TAnyElement =>
+  childrenOf(node)[0] as TAnyElement;
 
 const {
   getSiteSettingsMock,
@@ -287,8 +297,8 @@ describe('LocaleLayout', () => {
       }),
     });
 
-    const [sanityImageBaseUrlProvider] = html.props.children;
-    const provider = sanityImageBaseUrlProvider.props.children;
+    const sanityImageBaseUrlProvider = firstChildOf(html);
+    const provider = firstChildOf(sanityImageBaseUrlProvider);
 
     expect(setRequestLocaleMock).toHaveBeenCalledWith(LOCALE_ISO_CODES.EN);
     expect(provider.props.locale).toBe(LOCALE_ISO_CODES.EN);
@@ -310,8 +320,8 @@ describe('LocaleLayout', () => {
       realMessages,
       'tenant-1',
     );
-    const [sanityImageBaseUrlProvider] = html.props.children;
-    const provider = sanityImageBaseUrlProvider.props.children;
+    const sanityImageBaseUrlProvider = firstChildOf(html);
+    const provider = firstChildOf(sanityImageBaseUrlProvider);
     expect(provider.props.messages).toBe(realMessages);
   });
 
@@ -330,11 +340,11 @@ describe('LocaleLayout', () => {
       }),
     });
 
-    const [sanityImageBaseUrlProvider] = html.props.children;
-    const provider = sanityImageBaseUrlProvider.props.children;
-    const sessionProvider = provider.props.children;
-    const toastProvider = sessionProvider.props.children;
-    const voiceRichProvider = toastProvider.props.children;
+    const sanityImageBaseUrlProvider = firstChildOf(html);
+    const provider = firstChildOf(sanityImageBaseUrlProvider);
+    const sessionProvider = firstChildOf(provider);
+    const toastProvider = firstChildOf(sessionProvider);
+    const voiceRichProvider = firstChildOf(toastProvider);
 
     expect(voiceRichProvider.type).toBe(VoiceRichProvider);
     expect(voiceRichProvider.props.values).toBe(rich);
@@ -362,7 +372,7 @@ describe('LocaleLayout', () => {
       }),
     });
 
-    const children = [html.props.children].flat();
+    const children = childrenOf(html);
 
     expect(
       children.some((child: React.ReactElement) => child?.type === Analytics),
@@ -386,7 +396,7 @@ describe('LocaleLayout', () => {
       }),
     });
 
-    const children = [html.props.children].flat();
+    const children = childrenOf(html);
 
     expect(
       children.some((child: React.ReactElement) => child?.type === Analytics),
@@ -410,7 +420,7 @@ describe('LocaleLayout', () => {
       }),
     });
 
-    const children = [html.props.children].flat();
+    const children = childrenOf(html);
 
     expect(
       children.some((child: React.ReactElement) => child?.type === Analytics),

@@ -39,7 +39,7 @@ const setup = customRender(Wrapper, {
 const getTriggerImage = () => {
   const trigger = screen.getByRole('button', { name: 'Account menu' });
 
-  return trigger.querySelector('img');
+  return within(trigger).queryByRole('presentation');
 };
 
 describe(`<${AccountMenu.name}/>`, () => {
@@ -52,7 +52,7 @@ describe(`<${AccountMenu.name}/>`, () => {
     fireEvent.error(image!);
 
     const trigger = screen.getByRole('button', { name: 'Account menu' });
-    expect(trigger.querySelector('img')).not.toBeInTheDocument();
+    expect(within(trigger).queryByRole('presentation')).not.toBeInTheDocument();
     expect(within(trigger).getByText('JD')).toBeVisible();
   });
 
@@ -66,7 +66,7 @@ describe(`<${AccountMenu.name}/>`, () => {
     await user.click(trigger);
     const panel = screen.getByRole('menu');
 
-    expect(panel.querySelector('img')).not.toBeInTheDocument();
+    expect(within(panel).queryByRole('presentation')).not.toBeInTheDocument();
     expect(within(panel).getAllByText('JD').length).toBeGreaterThan(0);
   });
 

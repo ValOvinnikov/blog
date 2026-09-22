@@ -1,10 +1,5 @@
 import userEvent from '@testing-library/user-event';
-import {
-  customRender,
-  fireEvent,
-  screen,
-  within,
-} from '@web/testing/custom-render';
+import { customRender, fireEvent, screen } from '@web/testing/custom-render';
 import { mockPostHeadings } from '@web/testing/shared/post-contents-rail/fixtures';
 import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
@@ -120,10 +115,10 @@ describe(`<${PostContentsRail.name}/>`, () => {
 
     await user.tab();
 
-    expect(document.activeElement).not.toBe(lastLinkInPanel);
-    expect(document.activeElement).not.toBe(
+    expect(lastLinkInPanel).not.toHaveFocus();
+    expect(
       screen.getAllByRole('link', { name: mockPostHeadings.at(0)?.text }).at(0),
-    );
+    ).not.toHaveFocus();
   });
 
   it('closes the mobile disclosure on Escape', async () => {
@@ -154,18 +149,18 @@ describe(`<${PostContentsRail.name}/>`, () => {
     const user = userEvent.setup();
     setup();
     const trigger = getMobileTrigger();
-    const panelId = trigger.getAttribute('aria-controls') ?? '';
 
     await user.click(trigger);
-    const panel = document.getElementById(panelId)!;
-    const panelLink = within(panel).getByRole('link', {
-      name: mockPostHeadings.at(0)?.text,
-    });
+    const panelLink = screen
+      .getAllByRole('link', { name: mockPostHeadings.at(0)?.text })
+      .at(-1)!;
     await user.click(panelLink);
 
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    expect(panel).toHaveAttribute('hidden');
     expect(screen.getAllByRole('link')).toHaveLength(mockPostHeadings.length);
+    expect(
+      screen.getAllByRole('list', { hidden: true }).at(-1),
+    ).not.toBeVisible();
   });
 
   it('marks the active heading link with aria-current="location", and no other', () => {

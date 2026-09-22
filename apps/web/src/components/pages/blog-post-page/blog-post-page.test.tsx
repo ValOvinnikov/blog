@@ -91,15 +91,16 @@ describe(`<${BlogPostPage.name}/>`, () => {
   it('renders the parts in order: schema, breadcrumbs, article, skim panel, modules', async () => {
     getPostPageMock.mockResolvedValue({ ok: true, data: mockPostDetail });
 
-    const { container } = await setup();
+    await setup();
 
-    const order = Array.from(
-      container.querySelectorAll<HTMLElement>('[data-testid]'),
-    ).map((el) => el.getAttribute('data-testid'));
+    const order = screen
+      .getAllByTestId(/.+/)
+      .map((el) => el.getAttribute('data-testid'));
 
     expect(order).toEqual([
       'blog-posting-schema',
       'post-breadcrumbs',
+      'depth-root',
       'post-article',
       'skim-panel',
       'module-renderer',

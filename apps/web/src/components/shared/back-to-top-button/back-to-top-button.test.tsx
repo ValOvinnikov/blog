@@ -165,9 +165,7 @@ describe(`<${BackToTopButton.name}/>`, () => {
 
     setup();
 
-    const siteFooter = document.querySelector(
-      'footer[data-testid="site-footer"]',
-    );
+    const siteFooter = screen.getByTestId('site-footer');
 
     expect(getObserver().observed).toEqual([siteFooter]);
   });

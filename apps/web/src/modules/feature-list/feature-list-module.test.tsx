@@ -95,7 +95,6 @@ describe(`<${FeatureListModule.name}/>`, () => {
     const { container } = await setup();
 
     expect(container).toBeEmptyDOMElement();
-    expect(container.querySelector('section')).not.toBeInTheDocument();
   });
 
   it('renders the resolved feature cards', async () => {

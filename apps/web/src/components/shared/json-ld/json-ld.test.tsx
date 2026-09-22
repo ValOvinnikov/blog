@@ -1,4 +1,4 @@
-import { customRender } from '@web/testing/custom-render';
+import { customRender, screen } from '@web/testing/custom-render';
 
 import { JsonLd } from './json-ld';
 
@@ -12,29 +12,29 @@ describe(`<${JsonLd.name}/>`, () => {
       headline: 'Hello world',
     };
 
-    const { container } = setup({ schema });
+    setup({ schema });
 
-    const script = container.querySelector('script');
+    const script = screen.getByTestId('json-ld-script');
     expect(script).toHaveAttribute('type', 'application/ld+json');
-    expect(script?.innerHTML).toBe(JSON.stringify(schema));
+    expect(script.innerHTML).toBe(JSON.stringify(schema));
   });
 
   it('escapes </script> sequences in string fields to prevent premature tag closure', () => {
     const schema = { description: '</script><script>alert(1)</script>' };
 
-    const { container } = setup({ schema });
+    setup({ schema });
 
-    const script = container.querySelector('script');
-    expect(script?.innerHTML).not.toContain('</script>');
-    expect(script?.innerHTML).toContain('\\u003c/script\\u003e');
+    const script = screen.getByTestId('json-ld-script');
+    expect(script.innerHTML).not.toContain('</script>');
+    expect(script.innerHTML).toContain('\\u003c/script\\u003e');
   });
 
   it('escapes a bare ampersand', () => {
     const schema = { description: 'Tom & Jerry' };
 
-    const { container } = setup({ schema });
+    setup({ schema });
 
-    const script = container.querySelector('script');
-    expect(script?.innerHTML).toBe('{"description":"Tom \\u0026 Jerry"}');
+    const script = screen.getByTestId('json-ld-script');
+    expect(script.innerHTML).toBe('{"description":"Tom \\u0026 Jerry"}');
   });
 });

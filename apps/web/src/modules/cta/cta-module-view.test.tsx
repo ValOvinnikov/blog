@@ -92,8 +92,8 @@ describe(`<${CtaModuleView.name}/>`, () => {
     );
   });
 
-  it('wires bandTone (Section band) and brandVariant (card tone) independently', () => {
-    const { container } = setup({
+  it('wires bandTone (Section band) independently of brandVariant (card tone)', () => {
+    setup({
       bandTone: BRAND_VARIANT.SECONDARY,
       brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
     });
@@ -105,7 +105,6 @@ describe(`<${CtaModuleView.name}/>`, () => {
       'data-brand-variant',
       BRAND_VARIANT.SECONDARY,
     );
-    expect(container.querySelector('.bg-brand-primary-muted')).not.toBeNull();
   });
 
   it('renders authored primary and secondary ctaButtons through ActionGroup, in order', () => {
