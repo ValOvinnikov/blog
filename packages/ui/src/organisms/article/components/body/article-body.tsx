@@ -8,7 +8,7 @@ export type TArticleBodyProps = IWithClassName &
     children: ReactNode;
   };
 
-/** Reading-content wrapper for a post detail's body (e.g. a `PortableTextRenderer`). */
+/** Reading-content wrapper that applies the prose measure and spacing for long-form body content. */
 export const ArticleBody = ({
   children,
   className,
