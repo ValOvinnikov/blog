@@ -3,7 +3,7 @@ import { ctaButtonFragment } from '@blog/service/shared/fragments/cta/cta-button
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
 import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
-import { portableTextMarkDefFragment } from '@blog/service/shared/fragments/portable-text/portable-text-mark-def';
+import { listedTextBlockFragment } from '@blog/service/shared/fragments/portable-text/listed-text-block';
 
 export const ctaModuleQuery = q
   .parameters<{ id: string }>()
@@ -21,13 +21,7 @@ export const ctaModuleQuery = q
       .notNull(),
     content: sub
       .field('content[]')
-      .project((blockSub) => ({
-        '...': true,
-        markDefs: blockSub
-          .field('markDefs[]')
-          .project(portableTextMarkDefFragment)
-          .nullable(true),
-      }))
+      .project(listedTextBlockFragment)
       .nullable(true),
     // Not `.notNull()` — required only for Banner/Split via a custom
     // validator, not `.required()`, so it's genuinely absent for Callout.

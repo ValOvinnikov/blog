@@ -27,6 +27,7 @@ import type { TRawPostLatestModule } from '@blog/service/features/modules/post-l
 import type { TRawPostListModule } from '@blog/service/features/modules/post-list/adaptor/transformer';
 import type { TRawPostRelatedModule } from '@blog/service/features/modules/post-related/adaptor/transformer';
 import type { TRawTaxonomyListModule } from '@blog/service/features/modules/taxonomy-list/adaptor/transformer';
+import type { TRawTestimonialModule } from '@blog/service/features/modules/testimonial/adaptor/transformer';
 import type { TRawCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button';
 import {
   makeRawHeadingBlock,
@@ -41,6 +42,9 @@ type TRawFeatureListItem = NonNullable<
   TRawFeatureListModule['features']
 >[number];
 type TRawTaxonomyEntry = NonNullable<TRawTaxonomyListModule['entries']>[number];
+type TRawTestimonialItem = NonNullable<
+  TRawTestimonialModule['testimonials']
+>[number];
 
 export function makeRawHeroModule(
   overrides: Partial<TRawHeroModule> = {},
@@ -341,6 +345,47 @@ export function makeRawFeatureListModule(
     displayMode: DISPLAY_MODE.GRID,
     contentAlignment: null,
     cardAlignment: CONTENT_ALIGNMENT.LEFT,
+    layout: null,
+    ...overrides,
+  };
+}
+
+export function makeRawTestimonialItem(
+  overrides: Partial<TRawTestimonialItem> = {},
+): TRawTestimonialItem {
+  return {
+    _id: 'block-testimonial-1',
+    name: 'Jamie Rivera',
+    quote: [
+      {
+        _type: 'block',
+        _key: 'block-1',
+        style: 'normal',
+        children: [{ _type: 'span', _key: 'span-1', text: 'Great work.' }],
+        markDefs: null,
+      },
+    ],
+    role: null,
+    image: null,
+    link: null,
+    ...overrides,
+  };
+}
+
+export function makeRawTestimonialModule(
+  overrides: Partial<TRawTestimonialModule> = {},
+): TRawTestimonialModule {
+  return {
+    brandVariant: BRAND_VARIANT.PRIMARY,
+    headingBlock: makeRawHeadingBlock('What people say'),
+    testimonials: [
+      makeRawTestimonialItem(),
+      makeRawTestimonialItem({ _id: 'block-testimonial-2' }),
+    ],
+    ctaButtons: null,
+    displayMode: DISPLAY_MODE.GRID,
+    cardAlignment: null,
+    contentAlignment: null,
     layout: null,
     ...overrides,
   };
