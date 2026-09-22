@@ -3,7 +3,6 @@ import {
   CONTENT_ALIGNMENT,
   CTA_ACTION_APPEARANCE,
   CTA_ACTION_VARIANT,
-  HERO_IMAGE_SOURCE,
   HERO_VARIANT,
   LINK_TYPE,
   MEDIA_ORDER,
@@ -103,11 +102,10 @@ describe(toHeroBlogModule, () => {
     expect(hero.eyebrow).toBe('Field notes');
   });
 
-  it('uses the resolved post image when imageSource is POST', () => {
+  it('falls back to the resolved post image when no custom image is set', () => {
     const raw = makeRawHeroBlogModule({
       post: makeRawPostCard(),
-      imageSource: HERO_IMAGE_SOURCE.POST,
-      image: makeRawSanityImage('Custom alt'),
+      image: null,
     });
 
     const hero = toHeroBlogModule(raw);
@@ -116,28 +114,15 @@ describe(toHeroBlogModule, () => {
     expect(hero.sanityImage?.alt).toBe('Alt text');
   });
 
-  it('uses the custom module image when imageSource is CUSTOM', () => {
+  it('prefers the custom module image over the resolved post image', () => {
     const raw = makeRawHeroBlogModule({
       post: makeRawPostCard(),
-      imageSource: HERO_IMAGE_SOURCE.CUSTOM,
       image: makeRawSanityImage('Custom alt'),
     });
 
     const hero = toHeroBlogModule(raw);
 
     expect(hero.sanityImage?.alt).toBe('Custom alt');
-  });
-
-  it('has no image at all when imageSource is NONE, even with a resolved post image', () => {
-    const raw = makeRawHeroBlogModule({
-      post: makeRawPostCard(),
-      imageSource: HERO_IMAGE_SOURCE.NONE,
-      image: makeRawSanityImage(),
-    });
-
-    const hero = toHeroBlogModule(raw);
-
-    expect(hero.sanityImage).toBeUndefined();
   });
 
   it('builds the primary button from the authored label, linking to the resolved post', () => {

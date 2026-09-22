@@ -7,7 +7,6 @@ import {
   CTA_VARIANT,
   DISPLAY_MODE,
   HERO_FIELD_MODE,
-  HERO_IMAGE_SOURCE,
   HERO_VARIANT,
   LINK_TYPE,
   NEWSLETTER_VARIANT,
@@ -70,7 +69,6 @@ export function makeRawHeroBlogModule(
   return {
     post: null,
     eyebrow: null,
-    imageSource: HERO_IMAGE_SOURCE.POST,
     image: null,
     primaryActionLabel: 'Read the post',
     primaryActionAppearance: CTA_ACTION_APPEARANCE.CONTAINED,
