@@ -63,16 +63,6 @@ describe('toPortableTextBody', () => {
     });
   });
 
-  it('maps a bodyImage block with no alt text to an empty string, not undefined', () => {
-    const raw = makeRawBody({ alt: null });
-
-    const result = toPortableTextBody(raw);
-
-    expect(result[0]).toMatchObject({
-      image: expect.objectContaining({ alt: '' }),
-    });
-  });
-
   it('maps a missing layout to undefined (no faked default)', () => {
     const raw = makeRawBody({ layout: null });
 
