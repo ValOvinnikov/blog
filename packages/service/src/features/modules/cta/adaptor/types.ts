@@ -11,8 +11,6 @@ import type {
 } from '@blog/config';
 import type { TCtaButton } from '@blog/service/shared/transformers/to-cta-button';
 
-export type TResolvedCtaContentBlock = TPortableText;
-
 export type TCtaModule = {
   variant: TCtaVariant;
   brandVariant: TFullBrandVariant;
