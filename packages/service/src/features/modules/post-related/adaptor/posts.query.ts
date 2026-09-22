@@ -1,5 +1,5 @@
 import { q } from '@blog/service/sanity/query';
-import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-post';
+import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/published-post';
 import { postCardFragment } from '@blog/service/shared/fragments/post';
 
 import { RELATED_POSTS_TAG_CANDIDATE_LIMIT } from './constants';

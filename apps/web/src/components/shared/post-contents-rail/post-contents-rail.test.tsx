@@ -66,7 +66,7 @@ describe(`<${PostContentsRail.name}/>`, () => {
     mockPostHeadings.forEach((heading) => {
       expect(screen.getByRole('link', { name: heading.text })).toHaveAttribute(
         'href',
-        `#${heading.id}`,
+        `#${heading.key}`,
       );
     });
   });

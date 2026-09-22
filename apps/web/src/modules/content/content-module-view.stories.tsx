@@ -1,6 +1,6 @@
 import { BRAND_VARIANT, SPACING_SCALE } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { richTextDemo } from '@web/testing/shared/portable-text-renderer/fixtures';
+import { richTextDemo } from '@web/testing/shared/portable-text/fixtures';
 
 import { ContentModuleView } from './content-module-view';
 

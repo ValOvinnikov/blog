@@ -1,6 +1,6 @@
 import { TAXONOMY_KIND, TAXONOMY_SORT } from '@blog/config';
 import { q } from '@blog/service/sanity/query';
-import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-post';
+import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/published-post';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
 import { layoutFragment } from '@blog/service/shared/fragments/layout';
 import {

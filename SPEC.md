@@ -551,26 +551,54 @@ editing experience makes. `headingBlock.heading`, `publishedAt`, `author`,
 (`headingBlock.supportingText`), `heroImage`, `tags`, `featured` and `postTakeaways`
 are optional on both.
 
-**An incomplete post is not published.** `PUBLISHED_POST_FILTER` is what
-makes the paragraph above safe. It requires
-`defined(headingBlock.heading) && defined(author) && defined(topic) &&
-defined(content) && defined(seo.metaTitle)` alongside `publishedAt <= now()`, so a
-`page_post` missing any of them never appears in a listing and resolves as
-not-found on its own URL — the same treatment an unpublished post gets.
-Without that gate a `.notNull()` projection would throw at parse time and
-take down an entire listing rather than dropping one card.
+**`PUBLISHED_POST_FILTER` is a scheduling gate, and only that.** It is
+`publishedAt <= now()`, so a `page_post` dated in the future never appears in
+a listing and resolves as not-found on its own URL until its date arrives.
 
-The gate covers every field the paragraph above calls required, `seo`
-included — which is what keeps a client-written document (the one path that
-bypasses Studio's validation) from surfacing as a card that links to a 404.
+**Completeness is enforced by Studio, not by the query.** The fields the
+paragraph above calls required carry `required()` on `page_post`, so the
+Studio refuses to publish a document missing any of them.
 
-This is an **exclusion, not a fallback**: nothing is substituted. Every
-consumer of these fields structurally needs a value — RSS `<title>`, the
+That leaves a deliberate, accepted gap, recorded here so it is not
+rediscovered as a bug. Three paths bypass Studio validation — a content
+migration, a direct API write, and any future mandatory field, which by
+convention cannot carry `required()` because `initialValue` never backfills
+and would strand already-published documents. A document arriving by one of
+those routes now reaches every query the old `defined()` clauses excluded it
+from, and what happens next depends on which field is absent, because each
+fragment asserts `.notNull()` only over what it projects:
+
+- `headingBlock.heading` or `slug` — projected by every post fragment (as is
+  `publishedAt`, bar `postLinkFragment`), so the parse throws wherever the
+  document appears.
+- `author` or `topic` — projected by `postCardFragment` and
+  `postDetailFragment`, but not by `feedPostFragment` or `postLinkFragment`,
+  so card listings and the detail page break while the feeds and taxonomy
+  post links render normally.
+- `content` or `seo.metaTitle` — projected only by `postDetailFragment`. No
+  listing is affected; the document surfaces as a card whose link resolves
+  not-found.
+
+Where the parse throws is the query layer's business and ends there.
+`safeAsync` turns the throw into `{ ok: false }`, and the consequence is
+whatever the caller decides — 404 the page, drop the failing module and
+render the rest, or degrade to an empty but valid response. The query is
+neutral between them, and no single rule predicts which a given caller
+picks. Several currently decide without logging, which is tracked
+separately; a caller that swallows a `{ ok: false }` silently is a defect
+against §17 rather than a shape this section endorses.
+
+Until this was reduced, the filter also asserted `defined()` on each required
+field, which closed the gap entirely. It was narrowed because those clauses
+excluded nothing in practice and made a one-clause rule read as a six-clause
+one.
+
+Absent values are still never substituted — an **exclusion, not a fallback**.
+Every consumer of these fields structurally needs a value: RSS `<title>`, the
 `BlogPosting` `headline` and `author`, breadcrumb labels, card headings, the
-topic chip, the bookmarks list — and the only way to satisfy them from an
-absent field would be to invent one. Excluding the document is the honest
-alternative to a placeholder, and the document's own `title` is never
-borrowed for the purpose.
+topic chip, the bookmarks list. The only way to satisfy them from an absent
+field would be to invent one, so the `.notNull()` boundary fails loudly
+instead, and the document's own `title` is never borrowed for the purpose.
 
 `excerpt` is the one post field that still degrades by omission rather than
 excluding the document, because `supportingText` is genuinely optional in

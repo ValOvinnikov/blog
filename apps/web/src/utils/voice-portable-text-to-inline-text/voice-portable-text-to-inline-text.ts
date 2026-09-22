@@ -1,13 +1,12 @@
-import type { TVoicePortableText } from '@blog/config';
-import type { TResolvedCtaContentBlock } from '@blog/service';
+import type { TPortableText, TVoicePortableText } from '@blog/config';
 
 /**
- * Adapts a Voice rich-text value for `InlineTextRenderer` by wrapping each
- * `link` markDef's stored `href` as a resolved `linkRef` mark.
+ * Adapts a Voice rich-text value for `PortableText` by wrapping each `link`
+ * markDef's stored `href` as a resolved `linkRef` mark.
  */
 export const voicePortableTextToInlineText = (
   value: TVoicePortableText,
-): TResolvedCtaContentBlock[] =>
+): TPortableText[] =>
   value.map((block) => ({
     ...block,
     markDefs: block.markDefs?.map(({ href, _key }) => ({
