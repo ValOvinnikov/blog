@@ -272,6 +272,11 @@ Node/TypeScript idiom — so never "fix" a declaration you see there.
 
 ## Component patterns
 
+- Follow the `react-component-practices` skill first
+  (`.claude/skills/react-component-practices/SKILL.md`, read with Read): the
+  rules every React layer shares — `'use client'` at the leaf, closed named
+  props, derived state over mirrored state, composition over boolean props,
+  no unmeasured memo, accessible by construction.
 - Follow the same component conventions as `@blog/ui` (see the
   `ui-library-practices` skill — `.claude/skills/ui-library-practices/SKILL.md`,
   read it with Read; you have no Skill tool): `T`/`I`-prefixed prop types, `className`
@@ -424,7 +429,10 @@ delete-don't-shorten rule. It is not restated here; follow it as written.
   fix and make it pass; new-feature coverage instead comes from
   `test-writer`'s pass after your implementation lands.
 
-- Component/route tests with Vitest + Testing Library (jsdom). Mock `service`
+- Component/route tests with Vitest + Testing Library (jsdom), shaped by
+  `testing-practices` → "Writing a component test" (query ladder
+  `getByRole` → `getByText` → `getByTestId`, `userEvent`, `findBy*` for
+  async, module-level `setup`). Mock `service`
   functions; assert that fetched data renders. Query through `screen`, never
   `container.querySelector` or a node walk, and never a class
   (`testing-library/no-container`, `no-node-access`, `prefer-screen-queries`

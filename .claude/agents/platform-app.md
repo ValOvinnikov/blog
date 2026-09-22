@@ -29,6 +29,12 @@ relative, parent-traversal `../` never.
 
 ## Start here
 
+Every component here follows the `react-component-practices` skill
+(`.claude/skills/react-component-practices/SKILL.md`, read with Read; you
+have no Skill tool) — `'use client'` at the leaf, closed named props, derived
+state over mirrored state, composition over boolean props, no unmeasured
+memo, accessible by construction — with this app's own rules below on top.
+
 When invoked, before writing any code:
 
 1. Read the context brief you were given: issue summary, acceptance criteria,
@@ -511,6 +517,9 @@ delete-don't-shorten rule. It is not restated here; follow it as written.
   `no-tests-needed`. The `no-class-assertions` lint rule fails
   `toHaveClass` and class reads in test files; see `testing-practices` →
   "What not to test".
+- **Tests follow `testing-practices` → "Writing a component test":** query
+  ladder `getByRole` → `getByText` → `getByTestId`, `userEvent` for every
+  interaction, `findBy*`/`waitFor` for async, a module-level `setup`.
 - **Query through `screen`, never the DOM.** `container.querySelector`, a
   node walk (`.parentElement`, `.children`) and queries destructured from
   `render()` fail lint (`testing-library/no-container`, `no-node-access`,

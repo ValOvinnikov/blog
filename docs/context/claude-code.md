@@ -685,6 +685,7 @@ file` are all denied alike) — an earlier version only handled the
   - `develop-feature` — the lifecycle playbook (investigate → delegate per layer → test → review → commit → remove the subagent worktrees); start here for non-trivial work.
   - `add-content-type` — end-to-end recipe spanning all layers (schema → types → service → ui → web).
   - `studio-schema-practices` — Sanity schema quality bar + content-migration workflow.
+  - `react-component-practices` — the React rules shared by `ui`, `web` and `platform-app` (server-first, closed props, derived state, composition, no unmeasured memo, accessible by construction).
   - `ui-library-practices` — building pure, prop-driven design-system components.
   - `web-component-practices` — building interactive `apps/web` components (compose `@blog/ui` via slots, client behaviour in ref-based hooks, merge Portable Text component maps rather than spreading them).
   - `ui-storybook` / `web-storybook` — Storybook conventions per workspace.

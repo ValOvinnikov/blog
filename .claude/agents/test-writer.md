@@ -112,6 +112,14 @@ prune: note them as a finding.
 
 ## Per-layer conventions (from testing-practices — read it, this is a pointer not a summary)
 
+- **Every React component test** (`ui`, `web`, `platform-app`) has the shape
+  in `testing-practices` → "Writing a component test": query ladder
+  `getByRole` → `getByText` → `getByTestId`, `userEvent` (never
+  `fireEvent.click`), `findBy*`/`waitFor` for async, `.toBeVisible()` for
+  presence and `queryBy*` + `.not.toBeInTheDocument()` for absence, a
+  module-level `setup`. A component a test can only reach by test id is a
+  markup finding (`react-component-practices` → "Accessible by
+  construction"), reported, not worked around.
 - **`@blog/ui`** components: Testing Library, query by role/text, assert
   behaviour/props/variants — never class names or snapshots, not even a
   class a prop toggles (the `no-class-assertions` lint rule fails it); a

@@ -41,9 +41,13 @@ When invoked, before writing any code:
    props to service view-models; each component owns its own prop types. The
    `web` agent maps service data to UI props.
 
-Follow the `ui-library-practices` skill for the full conventions — read
-`.claude/skills/ui-library-practices/SKILL.md` (you have no Skill tool; use
-Read). Key rules:
+Follow the `react-component-practices` skill for the rules every React
+layer shares — server-first, closed named props, derived state over mirrored
+state, composition over boolean props, no unmeasured memo, accessible by
+construction (`.claude/skills/react-component-practices/SKILL.md`, read with
+Read; you have no Skill tool) — and the `ui-library-practices` skill for this
+library's own conventions on top (`.claude/skills/ui-library-practices/SKILL.md`).
+Key rules:
 
 ## Hard boundaries (do not violate)
 
