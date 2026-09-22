@@ -1134,13 +1134,16 @@ declare their own `title` rather than using the helper, because theirs **is**
 public — rendered on chips, archives, filters and navigation.
 
 **Option lists default to a dropdown; `layout: 'radio'` is the opt-out, and
-requiredness decides.** A Sanity dropdown always renders a blank option for
-the unset state which cannot be removed or renamed, and neither
-`initialValue` nor validation suppresses it. So a `required()` field uses a
-radio — the blank is otherwise a selectable trap that only fails at publish —
-and any field that is not required uses a dropdown, where blank is already
-legal and compactness is free. Option count does not enter into it. Both are
-stated explicitly in the schema rather than left to the default.
+requiredness does not decide it.** A Sanity dropdown always renders a blank
+option for the unset state which cannot be removed or renamed, and neither
+`initialValue` nor validation suppresses it — but that blank is guarded, not
+hidden: `required()` flags the field inline in the Studio and blocks publish
+until it is set, and a radio has an unset state of its own. Layout is
+therefore a form-ergonomics choice: dropdown by default, radio where the
+editor benefits from seeing every option at once, which in practice means a
+field gating other fields' `hidden:` predicates. Option count does not enter
+into it. The layout is stated explicitly rather than left to the default, and
+`required()` is applied wherever blank is not a legal value.
 
 Full schema reference (every document/object, field-by-field), naming and
 validation conventions, incl. the `layout`/`headingBlock` objects' own
