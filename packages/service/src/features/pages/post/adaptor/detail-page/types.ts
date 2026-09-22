@@ -2,7 +2,7 @@ import type {
   ISanityImage,
   TMaybeUndefined,
   TPagePostType,
-  TPortableText,
+  TPortableTextBlock,
 } from '@blog/config';
 import type { TSeoResolved } from '@blog/service/shared/transformers/resolve-seo';
 import type { TModule } from '@blog/service/shared/transformers/to-module';
@@ -18,7 +18,7 @@ export type TPostDetailAuthor = {
   profilePageHref: TMaybeUndefined<string>;
   image: TMaybeUndefined<ISanityImage>;
   role: TMaybeUndefined<string>;
-  bio: TMaybeUndefined<TPortableText[]>;
+  bio: TMaybeUndefined<TPortableTextBlock[]>;
   socialLinks: TSocialProfile[];
 };
 
