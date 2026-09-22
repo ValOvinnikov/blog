@@ -134,7 +134,6 @@ export type {
   TPostCardAuthor,
   TPostCardTopic,
 } from './shared/transformers/to-post-card';
-export type { TPostLink } from './shared/transformers/to-post-link';
 export type { IPortableTextLinkMark, TPortableTextLink } from '@blog/config';
 export type { TPortableTextBody } from './shared/transformers/to-portable-text-body';
 export type { TSeoResolved } from './shared/transformers/resolve-seo';

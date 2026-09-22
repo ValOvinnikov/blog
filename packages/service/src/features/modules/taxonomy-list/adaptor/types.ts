@@ -6,7 +6,12 @@ import type {
   THeadingBlock,
   TTaxonomyKind,
 } from '@blog/config';
-import type { TPostLink } from '@blog/service/shared/transformers/to-post-link';
+
+export type TPostLink = {
+  id: string;
+  title: string;
+  slug: string;
+};
 
 /**
  * A resolved taxonomy term (topic or tag) as rendered by the module — the two
