@@ -43,10 +43,6 @@ const renderBodyImage = (block: IBodyImageBlock) => {
     </ImageWithCaption>
   );
 
-  // `data-full-bleed` is the hook a caller's own measure-cap selector
-  // (e.g. `post-article-variants.ts`'s `prose` slot) excludes from the
-  // text measure, so this wrapper's `ImageWithCaption` can reach its own
-  // `FULL_BLEED` breakout width instead of being capped to the text column.
   return block.layout === IMAGE_LAYOUT.FULL_BLEED ? (
     <div {...{ [FULL_BLEED_DATA_ATTR]: '' }}>{image}</div>
   ) : (
