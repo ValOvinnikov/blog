@@ -131,7 +131,6 @@ export const heroBlogSchema = defineType({
     ...heroFieldsets,
   ],
   validation: (rule) => [
-    rule.custom(validateNewestFeaturedHasCandidate('hero')),
     rule.custom(validateVariantRequiresImage),
     rule.custom(validatePostImageFallback).warning(),
   ],
@@ -153,7 +152,8 @@ export const heroBlogSchema = defineType({
         })),
       },
       initialValue: POST_SOURCE.NEWEST_FEATURED,
-      validation: (rule) => rule.required(),
+      validation: (rule) =>
+        rule.required().custom(validateNewestFeaturedHasCandidate('hero')),
     }),
     defineField({
       name: 'post',

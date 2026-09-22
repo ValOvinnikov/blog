@@ -28,9 +28,6 @@ export const postFeaturedSchema = defineType({
   description:
     'A spotlight on up to three posts, with the first shown larger as the lead. Pin the posts yourself, or let it pick the newest ones marked Featured.',
   icon: Pin,
-  validation: (rule) => [
-    rule.custom(validateNewestFeaturedHasCandidate('spotlight')),
-  ],
   fieldsets: [
     {
       name: POSTS_FIELDSET,
@@ -57,7 +54,10 @@ export const postFeaturedSchema = defineType({
         })),
       },
       initialValue: POST_SOURCE.PINNED,
-      validation: (rule) => rule.required(),
+      validation: (rule) =>
+        rule
+          .required()
+          .custom(validateNewestFeaturedHasCandidate('spotlight')),
     }),
     defineField({
       name: 'posts',

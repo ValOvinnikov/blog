@@ -23,6 +23,11 @@ type TDocFn = (
   context: ValidationContext,
 ) => Promise<string | true> | string | true;
 
+type TFieldAsyncFn = (
+  value: string | undefined,
+  context: ValidationContext,
+) => Promise<string | true>;
+
 const getHeroBlogField = (name: string) => getField(heroBlogSchema, name);
 
 const getDocumentValidators = (): TRecordedValidator<TDocFn>[] =>
@@ -40,6 +45,48 @@ const createMockContext = (
 
   return { getClient } as unknown as ValidationContext;
 };
+
+describe('heroBlogSchema postSource field', () => {
+  describe('newest-featured-has-candidate', () => {
+    it('passes without querying when Post Source is Pinned', async () => {
+      const validate = getCustomValidator<TFieldAsyncFn>(
+        getHeroBlogField('postSource'),
+      );
+      let called = false;
+      const context = createMockContext(() => {
+        called = true;
+        return 0;
+      });
+
+      await expect(validate(POST_SOURCE.PINNED, context)).resolves.toBe(true);
+      expect(called).toBe(false);
+    });
+
+    it('errors when Newest Featured and no candidate exists', async () => {
+      const validate = getCustomValidator<TFieldAsyncFn>(
+        getHeroBlogField('postSource'),
+      );
+      const context = createMockContext(() => 0);
+
+      await expect(
+        validate(POST_SOURCE.NEWEST_FEATURED, context),
+      ).resolves.toBe(
+        'No published post is marked Featured, so this hero would render empty.',
+      );
+    });
+
+    it('passes when Newest Featured and a candidate exists', async () => {
+      const validate = getCustomValidator<TFieldAsyncFn>(
+        getHeroBlogField('postSource'),
+      );
+      const context = createMockContext(() => 1);
+
+      await expect(
+        validate(POST_SOURCE.NEWEST_FEATURED, context),
+      ).resolves.toBe(true);
+    });
+  });
+});
 
 describe('heroBlogSchema post field', () => {
   it('is hidden unless Post Source is Pinned', () => {
@@ -119,58 +166,9 @@ describe('heroBlogSchema image field', () => {
 });
 
 describe('heroBlogSchema document validation', () => {
-  describe('newest-featured-has-candidate', () => {
-    it('passes without querying when Post Source is Pinned', async () => {
-      const [validateNewestFeatured] = getDocumentValidators();
-      let called = false;
-      const context = createMockContext(() => {
-        called = true;
-        return 0;
-      });
-
-      await expect(
-        validateNewestFeatured!.fn(
-          { postSource: POST_SOURCE.PINNED } as unknown as SanityDocument,
-          context,
-        ),
-      ).resolves.toBe(true);
-      expect(called).toBe(false);
-    });
-
-    it('errors when Newest Featured and no candidate exists', async () => {
-      const [validateNewestFeatured] = getDocumentValidators();
-      const context = createMockContext(() => 0);
-
-      await expect(
-        validateNewestFeatured!.fn(
-          {
-            postSource: POST_SOURCE.NEWEST_FEATURED,
-          } as unknown as SanityDocument,
-          context,
-        ),
-      ).resolves.toBe(
-        'No published post is marked Featured, so this hero would render empty.',
-      );
-    });
-
-    it('passes when Newest Featured and a candidate exists', async () => {
-      const [validateNewestFeatured] = getDocumentValidators();
-      const context = createMockContext(() => 1);
-
-      await expect(
-        validateNewestFeatured!.fn(
-          {
-            postSource: POST_SOURCE.NEWEST_FEATURED,
-          } as unknown as SanityDocument,
-          context,
-        ),
-      ).resolves.toBe(true);
-    });
-  });
-
   describe('variant-requires-image', () => {
     it('errors when Split with Image Source None', () => {
-      const [, validateVariantImage] = getDocumentValidators();
+      const [validateVariantImage] = getDocumentValidators();
 
       expect(
         validateVariantImage!.fn(
@@ -184,7 +182,7 @@ describe('heroBlogSchema document validation', () => {
     });
 
     it('errors when Banner with Image Source None', () => {
-      const [, validateVariantImage] = getDocumentValidators();
+      const [validateVariantImage] = getDocumentValidators();
 
       expect(
         validateVariantImage!.fn(
@@ -198,7 +196,7 @@ describe('heroBlogSchema document validation', () => {
     });
 
     it('passes when Stacked with Image Source None', () => {
-      const [, validateVariantImage] = getDocumentValidators();
+      const [validateVariantImage] = getDocumentValidators();
 
       expect(
         validateVariantImage!.fn(
@@ -212,7 +210,7 @@ describe('heroBlogSchema document validation', () => {
     });
 
     it('passes when Split with an image source', () => {
-      const [, validateVariantImage] = getDocumentValidators();
+      const [validateVariantImage] = getDocumentValidators();
 
       expect(
         validateVariantImage!.fn(
@@ -228,7 +226,7 @@ describe('heroBlogSchema document validation', () => {
 
   describe('post-image-fallback', () => {
     it('passes without querying when Image Source is not Post', async () => {
-      const [, , validateImageFallback] = getDocumentValidators();
+      const [, validateImageFallback] = getDocumentValidators();
       let called = false;
       const context = createMockContext(() => {
         called = true;
@@ -247,7 +245,7 @@ describe('heroBlogSchema document validation', () => {
     });
 
     it('queries page_post for the newest featured, published post', async () => {
-      const [, , validateImageFallback] = getDocumentValidators();
+      const [, validateImageFallback] = getDocumentValidators();
       let receivedQuery = '';
       const context = createMockContext((query) => {
         receivedQuery = query;
@@ -268,7 +266,7 @@ describe('heroBlogSchema document validation', () => {
     });
 
     it('warns when Image Source is Post and the resolved post has no image', async () => {
-      const [, , validateImageFallback] = getDocumentValidators();
+      const [, validateImageFallback] = getDocumentValidators();
       const context = createMockContext(() => ({
         publishedAt: null,
         heroImage: undefined,
@@ -286,7 +284,7 @@ describe('heroBlogSchema document validation', () => {
     });
 
     it('passes when Image Source is Post and the resolved post has an image', async () => {
-      const [, , validateImageFallback] = getDocumentValidators();
+      const [, validateImageFallback] = getDocumentValidators();
       const context = createMockContext(() => ({
         publishedAt: null,
         heroImage: { asset: { _ref: 'image-abc' } },
