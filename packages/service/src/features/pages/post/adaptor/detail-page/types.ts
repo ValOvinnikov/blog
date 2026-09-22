@@ -4,13 +4,13 @@ import type {
   TPagePostType,
   TPortableTextBlock,
 } from '@blog/config';
-import type { TSeoResolved } from '@blog/service/shared/transformers/resolve-seo';
-import type { TModule } from '@blog/service/shared/transformers/to-module';
-import type { TPortableTextBody } from '@blog/service/shared/transformers/to-portable-text-body';
-import type { TPostCard } from '@blog/service/shared/transformers/to-post-card';
-import type { TSocialProfile } from '@blog/service/shared/transformers/to-social-profile';
-import type { TTag } from '@blog/service/shared/transformers/to-tag';
-import type { TTopic } from '@blog/service/shared/transformers/to-topic';
+import type { TModule } from '@blog/service/shared/transformers/module/to-module';
+import type { TPortableTextBody } from '@blog/service/shared/transformers/portable-text/to-portable-text-body';
+import type { TPostCard } from '@blog/service/shared/transformers/post/to-post-card';
+import type { TSeoResolved } from '@blog/service/shared/transformers/seo/resolve-seo';
+import type { TSocialProfile } from '@blog/service/shared/transformers/social-profile/to-social-profile';
+import type { TTag } from '@blog/service/shared/transformers/tag/to-tag';
+import type { TTopic } from '@blog/service/shared/transformers/topic/to-topic';
 
 export type TPostDetailAuthor = {
   id: string;

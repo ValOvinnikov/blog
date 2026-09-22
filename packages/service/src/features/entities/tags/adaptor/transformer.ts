@@ -1,4 +1,4 @@
-import { toTag } from '@blog/service/shared/transformers/to-tag';
+import { toTag } from '@blog/service/shared/transformers/tag/to-tag';
 import type { InferResultType } from 'groqd';
 
 import type { tagsQuery } from './query';

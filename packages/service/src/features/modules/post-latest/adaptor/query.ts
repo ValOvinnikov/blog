@@ -2,13 +2,13 @@ import { q } from '@blog/service/sanity/query';
 import {
   DISPLAY_MODE_EXPRESSION,
   displayModeParser,
-} from '@blog/service/shared/fragments/display-mode';
-import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
-import { layoutFragment } from '@blog/service/shared/fragments/layout';
+} from '@blog/service/shared/expressions/display-mode';
 import {
   SHOW_IMAGES_EXPRESSION,
   showImagesParser,
-} from '@blog/service/shared/fragments/show-images';
+} from '@blog/service/shared/expressions/show-images';
+import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
+import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
 
 export const postLatestModuleQuery = q
   .parameters<{ id: string }>()

@@ -5,7 +5,7 @@ import type {
   TLayout,
   TMaybeUndefined,
 } from '@blog/config';
-import type { THeroPrimaryAction } from '@blog/service/shared/transformers/to-hero-primary-action';
+import type { THeroPrimaryAction } from '@blog/service/shared/transformers/hero/to-hero-primary-action';
 
 export type THeroModule = {
   brandVariant: TFullBrandVariant;

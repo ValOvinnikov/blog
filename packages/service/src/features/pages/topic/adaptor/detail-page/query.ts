@@ -1,10 +1,10 @@
 import type { TPageTopicType } from '@blog/config';
 import { q, type TSlugParams } from '@blog/service/sanity/query';
-import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
-import { moduleFragment } from '@blog/service/shared/fragments/module';
-import { seoFragment } from '@blog/service/shared/fragments/seo';
-import { topicFragment } from '@blog/service/shared/fragments/topic';
-import type { TRawModule } from '@blog/service/shared/transformers/to-module';
+import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
+import { moduleFragment } from '@blog/service/shared/fragments/module/module';
+import { seoFragment } from '@blog/service/shared/fragments/seo/seo';
+import { topicFragment } from '@blog/service/shared/fragments/topic/topic';
+import type { TRawModule } from '@blog/service/shared/transformers/module/to-module';
 
 export const topicPageQuery = q
   .parameters<TSlugParams>()

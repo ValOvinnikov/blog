@@ -1,7 +1,7 @@
 import { NEWSLETTER_VARIANT } from '@blog/config';
 import { q } from '@blog/service/sanity/query';
-import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
-import { layoutFragment } from '@blog/service/shared/fragments/layout';
+import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
+import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { z } from 'zod';
 
 const NEWSLETTER_VARIANT_EXPRESSION = `coalesce(variant, "${NEWSLETTER_VARIANT.FULL}")`;

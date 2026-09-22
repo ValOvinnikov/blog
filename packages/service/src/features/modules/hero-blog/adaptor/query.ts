@@ -1,10 +1,10 @@
 import { POST_SOURCE } from '@blog/config';
 import { q } from '@blog/service/sanity/query';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/published-post';
-import { ctaSecondaryButtonFragment } from '@blog/service/shared/fragments/cta-button';
-import { sanityImageFragment } from '@blog/service/shared/fragments/image';
-import { heroLayoutFragment } from '@blog/service/shared/fragments/layout';
-import { postCardFragment } from '@blog/service/shared/fragments/post';
+import { ctaSecondaryButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
+import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
+import { heroLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { postCardFragment } from '@blog/service/shared/fragments/post/post';
 
 const newestFeaturedPostQuery = q.star
   .filterByType('page_post')

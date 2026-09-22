@@ -1,7 +1,7 @@
 import { TAXONOMY_KIND, type TTaxonomyKind } from '@blog/config';
 import { q } from '@blog/service/sanity/query';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/published-post';
-import { postCardFragment } from '@blog/service/shared/fragments/post';
+import { postCardFragment } from '@blog/service/shared/fragments/post/post';
 
 export type TPostListScope = {
   kind: TTaxonomyKind;

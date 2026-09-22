@@ -128,17 +128,17 @@ export { getSanityImageBaseUrl } from './sanity/image-base-url';
 export type { TTenantSanityContext } from './sanity/query';
 export { getPlatformSanityContext } from './sanity/client';
 export { getPlatformSanityWriteContext } from './sanity/write-client';
-export type { TCtaButton } from './shared/transformers/to-cta-button';
-export type { THeroPrimaryAction } from './shared/transformers/to-hero-primary-action';
-export type { TModule } from './shared/transformers/to-module';
+export type { TCtaButton } from './shared/transformers/cta/to-cta-button';
+export type { THeroPrimaryAction } from './shared/transformers/hero/to-hero-primary-action';
+export type { TModule } from './shared/transformers/module/to-module';
 export type {
   TPostCard,
   TPostCardAuthor,
   TPostCardTopic,
-} from './shared/transformers/to-post-card';
+} from './shared/transformers/post/to-post-card';
 export type { IPortableTextLinkMark, TPortableTextLink } from '@blog/config';
-export type { TPortableTextBody } from './shared/transformers/to-portable-text-body';
-export type { TSeoResolved } from './shared/transformers/resolve-seo';
-export type { TSocialProfile } from './shared/transformers/to-social-profile';
-export type { TTag } from './shared/transformers/to-tag';
-export type { TTopic } from './shared/transformers/to-topic';
+export type { TPortableTextBody } from './shared/transformers/portable-text/to-portable-text-body';
+export type { TSeoResolved } from './shared/transformers/seo/resolve-seo';
+export type { TSocialProfile } from './shared/transformers/social-profile/to-social-profile';
+export type { TTag } from './shared/transformers/tag/to-tag';
+export type { TTopic } from './shared/transformers/topic/to-topic';

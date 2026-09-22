@@ -1,7 +1,7 @@
 import { TAXONOMY_SORT } from '@blog/config';
-import type { postLinkFragment } from '@blog/service/shared/fragments/post-link';
-import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
-import { toLayout } from '@blog/service/shared/transformers/to-layout';
+import type { postLinkFragment } from '@blog/service/shared/fragments/post/post-link';
+import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
+import { toLayout } from '@blog/service/shared/transformers/layout/to-layout';
 import type { InferFragmentType, InferResultType } from 'groqd';
 
 import type { taxonomyListModuleQuery } from './query';

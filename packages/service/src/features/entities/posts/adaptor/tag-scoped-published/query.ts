@@ -1,6 +1,6 @@
 import { q } from '@blog/service/sanity/query';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/published-post';
-import { postFeedFragment } from '@blog/service/shared/fragments/post-feed';
+import { postFeedFragment } from '@blog/service/shared/fragments/post/post-feed';
 
 /**
  * Every published post tagged with `$tagId`, newest first — the tag-scoped

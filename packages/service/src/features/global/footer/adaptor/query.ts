@@ -1,5 +1,5 @@
 import { q } from '@blog/service/sanity/query';
-import { socialProfileFragment } from '@blog/service/shared/fragments/social-profile';
+import { socialProfileFragment } from '@blog/service/shared/fragments/social-profile/social-profile';
 
 export const footerQuery = q.star
   .filterByType('settings_footer')

@@ -1,9 +1,9 @@
 import { q } from '@blog/service/sanity/query';
-import { ctaButtonFragment } from '@blog/service/shared/fragments/cta-button';
-import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
-import { sanityImageFragment } from '@blog/service/shared/fragments/image';
-import { layoutFragment } from '@blog/service/shared/fragments/layout';
-import { portableTextMarkDefFragment } from '@blog/service/shared/fragments/portable-text-mark-def';
+import { ctaButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
+import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
+import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
+import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { portableTextMarkDefFragment } from '@blog/service/shared/fragments/portable-text/portable-text-mark-def';
 
 export const ctaModuleQuery = q
   .parameters<{ id: string }>()
