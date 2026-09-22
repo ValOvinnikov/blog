@@ -1,9 +1,9 @@
 import type { TMaybeUndefined } from '@blog/config';
-import type { feedPostFragment } from '@blog/service/shared/fragments/feed-post';
+import type { postFeedFragment } from '@blog/service/shared/fragments/post-feed';
 import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import type { InferFragmentType } from 'groqd';
 
-export type TRawFeedPost = InferFragmentType<typeof feedPostFragment>;
+export type TRawFeedPost = InferFragmentType<typeof postFeedFragment>;
 
 export type TFeedPost = {
   title: string;

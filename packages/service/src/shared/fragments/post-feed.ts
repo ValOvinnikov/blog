@@ -6,7 +6,7 @@ import { headingBlockFragment } from '@blog/service/shared/fragments/heading-blo
  * renders `title`/`slug`/`excerpt`/`publishedAt`, so this fragment skips
  * `author`, every image, `topic`, and `wordCount` entirely.
  */
-export const feedPostFragment = q
+export const postFeedFragment = q
   .fragmentForType<'page_post'>()
   .project((sub) => ({
     headingBlock: sub

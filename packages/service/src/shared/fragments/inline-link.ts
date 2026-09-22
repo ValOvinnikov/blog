@@ -1,6 +1,6 @@
 import { q } from '@blog/service/sanity/query';
 
-export const linkFragment = q
+export const inlineLinkFragment = q
   .fragmentForType<'inlineLink'>()
   .project((sub) => ({
     label: sub.field('label').notNull(),

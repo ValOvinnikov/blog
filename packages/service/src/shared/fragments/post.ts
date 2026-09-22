@@ -6,7 +6,7 @@ import type { TRawModule } from '@blog/service/shared/transformers/to-module';
 
 import { authorCardFragment, authorDetailFragment } from './author';
 import { sanityImageFragment } from './image';
-import { portableTextBodyItemFragment } from './portable-text-body';
+import { portableTextBodyItemFragment } from './portable-text-body-item';
 import { seoFragment } from './seo';
 import { tagFragment } from './tag';
 import { topicFragment } from './topic';
