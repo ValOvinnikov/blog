@@ -7,6 +7,7 @@ vi.mock('sanity/structure', () => ({
 }));
 vi.mock('sanity-plugin-media', () => ({
   media: () => ({ name: 'media' }),
+  mediaAssetSource: { name: 'media', title: 'Media' },
 }));
 vi.mock('@sanity/vision', () => ({
   visionTool: () => ({ name: 'visionTool' }),
