@@ -1,3 +1,3 @@
-import type { RichText } from '@blog/config';
+import type { ArticleText } from '@blog/config';
 
-export type TPostBody = RichText;
+export type TPostBody = ArticleText;

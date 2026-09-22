@@ -48,8 +48,9 @@ Studio from one deployment.
   `module_postRelated`, `module_taxonomyList`)
 - `src/schema-types/objects/` — shared object types (`linkRef`, `ctaButton`,
   `socialProfile`, `brand`, `imageWithAlt`, `seo`, `openGraph`, …)
-- `src/schema-types/portable-text/` — the Portable Text block editors
-  (`richText`, `proseText`, `inlineText`)
+- `src/schema-types/portable-text/` — the Portable Text block editors:
+  `paragraphText` (paragraphs only), `listedText` (plus bullet/numbered
+  lists), and `articleText` (plus H2–H4, quote, images, code, and asides)
 - `src/schema-types/fields/` — DRY field factories reused across schemas
   (e.g. `title-field`, `slug-field`, `modules-field`); a factory that serves one
   object or schema lives beside it instead

@@ -234,7 +234,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "inlineText"
+          "name": "listedText"
         },
         "optional": true
       },
@@ -396,7 +396,7 @@
     }
   },
   {
-    "name": "inlineText",
+    "name": "listedText",
     "type": "type",
     "value": {
       "type": "array",
@@ -678,7 +678,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "richText"
+          "name": "articleText"
         },
         "optional": true
       },
@@ -693,7 +693,7 @@
     }
   },
   {
-    "name": "richText",
+    "name": "articleText",
     "type": "type",
     "value": {
       "type": "array",
@@ -2305,7 +2305,7 @@
     }
   },
   {
-    "name": "proseText",
+    "name": "paragraphText",
     "type": "type",
     "value": {
       "type": "array",
@@ -2918,7 +2918,7 @@
           "type": "objectAttribute",
           "value": {
             "type": "inline",
-            "name": "proseText"
+            "name": "paragraphText"
           },
           "optional": true
         }
@@ -3769,7 +3769,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "inlineText"
+          "name": "listedText"
         },
         "optional": true
       },
@@ -4053,7 +4053,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "proseText"
+          "name": "paragraphText"
         },
         "optional": true
       },
@@ -7107,7 +7107,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "richText"
+          "name": "articleText"
         },
         "optional": true
       },
