@@ -33,7 +33,7 @@ export const BrandMark = ({
           stacked: isStacked,
           class: className,
         })}
-        data-testid={dataTestId}
+        data-testid={dataTestId ?? 'brand-mark-image'}
       />
     );
   }
@@ -47,14 +47,20 @@ export const BrandMark = ({
       data-testid={dataTestId}
     >
       {title && <title>{title}</title>}
-      <polygon points="12,3 22,7 12,11 2,7" style={{ fill: 'var(--logo-1)' }} />
+      <polygon
+        points="12,3 22,7 12,11 2,7"
+        style={{ fill: 'var(--logo-1)' }}
+        data-testid="brand-mark-polygon"
+      />
       <polygon
         points="12,8 22,12 12,16 2,12"
         style={{ fill: 'var(--logo-2)' }}
+        data-testid="brand-mark-polygon"
       />
       <polygon
         points="12,13 22,17 12,21 2,17"
         style={{ fill: 'var(--logo-3)' }}
+        data-testid="brand-mark-polygon"
       />
     </svg>
   );

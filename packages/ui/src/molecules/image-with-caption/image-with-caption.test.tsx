@@ -31,13 +31,17 @@ describe(`<${ImageWithCaption.name}/>`, () => {
   });
 
   it('does not render a <figcaption> when caption is an empty string', () => {
-    const { container } = setup({ caption: '', children: undefined });
-    expect(container.querySelector('figcaption')).toBeNull();
+    setup({ caption: '', children: undefined });
+    expect(
+      screen.queryByTestId('image-with-caption-caption'),
+    ).not.toBeInTheDocument();
   });
 
   it('does not render a <figcaption> when caption is omitted', () => {
-    const { container } = setup({ caption: undefined, children: undefined });
-    expect(container.querySelector('figcaption')).toBeNull();
+    setup({ caption: undefined, children: undefined });
+    expect(
+      screen.queryByTestId('image-with-caption-caption'),
+    ).not.toBeInTheDocument();
   });
 
   it('forwards dataTestId to the root figure', () => {

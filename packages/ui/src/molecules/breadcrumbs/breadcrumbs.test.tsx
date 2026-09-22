@@ -53,10 +53,11 @@ describe(`<${Breadcrumbs.name}/>`, () => {
   });
 
   it('sets a title attribute on the first item even when it is also the current page', () => {
-    const { container } = setup({ items: [firstItem] });
-    const current = container.querySelector('[aria-current="page"]');
-
-    expect(current).toHaveAttribute('title', firstItem.label);
+    setup({ items: [firstItem] });
+    expect(screen.getByTitle(firstItem.label)).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
   });
 
   it('renders the last item as text with aria-current="page", not a link', () => {

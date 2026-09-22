@@ -28,7 +28,9 @@ export const ImageWithCaption = ({
   return (
     <figure className={s.figure()} data-testid={dataTestId}>
       <MediaFrame className={className}>{children}</MediaFrame>
-      {caption && <Caption>{caption}</Caption>}
+      {caption && (
+        <Caption dataTestId="image-with-caption-caption">{caption}</Caption>
+      )}
     </figure>
   );
 };
