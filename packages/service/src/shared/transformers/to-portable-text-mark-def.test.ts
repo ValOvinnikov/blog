@@ -1,8 +1,8 @@
 import { makeRawPortableTextMarkDef } from '@blog/service/testing/shared/fixtures';
 
-import { toPortableTextBlockWithResolvedLinks } from './to-portable-text-mark-def';
+import { toPortableText } from './to-portable-text-mark-def';
 
-describe(toPortableTextBlockWithResolvedLinks, () => {
+describe(toPortableText, () => {
   it('resolves a linkRef mark to its link document href', () => {
     const block = {
       _type: 'block' as const,
@@ -10,7 +10,7 @@ describe(toPortableTextBlockWithResolvedLinks, () => {
       markDefs: [makeRawPortableTextMarkDef()],
     };
 
-    const result = toPortableTextBlockWithResolvedLinks(block);
+    const result = toPortableText(block);
 
     expect(result.markDefs?.[0]).toEqual({
       _key: 'mark-1',
@@ -29,8 +29,8 @@ describe(toPortableTextBlockWithResolvedLinks, () => {
       markDefs: [makeRawPortableTextMarkDef({ link: null })],
     };
 
-    expect(() => toPortableTextBlockWithResolvedLinks(block)).not.toThrow();
-    const result = toPortableTextBlockWithResolvedLinks(block);
+    expect(() => toPortableText(block)).not.toThrow();
+    const result = toPortableText(block);
     expect(result.markDefs?.[0]?.link).toBeUndefined();
   });
 
@@ -41,7 +41,7 @@ describe(toPortableTextBlockWithResolvedLinks, () => {
       markDefs: [makeRawPortableTextMarkDef({ _key: 'mark-42', link: null })],
     };
 
-    const result = toPortableTextBlockWithResolvedLinks(block);
+    const result = toPortableText(block);
 
     expect(result.markDefs?.[0]?._key).toBe('mark-42');
   });
@@ -49,7 +49,7 @@ describe(toPortableTextBlockWithResolvedLinks, () => {
   it('leaves markDefs undefined when the block has none', () => {
     const block = { _type: 'block' as const, _key: 'block-1', markDefs: null };
 
-    const result = toPortableTextBlockWithResolvedLinks(block);
+    const result = toPortableText(block);
 
     expect(result.markDefs).toBeUndefined();
   });
@@ -63,11 +63,36 @@ describe(toPortableTextBlockWithResolvedLinks, () => {
       markDefs: null,
     };
 
-    const result = toPortableTextBlockWithResolvedLinks(block);
+    const result = toPortableText(block);
 
     expect(result).toMatchObject({
       style: 'normal',
       children: block.children,
+    });
+  });
+
+  it('normalises missing children to an empty array', () => {
+    const block = { _type: 'block' as const, _key: 'block-1', markDefs: null };
+
+    const result = toPortableText(block);
+
+    expect(result.children).toEqual([]);
+  });
+
+  it('normalises a span with no text to an empty string', () => {
+    const block = {
+      _type: 'block' as const,
+      _key: 'block-1',
+      children: [{ _type: 'span' as const, _key: 'span-1' }],
+      markDefs: null,
+    };
+
+    const result = toPortableText(block);
+
+    expect(result.children[0]).toEqual({
+      _type: 'span',
+      _key: 'span-1',
+      text: '',
     });
   });
 });

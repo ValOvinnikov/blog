@@ -3,7 +3,7 @@ import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
 import { toLinkDocument } from '@blog/service/shared/transformers/to-link-document';
 import { toModule } from '@blog/service/shared/transformers/to-module';
 import { toPortableTextBody } from '@blog/service/shared/transformers/to-portable-text-body';
-import { toPortableTextBlockWithResolvedLinks } from '@blog/service/shared/transformers/to-portable-text-mark-def';
+import { toPortableText } from '@blog/service/shared/transformers/to-portable-text-mark-def';
 import { toPostHeading } from '@blog/service/shared/transformers/to-post-heading';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
 import { toSocialProfiles } from '@blog/service/shared/transformers/to-social-profiles';
@@ -24,7 +24,7 @@ function toPostDetailAuthor(raw: TRawPostDetail['author']): TPostDetailAuthor {
     profilePageHref: toLinkDocument(raw.profilePage)?.href,
     image: toSanityImage(raw.image),
     role: raw.role ?? undefined,
-    bio: raw.bio?.map(toPortableTextBlockWithResolvedLinks) ?? undefined,
+    bio: raw.bio?.map(toPortableText) ?? undefined,
     socialLinks: toSocialProfiles(raw.socialLinks),
   };
 }

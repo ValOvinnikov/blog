@@ -1,4 +1,4 @@
-import type { ILink, TMaybeUndefined } from '@blog/config';
+import type { IPortableTextLinkMark, TPortableText } from '@blog/config';
 import type { portableTextMarkDefFragment } from '@blog/service/shared/fragments/portable-text-mark-def';
 import { toLinkDocument } from '@blog/service/shared/transformers/to-link-document';
 import type { InferFragmentType } from 'groqd';
@@ -7,21 +7,15 @@ export type TRawPortableTextMarkDef = InferFragmentType<
   typeof portableTextMarkDefFragment
 >;
 
-/** An inline mark's anchor text comes from its span children, so the resolved link carries only the destination, not a label. */
-export type TPortableTextLink = Pick<ILink, 'href' | 'target'>;
-
-/** A Portable Text `linkRef` mark with its `link` document resolved; an absent `link` means a dangling reference, which the renderer degrades to plain text. */
-export interface IPortableTextLinkMark {
+type TRawPortableTextSpan = {
+  _type: 'span';
   _key: string;
-  _type: 'linkRef';
-  link: TMaybeUndefined<TPortableTextLink>;
-}
-
-export type TPortableTextBlockWithResolvedLinks<
-  TBlock extends { markDefs?: unknown },
-> = Omit<TBlock, 'markDefs'> & {
-  markDefs: TMaybeUndefined<IPortableTextLinkMark[]>;
+  text?: string;
+  marks?: string[];
 };
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export type TPortableTextBlockWithResolvedLinks<TBlock> = TPortableText;
 
 function toPortableTextMarkDef(
   raw: TRawPortableTextMarkDef,
@@ -35,11 +29,19 @@ function toPortableTextMarkDef(
   };
 }
 
-export function toPortableTextBlockWithResolvedLinks<
-  TBlock extends { markDefs?: TRawPortableTextMarkDef[] | null },
->(raw: TBlock): TPortableTextBlockWithResolvedLinks<TBlock> {
+export function toPortableText<
+  TBlock extends {
+    children?: TRawPortableTextSpan[] | null;
+    markDefs?: TRawPortableTextMarkDef[] | null;
+  },
+>(raw: TBlock): TPortableText {
   return {
     ...raw,
+    _type: 'block',
+    children: (raw.children ?? []).map((span) => ({
+      ...span,
+      text: span.text ?? '',
+    })),
     markDefs: raw.markDefs?.map(toPortableTextMarkDef) ?? undefined,
   };
 }
