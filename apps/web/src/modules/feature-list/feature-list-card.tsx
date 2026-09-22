@@ -10,8 +10,7 @@ import type { THeadingLevel } from '@blog/ui/lib/react';
 import { MediaCard } from '@blog/ui/molecules/media-card';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
-
-import { featureListCardVariants } from './feature-list-card-variants';
+import { stretchedLinkVariants } from '@web/components/shared/stretched-link';
 
 const CARD_IMAGE_SHAPE_TO_MEDIA_SHAPE: Record<
   TCardImageShape,
@@ -36,8 +35,6 @@ export interface IFeatureListCardProps extends IWithDataTestId {
   imageSizes: string;
   headingLevel: THeadingLevel;
 }
-
-const s = featureListCardVariants();
 
 export const FeatureListCard = ({
   item,
@@ -97,7 +94,7 @@ export const FeatureListCard = ({
             href={item.link.href}
             target={item.link.target}
             aria-label={item.link.ariaLabel}
-            className={s.titleLink()}
+            className={stretchedLinkVariants()}
           >
             {heading}
           </SmartLink>
