@@ -207,14 +207,19 @@ export default mergeConfig(
   `IWithDataTestId`/`dataTestId` prop — that one is for the component's own
   root; this is a literal on a roleless internal element.)
 
-  **This is lint, not advice.** `testing-library/no-container`,
+  **Mostly lint, and review for the rest.** `testing-library/no-container`,
   `testing-library/no-node-access` and `testing-library/prefer-screen-queries`
   are `error` in every `*.test.{ts,tsx}` (`configs/eslint/base.js`), so a
-  raw query, a node walk (`el.parentElement`, `.children`, `.firstChild`)
-  or `const { getByRole } = render(…)` instead of `screen.getByRole` fails
-  `pnpm lint`. Sites that predate the rules sit in per-workspace
-  `eslint-suppressions.json` baselines drained by epic #3522 — never add to
-  one. The one legitimate `eslint-disable-next-line testing-library/no-node-access`
+  raw query, a bare node walk (`el.parentElement`, `container.children`,
+  `.firstChild`) or `const { getByRole } = render(…)` instead of
+  `screen.getByRole` fails `pnpm lint`. **A chained one does not:**
+  `container.children[0]`, `container.firstChild.textContent` and
+  `el.parentElement.id` all pass, because `no-node-access` skips a property
+  access that is itself the object of another one and the outer property is
+  not a node property. That is not a licence to chain — it is the same
+  banned walk, caught by the reviewer's mechanical scan
+  (`code-review-practices` §0) instead of by lint. The one legitimate
+  `eslint-disable-next-line testing-library/no-node-access`
   is a structural-layout claim with no semantic handle (an image being a
   direct child of its frame); it goes on that single line, with the reason
   in the `it` title, not in a comment.
@@ -425,10 +430,10 @@ describe(`<${SubscribeForm.name}/>`, () => {
   it is a one-line `cn()` call, and a test for it restates that line.
   Mechanically enforced: the `no-class-assertions` rule in
   `configs/eslint/base.js` fails `toHaveClass`, `.className`/`.classList`
-  reads and `class`-attribute assertions in every `*.test.{ts,tsx}`. The
-  violations that predate the rule are listed in each workspace's
-  `eslint-suppressions.json` and drained by the per-workspace sweep tickets;
-  a new one is a lint failure, not a judgement call.
+  reads and `class`-attribute assertions in every `*.test.{ts,tsx}`. No
+  baseline remains anywhere — epics #3461 and #3522 drained the last
+  `eslint-suppressions.json` — so a class assertion is a lint failure, not a
+  judgement call.
 - **No comments in a test file — none.** The `describe` and `it` titles are
   the documentation: a "why this case exists" belongs in the `it` title, a
   "why this mock" belongs in the helper's name, and a "the other route is
