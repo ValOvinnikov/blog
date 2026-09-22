@@ -1,6 +1,6 @@
 import { POST_SOURCE } from '@blog/config';
 import { q } from '@blog/service/sanity/query';
-import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-post';
+import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/published-post';
 import {
   DISPLAY_MODE_EXPRESSION,
   displayModeParser,

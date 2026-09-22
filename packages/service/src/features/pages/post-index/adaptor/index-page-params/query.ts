@@ -1,5 +1,5 @@
 import { q } from '@blog/service/sanity/query';
-import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-post';
+import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/published-post';
 import { z } from 'zod';
 
 const FIRST_POST_LIST_PAGE_SIZE_EXPRESSION =

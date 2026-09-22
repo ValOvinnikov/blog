@@ -1,5 +1,5 @@
 import { q } from '@blog/service/sanity/query';
-import { PUBLISHED_POST_FILTER } from '@blog/service/shared/filters/published-post';
+import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/published-post';
 
 export const postParamsQuery = q.star
   .filterByType('page_post')
