@@ -551,26 +551,36 @@ editing experience makes. `headingBlock.heading`, `publishedAt`, `author`,
 (`headingBlock.supportingText`), `heroImage`, `tags`, `featured` and `postTakeaways`
 are optional on both.
 
-**An incomplete post is not published.** `PUBLISHED_POST_FILTER` is what
-makes the paragraph above safe. It requires
-`defined(headingBlock.heading) && defined(author) && defined(topic) &&
-defined(content) && defined(seo.metaTitle)` alongside `publishedAt <= now()`, so a
-`page_post` missing any of them never appears in a listing and resolves as
-not-found on its own URL — the same treatment an unpublished post gets.
-Without that gate a `.notNull()` projection would throw at parse time and
-take down an entire listing rather than dropping one card.
+**`PUBLISHED_POST_FILTER` is a scheduling gate, and only that.** It is
+`publishedAt <= now()`, so a `page_post` dated in the future never appears in
+a listing and resolves as not-found on its own URL until its date arrives.
 
-The gate covers every field the paragraph above calls required, `seo`
-included — which is what keeps a client-written document (the one path that
-bypasses Studio's validation) from surfacing as a card that links to a 404.
+**Completeness is enforced by Studio, not by the query.** `content`, `author`,
+`topic` and `publishedAt` carry `required()` on `page_post`, so the Studio
+refuses to publish a document missing any of them. Measured on the
+development dataset (2026-09-22), every `page_post` satisfies the date gate
+and the full required set alike.
 
-This is an **exclusion, not a fallback**: nothing is substituted. Every
-consumer of these fields structurally needs a value — RSS `<title>`, the
+That leaves a deliberate, accepted gap, recorded here so it is not
+rediscovered as a bug. Three paths bypass Studio validation — a content
+migration, a direct API write, and any future mandatory field, which by
+convention cannot carry `required()` because `initialValue` never backfills
+and would strand already-published documents. A document arriving by one of
+those routes and missing a required field **will** reach listings, and the
+`.notNull()` projection in `postCardFragment` throws at parse time rather
+than dropping one card: `safeAsync` converts the throw to `{ ok: false }` and
+the app layer 404s the whole page. One malformed document therefore takes
+down every listing it appears in. Until 2026-09-22 the filter also asserted
+`defined()` on each required field, which closed that gap; it was reduced
+because the clauses excluded nothing in practice and made a one-clause rule
+read as a six-clause one.
+
+Absent values are still never substituted — an **exclusion, not a fallback**.
+Every consumer of these fields structurally needs a value: RSS `<title>`, the
 `BlogPosting` `headline` and `author`, breadcrumb labels, card headings, the
-topic chip, the bookmarks list — and the only way to satisfy them from an
-absent field would be to invent one. Excluding the document is the honest
-alternative to a placeholder, and the document's own `title` is never
-borrowed for the purpose.
+topic chip, the bookmarks list. The only way to satisfy them from an absent
+field would be to invent one, so the `.notNull()` boundary fails loudly
+instead, and the document's own `title` is never borrowed for the purpose.
 
 `excerpt` is the one post field that still degrades by omission rather than
 excluding the document, because `supportingText` is genuinely optional in
