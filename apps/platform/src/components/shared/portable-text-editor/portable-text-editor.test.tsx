@@ -1,4 +1,4 @@
-import type { TPortableTextBlock } from '@blog/db/schema/email-templates';
+import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
 import {
   renderWithIntl,
   screen,
@@ -9,7 +9,7 @@ import { PortableTextEditor } from './portable-text-editor';
 
 const render = renderWithIntl;
 
-const linkBody = (href: string): TPortableTextBlock[] => [
+const linkBody = (href: string): TEmailTemplateBlock[] => [
   {
     _type: 'block',
     _key: 'k1',

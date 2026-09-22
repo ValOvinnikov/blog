@@ -1,7 +1,7 @@
 'use client';
 
 import { ALERT_TYPE, type TEmailTemplateType } from '@blog/config';
-import type { TPortableTextBlock } from '@blog/db/schema/email-templates';
+import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
 import type { TTenantEmailBrand } from '@blog/email/html';
 import { buildTenantEmail } from '@blog/email/templates/tenant';
 import { EmailLogoField } from '@platform/components/features/email/email-logo-field';
@@ -25,7 +25,7 @@ import { emailTemplateEditorVariants } from './email-template-editor-variants';
 
 export type TEmailTemplateEditorValues = {
   subject: string;
-  body: TPortableTextBlock[];
+  body: TEmailTemplateBlock[];
   logoAssetUrl: string | undefined;
 };
 
