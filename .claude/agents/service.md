@@ -159,6 +159,25 @@ relative paths only within a single slice (`./query`, `./types`).
   each exporting its `TRaw*` input type (`InferFragmentType<typeof fragment>`)
   **and** the view-model `T*` type, both co-located and re-exported for web via
   `src/index.ts`).
+- **Naming in `shared/` follows five rules.** They were implicit and
+  partly contradictory until #3548's audit; a new file copies whichever
+  neighbour it was modelled on, so the rule is written here rather than
+  inferred.
+  - **R1** — a fragment file is named for the Sanity `_type` it projects. A
+    file called `link.ts` that projects `inlineLink` is the failure this
+    prevents.
+  - **R2** — the directory states the kind, and every export carries its kind
+    suffix: `*Fragment`, `*_EXPRESSION` paired with `*Parser`, `*_FILTER`,
+    `to*` / `resolve*`.
+  - **R3** — domain first, variant second (`post-feed.ts`, not
+    `feed-post.ts`), so one domain's files sort and read together.
+  - **R4** — `to*` maps one raw shape to one view-model; `resolve*` combines
+    several inputs or applies a fallback precedence. That is what makes
+    `resolveSeo` a principled second verb rather than an exception.
+  - **R5** — a singular transformer maps one entity; a plural wraps the
+    singular over an array and drops entries that do not resolve. Never
+    hand-roll a plural locally.
+
 - **Put something in `shared/` only if it's reused now or clearly will be**
   (e.g. SEO — there's a `seo-and-metadata` skill, so `seoFragment`/`toSeoMeta`
   stay shared even at one current use). If it's used in exactly one place with no
