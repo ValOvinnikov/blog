@@ -4,7 +4,7 @@ import { codeInput } from '@sanity/code-input';
 import { visionTool } from '@sanity/vision';
 import { defineConfig } from 'sanity';
 import { structureTool } from 'sanity/structure';
-import { media } from 'sanity-plugin-media';
+import { media, mediaAssetSource } from 'sanity-plugin-media';
 
 import { studioStructure } from './studio-structure';
 
@@ -44,6 +44,11 @@ export const buildStudioConfig = ({
 
     schema: {
       types: schemaTypes,
+    },
+
+    form: {
+      image: { assetSources: [mediaAssetSource] },
+      file: { assetSources: [mediaAssetSource] },
     },
 
     document: {

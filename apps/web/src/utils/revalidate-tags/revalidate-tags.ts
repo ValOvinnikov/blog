@@ -38,7 +38,8 @@ type TCachedDocumentType =
   | 'settings_newsletter'
   | 'settings_theme'
   | 'link'
-  | 'block_feature';
+  | 'block_feature'
+  | 'block_testimonial';
 
 /**
  * Base ISR tags to revalidate per Sanity document `_type`, for the revalidation
@@ -83,11 +84,13 @@ const REVALIDATE_TAGS = {
   module_postFeatured: ['modules:postFeatured'],
   module_postRelated: ['modules:postRelated'],
   module_featureList: ['modules:featureList'],
+  module_testimonial: ['modules:testimonial'],
   module_content: ['modules:content'],
   module_cta: ['modules:cta'],
   module_newsletter: ['modules:newsletter'],
   link: ['link'],
   block_feature: ['block_feature'],
+  block_testimonial: ['block_testimonial'],
 } as const satisfies Record<
   TModuleType | TCachedDocumentType,
   readonly string[]
