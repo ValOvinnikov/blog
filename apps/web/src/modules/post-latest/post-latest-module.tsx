@@ -1,5 +1,6 @@
 import { service } from '@blog/service';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { logger } from '@web/utils/logger/logger';
 import { renderPostCardImage } from '@web/utils/render-post-card-image';
 import { toPostListItems } from '@web/utils/to-post-list-items';
 
@@ -21,7 +22,13 @@ export const PostLatestModule = async ({
     tenantContext,
   );
 
-  if (!result.ok) return null;
+  if (!result.ok) {
+    logger.error('post_latest_module.fetch_failed', {
+      id,
+      error: result.error,
+    });
+    return null;
+  }
 
   const {
     brandVariant,
