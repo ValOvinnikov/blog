@@ -1,4 +1,4 @@
-import { getDraftsClient } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import { fetchDraftsFailSafe } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
 import type { ValidationContext } from 'sanity';
 
 type TModuleReference = { _type?: string; _ref?: string };
@@ -36,13 +36,20 @@ export const validateSingleBlankHeadingPerType =
 
     if (idsNeedingCheck.length === 0) return true;
 
-    const client = getDraftsClient(context);
+    const ids = idsNeedingCheck.flat();
+    const failSafeAssumesEveryCandidateHasAHeading = ids.map((id) => ({
+      id,
+      heading: 'heading present',
+    }));
 
-    const candidates = await client.fetch<
+    const candidates = await fetchDraftsFailSafe<
       { id: string; heading?: string | null }[]
-    >(`*[_id in $ids]{ "id": _id, "heading": headingBlock.heading }`, {
-      ids: idsNeedingCheck.flat(),
-    });
+    >(
+      context,
+      `*[_id in $ids]{ "id": _id, "heading": headingBlock.heading }`,
+      { ids },
+      failSafeAssumesEveryCandidateHasAHeading,
+    );
 
     const headingById = new Map(
       candidates.map((candidate) => [candidate.id, candidate.heading]),

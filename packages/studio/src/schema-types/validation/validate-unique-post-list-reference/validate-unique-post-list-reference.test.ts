@@ -21,6 +21,7 @@ const createMockContext = (fetchResult: unknown) => {
       return {
         fetch: async (query: string, params: unknown) => {
           fetchCalls.push({ query, params });
+          if (fetchResult instanceof Error) throw fetchResult;
           return fetchResult;
         },
       };
@@ -78,6 +79,24 @@ describe('validateUniquePostListReference', () => {
         context,
       ),
     ).resolves.toBe(UNIQUENESS_ERROR);
+  });
+
+  it('resolves to true, not the uniqueness error, when the fetch rejects', async () => {
+    const validate = validateUniquePostListReference(
+      PAGE_TYPE,
+      UNIQUENESS_ERROR,
+    );
+    const { context } = createMockContext(new Error('network down'));
+
+    await expect(
+      validate(
+        asDocument({
+          _id: 'page-tag-1',
+          modules: [{ _type: postListSchema.name, _ref: 'post-list-1' }],
+        }),
+        context,
+      ),
+    ).resolves.toBe(true);
   });
 
   it('excludes both the draft and published id of the current document', async () => {

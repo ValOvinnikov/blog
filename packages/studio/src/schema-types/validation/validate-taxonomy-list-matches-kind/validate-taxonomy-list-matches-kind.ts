@@ -1,5 +1,5 @@
 import type { TTaxonomyKind } from '@blog/config/constants';
-import { getDraftsClient } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import { fetchDraftsFailSafe } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
 import type { SanityDocument, ValidationContext } from 'sanity';
 
 type TModuleReference = { _type?: string; _ref?: string };
@@ -7,6 +7,8 @@ type TTaxonomyListReferencesDocument = {
   taxonomyList?: { _ref?: string };
   modules?: TModuleReference[];
 };
+
+const FAIL_SAFE_ASSUMES_NO_MISMATCH: { taxonomy?: string | null }[] = [];
 
 const collectTaxonomyListRefs = (
   document: SanityDocument | undefined,
@@ -39,11 +41,11 @@ export const validateTaxonomyListReferencesMatchKind =
 
     if (ids.length === 0) return true;
 
-    const client = getDraftsClient(context);
-
-    const modules = await client.fetch<{ taxonomy?: string | null }[]>(
+    const modules = await fetchDraftsFailSafe<{ taxonomy?: string | null }[]>(
+      context,
       `*[_id in $ids]{ taxonomy }`,
       { ids },
+      FAIL_SAFE_ASSUMES_NO_MISMATCH,
     );
 
     return modules.some((module) => module.taxonomy && module.taxonomy !== kind)
