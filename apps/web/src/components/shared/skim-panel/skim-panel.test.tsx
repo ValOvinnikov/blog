@@ -33,9 +33,9 @@ describe(`<${SkimPanel.name}/>`, () => {
   });
 
   it('renders nothing when takeaways is undefined', async () => {
-    const { container } = await setup({ takeaways: undefined });
+    await setup({ takeaways: undefined });
 
-    expect(container.querySelector('section')).not.toBeInTheDocument();
+    expect(screen.queryByRole('region')).not.toBeInTheDocument();
   });
 
   it('renders the translated panel label and "read the full article" copy', async () => {

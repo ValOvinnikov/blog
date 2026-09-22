@@ -157,11 +157,11 @@ describe(`<${TopicPage.name}/>`, () => {
       },
     });
 
-    const { container } = await setup();
+    await setup();
 
-    const order = Array.from(
-      container.querySelectorAll<HTMLElement>('[data-testid]'),
-    ).map((el) => el.getAttribute('data-testid'));
+    const order = screen
+      .getAllByTestId(/.+/)
+      .map((el) => el.getAttribute('data-testid'));
 
     expect(order).toEqual([
       'topic-breadcrumbs',

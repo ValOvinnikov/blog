@@ -4,6 +4,7 @@ import {
   fireEvent,
   screen,
   waitFor,
+  within,
 } from '@web/testing/custom-render';
 
 import { PostShare } from './post-share';
@@ -37,10 +38,9 @@ describe(`<${PostShare.name}/>`, () => {
     const trigger = getTrigger();
 
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    expect(trigger.querySelector('svg')).toHaveAttribute(
-      'viewBox',
-      '0 0 24 24',
-    );
+    expect(
+      within(trigger).getByTestId('post-share-trigger-icon'),
+    ).toBeVisible();
   });
 
   it('opens the panel on trigger click and closes it again on a second click', async () => {
@@ -66,7 +66,9 @@ describe(`<${PostShare.name}/>`, () => {
     expect(writeText).toHaveBeenCalledWith('https://example.com/blog/hello');
     const copiedItem = await screen.findByRole('menuitem', { name: 'Copied' });
     expect(copiedItem).toBeVisible();
-    expect(copiedItem.querySelector('svg')).toBeInTheDocument();
+    expect(
+      within(copiedItem).getByTestId('post-share-status-icon'),
+    ).toBeVisible();
 
     await waitFor(
       () => {

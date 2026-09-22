@@ -107,9 +107,9 @@ describe(`<${HeroModuleShell.name}/>`, () => {
   });
 
   it('gives the hero image an empty alt on Banner, since it renders as a decorative backdrop there', () => {
-    const { container } = setup({ variant: HERO_VARIANT.BANNER, sanityImage });
+    setup({ variant: HERO_VARIANT.BANNER, sanityImage });
 
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
-    expect(container.querySelector('img')).toHaveAttribute('alt', '');
+    expect(screen.getByRole('presentation')).toHaveAttribute('alt', '');
   });
 });

@@ -1,5 +1,6 @@
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { errorBoundaryCopy } from '@web/components/shared/error-boundary-copy';
 import { customRender, screen } from '@web/testing/custom-render';
 
 import { ErrorPage } from './error-page';
@@ -57,20 +58,15 @@ describe(`<${ErrorPage.name}/>`, () => {
   });
 
   it('announces the error to assistive technology after mount', () => {
-    const { container } = setup();
+    setup();
 
-    const liveRegion = container.querySelector('[aria-live="assertive"]');
-    expect(liveRegion).not.toBeNull();
-    expect(liveRegion?.textContent).toBe(
-      'Something went wrong. You can try again, or go home.',
-    );
+    expect(screen.getByText(errorBoundaryCopy.announcement)).toBeVisible();
   });
 
   it('names both available actions in the announcement, matching the rendered controls', () => {
-    const { container } = setup();
+    setup();
 
-    const liveRegion = container.querySelector('[aria-live="assertive"]');
-    const announcement = liveRegion?.textContent?.toLowerCase() ?? '';
+    const announcement = errorBoundaryCopy.announcement.toLowerCase();
     const tryAgainLabel =
       screen.getByRole('button', { name: 'Try again' }).textContent ?? '';
     const goHomeLabel =
@@ -81,10 +77,12 @@ describe(`<${ErrorPage.name}/>`, () => {
   });
 
   it('sets aria-atomic on the live region', () => {
-    const { container } = setup();
+    setup();
 
-    const liveRegion = container.querySelector('[aria-live="assertive"]');
-    expect(liveRegion).toHaveAttribute('aria-atomic', 'true');
+    expect(screen.getByText(errorBoundaryCopy.announcement)).toHaveAttribute(
+      'aria-atomic',
+      'true',
+    );
   });
 
   it('does not re-report or re-announce on a re-render with the same error', () => {

@@ -49,7 +49,11 @@ export const PostShare = ({
         panelId={panelId}
         onClick={toggle}
       >
-        <Icon name={ICONS.SHARE} size={SIZE.SM} />
+        <Icon
+          name={ICONS.SHARE}
+          size={SIZE.SM}
+          dataTestId="post-share-trigger-icon"
+        />
       </PopoverMenu.Trigger>
       <PopoverMenu.Panel
         ref={panelRef}
@@ -60,9 +64,17 @@ export const PostShare = ({
         <PopoverMenu.Item
           icon={
             isCopied ? (
-              <Icon name={ICONS.CHECK} size={SIZE.SM} />
+              <Icon
+                name={ICONS.CHECK}
+                size={SIZE.SM}
+                dataTestId="post-share-status-icon"
+              />
             ) : (
-              <Icon name={ICONS.COPY} size={SIZE.SM} />
+              <Icon
+                name={ICONS.COPY}
+                size={SIZE.SM}
+                dataTestId="post-share-status-icon"
+              />
             )
           }
           onClick={() => copy(url)}

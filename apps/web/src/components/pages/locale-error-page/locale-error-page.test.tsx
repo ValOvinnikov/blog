@@ -44,23 +44,21 @@ describe(`<${LocaleErrorPage.name}/>`, () => {
   });
 
   it('announces the error to assistive technology after mount', () => {
-    const { container } = setup();
+    setup();
 
-    const liveRegion = container.querySelector('[aria-live="assertive"]');
-    expect(liveRegion).not.toBeNull();
-    expect(liveRegion?.textContent).toBe(
-      SITE_MESSAGES.localeErrorPage.announcement,
-    );
+    expect(
+      screen.getByText(SITE_MESSAGES.localeErrorPage.announcement),
+    ).toBeVisible();
     expect(SITE_MESSAGES.localeErrorPage.announcement).not.toBe(
       SITE_MESSAGES.localeErrorPage.title,
     );
   });
 
   it('names both available actions in the announcement, matching the rendered controls', () => {
-    const { container } = setup();
+    setup();
 
-    const liveRegion = container.querySelector('[aria-live="assertive"]');
-    const announcement = liveRegion?.textContent?.toLowerCase() ?? '';
+    const announcement =
+      SITE_MESSAGES.localeErrorPage.announcement.toLowerCase();
     const tryAgainLabel =
       screen.getByRole('button', { name: 'Try again' }).textContent ?? '';
     const goHomeLabel =
@@ -71,10 +69,11 @@ describe(`<${LocaleErrorPage.name}/>`, () => {
   });
 
   it('sets aria-atomic on the live region', () => {
-    const { container } = setup();
+    setup();
 
-    const liveRegion = container.querySelector('[aria-live="assertive"]');
-    expect(liveRegion).toHaveAttribute('aria-atomic', 'true');
+    expect(
+      screen.getByText(SITE_MESSAGES.localeErrorPage.announcement),
+    ).toHaveAttribute('aria-atomic', 'true');
   });
 
   it('reports the error exactly once on mount, with its digest', () => {

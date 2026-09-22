@@ -134,10 +134,12 @@ export const DepthProvider = ({
       <div
         className={s.root()}
         data-depth={depth}
+        data-testid="depth-root"
         suppressHydrationWarning={true}
       >
         {shouldRenderBootstrapScript && (
           <script
+            data-testid="depth-bootstrap-script"
             dangerouslySetInnerHTML={{
               __html: buildDepthBootstrapScript({ hasSkim, hasDeep }),
             }}

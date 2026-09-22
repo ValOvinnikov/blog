@@ -111,7 +111,6 @@ describe(`<${PostLatestModule.name}/>`, () => {
     const { container } = await setup();
 
     expect(container).toBeEmptyDOMElement();
-    expect(container.querySelector('section')).not.toBeInTheDocument();
   });
 
   it('renders the resolved posts and no pagination nav', async () => {

@@ -103,19 +103,10 @@ describe(`<${PostArticle.name}/>`, () => {
 
     await setup();
 
-    const heading = screen.getByRole('heading', {
-      level: 1,
-      name: 'Hello World',
-    });
-    const header = heading.closest('header');
-    expect(header).not.toBeNull();
+    const header = screen.getByTestId('post-article-header');
 
-    expect(
-      within(header as HTMLElement).getByTestId('bookmark-button-gate'),
-    ).toBeVisible();
-    expect(
-      within(header as HTMLElement).getByRole('button', { name: /Share/ }),
-    ).toBeVisible();
+    expect(within(header).getByTestId('bookmark-button-gate')).toBeVisible();
+    expect(within(header).getByRole('button', { name: /Share/ })).toBeVisible();
   });
 
   it('renders the published date formatted via next-intl (year/month/day) and the reading time', async () => {

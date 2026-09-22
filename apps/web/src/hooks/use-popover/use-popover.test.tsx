@@ -48,6 +48,6 @@ describe(usePopover, () => {
     await user.click(screen.getByRole('button', { name: 'second' }));
 
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    expect(document.activeElement).toBe(trigger);
+    expect(trigger).toHaveFocus();
   });
 });

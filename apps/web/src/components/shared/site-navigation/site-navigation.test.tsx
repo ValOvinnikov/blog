@@ -179,7 +179,7 @@ describe(`<${SiteNavigation.name}/>`, () => {
       fireEvent.keyDown(document, { key: 'Escape' });
 
       expect(toggle).toHaveAttribute('aria-expanded', 'false');
-      expect(document.activeElement).toBe(toggle);
+      expect(toggle).toHaveFocus();
     });
 
     it('closes on an outside click', async () => {

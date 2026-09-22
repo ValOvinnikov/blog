@@ -51,14 +51,17 @@ describe(`<${NewsletterModuleView.name}/>`, () => {
   });
 
   it('resolves the Section landmark aria-labelledby to the rendered heading id', () => {
-    const { container } = setup();
+    setup();
 
-    const section = container.querySelector('section');
-    const labelledBy = section?.getAttribute('aria-labelledby');
+    const section = screen.getByTestId('newsletter-module-newsletter-1');
 
-    expect(labelledBy).toBe('newsletter-newsletter-1');
-    expect(document.getElementById(labelledBy ?? '')).toHaveTextContent(
-      'Get new posts',
+    expect(section).toHaveAttribute(
+      'aria-labelledby',
+      'newsletter-newsletter-1',
+    );
+    expect(screen.getByText('Get new posts')).toHaveAttribute(
+      'id',
+      'newsletter-newsletter-1',
     );
   });
 

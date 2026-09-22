@@ -75,11 +75,11 @@ describe(`<${PostFeaturedModuleView.name}/>`, () => {
   });
 
   it('renders nothing (no lead group, no cards) when items is empty', () => {
-    const { container } = setup({ items: [] });
+    setup({ items: [] });
 
     expect(screen.queryAllByRole('article')).toHaveLength(0);
     expect(
-      container.querySelector('[data-testid$="-lead"]'),
+      screen.queryByTestId('post-featured-module-featured-1-lead'),
     ).not.toBeInTheDocument();
   });
 

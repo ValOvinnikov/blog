@@ -1,5 +1,5 @@
 import { PRESET_ID, PRESET_REGISTRY } from '@blog/config';
-import { customRender } from '@web/testing/custom-render';
+import { customRender, screen } from '@web/testing/custom-render';
 
 import { ThemeScope } from './theme-scope';
 
@@ -12,9 +12,9 @@ const setup = customRender(ThemeScope, {
 
 describe(`<${ThemeScope.name}/>`, () => {
   it('renders children', () => {
-    const { getByText } = setup();
+    setup();
 
-    expect(getByText('content')).toBeVisible();
+    expect(screen.getByText('content')).toBeVisible();
   });
 
   it('injects the resolved theme tokens as a <style> block', () => {

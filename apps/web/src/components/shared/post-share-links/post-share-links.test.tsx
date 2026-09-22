@@ -1,5 +1,6 @@
+import { SOCIAL_PLATFORMS } from '@blog/config';
 import userEvent from '@testing-library/user-event';
-import { customRender, screen } from '@web/testing/custom-render';
+import { customRender, screen, within } from '@web/testing/custom-render';
 
 import { PostShareLinks } from './post-share-links';
 
@@ -16,16 +17,19 @@ describe(`<${PostShareLinks.name}/>`, () => {
 
     const xShareLink = screen.getByRole('menuitem', { name: /Share on X/ });
     expect(xShareLink).toBeVisible();
-    expect(xShareLink.querySelector('svg')).toBeInTheDocument();
+    expect(
+      within(xShareLink).getByTestId(`share-icon-${SOCIAL_PLATFORMS.X}`),
+    ).toBeVisible();
 
     const linkedInShareLink = screen.getByRole('menuitem', {
       name: /Share on LinkedIn/,
     });
     expect(linkedInShareLink).toBeVisible();
-
-    expect(xShareLink.querySelector('svg')?.outerHTML).not.toBe(
-      linkedInShareLink.querySelector('svg')?.outerHTML,
-    );
+    expect(
+      within(linkedInShareLink).getByTestId(
+        `share-icon-${SOCIAL_PLATFORMS.LINKEDIN}`,
+      ),
+    ).toBeVisible();
   });
 
   it('builds each share link href from the given url and title', async () => {

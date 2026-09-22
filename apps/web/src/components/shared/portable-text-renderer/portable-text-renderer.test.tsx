@@ -250,22 +250,15 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
       richTextBlock('h2', [richTextSpan('Summary')]),
     ];
 
-    const { container: firstContainer } = renderElement(
-      <PortableTextRenderer value={firstModuleBody} />,
-    );
-    const { container: secondContainer } = renderElement(
-      <PortableTextRenderer value={secondModuleBody} />,
-    );
+    renderElement(<PortableTextRenderer value={firstModuleBody} />);
+    renderElement(<PortableTextRenderer value={secondModuleBody} />);
 
-    const firstIds = Array.from(firstContainer.querySelectorAll('h2')).map(
-      (heading) => heading.getAttribute('id'),
-    );
-    const secondIds = Array.from(secondContainer.querySelectorAll('h2')).map(
-      (heading) => heading.getAttribute('id'),
-    );
+    const headings = screen.getAllByRole('heading', { level: 2 });
 
-    expect(firstIds.every((id) => id === null)).toBe(true);
-    expect(secondIds.every((id) => id === null)).toBe(true);
+    expect(headings).toHaveLength(6);
+    headings.forEach((heading) => {
+      expect(heading).not.toHaveAttribute('id');
+    });
   });
 
   it('renders a code block with syntax highlighting', () => {
@@ -323,9 +316,10 @@ describe(`<${PortableTextRenderer.name}/>`, () => {
       },
     ];
 
-    const { container } = setup({ value });
+    setup({ value });
 
-    expect(container.querySelector('img')).not.toBeInTheDocument();
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    expect(screen.queryByRole('presentation')).not.toBeInTheDocument();
   });
 
   it("passes the block's chosen layout through to ImageWithCaption", () => {

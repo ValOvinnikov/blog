@@ -80,10 +80,8 @@ describe(`<${MediaCardItem.name}/>`, () => {
   });
 
   it('renders no dataTestId on the underlying MediaCard when omitted', () => {
-    const { container } = renderElement(<MediaCardItem item={item} />);
+    renderElement(<MediaCardItem item={item} />);
 
-    expect(container.querySelector('article')).not.toHaveAttribute(
-      'data-testid',
-    );
+    expect(screen.getByRole('article')).not.toHaveAttribute('data-testid');
   });
 });

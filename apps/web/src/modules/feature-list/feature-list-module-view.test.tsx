@@ -106,7 +106,6 @@ describe(`<${FeatureListModuleView.name}/>`, () => {
     const { container } = setup({ items: [] });
 
     expect(container).toBeEmptyDOMElement();
-    expect(container.querySelector('section')).not.toBeInTheDocument();
   });
 
   it('renders no action group when there are no cta buttons', () => {

@@ -155,7 +155,7 @@ describe(useDismissibleMenu, () => {
 
     fireEvent.keyDown(document, { key: 'Tab', shiftKey: true });
 
-    expect(document.activeElement).toBe(last);
+    expect(last).toHaveFocus();
   });
 
   it('closes on a pointer-down on a sibling element outside the trigger/panel when no `getContainer` is given (narrow scoping, e.g. `usePopover`)', async () => {
@@ -191,9 +191,7 @@ describe(`${useDismissibleMenu.name} with trapFocus: false`, () => {
 
     await user.tab();
 
-    expect(document.activeElement).toBe(
-      screen.getByRole('button', { name: 'after panel' }),
-    );
+    expect(screen.getByRole('button', { name: 'after panel' })).toHaveFocus();
   });
 
   it('does not reverse-trap Shift+Tab — tabbing back from the first item moves focus to the trigger instead of wrapping to the last', async () => {
@@ -206,7 +204,7 @@ describe(`${useDismissibleMenu.name} with trapFocus: false`, () => {
 
     await user.tab({ shift: true });
 
-    expect(document.activeElement).toBe(trigger);
+    expect(trigger).toHaveFocus();
   });
 
   it('does not move focus on ArrowDown/ArrowUp/Home/End', async () => {
@@ -217,16 +215,16 @@ describe(`${useDismissibleMenu.name} with trapFocus: false`, () => {
     first.focus();
 
     fireEvent.keyDown(document, { key: 'ArrowDown' });
-    expect(document.activeElement).toBe(first);
+    expect(first).toHaveFocus();
 
     fireEvent.keyDown(document, { key: 'ArrowUp' });
-    expect(document.activeElement).toBe(first);
+    expect(first).toHaveFocus();
 
     fireEvent.keyDown(document, { key: 'Home' });
-    expect(document.activeElement).toBe(first);
+    expect(first).toHaveFocus();
 
     fireEvent.keyDown(document, { key: 'End' });
-    expect(document.activeElement).toBe(first);
+    expect(first).toHaveFocus();
   });
 
   it('still closes on Escape and returns focus to the trigger', async () => {
@@ -237,7 +235,7 @@ describe(`${useDismissibleMenu.name} with trapFocus: false`, () => {
     fireEvent.keyDown(document, { key: 'Escape' });
 
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    expect(document.activeElement).toBe(trigger);
+    expect(trigger).toHaveFocus();
   });
 
   it('still closes on an outside pointer-down and returns focus to the trigger', async () => {
@@ -248,7 +246,7 @@ describe(`${useDismissibleMenu.name} with trapFocus: false`, () => {
     fireEvent.mouseDown(document.body);
 
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    expect(document.activeElement).toBe(trigger);
+    expect(trigger).toHaveFocus();
   });
 
   it('with the default closeOnFocusOut (false), stays open when Tab carries focus past the last item and out of the panel', async () => {
@@ -261,9 +259,7 @@ describe(`${useDismissibleMenu.name} with trapFocus: false`, () => {
 
     await user.tab();
 
-    expect(document.activeElement).toBe(
-      screen.getByRole('button', { name: 'after panel' }),
-    );
+    expect(screen.getByRole('button', { name: 'after panel' })).toHaveFocus();
     expect(trigger).toHaveAttribute('aria-expanded', 'true');
   });
 });
@@ -286,7 +282,7 @@ describe(`${useDismissibleMenu.name} with closeOnFocusOut: true`, () => {
     await user.tab();
 
     const afterPanel = screen.getByRole('button', { name: 'after panel' });
-    expect(document.activeElement).toBe(afterPanel);
+    expect(afterPanel).toHaveFocus();
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
   });
 
@@ -352,7 +348,7 @@ describe(`${useDismissibleMenu.name} with closeOnFocusOut: true`, () => {
     fireEvent.keyDown(document, { key: 'Escape' });
 
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    expect(document.activeElement).toBe(trigger);
+    expect(trigger).toHaveFocus();
   });
 
   it('still closes on an outside pointer-down and returns focus to the trigger', async () => {
@@ -363,7 +359,7 @@ describe(`${useDismissibleMenu.name} with closeOnFocusOut: true`, () => {
     fireEvent.mouseDown(document.body);
 
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    expect(document.activeElement).toBe(trigger);
+    expect(trigger).toHaveFocus();
   });
 });
 

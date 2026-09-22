@@ -100,12 +100,12 @@ describe(`<${SanityImage.name}/>`, () => {
   });
 
   it('withholds the LQIP preview for a priority image, rendering a single img with no hydration-gated placeholder swap', () => {
-    const { container } = setup({
+    setup({
       priority: true,
       image: { ...image, lqip: 'data:image/webp;base64,fake' },
     });
 
-    const images = container.querySelectorAll('img');
+    const images = screen.getAllByRole('img', { name: image.alt });
     expect(images).toHaveLength(1);
     expect(images[0]).not.toHaveAttribute('data-lqip');
     expect(images[0]).toHaveAttribute(
@@ -115,10 +115,11 @@ describe(`<${SanityImage.name}/>`, () => {
   });
 
   it('renders the LQIP blur-up placeholder for a non-priority image with a preview available', () => {
-    const { container } = setup({
+    setup({
       image: { ...image, lqip: 'data:image/webp;base64,fake' },
     });
 
-    expect(container.querySelectorAll('img').length).toBeGreaterThan(1);
+    expect(screen.getByRole('img', { name: image.alt })).toBeVisible();
+    expect(screen.getByRole('presentation')).toBeInTheDocument();
   });
 });

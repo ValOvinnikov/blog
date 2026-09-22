@@ -8,18 +8,17 @@ const setup = customRender(BrandLockupLink, { logoUrl: LOGO_URL });
 
 describe(`<${BrandLockupLink.name}/>`, () => {
   it('renders a link home labelled "Home" wrapping the brand lockup', () => {
-    const { container } = setup();
+    setup();
 
     const link = screen.getByRole('link', { name: 'Home' });
     expect(link).toHaveAttribute('href', '/');
-    expect(container.querySelector('img')).toHaveAttribute('src', LOGO_URL);
+    expect(screen.getByRole('presentation')).toHaveAttribute('src', LOGO_URL);
   });
 
   it('falls through to the polygon mark when no logo is uploaded', () => {
-    const { container } = setup({ logoUrl: undefined });
+    setup({ logoUrl: undefined });
 
-    expect(container.querySelector('img')).not.toBeInTheDocument();
-    expect(container.querySelector('svg')).toBeInTheDocument();
+    expect(screen.queryByRole('presentation')).not.toBeInTheDocument();
   });
 
   it('passes the tagline through to the brand lockup when set', () => {

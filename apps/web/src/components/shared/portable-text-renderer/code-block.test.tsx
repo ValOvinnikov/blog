@@ -44,12 +44,10 @@ describe(`<${CodeBlock.name}/>`, () => {
   });
 
   it('colors syntax tokens with theme-aware CSS custom properties, not literal hex/hsl values', () => {
-    const { container } = setup();
+    setup();
 
-    const keywordToken = Array.from(container.querySelectorAll('.token')).find(
-      (token) => token.textContent === 'const',
-    );
-
-    expect(keywordToken).toHaveStyle({ color: 'var(--code-keyword)' });
+    expect(screen.getByText('const')).toHaveStyle({
+      color: 'var(--code-keyword)',
+    });
   });
 });
