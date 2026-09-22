@@ -1,0 +1,37 @@
+{
+  "src/atoms/brand-mark/brand-mark.test.tsx": {
+    "testing-library/no-container": {
+      "count": 5
+    }
+  },
+  "src/atoms/prose/prose.test.tsx": {
+    "testing-library/prefer-screen-queries": {
+      "count": 1
+    }
+  },
+  "src/atoms/theme-toggle/theme-toggle.test.tsx": {
+    "testing-library/no-node-access": {
+      "count": 3
+    }
+  },
+  "src/molecules/brand-lockup/brand-lockup.test.tsx": {
+    "testing-library/no-container": {
+      "count": 3
+    }
+  },
+  "src/molecules/breadcrumbs/breadcrumbs.test.tsx": {
+    "testing-library/no-container": {
+      "count": 1
+    }
+  },
+  "src/molecules/image-with-caption/image-with-caption.test.tsx": {
+    "testing-library/no-container": {
+      "count": 2
+    }
+  },
+  "src/molecules/quote-card/quote-card.test.tsx": {
+    "testing-library/no-container": {
+      "count": 2
+    }
+  }
+}

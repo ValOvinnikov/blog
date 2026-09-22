@@ -1,0 +1,163 @@
+{
+  "src/app/[locale]/layout.test.tsx": {
+    "testing-library/prefer-screen-queries": {
+      "count": 1
+    }
+  },
+  "src/components/features/capabilities/features-settings/features-settings.test.tsx": {
+    "testing-library/no-node-access": {
+      "count": 4
+    }
+  },
+  "src/components/features/email/email-settings-form/email-settings-form.test.tsx": {
+    "testing-library/no-node-access": {
+      "count": 1
+    }
+  },
+  "src/components/features/email/email-template-editor/email-template-editor.test.tsx": {
+    "testing-library/no-node-access": {
+      "count": 1
+    }
+  },
+  "src/components/features/layout/nav-item-content/nav-item-content.test.tsx": {
+    "testing-library/no-container": {
+      "count": 4
+    }
+  },
+  "src/components/features/layout/sidebar-collapse-provider/sidebar-collapse-provider.test.tsx": {
+    "testing-library/no-node-access": {
+      "count": 2
+    }
+  },
+  "src/components/features/look/brand-asset-field/brand-asset-field.test.tsx": {
+    "testing-library/no-container": {
+      "count": 2
+    },
+    "testing-library/no-node-access": {
+      "count": 2
+    },
+    "testing-library/prefer-screen-queries": {
+      "count": 1
+    }
+  },
+  "src/components/features/look/look-form/look-form.test.tsx": {
+    "testing-library/no-node-access": {
+      "count": 4
+    }
+  },
+  "src/components/features/look/look-preview/look-preview.test.tsx": {
+    "testing-library/no-node-access": {
+      "count": 4
+    }
+  },
+  "src/components/features/tenants/deprovisioning-status-view/deprovisioning-status-view.test.tsx": {
+    "testing-library/no-container": {
+      "count": 3
+    },
+    "testing-library/no-node-access": {
+      "count": 6
+    }
+  },
+  "src/components/features/tenants/provisioning-status-view/provisioning-status-view.test.tsx": {
+    "testing-library/no-container": {
+      "count": 1
+    },
+    "testing-library/no-node-access": {
+      "count": 21
+    }
+  },
+  "src/components/features/tenants/recent-activity-card/recent-activity-card.test.tsx": {
+    "testing-library/no-container": {
+      "count": 1
+    }
+  },
+  "src/components/features/tenants/tenant-details-form/tenant-details-form.test.tsx": {
+    "testing-library/no-node-access": {
+      "count": 1
+    }
+  },
+  "src/components/features/tenants/tenant-details-panel/tenant-details-panel.test.tsx": {
+    "testing-library/no-container": {
+      "count": 3
+    },
+    "testing-library/no-node-access": {
+      "count": 17
+    }
+  },
+  "src/components/features/tenants/tenant-details-panel/use-lock-state-change.test.tsx": {
+    "testing-library/no-node-access": {
+      "count": 6
+    }
+  },
+  "src/components/features/voice/voice-settings/voice-settings.test.tsx": {
+    "testing-library/no-node-access": {
+      "count": 6
+    }
+  },
+  "src/components/shared/asset-upload-field/asset-upload-field.test.tsx": {
+    "testing-library/no-container": {
+      "count": 1
+    },
+    "testing-library/no-node-access": {
+      "count": 1
+    }
+  },
+  "src/components/shared/avatar/avatar.test.tsx": {
+    "testing-library/no-container": {
+      "count": 2
+    }
+  },
+  "src/components/shared/data-table-shell/data-table-shell.test.tsx": {
+    "testing-library/no-container": {
+      "count": 5
+    }
+  },
+  "src/components/shared/disclosure/disclosure.test.tsx": {
+    "testing-library/no-container": {
+      "count": 6
+    },
+    "testing-library/no-node-access": {
+      "count": 13
+    }
+  },
+  "src/components/shared/font-picker/font-picker.test.tsx": {
+    "testing-library/no-node-access": {
+      "count": 1
+    }
+  },
+  "src/components/shared/form-field/form-field.test.tsx": {
+    "testing-library/no-node-access": {
+      "count": 1
+    }
+  },
+  "src/components/shared/hue-slider/hue-slider.test.tsx": {
+    "testing-library/no-node-access": {
+      "count": 4
+    }
+  },
+  "src/components/shared/icon/icon.test.tsx": {
+    "testing-library/no-container": {
+      "count": 2
+    }
+  },
+  "src/components/shared/preset-picker/preset-picker.test.tsx": {
+    "testing-library/no-node-access": {
+      "count": 1
+    }
+  },
+  "src/components/shared/status-badge/status-badge.test.tsx": {
+    "testing-library/no-container": {
+      "count": 2
+    }
+  },
+  "src/components/shared/step-list/step-list.test.tsx": {
+    "testing-library/no-container": {
+      "count": 1
+    }
+  },
+  "src/components/shared/toast/toast.test.tsx": {
+    "testing-library/no-node-access": {
+      "count": 1
+    }
+  }
+}

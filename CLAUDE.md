@@ -767,8 +767,14 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   same mistake, prop-driven or not** — `toHaveClass('hover:bg-…')` gated on
   a prop is the variants map read back, and the case agents write most; the
   `no-class-assertions` lint rule fails it in every `*.test.{ts,tsx}`, so a
-  styling-only change gets a story and `no-tests-needed`, never a test. One
-  rule, one home — `testing-practices` → "What not to test".
+  styling-only change gets a story and `no-tests-needed`, never a test. **A
+  raw DOM query is the neighbouring mistake** — `container.querySelector`,
+  a node walk, queries destructured from `render()` — and
+  `testing-library/no-container`, `no-node-access` and
+  `prefer-screen-queries` fail those the same way; a roleless element gets
+  a fixed `data-testid` on the component and `screen.getByTestId`. One
+  rule, one home — `testing-practices` → "What not to test" and "Never drop
+  to a raw DOM query".
 - After a schema change: `pnpm typegen`, then commit the regenerated files in
   `packages/config/src/sanity/generated/`. Typegen can be non-deterministic —
   re-run until the diff is minimal.

@@ -205,8 +205,19 @@ export default mergeConfig(
 
   (This fixed `data-testid` differs from the consumer-supplied
   `IWithDataTestId`/`dataTestId` prop — that one is for the component's own
-  root; this is a literal on a roleless internal element. Existing raw-DOM
-  queries migrate opportunistically when a test is touched; no mass rewrite.)
+  root; this is a literal on a roleless internal element.)
+
+  **This is lint, not advice.** `testing-library/no-container`,
+  `testing-library/no-node-access` and `testing-library/prefer-screen-queries`
+  are `error` in every `*.test.{ts,tsx}` (`configs/eslint/base.js`), so a
+  raw query, a node walk (`el.parentElement`, `.children`, `.firstChild`)
+  or `const { getByRole } = render(…)` instead of `screen.getByRole` fails
+  `pnpm lint`. Sites that predate the rules sit in per-workspace
+  `eslint-suppressions.json` baselines drained by epic #3522 — never add to
+  one. The one legitimate `eslint-disable-next-line testing-library/no-node-access`
+  is a structural-layout claim with no semantic handle (an image being a
+  direct child of its frame); it goes on that single line, with the reason
+  in the `it` title, not in a comment.
 
 - **`.toBeVisible()` for positive render assertions**, not
   `.toBeInTheDocument()` — the latter is valid only with `.not`, to assert

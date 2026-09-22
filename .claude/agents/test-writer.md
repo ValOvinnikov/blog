@@ -115,7 +115,12 @@ prune: note them as a finding.
 - **`@blog/ui`** components: Testing Library, query by role/text, assert
   behaviour/props/variants — never class names or snapshots, not even a
   class a prop toggles (the `no-class-assertions` lint rule fails it); a
-  prop whose only effect is styling gets no test.
+  prop whose only effect is styling gets no test. Query through `screen`,
+  never `container.querySelector`, a node walk (`.parentElement`) or
+  queries destructured from `render()` — `testing-library/no-container`,
+  `no-node-access` and `prefer-screen-queries` fail those; a roleless
+  element gets a fixed `data-testid` on the component (report it as a
+  product-code finding, you cannot add it yourself).
 - **`@blog/service`** mappers/loaders: mock the Sanity client, test
   transformer/loader mapping and `urlForImage`, no network.
 - **`apps/web`** routes: mock `service` functions, assert data renders and

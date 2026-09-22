@@ -61,6 +61,15 @@ D | grep -nE '^\+.*/access/project/[a-z0-9]{8}/'
 # value. The grep narrows; the judgement is by eye, and a hit is blocking.
 D | grep -nE '^\+.*(fields\.map\(\(f\) => f\.name\)|typeof [^)]*\)\.toBe\(.function.\)|\.name\)\.toBe\()'
 
+# Tests that bypass Testing Library (testing-practices → "Never drop to a raw
+# DOM query"): a class assertion, a raw DOM query, a node walk, or queries
+# destructured from render() instead of `screen`. All four are lint errors
+# (`blog-test/no-class-assertions`, `testing-library/no-container`,
+# `no-node-access`, `prefer-screen-queries`), so a hit that lint let through
+# means a suppression was added — that is the finding. Every hit is blocking.
+D | grep -nE '^\+.*(toHaveClass|\.className|\.classList|container\.querySelector|document\.querySelector|baseElement\.querySelector|\.(parentElement|parentNode|firstChild|lastChild|children|childNodes|nextSibling|previousSibling)\b)'
+D | grep -nE '^\+.*const \{[^}]*(getBy|queryBy|findBy|getAllBy|queryAllBy|findAllBy)[^}]*\} = render'
+
 # Comments that restate the code (CLAUDE.md → "Comments default to zero").
 # A doc block opening with the identifier (`Name — does X`) restates the
 # name; a doc block three or more lines long is narrating how, not what
