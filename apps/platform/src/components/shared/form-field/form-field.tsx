@@ -34,11 +34,7 @@ export const FormField = ({
       {children}
       {hint}
       {error && (
-        <span
-          id={errorId}
-          className={errorSlot()}
-          data-testid="form-field-error"
-        >
+        <span id={errorId} className={errorSlot()}>
           {error}
         </span>
       )}

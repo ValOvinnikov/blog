@@ -70,11 +70,7 @@ export const Toast = ({
         </span>
       )}
       <span className={s.message()}>
-        {title && (
-          <strong className={s.titleText()} data-testid="toast-title">
-            {title}
-          </strong>
-        )}
+        {title && <strong className={s.titleText()}>{title}</strong>}
         {message}
       </span>
       {time && <span className={s.time()}>{time}</span>}

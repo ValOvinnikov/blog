@@ -62,11 +62,7 @@ export const StepList = ({ steps, className }: TStepListProps) => {
           return (
             <div className={step()} key={key}>
               <div className={indicatorCol()}>
-                <span
-                  className={circle({ status })}
-                  aria-hidden="true"
-                  data-testid="step-indicator"
-                >
+                <span className={circle({ status })} aria-hidden="true">
                   {isDone ? '✓' : isFailed ? '!' : index + 1}
                 </span>
                 {!isLast && (

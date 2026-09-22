@@ -52,7 +52,11 @@ describe(StepList, () => {
   it('renders a connector after every step except the last', () => {
     render(<StepList steps={steps} />);
 
-    expect(screen.getAllByTestId('step-indicator')).toHaveLength(steps.length);
+    expect(
+      screen.getAllByText((content) => content.length > 0, {
+        selector: 'span[aria-hidden="true"]',
+      }),
+    ).toHaveLength(steps.length);
     expect(screen.getAllByTestId('step-connector')).toHaveLength(
       steps.length - 1,
     );

@@ -133,7 +133,9 @@ describe(ProvisioningStatusView, () => {
     );
 
     expect(
-      within(screen.getByTestId('page-header')).queryByText('Running…'),
+      within(screen.getByRole('heading', { name: 'Provisioning' })).queryByText(
+        'Running…',
+      ),
     ).not.toBeInTheDocument();
     expect(
       within(screen.getByTestId('run-status-live')).getByText('Running…'),

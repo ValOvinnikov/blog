@@ -46,7 +46,7 @@ describe(FormField, () => {
       </FormField>,
     );
 
-    expect(screen.queryByTestId('form-field-error')).not.toBeInTheDocument();
+    expect(screen.getByRole('textbox')).toHaveAccessibleDescription('');
   });
 
   it('renders the error with a predictable id derived from htmlFor, for aria-describedby wiring', () => {

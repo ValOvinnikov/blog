@@ -29,13 +29,13 @@ describe(Avatar, () => {
   });
 
   it('renders no initials for an empty name without throwing', () => {
-    render(<Avatar name="" variant="table" />);
-    expect(screen.getByTestId('avatar')).toHaveTextContent('');
+    const { container } = render(<Avatar name="" variant="table" />);
+    expect(container).toHaveTextContent('');
   });
 
   it('is decorative — hidden from assistive tech', () => {
     render(<Avatar name="Jane Doe" variant="table" />);
-    expect(screen.getByTestId('avatar')).toHaveAttribute('aria-hidden', 'true');
+    expect(screen.getByText('JD')).toHaveAttribute('aria-hidden', 'true');
   });
 
   it('renders every variant without throwing', () => {
