@@ -1,19 +1,10 @@
 import { POST_SOURCE } from '@blog/config/constants';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
+import { PUBLISHED_POST_CONDITION } from '@blog/studio/schema-types/filters/published-post';
 import { getDraftsClient } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
 import type { SanityDocument, ValidationContext } from 'sanity';
 
 type TPostSourceDocument = { postSource?: string };
-
-/**
- * Mirrors `PUBLISHED_POST_FILTER` (`packages/service/src/shared/filters/published-post.ts`)
- * so Studio-side validation queries track exactly what the runtime
- * hero/spotlight query considers a candidate. `@blog/studio` cannot import
- * `@blog/service`, so the condition is duplicated here — keep the two in
- * sync by hand.
- */
-export const PUBLISHED_POST_CONDITION =
-  'publishedAt <= now() && defined(headingBlock.heading) && defined(author) && defined(topic) && defined(content) && defined(seo.metaTitle)';
 
 export const validateNewestFeaturedHasCandidate =
   (renderTarget: string) =>
