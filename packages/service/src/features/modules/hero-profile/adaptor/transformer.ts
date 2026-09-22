@@ -7,7 +7,7 @@ import { toCtaButtons } from '@blog/service/shared/transformers/to-cta-buttons';
 import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import { toHeroPresentation } from '@blog/service/shared/transformers/to-hero-presentation';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
-import { toPortableTextBlockWithResolvedLinks } from '@blog/service/shared/transformers/to-portable-text-mark-def';
+import { toPortableText } from '@blog/service/shared/transformers/to-portable-text-mark-def';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
 import type { TSocialProfile } from '@blog/service/shared/transformers/to-social-profile';
 import { toSocialProfiles } from '@blog/service/shared/transformers/to-social-profiles';
@@ -41,7 +41,7 @@ function toEyebrow(raw: TRawHeroProfileModule): TMaybeUndefined<string> {
 function toBio(raw: TRawHeroProfileModule): THeroProfileModule['bio'] {
   if (!raw.showBio) return undefined;
 
-  return raw.author.bio?.map(toPortableTextBlockWithResolvedLinks) ?? undefined;
+  return raw.author.bio?.map(toPortableText) ?? undefined;
 }
 
 export function toHeroProfileModule(

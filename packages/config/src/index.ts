@@ -1,5 +1,6 @@
 export * from './client/objects';
 export * from './constants';
+export * from './portable-text';
 export * from './routes';
 export * from './sanity/generated/types';
 export * from './theme';
