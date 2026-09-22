@@ -1,7 +1,7 @@
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
-import { richTextSchema } from '@blog/studio/schema-types/portable-text/rich-text/rich-text';
+import { articleTextSchema } from '@blog/studio/schema-types/portable-text/article-text/article-text';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { FileText } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
@@ -19,7 +19,7 @@ export const contentSchema = defineType({
     defineField({
       name: 'body',
       title: 'Body',
-      type: richTextSchema.name,
+      type: articleTextSchema.name,
       description: 'The text itself, with images and code blocks as needed.',
       validation: (rule) => rule.required(),
     }),

@@ -13,7 +13,7 @@ import { headingBlockField } from '@blog/studio/schema-types/objects/heading-blo
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
 import { postTakeawaysSchema } from '@blog/studio/schema-types/objects/post-takeaways/post-takeaways';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
-import { richTextSchema } from '@blog/studio/schema-types/portable-text/rich-text/rich-text';
+import { articleTextSchema } from '@blog/studio/schema-types/portable-text/article-text/article-text';
 import { validateSingleBlankHeadingPerType } from '@blog/studio/schema-types/validation/validate-single-blank-heading-per-type/validate-single-blank-heading-per-type';
 import { Newspaper } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
@@ -44,7 +44,7 @@ export const postPageSchema = defineType({
     defineField({
       name: 'content',
       title: 'Content',
-      type: richTextSchema.name,
+      type: articleTextSchema.name,
       description:
         'Full post content — supports rich text, images, and code blocks.',
       validation: (rule) => rule.required(),

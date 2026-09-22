@@ -6,11 +6,11 @@ import {
   type BlockStyleDefinition,
 } from 'sanity';
 
-export const inlineTextStyles: BlockStyleDefinition[] = [
+export const listedTextStyles: BlockStyleDefinition[] = [
   { title: 'Normal', value: 'normal' },
 ];
 
-export const inlineTextMarks: BlockMarksDefinition = {
+export const listedTextMarks: BlockMarksDefinition = {
   decorators: [
     { title: 'Bold', value: 'strong' },
     { title: 'Italic', value: 'em' },
@@ -18,21 +18,21 @@ export const inlineTextMarks: BlockMarksDefinition = {
   annotations: [{ type: linkRefSchema.name }],
 };
 
-export const inlineTextSchema = defineType({
-  name: 'inlineText',
-  title: 'Inline Text',
+export const listedTextSchema = defineType({
+  name: 'listedText',
+  title: 'Listed Text',
   type: 'array',
   description:
     'Short formatted text with bold, italics, lists, and links, but no headings or images.',
   of: [
     defineArrayMember({
       type: 'block',
-      styles: inlineTextStyles,
+      styles: listedTextStyles,
       lists: [
         { title: 'Bullet', value: 'bullet' },
         { title: 'Numbered', value: 'number' },
       ],
-      marks: inlineTextMarks,
+      marks: listedTextMarks,
     }),
   ],
 });

@@ -13,7 +13,7 @@ import { titleField } from '@blog/studio/schema-types/fields/title-field/title-f
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
 import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
-import { inlineTextSchema } from '@blog/studio/schema-types/portable-text/inline-text/inline-text';
+import { listedTextSchema } from '@blog/studio/schema-types/portable-text/listed-text/listed-text';
 import { toTitleCase } from '@blog/utils/primitives';
 import { Megaphone } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
@@ -75,7 +75,7 @@ export const ctaSchema = defineType({
     defineField({
       name: 'content',
       title: 'Content',
-      type: inlineTextSchema.name,
+      type: listedTextSchema.name,
       description: 'Optional longer text below the heading.',
     }),
     ctaButtonsField(),

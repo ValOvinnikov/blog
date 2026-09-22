@@ -1,5 +1,5 @@
 import { ASIDE_KIND } from '@blog/config/constants';
-import { proseTextSchema } from '@blog/studio/schema-types/portable-text/prose-text/prose-text';
+import { paragraphTextSchema } from '@blog/studio/schema-types/portable-text/paragraph-text/paragraph-text';
 import { toTitleCase } from '@blog/utils/primitives';
 import { MessageSquareText } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
@@ -47,7 +47,7 @@ export const asideSchema = defineType({
     defineField({
       name: 'body',
       title: 'Body',
-      type: proseTextSchema.name,
+      type: paragraphTextSchema.name,
       description: 'The side note content.',
       validation: (rule) => rule.required(),
     }),

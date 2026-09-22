@@ -3,9 +3,9 @@ import { bodyImageSchema } from '@blog/studio/schema-types/objects/body-image/bo
 import { linkRefSchema } from '@blog/studio/schema-types/objects/link-ref/link-ref';
 import { defineArrayMember, defineType } from 'sanity';
 
-export const richTextSchema = defineType({
-  name: 'richText',
-  title: 'Rich Text',
+export const articleTextSchema = defineType({
+  name: 'articleText',
+  title: 'Article Text',
   type: 'array',
   description:
     'The main body of a post or content module, supporting headings, images, code blocks, and asides.',

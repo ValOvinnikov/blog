@@ -1,5 +1,9 @@
-import { inlineTextSchema } from './inline-text/inline-text';
-import { proseTextSchema } from './prose-text/prose-text';
-import { richTextSchema } from './rich-text/rich-text';
+import { articleTextSchema } from './article-text/article-text';
+import { listedTextSchema } from './listed-text/listed-text';
+import { paragraphTextSchema } from './paragraph-text/paragraph-text';
 
-export const portableText = [richTextSchema, proseTextSchema, inlineTextSchema];
+export const portableText = [
+  articleTextSchema,
+  paragraphTextSchema,
+  listedTextSchema,
+];
