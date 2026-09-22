@@ -15,6 +15,7 @@ import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/n
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
+import { testimonialSchema } from '@blog/studio/schema-types/modules/testimonial/testimonial';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
 import { validateSingleBlankHeadingPerType } from '@blog/studio/schema-types/validation/validate-single-blank-heading-per-type/validate-single-blank-heading-per-type';
@@ -71,6 +72,7 @@ export const landingPageSchema = defineType({
         newsletterSchema.name,
         taxonomyListSchema.name,
         featureListSchema.name,
+        testimonialSchema.name,
       ],
       validateCustom: (rule) =>
         rule

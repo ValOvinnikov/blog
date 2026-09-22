@@ -63,7 +63,7 @@ const validatePinnedPostsPublishDate = async (
 
 export const postFeaturedSchema = defineType({
   name: 'module_postFeatured',
-  title: 'Post Featured',
+  title: 'Featured Posts',
   type: 'document',
   description:
     'A spotlight on up to three posts, with the first shown larger as the lead. Pin the posts yourself, or let it pick the newest ones marked Featured.',

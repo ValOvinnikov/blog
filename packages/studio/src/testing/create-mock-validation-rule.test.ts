@@ -43,6 +43,14 @@ const boundedField = defineField({
   validation: (rule) => rule.required().min(3).max(10),
 });
 
+const uniqueArrayField = defineField({
+  name: 'tags',
+  title: 'Tags',
+  type: 'array',
+  of: [{ type: 'string' }],
+  validation: (rule) => rule.unique().min(1).max(8),
+});
+
 const documentType = defineType({
   name: 'testing_document',
   title: 'Testing Document',
@@ -72,7 +80,19 @@ describe(getRecordedValidators, () => {
 
 describe(getRecordedBounds, () => {
   it('captures the numeric arguments passed to min() and max()', () => {
-    expect(getRecordedBounds(boundedField)).toEqual({ min: 3, max: 10 });
+    expect(getRecordedBounds(boundedField)).toEqual({
+      required: true,
+      min: 3,
+      max: 10,
+    });
+  });
+
+  it('captures whether unique() was chained', () => {
+    expect(getRecordedBounds(uniqueArrayField)).toEqual({
+      unique: true,
+      min: 1,
+      max: 8,
+    });
   });
 
   it('leaves a bound unset when the chain never calls it', () => {
