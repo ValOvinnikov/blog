@@ -50,20 +50,15 @@
   indirectly through `objectContaining` in a `toHaveBeenCalledWith`.
 
   Pre-existing violations in `packages/ui`, `apps/web`, and `apps/platform`
-  are baselined via ESLint's bulk-suppressions feature
-  (`eslint-suppressions.json` at each workspace root, read automatically by
-  that workspace's `"lint": "eslint ."` script) rather than fixed inline —
-  126/71/8 violations respectively. That file is a baseline being drained by
-  sweep tickets, not a permanent allowlist: fixing a suppressed violation
-  without pruning its entry makes ESLint exit non-zero with an "unused
-  suppressions" error, so removing a class assertion forces the prune in the
-  same change. Prune after fixing one with:
-
-  ```
-  eslint . --prune-suppressions
-  ```
-
-  Never add a suppression for anything but `blog-test/no-class-assertions`.
+  were baselined via ESLint's bulk-suppressions feature
+  (`eslint-suppressions.json` at each workspace root) while sweep tickets
+  drained them; epics #3461 and #3522 finished that drain, and no
+  `eslint-suppressions.json` file remains anywhere in the repo — the rule is
+  enforced from a clean baseline in every workspace. The bulk-suppressions
+  mechanism itself is still worth knowing: if a baseline is ever
+  reintroduced, fixing a suppressed violation without pruning its entry
+  (`eslint . --prune-suppressions`) makes ESLint exit non-zero with an
+  "unused suppressions" error.
 
 - `eslint-plugin-testing-library` — registered in `base.js`'s
   `**/*.test.{ts,tsx}` override alongside `blog-test/no-class-assertions`,
@@ -72,7 +67,12 @@
   `container.querySelectorAll` in favor of a `screen` query;
   `testing-library/no-node-access` bans reaching into the DOM/React-element
   tree with `.parentElement`/`.closest()`/`.children`/`.firstChild` and
-  similar; `testing-library/prefer-screen-queries` bans destructuring a
+  similar — known gap (#3561): it flags a bare node-property access
+  (`container.children`, `el.firstChild`) but not a chained one
+  (`container.children[0]`, `el.firstChild.textContent`), since the rule
+  skips a property access that is itself the object of another; the chained
+  form is caught in review instead (`code-review-practices` §0);
+  `testing-library/prefer-screen-queries` bans destructuring a
   query off `render()`'s return value instead of using `screen`.
 
   The plugin's "which calls count as a render" detection is aggressive
@@ -86,18 +86,14 @@
   to be listed, not just `setup`: `customRender`, `customRenderAsync`,
   `renderElement`, `renderWithIntl`. (A local helper that only wraps one of
   these — e.g. a per-file `renderHydrated` — needs no separate entry; the
-  wrapped call is what the rule sees.) Verify any change to this list against
-  a full suppression regen with no regressions (`git diff` the three
-  `eslint-suppressions.json` files — counts must only grow, never shrink,
-  for a file that already had entries).
+  wrapped call is what the rule sees.) Verify any change to this list by
+  editing it and running `pnpm lint` from root — it should stay green.
 
   Pre-existing violations in `packages/ui`, `apps/web`, and `apps/platform`
-  are baselined the same way as `no-class-assertions` — 17/131/132 violations
-  respectively across the three rules combined. Prune after fixing one with:
-
-  ```
-  eslint . --prune-suppressions
-  ```
+  were baselined the same way as `no-class-assertions` while epics #3461
+  and #3522 drained them; that drain is complete, no
+  `eslint-suppressions.json` file remains anywhere in the repo, and all
+  three rules are enforced from a clean baseline in every workspace.
 
 - `func-style` — enforces arrow-function expressions (`'error', 'expression',
 { allowArrowFunctions: true }`) over function declarations. Registered only
