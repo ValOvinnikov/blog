@@ -16,4 +16,4 @@ export interface IPortableTextLinkMark extends PortableTextMarkDefinition {
 export type TPortableText = PortableTextBlock<
   IPortableTextLinkMark,
   PortableTextSpan
->;
+> & { _type: 'block' };
