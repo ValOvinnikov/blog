@@ -10,7 +10,7 @@ export type TPortableTextMarkDef = {
   href?: string;
 };
 
-export type TPortableTextBlock = {
+export type TEmailBlock = {
   _type: 'block';
   style?: string;
   listItem?: string;

@@ -2,7 +2,7 @@ import { escapeHtml } from '@blog/email/html/escape-html';
 import { sanitizeHref } from '@blog/utils';
 
 import type {
-  TPortableTextBlock,
+  TEmailBlock,
   TPortableTextContent,
   TPortableTextMarkDef,
   TPortableTextNode,
@@ -80,11 +80,11 @@ function renderNode(node: TPortableTextNode): TRenderUnit | null {
   return null;
 }
 
-function isBlock(node: TPortableTextNode): node is TPortableTextBlock {
+function isBlock(node: TPortableTextNode): node is TEmailBlock {
   return node._type === 'block';
 }
 
-function renderChildren(block: TPortableTextBlock): string {
+function renderChildren(block: TEmailBlock): string {
   const children = block.children ?? [];
   const markDefs = block.markDefs ?? [];
 
