@@ -774,7 +774,8 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   raw DOM query is the neighbouring mistake** — `container.querySelector`,
   a node walk, queries destructured from `render()` — and
   `testing-library/no-container`, `no-node-access` and
-  `prefer-screen-queries` fail those the same way; a roleless element gets
+  `prefer-screen-queries` fail those the same way, except a _chained_ walk
+  (`container.children[0]`), which only review catches; a roleless element gets
   a fixed `data-testid` on the component and `screen.getByTestId`. One
   rule, one home — `testing-practices` → "What not to test" and "Never drop
   to a raw DOM query".

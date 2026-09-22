@@ -436,7 +436,8 @@ delete-don't-shorten rule. It is not restated here; follow it as written.
   functions; assert that fetched data renders. Query through `screen`, never
   `container.querySelector` or a node walk, and never a class
   (`testing-library/no-container`, `no-node-access`, `prefer-screen-queries`
-  and `blog-test/no-class-assertions` fail those); a roleless element gets a
+  and `blog-test/no-class-assertions` fail those, and a chained walk like
+  `container.children[0]` is banned too though lint misses it); a roleless element gets a
   fixed `data-testid` on the component. See the `testing-practices`
   skill (`.claude/skills/testing-practices/SKILL.md`).
 - Storybook is configured in `apps/web` (`.storybook/main.ts` scans

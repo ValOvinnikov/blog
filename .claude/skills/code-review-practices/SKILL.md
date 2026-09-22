@@ -63,10 +63,11 @@ D | grep -nE '^\+.*(fields\.map\(\(f\) => f\.name\)|typeof [^)]*\)\.toBe\(.funct
 
 # Tests that bypass Testing Library (testing-practices → "Never drop to a raw
 # DOM query"): a class assertion, a raw DOM query, a node walk, or queries
-# destructured from render() instead of `screen`. All four are lint errors
-# (`blog-test/no-class-assertions`, `testing-library/no-container`,
-# `no-node-access`, `prefer-screen-queries`), so a hit that lint let through
-# means a suppression was added — that is the finding. Every hit is blocking.
+# destructured from render() instead of `screen`. Lint fails all four, with
+# one gap this grep exists to close: `no-node-access` skips a *chained* walk
+# (`container.children[0]`, `el.firstChild.textContent`), so those reach
+# review unflagged and unsuppressed. Every hit is blocking — a bare one means
+# a suppression was added, a chained one means lint never saw it.
 D | grep -nE '^\+.*(toHaveClass|\.className|\.classList|container\.querySelector|document\.querySelector|baseElement\.querySelector|\.(parentElement|parentNode|firstChild|lastChild|children|childNodes|nextSibling|previousSibling)\b)'
 D | grep -nE '^\+.*const \{[^}]*(getBy|queryBy|findBy|getAllBy|queryAllBy|findAllBy)[^}]*\} = render'
 

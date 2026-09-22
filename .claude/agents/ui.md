@@ -148,7 +148,8 @@ delete-don't-shorten rule. It is not restated here; follow it as written.
   toggles (the `no-class-assertions` lint rule fails it). Query through
   `screen`, never `container.querySelector` or a node walk
   (`testing-library/no-container`, `no-node-access`, `prefer-screen-queries`
-  fail those); a roleless internal element gets a fixed `data-testid` like
+  fail those, and a chained walk like `container.children[0]` is banned too
+  though lint misses it); a roleless internal element gets a fixed `data-testid` like
   `hero-media`. A variant whose only
   effect is styling gets a story and `no-tests-needed`, not a test. See the
   `testing-practices` skill (`.claude/skills/testing-practices/SKILL.md`).
