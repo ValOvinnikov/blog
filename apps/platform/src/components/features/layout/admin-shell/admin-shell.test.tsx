@@ -25,7 +25,7 @@ vi.mock('@platform/i18n/navigation', () => ({
 
 const render = renderWithIntl;
 
-const roleChip = { name: 'Val Ovinnikov', role: 'ADMIN', scope: 'Platform' };
+const roleChip = { name: 'Jane Doe', role: 'ADMIN', scope: 'Platform' };
 
 describe(AdminShell, () => {
   afterEach(() => {
