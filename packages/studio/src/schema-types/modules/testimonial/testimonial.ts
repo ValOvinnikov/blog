@@ -1,4 +1,4 @@
-import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config/constants';
+import { CONTENT_ALIGNMENT } from '@blog/config/constants';
 import { blockTestimonialSchema } from '@blog/studio/schema-types/documents/blocks/testimonial/testimonial';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
@@ -20,9 +20,7 @@ export const testimonialSchema = defineType({
   icon: MessageSquareQuote,
   fields: [
     titleField(),
-    brandVariantField({
-      list: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
-    }),
+    brandVariantField(),
     headingBlockField(),
     defineField({
       name: 'testimonials',
