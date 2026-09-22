@@ -1,5 +1,6 @@
 import type { TImageLayout } from '@blog/config/constants/image-layout';
 import type { TSocialPlatform } from '@blog/config/constants/link';
+import type { PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config/constants/portable-text-block-type';
 import type { TMaybeUndefined } from '@blog/config/types';
 
 export interface ISanityImageHotspot {
@@ -40,7 +41,7 @@ export interface ILink {
 }
 
 export interface IBodyImageBlock {
-  _type: 'bodyImage';
+  _type: typeof PORTABLE_TEXT_BLOCK_TYPE.BODY_IMAGE;
   _key: string;
   layout: TMaybeUndefined<TImageLayout>;
   image: TMaybeUndefined<ISanityImage>;

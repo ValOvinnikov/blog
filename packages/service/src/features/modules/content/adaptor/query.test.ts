@@ -1,3 +1,4 @@
+import type { TRawContentModule } from '@blog/service/features/modules/content/adaptor/transformer';
 import { makeRawContentModule } from '@blog/service/testing/modules/fixtures';
 import { makeRawExternalLinkDocument } from '@blog/service/testing/shared/fixtures';
 
@@ -63,7 +64,7 @@ describe('contentModuleQuery', () => {
     });
   });
 
-  it('allows a bodyImage body block with no alt text', () => {
+  it('throws when a bodyImage body block has no alt text', () => {
     const raw = makeRawContentModule({
       body: [
         {
@@ -80,15 +81,11 @@ describe('contentModuleQuery', () => {
           crop: null,
           alt: null,
           layout: 'FULL_BLEED',
-        },
+        } as unknown as TRawContentModule['body'][number],
       ],
     });
 
-    expect(() => contentModuleQuery.parse(raw)).not.toThrow();
-    expect(contentModuleQuery.parse(raw).body[0]).toMatchObject({
-      _type: 'bodyImage',
-      alt: null,
-    });
+    expect(() => contentModuleQuery.parse(raw)).toThrow();
   });
 
   it('keeps every field of a rich text block intact', () => {
