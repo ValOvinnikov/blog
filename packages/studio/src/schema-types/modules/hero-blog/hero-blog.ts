@@ -1,11 +1,7 @@
 import {
   CTA_ACTION_APPEARANCE,
-  HERO_IMAGE_SOURCE,
   POST_SOURCE,
-  HERO_VARIANT,
-  type THeroImageSource,
   type TPostSource,
-  type THeroVariant,
   FULL_BRAND_VARIANT_LIST,
 } from '@blog/config/constants';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
@@ -17,92 +13,22 @@ import {
 } from '@blog/studio/schema-types/fields/hero-media-order-fields/hero-media-order-fields';
 import { heroVariantField } from '@blog/studio/schema-types/fields/hero-variant-field/hero-variant-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import {
-  PUBLISHED_POST_CONDITION,
-  publishedPostFilter,
-} from '@blog/studio/schema-types/filters/published-post';
+import { publishedPostFilter } from '@blog/studio/schema-types/filters/published-post';
 import { heroFieldsets } from '@blog/studio/schema-types/modules/hero-fieldsets/hero-fieldsets';
 import { ctaSecondaryButtonSchema } from '@blog/studio/schema-types/objects/cta-button/cta-button';
 import { heroLayoutField } from '@blog/studio/schema-types/objects/hero-layout/hero-layout-field';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
-import { getDraftsClient } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
 import { validateNewestFeaturedHasCandidate } from '@blog/studio/schema-types/validation/validate-newest-featured-has-candidate/validate-newest-featured-has-candidate';
 import { toTitleCase } from '@blog/utils/primitives';
 import { Star } from 'lucide-react';
-import {
-  defineField,
-  defineType,
-  type SanityDocument,
-  type ValidationContext,
-} from 'sanity';
+import { defineField, defineType } from 'sanity';
 
 type THeroBlogDocument = {
   postSource?: TPostSource;
   post?: { _ref?: string };
-  imageSource?: THeroImageSource;
-  variant?: THeroVariant;
-};
-
-type TResolvedPost = {
-  publishedAt: string | null;
-  heroImage: unknown;
-};
-
-const asHeroBlogDocument = (
-  document: SanityDocument | undefined,
-): THeroBlogDocument | undefined => document as THeroBlogDocument | undefined;
-
-const fetchResolvedPost = async (
-  document: THeroBlogDocument,
-  context: ValidationContext,
-): Promise<TResolvedPost | null> => {
-  const client = getDraftsClient(context);
-
-  if (document.postSource === POST_SOURCE.PINNED) {
-    const ref = document.post?._ref;
-
-    if (!ref) return null;
-
-    return client.fetch<TResolvedPost | null>(
-      `*[_id == $id][0]{ publishedAt, heroImage }`,
-      { id: ref },
-    );
-  }
-
-  return client.fetch<TResolvedPost | null>(
-    `*[_type == "${PAGE_POST_TYPE}" && featured == true && ${PUBLISHED_POST_CONDITION}] | order(publishedAt desc)[0]{ publishedAt, heroImage }`,
-  );
-};
-
-const validateVariantRequiresImage = (
-  document: SanityDocument | undefined,
-): string | true => {
-  const doc = asHeroBlogDocument(document);
-  const variantNeedsImage =
-    doc?.variant === HERO_VARIANT.SPLIT || doc?.variant === HERO_VARIANT.BANNER;
-
-  return variantNeedsImage && doc?.imageSource === HERO_IMAGE_SOURCE.NONE
-    ? 'These variants are built around an image.'
-    : true;
-};
-
-const validatePostImageFallback = async (
-  document: SanityDocument | undefined,
-  context: ValidationContext,
-): Promise<string | true> => {
-  const doc = asHeroBlogDocument(document);
-
-  if (doc?.imageSource !== HERO_IMAGE_SOURCE.POST) return true;
-
-  const resolved = await fetchResolvedPost(doc, context);
-
-  return resolved && !resolved.heroImage
-    ? 'Falls back to no image on the page.'
-    : true;
 };
 
 const FIELDSET_POST = 'post';
-const FIELDSET_IMAGE = 'image';
 const FIELDSET_PRIMARY_ACTION = 'primaryAction';
 
 export const heroBlogSchema = defineType({
@@ -119,20 +45,11 @@ export const heroBlogSchema = defineType({
       description: 'Which post this hero features.',
     },
     {
-      name: FIELDSET_IMAGE,
-      title: 'Image',
-      description: "Where the hero's image comes from.",
-    },
-    {
       name: FIELDSET_PRIMARY_ACTION,
       title: 'Primary Action',
       description: 'The main action. It always links to the featured post.',
     },
     ...heroFieldsets,
-  ],
-  validation: (rule) => [
-    rule.custom(validateVariantRequiresImage),
-    rule.custom(validatePostImageFallback).warning(),
   ],
   fields: [
     titleField(),
@@ -176,38 +93,11 @@ export const heroBlogSchema = defineType({
         }),
     }),
     defineField({
-      name: 'imageSource',
-      title: 'Source',
-      type: 'string',
-      description: "The post's own hero image, a custom image, or no image.",
-      fieldset: FIELDSET_IMAGE,
-      options: {
-        layout: 'radio',
-        list: Object.values(HERO_IMAGE_SOURCE).map((value) => ({
-          title: toTitleCase(value),
-          value,
-        })),
-      },
-      initialValue: HERO_IMAGE_SOURCE.POST,
-      validation: (rule) => rule.required(),
-    }),
-    defineField({
       name: 'image',
-      title: 'Custom Image',
+      title: 'Image',
       type: imageWithAltSchema.name,
-      description: 'Used when Source is Custom.',
-      fieldset: FIELDSET_IMAGE,
-      hidden: ({ parent }) =>
-        (parent as THeroBlogDocument | undefined)?.imageSource !==
-        HERO_IMAGE_SOURCE.CUSTOM,
-      validation: (rule) =>
-        rule.custom((value, context) => {
-          const parent = context.parent as THeroBlogDocument | undefined;
-
-          return parent?.imageSource === HERO_IMAGE_SOURCE.CUSTOM && !value
-            ? 'A custom image is required when Source is Custom.'
-            : true;
-        }),
+      description:
+        "Upload an image to use it here. Falls back to the post's own hero image when left empty.",
     }),
     defineField({
       name: 'eyebrow',
