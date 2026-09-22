@@ -2,24 +2,25 @@ import {
   CTA_VARIANT,
   type TContentAlignment,
   type TMaybeUndefined,
+  type TPortableText,
 } from '@blog/config';
 import { toCtaButtons } from '@blog/service/shared/transformers/to-cta-buttons';
 import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import { toLayout } from '@blog/service/shared/transformers/to-layout';
-import { toPortableTextBlockWithResolvedLinks } from '@blog/service/shared/transformers/to-portable-text-mark-def';
+import { toPortableText } from '@blog/service/shared/transformers/to-portable-text-mark-def';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
 import type { InferResultType } from 'groqd';
 
 import type { ctaModuleQuery } from './query';
-import type { TCtaModule, TResolvedCtaContentBlock } from './types';
+import type { TCtaModule } from './types';
 
 export type TRawCtaModule = InferResultType<typeof ctaModuleQuery>;
 
 function toContent(
   raw: TRawCtaModule['content'],
-): TMaybeUndefined<TResolvedCtaContentBlock[]> {
+): TMaybeUndefined<TPortableText[]> {
   if (!raw || raw.length === 0) return undefined;
-  return raw.map(toPortableTextBlockWithResolvedLinks);
+  return raw.map(toPortableText);
 }
 
 function toContentPosition(

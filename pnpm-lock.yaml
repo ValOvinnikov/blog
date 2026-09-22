@@ -535,6 +535,9 @@ importers:
       '@blog/utils':
         specifier: workspace:*
         version: link:../utils
+      '@portabletext/types':
+        specifier: ^2.0.15
+        version: 2.0.15
     devDependencies:
       '@blog/eslint-config':
         specifier: workspace:*

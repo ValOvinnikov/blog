@@ -124,7 +124,12 @@ describe(toHeroProfileModule, () => {
       const hero = toHeroProfileModule(raw);
 
       expect(hero.bio).toEqual([
-        { _type: 'block', _key: 'bio-block-1', markDefs: undefined },
+        {
+          _type: 'block',
+          _key: 'bio-block-1',
+          children: [],
+          markDefs: undefined,
+        },
       ]);
     });
 

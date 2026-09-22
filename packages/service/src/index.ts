@@ -138,12 +138,9 @@ export type {
   TPostCardTopic,
 } from './shared/transformers/to-post-card';
 export type { TPostLink } from './shared/transformers/to-post-link';
-export type {
-  IPortableTextLinkMark,
-  TPortableTextBlockWithResolvedLinks,
-  TPortableTextLink,
-} from './shared/transformers/to-portable-text-mark-def';
+export type { IPortableTextLinkMark, TPortableTextLink } from '@blog/config';
 export type { TPortableTextBody } from './shared/transformers/to-portable-text-body';
+export type { TPortableTextBlockWithResolvedLinks } from './shared/transformers/to-portable-text-mark-def';
 export type { TSeoResolved } from './shared/transformers/resolve-seo';
 export type { TSocialProfile } from './shared/transformers/to-social-profile';
 export type { TTag } from './shared/transformers/to-tag';

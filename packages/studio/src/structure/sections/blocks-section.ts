@@ -1,4 +1,5 @@
 import { featureBlockSchema } from '@blog/studio/schema-types/documents/blocks/feature/feature';
+import { blockTestimonialSchema } from '@blog/studio/schema-types/documents/blocks/testimonial/testimonial';
 import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
 import type { TStructureSection } from '@blog/studio/structure/build-section/build-section';
 import { Boxes } from 'lucide-react';
@@ -10,7 +11,10 @@ export const blocksSection: TStructureSection = {
   groups: [
     {
       title: 'Cards',
-      items: [{ schema: featureBlockSchema }],
+      items: [
+        { schema: featureBlockSchema },
+        { schema: blockTestimonialSchema },
+      ],
     },
     {
       title: 'Links',

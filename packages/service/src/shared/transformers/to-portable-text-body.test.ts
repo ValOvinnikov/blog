@@ -96,7 +96,7 @@ describe('toPortableTextBody', () => {
 
     const result = toPortableTextBody(raw);
 
-    expect(result).toEqual([{ ...block, markDefs: undefined }]);
+    expect(result).toEqual([{ ...block, children: [], markDefs: undefined }]);
   });
 
   it("resolves a block's linkRef mark to its link document href", () => {

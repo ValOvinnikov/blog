@@ -104,6 +104,12 @@ describe('getRevalidateTagsForType', () => {
     ]);
   });
 
+  it('maps the testimonial card document type to its ISR tag', () => {
+    expect(
+      getRevalidateTagsForType('block_testimonial', 'testimonial-1'),
+    ).toEqual(['block_testimonial']);
+  });
+
   it('returns an empty list for an unknown type', () => {
     expect(getRevalidateTagsForType('nope', 'x')).toEqual([]);
   });
@@ -115,6 +121,7 @@ describe('getRevalidateTagsForType', () => {
     'module_postLatest',
     'module_postRelated',
     'module_featureList',
+    'module_testimonial',
     'module_content',
     'module_cta',
     'module_newsletter',

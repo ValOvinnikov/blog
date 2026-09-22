@@ -1,14 +1,11 @@
 import type {
   IBodyImageBlock,
-  ProseText,
   RichText,
   TMaybeUndefined,
+  TPortableText,
 } from '@blog/config';
 import type { portableTextBodyItemFragment } from '@blog/service/shared/fragments/portable-text-body';
-import {
-  toPortableTextBlockWithResolvedLinks,
-  type TPortableTextBlockWithResolvedLinks,
-} from '@blog/service/shared/transformers/to-portable-text-mark-def';
+import { toPortableText } from '@blog/service/shared/transformers/to-portable-text-mark-def';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
 import type { InferFragmentType } from 'groqd';
 
@@ -21,16 +18,13 @@ type TRawBodyImageBlock = Extract<
   { _type: 'bodyImage' }
 >;
 type TRawAsideBlock = Extract<TRawPortableTextBody[number], { _type: 'aside' }>;
-type TRawTextBlock = Extract<TRawPortableTextBody[number], { _type: 'block' }>;
 
 type TResolvedAsideBlock = Omit<TRawAsideBlock, 'body'> & {
-  body: TMaybeUndefined<
-    Array<TPortableTextBlockWithResolvedLinks<ProseText[number]>>
-  >;
+  body: TMaybeUndefined<TPortableText[]>;
 };
 
 export type TPortableTextBody = Array<
-  | TPortableTextBlockWithResolvedLinks<TRawTextBlock>
+  | TPortableText
   | IBodyImageBlock
   | Extract<RichText[number], { _type: 'code' }>
   | TResolvedAsideBlock
@@ -48,7 +42,7 @@ function toBodyImageBlock(raw: TRawBodyImageBlock): IBodyImageBlock {
 function toAsideBlock(raw: TRawAsideBlock): TResolvedAsideBlock {
   return {
     ...raw,
-    body: raw.body?.map(toPortableTextBlockWithResolvedLinks) ?? undefined,
+    body: raw.body?.map(toPortableText) ?? undefined,
   };
 }
 
@@ -62,9 +56,8 @@ export function toPortableTextBody(
       case 'aside':
         return toAsideBlock(block);
       case 'block':
-        return toPortableTextBlockWithResolvedLinks(block);
+        return toPortableText(block);
       default:
-        // `code` is the only block type left unhandled, so it's safe to assert back to its real shape.
         return block as Extract<RichText[number], { _type: 'code' }>;
     }
   });
