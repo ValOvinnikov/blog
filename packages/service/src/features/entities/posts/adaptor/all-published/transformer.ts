@@ -1,6 +1,6 @@
 import type { TMaybeUndefined } from '@blog/config';
 import type { feedPostFragment } from '@blog/service/shared/fragments/feed-post';
-import { toPostHeading } from '@blog/service/shared/transformers/to-post-heading';
+import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import type { InferFragmentType } from 'groqd';
 
 export type TRawFeedPost = InferFragmentType<typeof feedPostFragment>;
@@ -13,7 +13,9 @@ export type TFeedPost = {
 };
 
 function toFeedPost(raw: TRawFeedPost): TFeedPost {
-  const { title, excerpt } = toPostHeading(raw.headingBlock);
+  const { heading: title, supportingText: excerpt } = toHeadingBlock(
+    raw.headingBlock,
+  );
 
   return {
     title,
