@@ -1,8 +1,12 @@
 import { ASIDE_KIND, routes, type TAsideKind } from '@blog/config';
 import { type TImageTransformOptions, urlForSanityImage } from '@blog/service';
+import { Prose } from '@blog/ui/atoms/prose';
 import { Article } from '@blog/ui/organisms/article';
 import { BookmarkButtonGate } from '@web/components/features/post/bookmark-button-gate';
-import { PostBody } from '@web/components/shared/post-body';
+import {
+  createAsideOverride,
+  PortableText,
+} from '@web/components/shared/portable-text';
 import { PostContentsRail } from '@web/components/shared/post-contents-rail';
 import { PostShareLinks } from '@web/components/shared/post-share-links';
 import { SanityImage } from '@web/components/shared/sanity-image';
@@ -82,6 +86,7 @@ export const PostArticle = async ({ slug, tenant }: TPostArticleProps) => {
     label: tag.title,
     href: routes.tag(tag.slug),
   }));
+  const components = createAsideOverride(asideKindLabels);
 
   return (
     <Article>
@@ -131,11 +136,15 @@ export const PostArticle = async ({ slug, tenant }: TPostArticleProps) => {
           <>
             <PostContentsRail className={s.rail()} headings={headings} />
             <div className={s.content({ withRail: true })}>
-              <PostBody value={body} asideKindLabels={asideKindLabels} />
+              <Prose className={s.prose()}>
+                <PortableText value={body} components={components} />
+              </Prose>
             </div>
           </>
         ) : (
-          <PostBody value={body} asideKindLabels={asideKindLabels} />
+          <Prose className={s.prose()}>
+            <PortableText value={body} components={components} />
+          </Prose>
         )}
         <Article.Footer
           className={hasContentsRail ? s.footerInRail() : s.footer()}

@@ -1,11 +1,16 @@
 import type { TContentModule } from '@blog/service';
+import { Prose } from '@blog/ui/atoms/prose';
 import { ContentModule as ContentModuleUi } from '@blog/ui/organisms/content-module';
-import { PostBody } from '@web/components/shared/post-body';
+import { PortableText } from '@web/components/shared/portable-text';
 import { Section } from '@web/components/shared/section';
+
+import { contentModuleViewVariants } from './content-module-view-variants';
 
 export interface IContentModuleViewProps extends TContentModule {
   id: string;
 }
+
+const s = contentModuleViewVariants();
 
 /**
  * No `titleId` is passed to `Section` — this module renders no heading of
@@ -25,7 +30,9 @@ export const ContentModuleView = ({
       dataTestId={`content-module-${id}`}
     >
       <ContentModuleUi isWrapped={true}>
-        <PostBody value={body} />
+        <Prose className={s.prose()}>
+          <PortableText value={body} />
+        </Prose>
       </ContentModuleUi>
     </Section>
   );

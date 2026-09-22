@@ -53,5 +53,4 @@ export const createAsideOverride = (
   },
 });
 
-export { renderBodyImage } from './types';
 export type { TAsideKindLabels } from './types';

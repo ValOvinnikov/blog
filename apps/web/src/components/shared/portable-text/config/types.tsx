@@ -1,5 +1,6 @@
 import {
   ASIDE_KIND,
+  IMAGE_LAYOUT,
   type Code,
   type IBodyImageBlock,
   type TAsideKind,
@@ -25,10 +26,10 @@ type TResolvedAsideBlock = Extract<
   { _type: 'aside' }
 >;
 
-export const renderBodyImage = (block: IBodyImageBlock) => {
+const renderBodyImage = (block: IBodyImageBlock) => {
   if (!block.image) return null;
 
-  return (
+  const image = (
     <ImageWithCaption layout={block.layout}>
       <SanityImage
         image={block.image}
@@ -38,6 +39,16 @@ export const renderBodyImage = (block: IBodyImageBlock) => {
         className={s.image()}
       />
     </ImageWithCaption>
+  );
+
+  // `data-full-bleed` is the hook a caller's own measure-cap selector
+  // (e.g. `post-article-variants.ts`'s `prose` slot) excludes from the
+  // text measure, so this wrapper's `ImageWithCaption` can reach its own
+  // `FULL_BLEED` breakout width instead of being capped to the text column.
+  return block.layout === IMAGE_LAYOUT.FULL_BLEED ? (
+    <div data-full-bleed="">{image}</div>
+  ) : (
+    image
   );
 };
 

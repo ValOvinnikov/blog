@@ -14,14 +14,27 @@ export const postArticleVariants = tv({
     // The breakout-safe column — fills whatever width its own container
     // makes available (`body`'s own measure/page cap below `lg:`, or the
     // grid's column-2 track at `lg:` once `withRail` is true), with no
-    // measure cap of its own. `PostBody`'s own `Prose` root owns
-    // the reading-measure cap now (nested inside this box, around each text
-    // run), so a `FULL_BLEED` image — rendered as `Prose`'s sibling, not its
-    // child — can fill this box's full width outright. See the `withRail`
-    // variant below for the `--container-page` override that bounds a
-    // `FULL_BLEED` image to this column's own rendered width once there's a
-    // rail beside it (rather than the page-wide breakout it gets without one).
+    // measure cap of its own. See the `withRail` variant below for the
+    // `--container-page` override that bounds a `FULL_BLEED` image to this
+    // column's own rendered width once there's a rail beside it (rather
+    // than the page-wide breakout it gets without one).
     content: ['w-full', 'lg:col-start-2 lg:row-start-1'],
+    // `Prose` itself carries no width cap — a `FULL_BLEED` `bodyImage`
+    // (`config/types.tsx` marks its wrapper `data-full-bleed`) is a direct
+    // child of `Prose` now (`PortableText` renders bare, no sibling split),
+    // so `Prose`'s own box has to stay as wide as `content` for that
+    // wrapper's `min(100vw, var(--container-page))` breakout to resolve
+    // against `content`'s width rather than the narrower text measure. The
+    // measure cap moves onto every *other* direct child instead — `mx-auto
+    // max-w-measure lg:mx-0` matches what `Prose` itself used to carry, so
+    // text renders at the identical width/position; only the breakout
+    // image escapes it.
+    prose: [
+      '[&>*:not([data-full-bleed])]:mx-auto',
+      '[&>*:not([data-full-bleed])]:max-w-measure',
+      '[&>*:not([data-full-bleed])]:lg:mx-0',
+      '[&>*+*]:mt-6',
+    ],
     // Spans both grid rows so its sticky containing block reaches the
     // footer row. Mirrors `content`'s own measure below `lg:`; `lg:max-w-none`
     // frees the fixed 220px track once it's a real rail (the font-size no
@@ -41,13 +54,13 @@ export const postArticleVariants = tv({
     // `text-prose` is load-bearing, not typography: `max-w-measure` is
     // `68ch` (`configs/tailwind/theme.css`), and `ch` resolves against the
     // font-size of the element it's applied to. `footerInRail` and
-    // `PostBody`'s `Prose` root are grid siblings (neither
-    // nests inside the other), so nothing arbitrates a shared width between
-    // them — `Prose` renders its `68ch` at its own `text-prose` (17px), so
-    // without a matching override here `footerInRail` would compute its
-    // `68ch` against the ambient 16px instead, landing ~38px narrower and
-    // sharing a left edge with `Prose` but not a right one. Matching
-    // `text-prose` here makes both edges line up exactly.
+    // `Prose`'s own text children are grid siblings (neither nests inside
+    // the other), so nothing arbitrates a shared width between them —
+    // `Prose`'s children render their `68ch` at `Prose`'s own `text-prose`
+    // (17px, inherited), so without a matching override here `footerInRail`
+    // would compute its `68ch` against the ambient 16px instead, landing
+    // ~38px narrower and sharing a left edge with `Prose` but not a right
+    // one. Matching `text-prose` here makes both edges line up exactly.
     footerInRail: [
       'mx-auto text-prose',
       'max-w-measure',
