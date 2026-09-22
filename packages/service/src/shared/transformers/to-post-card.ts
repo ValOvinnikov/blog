@@ -1,7 +1,7 @@
 import type { ISanityImage, TMaybeUndefined } from '@blog/config';
 import type { postCardFragment } from '@blog/service/shared/fragments/post';
+import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
 import { toLinkDocument } from '@blog/service/shared/transformers/to-link-document';
-import { toPostHeading } from '@blog/service/shared/transformers/to-post-heading';
 import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
 import { toReadingTimeMinutes } from '@blog/utils';
 import type { InferFragmentType } from 'groqd';
@@ -52,7 +52,9 @@ function toPostCardTopic(raw: TRawPostCard['topic']): TPostCardTopic {
 }
 
 export function toPostCard(raw: TRawPostCard): TPostCard {
-  const { title, excerpt } = toPostHeading(raw.headingBlock);
+  const { heading: title, supportingText: excerpt } = toHeadingBlock(
+    raw.headingBlock,
+  );
 
   return {
     id: raw._id,

@@ -1,6 +1,8 @@
 import { POST_SOURCE } from '@blog/config/constants';
+import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
+import { PUBLISHED_POST_CONDITION } from '@blog/studio/schema-types/filters/published-post';
 import { validateNewestFeaturedHasCandidate } from '@blog/studio/schema-types/validation/validate-newest-featured-has-candidate/validate-newest-featured-has-candidate';
-import type { SanityDocument, ValidationContext } from 'sanity';
+import type { ValidationContext } from 'sanity';
 
 const createMockContext = (
   fetchImpl: (query: string, params?: unknown) => unknown,
@@ -24,12 +26,7 @@ describe('validateNewestFeaturedHasCandidate', () => {
       return 0;
     });
 
-    await expect(
-      validate(
-        { postSource: POST_SOURCE.PINNED } as unknown as SanityDocument,
-        context,
-      ),
-    ).resolves.toBe(true);
+    await expect(validate(POST_SOURCE.PINNED, context)).resolves.toBe(true);
     expect(called).toBe(false);
   });
 
@@ -37,14 +34,7 @@ describe('validateNewestFeaturedHasCandidate', () => {
     const validate = validateNewestFeaturedHasCandidate('hero');
     const context = createMockContext(() => 0);
 
-    await expect(
-      validate(
-        {
-          postSource: POST_SOURCE.NEWEST_FEATURED,
-        } as unknown as SanityDocument,
-        context,
-      ),
-    ).resolves.toBe(
+    await expect(validate(POST_SOURCE.NEWEST_FEATURED, context)).resolves.toBe(
       'No published post is marked Featured, so this hero would render empty.',
     );
   });
@@ -53,14 +43,7 @@ describe('validateNewestFeaturedHasCandidate', () => {
     const validate = validateNewestFeaturedHasCandidate('spotlight');
     const context = createMockContext(() => 0);
 
-    await expect(
-      validate(
-        {
-          postSource: POST_SOURCE.NEWEST_FEATURED,
-        } as unknown as SanityDocument,
-        context,
-      ),
-    ).resolves.toBe(
+    await expect(validate(POST_SOURCE.NEWEST_FEATURED, context)).resolves.toBe(
       'No published post is marked Featured, so this spotlight would render empty.',
     );
   });
@@ -69,14 +52,9 @@ describe('validateNewestFeaturedHasCandidate', () => {
     const validate = validateNewestFeaturedHasCandidate('hero');
     const context = createMockContext(() => 1);
 
-    await expect(
-      validate(
-        {
-          postSource: POST_SOURCE.NEWEST_FEATURED,
-        } as unknown as SanityDocument,
-        context,
-      ),
-    ).resolves.toBe(true);
+    await expect(validate(POST_SOURCE.NEWEST_FEATURED, context)).resolves.toBe(
+      true,
+    );
   });
 
   it('queries the featured, published post count', async () => {
@@ -87,13 +65,10 @@ describe('validateNewestFeaturedHasCandidate', () => {
       return 1;
     });
 
-    await validate(
-      { postSource: POST_SOURCE.NEWEST_FEATURED } as unknown as SanityDocument,
-      context,
-    );
+    await validate(POST_SOURCE.NEWEST_FEATURED, context);
 
-    expect(receivedQuery).toBe(
-      'count(*[_type == "page_post" && featured == true && publishedAt <= now() && defined(headingBlock.heading) && defined(author) && defined(topic) && defined(content) && defined(seo.metaTitle)])',
-    );
+    expect(receivedQuery).toContain(`_type == "${PAGE_POST_TYPE}"`);
+    expect(receivedQuery).toContain('featured == true');
+    expect(receivedQuery).toContain(PUBLISHED_POST_CONDITION);
   });
 });

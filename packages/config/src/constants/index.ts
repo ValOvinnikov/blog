@@ -19,6 +19,7 @@ export * from './link';
 export * from './module';
 export * from './operator-alert';
 export * from './path';
+export * from './portable-text-block-type';
 export * from './preset';
 export * from './reserved-slug';
 export * from './size';

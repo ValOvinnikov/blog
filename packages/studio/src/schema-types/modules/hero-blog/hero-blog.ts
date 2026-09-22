@@ -17,15 +17,16 @@ import {
 } from '@blog/studio/schema-types/fields/hero-media-order-fields/hero-media-order-fields';
 import { heroVariantField } from '@blog/studio/schema-types/fields/hero-variant-field/hero-variant-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import {
+  PUBLISHED_POST_CONDITION,
+  publishedPostFilter,
+} from '@blog/studio/schema-types/filters/published-post';
 import { heroFieldsets } from '@blog/studio/schema-types/modules/hero-fieldsets/hero-fieldsets';
 import { ctaSecondaryButtonSchema } from '@blog/studio/schema-types/objects/cta-button/cta-button';
 import { heroLayoutField } from '@blog/studio/schema-types/objects/hero-layout/hero-layout-field';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
 import { getDraftsClient } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
-import {
-  PUBLISHED_POST_CONDITION,
-  validateNewestFeaturedHasCandidate,
-} from '@blog/studio/schema-types/validation/validate-newest-featured-has-candidate/validate-newest-featured-has-candidate';
+import { validateNewestFeaturedHasCandidate } from '@blog/studio/schema-types/validation/validate-newest-featured-has-candidate/validate-newest-featured-has-candidate';
 import { toTitleCase } from '@blog/utils/primitives';
 import { Star } from 'lucide-react';
 import {
@@ -85,21 +86,6 @@ const validateVariantRequiresImage = (
     : true;
 };
 
-const validatePinnedPostPublishDate = async (
-  document: SanityDocument | undefined,
-  context: ValidationContext,
-): Promise<string | true> => {
-  const doc = asHeroBlogDocument(document);
-
-  if (doc?.postSource !== POST_SOURCE.PINNED) return true;
-
-  const resolved = await fetchResolvedPost(doc, context);
-
-  return resolved?.publishedAt && new Date(resolved.publishedAt) > new Date()
-    ? 'This post publishes later. The hero stays empty until then.'
-    : true;
-};
-
 const validatePostImageFallback = async (
   document: SanityDocument | undefined,
   context: ValidationContext,
@@ -145,9 +131,7 @@ export const heroBlogSchema = defineType({
     ...heroFieldsets,
   ],
   validation: (rule) => [
-    rule.custom(validateNewestFeaturedHasCandidate('hero')),
     rule.custom(validateVariantRequiresImage),
-    rule.custom(validatePinnedPostPublishDate).warning(),
     rule.custom(validatePostImageFallback).warning(),
   ],
   fields: [
@@ -168,7 +152,8 @@ export const heroBlogSchema = defineType({
         })),
       },
       initialValue: POST_SOURCE.NEWEST_FEATURED,
-      validation: (rule) => rule.required(),
+      validation: (rule) =>
+        rule.required().custom(validateNewestFeaturedHasCandidate('hero')),
     }),
     defineField({
       name: 'post',
@@ -177,6 +162,7 @@ export const heroBlogSchema = defineType({
       description: 'The pinned post.',
       fieldset: FIELDSET_POST,
       to: [{ type: PAGE_POST_TYPE }],
+      options: { filter: publishedPostFilter },
       hidden: ({ parent }) =>
         (parent as THeroBlogDocument | undefined)?.postSource !==
         POST_SOURCE.PINNED,

@@ -1,21 +1,9 @@
-import {
-  BRAND_VARIANT,
-  DISPLAY_MODE,
-  POST_SOURCE,
-} from '@blog/config/constants';
+import { BRAND_VARIANT, POST_SOURCE } from '@blog/config/constants';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
-import {
-  getRecordedValidators,
-  type TRecordedValidator,
-} from '@blog/studio/testing/create-mock-validation-rule';
+import { getCustomValidator } from '@blog/studio/testing/create-mock-validation-rule';
 import { getField } from '@blog/studio/testing/get-field';
 import { getHidden } from '@blog/studio/testing/get-field-hidden';
-import type { SanityDocument, ValidationContext } from 'sanity';
-
-type TDocFn = (
-  document: SanityDocument | undefined,
-  context: ValidationContext,
-) => Promise<string | true> | string | true;
+import type { ValidationContext } from 'sanity';
 
 const getPostFeaturedField = (name: string) =>
   getField(postFeaturedSchema, name);
@@ -24,6 +12,11 @@ type TCustomProbe<TValue> = (
   value: TValue,
   context: { parent?: unknown },
 ) => string | true;
+
+type TFieldAsyncFn = (
+  value: string | undefined,
+  context: ValidationContext,
+) => Promise<string | true>;
 
 const getCustomFn = <TValue>(fieldName: string): TCustomProbe<TValue> => {
   const field = getPostFeaturedField(fieldName);
@@ -56,9 +49,6 @@ const getCustomFn = <TValue>(fieldName: string): TCustomProbe<TValue> => {
 
   return customFn;
 };
-
-const getDocumentValidators = (): TRecordedValidator<TDocFn>[] =>
-  getRecordedValidators<TDocFn>(postFeaturedSchema);
 
 const createMockContext = (
   fetchImpl: (query: string, params?: unknown) => unknown,
@@ -152,144 +142,43 @@ describe('postFeaturedSchema limit field', () => {
   });
 });
 
-describe('postFeaturedSchema document validation', () => {
-  it('defines no carousel/limit warning, unlike postLatestSchema', async () => {
-    const validators = getDocumentValidators();
-
-    for (const validator of validators) {
-      await expect(
-        validator.fn(
-          {
-            displayMode: DISPLAY_MODE.CAROUSEL,
-            postSource: POST_SOURCE.NEWEST_FEATURED,
-            limit: 1,
-          } as unknown as SanityDocument,
-          createMockContext(() => 1),
-        ),
-      ).resolves.toBe(true);
-    }
-  });
-
+describe('postFeaturedSchema postSource field', () => {
   describe('newest-featured-has-candidate', () => {
     it('passes without querying when Post Source is Pinned', async () => {
-      const [validateNewestFeatured] = getDocumentValidators();
+      const validate = getCustomValidator<TFieldAsyncFn>(
+        getPostFeaturedField('postSource'),
+      );
       let called = false;
       const context = createMockContext(() => {
         called = true;
         return 0;
       });
 
-      await expect(
-        validateNewestFeatured!.fn(
-          { postSource: POST_SOURCE.PINNED } as unknown as SanityDocument,
-          context,
-        ),
-      ).resolves.toBe(true);
+      await expect(validate(POST_SOURCE.PINNED, context)).resolves.toBe(true);
       expect(called).toBe(false);
     });
 
     it('errors when Newest Featured and no candidate exists', async () => {
-      const [validateNewestFeatured] = getDocumentValidators();
+      const validate = getCustomValidator<TFieldAsyncFn>(
+        getPostFeaturedField('postSource'),
+      );
       const context = createMockContext(() => 0);
 
       await expect(
-        validateNewestFeatured!.fn(
-          {
-            postSource: POST_SOURCE.NEWEST_FEATURED,
-          } as unknown as SanityDocument,
-          context,
-        ),
+        validate(POST_SOURCE.NEWEST_FEATURED, context),
       ).resolves.toBe(
         'No published post is marked Featured, so this spotlight would render empty.',
       );
     });
 
     it('passes when Newest Featured and a candidate exists', async () => {
-      const [validateNewestFeatured] = getDocumentValidators();
+      const validate = getCustomValidator<TFieldAsyncFn>(
+        getPostFeaturedField('postSource'),
+      );
       const context = createMockContext(() => 1);
 
       await expect(
-        validateNewestFeatured!.fn(
-          {
-            postSource: POST_SOURCE.NEWEST_FEATURED,
-          } as unknown as SanityDocument,
-          context,
-        ),
-      ).resolves.toBe(true);
-    });
-  });
-
-  describe('pinned-posts-publish-date', () => {
-    it('passes without querying when Post Source is Newest Featured', async () => {
-      const [, validatePublishDate] = getDocumentValidators();
-      let called = false;
-      const context = createMockContext(() => {
-        called = true;
-        return [];
-      });
-
-      await expect(
-        validatePublishDate!.fn(
-          {
-            postSource: POST_SOURCE.NEWEST_FEATURED,
-          } as unknown as SanityDocument,
-          context,
-        ),
-      ).resolves.toBe(true);
-      expect(called).toBe(false);
-    });
-
-    it('passes without querying when Pinned with no posts chosen yet', async () => {
-      const [, validatePublishDate] = getDocumentValidators();
-      let called = false;
-      const context = createMockContext(() => {
-        called = true;
-        return [];
-      });
-
-      await expect(
-        validatePublishDate!.fn(
-          {
-            postSource: POST_SOURCE.PINNED,
-            posts: [],
-          } as unknown as SanityDocument,
-          context,
-        ),
-      ).resolves.toBe(true);
-      expect(called).toBe(false);
-    });
-
-    it('warns when a pinned post publishes in the future', async () => {
-      const [, validatePublishDate] = getDocumentValidators();
-      const future = new Date(Date.now() + 86_400_000).toISOString();
-      const context = createMockContext(() => [{ publishedAt: future }]);
-
-      await expect(
-        validatePublishDate!.fn(
-          {
-            postSource: POST_SOURCE.PINNED,
-            posts: [{ _ref: 'post-1' }],
-          } as unknown as SanityDocument,
-          context,
-        ),
-      ).resolves.toBe(
-        'This post publishes later. The spotlight skips it until then.',
-      );
-    });
-
-    it('passes when every pinned post already published', async () => {
-      const [, validatePublishDate] = getDocumentValidators();
-      const past = new Date(Date.now() - 86_400_000).toISOString();
-      const context = createMockContext(() => [{ publishedAt: past }]);
-
-      await expect(
-        validatePublishDate!.fn(
-          {
-            postSource: POST_SOURCE.PINNED,
-            posts: [{ _ref: 'post-1' }],
-          } as unknown as SanityDocument,
-          context,
-        ),
+        validate(POST_SOURCE.NEWEST_FEATURED, context),
       ).resolves.toBe(true);
     });
   });
