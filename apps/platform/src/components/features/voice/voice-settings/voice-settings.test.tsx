@@ -13,9 +13,6 @@ mockRouterRefresh();
 const ADVANCED_SUMMARY = 'Advanced — 8 curated strings, 2 groups';
 const ARCHIVED_AT = new Date('2026-08-26T00:00:00.000Z');
 
-// Advanced starts collapsed (matching the Look tab) — every test that reads
-// or interacts with a curated field opens it first, same as a real user
-// would have to.
 const openAdvanced = async (user: ReturnType<typeof userEvent.setup>) => {
   await user.click(screen.getByText(ADVANCED_SUMMARY));
 };

@@ -34,8 +34,6 @@ const DOMAIN_LOCKED: TTenantFieldLocks = {
   primaryDomain: { kind: 'step', step: TENANT_PROVISIONING_STEP.MAP_DOMAIN },
 };
 
-// Applies the same wrapper on mount and on every `rerender()` call, so the
-// live region's node identity is preserved across rerenders.
 const withIntl = (ui: ReactElement) => {
   return (
     <NextIntlClientProvider locale={LOCALE_ISO_CODES.EN} messages={messages}>
@@ -44,9 +42,6 @@ const withIntl = (ui: ReactElement) => {
   );
 };
 
-// A sibling control outside the panel entirely, standing in for an unrelated
-// field or the adjacent steps list that a background poll must not steal
-// focus from.
 const PanelWithOutsideControl = (props: TTenantDetailsPanelProps) => {
   return (
     <>
@@ -108,7 +103,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       expect(ownerEmailInput).toHaveValue('owner@example.com');
       expect(ownerEmailInput).toHaveAttribute('type', 'email');
 
-      // Nothing has been edited yet, so Save has nothing to submit.
       expect(
         screen.getByRole('button', { name: 'Save changes' }),
       ).toBeDisabled();
@@ -124,16 +118,10 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         />,
       );
 
-      // SegmentedControl's root has no id a `for` could ever reference, so
-      // the "Plan" label text must render as a plain span rather than a
-      // <label htmlFor> — a <label for="tenant-detail-plan"> here would
-      // never associate with anything and is the regression this guards.
       const planLabelText = screen.getByText('Plan');
       expect(planLabelText.tagName).toBe('SPAN');
       expect(planLabelText).not.toHaveAttribute('for');
 
-      // The accessible name still resolves correctly — via SegmentedControl's
-      // own required `ariaLabel` prop, not a label association.
       expect(screen.getByRole('group', { name: 'Plan' })).toBeVisible();
     });
 
@@ -287,7 +275,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       expect(domainInput).toBeInvalid();
       expect(domainInput).toHaveAccessibleDescription('Enter a valid domain.');
 
-      // Fields with no error of their own stay valid and undescribed.
       const localeInput = screen.getByRole('textbox', { name: 'Locale' });
       expect(localeInput).not.toBeInvalid();
       expect(localeInput).toHaveAccessibleDescription('');
@@ -317,9 +304,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
       expect(await screen.findByText('Tenant details saved.')).toBeVisible();
 
-      // Unlike the old inline alert (tied to `showSaveSuccess`, cleared on
-      // any edit), a toast's lifecycle is independent of the form — it must
-      // not disappear just because editing resumed.
       await user.type(screen.getByRole('textbox', { name: 'Name' }), ' again');
       expect(screen.getByText('Tenant details saved.')).toBeVisible();
     });
@@ -404,8 +388,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         "This tenant's owner has already signed in, so their email can no longer be corrected here — this would transfer ownership instead.",
       );
       expect(message).toBeVisible();
-      // Distinct from the generic "couldn't save, try again" copy — it
-      // never appears alongside the specific explanation.
       expect(screen.queryByText(/couldn.?t save/i)).not.toBeInTheDocument();
       expect(refreshMock).not.toHaveBeenCalled();
     });
@@ -528,7 +510,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
           'tenant-1',
           expect.objectContaining({
             primaryDomain: 'new-domain.example.com',
-            // The locked field's original value is submitted unchanged.
             name: tenant.name,
           }),
         );
@@ -664,8 +645,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         screen.getByRole('textbox', { name: 'Primary domain' }),
       ).toHaveValue('unsaved-domain.example.com');
 
-      // A background poll discovers a step has completed, locking the
-      // domain — while the operator's unsaved edit above is still showing.
       rerender(
         withIntl(
           <TenantDetailsPanel
@@ -827,8 +806,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
       await waitFor(() => expect(refreshMock).toHaveBeenCalled());
 
-      // Stands in for `router.refresh()` causing the parent Server Component
-      // to re-fetch and pass down the now-persisted tenant.
       rerender(
         withIntl(
           <TenantDetailsPanel

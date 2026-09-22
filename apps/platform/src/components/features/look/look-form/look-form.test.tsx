@@ -42,10 +42,6 @@ describe(`<${LookForm.name}/>`, () => {
     updateLookActionMock.mockResolvedValue({ ok: true });
   });
 
-  // On CI's shared runners, mounting LookForm's full control tree (preset
-  // picker, hue slider, font pickers, both preview panels) as the first
-  // render in this file consistently lands just over Vitest's 5000ms
-  // default — not a code regression, just cold-start cost under contention.
   it(
     'renders the current preset and accent hue from the given initial values',
     { timeout: 15000 },

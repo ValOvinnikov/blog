@@ -43,7 +43,6 @@ const clickConfirmInviteOwner = async (
   );
 };
 
-/** Queues the first submit's "unregistered owner" confirmation, then a second-submit success — the shared arrangement of every confirm-and-resubmit test below. */
 const mockOwnerInviteConfirmation = (overrides: {
   email: string;
   token?: string;

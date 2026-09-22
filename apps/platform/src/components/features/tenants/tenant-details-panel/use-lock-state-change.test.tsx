@@ -16,11 +16,6 @@ type THarnessProps = {
   onFieldsLocked?: (keys: TTenantFieldKey[]) => void;
 };
 
-/**
- * Minimal harness wiring the hook's ref onto a real focusable container so
- * the DOM-dependent behaviour (focus movement, live-region text) can be
- * exercised directly against the hook, independent of the panel component.
- */
 const Harness = ({ fieldLocks, onFieldsLocked = () => {} }: THarnessProps) => {
   const { lockAnnouncement, fieldsContainerRef } = useLockStateChange({
     panelId: 'test-panel',
