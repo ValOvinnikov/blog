@@ -1,9 +1,4 @@
 {
-  "src/components/features/voice/voice-settings/voice-settings.test.tsx": {
-    "testing-library/no-node-access": {
-      "count": 6
-    }
-  },
   "src/components/shared/asset-upload-field/asset-upload-field.test.tsx": {
     "testing-library/no-container": {
       "count": 1
