@@ -1,6 +1,8 @@
-import { getDraftsClient } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import { fetchDraftsFailSafe } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
 import { getPostListModuleRefs } from '@blog/studio/schema-types/validation/validate-post-list-cardinality/validate-post-list-cardinality';
 import type { SanityDocument, ValidationContext } from 'sanity';
+
+const FAIL_SAFE_ASSUMES_NO_CONFLICT = 0;
 
 /**
  * Builds a document-level rule rejecting a second page of `pageType`
@@ -22,11 +24,11 @@ export const validateUniquePostListReference =
 
     if (!publishedId) return true;
 
-    const client = getDraftsClient(context);
-
-    const conflictingCount = await client.fetch<number>(
+    const conflictingCount = await fetchDraftsFailSafe<number>(
+      context,
       `count(*[_type == $type && $postListId in modules[]._ref && !(_id in [$publishedId, "drafts." + $publishedId])])`,
       { type: pageType, postListId: postListRef, publishedId },
+      FAIL_SAFE_ASSUMES_NO_CONFLICT,
     );
 
     return conflictingCount > 0 ? uniquenessError : true;

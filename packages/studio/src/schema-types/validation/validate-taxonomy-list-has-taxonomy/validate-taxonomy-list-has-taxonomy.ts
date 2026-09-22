@@ -1,5 +1,5 @@
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
-import { getDraftsClient } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import { fetchDraftsFailSafe } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
 import type { ValidationContext } from 'sanity';
 
 type TModuleReference = { _type?: string; _ref?: string };
@@ -23,11 +23,19 @@ export const validateTaxonomyListHasTaxonomy = async (
 
   if (ids.length === 0) return true;
 
-  const client = getDraftsClient(context);
+  const failSafeAssumesEveryCandidateHasATaxonomy = ids.map((id) => ({
+    id,
+    taxonomy: 'taxonomy present',
+  }));
 
-  const candidates = await client.fetch<
+  const candidates = await fetchDraftsFailSafe<
     { id: string; title?: string | null; taxonomy?: string | null }[]
-  >(`*[_id in $ids]{ "id": _id, title, taxonomy }`, { ids });
+  >(
+    context,
+    `*[_id in $ids]{ "id": _id, title, taxonomy }`,
+    { ids },
+    failSafeAssumesEveryCandidateHasATaxonomy,
+  );
 
   const missing = candidates.find((candidate) => !candidate.taxonomy);
 

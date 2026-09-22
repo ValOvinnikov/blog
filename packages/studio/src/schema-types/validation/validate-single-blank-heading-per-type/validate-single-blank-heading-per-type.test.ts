@@ -7,7 +7,7 @@ type TCandidate = { id: string; heading?: string | null };
 const BLANK_HEADING_ERROR =
   'Only one module of this type without its own heading is allowed per page — give this one a heading or remove the duplicate.';
 
-const createMockContext = (candidates: TCandidate[]) => {
+const createMockContext = (candidates: TCandidate[] | Error) => {
   const getClientCalls: unknown[] = [];
   const withConfigCalls: unknown[] = [];
   const fetchCalls: { query: string; params: unknown }[] = [];
@@ -22,6 +22,7 @@ const createMockContext = (candidates: TCandidate[]) => {
         return {
           fetch: async (query: string, params: unknown) => {
             fetchCalls.push({ query, params });
+            if (candidates instanceof Error) throw candidates;
             return candidates;
           },
         };
@@ -146,6 +147,17 @@ describe('validateSingleBlankHeadingPerType', () => {
     await validate(modules, context);
 
     expect(withConfigCalls).toEqual([{ perspective: 'drafts' }]);
+  });
+
+  it('resolves to true, not an error, when the fetch rejects', async () => {
+    const validate = validateSingleBlankHeadingPerType(['module_postLatest']);
+    const { context } = createMockContext(new Error('network down'));
+    const modules: TModuleReference[] = [
+      { _type: 'module_postLatest', _ref: 'post-latest-1' },
+      { _type: 'module_postLatest', _ref: 'post-latest-2' },
+    ];
+
+    await expect(validate(modules, context)).resolves.toBe(true);
   });
 
   it('flags two blank-heading instances of the same type among several listed types', async () => {
