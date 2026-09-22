@@ -35,5 +35,4 @@ export const inlineTextSchema = defineType({
       marks: inlineTextMarks,
     }),
   ],
-  validation: (rule) => rule.max(6),
 });
