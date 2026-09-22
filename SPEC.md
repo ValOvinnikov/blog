@@ -382,8 +382,9 @@ surplus entry in its `apps/web` module map from dead code into a
 
 Four kinds are registered. **`module_hero`** is the original, kept until
 #2813 retires it. **`module_heroBlog`** is the featured-post hero: its
-copy, image and primary action all derive from a post, and publish is
-blocked when none resolves. It authors no heading or supporting text of its
+copy and primary action derive from a post, its image is an optional
+override falling back to that post's, and publish is blocked when no post
+resolves. It authors no heading or supporting text of its
 own — those are the post's, and a hero without a post is broken rather than
 sparse, since its action is built from that post and would link nowhere. Its
 only authored copy is an optional `eyebrow`, overriding the post's topic
@@ -448,9 +449,9 @@ both media-order fields and layout — and passes no configuration object.
 A single `heroFields({ … })` helper taking option flags used to build that
 tail for every hero; #3275 deleted it, because omission is how a hero says
 it lacks a field, and a flag list is a worse way to say the same thing. So
-the statement hero's `image` is its own, where `module_heroBlog` has a
-post-sourced one and `module_heroProfile` has the author-fallback pair
-above.
+the statement hero's `image` is its own, where `module_heroBlog` and
+`module_heroProfile` both author an optional image over a fallback — the
+referenced post's hero image, and the author-fallback pair above.
 Actions are not part of the tail: `module_heroBlog`'s primary links to the
 resolved post, with a **required** authored `primaryActionLabel` and
 `primaryActionAppearance` (no "Read more" fallback — an unlabelled hero is
