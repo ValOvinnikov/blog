@@ -17,7 +17,8 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@blog/utils": "workspace:*"
+    "@blog/utils": "workspace:*",
+    "@portabletext/types": "^2.0.15"
   },
   "devDependencies": {
     "@blog/eslint-config": "workspace:*",
