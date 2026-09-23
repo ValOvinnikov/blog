@@ -5,7 +5,7 @@ import {
 } from '@blog/service/shared/expressions/display-mode';
 import { ctaButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
-import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
+import { sanityImageAssetFragment } from '@blog/service/shared/fragments/image/image';
 import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document';
 
@@ -22,10 +22,21 @@ export const logoWallModuleQuery = q
       .notNull(),
     logos: sub
       .field('logos[]')
-      .deref()
       .project((logoSub) => ({
-        _id: true,
-        image: logoSub.field('image').project(sanityImageFragment).notNull(),
+        _key: true,
+        name: logoSub.field('name').notNull(),
+        image: logoSub
+          .field('image')
+          .project((imageSub) => ({
+            asset: imageSub
+              .field('asset')
+              .deref()
+              .project(sanityImageAssetFragment)
+              .notNull(),
+            hotspot: true,
+            crop: true,
+          }))
+          .notNull(),
         link: logoSub
           .field('link')
           .deref()

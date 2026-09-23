@@ -1,7 +1,7 @@
 import type { PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config';
 import { q } from '@blog/service/sanity/query';
 
-const sanityImageAssetFragment = q
+export const sanityImageAssetFragment = q
   .fragmentForType<'sanity.imageAsset'>()
   .project((sub) => ({
     _id: true,
