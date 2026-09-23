@@ -191,7 +191,7 @@ Props: className?: string _(extends IWithDataTestId, VariantProps<typeof buttonV
 
 ### LogoTile — `molecules/logo-tile/logo-tile.tsx`
 
-A surface-less holder that centres one logo mark; the consumer supplies the image and any link, and the mark's own alt text is its accessible name.
+Carries no surface, border, or shadow, deliberately: a card promises a click most logos don't have.
 Props: children: ReactNode · isInteractive?: TLogoTileVariants['isInteractive'] _(extends IWithClassName, IWithDataTestId)_
 Variants: isInteractive: (boolean)
 

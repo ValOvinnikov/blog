@@ -9,7 +9,7 @@ export type TLogoTileProps = IWithClassName &
     isInteractive?: TLogoTileVariants['isInteractive'];
   };
 
-/** LogoTile — A surface-less holder that centres one logo mark; the consumer supplies the image and any link, and the mark's own alt text is its accessible name. */
+/** Carries no surface, border, or shadow, deliberately: a card promises a click most logos don't have. */
 export const LogoTile = ({
   children,
   isInteractive,
