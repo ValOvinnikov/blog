@@ -51,7 +51,7 @@ describe(`<${AssetUploadField.name}/>`, () => {
   it('rejects a file client-side without calling onUpload, showing onValidateFile’s message', async () => {
     const onUpload = vi.fn();
     const onChange = vi.fn();
-    const { container } = render(
+    render(
       <AssetUploadField
         {...baseProps}
         onValidateFile={() => 'Choose a PNG, JPEG, or WebP image.'}
@@ -60,7 +60,7 @@ describe(`<${AssetUploadField.name}/>`, () => {
       />,
     );
 
-    await selectFile(container, pngFile());
+    await selectFile(pngFile());
 
     expect(
       await screen.findByText('Choose a PNG, JPEG, or WebP image.'),
@@ -74,7 +74,7 @@ describe(`<${AssetUploadField.name}/>`, () => {
       .fn()
       .mockResolvedValue({ ok: true, url: 'https://example.com/logo-new.png' });
     const onChange = vi.fn();
-    const { container } = render(
+    render(
       <AssetUploadField
         {...baseProps}
         onUpload={onUpload}
@@ -82,7 +82,7 @@ describe(`<${AssetUploadField.name}/>`, () => {
       />,
     );
 
-    await selectFile(container, pngFile());
+    await selectFile(pngFile());
 
     await waitFor(() => {
       expect(onChange).toHaveBeenCalledWith('https://example.com/logo-new.png');
@@ -95,7 +95,7 @@ describe(`<${AssetUploadField.name}/>`, () => {
       .fn()
       .mockResolvedValue({ ok: false, error: 'That file is too large.' });
     const onChange = vi.fn();
-    const { container } = render(
+    render(
       <AssetUploadField
         {...baseProps}
         currentUrl="https://example.com/logo.png"
@@ -104,7 +104,7 @@ describe(`<${AssetUploadField.name}/>`, () => {
       />,
     );
 
-    await selectFile(container, pngFile());
+    await selectFile(pngFile());
 
     expect(await screen.findByText('That file is too large.')).toBeVisible();
     expect(onChange).not.toHaveBeenCalled();
@@ -114,7 +114,7 @@ describe(`<${AssetUploadField.name}/>`, () => {
   it('shows the unexpectedErrorLabel fallback, without crashing, when onUpload itself throws', async () => {
     const onUpload = vi.fn().mockRejectedValue(new Error('network error'));
     const onChange = vi.fn();
-    const { container } = render(
+    render(
       <AssetUploadField
         {...baseProps}
         onUpload={onUpload}
@@ -122,7 +122,7 @@ describe(`<${AssetUploadField.name}/>`, () => {
       />,
     );
 
-    await selectFile(container, pngFile());
+    await selectFile(pngFile());
 
     expect(
       await screen.findByText('Something went wrong — try again.'),

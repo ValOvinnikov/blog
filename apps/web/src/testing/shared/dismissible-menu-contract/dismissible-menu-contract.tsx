@@ -18,9 +18,7 @@ export const testCoreDismissibleMenuBehavior = () => {
     await user.click(getTrigger());
 
     expect(getTrigger()).toHaveAttribute('aria-expanded', 'true');
-    expect(document.activeElement).toBe(
-      screen.getByRole('button', { name: 'first' }),
-    );
+    expect(screen.getByRole('button', { name: 'first' })).toHaveFocus();
   });
 
   it('closes on a second toggle and returns focus to the trigger', async () => {
@@ -31,7 +29,7 @@ export const testCoreDismissibleMenuBehavior = () => {
     await user.click(trigger);
 
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    expect(document.activeElement).toBe(trigger);
+    expect(trigger).toHaveFocus();
   });
 
   it('closes on Escape and returns focus to the trigger', async () => {
@@ -42,7 +40,7 @@ export const testCoreDismissibleMenuBehavior = () => {
     fireEvent.keyDown(document, { key: 'Escape' });
 
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    expect(document.activeElement).toBe(trigger);
+    expect(trigger).toHaveFocus();
   });
 
   it('closes on an outside pointer-down and returns focus to the trigger', async () => {
@@ -53,7 +51,7 @@ export const testCoreDismissibleMenuBehavior = () => {
     fireEvent.mouseDown(document.body);
 
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    expect(document.activeElement).toBe(trigger);
+    expect(trigger).toHaveFocus();
   });
 
   it('stays open on a pointer-down inside the panel', async () => {
@@ -76,7 +74,7 @@ export const testCoreDismissibleMenuBehavior = () => {
 
     fireEvent.keyDown(document, { key: 'Tab' });
 
-    expect(document.activeElement).toBe(first);
+    expect(first).toHaveFocus();
   });
 
   it('moves focus to the next item on ArrowDown, wrapping from the last back to the first', async () => {
@@ -87,10 +85,10 @@ export const testCoreDismissibleMenuBehavior = () => {
     const last = screen.getByRole('button', { name: 'second' });
 
     fireEvent.keyDown(document, { key: 'ArrowDown' });
-    expect(document.activeElement).toBe(last);
+    expect(last).toHaveFocus();
 
     fireEvent.keyDown(document, { key: 'ArrowDown' });
-    expect(document.activeElement).toBe(first);
+    expect(first).toHaveFocus();
   });
 
   it('focuses the last item on End', async () => {
@@ -101,7 +99,7 @@ export const testCoreDismissibleMenuBehavior = () => {
 
     fireEvent.keyDown(document, { key: 'End' });
 
-    expect(document.activeElement).toBe(last);
+    expect(last).toHaveFocus();
   });
 };
 
@@ -142,6 +140,6 @@ export const testArrowUpAndHomeBehavior = () => {
 
     fireEvent.keyDown(document, { key });
 
-    expect(document.activeElement).toBe(expected === 'first' ? first : last);
+    expect(expected === 'first' ? first : last).toHaveFocus();
   });
 };

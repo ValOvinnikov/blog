@@ -73,7 +73,7 @@ export default [
     // like `packages/insight/src/**` would never match from this shared file.
     // Own namespace: registering a second rules object under `blog` throws
     // "Cannot redefine plugin".
-    files: ['**/*.test.{ts,tsx}'],
+    files: ['**/*.test.{ts,tsx}', 'src/testing/**/*.{ts,tsx}'],
     plugins: {
       'blog-test': { rules: { 'no-class-assertions': noClassAssertionsRule } },
       'testing-library': testingLibrary,
