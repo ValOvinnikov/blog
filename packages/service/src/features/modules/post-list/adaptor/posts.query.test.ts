@@ -39,7 +39,7 @@ describe(postListModulePaginatedPostsQuery, () => {
     }).query;
 
     expect(query).toContain(
-      'references(*[_type == "page_tag" && slug.current == $scopeSlug][0].tag._ref)',
+      'references(*[_type == "page_tag" && slug.current == $archivePageSlug][0].tag._ref)',
     );
     expect(query).not.toContain('blog_tag');
     expect(query).not.toContain('blog_topic');
@@ -52,31 +52,17 @@ describe(postListModulePaginatedPostsQuery, () => {
     }).query;
 
     expect(query).toContain(
-      'references(*[_type == "page_topic" && slug.current == $scopeSlug][0].topic._ref)',
+      'references(*[_type == "page_topic" && slug.current == $archivePageSlug][0].topic._ref)',
     );
     expect(query).not.toContain('blog_topic');
     expect(query).not.toContain('blog_tag');
-  });
-
-  it('still resolves the tag when the archive page slug has drifted from the term own slug', () => {
-    const query = postListModulePaginatedPostsQuery(1, 9, {
-      kind: TAXONOMY_KIND.TAGS,
-      slug: 'drifted-page-slug',
-    }).query;
-
-    expect(query).not.toContain(
-      '_type == "blog_tag" && slug.current == $scopeSlug',
-    );
-    expect(query).toContain(
-      '_type == "page_tag" && slug.current == $scopeSlug',
-    );
   });
 
   it('omits the scope predicate entirely when unscoped', () => {
     const query = postListModulePaginatedPostsQuery(1, 9).query;
 
     expect(query).not.toContain('references(');
-    expect(query).not.toContain('$scopeSlug');
+    expect(query).not.toContain('$archivePageSlug');
     expect(query).not.toContain('blog_tag');
     expect(query).not.toContain('blog_topic');
   });

@@ -16,13 +16,9 @@ const SCOPE_ARCHIVE_PAGE: Record<
   [TAXONOMY_KIND.TOPICS]: { pageType: 'page_topic', referenceField: 'topic' },
 };
 
-// $scopeSlug is the archive page's own slug (from the route), not the
-// referenced term's slug — the two are independently editable and can
-// drift. Resolving the archive page by $scopeSlug first and then following
-// its reference field to the term keeps this correct even when they do.
 function scopeFilter(kind: TTaxonomyKind) {
   const { pageType, referenceField } = SCOPE_ARCHIVE_PAGE[kind];
-  return `references(*[_type == "${pageType}" && slug.current == $scopeSlug][0].${referenceField}._ref)`;
+  return `references(*[_type == "${pageType}" && slug.current == $archivePageSlug][0].${referenceField}._ref)`;
 }
 
 /**
@@ -48,7 +44,7 @@ export function postListModulePaginatedPostsQuery(
     : q.star.filterByType('page_post').filterRaw(PUBLISHED_POST_FILTER);
 
   return q
-    .parameters<{ scopeSlug?: string }>()
+    .parameters<{ archivePageSlug?: string }>()
     .project((sub) => ({
       posts: posts
         .order('publishedAt desc')
