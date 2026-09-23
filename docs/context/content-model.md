@@ -325,7 +325,7 @@ when set) and a `modules` array. What differs per page is which module types
 each slot accepts.
 
 `heroField({ allow })` (`schema-types/fields/hero-field/hero-field.ts`) and
-`modulesField({ allow, description?, validateCustom? })`
+`modulesField({ allow, description?, once? })`
 (`schema-types/fields/modules-field/modules-field.ts`) build both — one strong
 `reference` array member per allowed type, defined in one place rather than
 duplicated per page.
@@ -351,21 +351,44 @@ kind. Each still carries a legacy singular `taxonomyList` reference field,
 reference now folded into `modules[]`, and left in place only until a migration
 drops it. Do not author against it.
 
-**Page-level validation.** Each page enforces what its own composition needs,
-and the rules are not uniform:
+**`modules[]` validation lives in `modulesField`, not per page.** Two rules run
+on every page: `.unique()` rejects the same module _document_ referenced twice,
+and — when the page passes `once` — a second module of a listed _type_ is
+rejected, flagged against each offending array item rather than as a
+document-wide banner. Omitting `once` attaches no second rule at all.
 
-- **Home, landing** — reject a `module_taxonomyList` reference with no
-  `taxonomy` set, and warn when two modules of the same listing type both leave
-  their heading blank.
-- **Post index** — exactly one `module_postList` (error on more), warning when
-  none is present.
-- **Topic, tag** — exactly one `module_postList` (error), warning when absent,
-  and a given `module_postList` or taxonomy reference may back only one such
-  page (error). These pages run **no** `taxonomy` check, so an unset
-  `taxonomy` publishes cleanly there.
-- **Topic index, tag index** — exactly one `module_taxonomyList` (error),
-  warning when absent, reject one with no `taxonomy`, and reject one whose kind
-  disagrees with the page's own.
+| Page                               | `once`         |
+| ---------------------------------- | -------------- |
+| `page_postIndex`                   | `postList`     |
+| `page_topic`, `page_tag`           | `postList`     |
+| `page_topicIndex`, `page_tagIndex` | `taxonomyList` |
+| `page_post`                        | `postRelated`  |
+| `page_home`, `page_landing`        | — none         |
+
+Home and landing pass nothing deliberately: they are the composable pages, so
+repeat `module_content`, `module_cta` and `module_newsletter` have to stay
+authorable. A blanket one-per-type rule would forbid the second content section
+on a marketing page.
+
+**Only three page-level rules survive**, each guarding a state the renderer
+would otherwise get silently wrong:
+
+- **Topic, tag** — a term may back only one archive page
+  (`validateUniqueTaxonomyReference`, on the `topic`/`tag` reference field).
+  Every taxonomy href resolves through `*[_type == "page_topic" && topic._ref ==
+^._id][0]`, so a second page makes that `[0]` arbitrary.
+- **Topic index, tag index** — a referenced `module_taxonomyList` must match the
+  page's own kind (`validateTaxonomyListReferencesMatchKind`). Nothing else
+  stops `/topics` listing tags.
+- **`blog_topic`, `blog_tag`** — a term with no archive page blocks publishing
+  (`validateHasPage`), since its URL 404s with no runtime fallback.
+
+The cardinality, blank-heading and unset-taxonomy validators that used to sit
+here are gone. The blank-heading ones guarded a state `headingBlockField()`'s
+`required()` already makes impossible; the "warns when none is present" ones
+were invisible until an editor clicked the validation icon; and an unset
+`module_taxonomyList.taxonomy` now renders the module's empty state instead of
+404ing the page.
 
 Beyond the module slots, pages carry their own fields: `title` (internal Studio
 label on the singletons), `slug` where the page is addressable — `page_landing`

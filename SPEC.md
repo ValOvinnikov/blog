@@ -668,19 +668,22 @@ is rendered.
 Which taxonomy it lists is an optional authored field, because a module
 document cannot see what holds it: the page references the module, not the
 reverse, and Sanity's `hidden` callback is synchronous and sees only the
-module's own document. So the field is always visible and the requirement
-lives on the pages instead: every page placing one must set it, enforced by an
-async rule on `modules[]` that fetches each referenced module and rejects one
-that has not.
+module's own document. So the field is always visible, and nothing requires it.
 
-Nothing overrides that field at read time. `renderModules` calls every module
+Nothing overrides it at read time either. `renderModules` calls every module
 with the same arguments, so there is no channel by which a page could supply a
 kind the module itself lacks, and
 `service.modules.taxonomyList.v1.getTaxonomyList(id, tenant)` projects the
-authored field alone. A module reaching the loader without one resolves to
-`null` and raises `UnresolvedTaxonomyError` in the transformer — a failed
-fetch, never an empty list, so an unauthored module is visible as a fault
-rather than as a section that renders nothing.
+authored field alone — it takes no page-kind fallback.
+
+An unset field therefore resolves to `null`, which the query's `entries`
+`select` has no arm for, and the transformer reads that pair as **zero
+entries** — so the module renders its ordinary empty-state message and the page
+returns 200. It previously threw `UnresolvedTaxonomyError` there, which
+`notFound()`'d the entire page holding the module: one unset dropdown took down
+a whole page, and a Studio-only rule on each page's `modules[]` was what stood
+between an editor and that outcome. Degrading in the renderer removes the need
+for the rule, and covers the pages the rule never ran on.
 
 `sortOrder` (`TAXONOMY_SORT`, coalesced to `ALPHABETICAL` at read time)
 and `limit` apply wherever the module sits, and their defaults reproduce the
