@@ -132,12 +132,13 @@ describe('toTaxonomyListModule', () => {
     ]);
   });
 
-  it('throws when the taxonomy is unresolved', () => {
+  it('degrades to an empty module when no taxonomy is authored', () => {
     const raw = makeRawTaxonomyListModule({ taxonomy: null, entries: null });
 
-    expect(() => toTaxonomyListModule(raw)).toThrow(
-      'module_taxonomyList has no resolvable taxonomy',
-    );
+    const module = toTaxonomyListModule(raw);
+
+    expect(module.taxonomy).toBeUndefined();
+    expect(module.entries).toEqual([]);
   });
 
   it('keeps ALPHABETICAL order as returned by the query', () => {
