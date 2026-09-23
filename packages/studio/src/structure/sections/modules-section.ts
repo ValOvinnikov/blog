@@ -5,6 +5,7 @@ import { heroSchema } from '@blog/studio/schema-types/modules/hero/hero';
 import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
 import { heroProfileSchema } from '@blog/studio/schema-types/modules/hero-profile/hero-profile';
 import { heroStatementSchema } from '@blog/studio/schema-types/modules/hero-statement/hero-statement';
+import { logoWallSchema } from '@blog/studio/schema-types/modules/logo-wall/logo-wall';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
@@ -44,6 +45,7 @@ export const modulesSection: TStructureSection = {
       items: [
         { schema: contentSchema },
         { schema: featureListSchema },
+        { schema: logoWallSchema },
         { schema: testimonialSchema },
       ],
     },
