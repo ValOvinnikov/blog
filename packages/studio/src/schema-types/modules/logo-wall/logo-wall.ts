@@ -25,8 +25,7 @@ export const logoWallSchema = defineType({
       name: 'logos',
       title: 'Logos',
       type: 'array',
-      description:
-        'Pick the logos to show, in order. Blocks → Logos holds the reusable documents.',
+      description: 'The logos shown in this section, in display order.',
       of: [
         defineArrayMember({
           type: 'reference',
