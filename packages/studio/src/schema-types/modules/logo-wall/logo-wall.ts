@@ -34,6 +34,8 @@ export const logoWallSchema = defineType({
       ],
       validation: (rule) =>
         rule
+          .required()
+          .error('A logo wall needs at least three logos.')
           .unique()
           .min(3)
           .error('A logo wall needs at least three logos.')
