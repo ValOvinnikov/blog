@@ -14,13 +14,6 @@ export const logoBlockSchema = defineType({
   fields: [
     titleField(),
     defineField({
-      name: 'name',
-      title: 'Name',
-      type: 'string',
-      description: 'The company this logo belongs to.',
-      validation: (rule) => rule.required().error('Name the company.'),
-    }),
-    defineField({
       name: 'image',
       title: 'Logo',
       type: imageWithAltSchema.name,
@@ -40,13 +33,11 @@ export const logoBlockSchema = defineType({
   preview: {
     select: {
       title: 'title',
-      name: 'name',
       media: 'image',
     },
-    prepare({ title, name, media }) {
+    prepare({ title, media }) {
       return {
         title: String(title ?? 'Unknown'),
-        subtitle: typeof name === 'string' ? name : undefined,
         media: media ?? undefined,
       };
     },
