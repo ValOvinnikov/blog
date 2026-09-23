@@ -33,9 +33,9 @@ export const logoWallSchema = defineType({
         }),
       ],
       validation: (rule) => [
-        rule.required().error('A logo wall needs at least three logos.'),
+        rule.required().error('A logo wall needs at least one logo.'),
         rule.unique().error('Each logo can only appear once.'),
-        rule.min(3).error('A logo wall needs at least three logos.'),
+        rule.min(1).error('A logo wall needs at least one logo.'),
         rule.max(12).error('A logo wall holds at most twelve logos.'),
       ],
     }),
