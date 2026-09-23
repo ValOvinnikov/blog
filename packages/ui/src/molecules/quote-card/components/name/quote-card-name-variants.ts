@@ -6,8 +6,9 @@ export const quoteCardNameVariants = tv({
   base: [
     'inline-block rounded-sm',
     'font-medium text-text no-underline',
-    'transition-colors duration-base ease-smooth',
-    'hover:text-brand-primary',
+    'has-[a]:underline has-[a]:decoration-border-strong has-[a]:underline-offset-2',
+    'has-[a]:transition-colors has-[a]:duration-base has-[a]:ease-smooth',
+    'has-[a]:hover:text-brand-primary',
     'has-[:focus-visible]:outline-none has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand-primary',
     'has-[:focus-visible]:ring-offset-2',
   ],

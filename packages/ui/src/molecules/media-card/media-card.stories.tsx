@@ -1,6 +1,6 @@
 import { ICONS, SIZE } from '@blog/config';
 import { Icon } from '@blog/ui/atoms/icon';
-import { objectKeys } from '@blog/utils';
+import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { MediaCard } from './media-card';
