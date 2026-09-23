@@ -195,13 +195,6 @@ export type Module_testimonial = {
   layout?: Layout;
 };
 
-export type Block_logoReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'block_logo';
-};
-
 export type Module_logoWall = {
   _id: string;
   _type: 'module_logoWall';
@@ -214,7 +207,7 @@ export type Module_logoWall = {
   logos?: Array<
     {
       _key: string;
-    } & Block_logoReference
+    } & LogoItem
   >;
   ctaButtons?: Array<
     {
@@ -499,6 +492,35 @@ export type SocialProfile = {
     | 'RSS';
 };
 
+export type LogoItem = {
+  _type: 'logoItem';
+  name?: string;
+  image?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: 'image';
+  };
+  link?: LinkReference;
+};
+
+export type SanityImageCrop = {
+  _type: 'sanity.imageCrop';
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+};
+
+export type SanityImageHotspot = {
+  _type: 'sanity.imageHotspot';
+  x?: number;
+  y?: number;
+  height?: number;
+  width?: number;
+};
+
 export type LinkRef = {
   _type: 'linkRef';
   link?: LinkReference;
@@ -630,17 +652,6 @@ export type Block_testimonial = {
   name?: string;
   quote?: ListedText;
   role?: string;
-  image?: ImageWithAlt;
-  link?: LinkReference;
-};
-
-export type Block_logo = {
-  _id: string;
-  _type: 'block_logo';
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
   image?: ImageWithAlt;
   link?: LinkReference;
 };
@@ -1280,22 +1291,6 @@ export type Blog_topic = {
   description?: string;
 };
 
-export type SanityImageCrop = {
-  _type: 'sanity.imageCrop';
-  top?: number;
-  bottom?: number;
-  left?: number;
-  right?: number;
-};
-
-export type SanityImageHotspot = {
-  _type: 'sanity.imageHotspot';
-  x?: number;
-  y?: number;
-  height?: number;
-  width?: number;
-};
-
 export type MediaTag = {
   _id: string;
   _type: 'media.tag';
@@ -1422,7 +1417,6 @@ export type AllSanitySchemaTypes =
   | Module_stats
   | Block_testimonialReference
   | Module_testimonial
-  | Block_logoReference
   | Module_logoWall
   | Block_featureReference
   | Module_featureList
@@ -1447,6 +1441,9 @@ export type AllSanitySchemaTypes =
   | CtaSecondaryButton
   | CtaButton
   | SocialProfile
+  | LogoItem
+  | SanityImageCrop
+  | SanityImageHotspot
   | LinkRef
   | Aside
   | BodyImage
@@ -1459,7 +1456,6 @@ export type AllSanitySchemaTypes =
   | Settings_navigation
   | Settings_site
   | Block_testimonial
-  | Block_logo
   | Block_feature
   | Blog_author
   | Page_homeReference
@@ -1500,8 +1496,6 @@ export type AllSanitySchemaTypes =
   | Module_postRelatedReference
   | Page_post
   | Blog_topic
-  | SanityImageCrop
-  | SanityImageHotspot
   | MediaTag
   | Code
   | SanityImagePaletteSwatch
