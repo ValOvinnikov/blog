@@ -17,6 +17,7 @@ import { createHeroModuleService } from './features/modules/hero';
 import { createHeroBlogModuleService } from './features/modules/hero-blog';
 import { createHeroProfileModuleService } from './features/modules/hero-profile';
 import { createHeroStatementModuleService } from './features/modules/hero-statement';
+import { createLogoWallModuleService } from './features/modules/logo-wall';
 import { createNewsletterModuleService } from './features/modules/newsletter';
 import { createPostFeaturedModuleService } from './features/modules/post-featured';
 import { createPostLatestModuleService } from './features/modules/post-latest';
@@ -61,6 +62,7 @@ export const service = {
     newsletter: createNewsletterModuleService(),
     taxonomyList: createTaxonomyListModuleService(),
     featureList: createFeatureListModuleService(),
+    logoWall: createLogoWallModuleService(),
     testimonial: createTestimonialModuleService(),
   },
   entities: {
@@ -103,6 +105,7 @@ export type {
 } from './features/modules/hero-blog';
 export type { THeroProfileModule } from './features/modules/hero-profile';
 export type { THeroStatementModule } from './features/modules/hero-statement';
+export type { TLogoItem, TLogoWallModule } from './features/modules/logo-wall';
 export type { TNewsletterModule } from './features/modules/newsletter';
 export type { TPostFeaturedModule } from './features/modules/post-featured';
 export type { TPostLatestModule } from './features/modules/post-latest';

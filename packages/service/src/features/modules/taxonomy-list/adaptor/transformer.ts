@@ -6,7 +6,6 @@ import type { InferFragmentType, InferResultType } from 'groqd';
 
 import type { taxonomyListModuleQuery } from './query';
 import type { TPostLink, TTaxonomyEntry, TTaxonomyListModule } from './types';
-import { UnresolvedTaxonomyError } from './unresolved-taxonomy-error';
 
 export type TRawTaxonomyListModule = InferResultType<
   typeof taxonomyListModuleQuery
@@ -51,12 +50,8 @@ function orderEntries(
 export function toTaxonomyListModule(
   raw: TRawTaxonomyListModule,
 ): TTaxonomyListModule {
-  if (raw.taxonomy === null || raw.entries === null) {
-    throw new UnresolvedTaxonomyError();
-  }
-
   const entries = orderEntries(
-    raw.entries.map(toTaxonomyEntry),
+    (raw.entries ?? []).map(toTaxonomyEntry),
     raw.sortOrder,
   ).slice(0, raw.limit ?? undefined);
 
@@ -65,7 +60,7 @@ export function toTaxonomyListModule(
     headingBlock: toHeadingBlock(raw.headingBlock),
     layout: toLayout(raw.layout),
     contentAlignment: raw.contentAlignment ?? undefined,
-    taxonomy: raw.taxonomy,
+    taxonomy: raw.taxonomy ?? undefined,
     showLatestPosts: raw.showLatestPosts,
     entries,
   };
