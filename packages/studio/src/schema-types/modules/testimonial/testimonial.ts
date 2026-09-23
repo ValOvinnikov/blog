@@ -34,13 +34,12 @@ export const testimonialSchema = defineType({
           to: [{ type: blockTestimonialSchema.name }],
         }),
       ],
-      validation: (rule) =>
-        rule
-          .unique()
-          .min(1)
-          .error('Pick at least one testimonial.')
-          .max(8)
-          .error('A testimonials module holds at most eight quotes.'),
+      validation: (rule) => [
+        rule.required().error('Pick at least one testimonial.'),
+        rule.unique().error('Each testimonial can only appear once.'),
+        rule.min(1).error('Pick at least one testimonial.'),
+        rule.max(8).error('A testimonials module holds at most eight quotes.'),
+      ],
     }),
     ctaButtonsField(),
     displayModeField({
