@@ -35,7 +35,9 @@ export const testimonialSchema = defineType({
         }),
       ],
       validation: (rule) => [
-        rule.required().unique().min(1).error('Pick at least one testimonial.'),
+        rule.required().error('Pick at least one testimonial.'),
+        rule.unique().error('Each testimonial can only appear once.'),
+        rule.min(1).error('Pick at least one testimonial.'),
         rule.max(8).error('A testimonials module holds at most eight quotes.'),
       ],
     }),
