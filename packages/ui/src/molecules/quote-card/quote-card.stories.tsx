@@ -100,6 +100,38 @@ export const Spotlight: TStory = {
   },
 };
 
+const LinkedVsUnlinked = (args: TQuoteCardProps) => (
+  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem' }}>
+    <div style={{ maxWidth: 360 }}>
+      <QuoteCard {...args}>
+        <QuoteCard.Quote>{faker.lorem.sentences(2)}</QuoteCard.Quote>
+        <QuoteCard.Avatar>
+          <Avatar src={AVATAR_SRC} alt={NAME} name={NAME} />
+        </QuoteCard.Avatar>
+        <QuoteCard.Name>
+          <span>{NAME}</span>
+        </QuoteCard.Name>
+      </QuoteCard>
+    </div>
+    <div style={{ maxWidth: 360 }}>
+      <QuoteCard {...args}>
+        <QuoteCard.Quote>{faker.lorem.sentences(2)}</QuoteCard.Quote>
+        <QuoteCard.Avatar>
+          <Avatar src={AVATAR_SRC} alt={NAME} name={NAME} />
+        </QuoteCard.Avatar>
+        <QuoteCard.Name>
+          <a href="https://example.com/case-studies/customer">{NAME}</a>
+        </QuoteCard.Name>
+      </QuoteCard>
+    </div>
+  </div>
+);
+
+export const LinkedVsUnlinkedName: TStory = {
+  name: 'Linked vs. unlinked name',
+  render: LinkedVsUnlinked,
+};
+
 const BRAND_BANDS = [
   { className: 'bg-primary', tone: BRAND_VARIANT.PRIMARY },
   { className: 'bg-secondary', tone: BRAND_VARIANT.SECONDARY },
