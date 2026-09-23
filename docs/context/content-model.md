@@ -8,9 +8,8 @@ Source of truth: `packages/studio/src/schema-types/` (documents grouped `blog/`,
 `pages/`, `settings/`; shared `objects/`; `modules/` — standalone,
 cross-referenceable page-builder documents, not embedded objects). Naming
 convention `{group}_{name}` is being applied incrementally (#251):
-`settings_navigation`, `settings_footer`, `page_home`, `page_landing`, and
-every `module_*` document are done; `siteSettings` still carries a legacy
-name.
+every `settings_*`, `page_*`, `blog_*`, `block_*` and `module_*` document is
+done; `link` and `migrationState` still carry legacy names.
 
 **Modules are documents, not embedded objects** — pages reference them by
 `_ref`, so a module is independently listable, previewable, and reusable
@@ -369,32 +368,39 @@ and the rules are not uniform:
   disagrees with the page's own.
 
 Beyond the module slots, pages carry their own fields: `title` (internal Studio
-label on the singletons), `slug` where the page is addressable, `headingBlock`
-where the page owns its own `<h1>` (hidden once a hero is set, since the hero
-then owns it), `publishedAt` on `page_post` (required — it drives sort order
-and the date readers see), and `seo` on all of them.
+label on the singletons), `slug` where the page is addressable — `page_landing`
+additionally rejects anything in `RESERVED_SLUGS` — `headingBlock` where the
+page owns its own `<h1>` (hidden once a hero is set, since the hero then owns
+it), and `seo` on all of them. `page_topic` and `page_tag` each add a required
+reference to the term they archive.
+
+`page_post` carries the most of its own, since the post _is_ the page:
+`heroImage` (`imageWithAlt`, optional — a post without one renders imageless
+rather than 404ing), `content` (`articleText`, required), `featured`, `author`
+(→ `blog_author`, required), `topic` (→ `blog_topic`, required — the single
+primary classification), `tags` (→ `blog_tag`, optional, max 6), `publishedAt`
+(required — it drives sort order and the date readers see), and
+`postTakeaways` (optional, the 30-second-skim summary).
 
 **Other documents**
 
-- `post` — title, slug, excerpt, heroImage (`imageWithAlt`, **optional** — a
-  post without one renders imageless rather than 404ing), author (ref),
-  category (ref → `category`, required — the post's single primary
-  classification), tags (refs → `tag`, optional, max 6), publishedAt, body
-  (portable text incl. code blocks and `aside` blocks), featured,
-  `newsletterEnabled` (boolean, default `true` — per-post opt-out of the
-  newsletter-signup form shown on its post page), seo, skim
-  (`skim` object, **optional** — `takeaways` (3-7 items, each max 160 chars),
-  `generatedAt`/`model` read-only in Studio; pipeline-populated for the
-  choose-your-depth reading feature, #957).
-- `author` — name, image, bio, role, socialLinks (array of `socialProfile`),
-  profilePage (optional ref → a `link` document, so any page type it can
-  target).
-- `category` — title, slug, description.
-- `tag` — title, slug, description (topic taxonomy for posts; drives the
-  `/tag` archives + related-posts, alongside the section-level `category`).
-  Carries no `seo` of its own — the tag archive's metadata lives on the
-  `page_tag` document that renders it.
-- `siteSettings` (singleton) — `titleField` (bare; see helper note below),
+- `blog_author` — name, image (`imageWithAlt`), bio, role, socialLinks (array of
+  `socialProfile`), profilePage (optional ref → a `link` document, so any page
+  type it can target).
+- `blog_topic` — `title` (required, max 60), slug, description (max 300). The
+  post's single primary classification, rendered by the `page_topic` archive
+  that references it.
+- `blog_tag` — same shape as `blog_topic`. A peer taxonomy, not a sub-level of
+  it: a post carries one required `topic` and up to six optional `tags`, and
+  each drives its own archive. Neither carries `seo` of its own — the archive's
+  metadata lives on the `page_topic`/`page_tag` document that renders it, and
+  both warn when no such page exists.
+- `block_feature` (`featureBlockSchema`) — a reusable feature card, referenced
+  by `module_featureList`'s `features` array (2–8 per module).
+- `link` — the single link target every reference-shaped object
+  (`linkRef`, `ctaButton`, `ctaSecondaryButton`, `socialProfile`,
+  `blog_author.profilePage`) points at.
+- `settings_site` (singleton) — `titleField` (bare; see helper note below),
   brand
   (`brand` object: name/logo/tagline — `logo` is optional, falling
   back to a default mark when unset; `tagline` is
@@ -419,14 +425,17 @@ separator: BRAND_TAGLINE_SEPARATORS }`, replacing a plain string so the
 - `settings_navigation` (singleton) — `titleField` (bare; see helper note
   below), items (links).
 - `settings_footer` (singleton) — `titleField` (bare; see helper note below),
-  social links.
+  `social` (social links).
 - `settings_newsletter` (singleton) — `titleField` (bare; see helper note
-  below), `heading` (required, max 80), `description` (optional, max 300) —
-  the CMS-authored source of the newsletter form's copy wherever it's
-  rendered outside the `module_newsletter` page-builder placement (e.g. the
-  per-post compact form gated by `post.newsletterEnabled`). Lives in the
-  desk's **Blog** section, directly after Authors, not the top-level
+  below), `heading` (required, max 80), `description` (optional, max 300),
+  `trustCues` (optional, max 2 phrases of 40 characters) — the CMS-authored
+  source of the newsletter form's copy wherever
+  it's rendered outside the `module_newsletter` page-builder placement. Lives
+  in the desk's **Blog** section, directly after Authors, not the top-level
   Settings group.
+- `migrationState` — the system ledger recording which content migrations in
+  `packages/studio/migrations/` have run. `studio-config.ts` hides it from
+  document actions and the new-document menu; it is never authored by hand.
 
 **Reusable `titleField` helper** (`schema-types/fields/title-field/title-field.ts`) —
 `titleField({ initialValue?, readOnly?, description? })`
@@ -447,8 +456,8 @@ empty. Singletons resolve their Studio label via `preview.prepare` instead
 `socialProfile` (each wrapping a reference to a `link` **document**),
 `brand`, `brandTagline` (structured tagline: `items` + a
 `BRAND_TAGLINE_SEPARATORS`-driven `separator`), `imageWithAlt` (required alt —
-used by `heroImage`, `author.avatar`, `brand`, `openGraph.image`, and
-site-settings favicon/logo), `bodyImage` (required alt; optional `layout`
+used by `page_post.heroImage`, `blog_author.image`, `brand.logo`,
+`openGraph.image`, `block_feature.image` and the hero/CTA modules), `bodyImage` (required alt; optional `layout`
 from `IMAGE_LAYOUT`, undefined = Inline — shares its `alt`/hotspot shape with
 `imageWithAlt` via the `image-alt-field` helper, but is a distinct type
 registered only as `richText`'s body-array image member, so the layout
@@ -458,7 +467,7 @@ page head when unset — there is no fallback) + `openGraph`,
 `proseText` / `richText`, `aside` (deep-dive block type registered in
 `richText`'s portable-text array; `kind` from `ASIDE_KIND`, required; `body`
 via `proseText`, required — part of the choose-your-depth reading feature,
-#957), `skim` (see `post` above), `layout`/`heroLayout` (all-optional
+#957), `postTakeaways` (see `page_post` above), `layout`/`heroLayout` (all-optional
 fields, no defaults set at the schema level: `spacingTop`/`spacingBottom`
 (`SPACING_SCALE`), `containerWidth` (`CONTAINER_WIDTH`, `layout` only —
 `heroLayout` omits it, Hero's grid always manages its own width),

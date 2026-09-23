@@ -15,16 +15,7 @@ export async function getHeroStatement(
   const raw = await runQuery(heroStatementModuleQuery, {
     parameters: { id },
     tenant,
-    ...isr(
-      [
-        'modules:heroStatement',
-        `module:${id}`,
-        'link',
-        'homePage',
-        'page_landing',
-      ],
-      tenant.projectId,
-    ),
+    ...isr(['modules:heroStatement', `module:${id}`, 'link'], tenant.projectId),
   });
 
   return toHeroStatementModule(raw);
