@@ -4,11 +4,11 @@ import { CardGrid } from '@blog/ui/organisms/card-grid';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';
+import { moduleGridActionsVariants } from '@web/utils/module-grid-actions-variants';
 import { toTestimonialGridColumns } from '@web/utils/to-testimonial-grid-columns';
 
 import { TestimonialCard } from './testimonial-card';
 import { TestimonialCarousel } from './testimonial-carousel';
-import { testimonialModuleViewVariants } from './testimonial-module-view-variants';
 
 export interface ITestimonialModuleViewProps extends TTestimonialModule {
   titleId: string;
@@ -37,7 +37,7 @@ export const TestimonialModuleView = ({
   const cardAlign =
     cardAlignment === CONTENT_ALIGNMENT.CENTER ? 'center' : 'left';
   const columns = toTestimonialGridColumns(testimonials.length);
-  const s = testimonialModuleViewVariants({ align: headingAlign });
+  const s = moduleGridActionsVariants({ align: headingAlign });
 
   return (
     <Section

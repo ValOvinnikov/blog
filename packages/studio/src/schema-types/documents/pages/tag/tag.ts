@@ -13,23 +13,14 @@ import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
-import {
-  validateHasPostListModule,
-  validateSinglePostListModule,
-} from '@blog/studio/schema-types/validation/validate-post-list-cardinality/validate-post-list-cardinality';
-import { validateUniquePostListReference } from '@blog/studio/schema-types/validation/validate-unique-post-list-reference/validate-unique-post-list-reference';
 import { validateUniqueTaxonomyReference } from '@blog/studio/schema-types/validation/validate-unique-taxonomy-reference/validate-unique-taxonomy-reference';
 import { Tag } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
 const tagSlugUrlPreviewInput = createSlugUrlPreviewInput('/tags/');
 
-const NO_POST_LIST_WARNING =
-  'This page has no Post List module — the archive will be empty until one is added.';
 const TAG_UNIQUENESS_ERROR =
   'Another Tag Page already references this tag — each tag can only back one Tag Page.';
-const POST_LIST_UNIQUENESS_ERROR =
-  'Another Tag Page already references this Post List — each Post List can only back one Tag Page.';
 
 export const tagPageSchema = defineType({
   name: PAGE_TAG_TYPE,
@@ -38,16 +29,6 @@ export const tagPageSchema = defineType({
   description:
     'The archive page for one tag, listing the posts labeled with it.',
   icon: Tag,
-  validation: (rule) => [
-    rule.custom(validateSinglePostListModule),
-    rule.custom(validateHasPostListModule(NO_POST_LIST_WARNING)).warning(),
-    rule.custom(
-      validateUniquePostListReference(
-        PAGE_TAG_TYPE,
-        POST_LIST_UNIQUENESS_ERROR,
-      ),
-    ),
-  ],
   fields: [
     titleField(),
     slugField({
@@ -81,6 +62,7 @@ export const tagPageSchema = defineType({
         newsletterSchema.name,
         taxonomyListSchema.name,
       ],
+      once: [postListSchema.name],
     }),
     seoField(),
   ],

@@ -10,39 +10,8 @@ import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
-import { validateSingleBlankHeadingPerType } from '@blog/studio/schema-types/validation/validate-single-blank-heading-per-type/validate-single-blank-heading-per-type';
 import { Newspaper } from 'lucide-react';
-import { defineType, type SanityDocument } from 'sanity';
-
-type TModuleReference = { _type?: string; _ref?: string };
-
-type TPostIndexPageDocument = {
-  modules?: TModuleReference[];
-};
-
-const asPostIndexPageDocument = (
-  document: SanityDocument | undefined,
-): TPostIndexPageDocument | undefined =>
-  document as TPostIndexPageDocument | undefined;
-
-const countPostListModules = (document: SanityDocument | undefined): number =>
-  (asPostIndexPageDocument(document)?.modules ?? []).filter(
-    (module) => module._type === postListSchema.name,
-  ).length;
-
-const validatePostListModuleCount = (
-  document: SanityDocument | undefined,
-): string | true =>
-  countPostListModules(document) > 1
-    ? 'Only one Post List module is allowed per page.'
-    : true;
-
-const validatePostListModulePresent = (
-  document: SanityDocument | undefined,
-): string | true =>
-  countPostListModules(document) === 0
-    ? 'Add a Post List module so this page can list posts.'
-    : true;
+import { defineType } from 'sanity';
 
 export const postIndexPageSchema = defineType({
   name: PAGE_POST_INDEX_TYPE,
@@ -51,10 +20,6 @@ export const postIndexPageSchema = defineType({
   description:
     'The page that lists posts, built from a hero, a heading, and a stack of modules.',
   icon: Newspaper,
-  validation: (rule) => [
-    rule.custom(validatePostListModuleCount),
-    rule.custom(validatePostListModulePresent).warning(),
-  ],
   preview: {
     select: {
       title: 'title',
@@ -78,10 +43,7 @@ export const postIndexPageSchema = defineType({
         postFeaturedSchema.name,
         taxonomyListSchema.name,
       ],
-      validateCustom: (rule) =>
-        rule.custom(
-          validateSingleBlankHeadingPerType([postFeaturedSchema.name]),
-        ),
+      once: [postListSchema.name],
     }),
     seoField(),
   ],

@@ -3,10 +3,11 @@ import { getRecordedBounds } from '@blog/studio/testing/create-mock-validation-r
 import { getField } from '@blog/studio/testing/get-field';
 
 describe('testimonialSchema testimonials field validation', () => {
-  it('is unique and bounded to one through eight references', () => {
+  it('is required, unique and bounded to one through eight references', () => {
     const testimonialsField = getField(testimonialSchema, 'testimonials');
 
     expect(getRecordedBounds(testimonialsField)).toEqual({
+      required: true,
       unique: true,
       min: 1,
       max: 8,

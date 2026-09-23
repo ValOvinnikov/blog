@@ -35,7 +35,7 @@ export const taxonomyListSchema = defineType({
       type: 'string',
       fieldset: TERMS_FIELDSET,
       description:
-        'Topics or tags. Leave empty to list whatever the page itself is about.',
+        'Topics or tags. Leave empty and the module shows its empty state.',
       options: {
         layout: 'dropdown',
         list: Object.values(TAXONOMY_KIND).map((value) => ({
