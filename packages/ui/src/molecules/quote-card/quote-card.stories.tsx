@@ -1,6 +1,6 @@
 import { BRAND_VARIANT } from '@blog/config';
 import { Avatar } from '@blog/ui/atoms/avatar';
-import { objectKeys } from '@blog/utils';
+import { objectKeys } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -82,7 +82,20 @@ export const Linked: TStory = {
 };
 
 export const Spotlight: TStory = {
-  args: { isSpotlight: true },
+  args: {
+    isSpotlight: true,
+    children: (
+      <>
+        <QuoteCard.Quote>{faker.lorem.sentences(4)}</QuoteCard.Quote>
+        <QuoteCard.Avatar>
+          <Avatar src={AVATAR_SRC} alt={NAME} name={NAME} />
+        </QuoteCard.Avatar>
+        <QuoteCard.Name>
+          <span>{NAME}</span>
+        </QuoteCard.Name>
+      </>
+    ),
+  },
 };
 
 const BRAND_BANDS = [

@@ -24,7 +24,7 @@ export const quoteCardVariants = tv({
     },
     isSpotlight: {
       true: {
-        root: ['mx-auto max-w-[52ch] border-l-0 bg-transparent px-0 py-0'],
+        root: ['mx-auto max-w-[38ch] border-l-0 bg-transparent px-0 py-0'],
         quoteMark: ['size-10'],
       },
       false: {},
