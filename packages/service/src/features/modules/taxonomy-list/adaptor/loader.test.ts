@@ -64,14 +64,15 @@ describe('getTaxonomyList', () => {
     ]);
   });
 
-  it('throws when the module has no authored taxonomy', async () => {
+  it('degrades to an empty module when no taxonomy is authored', async () => {
     mockRun.mockResolvedValueOnce(
       makeRawTaxonomyListModule({ taxonomy: null, entries: null }),
     );
 
-    await expect(getTaxonomyList('taxonomy-list-1', tenant)).rejects.toThrow(
-      'module_taxonomyList has no resolvable taxonomy',
-    );
+    const module = await getTaxonomyList('taxonomy-list-1', tenant);
+
+    expect(module.taxonomy).toBeUndefined();
+    expect(module.entries).toEqual([]);
   });
 
   it('propagates when the module document is missing', async () => {

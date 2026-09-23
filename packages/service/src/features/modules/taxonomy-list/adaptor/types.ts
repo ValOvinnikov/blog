@@ -32,7 +32,7 @@ export type TTaxonomyListModule = {
   headingBlock: THeadingBlock;
   layout: TMaybeUndefined<TLayout>;
   contentAlignment: TMaybeUndefined<TContentAlignment>;
-  taxonomy: TTaxonomyKind;
+  taxonomy: TMaybeUndefined<TTaxonomyKind>;
   showLatestPosts: boolean;
   entries: TTaxonomyEntry[];
 };

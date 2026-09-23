@@ -5,6 +5,7 @@ import {
   testHeadingWithoutHero,
   testHeroProfileHero,
   testRendersAllowedModulesInOrder,
+  testTestimonialModule,
   testWarnsForUnknownModule,
 } from '@web/testing/shared/module-renderer-contract/module-renderer-contract';
 
@@ -18,6 +19,7 @@ const {
   taxonomyListModuleMock,
   postFeaturedModuleMock,
   featureListModuleMock,
+  testimonialModuleMock,
   heroBlogModuleMock,
   heroProfileModuleMock,
   heroStatementModuleMock,
@@ -43,6 +45,9 @@ const {
   )),
   featureListModuleMock: vi.fn(({ id }: { id: string }) => (
     <div data-testid="stub-feature-list">{id}</div>
+  )),
+  testimonialModuleMock: vi.fn(({ id }: { id: string }) => (
+    <div data-testid="stub-testimonial">{id}</div>
   )),
   heroBlogModuleMock: vi.fn(async () => null),
   heroProfileModuleMock: vi.fn(async ({ id }: { id: string }) => (
@@ -72,6 +77,9 @@ vi.mock('@web/modules/post-featured/post-featured-module', () => ({
 }));
 vi.mock('@web/modules/feature-list/feature-list-module', () => ({
   FeatureListModule: featureListModuleMock,
+}));
+vi.mock('@web/modules/testimonial/testimonial-module', () => ({
+  TestimonialModule: testimonialModuleMock,
 }));
 vi.mock('@web/modules/hero-blog/hero-blog-module', () => ({
   HeroBlogModule: heroBlogModuleMock,
@@ -149,6 +157,7 @@ describe(`<${HomeModuleRenderer.name}/>`, () => {
       'renders nothing and warns once for a module absent from the home page allow-list',
   });
   testFeatureListModule({ setup, loggerWarnMock });
+  testTestimonialModule({ setup, loggerWarnMock });
   testRendersAllowedModulesInOrder({
     setup,
     modules: [
