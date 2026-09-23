@@ -1,5 +1,5 @@
 import { TAXONOMY_KIND, TAXONOMY_SORT } from '@blog/config';
-import { q, type TIdParams } from '@blog/service/sanity/query';
+import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/published-post';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
 import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
@@ -50,7 +50,7 @@ const tagEntriesQuery = q.star
   }));
 
 export const taxonomyListModuleQuery = q
-  .parameters<TIdParams>()
+  .parameters<TModuleQueryParams>()
   .star.filterByType('module_taxonomyList')
   .filterBy('_id == $id')
   .slice(0)

@@ -1,5 +1,5 @@
 import { POST_SOURCE } from '@blog/config';
-import { q, type TIdParams } from '@blog/service/sanity/query';
+import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
 import {
   DISPLAY_MODE_EXPRESSION,
   displayModeParser,
@@ -22,7 +22,7 @@ const newestFeaturedPostsQuery = q.star
   .project(postCardFragment);
 
 export const postFeaturedModuleQuery = q
-  .parameters<TIdParams>()
+  .parameters<TModuleQueryParams>()
   .star.filterByType('module_postFeatured')
   .filterBy('_id == $id')
   .slice(0)

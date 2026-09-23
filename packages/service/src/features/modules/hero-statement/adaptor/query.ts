@@ -1,11 +1,11 @@
-import { q, type TIdParams } from '@blog/service/sanity/query';
+import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
 import { ctaButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
 import { heroLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 
 export const heroStatementModuleQuery = q
-  .parameters<TIdParams>()
+  .parameters<TModuleQueryParams>()
   .star.filterByType('module_heroStatement')
   .filterBy('_id == $id')
   .slice(0)

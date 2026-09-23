@@ -1,4 +1,4 @@
-import { q, type TIdParams } from '@blog/service/sanity/query';
+import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
 import { ctaButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
@@ -6,7 +6,7 @@ import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { listedTextBlockFragment } from '@blog/service/shared/fragments/portable-text/listed-text-block';
 
 export const ctaModuleQuery = q
-  .parameters<TIdParams>()
+  .parameters<TModuleQueryParams>()
   .star.filterByType('module_cta')
   .filterBy('_id == $id')
   .slice(0)

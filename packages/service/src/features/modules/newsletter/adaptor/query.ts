@@ -1,5 +1,5 @@
 import { NEWSLETTER_VARIANT } from '@blog/config';
-import { q, type TIdParams } from '@blog/service/sanity/query';
+import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
 import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { z } from 'zod';
@@ -11,7 +11,7 @@ const newsletterVariantParser = z.enum([
 ]);
 
 export const newsletterModuleQuery = q
-  .parameters<TIdParams>()
+  .parameters<TModuleQueryParams>()
   .star.filterByType('module_newsletter')
   .filterBy('_id == $id')
   .slice(0)

@@ -1,4 +1,4 @@
-import { q, type TIdParams } from '@blog/service/sanity/query';
+import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
 import {
   DISPLAY_MODE_EXPRESSION,
   displayModeParser,
@@ -11,7 +11,7 @@ import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-d
 import { listedTextBlockFragment } from '@blog/service/shared/fragments/portable-text/listed-text-block';
 
 export const testimonialModuleQuery = q
-  .parameters<TIdParams>()
+  .parameters<TModuleQueryParams>()
   .star.filterByType('module_testimonial')
   .filterBy('_id == $id')
   .slice(0)

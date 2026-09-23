@@ -1,4 +1,4 @@
-import { q, type TIdParams } from '@blog/service/sanity/query';
+import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
 import {
   SHOW_IMAGES_EXPRESSION,
   showImagesParser,
@@ -7,7 +7,7 @@ import { headingBlockFragment } from '@blog/service/shared/fragments/heading-blo
 import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
 
 export const postListModuleQuery = q
-  .parameters<TIdParams>()
+  .parameters<TModuleQueryParams>()
   .star.filterByType('module_postList')
   .filterBy('_id == $id')
   .slice(0)

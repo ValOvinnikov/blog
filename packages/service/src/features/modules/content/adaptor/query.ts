@@ -1,9 +1,9 @@
-import { q, type TIdParams } from '@blog/service/sanity/query';
+import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
 import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { portableTextBodyItemFragment } from '@blog/service/shared/fragments/portable-text/portable-text-body-item';
 
 export const contentModuleQuery = q
-  .parameters<TIdParams>()
+  .parameters<TModuleQueryParams>()
   .star.filterByType('module_content')
   .filterBy('_id == $id')
   .slice(0)
