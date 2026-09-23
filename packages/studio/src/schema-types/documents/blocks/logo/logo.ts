@@ -1,5 +1,6 @@
 import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
 import { Building2 } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
@@ -16,16 +17,15 @@ export const logoBlockSchema = defineType({
       name: 'name',
       title: 'Name',
       type: 'string',
-      description:
-        "The company. Becomes the image's alt text and the link's accessible name.",
+      description: 'The company this logo belongs to.',
       validation: (rule) => rule.required().error('Name the company.'),
     }),
     defineField({
       name: 'image',
       title: 'Logo',
-      type: 'image',
+      type: imageWithAltSchema.name,
       description:
-        'SVG or PNG with a transparent background, trimmed to the mark. Shown at 36px tall, as uploaded.',
+        'SVG or PNG with a transparent background, trimmed to the mark. Shown at 36px tall.',
       validation: (rule) => rule.required().error('Upload the logo.'),
     }),
     defineField({
