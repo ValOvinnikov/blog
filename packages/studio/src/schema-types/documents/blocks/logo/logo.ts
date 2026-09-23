@@ -1,4 +1,5 @@
 import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
+import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { Building2 } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
@@ -10,6 +11,7 @@ export const logoBlockSchema = defineType({
     'A partner or client mark — reusable across every Logo Wall module on the site.',
   icon: Building2,
   fields: [
+    titleField(),
     defineField({
       name: 'name',
       title: 'Name',
@@ -37,14 +39,14 @@ export const logoBlockSchema = defineType({
   ],
   preview: {
     select: {
-      title: 'name',
-      linkLabel: 'link.label',
+      title: 'title',
+      name: 'name',
       media: 'image',
     },
-    prepare({ title, linkLabel, media }) {
+    prepare({ title, name, media }) {
       return {
         title: String(title ?? 'Unknown'),
-        subtitle: typeof linkLabel === 'string' ? linkLabel : undefined,
+        subtitle: typeof name === 'string' ? name : undefined,
         media: media ?? undefined,
       };
     },

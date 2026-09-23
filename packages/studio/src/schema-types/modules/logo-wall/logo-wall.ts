@@ -1,4 +1,3 @@
-import { DISPLAY_MODE, type TDisplayMode } from '@blog/config/constants';
 import { logoBlockSchema } from '@blog/studio/schema-types/documents/blocks/logo/logo';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
@@ -9,29 +8,7 @@ import { headingBlockField } from '@blog/studio/schema-types/objects/heading-blo
 import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { Images } from 'lucide-react';
-import {
-  defineArrayMember,
-  defineField,
-  defineType,
-  type SanityDocument,
-} from 'sanity';
-
-type TLogoWallDocument = {
-  displayMode?: TDisplayMode;
-  logos?: unknown[];
-};
-
-const validateCarouselHasEnoughLogos = (
-  document: SanityDocument | undefined,
-): string | true => {
-  const doc = document as TLogoWallDocument | undefined;
-
-  if (doc?.displayMode !== DISPLAY_MODE.CAROUSEL) return true;
-
-  return (doc?.logos?.length ?? 0) < 7
-    ? 'Six or fewer logos fit in one row — Grid shows them all without scrolling.'
-    : true;
-};
+import { defineArrayMember, defineField, defineType } from 'sanity';
 
 export const logoWallSchema = defineType({
   name: 'module_logoWall',
@@ -40,7 +17,6 @@ export const logoWallSchema = defineType({
   description:
     'A grid or carousel of partner or client logos, used as social proof.',
   icon: Images,
-  validation: (rule) => rule.custom(validateCarouselHasEnoughLogos).warning(),
   fields: [
     titleField(),
     brandVariantField(),
