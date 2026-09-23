@@ -15,6 +15,7 @@ import { logoWallSchema } from '@blog/studio/schema-types/modules/logo-wall/logo
 import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
+import { statsSchema } from '@blog/studio/schema-types/modules/stats/stats';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import { testimonialSchema } from '@blog/studio/schema-types/modules/testimonial/testimonial';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
@@ -73,6 +74,7 @@ export const landingPageSchema = defineType({
         featureListSchema.name,
         logoWallSchema.name,
         testimonialSchema.name,
+        statsSchema.name,
       ],
     }),
     seoField(),

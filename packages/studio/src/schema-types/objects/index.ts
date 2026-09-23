@@ -16,6 +16,7 @@ import { openGraphSchema } from './open-graph/open-graph';
 import { postTakeawaysSchema } from './post-takeaways/post-takeaways';
 import { seoSchema } from './seo/seo';
 import { socialProfileSchema } from './social-profile/social-profile';
+import { statSchema } from './stat/stat';
 
 export const objects = [
   layoutSchema,
@@ -34,4 +35,5 @@ export const objects = [
   brandTaglineSchema,
   brandSchema,
   postTakeawaysSchema,
+  statSchema,
 ];

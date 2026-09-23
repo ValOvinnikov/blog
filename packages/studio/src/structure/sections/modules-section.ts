@@ -11,6 +11,7 @@ import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featu
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
 import { postRelatedSchema } from '@blog/studio/schema-types/modules/post-related/post-related';
+import { statsSchema } from '@blog/studio/schema-types/modules/stats/stats';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import { testimonialSchema } from '@blog/studio/schema-types/modules/testimonial/testimonial';
 import type { TStructureSection } from '@blog/studio/structure/build-section/build-section';
@@ -47,6 +48,7 @@ export const modulesSection: TStructureSection = {
         { schema: featureListSchema },
         { schema: logoWallSchema },
         { schema: testimonialSchema },
+        { schema: statsSchema },
       ],
     },
     {
