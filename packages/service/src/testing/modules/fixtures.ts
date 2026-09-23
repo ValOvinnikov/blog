@@ -27,6 +27,7 @@ import type { TRawPostFeaturedModule } from '@blog/service/features/modules/post
 import type { TRawPostLatestModule } from '@blog/service/features/modules/post-latest/adaptor/transformer';
 import type { TRawPostListModule } from '@blog/service/features/modules/post-list/adaptor/transformer';
 import type { TRawPostRelatedModule } from '@blog/service/features/modules/post-related/adaptor/transformer';
+import type { TRawStatsModule } from '@blog/service/features/modules/stats/adaptor/transformer';
 import type { TRawTaxonomyListModule } from '@blog/service/features/modules/taxonomy-list/adaptor/transformer';
 import type { TRawTestimonialModule } from '@blog/service/features/modules/testimonial/adaptor/transformer';
 import type { TRawCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button';
@@ -45,6 +46,7 @@ type TRawFeatureListItem = NonNullable<
 >[number];
 type TRawTaxonomyEntry = NonNullable<TRawTaxonomyListModule['entries']>[number];
 type TRawLogoItem = NonNullable<TRawLogoWallModule['logos']>[number];
+type TRawStatItem = NonNullable<TRawStatsModule['stats']>[number];
 type TRawTestimonialItem = NonNullable<
   TRawTestimonialModule['testimonials']
 >[number];
@@ -393,6 +395,35 @@ export function makeRawLogoWallModule(
     ],
     ctaButtons: null,
     displayMode: DISPLAY_MODE.GRID,
+    contentAlignment: null,
+    layout: null,
+    ...overrides,
+  };
+}
+
+export function makeRawStatItem(
+  overrides: Partial<TRawStatItem> = {},
+): TRawStatItem {
+  return {
+    value: '2.4M',
+    label: 'Monthly readers',
+    description: null,
+    ...overrides,
+  };
+}
+
+export function makeRawStatsModule(
+  overrides: Partial<TRawStatsModule> = {},
+): TRawStatsModule {
+  return {
+    brandVariant: BRAND_VARIANT.PRIMARY,
+    headingBlock: makeRawHeadingBlock('By the numbers'),
+    stats: [
+      makeRawStatItem(),
+      makeRawStatItem({ value: '128', label: 'Countries reached' }),
+    ],
+    footnote: null,
+    ctaButtons: null,
     contentAlignment: null,
     layout: null,
     ...overrides,
