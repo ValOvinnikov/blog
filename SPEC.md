@@ -1262,6 +1262,13 @@ target's id is not knowable when `isr()` runs. It is best-effort: a failed
 lookup is logged once by `apps/web`, and the tags already resolved are still
 purged.
 
+The lookup stops at those two hops. A hero also reaches link targets through
+an author or a post it reads (`authorDetailFragment` derefs a `link` from
+`profilePage`, `bio` markDefs and `socialLinks`), which is three or four hops
+out and not resolved — so `hero`, `hero-blog` and `hero-profile` keep the
+page-type tags covering those paths, and only `hero-statement`, which reads
+neither an author nor a post, carries none.
+
 That purge is best-effort, and the backstop behind it is a time-based
 expiry declared per content route: `export const revalidate = 21600` (6 hours)
 on each of the eleven `[tenant]/[locale]` content routes, excluding

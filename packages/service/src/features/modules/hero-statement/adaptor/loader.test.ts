@@ -49,9 +49,25 @@ describe(getHeroStatement, () => {
             't:tenant-a:modules:heroStatement',
             't:tenant-a:module:hero-statement-1',
             't:tenant-a:link',
+          ],
+        }),
+      }),
+    );
+  });
+
+  it('carries no page-type tag, since the webhook purges this module by id when a link target changes', async () => {
+    mockRun.mockResolvedValueOnce(makeRawHeroStatementModule());
+
+    await getHeroStatement('hero-statement-1', tenant);
+
+    expect(mockRun).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        next: expect.objectContaining({
+          tags: expect.not.arrayContaining([
             't:tenant-a:homePage',
             't:tenant-a:page_landing',
-          ],
+          ]),
         }),
       }),
     );
