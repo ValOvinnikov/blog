@@ -4,12 +4,12 @@ import type { SanityDocument, ValidationContext } from 'sanity';
 const FAIL_SAFE_ASSUMES_REFERENCED = 1;
 
 /**
- * Builds a document-level warning rule for a taxonomy term with no page
+ * Builds a document-level rule rejecting a taxonomy term with no page
  * rendering it yet — the page's URL 404s with no runtime fallback in that
- * state, so the editor should see the gap on the term they'd fix it from.
+ * state, so publishing is blocked until a page references the term.
  */
 export const validateHasPage =
-  (pageType: string, referenceField: string, noPageWarning: string) =>
+  (pageType: string, referenceField: string, noPageError: string) =>
   async (
     document: SanityDocument | undefined,
     context: ValidationContext,
@@ -25,5 +25,5 @@ export const validateHasPage =
       FAIL_SAFE_ASSUMES_REFERENCED,
     );
 
-    return referencingCount > 0 ? true : noPageWarning;
+    return referencingCount > 0 ? true : noPageError;
   };

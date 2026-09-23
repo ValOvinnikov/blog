@@ -4,7 +4,7 @@ import { validateHasPage } from '@blog/studio/schema-types/validation/validate-h
 import { Tags } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
-const MISSING_PAGE_WARNING =
+const MISSING_PAGE_ERROR =
   'No Topic Page references this topic yet — /topics/{slug} will 404 until one is created.';
 
 export const topicSchema = defineType({
@@ -15,9 +15,7 @@ export const topicSchema = defineType({
     'A subject category used to classify posts, powering topic filters and the topic archive page.',
   icon: Tags,
   validation: (rule) =>
-    rule
-      .custom(validateHasPage(PAGE_TOPIC_TYPE, 'topic', MISSING_PAGE_WARNING))
-      .warning(),
+    rule.custom(validateHasPage(PAGE_TOPIC_TYPE, 'topic', MISSING_PAGE_ERROR)),
   fields: [
     defineField({
       name: 'title',

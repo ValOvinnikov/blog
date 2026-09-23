@@ -9,14 +9,14 @@ const asDocument = (doc: Record<string, unknown>): SanityDocument =>
 
 const PAGE_TYPE = PAGE_TAG_TYPE;
 const REFERENCE_FIELD = 'tag';
-const MISSING_PAGE_WARNING =
+const MISSING_PAGE_ERROR =
   'No Tag Page references this tag yet — /tags/{slug} will 404 until one is created.';
 
 describe('validateHasPage', () => {
   const validate = validateHasPage(
     PAGE_TYPE,
     REFERENCE_FIELD,
-    MISSING_PAGE_WARNING,
+    MISSING_PAGE_ERROR,
   );
 
   it('passes without querying when the document has no id', async () => {
@@ -33,13 +33,11 @@ describe('validateHasPage', () => {
     await expect(validate(document, context)).resolves.toBe(true);
   });
 
-  it('warns when no page references the term', async () => {
+  it('errors when no page references the term', async () => {
     const { context } = createMockCountContext(0);
     const document = asDocument({ _id: 'tag-1', _type: 'blog_tag' });
 
-    await expect(validate(document, context)).resolves.toBe(
-      MISSING_PAGE_WARNING,
-    );
+    await expect(validate(document, context)).resolves.toBe(MISSING_PAGE_ERROR);
   });
 
   it('strips the drafts. prefix and queries the drafts perspective', async () => {
@@ -55,7 +53,7 @@ describe('validateHasPage', () => {
     expect(withConfigCalls).toEqual([{ perspective: 'drafts' }]);
   });
 
-  it('resolves to true, not a warning, when the fetch rejects', async () => {
+  it('resolves to true, not the error, when the fetch rejects', async () => {
     const { context } = createMockCountContext(new Error('network down'));
     const document = asDocument({ _id: 'tag-1', _type: 'blog_tag' });
 
