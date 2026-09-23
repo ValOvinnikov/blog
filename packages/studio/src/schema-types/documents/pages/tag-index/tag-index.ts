@@ -10,8 +10,6 @@ export const tagIndexPageSchema = taxonomyIndexPage({
     'The page that lists every tag, for readers browsing by keyword.',
   icon: Tag,
   kind: TAXONOMY_KIND.TAGS,
-  noTaxonomyListWarning:
-    'This page has no Taxonomy List module — the tag list will be empty until one is added.',
   taxonomyKindMismatchError:
     'This page lists tags; the module is set to topics.',
   previewSubtitle: 'Tag index singleton',

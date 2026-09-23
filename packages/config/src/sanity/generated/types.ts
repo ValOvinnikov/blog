@@ -610,7 +610,6 @@ export type Block_logo = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  name?: string;
   image?: ImageWithAlt;
   link?: LinkReference;
 };

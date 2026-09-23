@@ -14,7 +14,6 @@ import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with
 import { postTakeawaysSchema } from '@blog/studio/schema-types/objects/post-takeaways/post-takeaways';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
 import { articleTextSchema } from '@blog/studio/schema-types/portable-text/article-text/article-text';
-import { validateSingleBlankHeadingPerType } from '@blog/studio/schema-types/validation/validate-single-blank-heading-per-type/validate-single-blank-heading-per-type';
 import { Newspaper } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
@@ -84,14 +83,11 @@ export const postPageSchema = defineType({
           to: [{ type: tagSchema.name }],
         }),
       ],
-      validation: (rule) => rule.max(6),
+      validation: (rule) => rule.max(6).unique(),
     }),
     modulesField({
       allow: [postRelatedSchema.name, newsletterSchema.name, ctaSchema.name],
-      validateCustom: (rule) =>
-        rule.custom(
-          validateSingleBlankHeadingPerType([postRelatedSchema.name]),
-        ),
+      once: [postRelatedSchema.name],
     }),
     defineField({
       name: 'publishedAt',

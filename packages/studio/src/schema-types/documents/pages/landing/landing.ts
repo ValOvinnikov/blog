@@ -19,8 +19,6 @@ import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-l
 import { testimonialSchema } from '@blog/studio/schema-types/modules/testimonial/testimonial';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
-import { validateSingleBlankHeadingPerType } from '@blog/studio/schema-types/validation/validate-single-blank-heading-per-type/validate-single-blank-heading-per-type';
-import { validateTaxonomyListHasTaxonomy } from '@blog/studio/schema-types/validation/validate-taxonomy-list-has-taxonomy/validate-taxonomy-list-has-taxonomy';
 import { FileText } from 'lucide-react';
 import { defineType } from 'sanity';
 
@@ -76,15 +74,6 @@ export const landingPageSchema = defineType({
         logoWallSchema.name,
         testimonialSchema.name,
       ],
-      validateCustom: (rule) =>
-        rule
-          .custom(
-            validateSingleBlankHeadingPerType([
-              postLatestSchema.name,
-              postFeaturedSchema.name,
-            ]),
-          )
-          .custom(validateTaxonomyListHasTaxonomy),
     }),
     seoField(),
   ],

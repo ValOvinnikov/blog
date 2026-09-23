@@ -2,7 +2,7 @@
 
 # @blog/ui component index
 
-_55 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
+_56 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
 
 ## Atoms
 
@@ -189,6 +189,12 @@ Variants: layout: IMAGE_LAYOUT.INLINE|IMAGE_LAYOUT.FULL_BLEED|IMAGE_LAYOUT.FLOAT
 A navigation link that looks like a `Button`: applies the shared `buttonVariants` to an anchor (or any `as` element), so links can read as buttons.
 Props: className?: string _(extends IWithDataTestId, VariantProps<typeof buttonVariants>)_
 
+### LogoTile — `molecules/logo-tile/logo-tile.tsx`
+
+Carries no surface, border, or shadow, deliberately: a card promises a click most logos don't have.
+Props: children: ReactNode · isInteractive?: TLogoTileVariants['isInteractive'] _(extends IWithClassName, IWithDataTestId)_
+Variants: isInteractive: (boolean)
+
 ### MediaCard — `molecules/media-card/media-card.tsx`
 
 A media-led summary card for any linked item, rendered as an `<article>`.
@@ -300,7 +306,7 @@ Props: rows: IBookmarkRow[] · emptyMessage: string · hint?: string · prefix?:
 
 The responsive grid container that lays out cards (or any children) in columns.
 Props: columns?: TCardGridVariants['columns'] · children: ReactNode _(extends IWithClassName, IWithDataTestId)_
-Variants: columns: 1|2|3|4
+Variants: columns: 1|2|3|4|5|6
 
 ### Carousel — `organisms/carousel/carousel.tsx`
 

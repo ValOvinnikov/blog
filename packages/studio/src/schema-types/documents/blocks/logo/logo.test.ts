@@ -3,8 +3,8 @@ import { getRecordedBounds } from '@blog/studio/testing/create-mock-validation-r
 import { getField } from '@blog/studio/testing/get-field';
 
 describe('logoBlockSchema field validation', () => {
-  it.each([['name'], ['image']])('%s field is required', (fieldName) => {
-    const field = getField(logoBlockSchema, fieldName);
+  it('image field is required', () => {
+    const field = getField(logoBlockSchema, 'image');
 
     expect(getRecordedBounds(field)).toEqual({ required: true });
   });

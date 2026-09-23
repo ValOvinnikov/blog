@@ -4,7 +4,7 @@ import { validateHasPage } from '@blog/studio/schema-types/validation/validate-h
 import { Tag } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
-const MISSING_PAGE_WARNING =
+const MISSING_PAGE_ERROR =
   'No Tag Page references this tag yet — /tags/{slug} will 404 until one is created.';
 
 export const tagSchema = defineType({
@@ -15,9 +15,7 @@ export const tagSchema = defineType({
     'A keyword used to label posts, powering tag chips, related posts, and the tag archive page.',
   icon: Tag,
   validation: (rule) =>
-    rule
-      .custom(validateHasPage(PAGE_TAG_TYPE, 'tag', MISSING_PAGE_WARNING))
-      .warning(),
+    rule.custom(validateHasPage(PAGE_TAG_TYPE, 'tag', MISSING_PAGE_ERROR)),
   fields: [
     defineField({
       name: 'title',

@@ -1,51 +1,58 @@
 import { modulesField } from '@blog/studio/schema-types/fields/modules-field/modules-field';
-import type { ArrayRule } from 'sanity';
 
 type TCallLog = { method: string; args: unknown[] }[];
+type TModuleReference = { _type?: string; _key?: string };
+type TViolation = { message: string; path: unknown[] };
+type TOnceCustomFn = (
+  modules: TModuleReference[] | undefined,
+) => TViolation[] | true;
 
 type TMockRule = {
-  readonly path: string;
   unique: () => TMockRule;
   error: (message: string) => TMockRule;
-  custom: (fn: (...args: never[]) => unknown) => TMockRule;
+  custom: (fn: TOnceCustomFn) => TMockRule;
 };
 
-const createMockRule = (callLog: TCallLog, path = 'rule'): TMockRule => ({
-  path,
+const createMockRule = (
+  callLog: TCallLog,
+  customFns: TOnceCustomFn[],
+): TMockRule => ({
   unique: () => {
     callLog.push({ method: 'unique', args: [] });
-    return createMockRule(callLog, `${path}.unique()`);
+    return createMockRule(callLog, customFns);
   },
   error: (message) => {
     callLog.push({ method: 'error', args: [message] });
-    return createMockRule(callLog, `${path}.error()`);
+    return createMockRule(callLog, customFns);
   },
   custom: (fn) => {
     callLog.push({ method: 'custom', args: [fn] });
-    return createMockRule(callLog, `${path}.custom()`);
+    customFns.push(fn);
+    return createMockRule(callLog, customFns);
   },
 });
 
 const runFieldValidation = (
   field: ReturnType<typeof modulesField>,
-  callLog: TCallLog,
-): TMockRule => {
+  customFns: TOnceCustomFn[] = [],
+): TCallLog => {
   if (!field.validation) {
     throw new Error('Expected modulesField to define validation.');
   }
 
-  const baseRule = createMockRule(callLog);
+  const callLog: TCallLog = [];
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exercising a real Sanity validation builder against a minimal mock Rule
-  return (field.validation as any)(baseRule) as TMockRule;
+  (field.validation as any)(createMockRule(callLog, customFns));
+
+  return callLog;
 };
 
 describe('modulesField validation', () => {
   it('always chains unique().error(...) with the shared duplicate-reference message', () => {
-    const callLog: TCallLog = [];
     const field = modulesField({ allow: ['module_cta'] });
 
-    runFieldValidation(field, callLog);
+    const callLog = runFieldValidation(field);
 
     expect(callLog[0]).toEqual({ method: 'unique', args: [] });
     expect(callLog[1]).toEqual({
@@ -54,41 +61,84 @@ describe('modulesField validation', () => {
     });
   });
 
-  describe('when validateCustom is omitted', () => {
-    it('returns the unique().error() rule unchanged, with no further calls', () => {
-      const callLog: TCallLog = [];
+  describe('when once is omitted', () => {
+    it('attaches no custom rule beyond unique().error()', () => {
       const field = modulesField({ allow: ['module_cta'] });
 
-      const result = runFieldValidation(field, callLog);
+      const callLog = runFieldValidation(field);
 
       expect(callLog).toHaveLength(2);
-      expect(result.path).toBe('rule.unique().error()');
     });
   });
 
-  describe('when validateCustom is supplied', () => {
-    it('receives the rule after unique().error(), and its return value becomes the final rule', () => {
-      const callLog: TCallLog = [];
-      let receivedRulePath: string | undefined;
-
+  describe('when once is supplied', () => {
+    const buildOnceCustomFn = (): TOnceCustomFn => {
+      const customFns: TOnceCustomFn[] = [];
       const field = modulesField({
-        allow: ['module_postLatest'],
-        validateCustom: (rule) => {
-          receivedRulePath = (rule as unknown as TMockRule).path;
-          const next = (rule as unknown as TMockRule).custom(() => true);
-          return next as unknown as ArrayRule<unknown[]>;
-        },
+        allow: ['module_postList', 'module_cta'],
+        once: ['module_postList'],
       });
 
-      const result = runFieldValidation(field, callLog);
+      runFieldValidation(field, customFns);
 
-      expect(receivedRulePath).toBe('rule.unique().error()');
-      expect(callLog.map((call) => call.method)).toEqual([
-        'unique',
-        'error',
-        'custom',
+      const [customFn] = customFns;
+
+      if (!customFn) {
+        throw new Error('Expected modulesField to register a custom() rule.');
+      }
+
+      return customFn;
+    };
+
+    it('errors on a second module of a listed type, marking each offending item by _key', () => {
+      const customFn = buildOnceCustomFn();
+
+      const result = customFn([
+        { _type: 'module_postList', _key: 'a' },
+        { _type: 'module_postList', _key: 'b' },
       ]);
-      expect(result.path).toBe('rule.unique().error().custom()');
+
+      expect(result).toEqual([
+        {
+          message: 'Only one module of this type is allowed per page.',
+          path: [{ _key: 'a' }],
+        },
+        {
+          message: 'Only one module of this type is allowed per page.',
+          path: [{ _key: 'b' }],
+        },
+      ]);
+    });
+
+    it('falls back to the item index when _key is absent', () => {
+      const customFn = buildOnceCustomFn();
+
+      const result = customFn([
+        { _type: 'module_postList' },
+        { _type: 'module_postList' },
+      ]);
+
+      expect(result).toEqual([
+        {
+          message: 'Only one module of this type is allowed per page.',
+          path: [0],
+        },
+        {
+          message: 'Only one module of this type is allowed per page.',
+          path: [1],
+        },
+      ]);
+    });
+
+    it('accepts a second module of a type not listed in once', () => {
+      const customFn = buildOnceCustomFn();
+
+      const result = customFn([
+        { _type: 'module_cta', _key: 'a' },
+        { _type: 'module_cta', _key: 'b' },
+      ]);
+
+      expect(result).toBe(true);
     });
   });
 });

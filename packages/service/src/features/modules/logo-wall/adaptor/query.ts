@@ -25,7 +25,6 @@ export const logoWallModuleQuery = q
       .deref()
       .project((logoSub) => ({
         _id: true,
-        name: logoSub.field('name').notNull(),
         image: logoSub.field('image').project(sanityImageFragment).notNull(),
         link: logoSub
           .field('link')

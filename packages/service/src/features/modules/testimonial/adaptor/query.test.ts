@@ -23,6 +23,12 @@ describe('testimonialModuleQuery', () => {
     expect(() => testimonialModuleQuery.parse(raw)).toThrow();
   });
 
+  it('rejects a module with no testimonials', () => {
+    const raw = { ...makeRawTestimonialModule(), testimonials: null };
+
+    expect(() => testimonialModuleQuery.parse(raw)).toThrow();
+  });
+
   it('rejects a testimonial item with no name', () => {
     const [firstItem] = makeRawTestimonialModule().testimonials ?? [];
     if (!firstItem) throw new Error('expected a fixture testimonial item');
