@@ -205,7 +205,7 @@ export function makeRawContentModule(
 ): TRawContentModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    body: [{ _type: 'block', _key: 'block-1', markDefs: null }],
+    body: [makeRawContentBlock()],
     layout: null,
     ...overrides,
   };
@@ -259,15 +259,17 @@ export function makeRawContentMarkDef(
 }
 
 export function makeRawContentBlock(
-  overrides: Partial<TRawCtaContentBlock> = {},
+  overrides: Partial<TRawCtaContentBlock> & { text?: string } = {},
 ): TRawCtaContentBlock {
+  const { text = 'Hi.', ...rest } = overrides;
+
   return {
     _type: 'block',
     _key: 'block-1',
     style: 'normal',
-    children: [{ _type: 'span', _key: 'span-1', text: 'Hi.' }],
+    children: [{ _type: 'span', _key: 'span-1', text }],
     markDefs: null,
-    ...overrides,
+    ...rest,
   };
 }
 
@@ -356,11 +358,7 @@ export function makeRawTestimonialItem(
   return {
     _id: 'block-testimonial-1',
     name: 'Jamie Rivera',
-    quote: [
-      makeRawContentBlock({
-        children: [{ _type: 'span', _key: 'span-1', text: 'Great work.' }],
-      }),
-    ],
+    quote: [makeRawContentBlock({ text: 'Great work.' })],
     role: null,
     image: null,
     link: null,
