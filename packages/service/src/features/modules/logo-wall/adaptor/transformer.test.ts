@@ -58,14 +58,17 @@ describe('toLogoWallModule', () => {
     expect(module.logos).toEqual([]);
   });
 
-  it('degrades to an empty logos array when below the schema minimum of three', () => {
+  it('transforms a module with fewer than three logos', () => {
     const raw = makeRawLogoWallModule({
       logos: [makeRawLogoItem(), makeRawLogoItem({ _id: 'block-logo-2' })],
     });
 
     const module = toLogoWallModule(raw);
 
-    expect(module.logos).toEqual([]);
+    expect(module.logos.map((logo) => logo.id)).toEqual([
+      'block-logo-1',
+      'block-logo-2',
+    ]);
   });
 
   it('carries the company name through to each logo', () => {

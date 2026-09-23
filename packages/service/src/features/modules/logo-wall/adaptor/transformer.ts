@@ -21,10 +21,8 @@ function toLogoItem(raw: TRawLogoItem): TLogoItem {
   };
 }
 
-// Mirrors the schema's own `min(3)` logos rule — fewer than 3 degrades to an
-// empty list rather than failing the whole module.
 function toLogoItems(raw: TRawLogoWallModule['logos']): TLogoItem[] {
-  if (!raw || raw.length < 3) return [];
+  if (!raw) return [];
 
   return raw.map(toLogoItem);
 }
