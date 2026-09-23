@@ -1,5 +1,6 @@
 import { contentSchema } from './content/content';
 import { ctaSchema } from './cta/cta';
+import { faqSchema } from './faq/faq';
 import { featureListSchema } from './feature-list/feature-list';
 import { heroSchema } from './hero/hero';
 import { heroBlogSchema } from './hero-blog/hero-blog';
@@ -29,6 +30,7 @@ export const modules = [
   logoWallSchema,
   testimonialSchema,
   statsSchema,
+  faqSchema,
   contentSchema,
   ctaSchema,
   newsletterSchema,

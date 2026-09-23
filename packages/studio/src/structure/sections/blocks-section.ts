@@ -1,3 +1,4 @@
+import { faqBlockSchema } from '@blog/studio/schema-types/documents/blocks/faq/faq';
 import { featureBlockSchema } from '@blog/studio/schema-types/documents/blocks/feature/feature';
 import { blockTestimonialSchema } from '@blog/studio/schema-types/documents/blocks/testimonial/testimonial';
 import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
@@ -15,6 +16,10 @@ export const blocksSection: TStructureSection = {
         { schema: featureBlockSchema },
         { schema: blockTestimonialSchema },
       ],
+    },
+    {
+      title: 'FAQs',
+      items: [{ schema: faqBlockSchema }],
     },
     {
       title: 'Links',
