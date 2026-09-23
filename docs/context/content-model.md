@@ -27,7 +27,7 @@ a compile error (see [`data-flow.md`](./data-flow.md)). Rendering is not:
 `TOPIC_INDEX_MAP`, `TAG_INDEX_MAP` — and every one is declared
 `Partial<Record<TPage…Type, TModuleComponent>>`. A module the schema allows on
 a page but the map omits therefore compiles cleanly and renders nothing at
-runtime. That is how `module_testimonial` currently sits, and it is the drift
+runtime. That is how `module_logoWall` currently sits, and it is the drift
 to check for by hand when adding a module.
 
 Those per-page maps include the hero types, so a hero is keyed the same way as
@@ -36,14 +36,14 @@ any other module; what differs is that a hero arrives through the page's own
 
 ## Module documents
 
-`packages/studio/src/schema-types/modules/`. Fourteen `module_*` types exist.
-**Twelve are live** — schema, service adaptor and renderer all present. Two are
-not, and neither should be described as working:
+`packages/studio/src/schema-types/modules/`. Fifteen `module_*` types exist.
+**Thirteen are live** — schema, service adaptor and renderer all present. Two
+are not, and neither should be described as working:
 
-| Type                 | State                                                                                                                                                                                                             |
-| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `module_testimonial` | Schema only. Authorable in Studio, but there is no `packages/service` adaptor and no `apps/web` renderer, so it renders nothing.                                                                                  |
-| `module_hero`        | Deprecated in-schema ("Superseded by the Blog Hero module"). No page's hero slot offers it, no renderer keys it, and its surviving `service.modules.hero.v1` loader has no caller. Replaced by `module_heroBlog`. |
+| Type              | State                                                                                                                                                                                                             |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `module_logoWall` | Schema only. Authorable in Studio, but there is no `packages/service` adaptor and no `apps/web` renderer, so it renders nothing.                                                                                  |
+| `module_hero`     | Deprecated in-schema ("Superseded by the Blog Hero module"). No page's hero slot offers it, no renderer keys it, and its surviving `service.modules.hero.v1` loader has no caller. Replaced by `module_heroBlog`. |
 
 ### What every module carries
 
@@ -212,17 +212,24 @@ A grid or carousel of feature cards.
 - **Renders nothing** when no items resolve.
 - **Pages** — home, landing.
 
-#### `module_testimonial` — social proof _(not yet rendered)_
-
-Schema is complete; there is no service adaptor and no renderer, so nothing
-reaches the page yet.
+#### `module_testimonial` — social proof
 
 - **Items** — `testimonials`: 1–8 references to `block_testimonial`
-  **documents**, reusable the same way feature cards are. Each requires a name
-  and a quote; role, image and link are optional.
+  **documents**, reusable the same way feature cards are. Each requires a title,
+  a name and a quote; role, image and link are optional. The quote is Portable
+  Text (`listedText`), not a string, so it carries bold, italics, lists and
+  inline links.
 - **Variants** — `displayMode`: `GRID` (default) · `CAROUSEL`;
-  `cardAlignment`: `LEFT` (default) · `CENTER`. The schema's intent is one
-  quote as a spotlight and two or more as cards.
+  `cardAlignment`: `LEFT` (default) · `CENTER`. A single quote always renders as
+  a spotlight, with its heading and actions centred whatever `contentAlignment`
+  says; from two items up, `displayMode` picks the grid or the carousel.
+- **Grid columns** derive from the item count — 2→2, 3→3, 4→2, 5→3, 6→3, 7→3,
+  8→2 — capped at three rather than the feature grid's four, because a quote is
+  the wider card. Seven is the one count left with a single card on its last
+  row; no column choice inside that cap avoids it.
+- **Images** — an item renders its `image` when it has one and the person's
+  initials otherwise. There is no module-level toggle: the item is the only
+  thing that decides.
 - **Actions** — `ctaButtons`, 0–2.
 - **Pages** — home, landing.
 
@@ -397,6 +404,9 @@ primary classification), `tags` (→ `blog_tag`, optional, max 6), `publishedAt`
   both warn when no such page exists.
 - `block_feature` (`featureBlockSchema`) — a reusable feature card, referenced
   by `module_featureList`'s `features` array (2–8 per module).
+- `block_testimonial` (`blockTestimonialSchema`, titled "Testimonial Item") — a
+  reusable quote, referenced by `module_testimonial`'s `testimonials` array (1–8
+  per module). Authored under **Blocks → Cards** alongside `block_feature`.
 - `link` — the single link target every reference-shaped object
   (`linkRef`, `ctaButton`, `ctaSecondaryButton`, `socialProfile`,
   `blog_author.profilePage`) points at.
