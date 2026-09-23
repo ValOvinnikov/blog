@@ -94,14 +94,12 @@ export const testBreadcrumbsJsonLdSchema = <TData,>({
   it('renders the JSON-LD BreadcrumbList schema script', async () => {
     pageLoaderMock?.mockResolvedValue({ ok: true, data: successData });
 
-    const { container } = await setup();
+    await setup();
 
-    const script = container.querySelector(
-      'script[type="application/ld+json"]',
-    );
-    expect(script).not.toBeNull();
-    expect(script?.textContent).toContain('"@type":"BreadcrumbList"');
-    expect(script?.textContent).toContain(
+    const script = screen.getByTestId('json-ld-script');
+    expect(script).toHaveAttribute('type', 'application/ld+json');
+    expect(script.textContent).toContain('"@type":"BreadcrumbList"');
+    expect(script.textContent).toContain(
       `"item":"https://example.com${itemPath}"`,
     );
   });
@@ -120,11 +118,9 @@ export const testNoJsonLdWithoutBaseUrl = <TData,>({
     pageLoaderMock?.mockResolvedValue({ ok: true, data: successData });
     getTenantBaseUrlMock.mockResolvedValue(undefined);
 
-    const { container } = await setup();
+    await setup();
 
-    expect(
-      container.querySelector('script[type="application/ld+json"]'),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByTestId('json-ld-script')).not.toBeInTheDocument();
   });
 };
 
