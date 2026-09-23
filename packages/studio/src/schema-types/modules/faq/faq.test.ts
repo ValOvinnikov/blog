@@ -14,3 +14,36 @@ describe('faqSchema questions field validation', () => {
     });
   });
 });
+
+describe('faqSchema preview', () => {
+  const prepare = faqSchema.preview?.prepare;
+
+  if (!prepare) {
+    throw new Error('Expected faqSchema to define preview.prepare.');
+  }
+
+  it.each([
+    [
+      {
+        title: 'Common Questions',
+        brandVariant: 'PRIMARY',
+        questions: [{ _ref: 'faq-1' }, { _ref: 'faq-2' }],
+      },
+      { title: 'Common Questions', subtitle: 'Primary · 2 questions' },
+    ],
+    [
+      {
+        title: 'Pricing',
+        brandVariant: 'SECONDARY',
+        questions: [{ _ref: 'faq-1' }],
+      },
+      { title: 'Pricing', subtitle: 'Secondary · 1 question' },
+    ],
+    [
+      { title: undefined, brandVariant: undefined, questions: undefined },
+      { title: 'Unknown', subtitle: '0 questions' },
+    ],
+  ])('prepares %j', (input, expected) => {
+    expect(prepare(input)).toEqual(expected);
+  });
+});
