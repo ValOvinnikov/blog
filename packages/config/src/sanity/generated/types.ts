@@ -609,31 +609,10 @@ export type Block_logo = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  title?: string;
   name?: string;
-  image?: {
-    asset?: SanityImageAssetReference;
-    media?: unknown;
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    _type: 'image';
-  };
+  image?: ImageWithAlt;
   link?: LinkReference;
-};
-
-export type SanityImageCrop = {
-  _type: 'sanity.imageCrop';
-  top?: number;
-  bottom?: number;
-  left?: number;
-  right?: number;
-};
-
-export type SanityImageHotspot = {
-  _type: 'sanity.imageHotspot';
-  x?: number;
-  y?: number;
-  height?: number;
-  width?: number;
 };
 
 export type Block_feature = {
@@ -1258,6 +1237,22 @@ export type Blog_topic = {
   description?: string;
 };
 
+export type SanityImageCrop = {
+  _type: 'sanity.imageCrop';
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+};
+
+export type SanityImageHotspot = {
+  _type: 'sanity.imageHotspot';
+  x?: number;
+  y?: number;
+  height?: number;
+  width?: number;
+};
+
 export type MediaTag = {
   _id: string;
   _type: 'media.tag';
@@ -1420,8 +1415,6 @@ export type AllSanitySchemaTypes =
   | Settings_site
   | Block_testimonial
   | Block_logo
-  | SanityImageCrop
-  | SanityImageHotspot
   | Block_feature
   | Blog_author
   | Page_homeReference
@@ -1461,6 +1454,8 @@ export type AllSanitySchemaTypes =
   | Module_postRelatedReference
   | Page_post
   | Blog_topic
+  | SanityImageCrop
+  | SanityImageHotspot
   | MediaTag
   | Code
   | SanityImagePaletteSwatch
