@@ -1,4 +1,19 @@
 import { testimonialSchema } from '@blog/studio/schema-types/modules/testimonial/testimonial';
+import { getRecordedBounds } from '@blog/studio/testing/create-mock-validation-rule';
+import { getField } from '@blog/studio/testing/get-field';
+
+describe('testimonialSchema testimonials field validation', () => {
+  it('is required, unique and bounded to one through eight references', () => {
+    const testimonialsField = getField(testimonialSchema, 'testimonials');
+
+    expect(getRecordedBounds(testimonialsField)).toEqual({
+      required: true,
+      unique: true,
+      min: 1,
+      max: 8,
+    });
+  });
+});
 
 describe('testimonialSchema preview', () => {
   const prepare = testimonialSchema.preview?.prepare;
