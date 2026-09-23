@@ -12,7 +12,8 @@ import type { TCtaButton } from '@blog/service/shared/transformers/cta/to-cta-bu
 
 export type TLogoItem = {
   id: string;
-  image: TMaybeUndefined<ISanityImage>;
+  name: string;
+  image: ISanityImage;
   link: TMaybeUndefined<ILink>;
 };
 

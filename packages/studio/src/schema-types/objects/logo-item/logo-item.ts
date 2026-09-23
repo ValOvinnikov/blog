@@ -1,22 +1,26 @@
 import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
-import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
 import { Building2 } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
-export const logoBlockSchema = defineType({
-  name: 'block_logo',
+export const logoItemSchema = defineType({
+  name: 'logoItem',
   title: 'Logo',
-  type: 'document',
-  description:
-    'A partner or client mark — reusable across every Logo Wall module on the site.',
+  type: 'object',
+  description: 'A partner or client mark shown in a Logo Wall.',
   icon: Building2,
   fields: [
-    titleField(),
+    defineField({
+      name: 'name',
+      title: 'Name',
+      type: 'string',
+      description:
+        "The company's name. Screen readers announce it in place of the logo; it is not shown on the page.",
+      validation: (rule) => rule.required().error('Name the company.'),
+    }),
     defineField({
       name: 'image',
       title: 'Logo',
-      type: imageWithAltSchema.name,
+      type: 'image',
       description:
         'SVG or PNG with a transparent background, trimmed to the mark. Shown at 36px tall.',
       validation: (rule) => rule.required().error('Upload the logo.'),
@@ -32,7 +36,7 @@ export const logoBlockSchema = defineType({
   ],
   preview: {
     select: {
-      title: 'title',
+      title: 'name',
       media: 'image',
     },
     prepare({ title, media }) {

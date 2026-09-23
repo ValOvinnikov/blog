@@ -35,9 +35,9 @@ describe('toLogoWallModule', () => {
   it('keeps the logos in authored order', () => {
     const raw = makeRawLogoWallModule({
       logos: [
-        makeRawLogoItem({ _id: 'block-logo-b' }),
-        makeRawLogoItem({ _id: 'block-logo-a' }),
-        makeRawLogoItem({ _id: 'block-logo-c' }),
+        makeRawLogoItem({ _key: 'block-logo-b' }),
+        makeRawLogoItem({ _key: 'block-logo-a' }),
+        makeRawLogoItem({ _key: 'block-logo-c' }),
       ],
     });
 
@@ -52,7 +52,7 @@ describe('toLogoWallModule', () => {
 
   it('transforms a module with fewer than three logos', () => {
     const raw = makeRawLogoWallModule({
-      logos: [makeRawLogoItem(), makeRawLogoItem({ _id: 'block-logo-2' })],
+      logos: [makeRawLogoItem(), makeRawLogoItem({ _key: 'block-logo-2' })],
     });
 
     const module = toLogoWallModule(raw);
@@ -61,6 +61,17 @@ describe('toLogoWallModule', () => {
       'block-logo-1',
       'block-logo-2',
     ]);
+  });
+
+  it("builds the image's alt from the logo's name", () => {
+    const raw = makeRawLogoWallModule({
+      logos: [makeRawLogoItem({ name: 'Stripe' })],
+    });
+
+    const module = toLogoWallModule(raw);
+
+    expect(module.logos[0]?.name).toBe('Stripe');
+    expect(module.logos[0]?.image?.alt).toBe('Stripe');
   });
 
   it('resolves a logo link to an ILink', () => {
@@ -75,8 +86,8 @@ describe('toLogoWallModule', () => {
             openInNewTab: true,
           },
         }),
-        makeRawLogoItem({ _id: 'block-logo-2' }),
-        makeRawLogoItem({ _id: 'block-logo-3' }),
+        makeRawLogoItem({ _key: 'block-logo-2' }),
+        makeRawLogoItem({ _key: 'block-logo-3' }),
       ],
     });
 
@@ -95,8 +106,8 @@ describe('toLogoWallModule', () => {
     const raw = makeRawLogoWallModule({
       logos: [
         makeRawLogoItem({ link: null }),
-        makeRawLogoItem({ _id: 'block-logo-2' }),
-        makeRawLogoItem({ _id: 'block-logo-3' }),
+        makeRawLogoItem({ _key: 'block-logo-2' }),
+        makeRawLogoItem({ _key: 'block-logo-3' }),
       ],
     });
 
@@ -109,7 +120,7 @@ describe('toLogoWallModule', () => {
     const raw = makeRawLogoWallModule({
       logos: [
         makeRawLogoItem({
-          _id: 'block-logo-1',
+          _key: 'block-logo-1',
           link: {
             label: 'Broken',
             linkType: LINK_TYPE.INTERNAL,
@@ -118,8 +129,8 @@ describe('toLogoWallModule', () => {
             openInNewTab: null,
           },
         }),
-        makeRawLogoItem({ _id: 'block-logo-2' }),
-        makeRawLogoItem({ _id: 'block-logo-3' }),
+        makeRawLogoItem({ _key: 'block-logo-2' }),
+        makeRawLogoItem({ _key: 'block-logo-3' }),
       ],
     });
 

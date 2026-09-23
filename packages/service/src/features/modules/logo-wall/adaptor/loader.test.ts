@@ -60,7 +60,6 @@ describe(getLogoWallModule, () => {
           tags: [
             't:tenant-a:modules:logoWall',
             't:tenant-a:module:logo-wall-1',
-            't:tenant-a:block_logo',
             't:tenant-a:link',
             't:tenant-a:homePage',
             't:tenant-a:page_landing',

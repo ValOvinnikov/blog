@@ -357,12 +357,19 @@ export function makeRawFeatureListModule(
   };
 }
 
+function makeRawLogoImage(): TRawLogoItem['image'] {
+  const { asset, hotspot, crop } = makeRawSanityImage();
+
+  return { asset, hotspot, crop };
+}
+
 export function makeRawLogoItem(
   overrides: Partial<TRawLogoItem> = {},
 ): TRawLogoItem {
   return {
-    _id: 'block-logo-1',
-    image: makeRawSanityImage('Acme Corp logo'),
+    _key: 'block-logo-1',
+    name: 'Acme Corp',
+    image: makeRawLogoImage(),
     link: null,
     ...overrides,
   };
@@ -390,8 +397,8 @@ export function makeRawLogoWallModule(
     headingBlock: makeRawHeadingBlock('Trusted by'),
     logos: [
       makeRawLogoItem(),
-      makeRawLogoItem({ _id: 'block-logo-2' }),
-      makeRawLogoItem({ _id: 'block-logo-3' }),
+      makeRawLogoItem({ _key: 'block-logo-2' }),
+      makeRawLogoItem({ _key: 'block-logo-3' }),
     ],
     ctaButtons: null,
     displayMode: DISPLAY_MODE.GRID,
