@@ -10,6 +10,8 @@ import { quoteCardVariants } from './quote-card-variants';
 
 const NAME = faker.person.fullName();
 const AVATAR_SRC = faker.image.avatar();
+const SPOTLIGHT_QUOTE =
+  'Switching to this platform cut our publishing time in half. The editorial workflow finally feels like it was built for writers, not developers, and our readers noticed the difference within the first week.';
 
 const meta = {
   title: 'Molecules/QuoteCard',
@@ -86,7 +88,7 @@ export const Spotlight: TStory = {
     isSpotlight: true,
     children: (
       <>
-        <QuoteCard.Quote>{faker.lorem.sentences(4)}</QuoteCard.Quote>
+        <QuoteCard.Quote>{SPOTLIGHT_QUOTE}</QuoteCard.Quote>
         <QuoteCard.Avatar>
           <Avatar src={AVATAR_SRC} alt={NAME} name={NAME} />
         </QuoteCard.Avatar>
