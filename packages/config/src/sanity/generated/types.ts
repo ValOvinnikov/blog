@@ -139,6 +139,30 @@ export type ArticleText = Array<
     } & Aside)
 >;
 
+export type Module_stats = {
+  _id: string;
+  _type: 'module_stats';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  headingBlock?: HeadingBlock;
+  stats?: Array<
+    {
+      _key: string;
+    } & Stat
+  >;
+  footnote?: string;
+  ctaButtons?: Array<
+    {
+      _key: string;
+    } & CtaButton
+  >;
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  layout?: Layout;
+};
+
 export type Block_testimonialReference = {
   _ref: string;
   _type: 'reference';
@@ -396,6 +420,13 @@ export type ParagraphText = Array<{
   _type: 'block';
   _key: string;
 }>;
+
+export type Stat = {
+  _type: 'stat';
+  value?: string;
+  label?: string;
+  description?: string;
+};
 
 export type PostTakeaways = {
   _type: 'postTakeaways';
@@ -1010,6 +1041,13 @@ export type Module_testimonialReference = {
   [internalGroqTypeReferenceTo]?: 'module_testimonial';
 };
 
+export type Module_statsReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_stats';
+};
+
 export type Page_landing = {
   _id: string;
   _type: 'page_landing';
@@ -1051,6 +1089,9 @@ export type Page_landing = {
     | ({
         _key: string;
       } & Module_testimonialReference)
+    | ({
+        _key: string;
+      } & Module_statsReference)
   >;
   seo?: Seo;
 };
@@ -1095,6 +1136,9 @@ export type Page_home = {
     | ({
         _key: string;
       } & Module_testimonialReference)
+    | ({
+        _key: string;
+      } & Module_statsReference)
   >;
   seo?: Seo;
 };
@@ -1375,6 +1419,7 @@ export type AllSanitySchemaTypes =
   | ImageWithAlt
   | Module_content
   | ArticleText
+  | Module_stats
   | Block_testimonialReference
   | Module_testimonial
   | Block_logoReference
@@ -1392,6 +1437,7 @@ export type AllSanitySchemaTypes =
   | Page_postIndexReference
   | InlineLink
   | ParagraphText
+  | Stat
   | PostTakeaways
   | Brand
   | BrandTagline
@@ -1444,6 +1490,7 @@ export type AllSanitySchemaTypes =
   | Module_featureListReference
   | Module_logoWallReference
   | Module_testimonialReference
+  | Module_statsReference
   | Page_landing
   | Page_home
   | Blog_authorReference
