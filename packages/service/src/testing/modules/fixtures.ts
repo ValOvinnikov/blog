@@ -21,6 +21,7 @@ import type { TRawHeroModule } from '@blog/service/features/modules/hero/adaptor
 import type { TRawHeroBlogModule } from '@blog/service/features/modules/hero-blog/adaptor/transformer';
 import type { TRawHeroProfileModule } from '@blog/service/features/modules/hero-profile/adaptor/transformer';
 import type { TRawHeroStatementModule } from '@blog/service/features/modules/hero-statement/adaptor/transformer';
+import type { TRawLogoWallModule } from '@blog/service/features/modules/logo-wall/adaptor/transformer';
 import type { TRawNewsletterModule } from '@blog/service/features/modules/newsletter/adaptor/transformer';
 import type { TRawPostFeaturedModule } from '@blog/service/features/modules/post-featured/adaptor/transformer';
 import type { TRawPostLatestModule } from '@blog/service/features/modules/post-latest/adaptor/transformer';
@@ -32,6 +33,7 @@ import type { TRawCtaButton } from '@blog/service/shared/transformers/cta/to-cta
 import {
   makeRawHeadingBlock,
   makeRawPortableTextMarkDef,
+  makeRawSanityImage,
 } from '@blog/service/testing/shared/fixtures';
 
 type TRawCtaContentBlock = NonNullable<TRawCtaModule['content']>[number];
@@ -42,6 +44,7 @@ type TRawFeatureListItem = NonNullable<
   TRawFeatureListModule['features']
 >[number];
 type TRawTaxonomyEntry = NonNullable<TRawTaxonomyListModule['entries']>[number];
+type TRawLogoItem = NonNullable<TRawLogoWallModule['logos']>[number];
 type TRawTestimonialItem = NonNullable<
   TRawTestimonialModule['testimonials']
 >[number];
@@ -352,6 +355,18 @@ export function makeRawFeatureListModule(
   };
 }
 
+export function makeRawLogoItem(
+  overrides: Partial<TRawLogoItem> = {},
+): TRawLogoItem {
+  return {
+    _id: 'block-logo-1',
+    name: 'Acme Corp',
+    image: makeRawSanityImage('Acme Corp logo'),
+    link: null,
+    ...overrides,
+  };
+}
+
 export function makeRawTestimonialItem(
   overrides: Partial<TRawTestimonialItem> = {},
 ): TRawTestimonialItem {
@@ -362,6 +377,25 @@ export function makeRawTestimonialItem(
     role: null,
     image: null,
     link: null,
+    ...overrides,
+  };
+}
+
+export function makeRawLogoWallModule(
+  overrides: Partial<TRawLogoWallModule> = {},
+): TRawLogoWallModule {
+  return {
+    brandVariant: BRAND_VARIANT.PRIMARY,
+    headingBlock: makeRawHeadingBlock('Trusted by'),
+    logos: [
+      makeRawLogoItem(),
+      makeRawLogoItem({ _id: 'block-logo-2', name: 'Globex' }),
+      makeRawLogoItem({ _id: 'block-logo-3', name: 'Initech' }),
+    ],
+    ctaButtons: null,
+    displayMode: DISPLAY_MODE.GRID,
+    contentAlignment: null,
+    layout: null,
     ...overrides,
   };
 }
