@@ -28,6 +28,7 @@ import type { TRawPostLatestModule } from '@blog/service/features/modules/post-l
 import type { TRawPostListModule } from '@blog/service/features/modules/post-list/adaptor/transformer';
 import type { TRawPostRelatedModule } from '@blog/service/features/modules/post-related/adaptor/transformer';
 import type { TRawTaxonomyListModule } from '@blog/service/features/modules/taxonomy-list/adaptor/transformer';
+import type { TRawTestimonialModule } from '@blog/service/features/modules/testimonial/adaptor/transformer';
 import type { TRawCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button';
 import {
   makeRawHeadingBlock,
@@ -44,6 +45,9 @@ type TRawFeatureListItem = NonNullable<
 >[number];
 type TRawTaxonomyEntry = NonNullable<TRawTaxonomyListModule['entries']>[number];
 type TRawLogoItem = NonNullable<TRawLogoWallModule['logos']>[number];
+type TRawTestimonialItem = NonNullable<
+  TRawTestimonialModule['testimonials']
+>[number];
 
 export function makeRawHeroModule(
   overrides: Partial<TRawHeroModule> = {},
@@ -204,7 +208,7 @@ export function makeRawContentModule(
 ): TRawContentModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
-    body: [{ _type: 'block', _key: 'block-1', markDefs: null }],
+    body: [makeRawContentBlock()],
     layout: null,
     ...overrides,
   };
@@ -258,15 +262,17 @@ export function makeRawContentMarkDef(
 }
 
 export function makeRawContentBlock(
-  overrides: Partial<TRawCtaContentBlock> = {},
+  overrides: Partial<TRawCtaContentBlock> & { text?: string } = {},
 ): TRawCtaContentBlock {
+  const { text = 'Hi.', ...rest } = overrides;
+
   return {
     _type: 'block',
     _key: 'block-1',
     style: 'normal',
-    children: [{ _type: 'span', _key: 'span-1', text: 'Hi.' }],
+    children: [{ _type: 'span', _key: 'span-1', text }],
     markDefs: null,
-    ...overrides,
+    ...rest,
   };
 }
 
@@ -361,6 +367,20 @@ export function makeRawLogoItem(
   };
 }
 
+export function makeRawTestimonialItem(
+  overrides: Partial<TRawTestimonialItem> = {},
+): TRawTestimonialItem {
+  return {
+    _id: 'block-testimonial-1',
+    name: 'Jamie Rivera',
+    quote: [makeRawContentBlock({ text: 'Great work.' })],
+    role: null,
+    image: null,
+    link: null,
+    ...overrides,
+  };
+}
+
 export function makeRawLogoWallModule(
   overrides: Partial<TRawLogoWallModule> = {},
 ): TRawLogoWallModule {
@@ -374,6 +394,25 @@ export function makeRawLogoWallModule(
     ],
     ctaButtons: null,
     displayMode: DISPLAY_MODE.GRID,
+    contentAlignment: null,
+    layout: null,
+    ...overrides,
+  };
+}
+
+export function makeRawTestimonialModule(
+  overrides: Partial<TRawTestimonialModule> = {},
+): TRawTestimonialModule {
+  return {
+    brandVariant: BRAND_VARIANT.PRIMARY,
+    headingBlock: makeRawHeadingBlock('What people say'),
+    testimonials: [
+      makeRawTestimonialItem(),
+      makeRawTestimonialItem({ _id: 'block-testimonial-2' }),
+    ],
+    ctaButtons: null,
+    displayMode: DISPLAY_MODE.GRID,
+    cardAlignment: null,
     contentAlignment: null,
     layout: null,
     ...overrides,

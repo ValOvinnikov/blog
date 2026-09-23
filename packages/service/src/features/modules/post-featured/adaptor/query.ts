@@ -1,5 +1,5 @@
 import { POST_SOURCE } from '@blog/config';
-import { q } from '@blog/service/sanity/query';
+import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
 import {
   DISPLAY_MODE_EXPRESSION,
   displayModeParser,
@@ -22,9 +22,9 @@ const newestFeaturedPostsQuery = q.star
   .project(postCardFragment);
 
 export const postFeaturedModuleQuery = q
-  .parameters<{ id: string }>()
+  .parameters<TModuleQueryParams>()
   .star.filterByType('module_postFeatured')
-  .filterRaw('_id == $id')
+  .filterBy('_id == $id')
   .slice(0)
   .project((sub) => ({
     brandVariant: sub.field('brandVariant').notNull(),

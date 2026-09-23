@@ -8,10 +8,11 @@ import { headingBlockFragment } from '@blog/service/shared/fragments/heading-blo
 import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
 import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document';
+import { listedTextBlockFragment } from '@blog/service/shared/fragments/portable-text/listed-text-block';
 
-export const logoWallModuleQuery = q
+export const testimonialModuleQuery = q
   .parameters<TModuleQueryParams>()
-  .star.filterByType('module_logoWall')
+  .star.filterByType('module_testimonial')
   .filterBy('_id == $id')
   .slice(0)
   .project((sub) => ({
@@ -20,14 +21,22 @@ export const logoWallModuleQuery = q
       .field('headingBlock')
       .project(headingBlockFragment)
       .notNull(),
-    logos: sub
-      .field('logos[]')
+    testimonials: sub
+      .field('testimonials[]')
       .deref()
-      .project((logoSub) => ({
+      .project((itemSub) => ({
         _id: true,
-        name: logoSub.field('name').notNull(),
-        image: logoSub.field('image').project(sanityImageFragment).notNull(),
-        link: logoSub
+        name: itemSub.field('name').notNull(),
+        quote: itemSub
+          .field('quote[]')
+          .project(listedTextBlockFragment)
+          .notNull(),
+        role: itemSub.field('role').nullable(true),
+        image: itemSub
+          .field('image')
+          .project(sanityImageFragment)
+          .nullable(true),
+        link: itemSub
           .field('link')
           .deref()
           .project(linkDocumentFragment)
@@ -39,6 +48,7 @@ export const logoWallModuleQuery = q
       .project(ctaButtonFragment)
       .nullable(true),
     displayMode: sub.raw(DISPLAY_MODE_EXPRESSION, displayModeParser),
+    cardAlignment: sub.field('cardAlignment').nullable(true),
     contentAlignment: sub.field('contentAlignment').nullable(true),
     layout: sub.field('layout').project(layoutFragment).nullable(true),
   }))
