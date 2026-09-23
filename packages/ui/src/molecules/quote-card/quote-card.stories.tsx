@@ -27,11 +27,11 @@ const meta = {
     },
   },
   args: {
-    quote: faker.lorem.sentences(2),
     role: `${faker.person.jobTitle()}, ${faker.company.name()}`,
     tone: BRAND_VARIANT.PRIMARY,
     children: (
       <>
+        <QuoteCard.Quote>{faker.lorem.sentences(2)}</QuoteCard.Quote>
         <QuoteCard.Avatar>
           <Avatar src={AVATAR_SRC} alt={NAME} name={NAME} />
         </QuoteCard.Avatar>
@@ -55,9 +55,12 @@ export const Centered: TStory = {
 export const NoPhoto: TStory = {
   args: {
     children: (
-      <QuoteCard.Name>
-        <span>{NAME}</span>
-      </QuoteCard.Name>
+      <>
+        <QuoteCard.Quote>{faker.lorem.sentences(2)}</QuoteCard.Quote>
+        <QuoteCard.Name>
+          <span>{NAME}</span>
+        </QuoteCard.Name>
+      </>
     ),
   },
 };
@@ -66,6 +69,7 @@ export const Linked: TStory = {
   args: {
     children: (
       <>
+        <QuoteCard.Quote>{faker.lorem.sentences(2)}</QuoteCard.Quote>
         <QuoteCard.Avatar>
           <Avatar src={AVATAR_SRC} alt={NAME} name={NAME} />
         </QuoteCard.Avatar>

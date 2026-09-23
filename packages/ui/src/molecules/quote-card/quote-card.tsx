@@ -15,19 +15,20 @@ import { cloneElement, Fragment, type ElementType } from 'react';
 
 import { QuoteCardAvatar } from './components/avatar/quote-card-avatar';
 import { QuoteCardName } from './components/name/quote-card-name';
+import { QuoteCardQuote } from './components/quote/quote-card-quote';
 import {
   quoteCardVariants,
   type TQuoteCardVariants,
 } from './quote-card-variants';
 
 const QuoteCardParts = {
+  Quote: QuoteCardQuote,
   Avatar: QuoteCardAvatar,
   Name: QuoteCardName,
 } satisfies Record<string, ElementType>;
 
 export type TQuoteCardProps = IWithClassName &
   IWithDataTestId & {
-    quote: string;
     role?: string;
     align?: TQuoteCardVariants['align'];
     isSpotlight?: boolean;
@@ -35,9 +36,8 @@ export type TQuoteCardProps = IWithClassName &
     children?: TCompoundChildren<typeof QuoteCardParts>;
   };
 
-/** A testimonial quote rendered as a figure; composes a caller-supplied `QuoteCard.Avatar` and `QuoteCard.Name` for the quoted person. */
+/** A testimonial quote rendered as a figure; composes a caller-supplied `QuoteCard.Quote`, `QuoteCard.Avatar`, and `QuoteCard.Name` for the quoted person. */
 const QuoteCardRoot = ({
-  quote,
   role,
   align,
   isSpotlight = false,
@@ -55,7 +55,7 @@ const QuoteCardRoot = ({
   return (
     <figure className={s.root({ class: className })} data-testid={dataTestId}>
       <Icon name={ICONS.QUOTE} size={SIZE.LG} className={s.quoteMark()} />
-      <blockquote className={s.quote()}>{quote}</blockquote>
+      {slots.Quote && cloneElement(slots.Quote, { isSpotlight })}
       {unmatched.map((node, i) => (
         <Fragment key={i}>{node}</Fragment>
       ))}
