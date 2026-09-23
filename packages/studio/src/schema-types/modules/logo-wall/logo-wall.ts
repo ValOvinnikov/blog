@@ -29,7 +29,6 @@ export const logoWallSchema = defineType({
       of: [defineArrayMember({ type: logoItemSchema.name })],
       validation: (rule) => [
         rule.required().error('A logo wall needs at least one logo.'),
-        rule.unique().error('Each logo can only appear once.'),
         rule.min(1).error('A logo wall needs at least one logo.'),
         rule.max(12).error('A logo wall holds at most twelve logos.'),
       ],
