@@ -21,17 +21,11 @@ function toLogoItem(raw: TRawLogoItem): TLogoItem {
   };
 }
 
-function toLogoItems(raw: TRawLogoWallModule['logos']): TLogoItem[] {
-  if (!raw) return [];
-
-  return raw.map(toLogoItem);
-}
-
 export function toLogoWallModule(raw: TRawLogoWallModule): TLogoWallModule {
   return {
     brandVariant: raw.brandVariant,
     headingBlock: toHeadingBlock(raw.headingBlock),
-    logos: toLogoItems(raw.logos),
+    logos: raw.logos.map(toLogoItem),
     ctaButtons: toCtaButtons(raw.ctaButtons),
     displayMode: raw.displayMode,
     contentAlignment: raw.contentAlignment ?? undefined,

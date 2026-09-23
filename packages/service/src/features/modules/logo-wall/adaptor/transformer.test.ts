@@ -50,14 +50,6 @@ describe('toLogoWallModule', () => {
     ]);
   });
 
-  it('degrades to an empty logos array when logos is unset (no throw)', () => {
-    const raw = makeRawLogoWallModule({ logos: null });
-
-    const module = toLogoWallModule(raw);
-
-    expect(module.logos).toEqual([]);
-  });
-
   it('transforms a module with fewer than three logos', () => {
     const raw = makeRawLogoWallModule({
       logos: [makeRawLogoItem(), makeRawLogoItem({ _id: 'block-logo-2' })],

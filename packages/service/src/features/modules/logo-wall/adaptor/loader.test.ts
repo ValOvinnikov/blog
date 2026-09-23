@@ -38,14 +38,6 @@ describe(getLogoWallModule, () => {
     ]);
   });
 
-  it('resolves with an empty logos array rather than throwing when logos is unset', async () => {
-    mockRun.mockResolvedValueOnce(makeRawLogoWallModule({ logos: null }));
-
-    const logoWall = await getLogoWallModule('logo-wall-1', tenant);
-
-    expect(logoWall.logos).toEqual([]);
-  });
-
   it('propagates when the module document is missing', async () => {
     mockRun.mockRejectedValueOnce(new Error('ValidationError'));
 

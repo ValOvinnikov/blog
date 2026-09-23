@@ -17,6 +17,12 @@ describe('logoWallModuleQuery', () => {
     expect(() => logoWallModuleQuery.parse(raw)).toThrow();
   });
 
+  it('rejects a module with no logos', () => {
+    const raw = { ...makeRawLogoWallModule(), logos: null };
+
+    expect(() => logoWallModuleQuery.parse(raw)).toThrow();
+  });
+
   it('rejects a logo with no name', () => {
     const raw = {
       ...makeRawLogoWallModule(),

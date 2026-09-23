@@ -33,7 +33,7 @@ export const logoWallModuleQuery = q
           .project(linkDocumentFragment)
           .nullable(true),
       }))
-      .nullable(true),
+      .notNull(),
     ctaButtons: sub
       .field('ctaButtons[]')
       .project(ctaButtonFragment)
