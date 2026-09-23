@@ -42,13 +42,8 @@ export const logoWallSchema = defineType({
           .error('A logo wall holds at most twelve logos.'),
     }),
     ctaButtonsField(),
-    displayModeField({
-      description: 'Grid wraps the logos in rows; Carousel scrolls them.',
-    }),
-    ...alignmentFields([], {
-      description:
-        'Horizontal alignment of the heading, supporting text and actions. Logos are always centred in their tiles.',
-    }),
+    displayModeField(),
+    ...alignmentFields([]),
     layoutField,
   ],
   preview: {
