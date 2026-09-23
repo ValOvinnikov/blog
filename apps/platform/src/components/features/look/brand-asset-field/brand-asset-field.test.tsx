@@ -72,7 +72,7 @@ describe(`<${BrandAssetField.name}/>`, () => {
       ok: true,
       url: 'https://example.blob.vercel-storage.com/logo-new.png',
     });
-    const { container } = render(
+    render(
       <BrandAssetField
         tenantId="tenant-1"
         kind="logo"
@@ -84,7 +84,7 @@ describe(`<${BrandAssetField.name}/>`, () => {
     );
 
     const file = new File(['bytes'], 'logo.png', { type: 'image/png' });
-    await selectFile(container, file);
+    await selectFile(file);
 
     await waitFor(() => {
       expect(uploadBrandAssetActionMock).toHaveBeenCalledWith(

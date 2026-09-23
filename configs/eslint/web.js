@@ -13,6 +13,34 @@ const packageJsonPath = path.resolve(
   '../../apps/web/package.json',
 );
 
+const sanityRestrictedGroup = {
+  group: [
+    'sanity',
+    'sanity/*',
+    'next-sanity',
+    'next-sanity/*',
+    '@sanity/client',
+    '@sanity/client/*',
+    'groqd',
+    'groqd/*',
+  ],
+  message:
+    'apps/web must not talk to Sanity directly — fetch through @blog/service.',
+};
+
+const webTestingRestrictedGroup = {
+  group: ['@web/testing', '@web/testing/*', '**/testing/**'],
+  message:
+    'src/testing/ holds test-only helpers (custom renders, fixtures) that would drag @testing-library/react and its fixtures into the production bundle — import it only from *.test.{ts,tsx}, other src/testing files, *.stories.{ts,tsx}, or .storybook config.',
+};
+
+const TESTING_IMPORT_ALLOWED_FILES = [
+  '**/*.test.{ts,tsx}',
+  'src/testing/**/*.{ts,tsx}',
+  '**/*.stories.{ts,tsx}',
+  '.storybook/**/*.{ts,tsx}',
+];
+
 /** @type {import("eslint").Linter.Config[]} */
 export default [
   ...react,
@@ -43,22 +71,22 @@ export default [
         'error',
         {
           paths: [noVitestGlobalsImportPath],
-          patterns: [
-            {
-              group: [
-                'sanity',
-                'sanity/*',
-                'next-sanity',
-                'next-sanity/*',
-                '@sanity/client',
-                '@sanity/client/*',
-                'groqd',
-                'groqd/*',
-              ],
-              message:
-                'apps/web must not talk to Sanity directly — fetch through @blog/service.',
-            },
-          ],
+          patterns: [sanityRestrictedGroup, webTestingRestrictedGroup],
+        },
+      ],
+    },
+  },
+  {
+    // src/testing/ helpers legitimately import each other, and *.test,
+    // *.stories and .storybook config are their legitimate consumers —
+    // narrow no-restricted-imports back to the Sanity-SDK ban for those.
+    files: TESTING_IMPORT_ALLOWED_FILES,
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [noVitestGlobalsImportPath],
+          patterns: [sanityRestrictedGroup],
         },
       ],
     },
