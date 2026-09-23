@@ -22,7 +22,7 @@ export type TRelatedByTopicParams = {
 export const relatedPostAnchorQuery = q
   .parameters<TAnchorPostParams>()
   .star.filterByType('page_post')
-  .filterRaw('_id == $postId')
+  .filterBy('_id == $postId')
   .slice(0)
   .project((sub) => ({
     tagIds: sub

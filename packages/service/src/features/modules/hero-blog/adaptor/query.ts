@@ -1,5 +1,5 @@
 import { POST_SOURCE } from '@blog/config';
-import { q } from '@blog/service/sanity/query';
+import { q, type TIdParams } from '@blog/service/sanity/query';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/published-post';
 import { ctaSecondaryButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
@@ -16,9 +16,9 @@ const newestFeaturedPostQuery = q.star
   .nullable(true);
 
 export const heroBlogModuleQuery = q
-  .parameters<{ id: string }>()
+  .parameters<TIdParams>()
   .star.filterByType('module_heroBlog')
-  .filterRaw('_id == $id')
+  .filterBy('_id == $id')
   .slice(0)
   .project((sub) => ({
     post: sub

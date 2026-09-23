@@ -1,10 +1,10 @@
-import { q } from '@blog/service/sanity/query';
+import { q, type TIdParams } from '@blog/service/sanity/query';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/published-post';
 
 // Keyed by `_id` (the webhook payload's document id), not slug — this is the
 // read half of the publish-time skim pipeline, not a page-render query.
 export const publishedPostBodyQuery = q
-  .parameters<{ id: string }>()
+  .parameters<TIdParams>()
   .star.filterByType('page_post')
   .filterBy('_id == $id')
   .filterRaw(PUBLISHED_POST_FILTER)

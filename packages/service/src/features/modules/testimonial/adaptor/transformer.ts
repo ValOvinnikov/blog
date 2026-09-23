@@ -13,25 +13,17 @@ export type TRawTestimonialModule = InferResultType<
   typeof testimonialModuleQuery
 >;
 
-type TRawTestimonialItem = NonNullable<
-  TRawTestimonialModule['testimonials']
->[number];
-
-function toTestimonialItem(raw: TRawTestimonialItem): TTestimonialItem {
-  return {
-    id: raw._id,
-    name: raw.name,
-    quote: raw.quote.map(toPortableText),
-    role: raw.role ?? undefined,
-    image: toSanityImage(raw.image),
-    link: toLinkDocument(raw.link),
-  };
-}
-
 function toTestimonialItems(
   raw: TRawTestimonialModule['testimonials'],
 ): TTestimonialItem[] {
-  return (raw ?? []).map(toTestimonialItem);
+  return (raw ?? []).map((item) => ({
+    id: item._id,
+    name: item.name,
+    quote: item.quote.map(toPortableText),
+    role: item.role ?? undefined,
+    image: toSanityImage(item.image),
+    link: toLinkDocument(item.link),
+  }));
 }
 
 export function toTestimonialModule(

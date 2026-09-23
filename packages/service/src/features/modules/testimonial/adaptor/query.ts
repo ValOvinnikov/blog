@@ -1,4 +1,4 @@
-import { q } from '@blog/service/sanity/query';
+import { q, type TIdParams } from '@blog/service/sanity/query';
 import {
   DISPLAY_MODE_EXPRESSION,
   displayModeParser,
@@ -11,9 +11,9 @@ import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-d
 import { listedTextBlockFragment } from '@blog/service/shared/fragments/portable-text/listed-text-block';
 
 export const testimonialModuleQuery = q
-  .parameters<{ id: string }>()
+  .parameters<TIdParams>()
   .star.filterByType('module_testimonial')
-  .filterRaw('_id == $id')
+  .filterBy('_id == $id')
   .slice(0)
   .project((sub) => ({
     brandVariant: sub.field('brandVariant').notNull(),
@@ -42,8 +42,6 @@ export const testimonialModuleQuery = q
           .project(linkDocumentFragment)
           .nullable(true),
       }))
-      // Mirrors the schema's own `min(1)` rule — a below-minimum module
-      // degrades to no cards rather than failing the whole page.
       .nullable(true),
     ctaButtons: sub
       .field('ctaButtons[]')

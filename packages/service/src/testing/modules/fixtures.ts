@@ -357,13 +357,9 @@ export function makeRawTestimonialItem(
     _id: 'block-testimonial-1',
     name: 'Jamie Rivera',
     quote: [
-      {
-        _type: 'block',
-        _key: 'block-1',
-        style: 'normal',
+      makeRawContentBlock({
         children: [{ _type: 'span', _key: 'span-1', text: 'Great work.' }],
-        markDefs: null,
-      },
+      }),
     ],
     role: null,
     image: null,
