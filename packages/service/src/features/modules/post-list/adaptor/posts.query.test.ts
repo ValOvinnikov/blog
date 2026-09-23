@@ -2,7 +2,7 @@ import { TAXONOMY_KIND } from '@blog/config';
 
 import { postListModulePaginatedPostsQuery } from './posts.query';
 
-describe('postListModulePaginatedPostsQuery', () => {
+describe(postListModulePaginatedPostsQuery, () => {
   it('windows the first page by pageSize (end-exclusive slice)', () => {
     expect(postListModulePaginatedPostsQuery(1, 9).query).toContain('[0...9]');
   });
@@ -32,28 +32,44 @@ describe('postListModulePaginatedPostsQuery', () => {
     );
   });
 
-  it('scopes posts to a tag with a single direct lookup', () => {
+  it('scopes posts to a tag by the term the archive page references', () => {
     const query = postListModulePaginatedPostsQuery(1, 9, {
       kind: TAXONOMY_KIND.TAGS,
       slug: 'engineering',
     }).query;
 
     expect(query).toContain(
-      'references(*[_type == "blog_tag" && slug.current == $scopeSlug][0]._id)',
+      'references(*[_type == "page_tag" && slug.current == $scopeSlug][0].tag._ref)',
     );
+    expect(query).not.toContain('blog_tag');
     expect(query).not.toContain('blog_topic');
   });
 
-  it('scopes posts to a topic with a single direct lookup', () => {
+  it('scopes posts to a topic by the term the archive page references', () => {
     const query = postListModulePaginatedPostsQuery(1, 9, {
       kind: TAXONOMY_KIND.TOPICS,
       slug: 'news',
     }).query;
 
     expect(query).toContain(
-      'references(*[_type == "blog_topic" && slug.current == $scopeSlug][0]._id)',
+      'references(*[_type == "page_topic" && slug.current == $scopeSlug][0].topic._ref)',
     );
+    expect(query).not.toContain('blog_topic');
     expect(query).not.toContain('blog_tag');
+  });
+
+  it('still resolves the tag when the archive page slug has drifted from the term own slug', () => {
+    const query = postListModulePaginatedPostsQuery(1, 9, {
+      kind: TAXONOMY_KIND.TAGS,
+      slug: 'drifted-page-slug',
+    }).query;
+
+    expect(query).not.toContain(
+      '_type == "blog_tag" && slug.current == $scopeSlug',
+    );
+    expect(query).toContain(
+      '_type == "page_tag" && slug.current == $scopeSlug',
+    );
   });
 
   it('omits the scope predicate entirely when unscoped', () => {

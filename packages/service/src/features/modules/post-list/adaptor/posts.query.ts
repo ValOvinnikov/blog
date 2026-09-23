@@ -8,13 +8,21 @@ export type TPostListScope = {
   slug: string;
 };
 
-const SCOPE_TAXONOMY_TYPE: Record<TTaxonomyKind, string> = {
-  [TAXONOMY_KIND.TAGS]: 'blog_tag',
-  [TAXONOMY_KIND.TOPICS]: 'blog_topic',
+const SCOPE_ARCHIVE_PAGE: Record<
+  TTaxonomyKind,
+  { pageType: string; referenceField: string }
+> = {
+  [TAXONOMY_KIND.TAGS]: { pageType: 'page_tag', referenceField: 'tag' },
+  [TAXONOMY_KIND.TOPICS]: { pageType: 'page_topic', referenceField: 'topic' },
 };
 
+// $scopeSlug is the archive page's own slug (from the route), not the
+// referenced term's slug — the two are independently editable and can
+// drift. Resolving the archive page by $scopeSlug first and then following
+// its reference field to the term keeps this correct even when they do.
 function scopeFilter(kind: TTaxonomyKind) {
-  return `references(*[_type == "${SCOPE_TAXONOMY_TYPE[kind]}" && slug.current == $scopeSlug][0]._id)`;
+  const { pageType, referenceField } = SCOPE_ARCHIVE_PAGE[kind];
+  return `references(*[_type == "${pageType}" && slug.current == $scopeSlug][0].${referenceField}._ref)`;
 }
 
 /**
