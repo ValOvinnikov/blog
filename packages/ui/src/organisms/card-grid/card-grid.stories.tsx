@@ -1,7 +1,5 @@
-import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import { LogoTile } from '../../molecules/logo-tile';
 import { MediaCard } from '../../molecules/media-card';
 
 import { CardGrid } from './card-grid';
@@ -73,29 +71,6 @@ const renderMediaCards = (items: typeof posts) =>
     ),
   );
 
-const renderLogoTiles = (count: number) =>
-  Array.from({ length: count }, (_, index) => {
-    const alt = faker.company.name();
-    return (
-      <LogoTile key={index}>
-        <img
-          src={faker.image.urlPicsumPhotos({ width: 160, height: 80 })}
-          alt={alt}
-        />
-      </LogoTile>
-    );
-  });
-
-const renderLogoTilesWithWideWordmark = () => [
-  <LogoTile key="wide">
-    <img
-      src={faker.image.urlPicsumPhotos({ width: 1000, height: 100 })}
-      alt={faker.company.name()}
-    />
-  </LogoTile>,
-  ...renderLogoTiles(5),
-];
-
 const meta = {
   title: 'Organisms/CardGrid',
   component: CardGrid,
@@ -104,7 +79,7 @@ const meta = {
   argTypes: {
     columns: {
       control: 'select',
-      options: [1, 2, 3, 4, 5, 6],
+      options: [1, 2, 3, 4],
     },
   },
   args: {
@@ -131,20 +106,4 @@ export const SingleColumn: TStory = {
 
 export const FourColumns: TStory = {
   args: { columns: 4, children: renderMediaCards(posts) },
-};
-
-export const FiveColumns: TStory = {
-  args: { columns: 5, children: renderLogoTiles(5) },
-};
-
-export const SixColumns: TStory = {
-  args: { columns: 6, children: renderLogoTiles(6) },
-};
-
-// `columns: 6` is `grid-cols-2` below `md` (a real breakpoint fork) — pin the
-// viewport so the narrow, two-column state that can overflow actually renders.
-export const SixColumnsWideWordmarkOnPhone: TStory = {
-  name: 'Six columns — wide wordmark on phone',
-  globals: { viewport: 'phone' },
-  args: { columns: 6, children: renderLogoTilesWithWideWordmark() },
 };

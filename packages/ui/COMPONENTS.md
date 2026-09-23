@@ -306,7 +306,7 @@ Props: rows: IBookmarkRow[] · emptyMessage: string · hint?: string · prefix?:
 
 The responsive grid container that lays out cards (or any children) in columns.
 Props: columns?: TCardGridVariants['columns'] · children: ReactNode _(extends IWithClassName, IWithDataTestId)_
-Variants: columns: 1|2|3|4|5|6
+Variants: columns: 1|2|3|4
 
 ### Carousel — `organisms/carousel/carousel.tsx`
 
