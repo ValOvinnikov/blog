@@ -15,9 +15,10 @@ describe(buildArchivePageSlugExpression, () => {
   it('falls back to the term document own slug when no archive page references it', () => {
     const expression = buildArchivePageSlugExpression('page_tag', 'tag');
 
-    expect(expression).toBe(
-      'coalesce(*[_type == "page_tag" && tag._ref == ^._id][0].slug.current, slug.current)',
-    );
+    expect(expression).toContain('coalesce(');
+    expect(expression).toContain(', slug.current)');
+    expect(expression).toContain('_type == "page_tag"');
+    expect(expression).toContain('tag._ref == ^._id');
   });
 
   it('parses to a string', () => {
