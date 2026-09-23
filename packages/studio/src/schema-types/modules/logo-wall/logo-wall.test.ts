@@ -3,7 +3,7 @@ import { getRecordedBounds } from '@blog/studio/testing/create-mock-validation-r
 import { getField } from '@blog/studio/testing/get-field';
 
 describe('logoWallSchema logos field validation', () => {
-  it('is required, unique, and bounded to one through twelve references', () => {
+  it('is required, unique, and bounded to one through twelve logos', () => {
     const logosField = getField(logoWallSchema, 'logos');
 
     expect(getRecordedBounds(logosField)).toEqual({

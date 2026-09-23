@@ -1,4 +1,3 @@
-import { logoBlockSchema } from '@blog/studio/schema-types/documents/blocks/logo/logo';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
@@ -6,6 +5,7 @@ import { displayModeField } from '@blog/studio/schema-types/fields/display-mode-
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
+import { logoItemSchema } from '@blog/studio/schema-types/objects/logo-item/logo-item';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { Images } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
@@ -26,12 +26,7 @@ export const logoWallSchema = defineType({
       title: 'Logos',
       type: 'array',
       description: 'The logos shown in this section, in display order.',
-      of: [
-        defineArrayMember({
-          type: 'reference',
-          to: [{ type: logoBlockSchema.name }],
-        }),
-      ],
+      of: [defineArrayMember({ type: logoItemSchema.name })],
       validation: (rule) => [
         rule.required().error('A logo wall needs at least one logo.'),
         rule.unique().error('Each logo can only appear once.'),
