@@ -360,7 +360,6 @@ export function makeRawLogoItem(
 ): TRawLogoItem {
   return {
     _id: 'block-logo-1',
-    name: 'Acme Corp',
     image: makeRawSanityImage('Acme Corp logo'),
     link: null,
     ...overrides,
@@ -389,8 +388,8 @@ export function makeRawLogoWallModule(
     headingBlock: makeRawHeadingBlock('Trusted by'),
     logos: [
       makeRawLogoItem(),
-      makeRawLogoItem({ _id: 'block-logo-2', name: 'Globex' }),
-      makeRawLogoItem({ _id: 'block-logo-3', name: 'Initech' }),
+      makeRawLogoItem({ _id: 'block-logo-2' }),
+      makeRawLogoItem({ _id: 'block-logo-3' }),
     ],
     ctaButtons: null,
     displayMode: DISPLAY_MODE.GRID,
