@@ -13,17 +13,17 @@ export type TRawTestimonialModule = InferResultType<
   typeof testimonialModuleQuery
 >;
 
-function toTestimonialItems(
-  raw: TRawTestimonialModule['testimonials'],
-): TTestimonialItem[] {
-  return (raw ?? []).map((item) => ({
-    id: item._id,
-    name: item.name,
-    quote: item.quote.map(toPortableText),
-    role: item.role ?? undefined,
-    image: toSanityImage(item.image),
-    link: toLinkDocument(item.link),
-  }));
+type TRawTestimonialItem = TRawTestimonialModule['testimonials'][number];
+
+function toTestimonialItem(raw: TRawTestimonialItem): TTestimonialItem {
+  return {
+    id: raw._id,
+    name: raw.name,
+    quote: raw.quote.map(toPortableText),
+    role: raw.role ?? undefined,
+    image: toSanityImage(raw.image),
+    link: toLinkDocument(raw.link),
+  };
 }
 
 export function toTestimonialModule(
@@ -32,7 +32,7 @@ export function toTestimonialModule(
   return {
     brandVariant: raw.brandVariant,
     headingBlock: toHeadingBlock(raw.headingBlock),
-    testimonials: toTestimonialItems(raw.testimonials),
+    testimonials: raw.testimonials.map(toTestimonialItem),
     ctaButtons: toCtaButtons(raw.ctaButtons),
     displayMode: raw.displayMode,
     cardAlignment: raw.cardAlignment ?? undefined,
