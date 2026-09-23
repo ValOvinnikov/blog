@@ -87,6 +87,7 @@ const REVALIDATE_TAGS = {
   module_featureList: ['modules:featureList'],
   module_testimonial: ['modules:testimonial'],
   module_logoWall: ['modules:logoWall'],
+  module_stats: ['modules:stats'],
   module_content: ['modules:content'],
   module_cta: ['modules:cta'],
   module_newsletter: ['modules:newsletter'],
