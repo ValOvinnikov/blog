@@ -17,132 +17,370 @@ across pages (Studio's built-in **Incoming references** view shows which
 pages use a given module before it's edited or deleted). `TModuleType`
 (`packages/config/src/constants/module.ts`) is the single source of truth for
 the module type registry — a **type-only** union derived from the generated
-Sanity types, not a runtime const. Every layer derives from it, so omitting a
-type is a compile error rather than silent drift, in two separate places:
-web's `MODULE_MAP`, and `REVALIDATE_TAGS`' required
-`Record<TModuleType, …>` half (see [`data-flow.md`](./data-flow.md)).
+Sanity types, not a runtime const.
 
-`MODULE_MAP` is keyed `Exclude<TModuleType, TSlotModuleType>`, so it excludes
-the hero family — the only modules rendered _through_ a dedicated page slot
-(`hero`) rather than a `modules[]` array, and so the only ones that can never
-reach `ModuleRenderer`. Exclusion there does **not** exempt them from
-`REVALIDATE_TAGS`, which requires an entry for every module type.
+**Only one consumer of that union is exhaustive.** `REVALIDATE_TAGS` requires
+a `Record<TModuleType, …>` half, so a new module type that is missing there is
+a compile error (see [`data-flow.md`](./data-flow.md)). Rendering is not:
+`apps/web` keys components in **one map per page type** — `HOME_MAP`,
+`LANDING_MAP`, `BLOG_POST_MAP`, `POST_INDEX_MAP`, `TOPIC_MAP`, `TAG_MAP`,
+`TOPIC_INDEX_MAP`, `TAG_INDEX_MAP` — and every one is declared
+`Partial<Record<TPage…Type, TModuleComponent>>`. A module the schema allows on
+a page but the map omits therefore compiles cleanly and renders nothing at
+runtime. That is how `module_testimonial` currently sits, and it is the drift
+to check for by hand when adding a module.
 
-**Module documents** (`packages/studio/src/schema-types/modules/`)
+Those per-page maps include the hero types, so a hero is keyed the same way as
+any other module; what differs is that a hero arrives through the page's own
+`hero` reference rather than its `modules[]` array.
 
-- `module_hero` (`heroSchema`) — internal `title`, `featuredPost` (ref to
-  `page_post`, warning-only — falls back to the newest featured post), four
-  mode/custom field pairs (`heroEyebrow`, `heroTitle`, `heroSubtitle`,
-  `heroImage`) built via the `modeFieldPair` helper and driven by the
-  UPPERCASE `HERO_FIELD_MODE` const (`CUSTOM`/`NONE`/`POST_TOPIC`/
-  `POST_TITLE`/`POST_EXCERPT`/`POST_IMAGE`), `primaryActionLabel`,
-  `secondaryAction` (`link`).
-- `module_postList` (`postListSchema`) — the **paginated archive**: internal
-  `title`, `headingBlock` (required heading — see below), `pageSize` (posts per
-  page, 1–24, required), and a vestigial `limit` awaiting removal. It carries
-  **no `emptyMessage`** (removed in
-  #1899) — empty-state copy belongs to Voice (`site_config.voiceOverrides`),
-  same as every other module below.
-- `module_postLatest` (`postLatestSchema`) — the **latest-N teaser**: internal
-  `title`, `headingBlock` (required heading), `limit` (posts to fetch, 1–12). Split
-  from `module_postList` so one type is never both a teaser and an archive;
-  which mode you get is settled by the type, not by page context.
-- `module_taxonomyList` (`taxonomyListSchema`) — internal `title`,
-  `headingBlock` (required heading), `taxonomy` (`TAXONOMY_KIND`, optional),
-  `sortOrder` (`TAXONOMY_SORT`, `ALPHABETICAL` by default) and `limit`
-  (optional integer ≥ 1). Lists taxonomy entries as cards. `taxonomy` is
-  optional on the document because a module cannot see what holds it, so the
-  requirement lives on the pages: `page_home`/`page_landing` reject a
-  `modules[]` placement that leaves it empty, while an index page leaves it
-  empty and the service falls back to that page's own kind — and that page's
-  slot rule rejects a module set to the other kind. It carries
-  **no `emptyMessage`**: empty-state copy
-  belongs to Voice (`site_config.voiceOverrides`, edited in the platform's
-  Voice page and overridable per tenant), not to modules — same
-  as `module_postList` since #1899.
-- `module_content` (`contentSchema`) — internal `title`, `body` (portable
-  text). No `headingBlock` — its rich-text `body` supplies any in-content
-  headings, so a separate structured heading field would just be a second
-  way to do the same thing.
-- `module_cta` (`ctaSchema`) — internal `title`, `headingBlock` (heading
-  **required**), `action` (`link`, required).
-- `module_newsletter` (`newsletterSchema`) — internal `title`,
-  `headingBlock` (heading **required**).
+## Module documents
 
-Every module document gets a required internal `title` via the reusable
-`titleField` helper (§ below) so it's listable/previewable in Studio
-independent of its display fields, immediately followed by a **required**
-`brandVariant` field via the shared `brandVariantField()` helper
-(`schema-types/fields/brand-variant-field/brand-variant-field.ts`) — stored values from
-`@blog/config`'s `BRAND_VARIANT` const, `PRIMARY`/`SECONDARY` by default;
-`module_hero` passes the wider `BRAND_PRIMARY`/`PRIMARY`/`SECONDARY` option
-list. `module_cta`/`module_postList`/`module_newsletter` also get a
-`headingBlock` field via the shared `headingBlockField()` helper
-(`schema-types/objects/heading-block/heading-block-field.ts`) — see the
-`headingBlock` object below. Every module document (incl. `module_hero`)
-also gets an optional `layout` field via the shared `layoutField`/
-`heroLayoutField` values (`schema-types/objects/hero-layout/hero-layout-field.ts`) — see the
-`layout`/`heroLayout` objects below.
+`packages/studio/src/schema-types/modules/`. Fourteen `module_*` types exist.
+**Twelve are live** — schema, service adaptor and renderer all present. Two are
+not, and neither should be described as working:
 
-**Page documents reference modules**
+| Type                 | State                                                                                                                                                                                                             |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `module_testimonial` | Schema only. Authorable in Studio, but there is no `packages/service` adaptor and no `apps/web` renderer, so it renders nothing.                                                                                  |
+| `module_hero`        | Deprecated in-schema ("Superseded by the Blog Hero module"). No page's hero slot offers it, no renderer keys it, and its surviving `service.modules.hero.v1` loader has no caller. Replaced by `module_heroBlog`. |
 
-Every page document is built the same way: `titleField` (internal Studio label),
-a `headingBlock`, an optional `heroField`, a `modulesField` and `seoField`. The
-allow-lists below are what differs.
+### What every module carries
 
-- `page_home` (`homePageSchema`, singleton) — `preview.prepare` falls back to
-  the generic "Unknown" when the title is unset.
-  `heroField({ allow: [heroBlog, heroStatement, heroProfile] })`;
-  `modulesField({ allow: [content, cta, newsletter, postLatest, taxonomyList,
-postFeatured, featureList, testimonial] })`. Module validation rejects more
-  than one blank-heading `module_postLatest`/`module_postFeatured`, and a
-  `module_taxonomyList` without a taxonomy.
-- `page_landing` (`landingPageSchema`) — adds `slug` (source: title, rejecting
-  `RESERVED_SLUGS`). Same `heroField`, `modulesField` and validation as
-  `page_home`.
-- `page_post` (`postPageSchema`) — the post itself: `slug` (source: title),
-  `heroImage` (`imageWithAlt`, optional — a post without one renders imageless
-  rather than 404ing), `content` (`articleText`, required), `featured`,
-  `author` (ref → `blog_author`, required), `topic` (ref → `blog_topic`,
-  required — the post's single primary classification), `tags` (refs →
-  `blog_tag`, optional, max 6), `publishedAt` (required), `postTakeaways`
-  (optional — the 30-second-skim takeaways for the choose-your-depth reading
-  feature). No `heroField`;
-  `modulesField({ allow: [postRelated, newsletter, cta] })`, rejecting more
-  than one blank-heading `module_postRelated`.
-- `page_postIndex` (`postIndexPageSchema`, singleton) — the `/blog` index page
-  config. `heroField({ allow: [heroBlog] })`;
-  `modulesField({ allow: [postList, cta, newsletter, postFeatured,
-taxonomyList] })` — the archive is a `module_postList` placed here, and the
-  module's own `pageSize` drives the pagination window. Document validation
-  errors on more than one `module_postList` and warns when none is present.
-- `page_topic` / `page_tag` (`topicPageSchema` / `tagPageSchema`) — the archive
-  page for one term: `slug` (source: title) and a required `topic`/`tag`
-  reference, each validated unique across pages of that type.
-  `heroField({ allow: [heroBlog] })`;
-  `modulesField({ allow: [postList, postLatest, cta, newsletter,
-taxonomyList] })`. Document validation errors on more than one
-  `module_postList`, warns when none is present, and rejects a
-  `module_postList` already referenced by another page of the same type.
-- `page_topicIndex` / `page_tagIndex` (`topicIndexPageSchema` /
-  `tagIndexPageSchema`, singletons) — the `/topics` and `/tags` indexes, both
-  produced by the shared `taxonomyIndexPage` factory
-  (`documents/pages/taxonomy-index/taxonomy-index-page.ts`), which takes the
-  type name, copy and `TAXONOMY_KIND` per index.
-  `heroField({ allow: [heroBlog] })`;
-  `modulesField({ allow: [taxonomyList, postLatest, cta, newsletter] })`.
-  Document validation errors on more than one `module_taxonomyList`, warns when
-  none is present, and errors when a referenced `module_taxonomyList`'s
-  taxonomy does not match the page's kind. A `taxonomyList` singular reference
-  survives as a `readOnly`, `deprecated` field — superseded by the
-  `module_taxonomyList` folded into `modules[]`, and left in place only until a
-  follow-up migration drops it.
+- **`title`** — required, internal Studio label only, never rendered. Via
+  `titleField()`, so a module stays listable and previewable independent of its
+  display fields.
+- **`brandVariant`** — required, via `brandVariantField()`. `PRIMARY` /
+  `SECONDARY` by default; the hero family and `module_cta` pass the wider list
+  including `BRAND_PRIMARY`.
+- **`layout`** — optional. `spacingTop` / `spacingBottom` (five named scales),
+  `dividerTop` / `dividerBottom` hairlines, and `containerWidth` capping the
+  inner content. Spacing is padding rather than margin, so consecutive bands
+  tile edge-to-edge. Heroes use `heroLayoutField`, which omits
+  `containerWidth`.
+- **`headingBlock`** — required where present (its own `heading` required,
+  `supportingText` optional). Every module except `module_content` and
+  `module_heroBlog`, both of which get their heading elsewhere.
 
-`modulesField({ allow, description? })`
-(`schema-types/fields/modules-field/modules-field.ts`) builds the `modules` array
-field's `of` from the allowed `TModuleType[]`, one strong `reference` array
-member per allowed type — the single place that field shape is defined,
-replacing a hand-duplicated block per page document.
+### The layout controls, stated once
+
+These recur across modules and mean the same thing everywhere:
+
+- **`brandVariant`** colours the full-bleed band behind the module
+  (`bg-primary` / `bg-secondary` / `bg-brand-primary-muted`). Nothing
+  structural changes.
+- **`contentAlignment`** text-aligns the module's own heading and supporting
+  copy. It never affects cards, grid columns, or item layout.
+- **`contentPosition`** applies to the hero family and `module_cta` only. On
+  `SPLIT` it chooses which side the copy sits on from `lg` up; on `BANNER` it
+  chooses which corner the text block occupies. **It does nothing on
+  `STACKED`, and nothing on CTA's `CALLOUT`.** It is stored as separate
+  per-variant fields (`contentPositionSplit`, `contentPositionBanner`) which
+  the service layer collapses into one value.
+- **`mediaOrder`** on `SPLIT` reorders **the mobile stack only** — the desktop
+  side is `contentPosition`'s job. On `STACKED` it puts the image above or
+  below the copy at every width. It has no effect on `BANNER`.
+- **`displayMode`** switches a grid for a carousel. Carousels show roughly one
+  and a fifth cards on mobile (a deliberate peek at the next), two from `sm`,
+  three from `md`, with scroll-snap; the arrows hide once hydrated if there is
+  nothing left to scroll.
+
+### Hero slot — one per page, rendered before `modules[]`
+
+All three share `variant` (`SPLIT` default · `STACKED` · `BANNER`) and the wide
+`brandVariant` list. `SPLIT` is two columns from `lg` up; `STACKED` is one
+column at every width; `BANNER` goes full-bleed to the viewport with the image
+as a scrimmed background and white text.
+
+#### `module_heroBlog` — featured-post hero
+
+Opens a page with one blog post: its image, its own title as the heading, and a
+primary action linking to it. Either pin a post or let it track the newest post
+marked Featured.
+
+- **Source** — `postSource`: `NEWEST_FEATURED` (default) · `PINNED`. Pinning
+  reveals a `post` reference, whose picker is filtered to published posts.
+- **Optional overrides** — `image` falls back to the post's hero image;
+  `eyebrow` falls back to the post's topic.
+- **Action** — `primaryActionLabel` required, 40 characters max;
+  `primaryActionAppearance`: `CONTAINED` (default) · `INLINE`; one optional
+  secondary action.
+- **Blocks publish** — `NEWEST_FEATURED` with no published featured post
+  anywhere (checked by live query), or `PINNED` with no post chosen.
+- **Renders nothing** if the referenced post does not resolve.
+- **Pages** — home, landing, tag, topic, post index, topic/tag index.
+
+#### `module_heroProfile` — person hero
+
+Introduces one person, drawing their photo, role, bio and social links from a
+referenced author.
+
+- **Author** — `author` reference, required; publish is blocked without it.
+- **Image** — optional, and the fallback differs by variant: `STACKED` shows a
+  circular avatar falling back to initials, `SPLIT` shows a square portrait
+  **only if an image exists** (with none, nothing visible renders and the name
+  is screen-reader-only), `BANNER` shows the photo full-bleed or nothing.
+- **Toggles** — `showRole` (on) fills the eyebrow slot with the author's role
+  instead of the module's own `eyebrow` copy, which is hidden while it is on;
+  `showBio` (on) renders the bio; `showSocialLinks` (on) renders the social
+  row.
+- **Actions** — `ctaButtons`, 0–2, no two of the same variant, primary first
+  if present.
+- Has no `STACKED` media-order control, unlike the other two heroes.
+- **Pages** — home, landing.
+
+#### `module_heroStatement` — authored statement hero
+
+A bold opening statement with no post or author behind it — every word and
+image is authored on the module.
+
+- **Copy** — `headingBlock` required, `eyebrow` optional.
+- **Image** — **required for `SPLIT` and `BANNER`**, optional for `STACKED`.
+  Publish is blocked if missing on the two variants that need it.
+- **Actions** — `ctaButtons`, 0–2, same ordering rule as above.
+- **Pages** — home, landing.
+
+### Allowed on every page with a `modules[]` array
+
+#### `module_cta` — single-action section
+
+A headline, supporting copy, up to two actions and an optional image, in one of
+three shapes.
+
+- **Variants** — `variant`: `CALLOUT` (default) · `SPLIT` · `BANNER`.
+  `CALLOUT` is a centred card with the media above the copy and a fixed
+  maximum width. `SPLIT` is two columns from `md` up with the media in a
+  bordered, rounded frame. `BANNER` is full-bleed with a scrimmed background
+  image.
+- **Two tones, not one** — `brandVariant` (default `SECONDARY`) colours the
+  card or overlay; `bandTone` (default `PRIMARY`, hidden for `BANNER`) colours
+  the outer band behind it. A warning, not an error, flags the two being
+  equal.
+- **Image** — required for `BANNER` and `SPLIT`; publish is blocked without
+  it.
+- **Copy** — optional `eyebrow`, optional `content` (short formatted text),
+  `footnote` capped at 120 characters.
+- **Actions** — `ctaButtons`, 0–2, same ordering rule as the heroes.
+- **Pages** — all.
+
+#### `module_newsletter` — subscribe section
+
+Heading, copy and the signup form.
+
+- **Variants** — `variant`: `FULL` (default) · `COMPACT`. `FULL` is a bordered
+  panel that splits into two panes from `md` — pitch and trust cues on the
+  left, form on the right. `COMPACT` is a single accent-bordered strip that
+  becomes one inline row from `sm`.
+- `contentAlignment` affects `FULL`'s pitch pane only; `COMPACT` ignores it.
+- **Renders nothing** when the tenant's `NEWSLETTER` capability is off, and
+  for any visitor already carrying a subscribed cookie. Neither is an author
+  setting.
+- **Pages** — all.
+
+### Allowed on home and landing only
+
+#### `module_content` — prose body
+
+A block of portable text between other modules. No variants beyond the band
+colour.
+
+- **`body`** — required, type `articleText`: `Normal`, `H2`–`H4` and `Quote`
+  styles (H1 is deliberately excluded so the body never competes with the page
+  title), images with alt text and their own layout, code blocks, and asides.
+  Link annotations point at a `link` document.
+- Bulleted and numbered lists, and Sanity's full default decorator set (bold,
+  italic, code, underline, strike-through), are **inherited by omission** —
+  `articleText` declares neither, unlike its narrower siblings `listedText`
+  and `paragraphText`, which spell out bold and italic only. They render
+  correctly; the intent is simply undeclared.
+- **Pages** — home, landing.
+
+#### `module_featureList` — feature cards
+
+A grid or carousel of feature cards.
+
+- **Items** — `features`: 2–8 references to `block_feature` **documents**, so
+  the same feature can appear on several pages and be edited once. Each
+  requires an icon or an image.
+- **Variants** — `imageShape` required: `WIDE` (default) · `SQUARE` ·
+  `CIRCLE`; an item with no image falls back to its icon. `displayMode`:
+  `GRID` (default) · `CAROUSEL`. `cardAlignment` required: `LEFT` (default) ·
+  `CENTER`, which centres each card's own text and media.
+- **Grid columns are computed, not authored** — 2→2, 3→3, 4→4, 5–6→3, 7–8→4,
+  chosen so the last row never leaves a single orphan card.
+- **Actions** — `ctaButtons`, 0–2.
+- **Renders nothing** when no items resolve.
+- **Pages** — home, landing.
+
+#### `module_testimonial` — social proof _(not yet rendered)_
+
+Schema is complete; there is no service adaptor and no renderer, so nothing
+reaches the page yet.
+
+- **Items** — `testimonials`: 1–8 references to `block_testimonial`
+  **documents**, reusable the same way feature cards are. Each requires a name
+  and a quote; role, image and link are optional.
+- **Variants** — `displayMode`: `GRID` (default) · `CAROUSEL`;
+  `cardAlignment`: `LEFT` (default) · `CENTER`. The schema's intent is one
+  quote as a spotlight and two or more as cards.
+- **Actions** — `ctaButtons`, 0–2.
+- **Pages** — home, landing.
+
+### Listings
+
+#### `module_postList` — paginated archive
+
+The archive itself: every post, or the posts of the topic or tag whose page
+holds it. This is the only paginated module; every other listing is a
+fixed-count teaser.
+
+- **`pageSize`** — required integer, 1–24. The page number comes from the
+  route, not the schema.
+- **`showImages`** toggles card images; with it off the card is text-only, with
+  no placeholder.
+- No `displayMode` — always a grid.
+- **Always renders something.** Empty results show an empty-state message;
+  a fetch failure or an out-of-range page returns a 404 rather than an empty
+  page.
+- **Page-side rules** — exactly one per topic, tag or post-index page (error),
+  a warning when absent, and a given post-list document may back only one
+  topic or tag page (error).
+- **Pages** — topic, tag, post index.
+
+#### `module_postLatest` — newest posts
+
+A short teaser of the most recent posts, for surfacing recency on a page that
+is about something else.
+
+- **`limit`** — required integer, 1–12. `displayMode`: `GRID` (default) ·
+  `CAROUSEL`. `showImages`.
+- A warning, not an error, when `CAROUSEL` is paired with a limit below 4 —
+  fewer than four cards do not fill a row on wide screens.
+- **Renders nothing** when no posts resolve.
+- **Pages** — home, landing, topic, tag, topic/tag index.
+
+#### `module_postFeatured` — spotlight, at most three
+
+A curated highlight rather than a chronological feed, with the first post shown
+larger as the lead.
+
+- **Source** — `postSource` required: `PINNED` (default) reveals a `posts`
+  array (unique, at most 3, at least one required); `NEWEST_FEATURED` reveals
+  a `limit` of 1–3 instead.
+- **Variants** — `displayMode`, `showImages`. In `GRID` the lead post renders
+  as a large card with its media beside the text from `md` up; a single
+  remaining post becomes a second full-width split card, and two or more fall
+  into a two-column grid beneath. **`CAROUSEL` drops the lead distinction
+  entirely** — every item renders uniformly.
+- **Blocks publish** — `NEWEST_FEATURED` with no published featured post
+  anywhere.
+- **Renders nothing** when no posts resolve.
+- **Pages** — home, landing, post index.
+
+#### `module_postRelated` — next reads
+
+Other posts the reader might want next, chosen automatically from the current
+post's tags and topic. The selection lives in the service layer; nothing about
+it is authored.
+
+- **`limit`** — required integer, 1–6, default 3. `showImages`. No
+  `displayMode` — always a grid.
+- **Pages** — post only. It is the sole listing module allowed there.
+
+#### `module_taxonomyList` — browse topics or tags
+
+A list of topics or tags, each with its description and post count.
+
+- **`taxonomy`** — `TOPICS` · `TAGS`, and **optional on the module** so it can
+  inherit the subject of the page holding it.
+- **`sortOrder`** — `ALPHABETICAL` (default) · `MOST_POSTS`.
+- **`limit`** — integer, minimum 1, no maximum; empty shows every term.
+- **`showLatestPosts`** (on) inserts each term's most recent post titles
+  between its description and its post count.
+- **Enforcement of `taxonomy` is uneven.** Home, landing and the topic/tag
+  index pages reject a referenced module that has no `taxonomy` set, and the
+  index pages additionally reject one whose kind disagrees with the page.
+  Post index, topic and tag pages allow the module but run no such check — on
+  those, an empty `taxonomy` publishes cleanly.
+- A fetch failure returns a 404; zero entries show an empty-state message.
+- **Pages** — home, landing, topic, tag, post index, topic/tag index.
+
+### Not author-controllable
+
+Behaviour that exists in the renderer with no schema field behind it. None of
+it can be presented as a setting:
+
+- Feature-grid column counts (derived from item count).
+- The larger lead card in `module_postFeatured`'s grid, and its separate
+  image-rendering path.
+- `module_heroProfile`'s initials fallback, which exists for `STACKED` only.
+- Newsletter suppression by tenant capability or by a subscribed visitor.
+- Carousel cards-per-view breakpoints and arrow auto-hiding.
+
+## Page documents reference modules
+
+Every page composes from the same two slots: an **optional** `hero` (a single
+reference, rendered before everything else, which takes over the page's `<h1>`
+when set) and a `modules` array. What differs per page is which module types
+each slot accepts.
+
+`heroField({ allow })` (`schema-types/fields/hero-field/hero-field.ts`) and
+`modulesField({ allow, description?, validateCustom? })`
+(`schema-types/fields/modules-field/modules-field.ts`) build both — one strong
+`reference` array member per allowed type, defined in one place rather than
+duplicated per page.
+
+| Page                               | Hero slot accepts                          | `modules[]` accepts                                                                                        |
+| ---------------------------------- | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| `page_home` (singleton)            | `heroBlog`, `heroStatement`, `heroProfile` | `content`, `cta`, `newsletter`, `postLatest`, `taxonomyList`, `postFeatured`, `featureList`, `testimonial` |
+| `page_landing`                     | `heroBlog`, `heroStatement`, `heroProfile` | same eight as home                                                                                         |
+| `page_postIndex` (singleton)       | `heroBlog`                                 | `postList`, `cta`, `newsletter`, `postFeatured`, `taxonomyList`                                            |
+| `page_topic`, `page_tag`           | `heroBlog`                                 | `postList`, `postLatest`, `cta`, `newsletter`, `taxonomyList`                                              |
+| `page_topicIndex`, `page_tagIndex` | `heroBlog`                                 | `taxonomyList`, `postLatest`, `cta`, `newsletter`                                                          |
+| `page_post`                        | — none                                     | `postRelated`, `newsletter`, `cta`                                                                         |
+
+**Home and landing are the composable pages** — they take all three heroes and
+every non-listing module. Everything else is a page _about_ something, so its
+hero is fixed to `heroBlog` and its module list is scoped to what makes sense
+there. `page_post` has no hero slot at all.
+
+`page_topicIndex` and `page_tagIndex` are both produced by one factory,
+`taxonomyIndexPage({ kind, … })`, so they differ only in their fixed taxonomy
+kind. Each still carries a legacy singular `taxonomyList` reference field,
+**deprecated and read-only** — superseded by the `module_taxonomyList`
+reference now folded into `modules[]`, and left in place only until a migration
+drops it. Do not author against it.
+
+**Page-level validation.** Each page enforces what its own composition needs,
+and the rules are not uniform:
+
+- **Home, landing** — reject a `module_taxonomyList` reference with no
+  `taxonomy` set, and warn when two modules of the same listing type both leave
+  their heading blank.
+- **Post index** — exactly one `module_postList` (error on more), warning when
+  none is present.
+- **Topic, tag** — exactly one `module_postList` (error), warning when absent,
+  and a given `module_postList` or taxonomy reference may back only one such
+  page (error). These pages run **no** `taxonomy` check, so an unset
+  `taxonomy` publishes cleanly there.
+- **Topic index, tag index** — exactly one `module_taxonomyList` (error),
+  warning when absent, reject one with no `taxonomy`, and reject one whose kind
+  disagrees with the page's own.
+
+Beyond the module slots, pages carry their own fields: `title` (internal Studio
+label on the singletons), `slug` where the page is addressable — `page_landing`
+additionally rejects anything in `RESERVED_SLUGS` — `headingBlock` where the
+page owns its own `<h1>` (hidden once a hero is set, since the hero then owns
+it), and `seo` on all of them. `page_topic` and `page_tag` each add a required
+reference to the term they archive.
+
+`page_post` carries the most of its own, since the post _is_ the page:
+`heroImage` (`imageWithAlt`, optional — a post without one renders imageless
+rather than 404ing), `content` (`articleText`, required), `featured`, `author`
+(→ `blog_author`, required), `topic` (→ `blog_topic`, required — the single
+primary classification), `tags` (→ `blog_tag`, optional, max 6), `publishedAt`
+(required — it drives sort order and the date readers see), and
+`postTakeaways` (optional, the 30-second-skim summary).
 
 **Other documents**
 
@@ -248,13 +486,14 @@ takes no options, marks the containing field `required()` so that nested
 rule always has an object to run against. The heading is
 **required on every call site** — every module and every page — so no layer
 has to reason about which case it is holding; `module_content` and
-`module_hero` carry no `headingBlock` at all, and
+`module_heroBlog` carry no `headingBlock` at all — the first has no heading of
+its own, the second takes the referenced post's title — and
 alignment is not bundled here — it is a separate module-level
 `contentAlignment` field. Every `module_*` document gets its own
 standalone, **required** `brandVariant` field (`@blog/config`'s
 `BRAND_VARIANT` const) via the shared `brandVariantField()` helper, placed
 immediately after `titleField` in each schema's `fields` array (see
-"Page-builder modules" above).
+"Module documents" above).
 
 **Conventions**
 
