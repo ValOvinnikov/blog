@@ -15,7 +15,6 @@ type TRawLogoItem = NonNullable<TRawLogoWallModule['logos']>[number];
 function toLogoItem(raw: TRawLogoItem): TLogoItem {
   return {
     id: raw._id,
-    name: raw.name,
     image: toSanityImage(raw.image),
     link: toLinkDocument(raw.link),
   };

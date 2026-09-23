@@ -35,9 +35,9 @@ describe('toLogoWallModule', () => {
   it('keeps the logos in authored order', () => {
     const raw = makeRawLogoWallModule({
       logos: [
-        makeRawLogoItem({ _id: 'block-logo-b', name: 'B Corp' }),
-        makeRawLogoItem({ _id: 'block-logo-a', name: 'A Corp' }),
-        makeRawLogoItem({ _id: 'block-logo-c', name: 'C Corp' }),
+        makeRawLogoItem({ _id: 'block-logo-b' }),
+        makeRawLogoItem({ _id: 'block-logo-a' }),
+        makeRawLogoItem({ _id: 'block-logo-c' }),
       ],
     });
 
@@ -61,52 +61,6 @@ describe('toLogoWallModule', () => {
       'block-logo-1',
       'block-logo-2',
     ]);
-  });
-
-  it('carries the company name through to each logo', () => {
-    const raw = makeRawLogoWallModule({
-      logos: [
-        makeRawLogoItem({ name: 'Acme Corp' }),
-        makeRawLogoItem({ _id: 'block-logo-2', name: 'Globex' }),
-        makeRawLogoItem({ _id: 'block-logo-3', name: 'Initech' }),
-      ],
-    });
-
-    const module = toLogoWallModule(raw);
-
-    expect(module.logos.map((logo) => logo.name)).toEqual([
-      'Acme Corp',
-      'Globex',
-      'Initech',
-    ]);
-  });
-
-  it('carries the alt authored on the image itself, not the company name', () => {
-    const raw = makeRawLogoWallModule({
-      logos: [
-        makeRawLogoItem({
-          name: 'Acme Corp',
-          image: {
-            alt: 'A stylised A monogram',
-            hotspot: null,
-            crop: null,
-            asset: {
-              _id: 'image-abc123-800x600-jpg',
-              metadata: {
-                lqip: null,
-                dimensions: { width: 800, height: 600, aspectRatio: 1.333 },
-              },
-            },
-          },
-        }),
-        makeRawLogoItem({ _id: 'block-logo-2' }),
-        makeRawLogoItem({ _id: 'block-logo-3' }),
-      ],
-    });
-
-    const module = toLogoWallModule(raw);
-
-    expect(module.logos[0]?.image?.alt).toBe('A stylised A monogram');
   });
 
   it('resolves a logo link to an ILink', () => {
