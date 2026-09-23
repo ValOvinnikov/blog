@@ -248,7 +248,7 @@ no faked defaults), the module-registry mechanism, and the editorial write path:
 Source of truth: `packages/studio/src/schema-types/` — documents (`post`, `author`,
 `topic`, `tag`, `link`, page documents, singletons), standalone `module_*`
 page-builder documents, `block_*` documents those modules compose
-(`block_feature`), and shared objects (`linkRef`, `ctaButton`,
+(`block_feature`, `block_testimonial`), and shared objects (`linkRef`, `ctaButton`,
 `socialProfile`, `imageWithAlt`, `bodyImage`,
 `seo`, `aside`, `postTakeaways`, …). Naming convention `{group}_{name}` is being applied
 incrementally (#251).
@@ -769,6 +769,65 @@ validation never applies to a document written outside Studio — so
 whenever the authored array is absent, empty, or below two, matching how
 `postTakeaways` degrades below its own `min(3)`. The view returns `null` on an
 empty array, so the page loses the section instead of the render.
+
+**A testimonial is a document for the same reason a feature card is.**
+`block_testimonial` ("Testimonial Item") sits beside `block_feature` under
+**Blocks → Cards** and carries a `title` — its Studio label, which the preview
+reads rather than the quote — a `quote`, a `name`, an optional one-line `role`,
+an optional `image` and an optional `link` reference. The `quote` is Portable
+Text (`listedText`: bold, italic, bullet and numbered lists and links, `normal`
+style only), not a string, because a quote routinely wants an emphasised phrase
+or a link inside it. One consequence worth naming: a character bound cannot fire
+against a Portable Text array, so there is no length warning on it.
+
+`module_testimonial` ("Testimonials") references one to eight of those documents
+in authored order, validated `required()`, `unique()`, `min(1)` and `max(8)` —
+**each bound as its own rule chain**, because a Sanity `Rule` carries a single
+`_message` that `validate()` applies to every constraint on that chain. One
+chain cannot say "Pick at least one testimonial." for an empty list and "Each
+testimonial can only appear once." for a duplicate.
+
+**`required()` and `min(1)` are both needed, and neither is redundant.** The
+array `presence` validator tests `!value`, which an empty array passes, so
+`required()` rejects only an absent field; `min(1)` is what rejects `[]`. Sanity
+skips `min()` on an absent value, so it cannot stand alone either. `module_logoWall`'s
+`logos` field is bounded the same way and for the same reason.
+
+It carries the usual module furniture — `brandVariant`, `headingBlock`,
+`layout`, `ctaButtons` — plus `displayMode` (grid or carousel) and both
+alignment axes from `alignmentFields`: `contentAlignment` for the heading,
+supporting text and actions, and `cardAlignment` passed in as an extra field
+rather than declared separately the way `module_featureList` declares its own.
+It is allowed in `page_home.modules[]` and `page_landing.modules[]` only.
+
+**One testimonial renders as a spotlight rather than a one-card grid.**
+`QuoteCard`'s `isSpotlight` drops the surface and the accent rule, centres the
+figure, takes the avatar from 80 to 112 pixels and caps the measure in `ch`.
+That cap reads tighter than its number suggests: the spotlight quote renders at
+`text-prose-h4` while body copy is smaller, and `ch` is font-relative, so the
+same character count is physically wider here than in running text.
+
+**Grid columns are derived from the item count, not authored** — 2→2, 3→3, 4→2,
+5→3, 6→3, 7→3, 8→2 — capped at three rather than the feature grid's four,
+because a quote is the wider card. Seven is the one count left with a single
+card on its last row; no column choice inside that cap avoids it.
+`toTestimonialGridColumns` in `apps/web` is the whole rule, and the carousel
+ignores it. `cardAlignment` is the same casing seam as `module_featureList`'s:
+it stores UPPERCASE `CONTENT_ALIGNMENT` values, offers only `LEFT`/`CENTER`, and
+`apps/web` maps the casing explicitly rather than passing the stored value
+through.
+
+**There is no `showImages` switch.** An item renders its image when it has one
+and falls back to `Avatar`'s initials when it does not, so the card's own
+content already answers the question a toggle would have asked.
+
+**Unlike `module_featureList`, the service layer requires the array rather than
+tolerating its absence.** `service.modules.testimonial.v1.getTestimonialModule`
+projects `testimonials` with `.notNull()`, which the schema's `required()` makes
+safe. That is not a page-level risk: the loader is wrapped in `safeAsync`, so a
+parse failure returns a failed result and the module renders nothing rather than
+404ing the page, and the Sanity client pins `perspective: 'published'`, so a
+draft with the field still unset is never queried.
 
 `service.modules.<type>.v1` projects `brandVariant` as a required
 `TBrandVariantOf<...>` (narrowed per module to exactly the options its
