@@ -39,9 +39,11 @@ const getCarouselProps = () => {
 };
 
 describe(`<${TestimonialCarousel.name}/>`, () => {
-  it('composes the region label from the carousel.regionLabel Voice key rather than passing the title straight through, with the Voice-fixed previous/next labels', () => {
+  beforeEach(() => {
     setup();
+  });
 
+  it('composes the region label from the carousel.regionLabel Voice key rather than passing the title straight through, with the Voice-fixed previous/next labels', () => {
     expect(getCarouselProps()).toMatchObject({
       ariaLabel: 'What our customers say carousel',
       previousLabel: 'Previous slide',
@@ -50,7 +52,6 @@ describe(`<${TestimonialCarousel.name}/>`, () => {
   });
 
   it('renderItem renders exactly one TestimonialCard per item', () => {
-    setup();
     const { renderItem } = getCarouselProps();
 
     items.forEach((item, index) => {

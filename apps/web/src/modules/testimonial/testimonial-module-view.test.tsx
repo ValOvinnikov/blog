@@ -40,28 +40,34 @@ const setup = customRender(TestimonialModuleView, {
 });
 
 describe(`<${TestimonialModuleView.name}/>`, () => {
-  it('labels the section with the given titleId', () => {
-    setup();
-
-    const label = screen.getByText('What our customers say');
-    expect(label).toHaveAttribute('id', 'testimonial-title');
-    expect(label.tagName).toBe('H2');
-
-    const section = label.closest('section');
-    expect(section).toHaveAttribute('aria-labelledby', 'testimonial-title');
-    expect(section).toHaveAttribute('data-testid', dataTestId);
-  });
-
-  it('renders every testimonial as a blockquote in a grid when there is more than one', () => {
-    setup();
-
-    expect(screen.getAllByRole('blockquote')).toHaveLength(2);
-    items.forEach((item) => {
-      expect(
-        screen.getByText(item.name, { ignore: '.sr-only' }),
-      ).toBeInTheDocument();
+  describe('two testimonials in a grid with no actions', () => {
+    beforeEach(() => {
+      setup();
     });
-    expect(TestimonialCarousel).not.toHaveBeenCalled();
+
+    it('labels the section with the given titleId', () => {
+      const label = screen.getByText('What our customers say');
+      expect(label).toHaveAttribute('id', 'testimonial-title');
+      expect(label.tagName).toBe('H2');
+
+      const section = label.closest('section');
+      expect(section).toHaveAttribute('aria-labelledby', 'testimonial-title');
+      expect(section).toHaveAttribute('data-testid', dataTestId);
+    });
+
+    it('renders every testimonial as a blockquote in a grid when there is more than one', () => {
+      expect(screen.getAllByRole('blockquote')).toHaveLength(2);
+      items.forEach((item) => {
+        expect(
+          screen.getByText(item.name, { ignore: '.sr-only' }),
+        ).toBeInTheDocument();
+      });
+      expect(TestimonialCarousel).not.toHaveBeenCalled();
+    });
+
+    it('renders no action group when there are no cta buttons', () => {
+      expect(screen.queryAllByRole('link')).toHaveLength(0);
+    });
   });
 
   it('renders a single testimonial as the spotlight, never the grid or the carousel', () => {
@@ -86,12 +92,6 @@ describe(`<${TestimonialModuleView.name}/>`, () => {
     const { container } = setup({ testimonials: [] });
 
     expect(container).toBeEmptyDOMElement();
-  });
-
-  it('renders no action group when there are no cta buttons', () => {
-    setup();
-
-    expect(screen.queryAllByRole('link')).toHaveLength(0);
   });
 
   it('renders the resolved cta buttons when present', () => {

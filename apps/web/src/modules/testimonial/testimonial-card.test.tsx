@@ -19,27 +19,33 @@ const setup = customRender(TestimonialCard, {
 });
 
 describe(`<${TestimonialCard.name}/>`, () => {
-  it("renders the quote's portable text as a blockquote", () => {
-    setup();
+  describe('a testimonial with no image or link', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    const quote = screen.getByRole('blockquote');
-    expect(quote).toHaveTextContent('This product changed how our team ships.');
-  });
+    it("renders the quote's portable text as a blockquote", () => {
+      const quote = screen.getByRole('blockquote');
+      expect(quote).toHaveTextContent(
+        'This product changed how our team ships.',
+      );
+    });
 
-  it('renders the name and role', () => {
-    setup();
+    it('renders the name and role', () => {
+      expect(
+        screen.getByText(item.name, { ignore: '.sr-only' }),
+      ).toBeInTheDocument();
+      expect(screen.getByText(item.role!)).toBeInTheDocument();
+    });
 
-    expect(
-      screen.getByText(item.name, { ignore: '.sr-only' }),
-    ).toBeInTheDocument();
-    expect(screen.getByText(item.role!)).toBeInTheDocument();
-  });
+    it('renders the initials, never an empty avatar, when the item has no image', () => {
+      expect(screen.queryByRole('img')).not.toBeInTheDocument();
+      expect(screen.getByText('JR')).toBeInTheDocument();
+    });
 
-  it('renders the initials, never an empty avatar, when the item has no image', () => {
-    setup();
-
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
-    expect(screen.getByText('JR')).toBeInTheDocument();
+    it('renders no link when the item has none', () => {
+      expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    });
   });
 
   it('renders the image over the initials when the item has one', () => {
@@ -47,12 +53,6 @@ describe(`<${TestimonialCard.name}/>`, () => {
 
     expect(screen.getByRole('img')).toBeInTheDocument();
     expect(screen.queryByText('JR')).not.toBeInTheDocument();
-  });
-
-  it('renders no link when the item has none', () => {
-    setup();
-
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
   it('links the name and forwards target to the anchor when the item link opens in a new tab', () => {
