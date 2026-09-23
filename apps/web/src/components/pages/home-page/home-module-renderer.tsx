@@ -20,6 +20,7 @@ import { NewsletterModule } from '@web/modules/newsletter/newsletter-module';
 import { PostFeaturedModule } from '@web/modules/post-featured/post-featured-module';
 import { PostLatestModule } from '@web/modules/post-latest/post-latest-module';
 import { TaxonomyListModule } from '@web/modules/taxonomy-list/taxonomy-list-module';
+import { TestimonialModule } from '@web/modules/testimonial/testimonial-module';
 import type { ReactNode } from 'react';
 
 const HOME_MAP: Partial<Record<TPageHomeType, TModuleComponent>> = {
@@ -33,6 +34,7 @@ const HOME_MAP: Partial<Record<TPageHomeType, TModuleComponent>> = {
   module_taxonomyList: TaxonomyListModule,
   module_postFeatured: PostFeaturedModule,
   module_featureList: FeatureListModule,
+  module_testimonial: TestimonialModule,
 };
 
 export interface IHomeModuleRendererProps {
