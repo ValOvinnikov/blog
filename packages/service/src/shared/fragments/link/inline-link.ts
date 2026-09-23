@@ -1,4 +1,13 @@
 import { q } from '@blog/service/sanity/query';
+import {
+  archivePageSlugParser,
+  buildArchivePageSlugExpression,
+} from '@blog/service/shared/expressions/archive-page-slug';
+
+const TOPIC_ARCHIVE_PAGE_SLUG_EXPRESSION = buildArchivePageSlugExpression(
+  'page_topic',
+  'topic',
+);
 
 export const inlineLinkFragment = q
   .fragmentForType<'inlineLink'>()
@@ -17,7 +26,8 @@ export const inlineLinkFragment = q
         // schema requires the field.
         slug: ref.selectByType({
           page_post: (s) => s.field('slug.current').notNull(),
-          blog_topic: (s) => s.field('slug.current').notNull(),
+          blog_topic: (s) =>
+            s.raw(TOPIC_ARCHIVE_PAGE_SLUG_EXPRESSION, archivePageSlugParser),
           page_landing: (s) => s.field('slug.current').notNull(),
         }),
       }))
