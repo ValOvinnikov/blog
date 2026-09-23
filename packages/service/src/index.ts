@@ -23,6 +23,7 @@ import { createPostLatestModuleService } from './features/modules/post-latest';
 import { createPostListModuleService } from './features/modules/post-list';
 import { createPostRelatedModuleService } from './features/modules/post-related';
 import { createTaxonomyListModuleService } from './features/modules/taxonomy-list';
+import { createTestimonialModuleService } from './features/modules/testimonial';
 import { createHomeService } from './features/pages/home';
 import { createLandingPageService } from './features/pages/landing';
 import { createPostService } from './features/pages/post';
@@ -60,6 +61,7 @@ export const service = {
     newsletter: createNewsletterModuleService(),
     taxonomyList: createTaxonomyListModuleService(),
     featureList: createFeatureListModuleService(),
+    testimonial: createTestimonialModuleService(),
   },
   entities: {
     topics: createTopicsService(),
@@ -110,6 +112,10 @@ export type {
   TTaxonomyEntry,
   TTaxonomyListModule,
 } from './features/modules/taxonomy-list';
+export type {
+  TTestimonialItem,
+  TTestimonialModule,
+} from './features/modules/testimonial';
 export type { THomePage } from './features/pages/home';
 export type { TLandingPage } from './features/pages/landing';
 export type {
