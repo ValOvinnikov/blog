@@ -1,7 +1,8 @@
 import { BRAND_VARIANT } from '@blog/config';
-import { objectKeys } from '@blog/utils';
+import { objectKeys } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { ReactNode } from 'react';
 
 import { LogoTile, type TLogoTileProps } from './logo-tile';
 import { logoTileVariants } from './logo-tile-variants';
@@ -69,4 +70,57 @@ export const InteractiveOnEveryBrandVariant: TStory = {
   name: 'Interactive — on every brand variant',
   args: Interactive.args,
   render: OnEveryBand,
+};
+
+const renderLogoTiles = (count: number) =>
+  Array.from({ length: count }, (_, index) => (
+    <LogoTile key={index}>
+      <img
+        src={faker.image.urlPicsumPhotos({ width: 160, height: 80 })}
+        alt={faker.company.name()}
+      />
+    </LogoTile>
+  ));
+
+const renderWideWordmarkAndSquareLogos = () => [
+  <LogoTile key="wide">
+    <img
+      src={faker.image.urlPicsumPhotos({ width: 900, height: 180 })}
+      alt={faker.company.name()}
+    />
+  </LogoTile>,
+  ...renderLogoTiles(4),
+];
+
+const FlexWrap = ({ children }: { children: ReactNode }) => (
+  <div className="mx-auto flex max-w-5xl flex-wrap justify-center gap-6 px-gutter">
+    {children}
+  </div>
+);
+
+export const SingleFullRow: TStory = {
+  name: 'Single full row',
+  parameters: { layout: 'fullscreen' },
+  render: () => <FlexWrap>{renderLogoTiles(5)}</FlexWrap>,
+};
+
+export const PartialTrailingRow: TStory = {
+  name: 'Partial trailing row centers',
+  parameters: { layout: 'fullscreen' },
+  render: () => <FlexWrap>{renderLogoTiles(7)}</FlexWrap>,
+};
+
+export const MixedWordmarkAndSquareLogos: TStory = {
+  name: 'Wide wordmark grows within its cap, square logos share the floor',
+  parameters: { layout: 'fullscreen' },
+  render: () => <FlexWrap>{renderWideWordmarkAndSquareLogos()}</FlexWrap>,
+};
+
+// LogoTile's own sizing forks on `sm`/`md`/`lg` — pin the viewport so the
+// narrow, two-per-row state that only renders below `sm` actually shows.
+export const PartialTrailingRowOnPhone: TStory = {
+  name: 'Partial trailing row — on phone',
+  parameters: { layout: 'fullscreen' },
+  globals: { viewport: 'phone' },
+  render: () => <FlexWrap>{renderLogoTiles(5)}</FlexWrap>,
 };
