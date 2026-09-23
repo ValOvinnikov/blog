@@ -1,4 +1,4 @@
-import { q } from '@blog/service/sanity/query';
+import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
 import { authorDetailFragment } from '@blog/service/shared/fragments/author/author';
 import { ctaButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
@@ -7,9 +7,9 @@ import { heroLayoutFragment } from '@blog/service/shared/fragments/layout/layout
 import { z } from 'zod';
 
 export const heroProfileModuleQuery = q
-  .parameters<{ id: string }>()
+  .parameters<TModuleQueryParams>()
   .star.filterByType('module_heroProfile')
-  .filterRaw('_id == $id')
+  .filterBy('_id == $id')
   .slice(0)
   .project((sub) => ({
     brandVariant: sub.field('brandVariant').notNull(),
