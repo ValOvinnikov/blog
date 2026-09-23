@@ -32,16 +32,12 @@ export const logoWallSchema = defineType({
           to: [{ type: logoBlockSchema.name }],
         }),
       ],
-      validation: (rule) =>
-        rule
-          .required()
-          .error('A logo wall needs at least three logos.')
-          .unique()
-          .error('Each logo can only appear once.')
-          .min(3)
-          .error('A logo wall needs at least three logos.')
-          .max(12)
-          .error('A logo wall holds at most twelve logos.'),
+      validation: (rule) => [
+        rule.required().error('A logo wall needs at least three logos.'),
+        rule.unique().error('Each logo can only appear once.'),
+        rule.min(3).error('A logo wall needs at least three logos.'),
+        rule.max(12).error('A logo wall holds at most twelve logos.'),
+      ],
     }),
     ctaButtonsField(),
     displayModeField(),
