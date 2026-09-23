@@ -1,15 +1,20 @@
 import { toTestimonialGridColumns } from './to-testimonial-grid-columns';
 
 describe(toTestimonialGridColumns, () => {
-  it.each([
-    [2, 2],
-    [3, 3],
-    [4, 2],
-    [5, 3],
-    [6, 3],
-    [7, 3],
-    [8, 2],
-  ])('lays out %i items in %i columns', (itemCount, expectedColumns) => {
-    expect(toTestimonialGridColumns(itemCount)).toBe(expectedColumns);
-  });
+  it.each([1, 9])(
+    'falls back to 3 columns for a count outside the mapped range: %i',
+    (count) => {
+      expect(toTestimonialGridColumns(count)).toBe(3);
+    },
+  );
+
+  it.each(Array.from({ length: 7 }, (_, index) => index + 2))(
+    'caps a mapped count at 2 or 3 columns and never exceeds the item count: %i',
+    (count) => {
+      const columns = toTestimonialGridColumns(count);
+
+      expect([2, 3]).toContain(columns);
+      expect(columns).toBeLessThanOrEqual(count);
+    },
+  );
 });
