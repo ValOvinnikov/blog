@@ -14,7 +14,7 @@ export const statSchema = defineType({
       type: 'string',
       description: 'The figure as it should read. Kept short.',
       validation: (rule) => [
-        rule.required().error('Give the figure — 2.4M, <50ms, 4.9/5.'),
+        rule.required(),
         rule
           .max(8)
           .warning(
@@ -28,7 +28,7 @@ export const statSchema = defineType({
       type: 'string',
       description: 'What the figure counts. A few words, not a sentence.',
       validation: (rule) => [
-        rule.required().error('Say what the figure counts.'),
+        rule.required(),
         rule
           .max(48)
           .warning(
