@@ -155,6 +155,7 @@ export const AssetUploadField = ({
           onChange={handleFileChange}
           tabIndex={-1}
           aria-hidden="true"
+          data-testid="asset-upload-field-input"
         />
         <Button
           type="button"
