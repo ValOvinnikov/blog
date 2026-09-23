@@ -42,7 +42,7 @@ export const testimonialModuleQuery = q
           .project(linkDocumentFragment)
           .nullable(true),
       }))
-      .nullable(true),
+      .notNull(),
     ctaButtons: sub
       .field('ctaButtons[]')
       .project(ctaButtonFragment)

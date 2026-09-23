@@ -68,14 +68,6 @@ describe('toTestimonialModule', () => {
     ]);
   });
 
-  it('resolves to an empty testimonials array when unset (no throw)', () => {
-    const raw = makeRawTestimonialModule({ testimonials: null });
-
-    const module = toTestimonialModule(raw);
-
-    expect(module.testimonials).toEqual([]);
-  });
-
   it('transforms a quote with neither image nor link', () => {
     const raw = makeRawTestimonialModule({
       testimonials: [

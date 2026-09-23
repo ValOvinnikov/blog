@@ -37,16 +37,6 @@ describe(getTestimonialModule, () => {
     ]);
   });
 
-  it('resolves with an empty testimonials array rather than throwing when unset', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawTestimonialModule({ testimonials: null }),
-    );
-
-    const testimonial = await getTestimonialModule('testimonial-1', tenant);
-
-    expect(testimonial.testimonials).toEqual([]);
-  });
-
   it('propagates when the module document is missing', async () => {
     mockRun.mockRejectedValueOnce(new Error('ValidationError'));
 
