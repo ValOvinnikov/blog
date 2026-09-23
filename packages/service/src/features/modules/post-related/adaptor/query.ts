@@ -1,4 +1,4 @@
-import { q } from '@blog/service/sanity/query';
+import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
 import {
   SHOW_IMAGES_EXPRESSION,
   showImagesParser,
@@ -7,9 +7,9 @@ import { headingBlockFragment } from '@blog/service/shared/fragments/heading-blo
 import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
 
 export const postRelatedModuleQuery = q
-  .parameters<{ id: string }>()
+  .parameters<TModuleQueryParams>()
   .star.filterByType('module_postRelated')
-  .filterRaw('_id == $id')
+  .filterBy('_id == $id')
   .slice(0)
   .project((sub) => ({
     brandVariant: sub.field('brandVariant').notNull(),
