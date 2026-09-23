@@ -77,7 +77,7 @@ const renderLogoTiles = (count: number) =>
   Array.from({ length: count }, (_, index) => {
     const alt = faker.company.name();
     return (
-      <LogoTile key={`${alt}-${index}`}>
+      <LogoTile key={index}>
         <img
           src={faker.image.urlPicsumPhotos({ width: 160, height: 80 })}
           alt={alt}
@@ -85,6 +85,16 @@ const renderLogoTiles = (count: number) =>
       </LogoTile>
     );
   });
+
+const renderLogoTilesWithWideWordmark = () => [
+  <LogoTile key="wide">
+    <img
+      src={faker.image.urlPicsumPhotos({ width: 1000, height: 100 })}
+      alt={faker.company.name()}
+    />
+  </LogoTile>,
+  ...renderLogoTiles(5),
+];
 
 const meta = {
   title: 'Organisms/CardGrid',
@@ -129,4 +139,12 @@ export const FiveColumns: TStory = {
 
 export const SixColumns: TStory = {
   args: { columns: 6, children: renderLogoTiles(6) },
+};
+
+// `columns: 6` is `grid-cols-2` below `md` (a real breakpoint fork) — pin the
+// viewport so the narrow, two-column state that can overflow actually renders.
+export const SixColumnsWideWordmarkOnPhone: TStory = {
+  name: 'Six columns — wide wordmark on phone',
+  globals: { viewport: 'phone' },
+  args: { columns: 6, children: renderLogoTilesWithWideWordmark() },
 };

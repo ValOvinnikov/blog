@@ -5,7 +5,7 @@ export const logoTileVariants = tv({
   base: [
     'grid place-items-center',
     'px-card-x py-card-y',
-    '[&_img]:block [&_img]:max-h-9 [&_img]:w-auto',
+    '[&_img]:block [&_img]:max-h-9 [&_img]:w-auto [&_img]:max-w-full',
   ],
   variants: {
     isInteractive: {
