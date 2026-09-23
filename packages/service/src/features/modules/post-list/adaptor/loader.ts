@@ -28,7 +28,7 @@ export async function getPostList(
   const rawPosts = await runQuery(
     postListModulePaginatedPostsQuery(page, raw.pageSize, scope),
     {
-      parameters: scope ? { scopeSlug: scope.slug } : {},
+      parameters: scope ? { archivePageSlug: scope.slug } : {},
       tenant,
       ...isr(['posts', 'author', 'topic', 'tag'], tenant.projectId),
     },

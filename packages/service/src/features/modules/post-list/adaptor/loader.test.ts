@@ -58,7 +58,7 @@ describe('getPostList', () => {
       2,
       expect.anything(),
       expect.objectContaining({
-        parameters: { scopeSlug: 'engineering' },
+        parameters: { archivePageSlug: 'engineering' },
       }),
     );
   });
