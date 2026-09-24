@@ -21,8 +21,20 @@ export const LogoWallTile = ({ logo }: ILogoWallTileProps) => {
     />
   );
 
+  const rawAspectRatio = logo.image.dimensions?.aspectRatio;
+  const aspectRatio =
+    rawAspectRatio !== undefined &&
+    Number.isFinite(rawAspectRatio) &&
+    rawAspectRatio > 0
+      ? rawAspectRatio
+      : undefined;
+
   return (
-    <LogoTile isInteractive={Boolean(logo.link)}>
+    <LogoTile
+      isInteractive={Boolean(logo.link)}
+      aspectRatio={aspectRatio}
+      dataTestId="logo-wall-tile"
+    >
       {logo.link ? (
         <SmartLink
           href={logo.link.href}
