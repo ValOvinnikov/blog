@@ -25,7 +25,7 @@ export const LandingPage = async ({
       <PageShell.Breadcrumbs>
         <LandingBreadcrumbs slug={slug} tenant={tenant} />
       </PageShell.Breadcrumbs>
-      {faqs.length > 0 && <FaqPageSchema faqs={faqs} />}
+      <FaqPageSchema faqs={faqs} />
       <LandingModuleRenderer
         hero={hero}
         headingBlock={headingBlock}

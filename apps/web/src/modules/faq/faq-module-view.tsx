@@ -4,6 +4,7 @@ import { ActionGroup } from '@web/components/shared/action-group';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { PortableText } from '@web/components/shared/portable-text';
 import { Section } from '@web/components/shared/section';
+import { moduleGridActionsVariants } from '@web/utils/module-grid-actions-variants';
 
 import { faqModuleViewVariants } from './faq-module-view-variants';
 
@@ -25,6 +26,7 @@ export const FaqModuleView = ({
   if (questions.length === 0) return null;
 
   const s = faqModuleViewVariants({ align: contentAlignment });
+  const actions = moduleGridActionsVariants({ align: contentAlignment });
 
   return (
     <Section
@@ -52,7 +54,7 @@ export const FaqModuleView = ({
           ))}
         </Accordion>
         {ctaButtons.length > 0 && (
-          <div className={s.actions()}>
+          <div className={actions.actions()}>
             <ActionGroup actions={ctaButtons} />
           </div>
         )}

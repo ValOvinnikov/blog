@@ -19,7 +19,7 @@ export const HomePage = async ({ locale, tenant }: THomePageProps) => {
 
   return (
     <PageShell>
-      {faqs.length > 0 && <FaqPageSchema faqs={faqs} />}
+      <FaqPageSchema faqs={faqs} />
       <HomeModuleRenderer
         hero={hero}
         headingBlock={headingBlock}

@@ -1,7 +1,10 @@
 import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
-import { makeFaqQuestion } from '@web/testing/modules/faq/fixtures';
+import {
+  faqAnswerWithListAndLinkDemo,
+  makeFaqQuestion,
+} from '@web/testing/modules/faq/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { FaqModuleView } from './faq-module-view';
@@ -59,4 +62,16 @@ export const CenterAligned: TStory = {
 
 export const WithActions: TStory = {
   args: { ctaButtons: ctaActionsDemo },
+};
+
+export const WithRichAnswer: TStory = {
+  args: {
+    questions: [
+      makeFaqQuestion({
+        id: 'faq-1',
+        question: 'What does the free trial include?',
+        answer: faqAnswerWithListAndLinkDemo,
+      }),
+    ],
+  },
 };
