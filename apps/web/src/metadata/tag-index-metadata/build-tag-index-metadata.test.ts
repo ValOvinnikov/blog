@@ -74,7 +74,8 @@ describe('buildTagIndexMetadata', () => {
     ]);
   });
 
-  it('returns empty metadata when the index page fetch fails', async () => {
+  it('returns empty metadata and logs when the index page fetch fails', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getTagIndexPageMock.mockResolvedValue({
       ok: false,
       error: new Error('boom'),
@@ -83,6 +84,10 @@ describe('buildTagIndexMetadata', () => {
     const metadata = await buildTagIndexMetadata('tenant-1');
 
     expect(metadata).toEqual({});
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('tag_index_metadata.fetch_failed'),
+    );
+    errorSpy.mockRestore();
   });
 
   it('returns empty metadata without logging when the index page simply does not exist', async () => {

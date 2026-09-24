@@ -76,7 +76,8 @@ describe('buildTopicIndexMetadata', () => {
     ]);
   });
 
-  it('returns empty metadata when the index page fetch fails', async () => {
+  it('returns empty metadata and logs when the index page fetch fails', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getTopicIndexPageMock.mockResolvedValue({
       ok: false,
       error: new Error('boom'),
@@ -85,6 +86,10 @@ describe('buildTopicIndexMetadata', () => {
     const metadata = await buildTopicIndexMetadata('tenant-1');
 
     expect(metadata).toEqual({});
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('topic_index_metadata.fetch_failed'),
+    );
+    errorSpy.mockRestore();
   });
 
   it('returns empty metadata without logging when the index page simply does not exist', async () => {
