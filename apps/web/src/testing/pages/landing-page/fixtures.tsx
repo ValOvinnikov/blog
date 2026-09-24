@@ -9,6 +9,7 @@ export const mockLandingPage: TLandingPage = {
   headingBlock: { heading: 'About Us', supportingText: undefined },
   hero: undefined,
   modules: [],
+  faqs: [],
   seo: makeSeo({
     title: 'About Us',
     description: 'Who we are.',
