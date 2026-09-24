@@ -10,10 +10,6 @@ export type TBlogAuthorDoc = {
   profilePage?: unknown;
 };
 
-/**
- * Copies every `blog_author` field onto its `person` shape 1:1 — the two
- * types share the same fields, so this is a plain carry, not a merge.
- */
 export const buildPersonFields = (
   author: TBlogAuthorDoc,
   idMap: ReadonlyMap<string, string>,
