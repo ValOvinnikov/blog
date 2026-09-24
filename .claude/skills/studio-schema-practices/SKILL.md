@@ -233,3 +233,6 @@ Beyond the studio agent's checklist:
 - Restructure PRs state explicitly which constraints moved, were added, or
   were dropped — and why.
 - Migration has its test and both guards.
+- No test file beside a schema — validation, limits, required, `hidden` and
+  previews included (`testing-practices` → "What not to test"). Validators
+  in `schema-types/validation/` and migrations are the tested code.
