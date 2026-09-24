@@ -42,12 +42,14 @@ export const modulesSection: TStructureSection = {
       ],
     },
     {
-      title: 'Sections',
+      title: 'Explainers',
+      items: [{ schema: contentSchema }, { schema: featureListSchema }],
+    },
+    {
+      title: 'Proof',
       items: [
-        { schema: contentSchema },
-        { schema: featureListSchema },
-        { schema: logoWallSchema },
         { schema: testimonialSchema },
+        { schema: logoWallSchema },
         { schema: statsSchema },
       ],
     },
