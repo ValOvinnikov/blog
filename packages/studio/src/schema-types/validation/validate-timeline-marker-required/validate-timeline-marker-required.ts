@@ -1,10 +1,6 @@
-import {
-  TIMELINE_MARKER_STYLE,
-  type TTimelineMarkerStyle,
-} from '@blog/config/constants';
+import { TIMELINE_MARKER_STYLE } from '@blog/config/constants';
+import type { TTimelineDocument } from '@blog/studio/schema-types/modules/timeline/timeline-document';
 import type { ValidationContext } from 'sanity';
-
-type TTimelineDocument = { markerStyle?: TTimelineMarkerStyle };
 
 export const validateTimelineMarkerRequired = (
   marker: string | undefined,

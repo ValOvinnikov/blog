@@ -1,10 +1,6 @@
-import {
-  TIMELINE_ORIENTATION,
-  type TTimelineOrientation,
-} from '@blog/config/constants';
+import { TIMELINE_ORIENTATION } from '@blog/config/constants';
+import type { TTimelineDocument } from '@blog/studio/schema-types/modules/timeline/timeline-document';
 import type { ValidationContext } from 'sanity';
-
-type TTimelineDocument = { orientation?: TTimelineOrientation };
 
 const HORIZONTAL_ITEM_CAP = 5;
 

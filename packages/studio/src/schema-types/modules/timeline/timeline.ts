@@ -74,25 +74,23 @@ export const timelineSchema = defineType({
       validation: (rule) => rule.required(),
     }),
     ctaButtonsField(),
-    ...alignmentFields([], {
-      description:
-        'Horizontal alignment of the heading, supporting text and actions.',
-    }),
-    defineField({
-      name: 'itemAlignment',
-      title: 'Item Alignment',
-      type: 'string',
-      description:
-        'Left or Center. Horizontal items centre their marker and text; a vertical timeline centres the whole list, with text beside the line.',
-      options: {
-        layout: 'dropdown',
-        list: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER].map(
-          (value) => ({ title: toTitleCase(value), value }),
-        ),
+    ...alignmentFields(
+      [
+        {
+          name: 'itemAlignment',
+          title: 'Item Alignment',
+          description:
+            'Left or Center. Horizontal items centre their marker and text; a vertical timeline centres the whole list, with text beside the line.',
+          allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
+          initialValue: CONTENT_ALIGNMENT.LEFT,
+          validation: (rule) => rule.required(),
+        },
+      ],
+      {
+        description:
+          'Horizontal alignment of the heading, supporting text and actions.',
       },
-      initialValue: CONTENT_ALIGNMENT.LEFT,
-      validation: (rule) => rule.required(),
-    }),
+    ),
     layoutField,
   ],
   preview: {

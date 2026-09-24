@@ -13,6 +13,7 @@ type TAlignmentField = {
   initialValue?: TContentAlignment;
   hidden?: StringDefinition['hidden'];
   fieldset?: string;
+  validation?: StringDefinition['validation'];
 };
 
 const alignmentField = ({
@@ -23,6 +24,7 @@ const alignmentField = ({
   initialValue,
   hidden,
   fieldset,
+  validation,
 }: TAlignmentField) =>
   defineField({
     name,
@@ -39,6 +41,7 @@ const alignmentField = ({
     initialValue,
     hidden,
     fieldset,
+    validation,
   });
 
 type TAlignmentFieldExtra = {
@@ -49,6 +52,7 @@ type TAlignmentFieldExtra = {
   initialValue?: TContentAlignment;
   hidden?: StringDefinition['hidden'];
   fieldset?: string;
+  validation?: StringDefinition['validation'];
 };
 
 type TAlignmentFieldsOptions = {
@@ -77,6 +81,7 @@ export const alignmentFields = (
       initialValue: extra.initialValue,
       hidden: extra.hidden,
       fieldset: extra.fieldset,
+      validation: extra.validation,
     }),
   ),
   alignmentField({

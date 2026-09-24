@@ -31,9 +31,9 @@ export const modules = [
   logoWallSchema,
   testimonialSchema,
   statsSchema,
+  timelineSchema,
   faqSchema,
   contentSchema,
   ctaSchema,
   newsletterSchema,
-  timelineSchema,
 ];
