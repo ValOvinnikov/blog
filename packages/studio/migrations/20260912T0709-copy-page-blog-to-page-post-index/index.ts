@@ -15,10 +15,10 @@
  *      `modules` holds references to shared module documents, so those
  *      documents themselves are not duplicated — only the referencing array
  *      is copied (with any `page_blog`-pointing `_ref` inside it rewritten,
- *      see `rewrite-refs.ts`).
+ *      see `../lib/rewrite-refs.ts`).
  *   2. Regardless of type, rewrite any `_ref` anywhere in the document that
  *      matches `page_blog`/`drafts.page_blog` to its `page_postIndex`/
- *      `drafts.page_postIndex` id (see `rewrite-refs.ts`).
+ *      `drafts.page_postIndex` id (see `../lib/rewrite-refs.ts`).
  *
  * Idempotency: step 1 recomputes the same `page_postIndex` fields from the
  * same `page_blog` source data every run (a stable function of its inputs,
@@ -40,10 +40,7 @@ import {
   type Mutation,
 } from 'sanity/migrate';
 
-import {
-  rewriteRefsDeep,
-  collectRefRewritePatches,
-} from '../20260908T2227-absorb-blog-post-into-page-post/rewrite-refs';
+import { rewriteRefsDeep, collectRefRewritePatches } from '../lib/rewrite-refs';
 
 import {
   PAGE_BLOG_TO_POST_INDEX_ID_MAP,

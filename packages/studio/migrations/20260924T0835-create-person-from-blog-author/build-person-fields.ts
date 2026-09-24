@@ -1,4 +1,4 @@
-import { rewriteRefsDeep } from './rewrite-refs';
+import { rewriteRefsDeep } from '../lib/rewrite-refs';
 
 export type TBlogAuthorDoc = {
   _id: string;
