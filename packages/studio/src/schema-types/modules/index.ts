@@ -1,6 +1,7 @@
 import { contentSchema } from './content/content';
 import { ctaSchema } from './cta/cta';
 import { faqSchema } from './faq/faq';
+import { featureHighlightsSchema } from './feature-highlights/feature-highlights';
 import { featureListSchema } from './feature-list/feature-list';
 import { heroSchema } from './hero/hero';
 import { heroBlogSchema } from './hero-blog/hero-blog';
@@ -27,6 +28,7 @@ export const modules = [
   postRelatedSchema,
   taxonomyListSchema,
   featureListSchema,
+  featureHighlightsSchema,
   logoWallSchema,
   testimonialSchema,
   statsSchema,
