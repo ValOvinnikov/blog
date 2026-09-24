@@ -340,9 +340,9 @@ A component's `.stories.tsx` args and its `.test.tsx` render props both need
 sample data — don't duplicate a hand-written literal in both files. Follow
 the same `src/testing/` pattern as `apps/web` (`web-storybook`,
 `testing-practices` → "Where tests live"): mirror the component tree under
-`packages/ui/src/testing/`, e.g. `src/components/organisms/post-card/` →
-`src/testing/post-card/fixtures.ts`, and import via the workspace alias —
-`import { mockPostCard } from '@blog/ui/testing/post-card/fixtures'` — never
+`packages/ui/src/testing/`, e.g. `src/components/molecules/media-card/` →
+`src/testing/media-card/fixtures.ts`, and import via the workspace alias —
+`import { mockMediaCard } from '@blog/ui/testing/media-card/fixtures'` — never
 a relative path once the fixture is shared. A one-off literal used by only a
 single file stays inline; promote it to `src/testing/` the moment a second
 file (typically the story) needs the same shape.
