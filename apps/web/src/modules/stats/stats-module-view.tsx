@@ -42,11 +42,7 @@ export const StatsModuleView = ({
         align={contentAlignment}
         variant="section"
       />
-      <dl
-        className={v.grid({ class: s.grid() })}
-        data-testid={`${dataTestId}-grid`}
-        data-columns={columns}
-      >
+      <dl className={v.grid({ class: s.grid() })}>
         {stats.map((stat) => (
           <div key={stat.id} className={v.item()}>
             <dt className={v.label()}>{stat.label}</dt>

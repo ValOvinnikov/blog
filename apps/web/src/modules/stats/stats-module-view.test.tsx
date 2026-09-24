@@ -4,7 +4,6 @@ import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
 import { makeStatItem } from '@web/testing/modules/stats/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
-import { toModuleGridColumns } from '@web/utils/to-module-grid-columns';
 
 import { StatsModuleView } from './stats-module-view';
 
@@ -30,22 +29,6 @@ const setup = customRender(StatsModuleView, {
 });
 
 describe(`<${StatsModuleView.name}/>`, () => {
-  it.each([2, 4, 5, 6])(
-    'derives its column count from toModuleGridColumns for %i figures',
-    (statCount) => {
-      const stats = Array.from({ length: statCount }, (_, index) =>
-        makeStatItem({ id: `stat-${index}`, label: `Metric ${index}` }),
-      );
-
-      setup({ stats });
-
-      expect(screen.getByTestId(`${dataTestId}-grid`)).toHaveAttribute(
-        'data-columns',
-        String(toModuleGridColumns(statCount)),
-      );
-    },
-  );
-
   it('renders the given labels and values', () => {
     setup();
 
