@@ -14,7 +14,7 @@ export const faqSchema = defineType({
   title: 'FAQ',
   type: 'document',
   description:
-    'Questions a visitor asks before getting in touch, answered in an accordion.',
+    'A band of common questions and answers, for the doubts that keep a visitor from converting.',
   icon: MessageCircleQuestion,
   fields: [
     titleField(),
@@ -44,10 +44,7 @@ export const faqSchema = defineType({
       ],
     }),
     ctaButtonsField(),
-    ...alignmentFields([], {
-      description:
-        'Horizontal alignment of the heading, supporting text, questions and actions.',
-    }),
+    ...alignmentFields([]),
     layoutField,
   ],
   preview: {

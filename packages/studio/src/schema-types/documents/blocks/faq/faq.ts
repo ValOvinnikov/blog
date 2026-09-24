@@ -8,7 +8,7 @@ export const faqBlockSchema = defineType({
   title: 'FAQ Item',
   type: 'document',
   description:
-    'A question and its answer — reusable across every FAQ module on the site.',
+    'One thing visitors keep asking, answered plainly — trust, pricing, shipping, whatever they hesitate on before converting.',
   icon: CircleHelp,
   fields: [
     titleField(),
@@ -17,14 +17,14 @@ export const faqBlockSchema = defineType({
       title: 'Question',
       type: 'string',
       description: 'The question as a visitor would ask it.',
-      validation: (rule) => rule.required().error('Write the question.'),
+      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'answer',
       title: 'Answer',
       type: listedTextSchema.name,
       description: 'The answer, with bold, italics, lists and links.',
-      validation: (rule) => rule.required().error('Write the answer.'),
+      validation: (rule) => rule.required(),
     }),
   ],
   preview: {

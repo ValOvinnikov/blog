@@ -36,7 +36,6 @@ const DOCUMENT_TYPES = [
   'module_cta',
   'module_content',
   'block_testimonial',
-  'block_faq',
 ];
 
 type TMinimalDocument = { _id: string };
