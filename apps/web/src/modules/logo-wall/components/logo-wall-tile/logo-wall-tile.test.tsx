@@ -106,4 +106,20 @@ describe(`<${LogoWallTile.name}/>`, () => {
         .style.getPropertyValue('--logo-aspect'),
     ).toBe('');
   });
+
+  it('falls back to the contained layout when the asset aspect ratio is not finite', () => {
+    setup({
+      logo: makeLogoItem({
+        image: makeSanityImage({
+          dimensions: { width: Infinity, height: 0, aspectRatio: Infinity },
+        }),
+      }),
+    });
+
+    expect(
+      screen
+        .getByTestId('logo-wall-tile')
+        .style.getPropertyValue('--logo-aspect'),
+    ).toBe('');
+  });
 });
