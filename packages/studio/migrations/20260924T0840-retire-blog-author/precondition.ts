@@ -10,12 +10,6 @@ type TPreconditionResult = {
   refCount: number;
 };
 
-/**
- * Verifies a `blog_author` is safe to delete: its `person` counterpart
- * exists with `name` set, and nothing in the dataset still references it.
- * Throws rather than returning a boolean — a precondition failure aborts the
- * whole migration run instead of silently skipping the document.
- */
 export const assertBlogAuthorDeletable = async (
   context: MigrationContext,
   blogAuthorId: string,

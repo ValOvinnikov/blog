@@ -20,11 +20,6 @@ const isReferenceNode = (value: unknown): value is { _ref: string } =>
     typeof (value as { _ref?: unknown })._ref === 'string',
   );
 
-/**
- * Deep-rewrites every `_ref` in `value` found in `idMap`, returning a fresh
- * value — used to carry a copied field (e.g. `socialLinks`) across onto
- * `person` with its internal links already repointed.
- */
 export const rewriteRefsDeep = <T>(
   value: T,
   idMap: ReadonlyMap<string, string>,
@@ -54,12 +49,6 @@ export const rewriteRefsDeep = <T>(
 
 type TRawDocument = { _id: string; _type: string; [key: string]: unknown };
 
-/**
- * Walks every field of `doc`, returning a single `patch` mutation rewriting
- * any `_ref` found in `idMap` to its mapped value — covers reference fields,
- * reference arrays, and reference-typed Portable Text mark definitions alike,
- * since all three shapes are plain `{ _ref }` objects somewhere in the tree.
- */
 export const collectRefRewritePatches = (
   doc: TRawDocument,
   idMap: ReadonlyMap<string, string>,
