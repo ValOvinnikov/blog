@@ -1,6 +1,6 @@
-import { toFeatureGridColumns } from './to-feature-grid-columns';
+import { toModuleGridColumns } from './to-module-grid-columns';
 
-describe(toFeatureGridColumns, () => {
+describe(toModuleGridColumns, () => {
   it.each([
     [2, 2],
     [3, 3],
@@ -10,6 +10,6 @@ describe(toFeatureGridColumns, () => {
     [7, 4],
     [8, 4],
   ])('lays out %i items in %i columns', (itemCount, expectedColumns) => {
-    expect(toFeatureGridColumns(itemCount)).toBe(expectedColumns);
+    expect(toModuleGridColumns(itemCount)).toBe(expectedColumns);
   });
 });
