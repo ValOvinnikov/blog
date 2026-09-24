@@ -54,10 +54,7 @@ export const featureHighlightsSchema = defineType({
       initialValue: MEDIA_ORDER.FIRST,
       validation: (rule) => rule.required(),
     }),
-    ...alignmentFields([], {
-      description:
-        'Horizontal alignment of the heading, supporting text and actions. Row text always starts at the edge beside its image.',
-    }),
+    ...alignmentFields([]),
     layoutField,
   ],
   preview: {

@@ -22,8 +22,8 @@ export const featureHighlightSchema = defineType({
       name: 'body',
       title: 'Body',
       type: listedTextSchema.name,
-      description: 'The explanation, with bold, italics, lists and links.',
-      validation: (rule) => rule.required().error("Write the row's text."),
+      description: 'The explanation behind it, in a sentence or two.',
+      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'image',
@@ -31,7 +31,7 @@ export const featureHighlightSchema = defineType({
       type: imageWithAltSchema.name,
       description:
         'Shown at 4:3 beside the text. Product screenshots and illustrations work best.',
-      validation: (rule) => rule.required().error("Add the row's image."),
+      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'action',
