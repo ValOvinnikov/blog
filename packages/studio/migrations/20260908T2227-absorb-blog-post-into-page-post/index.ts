@@ -16,7 +16,7 @@
  *      merged in (see `build-page-post-fields.ts` for the conflict rules).
  *   2. Regardless of type, rewrite any `_ref` anywhere in the document that
  *      matches a `blog_post` id to its `page_post` id (see
- *      `rewrite-refs.ts`).
+ *      `../lib/rewrite-refs.ts`).
  *
  * Idempotency: step 1 recomputes the same `page_post` fields from the same
  * `blog_post` + already-migrated-page source data every run (a stable
@@ -43,12 +43,13 @@ import {
   type Mutation,
 } from 'sanity/migrate';
 
+import { collectRefRewritePatches } from '../lib/rewrite-refs';
+
 import {
   buildPagePostFields,
   type TBlogPostDoc,
 } from './build-page-post-fields';
 import { toPagePostId } from './id';
-import { collectRefRewritePatches } from './rewrite-refs';
 import {
   sharedNewsletterModule,
   sharedPostRelatedModule,

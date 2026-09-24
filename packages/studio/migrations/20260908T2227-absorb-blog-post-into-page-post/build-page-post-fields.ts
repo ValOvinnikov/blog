@@ -1,4 +1,5 @@
-import { rewriteRefsDeep } from './rewrite-refs';
+import { rewriteRefsDeep } from '../lib/rewrite-refs';
+
 import { SHARED_MODULE_IDS } from './shared-modules';
 
 export type TBlogPostDoc = {
