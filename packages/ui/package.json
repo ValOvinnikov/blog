@@ -16,6 +16,7 @@
     "storybook:build": "storybook build"
   },
   "dependencies": {
+    "@base-ui/react": "^1.7.0",
     "@blog/config": "workspace:*",
     "@blog/tailwind-config": "workspace:*",
     "@blog/utils": "workspace:*",

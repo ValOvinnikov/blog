@@ -12,6 +12,7 @@ import {
   makeRawTopic,
 } from '@blog/service/testing/entities/fixtures';
 import {
+  makeRawFaqPageQuestion,
   makeRawHeadingBlock,
   makeRawSanityImage,
   makeRawSeo,
@@ -100,6 +101,7 @@ export function makeRawHomePage(
       { _id: 'post-latest-1', _type: 'module_postLatest' },
       { _id: 'cta-1', _type: 'module_cta' },
     ],
+    faqs: [makeRawFaqPageQuestion()],
     seo: makeRawSeo(),
     ...overrides,
   };
@@ -180,6 +182,7 @@ export function makeRawLandingPage(
       { _id: 'content-1', _type: 'module_content' },
       { _id: 'cta-1', _type: 'module_cta' },
     ],
+    faqs: [makeRawFaqPageQuestion()],
     seo: makeRawSeo(),
     ...overrides,
   };

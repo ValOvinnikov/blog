@@ -1,6 +1,7 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawLandingPage } from '@blog/service/testing/pages/fixtures';
 import {
+  makeRawFaqPageQuestion,
   makeRawHeadingBlock,
   makeRawSeo,
 } from '@blog/service/testing/shared/fixtures';
@@ -91,6 +92,27 @@ describe('getPage', () => {
     expect(page.seo.ogTitle).toBeUndefined();
   });
 
+  it('dedupes a question referenced by two module_faq modules', async () => {
+    const shared = makeRawFaqPageQuestion({ id: 'block-faq-1' });
+    mockRun.mockResolvedValueOnce(
+      makeRawLandingPage({ faqs: [shared, shared] }),
+    );
+
+    const page = await getPage('about', tenant);
+    if (!page) throw new Error('expected a landing page');
+
+    expect(page.faqs).toEqual([shared]);
+  });
+
+  it('returns an empty faqs list when the page has no FAQ module', async () => {
+    mockRun.mockResolvedValueOnce(makeRawLandingPage({ faqs: [] }));
+
+    const page = await getPage('about', tenant);
+    if (!page) throw new Error('expected a landing page');
+
+    expect(page.faqs).toEqual([]);
+  });
+
   it('resolves undefined, rather than rejecting, when no page_landing matches the slug', async () => {
     mockRun.mockResolvedValueOnce(null);
 
@@ -108,7 +130,13 @@ describe('getPage', () => {
       expect.anything(),
       expect.objectContaining({
         tenant,
-        next: expect.objectContaining({ tags: ['t:tenant-a:page_landing'] }),
+        next: expect.objectContaining({
+          tags: [
+            't:tenant-a:page_landing',
+            't:tenant-a:modules:faq',
+            't:tenant-a:block_faq',
+          ],
+        }),
       }),
     );
   });
