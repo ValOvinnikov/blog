@@ -24,4 +24,5 @@ export * from './preset';
 export * from './reserved-slug';
 export * from './size';
 export * from './taxonomy';
+export * from './timeline';
 export * from './toast';
