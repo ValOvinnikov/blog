@@ -26,13 +26,14 @@ export const personSchema = defineType({
       title: 'Image',
       type: imageWithAltSchema.name,
       description:
-        "Photo shown on posts and this person's profile hero. Leave empty to show initials instead.",
+        "Photo shown on posts, this person's profile hero, and their team card. Leave empty to show initials instead.",
     }),
     defineField({
       name: 'bio',
       title: 'Bio',
       type: paragraphTextSchema.name,
-      description: "Short biography shown on this person's profile hero.",
+      description:
+        "Short biography shown on this person's profile hero, and on their team card when that module's Show Bios is on.",
     }),
     defineField({
       name: 'role',
@@ -47,7 +48,7 @@ export const personSchema = defineType({
       title: 'Social Links',
       type: 'array',
       description:
-        "Links to social profiles shown on this person's profile hero.",
+        "Links to social profiles shown as icons on this person's profile hero and their team card.",
       of: [defineArrayMember({ type: socialProfileSchema.name })],
     }),
     defineField({
