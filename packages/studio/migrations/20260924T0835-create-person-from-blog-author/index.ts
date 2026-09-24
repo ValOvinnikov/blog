@@ -5,9 +5,10 @@ import {
   type Mutation,
 } from 'sanity/migrate';
 
+import { collectRefRewritePatches } from '../lib/rewrite-refs';
+
 import { buildPersonFields, type TBlogAuthorDoc } from './build-person-fields';
 import { toPersonId } from './id';
-import { collectRefRewritePatches } from './rewrite-refs';
 
 const BLOG_AUTHOR_TYPE = 'blog_author';
 const PERSON_TYPE = 'person';
