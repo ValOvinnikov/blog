@@ -176,4 +176,45 @@ describe('create-person-from-blog-author migration — reference rewriting', () 
 
     expect(mutations).toEqual([]);
   });
+
+  it('is idempotent — a reference already pointing at its person id produces no mutations', async () => {
+    const { context } = createMockContext({ blogAuthorIds: ['author-1'] });
+    const rewrittenPostDoc = {
+      ...baseDoc,
+      _id: 'page_post-post-1',
+      _type: 'page_post',
+      author: { _type: 'reference', _ref: 'person-author-1' },
+    };
+
+    const mutations = await migration.migrate.document(
+      rewrittenPostDoc,
+      context,
+    );
+
+    expect(mutations).toEqual([]);
+  });
+
+  it('scopes the blog_author id map to its own migration run, never leaking across contexts', async () => {
+    const { context: firstContext } = createMockContext({
+      blogAuthorIds: ['author-1'],
+    });
+    const postDoc = {
+      ...baseDoc,
+      _id: 'page_post-post-1',
+      _type: 'page_post',
+      author: { _type: 'reference', _ref: 'author-1' },
+    };
+
+    await migration.migrate.document(postDoc, firstContext);
+
+    const { context: secondContext } = createMockContext({
+      blogAuthorIds: ['author-2'],
+    });
+    const secondRunMutations = await migration.migrate.document(
+      postDoc,
+      secondContext,
+    );
+
+    expect(secondRunMutations).toEqual([]);
+  });
 });

@@ -76,4 +76,15 @@ describe('collectRefRewritePatches', () => {
       patch('hero-profile-1', [at(['author', '_ref'], set('person-author-1'))]),
     );
   });
+
+  it('returns undefined when a reference already points at its mapped person id', () => {
+    const idMap = new Map([['author-1', 'person-author-1']]);
+    const doc = {
+      _id: 'page_post-post-1',
+      _type: 'page_post',
+      author: { _type: 'reference', _ref: 'person-author-1' },
+    };
+
+    expect(collectRefRewritePatches(doc, idMap)).toBeUndefined();
+  });
 });
