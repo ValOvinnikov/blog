@@ -832,8 +832,60 @@ parse failure returns a failed result and the module renders nothing rather than
 404ing the page, and the Sanity client pins `perspective: 'published'`, so a
 draft with the field still unset is never queried.
 
-`module_stats` ("Stats") is the one module in this family whose items are
-**inline objects rather than referenced documents**. A `stat` carries a required
+**A logo is an inline object, not a document — one of the two places the
+`block_*` pattern is deliberately not followed, `module_stats` below being the
+other.** `logoItem` ("Logo") holds a `name`, an
+`image` and an optional `link` reference, and lives directly on the module's
+`logos` array. Logos never recombine: a wall is reused by referencing the same
+`module_logoWall` from several pages, so reuse already happens one level up, and
+documents would only have added a desk entry, a reference picker and a
+revalidation tag while forcing editors to create each logo elsewhere before
+picking it. `block_logo` existed briefly and was retired for that reason.
+
+`module_logoWall` ("Logo Wall") validates `logos` with `required()`, `min(1)` and
+`max(12)` as separate rules, for the reason given above — and **without
+`unique()`**, unlike `module_testimonial`. Not because uniqueness cannot be
+expressed on an array of objects: Sanity deep-compares their values and ignores
+`_key` precisely so a paste-duplicated item is still caught. Repeating a logo is
+simply not a mistake worth blocking.
+
+**`name` is the logo's alt text and nothing else — it never renders as visible
+text.** WAI's rule for a logo is that the alt is the organisation's name,
+"Stripe" rather than "Stripe logo", so the service builds the image's alt from
+`name` directly and appends nothing. The image is a plain `image` rather than an
+`imageWithAlt`: a generic "describe the image" prompt invites the wrong alt, and
+crop and hotspot controls are noise for a mark that must render whole.
+
+**The wall is a wrapping flex row, not a grid.** `apps/web` composes
+`flex flex-wrap` with a 24px gap, and `@blog/ui`'s `LogoTile` carries its own
+per-breakpoint minimum width — two logos per row on phones, three at `sm`, four
+at `md`, five from `lg` — so the row holds tile width roughly constant instead of
+stretching tiles to fill a column count. The tiers are derived from that gap and
+`Section`'s `max-w-5xl` box, so changing either changes how many logos fit. A
+column count cannot express this: an equal-width grid track forces a wide
+wordmark to shrink below a square mark's height, and a trailing row would strand
+an orphan where wrapping simply re-flows. `containerWidth: FULL` stays available
+and gives the row more space than the tiers assume; tiles grow toward their
+maximum and the surplus becomes whitespace.
+
+The row's `justify-content` follows `contentAlignment`, the same field that
+aligns the heading and the actions — left by default, so a single logo sits under
+a left-aligned heading rather than floating centred. `LogoTile` paints no
+surface, border or radius in any state: most logos are unlinked, and a card
+promises a click that never arrives.
+
+**One logo the service cannot resolve costs the whole wall, not that tile.** The
+query projects `name` and `image` with `.notNull()`, and `toLogoItem` throws
+`UnresolvedLogoImageError` if an image still fails to resolve; the throw leaves
+`toLogoWallModule`, `safeAsync` turns it into a failed result, and the module
+renders nothing rather than a wall with a gap in it. As with
+`module_testimonial`, that is not a page-level risk — the page loses the section
+and keeps rendering. The view also returns nothing for an empty array, which
+`.notNull()` does not reject and `min(1)` only blocks in the Studio, so an
+API-written wall with no logos disappears instead of rendering an empty row.
+
+`module_stats` ("Stats") holds **inline objects rather than referenced
+documents** too, for a different reason than the logo wall's. A `stat` carries a required
 `value`, a required `label` and an optional `description`, and lives on the
 module's `stats` array — 2 to 6 of them, `required()` ahead of `min(2)` and
 `max(6)`, with no `unique()` because inline objects have no id to compare. The

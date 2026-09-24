@@ -27,8 +27,8 @@ a compile error (see [`data-flow.md`](./data-flow.md)). Rendering is not:
 `TOPIC_INDEX_MAP`, `TAG_INDEX_MAP` — and every one is declared
 `Partial<Record<TPage…Type, TModuleComponent>>`. A module the schema allows on
 a page but the map omits therefore compiles cleanly and renders nothing at
-runtime. That is how `module_logoWall` currently sits, and it is the drift
-to check for by hand when adding a module.
+runtime. That is the drift to check for by hand when adding a module: a new
+type that lands in a page's `allow` list but not in that page's map.
 
 Those per-page maps include the hero types, so a hero is keyed the same way as
 any other module; what differs is that a hero arrives through the page's own
@@ -37,13 +37,12 @@ any other module; what differs is that a hero arrives through the page's own
 ## Module documents
 
 `packages/studio/src/schema-types/modules/`. Sixteen `module_*` types exist.
-**Fourteen are live** — schema, service adaptor and renderer all present. Two
-are not, and neither should be described as working:
+**Fifteen are live** — schema, service adaptor and renderer all present. One is
+not, and should not be described as working:
 
-| Type              | State                                                                                                                                                                                                             |
-| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `module_logoWall` | Schema and `packages/service` adaptor both present, but there is no `apps/web` renderer and no page map keys it, so it renders nothing.                                                                           |
-| `module_hero`     | Deprecated in-schema ("Superseded by the Blog Hero module"). No page's hero slot offers it, no renderer keys it, and its surviving `service.modules.hero.v1` loader has no caller. Replaced by `module_heroBlog`. |
+| Type          | State                                                                                                                                                                                                             |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `module_hero` | Deprecated in-schema ("Superseded by the Blog Hero module"). No page's hero slot offers it, no renderer keys it, and its surviving `service.modules.hero.v1` loader has no caller. Replaced by `module_heroBlog`. |
 
 ### What every module carries
 
@@ -231,6 +230,32 @@ A grid or carousel of feature cards.
   initials otherwise. There is no module-level toggle: the item is the only
   thing that decides.
 - **Actions** — `ctaButtons`, 0–2.
+- **Pages** — home, landing.
+
+#### `module_logoWall` — logo social proof
+
+- **Items** — `logos`: 1–12 **inline `logoItem` objects**, not references. Logos
+  never recombine: a wall is reused by referencing the same `module_logoWall`
+  from several pages, so reuse already happens one level up. `block_logo`
+  existed briefly and was retired for that reason. Validated `required()`,
+  `min(1)` and `max(12)` as separate rules, and deliberately **without
+  `unique()`** — repeating a logo is not a mistake worth blocking.
+- **The item** — `name`, an `image` and an optional `link` reference. `name` is
+  the logo's alt text and never renders as visible text: WAI's rule is that a
+  logo's alt is the organisation's name, “Stripe” rather than “Stripe logo”. The
+  image is a plain `image`, not an `imageWithAlt`, because a generic “describe
+  the image” prompt invites the wrong alt.
+- **A wrapping flex row, not a grid** — `LogoTile` carries its own
+  per-breakpoint minimum width (two per row on phones, three at `sm`, four at
+  `md`, five from `lg`), so the row holds tile width roughly constant instead of
+  stretching tiles to fill a column count. There is no derived column helper.
+- **Not cards** — `LogoTile` paints no surface, border or radius in any state:
+  most logos are unlinked, and a card would promise a click that never arrives.
+- **Variants** — `displayMode`: `GRID` (default) · `CAROUSEL`.
+- **Actions** — `ctaButtons`, 0–2.
+- **Renders nothing** when the array is empty, or when a logo's image cannot be
+  resolved — one unresolvable logo costs the whole wall rather than leaving a
+  gap in it.
 - **Pages** — home, landing.
 
 #### `module_stats` — figures that back a claim
