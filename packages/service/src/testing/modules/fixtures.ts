@@ -412,7 +412,7 @@ export function makeRawStatItem(
   overrides: Partial<TRawStatItem> = {},
 ): TRawStatItem {
   return {
-    _key: 'block-stat-1',
+    _key: 'stat-1',
     value: '2.4M',
     label: 'Monthly readers',
     description: null,
@@ -429,7 +429,7 @@ export function makeRawStatsModule(
     stats: [
       makeRawStatItem(),
       makeRawStatItem({
-        _key: 'block-stat-2',
+        _key: 'stat-2',
         value: '128',
         label: 'Countries reached',
       }),
