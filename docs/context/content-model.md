@@ -36,13 +36,13 @@ any other module; what differs is that a hero arrives through the page's own
 
 ## Module documents
 
-`packages/studio/src/schema-types/modules/`. Fifteen `module_*` types exist.
-**Thirteen are live** — schema, service adaptor and renderer all present. Two
+`packages/studio/src/schema-types/modules/`. Sixteen `module_*` types exist.
+**Fourteen are live** — schema, service adaptor and renderer all present. Two
 are not, and neither should be described as working:
 
 | Type              | State                                                                                                                                                                                                             |
 | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `module_logoWall` | Schema only. Authorable in Studio, but there is no `packages/service` adaptor and no `apps/web` renderer, so it renders nothing.                                                                                  |
+| `module_logoWall` | Schema and `packages/service` adaptor both present, but there is no `apps/web` renderer and no page map keys it, so it renders nothing.                                                                           |
 | `module_hero`     | Deprecated in-schema ("Superseded by the Blog Hero module"). No page's hero slot offers it, no renderer keys it, and its surviving `service.modules.hero.v1` loader has no caller. Replaced by `module_heroBlog`. |
 
 ### What every module carries
@@ -230,6 +230,33 @@ A grid or carousel of feature cards.
 - **Images** — an item renders its `image` when it has one and the person's
   initials otherwise. There is no module-level toggle: the item is the only
   thing that decides.
+- **Actions** — `ctaButtons`, 0–2.
+- **Pages** — home, landing.
+
+#### `module_stats` — figures that back a claim
+
+- **Items** — `stats`: 2–6 **inline `stat` objects**, not references. A logo or
+  a quote recurs across pages; a figure belongs to the argument one page is
+  making, and reusing it would make a stale number wrong in two places. So
+  there is no Blocks desk entry, no reference picker and no `block_*`
+  revalidation tag — the whole module is one document read.
+- **The figure** — `value` is a single required string, never a number plus a
+  unit: real figures are `2.4M`, `<50ms`, `4.9/5`, `24/7`, `3×`, `Top 10`, and
+  a number-plus-unit split expresses none of them. Nothing is parsed; past
+  eight characters it warns. `label` is required, `description` optional.
+- **No `displayMode`** — two to six short figures always fit one or two rows,
+  so a carousel would hide them behind a swipe. One alignment control only:
+  the figures follow `contentAlignment` with the heading and actions.
+- **Grid columns** derive from the item count — 2→2, 3→3, 4→4, 5→3, 6→3 —
+  via the shared `toModuleGridColumns` helper, capped at four and dropping to
+  two on tablet and phone.
+- **Not cards** — the figures sit directly on the band with a hairline between
+  columns and no surface, border or radius. A card surface would promise a
+  click this module does not have, so `CardGrid` is skipped.
+- **Reading order** — the band is a `<dl>`, label-first in source order, so a
+  screen reader hears “median organic lift, plus 38 percent”; CSS `order` puts
+  the value on top visually. The value is the only thing carrying the accent.
+- **Footnote** — `footnote`, one optional line under the figures.
 - **Actions** — `ctaButtons`, 0–2.
 - **Pages** — home, landing.
 
@@ -486,7 +513,10 @@ empty. Singletons resolve their Studio label via `preview.prepare` instead
 `max` for an editable headline.
 
 **Objects** — `linkRef`, `ctaButton`, `ctaSecondaryButton` and
-`socialProfile` (each wrapping a reference to a `link` **document**),
+`socialProfile` (each wrapping a reference to a `link` **document**), `stat`
+(one figure — `value`, `label`, optional `description` — embedded on
+`module_stats` rather than referenced, so a number lives with the one
+argument that uses it),
 `brand`, `brandTagline` (structured tagline: `items` + a
 `BRAND_TAGLINE_SEPARATORS`-driven `separator`), `imageWithAlt` (required alt —
 used by `page_post.heroImage`, `blog_author.image`, `brand.logo`,
