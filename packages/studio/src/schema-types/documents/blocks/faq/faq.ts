@@ -8,7 +8,7 @@ export const faqBlockSchema = defineType({
   title: 'FAQ Item',
   type: 'document',
   description:
-    'One thing visitors keep asking, answered plainly — trust, pricing, shipping, whatever they hesitate on before converting.',
+    'One of those questions, answered plainly — process, timelines, pricing, scope.',
   icon: CircleHelp,
   fields: [
     titleField(),

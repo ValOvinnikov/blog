@@ -14,7 +14,7 @@ export const faqSchema = defineType({
   title: 'FAQ',
   type: 'document',
   description:
-    'A band of common questions and answers, for the doubts that keep a visitor from converting.',
+    'The questions a visitor asks before getting in touch, gathered here with their answers.',
   icon: MessageCircleQuestion,
   fields: [
     titleField(),
