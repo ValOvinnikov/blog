@@ -690,7 +690,7 @@ describe('POST /api/revalidate', () => {
       const { POST } = await import('./route');
 
       const request = makeRequest(
-        { _type: 'blog_author', _id: 'author-1' },
+        { _type: 'person', _id: 'author-1' },
         't=1,v=valid-signature',
         { [SANITY_PROJECT_ID_HEADER]: 'tenant-a-project' },
       );
@@ -710,7 +710,7 @@ describe('POST /api/revalidate', () => {
       const { POST } = await import('./route');
 
       const request = makeRequest(
-        { _type: 'blog_author', _id: 'author-1' },
+        { _type: 'person', _id: 'author-1' },
         't=1,v=valid-signature',
         { [SANITY_PROJECT_ID_HEADER]: 'tenant-a-project' },
       );
