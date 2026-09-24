@@ -829,6 +829,47 @@ parse failure returns a failed result and the module renders nothing rather than
 404ing the page, and the Sanity client pins `perspective: 'published'`, so a
 draft with the field still unset is never queried.
 
+**A logo is an inline object, not a document — the one place the `block_*`
+pattern is deliberately not followed.** `logoItem` ("Logo") holds a `name`, an
+`image` and an optional `link` reference, and lives directly on the module's
+`logos` array. Logos never recombine: a wall is reused by referencing the same
+`module_logoWall` from several pages, so reuse already happens one level up, and
+documents would only have added a desk entry, a reference picker and a
+revalidation tag while forcing editors to create each logo elsewhere before
+picking it. `block_logo` existed briefly and was retired for that reason.
+
+`module_logoWall` ("Logo Wall") validates `logos` with `required()`, `min(1)` and
+`max(12)` as separate rules, for the reason given above — and **without
+`unique()`**, unlike `module_testimonial`. Not because uniqueness cannot be
+expressed on an array of objects: Sanity deep-compares their values and ignores
+`_key` precisely so a paste-duplicated item is still caught. Repeating a logo is
+simply not a mistake worth blocking.
+
+**`name` is the logo's alt text and nothing else — it never renders as visible
+text.** WAI's rule for a logo is that the alt is the organisation's name,
+"Stripe" rather than "Stripe logo", so the service builds the image's alt from
+`name` directly and appends nothing. The image is a plain `image` rather than an
+`imageWithAlt`: a generic "describe the image" prompt invites the wrong alt, and
+crop and hotspot controls are noise for a mark that must render whole.
+
+**The wall is a wrapping flex row, not a grid.** `apps/web` composes
+`flex flex-wrap` with a 24px gap, and `@blog/ui`'s `LogoTile` carries its own
+per-breakpoint minimum width — two logos per row on phones, three at `sm`, four
+at `md`, five from `lg` — so the row holds tile width roughly constant instead of
+stretching tiles to fill a column count. The tiers are derived from that gap and
+`Section`'s `max-w-5xl` box, so changing either changes how many logos fit. A
+column count cannot express this: an equal-width grid track forces a wide
+wordmark to shrink below a square mark's height, and a trailing row would strand
+an orphan where wrapping simply re-flows. `containerWidth: FULL` stays available
+and gives the row more space than the tiers assume; tiles grow toward their
+maximum and the surplus becomes whitespace.
+
+The row's `justify-content` follows `contentAlignment`, the same field that
+aligns the heading and the actions — left by default, so a single logo sits under
+a left-aligned heading rather than floating centred. `LogoTile` paints no
+surface, border or radius in any state: most logos are unlinked, and a card
+promises a click that never arrives.
+
 `service.modules.<type>.v1` projects `brandVariant` as a required
 `TBrandVariantOf<...>` (narrowed per module to exactly the options its
 schema allows), `layout` as `TLayout | undefined`, and (where applicable)
