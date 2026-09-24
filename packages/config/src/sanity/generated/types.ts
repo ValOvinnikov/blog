@@ -15,38 +15,6 @@
 export declare const internalGroqTypeReferenceTo: unique symbol;
 
 // Source: ../config/src/sanity/generated/schema.json
-export type Module_timeline = {
-  _id: string;
-  _type: 'module_timeline';
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY';
-  headingBlock?: HeadingBlock;
-  markerStyle?: 'NUMBERED' | 'LABELLED';
-  items?: Array<
-    {
-      _key: string;
-    } & TimelineItem
-  >;
-  orientation?: 'VERTICAL' | 'HORIZONTAL';
-  ctaButtons?: Array<
-    {
-      _key: string;
-    } & CtaButton
-  >;
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
-  itemAlignment?: 'LEFT' | 'CENTER';
-  layout?: Layout;
-};
-
-export type HeadingBlock = {
-  _type: 'headingBlock';
-  heading?: string;
-  supportingText?: string;
-};
-
 export type Module_newsletter = {
   _id: string;
   _type: 'module_newsletter';
@@ -59,6 +27,12 @@ export type Module_newsletter = {
   variant?: 'FULL' | 'COMPACT';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   layout?: Layout;
+};
+
+export type HeadingBlock = {
+  _type: 'headingBlock';
+  heading?: string;
+  supportingText?: string;
 };
 
 export type Module_cta = {
@@ -191,6 +165,32 @@ export type Module_faq = {
       _key: string;
     } & CtaButton
   >;
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  layout?: Layout;
+};
+
+export type Module_timeline = {
+  _id: string;
+  _type: 'module_timeline';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  headingBlock?: HeadingBlock;
+  markerStyle?: 'NUMBERED' | 'LABELLED';
+  items?: Array<
+    {
+      _key: string;
+    } & TimelineItem
+  >;
+  orientation?: 'VERTICAL' | 'HORIZONTAL';
+  ctaButtons?: Array<
+    {
+      _key: string;
+    } & CtaButton
+  >;
+  itemAlignment?: 'LEFT' | 'CENTER';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   layout?: Layout;
 };
@@ -1506,9 +1506,8 @@ export type Geopoint = {
 };
 
 export type AllSanitySchemaTypes =
-  | Module_timeline
-  | HeadingBlock
   | Module_newsletter
+  | HeadingBlock
   | Module_cta
   | ListedText
   | SanityImageAssetReference
@@ -1517,6 +1516,7 @@ export type AllSanitySchemaTypes =
   | ArticleText
   | Block_faqReference
   | Module_faq
+  | Module_timeline
   | Module_stats
   | Block_testimonialReference
   | Module_testimonial
