@@ -1,5 +1,5 @@
 import { FULL_BRAND_VARIANT_LIST } from '@blog/config/constants';
-import { authorSchema } from '@blog/studio/schema-types/documents/blog/author/author';
+import { personSchema } from '@blog/studio/schema-types/documents/person/person';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { heroContentPositionFields } from '@blog/studio/schema-types/fields/hero-content-position-fields/hero-content-position-fields';
@@ -39,7 +39,7 @@ export const heroProfileSchema = defineType({
       type: 'reference',
       description:
         "The person this hero introduces. Supplies the hero's photo and social profiles.",
-      to: [{ type: authorSchema.name }],
+      to: [{ type: personSchema.name }],
       validation: (rule) =>
         rule.required().error('Choose the person this hero introduces.'),
     }),
