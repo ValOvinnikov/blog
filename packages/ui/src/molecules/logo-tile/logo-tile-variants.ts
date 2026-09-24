@@ -3,9 +3,8 @@ import type { VariantProps } from 'tailwind-variants';
 
 export const logoTileVariants = tv({
   base: [
-    'grid place-items-center',
-    'min-w-[156px] sm:min-w-[176px] md:min-w-[154px] lg:min-w-[169px]',
-    'max-w-[180px]',
+    'grid w-[144px] h-[88px] place-items-center',
+    'rounded-lg border border-border bg-surface',
     'px-card-x py-card-y',
     '[&_img]:block [&_img]:max-h-9 [&_img]:w-auto [&_img]:max-w-full',
   ],

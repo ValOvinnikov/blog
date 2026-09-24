@@ -82,14 +82,26 @@ const renderLogoTiles = (count: number) =>
     </LogoTile>
   ));
 
-const renderWideWordmarkAndSquareLogos = () => [
+const OPAQUE_BACKGROUND_LOGO_SRC = `data:image/svg+xml,${encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="64" height="64" fill="#4338ca"/><polygon points="32,8 54,20 54,44 32,56 10,44 10,20" fill="#ffffff"/></svg>',
+)}`;
+
+const renderMixedLogoShapes = () => [
   <LogoTile key="wide">
     <img
       src={faker.image.urlPicsumPhotos({ width: 900, height: 180 })}
       alt={faker.company.name()}
     />
   </LogoTile>,
-  ...renderLogoTiles(4),
+  <LogoTile key="square">
+    <img
+      src={faker.image.urlPicsumPhotos({ width: 160, height: 160 })}
+      alt={faker.company.name()}
+    />
+  </LogoTile>,
+  <LogoTile key="opaque-background">
+    <img src={OPAQUE_BACKGROUND_LOGO_SRC} alt={faker.company.name()} />
+  </LogoTile>,
 ];
 
 const FlexWrap = ({ children }: { children: ReactNode }) => (
@@ -110,17 +122,8 @@ export const PartialTrailingRow: TStory = {
   render: () => <FlexWrap>{renderLogoTiles(7)}</FlexWrap>,
 };
 
-export const MixedWordmarkAndSquareLogos: TStory = {
-  name: 'Wide wordmark grows within its cap, square logos share the floor',
+export const MixedLogoShapes: TStory = {
+  name: 'A wide wordmark, a square mark, and a mark with its own opaque background sit inside identical frames',
   parameters: { layout: 'fullscreen' },
-  render: () => <FlexWrap>{renderWideWordmarkAndSquareLogos()}</FlexWrap>,
-};
-
-// LogoTile's own sizing forks on `sm`/`md`/`lg` — pin the viewport so the
-// narrow, two-per-row state that only renders below `sm` actually shows.
-export const PartialTrailingRowOnPhone: TStory = {
-  name: 'Partial trailing row — on phone',
-  parameters: { layout: 'fullscreen' },
-  globals: { viewport: 'phone' },
-  render: () => <FlexWrap>{renderLogoTiles(5)}</FlexWrap>,
+  render: () => <FlexWrap>{renderMixedLogoShapes()}</FlexWrap>,
 };

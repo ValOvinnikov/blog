@@ -9,7 +9,7 @@ export type TLogoTileProps = IWithClassName &
     isInteractive?: TLogoTileVariants['isInteractive'];
   };
 
-/** Carries no surface, border, or shadow, deliberately: a card promises a click most logos don't have. */
+/** A fixed-size card that frames a single logo, so transparent and opaque-background assets sit inside identical bounds. */
 export const LogoTile = ({
   children,
   isInteractive,
