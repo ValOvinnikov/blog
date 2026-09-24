@@ -74,6 +74,26 @@ describe(collectRefRewritePatches, () => {
     );
   });
 
+  it('rewrites every matching reference across distinct top-level fields', () => {
+    const idMap = new Map([
+      ['post-1', 'page_post-post-1'],
+      ['author-1', 'person-author-1'],
+    ]);
+    const doc = {
+      _id: 'doc-1',
+      _type: 'module_postFeatured',
+      relatedPost: { _type: 'reference', _ref: 'post-1' },
+      author: { _type: 'reference', _ref: 'author-1' },
+    };
+
+    expect(collectRefRewritePatches(doc, idMap)).toEqual(
+      patch('doc-1', [
+        at(['relatedPost', '_ref'], set('page_post-post-1')),
+        at(['author', '_ref'], set('person-author-1')),
+      ]),
+    );
+  });
+
   it('rewrites every matching reference in an array field', () => {
     const idMap = new Map([
       ['post-1', 'page_post-post-1'],
