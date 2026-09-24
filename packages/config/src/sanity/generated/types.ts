@@ -15,6 +15,38 @@
 export declare const internalGroqTypeReferenceTo: unique symbol;
 
 // Source: ../config/src/sanity/generated/schema.json
+export type Module_timeline = {
+  _id: string;
+  _type: 'module_timeline';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  headingBlock?: HeadingBlock;
+  markerStyle?: 'NUMBERED' | 'LABELLED';
+  items?: Array<
+    {
+      _key: string;
+    } & TimelineItem
+  >;
+  orientation?: 'VERTICAL' | 'HORIZONTAL';
+  ctaButtons?: Array<
+    {
+      _key: string;
+    } & CtaButton
+  >;
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  itemAlignment?: 'LEFT' | 'CENTER';
+  layout?: Layout;
+};
+
+export type HeadingBlock = {
+  _type: 'headingBlock';
+  heading?: string;
+  supportingText?: string;
+};
+
 export type Module_newsletter = {
   _id: string;
   _type: 'module_newsletter';
@@ -27,12 +59,6 @@ export type Module_newsletter = {
   variant?: 'FULL' | 'COMPACT';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   layout?: Layout;
-};
-
-export type HeadingBlock = {
-  _type: 'headingBlock';
-  heading?: string;
-  supportingText?: string;
 };
 
 export type Module_cta = {
@@ -443,6 +469,13 @@ export type ParagraphText = Array<{
   _type: 'block';
   _key: string;
 }>;
+
+export type TimelineItem = {
+  _type: 'timelineItem';
+  marker?: string;
+  heading?: string;
+  body?: ParagraphText;
+};
 
 export type Stat = {
   _type: 'stat';
@@ -1100,6 +1133,13 @@ export type Module_statsReference = {
   [internalGroqTypeReferenceTo]?: 'module_stats';
 };
 
+export type Module_timelineReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_timeline';
+};
+
 export type Module_faqReference = {
   _ref: string;
   _type: 'reference';
@@ -1153,6 +1193,9 @@ export type Page_landing = {
       } & Module_statsReference)
     | ({
         _key: string;
+      } & Module_timelineReference)
+    | ({
+        _key: string;
       } & Module_faqReference)
   >;
   seo?: Seo;
@@ -1201,6 +1244,9 @@ export type Page_home = {
     | ({
         _key: string;
       } & Module_statsReference)
+    | ({
+        _key: string;
+      } & Module_timelineReference)
     | ({
         _key: string;
       } & Module_faqReference)
@@ -1460,8 +1506,9 @@ export type Geopoint = {
 };
 
 export type AllSanitySchemaTypes =
-  | Module_newsletter
+  | Module_timeline
   | HeadingBlock
+  | Module_newsletter
   | Module_cta
   | ListedText
   | SanityImageAssetReference
@@ -1487,6 +1534,7 @@ export type AllSanitySchemaTypes =
   | Page_postIndexReference
   | InlineLink
   | ParagraphText
+  | TimelineItem
   | Stat
   | PostTakeaways
   | Brand
@@ -1544,6 +1592,7 @@ export type AllSanitySchemaTypes =
   | Module_logoWallReference
   | Module_testimonialReference
   | Module_statsReference
+  | Module_timelineReference
   | Module_faqReference
   | Page_landing
   | Page_home
