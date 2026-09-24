@@ -29,7 +29,7 @@ type TCachedDocumentType =
   | 'page_landing'
   | 'page_post'
   | 'page_home'
-  | 'blog_author'
+  | 'person'
   | 'blog_topic'
   | 'blog_tag'
   | 'settings_site'
@@ -58,7 +58,7 @@ type TCachedDocumentType =
  * keep them in sync with `packages/service/src`.
  */
 const REVALIDATE_TAGS = {
-  blog_author: ['author', 'posts'],
+  person: ['author', 'posts'],
   blog_topic: ['topic', 'topics', 'posts'],
   blog_tag: ['tag', 'tags', 'posts'],
   settings_site: ['site-settings'],

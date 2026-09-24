@@ -279,11 +279,11 @@ dead anchor. Declaring `annotations` explicitly also replaces the default
 annotation set, so prose offers no paste-a-URL annotation of its own — an
 author picks an existing `link` document instead, which is the point.
 
-**`settings_navigation`, `settings_footer` and `blog_author` all author
+**`settings_navigation`, `settings_footer` and `person` all author
 through the library.** `settings_navigation.items` is an array of `linkRef`,
 so a navigation item carries no label of its own — the label comes from the
 `link` document, and editing it there updates every surface at once.
-`settings_footer.social` and `blog_author.socialLinks` are both arrays of
+`settings_footer.social` and `person.socialLinks` are both arrays of
 `socialProfile`, pairing a `link` reference with a `platform` from
 `SOCIAL_PLATFORMS`, and both resolve through one shared
 fragment/transformer pair rather than a type each. A social link's
@@ -292,7 +292,7 @@ accessible name is **derived** from that `platform` via the
 stays translated and consistent instead of depending on each author typing
 one.
 
-`blog_author.profilePage` is a `link` reference too, which widened it from
+`person.profilePage` is a `link` reference too, which widened it from
 the single `page_landing` target it once allowed to every type a `link` can
 point at. Because the destination is no longer knowably a landing page,
 `@blog/service` resolves the href and hands it to `apps/web` as
@@ -394,13 +394,13 @@ page's own required `headingBlock` heading becomes the `<h1>`. **`module_heroSta
 member — a headline, a line of support and up to two actions, with nothing
 derived from anything — and is the hero a marketing, agency, product or
 consultant home page opens with. **`module_heroProfile`** is the person
-hero: it references a `blog_author` for a photo, social profiles and — each
+hero: it references a `person` for a photo, social profiles and — each
 behind its own toggle — the author's `role` and `bio`, and authors the rest
 of its copy itself; nothing is ever derived from the author's `name`.
 
 `module_heroProfile`'s fields are `title`, `brandVariant`, the shared
 `headingBlock`, an optional `eyebrow`, a **required** `author` reference to
-`blog_author`, an optional `image`, the shared `ctaButtons`, and three
+`person`, an optional `image`, the shared `ctaButtons`, and three
 toggles defaulting on — `showSocialLinks`, `showRole` and `showBio` —
 before its composed tail. `showRole` renders the author's `role` as the
 hero's eyebrow and hides the authored `eyebrow` field while on, so the two
@@ -414,7 +414,7 @@ variant**: Stacked and Split take the module's own `image` when set and
 fall back to the author's, while **Banner takes the module's own image or
 nothing**. An author's photo is sized for a portrait; stretched across a
 full-bleed band it reads as a blur, so the Banner never inherits one.
-`blog_author.image` is optional by design, so a photoless author is a
+`person.image` is optional by design, so a photoless author is a
 supported state rather than a failure, which is why the schema declares
 **no document-level validation at all**: it validates what the editor
 cannot see, not what they just chose. **What each variant does without a

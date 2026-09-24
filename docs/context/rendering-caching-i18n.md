@@ -111,7 +111,7 @@ blog/my-post')` matches the resolved-pathname tag exactly — and is how the
   which is human-gated console work.
 
   Every other `_type` (including the `posts`-tagged
-  `blog_author`/`blog_topic`/`blog_tag`, whose edit can affect every
+  `person`/`blog_topic`/`blog_tag`, whose edit can affect every
   post-list-bearing page of a tenant) has no precise derivation yet — full
   enumeration for those is unbounded in the number of `revalidatePath` calls
   for a large tenant, a design tradeoff not yet resolved. Any undeliverable

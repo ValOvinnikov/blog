@@ -1203,7 +1203,7 @@ implementation sub-issues. `service` returns a per-kind view model; the `ui`
   (typegen reds `HERO_MAP` until the web entry lands); service adds a shared
   `toHeroPresentation()` collapse that `heroBlog` moves onto.
 - **2.2 `module_heroProfile`** (#2776 — **the design of record**) — a
-  reference to `blog_author` for the photo and social profiles the bylines
+  reference to `person` for the photo and social profiles the bylines
   already use, with every word of copy the editor's (the shared required
   `headingBlock` plus an optional eyebrow, nothing derived from the author);
   up to two `ctaButtons`; one optional photo resolved by precedence — the
@@ -1241,7 +1241,7 @@ adds `config`, `db` and `email`. Order by archetypes unlocked:
 3. **`module_faq`** (disclosure in a web client leaf), **`module_embed`**
    (video, booking, maps).
 4. **`module_featureHighlights`** (repeatable image + text rows),
-   **`module_team`** (reuse `blog_author` as the person),
+   **`module_team`** (reuse `person`),
    **`module_location`** (address, hours, map embed; feeds `LocalBusiness`
    JSON-LD), **`module_pricing`**, **`module_timeline`**.
 

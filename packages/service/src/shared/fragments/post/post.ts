@@ -4,13 +4,13 @@ import {
   WORD_COUNT_EXPRESSION,
   wordCountParser,
 } from '@blog/service/shared/expressions/word-count';
-import {
-  authorCardFragment,
-  authorDetailFragment,
-} from '@blog/service/shared/fragments/author/author';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
 import { moduleFragment } from '@blog/service/shared/fragments/module/module';
+import {
+  personCardFragment,
+  personDetailFragment,
+} from '@blog/service/shared/fragments/person/person';
 import { portableTextBodyItemFragment } from '@blog/service/shared/fragments/portable-text/portable-text-body-item';
 import { seoFragment } from '@blog/service/shared/fragments/seo/seo';
 import { tagFragment } from '@blog/service/shared/fragments/tag/tag';
@@ -40,7 +40,7 @@ export const postCardFragment = q
       .project(sanityImageFragment)
       .nullable(true),
     featured: sub.field('featured').nullable(true),
-    author: sub.field('author').deref().project(authorCardFragment).notNull(),
+    author: sub.field('author').deref().project(personCardFragment).notNull(),
     topic: sub.field('topic').deref().project(topicFragment).notNull(),
     wordCount: sub.raw(WORD_COUNT_EXPRESSION, wordCountParser),
   }));
@@ -49,7 +49,7 @@ export const postDetailFragment = q
   .fragmentForType<'page_post'>()
   .project((sub) => ({
     ...postCardFragment,
-    author: sub.field('author').deref().project(authorDetailFragment).notNull(),
+    author: sub.field('author').deref().project(personDetailFragment).notNull(),
     body: sub
       .field('content[]')
       .project(portableTextBodyItemFragment)

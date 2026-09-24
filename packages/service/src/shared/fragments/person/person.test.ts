@@ -5,19 +5,19 @@ import {
   makeRawSanityImage,
 } from '@blog/service/testing/shared/fixtures';
 
-import { authorCardFragment, authorDetailFragment } from './author';
+import { personCardFragment, personDetailFragment } from './person';
 
 const authorCardDocQuery = q.star
-  .filterByType('blog_author')
+  .filterByType('person')
   .slice(0)
-  .project(authorCardFragment);
+  .project(personCardFragment);
 
 const authorDetailDocQuery = q.star
-  .filterByType('blog_author')
+  .filterByType('person')
   .slice(0)
-  .project(authorDetailFragment);
+  .project(personDetailFragment);
 
-describe('authorCardFragment', () => {
+describe('personCardFragment', () => {
   it('parses an author with no image, leaving image null', () => {
     const raw = {
       _id: 'author-1',
@@ -59,7 +59,7 @@ describe('authorCardFragment', () => {
   });
 });
 
-describe('authorDetailFragment', () => {
+describe('personDetailFragment', () => {
   it('parses an author with no image, leaving image null', () => {
     const raw = {
       _id: 'author-1',
