@@ -407,14 +407,14 @@ reference to the term they archive.
 `page_post` carries the most of its own, since the post _is_ the page:
 `heroImage` (`imageWithAlt`, optional — a post without one renders imageless
 rather than 404ing), `content` (`articleText`, required), `featured`, `author`
-(→ `blog_author`, required), `topic` (→ `blog_topic`, required — the single
+(→ `person`, required), `topic` (→ `blog_topic`, required — the single
 primary classification), `tags` (→ `blog_tag`, optional, max 6), `publishedAt`
 (required — it drives sort order and the date readers see), and
 `postTakeaways` (optional, the 30-second-skim summary).
 
 **Other documents**
 
-- `blog_author` — name, image (`imageWithAlt`), bio, role, socialLinks (array of
+- `person` — name, image (`imageWithAlt`), bio, role, socialLinks (array of
   `socialProfile`), profilePage (optional ref → a `link` document, so any page
   type it can target).
 - `blog_topic` — `title` (required, max 60), slug, description (max 300). The
@@ -432,7 +432,7 @@ primary classification), `tags` (→ `blog_tag`, optional, max 6), `publishedAt`
   per module). Authored under **Blocks → Cards** alongside `block_feature`.
 - `link` — the single link target every reference-shaped object
   (`linkRef`, `ctaButton`, `ctaSecondaryButton`, `socialProfile`,
-  `blog_author.profilePage`) points at.
+  `person.profilePage`) points at.
 - `settings_site` (singleton) — `titleField` (bare; see helper note below),
   brand
   (`brand` object: name/logo/tagline — `logo` is optional, falling
@@ -489,7 +489,7 @@ empty. Singletons resolve their Studio label via `preview.prepare` instead
 `socialProfile` (each wrapping a reference to a `link` **document**),
 `brand`, `brandTagline` (structured tagline: `items` + a
 `BRAND_TAGLINE_SEPARATORS`-driven `separator`), `imageWithAlt` (required alt —
-used by `page_post.heroImage`, `blog_author.image`, `brand.logo`,
+used by `page_post.heroImage`, `person.image`, `brand.logo`,
 `openGraph.image`, `block_feature.image` and the hero/CTA modules), `bodyImage` (required alt; optional `layout`
 from `IMAGE_LAYOUT`, undefined = Inline — shares its `alt`/hotspot shape with
 `imageWithAlt` via the `image-alt-field` helper, but is a distinct type
