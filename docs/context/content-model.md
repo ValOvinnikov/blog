@@ -245,12 +245,11 @@ A grid or carousel of feature cards.
   logo's alt is the organisation's name, “Stripe” rather than “Stripe logo”. The
   image is a plain `image`, not an `imageWithAlt`, because a generic “describe
   the image” prompt invites the wrong alt.
-- **A wrapping flex row, not a grid** — `LogoTile` carries its own
-  per-breakpoint minimum width (two per row on phones, three at `sm`, four at
-  `md`, five from `lg`), so the row holds tile width roughly constant instead of
-  stretching tiles to fill a column count. There is no derived column helper.
-- **Not cards** — `LogoTile` paints no surface, border or radius in any state:
-  most logos are unlinked, and a card would promise a click that never arrives.
+- **A wrapping flex row, not a grid** — `LogoTile` is a fixed-size card, so how
+  many fit per row follows from wrapping rather than a column count or a
+  breakpoint ladder. There is no derived column helper. See `SPEC.md` for the
+  card's dimensions and for why the logo's box is computed from the asset's
+  aspect ratio rather than from the decoded image file.
 - **Variants** — `displayMode`: `GRID` (default) · `CAROUSEL`.
 - **Actions** — `ctaButtons`, 0–2.
 - **Renders nothing** when the array is empty, or when a logo's image cannot be
