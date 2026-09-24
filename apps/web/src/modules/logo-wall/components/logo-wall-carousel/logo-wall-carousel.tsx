@@ -7,8 +7,7 @@ import type {
 } from '@blog/config';
 import type { TLogoItem } from '@blog/service';
 import { LabelledCarousel } from '@web/components/shared/labelled-carousel';
-
-import { LogoWallTile } from './logo-wall-tile';
+import { LogoWallTile } from '@web/modules/logo-wall/components/logo-wall-tile/logo-wall-tile';
 
 export interface ILogoWallCarouselProps
   extends IWithClassName, IWithDataTestId {
