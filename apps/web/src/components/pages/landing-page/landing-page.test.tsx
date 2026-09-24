@@ -161,4 +161,33 @@ describe(`<${LandingPage.name}/>`, () => {
 
     expect(getLandingPageMock).toHaveBeenCalledWith('about-us', 'tenant-1');
   });
+
+  it('renders no FAQPage JSON-LD when the page has no FAQ questions', async () => {
+    getLandingPageMock.mockResolvedValue({ ok: true, data: mockLandingPage });
+
+    await setup();
+
+    expect(screen.queryByTestId('json-ld-script')).not.toBeInTheDocument();
+  });
+
+  it('renders the FAQPage JSON-LD when the page has FAQ questions', async () => {
+    getLandingPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        ...mockLandingPage,
+        faqs: [
+          {
+            id: 'faq-1',
+            question: 'Do you offer a free trial?',
+            answer: 'Yes.',
+          },
+        ],
+      },
+    });
+
+    await setup();
+
+    const script = screen.getByTestId('json-ld-script');
+    expect(script.textContent).toContain('"@type":"FAQPage"');
+  });
 });
