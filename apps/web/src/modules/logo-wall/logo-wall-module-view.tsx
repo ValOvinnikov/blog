@@ -3,10 +3,10 @@ import type { TLogoWallModule } from '@blog/service';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';
-import { LogoWallCarousel } from '@web/modules/logo-wall/components/logo-wall-carousel/logo-wall-carousel';
-import { LogoWallTile } from '@web/modules/logo-wall/components/logo-wall-tile/logo-wall-tile';
 import { moduleGridActionsVariants } from '@web/utils/module-grid-actions-variants';
 
+import { LogoWallCarousel } from './components/logo-wall-carousel/logo-wall-carousel';
+import { LogoWallTile } from './components/logo-wall-tile/logo-wall-tile';
 import { logoWallRowVariants } from './logo-wall-row-variants';
 
 export interface ILogoWallModuleViewProps extends TLogoWallModule {

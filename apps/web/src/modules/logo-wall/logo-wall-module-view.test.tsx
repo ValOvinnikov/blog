@@ -15,10 +15,9 @@ const { LogoWallCarousel } = vi.hoisted(() => ({
   LogoWallCarousel: vi.fn(() => <div data-testid="logo-wall-carousel-stub" />),
 }));
 
-vi.mock(
-  '@web/modules/logo-wall/components/logo-wall-carousel/logo-wall-carousel',
-  () => ({ LogoWallCarousel }),
-);
+vi.mock('./components/logo-wall-carousel/logo-wall-carousel', () => ({
+  LogoWallCarousel,
+}));
 
 const logos = [
   makeLogoItem({ id: 'logo-1', name: 'Acme Corp' }),
