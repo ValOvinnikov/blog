@@ -28,9 +28,10 @@ When invoked, before writing any code:
 
 1. Read the context brief you were given: issue summary, acceptance criteria,
    and which component(s) to add or change.
-2. Read existing components at the same atomic level (`atoms/`, `molecules/`,
-   `organisms/`) to understand current structure, naming conventions, and
-   patterns — follow what exists. Skim `packages/ui/COMPONENTS.md` (the
+2. Read existing components at the same atomic level (`src/components/atoms/`,
+   `src/components/molecules/`, `src/components/organisms/`) to understand
+   current structure, naming conventions, and patterns — follow what exists.
+   Skim `packages/ui/COMPONENTS.md` (the
    generated index of every component — purpose, props, compound slots) first
    to spot an existing component to reuse or extend before building a new one.
 3. While reading, identify any improvements to the current implementations

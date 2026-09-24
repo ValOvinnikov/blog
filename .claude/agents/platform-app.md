@@ -330,7 +330,7 @@ banner-state/` for this app's own instance). Never inline a second component
 
 A component with more than one exported part (`Card.Header`/`Card.Body`/
 `Card.Footer`, a future `Tabs.Trigger`/`Tabs.Panel`, …) follows `@blog/ui`'s
-split, not one crowded file — see `packages/ui/src/molecules/panel/` for the
+split, not one crowded file — see `packages/ui/src/components/molecules/panel/` for the
 reference shape (read it with Read before building the next one):
 
 - **Each part lives in its own file**, `components/<part>/<component>-<part>.tsx`
@@ -409,7 +409,7 @@ the exported value, not on how it was written.
   never a bare string, even a single class, even in a `variants`/
   `compoundVariants` override. (Non-slot `base`/`variants` calls in
   single-element components may use bare strings.) See
-  `packages/ui/src/molecules/toast/toast-variants.ts` for the pattern.
+  `packages/ui/src/components/molecules/toast/toast-variants.ts` for the pattern.
 - Base UI's `data-*` state selectors belong in those variant files like any
   other class, not scattered inline.
 - Responsive classes are mobile-first with `md:`/`lg:` as the two tiers. This
