@@ -45,6 +45,22 @@ describe(`<${Avatar.name}/>`, () => {
     expect(screen.getByText('MA')).toBeVisible();
   });
 
+  it('renders no accessible name on the image when alt is empty', () => {
+    setup({ src: '/photo.jpg', alt: '' });
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+  });
+
+  it('renders no sr-only name alongside the initials fallback when alt is empty', () => {
+    setup({ alt: '' });
+    expect(screen.getByText('JD')).toBeVisible();
+    expect(screen.queryByText('Jane Doe')).not.toBeInTheDocument();
+  });
+
+  it('renders a text alternative for the initials fallback when alt is provided', () => {
+    setup();
+    expect(screen.getByText('Jane Doe')).toBeInTheDocument();
+  });
+
   it('calls onImageError when the image fails to load', () => {
     const onImageError = vi.fn();
     setup({

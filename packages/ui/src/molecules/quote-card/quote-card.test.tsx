@@ -83,9 +83,7 @@ describe(`<${QuoteCard.name}/>`, () => {
 
   it('renders the caller-supplied Avatar with its initials fallback', () => {
     setup({
-      children: buildChildrenWithAvatar(
-        <Avatar name="Ada Lovelace" alt="Ada Lovelace" />,
-      ),
+      children: buildChildrenWithAvatar(<Avatar name="Ada Lovelace" alt="" />),
     });
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
     expect(screen.getByText('AL')).toBeInTheDocument();
@@ -96,15 +94,22 @@ describe(`<${QuoteCard.name}/>`, () => {
       children: buildChildrenWithAvatar(
         <Avatar
           name="Ada Lovelace"
-          alt="Ada Lovelace"
+          alt=""
           src="https://example.com/avatar.jpg"
         />,
       ),
     });
-    expect(screen.getByRole('img')).toHaveAttribute(
+    expect(screen.getByRole('presentation')).toHaveAttribute(
       'src',
       'https://example.com/avatar.jpg',
     );
+  });
+
+  it('announces the quoted person once when the caller-supplied Avatar sits beside QuoteCard.Name', () => {
+    setup({
+      children: buildChildrenWithAvatar(<Avatar name="Ada Lovelace" alt="" />),
+    });
+    expect(screen.getAllByText('Ada Lovelace')).toHaveLength(1);
   });
 
   it('renders neither an image nor initials when QuoteCard.Avatar is omitted', () => {

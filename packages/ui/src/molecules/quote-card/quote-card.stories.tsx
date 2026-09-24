@@ -35,7 +35,7 @@ const meta = {
       <>
         <QuoteCard.Quote>{faker.lorem.sentences(2)}</QuoteCard.Quote>
         <QuoteCard.Avatar>
-          <Avatar src={AVATAR_SRC} alt={NAME} name={NAME} />
+          <Avatar src={AVATAR_SRC} alt="" name={NAME} />
         </QuoteCard.Avatar>
         <QuoteCard.Name>
           <span>{NAME}</span>
@@ -73,7 +73,7 @@ export const Linked: TStory = {
       <>
         <QuoteCard.Quote>{faker.lorem.sentences(2)}</QuoteCard.Quote>
         <QuoteCard.Avatar>
-          <Avatar src={AVATAR_SRC} alt={NAME} name={NAME} />
+          <Avatar src={AVATAR_SRC} alt="" name={NAME} />
         </QuoteCard.Avatar>
         <QuoteCard.Name>
           <a href="https://example.com/case-studies/customer">{NAME}</a>
