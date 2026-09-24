@@ -16,6 +16,7 @@ import {
 } from '@blog/config';
 import type { TRawContentModule } from '@blog/service/features/modules/content/adaptor/transformer';
 import type { TRawCtaModule } from '@blog/service/features/modules/cta/adaptor/transformer';
+import type { TRawFaqModule } from '@blog/service/features/modules/faq/adaptor/transformer';
 import type { TRawFeatureListModule } from '@blog/service/features/modules/feature-list/adaptor/transformer';
 import type { TRawHeroModule } from '@blog/service/features/modules/hero/adaptor/transformer';
 import type { TRawHeroBlogModule } from '@blog/service/features/modules/hero-blog/adaptor/transformer';
@@ -50,6 +51,7 @@ type TRawStatItem = NonNullable<TRawStatsModule['stats']>[number];
 type TRawTestimonialItem = NonNullable<
   TRawTestimonialModule['testimonials']
 >[number];
+type TRawFaqQuestionItem = TRawFaqModule['questions'][number];
 
 export function makeRawHeroModule(
   overrides: Partial<TRawHeroModule> = {},
@@ -455,6 +457,36 @@ export function makeRawTestimonialModule(
     ctaButtons: null,
     displayMode: DISPLAY_MODE.GRID,
     cardAlignment: null,
+    contentAlignment: null,
+    layout: null,
+    ...overrides,
+  };
+}
+
+export function makeRawFaqQuestionItem(
+  overrides: Partial<TRawFaqQuestionItem> = {},
+): TRawFaqQuestionItem {
+  return {
+    _id: 'block-faq-1',
+    question: 'How long does onboarding take?',
+    answer: [
+      makeRawContentBlock({ text: 'Most teams are live within a week.' }),
+    ],
+    ...overrides,
+  };
+}
+
+export function makeRawFaqModule(
+  overrides: Partial<TRawFaqModule> = {},
+): TRawFaqModule {
+  return {
+    brandVariant: BRAND_VARIANT.PRIMARY,
+    headingBlock: makeRawHeadingBlock('Frequently asked questions'),
+    questions: [
+      makeRawFaqQuestionItem(),
+      makeRawFaqQuestionItem({ _id: 'block-faq-2' }),
+    ],
+    ctaButtons: null,
     contentAlignment: null,
     layout: null,
     ...overrides,

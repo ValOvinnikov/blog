@@ -50,4 +50,8 @@ describe('homePageQuery', () => {
 
     expect(() => homePageQuery.parse(raw)).not.toThrow();
   });
+
+  it('queries every module_faq question across the page', () => {
+    expect(homePageQuery.query).toContain('_type == "module_faq"');
+  });
 });

@@ -1,5 +1,9 @@
 import type { TPageLandingType } from '@blog/config';
 import { q, type TSlugParams } from '@blog/service/sanity/query';
+import {
+  PAGE_FAQ_QUESTIONS_EXPRESSION,
+  pageFaqQuestionsParser,
+} from '@blog/service/shared/expressions/page-faq-questions';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
 import { moduleFragment } from '@blog/service/shared/fragments/module/module';
 import { seoFragment } from '@blog/service/shared/fragments/seo/seo';
@@ -28,6 +32,7 @@ export const landingPageQuery = q
       .project(moduleFragment)
       .as<TRawModule<TPageLandingType>[]>()
       .nullable(),
+    faqs: sub.raw(PAGE_FAQ_QUESTIONS_EXPRESSION, pageFaqQuestionsParser),
     seo: sub.field('seo').project(seoFragment).notNull(),
   }))
   .nullable(true);

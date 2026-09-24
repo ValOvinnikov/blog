@@ -43,4 +43,8 @@ describe('landingPageQuery', () => {
   it('parses null as no matching page_landing document, rather than throwing', () => {
     expect(landingPageQuery.parse(null)).toBeNull();
   });
+
+  it('queries every module_faq question across the page', () => {
+    expect(landingPageQuery.query).toContain('_type == "module_faq"');
+  });
 });
