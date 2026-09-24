@@ -1,14 +1,17 @@
 /**
- * Pure helpers for the migration tooling (`migrate.mjs`) — no filesystem or
- * network access, so these are unit-testable in isolation. Everything here is
- * deterministic given its inputs (dates are passed in, never read from
- * `Date.now()` internally, except as a default parameter).
+ * Helpers for the migration tooling (`migrate.mjs`), unit-testable in
+ * isolation. Everything here is deterministic given its inputs (dates are
+ * passed in, never read from `Date.now()` internally, except as a default
+ * parameter) — `listMigrationIds` is the one exception, reading the
+ * filesystem, so it's tested against a temp directory rather than mocked.
  *
  * Migration id shape: `YYYYMMDDTHHmm-<slug>` (UTC), e.g.
  * `20260710T1200-unify-links`. Un-timestamped legacy folder names (no leading
  * `YYYYMMDDTHHmm-`) sort before every timestamped id — see
  * `compareMigrationIds`.
  */
+import { existsSync, readdirSync } from 'node:fs';
+import { join } from 'node:path';
 
 const TIMESTAMPED_ID_PATTERN = /^\d{8}T\d{4}-/;
 
@@ -79,3 +82,16 @@ export const computePending = (folderIds, appliedIds) => {
 
 /** Build a `migrationState.applied[]` entry for a successfully-applied migration. */
 export const buildLedgerEntry = (id, { runAt, sha }) => ({ id, runAt, sha });
+
+/**
+ * A directory under `migrations/` is a migration iff it contains an
+ * `index.ts` — the same structural test `.github/workflows/ci.yml`'s
+ * Migrations job already applies. This is what lets `lib/` (the shared
+ * pure-helper directory, no `index.ts`) and `backups/` (dataset exports)
+ * fall out without being named.
+ */
+export const listMigrationIds = (migrationsDir) =>
+  readdirSync(migrationsDir, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .filter((name) => existsSync(join(migrationsDir, name, 'index.ts')));
