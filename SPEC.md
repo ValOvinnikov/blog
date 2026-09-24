@@ -752,8 +752,11 @@ same reason: the card's own content already answers it.
 **Grid columns are derived from the card count, not authored** — 2→2, 3→3,
 4→4, 5→3, 6→3, 7→4, 8→4. Five and six take three columns rather than four,
 and seven takes four rather than three, so the last row is never left with a
-single orphaned card. `toFeatureGridColumns` in `apps/web` is the whole rule;
-the carousel ignores it.
+single orphaned card. `toModuleGridColumns` in `apps/web` is the whole rule;
+the carousel ignores it. It is named for the job rather than for this module
+because `module_stats` derives its columns from the same table — the mapping is
+identical across the 2–6 range a stats band can hold, so a second copy would
+have been a near-duplicate that never fails loudly.
 
 `cardAlignment` is a casing seam worth naming: it stores UPPERCASE
 `CONTENT_ALIGNMENT` values and offers only `LEFT`/`CENTER`, while `@blog/ui`'s
@@ -829,8 +832,9 @@ parse failure returns a failed result and the module renders nothing rather than
 404ing the page, and the Sanity client pins `perspective: 'published'`, so a
 draft with the field still unset is never queried.
 
-**A logo is an inline object, not a document — the one place the `block_*`
-pattern is deliberately not followed.** `logoItem` ("Logo") holds a `name`, an
+**A logo is an inline object, not a document — one of the two places the
+`block_*` pattern is deliberately not followed, `module_stats` below being the
+other.** `logoItem` ("Logo") holds a `name`, an
 `image` and an optional `link` reference, and lives directly on the module's
 `logos` array. Logos never recombine: a wall is reused by referencing the same
 `module_logoWall` from several pages, so reuse already happens one level up, and
@@ -879,6 +883,44 @@ renders nothing rather than a wall with a gap in it. As with
 and keeps rendering. The view also returns nothing for an empty array, which
 `.notNull()` does not reject and `min(1)` only blocks in the Studio, so an
 API-written wall with no logos disappears instead of rendering an empty row.
+
+`module_stats` ("Stats") holds **inline objects rather than referenced
+documents** too, for a different reason than the logo wall's. A `stat` carries a required
+`value`, a required `label` and an optional `description`, and lives on the
+module's `stats` array — 2 to 6 of them, `required()` ahead of `min(2)` and
+`max(6)`, with no `unique()` because inline objects have no id to compare. The
+reuse a `block_*` document buys is the wrong trade here: a logo or a quote
+recurs across pages, but a figure belongs to the argument one page is making,
+and editing it once would make a stale number wrong in two places. It follows
+that there is no Blocks desk entry, no reference picker, no `block_*`
+revalidation tag and — uniquely in this family — no dereference anywhere in the
+query, so the whole module is a single document read.
+
+**`value` is one string, never a number plus a unit.** Real figures are `2.4M`,
+`<50ms`, `4.9/5`, `24/7`, `3×` and `Top 10`; a numeric field with a unit
+alongside expresses none of them without an escape hatch, and an escape hatch
+means two ways to author the same figure. Nothing is parsed — past eight
+characters the schema warns and stops there. `@blog/service` exposes each figure
+as `TStatItem`, whose `id` comes from the array member's `_key`, matching how
+every other item array in the layer surfaces a stable identifier.
+
+It carries the usual furniture — `brandVariant`, `headingBlock`, `layout`,
+`ctaButtons`, plus an optional one-line `footnote` — and is allowed in
+`page_home.modules[]` and `page_landing.modules[]` only. **It has no
+`displayMode` and only one alignment axis**: two to six short figures always fit
+one or two rows, so a carousel would hide them behind a swipe, and the figures
+follow `contentAlignment` along with the heading and actions rather than taking
+a `cardAlignment` of their own.
+
+**The figures are not cards, and that is a deliberate affordance decision.** In
+this design system a card surface means the item does something — `MediaCard`
+takes `isInteractive`, a feature card is a link, a post card opens a post. A
+figure is read, not clicked, so a surface would promise a click that never
+arrives; the items sit directly on the band with a hairline between columns and
+no surface, border or radius, and `CardGrid` is skipped with them. The band is a
+`<dl>` whose source order is label-first, so a screen reader hears “median
+organic lift, plus 38 percent”, while CSS `order` puts the value on top
+visually — the value being the only element carrying the accent colour.
 
 `service.modules.<type>.v1` projects `brandVariant` as a required
 `TBrandVariantOf<...>` (narrowed per module to exactly the options its

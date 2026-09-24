@@ -20,6 +20,7 @@ import {
 import { NewsletterModule } from '@web/modules/newsletter/newsletter-module';
 import { PostFeaturedModule } from '@web/modules/post-featured/post-featured-module';
 import { PostLatestModule } from '@web/modules/post-latest/post-latest-module';
+import { StatsModule } from '@web/modules/stats/stats-module';
 import { TaxonomyListModule } from '@web/modules/taxonomy-list/taxonomy-list-module';
 import { TestimonialModule } from '@web/modules/testimonial/testimonial-module';
 import type { ReactNode } from 'react';
@@ -37,6 +38,7 @@ const LANDING_MAP: Partial<Record<TPageLandingType, TModuleComponent>> = {
   module_featureList: FeatureListModule,
   module_testimonial: TestimonialModule,
   module_logoWall: LogoWallModule,
+  module_stats: StatsModule,
 };
 
 export interface ILandingModuleRendererProps {
