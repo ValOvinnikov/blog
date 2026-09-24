@@ -2,7 +2,7 @@
 
 # @blog/ui component index
 
-_56 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
+_57 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
 
 ## Atoms
 
@@ -285,6 +285,17 @@ Props: type: TToastType · isLoading?: boolean · title?: ReactNode · message: 
 Variants: type: TOAST_TYPE.SUCCESS|TOAST_TYPE.INFO|TOAST_TYPE.WARNING|TOAST_TYPE.ERROR · phase: entering|visible|leaving · hasTime: (boolean) · paused: (boolean)
 
 ## Organisms
+
+### Accordion — `components/organisms/accordion/accordion.tsx`
+
+A list of disclosure rows, any number of which can be open at once; each is an `Accordion.Item` pairing an `Accordion.Trigger` with its `Accordion.Panel`.
+Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+
+Slots:
+
+- **Accordion.Item** — One disclosure row in an `Accordion`, pairing an `Accordion.Trigger` with its `Accordion.Panel`. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Accordion.Trigger** — The clickable label for an `Accordion.Item`, rendered as a full-width button inside a level-3 heading, with a chevron that turns to point up while its panel is open. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Accordion.Panel** — The collapsible content of an `Accordion.Item`; stays in the DOM closed so browser find-in-page can still match text inside it. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### Article — `components/organisms/article/article.tsx`
 
