@@ -857,22 +857,42 @@ text.** WAI's rule for a logo is that the alt is the organisation's name,
 crop and hotspot controls are noise for a mark that must render whole.
 
 **The wall is a wrapping flex row, not a grid.** `apps/web` composes
-`flex flex-wrap` with a 24px gap, and `@blog/ui`'s `LogoTile` carries its own
-per-breakpoint minimum width — two logos per row on phones, three at `sm`, four
-at `md`, five from `lg` — so the row holds tile width roughly constant instead of
-stretching tiles to fill a column count. The tiers are derived from that gap and
-`Section`'s `max-w-5xl` box, so changing either changes how many logos fit. A
-column count cannot express this: an equal-width grid track forces a wide
-wordmark to shrink below a square mark's height, and a trailing row would strand
-an orphan where wrapping simply re-flows. `containerWidth: FULL` stays available
-and gives the row more space than the tiers assume; tiles grow toward their
-maximum and the surplus becomes whitespace.
+`flex flex-wrap` with a 24px gap, and `@blog/ui`'s `LogoTile` is a fixed 192×88
+card at every breakpoint, so how many fit per row is a consequence of wrapping
+rather than a declared column count or a breakpoint ladder, and stays correct at
+any container width. An earlier per-breakpoint `min-w` ladder was derived against
+a 944px content box and produced the wrong count in the 648px row the home page
+actually renders; one fixed size removes that coupling. A column count cannot
+express this either: an equal-width grid track forces a wide wordmark to shrink
+below a square mark's height, and a trailing row would strand an orphan where
+wrapping simply re-flows. `containerWidth: FULL` stays available and fits more
+tiles per row.
 
 The row's `justify-content` follows `contentAlignment`, the same field that
 aligns the heading and the actions — left by default, so a single logo sits under
-a left-aligned heading rather than floating centred. `LogoTile` paints no
-surface, border or radius in any state: most logos are unlinked, and a card
-promises a click that never arrives.
+a left-aligned heading rather than floating centred. `LogoTile` paints a card —
+`bg-surface`, a hairline border and a token radius — because logos arrive as
+whatever the company supplies: a transparent SVG beside a raster mark with an
+opaque background baked in reads as an odd filled square floating next to a bare
+wordmark unless a uniform frame reconciles them. This reverses the earlier
+no-surface decision, whose reasoning was that a card promises a click most logos
+do not have; real assets made consistency the stronger concern.
+
+**The logo's box is computed from the asset's aspect ratio, never from the
+decoded file.** `SanityImage` paints an LQIP blur-up placeholder whose dimensions
+are rounded to whole pixels — 20×11 for a 2400×1260 asset, a ratio of 1.818
+against the real 1.905 — and a contained image takes its painted width from
+whichever file is currently decoded, so a non-square logo shifts about 1.5px per
+side the moment the blur is replaced. `LogoTile` therefore takes an `aspectRatio`,
+exposes it as a `--logo-aspect` custom property, and sizes the image with
+`aspect-ratio`, `height: auto` and
+`width: min(calc(2.25rem * var(--logo-aspect)), 100%)`. `object-fit: fill` is
+exact under that construction because the box ratio is the asset ratio, and
+`min()` rather than `max-width` is what makes a logo too wide for the card scale
+down proportionally instead of distorting. Within the 158px content box every
+logo up to 4.39:1 reaches the full 36px height. Omitting the ratio falls back to
+a contained image, so an asset whose dimensions metadata is missing still
+renders.
 
 **One logo the service cannot resolve costs the whole wall, not that tile.** The
 query projects `name` and `image` with `.notNull()`, and `toLogoItem` throws

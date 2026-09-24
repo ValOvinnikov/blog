@@ -82,14 +82,51 @@ const renderLogoTiles = (count: number) =>
     </LogoTile>
   ));
 
-const renderWideWordmarkAndSquareLogos = () => [
-  <LogoTile key="wide">
+const OPAQUE_BACKGROUND_LOGO_SRC = `data:image/svg+xml,${encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="64" height="64" fill="#4338ca"/><polygon points="32,8 54,20 54,44 32,56 10,44 10,20" fill="#ffffff"/></svg>',
+)}`;
+
+const WIDE_WORDMARK_SIZE = { width: 900, height: 180 };
+const SQUARE_MARK_SIZE = { width: 160, height: 160 };
+const OPAQUE_BACKGROUND_MARK_SIZE = { width: 64, height: 64 };
+
+const renderMixedLogoShapes = (withAspectRatio: boolean) => [
+  <LogoTile
+    key="wide"
+    aspectRatio={
+      withAspectRatio
+        ? WIDE_WORDMARK_SIZE.width / WIDE_WORDMARK_SIZE.height
+        : undefined
+    }
+  >
     <img
-      src={faker.image.urlPicsumPhotos({ width: 900, height: 180 })}
+      src={faker.image.urlPicsumPhotos(WIDE_WORDMARK_SIZE)}
       alt={faker.company.name()}
     />
   </LogoTile>,
-  ...renderLogoTiles(4),
+  <LogoTile
+    key="square"
+    aspectRatio={
+      withAspectRatio
+        ? SQUARE_MARK_SIZE.width / SQUARE_MARK_SIZE.height
+        : undefined
+    }
+  >
+    <img
+      src={faker.image.urlPicsumPhotos(SQUARE_MARK_SIZE)}
+      alt={faker.company.name()}
+    />
+  </LogoTile>,
+  <LogoTile
+    key="opaque-background"
+    aspectRatio={
+      withAspectRatio
+        ? OPAQUE_BACKGROUND_MARK_SIZE.width / OPAQUE_BACKGROUND_MARK_SIZE.height
+        : undefined
+    }
+  >
+    <img src={OPAQUE_BACKGROUND_LOGO_SRC} alt={faker.company.name()} />
+  </LogoTile>,
 ];
 
 const FlexWrap = ({ children }: { children: ReactNode }) => (
@@ -110,17 +147,14 @@ export const PartialTrailingRow: TStory = {
   render: () => <FlexWrap>{renderLogoTiles(7)}</FlexWrap>,
 };
 
-export const MixedWordmarkAndSquareLogos: TStory = {
-  name: 'Wide wordmark grows within its cap, square logos share the floor',
+export const MixedLogoShapes: TStory = {
+  name: 'A wide wordmark, a square mark, and a mark with its own opaque background sit inside identical frames',
   parameters: { layout: 'fullscreen' },
-  render: () => <FlexWrap>{renderWideWordmarkAndSquareLogos()}</FlexWrap>,
+  render: () => <FlexWrap>{renderMixedLogoShapes(true)}</FlexWrap>,
 };
 
-// LogoTile's own sizing forks on `sm`/`md`/`lg` — pin the viewport so the
-// narrow, two-per-row state that only renders below `sm` actually shows.
-export const PartialTrailingRowOnPhone: TStory = {
-  name: 'Partial trailing row — on phone',
+export const MixedLogoShapesWithoutAspectRatio: TStory = {
+  name: 'The same three shapes without an aspect ratio fall back to contained',
   parameters: { layout: 'fullscreen' },
-  globals: { viewport: 'phone' },
-  render: () => <FlexWrap>{renderLogoTiles(5)}</FlexWrap>,
+  render: () => <FlexWrap>{renderMixedLogoShapes(false)}</FlexWrap>,
 };
