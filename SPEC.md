@@ -870,6 +870,16 @@ a left-aligned heading rather than floating centred. `LogoTile` paints no
 surface, border or radius in any state: most logos are unlinked, and a card
 promises a click that never arrives.
 
+**One logo the service cannot resolve costs the whole wall, not that tile.** The
+query projects `name` and `image` with `.notNull()`, and `toLogoItem` throws
+`UnresolvedLogoImageError` if an image still fails to resolve; the throw leaves
+`toLogoWallModule`, `safeAsync` turns it into a failed result, and the module
+renders nothing rather than a wall with a gap in it. As with
+`module_testimonial`, that is not a page-level risk — the page loses the section
+and keeps rendering. The view also returns nothing for an empty array, which
+`.notNull()` does not reject and `min(1)` only blocks in the Studio, so an
+API-written wall with no logos disappears instead of rendering an empty row.
+
 `service.modules.<type>.v1` projects `brandVariant` as a required
 `TBrandVariantOf<...>` (narrowed per module to exactly the options its
 schema allows), `layout` as `TLayout | undefined`, and (where applicable)
