@@ -107,8 +107,11 @@ export default mergeConfig(
 - **`web`** — route/page components with `service` functions mocked; assert that
   the data renders and metadata is produced. Keep these light; prefer pushing
   logic down into `ui`/`service` where it's cheaper to test.
-- **`packages/studio/migrations/*`** (when one is authored — the directory currently
-  holds only the tooling) — a migration's `document()` handler is a pure
+- **`packages/studio/src`** — never a schema definition (see "What not to
+  test"); only the validators in `schema-types/validation/`, the
+  `structure/`, `inputs/` and `preview/` helpers, `studio-config` and
+  `studio-mount`.
+- **`packages/studio/migrations/*`** — a migration's `document()` handler is a pure
   function (doc → mutations), so test it directly. Cover **transform correctness**
   (a legacy doc maps to the expected module/field shape) and **idempotency**
   (running it against an already-migrated doc returns `undefined`/no-op — never
@@ -405,9 +408,20 @@ describe(`<${SubscribeForm.name}/>`, () => {
   `type-check` and the Studio itself already guard the shapes, and copy is
   reviewed in the diff, so the test protects nothing and fails on every
   intentional change. If a field having _some_ description matters, assert
-  that it is non-empty; never which words it contains. Test the _logic_
-  attached to config instead: a `rule.custom` validation, a conditional
-  `hidden`, a preview `prepare`, a transformer, a migration.
+  that it is non-empty; never which words it contains.
+- **A Studio schema definition gets no test at all.** Everything under
+  `packages/studio/src/schema-types/{documents,objects,modules,fields}/` is
+  declaration, and that covers its logic too: `required()`, a min/max
+  limit, a `rule.custom` written inside the schema, a conditional `hidden`,
+  a preview `prepare`, an `initialValue`, a field factory's branches. Each
+  one is read straight back out of the schema, is visible to the editor the
+  moment the Studio loads, and is changed only on purpose — so its test
+  fails on every intentional edit and on nothing else. A schema change ships
+  with `no-tests-needed`. What `packages/studio` does test is code that is
+  not a schema: the extracted cross-document validators in
+  `schema-types/validation/` (they query the dataset and strip drafts, which
+  the Studio does not show you when it breaks), the `structure/`, `inputs/`
+  and `preview/` helpers, `studio-config`, `studio-mount`, and migrations.
 - **Sibling cases use `it.each`, never copied blocks.** Three `it`s that
   differ only in an input and an expected value are one table-driven test.
   A test file that repeats an arrangement it already contains is fixed in
