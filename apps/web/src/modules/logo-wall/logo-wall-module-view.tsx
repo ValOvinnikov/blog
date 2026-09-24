@@ -7,7 +7,7 @@ import { moduleGridActionsVariants } from '@web/utils/module-grid-actions-varian
 
 import { LogoWallCarousel } from './components/logo-wall-carousel/logo-wall-carousel';
 import { LogoWallTile } from './components/logo-wall-tile/logo-wall-tile';
-import { logoWallRowVariants } from './logo-wall-row-variants';
+import { logoWallModuleViewVariants } from './logo-wall-module-view-variants';
 
 export interface ILogoWallModuleViewProps extends TLogoWallModule {
   titleId: string;
@@ -51,7 +51,7 @@ export const LogoWallModuleView = ({
         />
       ) : (
         <div
-          className={logoWallRowVariants({ align: contentAlignment })}
+          className={logoWallModuleViewVariants({ align: contentAlignment })}
           data-testid={`${dataTestId}-grid`}
         >
           {logos.map((logo) => (
