@@ -233,9 +233,10 @@ src/schema-types/modules/hero-blog/
 
 ## Content model (see SPEC.md §6 for the current model)
 
-Type names follow `{group}_{name}`. Documents: `blog_author`, `blog_tag`,
-`blog_topic`; page documents `page_home`, `page_blog`, `page_landing`,
-`page_post`, `page_tag`, `page_topic`, `page_tagIndex`, `page_topicIndex`;
+Type names follow `{group}_{name}`, except `person`, which is ungrouped.
+Documents: `person`, `blog_tag`, `blog_topic`; page documents `page_home`,
+`page_blog`, `page_landing`, `page_post`, `page_tag`, `page_topic`,
+`page_tagIndex`, `page_topicIndex`;
 singletons `settings_site`, `settings_navigation`, `settings_footer`,
 `settings_newsletter`, `settings_theme`; and the reusable module documents
 `module_content`, `module_cta`, `module_hero`, `module_heroBlog`,

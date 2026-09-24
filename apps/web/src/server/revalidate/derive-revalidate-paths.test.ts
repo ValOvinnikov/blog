@@ -68,7 +68,7 @@ const okPost = { id: 'post-1', slug: 'my-post' };
 describe('isDerivableRevalidateType', () => {
   it('is true only for page_post', () => {
     expect(isDerivableRevalidateType('page_post')).toBe(true);
-    expect(isDerivableRevalidateType('blog_author')).toBe(false);
+    expect(isDerivableRevalidateType('person')).toBe(false);
     expect(isDerivableRevalidateType('page_home')).toBe(false);
   });
 });
@@ -86,7 +86,7 @@ describe(deriveRevalidatePaths, () => {
 
   it('falls back with unsupported_type for a type it cannot derive, without calling the service', async () => {
     const result = await deriveRevalidatePaths({
-      type: 'blog_author',
+      type: 'person',
       id: 'author-1',
       tenantId: 'tenant-1',
       tenant,

@@ -7,7 +7,7 @@ describe(parseDocumentValidationDetails, () => {
       documents: [
         {
           documentId: 'provisioning.author.starter',
-          documentType: 'blog_author',
+          documentType: 'person',
           markers: [{ level: 'warning', message: "Field 'slug' missing" }],
         },
       ],
@@ -25,7 +25,7 @@ describe(parseDocumentValidationDetails, () => {
         documents: [
           {
             documentId: 'doc-1',
-            documentType: 'blog_author',
+            documentType: 'person',
             markers: [{ level: 'error', message: 'bad' }],
           },
         ],
@@ -46,7 +46,7 @@ describe(parseDocumentValidationDetails, () => {
         documents: [
           {
             documentId: 'doc-1',
-            documentType: 'blog_author',
+            documentType: 'person',
             markers: [{ level: 'critical', message: 'bad' }],
           },
         ],

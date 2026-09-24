@@ -700,9 +700,9 @@ export type Block_feature = {
   link?: LinkReference;
 };
 
-export type Blog_author = {
+export type Person = {
   _id: string;
-  _type: 'blog_author';
+  _type: 'person';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -1154,11 +1154,11 @@ export type Page_home = {
   seo?: Seo;
 };
 
-export type Blog_authorReference = {
+export type PersonReference = {
   _ref: string;
   _type: 'reference';
   _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'blog_author';
+  [internalGroqTypeReferenceTo]?: 'person';
 };
 
 export type Module_heroProfile = {
@@ -1171,7 +1171,7 @@ export type Module_heroProfile = {
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
   headingBlock?: HeadingBlock;
   eyebrow?: string;
-  author?: Blog_authorReference;
+  author?: PersonReference;
   image?: ImageWithAlt;
   ctaButtons?: Array<
     {
@@ -1257,7 +1257,7 @@ export type Page_post = {
   heroImage?: ImageWithAlt;
   content?: ArticleText;
   featured?: boolean;
-  author?: Blog_authorReference;
+  author?: PersonReference;
   topic?: Blog_topicReference;
   tags?: Array<
     {
@@ -1457,7 +1457,7 @@ export type AllSanitySchemaTypes =
   | Settings_site
   | Block_testimonial
   | Block_feature
-  | Blog_author
+  | Person
   | Page_homeReference
   | Page_topicReference
   | Page_topicIndexReference
@@ -1489,7 +1489,7 @@ export type AllSanitySchemaTypes =
   | Module_statsReference
   | Page_landing
   | Page_home
-  | Blog_authorReference
+  | PersonReference
   | Module_heroProfile
   | Module_heroStatement
   | Module_heroBlog

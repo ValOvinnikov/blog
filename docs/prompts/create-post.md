@@ -32,7 +32,7 @@ references):
 
 | Relation   | Document type | Cardinality | Required? |
 | ---------- | ------------- | ----------- | --------- |
-| **Author** | `blog_author` | exactly one | ✅ yes    |
+| **Author** | `person`      | exactly one | ✅ yes    |
 | **Topic**  | `blog_topic`  | exactly one | ✅ yes    |
 | **Tags**   | `blog_tag`    | 0–6         | optional  |
 
@@ -46,7 +46,7 @@ references):
 | `heroImage`    | image (`imageWithAlt`)            | optional. If present, `alt` is **required**. Shown at the top of the post. **Not** the social image — that is `seo.openGraph.ogImage` or nothing.                                               |
 | `content`      | Portable Text (`richText`)        | **required**. The article body — see "Body capabilities" below.                                                                                                                                 |
 | `featured`     | boolean                           | optional. Makes the post eligible for the blog hero's "newest featured" source and the featured spotlight.                                                                                      |
-| `author`       | ref → `blog_author`               | **required**.                                                                                                                                                                                   |
+| `author`       | ref → `person`                    | **required**.                                                                                                                                                                                   |
 | `topic`        | ref → `blog_topic`                | **required**, single. The post's primary classification.                                                                                                                                        |
 | `tags`         | array of ref → `blog_tag`         | optional, **max 6**. Finer topics, powering `/tags/{slug}`, related posts and the footer chips.                                                                                                 |
 | `modules`      | array of refs to module documents | optional — see "Modules" below.                                                                                                                                                                 |
@@ -82,7 +82,7 @@ the article. Each module document may be referenced at most once per page.
 Prefer referencing module documents that already exist; authoring a new one is
 its own task, outside this prompt. When in doubt, leave `modules` off entirely.
 
-### `blog_author` fields (create or reuse one author document)
+### `person` fields (create or reuse one person document)
 
 `name` (**required**, ≤ 100) · `image` (optional `imageWithAlt`; `alt` required
 when present — omit the image and the byline shows initials) · `bio`
@@ -306,7 +306,7 @@ author/topic/tag, resolve its real `_id` with:
 
 ```bash
 pnpm --filter @blog/studio exec sanity documents query \
-  '*[_type in ["blog_author","blog_topic","blog_tag"]]{_id,_type,title,name,"slug":slug.current}' \
+  '*[_type in ["person","blog_topic","blog_tag"]]{_id,_type,title,name,"slug":slug.current}' \
   --dataset <dataset>
 ```
 
@@ -331,7 +331,7 @@ pass `--project-id <id>` when it isn't the configured one.
 
 Rules — these must be exact or the import fails or orphans data:
 
-- Every document: `_id` and `_type` (`page_post`, `blog_author`, `blog_topic`,
+- Every document: `_id` and `_type` (`page_post`, `person`, `blog_topic`,
   `blog_tag`, `page_topic`, `page_tag`). The post itself always gets a stable,
   readable `_id` (`post.<slug>`) — that's fine, it's a document you're
   creating. Any **new** relation document in the same file also gets a readable

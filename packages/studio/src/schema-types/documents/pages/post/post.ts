@@ -1,7 +1,7 @@
-import { authorSchema } from '@blog/studio/schema-types/documents/blog/author/author';
 import { tagSchema } from '@blog/studio/schema-types/documents/blog/tag/tag';
 import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic/topic';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
+import { personSchema } from '@blog/studio/schema-types/documents/person/person';
 import { modulesField } from '@blog/studio/schema-types/fields/modules-field/modules-field';
 import { slugField } from '@blog/studio/schema-types/fields/slug-field/slug-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
@@ -60,7 +60,7 @@ export const postPageSchema = defineType({
       title: 'Author',
       type: 'reference',
       description: 'The person who wrote this post.',
-      to: [{ type: authorSchema.name }],
+      to: [{ type: personSchema.name }],
       validation: (rule) => rule.required(),
     }),
     defineField({
