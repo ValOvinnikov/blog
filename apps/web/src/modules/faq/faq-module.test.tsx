@@ -78,17 +78,6 @@ describe(`<${FaqModule.name}/>`, () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('renders nothing when the questions degrade to an empty list, never an empty landmark with a dangling aria-labelledby', async () => {
-    getFaqModuleMock.mockResolvedValue({
-      ok: true,
-      data: { ...baseModule, questions: [] },
-    });
-
-    const { container } = await setup();
-
-    expect(container).toBeEmptyDOMElement();
-  });
-
   it('renders the resolved questions as accordion triggers', async () => {
     const questions = [
       makeFaqQuestion({ id: 'faq-a', question: 'Do you offer refunds?' }),

@@ -18,7 +18,6 @@ export const FaqModule = async ({ id, tenant }: IFaqModuleProps) => {
     logger.error('faq_module.fetch_failed', { id, error: result.error });
     return null;
   }
-  if (result.data.questions.length === 0) return null;
 
   return (
     <FaqModuleView

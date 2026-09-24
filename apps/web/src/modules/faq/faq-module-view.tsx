@@ -23,8 +23,6 @@ export const FaqModuleView = ({
   titleId,
   dataTestId,
 }: IFaqModuleViewProps) => {
-  if (questions.length === 0) return null;
-
   const s = faqModuleViewVariants({ align: contentAlignment });
   const actions = moduleGridActionsVariants({ align: contentAlignment });
 
