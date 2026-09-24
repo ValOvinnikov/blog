@@ -1,6 +1,6 @@
 import { DISPLAY_MODE } from '@blog/config';
 import type { TPostFeaturedModule } from '@blog/service';
-import { CardGrid } from '@blog/ui/organisms/card-grid';
+import { CardGrid } from '@blog/ui/components/organisms/card-grid';
 import { CardCarousel } from '@web/components/shared/card-carousel';
 import {
   type IMediaCardData,

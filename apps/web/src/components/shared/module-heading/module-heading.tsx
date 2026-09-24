@@ -1,5 +1,5 @@
 import type { TContentAlignment, THeadingBlock } from '@blog/config';
-import { Heading } from '@blog/ui/atoms/heading';
+import { Heading } from '@blog/ui/components/atoms/heading';
 import type { THeadingLevel } from '@blog/ui/lib/react';
 
 import { moduleHeadingVariants } from './module-heading-variants';

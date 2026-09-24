@@ -1,6 +1,6 @@
-import { StatusBadge } from '@blog/ui/atoms/status-badge';
-import { Panel } from '@blog/ui/molecules/panel';
-import { SettingRow } from '@blog/ui/molecules/setting-row';
+import { StatusBadge } from '@blog/ui/components/atoms/status-badge';
+import { Panel } from '@blog/ui/components/molecules/panel';
+import { SettingRow } from '@blog/ui/components/molecules/setting-row';
 import type { ReactNode } from 'react';
 
 import { newsletterSectionVariants } from './newsletter-section-variants';

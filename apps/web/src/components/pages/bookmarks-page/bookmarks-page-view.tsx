@@ -1,9 +1,9 @@
-import { Heading } from '@blog/ui/atoms/heading';
-import { Panel } from '@blog/ui/molecules/panel';
+import { Heading } from '@blog/ui/components/atoms/heading';
+import { Panel } from '@blog/ui/components/molecules/panel';
 import {
   BookmarksList,
   type IBookmarkRow,
-} from '@blog/ui/organisms/bookmarks-list';
+} from '@blog/ui/components/organisms/bookmarks-list';
 import { SmartLink } from '@web/components/shared/smart-link';
 
 import { bookmarksPageVariants } from './bookmarks-page-variants';

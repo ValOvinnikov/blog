@@ -1,6 +1,6 @@
 import { CTA_VARIANT } from '@blog/config';
 import type { TCtaModule } from '@blog/service';
-import { CtaModule as CtaModuleUi } from '@blog/ui/organisms/cta-module';
+import { CtaModule as CtaModuleUi } from '@blog/ui/components/organisms/cta-module';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { PortableText } from '@web/components/shared/portable-text';
 import { SanityImage } from '@web/components/shared/sanity-image';

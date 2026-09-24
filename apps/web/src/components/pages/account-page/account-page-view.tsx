@@ -1,4 +1,4 @@
-import { Heading } from '@blog/ui/atoms/heading';
+import { Heading } from '@blog/ui/components/atoms/heading';
 import type { ReactNode } from 'react';
 
 import { accountPageVariants } from './account-page-variants';

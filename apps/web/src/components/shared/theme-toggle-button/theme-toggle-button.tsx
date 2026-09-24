@@ -1,6 +1,6 @@
 'use client';
 
-import { ThemeToggle } from '@blog/ui/atoms/theme-toggle';
+import { ThemeToggle } from '@blog/ui/components/atoms/theme-toggle';
 import { useEffect, useState } from 'react';
 
 export const ThemeToggleButton = () => {

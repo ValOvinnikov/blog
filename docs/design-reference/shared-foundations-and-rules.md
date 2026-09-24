@@ -185,9 +185,9 @@ This repo already has its own structure. Adapt examples in these reference files
 to the existing paths:
 
 ```txt
-packages/ui/src/atoms/
-packages/ui/src/molecules/
-packages/ui/src/organisms/
+packages/ui/src/components/atoms/
+packages/ui/src/components/molecules/
+packages/ui/src/components/organisms/
 apps/web/src/app/[locale]/page.tsx
 ```
 

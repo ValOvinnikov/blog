@@ -19,7 +19,7 @@ type TFakeMobileToggle = {
   panelId: string;
 };
 
-vi.mock('@blog/ui/molecules/primary-navigation', () => ({
+vi.mock('@blog/ui/components/molecules/primary-navigation', () => ({
   PrimaryNavigation: ({
     links,
     actions,

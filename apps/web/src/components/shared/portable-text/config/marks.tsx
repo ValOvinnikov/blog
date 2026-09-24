@@ -1,6 +1,6 @@
 import type { IPortableTextLinkMark } from '@blog/config';
-import { InlineCode } from '@blog/ui/atoms/inline-code';
-import { ProseLink } from '@blog/ui/atoms/prose-link';
+import { InlineCode } from '@blog/ui/components/atoms/inline-code';
+import { ProseLink } from '@blog/ui/components/atoms/prose-link';
 import type {
   PortableTextMarkComponentProps,
   PortableTextReactComponents,

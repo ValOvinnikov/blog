@@ -1,5 +1,5 @@
-import { Heading } from '@blog/ui/atoms/heading';
-import { QuoteBlock } from '@blog/ui/atoms/quote-block';
+import { Heading } from '@blog/ui/components/atoms/heading';
+import { QuoteBlock } from '@blog/ui/components/atoms/quote-block';
 import type { PortableTextReactComponents } from '@portabletext/react';
 
 import { portableTextVariants } from '../portable-text-variants';

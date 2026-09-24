@@ -14,7 +14,7 @@ import type { ReactNode } from 'react';
 
 import { PortableText } from './portable-text';
 
-vi.mock('@blog/ui/molecules/image-with-caption', () => ({
+vi.mock('@blog/ui/components/molecules/image-with-caption', () => ({
   ImageWithCaption: ({
     layout,
     children,

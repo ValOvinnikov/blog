@@ -2,11 +2,11 @@
 
 import type { TOAuthProviderId } from '@blog/auth/utils/oauth-providers/oauth-providers';
 import { ICONS, SIZE, type TIconName } from '@blog/config';
-import { Button } from '@blog/ui/atoms/button';
-import { Icon } from '@blog/ui/atoms/icon';
-import { Text } from '@blog/ui/atoms/text';
-import { TextInput } from '@blog/ui/atoms/text-input';
-import { PopoverMenu } from '@blog/ui/molecules/popover-menu';
+import { Button } from '@blog/ui/components/atoms/button';
+import { Icon } from '@blog/ui/components/atoms/icon';
+import { Text } from '@blog/ui/components/atoms/text';
+import { TextInput } from '@blog/ui/components/atoms/text-input';
+import { PopoverMenu } from '@blog/ui/components/molecules/popover-menu';
 import { authMenuVariants } from '@web/components/shared/auth-menu/auth-menu-variants';
 import { useEmailSignIn } from '@web/components/shared/auth-menu/hooks/use-email-sign-in';
 import { signIn } from 'next-auth/react';

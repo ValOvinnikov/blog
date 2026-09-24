@@ -1,7 +1,7 @@
 import { SIZE, type IWithDataTestId, type TBrandVariantOf } from '@blog/config';
 import type { TTestimonialItem } from '@blog/service';
-import { Avatar } from '@blog/ui/atoms/avatar';
-import { QuoteCard } from '@blog/ui/molecules/quote-card';
+import { Avatar } from '@blog/ui/components/atoms/avatar';
+import { QuoteCard } from '@blog/ui/components/molecules/quote-card';
 import { PortableText } from '@web/components/shared/portable-text';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';

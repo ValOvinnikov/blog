@@ -1,7 +1,7 @@
 'use client';
 
 import type { TOAuthProviderId } from '@blog/auth/utils/oauth-providers/oauth-providers';
-import { Spinner } from '@blog/ui/atoms/spinner';
+import { Spinner } from '@blog/ui/components/atoms/spinner';
 import { useOAuthErrorParam } from '@web/hooks/use-oauth-error-param';
 import { usePopover } from '@web/hooks/use-popover';
 import { useSession } from 'next-auth/react';

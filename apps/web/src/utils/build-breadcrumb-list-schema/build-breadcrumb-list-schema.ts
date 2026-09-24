@@ -1,4 +1,4 @@
-import type { IBreadcrumbItem } from '@blog/ui/molecules/breadcrumbs';
+import type { IBreadcrumbItem } from '@blog/ui/components/molecules/breadcrumbs';
 
 export type TBreadcrumbListSchema = {
   '@context': 'https://schema.org';

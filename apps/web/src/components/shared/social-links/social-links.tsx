@@ -1,5 +1,5 @@
 import type { TSocialProfile } from '@blog/service';
-import type { TNavLinkVariants } from '@blog/ui/atoms/nav-link/nav-link-variants';
+import type { TNavLinkVariants } from '@blog/ui/components/atoms/nav-link/nav-link-variants';
 import { useTranslations } from 'next-intl';
 
 import { SocialLink } from './social-link';

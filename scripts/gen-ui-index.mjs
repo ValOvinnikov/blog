@@ -484,7 +484,7 @@ const mainFileFor = (dir, name) => {
 };
 
 const collectLayer = (layer) => {
-  const layerDir = join(uiSrc, layer);
+  const layerDir = join(uiSrc, 'components', layer);
   const entries = [];
   const skipped = [];
   if (!existsSync(layerDir)) return { entries, skipped };
@@ -659,7 +659,7 @@ const collectProblems = (layers, skipped, { checkDrift }) => {
   if (struct.length)
     problems.push(
       `Component index is incomplete (${struct.length}):\n  ${struct.join('\n  ')}\n` +
-        '  → every atoms/molecules/organisms folder must yield an entry and every ' +
+        '  → every src/components/{atoms,molecules,organisms} folder must yield an entry and every ' +
         'compound slot must resolve (see the ui-library-practices skill).',
     );
   const missing = missingDescriptions(layers);
@@ -701,7 +701,7 @@ const main = () => {
     if (issues.length) {
       console.error(
         `Component index is incomplete (${issues.length}):\n  ${issues.join('\n  ')}\n\n` +
-          'Every atoms/molecules/organisms folder must yield an index entry and every ' +
+          'Every src/components/{atoms,molecules,organisms} folder must yield an index entry and every ' +
           'compound slot must resolve. Follow the folder/naming conventions in the ' +
           'ui-library-practices skill so the index generator can see the component.',
       );

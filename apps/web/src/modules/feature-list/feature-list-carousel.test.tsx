@@ -1,5 +1,5 @@
 import { CARD_IMAGE_SHAPE } from '@blog/config';
-import { Carousel } from '@blog/ui/organisms/carousel';
+import { Carousel } from '@blog/ui/components/organisms/carousel';
 import {
   customRender,
   renderElement,
@@ -14,7 +14,7 @@ vi.mock('@web/components/shared/smart-link', () => ({
   SmartLink: SmartLinkMock,
 }));
 
-vi.mock('@blog/ui/organisms/carousel', () => ({
+vi.mock('@blog/ui/components/organisms/carousel', () => ({
   Carousel: vi.fn(() => null),
 }));
 

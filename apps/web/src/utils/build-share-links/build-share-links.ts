@@ -1,5 +1,5 @@
 import { SOCIAL_PLATFORMS } from '@blog/config';
-import type { IShareLinkItem } from '@blog/ui/molecules/share-link';
+import type { IShareLinkItem } from '@blog/ui/components/molecules/share-link';
 
 type TShareLinkPlatform =
   typeof SOCIAL_PLATFORMS.X | typeof SOCIAL_PLATFORMS.LINKEDIN;

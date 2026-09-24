@@ -1,9 +1,9 @@
 import { SIZE } from '@blog/config';
-import { BrandMark } from '@blog/ui/atoms/brand-mark';
-import { Button } from '@blog/ui/atoms/button';
-import { Heading } from '@blog/ui/atoms/heading';
-import { Text } from '@blog/ui/atoms/text';
-import { Panel } from '@blog/ui/molecules/panel';
+import { BrandMark } from '@blog/ui/components/atoms/brand-mark';
+import { Button } from '@blog/ui/components/atoms/button';
+import { Heading } from '@blog/ui/components/atoms/heading';
+import { Text } from '@blog/ui/components/atoms/text';
+import { Panel } from '@blog/ui/components/molecules/panel';
 import { useTranslations } from 'next-intl';
 import type { CSSProperties } from 'react';
 

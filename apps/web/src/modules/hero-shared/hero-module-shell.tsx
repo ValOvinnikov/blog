@@ -10,7 +10,7 @@ import {
   type TMediaOrder,
 } from '@blog/config';
 import type { TCtaButton } from '@blog/service';
-import { Hero, type THeroProps } from '@blog/ui/organisms/hero';
+import { Hero, type THeroProps } from '@blog/ui/components/organisms/hero';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { Section } from '@web/components/shared/section';
