@@ -2,7 +2,7 @@ import { makeRawFaqPageQuestion } from '@blog/service/testing/shared/fixtures';
 
 import { resolveFaqs } from './resolve-faqs';
 
-describe('resolveFaqs', () => {
+describe(resolveFaqs, () => {
   it('returns an empty array when the page has no FAQ module', () => {
     expect(resolveFaqs([])).toEqual([]);
   });

@@ -7,7 +7,7 @@ import {
 
 import { toFaqModule } from './transformer';
 
-describe('toFaqModule', () => {
+describe(toFaqModule, () => {
   it('maps brandVariant straight through', () => {
     const raw = makeRawFaqModule({ brandVariant: BRAND_VARIANT.SECONDARY });
 
