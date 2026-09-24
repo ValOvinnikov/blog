@@ -19,6 +19,7 @@ import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/
 import { statsSchema } from '@blog/studio/schema-types/modules/stats/stats';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import { testimonialSchema } from '@blog/studio/schema-types/modules/testimonial/testimonial';
+import { timelineSchema } from '@blog/studio/schema-types/modules/timeline/timeline';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
 import { FileText } from 'lucide-react';
@@ -76,6 +77,7 @@ export const landingPageSchema = defineType({
         logoWallSchema.name,
         testimonialSchema.name,
         statsSchema.name,
+        timelineSchema.name,
         faqSchema.name,
       ],
     }),
