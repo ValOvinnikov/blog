@@ -192,8 +192,8 @@ Props: className?: string _(extends IWithDataTestId, VariantProps<typeof buttonV
 ### LogoTile — `molecules/logo-tile/logo-tile.tsx`
 
 A fixed-size card that frames a single logo, so transparent and opaque-background assets sit inside identical bounds.
-Props: children: ReactNode · isInteractive?: TLogoTileVariants['isInteractive'] _(extends IWithClassName, IWithDataTestId)_
-Variants: isInteractive: (boolean)
+Props: children: ReactNode · isInteractive?: TLogoTileVariants['isInteractive'] · aspectRatio?: number _(extends IWithClassName, IWithDataTestId)_
+Variants: isInteractive: (boolean) · hasAspectRatio: (boolean)
 
 ### MediaCard — `molecules/media-card/media-card.tsx`
 
