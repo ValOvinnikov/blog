@@ -43,13 +43,7 @@
  */
 import { createClient } from '@sanity/client';
 import { execFileSync } from 'node:child_process';
-import {
-  existsSync,
-  mkdirSync,
-  readdirSync,
-  readFileSync,
-  writeFileSync,
-} from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { createInterface } from 'node:readline/promises';
 import { fileURLToPath } from 'node:url';
@@ -58,6 +52,7 @@ import {
   appliedIdsFromLedger,
   buildLedgerEntry,
   computePending,
+  listMigrationIds,
   slugify,
   slugOf,
   sortMigrationIds,
@@ -94,10 +89,7 @@ export default defineMigration({
 });
 `;
 
-const listMigrations = () =>
-  readdirSync(migrationsDir, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory() && entry.name !== 'backups')
-    .map((entry) => entry.name);
+const listMigrations = () => listMigrationIds(migrationsDir);
 
 const newestMigration = () => {
   const ids = sortMigrationIds(listMigrations());
