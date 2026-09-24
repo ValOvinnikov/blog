@@ -90,14 +90,6 @@ describe('toStatsModule', () => {
     expect(module.stats[0]?.description).toBe('Year over year');
   });
 
-  it('folds an absent stats array to empty', () => {
-    const raw = makeRawStatsModule({ stats: null });
-
-    const module = toStatsModule(raw);
-
-    expect(module.stats).toEqual([]);
-  });
-
   it('folds an empty stats array to empty', () => {
     const raw = makeRawStatsModule({ stats: [] });
 

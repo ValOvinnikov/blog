@@ -8,19 +8,13 @@ import type { TStatItem, TStatsModule } from './types';
 
 export type TRawStatsModule = InferResultType<typeof statsModuleQuery>;
 
-type TRawStatItem = NonNullable<TRawStatsModule['stats']>[number];
-
-function toStatItem(raw: TRawStatItem): TStatItem {
-  return {
-    id: raw._key,
-    value: raw.value,
-    label: raw.label,
-    description: raw.description ?? undefined,
-  };
-}
-
 function toStatItems(raw: TRawStatsModule['stats']): TStatItem[] {
-  return (raw ?? []).map(toStatItem);
+  return raw.map((stat) => ({
+    id: stat._key,
+    value: stat.value,
+    label: stat.label,
+    description: stat.description ?? undefined,
+  }));
 }
 
 export function toStatsModule(raw: TRawStatsModule): TStatsModule {

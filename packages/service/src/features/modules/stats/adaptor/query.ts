@@ -22,7 +22,7 @@ export const statsModuleQuery = q
         label: statSub.field('label').notNull(),
         description: statSub.field('description').nullable(true),
       }))
-      .nullable(true),
+      .notNull(),
     footnote: sub.field('footnote').nullable(true),
     ctaButtons: sub
       .field('ctaButtons[]')

@@ -17,10 +17,10 @@ describe('statsModuleQuery', () => {
     expect(() => statsModuleQuery.parse(raw)).toThrow();
   });
 
-  it('parses a module with no stats', () => {
+  it('rejects a module with no stats', () => {
     const raw = { ...makeRawStatsModule(), stats: null };
 
-    expect(() => statsModuleQuery.parse(raw)).not.toThrow();
+    expect(() => statsModuleQuery.parse(raw)).toThrow();
   });
 
   it('rejects a stat with no value', () => {
