@@ -33,17 +33,25 @@ describe('toStatsModule', () => {
   it('keeps the stats in authored order across the full 2-to-6 range', () => {
     const raw = makeRawStatsModule({
       stats: [
-        makeRawStatItem({ value: '1', label: 'One' }),
-        makeRawStatItem({ value: '2', label: 'Two' }),
-        makeRawStatItem({ value: '3', label: 'Three' }),
-        makeRawStatItem({ value: '4', label: 'Four' }),
-        makeRawStatItem({ value: '5', label: 'Five' }),
-        makeRawStatItem({ value: '6', label: 'Six' }),
+        makeRawStatItem({ _key: 'stat-1', value: '1', label: 'One' }),
+        makeRawStatItem({ _key: 'stat-2', value: '2', label: 'Two' }),
+        makeRawStatItem({ _key: 'stat-3', value: '3', label: 'Three' }),
+        makeRawStatItem({ _key: 'stat-4', value: '4', label: 'Four' }),
+        makeRawStatItem({ _key: 'stat-5', value: '5', label: 'Five' }),
+        makeRawStatItem({ _key: 'stat-6', value: '6', label: 'Six' }),
       ],
     });
 
     const module = toStatsModule(raw);
 
+    expect(module.stats.map((stat) => stat.id)).toEqual([
+      'stat-1',
+      'stat-2',
+      'stat-3',
+      'stat-4',
+      'stat-5',
+      'stat-6',
+    ]);
     expect(module.stats.map((stat) => stat.value)).toEqual([
       '1',
       '2',

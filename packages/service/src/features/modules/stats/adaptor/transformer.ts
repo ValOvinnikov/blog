@@ -12,6 +12,7 @@ type TRawStatItem = NonNullable<TRawStatsModule['stats']>[number];
 
 function toStatItem(raw: TRawStatItem): TStatItem {
   return {
+    id: raw._key,
     value: raw.value,
     label: raw.label,
     description: raw.description ?? undefined,

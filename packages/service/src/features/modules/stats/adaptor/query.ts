@@ -17,6 +17,7 @@ export const statsModuleQuery = q
     stats: sub
       .field('stats[]')
       .project((statSub) => ({
+        _key: true,
         value: statSub.field('value').notNull(),
         label: statSub.field('label').notNull(),
         description: statSub.field('description').nullable(true),
