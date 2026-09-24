@@ -248,7 +248,7 @@ no faked defaults), the module-registry mechanism, and the editorial write path:
 Source of truth: `packages/studio/src/schema-types/` — documents (`post`, `author`,
 `topic`, `tag`, `link`, page documents, singletons), standalone `module_*`
 page-builder documents, `block_*` documents those modules compose
-(`block_feature`), and shared objects (`linkRef`, `ctaButton`,
+(`block_feature`, `block_testimonial`), and shared objects (`linkRef`, `ctaButton`,
 `socialProfile`, `imageWithAlt`, `bodyImage`,
 `seo`, `aside`, `postTakeaways`, …). Naming convention `{group}_{name}` is being applied
 incrementally (#251).
@@ -382,8 +382,9 @@ surplus entry in its `apps/web` module map from dead code into a
 
 Four kinds are registered. **`module_hero`** is the original, kept until
 #2813 retires it. **`module_heroBlog`** is the featured-post hero: its
-copy, image and primary action all derive from a post, and publish is
-blocked when none resolves. It authors no heading or supporting text of its
+copy and primary action derive from a post, its image is an optional
+override falling back to that post's, and publish is blocked when no post
+resolves. It authors no heading or supporting text of its
 own — those are the post's, and a hero without a post is broken rather than
 sparse, since its action is built from that post and would link nowhere. Its
 only authored copy is an optional `eyebrow`, overriding the post's topic
@@ -448,9 +449,9 @@ both media-order fields and layout — and passes no configuration object.
 A single `heroFields({ … })` helper taking option flags used to build that
 tail for every hero; #3275 deleted it, because omission is how a hero says
 it lacks a field, and a flag list is a worse way to say the same thing. So
-the statement hero's `image` is its own, where `module_heroBlog` has a
-post-sourced one and `module_heroProfile` has the author-fallback pair
-above.
+the statement hero's `image` is its own, where `module_heroBlog` and
+`module_heroProfile` both author an optional image over a fallback — the
+referenced post's hero image, and the author-fallback pair above.
 Actions are not part of the tail: `module_heroBlog`'s primary links to the
 resolved post, with a **required** authored `primaryActionLabel` and
 `primaryActionAppearance` (no "Read more" fallback — an unlabelled hero is
@@ -667,19 +668,22 @@ is rendered.
 Which taxonomy it lists is an optional authored field, because a module
 document cannot see what holds it: the page references the module, not the
 reverse, and Sanity's `hidden` callback is synchronous and sees only the
-module's own document. So the field is always visible and the requirement
-lives on the pages instead: every page placing one must set it, enforced by an
-async rule on `modules[]` that fetches each referenced module and rejects one
-that has not.
+module's own document. So the field is always visible, and nothing requires it.
 
-Nothing overrides that field at read time. `renderModules` calls every module
+Nothing overrides it at read time either. `renderModules` calls every module
 with the same arguments, so there is no channel by which a page could supply a
 kind the module itself lacks, and
 `service.modules.taxonomyList.v1.getTaxonomyList(id, tenant)` projects the
-authored field alone. A module reaching the loader without one resolves to
-`null` and raises `UnresolvedTaxonomyError` in the transformer — a failed
-fetch, never an empty list, so an unauthored module is visible as a fault
-rather than as a section that renders nothing.
+authored field alone — it takes no page-kind fallback.
+
+An unset field therefore resolves to `null`, which the query's `entries`
+`select` has no arm for, and the transformer reads that pair as **zero
+entries** — so the module renders its ordinary empty-state message and the page
+returns 200. It previously threw `UnresolvedTaxonomyError` there, which
+`notFound()`'d the entire page holding the module: one unset dropdown took down
+a whole page, and a Studio-only rule on each page's `modules[]` was what stood
+between an editor and that outcome. Degrading in the renderer removes the need
+for the rule, and covers the pages the rule never ran on.
 
 `sortOrder` (`TAXONOMY_SORT`, coalesced to `ALPHABETICAL` at read time)
 and `limit` apply wherever the module sits, and their defaults reproduce the
@@ -725,8 +729,9 @@ guaranteed instead of testing for its absence.
 array, `unique()` and validated `min(2).max(8)`. Two is the floor because a
 lone card is a statement rather than a grid; eight is the ceiling because the
 column rule below stops producing balanced rows past it. It carries the usual
-module furniture — `title`, `brandVariant` (the full three-value list,
-defaulting to `PRIMARY`), `headingBlock`, `layout`, `ctaButtons` — plus
+module furniture — `title`, `brandVariant` (the default
+`PRIMARY`/`SECONDARY` list, defaulting to `PRIMARY`), `headingBlock`,
+`layout`, `ctaButtons` — plus
 `displayMode` (grid or carousel), `contentAlignment` from `alignmentFields([])`
 with no position axis, and two fields of its own: `imageShape` and
 `cardAlignment`. It is allowed in `page_home.modules[]` and
@@ -764,6 +769,65 @@ validation never applies to a document written outside Studio — so
 whenever the authored array is absent, empty, or below two, matching how
 `postTakeaways` degrades below its own `min(3)`. The view returns `null` on an
 empty array, so the page loses the section instead of the render.
+
+**A testimonial is a document for the same reason a feature card is.**
+`block_testimonial` ("Testimonial Item") sits beside `block_feature` under
+**Blocks → Cards** and carries a `title` — its Studio label, which the preview
+reads rather than the quote — a `quote`, a `name`, an optional one-line `role`,
+an optional `image` and an optional `link` reference. The `quote` is Portable
+Text (`listedText`: bold, italic, bullet and numbered lists and links, `normal`
+style only), not a string, because a quote routinely wants an emphasised phrase
+or a link inside it. One consequence worth naming: a character bound cannot fire
+against a Portable Text array, so there is no length warning on it.
+
+`module_testimonial` ("Testimonials") references one to eight of those documents
+in authored order, validated `required()`, `unique()`, `min(1)` and `max(8)` —
+**each bound as its own rule chain**, because a Sanity `Rule` carries a single
+`_message` that `validate()` applies to every constraint on that chain. One
+chain cannot say "Pick at least one testimonial." for an empty list and "Each
+testimonial can only appear once." for a duplicate.
+
+**`required()` and `min(1)` are both needed, and neither is redundant.** The
+array `presence` validator tests `!value`, which an empty array passes, so
+`required()` rejects only an absent field; `min(1)` is what rejects `[]`. Sanity
+skips `min()` on an absent value, so it cannot stand alone either. `module_logoWall`'s
+`logos` field is bounded the same way and for the same reason.
+
+It carries the usual module furniture — `brandVariant`, `headingBlock`,
+`layout`, `ctaButtons` — plus `displayMode` (grid or carousel) and both
+alignment axes from `alignmentFields`: `contentAlignment` for the heading,
+supporting text and actions, and `cardAlignment` passed in as an extra field
+rather than declared separately the way `module_featureList` declares its own.
+It is allowed in `page_home.modules[]` and `page_landing.modules[]` only.
+
+**One testimonial renders as a spotlight rather than a one-card grid.**
+`QuoteCard`'s `isSpotlight` drops the surface and the accent rule, centres the
+figure, takes the avatar from 80 to 112 pixels and caps the measure in `ch`.
+That cap reads tighter than its number suggests: the spotlight quote renders at
+`text-prose-h4` while body copy is smaller, and `ch` is font-relative, so the
+same character count is physically wider here than in running text.
+
+**Grid columns are derived from the item count, not authored** — 2→2, 3→3, 4→2,
+5→3, 6→3, 7→3, 8→2 — capped at three rather than the feature grid's four,
+because a quote is the wider card. Seven is the one count left with a single
+card on its last row; no column choice inside that cap avoids it.
+`toTestimonialGridColumns` in `apps/web` is the whole rule, and the carousel
+ignores it. `cardAlignment` is the same casing seam as `module_featureList`'s:
+it stores UPPERCASE `CONTENT_ALIGNMENT` values, offers only `LEFT`/`CENTER`, and
+`apps/web` maps the casing explicitly rather than passing the stored value
+through.
+
+**There is no `showImages` switch.** An item renders its image when it has one
+and falls back to `Avatar`'s initials when it does not, so the card's own
+content already answers the question a toggle would have asked.
+
+**Unlike `module_featureList`, the service layer requires the array rather than
+tolerating its absence.** `service.modules.testimonial.v1.getTestimonialModule`
+projects `testimonials` with `.notNull()`, which the schema's `required()` makes
+safe. That is not a page-level risk: the loader is wrapped in `safeAsync`, so a
+parse failure returns a failed result and the module renders nothing rather than
+404ing the page, and the Sanity client pins `perspective: 'published'`, so a
+draft with the field still unset is never queried.
 
 `service.modules.<type>.v1` projects `brandVariant` as a required
 `TBrandVariantOf<...>` (narrowed per module to exactly the options its
@@ -1133,13 +1197,16 @@ declare their own `title` rather than using the helper, because theirs **is**
 public — rendered on chips, archives, filters and navigation.
 
 **Option lists default to a dropdown; `layout: 'radio'` is the opt-out, and
-requiredness decides.** A Sanity dropdown always renders a blank option for
-the unset state which cannot be removed or renamed, and neither
-`initialValue` nor validation suppresses it. So a `required()` field uses a
-radio — the blank is otherwise a selectable trap that only fails at publish —
-and any field that is not required uses a dropdown, where blank is already
-legal and compactness is free. Option count does not enter into it. Both are
-stated explicitly in the schema rather than left to the default.
+requiredness does not decide it.** A Sanity dropdown always renders a blank
+option for the unset state which cannot be removed or renamed, and neither
+`initialValue` nor validation suppresses it — but that blank is guarded, not
+hidden: `required()` flags the field inline in the Studio and blocks publish
+until it is set, and a radio has an unset state of its own. Layout is
+therefore a form-ergonomics choice: dropdown by default, radio where the
+editor benefits from seeing every option at once, which in practice means a
+field gating other fields' `hidden:` predicates. Option count does not enter
+into it. The layout is stated explicitly rather than left to the default, and
+`required()` is applied wherever blank is not a legal value.
 
 Full schema reference (every document/object, field-by-field), naming and
 validation conventions, incl. the `layout`/`headingBlock` objects' own
@@ -1244,6 +1311,26 @@ known, unsolved gap — the old slug isn't recoverable from the webhook payload,
 so the page at the old URL stays stale until the route-level backstop below
 expires it. Anything without a precise derivation yet falls back to a logged
 whole-site purge.
+
+The webhook also purges **by reverse lookup**. On every publish of a type that
+carries tags of its own, it resolves which page-builder modules reach the
+published document — directly, or through a `link` document's
+`internalReference` — and purges each one's `module:<id>` tag. A module's
+cached markup embeds its CTA's resolved target slug, so renaming that target
+would otherwise leave a dead link behind until the route-level backstop
+expired it, while tagging every page type a link may point at instead purges
+every module of that kind on every publish. The resolution happens at webhook
+time because a fetch's cache tags are fixed before its response exists, so the
+target's id is not knowable when `isr()` runs. It is best-effort: a failed
+lookup is logged once by `apps/web`, and the tags already resolved are still
+purged.
+
+The lookup stops at those two hops. A hero also reaches link targets through
+an author or a post it reads (`authorDetailFragment` derefs a `link` from
+`profilePage`, `bio` markDefs and `socialLinks`), which is three or four hops
+out and not resolved — so `hero`, `hero-blog` and `hero-profile` keep the
+page-type tags covering those paths, and only `hero-statement`, which reads
+neither an author nor a post, carries none.
 
 That purge is best-effort, and the backstop behind it is a time-based
 expiry declared per content route: `export const revalidate = 21600` (6 hours)

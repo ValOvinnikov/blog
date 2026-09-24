@@ -1,15 +1,15 @@
-import { q } from '@blog/service/sanity/query';
-import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
-import { layoutFragment } from '@blog/service/shared/fragments/layout';
+import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
 import {
   SHOW_IMAGES_EXPRESSION,
   showImagesParser,
-} from '@blog/service/shared/fragments/show-images';
+} from '@blog/service/shared/expressions/show-images';
+import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
+import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
 
 export const postRelatedModuleQuery = q
-  .parameters<{ id: string }>()
+  .parameters<TModuleQueryParams>()
   .star.filterByType('module_postRelated')
-  .filterRaw('_id == $id')
+  .filterBy('_id == $id')
   .slice(0)
   .project((sub) => ({
     brandVariant: sub.field('brandVariant').notNull(),

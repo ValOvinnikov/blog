@@ -1,18 +1,17 @@
 import {
   CTA_ACTION_VARIANT,
-  HERO_IMAGE_SOURCE,
   routes,
   type ISanityImage,
   type TMaybeUndefined,
 } from '@blog/config';
-import { toCtaButton } from '@blog/service/shared/transformers/to-cta-button';
-import { toHeroPresentation } from '@blog/service/shared/transformers/to-hero-presentation';
-import { toLayout } from '@blog/service/shared/transformers/to-layout';
+import { toCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button';
+import { toHeroPresentation } from '@blog/service/shared/transformers/hero/to-hero-presentation';
+import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image';
+import { toLayout } from '@blog/service/shared/transformers/layout/to-layout';
 import {
   toPostCard,
   type TPostCard,
-} from '@blog/service/shared/transformers/to-post-card';
-import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
+} from '@blog/service/shared/transformers/post/to-post-card';
 import type { InferResultType } from 'groqd';
 
 import type { heroBlogModuleQuery } from './query';
@@ -28,14 +27,7 @@ function toImage(
   raw: TRawHeroBlogModule,
   post: TPostCard | undefined,
 ): TMaybeUndefined<ISanityImage> {
-  switch (raw.imageSource) {
-    case HERO_IMAGE_SOURCE.CUSTOM:
-      return toSanityImage(raw.image);
-    case HERO_IMAGE_SOURCE.NONE:
-      return undefined;
-    case HERO_IMAGE_SOURCE.POST:
-      return post?.heroImage;
-  }
+  return toSanityImage(raw.image) ?? post?.heroImage;
 }
 
 function toPrimaryButton(

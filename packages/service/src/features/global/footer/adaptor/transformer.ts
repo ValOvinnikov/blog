@@ -1,4 +1,4 @@
-import { toSocialProfiles } from '@blog/service/shared/transformers/to-social-profiles';
+import { toSocialProfiles } from '@blog/service/shared/transformers/social-profile/to-social-profiles';
 import type { InferResultType } from 'groqd';
 
 import type { footerQuery } from './query';

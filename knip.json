@@ -26,13 +26,23 @@
       // entries — rather than ignoring them — keeps their own imports analysed.
       // This replaces the default `{index,cli,main}` entry patterns, which match
       // nothing here; the Sanity plugin still contributes sanity.{config,cli}.ts.
-      "entry": ["migrations/*/index.ts"]
+      "entry": ["migrations/*/index.ts"],
+      // Only `!`-suffixed patterns are read under `--production`, so restating
+      // the default project glob alongside a negated `src/testing/**` drops
+      // test infrastructure from the advisory run's reachability graph without
+      // touching the required run, where those files are legitimately used.
+      // A top-level `ignore` cannot do this: it has no effect on the default
+      // graph, so knip raises a config hint and the required check treats
+      // hints as errors. Repeated per workspace below, extensions included,
+      // because `project` replaces the default rather than extending it.
+      "project": ["**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}!", "!src/testing/**!"]
     },
     "packages/service": {
       // Reachable only through a string in vitest.config.ts's `resolve.alias`,
       // which knip cannot follow. src/index.ts needs no entry of its own — it is
       // already detected from package.json `exports`.
-      "entry": ["src/testing/server-only-stub.ts"]
+      "entry": ["src/testing/server-only-stub.ts"],
+      "project": ["**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}!", "!src/testing/**!"]
     },
     "packages/db": {
       // src/testing/server-only-stub.ts: same reason as packages/service
@@ -51,7 +61,8 @@
         "src/testing/server-only-stub.ts",
         "scripts/*.ts!",
         "scripts/*/run.ts!"
-      ]
+      ],
+      "project": ["**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}!", "!src/testing/**!"]
     },
     "packages/auth": {
       // Same reason as packages/service/packages/db above: reachable only
@@ -80,6 +91,10 @@
         "src/utils/voice-portable-text-to-inline-text/index.ts",
         "src/context/voice-rich-provider/index.ts"
       ],
+      "project": [
+        "**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx,mdx,css}!",
+        "!src/testing/**!"
+      ],
       // Referenced only as a Turbopack loader string (next.config.ts
       // `turbopack.rules['*.svg'].loaders: ['@svgr/webpack']`) — knip's
       // import graph can't see a bare string naming a package. Strict pnpm
@@ -91,7 +106,14 @@
       // `import ... from '@blog/db'` in apps/web.
       "ignoreDependencies": ["@svgr/webpack"]
     },
+    "packages/insight": {
+      "project": ["**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}!", "!src/testing/**!"]
+    },
     "apps/platform": {
+      "project": [
+        "**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx,css}!",
+        "!src/testing/**!"
+      ],
       // Referenced only as a Turbopack loader string (next.config.ts
       // `turbopack.rules['*.svg'].loaders: ['@svgr/webpack']`) — knip's
       // import graph can't see a bare string naming a package. Strict pnpm

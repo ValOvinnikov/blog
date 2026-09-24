@@ -11,15 +11,15 @@ import { featureListSchema } from '@blog/studio/schema-types/modules/feature-lis
 import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
 import { heroProfileSchema } from '@blog/studio/schema-types/modules/hero-profile/hero-profile';
 import { heroStatementSchema } from '@blog/studio/schema-types/modules/hero-statement/hero-statement';
+import { logoWallSchema } from '@blog/studio/schema-types/modules/logo-wall/logo-wall';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
+import { statsSchema } from '@blog/studio/schema-types/modules/stats/stats';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import { testimonialSchema } from '@blog/studio/schema-types/modules/testimonial/testimonial';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
-import { validateSingleBlankHeadingPerType } from '@blog/studio/schema-types/validation/validate-single-blank-heading-per-type/validate-single-blank-heading-per-type';
-import { validateTaxonomyListHasTaxonomy } from '@blog/studio/schema-types/validation/validate-taxonomy-list-has-taxonomy/validate-taxonomy-list-has-taxonomy';
 import { FileText } from 'lucide-react';
 import { defineType } from 'sanity';
 
@@ -72,17 +72,10 @@ export const landingPageSchema = defineType({
         newsletterSchema.name,
         taxonomyListSchema.name,
         featureListSchema.name,
+        logoWallSchema.name,
         testimonialSchema.name,
+        statsSchema.name,
       ],
-      validateCustom: (rule) =>
-        rule
-          .custom(
-            validateSingleBlankHeadingPerType([
-              postLatestSchema.name,
-              postFeaturedSchema.name,
-            ]),
-          )
-          .custom(validateTaxonomyListHasTaxonomy),
     }),
     seoField(),
   ],

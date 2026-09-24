@@ -12,10 +12,12 @@ import { imageWithAltSchema } from './image-with-alt/image-with-alt';
 import { inlineLinkSchema } from './inline-link/inline-link';
 import { layoutSchema } from './layout/layout';
 import { linkRefSchema } from './link-ref/link-ref';
+import { logoItemSchema } from './logo-item/logo-item';
 import { openGraphSchema } from './open-graph/open-graph';
 import { postTakeawaysSchema } from './post-takeaways/post-takeaways';
 import { seoSchema } from './seo/seo';
 import { socialProfileSchema } from './social-profile/social-profile';
+import { statSchema } from './stat/stat';
 
 export const objects = [
   layoutSchema,
@@ -26,6 +28,7 @@ export const objects = [
   asideSchema,
   inlineLinkSchema,
   linkRefSchema,
+  logoItemSchema,
   socialProfileSchema,
   ctaButtonSchema,
   ctaSecondaryButtonSchema,
@@ -34,4 +37,5 @@ export const objects = [
   brandTaglineSchema,
   brandSchema,
   postTakeawaysSchema,
+  statSchema,
 ];

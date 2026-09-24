@@ -1,6 +1,7 @@
 // Public surface of the data layer. web imports `service` — never the raw client.
 
 import { createSkimService } from './features/editorial/skim';
+import { createModulesService } from './features/entities/modules';
 import { createPostsService } from './features/entities/posts';
 import { createTagsService } from './features/entities/tags';
 import { createTopicsService } from './features/entities/topics';
@@ -16,12 +17,14 @@ import { createHeroModuleService } from './features/modules/hero';
 import { createHeroBlogModuleService } from './features/modules/hero-blog';
 import { createHeroProfileModuleService } from './features/modules/hero-profile';
 import { createHeroStatementModuleService } from './features/modules/hero-statement';
+import { createLogoWallModuleService } from './features/modules/logo-wall';
 import { createNewsletterModuleService } from './features/modules/newsletter';
 import { createPostFeaturedModuleService } from './features/modules/post-featured';
 import { createPostLatestModuleService } from './features/modules/post-latest';
 import { createPostListModuleService } from './features/modules/post-list';
 import { createPostRelatedModuleService } from './features/modules/post-related';
 import { createTaxonomyListModuleService } from './features/modules/taxonomy-list';
+import { createTestimonialModuleService } from './features/modules/testimonial';
 import { createHomeService } from './features/pages/home';
 import { createLandingPageService } from './features/pages/landing';
 import { createPostService } from './features/pages/post';
@@ -59,11 +62,14 @@ export const service = {
     newsletter: createNewsletterModuleService(),
     taxonomyList: createTaxonomyListModuleService(),
     featureList: createFeatureListModuleService(),
+    logoWall: createLogoWallModuleService(),
+    testimonial: createTestimonialModuleService(),
   },
   entities: {
     topics: createTopicsService(),
     tags: createTagsService(),
     posts: createPostsService(),
+    modules: createModulesService(),
   },
   global: {
     siteSettings: createSiteSettingsService(),
@@ -99,6 +105,7 @@ export type {
 } from './features/modules/hero-blog';
 export type { THeroProfileModule } from './features/modules/hero-profile';
 export type { THeroStatementModule } from './features/modules/hero-statement';
+export type { TLogoItem, TLogoWallModule } from './features/modules/logo-wall';
 export type { TNewsletterModule } from './features/modules/newsletter';
 export type { TPostFeaturedModule } from './features/modules/post-featured';
 export type { TPostLatestModule } from './features/modules/post-latest';
@@ -108,6 +115,10 @@ export type {
   TTaxonomyEntry,
   TTaxonomyListModule,
 } from './features/modules/taxonomy-list';
+export type {
+  TTestimonialItem,
+  TTestimonialModule,
+} from './features/modules/testimonial';
 export type { THomePage } from './features/pages/home';
 export type { TLandingPage } from './features/pages/landing';
 export type {
@@ -126,17 +137,17 @@ export { getSanityImageBaseUrl } from './sanity/image-base-url';
 export type { TTenantSanityContext } from './sanity/query';
 export { getPlatformSanityContext } from './sanity/client';
 export { getPlatformSanityWriteContext } from './sanity/write-client';
-export type { TCtaButton } from './shared/transformers/to-cta-button';
-export type { THeroPrimaryAction } from './shared/transformers/to-hero-primary-action';
-export type { TModule } from './shared/transformers/to-module';
+export type { TCtaButton } from './shared/transformers/cta/to-cta-button';
+export type { THeroPrimaryAction } from './shared/transformers/hero/to-hero-primary-action';
+export type { TModule } from './shared/transformers/module/to-module';
 export type {
   TPostCard,
   TPostCardAuthor,
   TPostCardTopic,
-} from './shared/transformers/to-post-card';
+} from './shared/transformers/post/to-post-card';
 export type { IPortableTextLinkMark, TPortableTextLink } from '@blog/config';
-export type { TPortableTextBody } from './shared/transformers/to-portable-text-body';
-export type { TSeoResolved } from './shared/transformers/resolve-seo';
-export type { TSocialProfile } from './shared/transformers/to-social-profile';
-export type { TTag } from './shared/transformers/to-tag';
-export type { TTopic } from './shared/transformers/to-topic';
+export type { TPortableTextBody } from './shared/transformers/portable-text/to-portable-text-body';
+export type { TSeoResolved } from './shared/transformers/seo/resolve-seo';
+export type { TSocialProfile } from './shared/transformers/social-profile/to-social-profile';
+export type { TTag } from './shared/transformers/tag/to-tag';
+export type { TTopic } from './shared/transformers/topic/to-topic';

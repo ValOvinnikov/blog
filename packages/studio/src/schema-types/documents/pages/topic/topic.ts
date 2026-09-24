@@ -13,23 +13,14 @@ import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
-import {
-  validateHasPostListModule,
-  validateSinglePostListModule,
-} from '@blog/studio/schema-types/validation/validate-post-list-cardinality/validate-post-list-cardinality';
-import { validateUniquePostListReference } from '@blog/studio/schema-types/validation/validate-unique-post-list-reference/validate-unique-post-list-reference';
 import { validateUniqueTaxonomyReference } from '@blog/studio/schema-types/validation/validate-unique-taxonomy-reference/validate-unique-taxonomy-reference';
 import { Tags } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
 const topicSlugUrlPreviewInput = createSlugUrlPreviewInput('/topics/');
 
-const NO_POST_LIST_WARNING =
-  'This page has no Post List module — the archive will be empty until one is added.';
 const TOPIC_UNIQUENESS_ERROR =
   'Another Topic Page already references this topic — each topic can only back one Topic Page.';
-const POST_LIST_UNIQUENESS_ERROR =
-  'Another Topic Page already references this Post List — each Post List can only back one Topic Page.';
 
 export const topicPageSchema = defineType({
   name: PAGE_TOPIC_TYPE,
@@ -38,16 +29,6 @@ export const topicPageSchema = defineType({
   description:
     'The archive page for one topic, listing the posts classified under it.',
   icon: Tags,
-  validation: (rule) => [
-    rule.custom(validateSinglePostListModule),
-    rule.custom(validateHasPostListModule(NO_POST_LIST_WARNING)).warning(),
-    rule.custom(
-      validateUniquePostListReference(
-        PAGE_TOPIC_TYPE,
-        POST_LIST_UNIQUENESS_ERROR,
-      ),
-    ),
-  ],
   fields: [
     titleField(),
     slugField({
@@ -81,6 +62,7 @@ export const topicPageSchema = defineType({
         newsletterSchema.name,
         taxonomyListSchema.name,
       ],
+      once: [postListSchema.name],
     }),
     seoField(),
   ],

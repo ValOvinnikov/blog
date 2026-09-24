@@ -9,12 +9,6 @@ import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
-import { validateSingleBlankHeadingPerType } from '@blog/studio/schema-types/validation/validate-single-blank-heading-per-type/validate-single-blank-heading-per-type';
-import {
-  validateHasTaxonomyListModule,
-  validateSingleTaxonomyListModule,
-} from '@blog/studio/schema-types/validation/validate-taxonomy-list-cardinality/validate-taxonomy-list-cardinality';
-import { validateTaxonomyListHasTaxonomy } from '@blog/studio/schema-types/validation/validate-taxonomy-list-has-taxonomy/validate-taxonomy-list-has-taxonomy';
 import { validateTaxonomyListReferencesMatchKind } from '@blog/studio/schema-types/validation/validate-taxonomy-list-matches-kind/validate-taxonomy-list-matches-kind';
 import type { ComponentType } from 'react';
 import { defineField, defineType } from 'sanity';
@@ -25,7 +19,6 @@ type TTaxonomyIndexPageOptions = {
   description: string;
   icon: ComponentType;
   kind: TTaxonomyKind;
-  noTaxonomyListWarning: string;
   taxonomyKindMismatchError: string;
   previewSubtitle: string;
 };
@@ -36,7 +29,6 @@ export const taxonomyIndexPage = ({
   description,
   icon,
   kind,
-  noTaxonomyListWarning,
   taxonomyKindMismatchError,
   previewSubtitle,
 }: TTaxonomyIndexPageOptions) =>
@@ -46,11 +38,7 @@ export const taxonomyIndexPage = ({
     type: 'document',
     description,
     icon,
-    validation: (rule) => [
-      rule.custom(validateSingleTaxonomyListModule),
-      rule
-        .custom(validateHasTaxonomyListModule(noTaxonomyListWarning))
-        .warning(),
+    validation: (rule) =>
       rule.custom(
         validateTaxonomyListReferencesMatchKind(
           kind,
@@ -58,7 +46,6 @@ export const taxonomyIndexPage = ({
           taxonomyKindMismatchError,
         ),
       ),
-    ],
     preview: {
       select: {
         title: 'title',
@@ -81,10 +68,7 @@ export const taxonomyIndexPage = ({
           ctaSchema.name,
           newsletterSchema.name,
         ],
-        validateCustom: (rule) =>
-          rule
-            .custom(validateSingleBlankHeadingPerType([postLatestSchema.name]))
-            .custom(validateTaxonomyListHasTaxonomy),
+        once: [taxonomyListSchema.name],
       }),
       seoField(),
       defineField({

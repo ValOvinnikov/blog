@@ -9,13 +9,19 @@ type TDocFn = (
   context: ValidationContext,
 ) => Promise<string | true>;
 
-const MISSING_PAGE_WARNING =
+const MISSING_PAGE_ERROR =
   'No Topic Page references this topic yet — /topics/{slug} will 404 until one is created.';
 
 const getHasPageValidator = () =>
   getCustomValidatorWithLevel<TDocFn>(topicSchema);
 
 describe('topicSchema validation', () => {
+  it('registers the has-page rule at error level, not warning', () => {
+    const { isWarning } = getHasPageValidator();
+
+    expect(isWarning).toBe(false);
+  });
+
   it('passes without querying when the document has no id', async () => {
     const { fn: validate } = getHasPageValidator();
     const { context, fetchCalls } = createMockCountContext(0);
@@ -31,12 +37,12 @@ describe('topicSchema validation', () => {
     await expect(validate({ _id: 'topic-1' }, context)).resolves.toBe(true);
   });
 
-  it('warns when no page_topic references this topic', async () => {
+  it('errors when no page_topic references this topic', async () => {
     const { fn: validate } = getHasPageValidator();
     const { context } = createMockCountContext(0);
 
     await expect(validate({ _id: 'topic-1' }, context)).resolves.toBe(
-      MISSING_PAGE_WARNING,
+      MISSING_PAGE_ERROR,
     );
   });
 

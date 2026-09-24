@@ -1,13 +1,13 @@
-import { q } from '@blog/service/sanity/query';
-import { ctaButtonFragment } from '@blog/service/shared/fragments/cta-button';
-import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
-import { sanityImageFragment } from '@blog/service/shared/fragments/image';
-import { heroLayoutFragment } from '@blog/service/shared/fragments/layout';
+import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
+import { ctaButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
+import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
+import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
+import { heroLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 
 export const heroStatementModuleQuery = q
-  .parameters<{ id: string }>()
+  .parameters<TModuleQueryParams>()
   .star.filterByType('module_heroStatement')
-  .filterRaw('_id == $id')
+  .filterBy('_id == $id')
   .slice(0)
   .project((sub) => ({
     brandVariant: sub.field('brandVariant').notNull(),

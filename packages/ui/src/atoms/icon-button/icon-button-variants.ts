@@ -10,7 +10,7 @@ export const iconButtonVariants = tv({
     'hover:border-border-emphasis hover:bg-surface-2 hover:text-text',
     'cursor-pointer',
     'focus-visible:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
-    'focus-visible:ring-offset-2 focus-visible:ring-offset-primary',
+    'focus-visible:ring-offset-2',
     'disabled:pointer-events-none disabled:opacity-50',
   ],
   variants: {
@@ -25,7 +25,7 @@ export const iconButtonVariants = tv({
       avatar: [
         'size-8 rounded-full border-0',
         'transition-shadow duration-base ease-smooth',
-        'hover:ring-2 hover:ring-border-emphasis hover:ring-offset-2 hover:ring-offset-primary',
+        'hover:ring-2 hover:ring-border-emphasis hover:ring-offset-2',
       ],
       control: [
         'size-9 rounded-full',
@@ -35,9 +35,18 @@ export const iconButtonVariants = tv({
       ],
     },
     tone: {
-      [BRAND_VARIANT.PRIMARY]: [],
-      [BRAND_VARIANT.SECONDARY]: [],
-      [BRAND_VARIANT.BRAND_PRIMARY]: [],
+      [BRAND_VARIANT.PRIMARY]: [
+        'focus-visible:ring-offset-primary',
+        'hover:ring-offset-primary',
+      ],
+      [BRAND_VARIANT.SECONDARY]: [
+        'focus-visible:ring-offset-secondary',
+        'hover:ring-offset-secondary',
+      ],
+      [BRAND_VARIANT.BRAND_PRIMARY]: [
+        'focus-visible:ring-offset-brand-primary-muted',
+        'hover:ring-offset-brand-primary-muted',
+      ],
     },
   },
   compoundVariants: [
@@ -50,6 +59,9 @@ export const iconButtonVariants = tv({
       ],
     },
   ],
+  defaultVariants: {
+    tone: BRAND_VARIANT.PRIMARY,
+  },
 });
 
 export type TIconButtonVariants = VariantProps<typeof iconButtonVariants>;

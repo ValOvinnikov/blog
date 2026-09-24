@@ -32,16 +32,6 @@ describe('toPostListModule', () => {
     expect(module.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
   });
 
-  it('maps brandVariant straight through, including BRAND_PRIMARY', () => {
-    const raw = makeRawPostListModule({
-      brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
-    });
-
-    const module = toPostListModule(raw, rawPosts, pagination);
-
-    expect(module.brandVariant).toBe(BRAND_VARIANT.BRAND_PRIMARY);
-  });
-
   it('leaves contentAlignment undefined when unset (no faked default)', () => {
     const raw = makeRawPostListModule({ contentAlignment: null });
 

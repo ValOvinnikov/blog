@@ -65,7 +65,7 @@ describe(`<${EmailLogoField.name}/>`, () => {
 
   it('translates an unsupported-type rejection before ever calling the upload action', async () => {
     const onChange = vi.fn();
-    const { container } = render(
+    render(
       <EmailLogoField
         tenantId="tenant-1"
         target={{ type: 'tenant' }}
@@ -77,7 +77,6 @@ describe(`<${EmailLogoField.name}/>`, () => {
     );
 
     await selectFile(
-      container,
       new File(['<svg></svg>'], 'logo.svg', { type: 'image/svg+xml' }),
     );
 
@@ -91,7 +90,7 @@ describe(`<${EmailLogoField.name}/>`, () => {
       ok: true,
       url: 'https://example.blob.vercel-storage.com/email-logo-new.png',
     });
-    const { container } = render(
+    render(
       <EmailLogoField
         tenantId="tenant-1"
         target={{ type: 'tenant' }}
@@ -102,10 +101,7 @@ describe(`<${EmailLogoField.name}/>`, () => {
       />,
     );
 
-    await selectFile(
-      container,
-      new File(['x'], 'logo.png', { type: 'image/png' }),
-    );
+    await selectFile(new File(['x'], 'logo.png', { type: 'image/png' }));
 
     expect(uploadEmailLogoActionMock).toHaveBeenCalledWith(
       'tenant-1',

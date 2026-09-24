@@ -3,9 +3,9 @@ import type {
   TMaybeUndefined,
   TPageTopicType,
 } from '@blog/config';
-import type { TSeoResolved } from '@blog/service/shared/transformers/resolve-seo';
-import type { TModule } from '@blog/service/shared/transformers/to-module';
-import type { TTopic } from '@blog/service/shared/transformers/to-topic';
+import type { TModule } from '@blog/service/shared/transformers/module/to-module';
+import type { TSeoResolved } from '@blog/service/shared/transformers/seo/resolve-seo';
+import type { TTopic } from '@blog/service/shared/transformers/topic/to-topic';
 
 export type TTopicDetailPage = {
   topic: TTopic;

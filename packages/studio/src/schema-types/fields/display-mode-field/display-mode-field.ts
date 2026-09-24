@@ -9,7 +9,7 @@ export const displayModeField = (options?: { description?: string }) =>
     type: 'string',
     description:
       options?.description ??
-      'Grid lays the posts out in rows. Carousel puts them in a single row the reader can swipe or step through.',
+      'Grid lays the items out in rows. Carousel puts them in a single row the reader can swipe or step through.',
     options: {
       layout: 'dropdown',
       list: Object.values(DISPLAY_MODE).map((value) => ({

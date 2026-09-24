@@ -1,4 +1,11 @@
-import { defineArrayMember, defineField, type ArrayRule } from 'sanity';
+import { defineArrayMember, defineField } from 'sanity';
+
+type TModuleReference = { _type?: string; _key?: string };
+
+const ONCE_ERROR = 'Only one module of this type is allowed per page.';
+
+const modulePath = (module: TModuleReference, index: number) =>
+  module._key ? [{ _key: module._key }] : [index];
 
 /**
  * `allow` is typed `string[]` rather than a module-type union: `defineType(...)`
@@ -9,11 +16,11 @@ import { defineArrayMember, defineField, type ArrayRule } from 'sanity';
 export const modulesField = ({
   allow,
   description,
-  validateCustom,
+  once,
 }: {
   allow: string[];
   description?: string;
-  validateCustom?: (rule: ArrayRule<unknown[]>) => ArrayRule<unknown[]>;
+  once?: string[];
 }) =>
   defineField({
     name: 'modules',
@@ -32,6 +39,25 @@ export const modulesField = ({
         .unique()
         .error('Each module can only be referenced once per page.');
 
-      return validateCustom ? validateCustom(uniqueRule) : uniqueRule;
+      if (!once) return uniqueRule;
+
+      return uniqueRule.custom((modules) => {
+        const references = (modules ?? []) as TModuleReference[];
+        const counts = new Map<string, number>();
+
+        for (const module of references) {
+          if (module._type && once.includes(module._type)) {
+            counts.set(module._type, (counts.get(module._type) ?? 0) + 1);
+          }
+        }
+
+        const violations = references.flatMap((module, index) =>
+          module._type && (counts.get(module._type) ?? 0) > 1
+            ? [{ message: ONCE_ERROR, path: modulePath(module, index) }]
+            : [],
+        );
+
+        return violations.length > 0 ? violations : true;
+      });
     },
   });

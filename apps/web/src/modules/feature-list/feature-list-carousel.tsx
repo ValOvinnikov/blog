@@ -7,8 +7,7 @@ import type {
   TCardImageShape,
 } from '@blog/config';
 import type { TFeatureListItem } from '@blog/service';
-import { Carousel } from '@blog/ui/organisms/carousel';
-import { useTranslations } from 'next-intl';
+import { LabelledCarousel } from '@web/components/shared/labelled-carousel';
 
 import { FeatureListCard } from './feature-list-card';
 
@@ -31,28 +30,22 @@ export const FeatureListCarousel = ({
   tone,
   className,
   dataTestId,
-}: IFeatureListCarouselProps) => {
-  const t = useTranslations('carousel');
-
-  return (
-    <Carousel
-      items={items}
-      renderItem={({ item }) => (
-        <FeatureListCard
-          item={item}
-          imageShape={imageShape}
-          align={align}
-          imageSizes={imageSizes}
-          headingLevel={3}
-        />
-      )}
-      getItemKey={({ item }) => item.id}
-      ariaLabel={t('regionLabel', { title })}
-      previousLabel={t('previousAriaLabel')}
-      nextLabel={t('nextAriaLabel')}
-      tone={tone}
-      className={className}
-      dataTestId={dataTestId}
-    />
-  );
-};
+}: IFeatureListCarouselProps) => (
+  <LabelledCarousel
+    items={items}
+    renderItem={({ item }) => (
+      <FeatureListCard
+        item={item}
+        imageShape={imageShape}
+        align={align}
+        imageSizes={imageSizes}
+        headingLevel={3}
+      />
+    )}
+    getItemKey={({ item }) => item.id}
+    title={title}
+    tone={tone}
+    className={className}
+    dataTestId={dataTestId}
+  />
+);

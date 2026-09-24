@@ -8,7 +8,9 @@ const MODULE_TYPE_NAME = 'module_taxonomyList';
 const asDocument = (doc: Record<string, unknown>): SanityDocument =>
   doc as unknown as SanityDocument;
 
-const createMockListContext = (modules: { taxonomy?: string | null }[]) => {
+const createMockListContext = (
+  modules: { taxonomy?: string | null }[] | Error,
+) => {
   const fetchCalls: { query: string; params: unknown }[] = [];
 
   const context = {
@@ -16,6 +18,7 @@ const createMockListContext = (modules: { taxonomy?: string | null }[]) => {
       withConfig: () => ({
         fetch: async (query: string, params: unknown) => {
           fetchCalls.push({ query, params });
+          if (modules instanceof Error) throw modules;
           return modules;
         },
       }),
@@ -104,6 +107,22 @@ describe('validateTaxonomyListReferencesMatchKind', () => {
     });
 
     await expect(validate(document, context)).resolves.toBe(MISMATCH_ERROR);
+  });
+
+  it('resolves to true, not an error, when the fetch rejects', async () => {
+    const validate = validateTaxonomyListReferencesMatchKind(
+      TAXONOMY_KIND.TOPICS,
+      MODULE_TYPE_NAME,
+      MISMATCH_ERROR,
+    );
+    const { context } = createMockListContext(new Error('network down'));
+    const document = asDocument({
+      modules: [
+        { _key: 'k1', _type: MODULE_TYPE_NAME, _ref: 'taxonomy-list-1' },
+      ],
+    });
+
+    await expect(validate(document, context)).resolves.toBe(true);
   });
 
   it('ignores modules[] entries of a different type', async () => {

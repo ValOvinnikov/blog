@@ -4,11 +4,11 @@ import {
   type TMaybeUndefined,
   type TPortableTextBlock,
 } from '@blog/config';
-import { toCtaButtons } from '@blog/service/shared/transformers/to-cta-buttons';
-import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
-import { toLayout } from '@blog/service/shared/transformers/to-layout';
-import { toPortableText } from '@blog/service/shared/transformers/to-portable-text-mark-def';
-import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
+import { toCtaButtons } from '@blog/service/shared/transformers/cta/to-cta-buttons';
+import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
+import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image';
+import { toLayout } from '@blog/service/shared/transformers/layout/to-layout';
+import { toPortableText } from '@blog/service/shared/transformers/portable-text/to-portable-text-mark-def';
 import type { InferResultType } from 'groqd';
 
 import type { ctaModuleQuery } from './query';

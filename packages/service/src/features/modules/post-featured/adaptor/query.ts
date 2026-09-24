@@ -1,17 +1,17 @@
 import { POST_SOURCE } from '@blog/config';
-import { q } from '@blog/service/sanity/query';
-import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/published-post';
+import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
 import {
   DISPLAY_MODE_EXPRESSION,
   displayModeParser,
-} from '@blog/service/shared/fragments/display-mode';
-import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
-import { layoutFragment } from '@blog/service/shared/fragments/layout';
-import { postCardFragment } from '@blog/service/shared/fragments/post';
+} from '@blog/service/shared/expressions/display-mode';
+import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/published-post';
 import {
   SHOW_IMAGES_EXPRESSION,
   showImagesParser,
-} from '@blog/service/shared/fragments/show-images';
+} from '@blog/service/shared/expressions/show-images';
+import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
+import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { postCardFragment } from '@blog/service/shared/fragments/post/post';
 
 const newestFeaturedPostsQuery = q.star
   .filterByType('page_post')
@@ -22,9 +22,9 @@ const newestFeaturedPostsQuery = q.star
   .project(postCardFragment);
 
 export const postFeaturedModuleQuery = q
-  .parameters<{ id: string }>()
+  .parameters<TModuleQueryParams>()
   .star.filterByType('module_postFeatured')
-  .filterRaw('_id == $id')
+  .filterBy('_id == $id')
   .slice(0)
   .project((sub) => ({
     brandVariant: sub.field('brandVariant').notNull(),

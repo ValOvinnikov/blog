@@ -1,5 +1,5 @@
 import { q } from '@blog/service/sanity/query';
-import { tagWithPostCountFragment } from '@blog/service/shared/fragments/tag';
+import { tagWithPostCountFragment } from '@blog/service/shared/fragments/tag/tag';
 
 export const tagsQuery = q.star
   .filterByType('blog_tag')

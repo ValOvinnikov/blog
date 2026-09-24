@@ -2,7 +2,7 @@
 
 # @blog/ui component index
 
-_55 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
+_56 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
 
 ## Atoms
 
@@ -189,6 +189,12 @@ Variants: layout: IMAGE_LAYOUT.INLINE|IMAGE_LAYOUT.FULL_BLEED|IMAGE_LAYOUT.FLOAT
 A navigation link that looks like a `Button`: applies the shared `buttonVariants` to an anchor (or any `as` element), so links can read as buttons.
 Props: className?: string _(extends IWithDataTestId, VariantProps<typeof buttonVariants>)_
 
+### LogoTile — `molecules/logo-tile/logo-tile.tsx`
+
+Carries no surface, border, or shadow, deliberately: a card promises a click most logos don't have.
+Props: children: ReactNode · isInteractive?: TLogoTileVariants['isInteractive'] _(extends IWithClassName, IWithDataTestId)_
+Variants: isInteractive: (boolean)
+
 ### MediaCard — `molecules/media-card/media-card.tsx`
 
 A media-led summary card for any linked item, rendered as an `<article>`.
@@ -237,12 +243,13 @@ Variants: collapsible: (boolean)
 
 ### QuoteCard — `molecules/quote-card/quote-card.tsx`
 
-A testimonial quote rendered as a figure; composes a caller-supplied `QuoteCard.Avatar` and `QuoteCard.Name` for the quoted person.
-Props: quote: string · role?: string · align?: TQuoteCardVariants['align'] · isSpotlight?: boolean · tone: TBrandVariantOf<'PRIMARY' | 'SECONDARY'> · children?: TCompoundChildren<typeof QuoteCardParts> _(extends IWithClassName, IWithDataTestId)_
+A testimonial quote rendered as a figure; composes a caller-supplied `QuoteCard.Quote`, `QuoteCard.Avatar`, and `QuoteCard.Name` for the quoted person.
+Props: role?: string · align?: TQuoteCardVariants['align'] · isSpotlight?: boolean · tone: TBrandVariantOf<'PRIMARY' | 'SECONDARY'> · children?: TCompoundChildren<typeof QuoteCardParts> _(extends IWithClassName, IWithDataTestId)_
 Variants: align: left|center · isSpotlight: (boolean)
 
 Slots:
 
+- **QuoteCard.Quote** — The quote slot of a `QuoteCard`; owns the figure's `<blockquote>`, so the caller passes the quote's inner content and never a `<blockquote>` of its own. Props: isSpotlight?: TQuoteCardQuoteVariants['isSpotlight'] · children: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: isSpotlight: (boolean)
 - **QuoteCard.Avatar** — The avatar slot of a `QuoteCard`; positions the caller's own `Avatar` element beside the quoted person's name. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **QuoteCard.Name** — The name slot of a `QuoteCard`; wraps the quoted person's link or text in the tone-matched link/focus treatment, on an element the component itself owns rather than the caller's link or text. Props: isSpotlight?: TQuoteCardNameVariants['isSpotlight'] · tone?: TQuoteCardNameVariants['tone'] · children: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: isSpotlight: (boolean) · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY
 
@@ -343,7 +350,7 @@ Slots:
 ### Hero — `organisms/hero/hero.tsx`
 
 The page-top hero band shared by every hero kind: renders `title` as an `<h1>` with optional `eyebrow`/`excerpt`, plus `Hero.Avatar`, `Hero.Body`, `Hero.Cta`, `Hero.Media`, and `Hero.Social` slots.
-Props: title: string · titleId: string · eyebrow?: string · excerpt?: string · variant?: THeroVariant · contentPosition?: TContentAlignment · contentAlignment?: TContentAlignment · mediaOrder?: TMediaOrder · tone?: TFullBrandVariant · children?: TCompoundChildren<typeof HeroParts> _(extends IWithClassName, IWithDataTestId)_
+Props: title: string · titleId: string · eyebrow?: string · excerpt?: string · variant?: THeroVariant · contentPosition?: TContentAlignment · contentAlignment?: TContentAlignment · mediaOrder?: TMediaOrder · tone: TBrandVariant · children?: TCompoundChildren<typeof HeroParts> _(extends IWithClassName, IWithDataTestId)_
 Variants: variant: HERO_VARIANT.SPLIT|HERO_VARIANT.STACKED|HERO_VARIANT.BANNER · hasMedia: (boolean) · position: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · alignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · mediaOrder: MEDIA_ORDER.FIRST|MEDIA_ORDER.LAST · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY|BRAND_VARIANT.BRAND_PRIMARY
 
 Slots:

@@ -1,9 +1,9 @@
-import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
-import { toLayout } from '@blog/service/shared/transformers/to-layout';
+import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
+import { toLayout } from '@blog/service/shared/transformers/layout/to-layout';
 import {
   toPostCard,
   type TPostCard,
-} from '@blog/service/shared/transformers/to-post-card';
+} from '@blog/service/shared/transformers/post/to-post-card';
 import type { InferResultType } from 'groqd';
 
 import type { relatedByTagsQuery, relatedByTopicQuery } from './posts.query';

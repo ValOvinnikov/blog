@@ -9,9 +9,12 @@ export type TMockCountContext = {
 /**
  * Mocks `context.getClient(...).withConfig(...).fetch(...)` — the shape
  * `getDraftsClient` builds — resolving to a fixed count, for validators
- * that check a reference count via that helper.
+ * that check a reference count via that helper. Pass an `Error` instead of
+ * a count to simulate a rejected fetch.
  */
-export const createMockCountContext = (count: number): TMockCountContext => {
+export const createMockCountContext = (
+  count: number | Error,
+): TMockCountContext => {
   const fetchCalls: { query: string; params: unknown }[] = [];
   const withConfigCalls: unknown[] = [];
 
@@ -22,6 +25,7 @@ export const createMockCountContext = (count: number): TMockCountContext => {
       return {
         fetch: async (query: string, params: unknown) => {
           fetchCalls.push({ query, params });
+          if (count instanceof Error) throw count;
           return count;
         },
       };

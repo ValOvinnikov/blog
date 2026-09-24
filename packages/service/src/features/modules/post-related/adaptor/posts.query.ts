@@ -1,6 +1,6 @@
 import { q } from '@blog/service/sanity/query';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/published-post';
-import { postCardFragment } from '@blog/service/shared/fragments/post';
+import { postCardFragment } from '@blog/service/shared/fragments/post/post';
 
 import { RELATED_POSTS_TAG_CANDIDATE_LIMIT } from './constants';
 
@@ -22,7 +22,7 @@ export type TRelatedByTopicParams = {
 export const relatedPostAnchorQuery = q
   .parameters<TAnchorPostParams>()
   .star.filterByType('page_post')
-  .filterRaw('_id == $postId')
+  .filterBy('_id == $postId')
   .slice(0)
   .project((sub) => ({
     tagIds: sub

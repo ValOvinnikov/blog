@@ -1,11 +1,11 @@
-import { q } from '@blog/service/sanity/query';
-import { layoutFragment } from '@blog/service/shared/fragments/layout';
-import { portableTextBodyItemFragment } from '@blog/service/shared/fragments/portable-text-body-item';
+import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
+import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { portableTextBodyItemFragment } from '@blog/service/shared/fragments/portable-text/portable-text-body-item';
 
 export const contentModuleQuery = q
-  .parameters<{ id: string }>()
+  .parameters<TModuleQueryParams>()
   .star.filterByType('module_content')
-  .filterRaw('_id == $id')
+  .filterBy('_id == $id')
   .slice(0)
   .project((sub) => ({
     brandVariant: sub.field('brandVariant').notNull(),

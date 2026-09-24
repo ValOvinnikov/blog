@@ -1,9 +1,9 @@
-import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
-import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
+import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
 import {
   toHeroSlot,
   toModule,
-} from '@blog/service/shared/transformers/to-module';
+} from '@blog/service/shared/transformers/module/to-module';
+import { resolveSeo } from '@blog/service/shared/transformers/seo/resolve-seo';
 import type { InferResultType } from 'groqd';
 
 import type { tagPageQuery } from './query';

@@ -57,6 +57,17 @@ describe('validateNewestFeaturedHasCandidate', () => {
     );
   });
 
+  it('resolves to true, not an error, when the fetch rejects', async () => {
+    const validate = validateNewestFeaturedHasCandidate('hero');
+    const context = createMockContext(() => {
+      throw new Error('network down');
+    });
+
+    await expect(validate(POST_SOURCE.NEWEST_FEATURED, context)).resolves.toBe(
+      true,
+    );
+  });
+
   it('queries the featured, published post count', async () => {
     const validate = validateNewestFeaturedHasCandidate('hero');
     let receivedQuery = '';

@@ -1,4 +1,4 @@
-import { toTopic } from '@blog/service/shared/transformers/to-topic';
+import { toTopic } from '@blog/service/shared/transformers/topic/to-topic';
 import type { InferResultType } from 'groqd';
 
 import type { topicsQuery } from './query';

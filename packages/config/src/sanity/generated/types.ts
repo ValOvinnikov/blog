@@ -139,6 +139,30 @@ export type ArticleText = Array<
     } & Aside)
 >;
 
+export type Module_stats = {
+  _id: string;
+  _type: 'module_stats';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  headingBlock?: HeadingBlock;
+  stats?: Array<
+    {
+      _key: string;
+    } & Stat
+  >;
+  footnote?: string;
+  ctaButtons?: Array<
+    {
+      _key: string;
+    } & CtaButton
+  >;
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  layout?: Layout;
+};
+
 export type Block_testimonialReference = {
   _ref: string;
   _type: 'reference';
@@ -167,6 +191,30 @@ export type Module_testimonial = {
   >;
   displayMode?: 'GRID' | 'CAROUSEL';
   cardAlignment?: 'LEFT' | 'CENTER';
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  layout?: Layout;
+};
+
+export type Module_logoWall = {
+  _id: string;
+  _type: 'module_logoWall';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  headingBlock?: HeadingBlock;
+  logos?: Array<
+    {
+      _key: string;
+    } & LogoItem
+  >;
+  ctaButtons?: Array<
+    {
+      _key: string;
+    } & CtaButton
+  >;
+  displayMode?: 'GRID' | 'CAROUSEL';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   layout?: Layout;
 };
@@ -271,7 +319,7 @@ export type Module_postList = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY';
   headingBlock?: HeadingBlock;
   pageSize?: number;
   showImages?: boolean;
@@ -366,6 +414,13 @@ export type ParagraphText = Array<{
   _key: string;
 }>;
 
+export type Stat = {
+  _type: 'stat';
+  value?: string;
+  label?: string;
+  description?: string;
+};
+
 export type PostTakeaways = {
   _type: 'postTakeaways';
   takeaways?: Array<string>;
@@ -435,6 +490,35 @@ export type SocialProfile = {
     | 'FACEBOOK'
     | 'THREADS'
     | 'RSS';
+};
+
+export type LogoItem = {
+  _type: 'logoItem';
+  name?: string;
+  image?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: 'image';
+  };
+  link?: LinkReference;
+};
+
+export type SanityImageCrop = {
+  _type: 'sanity.imageCrop';
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+};
+
+export type SanityImageHotspot = {
+  _type: 'sanity.imageHotspot';
+  x?: number;
+  y?: number;
+  height?: number;
+  width?: number;
 };
 
 export type LinkRef = {
@@ -954,11 +1038,25 @@ export type Module_featureListReference = {
   [internalGroqTypeReferenceTo]?: 'module_featureList';
 };
 
+export type Module_logoWallReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_logoWall';
+};
+
 export type Module_testimonialReference = {
   _ref: string;
   _type: 'reference';
   _weak?: boolean;
   [internalGroqTypeReferenceTo]?: 'module_testimonial';
+};
+
+export type Module_statsReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_stats';
 };
 
 export type Page_landing = {
@@ -998,7 +1096,13 @@ export type Page_landing = {
       } & Module_featureListReference)
     | ({
         _key: string;
+      } & Module_logoWallReference)
+    | ({
+        _key: string;
       } & Module_testimonialReference)
+    | ({
+        _key: string;
+      } & Module_statsReference)
   >;
   seo?: Seo;
 };
@@ -1039,7 +1143,13 @@ export type Page_home = {
       } & Module_featureListReference)
     | ({
         _key: string;
+      } & Module_logoWallReference)
+    | ({
+        _key: string;
       } & Module_testimonialReference)
+    | ({
+        _key: string;
+      } & Module_statsReference)
   >;
   seo?: Seo;
 };
@@ -1114,7 +1224,6 @@ export type Module_heroBlog = {
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
   postSource?: 'PINNED' | 'NEWEST_FEATURED';
   post?: Page_postReference;
-  imageSource?: 'POST' | 'CUSTOM' | 'NONE';
   image?: ImageWithAlt;
   eyebrow?: string;
   primaryActionLabel?: string;
@@ -1180,22 +1289,6 @@ export type Blog_topic = {
   title?: string;
   slug?: Slug;
   description?: string;
-};
-
-export type SanityImageCrop = {
-  _type: 'sanity.imageCrop';
-  top?: number;
-  bottom?: number;
-  left?: number;
-  right?: number;
-};
-
-export type SanityImageHotspot = {
-  _type: 'sanity.imageHotspot';
-  x?: number;
-  y?: number;
-  height?: number;
-  width?: number;
 };
 
 export type MediaTag = {
@@ -1321,8 +1414,10 @@ export type AllSanitySchemaTypes =
   | ImageWithAlt
   | Module_content
   | ArticleText
+  | Module_stats
   | Block_testimonialReference
   | Module_testimonial
+  | Module_logoWall
   | Block_featureReference
   | Module_featureList
   | Module_postRelated
@@ -1336,6 +1431,7 @@ export type AllSanitySchemaTypes =
   | Page_postIndexReference
   | InlineLink
   | ParagraphText
+  | Stat
   | PostTakeaways
   | Brand
   | BrandTagline
@@ -1345,6 +1441,9 @@ export type AllSanitySchemaTypes =
   | CtaSecondaryButton
   | CtaButton
   | SocialProfile
+  | LogoItem
+  | SanityImageCrop
+  | SanityImageHotspot
   | LinkRef
   | Aside
   | BodyImage
@@ -1385,7 +1484,9 @@ export type AllSanitySchemaTypes =
   | Module_heroProfileReference
   | Module_contentReference
   | Module_featureListReference
+  | Module_logoWallReference
   | Module_testimonialReference
+  | Module_statsReference
   | Page_landing
   | Page_home
   | Blog_authorReference
@@ -1395,8 +1496,6 @@ export type AllSanitySchemaTypes =
   | Module_postRelatedReference
   | Page_post
   | Blog_topic
-  | SanityImageCrop
-  | SanityImageHotspot
   | MediaTag
   | Code
   | SanityImagePaletteSwatch

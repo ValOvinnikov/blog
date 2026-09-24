@@ -1,5 +1,5 @@
 import { q } from '@blog/service/sanity/query';
-import { sanityImageFragment } from '@blog/service/shared/fragments/image';
+import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
 
 export const siteSettingsQuery = q.star
   .filterByType('settings_site')

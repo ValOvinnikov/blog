@@ -9,7 +9,6 @@ export const quoteCardVariants = tv({
       'px-card-x py-card-y',
     ],
     quoteMark: ['text-brand-primary'],
-    quote: ['font-read italic text-text', 'm-0'],
     caption: ['flex items-center gap-3'],
     person: ['flex flex-col'],
     role: ['text-sm text-subtle'],
@@ -25,13 +24,10 @@ export const quoteCardVariants = tv({
     },
     isSpotlight: {
       true: {
-        root: ['mx-auto max-w-[52ch] border-l-0 bg-transparent px-0 py-0'],
+        root: ['mx-auto max-w-[38ch] border-l-0 bg-transparent px-0 py-0'],
         quoteMark: ['size-10'],
-        quote: ['text-prose-h4'],
       },
-      false: {
-        quote: ['text-prose'],
-      },
+      false: {},
     },
   },
   defaultVariants: {

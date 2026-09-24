@@ -1,17 +1,17 @@
 import type {
   ISanityImage,
+  TBrandVariant,
   TContentAlignment,
-  TFullBrandVariant,
   THeadingBlock,
   THeroVariant,
   TLayout,
   TMaybeUndefined,
   TMediaOrder,
 } from '@blog/config';
-import type { TCtaButton } from '@blog/service/shared/transformers/to-cta-button';
+import type { TCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button';
 
 export type THeroStatementModule = {
-  brandVariant: TFullBrandVariant;
+  brandVariant: TBrandVariant;
   variant: THeroVariant;
   headingBlock: THeadingBlock;
   eyebrow: TMaybeUndefined<string>;

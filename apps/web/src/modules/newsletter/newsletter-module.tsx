@@ -25,7 +25,13 @@ export const NewsletterModule = async ({
     service.global.newsletterSettings.v1.getNewsletterSettings(tenantContext),
   ]);
 
-  if (!result.ok) return null;
+  if (!result.ok) {
+    logger.error('newsletter_module.fetch_failed', {
+      id,
+      error: result.error,
+    });
+    return null;
+  }
 
   if (!newsletterSettingsResult.ok) {
     logger.error('newsletter_module.newsletter_settings_fetch_failed', {

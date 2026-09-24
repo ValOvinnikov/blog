@@ -1,6 +1,6 @@
 import { q } from '@blog/service/sanity/query';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/published-post';
-import { postCardFragment } from '@blog/service/shared/fragments/post';
+import { postCardFragment } from '@blog/service/shared/fragments/post/post';
 
 // Fallback when the hero module has no `featuredPost` configured: newest
 // post marked `featured`. `.slice(0)` yields null when no post matches (e.g.

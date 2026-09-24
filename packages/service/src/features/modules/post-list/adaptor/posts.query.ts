@@ -1,20 +1,24 @@
 import { TAXONOMY_KIND, type TTaxonomyKind } from '@blog/config';
 import { q } from '@blog/service/sanity/query';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/published-post';
-import { postCardFragment } from '@blog/service/shared/fragments/post';
+import { postCardFragment } from '@blog/service/shared/fragments/post/post';
 
 export type TPostListScope = {
   kind: TTaxonomyKind;
   slug: string;
 };
 
-const SCOPE_TAXONOMY_TYPE: Record<TTaxonomyKind, string> = {
-  [TAXONOMY_KIND.TAGS]: 'blog_tag',
-  [TAXONOMY_KIND.TOPICS]: 'blog_topic',
+const SCOPE_ARCHIVE_PAGE: Record<
+  TTaxonomyKind,
+  { pageType: string; referenceField: string }
+> = {
+  [TAXONOMY_KIND.TAGS]: { pageType: 'page_tag', referenceField: 'tag' },
+  [TAXONOMY_KIND.TOPICS]: { pageType: 'page_topic', referenceField: 'topic' },
 };
 
 function scopeFilter(kind: TTaxonomyKind) {
-  return `references(*[_type == "${SCOPE_TAXONOMY_TYPE[kind]}" && slug.current == $scopeSlug][0]._id)`;
+  const { pageType, referenceField } = SCOPE_ARCHIVE_PAGE[kind];
+  return `references(*[_type == "${pageType}" && slug.current == $archivePageSlug][0].${referenceField}._ref)`;
 }
 
 /**
@@ -40,7 +44,7 @@ export function postListModulePaginatedPostsQuery(
     : q.star.filterByType('page_post').filterRaw(PUBLISHED_POST_FILTER);
 
   return q
-    .parameters<{ scopeSlug?: string }>()
+    .parameters<{ archivePageSlug?: string }>()
     .project((sub) => ({
       posts: posts
         .order('publishedAt desc')

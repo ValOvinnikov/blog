@@ -1,14 +1,14 @@
 import { PORTABLE_TEXT_BLOCK_TYPE, type TMaybeUndefined } from '@blog/config';
-import { resolveSeo } from '@blog/service/shared/transformers/resolve-seo';
-import { toHeadingBlock } from '@blog/service/shared/transformers/to-heading-block';
-import { toLinkDocument } from '@blog/service/shared/transformers/to-link-document';
-import { toModule } from '@blog/service/shared/transformers/to-module';
-import { toPortableTextBody } from '@blog/service/shared/transformers/to-portable-text-body';
-import { toPortableText } from '@blog/service/shared/transformers/to-portable-text-mark-def';
-import { toSanityImage } from '@blog/service/shared/transformers/to-sanity-image';
-import { toSocialProfiles } from '@blog/service/shared/transformers/to-social-profiles';
-import { toTag } from '@blog/service/shared/transformers/to-tag';
-import { toTopic } from '@blog/service/shared/transformers/to-topic';
+import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
+import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image';
+import { toLinkDocument } from '@blog/service/shared/transformers/link/to-link-document';
+import { toModule } from '@blog/service/shared/transformers/module/to-module';
+import { toPortableTextBody } from '@blog/service/shared/transformers/portable-text/to-portable-text-body';
+import { toPortableText } from '@blog/service/shared/transformers/portable-text/to-portable-text-mark-def';
+import { resolveSeo } from '@blog/service/shared/transformers/seo/resolve-seo';
+import { toSocialProfiles } from '@blog/service/shared/transformers/social-profile/to-social-profiles';
+import { toTag } from '@blog/service/shared/transformers/tag/to-tag';
+import { toTopic } from '@blog/service/shared/transformers/topic/to-topic';
 import { toReadingTimeMinutes } from '@blog/utils';
 import type { InferResultType } from 'groqd';
 

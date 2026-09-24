@@ -3,7 +3,7 @@ import {
   runQuery,
   type TTenantSanityContext,
 } from '@blog/service/sanity/query';
-import type { TPostCard } from '@blog/service/shared/transformers/to-post-card';
+import type { TPostCard } from '@blog/service/shared/transformers/post/to-post-card';
 
 import { postsByIdsQuery } from './query';
 import { toPostsByIds } from './transformer';

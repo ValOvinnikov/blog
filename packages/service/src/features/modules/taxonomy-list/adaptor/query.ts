@@ -1,11 +1,11 @@
 import { TAXONOMY_KIND, TAXONOMY_SORT } from '@blog/config';
-import { q } from '@blog/service/sanity/query';
+import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/published-post';
-import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block';
-import { layoutFragment } from '@blog/service/shared/fragments/layout';
-import { postLinkFragment } from '@blog/service/shared/fragments/post-link';
-import { tagWithPostCountFragment } from '@blog/service/shared/fragments/tag';
-import { topicWithPostCountFragment } from '@blog/service/shared/fragments/topic';
+import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
+import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { postLinkFragment } from '@blog/service/shared/fragments/post/post-link';
+import { tagWithPostCountFragment } from '@blog/service/shared/fragments/tag/tag';
+import { topicWithPostCountFragment } from '@blog/service/shared/fragments/topic/topic';
 import { z } from 'zod';
 
 const LATEST_POSTS_LIMIT = 2;
@@ -50,9 +50,9 @@ const tagEntriesQuery = q.star
   }));
 
 export const taxonomyListModuleQuery = q
-  .parameters<{ id: string }>()
+  .parameters<TModuleQueryParams>()
   .star.filterByType('module_taxonomyList')
-  .filterRaw('_id == $id')
+  .filterBy('_id == $id')
   .slice(0)
   .project((sub) => ({
     brandVariant: sub.field('brandVariant').notNull(),

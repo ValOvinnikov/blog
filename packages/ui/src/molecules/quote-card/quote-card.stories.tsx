@@ -1,6 +1,6 @@
 import { BRAND_VARIANT } from '@blog/config';
 import { Avatar } from '@blog/ui/atoms/avatar';
-import { objectKeys } from '@blog/utils';
+import { objectKeys } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -10,6 +10,8 @@ import { quoteCardVariants } from './quote-card-variants';
 
 const NAME = faker.person.fullName();
 const AVATAR_SRC = faker.image.avatar();
+const SPOTLIGHT_QUOTE =
+  'Switching to this platform cut our publishing time in half. The editorial workflow finally feels like it was built for writers, not developers, and our readers noticed the difference within the first week.';
 
 const meta = {
   title: 'Molecules/QuoteCard',
@@ -27,11 +29,11 @@ const meta = {
     },
   },
   args: {
-    quote: faker.lorem.sentences(2),
     role: `${faker.person.jobTitle()}, ${faker.company.name()}`,
     tone: BRAND_VARIANT.PRIMARY,
     children: (
       <>
+        <QuoteCard.Quote>{faker.lorem.sentences(2)}</QuoteCard.Quote>
         <QuoteCard.Avatar>
           <Avatar src={AVATAR_SRC} alt="" name={NAME} />
         </QuoteCard.Avatar>
@@ -55,9 +57,12 @@ export const Centered: TStory = {
 export const NoPhoto: TStory = {
   args: {
     children: (
-      <QuoteCard.Name>
-        <span>{NAME}</span>
-      </QuoteCard.Name>
+      <>
+        <QuoteCard.Quote>{faker.lorem.sentences(2)}</QuoteCard.Quote>
+        <QuoteCard.Name>
+          <span>{NAME}</span>
+        </QuoteCard.Name>
+      </>
     ),
   },
 };
@@ -66,6 +71,7 @@ export const Linked: TStory = {
   args: {
     children: (
       <>
+        <QuoteCard.Quote>{faker.lorem.sentences(2)}</QuoteCard.Quote>
         <QuoteCard.Avatar>
           <Avatar src={AVATAR_SRC} alt="" name={NAME} />
         </QuoteCard.Avatar>
@@ -78,7 +84,52 @@ export const Linked: TStory = {
 };
 
 export const Spotlight: TStory = {
-  args: { isSpotlight: true },
+  args: {
+    isSpotlight: true,
+    children: (
+      <>
+        <QuoteCard.Quote>{SPOTLIGHT_QUOTE}</QuoteCard.Quote>
+        <QuoteCard.Avatar>
+          <Avatar src={AVATAR_SRC} alt={NAME} name={NAME} />
+        </QuoteCard.Avatar>
+        <QuoteCard.Name>
+          <span>{NAME}</span>
+        </QuoteCard.Name>
+      </>
+    ),
+  },
+};
+
+const LinkedVsUnlinked = (args: TQuoteCardProps) => (
+  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem' }}>
+    <div style={{ maxWidth: 360 }}>
+      <QuoteCard {...args}>
+        <QuoteCard.Quote>{faker.lorem.sentences(2)}</QuoteCard.Quote>
+        <QuoteCard.Avatar>
+          <Avatar src={AVATAR_SRC} alt={NAME} name={NAME} />
+        </QuoteCard.Avatar>
+        <QuoteCard.Name>
+          <span>{NAME}</span>
+        </QuoteCard.Name>
+      </QuoteCard>
+    </div>
+    <div style={{ maxWidth: 360 }}>
+      <QuoteCard {...args}>
+        <QuoteCard.Quote>{faker.lorem.sentences(2)}</QuoteCard.Quote>
+        <QuoteCard.Avatar>
+          <Avatar src={AVATAR_SRC} alt={NAME} name={NAME} />
+        </QuoteCard.Avatar>
+        <QuoteCard.Name>
+          <a href="https://example.com/case-studies/customer">{NAME}</a>
+        </QuoteCard.Name>
+      </QuoteCard>
+    </div>
+  </div>
+);
+
+export const LinkedVsUnlinkedName: TStory = {
+  name: 'Linked vs. unlinked name',
+  render: LinkedVsUnlinked,
 };
 
 const BRAND_BANDS = [
