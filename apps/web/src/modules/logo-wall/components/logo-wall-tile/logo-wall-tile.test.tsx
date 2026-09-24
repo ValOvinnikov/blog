@@ -1,4 +1,5 @@
 import { customRender, screen } from '@web/testing/custom-render';
+import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeLogoItem } from '@web/testing/modules/logo-wall/fixtures';
 import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
@@ -58,5 +59,67 @@ describe(`<${LogoWallTile.name}/>`, () => {
     setup();
 
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
+  });
+
+  it('pins the tile to the logo asset aspect ratio', () => {
+    setup({
+      logo: makeLogoItem({
+        image: makeSanityImage({
+          dimensions: { width: 2400, height: 1260, aspectRatio: 2400 / 1260 },
+        }),
+      }),
+    });
+
+    expect(
+      screen
+        .getByTestId('logo-wall-tile')
+        .style.getPropertyValue('--logo-aspect'),
+    ).toBe(String(2400 / 1260));
+  });
+
+  it('falls back to the contained layout when the asset has no dimensions', () => {
+    setup({
+      logo: makeLogoItem({
+        image: makeSanityImage({ dimensions: undefined }),
+      }),
+    });
+
+    expect(
+      screen
+        .getByTestId('logo-wall-tile')
+        .style.getPropertyValue('--logo-aspect'),
+    ).toBe('');
+  });
+
+  it('falls back to the contained layout when the asset aspect ratio is not a positive number', () => {
+    setup({
+      logo: makeLogoItem({
+        image: makeSanityImage({
+          dimensions: { width: 0, height: 0, aspectRatio: 0 },
+        }),
+      }),
+    });
+
+    expect(
+      screen
+        .getByTestId('logo-wall-tile')
+        .style.getPropertyValue('--logo-aspect'),
+    ).toBe('');
+  });
+
+  it('falls back to the contained layout when the asset aspect ratio is not finite', () => {
+    setup({
+      logo: makeLogoItem({
+        image: makeSanityImage({
+          dimensions: { width: Infinity, height: 0, aspectRatio: Infinity },
+        }),
+      }),
+    });
+
+    expect(
+      screen
+        .getByTestId('logo-wall-tile')
+        .style.getPropertyValue('--logo-aspect'),
+    ).toBe('');
   });
 });

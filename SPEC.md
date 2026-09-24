@@ -890,9 +890,12 @@ exposes it as a `--logo-aspect` custom property, and sizes the image with
 exact under that construction because the box ratio is the asset ratio, and
 `min()` rather than `max-width` is what makes a logo too wide for the card scale
 down proportionally instead of distorting. Within the 158px content box every
-logo up to 4.39:1 reaches the full 36px height. Omitting the ratio falls back to
-a contained image, so an asset whose dimensions metadata is missing still
-renders.
+logo up to 4.39:1 reaches the full 36px height. `apps/web` supplies the ratio
+from the asset's own `dimensions.aspectRatio`, and withholds it unless it is a
+finite positive number — omitting it falls back to a contained image, so an
+asset with missing or degenerate dimensions metadata still renders. Substituting
+a default ratio would be worse than the fallback: a wrong ratio distorts the
+logo, where a contained image merely shifts.
 
 **One logo the service cannot resolve costs the whole wall, not that tile.** The
 query projects `name` and `image` with `.notNull()`, and `toLogoItem` throws
