@@ -56,7 +56,7 @@ All files and folders under `src/` must be **kebab-case** (enforced by ESLint).
 Each component lives in its own folder:
 
 ```
-src/atoms/theme-toggle/
+src/components/atoms/theme-toggle/
   theme-toggle.tsx           # component (one per file)
   theme-toggle-variants.ts   # cva variants (see Styling)
   theme-toggle.test.tsx      # co-located tests
@@ -74,7 +74,7 @@ src/atoms/theme-toggle/
   `*-variants.ts`. Extract the relevant slot classes into the child's own file.
 - **Every child lives in its own sub-folder** inside `components/`.
 - **Use absolute package paths for cross-folder imports** —
-  `@blog/ui/atoms/heading`, `@blog/ui/lib/compound`, never `../../atoms/heading`.
+  `@blog/ui/components/atoms/heading`, `@blog/ui/lib/compound`, never `../../atoms/heading`.
   The `@blog/ui/*` alias is configured in `tsconfig.json` (paths),
   `vitest.config.ts` (resolve.alias), and `.storybook/main.ts`. Same-folder
   imports (`./header-variants`) stay relative.
@@ -496,7 +496,7 @@ slot/media rules → **`compound-components.md`**.
 
 ## Icons
 
-- **Use the `<Icon name={ICONS.X}>` atom** (`@blog/ui/atoms/icon`) for all icons.
+- **Use the `<Icon name={ICONS.X}>` atom** (`@blog/ui/components/atoms/icon`) for all icons.
   `ICONS`/`TIconName` come from `@blog/config`; each maps to a bespoke local SVG
   through the icon registry. No `lucide-react`, no ad-hoc inline SVG in components.
 - Pass `size` and `strokeWidth` props: `<Icon name={ICONS.SUN} size={18} strokeWidth={1.6} aria-hidden="true" />`.
@@ -540,7 +540,7 @@ issues and ensures every committed file is consistently formatted.
       controlled-props bag. Data props shaped to accept the view-model directly.
 - [ ] Stories file created alongside the component.
 - [ ] Exported component (and every compound slot/part) has a `Name — …` JSDoc description; `pnpm gen:ui-index:check` passes.
-- [ ] Icons via `<Icon name={ICONS.X}>` (`@blog/ui/atoms/icon`); no `lucide-react`, no ad-hoc inline SVG.
+- [ ] Icons via `<Icon name={ICONS.X}>` (`@blog/ui/components/atoms/icon`); no `lucide-react`, no ad-hoc inline SVG.
 - [ ] `describe(Component.name, ...)` and `beforeEach` for shared setup.
 - [ ] Uses token utilities; dark mode intact.
 - [ ] Exported from the barrel (`index.ts` → `atoms/index.ts` → `src/index.ts`);

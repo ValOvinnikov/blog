@@ -149,7 +149,7 @@ studio`, local inspection only).
   containing `add-bookmark.ts` + `add-bookmark.test.ts` + an `index.ts`
   re-exporting the function — mirroring the atomic-folder convention
   `packages/ui`'s atoms/molecules already use (e.g.
-  `packages/ui/src/atoms/caption/`: `caption.tsx` + `caption.test.tsx` +
+  `packages/ui/src/components/atoms/caption/`: `caption.tsx` + `caption.test.tsx` +
   `index.ts`), not a flat file-per-query. So a domain with four queries looks
   like:
   ```
