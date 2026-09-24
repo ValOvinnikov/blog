@@ -1,5 +1,5 @@
 import { BRAND_VARIANT, CONTENT_ALIGNMENT, CTA_VARIANT } from '@blog/config';
-import { CtaModule } from '@blog/ui/organisms/cta-module';
+import { CtaModule } from '@blog/ui/components/organisms/cta-module';
 import { customRender, screen } from '@web/testing/custom-render';
 import {
   ctaActionsDemo,
@@ -10,9 +10,11 @@ import type { ReactNode } from 'react';
 
 import { CtaModuleView } from './cta-module-view';
 
-vi.mock('@blog/ui/organisms/cta-module', async (importOriginal) => {
+vi.mock('@blog/ui/components/organisms/cta-module', async (importOriginal) => {
   const actual =
-    await importOriginal<typeof import('@blog/ui/organisms/cta-module')>();
+    await importOriginal<
+      typeof import('@blog/ui/components/organisms/cta-module')
+    >();
   return {
     ...actual,
     CtaModule: vi.fn(actual.CtaModule),

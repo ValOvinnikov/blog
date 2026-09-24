@@ -125,7 +125,7 @@ Two tasks, delivered in order:
 - **D11 — The not-found and error pages use the Studio page shape.** Both
   carry `heading`, `supportingText` and an optional `eyebrow` — the short
   label above the heading that the `Eyebrow` atom already renders
-  (`packages/ui/src/atoms/eyebrow`). The not-found eyebrow defaults to
+  (`packages/ui/src/components/atoms/eyebrow`). The not-found eyebrow defaults to
   `404`; the error page's is empty by default. "Code" was rejected as the
   name because the field is a label, not always a status code, and
   `eyebrow` is the term the design system already uses. The heading is the
@@ -186,7 +186,7 @@ Two tasks, delivered in order:
 
 ### Renames
 
-- **`WindowChrome` → `Panel`** (`packages/ui/src/molecules/panel/`), compound
+- **`WindowChrome` → `Panel`** (`packages/ui/src/components/molecules/panel/`), compound
   parts `Panel.Header` (heading content + `headingLevel`) and `Panel.Body`.
   The bordered, rounded surface and the title bar keep their token-driven
   styling; the bar renders a real heading in the display font instead of a

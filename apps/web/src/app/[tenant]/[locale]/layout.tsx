@@ -11,10 +11,10 @@ import {
   service,
   urlForSanityImage,
 } from '@blog/service';
-import { Icon } from '@blog/ui/atoms/icon';
-import { NavLink } from '@blog/ui/atoms/nav-link';
-import { Footer } from '@blog/ui/organisms/footer';
-import { Header } from '@blog/ui/organisms/header';
+import { Icon } from '@blog/ui/components/atoms/icon';
+import { NavLink } from '@blog/ui/components/atoms/nav-link';
+import { Footer } from '@blog/ui/components/organisms/footer';
+import { Header } from '@blog/ui/components/organisms/header';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { AuthMenu } from '@web/components/shared/auth-menu';

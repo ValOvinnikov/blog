@@ -1,10 +1,10 @@
 'use client';
 
 import { routes } from '@blog/config';
-import { Button } from '@blog/ui/atoms/button';
-import { Heading } from '@blog/ui/atoms/heading';
-import { Text } from '@blog/ui/atoms/text';
-import { LinkButton } from '@blog/ui/molecules/link-button';
+import { Button } from '@blog/ui/components/atoms/button';
+import { Heading } from '@blog/ui/components/atoms/heading';
+import { Text } from '@blog/ui/components/atoms/text';
+import { LinkButton } from '@blog/ui/components/molecules/link-button';
 import { errorBoundaryCopy } from '@web/components/shared/error-boundary-copy';
 import { errorPageLayoutVariants } from '@web/components/shared/error-page-layout';
 import { reportClientError } from '@web/utils/report-client-error';

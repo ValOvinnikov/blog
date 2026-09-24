@@ -1,10 +1,10 @@
 'use client';
 
 import { ICONS, SIZE } from '@blog/config';
-import { Avatar } from '@blog/ui/atoms/avatar';
-import { Button } from '@blog/ui/atoms/button';
-import { Icon } from '@blog/ui/atoms/icon';
-import { TextInput } from '@blog/ui/atoms/text-input';
+import { Avatar } from '@blog/ui/components/atoms/avatar';
+import { Button } from '@blog/ui/components/atoms/button';
+import { Icon } from '@blog/ui/components/atoms/icon';
+import { TextInput } from '@blog/ui/components/atoms/text-input';
 import { useToast } from '@web/context/toast-provider';
 import { updateDisplayNameAction } from '@web/server/account/identity-actions';
 import { useRouter } from 'next/navigation';

@@ -82,7 +82,7 @@ and closes the two structural gaps the 2026-08-10 audit found.
   - `BrandMark` gains a variant that accepts an **image source**; when a tenant
     uploads a mark it renders that, otherwise it falls back to the existing
     three-polygon `BrandMark` recoloured from `--logo-1/2/3`
-    (`packages/ui/src/atoms/brand-mark/brand-mark.tsx`). This is the **only**
+    (`packages/ui/src/components/atoms/brand-mark/brand-mark.tsx`). This is the **only**
     genuinely shape-locked item today.
   - **Replace the hardwired `font-mono`** in the engagement chrome components
     (`window-chrome-bar-variants.ts`, `toast-variants.ts`,

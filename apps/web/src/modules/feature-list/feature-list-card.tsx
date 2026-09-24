@@ -5,9 +5,9 @@ import {
   type TCardImageShape,
 } from '@blog/config';
 import type { TFeatureListItem } from '@blog/service';
-import { Icon } from '@blog/ui/atoms/icon';
+import { Icon } from '@blog/ui/components/atoms/icon';
+import { MediaCard } from '@blog/ui/components/molecules/media-card';
 import type { THeadingLevel } from '@blog/ui/lib/react';
-import { MediaCard } from '@blog/ui/molecules/media-card';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { stretchedLinkVariants } from '@web/components/shared/stretched-link';

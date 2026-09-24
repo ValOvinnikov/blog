@@ -1,0 +1,374 @@
+import {
+  BRAND_VARIANT,
+  CONTENT_ALIGNMENT,
+  HERO_VARIANT,
+  ICONS,
+  MEDIA_ORDER,
+  SIZE,
+} from '@blog/config';
+import { Avatar } from '@blog/ui/components/atoms/avatar';
+import { Icon } from '@blog/ui/components/atoms/icon';
+import { ShareLink } from '@blog/ui/components/molecules/share-link';
+import { objectKeys } from '@blog/utils/primitives';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+
+import { NavLink } from '../../atoms/nav-link';
+
+import { Hero } from './hero';
+import { heroVariants } from './hero-variants';
+
+const bannerContent = (alt: string) => (
+  <>
+    <Hero.Media>
+      <img
+        src="https://images.unsplash.com/photo-1500534623283-312aade485b7?w=1600&h=900&fit=crop"
+        alt={alt}
+        className="size-full object-cover"
+      />
+    </Hero.Media>
+    <Hero.Cta>
+      <NavLink href="/posts/design-system">Read more</NavLink>
+    </Hero.Cta>
+  </>
+);
+
+const profileContent = (
+  <>
+    <Hero.Avatar>
+      <Avatar
+        src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=256&h=256&fit=crop"
+        alt="Portrait of Jane Doe"
+        name="Jane Doe"
+        size={SIZE.XXL}
+      />
+    </Hero.Avatar>
+    <Hero.Body>
+      <p>
+        Jane leads platform engineering, with a decade of shipping design
+        systems used across fintech and retail. She writes about the boring
+        parts that make software fast: caching, build graphs, and saying no to
+        abstractions.
+      </p>
+    </Hero.Body>
+    <Hero.Cta>
+      <NavLink href="/posts/design-system">Read more</NavLink>
+    </Hero.Cta>
+    <Hero.Social>
+      <ul aria-label="Find Jane Doe elsewhere">
+        <li>
+          <ShareLink
+            href="https://github.com/janedoe"
+            label="GitHub"
+            icon={<Icon name={ICONS.GITHUB} size={SIZE.SM} />}
+          />
+        </li>
+        <li>
+          <ShareLink
+            href="https://linkedin.com/in/janedoe"
+            label="LinkedIn"
+            icon={<Icon name={ICONS.LINKEDIN} size={SIZE.SM} />}
+          />
+        </li>
+        <li>
+          <ShareLink
+            href="https://x.com/janedoe"
+            label="X"
+            icon={<Icon name={ICONS.X} size={SIZE.SM} />}
+          />
+        </li>
+      </ul>
+    </Hero.Social>
+  </>
+);
+
+const meta = {
+  title: 'Organisms/Hero',
+  component: Hero,
+  tags: ['autodocs'],
+  argTypes: {
+    variant: {
+      control: 'select',
+      options: objectKeys(heroVariants.variants.variant),
+    },
+    contentPosition: {
+      control: 'select',
+      options: objectKeys(heroVariants.variants.position),
+    },
+    contentAlignment: {
+      control: 'select',
+      options: objectKeys(heroVariants.variants.alignment),
+    },
+    mediaOrder: {
+      control: 'select',
+      options: objectKeys(heroVariants.variants.mediaOrder),
+    },
+    tone: {
+      control: 'select',
+      options: objectKeys(heroVariants.variants.tone),
+    },
+  },
+  args: {
+    eyebrow: 'Architecture',
+    title: 'Building a Design System from Scratch',
+    excerpt:
+      'A deep dive into Atomic Design principles, Tailwind CSS v4, and class-variance-authority — all working together in a portable component library.',
+    titleId: 'hero-title',
+    tone: BRAND_VARIANT.PRIMARY,
+    children: (
+      <>
+        <Hero.Media>
+          <img
+            src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&h=675&fit=crop"
+            alt="Code editor showing component code"
+            className="size-full object-cover"
+          />
+        </Hero.Media>
+        <Hero.Cta>
+          <NavLink href="/posts/design-system">Read more</NavLink>
+        </Hero.Cta>
+      </>
+    ),
+  },
+} satisfies Meta<typeof Hero>;
+
+export default meta;
+type TStory = StoryObj<typeof meta>;
+
+export const Full: TStory = {};
+
+export const Minimal: TStory = {
+  args: {
+    eyebrow: 'Senior frontend engineer',
+    title: 'Notes on shipping frontend at scale',
+    excerpt:
+      'Architecture, performance, and design systems — from fintech and retail. Written, not generated.',
+    children: undefined,
+  },
+};
+
+export const WithoutEyebrow: TStory = {
+  args: {
+    eyebrow: undefined,
+    children: (
+      <Hero.Cta>
+        <NavLink href="/posts/design-system">Read more</NavLink>
+      </Hero.Cta>
+    ),
+  },
+};
+
+export const WithoutImage: TStory = {
+  args: {
+    children: (
+      <Hero.Cta>
+        <NavLink href="/posts/design-system">Read more</NavLink>
+      </Hero.Cta>
+    ),
+  },
+};
+
+export const SplitContentLeft: TStory = {
+  args: {
+    variant: HERO_VARIANT.SPLIT,
+    contentPosition: CONTENT_ALIGNMENT.LEFT,
+  },
+};
+
+export const SplitContentRight: TStory = {
+  args: {
+    variant: HERO_VARIANT.SPLIT,
+    contentPosition: CONTENT_ALIGNMENT.RIGHT,
+  },
+};
+
+export const StackedDefault: TStory = {
+  args: {
+    variant: HERO_VARIANT.STACKED,
+  },
+};
+
+export const BannerContentLeft: TStory = {
+  args: {
+    variant: HERO_VARIANT.BANNER,
+    tone: BRAND_VARIANT.BRAND_PRIMARY,
+    contentPosition: CONTENT_ALIGNMENT.LEFT,
+    contentAlignment: CONTENT_ALIGNMENT.LEFT,
+    children: bannerContent('Bright mountain sunrise'),
+  },
+};
+
+export const BannerWithBody: TStory = {
+  args: {
+    variant: HERO_VARIANT.BANNER,
+    tone: BRAND_VARIANT.BRAND_PRIMARY,
+    contentPosition: CONTENT_ALIGNMENT.LEFT,
+    contentAlignment: CONTENT_ALIGNMENT.LEFT,
+    children: (
+      <>
+        <Hero.Media>
+          <img
+            src="https://images.unsplash.com/photo-1500534623283-312aade485b7?w=1600&h=900&fit=crop"
+            alt="Bright mountain sunrise"
+            className="size-full object-cover"
+          />
+        </Hero.Media>
+        <Hero.Body>
+          <p>
+            Six months building this system in public — every decision, every
+            rollback, every lesson that didn&apos;t make the changelog.
+          </p>
+        </Hero.Body>
+        <Hero.Cta>
+          <NavLink href="/posts/design-system">Read more</NavLink>
+        </Hero.Cta>
+      </>
+    ),
+  },
+};
+
+export const BannerContentCenter: TStory = {
+  args: {
+    variant: HERO_VARIANT.BANNER,
+    tone: BRAND_VARIANT.PRIMARY,
+    contentPosition: CONTENT_ALIGNMENT.CENTER,
+    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    children: bannerContent('Bright mountain sunrise'),
+  },
+};
+
+export const BannerContentRight: TStory = {
+  args: {
+    variant: HERO_VARIANT.BANNER,
+    tone: BRAND_VARIANT.SECONDARY,
+    contentPosition: CONTENT_ALIGNMENT.RIGHT,
+    contentAlignment: CONTENT_ALIGNMENT.RIGHT,
+    children: bannerContent('Bright mountain sunrise'),
+  },
+};
+
+export const BannerToneBrandPrimary: TStory = {
+  args: {
+    variant: HERO_VARIANT.BANNER,
+    tone: BRAND_VARIANT.BRAND_PRIMARY,
+    contentPosition: CONTENT_ALIGNMENT.LEFT,
+    contentAlignment: CONTENT_ALIGNMENT.LEFT,
+    children: bannerContent('Bright mountain sunrise'),
+  },
+};
+
+export const BannerTonePrimary: TStory = {
+  args: {
+    variant: HERO_VARIANT.BANNER,
+    tone: BRAND_VARIANT.PRIMARY,
+    contentPosition: CONTENT_ALIGNMENT.LEFT,
+    contentAlignment: CONTENT_ALIGNMENT.LEFT,
+    children: bannerContent('Bright mountain sunrise'),
+  },
+};
+
+export const BannerToneSecondary: TStory = {
+  args: {
+    variant: HERO_VARIANT.BANNER,
+    tone: BRAND_VARIANT.SECONDARY,
+    contentPosition: CONTENT_ALIGNMENT.LEFT,
+    contentAlignment: CONTENT_ALIGNMENT.LEFT,
+    children: bannerContent('Bright mountain sunrise'),
+  },
+};
+
+export const SplitMediaOrderFirst: TStory = {
+  args: {
+    variant: HERO_VARIANT.SPLIT,
+    mediaOrder: MEDIA_ORDER.FIRST,
+  },
+};
+
+export const SplitMediaOrderLast: TStory = {
+  args: {
+    variant: HERO_VARIANT.SPLIT,
+    mediaOrder: MEDIA_ORDER.LAST,
+  },
+};
+
+export const StackedMediaOrderFirst: TStory = {
+  args: {
+    variant: HERO_VARIANT.STACKED,
+    mediaOrder: MEDIA_ORDER.FIRST,
+  },
+};
+
+export const StackedMediaOrderLast: TStory = {
+  args: {
+    variant: HERO_VARIANT.STACKED,
+    mediaOrder: MEDIA_ORDER.LAST,
+  },
+};
+
+export const StackedProfileToneBrandPrimary: TStory = {
+  args: {
+    variant: HERO_VARIANT.STACKED,
+    tone: BRAND_VARIANT.BRAND_PRIMARY,
+    eyebrow: 'Senior frontend engineer',
+    title: 'Jane Doe',
+    excerpt:
+      'Architecture, performance, and design systems — from fintech and retail.',
+    children: profileContent,
+  },
+};
+
+export const StackedProfileTonePrimary: TStory = {
+  args: {
+    variant: HERO_VARIANT.STACKED,
+    tone: BRAND_VARIANT.PRIMARY,
+    eyebrow: 'Senior frontend engineer',
+    title: 'Jane Doe',
+    excerpt:
+      'Architecture, performance, and design systems — from fintech and retail.',
+    children: profileContent,
+  },
+};
+
+export const StackedProfileToneSecondary: TStory = {
+  args: {
+    variant: HERO_VARIANT.STACKED,
+    tone: BRAND_VARIANT.SECONDARY,
+    eyebrow: 'Senior frontend engineer',
+    title: 'Jane Doe',
+    excerpt:
+      'Architecture, performance, and design systems — from fintech and retail.',
+    children: profileContent,
+  },
+};
+
+export const CenteredActions: TStory = {
+  args: {
+    variant: HERO_VARIANT.STACKED,
+    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    children: (
+      <Hero.Cta>
+        <NavLink href="/posts/design-system">Read more</NavLink>
+        <NavLink href="/about">About the author</NavLink>
+      </Hero.Cta>
+    ),
+  },
+};
+
+export const SplitSquarePortrait: TStory = {
+  args: {
+    variant: HERO_VARIANT.SPLIT,
+    children: (
+      <>
+        <Hero.Media ratio="square">
+          <img
+            src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&h=800&fit=crop"
+            alt="Portrait of Jane Doe"
+            className="size-full object-cover"
+          />
+        </Hero.Media>
+        <Hero.Cta>
+          <NavLink href="/posts/design-system">Read more</NavLink>
+        </Hero.Cta>
+      </>
+    ),
+  },
+};

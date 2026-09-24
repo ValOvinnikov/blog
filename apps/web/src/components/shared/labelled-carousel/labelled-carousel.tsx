@@ -5,7 +5,7 @@ import type {
   IWithDataTestId,
   TBrandVariant,
 } from '@blog/config';
-import { Carousel } from '@blog/ui/organisms/carousel';
+import { Carousel } from '@blog/ui/components/organisms/carousel';
 import { useTranslations } from 'next-intl';
 import type { Key, ReactNode } from 'react';
 

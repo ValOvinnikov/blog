@@ -1,10 +1,10 @@
 'use client';
 
 import { ICONS, routes, SIZE } from '@blog/config';
-import { Avatar } from '@blog/ui/atoms/avatar';
-import { Icon } from '@blog/ui/atoms/icon';
-import { Text } from '@blog/ui/atoms/text';
-import { PopoverMenu } from '@blog/ui/molecules/popover-menu';
+import { Avatar } from '@blog/ui/components/atoms/avatar';
+import { Icon } from '@blog/ui/components/atoms/icon';
+import { Text } from '@blog/ui/components/atoms/text';
+import { PopoverMenu } from '@blog/ui/components/molecules/popover-menu';
 import { authMenuVariants } from '@web/components/shared/auth-menu/auth-menu-variants';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { signOut } from 'next-auth/react';

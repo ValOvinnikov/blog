@@ -2090,7 +2090,7 @@ renders once through `renderItem`, keyed by `getItemKey`.
 
 **`PostsCarousel` is the `'use client'` wrapper**, under
 `apps/web/src/components/shared/posts-carousel/`, the `SanityImage` shape:
-the directive, `import { Carousel } from '@blog/ui/organisms/carousel'`, and
+the directive, `import { Carousel } from '@blog/ui/components/organisms/carousel'`, and
 nothing Embla-shaped of its own. **The wrapper is per item type by
 construction**: a function cannot cross the server→client boundary, so
 the Server Component views pass plain data and the wrapper is where

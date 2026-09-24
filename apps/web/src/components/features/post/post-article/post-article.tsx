@@ -1,7 +1,7 @@
 import { ASIDE_KIND, routes, type TAsideKind } from '@blog/config';
 import { type TImageTransformOptions, urlForSanityImage } from '@blog/service';
-import { Prose } from '@blog/ui/atoms/prose';
-import { Article } from '@blog/ui/organisms/article';
+import { Prose } from '@blog/ui/components/atoms/prose';
+import { Article } from '@blog/ui/components/organisms/article';
 import { BookmarkButtonGate } from '@web/components/features/post/bookmark-button-gate';
 import {
   createAsideOverride,

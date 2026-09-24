@@ -1,5 +1,5 @@
 import type { TPostRelatedModule } from '@blog/service';
-import { CardGrid } from '@blog/ui/organisms/card-grid';
+import { CardGrid } from '@blog/ui/components/organisms/card-grid';
 import {
   type IMediaCardData,
   MediaCardItem,

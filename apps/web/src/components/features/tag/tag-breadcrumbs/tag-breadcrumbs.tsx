@@ -2,7 +2,7 @@ import { routes } from '@blog/config';
 import {
   Breadcrumbs,
   type IBreadcrumbItem,
-} from '@blog/ui/molecules/breadcrumbs';
+} from '@blog/ui/components/molecules/breadcrumbs';
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';

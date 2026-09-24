@@ -135,9 +135,9 @@ existing ones are already imported today.
 
 **Deleted:**
 
-| Path                              | Why                                                                         |
-| --------------------------------- | --------------------------------------------------------------------------- |
-| `packages/ui/src/atoms/textarea/` | Exactly one consumer repo-wide (admin's `voice-field`); dead on separation. |
+| Path                                         | Why                                                                         |
+| -------------------------------------------- | --------------------------------------------------------------------------- |
+| `packages/ui/src/components/atoms/textarea/` | Exactly one consumer repo-wide (admin's `voice-field`); dead on separation. |
 
 ---
 
@@ -934,7 +934,7 @@ the two plans have to land in order — not a reason to restyle the file.
 
 - Modify: `apps/platform/package.json`, `apps/platform/tsconfig.json`,
   `apps/platform/vitest.config.ts`, `apps/platform/next.config.ts`, `apps/platform/index.css`
-- Delete: `packages/ui/src/atoms/textarea/`
+- Delete: `packages/ui/src/components/atoms/textarea/`
 - Modify: `packages/ui/COMPONENTS.md` (regenerated, never hand-edited)
 - Modify: `SPEC.md`, `CLAUDE.md`, `configs/tailwind/theme.css` header,
   `docs/context/frontend-conventions.md`
@@ -981,7 +981,7 @@ and remove it. A guard nobody has seen fail is not known to work.
 
 ```bash
 grep -rn "atoms/textarea" apps packages --exclude-dir=node_modules
-rm -rf packages/ui/src/atoms/textarea
+rm -rf packages/ui/src/components/atoms/textarea
 pnpm gen:ui-index
 ```
 

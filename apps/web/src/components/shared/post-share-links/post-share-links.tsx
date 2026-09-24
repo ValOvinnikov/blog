@@ -1,5 +1,5 @@
 import { SIZE, SOCIAL_PLATFORM_ICON } from '@blog/config';
-import { Icon } from '@blog/ui/atoms/icon';
+import { Icon } from '@blog/ui/components/atoms/icon';
 import { PostShare } from '@web/components/shared/post-share';
 import { buildShareLinks } from '@web/utils/build-share-links';
 

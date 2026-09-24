@@ -1,6 +1,6 @@
 import type { TPostListModule } from '@blog/service';
-import { CardGrid } from '@blog/ui/organisms/card-grid';
-import { Pagination } from '@blog/ui/organisms/pagination';
+import { CardGrid } from '@blog/ui/components/organisms/card-grid';
+import { Pagination } from '@blog/ui/components/organisms/pagination';
 import {
   type IMediaCardData,
   MediaCardItem,

@@ -1,7 +1,7 @@
 import { ICONS, SIZE, type IWithDataTestId } from '@blog/config';
-import { Icon } from '@blog/ui/atoms/icon';
+import { Icon } from '@blog/ui/components/atoms/icon';
+import { MediaCard } from '@blog/ui/components/molecules/media-card';
 import type { THeadingLevel } from '@blog/ui/lib/react';
-import { MediaCard } from '@blog/ui/molecules/media-card';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { stretchedLinkVariants } from '@web/components/shared/stretched-link';
 import type { ReactNode } from 'react';

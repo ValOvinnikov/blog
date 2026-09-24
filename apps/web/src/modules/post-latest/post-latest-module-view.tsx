@@ -1,7 +1,7 @@
 import { DISPLAY_MODE } from '@blog/config';
 import type { TPostLatestModule } from '@blog/service';
-import { Heading } from '@blog/ui/atoms/heading';
-import { CardGrid } from '@blog/ui/organisms/card-grid';
+import { Heading } from '@blog/ui/components/atoms/heading';
+import { CardGrid } from '@blog/ui/components/organisms/card-grid';
 import { CardCarousel } from '@web/components/shared/card-carousel';
 import {
   type IMediaCardData,

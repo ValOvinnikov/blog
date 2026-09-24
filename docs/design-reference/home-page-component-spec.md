@@ -23,9 +23,9 @@ Important implementation rules:
 Use the existing repo structure:
 
 ```txt
-packages/ui/src/atoms/
-packages/ui/src/molecules/
-packages/ui/src/organisms/
+packages/ui/src/components/atoms/
+packages/ui/src/components/molecules/
+packages/ui/src/components/organisms/
 apps/web/src/app/[locale]/page.tsx
 ```
 
@@ -740,7 +740,7 @@ export function PostCard({ href, title, description, meta }: PostCardProps) {
 
 > **Decision record (2026-07-21, issue #624, epic #612):** the reference
 > `PostCard` above is text-only — no thumbnail. The actual `@blog/ui`
-> `PostCard` (`packages/ui/src/molecules/post-card/`) is a compound
+> `PostCard` (`packages/ui/src/components/molecules/post-card/`) is a compound
 > component that includes a `PostCard.Media` slot for an optional
 > thumbnail. This is intentional, not drift to reconcile: it matches
 > issue #74's acceptance criteria, which predates and supersedes this
