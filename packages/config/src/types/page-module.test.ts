@@ -25,6 +25,7 @@ describe('page module type unions', () => {
       | 'module_logoWall'
       | 'module_testimonial'
       | 'module_stats'
+      | 'module_faq'
     >();
   });
 
@@ -49,6 +50,7 @@ describe('page module type unions', () => {
       | 'module_logoWall'
       | 'module_testimonial'
       | 'module_stats'
+      | 'module_faq'
     >();
   });
 

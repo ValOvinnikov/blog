@@ -139,6 +139,36 @@ export type ArticleText = Array<
     } & Aside)
 >;
 
+export type Block_faqReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'block_faq';
+};
+
+export type Module_faq = {
+  _id: string;
+  _type: 'module_faq';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  headingBlock?: HeadingBlock;
+  questions?: Array<
+    {
+      _key: string;
+    } & Block_faqReference
+  >;
+  ctaButtons?: Array<
+    {
+      _key: string;
+    } & CtaButton
+  >;
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  layout?: Layout;
+};
+
 export type Module_stats = {
   _id: string;
   _type: 'module_stats';
@@ -642,6 +672,17 @@ export type Settings_site = {
   brand?: Brand;
 };
 
+export type Block_faq = {
+  _id: string;
+  _type: 'block_faq';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  question?: string;
+  answer?: ListedText;
+};
+
 export type Block_testimonial = {
   _id: string;
   _type: 'block_testimonial';
@@ -1059,6 +1100,13 @@ export type Module_statsReference = {
   [internalGroqTypeReferenceTo]?: 'module_stats';
 };
 
+export type Module_faqReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_faq';
+};
+
 export type Page_landing = {
   _id: string;
   _type: 'page_landing';
@@ -1103,6 +1151,9 @@ export type Page_landing = {
     | ({
         _key: string;
       } & Module_statsReference)
+    | ({
+        _key: string;
+      } & Module_faqReference)
   >;
   seo?: Seo;
 };
@@ -1150,6 +1201,9 @@ export type Page_home = {
     | ({
         _key: string;
       } & Module_statsReference)
+    | ({
+        _key: string;
+      } & Module_faqReference)
   >;
   seo?: Seo;
 };
@@ -1414,6 +1468,8 @@ export type AllSanitySchemaTypes =
   | ImageWithAlt
   | Module_content
   | ArticleText
+  | Block_faqReference
+  | Module_faq
   | Module_stats
   | Block_testimonialReference
   | Module_testimonial
@@ -1455,6 +1511,7 @@ export type AllSanitySchemaTypes =
   | Settings_footer
   | Settings_navigation
   | Settings_site
+  | Block_faq
   | Block_testimonial
   | Block_feature
   | Person
@@ -1487,6 +1544,7 @@ export type AllSanitySchemaTypes =
   | Module_logoWallReference
   | Module_testimonialReference
   | Module_statsReference
+  | Module_faqReference
   | Page_landing
   | Page_home
   | PersonReference

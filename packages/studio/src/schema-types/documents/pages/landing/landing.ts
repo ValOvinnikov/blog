@@ -7,6 +7,7 @@ import { titleField } from '@blog/studio/schema-types/fields/title-field/title-f
 import { createSlugUrlPreviewInput } from '@blog/studio/schema-types/inputs/slug-url-preview/slug-url-preview-input';
 import { contentSchema } from '@blog/studio/schema-types/modules/content/content';
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
+import { faqSchema } from '@blog/studio/schema-types/modules/faq/faq';
 import { featureListSchema } from '@blog/studio/schema-types/modules/feature-list/feature-list';
 import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
 import { heroProfileSchema } from '@blog/studio/schema-types/modules/hero-profile/hero-profile';
@@ -75,6 +76,7 @@ export const landingPageSchema = defineType({
         logoWallSchema.name,
         testimonialSchema.name,
         statsSchema.name,
+        faqSchema.name,
       ],
     }),
     seoField(),
