@@ -1,6 +1,6 @@
 import { ICONS, SIZE } from '@blog/config';
-import { Button } from '@blog/ui/atoms/button';
-import { Icon } from '@blog/ui/atoms/icon';
+import { Button } from '@blog/ui/components/atoms/button';
+import { Icon } from '@blog/ui/components/atoms/icon';
 import { identitySectionVariants } from '@web/components/pages/account-page/sections/identity-section/identity-section-variants';
 import type {
   IIdentityProviderRow,

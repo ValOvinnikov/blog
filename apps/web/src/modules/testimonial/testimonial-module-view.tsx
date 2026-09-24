@@ -1,6 +1,6 @@
 import { CONTENT_ALIGNMENT, DISPLAY_MODE } from '@blog/config';
 import type { TTestimonialModule } from '@blog/service';
-import { CardGrid } from '@blog/ui/organisms/card-grid';
+import { CardGrid } from '@blog/ui/components/organisms/card-grid';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';

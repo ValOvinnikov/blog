@@ -1,6 +1,6 @@
 import { ICONS, SIZE } from '@blog/config';
 import { queries } from '@blog/db';
-import { Icon } from '@blog/ui/atoms/icon';
+import { Icon } from '@blog/ui/components/atoms/icon';
 import { DisplayNameControl } from '@web/components/shared/display-name-control';
 import { ProviderLinkControl } from '@web/components/shared/provider-link-control';
 import type { TLinkableProvider } from '@web/server/account/identity-actions';

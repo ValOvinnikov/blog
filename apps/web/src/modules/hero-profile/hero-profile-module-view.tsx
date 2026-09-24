@@ -1,7 +1,7 @@
 import { HERO_VARIANT } from '@blog/config';
 import type { THeroProfileModule } from '@blog/service';
-import { Avatar } from '@blog/ui/atoms/avatar';
-import { Hero } from '@blog/ui/organisms/hero';
+import { Avatar } from '@blog/ui/components/atoms/avatar';
+import { Hero } from '@blog/ui/components/organisms/hero';
 import { PortableText } from '@web/components/shared/portable-text';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SocialLinks } from '@web/components/shared/social-links';

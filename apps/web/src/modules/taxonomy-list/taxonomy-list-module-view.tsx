@@ -1,7 +1,7 @@
 import type { TTaxonomyListModule } from '@blog/service';
+import { TaxonomyCard } from '@blog/ui/components/molecules/taxonomy-card';
+import { CardGrid } from '@blog/ui/components/organisms/card-grid';
 import type { THeadingLevel } from '@blog/ui/lib/react';
-import { TaxonomyCard } from '@blog/ui/molecules/taxonomy-card';
-import { CardGrid } from '@blog/ui/organisms/card-grid';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';
 import { SmartLink } from '@web/components/shared/smart-link';

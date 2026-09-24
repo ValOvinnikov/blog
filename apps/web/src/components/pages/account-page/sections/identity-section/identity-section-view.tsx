@@ -1,6 +1,6 @@
-import { Heading } from '@blog/ui/atoms/heading';
-import { Panel } from '@blog/ui/molecules/panel';
-import { SettingRow } from '@blog/ui/molecules/setting-row';
+import { Heading } from '@blog/ui/components/atoms/heading';
+import { Panel } from '@blog/ui/components/molecules/panel';
+import { SettingRow } from '@blog/ui/components/molecules/setting-row';
 import type { ReactNode } from 'react';
 
 import { identitySectionVariants } from './identity-section-variants';

@@ -6,7 +6,7 @@ import {
   type TAsideKind,
 } from '@blog/config';
 import type { TPortableTextBody } from '@blog/service';
-import { ImageWithCaption } from '@blog/ui/molecules/image-with-caption';
+import { ImageWithCaption } from '@blog/ui/components/molecules/image-with-caption';
 import {
   PortableText as PortableTextRoot,
   type PortableTextReactComponents,

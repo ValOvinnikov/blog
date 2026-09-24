@@ -1,5 +1,5 @@
 import type { TLogoItem } from '@blog/service';
-import { LogoTile } from '@blog/ui/molecules/logo-tile';
+import { LogoTile } from '@blog/ui/components/molecules/logo-tile';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
 

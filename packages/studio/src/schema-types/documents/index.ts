@@ -1,3 +1,4 @@
+import { faqBlockSchema } from './blocks/faq/faq';
 import { featureBlockSchema } from './blocks/feature/feature';
 import { blockTestimonialSchema } from './blocks/testimonial/testimonial';
 import { tagSchema } from './blog/tag/tag';
@@ -25,6 +26,7 @@ export const documents = [
   tagSchema,
   featureBlockSchema,
   blockTestimonialSchema,
+  faqBlockSchema,
   linkSchema,
   landingPageSchema,
   homePageSchema,

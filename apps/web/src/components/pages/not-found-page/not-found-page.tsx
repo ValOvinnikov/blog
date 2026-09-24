@@ -1,8 +1,8 @@
 import { ICONS } from '@blog/config';
-import { Eyebrow } from '@blog/ui/atoms/eyebrow';
-import { Heading } from '@blog/ui/atoms/heading';
-import { Icon } from '@blog/ui/atoms/icon';
-import { Text } from '@blog/ui/atoms/text';
+import { Eyebrow } from '@blog/ui/components/atoms/eyebrow';
+import { Heading } from '@blog/ui/components/atoms/heading';
+import { Icon } from '@blog/ui/components/atoms/icon';
+import { Text } from '@blog/ui/components/atoms/text';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { useTranslations } from 'next-intl';
 

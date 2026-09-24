@@ -4,7 +4,7 @@ import { DEPTH, type TDepth } from '@blog/config';
 import {
   SegmentedControl,
   type ISegmentedControlOption,
-} from '@blog/ui/atoms/segmented-control';
+} from '@blog/ui/components/atoms/segmented-control';
 import { useDepth } from '@web/context/depth-provider';
 import { useTranslations } from 'next-intl';
 

@@ -1,4 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import {
   appliedIdsFromLedger,
@@ -7,6 +11,7 @@ import {
   computePending,
   formatTimestamp,
   isTimestamped,
+  listMigrationIds,
   slugify,
   slugOf,
   sortMigrationIds,
@@ -156,6 +161,44 @@ describe(computePending, () => {
     const appliedIds = ['legacy-a', '20260101T0000-a'];
 
     expect(computePending(folderIds, appliedIds)).toEqual([]);
+  });
+});
+
+describe(listMigrationIds, () => {
+  let migrationsDir;
+
+  beforeEach(() => {
+    migrationsDir = mkdtempSync(join(tmpdir(), 'migrate-lib-test-'));
+  });
+
+  afterEach(() => {
+    rmSync(migrationsDir, { recursive: true, force: true });
+  });
+
+  it('lists a directory that contains an index.ts', () => {
+    mkdirSync(join(migrationsDir, '20260710T1200-unify-links'));
+    writeFileSync(
+      join(migrationsDir, '20260710T1200-unify-links', 'index.ts'),
+      '',
+    );
+
+    expect(listMigrationIds(migrationsDir)).toEqual([
+      '20260710T1200-unify-links',
+    ]);
+  });
+
+  it('excludes lib/, the shared pure-helper directory with no index.ts', () => {
+    mkdirSync(join(migrationsDir, 'lib'));
+    writeFileSync(join(migrationsDir, 'lib', 'helpers.ts'), '');
+
+    expect(listMigrationIds(migrationsDir)).toEqual([]);
+  });
+
+  it('excludes backups/, which has no index.ts', () => {
+    mkdirSync(join(migrationsDir, 'backups'));
+    writeFileSync(join(migrationsDir, 'backups', 'dataset.tar.gz'), '');
+
+    expect(listMigrationIds(migrationsDir)).toEqual([]);
   });
 });
 

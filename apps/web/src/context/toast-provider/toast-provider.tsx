@@ -1,8 +1,8 @@
 'use client';
 
 import { TOAST_TYPE } from '@blog/config';
-import { Toast } from '@blog/ui/molecules/toast';
-import { ToastViewport } from '@blog/ui/organisms/toast-viewport';
+import { Toast } from '@blog/ui/components/molecules/toast';
+import { ToastViewport } from '@blog/ui/components/organisms/toast-viewport';
 import { useTranslations } from 'next-intl';
 import {
   createContext,

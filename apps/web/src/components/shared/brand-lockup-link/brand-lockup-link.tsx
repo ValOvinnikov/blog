@@ -1,4 +1,4 @@
-import { BrandLockup } from '@blog/ui/molecules/brand-lockup';
+import { BrandLockup } from '@blog/ui/components/molecules/brand-lockup';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { useTranslations } from 'next-intl';
 

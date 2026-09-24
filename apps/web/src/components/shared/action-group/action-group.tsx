@@ -6,7 +6,7 @@ import {
   type TCtaActionVariant,
   type TMaybeUndefined,
 } from '@blog/config';
-import { LinkButton } from '@blog/ui/molecules/link-button';
+import { LinkButton } from '@blog/ui/components/molecules/link-button';
 import { SmartLink } from '@web/components/shared/smart-link';
 
 import {

@@ -4,9 +4,9 @@ import {
   SOCIAL_PLATFORM_LABEL,
 } from '@blog/config';
 import type { TSocialProfile } from '@blog/service';
-import { Icon } from '@blog/ui/atoms/icon';
-import { NavLink } from '@blog/ui/atoms/nav-link';
-import type { TNavLinkVariants } from '@blog/ui/atoms/nav-link/nav-link-variants';
+import { Icon } from '@blog/ui/components/atoms/icon';
+import { NavLink } from '@blog/ui/components/atoms/nav-link';
+import type { TNavLinkVariants } from '@blog/ui/components/atoms/nav-link/nav-link-variants';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { useTranslations } from 'next-intl';
 
