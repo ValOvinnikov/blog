@@ -1,6 +1,9 @@
 import { CARD_IMAGE_SHAPE, CONTENT_ALIGNMENT } from '@blog/config/constants';
 import { personSchema } from '@blog/studio/schema-types/documents/person/person';
-import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
+import {
+  alignmentField,
+  alignmentFields,
+} from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { displayModeField } from '@blog/studio/schema-types/fields/display-mode-field/display-mode-field';
@@ -78,17 +81,11 @@ export const teamSchema = defineType({
       validation: (rule) => rule.required(),
     }),
     displayModeField(),
-    defineField({
+    alignmentField({
       name: 'cardAlignment',
       title: 'Card Alignment',
-      type: 'string',
       description: 'Left or Center, within each card.',
-      options: {
-        layout: 'dropdown',
-        list: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER].map(
-          (value) => ({ title: toTitleCase(value), value }),
-        ),
-      },
+      list: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
       initialValue: CONTENT_ALIGNMENT.CENTER,
       validation: (rule) => rule.required(),
     }),
@@ -110,7 +107,10 @@ export const teamSchema = defineType({
 
       return {
         title: title ?? 'Unknown',
-        subtitle: moduleSubtitle(brandVariant, `${String(count)} people`),
+        subtitle: moduleSubtitle(
+          brandVariant,
+          `${String(count)} ${count === 1 ? 'person' : 'people'}`,
+        ),
       };
     },
   },
