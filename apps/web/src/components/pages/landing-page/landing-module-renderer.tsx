@@ -11,6 +11,7 @@ import { FeatureListModule } from '@web/modules/feature-list/feature-list-module
 import { HeroBlogModule } from '@web/modules/hero-blog/hero-blog-module';
 import { HeroProfileModule } from '@web/modules/hero-profile/hero-profile-module';
 import { HeroStatementModule } from '@web/modules/hero-statement/hero-statement-module';
+import { LogoWallModule } from '@web/modules/logo-wall/logo-wall-module';
 import {
   renderHeroModule,
   renderModules,
@@ -19,6 +20,7 @@ import {
 import { NewsletterModule } from '@web/modules/newsletter/newsletter-module';
 import { PostFeaturedModule } from '@web/modules/post-featured/post-featured-module';
 import { PostLatestModule } from '@web/modules/post-latest/post-latest-module';
+import { StatsModule } from '@web/modules/stats/stats-module';
 import { TaxonomyListModule } from '@web/modules/taxonomy-list/taxonomy-list-module';
 import { TestimonialModule } from '@web/modules/testimonial/testimonial-module';
 import type { ReactNode } from 'react';
@@ -35,6 +37,8 @@ const LANDING_MAP: Partial<Record<TPageLandingType, TModuleComponent>> = {
   module_postFeatured: PostFeaturedModule,
   module_featureList: FeatureListModule,
   module_testimonial: TestimonialModule,
+  module_logoWall: LogoWallModule,
+  module_stats: StatsModule,
 };
 
 export interface ILandingModuleRendererProps {

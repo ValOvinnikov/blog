@@ -25,10 +25,10 @@ const setup = customRender(PostMeta, {
 });
 
 describe(`<${PostMeta.name}/>`, () => {
-  it('renders author name and avatar image', () => {
+  it('renders the author name once, with the avatar image contributing no duplicate accessible name', () => {
     setup();
-    expect(screen.getByText(author.name)).toBeVisible();
-    expect(screen.getByRole('img', { name: author.name })).toBeVisible();
+    expect(screen.getAllByText(author.name)).toHaveLength(1);
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
   it('renders a time element with the correct dateTime attribute and label', () => {
@@ -49,10 +49,10 @@ describe(`<${PostMeta.name}/>`, () => {
     expect(screen.queryByText(/min read/)).not.toBeInTheDocument();
   });
 
-  it('falls back to initials when imageUrl is not provided', () => {
+  it('falls back to initials when imageUrl is not provided, announcing the name once', () => {
     setup({ author: { name: author.name } });
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
-    expect(screen.getAllByText(author.name).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(author.name)).toHaveLength(1);
   });
 
   it('forwards dataTestId to root element', () => {

@@ -2669,8 +2669,8 @@ point; the graph stays acyclic.
   Banner; ui alone, then studio + service + web as one PR (2026-09-10,
   #2806).
 
-- **`module_heroProfile` references a `blog_author` rather than re-declaring
-  the person** — name, role, photo, bio and social links come through the
+- **`module_heroProfile` references a `person` document rather than
+  re-declaring it** — name, role, photo, bio and social links come through the
   reference with the `heroBlog`-style optional copy overrides; one photo,
   placed by the variant (a round `Hero.Avatar` on Stacked, a square
   `Hero.Media` on Split, the background on Banner), chosen by a new
@@ -2786,7 +2786,7 @@ catalogue has enough shipped history to matter).
 ## Resync log
 
 - **2026-09-11** — "`module_heroProfile` — the person hero" added (#2808),
-  the third hero kind, designed against `blog_author` as it stands (name,
+  the third hero kind, designed against `person` as it stands (name,
   image, Portable Text bio, role, `socialLinks[]`) and the footer's
   `toSocialIconName()` fallback; depends on #3071's Banner finish and
   #3073's `toHeroPresentation()`.

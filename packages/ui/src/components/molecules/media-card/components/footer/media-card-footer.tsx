@@ -31,12 +31,7 @@ export const MediaCardFooter = ({
 }: TMediaCardFooterProps) => (
   <div className={s.root({ class: className })} data-testid={dataTestId}>
     {authorName && (
-      <Avatar
-        name={authorName}
-        alt={authorName}
-        src={authorAvatarSrc}
-        size={SIZE.SM}
-      />
+      <Avatar name={authorName} alt="" src={authorAvatarSrc} size={SIZE.SM} />
     )}
     {authorName && <span>{authorName}</span>}
     {publishedAt && formattedDate && (

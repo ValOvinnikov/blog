@@ -1,4 +1,3 @@
-import { authorSchema } from '@blog/studio/schema-types/documents/blog/author/author';
 import { tagSchema } from '@blog/studio/schema-types/documents/blog/tag/tag';
 import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic/topic';
 import { postPageSchema } from '@blog/studio/schema-types/documents/pages/post/post';
@@ -30,10 +29,6 @@ export const blogSection: TStructureSection = {
     {
       title: 'Taxonomy',
       items: [{ schema: topicSchema }, { schema: tagSchema }],
-    },
-    {
-      title: 'People',
-      items: [{ schema: authorSchema }],
     },
     {
       title: 'Settings',

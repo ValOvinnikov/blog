@@ -5,7 +5,7 @@ import { ActionGroup } from '@web/components/shared/action-group';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';
 import { moduleGridActionsVariants } from '@web/utils/module-grid-actions-variants';
-import { toFeatureGridColumns } from '@web/utils/to-feature-grid-columns';
+import { toModuleGridColumns } from '@web/utils/to-module-grid-columns';
 
 import { FeatureListCard } from './feature-list-card';
 import { FeatureListCarousel } from './feature-list-carousel';
@@ -42,7 +42,7 @@ export const FeatureListModuleView = ({
 
   const cardAlign =
     cardAlignment === CONTENT_ALIGNMENT.CENTER ? 'center' : 'left';
-  const columns = toFeatureGridColumns(items.length);
+  const columns = toModuleGridColumns(items.length);
   const s = moduleGridActionsVariants({ align: contentAlignment });
 
   return (

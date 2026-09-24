@@ -4507,7 +4507,7 @@
     }
   },
   {
-    "name": "blog_author",
+    "name": "person",
     "type": "document",
     "attributes": {
       "_id": {
@@ -4520,7 +4520,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "string",
-          "value": "blog_author"
+          "value": "person"
         }
       },
       "_createdAt": {
@@ -6850,7 +6850,7 @@
   },
   {
     "type": "type",
-    "name": "blog_author.reference",
+    "name": "person.reference",
     "value": {
       "type": "object",
       "attributes": {
@@ -6875,7 +6875,7 @@
           "optional": true
         }
       },
-      "dereferencesTo": "blog_author"
+      "dereferencesTo": "person"
     }
   },
   {
@@ -6960,7 +6960,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "blog_author.reference"
+          "name": "person.reference"
         },
         "optional": true
       },
@@ -7728,7 +7728,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "blog_author.reference"
+          "name": "person.reference"
         },
         "optional": true
       },

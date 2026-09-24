@@ -153,20 +153,28 @@ document type to the desk — singleton or list — is one entry in a section's
 group, never a hand-built `S.listItem()…child(S.document())` chain in the
 entry file; Settings used to be exactly that exception and it is gone.
 
-**The Modules section has four fixed groups, and every module schema is
-placed by the job it does on the page — never appended to a catch-all.**
-`src/structure/sections/modules-section.ts` groups are: **Heroes** (the
-`hero` slot's family — `module_hero*`; never placeable in `modules[]`),
-**Posts** (blog listings fed by post/taxonomy queries — `module_post*`,
-`module_taxonomy*`; a second content type with listings, e.g. projects, gets
-its own sibling group), **Sections** (page-body bands presenting authored
-content — content, features, testimonials, logo wall, stats, team, timeline,
-gallery, FAQ, pricing, embed, location), and **Conversion** (bands whose point
-is a click or a signup — call to action, newsletter, contact form). A new
-module's ticket names its group in `## Scope`; a module that fits none is a
-design question to raise, not a fifth group to invent. Adopted 2026-09-21
-(#3509), when eight modules had accreted into "Content modules" with the
-heroes mixed in.
+**The Modules section groups every module by the job it does on the page —
+never by professional field, and never into a catch-all.** A module serves
+every kind of site, so a field-based group would either repeat it or file it
+arbitrarily; the job is one stable answer, and it is what an editor is
+thinking when they reach for one. `src/structure/sections/modules-section.ts`
+follows this taxonomy, in this order:
+
+| Group      | Job                                    | Modules                                                                        |
+| ---------- | -------------------------------------- | ------------------------------------------------------------------------------ |
+| Heroes     | open a page                            | `module_hero*` — the `hero` slot's family, never placeable in `modules[]`      |
+| Posts      | show the writing                       | `module_post*`, `module_taxonomy*` — listings fed by post and taxonomy queries |
+| Projects   | show the work                          | `module_project*` — listings fed by project queries                            |
+| Explainers | explain an offer, a story or a process | content, features, feature highlights, timeline, FAQ                           |
+| Proof      | back up a claim                        | testimonials, logo wall, stats                                                 |
+| Media      | show images or video                   | gallery, embed                                                                 |
+| Conversion | get the visitor to act                 | call to action, newsletter, pricing, contact form                              |
+
+A group enters the desk with its first module and is never listed empty. A
+new module's ticket names its group in `## Scope`; a module whose job fits
+none of the seven is a design question to raise, not a new group to invent.
+Adopted 2026-09-24 (#3694), when "Sections" was set to absorb about ten of
+the catalogue's modules.
 
 **The desk never restates a schema's name, title or icon.** `schema.name`,
 `schema.title` and `schema.icon` are the single source; `src/structure/*`
@@ -233,9 +241,10 @@ src/schema-types/modules/hero-blog/
 
 ## Content model (see SPEC.md §6 for the current model)
 
-Type names follow `{group}_{name}`. Documents: `blog_author`, `blog_tag`,
-`blog_topic`; page documents `page_home`, `page_blog`, `page_landing`,
-`page_post`, `page_tag`, `page_topic`, `page_tagIndex`, `page_topicIndex`;
+Type names follow `{group}_{name}`, except `person`, which is ungrouped.
+Documents: `person`, `blog_tag`, `blog_topic`; page documents `page_home`,
+`page_blog`, `page_landing`, `page_post`, `page_tag`, `page_topic`,
+`page_tagIndex`, `page_topicIndex`;
 singletons `settings_site`, `settings_navigation`, `settings_footer`,
 `settings_newsletter`, `settings_theme`; and the reusable module documents
 `module_content`, `module_cta`, `module_hero`, `module_heroBlog`,

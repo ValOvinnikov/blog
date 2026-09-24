@@ -41,7 +41,7 @@ export const PostMeta = ({
       <span className={s.author()}>
         <Avatar
           name={author.name}
-          alt={author.name}
+          alt=""
           src={author.imageUrl}
           size={SIZE.SM}
         />

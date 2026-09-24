@@ -4,8 +4,8 @@ import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-d
 import { portableTextMarkDefFragment } from '@blog/service/shared/fragments/portable-text/portable-text-mark-def';
 import { socialProfileFragment } from '@blog/service/shared/fragments/social-profile/social-profile';
 
-export const authorCardFragment = q
-  .fragmentForType<'blog_author'>()
+export const personCardFragment = q
+  .fragmentForType<'person'>()
   .project((sub) => ({
     _id: true,
     name: sub.field('name').notNull(),
@@ -17,10 +17,10 @@ export const authorCardFragment = q
       .nullable(true),
   }));
 
-export const authorDetailFragment = q
-  .fragmentForType<'blog_author'>()
+export const personDetailFragment = q
+  .fragmentForType<'person'>()
   .project((sub) => ({
-    ...authorCardFragment,
+    ...personCardFragment,
     role: sub.field('role').nullable(true),
     bio: sub
       .field('bio[]')
