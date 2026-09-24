@@ -24,6 +24,8 @@ export const StatsModuleView = ({
   titleId,
   dataTestId,
 }: IStatsModuleViewProps) => {
+  if (stats.length === 0) return null;
+
   const columns = toModuleGridColumns(stats.length);
   const s = moduleGridActionsVariants({ align: contentAlignment });
   const v = statsModuleViewVariants({ columns, align: contentAlignment });

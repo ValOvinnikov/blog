@@ -64,4 +64,10 @@ describe(`<${StatsModuleView.name}/>`, () => {
       '/blog',
     );
   });
+
+  it('renders nothing when stats is empty, never an empty landmark with a dangling aria-labelledby', () => {
+    const { container } = setup({ stats: [] });
+
+    expect(container).toBeEmptyDOMElement();
+  });
 });

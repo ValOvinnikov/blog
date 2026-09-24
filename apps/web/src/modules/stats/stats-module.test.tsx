@@ -65,6 +65,17 @@ describe(`<${StatsModule.name}/>`, () => {
     expect(container).toBeEmptyDOMElement();
   });
 
+  it('renders nothing when the stats degrade to an empty list, never an empty landmark with a dangling aria-labelledby', async () => {
+    getStatsModuleMock.mockResolvedValue({
+      ok: true,
+      data: makeStatsModule({ stats: [] }),
+    });
+
+    const { container } = await setup();
+
+    expect(container).toBeEmptyDOMElement();
+  });
+
   it('renders the resolved stat figures', async () => {
     getStatsModuleMock.mockResolvedValue({
       ok: true,

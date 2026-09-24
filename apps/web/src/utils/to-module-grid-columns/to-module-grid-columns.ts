@@ -8,10 +8,6 @@ const MODULE_GRID_COLUMNS_BY_ITEM_COUNT: Record<number, 1 | 2 | 3 | 4> = {
   8: 4,
 };
 
-/**
- * Full-rows rule: 5 and 6 items use 3 columns rather than 4, and 7 uses 4
- * rather than 3, so the grid's last row is never left with a single
- * orphaned item.
- */
+// Full-rows rule: 5/6 use 3 columns and 7 uses 4, not a naive progression, so no row is left with one orphaned item.
 export const toModuleGridColumns = (itemCount: number): 1 | 2 | 3 | 4 =>
   MODULE_GRID_COLUMNS_BY_ITEM_COUNT[itemCount] ?? 4;

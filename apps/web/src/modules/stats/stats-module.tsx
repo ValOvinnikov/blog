@@ -21,6 +21,7 @@ export const StatsModule = async ({ id, tenant }: IStatsModuleProps) => {
     logger.error('stats_module.fetch_failed', { id, error: result.error });
     return null;
   }
+  if (result.data.stats.length === 0) return null;
 
   return (
     <StatsModuleView
