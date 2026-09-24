@@ -74,13 +74,13 @@ describe(`<${MediaCard.name}/>`, () => {
     expect(screen.getByText('typescript')).toBeVisible();
   });
 
-  it("renders author name as visible text in the Footer, alongside the Avatar's own accessible-name duplicate", () => {
+  it('renders the author name once as visible text in the Footer, with the Avatar contributing no duplicate accessible name', () => {
     renderElement(
       <MediaCard>
         <MediaCard.Footer authorName="Jane Doe" />
       </MediaCard>,
     );
-    expect(screen.getAllByText('Jane Doe')).toHaveLength(2);
+    expect(screen.getAllByText('Jane Doe')).toHaveLength(1);
   });
 
   it('does not render author section when authorName is omitted', () => {

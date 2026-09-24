@@ -11,7 +11,7 @@ describe(DocumentValidationTable, () => {
     const documents: TSanityValidationResult[] = [
       {
         documentId: 'provisioning.author.starter',
-        documentType: 'blog_author',
+        documentType: 'person',
         markers: [{ level: 'warning', message: "Field 'slug' does not exist" }],
       },
     ];
@@ -24,7 +24,7 @@ describe(DocumentValidationTable, () => {
     ).toBeVisible();
     expect(screen.getByRole('columnheader', { name: 'Message' })).toBeVisible();
     expect(screen.getByText('Warning')).toBeVisible();
-    expect(screen.getByText('blog_author')).toBeVisible();
+    expect(screen.getByText('person')).toBeVisible();
     expect(screen.getByText('provisioning.author.starter')).toBeVisible();
     expect(screen.getByText("Field 'slug' does not exist")).toBeVisible();
   });

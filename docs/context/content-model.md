@@ -27,8 +27,8 @@ a compile error (see [`data-flow.md`](./data-flow.md)). Rendering is not:
 `TOPIC_INDEX_MAP`, `TAG_INDEX_MAP` — and every one is declared
 `Partial<Record<TPage…Type, TModuleComponent>>`. A module the schema allows on
 a page but the map omits therefore compiles cleanly and renders nothing at
-runtime. That is how `module_logoWall` currently sits, and it is the drift
-to check for by hand when adding a module.
+runtime. That is the drift to check for by hand when adding a module: a new
+type that lands in a page's `allow` list but not in that page's map.
 
 Those per-page maps include the hero types, so a hero is keyed the same way as
 any other module; what differs is that a hero arrives through the page's own
@@ -36,14 +36,13 @@ any other module; what differs is that a hero arrives through the page's own
 
 ## Module documents
 
-`packages/studio/src/schema-types/modules/`. Fifteen `module_*` types exist.
-**Thirteen are live** — schema, service adaptor and renderer all present. Two
-are not, and neither should be described as working:
+`packages/studio/src/schema-types/modules/`. Sixteen `module_*` types exist.
+**Fifteen are live** — schema, service adaptor and renderer all present. One is
+not, and should not be described as working:
 
-| Type              | State                                                                                                                                                                                                             |
-| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `module_logoWall` | Schema only. Authorable in Studio, but there is no `packages/service` adaptor and no `apps/web` renderer, so it renders nothing.                                                                                  |
-| `module_hero`     | Deprecated in-schema ("Superseded by the Blog Hero module"). No page's hero slot offers it, no renderer keys it, and its surviving `service.modules.hero.v1` loader has no caller. Replaced by `module_heroBlog`. |
+| Type          | State                                                                                                                                                                                                             |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `module_hero` | Deprecated in-schema ("Superseded by the Blog Hero module"). No page's hero slot offers it, no renderer keys it, and its surviving `service.modules.hero.v1` loader has no caller. Replaced by `module_heroBlog`. |
 
 ### What every module carries
 
@@ -233,6 +232,59 @@ A grid or carousel of feature cards.
 - **Actions** — `ctaButtons`, 0–2.
 - **Pages** — home, landing.
 
+#### `module_logoWall` — logo social proof
+
+- **Items** — `logos`: 1–12 **inline `logoItem` objects**, not references. Logos
+  never recombine: a wall is reused by referencing the same `module_logoWall`
+  from several pages, so reuse already happens one level up. `block_logo`
+  existed briefly and was retired for that reason. Validated `required()`,
+  `min(1)` and `max(12)` as separate rules, and deliberately **without
+  `unique()`** — repeating a logo is not a mistake worth blocking.
+- **The item** — `name`, an `image` and an optional `link` reference. `name` is
+  the logo's alt text and never renders as visible text: WAI's rule is that a
+  logo's alt is the organisation's name, “Stripe” rather than “Stripe logo”. The
+  image is a plain `image`, not an `imageWithAlt`, because a generic “describe
+  the image” prompt invites the wrong alt.
+- **A wrapping flex row, not a grid** — `LogoTile` carries its own
+  per-breakpoint minimum width (two per row on phones, three at `sm`, four at
+  `md`, five from `lg`), so the row holds tile width roughly constant instead of
+  stretching tiles to fill a column count. There is no derived column helper.
+- **Not cards** — `LogoTile` paints no surface, border or radius in any state:
+  most logos are unlinked, and a card would promise a click that never arrives.
+- **Variants** — `displayMode`: `GRID` (default) · `CAROUSEL`.
+- **Actions** — `ctaButtons`, 0–2.
+- **Renders nothing** when the array is empty, or when a logo's image cannot be
+  resolved — one unresolvable logo costs the whole wall rather than leaving a
+  gap in it.
+- **Pages** — home, landing.
+
+#### `module_stats` — figures that back a claim
+
+- **Items** — `stats`: 2–6 **inline `stat` objects**, not references. A logo or
+  a quote recurs across pages; a figure belongs to the argument one page is
+  making, and reusing it would make a stale number wrong in two places. So
+  there is no Blocks desk entry, no reference picker and no `block_*`
+  revalidation tag — the whole module is one document read.
+- **The figure** — `value` is a single required string, never a number plus a
+  unit: real figures are `2.4M`, `<50ms`, `4.9/5`, `24/7`, `3×`, `Top 10`, and
+  a number-plus-unit split expresses none of them. Nothing is parsed; past
+  eight characters it warns. `label` is required, `description` optional.
+- **No `displayMode`** — two to six short figures always fit one or two rows,
+  so a carousel would hide them behind a swipe. One alignment control only:
+  the figures follow `contentAlignment` with the heading and actions.
+- **Grid columns** derive from the item count — 2→2, 3→3, 4→4, 5→3, 6→3 —
+  via the shared `toModuleGridColumns` helper, capped at four and dropping to
+  two on tablet and phone.
+- **Not cards** — the figures sit directly on the band with a hairline between
+  columns and no surface, border or radius. A card surface would promise a
+  click this module does not have, so `CardGrid` is skipped.
+- **Reading order** — the band is a `<dl>`, label-first in source order, so a
+  screen reader hears “median organic lift, plus 38 percent”; CSS `order` puts
+  the value on top visually. The value is the only thing carrying the accent.
+- **Footnote** — `footnote`, one optional line under the figures.
+- **Actions** — `ctaButtons`, 0–2.
+- **Pages** — home, landing.
+
 ### Listings
 
 #### `module_postList` — paginated archive
@@ -407,14 +459,14 @@ reference to the term they archive.
 `page_post` carries the most of its own, since the post _is_ the page:
 `heroImage` (`imageWithAlt`, optional — a post without one renders imageless
 rather than 404ing), `content` (`articleText`, required), `featured`, `author`
-(→ `blog_author`, required), `topic` (→ `blog_topic`, required — the single
+(→ `person`, required), `topic` (→ `blog_topic`, required — the single
 primary classification), `tags` (→ `blog_tag`, optional, max 6), `publishedAt`
 (required — it drives sort order and the date readers see), and
 `postTakeaways` (optional, the 30-second-skim summary).
 
 **Other documents**
 
-- `blog_author` — name, image (`imageWithAlt`), bio, role, socialLinks (array of
+- `person` — name, image (`imageWithAlt`), bio, role, socialLinks (array of
   `socialProfile`), profilePage (optional ref → a `link` document, so any page
   type it can target).
 - `blog_topic` — `title` (required, max 60), slug, description (max 300). The
@@ -432,7 +484,7 @@ primary classification), `tags` (→ `blog_tag`, optional, max 6), `publishedAt`
   per module). Authored under **Blocks → Cards** alongside `block_feature`.
 - `link` — the single link target every reference-shaped object
   (`linkRef`, `ctaButton`, `ctaSecondaryButton`, `socialProfile`,
-  `blog_author.profilePage`) points at.
+  `person.profilePage`) points at.
 - `settings_site` (singleton) — `titleField` (bare; see helper note below),
   brand
   (`brand` object: name/logo/tagline — `logo` is optional, falling
@@ -486,10 +538,13 @@ empty. Singletons resolve their Studio label via `preview.prepare` instead
 `max` for an editable headline.
 
 **Objects** — `linkRef`, `ctaButton`, `ctaSecondaryButton` and
-`socialProfile` (each wrapping a reference to a `link` **document**),
+`socialProfile` (each wrapping a reference to a `link` **document**), `stat`
+(one figure — `value`, `label`, optional `description` — embedded on
+`module_stats` rather than referenced, so a number lives with the one
+argument that uses it),
 `brand`, `brandTagline` (structured tagline: `items` + a
 `BRAND_TAGLINE_SEPARATORS`-driven `separator`), `imageWithAlt` (required alt —
-used by `page_post.heroImage`, `blog_author.image`, `brand.logo`,
+used by `page_post.heroImage`, `person.image`, `brand.logo`,
 `openGraph.image`, `block_feature.image` and the hero/CTA modules), `bodyImage` (required alt; optional `layout`
 from `IMAGE_LAYOUT`, undefined = Inline — shares its `alt`/hotspot shape with
 `imageWithAlt` via the `image-alt-field` helper, but is a distinct type

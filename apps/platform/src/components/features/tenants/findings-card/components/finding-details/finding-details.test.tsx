@@ -15,7 +15,7 @@ describe(FindingDetails, () => {
           documents: [
             {
               documentId: 'provisioning.author.starter',
-              documentType: 'blog_author',
+              documentType: 'person',
               markers: [{ level: 'warning', message: "Field 'slug' missing" }],
             },
           ],
@@ -26,7 +26,7 @@ describe(FindingDetails, () => {
     await user.click(screen.getByText('Details'));
 
     expect(screen.getByRole('table')).toBeVisible();
-    expect(screen.getByText('blog_author')).toBeVisible();
+    expect(screen.getByText('person')).toBeVisible();
     expect(screen.queryByText(/invalidDocumentCount/)).not.toBeInTheDocument();
   });
 

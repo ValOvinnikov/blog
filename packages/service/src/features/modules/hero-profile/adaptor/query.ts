@@ -1,9 +1,9 @@
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
-import { authorDetailFragment } from '@blog/service/shared/fragments/author/author';
 import { ctaButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
 import { heroLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { personDetailFragment } from '@blog/service/shared/fragments/person/person';
 import { z } from 'zod';
 
 export const heroProfileModuleQuery = q
@@ -23,7 +23,7 @@ export const heroProfileModuleQuery = q
     showSocialLinks: sub.raw('coalesce(showSocialLinks, true)', z.boolean()),
     showRole: sub.raw('coalesce(showRole, true)', z.boolean()),
     showBio: sub.raw('coalesce(showBio, true)', z.boolean()),
-    author: sub.field('author').deref().project(authorDetailFragment).notNull(),
+    author: sub.field('author').deref().project(personDetailFragment).notNull(),
     ctaButtons: sub
       .field('ctaButtons[]')
       .project(ctaButtonFragment)

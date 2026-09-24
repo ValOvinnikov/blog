@@ -60,6 +60,9 @@ describe(`<${TopicIndexPage.name}/>`, () => {
     await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('topic_index_page.fetch_failed'),
+    );
 
     errorSpy.mockRestore();
   });

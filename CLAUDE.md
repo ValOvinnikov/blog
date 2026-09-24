@@ -776,7 +776,11 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   `testing-library/no-container`, `no-node-access` and
   `prefer-screen-queries` fail those the same way, except a _chained_ walk
   (`container.children[0]`), which only review catches; a roleless element gets
-  a fixed `data-testid` on the component and `screen.getByTestId`. One
+  a fixed `data-testid` on the component and `screen.getByTestId`. **A
+  Studio schema definition gets no test at all** — not its validation,
+  limits, required, `hidden` or preview, which are the schema read back
+  too; only `schema-types/validation/`, the structure, input and preview
+  helpers, config, mount and migrations are tested there. One
   rule, one home — `testing-practices` → "What not to test" and "Never drop
   to a raw DOM query".
 - After a schema change: `pnpm typegen`, then commit the regenerated files in
@@ -1316,8 +1320,8 @@ the "Comments default to zero" rule above:
   the change, `## Scope` lists no test file, and the ticket carries
   `no-tests-needed` from creation rather than the PR earning it later.
 - **The same check covers every other rule** a body can quietly
-  prescribe: a test that asserts a schema's field list or a constant's
-  value back at itself, a `Name — does X` doc block, a hand-edit to
+  prescribe: any test of a Studio schema definition, a test that asserts
+  a constant's value back at itself, a `Name — does X` doc block, a hand-edit to
   `packages/config/src/sanity/generated/`, a schema change with no
   migration decision.
 

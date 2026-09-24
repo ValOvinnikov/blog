@@ -203,7 +203,7 @@ describe(`<${PostArticle.name}/>`, () => {
       { width: 64, height: 64, fit: 'crop', quality: 75 },
     );
 
-    expect(screen.getByAltText('Jane Doe')).toHaveAttribute(
+    expect(screen.getByRole('presentation')).toHaveAttribute(
       'src',
       expectedAvatarUrl,
     );

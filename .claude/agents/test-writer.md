@@ -135,8 +135,12 @@ prune: note them as a finding.
   transformer/loader mapping and `urlForImage`, no network.
 - **`apps/web`** routes: mock `service` functions, assert data renders and
   metadata is produced; keep these light.
-- **`packages/studio` migrations**: test the `document()` transform directly —
-  correctness and idempotency.
+- **`packages/studio`**: never a schema definition — nothing under
+  `schema-types/{documents,objects,modules,fields}/`, not its validation,
+  limits, required, `hidden` or preview. A schema-only diff is "nothing to
+  add". Tests go to `schema-types/validation/`, `structure/`, `inputs/`,
+  `preview/`, config, mount and migrations; a migration's `document()`
+  transform is tested directly — correctness and idempotency.
 
 Follow each workspace's existing fixture/test conventions (service
 `testing/make*` factories, `vitest.config.ts` aliases) rather than inventing

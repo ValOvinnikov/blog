@@ -279,11 +279,11 @@ dead anchor. Declaring `annotations` explicitly also replaces the default
 annotation set, so prose offers no paste-a-URL annotation of its own — an
 author picks an existing `link` document instead, which is the point.
 
-**`settings_navigation`, `settings_footer` and `blog_author` all author
+**`settings_navigation`, `settings_footer` and `person` all author
 through the library.** `settings_navigation.items` is an array of `linkRef`,
 so a navigation item carries no label of its own — the label comes from the
 `link` document, and editing it there updates every surface at once.
-`settings_footer.social` and `blog_author.socialLinks` are both arrays of
+`settings_footer.social` and `person.socialLinks` are both arrays of
 `socialProfile`, pairing a `link` reference with a `platform` from
 `SOCIAL_PLATFORMS`, and both resolve through one shared
 fragment/transformer pair rather than a type each. A social link's
@@ -292,7 +292,7 @@ accessible name is **derived** from that `platform` via the
 stays translated and consistent instead of depending on each author typing
 one.
 
-`blog_author.profilePage` is a `link` reference too, which widened it from
+`person.profilePage` is a `link` reference too, which widened it from
 the single `page_landing` target it once allowed to every type a `link` can
 point at. Because the destination is no longer knowably a landing page,
 `@blog/service` resolves the href and hands it to `apps/web` as
@@ -394,13 +394,13 @@ page's own required `headingBlock` heading becomes the `<h1>`. **`module_heroSta
 member — a headline, a line of support and up to two actions, with nothing
 derived from anything — and is the hero a marketing, agency, product or
 consultant home page opens with. **`module_heroProfile`** is the person
-hero: it references a `blog_author` for a photo, social profiles and — each
+hero: it references a `person` for a photo, social profiles and — each
 behind its own toggle — the author's `role` and `bio`, and authors the rest
 of its copy itself; nothing is ever derived from the author's `name`.
 
 `module_heroProfile`'s fields are `title`, `brandVariant`, the shared
 `headingBlock`, an optional `eyebrow`, a **required** `author` reference to
-`blog_author`, an optional `image`, the shared `ctaButtons`, and three
+`person`, an optional `image`, the shared `ctaButtons`, and three
 toggles defaulting on — `showSocialLinks`, `showRole` and `showBio` —
 before its composed tail. `showRole` renders the author's `role` as the
 hero's eyebrow and hides the authored `eyebrow` field while on, so the two
@@ -414,7 +414,7 @@ variant**: Stacked and Split take the module's own `image` when set and
 fall back to the author's, while **Banner takes the module's own image or
 nothing**. An author's photo is sized for a portrait; stretched across a
 full-bleed band it reads as a blur, so the Banner never inherits one.
-`blog_author.image` is optional by design, so a photoless author is a
+`person.image` is optional by design, so a photoless author is a
 supported state rather than a failure, which is why the schema declares
 **no document-level validation at all**: it validates what the editor
 cannot see, not what they just chose. **What each variant does without a
@@ -752,8 +752,11 @@ same reason: the card's own content already answers it.
 **Grid columns are derived from the card count, not authored** — 2→2, 3→3,
 4→4, 5→3, 6→3, 7→4, 8→4. Five and six take three columns rather than four,
 and seven takes four rather than three, so the last row is never left with a
-single orphaned card. `toFeatureGridColumns` in `apps/web` is the whole rule;
-the carousel ignores it.
+single orphaned card. `toModuleGridColumns` in `apps/web` is the whole rule;
+the carousel ignores it. It is named for the job rather than for this module
+because `module_stats` derives its columns from the same table — the mapping is
+identical across the 2–6 range a stats band can hold, so a second copy would
+have been a near-duplicate that never fails loudly.
 
 `cardAlignment` is a casing seam worth naming: it stores UPPERCASE
 `CONTENT_ALIGNMENT` values and offers only `LEFT`/`CENTER`, while `@blog/ui`'s
@@ -828,6 +831,96 @@ safe. That is not a page-level risk: the loader is wrapped in `safeAsync`, so a
 parse failure returns a failed result and the module renders nothing rather than
 404ing the page, and the Sanity client pins `perspective: 'published'`, so a
 draft with the field still unset is never queried.
+
+**A logo is an inline object, not a document — one of the two places the
+`block_*` pattern is deliberately not followed, `module_stats` below being the
+other.** `logoItem` ("Logo") holds a `name`, an
+`image` and an optional `link` reference, and lives directly on the module's
+`logos` array. Logos never recombine: a wall is reused by referencing the same
+`module_logoWall` from several pages, so reuse already happens one level up, and
+documents would only have added a desk entry, a reference picker and a
+revalidation tag while forcing editors to create each logo elsewhere before
+picking it. `block_logo` existed briefly and was retired for that reason.
+
+`module_logoWall` ("Logo Wall") validates `logos` with `required()`, `min(1)` and
+`max(12)` as separate rules, for the reason given above — and **without
+`unique()`**, unlike `module_testimonial`. Not because uniqueness cannot be
+expressed on an array of objects: Sanity deep-compares their values and ignores
+`_key` precisely so a paste-duplicated item is still caught. Repeating a logo is
+simply not a mistake worth blocking.
+
+**`name` is the logo's alt text and nothing else — it never renders as visible
+text.** WAI's rule for a logo is that the alt is the organisation's name,
+"Stripe" rather than "Stripe logo", so the service builds the image's alt from
+`name` directly and appends nothing. The image is a plain `image` rather than an
+`imageWithAlt`: a generic "describe the image" prompt invites the wrong alt, and
+crop and hotspot controls are noise for a mark that must render whole.
+
+**The wall is a wrapping flex row, not a grid.** `apps/web` composes
+`flex flex-wrap` with a 24px gap, and `@blog/ui`'s `LogoTile` carries its own
+per-breakpoint minimum width — two logos per row on phones, three at `sm`, four
+at `md`, five from `lg` — so the row holds tile width roughly constant instead of
+stretching tiles to fill a column count. The tiers are derived from that gap and
+`Section`'s `max-w-5xl` box, so changing either changes how many logos fit. A
+column count cannot express this: an equal-width grid track forces a wide
+wordmark to shrink below a square mark's height, and a trailing row would strand
+an orphan where wrapping simply re-flows. `containerWidth: FULL` stays available
+and gives the row more space than the tiers assume; tiles grow toward their
+maximum and the surplus becomes whitespace.
+
+The row's `justify-content` follows `contentAlignment`, the same field that
+aligns the heading and the actions — left by default, so a single logo sits under
+a left-aligned heading rather than floating centred. `LogoTile` paints no
+surface, border or radius in any state: most logos are unlinked, and a card
+promises a click that never arrives.
+
+**One logo the service cannot resolve costs the whole wall, not that tile.** The
+query projects `name` and `image` with `.notNull()`, and `toLogoItem` throws
+`UnresolvedLogoImageError` if an image still fails to resolve; the throw leaves
+`toLogoWallModule`, `safeAsync` turns it into a failed result, and the module
+renders nothing rather than a wall with a gap in it. As with
+`module_testimonial`, that is not a page-level risk — the page loses the section
+and keeps rendering. The view also returns nothing for an empty array, which
+`.notNull()` does not reject and `min(1)` only blocks in the Studio, so an
+API-written wall with no logos disappears instead of rendering an empty row.
+
+`module_stats` ("Stats") holds **inline objects rather than referenced
+documents** too, for a different reason than the logo wall's. A `stat` carries a required
+`value`, a required `label` and an optional `description`, and lives on the
+module's `stats` array — 2 to 6 of them, `required()` ahead of `min(2)` and
+`max(6)`, with no `unique()` because inline objects have no id to compare. The
+reuse a `block_*` document buys is the wrong trade here: a logo or a quote
+recurs across pages, but a figure belongs to the argument one page is making,
+and editing it once would make a stale number wrong in two places. It follows
+that there is no Blocks desk entry, no reference picker, no `block_*`
+revalidation tag and — uniquely in this family — no dereference anywhere in the
+query, so the whole module is a single document read.
+
+**`value` is one string, never a number plus a unit.** Real figures are `2.4M`,
+`<50ms`, `4.9/5`, `24/7`, `3×` and `Top 10`; a numeric field with a unit
+alongside expresses none of them without an escape hatch, and an escape hatch
+means two ways to author the same figure. Nothing is parsed — past eight
+characters the schema warns and stops there. `@blog/service` exposes each figure
+as `TStatItem`, whose `id` comes from the array member's `_key`, matching how
+every other item array in the layer surfaces a stable identifier.
+
+It carries the usual furniture — `brandVariant`, `headingBlock`, `layout`,
+`ctaButtons`, plus an optional one-line `footnote` — and is allowed in
+`page_home.modules[]` and `page_landing.modules[]` only. **It has no
+`displayMode` and only one alignment axis**: two to six short figures always fit
+one or two rows, so a carousel would hide them behind a swipe, and the figures
+follow `contentAlignment` along with the heading and actions rather than taking
+a `cardAlignment` of their own.
+
+**The figures are not cards, and that is a deliberate affordance decision.** In
+this design system a card surface means the item does something — `MediaCard`
+takes `isInteractive`, a feature card is a link, a post card opens a post. A
+figure is read, not clicked, so a surface would promise a click that never
+arrives; the items sit directly on the band with a hairline between columns and
+no surface, border or radius, and `CardGrid` is skipped with them. The band is a
+`<dl>` whose source order is label-first, so a screen reader hears “median
+organic lift, plus 38 percent”, while CSS `order` puts the value on top
+visually — the value being the only element carrying the accent colour.
 
 `service.modules.<type>.v1` projects `brandVariant` as a required
 `TBrandVariantOf<...>` (narrowed per module to exactly the options its

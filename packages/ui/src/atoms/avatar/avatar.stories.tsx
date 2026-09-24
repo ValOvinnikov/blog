@@ -38,3 +38,8 @@ export const Small: TStory = {
 export const Large: TStory = {
   args: { size: SIZE.LG },
 };
+
+export const Decorative: TStory = {
+  name: 'Decorative (beside visible name text)',
+  args: { alt: '' },
+};

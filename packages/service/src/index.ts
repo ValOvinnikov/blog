@@ -23,6 +23,7 @@ import { createPostFeaturedModuleService } from './features/modules/post-feature
 import { createPostLatestModuleService } from './features/modules/post-latest';
 import { createPostListModuleService } from './features/modules/post-list';
 import { createPostRelatedModuleService } from './features/modules/post-related';
+import { createStatsModuleService } from './features/modules/stats';
 import { createTaxonomyListModuleService } from './features/modules/taxonomy-list';
 import { createTestimonialModuleService } from './features/modules/testimonial';
 import { createHomeService } from './features/pages/home';
@@ -64,6 +65,7 @@ export const service = {
     featureList: createFeatureListModuleService(),
     logoWall: createLogoWallModuleService(),
     testimonial: createTestimonialModuleService(),
+    stats: createStatsModuleService(),
   },
   entities: {
     topics: createTopicsService(),
@@ -111,6 +113,7 @@ export type { TPostFeaturedModule } from './features/modules/post-featured';
 export type { TPostLatestModule } from './features/modules/post-latest';
 export type { TPostListModule } from './features/modules/post-list';
 export type { TPostRelatedModule } from './features/modules/post-related';
+export type { TStatItem, TStatsModule } from './features/modules/stats';
 export type {
   TTaxonomyEntry,
   TTaxonomyListModule,

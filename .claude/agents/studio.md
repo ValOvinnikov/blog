@@ -177,24 +177,28 @@ its own `icon`.
 
 **One schema per directory, and one kind of thing per folder.** Everything
 registered in `schemaTypes` — `documents/**`, `modules/`, `objects/`,
-`portable-text/` — gets its own directory, single-file units included. A
-test lives beside the schema **only when the schema carries logic** — a
-`rule.custom` validation, a conditional `hidden`, a preview `prepare`, a
-field factory with branches. A schema that is pure declaration (fields,
-options, defaults, fieldsets, groups, order, title, icon) gets no test file:
-typegen and `type-check` already guard the shape, and a test that restates
-it fails on every intentional change while protecting nothing
+`portable-text/` — gets its own directory, single-file units included.
+**A schema directory never holds a test file.** Not for its fields,
+options or defaults, and not for its `required()`, limits, `rule.custom`,
+conditional `hidden`, preview `prepare` or a factory's branches either —
+every one of them is read back out of the schema, is visible the moment the
+Studio loads, and changes only on purpose, so its test fails on every
+intentional edit and protects nothing. A schema change ships with
+`no-tests-needed`. Tests belong to the code that is not a schema: the
+cross-document validators in `schema-types/validation/`, the `structure/`,
+`inputs/` and `preview/` helpers, the config and mount, and migrations
 (`testing-practices` → "What not to test").
 
 **A bugfix's regression test is TDD, written by you, first:** per
 `superpowers:test-driven-development`, write the failing test before the
 fix and make it pass; new-feature coverage instead comes from
-`test-writer`'s pass after your implementation lands.
+`test-writer`'s pass after your implementation lands. A bug inside a
+schema's own rule gets no regression test — unless the fix moves that rule
+into `schema-types/validation/`, where it is tested like any validator there.
 
 ```
 src/schema-types/modules/hero-blog/
-├─ hero-blog.ts        heroBlogSchema
-└─ hero-blog.test.ts   custom rules, hidden logic, preview — never the field list
+└─ hero-blog.ts        heroBlogSchema
 ```
 
 - Directory name is the `_type` minus its `{group}_` prefix, kebab-cased:
@@ -229,9 +233,10 @@ src/schema-types/modules/hero-blog/
 
 ## Content model (see SPEC.md §6 for the current model)
 
-Type names follow `{group}_{name}`. Documents: `blog_author`, `blog_tag`,
-`blog_topic`; page documents `page_home`, `page_blog`, `page_landing`,
-`page_post`, `page_tag`, `page_topic`, `page_tagIndex`, `page_topicIndex`;
+Type names follow `{group}_{name}`, except `person`, which is ungrouped.
+Documents: `person`, `blog_tag`, `blog_topic`; page documents `page_home`,
+`page_blog`, `page_landing`, `page_post`, `page_tag`, `page_topic`,
+`page_tagIndex`, `page_topicIndex`;
 singletons `settings_site`, `settings_navigation`, `settings_footer`,
 `settings_newsletter`, `settings_theme`; and the reusable module documents
 `module_content`, `module_cta`, `module_hero`, `module_heroBlog`,
@@ -305,9 +310,10 @@ Run these checks **once, after all schema work is complete**:
   in `@blog/config`); restructures kept validation parity (or the dropped
   constraint is called out in the report); previews present; any new migration
   has a target-state idempotency guard on every branch and a co-located test.
-- No test asserts a field list, option list, default, fieldset, group, order,
-  title, icon or registry membership — only validation, hidden logic,
-  previews, factories with branches, and migrations get tests.
+- No test file under `schema-types/{documents,objects,modules,fields}/` — no
+  validation, limit, required, `hidden`, preview or field-shape test; only
+  `schema-types/validation/`, `structure/`, `inputs/`, `preview/`, config,
+  mount and migrations get tests.
 - Every new type and field carries an editor-facing `description` that says
   what it is **for** and never restates validation, and every new
   `options.list` states its `layout` — dropdown by default, radio where the
