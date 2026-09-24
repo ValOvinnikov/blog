@@ -19,7 +19,7 @@ export type TAccordionProps = IWithClassName &
     children?: ReactNode;
   };
 
-/** A list of disclosure rows, any number of which can be open at once; each is an `Accordion.Item` pairing an `Accordion.Trigger` with its `Accordion.Panel`. */
+/** A list of disclosure rows; any number can be open at once. */
 const AccordionRoot = ({
   children,
   className,

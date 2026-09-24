@@ -9,7 +9,7 @@ export type TAccordionPanelProps = IWithClassName &
     children?: ReactNode;
   };
 
-/** The collapsible content of an `Accordion.Item`; stays in the DOM closed so browser find-in-page can still match text inside it. */
+/** Stays in the DOM while closed, so browser find-in-page can still match text inside it. */
 export const AccordionPanel = ({
   children,
   className,

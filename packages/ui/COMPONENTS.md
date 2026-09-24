@@ -288,14 +288,14 @@ Variants: type: TOAST_TYPE.SUCCESS|TOAST_TYPE.INFO|TOAST_TYPE.WARNING|TOAST_TYPE
 
 ### Accordion — `components/organisms/accordion/accordion.tsx`
 
-A list of disclosure rows, any number of which can be open at once; each is an `Accordion.Item` pairing an `Accordion.Trigger` with its `Accordion.Panel`.
+A list of disclosure rows; any number can be open at once.
 Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 Slots:
 
 - **Accordion.Item** — One disclosure row in an `Accordion`, pairing an `Accordion.Trigger` with its `Accordion.Panel`. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **Accordion.Trigger** — The clickable label for an `Accordion.Item`, rendered as a full-width button inside a level-3 heading, with a chevron that turns to point up while its panel is open. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **Accordion.Panel** — The collapsible content of an `Accordion.Item`; stays in the DOM closed so browser find-in-page can still match text inside it. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Accordion.Trigger** — Toggles an `Accordion.Item`'s panel open and closed. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Accordion.Panel** — Stays in the DOM while closed, so browser find-in-page can still match text inside it. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### Article — `components/organisms/article/article.tsx`
 

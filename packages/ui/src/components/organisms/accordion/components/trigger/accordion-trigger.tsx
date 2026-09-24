@@ -15,7 +15,7 @@ export type TAccordionTriggerProps = IWithClassName &
     children?: ReactNode;
   };
 
-/** The clickable label for an `Accordion.Item`, rendered as a full-width button inside a level-3 heading, with a chevron that turns to point up while its panel is open. */
+/** Toggles an `Accordion.Item`'s panel open and closed. */
 export const AccordionTrigger = ({
   children,
   className,
