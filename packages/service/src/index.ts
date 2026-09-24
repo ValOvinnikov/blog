@@ -12,6 +12,7 @@ import { createSiteSettingsService } from './features/global/site-settings';
 import { createThemeSettingsService } from './features/global/theme-settings';
 import { createContentModuleService } from './features/modules/content';
 import { createCtaModuleService } from './features/modules/cta';
+import { createFaqModuleService } from './features/modules/faq';
 import { createFeatureListModuleService } from './features/modules/feature-list';
 import { createHeroModuleService } from './features/modules/hero';
 import { createHeroBlogModuleService } from './features/modules/hero-blog';
@@ -66,6 +67,7 @@ export const service = {
     logoWall: createLogoWallModuleService(),
     testimonial: createTestimonialModuleService(),
     stats: createStatsModuleService(),
+    faq: createFaqModuleService(),
   },
   entities: {
     topics: createTopicsService(),
@@ -96,6 +98,7 @@ export type { TBrand, TSiteSettings } from './features/global/site-settings';
 export type { TThemeTokens } from './features/global/theme-settings';
 export type { TContentModule } from './features/modules/content';
 export type { TCtaModule } from './features/modules/cta';
+export type { TFaqModule, TFaqQuestion } from './features/modules/faq';
 export type {
   TFeatureListItem,
   TFeatureListModule,
@@ -141,6 +144,7 @@ export type { TTenantSanityContext } from './sanity/query';
 export { getPlatformSanityContext } from './sanity/client';
 export { getPlatformSanityWriteContext } from './sanity/write-client';
 export type { TCtaButton } from './shared/transformers/cta/to-cta-button';
+export type { TFaqPageQuestion } from './shared/transformers/faq/resolve-faqs';
 export type { THeroPrimaryAction } from './shared/transformers/hero/to-hero-primary-action';
 export type { TModule } from './shared/transformers/module/to-module';
 export type {

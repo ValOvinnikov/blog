@@ -1,6 +1,7 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawHomePage } from '@blog/service/testing/pages/fixtures';
 import {
+  makeRawFaqPageQuestion,
   makeRawHeadingBlock,
   makeRawSeo,
 } from '@blog/service/testing/shared/fixtures';
@@ -90,6 +91,25 @@ describe('getHomePage', () => {
     expect(page.seo.ogTitle).toBeUndefined();
   });
 
+  it('dedupes a question referenced by two module_faq modules', async () => {
+    const shared = makeRawFaqPageQuestion({ id: 'block-faq-1' });
+    mockRun.mockResolvedValueOnce(makeRawHomePage({ faqs: [shared, shared] }));
+
+    const page = await getHomePage(tenant);
+    if (!page) throw new Error('expected a home page');
+
+    expect(page.faqs).toEqual([shared]);
+  });
+
+  it('returns an empty faqs list when the page has no FAQ module', async () => {
+    mockRun.mockResolvedValueOnce(makeRawHomePage({ faqs: [] }));
+
+    const page = await getHomePage(tenant);
+    if (!page) throw new Error('expected a home page');
+
+    expect(page.faqs).toEqual([]);
+  });
+
   it('resolves undefined, rather than rejecting, when no page_home document exists', async () => {
     mockRun.mockResolvedValueOnce(null);
 
@@ -107,7 +127,13 @@ describe('getHomePage', () => {
       expect.anything(),
       expect.objectContaining({
         tenant,
-        next: expect.objectContaining({ tags: ['t:tenant-a:homePage'] }),
+        next: expect.objectContaining({
+          tags: [
+            't:tenant-a:homePage',
+            't:tenant-a:modules:faq',
+            't:tenant-a:block_faq',
+          ],
+        }),
       }),
     );
   });
