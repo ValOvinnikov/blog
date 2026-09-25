@@ -14,7 +14,7 @@ export type TFeatureHighlightItem = {
   id: string;
   heading: string;
   body: TPortableTextBlock[];
-  image: ISanityImage;
+  image: TMaybeUndefined<ISanityImage>;
   action: TMaybeUndefined<TCtaButton>;
 };
 

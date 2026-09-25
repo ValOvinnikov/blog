@@ -17,30 +17,14 @@ type TRawFeatureHighlightItem = NonNullable<
   TRawFeatureHighlightsModule['highlights']
 >[number];
 
-class UnresolvedFeatureHighlightImageError extends Error {
-  readonly code = 'UNRESOLVED_FEATURE_HIGHLIGHT_IMAGE' as const;
-
-  constructor(heading: string) {
-    super(
-      `Feature highlight "${heading}"'s image was accepted by the query but failed to resolve to an asset.`,
-    );
-  }
-}
-
 function toFeatureHighlightItem(
   raw: TRawFeatureHighlightItem,
 ): TFeatureHighlightItem {
-  const image = toSanityImage(raw.image);
-
-  if (!image) {
-    throw new UnresolvedFeatureHighlightImageError(raw.heading);
-  }
-
   return {
     id: raw._key,
     heading: raw.heading,
     body: raw.body.map(toPortableText),
-    image,
+    image: toSanityImage(raw.image),
     action: raw.action ? toCtaButton(raw.action) : undefined,
   };
 }
