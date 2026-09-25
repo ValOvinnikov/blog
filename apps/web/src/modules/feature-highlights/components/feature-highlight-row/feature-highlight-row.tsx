@@ -9,10 +9,6 @@ import { SanityImage } from '@web/components/shared/sanity-image';
 
 import { featureHighlightRowVariants } from './feature-highlight-row-variants';
 
-const IMAGE_WIDTH_PX = 800;
-const IMAGE_HEIGHT_PX = 600;
-const IMAGE_SIZES = '(min-width: 768px) 50vw, 100vw';
-
 export type TFeatureHighlightMediaSide = 'start' | 'end';
 
 export interface IFeatureHighlightRowProps extends IWithDataTestId {
@@ -41,9 +37,9 @@ export const FeatureHighlightRow = ({
           <MediaFrame ratio="classic" dataTestId={`${dataTestId}-media`}>
             <SanityImage
               image={item.image}
-              width={IMAGE_WIDTH_PX}
-              height={IMAGE_HEIGHT_PX}
-              sizes={IMAGE_SIZES}
+              width={800}
+              height={600}
+              sizes="(min-width: 768px) 50vw, 100vw"
               loading="lazy"
               className="size-full object-cover"
             />
