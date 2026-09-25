@@ -95,6 +95,7 @@ const REVALIDATE_TAGS = {
   module_newsletter: ['modules:newsletter'],
   module_team: ['modules:team'],
   module_timeline: ['modules:timeline'],
+  module_pricing: ['modules:pricing'],
   link: ['link'],
   block_feature: ['block_feature'],
   block_testimonial: ['block_testimonial'],
