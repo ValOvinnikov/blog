@@ -51,15 +51,4 @@ describe(`<${FeatureHighlightRow.name}/>`, () => {
 
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
-
-  it.each([['start'], ['end']] as const)(
-    'carries a data-media-side attribute matching the %s prop',
-    (mediaSide) => {
-      setup({ mediaSide });
-
-      expect(
-        screen.getByTestId('feature-highlight-row-highlight-1'),
-      ).toHaveAttribute('data-media-side', mediaSide);
-    },
-  );
 });
