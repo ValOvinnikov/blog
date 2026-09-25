@@ -55,9 +55,9 @@ export type Module_cta = {
   footnote?: string;
   variant?: 'BANNER' | 'SPLIT' | 'CALLOUT';
   bandTone?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   contentPositionSplit?: 'LEFT' | 'RIGHT';
   contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   mobileMediaOrder?: 'LAST' | 'FIRST';
   layout?: Layout;
 };
@@ -190,8 +190,8 @@ export type Module_timeline = {
       _key: string;
     } & CtaButton
   >;
-  itemAlignment?: 'LEFT' | 'CENTER';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  itemAlignment?: 'LEFT' | 'CENTER';
   layout?: Layout;
 };
 
@@ -246,8 +246,8 @@ export type Module_testimonial = {
     } & CtaButton
   >;
   displayMode?: 'GRID' | 'CAROUSEL';
-  cardAlignment?: 'LEFT' | 'CENTER';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  cardAlignment?: 'LEFT' | 'CENTER';
   layout?: Layout;
 };
 
@@ -1282,9 +1282,9 @@ export type Module_heroProfile = {
   showRole?: boolean;
   showBio?: boolean;
   variant?: 'SPLIT' | 'STACKED' | 'BANNER';
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   contentPositionSplit?: 'LEFT' | 'RIGHT';
   contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   mediaOrderSplit?: 'LAST' | 'FIRST';
   layout?: HeroLayout;
 };
@@ -1306,9 +1306,9 @@ export type Module_heroStatement = {
     } & CtaButton
   >;
   variant?: 'SPLIT' | 'STACKED' | 'BANNER';
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   contentPositionSplit?: 'LEFT' | 'RIGHT';
   contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   mediaOrderSplit?: 'LAST' | 'FIRST';
   mediaOrderStacked?: 'LAST' | 'FIRST';
   layout?: HeroLayout;
@@ -1330,9 +1330,9 @@ export type Module_heroBlog = {
   primaryActionAppearance?: 'CONTAINED' | 'INLINE';
   secondaryAction?: CtaSecondaryButton;
   variant?: 'SPLIT' | 'STACKED' | 'BANNER';
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   contentPositionSplit?: 'LEFT' | 'RIGHT';
   contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   mediaOrderSplit?: 'LAST' | 'FIRST';
   mediaOrderStacked?: 'LAST' | 'FIRST';
   layout?: HeroLayout;

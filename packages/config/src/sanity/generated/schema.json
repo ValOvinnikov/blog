@@ -309,24 +309,7 @@
         },
         "optional": true
       },
-      "contentPositionSplit": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "LEFT"
-            },
-            {
-              "type": "string",
-              "value": "RIGHT"
-            }
-          ]
-        },
-        "optional": true
-      },
-      "contentPositionBanner": {
+      "contentAlignment": {
         "type": "objectAttribute",
         "value": {
           "type": "union",
@@ -347,7 +330,24 @@
         },
         "optional": true
       },
-      "contentAlignment": {
+      "contentPositionSplit": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "LEFT"
+            },
+            {
+              "type": "string",
+              "value": "RIGHT"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "contentPositionBanner": {
         "type": "objectAttribute",
         "value": {
           "type": "union",
@@ -1211,23 +1211,6 @@
         },
         "optional": true
       },
-      "itemAlignment": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "LEFT"
-            },
-            {
-              "type": "string",
-              "value": "CENTER"
-            }
-          ]
-        },
-        "optional": true
-      },
       "contentAlignment": {
         "type": "objectAttribute",
         "value": {
@@ -1244,6 +1227,23 @@
             {
               "type": "string",
               "value": "RIGHT"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "itemAlignment": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "LEFT"
+            },
+            {
+              "type": "string",
+              "value": "CENTER"
             }
           ]
         },
@@ -1566,23 +1566,6 @@
         },
         "optional": true
       },
-      "cardAlignment": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "LEFT"
-            },
-            {
-              "type": "string",
-              "value": "CENTER"
-            }
-          ]
-        },
-        "optional": true
-      },
       "contentAlignment": {
         "type": "objectAttribute",
         "value": {
@@ -1599,6 +1582,23 @@
             {
               "type": "string",
               "value": "RIGHT"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "cardAlignment": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "LEFT"
+            },
+            {
+              "type": "string",
+              "value": "CENTER"
             }
           ]
         },
@@ -7618,24 +7618,7 @@
         },
         "optional": true
       },
-      "contentPositionSplit": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "LEFT"
-            },
-            {
-              "type": "string",
-              "value": "RIGHT"
-            }
-          ]
-        },
-        "optional": true
-      },
-      "contentPositionBanner": {
+      "contentAlignment": {
         "type": "objectAttribute",
         "value": {
           "type": "union",
@@ -7656,7 +7639,24 @@
         },
         "optional": true
       },
-      "contentAlignment": {
+      "contentPositionSplit": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "LEFT"
+            },
+            {
+              "type": "string",
+              "value": "RIGHT"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "contentPositionBanner": {
         "type": "objectAttribute",
         "value": {
           "type": "union",
@@ -7833,24 +7833,7 @@
         },
         "optional": true
       },
-      "contentPositionSplit": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "LEFT"
-            },
-            {
-              "type": "string",
-              "value": "RIGHT"
-            }
-          ]
-        },
-        "optional": true
-      },
-      "contentPositionBanner": {
+      "contentAlignment": {
         "type": "objectAttribute",
         "value": {
           "type": "union",
@@ -7871,7 +7854,24 @@
         },
         "optional": true
       },
-      "contentAlignment": {
+      "contentPositionSplit": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "LEFT"
+            },
+            {
+              "type": "string",
+              "value": "RIGHT"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "contentPositionBanner": {
         "type": "objectAttribute",
         "value": {
           "type": "union",
@@ -8092,24 +8092,7 @@
         },
         "optional": true
       },
-      "contentPositionSplit": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "LEFT"
-            },
-            {
-              "type": "string",
-              "value": "RIGHT"
-            }
-          ]
-        },
-        "optional": true
-      },
-      "contentPositionBanner": {
+      "contentAlignment": {
         "type": "objectAttribute",
         "value": {
           "type": "union",
@@ -8130,7 +8113,24 @@
         },
         "optional": true
       },
-      "contentAlignment": {
+      "contentPositionSplit": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "LEFT"
+            },
+            {
+              "type": "string",
+              "value": "RIGHT"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "contentPositionBanner": {
         "type": "objectAttribute",
         "value": {
           "type": "union",
