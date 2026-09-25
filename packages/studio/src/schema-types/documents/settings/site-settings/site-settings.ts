@@ -3,6 +3,8 @@ import { brandSchema } from '@blog/studio/schema-types/objects/brand/brand';
 import { Settings } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
+import { currencyOptionList } from './currency-options';
+
 export const siteSettingsSchema = defineType({
   name: 'settings_site',
   title: 'Site Settings',
@@ -24,6 +26,17 @@ export const siteSettingsSchema = defineType({
       type: brandSchema.name,
       description:
         "The site's identity — name, logo, and optional status line — used across the header and footer.",
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: 'currency',
+      title: 'Currency',
+      type: 'string',
+      description: 'The currency every price on the site is shown in.',
+      options: {
+        layout: 'dropdown',
+        list: currencyOptionList,
+      },
       validation: (rule) => rule.required(),
     }),
   ],
