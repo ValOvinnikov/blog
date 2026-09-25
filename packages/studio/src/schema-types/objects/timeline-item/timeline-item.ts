@@ -32,8 +32,7 @@ export const timelineItemSchema = defineType({
       name: 'marker',
       title: 'Marker',
       type: 'string',
-      description:
-        'A short label on the line: a year, a quarter, "Week 1". Hidden when the module is Numbered.',
+      description: 'A short label on the line: a year, a quarter, "Week 1".',
       hidden: ({ document }) => isNumbered(document),
       validation: (rule) => [
         rule.custom(validateTimelineMarkerRequired),
@@ -54,7 +53,7 @@ export const timelineItemSchema = defineType({
       name: 'body',
       title: 'Body',
       type: paragraphTextSchema.name,
-      description: 'A sentence or two, with bold, italics and links.',
+      description: 'A sentence or two describing this step or milestone.',
       validation: (rule) =>
         rule
           .custom((blocks: TParagraphBlock[] | undefined) =>

@@ -31,8 +31,7 @@ export const timelineSchema = defineType({
       name: 'markerStyle',
       title: 'Marker Style',
       type: 'string',
-      description:
-        "Numbered counts the items for you, for a process. Labelled shows each item's own marker, such as a year, for a history.",
+      description: 'How each item on the timeline is marked.',
       options: {
         layout: 'dropdown',
         list: Object.values(TIMELINE_MARKER_STYLE).map((value) => ({
@@ -47,8 +46,7 @@ export const timelineSchema = defineType({
       name: 'items',
       title: 'Items',
       type: 'array',
-      description:
-        'The steps or milestones, in the order they happen. A horizontal timeline holds at most five.',
+      description: 'The steps or milestones, in the order they happen.',
       of: [defineArrayMember({ type: timelineItemSchema.name })],
       validation: (rule) => [
         rule.required().error('Add at least two items.'),
@@ -61,8 +59,7 @@ export const timelineSchema = defineType({
       name: 'orientation',
       title: 'Orientation',
       type: 'string',
-      description:
-        'Horizontal lays items side by side on wide screens, up to five. Phones always show a vertical line.',
+      description: 'How the timeline is laid out on the page.',
       options: {
         layout: 'dropdown',
         list: Object.values(TIMELINE_ORIENTATION).map((value) => ({
@@ -74,23 +71,16 @@ export const timelineSchema = defineType({
       validation: (rule) => rule.required(),
     }),
     ctaButtonsField(),
-    ...alignmentFields(
-      [
-        {
-          name: 'itemAlignment',
-          title: 'Item Alignment',
-          description:
-            'Left or Center. Horizontal items centre their marker and text; a vertical timeline centres the whole list, with text beside the line.',
-          allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
-          initialValue: CONTENT_ALIGNMENT.LEFT,
-          validation: (rule) => rule.required(),
-        },
-      ],
+    ...alignmentFields([
       {
-        description:
-          'Horizontal alignment of the heading, supporting text and actions.',
+        name: 'itemAlignment',
+        title: 'Item Alignment',
+        description: 'Aligns the marker and text within each timeline item.',
+        allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
+        initialValue: CONTENT_ALIGNMENT.LEFT,
+        validation: (rule) => rule.required(),
       },
-    ),
+    ]),
     layoutField,
   ],
   preview: {
