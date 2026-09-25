@@ -5,6 +5,8 @@ const { headersMock } = vi.hoisted(() => ({ headersMock: vi.fn() }));
 
 vi.mock('next/headers', () => ({ headers: headersMock }));
 
+const VALID_TENANT_ID = 'a1b2c3d4-e5f6-4789-a012-3456789abcde';
+
 describe(getRequestTenantId, () => {
   beforeEach(() => {
     headersMock.mockReset();
@@ -23,8 +25,8 @@ describe(getRequestTenantId, () => {
   });
 
   it('prefers an explicitly supplied tenant over the header, without reading headers at all', async () => {
-    await expect(getRequestTenantId('tenant-from-param')).resolves.toBe(
-      'tenant-from-param',
+    await expect(getRequestTenantId(VALID_TENANT_ID)).resolves.toBe(
+      VALID_TENANT_ID,
     );
 
     expect(headersMock).not.toHaveBeenCalled();
@@ -44,6 +46,18 @@ describe(getRequestTenantId, () => {
     );
 
     await expect(getRequestTenantId()).resolves.toBeUndefined();
+  });
+
+  it('returns undefined for a tenant param that is not tenant-shaped, without reading headers at all', async () => {
+    await expect(getRequestTenantId('.well-known')).resolves.toBeUndefined();
+
+    expect(headersMock).not.toHaveBeenCalled();
+  });
+
+  it('returns undefined for a tenant param carrying a valid tenant id plus trailing garbage', async () => {
+    await expect(
+      getRequestTenantId(`${VALID_TENANT_ID}-trailing-garbage`),
+    ).resolves.toBeUndefined();
   });
 });
 

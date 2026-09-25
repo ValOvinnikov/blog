@@ -3,7 +3,7 @@ import {
   type TContentAlignment,
 } from '@blog/config/constants';
 import { toTitleCase } from '@blog/utils/primitives';
-import { defineField, type StringDefinition } from 'sanity';
+import { defineField, type StringDefinition, type StringRule } from 'sanity';
 
 type TAlignmentField = {
   name: string;
@@ -13,10 +13,10 @@ type TAlignmentField = {
   initialValue?: TContentAlignment;
   hidden?: StringDefinition['hidden'];
   fieldset?: string;
-  validation?: StringDefinition['validation'];
+  validation?: (rule: StringRule) => StringRule;
 };
 
-const alignmentField = ({
+export const alignmentField = ({
   name,
   title,
   description,
@@ -52,7 +52,7 @@ type TAlignmentFieldExtra = {
   initialValue?: TContentAlignment;
   hidden?: StringDefinition['hidden'];
   fieldset?: string;
-  validation?: StringDefinition['validation'];
+  validation?: (rule: StringRule) => StringRule;
 };
 
 type TAlignmentFieldsOptions = {

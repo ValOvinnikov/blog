@@ -19,6 +19,7 @@ import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featu
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import { statsSchema } from '@blog/studio/schema-types/modules/stats/stats';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
+import { teamSchema } from '@blog/studio/schema-types/modules/team/team';
 import { testimonialSchema } from '@blog/studio/schema-types/modules/testimonial/testimonial';
 import { timelineSchema } from '@blog/studio/schema-types/modules/timeline/timeline';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
@@ -78,6 +79,7 @@ export const landingPageSchema = defineType({
         featureHighlightsSchema.name,
         logoWallSchema.name,
         testimonialSchema.name,
+        teamSchema.name,
         statsSchema.name,
         timelineSchema.name,
         faqSchema.name,

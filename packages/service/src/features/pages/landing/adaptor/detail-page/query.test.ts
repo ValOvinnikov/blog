@@ -47,4 +47,10 @@ describe('landingPageQuery', () => {
   it('queries every module_faq question across the page', () => {
     expect(landingPageQuery.query).toContain('_type == "module_faq"');
   });
+
+  it('rejects a page whose faqs contain a null entry', () => {
+    const raw = { ...makeRawLandingPage(), faqs: [null] };
+
+    expect(() => landingPageQuery.parse(raw)).toThrow();
+  });
 });

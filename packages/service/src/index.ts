@@ -13,6 +13,7 @@ import { createThemeSettingsService } from './features/global/theme-settings';
 import { createContentModuleService } from './features/modules/content';
 import { createCtaModuleService } from './features/modules/cta';
 import { createFaqModuleService } from './features/modules/faq';
+import { createFeatureHighlightsModuleService } from './features/modules/feature-highlights';
 import { createFeatureListModuleService } from './features/modules/feature-list';
 import { createHeroModuleService } from './features/modules/hero';
 import { createHeroBlogModuleService } from './features/modules/hero-blog';
@@ -63,6 +64,7 @@ export const service = {
     cta: createCtaModuleService(),
     newsletter: createNewsletterModuleService(),
     taxonomyList: createTaxonomyListModuleService(),
+    featureHighlights: createFeatureHighlightsModuleService(),
     featureList: createFeatureListModuleService(),
     logoWall: createLogoWallModuleService(),
     testimonial: createTestimonialModuleService(),
@@ -99,6 +101,10 @@ export type { TThemeTokens } from './features/global/theme-settings';
 export type { TContentModule } from './features/modules/content';
 export type { TCtaModule } from './features/modules/cta';
 export type { TFaqModule, TFaqQuestion } from './features/modules/faq';
+export type {
+  TFeatureHighlightItem,
+  TFeatureHighlightsModule,
+} from './features/modules/feature-highlights';
 export type {
   TFeatureListItem,
   TFeatureListModule,

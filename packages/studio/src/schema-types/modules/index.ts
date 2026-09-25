@@ -15,6 +15,7 @@ import { postListSchema } from './post-list/post-list';
 import { postRelatedSchema } from './post-related/post-related';
 import { statsSchema } from './stats/stats';
 import { taxonomyListSchema } from './taxonomy-list/taxonomy-list';
+import { teamSchema } from './team/team';
 import { testimonialSchema } from './testimonial/testimonial';
 import { timelineSchema } from './timeline/timeline';
 
@@ -32,6 +33,7 @@ export const modules = [
   featureHighlightsSchema,
   logoWallSchema,
   testimonialSchema,
+  teamSchema,
   statsSchema,
   timelineSchema,
   faqSchema,

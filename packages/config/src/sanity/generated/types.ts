@@ -219,6 +219,41 @@ export type Module_stats = {
   layout?: Layout;
 };
 
+export type PersonReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'person';
+};
+
+export type Module_team = {
+  _id: string;
+  _type: 'module_team';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  headingBlock?: HeadingBlock;
+  members?: Array<
+    {
+      _key: string;
+    } & PersonReference
+  >;
+  showBios?: boolean;
+  showSocialLinks?: boolean;
+  imageShape?: 'CIRCLE' | 'SQUARE';
+  displayMode?: 'GRID' | 'CAROUSEL';
+  cardAlignment?: 'LEFT' | 'CENTER';
+  ctaButtons?: Array<
+    {
+      _key: string;
+    } & CtaButton
+  >;
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  layout?: Layout;
+};
+
 export type Block_testimonialReference = {
   _ref: string;
   _type: 'reference';
@@ -1328,6 +1363,13 @@ export type Module_testimonialReference = {
   [internalGroqTypeReferenceTo]?: 'module_testimonial';
 };
 
+export type Module_teamReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_team';
+};
+
 export type Module_statsReference = {
   _ref: string;
   _type: 'reference';
@@ -1395,6 +1437,9 @@ export type Page_landing = {
       } & Module_testimonialReference)
     | ({
         _key: string;
+      } & Module_teamReference)
+    | ({
+        _key: string;
       } & Module_statsReference)
     | ({
         _key: string;
@@ -1451,6 +1496,9 @@ export type Page_home = {
       } & Module_testimonialReference)
     | ({
         _key: string;
+      } & Module_teamReference)
+    | ({
+        _key: string;
       } & Module_statsReference)
     | ({
         _key: string;
@@ -1460,13 +1508,6 @@ export type Page_home = {
       } & Module_faqReference)
   >;
   seo?: Seo;
-};
-
-export type PersonReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'person';
 };
 
 export type Module_heroProfile = {
@@ -1726,6 +1767,8 @@ export type AllSanitySchemaTypes =
   | Module_faq
   | Module_timeline
   | Module_stats
+  | PersonReference
+  | Module_team
   | Block_testimonialReference
   | Module_testimonial
   | Module_logoWall
@@ -1802,12 +1845,12 @@ export type AllSanitySchemaTypes =
   | Module_featureHighlightsReference
   | Module_logoWallReference
   | Module_testimonialReference
+  | Module_teamReference
   | Module_statsReference
   | Module_timelineReference
   | Module_faqReference
   | Page_landing
   | Page_home
-  | PersonReference
   | Module_heroProfile
   | Module_heroStatement
   | Module_heroBlog
