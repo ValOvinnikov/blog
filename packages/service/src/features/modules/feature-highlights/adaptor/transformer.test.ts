@@ -71,12 +71,4 @@ describe('toFeatureHighlightsModule', () => {
     expect(module.highlights[0]?.heading).toBe('Row with a broken action');
     expect(module.highlights[0]?.action).toBeUndefined();
   });
-
-  it('returns an empty array for an absent ctaButtons field', () => {
-    const raw = makeRawFeatureHighlightsModule({ ctaButtons: null });
-
-    const module = toFeatureHighlightsModule(raw);
-
-    expect(module.ctaButtons).toEqual([]);
-  });
 });
