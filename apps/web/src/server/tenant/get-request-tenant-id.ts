@@ -8,13 +8,11 @@ import { UNRESOLVED_TENANT_PLACEHOLDER } from './unresolved-tenant-placeholder';
 /**
  * Resolves the request's tenant id, preferring an explicitly supplied
  * `tenant` (the `[tenant]` route param) over reading the request header,
- * since the header read is what makes a route dynamic. A `tenant` that isn't
- * a genuine tenant id — e.g. a value Next matched structurally from an
- * unrelated dotted path — resolves the same as an absent one, rather than
- * being forwarded to a caller that would use it as a database key.
- * `undefined` means none of the above is available, which is also what
- * `UNRESOLVED_TENANT_PLACEHOLDER` resolves to; a caller needing the full
- * tenant row goes through `resolveRequestTenant` instead.
+ * since the header read is what makes a route dynamic. A malformed `tenant`
+ * resolves the same as an absent one. `undefined` means none of the above is
+ * available, which is also what `UNRESOLVED_TENANT_PLACEHOLDER` resolves to;
+ * a caller needing the full tenant row goes through `resolveRequestTenant`
+ * instead.
  */
 export const getRequestTenantId = cache(
   async (tenant?: string): Promise<string | undefined> => {

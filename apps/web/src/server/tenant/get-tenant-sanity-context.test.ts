@@ -167,47 +167,28 @@ describe('getTenantSanityContext with the real getRequestTenantId chokepoint', (
     vi.resetModules();
   });
 
-  it('falls back to the platform Sanity context for the unresolved-tenant placeholder segment, without ever querying tenant credentials with it', async () => {
-    getPlatformSanityContextMock.mockReset();
-    getPlatformSanityContextMock.mockReturnValue(platformTenant);
-    isProductionEnvironmentMock.mockReset();
-    isProductionEnvironmentMock.mockReturnValue(false);
-    vi.mocked(queries.tenants.getTenantSanityCredentials).mockReset();
+  it.each([UNRESOLVED_TENANT_PLACEHOLDER, '.well-known'])(
+    'falls back to the platform Sanity context for the non-tenant-id segment %s, without ever querying tenant credentials with it',
+    async (tenantSegment) => {
+      getPlatformSanityContextMock.mockReset();
+      getPlatformSanityContextMock.mockReturnValue(platformTenant);
+      isProductionEnvironmentMock.mockReset();
+      isProductionEnvironmentMock.mockReturnValue(false);
+      vi.mocked(queries.tenants.getTenantSanityCredentials).mockReset();
 
-    vi.doUnmock('@web/server/tenant/get-request-tenant-id');
-    vi.doMock('next/headers', () => ({
-      headers: vi.fn().mockResolvedValue(new Headers()),
-    }));
-    vi.resetModules();
+      vi.doUnmock('@web/server/tenant/get-request-tenant-id');
+      vi.doMock('next/headers', () => ({
+        headers: vi.fn().mockResolvedValue(new Headers()),
+      }));
+      vi.resetModules();
 
-    const { getTenantSanityContext: freshGetTenantSanityContext } =
-      await import('./get-tenant-sanity-context');
+      const { getTenantSanityContext: freshGetTenantSanityContext } =
+        await import('./get-tenant-sanity-context');
 
-    await expect(
-      freshGetTenantSanityContext(UNRESOLVED_TENANT_PLACEHOLDER),
-    ).resolves.toBe(platformTenant);
-    expect(queries.tenants.getTenantSanityCredentials).not.toHaveBeenCalled();
-  });
-
-  it('falls back to the platform Sanity context for a malformed tenant segment matched structurally from a dotted path, without ever querying tenant credentials with it', async () => {
-    getPlatformSanityContextMock.mockReset();
-    getPlatformSanityContextMock.mockReturnValue(platformTenant);
-    isProductionEnvironmentMock.mockReset();
-    isProductionEnvironmentMock.mockReturnValue(false);
-    vi.mocked(queries.tenants.getTenantSanityCredentials).mockReset();
-
-    vi.doUnmock('@web/server/tenant/get-request-tenant-id');
-    vi.doMock('next/headers', () => ({
-      headers: vi.fn().mockResolvedValue(new Headers()),
-    }));
-    vi.resetModules();
-
-    const { getTenantSanityContext: freshGetTenantSanityContext } =
-      await import('./get-tenant-sanity-context');
-
-    await expect(freshGetTenantSanityContext('.well-known')).resolves.toBe(
-      platformTenant,
-    );
-    expect(queries.tenants.getTenantSanityCredentials).not.toHaveBeenCalled();
-  });
+      await expect(freshGetTenantSanityContext(tenantSegment)).resolves.toBe(
+        platformTenant,
+      );
+      expect(queries.tenants.getTenantSanityCredentials).not.toHaveBeenCalled();
+    },
+  );
 });

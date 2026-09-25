@@ -3,9 +3,6 @@
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
 
-// Anchored at both ends, unlike UUID_PATTERN above — accepting a segment
-// requires an exact match, or a UUID with trailing garbage appended would
-// pass here and still reach the credentials query as an invalid id.
 const EXACT_UUID_PATTERN = new RegExp(`${UUID_PATTERN.source}$`, 'i');
 
 /**
@@ -25,13 +22,9 @@ export const isTenantShapedPathSegment = (segment: string): boolean => {
 /**
  * True when a segment is exactly a UUID, the format a genuine `[tenant]`
  * route param always takes. Used to accept a route param as a real tenant
- * id before it reaches a database query — unlike
- * `isTenantShapedPathSegment`, this must not be a prefix match, or a UUID
- * with trailing garbage appended would be accepted and still fail the query.
- *
- * @example
- * isValidTenantId('a1b2c3d4-e5f6-4789-a012-3456789abcde') // true
- * isValidTenantId('a1b2c3d4-e5f6-4789-a012-3456789abcde-extra') // false
+ * id before it reaches a database query — this must be an exact match, not
+ * a prefix, or a UUID with trailing garbage appended would be accepted and
+ * still fail the query.
  */
 export const isValidTenantId = (segment: string): boolean => {
   return EXACT_UUID_PATTERN.test(segment);
