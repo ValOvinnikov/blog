@@ -249,6 +249,30 @@ export type Module_logoWall = {
   layout?: Layout;
 };
 
+export type Module_featureHighlights = {
+  _id: string;
+  _type: 'module_featureHighlights';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  headingBlock?: HeadingBlock;
+  highlights?: Array<
+    {
+      _key: string;
+    } & FeatureHighlight
+  >;
+  ctaButtons?: Array<
+    {
+      _key: string;
+    } & CtaButton
+  >;
+  mediaOrder?: 'LAST' | 'FIRST';
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  layout?: Layout;
+};
+
 export type Block_featureReference = {
   _ref: string;
   _type: 'reference';
@@ -483,6 +507,14 @@ export type OpenGraph = {
   ogTitle?: string;
   ogDescription?: string;
   ogImage?: ImageWithAlt;
+};
+
+export type FeatureHighlight = {
+  _type: 'featureHighlight';
+  heading?: string;
+  body?: ListedText;
+  image?: ImageWithAlt;
+  action?: CtaSecondaryButton;
 };
 
 export type LinkReference = {
@@ -1079,6 +1111,13 @@ export type Module_featureListReference = {
   [internalGroqTypeReferenceTo]?: 'module_featureList';
 };
 
+export type Module_featureHighlightsReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_featureHighlights';
+};
+
 export type Module_logoWallReference = {
   _ref: string;
   _type: 'reference';
@@ -1144,6 +1183,9 @@ export type Page_landing = {
       } & Module_featureListReference)
     | ({
         _key: string;
+      } & Module_featureHighlightsReference)
+    | ({
+        _key: string;
       } & Module_logoWallReference)
     | ({
         _key: string;
@@ -1192,6 +1234,9 @@ export type Page_home = {
     | ({
         _key: string;
       } & Module_featureListReference)
+    | ({
+        _key: string;
+      } & Module_featureHighlightsReference)
     | ({
         _key: string;
       } & Module_logoWallReference)
@@ -1474,6 +1519,7 @@ export type AllSanitySchemaTypes =
   | Block_testimonialReference
   | Module_testimonial
   | Module_logoWall
+  | Module_featureHighlights
   | Block_featureReference
   | Module_featureList
   | Module_postRelated
@@ -1493,6 +1539,7 @@ export type AllSanitySchemaTypes =
   | BrandTagline
   | Seo
   | OpenGraph
+  | FeatureHighlight
   | LinkReference
   | CtaSecondaryButton
   | CtaButton
@@ -1541,6 +1588,7 @@ export type AllSanitySchemaTypes =
   | Module_heroProfileReference
   | Module_contentReference
   | Module_featureListReference
+  | Module_featureHighlightsReference
   | Module_logoWallReference
   | Module_testimonialReference
   | Module_statsReference
