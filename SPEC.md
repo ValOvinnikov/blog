@@ -983,15 +983,19 @@ semantically as a `data-media-side` of `start` or `end`, which also drives those
 classes — one value, so the attribute and the layout cannot disagree, and the
 alternation is assertable without reaching for a class.
 
-**Unlike the logo wall, one unresolvable image costs that row's frame, not the
-module.** `image` is `T | undefined` in the view model, matching
-`toSanityImage`'s own return type, and the row renders its text column with the
-frame omitted. No guard is needed to reach that state and none is written: the
-query projects the image with `.notNull()` and `sanityImageFragment` in turn
-declares `asset: …deref().notNull()`, so a row whose image fails to resolve is
-rejected at parse time and never reaches the transformer. That makes the logo
-wall's `UnresolvedLogoImageError` above unreachable for the same reason, which is
-why #3745 removes it and brings the two modules into line.
+**One row the service cannot resolve costs the whole module, exactly as with the
+logo wall — but no transformer guard says so.** The query projects the image with
+`.notNull()` and `sanityImageFragment` in turn declares
+`asset: …deref().notNull()`, both nested inside `highlights[]`'s own
+`.notNull()`, so a row whose image fails to resolve is rejected at `.parse()`,
+`safeAsync` turns that into a failed result, and the module renders nothing
+rather than a run of rows with a hole in it. The page loses the section and keeps
+rendering, as everywhere else in this family. `image` is nonetheless
+`T | undefined` in the view model, because that is `toSanityImage`'s own return
+type rather than a reachable state, and the row omits the frame if it is ever
+absent — no non-null assertion to make the types lie. This is also why the logo
+wall's `UnresolvedLogoImageError` above is unreachable and #3745 removes it:
+the `.notNull()` chain already did that work.
 
 **A question is a document, and that is the opposite call from a figure.**
 `block_faq` ("FAQ Item") carries a `title` — its Studio label — a required
