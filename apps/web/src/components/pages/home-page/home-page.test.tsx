@@ -87,6 +87,7 @@ describe(`<${HomePage.name}/>`, () => {
         headingBlock: makeHeadingBlock({ heading: 'Welcome to the blog' }),
         hero: { id: 'hero-1', type: 'module_hero' },
         modules: [{ id: 'module-1', type: 'module_content' }],
+        faqs: [],
       },
     });
 
@@ -103,6 +104,7 @@ describe(`<${HomePage.name}/>`, () => {
         headingBlock: makeHeadingBlock({ heading: 'Welcome to the blog' }),
         hero: { id: 'hero-1', type: 'module_hero' },
         modules: [{ id: 'module-1', type: 'module_content' }],
+        faqs: [],
       },
     });
 
@@ -130,6 +132,7 @@ describe(`<${HomePage.name}/>`, () => {
         headingBlock: makeHeadingBlock({ heading: 'Welcome to the blog' }),
         hero: undefined,
         modules: [],
+        faqs: [],
       },
     });
 
@@ -157,11 +160,51 @@ describe(`<${HomePage.name}/>`, () => {
         headingBlock: makeHeadingBlock(),
         hero: undefined,
         modules: [],
+        faqs: [],
       },
     });
 
     await setup();
 
     expect(getHomePageMock).toHaveBeenCalledWith(tenant);
+  });
+
+  it('renders no FAQPage JSON-LD when the page has no FAQ questions', async () => {
+    getHomePageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        headingBlock: makeHeadingBlock(),
+        hero: undefined,
+        modules: [],
+        faqs: [],
+      },
+    });
+
+    await setup();
+
+    expect(screen.queryByTestId('json-ld-script')).not.toBeInTheDocument();
+  });
+
+  it('renders the FAQPage JSON-LD when the page has FAQ questions', async () => {
+    getHomePageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        headingBlock: makeHeadingBlock(),
+        hero: undefined,
+        modules: [],
+        faqs: [
+          {
+            id: 'faq-1',
+            question: 'Do you offer a free trial?',
+            answer: 'Yes.',
+          },
+        ],
+      },
+    });
+
+    await setup();
+
+    const script = screen.getByTestId('json-ld-script');
+    expect(script.textContent).toContain('"@type":"FAQPage"');
   });
 });

@@ -275,6 +275,30 @@ export type Module_logoWall = {
   layout?: Layout;
 };
 
+export type Module_featureHighlights = {
+  _id: string;
+  _type: 'module_featureHighlights';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  headingBlock?: HeadingBlock;
+  highlights?: Array<
+    {
+      _key: string;
+    } & FeatureHighlight
+  >;
+  ctaButtons?: Array<
+    {
+      _key: string;
+    } & CtaButton
+  >;
+  mediaOrder?: 'LAST' | 'FIRST';
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  layout?: Layout;
+};
+
 export type Block_featureReference = {
   _ref: string;
   _type: 'reference';
@@ -518,6 +542,14 @@ export type OpenGraph = {
   ogImage?: ImageWithAlt;
 };
 
+export type FeatureHighlight = {
+  _type: 'featureHighlight';
+  heading?: string;
+  body?: ListedText;
+  image?: ImageWithAlt;
+  action?: CtaSecondaryButton;
+};
+
 export type LinkReference = {
   _ref: string;
   _type: 'reference';
@@ -703,6 +735,169 @@ export type Settings_site = {
   _rev: string;
   title?: string;
   brand?: Brand;
+  currency?:
+    | 'AED'
+    | 'AFN'
+    | 'ALL'
+    | 'AMD'
+    | 'ANG'
+    | 'AOA'
+    | 'ARS'
+    | 'AUD'
+    | 'AWG'
+    | 'AZN'
+    | 'BAM'
+    | 'BBD'
+    | 'BDT'
+    | 'BGN'
+    | 'BHD'
+    | 'BIF'
+    | 'BMD'
+    | 'BND'
+    | 'BOB'
+    | 'BRL'
+    | 'BSD'
+    | 'BTN'
+    | 'BWP'
+    | 'BYN'
+    | 'BZD'
+    | 'CAD'
+    | 'CDF'
+    | 'CHF'
+    | 'CLP'
+    | 'CNY'
+    | 'COP'
+    | 'CRC'
+    | 'CUC'
+    | 'CUP'
+    | 'CVE'
+    | 'CZK'
+    | 'DJF'
+    | 'DKK'
+    | 'DOP'
+    | 'DZD'
+    | 'EGP'
+    | 'ERN'
+    | 'ETB'
+    | 'EUR'
+    | 'FJD'
+    | 'FKP'
+    | 'GBP'
+    | 'GEL'
+    | 'GHS'
+    | 'GIP'
+    | 'GMD'
+    | 'GNF'
+    | 'GTQ'
+    | 'GYD'
+    | 'HKD'
+    | 'HNL'
+    | 'HRK'
+    | 'HTG'
+    | 'HUF'
+    | 'IDR'
+    | 'ILS'
+    | 'INR'
+    | 'IQD'
+    | 'IRR'
+    | 'ISK'
+    | 'JMD'
+    | 'JOD'
+    | 'JPY'
+    | 'KES'
+    | 'KGS'
+    | 'KHR'
+    | 'KMF'
+    | 'KPW'
+    | 'KRW'
+    | 'KWD'
+    | 'KYD'
+    | 'KZT'
+    | 'LAK'
+    | 'LBP'
+    | 'LKR'
+    | 'LRD'
+    | 'LSL'
+    | 'LYD'
+    | 'MAD'
+    | 'MDL'
+    | 'MGA'
+    | 'MKD'
+    | 'MMK'
+    | 'MNT'
+    | 'MOP'
+    | 'MRU'
+    | 'MUR'
+    | 'MVR'
+    | 'MWK'
+    | 'MXN'
+    | 'MYR'
+    | 'MZN'
+    | 'NAD'
+    | 'NGN'
+    | 'NIO'
+    | 'NOK'
+    | 'NPR'
+    | 'NZD'
+    | 'OMR'
+    | 'PAB'
+    | 'PEN'
+    | 'PGK'
+    | 'PHP'
+    | 'PKR'
+    | 'PLN'
+    | 'PYG'
+    | 'QAR'
+    | 'RON'
+    | 'RSD'
+    | 'RUB'
+    | 'RWF'
+    | 'SAR'
+    | 'SBD'
+    | 'SCR'
+    | 'SDG'
+    | 'SEK'
+    | 'SGD'
+    | 'SHP'
+    | 'SLE'
+    | 'SLL'
+    | 'SOS'
+    | 'SRD'
+    | 'SSP'
+    | 'STN'
+    | 'SVC'
+    | 'SYP'
+    | 'SZL'
+    | 'THB'
+    | 'TJS'
+    | 'TMT'
+    | 'TND'
+    | 'TOP'
+    | 'TRY'
+    | 'TTD'
+    | 'TWD'
+    | 'TZS'
+    | 'UAH'
+    | 'UGX'
+    | 'USD'
+    | 'UYU'
+    | 'UZS'
+    | 'VES'
+    | 'VND'
+    | 'VUV'
+    | 'WST'
+    | 'XAF'
+    | 'XCD'
+    | 'XCG'
+    | 'XDR'
+    | 'XOF'
+    | 'XPF'
+    | 'XSU'
+    | 'YER'
+    | 'ZAR'
+    | 'ZMW'
+    | 'ZWG'
+    | 'ZWL';
 };
 
 export type Block_faq = {
@@ -1112,6 +1307,13 @@ export type Module_featureListReference = {
   [internalGroqTypeReferenceTo]?: 'module_featureList';
 };
 
+export type Module_featureHighlightsReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_featureHighlights';
+};
+
 export type Module_logoWallReference = {
   _ref: string;
   _type: 'reference';
@@ -1184,6 +1386,9 @@ export type Page_landing = {
       } & Module_featureListReference)
     | ({
         _key: string;
+      } & Module_featureHighlightsReference)
+    | ({
+        _key: string;
       } & Module_logoWallReference)
     | ({
         _key: string;
@@ -1235,6 +1440,9 @@ export type Page_home = {
     | ({
         _key: string;
       } & Module_featureListReference)
+    | ({
+        _key: string;
+      } & Module_featureHighlightsReference)
     | ({
         _key: string;
       } & Module_logoWallReference)
@@ -1521,6 +1729,7 @@ export type AllSanitySchemaTypes =
   | Block_testimonialReference
   | Module_testimonial
   | Module_logoWall
+  | Module_featureHighlights
   | Block_featureReference
   | Module_featureList
   | Module_postRelated
@@ -1541,6 +1750,7 @@ export type AllSanitySchemaTypes =
   | BrandTagline
   | Seo
   | OpenGraph
+  | FeatureHighlight
   | LinkReference
   | CtaSecondaryButton
   | CtaButton
@@ -1589,6 +1799,7 @@ export type AllSanitySchemaTypes =
   | Module_heroProfileReference
   | Module_contentReference
   | Module_featureListReference
+  | Module_featureHighlightsReference
   | Module_logoWallReference
   | Module_testimonialReference
   | Module_statsReference

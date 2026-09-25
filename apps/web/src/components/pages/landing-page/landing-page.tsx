@@ -1,4 +1,5 @@
 import type { ITenantLocalizedParams } from '@blog/config';
+import { FaqPageSchema } from '@web/components/features/faq-page-schema';
 import { LandingBreadcrumbs } from '@web/components/features/landing/landing-breadcrumbs';
 import { PageShell } from '@web/components/page-templates/page-shell';
 import { getLandingPage } from '@web/server/landing/get-landing-page';
@@ -17,13 +18,14 @@ export const LandingPage = async ({
   const page = guardPageLoaderResult(result, 'landing_page.fetch_failed', {
     slug,
   });
-  const { headingBlock, hero, modules } = page;
+  const { headingBlock, hero, modules, faqs } = page;
 
   return (
     <PageShell>
       <PageShell.Breadcrumbs>
         <LandingBreadcrumbs slug={slug} tenant={tenant} />
       </PageShell.Breadcrumbs>
+      <FaqPageSchema faqs={faqs} />
       <LandingModuleRenderer
         hero={hero}
         headingBlock={headingBlock}
