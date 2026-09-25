@@ -15,6 +15,7 @@ import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post
 import { postRelatedSchema } from '@blog/studio/schema-types/modules/post-related/post-related';
 import { statsSchema } from '@blog/studio/schema-types/modules/stats/stats';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
+import { teamSchema } from '@blog/studio/schema-types/modules/team/team';
 import { testimonialSchema } from '@blog/studio/schema-types/modules/testimonial/testimonial';
 import type { TStructureSection } from '@blog/studio/structure/build-section/build-section';
 import { Blocks } from 'lucide-react';
@@ -56,6 +57,7 @@ export const modulesSection: TStructureSection = {
       title: 'Proof',
       items: [
         { schema: testimonialSchema },
+        { schema: teamSchema },
         { schema: logoWallSchema },
         { schema: statsSchema },
       ],
