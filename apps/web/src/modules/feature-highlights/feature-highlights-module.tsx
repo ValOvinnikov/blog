@@ -28,11 +28,13 @@ export const FeatureHighlightsModule = async ({
     });
     return null;
   }
-  if (result.data.highlights.length === 0) return null;
+  const { highlights, ...view } = result.data;
+  if (highlights.length === 0) return null;
 
   return (
     <FeatureHighlightsModuleView
-      {...result.data}
+      {...view}
+      highlights={highlights}
       titleId={`feature-highlights-${id}`}
       dataTestId={`feature-highlights-module-${id}`}
     />

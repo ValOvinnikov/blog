@@ -38,7 +38,7 @@ export const FeatureHighlightRow = ({
     >
       {item.image && (
         <div className={s.media()}>
-          <MediaFrame ratio="classic" dataTestId="feature-highlight-media">
+          <MediaFrame ratio="classic" dataTestId={`${dataTestId}-media`}>
             <SanityImage
               image={item.image}
               width={IMAGE_WIDTH_PX}
