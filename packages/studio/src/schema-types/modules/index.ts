@@ -17,6 +17,7 @@ import { statsSchema } from './stats/stats';
 import { taxonomyListSchema } from './taxonomy-list/taxonomy-list';
 import { teamSchema } from './team/team';
 import { testimonialSchema } from './testimonial/testimonial';
+import { timelineSchema } from './timeline/timeline';
 
 export const modules = [
   heroSchema,
@@ -34,6 +35,7 @@ export const modules = [
   testimonialSchema,
   teamSchema,
   statsSchema,
+  timelineSchema,
   faqSchema,
   contentSchema,
   ctaSchema,

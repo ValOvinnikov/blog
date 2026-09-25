@@ -40,15 +40,11 @@ describe('isTenantShapedPathSegment', () => {
 
 describe('isValidTenantId', () => {
   it('accepts a lowercase UUID', () => {
-    expect(isValidTenantId('a1b2c3d4-e5f6-4789-a012-3456789abcde')).toBe(
-      true,
-    );
+    expect(isValidTenantId('a1b2c3d4-e5f6-4789-a012-3456789abcde')).toBe(true);
   });
 
   it('accepts an uppercase UUID', () => {
-    expect(isValidTenantId('A1B2C3D4-E5F6-4789-A012-3456789ABCDE')).toBe(
-      true,
-    );
+    expect(isValidTenantId('A1B2C3D4-E5F6-4789-A012-3456789ABCDE')).toBe(true);
   });
 
   it('rejects an ordinary content slug', () => {
@@ -57,9 +53,9 @@ describe('isValidTenantId', () => {
   });
 
   it('rejects a valid UUID with trailing garbage appended', () => {
-    expect(
-      isValidTenantId('a1b2c3d4-e5f6-4789-a012-3456789abcde-extra'),
-    ).toBe(false);
+    expect(isValidTenantId('a1b2c3d4-e5f6-4789-a012-3456789abcde-extra')).toBe(
+      false,
+    );
   });
 
   it('rejects an empty string', () => {
