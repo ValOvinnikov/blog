@@ -22,4 +22,8 @@ describe('PAGE_FAQ_QUESTIONS_EXPRESSION', () => {
       { id: 'block-faq-1', question: 'How much?', answer: 'It depends.' },
     ]);
   });
+
+  it('rejects a null entry, the shape a filter-after-deref GROQ traversal produces', () => {
+    expect(() => pageFaqQuestionsParser.parse([null])).toThrow();
+  });
 });
