@@ -29,7 +29,6 @@ export const FeatureHighlightsModule = async ({
     return null;
   }
   const { highlights, ...view } = result.data;
-  if (highlights.length === 0) return null;
 
   return (
     <FeatureHighlightsModuleView

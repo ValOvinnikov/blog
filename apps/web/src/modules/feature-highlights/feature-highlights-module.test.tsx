@@ -85,17 +85,6 @@ describe(`<${FeatureHighlightsModule.name}/>`, () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('renders nothing when the highlights degrade to an empty list, never an empty landmark with a dangling aria-labelledby', async () => {
-    getFeatureHighlightsModuleMock.mockResolvedValue({
-      ok: true,
-      data: { ...baseModule, highlights: [] },
-    });
-
-    const { container } = await setup();
-
-    expect(container).toBeEmptyDOMElement();
-  });
-
   it('renders the resolved highlight rows', async () => {
     const highlights = [
       makeFeatureHighlightItem({

@@ -41,8 +41,6 @@ export const FeatureHighlightsModuleView = ({
   titleId,
   dataTestId,
 }: IFeatureHighlightsModuleViewProps) => {
-  if (highlights.length === 0) return null;
-
   const s = featureHighlightsModuleViewVariants();
   const actions = moduleGridActionsVariants({ align: contentAlignment });
   const baseSide: TFeatureHighlightMediaSide =
