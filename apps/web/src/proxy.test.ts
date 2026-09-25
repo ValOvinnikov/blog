@@ -94,6 +94,21 @@ describe('proxy matcher', () => {
     expect(matcher.test('/icons')).toBe(false);
     expect(matcher.test('/icon-something')).toBe(false);
   });
+
+  it('excludes .well-known paths, permanent third-party traffic that should never reach app routing', () => {
+    const matcher = buildMatcherRegExp();
+
+    expect(
+      matcher.test('/.well-known/appspecific/com.chrome.devtools.json'),
+    ).toBe(false);
+    expect(matcher.test('/.well-known/acme-challenge/token')).toBe(false);
+  });
+
+  it('still matches other dotted multi-segment paths, so per-tag RSS keeps working', () => {
+    const matcher = buildMatcherRegExp();
+
+    expect(matcher.test('/tags/typescript/rss.xml')).toBe(true);
+  });
 });
 
 describe('proxy security guard', () => {
