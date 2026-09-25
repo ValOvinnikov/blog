@@ -84,16 +84,14 @@ export const teamSchema = defineType({
     alignmentField({
       name: 'cardAlignment',
       title: 'Card Alignment',
-      description: 'Left or Center, within each card.',
+      description:
+        "Aligns each person's photo, name and role inside their card.",
       list: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
       initialValue: CONTENT_ALIGNMENT.CENTER,
       validation: (rule) => rule.required(),
     }),
     ctaButtonsField(),
-    ...alignmentFields([], {
-      description:
-        'Horizontal alignment of the heading, supporting text and actions.',
-    }),
+    ...alignmentFields([]),
     layoutField,
   ],
   preview: {
