@@ -90,7 +90,7 @@ describe(toTeamModule, () => {
     ]);
   });
 
-  it('drops a member the deref could not resolve', () => {
+  it('keeps the members in authored order', () => {
     const raw = makeRawTeamModule({
       members: [
         makeRawTeamMember({ _id: 'person-1', name: 'Jamie Rivera' }),
