@@ -12,7 +12,7 @@ export type TPricingCardPriceProps = IWithClassName &
 
 const s = pricingCardPriceVariants();
 
-/** A `PricingCard`'s headline price, taking pre-formatted strings and never formatting currency or numbers itself. A `compareAt` value renders struck through with a screen-reader-only "Regular price" prefix, so it's announced as the regular price rather than read as a second, unexplained figure. */
+/** A `PricingCard`'s headline price, taking pre-formatted strings and never formatting currency or numbers itself; a `compareAt` value renders struck through with a screen-reader-only "Regular price" prefix. */
 export const PricingCardPrice = ({
   amount,
   compareAt,

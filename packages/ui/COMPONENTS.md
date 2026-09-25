@@ -246,7 +246,7 @@ Slots:
 - **PricingCard.Badge** — The raised-tier callout pinned to the top edge of a highlighted `PricingCard`. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **PricingCard.Name** — The `<h3>` naming a `PricingCard`'s tier. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **PricingCard.Description** — The one- or two-line summary of a `PricingCard`'s tier, below its `Name`. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **PricingCard.Price** — A `PricingCard`'s headline price, taking pre-formatted strings and never formatting currency or numbers itself. Props: amount: string · compareAt?: string · period?: string · prefix?: string _(extends IWithClassName, IWithDataTestId)_
+- **PricingCard.Price** — A `PricingCard`'s headline price, taking pre-formatted strings and never formatting currency or numbers itself; a `compareAt` value renders struck through with a screen-reader-only "Regular price" prefix. Props: amount: string · compareAt?: string · period?: string · prefix?: string _(extends IWithClassName, IWithDataTestId)_
 - **PricingCard.Extra** — One smaller price line below a `PricingCard`'s headline `Price` (e.g. a one-time setup fee). Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **PricingCard.Features** — The checklist of what a `PricingCard`'s tier includes; grows to fill the card's remaining height so `Actions` lines up across neighbouring cards. Props: items: string[] _(extends IWithClassName, IWithDataTestId)_
 - **PricingCard.Actions** — The stacked, full-width call-to-action slot of a `PricingCard`; the caller fills it with its own action buttons. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_

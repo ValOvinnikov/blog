@@ -15,7 +15,7 @@ export type TPricingCardFeaturesProps = IWithClassName &
 
 const s = pricingCardFeaturesVariants();
 
-/** The checklist of what a `PricingCard`'s tier includes; grows to fill the card's remaining height so `Actions` lines up across neighbouring cards. Each check icon is decorative and stays hidden from assistive tech. */
+/** The checklist of what a `PricingCard`'s tier includes; grows to fill the card's remaining height so `Actions` lines up across neighbouring cards. */
 export const PricingCardFeatures = ({
   items,
   className,
