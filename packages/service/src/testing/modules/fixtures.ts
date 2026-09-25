@@ -9,6 +9,7 @@ import {
   HERO_FIELD_MODE,
   HERO_VARIANT,
   LINK_TYPE,
+  MEDIA_ORDER,
   NEWSLETTER_VARIANT,
   POST_SOURCE,
   TAXONOMY_KIND,
@@ -17,6 +18,7 @@ import {
 import type { TRawContentModule } from '@blog/service/features/modules/content/adaptor/transformer';
 import type { TRawCtaModule } from '@blog/service/features/modules/cta/adaptor/transformer';
 import type { TRawFaqModule } from '@blog/service/features/modules/faq/adaptor/transformer';
+import type { TRawFeatureHighlightsModule } from '@blog/service/features/modules/feature-highlights/adaptor/transformer';
 import type { TRawFeatureListModule } from '@blog/service/features/modules/feature-list/adaptor/transformer';
 import type { TRawHeroModule } from '@blog/service/features/modules/hero/adaptor/transformer';
 import type { TRawHeroBlogModule } from '@blog/service/features/modules/hero-blog/adaptor/transformer';
@@ -47,6 +49,9 @@ type TRawFeatureListItem = NonNullable<
 >[number];
 type TRawTaxonomyEntry = NonNullable<TRawTaxonomyListModule['entries']>[number];
 type TRawLogoItem = NonNullable<TRawLogoWallModule['logos']>[number];
+type TRawFeatureHighlightItem = NonNullable<
+  TRawFeatureHighlightsModule['highlights']
+>[number];
 type TRawStatItem = NonNullable<TRawStatsModule['stats']>[number];
 type TRawTestimonialItem = NonNullable<
   TRawTestimonialModule['testimonials']
@@ -404,6 +409,37 @@ export function makeRawLogoWallModule(
     ],
     ctaButtons: null,
     displayMode: DISPLAY_MODE.GRID,
+    contentAlignment: null,
+    layout: null,
+    ...overrides,
+  };
+}
+
+export function makeRawFeatureHighlightItem(
+  overrides: Partial<TRawFeatureHighlightItem> = {},
+): TRawFeatureHighlightItem {
+  return {
+    _key: 'block-highlight-1',
+    heading: 'Ship faster',
+    body: [makeRawContentBlock({ text: 'Ship faster with less friction.' })],
+    image: makeRawSanityImage(),
+    action: null,
+    ...overrides,
+  };
+}
+
+export function makeRawFeatureHighlightsModule(
+  overrides: Partial<TRawFeatureHighlightsModule> = {},
+): TRawFeatureHighlightsModule {
+  return {
+    brandVariant: BRAND_VARIANT.PRIMARY,
+    headingBlock: makeRawHeadingBlock('Why teams choose us'),
+    highlights: [
+      makeRawFeatureHighlightItem(),
+      makeRawFeatureHighlightItem({ _key: 'block-highlight-2' }),
+    ],
+    ctaButtons: null,
+    mediaOrder: MEDIA_ORDER.FIRST,
     contentAlignment: null,
     layout: null,
     ...overrides,
