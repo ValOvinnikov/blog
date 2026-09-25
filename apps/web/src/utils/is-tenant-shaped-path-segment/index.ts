@@ -1,1 +1,4 @@
-export { isTenantShapedPathSegment } from './is-tenant-shaped-path-segment';
+export {
+  isTenantShapedPathSegment,
+  isValidTenantId,
+} from './is-tenant-shaped-path-segment';
