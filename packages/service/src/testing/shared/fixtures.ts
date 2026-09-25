@@ -4,6 +4,7 @@ import type { TRawFaqPageQuestion } from '@blog/service/shared/transformers/faq/
 import type { TRawHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
 import type { TRawSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image';
 import type { TRawLinkDocument } from '@blog/service/shared/transformers/link/to-link-document';
+import type { TRawPersonProfile } from '@blog/service/shared/transformers/person/to-person-profile';
 import type { TRawPortableTextMarkDef } from '@blog/service/shared/transformers/portable-text/to-portable-text-mark-def';
 import type { TRawSeo } from '@blog/service/shared/transformers/seo/resolve-seo';
 import type { TRawSocialProfile } from '@blog/service/shared/transformers/social-profile/to-social-profile';
@@ -45,6 +46,23 @@ export function makeRawPortableTextMarkDef(
     _type: 'linkRef',
     link: makeRawExternalLinkDocument(),
     ...overrides,
+  };
+}
+
+type TRawPersonBioBlock = NonNullable<TRawPersonProfile['bio']>[number];
+
+export function makeRawPersonBioBlock(
+  overrides: Partial<TRawPersonBioBlock> & { text?: string } = {},
+): TRawPersonBioBlock {
+  const { text = 'Builds things.', ...rest } = overrides;
+
+  return {
+    _type: 'block',
+    _key: 'bio-block-1',
+    style: 'normal',
+    children: [{ _type: 'span', _key: 'span-1', text }],
+    markDefs: null,
+    ...rest,
   };
 }
 

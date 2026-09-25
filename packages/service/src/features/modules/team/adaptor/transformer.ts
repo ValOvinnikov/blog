@@ -1,10 +1,7 @@
 import { toCtaButtons } from '@blog/service/shared/transformers/cta/to-cta-buttons';
 import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
-import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image';
 import { toLayout } from '@blog/service/shared/transformers/layout/to-layout';
-import { toLinkDocument } from '@blog/service/shared/transformers/link/to-link-document';
-import { toPortableText } from '@blog/service/shared/transformers/portable-text/to-portable-text-mark-def';
-import { toSocialProfiles } from '@blog/service/shared/transformers/social-profile/to-social-profiles';
+import { toPersonProfile } from '@blog/service/shared/transformers/person/to-person-profile';
 import type { InferResultType } from 'groqd';
 
 import type { teamModuleQuery } from './query';
@@ -19,14 +16,16 @@ function toTeamMember(
   showBios: boolean,
   showSocialLinks: boolean,
 ): TTeamMember {
+  const person = toPersonProfile(raw);
+
   return {
-    id: raw._id,
-    name: raw.name,
-    image: toSanityImage(raw.image),
-    role: raw.role ?? undefined,
-    bio: showBios ? (raw.bio?.map(toPortableText) ?? undefined) : undefined,
-    socialLinks: showSocialLinks ? toSocialProfiles(raw.socialLinks) : [],
-    profileUrl: toLinkDocument(raw.profilePage)?.href,
+    id: person.id,
+    name: person.name,
+    image: person.image,
+    role: person.role,
+    bio: showBios ? person.bio : undefined,
+    socialLinks: showSocialLinks ? person.socialLinks : [],
+    profileUrl: person.profileUrl,
   };
 }
 

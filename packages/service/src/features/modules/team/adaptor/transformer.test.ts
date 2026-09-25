@@ -8,7 +8,11 @@ import {
   makeRawTeamMember,
   makeRawTeamModule,
 } from '@blog/service/testing/modules/fixtures';
-import { makeRawExternalLinkDocument } from '@blog/service/testing/shared/fixtures';
+import {
+  makeRawExternalLinkDocument,
+  makeRawPersonBioBlock,
+  makeRawSocialProfile,
+} from '@blog/service/testing/shared/fixtures';
 
 import { toTeamModule } from './transformer';
 
@@ -25,23 +29,14 @@ describe(toTeamModule, () => {
           _id: 'person-1',
           name: 'Jamie Rivera',
           role: 'Staff Engineer',
-          bio: [
-            {
-              _type: 'block',
-              _key: 'bio-block-1',
-              children: [
-                { _type: 'span', _key: 'span-1', text: 'Builds things.' },
-              ],
-              markDefs: null,
-            },
-          ],
+          bio: [makeRawPersonBioBlock({ text: 'Builds things.' })],
           socialLinks: [
-            {
+            makeRawSocialProfile({
               platform: SOCIAL_PLATFORMS.GITHUB,
               link: makeRawExternalLinkDocument({
                 url: 'https://github.com/jamie',
               }),
-            },
+            }),
           ],
           profilePage: makeRawExternalLinkDocument({
             url: 'https://example.com/team/jamie',
@@ -67,6 +62,7 @@ describe(toTeamModule, () => {
           {
             _type: 'block',
             _key: 'bio-block-1',
+            style: 'normal',
             children: [
               { _type: 'span', _key: 'span-1', text: 'Builds things.' },
             ],
@@ -112,19 +108,9 @@ describe(toTeamModule, () => {
       showSocialLinks: false,
       members: [
         makeRawTeamMember({
-          bio: [
-            {
-              _type: 'block',
-              _key: 'bio-block-1',
-              children: [{ _type: 'span', _key: 'span-1', text: 'Hi.' }],
-              markDefs: null,
-            },
-          ],
+          bio: [makeRawPersonBioBlock({ text: 'Hi.' })],
           socialLinks: [
-            {
-              platform: SOCIAL_PLATFORMS.GITHUB,
-              link: makeRawExternalLinkDocument(),
-            },
+            makeRawSocialProfile({ platform: SOCIAL_PLATFORMS.GITHUB }),
           ],
         }),
       ],
