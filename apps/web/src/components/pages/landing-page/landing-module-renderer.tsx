@@ -8,6 +8,7 @@ import { PageHeading } from '@web/components/shared/page-heading';
 import { ContentModule } from '@web/modules/content/content-module';
 import { CtaModule } from '@web/modules/cta/cta-module';
 import { FaqModule } from '@web/modules/faq/faq-module';
+import { FeatureHighlightsModule } from '@web/modules/feature-highlights/feature-highlights-module';
 import { FeatureListModule } from '@web/modules/feature-list/feature-list-module';
 import { HeroBlogModule } from '@web/modules/hero-blog/hero-blog-module';
 import { HeroProfileModule } from '@web/modules/hero-profile/hero-profile-module';
@@ -37,6 +38,7 @@ const LANDING_MAP: Partial<Record<TPageLandingType, TModuleComponent>> = {
   module_taxonomyList: TaxonomyListModule,
   module_postFeatured: PostFeaturedModule,
   module_featureList: FeatureListModule,
+  module_featureHighlights: FeatureHighlightsModule,
   module_testimonial: TestimonialModule,
   module_logoWall: LogoWallModule,
   module_stats: StatsModule,
