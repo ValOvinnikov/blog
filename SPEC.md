@@ -248,7 +248,7 @@ no faked defaults), the module-registry mechanism, and the editorial write path:
 Source of truth: `packages/studio/src/schema-types/` — documents (`post`, `author`,
 `topic`, `tag`, `link`, page documents, singletons), standalone `module_*`
 page-builder documents, `block_*` documents those modules compose
-(`block_feature`, `block_testimonial`), and shared objects (`linkRef`, `ctaButton`,
+(`block_feature`, `block_testimonial`, `block_faq`), and shared objects (`linkRef`, `ctaButton`,
 `socialProfile`, `imageWithAlt`, `bodyImage`,
 `seo`, `aside`, `postTakeaways`, …). Naming convention `{group}_{name}` is being applied
 incrementally (#251).
@@ -945,6 +945,47 @@ no surface, border or radius, and `CardGrid` is skipped with them. The band is a
 organic lift, plus 38 percent”, while CSS `order` puts the value on top
 visually — the value being the only element carrying the accent colour.
 
+**A question is a document, and that is the opposite call from a figure.**
+`block_faq` ("FAQ Item") carries a `title` — its Studio label — a required
+`question`, and a required `answer` in `listedText`. It sits under **Blocks →
+FAQs**, and `module_faq` ("FAQ") references 2 to 20 of them in authored order,
+validated `required()`, `unique()`, `min(2)` and `max(20)` as separate rule
+chains for the same reason `module_testimonial`'s are separate. A figure belongs
+to one page's argument, but "what is your turnaround time?" is answered once and
+asked on every page that sells the work, so the reuse a `block_*` document buys
+is worth its desk entry and reference picker here. The answer is Portable Text
+rather than a string because an answer routinely wants a list, an emphasis or a
+link to the page that explains further.
+
+**The module is stacked only: no `displayMode`, no layout variant.** Questions
+are read top to bottom in the order they were authored, and every alternative
+arrangement either hides answers behind a swipe or breaks the reading order that
+makes an FAQ scannable. The questions sit in a column capped at `max-w-post`
+(47.5rem), positioned by `contentAlignment` along with the heading and actions,
+while the answer text inside each panel stays start-aligned whatever the module's
+alignment.
+
+**The disclosure is `Accordion` in `@blog/ui`, built on Base UI, and it carries
+no `'use client'`.** Every Base UI part ships its own directive and the organism
+owns no hooks, so an `apps/web` Server Component renders it directly — which is
+why it is styled with static classes and `data-*` variants only: a
+function-valued `className`, `style` or `render` prop cannot cross the
+server/client boundary, and would fail at runtime rather than at `type-check`.
+Several answers may be open at once, fixed with no Studio toggle, and a closed
+panel uses `hiddenUntilFound`, so browser find-in-page opens the item it matches.
+This supersedes the earlier plan (#1290 and the portfolio design doc) to put the
+disclosure in an `apps/web` client leaf.
+
+**One `FAQPage` per page, built at page level — modules emit none.** The home
+and landing loaders return `faqs`: every question across that page's FAQ modules,
+deduplicated by id in first-seen order, with the answer as plain text via GROQ's
+`pt::text(answer)`. The page renders a single `FAQPage` from it through the
+shared `JsonLd`, and nothing at all when the list is empty. Two FAQ modules on
+one page therefore stay valid, which a module-level block could not guarantee.
+The answer is consequently modelled twice on purpose — rich text
+(`TFaqQuestion`) for rendering, plain text (`TFaqPageQuestion`) for the
+structured data — because Portable Text is not a string and `FAQPage` wants one.
+
 `service.modules.<type>.v1` projects `brandVariant` as a required
 `TBrandVariantOf<...>` (narrowed per module to exactly the options its
 schema allows), `layout` as `TLayout | undefined`, and (where applicable)
@@ -1524,7 +1565,8 @@ one). `window.onerror`/`unhandledrejection` are deliberately out of scope.
 ## 10. SEO & accessibility
 
 Per-route `generateMetadata`, JSON-LD (`Article`/`BlogPosting`,
-`BreadcrumbList`), self-canonical pagination, per-environment `noindex`
+`BreadcrumbList`, and a page-level `FAQPage` on home and landing pages that
+carry FAQ modules), self-canonical pagination, per-environment `noindex`
 outside `production`, and the accessibility non-negotiables (no hardcoded
 `aria-label`s in `ui`, semantic heading tags, Lighthouse ≥ 95 target).
 

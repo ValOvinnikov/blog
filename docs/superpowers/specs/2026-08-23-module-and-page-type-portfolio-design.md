@@ -136,8 +136,11 @@ end rather than renumbering):
   reusable `block_testimonial` documents; designed below.
 - `module_logoWall` — client / tech logos.
 - `module_stats` — metric figures ("40% faster", "3M users").
-- `module_faq` — accordion (interactive; the disclosure lives in a `web`
-  client leaf per `web-component-practices`, the organism stays pure).
+- `module_faq` — **built** ([#2786](https://github.com/ValOvinnikov/blog/issues/2786));
+  `SPEC.md` §6 describes what shipped. The disclosure is `Accordion` in
+  `@blog/ui` on Base UI and carries no `'use client'`, so a Server Component
+  renders it directly — superseding this catalogue's earlier "lives in a `web`
+  client leaf" note.
 - `module_embed` — video / oEmbed (YouTube, Loom, CodePen).
 - `module_contactForm` — see below (has a write path; specced separately).
 - Second wave: `module_pricing`, `module_timeline`.
