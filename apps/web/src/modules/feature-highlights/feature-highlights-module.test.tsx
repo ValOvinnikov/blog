@@ -117,7 +117,7 @@ describe(`<${FeatureHighlightsModule.name}/>`, () => {
     highlights.forEach((highlight) => {
       expect(
         screen.getByRole('heading', { level: 3, name: highlight.heading }),
-      ).toBeInTheDocument();
+      ).toBeVisible();
     });
   });
 });

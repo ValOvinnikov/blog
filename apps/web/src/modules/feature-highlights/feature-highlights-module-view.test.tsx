@@ -63,6 +63,6 @@ describe(`<${FeatureHighlightsModuleView.name}/>`, () => {
     expect(screen.getAllByRole('link')).toHaveLength(1);
     expect(
       screen.getByRole('link', { name: ctaActionsDemo[0]!.link.label }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
   });
 });

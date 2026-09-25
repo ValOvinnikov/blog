@@ -23,13 +23,13 @@ describe(`<${FeatureHighlightRow.name}/>`, () => {
 
     expect(
       screen.getByRole('heading', { level: 3, name: item.heading }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
   });
 
   it('renders the row image when the item has one', () => {
     setup();
 
-    expect(screen.getByRole('img')).toBeInTheDocument();
+    expect(screen.getByRole('img')).toBeVisible();
   });
 
   it('renders no image when the item has none', () => {
@@ -43,7 +43,7 @@ describe(`<${FeatureHighlightRow.name}/>`, () => {
 
     expect(
       screen.getByRole('link', { name: ctaActionsDemo[0]!.link.label }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
   });
 
   it('renders no action when the item has none', () => {
