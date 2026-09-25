@@ -4,7 +4,7 @@ import { tv } from 'tailwind-variants';
 export const sectionVariants = tv({
   slots: {
     root: ['flex flex-col'],
-    inner: ['mx-auto flex flex-col px-gutter'],
+    inner: ['mx-auto w-full flex flex-col px-gutter'],
   },
   variants: {
     brandVariant: {
