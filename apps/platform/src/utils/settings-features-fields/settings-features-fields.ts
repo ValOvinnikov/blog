@@ -11,6 +11,7 @@ export type TSettingsFeaturesValues = {
   bookmarksEnabled: boolean;
   newsletterEnabled: boolean;
   analyticsEnabled: boolean;
+  consentBannerEnabled: boolean;
 };
 
 export type TCapabilityToggle = {
@@ -30,6 +31,7 @@ export const CAPABILITY_TOGGLES: TCapabilityToggle[] = [
   { capability: CAPABILITY.BOOKMARKS, field: 'bookmarksEnabled' },
   { capability: CAPABILITY.NEWSLETTER, field: 'newsletterEnabled' },
   { capability: CAPABILITY.ANALYTICS, field: 'analyticsEnabled' },
+  { capability: CAPABILITY.CONSENT_BANNER, field: 'consentBannerEnabled' },
 ];
 
 /** Converts a `PRESET_REGISTRY[preset].featureDefaults` map into the column-keyed view-model shape. */

@@ -693,14 +693,16 @@
       "RATINGS": "Ratings",
       "BOOKMARKS": "Bookmarks",
       "NEWSLETTER": "Newsletter",
-      "ANALYTICS": "Analytics"
+      "ANALYTICS": "Analytics",
+      "CONSENT_BANNER": "Cookie consent banner"
     },
     "toggleDescription": {
       "COMMENTS": "Let readers leave comments on posts.",
       "RATINGS": "Let readers rate posts.",
       "BOOKMARKS": "Let readers save posts to read later.",
       "NEWSLETTER": "Show the newsletter signup form on the site.",
-      "ANALYTICS": "Enable on-site analytics tracking."
+      "ANALYTICS": "Enable on-site analytics tracking.",
+      "CONSENT_BANNER": "Ask visitors' permission before anything outside Necessary loads."
     }
   }
 }
