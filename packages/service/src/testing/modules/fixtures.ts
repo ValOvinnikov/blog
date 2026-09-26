@@ -12,6 +12,7 @@ import {
   MEDIA_ORDER,
   NEWSLETTER_VARIANT,
   POST_SOURCE,
+  PRICE_PERIOD,
   TAXONOMY_KIND,
   TAXONOMY_SORT,
   TIMELINE_MARKER_STYLE,
@@ -32,6 +33,7 @@ import type { TRawPostFeaturedModule } from '@blog/service/features/modules/post
 import type { TRawPostLatestModule } from '@blog/service/features/modules/post-latest/adaptor/transformer';
 import type { TRawPostListModule } from '@blog/service/features/modules/post-list/adaptor/transformer';
 import type { TRawPostRelatedModule } from '@blog/service/features/modules/post-related/adaptor/transformer';
+import type { TRawPricingModule } from '@blog/service/features/modules/pricing/adaptor/transformer';
 import type { TRawStatsModule } from '@blog/service/features/modules/stats/adaptor/transformer';
 import type { TRawTaxonomyListModule } from '@blog/service/features/modules/taxonomy-list/adaptor/transformer';
 import type { TRawTestimonialModule } from '@blog/service/features/modules/testimonial/adaptor/transformer';
@@ -56,6 +58,8 @@ type TRawFeatureHighlightItem = NonNullable<
   TRawFeatureHighlightsModule['highlights']
 >[number];
 type TRawStatItem = NonNullable<TRawStatsModule['stats']>[number];
+type TRawPricingTier = NonNullable<TRawPricingModule['tiers']>[number];
+type TRawPricingPrice = NonNullable<TRawPricingTier['prices']>[number];
 type TRawTestimonialItem = NonNullable<
   TRawTestimonialModule['testimonials']
 >[number];
@@ -389,6 +393,55 @@ export function makeRawLogoItem(
     name: 'Acme Corp',
     image: makeRawLogoImage(),
     link: null,
+    ...overrides,
+  };
+}
+
+export function makeRawPricingPrice(
+  overrides: Partial<TRawPricingPrice> = {},
+): TRawPricingPrice {
+  return {
+    _key: 'price-1',
+    period: PRICE_PERIOD.MONTH,
+    amount: 29,
+    compareAtAmount: null,
+    isStartingAt: null,
+    ...overrides,
+  };
+}
+
+export function makeRawPricingTier(
+  overrides: Partial<TRawPricingTier> = {},
+): TRawPricingTier {
+  return {
+    _key: 'tier-1',
+    name: 'Pro',
+    description: null,
+    prices: [makeRawPricingPrice()],
+    priceLabel: null,
+    features: ['Unlimited posts', 'Priority support'],
+    ctaButtons: null,
+    isHighlighted: null,
+    highlightLabel: null,
+    footnote: null,
+    ...overrides,
+  };
+}
+
+export function makeRawPricingModule(
+  overrides: Partial<TRawPricingModule> = {},
+): TRawPricingModule {
+  return {
+    brandVariant: BRAND_VARIANT.PRIMARY,
+    headingBlock: makeRawHeadingBlock('Pricing'),
+    tiers: [
+      makeRawPricingTier(),
+      makeRawPricingTier({ _key: 'tier-2', name: 'Team' }),
+    ],
+    footnote: null,
+    ctaButtons: null,
+    contentAlignment: null,
+    layout: null,
     ...overrides,
   };
 }

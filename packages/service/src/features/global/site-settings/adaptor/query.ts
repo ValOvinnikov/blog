@@ -19,5 +19,6 @@ export const siteSettingsQuery = q.star
         logo: b.field('logo').project(sanityImageFragment).nullable(true),
       }))
       .notNull(),
+    currency: sub.field('currency').notNull(),
   }))
   .notNull();

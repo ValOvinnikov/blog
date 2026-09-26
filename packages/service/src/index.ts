@@ -25,6 +25,7 @@ import { createPostFeaturedModuleService } from './features/modules/post-feature
 import { createPostLatestModuleService } from './features/modules/post-latest';
 import { createPostListModuleService } from './features/modules/post-list';
 import { createPostRelatedModuleService } from './features/modules/post-related';
+import { createPricingModuleService } from './features/modules/pricing';
 import { createStatsModuleService } from './features/modules/stats';
 import { createTaxonomyListModuleService } from './features/modules/taxonomy-list';
 import { createTestimonialModuleService } from './features/modules/testimonial';
@@ -70,6 +71,7 @@ export const service = {
     logoWall: createLogoWallModuleService(),
     testimonial: createTestimonialModuleService(),
     stats: createStatsModuleService(),
+    pricing: createPricingModuleService(),
     faq: createFaqModuleService(),
     timeline: createTimelineModuleService(),
   },
@@ -125,6 +127,11 @@ export type { TPostLatestModule } from './features/modules/post-latest';
 export type { TPostListModule } from './features/modules/post-list';
 export type { TPostRelatedModule } from './features/modules/post-related';
 export type { TStatItem, TStatsModule } from './features/modules/stats';
+export type {
+  TPricingModule,
+  TPricingPrice,
+  TPricingTier,
+} from './features/modules/pricing';
 export type {
   TTaxonomyEntry,
   TTaxonomyListModule,

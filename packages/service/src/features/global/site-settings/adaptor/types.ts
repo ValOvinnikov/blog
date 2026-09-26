@@ -1,4 +1,8 @@
-import type { ISanityImage, TMaybeUndefined } from '@blog/config';
+import type {
+  ISanityImage,
+  Settings_site,
+  TMaybeUndefined,
+} from '@blog/config';
 
 export type TBrand = {
   name: string;
@@ -8,4 +12,5 @@ export type TBrand = {
 
 export type TSiteSettings = {
   brand: TBrand;
+  currency: NonNullable<Settings_site['currency']>;
 };

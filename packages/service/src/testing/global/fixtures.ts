@@ -14,6 +14,7 @@ export function makeRawSiteSettings(
       tagline: null,
       logo: makeRawSanityImage('Logo'),
     },
+    currency: 'USD',
     ...overrides,
   };
 }
