@@ -66,8 +66,7 @@ type TAlignmentFieldsOptions = {
 /**
  * A variant-scoped extra exists because a single field's `options.list` is
  * static and can't vary its option set by another field's value — each
- * extra covers one variant's allowed subset, alongside one baseline field
- * offering every alignment value.
+ * extra covers one variant's allowed subset.
  */
 export const alignmentFields = (
   extras: readonly TAlignmentFieldExtra[],
