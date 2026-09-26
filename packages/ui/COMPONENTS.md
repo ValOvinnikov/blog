@@ -2,7 +2,7 @@
 
 # @blog/ui component index
 
-_58 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
+_61 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
 
 ## Atoms
 
@@ -177,6 +177,21 @@ Variants: isCurrent: (boolean)
 
 Compact metadata row for cards.
 Props: dateValue: string · dateLabel: string · readingTime?: string _(extends IWithClassName, IWithDataTestId)_
+
+### ConsentBanner — `components/molecules/consent-banner/consent-banner.tsx`
+
+A persistent, non-modal card offering cookie-consent choices, fixed to the bottom of the viewport.
+Props: headingLevel: THeadingLevel · heading: string · message: string · acceptLabel: string · rejectLabel: string · settingsLabel: string · onAccept: () => void · onReject: () => void · onOpenSettings: () => void _(extends IWithClassName, IWithDataTestId)_
+
+### ConsentPlaceholder — `components/molecules/consent-placeholder/consent-placeholder.tsx`
+
+A themed stand-in, sized to the embed's aspect ratio, for a third-party embed a reader hasn't yet consented to load.
+Props: providerName: string · message: string · allowLabel: string · ratio?: TMediaFrameRatio · onAllow: () => void _(extends IWithClassName, IWithDataTestId)_
+
+### ConsentPreferences — `components/molecules/consent-preferences/consent-preferences.tsx`
+
+The body of the cookie-consent preferences dialog: one switch row per category and a Save action.
+Props: headingLevel: THeadingLevel · heading: string · categories: IConsentCategory[] · onCategoryChange: (id: string, checked: boolean) => void · saveLabel: string · onSave: () => void _(extends IWithClassName, IWithDataTestId)_
 
 ### ImageWithCaption — `components/molecules/image-with-caption/image-with-caption.tsx`
 
