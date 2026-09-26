@@ -185,8 +185,8 @@ Props: headingLevel: THeadingLevel · heading: string · message: string · acce
 
 ### ConsentPlaceholder — `components/molecules/consent-placeholder/consent-placeholder.tsx`
 
-A themed stand-in, sized to the embed's aspect ratio, for a third-party embed a reader hasn't yet consented to load.
-Props: providerName: string · message: string · allowLabel: string · ratio?: TMediaFrameRatio · onAllow: () => void _(extends IWithClassName, IWithDataTestId)_
+A themed stand-in, sized to the embed's aspect ratio, for a third-party embed a reader hasn't yet consented to load — allowing it grants the whole external-media category, so it also offers a route to the full preferences.
+Props: providerName: string · message: string · allowLabel: string · settingsLabel: string · scopeNote: string · ratio?: TMediaFrameRatio · onAllow: () => void · onOpenSettings: () => void _(extends IWithClassName, IWithDataTestId)_
 
 ### ConsentPreferences — `components/molecules/consent-preferences/consent-preferences.tsx`
 

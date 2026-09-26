@@ -10,19 +10,25 @@ export type TConsentPlaceholderProps = IWithClassName &
     providerName: string;
     message: string;
     allowLabel: string;
+    settingsLabel: string;
+    scopeNote: string;
     ratio?: TMediaFrameRatio;
     onAllow: () => void;
+    onOpenSettings: () => void;
   };
 
 const s = consentPlaceholderVariants();
 
-/** A themed stand-in, sized to the embed's aspect ratio, for a third-party embed a reader hasn't yet consented to load. */
+/** A themed stand-in, sized to the embed's aspect ratio, for a third-party embed a reader hasn't yet consented to load — allowing it grants the whole external-media category, so it also offers a route to the full preferences. */
 export const ConsentPlaceholder = ({
   providerName,
   message,
   allowLabel,
+  settingsLabel,
+  scopeNote,
   ratio = 'video',
   onAllow,
+  onOpenSettings,
   className,
   dataTestId,
 }: TConsentPlaceholderProps) => (
@@ -30,9 +36,15 @@ export const ConsentPlaceholder = ({
     <div className={s.content()}>
       <p className={s.provider()}>{providerName}</p>
       <p className={s.message()}>{message}</p>
-      <Button variant="primary" size={SIZE.SM} onClick={onAllow}>
-        {allowLabel}
-      </Button>
+      <div className={s.actions()}>
+        <Button variant="primary" size={SIZE.SM} onClick={onAllow}>
+          {allowLabel}
+        </Button>
+        <Button variant="link" size={SIZE.SM} onClick={onOpenSettings}>
+          {settingsLabel}
+        </Button>
+      </div>
+      <p className={s.scope()}>{scopeNote}</p>
     </div>
   </MediaFrame>
 );

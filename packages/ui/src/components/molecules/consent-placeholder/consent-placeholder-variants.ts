@@ -7,5 +7,7 @@ export const consentPlaceholderVariants = tv({
     ],
     provider: ['font-mono text-copy font-medium text-text'],
     message: ['max-w-prose text-card-copy text-subtle'],
+    actions: ['flex flex-wrap items-center justify-center gap-2'],
+    scope: ['max-w-prose text-card-copy text-subtle'],
   },
 });

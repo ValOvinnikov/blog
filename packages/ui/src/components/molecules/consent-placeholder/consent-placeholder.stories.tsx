@@ -12,8 +12,11 @@ const meta = {
     providerName: 'YouTube',
     message: 'This embed is blocked until you allow YouTube content.',
     allowLabel: 'Allow YouTube',
+    settingsLabel: 'Cookie settings',
+    scopeNote: 'Applies to every video, map and booking widget on this site.',
     ratio: 'video',
     onAllow: () => {},
+    onOpenSettings: () => {},
     className: 'w-96',
   },
   argTypes: {
@@ -35,5 +38,15 @@ export const Square: TStory = {
     message: 'This map is blocked until you allow Google Maps content.',
     allowLabel: 'Allow Google Maps',
     ratio: 'square',
+  },
+};
+
+export const WithScopeAndSettings: TStory = {
+  args: {
+    providerName: 'Vimeo',
+    message: 'This embed is blocked until you allow Vimeo content.',
+    allowLabel: 'Allow Vimeo',
+    settingsLabel: 'Cookie settings',
+    scopeNote: 'Applies to every video, map and booking widget on this site.',
   },
 };

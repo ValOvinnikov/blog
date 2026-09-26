@@ -9,12 +9,17 @@ faker.seed(123);
 const providerName = faker.company.name();
 const message = faker.lorem.sentence();
 const allowLabel = faker.word.verb();
+const settingsLabel = faker.word.noun();
+const scopeNote = faker.lorem.sentence();
 
 const setup = customRender(ConsentPlaceholder, {
   providerName,
   message,
   allowLabel,
+  settingsLabel,
+  scopeNote,
   onAllow: vi.fn(),
+  onOpenSettings: vi.fn(),
 });
 
 describe(`<${ConsentPlaceholder.name}/>`, () => {
@@ -24,9 +29,15 @@ describe(`<${ConsentPlaceholder.name}/>`, () => {
     expect(screen.getByText(message)).toBeVisible();
   });
 
-  it('renders the Allow control', () => {
+  it('renders the Allow and Cookie settings controls', () => {
     setup();
     expect(screen.getByRole('button', { name: allowLabel })).toBeVisible();
+    expect(screen.getByRole('button', { name: settingsLabel })).toBeVisible();
+  });
+
+  it('renders the scope note', () => {
+    setup();
+    expect(screen.getByText(scopeNote)).toBeVisible();
   });
 
   it('calls onAllow when Allow is clicked', async () => {
@@ -42,6 +53,21 @@ describe(`<${ConsentPlaceholder.name}/>`, () => {
     screen.getByRole('button', { name: allowLabel }).focus();
     await userEvent.keyboard('{Enter}');
     expect(onAllow).toHaveBeenCalledTimes(1);
+  });
+
+  it('calls onOpenSettings when Cookie settings is clicked', async () => {
+    const onOpenSettings = vi.fn();
+    setup({ onOpenSettings });
+    await userEvent.click(screen.getByRole('button', { name: settingsLabel }));
+    expect(onOpenSettings).toHaveBeenCalledTimes(1);
+  });
+
+  it('calls onOpenSettings when Cookie settings is activated by keyboard', async () => {
+    const onOpenSettings = vi.fn();
+    setup({ onOpenSettings });
+    screen.getByRole('button', { name: settingsLabel }).focus();
+    await userEvent.keyboard('{Enter}');
+    expect(onOpenSettings).toHaveBeenCalledTimes(1);
   });
 
   it('forwards dataTestId to the root element', () => {
