@@ -69,6 +69,14 @@ describe(`<${ConsentBanner.name}/>`, () => {
     expect(onAccept).toHaveBeenCalledTimes(1);
   });
 
+  it('calls onReject when Reject is activated by keyboard', async () => {
+    const onReject = vi.fn();
+    setup({ onReject });
+    screen.getByRole('button', { name: rejectLabel }).focus();
+    await userEvent.keyboard('{Enter}');
+    expect(onReject).toHaveBeenCalledTimes(1);
+  });
+
   it('calls onOpenSettings when Settings is activated by keyboard', async () => {
     const onOpenSettings = vi.fn();
     setup({ onOpenSettings });

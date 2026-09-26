@@ -26,7 +26,7 @@ export type TConsentPreferencesProps = IWithClassName &
 
 const s = consentPreferencesVariants();
 
-/** The body of the cookie-consent preferences dialog: one switch row per category and a Save action. The caller renders it inside its own `<dialog>` element. */
+/** The body of the cookie-consent preferences dialog — one switch row per category and a Save action — rendered without its own `<dialog>`, which the caller owns. */
 export const ConsentPreferences = ({
   headingLevel,
   heading,

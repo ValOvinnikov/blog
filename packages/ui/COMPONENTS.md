@@ -190,7 +190,7 @@ Props: providerName: string · message: string · allowLabel: string · ratio?: 
 
 ### ConsentPreferences — `components/molecules/consent-preferences/consent-preferences.tsx`
 
-The body of the cookie-consent preferences dialog: one switch row per category and a Save action.
+The body of the cookie-consent preferences dialog — one switch row per category and a Save action — rendered without its own `<dialog>`, which the caller owns.
 Props: headingLevel: THeadingLevel · heading: string · categories: IConsentCategory[] · onCategoryChange: (id: string, checked: boolean) => void · saveLabel: string · onSave: () => void _(extends IWithClassName, IWithDataTestId)_
 
 ### ImageWithCaption — `components/molecules/image-with-caption/image-with-caption.tsx`

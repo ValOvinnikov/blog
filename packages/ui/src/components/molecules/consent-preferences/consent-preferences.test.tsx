@@ -106,6 +106,14 @@ describe(`<${ConsentPreferences.name}/>`, () => {
     expect(onSave).toHaveBeenCalledTimes(1);
   });
 
+  it('calls onSave when Save is activated by keyboard', async () => {
+    const onSave = vi.fn();
+    setup({ onSave });
+    screen.getByRole('button', { name: saveLabel }).focus();
+    await userEvent.keyboard('{Enter}');
+    expect(onSave).toHaveBeenCalledTimes(1);
+  });
+
   it('forwards dataTestId to the root element', () => {
     setup({ dataTestId: 'consent-preferences' });
     expect(screen.getByTestId('consent-preferences')).toBeVisible();
