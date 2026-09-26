@@ -726,7 +726,8 @@ be published — which is what lets every consumer below treat the visual as
 guaranteed instead of testing for its absence.
 
 `module_featureList` ("Features") references those cards through a `features`
-array, `unique()` and validated `min(2).max(8)`. Two is the floor because a
+array, validated with `unique()`, `min(2)` and `max(8)` as separate rule chains.
+Two is the floor because a
 lone card is a statement rather than a grid; eight is the ceiling because the
 column rule below stops producing balanced rows past it. It carries the usual
 module furniture — `title`, `brandVariant` (the default
@@ -910,8 +911,9 @@ API-written wall with no logos disappears instead of rendering an empty row.
 `module_stats` ("Stats") holds **inline objects rather than referenced
 documents** too, for a different reason than the logo wall's. A `stat` carries a required
 `value`, a required `label` and an optional `description`, and lives on the
-module's `stats` array — 2 to 6 of them, `required()` ahead of `min(2)` and
-`max(6)`, with no `unique()` because inline objects have no id to compare. The
+module's `stats` array — 2 to 6 of them, with `required()`, `min(2)` and `max(6)`
+each their own rule chain, and no `unique()` because inline objects have no id to
+compare. The
 reuse a `block_*` document buys is the wrong trade here: a logo or a quote
 recurs across pages, but a figure belongs to the argument one page is making,
 and editing it once would make a stale number wrong in two places. It follows
@@ -951,8 +953,9 @@ tells one page's story in order and never recombines, so there is no Explainers
 `block_*`, no reference picker and no second revalidation tag. A `featureHighlight`
 ("Highlight") carries a required `heading`, a required `listedText` `body`, a
 required `imageWithAlt` `image`, and one optional `ctaSecondaryButton` `action`;
-the module holds 2 to 6 of them on `highlights`, `required()` ahead of `min(2)`
-and `max(6)`, with no `unique()` because inline objects have no id to compare.
+the module holds 2 to 6 of them on `highlights`, with `required()`, `min(2)` and
+`max(6)` each their own rule chain, and no `unique()` because inline objects have
+no id to compare.
 The module is offered on `page_home` and `page_landing` only, under **Modules →
 Explainers** beside Features.
 
