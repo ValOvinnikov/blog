@@ -61,6 +61,7 @@ type TRawTestimonialItem = NonNullable<
 >[number];
 type TRawFaqQuestionItem = TRawFaqModule['questions'][number];
 type TRawTimelineItem = NonNullable<TRawTimelineModule['items']>[number];
+type TRawTimelineItemBody = NonNullable<TRawTimelineItem['body']>[number];
 
 export function makeRawHeroModule(
   overrides: Partial<TRawHeroModule> = {},
@@ -274,9 +275,9 @@ export function makeRawContentMarkDef(
   return makeRawPortableTextMarkDef(overrides);
 }
 
-export function makeRawContentBlock(
-  overrides: Partial<TRawCtaContentBlock> & { text?: string } = {},
-): TRawCtaContentBlock {
+function makeRawParagraphTextBlock<T extends { _type: 'block'; _key: string }>(
+  overrides: Partial<T> & { text?: string } = {},
+): T {
   const { text = 'Hi.', ...rest } = overrides;
 
   return {
@@ -286,7 +287,13 @@ export function makeRawContentBlock(
     children: [{ _type: 'span', _key: 'span-1', text }],
     markDefs: null,
     ...rest,
-  };
+  } as unknown as T;
+}
+
+export function makeRawContentBlock(
+  overrides: Partial<TRawCtaContentBlock> & { text?: string } = {},
+): TRawCtaContentBlock {
+  return makeRawParagraphTextBlock<TRawCtaContentBlock>(overrides);
 }
 
 export function makeRawTaxonomyListModule(
@@ -541,18 +548,10 @@ export function makeRawTimelineItem(
     marker: null,
     heading: 'Kick off',
     body: [
-      {
-        _type: 'block',
+      makeRawParagraphTextBlock<TRawTimelineItemBody>({
         _key: 'timeline-body-1',
-        children: [
-          {
-            _type: 'span',
-            _key: 'timeline-body-1-span',
-            text: 'The project begins.',
-          },
-        ],
-        markDefs: null,
-      },
+        text: 'The project begins.',
+      }),
     ],
     ...overrides,
   };

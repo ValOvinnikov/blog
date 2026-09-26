@@ -2,7 +2,7 @@ import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
 import { ctaButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
 import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
-import { portableTextMarkDefFragment } from '@blog/service/shared/fragments/portable-text/portable-text-mark-def';
+import { paragraphTextBlockFragment } from '@blog/service/shared/fragments/portable-text/paragraph-text-block';
 
 export const timelineModuleQuery = q
   .parameters<TModuleQueryParams>()
@@ -24,13 +24,7 @@ export const timelineModuleQuery = q
         heading: itemSub.field('heading').notNull(),
         body: itemSub
           .field('body[]')
-          .project((blockSub) => ({
-            '...': true,
-            markDefs: blockSub
-              .field('markDefs[]')
-              .project(portableTextMarkDefFragment)
-              .nullable(true),
-          }))
+          .project(paragraphTextBlockFragment)
           .nullable(true),
       }))
       .notNull(),
