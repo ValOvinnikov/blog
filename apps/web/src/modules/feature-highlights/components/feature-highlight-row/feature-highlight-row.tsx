@@ -47,7 +47,7 @@ export const FeatureHighlightRow = ({
         </div>
       )}
       <div className={s.text()}>
-        <Heading level={3} className={s.heading()}>
+        <Heading level={3} visual="prose-h3" className={s.heading()}>
           {item.heading}
         </Heading>
         <Prose className={s.body()}>
