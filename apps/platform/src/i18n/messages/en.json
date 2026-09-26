@@ -702,7 +702,7 @@
       "BOOKMARKS": "Let readers save posts to read later.",
       "NEWSLETTER": "Show the newsletter signup form on the site.",
       "ANALYTICS": "Enable on-site analytics tracking.",
-      "CONSENT_BANNER": "Ask visitors' permission before anything outside Necessary loads."
+      "CONSENT_BANNER": "Show visitors a cookie-consent banner before non-essential cookies or scripts load."
     }
   }
 }

@@ -1,7 +1,7 @@
 import { CAPABILITY, type TCapability } from '@blog/config';
 
 /**
- * The five `settings_features` toggle columns, keyed the same way
+ * The `settings_features` toggle columns, keyed the same way
  * `@blog/db`'s `getSettingsFeatures`/`upsertSettingsFeatures` already are —
  * this is the admin-side view-model shape, not a redeclaration of the row.
  */
