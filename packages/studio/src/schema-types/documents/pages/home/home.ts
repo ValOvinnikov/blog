@@ -14,6 +14,7 @@ import { logoWallSchema } from '@blog/studio/schema-types/modules/logo-wall/logo
 import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
+import { pricingSchema } from '@blog/studio/schema-types/modules/pricing/pricing';
 import { statsSchema } from '@blog/studio/schema-types/modules/stats/stats';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import { teamSchema } from '@blog/studio/schema-types/modules/team/team';
@@ -68,6 +69,7 @@ export const homePageSchema = defineType({
         statsSchema.name,
         timelineSchema.name,
         faqSchema.name,
+        pricingSchema.name,
       ],
     }),
     seoField(),

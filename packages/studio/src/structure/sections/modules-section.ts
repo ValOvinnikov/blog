@@ -13,6 +13,7 @@ import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featu
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
 import { postRelatedSchema } from '@blog/studio/schema-types/modules/post-related/post-related';
+import { pricingSchema } from '@blog/studio/schema-types/modules/pricing/pricing';
 import { statsSchema } from '@blog/studio/schema-types/modules/stats/stats';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import { teamSchema } from '@blog/studio/schema-types/modules/team/team';
@@ -66,7 +67,11 @@ export const modulesSection: TStructureSection = {
     },
     {
       title: 'Conversion',
-      items: [{ schema: ctaSchema }, { schema: newsletterSchema }],
+      items: [
+        { schema: ctaSchema },
+        { schema: newsletterSchema },
+        { schema: pricingSchema },
+      ],
     },
   ],
 };

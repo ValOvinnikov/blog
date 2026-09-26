@@ -13,6 +13,7 @@ import { postFeaturedSchema } from './post-featured/post-featured';
 import { postLatestSchema } from './post-latest/post-latest';
 import { postListSchema } from './post-list/post-list';
 import { postRelatedSchema } from './post-related/post-related';
+import { pricingSchema } from './pricing/pricing';
 import { statsSchema } from './stats/stats';
 import { taxonomyListSchema } from './taxonomy-list/taxonomy-list';
 import { teamSchema } from './team/team';
@@ -40,4 +41,5 @@ export const modules = [
   contentSchema,
   ctaSchema,
   newsletterSchema,
+  pricingSchema,
 ];
