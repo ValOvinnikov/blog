@@ -36,7 +36,7 @@ export const pricingTierSchema = defineType({
       validation: (rule) =>
         rule
           .max(160)
-          .warning('Long descriptions crowd a narrow card — keep it brief.'),
+          .error('Long descriptions crowd a narrow card — keep it brief.'),
     }),
     defineField({
       name: 'prices',
@@ -98,7 +98,7 @@ export const pricingTierSchema = defineType({
       type: 'string',
       description: 'A short note under the tier — terms, taxes, or a caveat.',
       validation: (rule) =>
-        rule.max(120).warning('A footnote is one line, not a paragraph.'),
+        rule.max(120).error('A footnote is one line, not a paragraph.'),
     }),
   ],
   preview: {

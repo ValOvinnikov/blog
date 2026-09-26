@@ -41,7 +41,7 @@ export const pricingSchema = defineType({
       description:
         'One line under the tiers — the currency, taxes, or a caveat.',
       validation: (rule) =>
-        rule.max(160).warning('A footnote is one line, not a paragraph.'),
+        rule.max(160).error('A footnote is one line, not a paragraph.'),
     }),
     ctaButtonsField(),
     ...alignmentFields([], {
