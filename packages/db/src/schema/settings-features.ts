@@ -18,6 +18,9 @@ export const settingsFeatures = pgTable('settings_features', {
   bookmarksEnabled: boolean('bookmarks_enabled').notNull().default(true),
   newsletterEnabled: boolean('newsletter_enabled').notNull().default(false),
   analyticsEnabled: boolean('analytics_enabled').notNull().default(false),
+  consentBannerEnabled: boolean('consent_banner_enabled')
+    .notNull()
+    .default(false),
   createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { mode: 'date' })
     .notNull()

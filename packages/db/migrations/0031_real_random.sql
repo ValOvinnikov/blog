@@ -1,0 +1,1 @@
+ALTER TABLE "settings_features" ADD COLUMN "consent_banner_enabled" boolean DEFAULT false NOT NULL;
