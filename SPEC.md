@@ -726,7 +726,8 @@ be published — which is what lets every consumer below treat the visual as
 guaranteed instead of testing for its absence.
 
 `module_featureList` ("Features") references those cards through a `features`
-array, `unique()` and validated `min(2).max(8)`. Two is the floor because a
+array, validated with `unique()`, `min(2)` and `max(8)` as separate rule chains.
+Two is the floor because a
 lone card is a statement rather than a grid; eight is the ceiling because the
 column rule below stops producing balanced rows past it. It carries the usual
 module furniture — `title`, `brandVariant` (the default
@@ -910,8 +911,9 @@ API-written wall with no logos disappears instead of rendering an empty row.
 `module_stats` ("Stats") holds **inline objects rather than referenced
 documents** too, for a different reason than the logo wall's. A `stat` carries a required
 `value`, a required `label` and an optional `description`, and lives on the
-module's `stats` array — 2 to 6 of them, `required()` ahead of `min(2)` and
-`max(6)`, with no `unique()` because inline objects have no id to compare. The
+module's `stats` array — 2 to 6 of them, with `required()`, `min(2)` and `max(6)`
+each their own rule chain, and no `unique()` because inline objects have no id to
+compare. The
 reuse a `block_*` document buys is the wrong trade here: a logo or a quote
 recurs across pages, but a figure belongs to the argument one page is making,
 and editing it once would make a stale number wrong in two places. It follows
@@ -944,6 +946,59 @@ no surface, border or radius, and `CardGrid` is skipped with them. The band is a
 `<dl>` whose source order is label-first, so a screen reader hears “median
 organic lift, plus 38 percent”, while CSS `order` puts the value on top
 visually — the value being the only element carrying the accent colour.
+
+`module_featureHighlights` ("Feature Highlights") holds inline `featureHighlight`
+objects as well, for the same reason as the figures rather than the logos: a row
+tells one page's story in order and never recombines, so there is no Explainers
+`block_*`, no reference picker and no second revalidation tag. A `featureHighlight`
+("Highlight") carries a required `heading`, a required `listedText` `body`, a
+required `imageWithAlt` `image`, and one optional `ctaSecondaryButton` `action`;
+the module holds 2 to 6 of them on `highlights`, with `required()`, `min(2)` and
+`max(6)` each their own rule chain, and no `unique()` because inline objects have
+no id to compare.
+The module is offered on `page_home` and `page_landing` only, under **Modules →
+Explainers** beside Features.
+
+**One module field sets the rhythm, and there is no per-row side.** `mediaOrder`
+(the hero family's `MEDIA_ORDER`, defaulting to `FIRST`) sets the first row's
+image side and every following row flips, so an editor cannot break the
+alternation by setting each row independently — the pattern is the point, and six
+rows of individually-chosen sides is a mistake worth designing out rather than
+validating against. Below `md` every image sits above its text whatever
+`mediaOrder` says. Each row is two equal columns with the text vertically
+centred, its heading an `<h3>`, and **no card surface** — by the affordance rule
+the figures follow, a row is read rather than clicked, so the image takes a thin
+frame and the row itself takes none. Every image is 4:3 (`MediaFrame
+ratio="classic"`) with no ratio field and no `displayMode`: one rhythm, authored
+once.
+
+**Row text always starts at the edge beside its image; `contentAlignment`
+governs only the module's heading and its own buttons.** A row's optional action
+is a secondary button rendered through `ActionGroup`, and the module's
+`ctaButtonsField` under the rows keeps the page's main action — six rows should
+not carry six primary buttons.
+
+**The sides swap in CSS, never in markup.** Exactly as the stats band puts the
+value on top while keeping a label-first `<dl>`, every row's DOM order is
+identical and Tailwind `order-*` does the visual swapping, so screen-reader order
+stays consistent down the module. The side each row lands on is carried
+semantically as a `data-media-side` of `start` or `end`, which also drives those
+classes — one value, so the attribute and the layout cannot disagree, and the
+alternation is assertable without reaching for a class.
+
+**One row the service cannot resolve costs the whole module, exactly as with the
+logo wall — but no transformer guard says so.** The query projects the image with
+`.notNull()` and `sanityImageFragment` in turn declares
+`asset: …deref().notNull()`, both nested inside `highlights[]`'s own
+`.notNull()`, so a row whose image fails to resolve is rejected at `.parse()`,
+`safeAsync` turns that into a failed result, and the module renders nothing
+rather than a run of rows with a hole in it. The page loses the section and keeps
+rendering, as everywhere else in this family. `image` is nonetheless
+`T | undefined` in the view model, because that is `toSanityImage`'s own return
+type rather than a reachable state, and the row omits the frame if it is ever
+absent — no non-null assertion to make the types lie. This is also why the logo
+wall's `UnresolvedLogoImageError` above is unreachable and #3745 removes it:
+the `.notNull()` chain already did that work.
 
 **A question is a document, and that is the opposite call from a figure.**
 `block_faq` ("FAQ Item") carries a `title` — its Studio label — a required
