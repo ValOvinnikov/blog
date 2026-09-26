@@ -7,6 +7,7 @@ import { consentPlaceholderVariants } from './consent-placeholder-variants';
 
 export type TConsentPlaceholderProps = IWithClassName &
   IWithDataTestId & {
+    id: string;
     providerName: string;
     message: string;
     allowLabel: string;
@@ -21,6 +22,7 @@ const s = consentPlaceholderVariants();
 
 /** A themed stand-in, sized to the embed's aspect ratio, for a third-party embed a reader hasn't yet consented to load — allowing it grants the whole external-media category, so it also offers a route to the full preferences. */
 export const ConsentPlaceholder = ({
+  id,
   providerName,
   message,
   allowLabel,
@@ -31,20 +33,36 @@ export const ConsentPlaceholder = ({
   onOpenSettings,
   className,
   dataTestId,
-}: TConsentPlaceholderProps) => (
-  <MediaFrame ratio={ratio} className={className} dataTestId={dataTestId}>
-    <div className={s.content()}>
-      <p className={s.provider()}>{providerName}</p>
-      <p className={s.message()}>{message}</p>
-      <div className={s.actions()}>
-        <Button variant="primary" size={SIZE.SM} onClick={onAllow}>
-          {allowLabel}
-        </Button>
-        <Button variant="link" size={SIZE.SM} onClick={onOpenSettings}>
-          {settingsLabel}
-        </Button>
+}: TConsentPlaceholderProps) => {
+  const scopeId = `${id}-scope`;
+
+  return (
+    <MediaFrame ratio={ratio} className={className} dataTestId={dataTestId}>
+      <div className={s.content()}>
+        <p className={s.provider()}>{providerName}</p>
+        <p className={s.message()}>{message}</p>
+        <div className={s.actions()}>
+          <Button
+            variant="primary"
+            size={SIZE.SM}
+            onClick={onAllow}
+            aria-describedby={scopeId}
+          >
+            {allowLabel}
+          </Button>
+          <Button
+            variant="link"
+            size={SIZE.SM}
+            onClick={onOpenSettings}
+            aria-describedby={scopeId}
+          >
+            {settingsLabel}
+          </Button>
+        </div>
+        <p id={scopeId} className={s.scope()}>
+          {scopeNote}
+        </p>
       </div>
-      <p className={s.scope()}>{scopeNote}</p>
-    </div>
-  </MediaFrame>
-);
+    </MediaFrame>
+  );
+};

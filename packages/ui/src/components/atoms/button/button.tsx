@@ -12,6 +12,7 @@ export type TButtonProps = IWithClassName &
     onClick?: MouseEventHandler<HTMLButtonElement>;
     isDisabled?: boolean;
     'aria-busy'?: AriaAttributes['aria-busy'];
+    'aria-describedby'?: AriaAttributes['aria-describedby'];
   };
 
 /** The styled `<button>` for in-page actions (submit, toggle, dismiss). */
@@ -26,6 +27,7 @@ export const Button = ({
   onClick,
   isDisabled,
   'aria-busy': ariaBusy,
+  'aria-describedby': ariaDescribedby,
 }: TButtonProps) => {
   return (
     <button
@@ -34,6 +36,7 @@ export const Button = ({
       onClick={onClick}
       disabled={isDisabled}
       aria-busy={ariaBusy}
+      aria-describedby={ariaDescribedby}
       data-testid={dataTestId}
       className={buttonVariants({ variant, size, class: className })}
     >

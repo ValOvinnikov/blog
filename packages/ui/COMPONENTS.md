@@ -39,7 +39,7 @@ Variants: size: SIZE.SM|SIZE.MD|SIZE.LG
 ### Button — `components/atoms/button/button.tsx`
 
 The styled `<button>` for in-page actions (submit, toggle, dismiss).
-Props: type?: 'button' | 'submit' | 'reset' · title?: string · children?: ReactNode · onClick?: MouseEventHandler<HTMLButtonElement> · isDisabled?: boolean · 'aria-busy'?: AriaAttributes['aria-busy'] _(extends IWithClassName, IWithDataTestId, TButtonVariants)_
+Props: type?: 'button' | 'submit' | 'reset' · title?: string · children?: ReactNode · onClick?: MouseEventHandler<HTMLButtonElement> · isDisabled?: boolean · 'aria-busy'?: AriaAttributes['aria-busy'] · 'aria-describedby'?: AriaAttributes['aria-describedby'] _(extends IWithClassName, IWithDataTestId, TButtonVariants)_
 Variants: variant: primary|ghost|link|danger · size: SIZE.SM|SIZE.MD|SIZE.LG
 
 ### Caption — `components/atoms/caption/caption.tsx`
@@ -186,7 +186,7 @@ Props: headingLevel: THeadingLevel · heading: string · message: string · acce
 ### ConsentPlaceholder — `components/molecules/consent-placeholder/consent-placeholder.tsx`
 
 A themed stand-in, sized to the embed's aspect ratio, for a third-party embed a reader hasn't yet consented to load — allowing it grants the whole external-media category, so it also offers a route to the full preferences.
-Props: providerName: string · message: string · allowLabel: string · settingsLabel: string · scopeNote: string · ratio?: TMediaFrameRatio · onAllow: () => void · onOpenSettings: () => void _(extends IWithClassName, IWithDataTestId)_
+Props: id: string · providerName: string · message: string · allowLabel: string · settingsLabel: string · scopeNote: string · ratio?: TMediaFrameRatio · onAllow: () => void · onOpenSettings: () => void _(extends IWithClassName, IWithDataTestId)_
 
 ### ConsentPreferences — `components/molecules/consent-preferences/consent-preferences.tsx`
 

@@ -9,6 +9,7 @@ const meta = {
   component: ConsentPlaceholder,
   tags: ['autodocs'],
   args: {
+    id: 'consent-placeholder-youtube',
     providerName: 'YouTube',
     message: 'This embed is blocked until you allow YouTube content.',
     allowLabel: 'Allow YouTube',
@@ -34,6 +35,7 @@ export const Default: TStory = {};
 
 export const Square: TStory = {
   args: {
+    id: 'consent-placeholder-maps',
     providerName: 'Google Maps',
     message: 'This map is blocked until you allow Google Maps content.',
     allowLabel: 'Allow Google Maps',
@@ -41,12 +43,14 @@ export const Square: TStory = {
   },
 };
 
-export const WithScopeAndSettings: TStory = {
+export const LongScopeNote: TStory = {
   args: {
+    id: 'consent-placeholder-long-scope',
     providerName: 'Vimeo',
     message: 'This embed is blocked until you allow Vimeo content.',
     allowLabel: 'Allow Vimeo',
-    settingsLabel: 'Cookie settings',
-    scopeNote: 'Applies to every video, map and booking widget on this site.',
+    ratio: 'square',
+    scopeNote:
+      'Applies to every video, map, booking widget, live chat and social feed embedded anywhere on this site, including pages you have not visited yet.',
   },
 };

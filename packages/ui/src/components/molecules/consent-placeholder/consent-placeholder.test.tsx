@@ -6,6 +6,7 @@ import { ConsentPlaceholder } from './consent-placeholder';
 
 faker.seed(123);
 
+const id = faker.lorem.slug();
 const providerName = faker.company.name();
 const message = faker.lorem.sentence();
 const allowLabel = faker.word.verb();
@@ -13,6 +14,7 @@ const settingsLabel = faker.word.noun();
 const scopeNote = faker.lorem.sentence();
 
 const setup = customRender(ConsentPlaceholder, {
+  id,
   providerName,
   message,
   allowLabel,
@@ -38,6 +40,19 @@ describe(`<${ConsentPlaceholder.name}/>`, () => {
   it('renders the scope note', () => {
     setup();
     expect(screen.getByText(scopeNote)).toBeVisible();
+  });
+
+  it('associates the scope note as the accessible description of both controls', () => {
+    setup();
+    expect(
+      screen.getByRole('button', { name: allowLabel, description: scopeNote }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole('button', {
+        name: settingsLabel,
+        description: scopeNote,
+      }),
+    ).toBeVisible();
   });
 
   it('calls onAllow when Allow is clicked', async () => {
