@@ -28,14 +28,11 @@ export const featureHighlightsSchema = defineType({
       description:
         'The rows in the order they should be read. Images alternate sides from the first row.',
       of: [defineArrayMember({ type: featureHighlightSchema.name })],
-      validation: (rule) =>
-        rule
-          .required()
-          .error('Add at least two rows.')
-          .min(2)
-          .error('Feature highlights need at least two rows.')
-          .max(6)
-          .error('Feature highlights hold at most six rows.'),
+      validation: (rule) => [
+        rule.required().error('Add at least two rows.'),
+        rule.min(2).error('Add at least two rows.'),
+        rule.max(6).error('Feature highlights hold at most six rows.'),
+      ],
     }),
     ctaButtonsField(),
     defineField({
