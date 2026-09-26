@@ -27,7 +27,7 @@ export type TTimelineItemProps = IWithClassName &
     children?: TCompoundChildren<TTimelineItemParts>;
   };
 
-/** One step on a `Timeline`. Expects `Timeline.Marker` first, then `Timeline.Heading` and an optional `Timeline.Body`, in that order — the layout follows DOM position rather than slot detection. */
+/** Expects `Timeline.Marker` first, then `Timeline.Heading` and an optional `Timeline.Body`, in that order — the layout follows DOM position rather than slot detection. */
 export const TimelineItem = ({
   orientation = TIMELINE_ORIENTATION.VERTICAL,
   itemAlignment = CONTENT_ALIGNMENT.LEFT,
