@@ -1,3 +1,4 @@
+import { CONTENT_ALIGNMENT } from '@blog/config/constants';
 import { faqBlockSchema } from '@blog/studio/schema-types/documents/blocks/faq/faq';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
@@ -44,7 +45,9 @@ export const faqSchema = defineType({
       ],
     }),
     ctaButtonsField(),
-    ...alignmentFields([]),
+    ...alignmentFields([], {
+      allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
+    }),
     layoutField,
   ],
   preview: {

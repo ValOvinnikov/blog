@@ -60,6 +60,7 @@ type TAlignmentFieldsOptions = {
   description?: string;
   fieldset?: string;
   initialValue?: TContentAlignment;
+  allow?: readonly TContentAlignment[];
 };
 
 /**
@@ -77,6 +78,7 @@ export const alignmentFields = (
     title: options?.title ?? 'Content Alignment',
     description:
       options?.description ?? "Horizontal alignment of this module's content.",
+    list: options?.allow,
     initialValue: options?.initialValue ?? CONTENT_ALIGNMENT.LEFT,
     fieldset: options?.fieldset,
   }),
