@@ -2,7 +2,7 @@
 
 # @blog/ui component index
 
-_58 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
+_59 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
 
 ## Atoms
 
@@ -403,6 +403,19 @@ Compound component:
 Prev/next + numbered links for paginated listings, route-agnostic (`createHref`) and polymorphic (`linkAs`); renders nothing when there is a single page.
 Props: currentPage: number · totalPages: number · createHref: (page: number) => string · ariaLabel: string · previousLabel: string · nextLabel: string · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
 Variants: current: (boolean)
+
+### Timeline — `components/organisms/timeline/timeline.tsx`
+
+An ordered sequence of steps or milestones, joined by one connecting line, rendered as an `<ol>` of `Timeline.Item`s.
+Props: orientation: TTimelineOrientation · itemAlignment: Extract<TContentAlignment, 'LEFT' | 'CENTER'> · markerStyle: TTimelineMarkerStyle · children?: TCompoundChildren<Pick<typeof TimelineParts, 'Item'>> _(extends IWithClassName, IWithDataTestId)_
+Variants: orientation: TIMELINE_ORIENTATION.VERTICAL|TIMELINE_ORIENTATION.HORIZONTAL · itemAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER · markerStyle: TIMELINE_MARKER_STYLE.NUMBERED|TIMELINE_MARKER_STYLE.LABELLED
+
+Slots:
+
+- **Timeline.Item** — One step on a `Timeline`. Props: orientation?: TTimelineOrientation · itemAlignment?: Extract<TContentAlignment, 'LEFT' | 'CENTER'> · children?: TCompoundChildren<TTimelineItemParts> _(extends IWithClassName, IWithDataTestId)_ · Variants: orientation: TIMELINE_ORIENTATION.VERTICAL|TIMELINE_ORIENTATION.HORIZONTAL · itemAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER
+- **Timeline.Marker** — The point on a `Timeline.Item`'s line — a generated number, hidden from assistive tech since the `<ol>` already conveys the count, or a caller-supplied label, which is real content and stays announced. Props: markerStyle: TTimelineMarkerStyle · children: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: markerStyle: TIMELINE_MARKER_STYLE.NUMBERED|TIMELINE_MARKER_STYLE.LABELLED
+- **Timeline.Heading** — The `<h3>` naming a `Timeline.Item`. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Timeline.Body** — Slot for a `Timeline.Item`'s supporting copy, filled by the caller with rendered Portable Text. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### ToastViewport — `components/organisms/toast-viewport/toast-viewport.tsx`
 
