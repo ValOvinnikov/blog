@@ -899,10 +899,13 @@ a default ratio would be worse than the fallback: a wrong ratio distorts the
 logo, where a contained image merely shifts.
 
 **One logo the service cannot resolve costs the whole wall, not that tile.** The
-query projects `name` and `image` with `.notNull()`, and `toLogoItem` throws
-`UnresolvedLogoImageError` if an image still fails to resolve; the throw leaves
-`toLogoWallModule`, `safeAsync` turns it into a failed result, and the module
-renders nothing rather than a wall with a gap in it. As with
+query projects `name` and `image` with `.notNull()`, and the image's own
+`asset: …deref().notNull()` sits inside it, so a logo whose image fails to
+resolve is rejected at `.parse()`, `safeAsync` turns that into a failed result,
+and the module renders nothing rather than a wall with a gap in it. Because the
+query guarantees the asset, `toSanityImage` is typed to return an image rather
+than `T | undefined` for this call, so `TLogoItem.image` is required and the tile
+reads it without a guard. As with
 `module_testimonial`, that is not a page-level risk — the page loses the section
 and keeps rendering. The view also returns nothing for an empty array, which
 `.notNull()` does not reject and `min(1)` only blocks in the Studio, so an
@@ -994,11 +997,8 @@ logo wall — but no transformer guard says so.** The query projects the image w
 `safeAsync` turns that into a failed result, and the module renders nothing
 rather than a run of rows with a hole in it. The page loses the section and keeps
 rendering, as everywhere else in this family. `image` is nonetheless
-`T | undefined` in the view model, because that is `toSanityImage`'s own return
-type rather than a reachable state, and the row omits the frame if it is ever
-absent — no non-null assertion to make the types lie. This is also why the logo
-wall's `UnresolvedLogoImageError` above is unreachable and #3745 removes it:
-the `.notNull()` chain already did that work.
+`T | undefined` in the view model — not a reachable state — and the row omits
+the frame if it is ever absent; the logo wall instead keeps its image required.
 
 **A question is a document, and that is the opposite call from a figure.**
 `block_faq` ("FAQ Item") carries a `title` — its Studio label — a required
