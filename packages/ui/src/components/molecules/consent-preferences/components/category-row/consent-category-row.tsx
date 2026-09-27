@@ -1,5 +1,5 @@
 import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import type { ChangeEvent } from 'react';
+import { Switch } from '@blog/ui/components/atoms/switch';
 
 import { consentCategoryRowVariants } from './consent-category-row-variants';
 
@@ -29,10 +29,6 @@ export const ConsentCategoryRow = ({
   const labelId = `${id}-label`;
   const descriptionId = `${id}-description`;
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    onChange(event.target.checked);
-  };
-
   return (
     <div className={s.root({ class: className })} data-testid={dataTestId}>
       <div className={s.content()}>
@@ -43,20 +39,13 @@ export const ConsentCategoryRow = ({
           {description}
         </p>
       </div>
-      <label className={s.switchWrapper()}>
-        <input
-          type="checkbox"
-          role="switch"
-          aria-labelledby={labelId}
-          aria-describedby={descriptionId}
-          checked={isChecked}
-          disabled={isLocked}
-          onChange={handleChange}
-          className={s.input()}
-        />
-        <span className={s.track()} aria-hidden="true" />
-        <span className={s.thumb()} aria-hidden="true" />
-      </label>
+      <Switch
+        isChecked={isChecked}
+        isLocked={isLocked}
+        onChange={onChange}
+        aria-labelledby={labelId}
+        aria-describedby={descriptionId}
+      />
     </div>
   );
 };

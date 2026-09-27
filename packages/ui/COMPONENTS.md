@@ -2,7 +2,7 @@
 
 # @blog/ui component index
 
-_61 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
+_62 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
 
 ## Atoms
 
@@ -127,6 +127,11 @@ A small inline pill signalling a state such as "subscribed", "pending confirmati
 Props: tone: NonNullable<TStatusBadgeVariants['tone']> · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 Variants: tone: ok|warn|neutral
 
+### Switch — `components/atoms/switch/switch.tsx`
+
+A labelled on/off control for a single setting, backed by a native checkbox.
+Props: isChecked: boolean · isLocked?: boolean · onChange: (checked: boolean) => void · 'aria-labelledby'?: AriaAttributes['aria-labelledby'] · 'aria-describedby'?: AriaAttributes['aria-describedby'] _(extends IWithClassName, IWithDataTestId)_
+
 ### Tag — `components/atoms/tag/tag.tsx`
 
 Small pill-shaped label.
@@ -191,7 +196,7 @@ Props: id: string · providerName: string · message: string · allowLabel: stri
 ### ConsentPreferences — `components/molecules/consent-preferences/consent-preferences.tsx`
 
 The body of the cookie-consent preferences dialog — one switch row per category and a Save action — rendered without its own `<dialog>`, which the caller owns.
-Props: headingLevel: THeadingLevel · heading: string · categories: IConsentCategory[] · onCategoryChange: (id: string, checked: boolean) => void · saveLabel: string · onSave: () => void _(extends IWithClassName, IWithDataTestId)_
+Props: headingLevel: THeadingLevel · heading: string · categories: IConsentCategory[] · values: Record<string, boolean> · onCategoryChange: (id: string, checked: boolean) => void · saveLabel: string · onSave: () => void _(extends IWithClassName, IWithDataTestId)_
 
 ### ImageWithCaption — `components/molecules/image-with-caption/image-with-caption.tsx`
 

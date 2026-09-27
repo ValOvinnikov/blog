@@ -22,49 +22,80 @@ const categories: IConsentCategory[] = [
     id: 'necessary',
     label: necessaryLabel,
     description: necessaryDescription,
-    checked: true,
-    locked: true,
+    isLocked: true,
   },
   {
     id: 'analytics',
     label: analyticsLabel,
     description: analyticsDescription,
-    checked: false,
   },
 ];
+
+const values: Record<string, boolean> = {
+  necessary: true,
+  analytics: false,
+};
 
 const setup = customRender(ConsentPreferences, {
   headingLevel: 2,
   heading,
   categories,
+  values,
   onCategoryChange: vi.fn(),
   saveLabel,
   onSave: vi.fn(),
 });
 
 describe(`<${ConsentPreferences.name}/>`, () => {
-  it('renders the heading at the given level', () => {
-    setup();
-    expect(
-      screen.getByRole('heading', { level: 2, name: heading }),
-    ).toBeVisible();
-  });
-
-  it('renders one switch per category with its label and description', () => {
-    setup();
-    expect(screen.getByRole('switch', { name: necessaryLabel })).toBeVisible();
-    expect(screen.getByText(necessaryDescription)).toBeVisible();
-    expect(screen.getByRole('switch', { name: analyticsLabel })).toBeVisible();
-    expect(screen.getByText(analyticsDescription)).toBeVisible();
-  });
-
-  it('shows the locked category checked and disabled', () => {
-    setup();
-    const necessarySwitch = screen.getByRole('switch', {
-      name: necessaryLabel,
+  describe('rendering', () => {
+    beforeEach(() => {
+      setup();
     });
-    expect(necessarySwitch).toBeChecked();
-    expect(necessarySwitch).toBeDisabled();
+
+    it('renders the heading at the given level', () => {
+      expect(
+        screen.getByRole('heading', { level: 2, name: heading }),
+      ).toBeVisible();
+    });
+
+    it('renders one switch per category with its label and description', () => {
+      expect(
+        screen.getByRole('switch', { name: necessaryLabel }),
+      ).toBeVisible();
+      expect(screen.getByText(necessaryDescription)).toBeVisible();
+      expect(
+        screen.getByRole('switch', { name: analyticsLabel }),
+      ).toBeVisible();
+      expect(screen.getByText(analyticsDescription)).toBeVisible();
+    });
+
+    it('shows the locked category checked and disabled', () => {
+      const necessarySwitch = screen.getByRole('switch', {
+        name: necessaryLabel,
+      });
+      expect(necessarySwitch).toBeChecked();
+      expect(necessarySwitch).toBeDisabled();
+    });
+
+    it('shows an unlocked category unchecked and enabled', () => {
+      const analyticsSwitch = screen.getByRole('switch', {
+        name: analyticsLabel,
+      });
+      expect(analyticsSwitch).not.toBeChecked();
+      expect(analyticsSwitch).toBeEnabled();
+    });
+  });
+
+  it('shows an unlocked category checked when its value is true', () => {
+    setup({ values: { necessary: true, analytics: true } });
+    expect(screen.getByRole('switch', { name: analyticsLabel })).toBeChecked();
+  });
+
+  it('shows an unlocked category unchecked when its value is missing', () => {
+    setup({ values: { necessary: true } });
+    expect(
+      screen.getByRole('switch', { name: analyticsLabel }),
+    ).not.toBeChecked();
   });
 
   it('does not call onCategoryChange when the locked switch is clicked', async () => {
@@ -72,15 +103,6 @@ describe(`<${ConsentPreferences.name}/>`, () => {
     setup({ onCategoryChange });
     await userEvent.click(screen.getByRole('switch', { name: necessaryLabel }));
     expect(onCategoryChange).not.toHaveBeenCalled();
-  });
-
-  it('shows an unlocked category unchecked and enabled', () => {
-    setup();
-    const analyticsSwitch = screen.getByRole('switch', {
-      name: analyticsLabel,
-    });
-    expect(analyticsSwitch).not.toBeChecked();
-    expect(analyticsSwitch).toBeEnabled();
   });
 
   it('calls onCategoryChange with the category id and next value when an unlocked switch is clicked', async () => {

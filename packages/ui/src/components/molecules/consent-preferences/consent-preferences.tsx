@@ -10,8 +10,7 @@ export interface IConsentCategory {
   id: string;
   label: string;
   description: string;
-  checked: boolean;
-  locked?: boolean;
+  isLocked?: boolean;
 }
 
 export type TConsentPreferencesProps = IWithClassName &
@@ -19,6 +18,7 @@ export type TConsentPreferencesProps = IWithClassName &
     headingLevel: THeadingLevel;
     heading: string;
     categories: IConsentCategory[];
+    values: Record<string, boolean>;
     onCategoryChange: (id: string, checked: boolean) => void;
     saveLabel: string;
     onSave: () => void;
@@ -31,6 +31,7 @@ export const ConsentPreferences = ({
   headingLevel,
   heading,
   categories,
+  values,
   onCategoryChange,
   saveLabel,
   onSave,
@@ -48,8 +49,8 @@ export const ConsentPreferences = ({
           id={category.id}
           label={category.label}
           description={category.description}
-          isChecked={category.checked}
-          isLocked={category.locked}
+          isChecked={category.isLocked ? true : (values[category.id] ?? false)}
+          isLocked={category.isLocked}
           onChange={(checked) => onCategoryChange(category.id, checked)}
         />
       ))}

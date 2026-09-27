@@ -6,27 +6,30 @@ import {
   type IConsentCategory,
 } from './consent-preferences';
 
-const initialCategories: IConsentCategory[] = [
+const categories: IConsentCategory[] = [
   {
     id: 'necessary',
     label: 'Necessary',
     description: 'Required for the site to function and cannot be disabled.',
-    checked: true,
-    locked: true,
+    isLocked: true,
   },
   {
     id: 'analytics',
     label: 'Analytics',
     description: 'Helps us understand how the site is used.',
-    checked: true,
   },
   {
     id: 'marketing',
     label: 'Marketing',
     description: 'Used to show relevant ads on other sites.',
-    checked: false,
   },
 ];
+
+const initialValues: Record<string, boolean> = {
+  necessary: true,
+  analytics: true,
+  marketing: false,
+};
 
 const meta = {
   title: 'Molecules/ConsentPreferences',
@@ -36,7 +39,8 @@ const meta = {
   args: {
     headingLevel: 2,
     heading: 'Manage cookie preferences',
-    categories: initialCategories,
+    categories,
+    values: initialValues,
     onCategoryChange: () => {},
     saveLabel: 'Save preferences',
     onSave: () => {},
@@ -49,19 +53,16 @@ type TStory = StoryObj<typeof meta>;
 export const Default: TStory = {};
 
 const InteractiveDemo = () => {
-  const [categories, setCategories] = useState(initialCategories);
+  const [values, setValues] = useState(initialValues);
 
   return (
     <ConsentPreferences
       headingLevel={2}
       heading="Manage cookie preferences"
       categories={categories}
+      values={values}
       onCategoryChange={(id, checked) =>
-        setCategories((current) =>
-          current.map((category) =>
-            category.id === id ? { ...category, checked } : category,
-          ),
-        )
+        setValues((current) => ({ ...current, [id]: checked }))
       }
       saveLabel="Save preferences"
       onSave={() => {}}
