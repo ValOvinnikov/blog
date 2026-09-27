@@ -14,10 +14,12 @@ import { logoWallSchema } from '@blog/studio/schema-types/modules/logo-wall/logo
 import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
+import { pricingSchema } from '@blog/studio/schema-types/modules/pricing/pricing';
 import { statsSchema } from '@blog/studio/schema-types/modules/stats/stats';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import { teamSchema } from '@blog/studio/schema-types/modules/team/team';
 import { testimonialSchema } from '@blog/studio/schema-types/modules/testimonial/testimonial';
+import { timelineSchema } from '@blog/studio/schema-types/modules/timeline/timeline';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
 import { House } from 'lucide-react';
@@ -65,7 +67,9 @@ export const homePageSchema = defineType({
         testimonialSchema.name,
         teamSchema.name,
         statsSchema.name,
+        timelineSchema.name,
         faqSchema.name,
+        pricingSchema.name,
       ],
     }),
     seoField(),

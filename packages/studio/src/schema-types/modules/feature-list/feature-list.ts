@@ -34,13 +34,15 @@ export const featureListSchema = defineType({
           to: [{ type: featureBlockSchema.name }],
         }),
       ],
-      validation: (rule) =>
+      validation: (rule) => [
+        rule.unique().error('Each feature card can only appear once.'),
         rule
-          .unique()
           .min(2)
-          .error('A features section needs at least two feature cards.')
+          .error('A features section needs at least two feature cards.'),
+        rule
           .max(8)
           .error('A features section holds at most eight feature cards.'),
+      ],
     }),
     ctaButtonsField(),
     defineField({

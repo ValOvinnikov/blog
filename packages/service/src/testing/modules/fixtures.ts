@@ -9,14 +9,18 @@ import {
   HERO_FIELD_MODE,
   HERO_VARIANT,
   LINK_TYPE,
+  MEDIA_ORDER,
   NEWSLETTER_VARIANT,
   POST_SOURCE,
   TAXONOMY_KIND,
   TAXONOMY_SORT,
+  TIMELINE_MARKER_STYLE,
+  TIMELINE_ORIENTATION,
 } from '@blog/config';
 import type { TRawContentModule } from '@blog/service/features/modules/content/adaptor/transformer';
 import type { TRawCtaModule } from '@blog/service/features/modules/cta/adaptor/transformer';
 import type { TRawFaqModule } from '@blog/service/features/modules/faq/adaptor/transformer';
+import type { TRawFeatureHighlightsModule } from '@blog/service/features/modules/feature-highlights/adaptor/transformer';
 import type { TRawFeatureListModule } from '@blog/service/features/modules/feature-list/adaptor/transformer';
 import type { TRawHeroModule } from '@blog/service/features/modules/hero/adaptor/transformer';
 import type { TRawHeroBlogModule } from '@blog/service/features/modules/hero-blog/adaptor/transformer';
@@ -32,6 +36,7 @@ import type { TRawStatsModule } from '@blog/service/features/modules/stats/adapt
 import type { TRawTaxonomyListModule } from '@blog/service/features/modules/taxonomy-list/adaptor/transformer';
 import type { TRawTeamModule } from '@blog/service/features/modules/team/adaptor/transformer';
 import type { TRawTestimonialModule } from '@blog/service/features/modules/testimonial/adaptor/transformer';
+import type { TRawTimelineModule } from '@blog/service/features/modules/timeline/adaptor/transformer';
 import type { TRawCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button';
 import {
   makeRawHeadingBlock,
@@ -48,12 +53,17 @@ type TRawFeatureListItem = NonNullable<
 >[number];
 type TRawTaxonomyEntry = NonNullable<TRawTaxonomyListModule['entries']>[number];
 type TRawLogoItem = NonNullable<TRawLogoWallModule['logos']>[number];
+type TRawFeatureHighlightItem = NonNullable<
+  TRawFeatureHighlightsModule['highlights']
+>[number];
 type TRawStatItem = NonNullable<TRawStatsModule['stats']>[number];
 type TRawTestimonialItem = NonNullable<
   TRawTestimonialModule['testimonials']
 >[number];
 type TRawTeamMember = TRawTeamModule['members'][number];
 type TRawFaqQuestionItem = TRawFaqModule['questions'][number];
+type TRawTimelineItem = NonNullable<TRawTimelineModule['items']>[number];
+type TRawTimelineItemBody = NonNullable<TRawTimelineItem['body']>[number];
 
 export function makeRawHeroModule(
   overrides: Partial<TRawHeroModule> = {},
@@ -267,9 +277,9 @@ export function makeRawContentMarkDef(
   return makeRawPortableTextMarkDef(overrides);
 }
 
-export function makeRawContentBlock(
-  overrides: Partial<TRawCtaContentBlock> & { text?: string } = {},
-): TRawCtaContentBlock {
+function makeRawParagraphTextBlock<T extends { _type: 'block'; _key: string }>(
+  overrides: Partial<T> & { text?: string } = {},
+): T {
   const { text = 'Hi.', ...rest } = overrides;
 
   return {
@@ -279,7 +289,13 @@ export function makeRawContentBlock(
     children: [{ _type: 'span', _key: 'span-1', text }],
     markDefs: null,
     ...rest,
-  };
+  } as unknown as T;
+}
+
+export function makeRawContentBlock(
+  overrides: Partial<TRawCtaContentBlock> & { text?: string } = {},
+): TRawCtaContentBlock {
+  return makeRawParagraphTextBlock<TRawCtaContentBlock>(overrides);
 }
 
 export function makeRawTaxonomyListModule(
@@ -412,6 +428,37 @@ export function makeRawLogoWallModule(
   };
 }
 
+export function makeRawFeatureHighlightItem(
+  overrides: Partial<TRawFeatureHighlightItem> = {},
+): TRawFeatureHighlightItem {
+  return {
+    _key: 'block-highlight-1',
+    heading: 'Ship faster',
+    body: [makeRawContentBlock({ text: 'Ship faster with less friction.' })],
+    image: makeRawSanityImage(),
+    action: null,
+    ...overrides,
+  };
+}
+
+export function makeRawFeatureHighlightsModule(
+  overrides: Partial<TRawFeatureHighlightsModule> = {},
+): TRawFeatureHighlightsModule {
+  return {
+    brandVariant: BRAND_VARIANT.PRIMARY,
+    headingBlock: makeRawHeadingBlock('Why teams choose us'),
+    highlights: [
+      makeRawFeatureHighlightItem(),
+      makeRawFeatureHighlightItem({ _key: 'block-highlight-2' }),
+    ],
+    ctaButtons: null,
+    mediaOrder: MEDIA_ORDER.FIRST,
+    contentAlignment: null,
+    layout: null,
+    ...overrides,
+  };
+}
+
 export function makeRawStatItem(
   overrides: Partial<TRawStatItem> = {},
 ): TRawStatItem {
@@ -527,6 +574,47 @@ export function makeRawFaqModule(
     ],
     ctaButtons: null,
     contentAlignment: null,
+    layout: null,
+    ...overrides,
+  };
+}
+
+export function makeRawTimelineItem(
+  overrides: Partial<TRawTimelineItem> = {},
+): TRawTimelineItem {
+  return {
+    _key: 'block-timeline-1',
+    marker: null,
+    heading: 'Kick off',
+    body: [
+      makeRawParagraphTextBlock<TRawTimelineItemBody>({
+        _key: 'timeline-body-1',
+        text: 'The project begins.',
+      }),
+    ],
+    ...overrides,
+  };
+}
+
+export function makeRawTimelineModule(
+  overrides: Partial<TRawTimelineModule> = {},
+): TRawTimelineModule {
+  return {
+    brandVariant: BRAND_VARIANT.PRIMARY,
+    headingBlock: makeRawHeadingBlock('How it works'),
+    markerStyle: TIMELINE_MARKER_STYLE.NUMBERED,
+    items: [
+      makeRawTimelineItem(),
+      makeRawTimelineItem({
+        _key: 'block-timeline-2',
+        heading: 'Ship',
+        body: null,
+      }),
+    ],
+    orientation: TIMELINE_ORIENTATION.VERTICAL,
+    ctaButtons: null,
+    contentAlignment: null,
+    itemAlignment: CONTENT_ALIGNMENT.LEFT,
     layout: null,
     ...overrides,
   };

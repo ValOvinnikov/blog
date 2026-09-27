@@ -60,6 +60,10 @@ export const CenterAligned: TStory = {
   args: { contentAlignment: CONTENT_ALIGNMENT.CENTER },
 };
 
+export const RightAligned: TStory = {
+  args: { contentAlignment: CONTENT_ALIGNMENT.RIGHT },
+};
+
 export const WithActions: TStory = {
   args: { ctaButtons: ctaActionsDemo },
 };

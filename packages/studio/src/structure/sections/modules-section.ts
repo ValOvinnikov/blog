@@ -13,10 +13,12 @@ import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featu
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
 import { postRelatedSchema } from '@blog/studio/schema-types/modules/post-related/post-related';
+import { pricingSchema } from '@blog/studio/schema-types/modules/pricing/pricing';
 import { statsSchema } from '@blog/studio/schema-types/modules/stats/stats';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import { teamSchema } from '@blog/studio/schema-types/modules/team/team';
 import { testimonialSchema } from '@blog/studio/schema-types/modules/testimonial/testimonial';
+import { timelineSchema } from '@blog/studio/schema-types/modules/timeline/timeline';
 import type { TStructureSection } from '@blog/studio/structure/build-section/build-section';
 import { Blocks } from 'lucide-react';
 
@@ -50,6 +52,7 @@ export const modulesSection: TStructureSection = {
         { schema: contentSchema },
         { schema: featureListSchema },
         { schema: featureHighlightsSchema },
+        { schema: timelineSchema },
         { schema: faqSchema },
       ],
     },
@@ -64,7 +67,11 @@ export const modulesSection: TStructureSection = {
     },
     {
       title: 'Conversion',
-      items: [{ schema: ctaSchema }, { schema: newsletterSchema }],
+      items: [
+        { schema: ctaSchema },
+        { schema: newsletterSchema },
+        { schema: pricingSchema },
+      ],
     },
   ],
 };

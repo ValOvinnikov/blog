@@ -15,6 +15,36 @@
 export declare const internalGroqTypeReferenceTo: unique symbol;
 
 // Source: ../config/src/sanity/generated/schema.json
+export type Module_pricing = {
+  _id: string;
+  _type: 'module_pricing';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  headingBlock?: HeadingBlock;
+  tiers?: Array<
+    {
+      _key: string;
+    } & PricingTier
+  >;
+  footnote?: string;
+  ctaButtons?: Array<
+    {
+      _key: string;
+    } & CtaButton
+  >;
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  layout?: Layout;
+};
+
+export type HeadingBlock = {
+  _type: 'headingBlock';
+  heading?: string;
+  supportingText?: string;
+};
+
 export type Module_newsletter = {
   _id: string;
   _type: 'module_newsletter';
@@ -27,12 +57,6 @@ export type Module_newsletter = {
   variant?: 'FULL' | 'COMPACT';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   layout?: Layout;
-};
-
-export type HeadingBlock = {
-  _type: 'headingBlock';
-  heading?: string;
-  supportingText?: string;
 };
 
 export type Module_cta = {
@@ -55,9 +79,9 @@ export type Module_cta = {
   footnote?: string;
   variant?: 'BANNER' | 'SPLIT' | 'CALLOUT';
   bandTone?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   contentPositionSplit?: 'LEFT' | 'RIGHT';
   contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   mobileMediaOrder?: 'LAST' | 'FIRST';
   layout?: Layout;
 };
@@ -169,6 +193,32 @@ export type Module_faq = {
   layout?: Layout;
 };
 
+export type Module_timeline = {
+  _id: string;
+  _type: 'module_timeline';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  headingBlock?: HeadingBlock;
+  markerStyle?: 'NUMBERED' | 'LABELLED';
+  items?: Array<
+    {
+      _key: string;
+    } & TimelineItem
+  >;
+  orientation?: 'VERTICAL' | 'HORIZONTAL';
+  ctaButtons?: Array<
+    {
+      _key: string;
+    } & CtaButton
+  >;
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  itemAlignment?: 'LEFT' | 'CENTER';
+  layout?: Layout;
+};
+
 export type Module_stats = {
   _id: string;
   _type: 'module_stats';
@@ -255,8 +305,8 @@ export type Module_testimonial = {
     } & CtaButton
   >;
   displayMode?: 'GRID' | 'CAROUSEL';
-  cardAlignment?: 'LEFT' | 'CENTER';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  cardAlignment?: 'LEFT' | 'CENTER';
   layout?: Layout;
 };
 
@@ -502,6 +552,42 @@ export type ParagraphText = Array<{
   _type: 'block';
   _key: string;
 }>;
+
+export type PricingTier = {
+  _type: 'pricingTier';
+  name?: string;
+  description?: string;
+  prices?: Array<
+    {
+      _key: string;
+    } & PricingPrice
+  >;
+  priceLabel?: string;
+  features?: Array<string>;
+  ctaButtons?: Array<
+    {
+      _key: string;
+    } & CtaButton
+  >;
+  isHighlighted?: boolean;
+  highlightLabel?: string;
+  footnote?: string;
+};
+
+export type PricingPrice = {
+  _type: 'pricingPrice';
+  period?: 'ONE_TIME' | 'HOUR' | 'SESSION' | 'MONTH' | 'YEAR';
+  amount?: number;
+  compareAtAmount?: number;
+  isStartingAt?: boolean;
+};
+
+export type TimelineItem = {
+  _type: 'timelineItem';
+  marker?: string;
+  heading?: string;
+  body?: ParagraphText;
+};
 
 export type Stat = {
   _type: 'stat';
@@ -1344,11 +1430,25 @@ export type Module_statsReference = {
   [internalGroqTypeReferenceTo]?: 'module_stats';
 };
 
+export type Module_timelineReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_timeline';
+};
+
 export type Module_faqReference = {
   _ref: string;
   _type: 'reference';
   _weak?: boolean;
   [internalGroqTypeReferenceTo]?: 'module_faq';
+};
+
+export type Module_pricingReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_pricing';
 };
 
 export type Page_landing = {
@@ -1403,7 +1503,13 @@ export type Page_landing = {
       } & Module_statsReference)
     | ({
         _key: string;
+      } & Module_timelineReference)
+    | ({
+        _key: string;
       } & Module_faqReference)
+    | ({
+        _key: string;
+      } & Module_pricingReference)
   >;
   seo?: Seo;
 };
@@ -1459,7 +1565,13 @@ export type Page_home = {
       } & Module_statsReference)
     | ({
         _key: string;
+      } & Module_timelineReference)
+    | ({
+        _key: string;
       } & Module_faqReference)
+    | ({
+        _key: string;
+      } & Module_pricingReference)
   >;
   seo?: Seo;
 };
@@ -1485,9 +1597,9 @@ export type Module_heroProfile = {
   showRole?: boolean;
   showBio?: boolean;
   variant?: 'SPLIT' | 'STACKED' | 'BANNER';
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   contentPositionSplit?: 'LEFT' | 'RIGHT';
   contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   mediaOrderSplit?: 'LAST' | 'FIRST';
   layout?: HeroLayout;
 };
@@ -1509,9 +1621,9 @@ export type Module_heroStatement = {
     } & CtaButton
   >;
   variant?: 'SPLIT' | 'STACKED' | 'BANNER';
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   contentPositionSplit?: 'LEFT' | 'RIGHT';
   contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   mediaOrderSplit?: 'LAST' | 'FIRST';
   mediaOrderStacked?: 'LAST' | 'FIRST';
   layout?: HeroLayout;
@@ -1533,9 +1645,9 @@ export type Module_heroBlog = {
   primaryActionAppearance?: 'CONTAINED' | 'INLINE';
   secondaryAction?: CtaSecondaryButton;
   variant?: 'SPLIT' | 'STACKED' | 'BANNER';
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   contentPositionSplit?: 'LEFT' | 'RIGHT';
   contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   mediaOrderSplit?: 'LAST' | 'FIRST';
   mediaOrderStacked?: 'LAST' | 'FIRST';
   layout?: HeroLayout;
@@ -1709,8 +1821,9 @@ export type Geopoint = {
 };
 
 export type AllSanitySchemaTypes =
-  | Module_newsletter
+  | Module_pricing
   | HeadingBlock
+  | Module_newsletter
   | Module_cta
   | ListedText
   | SanityImageAssetReference
@@ -1719,6 +1832,7 @@ export type AllSanitySchemaTypes =
   | ArticleText
   | Block_faqReference
   | Module_faq
+  | Module_timeline
   | Module_stats
   | PersonReference
   | Module_team
@@ -1739,6 +1853,9 @@ export type AllSanitySchemaTypes =
   | Page_postIndexReference
   | InlineLink
   | ParagraphText
+  | PricingTier
+  | PricingPrice
+  | TimelineItem
   | Stat
   | PostTakeaways
   | Brand
@@ -1799,7 +1916,9 @@ export type AllSanitySchemaTypes =
   | Module_testimonialReference
   | Module_teamReference
   | Module_statsReference
+  | Module_timelineReference
   | Module_faqReference
+  | Module_pricingReference
   | Page_landing
   | Page_home
   | Module_heroProfile

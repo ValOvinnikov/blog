@@ -1,6 +1,7 @@
 import type { ArticleText } from '@blog/config';
 import { q } from '@blog/service/sanity/query';
 import { bodyImageFragment } from '@blog/service/shared/fragments/image/image';
+import { paragraphTextBlockFragment } from '@blog/service/shared/fragments/portable-text/paragraph-text-block';
 import { portableTextMarkDefFragment } from '@blog/service/shared/fragments/portable-text/portable-text-mark-def';
 
 export const portableTextBodyItemFragment = q
@@ -23,13 +24,7 @@ export const portableTextBodyItemFragment = q
         '...': true,
         body: asideSub
           .field('body[]')
-          .project((blockSub) => ({
-            '...': true,
-            markDefs: blockSub
-              .field('markDefs[]')
-              .project(portableTextMarkDefFragment)
-              .nullable(true),
-          }))
+          .project(paragraphTextBlockFragment)
           .nullable(true),
       }),
     }),

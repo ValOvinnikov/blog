@@ -26,8 +26,10 @@ describe('page module type unions', () => {
       | 'module_logoWall'
       | 'module_testimonial'
       | 'module_stats'
+      | 'module_timeline'
       | 'module_faq'
       | 'module_team'
+      | 'module_pricing'
     >();
   });
 
@@ -53,8 +55,10 @@ describe('page module type unions', () => {
       | 'module_logoWall'
       | 'module_testimonial'
       | 'module_stats'
+      | 'module_timeline'
       | 'module_faq'
       | 'module_team'
+      | 'module_pricing'
     >();
   });
 

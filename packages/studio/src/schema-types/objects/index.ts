@@ -16,9 +16,12 @@ import { linkRefSchema } from './link-ref/link-ref';
 import { logoItemSchema } from './logo-item/logo-item';
 import { openGraphSchema } from './open-graph/open-graph';
 import { postTakeawaysSchema } from './post-takeaways/post-takeaways';
+import { pricingPriceSchema } from './pricing-price/pricing-price';
+import { pricingTierSchema } from './pricing-tier/pricing-tier';
 import { seoSchema } from './seo/seo';
 import { socialProfileSchema } from './social-profile/social-profile';
 import { statSchema } from './stat/stat';
+import { timelineItemSchema } from './timeline-item/timeline-item';
 
 export const objects = [
   layoutSchema,
@@ -40,4 +43,7 @@ export const objects = [
   brandSchema,
   postTakeawaysSchema,
   statSchema,
+  timelineItemSchema,
+  pricingPriceSchema,
+  pricingTierSchema,
 ];
