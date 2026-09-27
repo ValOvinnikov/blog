@@ -29,6 +29,7 @@ describe('page module type unions', () => {
       | 'module_timeline'
       | 'module_faq'
       | 'module_team'
+      | 'module_pricing'
     >();
   });
 
@@ -57,6 +58,7 @@ describe('page module type unions', () => {
       | 'module_timeline'
       | 'module_faq'
       | 'module_team'
+      | 'module_pricing'
     >();
   });
 
