@@ -15,6 +15,36 @@
 export declare const internalGroqTypeReferenceTo: unique symbol;
 
 // Source: ../config/src/sanity/generated/schema.json
+export type Module_pricing = {
+  _id: string;
+  _type: 'module_pricing';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  headingBlock?: HeadingBlock;
+  tiers?: Array<
+    {
+      _key: string;
+    } & PricingTier
+  >;
+  footnote?: string;
+  ctaButtons?: Array<
+    {
+      _key: string;
+    } & CtaButton
+  >;
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  layout?: Layout;
+};
+
+export type HeadingBlock = {
+  _type: 'headingBlock';
+  heading?: string;
+  supportingText?: string;
+};
+
 export type Module_newsletter = {
   _id: string;
   _type: 'module_newsletter';
@@ -27,12 +57,6 @@ export type Module_newsletter = {
   variant?: 'FULL' | 'COMPACT';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   layout?: Layout;
-};
-
-export type HeadingBlock = {
-  _type: 'headingBlock';
-  heading?: string;
-  supportingText?: string;
 };
 
 export type Module_cta = {
@@ -528,6 +552,35 @@ export type ParagraphText = Array<{
   _type: 'block';
   _key: string;
 }>;
+
+export type PricingTier = {
+  _type: 'pricingTier';
+  name?: string;
+  description?: string;
+  prices?: Array<
+    {
+      _key: string;
+    } & PricingPrice
+  >;
+  priceLabel?: string;
+  features?: Array<string>;
+  ctaButtons?: Array<
+    {
+      _key: string;
+    } & CtaButton
+  >;
+  isHighlighted?: boolean;
+  highlightLabel?: string;
+  footnote?: string;
+};
+
+export type PricingPrice = {
+  _type: 'pricingPrice';
+  period?: 'ONE_TIME' | 'HOUR' | 'SESSION' | 'MONTH' | 'YEAR';
+  amount?: number;
+  compareAtAmount?: number;
+  isStartingAt?: boolean;
+};
 
 export type TimelineItem = {
   _type: 'timelineItem';
@@ -1391,6 +1444,13 @@ export type Module_faqReference = {
   [internalGroqTypeReferenceTo]?: 'module_faq';
 };
 
+export type Module_pricingReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_pricing';
+};
+
 export type Page_landing = {
   _id: string;
   _type: 'page_landing';
@@ -1447,6 +1507,9 @@ export type Page_landing = {
     | ({
         _key: string;
       } & Module_faqReference)
+    | ({
+        _key: string;
+      } & Module_pricingReference)
   >;
   seo?: Seo;
 };
@@ -1506,6 +1569,9 @@ export type Page_home = {
     | ({
         _key: string;
       } & Module_faqReference)
+    | ({
+        _key: string;
+      } & Module_pricingReference)
   >;
   seo?: Seo;
 };
@@ -1755,8 +1821,9 @@ export type Geopoint = {
 };
 
 export type AllSanitySchemaTypes =
-  | Module_newsletter
+  | Module_pricing
   | HeadingBlock
+  | Module_newsletter
   | Module_cta
   | ListedText
   | SanityImageAssetReference
@@ -1786,6 +1853,8 @@ export type AllSanitySchemaTypes =
   | Page_postIndexReference
   | InlineLink
   | ParagraphText
+  | PricingTier
+  | PricingPrice
   | TimelineItem
   | Stat
   | PostTakeaways
@@ -1849,6 +1918,7 @@ export type AllSanitySchemaTypes =
   | Module_statsReference
   | Module_timelineReference
   | Module_faqReference
+  | Module_pricingReference
   | Page_landing
   | Page_home
   | Module_heroProfile

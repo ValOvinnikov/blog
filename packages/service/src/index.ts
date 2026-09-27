@@ -28,6 +28,7 @@ import { createPostRelatedModuleService } from './features/modules/post-related'
 import { createStatsModuleService } from './features/modules/stats';
 import { createTaxonomyListModuleService } from './features/modules/taxonomy-list';
 import { createTestimonialModuleService } from './features/modules/testimonial';
+import { createTimelineModuleService } from './features/modules/timeline';
 import { createHomeService } from './features/pages/home';
 import { createLandingPageService } from './features/pages/landing';
 import { createPostService } from './features/pages/post';
@@ -70,6 +71,7 @@ export const service = {
     testimonial: createTestimonialModuleService(),
     stats: createStatsModuleService(),
     faq: createFaqModuleService(),
+    timeline: createTimelineModuleService(),
   },
   entities: {
     topics: createTopicsService(),
@@ -131,6 +133,10 @@ export type {
   TTestimonialItem,
   TTestimonialModule,
 } from './features/modules/testimonial';
+export type {
+  TTimelineItem,
+  TTimelineModule,
+} from './features/modules/timeline';
 export type { THomePage } from './features/pages/home';
 export type { TLandingPage } from './features/pages/landing';
 export type {
