@@ -1016,9 +1016,11 @@ link to the page that explains further.
 are read top to bottom in the order they were authored, and every alternative
 arrangement either hides answers behind a swipe or breaks the reading order that
 makes an FAQ scannable. The questions sit in a column capped at `max-w-post`
-(47.5rem), positioned by `contentAlignment` along with the heading and actions,
-while the answer text inside each panel stays start-aligned whatever the module's
-alignment.
+(47.5rem), positioned left or centred by `contentAlignment` along with the heading
+and actions, while the answer text inside each panel stays start-aligned whatever
+the module's alignment. This is the one module that restricts that field's option
+list: a right-aligned block of questions is not a design this module has, so
+`contentAlignment` offers two values here where every other module offers three.
 
 **The disclosure is `Accordion` in `@blog/ui`, built on Base UI, and it carries
 no `'use client'`.** Every Base UI part ships its own directive and the organism
