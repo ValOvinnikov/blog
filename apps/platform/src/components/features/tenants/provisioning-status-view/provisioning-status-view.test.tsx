@@ -165,7 +165,7 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    expect(screen.getByRole('complementary')).toBeInTheDocument();
+    expect(screen.getByRole('complementary')).toBeVisible();
   });
 
   it('titles the steps card "Steps" and shows a 0-of-6-done badge when every step is idle', () => {
@@ -401,7 +401,7 @@ describe(ProvisioningStatusView, () => {
         screen.getByText('Grant the missing permission, then retry.'),
       ).toBeVisible();
       expect(screen.getByText('Technical details')).toBeVisible();
-      expect(screen.getByText(rawError)).toBeInTheDocument();
+      expect(screen.getByText(rawError)).toBeVisible();
     });
 
     it('maps a 400 duplicate/already-in-use failure to a friendly headline and next step', () => {
@@ -442,7 +442,7 @@ describe(ProvisioningStatusView, () => {
           'Retry, or check the technical details before asking for help.',
         ),
       ).toBeVisible();
-      expect(screen.getByText(rawError)).toBeInTheDocument();
+      expect(screen.getByText(rawError)).toBeVisible();
     });
   });
 
@@ -649,7 +649,7 @@ describe(ProvisioningStatusView, () => {
     ).toBeVisible();
     expect(
       await screen.findByRole('button', { name: 'Start provisioning' }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
   });
 
   it('shows a not-found-specific error when the tenant no longer exists server-side', async () => {
@@ -1505,7 +1505,7 @@ describe(ProvisioningStatusView, () => {
 
       expect(
         screen.getByRole('heading', { level: 2, name: 'Run' }),
-      ).toBeInTheDocument();
+      ).toBeVisible();
       expect(screen.queryByText('Started')).not.toBeInTheDocument();
       expect(screen.queryByText('Finished')).not.toBeInTheDocument();
     });

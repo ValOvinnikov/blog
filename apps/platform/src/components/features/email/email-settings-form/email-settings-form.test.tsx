@@ -43,11 +43,9 @@ describe(EmailSettingsForm, () => {
       <EmailSettingsForm tenantId="tenant-1" initialValues={INITIAL_VALUES} />,
     );
 
-    expect(screen.getByDisplayValue('Acme Co')).toBeInTheDocument();
-    expect(
-      screen.getByDisplayValue('support@acme.example'),
-    ).toBeInTheDocument();
-    expect(screen.getByDisplayValue('123 Main St')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Acme Co')).toBeVisible();
+    expect(screen.getByDisplayValue('support@acme.example')).toBeVisible();
+    expect(screen.getByDisplayValue('123 Main St')).toBeVisible();
   });
 
   it('saves edited fields as-is', async () => {

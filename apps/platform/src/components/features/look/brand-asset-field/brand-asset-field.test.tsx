@@ -43,10 +43,10 @@ describe(`<${BrandAssetField.name}/>`, () => {
       />,
     );
 
-    expect(screen.getByText(/Pre-cropped square, please/)).toBeInTheDocument();
+    expect(screen.getByText(/Pre-cropped square, please/)).toBeVisible();
     expect(
       screen.getByRole('button', { name: 'Upload favicon' }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
   });
 
   it('shows the current alt text and the replace label once a value is set', () => {
@@ -61,10 +61,8 @@ describe(`<${BrandAssetField.name}/>`, () => {
       />,
     );
 
-    expect(screen.getByAltText('Current logo')).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: 'Replace logo' }),
-    ).toBeInTheDocument();
+    expect(screen.getByAltText('Current logo')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Replace logo' })).toBeVisible();
   });
 
   it('forwards the tenantId and kind to the upload action when a file is selected', async () => {

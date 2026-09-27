@@ -31,7 +31,7 @@ describe(PortableTextEditor, () => {
       />,
     );
 
-    expect(screen.getByRole('textbox', { name: 'Body' })).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'Body' })).toBeVisible();
   });
 
   it('shows a formatting toolbar when not disabled', () => {
@@ -43,7 +43,7 @@ describe(PortableTextEditor, () => {
       />,
     );
 
-    expect(screen.getByRole('button', { name: 'Bold' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Bold' })).toBeVisible();
   });
 
   it('hides the formatting toolbar when disabled', () => {
@@ -88,7 +88,7 @@ describe(PortableTextEditor, () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('click me')).toBeInTheDocument();
+      expect(screen.getByText('click me')).toBeVisible();
     });
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
@@ -103,7 +103,7 @@ describe(PortableTextEditor, () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('click me')).toBeInTheDocument();
+      expect(screen.getByText('click me')).toBeVisible();
     });
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
@@ -118,7 +118,7 @@ describe(PortableTextEditor, () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('click me')).toBeInTheDocument();
+      expect(screen.getByText('click me')).toBeVisible();
     });
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });

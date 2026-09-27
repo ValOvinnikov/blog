@@ -8,7 +8,7 @@ describe(`<${NavItemContent.name}/>`, () => {
     render(<NavItemContent icon={ICONS.GRID} label="Tenants" />);
 
     expect(screen.getByText('Tenants')).toBeVisible();
-    expect(screen.getByTestId('icon')).toBeInTheDocument();
+    expect(screen.getByTestId('icon')).toBeVisible();
   });
 
   it('renders a disabled reason only when given one', () => {
@@ -42,7 +42,7 @@ describe(`<${NavItemContent.name}/>`, () => {
     );
 
     expect(screen.getByText('this milestone')).toBeVisible();
-    expect(screen.getByTestId('status-badge-dot')).toBeInTheDocument();
+    expect(screen.getByTestId('status-badge-dot')).toBeVisible();
   });
 
   it('omits the tone dot when the badge sets hasDot to false', () => {
