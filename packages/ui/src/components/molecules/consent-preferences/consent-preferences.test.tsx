@@ -98,6 +98,24 @@ describe(`<${ConsentPreferences.name}/>`, () => {
     ).not.toBeChecked();
   });
 
+  it('shows a locked category checked and disabled even when its value is false', () => {
+    setup({ values: { necessary: false, analytics: false } });
+    const necessarySwitch = screen.getByRole('switch', {
+      name: necessaryLabel,
+    });
+    expect(necessarySwitch).toBeChecked();
+    expect(necessarySwitch).toBeDisabled();
+  });
+
+  it('shows a locked category checked and disabled even when its value is missing', () => {
+    setup({ values: {} });
+    const necessarySwitch = screen.getByRole('switch', {
+      name: necessaryLabel,
+    });
+    expect(necessarySwitch).toBeChecked();
+    expect(necessarySwitch).toBeDisabled();
+  });
+
   it('does not call onCategoryChange when the locked switch is clicked', async () => {
     const onCategoryChange = vi.fn();
     setup({ onCategoryChange });
