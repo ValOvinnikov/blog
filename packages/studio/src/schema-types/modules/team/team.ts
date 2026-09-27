@@ -9,7 +9,7 @@ import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-fi
 import { displayModeField } from '@blog/studio/schema-types/fields/display-mode-field/display-mode-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
-import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
+import { wideLayoutField } from '@blog/studio/schema-types/objects/wide-layout/wide-layout-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { toTitleCase } from '@blog/utils/primitives';
 import { Users } from 'lucide-react';
@@ -92,7 +92,7 @@ export const teamSchema = defineType({
     }),
     ctaButtonsField(),
     ...alignmentFields([]),
-    layoutField,
+    wideLayoutField,
   ],
   preview: {
     select: {
