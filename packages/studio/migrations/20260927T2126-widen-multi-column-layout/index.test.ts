@@ -2,7 +2,6 @@ import { set } from 'sanity/migrate';
 
 import migration from './index';
 
-/** The `object()` node handler is the only piece of migration logic under test here. */
 const objectHandler = migration.migrate.object;
 
 if (!objectHandler) {
