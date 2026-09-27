@@ -4,16 +4,8 @@ import type { VariantProps } from 'tailwind-variants';
 export const carouselVariants = tv({
   slots: {
     viewport: [],
-    track: [
-      'flex list-none m-0 p-0',
-      '[--carousel-gap:0.875rem] md:[--carousel-gap:1.25rem] lg:[--carousel-gap:1.75rem] gap-(--carousel-gap)',
-      '[--carousel-per-view:1.18] sm:[--carousel-per-view:2] md:[--carousel-per-view:3]',
-      '[touch-action:pan-y_pinch-zoom]',
-    ],
-    slide: [
-      'shrink-0 min-w-0 snap-start',
-      'basis-[calc((100%-(var(--carousel-per-view)-1)*var(--carousel-gap))/var(--carousel-per-view))]',
-    ],
+    track: ['flex list-none m-0 p-0', '[touch-action:pan-y_pinch-zoom]'],
+    slide: ['shrink-0 min-w-0 snap-start'],
     controls: ['flex items-center justify-center', 'gap-3 mt-5'],
   },
   variants: {
@@ -29,9 +21,25 @@ export const carouselVariants = tv({
         ],
       },
     },
+    slideSize: {
+      fraction: {
+        track: [
+          '[--carousel-gap:0.875rem] md:[--carousel-gap:1.25rem] lg:[--carousel-gap:1.75rem] gap-(--carousel-gap)',
+          '[--carousel-per-view:1.18] sm:[--carousel-per-view:2] md:[--carousel-per-view:3]',
+        ],
+        slide: [
+          'basis-[calc((100%-(var(--carousel-per-view)-1)*var(--carousel-gap))/var(--carousel-per-view))]',
+        ],
+      },
+      content: {
+        track: ['gap-6'],
+        slide: ['basis-auto'],
+      },
+    },
   },
   defaultVariants: {
     isEnhanced: false,
+    slideSize: 'fraction',
   },
 });
 
