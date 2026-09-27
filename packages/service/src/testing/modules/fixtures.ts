@@ -40,6 +40,7 @@ import type { TRawTimelineModule } from '@blog/service/features/modules/timeline
 import type { TRawCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button';
 import {
   makeRawHeadingBlock,
+  makeRawParagraphTextBlock,
   makeRawPortableTextMarkDef,
   makeRawSanityImage,
 } from '@blog/service/testing/shared/fixtures';
@@ -275,21 +276,6 @@ export function makeRawContentMarkDef(
   overrides: Partial<TRawCtaContentMarkDef> = {},
 ): TRawCtaContentMarkDef {
   return makeRawPortableTextMarkDef(overrides);
-}
-
-function makeRawParagraphTextBlock<T extends { _type: 'block'; _key: string }>(
-  overrides: Partial<T> & { text?: string } = {},
-): T {
-  const { text = 'Hi.', ...rest } = overrides;
-
-  return {
-    _type: 'block',
-    _key: 'block-1',
-    style: 'normal',
-    children: [{ _type: 'span', _key: 'span-1', text }],
-    markDefs: null,
-    ...rest,
-  } as unknown as T;
 }
 
 export function makeRawContentBlock(

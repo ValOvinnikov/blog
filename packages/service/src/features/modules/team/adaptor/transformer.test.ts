@@ -29,7 +29,12 @@ describe(toTeamModule, () => {
           _id: 'person-1',
           name: 'Jamie Rivera',
           role: 'Staff Engineer',
-          bio: [makeRawPersonBioBlock({ text: 'Builds things.' })],
+          bio: [
+            makeRawPersonBioBlock({
+              _key: 'bio-block-1',
+              text: 'Builds things.',
+            }),
+          ],
           socialLinks: [
             makeRawSocialProfile({
               platform: SOCIAL_PLATFORMS.GITHUB,

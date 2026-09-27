@@ -51,19 +51,25 @@ export function makeRawPortableTextMarkDef(
 
 type TRawPersonBioBlock = NonNullable<TRawPersonProfile['bio']>[number];
 
-export function makeRawPersonBioBlock(
-  overrides: Partial<TRawPersonBioBlock> & { text?: string } = {},
-): TRawPersonBioBlock {
-  const { text = 'Builds things.', ...rest } = overrides;
+export function makeRawParagraphTextBlock<
+  T extends { _type: 'block'; _key: string },
+>(overrides: Partial<T> & { text?: string } = {}): T {
+  const { text = 'Hi.', ...rest } = overrides;
 
   return {
     _type: 'block',
-    _key: 'bio-block-1',
+    _key: 'block-1',
     style: 'normal',
     children: [{ _type: 'span', _key: 'span-1', text }],
     markDefs: null,
     ...rest,
-  };
+  } as unknown as T;
+}
+
+export function makeRawPersonBioBlock(
+  overrides: Partial<TRawPersonBioBlock> & { text?: string } = {},
+): TRawPersonBioBlock {
+  return makeRawParagraphTextBlock<TRawPersonBioBlock>(overrides);
 }
 
 export function makeRawHeadingBlock(
