@@ -28,6 +28,7 @@ import { createPostRelatedModuleService } from './features/modules/post-related'
 import { createPricingModuleService } from './features/modules/pricing';
 import { createStatsModuleService } from './features/modules/stats';
 import { createTaxonomyListModuleService } from './features/modules/taxonomy-list';
+import { createTeamModuleService } from './features/modules/team';
 import { createTestimonialModuleService } from './features/modules/testimonial';
 import { createTimelineModuleService } from './features/modules/timeline';
 import { createHomeService } from './features/pages/home';
@@ -73,6 +74,7 @@ export const service = {
     stats: createStatsModuleService(),
     pricing: createPricingModuleService(),
     faq: createFaqModuleService(),
+    team: createTeamModuleService(),
     timeline: createTimelineModuleService(),
   },
   entities: {
@@ -136,6 +138,7 @@ export type {
   TTaxonomyEntry,
   TTaxonomyListModule,
 } from './features/modules/taxonomy-list';
+export type { TTeamMember, TTeamModule } from './features/modules/team';
 export type {
   TTestimonialItem,
   TTestimonialModule,

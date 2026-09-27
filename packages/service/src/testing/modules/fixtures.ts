@@ -36,11 +36,13 @@ import type { TRawPostRelatedModule } from '@blog/service/features/modules/post-
 import type { TRawPricingModule } from '@blog/service/features/modules/pricing/adaptor/transformer';
 import type { TRawStatsModule } from '@blog/service/features/modules/stats/adaptor/transformer';
 import type { TRawTaxonomyListModule } from '@blog/service/features/modules/taxonomy-list/adaptor/transformer';
+import type { TRawTeamModule } from '@blog/service/features/modules/team/adaptor/transformer';
 import type { TRawTestimonialModule } from '@blog/service/features/modules/testimonial/adaptor/transformer';
 import type { TRawTimelineModule } from '@blog/service/features/modules/timeline/adaptor/transformer';
 import type { TRawCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button';
 import {
   makeRawHeadingBlock,
+  makeRawParagraphTextBlock,
   makeRawPortableTextMarkDef,
   makeRawSanityImage,
 } from '@blog/service/testing/shared/fixtures';
@@ -63,6 +65,7 @@ type TRawPricingPrice = NonNullable<TRawPricingTier['prices']>[number];
 type TRawTestimonialItem = NonNullable<
   TRawTestimonialModule['testimonials']
 >[number];
+type TRawTeamMember = TRawTeamModule['members'][number];
 type TRawFaqQuestionItem = TRawFaqModule['questions'][number];
 type TRawTimelineItem = NonNullable<TRawTimelineModule['items']>[number];
 type TRawTimelineItemBody = NonNullable<TRawTimelineItem['body']>[number];
@@ -277,21 +280,6 @@ export function makeRawContentMarkDef(
   overrides: Partial<TRawCtaContentMarkDef> = {},
 ): TRawCtaContentMarkDef {
   return makeRawPortableTextMarkDef(overrides);
-}
-
-function makeRawParagraphTextBlock<T extends { _type: 'block'; _key: string }>(
-  overrides: Partial<T> & { text?: string } = {},
-): T {
-  const { text = 'Hi.', ...rest } = overrides;
-
-  return {
-    _type: 'block',
-    _key: 'block-1',
-    style: 'normal',
-    children: [{ _type: 'span', _key: 'span-1', text }],
-    markDefs: null,
-    ...rest,
-  } as unknown as T;
 }
 
 export function makeRawContentBlock(
@@ -557,6 +545,43 @@ export function makeRawTestimonialModule(
     ctaButtons: null,
     displayMode: DISPLAY_MODE.GRID,
     cardAlignment: null,
+    contentAlignment: null,
+    layout: null,
+    ...overrides,
+  };
+}
+
+export function makeRawTeamMember(
+  overrides: Partial<TRawTeamMember> = {},
+): TRawTeamMember {
+  return {
+    _id: 'person-1',
+    name: 'Jamie Rivera',
+    image: null,
+    profilePage: null,
+    role: null,
+    bio: null,
+    socialLinks: null,
+    ...overrides,
+  };
+}
+
+export function makeRawTeamModule(
+  overrides: Partial<TRawTeamModule> = {},
+): TRawTeamModule {
+  return {
+    brandVariant: BRAND_VARIANT.PRIMARY,
+    headingBlock: makeRawHeadingBlock('Meet the team'),
+    members: [
+      makeRawTeamMember(),
+      makeRawTeamMember({ _id: 'person-2', name: 'Alex Chen' }),
+    ],
+    showBios: false,
+    showSocialLinks: true,
+    imageShape: CARD_IMAGE_SHAPE.CIRCLE,
+    displayMode: DISPLAY_MODE.GRID,
+    cardAlignment: CONTENT_ALIGNMENT.CENTER,
+    ctaButtons: null,
     contentAlignment: null,
     layout: null,
     ...overrides,

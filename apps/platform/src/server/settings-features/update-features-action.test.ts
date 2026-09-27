@@ -55,6 +55,7 @@ const VALID_INPUT: TUpdateFeaturesInput = {
   bookmarksEnabled: true,
   newsletterEnabled: false,
   analyticsEnabled: false,
+  consentBannerEnabled: false,
 };
 
 describe(updateFeaturesAction, () => {

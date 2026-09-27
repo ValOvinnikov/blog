@@ -73,6 +73,7 @@ describe(getEffectiveSettingsFeatures, () => {
         BOOKMARKS: true,
         NEWSLETTER: false,
         ANALYTICS: false,
+        CONSENT_BANNER: false,
       },
     });
   });
@@ -92,6 +93,7 @@ describe(getEffectiveSettingsFeatures, () => {
         BOOKMARKS: true,
         NEWSLETTER: false,
         ANALYTICS: false,
+        CONSENT_BANNER: false,
       },
     });
   });

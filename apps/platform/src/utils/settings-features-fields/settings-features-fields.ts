@@ -1,16 +1,12 @@
 import { CAPABILITY, type TCapability } from '@blog/config';
 
-/**
- * The five `settings_features` toggle columns, keyed the same way
- * `@blog/db`'s `getSettingsFeatures`/`upsertSettingsFeatures` already are —
- * this is the admin-side view-model shape, not a redeclaration of the row.
- */
 export type TSettingsFeaturesValues = {
   commentsEnabled: boolean;
   ratingsEnabled: boolean;
   bookmarksEnabled: boolean;
   newsletterEnabled: boolean;
   analyticsEnabled: boolean;
+  consentBannerEnabled: boolean;
 };
 
 export type TCapabilityToggle = {
@@ -30,6 +26,7 @@ export const CAPABILITY_TOGGLES: TCapabilityToggle[] = [
   { capability: CAPABILITY.BOOKMARKS, field: 'bookmarksEnabled' },
   { capability: CAPABILITY.NEWSLETTER, field: 'newsletterEnabled' },
   { capability: CAPABILITY.ANALYTICS, field: 'analyticsEnabled' },
+  { capability: CAPABILITY.CONSENT_BANNER, field: 'consentBannerEnabled' },
 ];
 
 /** Converts a `PRESET_REGISTRY[preset].featureDefaults` map into the column-keyed view-model shape. */
