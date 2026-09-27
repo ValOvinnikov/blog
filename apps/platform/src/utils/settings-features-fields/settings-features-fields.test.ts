@@ -7,13 +7,14 @@ import {
 } from './settings-features-fields';
 
 describe('CAPABILITY_TOGGLES', () => {
-  it('lists all five v1 capabilities, each mapped to its own settings_features column', () => {
+  it('lists every v1 capability, each mapped to its own settings_features column', () => {
     expect(CAPABILITY_TOGGLES).toEqual([
       { capability: CAPABILITY.COMMENTS, field: 'commentsEnabled' },
       { capability: CAPABILITY.RATINGS, field: 'ratingsEnabled' },
       { capability: CAPABILITY.BOOKMARKS, field: 'bookmarksEnabled' },
       { capability: CAPABILITY.NEWSLETTER, field: 'newsletterEnabled' },
       { capability: CAPABILITY.ANALYTICS, field: 'analyticsEnabled' },
+      { capability: CAPABILITY.CONSENT_BANNER, field: 'consentBannerEnabled' },
     ]);
   });
 });
@@ -26,6 +27,7 @@ describe(featureDefaultsToValues, () => {
       [CAPABILITY.BOOKMARKS]: false,
       [CAPABILITY.NEWSLETTER]: false,
       [CAPABILITY.ANALYTICS]: true,
+      [CAPABILITY.CONSENT_BANNER]: false,
     };
 
     expect(featureDefaultsToValues(defaults)).toEqual({
@@ -34,6 +36,7 @@ describe(featureDefaultsToValues, () => {
       bookmarksEnabled: false,
       newsletterEnabled: false,
       analyticsEnabled: true,
+      consentBannerEnabled: false,
     });
   });
 });
@@ -46,6 +49,7 @@ describe(clampToEntitlement, () => {
       bookmarksEnabled: true,
       newsletterEnabled: true,
       analyticsEnabled: true,
+      consentBannerEnabled: true,
     };
 
     expect(
@@ -60,6 +64,7 @@ describe(clampToEntitlement, () => {
       bookmarksEnabled: true,
       newsletterEnabled: false,
       analyticsEnabled: false,
+      consentBannerEnabled: false,
     });
   });
 
@@ -70,6 +75,7 @@ describe(clampToEntitlement, () => {
       bookmarksEnabled: true,
       newsletterEnabled: true,
       analyticsEnabled: false,
+      consentBannerEnabled: true,
     };
 
     expect(
@@ -79,6 +85,7 @@ describe(clampToEntitlement, () => {
         CAPABILITY.BOOKMARKS,
         CAPABILITY.NEWSLETTER,
         CAPABILITY.ANALYTICS,
+        CAPABILITY.CONSENT_BANNER,
       ]),
     ).toEqual(values);
   });

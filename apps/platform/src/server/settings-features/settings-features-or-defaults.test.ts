@@ -20,7 +20,7 @@ describe(getSettingsFeaturesOrDefaults, () => {
     getSiteConfigMock.mockReset();
   });
 
-  it('returns the five toggle columns from an existing row, without touching site_config', async () => {
+  it('returns the six toggle columns from an existing row, without touching site_config', async () => {
     getSettingsFeaturesMock.mockResolvedValue({
       id: 'row-1',
       tenantId: 'tenant-1',
@@ -29,6 +29,7 @@ describe(getSettingsFeaturesOrDefaults, () => {
       bookmarksEnabled: true,
       newsletterEnabled: true,
       analyticsEnabled: false,
+      consentBannerEnabled: true,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -41,6 +42,7 @@ describe(getSettingsFeaturesOrDefaults, () => {
       bookmarksEnabled: true,
       newsletterEnabled: true,
       analyticsEnabled: false,
+      consentBannerEnabled: true,
     });
     expect(getSiteConfigMock).not.toHaveBeenCalled();
   });
@@ -57,6 +59,7 @@ describe(getSettingsFeaturesOrDefaults, () => {
       bookmarksEnabled: true,
       newsletterEnabled: false,
       analyticsEnabled: false,
+      consentBannerEnabled: false,
     });
   });
 
@@ -84,6 +87,7 @@ describe(getSettingsFeaturesOrDefaults, () => {
       bookmarksEnabled: true,
       newsletterEnabled: false,
       analyticsEnabled: false,
+      consentBannerEnabled: false,
     });
   });
 });

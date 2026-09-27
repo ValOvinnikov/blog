@@ -71,6 +71,7 @@ export const PRESET_REGISTRY: Record<TPresetId, TPresetBundle> = {
       [CAPABILITY.BOOKMARKS]: true,
       [CAPABILITY.NEWSLETTER]: false,
       [CAPABILITY.ANALYTICS]: false,
+      [CAPABILITY.CONSENT_BANNER]: false,
     },
   },
   [PRESET_ID.EDITORIAL]: {
@@ -87,6 +88,7 @@ export const PRESET_REGISTRY: Record<TPresetId, TPresetBundle> = {
       [CAPABILITY.BOOKMARKS]: true,
       [CAPABILITY.NEWSLETTER]: false,
       [CAPABILITY.ANALYTICS]: false,
+      [CAPABILITY.CONSENT_BANNER]: false,
     },
   },
 };
