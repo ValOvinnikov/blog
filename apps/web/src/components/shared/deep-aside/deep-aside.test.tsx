@@ -13,7 +13,7 @@ describe(`<${DeepAside.name}/>`, () => {
   it('renders the Aside molecule with its label and content', () => {
     setup();
 
-    expect(screen.getByRole('note')).toBeInTheDocument();
+    expect(screen.getByRole('note')).toBeVisible();
     expect(screen.getByText('Why not X')).toBeVisible();
     expect(screen.getByText('Because Y.')).toBeVisible();
   });

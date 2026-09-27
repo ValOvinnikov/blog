@@ -68,7 +68,7 @@ describe(`<${FeatureListCarousel.name}/>`, () => {
           level: 3,
           name: item.headingBlock.heading,
         }),
-      ).toBeInTheDocument();
+      ).toBeVisible();
 
       unmount();
     });

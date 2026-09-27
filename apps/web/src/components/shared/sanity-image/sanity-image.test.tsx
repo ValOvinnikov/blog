@@ -120,6 +120,6 @@ describe(`<${SanityImage.name}/>`, () => {
     });
 
     expect(screen.getByRole('img', { name: image.alt })).toBeVisible();
-    expect(screen.getByRole('presentation')).toBeInTheDocument();
+    expect(screen.getByRole('presentation')).toBeVisible();
   });
 });

@@ -137,7 +137,7 @@ describe(`<${PostLatestModule.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByText('First post')).toBeInTheDocument();
+    expect(screen.getByText('First post')).toBeVisible();
     expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
   });
 
@@ -168,9 +168,7 @@ describe(`<${PostLatestModule.name}/>`, () => {
 
     await setup();
 
-    expect(
-      screen.getByRole('img', { name: sanityImage.alt }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: sanityImage.alt })).toBeVisible();
   });
 
   it('renders no post images when showImages is false', async () => {
