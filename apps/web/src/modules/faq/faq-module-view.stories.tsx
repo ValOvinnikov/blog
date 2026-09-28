@@ -36,7 +36,7 @@ const meta = {
     },
     contentAlignment: {
       control: 'select',
-      options: Object.values(CONTENT_ALIGNMENT),
+      options: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
     },
   },
   args: {
@@ -58,10 +58,6 @@ export const Default: TStory = {};
 
 export const CenterAligned: TStory = {
   args: { contentAlignment: CONTENT_ALIGNMENT.CENTER },
-};
-
-export const RightAligned: TStory = {
-  args: { contentAlignment: CONTENT_ALIGNMENT.RIGHT },
 };
 
 export const WithActions: TStory = {

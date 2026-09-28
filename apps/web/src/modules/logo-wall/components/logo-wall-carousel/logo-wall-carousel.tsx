@@ -29,6 +29,7 @@ export const LogoWallCarousel = ({
     getItemKey={({ item }) => item.id}
     title={title}
     tone={tone}
+    slideSize="content"
     className={className}
     dataTestId={dataTestId}
   />

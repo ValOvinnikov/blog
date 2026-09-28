@@ -10,7 +10,7 @@ import { Icon } from '@blog/ui/components/atoms/icon';
 import { IconButton } from '@blog/ui/components/atoms/icon-button';
 import type { Key, ReactNode } from 'react';
 
-import { carouselVariants } from './carousel-variants';
+import { carouselVariants, type TCarouselVariants } from './carousel-variants';
 import { useCarousel } from './use-carousel';
 
 export interface ICarouselProps<T> extends IWithClassName, IWithDataTestId {
@@ -21,6 +21,7 @@ export interface ICarouselProps<T> extends IWithClassName, IWithDataTestId {
   previousLabel: string;
   nextLabel: string;
   tone?: TBrandVariant;
+  slideSize?: TCarouselVariants['slideSize'];
 }
 
 /** Scrolls through a row of items, revealing more of them as the viewport widens. */
@@ -32,6 +33,7 @@ export const Carousel = <T,>({
   previousLabel,
   nextLabel,
   tone = BRAND_VARIANT.PRIMARY,
+  slideSize = 'fraction',
   className,
   dataTestId,
 }: ICarouselProps<T>) => {
@@ -47,7 +49,7 @@ export const Carousel = <T,>({
     scrollNext,
   } = useCarousel();
 
-  const s = carouselVariants({ isEnhanced });
+  const s = carouselVariants({ isEnhanced, slideSize });
 
   return (
     <div
