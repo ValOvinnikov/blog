@@ -23,7 +23,7 @@ export const ModuleHeading = ({
   const s = moduleHeadingVariants({ variant, align });
 
   return (
-    <>
+    <div className={s.wrapper()}>
       <Heading
         level={level}
         id={id}
@@ -33,6 +33,6 @@ export const ModuleHeading = ({
         {heading}
       </Heading>
       {supportingText && <p className={s.supportingText()}>{supportingText}</p>}
-    </>
+    </div>
   );
 };

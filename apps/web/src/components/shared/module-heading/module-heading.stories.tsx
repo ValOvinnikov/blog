@@ -34,6 +34,12 @@ const meta = {
 export default meta;
 type TStory = StoryObj<typeof meta>;
 
+const longHeadingBlock = makeHeadingBlock({
+  heading: 'Everything you need to plan, write and ship a great post',
+  supportingText:
+    'From the first outline to the final proofread, our tools keep your writing workflow moving so you can focus on the ideas instead of the busywork.',
+});
+
 export const Default: TStory = {};
 
 export const WithSupportingText: TStory = {
@@ -45,23 +51,24 @@ export const WithSupportingText: TStory = {
   },
 };
 
+export const LeftAligned: TStory = {
+  args: {
+    align: CONTENT_ALIGNMENT.LEFT,
+    headingBlock: longHeadingBlock,
+  },
+};
+
 export const CenterAligned: TStory = {
   args: {
     align: CONTENT_ALIGNMENT.CENTER,
-    headingBlock: makeHeadingBlock({
-      heading: 'Latest posts',
-      supportingText: 'Fresh from the blog, updated weekly.',
-    }),
+    headingBlock: longHeadingBlock,
   },
 };
 
 export const RightAligned: TStory = {
   args: {
     align: CONTENT_ALIGNMENT.RIGHT,
-    headingBlock: makeHeadingBlock({
-      heading: 'Latest posts',
-      supportingText: 'Fresh from the blog, updated weekly.',
-    }),
+    headingBlock: longHeadingBlock,
   },
 };
 
