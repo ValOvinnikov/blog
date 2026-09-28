@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@blog/utils": "workspace:*",
-    "@portabletext/types": "^2.0.15"
+    "@portabletext/types": "^4.0.2"
   },
   "devDependencies": {
     "@blog/eslint-config": "workspace:*",
