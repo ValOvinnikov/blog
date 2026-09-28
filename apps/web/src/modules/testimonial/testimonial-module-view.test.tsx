@@ -17,7 +17,9 @@ const { TestimonialCarousel } = vi.hoisted(() => ({
   )),
 }));
 
-vi.mock('./testimonial-carousel', () => ({ TestimonialCarousel }));
+vi.mock('./components/testimonial-carousel/testimonial-carousel', () => ({
+  TestimonialCarousel,
+}));
 
 const items = [
   makeTestimonialItem({ id: 'testimonial-1', name: 'Jordan Reyes' }),
