@@ -1,6 +1,10 @@
 import { TIMELINE_MARKER_STYLE } from '@blog/config/constants';
 import type { TTimelineDocument } from '@blog/studio/schema-types/modules/timeline/timeline-document';
 import { paragraphTextSchema } from '@blog/studio/schema-types/portable-text/paragraph-text/paragraph-text';
+import {
+  toPlainText,
+  type TPlainTextBlock,
+} from '@blog/studio/schema-types/portable-text/to-plain-text/to-plain-text';
 import { validateTimelineMarkerRequired } from '@blog/studio/schema-types/validation/validate-timeline-marker-required/validate-timeline-marker-required';
 import { CircleDot } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
@@ -9,16 +13,7 @@ const isNumbered = (document: unknown): boolean =>
   (document as TTimelineDocument | undefined)?.markerStyle ===
   TIMELINE_MARKER_STYLE.NUMBERED;
 
-type TParagraphBlock = { children?: { text?: string }[] };
-
 const BODY_MAX_LENGTH = 300;
-
-const plainTextLength = (blocks: TParagraphBlock[] | undefined): number =>
-  (blocks ?? [])
-    .flatMap((block) => block.children ?? [])
-    .map((child) => child.text ?? '')
-    .join(' ')
-    .trim().length;
 
 export const timelineItemSchema = defineType({
   name: 'timelineItem',
@@ -56,8 +51,8 @@ export const timelineItemSchema = defineType({
       description: 'A sentence or two describing this step or milestone.',
       validation: (rule) =>
         rule
-          .custom((blocks: TParagraphBlock[] | undefined) =>
-            plainTextLength(blocks) > BODY_MAX_LENGTH
+          .custom((blocks: TPlainTextBlock[] | undefined) =>
+            toPlainText(blocks).length > BODY_MAX_LENGTH
               ? "An item's text reads best as a sentence or two."
               : true,
           )
