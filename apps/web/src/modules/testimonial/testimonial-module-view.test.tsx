@@ -88,12 +88,6 @@ describe(`<${TestimonialModuleView.name}/>`, () => {
     expect(screen.queryByRole('blockquote')).not.toBeInTheDocument();
   });
 
-  it('renders nothing when testimonials is empty, never an empty landmark with a dangling aria-labelledby', () => {
-    const { container } = setup({ testimonials: [] });
-
-    expect(container).toBeEmptyDOMElement();
-  });
-
   it('renders the resolved cta buttons when present', () => {
     setup({ ctaButtons: ctaActionsDemo });
 

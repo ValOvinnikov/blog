@@ -27,9 +27,6 @@ export const TestimonialModuleView = ({
   titleId,
   dataTestId,
 }: ITestimonialModuleViewProps) => {
-  const [spotlightItem] = testimonials;
-  if (!spotlightItem) return null;
-
   const isSpotlight = testimonials.length === 1;
   const headingAlign = isSpotlight
     ? CONTENT_ALIGNMENT.CENTER
@@ -54,13 +51,16 @@ export const TestimonialModuleView = ({
         variant="section"
       />
       {isSpotlight ? (
-        <TestimonialCard
-          item={spotlightItem}
-          align="center"
-          tone={brandVariant}
-          isSpotlight={true}
-          dataTestId={`${dataTestId}-spotlight`}
-        />
+        testimonials.map((item) => (
+          <TestimonialCard
+            key={item.id}
+            item={item}
+            align="center"
+            tone={brandVariant}
+            isSpotlight={true}
+            dataTestId={`${dataTestId}-spotlight`}
+          />
+        ))
       ) : displayMode === DISPLAY_MODE.CAROUSEL ? (
         <TestimonialCarousel
           items={testimonials}

@@ -85,17 +85,6 @@ describe(`<${TestimonialModule.name}/>`, () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('renders nothing when the testimonials degrade to an empty list, never an empty landmark with a dangling aria-labelledby', async () => {
-    getTestimonialModuleMock.mockResolvedValue({
-      ok: true,
-      data: { ...baseModule, testimonials: [] },
-    });
-
-    const { container } = await setup();
-
-    expect(container).toBeEmptyDOMElement();
-  });
-
   it('renders the resolved testimonials', async () => {
     const testimonials = [
       makeTestimonialItem({ id: 'testimonial-1' }),

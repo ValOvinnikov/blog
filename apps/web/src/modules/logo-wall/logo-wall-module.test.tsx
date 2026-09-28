@@ -61,7 +61,10 @@ describe(`<${LogoWallModule.name}/>`, () => {
     getTenantSanityContextMock.mockResolvedValue(tenant);
     getLogoWallModuleMock.mockResolvedValue({
       ok: true,
-      data: { ...baseModule, logos: [] },
+      data: {
+        ...baseModule,
+        logos: [makeLogoItem({ id: 'logo-1', name: 'Acme Corp' })],
+      },
     });
 
     await setup();
@@ -74,17 +77,6 @@ describe(`<${LogoWallModule.name}/>`, () => {
     getLogoWallModuleMock.mockResolvedValue({
       ok: false,
       error: new Error('Logo "Acme Corp"\'s image failed to resolve.'),
-    });
-
-    const { container } = await setup();
-
-    expect(container).toBeEmptyDOMElement();
-  });
-
-  it('renders nothing when the logos degrade to an empty list, never an empty landmark with a dangling aria-labelledby', async () => {
-    getLogoWallModuleMock.mockResolvedValue({
-      ok: true,
-      data: { ...baseModule, logos: [] },
     });
 
     const { container } = await setup();

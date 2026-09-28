@@ -25,8 +25,6 @@ export const LogoWallModuleView = ({
   titleId,
   dataTestId,
 }: ILogoWallModuleViewProps) => {
-  if (logos.length === 0) return null;
-
   const s = moduleGridActionsVariants({ align: contentAlignment });
 
   return (
