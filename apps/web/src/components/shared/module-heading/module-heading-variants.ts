@@ -3,9 +3,9 @@ import { tv } from 'tailwind-variants';
 
 export const moduleHeadingVariants = tv({
   slots: {
-    wrapper: ['max-w-measure text-prose'],
-    label: ['m-0 mb-3'],
-    supportingText: ['font-body text-prose text-muted', 'm-0 mb-5'],
+    wrapper: ['max-w-measure text-prose mb-5'],
+    label: ['m-0'],
+    supportingText: ['font-body text-prose text-muted', 'm-0 mt-3'],
   },
   variants: {
     variant: {
@@ -14,10 +14,7 @@ export const moduleHeadingVariants = tv({
           'font-mono text-label font-normal uppercase tracking-label text-subtle',
         ],
       },
-      section: {
-        label: ['m-0'],
-        supportingText: ['mt-3'],
-      },
+      section: {},
     },
     align: {
       [CONTENT_ALIGNMENT.LEFT]: {
