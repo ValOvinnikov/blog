@@ -4,7 +4,7 @@ import type { VariantProps } from 'tailwind-variants';
 
 export const avatarVariants = tv({
   base: [
-    'rounded-full overflow-hidden inline-flex items-center justify-center',
+    'overflow-hidden inline-flex items-center justify-center',
     'bg-surface-2 text-text-muted',
     'font-display font-medium',
     'select-none shrink-0',
@@ -17,9 +17,14 @@ export const avatarVariants = tv({
       [SIZE.XL]: 'h-24 w-24 text-lg',
       [SIZE.XXL]: 'h-32 w-32 text-xl',
     },
+    shape: {
+      circle: 'rounded-full',
+      square: '',
+    },
   },
   defaultVariants: {
     size: SIZE.MD,
+    shape: 'circle',
   },
 });
 

@@ -12,6 +12,7 @@ export type TAvatarProps = {
   alt: string;
   name: string;
   size?: TAvatarVariants['size'];
+  shape?: TAvatarVariants['shape'];
   className?: string;
   onImageError?: () => void;
 } & IWithDataTestId;
@@ -46,6 +47,7 @@ export const Avatar = ({
   alt,
   name,
   size,
+  shape,
   className,
   onImageError,
   dataTestId,
@@ -54,7 +56,7 @@ export const Avatar = ({
 
   return (
     <span
-      className={avatarVariants({ size, class: className })}
+      className={avatarVariants({ size, shape, class: className })}
       data-testid={dataTestId}
     >
       {src ? (

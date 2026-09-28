@@ -15,8 +15,8 @@ Variants: type: ALERT_TYPE.SUCCESS|ALERT_TYPE.WARNING|ALERT_TYPE.ERROR|ALERT_TYP
 ### Avatar — `components/atoms/avatar/avatar.tsx`
 
 Renders a provided image, or an initials badge derived from `name` when no image is supplied.
-Props: src?: string · alt: string · name: string · size?: TAvatarVariants['size'] · className?: string · onImageError?: () => void _(extends IWithDataTestId)_
-Variants: size: SIZE.SM|SIZE.MD|SIZE.LG|SIZE.XL|SIZE.XXL
+Props: src?: string · alt: string · name: string · size?: TAvatarVariants['size'] · shape?: TAvatarVariants['shape'] · className?: string · onImageError?: () => void _(extends IWithDataTestId)_
+Variants: size: SIZE.SM|SIZE.MD|SIZE.LG|SIZE.XL|SIZE.XXL · shape: circle|square
 
 ### BackToTop — `components/atoms/back-to-top/back-to-top.tsx`
 
