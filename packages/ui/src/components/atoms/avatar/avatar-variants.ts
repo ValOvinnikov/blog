@@ -19,7 +19,7 @@ export const avatarVariants = tv({
     },
     shape: {
       circle: 'rounded-full',
-      square: '',
+      square: [],
     },
   },
   defaultVariants: {
