@@ -766,13 +766,26 @@ narrows the projected type to those two values rather than the wider
 three-value union, and `apps/web` maps the casing explicitly instead of
 passing the stored value straight through.
 
-**A misconfigured module renders nothing rather than throwing.** `features` is
-modelled nullable — `min(2)` is a validation rule, not `.required()`, and
-validation never applies to a document written outside Studio — so
-`service.modules.featureList.v1.getFeatureList` yields an empty `items` array
-whenever the authored array is absent, empty, or below two, matching how
-`postTakeaways` degrades below its own `min(3)`. The view returns `null` on an
-empty array, so the page loses the section instead of the render.
+**An empty-array guard mirrors what Studio enforces on that field, and nothing
+more.** Where a module's array pairs `required()` with a `min()`, an empty list
+is a state the content model forbids, so `apps/web` does not check for it —
+`module_testimonial`, `module_logoWall`, `module_stats` and `module_faq` render
+whatever they are handed, in the module and in the view alike. The trade is
+deliberate: a document written around Studio's validation costs an empty section
+rather than a disappeared one, which is the cheaper failure and the visible one.
+
+`module_featureList` is the exception, and the reason the rule is stated per
+field rather than per module. `features` is modelled nullable — `min(2)` is a
+validation rule, not `.required()`, and validation never applies to a document
+written outside Studio — so `service.modules.featureList.v1.getFeatureList`
+yields an empty `items` array whenever the authored array is absent, empty, or
+below two, matching how `postTakeaways` degrades below its own `min(3)`. Its
+guard is load-bearing until `required()` joins the `min(2)`, and stays.
+
+`ctaButtons` is the same rule read from the other side, and is not a guard at
+all. `ctaButtonsField` defaults to `min = 0`, so a module with no actions is a
+valid document rather than a broken one; every `ctaButtons.length > 0` check is
+ordinary optional-content rendering and stays too.
 
 **A testimonial is a document for the same reason a feature card is.**
 `block_testimonial` ("Testimonial Item") sits beside `block_feature` under
@@ -907,9 +920,9 @@ query guarantees the asset, `toSanityImage` is typed to return an image rather
 than `T | undefined` for this call, so `TLogoItem.image` is required and the tile
 reads it without a guard. As with
 `module_testimonial`, that is not a page-level risk — the page loses the section
-and keeps rendering. The view also returns nothing for an empty array, which
-`.notNull()` does not reject and `min(1)` only blocks in the Studio, so an
-API-written wall with no logos disappears instead of rendering an empty row.
+and keeps rendering. An empty `logos` array is the other case and carries no
+guard, per the rule above: `required()` and `min(1)` forbid it, so a wall
+written around Studio's validation renders an empty row rather than vanishing.
 
 `module_stats` ("Stats") holds **inline objects rather than referenced
 documents** too, for a different reason than the logo wall's. A `stat` carries a required
