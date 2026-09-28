@@ -30,6 +30,7 @@
     "@blog/vitest-config": "workspace:*",
     "@types/node": "^26",
     "eslint": "catalog:",
+    "groq-js": "^2.0.0",
     "prettier": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
