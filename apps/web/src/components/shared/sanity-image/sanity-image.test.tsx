@@ -142,10 +142,10 @@ describe(`<${SanityImage.name}/>`, () => {
     setupWide();
 
     const img = screen.getByRole('img', { name: wideImage.alt });
-    expect(img.getAttribute('src')).toContain('fp-x=0.5');
-    expect(img.getAttribute('src')).toContain('fp-y=0.5');
+    expect(img.getAttribute('src')).toMatch(/[?&]fp-x=0\.5(?:&|$)/);
+    expect(img.getAttribute('src')).toMatch(/[?&]fp-y=0\.5(?:&|$)/);
     expect(img.getAttribute('src')).not.toContain('crop=entropy');
-    expect(img.getAttribute('srcset')).toContain('fp-x=0.5');
+    expect(img.getAttribute('srcset')).toMatch(/[?&]fp-x=0\.5(?:&|$)/);
     expect(img.getAttribute('srcset')).not.toContain('crop=entropy');
   });
 
@@ -155,8 +155,8 @@ describe(`<${SanityImage.name}/>`, () => {
     });
 
     const img = screen.getByRole('img', { name: wideImage.alt });
-    expect(img.getAttribute('src')).toContain('fp-x=0.2');
-    expect(img.getAttribute('src')).toContain('fp-y=0.8');
+    expect(img.getAttribute('src')).toMatch(/[?&]fp-x=0\.2(?:&|$)/);
+    expect(img.getAttribute('src')).toMatch(/[?&]fp-y=0\.8(?:&|$)/);
   });
 
   it('centres a hotspot-less focal point on the cropped area rather than the source when a crop is set', () => {
@@ -168,7 +168,7 @@ describe(`<${SanityImage.name}/>`, () => {
     });
 
     const img = screen.getByRole('img', { name: wideImage.alt });
-    expect(img.getAttribute('src')).toContain('fp-x=0.5');
-    expect(img.getAttribute('src')).toContain('fp-y=0.5');
+    expect(img.getAttribute('src')).toMatch(/[?&]fp-x=0\.5(?:&|$)/);
+    expect(img.getAttribute('src')).toMatch(/[?&]fp-y=0\.5(?:&|$)/);
   });
 });
