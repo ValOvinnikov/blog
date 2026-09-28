@@ -26,16 +26,10 @@ describe(`<${FeatureHighlightRow.name}/>`, () => {
     ).toBeVisible();
   });
 
-  it('renders the row image when the item has one', () => {
+  it('renders the row image', () => {
     setup();
 
     expect(screen.getByRole('img')).toBeVisible();
-  });
-
-  it('renders no image when the item has none', () => {
-    setup({ item: makeFeatureHighlightItem({ image: undefined }) });
-
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
   it('renders the row action when the item has one', () => {

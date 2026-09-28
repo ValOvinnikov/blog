@@ -20,11 +20,5 @@ export const featureHighlightRowVariants = tv({
         text: ['md:order-1'],
       },
     },
-    hasImage: {
-      true: {},
-      false: {
-        text: ['md:col-span-2'],
-      },
-    },
   },
 });
