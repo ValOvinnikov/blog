@@ -14,7 +14,7 @@ export const quoteCardNameVariants = tv({
   ],
   variants: {
     isSpotlight: {
-      true: [],
+      true: ['has-[:focus-visible]:ring-offset-ambient'],
       false: ['has-[:focus-visible]:ring-offset-surface'],
     },
     tone: {
@@ -22,18 +22,6 @@ export const quoteCardNameVariants = tv({
       [BRAND_VARIANT.SECONDARY]: [],
     },
   },
-  compoundVariants: [
-    {
-      isSpotlight: true,
-      tone: BRAND_VARIANT.PRIMARY,
-      class: 'has-[:focus-visible]:ring-offset-primary',
-    },
-    {
-      isSpotlight: true,
-      tone: BRAND_VARIANT.SECONDARY,
-      class: 'has-[:focus-visible]:ring-offset-secondary',
-    },
-  ],
   defaultVariants: {
     isSpotlight: false,
   },

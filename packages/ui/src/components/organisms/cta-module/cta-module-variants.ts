@@ -102,12 +102,12 @@ export const ctaModuleVariants = tv({
     {
       variant: [CTA_VARIANT.SPLIT, CTA_VARIANT.CALLOUT],
       tone: BRAND_VARIANT.SECONDARY,
-      class: { root: ['bg-secondary'] },
+      class: { root: ['bg-secondary', 'surface-secondary'] },
     },
     {
       variant: [CTA_VARIANT.SPLIT, CTA_VARIANT.CALLOUT],
       tone: BRAND_VARIANT.BRAND_PRIMARY,
-      class: { root: ['bg-brand-primary-muted'] },
+      class: { root: ['bg-brand-primary-muted', 'surface-brand-primary'] },
     },
     {
       variant: CTA_VARIANT.BANNER,

@@ -10,7 +10,7 @@ export const bookmarkToggleVariants = tv({
       'cursor-pointer',
       'hover:border-brand-primary hover:text-brand-primary',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
-      'focus-visible:ring-offset-2 focus-visible:ring-offset-primary',
+      'focus-visible:ring-offset-2 focus-visible:ring-offset-ambient',
       'disabled:pointer-events-none disabled:opacity-50',
     ],
     icon: ['fill-none shrink-0'],
