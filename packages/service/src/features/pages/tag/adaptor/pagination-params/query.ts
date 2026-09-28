@@ -1,25 +1,17 @@
 import { q } from '@blog/service/sanity/query';
+import {
+  FIRST_POST_LIST_PAGE_SIZE_EXPRESSION,
+  firstPostListPageSizeParser,
+} from '@blog/service/shared/expressions/first-post-list-page-size';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/published-post';
-import { z } from 'zod';
 
-const FIRST_POST_LIST_PAGE_SIZE_EXPRESSION =
-  'modules[]->[_type == "module_postList"][0].pageSize';
-
-// `^.tag._ref` (GROQ's parent-scope operator) correlates each `page_post`
-// back to the enclosing `page_tag` document's own tag reference within this
-// per-item projection — one round-trip for every tag page's slug, post
-// count, and archive page size, no per-slug fan-out. `references()` matches
-// a tag reference anywhere in the document, including inside `page_post`'s
-// `tags[]` array, so matching by reference identity (not slug) stays correct
-// even if `page_tag.slug` (independently editable) drifts from the
-// referenced tag's slug.
 export const tagPaginationParamsQuery = q.star
   .filterByType('page_tag')
   .project((sub) => ({
     slug: sub.field('slug.current').notNull(),
     pageSize: sub.raw(
       FIRST_POST_LIST_PAGE_SIZE_EXPRESSION,
-      z.number().nullable(),
+      firstPostListPageSizeParser,
     ),
     postCount: sub
       .count(
