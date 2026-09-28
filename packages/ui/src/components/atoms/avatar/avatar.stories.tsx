@@ -19,6 +19,10 @@ const meta = {
       control: 'select',
       options: objectKeys(avatarVariants.variants.size),
     },
+    shape: {
+      control: 'select',
+      options: objectKeys(avatarVariants.variants.shape),
+    },
   },
 } satisfies Meta<typeof Avatar>;
 
@@ -37,6 +41,14 @@ export const Small: TStory = {
 
 export const Large: TStory = {
   args: { size: SIZE.LG },
+};
+
+export const SquareWithImage: TStory = {
+  args: { shape: 'square', src: 'https://i.pravatar.cc/150?img=1' },
+};
+
+export const SquareInitials: TStory = {
+  args: { shape: 'square' },
 };
 
 export const Decorative: TStory = {
