@@ -21,6 +21,41 @@ const linkBody = (href: string): TEmailTemplateBlock[] => [
   },
 ];
 
+const listBody: TEmailTemplateBlock[] = [
+  {
+    _type: 'block',
+    _key: 'b1',
+    style: 'normal',
+    listItem: 'bullet',
+    level: 1,
+    children: [{ _type: 'span', _key: 'bs1', text: 'Bullet one', marks: [] }],
+  },
+  {
+    _type: 'block',
+    _key: 'b2',
+    style: 'normal',
+    listItem: 'bullet',
+    level: 1,
+    children: [{ _type: 'span', _key: 'bs2', text: 'Bullet two', marks: [] }],
+  },
+  {
+    _type: 'block',
+    _key: 'o1',
+    style: 'normal',
+    listItem: 'number',
+    level: 1,
+    children: [{ _type: 'span', _key: 'os1', text: 'Number one', marks: [] }],
+  },
+  {
+    _type: 'block',
+    _key: 'o2',
+    style: 'normal',
+    listItem: 'number',
+    level: 1,
+    children: [{ _type: 'span', _key: 'os2', text: 'Number two', marks: [] }],
+  },
+];
+
 describe(PortableTextEditor, () => {
   it('mounts with an accessible name and no starting content', () => {
     render(
@@ -121,5 +156,35 @@ describe(PortableTextEditor, () => {
       expect(screen.getByText('click me')).toBeInTheDocument();
     });
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
+  });
+
+  it('renders bulleted and numbered list items inside real list containers', async () => {
+    render(
+      <PortableTextEditor
+        initialValue={listBody}
+        onChange={() => {}}
+        ariaLabel="Body"
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getAllByRole('listitem')).toHaveLength(4);
+    });
+
+    const lists = screen.getAllByRole('list');
+    expect(lists).toHaveLength(4);
+    for (const list of lists) {
+      expect(list).toBeVisible();
+    }
+
+    const items = screen.getAllByRole('listitem');
+    for (const item of items) {
+      expect(item).toBeVisible();
+    }
+
+    expect(screen.getByText('Bullet one')).toBeVisible();
+    expect(screen.getByText('Bullet two')).toBeVisible();
+    expect(screen.getByText('Number one')).toBeVisible();
+    expect(screen.getByText('Number two')).toBeVisible();
   });
 });

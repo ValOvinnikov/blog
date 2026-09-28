@@ -9,8 +9,14 @@ import {
   defineTextBlock,
   EditorProvider,
   PortableTextEditable,
+  useEditor,
+  useEditorSelector,
+  type PortableTextBlock,
+  type PortableTextTextBlock,
+  type TextBlockRenderProps,
 } from '@portabletext/editor';
 import { EventListenerPlugin, NodePlugin } from '@portabletext/editor/plugins';
+import * as selectors from '@portabletext/editor/selectors';
 import { useMemo } from 'react';
 
 import { PortableTextEditorToolbar } from './components/toolbar/portable-text-editor-toolbar';
@@ -33,14 +39,60 @@ const emDecorator = defineDecorator({
   render: ({ children }) => <em>{children}</em>,
 });
 
+const isSameListRunMember = (
+  entry: PortableTextBlock,
+  listItem: string,
+  level: number,
+): boolean =>
+  entry._type === 'block' &&
+  (entry as PortableTextTextBlock).listItem === listItem &&
+  ((entry as PortableTextTextBlock).level ?? 1) === level;
+
+const getListItemPosition = (
+  value: PortableTextBlock[],
+  block: PortableTextTextBlock,
+): number => {
+  const index = value.findIndex((entry) => entry._key === block._key);
+  if (index === -1 || block.listItem === undefined) return 1;
+
+  let position = 1;
+  for (let i = index - 1; i >= 0; i -= 1) {
+    const entry = value[i];
+    if (entry && isSameListRunMember(entry, block.listItem, block.level ?? 1)) {
+      position += 1;
+    } else {
+      break;
+    }
+  }
+  return position;
+};
+
+const TextBlock = ({ attributes, children, node }: TextBlockRenderProps) => {
+  const editor = useEditor();
+  const value = useEditorSelector(editor, selectors.getValue);
+
+  const styled = node.style === 'h2' ? <h2>{children}</h2> : <p>{children}</p>;
+
+  if (node.listItem === undefined) {
+    return <div {...attributes}>{styled}</div>;
+  }
+
+  const listItem = <li>{styled}</li>;
+
+  return (
+    <div {...attributes}>
+      {node.listItem === 'number' ? (
+        <ol start={getListItemPosition(value, node)}>{listItem}</ol>
+      ) : (
+        <ul>{listItem}</ul>
+      )}
+    </div>
+  );
+};
+
 const textBlock = defineTextBlock({
   type: 'block',
-  render: ({ attributes, children, node }) => {
-    const styled =
-      node.style === 'h2' ? <h2>{children}</h2> : <p>{children}</p>;
-    const content = node.listItem !== undefined ? <li>{styled}</li> : styled;
-    return <div {...attributes}>{content}</div>;
-  },
+  render: (props) => <TextBlock {...props} />,
 });
 
 /**
