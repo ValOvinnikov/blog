@@ -51,6 +51,9 @@ export const CONTENT_ALIGNMENT = {
 
 export type TContentAlignment = TValueOf<typeof CONTENT_ALIGNMENT>;
 
+export type TContentAlignmentOf<TKeys extends keyof typeof CONTENT_ALIGNMENT> =
+  (typeof CONTENT_ALIGNMENT)[TKeys];
+
 export type THeadingBlock = {
   heading: string;
   supportingText?: string;

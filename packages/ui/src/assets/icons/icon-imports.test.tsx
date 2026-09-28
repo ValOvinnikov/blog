@@ -7,7 +7,7 @@ describe('svg import tooling', () => {
   it('resolves a bare .svg import to a renderable React component (SVGR)', () => {
     render(<SunIcon data-testid="sun-icon" />);
 
-    expect(screen.getByTestId('sun-icon')).toBeInTheDocument();
+    expect(screen.getByTestId('sun-icon')).toBeVisible();
   });
 
   it('keeps the source viewBox on the compiled SVG so CSS-driven resizing (Icon.tsx) rescales correctly', () => {

@@ -6,7 +6,7 @@ import {
 import { ctaButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
-import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { wideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document';
 import { listedTextBlockFragment } from '@blog/service/shared/fragments/portable-text/listed-text-block';
 
@@ -50,6 +50,6 @@ export const testimonialModuleQuery = q
     displayMode: sub.raw(DISPLAY_MODE_EXPRESSION, displayModeParser),
     cardAlignment: sub.field('cardAlignment').nullable(true),
     contentAlignment: sub.field('contentAlignment').nullable(true),
-    layout: sub.field('layout').project(layoutFragment).nullable(true),
+    layout: sub.field('layout').project(wideLayoutFragment).nullable(true),
   }))
   .notNull();

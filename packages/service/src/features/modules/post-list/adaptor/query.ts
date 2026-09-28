@@ -4,7 +4,7 @@ import {
   showImagesParser,
 } from '@blog/service/shared/expressions/show-images';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
-import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { wideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 
 export const postListModuleQuery = q
   .parameters<TModuleQueryParams>()
@@ -18,7 +18,7 @@ export const postListModuleQuery = q
       .project(headingBlockFragment)
       .notNull(),
     pageSize: sub.field('pageSize').notNull(),
-    layout: sub.field('layout').project(layoutFragment).nullable(true),
+    layout: sub.field('layout').project(wideLayoutFragment).nullable(true),
     contentAlignment: sub.field('contentAlignment').nullable(true),
     showImages: sub.raw(SHOW_IMAGES_EXPRESSION, showImagesParser),
   }))

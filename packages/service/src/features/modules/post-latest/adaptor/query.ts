@@ -8,7 +8,7 @@ import {
   showImagesParser,
 } from '@blog/service/shared/expressions/show-images';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
-import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { wideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 
 export const postLatestModuleQuery = q
   .parameters<TModuleQueryParams>()
@@ -22,7 +22,7 @@ export const postLatestModuleQuery = q
       .project(headingBlockFragment)
       .notNull(),
     limit: sub.field('limit').notNull(),
-    layout: sub.field('layout').project(layoutFragment).nullable(true),
+    layout: sub.field('layout').project(wideLayoutFragment).nullable(true),
     contentAlignment: sub.field('contentAlignment').nullable(true),
     showImages: sub.raw(SHOW_IMAGES_EXPRESSION, showImagesParser),
     displayMode: sub.raw(DISPLAY_MODE_EXPRESSION, displayModeParser),
