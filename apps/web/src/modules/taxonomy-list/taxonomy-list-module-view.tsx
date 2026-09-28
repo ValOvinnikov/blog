@@ -66,6 +66,7 @@ export const TaxonomyListModuleView = ({
         id={titleId}
         level={headingLevel}
         align={contentAlignment}
+        variant="section"
       />
       {isEmpty ? (
         <p className={s.emptyMessage()}>{emptyMessage}</p>

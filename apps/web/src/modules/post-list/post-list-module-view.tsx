@@ -59,6 +59,7 @@ export const PostListModuleView = ({
         id={titleId}
         level={2}
         align={contentAlignment}
+        variant="section"
       />
       {isEmpty ? (
         <p className={s.emptyMessage()}>{emptyMessage}</p>
