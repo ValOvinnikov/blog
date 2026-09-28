@@ -4,11 +4,10 @@ import { CardGrid } from '@blog/ui/components/organisms/card-grid';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';
+import { TestimonialCard } from '@web/modules/testimonial/components/testimonial-card/testimonial-card';
+import { TestimonialCarousel } from '@web/modules/testimonial/components/testimonial-carousel/testimonial-carousel';
 import { moduleGridActionsVariants } from '@web/utils/module-grid-actions-variants';
 import { toTestimonialGridColumns } from '@web/utils/to-testimonial-grid-columns';
-
-import { TestimonialCard } from './testimonial-card';
-import { TestimonialCarousel } from './testimonial-carousel';
 
 export interface ITestimonialModuleViewProps extends TTestimonialModule {
   titleId: string;
@@ -28,8 +27,6 @@ export const TestimonialModuleView = ({
   dataTestId,
 }: ITestimonialModuleViewProps) => {
   const [spotlightItem] = testimonials;
-  if (!spotlightItem) return null;
-
   const isSpotlight = testimonials.length === 1;
   const headingAlign = isSpotlight
     ? CONTENT_ALIGNMENT.CENTER
@@ -53,7 +50,7 @@ export const TestimonialModuleView = ({
         align={headingAlign}
         variant="section"
       />
-      {isSpotlight ? (
+      {isSpotlight && spotlightItem ? (
         <TestimonialCard
           item={spotlightItem}
           align="center"

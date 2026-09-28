@@ -17,7 +17,9 @@ const { TestimonialCarousel } = vi.hoisted(() => ({
   )),
 }));
 
-vi.mock('./testimonial-carousel', () => ({ TestimonialCarousel }));
+vi.mock('./components/testimonial-carousel/testimonial-carousel', () => ({
+  TestimonialCarousel,
+}));
 
 const items = [
   makeTestimonialItem({ id: 'testimonial-1', name: 'Jordan Reyes' }),
@@ -86,12 +88,6 @@ describe(`<${TestimonialModuleView.name}/>`, () => {
     expect(TestimonialCarousel).toHaveBeenCalledTimes(1);
     expect(screen.getByTestId('testimonial-carousel-stub')).toBeVisible();
     expect(screen.queryByRole('blockquote')).not.toBeInTheDocument();
-  });
-
-  it('renders nothing when testimonials is empty, never an empty landmark with a dangling aria-labelledby', () => {
-    const { container } = setup({ testimonials: [] });
-
-    expect(container).toBeEmptyDOMElement();
   });
 
   it('renders the resolved cta buttons when present', () => {

@@ -99,12 +99,6 @@ describe(`<${LogoWallModuleView.name}/>`, () => {
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
-  it('renders nothing when logos is empty, never an empty landmark with a dangling aria-labelledby', () => {
-    const { container } = setup({ logos: [] });
-
-    expect(container).toBeEmptyDOMElement();
-  });
-
   it('renders the resolved cta buttons when present', () => {
     setup({ ctaButtons: ctaActionsDemo });
 

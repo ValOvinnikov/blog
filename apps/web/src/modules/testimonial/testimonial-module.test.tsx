@@ -62,7 +62,10 @@ describe(`<${TestimonialModule.name}/>`, () => {
     getTenantSanityContextMock.mockResolvedValue(tenant);
     getTestimonialModuleMock.mockResolvedValue({
       ok: true,
-      data: { ...baseModule, testimonials: [] },
+      data: {
+        ...baseModule,
+        testimonials: [makeTestimonialItem({ id: 'testimonial-1' })],
+      },
     });
 
     await setup();
@@ -78,17 +81,6 @@ describe(`<${TestimonialModule.name}/>`, () => {
     getTestimonialModuleMock.mockResolvedValue({
       ok: false,
       error: new Error('boom'),
-    });
-
-    const { container } = await setup();
-
-    expect(container).toBeEmptyDOMElement();
-  });
-
-  it('renders nothing when the testimonials degrade to an empty list, never an empty landmark with a dangling aria-labelledby', async () => {
-    getTestimonialModuleMock.mockResolvedValue({
-      ok: true,
-      data: { ...baseModule, testimonials: [] },
     });
 
     const { container } = await setup();

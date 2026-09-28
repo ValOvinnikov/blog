@@ -27,8 +27,6 @@ export const TestimonialModule = async ({
     });
     return null;
   }
-  if (result.data.testimonials.length === 0) return null;
-
   return (
     <TestimonialModuleView
       {...result.data}

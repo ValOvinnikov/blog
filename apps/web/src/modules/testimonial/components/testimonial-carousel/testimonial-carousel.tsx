@@ -7,8 +7,7 @@ import type {
 } from '@blog/config';
 import type { TTestimonialItem } from '@blog/service';
 import { LabelledCarousel } from '@web/components/shared/labelled-carousel';
-
-import { TestimonialCard } from './testimonial-card';
+import { TestimonialCard } from '@web/modules/testimonial/components/testimonial-card/testimonial-card';
 
 export interface ITestimonialCarouselProps
   extends IWithClassName, IWithDataTestId {
