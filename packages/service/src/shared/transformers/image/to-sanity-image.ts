@@ -10,13 +10,13 @@ import type { InferFragmentType } from 'groqd';
 
 export type TRawSanityImage = InferFragmentType<typeof sanityImageFragment>;
 
-// Same shape as `TRawSanityImage`, but the asset and alt are nullable —
-// accepted so a `bodyImage` block whose asset was never selected, points at
-// a deleted document, or is missing alt text (`bodyImageFragment`'s shape),
-// is a valid argument too.
 type TRawSanityImageInput = Omit<TRawSanityImage, 'asset' | 'alt'> & {
   asset: TRawSanityImage['asset'] | null;
   alt: TRawSanityImage['alt'] | null;
+};
+
+type TRawSanityImageInputWithAsset = Omit<TRawSanityImageInput, 'asset'> & {
+  asset: TRawSanityImage['asset'];
 };
 
 function toHotspot(
@@ -71,6 +71,10 @@ function toDimensions(
   };
 }
 
+export function toSanityImage(raw: TRawSanityImageInputWithAsset): ISanityImage;
+export function toSanityImage(
+  raw: TRawSanityImageInput | null | undefined,
+): TMaybeUndefined<ISanityImage>;
 export function toSanityImage(
   raw: TRawSanityImageInput | null | undefined,
 ): TMaybeUndefined<ISanityImage> {
