@@ -40,6 +40,12 @@
   --color-border-emphasis: var(
     --border-emphasis
   ); /* @role high-contrast structural boundary */
+  --color-ambient: var(
+    --ambient
+  ); /* @role ring-offset colour of the surface in scope */
+  --color-divider: var(
+    --divider
+  ); /* @role divider colour of the surface in scope */
   --color-text: var(--text); /* @role primary ink */
   --color-text-muted: var(--text-muted); /* @role secondary body text */
   --color-text-subtle: var(--text-subtle); /* @role metadata / low emphasis */
@@ -250,6 +256,12 @@
      --primary-subtle — both clear the WCAG 1.4.11 3:1 non-text minimum
      (--border-strong itself only reaches 1.69:1 / 2.14:1 there). */
   --border-emphasis: oklch(0.62 0.006 250);
+  /* Ambient surface context: descendants read these for ring-offset/divider
+     colour instead of a hardcoded --primary/--border, so a `surface-secondary`/
+     `surface-brand-primary` ancestor (below) changes them for everything
+     inside it, with no per-component prop. */
+  --ambient: var(--primary);
+  --divider: var(--border);
   --text: oklch(0.2 0.01 250);
   --text-muted: oklch(0.46 0.01 250);
   --text-subtle: oklch(0.6 0.008 250);
@@ -497,6 +509,19 @@
 
 @utility max-w-copy {
   max-width: var(--container-copy);
+}
+
+/* Ambient-surface overrides: apply to an element that changes its own
+   background, so descendants' ring-offset-ambient/border-divider utilities
+   resolve against that background instead of the page default. */
+@utility surface-secondary {
+  --ambient: var(--secondary);
+  --divider: var(--border-strong);
+}
+
+@utility surface-brand-primary {
+  --ambient: var(--brand-primary-muted);
+  --divider: var(--border-strong);
 }
 
 /* Toast timer/drain bar (#1140): the linear rate is applied per-instance via
