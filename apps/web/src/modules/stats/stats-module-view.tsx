@@ -1,5 +1,4 @@
 import type { TStatsModule } from '@blog/service';
-import { Text } from '@blog/ui/components/atoms/text';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';
@@ -53,7 +52,7 @@ export const StatsModuleView = ({
           </div>
         ))}
       </dl>
-      {footnote && <Text variant="meta">{footnote}</Text>}
+      {footnote && <p className={v.footnote()}>{footnote}</p>}
       {ctaButtons.length > 0 && (
         <div className={s.actions()}>
           <ActionGroup actions={ctaButtons} />

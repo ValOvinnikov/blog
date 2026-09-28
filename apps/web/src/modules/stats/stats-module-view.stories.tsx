@@ -106,3 +106,34 @@ export const CenterAligned: TStory = {
     contentAlignment: CONTENT_ALIGNMENT.CENTER,
   },
 };
+
+export const LeftAlignedWithFootnote: TStory = {
+  args: {
+    stats,
+    footnote: 'Figures reflect the trailing 12 months.',
+    contentAlignment: CONTENT_ALIGNMENT.LEFT,
+  },
+};
+
+export const CenterAlignedWithFootnote: TStory = {
+  args: {
+    stats,
+    footnote: 'Figures reflect the trailing 12 months.',
+    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+  },
+};
+
+export const RightAlignedWithFootnote: TStory = {
+  args: {
+    stats,
+    footnote: 'Figures reflect the trailing 12 months.',
+    contentAlignment: CONTENT_ALIGNMENT.RIGHT,
+  },
+};
+
+export const Secondary: TStory = {
+  args: {
+    stats,
+    brandVariant: BRAND_VARIANT.SECONDARY,
+  },
+};
