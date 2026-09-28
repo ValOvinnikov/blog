@@ -7,6 +7,7 @@ import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic/topi
 import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
 import { PAGE_POST_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/post-index/post-index-type';
+import { accessibleLabelField } from '@blog/studio/schema-types/fields/accessible-label-field/accessible-label-field';
 import { Link2 } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
@@ -36,13 +37,7 @@ export const inlineLinkSchema = defineType({
       description: 'Visible link text.',
       validation: (rule) => rule.required().max(40),
     }),
-    defineField({
-      name: 'accessibleLabel',
-      title: 'Accessible Label',
-      type: 'string',
-      description:
-        "Optional: override the accessible name announced by screen readers and used by search engines, when the visible link text alone isn't descriptive enough — e.g. a generic 'Read more' button. Leave empty to use the visible text as-is.",
-    }),
+    accessibleLabelField(),
     defineField({
       name: 'linkType',
       title: 'Link Type',

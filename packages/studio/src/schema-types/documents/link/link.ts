@@ -1,5 +1,6 @@
 import { LINK_TYPE } from '@blog/config/constants';
 import { LINK_PAGE_TYPES } from '@blog/studio/schema-types/documents/link/link-page-types';
+import { accessibleLabelField } from '@blog/studio/schema-types/fields/accessible-label-field/accessible-label-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { Link2 } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
@@ -41,6 +42,7 @@ export const linkSchema = defineType({
         'The visible link text readers see wherever this link is used.',
       validation: (rule) => rule.required().max(60),
     }),
+    accessibleLabelField(),
     defineField({
       name: 'linkType',
       title: 'Link Type',
