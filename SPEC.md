@@ -726,8 +726,8 @@ be published — which is what lets every consumer below treat the visual as
 guaranteed instead of testing for its absence.
 
 `module_featureList` ("Features") references those cards through a `features`
-array, validated with `unique()`, `min(2)` and `max(8)` as separate rule chains.
-Two is the floor because a
+array, validated with `required()`, `unique()`, `min(2)` and `max(8)` as
+separate rule chains. Two is the floor because a
 lone card is a statement rather than a grid; eight is the ceiling because the
 column rule below stops producing balanced rows past it. It carries the usual
 module furniture — `title`, `brandVariant` (the default
@@ -769,18 +769,19 @@ passing the stored value straight through.
 **An empty-array guard mirrors what Studio enforces on that field, and nothing
 more.** Where a module's array pairs `required()` with a `min()`, an empty list
 is a state the content model forbids, so `apps/web` does not check for it —
-`module_testimonial`, `module_logoWall`, `module_stats` and `module_faq` render
-whatever they are handed, in the module and in the view alike. The trade is
-deliberate: a document written around Studio's validation costs an empty section
-rather than a disappeared one, which is the cheaper failure and the visible one.
+`module_featureList`, `module_testimonial`, `module_logoWall`, `module_stats`
+and `module_faq` render whatever they are handed, in the module and in the view
+alike. The trade is deliberate: a document written around Studio's validation
+costs an empty section rather than a disappeared one, which is the cheaper
+failure and the visible one.
 
-`module_featureList` is the exception, and the reason the rule is stated per
-field rather than per module. `features` is modelled nullable — `min(2)` is a
-validation rule, not `.required()`, and validation never applies to a document
-written outside Studio — so `service.modules.featureList.v1.getFeatureList`
-yields an empty `items` array whenever the authored array is absent, empty, or
-below two, matching how `postTakeaways` degrades below its own `min(3)`. Its
-guard is load-bearing until `required()` joins the `min(2)`, and stays.
+The service layer still models `features` nullable, because validation never
+applies to a document written outside Studio, so
+`service.modules.featureList.v1.getFeatureList` yields an empty `items` array
+whenever the authored array is absent, empty, or below two, matching how
+`postTakeaways` degrades below its own `min(3)`. That is a projection's
+tolerance for what it cannot guarantee, not a second place to re-decide what
+`required()` and `min(2)` already settle.
 
 `ctaButtons` is the same rule read from the other side, and is not a guard at
 all. `ctaButtonsField` defaults to `min = 0`, so a module with no actions is a
