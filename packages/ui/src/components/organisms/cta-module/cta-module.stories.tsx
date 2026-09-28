@@ -3,6 +3,7 @@ import {
   CONTENT_ALIGNMENT,
   CTA_VARIANT,
   MEDIA_ORDER,
+  SPACING_SCALE,
 } from '@blog/config';
 import { Button } from '@blog/ui/components/atoms/button';
 import { objectKeys } from '@blog/utils/primitives';
@@ -63,6 +64,14 @@ const meta = {
     mobileMediaOrder: {
       control: 'select',
       options: objectKeys(ctaModuleVariants.variants.mobileMediaOrder),
+    },
+    spacingTop: {
+      control: 'select',
+      options: objectKeys(ctaModuleVariants.variants.spacingTop),
+    },
+    spacingBottom: {
+      control: 'select',
+      options: objectKeys(ctaModuleVariants.variants.spacingBottom),
     },
   },
   args: {
@@ -200,6 +209,30 @@ export const BannerAlignRight: TStory = {
       'A hands-on writing intensive. Small cohort, live feedback.',
     actions: PrimaryAndInlineLink,
     footnote: undefined,
+  },
+};
+
+export const BannerSpacingNone: TStory = {
+  args: {
+    ...BannerDefault.args,
+    spacingTop: SPACING_SCALE.NONE,
+    spacingBottom: SPACING_SCALE.NONE,
+  },
+};
+
+export const BannerSpacingMd: TStory = {
+  args: {
+    ...BannerDefault.args,
+    spacingTop: SPACING_SCALE.MD,
+    spacingBottom: SPACING_SCALE.MD,
+  },
+};
+
+export const BannerSpacingXl: TStory = {
+  args: {
+    ...BannerDefault.args,
+    spacingTop: SPACING_SCALE.XL,
+    spacingBottom: SPACING_SCALE.XL,
   },
 };
 

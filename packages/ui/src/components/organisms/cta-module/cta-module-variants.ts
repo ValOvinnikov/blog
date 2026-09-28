@@ -3,6 +3,7 @@ import {
   CONTENT_ALIGNMENT,
   CTA_VARIANT,
   MEDIA_ORDER,
+  SPACING_SCALE,
 } from '@blog/config';
 import { AZURE_SCRIM, NEUTRAL_SCRIM, tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
@@ -13,7 +14,7 @@ export const ctaModuleVariants = tv({
       'relative isolate flex flex-col',
       'mx-auto w-full max-w-4xl overflow-hidden',
       'rounded-xl border border-border shadow-card',
-      'px-6 py-8 sm:px-8 sm:py-10',
+      'px-6 pt-8 pb-8 sm:px-8 sm:pt-10 sm:pb-10',
     ],
     eyebrow: ['mb-3'],
     group: ['max-w-measure', 'text-prose'],
@@ -36,7 +37,7 @@ export const ctaModuleVariants = tv({
         root: [
           'left-1/2 mx-0 w-screen max-w-none -translate-x-1/2',
           'rounded-none border-0 shadow-none',
-          'min-h-[280px] justify-center px-7 py-12 sm:px-10',
+          'min-h-[280px] justify-center px-7 sm:px-10',
         ],
         body: ['max-w-measure', 'text-prose'],
         heading: ['text-white'],
@@ -91,6 +92,20 @@ export const ctaModuleVariants = tv({
     },
     wrapped: {
       true: { root: ['mt-0'] },
+    },
+    spacingTop: {
+      [SPACING_SCALE.NONE]: { root: ['pt-6 sm:pt-6'] },
+      [SPACING_SCALE.SM]: { root: ['pt-8 sm:pt-8'] },
+      [SPACING_SCALE.MD]: { root: ['pt-12 sm:pt-12'] },
+      [SPACING_SCALE.LG]: { root: ['pt-16 sm:pt-16'] },
+      [SPACING_SCALE.XL]: { root: ['pt-24 sm:pt-24'] },
+    },
+    spacingBottom: {
+      [SPACING_SCALE.NONE]: { root: ['pb-6 sm:pb-6'] },
+      [SPACING_SCALE.SM]: { root: ['pb-8 sm:pb-8'] },
+      [SPACING_SCALE.MD]: { root: ['pb-12 sm:pb-12'] },
+      [SPACING_SCALE.LG]: { root: ['pb-16 sm:pb-16'] },
+      [SPACING_SCALE.XL]: { root: ['pb-24 sm:pb-24'] },
     },
   },
   compoundVariants: [
