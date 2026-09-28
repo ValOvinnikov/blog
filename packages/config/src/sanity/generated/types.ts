@@ -36,7 +36,7 @@ export type Module_pricing = {
     } & CtaButton
   >;
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
-  layout?: Layout;
+  layout?: WideLayout;
 };
 
 export type HeadingBlock = {
@@ -240,7 +240,7 @@ export type Module_stats = {
     } & CtaButton
   >;
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
-  layout?: Layout;
+  layout?: WideLayout;
 };
 
 export type PersonReference = {
@@ -275,7 +275,7 @@ export type Module_team = {
     } & CtaButton
   >;
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
-  layout?: Layout;
+  layout?: WideLayout;
 };
 
 export type Block_testimonialReference = {
@@ -307,7 +307,7 @@ export type Module_testimonial = {
   displayMode?: 'GRID' | 'CAROUSEL';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   cardAlignment?: 'LEFT' | 'CENTER';
-  layout?: Layout;
+  layout?: WideLayout;
 };
 
 export type Module_logoWall = {
@@ -334,6 +334,15 @@ export type Module_logoWall = {
   layout?: Layout;
 };
 
+export type Layout = {
+  _type: 'layout';
+  spacingTop?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  spacingBottom?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  containerWidth?: 'NARROW' | 'WIDE' | 'FULL';
+  dividerTop?: boolean;
+  dividerBottom?: boolean;
+};
+
 export type Module_featureHighlights = {
   _id: string;
   _type: 'module_featureHighlights';
@@ -355,7 +364,7 @@ export type Module_featureHighlights = {
   >;
   mediaOrder?: 'LAST' | 'FIRST';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
-  layout?: Layout;
+  layout?: WideLayout;
 };
 
 export type Block_featureReference = {
@@ -388,7 +397,7 @@ export type Module_featureList = {
   displayMode?: 'GRID' | 'CAROUSEL';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   cardAlignment?: 'LEFT' | 'CENTER';
-  layout?: Layout;
+  layout?: WideLayout;
 };
 
 export type Module_postRelated = {
@@ -403,7 +412,7 @@ export type Module_postRelated = {
   limit?: number;
   showImages?: boolean;
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
-  layout?: Layout;
+  layout?: WideLayout;
 };
 
 export type Page_postReference = {
@@ -432,7 +441,7 @@ export type Module_postFeatured = {
   showImages?: boolean;
   displayMode?: 'GRID' | 'CAROUSEL';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
-  layout?: Layout;
+  layout?: WideLayout;
 };
 
 export type Module_postLatest = {
@@ -448,7 +457,7 @@ export type Module_postLatest = {
   showImages?: boolean;
   displayMode?: 'GRID' | 'CAROUSEL';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
-  layout?: Layout;
+  layout?: WideLayout;
 };
 
 export type Module_postList = {
@@ -463,7 +472,7 @@ export type Module_postList = {
   pageSize?: number;
   showImages?: boolean;
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
-  layout?: Layout;
+  layout?: WideLayout;
 };
 
 export type Module_hero = {
@@ -725,19 +734,19 @@ export type BodyImage = {
   layout?: 'INLINE' | 'FULL_BLEED' | 'FLOAT_LEFT' | 'FLOAT_RIGHT';
 };
 
-export type HeroLayout = {
-  _type: 'heroLayout';
+export type WideLayout = {
+  _type: 'wideLayout';
   spacingTop?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
   spacingBottom?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  containerWidth?: 'WIDE' | 'FULL';
   dividerTop?: boolean;
   dividerBottom?: boolean;
 };
 
-export type Layout = {
-  _type: 'layout';
+export type HeroLayout = {
+  _type: 'heroLayout';
   spacingTop?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
   spacingBottom?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
-  containerWidth?: 'NARROW' | 'WIDE' | 'FULL';
   dividerTop?: boolean;
   dividerBottom?: boolean;
 };
@@ -1297,7 +1306,7 @@ export type Module_taxonomyList = {
   limit?: number;
   showLatestPosts?: boolean;
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
-  layout?: Layout;
+  layout?: WideLayout;
 };
 
 export type Page_topic = {
@@ -1839,6 +1848,7 @@ export type AllSanitySchemaTypes =
   | Block_testimonialReference
   | Module_testimonial
   | Module_logoWall
+  | Layout
   | Module_featureHighlights
   | Block_featureReference
   | Module_featureList
@@ -1873,8 +1883,8 @@ export type AllSanitySchemaTypes =
   | LinkRef
   | Aside
   | BodyImage
+  | WideLayout
   | HeroLayout
-  | Layout
   | MigrationState
   | Settings_theme
   | Settings_newsletter

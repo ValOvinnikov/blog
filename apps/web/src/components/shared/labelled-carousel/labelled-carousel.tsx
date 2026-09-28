@@ -5,7 +5,10 @@ import type {
   IWithDataTestId,
   TBrandVariant,
 } from '@blog/config';
-import { Carousel } from '@blog/ui/components/organisms/carousel';
+import {
+  Carousel,
+  type ICarouselProps,
+} from '@blog/ui/components/organisms/carousel';
 import { useTranslations } from 'next-intl';
 import type { Key, ReactNode } from 'react';
 
@@ -16,6 +19,7 @@ export interface ILabelledCarouselProps<T>
   getItemKey?: (args: { item: T; index: number }) => Key;
   title: string;
   tone?: TBrandVariant;
+  slideSize?: ICarouselProps<T>['slideSize'];
 }
 
 /**
@@ -28,6 +32,7 @@ export const LabelledCarousel = <T,>({
   getItemKey,
   title,
   tone,
+  slideSize,
   className,
   dataTestId,
 }: ILabelledCarouselProps<T>) => {
@@ -42,6 +47,7 @@ export const LabelledCarousel = <T,>({
       previousLabel={t('previousAriaLabel')}
       nextLabel={t('nextAriaLabel')}
       tone={tone}
+      slideSize={slideSize}
       className={className}
       dataTestId={dataTestId}
     />

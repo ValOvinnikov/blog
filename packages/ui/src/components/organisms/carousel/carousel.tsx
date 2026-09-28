@@ -10,7 +10,7 @@ import { Icon } from '@blog/ui/components/atoms/icon';
 import { IconButton } from '@blog/ui/components/atoms/icon-button';
 import type { Key, ReactNode } from 'react';
 
-import { carouselVariants } from './carousel-variants';
+import { carouselVariants, type TCarouselVariants } from './carousel-variants';
 import { useCarousel } from './use-carousel';
 
 export interface ICarouselProps<T> extends IWithClassName, IWithDataTestId {
@@ -21,6 +21,7 @@ export interface ICarouselProps<T> extends IWithClassName, IWithDataTestId {
   previousLabel: string;
   nextLabel: string;
   tone?: TBrandVariant;
+  slideSize?: TCarouselVariants['slideSize'];
 }
 
 /** Scrolls through a row of items, revealing more of them as the viewport widens. */
@@ -32,30 +33,20 @@ export const Carousel = <T,>({
   previousLabel,
   nextLabel,
   tone = BRAND_VARIANT.PRIMARY,
+  slideSize = 'fraction',
   className,
   dataTestId,
 }: ICarouselProps<T>) => {
-  const {
-    isEnhanced,
-    isPreviousDisabled,
-    isNextDisabled,
-    viewportRef,
-    regionRef,
-    previousButtonRef,
-    nextButtonRef,
-    scrollPrev,
-    scrollNext,
-  } = useCarousel();
+  const { canScrollPrev, canScrollNext, viewportRef, scrollPrev, scrollNext } =
+    useCarousel();
 
-  const s = carouselVariants({ isEnhanced });
+  const s = carouselVariants({ slideSize });
 
   return (
     <div
-      ref={regionRef}
       role="region"
       aria-roledescription="carousel"
       aria-label={ariaLabel}
-      tabIndex={-1}
       className={className}
       data-testid={dataTestId}
     >
@@ -71,25 +62,25 @@ export const Carousel = <T,>({
           ))}
         </ul>
       </div>
-      {(!isEnhanced || !(isPreviousDisabled && isNextDisabled)) && (
+      {(canScrollPrev || canScrollNext) && (
         <div className={s.controls()}>
           <IconButton
-            ref={previousButtonRef}
             ariaLabel={previousLabel}
             title={previousLabel}
             onClick={scrollPrev}
-            isDisabled={isPreviousDisabled}
+            isDisabled={!canScrollPrev}
+            isFocusableWhenDisabled={true}
             variant="control"
             tone={tone}
           >
             <Icon name={ICONS.CHEVRON_LEFT} size={SIZE.SM} />
           </IconButton>
           <IconButton
-            ref={nextButtonRef}
             ariaLabel={nextLabel}
             title={nextLabel}
             onClick={scrollNext}
-            isDisabled={isNextDisabled}
+            isDisabled={!canScrollNext}
+            isFocusableWhenDisabled={true}
             variant="control"
             tone={tone}
           >

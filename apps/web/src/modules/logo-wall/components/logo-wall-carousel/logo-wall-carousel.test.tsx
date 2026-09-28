@@ -56,7 +56,7 @@ describe(`<${LogoWallCarousel.name}/>`, () => {
     logos.forEach((item, index) => {
       const { unmount } = renderElement(<>{renderItem({ item, index })}</>);
 
-      expect(screen.getByRole('img', { name: item.name })).toBeInTheDocument();
+      expect(screen.getByRole('img', { name: item.name })).toBeVisible();
 
       unmount();
     });

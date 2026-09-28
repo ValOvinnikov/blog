@@ -121,13 +121,13 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByText('Lead post')).toBeInTheDocument();
-    expect(screen.getByText('Second post')).toBeInTheDocument();
-    expect(screen.getByText('Third post')).toBeInTheDocument();
+    expect(screen.getByText('Lead post')).toBeVisible();
+    expect(screen.getByText('Second post')).toBeVisible();
+    expect(screen.getByText('Third post')).toBeVisible();
     const tailGrid = screen.getByTestId(
       'post-featured-module-post-featured-1-tail-grid',
     );
-    expect(tailGrid).toBeInTheDocument();
+    expect(tailGrid).toBeVisible();
     expect(tailGrid).not.toHaveTextContent('Lead post');
   });
 

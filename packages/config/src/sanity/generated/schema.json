@@ -142,7 +142,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "layout"
+          "name": "wideLayout"
         },
         "optional": true
       }
@@ -1547,7 +1547,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "layout"
+          "name": "wideLayout"
         },
         "optional": true
       }
@@ -1784,7 +1784,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "layout"
+          "name": "wideLayout"
         },
         "optional": true
       }
@@ -1990,7 +1990,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "layout"
+          "name": "wideLayout"
         },
         "optional": true
       }
@@ -2156,6 +2156,115 @@
     }
   },
   {
+    "name": "layout",
+    "type": "type",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "layout"
+          }
+        },
+        "spacingTop": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "NONE"
+              },
+              {
+                "type": "string",
+                "value": "SM"
+              },
+              {
+                "type": "string",
+                "value": "MD"
+              },
+              {
+                "type": "string",
+                "value": "LG"
+              },
+              {
+                "type": "string",
+                "value": "XL"
+              }
+            ]
+          },
+          "optional": true
+        },
+        "spacingBottom": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "NONE"
+              },
+              {
+                "type": "string",
+                "value": "SM"
+              },
+              {
+                "type": "string",
+                "value": "MD"
+              },
+              {
+                "type": "string",
+                "value": "LG"
+              },
+              {
+                "type": "string",
+                "value": "XL"
+              }
+            ]
+          },
+          "optional": true
+        },
+        "containerWidth": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "NARROW"
+              },
+              {
+                "type": "string",
+                "value": "WIDE"
+              },
+              {
+                "type": "string",
+                "value": "FULL"
+              }
+            ]
+          },
+          "optional": true
+        },
+        "dividerTop": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        },
+        "dividerBottom": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      }
+    }
+  },
+  {
     "name": "module_featureHighlights",
     "type": "document",
     "attributes": {
@@ -2308,7 +2417,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "layout"
+          "name": "wideLayout"
         },
         "optional": true
       }
@@ -2535,7 +2644,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "layout"
+          "name": "wideLayout"
         },
         "optional": true
       }
@@ -2647,7 +2756,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "layout"
+          "name": "wideLayout"
         },
         "optional": true
       }
@@ -2845,7 +2954,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "layout"
+          "name": "wideLayout"
         },
         "optional": true
       }
@@ -2974,7 +3083,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "layout"
+          "name": "wideLayout"
         },
         "optional": true
       }
@@ -3086,7 +3195,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "layout"
+          "name": "wideLayout"
         },
         "optional": true
       }
@@ -4681,7 +4790,7 @@
     }
   },
   {
-    "name": "heroLayout",
+    "name": "wideLayout",
     "type": "type",
     "value": {
       "type": "object",
@@ -4690,95 +4799,7 @@
           "type": "objectAttribute",
           "value": {
             "type": "string",
-            "value": "heroLayout"
-          }
-        },
-        "spacingTop": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "union",
-            "of": [
-              {
-                "type": "string",
-                "value": "NONE"
-              },
-              {
-                "type": "string",
-                "value": "SM"
-              },
-              {
-                "type": "string",
-                "value": "MD"
-              },
-              {
-                "type": "string",
-                "value": "LG"
-              },
-              {
-                "type": "string",
-                "value": "XL"
-              }
-            ]
-          },
-          "optional": true
-        },
-        "spacingBottom": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "union",
-            "of": [
-              {
-                "type": "string",
-                "value": "NONE"
-              },
-              {
-                "type": "string",
-                "value": "SM"
-              },
-              {
-                "type": "string",
-                "value": "MD"
-              },
-              {
-                "type": "string",
-                "value": "LG"
-              },
-              {
-                "type": "string",
-                "value": "XL"
-              }
-            ]
-          },
-          "optional": true
-        },
-        "dividerTop": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "boolean"
-          },
-          "optional": true
-        },
-        "dividerBottom": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "boolean"
-          },
-          "optional": true
-        }
-      }
-    }
-  },
-  {
-    "name": "layout",
-    "type": "type",
-    "value": {
-      "type": "object",
-      "attributes": {
-        "_type": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string",
-            "value": "layout"
+            "value": "wideLayout"
           }
         },
         "spacingTop": {
@@ -4846,15 +4867,99 @@
             "of": [
               {
                 "type": "string",
-                "value": "NARROW"
-              },
-              {
-                "type": "string",
                 "value": "WIDE"
               },
               {
                 "type": "string",
                 "value": "FULL"
+              }
+            ]
+          },
+          "optional": true
+        },
+        "dividerTop": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        },
+        "dividerBottom": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      }
+    }
+  },
+  {
+    "name": "heroLayout",
+    "type": "type",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "heroLayout"
+          }
+        },
+        "spacingTop": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "NONE"
+              },
+              {
+                "type": "string",
+                "value": "SM"
+              },
+              {
+                "type": "string",
+                "value": "MD"
+              },
+              {
+                "type": "string",
+                "value": "LG"
+              },
+              {
+                "type": "string",
+                "value": "XL"
+              }
+            ]
+          },
+          "optional": true
+        },
+        "spacingBottom": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "NONE"
+              },
+              {
+                "type": "string",
+                "value": "SM"
+              },
+              {
+                "type": "string",
+                "value": "MD"
+              },
+              {
+                "type": "string",
+                "value": "LG"
+              },
+              {
+                "type": "string",
+                "value": "XL"
               }
             ]
           },
@@ -7667,7 +7772,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "layout"
+          "name": "wideLayout"
         },
         "optional": true
       }

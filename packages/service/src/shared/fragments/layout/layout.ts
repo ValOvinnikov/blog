@@ -8,6 +8,16 @@ export const layoutFragment = q.fragmentForType<'layout'>().project((sub) => ({
   dividerBottom: sub.field('dividerBottom').nullable(true),
 }));
 
+export const wideLayoutFragment = q
+  .fragmentForType<'wideLayout'>()
+  .project((sub) => ({
+    spacingTop: sub.field('spacingTop').nullable(true),
+    spacingBottom: sub.field('spacingBottom').nullable(true),
+    containerWidth: sub.field('containerWidth').nullable(true),
+    dividerTop: sub.field('dividerTop').nullable(true),
+    dividerBottom: sub.field('dividerBottom').nullable(true),
+  }));
+
 export const heroLayoutFragment = q
   .fragmentForType<'heroLayout'>()
   .project((sub) => ({

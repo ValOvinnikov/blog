@@ -32,15 +32,13 @@ describe(`<${TestimonialCard.name}/>`, () => {
     });
 
     it('renders the name and role', () => {
-      expect(
-        screen.getByText(item.name, { ignore: '.sr-only' }),
-      ).toBeInTheDocument();
-      expect(screen.getByText(item.role!)).toBeInTheDocument();
+      expect(screen.getByText(item.name, { ignore: '.sr-only' })).toBeVisible();
+      expect(screen.getByText(item.role!)).toBeVisible();
     });
 
     it('renders the initials, never an empty avatar, when the item has no image', () => {
       expect(screen.queryByRole('img')).not.toBeInTheDocument();
-      expect(screen.getByText('JR')).toBeInTheDocument();
+      expect(screen.getByText('JR')).toBeVisible();
     });
 
     it('renders no link when the item has none', () => {
@@ -51,7 +49,7 @@ describe(`<${TestimonialCard.name}/>`, () => {
   it('renders the image over the initials when the item has one', () => {
     setup({ item: makeTestimonialItem({ image: makeSanityImage() }) });
 
-    expect(screen.getByRole('img')).toBeInTheDocument();
+    expect(screen.getByRole('img')).toBeVisible();
     expect(screen.queryByText('JR')).not.toBeInTheDocument();
   });
 

@@ -2,14 +2,16 @@ import type { TLayout, TMaybeUndefined } from '@blog/config';
 import type {
   heroLayoutFragment,
   layoutFragment,
+  wideLayoutFragment,
 } from '@blog/service/shared/fragments/layout/layout';
 import type { InferFragmentType } from 'groqd';
 
 export type TRawLayout = InferFragmentType<typeof layoutFragment>;
 export type TRawHeroLayout = InferFragmentType<typeof heroLayoutFragment>;
+export type TRawWideLayout = InferFragmentType<typeof wideLayoutFragment>;
 
 export function toLayout(
-  raw: TRawLayout | TRawHeroLayout | null | undefined,
+  raw: TRawLayout | TRawHeroLayout | TRawWideLayout | null | undefined,
 ): TMaybeUndefined<TLayout> {
   if (!raw) return undefined;
 

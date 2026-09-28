@@ -46,8 +46,11 @@ export const heroVariants = tv({
     },
     alignment: {
       [CONTENT_ALIGNMENT.LEFT]: { copy: ['text-left'] },
-      [CONTENT_ALIGNMENT.CENTER]: { copy: ['text-center'] },
-      [CONTENT_ALIGNMENT.RIGHT]: { copy: ['text-right'] },
+      [CONTENT_ALIGNMENT.CENTER]: {
+        copy: ['text-center'],
+        excerpt: ['mx-auto'],
+      },
+      [CONTENT_ALIGNMENT.RIGHT]: { copy: ['text-right'], excerpt: ['ml-auto'] },
     },
     mediaOrder: {
       [MEDIA_ORDER.FIRST]: {},

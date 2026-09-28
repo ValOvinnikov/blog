@@ -59,9 +59,7 @@ describe(`<${PostFeaturedModuleView.name}/>`, () => {
       'data-testid',
       'post-featured-module-featured-1',
     );
-    expect(
-      screen.getByRole('region', { name: 'Featured' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Featured' })).toBeVisible();
   });
 
   it('renders the first item as a lead card with a level-3 heading link', () => {
@@ -71,7 +69,7 @@ describe(`<${PostFeaturedModuleView.name}/>`, () => {
     expect(link).toHaveAttribute('href', leadPost.href);
     expect(
       screen.getByRole('heading', { level: 3, name: 'Lead post' }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
   });
 
   it('renders nothing (no lead group, no cards) when items is empty', () => {
@@ -89,7 +87,7 @@ describe(`<${PostFeaturedModuleView.name}/>`, () => {
     expect(screen.getAllByRole('article')).toHaveLength(1);
     expect(
       screen.getByTestId('post-featured-module-featured-1-lead'),
-    ).toBeInTheDocument();
+    ).toBeVisible();
     expect(
       screen.queryByTestId('post-featured-module-featured-1-tail'),
     ).not.toBeInTheDocument();
@@ -101,15 +99,15 @@ describe(`<${PostFeaturedModuleView.name}/>`, () => {
   it('renders exactly one tail card when two items resolve', () => {
     setup({ items: [leadPost, secondPost], hasImages: true });
 
-    expect(screen.getByText('Lead post')).toBeInTheDocument();
-    expect(screen.getByText('Second post')).toBeInTheDocument();
+    expect(screen.getByText('Lead post')).toBeVisible();
+    expect(screen.getByText('Second post')).toBeVisible();
     expect(screen.getAllByRole('article')).toHaveLength(2);
     expect(
       screen.queryByTestId('post-featured-module-featured-1-tail-grid'),
     ).not.toBeInTheDocument();
     expect(
       screen.getByTestId('post-featured-module-featured-1-tail'),
-    ).toBeInTheDocument();
+    ).toBeVisible();
   });
 
   it('renders a two-column grid of the remaining posts when three or more items resolve', () => {
@@ -119,8 +117,8 @@ describe(`<${PostFeaturedModuleView.name}/>`, () => {
       'post-featured-module-featured-1-tail-grid',
     );
 
-    expect(within(tailGrid).getByText('Second post')).toBeInTheDocument();
-    expect(within(tailGrid).getByText('Third post')).toBeInTheDocument();
+    expect(within(tailGrid).getByText('Second post')).toBeVisible();
+    expect(within(tailGrid).getByText('Third post')).toBeVisible();
     expect(within(tailGrid).queryByText('Lead post')).not.toBeInTheDocument();
     expect(screen.getAllByRole('article')).toHaveLength(3);
   });
@@ -134,8 +132,8 @@ describe(`<${PostFeaturedModuleView.name}/>`, () => {
   it('renders a media region for the lead card when hasImages is true', () => {
     setup({ hasImages: true });
 
-    expect(screen.getByTestId('media-card-media')).toBeInTheDocument();
-    expect(screen.getByTestId('lead-image')).toBeInTheDocument();
+    expect(screen.getByTestId('media-card-media')).toBeVisible();
+    expect(screen.getByTestId('lead-image')).toBeVisible();
   });
 
   it('renders CardCarousel with the view items when displayMode is CAROUSEL', () => {
@@ -144,7 +142,7 @@ describe(`<${PostFeaturedModuleView.name}/>`, () => {
       displayMode: DISPLAY_MODE.CAROUSEL,
     });
 
-    expect(screen.getByTestId('card-carousel-stub')).toBeInTheDocument();
+    expect(screen.getByTestId('card-carousel-stub')).toBeVisible();
     expect(CardCarousel).toHaveBeenCalledWith(
       expect.objectContaining({ items: [leadPost, secondPost, thirdPost] }),
       undefined,

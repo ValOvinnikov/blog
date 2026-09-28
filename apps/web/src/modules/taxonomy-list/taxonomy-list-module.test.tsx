@@ -110,7 +110,7 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
       expect(screen.getByText('5 posts')).toBeVisible();
       expect(
         screen.getByRole('heading', { level: 2, name: 'Topics' }),
-      ).toBeInTheDocument();
+      ).toBeVisible();
     });
 
     it('derives titleId and dataTestId from the module id', async () => {
@@ -142,7 +142,7 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
       expect(screen.getByText('5 posts')).toBeVisible();
       expect(
         screen.getByRole('heading', { level: 2, name: 'Tags' }),
-      ).toBeInTheDocument();
+      ).toBeVisible();
     });
 
     it('renders a labeled section with the topics empty message when entries is empty', async () => {

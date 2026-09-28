@@ -26,7 +26,7 @@ describe(`<${ModuleHeading.name}/>`, () => {
 
     expect(
       screen.getByRole('heading', { level: 3, name: 'Latest posts' }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
   });
 
   it('renders no supporting text paragraph when supportingText is absent', () => {

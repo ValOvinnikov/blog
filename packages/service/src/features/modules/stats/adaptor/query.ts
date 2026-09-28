@@ -1,7 +1,7 @@
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
 import { ctaButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
-import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { wideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 
 export const statsModuleQuery = q
   .parameters<TModuleQueryParams>()
@@ -29,6 +29,6 @@ export const statsModuleQuery = q
       .project(ctaButtonFragment)
       .nullable(true),
     contentAlignment: sub.field('contentAlignment').nullable(true),
-    layout: sub.field('layout').project(layoutFragment).nullable(true),
+    layout: sub.field('layout').project(wideLayoutFragment).nullable(true),
   }))
   .notNull();

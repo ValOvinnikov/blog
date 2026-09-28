@@ -43,6 +43,22 @@ const renderImageItem = ({ item }: { item: TImageItem }) => (
   />
 );
 
+type TLogoItem = { id: number; name: string };
+
+const buildLogoItems = (count: number): TLogoItem[] =>
+  Array.from({ length: count }, (_, index) => ({
+    id: index,
+    name: faker.company.name(),
+  }));
+
+const renderLogoItem = ({ item }: { item: TLogoItem }) => (
+  <div className="flex size-48 items-center justify-center rounded-lg border border-border bg-surface p-4">
+    <p className="text-center font-mono text-label text-muted uppercase">
+      {item.name}
+    </p>
+  </div>
+);
+
 const meta = {
   title: 'Organisms/Carousel',
   component: Carousel,
@@ -52,6 +68,10 @@ const meta = {
     tone: {
       control: 'select',
       options: Object.values(BRAND_VARIANT),
+    },
+    slideSize: {
+      control: 'select',
+      options: ['fraction', 'content'],
     },
   },
   args: {
@@ -88,6 +108,19 @@ export const WithPlainImages: TStory = {
       ariaLabel="Latest posts"
       previousLabel="Previous slide"
       nextLabel="Next slide"
+    />
+  ),
+};
+
+export const FixedWidthContentSizing: TStory = {
+  render: () => (
+    <Carousel
+      items={buildLogoItems(10)}
+      renderItem={renderLogoItem}
+      ariaLabel="Trusted by"
+      previousLabel="Previous slide"
+      nextLabel="Next slide"
+      slideSize="content"
     />
   ),
 };

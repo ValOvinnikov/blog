@@ -5,7 +5,7 @@ import { displayModeField } from '@blog/studio/schema-types/fields/display-mode-
 import { showImagesField } from '@blog/studio/schema-types/fields/show-images-field/show-images-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
-import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
+import { wideLayoutField } from '@blog/studio/schema-types/objects/wide-layout/wide-layout-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { Clock } from 'lucide-react';
 import { defineField, defineType, type SanityDocument } from 'sanity';
@@ -52,7 +52,7 @@ export const postLatestSchema = defineType({
       title: 'Heading Alignment',
       description: 'Horizontal alignment of the heading and supporting text.',
     }),
-    layoutField,
+    wideLayoutField,
   ],
   preview: {
     select: {

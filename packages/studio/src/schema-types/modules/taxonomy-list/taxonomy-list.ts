@@ -3,7 +3,7 @@ import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fiel
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
-import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
+import { wideLayoutField } from '@blog/studio/schema-types/objects/wide-layout/wide-layout-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { toTitleCase } from '@blog/utils/primitives';
 import { LayoutGrid } from 'lucide-react';
@@ -78,7 +78,7 @@ export const taxonomyListSchema = defineType({
       title: 'Heading Alignment',
       description: 'Horizontal alignment of the heading and supporting text.',
     }),
-    layoutField,
+    wideLayoutField,
   ],
   preview: {
     select: {

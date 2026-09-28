@@ -2,7 +2,7 @@ import { TAXONOMY_KIND, TAXONOMY_SORT } from '@blog/config';
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/published-post';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
-import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { wideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { postLinkFragment } from '@blog/service/shared/fragments/post/post-link';
 import { tagWithPostCountFragment } from '@blog/service/shared/fragments/tag/tag';
 import { topicWithPostCountFragment } from '@blog/service/shared/fragments/topic/topic';
@@ -60,7 +60,7 @@ export const taxonomyListModuleQuery = q
       .field('headingBlock')
       .project(headingBlockFragment)
       .notNull(),
-    layout: sub.field('layout').project(layoutFragment).nullable(true),
+    layout: sub.field('layout').project(wideLayoutFragment).nullable(true),
     contentAlignment: sub.field('contentAlignment').nullable(true),
     taxonomy: sub.raw('taxonomy', taxonomyParser),
     sortOrder: sub.raw(

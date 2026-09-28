@@ -92,9 +92,9 @@ describe(`<${FaqModule.name}/>`, () => {
 
     expect(
       screen.getByRole('button', { name: 'Do you offer refunds?' }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
     expect(
       screen.getByRole('button', { name: 'Is there a free trial?' }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
   });
 });

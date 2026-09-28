@@ -29,16 +29,14 @@ describe(`<${FeatureListCard.name}/>`, () => {
         level: 3,
         name: item.headingBlock.heading,
       }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(item.headingBlock.supportingText!),
-    ).toBeInTheDocument();
+    ).toBeVisible();
+    expect(screen.getByText(item.headingBlock.supportingText!)).toBeVisible();
   });
 
   it('renders the chosen icon when the item has no image', () => {
     setup();
 
-    expect(screen.getByTestId('feature-card-icon')).toBeInTheDocument();
+    expect(screen.getByTestId('feature-card-icon')).toBeVisible();
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
@@ -46,7 +44,7 @@ describe(`<${FeatureListCard.name}/>`, () => {
     const sanityImage = makeSanityImage();
     setup({ item: makeFeatureListItem({ sanityImage, icon: ICONS.STAR }) });
 
-    expect(screen.getByRole('img')).toBeInTheDocument();
+    expect(screen.getByRole('img')).toBeVisible();
     expect(screen.queryByTestId('feature-card-icon')).not.toBeInTheDocument();
   });
 
