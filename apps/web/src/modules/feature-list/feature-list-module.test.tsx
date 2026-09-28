@@ -66,7 +66,10 @@ describe(`<${FeatureListModule.name}/>`, () => {
     getTenantSanityContextMock.mockResolvedValue(tenant);
     getFeatureListMock.mockResolvedValue({
       ok: true,
-      data: { ...baseModule, items: [] },
+      data: {
+        ...baseModule,
+        items: [makeFeatureListItem({ id: 'feature-1' })],
+      },
     });
 
     await setup();
@@ -79,17 +82,6 @@ describe(`<${FeatureListModule.name}/>`, () => {
     getFeatureListMock.mockResolvedValue({
       ok: false,
       error: new Error('boom'),
-    });
-
-    const { container } = await setup();
-
-    expect(container).toBeEmptyDOMElement();
-  });
-
-  it('renders nothing when the items degrade to an empty list, never an empty landmark with a dangling aria-labelledby', async () => {
-    getFeatureListMock.mockResolvedValue({
-      ok: true,
-      data: { ...baseModule, items: [] },
     });
 
     const { container } = await setup();

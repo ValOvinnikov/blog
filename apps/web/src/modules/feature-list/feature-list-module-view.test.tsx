@@ -100,12 +100,6 @@ describe(`<${FeatureListModuleView.name}/>`, () => {
     },
   );
 
-  it('renders nothing when items is empty, never an empty landmark with a dangling aria-labelledby', () => {
-    const { container } = setup({ items: [] });
-
-    expect(container).toBeEmptyDOMElement();
-  });
-
   it('renders no action group when there are no cta buttons', () => {
     setup();
 

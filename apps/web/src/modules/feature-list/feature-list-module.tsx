@@ -27,7 +27,6 @@ export const FeatureListModule = async ({
     });
     return null;
   }
-  if (result.data.items.length === 0) return null;
 
   return (
     <FeatureListModuleView

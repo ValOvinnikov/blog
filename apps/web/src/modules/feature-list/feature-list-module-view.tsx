@@ -38,8 +38,6 @@ export const FeatureListModuleView = ({
   titleId,
   dataTestId,
 }: IFeatureListModuleViewProps) => {
-  if (items.length === 0) return null;
-
   const cardAlign =
     cardAlignment === CONTENT_ALIGNMENT.CENTER ? 'center' : 'left';
   const columns = toModuleGridColumns(items.length);
