@@ -134,7 +134,10 @@ export const LinkedVsUnlinkedName: TStory = {
 
 const BRAND_BANDS = [
   { className: 'bg-primary', tone: BRAND_VARIANT.PRIMARY },
-  { className: 'bg-secondary', tone: BRAND_VARIANT.SECONDARY },
+  {
+    className: 'bg-secondary surface-secondary',
+    tone: BRAND_VARIANT.SECONDARY,
+  },
 ] as const;
 
 const OnEveryBand = (args: TQuoteCardProps) => (

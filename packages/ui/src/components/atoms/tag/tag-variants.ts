@@ -9,7 +9,7 @@ export const tagVariants = tv({
     'tracking-[.06em] uppercase whitespace-nowrap',
     'px-2 py-0.5',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
-    'focus-visible:ring-offset-2 focus-visible:ring-offset-primary',
+    'focus-visible:ring-offset-2 focus-visible:ring-offset-ambient',
   ],
   variants: {
     variant: {
