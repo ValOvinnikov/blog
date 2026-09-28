@@ -12,9 +12,10 @@ export const heroVariants = tv({
     grid: ['grid grid-cols-1 items-stretch gap-[clamp(1.25rem,4vw,2rem)]'],
     copy: ['flex h-full flex-col', 'min-w-0'],
     eyebrow: [],
+    group: ['max-w-measure', 'text-prose'],
     title: ['mt-2.5 mb-3'],
     heading: [],
-    excerpt: ['m-0', 'max-w-[52ch]'],
+    excerpt: ['m-0'],
     body: [],
     media: [],
     overlay: [],
@@ -48,9 +49,9 @@ export const heroVariants = tv({
       [CONTENT_ALIGNMENT.LEFT]: { copy: ['text-left'] },
       [CONTENT_ALIGNMENT.CENTER]: {
         copy: ['text-center'],
-        excerpt: ['mx-auto'],
+        group: ['mx-auto'],
       },
-      [CONTENT_ALIGNMENT.RIGHT]: { copy: ['text-right'], excerpt: ['ml-auto'] },
+      [CONTENT_ALIGNMENT.RIGHT]: { copy: ['text-right'], group: ['ml-auto'] },
     },
     mediaOrder: {
       [MEDIA_ORDER.FIRST]: {},
