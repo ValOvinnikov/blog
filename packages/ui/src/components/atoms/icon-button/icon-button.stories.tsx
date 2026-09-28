@@ -47,6 +47,16 @@ export const Disabled: TStory = {
   args: { isDisabled: true },
 };
 
+export const FocusableWhenDisabled: TStory = {
+  args: {
+    variant: 'control',
+    ariaLabel: 'Next slide',
+    children: <Icon name={ICONS.CHEVRON_RIGHT} size={SIZE.SM} />,
+    isDisabled: true,
+    isFocusableWhenDisabled: true,
+  },
+};
+
 export const Bordered: TStory = {
   args: {
     variant: 'bordered',

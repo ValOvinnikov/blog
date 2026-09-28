@@ -68,7 +68,7 @@ Variants: size: SIZE.SM|SIZE.MD|SIZE.LG
 ### IconButton — `components/atoms/icon-button/icon-button.tsx`
 
 A compact button for icon, labelled, or avatar-triggered actions: a 22×22 icon-only default, a `bordered` variant sized to its text label, a 32×32 circular `avatar` variant, and a 36×36 outlined `control` variant for a standalone control (e.g. carousel navigation).
-Props: ariaLabel: string · title?: string · children: ReactNode · onClick?: MouseEventHandler<HTMLButtonElement> · isDisabled?: boolean · isInert?: boolean · tone?: TBrandVariant · 'aria-expanded'?: AriaAttributes['aria-expanded'] · 'aria-controls'?: AriaAttributes['aria-controls'] · 'aria-haspopup'?: AriaAttributes['aria-haspopup'] · ref?: Ref<HTMLButtonElement> _(extends IWithClassName, TIconButtonVariants, IWithDataTestId)_
+Props: ariaLabel: string · title?: string · children: ReactNode · onClick?: MouseEventHandler<HTMLButtonElement> · isDisabled?: boolean · isFocusableWhenDisabled?: boolean · isInert?: boolean · tone?: TBrandVariant · 'aria-expanded'?: AriaAttributes['aria-expanded'] · 'aria-controls'?: AriaAttributes['aria-controls'] · 'aria-haspopup'?: AriaAttributes['aria-haspopup'] · ref?: Ref<HTMLButtonElement> _(extends IWithClassName, TIconButtonVariants, IWithDataTestId)_
 Variants: variant: bordered|avatar|control · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY|BRAND_VARIANT.BRAND_PRIMARY
 
 ### InlineCode — `components/atoms/inline-code/inline-code.tsx`
@@ -340,7 +340,7 @@ Variants: columns: 1|2|3|4
 
 Scrolls through a row of items, revealing more of them as the viewport widens.
 Props: items: readonly T[] · renderItem: (args: { item: T; index: number }) => ReactNode · getItemKey?: (args: { item: T; index: number }) => Key · ariaLabel: string · previousLabel: string · nextLabel: string · tone?: TBrandVariant · slideSize?: TCarouselVariants['slideSize'] _(extends IWithClassName, IWithDataTestId)_
-Variants: isEnhanced: (boolean) · slideSize: fraction|content
+Variants: slideSize: fraction|content
 
 ### ContentModule — `components/organisms/content-module/content-module.tsx`
 

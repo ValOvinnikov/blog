@@ -10,9 +10,6 @@ faker.seed(123);
 type TListener = (api: TMockEmblaApi) => void;
 
 type TMockEmblaApi = {
-  rootNode: () => { scrollLeft: number };
-  slideNodes: () => { offsetLeft: number }[];
-  scrollTo: ReturnType<typeof vi.fn>;
   scrollPrev: ReturnType<typeof vi.fn>;
   scrollNext: ReturnType<typeof vi.fn>;
   canScrollPrev: ReturnType<typeof vi.fn>;
@@ -22,14 +19,8 @@ type TMockEmblaApi = {
 };
 
 const listeners = new Map<string, Set<TListener>>();
-let currentApi: TMockEmblaApi | undefined;
-let mockViewport: { scrollLeft: number };
-let mockSlides: { offsetLeft: number }[];
 
 const emblaApi: TMockEmblaApi = {
-  rootNode: () => mockViewport,
-  slideNodes: () => mockSlides,
-  scrollTo: vi.fn(),
   scrollPrev: vi.fn(),
   scrollNext: vi.fn(),
   canScrollPrev: vi.fn(() => true),
@@ -51,22 +42,12 @@ const emitEvent = (event: string) => {
   });
 };
 
-const { emblaCarouselOptionsSpy } = vi.hoisted(() => ({
-  emblaCarouselOptionsSpy: vi.fn(),
-}));
-
 vi.mock('embla-carousel-react', () => ({
-  default: (...args: unknown[]) => {
-    emblaCarouselOptionsSpy(...args);
-    return [vi.fn(), currentApi];
-  },
+  default: () => [vi.fn(), emblaApi],
 }));
 
 beforeEach(() => {
   listeners.clear();
-  mockViewport = { scrollLeft: 0 };
-  mockSlides = [];
-  currentApi = emblaApi;
   emblaApi.canScrollPrev.mockReturnValue(true);
   emblaApi.canScrollNext.mockReturnValue(true);
 });
@@ -90,6 +71,11 @@ const carouselElement = (overrides: Partial<ICarouselProps<string>> = {}) => (
 
 const renderCarousel = (overrides?: Partial<ICarouselProps<string>>) =>
   renderElement(carouselElement(overrides));
+
+const queryNavButtons = () => ({
+  previous: screen.queryByRole('button', { name: previousLabel }),
+  next: screen.queryByRole('button', { name: nextLabel }),
+});
 
 const getNavButtons = () => ({
   previous: screen.getByRole('button', { name: previousLabel }),
@@ -184,26 +170,30 @@ describe(`<${Carousel.name}/>`, () => {
     expect(screen.getByTestId('posts-carousel')).toBeVisible();
   });
 
-  it('resets the native scrollLeft and jumps Embla to the slide already in view', () => {
-    mockViewport = { scrollLeft: 240 };
-    mockSlides = [
-      { offsetLeft: 0 },
-      { offsetLeft: 100 },
-      { offsetLeft: 200 },
-      { offsetLeft: 300 },
-    ];
-    currentApi = undefined;
-    const { rerender } = renderCarousel({ dataTestId: 'carousel' });
+  it('renders no nav buttons before Embla reports which directions can scroll', () => {
+    renderCarousel();
 
-    currentApi = emblaApi;
-    rerender(carouselElement({ dataTestId: 'carousel' }));
-
-    expect(mockViewport.scrollLeft).toBe(0);
-    expect(emblaApi.scrollTo).toHaveBeenCalledWith(2, true);
+    const { previous, next } = queryNavButtons();
+    expect(previous).not.toBeInTheDocument();
+    expect(next).not.toBeInTheDocument();
   });
 
-  it('renders both buttons, labelled and titled from previousLabel/nextLabel', () => {
+  it('renders no nav buttons once Embla initializes with nothing scrollable', () => {
+    emblaApi.canScrollPrev.mockReturnValue(false);
+    emblaApi.canScrollNext.mockReturnValue(false);
     renderCarousel();
+
+    emitEvent('init');
+
+    const { previous, next } = queryNavButtons();
+    expect(previous).not.toBeInTheDocument();
+    expect(next).not.toBeInTheDocument();
+  });
+
+  it('renders both nav buttons once Embla initializes with a direction scrollable, labelled and titled', () => {
+    renderCarousel();
+
+    emitEvent('init');
 
     const { previous, next } = getNavButtons();
     expect(previous).toHaveAttribute('title', previousLabel);
@@ -213,6 +203,7 @@ describe(`<${Carousel.name}/>`, () => {
   it('calls scrollPrev/scrollNext on the Embla api when the buttons are clicked', async () => {
     const user = userEvent.setup();
     renderCarousel();
+    emitEvent('init');
 
     const { previous, next } = getNavButtons();
     await user.click(previous);
@@ -222,125 +213,68 @@ describe(`<${Carousel.name}/>`, () => {
     expect(emblaApi.scrollNext).toHaveBeenCalledTimes(1);
   });
 
-  it('disables the previous/next buttons from canScrollPrev/canScrollNext, and follows select', () => {
+  it('marks the nav button at an end of the track aria-disabled, and follows select', () => {
     emblaApi.canScrollPrev.mockReturnValue(false);
     emblaApi.canScrollNext.mockReturnValue(true);
     renderCarousel();
+    emitEvent('init');
 
-    expect(getNavButtons().previous).toBeDisabled();
-    expect(getNavButtons().next).toBeEnabled();
+    expect(getNavButtons().previous).toHaveAttribute('aria-disabled', 'true');
+    expect(getNavButtons().next).not.toHaveAttribute('aria-disabled');
 
     emblaApi.canScrollPrev.mockReturnValue(true);
     emblaApi.canScrollNext.mockReturnValue(false);
     emitEvent('select');
 
-    expect(getNavButtons().previous).toBeEnabled();
-    expect(getNavButtons().next).toBeDisabled();
+    expect(getNavButtons().previous).not.toHaveAttribute('aria-disabled');
+    expect(getNavButtons().next).toHaveAttribute('aria-disabled', 'true');
   });
 
-  it('keeps both nav buttons mounted, disabled, before Embla initializes', () => {
-    currentApi = undefined;
+  it('re-reads the scrollable state on reInit', () => {
     renderCarousel();
+    emitEvent('init');
 
-    const { previous, next } = getNavButtons();
-    expect(previous).toBeDisabled();
-    expect(next).toBeDisabled();
-  });
-
-  it('renders neither nav button when nothing can scroll in either direction', () => {
-    emblaApi.canScrollPrev.mockReturnValue(false);
     emblaApi.canScrollNext.mockReturnValue(false);
-    renderCarousel();
+    emitEvent('reInit');
 
-    expect(
-      screen.queryByRole('button', { name: previousLabel }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', { name: nextLabel }),
-    ).not.toBeInTheDocument();
+    expect(getNavButtons().next).toHaveAttribute('aria-disabled', 'true');
+  });
+
+  it('does nothing when clicking an aria-disabled nav button', async () => {
+    const user = userEvent.setup();
+    emblaApi.canScrollPrev.mockReturnValue(false);
+    renderCarousel();
+    emitEvent('init');
+
+    await user.click(getNavButtons().previous);
+
+    expect(emblaApi.scrollPrev).not.toHaveBeenCalled();
+  });
+
+  it('keeps focus on a nav button once it becomes aria-disabled', () => {
+    renderCarousel();
+    emitEvent('init');
+
+    const previousButton = getNavButtons().previous;
+    previousButton.focus();
+    expect(previousButton).toHaveFocus();
+
+    emblaApi.canScrollPrev.mockReturnValue(false);
+    emitEvent('select');
+
+    expect(getNavButtons().previous).toHaveFocus();
   });
 
   it('brings the nav buttons back once a direction becomes scrollable again', () => {
     emblaApi.canScrollPrev.mockReturnValue(false);
     emblaApi.canScrollNext.mockReturnValue(false);
     renderCarousel();
+    emitEvent('init');
 
     emblaApi.canScrollNext.mockReturnValue(true);
     emitEvent('select');
 
-    expect(getNavButtons().previous).toBeDisabled();
-    expect(getNavButtons().next).toBeEnabled();
+    expect(getNavButtons().previous).toHaveAttribute('aria-disabled', 'true');
+    expect(getNavButtons().next).not.toHaveAttribute('aria-disabled');
   });
-
-  it('re-reads the disabled flags on reInit', () => {
-    renderCarousel();
-
-    emblaApi.canScrollNext.mockReturnValue(false);
-    emitEvent('reInit');
-
-    expect(getNavButtons().next).toBeDisabled();
-  });
-
-  it("configures Embla with the design's fixed options", () => {
-    renderCarousel();
-
-    expect(emblaCarouselOptionsSpy).toHaveBeenCalledWith({
-      align: 'start',
-      slidesToScroll: 1,
-      containScroll: 'trimSnaps',
-      dragFree: false,
-      loop: false,
-      breakpoints: { '(prefers-reduced-motion: reduce)': { duration: 0 } },
-    });
-  });
-
-  it.each([
-    {
-      name: 'moves focus to the sibling nav button before disabling the one that holds it',
-      focusedLabel: nextLabel,
-      canScrollPrev: true,
-      canScrollNext: false,
-      expectedRole: 'button' as const,
-      expectedName: previousLabel,
-    },
-    {
-      name: 'moves focus to the region when both nav buttons disable at once',
-      focusedLabel: nextLabel,
-      canScrollPrev: false,
-      canScrollNext: false,
-      expectedRole: 'region' as const,
-      expectedName: ariaLabel,
-    },
-    {
-      name: 'leaves focus alone when the disabled flags change without focus on a nav button',
-      focusedLabel: previousLabel,
-      canScrollPrev: true,
-      canScrollNext: false,
-      expectedRole: 'button' as const,
-      expectedName: previousLabel,
-    },
-  ])(
-    '$name',
-    ({
-      focusedLabel,
-      canScrollPrev,
-      canScrollNext,
-      expectedRole,
-      expectedName,
-    }) => {
-      renderCarousel();
-
-      const focusTarget = screen.getByRole('button', { name: focusedLabel });
-      focusTarget.focus();
-      expect(focusTarget).toHaveFocus();
-
-      emblaApi.canScrollPrev.mockReturnValue(canScrollPrev);
-      emblaApi.canScrollNext.mockReturnValue(canScrollNext);
-      emitEvent('select');
-
-      expect(
-        screen.getByRole(expectedRole, { name: expectedName }),
-      ).toHaveFocus();
-    },
-  );
 });

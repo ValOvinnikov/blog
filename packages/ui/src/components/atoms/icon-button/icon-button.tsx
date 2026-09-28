@@ -18,6 +18,7 @@ export type TIconButtonProps = IWithClassName &
     children: ReactNode;
     onClick?: MouseEventHandler<HTMLButtonElement>;
     isDisabled?: boolean;
+    isFocusableWhenDisabled?: boolean;
     isInert?: boolean;
     tone?: TBrandVariant;
     'aria-expanded'?: AriaAttributes['aria-expanded'];
@@ -38,25 +39,31 @@ export const IconButton = ({
   ref,
   onClick,
   isDisabled,
+  isFocusableWhenDisabled,
   isInert,
   'aria-expanded': ariaExpanded,
   'aria-controls': ariaControls,
   'aria-haspopup': ariaHaspopup,
-}: TIconButtonProps) => (
-  <button
-    ref={ref}
-    type="button"
-    aria-label={ariaLabel}
-    title={title}
-    onClick={onClick}
-    disabled={isDisabled}
-    inert={isInert}
-    aria-expanded={ariaExpanded}
-    aria-controls={ariaControls}
-    aria-haspopup={ariaHaspopup}
-    data-testid={dataTestId}
-    className={iconButtonVariants({ variant, tone, class: className })}
-  >
-    {children}
-  </button>
-);
+}: TIconButtonProps) => {
+  const isAriaDisabled = Boolean(isDisabled && isFocusableWhenDisabled);
+
+  return (
+    <button
+      ref={ref}
+      type="button"
+      aria-label={ariaLabel}
+      title={title}
+      onClick={isAriaDisabled ? undefined : onClick}
+      disabled={isDisabled && !isFocusableWhenDisabled}
+      aria-disabled={isAriaDisabled || undefined}
+      inert={isInert}
+      aria-expanded={ariaExpanded}
+      aria-controls={ariaControls}
+      aria-haspopup={ariaHaspopup}
+      data-testid={dataTestId}
+      className={iconButtonVariants({ variant, tone, class: className })}
+    >
+      {children}
+    </button>
+  );
+};

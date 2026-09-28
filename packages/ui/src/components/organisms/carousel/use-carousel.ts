@@ -1,81 +1,38 @@
 import type { EmblaCarouselType } from 'embla-carousel';
 import useEmblaCarousel from 'embla-carousel-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-/** Owns the Embla instance behind `Carousel`, including the focus handoff that keeps a disabling nav button from dropping focus. */
 export const useCarousel = () => {
-  const [isEnhanced, setIsEnhanced] = useState(false);
-  const [isPreviousDisabled, setIsPreviousDisabled] = useState(true);
-  const [isNextDisabled, setIsNextDisabled] = useState(true);
+  const [canScrollPrev, setCanScrollPrev] = useState(false);
+  const [canScrollNext, setCanScrollNext] = useState(false);
   const [viewportRef, embla] = useEmblaCarousel({
     align: 'start',
-    slidesToScroll: 1,
-    containScroll: 'trimSnaps',
-    dragFree: false,
-    loop: false,
     breakpoints: { '(prefers-reduced-motion: reduce)': { duration: 0 } },
   });
-  const regionRef = useRef<HTMLDivElement>(null);
-  const previousButtonRef = useRef<HTMLButtonElement>(null);
-  const nextButtonRef = useRef<HTMLButtonElement>(null);
 
-  const updateDisabledState = useCallback((api: EmblaCarouselType) => {
-    const nextIsPreviousDisabled = !api.canScrollPrev();
-    const nextIsNextDisabled = !api.canScrollNext();
-
-    if (
-      nextIsPreviousDisabled &&
-      document.activeElement === previousButtonRef.current
-    ) {
-      (nextIsNextDisabled ? regionRef : nextButtonRef).current?.focus();
-    } else if (
-      nextIsNextDisabled &&
-      document.activeElement === nextButtonRef.current
-    ) {
-      (nextIsPreviousDisabled ? regionRef : previousButtonRef).current?.focus();
-    }
-
-    setIsPreviousDisabled(nextIsPreviousDisabled);
-    setIsNextDisabled(nextIsNextDisabled);
+  const updateScrollableState = useCallback((api: EmblaCarouselType) => {
+    setCanScrollPrev(api.canScrollPrev());
+    setCanScrollNext(api.canScrollNext());
   }, []);
 
   useEffect(() => {
     if (!embla) return;
 
-    const viewport = embla.rootNode();
-    const scrollLeft = viewport.scrollLeft;
-    viewport.scrollLeft = 0;
-
-    const slides = embla.slideNodes();
-    const start = slides[0]?.offsetLeft ?? 0;
-    const distances = slides.map((slide) =>
-      Math.abs(slide.offsetLeft - start - scrollLeft),
-    );
-    const index =
-      distances.length > 0 ? distances.indexOf(Math.min(...distances)) : 0;
-    embla.scrollTo(index, true);
-
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setIsEnhanced(true);
-    updateDisabledState(embla);
-
-    embla.on('select', updateDisabledState);
-    embla.on('reInit', updateDisabledState);
+    embla.on('init', updateScrollableState);
+    embla.on('select', updateScrollableState);
+    embla.on('reInit', updateScrollableState);
 
     return () => {
-      embla.off('select', updateDisabledState);
-      embla.off('reInit', updateDisabledState);
+      embla.off('init', updateScrollableState);
+      embla.off('select', updateScrollableState);
+      embla.off('reInit', updateScrollableState);
     };
-  }, [embla, updateDisabledState]);
+  }, [embla, updateScrollableState]);
 
   return {
-    isEnhanced,
-    isPreviousDisabled,
-    isNextDisabled,
+    canScrollPrev,
+    canScrollNext,
     viewportRef,
-    regionRef,
-    previousButtonRef,
-    nextButtonRef,
     scrollPrev: () => embla?.scrollPrev(),
     scrollNext: () => embla?.scrollNext(),
   };
