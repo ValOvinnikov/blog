@@ -1,4 +1,3 @@
-import { CONTENT_ALIGNMENT } from '@blog/config';
 import type { TFaqModule } from '@blog/service';
 import { Accordion } from '@blog/ui/components/organisms/accordion';
 import { ActionGroup } from '@web/components/shared/action-group';
@@ -24,12 +23,8 @@ export const FaqModuleView = ({
   titleId,
   dataTestId,
 }: IFaqModuleViewProps) => {
-  const align =
-    contentAlignment === CONTENT_ALIGNMENT.CENTER
-      ? CONTENT_ALIGNMENT.CENTER
-      : CONTENT_ALIGNMENT.LEFT;
-  const s = faqModuleViewVariants({ align });
-  const actions = moduleGridActionsVariants({ align });
+  const s = faqModuleViewVariants({ align: contentAlignment });
+  const actions = moduleGridActionsVariants({ align: contentAlignment });
 
   return (
     <Section
@@ -43,7 +38,7 @@ export const FaqModuleView = ({
           headingBlock={headingBlock}
           id={titleId}
           level={2}
-          align={align}
+          align={contentAlignment}
           variant="section"
         />
         <Accordion dataTestId={`${dataTestId}-accordion`}>
