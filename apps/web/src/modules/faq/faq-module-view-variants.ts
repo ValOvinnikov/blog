@@ -3,7 +3,7 @@ import { tv } from 'tailwind-variants';
 
 export const faqModuleViewVariants = tv({
   slots: {
-    wrapper: ['w-full max-w-measure text-prose'],
+    wrapper: ['w-full max-w-post text-prose'],
   },
   variants: {
     align: {
