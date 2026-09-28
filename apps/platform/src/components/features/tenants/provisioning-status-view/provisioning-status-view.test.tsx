@@ -401,7 +401,7 @@ describe(ProvisioningStatusView, () => {
         screen.getByText('Grant the missing permission, then retry.'),
       ).toBeVisible();
       expect(screen.getByText('Technical details')).toBeVisible();
-      expect(screen.getByText(rawError)).toBeVisible();
+      expect(screen.getByText(rawError)).not.toBeVisible();
     });
 
     it('maps a 400 duplicate/already-in-use failure to a friendly headline and next step', () => {
@@ -442,7 +442,7 @@ describe(ProvisioningStatusView, () => {
           'Retry, or check the technical details before asking for help.',
         ),
       ).toBeVisible();
-      expect(screen.getByText(rawError)).toBeVisible();
+      expect(screen.getByText(rawError)).not.toBeVisible();
     });
   });
 

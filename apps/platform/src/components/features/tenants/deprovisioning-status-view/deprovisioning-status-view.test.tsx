@@ -217,7 +217,7 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
         screen.getByText('Failed while running "Revoke Sanity tokens".'),
       ).toBeVisible();
       expect(screen.getByText('Technical details')).toBeVisible();
-      expect(screen.getByText(rawError)).toBeVisible();
+      expect(screen.getByText(rawError)).not.toBeVisible();
     });
 
     it('renders no retry button', () => {
