@@ -42,6 +42,19 @@ const longHeadingBlock = makeHeadingBlock({
 
 export const Default: TStory = {};
 
+export const NoSupportingText: TStory = {
+  args: {
+    headingBlock: makeHeadingBlock({ heading: 'Latest posts' }),
+  },
+};
+
+export const SectionVariantNoSupportingText: TStory = {
+  args: {
+    variant: 'section',
+    headingBlock: makeHeadingBlock({ heading: 'Why choose us' }),
+  },
+};
+
 export const WithSupportingText: TStory = {
   args: {
     headingBlock: makeHeadingBlock({
