@@ -996,9 +996,8 @@ logo wall — but no transformer guard says so.** The query projects the image w
 `.notNull()`, so a row whose image fails to resolve is rejected at `.parse()`,
 `safeAsync` turns that into a failed result, and the module renders nothing
 rather than a run of rows with a hole in it. The page loses the section and keeps
-rendering, as everywhere else in this family. `image` is nonetheless
-`T | undefined` in the view model — not a reachable state — and the row omits
-the frame if it is ever absent; the logo wall instead keeps its image required.
+rendering, as everywhere else in this family. `image` is therefore required in
+the view model, exactly as it is for the logo wall.
 
 **A question is a document, and that is the opposite call from a figure.**
 `block_faq` ("FAQ Item") carries a `title` — its Studio label — a required
