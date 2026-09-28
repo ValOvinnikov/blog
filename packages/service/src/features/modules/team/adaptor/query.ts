@@ -5,7 +5,7 @@ import {
 } from '@blog/service/shared/expressions/display-mode';
 import { ctaButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
-import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { wideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { personDetailFragment } from '@blog/service/shared/fragments/person/person';
 import { z } from 'zod';
 
@@ -35,6 +35,6 @@ export const teamModuleQuery = q
       .project(ctaButtonFragment)
       .nullable(true),
     contentAlignment: sub.field('contentAlignment').nullable(true),
-    layout: sub.field('layout').project(layoutFragment).nullable(true),
+    layout: sub.field('layout').project(wideLayoutFragment).nullable(true),
   }))
   .notNull();

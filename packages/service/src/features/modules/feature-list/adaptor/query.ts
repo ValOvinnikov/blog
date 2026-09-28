@@ -6,7 +6,7 @@ import {
 import { ctaButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
-import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { wideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document';
 
 export const featureListModuleQuery = q
@@ -49,6 +49,6 @@ export const featureListModuleQuery = q
     displayMode: sub.raw(DISPLAY_MODE_EXPRESSION, displayModeParser),
     contentAlignment: sub.field('contentAlignment').nullable(true),
     cardAlignment: sub.field('cardAlignment').notNull(),
-    layout: sub.field('layout').project(layoutFragment).nullable(true),
+    layout: sub.field('layout').project(wideLayoutFragment).nullable(true),
   }))
   .notNull();

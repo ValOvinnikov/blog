@@ -10,7 +10,7 @@ import {
   showImagesParser,
 } from '@blog/service/shared/expressions/show-images';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
-import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { wideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { postCardFragment } from '@blog/service/shared/fragments/post/post';
 
 const newestFeaturedPostsQuery = q.star
@@ -47,7 +47,7 @@ export const postFeaturedModuleQuery = q
       )
       .nullable(true),
     limit: sub.field('limit').nullable(true),
-    layout: sub.field('layout').project(layoutFragment).nullable(true),
+    layout: sub.field('layout').project(wideLayoutFragment).nullable(true),
     contentAlignment: sub.field('contentAlignment').nullable(true),
     showImages: sub.raw(SHOW_IMAGES_EXPRESSION, showImagesParser),
     displayMode: sub.raw(DISPLAY_MODE_EXPRESSION, displayModeParser),
