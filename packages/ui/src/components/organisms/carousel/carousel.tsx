@@ -37,27 +37,16 @@ export const Carousel = <T,>({
   className,
   dataTestId,
 }: ICarouselProps<T>) => {
-  const {
-    isEnhanced,
-    isPreviousDisabled,
-    isNextDisabled,
-    viewportRef,
-    regionRef,
-    previousButtonRef,
-    nextButtonRef,
-    scrollPrev,
-    scrollNext,
-  } = useCarousel();
+  const { canScrollPrev, canScrollNext, viewportRef, scrollPrev, scrollNext } =
+    useCarousel();
 
-  const s = carouselVariants({ isEnhanced, slideSize });
+  const s = carouselVariants({ slideSize });
 
   return (
     <div
-      ref={regionRef}
       role="region"
       aria-roledescription="carousel"
       aria-label={ariaLabel}
-      tabIndex={-1}
       className={className}
       data-testid={dataTestId}
     >
@@ -73,25 +62,25 @@ export const Carousel = <T,>({
           ))}
         </ul>
       </div>
-      {(!isEnhanced || !(isPreviousDisabled && isNextDisabled)) && (
+      {(canScrollPrev || canScrollNext) && (
         <div className={s.controls()}>
           <IconButton
-            ref={previousButtonRef}
             ariaLabel={previousLabel}
             title={previousLabel}
             onClick={scrollPrev}
-            isDisabled={isPreviousDisabled}
+            isDisabled={!canScrollPrev}
+            isFocusableWhenDisabled={true}
             variant="control"
             tone={tone}
           >
             <Icon name={ICONS.CHEVRON_LEFT} size={SIZE.SM} />
           </IconButton>
           <IconButton
-            ref={nextButtonRef}
             ariaLabel={nextLabel}
             title={nextLabel}
             onClick={scrollNext}
-            isDisabled={isNextDisabled}
+            isDisabled={!canScrollNext}
+            isFocusableWhenDisabled={true}
             variant="control"
             tone={tone}
           >
