@@ -726,8 +726,8 @@ be published — which is what lets every consumer below treat the visual as
 guaranteed instead of testing for its absence.
 
 `module_featureList` ("Features") references those cards through a `features`
-array, validated with `unique()`, `min(2)` and `max(8)` as separate rule chains.
-Two is the floor because a
+array, validated with `required()`, `unique()`, `min(2)` and `max(8)` as
+separate rule chains. Two is the floor because a
 lone card is a statement rather than a grid; eight is the ceiling because the
 column rule below stops producing balanced rows past it. It carries the usual
 module furniture — `title`, `brandVariant` (the default
@@ -766,9 +766,10 @@ narrows the projected type to those two values rather than the wider
 three-value union, and `apps/web` maps the casing explicitly instead of
 passing the stored value straight through.
 
-**A misconfigured module renders nothing rather than throwing.** `features` is
-modelled nullable — `min(2)` is a validation rule, not `.required()`, and
-validation never applies to a document written outside Studio — so
+**A misconfigured module renders nothing rather than throwing.** `required()`
+stops an editor publishing the module with no cards, but validation never
+applies to a document written outside Studio, so the service layer still
+models `features` nullable —
 `service.modules.featureList.v1.getFeatureList` yields an empty `items` array
 whenever the authored array is absent, empty, or below two, matching how
 `postTakeaways` degrades below its own `min(3)`. The view returns `null` on an

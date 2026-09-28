@@ -38,6 +38,7 @@ export const featureListSchema = defineType({
         }),
       ],
       validation: (rule) => [
+        rule.required().error('Add at least two feature cards.'),
         rule.unique().error('Each feature card can only appear once.'),
         rule
           .min(2)
