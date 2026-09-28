@@ -82,16 +82,18 @@ export const CtaModule = ({
     <div className={s.root({ class: className })} data-testid={dataTestId}>
       <div className={s.body()}>
         {eyebrow && <Eyebrow className={s.eyebrow()}>{eyebrow}</Eyebrow>}
-        <Heading
-          id={headingId}
-          level={2}
-          visual="section"
-          className={s.heading()}
-        >
-          {heading}
-        </Heading>
-        {supportingText && <p className={s.text()}>{supportingText}</p>}
-        {content && <Prose className={s.text()}>{content}</Prose>}
+        <div className={s.group()}>
+          <Heading
+            id={headingId}
+            level={2}
+            visual="section"
+            className={s.heading()}
+          >
+            {heading}
+          </Heading>
+          {supportingText && <p className={s.text()}>{supportingText}</p>}
+          {content && <Prose className={s.text()}>{content}</Prose>}
+        </div>
         {actions && <div className={s.actions()}>{actions}</div>}
         {footnote && <p className={s.footnote()}>{footnote}</p>}
       </div>

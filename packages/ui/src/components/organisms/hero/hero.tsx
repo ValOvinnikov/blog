@@ -96,26 +96,28 @@ const HeroRoot = ({
               contentAlignment: resolvedAlignment,
             })}
           {eyebrow && <Eyebrow className={s.eyebrow()}>{eyebrow}</Eyebrow>}
-          <div className={s.title()}>
-            <Heading
-              id={titleId}
-              level={1}
-              visual="hero"
-              className={s.heading()}
-            >
-              {title}
-            </Heading>
+          <div className={s.group()}>
+            <div className={s.title()}>
+              <Heading
+                id={titleId}
+                level={1}
+                visual="hero"
+                className={s.heading()}
+              >
+                {title}
+              </Heading>
+            </div>
+            {excerpt && (
+              <Text variant="hero" className={s.excerpt()}>
+                {excerpt}
+              </Text>
+            )}
+            {slots.Body &&
+              cloneElement(slots.Body, {
+                contentAlignment: resolvedAlignment,
+                className: s.body(),
+              })}
           </div>
-          {excerpt && (
-            <Text variant="hero" className={s.excerpt()}>
-              {excerpt}
-            </Text>
-          )}
-          {slots.Body &&
-            cloneElement(slots.Body, {
-              contentAlignment: resolvedAlignment,
-              className: s.body(),
-            })}
           {slots.Cta &&
             cloneElement(slots.Cta, {
               contentAlignment: resolvedAlignment,
