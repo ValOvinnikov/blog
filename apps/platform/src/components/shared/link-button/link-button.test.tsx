@@ -61,9 +61,7 @@ describe(LinkButton, () => {
       </LinkButton>,
     );
 
-    expect(
-      screen.getByRole('link', { name: 'View steps' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'View steps' })).toBeVisible();
   });
 
   it('renders through a custom `as` component', () => {
