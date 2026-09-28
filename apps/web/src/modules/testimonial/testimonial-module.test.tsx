@@ -62,7 +62,10 @@ describe(`<${TestimonialModule.name}/>`, () => {
     getTenantSanityContextMock.mockResolvedValue(tenant);
     getTestimonialModuleMock.mockResolvedValue({
       ok: true,
-      data: { ...baseModule, testimonials: [] },
+      data: {
+        ...baseModule,
+        testimonials: [makeTestimonialItem({ id: 'testimonial-1' })],
+      },
     });
 
     await setup();
