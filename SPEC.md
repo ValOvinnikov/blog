@@ -1994,3 +1994,54 @@ repo-specific ESLint rules in
 [`docs/context/claude-code.md`](./docs/context/claude-code.md). The
 per-component how-to, including the `tv()` and slot conventions that go with
 this, lives in `.claude/skills/ui-library-practices`.
+
+## 19. Surface tokens
+
+A control cannot see the background it sits on, so a focus-ring offset or a
+hairline divider hard-coded to the page default is wrong the moment the
+surface changes — a near-white band between a control and its ring, and a
+divider that measures 1.03:1 against Secondary. Two **inherited CSS custom
+properties** in `configs/tailwind/theme.css` carry that context instead:
+
+| Property    | `:root` default  | Tailwind utility      | Used for              |
+| ----------- | ---------------- | --------------------- | --------------------- |
+| `--ambient` | `var(--primary)` | `ring-offset-ambient` | the focus-ring offset |
+| `--divider` | `var(--border)`  | `border-divider`      | hairline dividers     |
+
+Both are exposed through **`@theme inline`**, and that is load-bearing:
+`inline` emits `var(--ambient)` into the generated utility instead of
+resolving it to a literal at build time, so an ancestor that redefines the
+property changes what every descendant resolves to. A non-inline `@theme`
+would bake in the `:root` value and an override would do nothing.
+
+**Surfaces set them; components read them.** Two `@utility` classes,
+`surface-secondary` and `surface-brand-primary`, retarget both at once and are
+applied by whatever element paints the background:
+
+- `apps/web`'s `Section`, per `brandVariant`.
+- `@blog/ui` organisms that paint their own flat background behind focusable
+  children — `CtaModule` (SPLIT and CALLOUT) and `Footer`.
+
+A surface painted with an image or a scrim rather than a flat token colour
+(`Hero` BANNER, `CtaModule` BANNER) sets neither: there is no single colour a
+ring offset could match.
+
+**No props and no context.** Everything stays server-renderable, dark mode
+follows automatically because the defaults are references rather than literals
+and `.dark` already overrides `--primary`/`--border`, and a background added
+later works by setting the two properties. This is deliberate: the rejected
+alternative was a `tone` prop on every component and every consumer.
+
+`tone` props were not removed, but what survives of them varies. `IconButton`'s
+still drives its `control` variant's border, background and text. `QuoteCardName`'s
+is now fully inert — the ring offset was the only thing it ever drove — and is
+kept solely because it is required by `QuoteCard` and `TestimonialCard` and
+threaded from `apps/web`, so dropping it is an API break rather than a cleanup.
+
+**Secondary and Brand-primary dividers resolve to `--border-strong`, one step
+heavier than Primary's own `--border` hairline — enough to read on a darker
+ground, deliberately not enough for WCAG 1.4.11's 3:1.** That threshold
+governs graphics required to identify a control, and these dividers are
+decorative — an accordion row is already a real `<button>` with its own focus
+ring, and a section's edge rule is a presentational boundary. `--border-emphasis`
+is the token for a border that genuinely is the sole indicator.
