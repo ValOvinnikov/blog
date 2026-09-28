@@ -58,7 +58,7 @@ describe(`<${TaxonomyListModuleView.name}/>`, () => {
     );
     expect(
       screen.getByRole('region', { name: 'Browse by topic' }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
   });
 
   it('renders the section heading as an h2 by default', () => {
@@ -82,7 +82,7 @@ describe(`<${TaxonomyListModuleView.name}/>`, () => {
     expect(link).toHaveAttribute('href', '/topics/engineering');
     expect(
       screen.getByRole('heading', { level: 3, name: /Engineering/ }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
     expect(screen.getByText('Posts about building things.')).toBeVisible();
     expect(screen.getByText('5 posts')).toBeVisible();
   });

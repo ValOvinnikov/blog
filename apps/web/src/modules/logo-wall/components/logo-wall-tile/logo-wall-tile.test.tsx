@@ -17,7 +17,7 @@ describe(`<${LogoWallTile.name}/>`, () => {
   it('renders the logo image with the company name as its alt', () => {
     setup();
 
-    expect(screen.getByRole('img', { name: item.name })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: item.name })).toBeVisible();
   });
 
   it('wraps the logo in a link when the item has one, with the company name as its accessible name', () => {

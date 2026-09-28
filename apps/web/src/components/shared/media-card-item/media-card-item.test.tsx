@@ -56,8 +56,8 @@ describe(`<${MediaCardItem.name}/>`, () => {
       />,
     );
 
-    expect(screen.getByTestId('media-card-media')).toBeInTheDocument();
-    expect(screen.getByTestId('post-image')).toBeInTheDocument();
+    expect(screen.getByTestId('media-card-media')).toBeVisible();
+    expect(screen.getByTestId('post-image')).toBeVisible();
   });
 
   it('renders the formatted date and reading time', () => {
@@ -76,7 +76,7 @@ describe(`<${MediaCardItem.name}/>`, () => {
   it('forwards dataTestId to the underlying MediaCard', () => {
     renderElement(<MediaCardItem item={item} dataTestId="lead-card" />);
 
-    expect(screen.getByTestId('lead-card')).toBeInTheDocument();
+    expect(screen.getByTestId('lead-card')).toBeVisible();
   });
 
   it('renders no dataTestId on the underlying MediaCard when omitted', () => {

@@ -156,7 +156,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByRole('radio', { name: 'Deep' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'Deep' })).toBeVisible();
   });
 
   it('renders the reading-depth control with the 30s option once the post has an approved skim', async () => {
@@ -174,7 +174,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByRole('radio', { name: '30s' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: '30s' })).toBeVisible();
   });
 
   it('forwards the resolved slug/tenant to getPostPage', async () => {

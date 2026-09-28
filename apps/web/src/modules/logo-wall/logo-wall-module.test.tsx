@@ -105,7 +105,7 @@ describe(`<${LogoWallModule.name}/>`, () => {
     await setup();
 
     logos.forEach((logo) => {
-      expect(screen.getByRole('img', { name: logo.name })).toBeInTheDocument();
+      expect(screen.getByRole('img', { name: logo.name })).toBeVisible();
     });
   });
 });

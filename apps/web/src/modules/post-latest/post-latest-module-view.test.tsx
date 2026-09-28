@@ -43,9 +43,7 @@ describe(`<${PostLatestModuleView.name}/>`, () => {
       'data-testid',
       'post-latest-module-post-latest-1',
     );
-    expect(
-      screen.getByRole('region', { name: 'Latest posts' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Latest posts' })).toBeVisible();
   });
 
   it('renders a card per item, linked to its href', () => {
@@ -55,7 +53,7 @@ describe(`<${PostLatestModuleView.name}/>`, () => {
     expect(link).toHaveAttribute('href', post.href);
     expect(
       screen.getByRole('heading', { level: 3, name: post.title }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
   });
 
   it('never renders a pagination nav', () => {
@@ -76,14 +74,14 @@ describe(`<${PostLatestModuleView.name}/>`, () => {
       items: [{ ...post, image: <div data-testid="post-image" /> }],
     });
 
-    expect(screen.getByTestId('media-card-media')).toBeInTheDocument();
-    expect(screen.getByTestId('post-image')).toBeInTheDocument();
+    expect(screen.getByTestId('media-card-media')).toBeVisible();
+    expect(screen.getByTestId('post-image')).toBeVisible();
   });
 
   it('renders CardCarousel with the view items when displayMode is CAROUSEL', () => {
     setup({ displayMode: DISPLAY_MODE.CAROUSEL });
 
-    expect(screen.getByTestId('card-carousel-stub')).toBeInTheDocument();
+    expect(screen.getByTestId('card-carousel-stub')).toBeVisible();
     expect(CardCarousel).toHaveBeenCalledWith(
       expect.objectContaining({ items: [post] }),
       undefined,

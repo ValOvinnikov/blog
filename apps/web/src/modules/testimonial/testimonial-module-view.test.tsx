@@ -60,7 +60,7 @@ describe(`<${TestimonialModuleView.name}/>`, () => {
       items.forEach((item) => {
         expect(
           screen.getByText(item.name, { ignore: '.sr-only' }),
-        ).toBeInTheDocument();
+        ).toBeVisible();
       });
       expect(TestimonialCarousel).not.toHaveBeenCalled();
     });
@@ -84,7 +84,7 @@ describe(`<${TestimonialModuleView.name}/>`, () => {
     setup({ displayMode: DISPLAY_MODE.CAROUSEL });
 
     expect(TestimonialCarousel).toHaveBeenCalledTimes(1);
-    expect(screen.getByTestId('testimonial-carousel-stub')).toBeInTheDocument();
+    expect(screen.getByTestId('testimonial-carousel-stub')).toBeVisible();
     expect(screen.queryByRole('blockquote')).not.toBeInTheDocument();
   });
 

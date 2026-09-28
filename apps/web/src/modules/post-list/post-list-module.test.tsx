@@ -154,7 +154,7 @@ describe(`<${PostListModule.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByText('No posts yet.')).toBeInTheDocument();
+    expect(screen.getByText('No posts yet.')).toBeVisible();
   });
 
   it('renders a pager with a fully translated aria-label and correct hrefs', async () => {
@@ -184,7 +184,7 @@ describe(`<${PostListModule.name}/>`, () => {
     await setup({ context: { page: 2 } });
 
     const nav = screen.getByRole('navigation', { name: 'Blog pages' });
-    expect(nav).toBeInTheDocument();
+    expect(nav).toBeVisible();
 
     const previousLink = screen.getByRole('link', { name: 'Previous' });
     expect(previousLink).toHaveAttribute('href', '/blog');
@@ -231,7 +231,7 @@ describe(`<${PostListModule.name}/>`, () => {
     await setup({ context: { page: 1 } });
 
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
-    expect(screen.getByText('No posts yet.')).toBeInTheDocument();
+    expect(screen.getByText('No posts yet.')).toBeVisible();
   });
 
   it('renders each post image when showImages is true', async () => {
@@ -263,9 +263,7 @@ describe(`<${PostListModule.name}/>`, () => {
 
     await setup();
 
-    expect(
-      screen.getByRole('img', { name: sanityImage.alt }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: sanityImage.alt })).toBeVisible();
   });
 
   it('renders no post images when showImages is false', async () => {
@@ -338,7 +336,7 @@ describe(`<${PostListModule.name}/>`, () => {
     ).toHaveAttribute('aria-labelledby', 'topic-posts-title');
     expect(
       screen.getByRole('navigation', { name: 'News pages' }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
     expect(getPostListMock).toHaveBeenCalledWith(
       'post-list-1',
       DEFAULT_TENANT_SANITY_CONTEXT,
@@ -396,7 +394,7 @@ describe(`<${PostListModule.name}/>`, () => {
     ).toHaveAttribute('id', 'tag-posts-title');
     expect(
       screen.getByRole('navigation', { name: 'TypeScript pages' }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
     expect(getPostListMock).toHaveBeenCalledWith(
       'post-list-1',
       DEFAULT_TENANT_SANITY_CONTEXT,
@@ -435,9 +433,7 @@ describe(`<${PostListModule.name}/>`, () => {
       },
     });
 
-    expect(
-      screen.getByText('No posts tagged TypeScript yet.'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('No posts tagged TypeScript yet.')).toBeVisible();
     expect(
       screen.getByRole('heading', {
         level: 2,
@@ -465,6 +461,6 @@ describe(`<${PostListModule.name}/>`, () => {
     expect(
       screen.getByRole('heading', { level: 2, name: 'All posts' }),
     ).toHaveAttribute('id', 'blog-posts-title');
-    expect(screen.getByText('No posts yet.')).toBeInTheDocument();
+    expect(screen.getByText('No posts yet.')).toBeVisible();
   });
 });

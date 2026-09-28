@@ -48,7 +48,7 @@ describe(`<${PostContentsRail.name}/>`, () => {
 
     expect(
       screen.getByRole('button', { name: 'Topics Getting started' }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
   });
 
   it('updates the mobile selector to the active heading reported by useActiveHeadingId', () => {
@@ -57,7 +57,7 @@ describe(`<${PostContentsRail.name}/>`, () => {
 
     expect(
       screen.getByRole('button', { name: 'Topics Configuration' }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
   });
 
   it('renders every heading as a link to its anchor in the always-visible desktop list', () => {

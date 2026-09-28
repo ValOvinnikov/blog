@@ -89,8 +89,8 @@ describe(`<${CardCarousel.name}/>`, () => {
 
     renderElement(<>{renderItem({ item: itemsWithImages[0], index: 0 })}</>);
 
-    expect(screen.getByTestId('media-card-media')).toBeInTheDocument();
-    expect(screen.getByTestId('image-1')).toBeInTheDocument();
+    expect(screen.getByTestId('media-card-media')).toBeVisible();
+    expect(screen.getByTestId('image-1')).toBeVisible();
   });
 
   it('renderItem renders an empty media frame when hasImages is set but the item has no image', () => {

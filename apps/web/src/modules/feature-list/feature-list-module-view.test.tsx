@@ -74,7 +74,7 @@ describe(`<${FeatureListModuleView.name}/>`, () => {
           level: 3,
           name: item.headingBlock.heading,
         }),
-      ).toBeInTheDocument();
+      ).toBeVisible();
     });
   });
 
@@ -90,9 +90,7 @@ describe(`<${FeatureListModuleView.name}/>`, () => {
         expectedCarousel ? 1 : 0,
       );
       if (expectedCarousel) {
-        expect(
-          screen.getByTestId('feature-list-carousel-stub'),
-        ).toBeInTheDocument();
+        expect(screen.getByTestId('feature-list-carousel-stub')).toBeVisible();
         expect(FeatureListCarousel).toHaveBeenCalledWith(
           expect.objectContaining({ items }),
           undefined,

@@ -38,7 +38,7 @@ describe(`<${PostRelatedModuleView.name}/>`, () => {
     );
     expect(
       screen.getByRole('region', { name: 'Related reading' }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
   });
 
   it('renders a card per item, linked to its href', () => {
@@ -48,7 +48,7 @@ describe(`<${PostRelatedModuleView.name}/>`, () => {
     expect(link).toHaveAttribute('href', post.href);
     expect(
       screen.getByRole('heading', { level: 3, name: post.title }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
   });
 
   it('never renders a pagination nav', () => {
@@ -69,7 +69,7 @@ describe(`<${PostRelatedModuleView.name}/>`, () => {
       items: [{ ...post, image: <div data-testid="post-image" /> }],
     });
 
-    expect(screen.getByTestId('media-card-media')).toBeInTheDocument();
-    expect(screen.getByTestId('post-image')).toBeInTheDocument();
+    expect(screen.getByTestId('media-card-media')).toBeVisible();
+    expect(screen.getByTestId('post-image')).toBeVisible();
   });
 });
