@@ -13,9 +13,7 @@ describe(Disclosure, () => {
     );
 
     expect(screen.getByText('Advanced')).toBeVisible();
-    expect(
-      screen.getByText('Curated overrides live here.'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Curated overrides live here.')).not.toBeVisible();
   });
 
   it('is closed by default', () => {

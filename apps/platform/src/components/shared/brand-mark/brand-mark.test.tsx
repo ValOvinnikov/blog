@@ -5,7 +5,7 @@ import { BrandMark } from './brand-mark';
 describe(BrandMark, () => {
   it('renders the glyph', () => {
     render(<BrandMark />);
-    expect(screen.getByText('V')).toBeInTheDocument();
+    expect(screen.getByText('V')).toBeVisible();
   });
 
   it('is decorative by default', () => {
@@ -15,7 +15,7 @@ describe(BrandMark, () => {
 
   it('exposes an accessible name when a title is given', () => {
     render(<BrandMark title="Valstack" />);
-    expect(screen.getByRole('img', { name: 'Valstack' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'Valstack' })).toBeVisible();
   });
 
   it('drops aria-hidden when a title is given', () => {
