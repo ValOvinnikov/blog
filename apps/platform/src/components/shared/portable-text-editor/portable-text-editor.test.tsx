@@ -176,6 +176,8 @@ describe(PortableTextEditor, () => {
     for (const list of lists) {
       expect(list).toBeVisible();
     }
+    expect(lists[2]).toHaveAttribute('start', '1');
+    expect(lists[3]).toHaveAttribute('start', '2');
 
     const items = screen.getAllByRole('listitem');
     for (const item of items) {
