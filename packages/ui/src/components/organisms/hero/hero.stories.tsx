@@ -181,9 +181,37 @@ export const SplitContentRight: TStory = {
   },
 };
 
+export const SplitContentAlignmentRight: TStory = {
+  args: {
+    variant: HERO_VARIANT.SPLIT,
+    contentAlignment: CONTENT_ALIGNMENT.RIGHT,
+  },
+};
+
+export const SplitContentAlignmentCenter: TStory = {
+  args: {
+    variant: HERO_VARIANT.SPLIT,
+    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+  },
+};
+
 export const StackedDefault: TStory = {
   args: {
     variant: HERO_VARIANT.STACKED,
+  },
+};
+
+export const StackedContentAlignmentRight: TStory = {
+  args: {
+    variant: HERO_VARIANT.STACKED,
+    contentAlignment: CONTENT_ALIGNMENT.RIGHT,
+  },
+};
+
+export const StackedContentAlignmentCenter: TStory = {
+  args: {
+    variant: HERO_VARIANT.STACKED,
+    contentAlignment: CONTENT_ALIGNMENT.CENTER,
   },
 };
 
