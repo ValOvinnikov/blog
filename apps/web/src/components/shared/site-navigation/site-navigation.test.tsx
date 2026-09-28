@@ -144,7 +144,7 @@ describe(`<${SiteNavigation.name}/>`, () => {
       <SiteNavigation links={links} actions={<button>Toggle</button>} />,
     );
 
-    expect(screen.getByRole('button', { name: 'Toggle' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Toggle' })).toBeVisible();
   });
 
   describe('mobile toggle', () => {

@@ -37,9 +37,7 @@ describe(`<${PostListModuleView.name}/>`, () => {
       'data-testid',
       'post-list-module-post-list-1',
     );
-    expect(
-      screen.getByRole('region', { name: 'Latest posts' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Latest posts' })).toBeVisible();
   });
 
   it('derives a different section id when given a different titleId, avoiding duplicate DOM ids', () => {
@@ -61,7 +59,7 @@ describe(`<${PostListModuleView.name}/>`, () => {
     expect(link).toHaveAttribute('href', post.href);
     expect(
       screen.getByRole('heading', { level: 3, name: post.title }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
   });
 
   it('renders no pagination nav when the pagination prop is absent', () => {
@@ -91,13 +89,13 @@ describe(`<${PostListModuleView.name}/>`, () => {
     expect(previousLink).toHaveAttribute('href', '/topics/engineering/page/1');
     const nextLink = within(section).getByRole('link', { name: 'Next' });
     expect(nextLink).toHaveAttribute('href', '/topics/engineering/page/3');
-    expect(nav).toBeInTheDocument();
+    expect(nav).toBeVisible();
   });
 
   it('renders the resolved i18n empty message instead of the grid when items is empty', () => {
     setup({ items: [] });
 
-    expect(screen.getByText('No posts yet.')).toBeInTheDocument();
+    expect(screen.getByText('No posts yet.')).toBeVisible();
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
@@ -113,7 +111,7 @@ describe(`<${PostListModuleView.name}/>`, () => {
       items: [{ ...post, image: <div data-testid="post-image" /> }],
     });
 
-    expect(screen.getByTestId('media-card-media')).toBeInTheDocument();
-    expect(screen.getByTestId('post-image')).toBeInTheDocument();
+    expect(screen.getByTestId('media-card-media')).toBeVisible();
+    expect(screen.getByTestId('post-image')).toBeVisible();
   });
 });

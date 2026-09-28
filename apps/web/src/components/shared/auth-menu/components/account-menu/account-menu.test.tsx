@@ -47,7 +47,7 @@ describe(`<${AccountMenu.name}/>`, () => {
     setup();
 
     const image = getTriggerImage();
-    expect(image).toBeInTheDocument();
+    expect(image).toBeVisible();
 
     fireEvent.error(image!);
 
@@ -84,7 +84,7 @@ describe(`<${AccountMenu.name}/>`, () => {
       />,
     );
 
-    expect(getTriggerImage()).toBeInTheDocument();
+    expect(getTriggerImage()).toBeVisible();
   });
 
   it('renders a plain "Account" label — not a heading — and the session name/email', async () => {

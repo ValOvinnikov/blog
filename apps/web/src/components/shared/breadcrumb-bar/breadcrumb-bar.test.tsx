@@ -10,6 +10,6 @@ describe(`<${BreadcrumbBar.name}/>`, () => {
   it('renders its children', () => {
     setup();
 
-    expect(screen.getByTestId('breadcrumbs-slot')).toBeInTheDocument();
+    expect(screen.getByTestId('breadcrumbs-slot')).toBeVisible();
   });
 });

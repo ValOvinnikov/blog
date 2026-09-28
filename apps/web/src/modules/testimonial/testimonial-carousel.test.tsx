@@ -57,10 +57,8 @@ describe(`<${TestimonialCarousel.name}/>`, () => {
     items.forEach((item, index) => {
       const { unmount } = renderElement(<>{renderItem({ item, index })}</>);
 
-      expect(screen.getByRole('blockquote')).toBeInTheDocument();
-      expect(
-        screen.getByText(item.name, { ignore: '.sr-only' }),
-      ).toBeInTheDocument();
+      expect(screen.getByRole('blockquote')).toBeVisible();
+      expect(screen.getByText(item.name, { ignore: '.sr-only' })).toBeVisible();
 
       unmount();
     });

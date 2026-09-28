@@ -56,9 +56,7 @@ describe(`<${LogoWallModuleView.name}/>`, () => {
 
     it('renders every logo as an image named after the company, never as visible text', () => {
       logos.forEach((logo) => {
-        expect(
-          screen.getByRole('img', { name: logo.name }),
-        ).toBeInTheDocument();
+        expect(screen.getByRole('img', { name: logo.name })).toBeVisible();
       });
       expect(LogoWallCarousel).not.toHaveBeenCalled();
     });
@@ -97,7 +95,7 @@ describe(`<${LogoWallModuleView.name}/>`, () => {
     setup({ displayMode: DISPLAY_MODE.CAROUSEL });
 
     expect(LogoWallCarousel).toHaveBeenCalledTimes(1);
-    expect(screen.getByTestId('logo-wall-carousel-stub')).toBeInTheDocument();
+    expect(screen.getByTestId('logo-wall-carousel-stub')).toBeVisible();
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 

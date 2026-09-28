@@ -43,10 +43,10 @@ describe(`<${SkimPanel.name}/>`, () => {
 
     expect(
       screen.getByRole('region', { name: '30-second summary' }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
     expect(
       screen.getByRole('button', { name: 'Read the full article' }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
   });
 
   it('the "read the full article" button switches depth back to READ', async () => {

@@ -277,7 +277,7 @@ describe(`<${PortableText.name}/>`, () => {
 
     setup({ value });
 
-    expect(screen.getByRole('note')).toBeInTheDocument();
+    expect(screen.getByRole('note')).toBeVisible();
     expect(screen.getByText('Because Y.')).toBeVisible();
   });
 
