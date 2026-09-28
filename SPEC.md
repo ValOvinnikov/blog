@@ -2032,11 +2032,15 @@ and `.dark` already overrides `--primary`/`--border`, and a background added
 later works by setting the two properties. This is deliberate: the rejected
 alternative was a `tone` prop on every component and every consumer.
 
-`tone` props still exist and still drive fills and text colour; only their
-ring-offset cases collapsed into `--ambient`.
+`tone` props were not removed, but what survives of them varies. `IconButton`'s
+still drives its `control` variant's border, background and text. `QuoteCardName`'s
+is now fully inert — the ring offset was the only thing it ever drove — and is
+kept solely because it is required by `QuoteCard` and `TestimonialCard` and
+threaded from `apps/web`, so dropping it is an API break rather than a cleanup.
 
-**Secondary and Brand-primary dividers resolve to `--border-strong`, which is
-parity with Primary's weight rather than WCAG 1.4.11's 3:1.** That threshold
+**Secondary and Brand-primary dividers resolve to `--border-strong`, one step
+heavier than Primary's own `--border` hairline — enough to read on a darker
+ground, deliberately not enough for WCAG 1.4.11's 3:1.** That threshold
 governs graphics required to identify a control, and these dividers are
 decorative — an accordion row is already a real `<button>` with its own focus
 ring, and a section's edge rule is a presentational boundary. `--border-emphasis`
