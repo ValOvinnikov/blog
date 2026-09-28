@@ -18,10 +18,25 @@ const image: ISanityImage = {
   dimensions: { width: 800, height: 600, aspectRatio: 800 / 600 },
 };
 
+const wideImage: ISanityImage = {
+  assetId: 'image-abc123-2400x1260-png',
+  alt: 'A wide banner image',
+  hotspot: undefined,
+  crop: undefined,
+  lqip: undefined,
+  dimensions: { width: 2400, height: 1260, aspectRatio: 2400 / 1260 },
+};
+
 const setup = customRender(SanityImage, {
   image,
   width: 960,
   height: 720,
+});
+
+const setupWide = customRender(SanityImage, {
+  image: wideImage,
+  width: 800,
+  height: 600,
 });
 
 describe(`<${SanityImage.name}/>`, () => {
@@ -121,5 +136,39 @@ describe(`<${SanityImage.name}/>`, () => {
 
     expect(screen.getByRole('img', { name: image.alt })).toBeVisible();
     expect(screen.getByRole('presentation')).not.toBeVisible();
+  });
+
+  it('crops a hotspot-less, mismatched-ratio cover image from its centre instead of an entropy heuristic', () => {
+    setupWide();
+
+    const img = screen.getByRole('img', { name: wideImage.alt });
+    expect(img.getAttribute('src')).toMatch(/[?&]fp-x=0\.5(?:&|$)/);
+    expect(img.getAttribute('src')).toMatch(/[?&]fp-y=0\.5(?:&|$)/);
+    expect(img.getAttribute('src')).not.toContain('crop=entropy');
+    expect(img.getAttribute('srcset')).toMatch(/[?&]fp-x=0\.5(?:&|$)/);
+    expect(img.getAttribute('srcset')).not.toContain('crop=entropy');
+  });
+
+  it('keeps a real hotspot as the focal point instead of the centre fallback', () => {
+    setupWide({
+      image: { ...wideImage, hotspot: { x: 0.2, y: 0.8, width: 1, height: 1 } },
+    });
+
+    const img = screen.getByRole('img', { name: wideImage.alt });
+    expect(img.getAttribute('src')).toMatch(/[?&]fp-x=0\.2(?:&|$)/);
+    expect(img.getAttribute('src')).toMatch(/[?&]fp-y=0\.8(?:&|$)/);
+  });
+
+  it('centres a hotspot-less focal point on the cropped area rather than the source when a crop is set', () => {
+    setupWide({
+      image: {
+        ...wideImage,
+        crop: { top: 0.1, bottom: 0, left: 0.2, right: 0 },
+      },
+    });
+
+    const img = screen.getByRole('img', { name: wideImage.alt });
+    expect(img.getAttribute('src')).toMatch(/[?&]fp-x=0\.5(?:&|$)/);
+    expect(img.getAttribute('src')).toMatch(/[?&]fp-y=0\.5(?:&|$)/);
   });
 });
