@@ -68,7 +68,10 @@ describe(`<${FeatureListModule.name}/>`, () => {
       ok: true,
       data: {
         ...baseModule,
-        items: [makeFeatureListItem({ id: 'feature-1' })],
+        items: [
+          makeFeatureListItem({ id: 'feature-1' }),
+          makeFeatureListItem({ id: 'feature-2' }),
+        ],
       },
     });
 
