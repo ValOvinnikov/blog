@@ -105,7 +105,7 @@ describe(`<${NewsletterSignupContent.name}/>`, () => {
     setup({ status: 'submitting' });
 
     const button = screen.getByRole('button', { name: 'Subscribe' });
-    expect(screen.getByTestId('newsletter-signup-spinner')).toBeInTheDocument();
+    expect(screen.getByTestId('newsletter-signup-spinner')).toBeVisible();
     expect(button).toContainElement(
       screen.getByTestId('newsletter-signup-spinner'),
     );
