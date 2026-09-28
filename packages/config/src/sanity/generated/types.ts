@@ -1127,6 +1127,7 @@ export type Link = {
   _rev: string;
   title?: string;
   label?: string;
+  accessibleLabel?: string;
   linkType?: 'INTERNAL' | 'EXTERNAL';
   internalReference?:
     | Page_homeReference
