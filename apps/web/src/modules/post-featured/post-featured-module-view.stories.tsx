@@ -85,6 +85,36 @@ export const CenterAligned: TStory = {
   args: { contentAlignment: CONTENT_ALIGNMENT.CENTER },
 };
 
+const manyItems = Array.from({ length: 8 }, (_, index) => ({
+  ...leadItem,
+  id: `post-many-${index}`,
+  title: `${leadItem.title} ${index + 1}`,
+}));
+
+export const CarouselFitsLeft: TStory = {
+  args: {
+    displayMode: DISPLAY_MODE.CAROUSEL,
+    contentAlignment: CONTENT_ALIGNMENT.LEFT,
+    items: [leadItem, secondItem],
+  },
+};
+
+export const CarouselFitsCenter: TStory = {
+  args: {
+    displayMode: DISPLAY_MODE.CAROUSEL,
+    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    items: [leadItem, secondItem],
+  },
+};
+
+export const CarouselOverflowsCenter: TStory = {
+  args: {
+    displayMode: DISPLAY_MODE.CAROUSEL,
+    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    items: manyItems,
+  },
+};
+
 const placeholderImage = (alt: string) => (
   // eslint-disable-next-line @next/next/no-img-element -- Storybook placeholder image, not a production asset; next/image would be wrong here
   <img src="https://placehold.co/640x360" alt={alt} />

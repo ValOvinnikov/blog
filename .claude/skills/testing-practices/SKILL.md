@@ -319,12 +319,21 @@ export default mergeConfig(
 **Fake the edges of the app, never our own components.** An edge is code that
 reaches outside the process or the request: `@blog/service`, `@blog/db` (or
 its `client` inside `packages/db`), the Sanity query runner, tenant and auth
-resolution, `env`, the logger, each app's `i18n/navigation`, `next/cache`,
-`next/navigation`, `next-auth`. Everything between the edges — our
-components, `@blog/ui`, our helpers — renders for real, so the test sees what
-the user sees. The rules below hold in `apps/web` and `apps/platform` alike.
-`SmartLink` is ours: fake `@web/i18n/navigation` under it, never
-`SmartLink` itself.
+resolution, `env`, the logger, each app's `i18n/navigation`, Server Action
+modules (the `'use server'` files under each app's `src/server/`),
+`next/cache`, `next/navigation`, `next-auth` and `next-auth/react`.
+Everything between the edges — our components, `@blog/ui`, our helpers, our
+context providers — renders for real, so the test sees what the user sees.
+The rules below hold in `apps/web` and `apps/platform` alike.
+
+- `SmartLink` is ours: fake `@web/i18n/navigation` under it, never
+  `SmartLink` itself.
+- A context provider is ours too. A component that calls `useToast` renders
+  inside the real `ToastProvider`, and the test asserts the toast text on
+  screen. Never fake the hook.
+- Check the app's `src/vitest-setup.ts` before writing a `vi.mock`. Both apps
+  fake `next/navigation`, `next-intl/server` and `next/font/google` there
+  for every test, so a test never mocks those again.
 
 - **Never `vi.mock` an `@web/*`, `@platform/*` or `@blog/ui` component to test
   its parent.** Render the real child and query what it puts on screen. A
