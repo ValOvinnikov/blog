@@ -1865,10 +1865,6 @@
             {
               "type": "string",
               "value": "CENTER"
-            },
-            {
-              "type": "string",
-              "value": "RIGHT"
             }
           ]
         },
@@ -2704,10 +2700,6 @@
             {
               "type": "string",
               "value": "CENTER"
-            },
-            {
-              "type": "string",
-              "value": "RIGHT"
             }
           ]
         },
@@ -3031,10 +3023,6 @@
             {
               "type": "string",
               "value": "CENTER"
-            },
-            {
-              "type": "string",
-              "value": "RIGHT"
             }
           ]
         },
