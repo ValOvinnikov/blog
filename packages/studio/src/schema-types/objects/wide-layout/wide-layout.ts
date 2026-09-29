@@ -14,7 +14,9 @@ export const wideLayoutSchema = defineType({
   options: { collapsible: true, collapsed: true },
   fields: [
     ...spacingAndDividerFields().slice(0, 2),
-    containerWidthField([CONTAINER_WIDTH.WIDE, CONTAINER_WIDTH.FULL]),
+    containerWidthField({
+      values: [CONTAINER_WIDTH.WIDE, CONTAINER_WIDTH.FULL],
+    }),
     ...spacingAndDividerFields().slice(2),
   ],
 });

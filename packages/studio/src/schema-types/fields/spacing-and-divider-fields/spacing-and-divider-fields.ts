@@ -15,13 +15,6 @@ type TSpacingAndDividerFieldsOptions = {
   dividerHidden?: ConditionalProperty;
 };
 
-/**
- * Shared spacing + divider fields for both `layoutSchema` and
- * `heroLayoutSchema` — the two types differ only in whether `containerWidth`
- * is present, so the overlapping fields are built once here rather than
- * duplicated (same pattern as `imageAltField()` shared between
- * `imageWithAlt`/`bodyImage`).
- */
 export const spacingAndDividerFields = ({
   spacingDescriptionSuffix = '',
   dividerHidden,

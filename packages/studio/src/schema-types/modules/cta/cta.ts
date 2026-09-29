@@ -52,7 +52,7 @@ const ctaLayoutField = () => {
     options: { collapsible: true, collapsed: true },
     fields: [
       ...layoutSpacingAndDividerFields.slice(0, 2),
-      containerWidthField(undefined, isBannerVariantDocument),
+      containerWidthField({ hidden: isBannerVariantDocument }),
       ...layoutSpacingAndDividerFields.slice(2),
     ],
   });
