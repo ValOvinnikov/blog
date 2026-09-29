@@ -38,7 +38,7 @@ const meta = {
   argTypes: {
     brandVariant: {
       control: 'select',
-      options: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
+      options: Object.values(BRAND_VARIANT),
     },
     contentAlignment: {
       control: 'select',
@@ -135,5 +135,12 @@ export const Secondary: TStory = {
   args: {
     stats,
     brandVariant: BRAND_VARIANT.SECONDARY,
+  },
+};
+
+export const BrandPrimary: TStory = {
+  args: {
+    stats,
+    brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
   },
 };
