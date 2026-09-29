@@ -1,12 +1,12 @@
 import { CONTENT_ROUTE_REVALIDATE_SECONDS } from '@blog/config';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import HomeRoute, { generateMetadata, revalidate } from './page';
 
-const { getHomePageMock, getTenantSanityContextMock } = vi.hoisted(() => ({
+const { getHomePageMock } = vi.hoisted(() => ({
   getHomePageMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -17,9 +17,7 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-sanity-context');
 
 vi.mock('@web/components/pages/home-page', () => ({
   HomePage: ({ locale, tenant }: { locale: string; tenant: string }) => (
@@ -28,6 +26,8 @@ vi.mock('@web/components/pages/home-page', () => ({
     </div>
   ),
 }));
+
+const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
 
 describe('HomeRoute', () => {
   it('declares the shared content-route revalidate backstop', () => {

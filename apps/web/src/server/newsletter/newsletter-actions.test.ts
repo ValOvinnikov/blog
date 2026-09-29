@@ -1,12 +1,13 @@
 import { PRESET_ID, resolveTenantEmailBrand } from '@blog/config';
+import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
+import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
 
 const {
   createPendingSubscriberMock,
   sendEmailMock,
   resolveTenantEmailIdentityMock,
   markNewsletterSubscribedMock,
-  getRequestTenantIdMock,
-  getTenantBaseUrlMock,
+
   isTenantActiveMock,
   getEmailConfigMock,
   getEmailTemplateMock,
@@ -15,8 +16,6 @@ const {
   sendEmailMock: vi.fn(),
   resolveTenantEmailIdentityMock: vi.fn(),
   markNewsletterSubscribedMock: vi.fn(),
-  getRequestTenantIdMock: vi.fn(),
-  getTenantBaseUrlMock: vi.fn(),
   isTenantActiveMock: vi.fn(),
   getEmailConfigMock: vi.fn(),
   getEmailTemplateMock: vi.fn(),
@@ -49,13 +48,9 @@ vi.mock('@web/server/newsletter/newsletter-subscribed-cookie', () => ({
   markNewsletterSubscribed: markNewsletterSubscribedMock,
 }));
 
-vi.mock('@web/server/tenant/get-request-tenant-id', () => ({
-  getRequestTenantId: getRequestTenantIdMock,
-}));
+vi.mock('@web/server/tenant/get-request-tenant-id');
 
-vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
-  getTenantBaseUrl: getTenantBaseUrlMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-base-url');
 
 vi.mock('@web/server/tenant/is-tenant-active', () => ({
   isTenantActive: isTenantActiveMock,
@@ -66,6 +61,9 @@ const TENANT_ID = 'tenant-1';
 vi.mock('@web/utils/env/env', () => ({
   env: { NEWSLETTER_FROM_ADDRESS: undefined },
 }));
+
+const getRequestTenantIdMock = vi.mocked(getRequestTenantId);
+const getTenantBaseUrlMock = vi.mocked(getTenantBaseUrl);
 
 const subscriber = {
   id: 'sub-1',
@@ -155,7 +153,7 @@ describe('subscribeToNewsletterAction', () => {
     expect(markNewsletterSubscribedMock).toHaveBeenCalledTimes(1);
   });
 
-  it('re-sends the confirmation email and returns "success" for an already-pending subscriber', async () => {
+  it('re-sends the confirmation email and returns "success" for a pending subscriber', async () => {
     createPendingSubscriberMock.mockResolvedValue({
       ok: true,
       data: { outcome: 'already-pending', subscriber },
@@ -171,7 +169,7 @@ describe('subscribeToNewsletterAction', () => {
     expect(markNewsletterSubscribedMock).toHaveBeenCalledTimes(1);
   });
 
-  it('returns "already-subscribed" without sending an email for an already-active subscriber', async () => {
+  it('returns "already-subscribed" without sending an email for an active subscriber', async () => {
     createPendingSubscriberMock.mockResolvedValue({
       ok: true,
       data: {
@@ -215,7 +213,7 @@ describe('subscribeToNewsletterAction', () => {
     expect(markNewsletterSubscribedMock).not.toHaveBeenCalled();
   });
 
-  it('returns "server-error" and logs when createPendingSubscriber resolves a typed failure', async () => {
+  it('returns "server-error" and logs when createPendingSubscriber fails', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     createPendingSubscriberMock.mockResolvedValue({
       ok: false,
@@ -265,7 +263,7 @@ describe('subscribeToNewsletterAction', () => {
     errorSpy.mockRestore();
   });
 
-  it('still returns "success" (logging, not failing) when marking the cookie throws after a real successful signup', async () => {
+  it('still returns "success", logging, when marking the cookie throws after signup', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     createPendingSubscriberMock.mockResolvedValue({
       ok: true,
@@ -287,7 +285,7 @@ describe('subscribeToNewsletterAction', () => {
     errorSpy.mockRestore();
   });
 
-  it("renders the subscribing tenant's own resolved brand and name in the confirmation email", async () => {
+  it("renders the subscribing tenant's own brand and name in the confirmation email", async () => {
     createPendingSubscriberMock.mockResolvedValue({
       ok: true,
       data: { outcome: 'created', subscriber },
@@ -339,7 +337,7 @@ describe('subscribeToNewsletterAction', () => {
     warnSpy.mockRestore();
   });
 
-  it('falls back to product-default subject and body and still sends when the authored-copy lookup rejects', async () => {
+  it('falls back to default subject and body when the authored-copy lookup rejects', async () => {
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     getEmailTemplateMock.mockRejectedValue(new Error('db down'));
     createPendingSubscriberMock.mockResolvedValue({
@@ -421,7 +419,7 @@ describe('subscribeToNewsletterAction', () => {
     );
   });
 
-  it('still returns "already-subscribed" (logging, not failing) when marking the cookie throws', async () => {
+  it('still returns "already-subscribed", logging, when marking the cookie throws', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     createPendingSubscriberMock.mockResolvedValue({
       ok: true,

@@ -19,9 +19,7 @@ const {
 vi.mock('@blog/service', () => ({
   getPlatformSanityContext: getPlatformSanityContextMock,
 }));
-vi.mock('@web/server/tenant/get-request-tenant-id', () => ({
-  getRequestTenantId: vi.fn(),
-}));
+vi.mock('@web/server/tenant/get-request-tenant-id');
 vi.mock('@web/utils/is-production-environment', () => ({
   isProductionEnvironment: isProductionEnvironmentMock,
 }));
@@ -49,14 +47,14 @@ describe(getTenantSanityContext, () => {
     isProductionEnvironmentMock.mockReturnValue(false);
   });
 
-  it('falls back to the platform Sanity context when no tenant is resolved for the request', async () => {
+  it('falls back to the platform Sanity context when no tenant resolves', async () => {
     vi.mocked(getRequestTenantId).mockResolvedValue(undefined);
 
     await expect(getTenantSanityContext()).resolves.toBe(platformTenant);
     expect(queries.tenants.getTenantSanityCredentials).not.toHaveBeenCalled();
   });
 
-  it('falls back to the platform Sanity context outside production when the resolved tenant has no credentials set', async () => {
+  it('falls back to the platform context outside production with no credentials', async () => {
     vi.mocked(getRequestTenantId).mockResolvedValue('tenant-uuid');
     vi.mocked(queries.tenants.getTenantSanityCredentials).mockResolvedValue(
       undefined,
@@ -65,7 +63,7 @@ describe(getTenantSanityContext, () => {
     await expect(getTenantSanityContext()).resolves.toBe(platformTenant);
   });
 
-  it('refuses with notFound() in production when the resolved tenant has no credentials set, never falling back to the platform context', async () => {
+  it('refuses with notFound() in production for a tenant without credentials', async () => {
     isProductionEnvironmentMock.mockReturnValue(true);
     vi.mocked(getRequestTenantId).mockResolvedValue('tenant-uuid');
     vi.mocked(queries.tenants.getTenantSanityCredentials).mockResolvedValue(
@@ -118,7 +116,7 @@ describe('getTenantSanityContext memoization', () => {
     vi.resetModules();
   });
 
-  it('dedupes the tenant credentials query when called more than once in the same render pass', async () => {
+  it('dedupes the tenant credentials query across one render pass', async () => {
     vi.mocked(getRequestTenantId).mockReset();
     vi.mocked(queries.tenants.getTenantSanityCredentials).mockReset();
     vi.mocked(getRequestTenantId).mockResolvedValue('tenant-uuid');
@@ -168,7 +166,7 @@ describe('getTenantSanityContext with the real getRequestTenantId chokepoint', (
   });
 
   it.each([UNRESOLVED_TENANT_PLACEHOLDER, '.well-known'])(
-    'falls back to the platform Sanity context for the non-tenant-id segment %s, without ever querying tenant credentials with it',
+    'falls back to the platform context for the non-tenant-id segment %s',
     async (tenantSegment) => {
       getPlatformSanityContextMock.mockReset();
       getPlatformSanityContextMock.mockReturnValue(platformTenant);

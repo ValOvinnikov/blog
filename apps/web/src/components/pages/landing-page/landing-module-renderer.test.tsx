@@ -11,6 +11,7 @@ import {
   testTestimonialModule,
   testWarnsForUnknownModule,
 } from '@web/testing/shared/module-renderer-contract/module-renderer-contract';
+import { logger } from '@web/utils/logger/logger';
 import type { ReactNode } from 'react';
 
 import { LandingModuleRenderer } from './landing-module-renderer';
@@ -27,7 +28,6 @@ const {
   heroBlogModuleMock,
   heroProfileModuleMock,
   heroStatementModuleMock,
-  loggerWarnMock,
 } = vi.hoisted(() => ({
   contentModuleMock: vi.fn(({ id }: { id: string }) => (
     <div data-testid="stub-content">{id}</div>
@@ -64,7 +64,6 @@ const {
   heroStatementModuleMock: vi.fn(async ({ id }: { id: string }) => (
     <h1 data-testid="stub-hero-statement">{id}</h1>
   )),
-  loggerWarnMock: vi.fn(),
 }));
 
 vi.mock('@web/modules/content/content-module', () => ({
@@ -99,14 +98,9 @@ vi.mock('@web/modules/hero-statement/hero-statement-module', () => ({
   HeroStatementModule: heroStatementModuleMock,
 }));
 
-vi.mock('@web/utils/logger/logger', () => ({
-  logger: {
-    error: vi.fn(),
-    warn: loggerWarnMock,
-    info: vi.fn(),
-    debug: vi.fn(),
-  },
-}));
+vi.mock('@web/utils/logger/logger');
+
+const loggerWarnMock = vi.mocked(logger.warn);
 
 const setup = customRenderAsync(LandingModuleRenderer, {
   hero: undefined,

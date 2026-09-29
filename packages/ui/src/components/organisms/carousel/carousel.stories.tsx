@@ -172,3 +172,15 @@ export const AlignedCenterOverflowsStaysLeft: TStory = {
     />
   ),
 };
+
+export const FractionSlidesAlignedLeft: TStory = {
+  args: { items: buildItems(2), contentAlignment: 'LEFT' },
+};
+
+export const FractionSlidesAlignedCenter: TStory = {
+  args: { items: buildItems(2), contentAlignment: 'CENTER' },
+};
+
+export const FractionSlidesAlignedCenterOverflowsStaysLeft: TStory = {
+  args: { items: buildItems(8), contentAlignment: 'CENTER' },
+};

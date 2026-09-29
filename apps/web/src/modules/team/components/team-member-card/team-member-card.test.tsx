@@ -3,13 +3,10 @@ import { customRender, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeTeamMember } from '@web/testing/modules/team/fixtures';
 import { portableTextBlock } from '@web/testing/shared/portable-text/fixtures';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { TeamMemberCard } from './team-member-card';
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
+vi.mock('@web/i18n/navigation');
 
 const member = makeTeamMember();
 

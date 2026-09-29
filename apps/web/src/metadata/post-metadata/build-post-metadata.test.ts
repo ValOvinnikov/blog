@@ -1,22 +1,22 @@
 import { type TPostDetail, urlForSanityImage } from '@blog/service';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { buildPostMetadata } from './build-post-metadata';
 
-const { getPostPageMock, getTenantSanityContextMock } = vi.hoisted(() => ({
+const { getPostPageMock } = vi.hoisted(() => ({
   getPostPageMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
 }));
 
 vi.mock('@web/server/post/get-post-page', () => ({
   getPostPage: getPostPageMock,
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-sanity-context');
+
+const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
 
 const ogImage = makeSanityImage();
 const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
@@ -69,7 +69,7 @@ describe('buildPostMetadata', () => {
     getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
-  it('forwards the slug and tenant to getPostPage — the same cached loader BlogPostPage reads', async () => {
+  it('forwards the slug and tenant to getPostPage, the loader BlogPostPage reads', async () => {
     getPostPageMock.mockResolvedValue({ ok: true, data: basePost });
 
     await buildPostMetadata('hello-world', 'tenant-1');

@@ -31,12 +31,13 @@ const uiRestrictedGroup = {
 const platformTestingRestrictedGroup = {
   group: ['@platform/testing', '@platform/testing/*', '**/testing/**'],
   message:
-    'src/testing/ holds test-only helpers (custom renders, fixtures) that would drag @testing-library/react and its fixtures into the production bundle — import it only from *.test.{ts,tsx}, other src/testing files, or *.stories.{ts,tsx}.',
+    'src/testing/ holds test-only helpers (custom renders, fixtures) that would drag @testing-library/react and its fixtures into the production bundle — import it only from *.test.{ts,tsx}, other src/testing files, __mocks__ fakes, or *.stories.{ts,tsx}.',
 };
 
 const TESTING_IMPORT_ALLOWED_FILES = [
   '**/*.test.{ts,tsx}',
   'src/testing/**/*.{ts,tsx}',
+  '**/__mocks__/*.{ts,tsx}',
   '**/*.stories.{ts,tsx}',
 ];
 
@@ -57,6 +58,7 @@ export default [
         {
           'src/!(app)/**/': 'KEBAB_CASE',
         },
+        { ignoreWords: ['__mocks__'] },
       ],
     },
   },
@@ -107,10 +109,6 @@ export default [
     },
   },
   {
-    // src/testing/ helpers legitimately import each other, and are the
-    // legitimate consumers of themselves — narrow no-restricted-imports back
-    // to the content-layer and @blog/ui bans for *.test, other src/testing
-    // files, and stories.
     files: TESTING_IMPORT_ALLOWED_FILES,
     rules: {
       'no-restricted-imports': [

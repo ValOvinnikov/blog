@@ -1,4 +1,5 @@
 import { urlForSanityImage } from '@blog/service';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import {
   LANDING_PAGE_OG_IMAGE,
   mockLandingPage,
@@ -7,18 +8,17 @@ import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtur
 
 import { buildLandingPageMetadata } from './build-landing-page-metadata';
 
-const { getLandingPageMock, getTenantSanityContextMock } = vi.hoisted(() => ({
+const { getLandingPageMock } = vi.hoisted(() => ({
   getLandingPageMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
 }));
 
 vi.mock('@web/server/landing/get-landing-page', () => ({
   getLandingPage: getLandingPageMock,
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-sanity-context');
+
+const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
 
 const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
   LANDING_PAGE_OG_IMAGE,
@@ -32,7 +32,7 @@ describe('buildLandingPageMetadata', () => {
     getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
-  it('forwards the slug and tenant to getLandingPage — the same cached loader LandingPage reads', async () => {
+  it('forwards the slug and tenant to getLandingPage, the loader LandingPage reads', async () => {
     getLandingPageMock.mockResolvedValue({ ok: true, data: mockLandingPage });
 
     await buildLandingPageMetadata('about-us', 'tenant-1');
