@@ -1,19 +1,15 @@
+import { env } from '@platform/utils/env/env';
+import { logger } from '@platform/utils/logger/logger';
+
 import { checkDomainAvailability } from './check-domain-availability';
 
-const { envMock, loggerErrorMock } = vi.hoisted(() => ({
-  envMock: {
-    VERCEL_API_TOKEN: undefined as string | undefined,
-    VERCEL_PROJECT_ID_WEB: undefined as string | undefined,
-    VERCEL_TEAM_ID: undefined as string | undefined,
-  },
-  loggerErrorMock: vi.fn(),
-}));
+vi.mock('@platform/utils/env/env');
 
-vi.mock('@platform/utils/env/env', () => ({ env: envMock }));
+const envMock: Partial<Record<keyof typeof env, string>> = env;
 
-vi.mock('@platform/utils/logger/logger', () => ({
-  logger: { error: loggerErrorMock, warn: vi.fn() },
-}));
+vi.mock('@platform/utils/logger/logger');
+
+const loggerErrorMock = vi.mocked(logger.error);
 
 describe(checkDomainAvailability, () => {
   const fetchMock = vi.fn();
@@ -27,7 +23,7 @@ describe(checkDomainAvailability, () => {
     envMock.VERCEL_TEAM_ID = undefined;
   });
 
-  it('returns NOT_CONFIGURED when the Vercel token or project id is missing, and makes no request', async () => {
+  it('returns NOT_CONFIGURED with no request when the Vercel token or project is unset', async () => {
     envMock.VERCEL_API_TOKEN = undefined;
     envMock.VERCEL_PROJECT_ID_WEB = undefined;
 
@@ -52,7 +48,7 @@ describe(checkDomainAvailability, () => {
     expect(result).toBe('AVAILABLE');
   });
 
-  it('returns AVAILABLE when the domain is attached only to the shared web project (own, on retry)', async () => {
+  it('returns AVAILABLE when the domain is attached only to the shared web project', async () => {
     fetchMock.mockResolvedValue(
       new Response(
         JSON.stringify({
@@ -97,7 +93,7 @@ describe(checkDomainAvailability, () => {
     expect(result).toBe('IN_USE');
   });
 
-  it('requests the apex domain, not the full subdomain, and matches the full domain in the response', async () => {
+  it('requests the apex domain and matches the full domain in the response', async () => {
     fetchMock.mockResolvedValue(
       new Response(JSON.stringify({ projectDomains: [] }), { status: 200 }),
     );
@@ -108,7 +104,7 @@ describe(checkDomainAvailability, () => {
     expect(calledUrl.pathname).toBe('/v1/domains/valstack.dev/project-domains');
   });
 
-  it('requests the registrable domain under a multi-part public suffix, not the last two labels', async () => {
+  it('requests the registrable domain under a multi-part public suffix', async () => {
     fetchMock.mockResolvedValue(
       new Response(JSON.stringify({ projectDomains: [] }), { status: 200 }),
     );
@@ -121,7 +117,7 @@ describe(checkDomainAvailability, () => {
     );
   });
 
-  it('returns ERROR without making a request when the apex domain cannot be determined, and logs the specific event', async () => {
+  it('returns ERROR with no request, and logs, when the apex domain is undeterminable', async () => {
     const result = await checkDomainAvailability('co.uk');
 
     expect(result).toBe('ERROR');
@@ -132,7 +128,7 @@ describe(checkDomainAvailability, () => {
     );
   });
 
-  it('returns ERROR without making a request for an IP-literal host (passes the domain pattern but has no registrable apex)', async () => {
+  it('returns ERROR with no request for an IP-literal host', async () => {
     const result = await checkDomainAvailability('1.2.3.4');
 
     expect(result).toBe('ERROR');
@@ -143,7 +139,7 @@ describe(checkDomainAvailability, () => {
     );
   });
 
-  it('returns IN_USE for a subdomain attached to a different project under the same apex, requested against the apex', async () => {
+  it('returns IN_USE for a subdomain attached to another project under the same apex', async () => {
     fetchMock.mockResolvedValue(
       new Response(
         JSON.stringify({
@@ -163,7 +159,7 @@ describe(checkDomainAvailability, () => {
     expect(calledUrl.pathname).toBe('/v1/domains/valstack.dev/project-domains');
   });
 
-  it('returns AVAILABLE for a subdomain already attached to the shared web project (own, on retry), requested against the apex', async () => {
+  it('returns AVAILABLE for a subdomain already attached to the shared web project', async () => {
     fetchMock.mockResolvedValue(
       new Response(
         JSON.stringify({
@@ -182,7 +178,7 @@ describe(checkDomainAvailability, () => {
     expect(calledUrl.pathname).toBe('/v1/domains/valstack.dev/project-domains');
   });
 
-  it('returns AVAILABLE when returned project domains do not include the exact requested name', async () => {
+  it('returns AVAILABLE when no returned project domain is the exact requested name', async () => {
     fetchMock.mockResolvedValue(
       new Response(
         JSON.stringify({
@@ -199,7 +195,7 @@ describe(checkDomainAvailability, () => {
     expect(result).toBe('AVAILABLE');
   });
 
-  it('follows the pagination cursor and finds a conflict that only appears on a later page', async () => {
+  it('follows the pagination cursor to a conflict that only appears on a later page', async () => {
     fetchMock
       .mockResolvedValueOnce(
         new Response(
@@ -255,7 +251,7 @@ describe(checkDomainAvailability, () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
-  it('returns ERROR without a false AVAILABLE when the page cap is exhausted without a conclusive answer', async () => {
+  it('returns ERROR, not a false AVAILABLE, when the page cap runs out inconclusively', async () => {
     fetchMock.mockImplementation(() =>
       Promise.resolve(
         new Response(

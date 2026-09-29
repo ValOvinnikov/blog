@@ -1,30 +1,17 @@
 import { ICONS } from '@blog/config';
+import { usePathname } from '@platform/i18n/navigation';
 import {
   renderWithIntl,
   screen,
   within,
 } from '@platform/testing/custom-render';
 import userEvent from '@testing-library/user-event';
-import type { ComponentPropsWithoutRef } from 'react';
 
 import { TopbarNavMenu } from './topbar-nav-menu';
 
-const { usePathnameMock } = vi.hoisted(() => ({
-  usePathnameMock: vi.fn(),
-}));
+vi.mock('@platform/i18n/navigation');
 
-vi.mock('@platform/i18n/navigation', () => ({
-  usePathname: usePathnameMock,
-  Link: ({
-    href,
-    children,
-    ...rest
-  }: ComponentPropsWithoutRef<'a'> & { href: string }) => (
-    <a href={href} {...rest}>
-      {children}
-    </a>
-  ),
-}));
+const usePathnameMock = vi.mocked(usePathname);
 
 const render = renderWithIntl;
 
@@ -123,7 +110,7 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
     ).not.toHaveAttribute('aria-current');
   });
 
-  it('renders an item with no href as an inert, non-interactive row that is never marked active', async () => {
+  it('renders an item with no href as an inert row that is never marked active', async () => {
     setPathname('/tenants/tenant-1/domain');
     const user = userEvent.setup();
     render(

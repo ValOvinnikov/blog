@@ -1,26 +1,14 @@
 import { usePathname } from '@platform/i18n/navigation';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
-import type { ComponentPropsWithoutRef } from 'react';
 
 import { OperatorBreadcrumb } from './operator-breadcrumb';
 
-vi.mock('@platform/i18n/navigation', () => ({
-  usePathname: vi.fn(() => '/tenants'),
-  Link: ({
-    href,
-    children,
-    ...rest
-  }: ComponentPropsWithoutRef<'a'> & { href: string }) => (
-    <a href={href} {...rest}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('@platform/i18n/navigation');
 
 const render = renderWithIntl;
 
 describe(OperatorBreadcrumb, () => {
-  it('renders the 2-segment trail on the tenants list, with Tenants as the current item', () => {
+  it('renders a 2-segment trail on the tenants list, with Tenants current', () => {
     vi.mocked(usePathname).mockReturnValue('/tenants');
 
     render(<OperatorBreadcrumb />);
@@ -43,7 +31,7 @@ describe(OperatorBreadcrumb, () => {
     expect(screen.getByText('Add tenant')).toBeVisible();
   });
 
-  it('renders the 2-segment trail on the findings list, with Findings as the current item', () => {
+  it('renders a 2-segment trail on the findings list, with Findings current', () => {
     vi.mocked(usePathname).mockReturnValue('/findings');
 
     render(<OperatorBreadcrumb />);

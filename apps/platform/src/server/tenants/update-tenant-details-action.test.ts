@@ -1,32 +1,29 @@
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import { auth } from '@platform/server/auth/auth';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { makeTenant } from '@platform/testing/tenants/fixtures';
+import { logger } from '@platform/utils/logger/logger';
+import type { Session } from 'next-auth';
 
 const {
   requireAdminMock,
-  authMock,
   getTenantByIdMock,
   updateTenantDetailsMock,
   insertAuditEventMock,
-  loggerErrorMock,
 } = vi.hoisted(() => ({
   requireAdminMock: vi.fn(),
-  authMock: vi.fn(),
   getTenantByIdMock: vi.fn(),
   updateTenantDetailsMock: vi.fn(),
   insertAuditEventMock: vi.fn(),
-  loggerErrorMock: vi.fn(),
 }));
 
 vi.mock('@platform/server/auth/require-admin', () => ({
   requireAdmin: requireAdminMock,
 }));
 
-vi.mock('@platform/server/auth/auth', () => ({ auth: authMock }));
+vi.mock('@platform/server/auth/auth');
 
-vi.mock('@platform/utils/logger/logger', () => ({
-  logger: { error: loggerErrorMock },
-}));
+vi.mock('@platform/utils/logger/logger');
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
@@ -38,6 +35,9 @@ vi.mock('@blog/db', async () => ({
     auditEvents: { insertAuditEvent: insertAuditEventMock },
   },
 }));
+
+const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
+const loggerErrorMock = vi.mocked(logger.error);
 
 const validInput = {
   name: 'Acme',
@@ -86,7 +86,7 @@ describe('updateTenantDetailsAction', () => {
     expect(updateTenantDetailsMock).not.toHaveBeenCalled();
   });
 
-  it('rejects a write against an archived tenant server-side, without touching updateTenantDetails or recording an audit event', async () => {
+  it('rejects a write against an archived tenant with no update or audit event', async () => {
     getTenantByIdMock.mockResolvedValue(
       makeTenant({ deprovisionedAt: new Date('2026-08-26T00:00:00.000Z') }),
     );
@@ -135,7 +135,7 @@ describe('updateTenantDetailsAction', () => {
     expect(updateTenantDetailsMock).not.toHaveBeenCalled();
   });
 
-  it('passes a supplied ownerEmail through to updateTenantDetails and returns the updated tenant', async () => {
+  it('passes a supplied ownerEmail to updateTenantDetails and returns the tenant', async () => {
     const tenant = makeTenant({ name: 'Acme' });
     updateTenantDetailsMock.mockResolvedValue({ outcome: 'updated', tenant });
     const { updateTenantDetailsAction } =
@@ -193,7 +193,7 @@ describe('updateTenantDetailsAction', () => {
     });
   });
 
-  it('maps a domain-locked outcome onto a primaryDomain field error naming the blocking step', async () => {
+  it('maps a domain-locked outcome to a primaryDomain error naming the blocking step', async () => {
     updateTenantDetailsMock.mockResolvedValue({
       outcome: 'domain-locked',
       blockingStep: 'MAP_DOMAIN',
@@ -213,7 +213,7 @@ describe('updateTenantDetailsAction', () => {
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
-  it('maps a provisioning-started outcome onto a form-level error, without a successful update', async () => {
+  it('maps a provisioning-started outcome to a form-level error', async () => {
     updateTenantDetailsMock.mockResolvedValue({
       outcome: 'provisioning-started',
     });
@@ -245,7 +245,7 @@ describe('updateTenantDetailsAction', () => {
     });
   });
 
-  it('succeeds on a rename-only submit that resends the current owner email, even once the owner has already joined', async () => {
+  it('succeeds on a rename that resends the current owner email after they joined', async () => {
     const tenant = makeTenant({ name: 'Acme Renamed' });
     updateTenantDetailsMock.mockResolvedValue({ outcome: 'updated', tenant });
     const { updateTenantDetailsAction } =
@@ -265,7 +265,7 @@ describe('updateTenantDetailsAction', () => {
     });
   });
 
-  it('maps an owner-already-joined outcome onto a distinct form-level error, without a successful update', async () => {
+  it('maps an owner-already-joined outcome to a distinct form-level error', async () => {
     updateTenantDetailsMock.mockResolvedValue({
       outcome: 'owner-already-joined',
     });
@@ -336,7 +336,7 @@ describe('updateTenantDetailsAction', () => {
     );
   });
 
-  it('records a SETTINGS_UPDATED audit event for the tenant, with the operator as actor', async () => {
+  it('records a SETTINGS_UPDATED audit event for the tenant with the operator as actor', async () => {
     const tenant = makeTenant({ name: 'Acme' });
     updateTenantDetailsMock.mockResolvedValue({ outcome: 'updated', tenant });
     const { updateTenantDetailsAction } =
@@ -354,7 +354,7 @@ describe('updateTenantDetailsAction', () => {
     });
   });
 
-  it('still returns the updated tenant when the audit write fails, and logs the failure', async () => {
+  it('still returns the updated tenant when the audit write fails, and logs it', async () => {
     const tenant = makeTenant({ name: 'Acme' });
     updateTenantDetailsMock.mockResolvedValue({ outcome: 'updated', tenant });
     insertAuditEventMock.mockRejectedValue(new Error('connection reset'));

@@ -1,21 +1,9 @@
 import { usePathname } from '@platform/i18n/navigation';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
-import type { ComponentPropsWithoutRef } from 'react';
 
 import { DashboardBreadcrumb } from './dashboard-breadcrumb';
 
-vi.mock('@platform/i18n/navigation', () => ({
-  usePathname: vi.fn(() => '/dashboard'),
-  Link: ({
-    href,
-    children,
-    ...rest
-  }: ComponentPropsWithoutRef<'a'> & { href: string }) => (
-    <a href={href} {...rest}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('@platform/i18n/navigation');
 
 const render = renderWithIntl;
 

@@ -1,7 +1,9 @@
+import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import userEvent from '@testing-library/user-event';
 import { redirect } from 'next/navigation';
+import type { Session } from 'next-auth';
 
 import VoicePage from './page';
 
@@ -11,15 +13,14 @@ const openAdvanced = async () => {
   await userEvent.setup().click(screen.getByText(ADVANCED_SUMMARY));
 };
 
-const { authMock, getAdminByUserIdMock, getTenantByIdMock, getSiteConfigMock } =
+const { getAdminByUserIdMock, getTenantByIdMock, getSiteConfigMock } =
   vi.hoisted(() => ({
-    authMock: vi.fn(),
     getAdminByUserIdMock: vi.fn(),
     getTenantByIdMock: vi.fn(),
     getSiteConfigMock: vi.fn(),
   }));
 
-vi.mock('@platform/server/auth/auth', () => ({ auth: authMock }));
+vi.mock('@platform/server/auth/auth');
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
@@ -29,6 +30,8 @@ vi.mock('@blog/db', async () => ({
     siteConfig: { getSiteConfig: getSiteConfigMock },
   },
 }));
+
+const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 const setup = customRenderAsync(VoicePage, {
   params: Promise.resolve({ tenantId: 'tenant-1' }),
@@ -55,7 +58,7 @@ describe(`<${VoicePage.name}/>`, () => {
     expect(getSiteConfigMock).not.toHaveBeenCalled();
   });
 
-  it('shows every field blank, with no placeholder, when the tenant has no site_config row yet', async () => {
+  it('shows every field blank, with no placeholder, when there is no site_config row', async () => {
     getSiteConfigMock.mockResolvedValue(undefined);
 
     await setup();

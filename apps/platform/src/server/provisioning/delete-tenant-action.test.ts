@@ -1,31 +1,28 @@
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import { auth } from '@platform/server/auth/auth';
+import { logger } from '@platform/utils/logger/logger';
 import { notFound, redirect } from 'next/navigation';
+import type { Session } from 'next-auth';
 
 const {
   requireSuperAdminMock,
-  authMock,
   listTenantsByIdsMock,
   deleteTenantMock,
   insertAuditEventMock,
-  loggerErrorMock,
 } = vi.hoisted(() => ({
   requireSuperAdminMock: vi.fn(),
-  authMock: vi.fn(),
   listTenantsByIdsMock: vi.fn(),
   deleteTenantMock: vi.fn(),
   insertAuditEventMock: vi.fn(),
-  loggerErrorMock: vi.fn(),
 }));
 
 vi.mock('@platform/server/auth/require-super-admin', () => ({
   requireSuperAdmin: requireSuperAdminMock,
 }));
 
-vi.mock('@platform/server/auth/auth', () => ({ auth: authMock }));
+vi.mock('@platform/server/auth/auth');
 
-vi.mock('@platform/utils/logger/logger', () => ({
-  logger: { error: loggerErrorMock },
-}));
+vi.mock('@platform/utils/logger/logger');
 
 vi.mock('@blog/db', () => ({
   queries: {
@@ -36,6 +33,9 @@ vi.mock('@blog/db', () => ({
     auditEvents: { insertAuditEvent: insertAuditEventMock },
   },
 }));
+
+const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
+const loggerErrorMock = vi.mocked(logger.error);
 
 const tenant = {
   id: 'tenant-1',
@@ -75,7 +75,7 @@ describe('deleteTenantAction', () => {
     expect(deleteTenantMock).not.toHaveBeenCalled();
   });
 
-  it("rejects an ADMIN-role caller via requireSuperAdmin's 404, before touching the tenant", async () => {
+  it("rejects an ADMIN-role caller via requireSuperAdmin's 404 before any tenant work", async () => {
     requireSuperAdminMock.mockImplementation(() => {
       notFound();
     });
@@ -113,7 +113,7 @@ describe('deleteTenantAction', () => {
     expect(deleteTenantMock).not.toHaveBeenCalled();
   });
 
-  it('returns an error and records no audit event when the mutation refuses a non-archived tenant', async () => {
+  it('returns an error and no audit event when the mutation refuses a live tenant', async () => {
     deleteTenantMock.mockResolvedValue({ outcome: 'not-archived' });
     const { deleteTenantAction } = await import('./delete-tenant-action');
 
@@ -125,7 +125,7 @@ describe('deleteTenantAction', () => {
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
-  it('returns an error and records no audit event when the mutation reports the tenant gone', async () => {
+  it('returns an error and no audit event when the mutation reports the tenant gone', async () => {
     deleteTenantMock.mockResolvedValue({ outcome: 'not-found' });
     const { deleteTenantAction } = await import('./delete-tenant-action');
 
@@ -137,7 +137,7 @@ describe('deleteTenantAction', () => {
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
-  it('deletes the tenant and records a DELETED audit event when confirm matches the live name', async () => {
+  it('deletes the tenant and records a DELETED audit event when confirm matches', async () => {
     const { deleteTenantAction } = await import('./delete-tenant-action');
 
     const result = await deleteTenantAction('tenant-1', {

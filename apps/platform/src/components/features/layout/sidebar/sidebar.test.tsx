@@ -1,39 +1,20 @@
 import { ICONS } from '@blog/config';
 import { SidebarCollapseProvider } from '@platform/components/features/layout/sidebar-collapse-provider';
+import { usePathname } from '@platform/i18n/navigation';
 import {
   renderWithIntl,
   screen,
   within,
 } from '@platform/testing/custom-render';
 import userEvent from '@testing-library/user-event';
-import type { ComponentPropsWithoutRef, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 import { Sidebar } from './sidebar';
 
-const { usePathnameMock } = vi.hoisted(() => ({
-  usePathnameMock: vi.fn(),
-}));
+vi.mock('@platform/i18n/navigation');
 
-// `SidebarNavLink` resolves the active route via `@platform/i18n/navigation`
-// (next-intl's locale-aware `usePathname`), not plain `next/navigation` —
-// mocking the wrong module here previously let a broken import ship
-// unnoticed (see `sidebar-nav-link.tsx`).
-vi.mock('@platform/i18n/navigation', () => ({
-  usePathname: usePathnameMock,
-  Link: ({
-    href,
-    children,
-    ...rest
-  }: ComponentPropsWithoutRef<'a'> & { href: string }) => (
-    <a href={href} {...rest}>
-      {children}
-    </a>
-  ),
-}));
+const usePathnameMock = vi.mocked(usePathname);
 
-// `Sidebar` renders `SidebarCollapseToggle`, which reads `useSidebarCollapse`
-// — every render needs the ambient `SidebarCollapseProvider` `ShellFrame`
-// supplies in production.
 const render = (ui: ReactNode) =>
   renderWithIntl(
     <SidebarCollapseProvider isInitiallyCollapsed={false}>
@@ -197,7 +178,7 @@ describe(`<${Sidebar.name}/>`, () => {
     ).not.toHaveAttribute('aria-current');
   });
 
-  it('renders an unbuilt destination as an inert, non-navigable row carrying its badge as real text, and never as active even at its own path', () => {
+  it('renders an unbuilt destination as an inert, never-active row with its badge text', () => {
     setPathname('/tenants/tenant-1/domain');
 
     render(
@@ -248,7 +229,7 @@ describe(`<${Sidebar.name}/>`, () => {
     expect(screen.getByText("Provisioning isn't available yet.")).toBeVisible();
   });
 
-  it('names its collapse toggle for the action it performs, and flips both the name and aria-expanded on click', async () => {
+  it('names its collapse toggle for its action, flipping name and aria-expanded', async () => {
     const user = userEvent.setup();
     render(<Sidebar sections={[]} />);
 
@@ -262,7 +243,7 @@ describe(`<${Sidebar.name}/>`, () => {
     ).toHaveAttribute('aria-expanded', 'false');
   });
 
-  it('keeps a nav link reachable by its accessible name once the sidebar starts collapsed', () => {
+  it('keeps a nav link reachable by its name when the sidebar starts collapsed', () => {
     renderWithIntl(
       <SidebarCollapseProvider isInitiallyCollapsed={true}>
         <Sidebar
