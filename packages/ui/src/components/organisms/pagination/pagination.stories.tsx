@@ -36,3 +36,15 @@ export const LastPage: TStory = {
 export const SinglePage: TStory = {
   args: { currentPage: 1, totalPages: 1 },
 };
+
+export const TruncatedNearStart: TStory = {
+  args: { currentPage: 1, totalPages: 12 },
+};
+
+export const TruncatedMiddle: TStory = {
+  args: { currentPage: 6, totalPages: 12 },
+};
+
+export const TruncatedNearEnd: TStory = {
+  args: { currentPage: 12, totalPages: 12 },
+};
