@@ -129,6 +129,12 @@ export const SquareShape: TStory = {
   },
 };
 
+export const SquareShapeInitials: TStory = {
+  args: {
+    imageShape: CARD_IMAGE_SHAPE.SQUARE,
+  },
+};
+
 export const WithBios: TStory = {
   args: {
     showBios: true,

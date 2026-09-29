@@ -8,7 +8,10 @@ import { SmartLink } from '@web/components/shared/smart-link';
 import { SocialLinks } from '@web/components/shared/social-links';
 import { stretchedLinkVariants } from '@web/components/shared/stretched-link';
 
-import { teamMemberCardVariants } from './team-member-card-variants';
+import {
+  teamMemberCardAvatarFallbackVariants,
+  teamMemberCardVariants,
+} from './team-member-card-variants';
 
 const CIRCLE_IMAGE_SIZE = 224;
 const SQUARE_IMAGE_SIZE = 640;
@@ -50,7 +53,12 @@ export const TeamMemberCard = ({
             className="size-full object-cover"
           />
         ) : (
-          <Avatar alt={member.name} name={member.name} shape={mediaShape} />
+          <Avatar
+            alt={member.name}
+            name={member.name}
+            shape={mediaShape}
+            className={teamMemberCardAvatarFallbackVariants()}
+          />
         )}
       </MediaCard.Media>
       <MediaCard.Title level={3}>
@@ -72,7 +80,7 @@ export const TeamMemberCard = ({
         </div>
       )}
       {member.socialLinks.length > 0 && (
-        <SocialLinks profiles={member.socialLinks} />
+        <SocialLinks profiles={member.socialLinks} variant="outlined" />
       )}
     </MediaCard>
   );
