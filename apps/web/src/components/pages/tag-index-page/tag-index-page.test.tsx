@@ -1,56 +1,71 @@
-import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { service, type TTagIndexPage } from '@blog/service';
+import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import {
+  customRenderServerAsync,
+  screen,
+  within,
+} from '@web/testing/custom-render';
+import { makeCtaModuleData } from '@web/testing/modules/cta/fixtures';
+import { makeHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { makeSeo } from '@web/testing/shared/seo/fixtures';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 
 import { TagIndexPage } from './tag-index-page';
 
-const { getTagIndexPageMock, tagIndexModuleRendererMock } = vi.hoisted(() => ({
-  getTagIndexPageMock: vi.fn(),
-  tagIndexModuleRendererMock: vi.fn(
-    ({
-      hero,
-      headingBlock,
-      modules,
-    }: {
-      hero?: { id: string };
-      headingBlock: { heading: string };
-      modules: { id: string; type: string }[];
-    }) => (
-      <div data-testid="tag-index-module-renderer">
-        {hero ? hero.id : headingBlock.heading} —{' '}
-        {modules.map((module) => module.type).join(',')}
-      </div>
-    ),
-  ),
+vi.mock('@blog/service', () => ({
+  service: {
+    pages: { tagIndex: { v1: { getIndexPage: vi.fn() } } },
+    modules: {
+      cta: { v1: { getCta: vi.fn() } },
+      heroBlog: { v1: { getHeroBlog: vi.fn() } },
+    },
+  },
 }));
 
-vi.mock('@web/server/tag-index/get-tag-index-page', () => ({
-  getTagIndexPage: getTagIndexPageMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-sanity-context');
 
-vi.mock('@web/components/features/tag-index/tag-index-breadcrumbs', () => ({
-  TagIndexBreadcrumbs: ({ tenant }: { tenant: string }) => (
-    <div data-testid="tag-index-breadcrumbs">{tenant}</div>
-  ),
-}));
+vi.mock('@web/server/tenant/get-tenant-base-url');
 
-vi.mock('./tag-index-module-renderer', () => ({
-  TagIndexModuleRenderer: tagIndexModuleRendererMock,
-}));
+vi.mock('@web/utils/logger/logger');
 
-const setup = customRenderAsync(TagIndexPage, {
+vi.mock('@web/i18n/navigation');
+
+const getIndexPageMock = vi.mocked(service.pages.tagIndex.v1.getIndexPage);
+
+const tagIndexPage: TTagIndexPage = {
+  headingBlock: makeHeadingBlock({
+    heading: 'Tags',
+    supportingText: 'Browse every post by tag.',
+  }),
+  hero: undefined,
+  modules: [],
+  seo: makeSeo(),
+};
+
+const setup = customRenderServerAsync(TagIndexPage, {
   locale: 'en',
   tenant: 'tenant-1',
 });
 
 describe(`<${TagIndexPage.name}/>`, () => {
   beforeEach(() => {
-    getTagIndexPageMock.mockReset();
+    getIndexPageMock.mockResolvedValue({ ok: true, data: tagIndexPage });
+    vi.mocked(service.modules.cta.v1.getCta).mockImplementation(async (id) => ({
+      ok: true,
+      data: makeCtaModuleData({
+        headingBlock: makeHeadingBlock({
+          heading: id === 'cta-1' ? 'Join the list' : 'Write for us',
+        }),
+      }),
+    }));
   });
 
-  it('calls notFound() when the fetch fails', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getTagIndexPageMock.mockResolvedValue({
+  it('logs and calls notFound() when the fetch fails', async () => {
+    getIndexPageMock.mockResolvedValueOnce({
       ok: false,
       error: new Error('boom'),
     });
@@ -58,166 +73,97 @@ describe(`<${TagIndexPage.name}/>`, () => {
     await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('tag_index_page.fetch_failed'),
+    expect(logger.error).toHaveBeenCalledWith(
+      'tag_index_page.fetch_failed',
+      expect.anything(),
     );
-
-    errorSpy.mockRestore();
   });
 
-  it('calls notFound() without logging when the index page simply does not exist', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getTagIndexPageMock.mockResolvedValue({ ok: true, data: undefined });
+  it('calls notFound() without logging when the index page does not exist', async () => {
+    getIndexPageMock.mockResolvedValueOnce({ ok: true, data: undefined });
 
     await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    expect(errorSpy).not.toHaveBeenCalled();
-
-    errorSpy.mockRestore();
+    expect(logger.error).not.toHaveBeenCalled();
   });
 
-  it('dispatches TagIndexModuleRenderer with the fetched headingBlock and modules', async () => {
-    getTagIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        headingBlock: makeHeadingBlock({
-          heading: 'Tags',
-          supportingText: 'Browse every post by tag.',
-        }),
-        modules: [],
-      },
-    });
-
+  it('fetches the index page and breadcrumb base URL for the tenant', async () => {
     await setup();
 
-    expect(tagIndexModuleRendererMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        headingBlock: makeHeadingBlock({
-          heading: 'Tags',
-          supportingText: 'Browse every post by tag.',
-        }),
-        modules: [],
-        locale: 'en',
-        tenant: 'tenant-1',
-      }),
-      undefined,
+    expect(getTenantSanityContext).toHaveBeenCalledWith('tenant-1');
+    expect(getIndexPageMock).toHaveBeenCalledWith(
+      DEFAULT_TENANT_SANITY_CONTEXT,
     );
-    expect(screen.getByTestId('tag-index-module-renderer')).toHaveTextContent(
-      'Tags',
-    );
+    expect(getTenantBaseUrl).toHaveBeenCalledWith('tenant-1');
+  });
+
+  it('renders the heading and supporting text inside main', async () => {
+    await setup();
+
+    const main = screen.getByRole('main');
+    expect(
+      within(main).getByRole('heading', { level: 1, name: 'Tags' }),
+    ).toBeVisible();
+    expect(within(main).getByText('Browse every post by tag.')).toBeVisible();
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 
-  it('dispatches TagIndexModuleRenderer with the hero when a hero is set', async () => {
-    getTagIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        headingBlock: makeHeadingBlock({ heading: 'Tags' }),
-        hero: { id: 'hero-1', type: 'module_hero' },
-        modules: [],
-      },
-    });
-
+  it('renders the breadcrumb trail outside main', async () => {
     await setup();
 
-    expect(tagIndexModuleRendererMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        hero: { id: 'hero-1', type: 'module_hero' },
-        locale: 'en',
-        tenant: 'tenant-1',
-      }),
-      undefined,
-    );
-    expect(screen.getByTestId('tag-index-module-renderer')).toHaveTextContent(
-      'hero-1',
-    );
+    const breadcrumbs = screen.getByRole('navigation', { name: 'Breadcrumb' });
+    expect(
+      within(breadcrumbs).getByRole('link', { name: 'Home' }),
+    ).toBeVisible();
+    expect(within(breadcrumbs).getByText('Tags')).toBeVisible();
+    expect(screen.getByRole('main')).not.toContainElement(breadcrumbs);
   });
 
-  it('renders the parts in order: breadcrumbs, then the module renderer', async () => {
-    getTagIndexPageMock.mockResolvedValue({
+  it('renders the authored modules inside main in order', async () => {
+    getIndexPageMock.mockResolvedValueOnce({
       ok: true,
       data: {
-        headingBlock: makeHeadingBlock({ heading: 'Tags' }),
-        modules: [{ id: 'tag-list-1', type: 'module_taxonomyList' }],
-      },
-    });
-
-    await setup();
-
-    const order = screen
-      .getAllByTestId(/.+/)
-      .map((el) => el.getAttribute('data-testid'));
-
-    expect(order).toEqual([
-      'tag-index-breadcrumbs',
-      'tag-index-module-renderer',
-    ]);
-  });
-
-  it('renders through PageShell: breadcrumbs outside main, module renderer inside it', async () => {
-    getTagIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        headingBlock: makeHeadingBlock({ heading: 'Tags' }),
-        modules: [],
+        ...tagIndexPage,
+        modules: [
+          { id: 'cta-1', type: 'module_cta' },
+          { id: 'cta-2', type: 'module_cta' },
+        ],
       },
     });
 
     await setup();
 
     const main = screen.getByRole('main');
-    expect(main).toContainElement(
-      screen.getByTestId('tag-index-module-renderer'),
-    );
+    expect(within(main).getAllByRole('region')).toEqual([
+      within(main).getByRole('region', { name: 'Join the list' }),
+      within(main).getByRole('region', { name: 'Write for us' }),
+    ]);
+  });
+
+  it('renders the hero in place of the heading when one is set', async () => {
+    getIndexPageMock.mockResolvedValueOnce({
+      ok: true,
+      data: {
+        ...tagIndexPage,
+        hero: { id: 'hero-1', type: 'module_heroBlog' },
+      },
+    });
+    vi.mocked(service.modules.heroBlog.v1.getHeroBlog).mockResolvedValueOnce({
+      ok: true,
+      data: makeHeroBlogData({ heading: 'Every tag we write about' }),
+    });
+
+    await setup();
+
     expect(
-      screen.getByTestId('tag-index-breadcrumbs').closest('main'),
-    ).toBeNull();
-  });
-
-  it('passes the page-builder modules through to TagIndexModuleRenderer, in order, including the taxonomy list module', async () => {
-    getTagIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        headingBlock: makeHeadingBlock({ heading: 'Tags' }),
-        modules: [
-          { id: 'tag-list-1', type: 'module_taxonomyList' },
-          { id: 'newsletter-1', type: 'module_newsletter' },
-        ],
-      },
-    });
-
-    await setup();
-
-    expect(tagIndexModuleRendererMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        modules: [
-          { id: 'tag-list-1', type: 'module_taxonomyList' },
-          { id: 'newsletter-1', type: 'module_newsletter' },
-        ],
-        locale: 'en',
+      screen.getByRole('heading', {
+        level: 1,
+        name: 'Every tag we write about',
       }),
-      undefined,
-    );
-    expect(screen.getByTestId('tag-index-module-renderer')).toHaveTextContent(
-      'module_taxonomyList,module_newsletter',
-    );
-  });
-
-  it('forwards the tenant to getTagIndexPage and TagIndexBreadcrumbs', async () => {
-    getTagIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        headingBlock: makeHeadingBlock({ heading: 'Tags' }),
-        modules: [],
-      },
-    });
-
-    await setup();
-
-    expect(getTagIndexPageMock).toHaveBeenCalledWith('tenant-1');
-    expect(screen.getByTestId('tag-index-breadcrumbs')).toHaveTextContent(
-      'tenant-1',
-    );
+    ).toBeVisible();
+    expect(
+      screen.queryByRole('heading', { level: 1, name: 'Tags' }),
+    ).not.toBeInTheDocument();
   });
 });

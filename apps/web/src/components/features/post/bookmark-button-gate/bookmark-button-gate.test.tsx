@@ -1,7 +1,11 @@
 import { ToastProvider } from '@web/context/toast-provider';
 import { getBookmarkStatus } from '@web/server/bookmarks/bookmark-actions';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
-import { renderElement, screen, waitFor } from '@web/testing/custom-render';
+import {
+  customRenderServerAsync,
+  screen,
+  waitFor,
+} from '@web/testing/custom-render';
 import { useSession } from 'next-auth/react';
 
 import { BookmarkButtonGate } from './bookmark-button-gate';
@@ -17,12 +21,11 @@ vi.mock('@web/server/bookmarks/bookmark-actions', () => ({
 
 vi.mock('next-auth/react', () => ({ useSession: vi.fn() }));
 
-const setup = async () =>
-  renderElement(
-    <ToastProvider>
-      {await BookmarkButtonGate({ postId: 'post-1', tenant: 'tenant-1' })}
-    </ToastProvider>,
-  );
+const setup = customRenderServerAsync(
+  BookmarkButtonGate,
+  { postId: 'post-1', tenant: 'tenant-1' },
+  { wrapper: ToastProvider },
+);
 
 describe(`<${BookmarkButtonGate.name}/>`, () => {
   beforeEach(() => {

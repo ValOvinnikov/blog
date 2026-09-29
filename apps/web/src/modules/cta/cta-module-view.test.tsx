@@ -1,8 +1,8 @@
-import { BRAND_VARIANT, CTA_VARIANT } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
 import {
   ctaActionsDemo,
   ctaContentDemo,
+  makeCtaModuleData,
 } from '@web/testing/modules/cta/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
@@ -10,21 +10,7 @@ import { CtaModuleView } from './cta-module-view';
 
 const setup = customRender(CtaModuleView, {
   id: 'cta-1',
-  variant: CTA_VARIANT.CALLOUT,
-  brandVariant: BRAND_VARIANT.PRIMARY,
-  bandTone: BRAND_VARIANT.SECONDARY,
-  eyebrow: undefined,
-  headingBlock: makeHeadingBlock({
-    heading: 'Get started',
-  }),
-  content: undefined,
-  image: undefined,
-  contentPosition: undefined,
-  contentAlignment: undefined,
-  mobileMediaOrder: undefined,
-  ctaButtons: [],
-  footnote: undefined,
-  layout: undefined,
+  ...makeCtaModuleData(),
 });
 
 describe(`<${CtaModuleView.name}/>`, () => {
