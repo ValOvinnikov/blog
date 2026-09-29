@@ -5,22 +5,10 @@ import {
   within,
 } from '@platform/testing/custom-render';
 import userEvent from '@testing-library/user-event';
-import type { ComponentPropsWithoutRef } from 'react';
 
 import { Topbar } from './topbar';
 
-vi.mock('@platform/i18n/navigation', () => ({
-  usePathname: () => '/',
-  Link: ({
-    href,
-    children,
-    ...rest
-  }: ComponentPropsWithoutRef<'a'> & { href: string }) => (
-    <a href={href} {...rest}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('@platform/i18n/navigation');
 
 const render = renderWithIntl;
 
@@ -43,7 +31,7 @@ describe(Topbar, () => {
     ).not.toBeInTheDocument();
   });
 
-  it('renders a nav menu trigger that opens the passed sections when sections are provided', async () => {
+  it('renders a nav menu trigger that opens the passed sections', async () => {
     const user = userEvent.setup();
     render(
       <Topbar

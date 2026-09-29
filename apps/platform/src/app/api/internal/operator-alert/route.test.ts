@@ -1,29 +1,20 @@
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { makeTenant } from '@platform/testing/tenants/fixtures';
+import { env } from '@platform/utils/env/env';
+import { logger } from '@platform/utils/logger/logger';
 
-const {
-  envMock,
-  getTenantByIdMock,
-  listSuperadminEmailsMock,
-  sendEmailMock,
-  loggerErrorMock,
-} = vi.hoisted(() => ({
-  envMock: { OPERATOR_ALERT_SECRET: undefined as string | undefined },
-  getTenantByIdMock: vi.fn(),
-  listSuperadminEmailsMock: vi.fn(),
-  sendEmailMock: vi.fn(),
-  loggerErrorMock: vi.fn(),
-}));
+const { getTenantByIdMock, listSuperadminEmailsMock, sendEmailMock } =
+  vi.hoisted(() => ({
+    getTenantByIdMock: vi.fn(),
+    listSuperadminEmailsMock: vi.fn(),
+    sendEmailMock: vi.fn(),
+  }));
 
-vi.mock('@platform/utils/env/env', () => ({
-  get env() {
-    return envMock;
-  },
-}));
+vi.mock('@platform/utils/env/env');
 
-vi.mock('@platform/utils/logger/logger', () => ({
-  logger: { error: loggerErrorMock, warn: vi.fn() },
-}));
+const envMock: Partial<Record<keyof typeof env, string>> = env;
+
+vi.mock('@platform/utils/logger/logger');
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
@@ -41,6 +32,8 @@ vi.mock('@blog/email', async () => {
     sendEmail: sendEmailMock,
   };
 });
+
+const loggerErrorMock = vi.mocked(logger.error);
 
 const ENDPOINT = 'https://admin.example.com/api/internal/operator-alert';
 const VALID_SECRET = 'a-very-secret-value';

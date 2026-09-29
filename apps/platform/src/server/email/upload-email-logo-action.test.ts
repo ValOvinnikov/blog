@@ -3,13 +3,14 @@ import {
   AUDIT_TARGET_TYPE,
   EMAIL_TEMPLATE_TYPE,
 } from '@blog/config';
+import { auth } from '@platform/server/auth/auth';
+import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { env } from '@platform/utils/env/env';
+import type { Session } from 'next-auth';
 
 import { uploadEmailLogoAction } from './upload-email-logo-action';
 
 const {
-  requireTenantMembershipMock,
-  authMock,
   getEmailConfigMock,
   getEmailTemplateMock,
   upsertEmailConfigMock,
@@ -19,8 +20,6 @@ const {
   putMock,
   delMock,
 } = vi.hoisted(() => ({
-  requireTenantMembershipMock: vi.fn(),
-  authMock: vi.fn(),
   getEmailConfigMock: vi.fn(),
   getEmailTemplateMock: vi.fn(),
   upsertEmailConfigMock: vi.fn(),
@@ -31,11 +30,9 @@ const {
   delMock: vi.fn(),
 }));
 
-vi.mock('@platform/server/auth/require-tenant-membership', () => ({
-  requireTenantMembership: requireTenantMembershipMock,
-}));
+vi.mock('@platform/server/auth/require-tenant-membership');
 
-vi.mock('@platform/server/auth/auth', () => ({ auth: authMock }));
+vi.mock('@platform/server/auth/auth');
 
 vi.mock('@platform/server/email/validate-email-logo', () => ({
   validateEmailLogoUpload: validateEmailLogoUploadMock,
@@ -57,9 +54,14 @@ vi.mock('@blog/db', () => ({
 
 vi.mock('@vercel/blob', () => ({ put: putMock, del: delMock }));
 
-vi.mock('@platform/utils/env/env', () => ({
-  env: { BLOB_READ_WRITE_TOKEN: 'test-token' },
-}));
+vi.mock('@platform/utils/env/env');
+
+Object.assign(env, { BLOB_READ_WRITE_TOKEN: 'test-token' });
+
+const requireTenantMembershipMock = vi.mocked<
+  (tenantId: string) => Promise<unknown>
+>(requireTenantMembership);
+const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 const makeFormData = (file: File | null): FormData => {
   const formData = new FormData();
@@ -236,8 +238,7 @@ describe(uploadEmailLogoAction, () => {
   });
 
   it('reports a readable error and never touches Blob when the token is unconfigured', async () => {
-    // @ts-expect-error -- the mocked env module is a plain mutable object
-    env.BLOB_READ_WRITE_TOKEN = undefined;
+    Object.assign(env, { BLOB_READ_WRITE_TOKEN: undefined });
 
     try {
       const result = await uploadEmailLogoAction(
@@ -252,8 +253,7 @@ describe(uploadEmailLogoAction, () => {
       });
       expect(putMock).not.toHaveBeenCalled();
     } finally {
-      // @ts-expect-error -- restore the mocked env module for later tests
-      env.BLOB_READ_WRITE_TOKEN = 'test-token';
+      Object.assign(env, { BLOB_READ_WRITE_TOKEN: 'test-token' });
     }
   });
 

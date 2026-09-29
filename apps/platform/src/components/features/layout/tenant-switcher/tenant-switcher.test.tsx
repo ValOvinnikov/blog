@@ -4,21 +4,10 @@ import {
   makeTenant,
 } from '@platform/testing/tenants/fixtures';
 import userEvent from '@testing-library/user-event';
-import type { ComponentPropsWithoutRef } from 'react';
 
 import { TenantSwitcher } from './tenant-switcher';
 
-vi.mock('@platform/i18n/navigation', () => ({
-  Link: ({
-    href,
-    children,
-    ...rest
-  }: ComponentPropsWithoutRef<'a'> & { href: string }) => (
-    <a href={href} {...rest}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('@platform/i18n/navigation');
 
 const tenant = makeReadyTenant();
 
@@ -36,7 +25,7 @@ describe(`<${TenantSwitcher.name}/>`, () => {
     ).toHaveTextContent('acme.example.com');
   });
 
-  it('opens a menu whose accessible name is the active tenant (from the trigger), listing every tenant the user can switch into and linking to its route', async () => {
+  it('opens a menu named for the active tenant, linking every switchable tenant', async () => {
     const user = userEvent.setup();
     setup();
 
@@ -47,7 +36,7 @@ describe(`<${TenantSwitcher.name}/>`, () => {
     expect(link).toHaveAttribute('href', '/tenants/tenant-1');
   });
 
-  it('links each tenant through a caller-supplied hrefFor instead of the default /tenants/{id} route', async () => {
+  it('links each tenant through a caller-supplied hrefFor instead of /tenants/{id}', async () => {
     const user = userEvent.setup();
     setup({
       hrefFor: (t) => `/dashboard/select-tenant?tenantId=${t.id}`,
@@ -63,7 +52,7 @@ describe(`<${TenantSwitcher.name}/>`, () => {
     );
   });
 
-  it('marks an archived tenant in the menu, as part of its accessible name, and leaves a non-archived one unmarked', async () => {
+  it('marks an archived tenant in its accessible name and leaves others unmarked', async () => {
     const user = userEvent.setup();
     const archivedTenant = makeTenant({
       id: 'tenant-2',

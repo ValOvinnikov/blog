@@ -1,18 +1,19 @@
 import { usePathname } from '@platform/i18n/navigation';
+import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { redirect, useParams } from 'next/navigation';
-import type { ComponentPropsWithoutRef } from 'react';
+import type { Session } from 'next-auth';
 
 import OperatorLayout from './layout';
 
-const { authMock, getAdminByUserIdMock, resolveIsSidebarCollapsedMock } =
-  vi.hoisted(() => ({
-    authMock: vi.fn(),
+const { getAdminByUserIdMock, resolveIsSidebarCollapsedMock } = vi.hoisted(
+  () => ({
     getAdminByUserIdMock: vi.fn(),
     resolveIsSidebarCollapsedMock: vi.fn(),
-  }));
+  }),
+);
 
-vi.mock('@platform/server/auth/auth', () => ({ auth: authMock }));
+vi.mock('@platform/server/auth/auth');
 
 vi.mock('@platform/server/layout/resolve-is-sidebar-collapsed', () => ({
   resolveIsSidebarCollapsed: resolveIsSidebarCollapsedMock,
@@ -22,18 +23,7 @@ vi.mock('@blog/db', () => ({
   queries: { admins: { getAdminByUserId: getAdminByUserIdMock } },
 }));
 
-vi.mock('@platform/i18n/navigation', () => ({
-  usePathname: vi.fn(() => '/tenants'),
-  Link: ({
-    href,
-    children,
-    ...rest
-  }: ComponentPropsWithoutRef<'a'> & { href: string }) => (
-    <a href={href} {...rest}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('@platform/i18n/navigation');
 
 vi.mock('next/navigation', () => ({
   redirect: vi.fn(() => {
@@ -45,6 +35,8 @@ vi.mock('next/navigation', () => ({
   useParams: vi.fn(() => ({})),
   useSelectedLayoutSegment: vi.fn(() => null),
 }));
+
+const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 const setup = customRenderAsync(OperatorLayout, {
   children: <div>content</div>,
