@@ -91,7 +91,9 @@ export const teamSchema = defineType({
       validation: (rule) => rule.required(),
     }),
     ctaButtonsField(),
-    ...alignmentFields([]),
+    ...alignmentFields([], {
+      allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
+    }),
     wideLayoutField,
   ],
   preview: {

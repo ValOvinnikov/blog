@@ -280,7 +280,7 @@ export type Module_team = {
       _key: string;
     } & CtaButton
   >;
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  contentAlignment?: 'LEFT' | 'CENTER';
   layout?: WideLayout;
 };
 
@@ -401,7 +401,7 @@ export type Module_featureList = {
   >;
   imageShape?: 'WIDE' | 'SQUARE' | 'CIRCLE';
   displayMode?: 'GRID' | 'CAROUSEL';
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  contentAlignment?: 'LEFT' | 'CENTER';
   cardAlignment?: 'LEFT' | 'CENTER';
   layout?: WideLayout;
 };
@@ -446,7 +446,7 @@ export type Module_postFeatured = {
   limit?: number;
   showImages?: boolean;
   displayMode?: 'GRID' | 'CAROUSEL';
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  contentAlignment?: 'LEFT' | 'CENTER';
   layout?: WideLayout;
 };
 
