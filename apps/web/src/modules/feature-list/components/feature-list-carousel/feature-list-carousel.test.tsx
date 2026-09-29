@@ -1,22 +1,10 @@
 import { CARD_IMAGE_SHAPE } from '@blog/config';
-import { Carousel } from '@blog/ui/components/organisms/carousel';
-import {
-  customRender,
-  renderElement,
-  screen,
-} from '@web/testing/custom-render';
+import { customRender, screen, within } from '@web/testing/custom-render';
 import { makeFeatureListItem } from '@web/testing/modules/feature-list/fixtures';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { FeatureListCarousel } from './feature-list-carousel';
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
-
-vi.mock('@blog/ui/components/organisms/carousel', () => ({
-  Carousel: vi.fn(() => null),
-}));
+vi.mock('@web/i18n/navigation');
 
 const items = [
   makeFeatureListItem({
@@ -37,40 +25,27 @@ const setup = customRender(FeatureListCarousel, {
   title: 'Why choose us',
 });
 
-const getCarouselProps = () => {
-  const props = vi.mocked(Carousel).mock.calls.at(-1)?.[0];
-  if (!props) {
-    throw new Error('Carousel was not called');
-  }
-  return props;
-};
-
 describe(`<${FeatureListCarousel.name}/>`, () => {
-  it('composes the region label from the carousel.regionLabel Voice key rather than passing the title straight through, with the Voice-fixed previous/next labels', () => {
+  it('renders a labelled carousel with one card per item', async () => {
     setup();
 
-    expect(getCarouselProps()).toMatchObject({
-      ariaLabel: 'Why choose us carousel',
-      previousLabel: 'Previous slide',
-      nextLabel: 'Next slide',
+    const region = screen.getByRole('region', {
+      name: 'Why choose us carousel',
     });
-  });
-
-  it('renderItem renders exactly one FeatureListCard per item', () => {
-    setup();
-    const { renderItem } = getCarouselProps();
-
-    items.forEach((item, index) => {
-      const { unmount } = renderElement(<>{renderItem({ item, index })}</>);
-
+    expect(within(region).getAllByRole('heading', { level: 3 })).toHaveLength(
+      items.length,
+    );
+    items.forEach((item) => {
       expect(
-        screen.getByRole('heading', {
+        within(region).getByRole('heading', {
           level: 3,
           name: item.headingBlock.heading,
         }),
       ).toBeVisible();
-
-      unmount();
     });
+    expect(
+      await screen.findByRole('button', { name: 'Previous slide' }),
+    ).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Next slide' })).toBeVisible();
   });
 });
