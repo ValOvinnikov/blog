@@ -46,6 +46,7 @@ export const LogoWallModuleView = ({
           logos={logos}
           title={headingBlock.heading}
           tone={brandVariant}
+          contentAlignment={contentAlignment}
         />
       ) : (
         <div

@@ -20,6 +20,7 @@ export interface ILabelledCarouselProps<T>
   title: string;
   tone?: TBrandVariant;
   slideSize?: ICarouselProps<T>['slideSize'];
+  contentAlignment?: ICarouselProps<T>['contentAlignment'];
 }
 
 /**
@@ -33,6 +34,7 @@ export const LabelledCarousel = <T,>({
   title,
   tone,
   slideSize,
+  contentAlignment,
   className,
   dataTestId,
 }: ILabelledCarouselProps<T>) => {
@@ -48,6 +50,7 @@ export const LabelledCarousel = <T,>({
       nextLabel={t('nextAriaLabel')}
       tone={tone}
       slideSize={slideSize}
+      contentAlignment={contentAlignment}
       className={className}
       dataTestId={dataTestId}
     />
