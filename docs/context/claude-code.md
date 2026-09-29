@@ -747,13 +747,14 @@ file` are all denied alike) — an earlier version only handled the
   (see [`docs/context/ci-automation.md`](./ci-automation.md)) — without it every `mcp__github__*` tool is
   silently absent from the run. That server also exposes write tools this
   repo's gates reserve for a human or for local git, so the deny list blocks
-  eight of them: `create_pull_request`, `merge_pull_request` and
-  `pull_request_review_write` (opening, merging and approving are the human's
-  calls); `create_or_update_file`, `push_files` and `delete_file` (committing
-  through the API skips commitlint, lint-staged and the push gate); and
-  `create_repository` / `delete_repository`. `create_pull_request` matters
-  most: a local session's `gh pr create` prompts for approval, so without the
-  denial the MCP call is an unprompted way around the same gate. The
+  seven of them: `merge_pull_request` and `pull_request_review_write`
+  (merging and approving are the human's calls); `create_or_update_file`,
+  `push_files` and `delete_file` (committing through the API skips
+  commitlint, lint-staged and the push gate); and `create_repository` /
+  `delete_repository`. `create_pull_request` sits in the `ask` list instead:
+  a cloud session has no `gh`, so it is the only way one can open its own PR,
+  and `ask` keeps it prompting for approval the way `gh pr create` does
+  locally. The
   issue tools `board-keeper` depends on — `issue_read`, `issue_write`,
   `sub_issue_write` — stay permitted, as does `pull_request_read`, which
   `ci-watcher` uses.
