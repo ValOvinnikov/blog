@@ -4,11 +4,10 @@ import { CardGrid } from '@blog/ui/components/organisms/card-grid';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';
+import { FeatureListCard } from '@web/modules/feature-list/components/feature-list-card/feature-list-card';
+import { FeatureListCarousel } from '@web/modules/feature-list/components/feature-list-carousel/feature-list-carousel';
 import { moduleGridActionsVariants } from '@web/utils/module-grid-actions-variants';
 import { toModuleGridColumns } from '@web/utils/to-module-grid-columns';
-
-import { FeatureListCard } from './feature-list-card';
-import { FeatureListCarousel } from './feature-list-carousel';
 
 const GRID_IMAGE_SIZES: Record<1 | 2 | 3 | 4, string> = {
   1: '100vw',

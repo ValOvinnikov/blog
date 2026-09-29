@@ -8,8 +8,7 @@ import type {
 } from '@blog/config';
 import type { TFeatureListItem } from '@blog/service';
 import { LabelledCarousel } from '@web/components/shared/labelled-carousel';
-
-import { FeatureListCard } from './feature-list-card';
+import { FeatureListCard } from '@web/modules/feature-list/components/feature-list-card/feature-list-card';
 
 export interface IFeatureListCarouselProps
   extends IWithClassName, IWithDataTestId {

@@ -22,7 +22,9 @@ const { FeatureListCarousel } = vi.hoisted(() => ({
   )),
 }));
 
-vi.mock('./feature-list-carousel', () => ({ FeatureListCarousel }));
+vi.mock('./components/feature-list-carousel/feature-list-carousel', () => ({
+  FeatureListCarousel,
+}));
 
 const items = [
   makeFeatureListItem({
