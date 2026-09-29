@@ -41,9 +41,11 @@ const getCarouselProps = () => {
 };
 
 describe(`<${TeamCarousel.name}/>`, () => {
-  it('composes the region label from the carousel.regionLabel Voice key rather than passing the title straight through, with the Voice-fixed previous/next labels', () => {
+  beforeEach(() => {
     setup();
+  });
 
+  it('composes the region label from the carousel.regionLabel Voice key rather than passing the title straight through, with the Voice-fixed previous/next labels', () => {
     expect(getCarouselProps()).toMatchObject({
       ariaLabel: 'Meet the team carousel',
       previousLabel: 'Previous slide',
@@ -52,7 +54,6 @@ describe(`<${TeamCarousel.name}/>`, () => {
   });
 
   it('renderItem renders exactly one TeamMemberCard per member', () => {
-    setup();
     const { renderItem } = getCarouselProps();
 
     members.forEach((member, index) => {
@@ -69,7 +70,6 @@ describe(`<${TeamCarousel.name}/>`, () => {
   });
 
   it('getItemKey returns the member id', () => {
-    setup();
     const { getItemKey } = getCarouselProps();
 
     members.forEach((member, index) => {
