@@ -195,6 +195,33 @@ When invoked, before writing any code:
   `post-list/`, `content/`, `cta/`). A new CMS module type gets its renderer
   folder here plus an entry in the map — it is not a `src/components/`
   component.
+- **Sub-components go under `components/`.** When a component or module is
+  built from two or more child components that only it uses, each child
+  gets its own folder under a `components/` directory inside the parent's
+  folder, holding its file, test and any `*-variants.ts`. Never leave them
+  flat beside the parent. No `index.ts` in a child folder; the parent
+  imports the file directly. This applies in `src/components/**` and
+  `src/modules/**` alike. `modules/testimonial/` is the model:
+
+  ```
+  src/modules/testimonial/
+    testimonial-module.tsx
+    testimonial-module-view.tsx
+    testimonial-module-view.stories.tsx
+    components/
+      testimonial-card/
+        testimonial-card.tsx
+        testimonial-card-variants.ts
+        testimonial-card.test.tsx
+      testimonial-carousel/
+        testimonial-carousel.tsx
+        testimonial-carousel.test.tsx
+  ```
+
+  The `*-module.tsx` / `*-module-view.tsx` pair is the module itself, not
+  a sub-component, and stays at the top. A child used by a second parent
+  moves to `src/components/shared/` instead.
+
 - **Metadata builders** live in `src/metadata/` (e.g. `blog-list-metadata/`)
   — shared `generateMetadata` helpers, one folder per builder, co-located test.
 - **Helper functions** (slot builders, data transformers, formatters) live in
