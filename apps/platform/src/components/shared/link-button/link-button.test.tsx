@@ -1,20 +1,9 @@
 import { SIZE } from '@blog/config';
 import { render, screen } from '@platform/testing/custom-render';
-import type { ComponentPropsWithoutRef } from 'react';
 
 import { LinkButton } from './link-button';
 
-vi.mock('@platform/i18n/navigation', () => ({
-  Link: ({
-    href,
-    children,
-    ...rest
-  }: ComponentPropsWithoutRef<'a'> & { href: string }) => (
-    <a href={href} {...rest}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('@platform/i18n/navigation');
 
 describe(LinkButton, () => {
   it('renders as an anchor with the given href', () => {

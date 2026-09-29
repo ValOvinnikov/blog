@@ -3,9 +3,7 @@ import {
   verifyOwnerInviteToken,
 } from './owner-invite-token';
 
-vi.mock('@platform/utils/env/env', () => ({
-  env: { AUTH_SECRET: 'test-auth-secret' },
-}));
+vi.mock('@platform/utils/env/env');
 
 describe(createOwnerInviteToken, () => {
   it('returns a stable, deterministic token for the same email', () => {

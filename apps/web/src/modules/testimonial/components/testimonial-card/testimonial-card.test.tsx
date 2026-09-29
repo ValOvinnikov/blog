@@ -2,13 +2,10 @@ import { BRAND_VARIANT } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeTestimonialItem } from '@web/testing/modules/testimonial/fixtures';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { TestimonialCard } from './testimonial-card';
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
+vi.mock('@web/i18n/navigation');
 
 const item = makeTestimonialItem();
 
@@ -53,7 +50,7 @@ describe(`<${TestimonialCard.name}/>`, () => {
     expect(screen.queryByText('JR')).not.toBeInTheDocument();
   });
 
-  it('links the name and forwards target to the anchor when the item link opens in a new tab', () => {
+  it('links the name and forwards target when the item link opens in a new tab', () => {
     setup({
       item: makeTestimonialItem({
         link: {

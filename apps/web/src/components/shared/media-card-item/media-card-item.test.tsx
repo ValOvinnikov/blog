@@ -1,11 +1,8 @@
 import { renderElement, screen } from '@web/testing/custom-render';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { MediaCardItem, type IMediaCardData } from './media-card-item';
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
+vi.mock('@web/i18n/navigation');
 
 const item: IMediaCardData = {
   id: 'post-1',

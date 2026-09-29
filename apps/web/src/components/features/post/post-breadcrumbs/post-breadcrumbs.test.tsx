@@ -1,3 +1,4 @@
+import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
 import { customRenderAsync } from '@web/testing/custom-render';
 import { mockPostDetail } from '@web/testing/pages/blog-post-page/fixtures';
 import {
@@ -7,26 +8,22 @@ import {
   testNotFoundOnFetchFailure,
   testNotFoundWithoutLog,
 } from '@web/testing/shared/breadcrumbs-page-contract/breadcrumbs-page-contract';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { PostBreadcrumbs } from './post-breadcrumbs';
 
-const { getPostPageMock, getTenantBaseUrlMock } = vi.hoisted(() => ({
+const { getPostPageMock } = vi.hoisted(() => ({
   getPostPageMock: vi.fn(),
-  getTenantBaseUrlMock: vi.fn(),
 }));
+
+vi.mock('@web/i18n/navigation');
 
 vi.mock('@web/server/post/get-post-page', () => ({
   getPostPage: getPostPageMock,
 }));
 
-vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
-  getTenantBaseUrl: getTenantBaseUrlMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-base-url');
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
+const getTenantBaseUrlMock = vi.mocked(getTenantBaseUrl);
 
 const setup = customRenderAsync(PostBreadcrumbs, {
   slug: 'hello-world',

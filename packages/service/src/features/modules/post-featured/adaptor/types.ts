@@ -1,6 +1,6 @@
 import type {
   TBrandVariantOf,
-  TContentAlignment,
+  TContentAlignmentOf,
   TDisplayMode,
   TLayout,
   TMaybeUndefined,
@@ -13,7 +13,7 @@ export type TPostFeaturedModule = {
   headingBlock: THeadingBlock;
   posts: TPostCard[];
   layout: TMaybeUndefined<TLayout>;
-  contentAlignment: TMaybeUndefined<TContentAlignment>;
+  contentAlignment: TMaybeUndefined<TContentAlignmentOf<'LEFT' | 'CENTER'>>;
   showImages: boolean;
   displayMode: TDisplayMode;
 };

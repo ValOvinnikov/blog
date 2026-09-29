@@ -1,4 +1,5 @@
 import { urlForSanityImage } from '@blog/service';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
 import { makeTagDetailPage } from '@web/testing/shared/tag/fixtures';
@@ -6,18 +7,17 @@ import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtur
 
 import { buildTagMetadata } from './build-tag-metadata';
 
-const { getTagPageMock, getTenantSanityContextMock } = vi.hoisted(() => ({
+const { getTagPageMock } = vi.hoisted(() => ({
   getTagPageMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
 }));
 
 vi.mock('@web/server/tag/get-tag-page', () => ({
   getTagPage: getTagPageMock,
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-sanity-context');
+
+const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
 
 const ogImage = makeSanityImage();
 const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
@@ -40,7 +40,7 @@ describe('buildTagMetadata', () => {
     getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
-  it('forwards the slug and tenant to getTagPage — the same cached loader TagPage reads', async () => {
+  it('forwards the slug and tenant to getTagPage, the loader TagPage reads', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
       data: makeTagDetailPage({ seo }),
@@ -83,7 +83,7 @@ describe('buildTagMetadata', () => {
     expect(metadata).toEqual({});
   });
 
-  it('builds page-N metadata with a "– Page N" suffix, self-canonical to /tags/[slug]/page/N — never /tags/[slug]', async () => {
+  it('builds page-N metadata with a "– Page N" suffix, canonical to its own page URL', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
       data: makeTagDetailPage({ seo }),
@@ -100,7 +100,7 @@ describe('buildTagMetadata', () => {
     });
   });
 
-  it('leaves ogTitle omitted on page 2+ when unauthored, rather than suffixing "undefined"', async () => {
+  it('leaves ogTitle omitted on page 2+ when unauthored, never suffixing "undefined"', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
       data: makeTagDetailPage({ seo: makeSeo({ ogTitle: undefined }) }),

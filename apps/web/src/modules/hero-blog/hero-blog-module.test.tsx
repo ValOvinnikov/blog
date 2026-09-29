@@ -1,3 +1,4 @@
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import {
@@ -6,15 +7,13 @@ import {
   makeUnresolvedHeroBlogData,
 } from '@web/testing/modules/hero-blog/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { logger } from '@web/utils/logger/logger';
 
 import { HeroBlogModule } from './hero-blog-module';
 
-const { getHeroBlogMock, getTenantSanityContextMock, loggerErrorMock } =
-  vi.hoisted(() => ({
-    getHeroBlogMock: vi.fn(),
-    getTenantSanityContextMock: vi.fn(),
-    loggerErrorMock: vi.fn(),
-  }));
+const { getHeroBlogMock } = vi.hoisted(() => ({
+  getHeroBlogMock: vi.fn(),
+}));
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -24,18 +23,12 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-sanity-context');
 
-vi.mock('@web/utils/logger/logger', () => ({
-  logger: {
-    error: loggerErrorMock,
-    warn: vi.fn(),
-    info: vi.fn(),
-    debug: vi.fn(),
-  },
-}));
+vi.mock('@web/utils/logger/logger');
+
+const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
+const loggerErrorMock = vi.mocked(logger.error);
 
 const setup = customRenderAsync(HeroBlogModule, {
   id: 'hero-blog-1',
@@ -89,7 +82,7 @@ describe(`<${HeroBlogModule.name}/>`, () => {
     ).toBeVisible();
   });
 
-  it('logs and renders nothing when no post resolves (unfeatured, unpublished, or deleted after publish)', async () => {
+  it('logs and renders nothing when no post resolves', async () => {
     getHeroBlogMock.mockResolvedValue({
       ok: true,
       data: makeUnresolvedHeroBlogData(),
@@ -104,7 +97,7 @@ describe(`<${HeroBlogModule.name}/>`, () => {
     );
   });
 
-  it('logs and renders nothing for a stale hasPost: false result that still carries a heading', async () => {
+  it('logs and renders nothing for a stale hasPost: false result carrying a heading', async () => {
     getHeroBlogMock.mockResolvedValue({
       ok: true,
       data: makeStaleUnresolvedHeroBlogData(

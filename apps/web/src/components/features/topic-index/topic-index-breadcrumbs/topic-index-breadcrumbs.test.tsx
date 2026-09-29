@@ -1,20 +1,14 @@
+import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
 import { customRenderAsync } from '@web/testing/custom-render';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 import { testStaticBreadcrumbsContract } from '@web/testing/shared/static-breadcrumbs-contract/static-breadcrumbs-contract';
 
 import { TopicIndexBreadcrumbs } from './topic-index-breadcrumbs';
 
-const { getTenantBaseUrlMock } = vi.hoisted(() => ({
-  getTenantBaseUrlMock: vi.fn(),
-}));
+vi.mock('@web/i18n/navigation');
 
-vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
-  getTenantBaseUrl: getTenantBaseUrlMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-base-url');
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
+const getTenantBaseUrlMock = vi.mocked(getTenantBaseUrl);
 
 const setup = customRenderAsync(TopicIndexBreadcrumbs, {
   tenant: 'tenant-1',

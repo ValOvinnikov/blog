@@ -1,3 +1,4 @@
+import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
 import { customRenderAsync } from '@web/testing/custom-render';
 import { mockLandingPage } from '@web/testing/pages/landing-page/fixtures';
 import {
@@ -8,26 +9,22 @@ import {
   testNotFoundOnFetchFailure,
   testNotFoundWithoutLog,
 } from '@web/testing/shared/breadcrumbs-page-contract/breadcrumbs-page-contract';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { LandingBreadcrumbs } from './landing-breadcrumbs';
 
-const { getLandingPageMock, getTenantBaseUrlMock } = vi.hoisted(() => ({
+const { getLandingPageMock } = vi.hoisted(() => ({
   getLandingPageMock: vi.fn(),
-  getTenantBaseUrlMock: vi.fn(),
 }));
+
+vi.mock('@web/i18n/navigation');
 
 vi.mock('@web/server/landing/get-landing-page', () => ({
   getLandingPage: getLandingPageMock,
 }));
 
-vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
-  getTenantBaseUrl: getTenantBaseUrlMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-base-url');
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
+const getTenantBaseUrlMock = vi.mocked(getTenantBaseUrl);
 
 const setup = customRenderAsync(LandingBreadcrumbs, {
   slug: 'about-us',

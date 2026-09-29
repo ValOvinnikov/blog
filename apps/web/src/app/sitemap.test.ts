@@ -1,4 +1,4 @@
-export {};
+import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
 
 const {
   getPostParamsMock,
@@ -11,7 +11,6 @@ const {
   getTopicIndexPageMock,
   getTagIndexPageMock,
   getHostTenantSanityContextMock,
-  getTenantBaseUrlMock,
 } = vi.hoisted(() => ({
   getPostParamsMock: vi.fn(),
   getTopicParamsMock: vi.fn(),
@@ -23,16 +22,13 @@ const {
   getTopicIndexPageMock: vi.fn(),
   getTagIndexPageMock: vi.fn(),
   getHostTenantSanityContextMock: vi.fn(),
-  getTenantBaseUrlMock: vi.fn(),
 }));
 
 vi.mock('@web/server/tenant/get-host-tenant-sanity-context', () => ({
   getHostTenantSanityContext: getHostTenantSanityContextMock,
 }));
 
-vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
-  getTenantBaseUrl: getTenantBaseUrlMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-base-url');
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -58,6 +54,8 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
+let getTenantBaseUrlMock = vi.mocked(getTenantBaseUrl);
+
 const mockAllEmpty = () => {
   getPostParamsMock.mockResolvedValue({ ok: true, data: [] });
   getTopicParamsMock.mockResolvedValue({ ok: true, data: [] });
@@ -71,7 +69,9 @@ const mockAllEmpty = () => {
 };
 
 describe('sitemap', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
+    const fresh = await import('@web/server/tenant/get-tenant-base-url');
+    getTenantBaseUrlMock = vi.mocked(fresh.getTenantBaseUrl);
     getHostTenantSanityContextMock.mockResolvedValue({
       isResolvable: true,
       tenant: undefined,
@@ -94,7 +94,7 @@ describe('sitemap', () => {
     getTenantBaseUrlMock.mockReset();
   });
 
-  it('includes home, blog index, topics hub, post, topic, tag, blog page and landing page entries', async () => {
+  it('includes every static, post, topic, tag, blog page and landing page entry', async () => {
     mockAllEmpty();
     getPostParamsMock.mockResolvedValue({
       ok: true,
@@ -160,7 +160,7 @@ describe('sitemap', () => {
     expect(urls).toContain('https://example.com/tags/typescript/page/3');
   });
 
-  it('sets lastModified on post entries from publishedAt, but not on entries without a date source', async () => {
+  it('sets lastModified from publishedAt on posts, and not on entries without a date', async () => {
     mockAllEmpty();
     getPostParamsMock.mockResolvedValue({
       ok: true,
@@ -303,7 +303,7 @@ describe('sitemap', () => {
     expect(getTagIndexPageMock).toHaveBeenCalledWith(tenant);
   });
 
-  it('returns an empty sitemap without querying any content when the host is unresolvable', async () => {
+  it('returns an empty sitemap without querying content when the host is unresolvable', async () => {
     getHostTenantSanityContextMock.mockResolvedValue({ isResolvable: false });
     const sitemap = (await import('./sitemap')).default;
 
