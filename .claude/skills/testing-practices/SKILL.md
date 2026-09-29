@@ -336,11 +336,16 @@ the user sees. The rules below hold in `apps/web` and `apps/platform` alike.
   `renderItem` by hand tests the wiring, not the result. Render, then query.
   Checking an edge was called (`expect(getCta).toHaveBeenCalledWith('cta-1',
 tenant)`) is fine: that call is the component's contract with the outside.
-- **The one exception: a module renderer** (`apps/web` only; `apps/platform`
-  has none). A `*-module-renderer` picks one of
-  many async modules per `_type`. Its test may stub each module to render its
-  id, because rendering them for real would pull in every module's fakes.
-  The stub proves the dispatch, and each module has its own test.
+- **Two exceptions, both thin dispatchers whose children have their own
+  tests.**
+  - **A module renderer** (`apps/web` only). A `*-module-renderer` picks one
+    of many async modules per `_type`; its test may stub each module to
+    render its id, because rendering them for real would pull in every
+    module's fakes. The stub proves the dispatch.
+  - **A route file** (`src/app/**/page.tsx`, `not-found.tsx`, in either
+    app). Its test may stub the page component it renders and assert the
+    route params and props it hands over, because the page component's own
+    test covers what it renders.
 - **An edge fake is written once, next to the module it replaces.** Put the
   default fake in a `__mocks__/` directory beside the module's file
   (`server/tenant/__mocks__/get-tenant-base-url.ts` for

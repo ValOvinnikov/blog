@@ -73,9 +73,10 @@ D | grep -nE '^\+.*const \{[^}]*(getBy|queryBy|findBy|getAllBy|queryAllBy|findAl
 
 # Faking our own components, or reading a fake's arguments (testing-practices
 # → "What to fake"). A `vi.mock` of an @web/@platform/@blog/ui component is
-# blocking unless the file is a `*-module-renderer.test.tsx`; `mock.calls` is
-# blocking when it pulls props out of a faked component.
-D | awk '/^\+\+\+ b\//{f=$0} /^\+vi\.mock\(.(@web\/(components|modules)|@platform\/components|@blog\/ui)/ && f !~ /module-renderer\.test/{print FNR": "$0}'
+# blocking unless the file is a `*-module-renderer.test.tsx` or a route
+# file's test under `src/app/`; `mock.calls` is blocking
+# when it pulls props out of a faked component outside those two cases.
+D | awk '/^\+\+\+ b\//{f=$0} /^\+vi\.mock\(.(@web\/(components|modules)|@platform\/components|@blog\/ui)/ && f !~ /(module-renderer|\/src\/app\/.*)\.test/{print FNR": "$0}'
 D | grep -nE '^\+.*mock\.calls'
 
 # Test titles over 80 characters (testing-practices → Conventions). Blocking
