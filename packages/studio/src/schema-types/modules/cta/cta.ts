@@ -8,14 +8,15 @@ import {
 } from '@blog/config/constants';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { containerWidthField } from '@blog/studio/schema-types/fields/container-width-field/container-width-field';
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
+import { spacingAndDividerFields } from '@blog/studio/schema-types/fields/spacing-and-divider-fields/spacing-and-divider-fields';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
-import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
 import { listedTextSchema } from '@blog/studio/schema-types/portable-text/listed-text/listed-text';
 import { toTitleCase } from '@blog/utils/primitives';
-import { Megaphone } from 'lucide-react';
+import { Megaphone, SlidersHorizontal } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
 type TCtaParent = { variant?: string; brandVariant?: string };
@@ -31,6 +32,31 @@ const isBannerVariant = ({ parent }: { parent?: unknown }) =>
 
 const isNotBannerVariant = ({ parent }: { parent?: unknown }) =>
   !isVariant(parent, CTA_VARIANT.BANNER);
+
+const isBannerVariantDocument = ({ document }: { document?: unknown }) =>
+  isVariant(document, CTA_VARIANT.BANNER);
+
+const ctaLayoutField = () => {
+  const layoutSpacingAndDividerFields = spacingAndDividerFields({
+    spacingDescriptionSuffix: ' On a Banner, this sets the Banner’s height.',
+    dividerHidden: isBannerVariantDocument,
+  });
+
+  return defineField({
+    name: 'layout',
+    title: 'Layout',
+    type: 'object',
+    description:
+      'Optional visual overrides — spacing, container width, dividers.',
+    icon: SlidersHorizontal,
+    options: { collapsible: true, collapsed: true },
+    fields: [
+      ...layoutSpacingAndDividerFields.slice(0, 2),
+      containerWidthField(undefined, isBannerVariantDocument),
+      ...layoutSpacingAndDividerFields.slice(2),
+    ],
+  });
+};
 
 export const ctaSchema = defineType({
   name: 'module_cta',
@@ -169,7 +195,7 @@ export const ctaSchema = defineType({
       initialValue: MEDIA_ORDER.LAST,
       hidden: isNotSplitVariant,
     }),
-    layoutField,
+    ctaLayoutField(),
   ],
   preview: {
     select: {

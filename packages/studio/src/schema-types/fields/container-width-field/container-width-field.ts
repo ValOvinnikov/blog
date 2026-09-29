@@ -1,9 +1,10 @@
 import { CONTAINER_WIDTH, type TContainerWidth } from '@blog/config/constants';
 import { toTitleCase } from '@blog/utils/primitives';
-import { defineField } from 'sanity';
+import { type ConditionalProperty, defineField } from 'sanity';
 
 export const containerWidthField = (
   values: readonly TContainerWidth[] = Object.values(CONTAINER_WIDTH),
+  hidden?: ConditionalProperty,
 ) =>
   defineField({
     name: 'containerWidth',
@@ -17,4 +18,5 @@ export const containerWidthField = (
         value,
       })),
     },
+    hidden,
   });
