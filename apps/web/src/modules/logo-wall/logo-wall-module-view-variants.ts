@@ -7,7 +7,6 @@ export const logoWallModuleViewVariants = tv({
     align: {
       [CONTENT_ALIGNMENT.LEFT]: ['justify-start'],
       [CONTENT_ALIGNMENT.CENTER]: ['justify-center'],
-      [CONTENT_ALIGNMENT.RIGHT]: ['justify-end'],
     },
   },
   defaultVariants: { align: CONTENT_ALIGNMENT.LEFT },

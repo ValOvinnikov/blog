@@ -24,6 +24,21 @@ const logos = [
   makeLogoItem({ id: 'logo-5', name: 'Meridian Group' }),
 ];
 
+const manyLogos = [
+  ...logos,
+  makeLogoItem({ id: 'logo-6', name: 'Solstice Partners' }),
+  makeLogoItem({ id: 'logo-7', name: 'Vantage Point' }),
+];
+
+const overflowingLogos = [
+  ...manyLogos,
+  makeLogoItem({ id: 'logo-8', name: 'Northwind Traders' }),
+  makeLogoItem({ id: 'logo-9', name: 'Beacon Analytics' }),
+  makeLogoItem({ id: 'logo-10', name: 'Crestline Media' }),
+  makeLogoItem({ id: 'logo-11', name: 'Harborlight Group' }),
+  makeLogoItem({ id: 'logo-12', name: 'Fernbridge Co' }),
+];
+
 const meta = {
   title: 'Modules/LogoWallModule',
   component: LogoWallModuleView,
@@ -36,7 +51,7 @@ const meta = {
     },
     contentAlignment: {
       control: 'select',
-      options: Object.values(CONTENT_ALIGNMENT),
+      options: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
     },
     displayMode: {
       control: 'select',
@@ -65,6 +80,25 @@ export const Carousel: TStory = {
   args: { displayMode: DISPLAY_MODE.CAROUSEL },
 };
 
+export const CarouselCenterAligned: TStory = {
+  args: {
+    displayMode: DISPLAY_MODE.CAROUSEL,
+    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+  },
+};
+
+export const CarouselOverflowing: TStory = {
+  args: { displayMode: DISPLAY_MODE.CAROUSEL, logos: overflowingLogos },
+};
+
+export const CarouselOverflowingCenterAligned: TStory = {
+  args: {
+    displayMode: DISPLAY_MODE.CAROUSEL,
+    logos: overflowingLogos,
+    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+  },
+};
+
 export const WithActions: TStory = {
   args: { ctaButtons: ctaActionsDemo },
 };
@@ -78,11 +112,5 @@ export const SingleLogo: TStory = {
 };
 
 export const PartialTrailingRow: TStory = {
-  args: {
-    logos: [
-      ...logos,
-      makeLogoItem({ id: 'logo-6', name: 'Solstice Partners' }),
-      makeLogoItem({ id: 'logo-7', name: 'Vantage Point' }),
-    ],
-  },
+  args: { logos: manyLogos },
 };
