@@ -297,6 +297,10 @@ the single `page_landing` target it once allowed to every type a `link` can
 point at. Because the destination is no longer knowably a landing page,
 `@blog/service` resolves the href and hands it to `apps/web` as
 `profilePageHref`; the byline no longer builds a URL from a slug.
+`module_team` receives that same resolved href per member, as `profileUrl`,
+and links a card's name to it when set, leaving the name as plain text when
+it is unset. The two names for one value are a seam to unify, not a
+distinction worth keeping.
 
 Every `module_*` document also carries a **required** `brandVariant` field
 (stored values from `@blog/config`'s `BRAND_VARIANT` const —
@@ -769,8 +773,8 @@ passing the stored value straight through.
 **An empty-array guard mirrors what Studio enforces on that field, and nothing
 more.** Where a module's array pairs `required()` with a `min()`, an empty list
 is a state the content model forbids, so `apps/web` does not check for it —
-`module_featureList`, `module_testimonial`, `module_logoWall`, `module_stats`
-and `module_faq` render whatever they are handed, in the module and in the view
+`module_featureList`, `module_testimonial`, `module_logoWall`, `module_stats`,
+`module_faq` and `module_team` render whatever they are handed, in the module and in the view
 alike. The trade is deliberate: a document written around Studio's validation
 costs an empty section rather than a disappeared one, which is the cheaper
 failure and the visible one.
@@ -1055,6 +1059,28 @@ one page therefore stay valid, which a module-level block could not guarantee.
 The answer is consequently modelled twice on purpose — rich text
 (`TFaqQuestion`) for rendering, plain text (`TFaqPageQuestion`) for the
 structured data — because Portable Text is not a string and `FAQPage` wants one.
+
+**A team is a list of references to `person`, and nothing about a person is
+overridden per module.** `module_team` ("Team") references 2 to 12 `person`
+documents in authored order, validated `required()`, `min(2)`, `max(12)` and
+`unique()` as separate rule chains for the same reason `module_testimonial`'s
+are. The `min(2)` message sends a one-person team to `module_heroProfile`,
+which is what a single person already has. A person is edited once and carries
+the same photo, role, links and bio wherever they appear — as a post's author,
+as the profile hero's subject, and as a team member — so the module has **no
+per-member override fields at all**: the order belongs to the module, the
+content belongs to the person.
+
+**Two toggles decide what a card carries, and the loader resolves them rather
+than the view.** `showSocialLinks` defaults on; `showBios` defaults off, because
+a bio is written for the profile hero and runs long enough to change what the
+grid is. `@blog/service` applies both — `bio` is projected only when `showBios`,
+and `socialLinks` comes back empty when `showSocialLinks` is off — so `apps/web`
+renders what it is handed instead of re-deciding. `showBios` reaches the view
+only to cap its columns; `showSocialLinks` is not read there at all. `imageShape` offers Circle and Square alone:
+`CARD_IMAGE_SHAPE`'s third value, Wide, crops faces. The initials fallback takes
+that same shape through `Avatar`'s `shape` variant, added for this module so a
+photoless member is not a circle among squares.
 
 `service.modules.<type>.v1` projects `brandVariant` as a required
 `TBrandVariantOf<...>` (narrowed per module to exactly the options its
