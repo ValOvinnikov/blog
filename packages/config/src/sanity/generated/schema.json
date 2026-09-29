@@ -537,8 +537,102 @@
       "layout": {
         "type": "objectAttribute",
         "value": {
-          "type": "inline",
-          "name": "layout"
+          "type": "object",
+          "attributes": {
+            "spacingTop": {
+              "type": "objectAttribute",
+              "value": {
+                "type": "union",
+                "of": [
+                  {
+                    "type": "string",
+                    "value": "NONE"
+                  },
+                  {
+                    "type": "string",
+                    "value": "SM"
+                  },
+                  {
+                    "type": "string",
+                    "value": "MD"
+                  },
+                  {
+                    "type": "string",
+                    "value": "LG"
+                  },
+                  {
+                    "type": "string",
+                    "value": "XL"
+                  }
+                ]
+              },
+              "optional": true
+            },
+            "spacingBottom": {
+              "type": "objectAttribute",
+              "value": {
+                "type": "union",
+                "of": [
+                  {
+                    "type": "string",
+                    "value": "NONE"
+                  },
+                  {
+                    "type": "string",
+                    "value": "SM"
+                  },
+                  {
+                    "type": "string",
+                    "value": "MD"
+                  },
+                  {
+                    "type": "string",
+                    "value": "LG"
+                  },
+                  {
+                    "type": "string",
+                    "value": "XL"
+                  }
+                ]
+              },
+              "optional": true
+            },
+            "containerWidth": {
+              "type": "objectAttribute",
+              "value": {
+                "type": "union",
+                "of": [
+                  {
+                    "type": "string",
+                    "value": "NARROW"
+                  },
+                  {
+                    "type": "string",
+                    "value": "WIDE"
+                  },
+                  {
+                    "type": "string",
+                    "value": "FULL"
+                  }
+                ]
+              },
+              "optional": true
+            },
+            "dividerTop": {
+              "type": "objectAttribute",
+              "value": {
+                "type": "boolean"
+              },
+              "optional": true
+            },
+            "dividerBottom": {
+              "type": "objectAttribute",
+              "value": {
+                "type": "boolean"
+              },
+              "optional": true
+            }
+          }
         },
         "optional": true
       }

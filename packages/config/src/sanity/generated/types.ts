@@ -83,7 +83,13 @@ export type Module_cta = {
   contentPositionSplit?: 'LEFT' | 'RIGHT';
   contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
   mobileMediaOrder?: 'LAST' | 'FIRST';
-  layout?: Layout;
+  layout?: {
+    spacingTop?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+    spacingBottom?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+    containerWidth?: 'NARROW' | 'WIDE' | 'FULL';
+    dividerTop?: boolean;
+    dividerBottom?: boolean;
+  };
 };
 
 export type ListedText = Array<{
