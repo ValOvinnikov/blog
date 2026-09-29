@@ -11,6 +11,10 @@ import type { THeadingLevel } from '@blog/ui/lib/react';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { stretchedLinkVariants } from '@web/components/shared/stretched-link';
+import {
+  CIRCLE_IMAGE_SIZE,
+  SQUARE_IMAGE_SIZE,
+} from '@web/utils/media-card-image-size';
 
 import { featureListCardVariants } from './feature-list-card-variants';
 
@@ -23,12 +27,7 @@ const CARD_IMAGE_SHAPE_TO_MEDIA_SHAPE: Record<
   [CARD_IMAGE_SHAPE.CIRCLE]: 'circle',
 };
 
-// `MediaCard.Media`'s `circle` shape renders at a fixed CSS `size-28`
-// (112px) regardless of grid width, so its request is a fixed 2x-density
-// 224px rather than a `sizes`-driven fraction of the column.
-const CIRCLE_IMAGE_SIZE = 224;
 const WIDE_IMAGE_HEIGHT = 360;
-const SQUARE_IMAGE_SIZE = 640;
 
 export interface IFeatureListCardProps extends IWithDataTestId {
   item: TFeatureListItem;
