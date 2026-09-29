@@ -66,6 +66,7 @@ export const TeamModuleView = ({
           imageSizes={CAROUSEL_IMAGE_SIZES}
           title={headingBlock.heading}
           tone={brandVariant}
+          contentAlignment={contentAlignment}
         />
       ) : (
         <CardGrid
