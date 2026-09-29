@@ -964,6 +964,12 @@ main` fires no workflow. CodeQL runs here through GitHub's _default setup_
   changes agent tooling (`.claude/` hooks/agents/skills/settings) updates
   [`docs/context/claude-code.md`](docs/context/claude-code.md).
 - `.claude/skills/` is the single home for skills — edit one copy, no mirror.
+- **A rule added to a skill or agent guide for one app covers the other
+  too.** `apps/web` and `apps/platform` share every convention unless the
+  guide names a reason one of them differs (platform has no `modules/`, no
+  page builder, no SEO surface). When a rule lands in `web.md`, check
+  `platform-app.md` states the same thing, and the reverse. The same goes
+  for a shared skill whose examples name only one app.
 
 ## Reporting to the user
 
