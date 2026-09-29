@@ -4,12 +4,12 @@ import type { VariantProps } from 'tailwind-variants';
 export const quoteCardVariants = tv({
   slots: {
     root: [
-      'flex flex-col gap-4',
+      'flex h-full flex-col gap-4',
       'bg-surface border-l-2 border-brand-primary',
       'px-card-x py-card-y',
     ],
     quoteMark: ['text-brand-primary'],
-    caption: ['flex items-center gap-3'],
+    caption: ['mt-auto flex items-center gap-3'],
     person: ['flex flex-col'],
     role: ['text-sm text-subtle'],
   },
