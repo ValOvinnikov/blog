@@ -41,6 +41,7 @@ export const FeatureListModuleView = ({
     cardAlignment === CONTENT_ALIGNMENT.CENTER ? 'center' : 'left';
   const columns = toModuleGridColumns(items.length);
   const s = moduleGridActionsVariants({ align: contentAlignment });
+  const hasAnyImage = items.some((item) => Boolean(item.sanityImage));
 
   return (
     <Section
@@ -65,6 +66,7 @@ export const FeatureListModuleView = ({
           title={headingBlock.heading}
           tone={brandVariant}
           contentAlignment={contentAlignment}
+          hasAnyImage={hasAnyImage}
         />
       ) : (
         <CardGrid
@@ -80,6 +82,7 @@ export const FeatureListModuleView = ({
               align={cardAlign}
               imageSizes={GRID_IMAGE_SIZES[columns]}
               headingLevel={3}
+              hasAnyImage={hasAnyImage}
             />
           ))}
         </CardGrid>

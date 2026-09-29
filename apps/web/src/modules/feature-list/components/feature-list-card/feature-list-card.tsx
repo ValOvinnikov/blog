@@ -34,6 +34,7 @@ export interface IFeatureListCardProps extends IWithDataTestId {
   align: 'left' | 'center';
   imageSizes: string;
   headingLevel: THeadingLevel;
+  hasAnyImage?: boolean;
 }
 
 export const FeatureListCard = ({
@@ -42,12 +43,14 @@ export const FeatureListCard = ({
   align,
   imageSizes,
   headingLevel,
+  hasAnyImage,
   dataTestId,
 }: IFeatureListCardProps) => {
   const { heading, supportingText } = item.headingBlock;
-  const mediaShape = item.sanityImage
-    ? CARD_IMAGE_SHAPE_TO_MEDIA_SHAPE[imageShape]
-    : 'icon';
+  const mediaShape =
+    item.sanityImage || hasAnyImage
+      ? CARD_IMAGE_SHAPE_TO_MEDIA_SHAPE[imageShape]
+      : 'icon';
 
   return (
     <MediaCard
@@ -79,13 +82,25 @@ export const FeatureListCard = ({
             className="size-full object-cover"
           />
         ) : (
-          item.icon && (
+          item.icon &&
+          (mediaShape === 'icon' ? (
             <Icon
               name={item.icon}
               size={SIZE.LG}
               dataTestId="feature-card-icon"
             />
-          )
+          ) : (
+            <div
+              className="bg-brand-primary-muted text-brand-primary group-hover:bg-surface group-focus-within:bg-surface flex size-full items-center justify-center"
+              data-testid="feature-card-icon-panel"
+            >
+              <Icon
+                name={item.icon}
+                size={SIZE.LG}
+                dataTestId="feature-card-icon"
+              />
+            </div>
+          ))
         )}
       </MediaCard.Media>
       <MediaCard.Title level={headingLevel}>
