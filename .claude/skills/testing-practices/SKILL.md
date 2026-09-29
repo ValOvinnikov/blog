@@ -131,6 +131,13 @@ export default mergeConfig(
   legitimately name real people on purpose.
 - Arrange–Act–Assert; one behaviour per `it`. Descriptive names:
   `it("renders the post title and author")`.
+- **An `it` title states the behaviour a user or caller sees, in 80
+  characters or fewer.** It never names a prop, a mock, a helper or how the
+  code gets there. "labels the region with the carousel title", not
+  "composes the region label from the carousel.regionLabel Voice key rather
+  than passing the title straight through". A title that needs "rather than"
+  or "instead of" is arguing with an implementation nobody wrote. Long
+  existing titles are shortened when the file is touched, not in a sweep.
 - **Never label a suite with a hand-written string when a symbol names it.**
   Vitest derives the suite name from the reference's `.name`, so the label can
   never drift: rename the symbol and the suite name follows, and deleting it is
@@ -301,11 +308,48 @@ export default mergeConfig(
   });
   ```
 
-- Use `vi.fn()` / `vi.mock()` for boundaries (the Sanity client, `service`).
+- Use `vi.fn()` / `vi.mock()` for edges only — see "What to fake".
 - Deterministic: no real dates/network/random. Inject or freeze.
 - A bug fix gets a regression test that fails before the fix — **unless** it's
   a pure styling fix (borders/spacing/tokens) with no behavioural surface, which
   gets the `no-tests-needed` label instead of a class assertion.
+
+## What to fake
+
+**Fake the edges of the app, never our own components.** An edge is code that
+reaches outside the process or the request: `@blog/service`, `@blog/db` (or
+its `client` inside `packages/db`), the Sanity query runner, tenant and auth
+resolution, `env`, the logger, each app's `i18n/navigation`, `next/cache`,
+`next/navigation`, `next-auth`. Everything between the edges — our
+components, `@blog/ui`, our helpers — renders for real, so the test sees what
+the user sees. `SmartLink` is ours: fake `@web/i18n/navigation` under it,
+never `SmartLink` itself.
+
+- **Never `vi.mock` an `@web/*`, `@platform/*` or `@blog/ui` component to test
+  its parent.** Render the real child and query what it puts on screen. A
+  child that won't render in jsdom (a carousel library needing
+  `IntersectionObserver`, `matchMedia`) gets that browser API stubbed once in
+  the workspace's vitest setup file, not the child faked per test file.
+- **Never read a fake's arguments to assert what a child receives.**
+  `vi.mocked(Carousel).mock.calls.at(-1)[0]` followed by calling
+  `renderItem` by hand tests the wiring, not the result. Render, then query.
+  Checking an edge was called (`expect(getCta).toHaveBeenCalledWith('cta-1',
+tenant)`) is fine: that call is the component's contract with the outside.
+- **The one exception: a module renderer.** A `*-module-renderer` picks one of
+  many async modules per `_type`. Its test may stub each module to render its
+  id, because rendering them for real would pull in every module's fakes.
+  The stub proves the dispatch, and each module has its own test.
+- **An edge fake is written once, next to the module it replaces.** Put the
+  default fake in a `__mocks__/` directory beside the module's file
+  (`server/tenant/__mocks__/get-tenant-base-url.ts` for
+  `server/tenant/get-tenant-base-url.ts`); a test then writes
+  `vi.mock('@web/server/tenant/get-tenant-base-url')` with no factory and
+  Vitest picks it up, alias included. Export each fake function as a
+  `vi.fn()` with a sensible default, and let a test change it with
+  `vi.mocked(fn).mockResolvedValueOnce(…)`. Use the `Once` form, or reset in
+  `beforeEach`, because the preset's `clearMocks` clears calls but keeps an
+  implementation a previous test set. An inline factory is only for a fake
+  that exists in one file.
 
 ## Writing a component test
 
@@ -459,10 +503,10 @@ describe(`<${SubscribeForm.name}/>`, () => {
 - **No snapshot tests** — they couple tests to markup and break on unrelated changes.
 - **No implementation details** — test what a component does, not how it does it.
 - **No network calls** — always mock the Sanity client and `service` functions.
-- **Never mock a sibling `@blog/ui` component** to make a `web` test pass. If a
-  test has to `vi.mock('@blog/ui')` and reimplement a fake `PostMeta`/panel,
-  that's a composition smell — the web component is wrapping the pure one
-  instead of being passed into its slot. Fix the structure
+- **Never mock our own components** — "What to fake" has the rule and its
+  one exception. A test that can only pass by faking a sibling `@blog/ui`
+  component is usually a composition smell: the web component wraps the pure
+  one instead of being passed into its slot. Fix the structure
   (`web-component-practices`) and test the real composed tree.
 
 ## Coverage strategy
@@ -480,6 +524,7 @@ rather than leaving them silent.
 - [ ] Test co-located and named `*.test.ts(x)`.
 - [ ] Migrations: transform-correctness + idempotency tested.
 - [ ] Right environment (jsdom for components, node for service).
-- [ ] Boundaries mocked; no network, no real time.
+- [ ] Only edges faked, shared fakes from `__mocks__/`; no network, no real time.
 - [ ] Queried by role/text; asserts behaviour, not implementation detail.
+- [ ] Every `it` title is behaviour, 80 characters or fewer.
 - [ ] `pnpm --filter <pkg> test` passes.

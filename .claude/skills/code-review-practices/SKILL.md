@@ -71,6 +71,17 @@ D | grep -nE '^\+.*(fields\.map\(\(f\) => f\.name\)|typeof [^)]*\)\.toBe\(.funct
 D | grep -nE '^\+.*(toHaveClass|\.className|\.classList|container\.querySelector|document\.querySelector|baseElement\.querySelector|\.(parentElement|parentNode|firstChild|lastChild|children|childNodes|nextSibling|previousSibling)\b)'
 D | grep -nE '^\+.*const \{[^}]*(getBy|queryBy|findBy|getAllBy|queryAllBy|findAllBy)[^}]*\} = render'
 
+# Faking our own components, or reading a fake's arguments (testing-practices
+# → "What to fake"). A `vi.mock` of an @web/@platform/@blog/ui component is
+# blocking unless the file is a `*-module-renderer.test.tsx`; `mock.calls` is
+# blocking when it pulls props out of a faked component.
+D | awk '/^\+\+\+ b\//{f=$0} /^\+vi\.mock\(.(@web\/(components|modules)|@platform\/components|@blog\/ui)/ && f !~ /module-renderer\.test/{print FNR": "$0}'
+D | grep -nE '^\+.*mock\.calls'
+
+# Test titles over 80 characters (testing-practices → Conventions). Blocking
+# on added or edited titles only.
+D | grep -nE "^\+[[:space:]]*it(\.each\(.*\))?\([[:space:]]*['\"\`][^'\"\`]{81,}"
+
 # Comments that restate the code (CLAUDE.md → "Comments default to zero").
 # A doc block opening with the identifier (`Name — does X`) restates the
 # name; a doc block three or more lines long is narrating how, not what
