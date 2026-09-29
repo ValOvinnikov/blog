@@ -1,14 +1,9 @@
 import { CONTENT_ROUTE_REVALIDATE_SECONDS } from '@blog/config';
+import { permanentRedirect } from '@web/i18n/navigation';
 import { customRenderAsync } from '@web/testing/custom-render';
 import { notFound } from 'next/navigation';
 
 import PostIndexNumberedPage, { revalidate } from './page';
-
-const { permanentRedirectMock } = vi.hoisted(() => ({
-  permanentRedirectMock: vi.fn(() => {
-    throw new Error('NEXT_REDIRECT');
-  }),
-}));
 
 const { getIndexPageMock } = vi.hoisted(() => ({
   getIndexPageMock: vi.fn(),
@@ -22,9 +17,7 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/i18n/navigation', () => ({
-  permanentRedirect: permanentRedirectMock,
-}));
+vi.mock('@web/i18n/navigation');
 
 const setup = customRenderAsync(PostIndexNumberedPage, {
   params: Promise.resolve({ tenant: 'tenant-1', locale: 'EN', page: '1' }),
@@ -38,7 +31,7 @@ describe('PostIndexNumberedPage', () => {
   it('redirects /blog/page/1 to /blog (canonical page 1 has one URL)', async () => {
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
 
-    expect(permanentRedirectMock).toHaveBeenCalledWith({
+    expect(permanentRedirect).toHaveBeenCalledWith({
       href: '/blog',
       locale: 'EN',
     });
