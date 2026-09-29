@@ -1,22 +1,10 @@
 import { BRAND_VARIANT } from '@blog/config';
-import { Carousel } from '@blog/ui/components/organisms/carousel';
-import {
-  customRender,
-  renderElement,
-  screen,
-} from '@web/testing/custom-render';
+import { customRender, screen, within } from '@web/testing/custom-render';
 import { makeTestimonialItem } from '@web/testing/modules/testimonial/fixtures';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { TestimonialCarousel } from './testimonial-carousel';
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
-
-vi.mock('@blog/ui/components/organisms/carousel', () => ({
-  Carousel: vi.fn(() => null),
-}));
+vi.mock('@web/i18n/navigation');
 
 const items = [
   makeTestimonialItem({ id: 'testimonial-1', name: 'Jordan Reyes' }),
@@ -30,37 +18,24 @@ const setup = customRender(TestimonialCarousel, {
   title: 'What our customers say',
 });
 
-const getCarouselProps = () => {
-  const props = vi.mocked(Carousel).mock.calls.at(-1)?.[0];
-  if (!props) {
-    throw new Error('Carousel was not called');
-  }
-  return props;
-};
-
 describe(`<${TestimonialCarousel.name}/>`, () => {
-  beforeEach(() => {
+  it('renders a labelled carousel with one testimonial per item', async () => {
     setup();
-  });
 
-  it('composes the region label from the carousel.regionLabel Voice key rather than passing the title straight through, with the Voice-fixed previous/next labels', () => {
-    expect(getCarouselProps()).toMatchObject({
-      ariaLabel: 'What our customers say carousel',
-      previousLabel: 'Previous slide',
-      nextLabel: 'Next slide',
+    const region = screen.getByRole('region', {
+      name: 'What our customers say carousel',
     });
-  });
-
-  it('renderItem renders exactly one TestimonialCard per item', () => {
-    const { renderItem } = getCarouselProps();
-
-    items.forEach((item, index) => {
-      const { unmount } = renderElement(<>{renderItem({ item, index })}</>);
-
-      expect(screen.getByRole('blockquote')).toBeVisible();
-      expect(screen.getByText(item.name, { ignore: '.sr-only' })).toBeVisible();
-
-      unmount();
+    expect(within(region).getAllByRole('blockquote')).toHaveLength(
+      items.length,
+    );
+    items.forEach((item) => {
+      expect(
+        within(region).getByText(item.name, { ignore: '.sr-only' }),
+      ).toBeVisible();
     });
+    expect(
+      await screen.findByRole('button', { name: 'Previous slide' }),
+    ).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Next slide' })).toBeVisible();
   });
 });
