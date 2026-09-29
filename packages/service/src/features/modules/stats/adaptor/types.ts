@@ -1,5 +1,5 @@
 import type {
-  TBrandVariantOf,
+  TBrandVariant,
   TContentAlignment,
   TLayout,
   TMaybeUndefined,
@@ -15,7 +15,7 @@ export type TStatItem = {
 };
 
 export type TStatsModule = {
-  brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
+  brandVariant: TBrandVariant;
   headingBlock: THeadingBlock;
   stats: TStatItem[];
   footnote: TMaybeUndefined<string>;

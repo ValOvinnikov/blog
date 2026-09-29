@@ -1,3 +1,4 @@
+import { BRAND_VARIANT, FULL_BRAND_VARIANT_LIST } from '@blog/config/constants';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
@@ -18,7 +19,10 @@ export const statsSchema = defineType({
   icon: ChartBar,
   fields: [
     titleField(),
-    brandVariantField(),
+    brandVariantField({
+      list: FULL_BRAND_VARIANT_LIST,
+      initialValue: BRAND_VARIANT.PRIMARY,
+    }),
     headingBlockField(),
     defineField({
       name: 'stats',
