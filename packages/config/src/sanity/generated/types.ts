@@ -330,7 +330,7 @@ export type Module_logoWall = {
     } & CtaButton
   >;
   displayMode?: 'GRID' | 'CAROUSEL';
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  contentAlignment?: 'LEFT' | 'CENTER';
   layout?: Layout;
 };
 

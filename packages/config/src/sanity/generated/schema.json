@@ -2136,10 +2136,6 @@
             {
               "type": "string",
               "value": "CENTER"
-            },
-            {
-              "type": "string",
-              "value": "RIGHT"
             }
           ]
         },
