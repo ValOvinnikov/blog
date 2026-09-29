@@ -1,19 +1,14 @@
 import { CONTENT_ROUTE_REVALIDATE_SECONDS } from '@blog/config';
+import { permanentRedirect } from '@web/i18n/navigation';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { customRenderAsync } from '@web/testing/custom-render';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
 
 import TagNumberedPage, { generateMetadata, revalidate } from './page';
 
-const { permanentRedirectMock } = vi.hoisted(() => ({
-  permanentRedirectMock: vi.fn(() => {
-    throw new Error('NEXT_REDIRECT');
-  }),
-}));
-
-const { getTagPageMock, getTenantSanityContextMock } = vi.hoisted(() => ({
+const { getTagPageMock } = vi.hoisted(() => ({
   getTagPageMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -28,13 +23,12 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-sanity-context');
 
-vi.mock('@web/i18n/navigation', () => ({
-  permanentRedirect: permanentRedirectMock,
-}));
+vi.mock('@web/i18n/navigation');
+
+const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
+const permanentRedirectMock = vi.mocked(permanentRedirect);
 
 const setup = customRenderAsync(TagNumberedPage, {
   params: Promise.resolve({

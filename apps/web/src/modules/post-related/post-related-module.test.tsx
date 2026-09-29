@@ -1,18 +1,18 @@
 import { BRAND_VARIANT } from '@blog/config';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { logger } from '@web/utils/logger/logger';
 
 import { PostRelatedModule } from './post-related-module';
 
-const { getPostRelatedMock, getTenantSanityContextMock, loggerWarnMock } =
-  vi.hoisted(() => ({
-    getPostRelatedMock: vi.fn(),
-    getTenantSanityContextMock: vi.fn(),
-    loggerWarnMock: vi.fn(),
-  }));
+const { getPostRelatedMock } = vi.hoisted(() => ({
+  getPostRelatedMock: vi.fn(),
+}));
+
+vi.mock('@web/i18n/navigation');
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -22,22 +22,12 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-sanity-context');
 
-vi.mock('@web/utils/logger/logger', () => ({
-  logger: {
-    warn: loggerWarnMock,
-    error: vi.fn(),
-    info: vi.fn(),
-    debug: vi.fn(),
-  },
-}));
+vi.mock('@web/utils/logger/logger');
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
+const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
+const loggerWarnMock = vi.mocked(logger.warn);
 
 const makePost = (overrides: Record<string, unknown> = {}) => ({
   id: 'post-1',
@@ -65,7 +55,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
     loggerWarnMock.mockReset();
   });
 
-  it('calls getPostRelated with the module id, the anchor post id, and the resolved tenant Sanity context', async () => {
+  it('calls getPostRelated with the module id, anchor post id and tenant context', async () => {
     getPostRelatedMock.mockResolvedValue({
       ok: true,
       data: {
@@ -87,7 +77,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
     );
   });
 
-  it('renders nothing and warns once, without calling the service, when context.post is absent', async () => {
+  it('renders nothing and warns once, without calling the service, with no post', async () => {
     const { container } = await setup({ context: undefined });
 
     expect(container).toBeEmptyDOMElement();
@@ -110,7 +100,7 @@ describe(`<${PostRelatedModule.name}/>`, () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('renders nothing when no posts resolve, never an empty landmark with a dangling aria-labelledby', async () => {
+  it('renders nothing when no posts resolve, never an empty labelled landmark', async () => {
     getPostRelatedMock.mockResolvedValue({
       ok: true,
       data: {

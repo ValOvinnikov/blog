@@ -1,13 +1,10 @@
 import { customRender, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeLogoItem } from '@web/testing/modules/logo-wall/fixtures';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { LogoWallTile } from './logo-wall-tile';
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
+vi.mock('@web/i18n/navigation');
 
 const item = makeLogoItem();
 
@@ -20,7 +17,7 @@ describe(`<${LogoWallTile.name}/>`, () => {
     expect(screen.getByRole('img', { name: item.name })).toBeVisible();
   });
 
-  it('wraps the logo in a link when the item has one, with the company name as its accessible name', () => {
+  it('wraps the logo in a link named by the company when the item has one', () => {
     setup({
       logo: makeLogoItem({
         link: {
@@ -91,7 +88,7 @@ describe(`<${LogoWallTile.name}/>`, () => {
     ).toBe('');
   });
 
-  it('falls back to the contained layout when the asset aspect ratio is not a positive number', () => {
+  it('falls back to the contained layout when the aspect ratio is not positive', () => {
     setup({
       logo: makeLogoItem({
         image: makeSanityImage({

@@ -1,17 +1,18 @@
 import { BRAND_VARIANT, TAXONOMY_KIND } from '@blog/config';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
 
 import { PostListModule } from './post-list-module';
 
-const { getPostListMock, getTenantSanityContextMock } = vi.hoisted(() => ({
+const { getPostListMock } = vi.hoisted(() => ({
   getPostListMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
 }));
+
+vi.mock('@web/i18n/navigation');
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -21,13 +22,9 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-sanity-context');
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
+const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
 
 const setup = customRenderAsync(PostListModule, {
   id: 'post-list-1',
@@ -297,7 +294,7 @@ describe(`<${PostListModule.name}/>`, () => {
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
-  it('derives href, aria-label, empty message, and titleId from context.archive (topic kind)', async () => {
+  it('derives href, aria-label, empty message and titleId from a topic archive', async () => {
     getPostListMock.mockResolvedValue({
       ok: true,
       data: {

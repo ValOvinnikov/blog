@@ -7,6 +7,7 @@ import {
   testResolvedHero,
   testWarnsForUnknownModule,
 } from '@web/testing/shared/module-renderer-contract/module-renderer-contract';
+import { logger } from '@web/utils/logger/logger';
 import type { ReactNode } from 'react';
 
 import { TopicModuleRenderer } from './topic-module-renderer';
@@ -18,7 +19,6 @@ const {
   postListModuleMock,
   taxonomyListModuleMock,
   heroBlogModuleMock,
-  loggerWarnMock,
 } = vi.hoisted(() => ({
   ctaModuleMock: vi.fn(({ id }: { id: string }) => (
     <div data-testid="stub-cta">{id}</div>
@@ -40,7 +40,6 @@ const {
       <h1 data-testid="stub-hero">{id}</h1>
     ),
   ),
-  loggerWarnMock: vi.fn(),
 }));
 
 vi.mock('@web/modules/cta/cta-module', () => ({ CtaModule: ctaModuleMock }));
@@ -60,14 +59,9 @@ vi.mock('@web/modules/hero-blog/hero-blog-module', () => ({
   HeroBlogModule: heroBlogModuleMock,
 }));
 
-vi.mock('@web/utils/logger/logger', () => ({
-  logger: {
-    error: vi.fn(),
-    warn: loggerWarnMock,
-    info: vi.fn(),
-    debug: vi.fn(),
-  },
-}));
+vi.mock('@web/utils/logger/logger');
+
+const loggerWarnMock = vi.mocked(logger.warn);
 
 const setup = customRenderAsync(TopicModuleRenderer, {
   hero: undefined,

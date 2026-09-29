@@ -3,11 +3,12 @@ import {
   customRenderAsync,
   screen,
 } from '@web/testing/custom-render';
+import { logger } from '@web/utils/logger/logger';
 
 import { renderHeroModule, renderModules } from './module-renderer';
 
-const { ctaModuleMock, postListModuleMock, heroModuleMock, loggerWarnMock } =
-  vi.hoisted(() => ({
+const { ctaModuleMock, postListModuleMock, heroModuleMock } = vi.hoisted(
+  () => ({
     ctaModuleMock: vi.fn(({ id }: { id: string; locale: string }) => (
       <div data-testid="stub-cta">{id}</div>
     )),
@@ -17,17 +18,12 @@ const { ctaModuleMock, postListModuleMock, heroModuleMock, loggerWarnMock } =
     heroModuleMock: vi.fn(async ({ id }: { id: string }) => (
       <div data-testid="stub-hero">{id}</div>
     )),
-    loggerWarnMock: vi.fn(),
-  }));
+  }),
+);
 
-vi.mock('@web/utils/logger/logger', () => ({
-  logger: {
-    error: vi.fn(),
-    warn: loggerWarnMock,
-    info: vi.fn(),
-    debug: vi.fn(),
-  },
-}));
+vi.mock('@web/utils/logger/logger');
+
+const loggerWarnMock = vi.mocked(logger.warn);
 
 const moduleMap = {
   module_cta: ctaModuleMock,

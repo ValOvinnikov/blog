@@ -1,3 +1,4 @@
+import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
 import { customRenderAsync } from '@web/testing/custom-render';
 import {
   testBreadcrumbsJsonLdSchema,
@@ -7,27 +8,23 @@ import {
   testNotFoundOnFetchFailure,
   testNotFoundWithoutLog,
 } from '@web/testing/shared/breadcrumbs-page-contract/breadcrumbs-page-contract';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 import { makeTopic } from '@web/testing/shared/topic/fixtures';
 
 import { TopicBreadcrumbs } from './topic-breadcrumbs';
 
-const { getTopicPageMock, getTenantBaseUrlMock } = vi.hoisted(() => ({
+const { getTopicPageMock } = vi.hoisted(() => ({
   getTopicPageMock: vi.fn(),
-  getTenantBaseUrlMock: vi.fn(),
 }));
+
+vi.mock('@web/i18n/navigation');
 
 vi.mock('@web/server/topic/get-topic-page', () => ({
   getTopicPage: getTopicPageMock,
 }));
 
-vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
-  getTenantBaseUrl: getTenantBaseUrlMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-base-url');
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
+const getTenantBaseUrlMock = vi.mocked(getTenantBaseUrl);
 
 const topic = makeTopic({ title: 'News', slug: 'news' });
 const successData = { topic, modules: [], seo: {} };
