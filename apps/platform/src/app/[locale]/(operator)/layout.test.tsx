@@ -25,17 +25,6 @@ vi.mock('@blog/db', () => ({
 
 vi.mock('@platform/i18n/navigation');
 
-vi.mock('next/navigation', () => ({
-  redirect: vi.fn(() => {
-    throw new Error('NEXT_REDIRECT');
-  }),
-  notFound: vi.fn(() => {
-    throw new Error('NEXT_NOT_FOUND');
-  }),
-  useParams: vi.fn(() => ({})),
-  useSelectedLayoutSegment: vi.fn(() => null),
-}));
-
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 const setup = customRenderAsync(OperatorLayout, {
