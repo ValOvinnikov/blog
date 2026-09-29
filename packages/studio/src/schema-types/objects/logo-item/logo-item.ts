@@ -1,4 +1,5 @@
 import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
+import { validateImageHasAsset } from '@blog/studio/schema-types/validation/validate-image-has-asset/validate-image-has-asset';
 import { Building2 } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
@@ -23,7 +24,8 @@ export const logoItemSchema = defineType({
       type: 'image',
       description:
         'SVG or PNG with a transparent background, trimmed to the mark. Shown at 36px tall.',
-      validation: (rule) => rule.required().error('Upload the logo.'),
+      validation: (rule) =>
+        rule.custom(validateImageHasAsset('Upload the logo.')),
     }),
     defineField({
       name: 'link',

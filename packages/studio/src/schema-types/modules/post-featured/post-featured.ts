@@ -77,19 +77,18 @@ export const postFeaturedSchema = defineType({
       hidden: ({ parent }) =>
         (parent as TPostFeaturedDocument | undefined)?.postSource !==
         POST_SOURCE.PINNED,
-      validation: (rule) =>
-        rule
-          .unique()
-          .max(3)
-          .error('A spotlight holds at most three posts.')
-          .custom((value, context) => {
-            const parent = context.parent as TPostFeaturedDocument | undefined;
+      validation: (rule) => [
+        rule.unique().error('A post can only be pinned once.'),
+        rule.max(3).error('A spotlight holds at most three posts.'),
+        rule.custom((value, context) => {
+          const parent = context.parent as TPostFeaturedDocument | undefined;
 
-            return parent?.postSource === POST_SOURCE.PINNED &&
-              (!value || value.length === 0)
-              ? 'Pin at least one post, or switch the source to Newest featured.'
-              : true;
-          }),
+          return parent?.postSource === POST_SOURCE.PINNED &&
+            (!value || value.length === 0)
+            ? 'Pin at least one post, or switch the source to Newest featured.'
+            : true;
+        }),
+      ],
     }),
     defineField({
       name: 'limit',

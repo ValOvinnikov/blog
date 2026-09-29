@@ -1,6 +1,7 @@
 import { ctaSecondaryButtonSchema } from '@blog/studio/schema-types/objects/cta-button/cta-button';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
 import { listedTextSchema } from '@blog/studio/schema-types/portable-text/listed-text/listed-text';
+import { validateImageHasAsset } from '@blog/studio/schema-types/validation/validate-image-has-asset/validate-image-has-asset';
 import { Columns2 } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
@@ -31,7 +32,8 @@ export const featureHighlightSchema = defineType({
       type: imageWithAltSchema.name,
       description:
         'Shown at 4:3 beside the text. Product screenshots and illustrations work best.',
-      validation: (rule) => rule.required(),
+      validation: (rule) =>
+        rule.custom(validateImageHasAsset('Add an image for this row.')),
     }),
     defineField({
       name: 'action',
