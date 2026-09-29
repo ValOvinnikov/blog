@@ -73,10 +73,6 @@ export const CenterAligned: TStory = {
   args: { contentAlignment: CONTENT_ALIGNMENT.CENTER },
 };
 
-export const RightAligned: TStory = {
-  args: { contentAlignment: CONTENT_ALIGNMENT.RIGHT },
-};
-
 export const SingleLogo: TStory = {
   args: { logos: [logos[0]!] },
 };
