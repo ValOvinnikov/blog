@@ -1,58 +1,71 @@
-import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { service, type TTopicIndexPage } from '@blog/service';
+import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import {
+  customRenderServerAsync,
+  screen,
+  within,
+} from '@web/testing/custom-render';
+import { makeCtaModuleData } from '@web/testing/modules/cta/fixtures';
+import { makeHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { makeSeo } from '@web/testing/shared/seo/fixtures';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 
 import { TopicIndexPage } from './topic-index-page';
 
-const { getTopicIndexPageMock, topicIndexModuleRendererMock } = vi.hoisted(
-  () => ({
-    getTopicIndexPageMock: vi.fn(),
-    topicIndexModuleRendererMock: vi.fn(
-      ({
-        hero,
-        headingBlock,
-        modules,
-      }: {
-        hero?: { id: string };
-        headingBlock: { heading: string };
-        modules: { id: string; type: string }[];
-      }) => (
-        <div data-testid="topic-index-module-renderer">
-          {hero ? hero.id : headingBlock.heading} —{' '}
-          {modules.map((module) => module.type).join(',')}
-        </div>
-      ),
-    ),
+vi.mock('@blog/service', () => ({
+  service: {
+    pages: { topicIndex: { v1: { getIndexPage: vi.fn() } } },
+    modules: {
+      cta: { v1: { getCta: vi.fn() } },
+      heroBlog: { v1: { getHeroBlog: vi.fn() } },
+    },
+  },
+}));
+
+vi.mock('@web/server/tenant/get-tenant-sanity-context');
+
+vi.mock('@web/server/tenant/get-tenant-base-url');
+
+vi.mock('@web/utils/logger/logger');
+
+vi.mock('@web/i18n/navigation');
+
+const getIndexPageMock = vi.mocked(service.pages.topicIndex.v1.getIndexPage);
+
+const topicIndexPage: TTopicIndexPage = {
+  headingBlock: makeHeadingBlock({
+    heading: 'Topics',
+    supportingText: 'Browse every post by topic.',
   }),
-);
+  hero: undefined,
+  modules: [],
+  seo: makeSeo(),
+};
 
-vi.mock('@web/server/topic-index/get-topic-index-page', () => ({
-  getTopicIndexPage: getTopicIndexPageMock,
-}));
-
-vi.mock('@web/components/features/topic-index/topic-index-breadcrumbs', () => ({
-  TopicIndexBreadcrumbs: ({ tenant }: { tenant: string }) => (
-    <div data-testid="topic-index-breadcrumbs">{tenant}</div>
-  ),
-}));
-
-vi.mock('./topic-index-module-renderer', () => ({
-  TopicIndexModuleRenderer: topicIndexModuleRendererMock,
-}));
-
-const setup = customRenderAsync(TopicIndexPage, {
+const setup = customRenderServerAsync(TopicIndexPage, {
   locale: 'en',
   tenant: 'tenant-1',
 });
 
 describe(`<${TopicIndexPage.name}/>`, () => {
   beforeEach(() => {
-    getTopicIndexPageMock.mockReset();
+    getIndexPageMock.mockResolvedValue({ ok: true, data: topicIndexPage });
+    vi.mocked(service.modules.cta.v1.getCta).mockImplementation(async (id) => ({
+      ok: true,
+      data: makeCtaModuleData({
+        headingBlock: makeHeadingBlock({
+          heading: id === 'cta-1' ? 'Join the list' : 'Write for us',
+        }),
+      }),
+    }));
   });
 
-  it('calls notFound() when the fetch fails', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getTopicIndexPageMock.mockResolvedValue({
+  it('logs and calls notFound() when the fetch fails', async () => {
+    getIndexPageMock.mockResolvedValueOnce({
       ok: false,
       error: new Error('boom'),
     });
@@ -60,167 +73,97 @@ describe(`<${TopicIndexPage.name}/>`, () => {
     await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('topic_index_page.fetch_failed'),
+    expect(logger.error).toHaveBeenCalledWith(
+      'topic_index_page.fetch_failed',
+      expect.anything(),
     );
-
-    errorSpy.mockRestore();
   });
 
-  it('calls notFound() without logging when the index page simply does not exist', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getTopicIndexPageMock.mockResolvedValue({ ok: true, data: undefined });
+  it('calls notFound() without logging when the index page does not exist', async () => {
+    getIndexPageMock.mockResolvedValueOnce({ ok: true, data: undefined });
 
     await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    expect(errorSpy).not.toHaveBeenCalled();
-
-    errorSpy.mockRestore();
+    expect(logger.error).not.toHaveBeenCalled();
   });
 
-  it('dispatches TopicIndexModuleRenderer with the fetched headingBlock and modules', async () => {
-    getTopicIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        headingBlock: makeHeadingBlock({
-          heading: 'Topics',
-          supportingText: 'Browse every post by topic.',
-        }),
-        modules: [],
-      },
-    });
-
+  it('fetches the index page and breadcrumb base URL for the tenant', async () => {
     await setup();
 
-    expect(topicIndexModuleRendererMock).toHaveBeenCalledWith(
-      {
-        hero: undefined,
-        headingBlock: makeHeadingBlock({
-          heading: 'Topics',
-          supportingText: 'Browse every post by topic.',
-        }),
-        modules: [],
-        locale: 'en',
-        tenant: 'tenant-1',
-      },
-      undefined,
+    expect(getTenantSanityContext).toHaveBeenCalledWith('tenant-1');
+    expect(getIndexPageMock).toHaveBeenCalledWith(
+      DEFAULT_TENANT_SANITY_CONTEXT,
     );
-    expect(screen.getByTestId('topic-index-module-renderer')).toHaveTextContent(
-      'Topics',
-    );
+    expect(getTenantBaseUrl).toHaveBeenCalledWith('tenant-1');
+  });
+
+  it('renders the heading and supporting text inside main', async () => {
+    await setup();
+
+    const main = screen.getByRole('main');
+    expect(
+      within(main).getByRole('heading', { level: 1, name: 'Topics' }),
+    ).toBeVisible();
+    expect(within(main).getByText('Browse every post by topic.')).toBeVisible();
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 
-  it('dispatches TopicIndexModuleRenderer with the hero when a hero is set', async () => {
-    getTopicIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        headingBlock: makeHeadingBlock({ heading: 'Topics' }),
-        hero: { id: 'hero-1', type: 'module_hero' },
-        modules: [],
-      },
-    });
-
+  it('renders the breadcrumb trail outside main', async () => {
     await setup();
 
-    expect(topicIndexModuleRendererMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        hero: { id: 'hero-1', type: 'module_hero' },
-        locale: 'en',
-        tenant: 'tenant-1',
-      }),
-      undefined,
-    );
-    expect(screen.getByTestId('topic-index-module-renderer')).toHaveTextContent(
-      'hero-1',
-    );
+    const breadcrumbs = screen.getByRole('navigation', { name: 'Breadcrumb' });
+    expect(
+      within(breadcrumbs).getByRole('link', { name: 'Home' }),
+    ).toBeVisible();
+    expect(within(breadcrumbs).getByText('Topics')).toBeVisible();
+    expect(screen.getByRole('main')).not.toContainElement(breadcrumbs);
   });
 
-  it('renders the parts in order: breadcrumbs, then the module renderer', async () => {
-    getTopicIndexPageMock.mockResolvedValue({
+  it('renders the authored modules inside main in order', async () => {
+    getIndexPageMock.mockResolvedValueOnce({
       ok: true,
       data: {
-        headingBlock: makeHeadingBlock({ heading: 'Topics' }),
-        modules: [{ id: 'topic-list-1', type: 'module_taxonomyList' }],
-      },
-    });
-
-    await setup();
-
-    const order = screen
-      .getAllByTestId(/.+/)
-      .map((el) => el.getAttribute('data-testid'));
-
-    expect(order).toEqual([
-      'topic-index-breadcrumbs',
-      'topic-index-module-renderer',
-    ]);
-  });
-
-  it('renders through PageShell: the module renderer inside a single main landmark', async () => {
-    getTopicIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        headingBlock: makeHeadingBlock({ heading: 'Topics' }),
-        modules: [],
+        ...topicIndexPage,
+        modules: [
+          { id: 'cta-1', type: 'module_cta' },
+          { id: 'cta-2', type: 'module_cta' },
+        ],
       },
     });
 
     await setup();
 
     const main = screen.getByRole('main');
-    expect(main).toContainElement(
-      screen.getByTestId('topic-index-module-renderer'),
-    );
+    expect(within(main).getAllByRole('region')).toEqual([
+      within(main).getByRole('region', { name: 'Join the list' }),
+      within(main).getByRole('region', { name: 'Write for us' }),
+    ]);
+  });
+
+  it('renders the hero in place of the heading when one is set', async () => {
+    getIndexPageMock.mockResolvedValueOnce({
+      ok: true,
+      data: {
+        ...topicIndexPage,
+        hero: { id: 'hero-1', type: 'module_heroBlog' },
+      },
+    });
+    vi.mocked(service.modules.heroBlog.v1.getHeroBlog).mockResolvedValueOnce({
+      ok: true,
+      data: makeHeroBlogData({ heading: 'Every topic we write about' }),
+    });
+
+    await setup();
+
     expect(
-      screen.getByTestId('topic-index-breadcrumbs').closest('main'),
-    ).toBeNull();
-  });
-
-  it('passes the page-builder modules through to TopicIndexModuleRenderer, in order, including the taxonomy list module', async () => {
-    getTopicIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        headingBlock: makeHeadingBlock({ heading: 'Topics' }),
-        modules: [
-          { id: 'topic-list-1', type: 'module_taxonomyList' },
-          { id: 'newsletter-1', type: 'module_newsletter' },
-        ],
-      },
-    });
-
-    await setup();
-
-    expect(topicIndexModuleRendererMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        modules: [
-          { id: 'topic-list-1', type: 'module_taxonomyList' },
-          { id: 'newsletter-1', type: 'module_newsletter' },
-        ],
-        locale: 'en',
+      screen.getByRole('heading', {
+        level: 1,
+        name: 'Every topic we write about',
       }),
-      undefined,
-    );
-    expect(screen.getByTestId('topic-index-module-renderer')).toHaveTextContent(
-      'module_taxonomyList,module_newsletter',
-    );
-  });
-
-  it('forwards the tenant to getTopicIndexPage and TopicIndexBreadcrumbs', async () => {
-    getTopicIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        headingBlock: makeHeadingBlock({ heading: 'Topics' }),
-        modules: [],
-      },
-    });
-
-    await setup();
-
-    expect(getTopicIndexPageMock).toHaveBeenCalledWith('tenant-1');
-    expect(screen.getByTestId('topic-index-breadcrumbs')).toHaveTextContent(
-      'tenant-1',
-    );
+    ).toBeVisible();
+    expect(
+      screen.queryByRole('heading', { level: 1, name: 'Topics' }),
+    ).not.toBeInTheDocument();
   });
 });

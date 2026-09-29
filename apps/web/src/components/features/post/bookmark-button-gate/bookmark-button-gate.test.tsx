@@ -1,55 +1,66 @@
-import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { ToastProvider } from '@web/context/toast-provider';
+import { getBookmarkStatus } from '@web/server/bookmarks/bookmark-actions';
+import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
+import {
+  customRenderServerAsync,
+  screen,
+  waitFor,
+} from '@web/testing/custom-render';
+import { useSession } from 'next-auth/react';
 
 import { BookmarkButtonGate } from './bookmark-button-gate';
 
-const { isCapabilityEnabledMock } = vi.hoisted(() => ({
-  isCapabilityEnabledMock: vi.fn(),
-}));
-
 vi.mock('@web/server/settings-features/is-capability-enabled', () => ({
-  isCapabilityEnabled: isCapabilityEnabledMock,
+  isCapabilityEnabled: vi.fn(),
 }));
 
-vi.mock('@web/components/shared/bookmark-button', () => ({
-  BookmarkButton: ({ postId }: { postId: string }) => (
-    <div data-testid="bookmark-button">{postId}</div>
-  ),
+vi.mock('@web/server/bookmarks/bookmark-actions', () => ({
+  getBookmarkStatus: vi.fn(),
+  setBookmarkStatus: vi.fn(),
 }));
 
-const setup = customRenderAsync(BookmarkButtonGate, {
-  postId: 'post-1',
-  tenant: 'tenant-1',
-});
+vi.mock('next-auth/react', () => ({ useSession: vi.fn() }));
+
+const setup = customRenderServerAsync(
+  BookmarkButtonGate,
+  { postId: 'post-1', tenant: 'tenant-1' },
+  { wrapper: ToastProvider },
+);
 
 describe(`<${BookmarkButtonGate.name}/>`, () => {
   beforeEach(() => {
-    isCapabilityEnabledMock.mockReset();
+    vi.mocked(useSession).mockReturnValue({
+      data: { user: { id: 'user-1' }, expires: '' },
+      status: 'authenticated',
+      update: vi.fn(),
+    });
+    vi.mocked(getBookmarkStatus).mockResolvedValue(false);
   });
 
-  it('renders BookmarkButton with the given postId when the BOOKMARKS capability is enabled', async () => {
-    isCapabilityEnabledMock.mockResolvedValue(true);
+  it('renders the bookmark toggle when bookmarks are enabled', async () => {
+    vi.mocked(isCapabilityEnabled).mockResolvedValueOnce(true);
 
     await setup();
 
-    expect(screen.getByTestId('bookmark-button')).toHaveTextContent('post-1');
-  });
-
-  it('renders nothing when the BOOKMARKS capability is not entitled/enabled', async () => {
-    isCapabilityEnabledMock.mockResolvedValue(false);
-
-    const { container } = await setup();
-
-    expect(container).toBeEmptyDOMElement();
-  });
-
-  it('forwards the tenant route param to isCapabilityEnabled', async () => {
-    isCapabilityEnabledMock.mockResolvedValue(false);
-
-    await setup();
-
-    expect(isCapabilityEnabledMock).toHaveBeenCalledWith(
-      'BOOKMARKS',
-      'tenant-1',
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Save post' })).toBeEnabled(),
     );
+    expect(getBookmarkStatus).toHaveBeenCalledWith('post-1');
+  });
+
+  it('renders no toggle when bookmarks are not enabled', async () => {
+    vi.mocked(isCapabilityEnabled).mockResolvedValueOnce(false);
+
+    await setup();
+
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+  });
+
+  it('checks the bookmarks capability for the given tenant', async () => {
+    vi.mocked(isCapabilityEnabled).mockResolvedValueOnce(false);
+
+    await setup();
+
+    expect(isCapabilityEnabled).toHaveBeenCalledWith('BOOKMARKS', 'tenant-1');
   });
 });

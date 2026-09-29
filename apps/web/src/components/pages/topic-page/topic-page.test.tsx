@@ -1,81 +1,49 @@
 import { TAXONOMY_KIND } from '@blog/config';
-import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { service } from '@blog/service';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import {
+  customRenderServerAsync,
+  screen,
+  within,
+} from '@web/testing/custom-render';
+import { makeCtaModuleData } from '@web/testing/modules/cta/fixtures';
+import { makeHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
+import { makePostListModuleData } from '@web/testing/modules/post-list/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { makeTopic } from '@web/testing/shared/topic/fixtures';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import {
+  makeTopic,
+  makeTopicDetailPage,
+  makeTopicWithPostCount,
+} from '@web/testing/shared/topic/fixtures';
+import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
-import type { ReactNode } from 'react';
 
 import { TopicPage } from './topic-page';
 
-const {
-  getTopicPageMock,
-  topicBreadcrumbsMock,
-  topicChipsMock,
-  topicModuleRendererMock,
-} = vi.hoisted(() => ({
-  getTopicPageMock: vi.fn(),
-  topicBreadcrumbsMock: vi.fn(
-    ({ slug, tenant }: { slug: string; tenant: string }) => (
-      <div data-testid="topic-breadcrumbs">
-        {slug}:{tenant}
-      </div>
-    ),
-  ),
-  topicChipsMock: vi.fn(
-    ({ activeSlug, tenant }: { activeSlug: string; tenant: string }) => (
-      <div data-testid="topic-chips">
-        {activeSlug}:{tenant}
-      </div>
-    ),
-  ),
-  topicModuleRendererMock: vi.fn(
-    ({
-      hero,
-      headingBlock,
-      modules,
-      children,
-    }: {
-      hero?: { id: string };
-      headingBlock: { heading: string };
-      modules: { id: string; type: string }[];
-      children?: ReactNode;
-    }) => (
-      <div data-testid="topic-module-renderer">
-        <span data-testid="page-intro">
-          {hero ? hero.id : headingBlock.heading}
-        </span>
-        {children}
-        <div data-testid="module-renderer-stub">
-          {modules.map((module) => module.type).join(',')}
-        </div>
-      </div>
-    ),
-  ),
+vi.mock('@blog/service', () => ({
+  service: {
+    pages: { topic: { v1: { getTopicPage: vi.fn() } } },
+    entities: { topics: { v1: { getTopics: vi.fn() } } },
+    modules: {
+      cta: { v1: { getCta: vi.fn() } },
+      heroBlog: { v1: { getHeroBlog: vi.fn() } },
+      postList: { v1: { getPostList: vi.fn() } },
+    },
+  },
 }));
 
-vi.mock('@web/server/topic/get-topic-page', () => ({
-  getTopicPage: getTopicPageMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-sanity-context');
 
-vi.mock('@web/components/features/topic/topic-breadcrumbs', () => ({
-  TopicBreadcrumbs: topicBreadcrumbsMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-base-url');
 
-vi.mock('@web/components/features/topic/topic-chips', () => ({
-  TopicChips: topicChipsMock,
-}));
+vi.mock('@web/utils/logger/logger');
 
-vi.mock('./topic-module-renderer', () => ({
-  TopicModuleRenderer: topicModuleRendererMock,
-}));
+vi.mock('@web/i18n/navigation');
 
-const topic = makeTopic({
-  title: 'News',
-  slug: 'news',
-  description: 'The latest updates.',
-});
+const getTopicPageMock = vi.mocked(service.pages.topic.v1.getTopicPage);
 
-const setup = customRenderAsync(TopicPage, {
+const setup = customRenderServerAsync(TopicPage, {
   slug: 'news',
   locale: 'en',
   tenant: 'tenant-1',
@@ -83,12 +51,31 @@ const setup = customRenderAsync(TopicPage, {
 
 describe(`<${TopicPage.name}/>`, () => {
   beforeEach(() => {
-    getTopicPageMock.mockReset();
+    getTopicPageMock.mockResolvedValue({
+      ok: true,
+      data: makeTopicDetailPage({
+        topic: makeTopic({ title: 'News', slug: 'news' }),
+        headingBlock: makeHeadingBlock({
+          heading: 'News',
+          supportingText: 'The latest updates.',
+        }),
+      }),
+    });
+    vi.mocked(service.entities.topics.v1.getTopics).mockResolvedValue({
+      ok: true,
+      data: [
+        makeTopicWithPostCount({ title: 'News', slug: 'news' }),
+        makeTopicWithPostCount({
+          id: 'topic-2',
+          title: 'Design',
+          slug: 'design',
+        }),
+      ],
+    });
   });
 
-  it('calls notFound() and logs when the fetch fails', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getTopicPageMock.mockResolvedValue({
+  it('logs and calls notFound() when the fetch fails', async () => {
+    getTopicPageMock.mockResolvedValueOnce({
       ok: false,
       error: new Error('boom'),
     });
@@ -96,218 +83,159 @@ describe(`<${TopicPage.name}/>`, () => {
     await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('topic_page.fetch_failed'),
+    expect(logger.error).toHaveBeenCalledWith(
+      'topic_page.fetch_failed',
+      expect.objectContaining({ slug: 'news' }),
     );
-
-    errorSpy.mockRestore();
   });
 
-  it('calls notFound() without logging when the topic simply does not exist', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getTopicPageMock.mockResolvedValue({ ok: true, data: undefined });
+  it('calls notFound() without logging when the topic does not exist', async () => {
+    getTopicPageMock.mockResolvedValueOnce({ ok: true, data: undefined });
 
     await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    expect(errorSpy).not.toHaveBeenCalled();
-
-    errorSpy.mockRestore();
+    expect(logger.error).not.toHaveBeenCalled();
   });
 
-  it('dispatches TopicModuleRenderer with the view-model headingBlock', async () => {
-    getTopicPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        topic,
-        headingBlock: makeHeadingBlock({
-          heading: 'News',
-          supportingText: 'The latest updates.',
-        }),
-        modules: [],
-        seo: {},
-      },
-    });
-
+  it('fetches the topic for the given slug with the tenant context', async () => {
     await setup();
 
-    expect(topicModuleRendererMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        headingBlock: makeHeadingBlock({
-          heading: 'News',
-          supportingText: 'The latest updates.',
-        }),
-        locale: 'en',
-        tenant: 'tenant-1',
-      }),
-      undefined,
+    expect(getTopicPageMock).toHaveBeenCalledWith(
+      'news',
+      DEFAULT_TENANT_SANITY_CONTEXT,
     );
-    expect(screen.getByTestId('page-intro')).toHaveTextContent('News');
-    expect(vi.mocked(notFound)).not.toHaveBeenCalled();
+    expect(getTenantSanityContext).toHaveBeenCalledWith('tenant-1');
   });
 
-  it('renders the parts in order: breadcrumbs, hero/heading, topic chips, module renderer', async () => {
-    getTopicPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        topic,
-        headingBlock: makeHeadingBlock({ heading: 'News' }),
-        modules: [{ id: 'newsletter-1', type: 'module_newsletter' }],
-        seo: {},
-      },
-    });
-
-    await setup();
-
-    const order = screen
-      .getAllByTestId(/.+/)
-      .map((el) => el.getAttribute('data-testid'));
-
-    expect(order).toEqual([
-      'topic-breadcrumbs',
-      'topic-module-renderer',
-      'page-intro',
-      'topic-chips',
-      'module-renderer-stub',
-    ]);
-  });
-
-  it('renders through PageShell: breadcrumbs outside main, everything else inside it', async () => {
-    getTopicPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        topic,
-        headingBlock: makeHeadingBlock({ heading: 'News' }),
-        modules: [],
-        seo: {},
-      },
-    });
-
+  it('renders the topic heading and supporting text inside main', async () => {
     await setup();
 
     const main = screen.getByRole('main');
-    expect(main).toContainElement(screen.getByTestId('topic-chips'));
-    expect(main).toContainElement(screen.getByTestId('module-renderer-stub'));
-    expect(screen.getByTestId('topic-breadcrumbs').closest('main')).toBeNull();
+    expect(
+      within(main).getByRole('heading', { level: 1, name: 'News' }),
+    ).toBeVisible();
+    expect(within(main).getByText('The latest updates.')).toBeVisible();
   });
 
-  it('passes the current page and the topic archive scope as context to TopicModuleRenderer', async () => {
-    getTopicPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        topic,
-        headingBlock: makeHeadingBlock({ heading: 'News' }),
-        modules: [],
-        seo: {},
-      },
+  it('renders the breadcrumb trail outside main', async () => {
+    await setup();
+
+    const breadcrumbs = screen.getByRole('navigation', { name: 'Breadcrumb' });
+    expect(
+      within(breadcrumbs).getByRole('link', { name: 'Home' }),
+    ).toBeVisible();
+    expect(within(breadcrumbs).getByText('News')).toBeVisible();
+    expect(screen.getByRole('main')).not.toContainElement(breadcrumbs);
+  });
+
+  it('renders the topic chips inside main with the current topic active', async () => {
+    await setup();
+
+    const chips = within(screen.getByRole('main')).getByRole('navigation', {
+      name: 'Topics',
     });
-
-    await setup({ page: 3 });
-
-    expect(topicModuleRendererMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        context: {
-          page: 3,
-          archive: { kind: TAXONOMY_KIND.TOPICS, slug: 'news', name: 'News' },
-        },
-      }),
-      undefined,
+    expect(within(chips).getByRole('link', { name: 'News' })).toHaveAttribute(
+      'aria-current',
+      'page',
     );
+    expect(
+      within(chips).getByRole('link', { name: 'Design' }),
+    ).not.toHaveAttribute('aria-current');
   });
 
-  it('defaults the TopicModuleRenderer context page to 1 when no page is given', async () => {
-    getTopicPageMock.mockResolvedValue({
+  it('renders the authored modules inside main', async () => {
+    getTopicPageMock.mockResolvedValueOnce({
       ok: true,
-      data: {
-        topic,
-        headingBlock: makeHeadingBlock({ heading: 'News' }),
-        modules: [],
-        seo: {},
-      },
+      data: makeTopicDetailPage({
+        topic: makeTopic({ title: 'News', slug: 'news' }),
+        modules: [{ id: 'cta-1', type: 'module_cta' }],
+      }),
+    });
+    vi.mocked(service.modules.cta.v1.getCta).mockResolvedValueOnce({
+      ok: true,
+      data: makeCtaModuleData({
+        headingBlock: makeHeadingBlock({ heading: 'Join the list' }),
+      }),
     });
 
     await setup();
 
-    expect(topicModuleRendererMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        context: {
-          page: 1,
-          archive: { kind: TAXONOMY_KIND.TOPICS, slug: 'news', name: 'News' },
-        },
+    expect(
+      within(screen.getByRole('main')).getByRole('region', {
+        name: 'Join the list',
       }),
-      undefined,
-    );
+    ).toBeVisible();
   });
 
-  it('passes the page-builder modules through to TopicModuleRenderer', async () => {
-    getTopicPageMock.mockResolvedValue({
+  it('renders the hero in place of the topic heading when one is set', async () => {
+    getTopicPageMock.mockResolvedValueOnce({
       ok: true,
-      data: {
-        topic,
+      data: makeTopicDetailPage({
+        topic: makeTopic({ title: 'News', slug: 'news' }),
         headingBlock: makeHeadingBlock({ heading: 'News' }),
-        modules: [{ id: 'newsletter-1', type: 'module_newsletter' }],
-        seo: {},
-      },
+        hero: { id: 'hero-1', type: 'module_heroBlog' },
+      }),
+    });
+    vi.mocked(service.modules.heroBlog.v1.getHeroBlog).mockResolvedValueOnce({
+      ok: true,
+      data: makeHeroBlogData({ heading: 'All about news' }),
     });
 
     await setup();
 
-    expect(topicModuleRendererMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        modules: [{ id: 'newsletter-1', type: 'module_newsletter' }],
-        locale: 'en',
-      }),
-      undefined,
-    );
-    expect(screen.getByTestId('module-renderer-stub')).toHaveTextContent(
-      'module_newsletter',
-    );
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'All about news' }),
+    ).toBeVisible();
+    expect(
+      screen.queryByRole('heading', { level: 1, name: 'News' }),
+    ).not.toBeInTheDocument();
   });
 
-  it('dispatches TopicModuleRenderer with the hero when a hero is set', async () => {
-    getTopicPageMock.mockResolvedValue({
+  it.each([
+    { page: 3, expected: 3 },
+    { page: undefined, expected: 1 },
+  ])(
+    'loads post lists for page $expected of the topic archive',
+    async ({ page, expected }) => {
+      getTopicPageMock.mockResolvedValueOnce({
+        ok: true,
+        data: makeTopicDetailPage({
+          topic: makeTopic({ title: 'News', slug: 'news' }),
+          modules: [{ id: 'list-1', type: 'module_postList' }],
+        }),
+      });
+      vi.mocked(service.modules.postList.v1.getPostList).mockResolvedValueOnce({
+        ok: false,
+        error: new Error('boom'),
+      });
+
+      await expect(setup({ page })).rejects.toThrow('NEXT_NOT_FOUND');
+
+      expect(service.modules.postList.v1.getPostList).toHaveBeenCalledWith(
+        'list-1',
+        DEFAULT_TENANT_SANITY_CONTEXT,
+        expected,
+        { kind: TAXONOMY_KIND.TOPICS, slug: 'news' },
+      );
+    },
+  );
+
+  it('names the topic in an empty post list', async () => {
+    getTopicPageMock.mockResolvedValueOnce({
       ok: true,
-      data: {
-        topic,
-        headingBlock: makeHeadingBlock({ heading: 'News' }),
-        hero: { id: 'hero-1', type: 'module_hero' },
-        modules: [],
-        seo: {},
-      },
+      data: makeTopicDetailPage({
+        topic: makeTopic({ title: 'News', slug: 'news' }),
+        modules: [{ id: 'list-1', type: 'module_postList' }],
+      }),
+    });
+    vi.mocked(service.modules.postList.v1.getPostList).mockResolvedValueOnce({
+      ok: true,
+      data: makePostListModuleData(),
     });
 
     await setup();
 
-    expect(topicModuleRendererMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        hero: { id: 'hero-1', type: 'module_hero' },
-        locale: 'en',
-        tenant: 'tenant-1',
-      }),
-      undefined,
-    );
-    expect(screen.getByTestId('page-intro')).toHaveTextContent('hero-1');
-  });
-
-  it('forwards the slug and tenant to getTopicPage, TopicBreadcrumbs, and TopicChips', async () => {
-    getTopicPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        topic,
-        headingBlock: makeHeadingBlock({ heading: 'News' }),
-        modules: [],
-        seo: {},
-      },
-    });
-
-    await setup();
-
-    expect(getTopicPageMock).toHaveBeenCalledWith('news', 'tenant-1');
-    expect(screen.getByTestId('topic-breadcrumbs')).toHaveTextContent(
-      'news:tenant-1',
-    );
-    expect(screen.getByTestId('topic-chips')).toHaveTextContent(
-      'news:tenant-1',
-    );
+    expect(screen.getByText('No posts in News yet.')).toBeVisible();
   });
 });

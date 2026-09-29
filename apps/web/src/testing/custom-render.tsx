@@ -61,28 +61,43 @@ type TAsyncComponent = (props: object) => Promise<ReactNode>;
 const isAsyncComponent = (type: unknown): type is TAsyncComponent =>
   typeof type === 'function' && type.constructor.name === 'AsyncFunction';
 
-const resolveServerTree = async (node: ReactNode): Promise<ReactNode> => {
-  if (Array.isArray(node)) return Promise.all(node.map(resolveServerTree));
-  if (!isValidElement<Record<string, unknown>>(node)) return node;
-  if (isAsyncComponent(node.type)) {
-    return resolveServerTree(await node.type(node.props));
-  }
+const isPlainObject = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' &&
+  value !== null &&
+  Object.getPrototypeOf(value) === Object.prototype;
 
-  const resolvedProps = await Promise.all(
-    Object.entries(node.props).map(
-      async ([key, value]) =>
-        [key, await resolveServerTree(value as ReactNode)] as const,
+const resolveEntries = async (
+  record: Record<string, unknown>,
+): Promise<Record<string, unknown>> =>
+  Object.fromEntries(
+    await Promise.all(
+      Object.entries(record).map(
+        async ([key, value]) => [key, await resolveValue(value)] as const,
+      ),
     ),
   );
-  return cloneElement(node, Object.fromEntries(resolvedProps));
+
+const resolveValue = async (value: unknown): Promise<unknown> => {
+  if (Array.isArray(value)) return Promise.all(value.map(resolveValue));
+  if (isValidElement<Record<string, unknown>>(value)) {
+    if (isAsyncComponent(value.type)) {
+      return resolveValue(await value.type(value.props));
+    }
+    return cloneElement(value, await resolveEntries(value.props));
+  }
+  if (isPlainObject(value)) return resolveEntries(value);
+  return value;
 };
+
+const resolveServerTree = (node: ReactNode) =>
+  resolveValue(node) as Promise<ReactNode>;
 
 /**
  * `customRenderAsync` for a Server Component whose tree nests further async
  * Server Components: each one is awaited before RTL renders, the way the RSC
- * renderer resolves them. Only `async` function components are called; sync
- * ones render normally, so an async component returned from inside a sync
- * one's body is never reached.
+ * renderer resolves them, including those passed inside a plain-object prop.
+ * Only `async` function components are called; sync ones render normally, so
+ * an async component returned from inside a sync one's body is never reached.
  */
 export const customRenderServerAsync = <P extends object>(
   Component: (props: P) => Promise<ReactNode>,
