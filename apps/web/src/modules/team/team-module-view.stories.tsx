@@ -73,7 +73,7 @@ const meta = {
     },
     contentAlignment: {
       control: 'select',
-      options: Object.values(CONTENT_ALIGNMENT),
+      options: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
     },
     cardAlignment: {
       control: 'select',
@@ -151,6 +151,36 @@ export const WithSocialLinks: TStory = {
 
 export const Carousel: TStory = {
   args: { displayMode: DISPLAY_MODE.CAROUSEL },
+};
+
+export const CarouselTwoMembersLeft: TStory = {
+  args: {
+    displayMode: DISPLAY_MODE.CAROUSEL,
+    members: members.slice(0, 2),
+    contentAlignment: CONTENT_ALIGNMENT.LEFT,
+  },
+};
+
+export const CarouselTwoMembersCentre: TStory = {
+  args: {
+    displayMode: DISPLAY_MODE.CAROUSEL,
+    members: members.slice(0, 2),
+    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    cardAlignment: CONTENT_ALIGNMENT.CENTER,
+  },
+};
+
+export const CarouselOverflowCentre: TStory = {
+  args: {
+    displayMode: DISPLAY_MODE.CAROUSEL,
+    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    members: [
+      ...members,
+      makeTeamMember({ id: 'team-member-4', name: 'Sana Ito' }),
+      makeTeamMember({ id: 'team-member-5', name: 'Wale Adebayo' }),
+      makeTeamMember({ id: 'team-member-6', name: 'Elin Kask' }),
+    ],
+  },
 };
 
 export const WithActions: TStory = {

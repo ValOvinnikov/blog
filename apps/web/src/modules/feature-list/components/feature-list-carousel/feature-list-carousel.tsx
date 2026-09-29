@@ -7,6 +7,7 @@ import type {
   TCardImageShape,
 } from '@blog/config';
 import type { TFeatureListItem } from '@blog/service';
+import type { ICarouselProps } from '@blog/ui/components/organisms/carousel';
 import { LabelledCarousel } from '@web/components/shared/labelled-carousel';
 import { FeatureListCard } from '@web/modules/feature-list/components/feature-list-card/feature-list-card';
 
@@ -18,6 +19,7 @@ export interface IFeatureListCarouselProps
   imageSizes: string;
   title: string;
   tone?: TBrandVariant;
+  contentAlignment?: ICarouselProps<TFeatureListItem>['contentAlignment'];
 }
 
 export const FeatureListCarousel = ({
@@ -27,6 +29,7 @@ export const FeatureListCarousel = ({
   imageSizes,
   title,
   tone,
+  contentAlignment,
   className,
   dataTestId,
 }: IFeatureListCarouselProps) => (
@@ -44,6 +47,7 @@ export const FeatureListCarousel = ({
     getItemKey={({ item }) => item.id}
     title={title}
     tone={tone}
+    contentAlignment={contentAlignment}
     className={className}
     dataTestId={dataTestId}
   />
