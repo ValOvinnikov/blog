@@ -6,10 +6,10 @@ import {
 } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
 import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
-import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeTeamMember } from '@web/testing/modules/team/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
+import type { ReactNode } from 'react';
 
 import { TeamModuleView } from './team-module-view';
 
@@ -22,6 +22,20 @@ const { TeamCarousel } = vi.hoisted(() => ({
 }));
 
 vi.mock('./team-carousel', () => ({ TeamCarousel }));
+
+const { CardGrid } = vi.hoisted(() => ({
+  CardGrid: vi.fn(({ children }: { children: ReactNode }) => <>{children}</>),
+}));
+
+vi.mock('@blog/ui/components/organisms/card-grid', () => ({ CardGrid }));
+
+const getCardGridProps = () => {
+  const props = vi.mocked(CardGrid).mock.calls.at(-1)?.[0];
+  if (!props) {
+    throw new Error('CardGrid was not called');
+  }
+  return props;
+};
 
 const members = [
   makeTeamMember({ id: 'team-member-1', name: 'Jordan Reyes' }),
@@ -111,47 +125,21 @@ describe(`<${TeamModuleView.name}/>`, () => {
   });
 
   const fourMembers = [
-    makeTeamMember({
-      id: 'team-member-1',
-      name: 'Member One',
-      image: makeSanityImage({ alt: 'Member One photo' }),
-    }),
-    makeTeamMember({
-      id: 'team-member-2',
-      name: 'Member Two',
-      image: makeSanityImage({ alt: 'Member Two photo' }),
-    }),
-    makeTeamMember({
-      id: 'team-member-3',
-      name: 'Member Three',
-      image: makeSanityImage({ alt: 'Member Three photo' }),
-    }),
-    makeTeamMember({
-      id: 'team-member-4',
-      name: 'Member Four',
-      image: makeSanityImage({ alt: 'Member Four photo' }),
-    }),
+    makeTeamMember({ id: 'team-member-1', name: 'Member One' }),
+    makeTeamMember({ id: 'team-member-2', name: 'Member Two' }),
+    makeTeamMember({ id: 'team-member-3', name: 'Member Three' }),
+    makeTeamMember({ id: 'team-member-4', name: 'Member Four' }),
   ];
 
-  it('keeps the base 4-column image sizes request when bios are hidden', () => {
+  it('passes the base 4-column count to CardGrid when bios are hidden', () => {
     setup({ members: fourMembers, showBios: false });
 
-    expect(
-      screen.getByRole('img', { name: 'Member One photo' }),
-    ).toHaveAttribute(
-      'sizes',
-      '(min-width: 1024px) 25vw, (min-width: 768px) 33vw, (min-width: 640px) 50vw, 100vw',
-    );
+    expect(getCardGridProps()).toMatchObject({ columns: 4 });
   });
 
-  it('caps the grid at 3 columns when bios are shown and the base column count is 4', () => {
+  it('caps the CardGrid columns prop at 3 when bios are shown and the base column count is 4', () => {
     setup({ members: fourMembers, showBios: true });
 
-    expect(
-      screen.getByRole('img', { name: 'Member One photo' }),
-    ).toHaveAttribute(
-      'sizes',
-      '(min-width: 768px) 33vw, (min-width: 640px) 50vw, 100vw',
-    );
+    expect(getCardGridProps()).toMatchObject({ columns: 3 });
   });
 });
