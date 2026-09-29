@@ -126,7 +126,27 @@ export const CircleImages: TStory = {
 };
 
 export const Carousel: TStory = {
-  args: { displayMode: DISPLAY_MODE.CAROUSEL },
+  args: {
+    displayMode: DISPLAY_MODE.CAROUSEL,
+    contentAlignment: CONTENT_ALIGNMENT.LEFT,
+  },
+};
+
+export const CarouselCenterAligned: TStory = {
+  args: {
+    displayMode: DISPLAY_MODE.CAROUSEL,
+    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+  },
+};
+
+export const CarouselOverflowingCenterAligned: TStory = {
+  args: {
+    displayMode: DISPLAY_MODE.CAROUSEL,
+    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    items: Array.from({ length: 8 }, (_, index) =>
+      makeFeatureListItem({ id: `feature-${index + 1}`, icon: ICONS.ROCKET }),
+    ),
+  },
 };
 
 export const WithActions: TStory = {
