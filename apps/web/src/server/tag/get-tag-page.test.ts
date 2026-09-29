@@ -9,9 +9,7 @@ vi.mock('@blog/service', () => ({
   service: { pages: { tag: { v1: { getTagPage: getTagPageMock } } } },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: vi.fn(),
-}));
+vi.mock('@web/server/tenant/get-tenant-sanity-context');
 
 describe(getTagPage, () => {
   beforeEach(() => {
@@ -22,7 +20,7 @@ describe(getTagPage, () => {
     );
   });
 
-  it('resolves the tenant Sanity context, then forwards the slug and that context to service.pages.tag.v1.getTagPage', async () => {
+  it('forwards the slug and the resolved tenant context to the tag page service', async () => {
     getTagPageMock.mockResolvedValue({ ok: true, data: undefined });
 
     await getTagPage('typescript', 'tenant-1');
@@ -48,7 +46,7 @@ describe('getTagPage memoization', () => {
     vi.resetModules();
   });
 
-  it('dedupes the tag-page query when called more than once in the same render pass with the same arguments', async () => {
+  it('dedupes the tag-page query across one render pass with the same arguments', async () => {
     getTagPageMock.mockReset();
     vi.mocked(getTenantSanityContext).mockReset();
     vi.mocked(getTenantSanityContext).mockResolvedValue(

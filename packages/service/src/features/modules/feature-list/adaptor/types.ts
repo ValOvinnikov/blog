@@ -4,6 +4,7 @@ import type {
   TBrandVariantOf,
   TCardImageShape,
   TContentAlignment,
+  TContentAlignmentOf,
   TDisplayMode,
   TFeatureIconName,
   TLayout,
@@ -27,7 +28,7 @@ export type TFeatureListModule = {
   ctaButtons: TCtaButton[];
   imageShape: TCardImageShape;
   displayMode: TDisplayMode;
-  contentAlignment: TMaybeUndefined<TContentAlignment>;
+  contentAlignment: TMaybeUndefined<TContentAlignmentOf<'LEFT' | 'CENTER'>>;
   cardAlignment: Extract<TContentAlignment, 'LEFT' | 'CENTER'>;
   layout: TMaybeUndefined<TLayout>;
 };

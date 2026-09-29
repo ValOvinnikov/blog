@@ -3,6 +3,7 @@ import type {
   TBrandVariantOf,
   TCardImageShape,
   TContentAlignment,
+  TContentAlignmentOf,
   TDisplayMode,
   THeadingBlock,
   TLayout,
@@ -32,6 +33,6 @@ export type TTeamModule = {
   displayMode: TDisplayMode;
   cardAlignment: Extract<TContentAlignment, 'LEFT' | 'CENTER'>;
   ctaButtons: TCtaButton[];
-  contentAlignment: TMaybeUndefined<TContentAlignment>;
+  contentAlignment: TMaybeUndefined<TContentAlignmentOf<'LEFT' | 'CENTER'>>;
   layout: TMaybeUndefined<TLayout>;
 };

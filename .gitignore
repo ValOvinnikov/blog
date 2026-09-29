@@ -65,9 +65,10 @@ Thumbs.db
 .claude/settings.local.json
 .claude/worktrees/
 # Subagent -> orchestrator transfer buffers: a working copy of an agent's diff,
-# duplicated into git the moment the work is assembled onto a branch.
-.claude/scratchpad/
-.claude/scratchpads/
+# duplicated into git the moment the work is assembled onto a branch. Agents
+# name them per task (`scratchpad-3822-logo-wall`), so match the suffixed form
+# too — an unignored buffer is walked by knip and fails the pre-push hook.
+.claude/scratchpad*/
 
 # superpowers subagent-driven-development scratch (progress ledger, task
 # briefs, review packages) — local coordination state, never committed

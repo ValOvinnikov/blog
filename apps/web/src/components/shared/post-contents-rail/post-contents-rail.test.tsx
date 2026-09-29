@@ -1,7 +1,6 @@
 import userEvent from '@testing-library/user-event';
 import { customRender, fireEvent, screen } from '@web/testing/custom-render';
 import { mockPostHeadings } from '@web/testing/shared/post-contents-rail/fixtures';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { PostContentsRail } from './post-contents-rail';
 
@@ -9,12 +8,10 @@ const { useActiveHeadingIdMock } = vi.hoisted(() => ({
   useActiveHeadingIdMock: vi.fn(() => null as string | null),
 }));
 
+vi.mock('@web/i18n/navigation');
+
 vi.mock('@web/hooks/use-active-heading-id', () => ({
   useActiveHeadingId: useActiveHeadingIdMock,
-}));
-
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
 }));
 
 const setup = customRender(PostContentsRail, { headings: mockPostHeadings });
@@ -71,7 +68,7 @@ describe(`<${PostContentsRail.name}/>`, () => {
     });
   });
 
-  it('starts with the mobile disclosure closed, so its copy of the links is not in the accessibility tree', () => {
+  it('starts with the mobile disclosure closed and its links hidden', () => {
     setup();
 
     const trigger = getMobileTrigger();
@@ -79,7 +76,7 @@ describe(`<${PostContentsRail.name}/>`, () => {
     expect(screen.getAllByRole('link')).toHaveLength(mockPostHeadings.length);
   });
 
-  it('opens the mobile disclosure on trigger click, exposing its own copy of the links as plain links', async () => {
+  it('opens the mobile disclosure on trigger click, exposing its links as plain links', async () => {
     const user = userEvent.setup();
     setup();
 
@@ -101,7 +98,7 @@ describe(`<${PostContentsRail.name}/>`, () => {
     expect(screen.queryByRole('menuitem')).not.toBeInTheDocument();
   });
 
-  it('lets Tab carry focus through the open mobile disclosure and out into the page, instead of trapping it inside the panel', async () => {
+  it('lets Tab move through the open mobile disclosure and out, without trapping focus', async () => {
     const user = userEvent.setup();
     setup();
 
@@ -145,7 +142,7 @@ describe(`<${PostContentsRail.name}/>`, () => {
     expect(screen.getAllByRole('link')).toHaveLength(mockPostHeadings.length);
   });
 
-  it('closes the mobile disclosure when one of its own links is clicked, so the target heading is not left hidden behind the still-open overlay', async () => {
+  it('closes the mobile disclosure when one of its links is clicked', async () => {
     const user = userEvent.setup();
     setup();
     const trigger = getMobileTrigger();
@@ -176,7 +173,7 @@ describe(`<${PostContentsRail.name}/>`, () => {
     ).not.toHaveAttribute('aria-current');
   });
 
-  it('marks the first heading as current when no heading is active yet, agreeing with the selector default', () => {
+  it('marks the first heading as current when no heading is active yet', () => {
     setup();
 
     expect(
