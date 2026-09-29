@@ -1,8 +1,10 @@
 import { BRAND_VARIANT } from '@blog/config';
+import { objectKeys } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Carousel } from './carousel';
+import { carouselVariants } from './carousel-variants';
 
 type TSampleItem = { id: number; body: string };
 
@@ -73,6 +75,10 @@ const meta = {
       control: 'select',
       options: ['fraction', 'content'],
     },
+    contentAlignment: {
+      control: 'select',
+      options: objectKeys(carouselVariants.variants.alignment),
+    },
   },
   args: {
     ariaLabel: 'Latest posts',
@@ -121,6 +127,48 @@ export const FixedWidthContentSizing: TStory = {
       previousLabel="Previous slide"
       nextLabel="Next slide"
       slideSize="content"
+    />
+  ),
+};
+
+export const AlignedLeftFitsViewport: TStory = {
+  render: () => (
+    <Carousel
+      items={buildLogoItems(3)}
+      renderItem={renderLogoItem}
+      ariaLabel="Trusted by"
+      previousLabel="Previous slide"
+      nextLabel="Next slide"
+      slideSize="content"
+      contentAlignment="LEFT"
+    />
+  ),
+};
+
+export const AlignedCenterFitsViewport: TStory = {
+  render: () => (
+    <Carousel
+      items={buildLogoItems(3)}
+      renderItem={renderLogoItem}
+      ariaLabel="Trusted by"
+      previousLabel="Previous slide"
+      nextLabel="Next slide"
+      slideSize="content"
+      contentAlignment="CENTER"
+    />
+  ),
+};
+
+export const AlignedCenterOverflowsStaysLeft: TStory = {
+  render: () => (
+    <Carousel
+      items={buildLogoItems(10)}
+      renderItem={renderLogoItem}
+      ariaLabel="Trusted by"
+      previousLabel="Previous slide"
+      nextLabel="Next slide"
+      slideSize="content"
+      contentAlignment="CENTER"
     />
   ),
 };

@@ -1,5 +1,6 @@
 import {
   BRAND_VARIANT,
+  CONTENT_ALIGNMENT,
   ICONS,
   SIZE,
   type IWithClassName,
@@ -22,6 +23,7 @@ export interface ICarouselProps<T> extends IWithClassName, IWithDataTestId {
   nextLabel: string;
   tone?: TBrandVariant;
   slideSize?: TCarouselVariants['slideSize'];
+  contentAlignment?: TCarouselVariants['alignment'];
 }
 
 /** Scrolls through a row of items, revealing more of them as the viewport widens. */
@@ -34,13 +36,17 @@ export const Carousel = <T,>({
   nextLabel,
   tone = BRAND_VARIANT.PRIMARY,
   slideSize = 'fraction',
+  contentAlignment = CONTENT_ALIGNMENT.LEFT,
   className,
   dataTestId,
 }: ICarouselProps<T>) => {
   const { canScrollPrev, canScrollNext, viewportRef, scrollPrev, scrollNext } =
     useCarousel();
 
-  const s = carouselVariants({ slideSize });
+  const alignment =
+    canScrollPrev || canScrollNext ? CONTENT_ALIGNMENT.LEFT : contentAlignment;
+
+  const s = carouselVariants({ slideSize, alignment });
 
   return (
     <div
