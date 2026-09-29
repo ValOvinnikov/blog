@@ -351,8 +351,8 @@ Variants: wrapped: (boolean)
 ### CtaModule — `components/organisms/cta-module/cta-module.tsx`
 
 Page-builder organism rendering a call-to-action in one of three layouts.
-Props: variant: TCtaVariant · tone: TBrandVariant · eyebrow?: string · heading: string · headingId?: string · supportingText?: string · content?: ReactNode · image?: ReactNode · actions?: ReactNode · footnote?: string · contentPosition?: TContentAlignment · contentAlignment?: TContentAlignment · mobileMediaOrder?: TMediaOrder · isWrapped?: TCtaModuleVariants['wrapped'] _(extends IWithClassName, IWithDataTestId)_
-Variants: variant: CTA_VARIANT.BANNER|CTA_VARIANT.SPLIT|CTA_VARIANT.CALLOUT · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY|BRAND_VARIANT.BRAND_PRIMARY · position: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · alignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · mobileMediaOrder: MEDIA_ORDER.FIRST|MEDIA_ORDER.LAST · wrapped: (boolean)
+Props: variant: TCtaVariant · tone: TBrandVariant · eyebrow?: string · heading: string · headingId?: string · supportingText?: string · content?: ReactNode · image?: ReactNode · actions?: ReactNode · footnote?: string · contentPosition?: TContentAlignment · contentAlignment?: TContentAlignment · mobileMediaOrder?: TMediaOrder · isWrapped?: TCtaModuleVariants['wrapped'] · spacingTop?: TSpacingScale · spacingBottom?: TSpacingScale _(extends IWithClassName, IWithDataTestId)_
+Variants: variant: CTA_VARIANT.BANNER|CTA_VARIANT.SPLIT|CTA_VARIANT.CALLOUT · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY|BRAND_VARIANT.BRAND_PRIMARY · position: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · alignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · mobileMediaOrder: MEDIA_ORDER.FIRST|MEDIA_ORDER.LAST · wrapped: (boolean) · spacingTop: SPACING_SCALE.NONE|SPACING_SCALE.SM|SPACING_SCALE.MD|SPACING_SCALE.LG|SPACING_SCALE.XL · spacingBottom: SPACING_SCALE.NONE|SPACING_SCALE.SM|SPACING_SCALE.MD|SPACING_SCALE.LG|SPACING_SCALE.XL
 
 ### Footer — `components/organisms/footer/footer.tsx`
 
