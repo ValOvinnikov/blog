@@ -98,9 +98,9 @@ D | grep -nE '^\+ {4,}// '
 D | awk '/^\+\+\+ b\//{t=($0 ~ /\.test\.tsx?$/)} t&&/^\+[[:space:]]*(\/\/|\/\*\*|\*[[:space:]])/{print FNR": "$0}'
 
 # Clones. Run over every workspace the diff touches, then read the hits that
-# involve a changed file. A whole helper/component/hook copied instead of
-# shared is blocking; a repeated test arrangement that wants `it.each` is
-# non-blocking and gets filed. ~5s for the whole repo.
+# involve a changed file. A clone the diff creates — a helper, component,
+# hook, test fake, fixture or repeated test arrangement — is blocking; a
+# clone whose copies were all on main before the diff is filed. ~5s for the whole repo.
 WS=$( (git diff "$BASE"...HEAD --name-only; git diff --name-only) | grep -E '\.(ts|tsx)$' | cut -d/ -f1-2 | sort -u )
 [ -n "$WS" ] && pnpm dlx jscpd@4 --min-tokens 60 --min-lines 8 \
   --ignore '**/node_modules/**,**/generated/**,**/.next/**' --reporters console $WS 2>/dev/null \
@@ -220,12 +220,11 @@ CI-enforced guard was deliberately not added.
   (field list, option list, default, fieldset, "exposes X as a function",
   constant value) is **blocking** — delete it, don't keep it (full rule:
   `testing-practices` → "What not to test"). Sibling cases that differ only
-  in an input and an expected value are one `it.each`; a copied block is
-  non-blocking and gets filed. A finding whose fix is a **new shared file**
-  is blocking only when the ticket's own scope is that extraction; otherwise
-  file it — two parallel sessions extracting the same helper meet as an
-  add/add conflict (CLAUDE.md → "Creating a shared file is not an inline
-  fix").
+  in an input and an expected value are one `it.each`. A test fake, fixture
+  or builder the diff copies from another file is **blocking**: it moves to
+  `testing/` or `__mocks__/` in this diff. Repetition that was already on
+  `main` and that the diff adds nothing to is filed, not fixed (CLAUDE.md →
+  "Duplication that already existed is filed, not fixed inline").
 - Bug fixes include a regression test that failed before the fix.
 - **Suite labels — a component takes ``describe(`<${Component.name}/>`, …)``,
   everything else takes the bare symbol `describe(theSymbol, …)`.** A string

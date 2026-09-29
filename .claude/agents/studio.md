@@ -369,6 +369,14 @@ not reach — the other app (`apps/web` and `apps/platform` share no code) or
 a package the layer contracts forbid — name the match in your report
 instead of copying it silently.
 
+If what you are about to write would be a second copy of something you may
+import — a function, component, hook, test fake, fixture or builder — move it
+to the folder that owns its kind (`shared/`, `testing/`, `__mocks__/`, one
+per file) and point every call site at it, in this change. Two copies that
+were both there before you started and that you add nothing to: report them,
+don't extract them (CLAUDE.md → "Duplication that already existed is filed,
+not fixed inline").
+
 If something similar exists and it is not obvious whether to extend it or add
 alongside it, **do not settle that quietly**. Check who calls the existing one
 and what `SPEC.md` says. If it is still unclear, put it in your report as an
