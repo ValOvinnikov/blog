@@ -1,59 +1,46 @@
-import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { queries } from '@blog/db';
+import { ToastProvider } from '@web/context/toast-provider';
+import { auth } from '@web/server/auth/auth';
+import { customRenderServerAsync, screen } from '@web/testing/custom-render';
 
 import { IdentitySection } from './identity-section';
 
-const { authMock, getLinkedProvidersMock } = vi.hoisted(() => ({
-  authMock: vi.fn(),
-  getLinkedProvidersMock: vi.fn(),
-}));
-
-vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
+vi.mock('@web/server/auth/auth', () => ({ auth: vi.fn() }));
 
 vi.mock('@blog/db', () => ({
-  queries: {
-    account: { getLinkedProviders: getLinkedProvidersMock },
-  },
+  queries: { account: { getLinkedProviders: vi.fn() } },
 }));
 
-vi.mock('@web/components/shared/provider-link-control', () => ({
-  ProviderLinkControl: ({
-    provider,
-    action,
-  }: {
-    provider: string;
-    action: string;
-  }) => <div data-testid={`provider-link-control-${provider}`}>{action}</div>,
-}));
+vi.mock('@web/utils/logger/logger');
 
-vi.mock('@web/components/shared/display-name-control', () => ({
-  DisplayNameControl: ({ initialName }: { initialName: string }) => (
-    <div data-testid="display-name-control">{initialName}</div>
-  ),
-}));
+const authMock = vi.mocked(auth as () => Promise<unknown>);
+const getLinkedProvidersMock = vi.mocked(queries.account.getLinkedProviders);
 
-const setup = customRenderAsync(IdentitySection, {});
-
-const authedSession = {
-  user: { id: 'user-1', name: 'Jane Doe', email: 'jane@icloud.com' },
-};
+const setup = customRenderServerAsync(
+  IdentitySection,
+  {},
+  { wrapper: ToastProvider },
+);
 
 describe(`<${IdentitySection.name}/>`, () => {
   beforeEach(() => {
-    authMock.mockReset();
-    getLinkedProvidersMock.mockReset();
+    authMock.mockResolvedValue({
+      user: { id: 'user-1', name: 'Jane Doe', email: 'jane@icloud.com' },
+    });
   });
 
   it('renders nothing when there is no session', async () => {
     authMock.mockResolvedValue(null);
 
-    const { container } = await setup();
+    await setup();
 
-    expect(container).toBeEmptyDOMElement();
+    expect(
+      screen.queryByRole('heading', { name: 'Connected accounts' }),
+    ).not.toBeInTheDocument();
     expect(getLinkedProvidersMock).not.toHaveBeenCalled();
   });
 
-  it('calls getLinkedProviders with the signed-in user id and renders the panel heading', async () => {
-    authMock.mockResolvedValue(authedSession);
+  it('reads the linked providers of the signed-in user', async () => {
     getLinkedProvidersMock.mockResolvedValue({
       github: true,
       google: false,
@@ -63,11 +50,12 @@ describe(`<${IdentitySection.name}/>`, () => {
     await setup();
 
     expect(getLinkedProvidersMock).toHaveBeenCalledWith('user-1');
-    expect(screen.getByText(/Connected accounts/)).toBeVisible();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Connected accounts' }),
+    ).toBeVisible();
   });
 
-  it('shows an unlink control for a linked provider that is not the last method', async () => {
-    authMock.mockResolvedValue(authedSession);
+  it('offers to unlink each linked provider that is not the last method', async () => {
     getLinkedProvidersMock.mockResolvedValue({
       github: true,
       google: true,
@@ -76,49 +64,42 @@ describe(`<${IdentitySection.name}/>`, () => {
 
     await setup();
 
+    expect(screen.getAllByRole('button', { name: 'Unlink' })).toHaveLength(2);
     expect(
-      screen.getByTestId('provider-link-control-github'),
-    ).toHaveTextContent('unlink');
-    expect(
-      screen.getByTestId('provider-link-control-google'),
-    ).toHaveTextContent('unlink');
-  });
-
-  it('shows a link control for a provider that is not linked', async () => {
-    authMock.mockResolvedValue(authedSession);
-    getLinkedProvidersMock.mockResolvedValue({
-      github: false,
-      google: true,
-      emailLink: true,
-    });
-
-    await setup();
-
-    expect(
-      screen.getByTestId('provider-link-control-github'),
-    ).toHaveTextContent('link');
-  });
-
-  it('replaces the control with a last-method notice for the sole remaining linked method', async () => {
-    authMock.mockResolvedValue(authedSession);
-    getLinkedProvidersMock.mockResolvedValue({
-      github: true,
-      google: false,
-      emailLink: false,
-    });
-
-    await setup();
-
-    expect(
-      screen.queryByTestId('provider-link-control-github'),
+      screen.queryByRole('button', { name: 'Link' }),
     ).not.toBeInTheDocument();
+  });
+
+  it('offers to link a provider that is not linked', async () => {
+    getLinkedProvidersMock.mockResolvedValue({
+      github: false,
+      google: true,
+      emailLink: true,
+    });
+
+    await setup();
+
+    expect(screen.getByRole('button', { name: 'Link' })).toBeVisible();
+  });
+
+  it('shows the last-method notice instead of a control for the sole method', async () => {
+    getLinkedProvidersMock.mockResolvedValue({
+      github: true,
+      google: false,
+      emailLink: false,
+    });
+
+    await setup();
+
     expect(
       screen.getByText("Last remaining method — can't unlink"),
     ).toBeVisible();
+    expect(
+      screen.queryByRole('button', { name: 'Unlink' }),
+    ).not.toBeInTheDocument();
   });
 
-  it('applies the last-method notice to email link too when it is the only linked method', async () => {
-    authMock.mockResolvedValue(authedSession);
+  it('shows the last-method notice when email link is the only method', async () => {
     getLinkedProvidersMock.mockResolvedValue({
       github: false,
       google: false,
@@ -132,8 +113,7 @@ describe(`<${IdentitySection.name}/>`, () => {
     ).toBeVisible();
   });
 
-  it('renders the display-name control with the session name', async () => {
-    authMock.mockResolvedValue(authedSession);
+  it('prefills the display-name field with the session name', async () => {
     getLinkedProvidersMock.mockResolvedValue({
       github: true,
       google: false,
@@ -142,8 +122,9 @@ describe(`<${IdentitySection.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByTestId('display-name-control')).toHaveTextContent(
+    expect(screen.getByRole('textbox', { name: 'Display name' })).toHaveValue(
       'Jane Doe',
     );
+    expect(screen.getByRole('button', { name: 'Save' })).toBeVisible();
   });
 });

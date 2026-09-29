@@ -1,45 +1,49 @@
-import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { queries } from '@blog/db';
+import userEvent from '@testing-library/user-event';
+import { ToastProvider } from '@web/context/toast-provider';
+import { auth } from '@web/server/auth/auth';
+import { customRenderServerAsync, screen } from '@web/testing/custom-render';
 import { redirect } from 'next/navigation';
 
 import { AccountPage } from './account-page';
 
-const { authMock, privacySectionMock } = vi.hoisted(() => ({
-  authMock: vi.fn(),
-  privacySectionMock: vi.fn(() => (
-    <div data-testid="privacy-section">privacy section</div>
-  )),
+vi.mock('@web/server/auth/auth', () => ({ auth: vi.fn() }));
+
+vi.mock('@blog/db', () => ({
+  queries: {
+    account: { getLinkedProviders: vi.fn() },
+    subscribers: { getSubscriptionStatus: vi.fn() },
+  },
 }));
 
-vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
+vi.mock('@web/server/tenant/get-request-tenant-id');
 
-vi.mock('@web/components/pages/account-page/sections/identity-section', () => ({
-  IdentitySection: () => (
-    <div data-testid="identity-section">identity section</div>
-  ),
-}));
+vi.mock('@web/i18n/navigation');
 
-vi.mock(
-  '@web/components/pages/account-page/sections/newsletter-section',
-  () => ({
-    NewsletterSection: () => (
-      <div data-testid="newsletter-section">newsletter section</div>
-    ),
-  }),
+vi.mock('@web/utils/logger/logger');
+
+const authMock = vi.mocked(auth as () => Promise<unknown>);
+
+const setup = customRenderServerAsync(
+  AccountPage,
+  {},
+  { wrapper: ToastProvider },
 );
-
-vi.mock('@web/components/pages/account-page/sections/privacy-section', () => ({
-  PrivacySection: privacySectionMock,
-}));
-
-const setup = customRenderAsync(AccountPage, {});
-
-const authedSession = {
-  user: { id: 'user-1', name: 'Jane Doe', email: 'jane@example.com' },
-};
 
 describe(`<${AccountPage.name}/>`, () => {
   beforeEach(() => {
-    authMock.mockReset();
+    authMock.mockResolvedValue({
+      user: { id: 'user-1', name: 'Jane Doe', email: 'jane@example.com' },
+    });
+    vi.mocked(queries.account.getLinkedProviders).mockResolvedValue({
+      github: true,
+      google: false,
+      emailLink: true,
+    });
+    vi.mocked(queries.subscribers.getSubscriptionStatus).mockResolvedValue({
+      outcome: 'active',
+      subscriber: { email: 'jane@example.com' },
+    } as Awaited<ReturnType<typeof queries.subscribers.getSubscriptionStatus>>);
   });
 
   it('redirects home when there is no session', async () => {
@@ -50,44 +54,42 @@ describe(`<${AccountPage.name}/>`, () => {
     expect(vi.mocked(redirect)).toHaveBeenCalledWith('/');
   });
 
-  it('renders the page heading and all three sections, in identity/newsletter/privacy order', async () => {
-    authMock.mockResolvedValue(authedSession);
-
+  it('renders the three sections under the page heading, in order', async () => {
     await setup();
 
     expect(
       screen.getByRole('heading', { level: 1, name: 'Account' }),
     ).toBeVisible();
-
-    const identitySection = screen.getByTestId('identity-section');
-    const newsletterSection = screen.getByTestId('newsletter-section');
-    const privacySection = screen.getByTestId('privacy-section');
-    expect(identitySection).toBeVisible();
-    expect(newsletterSection).toBeVisible();
-    expect(privacySection).toBeVisible();
     expect(
-      identitySection.compareDocumentPosition(newsletterSection) &
-        Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
-    expect(
-      newsletterSection.compareDocumentPosition(privacySection) &
-        Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
+      screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent),
+    ).toEqual(['Connected accounts', 'Newsletter', 'Privacy']);
   });
 
-  it('resolves the session handle into PrivacySection props', async () => {
-    authMock.mockResolvedValue(authedSession);
+  it('omits the newsletter section when the account is not subscribed', async () => {
+    vi.mocked(queries.subscribers.getSubscriptionStatus).mockResolvedValueOnce({
+      outcome: 'not-subscribed',
+    });
 
     await setup();
 
-    expect(privacySectionMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        handle: 'jane',
-        heading: 'Privacy',
-        exportLabel: 'Export my data',
-        deleteLabel: 'Delete account',
+    expect(
+      screen.queryByRole('heading', { level: 2, name: 'Newsletter' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('arms account deletion with the handle derived from the session', async () => {
+    const user = userEvent.setup();
+    await setup();
+
+    await user.type(
+      screen.getByRole('textbox', {
+        name: 'Type your handle to confirm deletion',
       }),
-      undefined,
+      'jane',
     );
+
+    expect(
+      screen.getByRole('button', { name: 'Delete account' }),
+    ).toBeEnabled();
   });
 });
