@@ -2,19 +2,10 @@ import { BRAND_VARIANT, DISPLAY_MODE } from '@blog/config';
 import { customRender, screen, within } from '@web/testing/custom-render';
 import { makePostListItem } from '@web/testing/modules/post-list/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { PostFeaturedModuleView } from './post-featured-module-view';
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
-
-const { CardCarousel } = vi.hoisted(() => ({
-  CardCarousel: vi.fn(() => <div data-testid="card-carousel-stub" />),
-}));
-
-vi.mock('@web/components/shared/card-carousel', () => ({ CardCarousel }));
+vi.mock('@web/i18n/navigation');
 
 const leadPost = makePostListItem({
   id: 'post-1',
@@ -110,7 +101,7 @@ describe(`<${PostFeaturedModuleView.name}/>`, () => {
     ).toBeVisible();
   });
 
-  it('renders a two-column grid of the remaining posts when three or more items resolve', () => {
+  it('renders the remaining posts in a grid when three or more resolve', () => {
     setup({ items: [leadPost, secondPost, thirdPost] });
 
     const tailGrid = screen.getByTestId(
@@ -136,23 +127,28 @@ describe(`<${PostFeaturedModuleView.name}/>`, () => {
     expect(screen.getByTestId('lead-image')).toBeVisible();
   });
 
-  it('renders CardCarousel with the view items when displayMode is CAROUSEL', () => {
+  it('renders the items as a labelled carousel when displayMode is CAROUSEL', async () => {
     setup({
       items: [leadPost, secondPost, thirdPost],
       displayMode: DISPLAY_MODE.CAROUSEL,
     });
 
-    expect(screen.getByTestId('card-carousel-stub')).toBeVisible();
-    expect(CardCarousel).toHaveBeenCalledWith(
-      expect.objectContaining({ items: [leadPost, secondPost, thirdPost] }),
-      undefined,
-    );
-    expect(screen.queryByRole('article')).not.toBeInTheDocument();
+    const region = screen.getByRole('region', { name: 'Featured carousel' });
+    expect(within(region).getAllByRole('article')).toHaveLength(3);
+    expect(
+      screen.queryByTestId('post-featured-module-featured-1-lead'),
+    ).not.toBeInTheDocument();
+    expect(
+      await screen.findByRole('button', { name: 'Previous slide' }),
+    ).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Next slide' })).toBeVisible();
   });
 
-  it('never renders CardCarousel when displayMode is GRID', () => {
+  it('renders no carousel when displayMode is GRID', () => {
     setup();
 
-    expect(CardCarousel).not.toHaveBeenCalled();
+    expect(
+      screen.queryByRole('region', { name: 'Featured carousel' }),
+    ).not.toBeInTheDocument();
   });
 });

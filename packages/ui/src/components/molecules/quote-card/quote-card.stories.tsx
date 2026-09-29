@@ -1,5 +1,7 @@
 import { BRAND_VARIANT } from '@blog/config';
 import { Avatar } from '@blog/ui/components/atoms/avatar';
+import { CardGrid } from '@blog/ui/components/organisms/card-grid';
+import { Carousel } from '@blog/ui/components/organisms/carousel';
 import { objectKeys } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -163,4 +165,83 @@ export const SpotlightOnEveryBrandVariant: TStory = {
   name: 'Spotlight — on every brand variant',
   args: { isSpotlight: true },
   render: OnEveryBand,
+};
+
+const UNEVEN_QUOTES = [
+  {
+    id: 'short',
+    quote: 'It just works.',
+    name: faker.person.fullName(),
+    role: `${faker.person.jobTitle()}, ${faker.company.name()}`,
+  },
+  {
+    id: 'long-1',
+    quote: faker.lorem.sentences(4),
+    name: faker.person.fullName(),
+    role: `${faker.person.jobTitle()}, ${faker.company.name()}`,
+  },
+  {
+    id: 'long-2',
+    quote: faker.lorem.sentences(3),
+    name: faker.person.fullName(),
+    role: `${faker.person.jobTitle()}, ${faker.company.name()}`,
+  },
+] as const;
+
+const renderUnevenQuote = (
+  item: (typeof UNEVEN_QUOTES)[number],
+  align: 'left' | 'center',
+) => (
+  <QuoteCard
+    key={item.id}
+    role={item.role}
+    align={align}
+    tone={BRAND_VARIANT.PRIMARY}
+    dataTestId={`quote-card-${item.id}`}
+  >
+    <QuoteCard.Quote>{item.quote}</QuoteCard.Quote>
+    <QuoteCard.Avatar>
+      <Avatar alt={item.name} name={item.name} />
+    </QuoteCard.Avatar>
+    <QuoteCard.Name>
+      <span>{item.name}</span>
+    </QuoteCard.Name>
+  </QuoteCard>
+);
+
+const UnevenQuotesCarousel = ({ align }: { align: 'left' | 'center' }) => (
+  <Carousel
+    items={UNEVEN_QUOTES}
+    renderItem={({ item }) => renderUnevenQuote(item, align)}
+    getItemKey={({ item }) => item.id}
+    ariaLabel="Customer testimonials"
+    previousLabel="Previous testimonial"
+    nextLabel="Next testimonial"
+  />
+);
+
+export const CarouselAlignedLeft: TStory = {
+  name: 'Carousel — uneven quotes, aligned left',
+  render: () => <UnevenQuotesCarousel align="left" />,
+};
+
+export const CarouselAlignedCenter: TStory = {
+  name: 'Carousel — uneven quotes, aligned center',
+  render: () => <UnevenQuotesCarousel align="center" />,
+};
+
+const UnevenQuotesGrid = ({ align }: { align: 'left' | 'center' }) => (
+  <CardGrid columns={3}>
+    {UNEVEN_QUOTES.map((item) => renderUnevenQuote(item, align))}
+  </CardGrid>
+);
+
+export const GridAlignedLeft: TStory = {
+  name: 'Grid — uneven quotes, aligned left',
+  render: () => <UnevenQuotesGrid align="left" />,
+};
+
+export const GridAlignedCenter: TStory = {
+  name: 'Grid — uneven quotes, aligned center',
+  render: () => <UnevenQuotesGrid align="center" />,
 };
