@@ -1,4 +1,4 @@
-import { evaluate, parse } from 'groq-js';
+import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 
 import {
   PAGE_FAQ_QUESTIONS_EXPRESSION,
@@ -26,15 +26,6 @@ const dataset = [
     ],
   },
 ];
-
-async function evaluateExpression(root: unknown): Promise<unknown> {
-  const value = await evaluate(parse(PAGE_FAQ_QUESTIONS_EXPRESSION), {
-    root,
-    dataset,
-  });
-
-  return value.get();
-}
 
 describe('PAGE_FAQ_QUESTIONS_EXPRESSION', () => {
   it('filters modules to module_faq before flattening their questions', () => {
@@ -65,7 +56,13 @@ describe('PAGE_FAQ_QUESTIONS_EXPRESSION', () => {
       modules: [{ _type: 'reference', _ref: 'module-faq-a' }],
     };
 
-    const parsed = pageFaqQuestionsParser.parse(await evaluateExpression(root));
+    const parsed = pageFaqQuestionsParser.parse(
+      await evaluateGroqExpression(
+        PAGE_FAQ_QUESTIONS_EXPRESSION,
+        dataset,
+        root,
+      ),
+    );
 
     expect(parsed).toEqual([
       { id: 'block-faq-ok', question: 'How much?', answer: 'It depends.' },

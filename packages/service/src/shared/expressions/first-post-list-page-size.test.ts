@@ -1,4 +1,4 @@
-import { evaluate, parse } from 'groq-js';
+import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 
 import {
   FIRST_POST_LIST_PAGE_SIZE_EXPRESSION,
@@ -11,12 +11,11 @@ const dataset = [
 ];
 
 async function evaluateExpression(root: unknown): Promise<unknown> {
-  const value = await evaluate(parse(FIRST_POST_LIST_PAGE_SIZE_EXPRESSION), {
-    root,
+  return evaluateGroqExpression(
+    FIRST_POST_LIST_PAGE_SIZE_EXPRESSION,
     dataset,
-  });
-
-  return value.get();
+    root,
+  );
 }
 
 describe('FIRST_POST_LIST_PAGE_SIZE_EXPRESSION', () => {
