@@ -1,3 +1,4 @@
+import { CONTENT_ALIGNMENT } from '@blog/config';
 import { tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
@@ -25,9 +26,14 @@ export const carouselVariants = tv({
         slide: ['basis-auto', 'pl-6'],
       },
     },
+    alignment: {
+      [CONTENT_ALIGNMENT.LEFT]: { viewport: [] },
+      [CONTENT_ALIGNMENT.CENTER]: { viewport: ['mx-auto w-fit'] },
+    },
   },
   defaultVariants: {
     slideSize: 'fraction',
+    alignment: CONTENT_ALIGNMENT.LEFT,
   },
 });
 
