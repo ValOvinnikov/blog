@@ -51,6 +51,19 @@ const uniqueArrayField = defineField({
   validation: (rule) => rule.unique().min(1).max(8),
 });
 
+const independentRulesArrayField = defineField({
+  name: 'cards',
+  title: 'Cards',
+  type: 'array',
+  of: [{ type: 'string' }],
+  validation: (rule) => [
+    rule.required().error('Add at least two cards.'),
+    rule.unique().error('Each card can only appear once.'),
+    rule.min(2).error('Needs at least two cards.'),
+    rule.max(8).error('Holds at most eight cards.'),
+  ],
+});
+
 const documentType = defineType({
   name: 'testing_document',
   title: 'Testing Document',
@@ -97,6 +110,15 @@ describe(getRecordedBounds, () => {
 
   it('leaves a bound unset when the chain never calls it', () => {
     expect(getRecordedBounds(singleRuleField)).toEqual({});
+  });
+
+  it('captures every rule when validation returns an array of independent rules', () => {
+    expect(getRecordedBounds(independentRulesArrayField)).toEqual({
+      required: true,
+      unique: true,
+      min: 2,
+      max: 8,
+    });
   });
 
   it('throws when the source defines no validation builder', () => {
