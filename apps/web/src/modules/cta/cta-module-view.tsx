@@ -1,4 +1,9 @@
-import { CTA_VARIANT } from '@blog/config';
+import {
+  BRAND_VARIANT,
+  CTA_VARIANT,
+  SPACING_SCALE,
+  type TLayout,
+} from '@blog/config';
 import type { TCtaModule } from '@blog/service';
 import { CtaModule as CtaModuleUi } from '@blog/ui/components/organisms/cta-module';
 import { ActionGroup } from '@web/components/shared/action-group';
@@ -10,11 +15,13 @@ export interface ICtaModuleViewProps extends TCtaModule {
   id: string;
 }
 
-/**
- * `bandTone` and `brandVariant` are distinct concerns: `bandTone` colors the
- * full-bleed section band, `brandVariant` colors the card/overlay the
- * organism paints itself.
- */
+const BANNER_SECTION_LAYOUT: TLayout = {
+  spacingTop: SPACING_SCALE.NONE,
+  spacingBottom: SPACING_SCALE.NONE,
+  dividerTop: false,
+  dividerBottom: false,
+};
+
 export const CtaModuleView = ({
   id,
   variant,
@@ -33,11 +40,12 @@ export const CtaModuleView = ({
 }: ICtaModuleViewProps) => {
   const titleId = `cta-${id}`;
   const { heading, supportingText } = headingBlock;
+  const isBanner = variant === CTA_VARIANT.BANNER;
 
   return (
     <Section
-      brandVariant={bandTone}
-      layout={layout}
+      brandVariant={isBanner ? BRAND_VARIANT.PRIMARY : bandTone}
+      layout={isBanner ? BANNER_SECTION_LAYOUT : layout}
       titleId={titleId}
       dataTestId={`cta-module-${id}`}
     >
@@ -61,10 +69,7 @@ export const CtaModuleView = ({
         }
         actions={
           ctaButtons.length > 0 ? (
-            <ActionGroup
-              actions={ctaButtons}
-              isOnDark={variant === CTA_VARIANT.BANNER}
-            />
+            <ActionGroup actions={ctaButtons} isOnDark={isBanner} />
           ) : undefined
         }
         footnote={footnote}
@@ -72,6 +77,8 @@ export const CtaModuleView = ({
         contentAlignment={contentAlignment}
         mobileMediaOrder={mobileMediaOrder}
         isWrapped={true}
+        spacingTop={isBanner ? layout?.spacingTop : undefined}
+        spacingBottom={isBanner ? layout?.spacingBottom : undefined}
       />
     </Section>
   );
