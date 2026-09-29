@@ -189,10 +189,18 @@ delete-don't-shorten rule. It is not restated here; follow it as written.
 
 ## Reuse before you create
 
-Before adding a function, type, schema definition, field helper or constant,
-search this workspace for one that already does the job. A near-duplicate is
-the most expensive kind of mistake to find later, because nothing fails — both
-versions work.
+Before adding a function, type, schema definition, field helper, constant,
+component, test fake, fixture or builder, search the **whole repo** for one
+that already does the job — every app and package, including their
+`testing/` and `__mocks__/` folders, not just this workspace. A
+near-duplicate is the most expensive kind of mistake to find later, because
+nothing fails — both versions work.
+
+A match you cannot import is not permission to copy it. If it lives in a
+package this layer may depend on, use it. If it lives where this layer may
+not reach — the other app (`apps/web` and `apps/platform` share no code) or
+a package the layer contracts forbid — name the match in your report
+instead of copying it silently.
 
 If something similar exists and it is not obvious whether to extend it or add
 alongside it, **do not settle that quietly**. Check who calls the existing one

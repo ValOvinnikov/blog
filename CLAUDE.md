@@ -229,8 +229,9 @@ its blast radius was never put to the user.
 
 ### Reuse before you create
 
-**Search for what already exists before adding a function, schema type, field
-helper, constant or type.** A near-duplicate is the most expensive kind of
+**Search the whole repo for what already exists before adding a function,
+schema type, field helper, constant, type, component, test fake or fixture** —
+every app and package, not just the one being changed. A near-duplicate is the most expensive kind of
 mistake to find later, because nothing fails — both versions work.
 
 When you or a subagent notices something similar already exists and it is not
