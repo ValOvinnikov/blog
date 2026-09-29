@@ -168,6 +168,12 @@ CI-enforced guard was deliberately not added.
 - ISR present (`next: { revalidate, tags }`); revalidate route verifies the
   secret. No accidental fully-dynamic rendering of static content.
 - Queries project only needed fields; no over-fetching.
+- No request waterfall: a Server Component that awaits two independent
+  fetches one after the other, or a route that blocks on a slow fetch it
+  could stream behind `Suspense`, is a finding. Same for a client component
+  handed a whole service result when it renders two fields of it. The rules
+  that apply, and the ones this repo overrides (never flag a missing memo),
+  are in `react-component-practices` → "Vercel's React rules".
 
 ## 4. SEO & accessibility
 

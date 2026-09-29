@@ -545,6 +545,10 @@ silently unindexed). Never hand-edit it; fix the source and regenerate. A future
   `apps/web`.
 - `vercel:next-cache-components` for caching, ISR, or Partial Prerendering
   work in `apps/web`.
+- `vercel:react-best-practices` for performance work in `apps/web` or
+  `apps/platform` — request waterfalls, the RSC boundary, client bundle
+  size, re-renders. `react-component-practices` → "Vercel's React rules"
+  lists which of its rules apply and which this repo overrides.
 - `vercel:deployments-cicd` when changing the deploy pipeline or
   `.github/workflows/` CI config.
 - `frontend-design:frontend-design` for visual design work in `packages/ui`

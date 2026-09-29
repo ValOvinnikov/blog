@@ -714,6 +714,7 @@ file` are all denied alike) — an earlier version only handled the
     `superpowers:verification-before-completion`, `superpowers:writing-skills`,
     `superpowers:brainstorming` and `superpowers:using-git-worktrees` (invoked
     by `develop-feature`), `vercel:nextjs`, `vercel:next-cache-components`,
+    `vercel:react-best-practices` (scoped by `react-component-practices`),
     `vercel:deployments-cicd`, `frontend-design:frontend-design`.
 - **Settings** (`.claude/settings.json`) — permission allowlist for the standard
   pnpm/turbo/sanity/git/gh commands and hook wiring; deploys and hand-edits to
