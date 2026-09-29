@@ -14,7 +14,7 @@ export const statsModuleViewVariants = tv({
     ],
     label: ['order-2', 'text-sm text-text-muted'],
     description: ['order-3', 'text-sm text-text-muted'],
-    footnote: ['mt-5 max-w-measure text-caption text-subtle'],
+    footnote: ['mt-5 max-w-measure'],
   },
   variants: {
     columns: {
