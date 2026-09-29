@@ -1,3 +1,4 @@
+import { CONTENT_ALIGNMENT } from '@blog/config/constants';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
@@ -35,7 +36,9 @@ export const logoWallSchema = defineType({
     }),
     ctaButtonsField(),
     displayModeField(),
-    ...alignmentFields([]),
+    ...alignmentFields([], {
+      allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
+    }),
     layoutField,
   ],
   preview: {
