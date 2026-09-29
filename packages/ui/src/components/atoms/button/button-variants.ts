@@ -10,7 +10,7 @@ export const buttonVariants = tv({
     'transition-colors duration-base ease-smooth',
     'cursor-pointer',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
-    'focus-visible:ring-offset-2 focus-visible:ring-offset-primary',
+    'focus-visible:ring-offset-2 focus-visible:ring-offset-ambient',
     'disabled:pointer-events-none disabled:opacity-50',
   ],
   variants: {

@@ -10,7 +10,7 @@ export const paginationVariants = tv({
       'transition-colors duration-base ease-smooth',
       'text-subtle hover:text-text',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
-      'focus-visible:ring-offset-2 focus-visible:ring-offset-primary',
+      'focus-visible:ring-offset-2 focus-visible:ring-offset-ambient',
     ],
   },
   variants: {

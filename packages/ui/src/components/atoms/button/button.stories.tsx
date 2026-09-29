@@ -1,6 +1,7 @@
 import { SIZE } from '@blog/config';
 import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { within } from 'storybook/test';
 
 import { Button } from './button';
 import { buttonVariants } from './button-variants';
@@ -54,4 +55,37 @@ export const Large: TStory = {
 
 export const Disabled: TStory = {
   args: { children: 'Disabled', isDisabled: true },
+};
+
+const OnSecondary = () => (
+  <div className="bg-secondary surface-secondary" style={{ padding: '1.5rem' }}>
+    <Button variant="primary">Continue</Button>
+  </div>
+);
+
+export const OnSecondaryBackgroundFocused: TStory = {
+  name: 'On a Secondary background, focused',
+  render: OnSecondary,
+  play: ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    canvas.getByRole('button').focus();
+  },
+};
+
+const OnBrandPrimary = () => (
+  <div
+    className="bg-brand-primary-muted surface-brand-primary"
+    style={{ padding: '1.5rem' }}
+  >
+    <Button variant="primary">Continue</Button>
+  </div>
+);
+
+export const OnBrandPrimaryBackgroundFocused: TStory = {
+  name: 'On a Brand-primary background, focused',
+  render: OnBrandPrimary,
+  play: ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    canvas.getByRole('button').focus();
+  },
 };
