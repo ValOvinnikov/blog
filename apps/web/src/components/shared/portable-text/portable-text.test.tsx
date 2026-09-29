@@ -10,23 +10,8 @@ import {
   portableTextBlock,
   portableTextSpan,
 } from '@web/testing/shared/portable-text/fixtures';
-import type { ReactNode } from 'react';
 
 import { PortableText } from './portable-text';
-
-vi.mock('@blog/ui/components/molecules/image-with-caption', () => ({
-  ImageWithCaption: ({
-    layout,
-    children,
-  }: {
-    layout?: string;
-    children?: ReactNode;
-  }) => (
-    <div data-testid="image-with-caption" data-layout={layout}>
-      {children}
-    </div>
-  ),
-}));
 
 const setup = customRender(PortableText, {
   value: [],
@@ -72,7 +57,7 @@ describe(`<${PortableText.name}/>`, () => {
     });
   });
 
-  it('gives every h2/h3 block a stable id from its own _key, with no lookup table needed', () => {
+  it('gives every h2/h3 block a stable id from its own _key', () => {
     const value: TPortableTextBody = [
       portableTextBlock('Getting started', { style: 'h2', key: 'section-1' }),
       portableTextBlock('Prerequisites', { style: 'h3', key: 'section-2' }),
@@ -88,7 +73,7 @@ describe(`<${PortableText.name}/>`, () => {
     ).toHaveAttribute('id', 'section-2');
   });
 
-  it('never lets two separate PortableText instances on the same page collide on heading ids, since each id comes from its own block _key', () => {
+  it('keeps heading ids distinct across two PortableText instances', () => {
     const firstBody: TPortableTextBody = [
       portableTextBlock('Overview', { style: 'h2', key: 'overview-1' }),
     ];
@@ -197,7 +182,7 @@ describe(`<${PortableText.name}/>`, () => {
     expect(screen.getByText('incomplete link')).toBeVisible();
   });
 
-  it('renders sibling blocks as direct children with no wrapper of its own — PortableText renders bare', () => {
+  it('renders sibling blocks bare, with no wrapper of its own', () => {
     const value: TPortableTextBody = [
       portableTextBlock('Section', { style: 'h2' }),
       portableTextBlock('First paragraph'),
@@ -265,7 +250,7 @@ describe(`<${PortableText.name}/>`, () => {
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
-  it('renders an aside block as a DeepAside, with its body rendered through the same block components', () => {
+  it('renders an aside block with its body through the same components', () => {
     const value: TPortableTextBody = [
       {
         _type: 'aside',
@@ -281,7 +266,7 @@ describe(`<${PortableText.name}/>`, () => {
     expect(screen.getByText('Because Y.')).toBeVisible();
   });
 
-  it('falls back to the raw kind value as the aside label when no override supplies a label', () => {
+  it('labels an aside with its raw kind when no override supplies a label', () => {
     const value: TPortableTextBody = [
       {
         _type: 'aside',
@@ -336,7 +321,7 @@ describe(`<${PortableText.name}/>`, () => {
     expect(link).toHaveAttribute('href', 'https://example.com');
   });
 
-  it('merges a caller-supplied components override non-destructively: overriding the code mark leaves the strong mark, inherited from the library defaults, intact', () => {
+  it('keeps the default strong mark when a caller overrides the code mark', () => {
     const value: TPortableTextBody = [
       portableTextBlock([
         portableTextSpan('bold text', ['strong']),
