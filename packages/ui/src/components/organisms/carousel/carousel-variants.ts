@@ -40,7 +40,7 @@ export const carouselVariants = tv({
     {
       slideSize: 'fraction',
       alignment: CONTENT_ALIGNMENT.CENTER,
-      class: { track: ['justify-center'] },
+      class: { track: ['justify-center-safe'] },
     },
   ],
   defaultVariants: {
