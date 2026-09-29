@@ -14,6 +14,7 @@ export const textVariants = tv(
         statement: ['text-lg font-medium', 'text-text'],
         meta: ['text-meta', 'text-subtle'],
         emphasis: ['text-card-copy leading-[1.55] font-semibold', 'text-text'],
+        footnote: ['text-caption', 'text-subtle'],
       },
     },
     defaultVariants: { variant: 'lead' },
