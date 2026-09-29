@@ -70,6 +70,7 @@ export const featureListSchema = defineType({
         'Grid lays the cards out in rows. Carousel puts them in a single row the reader can swipe or step through.',
     }),
     ...alignmentFields([], {
+      allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
       description:
         'Horizontal alignment of the heading, supporting text and actions. Cards have their own alignment.',
     }),

@@ -1,4 +1,8 @@
-import { POST_SOURCE, type TPostSource } from '@blog/config/constants';
+import {
+  CONTENT_ALIGNMENT,
+  POST_SOURCE,
+  type TPostSource,
+} from '@blog/config/constants';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
@@ -113,8 +117,10 @@ export const postFeaturedSchema = defineType({
     showImagesField(),
     displayModeField(),
     ...alignmentFields([], {
+      allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
       title: 'Heading Alignment',
-      description: 'Horizontal alignment of the heading and supporting text.',
+      description:
+        'Horizontal alignment of the heading, supporting text and, in a carousel that fits, the cards.',
     }),
     wideLayoutField,
   ],
