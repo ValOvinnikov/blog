@@ -53,7 +53,11 @@ export const StatsModuleView = ({
           </div>
         ))}
       </dl>
-      {footnote && <Text variant="meta">{footnote}</Text>}
+      {footnote && (
+        <Text variant="footnote" className={v.footnote()}>
+          {footnote}
+        </Text>
+      )}
       {ctaButtons.length > 0 && (
         <div className={s.actions()}>
           <ActionGroup actions={ctaButtons} />

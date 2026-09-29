@@ -3,7 +3,7 @@ import { tv } from 'tailwind-variants';
 
 export const statsModuleViewVariants = tv({
   slots: {
-    grid: ['grid grid-cols-2 divide-x divide-border'],
+    grid: ['grid grid-cols-2 divide-x divide-divider'],
     item: [
       'flex flex-col gap-1',
       'px-4 first:pl-0 last:pr-0 sm:px-5 sm:first:pl-0 sm:last:pr-0',
@@ -14,6 +14,7 @@ export const statsModuleViewVariants = tv({
     ],
     label: ['order-2', 'text-sm text-text-muted'],
     description: ['order-3', 'text-sm text-text-muted'],
+    footnote: ['mt-5 max-w-measure'],
   },
   variants: {
     columns: {
@@ -23,9 +24,18 @@ export const statsModuleViewVariants = tv({
       4: { grid: ['lg:grid-cols-4'] },
     },
     align: {
-      [CONTENT_ALIGNMENT.LEFT]: { item: ['items-start text-left'] },
-      [CONTENT_ALIGNMENT.CENTER]: { item: ['items-center text-center'] },
-      [CONTENT_ALIGNMENT.RIGHT]: { item: ['items-end text-right'] },
+      [CONTENT_ALIGNMENT.LEFT]: {
+        item: ['items-start text-left'],
+        footnote: ['text-left'],
+      },
+      [CONTENT_ALIGNMENT.CENTER]: {
+        item: ['items-center text-center'],
+        footnote: ['mx-auto text-center'],
+      },
+      [CONTENT_ALIGNMENT.RIGHT]: {
+        item: ['items-end text-right'],
+        footnote: ['ml-auto text-right'],
+      },
     },
   },
   defaultVariants: { align: CONTENT_ALIGNMENT.LEFT },
