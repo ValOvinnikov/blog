@@ -3,12 +3,14 @@ import {
   AUDIT_TARGET_TYPE,
   EMAIL_TEMPLATE_TYPE,
 } from '@blog/config';
+import { auth } from '@platform/server/auth/auth';
+import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { env } from '@platform/utils/env/env';
+import type { Session } from 'next-auth';
 
 import { clearEmailLogoAction } from './clear-email-logo-action';
 
 const {
-  requireTenantMembershipMock,
-  authMock,
   getEmailConfigMock,
   getEmailTemplateMock,
   upsertEmailConfigMock,
@@ -16,8 +18,6 @@ const {
   insertAuditEventMock,
   delMock,
 } = vi.hoisted(() => ({
-  requireTenantMembershipMock: vi.fn(),
-  authMock: vi.fn(),
   getEmailConfigMock: vi.fn(),
   getEmailTemplateMock: vi.fn(),
   upsertEmailConfigMock: vi.fn(),
@@ -26,11 +26,9 @@ const {
   delMock: vi.fn(),
 }));
 
-vi.mock('@platform/server/auth/require-tenant-membership', () => ({
-  requireTenantMembership: requireTenantMembershipMock,
-}));
+vi.mock('@platform/server/auth/require-tenant-membership');
 
-vi.mock('@platform/server/auth/auth', () => ({ auth: authMock }));
+vi.mock('@platform/server/auth/auth');
 
 vi.mock('@blog/db', () => ({
   queries: {
@@ -48,9 +46,14 @@ vi.mock('@blog/db', () => ({
 
 vi.mock('@vercel/blob', () => ({ del: delMock }));
 
-vi.mock('@platform/utils/env/env', () => ({
-  env: { BLOB_READ_WRITE_TOKEN: 'test-token' },
-}));
+vi.mock('@platform/utils/env/env');
+
+Object.assign(env, { BLOB_READ_WRITE_TOKEN: 'test-token' });
+
+const requireTenantMembershipMock = vi.mocked<
+  (tenantId: string) => Promise<unknown>
+>(requireTenantMembership);
+const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 describe(clearEmailLogoAction, () => {
   beforeEach(() => {

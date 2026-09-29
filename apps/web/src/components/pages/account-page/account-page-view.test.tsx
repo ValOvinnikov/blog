@@ -1,15 +1,24 @@
-import { customRender, screen } from '@web/testing/custom-render';
+import { ToastProvider } from '@web/context/toast-provider';
+import { renderElement, screen } from '@web/testing/custom-render';
 import { makeAccountPageView } from '@web/testing/pages/account-page/fixtures';
 
-import { AccountPageView } from './account-page-view';
+import {
+  AccountPageView,
+  type IAccountPageViewProps,
+} from './account-page-view';
 
-vi.mock('@web/components/shared/delete-account-control', () => ({
-  DeleteAccountControl: ({ handle }: { handle: string }) => (
-    <div data-testid="delete-account-control">{handle}</div>
-  ),
-}));
+vi.mock('@web/i18n/navigation');
 
-const setup = customRender(AccountPageView, makeAccountPageView());
+vi.mock('@web/server/auth/auth', () => ({ auth: vi.fn() }));
+
+vi.mock('@web/utils/logger/logger');
+
+const setup = (overrides?: Partial<IAccountPageViewProps>) =>
+  renderElement(
+    <ToastProvider>
+      <AccountPageView {...makeAccountPageView(overrides)} />
+    </ToastProvider>,
+  );
 
 describe(`<${AccountPageView.name}/>`, () => {
   it('renders the page heading', () => {

@@ -22,7 +22,7 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-vi.mock('@platform/server/auth/auth', () => ({ auth: vi.fn() }));
+vi.mock('@platform/server/auth/auth');
 
 vi.mock('@platform/server/email-config/update-email-config-action', () => ({
   updateEmailConfigAction: vi.fn(),

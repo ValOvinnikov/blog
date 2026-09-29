@@ -1,11 +1,13 @@
+import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { redirect } from 'next/navigation';
+import type { Session } from 'next-auth';
 
 import WorkspacePendingPage from './page';
 
-const { authMock } = vi.hoisted(() => ({ authMock: vi.fn() }));
+vi.mock('@platform/server/auth/auth');
 
-vi.mock('@platform/server/auth/auth', () => ({ auth: authMock }));
+const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 const setup = customRenderAsync(WorkspacePendingPage, {});
 

@@ -27,22 +27,10 @@ export const carouselVariants = tv({
       },
     },
     alignment: {
-      [CONTENT_ALIGNMENT.LEFT]: { viewport: [] },
-      [CONTENT_ALIGNMENT.CENTER]: { viewport: [] },
+      [CONTENT_ALIGNMENT.LEFT]: { track: [] },
+      [CONTENT_ALIGNMENT.CENTER]: { track: ['justify-center-safe'] },
     },
   },
-  compoundVariants: [
-    {
-      slideSize: 'content',
-      alignment: CONTENT_ALIGNMENT.CENTER,
-      class: { viewport: ['mx-auto w-fit'] },
-    },
-    {
-      slideSize: 'fraction',
-      alignment: CONTENT_ALIGNMENT.CENTER,
-      class: { track: ['justify-center-safe'] },
-    },
-  ],
   defaultVariants: {
     slideSize: 'fraction',
     alignment: CONTENT_ALIGNMENT.LEFT,

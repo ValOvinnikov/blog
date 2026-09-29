@@ -1,104 +1,100 @@
-import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { queries } from '@blog/db';
+import { ToastProvider } from '@web/context/toast-provider';
+import { auth } from '@web/server/auth/auth';
+import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
+import { customRenderServerAsync, screen } from '@web/testing/custom-render';
+import { DEFAULT_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 
 import { NewsletterSection } from './newsletter-section';
 
-const { authMock, getSubscriptionStatusMock, getRequestTenantIdMock } =
-  vi.hoisted(() => ({
-    authMock: vi.fn(),
-    getSubscriptionStatusMock: vi.fn(),
-    getRequestTenantIdMock: vi.fn(),
-  }));
+vi.mock('@web/server/auth/auth', () => ({ auth: vi.fn() }));
 
-vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
-
-vi.mock('@web/server/tenant/get-request-tenant-id', () => ({
-  getRequestTenantId: getRequestTenantIdMock,
-}));
+vi.mock('@web/server/tenant/get-request-tenant-id');
 
 vi.mock('@blog/db', () => ({
-  queries: {
-    subscribers: { getSubscriptionStatus: getSubscriptionStatusMock },
-  },
+  queries: { subscribers: { getSubscriptionStatus: vi.fn() } },
 }));
 
-vi.mock('@web/components/shared/newsletter-subscription-control', () => ({
-  NewsletterSubscriptionControl: ({ action }: { action: string }) => (
-    <div data-testid="newsletter-subscription-control">{action}</div>
-  ),
-}));
+vi.mock('@web/utils/logger/logger');
 
-const setup = customRenderAsync(NewsletterSection, {});
+const authMock = vi.mocked(auth as () => Promise<unknown>);
+const getSubscriptionStatusMock = vi.mocked(
+  queries.subscribers.getSubscriptionStatus,
+);
 
-const TENANT_ID = 'tenant-1';
-
-const authedSession = {
-  user: { id: 'user-1', name: 'Jane Doe', email: 'jane@icloud.com' },
-};
+const setup = customRenderServerAsync(
+  NewsletterSection,
+  {},
+  { wrapper: ToastProvider },
+);
 
 describe(`<${NewsletterSection.name}/>`, () => {
   beforeEach(() => {
-    authMock.mockReset();
-    getSubscriptionStatusMock.mockReset();
-    getRequestTenantIdMock.mockReset();
-    getRequestTenantIdMock.mockResolvedValue(TENANT_ID);
+    authMock.mockResolvedValue({
+      user: { id: 'user-1', name: 'Jane Doe', email: 'jane@icloud.com' },
+    });
   });
 
   it('renders nothing when there is no session', async () => {
     authMock.mockResolvedValue(null);
 
-    const { container } = await setup();
+    await setup();
 
-    expect(container).toBeEmptyDOMElement();
+    expect(
+      screen.queryByRole('heading', { name: 'Newsletter' }),
+    ).not.toBeInTheDocument();
     expect(getSubscriptionStatusMock).not.toHaveBeenCalled();
   });
 
   it('renders nothing when no tenant resolves', async () => {
-    authMock.mockResolvedValue(authedSession);
-    getRequestTenantIdMock.mockResolvedValue(undefined);
+    vi.mocked(getRequestTenantId).mockResolvedValueOnce(undefined);
 
-    const { container } = await setup();
+    await setup();
 
-    expect(container).toBeEmptyDOMElement();
+    expect(
+      screen.queryByRole('heading', { name: 'Newsletter' }),
+    ).not.toBeInTheDocument();
     expect(getSubscriptionStatusMock).not.toHaveBeenCalled();
   });
 
   it('renders nothing when the account is not subscribed', async () => {
-    authMock.mockResolvedValue(authedSession);
     getSubscriptionStatusMock.mockResolvedValue({ outcome: 'not-subscribed' });
 
-    const { container } = await setup();
+    await setup();
 
-    expect(container).toBeEmptyDOMElement();
+    expect(
+      screen.queryByRole('heading', { name: 'Newsletter' }),
+    ).not.toBeInTheDocument();
   });
 
-  it('queries the subscription status for the tenant and user, then renders the active state with an unsubscribe control', async () => {
-    authMock.mockResolvedValue(authedSession);
+  it('shows the active subscription with an unsubscribe button', async () => {
     getSubscriptionStatusMock.mockResolvedValue({
       outcome: 'active',
       subscriber: { email: 'jane@icloud.com' },
-    });
+    } as Awaited<ReturnType<typeof getSubscriptionStatusMock>>);
 
     await setup();
 
-    expect(getSubscriptionStatusMock).toHaveBeenCalledWith(TENANT_ID, 'user-1');
+    expect(getSubscriptionStatusMock).toHaveBeenCalledWith(
+      DEFAULT_TENANT_ID,
+      'user-1',
+    );
     expect(screen.getByText('Subscribed')).toBeVisible();
     expect(screen.getByText('jane@icloud.com')).toBeVisible();
-    expect(
-      screen.getByTestId('newsletter-subscription-control'),
-    ).toHaveTextContent('unsubscribe');
+    expect(screen.getByRole('button', { name: 'Unsubscribe' })).toBeVisible();
   });
 
-  it('passes a resend control action for the pending outcome', async () => {
-    authMock.mockResolvedValue(authedSession);
+  it('offers to resend the confirmation for a pending subscription', async () => {
     getSubscriptionStatusMock.mockResolvedValue({
       outcome: 'pending',
       subscriber: { email: 'jane@icloud.com' },
-    });
+    } as Awaited<ReturnType<typeof getSubscriptionStatusMock>>);
 
     await setup();
 
+    expect(screen.getByText('Pending confirmation')).toBeVisible();
     expect(
-      screen.getByTestId('newsletter-subscription-control'),
-    ).toHaveTextContent('resend');
+      screen.getByRole('button', { name: 'Resend confirmation' }),
+    ).toBeVisible();
   });
 });

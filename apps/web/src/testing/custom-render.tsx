@@ -5,7 +5,9 @@ import {
 } from '@testing-library/react';
 import { AppProviders } from '@web/testing/providers';
 import {
+  cloneElement,
   createElement,
+  isValidElement,
   type ComponentType,
   type ReactElement,
   type ReactNode,
@@ -38,8 +40,8 @@ export const customRender = <P extends object>(
  * (e.g. notFound()) before returning JSX. Awaiting only the top-level
  * component resolves its own promise, not any async Server Component still
  * unresolved in the JSX it returns — RTL's client renderer cannot render
- * those (`<X> is an async Client Component`), so any such child must be
- * mocked as a plain sync component in the test.
+ * those (`<X> is an async Client Component`) — use `customRenderServerAsync`
+ * for a tree with async children.
  */
 export const customRenderAsync = <P extends object>(
   Component: (props: P) => Promise<ReactNode>,
@@ -51,6 +53,53 @@ export const customRenderAsync = <P extends object>(
   ): Promise<RenderResult> => {
     const ui = await Component({ ...defaultProps, ...overrides });
     return rtlRender(<>{ui}</>, { wrapper: Providers, ...options });
+  };
+};
+
+type TAsyncComponent = (props: object) => Promise<ReactNode>;
+
+const isAsyncComponent = (type: unknown): type is TAsyncComponent =>
+  typeof type === 'function' && type.constructor.name === 'AsyncFunction';
+
+const resolveServerTree = async (node: ReactNode): Promise<ReactNode> => {
+  if (Array.isArray(node)) return Promise.all(node.map(resolveServerTree));
+  if (!isValidElement<Record<string, unknown>>(node)) return node;
+  if (isAsyncComponent(node.type)) {
+    return resolveServerTree(await node.type(node.props));
+  }
+
+  const resolvedProps = await Promise.all(
+    Object.entries(node.props).map(
+      async ([key, value]) =>
+        [key, await resolveServerTree(value as ReactNode)] as const,
+    ),
+  );
+  return cloneElement(node, Object.fromEntries(resolvedProps));
+};
+
+/**
+ * `customRenderAsync` for a Server Component whose tree nests further async
+ * Server Components: each one is awaited before RTL renders, the way the RSC
+ * renderer resolves them. Only `async` function components are called; sync
+ * ones render normally, so an async component returned from inside a sync
+ * one's body is never reached.
+ */
+export const customRenderServerAsync = <P extends object>(
+  Component: (props: P) => Promise<ReactNode>,
+  defaultProps: NoInfer<P>,
+  { wrapper: Wrapper }: Pick<RenderOptions, 'wrapper'> = {},
+) => {
+  return async (
+    overrides?: Partial<P>,
+    options?: TRenderOpts,
+  ): Promise<RenderResult> => {
+    const ui = await resolveServerTree(
+      await Component({ ...defaultProps, ...overrides }),
+    );
+    return rtlRender(Wrapper ? <Wrapper>{ui}</Wrapper> : <>{ui}</>, {
+      wrapper: Providers,
+      ...options,
+    });
   };
 };
 

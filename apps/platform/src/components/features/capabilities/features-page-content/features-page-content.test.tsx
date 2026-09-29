@@ -19,7 +19,7 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-vi.mock('@platform/server/auth/auth', () => ({ auth: vi.fn() }));
+vi.mock('@platform/server/auth/auth');
 
 const buildTenant = (plan: 'FREE' | 'GROWTH'): TTenant =>
   makeReadyTenant({ plan });
@@ -34,7 +34,7 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
     getSiteConfigMock.mockReset();
   });
 
-  it('renders CONSOLE featureDefaults when the tenant has no settings_features row and no site_config row yet', async () => {
+  it('renders CONSOLE featureDefaults with no settings_features or site_config row', async () => {
     getSettingsFeaturesMock.mockResolvedValue(undefined);
     getSiteConfigMock.mockResolvedValue(undefined);
 
@@ -77,7 +77,7 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
     );
   });
 
-  it('falls back to the EDITORIAL preset featureDefaults when site_config has that preset saved', async () => {
+  it('falls back to EDITORIAL featureDefaults when site_config has that preset saved', async () => {
     getSettingsFeaturesMock.mockResolvedValue(undefined);
     getSiteConfigMock.mockResolvedValue({
       preset: PRESET_ID.EDITORIAL,
@@ -115,7 +115,7 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
     );
   });
 
-  it('clamps a stale out-of-plan value to unchecked+disabled after a downgrade from GROWTH to FREE', async () => {
+  it('clamps a stale out-of-plan value to unchecked+disabled after a plan downgrade', async () => {
     getSettingsFeaturesMock.mockResolvedValue({
       id: 'row-1',
       tenantId: 'tenant-1',
