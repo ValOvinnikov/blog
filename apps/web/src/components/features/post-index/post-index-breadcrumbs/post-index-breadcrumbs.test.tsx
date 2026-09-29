@@ -1,16 +1,11 @@
+import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
 import { customRenderAsync } from '@web/testing/custom-render';
 import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 import { testStaticBreadcrumbsContract } from '@web/testing/shared/static-breadcrumbs-contract/static-breadcrumbs-contract';
 
 import { PostIndexBreadcrumbs } from './post-index-breadcrumbs';
 
-const { getTenantBaseUrlMock } = vi.hoisted(() => ({
-  getTenantBaseUrlMock: vi.fn(),
-}));
-
-vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
-  getTenantBaseUrl: getTenantBaseUrlMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-base-url');
 
 vi.mock('@web/components/shared/smart-link', () => ({
   SmartLink: SmartLinkMock,
@@ -19,14 +14,9 @@ vi.mock('@web/components/shared/smart-link', () => ({
 const setup = customRenderAsync(PostIndexBreadcrumbs, { tenant: 'tenant-1' });
 
 describe(`<${PostIndexBreadcrumbs.name}/>`, () => {
-  beforeEach(() => {
-    getTenantBaseUrlMock.mockReset();
-    getTenantBaseUrlMock.mockResolvedValue('https://example.com');
-  });
-
   testStaticBreadcrumbsContract({
     setup,
-    getTenantBaseUrlMock,
+    getTenantBaseUrlMock: vi.mocked(getTenantBaseUrl),
     label: 'Blog',
     path: '/blog',
   });
