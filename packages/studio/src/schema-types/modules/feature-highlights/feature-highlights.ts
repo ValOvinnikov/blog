@@ -2,12 +2,12 @@ import { MEDIA_ORDER } from '@blog/config/constants';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
+import { mediaOrderField } from '@blog/studio/schema-types/fields/media-order-field/media-order-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { featureHighlightSchema } from '@blog/studio/schema-types/objects/feature-highlight/feature-highlight';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { wideLayoutField } from '@blog/studio/schema-types/objects/wide-layout/wide-layout-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
-import { toTitleCase } from '@blog/utils/primitives';
 import { Rows3 } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
@@ -35,19 +35,11 @@ export const featureHighlightsSchema = defineType({
       ],
     }),
     ctaButtonsField(),
-    defineField({
+    mediaOrderField({
       name: 'mediaOrder',
       title: 'First Image',
-      type: 'string',
       description:
         "Which side the first row's image sits on. Later rows alternate; on phones every image sits above its text.",
-      options: {
-        layout: 'dropdown',
-        list: Object.values(MEDIA_ORDER).map((value) => ({
-          title: toTitleCase(value),
-          value,
-        })),
-      },
       initialValue: MEDIA_ORDER.FIRST,
       validation: (rule) => rule.required(),
     }),
