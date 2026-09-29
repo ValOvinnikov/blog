@@ -1,22 +1,22 @@
+import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { redirect } from 'next/navigation';
+import type { Session } from 'next-auth';
 
 import SelectTenantPage from './page';
 
 const {
-  authMock,
   listMembershipsForUserMock,
   listTenantsByIdsMock,
   getAdminByUserIdMock,
 } = vi.hoisted(() => ({
-  authMock: vi.fn(),
   listMembershipsForUserMock: vi.fn(),
   listTenantsByIdsMock: vi.fn(),
   getAdminByUserIdMock: vi.fn(),
 }));
 
-vi.mock('@platform/server/auth/auth', () => ({ auth: authMock }));
+vi.mock('@platform/server/auth/auth');
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
@@ -26,6 +26,8 @@ vi.mock('@blog/db', async () => ({
     admins: { getAdminByUserId: getAdminByUserIdMock },
   },
 }));
+
+const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 const setup = customRenderAsync(SelectTenantPage, {});
 

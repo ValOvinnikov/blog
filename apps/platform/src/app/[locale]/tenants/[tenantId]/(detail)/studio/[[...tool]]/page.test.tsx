@@ -1,24 +1,24 @@
+import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { makeTenant } from '@platform/testing/tenants/fixtures';
+import type { Session } from 'next-auth';
 
 import TenantStudioPage from './page';
 
 const {
-  authMock,
   getAdminByUserIdMock,
   getTenantByIdMock,
   getTenantSanityCredentialsMock,
   studioMountMock,
 } = vi.hoisted(() => ({
-  authMock: vi.fn(),
   getAdminByUserIdMock: vi.fn(),
   getTenantByIdMock: vi.fn(),
   getTenantSanityCredentialsMock: vi.fn(),
   studioMountMock: vi.fn(),
 }));
 
-vi.mock('@platform/server/auth/auth', () => ({ auth: authMock }));
+vi.mock('@platform/server/auth/auth');
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
@@ -37,6 +37,8 @@ vi.mock('@blog/studio', () => ({
     return <div data-testid="studio-mount" />;
   },
 }));
+
+const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 const setup = customRenderAsync(TenantStudioPage, {
   params: Promise.resolve({ tenantId: 'tenant-2' }),
@@ -59,7 +61,7 @@ describe(`<${TenantStudioPage.name}/>`, () => {
     expect(getTenantByIdMock).not.toHaveBeenCalled();
   });
 
-  it("404s a signed-in tenant owner with no admins row — editing the URL to another tenant's id never reaches its Studio, even calling the page directly", async () => {
+  it('404s a signed-in tenant owner with no admins row, even calling the page directly', async () => {
     getAdminByUserIdMock.mockResolvedValue(undefined);
 
     await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
@@ -74,7 +76,7 @@ describe(`<${TenantStudioPage.name}/>`, () => {
     await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
   });
 
-  it("mounts Studio for an operator with the routed tenant's own coordinates and a locale-free basePath keyed by that tenant id", async () => {
+  it("mounts Studio with the routed tenant's coordinates and a tenant-keyed basePath", async () => {
     getTenantByIdMock.mockResolvedValue(
       makeTenant({
         id: 'tenant-2',

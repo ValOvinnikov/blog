@@ -4,12 +4,12 @@ import {
   within,
 } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { env } from '@platform/utils/env/env';
 
 import TenantsPage from './page';
 
-const { listTenantsMock, envMock } = vi.hoisted(() => ({
+const { listTenantsMock } = vi.hoisted(() => ({
   listTenantsMock: vi.fn(),
-  envMock: { RESEND_API_KEY: undefined as string | undefined },
 }));
 
 vi.mock('@blog/db', async () => ({
@@ -17,7 +17,9 @@ vi.mock('@blog/db', async () => ({
   queries: { tenants: { listTenants: listTenantsMock } },
 }));
 
-vi.mock('@platform/utils/env/env', () => ({ env: envMock }));
+vi.mock('@platform/utils/env/env');
+
+const envMock: Partial<Record<keyof typeof env, string>> = env;
 
 const setup = customRenderAsync(TenantsPage, {
   searchParams: Promise.resolve({}),

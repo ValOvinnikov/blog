@@ -1,14 +1,15 @@
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import { auth, signIn } from '@platform/server/auth/auth';
 import { createOwnerInviteToken } from '@platform/server/tenants/owner-invite-token';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { logger } from '@platform/utils/logger/logger';
 import { redirect } from 'next/navigation';
+import type { Session } from 'next-auth';
 
 const validOwnerInviteToken = createOwnerInviteToken('owner@example.com');
 
 const {
   requireAdminMock,
-  authMock,
-  signInMock,
   dispatchProvisioningWorkflowMock,
   getUserByEmailMock,
   getTenantByDomainMock,
@@ -16,13 +17,9 @@ const {
   beginTenantProvisioningMock,
   setTenantProvisioningStatusMock,
   insertAuditEventMock,
-  loggerErrorMock,
-  loggerWarnMock,
   checkDomainAvailabilityMock,
 } = vi.hoisted(() => ({
   requireAdminMock: vi.fn(),
-  authMock: vi.fn(),
-  signInMock: vi.fn(),
   dispatchProvisioningWorkflowMock: vi.fn(),
   getUserByEmailMock: vi.fn(),
   getTenantByDomainMock: vi.fn(),
@@ -30,8 +27,6 @@ const {
   beginTenantProvisioningMock: vi.fn(),
   setTenantProvisioningStatusMock: vi.fn(),
   insertAuditEventMock: vi.fn(),
-  loggerErrorMock: vi.fn(),
-  loggerWarnMock: vi.fn(),
   checkDomainAvailabilityMock: vi.fn(),
 }));
 
@@ -39,10 +34,7 @@ vi.mock('@platform/server/auth/require-admin', () => ({
   requireAdmin: requireAdminMock,
 }));
 
-vi.mock('@platform/server/auth/auth', () => ({
-  auth: authMock,
-  signIn: signInMock,
-}));
+vi.mock('@platform/server/auth/auth');
 
 vi.mock('@platform/server/provisioning/dispatch-provisioning-workflow', () => ({
   dispatchProvisioningWorkflow: dispatchProvisioningWorkflowMock,
@@ -52,13 +44,9 @@ vi.mock('@platform/server/provisioning/check-domain-availability', () => ({
   checkDomainAvailability: checkDomainAvailabilityMock,
 }));
 
-vi.mock('@platform/utils/logger/logger', () => ({
-  logger: { error: loggerErrorMock, warn: loggerWarnMock },
-}));
+vi.mock('@platform/utils/logger/logger');
 
-vi.mock('@platform/utils/env/env', () => ({
-  env: { AUTH_SECRET: 'test-auth-secret' },
-}));
+vi.mock('@platform/utils/env/env');
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
@@ -73,6 +61,11 @@ vi.mock('@blog/db', async () => ({
     auditEvents: { insertAuditEvent: insertAuditEventMock },
   },
 }));
+
+const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
+const signInMock = vi.mocked(signIn);
+const loggerErrorMock = vi.mocked(logger.error);
+const loggerWarnMock = vi.mocked(logger.warn);
 
 const validInput = {
   name: 'Acme',
@@ -139,7 +132,7 @@ describe('createTenantAction', () => {
     expect(createTenantDraftMock).not.toHaveBeenCalled();
   });
 
-  it('returns a soft owner-invite confirmation (not a field error) when the owner email matches no registered user', async () => {
+  it('returns a soft owner-invite confirmation when the owner email matches no user', async () => {
     getUserByEmailMock.mockResolvedValue(undefined);
     const { createTenantAction } = await import('./create-tenant-action');
 
@@ -158,7 +151,7 @@ describe('createTenantAction', () => {
     expect(signInMock).not.toHaveBeenCalled();
   });
 
-  it('rejects a confirming submit whose token was issued for a different email, and re-issues a fresh confirmation for the current one', async () => {
+  it('re-issues a confirmation when the confirming token was for a different email', async () => {
     getUserByEmailMock.mockResolvedValue(undefined);
     const { createTenantAction } = await import('./create-tenant-action');
     const tokenForOtherEmail = createOwnerInviteToken('other@example.com');
@@ -180,7 +173,7 @@ describe('createTenantAction', () => {
     expect(signInMock).not.toHaveBeenCalled();
   });
 
-  it('rejects a confirming submit with an invalid/garbage token, and re-issues a fresh confirmation', async () => {
+  it('re-issues a confirmation when the confirming token is invalid', async () => {
     getUserByEmailMock.mockResolvedValue(undefined);
     const { createTenantAction } = await import('./create-tenant-action');
 
@@ -201,7 +194,7 @@ describe('createTenantAction', () => {
     expect(signInMock).not.toHaveBeenCalled();
   });
 
-  it('proceeds down the invite path once confirmOwnerInviteToken is verified for an unregistered email', async () => {
+  it('proceeds down the invite path once the token verifies for an unregistered email', async () => {
     getUserByEmailMock.mockResolvedValue(undefined);
     const { createTenantAction } = await import('./create-tenant-action');
 
@@ -227,7 +220,7 @@ describe('createTenantAction', () => {
     expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1/provisioning');
   });
 
-  it('logs at error level, but still redirects, when the owner-invite sign-in email fails to send', async () => {
+  it('logs an error but still redirects when the owner-invite email fails to send', async () => {
     getUserByEmailMock.mockResolvedValue(undefined);
     signInMock.mockResolvedValue({ ok: false, error: 'EmailSignInError' });
     const { createTenantAction } = await import('./create-tenant-action');
@@ -250,7 +243,7 @@ describe('createTenantAction', () => {
     expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1/provisioning');
   });
 
-  it('logs at error level, but still redirects, when the owner-invite sign-in trigger throws', async () => {
+  it('logs an error but still redirects when the owner-invite sign-in throws', async () => {
     getUserByEmailMock.mockResolvedValue(undefined);
     signInMock.mockRejectedValue(new Error('network error'));
     const { createTenantAction } = await import('./create-tenant-action');
@@ -297,7 +290,7 @@ describe('createTenantAction', () => {
     expect(createTenantDraftMock).not.toHaveBeenCalled();
   });
 
-  it('returns a field error and blocks creation when the domain is already in use by another Vercel project', async () => {
+  it('returns a field error and blocks creation when another project uses the domain', async () => {
     checkDomainAvailabilityMock.mockResolvedValue('IN_USE');
     const { createTenantAction } = await import('./create-tenant-action');
 
@@ -358,7 +351,7 @@ describe('createTenantAction', () => {
     );
   });
 
-  it('returns a generic error and logs at error level when createTenantDraft reports any other typed failure', async () => {
+  it('returns a generic error and logs on any other createTenantDraft failure', async () => {
     createTenantDraftMock.mockResolvedValue({
       ok: false,
       error: 'DB_NOT_FOUND',
@@ -380,7 +373,7 @@ describe('createTenantAction', () => {
     expect(loggerWarnMock).not.toHaveBeenCalled();
   });
 
-  it('creates the tenant draft with the resolved owner id and the platform default locale', async () => {
+  it('creates the draft with the resolved owner id and the platform default locale', async () => {
     const { createTenantAction } = await import('./create-tenant-action');
 
     await expect(createTenantAction(validInput)).rejects.toThrow(
@@ -396,7 +389,7 @@ describe('createTenantAction', () => {
     });
   });
 
-  it('begins provisioning before dispatching the workflow, then redirects to the status page on success', async () => {
+  it('begins provisioning before dispatching, then redirects to the status page', async () => {
     const { createTenantAction } = await import('./create-tenant-action');
 
     await expect(createTenantAction(validInput)).rejects.toThrow(
@@ -409,7 +402,7 @@ describe('createTenantAction', () => {
     expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1/provisioning');
   });
 
-  it('reverts the PROVISIONING transition, but still redirects, when the GitHub dispatch fails', async () => {
+  it('reverts the PROVISIONING transition but still redirects when the dispatch fails', async () => {
     beginTenantProvisioningMock.mockResolvedValue({
       ok: true,
       data: { tenant: { id: 'tenant-1' }, previousProvisioningStatus: null },
@@ -428,7 +421,7 @@ describe('createTenantAction', () => {
     expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1/provisioning');
   });
 
-  it('does not dispatch, and still redirects, when the atomic guard reports a concurrent dispatch', async () => {
+  it('skips the dispatch but still redirects when a concurrent dispatch is reported', async () => {
     beginTenantProvisioningMock.mockResolvedValue({
       ok: false,
       error: 'DB_ALREADY_PROVISIONING',
@@ -470,7 +463,7 @@ describe('createTenantAction', () => {
     });
   });
 
-  it('still dispatches provisioning and redirects when the audit write fails, and logs the failure', async () => {
+  it('still dispatches and redirects when the audit write fails, and logs it', async () => {
     insertAuditEventMock.mockRejectedValue(new Error('connection reset'));
     const { createTenantAction } = await import('./create-tenant-action');
 

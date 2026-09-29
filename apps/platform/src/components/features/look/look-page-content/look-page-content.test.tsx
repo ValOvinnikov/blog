@@ -14,7 +14,7 @@ vi.mock('@blog/db', async () => ({
   queries: { siteConfig: { getSiteConfig: getSiteConfigMock } },
 }));
 
-vi.mock('@platform/server/auth/auth', () => ({ auth: vi.fn() }));
+vi.mock('@platform/server/auth/auth');
 
 const tenant = makeReadyTenant();
 

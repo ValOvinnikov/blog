@@ -1,17 +1,18 @@
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { redirect } from 'next/navigation';
+import type { Session } from 'next-auth';
 
+import { auth } from './auth';
 import { requireTenantMembership } from './require-tenant-membership';
 
-const { authMock, getTenantByIdMock, getMembershipMock, getAdminByUserIdMock } =
+const { getTenantByIdMock, getMembershipMock, getAdminByUserIdMock } =
   vi.hoisted(() => ({
-    authMock: vi.fn(),
     getTenantByIdMock: vi.fn(),
     getMembershipMock: vi.fn(),
     getAdminByUserIdMock: vi.fn(),
   }));
 
-vi.mock('./auth', () => ({ auth: authMock }));
+vi.mock('./auth');
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
@@ -21,6 +22,8 @@ vi.mock('@blog/db', async () => ({
     admins: { getAdminByUserId: getAdminByUserIdMock },
   },
 }));
+
+const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 describe(requireTenantMembership, () => {
   beforeEach(() => {
@@ -53,7 +56,7 @@ describe(requireTenantMembership, () => {
     expect(getAdminByUserIdMock).not.toHaveBeenCalled();
   });
 
-  it('404s — the same outcome as an unknown id — when the signed-in user has no admins row and no membership on that tenant', async () => {
+  it('404s, as for an unknown id, with no admins row and no membership on the tenant', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getTenantByIdMock.mockResolvedValue({ id: 'tenant-1' });
     getAdminByUserIdMock.mockResolvedValue(undefined);
@@ -68,7 +71,7 @@ describe(requireTenantMembership, () => {
   });
 
   it.each(['ADMIN', 'MODERATOR', 'SUPERADMIN'])(
-    'grants a %s admins row OWNER-level access with no real membership on that tenant, without redirecting',
+    'grants a %s admins row OWNER-level access with no membership on the tenant',
     async (role) => {
       authMock.mockResolvedValue({ user: { id: 'user-1' } });
       getTenantByIdMock.mockResolvedValue({ id: 'tenant-1' });
@@ -107,7 +110,7 @@ describe(requireTenantMembership, () => {
     expect(redirect).not.toHaveBeenCalled();
   });
 
-  it("refuses a member of tenant A supplying tenant B's id: it looks up B, then finds no membership row for A's user on B, and 404s rather than authorizing against A's own membership", async () => {
+  it("404s a member of tenant A supplying tenant B's id, never authorizing against A", async () => {
     authMock.mockResolvedValue({ user: { id: 'user-from-tenant-a' } });
     getTenantByIdMock.mockResolvedValue({ id: 'tenant-b' });
     getAdminByUserIdMock.mockResolvedValue(undefined);

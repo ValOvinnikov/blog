@@ -1,24 +1,24 @@
+import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { makeTenant } from '@platform/testing/tenants/fixtures';
+import type { Session } from 'next-auth';
 
 import TenantDomainPage from './page';
 
 const {
-  authMock,
   getAdminByUserIdMock,
   getTenantByIdMock,
   getDomainVerificationStatusMock,
   getDomainDnsRecordsMock,
 } = vi.hoisted(() => ({
-  authMock: vi.fn(),
   getAdminByUserIdMock: vi.fn(),
   getTenantByIdMock: vi.fn(),
   getDomainVerificationStatusMock: vi.fn(),
   getDomainDnsRecordsMock: vi.fn(),
 }));
 
-vi.mock('@platform/server/auth/auth', () => ({ auth: authMock }));
+vi.mock('@platform/server/auth/auth');
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
@@ -35,6 +35,8 @@ vi.mock('@platform/server/provisioning/get-domain-verification-status', () => ({
 vi.mock('@platform/server/provisioning/get-domain-dns-records', () => ({
   getDomainDnsRecords: getDomainDnsRecordsMock,
 }));
+
+const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 const setup = customRenderAsync(TenantDomainPage, {
   params: Promise.resolve({ tenantId: 'tenant-1' }),
