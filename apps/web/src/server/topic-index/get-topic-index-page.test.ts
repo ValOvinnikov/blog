@@ -11,9 +11,7 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: vi.fn(),
-}));
+vi.mock('@web/server/tenant/get-tenant-sanity-context');
 
 describe(getTopicIndexPage, () => {
   beforeEach(() => {
@@ -24,7 +22,7 @@ describe(getTopicIndexPage, () => {
     );
   });
 
-  it('resolves the tenant Sanity context, then forwards it to service.pages.topicIndex.v1.getIndexPage', async () => {
+  it('forwards the resolved tenant context to the topic index service', async () => {
     getIndexPageMock.mockResolvedValue({ ok: true, data: undefined });
 
     await getTopicIndexPage('tenant-1');
@@ -49,7 +47,7 @@ describe('getTopicIndexPage memoization', () => {
     vi.resetModules();
   });
 
-  it('dedupes the index-page query when called more than once in the same render pass with the same arguments', async () => {
+  it('dedupes the index-page query across one render pass with the same arguments', async () => {
     getIndexPageMock.mockReset();
     vi.mocked(getTenantSanityContext).mockReset();
     vi.mocked(getTenantSanityContext).mockResolvedValue(

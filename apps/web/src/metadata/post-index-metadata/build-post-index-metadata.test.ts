@@ -1,4 +1,5 @@
 import { urlForSanityImage } from '@blog/service';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
@@ -6,18 +7,17 @@ import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtur
 
 import { buildPostIndexMetadata } from './build-post-index-metadata';
 
-const { getPostIndexPageMock, getTenantSanityContextMock } = vi.hoisted(() => ({
+const { getPostIndexPageMock } = vi.hoisted(() => ({
   getPostIndexPageMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
 }));
 
 vi.mock('@web/server/post-index/get-post-index-page', () => ({
   getPostIndexPage: getPostIndexPageMock,
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-sanity-context');
+
+const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
 
 const ogImage = makeSanityImage();
 const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
@@ -40,7 +40,7 @@ describe('buildPostIndexMetadata', () => {
     getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
-  it('forwards the slug-less tenant to getPostIndexPage — the same cached loader PostIndexPage reads', async () => {
+  it('forwards the tenant to getPostIndexPage, the loader PostIndexPage reads', async () => {
     getPostIndexPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -82,7 +82,7 @@ describe('buildPostIndexMetadata', () => {
     });
   });
 
-  it('builds page-N metadata with a "– Page N" suffix, self-canonical to /blog/page/N — never /blog', async () => {
+  it('builds page-N metadata with a "– Page N" suffix, canonical to /blog/page/N', async () => {
     getPostIndexPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -105,7 +105,7 @@ describe('buildPostIndexMetadata', () => {
     });
   });
 
-  it('leaves ogTitle omitted on page 2+ when unauthored, rather than suffixing "undefined"', async () => {
+  it('leaves ogTitle omitted on page 2+ when unauthored, never suffixing "undefined"', async () => {
     getPostIndexPageMock.mockResolvedValue({
       ok: true,
       data: {

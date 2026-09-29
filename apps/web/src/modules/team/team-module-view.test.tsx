@@ -8,18 +8,15 @@ import { customRender, screen } from '@web/testing/custom-render';
 import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
 import { makeTeamMember } from '@web/testing/modules/team/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 import type { ReactNode } from 'react';
 
 import { TeamModuleView } from './team-module-view';
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
-
 const { TeamCarousel } = vi.hoisted(() => ({
   TeamCarousel: vi.fn(() => <div data-testid="team-carousel-stub" />),
 }));
+
+vi.mock('@web/i18n/navigation');
 
 vi.mock('./components/team-carousel/team-carousel', () => ({ TeamCarousel }));
 
@@ -137,7 +134,7 @@ describe(`<${TeamModuleView.name}/>`, () => {
     expect(getCardGridProps()).toMatchObject({ columns: 4 });
   });
 
-  it('caps the CardGrid columns prop at 3 when bios are shown and the base column count is 4', () => {
+  it('caps the CardGrid columns at 3 when bios are shown and the base count is 4', () => {
     setup({ members: fourMembers, showBios: true });
 
     expect(getCardGridProps()).toMatchObject({ columns: 3 });

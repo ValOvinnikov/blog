@@ -1,4 +1,6 @@
 import { PRESET_ID, resolveTenantEmailBrand } from '@blog/config';
+import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
+import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
 
 const {
   authMock,
@@ -7,8 +9,7 @@ const {
   sendEmailMock,
   resolveTenantEmailIdentityMock,
   clearNewsletterSubscribedCookieMock,
-  getRequestTenantIdMock,
-  getTenantBaseUrlMock,
+
   isTenantActiveMock,
   getEmailConfigMock,
   getEmailTemplateMock,
@@ -19,8 +20,6 @@ const {
   sendEmailMock: vi.fn(),
   resolveTenantEmailIdentityMock: vi.fn(),
   clearNewsletterSubscribedCookieMock: vi.fn(),
-  getRequestTenantIdMock: vi.fn(),
-  getTenantBaseUrlMock: vi.fn(),
   isTenantActiveMock: vi.fn(),
   getEmailConfigMock: vi.fn(),
   getEmailTemplateMock: vi.fn(),
@@ -58,13 +57,9 @@ vi.mock('@web/server/newsletter/newsletter-subscribed-cookie', () => ({
   clearNewsletterSubscribedCookie: clearNewsletterSubscribedCookieMock,
 }));
 
-vi.mock('@web/server/tenant/get-request-tenant-id', () => ({
-  getRequestTenantId: getRequestTenantIdMock,
-}));
+vi.mock('@web/server/tenant/get-request-tenant-id');
 
-vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
-  getTenantBaseUrl: getTenantBaseUrlMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-base-url');
 
 vi.mock('@web/server/tenant/is-tenant-active', () => ({
   isTenantActive: isTenantActiveMock,
@@ -75,6 +70,9 @@ const TENANT_ID = 'tenant-1';
 vi.mock('@web/utils/env/env', () => ({
   env: { NEWSLETTER_FROM_ADDRESS: undefined },
 }));
+
+const getRequestTenantIdMock = vi.mocked(getRequestTenantId);
+const getTenantBaseUrlMock = vi.mocked(getTenantBaseUrl);
 
 const session = {
   user: { id: 'user-1', email: 'val@icloud.com' },
@@ -135,7 +133,7 @@ describe('unsubscribeAction', () => {
     expect(clearNewsletterSubscribedCookieMock).toHaveBeenCalledTimes(1);
   });
 
-  it('returns { ok: false }, logs, and does not clear the cookie when the db write throws', async () => {
+  it('returns { ok: false }, logs and keeps the cookie when the db write throws', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     authMock.mockResolvedValue(session);
     unsubscribeMock.mockRejectedValue(new Error('boom'));
@@ -148,7 +146,7 @@ describe('unsubscribeAction', () => {
     errorSpy.mockRestore();
   });
 
-  it('still returns { ok: true } (logging, not failing) when clearing the cookie throws after a real successful unsubscribe', async () => {
+  it('still returns { ok: true }, logging, when clearing the cookie throws', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     authMock.mockResolvedValue(session);
     unsubscribeMock.mockResolvedValue(undefined);
@@ -266,7 +264,7 @@ describe('resendConfirmationAction', () => {
     );
   });
 
-  it("renders the subscribing tenant's own resolved brand in the resent confirmation email", async () => {
+  it("renders the subscribing tenant's own brand in the resent confirmation email", async () => {
     authMock.mockResolvedValue(session);
     resendConfirmationMock.mockResolvedValue({
       outcome: 'pending',
@@ -342,7 +340,7 @@ describe('resendConfirmationAction', () => {
     warnSpy.mockRestore();
   });
 
-  it('falls back to product-default subject and body and still sends when the authored-copy lookup rejects', async () => {
+  it('falls back to default subject and body when the authored-copy lookup rejects', async () => {
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     authMock.mockResolvedValue(session);
     getEmailTemplateMock.mockRejectedValue(new Error('db down'));

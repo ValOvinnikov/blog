@@ -3,17 +3,14 @@ import { customRender, screen } from '@web/testing/custom-render';
 import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
 import { makeLogoItem } from '@web/testing/modules/logo-wall/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { LogoWallModuleView } from './logo-wall-module-view';
-
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
 
 const { LogoWallCarousel } = vi.hoisted(() => ({
   LogoWallCarousel: vi.fn(() => <div data-testid="logo-wall-carousel-stub" />),
 }));
+
+vi.mock('@web/i18n/navigation');
 
 vi.mock('./components/logo-wall-carousel/logo-wall-carousel', () => ({
   LogoWallCarousel,

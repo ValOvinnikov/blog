@@ -9,9 +9,7 @@ vi.mock('@blog/service', () => ({
   service: { pages: { post: { v1: { getPost: getPostMock } } } },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: vi.fn(),
-}));
+vi.mock('@web/server/tenant/get-tenant-sanity-context');
 
 describe(getPostPage, () => {
   beforeEach(() => {
@@ -22,7 +20,7 @@ describe(getPostPage, () => {
     );
   });
 
-  it('resolves the tenant Sanity context, then forwards the slug and that context to service.pages.post.v1.getPost', async () => {
+  it('forwards the slug and the resolved tenant context to the post service', async () => {
     getPostMock.mockResolvedValue({ ok: true, data: undefined });
 
     await getPostPage('hello-world', 'tenant-1');
@@ -48,7 +46,7 @@ describe('getPostPage memoization', () => {
     vi.resetModules();
   });
 
-  it('dedupes the post query when called more than once in the same render pass with the same arguments', async () => {
+  it('dedupes the post query across one render pass with the same arguments', async () => {
     getPostMock.mockReset();
     vi.mocked(getTenantSanityContext).mockReset();
     vi.mocked(getTenantSanityContext).mockResolvedValue(

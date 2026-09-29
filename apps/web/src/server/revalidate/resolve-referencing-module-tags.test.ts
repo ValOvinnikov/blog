@@ -1,3 +1,5 @@
+import { logger } from '@web/utils/logger/logger';
+
 import { resolveReferencingModuleTags } from './resolve-referencing-module-tags';
 
 const { getReferencingModuleIdsMock } = vi.hoisted(() => ({
@@ -12,18 +14,9 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-const { loggerErrorMock } = vi.hoisted(() => ({
-  loggerErrorMock: vi.fn(),
-}));
+vi.mock('@web/utils/logger/logger');
 
-vi.mock('@web/utils/logger/logger', () => ({
-  logger: {
-    error: loggerErrorMock,
-    warn: vi.fn(),
-    info: vi.fn(),
-    debug: vi.fn(),
-  },
-}));
+const loggerErrorMock = vi.mocked(logger.error);
 
 const tenant = {
   projectId: 'tenant-a-project',
@@ -71,7 +64,7 @@ describe(resolveReferencingModuleTags, () => {
     expect(getReferencingModuleIdsMock).toHaveBeenCalledWith('topic-1', tenant);
   });
 
-  it('degrades to no tags when the lookup fails, leaving the caller free to purge the rest', async () => {
+  it('degrades to no tags when the lookup fails, so the caller can purge the rest', async () => {
     getReferencingModuleIdsMock.mockResolvedValue({
       ok: false,
       error: new Error('sanity unreachable'),

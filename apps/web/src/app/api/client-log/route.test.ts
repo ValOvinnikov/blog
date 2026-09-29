@@ -1,17 +1,8 @@
-export {};
+import { logger } from '@web/utils/logger/logger';
 
-const { loggerErrorMock } = vi.hoisted(() => ({
-  loggerErrorMock: vi.fn(),
-}));
+vi.mock('@web/utils/logger/logger');
 
-vi.mock('@web/utils/logger/logger', () => ({
-  logger: {
-    error: loggerErrorMock,
-    warn: vi.fn(),
-    info: vi.fn(),
-    debug: vi.fn(),
-  },
-}));
+let loggerErrorMock = vi.mocked(logger.error);
 
 const validPayload = {
   event: 'copy_to_clipboard.write_failed',
@@ -49,6 +40,8 @@ const postStreamRequest = (byteLength: number) => {
 
 const freshRoute = async () => {
   vi.resetModules();
+  const fresh = await import('@web/utils/logger/logger');
+  loggerErrorMock = vi.mocked(fresh.logger.error);
   return import('./route');
 };
 
@@ -114,7 +107,7 @@ describe('POST /api/client-log', () => {
     expect(loggerErrorMock).not.toHaveBeenCalled();
   });
 
-  it('rejects an oversized streamed body with no Content-Length at all, without buffering it first', async () => {
+  it('rejects an oversized streamed body with no Content-Length, without buffering it', async () => {
     const { POST } = await freshRoute();
     const request = postStreamRequest(9 * 1024);
     expect(request.headers.get('content-length')).toBeNull();
@@ -147,7 +140,7 @@ describe('POST /api/client-log', () => {
     expect(response.status).toBe(204);
   });
 
-  it('strips control characters from the message before logging, so a payload cannot forge a log entry', async () => {
+  it('strips control characters from the message so a payload cannot forge a log line', async () => {
     const { POST } = await freshRoute();
     const forgedSuffix = JSON.stringify({
       level: 'error',

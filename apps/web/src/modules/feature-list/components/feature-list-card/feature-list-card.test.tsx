@@ -2,13 +2,10 @@ import { CARD_IMAGE_SHAPE, ICONS } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
 import { makeFeatureListItem } from '@web/testing/modules/feature-list/fixtures';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { FeatureListCard } from './feature-list-card';
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
+vi.mock('@web/i18n/navigation');
 
 const item = makeFeatureListItem();
 
@@ -48,7 +45,7 @@ describe(`<${FeatureListCard.name}/>`, () => {
     expect(screen.queryByTestId('feature-card-icon')).not.toBeInTheDocument();
   });
 
-  it('wraps the whole card title in a link when the item has one, with the title as its accessible name', () => {
+  it('wraps the whole card title in a link named by the title when the item has one', () => {
     setup({
       item: makeFeatureListItem({
         link: {
@@ -65,7 +62,7 @@ describe(`<${FeatureListCard.name}/>`, () => {
     expect(link).toHaveAttribute('href', '/features/fast');
   });
 
-  it('exposes the link under its ariaLabel override, not the heading text, when the item link sets one', () => {
+  it('names the link by its ariaLabel override, not the heading, when one is set', () => {
     setup({
       item: makeFeatureListItem({
         link: {

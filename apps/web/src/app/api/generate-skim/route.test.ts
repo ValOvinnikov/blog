@@ -1,4 +1,4 @@
-export {};
+import { logger } from '@web/utils/logger/logger';
 
 const {
   getPublishedPostBodyMock,
@@ -8,8 +8,6 @@ const {
   getHostTenantSanityWriteContextMock,
   getPlatformSanityWriteContextMock,
   isTenantActiveMock,
-  loggerErrorMock,
-  loggerWarnMock,
 } = vi.hoisted(() => ({
   getPublishedPostBodyMock: vi.fn(),
   saveSkimDraftMock: vi.fn(),
@@ -18,8 +16,6 @@ const {
   getHostTenantSanityWriteContextMock: vi.fn(),
   getPlatformSanityWriteContextMock: vi.fn(),
   isTenantActiveMock: vi.fn(),
-  loggerErrorMock: vi.fn(),
-  loggerWarnMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -53,9 +49,7 @@ vi.mock('@web/server/tenant/is-tenant-active', () => ({
   isTenantActive: isTenantActiveMock,
 }));
 
-vi.mock('@web/utils/logger/logger', () => ({
-  logger: { error: loggerErrorMock, warn: loggerWarnMock },
-}));
+vi.mock('@web/utils/logger/logger');
 
 vi.mock('@web/utils/env/env', () => ({
   env: {
@@ -63,6 +57,9 @@ vi.mock('@web/utils/env/env', () => ({
     ANTHROPIC_API_KEY: 'test-api-key',
   },
 }));
+
+let loggerErrorMock = vi.mocked(logger.error);
+let loggerWarnMock = vi.mocked(logger.warn);
 
 const platformTenant = {
   projectId: 'platform-project',
@@ -80,7 +77,10 @@ const makeRequest = (body: unknown, secret = 'test-secret'): Request => {
 };
 
 describe('POST /api/generate-skim', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
+    const fresh = await import('@web/utils/logger/logger');
+    loggerErrorMock = vi.mocked(fresh.logger.error);
+    loggerWarnMock = vi.mocked(fresh.logger.warn);
     getPublishedPostBodyMock.mockReset();
     saveSkimDraftMock.mockReset();
     generateTakeawaysMock.mockReset();
@@ -160,7 +160,7 @@ describe('POST /api/generate-skim', () => {
     expect(generateTakeawaysMock).not.toHaveBeenCalled();
   });
 
-  it('returns 422 and leaves the draft untouched when Claude returns a malformed response', async () => {
+  it("returns 422 and leaves the draft untouched when Claude's response is malformed", async () => {
     getPublishedPostBodyMock.mockResolvedValue({ ok: true, data: [] });
     generateTakeawaysMock.mockRejectedValue(new Error('bad response'));
     const { POST } = await import('./route');
@@ -171,7 +171,7 @@ describe('POST /api/generate-skim', () => {
     expect(saveSkimDraftMock).not.toHaveBeenCalled();
   });
 
-  it('returns 503 without saving when the platform write context is unconfigured (SANITY_API_WRITE_TOKEN absent)', async () => {
+  it('returns 503 without saving when the platform write context is unconfigured', async () => {
     getPublishedPostBodyMock.mockResolvedValue({ ok: true, data: [] });
     generateTakeawaysMock.mockResolvedValue(['a', 'b', 'c']);
     getPlatformSanityWriteContextMock.mockImplementation(() => {
@@ -225,7 +225,7 @@ describe('POST /api/generate-skim', () => {
     );
   });
 
-  it('re-running with the same post is idempotent (always patches the draft, never appends)', async () => {
+  it('is idempotent for the same post: it patches the draft and never appends', async () => {
     getPublishedPostBodyMock.mockResolvedValue({ ok: true, data: [] });
     generateTakeawaysMock.mockResolvedValue(['a', 'b', 'c']);
     saveSkimDraftMock.mockResolvedValue({ ok: true, data: undefined });
@@ -315,7 +315,7 @@ describe('POST /api/generate-skim', () => {
     expect(getPlatformSanityWriteContextMock).not.toHaveBeenCalled();
   });
 
-  it('returns 503 without generating takeaways when the resolved tenant has no usable write credentials', async () => {
+  it('returns 503 without generating when the tenant has no write credentials', async () => {
     getHostTenantSanityWriteContextMock.mockResolvedValue({
       isResolvable: true,
       tenant: undefined,
@@ -417,7 +417,7 @@ describe('POST /api/generate-skim', () => {
     expect(isTenantActiveMock).not.toHaveBeenCalled();
   });
 
-  it('returns 404 without reading the post when the write-side tenant context is unresolvable', async () => {
+  it('returns 404 without reading the post when the write-side tenant is unresolvable', async () => {
     getHostTenantSanityWriteContextMock.mockResolvedValue({
       isResolvable: false,
     });
