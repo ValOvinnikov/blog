@@ -42,12 +42,12 @@ describe(toPostFeaturedModule, () => {
 
   it('maps contentAlignment when authored', () => {
     const raw = makeRawPostFeaturedModule({
-      contentAlignment: CONTENT_ALIGNMENT.RIGHT,
+      contentAlignment: CONTENT_ALIGNMENT.CENTER,
     });
 
     const module = toPostFeaturedModule(raw);
 
-    expect(module.contentAlignment).toBe(CONTENT_ALIGNMENT.RIGHT);
+    expect(module.contentAlignment).toBe(CONTENT_ALIGNMENT.CENTER);
   });
 
   it('maps a fully-authored layout object 1:1', () => {
