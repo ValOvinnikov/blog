@@ -39,14 +39,29 @@ const emDecorator = defineDecorator({
   render: ({ children }) => <em>{children}</em>,
 });
 
-const isSameListRunMember = (
+const isListItemBlock = (
   entry: PortableTextBlock,
+): entry is PortableTextTextBlock =>
+  entry._type === 'block' &&
+  (entry as PortableTextTextBlock).listItem !== undefined;
+
+const countRunNeighbors = (
+  value: PortableTextBlock[],
+  fromIndex: number,
+  step: 1 | -1,
   listItem: string,
   level: number,
-): boolean =>
-  entry._type === 'block' &&
-  (entry as PortableTextTextBlock).listItem === listItem &&
-  ((entry as PortableTextTextBlock).level ?? 1) === level;
+): number => {
+  let count = 0;
+  for (let i = fromIndex; i >= 0 && i < value.length; i += step) {
+    const entry = value[i];
+    if (!entry || !isListItemBlock(entry)) break;
+    if ((entry.level ?? 1) !== level) continue;
+    if (entry.listItem !== listItem) break;
+    count += 1;
+  }
+  return count;
+};
 
 const getListItemPosition = (
   value: PortableTextBlock[],
@@ -55,16 +70,25 @@ const getListItemPosition = (
   const index = value.findIndex((entry) => entry._key === block._key);
   if (index === -1 || block.listItem === undefined) return 1;
 
-  let position = 1;
-  for (let i = index - 1; i >= 0; i -= 1) {
-    const entry = value[i];
-    if (entry && isSameListRunMember(entry, block.listItem, block.level ?? 1)) {
-      position += 1;
-    } else {
-      break;
-    }
-  }
-  return position;
+  return (
+    1 +
+    countRunNeighbors(value, index - 1, -1, block.listItem, block.level ?? 1)
+  );
+};
+
+const getListItemRunSize = (
+  value: PortableTextBlock[],
+  block: PortableTextTextBlock,
+): number => {
+  const index = value.findIndex((entry) => entry._key === block._key);
+  if (index === -1 || block.listItem === undefined) return 1;
+
+  const level = block.level ?? 1;
+  return (
+    1 +
+    countRunNeighbors(value, index - 1, -1, block.listItem, level) +
+    countRunNeighbors(value, index + 1, 1, block.listItem, level)
+  );
 };
 
 const TextBlock = ({ attributes, children, node }: TextBlockRenderProps) => {
@@ -77,12 +101,18 @@ const TextBlock = ({ attributes, children, node }: TextBlockRenderProps) => {
     return <div {...attributes}>{styled}</div>;
   }
 
-  const listItem = <li>{styled}</li>;
+  const position = getListItemPosition(value, node);
+  const setSize = getListItemRunSize(value, node);
+  const listItem = (
+    <li aria-posinset={position} aria-setsize={setSize}>
+      {styled}
+    </li>
+  );
 
   return (
     <div {...attributes}>
       {node.listItem === 'number' ? (
-        <ol start={getListItemPosition(value, node)}>{listItem}</ol>
+        <ol start={position}>{listItem}</ol>
       ) : (
         <ul>{listItem}</ul>
       )}
