@@ -524,6 +524,17 @@
   --divider: var(--border-strong);
 }
 
+/* --border against --surface-2 (1.25:1 light / 1.21:1 dark) reads weaker than
+   the page default's own --primary/--border pairing (1.31:1 / 1.40:1) — the
+   wrong direction for a divider meant to match. --border-strong measures
+   1.74:1 / 1.95:1 against --surface-2, in line with the other two surfaces'
+   own divider weight (1.43:1/1.95:1, 1.62:1/1.61:1). Verified via
+   wcagContrastRatio (packages/utils/src/color/oklch.ts). */
+@utility surface-nested {
+  --ambient: var(--surface-2);
+  --divider: var(--border-strong);
+}
+
 /* Toast timer/drain bar (#1140): the linear rate is applied per-instance via
    inline style (animationTimingFunction), since a shell progress bar reads
    as constant rate — easing here would misrepresent remaining time. */

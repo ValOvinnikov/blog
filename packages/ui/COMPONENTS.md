@@ -137,7 +137,7 @@ Variants: variant: default|accent · interactive: (boolean)
 
 The body-copy paragraph primitive: applies a `variant` from the type scale to a `<p>`.
 Props: style?: CSSProperties · children?: ReactNode _(extends IWithClassName, TTextVariants, IWithDataTestId)_
-Variants: variant: lead|muted|hero|card|supporting|statement|meta|emphasis
+Variants: variant: lead|muted|hero|card|supporting|statement|meta|emphasis|footnote
 
 ### TextInput — `components/atoms/text-input/text-input.tsx`
 

@@ -76,3 +76,10 @@ export const Emphasis: TStory = {
     children: 'Card-sized copy rendered bold and full-color for emphasis.',
   },
 };
+
+export const Footnote: TStory = {
+  args: {
+    variant: 'footnote',
+    children: 'A shared footnote style for module type, rendered subtle.',
+  },
+};
