@@ -12,7 +12,7 @@ import { IconButton } from '@blog/ui/components/atoms/icon-button';
 import type { Key, ReactNode } from 'react';
 
 import { carouselVariants, type TCarouselVariants } from './carousel-variants';
-import { hasOverflow, useCarousel } from './use-carousel';
+import { useCarousel } from './use-carousel';
 
 export interface ICarouselProps<T> extends IWithClassName, IWithDataTestId {
   items: readonly T[];
@@ -43,9 +43,8 @@ export const Carousel = <T,>({
   const { canScrollPrev, canScrollNext, viewportRef, scrollPrev, scrollNext } =
     useCarousel();
 
-  const alignment = hasOverflow(canScrollPrev, canScrollNext)
-    ? CONTENT_ALIGNMENT.LEFT
-    : contentAlignment;
+  const alignment =
+    canScrollPrev || canScrollNext ? CONTENT_ALIGNMENT.LEFT : contentAlignment;
 
   const s = carouselVariants({ slideSize, alignment });
 

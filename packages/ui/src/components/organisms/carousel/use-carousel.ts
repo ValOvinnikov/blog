@@ -1,9 +1,6 @@
 import useEmblaCarousel from 'embla-carousel-react';
 import { useCallback, useSyncExternalStore } from 'react';
 
-export const hasOverflow = (canScrollPrev: boolean, canScrollNext: boolean) =>
-  canScrollPrev || canScrollNext;
-
 export const useCarousel = () => {
   const [viewportRef, embla] = useEmblaCarousel({
     align: 'start',
