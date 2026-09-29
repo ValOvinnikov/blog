@@ -5,6 +5,7 @@ import type {
   IWithDataTestId,
   TBrandVariant,
 } from '@blog/config';
+import type { ICarouselProps } from '@blog/ui/components/organisms/carousel';
 import { LabelledCarousel } from '@web/components/shared/labelled-carousel';
 import {
   type IMediaCardData,
@@ -16,6 +17,7 @@ export interface ICardCarouselProps extends IWithClassName, IWithDataTestId {
   hasImages?: boolean;
   title: string;
   tone?: TBrandVariant;
+  contentAlignment?: ICarouselProps<IMediaCardData>['contentAlignment'];
 }
 
 export const CardCarousel = ({
@@ -23,6 +25,7 @@ export const CardCarousel = ({
   hasImages,
   title,
   tone,
+  contentAlignment,
   className,
   dataTestId,
 }: ICardCarouselProps) => (
@@ -34,6 +37,7 @@ export const CardCarousel = ({
     getItemKey={({ item }) => item.id}
     title={title}
     tone={tone}
+    contentAlignment={contentAlignment}
     className={className}
     dataTestId={dataTestId}
   />

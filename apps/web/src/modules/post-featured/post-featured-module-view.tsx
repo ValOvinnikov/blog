@@ -59,6 +59,7 @@ export const PostFeaturedModuleView = ({
           hasImages={hasImages}
           title={heading}
           tone={brandVariant}
+          contentAlignment={contentAlignment}
         />
       )}
       {leadPost && displayMode !== DISPLAY_MODE.CAROUSEL && (
