@@ -9,9 +9,7 @@ vi.mock('@blog/service', () => ({
   service: { pages: { landing: { v1: { getPage: getPageMock } } } },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: vi.fn(),
-}));
+vi.mock('@web/server/tenant/get-tenant-sanity-context');
 
 describe(getLandingPage, () => {
   beforeEach(() => {
@@ -22,7 +20,7 @@ describe(getLandingPage, () => {
     );
   });
 
-  it('resolves the tenant Sanity context, then forwards the slug and that context to service.pages.landing.v1.getPage', async () => {
+  it('forwards the slug and the resolved tenant context to the landing page service', async () => {
     getPageMock.mockResolvedValue({ ok: true, data: undefined });
 
     await getLandingPage('about-us', 'tenant-1');
@@ -48,7 +46,7 @@ describe('getLandingPage memoization', () => {
     vi.resetModules();
   });
 
-  it('dedupes the page query when called more than once in the same render pass with the same arguments', async () => {
+  it('dedupes the page query across one render pass with the same arguments', async () => {
     getPageMock.mockReset();
     vi.mocked(getTenantSanityContext).mockReset();
     vi.mocked(getTenantSanityContext).mockResolvedValue(

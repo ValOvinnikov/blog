@@ -8,19 +8,16 @@ import { customRender, screen } from '@web/testing/custom-render';
 import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
 import { makeFeatureListItem } from '@web/testing/modules/feature-list/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { FeatureListModuleView } from './feature-list-module-view';
-
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
 
 const { FeatureListCarousel } = vi.hoisted(() => ({
   FeatureListCarousel: vi.fn(() => (
     <div data-testid="feature-list-carousel-stub" />
   )),
 }));
+
+vi.mock('@web/i18n/navigation');
 
 vi.mock('./components/feature-list-carousel/feature-list-carousel', () => ({
   FeatureListCarousel,

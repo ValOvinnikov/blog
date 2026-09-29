@@ -1,3 +1,5 @@
+import { logger } from '@web/utils/logger/logger';
+
 import {
   deriveRevalidatePaths,
   isDerivableRevalidateType,
@@ -46,16 +48,9 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-const { loggerErrorMock } = vi.hoisted(() => ({ loggerErrorMock: vi.fn() }));
+vi.mock('@web/utils/logger/logger');
 
-vi.mock('@web/utils/logger/logger', () => ({
-  logger: {
-    error: loggerErrorMock,
-    warn: vi.fn(),
-    info: vi.fn(),
-    debug: vi.fn(),
-  },
-}));
+const loggerErrorMock = vi.mocked(logger.error);
 
 const tenant = {
   projectId: 'project-1',
@@ -84,7 +79,7 @@ describe(deriveRevalidatePaths, () => {
     loggerErrorMock.mockReset();
   });
 
-  it('falls back with unsupported_type for a type it cannot derive, without calling the service', async () => {
+  it('falls back with unsupported_type for an unknown type, skipping the service', async () => {
     const result = await deriveRevalidatePaths({
       type: 'person',
       id: 'author-1',
@@ -96,7 +91,7 @@ describe(deriveRevalidatePaths, () => {
     expect(getPostsByIdsMock).not.toHaveBeenCalled();
   });
 
-  it('resolves the full path set for a published post, including every tag/topic page of the tenant', async () => {
+  it('resolves every path for a published post, including its tag and topic pages', async () => {
     getPostsByIdsMock.mockResolvedValue({ ok: true, data: [okPost] });
     getIndexPageParamsMock.mockResolvedValue({ ok: true, data: [] });
     getTagParamsMock.mockResolvedValue({
@@ -174,7 +169,7 @@ describe(deriveRevalidatePaths, () => {
     );
   });
 
-  it('falls back with fetch_failed and logs when the blog index pagination lookup fails', async () => {
+  it('falls back with fetch_failed and logs when the blog pagination lookup fails', async () => {
     getPostsByIdsMock.mockResolvedValue({ ok: true, data: [okPost] });
     getIndexPageParamsMock.mockResolvedValue({
       ok: false,

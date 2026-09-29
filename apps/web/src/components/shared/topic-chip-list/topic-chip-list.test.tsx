@@ -1,11 +1,8 @@
 import { customRender, screen } from '@web/testing/custom-render';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { TopicChipList } from './topic-chip-list';
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
+vi.mock('@web/i18n/navigation');
 
 const topics = [
   {

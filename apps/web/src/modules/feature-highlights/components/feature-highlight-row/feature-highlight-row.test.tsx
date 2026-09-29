@@ -1,13 +1,10 @@
 import { customRender, screen } from '@web/testing/custom-render';
 import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
 import { makeFeatureHighlightItem } from '@web/testing/modules/feature-highlights/fixtures';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { FeatureHighlightRow } from './feature-highlight-row';
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
+vi.mock('@web/i18n/navigation');
 
 const item = makeFeatureHighlightItem();
 

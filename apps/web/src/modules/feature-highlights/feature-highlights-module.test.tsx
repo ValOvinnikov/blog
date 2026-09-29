@@ -1,17 +1,17 @@
 import { BRAND_VARIANT, MEDIA_ORDER } from '@blog/config';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeFeatureHighlightItem } from '@web/testing/modules/feature-highlights/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { FeatureHighlightsModule } from './feature-highlights-module';
 
-const { getFeatureHighlightsModuleMock, getTenantSanityContextMock } =
-  vi.hoisted(() => ({
-    getFeatureHighlightsModuleMock: vi.fn(),
-    getTenantSanityContextMock: vi.fn(),
-  }));
+const { getFeatureHighlightsModuleMock } = vi.hoisted(() => ({
+  getFeatureHighlightsModuleMock: vi.fn(),
+}));
+
+vi.mock('@web/i18n/navigation');
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -23,13 +23,9 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-sanity-context');
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
+const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
 
 const baseModule = {
   brandVariant: BRAND_VARIANT.PRIMARY,
@@ -53,7 +49,7 @@ describe(`<${FeatureHighlightsModule.name}/>`, () => {
     getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
-  it('calls getFeatureHighlightsModule with the module id and the tenant Sanity context resolved from the tenant slug', async () => {
+  it('calls getFeatureHighlightsModule with the module id and tenant context', async () => {
     const tenant = {
       projectId: 'tenant-project',
       dataset: 'production',

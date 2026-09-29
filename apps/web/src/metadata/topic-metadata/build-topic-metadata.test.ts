@@ -1,22 +1,22 @@
 import { urlForSanityImage } from '@blog/service';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { buildTopicMetadata } from './build-topic-metadata';
 
-const { getTopicPageMock, getTenantSanityContextMock } = vi.hoisted(() => ({
+const { getTopicPageMock } = vi.hoisted(() => ({
   getTopicPageMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
 }));
 
 vi.mock('@web/server/topic/get-topic-page', () => ({
   getTopicPage: getTopicPageMock,
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-sanity-context');
+
+const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
 
 const ogImage = makeSanityImage();
 const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
@@ -39,7 +39,7 @@ describe('buildTopicMetadata', () => {
     getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
-  it('forwards the slug and tenant to getTopicPage — the same cached loader TopicPage reads', async () => {
+  it('forwards the slug and tenant to getTopicPage, the loader TopicPage reads', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,
       data: { topic: {}, modules: [], seo },
@@ -81,7 +81,7 @@ describe('buildTopicMetadata', () => {
     expect(metadata).toEqual({});
   });
 
-  it('builds page-N metadata with a "– Page N" suffix, self-canonical to /topics/[slug]/page/N — never /topics/[slug]', async () => {
+  it('builds page-N metadata with a "– Page N" suffix, self-canonical to its own URL', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,
       data: { topic: {}, modules: [], seo },
@@ -95,7 +95,7 @@ describe('buildTopicMetadata', () => {
     expect(metadata.alternates?.canonical).not.toBe('/topics/engineering');
   });
 
-  it('leaves ogTitle omitted on page 2+ when unauthored, rather than suffixing "undefined"', async () => {
+  it('leaves ogTitle omitted on page 2+ when unauthored, never suffixing "undefined"', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,
       data: { topic: {}, modules: [], seo: makeSeo({ ogTitle: undefined }) },

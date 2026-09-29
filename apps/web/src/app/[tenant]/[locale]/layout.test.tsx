@@ -10,6 +10,8 @@ import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { ThemeScope } from '@web/components/shared/theme-scope';
 import { VoiceRichProvider } from '@web/context/voice-rich-provider';
+import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
@@ -43,8 +45,7 @@ const {
   isProductionEnvironmentMock,
   useSessionMock,
   getEnabledOAuthProviderIdsMock,
-  getTenantSanityContextMock,
-  getTenantBaseUrlMock,
+
   getSanityImageBaseUrlMock,
   urlForSanityImageMock,
   rememberRequestTenantIdMock,
@@ -64,20 +65,14 @@ const {
   isProductionEnvironmentMock: vi.fn(),
   useSessionMock: vi.fn(),
   getEnabledOAuthProviderIdsMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
-  getTenantBaseUrlMock: vi.fn(),
   getSanityImageBaseUrlMock: vi.fn(),
   urlForSanityImageMock: vi.fn(),
   rememberRequestTenantIdMock: vi.fn(),
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-sanity-context');
 
-vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
-  getTenantBaseUrl: getTenantBaseUrlMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-base-url');
 
 vi.mock('@web/server/tenant/remembered-tenant', () => ({
   rememberRequestTenantId: rememberRequestTenantIdMock,
@@ -147,6 +142,9 @@ vi.mock('next-auth/react', () => ({
   signOut: vi.fn(),
   SessionProvider: ({ children }: { children: ReactNode }) => children,
 }));
+
+const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
+const getTenantBaseUrlMock = vi.mocked(getTenantBaseUrl);
 
 const brand = { name: 'Blog', logo: undefined };
 const now = new Date('2026-07-21T00:00:00.000Z');
@@ -325,7 +323,7 @@ describe('LocaleLayout', () => {
     expect(provider.props.messages).toBe(realMessages);
   });
 
-  it('mounts VoiceRichProvider with the rich voice values resolved by resolveTenantMessages', async () => {
+  it('mounts VoiceRichProvider with the rich voice values from resolveTenantMessages', async () => {
     const rich = { blogListEmpty: [{ _type: 'block' }] };
     resolveTenantMessagesMock.mockResolvedValue({
       messages: realMessages,
@@ -384,7 +382,7 @@ describe('LocaleLayout', () => {
     ).toBe(false);
   });
 
-  it('mounts Analytics and SpeedInsights when WEB_ANALYTICS_ENABLED is enabled and the capability is entitled', async () => {
+  it('mounts Analytics and SpeedInsights when enabled and the capability is entitled', async () => {
     isWebAnalyticsEnabledMock.mockReturnValue(true);
     isCapabilityEnabledMock.mockResolvedValue(true);
 
@@ -408,7 +406,7 @@ describe('LocaleLayout', () => {
     ).toBe(true);
   });
 
-  it('omits Analytics and SpeedInsights when WEB_ANALYTICS_ENABLED is enabled but the ANALYTICS capability is not entitled/enabled', async () => {
+  it('omits Analytics and SpeedInsights when the ANALYTICS capability is not entitled', async () => {
     isWebAnalyticsEnabledMock.mockReturnValue(true);
     isCapabilityEnabledMock.mockResolvedValue(false);
 
@@ -442,7 +440,7 @@ describe('LocaleLayout', () => {
     expect(within(link).getByTestId('rss-icon')).toBeVisible();
   });
 
-  it('renders a mapped social link icon-only, with an accessible name derived from its platform', async () => {
+  it('renders a mapped social link icon-only, named after its platform', async () => {
     getFooterMock.mockResolvedValue({
       ok: true,
       data: {
@@ -502,7 +500,7 @@ describe('LocaleLayout', () => {
     ).toBeVisible();
   });
 
-  it('wires the enabled OAuth provider ids from getEnabledOAuthProviderIds into AuthMenu', async () => {
+  it('passes the enabled OAuth provider ids into AuthMenu', async () => {
     getEnabledOAuthProviderIdsMock.mockReturnValue(['github']);
 
     await setup();
@@ -519,7 +517,7 @@ describe('LocaleLayout', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('forwards the resolved tenant Sanity context to getSiteSettings, getNavigation, and getFooter', async () => {
+  it('forwards the tenant Sanity context to the settings, nav and footer loaders', async () => {
     const tenant = {
       projectId: 'tenant-project',
       dataset: 'production',
@@ -534,7 +532,7 @@ describe('LocaleLayout', () => {
     expect(getFooterMock).toHaveBeenCalledWith(tenant);
   });
 
-  it('forwards the tenant route param to getTenantSanityContext, getThemeTokens, isCapabilityEnabled, and resolveTenantMessages', async () => {
+  it('forwards the tenant route param to every tenant-scoped loader', async () => {
     await setup();
 
     expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
