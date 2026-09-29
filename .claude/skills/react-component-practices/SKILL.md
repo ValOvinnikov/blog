@@ -104,7 +104,7 @@ Apply as written:
 - **Server work** — `server-cache-react` for a lookup several components on
   one request make, `server-after-nonblocking` for logging or side effects
   the response doesn't wait on, `server-auth-actions` for every Server Action
-  in `apps/platform`.
+  in either app.
 - **Client bundle** — `bundle-dynamic-imports`, `bundle-defer-third-party`.
 - **Re-renders that are really design** — `rerender-derived-state-no-effect`,
   `rerender-no-inline-components`, `rerender-move-effect-to-event`,
@@ -117,10 +117,10 @@ Overridden here:
   applies. A Vercel rule is not the measurement.
 - **`bundle-barrel-imports`** — the `@blog/ui` barrel is that package's
   public API; import from `@blog/ui`, never a deep path into it. The rule
-  still applies inside `apps/web`, where a barrel can pull `server-only`
-  code into the client graph.
+  still applies to barrels inside `apps/web` and `apps/platform`, where one
+  can pull `server-only` code into the client graph.
 - **`server-cache-lru`** — caching across requests goes through Next's cache
-  and ISR tags (`vercel:next-cache-components`), never a module-level cache.
+  (`vercel:next-cache-components`) in either app, never a module-level cache.
 - **`client-swr-dedup`** — this repo doesn't use SWR.
 
 ## Accessible by construction

@@ -322,8 +322,9 @@ its `client` inside `packages/db`), the Sanity query runner, tenant and auth
 resolution, `env`, the logger, each app's `i18n/navigation`, `next/cache`,
 `next/navigation`, `next-auth`. Everything between the edges — our
 components, `@blog/ui`, our helpers — renders for real, so the test sees what
-the user sees. `SmartLink` is ours: fake `@web/i18n/navigation` under it,
-never `SmartLink` itself.
+the user sees. The rules below hold in `apps/web` and `apps/platform` alike.
+`SmartLink` is ours: fake `@web/i18n/navigation` under it, never
+`SmartLink` itself.
 
 - **Never `vi.mock` an `@web/*`, `@platform/*` or `@blog/ui` component to test
   its parent.** Render the real child and query what it puts on screen. A
@@ -335,16 +336,24 @@ never `SmartLink` itself.
   `renderItem` by hand tests the wiring, not the result. Render, then query.
   Checking an edge was called (`expect(getCta).toHaveBeenCalledWith('cta-1',
 tenant)`) is fine: that call is the component's contract with the outside.
-- **The one exception: a module renderer.** A `*-module-renderer` picks one of
-  many async modules per `_type`. Its test may stub each module to render its
-  id, because rendering them for real would pull in every module's fakes.
-  The stub proves the dispatch, and each module has its own test.
+- **Two exceptions, both thin dispatchers whose children have their own
+  tests.**
+  - **A module renderer** (`apps/web` only). A `*-module-renderer` picks one
+    of many async modules per `_type`; its test may stub each module to
+    render its id, because rendering them for real would pull in every
+    module's fakes. The stub proves the dispatch.
+  - **A route file** (`src/app/**/page.tsx`, `not-found.tsx`, in either
+    app). Its test may stub the page component it renders and assert the
+    route params and props it hands over, because the page component's own
+    test covers what it renders.
 - **An edge fake is written once, next to the module it replaces.** Put the
   default fake in a `__mocks__/` directory beside the module's file
   (`server/tenant/__mocks__/get-tenant-base-url.ts` for
   `server/tenant/get-tenant-base-url.ts`); a test then writes
   `vi.mock('@web/server/tenant/get-tenant-base-url')` with no factory and
-  Vitest picks it up, alias included. Export each fake function as a
+  Vitest picks it up, alias included. Platform is the same:
+  `server/auth/__mocks__/auth.ts` serves every
+  `vi.mock('@platform/server/auth/auth')`. Export each fake function as a
   `vi.fn()` with a sensible default, and let a test change it with
   `vi.mocked(fn).mockResolvedValueOnce(…)`. Use the `Once` form, or reset in
   `beforeEach`, because the preset's `clearMocks` clears calls but keeps an
