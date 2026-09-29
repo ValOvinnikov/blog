@@ -21,7 +21,7 @@ const { TeamCarousel } = vi.hoisted(() => ({
   TeamCarousel: vi.fn(() => <div data-testid="team-carousel-stub" />),
 }));
 
-vi.mock('./team-carousel', () => ({ TeamCarousel }));
+vi.mock('./components/team-carousel/team-carousel', () => ({ TeamCarousel }));
 
 const { CardGrid } = vi.hoisted(() => ({
   CardGrid: vi.fn(({ children }: { children: ReactNode }) => <>{children}</>),

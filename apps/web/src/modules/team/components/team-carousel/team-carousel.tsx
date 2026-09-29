@@ -3,8 +3,7 @@
 import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import type { TTeamMember, TTeamModule } from '@blog/service';
 import { LabelledCarousel } from '@web/components/shared/labelled-carousel';
-
-import { TeamMemberCard } from './team-member-card';
+import { TeamMemberCard } from '@web/modules/team/components/team-member-card/team-member-card';
 
 export interface ITeamCarouselProps extends IWithClassName, IWithDataTestId {
   members: TTeamMember[];
