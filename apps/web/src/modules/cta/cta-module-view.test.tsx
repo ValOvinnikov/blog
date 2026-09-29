@@ -8,6 +8,8 @@ import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { CtaModuleView } from './cta-module-view';
 
+vi.mock('@web/i18n/navigation');
+
 const setup = customRender(CtaModuleView, {
   id: 'cta-1',
   ...makeCtaModuleData(),

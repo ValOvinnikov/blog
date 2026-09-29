@@ -13,6 +13,8 @@ import {
 
 import { PortableText } from './portable-text';
 
+vi.mock('@web/i18n/navigation');
+
 const setup = customRender(PortableText, {
   value: [],
 });
