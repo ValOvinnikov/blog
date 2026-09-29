@@ -24,6 +24,7 @@ import { PostFeaturedModule } from '@web/modules/post-featured/post-featured-mod
 import { PostLatestModule } from '@web/modules/post-latest/post-latest-module';
 import { StatsModule } from '@web/modules/stats/stats-module';
 import { TaxonomyListModule } from '@web/modules/taxonomy-list/taxonomy-list-module';
+import { TeamModule } from '@web/modules/team/team-module';
 import { TestimonialModule } from '@web/modules/testimonial/testimonial-module';
 import type { ReactNode } from 'react';
 
@@ -43,6 +44,7 @@ const LANDING_MAP: Partial<Record<TPageLandingType, TModuleComponent>> = {
   module_logoWall: LogoWallModule,
   module_stats: StatsModule,
   module_faq: FaqModule,
+  module_team: TeamModule,
 };
 
 export interface ILandingModuleRendererProps {
