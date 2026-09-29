@@ -1,4 +1,1 @@
-export {
-  LabelledCarousel,
-  type ILabelledCarouselProps,
-} from './labelled-carousel';
+export { LabelledCarousel } from './labelled-carousel';
