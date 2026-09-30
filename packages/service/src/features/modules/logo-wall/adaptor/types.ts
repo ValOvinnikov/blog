@@ -14,6 +14,7 @@ export type TLogoItem = {
   id: string;
   name: string;
   image: ISanityImage;
+  imageDark: TMaybeUndefined<ISanityImage>;
   link: TMaybeUndefined<ILink>;
 };
 

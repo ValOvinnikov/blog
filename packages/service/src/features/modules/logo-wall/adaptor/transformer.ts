@@ -17,6 +17,9 @@ function toLogoItem(raw: TRawLogoItem): TLogoItem {
     id: raw._key,
     name: raw.name,
     image: toSanityImage({ ...raw.image, alt: raw.name }),
+    imageDark: toSanityImage(
+      raw.imageDark && { ...raw.imageDark, alt: raw.name },
+    ),
     link: toLinkDocument(raw.link),
   };
 }

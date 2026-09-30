@@ -51,6 +51,20 @@ describe('logoWallModuleQuery', () => {
     expect(logoWallModuleQuery.parse(raw).logos?.[0]?.link).toBeNull();
   });
 
+  it('parses a logo whose dark-background image has no asset', () => {
+    const raw = {
+      ...makeRawLogoWallModule(),
+      logos: [
+        {
+          ...makeRawLogoItem(),
+          imageDark: { asset: null, hotspot: null, crop: null },
+        },
+      ],
+    };
+
+    expect(() => logoWallModuleQuery.parse(raw)).not.toThrow();
+  });
+
   it('coalesces displayMode to GRID for documents authored before the field existed', () => {
     expect(logoWallModuleQuery.query).toContain(
       'coalesce(displayMode, "GRID")',

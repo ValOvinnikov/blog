@@ -38,6 +38,18 @@ export const logoWallModuleQuery = q
             crop: true,
           }))
           .notNull(),
+        imageDark: logoSub
+          .field('imageDark')
+          .project((imageSub) => ({
+            asset: imageSub
+              .field('asset')
+              .deref()
+              .project(sanityImageAssetFragment)
+              .nullable(true),
+            hotspot: true,
+            crop: true,
+          }))
+          .nullable(true),
         link: logoSub
           .field('link')
           .deref()
