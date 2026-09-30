@@ -12,6 +12,8 @@ import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { stretchedLinkVariants } from '@web/components/shared/stretched-link';
 
+import { featureListCardVariants } from './feature-list-card-variants';
+
 const CARD_IMAGE_SHAPE_TO_MEDIA_SHAPE: Record<
   TCardImageShape,
   'wide' | 'square' | 'circle'
@@ -51,6 +53,7 @@ export const FeatureListCard = ({
     item.sanityImage || hasAnyImage
       ? CARD_IMAGE_SHAPE_TO_MEDIA_SHAPE[imageShape]
       : 'icon';
+  const { iconPanel } = featureListCardVariants();
 
   return (
     <MediaCard
@@ -90,10 +93,7 @@ export const FeatureListCard = ({
               dataTestId="feature-card-icon"
             />
           ) : (
-            <div
-              className="bg-brand-primary-muted text-brand-primary group-hover:bg-surface group-focus-within:bg-surface flex size-full items-center justify-center"
-              data-testid="feature-card-icon-panel"
-            >
+            <div className={iconPanel()} data-testid="feature-card-icon-panel">
               <Icon
                 name={item.icon}
                 size={SIZE.LG}
