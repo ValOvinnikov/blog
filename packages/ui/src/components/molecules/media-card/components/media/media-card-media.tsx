@@ -15,7 +15,7 @@ export type TMediaCardMediaProps = IWithClassName &
     children?: ReactNode;
   };
 
-/** The media region of a `MediaCard`; a styled `<div>` wrapper you fill with an image or `MediaFrame`, or — with `iconPanel` — an icon centered inside a tinted panel matching `shape`'s ratio/size. */
+/** The media region of a `MediaCard`, reserving a consistent shape for its visual content regardless of what fills it. */
 export const MediaCardMedia = ({
   isLead,
   shape,

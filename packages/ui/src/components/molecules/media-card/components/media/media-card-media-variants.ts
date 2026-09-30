@@ -32,8 +32,6 @@ export const mediaCardMediaVariants = tv({
   compoundVariants: [
     { shape: 'wide', isLead: false, class: 'aspect-video' },
     { shape: 'wide', isLead: true, class: 'aspect-[4/3]' },
-    // ~2:1 — flatter than `wide`'s 16:9, so a two-column grid card's image
-    // doesn't dominate the card the way `aspect-video` does at that width.
     { shape: 'wideFlat', class: 'aspect-[2/1]' },
     { shape: 'circle', align: 'left', class: 'mx-card-x' },
     { shape: 'circle', align: 'center', class: 'mx-auto' },
