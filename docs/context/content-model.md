@@ -240,11 +240,16 @@ A grid or carousel of feature cards.
   existed briefly and was retired for that reason. Validated `required()`,
   `min(1)` and `max(12)` as separate rules, and deliberately **without
   `unique()`** — repeating a logo is not a mistake worth blocking.
-- **The item** — `name`, an `image` and an optional `link` reference. `name` is
+- **The item** — `name`, an `image`, an optional `imageDark` and an optional
+  `link` reference. `name` is
   the logo's alt text and never renders as visible text: WAI's rule is that a
   logo's alt is the organisation's name, “Stripe” rather than “Stripe logo”. The
   image is a plain `image`, not an `imageWithAlt`, because a generic “describe
   the image” prompt invites the wrong alt.
+- **`imageDark`** — “Logo for dark backgrounds”, a plain optional `image` shown
+  in dark mode instead of `image`, for a mark that would vanish on the dark
+  tile. Unvalidated; one with no resolvable asset (e.g. crop data only) is
+  treated as absent and the logo falls back to `image`.
 - **A wrapping flex row, not a grid** — `LogoTile` is a fixed-size card, so how
   many fit per row follows from wrapping rather than a column count or a
   breakpoint ladder. There is no derived column helper. See `SPEC.md` for the

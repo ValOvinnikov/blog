@@ -853,7 +853,7 @@ draft with the field still unset is never queried.
 **A logo is an inline object, not a document — one of the two places the
 `block_*` pattern is deliberately not followed, `module_stats` below being the
 other.** `logoItem` ("Logo") holds a `name`, an
-`image` and an optional `link` reference, and lives directly on the module's
+`image`, an optional `imageDark` and an optional `link` reference, and lives directly on the module's
 `logos` array. Logos never recombine: a wall is reused by referencing the same
 `module_logoWall` from several pages, so reuse already happens one level up, and
 documents would only have added a desk entry, a reference picker and a
@@ -873,6 +873,21 @@ text.** WAI's rule for a logo is that the alt is the organisation's name,
 `name` directly and appends nothing. The image is a plain `image` rather than an
 `imageWithAlt`: a generic "describe the image" prompt invites the wrong alt, and
 crop and hotspot controls are noise for a mark that must render whole.
+
+**`imageDark` is a second logo for dark backgrounds, shown in dark mode when
+present.** A single-colour mark vanishes on a tile of the same colour — a white
+wordmark on the light tile, a black one on the dark tile — and a second upload is
+the only fix that keeps brand colours and covers both. It is a plain optional
+`image` with no validation, so a wall without one publishes as before. The
+service projects it like `image`, with its own dimensions, but with a nullable
+asset: an `imageDark` holding only leftover crop or hotspot data, or one whose
+asset cannot resolve, becomes `undefined` and the logo falls back to its main
+image — unlike the main image, it never costs the wall. `LogoTile` takes it as
+`darkLogo` plus `darkAspectRatio` and renders both logos, the regular one hidden
+under `.dark` and the dark one hidden outside it; `display: none` takes the hidden
+one out of the accessibility tree and tab order, so the name is announced and the
+link focused once. `apps/web` wraps each in the logo's link, and the dark one
+overrides `--logo-aspect` for itself so each is sized by its own ratio.
 
 **The wall is a wrapping flex row, not a grid.** `apps/web` composes
 `flex flex-wrap` with a 24px gap, and `@blog/ui`'s `LogoTile` is a fixed 192×88

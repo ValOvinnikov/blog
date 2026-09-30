@@ -119,4 +119,39 @@ describe(`<${LogoWallTile.name}/>`, () => {
         .style.getPropertyValue('--logo-aspect'),
     ).toBe('');
   });
+
+  it('renders the dark-background logo alongside the regular one when the item has one', () => {
+    setup({
+      logo: makeLogoItem({
+        imageDark: makeSanityImage({
+          assetId:
+            'image-9b1d3f0c2e7a4b5c8d6e1f2a3b4c5d6e7f8a9b0c-1800x400-png',
+          alt: item.name,
+        }),
+      }),
+    });
+
+    expect(screen.getAllByRole('img', { name: item.name })).toHaveLength(2);
+  });
+
+  it('wraps the dark-background logo in the item link too', () => {
+    setup({
+      logo: makeLogoItem({
+        imageDark: makeSanityImage({
+          assetId:
+            'image-9b1d3f0c2e7a4b5c8d6e1f2a3b4c5d6e7f8a9b0c-1800x400-png',
+          alt: item.name,
+        }),
+        link: {
+          label: 'Visit Acme Corp',
+          href: 'https://acme.example.com',
+          target: undefined,
+          platform: undefined,
+          ariaLabel: undefined,
+        },
+      }),
+    });
+
+    expect(screen.getAllByRole('link', { name: item.name })).toHaveLength(2);
+  });
 });
