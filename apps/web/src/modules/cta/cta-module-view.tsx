@@ -1,26 +1,15 @@
-import {
-  BRAND_VARIANT,
-  CTA_VARIANT,
-  SPACING_SCALE,
-  type TLayout,
-} from '@blog/config';
+import { BRAND_VARIANT, CTA_VARIANT } from '@blog/config';
 import type { TCtaModule } from '@blog/service';
 import { CtaModule as CtaModuleUi } from '@blog/ui/components/organisms/cta-module';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { PortableText } from '@web/components/shared/portable-text';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { Section } from '@web/components/shared/section';
+import { BANNER_SECTION_LAYOUT } from '@web/utils/banner-section-layout';
 
 export interface ICtaModuleViewProps extends TCtaModule {
   id: string;
 }
-
-const BANNER_SECTION_LAYOUT: TLayout = {
-  spacingTop: SPACING_SCALE.NONE,
-  spacingBottom: SPACING_SCALE.NONE,
-  dividerTop: false,
-  dividerBottom: false,
-};
 
 export const CtaModuleView = ({
   id,

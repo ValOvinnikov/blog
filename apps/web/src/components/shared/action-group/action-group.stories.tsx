@@ -1,5 +1,6 @@
 import { CTA_ACTION_APPEARANCE, CTA_ACTION_VARIANT } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { onDarkDecorators } from '@web/testing/shared/on-dark/decorators';
 
 import { ActionGroup } from './action-group';
 
@@ -45,6 +46,34 @@ export const MixedLabelLengths: TStory = {
 
 export const MobileStacked: TStory = {
   globals: { viewport: 'mobile' },
+};
+
+export const OnDarkContained: TStory = {
+  args: {
+    isOnDark: true,
+    actions: [
+      shortAction,
+      { ...longAction, appearance: CTA_ACTION_APPEARANCE.CONTAINED },
+    ],
+  },
+  decorators: onDarkDecorators,
+};
+
+export const OnDarkInline: TStory = {
+  args: {
+    isOnDark: true,
+    actions: [
+      {
+        ...shortAction,
+        appearance: CTA_ACTION_APPEARANCE.INLINE,
+      },
+      {
+        ...longAction,
+        appearance: CTA_ACTION_APPEARANCE.INLINE,
+      },
+    ],
+  },
+  decorators: onDarkDecorators,
 };
 
 export const InlineAppearance: TStory = {
