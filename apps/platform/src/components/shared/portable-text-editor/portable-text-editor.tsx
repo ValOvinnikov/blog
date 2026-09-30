@@ -154,7 +154,7 @@ export const PortableTextEditor = ({
             <a
               href={safeHref ?? undefined}
               rel="noopener noreferrer"
-              className={linkClassName}
+              className={safeHref ? linkClassName : undefined}
             >
               {children}
             </a>
@@ -182,7 +182,11 @@ export const PortableTextEditor = ({
           }}
         />
         {!isDisabled && <PortableTextEditorToolbar />}
-        <PortableTextEditable aria-label={ariaLabel} className={editable()} />
+        <PortableTextEditable
+          aria-label={ariaLabel}
+          aria-disabled={isDisabled || undefined}
+          className={editable()}
+        />
       </EditorProvider>
     </div>
   );

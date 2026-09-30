@@ -162,6 +162,36 @@ describe(PortableTextEditor, () => {
     ).not.toBeInTheDocument();
   });
 
+  it('conveys its disabled state to assistive technology, not only visually', () => {
+    render(
+      <PortableTextEditor
+        initialValue={[]}
+        onChange={() => {}}
+        ariaLabel="Body"
+        isDisabled={true}
+      />,
+    );
+
+    expect(screen.getByLabelText('Body')).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+  });
+
+  it('carries no aria-disabled attribute when enabled', () => {
+    render(
+      <PortableTextEditor
+        initialValue={[]}
+        onChange={() => {}}
+        ariaLabel="Body"
+      />,
+    );
+
+    expect(screen.getByRole('textbox', { name: 'Body' })).not.toHaveAttribute(
+      'aria-disabled',
+    );
+  });
+
   it('renders an authored link with a safe href as a real, working anchor', async () => {
     render(
       <PortableTextEditor
