@@ -107,3 +107,22 @@ export const SingleColumn: TStory = {
 export const FourColumns: TStory = {
   args: { columns: 4, children: renderMediaCards(posts) },
 };
+
+// The gap steps up across real `sm:`/`lg:` breakpoints, so it renders
+// identically to `Default` at Storybook's normal wide canvas — pinning
+// `globals.viewport` per story is the documented exception for demonstrating
+// that state (see `PrimaryNavigation`'s `MobileClosed` story).
+export const GapOnPhone: TStory = {
+  args: { columns: 2, children: renderMediaCards(posts.slice(0, 2)) },
+  globals: { viewport: 'phone' },
+};
+
+export const GapOnTablet: TStory = {
+  args: { columns: 2, children: renderMediaCards(posts.slice(0, 2)) },
+  globals: { viewport: 'tablet' },
+};
+
+export const GapOnDesktop: TStory = {
+  args: { columns: 3 },
+  globals: { viewport: 'desktop' },
+};
