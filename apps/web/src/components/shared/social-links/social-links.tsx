@@ -8,11 +8,13 @@ import { socialLinksVariants } from './social-links-variants';
 export type TSocialLinksProps = {
   profiles: TSocialProfile[];
   variant?: TNavLinkVariants['variant'];
+  isOnDark?: boolean;
 };
 
 export const SocialLinks = ({
   profiles,
   variant = 'plain',
+  isOnDark,
 }: TSocialLinksProps) => {
   const t = useTranslations('socialLinks');
 
@@ -24,7 +26,7 @@ export const SocialLinks = ({
     >
       {profiles.map((profile) => (
         <li key={profile.link.href}>
-          <SocialLink {...profile} variant={variant} />
+          <SocialLink {...profile} variant={variant} isOnDark={isOnDark} />
         </li>
       ))}
     </ul>
