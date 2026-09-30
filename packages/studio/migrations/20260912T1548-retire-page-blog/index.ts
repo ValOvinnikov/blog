@@ -10,7 +10,7 @@
  *   2. Verify at run time, never trusting a prior check against a
  *      now-possibly-moved dataset, that its `page_postIndex` counterpart
  *      exists with a non-empty `modules` array and nothing still references
- *      the `page_blog` id (`assertPageBlogDeletable`, throws to abort the
+ *      the `page_blog` id (`assertCounterpartDeletable`, throws to abort the
  *      whole run otherwise).
  *   3. `del` it.
  *
@@ -33,8 +33,12 @@ import {
   PAGE_BLOG_TO_POST_INDEX_ID_MAP,
   PAGE_BLOG_TYPE,
 } from '../20260912T0709-copy-page-blog-to-page-post-index/ids';
+import { assertCounterpartDeletable } from '../lib/assert-counterpart-deletable';
 
-import { assertPageBlogDeletable } from './precondition';
+const PAGE_POST_INDEX_TYPE = 'page_postIndex';
+
+const hasModules = (modules: unknown): boolean =>
+  Array.isArray(modules) && modules.length > 0;
 
 type TRawDocument = { _id: string; _type: string };
 
@@ -52,7 +56,13 @@ export default defineMigration({
         );
       }
 
-      await assertPageBlogDeletable(context, doc._id, postIndexId);
+      await assertCounterpartDeletable(context, doc._id, postIndexId, {
+        sourceType: PAGE_BLOG_TYPE,
+        counterpartType: PAGE_POST_INDEX_TYPE,
+        counterpartIdParam: 'postIndexId',
+        field: 'modules',
+        hasValue: hasModules,
+      });
 
       const mutations: Mutation[] = [del(doc._id)];
 
