@@ -274,6 +274,16 @@ export const BannerWithBody: TStory = {
   },
 };
 
+export const BannerContentLeftNeutral: TStory = {
+  args: {
+    variant: HERO_VARIANT.BANNER,
+    tone: BRAND_VARIANT.PRIMARY,
+    contentPosition: CONTENT_ALIGNMENT.LEFT,
+    contentAlignment: CONTENT_ALIGNMENT.LEFT,
+    children: bannerContent('Bright mountain sunrise'),
+  },
+};
+
 export const BannerContentCenter: TStory = {
   args: {
     variant: HERO_VARIANT.BANNER,
@@ -284,10 +294,30 @@ export const BannerContentCenter: TStory = {
   },
 };
 
+export const BannerContentCenterAzure: TStory = {
+  args: {
+    variant: HERO_VARIANT.BANNER,
+    tone: BRAND_VARIANT.BRAND_PRIMARY,
+    contentPosition: CONTENT_ALIGNMENT.CENTER,
+    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    children: bannerContent('Bright mountain sunrise'),
+  },
+};
+
 export const BannerContentRight: TStory = {
   args: {
     variant: HERO_VARIANT.BANNER,
     tone: BRAND_VARIANT.SECONDARY,
+    contentPosition: CONTENT_ALIGNMENT.RIGHT,
+    contentAlignment: CONTENT_ALIGNMENT.RIGHT,
+    children: bannerContent('Bright mountain sunrise'),
+  },
+};
+
+export const BannerContentRightAzure: TStory = {
+  args: {
+    variant: HERO_VARIANT.BANNER,
+    tone: BRAND_VARIANT.BRAND_PRIMARY,
     contentPosition: CONTENT_ALIGNMENT.RIGHT,
     contentAlignment: CONTENT_ALIGNMENT.RIGHT,
     children: bannerContent('Bright mountain sunrise'),
