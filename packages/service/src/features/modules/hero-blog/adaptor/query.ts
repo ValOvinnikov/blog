@@ -3,7 +3,8 @@ import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/published-post';
 import { ctaSecondaryButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
-import { heroLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { moduleHeroLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { postCardFragment } from '@blog/service/shared/fragments/post/post';
 
 const newestFeaturedPostQuery = q.star
@@ -45,9 +46,9 @@ export const heroBlogModuleQuery = q
     brandVariant: sub.field('brandVariant').notNull(),
     contentPositionSplit: sub.field('contentPositionSplit').nullable(true),
     contentPositionBanner: sub.field('contentPositionBanner').nullable(true),
-    contentAlignment: sub.field('contentAlignment').nullable(true),
+    ...moduleContentAlignmentFragment,
     mediaOrderSplit: sub.field('mediaOrderSplit').nullable(true),
     mediaOrderStacked: sub.field('mediaOrderStacked').nullable(true),
-    layout: sub.field('layout').project(heroLayoutFragment).nullable(true),
+    ...moduleHeroLayoutFragment,
   }))
   .notNull();
