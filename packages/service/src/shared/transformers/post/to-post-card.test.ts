@@ -45,7 +45,7 @@ describe('toPostCard', () => {
     expect(result.author).toEqual({
       id: 'author-1',
       name: 'Jane Doe',
-      profilePageHref: '/jane-doe',
+      profileUrl: '/jane-doe',
       image: expect.objectContaining({ assetId: 'image-abc123-800x600-jpg' }),
     });
   });
@@ -65,10 +65,10 @@ describe('toPostCard', () => {
     expect(result.author.image).toBeUndefined();
   });
 
-  it('maps a missing profilePage reference to an undefined profilePageHref', () => {
+  it('maps a missing profilePage reference to an undefined profileUrl', () => {
     const result = toPostCard(makeRawPostCard());
 
-    expect(result.author.profilePageHref).toBeUndefined();
+    expect(result.author.profileUrl).toBeUndefined();
   });
 
   it('maps the topic', () => {

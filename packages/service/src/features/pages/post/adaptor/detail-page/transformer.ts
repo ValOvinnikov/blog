@@ -11,23 +11,9 @@ import { toReadingTimeMinutes } from '@blog/utils';
 import type { InferResultType } from 'groqd';
 
 import type { postPageQuery } from './query';
-import type { TPostDetail, TPostDetailAuthor, TPostTakeaways } from './types';
+import type { TPostDetail, TPostTakeaways } from './types';
 
 export type TRawPostDetail = NonNullable<InferResultType<typeof postPageQuery>>;
-
-function toPostDetailAuthor(raw: TRawPostDetail['author']): TPostDetailAuthor {
-  const person = toPersonProfile(raw);
-
-  return {
-    id: person.id,
-    name: person.name,
-    profilePageHref: person.profileUrl,
-    image: person.image,
-    role: person.role,
-    bio: person.bio,
-    socialLinks: person.socialLinks,
-  };
-}
 
 // Mirrors the schema's own `min(3)` takeaways rule — fewer than 3 takeaways
 // is treated the same as none at all, never a partial list.
@@ -62,7 +48,7 @@ export function toPostDetail(raw: TRawPostDetail): TPostDetail {
       (block) => block._type === PORTABLE_TEXT_BLOCK_TYPE.ASIDE,
     ),
     seo: resolveSeo(raw.seo),
-    author: toPostDetailAuthor(raw.author),
+    author: toPersonProfile(raw.author),
     topic: toTopic(raw.topic),
     tags: (raw.tags ?? []).map(toTag),
     modules: (raw.modules ?? []).map(toModule),
