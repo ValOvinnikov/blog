@@ -3,6 +3,7 @@ import {
   renderWithIntl,
   screen,
   waitFor,
+  within,
 } from '@platform/testing/custom-render';
 
 import { PortableTextEditor } from './portable-text-editor';
@@ -53,6 +54,71 @@ const listBody: TEmailTemplateBlock[] = [
     listItem: 'number',
     level: 1,
     children: [{ _type: 'span', _key: 'os2', text: 'Number two', marks: [] }],
+  },
+];
+
+const fourItemBulletBody: TEmailTemplateBlock[] = ['a', 'b', 'c', 'd'].map(
+  (letter, index) => ({
+    _type: 'block',
+    _key: `run-${letter}`,
+    style: 'normal',
+    listItem: 'bullet',
+    level: 1,
+    children: [
+      {
+        _type: 'span',
+        _key: `run-${letter}-span`,
+        text: `Item ${index + 1}`,
+        marks: [],
+      },
+    ],
+  }),
+);
+
+const numberedListWithNestedBulletBody: TEmailTemplateBlock[] = [
+  {
+    _type: 'block',
+    _key: 'n1',
+    style: 'normal',
+    listItem: 'number',
+    level: 1,
+    children: [{ _type: 'span', _key: 'n1s', text: 'Outer one', marks: [] }],
+  },
+  {
+    _type: 'block',
+    _key: 'n2',
+    style: 'normal',
+    listItem: 'number',
+    level: 1,
+    children: [{ _type: 'span', _key: 'n2s', text: 'Outer two', marks: [] }],
+  },
+  {
+    _type: 'block',
+    _key: 'nested1',
+    style: 'normal',
+    listItem: 'bullet',
+    level: 2,
+    children: [
+      { _type: 'span', _key: 'nested1s', text: 'Nested one', marks: [] },
+    ],
+  },
+  {
+    _type: 'block',
+    _key: 'nested2',
+    style: 'normal',
+    listItem: 'bullet',
+    level: 2,
+    children: [
+      { _type: 'span', _key: 'nested2s', text: 'Nested two', marks: [] },
+    ],
+  },
+  {
+    _type: 'block',
+    _key: 'n3',
+    style: 'normal',
+    listItem: 'number',
+    level: 1,
+    children: [{ _type: 'span', _key: 'n3s', text: 'Outer three', marks: [] }],
   },
 ];
 
@@ -188,5 +254,59 @@ describe(PortableTextEditor, () => {
     expect(screen.getByText('Bullet two')).toBeVisible();
     expect(screen.getByText('Number one')).toBeVisible();
     expect(screen.getByText('Number two')).toBeVisible();
+  });
+
+  it('conveys the true set size and position of a four-item list despite the one-list-per-item DOM', async () => {
+    render(
+      <PortableTextEditor
+        initialValue={fourItemBulletBody}
+        onChange={() => {}}
+        ariaLabel="Body"
+      />,
+    );
+
+    const items = await waitFor(() => {
+      const found = screen.getAllByRole('listitem');
+      expect(found).toHaveLength(4);
+      return found;
+    });
+
+    items.forEach((item, index) => {
+      expect(item).toHaveAttribute('aria-setsize', '4');
+      expect(item).toHaveAttribute('aria-posinset', String(index + 1));
+    });
+  });
+
+  it("continues an outer numbered list's position past a nested sub-list instead of restarting it", async () => {
+    render(
+      <PortableTextEditor
+        initialValue={numberedListWithNestedBulletBody}
+        onChange={() => {}}
+        ariaLabel="Body"
+      />,
+    );
+
+    const items = await waitFor(() => {
+      const found = screen.getAllByRole('listitem');
+      expect(found).toHaveLength(5);
+      return found;
+    });
+
+    const outerThirdItem = items.find((item) =>
+      within(item).queryByText('Outer three'),
+    );
+    const nestedFirstItem = items.find((item) =>
+      within(item).queryByText('Nested one'),
+    );
+    const nestedSecondItem = items.find((item) =>
+      within(item).queryByText('Nested two'),
+    );
+
+    expect(outerThirdItem).toHaveAttribute('aria-posinset', '3');
+    expect(outerThirdItem).toHaveAttribute('aria-setsize', '3');
+    expect(nestedFirstItem).toHaveAttribute('aria-posinset', '1');
+    expect(nestedFirstItem).toHaveAttribute('aria-setsize', '2');
+    expect(nestedSecondItem).toHaveAttribute('aria-posinset', '2');
+    expect(nestedSecondItem).toHaveAttribute('aria-setsize', '2');
   });
 });
