@@ -183,7 +183,7 @@ describe(`<${PostArticle.name}/>`, () => {
         ...mockPostDetail,
         author: {
           ...mockPostDetail.author,
-          profilePageHref: '/blog/tag/writers',
+          profileUrl: '/blog/tag/writers',
         },
       },
     });
