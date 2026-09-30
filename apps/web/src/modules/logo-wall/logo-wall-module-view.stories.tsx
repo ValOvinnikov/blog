@@ -1,6 +1,7 @@
 import { BRAND_VARIANT, CONTENT_ALIGNMENT, DISPLAY_MODE } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
+import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeLogoItem } from '@web/testing/modules/logo-wall/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
@@ -38,6 +39,20 @@ const overflowingLogos = [
   makeLogoItem({ id: 'logo-11', name: 'Harborlight Group' }),
   makeLogoItem({ id: 'logo-12', name: 'Fernbridge Co' }),
 ];
+
+const logosWithDarkLogo = logos.map((logo, index) =>
+  index % 2 === 0
+    ? {
+        ...logo,
+        imageDark: makeSanityImage({
+          assetId:
+            'image-9b1d3f0c2e7a4b5c8d6e1f2a3b4c5d6e7f8a9b0c-1800x400-png',
+          alt: logo.name,
+          dimensions: { width: 1800, height: 400, aspectRatio: 1800 / 400 },
+        }),
+      }
+    : logo,
+);
 
 const meta = {
   title: 'Modules/LogoWallModule',
@@ -113,4 +128,24 @@ export const SingleLogo: TStory = {
 
 export const PartialTrailingRow: TStory = {
   args: { logos: manyLogos },
+};
+
+export const WithDarkLogos: TStory = {
+  args: { logos: logosWithDarkLogo },
+};
+
+export const WithDarkLogosInDarkMode: TStory = {
+  args: { logos: logosWithDarkLogo },
+  decorators: [
+    (Story) => (
+      <div className="dark bg-primary">
+        <Story />
+      </div>
+    ),
+  ],
+};
+
+export const CarouselWithDarkLogosInDarkMode: TStory = {
+  args: { displayMode: DISPLAY_MODE.CAROUSEL, logos: logosWithDarkLogo },
+  decorators: WithDarkLogosInDarkMode.decorators,
 };
