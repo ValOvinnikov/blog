@@ -1075,11 +1075,11 @@ The answer is consequently modelled twice on purpose — rich text
 structured data — because Portable Text is not a string and `FAQPage` wants one.
 
 **A team is a list of references to `person`, and nothing about a person is
-overridden per module.** `module_team` ("Team") references 2 to 12 `person`
-documents in authored order, validated `required()`, `min(2)`, `max(12)` and
+overridden per module.** `module_team` ("Team") references 1 to 12 `person`
+documents in authored order, validated `required()`, `min(1)`, `max(12)` and
 `unique()` as separate rule chains for the same reason `module_testimonial`'s
-are. The `min(2)` message sends a one-person team to `module_heroProfile`,
-which is what a single person already has. A person is edited once and carries
+are. A one-person team is allowed so a single person can be introduced
+mid-page, where `module_heroProfile` cannot sit. A person is edited once and carries
 the same photo, role, links and bio wherever they appear — as a post's author,
 as the profile hero's subject, and as a team member — so the module has **no
 per-member override fields at all**: the order belongs to the module, the

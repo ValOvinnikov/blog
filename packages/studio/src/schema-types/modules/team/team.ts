@@ -31,7 +31,7 @@ export const teamSchema = defineType({
       title: 'Members',
       type: 'array',
       description:
-        'The people on this team, in the order they should appear. Each is a Person, edited under People.',
+        'The people on this team, in the order they should appear. Each is a Person, edited under People. One person renders as a single spotlight; two or more as cards.',
       of: [
         defineArrayMember({
           type: 'reference',
@@ -39,12 +39,8 @@ export const teamSchema = defineType({
         }),
       ],
       validation: (rule) => [
-        rule.required().error('Add at least two people.'),
-        rule
-          .min(2)
-          .error(
-            'A team needs at least two people. For one person, use a Profile Hero.',
-          ),
+        rule.required().error('Add at least one person.'),
+        rule.min(1).error('Add at least one person.'),
         rule.max(12).error('A team holds at most twelve people.'),
         rule.unique(),
       ],
