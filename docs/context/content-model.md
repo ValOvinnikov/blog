@@ -232,6 +232,21 @@ A grid or carousel of feature cards.
 - **Actions** — `ctaButtons`, 0–2.
 - **Pages** — home, landing.
 
+#### `module_team` — people
+
+- **Items** — `members`: 1–12 references to `person` **documents**, in authored
+  order and `unique()`. Nothing about a person is overridden per module.
+- **Variants** — `imageShape` required: `CIRCLE` (default) · `SQUARE`, with the
+  initials fallback taking the same shape. `displayMode`: `GRID` (default) ·
+  `CAROUSEL`. `cardAlignment`: `CENTER` (default) · `LEFT`. `showBios` (off) and
+  `showSocialLinks` (on) are applied by the loader, not the view.
+- **One person renders as a spotlight** — a larger photo beside the name, role,
+  bio and social links from `lg`, stacked below it, ignoring `displayMode` and
+  `cardAlignment`. It is not a second profile hero: no eyebrow, no heading slot
+  of its own; the module heading and actions still apply.
+- **Actions** — `ctaButtons`, 0–2.
+- **Pages** — home, landing.
+
 #### `module_logoWall` — logo social proof
 
 - **Items** — `logos`: 1–12 **inline `logoItem` objects**, not references. Logos

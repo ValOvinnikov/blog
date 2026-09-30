@@ -204,3 +204,27 @@ export const SixMembers: TStory = {
     ],
   },
 };
+
+export const Spotlight: TStory = {
+  args: {
+    showBios: true,
+    showSocialLinks: true,
+    members: [
+      makeTeamMember({
+        name: 'Marco Duarte',
+        role: 'Founder',
+        image: makeSanityImage(),
+        bio,
+        socialLinks,
+      }),
+    ],
+  },
+};
+
+export const SpotlightSquareInitials: TStory = {
+  args: {
+    imageShape: CARD_IMAGE_SHAPE.SQUARE,
+    displayMode: DISPLAY_MODE.CAROUSEL,
+    members: [makeTeamMember()],
+  },
+};

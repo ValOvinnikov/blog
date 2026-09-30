@@ -101,6 +101,28 @@ describe(`<${TeamModuleView.name}/>`, () => {
     },
   );
 
+  it.each([DISPLAY_MODE.GRID, DISPLAY_MODE.CAROUSEL])(
+    'renders a single member as a spotlight in %s display mode',
+    (displayMode) => {
+      setup({ members: [makeTeamMember()], displayMode });
+
+      expect(screen.getByTestId(`${dataTestId}-spotlight`)).toBeVisible();
+      expect(
+        screen.getByRole('heading', { level: 3, name: 'Jordan Reyes' }),
+      ).toBeVisible();
+      expect(TeamCarousel).not.toHaveBeenCalled();
+      expect(CardGrid).not.toHaveBeenCalled();
+    },
+  );
+
+  it('renders two or more members without a spotlight', () => {
+    setup();
+
+    expect(
+      screen.queryByTestId(`${dataTestId}-spotlight`),
+    ).not.toBeInTheDocument();
+  });
+
   it('renders no action group when there are no cta buttons', () => {
     setup();
 

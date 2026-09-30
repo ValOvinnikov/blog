@@ -6,6 +6,7 @@ import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';
 import { TeamCarousel } from '@web/modules/team/components/team-carousel/team-carousel';
 import { TeamMemberCard } from '@web/modules/team/components/team-member-card/team-member-card';
+import { TeamSpotlight } from '@web/modules/team/components/team-spotlight/team-spotlight';
 import { moduleGridActionsVariants } from '@web/utils/module-grid-actions-variants';
 import {
   CAROUSEL_IMAGE_SIZES,
@@ -32,6 +33,8 @@ export const TeamModuleView = ({
   titleId,
   dataTestId,
 }: ITeamModuleViewProps) => {
+  const [spotlightMember] = members;
+  const isSpotlight = members.length === 1;
   const cardAlign =
     cardAlignment === CONTENT_ALIGNMENT.CENTER ? 'center' : 'left';
   const baseColumns = toModuleGridColumns(members.length);
@@ -52,7 +55,13 @@ export const TeamModuleView = ({
         align={contentAlignment}
         variant="section"
       />
-      {displayMode === DISPLAY_MODE.CAROUSEL ? (
+      {isSpotlight && spotlightMember ? (
+        <TeamSpotlight
+          member={spotlightMember}
+          imageShape={imageShape}
+          dataTestId={`${dataTestId}-spotlight`}
+        />
+      ) : displayMode === DISPLAY_MODE.CAROUSEL ? (
         <TeamCarousel
           members={members}
           imageShape={imageShape}
