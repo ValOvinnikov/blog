@@ -214,6 +214,13 @@ export const StackedDefault: TStory = {
   },
 };
 
+export const StackedContentAlignmentLeft: TStory = {
+  args: {
+    variant: HERO_VARIANT.STACKED,
+    contentAlignment: CONTENT_ALIGNMENT.LEFT,
+  },
+};
+
 export const StackedContentAlignmentRight: TStory = {
   args: {
     variant: HERO_VARIANT.STACKED,
@@ -354,6 +361,14 @@ export const BannerHeadingOnly: TStory = {
 export const StackedAtLg: TStory = {
   args: {
     variant: HERO_VARIANT.STACKED,
+  },
+  globals: { viewport: 'desktop' },
+};
+
+export const StackedMediaFirstAtLg: TStory = {
+  args: {
+    variant: HERO_VARIANT.STACKED,
+    mediaOrder: MEDIA_ORDER.FIRST,
   },
   globals: { viewport: 'desktop' },
 };
