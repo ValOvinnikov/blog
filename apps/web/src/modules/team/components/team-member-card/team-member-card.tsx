@@ -7,14 +7,15 @@ import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { SocialLinks } from '@web/components/shared/social-links';
 import { stretchedLinkVariants } from '@web/components/shared/stretched-link';
+import {
+  CIRCLE_IMAGE_SIZE,
+  SQUARE_IMAGE_SIZE,
+} from '@web/utils/media-card-image-size';
 
 import {
   teamMemberCardAvatarFallbackVariants,
   teamMemberCardVariants,
 } from './team-member-card-variants';
-
-const CIRCLE_IMAGE_SIZE = 224;
-const SQUARE_IMAGE_SIZE = 640;
 
 export interface ITeamMemberCardProps extends IWithDataTestId {
   member: TTeamMember;

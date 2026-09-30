@@ -7,17 +7,11 @@ import { Section } from '@web/components/shared/section';
 import { TeamCarousel } from '@web/modules/team/components/team-carousel/team-carousel';
 import { TeamMemberCard } from '@web/modules/team/components/team-member-card/team-member-card';
 import { moduleGridActionsVariants } from '@web/utils/module-grid-actions-variants';
+import {
+  CAROUSEL_IMAGE_SIZES,
+  GRID_IMAGE_SIZES,
+} from '@web/utils/module-image-sizes';
 import { toModuleGridColumns } from '@web/utils/to-module-grid-columns';
-
-const GRID_IMAGE_SIZES: Record<1 | 2 | 3 | 4, string> = {
-  1: '100vw',
-  2: '(min-width: 640px) 50vw, 100vw',
-  3: '(min-width: 768px) 33vw, (min-width: 640px) 50vw, 100vw',
-  4: '(min-width: 1024px) 25vw, (min-width: 768px) 33vw, (min-width: 640px) 50vw, 100vw',
-};
-
-const CAROUSEL_IMAGE_SIZES =
-  '(min-width: 768px) 33vw, (min-width: 640px) 50vw, 85vw';
 
 export interface ITeamModuleViewProps extends TTeamModule {
   titleId: string;
