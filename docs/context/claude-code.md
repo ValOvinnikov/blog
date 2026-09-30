@@ -327,6 +327,10 @@ file` are all denied alike) — an earlier version only handled the
   - `pre-bash-worktree-install-guard.sh` — `PreToolUse` hook that blocks
     dependency-mutating pnpm commands inside a shared-deps agent worktree
     (see below) before pnpm can write anything.
+  - `pre-bash-branch-name-guard.sh` — `PreToolUse` hook that refuses
+    `git push` of a session's generated `claude/<words>-<id>` branch and
+    prints the rename command. `claude/issue-<n>-…` passes. Without an
+    issue number in the name, `board-auto-sync.yml` cannot move the ticket.
   - `gate-bypass-guard.sh` — `PreToolUse` hook, wired **globally** in
     `.claude/settings.json` (every agent's `Bash` calls, not one agent's —
     bypass commands could come from any context, including the
