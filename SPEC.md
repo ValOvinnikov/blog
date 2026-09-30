@@ -1096,6 +1096,14 @@ only to cap its columns; `showSocialLinks` is not read there at all. `imageShape
 that same shape through `Avatar`'s `shape` variant, added for this module so a
 photoless member is not a circle among squares.
 
+**One member renders as a spotlight rather than a one-card grid**, as a single
+testimonial does. `TeamSpotlight` composes `Avatar`, `Heading`, `MediaFrame`,
+`Prose` and `Text` in `apps/web` — there is no `@blog/ui` spotlight component —
+and puts a larger photo beside the text from `lg`, stacked below it. It ignores
+`displayMode` and `cardAlignment`, and carries none of the profile hero's
+eyebrow, heading slot or banner variant: the module heading and actions apply
+unchanged.
+
 `service.modules.<type>.v1` projects `brandVariant` as a required
 `TBrandVariantOf<...>` (narrowed per module to exactly the options its
 schema allows), `layout` as `TLayout | undefined`, and (where applicable)
