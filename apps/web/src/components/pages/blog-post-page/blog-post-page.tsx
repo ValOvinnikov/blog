@@ -42,22 +42,28 @@ export const BlogPostPage = async ({
       <PostBreadcrumbs slug={slug} tenant={tenant} />
 
       <main className={s.root()}>
-        <DepthProvider hasSkim={hasSkim} hasDeep={hasAsides}>
-          <DepthToggle
-            hasSkim={hasSkim}
-            hasDeep={hasAsides}
-            className={s.depthToggle()}
-          />
-          <PostArticle slug={slug} tenant={tenant} />
-          <SkimPanel takeaways={postTakeaways} />
-        </DepthProvider>
+        <div className={s.article()}>
+          <DepthProvider hasSkim={hasSkim} hasDeep={hasAsides}>
+            <DepthToggle
+              hasSkim={hasSkim}
+              hasDeep={hasAsides}
+              className={s.depthToggle()}
+            />
+            <PostArticle slug={slug} tenant={tenant} />
+            <SkimPanel takeaways={postTakeaways} />
+          </DepthProvider>
+        </div>
 
-        <BlogPostModuleRenderer
-          modules={modules}
-          locale={locale}
-          tenant={tenant}
-          context={{ post: { id } }}
-        />
+        {modules.length > 0 && (
+          <div className={s.modules()}>
+            <BlogPostModuleRenderer
+              modules={modules}
+              locale={locale}
+              tenant={tenant}
+              context={{ post: { id } }}
+            />
+          </div>
+        )}
       </main>
 
       <BackToTopButton />

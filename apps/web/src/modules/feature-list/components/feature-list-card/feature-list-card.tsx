@@ -12,6 +12,8 @@ import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { stretchedLinkVariants } from '@web/components/shared/stretched-link';
 
+import { featureListCardVariants } from './feature-list-card-variants';
+
 const CARD_IMAGE_SHAPE_TO_MEDIA_SHAPE: Record<
   TCardImageShape,
   'wide' | 'square' | 'circle'
@@ -34,6 +36,7 @@ export interface IFeatureListCardProps extends IWithDataTestId {
   align: 'left' | 'center';
   imageSizes: string;
   headingLevel: THeadingLevel;
+  hasAnyImage?: boolean;
 }
 
 export const FeatureListCard = ({
@@ -42,12 +45,15 @@ export const FeatureListCard = ({
   align,
   imageSizes,
   headingLevel,
+  hasAnyImage,
   dataTestId,
 }: IFeatureListCardProps) => {
   const { heading, supportingText } = item.headingBlock;
-  const mediaShape = item.sanityImage
-    ? CARD_IMAGE_SHAPE_TO_MEDIA_SHAPE[imageShape]
-    : 'icon';
+  const mediaShape =
+    item.sanityImage || hasAnyImage
+      ? CARD_IMAGE_SHAPE_TO_MEDIA_SHAPE[imageShape]
+      : 'icon';
+  const { iconPanel } = featureListCardVariants();
 
   return (
     <MediaCard
@@ -79,13 +85,22 @@ export const FeatureListCard = ({
             className="size-full object-cover"
           />
         ) : (
-          item.icon && (
+          item.icon &&
+          (mediaShape === 'icon' ? (
             <Icon
               name={item.icon}
               size={SIZE.LG}
               dataTestId="feature-card-icon"
             />
-          )
+          ) : (
+            <div className={iconPanel()} data-testid="feature-card-icon-panel">
+              <Icon
+                name={item.icon}
+                size={SIZE.LG}
+                dataTestId="feature-card-icon"
+              />
+            </div>
+          ))
         )}
       </MediaCard.Media>
       <MediaCard.Title level={headingLevel}>

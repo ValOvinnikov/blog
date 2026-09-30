@@ -43,6 +43,7 @@ export const PostRelatedModuleView = ({
         id={titleId}
         level={2}
         align={contentAlignment}
+        variant="section"
       />
       <CardGrid className={s.grid()}>
         {items.map((item) => (

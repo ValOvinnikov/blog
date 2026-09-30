@@ -20,6 +20,7 @@ export interface IFeatureListCarouselProps
   title: string;
   tone?: TBrandVariant;
   contentAlignment?: ICarouselProps<TFeatureListItem>['contentAlignment'];
+  hasAnyImage?: boolean;
 }
 
 export const FeatureListCarousel = ({
@@ -30,6 +31,7 @@ export const FeatureListCarousel = ({
   title,
   tone,
   contentAlignment,
+  hasAnyImage,
   className,
   dataTestId,
 }: IFeatureListCarouselProps) => (
@@ -42,6 +44,7 @@ export const FeatureListCarousel = ({
         align={align}
         imageSizes={imageSizes}
         headingLevel={3}
+        hasAnyImage={hasAnyImage}
       />
     )}
     getItemKey={({ item }) => item.id}

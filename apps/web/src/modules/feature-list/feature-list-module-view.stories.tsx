@@ -125,6 +125,15 @@ export const CircleImages: TStory = {
   },
 };
 
+/** One card has an image, so the icon-only cards render their icon in the same size panel and every heading starts on the same line. */
+export const MixedImagesAndIcons: TStory = {
+  args: {
+    items: items.map((item, index) =>
+      index === 0 ? { ...item, sanityImage: makeSanityImage() } : item,
+    ),
+  },
+};
+
 export const Carousel: TStory = {
   args: {
     displayMode: DISPLAY_MODE.CAROUSEL,
