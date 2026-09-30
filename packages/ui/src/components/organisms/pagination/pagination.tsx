@@ -1,6 +1,9 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import {
+  A_AS_CONST,
+  type IWithClassName,
+  type IWithDataTestId,
+} from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
-import { resolveComponent } from '@blog/ui/lib/react';
 
 import { paginationVariants } from './pagination-variants';
 
@@ -72,7 +75,7 @@ export const Pagination = ({
 }: TPaginationProps) => {
   if (totalPages <= 1) return null;
 
-  const Component = resolveComponent(linkAs, 'a');
+  const Component = linkAs ?? A_AS_CONST;
   const items = getPaginationItems(currentPage, totalPages);
 
   return (
@@ -82,7 +85,6 @@ export const Pagination = ({
       data-testid={dataTestId}
     >
       {currentPage > 1 && (
-        // eslint-disable-next-line react-hooks/static-components -- resolveComponent returns `linkAs`/fallback verbatim, so the reference stays stable across renders
         <Component href={createHref(currentPage - 1)} className={s.link()}>
           {previousLabel}
         </Component>
@@ -107,7 +109,6 @@ export const Pagination = ({
         )}
       </ul>
       {currentPage < totalPages && (
-        // eslint-disable-next-line react-hooks/static-components -- resolveComponent returns `linkAs`/fallback verbatim, so the reference stays stable across renders
         <Component href={createHref(currentPage + 1)} className={s.link()}>
           {nextLabel}
         </Component>

@@ -1,8 +1,12 @@
-import { type IWithClassName, type IWithDataTestId, SIZE } from '@blog/config';
+import {
+  A_AS_CONST,
+  type IWithClassName,
+  type IWithDataTestId,
+  SIZE,
+} from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
 import { Avatar } from '@blog/ui/components/atoms/avatar';
 import { MetaSeparator } from '@blog/ui/components/atoms/meta-separator';
-import { resolveComponent } from '@blog/ui/lib/react';
 import { type ReactNode } from 'react';
 
 import { postMetaVariants } from './post-meta-variants';
@@ -34,7 +38,7 @@ export const PostMeta = ({
   className,
   dataTestId,
 }: TPostMetaProps) => {
-  const LinkComponent = resolveComponent(linkAs, 'a');
+  const LinkComponent = linkAs ?? A_AS_CONST;
 
   return (
     <div className={s.root({ class: className })} data-testid={dataTestId}>
@@ -46,7 +50,6 @@ export const PostMeta = ({
           size={SIZE.SM}
         />
         {author.href ? (
-          // eslint-disable-next-line react-hooks/static-components -- resolveComponent returns `linkAs`/fallback verbatim, so the reference stays stable across renders
           <LinkComponent href={author.href} className={s.authorName()}>
             {author.name}
           </LinkComponent>

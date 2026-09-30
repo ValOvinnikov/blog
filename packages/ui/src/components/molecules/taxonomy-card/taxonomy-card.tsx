@@ -1,9 +1,12 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import {
+  A_AS_CONST,
+  type IWithClassName,
+  type IWithDataTestId,
+} from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
 import { Heading } from '@blog/ui/components/atoms/heading';
 import {
   mapCompoundSlots,
-  resolveComponent,
   type TCompoundChildren,
   type TCompoundComponent,
   type THeadingLevel,
@@ -44,7 +47,7 @@ const TaxonomyCardRoot = ({
   className,
   dataTestId,
 }: TTaxonomyCardProps) => {
-  const LinkComponent = resolveComponent(linkAs, 'a');
+  const LinkComponent = linkAs ?? A_AS_CONST;
   const { slots, unmatched } = mapCompoundSlots(children, TaxonomyCardParts);
   const posts = slots.Posts
     ? cloneElement(slots.Posts, {
@@ -55,7 +58,6 @@ const TaxonomyCardRoot = ({
   return (
     <article className={s.root({ class: className })} data-testid={dataTestId}>
       <Heading level={headingLevel} visual="card">
-        {/* eslint-disable-next-line react-hooks/static-components -- resolveComponent returns `linkAs`/fallback verbatim, so the reference stays stable across renders */}
         <LinkComponent href={href} className={s.link()}>
           <span aria-hidden="true">{title}</span>
           <span className={s.accessibleName()}>
