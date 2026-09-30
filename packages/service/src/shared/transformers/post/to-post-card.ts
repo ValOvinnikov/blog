@@ -2,18 +2,16 @@ import type { ISanityImage, TMaybeUndefined } from '@blog/config';
 import type { postCardFragment } from '@blog/service/shared/fragments/post/post';
 import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
 import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image';
-import { toLinkDocument } from '@blog/service/shared/transformers/link/to-link-document';
+import {
+  toPersonCard,
+  type TPersonCard,
+} from '@blog/service/shared/transformers/person/to-person-card';
 import { toReadingTimeMinutes } from '@blog/utils';
 import type { InferFragmentType } from 'groqd';
 
 export type TRawPostCard = InferFragmentType<typeof postCardFragment>;
 
-export type TPostCardAuthor = {
-  id: string;
-  name: string;
-  profileUrl: TMaybeUndefined<string>;
-  image: TMaybeUndefined<ISanityImage>;
-};
+export type TPostCardAuthor = TPersonCard;
 
 export type TPostCardTopic = {
   id: string;
@@ -33,15 +31,6 @@ export type TPostCard = {
   topic: TPostCardTopic;
   readingTimeMinutes: number;
 };
-
-function toPostCardAuthor(raw: TRawPostCard['author']): TPostCardAuthor {
-  return {
-    id: raw._id,
-    name: raw.name,
-    profileUrl: toLinkDocument(raw.profilePage)?.href,
-    image: toSanityImage(raw.image),
-  };
-}
 
 function toPostCardTopic(raw: TRawPostCard['topic']): TPostCardTopic {
   return {
@@ -64,7 +53,7 @@ export function toPostCard(raw: TRawPostCard): TPostCard {
     publishedAt: raw.publishedAt,
     heroImage: toSanityImage(raw.heroImage),
     featured: raw.featured ?? false,
-    author: toPostCardAuthor(raw.author),
+    author: toPersonCard(raw.author),
     topic: toPostCardTopic(raw.topic),
     readingTimeMinutes: toReadingTimeMinutes(raw.wordCount),
   };
