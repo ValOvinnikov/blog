@@ -28,6 +28,13 @@ export const logoItemSchema = defineType({
         rule.custom(validateImageHasAsset('Upload the logo.')),
     }),
     defineField({
+      name: 'imageDark',
+      title: 'Logo for dark backgrounds',
+      type: 'image',
+      description:
+        'Optional. Shown instead of the logo in dark mode — add one when the logo would disappear on a dark tile, e.g. a black or dark wordmark.',
+    }),
+    defineField({
       name: 'link',
       title: 'Link',
       type: 'reference',
