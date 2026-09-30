@@ -21,7 +21,7 @@ function toPostDetailAuthor(raw: TRawPostDetail['author']): TPostDetailAuthor {
   return {
     id: person.id,
     name: person.name,
-    profilePageHref: person.profileUrl,
+    profileUrl: person.profileUrl,
     image: person.image,
     role: person.role,
     bio: person.bio,

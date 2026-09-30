@@ -15,7 +15,7 @@ import type { TTopic } from '@blog/service/shared/transformers/topic/to-topic';
 export type TPostDetailAuthor = {
   id: string;
   name: string;
-  profilePageHref: TMaybeUndefined<string>;
+  profileUrl: TMaybeUndefined<string>;
   image: TMaybeUndefined<ISanityImage>;
   role: TMaybeUndefined<string>;
   bio: TMaybeUndefined<TPortableTextBlock[]>;
