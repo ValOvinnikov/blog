@@ -13,12 +13,7 @@ type TPreconditionResult = {
   refCount: number;
 };
 
-/**
- * Verifies a source document is safe to delete: its replacement counterpart
- * exists with `field` set, and nothing in the dataset still references the
- * source. Throws rather than returning a boolean — a precondition failure
- * aborts the whole migration run instead of silently skipping the document.
- */
+// Throws rather than returning a boolean — a failure here aborts the whole migration run, not just the current document.
 export const assertCounterpartDeletable = async (
   context: MigrationContext,
   sourceId: string,
