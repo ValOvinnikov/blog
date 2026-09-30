@@ -1128,11 +1128,14 @@ how `CtaModule` uses the space `Section` gives it.
 its image is a full-bleed background, so the copy needs a floor under it.
 `Hero` takes an optional `tone` that **only `BANNER` reads** — it renders an
 `aria-hidden` gradient scrim between the image (`-z-20`) and the copy
-(`-z-10`), picking `AZURE_SCRIM` on `BRAND_PRIMARY` and `NEUTRAL_SCRIM`
-otherwise, and switches the copy to on-image colours. `SPLIT` and `STACKED`
-ignore `tone` entirely. The two gradients live in
-`packages/ui/src/lib/styling/scrims.ts` so the two organisms cannot drift
-apart. `tone` **defaults to `PRIMARY` at the variant level** rather than
+(`-z-10`), picking the azure or neutral scrim by `tone` (`AZURE_SCRIM_*` on
+`BRAND_PRIMARY`, `NEUTRAL_SCRIM_*` otherwise) and by `position`
+(`_LEFT`/`_CENTER`/`_RIGHT`) — the gradient's strongest stop always sits
+under wherever the Banner's copy renders, so on-image text stays legible
+whichever side it's on — and switches the copy to on-image colours. `SPLIT`
+and `STACKED` ignore `tone` entirely. The six gradients live in
+`packages/ui/src/lib/styling/scrims.ts` so `Hero` and `CtaModule` cannot
+drift apart. `tone` **defaults to `PRIMARY` at the variant level** rather than
 being left unset, so a Banner is never scrim-less: the on-image copy colours
 apply on `BANNER` unconditionally, and white copy over an unscrimmed
 photograph is less legible than no treatment at all. Each hero view passes
