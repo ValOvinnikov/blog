@@ -700,6 +700,13 @@ export type LogoItem = {
     crop?: SanityImageCrop;
     _type: 'image';
   };
+  imageDark?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: 'image';
+  };
   link?: LinkReference;
 };
 
