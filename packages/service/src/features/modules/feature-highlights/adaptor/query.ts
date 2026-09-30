@@ -1,11 +1,10 @@
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
-import {
-  ctaButtonFragment,
-  ctaSecondaryButtonFragment,
-} from '@blog/service/shared/fragments/cta/cta-button';
+import { ctaSecondaryButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
+import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
-import { wideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { listedTextBlockFragment } from '@blog/service/shared/fragments/portable-text/listed-text-block';
 
 export const featureHighlightsModuleQuery = q
@@ -38,12 +37,9 @@ export const featureHighlightsModuleQuery = q
           .nullable(true),
       }))
       .notNull(),
-    ctaButtons: sub
-      .field('ctaButtons[]')
-      .project(ctaButtonFragment)
-      .nullable(true),
+    ...ctaButtonsFragment,
     mediaOrder: sub.field('mediaOrder').notNull(),
-    contentAlignment: sub.field('contentAlignment').nullable(true),
-    layout: sub.field('layout').project(wideLayoutFragment).nullable(true),
+    ...moduleContentAlignmentFragment,
+    ...moduleWideLayoutFragment,
   }))
   .notNull();

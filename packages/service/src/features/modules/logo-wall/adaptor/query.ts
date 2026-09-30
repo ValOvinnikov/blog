@@ -3,11 +3,12 @@ import {
   DISPLAY_MODE_EXPRESSION,
   displayModeParser,
 } from '@blog/service/shared/expressions/display-mode';
-import { ctaButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
+import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
 import { sanityImageAssetFragment } from '@blog/service/shared/fragments/image/image';
-import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { moduleLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document';
+import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 
 export const logoWallModuleQuery = q
   .parameters<TModuleQueryParams>()
@@ -44,12 +45,9 @@ export const logoWallModuleQuery = q
           .nullable(true),
       }))
       .notNull(),
-    ctaButtons: sub
-      .field('ctaButtons[]')
-      .project(ctaButtonFragment)
-      .nullable(true),
+    ...ctaButtonsFragment,
     displayMode: sub.raw(DISPLAY_MODE_EXPRESSION, displayModeParser),
-    contentAlignment: sub.field('contentAlignment').nullable(true),
-    layout: sub.field('layout').project(layoutFragment).nullable(true),
+    ...moduleContentAlignmentLeftCenterFragment,
+    ...moduleLayoutFragment,
   }))
   .notNull();

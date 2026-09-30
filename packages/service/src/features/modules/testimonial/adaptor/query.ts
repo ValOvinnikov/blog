@@ -3,11 +3,12 @@ import {
   DISPLAY_MODE_EXPRESSION,
   displayModeParser,
 } from '@blog/service/shared/expressions/display-mode';
-import { ctaButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
+import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
-import { wideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document';
+import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { listedTextBlockFragment } from '@blog/service/shared/fragments/portable-text/listed-text-block';
 
 export const testimonialModuleQuery = q
@@ -43,13 +44,10 @@ export const testimonialModuleQuery = q
           .nullable(true),
       }))
       .notNull(),
-    ctaButtons: sub
-      .field('ctaButtons[]')
-      .project(ctaButtonFragment)
-      .nullable(true),
+    ...ctaButtonsFragment,
     displayMode: sub.raw(DISPLAY_MODE_EXPRESSION, displayModeParser),
     cardAlignment: sub.field('cardAlignment').nullable(true),
-    contentAlignment: sub.field('contentAlignment').nullable(true),
-    layout: sub.field('layout').project(wideLayoutFragment).nullable(true),
+    ...moduleContentAlignmentFragment,
+    ...moduleWideLayoutFragment,
   }))
   .notNull();

@@ -1,8 +1,9 @@
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
-import { ctaButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
+import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
-import { heroLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { moduleHeroLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 
 export const heroStatementModuleQuery = q
   .parameters<TModuleQueryParams>()
@@ -18,15 +19,12 @@ export const heroStatementModuleQuery = q
       .project(headingBlockFragment)
       .notNull(),
     image: sub.field('image').project(sanityImageFragment).nullable(true),
-    ctaButtons: sub
-      .field('ctaButtons[]')
-      .project(ctaButtonFragment)
-      .nullable(true),
+    ...ctaButtonsFragment,
     contentPositionSplit: sub.field('contentPositionSplit').nullable(true),
     contentPositionBanner: sub.field('contentPositionBanner').nullable(true),
-    contentAlignment: sub.field('contentAlignment').nullable(true),
+    ...moduleContentAlignmentFragment,
     mediaOrderSplit: sub.field('mediaOrderSplit').nullable(true),
     mediaOrderStacked: sub.field('mediaOrderStacked').nullable(true),
-    layout: sub.field('layout').project(heroLayoutFragment).nullable(true),
+    ...moduleHeroLayoutFragment,
   }))
   .notNull();
