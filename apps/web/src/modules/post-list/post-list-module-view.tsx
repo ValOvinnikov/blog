@@ -8,6 +8,7 @@ import {
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';
 import { SmartLink } from '@web/components/shared/smart-link';
+import { moduleGridActionsVariants } from '@web/utils/module-grid-actions-variants';
 
 import { postListModuleViewVariants } from './post-list-module-view-variants';
 
@@ -45,7 +46,8 @@ export const PostListModuleView = ({
   hasImages,
 }: IPostListModuleViewProps) => {
   const isEmpty = items.length === 0;
-  const s = postListModuleViewVariants();
+  const v = postListModuleViewVariants();
+  const s = moduleGridActionsVariants();
 
   return (
     <Section
@@ -62,7 +64,7 @@ export const PostListModuleView = ({
         variant="section"
       />
       {isEmpty ? (
-        <p className={s.emptyMessage()}>{emptyMessage}</p>
+        <p className={v.emptyMessage()}>{emptyMessage}</p>
       ) : (
         <CardGrid className={s.grid()}>
           {items.map((item) => (
