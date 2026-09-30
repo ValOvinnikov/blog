@@ -138,6 +138,11 @@ export const PortableTextEditor = ({
 }: TPortableTextEditorProps) => {
   const { root, editable } = portableTextEditorVariants({ isDisabled });
 
+  // @portabletext/editor drops role and aria-multiline entirely when readOnly; restore both so a disabled editor still announces as a (dimmed) text field instead of a nameless generic node.
+  const disabledFieldProps = isDisabled
+    ? { role: 'textbox', 'aria-multiline': true }
+    : {};
+
   const nodes = useMemo(() => {
     const linkClassName = portableTextEditorVariants({ isDisabled }).link();
     return [
@@ -185,6 +190,7 @@ export const PortableTextEditor = ({
         <PortableTextEditable
           aria-label={ariaLabel}
           aria-disabled={isDisabled || undefined}
+          {...disabledFieldProps}
           className={editable()}
         />
       </EditorProvider>

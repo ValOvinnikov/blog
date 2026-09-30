@@ -162,7 +162,7 @@ describe(PortableTextEditor, () => {
     ).not.toBeInTheDocument();
   });
 
-  it('conveys its disabled state to assistive technology, not only visually', () => {
+  it('conveys its disabled state to assistive technology as a dimmed text field, not only visually', () => {
     render(
       <PortableTextEditor
         initialValue={[]}
@@ -172,13 +172,13 @@ describe(PortableTextEditor, () => {
       />,
     );
 
-    expect(screen.getByLabelText('Body')).toHaveAttribute(
-      'aria-disabled',
-      'true',
-    );
+    const field = screen.getByRole('textbox', { name: 'Body' });
+    expect(field).toHaveAttribute('aria-disabled', 'true');
+    expect(field).toHaveAttribute('aria-multiline', 'true');
+    expect(field).not.toHaveAttribute('tabindex');
   });
 
-  it('carries no aria-disabled attribute when enabled', () => {
+  it('keeps its own multiline textbox role and carries no aria-disabled attribute when enabled', () => {
     render(
       <PortableTextEditor
         initialValue={[]}
@@ -187,9 +187,9 @@ describe(PortableTextEditor, () => {
       />,
     );
 
-    expect(screen.getByRole('textbox', { name: 'Body' })).not.toHaveAttribute(
-      'aria-disabled',
-    );
+    const field = screen.getByRole('textbox', { name: 'Body' });
+    expect(field).toHaveAttribute('aria-multiline', 'true');
+    expect(field).not.toHaveAttribute('aria-disabled');
   });
 
   it('renders an authored link with a safe href as a real, working anchor', async () => {
