@@ -162,6 +162,36 @@ describe(PortableTextEditor, () => {
     ).not.toBeInTheDocument();
   });
 
+  it('conveys its disabled state to assistive technology as a dimmed text field, not only visually', () => {
+    render(
+      <PortableTextEditor
+        initialValue={[]}
+        onChange={() => {}}
+        ariaLabel="Body"
+        isDisabled={true}
+      />,
+    );
+
+    const field = screen.getByRole('textbox', { name: 'Body' });
+    expect(field).toHaveAttribute('aria-disabled', 'true');
+    expect(field).toHaveAttribute('aria-multiline', 'true');
+    expect(field).not.toHaveAttribute('tabindex');
+  });
+
+  it('keeps its own multiline textbox role and carries no aria-disabled attribute when enabled', () => {
+    render(
+      <PortableTextEditor
+        initialValue={[]}
+        onChange={() => {}}
+        ariaLabel="Body"
+      />,
+    );
+
+    const field = screen.getByRole('textbox', { name: 'Body' });
+    expect(field).toHaveAttribute('aria-multiline', 'true');
+    expect(field).not.toHaveAttribute('aria-disabled');
+  });
+
   it('renders an authored link with a safe href as a real, working anchor', async () => {
     render(
       <PortableTextEditor
