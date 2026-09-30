@@ -1,6 +1,5 @@
 import {
   A_AS_CONST,
-  P_AS_CONST,
   type IWithClassName,
   type IWithDataTestId,
 } from '@blog/config';
@@ -31,9 +30,9 @@ export const Eyebrow = ({
 
   if (!href) {
     return (
-      <P_AS_CONST className={rootClassName} data-testid={dataTestId}>
+      <p className={rootClassName} data-testid={dataTestId}>
         {children}
-      </P_AS_CONST>
+      </p>
     );
   }
 
