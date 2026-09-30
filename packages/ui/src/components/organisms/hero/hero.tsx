@@ -8,6 +8,7 @@ import {
   type TContentAlignment,
   type THeroVariant,
   type TMediaOrder,
+  type TSpacingScale,
 } from '@blog/config';
 import { Eyebrow } from '@blog/ui/components/atoms/eyebrow';
 import { Heading } from '@blog/ui/components/atoms/heading';
@@ -45,6 +46,8 @@ export type THeroProps = IWithClassName &
     contentAlignment?: TContentAlignment;
     mediaOrder?: TMediaOrder;
     tone: TBrandVariant;
+    spacingTop?: TSpacingScale;
+    spacingBottom?: TSpacingScale;
     children?: TCompoundChildren<typeof HeroParts>;
   };
 
@@ -59,6 +62,8 @@ const HeroRoot = ({
   contentAlignment,
   mediaOrder,
   tone,
+  spacingTop,
+  spacingBottom,
   children,
   className,
   dataTestId,
@@ -85,6 +90,8 @@ const HeroRoot = ({
     alignment: resolvedAlignment,
     mediaOrder: resolvedMediaOrder,
     tone,
+    spacingTop: isBanner ? spacingTop : undefined,
+    spacingBottom: isBanner ? spacingBottom : undefined,
   });
 
   return (
@@ -129,9 +136,10 @@ const HeroRoot = ({
         </div>
         {slots.Media && (
           <div className={s.media()} data-testid="hero-media">
-            {isBanner
-              ? cloneElement(slots.Media, { isFramed: false })
-              : slots.Media}
+            {cloneElement(
+              slots.Media,
+              isBanner ? { isFramed: false } : { variant: resolvedVariant },
+            )}
           </div>
         )}
         {isBanner && (

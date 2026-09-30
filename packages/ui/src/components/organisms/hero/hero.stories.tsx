@@ -5,6 +5,7 @@ import {
   ICONS,
   MEDIA_ORDER,
   SIZE,
+  SPACING_SCALE,
 } from '@blog/config';
 import { Avatar } from '@blog/ui/components/atoms/avatar';
 import { Icon } from '@blog/ui/components/atoms/icon';
@@ -48,6 +49,10 @@ const profileContent = (
         systems used across fintech and retail. She writes about the boring
         parts that make software fast: caching, build graphs, and saying no to
         abstractions.
+      </p>
+      <p>
+        Off the clock she maintains open-source tooling and mentors engineers
+        moving into staff roles.
       </p>
     </Hero.Body>
     <Hero.Cta>
@@ -105,6 +110,14 @@ const meta = {
     tone: {
       control: 'select',
       options: objectKeys(heroVariants.variants.tone),
+    },
+    spacingTop: {
+      control: 'select',
+      options: objectKeys(heroVariants.variants.spacingTop),
+    },
+    spacingBottom: {
+      control: 'select',
+      options: objectKeys(heroVariants.variants.spacingBottom),
     },
   },
   args: {
@@ -302,6 +315,47 @@ export const BannerToneSecondary: TStory = {
     contentAlignment: CONTENT_ALIGNMENT.LEFT,
     children: bannerContent('Bright mountain sunrise'),
   },
+};
+
+export const BannerSpacingNone: TStory = {
+  args: {
+    ...BannerContentLeft.args,
+    spacingTop: SPACING_SCALE.NONE,
+    spacingBottom: SPACING_SCALE.NONE,
+  },
+};
+
+export const BannerSpacingMd: TStory = {
+  args: {
+    ...BannerContentLeft.args,
+    spacingTop: SPACING_SCALE.MD,
+    spacingBottom: SPACING_SCALE.MD,
+  },
+};
+
+export const BannerSpacingXl: TStory = {
+  args: {
+    ...BannerContentLeft.args,
+    spacingTop: SPACING_SCALE.XL,
+    spacingBottom: SPACING_SCALE.XL,
+  },
+};
+
+export const BannerHeadingOnly: TStory = {
+  args: {
+    variant: HERO_VARIANT.BANNER,
+    tone: BRAND_VARIANT.PRIMARY,
+    excerpt: undefined,
+    eyebrow: undefined,
+    children: undefined,
+  },
+};
+
+export const StackedAtLg: TStory = {
+  args: {
+    variant: HERO_VARIANT.STACKED,
+  },
+  globals: { viewport: 'desktop' },
 };
 
 export const SplitMediaOrderFirst: TStory = {

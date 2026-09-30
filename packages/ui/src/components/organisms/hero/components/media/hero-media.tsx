@@ -1,4 +1,8 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import type {
+  IWithClassName,
+  IWithDataTestId,
+  THeroVariant,
+} from '@blog/config';
 import { MediaFrame } from '@blog/ui/components/atoms/media-frame';
 import type { TMediaFrameRatio } from '@blog/ui/components/atoms/media-frame/media-frame-variants';
 import type { ReactNode } from 'react';
@@ -9,6 +13,7 @@ export type THeroMediaProps = IWithClassName &
   IWithDataTestId & {
     isFramed?: boolean;
     ratio?: TMediaFrameRatio;
+    variant?: THeroVariant;
     children?: ReactNode;
   };
 
@@ -16,6 +21,7 @@ export type THeroMediaProps = IWithClassName &
 export const HeroMedia = ({
   isFramed = true,
   ratio = 'video',
+  variant,
   className,
   dataTestId,
   children,
@@ -23,7 +29,7 @@ export const HeroMedia = ({
   isFramed ? (
     <MediaFrame
       ratio={ratio}
-      className={heroMediaVariants({ ratio, class: className })}
+      className={heroMediaVariants({ ratio, variant, class: className })}
       dataTestId={dataTestId}
     >
       {children}
