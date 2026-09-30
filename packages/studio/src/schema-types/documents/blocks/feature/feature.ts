@@ -5,7 +5,12 @@ import { headingBlockField } from '@blog/studio/schema-types/objects/heading-blo
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
 import { toTitleCase } from '@blog/utils/primitives';
 import { IdCard } from 'lucide-react';
-import { defineField, defineType, type SanityDocument } from 'sanity';
+import {
+  defineField,
+  defineType,
+  type SanityDocument,
+  type ValidationContext,
+} from 'sanity';
 
 type TFeatureBlockDocument = {
   icon?: string;
@@ -17,14 +22,16 @@ const asFeatureBlockDocument = (
 ): TFeatureBlockDocument | undefined =>
   document as TFeatureBlockDocument | undefined;
 
-const validateFeatureHasVisual = (
-  document: SanityDocument | undefined,
-): string | true => {
-  const doc = asFeatureBlockDocument(document);
+const FEATURE_VISUAL_ERROR =
+  'Add an icon or an image so this card has something to display.';
 
-  return doc?.icon || doc?.image
-    ? true
-    : 'Add an icon or an image so this card has something to display.';
+const validateFeatureHasVisual = (
+  _value: unknown,
+  context: ValidationContext,
+): string | true => {
+  const doc = asFeatureBlockDocument(context.document);
+
+  return doc?.icon || doc?.image ? true : FEATURE_VISUAL_ERROR;
 };
 
 export const featureBlockSchema = defineType({
@@ -34,7 +41,6 @@ export const featureBlockSchema = defineType({
   description:
     'One feature — a heading and supporting text from its heading block, plus an icon or image — reusable across every Features module on the site.',
   icon: IdCard,
-  validation: (rule) => rule.custom(validateFeatureHasVisual),
   fields: [
     titleField(),
     headingBlockField(),
@@ -50,6 +56,7 @@ export const featureBlockSchema = defineType({
           value,
         })),
       },
+      validation: (rule) => rule.custom(validateFeatureHasVisual),
     }),
     defineField({
       name: 'image',
@@ -57,6 +64,7 @@ export const featureBlockSchema = defineType({
       type: imageWithAltSchema.name,
       description:
         "The image shown for this card, cropped to the shape chosen on the Features module. Takes priority over the card's icon when both are set.",
+      validation: (rule) => rule.custom(validateFeatureHasVisual),
     }),
     defineField({
       name: 'link',
