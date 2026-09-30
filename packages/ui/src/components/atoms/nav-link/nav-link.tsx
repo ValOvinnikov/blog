@@ -1,6 +1,6 @@
-import type { IWithDataTestId } from '@blog/config';
+import { A_AS_CONST, type IWithDataTestId } from '@blog/config';
 import type { TPolymorphicProps } from '@blog/config/react';
-import { resolveComponent, type IWithIcon } from '@blog/ui/lib/react';
+import { type IWithIcon } from '@blog/ui/lib/react';
 import type { ElementType } from 'react';
 
 import { navLinkVariants, type TNavLinkVariants } from './nav-link-variants';
@@ -13,13 +13,11 @@ type TNavLinkOwnProps = {
 } & IWithIcon &
   IWithDataTestId;
 
-export type TNavLinkProps<C extends ElementType = 'a'> = TPolymorphicProps<
-  C,
-  TNavLinkOwnProps
->;
+export type TNavLinkProps<C extends ElementType = typeof A_AS_CONST> =
+  TPolymorphicProps<C, TNavLinkOwnProps>;
 
 /** A chrome-level navigation link (header/footer nav items). */
-export const NavLink = <C extends ElementType = 'a'>({
+export const NavLink = <C extends ElementType = typeof A_AS_CONST>({
   isActive = false,
   variant = 'plain',
   className,
@@ -30,13 +28,12 @@ export const NavLink = <C extends ElementType = 'a'>({
   children,
   ...rest
 }: TNavLinkProps<C>) => {
-  const Component = resolveComponent(as, 'a');
+  const Component = as ?? A_AS_CONST;
   const { root, label } = navLinkVariants({ isActive, variant });
   const title =
     !hasLabel && typeof children === 'string' ? children : undefined;
 
   return (
-    // eslint-disable-next-line react-hooks/static-components -- resolveComponent returns `as`/fallback verbatim, so the reference stays stable across renders
     <Component
       className={root({ class: className })}
       aria-current={isActive ? 'page' : undefined}
