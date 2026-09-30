@@ -38,6 +38,11 @@ block 'git push -u origin HEAD'
 block 'git push -u origin claude/optimistic-noether-isuljn'
 block 'git fetch origin && git push origin HEAD'
 block "git -C $repo push"
+block 'GIT_SSH_COMMAND=x git push'
+block 'env GIT_SSH_COMMAND=x git push'
+block 'git push -o skip-ci origin'
+block 'git push --push-option skip-ci origin'
+block 'git push --force-with-lease origin'
 allow 'git push origin HEAD:feat/3952-team-single-member'
 allow 'git push origin --delete claude/optimistic-noether-isuljn'
 allow 'git push origin :claude/optimistic-noether-isuljn'
@@ -54,6 +59,8 @@ allow 'git push -u origin HEAD'
 
 on_branch feat/3952-team-single-member
 allow 'git push'
+allow 'git push -o skip-ci origin'
+allow 'GIT_SSH_COMMAND=x git push'
 allow 'git push -u origin HEAD'
 block 'git push origin HEAD:claude/eager-wozniak-gsbpiz'
 

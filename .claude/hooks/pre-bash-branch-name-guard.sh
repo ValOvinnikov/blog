@@ -44,8 +44,11 @@ process.stdin.on("end", () => {
   const destinations = [];
   for (const segment of command.split(/&&|\|\||[;&|\n]/)) {
     const words = segment.trim().split(/\s+/).filter(Boolean);
-    if (words[0] !== "git") continue;
-    let i = 1;
+    let i = 0;
+    if (words[i] === "env") i += 1;
+    while (i < words.length && /^[A-Za-z_][A-Za-z0-9_]*=/.test(words[i])) i += 1;
+    if (words[i] !== "git") continue;
+    i += 1;
     let dir = process.cwd();
     while (i < words.length && words[i].startsWith("-")) {
       if (words[i] === "-C") dir = words[i + 1] ?? dir;
@@ -54,7 +57,10 @@ process.stdin.on("end", () => {
     if (words[i] !== "push") continue;
     const rest = words.slice(i + 1);
     if (rest.some((w) => ["--delete", "-d", "--tags"].includes(w))) continue;
-    const positional = rest.filter((w) => !w.startsWith("-"));
+    const valueFlags = ["-o", "--push-option", "--receive-pack", "--exec"];
+    const positional = rest.filter(
+      (w, j) => !w.startsWith("-") && !valueFlags.includes(rest[j - 1]),
+    );
     const refspecs = positional.slice(1);
     if (refspecs.length === 0) {
       destinations.push(currentBranch(dir));
