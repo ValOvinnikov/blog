@@ -46,7 +46,7 @@ const basePost: TPostDetail = {
   author: {
     id: 'author-1',
     name: 'Jane Doe',
-    profilePageHref: '/jane-doe',
+    profileUrl: '/jane-doe',
     image: undefined,
     role: undefined,
     bio: undefined,

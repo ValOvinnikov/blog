@@ -296,11 +296,10 @@ one.
 the single `page_landing` target it once allowed to every type a `link` can
 point at. Because the destination is no longer knowably a landing page,
 `@blog/service` resolves the href and hands it to `apps/web` as
-`profilePageHref`; the byline no longer builds a URL from a slug.
-`module_team` receives that same resolved href per member, as `profileUrl`,
-and links a card's name to it when set, leaving the name as plain text when
-it is unset. The two names for one value are a seam to unify, not a
-distinction worth keeping.
+`profileUrl`; the byline no longer builds a URL from a slug.
+`module_team` receives that same resolved href per member under that same
+name, and links a card's name to it when set, leaving the name as plain
+text when it is unset.
 
 Every `module_*` document also carries a **required** `brandVariant` field
 (stored values from `@blog/config`'s `BRAND_VARIANT` const —
