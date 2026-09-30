@@ -48,6 +48,7 @@ export const heroBlogSchema = defineType({
       name: FIELDSET_PRIMARY_ACTION,
       title: 'Primary Action',
       description: 'The main action. It always links to the featured post.',
+      options: { collapsible: true, collapsed: false },
     },
     ...heroFieldsets,
   ],
@@ -136,6 +137,7 @@ export const heroBlogSchema = defineType({
       type: ctaSecondaryButtonSchema.name,
       description:
         'An optional supporting action. Leave the link empty to show none.',
+      options: { collapsible: true, collapsed: true },
     }),
     heroVariantField(),
     ...heroContentPositionFields(),

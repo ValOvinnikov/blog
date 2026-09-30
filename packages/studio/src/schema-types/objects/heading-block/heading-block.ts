@@ -1,5 +1,7 @@
 import { defineField, defineType } from 'sanity';
 
+export const HEADING_REQUIRED_MESSAGE = 'Add a heading.';
+
 export const headingBlockSchema = defineType({
   name: 'headingBlock',
   title: 'Heading Block',
@@ -12,7 +14,7 @@ export const headingBlockSchema = defineType({
       title: 'Heading',
       type: 'string',
       description: 'The heading text shown to readers.',
-      validation: (rule) => rule.required(),
+      validation: (rule) => rule.required().error(HEADING_REQUIRED_MESSAGE),
     }),
     defineField({
       name: 'supportingText',

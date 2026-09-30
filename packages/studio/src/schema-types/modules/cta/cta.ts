@@ -7,6 +7,7 @@ import {
   type TCtaVariant,
 } from '@blog/config/constants';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
+import { isBannerVariantDocument } from '@blog/studio/schema-types/fields/banner-variant-document-predicate/banner-variant-document-predicate';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { containerWidthField } from '@blog/studio/schema-types/fields/container-width-field/container-width-field';
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
@@ -32,9 +33,6 @@ const isBannerVariant = ({ parent }: { parent?: unknown }) =>
 
 const isNotBannerVariant = ({ parent }: { parent?: unknown }) =>
   !isVariant(parent, CTA_VARIANT.BANNER);
-
-const isBannerVariantDocument = ({ document }: { document?: unknown }) =>
-  isVariant(document, CTA_VARIANT.BANNER);
 
 const ctaLayoutField = () => {
   const layoutSpacingAndDividerFields = spacingAndDividerFields({
@@ -85,11 +83,11 @@ export const ctaSchema = defineType({
       type: imageWithAltSchema.name,
       description: 'Optional image, placed according to the Variant.',
       validation: (rule) =>
-        rule.custom((value, context) => {
+        rule.custom<{ asset?: unknown }>((value, context) => {
           const variant = (context.parent as TCtaParent | undefined)?.variant;
 
           if (
-            !value &&
+            !value?.asset &&
             (variant === CTA_VARIANT.BANNER || variant === CTA_VARIANT.SPLIT)
           ) {
             return 'Image is required for the Banner and Split variants.';
