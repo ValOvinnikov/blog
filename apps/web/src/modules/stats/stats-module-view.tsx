@@ -3,6 +3,7 @@ import { Text } from '@blog/ui/components/atoms/text';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';
+import { isLoneLastInRow } from '@web/utils/is-lone-last-in-row';
 import { moduleGridActionsVariants } from '@web/utils/module-grid-actions-variants';
 import { toModuleGridColumns } from '@web/utils/to-module-grid-columns';
 
@@ -27,6 +28,9 @@ export const StatsModuleView = ({
   const columns = toModuleGridColumns(stats.length);
   const s = moduleGridActionsVariants({ align: contentAlignment });
   const v = statsModuleViewVariants({ columns, align: contentAlignment });
+  const lastIndex = stats.length - 1;
+  const isLoneBelowLg = isLoneLastInRow(stats.length, 2);
+  const isLoneFromLg = isLoneLastInRow(stats.length, columns);
 
   return (
     <Section
@@ -42,9 +46,17 @@ export const StatsModuleView = ({
         align={contentAlignment}
         variant="section"
       />
-      <dl className={v.grid({ class: s.grid() })}>
-        {stats.map((stat) => (
-          <div key={stat.id} className={v.item()}>
+      <dl className={v.grid()}>
+        {stats.map((stat, index) => (
+          <div
+            key={stat.id}
+            className={v.item({
+              hasDividerBelowLg: index % 2 === 1,
+              hasDividerFromLg: index % columns !== 0,
+              isLoneBelowLg: index === lastIndex && isLoneBelowLg,
+              isLoneFromLg: index === lastIndex && isLoneFromLg,
+            })}
+          >
             <dt className={v.label()}>{stat.label}</dt>
             <dd className={v.value()}>{stat.value}</dd>
             {stat.description && (

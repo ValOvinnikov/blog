@@ -29,7 +29,7 @@ export const ContentModuleView = ({
       layout={layout}
       dataTestId={`content-module-${id}`}
     >
-      <ContentModuleUi isWrapped={true}>
+      <ContentModuleUi isWrapped={true} className={s.root()}>
         <Prose className={s.prose()}>
           <PortableText value={body} />
         </Prose>

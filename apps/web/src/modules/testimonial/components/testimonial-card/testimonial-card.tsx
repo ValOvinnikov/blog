@@ -1,4 +1,9 @@
-import { SIZE, type IWithDataTestId, type TBrandVariantOf } from '@blog/config';
+import {
+  SIZE,
+  type IWithClassName,
+  type IWithDataTestId,
+  type TBrandVariantOf,
+} from '@blog/config';
 import type { TTestimonialItem } from '@blog/service';
 import { Avatar } from '@blog/ui/components/atoms/avatar';
 import { QuoteCard } from '@blog/ui/components/molecules/quote-card';
@@ -10,7 +15,7 @@ import { testimonialAvatarImageVariants } from './testimonial-card-variants';
 
 const AVATAR_IMAGE_SIZE_PX = { default: 80, spotlight: 112 } as const;
 
-export interface ITestimonialCardProps extends IWithDataTestId {
+export interface ITestimonialCardProps extends IWithClassName, IWithDataTestId {
   item: TTestimonialItem;
   align: 'left' | 'center';
   tone: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
@@ -22,6 +27,7 @@ export const TestimonialCard = ({
   align,
   tone,
   isSpotlight = false,
+  className,
   dataTestId,
 }: ITestimonialCardProps) => {
   const imageSize = isSpotlight
@@ -33,6 +39,7 @@ export const TestimonialCard = ({
       role={item.role}
       align={align}
       isSpotlight={isSpotlight}
+      className={className}
       tone={tone}
       dataTestId={dataTestId}
     >
