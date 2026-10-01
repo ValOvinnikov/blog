@@ -9,7 +9,7 @@ const buildChildren = () => [
   <PricingCard.Name key="name">
     {faker.commerce.productName()}
   </PricingCard.Name>,
-  <PricingCard.Price key="price" amount="$49" period="month" />,
+  <PricingCard.Price key="price" amount="$49" period="per month" />,
 ];
 
 const setup = customRender(PricingCard, {
@@ -60,7 +60,8 @@ describe(`<${PricingCard.name}/>`, () => {
     expect(screen.queryByText('Most popular')).not.toBeInTheDocument();
   });
 
-  it('announces a compareAt price as the regular price for assistive tech', () => {
+  it('announces a compareAt price with the label passed in', () => {
+    const compareAtLabel = faker.lorem.words(2);
     setup({
       children: [
         <PricingCard.Name key="name">
@@ -70,17 +71,29 @@ describe(`<${PricingCard.name}/>`, () => {
           key="price"
           amount="$39"
           compareAt="$49"
-          period="month"
+          compareAtLabel={compareAtLabel}
+          period="per month"
         />,
       ],
     });
-    expect(screen.getByText('Regular price')).toBeVisible();
+    expect(screen.getByText(compareAtLabel)).toBeVisible();
     expect(screen.getByText('$49')).toBeVisible();
   });
 
   it('does not render compareAt markup when omitted', () => {
     setup();
-    expect(screen.queryByText('Regular price')).not.toBeInTheDocument();
+    expect(screen.queryByText('$49', { exact: false })).toBeVisible();
+    expect(screen.queryByText(/regular/i)).not.toBeInTheDocument();
+  });
+
+  it('renders the period exactly as passed, with no slash added', () => {
+    setup({
+      children: [
+        <PricingCard.Price key="price" amount="$49" period="/month" />,
+      ],
+    });
+    expect(screen.getByText('/month')).toBeVisible();
+    expect(screen.queryByText('//month')).not.toBeInTheDocument();
   });
 
   it('hides each feature check icon from assistive tech', () => {

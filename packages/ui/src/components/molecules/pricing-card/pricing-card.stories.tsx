@@ -16,7 +16,7 @@ const meta = {
         <PricingCard.Description>
           Everything you need to launch a personal blog.
         </PricingCard.Description>
-        <PricingCard.Price amount="$19" period="month" />
+        <PricingCard.Price amount="$19" period="per month" />
         <PricingCard.Features
           items={['Unlimited posts', 'Custom domain', 'Community support']}
         />
@@ -43,7 +43,7 @@ export const Highlighted: TStory = {
         <PricingCard.Description>
           For a growing publication that needs more room to run.
         </PricingCard.Description>
-        <PricingCard.Price amount="$49" period="month" />
+        <PricingCard.Price amount="$49" period="per month" />
         <PricingCard.Features
           items={[
             'Everything in Starter',
@@ -92,7 +92,8 @@ export const PromoWithCompareAt: TStory = {
         <PricingCard.Price
           amount="$9"
           compareAt="$19"
-          period="month"
+          compareAtLabel="Regular price"
+          period="per month"
           prefix="From"
         />
         <PricingCard.Extra>$90 billed yearly</PricingCard.Extra>
@@ -110,6 +111,19 @@ export const PromoWithCompareAt: TStory = {
   },
 };
 
+export const PeriodStyles: TStory = {
+  render: (args) => (
+    <div style={{ display: 'grid', gap: '1rem' }}>
+      {['per month', '/month', 'one-time'].map((period) => (
+        <PricingCard key={period} {...args}>
+          <PricingCard.Name>{period}</PricingCard.Name>
+          <PricingCard.Price amount="$49" period={period} />
+        </PricingCard>
+      ))}
+    </div>
+  ),
+};
+
 const TierRow = (args: TPricingCardProps) => (
   <div
     style={{
@@ -124,7 +138,7 @@ const TierRow = (args: TPricingCardProps) => (
       <PricingCard.Description>
         Everything you need to launch a personal blog.
       </PricingCard.Description>
-      <PricingCard.Price amount="$19" period="month" />
+      <PricingCard.Price amount="$19" period="per month" />
       <PricingCard.Features
         items={['Unlimited posts', 'Custom domain', 'Community support']}
       />
@@ -138,7 +152,7 @@ const TierRow = (args: TPricingCardProps) => (
       <PricingCard.Description>
         For a growing publication that needs more room to run.
       </PricingCard.Description>
-      <PricingCard.Price amount="$49" period="month" />
+      <PricingCard.Price amount="$49" period="per month" />
       <PricingCard.Features
         items={[
           'Everything in Starter',
