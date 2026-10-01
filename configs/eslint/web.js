@@ -102,7 +102,13 @@ export default [
   {
     // Next.js reserved exports (generateMetadata, route verbs, ...) stay as
     // function declarations — framework API surface, not app code.
-    files: ['**/page.tsx', '**/layout.tsx', '**/route.ts', '**/not-found.tsx'],
+    files: [
+      '**/page.tsx',
+      '**/layout.tsx',
+      '**/route.ts',
+      '**/not-found.tsx',
+      '**/global-not-found.tsx',
+    ],
     rules: {
       'func-style': 'off',
     },

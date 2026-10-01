@@ -1284,13 +1284,17 @@ per-request `getRequestTenantId()` and caches per tenant — both the
 (`buildSiteConfigCacheTag`/`buildSettingsFeaturesCacheTag`/
 `buildTenantPlanCacheTag`, `apps/web/src/utils/tenant-cache-tags/`) — closing
 the leak where every tenant was served the first `tenants` row's config
-(#2477). The **root layout (`app/layout.tsx`) is tenant-independent** — it
-owns only the static document shell (`<html lang>`, the Sanity CDN
-preconnect, the dark-mode bootstrap script, `<body>`) and reads no Dynamic
-API. Theme tokens, font variables, analytics gating and the tenant's voice
-overrides all resolve in `[locale]/layout.tsx`. **There are two
-`not-found.tsx` boundaries outside `[tenant]/[locale]/layout.tsx`'s own
-children.** `app/[tenant]/not-found.tsx` exists because a segment's own
+(#2477). **There is no `app/layout.tsx`: `[tenant]/[locale]/layout.tsx` is
+the root layout** and renders the document shell through `DocumentShell`
+(`<html lang>` set to the served language's BCP 47 tag from the route
+param, the Sanity CDN preconnect, the dark-mode bootstrap script, `<body>`),
+so `lang` follows the language without a Dynamic API. Theme tokens, font
+variables, analytics gating and the tenant's voice overrides all resolve in
+that same layout. **There are two 404 boundaries above it, and each renders
+its own English `DocumentShell`:** `app/[tenant]/not-found.tsx` and
+`app/global-not-found.tsx` (enabled by `experimental.globalNotFound`, since
+there is no single root layout to compose a 404 from).
+`app/[tenant]/not-found.tsx` exists because a segment's own
 `not-found.tsx` wraps only that segment's children, never its own layout,
 so a `notFound()` thrown inside `[tenant]/[locale]/layout.tsx` itself is
 catchable only one segment up — without it that throw escaped to a 500 on
@@ -1316,8 +1320,9 @@ the store. If the hand-off doesn't survive, `getRememberedTenantId()`
 returns `undefined` and the boundary renders unthemed — a graceful
 fallback, never a 500.
 
-The root `app/not-found.tsx` boundary has no `[tenant]` route param to
-thread even when one exists in the URL, and never resolves a tenant at all:
+`app/global-not-found.tsx` (formerly the root `app/not-found.tsx`) serves
+URLs that match no route. It has no `[tenant]` route param to thread even
+when one exists in the URL, and never resolves a tenant at all:
 it renders `StandaloneNotFoundPage` with no argument, always falling back to
 default theme tokens and base messages. What was actually checked: curling
 four content-404 URLs against a production build — `/tags` (an index page
@@ -1341,8 +1346,9 @@ can't be the whole explanation on its own — it would equally predict
 `app/[tenant]/not-found.tsx` being bypassed for the layout's own throw,
 which the paragraph above says it is not. `i18n/request.ts`
 is likewise tenant-independent, returning the base locale messages only.
-This split exists because the root layout and `getRequestConfig` both sit
-above any future `[tenant]` route segment and so can never receive it as a
+This split exists because `getRequestConfig` (and, before `<html lang>`
+moved into `[tenant]/[locale]/layout.tsx`, the old `app/layout.tsx`) sits
+above the `[tenant]` route segment and so can never receive it as a
 param — while either resolved tenant state, every route stayed dynamic
 regardless of its path. `/_not-found` renders outside `[locale]/layout.tsx`
 and had no `headers()` dependency before #2477 (`getSiteConfig()` previously
@@ -1363,7 +1369,7 @@ Next had already committed to a static/ISR shape at build time, and
 encountering a Dynamic API call while serving that fallback errored instead
 of quietly reclassifying. This distinction is inferred from the two
 observed outcomes here, not verified against Next's own source or docs — so
-`app/not-found.tsx` avoids the read rather than relying on any general claim
+`app/global-not-found.tsx` avoids the read rather than relying on any general claim
 about when Next treats it as fatal. The
 Sanity `settings_theme` schema this superseded is
 retained only as a rollback path (unused by any read path) until the
@@ -1710,8 +1716,8 @@ root-level `Host`-resolved routes (`robots.ts`/`sitemap.ts`/`rss.xml`) — none
 of which have route params to thread — and also the `account`/`bookmarks`
 compositions, which do sit under a route carrying `tenant` but deliberately
 leave it unthreaded: `force-dynamic` already excludes them from the cache,
-so resolving from the request costs them nothing. The root `app/not-found.tsx`
-boundary reads neither function: it renders unthemed rather than resolving a
+so resolving from the request costs them nothing. `app/global-not-found.tsx`
+reads neither function: it renders unthemed rather than resolving a
 tenant at all — a `headers()` read there was what produced #3191's 500 (see
 above), so it avoids the read rather than resolving a tenant a different way.
 
@@ -1728,7 +1734,7 @@ layers below it.
 
 Client-side error capture is a self-hosted route, not a third-party SDK
 (`web`'s Lighthouse performance budget rules out shipping an SDK on every
-page view): `app/error.tsx`/`app/global-error.tsx` report render failures on
+page view): `[tenant]/[locale]/error.tsx`/`app/global-error.tsx` report render failures on
 mount, and the two existing explicit client catches report alongside their
 `logger.*` calls, all via `@web/utils/report-client-error`
 (`navigator.sendBeacon`, falling back to `fetch(..., { keepalive: true })`;

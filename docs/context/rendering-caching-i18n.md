@@ -34,8 +34,8 @@
   `/_not-found` and `/robots.txt` remained static at that baseline. #2477 gave
   the root layout its own `headers()` dependency via
   `getThemeTokens()`/`isCapabilityEnabled()`; #2625's first stage moved both
-  down into `[locale]/layout.tsx`, leaving the root layout
-  tenant-independent (see "Root layout" below). For the ten content routes
+  down into `[locale]/layout.tsx`, leaving the then root layout
+  tenant-independent (see "Root layout" below for today's shape). For the ten content routes
   above neither change altered the rendering mode — a descendant layout or
   page already forced dynamic rendering. `/_not-found` is different: it
   renders outside `[locale]/layout.tsx` and had no `headers()` dependency
@@ -229,13 +229,17 @@ detected`, and a re-export with `it mustn't be reexported`, so a wrong form
   call site. `@web/i18n/navigation` remains the source of the non-link
   navigation helpers (`permanentRedirect`, `usePathname`) and of the `Link`
   that `SmartLink` wraps internally.
-- **Root layout:** `src/app/layout.tsx` is a real root layout — it owns the
-  document shell (`<html>`/`<head>`/`<body>`, global stylesheet, the
-  Sanity CDN preconnect, the dark-mode bootstrap script) with a fixed `lang`
-  (`LOCALE_ISO_CODES.EN`; this app has exactly one locale today). It is
-  **tenant-independent and reads no Dynamic API**: theme tokens, `next/font`
-  variables, analytics gating and the tenant's voice overrides all live in
-  `[locale]/layout.tsx`, which also owns everything locale-aware
+- **Root layout:** there is no `src/app/layout.tsx`. `[tenant]/[locale]/layout.tsx`
+  is the root layout and renders the document shell through `DocumentShell`
+  (`src/components/shared/document-shell/`: `<html>`/`<head>`/`<body>`,
+  global stylesheet, the Sanity CDN preconnect, the dark-mode bootstrap
+  script), with `lang` set to the served language's BCP 47 tag
+  (`LOCALE_BCP47_TAGS`) from the route param — no Dynamic API. The boundaries
+  above it, `app/[tenant]/not-found.tsx` and `app/global-not-found.tsx`
+  (`experimental.globalNotFound`), each render their own English
+  `DocumentShell`; `app/global-error.tsx` keeps its own `<html>`. Theme
+  tokens, `next/font` variables, analytics gating and the tenant's voice
+  overrides all live in that layout, which also owns everything locale-aware
   (`NextIntlClientProvider`, `Header`/`Footer` chrome, the locale-validation
   `notFound()`). The theme tokens reach the tree through `ThemeScope`
   (`src/components/shared/theme-scope/`), whose `<style>` carries
@@ -244,16 +248,15 @@ detected`, and a re-export with `it mustn't be reexported`, so a wrong form
   `src/i18n/request.ts` is tenant-independent for the same reason, returning
   base locale messages only, with `resolveTenantMessages` applying the
   tenant's preset voice pack and overrides in the layout instead. Both
-  moved in #2625's first stage, because the root layout and
-  `getRequestConfig` sit above any future `[tenant]` segment and can never
-  receive it as a param. The root layout exists so root-level files
-  that need a layout to render into — chiefly `src/app/not-found.tsx` — have
-  one. There are two such boundaries: `app/not-found.tsx` and
+  moved in #2625's first stage, because `getRequestConfig` (and the
+  former `app/layout.tsx`) sits above the `[tenant]` segment and can never
+  receive it as a param. There are two 404 boundaries above the root
+  layout: `app/global-not-found.tsx`, for URLs that match no route, and
   `app/[tenant]/not-found.tsx`, the latter catching a `notFound()` thrown by
   `[tenant]/[locale]/layout.tsx` itself, which a same-segment boundary cannot
   reach. Both render outside the `[locale]` tree, so neither has
   `Header`/`Footer` chrome — just the terminal-styled 404 body (#491) — and
   both mount their own `ThemeScope`, but only `app/[tenant]/not-found.tsx`
   resolves tenant-scoped theme tokens and messages, from the tenant its
-  layout remembered before throwing; `app/not-found.tsx` resolves neither,
+  layout remembered before throwing; `app/global-not-found.tsx` resolves neither,
   rendering default tokens and base messages instead.
