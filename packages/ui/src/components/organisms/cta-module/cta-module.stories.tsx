@@ -243,6 +243,28 @@ export const BannerSpacingXl: TStory = {
   },
 };
 
+export const BannerPositionBySpacing: TStory = {
+  args: { ...BannerDefault.args },
+  parameters: { layout: 'fullscreen' },
+  render: (args) => (
+    <div className="flex flex-col gap-10">
+      {objectKeys(ctaModuleVariants.variants.position).map((position) =>
+        objectKeys(ctaModuleVariants.variants.spacingTop).map((spacing) => (
+          <CtaModule
+            key={`${position}-${spacing}`}
+            {...args}
+            heading={`${position} / ${spacing}`}
+            contentPosition={position}
+            contentAlignment={position}
+            spacingTop={spacing}
+            spacingBottom={spacing}
+          />
+        )),
+      )}
+    </div>
+  ),
+};
+
 export const Wrapped: TStory = {
   args: {
     isWrapped: true,
