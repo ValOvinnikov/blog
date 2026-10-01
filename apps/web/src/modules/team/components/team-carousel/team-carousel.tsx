@@ -5,6 +5,7 @@ import type { TTeamMember, TTeamModule } from '@blog/service';
 import type { ICarouselProps } from '@blog/ui/components/organisms/carousel';
 import { LabelledCarousel } from '@web/components/shared/labelled-carousel';
 import { TeamMemberCard } from '@web/modules/team/components/team-member-card/team-member-card';
+import { twoUpCarouselVariants } from '@web/utils/two-up-carousel-variants';
 
 export interface ITeamCarouselProps extends IWithClassName, IWithDataTestId {
   members: TTeamMember[];
@@ -41,7 +42,7 @@ export const TeamCarousel = ({
     title={title}
     tone={tone}
     contentAlignment={contentAlignment}
-    className={className}
+    className={twoUpCarouselVariants({ class: className })}
     dataTestId={dataTestId}
   />
 );

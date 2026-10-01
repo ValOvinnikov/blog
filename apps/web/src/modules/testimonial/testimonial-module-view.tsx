@@ -6,8 +6,11 @@ import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';
 import { TestimonialCard } from '@web/modules/testimonial/components/testimonial-card/testimonial-card';
 import { TestimonialCarousel } from '@web/modules/testimonial/components/testimonial-carousel/testimonial-carousel';
+import { isLoneLastInRow } from '@web/utils/is-lone-last-in-row';
 import { moduleGridActionsVariants } from '@web/utils/module-grid-actions-variants';
 import { toTestimonialGridColumns } from '@web/utils/to-testimonial-grid-columns';
+
+import { testimonialModuleViewVariants } from './testimonial-module-view-variants';
 
 export interface ITestimonialModuleViewProps extends TTestimonialModule {
   titleId: string;
@@ -35,6 +38,10 @@ export const TestimonialModuleView = ({
     cardAlignment === CONTENT_ALIGNMENT.CENTER ? 'center' : 'left';
   const columns = toTestimonialGridColumns(testimonials.length);
   const s = moduleGridActionsVariants({ align: headingAlign });
+  const v = testimonialModuleViewVariants({ columns });
+  const lastIndex = testimonials.length - 1;
+  const isLoneBelowLg = isLoneLastInRow(testimonials.length, 2);
+  const isLoneFromLg = isLoneLastInRow(testimonials.length, columns);
 
   return (
     <Section
@@ -68,13 +75,17 @@ export const TestimonialModuleView = ({
       ) : (
         <CardGrid
           columns={columns}
-          className={s.grid()}
+          className={v.grid({ class: s.grid() })}
           dataTestId={`${dataTestId}-grid`}
         >
-          {testimonials.map((item) => (
+          {testimonials.map((item, index) => (
             <TestimonialCard
               key={item.id}
               item={item}
+              className={v.item({
+                isLoneBelowLg: index === lastIndex && isLoneBelowLg,
+                isLoneFromLg: index === lastIndex && isLoneFromLg,
+              })}
               align={cardAlign}
               tone={brandVariant}
             />

@@ -34,6 +34,13 @@ const meta = {
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
   args: { actions: [shortAction, longAction] },
+  decorators: [
+    (Story) => (
+      <div className="flex flex-wrap items-center gap-3">
+        <Story />
+      </div>
+    ),
+  ],
 } satisfies Meta<typeof ActionGroup>;
 
 export default meta;
@@ -81,6 +88,15 @@ export const InlineAppearance: TStory = {
     actions: [
       { ...shortAction, appearance: CTA_ACTION_APPEARANCE.INLINE },
       { ...longAction, appearance: CTA_ACTION_APPEARANCE.INLINE },
+    ],
+  },
+};
+
+export const ContainedAndInline: TStory = {
+  args: {
+    actions: [
+      shortAction,
+      { ...shortAction, appearance: CTA_ACTION_APPEARANCE.INLINE },
     ],
   },
 };

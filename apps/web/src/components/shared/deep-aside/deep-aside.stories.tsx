@@ -1,5 +1,7 @@
-import { ASIDE_KIND } from '@blog/config';
+import { ASIDE_KIND, DEPTH } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { DEPTH_STORAGE_KEY } from '@web/config/depth-script';
+import { DepthProvider } from '@web/context/depth-provider';
 
 import { DeepAside } from './deep-aside';
 
@@ -25,18 +27,6 @@ const meta = {
       </p>
     ),
   },
-  decorators: [
-    // The real gate is CSS only, keyed off the nearest `DepthProvider`
-    // wrapper's `data-depth` attribute — this mimics that exact wrapper
-    // shape directly rather than pulling in the full provider/localStorage
-    // machinery, since `DeepAside`'s children have no `useDepth()` call of
-    // their own to satisfy.
-    (Story) => (
-      <div className="group/depth" data-depth="DEEP">
-        <Story />
-      </div>
-    ),
-  ],
 } satisfies Meta<typeof DeepAside>;
 
 export default meta;
@@ -52,13 +42,28 @@ export const Context: TStory = {
   args: { kind: ASIDE_KIND.CONTEXT, label: 'Context' },
 };
 
-/** Outside the `DEEP` depth, the CSS gate hides the aside entirely. */
-export const HiddenOutsideDeepDepth: TStory = {
+export const AlwaysVisibleOutsideDepthProvider: TStory = {};
+
+/** Inside a `DepthProvider` at the default `READ` depth, the aside is hidden. */
+export const HiddenInReadDepth: TStory = {
   decorators: [
     (Story) => (
-      <div className="group/depth" data-depth="READ">
+      <DepthProvider hasSkim={false} hasDeep={true}>
         <Story />
-      </div>
+      </DepthProvider>
     ),
+  ],
+};
+
+export const VisibleInDeepDepth: TStory = {
+  decorators: [
+    (Story) => {
+      localStorage.setItem(DEPTH_STORAGE_KEY, DEPTH.DEEP);
+      return (
+        <DepthProvider hasSkim={false} hasDeep={true}>
+          <Story />
+        </DepthProvider>
+      );
+    },
   ],
 };

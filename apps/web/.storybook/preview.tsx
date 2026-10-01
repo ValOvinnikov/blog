@@ -37,9 +37,9 @@ const preview: Preview = {
       appDirectory: true,
     },
     layout: 'fullscreen',
-    // Custom viewport presets matching this app's real Tailwind `lg:`
-    // breakpoint (1024px) — mirrors `packages/ui/.storybook/preview.ts`'s
-    // `sm`/`md` presets. Don't redefine viewports or override them per-story,
+    // Custom viewport presets matching this app's real Tailwind breakpoints:
+    // `mobile` and `desktop` straddle `lg:` (1024px), `tablet` sits between
+    // `md:` (768px) and `lg:`. Don't redefine viewports or override them per-story,
     // except the narrow case documented in the `ui-storybook` skill (a
     // component whose rendering forks on a real, non-container media-query
     // breakpoint) — first precedent here: `PostContentsRail`'s mobile
@@ -50,6 +50,11 @@ const preview: Preview = {
           name: 'Mobile (<1024px)',
           styles: { width: '390px', height: '844px' },
           type: 'mobile',
+        },
+        tablet: {
+          name: 'Tablet (768-1023px)',
+          styles: { width: '820px', height: '1180px' },
+          type: 'tablet',
         },
         desktop: {
           name: 'Desktop (≥1024px)',
