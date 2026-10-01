@@ -27,3 +27,22 @@ export default meta;
 type TStory = StoryObj<typeof meta>;
 
 export const FullBleedImage: TStory = {};
+
+const withRail = postArticleVariants({ withRail: true });
+
+export const FullBleedImageWithContentsRail: TStory = {
+  render: ({ body }) => (
+    <Article>
+      <Article.Body className={withRail.body()}>
+        <nav className={withRail.rail()} aria-label="Contents">
+          Contents rail
+        </nav>
+        <div className={withRail.content()}>
+          <Prose className={withRail.prose()}>
+            <PortableText value={body} />
+          </Prose>
+        </div>
+      </Article.Body>
+    </Article>
+  ),
+};
