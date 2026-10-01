@@ -17,3 +17,13 @@ export const DEFAULT_PRICE_PERIOD_LABELS = {
   [PRICE_PERIOD.MONTH]: 'per month',
   [PRICE_PERIOD.YEAR]: 'per year',
 } as const satisfies Record<TPricePeriod, string>;
+
+export const PRICE_PERIOD_LABEL_FIELD = {
+  [PRICE_PERIOD.ONE_TIME]: 'oneTime',
+  [PRICE_PERIOD.HOUR]: 'hour',
+  [PRICE_PERIOD.SESSION]: 'session',
+  [PRICE_PERIOD.MONTH]: 'month',
+  [PRICE_PERIOD.YEAR]: 'year',
+} as const satisfies Record<TPricePeriod, string>;
+
+export type TPricePeriodLabelField = TValueOf<typeof PRICE_PERIOD_LABEL_FIELD>;
