@@ -103,24 +103,14 @@ vi.mock('next-intl/server', () => ({
   })),
 }));
 
-// The `next/font/google` loaders rely on a Next build-time transform and throw
-// when `@web/config/fonts` is evaluated under Vitest.
-vi.mock('next/font/google', () => {
-  const createFontMock =
-    (fontName: string) =>
-    ({ variable }: { variable?: string } = {}) => ({
-      className: `mock-${fontName}-className`,
-      variable: variable ?? `mock-${fontName}-variable`,
-    });
-
-  return {
-    Space_Grotesk: createFontMock('space-grotesk'),
-    Newsreader: createFontMock('newsreader'),
-    JetBrains_Mono: createFontMock('jetbrains-mono'),
-    Fraunces: createFontMock('fraunces'),
-    Inter: createFontMock('inter'),
-  };
-});
+// `next/font/local` relies on a Next build-time transform and throws when
+// `@web/config/fonts` is evaluated under Vitest.
+vi.mock('next/font/local', () => ({
+  default: ({ variable }: { variable?: string } = {}) => ({
+    className: 'mock-font-className',
+    variable: variable ?? 'mock-font-variable',
+  }),
+}));
 
 // next-intl's `Link` reads `usePathname`/`useRouter` off `next/navigation`
 // even when a test never navigates.
