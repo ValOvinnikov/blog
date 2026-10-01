@@ -2,7 +2,7 @@
 
 # @blog/ui component index
 
-_58 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
+_59 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
 
 ## Atoms
 
@@ -403,6 +403,19 @@ Compound component:
 Prev/next + numbered links for paginated listings, route-agnostic (`createHref`) and polymorphic (`linkAs`); renders nothing when there is a single page.
 Props: currentPage: number · totalPages: number · createHref: (page: number) => string · ariaLabel: string · previousLabel: string · nextLabel: string · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
 Variants: current: (boolean)
+
+### Timeline — `components/organisms/timeline/timeline.tsx`
+
+A sequence of steps or milestones that reads as one connected line.
+Props: orientation: TTimelineOrientation · itemAlignment: Extract<TContentAlignment, 'LEFT' | 'CENTER'> · markerStyle: TTimelineMarkerStyle · children?: TCompoundChildren<Pick<typeof TimelineParts, 'Item'>> _(extends IWithClassName, IWithDataTestId)_
+Variants: orientation: TIMELINE_ORIENTATION.VERTICAL|TIMELINE_ORIENTATION.HORIZONTAL · itemAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER · markerStyle: TIMELINE_MARKER_STYLE.NUMBERED|TIMELINE_MARKER_STYLE.LABELLED
+
+Slots:
+
+- **Timeline.Item** — One step on the timeline: a marker, a heading and optional supporting copy. Props: orientation?: TTimelineOrientation · itemAlignment?: Extract<TContentAlignment, 'LEFT' | 'CENTER'> · children?: TCompoundChildren<typeof TimelineItemParts> _(extends IWithClassName, IWithDataTestId)_ · Variants: orientation: TIMELINE_ORIENTATION.VERTICAL|TIMELINE_ORIENTATION.HORIZONTAL · itemAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER
+- **Timeline.Marker** — The badge on a timeline item showing its step number or label. Props: markerStyle: TTimelineMarkerStyle · children: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: markerStyle: TIMELINE_MARKER_STYLE.NUMBERED|TIMELINE_MARKER_STYLE.LABELLED
+- **Timeline.Heading** — The title of a single step. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Timeline.Body** — Supporting copy for a `Timeline.Item`. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### ToastViewport — `components/organisms/toast-viewport/toast-viewport.tsx`
 
