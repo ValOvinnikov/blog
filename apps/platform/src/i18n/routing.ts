@@ -2,7 +2,7 @@ import { LOCALE_ISO_CODES } from '@blog/config';
 import { defineRouting } from 'next-intl/routing';
 
 export const routing = defineRouting({
-  locales: [LOCALE_ISO_CODES.EN],
+  locales: Object.values(LOCALE_ISO_CODES),
   defaultLocale: LOCALE_ISO_CODES.EN,
   localePrefix: 'never',
 });

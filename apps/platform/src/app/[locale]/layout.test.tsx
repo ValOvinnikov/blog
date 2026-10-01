@@ -27,7 +27,9 @@ describe('LocaleLayout', () => {
 
   describe('generateStaticParams', () => {
     it('returns params for every supported locale', () => {
-      expect(generateStaticParams()).toEqual([{ locale: LOCALE_ISO_CODES.EN }]);
+      expect(generateStaticParams()).toEqual(
+        Object.values(LOCALE_ISO_CODES).map((locale) => ({ locale })),
+      );
     });
   });
 
@@ -35,7 +37,7 @@ describe('LocaleLayout', () => {
     await expect(
       LocaleLayout({
         children: <div>content</div>,
-        params: Promise.resolve({ locale: 'FR' as typeof LOCALE_ISO_CODES.EN }),
+        params: Promise.resolve({ locale: 'PT' }),
       }),
     ).rejects.toThrow('NEXT_NOT_FOUND');
 

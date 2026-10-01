@@ -1,0 +1,737 @@
+{
+  "pageMetadata": {
+    "root": "Admin",
+    "tenants": "Tenants · Admin",
+    "tenant": "Tenant · Admin",
+    "look": "Uiterlijk · Admin",
+    "voice": "Toon · Admin",
+    "selectTenant": "Kies een werkruimte · Admin",
+    "addTenant": "Tenant toevoegen · Admin",
+    "tenantOverview": "Tenantoverzicht · Admin",
+    "tenantProvisioning": "Inrichting · Admin",
+    "tenantDanger": "Gevarenzone · Admin",
+    "tenantDomain": "Domein · Admin",
+    "features": "Functies · Admin",
+    "languages": "Talen · Admin",
+    "studio": "Studio · Admin",
+    "findings": "Bevindingen · Admin",
+    "email": "E-mail · Admin"
+  },
+  "workspacePendingPage": {
+    "heading": "Uw werkruimte is nog niet klaar",
+    "description": "Dit kan gebeuren terwijl een werkruimte wordt ingericht, of als er onderweg iets is misgegaan. Vernieuw de pagina over een paar minuten, of neem contact op met degene die u heeft uitgenodigd als het probleem aanhoudt."
+  },
+  "sidebar": {
+    "brandName": "Valstack",
+    "brandTagline": "admin",
+    "collapseToggle": "Zijbalk inklappen",
+    "expandToggle": "Zijbalk uitklappen"
+  },
+  "tenantSwitcher": {
+    "archived": "Gearchiveerd"
+  },
+  "toastProvider": {
+    "viewportAriaLabel": "Meldingen",
+    "dismissLabel": "Melding sluiten",
+    "mergeCountSuffix": " ×{count}"
+  },
+  "topbarNavMenu": {
+    "triggerLabel": "Menu"
+  },
+  "topbar": {
+    "breadcrumbAriaLabel": "Kruimelpad"
+  },
+  "navSections": {
+    "platformLabel": "Platform",
+    "platformSectionLabel": "Platformacties",
+    "contentSectionLabel": "Content",
+    "configurationSectionLabel": "Configuratie",
+    "tenants": "Tenants",
+    "addTenant": "Tenant toevoegen",
+    "findings": "Bevindingen",
+    "tenantLabel": "Tenant · {tenantName}",
+    "overview": "Overzicht",
+    "look": "Uiterlijk",
+    "voice": "Toon",
+    "languages": "Talen",
+    "domain": "Domein",
+    "studio": "Studio",
+    "email": "E-mail",
+    "subscribers": "Abonnees",
+    "comments": "Reacties",
+    "team": "Team",
+    "provisioning": "Inrichting",
+    "dangerZone": "Gevarenzone",
+    "badgeLater": "later",
+    "badgeThisMilestone": "deze mijlpaal",
+    "badgePlatform": "platform",
+    "features": "Functies"
+  },
+  "tenantLayout": {
+    "scopeLabel": "Tenant"
+  },
+  "dashboardLayout": {
+    "yourSiteLabel": "Uw site"
+  },
+  "dashboardTenantPicker": {
+    "heading": "Kies een werkruimte",
+    "description": "U hebt toegang tot meer dan één werkruimte. Kies er een om verder te gaan."
+  },
+  "tenantsView": {
+    "title": "Tenants",
+    "description": "Elke site op het platform, gelezen uit de echte <code>tenants</code>-tabel.",
+    "addTenant": "+ Tenant toevoegen"
+  },
+  "emailAlertsBanner": {
+    "title": "E-mailmeldingen niet geconfigureerd",
+    "description": "RESEND_API_KEY is niet ingesteld, dus operators krijgen geen e-mail wanneer een tenant aandacht nodig heeft — controleer deze pagina handmatig."
+  },
+  "tenantsTable": {
+    "empty": "Nog geen tenants.",
+    "columnTenant": "Tenant",
+    "columnPlan": "Abonnement",
+    "columnStatus": "Status",
+    "columnCreated": "Aangemaakt",
+    "status": {
+      "ACTIVE": "Actief",
+      "SUSPENDED": "Opgeschort",
+      "ARCHIVED": "Gearchiveerd"
+    },
+    "plan": {
+      "FREE": "Free",
+      "GROWTH": "Growth"
+    },
+    "manage": "Beheren",
+    "manageAriaLabel": "{tenantName} beheren"
+  },
+  "findingsView": {
+    "title": "Bevindingen",
+    "description": "Operationele problemen die door geplande controles zijn gedetecteerd, voor alle tenants."
+  },
+  "findingsTable": {
+    "columnTenant": "Tenant",
+    "columnSource": "Bron",
+    "columnKind": "Soort",
+    "columnSeverity": "Ernst",
+    "columnLastSeen": "Laatst gezien",
+    "noTenant": "— platformbreed",
+    "empty": "Geen openstaande bevindingen. Alles is in orde."
+  },
+  "findingsCard": {
+    "title": "Openstaande bevindingen",
+    "empty": "Geen openstaande bevindingen voor deze tenant — alles is in orde.",
+    "detailsToggle": "Details",
+    "columnLevel": "Niveau",
+    "columnDocument": "Document",
+    "columnMessage": "Bericht"
+  },
+  "findingSeverityLabel": {
+    "INFO": "Info",
+    "WARNING": "Waarschuwing",
+    "CRITICAL": "Kritiek"
+  },
+  "sanityValidationMarkerLabel": {
+    "error": "Fout",
+    "warning": "Waarschuwing",
+    "info": "Info"
+  },
+  "findingSourceLabel": {
+    "DOCUMENT_VALIDATION": "Documentvalidatie",
+    "TENANT_PROVISIONING": "Tenantinrichting",
+    "RECHECK_TENANT_OWNERS": "Hercontrole eigenaar",
+    "DOMAIN_VERIFICATION": "Domeinverificatie",
+    "SITE_CONFIG_REVALIDATION": "Hervalidatie siteconfiguratie"
+  },
+  "findingKindLabel": {
+    "SCHEMA_VALIDATION_ERROR": "Schemavalidatiefout",
+    "PROVISIONING_STEP_FAILED": "Inrichtingsstap mislukt",
+    "OWNER_CHECK_STALLED": "Eigenaarscontrole vastgelopen",
+    "OWNER_CHECK_AMBIGUOUS": "Eigenaarscontrole onduidelijk",
+    "DOMAIN_NOT_ADDED": "Domein niet toegevoegd",
+    "REVALIDATION_FAILED": "Hervalidatie mislukt"
+  },
+  "ownerHomePage": {
+    "description": "Uw site in één oogopslag. Alles hier is live.",
+    "yourSiteCardTitle": "Uw site",
+    "readOnlyBadge": "alleen-lezen",
+    "nameLabel": "Naam",
+    "publicDomainLabel": "Openbaar domein",
+    "planLabel": "Abonnement",
+    "localeLabel": "Taal",
+    "openPublicDomainAriaLabel": "{domain} openen in een nieuw tabblad",
+    "readOnlyHint": "Moet een van deze waarden worden gewijzigd? Vraag het uw contactpersoon bij het platform — deze waarden zijn gekoppeld aan de hosting van uw site.",
+    "makeItYoursCardTitle": "Maak het eigen",
+    "makeItYoursSupportingText": "wijzigingen zijn direct live",
+    "lookTileTitle": "Uiterlijk",
+    "lookTileDescription": "Kleuren, lettertypen, logo, dichtheid",
+    "voiceTileTitle": "Toon",
+    "voiceTileDescription": "De woorden die uw site gebruikt",
+    "featuresTileTitle": "Functies",
+    "featuresTileDescription": "Reacties, bladwijzers, nieuwsbrief"
+  },
+  "provisioningBanner": {
+    "readyTitle": "Ingericht",
+    "readyDescription": "Alle stappen zijn voltooid.",
+    "viewStepsButton": "Stappen bekijken",
+    "runningTitle": "Inrichting — stap {step} van {total}",
+    "runningDescription": "Deze pagina wordt automatisch bijgewerkt.",
+    "failedTitle": "Inrichting mislukt bij stap {step} van {total}",
+    "failedDescription": "{step} — {reason}",
+    "failedDescriptionFallback": "Deze stap is mislukt — bekijk de stappen om het opnieuw te proberen.",
+    "ownerElevationBadge": {
+      "STALLED": "Uitnodiging eigenaar vastgelopen",
+      "AMBIGUOUS_MEMBERSHIP": "Lidmaatschap eigenaar onduidelijk"
+    },
+    "ownerElevationDescription": {
+      "STALLED": "De eigenaar heeft de uitnodiging nog niet geaccepteerd — er is niets mislukt, maar tot die tijd kan de eigenaar de eigen content niet bewerken.",
+      "AMBIGUOUS_MEMBERSHIP": "Meer dan één lidmaatschap komt overeen met de eigenaar van deze tenant — los dit handmatig op in Sanity Manage."
+    }
+  },
+  "tenantOverviewPage": {
+    "openSiteAction": "Site openen",
+    "domainCardTitle": "Domein",
+    "dnsLinkButton": "DNS",
+    "publicDomainLabel": "Openbaar domein",
+    "lastCheckedLabel": "Laatst gecontroleerd",
+    "lastCheckedJustNow": "Zojuist",
+    "dnsStatus": {
+      "NOT_CONFIGURED": "Niet beschikbaar",
+      "NOT_ADDED": "Nog niet toegevoegd",
+      "PENDING": "In afwachting — wacht op DNS",
+      "VERIFIED": "Geverifieerd",
+      "ERROR": "Controle mislukt"
+    },
+    "ownerCardTitle": "Eigenaar",
+    "emailLabel": "E-mail",
+    "roleLabel": "Rol",
+    "ownerRoleBadge": "OWNER",
+    "ownerInvitedPendingBadge": "Uitgenodigd, in afwachting",
+    "joinedLabel": "Lid sinds",
+    "contentWorkspaceCardTitle": "Contentwerkruimte",
+    "platformBadge": "platform",
+    "sanityProjectLabel": "Sanity-project",
+    "datasetLabel": "Dataset",
+    "readTokenLabel": "Leestoken",
+    "readTokenStored": "Opgeslagen",
+    "readTokenNotSet": "Niet ingesteld",
+    "revalidateHookLabel": "Hervalidatiehook",
+    "revalidateHookActive": "Actief",
+    "revalidateHookNotSet": "Niet ingesteld",
+    "notSetValue": "Niet ingesteld",
+    "recentActivityCardTitle": "Recente activiteit",
+    "recentActivitySourceLabel": "Systeemlog",
+    "activityEmpty": "Nog geen activiteit geregistreerd.",
+    "relativeJustNow": "Zojuist",
+    "relativeMinutesAgo": "{minutes} min geleden",
+    "relativeHoursAgo": "{hours} uur geleden",
+    "relativeDaysAgo": "{days} d geleden",
+    "activityAction": {
+      "CREATED": "Tenant aangemaakt",
+      "DEPROVISION_REQUESTED": "Ontmanteling aangevraagd",
+      "DEPROVISIONED": "Tenant ontmanteld",
+      "REACTIVATED": "Tenant opnieuw geactiveerd",
+      "PROVISIONED": "Tenant ingericht",
+      "PROVISIONING_FAILED": "Inrichting mislukt",
+      "SETTINGS_UPDATED": "Instellingen bijgewerkt",
+      "DELETED": "Tenant verwijderd"
+    }
+  },
+  "tenantDomainPage": {
+    "pageTitle": "Domein",
+    "subCopy": "Het enige onderdeel van de inrichting dat u echt zelf moet afronden.",
+    "cardTitle": "Verwijs {domain} naar ons",
+    "checkedHint": "Zojuist gecontroleerd",
+    "bodyCopy": "Voeg deze records toe bij uw DNS-provider. Verificatie is meestal binnen een uur voltooid.",
+    "columnType": "Type",
+    "columnName": "Naam",
+    "columnValue": "Waarde",
+    "verifiedEmptyState": "Dit domein is geverifieerd — er valt niets meer te configureren.",
+    "unavailableState": "DNS-records zijn op dit moment niet beschikbaar.",
+    "dnsStatus": {
+      "NOT_CONFIGURED": "Niet beschikbaar",
+      "NOT_ADDED": "Nog niet toegevoegd",
+      "PENDING": "Wacht op DNS",
+      "VERIFIED": "Geverifieerd",
+      "ERROR": "Controle mislukt"
+    }
+  },
+  "presetPicker": {
+    "ariaLabel": "Voorinstelling",
+    "console": "Console",
+    "consoleDescription": "Monospace, precies en technisch.",
+    "consoleMiniPrimary": "Build Log",
+    "consoleMiniSecondary": "Zonder drama uitgerold",
+    "editorial": "Editorial",
+    "editorialDescription": "Serif, warm en als een tijdschrift.",
+    "editorialMiniPrimary": "Veldnotities",
+    "editorialMiniSecondary": "Berichten van de kust"
+  },
+  "logoHueField": {
+    "followAccentHue": "Accenttint volgen",
+    "logoHueAriaLabel": "Logotint",
+    "followsAccent": "volgt accent",
+    "hueValue": "tint {hue}°"
+  },
+  "lookForm": {
+    "heading": "Uiterlijk",
+    "subtitle": "Geef deze site een thema. Alles wordt hieronder direct getoond — niets is live totdat u opslaat.",
+    "resetButton": "Terugzetten naar voorinstelling",
+    "saveButton": "Wijzigingen opslaan",
+    "savingButton": "Opslaan…",
+    "alertSuccess": "Opgeslagen in site_config.",
+    "alertError": "Uiterlijk-instellingen konden niet worden opgeslagen. Probeer het opnieuw.",
+    "basicHeading": "Basis",
+    "basicDescription": "Wat de meeste tenants aanpassen",
+    "presetLabel": "Voorinstelling",
+    "presetDescription": "Het startpunt dat bijna elke tenant kiest. Stelt accenttint, kop- en tekstlettertype, afronding en dichtheid in.",
+    "accentHueLabel": "Accenttint",
+    "accentHueDescription": "Alleen de tint verandert — lichtheid en chroma liggen vast (OKLCH), zodat het contrast WCAG-geverifieerd blijft.",
+    "logoHueLabel": "Logotint",
+    "logoHueDescription": "Kleurt de toonstappen van het woordmerk (--logo-1/2/3). Volgt de accenttint, tenzij u deze instelt.",
+    "brandImagesLabel": "Merkafbeeldingen",
+    "brandImagesDescription": "Opgeslagen in Vercel Blob — geen transformaties achteraf, dus wat u uploadt is wat er live gaat.",
+    "logoFieldLabel": "Logo",
+    "logoFieldHint": "PNG, JPEG, WebP of SVG · valt terug op het polygoonwoordmerk",
+    "faviconFieldLabel": "Favicon",
+    "faviconFieldHint": "Graag vooraf vierkant bijgesneden — Blob kan dat niet voor u doen (bij een SVG telt de viewBox als vorm). Niet-vierkante uploads worden geweigerd.",
+    "advancedSummary": "Geavanceerd",
+    "optionalTag": "optioneel",
+    "headingFontLabel": "Koplettertype",
+    "headingFontDescription": "Vaste set van vijf (statische next/font-loaders). Elk wordt in zijn eigen letter getoond.",
+    "bodyFontLabel": "Tekstlettertype",
+    "radiusScaleLabel": "Afrondingsschaal",
+    "radiusScaleDescription": "Rondheid van hoeken op elk oppervlak.",
+    "densityLabel": "Dichtheid",
+    "densityDescription": "Witruimte en grootte van bedieningselementen.",
+    "footerNote": "Afrondingsschaal en dichtheid worden met de rest van dit formulier opgeslagen, maar sturen de voorbeeldweergave hierboven nog niet aan.",
+    "radiusScaleOptionLabel": {
+      "SM": "Klein",
+      "MD": "Middel",
+      "LG": "Groot",
+      "XL": "Extra groot"
+    },
+    "densityOptionLabel": {
+      "DEFAULT": "Standaard",
+      "COMPACT": "Compact"
+    }
+  },
+  "lookPreview": {
+    "modeLight": "Licht",
+    "modeDark": "Donker",
+    "previewColorSchemeAriaLabel": "Kleurenschema van voorbeeld",
+    "livePreviewHeading": "Live voorbeeld",
+    "livePreviewDescription": "Echte @blog/ui-primitieven",
+    "sampleHeading": "De getijdentabellen lezen",
+    "samplePara": "Een kort bericht om kop- en tekstletter, accent, logotinten en afronding samen te tonen.",
+    "subscribeButton": "Abonneren",
+    "readMoreButton": "Lees meer",
+    "readTimeChip": "4 min lezen",
+    "previewNote": "Niet-opgeslagen formulierstatus → CSS custom properties, volgens dezelfde OKLCH-schaal als in productie. Niets hier is live totdat u opslaat.",
+    "fullPagePreviewHeading": "Voorbeeld van volledige pagina",
+    "fullPagePreviewDescription": "Gereserveerd — wordt pas na opslaan bijgewerkt",
+    "deviceUrl": "{primaryDomain}",
+    "framePlaceholder": "Iframe van de echte site in voorbeeldmodus. Wordt pas bijgewerkt na opslaan (of met een voorbeeld-URL) — ruimte en routing zijn nu al gereserveerd."
+  },
+  "brandAssetField": {
+    "unexpectedError": "Er is iets misgegaan. Probeer het opnieuw.",
+    "currentAlt": "Huidige {label}",
+    "uploading": "Uploaden…",
+    "replace": "{label} vervangen",
+    "upload": "{label} uploaden",
+    "remove": "Verwijderen"
+  },
+  "emailForm": {
+    "pageHeading": "E-mail",
+    "pageSubtitle": "Afzenderidentiteit en tekst per sjabloon voor elke e-mail die deze tenant verstuurt."
+  },
+  "emailSettingsForm": {
+    "heading": "E-mailinstellingen",
+    "description": "Geldt voor elke e-mail die deze tenant verstuurt. Lege velden vallen terug op de productstandaard.",
+    "senderNameLabel": "Naam afzender",
+    "senderNameHint": "De weergavenaam bij het Van-adres — staat los van de sitetitel.",
+    "replyToLabel": "Antwoordadres",
+    "replyToHint": "Waar een antwoord op een e-mail van de tenant naartoe gaat.",
+    "footerAddressLabel": "Postadres in voettekst",
+    "footerAddressHint": "Wettelijk verplicht voor bulkmail — wordt getoond in de voettekst van elke e-mail van de tenant.",
+    "logoLabel": "E-maillogo",
+    "logoHint": "Valt terug op de productstandaard. Een sjabloon kan dit hieronder met een eigen logo overschrijven.",
+    "saveButton": "Wijzigingen opslaan",
+    "savingButton": "Opslaan…",
+    "alertSuccess": "E-mailinstellingen opgeslagen.",
+    "alertError": "E-mailinstellingen konden niet worden opgeslagen. Probeer het opnieuw."
+  },
+  "emailLogoField": {
+    "unexpectedError": "Er is iets misgegaan. Probeer het opnieuw.",
+    "currentAlt": "Huidige {label}",
+    "uploading": "Uploaden…",
+    "replace": "{label} vervangen",
+    "upload": "{label} uploaden",
+    "remove": "Verwijderen",
+    "unsupportedType": "Kies een PNG-, JPEG- of GIF-afbeelding — SVG en WebP worden niet ondersteund door grote e-mailprogramma's.",
+    "tooLarge": "Dat bestand is te groot — de limiet is {limit}."
+  },
+  "emailTemplatesSection": {
+    "heading": "Sjablonen",
+    "description": "Onderwerp, tekst en logo per sjabloontype. Als alle eigen tekst wordt verwijderd, wordt de productstandaard getoond.",
+    "segmentedControlAriaLabel": "Kies een e-mailsjabloon om te bewerken"
+  },
+  "emailTemplateEditor": {
+    "subjectLabel": "Onderwerp",
+    "subjectHint": "Leeg laten herstelt het standaardonderwerp van het product.",
+    "bodyLabel": "Tekst",
+    "bodyHint": "De inlogknop, uitnodigingslink of afmeldlink wordt altijd hieronder getoond — die kan hier niet worden verwijderd.",
+    "logoLabel": "Sjabloonlogo",
+    "logoHint": "Overschrijft het e-maillogo van de tenant voor alleen dit sjabloon.",
+    "saveButton": "Wijzigingen opslaan",
+    "savingButton": "Opslaan…",
+    "alertSuccess": "Sjabloon opgeslagen.",
+    "alertError": "Dit sjabloon kon niet worden opgeslagen. Probeer het opnieuw.",
+    "previewHeading": "Voorbeeld",
+    "previewIframeTitle": "E-mailvoorbeeld",
+    "actionLockedNote": "De knop hieronder wordt altijd getoond en kan hier niet worden bewerkt.",
+    "templateTypeLabel": {
+      "MAGIC_LINK": "Inloglink",
+      "TENANT_INVITE": "Teamuitnodiging",
+      "NEWSLETTER_CONFIRMATION": "Bevestiging nieuwsbrief"
+    },
+    "templateTypeDescription": {
+      "MAGIC_LINK": "Verstuurd wanneer iemand inlogt op de site van deze tenant.",
+      "TENANT_INVITE": "Verstuurd wanneer iemand wordt uitgenodigd voor het team van deze tenant.",
+      "NEWSLETTER_CONFIRMATION": "Verstuurd om een nieuwsbriefabonnement te bevestigen."
+    },
+    "previewActionLabel": {
+      "MAGIC_LINK": "Inloggen",
+      "TENANT_INVITE": "Uitnodiging accepteren",
+      "NEWSLETTER_CONFIRMATION": "Abonnement bevestigen"
+    }
+  },
+  "portableTextEditorToolbar": {
+    "bold": "Vet",
+    "italic": "Cursief",
+    "heading": "Kop",
+    "bulletList": "Opsommingslijst",
+    "numberedList": "Genummerde lijst",
+    "link": "Link",
+    "removeLink": "Link verwijderen",
+    "linkUrlLabel": "Link-URL",
+    "linkApply": "Toepassen",
+    "linkCancel": "Annuleren"
+  },
+  "voiceSettings": {
+    "heading": "Toon",
+    "description": "De woorden die de site zelf gebruikt. Elk veld heeft al een verstandige standaardwaarde.",
+    "saveButton": "Wijzigingen opslaan",
+    "savingButton": "Opslaan…",
+    "alertSuccess": "voiceOverrides opgeslagen.",
+    "alertError": "Opslaan mislukt. Probeer het opnieuw.",
+    "basicHeading": "Basis",
+    "basicAlert": "Hier is niets verplicht. De site heeft al verstandige standaardteksten. De meeste tenants openen de geavanceerde velden hieronder nooit.",
+    "advancedSummary": "Geavanceerd — 8 geselecteerde teksten, 2 groepen",
+    "advancedOverrideInfo": "Elk veld is een overschrijving. Laat een veld leeg om de eigen standaardtekst van de site te gebruiken — een veld leegmaken zet het terug naar die standaard, het maakt de tekst niet leeg."
+  },
+  "voiceFieldGroup": {
+    "fieldCount": "{count, plural, one {# veld} other {# velden}}"
+  },
+  "voiceFieldGroups": {
+    "notFoundPage": "404-pagina",
+    "emptyStates": "Lege staten"
+  },
+  "voiceFieldLabels": {
+    "notFoundHeading": "Kop niet gevonden",
+    "notFoundSupportingText": "Ondersteunende tekst niet gevonden",
+    "notFoundReturnHome": "Terug naar home (niet gevonden)",
+    "blogListEmpty": "Bloglijst leeg",
+    "topicEmpty": "Onderwerp leeg",
+    "tagEmpty": "Tag leeg",
+    "topicsEmpty": "Onderwerpen leeg",
+    "bookmarksEmpty": "Bladwijzers leeg"
+  },
+  "addTenantWizard": {
+    "heading": "Tenant toevoegen",
+    "railAriaLabel": "Inrichtingsstappen",
+    "steps": {
+      "details": {
+        "title": "Gegevens",
+        "description": "Naam, domein, abonnement"
+      }
+    },
+    "stepDescriptions": {
+      "SANITY_PROJECT": "Aanmaken + configureren",
+      "SEED_CONTENT": "Startdocumenten",
+      "PERSIST_TOKEN": "Leesgegevens",
+      "MAP_DOMAIN": "DNS + verificatie",
+      "CREATE_WEBHOOK": "CMS naar website",
+      "VERIFY_CONTENT": "Controle startcontent"
+    }
+  },
+  "tenantDetailsForm": {
+    "heading": "Tenantgegevens",
+    "description": "Het snelle deel. Alles hierna verloopt automatisch, en elke stap kan na een fout worden hervat.",
+    "nameLabel": "Tenantnaam",
+    "domainLabel": "Domein",
+    "domainHint": "Het openbare domein waarop de site van deze tenant bereikbaar is.",
+    "planLabel": "Abonnement",
+    "planOptionFree": "Free",
+    "planOptionGrowth": "Growth",
+    "ownerEmailLabel": "E-mailadres eigenaar",
+    "ownerEmailHint": "De persoon die deze tenant beheert. Een bestaand account krijgt direct toegang; een nieuw adres ontvangt een uitnodiging per e-mail om in te loggen.",
+    "submitButton": "Inrichting starten",
+    "confirmOwnerInviteButton": "Bevestigen en eigenaar uitnodigen",
+    "submittingBeginButton": "Inrichting starten…",
+    "submittingInviteButton": "Eigenaar uitnodigen…"
+  },
+  "provisioningStatusView": {
+    "pageTitle": "Inrichting",
+    "description": "{tenantName} · elke stap kan afzonderlijk worden hervat.",
+    "stepsCardTitle": "Stappen",
+    "stepsCompletionBadge": "{done} van {total} voltooid",
+    "stepLabel": {
+      "SANITY_PROJECT": "Werkruimte aanmaken",
+      "SEED_CONTENT": "Startcontent toevoegen",
+      "PERSIST_TOKEN": "Leesgegevens uitgeven",
+      "MAP_DOMAIN": "Domein koppelen",
+      "CREATE_WEBHOOK": "CMS aan website koppelen",
+      "VERIFY_CONTENT": "Controleren of content klaar is"
+    },
+    "statusLabel": {
+      "IDLE": "Niet gestart",
+      "RUNNING": "Bezig…",
+      "DONE": "Voltooid",
+      "FAILED": "Mislukt"
+    },
+    "retryButton": "Inrichting opnieuw proberen",
+    "retryingButton": "Inrichting opnieuw proberen…",
+    "startButton": "Inrichting starten",
+    "startingButton": "Starten…",
+    "startError": "Inrichting kon niet worden gestart. Probeer het opnieuw.",
+    "startErrorNotFound": "Deze tenant is niet gevonden. Vernieuw de pagina en probeer het opnieuw.",
+    "startErrorArchived": "Deze tenant is gearchiveerd; de inrichting kan niet worden gestart.",
+    "startNoticeAlreadyInProgress": "Er loopt al een inrichting voor deze tenant — deze pagina wordt automatisch bijgewerkt zodra die klaar is.",
+    "pollErrorWarning": "De laatste status kon niet worden opgehaald — er wordt automatisch opnieuw geprobeerd.",
+    "errorKind": {
+      "permission": {
+        "headline": "Ontbrekende rechten om deze stap te voltooien",
+        "body": "De inrichtingsgegevens hebben geen rechten voor wat deze stap nodig heeft — vaak het uitnodigen van een projectlid of het verlenen van toegang. Mogelijk moet de stap handmatig worden afgerond in Sanity Manage of het Vercel-dashboard.",
+        "nextStep": "Verleen de ontbrekende rechten en probeer het opnieuw."
+      },
+      "duplicate": {
+        "headline": "Al in gebruik door een andere tenant",
+        "body": "Iets wat deze stap probeert aan te maken — een projecthandle, een e-mailuitnodiging of een domein — is elders al in gebruik.",
+        "nextStep": "Los het conflict op en probeer het opnieuw."
+      },
+      "network": {
+        "headline": "Inrichtingsdienst niet bereikbaar",
+        "body": "Het verzoek aan Sanity of Vercel duurde te lang of de verbinding werd verbroken voordat het klaar was. Dit is vaak tijdelijk.",
+        "nextStep": "Wacht even en probeer het opnieuw."
+      },
+      "unknown": {
+        "headline": "Deze stap is mislukt",
+        "body": "De inrichting liep tegen een fout aan die nog niet wordt herkend. De technische details hieronder kunnen helpen bij de diagnose.",
+        "nextStep": "Probeer het opnieuw, of bekijk de technische details voordat u om hulp vraagt."
+      }
+    },
+    "technicalDetailsToggle": "Technische details",
+    "ownerLabel": "Eigenaar",
+    "ownerInvitedPendingBadge": "Uitgenodigd, in afwachting",
+    "stepRunningNow": "nu",
+    "relativeJustNow": "Zojuist",
+    "relativeMinutesAgo": "{minutes} min geleden",
+    "relativeHoursAgo": "{hours} uur geleden",
+    "relativeDaysAgo": "{days} d geleden",
+    "runCardTitle": "Run",
+    "runStartedLabel": "Gestart",
+    "runFinishedLabel": "Voltooid",
+    "runRegistryLabel": "Register",
+    "runStartedPending": "Wachten tot de run start…",
+    "runFinishedPending": "—",
+    "runWorkflowLogLink": "Workflowlog"
+  },
+  "deprovisioningStatusView": {
+    "cardTitle": "Voortgang ontmanteling",
+    "stepsCompletionBadge": "{done} van {total} voltooid",
+    "startingBadge": "Starten…",
+    "preRunStepStatusLabel": "In wachtrij",
+    "stepLabel": {
+      "REMOVE_DOMAIN": "Domein verwijderen",
+      "ARCHIVE_SANITY_PROJECT": "Sanity-project archiveren",
+      "REVOKE_SANITY_TOKENS": "Sanity-tokens intrekken",
+      "CLEAR_ARTIFACTS": "Inrichtingsartefacten opruimen",
+      "ARCHIVE_TENANT": "Tenant archiveren",
+      "INVALIDATE_TENANT_CACHE": "Gecachte pagina's ongeldig maken"
+    },
+    "statusLabel": {
+      "IDLE": "Niet gestart",
+      "RUNNING": "Bezig…",
+      "DONE": "Voltooid",
+      "FAILED": "Mislukt"
+    },
+    "stepRunningNow": "nu",
+    "failedStepLabel": "Mislukt tijdens \"{step}\".",
+    "errorKind": {
+      "permission": {
+        "headline": "Ontbrekende rechten om deze stap te voltooien",
+        "body": "De ontmantelingsgegevens hebben geen rechten voor wat deze stap nodig heeft — vaak het intrekken van een token of het verwijderen van een projectlid. Mogelijk moet de stap handmatig worden afgerond in Sanity Manage of het Vercel-dashboard.",
+        "nextStep": "Verleen de ontbrekende rechten en start de ontmanteling opnieuw."
+      },
+      "duplicate": {
+        "headline": "Elders al in gebruik",
+        "body": "Iets wat deze stap probeert te verwijderen of opnieuw toe te wijzen — een domeinkoppeling, een token — is elders al in gebruik of wordt elders nog gebruikt.",
+        "nextStep": "Los het conflict op en start de ontmanteling opnieuw."
+      },
+      "network": {
+        "headline": "Ontmantelingsdienst niet bereikbaar",
+        "body": "Het verzoek aan Sanity of Vercel duurde te lang of de verbinding werd verbroken voordat het klaar was. Dit is vaak tijdelijk.",
+        "nextStep": "Wacht even en start de ontmanteling opnieuw."
+      },
+      "unknown": {
+        "headline": "Deze stap is mislukt",
+        "body": "De ontmanteling liep tegen een fout aan die nog niet wordt herkend. De technische details hieronder kunnen helpen bij de diagnose.",
+        "nextStep": "Start de ontmanteling opnieuw, of bekijk de technische details voordat u om hulp vraagt."
+      }
+    },
+    "technicalDetailsToggle": "Technische details",
+    "relativeJustNow": "Zojuist",
+    "relativeMinutesAgo": "{minutes} min geleden",
+    "relativeHoursAgo": "{hours} uur geleden",
+    "relativeDaysAgo": "{days} d geleden",
+    "runCardTitle": "Run",
+    "runStartedLabel": "Gestart",
+    "runFinishedLabel": "Voltooid",
+    "runFinishedPending": "—",
+    "runWorkflowLogLink": "Workflowlog"
+  },
+  "tenantDangerPage": {
+    "title": "Gevarenzone",
+    "description": "Onomkeerbare acties voor deze tenant. Alleen voor superadmins.",
+    "historyHeading": "Ontmantelingsgeschiedenis"
+  },
+  "studioPage": {
+    "title": "Studio",
+    "notProvisionedTitle": "Studio is nog niet klaar",
+    "notProvisionedDescription": "Het Sanity-project van deze tenant is nog niet volledig ingericht. Probeer het opnieuw zodra de inrichting is voltooid."
+  },
+  "tenantDetailsPanel": {
+    "heading": "Tenantgegevens",
+    "fieldsGroupLabel": "Velden met tenantgegevens",
+    "nameLabel": "Naam",
+    "domainLabel": "Primair domein",
+    "ownerEmailLabel": "E-mailadres eigenaar",
+    "planLabel": "Abonnement",
+    "planOptionFree": "Free",
+    "planOptionGrowth": "Growth",
+    "localeLabel": "Standaardtaal",
+    "saveButton": "Wijzigingen opslaan",
+    "savingButton": "Opslaan…",
+    "alertSuccess": "Tenantgegevens opgeslagen.",
+    "provisioningStartedError": "De inrichting van deze tenant is al gestart; de gegevens kunnen niet meer worden bewerkt.",
+    "archivedError": "Deze tenant is gearchiveerd; de gegevens kunnen niet meer worden bewerkt.",
+    "notFoundError": "Tenant niet gevonden.",
+    "ownerAlreadyJoinedError": "De eigenaar van deze tenant heeft al ingelogd, dus het e-mailadres kan hier niet meer worden gecorrigeerd — dat zou in plaats daarvan het eigendom overdragen.",
+    "ownerEmailTakenError": "Voor dit e-mailadres staat al een uitnodiging open bij deze tenant.",
+    "lockedAnnouncement": "Sommige velden met tenantgegevens zijn nu vergrendeld.",
+    "unlockedAnnouncement": "Meer velden met tenantgegevens zijn nu bewerkbaar.",
+    "fieldLockedReasonStep": "Vergrendeld — de stap \"{step}\" is al voltooid en heeft deze waarde gebruikt.",
+    "fieldLockedReasonRunning": "Vergrendeld zolang de inrichting loopt.",
+    "fieldLockedReasonSucceeded": "Vergrendeld — de inrichting is al voltooid.",
+    "fieldLockedReasonArchived": "Vergrendeld — deze tenant is gearchiveerd.",
+    "localeIsAdditionalError": "Deze taal is al een extra taal. Verwijder deze daar eerst.",
+    "localeInvalidError": "Kies een ondersteunde taal."
+  },
+  "archivedTenantNotice": {
+    "title": "Deze tenant is gearchiveerd",
+    "description": "Ontmanteld op {date}. Alles op deze pagina's is alleen-lezen."
+  },
+  "archivedTenantsToggle": {
+    "ariaLabel": "Zichtbaarheid tenants",
+    "activeOption": "Actief",
+    "allOption": "Alle"
+  },
+  "deprovisionTenantControl": {
+    "cardTitle": "Deze tenant ontmantelen",
+    "archivedCardTitle": "Deze tenant definitief verwijderen",
+    "description": "Verwijdert het eigen domein van de tenant, verwijdert het Studio-project en archiveert het Sanity-project zodat er geen kosten meer worden gemaakt, in plaats van het te verwijderen. De tenantrij zelf wordt gearchiveerd, niet verwijderd. Dit kan niet ongedaan worden gemaakt.",
+    "triggerButton": "Ontmantelen",
+    "inProgressHint": "Er loopt al een ontmanteling voor deze tenant.",
+    "dialogTitle": "{name} ontmantelen",
+    "dialogDescription": "Dit start deprovision-tenant.yml, dat elke ingerichte resource van deze tenant afbreekt. Typ de naam van de tenant om te bevestigen.",
+    "confirmLabel": "Typ \"{name}\" om te bevestigen",
+    "confirmHint": "Moet exact overeenkomen met de naam van de tenant.",
+    "dryRunLabel": "Proefrun (alleen voorbeeld, er wordt niets verwijderd)",
+    "cancelButton": "Annuleren",
+    "confirmButton": "Ontmantelen",
+    "confirmingButton": "Starten…",
+    "deleteDescription": "Verwijdert deze tenant en elke afhankelijke rij (lidmaatschappen, abonnees, bladwijzers, domeinen, siteconfiguratie) definitief uit de database. Dit kan niet ongedaan worden gemaakt en maakt het domein weer vrij voor hergebruik.",
+    "deleteTriggerButton": "Tenant definitief verwijderen",
+    "deleteDialogTitle": "{name} verwijderen",
+    "deleteDialogDescription": "Dit verwijdert de tenantrij en alles wat ervan afhankelijk is definitief. Typ de naam van de tenant om te bevestigen.",
+    "deleteConfirmLabel": "Typ \"{name}\" om te bevestigen",
+    "deleteConfirmHint": "Moet exact overeenkomen met de naam van de tenant.",
+    "deleteConfirmButton": "Verwijderen",
+    "deleteConfirmingButton": "Verwijderen…"
+  },
+  "reactivateTenantControl": {
+    "cardTitle": "Deze tenant opnieuw activeren",
+    "description": "Brengt een gearchiveerde tenant weer online door de inrichting opnieuw uit te voeren: de tenantrij en het Sanity-project worden uit het archief gehaald, het eigen domein wordt opnieuw gekoppeld en de hervalidatiewebhook wordt opnieuw aangemaakt. Gebruik dit in plaats van een tenant te verwijderen die per vergissing is ontmanteld.",
+    "triggerButton": "Tenant opnieuw activeren",
+    "dialogTitle": "{name} opnieuw activeren",
+    "dialogDescription": "Dit start provision-tenant.yml, dat elke ingerichte resource van deze tenant herstelt. Typ de naam van de tenant om te bevestigen.",
+    "confirmLabel": "Typ \"{name}\" om te bevestigen",
+    "confirmHint": "Moet exact overeenkomen met de naam van de tenant.",
+    "cancelButton": "Annuleren",
+    "confirmButton": "Opnieuw activeren",
+    "confirmingButton": "Starten…"
+  },
+  "featuresSettings": {
+    "heading": "Functies",
+    "description": "Zet functies voor de tenant aan of uit. Vergrendelde schakelaars vereisen het Growth-abonnement.",
+    "saveButton": "Wijzigingen opslaan",
+    "savingButton": "Opslaan…",
+    "alertSuccess": "Functies opgeslagen.",
+    "alertError": "Opslaan mislukt. Probeer het opnieuw.",
+    "planLockedBadge": "Growth-abonnement",
+    "switchOn": "Aan",
+    "switchOff": "Uit",
+    "capabilitiesHeading": "Mogelijkheden",
+    "toggleLabel": {
+      "COMMENTS": "Reacties",
+      "RATINGS": "Beoordelingen",
+      "BOOKMARKS": "Bladwijzers",
+      "NEWSLETTER": "Nieuwsbrief",
+      "ANALYTICS": "Analyse",
+      "CONSENT_BANNER": "Cookiemelding"
+    },
+    "toggleDescription": {
+      "COMMENTS": "Laat lezers reageren op berichten.",
+      "RATINGS": "Laat lezers berichten beoordelen.",
+      "BOOKMARKS": "Laat lezers berichten bewaren om later te lezen.",
+      "NEWSLETTER": "Toon het aanmeldformulier voor de nieuwsbrief op de site.",
+      "ANALYTICS": "Schakel analysetracking op de site in.",
+      "CONSENT_BANNER": "Toon bezoekers een cookiemelding voordat niet-essentiële cookies of scripts worden geladen."
+    }
+  },
+  "languageNames": {
+    "EN": "Engels",
+    "NL": "Nederlands",
+    "FR": "Frans",
+    "DE": "Duits",
+    "ES": "Spaans"
+  },
+  "languagesSettings": {
+    "heading": "Talen",
+    "description": "Kies in welke talen de site naast de standaardtaal wordt gepubliceerd.",
+    "saveButton": "Wijzigingen opslaan",
+    "savingButton": "Opslaan…",
+    "alertSuccess": "Talen opgeslagen.",
+    "alertError": "Opslaan mislukt. Probeer het opnieuw.",
+    "switchOn": "Aan",
+    "switchOff": "Uit",
+    "defaultHeading": "Standaardtaal",
+    "defaultDescription": "{language}. Elke pagina wordt eerst in deze taal geschreven; stel deze in bij de tenantgegevens.",
+    "additionalHeading": "Extra talen",
+    "allowance": "{used} van {allowed} extra talen in gebruik binnen uw abonnement.",
+    "upgradeNotice": "Uw abonnement publiceert alleen de standaardtaal. Upgrade om meer talen toe te voegen.",
+    "downgradeNotice": "Uw abonnement publiceert {allowed, plural, one {# extra taal} other {# extra talen}}, maar er zijn er {stored} opgeslagen. Kies welke live blijven — de andere worden bewaard en er wordt niets verwijderd.",
+    "keptBadge": "Bewaard, niet live binnen uw abonnement",
+    "planLockedBadge": "Niet in uw abonnement"
+  }
+}
