@@ -119,4 +119,41 @@ describe(toPricingPanels.name, () => {
       label: 'Regular price',
     });
   });
+
+  it('heads the monthly tab with the first price of a yearly-only tier', () => {
+    const [monthly, yearly] = setup([
+      monthlyAndYearly,
+      makePricingTier({
+        id: 'annual',
+        prices: [makePricingPrice({ period: PRICE_PERIOD.YEAR, amount: 300 })],
+      }),
+    ]);
+
+    expect(monthly?.cards[1]?.headline).toMatchObject({
+      amount: '£300',
+      period: 'per year',
+    });
+    expect(monthly?.cards[1]?.extras).toEqual([]);
+    expect(yearly?.cards[1]?.headline).toMatchObject({ amount: '£300' });
+  });
+
+  it('heads the yearly tab with the first price of a monthly-only tier', () => {
+    const [monthly, yearly] = setup([
+      monthlyAndYearly,
+      makePricingTier({
+        id: 'flex',
+        prices: [
+          makePricingPrice({ period: PRICE_PERIOD.MONTH, amount: 9 }),
+          makePricingPrice({ period: PRICE_PERIOD.ONE_TIME, amount: 20 }),
+        ],
+      }),
+    ]);
+
+    expect(yearly?.cards[1]?.headline).toMatchObject({
+      amount: '£9',
+      period: 'per month',
+    });
+    expect(yearly?.cards[1]?.extras).toEqual(['£20 one-time']);
+    expect(monthly?.cards[1]?.headline).toMatchObject({ amount: '£9' });
+  });
 });

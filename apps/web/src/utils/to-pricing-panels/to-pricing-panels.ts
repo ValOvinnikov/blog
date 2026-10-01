@@ -83,11 +83,13 @@ export const toPricingPanels = ({
     tier: TPricingTier,
     tab: TMaybeUndefined<TPricingTabPeriod>,
   ): IPricingCardData => {
-    const prices = tab
-      ? tier.prices.filter(
-          (price) => price.period === tab || !isTabPeriod(price.period),
-        )
-      : tier.prices;
+    const hasTabPrice = tier.prices.some((price) => price.period === tab);
+    const prices =
+      tab && hasTabPrice
+        ? tier.prices.filter(
+            (price) => price.period === tab || !isTabPeriod(price.period),
+          )
+        : tier.prices;
     const head = prices.find((price) => price.period === tab) ?? prices[0];
 
     return {
