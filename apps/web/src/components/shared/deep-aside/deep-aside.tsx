@@ -15,11 +15,6 @@ export interface IDeepAsideProps {
 
 const s = deepAsideVariants();
 
-/**
- * Inside a `DepthProvider` visibility is pure CSS, keyed off its
- * `data-depth` attribute, so the markup is identical at every depth.
- * Outside one there is no depth to follow and the aside always shows.
- */
 export const DeepAside = ({ kind, label, children }: IDeepAsideProps) => {
   const hasDepthProvider = useHasDepthProvider();
   const aside = (

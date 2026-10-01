@@ -14,9 +14,13 @@ export const testimonialModuleViewVariants = tv({
     isLoneFromLg: { true: {}, false: {} },
   },
   compoundVariants: [
-    { columns: 2, isLoneBelowLg: true, item: ['sm:col-start-2'] },
-    { columns: 3, isLoneBelowLg: true, item: ['sm:max-lg:col-start-2'] },
-    { columns: 3, isLoneFromLg: true, item: ['lg:col-start-3'] },
+    { columns: 2, isLoneBelowLg: true, class: { item: ['sm:col-start-2'] } },
+    {
+      columns: 3,
+      isLoneBelowLg: true,
+      class: { item: ['sm:max-lg:col-start-2'] },
+    },
+    { columns: 3, isLoneFromLg: true, class: { item: ['lg:col-start-3'] } },
   ],
   defaultVariants: { isLoneBelowLg: false, isLoneFromLg: false },
 });

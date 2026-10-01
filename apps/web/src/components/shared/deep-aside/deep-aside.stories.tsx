@@ -47,11 +47,14 @@ export const AlwaysVisibleOutsideDepthProvider: TStory = {};
 /** Inside a `DepthProvider` at the default `READ` depth, the aside is hidden. */
 export const HiddenInReadDepth: TStory = {
   decorators: [
-    (Story) => (
-      <DepthProvider hasSkim={false} hasDeep={true}>
-        <Story />
-      </DepthProvider>
-    ),
+    (Story) => {
+      localStorage.removeItem(DEPTH_STORAGE_KEY);
+      return (
+        <DepthProvider hasSkim={false} hasDeep={true}>
+          <Story />
+        </DepthProvider>
+      );
+    },
   ],
 };
 
