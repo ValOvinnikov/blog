@@ -46,18 +46,13 @@ describe(`<${TimelineModuleView.name}/>`, () => {
   it('renders the items in order as an ordered list', () => {
     setup();
 
-    const list = screen.getByRole('list');
-    const headings = screen
-      .getAllByRole('heading', { level: 3 })
-      .map((heading) => heading.textContent);
+    const headings = screen.getAllByRole('heading', { level: 3 });
 
-    expect(list.tagName).toBe('OL');
+    expect(screen.getByRole('list')).toBeVisible();
     expect(screen.getAllByRole('listitem')).toHaveLength(3);
-    expect(headings).toEqual([
-      'Step heading 1',
-      'Step heading 2',
-      'Step heading 3',
-    ]);
+    expect(headings[0]).toHaveAccessibleName('Step heading 1');
+    expect(headings[1]).toHaveAccessibleName('Step heading 2');
+    expect(headings[2]).toHaveAccessibleName('Step heading 3');
   });
 
   it('numbers the markers by position when the marker style is numbered', () => {

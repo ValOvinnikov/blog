@@ -58,25 +58,32 @@ export const TimelineModuleView = ({
           markerStyle={markerStyle}
           dataTestId={`${dataTestId}-timeline-${orientation.toLowerCase()}`}
         >
-          {items.map(({ id, marker, heading, body }, index) => (
-            <Timeline.Item
-              key={id}
-              orientation={orientation}
-              itemAlignment={itemAlignment}
-            >
-              <Timeline.Marker markerStyle={markerStyle}>
-                {markerStyle === TIMELINE_MARKER_STYLE.NUMBERED
-                  ? index + 1
-                  : marker}
-              </Timeline.Marker>
-              <Timeline.Heading>{heading}</Timeline.Heading>
-              {body && (
-                <Timeline.Body>
-                  <PortableText value={body} />
-                </Timeline.Body>
-              )}
-            </Timeline.Item>
-          ))}
+          {items.map(({ id, marker, heading, body }, index) => {
+            const markerContent =
+              markerStyle === TIMELINE_MARKER_STYLE.NUMBERED
+                ? index + 1
+                : marker;
+
+            return (
+              <Timeline.Item
+                key={id}
+                orientation={orientation}
+                itemAlignment={itemAlignment}
+              >
+                {markerContent !== undefined && markerContent !== '' && (
+                  <Timeline.Marker markerStyle={markerStyle}>
+                    {markerContent}
+                  </Timeline.Marker>
+                )}
+                <Timeline.Heading>{heading}</Timeline.Heading>
+                {body && body.length > 0 && (
+                  <Timeline.Body>
+                    <PortableText value={body} />
+                  </Timeline.Body>
+                )}
+              </Timeline.Item>
+            );
+          })}
         </Timeline>
         {ctaButtons.length > 0 && (
           <div className={actions.actions()}>
