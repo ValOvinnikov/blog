@@ -35,8 +35,12 @@ export const postArticleVariants = tv({
     withRail: {
       true: {
         body: ['lg:max-w-page', 'lg:grid lg:grid-cols-[220px_1fr] lg:gap-x-10'],
-        // Scopes the full-bleed breakout to this column instead of the page width; `lg:`-scoped since the grid only exists there.
-        content: ['lg:[--container-page:100%]'],
+        // The grid column is not viewport-centred, so a viewport-wide breakout would overflow it; a full bleed image fills the column instead.
+        content: [
+          'lg:[&_[data-full-bleed]_figure]:left-0',
+          'lg:[&_[data-full-bleed]_figure]:ml-0',
+          'lg:[&_[data-full-bleed]_figure]:w-full',
+        ],
       },
       false: {
         body: ['max-w-measure'],

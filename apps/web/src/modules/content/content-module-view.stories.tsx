@@ -1,6 +1,9 @@
 import { BRAND_VARIANT, CONTAINER_WIDTH, SPACING_SCALE } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { richTextDemo } from '@web/testing/shared/portable-text/fixtures';
+import {
+  fullBleedImageDemo,
+  richTextDemo,
+} from '@web/testing/shared/portable-text/fixtures';
 
 import { ContentModuleView } from './content-module-view';
 
@@ -48,6 +51,10 @@ export const WithDividerAndLargeSpacing: TStory = {
       dividerBottom: true,
     },
   },
+};
+
+export const FullBleedImage: TStory = {
+  args: { body: fullBleedImageDemo },
 };
 
 export const CentredInWideContainer: TStory = {
