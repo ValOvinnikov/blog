@@ -410,7 +410,6 @@ export function makeRawPricingTier(
     priceLabel: null,
     features: ['Unlimited posts', 'Priority support'],
     ctaButtons: null,
-    isHighlighted: null,
     highlightLabel: null,
     footnote: null,
     ...overrides,

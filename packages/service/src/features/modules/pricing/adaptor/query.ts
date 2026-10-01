@@ -36,7 +36,6 @@ export const pricingModuleQuery = q
           .field('ctaButtons[]')
           .project(ctaButtonFragment)
           .nullable(true),
-        isHighlighted: tierSub.field('isHighlighted').nullable(true),
         highlightLabel: tierSub.field('highlightLabel').nullable(true),
         footnote: tierSub.field('footnote').nullable(true),
       }))

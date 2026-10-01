@@ -32,7 +32,6 @@ describe('toPricingModule', () => {
           priceLabel: null,
           features: ['Unlimited posts', 'Priority support'],
           ctaButtons: [makeRawCtaButton()],
-          isHighlighted: true,
           highlightLabel: 'Most popular',
           footnote: 'Billed annually',
         }),
@@ -126,14 +125,20 @@ describe('toPricingModule', () => {
     expect(module.tiers[0]?.ctaButtons).toEqual([]);
   });
 
-  it('reports highlightLabel undefined when the tier is not highlighted', () => {
+  it('highlights a tier whose label is filled', () => {
     const raw = makeRawPricingModule({
-      tiers: [
-        makeRawPricingTier({
-          isHighlighted: false,
-          highlightLabel: 'Most popular',
-        }),
-      ],
+      tiers: [makeRawPricingTier({ highlightLabel: '  Most popular ' })],
+    });
+
+    const module = toPricingModule(raw);
+
+    expect(module.tiers[0]?.isHighlighted).toBe(true);
+    expect(module.tiers[0]?.highlightLabel).toBe('Most popular');
+  });
+
+  it('does not highlight a tier with no label', () => {
+    const raw = makeRawPricingModule({
+      tiers: [makeRawPricingTier({ highlightLabel: null })],
     });
 
     const module = toPricingModule(raw);
@@ -142,11 +147,21 @@ describe('toPricingModule', () => {
     expect(module.tiers[0]?.highlightLabel).toBeUndefined();
   });
 
-  it('folds an absent isHighlighted/isStartingAt to false (genuine default)', () => {
+  it('does not highlight a tier whose label is only whitespace', () => {
+    const raw = makeRawPricingModule({
+      tiers: [makeRawPricingTier({ highlightLabel: '   ' })],
+    });
+
+    const module = toPricingModule(raw);
+
+    expect(module.tiers[0]?.isHighlighted).toBe(false);
+    expect(module.tiers[0]?.highlightLabel).toBeUndefined();
+  });
+
+  it('folds an absent isStartingAt to false (genuine default)', () => {
     const raw = makeRawPricingModule({
       tiers: [
         makeRawPricingTier({
-          isHighlighted: null,
           prices: [makeRawPricingPrice({ isStartingAt: null })],
         }),
       ],
@@ -154,7 +169,6 @@ describe('toPricingModule', () => {
 
     const module = toPricingModule(raw);
 
-    expect(module.tiers[0]?.isHighlighted).toBe(false);
     expect(module.tiers[0]?.prices[0]?.isStartingAt).toBe(false);
   });
 

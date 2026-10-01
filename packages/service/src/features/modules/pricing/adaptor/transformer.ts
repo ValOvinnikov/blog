@@ -21,7 +21,8 @@ function toPricingPrices(
 
 function toPricingTiers(raw: TRawPricingModule['tiers']): TPricingTier[] {
   return raw.map((tier) => {
-    const isHighlighted = tier.isHighlighted ?? false;
+    const highlightLabel = tier.highlightLabel?.trim();
+    const isHighlighted = Boolean(highlightLabel);
 
     return {
       id: tier._key,
@@ -32,9 +33,7 @@ function toPricingTiers(raw: TRawPricingModule['tiers']): TPricingTier[] {
       features: tier.features ?? [],
       ctaButtons: toCtaButtons(tier.ctaButtons),
       isHighlighted,
-      highlightLabel: isHighlighted
-        ? (tier.highlightLabel ?? undefined)
-        : undefined,
+      highlightLabel: isHighlighted ? highlightLabel : undefined,
       footnote: tier.footnote ?? undefined,
     };
   });
