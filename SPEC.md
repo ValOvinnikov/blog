@@ -1248,10 +1248,12 @@ own default). `apps/web`'s `[locale]/layout.tsx` fetches this once per request
 which injects the resolved tokens as a server-rendered `<style>` block
 declaring CSS custom properties under both `:root` and `.dark`
 (carrying `precedence`/`href` so React hoists it into `<head>` from wherever
-it mounts), and selects the matching `next/font/google`
+it mounts), and selects the matching `next/font/local`
 pair (`headingFont`/`bodyFont`) via a per-font dynamically imported loader
 module so only the two fonts actually resolved for that render are
-bundled/preloaded. `apps/web/src/proxy.ts` resolves the request's tenant from
+bundled/preloaded. Fonts are self-hosted in both apps: Latin-subset variable
+woff2 files (SIL OFL, `OFL.txt` alongside) are committed beside each app's
+loaders, so no build fetches Google Fonts. `apps/web/src/proxy.ts` resolves the request's tenant from
 its `Host` header against `@blog/db`'s `tenant_domains`
 (`resolveTenantId()`, `apps/web/src/server/tenant/`), falling back to the
 sole `tenants` row outside production (`isProductionEnvironment()` — never
