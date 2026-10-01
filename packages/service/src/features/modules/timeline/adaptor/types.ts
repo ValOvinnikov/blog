@@ -25,6 +25,6 @@ export type TTimelineModule = {
   orientation: TTimelineOrientation;
   ctaButtons: TCtaButton[];
   contentAlignment: TMaybeUndefined<TContentAlignment>;
-  itemAlignment: TContentAlignment;
+  itemAlignment: Extract<TContentAlignment, 'LEFT' | 'CENTER'>;
   layout: TMaybeUndefined<TLayout>;
 };
