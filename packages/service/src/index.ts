@@ -27,6 +27,7 @@ import { createPostListModuleService } from './features/modules/post-list';
 import { createPostRelatedModuleService } from './features/modules/post-related';
 import { createStatsModuleService } from './features/modules/stats';
 import { createTaxonomyListModuleService } from './features/modules/taxonomy-list';
+import { createTeamModuleService } from './features/modules/team';
 import { createTestimonialModuleService } from './features/modules/testimonial';
 import { createTimelineModuleService } from './features/modules/timeline';
 import { createHomeService } from './features/pages/home';
@@ -71,6 +72,7 @@ export const service = {
     testimonial: createTestimonialModuleService(),
     stats: createStatsModuleService(),
     faq: createFaqModuleService(),
+    team: createTeamModuleService(),
     timeline: createTimelineModuleService(),
   },
   entities: {
@@ -129,6 +131,7 @@ export type {
   TTaxonomyEntry,
   TTaxonomyListModule,
 } from './features/modules/taxonomy-list';
+export type { TTeamMember, TTeamModule } from './features/modules/team';
 export type {
   TTestimonialItem,
   TTestimonialModule,
@@ -159,6 +162,7 @@ export type { TCtaButton } from './shared/transformers/cta/to-cta-button';
 export type { TFaqPageQuestion } from './shared/transformers/faq/resolve-faqs';
 export type { THeroPrimaryAction } from './shared/transformers/hero/to-hero-primary-action';
 export type { TModule } from './shared/transformers/module/to-module';
+export type { TPersonCard } from './shared/transformers/person/to-person-card';
 export type {
   TPostCard,
   TPostCardAuthor,

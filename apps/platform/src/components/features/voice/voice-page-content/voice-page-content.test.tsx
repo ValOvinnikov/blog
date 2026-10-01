@@ -20,7 +20,7 @@ vi.mock('@blog/db', async () => ({
   queries: { siteConfig: { getSiteConfig: getSiteConfigMock } },
 }));
 
-vi.mock('@platform/server/auth/auth', () => ({ auth: vi.fn() }));
+vi.mock('@platform/server/auth/auth');
 
 const tenant = makeReadyTenant();
 
@@ -31,7 +31,7 @@ describe(`<${VoicePageContent.name}/>`, () => {
     getSiteConfigMock.mockReset();
   });
 
-  it('shows every field blank, with no placeholder, when the tenant has no site_config row yet', async () => {
+  it('shows every field blank, with no placeholder, when there is no site_config row', async () => {
     getSiteConfigMock.mockResolvedValue(undefined);
 
     await setup();

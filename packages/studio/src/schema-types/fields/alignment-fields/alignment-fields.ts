@@ -60,13 +60,13 @@ type TAlignmentFieldsOptions = {
   description?: string;
   fieldset?: string;
   initialValue?: TContentAlignment;
+  allow?: readonly TContentAlignment[];
 };
 
 /**
  * A variant-scoped extra exists because a single field's `options.list` is
  * static and can't vary its option set by another field's value — each
- * extra covers one variant's allowed subset, alongside one baseline field
- * offering every alignment value.
+ * extra covers one variant's allowed subset.
  */
 export const alignmentFields = (
   extras: readonly TAlignmentFieldExtra[],
@@ -77,6 +77,7 @@ export const alignmentFields = (
     title: options?.title ?? 'Content Alignment',
     description:
       options?.description ?? "Horizontal alignment of this module's content.",
+    list: options?.allow,
     initialValue: options?.initialValue ?? CONTENT_ALIGNMENT.LEFT,
     fieldset: options?.fieldset,
   }),

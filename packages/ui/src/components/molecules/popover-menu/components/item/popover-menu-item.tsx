@@ -1,6 +1,5 @@
-import type { IWithDataTestId } from '@blog/config';
+import { BUTTON_AS_CONST, type IWithDataTestId } from '@blog/config';
 import type { TPolymorphicProps } from '@blog/config/react';
-import { resolveComponent } from '@blog/ui/lib/react';
 import type { ElementType, ReactNode } from 'react';
 
 import {
@@ -13,11 +12,14 @@ type TPopoverMenuItemOwnProps = TPopoverMenuItemVariants & {
   icon?: ReactNode;
 };
 
-export type TPopoverMenuItemProps<C extends ElementType = 'button'> =
-  TPolymorphicProps<C, TPopoverMenuItemOwnProps> & IWithDataTestId;
+export type TPopoverMenuItemProps<
+  C extends ElementType = typeof BUTTON_AS_CONST,
+> = TPolymorphicProps<C, TPopoverMenuItemOwnProps> & IWithDataTestId;
 
 /** A single rounded-rectangle row inside a `PopoverMenu.Panel` (`role="menuitem"`). */
-export const PopoverMenuItem = <C extends ElementType = 'button'>({
+export const PopoverMenuItem = <
+  C extends ElementType = typeof BUTTON_AS_CONST,
+>({
   as,
   icon,
   className,
@@ -26,11 +28,10 @@ export const PopoverMenuItem = <C extends ElementType = 'button'>({
   dataTestId,
   ...rest
 }: TPopoverMenuItemProps<C>) => {
-  const Component = resolveComponent(as, 'button');
+  const Component = as ?? BUTTON_AS_CONST;
   const isButton = Component === 'button';
 
   return (
-    // eslint-disable-next-line react-hooks/static-components -- resolveComponent returns `as`/fallback verbatim, so the reference stays stable across renders
     <Component
       role="menuitem"
       type={isButton ? 'button' : undefined}

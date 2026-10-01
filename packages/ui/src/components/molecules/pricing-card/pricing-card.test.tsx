@@ -74,7 +74,7 @@ describe(`<${PricingCard.name}/>`, () => {
         />,
       ],
     });
-    expect(screen.getByText('Regular price')).toBeInTheDocument();
+    expect(screen.getByText('Regular price')).toBeVisible();
     expect(screen.getByText('$49')).toBeVisible();
   });
 

@@ -296,7 +296,10 @@ one.
 the single `page_landing` target it once allowed to every type a `link` can
 point at. Because the destination is no longer knowably a landing page,
 `@blog/service` resolves the href and hands it to `apps/web` as
-`profilePageHref`; the byline no longer builds a URL from a slug.
+`profileUrl`; the byline no longer builds a URL from a slug.
+`module_team` receives that same resolved href per member under that same
+name, and links a card's name to it when set, leaving the name as plain
+text when it is unset.
 
 Every `module_*` document also carries a **required** `brandVariant` field
 (stored values from `@blog/config`'s `BRAND_VARIANT` const —
@@ -726,8 +729,8 @@ be published — which is what lets every consumer below treat the visual as
 guaranteed instead of testing for its absence.
 
 `module_featureList` ("Features") references those cards through a `features`
-array, validated with `unique()`, `min(2)` and `max(8)` as separate rule chains.
-Two is the floor because a
+array, validated with `required()`, `unique()`, `min(2)` and `max(8)` as
+separate rule chains. Two is the floor because a
 lone card is a statement rather than a grid; eight is the ceiling because the
 column rule below stops producing balanced rows past it. It carries the usual
 module furniture — `title`, `brandVariant` (the default
@@ -766,13 +769,27 @@ narrows the projected type to those two values rather than the wider
 three-value union, and `apps/web` maps the casing explicitly instead of
 passing the stored value straight through.
 
-**A misconfigured module renders nothing rather than throwing.** `features` is
-modelled nullable — `min(2)` is a validation rule, not `.required()`, and
-validation never applies to a document written outside Studio — so
+**An empty-array guard mirrors what Studio enforces on that field, and nothing
+more.** Where a module's array pairs `required()` with a `min()`, an empty list
+is a state the content model forbids, so `apps/web` does not check for it —
+`module_featureList`, `module_testimonial`, `module_logoWall`, `module_stats`,
+`module_faq` and `module_team` render whatever they are handed, in the module and in the view
+alike. The trade is deliberate: a document written around Studio's validation
+costs an empty section rather than a disappeared one, which is the cheaper
+failure and the visible one.
+
+The service layer still models `features` nullable, because validation never
+applies to a document written outside Studio, so
 `service.modules.featureList.v1.getFeatureList` yields an empty `items` array
 whenever the authored array is absent, empty, or below two, matching how
-`postTakeaways` degrades below its own `min(3)`. The view returns `null` on an
-empty array, so the page loses the section instead of the render.
+`postTakeaways` degrades below its own `min(3)`. That is a projection's
+tolerance for what it cannot guarantee, not a second place to re-decide what
+`required()` and `min(2)` already settle.
+
+`ctaButtons` is the same rule read from the other side, and is not a guard at
+all. `ctaButtonsField` defaults to `min = 0`, so a module with no actions is a
+valid document rather than a broken one; every `ctaButtons.length > 0` check is
+ordinary optional-content rendering and stays too.
 
 **A testimonial is a document for the same reason a feature card is.**
 `block_testimonial` ("Testimonial Item") sits beside `block_feature` under
@@ -836,7 +853,7 @@ draft with the field still unset is never queried.
 **A logo is an inline object, not a document — one of the two places the
 `block_*` pattern is deliberately not followed, `module_stats` below being the
 other.** `logoItem` ("Logo") holds a `name`, an
-`image` and an optional `link` reference, and lives directly on the module's
+`image`, an optional `imageDark` and an optional `link` reference, and lives directly on the module's
 `logos` array. Logos never recombine: a wall is reused by referencing the same
 `module_logoWall` from several pages, so reuse already happens one level up, and
 documents would only have added a desk entry, a reference picker and a
@@ -856,6 +873,21 @@ text.** WAI's rule for a logo is that the alt is the organisation's name,
 `name` directly and appends nothing. The image is a plain `image` rather than an
 `imageWithAlt`: a generic "describe the image" prompt invites the wrong alt, and
 crop and hotspot controls are noise for a mark that must render whole.
+
+**`imageDark` is a second logo for dark backgrounds, shown in dark mode when
+present.** A single-colour mark vanishes on a tile of the same colour — a white
+wordmark on the light tile, a black one on the dark tile — and a second upload is
+the only fix that keeps brand colours and covers both. It is a plain optional
+`image` with no validation, so a wall without one publishes as before. The
+service projects it like `image`, with its own dimensions, but with a nullable
+asset: an `imageDark` holding only leftover crop or hotspot data, or one whose
+asset cannot resolve, becomes `undefined` and the logo falls back to its main
+image — unlike the main image, it never costs the wall. `LogoTile` takes it as
+`darkLogo` plus `darkAspectRatio` and renders both logos, the regular one hidden
+under `.dark` and the dark one hidden outside it; `display: none` takes the hidden
+one out of the accessibility tree and tab order, so the name is announced and the
+link focused once. `apps/web` wraps each in the logo's link, and the dark one
+overrides `--logo-aspect` for itself so each is sized by its own ratio.
 
 **The wall is a wrapping flex row, not a grid.** `apps/web` composes
 `flex flex-wrap` with a 24px gap, and `@blog/ui`'s `LogoTile` is a fixed 192×88
@@ -899,14 +931,17 @@ a default ratio would be worse than the fallback: a wrong ratio distorts the
 logo, where a contained image merely shifts.
 
 **One logo the service cannot resolve costs the whole wall, not that tile.** The
-query projects `name` and `image` with `.notNull()`, and `toLogoItem` throws
-`UnresolvedLogoImageError` if an image still fails to resolve; the throw leaves
-`toLogoWallModule`, `safeAsync` turns it into a failed result, and the module
-renders nothing rather than a wall with a gap in it. As with
+query projects `name` and `image` with `.notNull()`, and the image's own
+`asset: …deref().notNull()` sits inside it, so a logo whose image fails to
+resolve is rejected at `.parse()`, `safeAsync` turns that into a failed result,
+and the module renders nothing rather than a wall with a gap in it. Because the
+query guarantees the asset, `toSanityImage` is typed to return an image rather
+than `T | undefined` for this call, so `TLogoItem.image` is required and the tile
+reads it without a guard. As with
 `module_testimonial`, that is not a page-level risk — the page loses the section
-and keeps rendering. The view also returns nothing for an empty array, which
-`.notNull()` does not reject and `min(1)` only blocks in the Studio, so an
-API-written wall with no logos disappears instead of rendering an empty row.
+and keeps rendering. An empty `logos` array is the other case and carries no
+guard, per the rule above: `required()` and `min(1)` forbid it, so a wall
+written around Studio's validation renders an empty row rather than vanishing.
 
 `module_stats` ("Stats") holds **inline objects rather than referenced
 documents** too, for a different reason than the logo wall's. A `stat` carries a required
@@ -993,12 +1028,8 @@ logo wall — but no transformer guard says so.** The query projects the image w
 `.notNull()`, so a row whose image fails to resolve is rejected at `.parse()`,
 `safeAsync` turns that into a failed result, and the module renders nothing
 rather than a run of rows with a hole in it. The page loses the section and keeps
-rendering, as everywhere else in this family. `image` is nonetheless
-`T | undefined` in the view model, because that is `toSanityImage`'s own return
-type rather than a reachable state, and the row omits the frame if it is ever
-absent — no non-null assertion to make the types lie. This is also why the logo
-wall's `UnresolvedLogoImageError` above is unreachable and #3745 removes it:
-the `.notNull()` chain already did that work.
+rendering, as everywhere else in this family. `image` is therefore required in
+the view model, exactly as it is for the logo wall.
 
 **A question is a document, and that is the opposite call from a figure.**
 `block_faq` ("FAQ Item") carries a `title` — its Studio label — a required
@@ -1016,9 +1047,11 @@ link to the page that explains further.
 are read top to bottom in the order they were authored, and every alternative
 arrangement either hides answers behind a swipe or breaks the reading order that
 makes an FAQ scannable. The questions sit in a column capped at `max-w-post`
-(47.5rem), positioned by `contentAlignment` along with the heading and actions,
-while the answer text inside each panel stays start-aligned whatever the module's
-alignment.
+(47.5rem), positioned left or centred by `contentAlignment` along with the heading
+and actions, while the answer text inside each panel stays start-aligned whatever
+the module's alignment. This is the one module that restricts that field's option
+list: a right-aligned block of questions is not a design this module has, so
+`contentAlignment` offers two values here where every other module offers three.
 
 **The disclosure is `Accordion` in `@blog/ui`, built on Base UI, and it carries
 no `'use client'`.** Every Base UI part ships its own directive and the organism
@@ -1040,6 +1073,36 @@ one page therefore stay valid, which a module-level block could not guarantee.
 The answer is consequently modelled twice on purpose — rich text
 (`TFaqQuestion`) for rendering, plain text (`TFaqPageQuestion`) for the
 structured data — because Portable Text is not a string and `FAQPage` wants one.
+
+**A team is a list of references to `person`, and nothing about a person is
+overridden per module.** `module_team` ("Team") references 1 to 12 `person`
+documents in authored order, validated `required()`, `min(1)`, `max(12)` and
+`unique()` as separate rule chains for the same reason `module_testimonial`'s
+are. A one-person team is allowed so a single person can be introduced
+mid-page, where `module_heroProfile` cannot sit. A person is edited once and carries
+the same photo, role, links and bio wherever they appear — as a post's author,
+as the profile hero's subject, and as a team member — so the module has **no
+per-member override fields at all**: the order belongs to the module, the
+content belongs to the person.
+
+**Two toggles decide what a card carries, and the loader resolves them rather
+than the view.** `showSocialLinks` defaults on; `showBios` defaults off, because
+a bio is written for the profile hero and runs long enough to change what the
+grid is. `@blog/service` applies both — `bio` is projected only when `showBios`,
+and `socialLinks` comes back empty when `showSocialLinks` is off — so `apps/web`
+renders what it is handed instead of re-deciding. `showBios` reaches the view
+only to cap its columns; `showSocialLinks` is not read there at all. `imageShape` offers Circle and Square alone:
+`CARD_IMAGE_SHAPE`'s third value, Wide, crops faces. The initials fallback takes
+that same shape through `Avatar`'s `shape` variant, added for this module so a
+photoless member is not a circle among squares.
+
+**One member renders as a spotlight rather than a one-card grid**, as a single
+testimonial does. `TeamSpotlight` composes `Avatar`, `Heading`, `MediaFrame`,
+`Prose` and `Text` in `apps/web` — there is no `@blog/ui` spotlight component —
+and puts a larger photo beside the text from `lg`, stacked below it. It ignores
+`displayMode` and `cardAlignment`, and carries none of the profile hero's
+eyebrow, heading slot or banner variant: the module heading and actions apply
+unchanged.
 
 `service.modules.<type>.v1` projects `brandVariant` as a required
 `TBrandVariantOf<...>` (narrowed per module to exactly the options its
@@ -1088,11 +1151,14 @@ how `CtaModule` uses the space `Section` gives it.
 its image is a full-bleed background, so the copy needs a floor under it.
 `Hero` takes an optional `tone` that **only `BANNER` reads** — it renders an
 `aria-hidden` gradient scrim between the image (`-z-20`) and the copy
-(`-z-10`), picking `AZURE_SCRIM` on `BRAND_PRIMARY` and `NEUTRAL_SCRIM`
-otherwise, and switches the copy to on-image colours. `SPLIT` and `STACKED`
-ignore `tone` entirely. The two gradients live in
-`packages/ui/src/lib/styling/scrims.ts` so the two organisms cannot drift
-apart. `tone` **defaults to `PRIMARY` at the variant level** rather than
+(`-z-10`), picking the azure or neutral scrim by `tone` (`AZURE_SCRIM_*` on
+`BRAND_PRIMARY`, `NEUTRAL_SCRIM_*` otherwise) and by `position`
+(`_LEFT`/`_CENTER`/`_RIGHT`) — the gradient's strongest stop always sits
+under wherever the Banner's copy renders, so on-image text stays legible
+whichever side it's on — and switches the copy to on-image colours. `SPLIT`
+and `STACKED` ignore `tone` entirely. The six gradients live in
+`packages/ui/src/lib/styling/scrims.ts` so `Hero` and `CtaModule` cannot
+drift apart. `tone` **defaults to `PRIMARY` at the variant level** rather than
 being left unset, so a Banner is never scrim-less: the on-image copy colours
 apply on `BANNER` unconditionally, and white copy over an unscrimmed
 photograph is less legible than no treatment at all. Each hero view passes
@@ -1979,3 +2045,54 @@ repo-specific ESLint rules in
 [`docs/context/claude-code.md`](./docs/context/claude-code.md). The
 per-component how-to, including the `tv()` and slot conventions that go with
 this, lives in `.claude/skills/ui-library-practices`.
+
+## 19. Surface tokens
+
+A control cannot see the background it sits on, so a focus-ring offset or a
+hairline divider hard-coded to the page default is wrong the moment the
+surface changes — a near-white band between a control and its ring, and a
+divider that measures 1.03:1 against Secondary. Two **inherited CSS custom
+properties** in `configs/tailwind/theme.css` carry that context instead:
+
+| Property    | `:root` default  | Tailwind utility      | Used for              |
+| ----------- | ---------------- | --------------------- | --------------------- |
+| `--ambient` | `var(--primary)` | `ring-offset-ambient` | the focus-ring offset |
+| `--divider` | `var(--border)`  | `border-divider`      | hairline dividers     |
+
+Both are exposed through **`@theme inline`**, and that is load-bearing:
+`inline` emits `var(--ambient)` into the generated utility instead of
+resolving it to a literal at build time, so an ancestor that redefines the
+property changes what every descendant resolves to. A non-inline `@theme`
+would bake in the `:root` value and an override would do nothing.
+
+**Surfaces set them; components read them.** Two `@utility` classes,
+`surface-secondary` and `surface-brand-primary`, retarget both at once and are
+applied by whatever element paints the background:
+
+- `apps/web`'s `Section`, per `brandVariant`.
+- `@blog/ui` organisms that paint their own flat background behind focusable
+  children — `CtaModule` (SPLIT and CALLOUT) and `Footer`.
+
+A surface painted with an image or a scrim rather than a flat token colour
+(`Hero` BANNER, `CtaModule` BANNER) sets neither: there is no single colour a
+ring offset could match.
+
+**No props and no context.** Everything stays server-renderable, dark mode
+follows automatically because the defaults are references rather than literals
+and `.dark` already overrides `--primary`/`--border`, and a background added
+later works by setting the two properties. This is deliberate: the rejected
+alternative was a `tone` prop on every component and every consumer.
+
+`tone` props were not removed, but what survives of them varies. `IconButton`'s
+still drives its `control` variant's border, background and text. `QuoteCardName`'s
+is now fully inert — the ring offset was the only thing it ever drove — and is
+kept solely because it is required by `QuoteCard` and `TestimonialCard` and
+threaded from `apps/web`, so dropping it is an API break rather than a cleanup.
+
+**Secondary and Brand-primary dividers resolve to `--border-strong`, one step
+heavier than Primary's own `--border` hairline — enough to read on a darker
+ground, deliberately not enough for WCAG 1.4.11's 3:1.** That threshold
+governs graphics required to identify a control, and these dividers are
+decorative — an accordion row is already a real `<button>` with its own focus
+ring, and a section's edge rule is a presentational boundary. `--border-emphasis`
+is the token for a border that genuinely is the sole indicator.

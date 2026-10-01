@@ -38,7 +38,7 @@ const meta = {
   argTypes: {
     brandVariant: {
       control: 'select',
-      options: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
+      options: Object.values(BRAND_VARIANT),
     },
     contentAlignment: {
       control: 'select',
@@ -105,4 +105,63 @@ export const CenterAligned: TStory = {
     stats,
     contentAlignment: CONTENT_ALIGNMENT.CENTER,
   },
+};
+
+export const LeftAlignedWithFootnote: TStory = {
+  args: {
+    stats,
+    footnote: 'Figures reflect the trailing 12 months.',
+    contentAlignment: CONTENT_ALIGNMENT.LEFT,
+  },
+};
+
+export const CenterAlignedWithFootnote: TStory = {
+  args: {
+    stats,
+    footnote: 'Figures reflect the trailing 12 months.',
+    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+  },
+};
+
+export const RightAlignedWithFootnote: TStory = {
+  args: {
+    stats,
+    footnote: 'Figures reflect the trailing 12 months.',
+    contentAlignment: CONTENT_ALIGNMENT.RIGHT,
+  },
+};
+
+export const Secondary: TStory = {
+  args: {
+    stats,
+    brandVariant: BRAND_VARIANT.SECONDARY,
+  },
+};
+
+export const BrandPrimary: TStory = {
+  args: {
+    stats,
+    brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
+  },
+};
+
+export const SevenFiguresLoneLastCentred: TStory = {
+  args: {
+    stats: [
+      ...stats,
+      makeStatItem({ id: 'stat-5', value: '3×', label: 'Faster indexing' }),
+      makeStatItem({ id: 'stat-6', value: 'Top 10', label: 'Industry rank' }),
+      makeStatItem({ id: 'stat-7', value: '99.9%', label: 'Uptime' }),
+    ],
+  },
+};
+
+export const PhoneOneFigurePerRow: TStory = {
+  globals: { viewport: 'mobile' },
+  args: { stats },
+};
+
+export const TabletTwoFiguresPerRow: TStory = {
+  globals: { viewport: 'tablet' },
+  args: SevenFiguresLoneLastCentred.args,
 };

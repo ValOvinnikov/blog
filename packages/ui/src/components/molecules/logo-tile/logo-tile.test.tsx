@@ -41,4 +41,28 @@ describe(`<${LogoTile.name}/>`, () => {
 
     expect(screen.getByTestId('logo-tile')).not.toHaveAccessibleName();
   });
+
+  it('renders a single logo when it has no dark-background logo', () => {
+    const setup = customRender(LogoTile, {
+      children: <img src={faker.image.url()} alt={faker.company.name()} />,
+    });
+
+    setup();
+
+    expect(screen.getAllByRole('img')).toHaveLength(1);
+  });
+
+  it('renders both the regular and the dark-background logo, each named', () => {
+    const regularAlt = faker.company.name();
+    const darkAlt = faker.company.name();
+    const setup = customRender(LogoTile, {
+      children: <img src={faker.image.url()} alt={regularAlt} />,
+      darkLogo: <img src={faker.image.url()} alt={darkAlt} />,
+    });
+
+    setup();
+
+    expect(screen.getByRole('img', { name: regularAlt })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: darkAlt })).toBeInTheDocument();
+  });
 });

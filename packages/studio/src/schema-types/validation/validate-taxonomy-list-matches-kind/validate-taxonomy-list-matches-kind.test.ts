@@ -9,7 +9,7 @@ const asDocument = (doc: Record<string, unknown>): SanityDocument =>
   doc as unknown as SanityDocument;
 
 const createMockListContext = (
-  modules: { taxonomy?: string | null }[] | Error,
+  modules: { _id?: string; taxonomy?: string | null }[] | Error,
 ) => {
   const fetchCalls: { query: string; params: unknown }[] = [];
 
@@ -48,7 +48,7 @@ describe('validateTaxonomyListReferencesMatchKind', () => {
       MISMATCH_ERROR,
     );
     const { context } = createMockListContext([
-      { taxonomy: TAXONOMY_KIND.TOPICS },
+      { _id: 'taxonomy-list-1', taxonomy: TAXONOMY_KIND.TOPICS },
     ]);
     const document = asDocument({ taxonomyList: { _ref: 'taxonomy-list-1' } });
 
@@ -61,7 +61,9 @@ describe('validateTaxonomyListReferencesMatchKind', () => {
       MODULE_TYPE_NAME,
       MISMATCH_ERROR,
     );
-    const { context } = createMockListContext([{ taxonomy: undefined }]);
+    const { context } = createMockListContext([
+      { _id: 'taxonomy-list-1', taxonomy: undefined },
+    ]);
     const document = asDocument({
       modules: [
         { _key: 'k1', _type: MODULE_TYPE_NAME, _ref: 'taxonomy-list-1' },
@@ -71,14 +73,14 @@ describe('validateTaxonomyListReferencesMatchKind', () => {
     await expect(validate(document, context)).resolves.toBe(true);
   });
 
-  it('fails when a modules[] entry lists the other kind', async () => {
+  it('fails when a modules[] entry lists the other kind, targeting that entry', async () => {
     const validate = validateTaxonomyListReferencesMatchKind(
       TAXONOMY_KIND.TOPICS,
       MODULE_TYPE_NAME,
       MISMATCH_ERROR,
     );
     const { context } = createMockListContext([
-      { taxonomy: TAXONOMY_KIND.TAGS },
+      { _id: 'taxonomy-list-1', taxonomy: TAXONOMY_KIND.TAGS },
     ]);
     const document = asDocument({
       modules: [
@@ -86,27 +88,45 @@ describe('validateTaxonomyListReferencesMatchKind', () => {
       ],
     });
 
-    await expect(validate(document, context)).resolves.toBe(MISMATCH_ERROR);
+    await expect(validate(document, context)).resolves.toEqual([
+      { message: MISMATCH_ERROR, path: ['modules', { _key: 'k1' }] },
+    ]);
   });
 
-  it('fails when the deprecated legacy field lists the other kind, even alongside modules[]', async () => {
+  it('falls back to the array index when a mismatching modules[] entry has no _key', async () => {
     const validate = validateTaxonomyListReferencesMatchKind(
       TAXONOMY_KIND.TOPICS,
       MODULE_TYPE_NAME,
       MISMATCH_ERROR,
     );
     const { context } = createMockListContext([
-      { taxonomy: TAXONOMY_KIND.TOPICS },
-      { taxonomy: TAXONOMY_KIND.TAGS },
+      { _id: 'taxonomy-list-1', taxonomy: TAXONOMY_KIND.TAGS },
+    ]);
+    const document = asDocument({
+      modules: [{ _type: MODULE_TYPE_NAME, _ref: 'taxonomy-list-1' }],
+    });
+
+    await expect(validate(document, context)).resolves.toEqual([
+      { message: MISMATCH_ERROR, path: ['modules', 0] },
+    ]);
+  });
+
+  it('fails when the deprecated legacy field lists the other kind, targeting that field', async () => {
+    const validate = validateTaxonomyListReferencesMatchKind(
+      TAXONOMY_KIND.TOPICS,
+      MODULE_TYPE_NAME,
+      MISMATCH_ERROR,
+    );
+    const { context } = createMockListContext([
+      { _id: 'taxonomy-list-legacy', taxonomy: TAXONOMY_KIND.TAGS },
     ]);
     const document = asDocument({
       taxonomyList: { _ref: 'taxonomy-list-legacy' },
-      modules: [
-        { _key: 'k1', _type: MODULE_TYPE_NAME, _ref: 'taxonomy-list-legacy' },
-      ],
     });
 
-    await expect(validate(document, context)).resolves.toBe(MISMATCH_ERROR);
+    await expect(validate(document, context)).resolves.toEqual([
+      { message: MISMATCH_ERROR, path: ['taxonomyList'] },
+    ]);
   });
 
   it('resolves to true, not an error, when the fetch rejects', async () => {
@@ -140,14 +160,14 @@ describe('validateTaxonomyListReferencesMatchKind', () => {
     expect(fetchCalls).toHaveLength(0);
   });
 
-  it('deduplicates a ref shared by the legacy field and modules[]', async () => {
+  it('deduplicates a ref shared by the legacy field and modules[] into one fetch, but reports both locations', async () => {
     const validate = validateTaxonomyListReferencesMatchKind(
       TAXONOMY_KIND.TOPICS,
       MODULE_TYPE_NAME,
       MISMATCH_ERROR,
     );
     const { context, fetchCalls } = createMockListContext([
-      { taxonomy: TAXONOMY_KIND.TOPICS },
+      { _id: 'taxonomy-list-1', taxonomy: TAXONOMY_KIND.TAGS },
     ]);
     const document = asDocument({
       taxonomyList: { _ref: 'taxonomy-list-1' },
@@ -156,8 +176,11 @@ describe('validateTaxonomyListReferencesMatchKind', () => {
       ],
     });
 
-    await validate(document, context);
-
+    await expect(validate(document, context)).resolves.toEqual([
+      { message: MISMATCH_ERROR, path: ['taxonomyList'] },
+      { message: MISMATCH_ERROR, path: ['modules', { _key: 'k1' }] },
+    ]);
     expect(fetchCalls[0]?.params).toEqual({ ids: ['taxonomy-list-1'] });
+    expect(fetchCalls).toHaveLength(1);
   });
 });

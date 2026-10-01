@@ -6,8 +6,7 @@ import {
 } from '@web/components/shared/media-card-item';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';
-
-import { postRelatedModuleViewVariants } from './post-related-module-view-variants';
+import { moduleGridActionsVariants } from '@web/utils/module-grid-actions-variants';
 
 export interface IPostRelatedModuleViewProps extends Omit<
   TPostRelatedModule,
@@ -29,7 +28,7 @@ export const PostRelatedModuleView = ({
   contentAlignment,
   hasImages,
 }: IPostRelatedModuleViewProps) => {
-  const s = postRelatedModuleViewVariants();
+  const s = moduleGridActionsVariants();
 
   return (
     <Section
@@ -43,6 +42,7 @@ export const PostRelatedModuleView = ({
         id={titleId}
         level={2}
         align={contentAlignment}
+        variant="section"
       />
       <CardGrid className={s.grid()}>
         {items.map((item) => (

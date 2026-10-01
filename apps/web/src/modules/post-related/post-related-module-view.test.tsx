@@ -2,13 +2,10 @@ import { BRAND_VARIANT } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
 import { makePostListItem } from '@web/testing/modules/post-list/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { PostRelatedModuleView } from './post-related-module-view';
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
+vi.mock('@web/i18n/navigation');
 
 const post = makePostListItem();
 
@@ -38,7 +35,7 @@ describe(`<${PostRelatedModuleView.name}/>`, () => {
     );
     expect(
       screen.getByRole('region', { name: 'Related reading' }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
   });
 
   it('renders a card per item, linked to its href', () => {
@@ -48,7 +45,7 @@ describe(`<${PostRelatedModuleView.name}/>`, () => {
     expect(link).toHaveAttribute('href', post.href);
     expect(
       screen.getByRole('heading', { level: 3, name: post.title }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
   });
 
   it('never renders a pagination nav', () => {
@@ -69,7 +66,7 @@ describe(`<${PostRelatedModuleView.name}/>`, () => {
       items: [{ ...post, image: <div data-testid="post-image" /> }],
     });
 
-    expect(screen.getByTestId('media-card-media')).toBeInTheDocument();
-    expect(screen.getByTestId('post-image')).toBeInTheDocument();
+    expect(screen.getByTestId('media-card-media')).toBeVisible();
+    expect(screen.getByTestId('post-image')).toBeVisible();
   });
 });

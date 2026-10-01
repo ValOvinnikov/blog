@@ -3,8 +3,17 @@ import {
   CONTENT_ALIGNMENT,
   CTA_VARIANT,
   MEDIA_ORDER,
+  SPACING_SCALE,
 } from '@blog/config';
-import { AZURE_SCRIM, NEUTRAL_SCRIM, tv } from '@blog/ui/lib/styling';
+import {
+  AZURE_SCRIM_CENTER,
+  AZURE_SCRIM_LEFT,
+  AZURE_SCRIM_RIGHT,
+  NEUTRAL_SCRIM_CENTER,
+  NEUTRAL_SCRIM_LEFT,
+  NEUTRAL_SCRIM_RIGHT,
+  tv,
+} from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const ctaModuleVariants = tv({
@@ -13,21 +22,22 @@ export const ctaModuleVariants = tv({
       'relative isolate flex flex-col',
       'mx-auto w-full max-w-4xl overflow-hidden',
       'rounded-xl border border-border shadow-card',
-      'px-6 py-8 sm:px-8 sm:py-10',
+      'px-6 pt-8 pb-8 sm:px-8 sm:pt-10 sm:pb-10',
     ],
     eyebrow: ['mb-3'],
+    group: ['max-w-measure', 'text-prose'],
     heading: ['m-0'],
     body: ['relative z-0 min-w-0'],
     text: [
-      'mt-3 max-w-prose text-muted',
+      'mt-3 text-muted',
       '[&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-5 [&_ol]:pl-5',
       '[&>*+*]:mt-2 [&_li+li]:mt-1',
-      'marker:text-brand-primary',
+      'marker:text-current',
     ],
     media: ['[&>*]:block [&>*]:h-full [&>*]:w-full [&>*]:object-cover'],
     overlay: ['pointer-events-none absolute inset-0 -z-10'],
     actions: ['mt-5 flex flex-wrap items-center gap-3'],
-    footnote: ['mt-3.5 font-mono text-meta text-subtle'],
+    footnote: ['mt-3.5 max-w-measure font-mono text-caption text-subtle'],
   },
   variants: {
     variant: {
@@ -35,12 +45,12 @@ export const ctaModuleVariants = tv({
         root: [
           'left-1/2 mx-0 w-screen max-w-none -translate-x-1/2',
           'rounded-none border-0 shadow-none',
-          'min-h-[280px] justify-center px-7 py-12 sm:px-10',
+          'min-h-[280px] justify-center px-7 sm:px-10',
         ],
-        body: ['max-w-[46ch]'],
+        body: ['max-w-measure', 'text-prose'],
         heading: ['text-white'],
         eyebrow: ['text-white'],
-        text: ['text-white/85', 'marker:text-white'],
+        text: ['text-white/85'],
         footnote: ['text-white/70'],
         media: ['absolute inset-0 -z-20 overflow-hidden'],
       },
@@ -75,10 +85,14 @@ export const ctaModuleVariants = tv({
       },
       [CONTENT_ALIGNMENT.CENTER]: {
         root: ['text-center'],
+        group: ['mx-auto'],
+        footnote: ['mx-auto'],
         actions: ['justify-center'],
       },
       [CONTENT_ALIGNMENT.RIGHT]: {
         root: ['text-right'],
+        group: ['ml-auto'],
+        footnote: ['ml-auto'],
         actions: ['justify-end'],
       },
     },
@@ -88,6 +102,20 @@ export const ctaModuleVariants = tv({
     },
     wrapped: {
       true: { root: ['mt-0'] },
+    },
+    spacingTop: {
+      [SPACING_SCALE.NONE]: { root: ['pt-6 sm:pt-6'] },
+      [SPACING_SCALE.SM]: { root: ['pt-8 sm:pt-8'] },
+      [SPACING_SCALE.MD]: { root: ['pt-12 sm:pt-12'] },
+      [SPACING_SCALE.LG]: { root: ['pt-16 sm:pt-16'] },
+      [SPACING_SCALE.XL]: { root: ['pt-24 sm:pt-24'] },
+    },
+    spacingBottom: {
+      [SPACING_SCALE.NONE]: { root: ['pb-6 sm:pb-6'] },
+      [SPACING_SCALE.SM]: { root: ['pb-8 sm:pb-8'] },
+      [SPACING_SCALE.MD]: { root: ['pb-12 sm:pb-12'] },
+      [SPACING_SCALE.LG]: { root: ['pb-16 sm:pb-16'] },
+      [SPACING_SCALE.XL]: { root: ['pb-24 sm:pb-24'] },
     },
   },
   compoundVariants: [
@@ -99,22 +127,48 @@ export const ctaModuleVariants = tv({
     {
       variant: [CTA_VARIANT.SPLIT, CTA_VARIANT.CALLOUT],
       tone: BRAND_VARIANT.SECONDARY,
-      class: { root: ['bg-secondary'] },
+      class: { root: ['bg-secondary', 'surface-secondary'] },
     },
     {
       variant: [CTA_VARIANT.SPLIT, CTA_VARIANT.CALLOUT],
       tone: BRAND_VARIANT.BRAND_PRIMARY,
-      class: { root: ['bg-brand-primary-muted'] },
+      class: { root: ['bg-brand-primary-muted', 'surface-brand-primary'] },
     },
     {
       variant: CTA_VARIANT.BANNER,
       tone: BRAND_VARIANT.BRAND_PRIMARY,
-      class: { overlay: [AZURE_SCRIM] },
+      position: CONTENT_ALIGNMENT.LEFT,
+      class: { overlay: [AZURE_SCRIM_LEFT] },
+    },
+    {
+      variant: CTA_VARIANT.BANNER,
+      tone: BRAND_VARIANT.BRAND_PRIMARY,
+      position: CONTENT_ALIGNMENT.CENTER,
+      class: { overlay: [AZURE_SCRIM_CENTER] },
+    },
+    {
+      variant: CTA_VARIANT.BANNER,
+      tone: BRAND_VARIANT.BRAND_PRIMARY,
+      position: CONTENT_ALIGNMENT.RIGHT,
+      class: { overlay: [AZURE_SCRIM_RIGHT] },
     },
     {
       variant: CTA_VARIANT.BANNER,
       tone: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
-      class: { overlay: [NEUTRAL_SCRIM] },
+      position: CONTENT_ALIGNMENT.LEFT,
+      class: { overlay: [NEUTRAL_SCRIM_LEFT] },
+    },
+    {
+      variant: CTA_VARIANT.BANNER,
+      tone: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
+      position: CONTENT_ALIGNMENT.CENTER,
+      class: { overlay: [NEUTRAL_SCRIM_CENTER] },
+    },
+    {
+      variant: CTA_VARIANT.BANNER,
+      tone: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
+      position: CONTENT_ALIGNMENT.RIGHT,
+      class: { overlay: [NEUTRAL_SCRIM_RIGHT] },
     },
     {
       variant: CTA_VARIANT.BANNER,

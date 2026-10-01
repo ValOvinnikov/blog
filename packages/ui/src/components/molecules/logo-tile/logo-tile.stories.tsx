@@ -158,3 +158,61 @@ export const MixedLogoShapesWithoutAspectRatio: TStory = {
   parameters: { layout: 'fullscreen' },
   render: () => <FlexWrap>{renderMixedLogoShapes(false)}</FlexWrap>,
 };
+
+const wordmarkSrc = (fill: string, width: number) =>
+  `data:image/svg+xml,${encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="60"><text x="0" y="46" font-family="sans-serif" font-size="48" font-weight="700" fill="${fill}">Northwind</text></svg>`,
+  )}`;
+
+const BLACK_WORDMARK_SIZE = { width: 260, height: 60 };
+const WHITE_WORDMARK_SIZE = { width: 300, height: 60 };
+const WORDMARK_NAME = 'Northwind';
+
+const withDarkLogoArgs = {
+  aspectRatio: BLACK_WORDMARK_SIZE.width / BLACK_WORDMARK_SIZE.height,
+  children: (
+    <img
+      src={wordmarkSrc('#111111', BLACK_WORDMARK_SIZE.width)}
+      alt={WORDMARK_NAME}
+    />
+  ),
+  darkAspectRatio: WHITE_WORDMARK_SIZE.width / WHITE_WORDMARK_SIZE.height,
+  darkLogo: (
+    <img
+      src={wordmarkSrc('#ffffff', WHITE_WORDMARK_SIZE.width)}
+      alt={WORDMARK_NAME}
+    />
+  ),
+} satisfies Partial<TLogoTileProps>;
+
+export const WithDarkLogo: TStory = {
+  name: 'With a dark-background logo — light mode shows the regular logo',
+  args: withDarkLogoArgs,
+};
+
+export const WithDarkLogoInDarkMode: TStory = {
+  name: 'With a dark-background logo — dark mode swaps to it',
+  args: withDarkLogoArgs,
+  globals: { theme: 'dark' },
+};
+
+export const WithoutDarkLogoInDarkMode: TStory = {
+  name: 'Without a dark-background logo — dark mode keeps the regular logo',
+  args: {
+    ...withDarkLogoArgs,
+    darkLogo: undefined,
+    darkAspectRatio: undefined,
+  },
+  globals: { theme: 'dark' },
+};
+
+export const InteractiveWithDarkLogoInDarkMode: TStory = {
+  name: 'Interactive with a dark-background logo — dark mode swaps the linked logo',
+  args: {
+    ...withDarkLogoArgs,
+    isInteractive: true,
+    children: <a href="#northwind">{withDarkLogoArgs.children}</a>,
+    darkLogo: <a href="#northwind">{withDarkLogoArgs.darkLogo}</a>,
+  },
+  globals: { theme: 'dark' },
+};

@@ -58,7 +58,7 @@ describe(`<${Avatar.name}/>`, () => {
 
   it('renders a text alternative for the initials fallback when alt is provided', () => {
     setup();
-    expect(screen.getByText('Jane Doe')).toBeInTheDocument();
+    expect(screen.getByText('Jane Doe')).toBeVisible();
   });
 
   it('calls onImageError when the image fails to load', () => {

@@ -1,13 +1,10 @@
 import { BRAND_VARIANT } from '@blog/config';
 import { customRender, screen, within } from '@web/testing/custom-render';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { TaxonomyListModuleView } from './taxonomy-list-module-view';
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
+vi.mock('@web/i18n/navigation');
 
 const item = {
   id: 'topic-1',
@@ -58,7 +55,7 @@ describe(`<${TaxonomyListModuleView.name}/>`, () => {
     );
     expect(
       screen.getByRole('region', { name: 'Browse by topic' }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
   });
 
   it('renders the section heading as an h2 by default', () => {
@@ -75,14 +72,14 @@ describe(`<${TaxonomyListModuleView.name}/>`, () => {
     expect(label.tagName).toBe('H3');
   });
 
-  it('renders a card per entry, linking to its href with the post count as level-3 heading', () => {
+  it('renders a linked card per entry with the post count as a level-3 heading', () => {
     setup();
 
     const link = screen.getByRole('link', { name: /Engineering/ });
     expect(link).toHaveAttribute('href', '/topics/engineering');
     expect(
       screen.getByRole('heading', { level: 3, name: /Engineering/ }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
     expect(screen.getByText('Posts about building things.')).toBeVisible();
     expect(screen.getByText('5 posts')).toBeVisible();
   });
@@ -120,7 +117,7 @@ describe(`<${TaxonomyListModuleView.name}/>`, () => {
     ).not.toBeInTheDocument();
   });
 
-  it('omits the latest-posts list when the entry has no posts, even though the flag is on', () => {
+  it('omits the latest-posts list when the entry has no posts, even with the flag on', () => {
     setup({ items: [{ ...item, posts: [] }] });
 
     expect(

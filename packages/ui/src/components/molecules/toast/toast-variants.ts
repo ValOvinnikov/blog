@@ -36,7 +36,7 @@ export const toastVariants = tv({
       'font-ui text-label',
       'transition-colors duration-base ease-smooth',
       'cursor-pointer',
-      'focus-visible:ring-brand-primary focus-visible:ring-offset-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+      'focus-visible:ring-brand-primary focus-visible:ring-offset-ambient focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
     ],
     actionKey: [
       'rounded-[3px] border border-border px-[0.4ch] text-label text-subtle',

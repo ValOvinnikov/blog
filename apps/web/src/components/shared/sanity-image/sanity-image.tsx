@@ -2,7 +2,12 @@
 
 // `sanity-image` uses `useState` internally (LQIP blur-up), so this bridge
 // must be a Client Component boundary when rendered from Server Components.
-import type { ISanityImage } from '@blog/config';
+import type {
+  ISanityImage,
+  ISanityImageCrop,
+  ISanityImageHotspot,
+  TMaybeUndefined,
+} from '@blog/config';
 import { useSanityImageBaseUrl } from '@web/context/sanity-image-base-url-provider';
 import { SanityImage as SanityImageBase } from 'sanity-image';
 
@@ -17,6 +22,22 @@ export interface ISanityImageProps {
   className?: string;
   alt?: string;
 }
+
+// Without a hotspot, `sanity-image` falls back to an entropy crop, which is
+// a heuristic and can land off-centre; a synthetic centre hotspot keeps
+// framing deterministic instead.
+const toCenterFocalPoint = (
+  crop: TMaybeUndefined<ISanityImageCrop>,
+): ISanityImageHotspot => {
+  const { top = 0, bottom = 0, left = 0, right = 0 } = crop ?? {};
+
+  return {
+    x: left + (1 - left - right) / 2,
+    y: top + (1 - top - bottom) / 2,
+    width: 1,
+    height: 1,
+  };
+};
 
 /**
  * Framework-coupled bridge between the service layer's `ISanityImage`
@@ -53,7 +74,7 @@ export const SanityImage = ({
     <SanityImageBase
       id={image.assetId}
       baseUrl={baseUrl}
-      hotspot={image.hotspot}
+      hotspot={image.hotspot ?? toCenterFocalPoint(image.crop)}
       crop={image.crop}
       preview={priority ? undefined : image.lqip}
       width={width}

@@ -8,6 +8,7 @@ export const makeLogoItem = (overrides: Partial<TLogoItem> = {}): TLogoItem => {
     id: 'logo-1',
     name,
     image: makeSanityImage({ alt: name }),
+    imageDark: undefined,
     link: undefined,
     ...overrides,
   };

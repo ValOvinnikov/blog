@@ -1,15 +1,13 @@
+import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
+
 import { getEffectiveSettingsFeatures } from './get-effective-settings-features';
 
-const { getRequestTenantIdMock, getSettingsFeaturesMock, getSiteConfigMock } =
-  vi.hoisted(() => ({
-    getRequestTenantIdMock: vi.fn(),
-    getSettingsFeaturesMock: vi.fn(),
-    getSiteConfigMock: vi.fn(),
-  }));
-
-vi.mock('@web/server/tenant/get-request-tenant-id', () => ({
-  getRequestTenantId: getRequestTenantIdMock,
+const { getSettingsFeaturesMock, getSiteConfigMock } = vi.hoisted(() => ({
+  getSettingsFeaturesMock: vi.fn(),
+  getSiteConfigMock: vi.fn(),
 }));
+
+vi.mock('@web/server/tenant/get-request-tenant-id');
 
 vi.mock('@blog/db', () => ({
   queries: {
@@ -21,6 +19,8 @@ vi.mock('@blog/db', () => ({
 vi.mock('next/cache', () => ({
   unstable_cache: (fn: (...args: unknown[]) => unknown) => fn,
 }));
+
+const getRequestTenantIdMock = vi.mocked(getRequestTenantId);
 
 const TENANT_A_ID = 'tenant-a';
 const TENANT_B_ID = 'tenant-b';
@@ -58,7 +58,7 @@ describe(getEffectiveSettingsFeatures, () => {
     expect(getSettingsFeaturesMock).toHaveBeenCalledWith(TENANT_A_ID);
   });
 
-  it("falls back to the tenant's current preset defaults when no settings_features row exists", async () => {
+  it("falls back to the tenant's preset defaults when no settings_features row exists", async () => {
     getRequestTenantIdMock.mockResolvedValue(TENANT_A_ID);
     getSettingsFeaturesMock.mockResolvedValue(undefined);
     getSiteConfigMock.mockResolvedValue({ preset: 'EDITORIAL' });
@@ -73,6 +73,7 @@ describe(getEffectiveSettingsFeatures, () => {
         BOOKMARKS: true,
         NEWSLETTER: false,
         ANALYTICS: false,
+        CONSENT_BANNER: false,
       },
     });
   });
@@ -92,6 +93,7 @@ describe(getEffectiveSettingsFeatures, () => {
         BOOKMARKS: true,
         NEWSLETTER: false,
         ANALYTICS: false,
+        CONSENT_BANNER: false,
       },
     });
   });
@@ -146,7 +148,7 @@ describe(getEffectiveSettingsFeatures, () => {
     expect(getSettingsFeaturesMock).toHaveBeenCalledWith(TENANT_B_ID);
   });
 
-  it("propagates the header read's dynamic-rendering signal rather than reporting it as a fetch failure", async () => {
+  it("rethrows the header read's dynamic-rendering signal instead of a fetch failure", async () => {
     const dynamicSignal = Object.assign(
       new Error(
         "Dynamic server usage: Route /[tenant]/[locale] couldn't be rendered statically because it used `headers`",

@@ -1,3 +1,5 @@
+import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockPostDetail } from '@web/testing/pages/blog-post-page/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
@@ -5,24 +7,20 @@ import { notFound } from 'next/navigation';
 
 import { BlogPostingSchema } from './blog-posting-schema';
 
-const { getPostPageMock, getTenantBaseUrlMock, getTenantSanityContextMock } =
-  vi.hoisted(() => ({
-    getPostPageMock: vi.fn(),
-    getTenantBaseUrlMock: vi.fn(),
-    getTenantSanityContextMock: vi.fn(),
-  }));
+const { getPostPageMock } = vi.hoisted(() => ({
+  getPostPageMock: vi.fn(),
+}));
 
 vi.mock('@web/server/post/get-post-page', () => ({
   getPostPage: getPostPageMock,
 }));
 
-vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
-  getTenantBaseUrl: getTenantBaseUrlMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-base-url');
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-sanity-context');
+
+const getTenantBaseUrlMock = vi.mocked(getTenantBaseUrl);
+const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
 
 const setup = customRenderAsync(BlogPostingSchema, {
   slug: 'hello-world',

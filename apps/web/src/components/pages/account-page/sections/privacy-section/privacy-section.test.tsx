@@ -1,20 +1,22 @@
-import { customRender, screen } from '@web/testing/custom-render';
+import userEvent from '@testing-library/user-event';
+import { ToastProvider } from '@web/context/toast-provider';
+import { renderElement, screen } from '@web/testing/custom-render';
 import { makePrivacySection } from '@web/testing/pages/account-page/privacy-section-fixtures';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { PrivacySection } from './privacy-section';
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
+vi.mock('@web/i18n/navigation');
 
-vi.mock('@web/components/shared/delete-account-control', () => ({
-  DeleteAccountControl: ({ handle }: { handle: string }) => (
-    <div data-testid="delete-account-control">{handle}</div>
-  ),
-}));
+vi.mock('@web/server/auth/auth', () => ({ auth: vi.fn() }));
 
-const setup = customRender(PrivacySection, makePrivacySection());
+vi.mock('@web/utils/logger/logger');
+
+const setup = () =>
+  renderElement(
+    <ToastProvider>
+      <PrivacySection {...makePrivacySection()} />
+    </ToastProvider>,
+  );
 
 describe(`<${PrivacySection.name}/>`, () => {
   it('renders the panel heading as a level-2 heading', () => {
@@ -25,7 +27,7 @@ describe(`<${PrivacySection.name}/>`, () => {
     ).toBeVisible();
   });
 
-  it('renders the export-my-data row as a download link to the export route', () => {
+  it('renders the export row as a download link to the export route', () => {
     setup();
 
     const exportLink = screen.getByRole('link', { name: 'Request export' });
@@ -33,12 +35,20 @@ describe(`<${PrivacySection.name}/>`, () => {
     expect(exportLink).toHaveAttribute('download');
   });
 
-  it('renders the delete-account row with the given handle passed to the control', () => {
+  it('arms the delete button once the handle is typed', async () => {
+    const user = userEvent.setup();
     setup();
 
-    expect(screen.getByText('Delete account')).toBeVisible();
-    expect(screen.getByTestId('delete-account-control')).toHaveTextContent(
+    const deleteButton = screen.getByRole('button', { name: 'Delete account' });
+    expect(deleteButton).toBeDisabled();
+
+    await user.type(
+      screen.getByRole('textbox', {
+        name: 'Type your handle to confirm deletion',
+      }),
       'jane',
     );
+
+    expect(deleteButton).toBeEnabled();
   });
 });

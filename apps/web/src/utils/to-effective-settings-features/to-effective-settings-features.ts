@@ -11,6 +11,7 @@ type TSettingsFeaturesRow = {
   bookmarksEnabled: boolean;
   newsletterEnabled: boolean;
   analyticsEnabled: boolean;
+  consentBannerEnabled: boolean;
 };
 
 /**
@@ -33,5 +34,6 @@ export const toEffectiveSettingsFeatures = (
     [CAPABILITY.BOOKMARKS]: row.bookmarksEnabled,
     [CAPABILITY.NEWSLETTER]: row.newsletterEnabled,
     [CAPABILITY.ANALYTICS]: row.analyticsEnabled,
+    [CAPABILITY.CONSENT_BANNER]: row.consentBannerEnabled,
   };
 };

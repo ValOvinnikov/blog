@@ -1,23 +1,23 @@
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { redirect } from 'next/navigation';
+import type { Session } from 'next-auth';
 
+import { auth } from './auth';
 import { listSessionTenants } from './list-session-tenants';
 
 const {
-  authMock,
   listMembershipsForUserMock,
   listTenantsByIdsMock,
   listTenantsMock,
   getAdminByUserIdMock,
 } = vi.hoisted(() => ({
-  authMock: vi.fn(),
   listMembershipsForUserMock: vi.fn(),
   listTenantsByIdsMock: vi.fn(),
   listTenantsMock: vi.fn(),
   getAdminByUserIdMock: vi.fn(),
 }));
 
-vi.mock('./auth', () => ({ auth: authMock }));
+vi.mock('./auth');
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
@@ -30,6 +30,8 @@ vi.mock('@blog/db', async () => ({
     admins: { getAdminByUserId: getAdminByUserIdMock },
   },
 }));
+
+const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 describe(listSessionTenants, () => {
   beforeEach(() => {
@@ -49,7 +51,7 @@ describe(listSessionTenants, () => {
     expect(listMembershipsForUserMock).not.toHaveBeenCalled();
   });
 
-  it('redirects to /workspace-pending when the signed-in user has zero memberships and is not a SUPERADMIN', async () => {
+  it('redirects to /workspace-pending for a non-SUPERADMIN with zero memberships', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue(undefined);
     listMembershipsForUserMock.mockResolvedValue([]);
@@ -93,7 +95,7 @@ describe(listSessionTenants, () => {
     expect(redirect).not.toHaveBeenCalled();
   });
 
-  it('resolves every tenant in the system for a SUPERADMIN, regardless of their own memberships row count', async () => {
+  it('resolves every tenant for a SUPERADMIN, regardless of their own memberships', async () => {
     authMock.mockResolvedValue({ user: { id: 'super-1' } });
     getAdminByUserIdMock.mockResolvedValue({
       id: 'admin-1',

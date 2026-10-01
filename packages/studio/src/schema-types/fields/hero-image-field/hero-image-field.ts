@@ -12,12 +12,12 @@ export const heroImageField = () =>
     description:
       "The hero's image — sits beside the copy for Split, below the copy for Stacked, or behind the copy as a full-bleed background for Banner.",
     validation: (rule) =>
-      rule.custom((value, context) => {
+      rule.custom<{ asset?: unknown }>((value, context) => {
         const variant = (context.parent as THeroImageFieldParent | undefined)
           ?.variant;
 
         if (
-          !value &&
+          !value?.asset &&
           (variant === HERO_VARIANT.SPLIT || variant === HERO_VARIANT.BANNER)
         ) {
           return 'Image is required for the Split and Banner variants.';

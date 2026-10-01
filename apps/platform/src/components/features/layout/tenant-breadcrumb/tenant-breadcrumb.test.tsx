@@ -1,21 +1,9 @@
 import { usePathname } from '@platform/i18n/navigation';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
-import type { ComponentPropsWithoutRef } from 'react';
 
 import { TenantBreadcrumb } from './tenant-breadcrumb';
 
-vi.mock('@platform/i18n/navigation', () => ({
-  usePathname: vi.fn(() => '/tenants/tenant-1/look'),
-  Link: ({
-    href,
-    children,
-    ...rest
-  }: ComponentPropsWithoutRef<'a'> & { href: string }) => (
-    <a href={href} {...rest}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('@platform/i18n/navigation');
 
 const render = renderWithIntl;
 
@@ -37,7 +25,7 @@ describe(TenantBreadcrumb, () => {
     );
   });
 
-  it('shows the tenant name as the unlinked current item on the overview route, with no extra leaf', () => {
+  it('shows the tenant name as the unlinked current item on the overview route', () => {
     vi.mocked(usePathname).mockReturnValue('/tenants/tenant-1');
 
     render(<TenantBreadcrumb tenantId="tenant-1" tenantName="Acme Inc." />);
@@ -106,7 +94,7 @@ describe(TenantBreadcrumb, () => {
     expect(screen.queryByRole('link', { name: 'Danger zone' })).toBeNull();
   });
 
-  it("omits the leaf entirely on an unmatched route, rather than defaulting to any label — the tenant name becomes the trail's current item", () => {
+  it('omits the leaf on an unmatched route, making the tenant name the current item', () => {
     vi.mocked(usePathname).mockReturnValue('/tenants/tenant-1/unlisted');
 
     render(<TenantBreadcrumb tenantId="tenant-1" tenantName="Acme Inc." />);

@@ -3,11 +3,12 @@ import {
   DISPLAY_MODE_EXPRESSION,
   displayModeParser,
 } from '@blog/service/shared/expressions/display-mode';
-import { ctaButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
+import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
-import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document';
+import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 
 export const featureListModuleQuery = q
   .parameters<TModuleQueryParams>()
@@ -41,14 +42,11 @@ export const featureListModuleQuery = q
           .nullable(true),
       }))
       .nullable(true),
-    ctaButtons: sub
-      .field('ctaButtons[]')
-      .project(ctaButtonFragment)
-      .nullable(true),
+    ...ctaButtonsFragment,
     imageShape: sub.field('imageShape').notNull(),
     displayMode: sub.raw(DISPLAY_MODE_EXPRESSION, displayModeParser),
-    contentAlignment: sub.field('contentAlignment').nullable(true),
+    ...moduleContentAlignmentLeftCenterFragment,
     cardAlignment: sub.field('cardAlignment').notNull(),
-    layout: sub.field('layout').project(layoutFragment).nullable(true),
+    ...moduleWideLayoutFragment,
   }))
   .notNull();

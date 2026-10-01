@@ -18,6 +18,7 @@ const ALL_ENTITLED = [
   CAPABILITY.BOOKMARKS,
   CAPABILITY.NEWSLETTER,
   CAPABILITY.ANALYTICS,
+  CAPABILITY.CONSENT_BANNER,
 ];
 
 const FREE_ENTITLED = [
@@ -32,6 +33,7 @@ const INITIAL_VALUES: TSettingsFeaturesValues = {
   bookmarksEnabled: true,
   newsletterEnabled: false,
   analyticsEnabled: false,
+  consentBannerEnabled: false,
 };
 
 const ARCHIVED_AT = new Date('2026-08-26T00:00:00.000Z');
@@ -55,7 +57,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       'data-unchecked',
       '',
     );
-    expect(screen.getAllByRole('switch')).toHaveLength(5);
+    expect(screen.getAllByRole('switch')).toHaveLength(6);
   });
 
   it('disables an out-of-plan toggle and shows a plan-locked badge, without hiding it', () => {
@@ -72,7 +74,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
     expect(
       screen.getByRole('switch', { name: 'Comments' }),
     ).not.toHaveAttribute('data-disabled');
-    expect(screen.getAllByText('Growth plan')).toHaveLength(2);
+    expect(screen.getAllByText('Growth plan')).toHaveLength(3);
   });
 
   it('makes a locked toggle inert (unreachable and unclickable) while leaving an entitled toggle interactive, same as a provisioning-locked field', () => {

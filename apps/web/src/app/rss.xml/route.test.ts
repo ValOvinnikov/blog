@@ -2,19 +2,18 @@
  * @vitest-environment jsdom
  */
 import type { TFeedPost } from '@blog/service';
+import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
 
 const {
   getAllPublishedPostsMock,
   getSiteSettingsMock,
   getIndexPageMock,
   getHostTenantSanityContextMock,
-  getTenantBaseUrlMock,
 } = vi.hoisted(() => ({
   getAllPublishedPostsMock: vi.fn(),
   getSiteSettingsMock: vi.fn(),
   getIndexPageMock: vi.fn(),
   getHostTenantSanityContextMock: vi.fn(),
-  getTenantBaseUrlMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -31,9 +30,9 @@ vi.mock('@web/server/tenant/get-host-tenant-sanity-context', () => ({
   getHostTenantSanityContext: getHostTenantSanityContextMock,
 }));
 
-vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
-  getTenantBaseUrl: getTenantBaseUrlMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-base-url');
+
+const getTenantBaseUrlMock = vi.mocked(getTenantBaseUrl);
 
 const post: TFeedPost = {
   title: 'Hello & Welcome',

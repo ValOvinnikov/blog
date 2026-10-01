@@ -1,15 +1,10 @@
+import { env } from '@platform/utils/env/env';
+
 import { dispatchDeprovisioningWorkflow } from './dispatch-deprovisioning-workflow';
 
-const { envMock } = vi.hoisted(() => ({
-  envMock: {
-    TENANT_PROVISIONING_GITHUB_TOKEN: undefined as string | undefined,
-    TENANT_PROVISIONING_GITHUB_REPO: undefined as string | undefined,
-    TENANT_PROVISIONING_DATASET: undefined as
-      'development' | 'production' | undefined,
-  },
-}));
+vi.mock('@platform/utils/env/env');
 
-vi.mock('@platform/utils/env/env', () => ({ env: envMock }));
+const envMock: Partial<Record<keyof typeof env, string>> = env;
 
 describe(dispatchDeprovisioningWorkflow, () => {
   const fetchMock = vi.fn();
@@ -48,7 +43,7 @@ describe(dispatchDeprovisioningWorkflow, () => {
     expect(result).toBe(false);
   });
 
-  it('POSTs a workflow_dispatch request with tenantId, confirm, and dryRun as inputs, and returns true', async () => {
+  it('POSTs a workflow_dispatch with tenantId, confirm and dryRun, and returns true', async () => {
     fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
 
     const result = await dispatchDeprovisioningWorkflow({
@@ -73,7 +68,7 @@ describe(dispatchDeprovisioningWorkflow, () => {
     expect(result).toBe(true);
   });
 
-  it('omits environment from the dispatch body when TENANT_PROVISIONING_DATASET is not configured', async () => {
+  it('omits environment from the dispatch body when no dataset is configured', async () => {
     fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
 
     await dispatchDeprovisioningWorkflow({
@@ -93,7 +88,7 @@ describe(dispatchDeprovisioningWorkflow, () => {
     );
   });
 
-  it('includes environment from TENANT_PROVISIONING_DATASET in the dispatch body when configured', async () => {
+  it('sends environment from TENANT_PROVISIONING_DATASET when configured', async () => {
     envMock.TENANT_PROVISIONING_DATASET = 'development';
     fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
 
@@ -119,7 +114,7 @@ describe(dispatchDeprovisioningWorkflow, () => {
     );
   });
 
-  it('never throws, and returns false, when the dispatch call responds with a non-2xx status', async () => {
+  it('returns false without throwing when the dispatch responds non-2xx', async () => {
     fetchMock.mockResolvedValue(new Response(null, { status: 404 }));
 
     await expect(

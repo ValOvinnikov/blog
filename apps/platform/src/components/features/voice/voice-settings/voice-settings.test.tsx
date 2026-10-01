@@ -46,7 +46,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
     expect(
       within(screen.getByText(ADVANCED_SUMMARY)).getByTestId('icon'),
-    ).toBeInTheDocument();
+    ).toBeVisible();
   });
 
   it('expands the Advanced section on click', async () => {

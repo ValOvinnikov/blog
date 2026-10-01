@@ -6,13 +6,14 @@ import {
   PRESET_ID,
   RADIUS_SCALE,
 } from '@blog/config';
+import { auth } from '@platform/server/auth/auth';
+import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { env } from '@platform/utils/env/env';
+import type { Session } from 'next-auth';
 
 import { uploadBrandAssetAction } from './upload-brand-asset-action';
 
 const {
-  requireTenantMembershipMock,
-  authMock,
   getSiteConfigOrDefaultsMock,
   validateBrandAssetUploadMock,
   upsertSiteConfigMock,
@@ -20,8 +21,6 @@ const {
   putMock,
   delMock,
 } = vi.hoisted(() => ({
-  requireTenantMembershipMock: vi.fn(),
-  authMock: vi.fn(),
   getSiteConfigOrDefaultsMock: vi.fn(),
   validateBrandAssetUploadMock: vi.fn(),
   upsertSiteConfigMock: vi.fn(),
@@ -30,11 +29,9 @@ const {
   delMock: vi.fn(),
 }));
 
-vi.mock('@platform/server/auth/require-tenant-membership', () => ({
-  requireTenantMembership: requireTenantMembershipMock,
-}));
+vi.mock('@platform/server/auth/require-tenant-membership');
 
-vi.mock('@platform/server/auth/auth', () => ({ auth: authMock }));
+vi.mock('@platform/server/auth/auth');
 
 vi.mock('@platform/server/site-config/site-config-or-defaults', () => ({
   getSiteConfigOrDefaults: getSiteConfigOrDefaultsMock,
@@ -56,9 +53,14 @@ vi.mock('@vercel/blob', () => ({
   del: delMock,
 }));
 
-vi.mock('@platform/utils/env/env', () => ({
-  env: { BLOB_READ_WRITE_TOKEN: 'test-token' },
-}));
+vi.mock('@platform/utils/env/env');
+
+Object.assign(env, { BLOB_READ_WRITE_TOKEN: 'test-token' });
+
+const requireTenantMembershipMock = vi.mocked<
+  (tenantId: string) => Promise<unknown>
+>(requireTenantMembership);
+const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 const THEME_FIELDS = {
   preset: PRESET_ID.CONSOLE,
@@ -179,7 +181,7 @@ describe(uploadBrandAssetAction, () => {
     });
   });
 
-  it('records exactly one SETTINGS_UPDATED audit event identifying the asset and operation', async () => {
+  it('records one SETTINGS_UPDATED audit event naming the asset and operation', async () => {
     validateBrandAssetUploadMock.mockResolvedValue({
       ok: true,
       asset: {
@@ -214,7 +216,7 @@ describe(uploadBrandAssetAction, () => {
     });
   });
 
-  it('deletes the previous asset after a successful replace, without blocking the result on it', async () => {
+  it('deletes the previous asset after a replace, without blocking the result on it', async () => {
     getSiteConfigOrDefaultsMock.mockResolvedValue({
       ...THEME_FIELDS,
       logoAssetUrl: 'https://example.blob.vercel-storage.com/logo-old.png',
@@ -247,7 +249,7 @@ describe(uploadBrandAssetAction, () => {
     );
   });
 
-  it('leaves the site_config write untouched and reports failure when the Blob upload itself throws', async () => {
+  it('reports failure with no site_config write when the Blob upload throws', async () => {
     validateBrandAssetUploadMock.mockResolvedValue({
       ok: true,
       asset: {
@@ -300,8 +302,7 @@ describe(uploadBrandAssetAction, () => {
   });
 
   it('reports a readable error and never touches Blob when the token is unconfigured', async () => {
-    // @ts-expect-error -- the mocked env module is a plain mutable object
-    env.BLOB_READ_WRITE_TOKEN = undefined;
+    Object.assign(env, { BLOB_READ_WRITE_TOKEN: undefined });
 
     try {
       const result = await uploadBrandAssetAction(
@@ -318,8 +319,7 @@ describe(uploadBrandAssetAction, () => {
       expect(putMock).not.toHaveBeenCalled();
       expect(insertAuditEventMock).not.toHaveBeenCalled();
     } finally {
-      // @ts-expect-error -- restore the mocked env module for later tests
-      env.BLOB_READ_WRITE_TOKEN = 'test-token';
+      Object.assign(env, { BLOB_READ_WRITE_TOKEN: 'test-token' });
     }
   });
 

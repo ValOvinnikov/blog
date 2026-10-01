@@ -1,17 +1,14 @@
+import { env } from '@platform/utils/env/env';
+import { logger } from '@platform/utils/logger/logger';
+
 import { dispatchGitHubWorkflow } from './dispatch-github-workflow';
 
-const { envMock, loggerErrorMock } = vi.hoisted(() => ({
-  envMock: {
-    TENANT_PROVISIONING_GITHUB_TOKEN: undefined as string | undefined,
-    TENANT_PROVISIONING_GITHUB_REPO: undefined as string | undefined,
-  },
-  loggerErrorMock: vi.fn(),
-}));
+vi.mock('@platform/utils/env/env');
 
-vi.mock('@platform/utils/env/env', () => ({ env: envMock }));
-vi.mock('@platform/utils/logger/logger', () => ({
-  logger: { error: loggerErrorMock },
-}));
+const envMock: Partial<Record<keyof typeof env, string>> = env;
+vi.mock('@platform/utils/logger/logger');
+
+const loggerErrorMock = vi.mocked(logger.error);
 
 describe(dispatchGitHubWorkflow, () => {
   const fetchMock = vi.fn();
@@ -32,7 +29,7 @@ describe(dispatchGitHubWorkflow, () => {
     envMock.TENANT_PROVISIONING_GITHUB_REPO = 'acme-org/acme-repo';
   });
 
-  it('skips the dispatch call, logs the skipped event, and returns false when no token is configured', async () => {
+  it('skips the dispatch, logs it, and returns false when no token is configured', async () => {
     envMock.TENANT_PROVISIONING_GITHUB_TOKEN = undefined;
 
     const result = await dispatch();
@@ -53,7 +50,7 @@ describe(dispatchGitHubWorkflow, () => {
     expect(result).toBe(false);
   });
 
-  it('POSTs a workflow_dispatch request built from the given workflow file and inputs, and returns true', async () => {
+  it('POSTs a workflow_dispatch built from the file and inputs, and returns true', async () => {
     fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
 
     const result = await dispatch({ tenantId: 'tenant-1' });
@@ -93,7 +90,7 @@ describe(dispatchGitHubWorkflow, () => {
     );
   });
 
-  it('logs the failed event with the response status, and returns false, on a non-2xx response', async () => {
+  it('logs the failure with the response status and returns false on a non-2xx', async () => {
     fetchMock.mockResolvedValue(new Response(null, { status: 404 }));
 
     const result = await dispatch();
@@ -105,7 +102,7 @@ describe(dispatchGitHubWorkflow, () => {
     });
   });
 
-  it('logs the error event with the thrown error, and returns false, when the request itself fails', async () => {
+  it('logs the thrown error and returns false when the request itself fails', async () => {
     const thrown = new Error('network down');
     fetchMock.mockRejectedValue(thrown);
 

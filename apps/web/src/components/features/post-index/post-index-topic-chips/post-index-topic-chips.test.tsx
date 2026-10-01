@@ -1,26 +1,23 @@
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { makeTopicWithPostCount } from '@web/testing/shared/topic/fixtures';
 
 import { PostIndexTopicChips } from './post-index-topic-chips';
 
-const { getTopicsSafelyMock, getTenantSanityContextMock } = vi.hoisted(() => ({
+const { getTopicsSafelyMock } = vi.hoisted(() => ({
   getTopicsSafelyMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
 }));
+
+vi.mock('@web/i18n/navigation');
 
 vi.mock('@web/utils/get-topics-safely', () => ({
   getTopicsSafely: getTopicsSafelyMock,
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-sanity-context');
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
+const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
 
 const setup = customRenderAsync(PostIndexTopicChips, { tenant: 'tenant-1' });
 

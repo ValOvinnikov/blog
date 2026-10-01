@@ -15,6 +15,7 @@ const updateFeaturesInputSchema = z.object({
   bookmarksEnabled: z.boolean(),
   newsletterEnabled: z.boolean(),
   analyticsEnabled: z.boolean(),
+  consentBannerEnabled: z.boolean(),
 });
 
 export type TUpdateFeaturesInput = z.input<typeof updateFeaturesInputSchema>;

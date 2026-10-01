@@ -1,4 +1,5 @@
 import { BRAND_VARIANT, HERO_VARIANT, SOCIAL_PLATFORMS } from '@blog/config';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { STATIC_SANITY_IMAGE_BASE_URL } from '@web/testing/providers';
@@ -7,9 +8,8 @@ import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtur
 
 import { HeroProfileModule } from './hero-profile-module';
 
-const { getHeroProfileMock, getTenantSanityContextMock } = vi.hoisted(() => ({
+const { getHeroProfileMock } = vi.hoisted(() => ({
   getHeroProfileMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -20,9 +20,9 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-sanity-context');
+
+const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
 
 const makeHeroProfileData = (overrides: Record<string, unknown> = {}) => ({
   brandVariant: BRAND_VARIANT.PRIMARY,
@@ -95,7 +95,7 @@ describe(`<${HeroProfileModule.name}/>`, () => {
     ).toBeVisible();
   });
 
-  it('renders the hero image src from the configured Sanity CDN base URL, not a hardcoded origin', async () => {
+  it('renders the hero image src from the configured Sanity CDN base URL', async () => {
     const sanityImage = makeSanityImage();
     getHeroProfileMock.mockResolvedValue({
       ok: true,
@@ -121,7 +121,7 @@ describe(`<${HeroProfileModule.name}/>`, () => {
     expect(screen.queryByRole('list')).not.toBeInTheDocument();
   });
 
-  it('renders a labelled list of the resolved social links, each honouring the authored target and rendering a platform icon with an accessible name', async () => {
+  it('renders a labelled list of social links with their targets and named icons', async () => {
     getHeroProfileMock.mockResolvedValue({
       ok: true,
       data: makeHeroProfileData({

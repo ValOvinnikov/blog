@@ -1,16 +1,17 @@
 import { BRAND_VARIANT } from '@blog/config';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeFaqQuestion } from '@web/testing/modules/faq/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { FaqModule } from './faq-module';
 
-const { getFaqModuleMock, getTenantSanityContextMock } = vi.hoisted(() => ({
+const { getFaqModuleMock } = vi.hoisted(() => ({
   getFaqModuleMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
 }));
+
+vi.mock('@web/i18n/navigation');
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -20,13 +21,9 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-sanity-context');
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
+const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
 
 const baseModule = {
   brandVariant: BRAND_VARIANT.PRIMARY,
@@ -49,7 +46,7 @@ describe(`<${FaqModule.name}/>`, () => {
     getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
-  it('calls getFaqModule with the module id and the tenant Sanity context resolved from the tenant slug', async () => {
+  it('calls getFaqModule with the module id and the tenant Sanity context', async () => {
     const tenant = {
       projectId: 'tenant-project',
       dataset: 'production',
@@ -92,9 +89,9 @@ describe(`<${FaqModule.name}/>`, () => {
 
     expect(
       screen.getByRole('button', { name: 'Do you offer refunds?' }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
     expect(
       screen.getByRole('button', { name: 'Is there a free trial?' }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
   });
 });

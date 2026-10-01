@@ -1,6 +1,6 @@
 import type {
   TBrandVariantOf,
-  TContentAlignment,
+  TContentAlignmentOf,
   THeadingBlock,
   TLayout,
   TMaybeUndefined,
@@ -19,6 +19,6 @@ export type TFaqModule = {
   headingBlock: THeadingBlock;
   questions: TFaqQuestion[];
   ctaButtons: TCtaButton[];
-  contentAlignment: TMaybeUndefined<TContentAlignment>;
+  contentAlignment: TMaybeUndefined<TContentAlignmentOf<'LEFT' | 'CENTER'>>;
   layout: TMaybeUndefined<TLayout>;
 };

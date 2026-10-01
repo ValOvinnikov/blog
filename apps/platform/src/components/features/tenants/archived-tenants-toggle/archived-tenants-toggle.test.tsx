@@ -1,3 +1,4 @@
+import { useRouter } from '@platform/i18n/navigation';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import userEvent from '@testing-library/user-event';
 
@@ -5,15 +6,13 @@ import { ArchivedTenantsToggle } from './archived-tenants-toggle';
 
 const render = renderWithIntl;
 
-const { pushMock } = vi.hoisted(() => ({ pushMock: vi.fn() }));
+vi.mock('@platform/i18n/navigation');
 
-vi.mock('@platform/i18n/navigation', () => ({
-  useRouter: () => ({ push: pushMock }),
-}));
+const pushMock = vi.fn();
 
 describe(ArchivedTenantsToggle, () => {
   beforeEach(() => {
-    pushMock.mockReset();
+    vi.mocked(useRouter).mockReturnValue({ ...useRouter(), push: pushMock });
   });
 
   it('shows Active selected by default', () => {

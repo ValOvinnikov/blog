@@ -1,19 +1,8 @@
 import { render, screen } from '@platform/testing/custom-render';
-import type { ComponentPropsWithoutRef } from 'react';
 
 import { Breadcrumbs } from './breadcrumbs';
 
-vi.mock('@platform/i18n/navigation', () => ({
-  Link: ({
-    href,
-    children,
-    ...rest
-  }: ComponentPropsWithoutRef<'a'> & { href: string }) => (
-    <a href={href} {...rest}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('@platform/i18n/navigation');
 
 describe(Breadcrumbs, () => {
   it('renders every ancestor with an href as a real link', () => {
@@ -34,7 +23,7 @@ describe(Breadcrumbs, () => {
     );
   });
 
-  it('renders the last item as the current, non-clickable label even when it has an href', () => {
+  it('renders the last item as the current, non-clickable label even with an href', () => {
     render(
       <Breadcrumbs
         ariaLabel="Breadcrumb"

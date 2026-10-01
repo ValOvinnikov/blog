@@ -1,14 +1,15 @@
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { redirect } from 'next/navigation';
+import type { Session } from 'next-auth';
 
+import { auth } from './auth';
 import { requireSuperAdmin } from './require-super-admin';
 
-const { authMock, getAdminByUserIdMock } = vi.hoisted(() => ({
-  authMock: vi.fn(),
+const { getAdminByUserIdMock } = vi.hoisted(() => ({
   getAdminByUserIdMock: vi.fn(),
 }));
 
-vi.mock('./auth', () => ({ auth: authMock }));
+vi.mock('./auth');
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
@@ -16,6 +17,8 @@ vi.mock('@blog/db', async () => ({
     admins: { getAdminByUserId: getAdminByUserIdMock },
   },
 }));
+
+const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 describe(requireSuperAdmin, () => {
   beforeEach(() => {

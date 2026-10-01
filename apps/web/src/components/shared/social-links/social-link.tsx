@@ -10,11 +10,19 @@ import type { TNavLinkVariants } from '@blog/ui/components/atoms/nav-link/nav-li
 import { SmartLink } from '@web/components/shared/smart-link';
 import { useTranslations } from 'next-intl';
 
+import { socialLinkOnDarkVariants } from './social-links-variants';
+
 export type TSocialLinkProps = TSocialProfile & {
   variant?: TNavLinkVariants['variant'];
+  isOnDark?: boolean;
 };
 
-export const SocialLink = ({ platform, link, variant }: TSocialLinkProps) => {
+export const SocialLink = ({
+  platform,
+  link,
+  variant,
+  isOnDark,
+}: TSocialLinkProps) => {
   const t = useTranslations('socialLinks');
   const platformLabel = SOCIAL_PLATFORM_LABEL[platform];
 
@@ -24,6 +32,7 @@ export const SocialLink = ({ platform, link, variant }: TSocialLinkProps) => {
       href={link.href}
       target={link.target}
       variant={variant}
+      className={socialLinkOnDarkVariants({ isOnDark })}
       icon={
         <Icon
           name={SOCIAL_PLATFORM_ICON[platform]}

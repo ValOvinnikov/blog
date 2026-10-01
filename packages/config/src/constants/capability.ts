@@ -6,6 +6,7 @@ export const CAPABILITY = {
   BOOKMARKS: 'BOOKMARKS',
   NEWSLETTER: 'NEWSLETTER',
   ANALYTICS: 'ANALYTICS',
+  CONSENT_BANNER: 'CONSENT_BANNER',
 } as const;
 
 export type TCapability = TValueOf<typeof CAPABILITY>;

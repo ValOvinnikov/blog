@@ -67,12 +67,10 @@ describe(`<${LookForm.name}/>`, () => {
   it('shows the favicon square requirement before any file is chosen', () => {
     setup();
 
-    expect(
-      screen.getByRole('button', { name: 'Upload logo' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Upload logo' })).toBeVisible();
     expect(
       screen.getByRole('button', { name: 'Upload favicon' }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
     expect(screen.getByText(/Pre-cropped square, please/)).toBeVisible();
   });
 
@@ -87,7 +85,7 @@ describe(`<${LookForm.name}/>`, () => {
 
     await user.click(screen.getByRole('radio', { name: 'Editorial' }));
 
-    expect(screen.getByAltText('Current logo')).toBeInTheDocument();
+    expect(screen.getByAltText('Current logo')).toBeVisible();
   });
 
   it("choosing a preset resets every one of that preset's defaults", async () => {

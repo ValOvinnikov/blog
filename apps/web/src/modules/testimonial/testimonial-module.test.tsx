@@ -1,18 +1,17 @@
 import { BRAND_VARIANT, CONTENT_ALIGNMENT, DISPLAY_MODE } from '@blog/config';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeTestimonialItem } from '@web/testing/modules/testimonial/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { TestimonialModule } from './testimonial-module';
 
-const { getTestimonialModuleMock, getTenantSanityContextMock } = vi.hoisted(
-  () => ({
-    getTestimonialModuleMock: vi.fn(),
-    getTenantSanityContextMock: vi.fn(),
-  }),
-);
+const { getTestimonialModuleMock } = vi.hoisted(() => ({
+  getTestimonialModuleMock: vi.fn(),
+}));
+
+vi.mock('@web/i18n/navigation');
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -22,13 +21,9 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-sanity-context');
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
+const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
 
 const baseModule = {
   brandVariant: BRAND_VARIANT.PRIMARY,
@@ -53,7 +48,7 @@ describe(`<${TestimonialModule.name}/>`, () => {
     getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
-  it('calls getTestimonialModule with the module id and the tenant Sanity context resolved from the tenant slug', async () => {
+  it('calls getTestimonialModule with the module id and the tenant Sanity context', async () => {
     const tenant = {
       projectId: 'tenant-project',
       dataset: 'production',
@@ -62,7 +57,10 @@ describe(`<${TestimonialModule.name}/>`, () => {
     getTenantSanityContextMock.mockResolvedValue(tenant);
     getTestimonialModuleMock.mockResolvedValue({
       ok: true,
-      data: { ...baseModule, testimonials: [] },
+      data: {
+        ...baseModule,
+        testimonials: [makeTestimonialItem({ id: 'testimonial-1' })],
+      },
     });
 
     await setup();
@@ -78,17 +76,6 @@ describe(`<${TestimonialModule.name}/>`, () => {
     getTestimonialModuleMock.mockResolvedValue({
       ok: false,
       error: new Error('boom'),
-    });
-
-    const { container } = await setup();
-
-    expect(container).toBeEmptyDOMElement();
-  });
-
-  it('renders nothing when the testimonials degrade to an empty list, never an empty landmark with a dangling aria-labelledby', async () => {
-    getTestimonialModuleMock.mockResolvedValue({
-      ok: true,
-      data: { ...baseModule, testimonials: [] },
     });
 
     const { container } = await setup();

@@ -3,6 +3,7 @@ import { Avatar } from '@blog/ui/components/atoms/avatar';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { within } from 'storybook/test';
 
 import { IconButton } from './icon-button';
 import { iconButtonVariants } from './icon-button-variants';
@@ -45,6 +46,16 @@ export const WithMoonIcon: TStory = {
 
 export const Disabled: TStory = {
   args: { isDisabled: true },
+};
+
+export const FocusableWhenDisabled: TStory = {
+  args: {
+    variant: 'control',
+    ariaLabel: 'Next slide',
+    children: <Icon name={ICONS.CHEVRON_RIGHT} size={SIZE.SM} />,
+    isDisabled: true,
+    isFocusableWhenDisabled: true,
+  },
 };
 
 export const Bordered: TStory = {
@@ -94,7 +105,7 @@ export const ControlOnGrounds: TStory = {
         </IconButton>
       </div>
       <div
-        className="bg-secondary"
+        className="bg-secondary surface-secondary"
         style={{ padding: '1.5rem', borderRadius: '0.5rem' }}
       >
         <IconButton
@@ -107,7 +118,7 @@ export const ControlOnGrounds: TStory = {
         </IconButton>
       </div>
       <div
-        className="bg-brand-primary-muted"
+        className="bg-brand-primary-muted surface-brand-primary"
         style={{ padding: '1.5rem', borderRadius: '0.5rem' }}
       >
         <IconButton
@@ -121,6 +132,11 @@ export const ControlOnGrounds: TStory = {
       </div>
     </div>
   ),
+  play: ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const buttons = canvas.getAllByRole('button', { name: 'Next slide' });
+    buttons[buttons.length - 1]?.focus();
+  },
 };
 
 // A disabled control keeps its brand ring and fades with it; toggle the toolbar theme to check both modes.
@@ -143,7 +159,7 @@ export const ControlDisabledOnGrounds: TStory = {
         </IconButton>
       </div>
       <div
-        className="bg-secondary"
+        className="bg-secondary surface-secondary"
         style={{ padding: '1.5rem', borderRadius: '0.5rem' }}
       >
         <IconButton
@@ -157,7 +173,7 @@ export const ControlDisabledOnGrounds: TStory = {
         </IconButton>
       </div>
       <div
-        className="bg-brand-primary-muted"
+        className="bg-brand-primary-muted surface-brand-primary"
         style={{ padding: '1.5rem', borderRadius: '0.5rem' }}
       >
         <IconButton

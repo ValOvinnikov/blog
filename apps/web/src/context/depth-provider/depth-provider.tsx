@@ -159,3 +159,6 @@ export const useDepth = (): IDepthContextValue => {
   }
   return context;
 };
+
+export const useHasDepthProvider = (): boolean =>
+  useContext(DepthContext) !== undefined;

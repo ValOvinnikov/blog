@@ -135,6 +135,12 @@ prune: note them as a finding.
   transformer/loader mapping and `urlForImage`, no network.
 - **`apps/web`** routes: mock `service` functions, assert data renders and
   metadata is produced; keep these light.
+- **`apps/web` and `apps/platform`** components: fake only the edges and
+  render every child for real — `testing-practices` → "What to fake". Use an
+  existing `__mocks__/` fake with a bare `vi.mock('<path>')` before writing a
+  factory. If a shared edge has no `__mocks__/` fake yet, write the inline
+  factory and report the missing shared fake as a finding. Every `it`
+  title describes behaviour in 80 characters or fewer.
 - **`packages/studio`**: never a schema definition — nothing under
   `schema-types/{documents,objects,modules,fields}/`, not its validation,
   limits, required, `hidden` or preview. A schema-only diff is "nothing to
@@ -183,10 +189,26 @@ delete-don't-shorten rule. It is not restated here; follow it as written.
 
 ## Reuse before you create
 
-Before adding a function, type, schema definition, field helper or constant,
-search this workspace for one that already does the job. A near-duplicate is
-the most expensive kind of mistake to find later, because nothing fails — both
-versions work.
+Before adding a function, type, schema definition, field helper, constant,
+component, test fake, fixture or builder, search the **whole repo** for one
+that already does the job — every app and package, including their
+`testing/` and `__mocks__/` folders, not just this workspace. A
+near-duplicate is the most expensive kind of mistake to find later, because
+nothing fails — both versions work.
+
+A match you cannot import is not permission to copy it. If it lives in a
+package this layer may depend on, use it. If it lives where this layer may
+not reach — the other app (`apps/web` and `apps/platform` share no code) or
+a package the layer contracts forbid — name the match in your report
+instead of copying it silently.
+
+If what you are about to write would be a second copy of something you may
+import — a function, component, hook, test fake, fixture or builder — move it
+to the folder that owns its kind (`shared/`, `testing/`, `__mocks__/`, one
+per file) and point every call site at it, in this change. Two copies that
+were both there before you started and that you add nothing to: report them,
+don't extract them (CLAUDE.md → "Duplication that already existed is filed,
+not fixed inline").
 
 If something similar exists and it is not obvious whether to extend it or add
 alongside it, **do not settle that quietly**. Check who calls the existing one

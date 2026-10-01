@@ -9,8 +9,8 @@
  *   1. `blog_post` (published or draft): verify at run time, never trusting a
  *      prior check against a now-possibly-moved dataset, that its
  *      `page_post-<id>` counterpart exists with `content` set and nothing
- *      still references it (`assertBlogPostDeletable`, throws to abort the
- *      whole run otherwise), then `del` it.
+ *      still references it (`assertCounterpartDeletable`, throws to abort
+ *      the whole run otherwise), then `del` it.
  *   2. `page_post` still carrying a `post` field: `unset(['post'])`. Inert
  *      data (nothing reads it), but CI's advisory `Document validation` job
  *      reports it as a deprecated field on every PR.
@@ -39,11 +39,13 @@ import {
 } from 'sanity/migrate';
 
 import { toPagePostId } from '../20260908T2227-absorb-blog-post-into-page-post/id';
-
-import { assertBlogPostDeletable } from './precondition';
+import { assertCounterpartDeletable } from '../lib/assert-counterpart-deletable';
 
 const BLOG_POST_TYPE = 'blog_post';
 const PAGE_POST_TYPE = 'page_post';
+
+const hasContent = (content: unknown): boolean =>
+  Array.isArray(content) ? content.length > 0 : Boolean(content);
 
 type TRawDocument = { _id: string; _type: string; post?: unknown };
 
@@ -58,7 +60,13 @@ export default defineMigration({
       if (doc._type === BLOG_POST_TYPE) {
         const pagePostId = toPagePostId(doc._id);
 
-        await assertBlogPostDeletable(context, doc._id, pagePostId);
+        await assertCounterpartDeletable(context, doc._id, pagePostId, {
+          sourceType: BLOG_POST_TYPE,
+          counterpartType: PAGE_POST_TYPE,
+          counterpartIdParam: 'pagePostId',
+          field: 'content',
+          hasValue: hasContent,
+        });
         mutations.push(del(doc._id));
       }
 

@@ -1,18 +1,14 @@
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { NewsletterModule } from './newsletter-module';
 
-const {
-  getNewsletterMock,
-  getNewsletterSettingsMock,
-  getTenantSanityContextMock,
-} = vi.hoisted(() => ({
+const { getNewsletterMock, getNewsletterSettingsMock } = vi.hoisted(() => ({
   getNewsletterMock: vi.fn(),
   getNewsletterSettingsMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -28,9 +24,7 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-sanity-context');
 
 vi.mock('@web/server/settings-features/is-capability-enabled', () => ({
   isCapabilityEnabled: vi.fn(),
@@ -39,6 +33,8 @@ vi.mock('@web/server/settings-features/is-capability-enabled', () => ({
 vi.mock('@web/server/newsletter/newsletter-actions', () => ({
   subscribeToNewsletterAction: vi.fn(),
 }));
+
+const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
 
 const setup = customRenderAsync(NewsletterModule, {
   id: 'newsletter-1',
@@ -159,7 +155,7 @@ describe(`<${NewsletterModule.name}/>`, () => {
     expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
   });
 
-  it('renders nothing, without fetching the module, when the NEWSLETTER capability is not entitled/enabled', async () => {
+  it('renders nothing, without fetching, when the NEWSLETTER capability is off', async () => {
     vi.mocked(isCapabilityEnabled).mockResolvedValue(false);
 
     const { container } = await setup();

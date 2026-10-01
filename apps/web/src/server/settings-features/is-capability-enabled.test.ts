@@ -13,8 +13,15 @@ vi.mock('./get-effective-settings-features', () => ({
 
 vi.mock('@blog/db', () => ({
   PLAN_REGISTRY: {
-    FREE: ['COMMENTS', 'RATINGS', 'BOOKMARKS'],
-    GROWTH: ['COMMENTS', 'RATINGS', 'BOOKMARKS', 'NEWSLETTER', 'ANALYTICS'],
+    FREE: ['COMMENTS', 'RATINGS', 'BOOKMARKS', 'CONSENT_BANNER'],
+    GROWTH: [
+      'COMMENTS',
+      'RATINGS',
+      'BOOKMARKS',
+      'NEWSLETTER',
+      'ANALYTICS',
+      'CONSENT_BANNER',
+    ],
   },
 }));
 
@@ -24,6 +31,7 @@ const ALL_ENABLED = {
   [CAPABILITY.BOOKMARKS]: true,
   [CAPABILITY.NEWSLETTER]: true,
   [CAPABILITY.ANALYTICS]: true,
+  [CAPABILITY.CONSENT_BANNER]: true,
 };
 
 describe(isCapabilityEnabled, () => {

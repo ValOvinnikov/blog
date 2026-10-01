@@ -1,10 +1,11 @@
+import { BRAND_VARIANT, FULL_BRAND_VARIANT_LIST } from '@blog/config/constants';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
-import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
 import { statSchema } from '@blog/studio/schema-types/objects/stat/stat';
+import { wideLayoutField } from '@blog/studio/schema-types/objects/wide-layout/wide-layout-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { ChartBar } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
@@ -18,7 +19,10 @@ export const statsSchema = defineType({
   icon: ChartBar,
   fields: [
     titleField(),
-    brandVariantField(),
+    brandVariantField({
+      list: FULL_BRAND_VARIANT_LIST,
+      initialValue: BRAND_VARIANT.PRIMARY,
+    }),
     headingBlockField(),
     defineField({
       name: 'stats',
@@ -46,7 +50,7 @@ export const statsSchema = defineType({
       description:
         'Horizontal alignment of the heading, supporting text, figures and actions.',
     }),
-    layoutField,
+    wideLayoutField,
   ],
   preview: {
     select: {

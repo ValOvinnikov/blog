@@ -1,8 +1,9 @@
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
-import { ctaButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
+import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
-import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { moduleLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { listedTextBlockFragment } from '@blog/service/shared/fragments/portable-text/listed-text-block';
 
 export const ctaModuleQuery = q
@@ -13,7 +14,7 @@ export const ctaModuleQuery = q
   .project((sub) => ({
     variant: sub.field('variant').notNull(),
     brandVariant: sub.field('brandVariant').notNull(),
-    bandTone: sub.field('bandTone').notNull(),
+    bandTone: sub.field('bandTone').nullable(true),
     eyebrow: sub.field('eyebrow').nullable(true),
     headingBlock: sub
       .field('headingBlock')
@@ -26,13 +27,10 @@ export const ctaModuleQuery = q
     image: sub.field('image').project(sanityImageFragment).nullable(true),
     contentPositionSplit: sub.field('contentPositionSplit').nullable(true),
     contentPositionBanner: sub.field('contentPositionBanner').nullable(true),
-    contentAlignment: sub.field('contentAlignment').nullable(true),
+    ...moduleContentAlignmentFragment,
     mobileMediaOrder: sub.field('mobileMediaOrder').nullable(true),
-    ctaButtons: sub
-      .field('ctaButtons[]')
-      .project(ctaButtonFragment)
-      .nullable(true),
+    ...ctaButtonsFragment,
     footnote: sub.field('footnote').nullable(true),
-    layout: sub.field('layout').project(layoutFragment).nullable(true),
+    ...moduleLayoutFragment,
   }))
   .notNull();

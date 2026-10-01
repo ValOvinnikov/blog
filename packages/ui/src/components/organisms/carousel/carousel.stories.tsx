@@ -1,8 +1,10 @@
 import { BRAND_VARIANT } from '@blog/config';
+import { objectKeys } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { Carousel } from './carousel';
+import { carouselVariants } from './carousel-variants';
 
 type TSampleItem = { id: number; body: string };
 
@@ -43,6 +45,22 @@ const renderImageItem = ({ item }: { item: TImageItem }) => (
   />
 );
 
+type TLogoItem = { id: number; name: string };
+
+const buildLogoItems = (count: number): TLogoItem[] =>
+  Array.from({ length: count }, (_, index) => ({
+    id: index,
+    name: faker.company.name(),
+  }));
+
+const renderLogoItem = ({ item }: { item: TLogoItem }) => (
+  <div className="flex size-48 items-center justify-center rounded-lg border border-border bg-surface p-4">
+    <p className="text-center font-mono text-label text-muted uppercase">
+      {item.name}
+    </p>
+  </div>
+);
+
 const meta = {
   title: 'Organisms/Carousel',
   component: Carousel,
@@ -52,6 +70,14 @@ const meta = {
     tone: {
       control: 'select',
       options: Object.values(BRAND_VARIANT),
+    },
+    slideSize: {
+      control: 'select',
+      options: objectKeys(carouselVariants.variants.slideSize),
+    },
+    contentAlignment: {
+      control: 'select',
+      options: objectKeys(carouselVariants.variants.alignment),
     },
   },
   args: {
@@ -74,6 +100,13 @@ export const RowThatScrolls: TStory = {
   },
 };
 
+export const SteppedSlideSize: TStory = {
+  args: {
+    items: buildItems(8),
+    slideSize: 'stepped',
+  },
+};
+
 export const FewerItemsThanFit: TStory = {
   args: {
     items: buildItems(2),
@@ -90,4 +123,71 @@ export const WithPlainImages: TStory = {
       nextLabel="Next slide"
     />
   ),
+};
+
+export const FixedWidthContentSizing: TStory = {
+  render: () => (
+    <Carousel
+      items={buildLogoItems(10)}
+      renderItem={renderLogoItem}
+      ariaLabel="Trusted by"
+      previousLabel="Previous slide"
+      nextLabel="Next slide"
+      slideSize="content"
+    />
+  ),
+};
+
+export const AlignedLeftFitsViewport: TStory = {
+  render: () => (
+    <Carousel
+      items={buildLogoItems(3)}
+      renderItem={renderLogoItem}
+      ariaLabel="Trusted by"
+      previousLabel="Previous slide"
+      nextLabel="Next slide"
+      slideSize="content"
+      contentAlignment="LEFT"
+    />
+  ),
+};
+
+export const AlignedCenterFitsViewport: TStory = {
+  render: () => (
+    <Carousel
+      items={buildLogoItems(3)}
+      renderItem={renderLogoItem}
+      ariaLabel="Trusted by"
+      previousLabel="Previous slide"
+      nextLabel="Next slide"
+      slideSize="content"
+      contentAlignment="CENTER"
+    />
+  ),
+};
+
+export const AlignedCenterOverflowsStaysLeft: TStory = {
+  render: () => (
+    <Carousel
+      items={buildLogoItems(10)}
+      renderItem={renderLogoItem}
+      ariaLabel="Trusted by"
+      previousLabel="Previous slide"
+      nextLabel="Next slide"
+      slideSize="content"
+      contentAlignment="CENTER"
+    />
+  ),
+};
+
+export const FractionSlidesAlignedLeft: TStory = {
+  args: { items: buildItems(2), contentAlignment: 'LEFT' },
+};
+
+export const FractionSlidesAlignedCenter: TStory = {
+  args: { items: buildItems(2), contentAlignment: 'CENTER' },
+};
+
+export const FractionSlidesAlignedCenterOverflowsStaysLeft: TStory = {
+  args: { items: buildItems(8), contentAlignment: 'CENTER' },
 };

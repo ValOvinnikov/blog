@@ -1,14 +1,10 @@
+import { env } from '@platform/utils/env/env';
+
 import { getDomainDnsRecords } from './get-domain-dns-records';
 
-const { envMock } = vi.hoisted(() => ({
-  envMock: {
-    VERCEL_API_TOKEN: undefined as string | undefined,
-    VERCEL_PROJECT_ID_WEB: undefined as string | undefined,
-    VERCEL_TEAM_ID: undefined as string | undefined,
-  },
-}));
+vi.mock('@platform/utils/env/env');
 
-vi.mock('@platform/utils/env/env', () => ({ env: envMock }));
+const envMock: Partial<Record<keyof typeof env, string>> = env;
 
 describe(getDomainDnsRecords, () => {
   const fetchMock = vi.fn();
@@ -62,7 +58,7 @@ describe(getDomainDnsRecords, () => {
     expect(result).toBeUndefined();
   });
 
-  it('returns undefined when the domain is already verified, even if Vercel still lists challenges', async () => {
+  it('returns undefined for a verified domain even if Vercel still lists challenges', async () => {
     fetchMock.mockResolvedValue(
       new Response(
         JSON.stringify({

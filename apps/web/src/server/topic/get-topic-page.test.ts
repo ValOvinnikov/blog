@@ -9,9 +9,7 @@ vi.mock('@blog/service', () => ({
   service: { pages: { topic: { v1: { getTopicPage: getTopicPageMock } } } },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: vi.fn(),
-}));
+vi.mock('@web/server/tenant/get-tenant-sanity-context');
 
 describe(getTopicPage, () => {
   beforeEach(() => {
@@ -22,7 +20,7 @@ describe(getTopicPage, () => {
     );
   });
 
-  it('resolves the tenant Sanity context, then forwards the slug and that context to service.pages.topic.v1.getTopicPage', async () => {
+  it('forwards the slug and the resolved tenant context to the topic page service', async () => {
     getTopicPageMock.mockResolvedValue({ ok: true, data: undefined });
 
     await getTopicPage('engineering', 'tenant-1');
@@ -48,7 +46,7 @@ describe('getTopicPage memoization', () => {
     vi.resetModules();
   });
 
-  it('dedupes the topic-page query when called more than once in the same render pass with the same arguments', async () => {
+  it('dedupes the topic-page query across one render pass with the same arguments', async () => {
     getTopicPageMock.mockReset();
     vi.mocked(getTenantSanityContext).mockReset();
     vi.mocked(getTenantSanityContext).mockResolvedValue(

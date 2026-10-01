@@ -26,7 +26,7 @@ describe(Spinner, () => {
 
   it('renders the label as visible text when hasLabel is true', () => {
     render(<Spinner label="Creating…" hasLabel={true} />);
-    expect(screen.getByText('Creating…')).toBeInTheDocument();
+    expect(screen.getByText('Creating…')).toBeVisible();
   });
 
   it('renders every size without throwing', () => {

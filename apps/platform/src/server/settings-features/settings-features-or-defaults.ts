@@ -26,6 +26,7 @@ export const getSettingsFeaturesOrDefaults = async (
       bookmarksEnabled: row.bookmarksEnabled,
       newsletterEnabled: row.newsletterEnabled,
       analyticsEnabled: row.analyticsEnabled,
+      consentBannerEnabled: row.consentBannerEnabled,
     };
   }
 
