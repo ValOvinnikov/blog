@@ -65,4 +65,26 @@ describe(`<${NewsletterModuleView.name}/>`, () => {
 
     expect(screen.queryByText('No spam')).not.toBeInTheDocument();
   });
+
+  it('renders neither the band nor the form for a reader with the subscribed cookie', () => {
+    document.cookie = 'newsletter_subscribed=1';
+
+    setup();
+
+    expect(
+      screen.queryByTestId('newsletter-module-newsletter-1'),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('textbox', { name: 'Email address' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders the band and the form together on first render without the cookie', () => {
+    setup();
+
+    expect(screen.getByTestId('newsletter-module-newsletter-1')).toBeVisible();
+    expect(
+      screen.getByRole('textbox', { name: 'Email address' }),
+    ).toBeVisible();
+  });
 });

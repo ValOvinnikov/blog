@@ -5,6 +5,7 @@ import { StudioMount } from '@blog/studio';
 import { Alert } from '@platform/components/shared/alert';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { PageHeader } from '@platform/components/shared/page-header';
+import { getEnabledCapabilities } from '@platform/server/settings-features/get-enabled-capabilities';
 import { getTranslations } from 'next-intl/server';
 
 export type TStudioMountViewProps = {
@@ -48,12 +49,15 @@ export const StudioMountView = async ({
     );
   }
 
+  const enabledCapabilities = await getEnabledCapabilities(tenant);
+
   return (
     <StudioMount
       projectId={credentials.projectId}
       dataset={credentials.dataset}
       basePath={basePath}
       title={tenant.name}
+      enabledCapabilities={enabledCapabilities}
     />
   );
 };

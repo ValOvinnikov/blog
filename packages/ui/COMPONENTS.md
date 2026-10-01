@@ -9,7 +9,7 @@ _59 components · generated from `packages/ui/src`. Paths are relative to `packa
 ### Alert — `components/atoms/alert/alert.tsx`
 
 A static, type-coded inline message block for form feedback (confirmations, warnings, and errors).
-Props: type: NonNullable<TAlertVariants['type']> · message: string · id?: string _(extends IWithClassName, IWithDataTestId)_
+Props: type: NonNullable<TAlertVariants['type']> · message: string · id?: string · hasIcon?: boolean _(extends IWithClassName, IWithDataTestId)_
 Variants: type: ALERT_TYPE.SUCCESS|ALERT_TYPE.WARNING|ALERT_TYPE.ERROR|ALERT_TYPE.INFO
 
 ### Avatar — `components/atoms/avatar/avatar.tsx`
@@ -396,7 +396,7 @@ A pure, controlled subscribe form built on the `TextInput` atom, exposed as two 
 Compound component:
 
 - **NewsletterSignup.Full** — The rich, tinted panel signup form used by the site footer and the CMS page-builder module. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading: string · headingId?: string · supportingText?: string · errorMessage?: string · errorMessageId?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string · trustCues?: INewsletterSignupTrustCue[] · align?: TNewsletterSignupVariants['align'] _(extends IWithClassName, IWithDataTestId)_
-- **NewsletterSignup.Compact** — A slim single-row subscribe strip for the end of every article. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading: string · headingId?: string · prefix?: ReactNode · errorMessage?: string · errorMessageId?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string _(extends IWithClassName, IWithDataTestId)_
+- **NewsletterSignup.Compact** — A slim single-row subscribe strip for the end of every article. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading: string · headingId?: string · prefix?: ReactNode · errorMessage?: string · errorMessageId?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string · align?: TNewsletterSignupVariants['align'] _(extends IWithClassName, IWithDataTestId)_
 
 ### Pagination — `components/organisms/pagination/pagination.tsx`
 

@@ -1,5 +1,7 @@
-import { FORM_STATUSES } from '@blog/config';
+import { CONTENT_ALIGNMENT, FORM_STATUSES } from '@blog/config';
 import { NewsletterSignup } from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup';
+import { newsletterSignupVariants } from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup-variants';
+import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const meta = {
@@ -11,6 +13,10 @@ const meta = {
     status: {
       control: 'select',
       options: FORM_STATUSES,
+    },
+    align: {
+      control: 'select',
+      options: objectKeys(newsletterSignupVariants.variants.align),
     },
   },
   args: {
@@ -58,12 +64,24 @@ export const WithoutPrefix: TStory = {
   args: { prefix: undefined },
 };
 
-// The root's `flex-col`/`sm:flex-row` stacking is a real `sm:` media-query
-// fork, not a container query — pinning `phone` (an intentional exception,
-// see the `ui-storybook` skill) is the only way to default this story to a
-// canvas under `sm` so the prefix+heading group's one-line layout, and the
-// strip spanning the full width of its container below `sm`, are what
-// actually render.
+export const Centered: TStory = {
+  args: { align: CONTENT_ALIGNMENT.CENTER },
+};
+
+export const RightAligned: TStory = {
+  args: { align: CONTENT_ALIGNMENT.RIGHT },
+};
+
+export const BrandPrimaryBand: TStory = {
+  decorators: [
+    (Story) => (
+      <div className="surface-brand-primary bg-brand-primary-muted p-8">
+        <Story />
+      </div>
+    ),
+  ],
+};
+
 export const MobilePhone: TStory = {
   globals: { viewport: 'phone' },
   decorators: [
