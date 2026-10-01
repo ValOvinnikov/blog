@@ -773,7 +773,7 @@ passing the stored value straight through.
 more.** Where a module's array pairs `required()` with a `min()`, an empty list
 is a state the content model forbids, so `apps/web` does not check for it —
 `module_featureList`, `module_testimonial`, `module_logoWall`, `module_stats`,
-`module_faq` and `module_team` render whatever they are handed, in the module and in the view
+`module_faq`, `module_team` and `module_pricing` render whatever they are handed, in the module and in the view
 alike. The trade is deliberate: a document written around Studio's validation
 costs an empty section rather than a disappeared one, which is the cheaper
 failure and the visible one.
@@ -1121,8 +1121,9 @@ when there are no prices ("Let's talk"), up to 12 plain feature lines, its own
 not warnings, because over-long copy breaks the card. **Filling `highlightLabel`
 is the highlight**: there is no separate toggle, the field has no initial value,
 and at most one tier per module may carry one. A `pricingPrice` has a `period`
-from `PRICE_PERIOD` (`ONE_TIME`, `HOUR`, `SESSION`, `MONTH`, `YEAR`, in
-`@blog/config`), an `amount` (≥ 0, two decimals), an optional `compareAtAmount`
+from `PRICE_PERIOD` (`ONE_TIME`, `HOUR`, `SESSION`, `MONTH`, `YEAR`; an
+UPPERCASE key/value constant in `@blog/config`'s `constants/price-period.ts`,
+with its `TPricePeriod` union), an `amount` (≥ 0, two decimals), an optional `compareAtAmount`
 that must exceed it, and an `isStartingAt` flag.
 
 **The currency is the site's, not the price's.** `settings_site.currency` is a
@@ -1150,8 +1151,9 @@ through `@blog/ui`'s `PricingCard`, raised with its label as the badge when
 `highlightLabel` is set, and with `ActionGroup` inside its `Actions` slot. The
 grid is the module's own, not `CardGrid`: one tier is centred at card width,
 two sit side by side from `md`, three stack until `lg` and then sit 3-up, and
-four sit 2×2 from `md` and 4-up from `lg`, so no card is squeezed or orphaned. The module footnote is capped
-at `max-w-measure`. No JSON-LD.
+four sit 2×2 from `md` and 4-up from `lg`, so no card is squeezed or orphaned.
+The module footnote is capped at `max-w-measure`. A compare-at amount shows on
+the headline price only, never on an extra line. No JSON-LD.
 
 `service.modules.<type>.v1` projects `brandVariant` as a required
 `TBrandVariantOf<...>` (narrowed per module to exactly the options its
