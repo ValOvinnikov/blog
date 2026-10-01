@@ -1,0 +1,235 @@
+{
+  "pagination": {
+    "previous": "Précédent",
+    "next": "Suivant",
+    "pageSuffix": "– Page {page}"
+  },
+  "breadcrumbs": {
+    "home": "Accueil",
+    "ariaLabel": "Fil d'Ariane",
+    "topics": "Thèmes",
+    "tags": "Étiquettes",
+    "blog": "Blog"
+  },
+  "notFound": {
+    "eyebrow": "404",
+    "heading": "Page introuvable",
+    "supportingText": "La page que vous cherchez n'existe pas.",
+    "returnHome": "Retour à l'accueil"
+  },
+  "localeErrorPage": {
+    "title": "Une erreur s'est produite",
+    "announcement": "Une erreur s'est produite. Vous pouvez réessayer ou revenir à l'accueil.",
+    "description": "Une erreur inattendue s'est produite lors de l'affichage de cette page. Vous pouvez réessayer ou revenir à la page d'accueil.",
+    "retry": "Réessayer",
+    "goHome": "Aller à l'accueil"
+  },
+  "postShare": {
+    "shareAriaLabel": "Partager « {title} »",
+    "panelAriaLabel": "Options de partage",
+    "copyLink": "Copier le lien",
+    "copied": "Copié",
+    "linkCopied": "Lien copié"
+  },
+  "siteNavigation": {
+    "toggleMenu": "Ouvrir ou fermer le menu de navigation"
+  },
+  "brandLockupLink": {
+    "ariaLabel": "Accueil"
+  },
+  "socialLinks": {
+    "linkAriaLabel": "Profil {platform}",
+    "listAriaLabel": "Profils"
+  },
+  "topicChipList": {
+    "ariaLabel": "Thèmes",
+    "all": "Tous"
+  },
+  "blogListPage": {
+    "empty": "Aucun article pour le moment.",
+    "paginationAriaLabel": "Pages du blog"
+  },
+  "blogPostPage": {
+    "depthToggle": {
+      "ariaLabel": "Niveau de lecture",
+      "skim": "30 s",
+      "read": "Lire",
+      "deep": "Approfondi"
+    },
+    "skimPanel": {
+      "label": "Résumé en 30 secondes",
+      "readFullArticle": "Lire l'article complet"
+    },
+    "asideKind": {
+      "WHY_NOT": "Pourquoi pas X",
+      "DIGRESSION": "Digression",
+      "CONTEXT": "Contexte"
+    },
+    "backToTop": {
+      "ariaLabel": "Retour en haut"
+    }
+  },
+  "postContentsRail": {
+    "label": "Thèmes"
+  },
+  "topicPage": {
+    "empty": "Aucun article sur {name} pour le moment.",
+    "paginationAriaLabel": "Pages de {name}"
+  },
+  "tagPage": {
+    "empty": "Aucun article avec l'étiquette {name} pour le moment.",
+    "paginationAriaLabel": "Pages de {name}"
+  },
+  "taxonomyListModule": {
+    "topics": {
+      "postsCount": "{count, plural, one {{count} article} other {{count} articles}}",
+      "latestPostsLabel": "Derniers articles sur {name}",
+      "empty": "Aucun thème pour le moment."
+    },
+    "tags": {
+      "postsCount": "{count, plural, one {{count} article} other {{count} articles}}",
+      "latestPostsLabel": "Derniers articles sur {name}",
+      "empty": "Aucune étiquette pour le moment."
+    }
+  },
+  "rss": {
+    "fallbackTitle": "Blog",
+    "feedLinkLabel": "Flux RSS"
+  },
+  "authMenu": {
+    "signIn": "Se connecter",
+    "panelAriaLabel": "Options de connexion",
+    "signInHeading": "Se connecter",
+    "accountHeading": "Compte",
+    "chooseProviderPrompt": "Choisissez un mode de connexion",
+    "continueWithGithub": "Continuer avec GitHub",
+    "continueWithGoogle": "Continuer avec Google",
+    "continueWithEmail": "Continuer avec l'e-mail",
+    "redirectHint": "Vous revenez à cet article — vous ne perdez jamais votre place.",
+    "emailAriaLabel": "Adresse e-mail",
+    "emailPlaceholder": "vous@exemple.fr",
+    "sendLink": "Envoyer le lien",
+    "sending": "Envoi…",
+    "checkYourInbox": "Consultez votre boîte de réception pour trouver le lien de connexion.",
+    "emailError": "Le lien n'a pas pu être envoyé. Veuillez réessayer.",
+    "oauthError": "La connexion a échoué. Veuillez réessayer.",
+    "accountMenuAriaLabel": "Menu du compte",
+    "signOut": "Se déconnecter",
+    "loadingAccountStatus": "Chargement de l'état du compte",
+    "myBookmarks": "Mes favoris",
+    "accountSettings": "Paramètres du compte"
+  },
+  "toastProvider": {
+    "viewportAriaLabel": "Notifications",
+    "dismissLabel": "Fermer la notification",
+    "mergeCountSuffix": " ×{count}"
+  },
+  "bookmarkButton": {
+    "save": "Enregistrer",
+    "saved": "Enregistré",
+    "saveAriaLabel": "Enregistrer l'article",
+    "removeAriaLabel": "Retirer des favoris",
+    "error": "L'enregistrement a échoué. Veuillez réessayer.",
+    "toastSavedMessage": "Ajouté aux favoris",
+    "toastRemovedMessage": "Retiré des favoris",
+    "toastRevertedMessage": "Annulé",
+    "toastUndoLabel": "Annuler",
+    "toastRetryLabel": "Réessayer"
+  },
+  "bookmarksPage": {
+    "title": "Mes favoris",
+    "listHeading": "Articles enregistrés",
+    "metaDescription": "Les articles que vous avez enregistrés pour plus tard.",
+    "empty": "Aucun favori pour le moment — enregistrez un article pour le retrouver ici.",
+    "hint": "{count, plural, one {{count} enregistré} other {{count} enregistrés}}"
+  },
+  "newsletterForm": {
+    "submitLabel": "S'abonner",
+    "emailAriaLabel": "Adresse e-mail",
+    "placeholder": "vous@exemple.fr",
+    "successMessage": "C'est presque fini — consultez votre boîte de réception pour confirmer.",
+    "errorInvalid": "Saisissez une adresse e-mail valide.",
+    "errorAlreadySubscribed": "Cette adresse e-mail est déjà abonnée.",
+    "errorServer": "Une erreur s'est produite. Veuillez réessayer."
+  },
+  "newsletterConfirm": {
+    "confirmedTitle": "Abonnement confirmé",
+    "confirmedMessage": "Votre abonnement est confirmé. Merci de votre inscription !",
+    "invalidTitle": "Lien de confirmation non valide",
+    "invalidMessage": "Ce lien de confirmation n'est pas valide ou a expiré.",
+    "errorTitle": "Une erreur s'est produite",
+    "errorMessage": "Nous n'avons pas pu confirmer votre abonnement. Veuillez réessayer plus tard.",
+    "returnHome": "Retour à l'accueil"
+  },
+  "newsletterUnsubscribe": {
+    "confirmTitle": "Se désabonner de notre newsletter",
+    "confirmMessage": "Cliquez sur le bouton ci-dessous pour confirmer que vous ne souhaitez plus recevoir notre newsletter.",
+    "confirmButtonLabel": "Confirmer le désabonnement",
+    "successTitle": "Vous êtes désabonné",
+    "successMessage": "Vous ne recevrez plus notre newsletter.",
+    "invalidTitle": "Lien expiré",
+    "invalidMessage": "Ce lien de désabonnement n'est plus valide — vous êtes peut-être déjà désabonné.",
+    "returnHome": "Retour à l'accueil"
+  },
+  "accountPage": {
+    "title": "Compte",
+    "metaDescription": "Gérez votre confidentialité et vos données — exportez ou supprimez votre compte.",
+    "privacy": {
+      "heading": "Confidentialité",
+      "exportLabel": "Exporter mes données",
+      "exportDescription": "Téléchargez votre profil et vos favoris dans une seule archive JSON.",
+      "exportButton": "Demander l'export",
+      "deleteLabel": "Supprimer le compte",
+      "deleteDescription": "Irréversible. Votre profil et vos favoris sont effacés et toutes vos sessions sont fermées. Saisissez votre identifiant pour activer le bouton.",
+      "deleteConfirmAriaLabel": "Saisissez votre identifiant pour confirmer la suppression",
+      "deleteConfirmPlaceholder": "Saisissez {handle} pour confirmer",
+      "deleteButton": "Supprimer le compte",
+      "deleteToastLoadingMessage": "Suppression de votre compte…",
+      "deleteToastSuccessMessage": "Votre compte a été supprimé.",
+      "deleteError": "Votre compte n'a pas pu être supprimé. Veuillez réessayer."
+    },
+    "newsletter": {
+      "heading": "Newsletter",
+      "label": "Newsletter",
+      "activeBadge": "Abonné",
+      "activeDescriptionPrefix": "Articles hebdomadaires envoyés à",
+      "activeDescriptionSuffix": "(l'e-mail de votre compte — en lecture seule dans la v1).",
+      "unsubscribeButton": "Se désabonner",
+      "pendingBadge": "En attente de confirmation",
+      "pendingDescription": "Le lien de double confirmation n'a pas encore été utilisé. Renvoyez-le s'il n'est jamais arrivé.",
+      "resendButton": "Renvoyer la confirmation",
+      "unsubscribeToastLoadingMessage": "Désabonnement…",
+      "unsubscribeToastSuccessMessage": "Vous avez été désabonné.",
+      "unsubscribeError": "Le désabonnement a échoué. Veuillez réessayer.",
+      "resendToastLoadingMessage": "Renvoi de l'e-mail de confirmation…",
+      "resendToastSuccessMessage": "E-mail de confirmation renvoyé.",
+      "resendError": "L'e-mail de confirmation n'a pas pu être renvoyé. Veuillez réessayer."
+    },
+    "identity": {
+      "heading": "Comptes associés",
+      "githubLabel": "GitHub",
+      "googleLabel": "Google",
+      "emailLinkLabel": "Lien par e-mail",
+      "linkedStatus": "Associé",
+      "linkButton": "Associer",
+      "unlinkButton": "Dissocier",
+      "lastMethodNotice": "Dernière méthode restante — impossible de la dissocier",
+      "unlinkToastLoadingMessage": "Dissociation de votre compte…",
+      "unlinkToastSuccessMessage": "Compte dissocié.",
+      "unlinkError": "La dissociation a échoué. Veuillez réessayer.",
+      "unlinkLastMethodError": "C'est votre seule méthode de connexion restante — associez-en une autre avant de dissocier celle-ci.",
+      "displayNameLabel": "Nom affiché",
+      "displayNameDescription": "Remplace votre identifiant de fournisseur partout où vos commentaires apparaissent.",
+      "displayNameAriaLabel": "Nom affiché",
+      "saveButton": "Enregistrer",
+      "saveToastLoadingMessage": "Enregistrement de votre nom affiché…",
+      "saveToastSuccessMessage": "Nom affiché mis à jour.",
+      "saveError": "Votre nom affiché n'a pas pu être mis à jour. Veuillez réessayer."
+    }
+  },
+  "carousel": {
+    "previousAriaLabel": "Diapositive précédente",
+    "nextAriaLabel": "Diapositive suivante",
+    "regionLabel": "Carrousel {title}"
+  }
+}
