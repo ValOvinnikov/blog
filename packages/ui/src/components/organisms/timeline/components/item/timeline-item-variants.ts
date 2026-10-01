@@ -9,7 +9,7 @@ export const timelineItemVariants = tv({
       'before:absolute before:top-8 before:bottom-0 before:left-6 before:w-px before:bg-border before:content-[""]',
       'last:before:hidden',
     ],
-    marker: ['row-span-full self-start justify-self-center'],
+    marker: ['relative row-span-full self-start justify-self-center'],
     content: ['col-start-2 flex min-w-0 flex-col gap-1'],
   },
   variants: {
