@@ -235,12 +235,13 @@
   "pricingModule": {
     "free": "Free",
     "from": "From",
+    "compareAtLabel": "Regular price",
     "period": {
       "ONE_TIME": "one-time",
-      "HOUR": "/ hour",
-      "SESSION": "/ session",
-      "MONTH": "/ month",
-      "YEAR": "/ year"
+      "HOUR": "per hour",
+      "SESSION": "per session",
+      "MONTH": "per month",
+      "YEAR": "per year"
     },
     "tabs": {
       "MONTH": "Monthly",

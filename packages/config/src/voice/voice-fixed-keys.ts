@@ -41,6 +41,7 @@ export const VOICE_FIXED_KEYS = [
   'carousel.regionLabel',
   'pricingModule.free',
   'pricingModule.from',
+  'pricingModule.compareAtLabel',
   'pricingModule.period.ONE_TIME',
   'pricingModule.period.HOUR',
   'pricingModule.period.SESSION',
