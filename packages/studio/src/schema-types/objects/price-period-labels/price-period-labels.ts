@@ -1,29 +1,30 @@
+import { PRICE_PERIOD, PRICE_PERIOD_LABEL_FIELD } from '@blog/config/constants';
 import { Tag } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
 const PERIOD_LABEL_FIELDS = [
   {
-    name: 'oneTime',
+    name: PRICE_PERIOD_LABEL_FIELD[PRICE_PERIOD.ONE_TIME],
     title: 'One-time',
     description: 'Wording beside a price that is paid once.',
   },
   {
-    name: 'hour',
+    name: PRICE_PERIOD_LABEL_FIELD[PRICE_PERIOD.HOUR],
     title: 'Per hour',
     description: 'Wording beside a price charged by the hour.',
   },
   {
-    name: 'session',
+    name: PRICE_PERIOD_LABEL_FIELD[PRICE_PERIOD.SESSION],
     title: 'Per session',
     description: 'Wording beside a price charged for each session.',
   },
   {
-    name: 'month',
+    name: PRICE_PERIOD_LABEL_FIELD[PRICE_PERIOD.MONTH],
     title: 'Per month',
     description: 'Wording beside a price charged every month.',
   },
   {
-    name: 'year',
+    name: PRICE_PERIOD_LABEL_FIELD[PRICE_PERIOD.YEAR],
     title: 'Per year',
     description: 'Wording beside a price charged every year.',
   },
