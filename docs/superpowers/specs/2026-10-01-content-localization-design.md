@@ -35,6 +35,32 @@ foundation goes in now, proven on two pilots first.
   - If a limit shrinks but stays above one, the admin app asks the tenant
     which languages to keep; it never picks for them.
 
+### Supported languages
+
+- **A curated list, not free text.** The admin app offers only languages we
+  ship a full UI translation for (`next-intl` messages), since the tenant
+  writes the content but the site's own chrome is ours.
+- **First list: EN, NL, FR, DE, ES.** All Latin script, left to right.
+- **Codes.** `LOCALE_ISO_CODES` keeps the UPPERCASE convention (`EN`, and
+  later e.g. `ZH_HANS`). It maps each code to the lowercase BCP 47 tag that
+  `next-intl`, `hreflang` and `<html lang>` need (`en`, `zh-Hans`).
+- **Today's free-text `tenants.locale`** becomes a choice from the same list.
+- **Adding a language later is its own small piece of work**, never just a
+  list entry:
+  - Its UI translation.
+  - For other scripts (Greek, Cyrillic): fonts that cover them.
+  - For Polish, Czech, Vietnamese and similar: extended Latin glyphs.
+- **Separate projects, not list entries:**
+  - **Chinese, Japanese, Korean:**
+    - Chinese is two languages (`zh-Hans`, `zh-Hant`).
+    - Automatic slugs from titles break, so slugs are typed or pinyin.
+    - Fonts need CJK coverage.
+    - Reading time needs a character count.
+    - The `ch`-based text measure is about half as many characters.
+    - Search tokenization differs.
+  - **Right-to-left (Arabic, Hebrew, Persian):** `dir="rtl"` and auditing
+    every component's physical-side Tailwind classes (`pl-`, `ml-`, `left-`).
+
 ### URLs
 
 - **Language prefix, `as-needed`.**
@@ -122,13 +148,13 @@ foundation goes in now, proven on two pilots first.
 
 ## Rollout
 
-| Step            | Scope                                                                                                                                                                                                                           | Proves                                                 |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| 0. Foundation   | Languages and plan limit on the tenant (db + admin app); Studio language config passed in by the mount; both Sanity plugins installed; `as-needed` routing; content-aware detection; a locale parameter through service queries | Nothing visible yet. Every later step needs it.        |
-| 1. Pilot module | CTA module field-level, plus the `link` document with resolution to translated pages                                                                                                                                            | Field-level editing, fallback, notices, links          |
-| 2. Pilot page   | Landing pages document-level: slug per language, `hreflang`, canonical, 404, optional switcher                                                                                                                                  | Document-level pages, SEO, links into translated pages |
-| 3. Review       | Both pilots checked on dev                                                                                                                                                                                                      | The design holds, or changes cheaply                   |
-| 4. Rollout      | Remaining modules (one PR each), other page types, Tag/Topic Pages with tags and topics, posts and inline links, site settings, navigation, footer, sitemap and RSS                                                             | Everything else                                        |
+| Step            | Scope                                                                                                                                                                                                                                                                                                          | Proves                                                 |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| 0. Foundation   | The language list with its BCP 47 mapping; UI translations for NL, FR, DE, ES; languages and plan limit on the tenant (db + admin app); Studio language config passed in by the mount; both Sanity plugins installed; `as-needed` routing; content-aware detection; a locale parameter through service queries | Nothing visible yet. Every later step needs it.        |
+| 1. Pilot module | CTA module field-level, plus the `link` document with resolution to translated pages                                                                                                                                                                                                                           | Field-level editing, fallback, notices, links          |
+| 2. Pilot page   | Landing pages document-level: slug per language, `hreflang`, canonical, 404, optional switcher                                                                                                                                                                                                                 | Document-level pages, SEO, links into translated pages |
+| 3. Review       | Both pilots checked on dev                                                                                                                                                                                                                                                                                     | The design holds, or changes cheaply                   |
+| 4. Rollout      | Remaining modules (one PR each), other page types, Tag/Topic Pages with tags and topics, posts and inline links, site settings, navigation, footer, sitemap and RSS                                                                                                                                            | Everything else                                        |
 
 ### PR shape
 
@@ -174,6 +200,7 @@ foundation goes in now, proven on two pilots first.
 - Translated fixed path segments.
 - Machine translation.
 - Changing a tenant's default language after content exists.
+- Languages beyond EN, NL, FR, DE, ES, including CJK and right-to-left.
 - Strict mode.
 - The tag/topic slug cleanup.
 
