@@ -1189,7 +1189,9 @@ messages. So does each period's text ("per month", "one-time"), which
 `PricingCard.Price` renders after the amount as given, adding no "/". When the tiers carry both
 `MONTH` and `YEAR` prices, `toPricingPanels` builds two panels, each heading a
 card with that tab's price, dropping the other tab's price, and listing the
-remaining prices as extra lines in authored order. Both panels are
+remaining prices as extra lines in authored order. A tier with no price for a
+tab heads that tab with its first price and that price's own period text,
+never a computed monthly equivalent. Both panels are
 server-rendered. `PricingPeriodSwitch`, the one `'use client'` leaf, composes
 `@blog/ui`'s `SegmentedControl` and toggles `hidden`, with Monthly showing first
 and without JS. With a single period there is no switch. Each tier renders
