@@ -37,7 +37,7 @@ export const ctaModuleVariants = tv({
     media: ['[&>*]:block [&>*]:h-full [&>*]:w-full [&>*]:object-cover'],
     overlay: ['pointer-events-none absolute inset-0 -z-10'],
     actions: ['mt-5 flex flex-wrap items-center gap-3'],
-    footnote: ['mt-3.5 font-mono text-caption text-subtle'],
+    footnote: ['mt-3.5 max-w-measure font-mono text-caption text-subtle'],
   },
   variants: {
     variant: {
@@ -86,11 +86,13 @@ export const ctaModuleVariants = tv({
       [CONTENT_ALIGNMENT.CENTER]: {
         root: ['text-center'],
         group: ['mx-auto'],
+        footnote: ['mx-auto'],
         actions: ['justify-center'],
       },
       [CONTENT_ALIGNMENT.RIGHT]: {
         root: ['text-right'],
         group: ['ml-auto'],
+        footnote: ['ml-auto'],
         actions: ['justify-end'],
       },
     },

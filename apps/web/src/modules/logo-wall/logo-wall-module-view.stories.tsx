@@ -130,6 +130,21 @@ export const PartialTrailingRow: TStory = {
   args: { logos: manyLogos },
 };
 
+const linkedLogos = logos.map((logo) => ({
+  ...logo,
+  link: {
+    label: `Visit ${logo.name}`,
+    href: `https://example.com/${logo.id}`,
+    target: undefined,
+    platform: undefined,
+    ariaLabel: undefined,
+  },
+}));
+
+export const AllLinked: TStory = {
+  args: { logos: linkedLogos },
+};
+
 export const WithDarkLogos: TStory = {
   args: { logos: logosWithDarkLogo },
 };

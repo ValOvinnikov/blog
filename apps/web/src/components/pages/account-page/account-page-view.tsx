@@ -27,7 +27,7 @@ export const AccountPageView = ({
 }: IAccountPageViewProps) => {
   return (
     <main className={s.root()}>
-      <Heading level={1} visual="section" className={s.heading()}>
+      <Heading level={1} visual="page" className={s.heading()}>
         {heading}
       </Heading>
       <div className={s.sections()}>

@@ -9,7 +9,10 @@ export const mediaCardMediaVariants = tv({
       wide: ['w-full'],
       wideFlat: ['w-full'],
       square: ['w-full aspect-square'],
-      circle: ['size-28 shrink-0 rounded-full mt-card-y'],
+      circle: [
+        'size-20 md:size-24 lg:size-28 shrink-0 rounded-full mt-card-y',
+        '[&>span]:text-2xl md:[&>span]:text-3xl lg:[&>span]:text-4xl',
+      ],
       icon: [
         'flex size-12 shrink-0 items-center justify-center rounded-md mt-card-y',
         'bg-brand-primary-muted text-brand-primary',

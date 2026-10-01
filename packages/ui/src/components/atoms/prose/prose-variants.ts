@@ -3,7 +3,7 @@ import { tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const proseVariants = tv({
-  base: ['font-read text-text', 'leading-[1.7]'],
+  base: ['font-read text-text', 'leading-[1.7]', '[&>:where(p+p)]:mt-4'],
   variants: {
     size: {
       [SIZE.SM]: 'text-sm',

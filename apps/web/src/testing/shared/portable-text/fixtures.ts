@@ -104,3 +104,18 @@ export const richTextDemo: TPortableTextBody = [
     'A closing paragraph after the image, long enough to demonstrate text wrapping around the floated image above at the md breakpoint and wider. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
   ),
 ];
+
+export const fullBleedImageDemo: TPortableTextBody = [
+  portableTextBlock(
+    'A paragraph before a full bleed image. Full bleed images break out of the text measure and reach both viewport edges.',
+  ),
+  {
+    _type: 'bodyImage',
+    _key: nextKey('image'),
+    image: makeSanityImage({ alt: 'A panoramic mountain range' }),
+    layout: IMAGE_LAYOUT.FULL_BLEED,
+  },
+  portableTextBlock(
+    'A paragraph after the full bleed image, continuing at the regular text measure.',
+  ),
+];

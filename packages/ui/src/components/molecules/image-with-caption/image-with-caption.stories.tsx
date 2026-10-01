@@ -56,7 +56,7 @@ export const FullBleed: TStory = {
 
 const wrappedCopy = (
   <p>
-    Body text wraps around the floated image at the `md` breakpoint and wider —
+    Body text wraps around the floated image at the `lg` breakpoint and wider —
     on narrower viewports the image renders full width above the text instead,
     since there isn&apos;t enough room left over for the wrapped copy to stay
     readable. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do

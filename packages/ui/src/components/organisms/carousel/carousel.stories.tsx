@@ -73,7 +73,7 @@ const meta = {
     },
     slideSize: {
       control: 'select',
-      options: ['fraction', 'content'],
+      options: objectKeys(carouselVariants.variants.slideSize),
     },
     contentAlignment: {
       control: 'select',
@@ -97,6 +97,13 @@ export const RowThatFits: TStory = {};
 export const RowThatScrolls: TStory = {
   args: {
     items: buildItems(8),
+  },
+};
+
+export const SteppedSlideSize: TStory = {
+  args: {
+    items: buildItems(8),
+    slideSize: 'stepped',
   },
 };
 
