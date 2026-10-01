@@ -415,7 +415,7 @@ Slots:
 - **Timeline.Item** — One step on the timeline: a marker, a heading and optional supporting copy. Props: orientation?: TTimelineOrientation · itemAlignment?: Extract<TContentAlignment, 'LEFT' | 'CENTER'> · children?: TCompoundChildren<typeof TimelineItemParts> _(extends IWithClassName, IWithDataTestId)_ · Variants: orientation: TIMELINE_ORIENTATION.VERTICAL|TIMELINE_ORIENTATION.HORIZONTAL · itemAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER
 - **Timeline.Marker** — The badge on a timeline item showing its step number or label. Props: markerStyle: TTimelineMarkerStyle · children: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: markerStyle: TIMELINE_MARKER_STYLE.NUMBERED|TIMELINE_MARKER_STYLE.LABELLED
 - **Timeline.Heading** — The title of a single step. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **Timeline.Body** — Slot for a `Timeline.Item`'s supporting copy, filled by the caller with rendered Portable Text. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Timeline.Body** — Supporting copy for a `Timeline.Item`. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### ToastViewport — `components/organisms/toast-viewport/toast-viewport.tsx`
 

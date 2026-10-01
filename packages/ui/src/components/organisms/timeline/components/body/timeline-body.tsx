@@ -8,7 +8,7 @@ export type TTimelineBodyProps = IWithClassName &
     children?: ReactNode;
   };
 
-/** Slot for a `Timeline.Item`'s supporting copy, filled by the caller with rendered Portable Text. */
+/** Supporting copy for a `Timeline.Item`. */
 export const TimelineBody = ({
   className,
   dataTestId,
