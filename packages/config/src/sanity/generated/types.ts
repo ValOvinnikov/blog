@@ -584,7 +584,6 @@ export type PricingTier = {
       _key: string;
     } & CtaButton
   >;
-  isHighlighted?: boolean;
   highlightLabel?: string;
   footnote?: string;
 };

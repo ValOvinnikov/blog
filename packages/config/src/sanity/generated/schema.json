@@ -3920,13 +3920,6 @@
           },
           "optional": true
         },
-        "isHighlighted": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "boolean"
-          },
-          "optional": true
-        },
         "highlightLabel": {
           "type": "objectAttribute",
           "value": {
