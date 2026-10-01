@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import { makeTenant } from '@platform/testing/tenants/fixtures';
@@ -12,14 +13,14 @@ describe(YourSiteCard, () => {
       name: 'Northwind Field Notes',
       primaryDomain: 'northwind.dev',
       plan: TENANT_PLAN.GROWTH,
-      locale: 'en',
+      locale: LOCALE_ISO_CODES.EN,
     });
     render(<YourSiteCard tenant={tenant} />);
 
     expect(screen.getByText('Northwind Field Notes')).toBeVisible();
     expect(screen.getByText('northwind.dev')).toBeVisible();
     expect(screen.getByText('Growth')).toBeVisible();
-    expect(screen.getByText('en')).toBeVisible();
+    expect(screen.getByText(LOCALE_ISO_CODES.EN)).toBeVisible();
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
   });
 

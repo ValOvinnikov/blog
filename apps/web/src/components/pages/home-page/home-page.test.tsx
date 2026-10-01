@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
@@ -43,7 +44,7 @@ vi.mock('./home-module-renderer', () => ({
 }));
 
 const setup = customRenderAsync(HomePage, {
-  locale: 'en',
+  locale: LOCALE_ISO_CODES.EN,
   tenant: 'tenant-1',
 });
 
@@ -115,7 +116,7 @@ describe(`<${HomePage.name}/>`, () => {
         hero: { id: 'hero-1', type: 'module_hero' },
         headingBlock: makeHeadingBlock({ heading: 'Welcome to the blog' }),
         modules: [{ id: 'module-1', type: 'module_content' }],
-        locale: 'en',
+        locale: LOCALE_ISO_CODES.EN,
         tenant: 'tenant-1',
       },
       undefined,

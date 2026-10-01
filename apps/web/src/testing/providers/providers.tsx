@@ -1,4 +1,4 @@
-import { SITE_MESSAGES } from '@blog/config';
+import { LOCALE_ISO_CODES, SITE_MESSAGES } from '@blog/config';
 import { SanityImageBaseUrlProvider } from '@web/context/sanity-image-base-url-provider';
 import { NextIntlClientProvider } from 'next-intl';
 import type { ReactNode } from 'react';
@@ -21,7 +21,7 @@ export interface IAppProvidersProps {
  * under test or in Storybook never throws for a missing provider.
  */
 export const AppProviders = ({ children }: IAppProvidersProps) => (
-  <NextIntlClientProvider locale="en" messages={SITE_MESSAGES}>
+  <NextIntlClientProvider locale={LOCALE_ISO_CODES.EN} messages={SITE_MESSAGES}>
     <SanityImageBaseUrlProvider baseUrl={STATIC_SANITY_IMAGE_BASE_URL}>
       {children}
     </SanityImageBaseUrlProvider>

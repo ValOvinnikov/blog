@@ -1,3 +1,4 @@
+import { queries } from '@blog/db';
 import { service, type TTenantSanityContext } from '@blog/service';
 import { routing } from '@web/i18n/routing';
 import { buildPostPublishPaths } from '@web/utils/build-post-publish-paths';
@@ -96,7 +97,9 @@ const deriveBlogPostPublishPaths = async ({
 
   const paths = buildPostPublishPaths({
     tenantId,
-    locales: routing.locales,
+    locales: (await queries.tenants.getTenantLiveLocales(tenantId)) ?? [
+      routing.defaultLocale,
+    ],
     postSlug: post.slug,
     tagSlugs: tagSlugsResult.data.map(({ slug }) => slug),
     topicSlugs: topicSlugsResult.data.map(({ slug }) => slug),

@@ -6,9 +6,12 @@ export const LOCALE_ISO_CODES = {
   FR: 'FR',
   DE: 'DE',
   ES: 'ES',
-};
+} as const;
 
 export type TLocaleIsoCode = TValueOf<typeof LOCALE_ISO_CODES>;
+
+export const isLocaleIsoCode = (value: string): value is TLocaleIsoCode =>
+  (Object.values(LOCALE_ISO_CODES) as string[]).includes(value);
 
 export const LOCALE_BCP47_TAGS = {
   EN: 'en',

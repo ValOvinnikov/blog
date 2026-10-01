@@ -4,7 +4,7 @@ import {
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
   DOMAIN_PATTERN,
-  LOCALE_ISO_CODES,
+  isLocaleIsoCode,
 } from '@blog/config';
 import { queries, TENANT_PLAN, type TTenantPlan } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
@@ -22,11 +22,9 @@ const updateTenantDetailsInputSchema = z.object({
     .toLowerCase()
     .regex(DOMAIN_PATTERN, 'Enter a valid domain.'),
   plan: z.enum(Object.values(TENANT_PLAN) as [TTenantPlan, ...TTenantPlan[]]),
-  locale: z
-    .string()
-    .refine((locale) => Object.values(LOCALE_ISO_CODES).includes(locale), {
-      message: 'Choose a supported language.',
-    }),
+  locale: z.string().refine(isLocaleIsoCode, {
+    message: 'Choose a supported language.',
+  }),
   ownerEmail: z
     .string()
     .trim()

@@ -21,6 +21,17 @@ const {
   getTopicPaginationParamsMock: vi.fn(),
 }));
 
+vi.mock('@blog/db', async () => {
+  const { LOCALE_ISO_CODES } = await import('@blog/config');
+  return {
+    queries: {
+      tenants: {
+        getTenantLiveLocales: vi.fn().mockResolvedValue([LOCALE_ISO_CODES.EN]),
+      },
+    },
+  };
+});
+
 vi.mock('@blog/service', () => ({
   service: {
     entities: {

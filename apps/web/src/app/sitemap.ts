@@ -1,4 +1,4 @@
-import { routes } from '@blog/config';
+import { LOCALE_BCP47_TAGS, routes } from '@blog/config';
 import { service } from '@blog/service';
 import { routing } from '@web/i18n/routing';
 import { getHostTenantSanityContext } from '@web/server/tenant/get-host-tenant-sanity-context';
@@ -18,8 +18,8 @@ const toEntry = (
     ...(lastModified ? { lastModified } : {}),
     alternates: {
       languages: Object.fromEntries(
-        routing.locales.map((locale) => [
-          locale.toLowerCase(),
+        [routing.defaultLocale].map((locale) => [
+          LOCALE_BCP47_TAGS[locale],
           `${siteUrl}${path}`,
         ]),
       ),

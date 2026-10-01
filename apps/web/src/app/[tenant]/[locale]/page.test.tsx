@@ -1,4 +1,7 @@
-import { CONTENT_ROUTE_REVALIDATE_SECONDS } from '@blog/config';
+import {
+  CONTENT_ROUTE_REVALIDATE_SECONDS,
+  LOCALE_ISO_CODES,
+} from '@blog/config';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
@@ -36,10 +39,13 @@ describe('HomeRoute', () => {
 
   it('renders HomePage with the resolved locale and tenant', async () => {
     const ui = await HomeRoute({
-      params: Promise.resolve({ tenant: 'tenant-1', locale: 'en' }),
+      params: Promise.resolve({
+        tenant: 'tenant-1',
+        locale: LOCALE_ISO_CODES.EN,
+      }),
     });
 
-    expect(ui.props.locale).toBe('en');
+    expect(ui.props.locale).toBe(LOCALE_ISO_CODES.EN);
     expect(ui.props.tenant).toBe('tenant-1');
   });
 });
@@ -56,7 +62,10 @@ describe('generateMetadata', () => {
     getHomePageMock.mockResolvedValue({ ok: false, error: new Error('boom') });
 
     const metadata = await generateMetadata({
-      params: Promise.resolve({ tenant: 'tenant-1', locale: 'en' }),
+      params: Promise.resolve({
+        tenant: 'tenant-1',
+        locale: LOCALE_ISO_CODES.EN,
+      }),
     });
 
     expect(metadata).toEqual({});
@@ -72,7 +81,10 @@ describe('generateMetadata', () => {
     getHomePageMock.mockResolvedValue({ ok: true, data: undefined });
 
     const metadata = await generateMetadata({
-      params: Promise.resolve({ tenant: 'tenant-1', locale: 'en' }),
+      params: Promise.resolve({
+        tenant: 'tenant-1',
+        locale: LOCALE_ISO_CODES.EN,
+      }),
     });
 
     expect(metadata).toEqual({});
@@ -92,7 +104,10 @@ describe('generateMetadata', () => {
     });
 
     const metadata = await generateMetadata({
-      params: Promise.resolve({ tenant: 'tenant-1', locale: 'en' }),
+      params: Promise.resolve({
+        tenant: 'tenant-1',
+        locale: LOCALE_ISO_CODES.EN,
+      }),
     });
 
     expect(metadata.title).toEqual({ absolute: 'Home' });
@@ -110,7 +125,10 @@ describe('generateMetadata', () => {
     });
 
     const metadata = await generateMetadata({
-      params: Promise.resolve({ tenant: 'tenant-1', locale: 'en' }),
+      params: Promise.resolve({
+        tenant: 'tenant-1',
+        locale: LOCALE_ISO_CODES.EN,
+      }),
     });
 
     expect(metadata.openGraph?.images).toBeUndefined();
@@ -130,7 +148,10 @@ describe('generateMetadata', () => {
     });
 
     await generateMetadata({
-      params: Promise.resolve({ tenant: 'tenant-1', locale: 'en' }),
+      params: Promise.resolve({
+        tenant: 'tenant-1',
+        locale: LOCALE_ISO_CODES.EN,
+      }),
     });
 
     expect(getHomePageMock).toHaveBeenCalledWith(tenant);

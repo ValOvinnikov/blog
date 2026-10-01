@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config';
 import { service } from '@blog/service';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import {
@@ -39,7 +40,7 @@ const FAQ_PAGE_JSON_LD = '"@type":"FAQPage"';
 
 const setup = customRenderServerAsync(LandingPage, {
   slug: 'about-us',
-  locale: 'en',
+  locale: LOCALE_ISO_CODES.EN,
   tenant: 'tenant-1',
 });
 
