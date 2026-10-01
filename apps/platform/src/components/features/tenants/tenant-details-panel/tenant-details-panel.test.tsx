@@ -95,7 +95,10 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         'aria-pressed',
         'true',
       );
-      expect(screen.getByRole('textbox', { name: 'Locale' })).toHaveValue('EN');
+      expect(screen.getByRole('button', { name: 'English' })).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      );
 
       const ownerEmailInput = screen.getByRole('textbox', {
         name: 'Owner email',
@@ -274,10 +277,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       });
       expect(domainInput).toBeInvalid();
       expect(domainInput).toHaveAccessibleDescription('Enter a valid domain.');
-
-      const localeInput = screen.getByRole('textbox', { name: 'Locale' });
-      expect(localeInput).not.toBeInvalid();
-      expect(localeInput).toHaveAccessibleDescription('');
     });
 
     it('shows a save-confirmation toast after a successful save, independent of further edits', async () => {
@@ -466,7 +465,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       expect(screen.getByRole('textbox', { name: 'Name' })).not.toBeDisabled();
       expect(screen.getByRole('button', { name: 'Free' })).not.toBeDisabled();
       expect(
-        screen.getByRole('textbox', { name: 'Locale' }),
+        screen.getByRole('button', { name: 'English' }),
       ).not.toBeDisabled();
       expect(
         screen.getByRole('textbox', { name: 'Owner email' }),
@@ -538,6 +537,31 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       expect(growthOption).toHaveAttribute('aria-pressed', 'true');
     });
 
+    it('saves the default language chosen from the supported list', async () => {
+      updateTenantDetailsActionMock.mockResolvedValue({
+        ok: true,
+        tenant: makeTenant({ locale: LOCALE_ISO_CODES.NL }),
+      });
+      const user = userEvent.setup();
+      render(
+        <TenantDetailsPanel
+          tenant={makeTenant({ id: 'tenant-1', locale: LOCALE_ISO_CODES.EN })}
+          fieldLocks={NO_LOCKS}
+          ownerEmail="owner@example.com"
+        />,
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Dutch' }));
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      await waitFor(() => {
+        expect(updateTenantDetailsActionMock).toHaveBeenCalledWith(
+          'tenant-1',
+          expect.objectContaining({ locale: LOCALE_ISO_CODES.NL }),
+        );
+      });
+    });
+
     it('surfaces a mismatched server-side lock as a field error on the still-enabled input', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         ok: false,
@@ -594,7 +618,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       expect(
         screen.getByRole('textbox', { name: 'Primary domain' }),
       ).toBeDisabled();
-      expect(screen.getByRole('textbox', { name: 'Locale' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: 'English' })).toBeDisabled();
       expect(
         screen.getByRole('textbox', { name: 'Owner email' }),
       ).toBeDisabled();
@@ -958,7 +982,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       expect(
         screen.getByRole('textbox', { name: 'Primary domain' }),
       ).toBeDisabled();
-      expect(screen.getByRole('textbox', { name: 'Locale' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: 'English' })).toBeDisabled();
       expect(
         screen.getByRole('textbox', { name: 'Owner email' }),
       ).toBeDisabled();

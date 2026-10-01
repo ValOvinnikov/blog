@@ -37,12 +37,12 @@ type TTenantNavHrefs = {
   look: string;
   voice: string;
   features: string;
+  languages: string;
   domain: string;
   email: string;
   studio: string;
 };
 
-/** The five site-configuration destinations that route somewhere today, shared by the `/tenants/{id}` and `/dashboard` sidebars — only the hrefs (and, via the caller, the section label) differ between them. */
 const configurationNavItems = (t: TNavTranslator, hrefs: TTenantNavHrefs) => {
   const shipping = { label: t('badgeThisMilestone'), tone: 'neutral' } as const;
 
@@ -61,6 +61,12 @@ const configurationNavItems = (t: TNavTranslator, hrefs: TTenantNavHrefs) => {
       label: t('features'),
       icon: ICONS.SETTINGS,
       href: hrefs.features,
+      badge: shipping,
+    },
+    {
+      label: t('languages'),
+      icon: ICONS.BOOK,
+      href: hrefs.languages,
       badge: shipping,
     },
     {
@@ -110,6 +116,7 @@ export const tenantNavSections = (
     look: adminRoutes.look(tenantId),
     voice: adminRoutes.voice(tenantId),
     features: adminRoutes.features(tenantId),
+    languages: adminRoutes.languages(tenantId),
     domain: adminRoutes.tenantDomain(tenantId),
     email: adminRoutes.email(tenantId),
     studio: adminRoutes.tenantStudio(tenantId),
@@ -162,6 +169,7 @@ export const dashboardNavSections = (
     look: adminRoutes.dashboardLook(),
     voice: adminRoutes.dashboardVoice(),
     features: adminRoutes.dashboardFeatures(),
+    languages: adminRoutes.dashboardLanguages(),
     domain: adminRoutes.dashboardDomain(),
     email: adminRoutes.dashboardEmail(),
     studio: adminRoutes.dashboardStudio(),
