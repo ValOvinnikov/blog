@@ -1183,8 +1183,10 @@ derives it from the label. Cache tags follow `module_stats`'.
 hides.** `PricingModule` reads the module, the site currency and the request
 locale. It formats with `Intl.NumberFormat(locale, { style: 'currency',
 currency, trailingZeroDisplay: 'stripIfInteger' })`, so £49 never renders as
-£49.00. A zero amount renders the translated "Free", and periods, "From" and the
-tab labels come from the `pricingModule` messages. When the tiers carry both
+£49.00. A zero amount renders the translated "Free", and "From", the tab labels
+and the compare-at amount's screen-reader label come from the `pricingModule`
+messages. So does each period's text ("per month", "one-time"), which
+`PricingCard.Price` renders after the amount as given, adding no "/". When the tiers carry both
 `MONTH` and `YEAR` prices, `toPricingPanels` builds two panels, each heading a
 card with that tab's price, dropping the other tab's price, and listing the
 remaining prices as extra lines in authored order. Both panels are
