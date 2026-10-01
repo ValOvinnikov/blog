@@ -27,7 +27,15 @@ foundation goes in now, proven on two pilots first.
 - The admin app never lets a tenant enable more languages than its plan
   allows.
 - **On a downgrade, extra languages are switched off, never deleted.**
-  - Their content stays in Studio, marked as not published for that reason.
+  - **Nothing in Sanity changes.** No document is unpublished, edited or
+    flagged, however many there are. Their content stays in Studio, published
+    as before.
+  - **The website alone stops serving those languages.** It reads the
+    tenant's live languages and skips the rest.
+  - **Studio shows a notice** on documents in a switched-off language
+    ("Dutch isn't live on your plan — this won't appear on the site"). The
+    notice is worked out from the tenant's live languages, the way the
+    Newsletter notice is; nothing is stored per document.
   - They drop out of the build, revalidation, sitemap, feeds, `hreflang`,
     browser detection and the switcher.
   - Their old URLs redirect to the same page in the default language.
