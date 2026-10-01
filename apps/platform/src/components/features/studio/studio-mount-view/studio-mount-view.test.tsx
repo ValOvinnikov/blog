@@ -1,4 +1,4 @@
-import { CAPABILITY } from '@blog/config';
+import { CAPABILITY, LOCALE_ISO_CODES } from '@blog/config';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import { makeTenant } from '@platform/testing/tenants/fixtures';
 
@@ -8,7 +8,9 @@ const {
   getTenantSanityCredentialsMock,
   studioMountMock,
   getEnabledCapabilitiesMock,
+  getTenantLiveLocalesMock,
 } = vi.hoisted(() => ({
+  getTenantLiveLocalesMock: vi.fn(),
   getEnabledCapabilitiesMock: vi.fn(),
   getTenantSanityCredentialsMock: vi.fn(),
   studioMountMock: vi.fn(),
@@ -16,7 +18,10 @@ const {
 
 vi.mock('@blog/db', () => ({
   queries: {
-    tenants: { getTenantSanityCredentials: getTenantSanityCredentialsMock },
+    tenants: {
+      getTenantSanityCredentials: getTenantSanityCredentialsMock,
+      getTenantLiveLocales: getTenantLiveLocalesMock,
+    },
   },
 }));
 
@@ -114,6 +119,31 @@ describe(`<${StudioMountView.name}/>`, () => {
     expect(getEnabledCapabilitiesMock).toHaveBeenCalledWith(tenant);
     expect(studioMountMock).toHaveBeenCalledWith(
       expect.objectContaining({ enabledCapabilities: [CAPABILITY.COMMENTS] }),
+    );
+  });
+
+  it("passes the tenant's default and live languages to Studio", async () => {
+    const tenant = makeTenant({ locale: LOCALE_ISO_CODES.NL });
+    getTenantSanityCredentialsMock.mockResolvedValue({
+      projectId: 'proj',
+      dataset: 'production',
+      token: 't',
+    });
+    getEnabledCapabilitiesMock.mockResolvedValue([]);
+    getTenantLiveLocalesMock.mockResolvedValue([
+      LOCALE_ISO_CODES.NL,
+      LOCALE_ISO_CODES.EN,
+    ]);
+
+    renderWithIntl(
+      await StudioMountView({ tenant, basePath: '/dashboard/studio' }),
+    );
+
+    expect(studioMountMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        defaultLocale: LOCALE_ISO_CODES.NL,
+        liveLocales: [LOCALE_ISO_CODES.NL, LOCALE_ISO_CODES.EN],
+      }),
     );
   });
 });
