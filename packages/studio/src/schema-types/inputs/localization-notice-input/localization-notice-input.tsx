@@ -1,4 +1,5 @@
 import { isLocaleIsoCode, type TLocaleIsoCode } from '@blog/config/constants';
+import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
 import {
   collectMissingLocales,
   formatLocaleList,
@@ -7,8 +8,6 @@ import {
 } from '@blog/studio/schema-types/inputs/localization-notice-input/missing-locales';
 import { Card, Stack, Text } from '@sanity/ui';
 import type { InputProps, SchemaType } from 'sanity';
-
-const LANGUAGE_FIELD = 'language';
 
 const Notice = ({ children }: { children: string }) => (
   <Card tone="caution" padding={3} radius={2} border={true}>

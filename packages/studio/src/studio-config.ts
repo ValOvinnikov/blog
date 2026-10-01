@@ -4,7 +4,9 @@ import {
   type TLocaleIsoCode,
 } from '@blog/config/constants';
 import { schemaTypes } from '@blog/studio/schema-types';
+import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
 import { migrationStateSchema } from '@blog/studio/schema-types/documents/system/migration-state/migration-state';
+import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
 import { createCapabilityWarningInput } from '@blog/studio/schema-types/inputs/capability-warning-input/capability-warning-input';
 import { createLocalizationNoticeInput } from '@blog/studio/schema-types/inputs/localization-notice-input/localization-notice-input';
 import { LOCALE_LABEL } from '@blog/studio/schema-types/inputs/localization-notice-input/missing-locales';
@@ -28,7 +30,7 @@ export type TBuildStudioConfigParams = {
   liveLocales?: readonly TLocaleIsoCode[];
 };
 
-const TRANSLATED_DOCUMENT_TYPES: string[] = [];
+const TRANSLATED_DOCUMENT_TYPES: string[] = [PAGE_LANDING_TYPE];
 
 const localizationNotices = definePlugin<readonly TLocaleIsoCode[]>(
   (liveLocales) => ({
@@ -78,15 +80,11 @@ export const buildStudioConfig = ({
       visionTool(),
       codeInput(),
       media(),
-      ...(TRANSLATED_DOCUMENT_TYPES.length > 0
-        ? [
-            documentInternationalization({
-              supportedLanguages: languages,
-              schemaTypes: TRANSLATED_DOCUMENT_TYPES,
-              languageField: 'language',
-            }),
-          ]
-        : []),
+      documentInternationalization({
+        supportedLanguages: languages,
+        schemaTypes: TRANSLATED_DOCUMENT_TYPES,
+        languageField: LANGUAGE_FIELD,
+      }),
       internationalizedArray({
         languages,
         defaultLanguages: [defaultLocale],
@@ -97,6 +95,11 @@ export const buildStudioConfig = ({
 
     schema: {
       types: schemaTypes,
+      // The plugin adds one template per language; the bare one would create a page with no language.
+      templates: (prev) =>
+        prev.filter(
+          (template) => !TRANSLATED_DOCUMENT_TYPES.includes(template.id),
+        ),
     },
 
     form: {
