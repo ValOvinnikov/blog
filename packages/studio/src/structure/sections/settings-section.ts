@@ -1,5 +1,6 @@
 import { footerSettingsSchema } from '@blog/studio/schema-types/documents/settings/footer/footer';
 import { navigationSettingsSchema } from '@blog/studio/schema-types/documents/settings/navigation/navigation';
+import { newsletterSettingsSchema } from '@blog/studio/schema-types/documents/settings/newsletter/newsletter';
 import { siteSettingsSchema } from '@blog/studio/schema-types/documents/settings/site-settings/site-settings';
 import { themeSettingsSchema } from '@blog/studio/schema-types/documents/settings/theme/theme';
 import type { TStructureSection } from '@blog/studio/structure/build-section/build-section';
@@ -16,6 +17,7 @@ export const settingsSection: TStructureSection = {
         { schema: navigationSettingsSchema, mode: 'singleton' },
         { schema: footerSettingsSchema, mode: 'singleton' },
         { schema: themeSettingsSchema, mode: 'singleton' },
+        { schema: newsletterSettingsSchema, mode: 'singleton' },
       ],
     },
     {
