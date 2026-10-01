@@ -82,8 +82,21 @@ describe(`<${PricingCard.name}/>`, () => {
 
   it('does not render compareAt markup when omitted', () => {
     setup();
-    expect(screen.queryByText('$49', { exact: false })).toBeVisible();
     expect(screen.queryByText(/regular/i)).not.toBeInTheDocument();
+  });
+
+  it('separates the amount and the period with a space', () => {
+    setup({
+      children: [
+        <PricingCard.Price
+          key="price"
+          amount="$49"
+          period="per month"
+          dataTestId="price"
+        />,
+      ],
+    });
+    expect(screen.getByTestId('price')).toHaveTextContent('$49 per month');
   });
 
   it('renders the period exactly as passed, with no slash added', () => {
