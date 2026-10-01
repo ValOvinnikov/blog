@@ -1,5 +1,7 @@
+import type { TCapability } from '@blog/config/constants';
 import { schemaTypes } from '@blog/studio/schema-types';
 import { migrationStateSchema } from '@blog/studio/schema-types/documents/system/migration-state/migration-state';
+import { createCapabilityWarningInput } from '@blog/studio/schema-types/inputs/capability-warning-input/capability-warning-input';
 import { codeInput } from '@sanity/code-input';
 import { visionTool } from '@sanity/vision';
 import { defineConfig } from 'sanity';
@@ -13,6 +15,7 @@ export type TBuildStudioConfigParams = {
   dataset: string;
   basePath?: string;
   title: string;
+  enabledCapabilities?: readonly TCapability[];
 };
 
 /**
@@ -27,6 +30,7 @@ export const buildStudioConfig = ({
   dataset,
   basePath,
   title,
+  enabledCapabilities,
 }: TBuildStudioConfigParams) =>
   defineConfig({
     name: 'default',
@@ -49,6 +53,11 @@ export const buildStudioConfig = ({
     form: {
       image: { assetSources: [mediaAssetSource] },
       file: { assetSources: [mediaAssetSource] },
+      ...(enabledCapabilities && {
+        components: {
+          input: createCapabilityWarningInput(enabledCapabilities),
+        },
+      }),
     },
 
     document: {
