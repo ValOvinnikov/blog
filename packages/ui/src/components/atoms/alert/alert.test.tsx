@@ -53,4 +53,14 @@ describe(`<${Alert.name}/>`, () => {
     setup();
     expect(screen.getByRole('status')).not.toHaveAttribute('id');
   });
+
+  it('renders a type icon by default', () => {
+    setup();
+    expect(screen.getByTestId('alert-icon')).toBeInTheDocument();
+  });
+
+  it('renders no icon when hasIcon is false', () => {
+    setup({ hasIcon: false });
+    expect(screen.queryByTestId('alert-icon')).not.toBeInTheDocument();
+  });
 });

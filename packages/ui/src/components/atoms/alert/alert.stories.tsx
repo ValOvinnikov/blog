@@ -50,3 +50,11 @@ export const Info: TStory = {
     message: 'New posts land in your inbox roughly twice a month.',
   },
 };
+
+export const WithoutIcon: TStory = {
+  args: {
+    type: ALERT_TYPE.ERROR,
+    hasIcon: false,
+    message: 'Enter a valid email address.',
+  },
+};

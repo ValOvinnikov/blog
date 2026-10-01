@@ -30,12 +30,11 @@ export const newsletterSignupVariants = tv({
     spinner: ['text-brand-primary-contrast'],
     label: ['font-mono text-copy text-text'],
     alert: [],
-    // Its own inline-flex wrapper so `prefix` + `label` never split across rows under the root's own `flex-col`/`sm:flex-row` stacking.
+    errorAlert: [],
     promptGroup: ['inline-flex shrink-0 items-center gap-1'],
   },
   variants: {
     variant: {
-      // `@container` on root makes the pitch/form split (`body`, `formPane`) respond to the panel's own rendered width rather than the viewport, so a Narrow page container keeps it stacked even on a wide screen.
       full: {
         root: ['w-full', '@container'],
         submit: ['w-full'],
@@ -43,18 +42,15 @@ export const newsletterSignupVariants = tv({
       compact: {
         root: [
           'flex w-full flex-col gap-2',
-          // Cross-axis start (not center) so a wrapped error line under the field never pushes the heading down from its line-one position.
-          'sm:inline-flex sm:w-auto sm:flex-row sm:flex-wrap sm:items-start',
+          'sm:flex-row sm:flex-wrap sm:items-center',
           'rounded-sm border border-border border-l-3 border-l-brand-primary bg-surface-2',
           'px-3 py-2.5',
         ],
-        form: [
-          'flex flex-1 flex-col gap-2',
-          'sm:flex-row sm:flex-wrap sm:items-center',
-        ],
+        form: ['contents'],
         field: ['flex-1 sm:min-w-[12rem] sm:max-w-xs'],
         submit: ['shrink-0'],
         alert: ['flex-1'],
+        errorAlert: ['sm:basis-full'],
       },
     },
     align: {
@@ -62,16 +58,19 @@ export const newsletterSignupVariants = tv({
         pitchPane: ['items-start text-left'],
         trustCues: ['items-start', 'md:justify-start'],
         promptGroup: ['max-sm:self-start'],
+        root: ['sm:justify-start'],
       },
       [CONTENT_ALIGNMENT.CENTER]: {
         pitchPane: ['items-center text-center'],
         trustCues: ['items-center', 'md:justify-center'],
         promptGroup: ['max-sm:self-center'],
+        root: ['sm:justify-center'],
       },
       [CONTENT_ALIGNMENT.RIGHT]: {
         pitchPane: ['items-end text-right'],
         trustCues: ['items-end', 'md:justify-end'],
         promptGroup: ['max-sm:self-end'],
+        root: ['sm:justify-end'],
       },
     },
   },

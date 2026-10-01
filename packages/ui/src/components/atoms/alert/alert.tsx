@@ -41,7 +41,7 @@ export const Alert = ({
       data-testid={dataTestId}
       className={alertVariants({ type, class: className })}
     >
-      {hasIcon && <Icon name={ALERT_ICON[type]} />}
+      {hasIcon && <Icon name={ALERT_ICON[type]} dataTestId="alert-icon" />}
       <span>{message}</span>
     </div>
   );

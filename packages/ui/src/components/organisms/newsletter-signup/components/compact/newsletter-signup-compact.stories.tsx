@@ -72,9 +72,6 @@ export const RightAligned: TStory = {
   args: { align: CONTENT_ALIGNMENT.RIGHT },
 };
 
-// Mirrors `Section`'s `brandVariant="BRAND_PRIMARY"` band treatment
-// (`bg-brand-primary-muted surface-brand-primary`) so the strip's own
-// opaque surface against that band stays checkable in isolation.
 export const BrandPrimaryBand: TStory = {
   decorators: [
     (Story) => (
@@ -85,12 +82,6 @@ export const BrandPrimaryBand: TStory = {
   ],
 };
 
-// The root's `flex-col`/`sm:flex-row` stacking is a real `sm:` media-query
-// fork, not a container query — pinning `phone` (an intentional exception,
-// see the `ui-storybook` skill) is the only way to default this story to a
-// canvas under `sm` so the prefix+heading group's one-line layout, and the
-// strip spanning the full width of its container below `sm`, are what
-// actually render.
 export const MobilePhone: TStory = {
   globals: { viewport: 'phone' },
   decorators: [
