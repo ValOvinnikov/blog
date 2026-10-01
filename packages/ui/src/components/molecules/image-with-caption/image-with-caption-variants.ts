@@ -20,11 +20,11 @@ export const imageWithCaptionVariants = tv({
         ],
       },
       [IMAGE_LAYOUT.FLOAT_LEFT]: {
-        // No float below `md:` — a floated image with wrapped text needs more width than a phone viewport gives the remaining text.
-        figure: ['w-full', 'md:float-left md:clear-left md:mr-6 md:w-2/5'],
+        // Padding, not margin, carries the gap: a consumer's `mx-*` on prose children zeroes a float's margins. Floats start at `lg:` so the wrapped text column stays wide enough to read.
+        figure: ['w-full', 'lg:float-left lg:clear-left lg:w-48 lg:pr-6'],
       },
       [IMAGE_LAYOUT.FLOAT_RIGHT]: {
-        figure: ['w-full', 'md:float-right md:clear-right md:ml-6 md:w-2/5'],
+        figure: ['w-full', 'lg:float-right lg:clear-right lg:w-48 lg:pl-6'],
       },
     },
   },
