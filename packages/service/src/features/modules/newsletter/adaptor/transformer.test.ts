@@ -31,6 +31,16 @@ describe('toNewsletterModule', () => {
     expect(module.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
   });
 
+  it('passes BRAND_PRIMARY through', () => {
+    const raw = makeRawNewsletterModule({
+      brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
+    });
+
+    const module = toNewsletterModule(raw);
+
+    expect(module.brandVariant).toBe(BRAND_VARIANT.BRAND_PRIMARY);
+  });
+
   it('maps variant straight through', () => {
     const raw = makeRawNewsletterModule({
       variant: NEWSLETTER_VARIANT.COMPACT,

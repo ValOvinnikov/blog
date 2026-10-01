@@ -89,6 +89,7 @@ export const NewsletterForm = ({
     submitLabel: t('submitLabel'),
     emailAriaLabel: t('emailAriaLabel'),
     placeholder: t('placeholder'),
+    align,
     className,
   };
 
@@ -111,7 +112,6 @@ export const NewsletterForm = ({
       {...sharedProps}
       supportingText={supportingText}
       trustCues={trustCueItems}
-      align={align}
     />
   );
 };
