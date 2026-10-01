@@ -1,4 +1,5 @@
 import {
+  BRAND_VARIANT,
   CTA_VARIANT,
   type TContentAlignment,
   type TMaybeUndefined,
@@ -40,7 +41,7 @@ export function toCtaModule(raw: TRawCtaModule): TCtaModule {
   return {
     variant: raw.variant,
     brandVariant: raw.brandVariant,
-    bandTone: raw.bandTone,
+    bandTone: raw.bandTone ?? BRAND_VARIANT.PRIMARY,
     eyebrow: raw.eyebrow ?? undefined,
     headingBlock: toHeadingBlock(raw.headingBlock),
     content: toContent(raw.content),
