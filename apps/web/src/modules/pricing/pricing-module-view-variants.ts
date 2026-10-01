@@ -10,7 +10,7 @@ export const pricingModuleViewVariants = tv({
     count: {
       1: { grid: ['mx-auto w-full max-w-sm'] },
       2: { grid: ['md:grid-cols-2'] },
-      3: { grid: ['md:grid-cols-3'] },
+      3: { grid: ['lg:grid-cols-3'] },
       4: { grid: ['md:grid-cols-2 lg:grid-cols-4'] },
     },
     align: {
