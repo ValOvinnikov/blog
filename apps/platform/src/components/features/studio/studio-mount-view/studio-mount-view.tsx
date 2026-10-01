@@ -50,6 +50,7 @@ export const StudioMountView = async ({
   }
 
   const enabledCapabilities = await getEnabledCapabilities(tenant);
+  const liveLocales = await queries.tenants.getTenantLiveLocales(tenant.id);
 
   return (
     <StudioMount
@@ -58,6 +59,8 @@ export const StudioMountView = async ({
       basePath={basePath}
       title={tenant.name}
       enabledCapabilities={enabledCapabilities}
+      defaultLocale={tenant.locale}
+      liveLocales={liveLocales}
     />
   );
 };

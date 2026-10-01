@@ -27,6 +27,7 @@ import { StatsModule } from '@web/modules/stats/stats-module';
 import { TaxonomyListModule } from '@web/modules/taxonomy-list/taxonomy-list-module';
 import { TeamModule } from '@web/modules/team/team-module';
 import { TestimonialModule } from '@web/modules/testimonial/testimonial-module';
+import { TimelineModule } from '@web/modules/timeline/timeline-module';
 import type { ReactNode } from 'react';
 
 const HOME_MAP: Partial<Record<TPageHomeType, TModuleComponent>> = {
@@ -47,6 +48,7 @@ const HOME_MAP: Partial<Record<TPageHomeType, TModuleComponent>> = {
   module_faq: FaqModule,
   module_team: TeamModule,
   module_pricing: PricingModule,
+  module_timeline: TimelineModule,
 };
 
 export interface IHomeModuleRendererProps {

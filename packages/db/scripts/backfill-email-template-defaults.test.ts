@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { createTestDb } from '@blog/db/testing/create-test-db';
@@ -34,7 +35,7 @@ afterEach(async () => {
 const baseTenant = {
   primaryDomain: 'acme.example.com',
   sanityDataset: 'production',
-  locale: 'en',
+  locale: LOCALE_ISO_CODES.EN,
   plan: TENANT_PLAN.FREE,
 };
 

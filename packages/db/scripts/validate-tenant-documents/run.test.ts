@@ -1,4 +1,4 @@
-import { FINDING_SEVERITY } from '@blog/config/constants';
+import { FINDING_SEVERITY, LOCALE_ISO_CODES } from '@blog/config/constants';
 import { TENANT_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
@@ -55,7 +55,8 @@ function tenant(id: string, name: string): TTenant {
     sanityDataset: 'production',
     sanityReadTokenEncrypted: 'encrypted',
     sanityWriteTokenEncrypted: 'encrypted',
-    locale: 'en',
+    locale: LOCALE_ISO_CODES.EN,
+    additionalLocales: [],
     plan: 'FREE',
     status: TENANT_STATUS.ACTIVE,
     provisioningStatus: 'READY',

@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
@@ -24,7 +25,7 @@ describe(listTenants, () => {
           primaryDomain: 'zeta.example.com',
           sanityProjectId: 'p1',
           sanityDataset: 'production',
-          locale: 'en',
+          locale: LOCALE_ISO_CODES.EN,
           plan: TENANT_PLAN.FREE,
           status: TENANT_STATUS.ACTIVE,
         },
@@ -33,7 +34,7 @@ describe(listTenants, () => {
           primaryDomain: 'acme.example.com',
           sanityProjectId: 'p2',
           sanityDataset: 'production',
-          locale: 'en',
+          locale: LOCALE_ISO_CODES.EN,
           plan: TENANT_PLAN.GROWTH,
           status: TENANT_STATUS.ACTIVE,
         },
@@ -59,7 +60,7 @@ describe(listTenants, () => {
           primaryDomain: 'acme.example.com',
           sanityProjectId: 'p1',
           sanityDataset: 'production',
-          locale: 'en',
+          locale: LOCALE_ISO_CODES.EN,
           plan: TENANT_PLAN.FREE,
           status: TENANT_STATUS.ACTIVE,
         },
@@ -68,7 +69,7 @@ describe(listTenants, () => {
           primaryDomain: 'zeta.example.com',
           sanityProjectId: 'p2',
           sanityDataset: 'production',
-          locale: 'en',
+          locale: LOCALE_ISO_CODES.EN,
           plan: TENANT_PLAN.FREE,
           status: TENANT_STATUS.ARCHIVED,
           deprovisionedAt: new Date(),
@@ -89,7 +90,7 @@ describe(listTenants, () => {
           primaryDomain: 'acme.example.com',
           sanityProjectId: 'p1',
           sanityDataset: 'production',
-          locale: 'en',
+          locale: LOCALE_ISO_CODES.EN,
           plan: TENANT_PLAN.FREE,
           status: TENANT_STATUS.ACTIVE,
         },
@@ -98,7 +99,7 @@ describe(listTenants, () => {
           primaryDomain: 'zeta.example.com',
           sanityProjectId: 'p2',
           sanityDataset: 'production',
-          locale: 'en',
+          locale: LOCALE_ISO_CODES.EN,
           plan: TENANT_PLAN.FREE,
           status: TENANT_STATUS.ARCHIVED,
           deprovisionedAt: new Date(),

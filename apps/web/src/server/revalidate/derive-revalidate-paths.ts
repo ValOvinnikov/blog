@@ -1,5 +1,5 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
 import { service, type TTenantSanityContext } from '@blog/service';
+import { routing } from '@web/i18n/routing';
 import { buildPostPublishPaths } from '@web/utils/build-post-publish-paths';
 import { logger } from '@web/utils/logger/logger';
 
@@ -96,7 +96,7 @@ const deriveBlogPostPublishPaths = async ({
 
   const paths = buildPostPublishPaths({
     tenantId,
-    locales: Object.values(LOCALE_ISO_CODES),
+    locales: routing.locales,
     postSlug: post.slug,
     tagSlugs: tagSlugsResult.data.map(({ slug }) => slug),
     topicSlugs: topicSlugsResult.data.map(({ slug }) => slug),

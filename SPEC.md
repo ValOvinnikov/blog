@@ -1031,6 +1031,50 @@ rather than a run of rows with a hole in it. The page loses the section and keep
 rendering, as everywhere else in this family. `image` is therefore required in
 the view model, exactly as it is for the logo wall.
 
+**A process and a history are one module, and the marker style is what separates
+them.** `module_timeline` ("Timeline") holds inline `timelineItem` objects for
+the same reason the highlights and the figures are inline: a sequence tells one
+page's story in order and never recombines, so there is no Explainers `block_*`,
+no reference picker and no second revalidation tag. `markerStyle`
+(`TIMELINE_MARKER_STYLE`) chooses **Numbered**, where 1, 2, 3 are generated from
+the authored order, or **Labelled**, where each item carries its own short
+marker such as "2019" or "Week 1". A `timelineItem` ("Step") carries that
+`marker` — free text, max 16, required and shown only when Labelled — a required
+`heading` (max 80, rendered `<h3>`) and an optional `paragraphText` `body`.
+There is no image, icon, button or date per item: an item is read as one line of
+a sequence, not as a card. The module holds 2 to 8 of them, with `required()`
+before `min(2)` and `max(8)` each its own rule chain, and no `unique()` because
+inline objects have no id to compare. It is offered on `page_home` and
+`page_landing` only, under **Modules → Explainers**.
+
+**Horizontal is capped at five items by a publishing rule, and the web layer
+still assumes it can be broken.** `orientation` (`TIMELINE_ORIENTATION`) is
+Vertical or Horizontal; Horizontal applies from `lg`, while phones and `md`
+always show the vertical line, decided in `lg:`-prefixed classes rather than any
+JS breakpoint. A custom rule rejects a Horizontal module holding more than
+`TIMELINE_HORIZONTAL_ITEM_CAP` items, so an author cannot publish one — but
+`apps/web` still falls back to Vertical above that count rather than trusting it,
+because legacy and API-written documents reach the view by paths Studio
+validation never sees, and **nothing is ever hidden**: a 6-item Horizontal
+timeline that reaches the page renders vertically with every item intact. That
+cap lives in `@blog/config` precisely so the publishing rule and the rendering
+fallback cannot drift apart — it is one number read by `packages/studio`'s
+validator and by the module view, never two.
+
+**Two alignments do two different jobs.** Content Alignment places the module
+heading and its actions, as everywhere else in this family; **Item Alignment**
+(Left or Center, following `module_featureList`'s Card Alignment) places the
+timeline itself — Center on Horizontal centres each marker over its text, and on
+Vertical centres the list as a block while keeping the text beside the line.
+Both are emitted `Content Alignment · Item Alignment` by the shared
+`alignmentFields` helper, which orders its baseline field before any extra a
+module adds. `@blog/ui`'s `Timeline` renders an `<ol>` in both orientations, and
+a Numbered marker is `aria-hidden` so the ordinal is not announced twice over
+the list's own; a Labelled marker carries real content and stays exposed. Item
+headings are `<h3>`, so the module heading above them is an `<h2>` — the one
+constraint `apps/web` must honour to keep the page outline unbroken. There is
+one `ctaButtonsField()` under the timeline and no JSON-LD.
+
 **A question is a document, and that is the opposite call from a figure.**
 `block_faq` ("FAQ Item") carries a `title` — its Studio label — a required
 `question`, and a required `answer` in `listedText`. It sits under **Blocks →

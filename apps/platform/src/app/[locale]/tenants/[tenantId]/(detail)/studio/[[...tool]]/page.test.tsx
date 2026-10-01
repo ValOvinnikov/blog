@@ -31,6 +31,7 @@ vi.mock('@blog/db', async () => ({
     tenants: {
       getTenantById: getTenantByIdMock,
       getTenantSanityCredentials: getTenantSanityCredentialsMock,
+      getTenantLiveLocales: vi.fn().mockResolvedValue([]),
     },
   },
 }));

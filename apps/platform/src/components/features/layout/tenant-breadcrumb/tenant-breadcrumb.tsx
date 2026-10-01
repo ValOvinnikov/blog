@@ -35,6 +35,7 @@ export const TenantBreadcrumb = ({
     [adminRoutes.look(tenantId)]: 'look',
     [adminRoutes.voice(tenantId)]: 'voice',
     [adminRoutes.features(tenantId)]: 'features',
+    [adminRoutes.languages(tenantId)]: 'languages',
     [adminRoutes.tenantDomain(tenantId)]: 'domain',
     [adminRoutes.tenantStudio(tenantId)]: 'studio',
     [adminRoutes.tenantProvisioning(tenantId)]: 'provisioning',

@@ -20,7 +20,7 @@ export const createCapabilityWarningInput = (
     }
 
     return (
-      <Stack space={4}>
+      <Stack gap={4}>
         <Card tone="caution" padding={3} radius={2} border={true}>
           <Text size={1}>
             This won&apos;t appear on the site until {CAPABILITY_LABEL[missing]}{' '}
