@@ -287,6 +287,16 @@ export const BannerMismatchedPositionAndAlignment: TStory = {
   ),
 };
 
+export const BannerPositionBySpacingPhone: TStory = {
+  ...BannerPositionBySpacing,
+  globals: { viewport: 'phone' },
+};
+
+export const BannerMismatchedPositionAndAlignmentPhone: TStory = {
+  ...BannerMismatchedPositionAndAlignment,
+  globals: { viewport: 'phone' },
+};
+
 export const Wrapped: TStory = {
   args: {
     isWrapped: true,

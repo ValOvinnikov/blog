@@ -76,20 +76,11 @@ export const pricingTierSchema = defineType({
     }),
     ctaButtonsField(),
     defineField({
-      name: 'isHighlighted',
-      title: 'Highlighted',
-      type: 'boolean',
-      description: "Calls out this tier as the plan's recommended choice.",
-      initialValue: false,
-    }),
-    defineField({
       name: 'highlightLabel',
       title: 'Highlight Label',
       type: 'string',
-      description: 'The badge text shown on a highlighted tier.',
-      initialValue: 'Most popular',
-      hidden: ({ parent }) =>
-        !(parent as { isHighlighted?: boolean } | undefined)?.isHighlighted,
+      description:
+        'Fill this in to recommend the tier: it stands out from the others and carries this text as its badge.',
       validation: (rule) => rule.max(24),
     }),
     defineField({
@@ -105,9 +96,9 @@ export const pricingTierSchema = defineType({
     select: {
       name: 'name',
       prices: 'prices',
-      isHighlighted: 'isHighlighted',
+      highlightLabel: 'highlightLabel',
     },
-    prepare({ name, prices, isHighlighted }) {
+    prepare({ name, prices, highlightLabel }) {
       const firstPrice = (
         prices as TPricingTierPricePreviewItem[] | undefined
       )?.[0];
@@ -117,7 +108,7 @@ export const pricingTierSchema = defineType({
           : undefined;
 
       return {
-        title: isHighlighted
+        title: String(highlightLabel ?? '').trim()
           ? `★ ${String(name ?? 'Unknown')}`
           : String(name ?? 'Unknown'),
         subtitle: priceSubtitle,
