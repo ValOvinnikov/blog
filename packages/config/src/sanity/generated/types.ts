@@ -1727,6 +1727,30 @@ export type Blog_topic = {
   description?: string;
 };
 
+export type InternationalizedArrayTextValue = {
+  _type: 'internationalizedArrayTextValue';
+  value?: string;
+  language?: string;
+};
+
+export type InternationalizedArrayStringValue = {
+  _type: 'internationalizedArrayStringValue';
+  value?: string;
+  language?: string;
+};
+
+export type InternationalizedArrayText = Array<
+  {
+    _key: string;
+  } & InternationalizedArrayTextValue
+>;
+
+export type InternationalizedArrayString = Array<
+  {
+    _key: string;
+  } & InternationalizedArrayStringValue
+>;
+
 export type MediaFolderReference = {
   _ref: string;
   _type: 'reference';
@@ -1966,6 +1990,10 @@ export type AllSanitySchemaTypes =
   | Module_postRelatedReference
   | Page_post
   | Blog_topic
+  | InternationalizedArrayTextValue
+  | InternationalizedArrayStringValue
+  | InternationalizedArrayText
+  | InternationalizedArrayString
   | MediaFolderReference
   | MediaFolder
   | MediaTag
