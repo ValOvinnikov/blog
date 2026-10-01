@@ -60,7 +60,6 @@ describe('toPricingModule', () => {
         priceLabel: undefined,
         features: ['Unlimited posts', 'Priority support'],
         ctaButtons: module.tiers[0]?.ctaButtons,
-        isHighlighted: true,
         highlightLabel: 'Most popular',
         footnote: 'Billed annually',
       },
@@ -125,36 +124,33 @@ describe('toPricingModule', () => {
     expect(module.tiers[0]?.ctaButtons).toEqual([]);
   });
 
-  it('highlights a tier whose label is filled', () => {
+  it('trims a padded highlight label', () => {
     const raw = makeRawPricingModule({
       tiers: [makeRawPricingTier({ highlightLabel: '  Most popular ' })],
     });
 
     const module = toPricingModule(raw);
 
-    expect(module.tiers[0]?.isHighlighted).toBe(true);
     expect(module.tiers[0]?.highlightLabel).toBe('Most popular');
   });
 
-  it('does not highlight a tier with no label', () => {
+  it('leaves the highlight label undefined when absent', () => {
     const raw = makeRawPricingModule({
       tiers: [makeRawPricingTier({ highlightLabel: null })],
     });
 
     const module = toPricingModule(raw);
 
-    expect(module.tiers[0]?.isHighlighted).toBe(false);
     expect(module.tiers[0]?.highlightLabel).toBeUndefined();
   });
 
-  it('does not highlight a tier whose label is only whitespace', () => {
+  it('leaves the highlight label undefined when only whitespace', () => {
     const raw = makeRawPricingModule({
       tiers: [makeRawPricingTier({ highlightLabel: '   ' })],
     });
 
     const module = toPricingModule(raw);
 
-    expect(module.tiers[0]?.isHighlighted).toBe(false);
     expect(module.tiers[0]?.highlightLabel).toBeUndefined();
   });
 

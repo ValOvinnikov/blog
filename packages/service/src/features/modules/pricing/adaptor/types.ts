@@ -23,7 +23,6 @@ export type TPricingTier = {
   priceLabel: TMaybeUndefined<string>;
   features: string[];
   ctaButtons: TCtaButton[];
-  isHighlighted: boolean;
   highlightLabel: TMaybeUndefined<string>;
   footnote: TMaybeUndefined<string>;
 };
