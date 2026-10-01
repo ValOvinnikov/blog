@@ -12,9 +12,10 @@ export interface IFeatureHighlightsModuleProps {
 
 export const FeatureHighlightsModule = async ({
   id,
+  locale,
   tenant,
 }: IFeatureHighlightsModuleProps) => {
-  const tenantContext = await getTenantSanityContext(tenant);
+  const tenantContext = await getTenantSanityContext(tenant, locale);
   const result =
     await service.modules.featureHighlights.v1.getFeatureHighlightsModule(
       id,

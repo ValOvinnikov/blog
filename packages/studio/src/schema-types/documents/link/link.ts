@@ -1,6 +1,7 @@
 import { LINK_TYPE } from '@blog/config/constants';
 import { LINK_PAGE_TYPES } from '@blog/studio/schema-types/documents/link/link-page-types';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { localizedStringValues } from '@blog/studio/schema-types/validation/localized-string-values/localized-string-values';
 import { Link2 } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
@@ -15,6 +16,21 @@ const LINK_TYPE_OPTIONS = [
   { title: 'Internal Link', value: LINK_TYPE.INTERNAL },
   { title: 'External Link', value: LINK_TYPE.EXTERNAL },
 ];
+
+const LABEL_MAX_LENGTH = 60;
+
+const INVALID_WEB_ADDRESS =
+  'Enter a full web address starting with https:// or http://, including a host, e.g. https://example.com.';
+
+const isWebAddress = (value: string): boolean => {
+  try {
+    const parsedUrl = new URL(value);
+
+    return /^https?:$/.test(parsedUrl.protocol) && Boolean(parsedUrl.hostname);
+  } catch {
+    return false;
+  }
+};
 
 const LINK_TYPE_LABEL: Record<string, string> = Object.fromEntries(
   LINK_TYPE_OPTIONS.map(({ title, value }) => [value, title]),
@@ -36,10 +52,23 @@ export const linkSchema = defineType({
     defineField({
       name: 'label',
       title: 'Label',
-      type: 'string',
+      type: 'internationalizedArrayString',
       description:
-        'The visible link text readers see wherever this link is used.',
-      validation: (rule) => rule.required().max(60),
+        'The visible link text readers see wherever this link is used, per language.',
+      validation: (rule) =>
+        rule.custom((value) => {
+          const labels = localizedStringValues(value);
+
+          if (labels.length === 0) {
+            return 'Enter a label.';
+          }
+
+          if (labels.some((label) => label.length > LABEL_MAX_LENGTH)) {
+            return `Keep each label to ${LABEL_MAX_LENGTH} characters or fewer.`;
+          }
+
+          return true;
+        }),
     }),
     defineField({
       name: 'linkType',
@@ -72,8 +101,9 @@ export const linkSchema = defineType({
     defineField({
       name: 'url',
       title: 'External Link',
-      type: 'string',
-      description: 'The full web address this links to, including https://.',
+      type: 'internationalizedArrayString',
+      description:
+        'The full web address this links to, including https://, per language.',
       hidden: ({ document }) => !isLinkType(document, LINK_TYPE.EXTERNAL),
       validation: (rule) =>
         rule.custom((value, context) => {
@@ -81,23 +111,13 @@ export const linkSchema = defineType({
             return true;
           }
 
-          if (!value) {
+          const urls = localizedStringValues(value);
+
+          if (urls.length === 0) {
             return 'Enter a full web address, including https://.';
           }
 
-          let parsedUrl: URL;
-
-          try {
-            parsedUrl = new URL(value);
-          } catch {
-            return 'Enter a full web address starting with https:// or http://, including a host, e.g. https://example.com.';
-          }
-
-          if (!/^https?:$/.test(parsedUrl.protocol) || !parsedUrl.hostname) {
-            return 'Enter a full web address starting with https:// or http://, including a host, e.g. https://example.com.';
-          }
-
-          return true;
+          return urls.every(isWebAddress) ? true : INVALID_WEB_ADDRESS;
         }),
     }),
     defineField({

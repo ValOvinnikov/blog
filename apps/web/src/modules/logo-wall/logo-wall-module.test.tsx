@@ -65,7 +65,7 @@ describe(`<${LogoWallModule.name}/>`, () => {
     await setup();
 
     expect(getLogoWallModuleMock).toHaveBeenCalledWith('logo-wall-1', tenant);
-    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
+    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1', 'en');
   });
 
   it('renders nothing when a logo image fails to resolve', async () => {

@@ -75,7 +75,7 @@ describe(`<${FeatureListModule.name}/>`, () => {
     await setup();
 
     expect(getFeatureListMock).toHaveBeenCalledWith('feature-list-1', tenant);
-    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
+    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1', 'en');
   });
 
   it('renders nothing when the fetch fails', async () => {

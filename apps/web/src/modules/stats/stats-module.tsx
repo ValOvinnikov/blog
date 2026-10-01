@@ -10,8 +10,12 @@ export interface IStatsModuleProps {
   tenant: string;
 }
 
-export const StatsModule = async ({ id, tenant }: IStatsModuleProps) => {
-  const tenantContext = await getTenantSanityContext(tenant);
+export const StatsModule = async ({
+  id,
+  locale,
+  tenant,
+}: IStatsModuleProps) => {
+  const tenantContext = await getTenantSanityContext(tenant, locale);
   const result = await service.modules.stats.v1.getStatsModule(
     id,
     tenantContext,

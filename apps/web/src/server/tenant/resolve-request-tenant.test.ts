@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config';
 import { queries, TENANT_STATUS } from '@blog/db';
 
 import { resolveRequestTenant } from './resolve-request-tenant';
@@ -167,6 +168,7 @@ describe('resolveRequestTenant memoization', () => {
       projectId: 'proj',
       dataset: 'production',
       token: 'tok',
+      defaultLocale: LOCALE_ISO_CODES.EN,
       status: TENANT_STATUS.ACTIVE,
       deprovisionedAt: null,
       provisioningStatus: null,
@@ -214,6 +216,7 @@ describe('resolveRequestTenant memoization', () => {
       projectId: 'proj',
       dataset: 'production',
       token: 'tok',
+      defaultLocale: LOCALE_ISO_CODES.EN,
       status: TENANT_STATUS.ACTIVE,
       deprovisionedAt: null,
       provisioningStatus: null,

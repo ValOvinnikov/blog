@@ -590,7 +590,10 @@ describe('LocaleLayout', () => {
   it('forwards the tenant route param to every tenant-scoped loader', async () => {
     await setup();
 
-    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
+    expect(getTenantSanityContextMock).toHaveBeenCalledWith(
+      'tenant-1',
+      LOCALE_ISO_CODES.EN,
+    );
     expect(getThemeTokensMock).toHaveBeenCalledWith('tenant-1');
     expect(isCapabilityEnabledMock).toHaveBeenCalledWith(
       'ANALYTICS',

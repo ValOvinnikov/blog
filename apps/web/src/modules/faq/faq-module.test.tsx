@@ -61,7 +61,7 @@ describe(`<${FaqModule.name}/>`, () => {
     await setup();
 
     expect(getFaqModuleMock).toHaveBeenCalledWith('faq-1', tenant);
-    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
+    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1', 'en');
   });
 
   it('renders nothing when the fetch fails', async () => {

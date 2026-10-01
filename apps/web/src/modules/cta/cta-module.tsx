@@ -10,8 +10,8 @@ export interface ICtaModuleProps {
   tenant: string;
 }
 
-export const CtaModule = async ({ id, tenant }: ICtaModuleProps) => {
-  const tenantContext = await getTenantSanityContext(tenant);
+export const CtaModule = async ({ id, locale, tenant }: ICtaModuleProps) => {
+  const tenantContext = await getTenantSanityContext(tenant, locale);
   const result = await service.modules.cta.v1.getCta(id, tenantContext);
 
   if (!result.ok) {

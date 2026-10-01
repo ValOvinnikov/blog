@@ -123,7 +123,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
 
   setRequestLocale(locale);
 
-  const tenantContext = await getTenantSanityContext(tenant);
+  const tenantContext = await getTenantSanityContext(tenant, locale);
   const [
     settingsResult,
     navResult,

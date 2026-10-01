@@ -90,7 +90,7 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
 
       await setup();
 
-      expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
+      expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1', 'en');
       expect(getTaxonomyListMock).toHaveBeenCalledWith(
         'taxonomy-list-1',
         DEFAULT_TENANT_SANITY_CONTEXT,
