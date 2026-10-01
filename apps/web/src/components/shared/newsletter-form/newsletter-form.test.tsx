@@ -202,6 +202,56 @@ describe(`<${NewsletterForm.name}/>`, () => {
     );
   });
 
+  it('clears the inline validation error once the reader edits the email', async () => {
+    const user = userEvent.setup();
+    setup();
+
+    await typeAndSubmit(user, 'not-an-email');
+    await screen.findByRole('alert');
+
+    await user.type(
+      screen.getByRole('textbox', { name: 'Email address' }),
+      'x',
+    );
+
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('clears a server-returned error once the reader edits the email', async () => {
+    subscribeToNewsletterActionMock.mockResolvedValue({
+      outcome: 'already-subscribed',
+    });
+    const user = userEvent.setup();
+    setup();
+
+    await typeAndSubmit(user, 'reader@example.com');
+    await screen.findByRole('alert');
+
+    await user.type(
+      screen.getByRole('textbox', { name: 'Email address' }),
+      'x',
+    );
+
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('shows the error again when an invalid email is submitted a second time', async () => {
+    const user = userEvent.setup();
+    setup();
+
+    await typeAndSubmit(user, 'not-an-email');
+    await screen.findByRole('alert');
+
+    const input = screen.getByRole('textbox', { name: 'Email address' });
+    await user.clear(input);
+    await user.type(input, 'still-not-an-email');
+    await user.click(screen.getByRole('button', { name: 'Subscribe' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Enter a valid email address.',
+    );
+  });
+
   it('forwards headingId to the rendered heading (full variant)', () => {
     setup({ headingId: 'newsletter-module-heading' });
 

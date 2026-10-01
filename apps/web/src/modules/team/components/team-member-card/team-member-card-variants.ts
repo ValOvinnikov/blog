@@ -4,6 +4,7 @@ export const teamMemberCardVariants = tv({
   slots: {
     role: ['text-sm text-subtle'],
     bio: ['text-prose text-sm text-muted'],
+    social: ['mt-auto pt-2'],
   },
 });
 

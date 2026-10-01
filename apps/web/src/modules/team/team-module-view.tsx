@@ -14,6 +14,8 @@ import {
 } from '@web/utils/module-image-sizes';
 import { toModuleGridColumns } from '@web/utils/to-module-grid-columns';
 
+import { teamModuleViewVariants } from './team-module-view-variants';
+
 export interface ITeamModuleViewProps extends TTeamModule {
   titleId: string;
   dataTestId: string;
@@ -40,6 +42,7 @@ export const TeamModuleView = ({
   const baseColumns = toModuleGridColumns(members.length);
   const columns = showBios && baseColumns === 4 ? 3 : baseColumns;
   const s = moduleGridActionsVariants({ align: contentAlignment });
+  const v = teamModuleViewVariants({ columns });
 
   return (
     <Section
@@ -74,7 +77,7 @@ export const TeamModuleView = ({
       ) : (
         <CardGrid
           columns={columns}
-          className={s.grid()}
+          className={v.grid({ class: s.grid() })}
           dataTestId={`${dataTestId}-grid`}
         >
           {members.map((member) => (
