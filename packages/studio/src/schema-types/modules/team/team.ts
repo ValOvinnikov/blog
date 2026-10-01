@@ -20,7 +20,7 @@ export const teamSchema = defineType({
   title: 'Team',
   type: 'document',
   description:
-    'A grid of people shown as cards, each drawn from an existing Person — used to introduce a team, staff, or contributors.',
+    'People drawn from existing Persons, shown as a single spotlight or a set of cards — used to introduce a founder, a team, staff, or contributors.',
   icon: Users,
   fields: [
     titleField(),
