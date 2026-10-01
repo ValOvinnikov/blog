@@ -26,7 +26,7 @@ export type TTestimonialModule = {
   testimonials: TTestimonialItem[];
   ctaButtons: TCtaButton[];
   displayMode: TDisplayMode;
-  cardAlignment: TMaybeUndefined<TContentAlignment>;
+  cardAlignment: TMaybeUndefined<Extract<TContentAlignment, 'LEFT' | 'CENTER'>>;
   contentAlignment: TMaybeUndefined<TContentAlignment>;
   layout: TMaybeUndefined<TLayout>;
 };
