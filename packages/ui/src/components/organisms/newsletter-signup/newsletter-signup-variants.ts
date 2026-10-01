@@ -5,7 +5,7 @@ import type { VariantProps } from 'tailwind-variants';
 export const newsletterSignupVariants = tv({
   slots: {
     root: [],
-    body: ['grid grid-cols-1 p-0', 'md:grid-cols-[1.1fr_1fr]'],
+    body: ['grid grid-cols-1 p-0', '@3xl:grid-cols-[1.1fr_1fr]'],
     pitchPane: ['flex flex-col gap-3 p-8'],
     heading: [
       'font-mono text-card-title font-medium text-brand-primary',
@@ -22,7 +22,7 @@ export const newsletterSignupVariants = tv({
     formPane: [
       'flex flex-col justify-center gap-3',
       'p-8',
-      'border-t border-border md:border-t-0 md:border-l',
+      'border-t border-border @3xl:border-t-0 @3xl:border-l',
     ],
     form: ['flex flex-col gap-3'],
     field: [],
@@ -35,14 +35,16 @@ export const newsletterSignupVariants = tv({
   },
   variants: {
     variant: {
+      // `@container` on root makes the pitch/form split (`body`, `formPane`) respond to the panel's own rendered width rather than the viewport, so a Narrow page container keeps it stacked even on a wide screen.
       full: {
-        root: ['w-full'],
+        root: ['w-full', '@container'],
         submit: ['w-full'],
       },
       compact: {
         root: [
           'flex w-full flex-col gap-2',
-          'sm:inline-flex sm:w-auto sm:flex-row sm:flex-wrap sm:items-center',
+          // Cross-axis start (not center) so a wrapped error line under the field never pushes the heading down from its line-one position.
+          'sm:inline-flex sm:w-auto sm:flex-row sm:flex-wrap sm:items-start',
           'rounded-sm border border-border border-l-3 border-l-brand-primary bg-surface-2',
           'px-3 py-2.5',
         ],
@@ -50,15 +52,27 @@ export const newsletterSignupVariants = tv({
           'flex flex-1 flex-col gap-2',
           'sm:flex-row sm:flex-wrap sm:items-center',
         ],
-        field: ['flex-1 sm:min-w-[12rem]'],
+        field: ['flex-1 sm:min-w-[12rem] sm:max-w-xs'],
         submit: ['shrink-0'],
         alert: ['flex-1'],
       },
     },
     align: {
-      [CONTENT_ALIGNMENT.LEFT]: { pitchPane: ['items-start text-left'] },
-      [CONTENT_ALIGNMENT.CENTER]: { pitchPane: ['items-center text-center'] },
-      [CONTENT_ALIGNMENT.RIGHT]: { pitchPane: ['items-end text-right'] },
+      [CONTENT_ALIGNMENT.LEFT]: {
+        pitchPane: ['items-start text-left'],
+        trustCues: ['items-start', 'md:justify-start'],
+        promptGroup: ['max-sm:self-start'],
+      },
+      [CONTENT_ALIGNMENT.CENTER]: {
+        pitchPane: ['items-center text-center'],
+        trustCues: ['items-center', 'md:justify-center'],
+        promptGroup: ['max-sm:self-center'],
+      },
+      [CONTENT_ALIGNMENT.RIGHT]: {
+        pitchPane: ['items-end text-right'],
+        trustCues: ['items-end', 'md:justify-end'],
+        promptGroup: ['max-sm:self-end'],
+      },
     },
   },
   defaultVariants: { variant: 'full', align: CONTENT_ALIGNMENT.LEFT },

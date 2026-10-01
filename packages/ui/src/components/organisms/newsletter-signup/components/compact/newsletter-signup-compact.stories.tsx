@@ -1,5 +1,7 @@
-import { FORM_STATUSES } from '@blog/config';
+import { CONTENT_ALIGNMENT, FORM_STATUSES } from '@blog/config';
 import { NewsletterSignup } from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup';
+import { newsletterSignupVariants } from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup-variants';
+import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const meta = {
@@ -11,6 +13,10 @@ const meta = {
     status: {
       control: 'select',
       options: FORM_STATUSES,
+    },
+    align: {
+      control: 'select',
+      options: objectKeys(newsletterSignupVariants.variants.align),
     },
   },
   args: {
@@ -56,6 +62,27 @@ export const Error: TStory = {
 
 export const WithoutPrefix: TStory = {
   args: { prefix: undefined },
+};
+
+export const Centered: TStory = {
+  args: { align: CONTENT_ALIGNMENT.CENTER },
+};
+
+export const RightAligned: TStory = {
+  args: { align: CONTENT_ALIGNMENT.RIGHT },
+};
+
+// Mirrors `Section`'s `brandVariant="BRAND_PRIMARY"` band treatment
+// (`bg-brand-primary-muted surface-brand-primary`) so the strip's own
+// opaque surface against that band stays checkable in isolation.
+export const BrandPrimaryBand: TStory = {
+  decorators: [
+    (Story) => (
+      <div className="surface-brand-primary bg-brand-primary-muted p-8">
+        <Story />
+      </div>
+    ),
+  ],
 };
 
 // The root's `flex-col`/`sm:flex-row` stacking is a real `sm:` media-query

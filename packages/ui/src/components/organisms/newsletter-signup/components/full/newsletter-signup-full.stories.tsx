@@ -82,12 +82,46 @@ export const Centered: TStory = {
   args: { align: CONTENT_ALIGNMENT.CENTER, trustCues },
 };
 
-// The pitch/form panes collapse from two columns to one at a real `md:`
-// media-query breakpoint (not a container query), so this story pins the
-// viewport to show the stacked mobile state — same precedent as
+export const RightAligned: TStory = {
+  args: { align: CONTENT_ALIGNMENT.RIGHT, trustCues },
+};
+
+// The pitch/form panes collapse from two columns to one below a `@3xl`
+// container-query threshold on the panel's own rendered width, so this story
+// pins the viewport to show the stacked mobile state — same precedent as
 // `PrimaryNavigation`'s `MobileClosed`/`MobileOpen` stories.
 export const MobilePhone: TStory = {
   globals: { viewport: 'phone' },
+  args: { trustCues },
+};
+
+// Proves the split is a container query, not a viewport breakpoint: at a
+// full desktop viewport, wrapping the panel in the page's Narrow container
+// width (`max-w-prose`, ~65ch — see `CONTAINER_WIDTH.NARROW` in
+// `apps/web`'s `Section`) still keeps pitch above form, because the panel
+// itself never reaches the `@3xl` threshold.
+export const NarrowContainer: TStory = {
+  decorators: [
+    (Story) => (
+      <div className="max-w-prose">
+        <Story />
+      </div>
+    ),
+  ],
+  args: { trustCues },
+};
+
+// Mirrors `Section`'s `brandVariant="BRAND_PRIMARY"` band treatment
+// (`bg-brand-primary-muted surface-brand-primary`) so the panel's own
+// opaque surface against that band stays checkable in isolation.
+export const BrandPrimaryBand: TStory = {
+  decorators: [
+    (Story) => (
+      <div className="surface-brand-primary bg-brand-primary-muted p-8">
+        <Story />
+      </div>
+    ),
+  ],
   args: { trustCues },
 };
 

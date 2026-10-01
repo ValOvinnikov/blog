@@ -83,6 +83,10 @@ export const NewsletterSignupContent = ({
           type={ALERT_TYPE.ERROR}
           message={errorMessage}
           id={errorMessageId}
+          hasIcon={false}
+          // `w-full` (not the shared `flex-1`) so it always wraps onto its own
+          // line under Compact's field/button row instead of squeezing beside them.
+          className={s.alert({ class: 'w-full' })}
         />
       )}
     </form>
