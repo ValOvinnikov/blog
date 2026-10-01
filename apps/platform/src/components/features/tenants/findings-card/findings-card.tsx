@@ -3,7 +3,7 @@ import { Card } from '@platform/components/shared/card';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { formatDate } from '@platform/utils/format-date/format-date';
 import { findingSeverityTone } from '@platform/utils/status-tone/status-tone';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { FindingDetails } from './components/finding-details/finding-details';
 import { findingsCardVariants } from './findings-card-variants';
@@ -12,13 +12,9 @@ export type TFindingsCardProps = {
   findings: TFinding[];
 };
 
-/**
- * This tenant's own open findings — the surface an operator already checks
- * while investigating a specific tenant, distinct from the platform-wide
- * Findings list.
- */
 export const FindingsCard = ({ findings }: TFindingsCardProps) => {
   const t = useTranslations('findingsCard');
+  const locale = useLocale();
   const tSeverity = useTranslations('findingSeverityLabel');
   const tSource = useTranslations('findingSourceLabel');
   const tKind = useTranslations('findingKindLabel');
@@ -51,7 +47,7 @@ export const FindingsCard = ({ findings }: TFindingsCardProps) => {
                   dateTime={finding.lastSeenAt.toISOString()}
                   className={time()}
                 >
-                  {formatDate(finding.lastSeenAt)}
+                  {formatDate(finding.lastSeenAt, locale)}
                 </time>
               </div>
             ))}

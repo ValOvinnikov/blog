@@ -3,7 +3,7 @@ import type { TAuditEvent } from '@blog/db/schema/audit-events';
 import { Card } from '@platform/components/shared/card';
 import { Text } from '@platform/components/shared/text';
 import { formatRelativeTime } from '@platform/utils/format-relative-time/format-relative-time';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { recentActivityCardVariants } from './recent-activity-card-variants';
 
@@ -24,6 +24,7 @@ const ACTIVITY_GLYPH: Record<TAuditAction, string> = {
 
 export const RecentActivityCard = ({ events }: TRecentActivityCardProps) => {
   const t = useTranslations('tenantOverviewPage');
+  const locale = useLocale();
   const {
     activityList,
     activityRow,
@@ -66,7 +67,7 @@ export const RecentActivityCard = ({ events }: TRecentActivityCardProps) => {
                   dateTime={event.createdAt.toISOString()}
                   className={activityTime()}
                 >
-                  {formatRelativeTime(event.createdAt, t)}
+                  {formatRelativeTime(event.createdAt, t, locale)}
                 </time>
               </div>
             ))}

@@ -1,6 +1,6 @@
 import { BannerState } from '@platform/components/shared/banner-state';
 import { formatDate } from '@platform/utils/format-date/format-date';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 export type TArchivedTenantNoticeProps = {
   archivedAt: Date;
@@ -12,6 +12,7 @@ export const ArchivedTenantNotice = ({
   id,
 }: TArchivedTenantNoticeProps) => {
   const t = useTranslations('archivedTenantNotice');
+  const locale = useLocale();
 
   return (
     <BannerState
@@ -19,7 +20,7 @@ export const ArchivedTenantNotice = ({
       tone="warn"
       role="status"
       title={t('title')}
-      description={t('description', { date: formatDate(archivedAt) })}
+      description={t('description', { date: formatDate(archivedAt, locale) })}
       action={null}
     />
   );

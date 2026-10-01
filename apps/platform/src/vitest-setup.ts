@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config';
 import { createTranslator } from 'next-intl';
 
 import '@testing-library/jest-dom/vitest';
@@ -20,6 +21,7 @@ const createLooseTranslator = createTranslator as unknown as (config: {
 
 vi.mock('next-intl/server', () => ({
   setRequestLocale: vi.fn(),
+  getLocale: vi.fn(async () => LOCALE_ISO_CODES.EN),
   getTranslations: vi.fn(async (arg?: TGetTranslationsArg) =>
     createLooseTranslator({
       locale: 'en',

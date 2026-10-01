@@ -5,7 +5,7 @@ import { getDomainVerificationStatus } from '@platform/server/provisioning/get-d
 import { formatDate } from '@platform/utils/format-date/format-date';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getTranslations } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('pageMetadata');
@@ -31,6 +31,7 @@ export default async function TenantOverviewPage({ params }: TProps) {
     ownerMembership,
     auditEvents,
     findings,
+    locale,
   ] = await Promise.all([
     getDomainVerificationStatus(tenant.primaryDomain),
     queries.memberships.getTenantOwnerEmail(tenant.id),
@@ -41,6 +42,7 @@ export default async function TenantOverviewPage({ params }: TProps) {
       { limit: 5 },
     ),
     queries.findings.listFindingsForTenant(tenant.id, FINDING_STATUS.OPEN),
+    getLocale(),
   ]);
 
   return (
@@ -49,7 +51,9 @@ export default async function TenantOverviewPage({ params }: TProps) {
       domainVerificationStatus={domainVerificationStatus}
       ownerEmail={ownerEmail}
       ownerJoinedAt={
-        ownerMembership ? formatDate(ownerMembership.joinedAt) : undefined
+        ownerMembership
+          ? formatDate(ownerMembership.joinedAt, locale)
+          : undefined
       }
       ownerJoinedAtIso={ownerMembership?.joinedAt.toISOString()}
       auditEvents={auditEvents}
