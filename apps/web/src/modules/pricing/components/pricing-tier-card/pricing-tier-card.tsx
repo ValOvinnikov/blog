@@ -51,8 +51,8 @@ export const PricingTierCard = ({ card }: IPricingTierCardProps) => {
             prefix={headline?.prefix}
           />
         ) : null,
-        ...extras.map((extra) => (
-          <PricingCard.Extra key={extra}>{extra}</PricingCard.Extra>
+        ...extras.map((extra, index) => (
+          <PricingCard.Extra key={`extra-${index}`}>{extra}</PricingCard.Extra>
         )),
         features.length > 0 ? (
           <PricingCard.Features key="features" items={features} />

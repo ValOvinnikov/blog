@@ -4,7 +4,7 @@ import { tv } from 'tailwind-variants';
 export const pricingModuleViewVariants = tv({
   slots: {
     grid: ['grid grid-cols-1 gap-4 sm:gap-6 lg:gap-8'],
-    footnote: ['mt-5 max-w-measure text-text-muted'],
+    footnote: ['mt-5 max-w-measure'],
   },
   variants: {
     count: {
