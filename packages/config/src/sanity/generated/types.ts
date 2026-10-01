@@ -591,9 +591,19 @@ export type PricingTier = {
 export type PricingPrice = {
   _type: 'pricingPrice';
   period?: 'ONE_TIME' | 'HOUR' | 'SESSION' | 'MONTH' | 'YEAR';
+  periodLabel?: string;
   amount?: number;
   compareAtAmount?: number;
   isStartingAt?: boolean;
+};
+
+export type PricePeriodLabels = {
+  _type: 'pricePeriodLabels';
+  oneTime?: string;
+  hour?: string;
+  session?: string;
+  month?: string;
+  year?: string;
 };
 
 export type TimelineItem = {
@@ -1007,6 +1017,7 @@ export type Settings_site = {
     | 'ZMW'
     | 'ZWG'
     | 'ZWL';
+  pricePeriodLabels?: PricePeriodLabels;
 };
 
 export type Block_faq = {
@@ -1877,6 +1888,7 @@ export type AllSanitySchemaTypes =
   | ParagraphText
   | PricingTier
   | PricingPrice
+  | PricePeriodLabels
   | TimelineItem
   | Stat
   | PostTakeaways

@@ -3983,6 +3983,13 @@
           },
           "optional": true
         },
+        "periodLabel": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
         "amount": {
           "type": "objectAttribute",
           "value": {
@@ -4001,6 +4008,57 @@
           "type": "objectAttribute",
           "value": {
             "type": "boolean"
+          },
+          "optional": true
+        }
+      }
+    }
+  },
+  {
+    "name": "pricePeriodLabels",
+    "type": "type",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "pricePeriodLabels"
+          }
+        },
+        "oneTime": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "hour": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "session": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "month": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "year": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
           },
           "optional": true
         }
@@ -6275,6 +6333,14 @@
               "value": "ZWL"
             }
           ]
+        },
+        "optional": true
+      },
+      "pricePeriodLabels": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "pricePeriodLabels"
         },
         "optional": true
       }
