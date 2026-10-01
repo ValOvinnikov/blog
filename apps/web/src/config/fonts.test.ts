@@ -2,20 +2,15 @@ import { FONT_CHOICE } from '@blog/config';
 
 import { resolveFontVariableClassName } from './fonts';
 
-vi.mock('next/font/google', () => {
-  const createFontMock = (fontName: string) => () => ({
-    className: `mock-${fontName}-className`,
-    variable: `mock-${fontName}-variable`,
-  });
-
-  return {
-    Space_Grotesk: createFontMock('space-grotesk'),
-    Fraunces: createFontMock('fraunces'),
-    Newsreader: createFontMock('newsreader'),
-    Inter: createFontMock('inter'),
-    JetBrains_Mono: createFontMock('jetbrains-mono'),
-  };
-});
+vi.mock('next/font/local', () => ({
+  default: ({ src }: { src: [{ path: string }, ...{ path: string }[]] }) => {
+    const fontName = src[0].path.replace(/^.*\//, '').replace('.woff2', '');
+    return {
+      className: `mock-${fontName}-className`,
+      variable: `mock-${fontName}-variable`,
+    };
+  },
+}));
 
 describe('resolveFontVariableClassName', () => {
   it('resolves SPACE_GROTESK/NEWSREADER to their own variable classes', () => {
