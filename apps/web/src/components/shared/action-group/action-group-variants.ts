@@ -16,6 +16,11 @@ export const actionGroupVariants = tv({
   },
   compoundVariants: [
     {
+      isOnDark: false,
+      isInline: true,
+      class: ['border-x-0'],
+    },
+    {
       isOnDark: true,
       isInline: false,
       class: ['hover:bg-white/15'],

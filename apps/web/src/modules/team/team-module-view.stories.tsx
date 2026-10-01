@@ -228,3 +228,29 @@ export const SpotlightSquareInitials: TStory = {
     members: [makeTeamMember()],
   },
 };
+
+export const SocialLinksAlignedAcrossRow: TStory = {
+  args: {
+    showBios: true,
+    showSocialLinks: true,
+    members: [
+      { ...members[0]!, bio, socialLinks },
+      {
+        ...members[1]!,
+        bio: [...bio, ...bio, ...bio],
+        socialLinks,
+      },
+      { ...members[2]!, socialLinks },
+    ],
+  },
+};
+
+export const TabletTwoPerRow: TStory = {
+  globals: { viewport: 'tablet' },
+  args: SixMembers.args,
+};
+
+export const TabletCarouselTwoPerView: TStory = {
+  globals: { viewport: 'tablet' },
+  args: { ...SixMembers.args, displayMode: DISPLAY_MODE.CAROUSEL },
+};

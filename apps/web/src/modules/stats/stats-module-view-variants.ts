@@ -3,17 +3,15 @@ import { tv } from 'tailwind-variants';
 
 export const statsModuleViewVariants = tv({
   slots: {
-    grid: ['grid grid-cols-2 divide-x divide-divider'],
-    item: [
-      'flex flex-col gap-1',
-      'px-4 first:pl-0 last:pr-0 sm:px-5 sm:first:pl-0 sm:last:pr-0',
-    ],
+    grid: ['grid grid-cols-1 gap-x-5 gap-y-8 sm:grid-cols-2'],
+    item: ['flex flex-col gap-1', 'border-divider'],
     value: [
       'order-1',
-      'text-[clamp(38px,7vw,56px)] font-bold tracking-tight tabular-nums text-brand-primary',
+      'text-3xl sm:text-4xl lg:text-display',
+      'font-bold tracking-tight tabular-nums text-brand-primary',
     ],
-    label: ['order-2', 'text-sm text-text-muted'],
-    description: ['order-3', 'text-sm text-text-muted'],
+    label: ['order-2', 'text-sm font-medium text-text'],
+    description: ['order-3', 'text-sm text-text'],
     footnote: ['mt-5 max-w-measure'],
   },
   variants: {
@@ -22,6 +20,18 @@ export const statsModuleViewVariants = tv({
       2: { grid: ['lg:grid-cols-2'] },
       3: { grid: ['lg:grid-cols-3'] },
       4: { grid: ['lg:grid-cols-4'] },
+    },
+    hasDividerBelowLg: {
+      true: { item: ['sm:max-lg:border-l sm:max-lg:pl-5'] },
+    },
+    hasDividerFromLg: {
+      true: { item: ['lg:border-l lg:pl-5'] },
+    },
+    isLoneBelowLg: {
+      true: { item: ['sm:max-lg:col-span-2 sm:max-lg:justify-self-center'] },
+    },
+    isLoneFromLg: {
+      true: { item: ['lg:col-span-full lg:justify-self-center'] },
     },
     align: {
       [CONTENT_ALIGNMENT.LEFT]: {
