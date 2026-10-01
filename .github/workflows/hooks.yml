@@ -52,6 +52,9 @@ jobs:
         # the negative cases — see the test file's own header.
         run: sh .claude/hooks/pre-bash-worktree-install-guard.test.sh
 
+      - name: pre-bash-branch-name-guard.sh deny/allow matrix
+        run: sh .claude/hooks/pre-bash-branch-name-guard.test.sh
+
       - name: test-writer-scope-guard.sh deny/allow matrix
         # #459: pins the *.test.ts(x)-only suffix check.
         run: bash .claude/hooks/test-writer-scope-guard.test.sh

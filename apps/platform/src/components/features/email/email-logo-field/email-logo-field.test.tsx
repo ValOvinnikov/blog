@@ -39,10 +39,10 @@ describe(`<${EmailLogoField.name}/>`, () => {
       />,
     );
 
-    expect(screen.getByText('PNG, JPEG, or GIF.')).toBeInTheDocument();
+    expect(screen.getByText('PNG, JPEG, or GIF.')).toBeVisible();
     expect(
       screen.getByRole('button', { name: 'Upload email logo' }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
   });
 
   it('shows the current alt text and the replace label once a value is set', () => {
@@ -57,10 +57,10 @@ describe(`<${EmailLogoField.name}/>`, () => {
       />,
     );
 
-    expect(screen.getByAltText('Current email logo')).toBeInTheDocument();
+    expect(screen.getByAltText('Current email logo')).toBeVisible();
     expect(
       screen.getByRole('button', { name: 'Replace email logo' }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
   });
 
   it('translates an unsupported-type rejection before ever calling the upload action', async () => {

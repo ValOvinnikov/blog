@@ -24,8 +24,6 @@ export const LogoWallModule = async ({ id, tenant }: ILogoWallModuleProps) => {
     });
     return null;
   }
-  if (result.data.logos.length === 0) return null;
-
   return (
     <LogoWallModuleView
       {...result.data}

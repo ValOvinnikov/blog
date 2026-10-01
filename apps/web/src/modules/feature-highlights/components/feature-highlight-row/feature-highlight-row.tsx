@@ -21,10 +21,7 @@ export const FeatureHighlightRow = ({
   mediaSide,
   dataTestId,
 }: IFeatureHighlightRowProps) => {
-  const s = featureHighlightRowVariants({
-    mediaSide,
-    hasImage: Boolean(item.image),
-  });
+  const s = featureHighlightRowVariants({ mediaSide });
 
   return (
     <div
@@ -32,20 +29,18 @@ export const FeatureHighlightRow = ({
       className={s.root()}
       data-testid={dataTestId}
     >
-      {item.image && (
-        <div className={s.media()}>
-          <MediaFrame ratio="classic" dataTestId={`${dataTestId}-media`}>
-            <SanityImage
-              image={item.image}
-              width={800}
-              height={600}
-              sizes="(min-width: 768px) 50vw, 100vw"
-              loading="lazy"
-              className="size-full object-cover"
-            />
-          </MediaFrame>
-        </div>
-      )}
+      <div className={s.media()}>
+        <MediaFrame ratio="classic" dataTestId={`${dataTestId}-media`}>
+          <SanityImage
+            image={item.image}
+            width={800}
+            height={600}
+            sizes="(min-width: 768px) 50vw, 100vw"
+            loading="lazy"
+            className="size-full object-cover"
+          />
+        </MediaFrame>
+      </div>
       <div className={s.text()}>
         <Heading level={3} visual="prose-h3" className={s.heading()}>
           {item.heading}

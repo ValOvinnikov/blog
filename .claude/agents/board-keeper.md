@@ -325,18 +325,65 @@ Each item gives you `id`, `status`, `content.number` (issue #), `content.type`
 (`Issue`/`DraftIssue`/`PullRequest`), and `linked pull requests`. This is your
 board-side truth.
 
+**With one exception: an issue's absence from this listing proves nothing.**
+`item-list` does not return **archived** items, and completed issues on this
+board end up archived while keeping Status `Done` — so every closed issue
+tends to look "not on the board at all". It also drops items that are
+neither closed nor archived: on 2026-09-23 a freshly created, open issue was
+missing from `-L 200` while `node()` resolved its item immediately, and four
+fresh `items(first: 100)` GraphQL pulls omitted a whole range of issue
+numbers while reporting a `totalCount` that included them. Dropping to raw
+GraphQL is therefore not a workaround — the `items` connection is unreliable
+by any access path.
+
+So before concluding an issue has no board item, resolve it directly:
+
+```
+gh api graphql -f query='query {
+  repository(owner: "ValOvinnikov", name: "blog") {
+    issue(number: <n>) {
+      projectItems(first: 10, includeArchived: true) {
+        nodes {
+          id
+          isArchived
+          project { number }
+          fieldValueByName(name: "Status") {
+            ... on ProjectV2ItemFieldSingleSelectValue { name }
+          }
+        }
+      }
+    }
+  }
+}'
+```
+
+`isArchived: true` with Status `Done` means the board is already correct —
+**do nothing.** Archived-and-Done is the resting state for finished work, not
+drift. Only an issue with no item on project 2 at all is genuinely missing.
+
 ## Step 1b — freshly filed issue (only when dispatched with "after filing issue #<n>")
 
 Skip this step entirely for any other trigger.
 
 1. Confirm issue `#<n>` actually appears in the Step 1 query by `content.number`.
-   If it's missing, the orchestrator's `gh project item-add` either wasn't run
-   or failed silently — add it yourself:
+   If it doesn't, **do not `item-add` yet** — run the `projectItems` query from
+   Step 1 first. Only if that returns no item on project 2 did the
+   orchestrator's `gh project item-add` fail to run or fail silently, and only
+   then add it yourself:
+
    ```
    gh project item-add 2 --owner ValOvinnikov --url https://github.com/ValOvinnikov/blog/issues/<n>
    ```
-   Then re-run the Step 1 query and confirm it now appears — same
-   re-verify-every-write discipline as any other fix here.
+
+   Then confirm it landed with the `projectItems` query, not by re-running the
+   Step 1 listing — same re-verify-every-write discipline as any other fix
+   here, and for the same reason the write-verification step below rejects
+   `item-list`.
+
+   Adding an item for an issue that already has one is the damage this guard
+   prevents: it creates a second, duplicate board entry for an issue that was
+   already recorded correctly.
+
 2. Confirm its status is Todo, or In Progress if the orchestrator says work
    already started. A blank status (GitHub Projects doesn't always default a
    new item to the first option) or anything else is drift — set it to Todo
@@ -364,9 +411,10 @@ Skip this step entirely for any other trigger.
    applies and re-verifies a write, then re-query to confirm.
 2. If the orchestrator mentions a parent tracking issue, pull its
    `subIssuesSummary` (same query as Step 3b) and act on what it shows. If
-   the parent doesn't appear in the Step 1 board query at all, add it the
-   same way Step 1b adds a missing freshly-filed issue
-   (`gh project item-add`), then continue. **These conditions aren't
+   the parent doesn't appear in the Step 1 board query at all, treat that as
+   unproven and resolve it the same way Step 1b does — the `projectItems`
+   query first, `gh project item-add` only if it genuinely has no item on
+   project 2 — then continue. **These conditions aren't
    mutually exclusive — check each independently, don't stop at the first
    match** (e.g. a parent that's both still `Todo` and `completed == total`
    needs the promotion applied _and_ the completion flagged, not just one):

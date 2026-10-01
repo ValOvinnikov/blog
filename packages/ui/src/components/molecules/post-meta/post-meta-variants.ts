@@ -4,7 +4,7 @@ export const postMetaVariants = tv({
   slots: {
     root: [
       'flex flex-wrap items-center gap-2',
-      'border-t border-border py-[14px]',
+      'border-t border-divider py-[14px]',
       'font-mono text-label text-subtle',
     ],
     author: ['flex items-center gap-2'],
@@ -13,7 +13,7 @@ export const postMetaVariants = tv({
       'transition-colors duration-base ease-smooth',
       'hover:text-brand-primary',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
-      'focus-visible:ring-offset-2 focus-visible:ring-offset-primary',
+      'focus-visible:ring-offset-2 focus-visible:ring-offset-ambient',
     ],
     share: ['ml-auto'],
   },

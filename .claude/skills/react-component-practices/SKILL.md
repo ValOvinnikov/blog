@@ -85,6 +85,44 @@ them repeat what is here. Tests for these components follow
 - A list that renders hundreds of rows gets pagination or virtualisation in
   the design, not a memo on the row.
 
+### Vercel's React rules — which apply here
+
+The `vercel:react-best-practices` plugin skill holds Vercel's performance
+rules for React and Next.js, one file per rule. Load it for performance work
+in `apps/web` or `apps/platform` — a slow route, a request waterfall, a
+heavy client bundle, a re-render problem — and when reviewing a Server
+Component that fetches. Where it disagrees with this repo, this repo wins.
+
+Apply as written:
+
+- **Waterfalls** — `async-parallel`, `async-defer-await`,
+  `async-suspense-boundaries`, `server-parallel-fetching`: independent
+  fetches start together, and a slow one streams behind its own `Suspense`
+  instead of blocking the route.
+- **The RSC boundary** — `server-serialization`, `server-dedup-props`: pass a
+  client component only the fields it renders, never a whole service result.
+- **Server work** — `server-cache-react` for a lookup several components on
+  one request make, `server-after-nonblocking` for logging or side effects
+  the response doesn't wait on, `server-auth-actions` for every Server Action
+  in either app.
+- **Client bundle** — `bundle-dynamic-imports`, `bundle-defer-third-party`.
+- **Re-renders that are really design** — `rerender-derived-state-no-effect`,
+  `rerender-no-inline-components`, `rerender-move-effect-to-event`,
+  `rerender-lazy-state-init`.
+
+Overridden here:
+
+- **Every memo rule** (`rerender-memo`, `rerender-memo-with-default-value`,
+  `rerender-simple-expression-in-memo`) — the measurement rule above still
+  applies. A Vercel rule is not the measurement.
+- **`bundle-barrel-imports`** — the `@blog/ui` barrel is that package's
+  public API; import from `@blog/ui`, never a deep path into it. The rule
+  still applies to barrels inside `apps/web` and `apps/platform`, where one
+  can pull `server-only` code into the client graph.
+- **`server-cache-lru`** — caching across requests goes through Next's cache
+  (`vercel:next-cache-components`) in either app, never a module-level cache.
+- **`client-swr-dedup`** — this repo doesn't use SWR.
+
 ## Accessible by construction
 
 - Every clickable thing is a `<button>` (action) or an `<a>`/`Link`

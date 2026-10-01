@@ -1,22 +1,16 @@
 import { PRESET_ID, PRESET_REGISTRY } from '@blog/config/constants';
+import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 
 import { saveVoiceOverridesAction } from './save-voice-overrides-action';
 
-const {
-  requireTenantMembershipMock,
-  getSiteConfigMock,
-  upsertSiteConfigMock,
-  revalidateSiteConfigMock,
-} = vi.hoisted(() => ({
-  requireTenantMembershipMock: vi.fn(),
-  getSiteConfigMock: vi.fn(),
-  upsertSiteConfigMock: vi.fn(),
-  revalidateSiteConfigMock: vi.fn(),
-}));
+const { getSiteConfigMock, upsertSiteConfigMock, revalidateSiteConfigMock } =
+  vi.hoisted(() => ({
+    getSiteConfigMock: vi.fn(),
+    upsertSiteConfigMock: vi.fn(),
+    revalidateSiteConfigMock: vi.fn(),
+  }));
 
-vi.mock('@platform/server/auth/require-tenant-membership', () => ({
-  requireTenantMembership: requireTenantMembershipMock,
-}));
+vi.mock('@platform/server/auth/require-tenant-membership');
 
 vi.mock('@platform/server/site-config/revalidate-site-config', () => ({
   revalidateSiteConfig: revalidateSiteConfigMock,
@@ -30,6 +24,10 @@ vi.mock('@blog/db', () => ({
     },
   },
 }));
+
+const requireTenantMembershipMock = vi.mocked<
+  (tenantId: string) => Promise<unknown>
+>(requireTenantMembership);
 
 const tenant = { id: 'tenant-1' };
 
@@ -57,7 +55,7 @@ describe(saveVoiceOverridesAction, () => {
     });
   });
 
-  it('resolves the tenant from the session-checked membership, never trusting a client-supplied id on its own', async () => {
+  it('resolves the tenant from the checked membership, never a bare client-supplied id', async () => {
     getSiteConfigMock.mockResolvedValue(undefined);
     upsertSiteConfigMock.mockResolvedValue({ ok: true });
 
@@ -71,7 +69,7 @@ describe(saveVoiceOverridesAction, () => {
     );
   });
 
-  it('falls back to the CONSOLE preset defaults when the tenant has no site_config row yet', async () => {
+  it('falls back to CONSOLE preset defaults when the tenant has no site_config row', async () => {
     getSiteConfigMock.mockResolvedValue(undefined);
     upsertSiteConfigMock.mockResolvedValue({ ok: true });
 
@@ -92,7 +90,7 @@ describe(saveVoiceOverridesAction, () => {
     });
   });
 
-  it("round-trips the tenant's existing theme fields unchanged so a Voice save never resets Look", async () => {
+  it('round-trips the existing theme fields so a Voice save never resets Look', async () => {
     getSiteConfigMock.mockResolvedValue({
       preset: PRESET_ID.EDITORIAL,
       accentHue: 28,

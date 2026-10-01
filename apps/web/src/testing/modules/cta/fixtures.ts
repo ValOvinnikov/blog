@@ -1,9 +1,12 @@
 import {
+  BRAND_VARIANT,
   CTA_ACTION_APPEARANCE,
   CTA_ACTION_VARIANT,
+  CTA_VARIANT,
   type TPortableTextBlock,
 } from '@blog/config';
-import type { TCtaButton } from '@blog/service';
+import type { TCtaButton, TCtaModule } from '@blog/service';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
   portableTextBlock,
   portableTextSpan,
@@ -47,3 +50,22 @@ export const ctaContentDemo: TPortableTextBlock[] = [
     listItem: 'bullet',
   }),
 ];
+
+export const makeCtaModuleData = (
+  overrides: Partial<TCtaModule> = {},
+): TCtaModule => ({
+  variant: CTA_VARIANT.CALLOUT,
+  brandVariant: BRAND_VARIANT.PRIMARY,
+  bandTone: BRAND_VARIANT.SECONDARY,
+  eyebrow: undefined,
+  headingBlock: makeHeadingBlock({ heading: 'Get started' }),
+  content: undefined,
+  image: undefined,
+  contentPosition: undefined,
+  contentAlignment: undefined,
+  mobileMediaOrder: undefined,
+  ctaButtons: [],
+  footnote: undefined,
+  layout: undefined,
+  ...overrides,
+});

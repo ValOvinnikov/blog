@@ -1,7 +1,8 @@
 import { NEWSLETTER_VARIANT } from '@blog/config';
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
-import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { moduleLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { z } from 'zod';
 
 const NEWSLETTER_VARIANT_EXPRESSION = `coalesce(variant, "${NEWSLETTER_VARIANT.FULL}")`;
@@ -22,7 +23,7 @@ export const newsletterModuleQuery = q
       .project(headingBlockFragment)
       .notNull(),
     variant: sub.raw(NEWSLETTER_VARIANT_EXPRESSION, newsletterVariantParser),
-    layout: sub.field('layout').project(layoutFragment).nullable(true),
-    contentAlignment: sub.field('contentAlignment').nullable(true),
+    ...moduleLayoutFragment,
+    ...moduleContentAlignmentFragment,
   }))
   .notNull();

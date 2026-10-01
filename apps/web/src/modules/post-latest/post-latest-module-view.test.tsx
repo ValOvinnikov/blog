@@ -1,20 +1,11 @@
 import { BRAND_VARIANT, DISPLAY_MODE } from '@blog/config';
-import { customRender, screen } from '@web/testing/custom-render';
+import { customRender, screen, within } from '@web/testing/custom-render';
 import { makePostListItem } from '@web/testing/modules/post-list/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { PostLatestModuleView } from './post-latest-module-view';
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
-
-const { CardCarousel } = vi.hoisted(() => ({
-  CardCarousel: vi.fn(() => <div data-testid="card-carousel-stub" />),
-}));
-
-vi.mock('@web/components/shared/card-carousel', () => ({ CardCarousel }));
+vi.mock('@web/i18n/navigation');
 
 const post = makePostListItem();
 
@@ -43,9 +34,7 @@ describe(`<${PostLatestModuleView.name}/>`, () => {
       'data-testid',
       'post-latest-module-post-latest-1',
     );
-    expect(
-      screen.getByRole('region', { name: 'Latest posts' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Latest posts' })).toBeVisible();
   });
 
   it('renders a card per item, linked to its href', () => {
@@ -55,7 +44,7 @@ describe(`<${PostLatestModuleView.name}/>`, () => {
     expect(link).toHaveAttribute('href', post.href);
     expect(
       screen.getByRole('heading', { level: 3, name: post.title }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
   });
 
   it('never renders a pagination nav', () => {
@@ -76,24 +65,29 @@ describe(`<${PostLatestModuleView.name}/>`, () => {
       items: [{ ...post, image: <div data-testid="post-image" /> }],
     });
 
-    expect(screen.getByTestId('media-card-media')).toBeInTheDocument();
-    expect(screen.getByTestId('post-image')).toBeInTheDocument();
+    expect(screen.getByTestId('media-card-media')).toBeVisible();
+    expect(screen.getByTestId('post-image')).toBeVisible();
   });
 
-  it('renders CardCarousel with the view items when displayMode is CAROUSEL', () => {
-    setup({ displayMode: DISPLAY_MODE.CAROUSEL });
+  it('renders the items as a labelled carousel when displayMode is CAROUSEL', async () => {
+    const secondPost = makePostListItem({ id: 'post-2', title: 'Second post' });
+    setup({ items: [post, secondPost], displayMode: DISPLAY_MODE.CAROUSEL });
 
-    expect(screen.getByTestId('card-carousel-stub')).toBeInTheDocument();
-    expect(CardCarousel).toHaveBeenCalledWith(
-      expect.objectContaining({ items: [post] }),
-      undefined,
-    );
-    expect(screen.queryByRole('article')).not.toBeInTheDocument();
+    const region = screen.getByRole('region', {
+      name: 'Latest posts carousel',
+    });
+    expect(within(region).getAllByRole('article')).toHaveLength(2);
+    expect(
+      await screen.findByRole('button', { name: 'Previous slide' }),
+    ).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Next slide' })).toBeVisible();
   });
 
-  it('never renders CardCarousel when displayMode is GRID', () => {
+  it('renders no carousel when displayMode is GRID', () => {
     setup();
 
-    expect(CardCarousel).not.toHaveBeenCalled();
+    expect(
+      screen.queryByRole('region', { name: 'Latest posts carousel' }),
+    ).not.toBeInTheDocument();
   });
 });

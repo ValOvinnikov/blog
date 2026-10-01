@@ -1,18 +1,17 @@
+import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { redirect } from 'next/navigation';
+import type { Session } from 'next-auth';
 
 import TenantByIdLayout from './layout';
 
-const { authMock, getAdminByUserIdMock, getTenantByIdMock } = vi.hoisted(
-  () => ({
-    authMock: vi.fn(),
-    getAdminByUserIdMock: vi.fn(),
-    getTenantByIdMock: vi.fn(),
-  }),
-);
+const { getAdminByUserIdMock, getTenantByIdMock } = vi.hoisted(() => ({
+  getAdminByUserIdMock: vi.fn(),
+  getTenantByIdMock: vi.fn(),
+}));
 
-vi.mock('@platform/server/auth/auth', () => ({ auth: authMock }));
+vi.mock('@platform/server/auth/auth');
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
@@ -21,6 +20,8 @@ vi.mock('@blog/db', async () => ({
     tenants: { getTenantById: getTenantByIdMock },
   },
 }));
+
+const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 const setup = customRenderAsync(TenantByIdLayout, {
   params: Promise.resolve({ tenantId: 'tenant-1' }),
@@ -43,7 +44,7 @@ describe(`<${TenantByIdLayout.name}/>`, () => {
     expect(getTenantByIdMock).not.toHaveBeenCalled();
   });
 
-  it('404s when the signed-in user has no admins row — this is what keeps the operator-only Studio route ungated by URL alone', async () => {
+  it('404s when the signed-in user has no admins row', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue(undefined);
 
@@ -65,7 +66,7 @@ describe(`<${TenantByIdLayout.name}/>`, () => {
     await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
   });
 
-  it('renders the gated content bare, with no AdminShell chrome, for a platform operator', async () => {
+  it('renders the gated content bare, with no AdminShell chrome, for an operator', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue({
       id: 'admin-1',

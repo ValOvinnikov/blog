@@ -1,13 +1,12 @@
+import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
+
 import { getTenantPlan } from './get-tenant-plan';
 
-const { getRequestTenantIdMock, listTenantsByIdsMock } = vi.hoisted(() => ({
-  getRequestTenantIdMock: vi.fn(),
+const { listTenantsByIdsMock } = vi.hoisted(() => ({
   listTenantsByIdsMock: vi.fn(),
 }));
 
-vi.mock('@web/server/tenant/get-request-tenant-id', () => ({
-  getRequestTenantId: getRequestTenantIdMock,
-}));
+vi.mock('@web/server/tenant/get-request-tenant-id');
 
 vi.mock('@blog/db', () => ({
   queries: {
@@ -23,6 +22,8 @@ vi.mock('next/cache', () => ({
 
 const TENANT_A_ID = 'tenant-a';
 const TENANT_B_ID = 'tenant-b';
+
+const getRequestTenantIdMock = vi.mocked(getRequestTenantId);
 
 describe(getTenantPlan, () => {
   beforeEach(() => {
@@ -42,7 +43,7 @@ describe(getTenantPlan, () => {
     expect(listTenantsByIdsMock).toHaveBeenCalledWith([TENANT_A_ID]);
   });
 
-  it('returns ok:true with undefined data when the request has no resolvable tenant', async () => {
+  it('returns ok:true with undefined data when no tenant resolves', async () => {
     getRequestTenantIdMock.mockResolvedValue(undefined);
 
     const result = await getTenantPlan();
@@ -71,7 +72,7 @@ describe(getTenantPlan, () => {
     expect(result.ok).toBe(false);
   });
 
-  it("resolves each request's own tenant's plan rather than a shared one", async () => {
+  it("resolves each request's own tenant's plan", async () => {
     listTenantsByIdsMock.mockImplementation((ids: string[]) => {
       const [id] = ids;
       return [{ id, plan: id === TENANT_A_ID ? 'GROWTH' : 'STARTER' }];
@@ -87,7 +88,7 @@ describe(getTenantPlan, () => {
     expect(resultB).toEqual({ ok: true, data: 'STARTER' });
   });
 
-  it("propagates the header read's dynamic-rendering signal rather than reporting it as a fetch failure", async () => {
+  it("rethrows the header read's dynamic-rendering signal", async () => {
     const dynamicSignal = Object.assign(
       new Error(
         "Dynamic server usage: Route /[tenant]/[locale] couldn't be rendered statically because it used `headers`",

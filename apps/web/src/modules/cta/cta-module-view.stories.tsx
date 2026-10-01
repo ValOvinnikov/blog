@@ -3,8 +3,10 @@ import {
   CONTENT_ALIGNMENT,
   CTA_VARIANT,
   MEDIA_ORDER,
+  SPACING_SCALE,
 } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { Section } from '@web/components/shared/section';
 import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
@@ -90,4 +92,41 @@ export const Banner: TStory = {
     contentPosition: CONTENT_ALIGNMENT.CENTER,
     contentAlignment: CONTENT_ALIGNMENT.CENTER,
   },
+};
+
+export const BannerBetweenSecondarySectionsSpacingNone: TStory = {
+  args: {
+    variant: CTA_VARIANT.BANNER,
+    brandVariant: BRAND_VARIANT.SECONDARY,
+    bandTone: BRAND_VARIANT.SECONDARY,
+    image: makeSanityImage(),
+    contentPosition: CONTENT_ALIGNMENT.CENTER,
+    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    layout: {
+      spacingTop: SPACING_SCALE.NONE,
+      spacingBottom: SPACING_SCALE.NONE,
+    },
+  },
+  render: (args) => (
+    <>
+      <Section brandVariant={BRAND_VARIANT.SECONDARY}>
+        <p>Section above the banner</p>
+      </Section>
+      <CtaModuleView {...args} />
+      <Section brandVariant={BRAND_VARIANT.SECONDARY}>
+        <p>Section below the banner</p>
+      </Section>
+    </>
+  ),
+};
+
+export const BannerBetweenSecondarySectionsSpacingXl: TStory = {
+  args: {
+    ...BannerBetweenSecondarySectionsSpacingNone.args,
+    layout: {
+      spacingTop: SPACING_SCALE.XL,
+      spacingBottom: SPACING_SCALE.XL,
+    },
+  },
+  render: BannerBetweenSecondarySectionsSpacingNone.render,
 };

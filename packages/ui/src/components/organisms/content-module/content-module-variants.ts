@@ -4,7 +4,7 @@ import type { VariantProps } from 'tailwind-variants';
 export const contentModuleVariants = tv({
   slots: {
     root: ['mt-[22px]'],
-    body: ['max-w-prose'],
+    body: ['max-w-measure', 'text-prose'],
   },
   variants: {
     wrapped: {

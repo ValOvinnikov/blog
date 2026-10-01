@@ -27,6 +27,7 @@ const meta = {
           <img
             src="https://picsum.photos/seed/designsystem/800/450"
             alt="Abstract design elements on a dark background"
+            className="size-full object-cover"
           />
         </MediaCard.Media>
         <MediaCard.Meta
@@ -164,6 +165,14 @@ export const LeadSplit: TStory = {
   },
 };
 
+export const SplitWithoutExcerpt: TStory = {
+  args: {
+    isSplit: true,
+    excerpt: undefined,
+    tags: undefined,
+  },
+};
+
 export const WithAuthorFooter: TStory = {
   args: {
     children: (
@@ -192,6 +201,27 @@ export const WideMedia: TStory = {
           <img
             src="https://picsum.photos/seed/wide/800/450"
             alt="Abstract design elements on a dark background"
+          />
+        </MediaCard.Media>
+        <MediaCard.Title level={3}>
+          <a href="/posts/building-a-design-system">
+            Building a Design System from Scratch
+          </a>
+        </MediaCard.Title>
+      </>
+    ),
+  },
+};
+
+export const WideFlatMedia: TStory = {
+  args: {
+    children: (
+      <>
+        <MediaCard.Media shape="wideFlat">
+          <img
+            src="https://picsum.photos/seed/wideflat/1200/600"
+            alt="Abstract design elements on a dark background"
+            className="size-full object-cover"
           />
         </MediaCard.Media>
         <MediaCard.Title level={3}>
@@ -252,6 +282,23 @@ export const IconMedia: TStory = {
       <>
         <MediaCard.Media shape="icon">
           <Icon name={ICONS.ROCKET} size={SIZE.MD} />
+        </MediaCard.Media>
+        <MediaCard.Title level={3}>
+          <a href="/features/design-system">Built for speed</a>
+        </MediaCard.Title>
+      </>
+    ),
+  },
+};
+
+export const IconPanelMedia: TStory = {
+  args: {
+    excerpt: 'Ship features faster with a shared, token-driven component set.',
+    tags: undefined,
+    children: (
+      <>
+        <MediaCard.Media shape="wide" iconPanel={true}>
+          <Icon name={ICONS.ROCKET} size={SIZE.LG} />
         </MediaCard.Media>
         <MediaCard.Title level={3}>
           <a href="/features/design-system">Built for speed</a>

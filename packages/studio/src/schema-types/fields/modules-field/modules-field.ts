@@ -1,3 +1,4 @@
+import { sortModulesByTitle } from '@blog/studio/schema-types/fields/modules-field/sort-modules-by-title';
 import { defineArrayMember, defineField } from 'sanity';
 
 type TModuleReference = { _type?: string; _key?: string };
@@ -27,7 +28,7 @@ export const modulesField = ({
     title: 'Modules',
     type: 'array',
     description: description ?? 'Ordered content modules that build this page.',
-    of: allow.map((type) =>
+    of: sortModulesByTitle(allow).map((type) =>
       defineArrayMember({ name: type, type: 'reference', to: [{ type }] }),
     ),
     validation: (rule) => {

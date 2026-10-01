@@ -1,15 +1,16 @@
+import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
+
 import { getBookmarkStatus, setBookmarkStatus } from './bookmark-actions';
 
 const {
   authMock,
-  getRequestTenantIdMock,
+
   isTenantActiveMock,
   isBookmarkedMock,
   addBookmarkMock,
   removeBookmarkMock,
 } = vi.hoisted(() => ({
   authMock: vi.fn(),
-  getRequestTenantIdMock: vi.fn(),
   isTenantActiveMock: vi.fn(),
   isBookmarkedMock: vi.fn(),
   addBookmarkMock: vi.fn(),
@@ -18,9 +19,7 @@ const {
 
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
 
-vi.mock('@web/server/tenant/get-request-tenant-id', () => ({
-  getRequestTenantId: getRequestTenantIdMock,
-}));
+vi.mock('@web/server/tenant/get-request-tenant-id');
 
 vi.mock('@web/server/tenant/is-tenant-active', () => ({
   isTenantActive: isTenantActiveMock,
@@ -35,6 +34,8 @@ vi.mock('@blog/db', () => ({
     },
   },
 }));
+
+const getRequestTenantIdMock = vi.mocked(getRequestTenantId);
 
 const TENANT_ID = 'tenant-1';
 

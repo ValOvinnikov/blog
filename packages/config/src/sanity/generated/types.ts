@@ -36,7 +36,7 @@ export type Module_pricing = {
     } & CtaButton
   >;
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
-  layout?: Layout;
+  layout?: WideLayout;
 };
 
 export type HeadingBlock = {
@@ -83,7 +83,13 @@ export type Module_cta = {
   contentPositionSplit?: 'LEFT' | 'RIGHT';
   contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
   mobileMediaOrder?: 'LAST' | 'FIRST';
-  layout?: Layout;
+  layout?: {
+    spacingTop?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+    spacingBottom?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+    containerWidth?: 'NARROW' | 'WIDE' | 'FULL';
+    dividerTop?: boolean;
+    dividerBottom?: boolean;
+  };
 };
 
 export type ListedText = Array<{
@@ -226,7 +232,7 @@ export type Module_stats = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
   headingBlock?: HeadingBlock;
   stats?: Array<
     {
@@ -240,7 +246,7 @@ export type Module_stats = {
     } & CtaButton
   >;
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
-  layout?: Layout;
+  layout?: WideLayout;
 };
 
 export type PersonReference = {
@@ -274,8 +280,8 @@ export type Module_team = {
       _key: string;
     } & CtaButton
   >;
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
-  layout?: Layout;
+  contentAlignment?: 'LEFT' | 'CENTER';
+  layout?: WideLayout;
 };
 
 export type Block_testimonialReference = {
@@ -307,7 +313,7 @@ export type Module_testimonial = {
   displayMode?: 'GRID' | 'CAROUSEL';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   cardAlignment?: 'LEFT' | 'CENTER';
-  layout?: Layout;
+  layout?: WideLayout;
 };
 
 export type Module_logoWall = {
@@ -330,8 +336,17 @@ export type Module_logoWall = {
     } & CtaButton
   >;
   displayMode?: 'GRID' | 'CAROUSEL';
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  contentAlignment?: 'LEFT' | 'CENTER';
   layout?: Layout;
+};
+
+export type Layout = {
+  _type: 'layout';
+  spacingTop?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  spacingBottom?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  containerWidth?: 'NARROW' | 'WIDE' | 'FULL';
+  dividerTop?: boolean;
+  dividerBottom?: boolean;
 };
 
 export type Module_featureHighlights = {
@@ -355,7 +370,7 @@ export type Module_featureHighlights = {
   >;
   mediaOrder?: 'LAST' | 'FIRST';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
-  layout?: Layout;
+  layout?: WideLayout;
 };
 
 export type Block_featureReference = {
@@ -386,9 +401,9 @@ export type Module_featureList = {
   >;
   imageShape?: 'WIDE' | 'SQUARE' | 'CIRCLE';
   displayMode?: 'GRID' | 'CAROUSEL';
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  contentAlignment?: 'LEFT' | 'CENTER';
   cardAlignment?: 'LEFT' | 'CENTER';
-  layout?: Layout;
+  layout?: WideLayout;
 };
 
 export type Module_postRelated = {
@@ -403,7 +418,7 @@ export type Module_postRelated = {
   limit?: number;
   showImages?: boolean;
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
-  layout?: Layout;
+  layout?: WideLayout;
 };
 
 export type Page_postReference = {
@@ -431,8 +446,8 @@ export type Module_postFeatured = {
   limit?: number;
   showImages?: boolean;
   displayMode?: 'GRID' | 'CAROUSEL';
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
-  layout?: Layout;
+  contentAlignment?: 'LEFT' | 'CENTER';
+  layout?: WideLayout;
 };
 
 export type Module_postLatest = {
@@ -448,7 +463,7 @@ export type Module_postLatest = {
   showImages?: boolean;
   displayMode?: 'GRID' | 'CAROUSEL';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
-  layout?: Layout;
+  layout?: WideLayout;
 };
 
 export type Module_postList = {
@@ -463,7 +478,7 @@ export type Module_postList = {
   pageSize?: number;
   showImages?: boolean;
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
-  layout?: Layout;
+  layout?: WideLayout;
 };
 
 export type Module_hero = {
@@ -569,7 +584,6 @@ export type PricingTier = {
       _key: string;
     } & CtaButton
   >;
-  isHighlighted?: boolean;
   highlightLabel?: string;
   footnote?: string;
 };
@@ -685,6 +699,13 @@ export type LogoItem = {
     crop?: SanityImageCrop;
     _type: 'image';
   };
+  imageDark?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: 'image';
+  };
   link?: LinkReference;
 };
 
@@ -725,19 +746,19 @@ export type BodyImage = {
   layout?: 'INLINE' | 'FULL_BLEED' | 'FLOAT_LEFT' | 'FLOAT_RIGHT';
 };
 
-export type HeroLayout = {
-  _type: 'heroLayout';
+export type WideLayout = {
+  _type: 'wideLayout';
   spacingTop?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
   spacingBottom?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  containerWidth?: 'WIDE' | 'FULL';
   dividerTop?: boolean;
   dividerBottom?: boolean;
 };
 
-export type Layout = {
-  _type: 'layout';
+export type HeroLayout = {
+  _type: 'heroLayout';
   spacingTop?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
   spacingBottom?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
-  containerWidth?: 'NARROW' | 'WIDE' | 'FULL';
   dividerTop?: boolean;
   dividerBottom?: boolean;
 };
@@ -1139,11 +1160,11 @@ export type Module_heroBlogReference = {
   [internalGroqTypeReferenceTo]?: 'module_heroBlog';
 };
 
-export type Module_taxonomyListReference = {
+export type Module_ctaReference = {
   _ref: string;
   _type: 'reference';
   _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'module_taxonomyList';
+  [internalGroqTypeReferenceTo]?: 'module_cta';
 };
 
 export type Module_postLatestReference = {
@@ -1153,18 +1174,18 @@ export type Module_postLatestReference = {
   [internalGroqTypeReferenceTo]?: 'module_postLatest';
 };
 
-export type Module_ctaReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'module_cta';
-};
-
 export type Module_newsletterReference = {
   _ref: string;
   _type: 'reference';
   _weak?: boolean;
   [internalGroqTypeReferenceTo]?: 'module_newsletter';
+};
+
+export type Module_taxonomyListReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_taxonomyList';
 };
 
 export type Page_tagIndex = {
@@ -1179,16 +1200,16 @@ export type Page_tagIndex = {
   modules?: Array<
     | ({
         _key: string;
-      } & Module_taxonomyListReference)
+      } & Module_ctaReference)
     | ({
         _key: string;
       } & Module_postLatestReference)
     | ({
         _key: string;
-      } & Module_ctaReference)
+      } & Module_newsletterReference)
     | ({
         _key: string;
-      } & Module_newsletterReference)
+      } & Module_taxonomyListReference)
   >;
   seo?: Seo;
   taxonomyList?: Module_taxonomyListReference;
@@ -1222,16 +1243,16 @@ export type Page_tag = {
   modules?: Array<
     | ({
         _key: string;
-      } & Module_postListReference)
+      } & Module_ctaReference)
     | ({
         _key: string;
       } & Module_postLatestReference)
     | ({
         _key: string;
-      } & Module_ctaReference)
+      } & Module_newsletterReference)
     | ({
         _key: string;
-      } & Module_newsletterReference)
+      } & Module_postListReference)
     | ({
         _key: string;
       } & Module_taxonomyListReference)
@@ -1268,16 +1289,16 @@ export type Page_topicIndex = {
   modules?: Array<
     | ({
         _key: string;
-      } & Module_taxonomyListReference)
+      } & Module_ctaReference)
     | ({
         _key: string;
       } & Module_postLatestReference)
     | ({
         _key: string;
-      } & Module_ctaReference)
+      } & Module_newsletterReference)
     | ({
         _key: string;
-      } & Module_newsletterReference)
+      } & Module_taxonomyListReference)
   >;
   seo?: Seo;
   taxonomyList?: Module_taxonomyListReference;
@@ -1297,7 +1318,7 @@ export type Module_taxonomyList = {
   limit?: number;
   showLatestPosts?: boolean;
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
-  layout?: Layout;
+  layout?: WideLayout;
 };
 
 export type Page_topic = {
@@ -1314,16 +1335,16 @@ export type Page_topic = {
   modules?: Array<
     | ({
         _key: string;
-      } & Module_postListReference)
+      } & Module_ctaReference)
     | ({
         _key: string;
       } & Module_postLatestReference)
     | ({
         _key: string;
-      } & Module_ctaReference)
+      } & Module_newsletterReference)
     | ({
         _key: string;
-      } & Module_newsletterReference)
+      } & Module_postListReference)
     | ({
         _key: string;
       } & Module_taxonomyListReference)
@@ -1350,28 +1371,21 @@ export type Page_postIndex = {
   modules?: Array<
     | ({
         _key: string;
-      } & Module_postListReference)
-    | ({
-        _key: string;
       } & Module_ctaReference)
-    | ({
-        _key: string;
-      } & Module_newsletterReference)
     | ({
         _key: string;
       } & Module_postFeaturedReference)
     | ({
         _key: string;
+      } & Module_newsletterReference)
+    | ({
+        _key: string;
+      } & Module_postListReference)
+    | ({
+        _key: string;
       } & Module_taxonomyListReference)
   >;
   seo?: Seo;
-};
-
-export type Module_heroStatementReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'module_heroStatement';
 };
 
 export type Module_heroProfileReference = {
@@ -1381,60 +1395,18 @@ export type Module_heroProfileReference = {
   [internalGroqTypeReferenceTo]?: 'module_heroProfile';
 };
 
+export type Module_heroStatementReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_heroStatement';
+};
+
 export type Module_contentReference = {
   _ref: string;
   _type: 'reference';
   _weak?: boolean;
   [internalGroqTypeReferenceTo]?: 'module_content';
-};
-
-export type Module_featureListReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'module_featureList';
-};
-
-export type Module_featureHighlightsReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'module_featureHighlights';
-};
-
-export type Module_logoWallReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'module_logoWall';
-};
-
-export type Module_testimonialReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'module_testimonial';
-};
-
-export type Module_teamReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'module_team';
-};
-
-export type Module_statsReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'module_stats';
-};
-
-export type Module_timelineReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'module_timeline';
 };
 
 export type Module_faqReference = {
@@ -1444,11 +1416,60 @@ export type Module_faqReference = {
   [internalGroqTypeReferenceTo]?: 'module_faq';
 };
 
+export type Module_featureHighlightsReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_featureHighlights';
+};
+
+export type Module_featureListReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_featureList';
+};
+
+export type Module_logoWallReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_logoWall';
+};
+
 export type Module_pricingReference = {
   _ref: string;
   _type: 'reference';
   _weak?: boolean;
   [internalGroqTypeReferenceTo]?: 'module_pricing';
+};
+
+export type Module_statsReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_stats';
+};
+
+export type Module_teamReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_team';
+};
+
+export type Module_testimonialReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_testimonial';
+};
+
+export type Module_timelineReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_timeline';
 };
 
 export type Page_landing = {
@@ -1462,54 +1483,54 @@ export type Page_landing = {
   headingBlock?: HeadingBlock;
   hero?:
     | Module_heroBlogReference
-    | Module_heroStatementReference
-    | Module_heroProfileReference;
+    | Module_heroProfileReference
+    | Module_heroStatementReference;
   modules?: Array<
-    | ({
-        _key: string;
-      } & Module_contentReference)
     | ({
         _key: string;
       } & Module_ctaReference)
     | ({
         _key: string;
-      } & Module_postLatestReference)
-    | ({
-        _key: string;
-      } & Module_postFeaturedReference)
-    | ({
-        _key: string;
-      } & Module_newsletterReference)
-    | ({
-        _key: string;
-      } & Module_taxonomyListReference)
-    | ({
-        _key: string;
-      } & Module_featureListReference)
-    | ({
-        _key: string;
-      } & Module_featureHighlightsReference)
-    | ({
-        _key: string;
-      } & Module_logoWallReference)
-    | ({
-        _key: string;
-      } & Module_testimonialReference)
-    | ({
-        _key: string;
-      } & Module_teamReference)
-    | ({
-        _key: string;
-      } & Module_statsReference)
-    | ({
-        _key: string;
-      } & Module_timelineReference)
+      } & Module_contentReference)
     | ({
         _key: string;
       } & Module_faqReference)
     | ({
         _key: string;
+      } & Module_featureHighlightsReference)
+    | ({
+        _key: string;
+      } & Module_postFeaturedReference)
+    | ({
+        _key: string;
+      } & Module_featureListReference)
+    | ({
+        _key: string;
+      } & Module_postLatestReference)
+    | ({
+        _key: string;
+      } & Module_logoWallReference)
+    | ({
+        _key: string;
+      } & Module_newsletterReference)
+    | ({
+        _key: string;
       } & Module_pricingReference)
+    | ({
+        _key: string;
+      } & Module_statsReference)
+    | ({
+        _key: string;
+      } & Module_taxonomyListReference)
+    | ({
+        _key: string;
+      } & Module_teamReference)
+    | ({
+        _key: string;
+      } & Module_testimonialReference)
+    | ({
+        _key: string;
+      } & Module_timelineReference)
   >;
   seo?: Seo;
 };
@@ -1524,24 +1545,21 @@ export type Page_home = {
   headingBlock?: HeadingBlock;
   hero?:
     | Module_heroBlogReference
-    | Module_heroStatementReference
-    | Module_heroProfileReference;
+    | Module_heroProfileReference
+    | Module_heroStatementReference;
   modules?: Array<
-    | ({
-        _key: string;
-      } & Module_contentReference)
     | ({
         _key: string;
       } & Module_ctaReference)
     | ({
         _key: string;
-      } & Module_newsletterReference)
+      } & Module_contentReference)
     | ({
         _key: string;
-      } & Module_postLatestReference)
+      } & Module_faqReference)
     | ({
         _key: string;
-      } & Module_taxonomyListReference)
+      } & Module_featureHighlightsReference)
     | ({
         _key: string;
       } & Module_postFeaturedReference)
@@ -1550,30 +1568,58 @@ export type Page_home = {
       } & Module_featureListReference)
     | ({
         _key: string;
-      } & Module_featureHighlightsReference)
+      } & Module_postLatestReference)
     | ({
         _key: string;
       } & Module_logoWallReference)
     | ({
         _key: string;
-      } & Module_testimonialReference)
+      } & Module_newsletterReference)
     | ({
         _key: string;
-      } & Module_teamReference)
+      } & Module_pricingReference)
     | ({
         _key: string;
       } & Module_statsReference)
     | ({
         _key: string;
+      } & Module_taxonomyListReference)
+    | ({
+        _key: string;
+      } & Module_teamReference)
+    | ({
+        _key: string;
+      } & Module_testimonialReference)
+    | ({
+        _key: string;
       } & Module_timelineReference)
-    | ({
-        _key: string;
-      } & Module_faqReference)
-    | ({
-        _key: string;
-      } & Module_pricingReference)
   >;
   seo?: Seo;
+};
+
+export type Module_heroStatement = {
+  _id: string;
+  _type: 'module_heroStatement';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
+  headingBlock?: HeadingBlock;
+  eyebrow?: string;
+  image?: ImageWithAlt;
+  ctaButtons?: Array<
+    {
+      _key: string;
+    } & CtaButton
+  >;
+  variant?: 'SPLIT' | 'STACKED' | 'BANNER';
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  contentPositionSplit?: 'LEFT' | 'RIGHT';
+  contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
+  mediaOrderSplit?: 'LAST' | 'FIRST';
+  mediaOrderStacked?: 'LAST' | 'FIRST';
+  layout?: HeroLayout;
 };
 
 export type Module_heroProfile = {
@@ -1601,31 +1647,6 @@ export type Module_heroProfile = {
   contentPositionSplit?: 'LEFT' | 'RIGHT';
   contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
   mediaOrderSplit?: 'LAST' | 'FIRST';
-  layout?: HeroLayout;
-};
-
-export type Module_heroStatement = {
-  _id: string;
-  _type: 'module_heroStatement';
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
-  headingBlock?: HeadingBlock;
-  eyebrow?: string;
-  image?: ImageWithAlt;
-  ctaButtons?: Array<
-    {
-      _key: string;
-    } & CtaButton
-  >;
-  variant?: 'SPLIT' | 'STACKED' | 'BANNER';
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
-  contentPositionSplit?: 'LEFT' | 'RIGHT';
-  contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
-  mediaOrderSplit?: 'LAST' | 'FIRST';
-  mediaOrderStacked?: 'LAST' | 'FIRST';
   layout?: HeroLayout;
 };
 
@@ -1682,13 +1703,13 @@ export type Page_post = {
   modules?: Array<
     | ({
         _key: string;
-      } & Module_postRelatedReference)
+      } & Module_ctaReference)
     | ({
         _key: string;
       } & Module_newsletterReference)
     | ({
         _key: string;
-      } & Module_ctaReference)
+      } & Module_postRelatedReference)
   >;
   publishedAt?: string;
   postTakeaways?: PostTakeaways;
@@ -1839,6 +1860,7 @@ export type AllSanitySchemaTypes =
   | Block_testimonialReference
   | Module_testimonial
   | Module_logoWall
+  | Layout
   | Module_featureHighlights
   | Block_featureReference
   | Module_featureList
@@ -1873,8 +1895,8 @@ export type AllSanitySchemaTypes =
   | LinkRef
   | Aside
   | BodyImage
+  | WideLayout
   | HeroLayout
-  | Layout
   | MigrationState
   | Settings_theme
   | Settings_newsletter
@@ -1892,10 +1914,10 @@ export type AllSanitySchemaTypes =
   | Page_tagIndexReference
   | Link
   | Module_heroBlogReference
-  | Module_taxonomyListReference
-  | Module_postLatestReference
   | Module_ctaReference
+  | Module_postLatestReference
   | Module_newsletterReference
+  | Module_taxonomyListReference
   | Page_tagIndex
   | Blog_tagReference
   | Module_postListReference
@@ -1907,22 +1929,22 @@ export type AllSanitySchemaTypes =
   | Page_topic
   | Module_postFeaturedReference
   | Page_postIndex
-  | Module_heroStatementReference
   | Module_heroProfileReference
+  | Module_heroStatementReference
   | Module_contentReference
-  | Module_featureListReference
-  | Module_featureHighlightsReference
-  | Module_logoWallReference
-  | Module_testimonialReference
-  | Module_teamReference
-  | Module_statsReference
-  | Module_timelineReference
   | Module_faqReference
+  | Module_featureHighlightsReference
+  | Module_featureListReference
+  | Module_logoWallReference
   | Module_pricingReference
+  | Module_statsReference
+  | Module_teamReference
+  | Module_testimonialReference
+  | Module_timelineReference
   | Page_landing
   | Page_home
-  | Module_heroProfile
   | Module_heroStatement
+  | Module_heroProfile
   | Module_heroBlog
   | Module_postRelatedReference
   | Page_post

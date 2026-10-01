@@ -1,7 +1,8 @@
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
-import { ctaButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
+import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
-import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { moduleLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { listedTextBlockFragment } from '@blog/service/shared/fragments/portable-text/listed-text-block';
 
 export const faqModuleQuery = q
@@ -27,11 +28,8 @@ export const faqModuleQuery = q
           .notNull(),
       }))
       .notNull(),
-    ctaButtons: sub
-      .field('ctaButtons[]')
-      .project(ctaButtonFragment)
-      .nullable(true),
-    contentAlignment: sub.field('contentAlignment').nullable(true),
-    layout: sub.field('layout').project(layoutFragment).nullable(true),
+    ...ctaButtonsFragment,
+    ...moduleContentAlignmentLeftCenterFragment,
+    ...moduleLayoutFragment,
   }))
   .notNull();

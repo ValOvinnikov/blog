@@ -1,67 +1,10 @@
 import userEvent from '@testing-library/user-event';
+import { usePathname } from '@web/i18n/navigation';
 import { fireEvent, renderElement, screen } from '@web/testing/custom-render';
-import type { ReactNode } from 'react';
 
 import { SiteNavigation } from './site-navigation';
 
-const { usePathnameMock } = vi.hoisted(() => ({
-  usePathnameMock: vi.fn(),
-}));
-
-vi.mock('@web/i18n/navigation', () => ({
-  usePathname: usePathnameMock,
-}));
-
-type TFakeMobileToggle = {
-  isOpen: boolean;
-  onToggle: () => void;
-  ariaLabel: string;
-  panelId: string;
-};
-
-vi.mock('@blog/ui/components/molecules/primary-navigation', () => ({
-  PrimaryNavigation: ({
-    links,
-    actions,
-    mobileToggle,
-  }: {
-    links: Array<{ href: string; label: string; isActive?: boolean }>;
-    actions?: ReactNode;
-    mobileToggle?: TFakeMobileToggle;
-  }) => (
-    <nav>
-      {links.map((link) => (
-        <a
-          key={link.href}
-          href={link.href}
-          aria-current={link.isActive ? 'page' : undefined}
-        >
-          {link.label}
-        </a>
-      ))}
-      {actions}
-      {mobileToggle && (
-        <>
-          <button
-            type="button"
-            aria-expanded={mobileToggle.isOpen}
-            aria-controls={mobileToggle.panelId}
-            onClick={mobileToggle.onToggle}
-          >
-            {mobileToggle.ariaLabel}
-          </button>
-          <div id={mobileToggle.panelId} hidden={!mobileToggle.isOpen}>
-            {links.map((link) => (
-              <a key={link.href} href={link.href}>
-                {link.label}
-              </a>
-            ))}
-          </div>
-        </>
-      )}
-    </nav>
-  ),
-}));
+vi.mock('@web/i18n/navigation');
 
 const links = [
   {
@@ -92,7 +35,7 @@ const getToggle = () =>
 
 describe(`<${SiteNavigation.name}/>`, () => {
   it('marks the Home item active only on the exact root path', () => {
-    usePathnameMock.mockReturnValue('/');
+    vi.mocked(usePathname).mockReturnValue('/');
     renderElement(<SiteNavigation links={links} />);
 
     expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute(
@@ -108,7 +51,7 @@ describe(`<${SiteNavigation.name}/>`, () => {
   });
 
   it('does not mark Home active on a nested route', () => {
-    usePathnameMock.mockReturnValue('/blog');
+    vi.mocked(usePathname).mockReturnValue('/blog');
     renderElement(<SiteNavigation links={links} />);
 
     expect(screen.getByRole('link', { name: 'Home' })).not.toHaveAttribute(
@@ -117,7 +60,7 @@ describe(`<${SiteNavigation.name}/>`, () => {
   });
 
   it('marks a section item active via prefix match on nested routes', () => {
-    usePathnameMock.mockReturnValue('/blog/hello-world');
+    vi.mocked(usePathname).mockReturnValue('/blog/hello-world');
     renderElement(<SiteNavigation links={links} />);
 
     expect(screen.getByRole('link', { name: 'Blog' })).toHaveAttribute(
@@ -129,8 +72,8 @@ describe(`<${SiteNavigation.name}/>`, () => {
     );
   });
 
-  it('does not match a section item against an unrelated path that merely shares a prefix', () => {
-    usePathnameMock.mockReturnValue('/blogging');
+  it('does not match a path that merely shares the section prefix', () => {
+    vi.mocked(usePathname).mockReturnValue('/blogging');
     renderElement(<SiteNavigation links={links} />);
 
     expect(screen.getByRole('link', { name: 'Blog' })).not.toHaveAttribute(
@@ -139,17 +82,17 @@ describe(`<${SiteNavigation.name}/>`, () => {
   });
 
   it('renders the actions slot', () => {
-    usePathnameMock.mockReturnValue('/');
+    vi.mocked(usePathname).mockReturnValue('/');
     renderElement(
       <SiteNavigation links={links} actions={<button>Toggle</button>} />,
     );
 
-    expect(screen.getByRole('button', { name: 'Toggle' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Toggle' })).toBeVisible();
   });
 
   describe('mobile toggle', () => {
     beforeEach(() => {
-      usePathnameMock.mockReturnValue('/');
+      vi.mocked(usePathname).mockReturnValue('/');
     });
 
     it('passes a real, non-generic accessible name for the toggle', () => {
@@ -200,7 +143,7 @@ describe(`<${SiteNavigation.name}/>`, () => {
       await user.click(toggle);
       expect(toggle).toHaveAttribute('aria-expanded', 'true');
 
-      usePathnameMock.mockReturnValue('/blog');
+      vi.mocked(usePathname).mockReturnValue('/blog');
       rerender(<SiteNavigation links={links} />);
 
       expect(getToggle()).toHaveAttribute('aria-expanded', 'false');

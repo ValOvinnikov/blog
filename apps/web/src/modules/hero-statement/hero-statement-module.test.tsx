@@ -1,4 +1,5 @@
 import { BRAND_VARIANT, HERO_VARIANT } from '@blog/config';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { STATIC_SANITY_IMAGE_BASE_URL } from '@web/testing/providers';
@@ -7,9 +8,8 @@ import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtur
 
 import { HeroStatementModule } from './hero-statement-module';
 
-const { getHeroStatementMock, getTenantSanityContextMock } = vi.hoisted(() => ({
+const { getHeroStatementMock } = vi.hoisted(() => ({
   getHeroStatementMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -20,9 +20,9 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-sanity-context');
+
+const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
 
 const makeHeroStatementData = (overrides: Record<string, unknown> = {}) => ({
   brandVariant: BRAND_VARIANT.PRIMARY,
@@ -98,7 +98,7 @@ describe(`<${HeroStatementModule.name}/>`, () => {
     ).toBeVisible();
   });
 
-  it('renders the hero image src from the configured Sanity CDN base URL, not a hardcoded origin', async () => {
+  it('renders the hero image src from the configured Sanity CDN base URL', async () => {
     const sanityImage = makeSanityImage();
     getHeroStatementMock.mockResolvedValue({
       ok: true,

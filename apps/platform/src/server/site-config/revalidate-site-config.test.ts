@@ -1,17 +1,10 @@
+import { env } from '@platform/utils/env/env';
+
 import { revalidateSiteConfig } from './revalidate-site-config';
 
-const { envMock } = vi.hoisted(() => ({
-  envMock: {
-    WEB_APP_URL: undefined as string | undefined,
-    SITE_CONFIG_REVALIDATE_SECRET: undefined as string | undefined,
-  },
-}));
+vi.mock('@platform/utils/env/env');
 
-vi.mock('@platform/utils/env/env', () => ({
-  get env() {
-    return envMock;
-  },
-}));
+const envMock: Partial<Record<keyof typeof env, string>> = env;
 
 const loggedEvent = (
   spy: ReturnType<typeof vi.spyOn>,
@@ -40,7 +33,7 @@ describe(revalidateSiteConfig, () => {
     consoleErrorSpy.mockRestore();
   });
 
-  it('POSTs the shared secret as a bearer token and the tenant id as a JSON body to the web app revalidation route, with a timeout signal', async () => {
+  it('POSTs the tenant id with the bearer secret and a timeout to the revalidate route', async () => {
     envMock.WEB_APP_URL = 'https://example.com';
     envMock.SITE_CONFIG_REVALIDATE_SECRET = 'shared-secret';
     fetchMock.mockResolvedValue(new Response(null, { status: 200 }));

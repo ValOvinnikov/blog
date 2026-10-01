@@ -1,15 +1,13 @@
 import { SITE_MESSAGES, type TVoicePortableText } from '@blog/config';
+import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
 
 import { resolveTenantMessages } from './resolve-tenant-messages';
 
-const { getRequestTenantIdMock, getSiteConfigMock } = vi.hoisted(() => ({
-  getRequestTenantIdMock: vi.fn(),
+const { getSiteConfigMock } = vi.hoisted(() => ({
   getSiteConfigMock: vi.fn(),
 }));
 
-vi.mock('@web/server/tenant/get-request-tenant-id', () => ({
-  getRequestTenantId: getRequestTenantIdMock,
-}));
+vi.mock('@web/server/tenant/get-request-tenant-id');
 
 vi.mock('@blog/db', () => ({
   queries: {
@@ -20,6 +18,8 @@ vi.mock('@blog/db', () => ({
 vi.mock('next/cache', () => ({
   unstable_cache: (fn: (...args: unknown[]) => unknown) => fn,
 }));
+
+const getRequestTenantIdMock = vi.mocked(getRequestTenantId);
 
 const TENANT = { id: 'tenant-1' };
 
@@ -70,7 +70,7 @@ describe('resolveTenantMessages', () => {
     expect(messages).toEqual(SITE_MESSAGES);
   });
 
-  it('returns the base messages unchanged when no site config row exists for the tenant', async () => {
+  it('returns the base messages unchanged when the tenant has no site config row', async () => {
     getSiteConfigMock.mockResolvedValue(undefined);
 
     const { messages } = await resolveTenantMessages(SITE_MESSAGES);
@@ -117,7 +117,7 @@ describe('resolveTenantMessages', () => {
     );
   });
 
-  it('ignores an override key absent from the VOICE_FIELDS registry rather than throwing', async () => {
+  it('ignores an override key missing from the VOICE_FIELDS registry', async () => {
     getSiteConfigMock.mockResolvedValue(
       siteConfigRow({ notARealVoiceField: 'ignored' }),
     );
@@ -127,7 +127,7 @@ describe('resolveTenantMessages', () => {
     expect(messages).toEqual(SITE_MESSAGES);
   });
 
-  it('forwards an explicitly supplied tenant to getSiteConfig, through to getRequestTenantId', async () => {
+  it('forwards an explicit tenant to getSiteConfig, through to getRequestTenantId', async () => {
     getSiteConfigMock.mockResolvedValue(siteConfigRow());
 
     await resolveTenantMessages(SITE_MESSAGES, 'tenant-2');
@@ -135,7 +135,7 @@ describe('resolveTenantMessages', () => {
     expect(getRequestTenantIdMock).toHaveBeenCalledWith('tenant-2');
   });
 
-  it('falls back to the base messages with no overrides when the site config fetch fails', async () => {
+  it('falls back to the base messages when the site config fetch fails', async () => {
     getSiteConfigMock.mockRejectedValue(new Error('boom'));
     const consoleErrorSpy = vi
       .spyOn(console, 'error')
@@ -159,7 +159,7 @@ describe('resolveTenantMessages', () => {
     expect(base.notFound.heading).toBe('Original heading');
   });
 
-  it('flattens a TEXT-kind override to plain text when its stored value is Portable Text', async () => {
+  it('flattens a TEXT-kind override stored as Portable Text to plain text', async () => {
     getSiteConfigMock.mockResolvedValue(
       siteConfigRow({ paginationPrevious: richTextOf('Prev') }),
     );
@@ -180,7 +180,7 @@ describe('resolveTenantMessages', () => {
     expect(rich.blogListEmpty).toBe(override);
   });
 
-  it('falls back the rich map to the catalog default wrapped as one paragraph when a RICH field has no override', async () => {
+  it('falls back to the catalog default paragraph for a RICH field with no override', async () => {
     getSiteConfigMock.mockResolvedValue(siteConfigRow());
 
     const { rich } = await resolveTenantMessages(SITE_MESSAGES);

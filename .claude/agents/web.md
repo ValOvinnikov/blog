@@ -195,6 +195,33 @@ When invoked, before writing any code:
   `post-list/`, `content/`, `cta/`). A new CMS module type gets its renderer
   folder here plus an entry in the map — it is not a `src/components/`
   component.
+- **Sub-components go under `components/`.** When a component or module is
+  built from two or more child components that only it uses, each child
+  gets its own folder under a `components/` directory inside the parent's
+  folder, holding its file, test and any `*-variants.ts`. Never leave them
+  flat beside the parent. No `index.ts` in a child folder; the parent
+  imports the file directly. This applies in `src/components/**` and
+  `src/modules/**` alike. `modules/testimonial/` is the model:
+
+  ```
+  src/modules/testimonial/
+    testimonial-module.tsx
+    testimonial-module-view.tsx
+    testimonial-module-view.stories.tsx
+    components/
+      testimonial-card/
+        testimonial-card.tsx
+        testimonial-card-variants.ts
+        testimonial-card.test.tsx
+      testimonial-carousel/
+        testimonial-carousel.tsx
+        testimonial-carousel.test.tsx
+  ```
+
+  The `*-module.tsx` / `*-module-view.tsx` pair is the module itself, not
+  a sub-component, and stays at the top. A child used by a second parent
+  moves to `src/components/shared/` instead.
+
 - **Metadata builders** live in `src/metadata/` (e.g. `blog-list-metadata/`)
   — shared `generateMetadata` helpers, one folder per builder, co-located test.
 - **Helper functions** (slot builders, data transformers, formatters) live in
@@ -478,10 +505,26 @@ from ending its turn at all.
 
 ## Reuse before you create
 
-Before adding a function, type, schema definition, field helper or constant,
-search this workspace for one that already does the job. A near-duplicate is
-the most expensive kind of mistake to find later, because nothing fails — both
-versions work.
+Before adding a function, type, schema definition, field helper, constant,
+component, test fake, fixture or builder, search the **whole repo** for one
+that already does the job — every app and package, including their
+`testing/` and `__mocks__/` folders, not just this workspace. A
+near-duplicate is the most expensive kind of mistake to find later, because
+nothing fails — both versions work.
+
+A match you cannot import is not permission to copy it. If it lives in a
+package this layer may depend on, use it. If it lives where this layer may
+not reach — the other app (`apps/web` and `apps/platform` share no code) or
+a package the layer contracts forbid — name the match in your report
+instead of copying it silently.
+
+If what you are about to write would be a second copy of something you may
+import — a function, component, hook, test fake, fixture or builder — move it
+to the folder that owns its kind (`shared/`, `testing/`, `__mocks__/`, one
+per file) and point every call site at it, in this change. Two copies that
+were both there before you started and that you add nothing to: report them,
+don't extract them (CLAUDE.md → "Duplication that already existed is filed,
+not fixed inline").
 
 If something similar exists and it is not obvious whether to extend it or add
 alongside it, **do not settle that quietly**. Check who calls the existing one

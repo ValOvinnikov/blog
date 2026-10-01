@@ -111,4 +111,42 @@ describe(`<${Pagination.name}/>`, () => {
     setup({ currentPage: 1, totalPages: 2, dataTestId: 'blog-pagination' });
     expect(screen.getByTestId('blog-pagination')).toBeVisible();
   });
+
+  describe('truncation', () => {
+    const pageLinkNumbers = () =>
+      screen
+        .getAllByRole('link')
+        .map((link) => link.textContent)
+        .filter((text) => text !== null && /^\d+$/.test(text))
+        .map(Number);
+
+    it('renders every page when the total fits within the visible range', () => {
+      setup({ currentPage: 4, totalPages: 7 });
+      expect(pageLinkNumbers()).toEqual([1, 2, 3, 4, 5, 6, 7]);
+      expect(screen.queryByText('…')).not.toBeInTheDocument();
+    });
+
+    it('shows a leading run plus the last page, with one ellipsis, near the first page', () => {
+      setup({ currentPage: 1, totalPages: 12 });
+      expect(pageLinkNumbers()).toEqual([1, 2, 3, 4, 5, 12]);
+      expect(screen.getAllByText('…')).toHaveLength(1);
+    });
+
+    it('shows the first page plus a trailing run, with one ellipsis, near the last page', () => {
+      setup({ currentPage: 12, totalPages: 12 });
+      expect(pageLinkNumbers()).toEqual([1, 8, 9, 10, 11, 12]);
+      expect(screen.getAllByText('…')).toHaveLength(1);
+    });
+
+    it('shows the first page, the last page, and the current page neighbours, with two ellipses, in the middle', () => {
+      setup({ currentPage: 6, totalPages: 12 });
+      expect(pageLinkNumbers()).toEqual([1, 5, 6, 7, 12]);
+      expect(screen.getAllByText('…')).toHaveLength(2);
+    });
+
+    it('hides the ellipsis from the accessibility tree', () => {
+      setup({ currentPage: 6, totalPages: 12 });
+      expect(screen.getAllByRole('listitem')).toHaveLength(5);
+    });
+  });
 });

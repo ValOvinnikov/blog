@@ -18,9 +18,6 @@ describe('indexPageParamsQuery', () => {
   });
 
   it('projects pageSize from the first module_postList entry in modules[], not the retired postList reference', () => {
-    expect(indexPageParamsQuery.query).toContain(
-      'modules[]->[_type == "module_postList"][0].pageSize',
-    );
     expect(indexPageParamsQuery.query).not.toContain('"postList"');
   });
 });

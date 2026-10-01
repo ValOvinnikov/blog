@@ -86,7 +86,7 @@ describe(`<${QuoteCard.name}/>`, () => {
       children: buildChildrenWithAvatar(<Avatar name="Ada Lovelace" alt="" />),
     });
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
-    expect(screen.getByText('AL')).toBeInTheDocument();
+    expect(screen.getByText('AL')).toBeVisible();
   });
 
   it('renders the caller-supplied Avatar image when given a src', () => {

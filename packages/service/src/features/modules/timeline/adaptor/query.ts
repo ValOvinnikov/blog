@@ -1,7 +1,8 @@
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
-import { ctaButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
+import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
-import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { moduleLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { paragraphTextBlockFragment } from '@blog/service/shared/fragments/portable-text/paragraph-text-block';
 
 export const timelineModuleQuery = q
@@ -29,12 +30,9 @@ export const timelineModuleQuery = q
       }))
       .notNull(),
     orientation: sub.field('orientation').notNull(),
-    ctaButtons: sub
-      .field('ctaButtons[]')
-      .project(ctaButtonFragment)
-      .nullable(true),
-    contentAlignment: sub.field('contentAlignment').nullable(true),
+    ...ctaButtonsFragment,
+    ...moduleContentAlignmentFragment,
     itemAlignment: sub.field('itemAlignment').notNull(),
-    layout: sub.field('layout').project(layoutFragment).nullable(true),
+    ...moduleLayoutFragment,
   }))
   .notNull();

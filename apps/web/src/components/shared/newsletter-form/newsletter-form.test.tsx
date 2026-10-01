@@ -37,40 +37,13 @@ describe(`<${NewsletterForm.name}/>`, () => {
     subscribeToNewsletterActionMock.mockReset();
   });
 
-  afterEach(() => {
-    document.cookie =
-      'newsletter_subscribed=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
-  });
-
-  it('renders idle with a labeled field and submit button once mounted (no subscribed cookie)', () => {
+  it('renders idle with a labeled field and submit button', () => {
     setup();
 
     expect(
       screen.getByRole('textbox', { name: 'Email address' }),
     ).toBeVisible();
     expect(screen.getByRole('button', { name: 'Subscribe' })).toBeVisible();
-  });
-
-  it('renders nothing once mounted when the newsletter_subscribed cookie is already present (full variant)', () => {
-    document.cookie = 'newsletter_subscribed=1';
-
-    const { container } = setup();
-
-    expect(container).toBeEmptyDOMElement();
-    expect(
-      screen.queryByRole('textbox', { name: 'Email address' }),
-    ).not.toBeInTheDocument();
-  });
-
-  it('renders nothing once mounted when the newsletter_subscribed cookie is already present (compact variant)', () => {
-    document.cookie = 'newsletter_subscribed=1';
-
-    const { container } = setup({ variant: 'compact' });
-
-    expect(container).toBeEmptyDOMElement();
-    expect(
-      screen.queryByRole('textbox', { name: 'Email address' }),
-    ).not.toBeInTheDocument();
   });
 
   it('shows an inline error without calling the server action for a malformed email', async () => {
@@ -199,6 +172,56 @@ describe(`<${NewsletterForm.name}/>`, () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'Something went wrong. Please try again.',
+    );
+  });
+
+  it('clears the inline validation error once the reader edits the email', async () => {
+    const user = userEvent.setup();
+    setup();
+
+    await typeAndSubmit(user, 'not-an-email');
+    await screen.findByRole('alert');
+
+    await user.type(
+      screen.getByRole('textbox', { name: 'Email address' }),
+      'x',
+    );
+
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('clears a server-returned error once the reader edits the email', async () => {
+    subscribeToNewsletterActionMock.mockResolvedValue({
+      outcome: 'already-subscribed',
+    });
+    const user = userEvent.setup();
+    setup();
+
+    await typeAndSubmit(user, 'reader@example.com');
+    await screen.findByRole('alert');
+
+    await user.type(
+      screen.getByRole('textbox', { name: 'Email address' }),
+      'x',
+    );
+
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('shows the error again when an invalid email is submitted a second time', async () => {
+    const user = userEvent.setup();
+    setup();
+
+    await typeAndSubmit(user, 'not-an-email');
+    await screen.findByRole('alert');
+
+    const input = screen.getByRole('textbox', { name: 'Email address' });
+    await user.clear(input);
+    await user.type(input, 'still-not-an-email');
+    await user.click(screen.getByRole('button', { name: 'Subscribe' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Enter a valid email address.',
     );
   });
 

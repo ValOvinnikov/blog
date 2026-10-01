@@ -1,15 +1,14 @@
 import { DISPLAY_MODE } from '@blog/config';
 import type { TPostLatestModule } from '@blog/service';
-import { Heading } from '@blog/ui/components/atoms/heading';
 import { CardGrid } from '@blog/ui/components/organisms/card-grid';
 import { CardCarousel } from '@web/components/shared/card-carousel';
 import {
   type IMediaCardData,
   MediaCardItem,
 } from '@web/components/shared/media-card-item';
+import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';
-
-import { postLatestModuleViewVariants } from './post-latest-module-view-variants';
+import { moduleGridActionsVariants } from '@web/utils/module-grid-actions-variants';
 
 export interface IPostLatestModuleViewProps extends Omit<
   TPostLatestModule,
@@ -32,8 +31,8 @@ export const PostLatestModuleView = ({
   hasImages,
   displayMode,
 }: IPostLatestModuleViewProps) => {
-  const { heading, supportingText } = headingBlock;
-  const s = postLatestModuleViewVariants({ align: contentAlignment });
+  const { heading } = headingBlock;
+  const s = moduleGridActionsVariants();
 
   return (
     <Section
@@ -42,10 +41,13 @@ export const PostLatestModuleView = ({
       titleId={titleId}
       dataTestId={dataTestId}
     >
-      <Heading level={2} id={titleId} className={s.label()}>
-        {heading}
-      </Heading>
-      {supportingText && <p className={s.supportingText()}>{supportingText}</p>}
+      <ModuleHeading
+        headingBlock={headingBlock}
+        id={titleId}
+        level={2}
+        align={contentAlignment}
+        variant="section"
+      />
       {displayMode === DISPLAY_MODE.CAROUSEL ? (
         <CardCarousel
           items={items}

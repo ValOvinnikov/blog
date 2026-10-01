@@ -618,7 +618,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
       expect(
         screen.getByRole('group', { name: 'Tenant detail fields' }),
-      ).toBeInTheDocument();
+      ).toBeVisible();
     });
   });
 

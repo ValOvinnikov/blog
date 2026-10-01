@@ -40,6 +40,12 @@
   --color-border-emphasis: var(
     --border-emphasis
   ); /* @role high-contrast structural boundary */
+  --color-ambient: var(
+    --ambient
+  ); /* @role ring-offset colour of the surface in scope */
+  --color-divider: var(
+    --divider
+  ); /* @role divider colour of the surface in scope */
   --color-text: var(--text); /* @role primary ink */
   --color-text-muted: var(--text-muted); /* @role secondary body text */
   --color-text-subtle: var(--text-subtle); /* @role metadata / low emphasis */
@@ -163,6 +169,10 @@
   --text-title-2xl--line-height: 1.2;
   --text-title-2xl--letter-spacing: -0.02em;
 
+  --text-title-section: clamp(1.6rem, 1.33rem + 1.1vw, 2rem);
+  --text-title-section--line-height: 1.2;
+  --text-title-section--letter-spacing: -0.02em;
+
   --text-title-xl: clamp(1.35rem, 1.15rem + 0.7vw, 1.6rem);
   --text-title-xl--line-height: 1.35;
 
@@ -250,6 +260,12 @@
      --primary-subtle — both clear the WCAG 1.4.11 3:1 non-text minimum
      (--border-strong itself only reaches 1.69:1 / 2.14:1 there). */
   --border-emphasis: oklch(0.62 0.006 250);
+  /* Ambient surface context: descendants read these for ring-offset/divider
+     colour instead of a hardcoded --primary/--border, so a `surface-secondary`/
+     `surface-brand-primary` ancestor (below) changes them for everything
+     inside it, with no per-component prop. */
+  --ambient: var(--primary);
+  --divider: var(--border);
   --text: oklch(0.2 0.01 250);
   --text-muted: oklch(0.46 0.01 250);
   --text-subtle: oklch(0.6 0.008 250);
@@ -497,6 +513,30 @@
 
 @utility max-w-copy {
   max-width: var(--container-copy);
+}
+
+/* Ambient-surface overrides: apply to an element that changes its own
+   background, so descendants' ring-offset-ambient/border-divider utilities
+   resolve against that background instead of the page default. */
+@utility surface-secondary {
+  --ambient: var(--secondary);
+  --divider: var(--border-strong);
+}
+
+@utility surface-brand-primary {
+  --ambient: var(--brand-primary-muted);
+  --divider: var(--border-strong);
+}
+
+/* --border against --surface-2 (1.25:1 light / 1.21:1 dark) reads weaker than
+   the page default's own --primary/--border pairing (1.31:1 / 1.40:1) — the
+   wrong direction for a divider meant to match. --border-strong measures
+   1.74:1 / 1.95:1 against --surface-2, in line with the other two surfaces'
+   own divider weight (1.43:1/1.95:1, 1.62:1/1.61:1). Verified via
+   wcagContrastRatio (packages/utils/src/color/oklch.ts). */
+@utility surface-nested {
+  --ambient: var(--surface-2);
+  --divider: var(--border-strong);
 }
 
 /* Toast timer/drain bar (#1140): the linear rate is applied per-instance via

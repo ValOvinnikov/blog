@@ -11,7 +11,7 @@ export const eyebrowVariants = tv({
         'no-underline transition-colors duration-base ease-smooth',
         'hover:text-brand-primary-hover',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
-        'focus-visible:ring-offset-2 focus-visible:ring-offset-primary',
+        'focus-visible:ring-offset-2 focus-visible:ring-offset-ambient',
       ],
     },
   },

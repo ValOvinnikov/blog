@@ -1,6 +1,9 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import {
+  A_AS_CONST,
+  type IWithClassName,
+  type IWithDataTestId,
+} from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
-import { resolveComponent } from '@blog/ui/lib/react';
 import type { ReactNode } from 'react';
 
 import { bookmarksListVariants } from './bookmarks-list-variants';
@@ -31,7 +34,7 @@ export const BookmarksList = ({
   className,
   dataTestId,
 }: TBookmarksListProps) => {
-  const Component = resolveComponent(linkAs, 'a');
+  const Component = linkAs ?? A_AS_CONST;
   const {
     root,
     list,

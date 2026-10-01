@@ -9,8 +9,10 @@ export const sectionVariants = tv({
   variants: {
     brandVariant: {
       [BRAND_VARIANT.PRIMARY]: { root: ['bg-primary'] },
-      [BRAND_VARIANT.SECONDARY]: { root: ['bg-secondary'] },
-      [BRAND_VARIANT.BRAND_PRIMARY]: { root: ['bg-brand-primary-muted'] },
+      [BRAND_VARIANT.SECONDARY]: { root: ['bg-secondary surface-secondary'] },
+      [BRAND_VARIANT.BRAND_PRIMARY]: {
+        root: ['bg-brand-primary-muted surface-brand-primary'],
+      },
     },
     spacingTop: {
       [SPACING_SCALE.NONE]: { root: ['pt-0'] },
@@ -31,8 +33,8 @@ export const sectionVariants = tv({
       [CONTAINER_WIDTH.WIDE]: { inner: ['max-w-5xl'] },
       [CONTAINER_WIDTH.FULL]: { inner: ['max-w-page'] },
     },
-    dividerTop: { true: { root: ['border-t border-border'] } },
-    dividerBottom: { true: { root: ['border-b border-border'] } },
+    dividerTop: { true: { root: ['border-t border-divider'] } },
+    dividerBottom: { true: { root: ['border-b border-divider'] } },
   },
   defaultVariants: {
     spacingTop: SPACING_SCALE.MD,

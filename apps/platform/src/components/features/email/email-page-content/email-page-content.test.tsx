@@ -22,7 +22,7 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-vi.mock('@platform/server/auth/auth', () => ({ auth: vi.fn() }));
+vi.mock('@platform/server/auth/auth');
 
 vi.mock('@platform/server/email-config/update-email-config-action', () => ({
   updateEmailConfigAction: vi.fn(),
@@ -108,22 +108,18 @@ describe(`<${EmailPageContent.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByDisplayValue('Acme Co')).toBeInTheDocument();
-    expect(
-      screen.getByDisplayValue('support@acme.example'),
-    ).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Acme Co')).toBeVisible();
+    expect(screen.getByDisplayValue('support@acme.example')).toBeVisible();
   });
 
   it('renders every template type, always fully populated, never blank', async () => {
     await setup();
 
-    expect(screen.getByDisplayValue('Sign in to Acme Co')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Sign in to Acme Co')).toBeVisible();
 
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Team invite' }));
-    expect(
-      screen.getByDisplayValue("You're invited to Acme Co"),
-    ).toBeInTheDocument();
+    expect(screen.getByDisplayValue("You're invited to Acme Co")).toBeVisible();
   });
 
   it('passes the archived date through for a deprovisioned tenant', async () => {

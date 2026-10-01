@@ -3,6 +3,7 @@ import {
   CONTENT_ALIGNMENT,
   CTA_VARIANT,
   MEDIA_ORDER,
+  SPACING_SCALE,
 } from '@blog/config';
 import { Button } from '@blog/ui/components/atoms/button';
 import { objectKeys } from '@blog/utils/primitives';
@@ -63,6 +64,14 @@ const meta = {
     mobileMediaOrder: {
       control: 'select',
       options: objectKeys(ctaModuleVariants.variants.mobileMediaOrder),
+    },
+    spacingTop: {
+      control: 'select',
+      options: objectKeys(ctaModuleVariants.variants.spacingTop),
+    },
+    spacingBottom: {
+      control: 'select',
+      options: objectKeys(ctaModuleVariants.variants.spacingBottom),
     },
   },
   args: {
@@ -200,7 +209,82 @@ export const BannerAlignRight: TStory = {
       'A hands-on writing intensive. Small cohort, live feedback.',
     actions: PrimaryAndInlineLink,
     footnote: undefined,
+    // Fixed bright photo, not the random `image()` helper — the right-side scrim needs a reliably bright backdrop to demonstrate its contrast.
+    image: (
+      <img
+        src="https://images.unsplash.com/photo-1500534623283-312aade485b7?w=1600&h=900&fit=crop"
+        alt=""
+      />
+    ),
   },
+};
+
+export const BannerSpacingNone: TStory = {
+  args: {
+    ...BannerDefault.args,
+    spacingTop: SPACING_SCALE.NONE,
+    spacingBottom: SPACING_SCALE.NONE,
+  },
+};
+
+export const BannerSpacingMd: TStory = {
+  args: {
+    ...BannerDefault.args,
+    spacingTop: SPACING_SCALE.MD,
+    spacingBottom: SPACING_SCALE.MD,
+  },
+};
+
+export const BannerSpacingXl: TStory = {
+  args: {
+    ...BannerDefault.args,
+    spacingTop: SPACING_SCALE.XL,
+    spacingBottom: SPACING_SCALE.XL,
+  },
+};
+
+export const BannerPositionBySpacing: TStory = {
+  args: { ...BannerDefault.args },
+  parameters: { layout: 'fullscreen' },
+  render: (args) => (
+    <div className="flex flex-col gap-10">
+      {objectKeys(ctaModuleVariants.variants.position).map((position) =>
+        objectKeys(ctaModuleVariants.variants.spacingTop).map((spacing) => (
+          <CtaModule
+            key={`${position}-${spacing}`}
+            {...args}
+            heading={`${position} / ${spacing}`}
+            contentPosition={position}
+            contentAlignment={position}
+            spacingTop={spacing}
+            spacingBottom={spacing}
+          />
+        )),
+      )}
+    </div>
+  ),
+};
+
+export const BannerMismatchedPositionAndAlignment: TStory = {
+  args: { ...BannerDefault.args },
+  parameters: { layout: 'fullscreen' },
+  render: (args) => (
+    <div className="flex flex-col gap-10">
+      {objectKeys(ctaModuleVariants.variants.position).map((position) =>
+        objectKeys(ctaModuleVariants.variants.alignment)
+          .filter((alignment) => alignment !== position)
+          .map((alignment) => (
+            <CtaModule
+              key={`${position}-${alignment}`}
+              {...args}
+              heading={`${position} position / ${alignment} text`}
+              contentPosition={position}
+              contentAlignment={alignment}
+            />
+          )),
+      )}
+    </div>
+  ),
 };
 
 export const Wrapped: TStory = {

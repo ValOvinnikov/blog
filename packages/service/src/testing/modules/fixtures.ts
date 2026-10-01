@@ -367,7 +367,7 @@ export function makeRawFeatureListModule(
   };
 }
 
-function makeRawLogoImage(): TRawLogoItem['image'] {
+export function makeRawLogoImage(): TRawLogoItem['image'] {
   const { asset, hotspot, crop } = makeRawSanityImage();
 
   return { asset, hotspot, crop };
@@ -380,6 +380,7 @@ export function makeRawLogoItem(
     _key: 'block-logo-1',
     name: 'Acme Corp',
     image: makeRawLogoImage(),
+    imageDark: null,
     link: null,
     ...overrides,
   };

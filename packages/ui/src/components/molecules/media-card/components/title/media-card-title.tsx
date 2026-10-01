@@ -22,7 +22,7 @@ export const MediaCardTitle = ({
 }: TMediaCardTitleProps) => (
   <Heading
     level={level}
-    visual={isLead ? 'post' : 'card'}
+    visual={isLead ? 'prose-h2' : 'card'}
     className={mediaCardTitleVariants({ class: className })}
     dataTestId={dataTestId}
   >

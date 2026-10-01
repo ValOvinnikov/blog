@@ -1,16 +1,17 @@
 import { BRAND_VARIANT } from '@blog/config';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { PostFeaturedModule } from './post-featured-module';
 
-const { getPostFeaturedMock, getTenantSanityContextMock } = vi.hoisted(() => ({
+const { getPostFeaturedMock } = vi.hoisted(() => ({
   getPostFeaturedMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
 }));
+
+vi.mock('@web/i18n/navigation');
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -20,13 +21,9 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-sanity-context');
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
+const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
 
 const makePost = (overrides: Record<string, unknown> = {}) => ({
   id: 'post-1',
@@ -84,7 +81,7 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('renders nothing when no posts resolve, never an empty landmark with a dangling aria-labelledby', async () => {
+  it('renders nothing when no posts resolve, never an empty labelled landmark', async () => {
     getPostFeaturedMock.mockResolvedValue({
       ok: true,
       data: {
@@ -121,13 +118,13 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByText('Lead post')).toBeInTheDocument();
-    expect(screen.getByText('Second post')).toBeInTheDocument();
-    expect(screen.getByText('Third post')).toBeInTheDocument();
+    expect(screen.getByText('Lead post')).toBeVisible();
+    expect(screen.getByText('Second post')).toBeVisible();
+    expect(screen.getByText('Third post')).toBeVisible();
     const tailGrid = screen.getByTestId(
       'post-featured-module-post-featured-1-tail-grid',
     );
-    expect(tailGrid).toBeInTheDocument();
+    expect(tailGrid).toBeVisible();
     expect(tailGrid).not.toHaveTextContent('Lead post');
   });
 

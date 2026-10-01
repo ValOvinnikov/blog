@@ -4,21 +4,14 @@ import { CardGrid } from '@blog/ui/components/organisms/card-grid';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';
+import { FeatureListCard } from '@web/modules/feature-list/components/feature-list-card/feature-list-card';
+import { FeatureListCarousel } from '@web/modules/feature-list/components/feature-list-carousel/feature-list-carousel';
 import { moduleGridActionsVariants } from '@web/utils/module-grid-actions-variants';
+import {
+  CAROUSEL_IMAGE_SIZES,
+  GRID_IMAGE_SIZES,
+} from '@web/utils/module-image-sizes';
 import { toModuleGridColumns } from '@web/utils/to-module-grid-columns';
-
-import { FeatureListCard } from './feature-list-card';
-import { FeatureListCarousel } from './feature-list-carousel';
-
-const GRID_IMAGE_SIZES: Record<1 | 2 | 3 | 4, string> = {
-  1: '100vw',
-  2: '(min-width: 640px) 50vw, 100vw',
-  3: '(min-width: 768px) 33vw, (min-width: 640px) 50vw, 100vw',
-  4: '(min-width: 1024px) 25vw, (min-width: 768px) 33vw, (min-width: 640px) 50vw, 100vw',
-};
-
-const CAROUSEL_IMAGE_SIZES =
-  '(min-width: 768px) 33vw, (min-width: 640px) 50vw, 85vw';
 
 export interface IFeatureListModuleViewProps extends TFeatureListModule {
   titleId: string;
@@ -38,12 +31,11 @@ export const FeatureListModuleView = ({
   titleId,
   dataTestId,
 }: IFeatureListModuleViewProps) => {
-  if (items.length === 0) return null;
-
   const cardAlign =
     cardAlignment === CONTENT_ALIGNMENT.CENTER ? 'center' : 'left';
   const columns = toModuleGridColumns(items.length);
   const s = moduleGridActionsVariants({ align: contentAlignment });
+  const hasAnyImage = items.some((item) => Boolean(item.sanityImage));
 
   return (
     <Section
@@ -67,6 +59,8 @@ export const FeatureListModuleView = ({
           imageSizes={CAROUSEL_IMAGE_SIZES}
           title={headingBlock.heading}
           tone={brandVariant}
+          contentAlignment={contentAlignment}
+          hasAnyImage={hasAnyImage}
         />
       ) : (
         <CardGrid
@@ -82,6 +76,7 @@ export const FeatureListModuleView = ({
               align={cardAlign}
               imageSizes={GRID_IMAGE_SIZES[columns]}
               headingLevel={3}
+              hasAnyImage={hasAnyImage}
             />
           ))}
         </CardGrid>

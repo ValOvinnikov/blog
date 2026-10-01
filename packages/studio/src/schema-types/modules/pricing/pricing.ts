@@ -3,8 +3,8 @@ import { brandVariantField } from '@blog/studio/schema-types/fields/brand-varian
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
-import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
 import { pricingTierSchema } from '@blog/studio/schema-types/objects/pricing-tier/pricing-tier';
+import { wideLayoutField } from '@blog/studio/schema-types/objects/wide-layout/wide-layout-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { validatePricingSingleHighlightedTier } from '@blog/studio/schema-types/validation/validate-pricing-single-highlighted-tier/validate-pricing-single-highlighted-tier';
 import { DollarSign } from 'lucide-react';
@@ -48,7 +48,7 @@ export const pricingSchema = defineType({
       description:
         'Horizontal alignment of the heading, period switch, footnote and actions. Card content is always left-aligned.',
     }),
-    layoutField,
+    wideLayoutField,
   ],
   preview: {
     select: {

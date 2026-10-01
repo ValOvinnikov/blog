@@ -84,7 +84,7 @@ describe(Button, () => {
 
     expect(
       screen.getByRole('button', { name: 'Begin provisioning' }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
   });
 
   it('associates a description via aria-describedby, so a disabled control can be explained by an element elsewhere on the page', () => {

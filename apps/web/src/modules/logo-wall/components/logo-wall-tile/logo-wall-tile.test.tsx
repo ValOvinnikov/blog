@@ -1,13 +1,10 @@
 import { customRender, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeLogoItem } from '@web/testing/modules/logo-wall/fixtures';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { LogoWallTile } from './logo-wall-tile';
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
+vi.mock('@web/i18n/navigation');
 
 const item = makeLogoItem();
 
@@ -17,10 +14,10 @@ describe(`<${LogoWallTile.name}/>`, () => {
   it('renders the logo image with the company name as its alt', () => {
     setup();
 
-    expect(screen.getByRole('img', { name: item.name })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: item.name })).toBeVisible();
   });
 
-  it('wraps the logo in a link when the item has one, with the company name as its accessible name', () => {
+  it('wraps the logo in a link named by the company when the item has one', () => {
     setup({
       logo: makeLogoItem({
         link: {
@@ -91,7 +88,7 @@ describe(`<${LogoWallTile.name}/>`, () => {
     ).toBe('');
   });
 
-  it('falls back to the contained layout when the asset aspect ratio is not a positive number', () => {
+  it('falls back to the contained layout when the aspect ratio is not positive', () => {
     setup({
       logo: makeLogoItem({
         image: makeSanityImage({
@@ -121,5 +118,40 @@ describe(`<${LogoWallTile.name}/>`, () => {
         .getByTestId('logo-wall-tile')
         .style.getPropertyValue('--logo-aspect'),
     ).toBe('');
+  });
+
+  it('renders the dark-background logo alongside the regular one when the item has one', () => {
+    setup({
+      logo: makeLogoItem({
+        imageDark: makeSanityImage({
+          assetId:
+            'image-9b1d3f0c2e7a4b5c8d6e1f2a3b4c5d6e7f8a9b0c-1800x400-png',
+          alt: item.name,
+        }),
+      }),
+    });
+
+    expect(screen.getAllByRole('img', { name: item.name })).toHaveLength(2);
+  });
+
+  it('wraps the dark-background logo in the item link too', () => {
+    setup({
+      logo: makeLogoItem({
+        imageDark: makeSanityImage({
+          assetId:
+            'image-9b1d3f0c2e7a4b5c8d6e1f2a3b4c5d6e7f8a9b0c-1800x400-png',
+          alt: item.name,
+        }),
+        link: {
+          label: 'Visit Acme Corp',
+          href: 'https://acme.example.com',
+          target: undefined,
+          platform: undefined,
+          ariaLabel: undefined,
+        },
+      }),
+    });
+
+    expect(screen.getAllByRole('link', { name: item.name })).toHaveLength(2);
   });
 });

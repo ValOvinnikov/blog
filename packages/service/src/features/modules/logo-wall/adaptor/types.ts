@@ -2,7 +2,7 @@ import type {
   ILink,
   ISanityImage,
   TBrandVariantOf,
-  TContentAlignment,
+  TContentAlignmentOf,
   TDisplayMode,
   TLayout,
   TMaybeUndefined,
@@ -14,6 +14,7 @@ export type TLogoItem = {
   id: string;
   name: string;
   image: ISanityImage;
+  imageDark: TMaybeUndefined<ISanityImage>;
   link: TMaybeUndefined<ILink>;
 };
 
@@ -23,6 +24,6 @@ export type TLogoWallModule = {
   logos: TLogoItem[];
   ctaButtons: TCtaButton[];
   displayMode: TDisplayMode;
-  contentAlignment: TMaybeUndefined<TContentAlignment>;
+  contentAlignment: TMaybeUndefined<TContentAlignmentOf<'LEFT' | 'CENTER'>>;
   layout: TMaybeUndefined<TLayout>;
 };

@@ -6,7 +6,7 @@ export const articleHeaderVariants = tv({
     headingGroup: ['max-w-[800px] mx-auto'],
     topic: ['mb-2'],
     title: ['mt-3'],
-    lead: ['mt-4 max-w-measure'],
+    lead: ['mt-4 max-w-measure text-prose'],
     meta: ['mt-4'],
     coverMedia: ['mt-2 max-w-page mx-auto'],
   },

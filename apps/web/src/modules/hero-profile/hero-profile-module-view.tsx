@@ -52,7 +52,6 @@ export const HeroProfileModuleView = ({
       layout={layout}
       dataTestId={`hero-profile-module-${id}`}
       ctaButtons={ctaButtons}
-      ctaClassName="mt-0"
       sanityImage={undefined}
     >
       {variant === HERO_VARIANT.STACKED && (
@@ -114,7 +113,11 @@ export const HeroProfileModuleView = ({
 
       {socialLinks.length > 0 && (
         <Hero.Social>
-          <SocialLinks profiles={socialLinks} variant="outlined" />
+          <SocialLinks
+            profiles={socialLinks}
+            variant="outlined"
+            isOnDark={isBanner}
+          />
         </Hero.Social>
       )}
     </HeroModuleShell>

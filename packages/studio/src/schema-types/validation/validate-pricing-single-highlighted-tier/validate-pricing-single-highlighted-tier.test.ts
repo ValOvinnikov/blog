@@ -5,20 +5,21 @@ const SINGLE_HIGHLIGHTED_TIER_MESSAGE = 'Only one tier can be highlighted.';
 describe(validatePricingSingleHighlightedTier, () => {
   it.each([
     ['no tiers are given', undefined],
-    ['no tier is highlighted', [{ isHighlighted: false }, {}]],
+    ['no tier has a label', [{ highlightLabel: '' }, {}]],
+    ['a label is only whitespace', [{ highlightLabel: '   ' }, {}]],
     [
-      'exactly one tier is highlighted',
-      [{ isHighlighted: true }, { isHighlighted: false }, {}],
+      'exactly one tier has a label',
+      [{ highlightLabel: 'Most popular' }, { highlightLabel: ' ' }, {}],
     ],
   ])('passes when %s', (_description, tiers) => {
     expect(validatePricingSingleHighlightedTier(tiers)).toBe(true);
   });
 
-  it('fails with the single-highlighted message when two tiers are highlighted', () => {
+  it('fails with the single-highlighted message when two tiers have a label', () => {
     expect(
       validatePricingSingleHighlightedTier([
-        { isHighlighted: true },
-        { isHighlighted: true },
+        { highlightLabel: 'Most popular' },
+        { highlightLabel: 'Best value' },
         {},
       ]),
     ).toBe(SINGLE_HIGHLIGHTED_TIER_MESSAGE);

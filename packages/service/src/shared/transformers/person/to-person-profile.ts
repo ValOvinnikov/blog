@@ -4,8 +4,7 @@ import type {
   TPortableTextBlock,
 } from '@blog/config';
 import type { personDetailFragment } from '@blog/service/shared/fragments/person/person';
-import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image';
-import { toLinkDocument } from '@blog/service/shared/transformers/link/to-link-document';
+import { toPersonCard } from '@blog/service/shared/transformers/person/to-person-card';
 import { toPortableText } from '@blog/service/shared/transformers/portable-text/to-portable-text-mark-def';
 import type { TSocialProfile } from '@blog/service/shared/transformers/social-profile/to-social-profile';
 import { toSocialProfiles } from '@blog/service/shared/transformers/social-profile/to-social-profiles';
@@ -25,12 +24,9 @@ export type TPersonProfile = {
 
 export function toPersonProfile(raw: TRawPersonProfile): TPersonProfile {
   return {
-    id: raw._id,
-    name: raw.name,
-    image: toSanityImage(raw.image),
+    ...toPersonCard(raw),
     role: raw.role ?? undefined,
     bio: raw.bio?.map(toPortableText) ?? undefined,
     socialLinks: toSocialProfiles(raw.socialLinks),
-    profileUrl: toLinkDocument(raw.profilePage)?.href,
   };
 }

@@ -1,17 +1,16 @@
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { redirect } from 'next/navigation';
+import type { Session } from 'next-auth';
 
+import { auth } from './auth';
 import { requireTenantById } from './require-tenant-by-id';
 
-const { authMock, getAdminByUserIdMock, getTenantByIdMock } = vi.hoisted(
-  () => ({
-    authMock: vi.fn(),
-    getAdminByUserIdMock: vi.fn(),
-    getTenantByIdMock: vi.fn(),
-  }),
-);
+const { getAdminByUserIdMock, getTenantByIdMock } = vi.hoisted(() => ({
+  getAdminByUserIdMock: vi.fn(),
+  getTenantByIdMock: vi.fn(),
+}));
 
-vi.mock('./auth', () => ({ auth: authMock }));
+vi.mock('./auth');
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
@@ -21,6 +20,8 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
+const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
+
 describe(requireTenantById, () => {
   beforeEach(() => {
     authMock.mockReset();
@@ -28,7 +29,7 @@ describe(requireTenantById, () => {
     getTenantByIdMock.mockReset();
   });
 
-  it('redirects to sign-in without querying admins or the tenant when there is no session', async () => {
+  it('redirects to sign-in without querying admins or the tenant when signed out', async () => {
     authMock.mockResolvedValue(null);
 
     await expect(requireTenantById('tenant-1')).rejects.toThrow(
@@ -65,7 +66,7 @@ describe(requireTenantById, () => {
     });
   });
 
-  it('returns the tenant and admin for a signed-in admins row, without checking membership', async () => {
+  it('returns the tenant and admin for an admins row without checking membership', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     const admin = {
       id: 'admin-1',
@@ -86,7 +87,7 @@ describe(requireTenantById, () => {
     expect(redirect).not.toHaveBeenCalled();
   });
 
-  it('resolves an archived tenant, requesting it with includeArchived so the query does not filter it out', async () => {
+  it('resolves an archived tenant by requesting it with includeArchived', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     const admin = {
       id: 'admin-1',

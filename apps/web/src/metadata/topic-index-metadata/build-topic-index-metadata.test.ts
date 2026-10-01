@@ -1,24 +1,22 @@
 import { urlForSanityImage } from '@blog/service';
+import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { buildTopicIndexMetadata } from './build-topic-index-metadata';
 
-const { getTopicIndexPageMock, getTenantSanityContextMock } = vi.hoisted(
-  () => ({
-    getTopicIndexPageMock: vi.fn(),
-    getTenantSanityContextMock: vi.fn(),
-  }),
-);
+const { getTopicIndexPageMock } = vi.hoisted(() => ({
+  getTopicIndexPageMock: vi.fn(),
+}));
 
 vi.mock('@web/server/topic-index/get-topic-index-page', () => ({
   getTopicIndexPage: getTopicIndexPageMock,
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
+vi.mock('@web/server/tenant/get-tenant-sanity-context');
+
+const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
 
 const ogImage = makeSanityImage();
 const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
@@ -41,7 +39,7 @@ describe('buildTopicIndexMetadata', () => {
     getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
-  it('forwards the tenant to getTopicIndexPage — the same cached loader TopicIndexPage reads', async () => {
+  it('forwards the tenant to getTopicIndexPage, the loader TopicIndexPage reads', async () => {
     getTopicIndexPageMock.mockResolvedValue({
       ok: true,
       data: { headingBlock: { heading: 'Topics' }, seo, modules: [] },
