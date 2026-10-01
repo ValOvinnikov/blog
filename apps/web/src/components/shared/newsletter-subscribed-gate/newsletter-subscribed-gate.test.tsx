@@ -1,4 +1,8 @@
-import { customRender, screen } from '@web/testing/custom-render';
+import {
+  customRender,
+  renderElement,
+  screen,
+} from '@web/testing/custom-render';
 
 import { NewsletterSubscribedGate } from './newsletter-subscribed-gate';
 
@@ -24,5 +28,22 @@ describe(`<${NewsletterSubscribedGate.name}/>`, () => {
     setup();
 
     expect(screen.queryByText('Subscribe here')).not.toBeInTheDocument();
+  });
+
+  it('keeps its children visible when the cookie is set after the first render', () => {
+    const { rerender } = renderElement(
+      <NewsletterSubscribedGate>
+        <p>Subscribe here</p>
+      </NewsletterSubscribedGate>,
+    );
+
+    document.cookie = 'newsletter_subscribed=1';
+    rerender(
+      <NewsletterSubscribedGate>
+        <p>Subscribe here</p>
+      </NewsletterSubscribedGate>,
+    );
+
+    expect(screen.getByText('Subscribe here')).toBeVisible();
   });
 });

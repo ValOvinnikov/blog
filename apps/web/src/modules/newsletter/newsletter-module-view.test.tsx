@@ -71,7 +71,9 @@ describe(`<${NewsletterModuleView.name}/>`, () => {
 
     setup();
 
-    expect(screen.queryByTestId('newsletter-module-newsletter-1')).toBeNull();
+    expect(
+      screen.queryByTestId('newsletter-module-newsletter-1'),
+    ).not.toBeInTheDocument();
     expect(
       screen.queryByRole('textbox', { name: 'Email address' }),
     ).not.toBeInTheDocument();
