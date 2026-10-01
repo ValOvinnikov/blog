@@ -24,7 +24,7 @@ export async function insertTestTenant(
       primaryDomain: `${key}.example.com`,
       sanityProjectId: `sanity-${crypto.randomUUID()}`,
       sanityDataset: 'production',
-      locale: 'en',
+      locale: 'EN',
       plan: TENANT_PLAN.FREE,
       status: TENANT_STATUS.ACTIVE,
       ...overrides,

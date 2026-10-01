@@ -43,7 +43,7 @@ function tenant(id: string, name: string): TTenant {
     sanityProjectId: `proj-${name}`,
     sanityDataset: 'production',
     sanityReadTokenEncrypted: null,
-    locale: 'en',
+    locale: 'EN',
     plan: 'FREE',
     status: TENANT_STATUS.ACTIVE,
     provisioningStatus: 'READY',

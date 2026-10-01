@@ -19,7 +19,7 @@ const baseTenant = {
   primaryDomain: 'acme.example.com',
   sanityProjectId: 'p1',
   sanityDataset: 'production',
-  locale: 'en',
+  locale: 'EN',
   plan: TENANT_PLAN.FREE,
 };
 

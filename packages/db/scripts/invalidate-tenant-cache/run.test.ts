@@ -43,7 +43,7 @@ describe(runInvalidateTenantCache, () => {
       primaryDomain: 'acme.example.com',
       sanityProjectId: 'abc123',
       sanityDataset: 'production',
-      locale: 'en',
+      locale: 'EN',
       plan: TENANT_PLAN.FREE,
       status: TENANT_STATUS.ACTIVE,
     });
@@ -73,7 +73,7 @@ describe(runInvalidateTenantCache, () => {
       primaryDomain: 'still-active.example.com',
       sanityProjectId: 'def456',
       sanityDataset: 'production',
-      locale: 'en',
+      locale: 'EN',
       plan: TENANT_PLAN.FREE,
       status: TENANT_STATUS.ACTIVE,
     });
@@ -91,7 +91,7 @@ describe(runInvalidateTenantCache, () => {
       primaryDomain: 'flaky.example.com',
       sanityProjectId: 'ghi789',
       sanityDataset: 'production',
-      locale: 'en',
+      locale: 'EN',
       plan: TENANT_PLAN.FREE,
       status: TENANT_STATUS.ACTIVE,
     });

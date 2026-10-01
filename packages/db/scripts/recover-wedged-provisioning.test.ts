@@ -23,7 +23,7 @@ function tenant(overrides: Partial<TTenant> = {}): TTenant {
     sanityDataset: 'production',
     sanityReadTokenEncrypted: null,
     sanityWriteTokenEncrypted: null,
-    locale: 'en',
+    locale: 'EN',
     plan: 'FREE',
     status: 'ACTIVE',
     provisioningStatus: 'PROVISIONING',

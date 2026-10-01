@@ -19,7 +19,7 @@ const db = useQueryTestDb(getDbMock);
 const draftInput: TCreateTenantDraftInput = {
   name: 'Acme',
   domain: 'acme.example.com',
-  locale: 'en',
+  locale: 'EN',
   plan: TENANT_PLAN.FREE,
   owner: { type: 'user', userId: 'user-1' },
 };
@@ -42,7 +42,7 @@ describe(createTenantDraft, () => {
     expect(result.data).toMatchObject({
       name: 'Acme',
       primaryDomain: 'acme.example.com',
-      locale: 'en',
+      locale: 'EN',
       plan: TENANT_PLAN.FREE,
       status: TENANT_STATUS.ACTIVE,
       provisioningStatus: 'PENDING',

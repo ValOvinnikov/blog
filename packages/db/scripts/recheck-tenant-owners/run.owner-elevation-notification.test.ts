@@ -88,7 +88,7 @@ async function insertActiveTenant(): Promise<string> {
     .values({
       name: 'Acme',
       primaryDomain: 'acme.example.com',
-      locale: 'en',
+      locale: 'EN',
       plan: TENANT_PLAN.FREE,
       status: TENANT_STATUS.ACTIVE,
       provisioningStatus: 'PENDING',

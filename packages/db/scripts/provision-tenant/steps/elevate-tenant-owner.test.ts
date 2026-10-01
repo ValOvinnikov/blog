@@ -42,7 +42,7 @@ function tenantAt(createdAt: Date, overrides: Partial<TTenant> = {}): TTenant {
     sanityProjectId: 'proj-abc',
     sanityDataset: 'production',
     sanityReadTokenEncrypted: null,
-    locale: 'en',
+    locale: 'EN',
     plan: 'FREE',
     status: 'ACTIVE',
     provisioningStatus: 'PROVISIONING',

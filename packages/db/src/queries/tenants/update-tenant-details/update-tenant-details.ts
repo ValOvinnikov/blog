@@ -15,6 +15,7 @@ import { tenantDomains } from '@blog/db/schema/tenant-domains';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
 import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
 import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
+import { normalizeLocaleCode } from '@blog/db/utils/normalize-locale-code/normalize-locale-code';
 import { and, eq, isNull, ne } from 'drizzle-orm';
 
 export type TUpdateTenantDetailsInput = {
@@ -248,7 +249,12 @@ export async function updateTenantDetails(
 
   const [tenant] = await db
     .update(tenants)
-    .set(tenantDetailsFields(input))
+    .set(
+      tenantDetailsFields({
+        ...input,
+        locale: normalizeLocaleCode(input.locale),
+      }),
+    )
     .where(eq(tenants.id, tenantId))
     .returning();
 

@@ -34,7 +34,7 @@ afterEach(async () => {
 const baseTenant = {
   primaryDomain: 'acme.example.com',
   sanityDataset: 'production',
-  locale: 'en',
+  locale: 'EN',
   plan: TENANT_PLAN.FREE,
 };
 

@@ -30,7 +30,7 @@ describe(getTenantDeprovisioningStatus, () => {
       .values({
         name: 'Acme',
         primaryDomain: 'acme.example.com',
-        locale: 'en',
+        locale: 'EN',
         plan: TENANT_PLAN.FREE,
         status: TENANT_STATUS.ACTIVE,
         deprovisioningSteps,
@@ -61,7 +61,7 @@ describe(getTenantDeprovisioningStatus, () => {
       .values({
         name: 'Never Deprovisioned',
         primaryDomain: 'never.example.com',
-        locale: 'en',
+        locale: 'EN',
         plan: TENANT_PLAN.FREE,
         status: TENANT_STATUS.ACTIVE,
       })
@@ -84,7 +84,7 @@ describe(getTenantDeprovisioningStatus, () => {
       .values({
         name: 'Deprovisioned',
         primaryDomain: 'gone.example.com',
-        locale: 'en',
+        locale: 'EN',
         plan: TENANT_PLAN.FREE,
         status: TENANT_STATUS.ARCHIVED,
         deprovisionedAt,

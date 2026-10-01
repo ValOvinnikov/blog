@@ -88,6 +88,7 @@ export const makeTenant = (overrides: Partial<TTenant> = {}): TTenant => {
     sanityReadTokenEncrypted: null,
     sanityWriteTokenEncrypted: null,
     locale: 'EN',
+    additionalLocales: [],
     plan: TENANT_PLAN.FREE,
     status: TENANT_STATUS.ACTIVE,
     provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,

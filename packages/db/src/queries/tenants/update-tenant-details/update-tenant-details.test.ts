@@ -33,7 +33,7 @@ const validInput: TUpdateTenantDetailsInput = {
   name: 'Acme Updated',
   primaryDomain: 'acme.example.com',
   plan: TENANT_PLAN.FREE,
-  locale: 'en',
+  locale: 'EN',
 };
 
 async function insertTenantWithDomain(overrides?: {
@@ -113,7 +113,7 @@ describe(updateTenantDetails, () => {
     const result = await updateTenantDetails(tenantId, {
       ...validInput,
       name: 'New Name',
-      locale: 'fr',
+      locale: 'FR',
       plan: TENANT_PLAN.GROWTH,
     });
 
@@ -122,7 +122,7 @@ describe(updateTenantDetails, () => {
     }
     expect(result.tenant).toMatchObject({
       name: 'New Name',
-      locale: 'fr',
+      locale: 'FR',
       plan: TENANT_PLAN.GROWTH,
     });
   });
@@ -170,7 +170,7 @@ describe(updateTenantDetails, () => {
       name: 'Acme',
       primaryDomain: 'globex.example.com',
       plan: TENANT_PLAN.FREE,
-      locale: 'en',
+      locale: 'EN',
     });
 
     const domainRows = await db()
@@ -204,7 +204,7 @@ describe(updateTenantDetails, () => {
       name: 'Acme',
       primaryDomain: 'acme.example.com',
       plan: TENANT_PLAN.FREE,
-      locale: 'en',
+      locale: 'EN',
     });
 
     const domainRows = await db()
@@ -525,12 +525,12 @@ describe(updateTenantDetails, () => {
       primaryDomain: 'acme.example.com',
       name: 'New Name',
       plan: TENANT_PLAN.GROWTH,
-      locale: 'fr',
+      locale: 'FR',
     });
 
     expect(result).toMatchObject({
       outcome: 'updated',
-      tenant: { name: 'New Name', plan: TENANT_PLAN.GROWTH, locale: 'fr' },
+      tenant: { name: 'New Name', plan: TENANT_PLAN.GROWTH, locale: 'FR' },
     });
   });
 
@@ -545,12 +545,12 @@ describe(updateTenantDetails, () => {
 
     const result = await updateTenantDetails(tenantId, {
       ...validInput,
-      locale: 'fr',
+      locale: 'FR',
     });
 
     expect(result).toMatchObject({
       outcome: 'updated',
-      tenant: { locale: 'fr' },
+      tenant: { locale: 'FR' },
     });
   });
 

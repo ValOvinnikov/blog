@@ -31,7 +31,7 @@ describe(getTenantRow, () => {
       primaryDomain: 'acme.example.com',
       sanityProjectId: 'abc123',
       sanityDataset: 'production',
-      locale: 'en',
+      locale: 'EN',
       plan: TENANT_PLAN.FREE,
       status: TENANT_STATUS.ACTIVE,
     });

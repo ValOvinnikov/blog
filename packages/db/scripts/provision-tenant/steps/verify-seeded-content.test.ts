@@ -43,7 +43,7 @@ function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
     sanityProjectId: 'proj123',
     sanityDataset: 'production',
     sanityReadTokenEncrypted: 'encrypted-token',
-    locale: 'en',
+    locale: 'EN',
     plan: 'FREE',
     status: 'ACTIVE',
     provisioningStatus: 'PROVISIONING',

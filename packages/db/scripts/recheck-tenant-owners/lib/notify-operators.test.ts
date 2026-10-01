@@ -14,7 +14,7 @@ function tenant(overrides: Partial<TTenant> = {}): TTenant {
     sanityProjectId: 'proj-acme',
     sanityDataset: 'production',
     sanityReadTokenEncrypted: null,
-    locale: 'en',
+    locale: 'EN',
     plan: 'FREE',
     status: TENANT_STATUS.ACTIVE,
     provisioningStatus: 'READY',
