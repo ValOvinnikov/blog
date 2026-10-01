@@ -10,10 +10,12 @@ name: Board Auto-Sync
 # Actions cloud shape `claude/issue-<n>-<timestamp>`) — diff the two if this
 # workflow's detection is ever suspected of drifting from board-keeper's.
 #
-# Gated to the repo owner only, same posture as claude.yml: a PR body's
-# "Closes #n" is otherwise attacker-controllable input, and without this gate
-# any contributor opening any PR against this public repo could move an
-# arbitrary issue to Code Review on the board.
+# Gated to the repo owner and claude[bot], same posture as claude.yml: a PR
+# body's "Closes #n" is otherwise attacker-controllable input, and without
+# this gate any contributor opening any PR against this public repo could
+# move an arbitrary issue to Code Review on the board. claude[bot] is safe to
+# admit because claude.yml only runs it for the owner, on owner-authored
+# issues; without it the @claude runner's own branches never move the board.
 
 on:
   create:
@@ -26,7 +28,7 @@ permissions:
 
 jobs:
   branch-created:
-    if: github.event_name == 'create' && github.event.ref_type == 'branch' && github.actor == 'ValOvinnikov'
+    if: github.event_name == 'create' && github.event.ref_type == 'branch' && (github.actor == 'ValOvinnikov' || github.event.sender.login == 'claude[bot]')
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -65,7 +67,7 @@ jobs:
         run: .github/scripts/sync-board-status.sh "$ISSUE_NUMBER" "In Progress"
 
   pr-opened:
-    if: github.event_name == 'pull_request' && github.actor == 'ValOvinnikov'
+    if: github.event_name == 'pull_request' && (github.actor == 'ValOvinnikov' || github.event.pull_request.user.login == 'claude[bot]')
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

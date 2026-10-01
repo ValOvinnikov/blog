@@ -5,7 +5,15 @@ import {
   MEDIA_ORDER,
   SPACING_SCALE,
 } from '@blog/config';
-import { AZURE_SCRIM, NEUTRAL_SCRIM, tv } from '@blog/ui/lib/styling';
+import {
+  AZURE_SCRIM_CENTER,
+  AZURE_SCRIM_LEFT,
+  AZURE_SCRIM_RIGHT,
+  NEUTRAL_SCRIM_CENTER,
+  NEUTRAL_SCRIM_LEFT,
+  NEUTRAL_SCRIM_RIGHT,
+  tv,
+} from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const ctaModuleVariants = tv({
@@ -127,12 +135,38 @@ export const ctaModuleVariants = tv({
     {
       variant: CTA_VARIANT.BANNER,
       tone: BRAND_VARIANT.BRAND_PRIMARY,
-      class: { overlay: [AZURE_SCRIM] },
+      position: CONTENT_ALIGNMENT.LEFT,
+      class: { overlay: [AZURE_SCRIM_LEFT] },
+    },
+    {
+      variant: CTA_VARIANT.BANNER,
+      tone: BRAND_VARIANT.BRAND_PRIMARY,
+      position: CONTENT_ALIGNMENT.CENTER,
+      class: { overlay: [AZURE_SCRIM_CENTER] },
+    },
+    {
+      variant: CTA_VARIANT.BANNER,
+      tone: BRAND_VARIANT.BRAND_PRIMARY,
+      position: CONTENT_ALIGNMENT.RIGHT,
+      class: { overlay: [AZURE_SCRIM_RIGHT] },
     },
     {
       variant: CTA_VARIANT.BANNER,
       tone: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
-      class: { overlay: [NEUTRAL_SCRIM] },
+      position: CONTENT_ALIGNMENT.LEFT,
+      class: { overlay: [NEUTRAL_SCRIM_LEFT] },
+    },
+    {
+      variant: CTA_VARIANT.BANNER,
+      tone: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
+      position: CONTENT_ALIGNMENT.CENTER,
+      class: { overlay: [NEUTRAL_SCRIM_CENTER] },
+    },
+    {
+      variant: CTA_VARIANT.BANNER,
+      tone: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
+      position: CONTENT_ALIGNMENT.RIGHT,
+      class: { overlay: [NEUTRAL_SCRIM_RIGHT] },
     },
     {
       variant: CTA_VARIANT.BANNER,

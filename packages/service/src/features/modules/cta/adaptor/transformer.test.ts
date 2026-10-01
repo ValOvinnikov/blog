@@ -49,6 +49,14 @@ describe('toCtaModule', () => {
     expect(cta.bandTone).toBe(BRAND_VARIANT.SECONDARY);
   });
 
+  it('falls back to Primary when bandTone is absent', () => {
+    const raw = makeRawCtaModule({ bandTone: null });
+
+    const cta = toCtaModule(raw);
+
+    expect(cta.bandTone).toBe(BRAND_VARIANT.PRIMARY);
+  });
+
   it('maps bandTone straight through, including BRAND_PRIMARY', () => {
     const raw = makeRawCtaModule({ bandTone: BRAND_VARIANT.BRAND_PRIMARY });
 
