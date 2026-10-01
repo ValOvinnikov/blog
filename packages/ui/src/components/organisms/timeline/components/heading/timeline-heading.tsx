@@ -7,7 +7,7 @@ export type TTimelineHeadingProps = IWithClassName &
     children: ReactNode;
   };
 
-/** The `<h3>` naming a `Timeline.Item`. */
+/** The title of a single step. */
 export const TimelineHeading = ({
   className,
   dataTestId,

@@ -14,7 +14,7 @@ export type TTimelineMarkerProps = IWithClassName &
     children: ReactNode;
   };
 
-/** The point on a `Timeline.Item`'s line — a generated number, hidden from assistive tech since the `<ol>` already conveys the count, or a caller-supplied label, which is real content and stays announced. */
+/** A numbered marker is hidden from assistive tech because the `<ol>` already conveys the count. */
 export const TimelineMarker = ({
   markerStyle,
   className,

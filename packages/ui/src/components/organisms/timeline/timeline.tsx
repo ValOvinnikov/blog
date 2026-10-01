@@ -29,7 +29,7 @@ export type TTimelineProps = IWithClassName &
     children?: TCompoundChildren<Pick<typeof TimelineParts, 'Item'>>;
   };
 
-/** An ordered sequence of steps or milestones, joined by one connecting line, rendered as an `<ol>` of `Timeline.Item`s. */
+/** A sequence of steps or milestones that reads as one connected line. */
 const TimelineRoot = ({
   orientation,
   itemAlignment,

@@ -2,6 +2,9 @@ import {
   CONTENT_ALIGNMENT,
   TIMELINE_MARKER_STYLE,
   TIMELINE_ORIENTATION,
+  type TContentAlignment,
+  type TTimelineMarkerStyle,
+  type TTimelineOrientation,
 } from '@blog/config';
 import { objectKeys } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
@@ -34,6 +37,32 @@ const longTextItems = [
   { heading: faker.company.catchPhrase(), body: faker.lorem.paragraphs(2) },
 ];
 
+type TTimelineStoryItem = { marker?: string; heading: string; body: string };
+
+const renderTimelineItems = (
+  items: TTimelineStoryItem[],
+  options: {
+    markerStyle: TTimelineMarkerStyle;
+    orientation?: TTimelineOrientation;
+    itemAlignment?: Extract<TContentAlignment, 'LEFT' | 'CENTER'>;
+  },
+) =>
+  items.map(({ marker, heading, body }, index) => (
+    <Timeline.Item
+      key={heading}
+      orientation={options.orientation}
+      itemAlignment={options.itemAlignment}
+    >
+      <Timeline.Marker markerStyle={options.markerStyle}>
+        {marker ?? index + 1}
+      </Timeline.Marker>
+      <Timeline.Heading>{heading}</Timeline.Heading>
+      <Timeline.Body>
+        <p>{body}</p>
+      </Timeline.Body>
+    </Timeline.Item>
+  ));
+
 const meta = {
   title: 'Organisms/Timeline',
   component: Timeline,
@@ -64,54 +93,28 @@ type TStory = StoryObj<typeof meta>;
 
 export const NumberedVertical: TStory = {
   args: {
-    children: numberedItems.map((item, index) => (
-      <Timeline.Item key={item.heading}>
-        <Timeline.Marker markerStyle={TIMELINE_MARKER_STYLE.NUMBERED}>
-          {index + 1}
-        </Timeline.Marker>
-        <Timeline.Heading>{item.heading}</Timeline.Heading>
-        <Timeline.Body>
-          <p>{item.body}</p>
-        </Timeline.Body>
-      </Timeline.Item>
-    )),
+    children: renderTimelineItems(numberedItems, {
+      markerStyle: TIMELINE_MARKER_STYLE.NUMBERED,
+    }),
   },
 };
 
 export const LabelledVertical: TStory = {
   args: {
     markerStyle: TIMELINE_MARKER_STYLE.LABELLED,
-    children: labelledItems.map((item) => (
-      <Timeline.Item key={item.heading}>
-        <Timeline.Marker markerStyle={TIMELINE_MARKER_STYLE.LABELLED}>
-          {item.marker}
-        </Timeline.Marker>
-        <Timeline.Heading>{item.heading}</Timeline.Heading>
-        <Timeline.Body>
-          <p>{item.body}</p>
-        </Timeline.Body>
-      </Timeline.Item>
-    )),
+    children: renderTimelineItems(labelledItems, {
+      markerStyle: TIMELINE_MARKER_STYLE.LABELLED,
+    }),
   },
 };
 
 export const NumberedHorizontal: TStory = {
   args: {
     orientation: TIMELINE_ORIENTATION.HORIZONTAL,
-    children: fourItems.map((item, index) => (
-      <Timeline.Item
-        key={item.heading}
-        orientation={TIMELINE_ORIENTATION.HORIZONTAL}
-      >
-        <Timeline.Marker markerStyle={TIMELINE_MARKER_STYLE.NUMBERED}>
-          {index + 1}
-        </Timeline.Marker>
-        <Timeline.Heading>{item.heading}</Timeline.Heading>
-        <Timeline.Body>
-          <p>{item.body}</p>
-        </Timeline.Body>
-      </Timeline.Item>
-    )),
+    children: renderTimelineItems(fourItems, {
+      markerStyle: TIMELINE_MARKER_STYLE.NUMBERED,
+      orientation: TIMELINE_ORIENTATION.HORIZONTAL,
+    }),
   },
 };
 
@@ -120,36 +123,18 @@ export const LabelledHorizontalCentered: TStory = {
     orientation: TIMELINE_ORIENTATION.HORIZONTAL,
     itemAlignment: CONTENT_ALIGNMENT.CENTER,
     markerStyle: TIMELINE_MARKER_STYLE.LABELLED,
-    children: labelledItems.map((item) => (
-      <Timeline.Item
-        key={item.heading}
-        orientation={TIMELINE_ORIENTATION.HORIZONTAL}
-        itemAlignment={CONTENT_ALIGNMENT.CENTER}
-      >
-        <Timeline.Marker markerStyle={TIMELINE_MARKER_STYLE.LABELLED}>
-          {item.marker}
-        </Timeline.Marker>
-        <Timeline.Heading>{item.heading}</Timeline.Heading>
-        <Timeline.Body>
-          <p>{item.body}</p>
-        </Timeline.Body>
-      </Timeline.Item>
-    )),
+    children: renderTimelineItems(labelledItems, {
+      markerStyle: TIMELINE_MARKER_STYLE.LABELLED,
+      orientation: TIMELINE_ORIENTATION.HORIZONTAL,
+      itemAlignment: CONTENT_ALIGNMENT.CENTER,
+    }),
   },
 };
 
 export const LongTextItem: TStory = {
   args: {
-    children: longTextItems.map((item, index) => (
-      <Timeline.Item key={item.heading}>
-        <Timeline.Marker markerStyle={TIMELINE_MARKER_STYLE.NUMBERED}>
-          {index + 1}
-        </Timeline.Marker>
-        <Timeline.Heading>{item.heading}</Timeline.Heading>
-        <Timeline.Body>
-          <p>{item.body}</p>
-        </Timeline.Body>
-      </Timeline.Item>
-    )),
+    children: renderTimelineItems(longTextItems, {
+      markerStyle: TIMELINE_MARKER_STYLE.NUMBERED,
+    }),
   },
 };
