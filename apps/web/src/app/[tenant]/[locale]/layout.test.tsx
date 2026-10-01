@@ -1,4 +1,5 @@
 import {
+  LOCALE_BCP47_TAGS,
   LOCALE_ISO_CODES,
   routes,
   SITE_MESSAGES as realMessages,
@@ -298,15 +299,17 @@ describe('LocaleLayout', () => {
   });
 
   it('passes real messages, locale, now, and timeZone to NextIntlClientProvider', async () => {
-    const html = await LocaleLayout({
-      children: <div>content</div>,
-      params: Promise.resolve({
-        tenant: 'tenant-1',
-        locale: LOCALE_ISO_CODES.EN,
+    const themeScope = firstChildOf(
+      await LocaleLayout({
+        children: <div>content</div>,
+        params: Promise.resolve({
+          tenant: 'tenant-1',
+          locale: LOCALE_ISO_CODES.EN,
+        }),
       }),
-    });
+    );
 
-    const sanityImageBaseUrlProvider = firstChildOf(html);
+    const sanityImageBaseUrlProvider = firstChildOf(themeScope);
     const provider = firstChildOf(sanityImageBaseUrlProvider);
 
     expect(setRequestLocaleMock).toHaveBeenCalledWith(LOCALE_ISO_CODES.EN);
@@ -317,25 +320,44 @@ describe('LocaleLayout', () => {
   });
 
   it('applies the tenant voice pack to the base messages before rendering', async () => {
-    const html = await LocaleLayout({
-      children: <div>content</div>,
-      params: Promise.resolve({
-        tenant: 'tenant-1',
-        locale: LOCALE_ISO_CODES.EN,
+    const themeScope = firstChildOf(
+      await LocaleLayout({
+        children: <div>content</div>,
+        params: Promise.resolve({
+          tenant: 'tenant-1',
+          locale: LOCALE_ISO_CODES.EN,
+        }),
       }),
-    });
+    );
 
     expect(resolveTenantMessagesMock).toHaveBeenCalledWith(
       realMessages,
       'tenant-1',
     );
-    const sanityImageBaseUrlProvider = firstChildOf(html);
+    const sanityImageBaseUrlProvider = firstChildOf(themeScope);
     const provider = firstChildOf(sanityImageBaseUrlProvider);
     expect(provider.props.messages).toBe(realMessages);
   });
 
   it("serves another language's messages without the tenant's default-language voice pack", async () => {
-    const html = await LocaleLayout({
+    const themeScope = firstChildOf(
+      await LocaleLayout({
+        children: <div>content</div>,
+        params: Promise.resolve({
+          tenant: 'tenant-1',
+          locale: LOCALE_ISO_CODES.NL,
+        }),
+      }),
+    );
+
+    expect(resolveTenantMessagesMock).not.toHaveBeenCalled();
+    const sanityImageBaseUrlProvider = firstChildOf(themeScope);
+    const provider = firstChildOf(sanityImageBaseUrlProvider);
+    expect(provider.props.messages).toBe(realMessages);
+  });
+
+  it('declares the served language on the document', async () => {
+    const document = await LocaleLayout({
       children: <div>content</div>,
       params: Promise.resolve({
         tenant: 'tenant-1',
@@ -343,10 +365,7 @@ describe('LocaleLayout', () => {
       }),
     });
 
-    expect(resolveTenantMessagesMock).not.toHaveBeenCalled();
-    const sanityImageBaseUrlProvider = firstChildOf(html);
-    const provider = firstChildOf(sanityImageBaseUrlProvider);
-    expect(provider.props.messages).toBe(realMessages);
+    expect(document.props.lang).toBe(LOCALE_BCP47_TAGS.NL);
   });
 
   it('mounts VoiceRichProvider with the rich voice values from resolveTenantMessages', async () => {
@@ -356,15 +375,17 @@ describe('LocaleLayout', () => {
       rich,
     });
 
-    const html = await LocaleLayout({
-      children: <div>content</div>,
-      params: Promise.resolve({
-        tenant: 'tenant-1',
-        locale: LOCALE_ISO_CODES.EN,
+    const themeScope = firstChildOf(
+      await LocaleLayout({
+        children: <div>content</div>,
+        params: Promise.resolve({
+          tenant: 'tenant-1',
+          locale: LOCALE_ISO_CODES.EN,
+        }),
       }),
-    });
+    );
 
-    const sanityImageBaseUrlProvider = firstChildOf(html);
+    const sanityImageBaseUrlProvider = firstChildOf(themeScope);
     const provider = firstChildOf(sanityImageBaseUrlProvider);
     const sessionProvider = firstChildOf(provider);
     const toastProvider = firstChildOf(sessionProvider);
@@ -375,28 +396,32 @@ describe('LocaleLayout', () => {
   });
 
   it('passes the resolved theme tokens through to ThemeScope', async () => {
-    const html = await LocaleLayout({
-      children: <div>content</div>,
-      params: Promise.resolve({
-        tenant: 'tenant-1',
-        locale: LOCALE_ISO_CODES.EN,
+    const themeScope = firstChildOf(
+      await LocaleLayout({
+        children: <div>content</div>,
+        params: Promise.resolve({
+          tenant: 'tenant-1',
+          locale: LOCALE_ISO_CODES.EN,
+        }),
       }),
-    });
+    );
 
-    expect(html.type).toBe(ThemeScope);
-    expect(html.props.themeTokens).toBe(THEME_TOKENS);
+    expect(themeScope.type).toBe(ThemeScope);
+    expect(themeScope.props.themeTokens).toBe(THEME_TOKENS);
   });
 
   it('omits Analytics and SpeedInsights when WEB_ANALYTICS_ENABLED is unset', async () => {
-    const html = await LocaleLayout({
-      children: <div>content</div>,
-      params: Promise.resolve({
-        tenant: 'tenant-1',
-        locale: LOCALE_ISO_CODES.EN,
+    const themeScope = firstChildOf(
+      await LocaleLayout({
+        children: <div>content</div>,
+        params: Promise.resolve({
+          tenant: 'tenant-1',
+          locale: LOCALE_ISO_CODES.EN,
+        }),
       }),
-    });
+    );
 
-    const children = childrenOf(html);
+    const children = childrenOf(themeScope);
 
     expect(
       children.some((child: React.ReactElement) => child?.type === Analytics),
@@ -412,15 +437,17 @@ describe('LocaleLayout', () => {
     isWebAnalyticsEnabledMock.mockReturnValue(true);
     isCapabilityEnabledMock.mockResolvedValue(true);
 
-    const html = await LocaleLayout({
-      children: <div>content</div>,
-      params: Promise.resolve({
-        tenant: 'tenant-1',
-        locale: LOCALE_ISO_CODES.EN,
+    const themeScope = firstChildOf(
+      await LocaleLayout({
+        children: <div>content</div>,
+        params: Promise.resolve({
+          tenant: 'tenant-1',
+          locale: LOCALE_ISO_CODES.EN,
+        }),
       }),
-    });
+    );
 
-    const children = childrenOf(html);
+    const children = childrenOf(themeScope);
 
     expect(
       children.some((child: React.ReactElement) => child?.type === Analytics),
@@ -436,15 +463,17 @@ describe('LocaleLayout', () => {
     isWebAnalyticsEnabledMock.mockReturnValue(true);
     isCapabilityEnabledMock.mockResolvedValue(false);
 
-    const html = await LocaleLayout({
-      children: <div>content</div>,
-      params: Promise.resolve({
-        tenant: 'tenant-1',
-        locale: LOCALE_ISO_CODES.EN,
+    const themeScope = firstChildOf(
+      await LocaleLayout({
+        children: <div>content</div>,
+        params: Promise.resolve({
+          tenant: 'tenant-1',
+          locale: LOCALE_ISO_CODES.EN,
+        }),
       }),
-    });
+    );
 
-    const children = childrenOf(html);
+    const children = childrenOf(themeScope);
 
     expect(
       children.some((child: React.ReactElement) => child?.type === Analytics),

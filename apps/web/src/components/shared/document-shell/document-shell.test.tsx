@@ -1,21 +1,27 @@
-import RootLayout from './layout';
+import { DocumentShell } from './document-shell';
 
-describe(`<${RootLayout.name}/>`, () => {
+const renderShell = (lang = 'en', children = <div>content</div>) =>
+  DocumentShell({ lang, children });
+
+const headChildren = (html: ReturnType<typeof renderShell>) => {
+  const [head] = html.props.children;
+  return [head.props.children].flat();
+};
+
+describe(`<${DocumentShell.name}/>`, () => {
+  it('declares the given language on the document', () => {
+    expect(renderShell('nl').props.lang).toBe('nl');
+  });
+
   it('mounts children in the body', () => {
     const children = <div>content</div>;
-    const html = RootLayout({ children });
-
-    const [, body] = html.props.children;
+    const [, body] = renderShell('en', children).props.children;
 
     expect(body.props.children).toBe(children);
   });
 
   it('preconnects to the Sanity image CDN without crossorigin', () => {
-    const html = RootLayout({ children: <div>content</div> });
-
-    const [head] = html.props.children;
-    const headChildren = [head.props.children].flat();
-    const preconnect = headChildren.find(
+    const preconnect = headChildren(renderShell()).find(
       (child: React.ReactElement<{ rel?: string }>) =>
         child?.type === 'link' && child.props.rel === 'preconnect',
     );
@@ -25,11 +31,7 @@ describe(`<${RootLayout.name}/>`, () => {
   });
 
   it('renders the dark-mode bootstrap script in the head', () => {
-    const html = RootLayout({ children: <div>content</div> });
-
-    const [head] = html.props.children;
-    const headChildren = [head.props.children].flat();
-    const script = headChildren.find(
+    const script = headChildren(renderShell()).find(
       (child: React.ReactElement) => child?.type === 'script',
     );
 

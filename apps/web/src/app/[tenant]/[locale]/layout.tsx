@@ -3,6 +3,7 @@ import {
   CAPABILITY,
   ICONS,
   type ITenantLocalizedParams,
+  LOCALE_BCP47_TAGS,
   routes,
   SIZE,
 } from '@blog/config';
@@ -20,6 +21,7 @@ import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { AuthMenu } from '@web/components/shared/auth-menu';
 import { BrandLockupLink } from '@web/components/shared/brand-lockup-link';
+import { DocumentShell } from '@web/components/shared/document-shell';
 import { SiteNavigation } from '@web/components/shared/site-navigation';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { SocialLinks } from '@web/components/shared/social-links';
@@ -188,12 +190,10 @@ export default async function LocaleLayout({ children, params }: TProps) {
     ? urlForSanityImage(brand.logo, tenantContext)
     : undefined;
   return (
-    // `<html>` (owned by the tenant-independent root layout above) has no
-    // tenant to resolve theme tokens from, so `ThemeScope` establishes them
-    // here instead.
-    <ThemeScope themeTokens={themeTokens}>
-      <SanityImageBaseUrlProvider baseUrl={sanityImageBaseUrl}>
-        {/* `locale`, `now`, and `timeZone` are passed explicitly (not
+    <DocumentShell lang={LOCALE_BCP47_TAGS[locale]}>
+      <ThemeScope themeTokens={themeTokens}>
+        <SanityImageBaseUrlProvider baseUrl={sanityImageBaseUrl}>
+          {/* `locale`, `now`, and `timeZone` are passed explicitly (not
           inherited) so the page stays statically rendered —
           `setRequestLocale` above already resolves them from the static
           param rather than a dynamic API, but passing them here skips the
@@ -202,67 +202,68 @@ export default async function LocaleLayout({ children, params }: TProps) {
           components that read the locale (next-intl
           navigation `Link` in the post-list module) need this provider or
           they throw "No intl context found". */}
-        <NextIntlClientProvider
-          locale={locale}
-          messages={messages}
-          now={now}
-          timeZone={timeZone}
-        >
-          {/* No `session` prop: `AuthMenu` resolves the session client-side rather than duplicating an `auth()` call at every layout render. */}
-          <SessionProvider>
-            {/* Mounted above `children` so a toast survives a client-side route change instead of being tied to the page that fired it. */}
-            <ToastProvider>
-              <VoiceRichProvider values={rich}>
-                <div className={s.root()}>
-                  <Header>
-                    <Header.Brand>
-                      <BrandLockupLink
-                        logoUrl={brandLogoUrl}
-                        tagline={brand.tagline}
-                      />
-                    </Header.Brand>
-                    <SiteNavigation
-                      links={navItems}
-                      actions={
-                        <>
-                          <ThemeToggleButton />
-                          <AuthMenu oauthProviderIds={oauthProviderIds} />
-                        </>
-                      }
-                    />
-                  </Header>
-                  <div className={s.content()}>{children}</div>
-                  <Footer dataTestId="site-footer">
-                    <Footer.Copyright title={brand.name} year={currentYear} />
-                    <Footer.Nav>
-                      <SocialLinks profiles={social} />
-                      <NavLink
-                        as={SmartLink}
-                        href={routes.rssFeed()}
-                        icon={
-                          <Icon
-                            name={ICONS.RSS}
-                            size={SIZE.SM}
-                            dataTestId="rss-icon"
-                          />
+          <NextIntlClientProvider
+            locale={locale}
+            messages={messages}
+            now={now}
+            timeZone={timeZone}
+          >
+            {/* No `session` prop: `AuthMenu` resolves the session client-side rather than duplicating an `auth()` call at every layout render. */}
+            <SessionProvider>
+              {/* Mounted above `children` so a toast survives a client-side route change instead of being tied to the page that fired it. */}
+              <ToastProvider>
+                <VoiceRichProvider values={rich}>
+                  <div className={s.root()}>
+                    <Header>
+                      <Header.Brand>
+                        <BrandLockupLink
+                          logoUrl={brandLogoUrl}
+                          tagline={brand.tagline}
+                        />
+                      </Header.Brand>
+                      <SiteNavigation
+                        links={navItems}
+                        actions={
+                          <>
+                            <ThemeToggleButton />
+                            <AuthMenu oauthProviderIds={oauthProviderIds} />
+                          </>
                         }
-                        hasLabel={false}
-                      >
-                        {t('feedLinkLabel')}
-                      </NavLink>
-                    </Footer.Nav>
-                  </Footer>
-                </div>
-              </VoiceRichProvider>
-            </ToastProvider>
-          </SessionProvider>
-        </NextIntlClientProvider>
-      </SanityImageBaseUrlProvider>
-      {/* Both scripts 404 on a project without Speed Insights/Web Analytics
+                      />
+                    </Header>
+                    <div className={s.content()}>{children}</div>
+                    <Footer dataTestId="site-footer">
+                      <Footer.Copyright title={brand.name} year={currentYear} />
+                      <Footer.Nav>
+                        <SocialLinks profiles={social} />
+                        <NavLink
+                          as={SmartLink}
+                          href={routes.rssFeed()}
+                          icon={
+                            <Icon
+                              name={ICONS.RSS}
+                              size={SIZE.SM}
+                              dataTestId="rss-icon"
+                            />
+                          }
+                          hasLabel={false}
+                        >
+                          {t('feedLinkLabel')}
+                        </NavLink>
+                      </Footer.Nav>
+                    </Footer>
+                  </div>
+                </VoiceRichProvider>
+              </ToastProvider>
+            </SessionProvider>
+          </NextIntlClientProvider>
+        </SanityImageBaseUrlProvider>
+        {/* Both scripts 404 on a project without Speed Insights/Web Analytics
           enabled in the Vercel dashboard, so `isWebAnalyticsEnabled()` must
           gate them alongside the tenant's `ANALYTICS` capability. */}
-      {analyticsEnabled && <SpeedInsights />}
-      {analyticsEnabled && <Analytics />}
-    </ThemeScope>
+        {analyticsEnabled && <SpeedInsights />}
+        {analyticsEnabled && <Analytics />}
+      </ThemeScope>
+    </DocumentShell>
   );
 }

@@ -19,14 +19,9 @@ export type TLocaleErrorPageProps = {
 const s = errorPageLayoutVariants();
 
 /**
- * Rendered by `[tenant]/[locale]/error.tsx` — sits below
- * `NextIntlClientProvider`, so unlike `ErrorPage`/`GlobalErrorPage` (which
- * sit above it and stay hardcoded English) this one can translate its copy,
- * and "Go home" can use `SmartLink` (its locale awareness needs that same
- * provider). It catches errors thrown anywhere in the localized route tree;
- * `app/error.tsx` still handles the narrower case of
- * `[tenant]/[locale]/layout.tsx` itself throwing, which
- * a boundary nested inside that layout can't reach.
+ * Sits below `NextIntlClientProvider`, so unlike `GlobalErrorPage` it can
+ * translate its copy and link home with `SmartLink`. An error thrown by
+ * `[tenant]/[locale]/layout.tsx` itself goes to `GlobalErrorPage` instead.
  */
 export const LocaleErrorPage = ({ error, reset }: TLocaleErrorPageProps) => {
   const t = useTranslations('localeErrorPage');

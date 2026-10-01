@@ -1,4 +1,4 @@
-import NotFound, { generateMetadata } from './not-found';
+import NotFound, { generateMetadata } from './global-not-found';
 
 const { standaloneNotFoundPageMock, buildNotFoundMetadataMock } = vi.hoisted(
   () => ({
@@ -15,7 +15,7 @@ vi.mock('@web/metadata/not-found-metadata', () => ({
   buildNotFoundMetadata: buildNotFoundMetadataMock,
 }));
 
-describe('NotFound (root not-found route)', () => {
+describe('GlobalNotFound (unmatched-route 404)', () => {
   describe('generateMetadata', () => {
     it('delegates to buildNotFoundMetadata', async () => {
       const metadata = { title: 'Page not found' };
@@ -29,7 +29,7 @@ describe('NotFound (root not-found route)', () => {
     const ui = { type: 'div', props: {} };
     standaloneNotFoundPageMock.mockResolvedValue(ui);
 
-    await expect(NotFound()).resolves.toBe(ui);
+    expect((await NotFound()).props.children).toBe(ui);
     expect(standaloneNotFoundPageMock).toHaveBeenCalledWith();
   });
 });

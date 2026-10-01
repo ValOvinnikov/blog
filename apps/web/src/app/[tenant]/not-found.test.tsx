@@ -41,7 +41,7 @@ describe('TenantNotFound ([tenant] not-found route)', () => {
     getRememberedTenantIdMock.mockReturnValue('tenant-1');
     standaloneNotFoundPageMock.mockResolvedValue(ui);
 
-    await expect(TenantNotFound()).resolves.toBe(ui);
+    expect((await TenantNotFound()).props.children).toBe(ui);
     expect(standaloneNotFoundPageMock).toHaveBeenCalledWith({
       tenant: 'tenant-1',
     });
@@ -53,7 +53,7 @@ describe('TenantNotFound ([tenant] not-found route)', () => {
     getRememberedTenantIdMock.mockReturnValue(undefined);
     standaloneNotFoundPageMock.mockResolvedValue(ui);
 
-    await expect(TenantNotFound()).resolves.toBe(ui);
+    expect((await TenantNotFound()).props.children).toBe(ui);
     expect(standaloneNotFoundPageMock).toHaveBeenCalledWith({
       tenant: undefined,
     });
