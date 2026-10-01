@@ -33,6 +33,14 @@ export const pricingPriceSchema = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: 'periodLabel',
+      title: 'Period label',
+      type: 'string',
+      description:
+        'Wording for this price only, replacing the site-wide label for its period.',
+      validation: (rule) => rule.max(24),
+    }),
+    defineField({
       name: 'amount',
       title: 'Amount',
       type: 'number',

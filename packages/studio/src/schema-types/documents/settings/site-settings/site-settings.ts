@@ -1,5 +1,6 @@
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { brandSchema } from '@blog/studio/schema-types/objects/brand/brand';
+import { pricePeriodLabelsSchema } from '@blog/studio/schema-types/objects/price-period-labels/price-period-labels';
 import { Settings } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
@@ -37,6 +38,14 @@ export const siteSettingsSchema = defineType({
         layout: 'dropdown',
         list: currencyOptionList,
       },
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: 'pricePeriodLabels',
+      title: 'Price period labels',
+      type: pricePeriodLabelsSchema.name,
+      description:
+        'The wording shown beside every price on the site, such as "per month". A single price can override it.',
       validation: (rule) => rule.required(),
     }),
   ],

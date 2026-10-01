@@ -16,6 +16,7 @@ import { linkRefSchema } from './link-ref/link-ref';
 import { logoItemSchema } from './logo-item/logo-item';
 import { openGraphSchema } from './open-graph/open-graph';
 import { postTakeawaysSchema } from './post-takeaways/post-takeaways';
+import { pricePeriodLabelsSchema } from './price-period-labels/price-period-labels';
 import { pricingPriceSchema } from './pricing-price/pricing-price';
 import { pricingTierSchema } from './pricing-tier/pricing-tier';
 import { seoSchema } from './seo/seo';
@@ -46,6 +47,7 @@ export const objects = [
   postTakeawaysSchema,
   statSchema,
   timelineItemSchema,
+  pricePeriodLabelsSchema,
   pricingPriceSchema,
   pricingTierSchema,
 ];
