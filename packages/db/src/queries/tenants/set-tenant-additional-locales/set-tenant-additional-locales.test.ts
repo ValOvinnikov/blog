@@ -1,4 +1,8 @@
-import { ERROR_CODE, LOCALE_ISO_CODES } from '@blog/config/constants';
+import {
+  ERROR_CODE,
+  LOCALE_ISO_CODES,
+  type TLocaleIsoCode,
+} from '@blog/config/constants';
 import {
   TENANT_PLAN,
   TENANT_STATUS,
@@ -17,15 +21,19 @@ vi.mock('@blog/db/client', () => ({ getDb: getDbMock }));
 
 const db = useQueryTestDb(getDbMock);
 
-const { EN, NL, FR, DE } = LOCALE_ISO_CODES;
+const { EN, NL, FR, DE, ES } = LOCALE_ISO_CODES;
 
-async function insertTenant(plan: TTenantPlan): Promise<string> {
+async function insertTenant(
+  plan: TTenantPlan,
+  additionalLocales: TLocaleIsoCode[] = [],
+): Promise<string> {
   const [tenant] = await db()
     .insert(schema.tenants)
     .values({
       name: 'Acme',
       primaryDomain: 'acme.example.com',
       locale: EN,
+      additionalLocales,
       plan,
       status: TENANT_STATUS.ACTIVE,
     })
@@ -109,6 +117,27 @@ describe(setTenantAdditionalLocales, () => {
 
     expect(result).toEqual({ ok: true, data: [] });
     expect(await storedAdditionalLocales(tenantId)).toEqual([]);
+  });
+
+  it('keeps stored locales past the limit in the order given after a downgrade', async () => {
+    const tenantId = await insertTenant(TENANT_PLAN.FREE, [NL, FR, DE]);
+
+    const result = await setTenantAdditionalLocales(tenantId, [DE, NL, FR]);
+
+    expect(result).toEqual({ ok: true, data: [DE, NL, FR] });
+    expect(await storedAdditionalLocales(tenantId)).toEqual([DE, NL, FR]);
+  });
+
+  it('rejects adding a new locale while over the limit', async () => {
+    const tenantId = await insertTenant(TENANT_PLAN.FREE, [NL, FR]);
+
+    const result = await setTenantAdditionalLocales(tenantId, [NL, ES]);
+
+    expect(result).toEqual({
+      ok: false,
+      error: ERROR_CODE.DB_LOCALE_LIMIT_EXCEEDED,
+    });
+    expect(await storedAdditionalLocales(tenantId)).toEqual([NL, FR]);
   });
 
   it('reports a missing tenant as not found', async () => {
