@@ -4,23 +4,12 @@ import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
 import {
   makePricingPrice,
   makePricingTier,
+  pricingLabels,
 } from '@web/testing/modules/pricing/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { toPricingPanels } from '@web/utils/to-pricing-panels';
 
 import { PricingModuleView } from './pricing-module-view';
-
-const labels = {
-  free: 'Free',
-  from: 'From',
-  periods: {
-    [PRICE_PERIOD.ONE_TIME]: 'one-time',
-    [PRICE_PERIOD.HOUR]: '/ hour',
-    [PRICE_PERIOD.SESSION]: '/ session',
-    [PRICE_PERIOD.MONTH]: '/ month',
-    [PRICE_PERIOD.YEAR]: '/ year',
-  },
-};
 
 const features = ['Unlimited posts', 'Custom domain', 'Email support'];
 
@@ -82,7 +71,7 @@ const panelsFor = (selected: typeof tiers) =>
     tiers: selected,
     locale: 'en-GB',
     currency: 'GBP',
-    labels,
+    labels: pricingLabels,
   });
 
 const meta = {

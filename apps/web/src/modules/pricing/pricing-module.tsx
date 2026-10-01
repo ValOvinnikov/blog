@@ -44,6 +44,7 @@ export const PricingModule = async ({
     currency: settingsResult.data.currency,
     labels: {
       free: t('free'),
+      compareAtLabel: t('compareAtLabel'),
       from: t('from'),
       periods: {
         [PRICE_PERIOD.ONE_TIME]: t('period.ONE_TIME'),

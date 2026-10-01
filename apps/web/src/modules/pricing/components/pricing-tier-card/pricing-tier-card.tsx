@@ -19,6 +19,7 @@ export const PricingTierCard = ({ card }: IPricingTierCardProps) => {
     footnote,
   } = card;
   const priceAmount = headline?.amount ?? label;
+  const compareAt = headline?.compareAt;
 
   return (
     <PricingCard isHighlighted={highlightLabel !== undefined}>
@@ -32,11 +33,20 @@ export const PricingTierCard = ({ card }: IPricingTierCardProps) => {
             {description}
           </PricingCard.Description>
         ) : null,
-        priceAmount ? (
+        priceAmount && compareAt ? (
           <PricingCard.Price
             key="price"
             amount={priceAmount}
-            compareAt={headline?.compareAt}
+            period={headline?.period}
+            prefix={headline?.prefix}
+            compareAt={compareAt.amount}
+            compareAtLabel={compareAt.label}
+          />
+        ) : null,
+        priceAmount && !compareAt ? (
+          <PricingCard.Price
+            key="price"
+            amount={priceAmount}
             period={headline?.period}
             prefix={headline?.prefix}
           />

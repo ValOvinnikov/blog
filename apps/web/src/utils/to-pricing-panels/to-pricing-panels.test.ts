@@ -2,24 +2,18 @@ import { PRICE_PERIOD } from '@blog/config';
 import {
   makePricingPrice,
   makePricingTier,
+  pricingLabels,
 } from '@web/testing/modules/pricing/fixtures';
 
 import { toPricingPanels } from './to-pricing-panels';
 
-const labels = {
-  free: 'Free',
-  from: 'From',
-  periods: {
-    [PRICE_PERIOD.ONE_TIME]: 'one-time',
-    [PRICE_PERIOD.HOUR]: '/ hour',
-    [PRICE_PERIOD.SESSION]: '/ session',
-    [PRICE_PERIOD.MONTH]: '/ month',
-    [PRICE_PERIOD.YEAR]: '/ year',
-  },
-};
-
 const setup = (tiers: Parameters<typeof toPricingPanels>[0]['tiers']) =>
-  toPricingPanels({ tiers, locale: 'en-GB', currency: 'GBP', labels });
+  toPricingPanels({
+    tiers,
+    locale: 'en-GB',
+    currency: 'GBP',
+    labels: pricingLabels,
+  });
 
 const monthlyAndYearly = makePricingTier({
   id: 'pro',
@@ -49,7 +43,7 @@ describe(toPricingPanels.name, () => {
     ]);
 
     expect(panel?.cards[0]?.headline?.amount).toBe('£99');
-    expect(panel?.cards[0]?.extras).toEqual(['£49 / month']);
+    expect(panel?.cards[0]?.extras).toEqual(['£49 per month']);
   });
 
   it('returns a monthly then a yearly panel when both periods exist', () => {
@@ -66,12 +60,12 @@ describe(toPricingPanels.name, () => {
 
     expect(monthly?.cards[0]?.headline).toMatchObject({
       amount: '£49',
-      period: '/ month',
+      period: 'per month',
     });
     expect(monthly?.cards[0]?.extras).toEqual(['£99 one-time']);
     expect(yearly?.cards[0]?.headline).toMatchObject({
       amount: '£490',
-      period: '/ year',
+      period: 'per year',
     });
     expect(yearly?.cards[0]?.extras).toEqual(['£99 one-time']);
   });
@@ -111,5 +105,18 @@ describe(toPricingPanels.name, () => {
       amount: '£49',
     });
     expect(panel?.cards[0]?.extras).toEqual(['Free']);
+  });
+
+  it('pairs the compare-at amount with its translated label', () => {
+    const [panel] = setup([
+      makePricingTier({
+        prices: [makePricingPrice({ amount: 39, compareAtAmount: 49 })],
+      }),
+    ]);
+
+    expect(panel?.cards[0]?.headline?.compareAt).toEqual({
+      amount: '£49',
+      label: 'Regular price',
+    });
   });
 });

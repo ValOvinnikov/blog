@@ -17,7 +17,7 @@ const makeCard = (
   headline: {
     amount: '£49',
     compareAt: undefined,
-    period: '/ month',
+    period: 'per month',
     prefix: undefined,
   },
   label: undefined,
@@ -66,7 +66,7 @@ describe(`<${PricingModuleView.name}/>`, () => {
               headline: {
                 amount: '£490',
                 compareAt: undefined,
-                period: '/ year',
+                period: 'per year',
                 prefix: undefined,
               },
             }),

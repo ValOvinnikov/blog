@@ -5,6 +5,7 @@ import type {
   TPricingTier,
 } from '@blog/service';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import type { IPricingLabels } from '@web/utils/to-pricing-panels';
 
 export const makePricingPrice = (
   overrides: Partial<TPricingPrice> = {},
@@ -43,3 +44,16 @@ export const makePricingModule = (
   layout: undefined,
   ...overrides,
 });
+
+export const pricingLabels: IPricingLabels = {
+  free: 'Free',
+  compareAtLabel: 'Regular price',
+  from: 'From',
+  periods: {
+    [PRICE_PERIOD.ONE_TIME]: 'one-time',
+    [PRICE_PERIOD.HOUR]: 'per hour',
+    [PRICE_PERIOD.SESSION]: 'per session',
+    [PRICE_PERIOD.MONTH]: 'per month',
+    [PRICE_PERIOD.YEAR]: 'per year',
+  },
+};

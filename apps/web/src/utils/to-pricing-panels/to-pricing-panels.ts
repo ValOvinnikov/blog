@@ -12,7 +12,7 @@ export type TPricingTabPeriod = (typeof PRICING_TAB_PERIODS)[number];
 
 interface IPricingHeadline {
   amount: string;
-  compareAt: TMaybeUndefined<string>;
+  compareAt: TMaybeUndefined<{ amount: string; label: string }>;
   period: TMaybeUndefined<string>;
   prefix: TMaybeUndefined<string>;
 }
@@ -35,8 +35,9 @@ export interface IPricingPanel {
   cards: IPricingCardData[];
 }
 
-interface IPricingLabels {
+export interface IPricingLabels {
   free: string;
+  compareAtLabel: string;
   from: string;
   periods: Record<TPricePeriod, string>;
 }
@@ -65,7 +66,10 @@ export const toPricingPanels = ({
     compareAt:
       price.compareAtAmount === undefined
         ? undefined
-        : formatAmount(price.compareAtAmount),
+        : {
+            amount: formatAmount(price.compareAtAmount),
+            label: labels.compareAtLabel,
+          },
     period: price.amount === 0 ? undefined : labels.periods[price.period],
     prefix: price.isStartingAt ? labels.from : undefined,
   });
