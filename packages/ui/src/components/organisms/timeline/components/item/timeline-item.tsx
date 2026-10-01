@@ -6,43 +6,52 @@ import {
   type TContentAlignment,
   type TTimelineOrientation,
 } from '@blog/config';
-import type { TCompoundChildren } from '@blog/ui/lib/react';
+import { mapCompoundSlots, type TCompoundChildren } from '@blog/ui/lib/react';
+import { Fragment } from 'react';
 
-import type { TimelineBody } from '../body/timeline-body';
-import type { TimelineHeading } from '../heading/timeline-heading';
-import type { TimelineMarker } from '../marker/timeline-marker';
+import { TimelineBody } from '../body/timeline-body';
+import { TimelineHeading } from '../heading/timeline-heading';
+import { TimelineMarker } from '../marker/timeline-marker';
 
 import { timelineItemVariants } from './timeline-item-variants';
 
-type TTimelineItemParts = {
-  Marker: typeof TimelineMarker;
-  Heading: typeof TimelineHeading;
-  Body: typeof TimelineBody;
+const TimelineItemParts = {
+  Marker: TimelineMarker,
+  Heading: TimelineHeading,
+  Body: TimelineBody,
 };
 
 export type TTimelineItemProps = IWithClassName &
   IWithDataTestId & {
     orientation?: TTimelineOrientation;
     itemAlignment?: Extract<TContentAlignment, 'LEFT' | 'CENTER'>;
-    children?: TCompoundChildren<TTimelineItemParts>;
+    children?: TCompoundChildren<typeof TimelineItemParts>;
   };
 
-/** Expects `Timeline.Marker` first, then `Timeline.Heading` and an optional `Timeline.Body`, in that order — the layout follows DOM position rather than slot detection. */
+/** One step on the timeline: a marker, a heading and optional supporting copy. */
 export const TimelineItem = ({
   orientation = TIMELINE_ORIENTATION.VERTICAL,
   itemAlignment = CONTENT_ALIGNMENT.LEFT,
   children,
   className,
   dataTestId,
-}: TTimelineItemProps) => (
-  <li
-    className={timelineItemVariants({
-      orientation,
-      itemAlignment,
-      class: className,
-    })}
-    data-testid={dataTestId}
-  >
-    {children}
-  </li>
-);
+}: TTimelineItemProps) => {
+  const { slots, unmatched } = mapCompoundSlots(children, TimelineItemParts);
+  const { root, marker, content } = timelineItemVariants({
+    orientation,
+    itemAlignment,
+  });
+
+  return (
+    <li className={root({ class: className })} data-testid={dataTestId}>
+      <div className={marker()}>{slots.Marker}</div>
+      <div className={content()}>
+        {slots.Heading}
+        {slots.Body}
+        {unmatched.map((node, i) => (
+          <Fragment key={i}>{node}</Fragment>
+        ))}
+      </div>
+    </li>
+  );
+};

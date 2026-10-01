@@ -11,12 +11,17 @@ import { Timeline } from './timeline';
 
 faker.seed(123);
 
-const items = Array.from({ length: 3 }, () => ({
+const createItem = () => ({
   heading: faker.company.catchPhrase(),
   body: faker.lorem.sentence(),
-}));
+});
 
-const renderTimeline = (markerStyle: TTimelineMarkerStyle) =>
+const firstItem = createItem();
+const items = [firstItem, createItem(), createItem()];
+
+const renderTimeline = (
+  markerStyle: TTimelineMarkerStyle = TIMELINE_MARKER_STYLE.NUMBERED,
+) =>
   renderElement(
     <Timeline
       orientation={TIMELINE_ORIENTATION.VERTICAL}
@@ -41,14 +46,14 @@ const renderTimeline = (markerStyle: TTimelineMarkerStyle) =>
 
 describe(`<${Timeline.name}/>`, () => {
   it('renders an ordered list with one item per entry', () => {
-    renderTimeline(TIMELINE_MARKER_STYLE.NUMBERED);
+    renderTimeline();
 
     expect(screen.getByRole('list')).toBeVisible();
     expect(screen.getAllByRole('listitem')).toHaveLength(items.length);
   });
 
   it('renders each item heading as a level-3 heading', () => {
-    renderTimeline(TIMELINE_MARKER_STYLE.NUMBERED);
+    renderTimeline();
 
     for (const item of items) {
       expect(
@@ -58,7 +63,7 @@ describe(`<${Timeline.name}/>`, () => {
   });
 
   it('hides a numbered marker from assistive tech, since the list already conveys the count', () => {
-    renderTimeline(TIMELINE_MARKER_STYLE.NUMBERED);
+    renderTimeline();
 
     expect(screen.getByText('1')).toHaveAttribute('aria-hidden', 'true');
   });
@@ -67,5 +72,33 @@ describe(`<${Timeline.name}/>`, () => {
     renderTimeline(TIMELINE_MARKER_STYLE.LABELLED);
 
     expect(screen.getByText('Step 1')).not.toHaveAttribute('aria-hidden');
+  });
+
+  it('renders the heading before the body whatever order the slots are written in', () => {
+    const { heading, body } = firstItem;
+    renderElement(
+      <Timeline
+        orientation={TIMELINE_ORIENTATION.VERTICAL}
+        itemAlignment={CONTENT_ALIGNMENT.LEFT}
+        markerStyle={TIMELINE_MARKER_STYLE.LABELLED}
+      >
+        <Timeline.Item>
+          <Timeline.Body>{body}</Timeline.Body>
+          <Timeline.Heading>{heading}</Timeline.Heading>
+          <Timeline.Marker markerStyle={TIMELINE_MARKER_STYLE.LABELLED}>
+            Step 1
+          </Timeline.Marker>
+        </Timeline.Item>
+      </Timeline>,
+    );
+
+    const headingNode = screen.getByRole('heading', {
+      level: 3,
+      name: heading,
+    });
+    expect(
+      headingNode.compareDocumentPosition(screen.getByText(body)) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   });
 });
