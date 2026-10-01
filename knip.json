@@ -41,7 +41,13 @@
       // Reachable only through a string in vitest.config.ts's `resolve.alias`,
       // which knip cannot follow. src/index.ts needs no entry of its own — it is
       // already detected from package.json `exports`.
-      "entry": ["src/testing/server-only-stub.ts"],
+      //
+      // src/shared/localization/*.ts: groundwork no loader imports until the
+      // CTA localization pilot adopts it; that pilot removes this entry.
+      "entry": [
+        "src/testing/server-only-stub.ts",
+        "src/shared/localization/*.ts"
+      ],
       "project": ["**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}!", "!src/testing/**!"]
     },
     "packages/db": {

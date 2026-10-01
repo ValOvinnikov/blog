@@ -2,6 +2,7 @@
 // Sanity client reads SANITY_API_READ_TOKEN and must stay server-only.
 import 'server-only';
 
+import type { TLocaleIsoCode } from '@blog/config/constants';
 import { env } from '@blog/service/utils/env/env';
 import { createClient } from 'next-sanity';
 
@@ -11,6 +12,8 @@ export type TTenantSanityContext = {
   projectId: string;
   dataset: string;
   token: string;
+  locale?: TLocaleIsoCode;
+  defaultLocale?: TLocaleIsoCode;
 };
 
 type TCachedTenantClient = {
