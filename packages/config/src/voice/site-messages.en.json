@@ -231,5 +231,21 @@
     "previousAriaLabel": "Previous slide",
     "nextAriaLabel": "Next slide",
     "regionLabel": "{title} carousel"
+  },
+  "pricingModule": {
+    "free": "Free",
+    "from": "From",
+    "period": {
+      "ONE_TIME": "one-time",
+      "HOUR": "/ hour",
+      "SESSION": "/ session",
+      "MONTH": "/ month",
+      "YEAR": "/ year"
+    },
+    "tabs": {
+      "MONTH": "Monthly",
+      "YEAR": "Yearly"
+    },
+    "periodSwitchLabel": "Billing period"
   }
 }
