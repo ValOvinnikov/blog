@@ -24,7 +24,7 @@ export const carouselVariants = tv({
       stepped: {
         track: ['-ml-[0.875rem] md:-ml-[1.25rem] lg:-ml-[1.75rem]'],
         slide: [
-          'basis-full md:basis-1/2 lg:basis-1/3',
+          'basis-[85%] sm:basis-1/2 lg:basis-1/3',
           'pl-[0.875rem] md:pl-[1.25rem] lg:pl-[1.75rem]',
         ],
       },
