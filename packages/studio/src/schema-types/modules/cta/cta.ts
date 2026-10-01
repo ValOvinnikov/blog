@@ -11,6 +11,7 @@ import { isBannerVariantDocument } from '@blog/studio/schema-types/fields/banner
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { containerWidthField } from '@blog/studio/schema-types/fields/container-width-field/container-width-field';
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
+import { mediaOrderField } from '@blog/studio/schema-types/fields/media-order-field/media-order-field';
 import { spacingAndDividerFields } from '@blog/studio/schema-types/fields/spacing-and-divider-fields/spacing-and-divider-fields';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
@@ -177,19 +178,11 @@ export const ctaSchema = defineType({
         hidden: isNotBannerVariant,
       },
     ]),
-    defineField({
+    mediaOrderField({
       name: 'mobileMediaOrder',
       title: 'Mobile Media Order',
-      type: 'string',
       description:
         'Whether the image comes before or after the text once the columns stack on small screens.',
-      options: {
-        layout: 'dropdown',
-        list: Object.values(MEDIA_ORDER).map((value) => ({
-          title: toTitleCase(value),
-          value,
-        })),
-      },
       initialValue: MEDIA_ORDER.LAST,
       hidden: isNotSplitVariant,
     }),
