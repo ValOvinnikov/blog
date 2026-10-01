@@ -12,11 +12,10 @@ export const imageWithCaptionVariants = tv({
         figure: ['w-full'],
       },
       [IMAGE_LAYOUT.FULL_BLEED]: {
-        // `left/right: 50%` plus a negative margin sized off the same `min(100vw, var(--container-page))` cap cancel out to a centered box at every width; a fixed `-mx-[50vw]` paired with an uncorrelated cap breaks that cancellation.
+        // Centred on its parent and sized to the viewport, so the parent column must itself be viewport-centred; the root clips horizontal overflow from the scrollbar gutter that `100vw` includes.
         figure: [
-          'relative left-1/2 right-1/2',
-          'w-[min(100vw,var(--container-page))]',
-          'mx-[calc(min(100vw,var(--container-page))*-0.5)]',
+          'relative left-1/2 w-screen -ml-[50vw]',
+          '[html:has(&)]:overflow-x-clip',
         ],
       },
       [IMAGE_LAYOUT.FLOAT_LEFT]: {
