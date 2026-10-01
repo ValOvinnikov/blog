@@ -34,7 +34,7 @@ const setup = customRender(TimelineModuleView, {
 });
 
 describe(`<${TimelineModuleView.name}/>`, () => {
-  it('renders the section heading as an h2 above the item headings', () => {
+  it('renders the section heading as an h2 and each item heading as an h3', () => {
     setup();
 
     expect(
@@ -43,7 +43,7 @@ describe(`<${TimelineModuleView.name}/>`, () => {
     expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(3);
   });
 
-  it('renders the items in order as an ordered list', () => {
+  it('renders the items in order as a list', () => {
     setup();
 
     const headings = screen.getAllByRole('heading', { level: 3 });
