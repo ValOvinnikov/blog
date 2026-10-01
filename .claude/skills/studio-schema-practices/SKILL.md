@@ -199,6 +199,23 @@ so a reader can tell a decision was made from the code alone.
 The `modeFieldPair` factory above keeps `layout: 'radio'` because its mode
 field gates a conditional custom field, not because it is `required()`.
 
+### No toggle beside the field it switches on
+
+When a boolean's only job is to switch an optional field on, drop the boolean.
+A filled field is the switch. A pricing tier is highlighted when its
+`highlightLabel` is filled; it has no `isHighlighted` toggle. With two fields,
+the toggle can be off while the label is filled, and the editor can't tell
+which one wins. The service derives the boolean from the filled field
+(`isHighlighted: Boolean(highlightLabel)`) when the view needs one.
+
+A field that acts as the switch gets **no `initialValue`**. A default would
+switch it on for every new item, so a new pricing tier would start out
+highlighted.
+
+Keep a separate boolean only when it means something the field can't express
+on its own, for example a flag that changes behaviour while the field keeps
+its value.
+
 ## Migration quality
 
 - **Idempotency via target-state guard, symmetric across all document types.**
