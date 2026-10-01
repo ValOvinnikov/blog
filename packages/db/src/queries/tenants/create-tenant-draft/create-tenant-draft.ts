@@ -20,6 +20,7 @@ import {
 } from '@blog/db/schema/tenants';
 import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
 import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
+import { normalizeLocaleCode } from '@blog/db/utils/normalize-locale-code/normalize-locale-code';
 import type { TResult } from '@blog/utils';
 import { eq } from 'drizzle-orm';
 
@@ -90,7 +91,7 @@ export async function createTenantDraft(
     .values({
       name: input.name,
       primaryDomain: input.domain,
-      locale: input.locale,
+      locale: normalizeLocaleCode(input.locale),
       plan: input.plan,
       status: TENANT_STATUS.ACTIVE,
       provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,

@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
@@ -23,7 +24,7 @@ describe(getTenantById, () => {
         primaryDomain: 'acme.example.com',
         sanityProjectId: 'abc123',
         sanityDataset: 'production',
-        locale: 'en',
+        locale: LOCALE_ISO_CODES.EN,
         plan: TENANT_PLAN.FREE,
         status: TENANT_STATUS.ACTIVE,
       })
@@ -49,7 +50,7 @@ describe(getTenantById, () => {
         primaryDomain: 'acme.example.com',
         sanityProjectId: 'abc123',
         sanityDataset: 'production',
-        locale: 'en',
+        locale: LOCALE_ISO_CODES.EN,
         plan: TENANT_PLAN.FREE,
         status: TENANT_STATUS.ARCHIVED,
         deprovisionedAt: new Date(),
@@ -70,7 +71,7 @@ describe(getTenantById, () => {
         primaryDomain: 'acme.example.com',
         sanityProjectId: 'abc123',
         sanityDataset: 'production',
-        locale: 'en',
+        locale: LOCALE_ISO_CODES.EN,
         plan: TENANT_PLAN.FREE,
         status: TENANT_STATUS.ARCHIVED,
         deprovisionedAt: new Date(),

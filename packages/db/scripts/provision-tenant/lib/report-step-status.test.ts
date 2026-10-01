@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import { beginTenantProvisioning } from '@blog/db/queries/tenants';
 import * as schema from '@blog/db/schema';
@@ -19,7 +20,7 @@ async function insertDraftTenant(): Promise<string> {
     .values({
       name: 'Acme',
       primaryDomain: 'acme.example.com',
-      locale: 'en',
+      locale: LOCALE_ISO_CODES.EN,
       plan: TENANT_PLAN.FREE,
       status: TENANT_STATUS.ACTIVE,
       provisioningStatus: 'PENDING',

@@ -37,3 +37,9 @@ export const PLAN_REGISTRY: Record<TTenantPlan, TCapability[]> = {
     CAPABILITY.CONSENT_BANNER,
   ],
 };
+
+// Includes the default locale.
+export const PLAN_LOCALE_LIMIT: Record<TTenantPlan, number> = {
+  [TENANT_PLAN.FREE]: 1,
+  [TENANT_PLAN.GROWTH]: 3,
+};
