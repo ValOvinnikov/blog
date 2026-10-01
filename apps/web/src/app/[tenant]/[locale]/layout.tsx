@@ -108,7 +108,7 @@ export function generateStaticParams() {
 
 type TProps = {
   children: React.ReactNode;
-  params: Promise<ITenantLocalizedParams>;
+  params: Promise<Omit<ITenantLocalizedParams, 'locale'> & { locale: string }>;
 };
 
 export default async function LocaleLayout({ children, params }: TProps) {
