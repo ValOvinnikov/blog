@@ -23,7 +23,7 @@ export const PageHeading = ({
 
   return (
     <div className={s.root()}>
-      <Heading level={1} visual="section" className={s.heading()}>
+      <Heading level={1} visual="page" className={s.heading()}>
         {heading}
       </Heading>
       {supportingText ? (

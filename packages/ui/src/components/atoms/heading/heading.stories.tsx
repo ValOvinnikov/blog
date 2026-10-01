@@ -61,6 +61,10 @@ export const VisualCard: TStory = {
   args: { level: 2, visual: 'card', children: 'Card Title Heading' },
 };
 
+export const VisualPage: TStory = {
+  args: { level: 1, visual: 'page', children: 'Page Title Heading' },
+};
+
 export const VisualSection: TStory = {
   args: { level: 2, visual: 'section', children: 'Section Heading' },
 };

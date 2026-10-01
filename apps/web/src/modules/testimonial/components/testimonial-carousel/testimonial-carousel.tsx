@@ -8,7 +8,6 @@ import type {
 import type { TTestimonialItem } from '@blog/service';
 import { LabelledCarousel } from '@web/components/shared/labelled-carousel';
 import { TestimonialCard } from '@web/modules/testimonial/components/testimonial-card/testimonial-card';
-import { twoUpCarouselVariants } from '@web/utils/two-up-carousel-variants';
 
 export interface ITestimonialCarouselProps
   extends IWithClassName, IWithDataTestId {
@@ -34,7 +33,8 @@ export const TestimonialCarousel = ({
     getItemKey={({ item }) => item.id}
     title={title}
     tone={tone}
-    className={twoUpCarouselVariants({ class: className })}
+    className={className}
+    slideSize="stepped"
     dataTestId={dataTestId}
   />
 );

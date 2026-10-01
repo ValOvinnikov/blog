@@ -9,5 +9,5 @@ export const teamMemberCardVariants = tv({
 });
 
 export const teamMemberCardAvatarFallbackVariants = tv({
-  base: ['size-full text-3xl sm:text-4xl'],
+  base: ['size-full'],
 });

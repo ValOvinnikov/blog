@@ -57,7 +57,7 @@ Variants: hasHref: (boolean)
 
 Semantic heading — `level` picks the rendered `h1`–`h4` tag for the page outline, independently of `visual`, which drives the rendered size instead (e.g. a deep Portable Text heading can still read as subordinate to the page's title).
 Props: level: THeadingLevel · visual?: THeadingVariants['visual'] · size?: THeadingVariants['size'] · id?: string · style?: CSSProperties · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-Variants: visual: hero|post|card|section|prose-h2|prose-h3|prose-h4|preview|copy · size: SIZE.XS|SIZE.SM|SIZE.MD|SIZE.LG|SIZE.XL|SIZE.XXL
+Variants: visual: hero|post|card|page|section|prose-h2|prose-h3|prose-h4|preview|copy · size: SIZE.XS|SIZE.SM|SIZE.MD|SIZE.LG|SIZE.XL|SIZE.XXL
 
 ### Icon — `components/atoms/icon/icon.tsx`
 
@@ -340,7 +340,7 @@ Variants: columns: 1|2|3|4
 
 Scrolls through a row of items, revealing more of them as the viewport widens.
 Props: items: readonly T[] · renderItem: (args: { item: T; index: number }) => ReactNode · getItemKey?: (args: { item: T; index: number }) => Key · ariaLabel: string · previousLabel: string · nextLabel: string · tone?: TBrandVariant · slideSize?: TCarouselVariants['slideSize'] · contentAlignment?: TCarouselVariants['alignment'] _(extends IWithClassName, IWithDataTestId)_
-Variants: slideSize: fraction|content · alignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER
+Variants: slideSize: fraction|stepped|content · alignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER
 
 ### ContentModule — `components/organisms/content-module/content-module.tsx`
 
