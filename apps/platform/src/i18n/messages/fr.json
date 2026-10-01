@@ -1,0 +1,737 @@
+{
+  "pageMetadata": {
+    "root": "Administration",
+    "tenants": "Locataires · Administration",
+    "tenant": "Locataire · Administration",
+    "look": "Apparence · Administration",
+    "voice": "Voix · Administration",
+    "selectTenant": "Choisir un espace de travail · Administration",
+    "addTenant": "Ajouter un locataire · Administration",
+    "tenantOverview": "Aperçu du locataire · Administration",
+    "tenantProvisioning": "Provisionnement · Administration",
+    "tenantDanger": "Zone de danger · Administration",
+    "tenantDomain": "Domaine · Administration",
+    "features": "Fonctionnalités · Administration",
+    "languages": "Langues · Administration",
+    "studio": "Studio · Administration",
+    "findings": "Constats · Administration",
+    "email": "E-mail · Administration"
+  },
+  "workspacePendingPage": {
+    "heading": "Votre espace de travail n'est pas encore prêt",
+    "description": "Cela peut arriver pendant la configuration d'un espace de travail, ou si un problème est survenu en cours de route. Actualisez la page dans quelques minutes, ou contactez la personne qui vous a invité si le problème persiste."
+  },
+  "sidebar": {
+    "brandName": "Valstack",
+    "brandTagline": "admin",
+    "collapseToggle": "Réduire la barre latérale",
+    "expandToggle": "Développer la barre latérale"
+  },
+  "tenantSwitcher": {
+    "archived": "Archivé"
+  },
+  "toastProvider": {
+    "viewportAriaLabel": "Notifications",
+    "dismissLabel": "Fermer la notification",
+    "mergeCountSuffix": " ×{count}"
+  },
+  "topbarNavMenu": {
+    "triggerLabel": "Menu"
+  },
+  "topbar": {
+    "breadcrumbAriaLabel": "Fil d'Ariane"
+  },
+  "navSections": {
+    "platformLabel": "Plateforme",
+    "platformSectionLabel": "Actions de la plateforme",
+    "contentSectionLabel": "Contenu",
+    "configurationSectionLabel": "Configuration",
+    "tenants": "Locataires",
+    "addTenant": "Ajouter un locataire",
+    "findings": "Constats",
+    "tenantLabel": "Locataire · {tenantName}",
+    "overview": "Aperçu",
+    "look": "Apparence",
+    "voice": "Voix",
+    "languages": "Langues",
+    "domain": "Domaine",
+    "studio": "Studio",
+    "email": "E-mail",
+    "subscribers": "Abonnés",
+    "comments": "Commentaires",
+    "team": "Équipe",
+    "provisioning": "Provisionnement",
+    "dangerZone": "Zone de danger",
+    "badgeLater": "plus tard",
+    "badgeThisMilestone": "cette étape",
+    "badgePlatform": "plateforme",
+    "features": "Fonctionnalités"
+  },
+  "tenantLayout": {
+    "scopeLabel": "Locataire"
+  },
+  "dashboardLayout": {
+    "yourSiteLabel": "Votre site"
+  },
+  "dashboardTenantPicker": {
+    "heading": "Choisir un espace de travail",
+    "description": "Vous avez accès à plusieurs espaces de travail. Choisissez-en un pour continuer."
+  },
+  "tenantsView": {
+    "title": "Locataires",
+    "description": "Tous les sites de la plateforme, lus depuis la table <code>tenants</code> réelle.",
+    "addTenant": "+ Ajouter un locataire"
+  },
+  "emailAlertsBanner": {
+    "title": "Alertes par e-mail non configurées",
+    "description": "RESEND_API_KEY n'est pas défini : les opérateurs ne recevront pas d'e-mail lorsqu'un locataire nécessite une intervention — consultez cette page manuellement."
+  },
+  "tenantsTable": {
+    "empty": "Aucun locataire pour le moment.",
+    "columnTenant": "Locataire",
+    "columnPlan": "Formule",
+    "columnStatus": "Statut",
+    "columnCreated": "Création",
+    "status": {
+      "ACTIVE": "Actif",
+      "SUSPENDED": "Suspendu",
+      "ARCHIVED": "Archivé"
+    },
+    "plan": {
+      "FREE": "Free",
+      "GROWTH": "Growth"
+    },
+    "manage": "Gérer",
+    "manageAriaLabel": "Gérer {tenantName}"
+  },
+  "findingsView": {
+    "title": "Constats",
+    "description": "Anomalies opérationnelles détectées par les contrôles planifiés, sur l'ensemble des locataires."
+  },
+  "findingsTable": {
+    "columnTenant": "Locataire",
+    "columnSource": "Source",
+    "columnKind": "Type",
+    "columnSeverity": "Gravité",
+    "columnLastSeen": "Dernière détection",
+    "noTenant": "— toute la plateforme",
+    "empty": "Aucun constat ouvert. Tout fonctionne correctement."
+  },
+  "findingsCard": {
+    "title": "Constats ouverts",
+    "empty": "Aucun constat ouvert pour ce locataire — tout fonctionne correctement.",
+    "detailsToggle": "Détails",
+    "columnLevel": "Niveau",
+    "columnDocument": "Document",
+    "columnMessage": "Message"
+  },
+  "findingSeverityLabel": {
+    "INFO": "Info",
+    "WARNING": "Avertissement",
+    "CRITICAL": "Critique"
+  },
+  "sanityValidationMarkerLabel": {
+    "error": "Erreur",
+    "warning": "Avertissement",
+    "info": "Info"
+  },
+  "findingSourceLabel": {
+    "DOCUMENT_VALIDATION": "Validation des documents",
+    "TENANT_PROVISIONING": "Provisionnement du locataire",
+    "RECHECK_TENANT_OWNERS": "Revérification du propriétaire",
+    "DOMAIN_VERIFICATION": "Vérification du domaine",
+    "SITE_CONFIG_REVALIDATION": "Revalidation de la configuration du site"
+  },
+  "findingKindLabel": {
+    "SCHEMA_VALIDATION_ERROR": "Erreur de validation du schéma",
+    "PROVISIONING_STEP_FAILED": "Échec d'une étape de provisionnement",
+    "OWNER_CHECK_STALLED": "Vérification du propriétaire bloquée",
+    "OWNER_CHECK_AMBIGUOUS": "Vérification du propriétaire ambiguë",
+    "DOMAIN_NOT_ADDED": "Domaine non ajouté",
+    "REVALIDATION_FAILED": "Échec de la revalidation"
+  },
+  "ownerHomePage": {
+    "description": "Votre site en un coup d'œil. Tout ce qui figure ici est en ligne.",
+    "yourSiteCardTitle": "Votre site",
+    "readOnlyBadge": "lecture seule",
+    "nameLabel": "Nom",
+    "publicDomainLabel": "Domaine public",
+    "planLabel": "Formule",
+    "localeLabel": "Langue",
+    "openPublicDomainAriaLabel": "Ouvrir {domain} dans un nouvel onglet",
+    "readOnlyHint": "Besoin de modifier l'une de ces valeurs ? Contactez votre interlocuteur sur la plateforme — elles sont liées à l'hébergement de votre site.",
+    "makeItYoursCardTitle": "Personnalisez-le",
+    "makeItYoursSupportingText": "les modifications sont appliquées immédiatement",
+    "lookTileTitle": "Apparence",
+    "lookTileDescription": "Couleurs, polices, logo, densité",
+    "voiceTileTitle": "Voix",
+    "voiceTileDescription": "Les textes qu'utilise votre site",
+    "featuresTileTitle": "Fonctionnalités",
+    "featuresTileDescription": "Commentaires, favoris, newsletter"
+  },
+  "provisioningBanner": {
+    "readyTitle": "Provisionné",
+    "readyDescription": "Toutes les étapes sont terminées.",
+    "viewStepsButton": "Voir les étapes",
+    "runningTitle": "Provisionnement — étape {step} sur {total}",
+    "runningDescription": "Cette page se met à jour automatiquement.",
+    "failedTitle": "Échec du provisionnement à l'étape {step} sur {total}",
+    "failedDescription": "{step} — {reason}",
+    "failedDescriptionFallback": "Cette étape a échoué — consultez les étapes pour réessayer.",
+    "ownerElevationBadge": {
+      "STALLED": "Invitation du propriétaire en attente",
+      "AMBIGUOUS_MEMBERSHIP": "Adhésion du propriétaire incertaine"
+    },
+    "ownerElevationDescription": {
+      "STALLED": "Le propriétaire n'a pas encore accepté son invitation — rien n'a échoué, mais il ne peut pas modifier son propre contenu tant qu'il ne l'a pas fait.",
+      "AMBIGUOUS_MEMBERSHIP": "Plusieurs adhésions correspondent au propriétaire de ce locataire — résolvez le problème manuellement dans Sanity Manage."
+    }
+  },
+  "tenantOverviewPage": {
+    "openSiteAction": "Ouvrir le site",
+    "domainCardTitle": "Domaine",
+    "dnsLinkButton": "DNS",
+    "publicDomainLabel": "Domaine public",
+    "lastCheckedLabel": "Dernière vérification",
+    "lastCheckedJustNow": "À l'instant",
+    "dnsStatus": {
+      "NOT_CONFIGURED": "Indisponible",
+      "NOT_ADDED": "Pas encore ajouté",
+      "PENDING": "En attente — DNS en cours",
+      "VERIFIED": "Vérifié",
+      "ERROR": "Vérification impossible"
+    },
+    "ownerCardTitle": "Propriétaire",
+    "emailLabel": "E-mail",
+    "roleLabel": "Rôle",
+    "ownerRoleBadge": "PROPRIÉTAIRE",
+    "ownerInvitedPendingBadge": "Invité, en attente",
+    "joinedLabel": "Inscrit le",
+    "contentWorkspaceCardTitle": "Espace de contenu",
+    "platformBadge": "plateforme",
+    "sanityProjectLabel": "Projet Sanity",
+    "datasetLabel": "Dataset",
+    "readTokenLabel": "Jeton de lecture",
+    "readTokenStored": "Enregistré",
+    "readTokenNotSet": "Non défini",
+    "revalidateHookLabel": "Webhook de revalidation",
+    "revalidateHookActive": "Actif",
+    "revalidateHookNotSet": "Non défini",
+    "notSetValue": "Non défini",
+    "recentActivityCardTitle": "Activité récente",
+    "recentActivitySourceLabel": "Journal système",
+    "activityEmpty": "Aucune activité enregistrée pour le moment.",
+    "relativeJustNow": "À l'instant",
+    "relativeMinutesAgo": "il y a {minutes} min",
+    "relativeHoursAgo": "il y a {hours} h",
+    "relativeDaysAgo": "il y a {days} j",
+    "activityAction": {
+      "CREATED": "Locataire créé",
+      "DEPROVISION_REQUESTED": "Déprovisionnement demandé",
+      "DEPROVISIONED": "Locataire déprovisionné",
+      "REACTIVATED": "Locataire réactivé",
+      "PROVISIONED": "Locataire provisionné",
+      "PROVISIONING_FAILED": "Échec du provisionnement",
+      "SETTINGS_UPDATED": "Paramètres mis à jour",
+      "DELETED": "Locataire supprimé"
+    }
+  },
+  "tenantDomainPage": {
+    "pageTitle": "Domaine",
+    "subCopy": "La seule étape de configuration qu'il vous revient réellement de terminer.",
+    "cardTitle": "Faites pointer {domain} vers nous",
+    "checkedHint": "Vérifié à l'instant",
+    "bodyCopy": "Ajoutez ces enregistrements chez votre fournisseur DNS. La vérification aboutit généralement en moins d'une heure.",
+    "columnType": "Type",
+    "columnName": "Nom",
+    "columnValue": "Valeur",
+    "verifiedEmptyState": "Ce domaine est vérifié — il ne reste rien à configurer.",
+    "unavailableState": "Les enregistrements DNS ne sont pas disponibles pour le moment.",
+    "dnsStatus": {
+      "NOT_CONFIGURED": "Indisponible",
+      "NOT_ADDED": "Pas encore ajouté",
+      "PENDING": "En attente du DNS",
+      "VERIFIED": "Vérifié",
+      "ERROR": "Vérification impossible"
+    }
+  },
+  "presetPicker": {
+    "ariaLabel": "Préréglage",
+    "console": "Console",
+    "consoleDescription": "Monospace, précis et technique.",
+    "consoleMiniPrimary": "Journal de build",
+    "consoleMiniSecondary": "Livré sans accroc",
+    "editorial": "Éditorial",
+    "editorialDescription": "Serif, chaleureux, esprit magazine.",
+    "editorialMiniPrimary": "Carnet de terrain",
+    "editorialMiniSecondary": "Chroniques du littoral"
+  },
+  "logoHueField": {
+    "followAccentHue": "Suivre la teinte d'accent",
+    "logoHueAriaLabel": "Teinte du logo",
+    "followsAccent": "suit l'accent",
+    "hueValue": "teinte {hue}°"
+  },
+  "lookForm": {
+    "heading": "Apparence",
+    "subtitle": "Personnalisez le thème de ce site. Tout s'affiche instantanément ci-dessous — rien n'est publié avant l'enregistrement.",
+    "resetButton": "Rétablir le préréglage",
+    "saveButton": "Enregistrer les modifications",
+    "savingButton": "Enregistrement…",
+    "alertSuccess": "Enregistré dans site_config.",
+    "alertError": "Impossible d'enregistrer les paramètres d'apparence — veuillez réessayer.",
+    "basicHeading": "Essentiel",
+    "basicDescription": "Ce que la plupart des locataires modifient",
+    "presetLabel": "Préréglage",
+    "presetDescription": "Le point de départ choisi par presque tous les locataires. Définit la teinte d'accent, les polices des titres et du texte, l'arrondi et la densité.",
+    "accentHueLabel": "Teinte d'accent",
+    "accentHueDescription": "Seule la teinte change — la luminosité et la chroma sont fixes (OKLCH), le contraste reste donc conforme aux WCAG.",
+    "logoHueLabel": "Teinte du logo",
+    "logoHueDescription": "Colore les nuances du logotype (--logo-1/2/3). Suit la teinte d'accent sauf si vous la définissez.",
+    "brandImagesLabel": "Images de marque",
+    "brandImagesDescription": "Stockées dans Vercel Blob — aucune transformation à la volée : le fichier envoyé est celui qui est publié.",
+    "logoFieldLabel": "Logo",
+    "logoFieldHint": "PNG, JPEG, WebP ou SVG · à défaut, le logotype polygonal est utilisé",
+    "faviconFieldLabel": "Favicon",
+    "faviconFieldHint": "Merci de fournir une image carrée déjà recadrée — Blob ne peut pas la recadrer pour vous (la viewBox d'un SVG définit sa forme). Les images non carrées sont refusées.",
+    "advancedSummary": "Avancé",
+    "optionalTag": "facultatif",
+    "headingFontLabel": "Police des titres",
+    "headingFontDescription": "Choix limité à cinq polices (chargeurs next/font statiques). Chacune s'affiche dans son propre style.",
+    "bodyFontLabel": "Police du texte",
+    "radiusScaleLabel": "Échelle d'arrondi",
+    "radiusScaleDescription": "Arrondi des angles sur toutes les surfaces.",
+    "densityLabel": "Densité",
+    "densityDescription": "Espacement et taille des contrôles.",
+    "footerNote": "L'échelle d'arrondi et la densité sont enregistrées avec le reste de ce formulaire, mais ne sont pas encore reflétées dans l'aperçu ci-dessus.",
+    "radiusScaleOptionLabel": {
+      "SM": "Petit",
+      "MD": "Moyen",
+      "LG": "Grand",
+      "XL": "Très grand"
+    },
+    "densityOptionLabel": {
+      "DEFAULT": "Par défaut",
+      "COMPACT": "Compacte"
+    }
+  },
+  "lookPreview": {
+    "modeLight": "Clair",
+    "modeDark": "Sombre",
+    "previewColorSchemeAriaLabel": "Jeu de couleurs de l'aperçu",
+    "livePreviewHeading": "Aperçu en direct",
+    "livePreviewDescription": "Véritables primitives @blog/ui",
+    "sampleHeading": "Lire les tables des marées",
+    "samplePara": "Une courte chronique pour montrer ensemble la typographie des titres et du texte, l'accent, les nuances du logo et l'arrondi.",
+    "subscribeButton": "S'abonner",
+    "readMoreButton": "Lire la suite",
+    "readTimeChip": "4 min de lecture",
+    "previewNote": "État du formulaire non enregistré → propriétés CSS personnalisées, selon la même rampe OKLCH qu'en production. Rien n'est publié avant l'enregistrement.",
+    "fullPagePreviewHeading": "Aperçu pleine page",
+    "fullPagePreviewDescription": "Réservé — nécessite un enregistrement pour s'afficher",
+    "deviceUrl": "{primaryDomain}",
+    "framePlaceholder": "Iframe du site réel en mode aperçu. Nécessite un enregistrement (ou une URL en mode aperçu) pour s'afficher — l'espace et le routage sont déjà réservés."
+  },
+  "brandAssetField": {
+    "unexpectedError": "Une erreur s'est produite — veuillez réessayer.",
+    "currentAlt": "{label} actuel",
+    "uploading": "Envoi…",
+    "replace": "Remplacer : {label}",
+    "upload": "Importer : {label}",
+    "remove": "Supprimer"
+  },
+  "emailForm": {
+    "pageHeading": "E-mail",
+    "pageSubtitle": "Identité de l'expéditeur et textes de chaque modèle pour tous les e-mails envoyés par ce locataire."
+  },
+  "emailSettingsForm": {
+    "heading": "Paramètres d'e-mail",
+    "description": "S'applique à tous les e-mails envoyés par ce locataire. Les champs vides reprennent la valeur par défaut du produit.",
+    "senderNameLabel": "Nom de l'expéditeur",
+    "senderNameHint": "Le nom affiché dans l'adresse d'expédition — indépendant du titre du site.",
+    "replyToLabel": "Adresse de réponse",
+    "replyToHint": "L'adresse vers laquelle sont dirigées les réponses aux e-mails du locataire.",
+    "footerAddressLabel": "Adresse postale du pied de page",
+    "footerAddressHint": "Une obligation légale pour les envois en masse — affichée dans le pied de page de chaque e-mail du locataire.",
+    "logoLabel": "Logo des e-mails",
+    "logoHint": "À défaut, le logo par défaut du produit est utilisé. Un modèle peut le remplacer par son propre logo ci-dessous.",
+    "saveButton": "Enregistrer les modifications",
+    "savingButton": "Enregistrement…",
+    "alertSuccess": "Paramètres d'e-mail enregistrés.",
+    "alertError": "Impossible d'enregistrer les paramètres d'e-mail — veuillez réessayer."
+  },
+  "emailLogoField": {
+    "unexpectedError": "Une erreur s'est produite — veuillez réessayer.",
+    "currentAlt": "{label} actuel",
+    "uploading": "Envoi…",
+    "replace": "Remplacer : {label}",
+    "upload": "Importer : {label}",
+    "remove": "Supprimer",
+    "unsupportedType": "Choisissez une image PNG, JPEG ou GIF — les formats SVG et WebP ne sont pas pris en charge par les principaux clients de messagerie.",
+    "tooLarge": "Ce fichier est trop volumineux — la limite est de {limit}."
+  },
+  "emailTemplatesSection": {
+    "heading": "Modèles",
+    "description": "Objet, corps et logo de chaque type de modèle. Si vous supprimez tout le texte rédigé, le modèle par défaut du produit est utilisé.",
+    "segmentedControlAriaLabel": "Choisissez un modèle d'e-mail à modifier"
+  },
+  "emailTemplateEditor": {
+    "subjectLabel": "Objet",
+    "subjectHint": "Laissez vide pour revenir à l'objet par défaut du produit.",
+    "bodyLabel": "Corps",
+    "bodyHint": "Le bouton de connexion, le lien d'invitation ou le lien de désabonnement s'affiche toujours sous ce texte — il ne peut pas être supprimé ici.",
+    "logoLabel": "Logo du modèle",
+    "logoHint": "Remplace le logo des e-mails du locataire pour ce modèle uniquement.",
+    "saveButton": "Enregistrer les modifications",
+    "savingButton": "Enregistrement…",
+    "alertSuccess": "Modèle enregistré.",
+    "alertError": "Impossible d'enregistrer ce modèle — veuillez réessayer.",
+    "previewHeading": "Aperçu",
+    "previewIframeTitle": "Aperçu de l'e-mail",
+    "actionLockedNote": "Le bouton ci-dessous s'affiche toujours et ne peut pas être modifié ici.",
+    "templateTypeLabel": {
+      "MAGIC_LINK": "Lien de connexion",
+      "TENANT_INVITE": "Invitation à l'équipe",
+      "NEWSLETTER_CONFIRMATION": "Confirmation de newsletter"
+    },
+    "templateTypeDescription": {
+      "MAGIC_LINK": "Envoyé lorsqu'une personne se connecte au site de ce locataire.",
+      "TENANT_INVITE": "Envoyé lorsqu'une personne est invitée à rejoindre l'équipe de ce locataire.",
+      "NEWSLETTER_CONFIRMATION": "Envoyé pour confirmer un abonnement à la newsletter."
+    },
+    "previewActionLabel": {
+      "MAGIC_LINK": "Se connecter",
+      "TENANT_INVITE": "Accepter l'invitation",
+      "NEWSLETTER_CONFIRMATION": "Confirmer l'abonnement"
+    }
+  },
+  "portableTextEditorToolbar": {
+    "bold": "Gras",
+    "italic": "Italique",
+    "heading": "Titre",
+    "bulletList": "Liste à puces",
+    "numberedList": "Liste numérotée",
+    "link": "Lien",
+    "removeLink": "Supprimer le lien",
+    "linkUrlLabel": "URL du lien",
+    "linkApply": "Appliquer",
+    "linkCancel": "Annuler"
+  },
+  "voiceSettings": {
+    "heading": "Voix",
+    "description": "Les mots que le site emploie pour s'exprimer. Chaque champ a déjà une valeur par défaut adaptée.",
+    "saveButton": "Enregistrer les modifications",
+    "savingButton": "Enregistrement…",
+    "alertSuccess": "voiceOverrides enregistré.",
+    "alertError": "Impossible d'enregistrer — veuillez réessayer.",
+    "basicHeading": "Essentiel",
+    "basicAlert": "Rien d'obligatoire ici. Le site dispose déjà de textes par défaut adaptés. La plupart des locataires n'ouvrent jamais les champs avancés ci-dessous.",
+    "advancedSummary": "Avancé — 8 textes sélectionnés, 2 groupes",
+    "advancedOverrideInfo": "Chaque champ est un remplacement. Laissez-en un vide pour utiliser le texte par défaut du site — vider un champ rétablit ce texte par défaut, il ne le remplace pas par une chaîne vide."
+  },
+  "voiceFieldGroup": {
+    "fieldCount": "{count, plural, one {# champ} other {# champs}}"
+  },
+  "voiceFieldGroups": {
+    "notFoundPage": "Page 404",
+    "emptyStates": "États vides"
+  },
+  "voiceFieldLabels": {
+    "notFoundHeading": "Titre de la page introuvable",
+    "notFoundSupportingText": "Texte de la page introuvable",
+    "notFoundReturnHome": "Lien de retour de la page introuvable",
+    "blogListEmpty": "Liste du blog vide",
+    "topicEmpty": "Thème vide",
+    "tagEmpty": "Étiquette vide",
+    "topicsEmpty": "Thèmes vides",
+    "bookmarksEmpty": "Favoris vides"
+  },
+  "addTenantWizard": {
+    "heading": "Ajouter un locataire",
+    "railAriaLabel": "Étapes de provisionnement",
+    "steps": {
+      "details": {
+        "title": "Détails",
+        "description": "Nom, domaine, formule"
+      }
+    },
+    "stepDescriptions": {
+      "SANITY_PROJECT": "Création et configuration",
+      "SEED_CONTENT": "Documents de départ",
+      "PERSIST_TOKEN": "Identifiants de lecture",
+      "MAP_DOMAIN": "DNS et vérification",
+      "CREATE_WEBHOOK": "Du CMS au site web",
+      "VERIFY_CONTENT": "Vérification du contenu de départ"
+    }
+  },
+  "tenantDetailsForm": {
+    "heading": "Détails du locataire",
+    "description": "La partie rapide. Tout le reste s'exécute automatiquement, et chaque étape peut être reprise en cas d'échec.",
+    "nameLabel": "Nom du locataire",
+    "domainLabel": "Domaine",
+    "domainHint": "Le domaine public auquel répondra le site de ce locataire.",
+    "planLabel": "Formule",
+    "planOptionFree": "Free",
+    "planOptionGrowth": "Growth",
+    "ownerEmailLabel": "E-mail du propriétaire",
+    "ownerEmailHint": "La personne qui gérera ce locataire. Un compte existant obtient l'accès immédiatement ; une nouvelle adresse reçoit une invitation par e-mail pour se connecter.",
+    "submitButton": "Lancer le provisionnement",
+    "confirmOwnerInviteButton": "Confirmer et inviter le propriétaire",
+    "submittingBeginButton": "Lancement du provisionnement…",
+    "submittingInviteButton": "Invitation du propriétaire…"
+  },
+  "provisioningStatusView": {
+    "pageTitle": "Provisionnement",
+    "description": "{tenantName} · chaque étape peut être reprise indépendamment.",
+    "stepsCardTitle": "Étapes",
+    "stepsCompletionBadge": "{done} sur {total} terminées",
+    "stepLabel": {
+      "SANITY_PROJECT": "Créer l'espace de travail",
+      "SEED_CONTENT": "Ajouter le contenu initial",
+      "PERSIST_TOKEN": "Émettre les identifiants de lecture",
+      "MAP_DOMAIN": "Connecter le domaine",
+      "CREATE_WEBHOOK": "Relier le CMS au site web",
+      "VERIFY_CONTENT": "Vérifier que le contenu est prêt"
+    },
+    "statusLabel": {
+      "IDLE": "Non démarrée",
+      "RUNNING": "En cours…",
+      "DONE": "Terminée",
+      "FAILED": "Échec"
+    },
+    "retryButton": "Relancer le provisionnement",
+    "retryingButton": "Relance du provisionnement…",
+    "startButton": "Démarrer le provisionnement",
+    "startingButton": "Démarrage…",
+    "startError": "Impossible de démarrer le provisionnement — veuillez réessayer.",
+    "startErrorNotFound": "Ce locataire est introuvable — actualisez la page et réessayez.",
+    "startErrorArchived": "Ce locataire est archivé ; le provisionnement ne peut pas être démarré.",
+    "startNoticeAlreadyInProgress": "Un provisionnement est déjà en cours pour ce locataire — cette page se mettra à jour automatiquement une fois celui-ci terminé.",
+    "pollErrorWarning": "Impossible d'actualiser le dernier statut — nouvelle tentative automatique.",
+    "errorKind": {
+      "permission": {
+        "headline": "Autorisation manquante pour terminer cette étape",
+        "body": "Les identifiants de provisionnement ne permettent pas d'effectuer ce que requiert cette étape — souvent inviter un membre du projet ou accorder un accès. Il peut être nécessaire de la terminer manuellement dans Sanity Manage ou le tableau de bord Vercel.",
+        "nextStep": "Accordez l'autorisation manquante, puis réessayez."
+      },
+      "duplicate": {
+        "headline": "Déjà utilisé par un autre locataire",
+        "body": "Un élément que cette étape tente de créer — un identifiant de projet, une invitation par e-mail ou un domaine — est déjà utilisé ailleurs.",
+        "nextStep": "Résolvez le conflit, puis réessayez."
+      },
+      "network": {
+        "headline": "Impossible de joindre le service de provisionnement",
+        "body": "La requête vers Sanity ou Vercel a expiré, ou la connexion a été interrompue avant la fin. Ce problème est souvent temporaire.",
+        "nextStep": "Patientez un instant, puis réessayez."
+      },
+      "unknown": {
+        "headline": "Cette étape a échoué",
+        "body": "Le provisionnement a rencontré une erreur qui n'est pas encore reconnue. Les détails techniques ci-dessous peuvent aider à la diagnostiquer.",
+        "nextStep": "Réessayez, ou consultez les détails techniques avant de demander de l'aide."
+      }
+    },
+    "technicalDetailsToggle": "Détails techniques",
+    "ownerLabel": "Propriétaire",
+    "ownerInvitedPendingBadge": "Invité, en attente",
+    "stepRunningNow": "en cours",
+    "relativeJustNow": "À l'instant",
+    "relativeMinutesAgo": "il y a {minutes} min",
+    "relativeHoursAgo": "il y a {hours} h",
+    "relativeDaysAgo": "il y a {days} j",
+    "runCardTitle": "Exécution",
+    "runStartedLabel": "Démarrée",
+    "runFinishedLabel": "Terminée",
+    "runRegistryLabel": "Registre",
+    "runStartedPending": "En attente du démarrage de l'exécution…",
+    "runFinishedPending": "—",
+    "runWorkflowLogLink": "Journal du workflow"
+  },
+  "deprovisioningStatusView": {
+    "cardTitle": "Progression du déprovisionnement",
+    "stepsCompletionBadge": "{done} sur {total} terminées",
+    "startingBadge": "Démarrage…",
+    "preRunStepStatusLabel": "En file d'attente",
+    "stepLabel": {
+      "REMOVE_DOMAIN": "Supprimer le domaine",
+      "ARCHIVE_SANITY_PROJECT": "Archiver le projet Sanity",
+      "REVOKE_SANITY_TOKENS": "Révoquer les jetons Sanity",
+      "CLEAR_ARTIFACTS": "Effacer les artefacts de provisionnement",
+      "ARCHIVE_TENANT": "Archiver le locataire",
+      "INVALIDATE_TENANT_CACHE": "Invalider les pages en cache"
+    },
+    "statusLabel": {
+      "IDLE": "Non démarrée",
+      "RUNNING": "En cours…",
+      "DONE": "Terminée",
+      "FAILED": "Échec"
+    },
+    "stepRunningNow": "en cours",
+    "failedStepLabel": "Échec pendant l'étape « {step} ».",
+    "errorKind": {
+      "permission": {
+        "headline": "Autorisation manquante pour terminer cette étape",
+        "body": "Les identifiants de démantèlement ne permettent pas d'effectuer ce que requiert cette étape — souvent révoquer un jeton ou retirer un membre du projet. Il peut être nécessaire de la terminer manuellement dans Sanity Manage ou le tableau de bord Vercel.",
+        "nextStep": "Accordez l'autorisation manquante, puis relancez le démantèlement."
+      },
+      "duplicate": {
+        "headline": "Déjà utilisé ailleurs",
+        "body": "Un élément que cette étape tente de supprimer ou de réattribuer — un mappage de domaine, un jeton — est déjà utilisé ou référencé ailleurs.",
+        "nextStep": "Résolvez le conflit, puis relancez le démantèlement."
+      },
+      "network": {
+        "headline": "Impossible de joindre le service de démantèlement",
+        "body": "La requête vers Sanity ou Vercel a expiré, ou la connexion a été interrompue avant la fin. Ce problème est souvent temporaire.",
+        "nextStep": "Patientez un instant, puis relancez le démantèlement."
+      },
+      "unknown": {
+        "headline": "Cette étape a échoué",
+        "body": "Le démantèlement a rencontré une erreur qui n'est pas encore reconnue. Les détails techniques ci-dessous peuvent aider à la diagnostiquer.",
+        "nextStep": "Relancez le démantèlement, ou consultez les détails techniques avant de demander de l'aide."
+      }
+    },
+    "technicalDetailsToggle": "Détails techniques",
+    "relativeJustNow": "À l'instant",
+    "relativeMinutesAgo": "il y a {minutes} min",
+    "relativeHoursAgo": "il y a {hours} h",
+    "relativeDaysAgo": "il y a {days} j",
+    "runCardTitle": "Exécution",
+    "runStartedLabel": "Démarrée",
+    "runFinishedLabel": "Terminée",
+    "runFinishedPending": "—",
+    "runWorkflowLogLink": "Journal du workflow"
+  },
+  "tenantDangerPage": {
+    "title": "Zone de danger",
+    "description": "Actions irréversibles pour ce locataire. Réservées aux super-administrateurs.",
+    "historyHeading": "Historique des démantèlements"
+  },
+  "studioPage": {
+    "title": "Studio",
+    "notProvisionedTitle": "Studio n'est pas encore prêt",
+    "notProvisionedDescription": "Le provisionnement du projet Sanity de ce locataire n'est pas terminé. Réessayez une fois le provisionnement achevé."
+  },
+  "tenantDetailsPanel": {
+    "heading": "Détails du locataire",
+    "fieldsGroupLabel": "Champs des détails du locataire",
+    "nameLabel": "Nom",
+    "domainLabel": "Domaine principal",
+    "ownerEmailLabel": "E-mail du propriétaire",
+    "planLabel": "Formule",
+    "planOptionFree": "Free",
+    "planOptionGrowth": "Growth",
+    "localeLabel": "Langue par défaut",
+    "saveButton": "Enregistrer les modifications",
+    "savingButton": "Enregistrement…",
+    "alertSuccess": "Détails du locataire enregistrés.",
+    "provisioningStartedError": "Le provisionnement de ce locataire a déjà commencé ; ses détails ne peuvent plus être modifiés.",
+    "archivedError": "Ce locataire est archivé ; ses détails ne peuvent plus être modifiés.",
+    "notFoundError": "Locataire introuvable.",
+    "ownerAlreadyJoinedError": "Le propriétaire de ce locataire s'est déjà connecté : son e-mail ne peut plus être corrigé ici — cela transférerait la propriété.",
+    "ownerEmailTakenError": "Cet e-mail fait déjà l'objet d'une invitation en attente pour ce locataire.",
+    "lockedAnnouncement": "Certains champs des détails du locataire sont désormais verrouillés.",
+    "unlockedAnnouncement": "D'autres champs des détails du locataire sont désormais modifiables.",
+    "fieldLockedReasonStep": "Verrouillé — l'étape « {step} » est déjà terminée et a utilisé cette valeur.",
+    "fieldLockedReasonRunning": "Verrouillé pendant le provisionnement.",
+    "fieldLockedReasonSucceeded": "Verrouillé — le provisionnement est déjà terminé.",
+    "fieldLockedReasonArchived": "Verrouillé — ce locataire est archivé.",
+    "localeIsAdditionalError": "Cette langue est déjà une langue supplémentaire. Retirez-la d'abord de cette liste.",
+    "localeInvalidError": "Choisissez une langue prise en charge."
+  },
+  "archivedTenantNotice": {
+    "title": "Ce locataire est archivé",
+    "description": "Déprovisionné le {date}. Tout le contenu de ces pages est en lecture seule."
+  },
+  "archivedTenantsToggle": {
+    "ariaLabel": "Visibilité des locataires",
+    "activeOption": "Actifs",
+    "allOption": "Tous"
+  },
+  "deprovisionTenantControl": {
+    "cardTitle": "Déprovisionner ce locataire",
+    "archivedCardTitle": "Supprimer définitivement ce locataire",
+    "description": "Supprime le domaine personnalisé du locataire, supprime son projet Studio et archive son projet Sanity pour en arrêter la facturation plutôt que de le supprimer. La ligne du locataire elle-même est archivée, pas supprimée. Cette action est irréversible.",
+    "triggerButton": "Déprovisionner",
+    "inProgressHint": "Un déprovisionnement est déjà en cours pour ce locataire.",
+    "dialogTitle": "Déprovisionner {name}",
+    "dialogDescription": "Cette action lance deprovision-tenant.yml, qui démantèle toutes les ressources provisionnées pour ce locataire. Saisissez le nom du locataire pour confirmer.",
+    "confirmLabel": "Saisissez « {name} » pour confirmer",
+    "confirmHint": "Doit correspondre exactement au nom du locataire.",
+    "dryRunLabel": "Simulation (aperçu uniquement, rien n'est supprimé)",
+    "cancelButton": "Annuler",
+    "confirmButton": "Déprovisionner",
+    "confirmingButton": "Lancement…",
+    "deleteDescription": "Supprime définitivement ce locataire et toutes les lignes dépendantes (adhésions, abonnés, favoris, domaines, configuration du site) de la base de données. Cette action est irréversible et libère son domaine pour une nouvelle utilisation.",
+    "deleteTriggerButton": "Supprimer définitivement le locataire",
+    "deleteDialogTitle": "Supprimer {name}",
+    "deleteDialogDescription": "Cette action supprime définitivement la ligne du locataire et tout ce qui en dépend. Saisissez le nom du locataire pour confirmer.",
+    "deleteConfirmLabel": "Saisissez « {name} » pour confirmer",
+    "deleteConfirmHint": "Doit correspondre exactement au nom du locataire.",
+    "deleteConfirmButton": "Supprimer",
+    "deleteConfirmingButton": "Suppression…"
+  },
+  "reactivateTenantControl": {
+    "cardTitle": "Réactiver ce locataire",
+    "description": "Remet en ligne un locataire archivé en relançant le provisionnement : la ligne du locataire et son projet Sanity sont désarchivés, le domaine personnalisé est de nouveau associé et le webhook de revalidation est recréé. Utilisez cette option plutôt que de supprimer un locataire déprovisionné par erreur.",
+    "triggerButton": "Réactiver le locataire",
+    "dialogTitle": "Réactiver {name}",
+    "dialogDescription": "Cette action lance provision-tenant.yml, qui restaure toutes les ressources provisionnées pour ce locataire. Saisissez le nom du locataire pour confirmer.",
+    "confirmLabel": "Saisissez « {name} » pour confirmer",
+    "confirmHint": "Doit correspondre exactement au nom du locataire.",
+    "cancelButton": "Annuler",
+    "confirmButton": "Réactiver",
+    "confirmingButton": "Lancement…"
+  },
+  "featuresSettings": {
+    "heading": "Fonctionnalités",
+    "description": "Activez ou désactivez les fonctionnalités proposées par le locataire. Les options verrouillées nécessitent la formule Growth.",
+    "saveButton": "Enregistrer les modifications",
+    "savingButton": "Enregistrement…",
+    "alertSuccess": "Fonctionnalités enregistrées.",
+    "alertError": "Impossible d'enregistrer — veuillez réessayer.",
+    "planLockedBadge": "Formule Growth",
+    "switchOn": "Activé",
+    "switchOff": "Désactivé",
+    "capabilitiesHeading": "Fonctionnalités disponibles",
+    "toggleLabel": {
+      "COMMENTS": "Commentaires",
+      "RATINGS": "Notes",
+      "BOOKMARKS": "Favoris",
+      "NEWSLETTER": "Newsletter",
+      "ANALYTICS": "Statistiques",
+      "CONSENT_BANNER": "Bannière de consentement aux cookies"
+    },
+    "toggleDescription": {
+      "COMMENTS": "Permettre aux lecteurs de commenter les articles.",
+      "RATINGS": "Permettre aux lecteurs de noter les articles.",
+      "BOOKMARKS": "Permettre aux lecteurs d'enregistrer des articles pour plus tard.",
+      "NEWSLETTER": "Afficher le formulaire d'inscription à la newsletter sur le site.",
+      "ANALYTICS": "Activer le suivi statistique sur le site.",
+      "CONSENT_BANNER": "Afficher aux visiteurs une bannière de consentement aux cookies avant le chargement des cookies ou scripts non essentiels."
+    }
+  },
+  "languageNames": {
+    "EN": "Anglais",
+    "NL": "Néerlandais",
+    "FR": "Français",
+    "DE": "Allemand",
+    "ES": "Espagnol"
+  },
+  "languagesSettings": {
+    "heading": "Langues",
+    "description": "Choisissez les langues dans lesquelles le site est publié, en plus de sa langue par défaut.",
+    "saveButton": "Enregistrer les modifications",
+    "savingButton": "Enregistrement…",
+    "alertSuccess": "Langues enregistrées.",
+    "alertError": "Impossible d'enregistrer — veuillez réessayer.",
+    "switchOn": "Activée",
+    "switchOff": "Désactivée",
+    "defaultHeading": "Langue par défaut",
+    "defaultDescription": "{language}. Chaque page est d'abord rédigée dans cette langue ; vous pouvez la définir dans les détails du locataire.",
+    "additionalHeading": "Langues supplémentaires",
+    "allowance": "{used} sur {allowed} langues supplémentaires utilisées avec votre formule.",
+    "upgradeNotice": "Votre formule ne publie que la langue par défaut. Passez à une formule supérieure pour ajouter d'autres langues.",
+    "downgradeNotice": "Votre formule publie {allowed, plural, one {# langue supplémentaire} other {# langues supplémentaires}}, mais {stored} sont enregistrées. Choisissez celles qui restent en ligne — les autres sont conservées et rien n'est supprimé.",
+    "keptBadge": "Conservée, non publiée avec votre formule",
+    "planLockedBadge": "Non incluse dans votre formule"
+  }
+}
