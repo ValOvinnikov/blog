@@ -70,13 +70,13 @@ export const TimelineModuleView = ({
                 orientation={orientation}
                 itemAlignment={itemAlignment}
               >
-                {markerContent !== undefined && markerContent !== '' && (
+                {!!markerContent && (
                   <Timeline.Marker markerStyle={markerStyle}>
                     {markerContent}
                   </Timeline.Marker>
                 )}
                 <Timeline.Heading>{heading}</Timeline.Heading>
-                {body && body.length > 0 && (
+                {!!body?.length && (
                   <Timeline.Body>
                     <PortableText value={body} />
                   </Timeline.Body>
