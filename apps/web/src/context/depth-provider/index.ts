@@ -1,1 +1,1 @@
-export { DepthProvider, useDepth } from './depth-provider';
+export { DepthProvider, useDepth, useHasDepthProvider } from './depth-provider';

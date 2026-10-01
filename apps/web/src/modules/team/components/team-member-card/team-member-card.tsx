@@ -81,7 +81,9 @@ export const TeamMemberCard = ({
         </div>
       )}
       {member.socialLinks.length > 0 && (
-        <SocialLinks profiles={member.socialLinks} variant="outlined" />
+        <div className={s.social()}>
+          <SocialLinks profiles={member.socialLinks} variant="outlined" />
+        </div>
       )}
     </MediaCard>
   );

@@ -111,3 +111,28 @@ export const FiveTestimonials: TStory = {
     ],
   },
 };
+
+export const SevenTestimonialsLastCardCentred: TStory = {
+  args: {
+    testimonials: [
+      ...testimonials,
+      makeTestimonialItem({ id: 'testimonial-4', name: 'Sana Ito' }),
+      makeTestimonialItem({ id: 'testimonial-5', name: 'Wale Adebayo' }),
+      makeTestimonialItem({ id: 'testimonial-6', name: 'Elin Kask' }),
+      makeTestimonialItem({ id: 'testimonial-7', name: 'Tomas Berg' }),
+    ],
+  },
+};
+
+export const TabletTwoPerRow: TStory = {
+  globals: { viewport: 'tablet' },
+  args: { testimonials: SevenTestimonialsLastCardCentred.args?.testimonials },
+};
+
+export const TabletCarouselTwoPerView: TStory = {
+  globals: { viewport: 'tablet' },
+  args: {
+    displayMode: DISPLAY_MODE.CAROUSEL,
+    testimonials: SevenTestimonialsLastCardCentred.args?.testimonials,
+  },
+};

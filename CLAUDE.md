@@ -1514,9 +1514,14 @@ must not attempt `gh project item-edit` or equivalent. Instead it signals
 status the way the board tooling already knows how to read
 (`board-keeper.md` Step 3's evidence table):
 
-- **Starting:** comment on the issue ("starting work in a cloud session"). A
-  web/remote session names its own branch `<type>/<n>-<slug>` — a pushed
-  branch with that name is the In Progress signal. The GitHub Actions
+- **Starting:** comment on the issue ("starting work in a cloud session"),
+  then rename the branch before the first push. A web/remote session starts
+  on a generated name like `claude/optimistic-noether-isuljn`, which carries
+  no issue number, so nothing can read it. Rename it to `<type>/<n>-<slug>`,
+  with the slug taken from the ticket title
+  (`git branch -m feat/3952-team-single-member` for "feat(studio): a Team
+  may have a single member"). A pushed branch with that name is the In Progress
+  signal. The GitHub Actions
   `@claude` path can't control this: `claude-code-action` generates its own
   branch as `claude/issue-<n>-<timestamp>`, which `board-keeper.md`'s Step 2
   also recognizes as an In Progress signal.
@@ -1532,9 +1537,13 @@ status the way the board tooling already knows how to read
   from the already-pushed branch without needing a checkout.
 - **Done:** the merged `Closes #n` PR is the Done signal; nothing extra.
 
-The board catches up when any local session dispatches `board-keeper`
-(targeted trigger or sweep) — its existing branch/PR inference turns that
-evidence into status writes.
+**The board updates itself from that evidence — no local session needed.**
+`.github/workflows/board-auto-sync.yml` moves issue `#n` to In Progress when a
+branch named for it is pushed, and to Code Review when its PR opens, and
+confirms each write. So a cloud session reports the evidence it left and
+stops there. It never tells the user the board is waiting on a local
+`board-keeper` run; that only catches up what the workflow can't see, such as
+a branch with a generated name.
 
 ## Deployment
 

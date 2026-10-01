@@ -1,4 +1,4 @@
-const TESTIMONIAL_GRID_COLUMNS_BY_ITEM_COUNT: Record<number, 1 | 2 | 3 | 4> = {
+const TESTIMONIAL_GRID_COLUMNS_BY_ITEM_COUNT: Record<number, 2 | 3> = {
   2: 2,
   3: 3,
   4: 2,
@@ -8,5 +8,5 @@ const TESTIMONIAL_GRID_COLUMNS_BY_ITEM_COUNT: Record<number, 1 | 2 | 3 | 4> = {
   8: 2,
 };
 
-export const toTestimonialGridColumns = (itemCount: number): 1 | 2 | 3 | 4 =>
+export const toTestimonialGridColumns = (itemCount: number): 2 | 3 =>
   TESTIMONIAL_GRID_COLUMNS_BY_ITEM_COUNT[itemCount] ?? 3;

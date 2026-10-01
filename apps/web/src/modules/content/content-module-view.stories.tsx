@@ -1,4 +1,4 @@
-import { BRAND_VARIANT, SPACING_SCALE } from '@blog/config';
+import { BRAND_VARIANT, CONTAINER_WIDTH, SPACING_SCALE } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { richTextDemo } from '@web/testing/shared/portable-text/fixtures';
 
@@ -46,6 +46,30 @@ export const WithDividerAndLargeSpacing: TStory = {
       spacingBottom: SPACING_SCALE.XL,
       dividerTop: true,
       dividerBottom: true,
+    },
+  },
+};
+
+export const CentredInWideContainer: TStory = {
+  args: {
+    layout: {
+      containerWidth: CONTAINER_WIDTH.WIDE,
+      spacingTop: SPACING_SCALE.MD,
+      spacingBottom: SPACING_SCALE.MD,
+      dividerTop: false,
+      dividerBottom: false,
+    },
+  },
+};
+
+export const CentredInFullContainer: TStory = {
+  args: {
+    layout: {
+      containerWidth: CONTAINER_WIDTH.FULL,
+      spacingTop: SPACING_SCALE.MD,
+      spacingBottom: SPACING_SCALE.MD,
+      dividerTop: false,
+      dividerBottom: false,
     },
   },
 };
