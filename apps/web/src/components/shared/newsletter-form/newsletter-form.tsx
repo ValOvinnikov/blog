@@ -42,6 +42,15 @@ export const NewsletterForm = ({
   );
   const errorMessageId = useId();
 
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
+
+    if (status === 'error') {
+      setStatus('idle');
+      setErrorMessage(undefined);
+    }
+  };
+
   const handleSubmit = async () => {
     if (!isValidEmail(email)) {
       setStatus('error');
@@ -69,7 +78,7 @@ export const NewsletterForm = ({
 
   const sharedProps = {
     email,
-    onChange: setEmail,
+    onChange: handleEmailChange,
     onSubmit: handleSubmit,
     status,
     heading,
