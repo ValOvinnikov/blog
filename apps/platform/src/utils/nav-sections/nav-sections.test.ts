@@ -141,13 +141,14 @@ describe('tenantNavSections', () => {
     }
   });
 
-  it('lists the eight Configuration-section destinations, Look through Team, with no Studio', () => {
+  it('lists the nine Configuration-section destinations, Look through Team, with no Studio', () => {
     const [, , configuration] = tenantNavSections(t, 'tenant-1', 'Acme Co');
 
     expect(configuration!.items.map((item) => item.label)).toEqual([
       'Look',
       'Voice',
       'Features',
+      'Languages',
       'Domain',
       'Email',
       'Subscribers',
@@ -175,7 +176,7 @@ describe('tenantNavSections', () => {
 });
 
 describe('dashboardNavSections', () => {
-  it('lists exactly two sections: Content (Studio) and Configuration (Look, Voice, Features, Domain, Email)', () => {
+  it('lists exactly two sections: Content (Studio) and Configuration (Look, Voice, Features, Languages, Domain, Email)', () => {
     const [content, configuration] = dashboardNavSections(t);
 
     expect(content!.label).toBe('Content');
@@ -185,6 +186,7 @@ describe('dashboardNavSections', () => {
       'Look',
       'Voice',
       'Features',
+      'Languages',
       'Domain',
       'Email',
     ]);

@@ -1,6 +1,6 @@
 'use client';
 
-import { ALERT_TYPE } from '@blog/config';
+import { ALERT_TYPE, LOCALE_ISO_CODES } from '@blog/config';
 import { TENANT_PLAN, type TTenantPlan } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { Alert } from '@platform/components/shared/alert';
@@ -43,12 +43,11 @@ type TFormValues = {
   ownerEmail: string;
 };
 
-type TTextFieldKey = 'name' | 'primaryDomain' | 'locale' | 'ownerEmail';
+type TTextFieldKey = 'name' | 'primaryDomain' | 'ownerEmail';
 
 const TEXT_FIELD_ID: Record<TTextFieldKey, string> = {
   name: 'tenant-detail-name',
   primaryDomain: 'tenant-detail-domain',
-  locale: 'tenant-detail-locale',
   ownerEmail: 'tenant-detail-owner-email',
 };
 
@@ -57,6 +56,7 @@ const TEXT_FIELD_TYPE: Partial<Record<TTextFieldKey, string>> = {
 };
 
 const PLAN_FIELD_ID = 'tenant-detail-plan';
+const LOCALE_FIELD_ID = 'tenant-detail-locale';
 
 const valuesFromProps = (
   tenant: TTenant,
@@ -96,6 +96,7 @@ export const TenantDetailsPanel = ({
 }: TTenantDetailsPanelProps) => {
   const t = useTranslations('tenantDetailsPanel');
   const tSteps = useTranslations('provisioningStatusView');
+  const tLanguage = useTranslations('languageNames');
   const toast = useToast();
   const router = useRouter();
   const panelId = useId();
@@ -234,11 +235,16 @@ export const TenantDetailsPanel = ({
   const textFields: { key: TTextFieldKey; label: string }[] = [
     { key: 'name', label: t('nameLabel') },
     { key: 'primaryDomain', label: t('domainLabel') },
-    { key: 'locale', label: t('localeLabel') },
     { key: 'ownerEmail', label: t('ownerEmailLabel') },
   ];
 
+  const localeOptions = Object.values(LOCALE_ISO_CODES).map((locale) => ({
+    value: locale,
+    label: tLanguage(locale),
+  }));
+
   const planLock = effectiveFieldLocks.plan;
+  const localeLock = effectiveFieldLocks.locale;
 
   return (
     <div data-tenant-details-panel={panelId}>
@@ -296,6 +302,32 @@ export const TenantDetailsPanel = ({
                   />
                 );
               })}
+
+              <FormField
+                label={t('localeLabel')}
+                hint={
+                  localeLock && (
+                    <span
+                      id={`${LOCALE_FIELD_ID}-lock-reason`}
+                      className={fieldLockReason()}
+                    >
+                      {lockReasonText(localeLock)}
+                    </span>
+                  )
+                }
+              >
+                <SegmentedControl<string>
+                  ariaLabel={t('localeLabel')}
+                  options={localeOptions}
+                  value={values.locale}
+                  onChange={(locale) => updateField('locale', locale)}
+                  className={planControl()}
+                  isDisabled={Boolean(localeLock)}
+                  aria-describedby={
+                    localeLock ? `${LOCALE_FIELD_ID}-lock-reason` : undefined
+                  }
+                />
+              </FormField>
 
               <FormField
                 label={t('planLabel')}

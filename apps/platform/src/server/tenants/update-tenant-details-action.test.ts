@@ -1,4 +1,8 @@
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import {
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  LOCALE_ISO_CODES,
+} from '@blog/config';
 import { auth } from '@platform/server/auth/auth';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { makeTenant } from '@platform/testing/tenants/fixtures';
@@ -43,7 +47,7 @@ const validInput = {
   name: 'Acme',
   primaryDomain: 'acme.example.com',
   plan: 'FREE' as const,
-  locale: 'EN',
+  locale: LOCALE_ISO_CODES.EN,
 };
 
 describe('updateTenantDetailsAction', () => {
@@ -401,5 +405,44 @@ describe('updateTenantDetailsAction', () => {
     const result = await updateTenantDetailsAction('tenant-1', validInput);
 
     expect(result).toEqual({ ok: false, error: expect.any(String) });
+  });
+
+  it('rejects a language outside the supported list without saving', async () => {
+    const { updateTenantDetailsAction } =
+      await import('./update-tenant-details-action');
+
+    const result = await updateTenantDetailsAction('tenant-1', {
+      ...validInput,
+      locale: 'en-US',
+    });
+
+    expect(result).toEqual({
+      ok: false,
+      fieldErrors: { locale: 'Choose a supported language.' },
+    });
+    expect(updateTenantDetailsMock).not.toHaveBeenCalled();
+  });
+
+  it('rejects a default language that is already an additional one', async () => {
+    getTenantByIdMock.mockResolvedValue(
+      makeTenant({
+        locale: LOCALE_ISO_CODES.EN,
+        additionalLocales: [LOCALE_ISO_CODES.NL],
+      }),
+    );
+    const { updateTenantDetailsAction } =
+      await import('./update-tenant-details-action');
+
+    const result = await updateTenantDetailsAction('tenant-1', {
+      ...validInput,
+      locale: LOCALE_ISO_CODES.NL,
+    });
+
+    expect(result).toEqual({
+      ok: false,
+      error:
+        'This language is already an additional language. Remove it there first.',
+    });
+    expect(updateTenantDetailsMock).not.toHaveBeenCalled();
   });
 });

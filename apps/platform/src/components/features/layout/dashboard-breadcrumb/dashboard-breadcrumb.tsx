@@ -38,6 +38,9 @@ export const DashboardBreadcrumb = () => {
     if (pathname === adminRoutes.dashboardVoice()) {
       return t('voice');
     }
+    if (pathname === adminRoutes.dashboardLanguages()) {
+      return t('languages');
+    }
     return t('features');
   })();
 
