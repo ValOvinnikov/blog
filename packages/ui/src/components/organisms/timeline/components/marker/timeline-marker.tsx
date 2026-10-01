@@ -14,7 +14,7 @@ export type TTimelineMarkerProps = IWithClassName &
     children: ReactNode;
   };
 
-/** A numbered marker is hidden from assistive tech because the `<ol>` already conveys the count. */
+/** The badge on a timeline item showing its step number or label. */
 export const TimelineMarker = ({
   markerStyle,
   className,
