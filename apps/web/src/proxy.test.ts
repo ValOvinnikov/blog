@@ -1,21 +1,28 @@
+import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config';
 import { logger } from '@web/utils/logger/logger';
 import { NextRequest, NextResponse } from 'next/server';
 
-const { resolveTenantIdMock, isProductionEnvironmentMock } = vi.hoisted(() => ({
-  resolveTenantIdMock: vi.fn(),
-  isProductionEnvironmentMock: vi.fn(),
-}));
+const { resolveTenantRoutingMock, isProductionEnvironmentMock } = vi.hoisted(
+  () => ({
+    resolveTenantRoutingMock: vi.fn(),
+    isProductionEnvironmentMock: vi.fn(),
+  }),
+);
 
 const intlMiddlewareMock = vi.fn<(request: NextRequest) => NextResponse>(() =>
   NextResponse.next(),
 );
 
+const createMiddlewareMock = vi.fn<
+  (routing: unknown) => typeof intlMiddlewareMock
+>(() => intlMiddlewareMock);
+
 vi.mock('next-intl/middleware', () => ({
-  default: () => intlMiddlewareMock,
+  default: (routing: unknown) => createMiddlewareMock(routing),
 }));
 
-vi.mock('./server/tenant/resolve-tenant-id', () => ({
-  resolveTenantId: resolveTenantIdMock,
+vi.mock('./server/tenant/resolve-tenant-routing', () => ({
+  resolveTenantRouting: resolveTenantRoutingMock,
 }));
 
 vi.mock('./utils/is-production-environment', () => ({
@@ -27,6 +34,12 @@ vi.mock('@web/utils/logger/logger');
 const loggerErrorMock = vi.mocked(logger.error);
 
 const { config, default: proxy } = await import('./proxy');
+
+const tenantRouting = (
+  tenantId: string,
+  defaultLocale: TLocaleIsoCode = LOCALE_ISO_CODES.EN,
+  liveLocales: TLocaleIsoCode[] = [defaultLocale],
+) => ({ tenantId, defaultLocale, liveLocales });
 
 const FOREIGN_TENANT_ID = 'a1b2c3d4-e5f6-4789-a012-3456789abcde';
 
@@ -102,7 +115,7 @@ describe('proxy matcher', () => {
 
 describe('proxy security guard', () => {
   beforeEach(() => {
-    resolveTenantIdMock.mockReset();
+    resolveTenantRoutingMock.mockReset();
     isProductionEnvironmentMock.mockReset();
     isProductionEnvironmentMock.mockReturnValue(false);
     loggerErrorMock.mockReset();
@@ -114,7 +127,7 @@ describe('proxy security guard', () => {
     );
 
     expect(response.status).toBe(404);
-    expect(resolveTenantIdMock).not.toHaveBeenCalled();
+    expect(resolveTenantRoutingMock).not.toHaveBeenCalled();
     expect(intlMiddlewareMock).not.toHaveBeenCalled();
   });
 
@@ -128,7 +141,7 @@ describe('proxy security guard', () => {
     );
 
     expect(response.status).toBe(404);
-    expect(resolveTenantIdMock).not.toHaveBeenCalled();
+    expect(resolveTenantRoutingMock).not.toHaveBeenCalled();
     expect(intlMiddlewareMock).not.toHaveBeenCalled();
   });
 
@@ -157,7 +170,7 @@ describe('proxy security guard', () => {
     );
 
     expect(response.status).toBe(404);
-    expect(resolveTenantIdMock).not.toHaveBeenCalled();
+    expect(resolveTenantRoutingMock).not.toHaveBeenCalled();
     expect(intlMiddlewareMock).not.toHaveBeenCalled();
   });
 
@@ -171,7 +184,7 @@ describe('proxy security guard', () => {
     );
 
     expect(response.status).toBe(404);
-    expect(resolveTenantIdMock).not.toHaveBeenCalled();
+    expect(resolveTenantRoutingMock).not.toHaveBeenCalled();
     expect(intlMiddlewareMock).not.toHaveBeenCalled();
   });
 
@@ -181,12 +194,12 @@ describe('proxy security guard', () => {
     );
 
     expect(response.status).toBe(404);
-    expect(resolveTenantIdMock).not.toHaveBeenCalled();
+    expect(resolveTenantRoutingMock).not.toHaveBeenCalled();
     expect(intlMiddlewareMock).not.toHaveBeenCalled();
   });
 
   it('does not refuse an ordinary content path', async () => {
-    resolveTenantIdMock.mockResolvedValue('tenant-1');
+    resolveTenantRoutingMock.mockResolvedValue(tenantRouting('tenant-1'));
 
     const response = await proxy(
       buildRequest('acme.example.com', undefined, '/blog/hello-world'),
@@ -198,7 +211,7 @@ describe('proxy security guard', () => {
 
 describe('proxy dotted-path pass-through', () => {
   beforeEach(() => {
-    resolveTenantIdMock.mockReset();
+    resolveTenantRoutingMock.mockReset();
     isProductionEnvironmentMock.mockReset();
     isProductionEnvironmentMock.mockReturnValue(false);
     loggerErrorMock.mockReset();
@@ -216,7 +229,7 @@ describe('proxy dotted-path pass-through', () => {
         buildRequest('acme.example.com', undefined, pathname),
       );
 
-      expect(resolveTenantIdMock).not.toHaveBeenCalled();
+      expect(resolveTenantRoutingMock).not.toHaveBeenCalled();
       expect(intlMiddlewareMock).not.toHaveBeenCalled();
       expect(response.headers.get('x-middleware-rewrite')).toBeNull();
       expect(response.status).not.toBe(404);
@@ -248,32 +261,32 @@ describe('proxy dotted-path pass-through', () => {
 
 describe('proxy tenant resolution', () => {
   beforeEach(() => {
-    resolveTenantIdMock.mockReset();
+    resolveTenantRoutingMock.mockReset();
     isProductionEnvironmentMock.mockReset();
     isProductionEnvironmentMock.mockReturnValue(false);
     loggerErrorMock.mockReset();
   });
 
   it('sets x-tenant-id on the request handed to next-intl when a tenant resolves', async () => {
-    resolveTenantIdMock.mockResolvedValue('tenant-1');
+    resolveTenantRoutingMock.mockResolvedValue(tenantRouting('tenant-1'));
 
     await proxy(buildRequest('acme.example.com'));
 
-    expect(resolveTenantIdMock).toHaveBeenCalledWith('acme.example.com');
+    expect(resolveTenantRoutingMock).toHaveBeenCalledWith('acme.example.com');
     const [forwardedRequest] = intlMiddlewareMock.mock.calls[0]!;
     expect(forwardedRequest.headers.get('x-tenant-id')).toBe('tenant-1');
   });
 
   it('calls resolveTenantId with null when the request has no Host header', async () => {
-    resolveTenantIdMock.mockResolvedValue('tenant-1');
+    resolveTenantRoutingMock.mockResolvedValue(tenantRouting('tenant-1'));
 
     await proxy(buildRequest(null));
 
-    expect(resolveTenantIdMock).toHaveBeenCalledWith(null);
+    expect(resolveTenantRoutingMock).toHaveBeenCalledWith(null);
   });
 
   it('falls through to next-intl with no header outside production and no tenant', async () => {
-    resolveTenantIdMock.mockResolvedValue(undefined);
+    resolveTenantRoutingMock.mockResolvedValue(undefined);
 
     const response = await proxy(buildRequest('unknown.example.com'));
 
@@ -285,7 +298,7 @@ describe('proxy tenant resolution', () => {
 
   it('404s without calling next-intl when no tenant resolves in production', async () => {
     isProductionEnvironmentMock.mockReturnValue(true);
-    resolveTenantIdMock.mockResolvedValue(undefined);
+    resolveTenantRoutingMock.mockResolvedValue(undefined);
 
     const response = await proxy(buildRequest('unknown.example.com'));
 
@@ -295,7 +308,7 @@ describe('proxy tenant resolution', () => {
 
   it('404s an archived or unprovisioned tenant domain in production', async () => {
     isProductionEnvironmentMock.mockReturnValue(true);
-    resolveTenantIdMock.mockResolvedValue(undefined);
+    resolveTenantRoutingMock.mockResolvedValue(undefined);
 
     const response = await proxy(buildRequest('archived-tenant.example.com'));
 
@@ -304,7 +317,7 @@ describe('proxy tenant resolution', () => {
   });
 
   it('strips a client-supplied x-tenant-id header before forwarding a resolved tenant', async () => {
-    resolveTenantIdMock.mockResolvedValue('tenant-1');
+    resolveTenantRoutingMock.mockResolvedValue(tenantRouting('tenant-1'));
 
     await proxy(
       buildRequest('acme.example.com', { 'x-tenant-id': 'spoofed-tenant' }),
@@ -315,7 +328,7 @@ describe('proxy tenant resolution', () => {
   });
 
   it('strips a client-supplied x-tenant-id header when resolution fails outside prod', async () => {
-    resolveTenantIdMock.mockResolvedValue(undefined);
+    resolveTenantRoutingMock.mockResolvedValue(undefined);
 
     await proxy(
       buildRequest('unknown.example.com', {
@@ -330,14 +343,14 @@ describe('proxy tenant resolution', () => {
 
 describe('proxy tenant segment rewrite', () => {
   beforeEach(() => {
-    resolveTenantIdMock.mockReset();
+    resolveTenantRoutingMock.mockReset();
     isProductionEnvironmentMock.mockReset();
     isProductionEnvironmentMock.mockReturnValue(false);
     loggerErrorMock.mockReset();
   });
 
   it("prepends the resolved tenant id to next-intl's locale-rewritten pathname", async () => {
-    resolveTenantIdMock.mockResolvedValue('tenant-1');
+    resolveTenantRoutingMock.mockResolvedValue(tenantRouting('tenant-1'));
     intlMiddlewareMock.mockImplementationOnce((request) =>
       NextResponse.rewrite(
         new URL(`/EN${request.nextUrl.pathname}`, request.url),
@@ -354,7 +367,7 @@ describe('proxy tenant segment rewrite', () => {
   });
 
   it('falls back to the original request URL when next-intl did not need to rewrite', async () => {
-    resolveTenantIdMock.mockResolvedValue('tenant-1');
+    resolveTenantRoutingMock.mockResolvedValue(tenantRouting('tenant-1'));
     intlMiddlewareMock.mockImplementationOnce(() => NextResponse.next());
 
     const response = await proxy(
@@ -367,7 +380,7 @@ describe('proxy tenant segment rewrite', () => {
   });
 
   it('uses a placeholder tenant segment outside production when no tenant resolves', async () => {
-    resolveTenantIdMock.mockResolvedValue(undefined);
+    resolveTenantRoutingMock.mockResolvedValue(undefined);
     intlMiddlewareMock.mockImplementationOnce((request) =>
       NextResponse.rewrite(
         new URL(`/EN${request.nextUrl.pathname}`, request.url),
@@ -384,7 +397,7 @@ describe('proxy tenant segment rewrite', () => {
   });
 
   it('never rewrites the tenant-shaped segment onto a redirect response', async () => {
-    resolveTenantIdMock.mockResolvedValue('tenant-1');
+    resolveTenantRoutingMock.mockResolvedValue(tenantRouting('tenant-1'));
     intlMiddlewareMock.mockImplementationOnce(() =>
       NextResponse.redirect(new URL('https://example.com/blog')),
     );
@@ -400,14 +413,14 @@ describe('proxy tenant segment rewrite', () => {
 
 describe('proxy tenant lookup failure', () => {
   beforeEach(() => {
-    resolveTenantIdMock.mockReset();
+    resolveTenantRoutingMock.mockReset();
     isProductionEnvironmentMock.mockReset();
     isProductionEnvironmentMock.mockReturnValue(false);
     loggerErrorMock.mockReset();
   });
 
   it('returns a controlled 503 instead of throwing when resolveTenantId rejects', async () => {
-    resolveTenantIdMock.mockRejectedValue(new Error('connection refused'));
+    resolveTenantRoutingMock.mockRejectedValue(new Error('connection refused'));
 
     const response = await proxy(buildRequest('acme.example.com'));
 
@@ -415,7 +428,7 @@ describe('proxy tenant lookup failure', () => {
   });
 
   it('never calls next-intl when the tenant lookup fails', async () => {
-    resolveTenantIdMock.mockRejectedValue(new Error('connection refused'));
+    resolveTenantRoutingMock.mockRejectedValue(new Error('connection refused'));
 
     await proxy(buildRequest('acme.example.com'));
 
@@ -424,7 +437,7 @@ describe('proxy tenant lookup failure', () => {
 
   it('logs the lookup failure exactly once with host and error context', async () => {
     const error = new Error('connection refused');
-    resolveTenantIdMock.mockRejectedValue(error);
+    resolveTenantRoutingMock.mockRejectedValue(error);
 
     await proxy(buildRequest('acme.example.com'));
 
@@ -437,7 +450,7 @@ describe('proxy tenant lookup failure', () => {
 
   it('fails closed in production when the tenant lookup fails', async () => {
     isProductionEnvironmentMock.mockReturnValue(true);
-    resolveTenantIdMock.mockRejectedValue(new Error('connection refused'));
+    resolveTenantRoutingMock.mockRejectedValue(new Error('connection refused'));
 
     const response = await proxy(buildRequest('acme.example.com'));
 
@@ -446,7 +459,7 @@ describe('proxy tenant lookup failure', () => {
   });
 
   it('sets no x-tenant-id and uses no fallback tenant when the lookup fails', async () => {
-    resolveTenantIdMock.mockRejectedValue(new Error('connection refused'));
+    resolveTenantRoutingMock.mockRejectedValue(new Error('connection refused'));
 
     await proxy(
       buildRequest('acme.example.com', { 'x-tenant-id': 'spoofed-tenant' }),
@@ -456,10 +469,60 @@ describe('proxy tenant lookup failure', () => {
   });
 
   it('does not log when a host resolves to no tenant, unlike a lookup failure', async () => {
-    resolveTenantIdMock.mockResolvedValue(undefined);
+    resolveTenantRoutingMock.mockResolvedValue(undefined);
 
     await proxy(buildRequest('unknown.example.com'));
 
     expect(loggerErrorMock).not.toHaveBeenCalled();
+  });
+});
+
+describe('proxy language routing', () => {
+  beforeEach(() => {
+    resolveTenantRoutingMock.mockReset();
+    isProductionEnvironmentMock.mockReturnValue(true);
+    intlMiddlewareMock.mockClear();
+  });
+
+  it('redirects a switched-off language prefix to the same path in the default language', async () => {
+    resolveTenantRoutingMock.mockResolvedValue(tenantRouting('tenant-1'));
+
+    const response = await proxy(
+      buildRequest('acme.example.com', undefined, '/nl/blog/hello'),
+    );
+
+    expect(response.status).toBe(307);
+    expect(new URL(response.headers.get('location') ?? '').pathname).toBe(
+      '/blog/hello',
+    );
+    expect(intlMiddlewareMock).not.toHaveBeenCalled();
+  });
+
+  it('passes a live language prefix through to the locale middleware', async () => {
+    resolveTenantRoutingMock.mockResolvedValue(
+      tenantRouting('tenant-1', LOCALE_ISO_CODES.EN, [
+        LOCALE_ISO_CODES.EN,
+        LOCALE_ISO_CODES.NL,
+      ]),
+    );
+
+    await proxy(buildRequest('acme.example.com', undefined, '/nl/blog'));
+
+    expect(intlMiddlewareMock).toHaveBeenCalled();
+  });
+
+  it("routes with the tenant's own default and live languages", async () => {
+    resolveTenantRoutingMock.mockResolvedValue(
+      tenantRouting('tenant-1', LOCALE_ISO_CODES.FR),
+    );
+
+    await proxy(buildRequest('acme.example.com'));
+
+    expect(createMiddlewareMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        defaultLocale: LOCALE_ISO_CODES.FR,
+        locales: [LOCALE_ISO_CODES.FR],
+      }),
+    );
   });
 });

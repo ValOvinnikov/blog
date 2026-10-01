@@ -4,7 +4,7 @@ import {
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
   ERROR_CODE,
-  LOCALE_ISO_CODES,
+  isLocaleIsoCode,
 } from '@blog/config';
 import { queries } from '@blog/db';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
@@ -13,9 +13,7 @@ import { logger } from '@platform/utils/logger/logger';
 import { z } from 'zod';
 
 const updateTenantLanguagesInputSchema = z.array(
-  z
-    .string()
-    .refine((locale) => Object.values(LOCALE_ISO_CODES).includes(locale)),
+  z.string().refine(isLocaleIsoCode),
 );
 
 export type TUpdateTenantLanguagesResult = { ok: true } | { ok: false };

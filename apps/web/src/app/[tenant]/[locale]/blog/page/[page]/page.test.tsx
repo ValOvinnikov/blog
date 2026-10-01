@@ -1,4 +1,7 @@
-import { CONTENT_ROUTE_REVALIDATE_SECONDS } from '@blog/config';
+import {
+  CONTENT_ROUTE_REVALIDATE_SECONDS,
+  LOCALE_ISO_CODES,
+} from '@blog/config';
 import { permanentRedirect } from '@web/i18n/navigation';
 import { customRenderAsync } from '@web/testing/custom-render';
 import { notFound } from 'next/navigation';
@@ -20,7 +23,11 @@ vi.mock('@blog/service', () => ({
 vi.mock('@web/i18n/navigation');
 
 const setup = customRenderAsync(PostIndexNumberedPage, {
-  params: Promise.resolve({ tenant: 'tenant-1', locale: 'EN', page: '1' }),
+  params: Promise.resolve({
+    tenant: 'tenant-1',
+    locale: LOCALE_ISO_CODES.EN,
+    page: '1',
+  }),
 });
 
 describe('PostIndexNumberedPage', () => {
@@ -33,7 +40,7 @@ describe('PostIndexNumberedPage', () => {
 
     expect(permanentRedirect).toHaveBeenCalledWith({
       href: '/blog',
-      locale: 'EN',
+      locale: LOCALE_ISO_CODES.EN,
     });
   });
 
@@ -44,7 +51,7 @@ describe('PostIndexNumberedPage', () => {
         setup({
           params: Promise.resolve({
             tenant: 'tenant-1',
-            locale: 'EN',
+            locale: LOCALE_ISO_CODES.EN,
             page: raw,
           }),
         }),

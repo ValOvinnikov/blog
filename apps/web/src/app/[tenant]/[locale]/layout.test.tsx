@@ -37,6 +37,7 @@ const {
   isCapabilityEnabledMock,
   isWebAnalyticsEnabledMock,
   resolveTenantMessagesMock,
+  getTenantLocalesMock,
   getMessagesMock,
   getNowMock,
   getTimeZoneMock,
@@ -57,6 +58,7 @@ const {
   isCapabilityEnabledMock: vi.fn(),
   isWebAnalyticsEnabledMock: vi.fn(),
   resolveTenantMessagesMock: vi.fn(),
+  getTenantLocalesMock: vi.fn(),
   getMessagesMock: vi.fn(),
   getNowMock: vi.fn(),
   getTimeZoneMock: vi.fn(),
@@ -96,6 +98,10 @@ vi.mock('@web/server/settings-features/is-capability-enabled', () => ({
 
 vi.mock('@web/utils/is-web-analytics-enabled', () => ({
   isWebAnalyticsEnabled: isWebAnalyticsEnabledMock,
+}));
+
+vi.mock('@blog/db', () => ({
+  queries: { tenants: { getTenantLocales: getTenantLocalesMock } },
 }));
 
 vi.mock('@web/utils/resolve-tenant-messages', () => ({
@@ -176,6 +182,11 @@ describe('LocaleLayout', () => {
     getThemeTokensMock.mockResolvedValue(THEME_TOKENS);
     isCapabilityEnabledMock.mockResolvedValue(true);
     isWebAnalyticsEnabledMock.mockReturnValue(false);
+    getTenantLocalesMock.mockResolvedValue({
+      defaultLocale: LOCALE_ISO_CODES.EN,
+      additionalLocales: [LOCALE_ISO_CODES.NL],
+      plan: 'GROWTH',
+    });
     resolveTenantMessagesMock.mockImplementation((messages: unknown) =>
       Promise.resolve({ messages, rich: {} }),
     );
@@ -318,6 +329,21 @@ describe('LocaleLayout', () => {
       realMessages,
       'tenant-1',
     );
+    const sanityImageBaseUrlProvider = firstChildOf(html);
+    const provider = firstChildOf(sanityImageBaseUrlProvider);
+    expect(provider.props.messages).toBe(realMessages);
+  });
+
+  it("serves another language's messages without the tenant's default-language voice pack", async () => {
+    const html = await LocaleLayout({
+      children: <div>content</div>,
+      params: Promise.resolve({
+        tenant: 'tenant-1',
+        locale: LOCALE_ISO_CODES.NL,
+      }),
+    });
+
+    expect(resolveTenantMessagesMock).not.toHaveBeenCalled();
     const sanityImageBaseUrlProvider = firstChildOf(html);
     const provider = firstChildOf(sanityImageBaseUrlProvider);
     expect(provider.props.messages).toBe(realMessages);

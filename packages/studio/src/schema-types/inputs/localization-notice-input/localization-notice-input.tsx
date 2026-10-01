@@ -1,4 +1,4 @@
-import type { TLocaleIsoCode } from '@blog/config/constants';
+import { isLocaleIsoCode, type TLocaleIsoCode } from '@blog/config/constants';
 import {
   collectMissingLocales,
   formatLocaleList,
@@ -26,9 +26,13 @@ const documentNotices = (
       ? (value as Record<string, unknown>)[LANGUAGE_FIELD]
       : undefined;
 
-  if (typeof language === 'string' && !liveLocales.includes(language)) {
+  if (
+    typeof language === 'string' &&
+    isLocaleIsoCode(language) &&
+    !liveLocales.includes(language)
+  ) {
     notices.push(
-      `${LOCALE_LABEL[language] ?? language} isn't live on your plan — this won't appear on the site.`,
+      `${LOCALE_LABEL[language]} isn't live on your plan — this won't appear on the site.`,
     );
   }
 

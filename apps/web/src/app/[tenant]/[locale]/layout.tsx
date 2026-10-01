@@ -6,6 +6,7 @@ import {
   routes,
   SIZE,
 } from '@blog/config';
+import { queries } from '@blog/db';
 import {
   getSanityImageBaseUrl,
   service,
@@ -37,6 +38,7 @@ import { isProductionEnvironment } from '@web/utils/is-production-environment';
 import { isWebAnalyticsEnabled } from '@web/utils/is-web-analytics-enabled';
 import { logger } from '@web/utils/logger/logger';
 import { resolveTenantMessages } from '@web/utils/resolve-tenant-messages';
+import { resolveVoiceRichFields } from '@web/utils/resolve-voice-rich-fields';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { SessionProvider } from 'next-auth/react';
@@ -101,12 +103,12 @@ export async function generateMetadata({
 }
 
 export function generateStaticParams() {
-  return routing.locales.map((locale) => ({ locale }));
+  return [{ locale: routing.defaultLocale }];
 }
 
 type TProps = {
   children: React.ReactNode;
-  params: Promise<ITenantLocalizedParams>;
+  params: Promise<Omit<ITenantLocalizedParams, 'locale'> & { locale: string }>;
 };
 
 export default async function LocaleLayout({ children, params }: TProps) {
@@ -130,6 +132,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
     now,
     timeZone,
     t,
+    tenantLocales,
   ] = await Promise.all([
     service.global.siteSettings.v1.getSiteSettings(tenantContext),
     service.global.navigation.v1.getNavigation(tenantContext),
@@ -140,6 +143,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
     getNow(),
     getTimeZone(),
     getTranslations('rss'),
+    queries.tenants.getTenantLocales(tenant),
   ]);
 
   if (!settingsResult.ok) {
@@ -152,7 +156,13 @@ export default async function LocaleLayout({ children, params }: TProps) {
     notFound();
   }
 
-  const { messages, rich } = await resolveTenantMessages(baseMessages, tenant);
+  const { messages, rich } =
+    locale === tenantLocales?.defaultLocale
+      ? await resolveTenantMessages(baseMessages, tenant)
+      : {
+          messages: baseMessages,
+          rich: resolveVoiceRichFields({}, baseMessages),
+        };
   const { brand } = settingsResult.data;
 
   if (!navResult.ok) {

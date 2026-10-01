@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config';
 import { service } from '@blog/service';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
@@ -44,7 +45,7 @@ const getPostMock = vi.mocked(service.pages.post.v1.getPost);
 
 const setup = customRenderServerAsync(BlogPostPage, {
   slug: 'hello-world',
-  locale: 'en',
+  locale: LOCALE_ISO_CODES.EN,
   tenant: 'tenant-1',
 });
 

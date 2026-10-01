@@ -1,5 +1,13 @@
-import type { TLocaleIsoCode } from '@blog/config/constants';
+import { isLocaleIsoCode, type TLocaleIsoCode } from '@blog/config/constants';
 
 export function normalizeLocaleCode(locale: string): TLocaleIsoCode {
-  return locale.trim().toUpperCase();
+  const code = locale.trim().toUpperCase();
+
+  if (!isLocaleIsoCode(code)) {
+    throw new Error(
+      `normalizeLocaleCode: "${locale}" is not a supported language.`,
+    );
+  }
+
+  return code;
 }

@@ -1,4 +1,4 @@
-import { SITE_MESSAGES } from '@blog/config';
+import { LOCALE_ISO_CODES, SITE_MESSAGES } from '@blog/config';
 import { createTranslator } from 'next-intl';
 
 import '@testing-library/jest-dom/vitest';
@@ -92,7 +92,7 @@ vi.mock('next-intl/server', () => ({
   getLocale: vi.fn(async () => 'en'),
   getTranslations: vi.fn(async (arg?: TGetTranslationsArg) =>
     createLooseTranslator({
-      locale: 'en',
+      locale: LOCALE_ISO_CODES.EN,
       messages: SITE_MESSAGES,
       namespace: toNamespace(arg),
     }),

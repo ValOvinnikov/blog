@@ -1,4 +1,4 @@
-import { SITE_MESSAGES } from '@blog/config';
+import { SITE_MESSAGES_BY_LOCALE } from '@blog/config';
 import { hasLocale } from 'next-intl';
 import { getRequestConfig } from 'next-intl/server';
 
@@ -10,5 +10,5 @@ export default getRequestConfig(async ({ requestLocale }) => {
     ? requested
     : routing.defaultLocale;
 
-  return { locale, messages: SITE_MESSAGES };
+  return { locale, messages: SITE_MESSAGES_BY_LOCALE[locale] };
 });

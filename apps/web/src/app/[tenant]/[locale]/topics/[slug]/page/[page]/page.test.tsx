@@ -1,4 +1,7 @@
-import { CONTENT_ROUTE_REVALIDATE_SECONDS } from '@blog/config';
+import {
+  CONTENT_ROUTE_REVALIDATE_SECONDS,
+  LOCALE_ISO_CODES,
+} from '@blog/config';
 import { permanentRedirect } from '@web/i18n/navigation';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { customRenderAsync } from '@web/testing/custom-render';
@@ -33,7 +36,7 @@ const permanentRedirectMock = vi.mocked(permanentRedirect);
 const setup = customRenderAsync(TopicNumberedPage, {
   params: Promise.resolve({
     tenant: 'tenant-1',
-    locale: 'EN',
+    locale: LOCALE_ISO_CODES.EN,
     slug: 'engineering',
     page: '1',
   }),
@@ -54,7 +57,7 @@ describe('TopicNumberedPage', () => {
       const metadata = await generateMetadata({
         params: Promise.resolve({
           tenant: 'tenant-1',
-          locale: 'EN',
+          locale: LOCALE_ISO_CODES.EN,
           slug: 'engineering',
           page: '1',
         }),
@@ -68,7 +71,7 @@ describe('TopicNumberedPage', () => {
       const metadata = await generateMetadata({
         params: Promise.resolve({
           tenant: 'tenant-1',
-          locale: 'EN',
+          locale: LOCALE_ISO_CODES.EN,
           slug: 'engineering',
           page: 'abc',
         }),
@@ -101,7 +104,7 @@ describe('TopicNumberedPage', () => {
       const metadata = await generateMetadata({
         params: Promise.resolve({
           tenant: 'tenant-1',
-          locale: 'EN',
+          locale: LOCALE_ISO_CODES.EN,
           slug: 'engineering',
           page: '2',
         }),
@@ -120,7 +123,7 @@ describe('TopicNumberedPage', () => {
 
     expect(permanentRedirectMock).toHaveBeenCalledWith({
       href: '/topics/engineering',
-      locale: 'EN',
+      locale: LOCALE_ISO_CODES.EN,
     });
   });
 
@@ -131,7 +134,7 @@ describe('TopicNumberedPage', () => {
         setup({
           params: Promise.resolve({
             tenant: 'tenant-1',
-            locale: 'EN',
+            locale: LOCALE_ISO_CODES.EN,
             slug: 'engineering',
             page: raw,
           }),

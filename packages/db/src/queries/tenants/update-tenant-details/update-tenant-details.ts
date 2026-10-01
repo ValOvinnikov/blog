@@ -1,3 +1,4 @@
+import type { TLocaleIsoCode } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import {
   CORE_PROVISIONING_STEPS,
@@ -30,7 +31,7 @@ type TTenantDetailsFields = {
   name: string;
   primaryDomain: string;
   plan: TTenantPlan;
-  locale: string;
+  locale: TLocaleIsoCode;
 };
 
 // The tenant columns this mutation writes, shared by the main update and

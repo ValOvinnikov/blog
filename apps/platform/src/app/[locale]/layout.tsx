@@ -1,4 +1,3 @@
-import type { ILocalizedParams } from '@blog/config';
 import { ToastProvider } from '@platform/context/toast-provider';
 import { routing } from '@platform/i18n/routing';
 import { notFound } from 'next/navigation';
@@ -7,7 +6,7 @@ import { getMessages, setRequestLocale } from 'next-intl/server';
 
 type TProps = {
   children: React.ReactNode;
-  params: Promise<ILocalizedParams>;
+  params: Promise<{ locale: string }>;
 };
 
 export function generateStaticParams() {
