@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
 import type { TProvisionEnv } from '../lib/env';
@@ -40,7 +41,7 @@ function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
     sanityProjectId: 'proj123',
     sanityDataset: 'production',
     sanityReadTokenEncrypted: null,
-    locale: 'EN',
+    locale: LOCALE_ISO_CODES.EN,
     plan: 'FREE',
     status: 'ACTIVE',
     provisioningStatus: 'PROVISIONING',

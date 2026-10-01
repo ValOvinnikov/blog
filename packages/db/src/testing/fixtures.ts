@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import type { TUser } from '@blog/db/schema/auth';
@@ -24,7 +25,7 @@ export async function insertTestTenant(
       primaryDomain: `${key}.example.com`,
       sanityProjectId: `sanity-${crypto.randomUUID()}`,
       sanityDataset: 'production',
-      locale: 'EN',
+      locale: LOCALE_ISO_CODES.EN,
       plan: TENANT_PLAN.FREE,
       status: TENANT_STATUS.ACTIVE,
       ...overrides,

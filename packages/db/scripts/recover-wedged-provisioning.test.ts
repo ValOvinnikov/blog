@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
 import { recoverWedgedTenants } from './recover-wedged-provisioning';
@@ -23,7 +24,7 @@ function tenant(overrides: Partial<TTenant> = {}): TTenant {
     sanityDataset: 'production',
     sanityReadTokenEncrypted: null,
     sanityWriteTokenEncrypted: null,
-    locale: 'EN',
+    locale: LOCALE_ISO_CODES.EN,
     plan: 'FREE',
     status: 'ACTIVE',
     provisioningStatus: 'PROVISIONING',

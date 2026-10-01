@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
 import {
   applyMigrationFile,
@@ -53,8 +54,8 @@ describe('0032_famous_hawkeye (tenants locale codes)', () => {
         .orderBy(tenants.primaryDomain);
 
       expect(rows).toEqual([
-        { locale: 'EN', additionalLocales: [] },
-        { locale: 'FR', additionalLocales: [] },
+        { locale: LOCALE_ISO_CODES.EN, additionalLocales: [] },
+        { locale: LOCALE_ISO_CODES.FR, additionalLocales: [] },
         { locale: 'DE', additionalLocales: [] },
       ]);
     },

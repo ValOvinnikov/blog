@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { ClientError } from '@sanity/client';
 
@@ -43,7 +44,7 @@ function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
     sanityProjectId: 'proj123',
     sanityDataset: 'production',
     sanityReadTokenEncrypted: 'encrypted-token',
-    locale: 'EN',
+    locale: LOCALE_ISO_CODES.EN,
     plan: 'FREE',
     status: 'ACTIVE',
     provisioningStatus: 'PROVISIONING',

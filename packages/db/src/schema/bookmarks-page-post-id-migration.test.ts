@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import {
@@ -37,7 +38,7 @@ async function setUpDbWithBookmark(postId: string) {
     .values({
       name: 'Acme',
       primaryDomain: 'acme.example.com',
-      locale: 'EN',
+      locale: LOCALE_ISO_CODES.EN,
       plan: TENANT_PLAN.FREE,
       status: TENANT_STATUS.ACTIVE,
     })

@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import {
   TENANT_PLAN,
   TENANT_PROVISIONING_STATUS,
@@ -19,7 +20,7 @@ async function insertTenant(): Promise<TTenant> {
     primaryDomain: 'acme.example.com',
     sanityProjectId: 'abc123',
     sanityDataset: 'production',
-    locale: 'EN',
+    locale: LOCALE_ISO_CODES.EN,
     plan: TENANT_PLAN.FREE,
     status: TENANT_STATUS.ACTIVE,
   });

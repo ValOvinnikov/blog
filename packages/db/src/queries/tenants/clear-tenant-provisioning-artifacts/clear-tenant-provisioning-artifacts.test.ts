@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import {
   TENANT_PLAN,
   TENANT_PROVISIONING_STATUS,
@@ -29,7 +30,7 @@ async function insertProvisionedTenant(): Promise<string> {
       sanityReadTokenEncrypted: 'encrypted-token',
       sanityWriteTokenEncrypted: 'encrypted-write-token',
       seededAt: new Date('2026-08-15T12:00:00.000Z'),
-      locale: 'EN',
+      locale: LOCALE_ISO_CODES.EN,
       plan: TENANT_PLAN.FREE,
       status: TENANT_STATUS.ACTIVE,
       provisioningStatus: TENANT_PROVISIONING_STATUS.READY,

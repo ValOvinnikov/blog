@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { ELEVATE_TENANT_OWNER_OUTCOME } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
@@ -42,7 +43,7 @@ function tenantAt(createdAt: Date, overrides: Partial<TTenant> = {}): TTenant {
     sanityProjectId: 'proj-abc',
     sanityDataset: 'production',
     sanityReadTokenEncrypted: null,
-    locale: 'EN',
+    locale: LOCALE_ISO_CODES.EN,
     plan: 'FREE',
     status: 'ACTIVE',
     provisioningStatus: 'PROVISIONING',

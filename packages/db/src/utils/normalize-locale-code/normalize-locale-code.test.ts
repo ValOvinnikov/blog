@@ -12,6 +12,6 @@ describe(normalizeLocaleCode, () => {
   });
 
   it('leaves an already-normalized code unchanged', () => {
-    expect(normalizeLocaleCode('FR')).toBe(LOCALE_ISO_CODES.FR);
+    expect(normalizeLocaleCode(LOCALE_ISO_CODES.FR)).toBe(LOCALE_ISO_CODES.FR);
   });
 });

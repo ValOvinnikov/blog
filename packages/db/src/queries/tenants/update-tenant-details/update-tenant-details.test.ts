@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import {
   MEMBERSHIP_ROLE,
   TENANT_PLAN,
@@ -33,7 +34,7 @@ const validInput: TUpdateTenantDetailsInput = {
   name: 'Acme Updated',
   primaryDomain: 'acme.example.com',
   plan: TENANT_PLAN.FREE,
-  locale: 'EN',
+  locale: LOCALE_ISO_CODES.EN,
 };
 
 async function insertTenantWithDomain(overrides?: {
@@ -113,7 +114,7 @@ describe(updateTenantDetails, () => {
     const result = await updateTenantDetails(tenantId, {
       ...validInput,
       name: 'New Name',
-      locale: 'FR',
+      locale: LOCALE_ISO_CODES.FR,
       plan: TENANT_PLAN.GROWTH,
     });
 
@@ -122,7 +123,7 @@ describe(updateTenantDetails, () => {
     }
     expect(result.tenant).toMatchObject({
       name: 'New Name',
-      locale: 'FR',
+      locale: LOCALE_ISO_CODES.FR,
       plan: TENANT_PLAN.GROWTH,
     });
   });
@@ -170,7 +171,7 @@ describe(updateTenantDetails, () => {
       name: 'Acme',
       primaryDomain: 'globex.example.com',
       plan: TENANT_PLAN.FREE,
-      locale: 'EN',
+      locale: LOCALE_ISO_CODES.EN,
     });
 
     const domainRows = await db()
@@ -204,7 +205,7 @@ describe(updateTenantDetails, () => {
       name: 'Acme',
       primaryDomain: 'acme.example.com',
       plan: TENANT_PLAN.FREE,
-      locale: 'EN',
+      locale: LOCALE_ISO_CODES.EN,
     });
 
     const domainRows = await db()
@@ -525,12 +526,16 @@ describe(updateTenantDetails, () => {
       primaryDomain: 'acme.example.com',
       name: 'New Name',
       plan: TENANT_PLAN.GROWTH,
-      locale: 'FR',
+      locale: LOCALE_ISO_CODES.FR,
     });
 
     expect(result).toMatchObject({
       outcome: 'updated',
-      tenant: { name: 'New Name', plan: TENANT_PLAN.GROWTH, locale: 'FR' },
+      tenant: {
+        name: 'New Name',
+        plan: TENANT_PLAN.GROWTH,
+        locale: LOCALE_ISO_CODES.FR,
+      },
     });
   });
 
@@ -545,12 +550,12 @@ describe(updateTenantDetails, () => {
 
     const result = await updateTenantDetails(tenantId, {
       ...validInput,
-      locale: 'FR',
+      locale: LOCALE_ISO_CODES.FR,
     });
 
     expect(result).toMatchObject({
       outcome: 'updated',
-      tenant: { locale: 'FR' },
+      tenant: { locale: LOCALE_ISO_CODES.FR },
     });
   });
 

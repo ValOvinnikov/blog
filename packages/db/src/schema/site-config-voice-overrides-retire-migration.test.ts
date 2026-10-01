@@ -1,6 +1,7 @@
 import {
   DENSITY,
   FONT_CHOICE,
+  LOCALE_ISO_CODES,
   PRESET_ID,
   RADIUS_SCALE,
 } from '@blog/config/constants';
@@ -38,7 +39,7 @@ async function setUpDbWithSiteConfigRow(
     .values({
       name: 'Acme',
       primaryDomain: 'acme.example.com',
-      locale: 'EN',
+      locale: LOCALE_ISO_CODES.EN,
       plan: TENANT_PLAN.FREE,
       status: TENANT_STATUS.ACTIVE,
     })

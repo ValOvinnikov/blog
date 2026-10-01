@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import { archiveTenant } from '@blog/db/queries/tenants';
 import { createTenant } from '@blog/db/queries/tenants/create-tenant';
@@ -43,7 +44,7 @@ describe(runInvalidateTenantCache, () => {
       primaryDomain: 'acme.example.com',
       sanityProjectId: 'abc123',
       sanityDataset: 'production',
-      locale: 'EN',
+      locale: LOCALE_ISO_CODES.EN,
       plan: TENANT_PLAN.FREE,
       status: TENANT_STATUS.ACTIVE,
     });
@@ -73,7 +74,7 @@ describe(runInvalidateTenantCache, () => {
       primaryDomain: 'still-active.example.com',
       sanityProjectId: 'def456',
       sanityDataset: 'production',
-      locale: 'EN',
+      locale: LOCALE_ISO_CODES.EN,
       plan: TENANT_PLAN.FREE,
       status: TENANT_STATUS.ACTIVE,
     });
@@ -91,7 +92,7 @@ describe(runInvalidateTenantCache, () => {
       primaryDomain: 'flaky.example.com',
       sanityProjectId: 'ghi789',
       sanityDataset: 'production',
-      locale: 'EN',
+      locale: LOCALE_ISO_CODES.EN,
       plan: TENANT_PLAN.FREE,
       status: TENANT_STATUS.ACTIVE,
     });
