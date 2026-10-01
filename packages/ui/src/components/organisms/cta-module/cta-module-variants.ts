@@ -195,7 +195,7 @@ export const ctaModuleVariants = tv({
     },
     {
       variant: CTA_VARIANT.BANNER,
-      alignment: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.RIGHT],
+      position: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.RIGHT],
       class: {
         root: ['max-sm:text-center'],
         group: ['max-sm:mx-auto'],

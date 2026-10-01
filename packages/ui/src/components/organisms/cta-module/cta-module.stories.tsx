@@ -265,6 +265,28 @@ export const BannerPositionBySpacing: TStory = {
   ),
 };
 
+export const BannerMismatchedPositionAndAlignment: TStory = {
+  args: { ...BannerDefault.args },
+  parameters: { layout: 'fullscreen' },
+  render: (args) => (
+    <div className="flex flex-col gap-10">
+      {objectKeys(ctaModuleVariants.variants.position).map((position) =>
+        objectKeys(ctaModuleVariants.variants.alignment)
+          .filter((alignment) => alignment !== position)
+          .map((alignment) => (
+            <CtaModule
+              key={`${position}-${alignment}`}
+              {...args}
+              heading={`${position} position / ${alignment} text`}
+              contentPosition={position}
+              contentAlignment={alignment}
+            />
+          )),
+      )}
+    </div>
+  ),
+};
+
 export const Wrapped: TStory = {
   args: {
     isWrapped: true,
