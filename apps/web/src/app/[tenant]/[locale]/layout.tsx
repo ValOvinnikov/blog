@@ -35,6 +35,7 @@ import {
   getRequestContext,
 } from '@web/server/request-context/request-context';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
+import { isReaderAccountEnabled } from '@web/server/settings-features/is-reader-account-enabled';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/unresolved-tenant-placeholder';
 import { getThemeTokens } from '@web/utils/get-theme-tokens';
 import { isProductionEnvironment } from '@web/utils/is-production-environment';
@@ -117,6 +118,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
     footerResult,
     themeTokens,
     isAnalyticsCapabilityEnabled,
+    hasReaderAccounts,
     baseMessages,
     now,
     timeZone,
@@ -127,6 +129,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
     service.global.footer.v1.getFooter(sanityContext),
     getThemeTokens(tenant),
     isCapabilityEnabled(CAPABILITY.ANALYTICS, tenant),
+    isReaderAccountEnabled(tenant),
     getMessages(),
     getNow(),
     getTimeZone(),
@@ -203,7 +206,9 @@ export default async function LocaleLayout({ children, params }: TProps) {
                         actions={
                           <>
                             <ThemeToggleButton />
-                            <AuthMenu oauthProviderIds={oauthProviderIds} />
+                            {hasReaderAccounts && (
+                              <AuthMenu oauthProviderIds={oauthProviderIds} />
+                            )}
                           </>
                         }
                       />

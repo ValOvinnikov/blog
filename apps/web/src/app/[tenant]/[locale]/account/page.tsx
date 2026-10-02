@@ -1,7 +1,9 @@
 import type { ITenantLocalizedParams } from '@blog/config';
 import { AccountPage } from '@web/components/pages/account-page';
 import { buildAccountMetadata } from '@web/metadata/account-metadata';
+import { isReaderAccountEnabled } from '@web/server/settings-features/is-reader-account-enabled';
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
 
 type TProps = {
@@ -16,8 +18,12 @@ export function generateMetadata(): Promise<Metadata> {
 export const dynamic = 'force-dynamic';
 
 export default async function AccountRoute({ params }: TProps) {
-  const { locale } = await params;
+  const { locale, tenant } = await params;
   setRequestLocale(locale);
+
+  if (!(await isReaderAccountEnabled(tenant))) {
+    notFound();
+  }
 
   return <AccountPage />;
 }
