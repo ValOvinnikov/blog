@@ -9,7 +9,9 @@ import { getRequestTenantId } from './get-request-tenant-id';
 const getCachedTenantPlanForTenant = (tenantId: string) =>
   unstable_cache(
     async (id: string): Promise<TTenantPlan | undefined> => {
-      const [tenant] = await queries.tenants.listTenantsByIds([id]);
+      const tenant = await queries.tenants.getTenantById(id, {
+        includeArchived: true,
+      });
       return tenant?.plan;
     },
     ['tenant-plan', tenantId],
@@ -26,9 +28,5 @@ const getTenantPlanForTenantId = safeAsync(
   },
 );
 
-/**
- * The `TENANT_PLAN` half of capability entitlement (`isCapabilityEnabled`),
- * cached per tenant the same way `site_config`/`settings_features` are.
- */
 export const getTenantPlan = async (tenant?: string) =>
   getTenantPlanForTenantId(await getRequestTenantId(tenant));

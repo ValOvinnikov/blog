@@ -1,17 +1,9 @@
 import { TENANT_STATUS } from '@blog/db';
+import type { TTenant } from '@blog/db/schema/tenants';
 
 import { isTenantActive } from './is-tenant-active';
 
-const { getTenantByIdMock } = vi.hoisted(() => ({
-  getTenantByIdMock: vi.fn(),
-}));
-
 vi.mock('@blog/db', () => ({
-  queries: {
-    tenants: {
-      getTenantById: getTenantByIdMock,
-    },
-  },
   TENANT_STATUS: {
     ACTIVE: 'ACTIVE',
     SUSPENDED: 'SUSPENDED',
@@ -19,51 +11,34 @@ vi.mock('@blog/db', () => ({
   },
 }));
 
-const TENANT_ID = 'tenant-a';
+const buildTenant = (overrides: Partial<TTenant>) =>
+  ({
+    id: 'tenant-a',
+    status: TENANT_STATUS.ACTIVE,
+    deprovisionedAt: null,
+    ...overrides,
+  }) as TTenant;
 
 describe(isTenantActive, () => {
-  beforeEach(() => {
-    getTenantByIdMock.mockReset();
+  it('returns true for an active tenant', () => {
+    expect(isTenantActive(buildTenant({}))).toBe(true);
   });
 
-  it('returns true for an active tenant', async () => {
-    getTenantByIdMock.mockResolvedValue({
-      id: TENANT_ID,
-      status: TENANT_STATUS.ACTIVE,
-    });
-
-    const result = await isTenantActive(TENANT_ID);
-
-    expect(result).toBe(true);
+  it('returns false for a suspended tenant', () => {
+    expect(
+      isTenantActive(buildTenant({ status: TENANT_STATUS.SUSPENDED })),
+    ).toBe(false);
   });
 
-  it('returns false for a suspended tenant', async () => {
-    getTenantByIdMock.mockResolvedValue({
-      id: TENANT_ID,
-      status: TENANT_STATUS.SUSPENDED,
-    });
-
-    const result = await isTenantActive(TENANT_ID);
-
-    expect(result).toBe(false);
+  it('returns false for an archived tenant', () => {
+    expect(
+      isTenantActive(buildTenant({ status: TENANT_STATUS.ARCHIVED })),
+    ).toBe(false);
   });
 
-  it('returns false for an archived tenant', async () => {
-    getTenantByIdMock.mockResolvedValue({
-      id: TENANT_ID,
-      status: TENANT_STATUS.ARCHIVED,
-    });
-
-    const result = await isTenantActive(TENANT_ID);
-
-    expect(result).toBe(false);
-  });
-
-  it('returns false when the tenant lookup returns undefined', async () => {
-    getTenantByIdMock.mockResolvedValue(undefined);
-
-    const result = await isTenantActive(TENANT_ID);
-
-    expect(result).toBe(false);
+  it('returns false for a deprovisioned tenant that is still marked active', () => {
+    expect(isTenantActive(buildTenant({ deprovisionedAt: new Date() }))).toBe(
+      false,
+    );
   });
 });

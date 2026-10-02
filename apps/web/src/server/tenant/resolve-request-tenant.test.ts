@@ -16,8 +16,8 @@ vi.mock('@blog/db', () => ({
   queries: {
     tenants: {
       getTenantById: vi.fn(),
-      getTenantSanityCredentials: vi.fn(),
-      getTenantSanityWriteCredentials: vi.fn(),
+      toTenantSanityCredentials: vi.fn(),
+      toTenantSanityWriteCredentials: vi.fn(),
     },
   },
   TENANT_STATUS: {
@@ -114,8 +114,8 @@ describe('resolveRequestTenant memoization', () => {
   beforeEach(() => {
     headersMock.mockReset();
     vi.mocked(resolveTenant).mockReset();
-    vi.mocked(queries.tenants.getTenantSanityCredentials).mockReset();
-    vi.mocked(queries.tenants.getTenantSanityWriteCredentials).mockReset();
+    vi.mocked(queries.tenants.toTenantSanityCredentials).mockReset();
+    vi.mocked(queries.tenants.toTenantSanityWriteCredentials).mockReset();
   });
 
   afterEach(() => {
@@ -164,7 +164,7 @@ describe('resolveRequestTenant memoization', () => {
       id: 'tenant-1',
       primaryDomain: 'acme.example.com',
     } as never);
-    vi.mocked(queries.tenants.getTenantSanityCredentials).mockResolvedValue({
+    vi.mocked(queries.tenants.toTenantSanityCredentials).mockReturnValue({
       projectId: 'proj',
       dataset: 'production',
       token: 'tok',
@@ -203,6 +203,7 @@ describe('resolveRequestTenant memoization', () => {
     await getTenantBaseUrl();
     await getHostTenantSanityContext();
 
+    expect(queries.tenants.getTenantById).not.toHaveBeenCalled();
     expect(resolveTenant).toHaveBeenCalledTimes(1);
   });
 
@@ -212,7 +213,7 @@ describe('resolveRequestTenant memoization', () => {
       id: 'tenant-1',
       primaryDomain: 'acme.example.com',
     } as never);
-    vi.mocked(queries.tenants.getTenantSanityCredentials).mockResolvedValue({
+    vi.mocked(queries.tenants.toTenantSanityCredentials).mockReturnValue({
       projectId: 'proj',
       dataset: 'production',
       token: 'tok',
@@ -221,16 +222,16 @@ describe('resolveRequestTenant memoization', () => {
       deprovisionedAt: null,
       provisioningStatus: null,
     });
-    vi.mocked(
-      queries.tenants.getTenantSanityWriteCredentials,
-    ).mockResolvedValue({
-      projectId: 'proj',
-      dataset: 'production',
-      token: 'write-tok',
-      status: TENANT_STATUS.ACTIVE,
-      deprovisionedAt: null,
-      provisioningStatus: null,
-    });
+    vi.mocked(queries.tenants.toTenantSanityWriteCredentials).mockResolvedValue(
+      {
+        projectId: 'proj',
+        dataset: 'production',
+        token: 'write-tok',
+        status: TENANT_STATUS.ACTIVE,
+        deprovisionedAt: null,
+        provisioningStatus: null,
+      },
+    );
 
     vi.doMock('react', async (importOriginal) => {
       const actual = await importOriginal<typeof import('react')>();
@@ -263,5 +264,6 @@ describe('resolveRequestTenant memoization', () => {
     await getHostTenantSanityWriteContext();
 
     expect(resolveTenant).toHaveBeenCalledTimes(1);
+    expect(queries.tenants.getTenantById).not.toHaveBeenCalled();
   });
 });

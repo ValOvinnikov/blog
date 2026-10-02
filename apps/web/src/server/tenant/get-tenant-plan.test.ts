@@ -2,8 +2,8 @@ import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
 
 import { getTenantPlan } from './get-tenant-plan';
 
-const { listTenantsByIdsMock } = vi.hoisted(() => ({
-  listTenantsByIdsMock: vi.fn(),
+const { getTenantByIdMock } = vi.hoisted(() => ({
+  getTenantByIdMock: vi.fn(),
 }));
 
 vi.mock('@web/server/tenant/get-request-tenant-id');
@@ -11,7 +11,7 @@ vi.mock('@web/server/tenant/get-request-tenant-id');
 vi.mock('@blog/db', () => ({
   queries: {
     tenants: {
-      listTenantsByIds: listTenantsByIdsMock,
+      getTenantById: getTenantByIdMock,
     },
   },
 }));
@@ -28,19 +28,19 @@ const getRequestTenantIdMock = vi.mocked(getRequestTenantId);
 describe(getTenantPlan, () => {
   beforeEach(() => {
     getRequestTenantIdMock.mockReset();
-    listTenantsByIdsMock.mockReset();
+    getTenantByIdMock.mockReset();
   });
 
   it('resolves the plan of the request-resolved tenant id', async () => {
     getRequestTenantIdMock.mockResolvedValue(TENANT_A_ID);
-    listTenantsByIdsMock.mockResolvedValue([
-      { id: TENANT_A_ID, plan: 'GROWTH' },
-    ]);
+    getTenantByIdMock.mockResolvedValue({ id: TENANT_A_ID, plan: 'GROWTH' });
 
     const result = await getTenantPlan();
 
     expect(result).toEqual({ ok: true, data: 'GROWTH' });
-    expect(listTenantsByIdsMock).toHaveBeenCalledWith([TENANT_A_ID]);
+    expect(getTenantByIdMock).toHaveBeenCalledWith(TENANT_A_ID, {
+      includeArchived: true,
+    });
   });
 
   it('returns ok:true with undefined data when no tenant resolves', async () => {
@@ -49,14 +49,12 @@ describe(getTenantPlan, () => {
     const result = await getTenantPlan();
 
     expect(result).toEqual({ ok: true, data: undefined });
-    expect(listTenantsByIdsMock).not.toHaveBeenCalled();
+    expect(getTenantByIdMock).not.toHaveBeenCalled();
   });
 
   it('forwards an explicitly supplied tenant to getRequestTenantId', async () => {
     getRequestTenantIdMock.mockResolvedValue(TENANT_A_ID);
-    listTenantsByIdsMock.mockResolvedValue([
-      { id: TENANT_A_ID, plan: 'GROWTH' },
-    ]);
+    getTenantByIdMock.mockResolvedValue({ id: TENANT_A_ID, plan: 'GROWTH' });
 
     await getTenantPlan(TENANT_A_ID);
 
@@ -65,7 +63,7 @@ describe(getTenantPlan, () => {
 
   it('returns ok:false when a query rejects', async () => {
     getRequestTenantIdMock.mockResolvedValue(TENANT_A_ID);
-    listTenantsByIdsMock.mockRejectedValue(new Error('boom'));
+    getTenantByIdMock.mockRejectedValue(new Error('boom'));
 
     const result = await getTenantPlan();
 
@@ -73,9 +71,8 @@ describe(getTenantPlan, () => {
   });
 
   it("resolves each request's own tenant's plan", async () => {
-    listTenantsByIdsMock.mockImplementation((ids: string[]) => {
-      const [id] = ids;
-      return [{ id, plan: id === TENANT_A_ID ? 'GROWTH' : 'STARTER' }];
+    getTenantByIdMock.mockImplementation((id: string) => {
+      return { id, plan: id === TENANT_A_ID ? 'GROWTH' : 'STARTER' };
     });
 
     getRequestTenantIdMock.mockResolvedValue(TENANT_A_ID);
@@ -98,6 +95,6 @@ describe(getTenantPlan, () => {
     getRequestTenantIdMock.mockRejectedValue(dynamicSignal);
 
     await expect(getTenantPlan()).rejects.toBe(dynamicSignal);
-    expect(listTenantsByIdsMock).not.toHaveBeenCalled();
+    expect(getTenantByIdMock).not.toHaveBeenCalled();
   });
 });
