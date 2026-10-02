@@ -21,6 +21,8 @@ import { notFound } from 'next/navigation';
 
 import { TopicPage } from './topic-page';
 
+vi.mock('@web/server/request-context/request-context');
+
 vi.mock('@blog/service', () => ({
   service: {
     pages: { topic: { v1: { getTopicPage: vi.fn() } } },

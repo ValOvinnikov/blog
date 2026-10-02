@@ -3,6 +3,7 @@ import {
   LOCALE_ISO_CODES,
 } from '@blog/config';
 import { permanentRedirect } from '@web/i18n/navigation';
+import { enterRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync } from '@web/testing/custom-render';
 import { notFound } from 'next/navigation';
 
@@ -11,6 +12,8 @@ import PostIndexNumberedPage, { revalidate } from './page';
 const { getIndexPageMock } = vi.hoisted(() => ({
   getIndexPageMock: vi.fn(),
 }));
+
+vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -37,6 +40,8 @@ describe('PostIndexNumberedPage', () => {
 
   it('redirects /blog/page/1 to /blog (canonical page 1 has one URL)', async () => {
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+
+    expect(enterRequestContext).toHaveBeenCalled();
 
     expect(permanentRedirect).toHaveBeenCalledWith({
       href: '/blog',

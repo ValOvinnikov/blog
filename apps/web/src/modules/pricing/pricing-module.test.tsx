@@ -1,11 +1,14 @@
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import {
   makePricingModule,
   makePricingPrice,
   makePricingTier,
 } from '@web/testing/modules/pricing/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import {
+  DEFAULT_REQUEST_CONTEXT,
+  DEFAULT_TENANT_SANITY_CONTEXT,
+} from '@web/testing/shared/tenant/fixtures';
 
 import { PricingModule } from './pricing-module';
 
@@ -23,22 +26,20 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
+vi.mock('@web/server/request-context/request-context');
 
-const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
+const getRequestContextMock = vi.mocked(getRequestContext);
 
 const setup = customRenderAsync(PricingModule, {
   id: 'pricing-1',
-  locale: 'en-GB',
-  tenant: 'tenant-1',
 });
 
 describe(`<${PricingModule.name}/>`, () => {
   beforeEach(() => {
     getPricingModuleMock.mockReset();
     getSiteSettingsMock.mockReset();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
+    getRequestContextMock.mockReset();
+    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
     getSiteSettingsMock.mockResolvedValue({
       ok: true,
       data: { currency: 'GBP' },

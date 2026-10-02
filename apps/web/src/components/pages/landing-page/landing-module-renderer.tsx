@@ -55,25 +55,21 @@ export interface ILandingModuleRendererProps {
   hero: TMaybeUndefined<TModule<TPageLandingType>>;
   headingBlock: THeadingBlock;
   modules: TModule<TPageLandingType>[];
-  locale: string;
-  tenant: string;
 }
 
 export const LandingModuleRenderer = async ({
   hero,
   headingBlock,
   modules,
-  locale,
-  tenant,
 }: ILandingModuleRendererProps): Promise<ReactNode> => {
   const heroNode = hero
-    ? await renderHeroModule({ hero, map: LANDING_MAP, locale, tenant })
+    ? await renderHeroModule({ hero, map: LANDING_MAP })
     : null;
 
   return (
     <>
       {heroNode ?? <PageHeading headingBlock={headingBlock} />}
-      {renderModules({ modules, map: LANDING_MAP, locale, tenant })}
+      {renderModules({ modules, map: LANDING_MAP })}
     </>
   );
 };

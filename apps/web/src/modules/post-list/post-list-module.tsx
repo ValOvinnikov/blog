@@ -1,7 +1,7 @@
 import { routes, TAXONOMY_KIND, type TTaxonomyKind } from '@blog/config';
 import { service } from '@blog/service';
 import type { TModuleComponentProps } from '@web/modules/module-renderer';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';
 import { renderPostCardImage } from '@web/utils/render-post-card-image';
 import { toPostListItems } from '@web/utils/to-post-list-items';
@@ -33,26 +33,15 @@ const ARCHIVE_TITLE_ID: Record<TTaxonomyKind, string> = {
   [TAXONOMY_KIND.TAGS]: 'tag-posts-title',
 };
 
-/**
- * Unlike every other module, this always renders — an archive must say
- * something even with zero posts — and 404s (after logging) both when the
- * fetch fails and when an explicit page number exceeds the corpus's page
- * count, since either would otherwise render the page's primary content as
- * silently missing.
- */
-export const PostListModule = async ({
-  id,
-  tenant,
-  context,
-}: TPostListModuleProps) => {
+export const PostListModule = async ({ id, context }: TPostListModuleProps) => {
   const resolvedPage = context?.page ?? 1;
   const archive = context?.archive;
 
-  const tenantContext = await getTenantSanityContext(tenant);
+  const { sanityContext } = await getRequestContext();
   const [result, paginationT, scopedT] = await Promise.all([
     service.modules.postList.v1.getPostList(
       id,
-      tenantContext,
+      sanityContext,
       resolvedPage,
       archive && { kind: archive.kind, slug: archive.slug },
     ),
@@ -80,9 +69,6 @@ export const PostListModule = async ({
     showImages,
   } = result.data;
 
-  // Out-of-range page (corpus shrank or hand-typed URL) → hard 404, never a
-  // soft-404 or a redirect to the last page (spec SEO rules). Page 1 of an
-  // empty archive is `totalPages === 1`, so page 1 never 404s.
   if (resolvedPage > totalPages) {
     notFound();
   }

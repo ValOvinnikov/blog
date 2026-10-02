@@ -1,5 +1,5 @@
 import { service } from '@blog/service';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';
 import { renderPostCardImage } from '@web/utils/render-post-card-image';
 import { toPostListItems } from '@web/utils/to-post-list-items';
@@ -8,19 +8,13 @@ import { PostLatestModuleView } from './post-latest-module-view';
 
 export interface IPostLatestModuleProps {
   id: string;
-  locale: string;
-  tenant: string;
 }
 
-export const PostLatestModule = async ({
-  id,
-  locale,
-  tenant,
-}: IPostLatestModuleProps) => {
-  const tenantContext = await getTenantSanityContext(tenant, locale);
+export const PostLatestModule = async ({ id }: IPostLatestModuleProps) => {
+  const { sanityContext } = await getRequestContext();
   const result = await service.modules.postLatest.v1.getPostLatest(
     id,
-    tenantContext,
+    sanityContext,
   );
 
   if (!result.ok) {

@@ -1,9 +1,12 @@
 import { BRAND_VARIANT, TAXONOMY_KIND } from '@blog/config';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import {
+  DEFAULT_REQUEST_CONTEXT,
+  DEFAULT_TENANT_SANITY_CONTEXT,
+} from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
 
 import { PostListModule } from './post-list-module';
@@ -22,21 +25,19 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
+vi.mock('@web/server/request-context/request-context');
 
-const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
+const getRequestContextMock = vi.mocked(getRequestContext);
 
 const setup = customRenderAsync(PostListModule, {
   id: 'post-list-1',
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${PostListModule.name}/>`, () => {
   beforeEach(() => {
     getPostListMock.mockReset();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
+    getRequestContextMock.mockReset();
+    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
   it('logs and calls notFound() when the fetch fails', async () => {
@@ -110,7 +111,10 @@ describe(`<${PostListModule.name}/>`, () => {
       dataset: 'production',
       token: 'tenant-token',
     };
-    getTenantSanityContextMock.mockResolvedValue(tenant);
+    getRequestContextMock.mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      sanityContext: tenant,
+    });
     getPostListMock.mockResolvedValue({
       ok: true,
       data: {
@@ -132,7 +136,6 @@ describe(`<${PostListModule.name}/>`, () => {
       1,
       undefined,
     );
-    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
   });
 
   it('renders the i18n default empty message when zero posts resolve, unconditionally', async () => {

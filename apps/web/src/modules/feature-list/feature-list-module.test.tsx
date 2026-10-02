@@ -4,11 +4,11 @@ import {
   CONTENT_ALIGNMENT,
   DISPLAY_MODE,
 } from '@blog/config';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeFeatureListItem } from '@web/testing/modules/feature-list/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { FeatureListModule } from './feature-list-module';
 
@@ -26,9 +26,9 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
+vi.mock('@web/server/request-context/request-context');
 
-const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
+const getRequestContextMock = vi.mocked(getRequestContext);
 
 const baseModule = {
   brandVariant: BRAND_VARIANT.PRIMARY,
@@ -43,15 +43,13 @@ const baseModule = {
 
 const setup = customRenderAsync(FeatureListModule, {
   id: 'feature-list-1',
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${FeatureListModule.name}/>`, () => {
   beforeEach(() => {
     getFeatureListMock.mockReset();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
+    getRequestContextMock.mockReset();
+    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
   it('calls getFeatureList with the module id and the tenant Sanity context', async () => {
@@ -60,7 +58,10 @@ describe(`<${FeatureListModule.name}/>`, () => {
       dataset: 'production',
       token: 'tenant-token',
     };
-    getTenantSanityContextMock.mockResolvedValue(tenant);
+    getRequestContextMock.mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      sanityContext: tenant,
+    });
     getFeatureListMock.mockResolvedValue({
       ok: true,
       data: {
@@ -75,7 +76,6 @@ describe(`<${FeatureListModule.name}/>`, () => {
     await setup();
 
     expect(getFeatureListMock).toHaveBeenCalledWith('feature-list-1', tenant);
-    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1', 'en');
   });
 
   it('renders nothing when the fetch fails', async () => {

@@ -4,11 +4,11 @@ import {
   TIMELINE_MARKER_STYLE,
   TIMELINE_ORIENTATION,
 } from '@blog/config';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeTimelineItem } from '@web/testing/modules/timeline/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { TimelineModule } from './timeline-module';
 
@@ -26,9 +26,9 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
+vi.mock('@web/server/request-context/request-context');
 
-const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
+const getRequestContextMock = vi.mocked(getRequestContext);
 
 const baseModule = {
   brandVariant: BRAND_VARIANT.PRIMARY,
@@ -43,15 +43,13 @@ const baseModule = {
 
 const setup = customRenderAsync(TimelineModule, {
   id: 'timeline-1',
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${TimelineModule.name}/>`, () => {
   beforeEach(() => {
     getTimelineModuleMock.mockReset();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
+    getRequestContextMock.mockReset();
+    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
   it('calls getTimelineModule with the module id and tenant context', async () => {
@@ -60,7 +58,10 @@ describe(`<${TimelineModule.name}/>`, () => {
       dataset: 'production',
       token: 'tenant-token',
     };
-    getTenantSanityContextMock.mockResolvedValue(tenant);
+    getRequestContextMock.mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      sanityContext: tenant,
+    });
     getTimelineModuleMock.mockResolvedValue({
       ok: true,
       data: { ...baseModule, items: [] },
@@ -69,7 +70,6 @@ describe(`<${TimelineModule.name}/>`, () => {
     await setup();
 
     expect(getTimelineModuleMock).toHaveBeenCalledWith('timeline-1', tenant);
-    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1', 'en');
   });
 
   it('renders nothing when the fetch fails', async () => {

@@ -32,8 +32,6 @@ export interface ITopicModuleRendererProps {
   hero: TMaybeUndefined<TModule<TPageTopicType>>;
   headingBlock: THeadingBlock;
   modules: TModule<TPageTopicType>[];
-  locale: string;
-  tenant: string;
   context?: TModuleComponentProps['context'];
   children?: ReactNode;
 }
@@ -42,20 +40,18 @@ export const TopicModuleRenderer = async ({
   hero,
   headingBlock,
   modules,
-  locale,
-  tenant,
   context,
   children,
 }: ITopicModuleRendererProps): Promise<ReactNode> => {
   const heroNode = hero
-    ? await renderHeroModule({ hero, map: TOPIC_MAP, locale, tenant })
+    ? await renderHeroModule({ hero, map: TOPIC_MAP })
     : null;
 
   return (
     <>
       {heroNode ?? <PageHeading headingBlock={headingBlock} />}
       {children}
-      {renderModules({ modules, map: TOPIC_MAP, locale, tenant, context })}
+      {renderModules({ modules, map: TOPIC_MAP, context })}
     </>
   );
 };

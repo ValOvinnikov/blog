@@ -1,9 +1,9 @@
 import { BRAND_VARIANT } from '@blog/config';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeFaqQuestion } from '@web/testing/modules/faq/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { FaqModule } from './faq-module';
 
@@ -21,9 +21,9 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
+vi.mock('@web/server/request-context/request-context');
 
-const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
+const getRequestContextMock = vi.mocked(getRequestContext);
 
 const baseModule = {
   brandVariant: BRAND_VARIANT.PRIMARY,
@@ -35,15 +35,13 @@ const baseModule = {
 
 const setup = customRenderAsync(FaqModule, {
   id: 'faq-1',
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${FaqModule.name}/>`, () => {
   beforeEach(() => {
     getFaqModuleMock.mockReset();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
+    getRequestContextMock.mockReset();
+    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
   it('calls getFaqModule with the module id and the tenant Sanity context', async () => {
@@ -52,7 +50,10 @@ describe(`<${FaqModule.name}/>`, () => {
       dataset: 'production',
       token: 'tenant-token',
     };
-    getTenantSanityContextMock.mockResolvedValue(tenant);
+    getRequestContextMock.mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      sanityContext: tenant,
+    });
     getFaqModuleMock.mockResolvedValue({
       ok: true,
       data: { ...baseModule, questions: [] },
@@ -61,7 +62,6 @@ describe(`<${FaqModule.name}/>`, () => {
     await setup();
 
     expect(getFaqModuleMock).toHaveBeenCalledWith('faq-1', tenant);
-    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1', 'en');
   });
 
   it('renders nothing when the fetch fails', async () => {

@@ -1,6 +1,6 @@
 import { routes, TAXONOMY_KIND } from '@blog/config';
 import { service } from '@blog/service';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
@@ -12,19 +12,13 @@ import {
 
 export interface ITaxonomyListModuleProps {
   id: string;
-  locale?: string;
-  tenant: string;
 }
 
-export const TaxonomyListModule = async ({
-  id,
-  locale,
-  tenant,
-}: ITaxonomyListModuleProps) => {
-  const tenantContext = await getTenantSanityContext(tenant, locale);
+export const TaxonomyListModule = async ({ id }: ITaxonomyListModuleProps) => {
+  const { sanityContext } = await getRequestContext();
   const result = await service.modules.taxonomyList.v1.getTaxonomyList(
     id,
-    tenantContext,
+    sanityContext,
   );
 
   if (!result.ok) {

@@ -8,11 +8,7 @@ import { PostIndexModuleRenderer } from './post-index-module-renderer';
 
 type TPostIndexPageProps = { page: number; locale: string; tenant: string };
 
-export const PostIndexPage = async ({
-  page,
-  locale,
-  tenant,
-}: TPostIndexPageProps) => {
+export const PostIndexPage = async ({ page, tenant }: TPostIndexPageProps) => {
   const result = await getPostIndexPage(tenant);
   const pageData = guardPageLoaderResult(
     result,
@@ -30,8 +26,6 @@ export const PostIndexPage = async ({
         headingBlock={headingBlock}
         modules={modules}
         context={{ page }}
-        locale={locale}
-        tenant={tenant}
       >
         <PostIndexTopicChips tenant={tenant} />
       </PostIndexModuleRenderer>
