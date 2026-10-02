@@ -1,11 +1,12 @@
 import { TENANT_WRITE_REFUSAL } from '@blog/config';
 import { TENANT_STATUS } from '@blog/db';
+import type { TTenant } from '@blog/db/schema/tenants';
+import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { logger } from '@web/utils/logger/logger';
 
-import { resolveRequestTenant } from './resolve-request-tenant';
-import { resolveWritableTenant } from './resolve-writable-tenant';
+import { isTenantActive, resolveWritableTenant } from './write-gate';
 
-vi.mock('./resolve-request-tenant', () => ({
+vi.mock('@web/server/tenant/request-tenant/request-tenant', () => ({
   resolveRequestTenant: vi.fn(),
 }));
 vi.mock('@blog/db', () => ({
@@ -78,5 +79,37 @@ describe(resolveWritableTenant, () => {
     await resolveWritableTenant(SITE);
 
     expect(resolveRequestTenant).toHaveBeenCalledTimes(1);
+  });
+});
+
+const buildTenant = (overrides: Partial<TTenant>) =>
+  ({
+    id: 'tenant-a',
+    status: TENANT_STATUS.ACTIVE,
+    deprovisionedAt: null,
+    ...overrides,
+  }) as TTenant;
+
+describe(isTenantActive, () => {
+  it('returns true for an active tenant', () => {
+    expect(isTenantActive(buildTenant({}))).toBe(true);
+  });
+
+  it('returns false for a suspended tenant', () => {
+    expect(
+      isTenantActive(buildTenant({ status: TENANT_STATUS.SUSPENDED })),
+    ).toBe(false);
+  });
+
+  it('returns false for an archived tenant', () => {
+    expect(
+      isTenantActive(buildTenant({ status: TENANT_STATUS.ARCHIVED })),
+    ).toBe(false);
+  });
+
+  it('returns false for a deprovisioned tenant that is still marked active', () => {
+    expect(isTenantActive(buildTenant({ deprovisionedAt: new Date() }))).toBe(
+      false,
+    );
   });
 });

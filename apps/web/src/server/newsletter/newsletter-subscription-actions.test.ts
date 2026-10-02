@@ -4,7 +4,7 @@ import {
   TENANT_WRITE_REFUSAL,
 } from '@blog/config';
 import { TENANT_STATUS } from '@blog/db';
-import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
+import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 
 const {
   authMock,
@@ -68,13 +68,13 @@ vi.mock('@web/server/newsletter/newsletter-subscribed-cookie', () => ({
   clearNewsletterSubscribedCookie: clearNewsletterSubscribedCookieMock,
 }));
 
-vi.mock('@web/server/tenant/get-tenant-base-url');
+vi.mock('@web/server/tenant/tenant-base-url/tenant-base-url');
 
-vi.mock('@web/server/tenant/resolve-request-tenant', () => ({
+vi.mock('@web/server/tenant/request-tenant/request-tenant', () => ({
   resolveRequestTenant: resolveRequestTenantMock,
 }));
 
-vi.mock('@web/server/tenant/resolve-writable-tenant', () => ({
+vi.mock('@web/server/tenant/write-gate/write-gate', () => ({
   resolveWritableTenant: resolveWritableTenantMock,
 }));
 

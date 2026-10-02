@@ -1,7 +1,8 @@
-import { getTenantBaseUrl } from './get-tenant-base-url';
-import { resolveRequestTenant } from './resolve-request-tenant';
+import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 
-vi.mock('./resolve-request-tenant', () => ({
+import { getTenantBaseUrl } from './tenant-base-url';
+
+vi.mock('@web/server/tenant/request-tenant/request-tenant', () => ({
   resolveRequestTenant: vi.fn(),
 }));
 
@@ -25,9 +26,9 @@ describe(getTenantBaseUrl, () => {
     }));
     vi.resetModules();
     const { getTenantBaseUrl: freshGetTenantBaseUrl } =
-      await import('./get-tenant-base-url');
+      await import('./tenant-base-url');
     const { resolveRequestTenant: freshResolveRequestTenant } =
-      await import('./resolve-request-tenant');
+      await import('@web/server/tenant/request-tenant/request-tenant');
     vi.mocked(freshResolveRequestTenant).mockResolvedValue(undefined);
 
     await expect(freshGetTenantBaseUrl()).resolves.toBe(
@@ -41,9 +42,9 @@ describe(getTenantBaseUrl, () => {
     }));
     vi.resetModules();
     const { getTenantBaseUrl: freshGetTenantBaseUrl } =
-      await import('./get-tenant-base-url');
+      await import('./tenant-base-url');
     const { resolveRequestTenant: freshResolveRequestTenant } =
-      await import('./resolve-request-tenant');
+      await import('@web/server/tenant/request-tenant/request-tenant');
     vi.mocked(freshResolveRequestTenant).mockResolvedValue({
       id: 'tenant-1',
       primaryDomain: '',
@@ -58,9 +59,9 @@ describe(getTenantBaseUrl, () => {
     vi.doMock('@web/utils/env/env', () => ({ env: {} }));
     vi.resetModules();
     const { getTenantBaseUrl: freshGetTenantBaseUrl } =
-      await import('./get-tenant-base-url');
+      await import('./tenant-base-url');
     const { resolveRequestTenant: freshResolveRequestTenant } =
-      await import('./resolve-request-tenant');
+      await import('@web/server/tenant/request-tenant/request-tenant');
     vi.mocked(freshResolveRequestTenant).mockResolvedValue(undefined);
 
     await expect(freshGetTenantBaseUrl()).resolves.toBeUndefined();

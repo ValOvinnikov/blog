@@ -5,13 +5,17 @@ import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
 
 import { LookPageContent } from './look-page-content';
 
-const { getSiteConfigMock } = vi.hoisted(() => ({
+const { getSiteConfigMock, getTenantLiveLocalesMock } = vi.hoisted(() => ({
   getSiteConfigMock: vi.fn(),
+  getTenantLiveLocalesMock: vi.fn(),
 }));
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
-  queries: { siteConfig: { getSiteConfig: getSiteConfigMock } },
+  queries: {
+    siteConfig: { getSiteConfig: getSiteConfigMock },
+    tenants: { getTenantLiveLocales: getTenantLiveLocalesMock },
+  },
 }));
 
 vi.mock('@platform/server/auth/auth');
@@ -23,6 +27,7 @@ const setup = customRenderAsync(LookPageContent, { tenant });
 describe(`<${LookPageContent.name}/>`, () => {
   beforeEach(() => {
     getSiteConfigMock.mockReset();
+    getTenantLiveLocalesMock.mockResolvedValue(['EN']);
   });
 
   it('renders Console defaults when the tenant has no saved site_config row yet', async () => {
@@ -49,6 +54,7 @@ describe(`<${LookPageContent.name}/>`, () => {
       bodyFont: 'INTER',
       radiusScale: 'SM',
       density: 'COMPACT',
+      languageSwitcherStyle: 'MENU_CODE',
       logoAssetUrl: undefined,
       faviconAssetUrl: undefined,
       voiceOverrides: {},

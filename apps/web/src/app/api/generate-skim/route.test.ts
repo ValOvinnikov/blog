@@ -35,13 +35,13 @@ vi.mock('@web/server/skim/generate-takeaways', () => ({
   SKIM_GENERATION_MODEL: 'claude-haiku-4-5',
 }));
 
-vi.mock('@web/server/tenant/get-host-tenant-sanity-context', () => ({
-  getHostTenantSanityContext: getHostTenantSanityContextMock,
-}));
-
-vi.mock('@web/server/tenant/get-host-tenant-sanity-write-context', () => ({
-  getHostTenantSanityWriteContext: getHostTenantSanityWriteContextMock,
-}));
+vi.mock(
+  '@web/server/tenant/tenant-sanity-context/tenant-sanity-context',
+  () => ({
+    getHostTenantSanityContext: getHostTenantSanityContextMock,
+    getHostTenantSanityWriteContext: getHostTenantSanityWriteContextMock,
+  }),
+);
 
 vi.mock('@web/utils/logger/logger');
 

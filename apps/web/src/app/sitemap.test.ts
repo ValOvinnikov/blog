@@ -1,5 +1,5 @@
 import { routing } from '@web/i18n/routing';
-import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
+import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 
 const {
   getPostParamsMock,
@@ -29,7 +29,7 @@ const {
   selectLiveLocalesMock: vi.fn(),
 }));
 
-vi.mock('@web/server/tenant/resolve-request-tenant', () => ({
+vi.mock('@web/server/tenant/request-tenant/request-tenant', () => ({
   resolveRequestTenant: resolveRequestTenantMock,
 }));
 
@@ -37,11 +37,14 @@ vi.mock('@blog/db', () => ({
   queries: { tenants: { selectLiveLocales: selectLiveLocalesMock } },
 }));
 
-vi.mock('@web/server/tenant/get-host-tenant-sanity-context', () => ({
-  getHostTenantSanityContext: getHostTenantSanityContextMock,
-}));
+vi.mock(
+  '@web/server/tenant/tenant-sanity-context/tenant-sanity-context',
+  () => ({
+    getHostTenantSanityContext: getHostTenantSanityContextMock,
+  }),
+);
 
-vi.mock('@web/server/tenant/get-tenant-base-url');
+vi.mock('@web/server/tenant/tenant-base-url/tenant-base-url');
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -83,7 +86,8 @@ const mockAllEmpty = () => {
 
 describe('sitemap', () => {
   beforeEach(async () => {
-    const fresh = await import('@web/server/tenant/get-tenant-base-url');
+    const fresh =
+      await import('@web/server/tenant/tenant-base-url/tenant-base-url');
     getTenantBaseUrlMock = vi.mocked(fresh.getTenantBaseUrl);
     getHostTenantSanityContextMock.mockResolvedValue({
       isResolvable: true,

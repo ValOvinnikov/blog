@@ -1,4 +1,10 @@
-import { DENSITY, FONT_CHOICE, PRESET_ID, RADIUS_SCALE } from '@blog/config';
+import {
+  DENSITY,
+  FONT_CHOICE,
+  LANGUAGE_SWITCHER_STYLE,
+  PRESET_ID,
+  RADIUS_SCALE,
+} from '@blog/config';
 import { customRender, screen, waitFor } from '@platform/testing/custom-render';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import userEvent from '@testing-library/user-event';
@@ -34,6 +40,7 @@ const setup = customRender(LookForm, {
   tenantName: 'Acme Inc.',
   primaryDomain: 'acme.example.com',
   initialValues: defaultLookFormValues(),
+  hasMultipleLanguages: true,
 });
 
 describe(`<${LookForm.name}/>`, () => {
@@ -114,8 +121,43 @@ describe(`<${LookForm.name}/>`, () => {
         bodyFont: FONT_CHOICE.NEWSREADER,
         radiusScale: RADIUS_SCALE.MD,
         density: DENSITY.DEFAULT,
+        languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
       });
     });
+  });
+
+  it('saves the chosen language switcher style', async () => {
+    const user = userEvent.setup();
+    setup();
+
+    await user.click(screen.getByText('Advanced'));
+    await user.click(screen.getByRole('button', { name: 'Compact codes' }));
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    await waitFor(() => {
+      expect(updateLookActionMock).toHaveBeenCalledWith(
+        'tenant-1',
+        expect.objectContaining({
+          languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
+        }),
+      );
+    });
+  });
+
+  it('shows a note instead of the language switcher choice with one live language', async () => {
+    const user = userEvent.setup();
+    setup({ hasMultipleLanguages: false });
+
+    await user.click(screen.getByText('Advanced'));
+
+    expect(
+      screen.getByText(
+        'Add another language in Languages settings to choose a style.',
+      ),
+    ).toBeVisible();
+    expect(
+      screen.queryByRole('button', { name: 'Compact codes' }),
+    ).not.toBeInTheDocument();
   });
 
   it('shows a save-confirmation toast once the save resolves', async () => {

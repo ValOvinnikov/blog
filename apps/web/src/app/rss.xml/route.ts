@@ -1,7 +1,7 @@
 import { routes } from '@blog/config';
 import { service, type TFeedPost } from '@blog/service';
-import { getHostTenantSanityContext } from '@web/server/tenant/get-host-tenant-sanity-context';
-import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
+import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
+import { getHostTenantSanityContext } from '@web/server/tenant/tenant-sanity-context/tenant-sanity-context';
 import { buildRssFeed, type TRssItem } from '@web/utils/build-rss-feed';
 import { logger } from '@web/utils/logger/logger';
 import { NextResponse } from 'next/server';

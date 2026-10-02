@@ -2,9 +2,9 @@ import { LOCALE_BCP47_TAGS, routes } from '@blog/config';
 import { queries } from '@blog/db';
 import { service } from '@blog/service';
 import { routing } from '@web/i18n/routing';
-import { getHostTenantSanityContext } from '@web/server/tenant/get-host-tenant-sanity-context';
-import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
-import { resolveRequestTenant } from '@web/server/tenant/resolve-request-tenant';
+import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
+import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
+import { getHostTenantSanityContext } from '@web/server/tenant/tenant-sanity-context/tenant-sanity-context';
 import { logger } from '@web/utils/logger/logger';
 import type { MetadataRoute } from 'next';
 
