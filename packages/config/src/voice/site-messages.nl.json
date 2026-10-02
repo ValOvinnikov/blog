@@ -238,5 +238,22 @@
     "previousAriaLabel": "Vorige dia",
     "nextAriaLabel": "Volgende dia",
     "regionLabel": "Carrousel {title}"
+  },
+  "pricingModule": {
+    "free": "Gratis",
+    "from": "Vanaf",
+    "compareAtLabel": "Normale prijs",
+    "period": {
+      "ONE_TIME": "eenmalig",
+      "HOUR": "per uur",
+      "SESSION": "per sessie",
+      "MONTH": "per maand",
+      "YEAR": "per jaar"
+    },
+    "tabs": {
+      "MONTH": "Maandelijks",
+      "YEAR": "Jaarlijks"
+    },
+    "periodSwitchLabel": "Factureringsperiode"
   }
 }

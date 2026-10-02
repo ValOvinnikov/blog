@@ -238,5 +238,22 @@
     "previousAriaLabel": "Diapositiva anterior",
     "nextAriaLabel": "Diapositiva siguiente",
     "regionLabel": "Carrusel {title}"
+  },
+  "pricingModule": {
+    "free": "Gratis",
+    "from": "Desde",
+    "compareAtLabel": "Precio habitual",
+    "period": {
+      "ONE_TIME": "pago único",
+      "HOUR": "por hora",
+      "SESSION": "por sesión",
+      "MONTH": "al mes",
+      "YEAR": "al año"
+    },
+    "tabs": {
+      "MONTH": "Mensual",
+      "YEAR": "Anual"
+    },
+    "periodSwitchLabel": "Periodo de facturación"
   }
 }

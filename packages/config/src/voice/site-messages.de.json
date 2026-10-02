@@ -238,5 +238,22 @@
     "previousAriaLabel": "Vorherige Folie",
     "nextAriaLabel": "Nächste Folie",
     "regionLabel": "Karussell {title}"
+  },
+  "pricingModule": {
+    "free": "Kostenlos",
+    "from": "Ab",
+    "compareAtLabel": "Regulärer Preis",
+    "period": {
+      "ONE_TIME": "einmalig",
+      "HOUR": "pro Stunde",
+      "SESSION": "pro Sitzung",
+      "MONTH": "pro Monat",
+      "YEAR": "pro Jahr"
+    },
+    "tabs": {
+      "MONTH": "Monatlich",
+      "YEAR": "Jährlich"
+    },
+    "periodSwitchLabel": "Abrechnungszeitraum"
   }
 }
