@@ -18,6 +18,17 @@ const setup = customRender(LanguagesSettings, {
 });
 
 describe(`<${LanguagesSettings.name}/>`, () => {
+  it('shows the default language apart from the helper sentence', () => {
+    setup({ defaultLocale: NL });
+
+    expect(screen.getByText('Dutch')).toBeVisible();
+    expect(
+      screen.getByText(
+        'Every page is written in it first; set it in the tenant details.',
+      ),
+    ).toBeVisible();
+  });
+
   it('does not offer the default language as an additional one', () => {
     setup();
 

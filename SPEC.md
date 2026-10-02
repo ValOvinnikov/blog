@@ -1551,6 +1551,27 @@ plan, since a disabled client control is never the real gate. Validation
 limits and layout thresholds (mentioned in the original phase scope) were
 cut with no concrete values ever specified; tracked separately (#1920).
 
+**"Coming soon" capabilities.** A capability that is not finished end to end
+— today `comments` and `ratings` (no public-site implementation) and
+`newsletter` (readers can subscribe, but no tenant can send an issue yet) — is
+flagged `isComingSoon` in `apps/platform`'s `CAPABILITY_TOGGLES`. The Features
+tab renders it as a read-only "Coming soon" row with no switch, loads it off,
+and the save action writes it off whatever the payload says, so the row cannot
+be bypassed by a crafted request. Plan-locked toggles keep their "Growth plan"
+lock. Shipping one of these features is a matter of dropping its flag.
+
+**Plan-aware navigation.** `apps/platform`'s `planPageAccess(plan)` derives
+which plan-gated pages a tenant can use: Languages when `PLAN_LOCALE_LIMIT`
+allows a language beyond the default; Email when `PLAN_REGISTRY` holds any of
+`bookmarks`/`comments`/`newsletter` (the capabilities that make the site send
+email); Subscribers with `newsletter`; Comments with `comments`; Team on any
+plan but `FREE`. The tenant's own `/dashboard` sidebar omits what the plan
+cannot use, and a gated dashboard page answers 404 for such a tenant. The
+operator's `/tenants/{id}` view ignores the plan and shows every entry and
+page, so a downgraded tenant's data stays reachable. Roadmap entries with no
+page yet (Subscribers, Comments, Team) render as non-interactive "Coming soon"
+items in both views; no entry carries a progress badge.
+
 **Studio capability warning.** `@blog/studio`'s `StudioMount` takes an optional
 `enabledCapabilities?: readonly TCapability[]`. When it is supplied, a
 type→capability map in the package (`module_newsletter` → `NEWSLETTER`)

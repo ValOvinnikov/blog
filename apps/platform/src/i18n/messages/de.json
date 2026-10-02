@@ -728,7 +728,7 @@
     "switchOn": "An",
     "switchOff": "Aus",
     "defaultHeading": "Standardsprache",
-    "defaultDescription": "{language}. Jede Seite wird zuerst in dieser Sprache verfasst; festgelegt wird sie in den Mandantendetails.",
+    "defaultDescription": "Jede Seite wird zuerst in dieser Sprache verfasst; festgelegt wird sie in den Mandantendetails.",
     "additionalHeading": "Zusätzliche Sprachen",
     "allowance": "{used} von {allowed} zusätzlichen Sprachen Ihres Tarifs in Verwendung.",
     "upgradeNotice": "Ihr Tarif veröffentlicht nur die Standardsprache. Führen Sie ein Upgrade durch, um weitere Sprachen hinzuzufügen.",

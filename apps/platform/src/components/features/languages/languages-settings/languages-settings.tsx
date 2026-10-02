@@ -17,6 +17,8 @@ import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
 
+import { languagesSettingsVariants } from './languages-settings-variants';
+
 const SUPPORTED_LOCALES = Object.values(LOCALE_ISO_CODES);
 
 // Past the limit nothing is dropped: switched-off stored locales stay after
@@ -64,6 +66,7 @@ export const LanguagesSettings = ({
   const archivedNoticeId = useId();
   const t = useTranslations('languagesSettings');
   const tLanguage = useTranslations('languageNames');
+  const { defaultLanguage } = languagesSettingsVariants();
   const toast = useToast();
   const router = useRouter();
   const [savedLocales, setSavedLocales] = useState(storedLocales);
@@ -127,9 +130,8 @@ export const LanguagesSettings = ({
       <Card>
         <Card.Header title={t('defaultHeading')} headingLevel={2} />
         <Card.Body>
-          <Text variant="supporting">
-            {t('defaultDescription', { language: tLanguage(defaultLocale) })}
-          </Text>
+          <Text className={defaultLanguage()}>{tLanguage(defaultLocale)}</Text>
+          <Text variant="supporting">{t('defaultDescription')}</Text>
         </Card.Body>
       </Card>
 

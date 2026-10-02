@@ -728,7 +728,7 @@
     "switchOn": "Aan",
     "switchOff": "Uit",
     "defaultHeading": "Standaardtaal",
-    "defaultDescription": "{language}. Elke pagina wordt eerst in deze taal geschreven; stel deze in bij de tenantgegevens.",
+    "defaultDescription": "Elke pagina wordt eerst in deze taal geschreven; stel deze in bij de tenantgegevens.",
     "additionalHeading": "Extra talen",
     "allowance": "{used} van {allowed} extra talen in gebruik binnen uw abonnement.",
     "upgradeNotice": "Uw abonnement publiceert alleen de standaardtaal. Upgrade om meer talen toe te voegen.",
