@@ -47,6 +47,19 @@ describe('BlogPostSlugPage', () => {
 
       expect(metadata).toEqual({ title: 'Hello World' });
     });
+
+    it('enters the request context with the route params', async () => {
+      const params: Parameters<typeof generateMetadata>[0]['params'] =
+        Promise.resolve({
+          tenant: 'tenant-1',
+          locale: 'EN',
+          slug: 'hello-world',
+        });
+
+      await generateMetadata({ params });
+
+      expect(enterRequestContext).toHaveBeenCalledWith(params);
+    });
   });
 
   it('renders BlogPostPage with the resolved slug', async () => {

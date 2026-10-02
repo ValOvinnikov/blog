@@ -1,4 +1,3 @@
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { getTopicPage } from './get-topic-page';
@@ -9,23 +8,18 @@ vi.mock('@blog/service', () => ({
   service: { pages: { topic: { v1: { getTopicPage: getTopicPageMock } } } },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
+vi.mock('@web/server/request-context/request-context');
 
 describe(getTopicPage, () => {
   beforeEach(() => {
     getTopicPageMock.mockReset();
-    vi.mocked(getTenantSanityContext).mockReset();
-    vi.mocked(getTenantSanityContext).mockResolvedValue(
-      DEFAULT_TENANT_SANITY_CONTEXT,
-    );
   });
 
   it('forwards the slug and the resolved tenant context to the topic page service', async () => {
     getTopicPageMock.mockResolvedValue({ ok: true, data: undefined });
 
-    await getTopicPage('engineering', 'tenant-1');
+    await getTopicPage('engineering');
 
-    expect(getTenantSanityContext).toHaveBeenCalledWith('tenant-1');
     expect(getTopicPageMock).toHaveBeenCalledWith(
       'engineering',
       DEFAULT_TENANT_SANITY_CONTEXT,
@@ -36,7 +30,7 @@ describe(getTopicPage, () => {
     const result = { ok: true, data: { topic: { title: 'Engineering' } } };
     getTopicPageMock.mockResolvedValue(result);
 
-    await expect(getTopicPage('engineering', 'tenant-1')).resolves.toBe(result);
+    await expect(getTopicPage('engineering')).resolves.toBe(result);
   });
 });
 
@@ -48,10 +42,6 @@ describe('getTopicPage memoization', () => {
 
   it('dedupes the topic-page query across one render pass with the same arguments', async () => {
     getTopicPageMock.mockReset();
-    vi.mocked(getTenantSanityContext).mockReset();
-    vi.mocked(getTenantSanityContext).mockResolvedValue(
-      DEFAULT_TENANT_SANITY_CONTEXT,
-    );
     getTopicPageMock.mockResolvedValue({ ok: true, data: undefined });
 
     vi.doMock('react', async (importOriginal) => {
@@ -75,8 +65,8 @@ describe('getTopicPage memoization', () => {
     const { getTopicPage: freshGetTopicPage } =
       await import('./get-topic-page');
 
-    await freshGetTopicPage('engineering', 'tenant-1');
-    await freshGetTopicPage('engineering', 'tenant-1');
+    await freshGetTopicPage('engineering');
+    await freshGetTopicPage('engineering');
 
     expect(getTopicPageMock).toHaveBeenCalledTimes(1);
   });

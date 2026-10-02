@@ -1,5 +1,7 @@
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { screen, within } from '@web/testing/custom-render';
 import type { TAsyncSetup } from '@web/testing/shared/async-setup/async-setup';
+import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
 import type { Mock } from 'vitest';
 
@@ -109,14 +111,15 @@ export const testNoJsonLdWithoutBaseUrl = <TData,>({
   pageLoaderMock,
   setup,
   successData,
-  getTenantBaseUrlMock,
 }: Partial<IWithSuccessData<TData>> & {
   setup: TAsyncSetup;
-  getTenantBaseUrlMock: Mock;
 }) => {
   it('renders no JSON-LD script when the base URL cannot be resolved', async () => {
     pageLoaderMock?.mockResolvedValue({ ok: true, data: successData });
-    getTenantBaseUrlMock.mockResolvedValue(undefined);
+    vi.mocked(getRequestContext).mockResolvedValueOnce({
+      ...DEFAULT_REQUEST_CONTEXT,
+      metadataBase: undefined,
+    });
 
     await setup();
 

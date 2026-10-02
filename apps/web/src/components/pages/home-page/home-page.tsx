@@ -1,17 +1,14 @@
-import type { ITenantLocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
 import { FaqPageSchema } from '@web/components/features/faq-page-schema';
 import { PageShell } from '@web/components/page-templates/page-shell';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 
 import { HomeModuleRenderer } from './home-module-renderer';
 
-type THomePageProps = ITenantLocalizedParams;
-
-export const HomePage = async ({ tenant }: THomePageProps) => {
-  const tenantContext = await getTenantSanityContext(tenant);
-  const result = await service.pages.home.v1.getHomePage(tenantContext);
+export const HomePage = async () => {
+  const { sanityContext } = await getRequestContext();
+  const result = await service.pages.home.v1.getHomePage(sanityContext);
   const { headingBlock, hero, modules, faqs } = guardPageLoaderResult(
     result,
     'home_page.fetch_failed',

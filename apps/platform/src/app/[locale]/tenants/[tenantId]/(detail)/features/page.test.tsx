@@ -69,7 +69,7 @@ describe(`<${FeaturesPage.name}/>`, () => {
     getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });
     getTenantByIdMock.mockResolvedValue({
       id: 'tenant-1',
-      plan: 'FREE',
+      plan: 'GROWTH',
     });
     getSettingsFeaturesMock.mockResolvedValue(undefined);
     getSiteConfigMock.mockResolvedValue(undefined);
@@ -97,6 +97,10 @@ describe(`<${FeaturesPage.name}/>`, () => {
     await setup();
 
     expect(screen.getByRole('switch', { name: 'Analytics' })).toHaveAttribute(
+      'data-disabled',
+      '',
+    );
+    expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(
       'data-disabled',
       '',
     );

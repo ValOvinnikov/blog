@@ -6,7 +6,7 @@ import {
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';
-import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { getTopicPage } from '@web/server/topic/get-topic-page';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
@@ -14,22 +14,18 @@ import { getTranslations } from 'next-intl/server';
 
 export type TTopicBreadcrumbsProps = {
   slug: string;
-  tenant: string;
 };
 
-export const TopicBreadcrumbs = async ({
-  slug,
-  tenant,
-}: TTopicBreadcrumbsProps) => {
-  const result = await getTopicPage(slug, tenant);
+export const TopicBreadcrumbs = async ({ slug }: TTopicBreadcrumbsProps) => {
+  const result = await getTopicPage(slug);
   const page = guardPageLoaderResult(result, 'topic_breadcrumbs.fetch_failed', {
     slug,
   });
   const { topic } = page;
 
-  const [t, siteUrl] = await Promise.all([
+  const [t, { metadataBase }] = await Promise.all([
     getTranslations('breadcrumbs'),
-    getTenantBaseUrl(tenant),
+    getRequestContext(),
   ]);
 
   const breadcrumbTrail: IBreadcrumbItem[] = [
@@ -38,7 +34,7 @@ export const TopicBreadcrumbs = async ({
   ];
   const breadcrumbListSchema = buildBreadcrumbListSchema(
     breadcrumbTrail,
-    siteUrl ?? '',
+    metadataBase,
   );
 
   return (

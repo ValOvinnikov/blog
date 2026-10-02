@@ -1,6 +1,4 @@
 import { service, type TTagIndexPage } from '@blog/service';
-import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import {
   customRenderServerAsync,
   screen,
@@ -28,10 +26,6 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
-
-vi.mock('@web/server/tenant/get-tenant-base-url');
-
 vi.mock('@web/utils/logger/logger');
 
 vi.mock('@web/i18n/navigation');
@@ -48,10 +42,7 @@ const tagIndexPage: TTagIndexPage = {
   seo: makeSeo(),
 };
 
-const setup = customRenderServerAsync(TagIndexPage, {
-  locale: 'en',
-  tenant: 'tenant-1',
-});
+const setup = customRenderServerAsync(TagIndexPage, {});
 
 describe(`<${TagIndexPage.name}/>`, () => {
   beforeEach(() => {
@@ -90,14 +81,12 @@ describe(`<${TagIndexPage.name}/>`, () => {
     expect(logger.error).not.toHaveBeenCalled();
   });
 
-  it('fetches the index page and breadcrumb base URL for the tenant', async () => {
+  it('fetches the index page with the request context Sanity context', async () => {
     await setup();
 
-    expect(getTenantSanityContext).toHaveBeenCalledWith('tenant-1');
     expect(getIndexPageMock).toHaveBeenCalledWith(
       DEFAULT_TENANT_SANITY_CONTEXT,
     );
-    expect(getTenantBaseUrl).toHaveBeenCalledWith('tenant-1');
   });
 
   it('renders the heading and supporting text inside main', async () => {

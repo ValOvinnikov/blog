@@ -47,6 +47,19 @@ describe('TagDetailPage', () => {
 
       expect(metadata).toEqual({ title: 'TypeScript' });
     });
+
+    it('enters the request context with the route params', async () => {
+      const params: Parameters<typeof generateMetadata>[0]['params'] =
+        Promise.resolve({
+          tenant: 'tenant-1',
+          locale: 'EN',
+          slug: 'typescript',
+        });
+
+      await generateMetadata({ params });
+
+      expect(enterRequestContext).toHaveBeenCalledWith(params);
+    });
   });
 
   it('renders TagPage with the resolved slug', async () => {

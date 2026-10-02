@@ -5,10 +5,8 @@ import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 
 import { TagIndexModuleRenderer } from './tag-index-module-renderer';
 
-type TTagIndexPageProps = { locale: string; tenant: string };
-
-export const TagIndexPage = async ({ tenant }: TTagIndexPageProps) => {
-  const result = await getTagIndexPage(tenant);
+export const TagIndexPage = async () => {
+  const result = await getTagIndexPage();
   const { headingBlock, hero, modules } = guardPageLoaderResult(
     result,
     'tag_index_page.fetch_failed',
@@ -17,7 +15,7 @@ export const TagIndexPage = async ({ tenant }: TTagIndexPageProps) => {
   return (
     <PageShell>
       <PageShell.Breadcrumbs>
-        <TagIndexBreadcrumbs tenant={tenant} />
+        <TagIndexBreadcrumbs />
       </PageShell.Breadcrumbs>
       <TagIndexModuleRenderer
         hero={hero}

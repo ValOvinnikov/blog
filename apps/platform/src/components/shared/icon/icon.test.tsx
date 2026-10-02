@@ -16,6 +16,7 @@ describe(Icon, () => {
 
   it('renders a glyph for every icon admin references', () => {
     const used = [
+      ICONS.BOOK,
       ICONS.CHECK_SHEET,
       ICONS.CHEVRON_RIGHT,
       ICONS.COMMENT,

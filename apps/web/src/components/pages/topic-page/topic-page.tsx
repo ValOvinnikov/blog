@@ -10,12 +10,10 @@ import { TopicModuleRenderer } from './topic-module-renderer';
 type TTopicPageProps = {
   slug: string;
   page?: number;
-  locale: string;
-  tenant: string;
 };
 
-export const TopicPage = async ({ slug, page, tenant }: TTopicPageProps) => {
-  const result = await getTopicPage(slug, tenant);
+export const TopicPage = async ({ slug, page }: TTopicPageProps) => {
+  const result = await getTopicPage(slug);
   const pageData = guardPageLoaderResult(result, 'topic_page.fetch_failed', {
     slug,
   });
@@ -26,7 +24,7 @@ export const TopicPage = async ({ slug, page, tenant }: TTopicPageProps) => {
   return (
     <PageShell>
       <PageShell.Breadcrumbs>
-        <TopicBreadcrumbs slug={slug} tenant={tenant} />
+        <TopicBreadcrumbs slug={slug} />
       </PageShell.Breadcrumbs>
       <TopicModuleRenderer
         hero={hero}
@@ -37,7 +35,7 @@ export const TopicPage = async ({ slug, page, tenant }: TTopicPageProps) => {
           archive: { kind: TAXONOMY_KIND.TOPICS, slug, name: topic.title },
         }}
       >
-        <TopicChips activeSlug={slug} tenant={tenant} />
+        <TopicChips activeSlug={slug} />
       </TopicModuleRenderer>
     </PageShell>
   );

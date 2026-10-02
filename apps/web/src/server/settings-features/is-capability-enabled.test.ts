@@ -1,5 +1,8 @@
 import { CAPABILITY } from '@blog/config';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { getTenantPlan } from '@web/server/tenant/get-tenant-plan';
+import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/unresolved-tenant-placeholder';
+import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { getEffectiveSettingsFeatures } from './get-effective-settings-features';
 import { isCapabilityEnabled } from './is-capability-enabled';
@@ -7,13 +10,14 @@ import { isCapabilityEnabled } from './is-capability-enabled';
 vi.mock('@web/server/tenant/get-tenant-plan', () => ({
   getTenantPlan: vi.fn(),
 }));
+vi.mock('@web/server/request-context/request-context');
 vi.mock('./get-effective-settings-features', () => ({
   getEffectiveSettingsFeatures: vi.fn(),
 }));
 
 vi.mock('@blog/db', () => ({
   PLAN_REGISTRY: {
-    FREE: ['COMMENTS', 'RATINGS', 'BOOKMARKS', 'CONSENT_BANNER'],
+    FREE: ['RATINGS', 'CONSENT_BANNER'],
     GROWTH: [
       'COMMENTS',
       'RATINGS',
@@ -109,16 +113,35 @@ describe(isCapabilityEnabled, () => {
     await expect(isCapabilityEnabled(CAPABILITY.COMMENTS)).resolves.toBe(false);
   });
 
-  it('forwards an explicitly supplied tenant to both reads', async () => {
+  it("reads both entitlements for the request context's tenant", async () => {
     vi.mocked(getTenantPlan).mockResolvedValue({ ok: true, data: 'GROWTH' });
     vi.mocked(getEffectiveSettingsFeatures).mockResolvedValue({
       ok: true,
       data: ALL_ENABLED,
     });
 
-    await isCapabilityEnabled(CAPABILITY.NEWSLETTER, 'tenant-1');
+    await isCapabilityEnabled(CAPABILITY.NEWSLETTER);
 
     expect(getTenantPlan).toHaveBeenCalledWith('tenant-1');
     expect(getEffectiveSettingsFeatures).toHaveBeenCalledWith('tenant-1');
+  });
+
+  it('reads the unresolved-tenant placeholder, never undefined, when the request has no tenant', async () => {
+    vi.mocked(getRequestContext).mockResolvedValueOnce({
+      ...DEFAULT_REQUEST_CONTEXT,
+      tenantId: undefined,
+    });
+    vi.mocked(getTenantPlan).mockResolvedValue({ ok: true, data: 'GROWTH' });
+    vi.mocked(getEffectiveSettingsFeatures).mockResolvedValue({
+      ok: true,
+      data: ALL_ENABLED,
+    });
+
+    await isCapabilityEnabled(CAPABILITY.NEWSLETTER);
+
+    expect(getTenantPlan).toHaveBeenCalledWith(UNRESOLVED_TENANT_PLACEHOLDER);
+    expect(getEffectiveSettingsFeatures).toHaveBeenCalledWith(
+      UNRESOLVED_TENANT_PLACEHOLDER,
+    );
   });
 });

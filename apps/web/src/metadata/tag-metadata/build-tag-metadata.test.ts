@@ -1,5 +1,4 @@
 import { urlForSanityImage } from '@blog/service';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
 import { makeTagDetailPage } from '@web/testing/shared/tag/fixtures';
@@ -15,9 +14,7 @@ vi.mock('@web/server/tag/get-tag-page', () => ({
   getTagPage: getTagPageMock,
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
-
-const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
+vi.mock('@web/server/request-context/request-context');
 
 const ogImage = makeSanityImage();
 const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
@@ -36,19 +33,17 @@ const seo = makeSeo({
 describe('buildTagMetadata', () => {
   beforeEach(() => {
     getTagPageMock.mockReset();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
-  it('forwards the slug and tenant to getTagPage, the loader TagPage reads', async () => {
+  it('forwards the slug to getTagPage, the loader TagPage reads', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
       data: makeTagDetailPage({ seo }),
     });
 
-    await buildTagMetadata('typescript', 'tenant-1');
+    await buildTagMetadata('typescript');
 
-    expect(getTagPageMock).toHaveBeenCalledWith('typescript', 'tenant-1');
+    expect(getTagPageMock).toHaveBeenCalledWith('typescript');
   });
 
   it('builds page-1 metadata from the resolved seo, self-canonical to /tags/[slug]', async () => {
@@ -57,7 +52,7 @@ describe('buildTagMetadata', () => {
       data: makeTagDetailPage({ seo }),
     });
 
-    const metadata = await buildTagMetadata('typescript', 'tenant-1');
+    const metadata = await buildTagMetadata('typescript');
 
     expect(metadata.title).toBe('TypeScript');
     expect(metadata.description).toBe('Posts about TypeScript.');
@@ -78,7 +73,7 @@ describe('buildTagMetadata', () => {
       error: new Error('boom'),
     });
 
-    const metadata = await buildTagMetadata('typescript', 'tenant-1');
+    const metadata = await buildTagMetadata('typescript');
 
     expect(metadata).toEqual({});
   });
@@ -89,7 +84,7 @@ describe('buildTagMetadata', () => {
       data: makeTagDetailPage({ seo }),
     });
 
-    const metadata = await buildTagMetadata('typescript', 'tenant-1', 2);
+    const metadata = await buildTagMetadata('typescript', 2);
 
     expect(metadata.title).toBe('TypeScript – Page 2');
     expect(metadata.openGraph?.title).toBe('TypeScript – Page 2');
@@ -106,7 +101,7 @@ describe('buildTagMetadata', () => {
       data: makeTagDetailPage({ seo: makeSeo({ ogTitle: undefined }) }),
     });
 
-    const metadata = await buildTagMetadata('typescript', 'tenant-1', 2);
+    const metadata = await buildTagMetadata('typescript', 2);
 
     expect(metadata.openGraph?.title).toBeUndefined();
     expect(metadata.twitter?.title).toBeUndefined();
@@ -118,7 +113,7 @@ describe('buildTagMetadata', () => {
       error: new Error('boom'),
     });
 
-    const metadata = await buildTagMetadata('missing', 'tenant-1', 2);
+    const metadata = await buildTagMetadata('missing', 2);
 
     expect(metadata).toEqual({});
   });
@@ -127,7 +122,7 @@ describe('buildTagMetadata', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getTagPageMock.mockResolvedValue({ ok: true, data: undefined });
 
-    const metadata = await buildTagMetadata('missing', 'tenant-1');
+    const metadata = await buildTagMetadata('missing');
 
     expect(metadata).toEqual({});
     expect(errorSpy).not.toHaveBeenCalled();

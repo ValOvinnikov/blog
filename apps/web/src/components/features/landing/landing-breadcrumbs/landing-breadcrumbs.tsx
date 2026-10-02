@@ -7,21 +7,19 @@ import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { getLandingPage } from '@web/server/landing/get-landing-page';
-import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 import { getTranslations } from 'next-intl/server';
 
 export type TLandingBreadcrumbsProps = {
   slug: string;
-  tenant: string;
 };
 
 export const LandingBreadcrumbs = async ({
   slug,
-  tenant,
 }: TLandingBreadcrumbsProps) => {
-  const result = await getLandingPage(slug, tenant);
+  const result = await getLandingPage(slug);
   const page = guardPageLoaderResult(
     result,
     'landing_breadcrumbs.fetch_failed',
@@ -29,9 +27,9 @@ export const LandingBreadcrumbs = async ({
   );
   const { headingBlock } = page;
 
-  const [t, siteUrl] = await Promise.all([
+  const [t, { metadataBase }] = await Promise.all([
     getTranslations('breadcrumbs'),
-    getTenantBaseUrl(tenant),
+    getRequestContext(),
   ]);
 
   const breadcrumbTrail: IBreadcrumbItem[] = [
@@ -40,7 +38,7 @@ export const LandingBreadcrumbs = async ({
   ];
   const breadcrumbListSchema = buildBreadcrumbListSchema(
     breadcrumbTrail,
-    siteUrl ?? '',
+    metadataBase,
   );
 
   return (

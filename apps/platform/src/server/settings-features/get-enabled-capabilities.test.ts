@@ -64,6 +64,6 @@ describe(getEnabledCapabilities, () => {
     });
 
     expect(result).not.toContain(CAPABILITY.NEWSLETTER);
-    expect(result).toContain(CAPABILITY.COMMENTS);
+    expect(result).toContain(CAPABILITY.RATINGS);
   });
 });

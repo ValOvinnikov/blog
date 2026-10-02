@@ -13,11 +13,7 @@ vi.mock('@web/metadata/topic-index-metadata', () => ({
 }));
 
 vi.mock('@web/components/pages/topic-index-page', () => ({
-  TopicIndexPage: ({ locale, tenant }: { locale: string; tenant: string }) => (
-    <div data-testid="topic-index-page">
-      {locale}:{tenant}
-    </div>
-  ),
+  TopicIndexPage: () => <div data-testid="topic-index-page" />,
 }));
 
 describe('TopicIndexRoute', () => {
@@ -38,21 +34,29 @@ describe('TopicIndexRoute', () => {
   });
 
   describe('generateMetadata', () => {
-    it('delegates to buildTopicIndexMetadata with the resolved tenant', async () => {
+    it('delegates to buildTopicIndexMetadata', async () => {
       const metadata = await generateMetadata({
         params: Promise.resolve({ tenant: 'tenant-1', locale: 'EN' }),
       });
 
       expect(metadata).toEqual({ title: 'Topics' });
     });
+
+    it('enters the request context with the route params', async () => {
+      const params: Parameters<typeof generateMetadata>[0]['params'] =
+        Promise.resolve({ tenant: 'tenant-1', locale: 'EN' });
+
+      await generateMetadata({ params });
+
+      expect(enterRequestContext).toHaveBeenCalledWith(params);
+    });
   });
 
-  it('renders TopicIndexPage with the resolved locale and tenant', async () => {
+  it('renders TopicIndexPage without forwarding route params', async () => {
     const ui = await TopicIndexRoute({
       params: Promise.resolve({ tenant: 'tenant-1', locale: 'EN' }),
     });
 
-    expect(ui.props.locale).toBe('EN');
-    expect(ui.props.tenant).toBe('tenant-1');
+    expect(ui.props).toEqual({});
   });
 });

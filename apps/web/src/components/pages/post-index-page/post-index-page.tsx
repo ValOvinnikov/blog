@@ -6,10 +6,10 @@ import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 
 import { PostIndexModuleRenderer } from './post-index-module-renderer';
 
-type TPostIndexPageProps = { page: number; locale: string; tenant: string };
+type TPostIndexPageProps = { page: number };
 
-export const PostIndexPage = async ({ page, tenant }: TPostIndexPageProps) => {
-  const result = await getPostIndexPage(tenant);
+export const PostIndexPage = async ({ page }: TPostIndexPageProps) => {
+  const result = await getPostIndexPage();
   const pageData = guardPageLoaderResult(
     result,
     'post_index_page.fetch_failed',
@@ -19,7 +19,7 @@ export const PostIndexPage = async ({ page, tenant }: TPostIndexPageProps) => {
   return (
     <PageShell>
       <PageShell.Breadcrumbs>
-        <PostIndexBreadcrumbs tenant={tenant} />
+        <PostIndexBreadcrumbs />
       </PageShell.Breadcrumbs>
       <PostIndexModuleRenderer
         hero={hero}
@@ -27,7 +27,7 @@ export const PostIndexPage = async ({ page, tenant }: TPostIndexPageProps) => {
         modules={modules}
         context={{ page }}
       >
-        <PostIndexTopicChips tenant={tenant} />
+        <PostIndexTopicChips />
       </PostIndexModuleRenderer>
     </PageShell>
   );

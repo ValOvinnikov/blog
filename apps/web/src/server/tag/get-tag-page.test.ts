@@ -1,4 +1,3 @@
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { getTagPage } from './get-tag-page';
@@ -9,23 +8,18 @@ vi.mock('@blog/service', () => ({
   service: { pages: { tag: { v1: { getTagPage: getTagPageMock } } } },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
+vi.mock('@web/server/request-context/request-context');
 
 describe(getTagPage, () => {
   beforeEach(() => {
     getTagPageMock.mockReset();
-    vi.mocked(getTenantSanityContext).mockReset();
-    vi.mocked(getTenantSanityContext).mockResolvedValue(
-      DEFAULT_TENANT_SANITY_CONTEXT,
-    );
   });
 
   it('forwards the slug and the resolved tenant context to the tag page service', async () => {
     getTagPageMock.mockResolvedValue({ ok: true, data: undefined });
 
-    await getTagPage('typescript', 'tenant-1');
+    await getTagPage('typescript');
 
-    expect(getTenantSanityContext).toHaveBeenCalledWith('tenant-1');
     expect(getTagPageMock).toHaveBeenCalledWith(
       'typescript',
       DEFAULT_TENANT_SANITY_CONTEXT,
@@ -36,7 +30,7 @@ describe(getTagPage, () => {
     const result = { ok: true, data: { tag: { title: 'TypeScript' } } };
     getTagPageMock.mockResolvedValue(result);
 
-    await expect(getTagPage('typescript', 'tenant-1')).resolves.toBe(result);
+    await expect(getTagPage('typescript')).resolves.toBe(result);
   });
 });
 
@@ -48,10 +42,6 @@ describe('getTagPage memoization', () => {
 
   it('dedupes the tag-page query across one render pass with the same arguments', async () => {
     getTagPageMock.mockReset();
-    vi.mocked(getTenantSanityContext).mockReset();
-    vi.mocked(getTenantSanityContext).mockResolvedValue(
-      DEFAULT_TENANT_SANITY_CONTEXT,
-    );
     getTagPageMock.mockResolvedValue({ ok: true, data: undefined });
 
     vi.doMock('react', async (importOriginal) => {
@@ -74,8 +64,8 @@ describe('getTagPage memoization', () => {
 
     const { getTagPage: freshGetTagPage } = await import('./get-tag-page');
 
-    await freshGetTagPage('typescript', 'tenant-1');
-    await freshGetTagPage('typescript', 'tenant-1');
+    await freshGetTagPage('typescript');
+    await freshGetTagPage('typescript');
 
     expect(getTagPageMock).toHaveBeenCalledTimes(1);
   });

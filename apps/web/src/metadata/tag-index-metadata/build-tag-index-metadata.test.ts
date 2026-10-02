@@ -13,7 +13,7 @@ vi.mock('@web/server/tag-index/get-tag-index-page', () => ({
   getTagIndexPage: getTagIndexPageMock,
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
+vi.mock('@web/server/request-context/request-context');
 
 const ogImage = makeSanityImage();
 const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
@@ -34,15 +34,15 @@ describe('buildTagIndexMetadata', () => {
     getTagIndexPageMock.mockReset();
   });
 
-  it('forwards the tenant to getTagIndexPage', async () => {
+  it('reads the page through getTagIndexPage', async () => {
     getTagIndexPageMock.mockResolvedValue({
       ok: true,
       data: { headingBlock: { heading: 'Tags' }, seo, modules: [] },
     });
 
-    await buildTagIndexMetadata('tenant-1');
+    await buildTagIndexMetadata();
 
-    expect(getTagIndexPageMock).toHaveBeenCalledWith('tenant-1');
+    expect(getTagIndexPageMock).toHaveBeenCalledWith();
   });
 
   it('builds metadata from the resolved seo, self-canonical to /tags', async () => {
@@ -55,7 +55,7 @@ describe('buildTagIndexMetadata', () => {
       },
     });
 
-    const metadata = await buildTagIndexMetadata('tenant-1');
+    const metadata = await buildTagIndexMetadata();
 
     expect(metadata.title).toBe('Tags');
     expect(metadata.description).toBe('Browse every post by tag.');
@@ -76,7 +76,7 @@ describe('buildTagIndexMetadata', () => {
       error: new Error('boom'),
     });
 
-    const metadata = await buildTagIndexMetadata('tenant-1');
+    const metadata = await buildTagIndexMetadata();
 
     expect(metadata).toEqual({});
     expect(errorSpy).toHaveBeenCalledWith(
@@ -89,7 +89,7 @@ describe('buildTagIndexMetadata', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getTagIndexPageMock.mockResolvedValue({ ok: true, data: undefined });
 
-    const metadata = await buildTagIndexMetadata('tenant-1');
+    const metadata = await buildTagIndexMetadata();
 
     expect(metadata).toEqual({});
     expect(errorSpy).not.toHaveBeenCalled();

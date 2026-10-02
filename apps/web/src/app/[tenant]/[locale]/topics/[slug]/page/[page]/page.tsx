@@ -19,14 +19,15 @@ export function generateStaticParams() {
 export const revalidate = 21600;
 
 export async function generateMetadata({ params }: TProps): Promise<Metadata> {
-  const { tenant, slug, page: rawPage } = await params;
+  await enterRequestContext(params);
+  const { slug, page: rawPage } = await params;
   const page = parsePageParam(rawPage);
   if (page === null || page < 2) return {};
-  return buildTopicMetadata(slug, tenant, page);
+  return buildTopicMetadata(slug, page);
 }
 
 export default async function TopicNumberedPage({ params }: TProps) {
-  const { locale, tenant, slug, page: rawPage } = await params;
+  const { locale, slug, page: rawPage } = await params;
   await enterRequestContext(params);
 
   const page = parsePageParam(rawPage);
@@ -41,5 +42,5 @@ export default async function TopicNumberedPage({ params }: TProps) {
     permanentRedirect({ href: routes.topic(slug, 1), locale });
   }
 
-  return <TopicPage slug={slug} page={page} locale={locale} tenant={tenant} />;
+  return <TopicPage slug={slug} page={page} />;
 }
