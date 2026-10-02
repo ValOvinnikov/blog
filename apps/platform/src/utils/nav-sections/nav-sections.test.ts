@@ -1,3 +1,4 @@
+import { ICON_REGISTRY } from '@platform/components/shared/icon/icon-registry';
 import messages from '@platform/i18n/messages/en.json';
 import type { TPlanPageAccess } from '@platform/utils/plan-page-access/plan-page-access';
 import { createTranslator } from 'next-intl';
@@ -283,5 +284,20 @@ describe('dashboardNavSections', () => {
     expect(labels).not.toContain('Overview');
     expect(labels).not.toContain('Provisioning');
     expect(labels).not.toContain('Danger zone');
+  });
+});
+
+describe('nav section icons', () => {
+  it('has a registered glyph for every icon a nav item references', () => {
+    const items = [
+      ...operatorNavSections(t),
+      ...tenantNavSections(t, 'tenant-1', 'Acme'),
+    ].flatMap((section) => section.items);
+
+    const missing = items
+      .filter((item) => !ICON_REGISTRY[item.icon])
+      .map((item) => item.label);
+
+    expect(missing).toEqual([]);
   });
 });
