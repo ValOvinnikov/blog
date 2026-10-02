@@ -1256,7 +1256,7 @@ export type Page_landing = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  language?: string;
+  language?: 'EN' | 'NL' | 'FR' | 'DE' | 'ES';
   title?: string;
   slug?: Slug;
   headingBlock?: HeadingBlock;

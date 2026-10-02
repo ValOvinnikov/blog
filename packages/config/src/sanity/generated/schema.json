@@ -7412,7 +7412,29 @@
       "language": {
         "type": "objectAttribute",
         "value": {
-          "type": "string"
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "EN"
+            },
+            {
+              "type": "string",
+              "value": "NL"
+            },
+            {
+              "type": "string",
+              "value": "FR"
+            },
+            {
+              "type": "string",
+              "value": "DE"
+            },
+            {
+              "type": "string",
+              "value": "ES"
+            }
+          ]
         },
         "optional": true
       },

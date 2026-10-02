@@ -1,4 +1,4 @@
-import { isLocaleIsoCode, RESERVED_SLUGS } from '@blog/config/constants';
+import { RESERVED_SLUGS, type TLocaleIsoCode } from '@blog/config/constants';
 import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
 import { heroField } from '@blog/studio/schema-types/fields/hero-field/hero-field';
 import {
@@ -48,12 +48,15 @@ export const landingPageSchema = defineType({
       title: 'title',
       language: LANGUAGE_FIELD,
     },
-    prepare: ({ title, language }) => ({
+    prepare: ({
       title,
-      subtitle:
-        typeof language === 'string' && isLocaleIsoCode(language)
-          ? LOCALE_LABEL[language]
-          : undefined,
+      language,
+    }: {
+      title?: string;
+      language?: TLocaleIsoCode;
+    }) => ({
+      title,
+      subtitle: language ? LOCALE_LABEL[language] : undefined,
     }),
   },
   fields: [
