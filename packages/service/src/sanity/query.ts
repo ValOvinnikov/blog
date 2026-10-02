@@ -3,6 +3,7 @@ import {
   type AllSanitySchemaTypes,
   type internalGroqTypeReferenceTo,
 } from '@blog/config';
+import { buildLocaleParams } from '@blog/service/shared/localization/locale-params';
 import { createGroqBuilder, makeSafeQueryRunner } from 'groqd';
 
 import { getClient, type TTenantSanityContext } from './client';
@@ -37,7 +38,7 @@ export const runQuery = makeSafeQueryRunner<TNextFetchOptions>(
   (query, { parameters, next, tenant }) =>
     getClient(tenant).fetch(
       query,
-      parameters ?? {},
+      { ...buildLocaleParams(tenant), ...parameters },
       next ? { next } : undefined,
     ),
 );

@@ -8519,7 +8519,8 @@
       "label": {
         "type": "objectAttribute",
         "value": {
-          "type": "string"
+          "type": "inline",
+          "name": "internationalizedArrayString"
         },
         "optional": true
       },
@@ -8584,7 +8585,8 @@
       "url": {
         "type": "objectAttribute",
         "value": {
-          "type": "string"
+          "type": "inline",
+          "name": "internationalizedArrayString"
         },
         "optional": true
       },

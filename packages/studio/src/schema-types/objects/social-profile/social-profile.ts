@@ -41,7 +41,7 @@ export const socialProfileSchema = defineType({
   ],
   preview: {
     select: {
-      title: 'link.label',
+      title: 'link.label.0.value',
       platform: 'platform',
     },
     prepare({ title, platform }) {

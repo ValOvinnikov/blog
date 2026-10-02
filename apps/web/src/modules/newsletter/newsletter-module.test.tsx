@@ -152,7 +152,7 @@ describe(`<${NewsletterModule.name}/>`, () => {
     await setup();
 
     expect(getNewsletterMock).toHaveBeenCalledWith('newsletter-1', tenant);
-    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
+    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1', 'en');
   });
 
   it('renders nothing, without fetching, when the NEWSLETTER capability is off', async () => {

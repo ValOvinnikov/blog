@@ -10,8 +10,12 @@ export interface IHeroBlogModuleProps {
   tenant: string;
 }
 
-export const HeroBlogModule = async ({ id, tenant }: IHeroBlogModuleProps) => {
-  const tenantContext = await getTenantSanityContext(tenant);
+export const HeroBlogModule = async ({
+  id,
+  locale,
+  tenant,
+}: IHeroBlogModuleProps) => {
+  const tenantContext = await getTenantSanityContext(tenant, locale);
   const result = await service.modules.heroBlog.v1.getHeroBlog(
     id,
     tenantContext,

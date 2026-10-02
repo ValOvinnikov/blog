@@ -8,7 +8,10 @@ import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/lan
 import { migrationStateSchema } from '@blog/studio/schema-types/documents/system/migration-state/migration-state';
 import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
 import { createCapabilityWarningInput } from '@blog/studio/schema-types/inputs/capability-warning-input/capability-warning-input';
-import { createLocalizationNoticeInput } from '@blog/studio/schema-types/inputs/localization-notice-input/localization-notice-input';
+import {
+  createLocalizationNoticeInput,
+  type TLocalizationNoticeOptions,
+} from '@blog/studio/schema-types/inputs/localization-notice-input/localization-notice-input';
 import { LOCALE_LABEL } from '@blog/studio/schema-types/inputs/localization-notice-input/missing-locales';
 import { orderLocales } from '@blog/studio/structure/locales/order-locales';
 import { codeInput } from '@sanity/code-input';
@@ -33,11 +36,11 @@ export type TBuildStudioConfigParams = {
 
 const TRANSLATED_DOCUMENT_TYPES: string[] = [PAGE_LANDING_TYPE];
 
-const localizationNotices = definePlugin<readonly TLocaleIsoCode[]>(
-  (liveLocales) => ({
+const localizationNotices = definePlugin<TLocalizationNoticeOptions>(
+  (options) => ({
     name: 'localization-notices',
     form: {
-      components: { input: createLocalizationNoticeInput(liveLocales) },
+      components: { input: createLocalizationNoticeInput(options) },
     },
   }),
 );
@@ -86,7 +89,9 @@ export const buildStudioConfig = ({
         defaultLanguages: [defaultLocale],
         fieldTypes: ['string', 'text'],
       }),
-      ...(liveLocales ? [localizationNotices(liveLocales)] : []),
+      ...(liveLocales
+        ? [localizationNotices({ liveLocales, defaultLocale })]
+        : []),
     ],
 
     schema: {

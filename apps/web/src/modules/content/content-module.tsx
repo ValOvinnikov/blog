@@ -10,8 +10,12 @@ export interface IContentModuleProps {
   tenant: string;
 }
 
-export const ContentModule = async ({ id, tenant }: IContentModuleProps) => {
-  const tenantContext = await getTenantSanityContext(tenant);
+export const ContentModule = async ({
+  id,
+  locale,
+  tenant,
+}: IContentModuleProps) => {
+  const tenantContext = await getTenantSanityContext(tenant, locale);
   const result = await service.modules.content.v1.getContent(id, tenantContext);
 
   if (!result.ok) {

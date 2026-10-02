@@ -53,6 +53,6 @@ describe(`<${CtaModule.name}/>`, () => {
     await setup();
 
     expect(getCtaMock).toHaveBeenCalledWith('cta-1', tenant);
-    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
+    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1', 'en');
   });
 });

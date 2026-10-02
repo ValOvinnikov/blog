@@ -90,4 +90,34 @@ describe('runQuery tenant threading', () => {
 
     expect(getClientMock).toHaveBeenCalledWith(testTenant);
   });
+
+  it("sends the tenant's request and default language as query params", async () => {
+    mockFetch.mockResolvedValue(null);
+
+    const query = q.star.filterByType('page_post').slice(0);
+    await runQuery(query, {
+      tenant: { ...testTenant, locale: 'NL', defaultLocale: 'DE' },
+    }).catch(() => {});
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.any(String),
+      { locale: 'NL', defaultLocale: 'DE' },
+      undefined,
+    );
+  });
+
+  it('defaults the request language to the default language', async () => {
+    mockFetch.mockResolvedValue(null);
+
+    const query = q.star.filterByType('page_post').slice(0);
+    await runQuery(query, {
+      tenant: { ...testTenant, defaultLocale: 'DE' },
+    }).catch(() => {});
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.any(String),
+      { locale: 'DE', defaultLocale: 'DE' },
+      undefined,
+    );
+  });
 });

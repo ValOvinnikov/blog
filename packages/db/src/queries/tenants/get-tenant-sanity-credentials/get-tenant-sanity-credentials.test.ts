@@ -60,6 +60,7 @@ describe(getTenantSanityCredentials, () => {
       projectId: 'abc123',
       dataset: 'production',
       token: 'sk-real-token-value',
+      defaultLocale: LOCALE_ISO_CODES.EN,
       status: TENANT_STATUS.ACTIVE,
       deprovisionedAt: null,
       provisioningStatus: null,

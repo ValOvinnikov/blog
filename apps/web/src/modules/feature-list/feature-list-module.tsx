@@ -12,9 +12,10 @@ export interface IFeatureListModuleProps {
 
 export const FeatureListModule = async ({
   id,
+  locale,
   tenant,
 }: IFeatureListModuleProps) => {
-  const tenantContext = await getTenantSanityContext(tenant);
+  const tenantContext = await getTenantSanityContext(tenant, locale);
   const result = await service.modules.featureList.v1.getFeatureList(
     id,
     tenantContext,

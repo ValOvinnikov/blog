@@ -12,9 +12,10 @@ export interface ITestimonialModuleProps {
 
 export const TestimonialModule = async ({
   id,
+  locale,
   tenant,
 }: ITestimonialModuleProps) => {
-  const tenantContext = await getTenantSanityContext(tenant);
+  const tenantContext = await getTenantSanityContext(tenant, locale);
   const result = await service.modules.testimonial.v1.getTestimonialModule(
     id,
     tenantContext,

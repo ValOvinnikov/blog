@@ -14,12 +14,13 @@ export interface INewsletterModuleProps {
 
 export const NewsletterModule = async ({
   id,
+  locale,
   tenant,
 }: INewsletterModuleProps) => {
   const isEnabled = await isCapabilityEnabled(CAPABILITY.NEWSLETTER, tenant);
   if (!isEnabled) return null;
 
-  const tenantContext = await getTenantSanityContext(tenant);
+  const tenantContext = await getTenantSanityContext(tenant, locale);
   const [result, newsletterSettingsResult] = await Promise.all([
     service.modules.newsletter.v1.getNewsletter(id, tenantContext),
     service.global.newsletterSettings.v1.getNewsletterSettings(tenantContext),

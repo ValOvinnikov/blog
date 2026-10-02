@@ -10,8 +10,8 @@ export interface ITeamModuleProps {
   tenant: string;
 }
 
-export const TeamModule = async ({ id, tenant }: ITeamModuleProps) => {
-  const tenantContext = await getTenantSanityContext(tenant);
+export const TeamModule = async ({ id, locale, tenant }: ITeamModuleProps) => {
+  const tenantContext = await getTenantSanityContext(tenant, locale);
   const result = await service.modules.team.v1.getTeamModule(id, tenantContext);
 
   if (!result.ok) {

@@ -12,9 +12,10 @@ export interface IHeroProfileModuleProps {
 
 export const HeroProfileModule = async ({
   id,
+  locale,
   tenant,
 }: IHeroProfileModuleProps) => {
-  const tenantContext = await getTenantSanityContext(tenant);
+  const tenantContext = await getTenantSanityContext(tenant, locale);
   const result = await service.modules.heroProfile.v1.getHeroProfile(
     id,
     tenantContext,

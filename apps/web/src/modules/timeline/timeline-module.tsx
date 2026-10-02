@@ -10,8 +10,12 @@ export interface ITimelineModuleProps {
   tenant: string;
 }
 
-export const TimelineModule = async ({ id, tenant }: ITimelineModuleProps) => {
-  const tenantContext = await getTenantSanityContext(tenant);
+export const TimelineModule = async ({
+  id,
+  locale,
+  tenant,
+}: ITimelineModuleProps) => {
+  const tenantContext = await getTenantSanityContext(tenant, locale);
   const result = await service.modules.timeline.v1.getTimelineModule(
     id,
     tenantContext,

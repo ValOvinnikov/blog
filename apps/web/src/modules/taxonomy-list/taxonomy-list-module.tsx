@@ -18,9 +18,10 @@ export interface ITaxonomyListModuleProps {
 
 export const TaxonomyListModule = async ({
   id,
+  locale,
   tenant,
 }: ITaxonomyListModuleProps) => {
-  const tenantContext = await getTenantSanityContext(tenant);
+  const tenantContext = await getTenantSanityContext(tenant, locale);
   const result = await service.modules.taxonomyList.v1.getTaxonomyList(
     id,
     tenantContext,

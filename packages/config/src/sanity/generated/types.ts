@@ -1447,7 +1447,7 @@ export type Link = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  label?: string;
+  label?: InternationalizedArrayString;
   linkType?: 'INTERNAL' | 'EXTERNAL';
   internalReference?:
     | Page_homeReference
@@ -1458,7 +1458,7 @@ export type Link = {
     | Page_topicIndexReference
     | Page_tagReference
     | Page_tagIndexReference;
-  url?: string;
+  url?: InternationalizedArrayString;
   openInNewTab?: boolean;
 };
 
