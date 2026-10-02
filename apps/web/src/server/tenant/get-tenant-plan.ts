@@ -28,5 +28,5 @@ const getTenantPlanForTenantId = safeAsync(
   },
 );
 
-export const getTenantPlan = async (tenant?: string) =>
+export const getTenantPlan = async (tenant: string) =>
   getTenantPlanForTenantId(await getRequestTenantId(tenant));

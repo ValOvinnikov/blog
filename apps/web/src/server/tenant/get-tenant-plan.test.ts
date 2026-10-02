@@ -31,11 +31,11 @@ describe(getTenantPlan, () => {
     getTenantByIdMock.mockReset();
   });
 
-  it('resolves the plan of the request-resolved tenant id', async () => {
+  it('resolves the plan of the supplied tenant id', async () => {
     getRequestTenantIdMock.mockResolvedValue(TENANT_A_ID);
     getTenantByIdMock.mockResolvedValue({ id: TENANT_A_ID, plan: 'GROWTH' });
 
-    const result = await getTenantPlan();
+    const result = await getTenantPlan(TENANT_A_ID);
 
     expect(result).toEqual({ ok: true, data: 'GROWTH' });
     expect(getTenantByIdMock).toHaveBeenCalledWith(TENANT_A_ID, {
@@ -43,10 +43,10 @@ describe(getTenantPlan, () => {
     });
   });
 
-  it('returns ok:true with undefined data when no tenant resolves', async () => {
+  it('returns ok:true with undefined data when the supplied tenant is the unresolved placeholder', async () => {
     getRequestTenantIdMock.mockResolvedValue(undefined);
 
-    const result = await getTenantPlan();
+    const result = await getTenantPlan(TENANT_A_ID);
 
     expect(result).toEqual({ ok: true, data: undefined });
     expect(getTenantByIdMock).not.toHaveBeenCalled();
@@ -65,7 +65,7 @@ describe(getTenantPlan, () => {
     getRequestTenantIdMock.mockResolvedValue(TENANT_A_ID);
     getTenantByIdMock.mockRejectedValue(new Error('boom'));
 
-    const result = await getTenantPlan();
+    const result = await getTenantPlan(TENANT_A_ID);
 
     expect(result.ok).toBe(false);
   });
@@ -76,10 +76,10 @@ describe(getTenantPlan, () => {
     });
 
     getRequestTenantIdMock.mockResolvedValue(TENANT_A_ID);
-    const resultA = await getTenantPlan();
+    const resultA = await getTenantPlan(TENANT_A_ID);
 
     getRequestTenantIdMock.mockResolvedValue(TENANT_B_ID);
-    const resultB = await getTenantPlan();
+    const resultB = await getTenantPlan(TENANT_B_ID);
 
     expect(resultA).toEqual({ ok: true, data: 'GROWTH' });
     expect(resultB).toEqual({ ok: true, data: 'STARTER' });
@@ -94,7 +94,7 @@ describe(getTenantPlan, () => {
     );
     getRequestTenantIdMock.mockRejectedValue(dynamicSignal);
 
-    await expect(getTenantPlan()).rejects.toBe(dynamicSignal);
+    await expect(getTenantPlan(TENANT_A_ID)).rejects.toBe(dynamicSignal);
     expect(getTenantByIdMock).not.toHaveBeenCalled();
   });
 });
