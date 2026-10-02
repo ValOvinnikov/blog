@@ -1,6 +1,7 @@
 import { PRICE_PERIOD } from '@blog/config';
 import { service } from '@blog/service';
 import { getRequestContext } from '@web/server/request-context/request-context';
+import { getSiteSettings } from '@web/server/site-settings/get-site-settings';
 import { logger } from '@web/utils/logger/logger';
 import { toPricingPanels } from '@web/utils/to-pricing-panels';
 import { getTranslations } from 'next-intl/server';
@@ -15,7 +16,7 @@ export const PricingModule = async ({ id }: IPricingModuleProps) => {
   const { sanityContext, locale } = await getRequestContext();
   const [result, settingsResult, t] = await Promise.all([
     service.modules.pricing.v1.getPricingModule(id, sanityContext),
-    service.global.siteSettings.v1.getSiteSettings(sanityContext),
+    getSiteSettings(),
     getTranslations('pricingModule'),
   ]);
 
