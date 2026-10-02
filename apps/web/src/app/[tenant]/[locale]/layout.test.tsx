@@ -482,6 +482,66 @@ describe('LocaleLayout', () => {
     ).toBe(false);
   });
 
+  it('shows the language switcher in the header when its toggle is on', async () => {
+    withRequestContext({
+      liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
+    });
+    getNavigationMock.mockResolvedValue({
+      ok: true,
+      data: { items: [], showLanguageSwitcher: true },
+    });
+    await setup();
+
+    expect(
+      within(screen.getByRole('banner')).getByRole('navigation', {
+        name: 'Language',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(screen.getByRole('contentinfo')).queryByRole('navigation', {
+        name: 'Language',
+      }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows the language switcher in the footer when its toggle is on', async () => {
+    withRequestContext({
+      liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
+    });
+    getFooterMock.mockResolvedValue({
+      ok: true,
+      data: { social: [], showLanguageSwitcher: true },
+    });
+    await setup();
+
+    expect(
+      within(screen.getByRole('contentinfo')).getByRole('navigation', {
+        name: 'Language',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(screen.getByRole('banner')).queryByRole('navigation', {
+        name: 'Language',
+      }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows no language switcher with one live language, whatever the toggles say', async () => {
+    getNavigationMock.mockResolvedValue({
+      ok: true,
+      data: { items: [], showLanguageSwitcher: true },
+    });
+    getFooterMock.mockResolvedValue({
+      ok: true,
+      data: { social: [], showLanguageSwitcher: true },
+    });
+    await setup();
+
+    expect(
+      screen.queryByRole('navigation', { name: 'Language' }),
+    ).not.toBeInTheDocument();
+  });
+
   it('adds a visible RSS feed link to the footer nav', async () => {
     await setup();
 

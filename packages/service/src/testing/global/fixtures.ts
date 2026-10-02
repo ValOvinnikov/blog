@@ -24,6 +24,7 @@ export function makeRawNavigation(
 ): TRawNavigation {
   return {
     items: null,
+    showLanguageSwitcher: null,
     ...overrides,
   };
 }
@@ -31,6 +32,7 @@ export function makeRawNavigation(
 export function makeRawFooter(overrides: Partial<TRawFooter> = {}): TRawFooter {
   return {
     social: null,
+    showLanguageSwitcher: null,
     ...overrides,
   };
 }
