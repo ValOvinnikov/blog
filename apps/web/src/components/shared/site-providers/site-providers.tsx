@@ -3,7 +3,7 @@ import { SanityImageBaseUrlProvider } from '@web/context/sanity-image-base-url-p
 import { ToastProvider } from '@web/context/toast-provider';
 import { VoiceRichProvider } from '@web/context/voice-rich-provider';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/unresolved-tenant-placeholder';
+import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { resolveTenantMessages } from '@web/utils/resolve-tenant-messages';
 import { resolveVoiceRichFields } from '@web/utils/resolve-voice-rich-fields';
 import { SessionProvider } from 'next-auth/react';

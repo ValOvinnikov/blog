@@ -12,7 +12,7 @@ vi.mock('@blog/db', () => ({
   queries: { subscribers: { confirmSubscriber: confirmSubscriberMock } },
 }));
 
-vi.mock('@web/server/tenant/resolve-writable-tenant', () => ({
+vi.mock('@web/server/tenant/write-gate/write-gate', () => ({
   resolveWritableTenant: resolveWritableTenantMock,
 }));
 

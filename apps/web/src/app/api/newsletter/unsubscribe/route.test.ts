@@ -17,7 +17,7 @@ vi.mock('@blog/db', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/resolve-request-tenant', () => ({
+vi.mock('@web/server/tenant/request-tenant/request-tenant', () => ({
   resolveRequestTenant: resolveRequestTenantMock,
 }));
 

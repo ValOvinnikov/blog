@@ -5,7 +5,7 @@ import {
 } from '@blog/config';
 import { queries } from '@blog/db';
 import { safeAsync } from '@blog/utils';
-import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
+import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
 import { buildSettingsFeaturesCacheTag } from '@web/utils/tenant-cache-tags';
 import { toEffectiveSettingsFeatures } from '@web/utils/to-effective-settings-features';
 import { unstable_cache } from 'next/cache';

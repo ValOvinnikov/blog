@@ -1,8 +1,8 @@
 import type { TCapability } from '@blog/config';
 import { PLAN_REGISTRY } from '@blog/db';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { getTenantPlan } from '@web/server/tenant/get-tenant-plan';
-import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/unresolved-tenant-placeholder';
+import { getTenantPlan } from '@web/server/settings-features/get-tenant-plan';
+import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { logger } from '@web/utils/logger/logger';
 
 import { getEffectiveSettingsFeatures } from './get-effective-settings-features';

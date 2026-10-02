@@ -21,7 +21,7 @@ vi.mock('next-intl/middleware', () => ({
   default: (routing: unknown) => createMiddlewareMock(routing),
 }));
 
-vi.mock('./server/tenant/resolve-tenant-routing', () => ({
+vi.mock('./server/tenant/resolve-tenant/resolve-tenant', () => ({
   resolveTenantRouting: resolveTenantRoutingMock,
 }));
 
