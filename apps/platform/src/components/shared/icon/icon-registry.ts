@@ -1,4 +1,5 @@
 import { ICONS, type TIconName } from '@blog/config';
+import Book from '@platform/assets/icons/book.svg';
 import CheckSheet from '@platform/assets/icons/check-sheet.svg';
 import ChevronRight from '@platform/assets/icons/chevron-right.svg';
 import Comment from '@platform/assets/icons/comment.svg';
@@ -20,6 +21,7 @@ import type { FC, SVGProps } from 'react';
 type TGlyph = FC<SVGProps<SVGSVGElement>>;
 
 export const ICON_REGISTRY: Partial<Record<TIconName, TGlyph>> = {
+  [ICONS.BOOK]: Book,
   [ICONS.CHECK_SHEET]: CheckSheet,
   [ICONS.CHEVRON_RIGHT]: ChevronRight,
   [ICONS.COMMENT]: Comment,

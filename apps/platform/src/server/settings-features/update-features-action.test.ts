@@ -51,10 +51,10 @@ const GROWTH_TENANT = { id: 'tenant-2', plan: 'GROWTH' };
 const VALID_INPUT: TUpdateFeaturesInput = {
   commentsEnabled: false,
   ratingsEnabled: false,
-  bookmarksEnabled: true,
+  bookmarksEnabled: false,
   newsletterEnabled: false,
   analyticsEnabled: false,
-  consentBannerEnabled: false,
+  consentBannerEnabled: true,
 };
 
 describe(updateFeaturesAction, () => {

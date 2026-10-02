@@ -15,6 +15,7 @@ import {
   getRequestContext,
 } from '@web/server/request-context/request-context';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
+import { isReaderAccountEnabled } from '@web/server/settings-features/is-reader-account-enabled';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
@@ -71,6 +72,10 @@ vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@web/server/settings-features/is-capability-enabled', () => ({
   isCapabilityEnabled: vi.fn(),
+}));
+
+vi.mock('@web/server/settings-features/is-reader-account-enabled', () => ({
+  isReaderAccountEnabled: vi.fn(),
 }));
 
 vi.mock('@blog/auth/utils/oauth-providers/oauth-providers', () => ({
@@ -136,6 +141,7 @@ vi.mock('next-auth/react', () => ({
 const enterRequestContextMock = vi.mocked(enterRequestContext);
 const getRequestContextMock = vi.mocked(getRequestContext);
 const isCapabilityEnabledMock = vi.mocked(isCapabilityEnabled);
+const isReaderAccountEnabledMock = vi.mocked(isReaderAccountEnabled);
 
 const withRequestContext = (
   overrides: Partial<typeof DEFAULT_REQUEST_CONTEXT>,
@@ -174,6 +180,7 @@ describe('LocaleLayout', () => {
     getFooterMock.mockResolvedValue({ ok: true, data: { social: [] } });
     getThemeTokensMock.mockResolvedValue(THEME_TOKENS);
     isCapabilityEnabledMock.mockResolvedValue(true);
+    isReaderAccountEnabledMock.mockResolvedValue(true);
     isWebAnalyticsEnabledMock.mockReturnValue(false);
     getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
     resolveTenantMessagesMock.mockImplementation((messages: unknown) =>
@@ -629,6 +636,22 @@ describe('LocaleLayout', () => {
     ).not.toBeInTheDocument();
   });
 
+  it('shows the sign-in menu when the tenant has a reader-account capability enabled', async () => {
+    await setup();
+
+    expect(screen.getByRole('button', { name: 'Sign in' })).toBeVisible();
+  });
+
+  it('hides the sign-in menu when the tenant has no reader-account capability enabled', async () => {
+    isReaderAccountEnabledMock.mockResolvedValue(false);
+
+    await setup();
+
+    expect(
+      screen.queryByRole('button', { name: 'Sign in' }),
+    ).not.toBeInTheDocument();
+  });
+
   it('forwards the tenant Sanity context to the settings, nav and footer loaders', async () => {
     const tenant = {
       projectId: 'tenant-project',
@@ -649,6 +672,7 @@ describe('LocaleLayout', () => {
 
     expect(getThemeTokensMock).toHaveBeenCalledWith('tenant-1');
     expect(isCapabilityEnabledMock).toHaveBeenCalledWith('ANALYTICS');
+    expect(isReaderAccountEnabledMock).toHaveBeenCalledWith();
     expect(resolveTenantMessagesMock).toHaveBeenCalledWith(
       realMessages,
       'tenant-1',

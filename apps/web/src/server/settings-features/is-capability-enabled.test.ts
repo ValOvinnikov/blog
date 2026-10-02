@@ -17,7 +17,7 @@ vi.mock('./get-effective-settings-features', () => ({
 
 vi.mock('@blog/db', () => ({
   PLAN_REGISTRY: {
-    FREE: ['COMMENTS', 'RATINGS', 'BOOKMARKS', 'CONSENT_BANNER'],
+    FREE: ['RATINGS', 'CONSENT_BANNER'],
     GROWTH: [
       'COMMENTS',
       'RATINGS',
