@@ -1,5 +1,4 @@
 import { isLocaleIsoCode, type TLocaleIsoCode } from '@blog/config/constants';
-import { LANGUAGE_SWITCHER_FIELD_NAME } from '@blog/studio/schema-types/fields/language-switcher-field/language-switcher-field';
 import { isLocalizedSchemaType } from '@blog/studio/schema-types/inputs/localization-notice-input/is-localized-schema-type';
 import {
   collectMissingLocales,
@@ -70,14 +69,6 @@ const fieldNotices = (
 
   return missing.length > 0 ? [`Missing: ${formatLocaleList(missing)}.`] : [];
 };
-
-const languageSwitcherNotices = (
-  path: InputProps['path'],
-  liveLocales: readonly TLocaleIsoCode[],
-): string[] =>
-  path.at(-1) === LANGUAGE_SWITCHER_FIELD_NAME && liveLocales.length < 2
-    ? ['Add another language in your site settings to use this.']
-    : [];
 
 const referencedId = (value: unknown): string | undefined => {
   const reference =
@@ -180,7 +171,7 @@ export const createLocalizationNoticeInput = (
         ? documentNotices(props.value, liveLocales)
         : isLocalizedSchemaType(props.schemaType)
           ? fieldNotices(props.value, liveLocales)
-          : languageSwitcherNotices(props.path, liveLocales);
+          : [];
 
     return (
       <NoticeStack notices={notices}>{props.renderDefault(props)}</NoticeStack>
