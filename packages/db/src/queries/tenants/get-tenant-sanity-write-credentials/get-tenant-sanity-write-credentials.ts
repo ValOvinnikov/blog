@@ -45,11 +45,6 @@ export function toTenantSanityWriteCredentials(
   };
 }
 
-/**
- * Resolves a tenant's Sanity write credentials alongside its servable
- * state (`status`, `deprovisionedAt`, `provisioningStatus`) — this does not
- * itself gate on that state, so callers must check it before writing.
- */
 export async function getTenantSanityWriteCredentials(
   tenantId: string,
 ): Promise<TTenantSanityWriteCredentials | undefined> {

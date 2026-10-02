@@ -156,8 +156,9 @@ describe(getTenantSanityWriteCredentials, () => {
 });
 
 describe(toTenantSanityWriteCredentials, () => {
-  async function insertTenantRow(): Promise<TTenant> {
+  async function insertTenantRow(writeToken?: string): Promise<TTenant> {
     const tenant = await insertTenant();
+    if (writeToken) await setTenantSanityWriteToken(tenant.id, writeToken);
     const [row] = await db()
       .select()
       .from(schema.tenants)
@@ -167,14 +168,9 @@ describe(toTenantSanityWriteCredentials, () => {
   }
 
   it('maps a tenant row with a write token to decrypted credentials and servable state', async () => {
-    const tenant = await insertTenant();
-    await setTenantSanityWriteToken(tenant.id, 'sk-real-write-token-value');
-    const [row] = await db()
-      .select()
-      .from(schema.tenants)
-      .where(eq(schema.tenants.id, tenant.id));
+    const row = await insertTenantRow('sk-real-write-token-value');
 
-    expect(row && toTenantSanityWriteCredentials(row)).toEqual({
+    expect(toTenantSanityWriteCredentials(row)).toEqual({
       projectId: 'abc123',
       dataset: 'production',
       token: 'sk-real-write-token-value',
@@ -191,15 +187,10 @@ describe(toTenantSanityWriteCredentials, () => {
   });
 
   it('throws when the encryption key is not configured', async () => {
-    const tenant = await insertTenant();
-    await setTenantSanityWriteToken(tenant.id, 'sk-real-write-token-value');
-    const [row] = await db()
-      .select()
-      .from(schema.tenants)
-      .where(eq(schema.tenants.id, tenant.id));
+    const row = await insertTenantRow('sk-real-write-token-value');
     delete process.env['TENANT_TOKEN_ENCRYPTION_KEY'];
 
-    expect(() => row && toTenantSanityWriteCredentials(row)).toThrow(
+    expect(() => toTenantSanityWriteCredentials(row)).toThrow(
       'TENANT_TOKEN_ENCRYPTION_KEY is not configured.',
     );
   });
