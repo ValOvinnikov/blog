@@ -1,5 +1,5 @@
 import type { TPageLandingType } from '@blog/config';
-import { q, type TSlugParams } from '@blog/service/sanity/query';
+import { q } from '@blog/service/sanity/query';
 import {
   PAGE_FAQ_QUESTIONS_EXPRESSION,
   pageFaqQuestionsParser,
@@ -7,12 +7,12 @@ import {
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
 import { moduleFragment } from '@blog/service/shared/fragments/module/module';
 import { seoFragment } from '@blog/service/shared/fragments/seo/seo';
-import type { TLocaleParams } from '@blog/service/shared/localization/locale-params';
 import { translationsQuery } from '@blog/service/shared/localization/translations';
 import type { TRawModule } from '@blog/service/shared/transformers/module/to-module';
+import type { TLocalizedSlugParams } from '@blog/service/shared/types/page';
 
 export const landingPageQuery = q
-  .parameters<TSlugParams & Partial<TLocaleParams>>()
+  .parameters<TLocalizedSlugParams>()
   .star.filterByType('page_landing')
   .filterBy('slug.current == $slug')
   .filterBy('language == $locale')
