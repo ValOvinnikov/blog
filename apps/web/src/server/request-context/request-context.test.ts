@@ -1,7 +1,7 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/unresolved-tenant-placeholder';
+import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { withMemoizingReactCache } from '@web/testing/shared/react-cache/memoizing-react-cache';
 import { setRequestLocale } from 'next-intl/server';
 
@@ -40,9 +40,15 @@ vi.mock('@blog/service', () => ({
 vi.mock('@web/utils/is-production-environment', () => ({
   isProductionEnvironment: isProductionEnvironmentMock,
 }));
-vi.mock('@web/server/tenant/is-tenant-servable', () => ({
-  isTenantServable: isTenantServableMock,
-}));
+vi.mock(
+  '@web/server/tenant/resolve-tenant/resolve-tenant',
+  async (importOriginal) => ({
+    ...(await importOriginal<
+      typeof import('@web/server/tenant/resolve-tenant/resolve-tenant')
+    >()),
+    isTenantServable: isTenantServableMock,
+  }),
+);
 
 const TENANT_ID = 'a1b2c3d4-e5f6-4789-a012-3456789abcde';
 

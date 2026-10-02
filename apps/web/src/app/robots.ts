@@ -1,4 +1,4 @@
-import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
+import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 import { isProductionEnvironment } from '@web/utils/is-production-environment';
 import type { MetadataRoute } from 'next';
 

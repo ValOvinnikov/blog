@@ -8,8 +8,10 @@ import {
   generateTakeaways,
   SKIM_GENERATION_MODEL,
 } from '@web/server/skim/generate-takeaways';
-import { getHostTenantSanityContext } from '@web/server/tenant/get-host-tenant-sanity-context';
-import { getHostTenantSanityWriteContext } from '@web/server/tenant/get-host-tenant-sanity-write-context';
+import {
+  getHostTenantSanityContext,
+  getHostTenantSanityWriteContext,
+} from '@web/server/tenant/tenant-sanity-context/tenant-sanity-context';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
 import { NextResponse } from 'next/server';

@@ -286,7 +286,7 @@ inside `sendVerificationRequest` — `findPendingInviteTenantNames(identifier)` 
 because `packages/auth/package.json:21` depends on `@blog/db`.
 
 So tenant resolution is `getTenantByDomain(host)`, the same lookup
-`apps/web/src/server/tenant/resolve-tenant.ts:31-32` performs against the
+`apps/web/src/server/tenant/resolve-tenant/resolve-tenant.ts`'s `resolveTenant` performs against the
 `tenant_domains` table for ordinary rendering. Resolved tenant yields both brand
 (§2) and copy (§4).
 

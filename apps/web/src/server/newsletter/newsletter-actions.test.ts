@@ -3,7 +3,7 @@ import {
   resolveTenantEmailBrand,
   TENANT_WRITE_REFUSAL,
 } from '@blog/config';
-import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
+import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 
 const {
   createPendingSubscriberMock,
@@ -51,9 +51,9 @@ vi.mock('@web/server/newsletter/newsletter-subscribed-cookie', () => ({
   markNewsletterSubscribed: markNewsletterSubscribedMock,
 }));
 
-vi.mock('@web/server/tenant/get-tenant-base-url');
+vi.mock('@web/server/tenant/tenant-base-url/tenant-base-url');
 
-vi.mock('@web/server/tenant/resolve-writable-tenant', () => ({
+vi.mock('@web/server/tenant/write-gate/write-gate', () => ({
   resolveWritableTenant: resolveWritableTenantMock,
 }));
 

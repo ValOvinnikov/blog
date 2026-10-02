@@ -156,9 +156,9 @@ src/server/newsletter/newsletter-from-address.test.ts
 src/server/newsletter/newsletter-subscription-actions.test.ts
 src/server/site-config/get-site-config.test.ts
 src/server/skim/generate-takeaways.test.ts
-src/server/tenant/get-request-tenant-id.test.ts
-src/server/tenant/get-tenant-sanity-context.test.ts
-src/server/tenant/resolve-tenant-id.test.ts
+src/server/tenant/request-tenant/request-tenant.test.ts
+src/server/tenant/resolve-tenant/resolve-tenant.test.ts
+src/server/tenant/tenant-sanity-context/tenant-sanity-context.test.ts
 src/utils/apply-voice-overrides/apply-voice-overrides.test.ts
 src/utils/block-text-to-plain/block-text-to-plain.test.ts
 src/utils/build-blog-posting-schema/build-blog-posting-schema.test.ts

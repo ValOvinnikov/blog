@@ -1,8 +1,8 @@
 import { LOCALE_BCP47_TAGS, routes } from '@blog/config';
 import { service } from '@blog/service';
 import { routing } from '@web/i18n/routing';
-import { getHostTenantSanityContext } from '@web/server/tenant/get-host-tenant-sanity-context';
-import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
+import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
+import { getHostTenantSanityContext } from '@web/server/tenant/tenant-sanity-context/tenant-sanity-context';
 import { logger } from '@web/utils/logger/logger';
 import type { MetadataRoute } from 'next';
 

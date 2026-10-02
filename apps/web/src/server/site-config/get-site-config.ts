@@ -1,7 +1,7 @@
 import { TENANT_CONFIG_REVALIDATE_SECONDS } from '@blog/config';
 import { queries } from '@blog/db';
 import { safeAsync } from '@blog/utils';
-import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
+import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
 import { buildSiteConfigCacheTag } from '@web/utils/tenant-cache-tags';
 import { unstable_cache } from 'next/cache';
 

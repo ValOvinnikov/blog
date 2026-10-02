@@ -7,7 +7,7 @@ describe('robots', () => {
 
   describe('production', () => {
     it('allows all crawlers and points sitemap at the absolute site URL', async () => {
-      vi.doMock('@web/server/tenant/get-tenant-base-url', () => ({
+      vi.doMock('@web/server/tenant/tenant-base-url/tenant-base-url', () => ({
         getTenantBaseUrl: async () => 'https://example.com',
       }));
       vi.doMock('@web/utils/is-production-environment', () => ({
@@ -22,7 +22,7 @@ describe('robots', () => {
     });
 
     it('falls back to a relative sitemap path when no base URL resolves', async () => {
-      vi.doMock('@web/server/tenant/get-tenant-base-url', () => ({
+      vi.doMock('@web/server/tenant/tenant-base-url/tenant-base-url', () => ({
         getTenantBaseUrl: async () => undefined,
       }));
       vi.doMock('@web/utils/is-production-environment', () => ({
@@ -38,7 +38,7 @@ describe('robots', () => {
 
   describe('non-production', () => {
     it('allows crawling (so the page-level noindex meta is seen) but omits the sitemap', async () => {
-      vi.doMock('@web/server/tenant/get-tenant-base-url', () => ({
+      vi.doMock('@web/server/tenant/tenant-base-url/tenant-base-url', () => ({
         getTenantBaseUrl: async () => 'https://dev.example.com',
       }));
       vi.doMock('@web/utils/is-production-environment', () => ({
@@ -53,7 +53,7 @@ describe('robots', () => {
 
     it('never resolves the tenant base URL, since its value goes unused', async () => {
       const getTenantBaseUrlMock = vi.fn(async () => 'https://dev.example.com');
-      vi.doMock('@web/server/tenant/get-tenant-base-url', () => ({
+      vi.doMock('@web/server/tenant/tenant-base-url/tenant-base-url', () => ({
         getTenantBaseUrl: getTenantBaseUrlMock,
       }));
       vi.doMock('@web/utils/is-production-environment', () => ({

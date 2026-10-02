@@ -100,7 +100,7 @@ apps/web
   `POST /api/generate-skim` route, the only caller, resolves this tenant
   context straight from the request's `Host` header via
   `getHostTenantSanityWriteContext()`
-  (`apps/web/src/server/tenant/get-host-tenant-sanity-write-context.ts`, the
+  (`apps/web/src/server/tenant/tenant-sanity-context/tenant-sanity-context.ts`, the
   write-side counterpart to `getHostTenantSanityContext()` above, not to the
   request context — `/api/*` is one of the routes `proxy.ts`'s matcher
   excludes, so no `[tenant]` segment is ever written here) rather than

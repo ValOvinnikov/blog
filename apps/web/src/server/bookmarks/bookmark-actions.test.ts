@@ -1,5 +1,5 @@
 import { TENANT_WRITE_REFUSAL } from '@blog/config';
-import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
+import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
 
 import { getBookmarkStatus, setBookmarkStatus } from './bookmark-actions';
 
@@ -20,9 +20,9 @@ const {
 
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
 
-vi.mock('@web/server/tenant/get-request-tenant-id');
+vi.mock('@web/server/tenant/request-tenant/request-tenant');
 
-vi.mock('@web/server/tenant/resolve-writable-tenant', () => ({
+vi.mock('@web/server/tenant/write-gate/write-gate', () => ({
   resolveWritableTenant: resolveWritableTenantMock,
 }));
 
