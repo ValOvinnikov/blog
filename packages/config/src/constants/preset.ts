@@ -42,6 +42,14 @@ export const DENSITY = {
 
 export type TDensity = TValueOf<typeof DENSITY>;
 
+export const LANGUAGE_SWITCHER_STYLE = {
+  MENU_CODE: 'MENU_CODE',
+  MENU_GLOBE: 'MENU_GLOBE',
+  CODES: 'CODES',
+} as const;
+
+export type TLanguageSwitcherStyle = TValueOf<typeof LANGUAGE_SWITCHER_STYLE>;
+
 export type TThemeTokens = {
   accentHue: number;
   logoHue?: number;

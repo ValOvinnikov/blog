@@ -1,4 +1,10 @@
-import { DENSITY, FONT_CHOICE, PRESET_ID, RADIUS_SCALE } from '@blog/config';
+import {
+  DENSITY,
+  FONT_CHOICE,
+  LANGUAGE_SWITCHER_STYLE,
+  PRESET_ID,
+  RADIUS_SCALE,
+} from '@blog/config';
 import type { TSiteConfigResult } from '@blog/db/queries/site-config';
 
 import { defaultLookFormValues, toLookFormValues } from './default-look-values';
@@ -31,6 +37,7 @@ describe(toLookFormValues, () => {
       bodyFont: FONT_CHOICE.INTER,
       radiusScale: RADIUS_SCALE.LG,
       density: DENSITY.COMPACT,
+      languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
       logoAssetUrl: 'https://example.blob.vercel-storage.com/logo.png',
       faviconAssetUrl: 'https://example.blob.vercel-storage.com/favicon.png',
       voiceOverrides: {},

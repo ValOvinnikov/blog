@@ -2,10 +2,12 @@ import type { TVoicePortableText } from '@blog/config';
 import {
   DENSITY,
   FONT_CHOICE,
+  LANGUAGE_SWITCHER_STYLE,
   PRESET_ID,
   RADIUS_SCALE,
   type TDensity,
   type TFontChoice,
+  type TLanguageSwitcherStyle,
   type TPresetId,
   type TRadiusScale,
 } from '@blog/config/constants';
@@ -41,13 +43,15 @@ export const densityEnum = pgEnum(
   Object.values(DENSITY) as [TDensity, ...TDensity[]],
 );
 
-// One row per tenant — `tenantId` is unique so an upsert can target it
-// directly. Theme gets typed columns (six knobs, unchanged since first
-// shipped); voice gets one JSONB column, since its curated key list moves
-// independently of this table's shape. `logoHue` unset means "follow
-// accentHue"; `voiceOverrides` defaults to `{}` rather than null so "no
-// overrides" and "the JSONB column itself is absent" are never two
-// different states callers have to distinguish.
+export const languageSwitcherStyleEnum = pgEnum(
+  'language_switcher_style',
+  Object.values(LANGUAGE_SWITCHER_STYLE) as [
+    TLanguageSwitcherStyle,
+    ...TLanguageSwitcherStyle[],
+  ],
+);
+
+// `voiceOverrides` defaults to `{}` so "no overrides" has one representation, never also null.
 export const siteConfig = pgTable('site_config', {
   id: uuid('id').primaryKey().defaultRandom(),
   tenantId: uuid('tenant_id')
@@ -61,6 +65,9 @@ export const siteConfig = pgTable('site_config', {
   bodyFont: fontChoiceEnum('body_font').notNull(),
   radiusScale: radiusScaleEnum('radius_scale').notNull(),
   density: densityEnum('density').notNull(),
+  languageSwitcherStyle: languageSwitcherStyleEnum('language_switcher_style')
+    .notNull()
+    .default(LANGUAGE_SWITCHER_STYLE.MENU_CODE),
   logoAssetUrl: text('logo_asset_url'),
   faviconAssetUrl: text('favicon_asset_url'),
   voiceOverrides: jsonb('voice_overrides')
