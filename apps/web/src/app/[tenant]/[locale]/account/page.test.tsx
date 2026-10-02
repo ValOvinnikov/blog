@@ -42,7 +42,7 @@ describe('AccountRoute', () => {
   it('answers 404 when the tenant has no reader-account capability enabled', async () => {
     isReaderAccountEnabledMock.mockResolvedValue(false);
 
-    await expect(setup()).rejects.toThrow();
+    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
   });
