@@ -1,19 +1,26 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
+import { LANGUAGE_SWITCHER_STYLE, LOCALE_ISO_CODES } from '@blog/config';
 import userEvent from '@testing-library/user-event';
 import { usePathname } from '@web/i18n/navigation';
-import { customRender, screen } from '@web/testing/custom-render';
+import { customRender, screen, within } from '@web/testing/custom-render';
 
 import { LanguageSwitcher } from './language-switcher';
 
 vi.mock('@web/i18n/navigation');
 
-const { EN, NL, FR } = LOCALE_ISO_CODES;
+const { EN, NL, FR, DE, ES } = LOCALE_ISO_CODES;
 
 const setup = customRender(LanguageSwitcher, {
   liveLocales: [EN, NL, FR],
   currentLocale: NL,
   defaultLocale: EN,
+  switcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
 });
+
+const openMenu = async (name = 'Language: Nederlands') => {
+  const trigger = screen.getAllByRole('button', { name })[0]!;
+  await userEvent.click(trigger);
+  return trigger;
+};
 
 describe(`<${LanguageSwitcher.name}/>`, () => {
   beforeEach(() => {
@@ -29,43 +36,133 @@ describe(`<${LanguageSwitcher.name}/>`, () => {
     ).not.toBeInTheDocument();
   });
 
-  it('lists each live language by its own name', () => {
-    setup();
+  describe('menu with code', () => {
+    it('renders a closed menu trigger naming the current language', () => {
+      setup();
 
-    expect(screen.getAllByRole('link').map((link) => link.textContent)).toEqual(
-      ['English', 'Nederlands', 'Français'],
-    );
+      const trigger = screen.getByRole('button', {
+        name: 'Language: Nederlands',
+      });
+
+      expect(trigger).toHaveAttribute('aria-haspopup', 'menu');
+      expect(trigger).toHaveAttribute('aria-expanded', 'false');
+      expect(trigger).toHaveTextContent('NL');
+    });
+
+    it('opens a menu of native names with the current language marked', async () => {
+      setup();
+
+      await openMenu();
+      const menu = screen.getByRole('menu', { name: 'Language' });
+
+      expect(
+        within(menu)
+          .getAllByRole('menuitem')
+          .map((item) => item.textContent),
+      ).toEqual(['English', 'Nederlands', 'Français']);
+      expect(
+        within(menu).getByRole('menuitem', { name: 'Nederlands' }),
+      ).toHaveAttribute('aria-current', 'page');
+    });
+
+    it('links each entry to its translation or the default-language page', async () => {
+      setup();
+
+      await openMenu();
+      const menu = screen.getByRole('menu', { name: 'Language' });
+      const current = within(menu).getByRole('menuitem', {
+        name: 'Nederlands',
+      });
+      const french = within(menu).getByRole('menuitem', { name: 'Français' });
+
+      expect(current).toHaveAttribute('href', '/nl/blog');
+      expect(french).toHaveAttribute('href', '/blog');
+      expect(french).toHaveAttribute('lang', 'fr');
+      expect(french).toHaveAttribute('hreflang', 'en');
+    });
+
+    it('closes on Escape and returns focus to the trigger', async () => {
+      setup();
+
+      const trigger = await openMenu();
+      await userEvent.keyboard('{Escape}');
+
+      expect(trigger).toHaveAttribute('aria-expanded', 'false');
+      expect(trigger).toHaveFocus();
+    });
+
+    it('remembers the chosen language', async () => {
+      setup();
+
+      await openMenu();
+      const french = within(
+        screen.getByRole('menu', { name: 'Language' }),
+      ).getByRole('menuitem', { name: 'Français' });
+      french.addEventListener('click', (event) => event.preventDefault());
+      await userEvent.click(french);
+
+      expect(document.cookie).toContain('NEXT_LOCALE=FR');
+    });
   });
 
-  it('marks the current language and links it to the current page', () => {
-    setup();
+  describe('menu with globe', () => {
+    it('shows the globe trigger on desktop and the language pill on phones', () => {
+      setup({ switcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_GLOBE });
 
-    const current = screen.getByRole('link', { name: 'Nederlands' });
+      const desktop = screen.getByTestId('language-switcher-desktop');
+      const mobile = screen.getByTestId('language-switcher-mobile');
 
-    expect(current).toHaveAttribute('aria-current', 'page');
-    expect(current).toHaveAttribute('href', '/nl/blog');
-    expect(current).toHaveAttribute('lang', 'nl');
-    expect(current).toHaveAttribute('hreflang', 'nl');
+      expect(
+        within(desktop).getByRole('button', { name: 'Language: Nederlands' }),
+      ).not.toHaveTextContent('NL');
+      expect(
+        within(mobile).getByRole('button', { name: 'Language: Nederlands' }),
+      ).toHaveTextContent('NL');
+    });
   });
 
-  it('links another language to the default-language page', () => {
-    setup();
+  describe('compact codes', () => {
+    it('links the codes directly on desktop, named for screen readers', () => {
+      setup({ switcherStyle: LANGUAGE_SWITCHER_STYLE.CODES });
 
-    const french = screen.getByRole('link', { name: 'Français' });
+      const desktop = screen.getByTestId('language-switcher-desktop');
+      const dutch = within(desktop).getByRole('link', { name: 'Nederlands' });
 
-    expect(french).not.toHaveAttribute('aria-current');
-    expect(french).toHaveAttribute('href', '/blog');
-    expect(french).toHaveAttribute('lang', 'fr');
-    expect(french).toHaveAttribute('hreflang', 'en');
+      expect(dutch).toHaveTextContent('NL');
+      expect(dutch).toHaveAttribute('aria-current', 'page');
+      expect(within(desktop).queryByRole('button')).not.toBeInTheDocument();
+    });
+
+    it('renders as the menu with more than four live languages', () => {
+      setup({
+        switcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
+        liveLocales: [EN, NL, FR, DE, ES],
+      });
+
+      expect(
+        screen.queryByTestId('language-switcher-desktop'),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Language: Nederlands' }),
+      ).toHaveTextContent('NL');
+    });
   });
 
-  it('remembers the chosen language', async () => {
-    setup();
+  describe('in the footer', () => {
+    it('names the current language on the menu trigger', () => {
+      setup({ isInFooter: true });
 
-    const french = screen.getByRole('link', { name: 'Français' });
-    french.addEventListener('click', (event) => event.preventDefault());
-    await userEvent.click(french);
+      expect(
+        screen.getByRole('button', { name: 'Language: Nederlands' }),
+      ).toHaveTextContent('Nederlands');
+    });
 
-    expect(document.cookie).toContain('NEXT_LOCALE=FR');
+    it('lists compact codes inline', () => {
+      setup({ isInFooter: true, switcherStyle: LANGUAGE_SWITCHER_STYLE.CODES });
+
+      expect(
+        screen.getAllByRole('link').map((link) => link.textContent),
+      ).toEqual(['EN', 'NL', 'FR']);
+    });
   });
 });

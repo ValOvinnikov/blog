@@ -8,17 +8,20 @@ import { SmartLink } from '@web/components/shared/smart-link';
 import { SocialLinks } from '@web/components/shared/social-links';
 import { routing } from '@web/i18n/routing';
 import { getRequestContext } from '@web/server/request-context/request-context';
+import { getLanguageSwitcherStyle } from '@web/server/site-config/get-language-switcher-style';
 import { getSiteSettings } from '@web/server/site-settings/get-site-settings';
+import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/unresolved-tenant-placeholder';
 import { logger } from '@web/utils/logger/logger';
 import { getTranslations } from 'next-intl/server';
 
 export const SiteFooter = async () => {
-  const { sanityContext, locale, defaultLocale, liveLocales } =
+  const { tenantId, sanityContext, locale, defaultLocale, liveLocales } =
     await getRequestContext();
-  const [settingsResult, footerResult, t] = await Promise.all([
+  const [settingsResult, footerResult, t, switcherStyle] = await Promise.all([
     getSiteSettings(),
     service.global.footer.v1.getFooter(sanityContext),
     getTranslations('rss'),
+    getLanguageSwitcherStyle(tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER),
   ]);
 
   if (!settingsResult.ok) {
@@ -45,6 +48,8 @@ export const SiteFooter = async () => {
             liveLocales={liveLocales ?? [locale]}
             currentLocale={locale}
             defaultLocale={defaultLocale ?? routing.defaultLocale}
+            switcherStyle={switcherStyle}
+            isInFooter={true}
           />
         )}
         <NavLink
