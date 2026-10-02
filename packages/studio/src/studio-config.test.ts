@@ -1,4 +1,5 @@
 import { CAPABILITY, type TCapability } from '@blog/config/constants';
+import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
 import { migrationStateSchema } from '@blog/studio/schema-types/documents/system/migration-state/migration-state';
 import { ThemeProvider } from '@sanity/ui';
 import { buildTheme } from '@sanity/ui/theme';
@@ -70,6 +71,32 @@ describe(buildStudioConfig, () => {
     } as DocumentActionsContext;
 
     expect(actions(prev, context)).toEqual([]);
+  });
+
+  it('creates a Landing page only through a language template', () => {
+    const config = buildStudioConfig({
+      projectId: 'test-project',
+      dataset: 'test-dataset',
+      title: 'Test Studio',
+    });
+    const templates = config.schema?.templates;
+    if (typeof templates !== 'function') {
+      throw new Error('expected config.schema.templates to be a function');
+    }
+    const template = (id: string, schemaType: string) => ({
+      id,
+      title: id,
+      schemaType,
+      value: {},
+    });
+
+    const ids = templates([
+      template(PAGE_LANDING_TYPE, PAGE_LANDING_TYPE),
+      template(`${PAGE_LANDING_TYPE}-EN`, PAGE_LANDING_TYPE),
+      template('page_post', 'page_post'),
+    ]).map(({ id }) => id);
+
+    expect(ids).toEqual([`${PAGE_LANDING_TYPE}-EN`, 'page_post']);
   });
 
   describe('capability warning', () => {

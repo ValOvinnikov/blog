@@ -1,9 +1,14 @@
-import { RESERVED_SLUGS } from '@blog/config/constants';
+import { RESERVED_SLUGS, type TLocaleIsoCode } from '@blog/config/constants';
 import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
 import { heroField } from '@blog/studio/schema-types/fields/hero-field/hero-field';
+import {
+  LANGUAGE_FIELD,
+  languageField,
+} from '@blog/studio/schema-types/fields/language-field/language-field';
 import { modulesField } from '@blog/studio/schema-types/fields/modules-field/modules-field';
 import { slugField } from '@blog/studio/schema-types/fields/slug-field/slug-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { LOCALE_LABEL } from '@blog/studio/schema-types/inputs/localization-notice-input/missing-locales';
 import { createSlugUrlPreviewInput } from '@blog/studio/schema-types/inputs/slug-url-preview/slug-url-preview-input';
 import { contentSchema } from '@blog/studio/schema-types/modules/content/content';
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
@@ -25,6 +30,7 @@ import { testimonialSchema } from '@blog/studio/schema-types/modules/testimonial
 import { timelineSchema } from '@blog/studio/schema-types/modules/timeline/timeline';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
+import { validateSlugUniqueInLanguage } from '@blog/studio/schema-types/validation/validate-slug-unique-in-language/validate-slug-unique-in-language';
 import { FileText } from 'lucide-react';
 import { defineType } from 'sanity';
 
@@ -40,13 +46,26 @@ export const landingPageSchema = defineType({
   preview: {
     select: {
       title: 'title',
+      language: LANGUAGE_FIELD,
     },
+    prepare: ({
+      title,
+      language,
+    }: {
+      title?: string;
+      language?: TLocaleIsoCode;
+    }) => ({
+      title,
+      subtitle: language ? LOCALE_LABEL[language] : undefined,
+    }),
   },
   fields: [
+    languageField(),
     titleField(),
     slugField({
       description: 'URL path segment — auto-generated from title.',
       previewInput: landingSlugUrlPreviewInput,
+      isUnique: validateSlugUniqueInLanguage,
       validateSlug: (value) => {
         const current = value?.current;
 

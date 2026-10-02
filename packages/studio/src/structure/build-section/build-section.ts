@@ -1,3 +1,9 @@
+import {
+  LOCALE_ISO_CODES,
+  LOCALE_NATIVE_LABEL,
+  type TLocaleIsoCode,
+} from '@blog/config/constants';
+import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
 import type { ComponentType } from 'react';
 import type { SchemaTypeDefinition } from 'sanity';
 import type { ListItemBuilder, StructureBuilder } from 'sanity/structure';
@@ -8,7 +14,7 @@ type TStructureSchema = Pick<SchemaTypeDefinition, 'name' | 'title' | 'icon'>;
 
 type TStructureGroupItem = {
   schema: TStructureSchema;
-  mode?: 'list' | 'singleton';
+  mode?: 'list' | 'singleton' | 'byLanguage';
 };
 
 type TStructureGroup = {
@@ -39,13 +45,88 @@ const requireSchemaField = <TValue>(
   return value;
 };
 
+const ALL_PAGES_TITLE = 'All pages';
+
+const buildByLanguageItem = (
+  S: StructureBuilder,
+  {
+    name,
+    title,
+    icon,
+  }: {
+    name: string;
+    title: string;
+    icon: TStructureSchema['icon'];
+  },
+  locales: readonly TLocaleIsoCode[],
+): ListItemBuilder => {
+  const languageList = (
+    id: string,
+    listTitle: string,
+    filter: string,
+    params: Record<string, string>,
+    templateIds: string[],
+  ) =>
+    S.listItem()
+      .title(listTitle)
+      .id(id)
+      .icon(icon)
+      .child(
+        S.documentTypeList(name)
+          .id(id)
+          .title(`${listTitle} ${title}`)
+          .filter(filter)
+          .params({ type: name, ...params })
+          .initialValueTemplates(
+            templateIds.map((templateId) =>
+              S.initialValueTemplateItem(templateId),
+            ),
+          ),
+      );
+
+  const templateIdFor = (locale: TLocaleIsoCode) => `${name}-${locale}`;
+
+  return S.listItem()
+    .title(title)
+    .id(name)
+    .icon(icon)
+    .child(
+      S.list()
+        .title(title)
+        .items([
+          ...locales.map((locale) =>
+            languageList(
+              templateIdFor(locale),
+              LOCALE_NATIVE_LABEL[locale],
+              `_type == $type && ${LANGUAGE_FIELD} == $language`,
+              { language: locale },
+              [templateIdFor(locale)],
+            ),
+          ),
+          S.divider(),
+          languageList(
+            `${name}-all`,
+            ALL_PAGES_TITLE,
+            '_type == $type',
+            {},
+            locales.map(templateIdFor),
+          ),
+        ]),
+    );
+};
+
 const buildGroupItem = (
   S: StructureBuilder,
   item: TStructureGroupItem,
+  locales: readonly TLocaleIsoCode[],
 ): ListItemBuilder => {
   const { name } = item.schema;
   const title = requireSchemaField(item.schema.title, name, 'title');
   const icon = requireSchemaField(item.schema.icon, name, 'icon');
+
+  if (item.mode === 'byLanguage') {
+    return buildByLanguageItem(S, { name, title, icon }, locales);
+  }
 
   if (item.mode === 'singleton') {
     return S.listItem()
@@ -61,6 +142,7 @@ const buildGroupItem = (
 const buildGroupedListItems = (
   S: StructureBuilder,
   groups: TStructureGroup[],
+  locales: readonly TLocaleIsoCode[],
 ): (ListItemBuilder | TDividerBuilder)[] =>
   groups
     .filter((group) => group.items.length > 0)
@@ -70,7 +152,7 @@ const buildGroupedListItems = (
         : group.dividerBefore
           ? [S.divider()]
           : []),
-      ...group.items.map((item) => buildGroupItem(S, item)),
+      ...group.items.map((item) => buildGroupItem(S, item, locales)),
     ]);
 
 const getFlattenableItem = (
@@ -84,6 +166,7 @@ const getFlattenableItem = (
 const buildSection = (
   S: StructureBuilder,
   section: TStructureSection,
+  locales: readonly TLocaleIsoCode[],
 ): ListItemBuilder => {
   if (section.flattenSingleItem) {
     const item = getFlattenableItem(section);
@@ -108,15 +191,16 @@ const buildSection = (
     .child(
       S.list()
         .title(section.title)
-        .items(buildGroupedListItems(S, section.groups)),
+        .items(buildGroupedListItems(S, section.groups, locales)),
     );
 };
 
 export const buildSections = (
   S: StructureBuilder,
   sections: TStructureSection[],
+  locales: readonly TLocaleIsoCode[] = Object.values(LOCALE_ISO_CODES),
 ): (ListItemBuilder | TDividerBuilder)[] =>
   sections.flatMap((section) => [
     ...(section.dividerBefore ? [S.divider()] : []),
-    buildSection(S, section),
+    buildSection(S, section, locales),
   ]);
