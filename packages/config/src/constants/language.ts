@@ -21,4 +21,12 @@ export const LOCALE_BCP47_TAGS = {
   ES: 'es',
 } as const satisfies Record<keyof typeof LOCALE_ISO_CODES, string>;
 
+export const LOCALE_NATIVE_LABEL = {
+  EN: 'English',
+  NL: 'Nederlands',
+  FR: 'Français',
+  DE: 'Deutsch',
+  ES: 'Español',
+} as const satisfies Record<keyof typeof LOCALE_ISO_CODES, string>;
+
 export type TLocaleBcp47Tag = TValueOf<typeof LOCALE_BCP47_TAGS>;
