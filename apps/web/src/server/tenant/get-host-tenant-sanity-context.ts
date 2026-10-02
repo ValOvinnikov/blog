@@ -3,9 +3,9 @@ import {
   getPlatformSanityContext,
   type TTenantSanityContext,
 } from '@blog/service';
-import { isProductionEnvironment } from '@web/utils/is-production-environment';
 import { cache } from 'react';
 
+import { isPlatformFallbackAllowed } from './is-platform-fallback-allowed';
 import { resolveRequestTenant } from './resolve-request-tenant';
 
 export type THostTenantSanityContext =
@@ -21,22 +21,14 @@ export type THostTenantSanityContext =
 export const getHostTenantSanityContext = cache(
   async (): Promise<THostTenantSanityContext> => {
     const resolvedTenant = await resolveRequestTenant();
-
-    if (!resolvedTenant) {
-      if (isProductionEnvironment()) {
-        return { isResolvable: false };
-      }
-      return { isResolvable: true, tenant: getPlatformSanityContext() };
-    }
-
-    const tenant = await queries.tenants.getTenantSanityCredentials(
-      resolvedTenant.id,
-    );
+    const tenant =
+      resolvedTenant &&
+      queries.tenants.toTenantSanityCredentials(resolvedTenant);
     if (tenant) {
       return { isResolvable: true, tenant };
     }
 
-    if (isProductionEnvironment()) {
+    if (!isPlatformFallbackAllowed()) {
       return { isResolvable: false };
     }
     return { isResolvable: true, tenant: getPlatformSanityContext() };

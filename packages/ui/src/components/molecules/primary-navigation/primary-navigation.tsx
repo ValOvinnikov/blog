@@ -32,15 +32,17 @@ export type TPrimaryNavigationProps = IWithClassName &
   IWithDataTestId & {
     links: INavItem[];
     actions?: ReactNode;
+    panelActions?: ReactNode;
     ariaLabel?: string;
     linkAs?: TAnchorElementType;
     mobileToggle?: TPrimaryNavigationMobileToggleProps;
   };
 
-/** Top-level `<nav>` landmark composing `NavLink` items with an optional trailing `actions` slot (e.g. a theme toggle or menu button). */
+/** Top-level `<nav>` landmark composing `NavLink` items with trailing `actions`, which stay in the bar, and `panelActions`, which move into the mobile panel below `lg`. */
 export const PrimaryNavigation = ({
   links,
   actions,
+  panelActions,
   ariaLabel = 'Primary',
   className,
   dataTestId,
@@ -53,6 +55,8 @@ export const PrimaryNavigation = ({
     toggle,
     panel,
     panelLink,
+    barPanelActions,
+    panelActionsRow,
   } = primaryNavigationVariants({ collapsible: Boolean(mobileToggle) });
 
   const renderLinks = (itemClassName?: string) =>
@@ -78,6 +82,7 @@ export const PrimaryNavigation = ({
       <div className={linksSlot()} data-testid="primary-navigation-links">
         {renderLinks()}
       </div>
+      {panelActions && <div className={barPanelActions()}>{panelActions}</div>}
       {actions}
       {mobileToggle && (
         <Fragment>
@@ -101,6 +106,14 @@ export const PrimaryNavigation = ({
             data-testid="primary-navigation-mobile-panel"
           >
             {renderLinks(panelLink())}
+            {panelActions && mobileToggle.isOpen && (
+              <div
+                className={panelActionsRow()}
+                data-testid="primary-navigation-panel-actions"
+              >
+                {panelActions}
+              </div>
+            )}
           </div>
         </Fragment>
       )}

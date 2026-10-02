@@ -14,7 +14,7 @@ vi.mock('./resolve-request-tenant', () => ({
   resolveRequestTenant: vi.fn(),
 }));
 vi.mock('@blog/db', () => ({
-  queries: { tenants: { getTenantSanityCredentials: vi.fn() } },
+  queries: { tenants: { toTenantSanityCredentials: vi.fn() } },
   TENANT_STATUS: {
     ACTIVE: 'ACTIVE',
     SUSPENDED: 'SUSPENDED',
@@ -37,7 +37,7 @@ const platformTenant = {
 describe(getHostTenantSanityContext, () => {
   beforeEach(() => {
     vi.mocked(resolveRequestTenant).mockReset();
-    vi.mocked(queries.tenants.getTenantSanityCredentials).mockReset();
+    vi.mocked(queries.tenants.toTenantSanityCredentials).mockReset();
     isProductionEnvironmentMock.mockReset();
     isProductionEnvironmentMock.mockReturnValue(false);
     getPlatformSanityContextMock.mockReset();
@@ -48,7 +48,7 @@ describe(getHostTenantSanityContext, () => {
     vi.mocked(resolveRequestTenant).mockResolvedValue({
       id: 'tenant-1',
     } as never);
-    vi.mocked(queries.tenants.getTenantSanityCredentials).mockResolvedValue({
+    vi.mocked(queries.tenants.toTenantSanityCredentials).mockReturnValue({
       projectId: 'proj',
       dataset: 'production',
       token: 'tok',
@@ -70,9 +70,9 @@ describe(getHostTenantSanityContext, () => {
         provisioningStatus: null,
       },
     });
-    expect(queries.tenants.getTenantSanityCredentials).toHaveBeenCalledWith(
-      'tenant-1',
-    );
+    expect(queries.tenants.toTenantSanityCredentials).toHaveBeenCalledWith({
+      id: 'tenant-1',
+    });
   });
 
   it('resolves as unresolvable in production when no tenant resolves', async () => {
@@ -82,7 +82,7 @@ describe(getHostTenantSanityContext, () => {
     await expect(getHostTenantSanityContext()).resolves.toEqual({
       isResolvable: false,
     });
-    expect(queries.tenants.getTenantSanityCredentials).not.toHaveBeenCalled();
+    expect(queries.tenants.toTenantSanityCredentials).not.toHaveBeenCalled();
   });
 
   it('falls back to the platform Sanity context outside production when no tenant resolves', async () => {
@@ -98,7 +98,7 @@ describe(getHostTenantSanityContext, () => {
     vi.mocked(resolveRequestTenant).mockResolvedValue({
       id: 'tenant-1',
     } as never);
-    vi.mocked(queries.tenants.getTenantSanityCredentials).mockResolvedValue(
+    vi.mocked(queries.tenants.toTenantSanityCredentials).mockReturnValue(
       undefined,
     );
 
@@ -113,7 +113,7 @@ describe(getHostTenantSanityContext, () => {
     vi.mocked(resolveRequestTenant).mockResolvedValue({
       id: 'tenant-1',
     } as never);
-    vi.mocked(queries.tenants.getTenantSanityCredentials).mockResolvedValue(
+    vi.mocked(queries.tenants.toTenantSanityCredentials).mockReturnValue(
       undefined,
     );
 
@@ -130,13 +130,13 @@ describe('getHostTenantSanityContext memoization', () => {
     vi.resetModules();
   });
 
-  it('dedupes the host lookup and credentials query when called more than once in the same render pass', async () => {
+  it('dedupes the host lookup and credentials derivation when called more than once in the same render pass', async () => {
     vi.mocked(resolveRequestTenant).mockReset();
-    vi.mocked(queries.tenants.getTenantSanityCredentials).mockReset();
+    vi.mocked(queries.tenants.toTenantSanityCredentials).mockReset();
     vi.mocked(resolveRequestTenant).mockResolvedValue({
       id: 'tenant-1',
     } as never);
-    vi.mocked(queries.tenants.getTenantSanityCredentials).mockResolvedValue({
+    vi.mocked(queries.tenants.toTenantSanityCredentials).mockReturnValue({
       projectId: 'proj',
       dataset: 'production',
       token: 'tok',
@@ -172,6 +172,6 @@ describe('getHostTenantSanityContext memoization', () => {
     await freshGetHostTenantSanityContext();
 
     expect(resolveRequestTenant).toHaveBeenCalledTimes(1);
-    expect(queries.tenants.getTenantSanityCredentials).toHaveBeenCalledTimes(1);
+    expect(queries.tenants.toTenantSanityCredentials).toHaveBeenCalledTimes(1);
   });
 });
