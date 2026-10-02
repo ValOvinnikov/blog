@@ -1,16 +1,11 @@
 import TenantNotFound, { generateMetadata } from './not-found';
 
-const {
-  standaloneNotFoundPageMock,
-  buildNotFoundMetadataMock,
-  getRememberedTenantIdMock,
-  headersMock,
-} = vi.hoisted(() => ({
-  standaloneNotFoundPageMock: vi.fn(),
-  buildNotFoundMetadataMock: vi.fn(),
-  getRememberedTenantIdMock: vi.fn(),
-  headersMock: vi.fn(),
-}));
+const { standaloneNotFoundPageMock, buildNotFoundMetadataMock, headersMock } =
+  vi.hoisted(() => ({
+    standaloneNotFoundPageMock: vi.fn(),
+    buildNotFoundMetadataMock: vi.fn(),
+    headersMock: vi.fn(),
+  }));
 
 vi.mock('@web/components/pages/standalone-not-found-page', () => ({
   StandaloneNotFoundPage: standaloneNotFoundPageMock,
@@ -18,10 +13,6 @@ vi.mock('@web/components/pages/standalone-not-found-page', () => ({
 
 vi.mock('@web/metadata/not-found-metadata', () => ({
   buildNotFoundMetadata: buildNotFoundMetadataMock,
-}));
-
-vi.mock('@web/server/tenant/remembered-tenant', () => ({
-  getRememberedTenantId: getRememberedTenantIdMock,
 }));
 
 vi.mock('next/headers', () => ({ headers: headersMock }));
@@ -36,27 +27,12 @@ describe('TenantNotFound ([tenant] not-found route)', () => {
     });
   });
 
-  it('renders StandaloneNotFoundPage with the tenant remembered by the layout', async () => {
+  it('renders StandaloneNotFoundPage with no tenant, never reading the request header', async () => {
     const ui = { type: 'div', props: {} };
-    getRememberedTenantIdMock.mockReturnValue('tenant-1');
     standaloneNotFoundPageMock.mockResolvedValue(ui);
 
     expect((await TenantNotFound()).props.children).toBe(ui);
-    expect(standaloneNotFoundPageMock).toHaveBeenCalledWith({
-      tenant: 'tenant-1',
-    });
-    expect(headersMock).not.toHaveBeenCalled();
-  });
-
-  it('renders StandaloneNotFoundPage with no tenant when the layout never remembered one, without reading headers', async () => {
-    const ui = { type: 'div', props: {} };
-    getRememberedTenantIdMock.mockReturnValue(undefined);
-    standaloneNotFoundPageMock.mockResolvedValue(ui);
-
-    expect((await TenantNotFound()).props.children).toBe(ui);
-    expect(standaloneNotFoundPageMock).toHaveBeenCalledWith({
-      tenant: undefined,
-    });
+    expect(standaloneNotFoundPageMock).toHaveBeenCalledWith();
     expect(headersMock).not.toHaveBeenCalled();
   });
 });

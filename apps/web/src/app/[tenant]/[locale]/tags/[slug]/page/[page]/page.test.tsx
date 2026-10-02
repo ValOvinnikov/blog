@@ -3,6 +3,7 @@ import {
   LOCALE_ISO_CODES,
 } from '@blog/config';
 import { permanentRedirect } from '@web/i18n/navigation';
+import { enterRequestContext } from '@web/server/request-context/request-context';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { customRenderAsync } from '@web/testing/custom-render';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
@@ -13,6 +14,8 @@ import TagNumberedPage, { generateMetadata, revalidate } from './page';
 const { getTagPageMock } = vi.hoisted(() => ({
   getTagPageMock: vi.fn(),
 }));
+
+vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -120,6 +123,8 @@ describe('TagNumberedPage', () => {
 
   it('redirects /tags/[slug]/page/1 to /tags/[slug] (canonical page 1 has one URL)', async () => {
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+
+    expect(enterRequestContext).toHaveBeenCalled();
 
     expect(permanentRedirectMock).toHaveBeenCalledWith({
       href: '/tags/typescript',

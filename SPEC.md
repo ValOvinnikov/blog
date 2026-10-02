@@ -1355,26 +1355,35 @@ there is no single root layout to compose a 404 from).
 so a `notFound()` thrown inside `[tenant]/[locale]/layout.tsx` itself is
 catchable only one segment up — without it that throw escaped to a 500 on
 every route. That is a Next.js file-convention rule, independent of the
-route's static/dynamic classification. `[tenant]/[locale]/layout.tsx` seeds
-`rememberRequestTenantId(tenant)` from its own route param immediately after
-awaiting `params`, ahead of both of its `notFound()` calls, and
-`app/[tenant]/not-found.tsx` reads it back with `getRememberedTenantId()`
-rather than the request header — a real `headers()` read there, on the same
-prerendered `/[tenant]/[locale]` route, would be expected to bail the render
-out of static and — with no `pages/500.html` to fall back on — return a
-bare 500 in place of the 404, the same failure #3191 fixed at the root
-boundary. Tokens and voice overrides come from the `@blog/db` `site_config`
-row rather than the Sanity `settings_site` fetch whose failure can be what
-raised the 404, so the _data_ a themed render would use is unaffected by
-that failure — but whether it renders themed at all turns on whether
-`getRememberedTenantId()` can still see what `rememberRequestTenantId`
-wrote into its `cache()`-scoped store once `notFound()` has unwound the
-throwing render, and that hand-off isn't independently verified against a
-real layout-level `notFound()` in a production build: every existing test
-of this path mocks `getRememberedTenantId` directly rather than exercising
-the store. If the hand-off doesn't survive, `getRememberedTenantId()`
-returns `undefined` and the boundary renders unthemed — a graceful
-fallback, never a 500.
+route's static/dynamic classification. Like `app/global-not-found.tsx`,
+`app/[tenant]/not-found.tsx` resolves no tenant and renders unthemed —
+including the 404 a site-settings failure or an unsupported locale raises
+in the layout. It must never read `headers()`: on the same prerendered
+`/[tenant]/[locale]` route that would be expected to bail the render out of
+static and — with no `pages/500.html` to fall back on — return a bare 500 in
+place of the 404, the same failure #3191 fixed at the root boundary.
+
+**The request context** (`apps/web/src/server/request-context/`) is where a
+`[tenant]/[locale]` request's tenant-wide values live, so they are not
+threaded by hand. It exports two functions. `enterRequestContext(params)`
+runs first in a route entry (the layout and its `generateMetadata` today;
+pages, their metadata and modules adopt it next): it 404s an unsupported
+locale, stores the tenant from the route param (the unresolved-tenant
+placeholder stored as no tenant) and the locale, calls `setRequestLocale`,
+and builds the context from one read of the `tenants` row. Entering twice
+with the same params is harmless; entering with different ones throws. It
+never reads `headers()` or `cookies()`, so routes stay static.
+`getRequestContext()` resolves one object — `tenantId`, `locale`,
+`sanityContext` (the locale applied), `metadataBase` (a ready `URL`), and
+the tenant's `defaultLocale` and `liveLocales` — which callers destructure;
+it holds stored values only, never flags derived from them, and throws an
+error naming `enterRequestContext()` when read before entry. The row
+read includes archived rows (the base URL applies `isTenantServable` and a
+`deprovisionedAt` check itself), and the credentials come from `@blog/db`'s
+`toTenantSanityCredentials(row)`, which `getTenantSanityCredentials` also
+uses. Resolution matches `getTenantSanityContext`: no tenant serves the
+platform project; a tenant without credentials 404s in production and falls
+back to the platform project elsewhere.
 
 `app/global-not-found.tsx` (formerly the root `app/not-found.tsx`) serves
 URLs that match no route. It has no `[tenant]` route param to thread even

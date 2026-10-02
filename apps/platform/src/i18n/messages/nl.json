@@ -62,8 +62,7 @@
     "team": "Team",
     "provisioning": "Inrichting",
     "dangerZone": "Gevarenzone",
-    "badgeLater": "later",
-    "badgeThisMilestone": "deze mijlpaal",
+    "badgeComingSoon": "Binnenkort",
     "badgePlatform": "platform",
     "features": "Functies"
   },
@@ -233,7 +232,8 @@
       "PROVISIONED": "Tenant ingericht",
       "PROVISIONING_FAILED": "Inrichting mislukt",
       "SETTINGS_UPDATED": "Instellingen bijgewerkt",
-      "DELETED": "Tenant verwijderd"
+      "DELETED": "Tenant verwijderd",
+      "READER_DATA_PURGED": "Lezersgegevens gewist"
     }
   },
   "tenantDomainPage": {
@@ -557,6 +557,7 @@
       "REVOKE_SANITY_TOKENS": "Sanity-tokens intrekken",
       "CLEAR_ARTIFACTS": "Inrichtingsartefacten opruimen",
       "ARCHIVE_TENANT": "Tenant archiveren",
+      "PURGE_READER_DATA": "Lezersgegevens wissen",
       "INVALIDATE_TENANT_CACHE": "Gecachte pagina's ongeldig maken"
     },
     "statusLabel": {
@@ -689,6 +690,7 @@
     "alertSuccess": "Functies opgeslagen.",
     "alertError": "Opslaan mislukt. Probeer het opnieuw.",
     "planLockedBadge": "Growth-abonnement",
+    "comingSoonBadge": "Binnenkort",
     "switchOn": "Aan",
     "switchOff": "Uit",
     "capabilitiesHeading": "Mogelijkheden",

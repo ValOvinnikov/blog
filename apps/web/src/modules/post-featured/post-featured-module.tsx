@@ -1,5 +1,5 @@
 import { service, type TPostCard } from '@blog/service';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';
 import { renderPostCardImage } from '@web/utils/render-post-card-image';
 import { renderPostLeadImage } from '@web/utils/render-post-lead-image';
@@ -9,19 +9,13 @@ import { PostFeaturedModuleView } from './post-featured-module-view';
 
 export interface IPostFeaturedModuleProps {
   id: string;
-  locale: string;
-  tenant: string;
 }
 
-export const PostFeaturedModule = async ({
-  id,
-  locale,
-  tenant,
-}: IPostFeaturedModuleProps) => {
-  const tenantContext = await getTenantSanityContext(tenant, locale);
+export const PostFeaturedModule = async ({ id }: IPostFeaturedModuleProps) => {
+  const { sanityContext } = await getRequestContext();
   const result = await service.modules.postFeatured.v1.getPostFeatured(
     id,
-    tenantContext,
+    sanityContext,
   );
 
   if (!result.ok) {

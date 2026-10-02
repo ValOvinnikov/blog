@@ -67,8 +67,6 @@ const setup = customRenderAsync(TopicModuleRenderer, {
   hero: undefined,
   headingBlock: makeHeadingBlock({ heading: 'News' }),
   modules: [],
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${TopicModuleRenderer.name}/>`, () => {

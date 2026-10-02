@@ -9,11 +9,7 @@ import { LandingModuleRenderer } from './landing-module-renderer';
 
 type TLandingPageProps = ITenantLocalizedParams & { slug: string };
 
-export const LandingPage = async ({
-  slug,
-  locale,
-  tenant,
-}: TLandingPageProps) => {
+export const LandingPage = async ({ slug, tenant }: TLandingPageProps) => {
   const result = await getLandingPage(slug, tenant);
   const page = guardPageLoaderResult(result, 'landing_page.fetch_failed', {
     slug,
@@ -30,8 +26,6 @@ export const LandingPage = async ({
         hero={hero}
         headingBlock={headingBlock}
         modules={modules}
-        locale={locale}
-        tenant={tenant}
       />
     </PageShell>
   );

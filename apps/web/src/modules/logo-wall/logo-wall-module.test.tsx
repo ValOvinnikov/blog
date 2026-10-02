@@ -1,9 +1,9 @@
 import { BRAND_VARIANT, DISPLAY_MODE } from '@blog/config';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeLogoItem } from '@web/testing/modules/logo-wall/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { LogoWallModule } from './logo-wall-module';
 
@@ -21,9 +21,9 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
+vi.mock('@web/server/request-context/request-context');
 
-const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
+const getRequestContextMock = vi.mocked(getRequestContext);
 
 const baseModule = {
   brandVariant: BRAND_VARIANT.PRIMARY,
@@ -36,15 +36,13 @@ const baseModule = {
 
 const setup = customRenderAsync(LogoWallModule, {
   id: 'logo-wall-1',
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${LogoWallModule.name}/>`, () => {
   beforeEach(() => {
     getLogoWallModuleMock.mockReset();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
+    getRequestContextMock.mockReset();
+    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
   it('calls getLogoWallModule with the module id and the tenant Sanity context', async () => {
@@ -53,7 +51,10 @@ describe(`<${LogoWallModule.name}/>`, () => {
       dataset: 'production',
       token: 'tenant-token',
     };
-    getTenantSanityContextMock.mockResolvedValue(tenant);
+    getRequestContextMock.mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      sanityContext: tenant,
+    });
     getLogoWallModuleMock.mockResolvedValue({
       ok: true,
       data: {
@@ -65,7 +66,6 @@ describe(`<${LogoWallModule.name}/>`, () => {
     await setup();
 
     expect(getLogoWallModuleMock).toHaveBeenCalledWith('logo-wall-1', tenant);
-    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1', 'en');
   });
 
   it('renders nothing when a logo image fails to resolve', async () => {

@@ -48,11 +48,13 @@ const tenant1 = {
   id: 'tenant-1',
   name: 'Acme Inc.',
   primaryDomain: 'acme.com',
+  plan: 'FREE',
 };
 const tenant2 = {
   id: 'tenant-2',
   name: 'Globex Corp.',
   primaryDomain: 'globex.com',
+  plan: 'GROWTH',
 };
 const membership1 = {
   id: 'm-1',
@@ -157,6 +159,38 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
       '/dashboard/look',
     );
     expect(screen.queryByText('Platform')).not.toBeInTheDocument();
+  });
+
+  it('hides Languages and Team from a FREE tenant', async () => {
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    listMembershipsForUserMock.mockResolvedValue([membership1, membership2]);
+    listTenantsByIdsMock.mockResolvedValue([tenant1, tenant2]);
+    mockCookie('tenant-1');
+
+    await setup();
+
+    expect(
+      screen.queryByRole('link', { name: /languages/i }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText('Team')).not.toBeInTheDocument();
+  });
+
+  it('shows Languages as a link and Team as "Coming soon" to a GROWTH tenant', async () => {
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    listMembershipsForUserMock.mockResolvedValue([membership1, membership2]);
+    listTenantsByIdsMock.mockResolvedValue([tenant1, tenant2]);
+    mockCookie('tenant-2');
+
+    await setup();
+
+    expect(screen.getByRole('link', { name: /languages/i })).toHaveAttribute(
+      'href',
+      '/dashboard/languages',
+    );
+    expect(screen.getByText('Team')).toBeVisible();
+    expect(
+      screen.queryByRole('link', { name: /team/i }),
+    ).not.toBeInTheDocument();
   });
 
   it('shows the platform role, never OWNER, for a SUPERADMIN with no memberships row', async () => {

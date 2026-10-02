@@ -4,7 +4,7 @@ import type {
   TTenantProvisioningStatus,
   TTenantStatus,
 } from '@blog/db/constants';
-import { tenants } from '@blog/db/schema/tenants';
+import { tenants, type TTenant } from '@blog/db/schema/tenants';
 import { env } from '@blog/db/utils/env/env';
 import { decryptSecret } from '@blog/utils';
 import { eq } from 'drizzle-orm';
@@ -19,23 +19,11 @@ export type TTenantSanityCredentials = {
   provisioningStatus: TTenantProvisioningStatus | null;
 };
 
-/**
- * Resolves a tenant's Sanity read credentials alongside its servable
- * state (`status`, `deprovisionedAt`, `provisioningStatus`) — this does not
- * itself gate on that state, so callers must check it before serving.
- */
-export async function getTenantSanityCredentials(
-  tenantId: string,
-): Promise<TTenantSanityCredentials | undefined> {
-  const db = getDb();
-
-  const [tenant] = await db
-    .select()
-    .from(tenants)
-    .where(eq(tenants.id, tenantId));
-
+export function toTenantSanityCredentials(
+  tenant: TTenant,
+): TTenantSanityCredentials | undefined {
   if (
-    !tenant?.sanityReadTokenEncrypted ||
+    !tenant.sanityReadTokenEncrypted ||
     !tenant.sanityProjectId ||
     !tenant.sanityDataset
   ) {
@@ -58,4 +46,22 @@ export async function getTenantSanityCredentials(
     deprovisionedAt: tenant.deprovisionedAt,
     provisioningStatus: tenant.provisioningStatus,
   };
+}
+
+/**
+ * Resolves a tenant's Sanity read credentials alongside its servable
+ * state (`status`, `deprovisionedAt`, `provisioningStatus`) — this does not
+ * itself gate on that state, so callers must check it before serving.
+ */
+export async function getTenantSanityCredentials(
+  tenantId: string,
+): Promise<TTenantSanityCredentials | undefined> {
+  const db = getDb();
+
+  const [tenant] = await db
+    .select()
+    .from(tenants)
+    .where(eq(tenants.id, tenantId));
+
+  return tenant && toTenantSanityCredentials(tenant);
 }

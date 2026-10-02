@@ -1,4 +1,5 @@
 import { isLocaleIsoCode, type TLocaleIsoCode } from '@blog/config/constants';
+import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
 import { isLocalizedSchemaType } from '@blog/studio/schema-types/inputs/localization-notice-input/is-localized-schema-type';
 import {
   collectMissingLocales,
@@ -14,7 +15,6 @@ import { Card, Stack, Text } from '@sanity/ui';
 import { useEffect, useState } from 'react';
 import { type InputProps, useClient } from 'sanity';
 
-const LANGUAGE_FIELD = 'language';
 const LINK_TYPE_NAME = 'link';
 const TRANSLATIONS_API_VERSION = '2024-01-01';
 const TARGET_TRANSLATIONS_QUERY =

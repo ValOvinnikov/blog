@@ -2,7 +2,7 @@
 
 import {
   LOCALE_BCP47_TAGS,
-  LOCALE_ENDONYMS,
+  LOCALE_NATIVE_LABEL,
   type TLocaleIsoCode,
 } from '@blog/config';
 import { NavLink } from '@blog/ui/components/atoms/nav-link';
@@ -55,7 +55,7 @@ export const LanguageSwitcher = ({
                 isActive={locale === currentLocale}
                 onClick={() => rememberLanguage(locale)}
               >
-                {LOCALE_ENDONYMS[locale]}
+                {LOCALE_NATIVE_LABEL[locale]}
               </NavLink>
             </li>
           );

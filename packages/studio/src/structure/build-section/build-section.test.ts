@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES, LOCALE_NATIVE_LABEL } from '@blog/config/constants';
 import { House, Link2, List, Settings, Tag } from 'lucide-react';
 import type { StructureBuilder } from 'sanity/structure';
 
@@ -19,6 +20,9 @@ const CHAINABLE_METHODS = [
   'schemaType',
   'documentId',
   'items',
+  'filter',
+  'params',
+  'initialValueTemplates',
 ] as const;
 
 const makeMockBuilder = (kind: string, documentType?: string): TMockBuilder => {
@@ -47,6 +51,8 @@ const makeMockStructureBuilder = () => ({
   ),
   document: vi.fn(() => makeMockBuilder('document')),
   list: vi.fn(() => makeMockBuilder('list')),
+  documentList: vi.fn(() => makeMockBuilder('documentList')),
+  initialValueTemplateItem: vi.fn((templateId: string) => ({ templateId })),
 });
 
 const asStructureBuilder = (S: ReturnType<typeof makeMockStructureBuilder>) =>
@@ -492,5 +498,88 @@ describe(buildSections, () => {
     ]);
     expect(callArgs(result[0]!, 'id')).toEqual(['modules']);
     expect(callArgs(result[2]!, 'id')).toEqual(['settings']);
+  });
+  describe('byLanguage items', () => {
+    const buildLanguageLists = () => {
+      const S = makeMockStructureBuilder();
+      const [item] = getGroupItems(S, [
+        {
+          items: [
+            {
+              schema: {
+                name: 'landingPage',
+                title: 'Landing Pages',
+                icon: List,
+              },
+              mode: 'byLanguage',
+            },
+          ],
+        },
+      ]);
+      const list = callArgs(item!, 'child')?.[0] as TMockBuilder;
+      return callArgs(list, 'items')?.[0] as TMockBuilder[];
+    };
+
+    const listOf = (languageItem: TMockBuilder) =>
+      callArgs(languageItem, 'child')?.[0] as TMockBuilder;
+
+    it('lists every locale by its own name, then a divider, then all pages', () => {
+      const lists = buildLanguageLists();
+
+      expect(lists.map((list) => list.kind)).toEqual([
+        ...Object.values(LOCALE_ISO_CODES).map(() => 'listItem'),
+        'divider',
+        'listItem',
+      ]);
+      expect(
+        lists
+          .filter((list) => list.kind === 'listItem')
+          .map((list) => callArgs(list, 'title')?.[0]),
+      ).toEqual([
+        ...Object.values(LOCALE_ISO_CODES).map(
+          (locale) => LOCALE_NATIVE_LABEL[locale],
+        ),
+        'All pages',
+      ]);
+    });
+
+    it('lists every page in all pages and offers a template per language', () => {
+      const documentList = listOf(buildLanguageLists().at(-1)!);
+
+      expect(callArgs(documentList, 'filter')).toEqual(['_type == $type']);
+      expect(callArgs(documentList, 'initialValueTemplates')).toEqual([
+        Object.values(LOCALE_ISO_CODES).map((locale) => ({
+          templateId: `landingPage-${locale}`,
+        })),
+      ]);
+    });
+
+    it('filters each language list to its language and creates pages in it', () => {
+      const [english] = buildLanguageLists();
+      const documentList = listOf(english!);
+
+      expect(callArgs(documentList, 'filter')).toEqual([
+        '_type == $type && language == $language',
+      ]);
+      expect(callArgs(documentList, 'params')).toEqual([
+        { type: 'landingPage', language: 'EN' },
+      ]);
+      expect(callArgs(documentList, 'initialValueTemplates')).toEqual([
+        [{ templateId: 'landingPage-EN' }],
+      ]);
+    });
+
+    it('builds every list from the document type list so it keeps the sort menu', () => {
+      const lists = buildLanguageLists().filter(
+        (list) => list.kind === 'listItem',
+      );
+
+      expect(lists.map((list) => listOf(list).kind)).toEqual(
+        lists.map(() => 'documentTypeList'),
+      );
+      expect(lists.map((list) => listOf(list).documentType)).toEqual(
+        lists.map(() => 'landingPage'),
+      );
+    });
   });
 });

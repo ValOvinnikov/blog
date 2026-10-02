@@ -1,24 +1,18 @@
 import { service } from '@blog/service';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';
 
 import { HeroProfileModuleView } from './hero-profile-module-view';
 
 export interface IHeroProfileModuleProps {
   id: string;
-  locale: string;
-  tenant: string;
 }
 
-export const HeroProfileModule = async ({
-  id,
-  locale,
-  tenant,
-}: IHeroProfileModuleProps) => {
-  const tenantContext = await getTenantSanityContext(tenant, locale);
+export const HeroProfileModule = async ({ id }: IHeroProfileModuleProps) => {
+  const { sanityContext } = await getRequestContext();
   const result = await service.modules.heroProfile.v1.getHeroProfile(
     id,
-    tenantContext,
+    sanityContext,
   );
 
   if (!result.ok) {

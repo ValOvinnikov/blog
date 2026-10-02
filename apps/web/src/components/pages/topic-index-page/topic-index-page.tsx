@@ -7,10 +7,7 @@ import { TopicIndexModuleRenderer } from './topic-index-module-renderer';
 
 type TTopicIndexPageProps = { locale: string; tenant: string };
 
-export const TopicIndexPage = async ({
-  locale,
-  tenant,
-}: TTopicIndexPageProps) => {
+export const TopicIndexPage = async ({ tenant }: TTopicIndexPageProps) => {
   const result = await getTopicIndexPage(tenant);
   const { headingBlock, hero, modules } = guardPageLoaderResult(
     result,
@@ -26,8 +23,6 @@ export const TopicIndexPage = async ({
         hero={hero}
         headingBlock={headingBlock}
         modules={modules}
-        locale={locale}
-        tenant={tenant}
       />
     </PageShell>
   );

@@ -18,15 +18,11 @@ const BLOG_POST_MAP: Partial<Record<TPagePostType, TModuleComponent>> = {
 
 export interface IBlogPostModuleRendererProps {
   modules: TModule<TPagePostType>[];
-  locale: string;
-  tenant: string;
   context?: TModuleComponentProps['context'];
 }
 
 export const BlogPostModuleRenderer = ({
   modules,
-  locale,
-  tenant,
   context,
 }: IBlogPostModuleRendererProps): ReactNode =>
-  renderModules({ modules, map: BLOG_POST_MAP, locale, tenant, context });
+  renderModules({ modules, map: BLOG_POST_MAP, context });

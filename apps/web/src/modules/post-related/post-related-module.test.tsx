@@ -1,9 +1,12 @@
 import { BRAND_VARIANT } from '@blog/config';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import {
+  DEFAULT_REQUEST_CONTEXT,
+  DEFAULT_TENANT_SANITY_CONTEXT,
+} from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { PostRelatedModule } from './post-related-module';
@@ -22,11 +25,11 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
+vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@web/utils/logger/logger');
 
-const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
+const getRequestContextMock = vi.mocked(getRequestContext);
 const loggerWarnMock = vi.mocked(logger.warn);
 
 const makePost = (overrides: Record<string, unknown> = {}) => ({
@@ -42,16 +45,14 @@ const makePost = (overrides: Record<string, unknown> = {}) => ({
 
 const setup = customRenderAsync(PostRelatedModule, {
   id: 'post-related-1',
-  locale: 'en',
-  tenant: 'tenant-1',
   context: { post: { id: 'anchor-post-1' } },
 });
 
 describe(`<${PostRelatedModule.name}/>`, () => {
   beforeEach(() => {
     getPostRelatedMock.mockReset();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
+    getRequestContextMock.mockReset();
+    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
     loggerWarnMock.mockReset();
   });
 

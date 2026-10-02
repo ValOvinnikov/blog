@@ -62,8 +62,7 @@
     "team": "Team",
     "provisioning": "Bereitstellung",
     "dangerZone": "Gefahrenzone",
-    "badgeLater": "später",
-    "badgeThisMilestone": "dieser Meilenstein",
+    "badgeComingSoon": "Demnächst",
     "badgePlatform": "Plattform",
     "features": "Funktionen"
   },
@@ -233,7 +232,8 @@
       "PROVISIONED": "Mandant bereitgestellt",
       "PROVISIONING_FAILED": "Bereitstellung fehlgeschlagen",
       "SETTINGS_UPDATED": "Einstellungen aktualisiert",
-      "DELETED": "Mandant gelöscht"
+      "DELETED": "Mandant gelöscht",
+      "READER_DATA_PURGED": "Leserdaten gelöscht"
     }
   },
   "tenantDomainPage": {
@@ -557,6 +557,7 @@
       "REVOKE_SANITY_TOKENS": "Sanity-Tokens widerrufen",
       "CLEAR_ARTIFACTS": "Bereitstellungsartefakte entfernen",
       "ARCHIVE_TENANT": "Mandant archivieren",
+      "PURGE_READER_DATA": "Leserdaten löschen",
       "INVALIDATE_TENANT_CACHE": "Zwischengespeicherte Seiten invalidieren"
     },
     "statusLabel": {
@@ -689,6 +690,7 @@
     "alertSuccess": "Funktionen gespeichert.",
     "alertError": "Speichern fehlgeschlagen — bitte erneut versuchen.",
     "planLockedBadge": "Growth-Tarif",
+    "comingSoonBadge": "Demnächst",
     "switchOn": "An",
     "switchOff": "Aus",
     "capabilitiesHeading": "Funktionen",

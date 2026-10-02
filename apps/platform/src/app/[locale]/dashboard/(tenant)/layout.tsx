@@ -10,6 +10,7 @@ import {
   dashboardNavSections,
   type TNavTranslator,
 } from '@platform/utils/nav-sections/nav-sections';
+import { planPageAccess } from '@platform/utils/plan-page-access/plan-page-access';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { getTranslations } from 'next-intl/server';
 
@@ -46,7 +47,7 @@ export default async function DashboardTenantLayout({ children }: TProps) {
   return (
     <AdminShell
       isSidebarInitiallyCollapsed={isSidebarInitiallyCollapsed}
-      sections={dashboardNavSections(tNavSections)}
+      sections={dashboardNavSections(tNavSections, planPageAccess(tenant.plan))}
       switcher={
         tenants.length > 1 ? (
           <TenantSwitcher

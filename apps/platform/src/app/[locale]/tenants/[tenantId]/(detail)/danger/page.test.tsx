@@ -214,7 +214,7 @@ describe(TenantDangerPage, () => {
       screen.getByRole('heading', { name: 'Deprovisioning progress' }),
     ).toBeVisible();
     expect(screen.getByText('Starting…')).toBeVisible();
-    expect(screen.getAllByText('Queued').length).toBe(6);
+    expect(screen.getAllByText('Queued').length).toBe(7);
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
 
     await act(async () => {
@@ -241,7 +241,7 @@ describe(TenantDangerPage, () => {
     expect(screen.getByText('Starting…')).toBeVisible();
     expect(screen.getByText('Remove domain')).toBeVisible();
     expect(screen.getByText('Invalidate cached pages')).toBeVisible();
-    expect(screen.getAllByText('Queued').length).toBe(6);
+    expect(screen.getAllByText('Queued').length).toBe(7);
     expect(screen.queryByText('Not started')).not.toBeInTheDocument();
     expect(
       screen.getByRole('heading', { level: 2, name: 'Run' }),

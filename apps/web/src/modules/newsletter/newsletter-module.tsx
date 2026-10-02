@@ -1,29 +1,27 @@
 import { CAPABILITY } from '@blog/config';
 import { service } from '@blog/service';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/unresolved-tenant-placeholder';
 import { logger } from '@web/utils/logger/logger';
 
 import { NewsletterModuleView } from './newsletter-module-view';
 
 export interface INewsletterModuleProps {
   id: string;
-  locale: string;
-  tenant: string;
 }
 
-export const NewsletterModule = async ({
-  id,
-  locale,
-  tenant,
-}: INewsletterModuleProps) => {
-  const isEnabled = await isCapabilityEnabled(CAPABILITY.NEWSLETTER, tenant);
+export const NewsletterModule = async ({ id }: INewsletterModuleProps) => {
+  const { tenantId, sanityContext } = await getRequestContext();
+  const isEnabled = await isCapabilityEnabled(
+    CAPABILITY.NEWSLETTER,
+    tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER,
+  );
   if (!isEnabled) return null;
 
-  const tenantContext = await getTenantSanityContext(tenant, locale);
   const [result, newsletterSettingsResult] = await Promise.all([
-    service.modules.newsletter.v1.getNewsletter(id, tenantContext),
-    service.global.newsletterSettings.v1.getNewsletterSettings(tenantContext),
+    service.modules.newsletter.v1.getNewsletter(id, sanityContext),
+    service.global.newsletterSettings.v1.getNewsletterSettings(sanityContext),
   ]);
 
   if (!result.ok) {

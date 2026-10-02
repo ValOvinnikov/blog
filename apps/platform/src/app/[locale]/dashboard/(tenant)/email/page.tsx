@@ -11,5 +11,9 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function DashboardEmailPage() {
-  return renderTenantScopedPage(resolveDashboardTenant, EmailPageContent);
+  return renderTenantScopedPage(
+    resolveDashboardTenant,
+    EmailPageContent,
+    'email',
+  );
 }
