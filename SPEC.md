@@ -1344,9 +1344,15 @@ the leak where every tenant was served the first `tenants` row's config
 the root layout** and renders the document shell through `DocumentShell`
 (`<html lang>` set to the served language's BCP 47 tag from the route
 param, the Sanity CDN preconnect, the dark-mode bootstrap script, `<body>`),
-so `lang` follows the language without a Dynamic API. Theme tokens, font
-variables, analytics gating and the tenant's voice overrides all resolve in
-that same layout. **There are two 404 boundaries above it, and each renders
+so `lang` follows the language without a Dynamic API. The layout keeps the
+theme tokens and font variables (`ThemeScope`) and the `notFound()` on a
+site-settings failure, and composes the rest from components that load
+their own data through the request context: `SiteHeader`, `SiteFooter`,
+`SiteProviders` (intl, session, toast, the tenant's voice overrides) and
+`SiteAnalytics` (`apps/web/src/components/shared/`). Site settings come
+from one per-request loader, `apps/web/src/server/site-settings/`, shared
+by `generateMetadata`, the layout, the header, the footer and any module
+that needs them. **There are two 404 boundaries above it, and each renders
 its own English `DocumentShell`:** `app/[tenant]/not-found.tsx` and
 `app/global-not-found.tsx` (enabled by `experimental.globalNotFound`, since
 there is no single root layout to compose a 404 from).

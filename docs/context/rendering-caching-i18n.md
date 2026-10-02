@@ -237,11 +237,13 @@ detected`, and a re-export with `it mustn't be reexported`, so a wrong form
   (`LOCALE_BCP47_TAGS`) from the route param — no Dynamic API. The boundaries
   above it, `app/[tenant]/not-found.tsx` and `app/global-not-found.tsx`
   (`experimental.globalNotFound`), each render their own English
-  `DocumentShell`; `app/global-error.tsx` keeps its own `<html>`. Theme
-  tokens, `next/font` variables, analytics gating and the tenant's voice
-  overrides all live in that layout, which also owns everything locale-aware
-  (`NextIntlClientProvider`, `Header`/`Footer` chrome, the locale-validation
-  `notFound()`). The theme tokens reach the tree through `ThemeScope`
+  `DocumentShell`; `app/global-error.tsx` keeps its own `<html>`. The layout
+  keeps theme tokens, `next/font` variables and the site-settings
+  `notFound()`; it composes `SiteHeader`, `SiteFooter`, `SiteProviders`
+  (`NextIntlClientProvider`, session, toast, the tenant's voice overrides)
+  and `SiteAnalytics` from `src/components/shared/`, each loading its own
+  data through the request context, with site settings from the shared
+  per-request loader in `src/server/site-settings/`. The theme tokens reach the tree through `ThemeScope`
   (`src/components/shared/theme-scope/`), whose `<style>` carries
   `precedence`/`href` so React hoists it into `<head>` from wherever it
   mounts — there is no ordering constraint on its siblings.
