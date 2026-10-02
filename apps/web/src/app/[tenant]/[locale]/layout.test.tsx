@@ -11,16 +11,12 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import { ThemeScope } from '@web/components/shared/theme-scope';
 import { VoiceRichProvider } from '@web/context/voice-rich-provider';
 import {
-  getContextSanityContext,
-  getContextTenantLocales,
-  isContextCapabilityEnabled,
-} from '@web/server/request-context/context-tenant';
-import {
   enterRequestContext,
-  getContextLocale,
+  getRequestContext,
 } from '@web/server/request-context/request-context';
+import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
 import type { ReactElement, ReactNode } from 'react';
 
@@ -73,7 +69,9 @@ const {
 
 vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@web/server/request-context/context-tenant');
+vi.mock('@web/server/settings-features/is-capability-enabled', () => ({
+  isCapabilityEnabled: vi.fn(),
+}));
 
 vi.mock('@blog/auth/utils/oauth-providers/oauth-providers', () => ({
   getEnabledOAuthProviderIds: getEnabledOAuthProviderIdsMock,
@@ -136,10 +134,16 @@ vi.mock('next-auth/react', () => ({
 }));
 
 const enterRequestContextMock = vi.mocked(enterRequestContext);
-const getContextLocaleMock = vi.mocked(getContextLocale);
-const getContextSanityContextMock = vi.mocked(getContextSanityContext);
-const getContextTenantLocalesMock = vi.mocked(getContextTenantLocales);
-const isContextCapabilityEnabledMock = vi.mocked(isContextCapabilityEnabled);
+const getRequestContextMock = vi.mocked(getRequestContext);
+const isCapabilityEnabledMock = vi.mocked(isCapabilityEnabled);
+
+const withRequestContext = (
+  overrides: Partial<typeof DEFAULT_REQUEST_CONTEXT>,
+) =>
+  getRequestContextMock.mockResolvedValue({
+    ...DEFAULT_REQUEST_CONTEXT,
+    ...overrides,
+  });
 
 const brand = { name: 'Blog', logo: undefined };
 const now = new Date('2026-07-21T00:00:00.000Z');
@@ -169,13 +173,9 @@ describe('LocaleLayout', () => {
     getNavigationMock.mockResolvedValue({ ok: true, data: { items: [] } });
     getFooterMock.mockResolvedValue({ ok: true, data: { social: [] } });
     getThemeTokensMock.mockResolvedValue(THEME_TOKENS);
-    isContextCapabilityEnabledMock.mockResolvedValue(true);
+    isCapabilityEnabledMock.mockResolvedValue(true);
     isWebAnalyticsEnabledMock.mockReturnValue(false);
-    getContextLocaleMock.mockReturnValue(LOCALE_ISO_CODES.EN);
-    getContextTenantLocalesMock.mockResolvedValue({
-      defaultLocale: LOCALE_ISO_CODES.EN,
-      liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
-    });
+    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
     resolveTenantMessagesMock.mockImplementation((messages: unknown) =>
       Promise.resolve({ messages, rich: {} }),
     );
@@ -186,9 +186,6 @@ describe('LocaleLayout', () => {
     isProductionEnvironmentMock.mockReturnValue(true);
     useSessionMock.mockReturnValue({ data: null, status: 'unauthenticated' });
     getEnabledOAuthProviderIdsMock.mockReturnValue(['github', 'google']);
-    getContextSanityContextMock.mockResolvedValue(
-      DEFAULT_TENANT_SANITY_CONTEXT,
-    );
     getSanityImageBaseUrlMock.mockReturnValue(
       'https://cdn.sanity.io/images/mock-project/mock-dataset/',
     );
@@ -285,7 +282,7 @@ describe('LocaleLayout', () => {
       expect(enterRequestContextMock).toHaveBeenCalledWith(params);
     });
 
-    it("resolves relative metadata URLs against the tenant's base URL", async () => {
+    it("sets metadataBase to the tenant's base URL", async () => {
       const metadata = await generateMetadata({
         params: Promise.resolve({
           tenant: 'tenant-1',
@@ -293,7 +290,7 @@ describe('LocaleLayout', () => {
         }),
       });
 
-      expect(metadata.metadataBase).toEqual(new URL('https://example.com'));
+      expect(metadata.metadataBase).toBe(DEFAULT_REQUEST_CONTEXT.metadataBase);
     });
   });
 
@@ -338,7 +335,7 @@ describe('LocaleLayout', () => {
   });
 
   it("serves another language's messages without the tenant's default-language voice pack", async () => {
-    getContextLocaleMock.mockReturnValue(LOCALE_ISO_CODES.NL);
+    withRequestContext({ locale: LOCALE_ISO_CODES.NL });
     const themeScope = firstChildOf(
       await LocaleLayout({
         children: <div>content</div>,
@@ -356,7 +353,7 @@ describe('LocaleLayout', () => {
   });
 
   it('declares the served language on the document', async () => {
-    getContextLocaleMock.mockReturnValue(LOCALE_ISO_CODES.NL);
+    withRequestContext({ locale: LOCALE_ISO_CODES.NL });
     const document = await LocaleLayout({
       children: <div>content</div>,
       params: Promise.resolve({
@@ -435,7 +432,7 @@ describe('LocaleLayout', () => {
 
   it('mounts Analytics and SpeedInsights when enabled and the capability is entitled', async () => {
     isWebAnalyticsEnabledMock.mockReturnValue(true);
-    isContextCapabilityEnabledMock.mockResolvedValue(true);
+    isCapabilityEnabledMock.mockResolvedValue(true);
 
     const themeScope = firstChildOf(
       await LocaleLayout({
@@ -461,7 +458,7 @@ describe('LocaleLayout', () => {
 
   it('omits Analytics and SpeedInsights when the ANALYTICS capability is not entitled', async () => {
     isWebAnalyticsEnabledMock.mockReturnValue(true);
-    isContextCapabilityEnabledMock.mockResolvedValue(false);
+    isCapabilityEnabledMock.mockResolvedValue(false);
 
     const themeScope = firstChildOf(
       await LocaleLayout({
@@ -578,7 +575,7 @@ describe('LocaleLayout', () => {
       dataset: 'production',
       token: 'tenant-token',
     };
-    getContextSanityContextMock.mockResolvedValue(tenant);
+    withRequestContext({ sanityContext: tenant });
 
     await setup();
 
@@ -591,7 +588,10 @@ describe('LocaleLayout', () => {
     await setup();
 
     expect(getThemeTokensMock).toHaveBeenCalledWith('tenant-1');
-    expect(isContextCapabilityEnabledMock).toHaveBeenCalledWith('ANALYTICS');
+    expect(isCapabilityEnabledMock).toHaveBeenCalledWith(
+      'ANALYTICS',
+      'tenant-1',
+    );
     expect(resolveTenantMessagesMock).toHaveBeenCalledWith(
       realMessages,
       'tenant-1',

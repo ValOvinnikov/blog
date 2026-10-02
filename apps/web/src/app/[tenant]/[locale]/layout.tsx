@@ -31,16 +31,10 @@ import { ToastProvider } from '@web/context/toast-provider';
 import { VoiceRichProvider } from '@web/context/voice-rich-provider';
 import { routing } from '@web/i18n/routing';
 import {
-  getContextBaseUrl,
-  getContextSanityContext,
-  getContextTenantLocales,
-  isContextCapabilityEnabled,
-} from '@web/server/request-context/context-tenant';
-import {
   enterRequestContext,
-  getContextLocale,
-  getContextTenantId,
+  getRequestContext,
 } from '@web/server/request-context/request-context';
+import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/unresolved-tenant-placeholder';
 import { getThemeTokens } from '@web/utils/get-theme-tokens';
 import { isProductionEnvironment } from '@web/utils/is-production-environment';
@@ -69,15 +63,12 @@ export async function generateMetadata({
   params,
 }: TGenerateMetadataProps): Promise<Metadata> {
   await enterRequestContext(params);
-  const tenantContext = await getContextSanityContext();
-  const result =
-    await service.global.siteSettings.v1.getSiteSettings(tenantContext);
-
   // Every route's own `openGraph`/`twitter` replaces (not merges with) this
   // root segment's. `metadataBase` inherits down, letting a leaf's relative
   // fallback image path resolve to an absolute URL.
-  const tenantBaseUrl = await getContextBaseUrl();
-  const metadataBase = tenantBaseUrl ? new URL(tenantBaseUrl) : undefined;
+  const { sanityContext, metadataBase } = await getRequestContext();
+  const result =
+    await service.global.siteSettings.v1.getSiteSettings(sanityContext);
 
   // Applied ahead of the `!result.ok` guard so a non-production page stays
   // de-indexed even when site settings fail to load.
@@ -115,12 +106,11 @@ type TProps = {
 
 export default async function LocaleLayout({ children, params }: TProps) {
   await enterRequestContext(params);
-  const locale = getContextLocale();
+  const { tenantId, locale, sanityContext, defaultLocale } =
+    await getRequestContext();
   // The tenant resolvers below read `headers()` when given no tenant; the
   // placeholder keeps an unresolved tenant's render static.
-  const tenant = getContextTenantId() ?? UNRESOLVED_TENANT_PLACEHOLDER;
-
-  const tenantContext = await getContextSanityContext();
+  const tenant = tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER;
   const [
     settingsResult,
     navResult,
@@ -131,18 +121,16 @@ export default async function LocaleLayout({ children, params }: TProps) {
     now,
     timeZone,
     t,
-    tenantLocales,
   ] = await Promise.all([
-    service.global.siteSettings.v1.getSiteSettings(tenantContext),
-    service.global.navigation.v1.getNavigation(tenantContext),
-    service.global.footer.v1.getFooter(tenantContext),
+    service.global.siteSettings.v1.getSiteSettings(sanityContext),
+    service.global.navigation.v1.getNavigation(sanityContext),
+    service.global.footer.v1.getFooter(sanityContext),
     getThemeTokens(tenant),
-    isContextCapabilityEnabled(CAPABILITY.ANALYTICS),
+    isCapabilityEnabled(CAPABILITY.ANALYTICS, tenant),
     getMessages(),
     getNow(),
     getTimeZone(),
     getTranslations('rss'),
-    getContextTenantLocales(),
   ]);
 
   if (!settingsResult.ok) {
@@ -156,7 +144,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
   }
 
   const { messages, rich } =
-    locale === tenantLocales?.defaultLocale
+    locale === defaultLocale
       ? await resolveTenantMessages(baseMessages, tenant)
       : {
           messages: baseMessages,
@@ -182,9 +170,9 @@ export default async function LocaleLayout({ children, params }: TProps) {
   const oauthProviderIds = getEnabledOAuthProviderIds();
   const analyticsEnabled =
     isWebAnalyticsEnabled() && isAnalyticsCapabilityEnabled;
-  const sanityImageBaseUrl = getSanityImageBaseUrl(tenantContext);
+  const sanityImageBaseUrl = getSanityImageBaseUrl(sanityContext);
   const brandLogoUrl = brand.logo
-    ? urlForSanityImage(brand.logo, tenantContext)
+    ? urlForSanityImage(brand.logo, sanityContext)
     : undefined;
   return (
     <DocumentShell lang={LOCALE_BCP47_TAGS[locale]}>

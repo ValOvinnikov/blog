@@ -1357,7 +1357,7 @@ every route. That is a Next.js file-convention rule, independent of the
 route's static/dynamic classification. `[tenant]/[locale]/layout.tsx` calls
 `enterRequestContext(params)` before anything else, and
 `app/[tenant]/not-found.tsx` reads the tenant back with
-`peekContextTenantId()` rather than the request header — a real `headers()`
+`peekRequestContext()` rather than the request header — a real `headers()`
 read there, on the same prerendered `/[tenant]/[locale]` route, would be
 expected to bail the render out of static and — with no `pages/500.html` to
 fall back on — return a bare 500 in place of the 404, the same failure #3191
@@ -1366,37 +1366,36 @@ fixed at the root boundary. Tokens and voice overrides come from the
 whose failure can be what raised the 404, so the _data_ a themed render
 would use is unaffected by that failure — but whether it renders themed at
 all turns on whether the context's `cache()`-scoped store still holds the
-tenant once `notFound()` has unwound the throwing render, and that hand-off
-isn't independently verified against a real layout-level `notFound()` in a
-production build: the boundary's tests mock `peekContextTenantId` directly.
-If the hand-off doesn't survive, `peekContextTenantId()` returns
-`undefined` and the boundary renders unthemed — a graceful fallback, never
-a 500.
+entered context once `notFound()` has unwound the throwing render, and that
+hand-off isn't independently verified against a real layout-level
+`notFound()` in a production build: the boundary's tests mock
+`peekRequestContext` directly. If the hand-off doesn't survive — or the
+404 came from entering the context itself (an unsupported locale, a tenant
+without credentials in production) — `peekRequestContext()` resolves
+`undefined` and the boundary renders unthemed: a graceful fallback, never a 500.
 
 **The request context** (`apps/web/src/server/request-context/`) is where a
 `[tenant]/[locale]` request's tenant-wide values live, so they are not
-threaded by hand. `enterRequestContext(params)` runs first in a route entry
-(the layout and its `generateMetadata` today; pages, their metadata and
-modules adopt it next). It stores the tenant from the route param — the
-unresolved-tenant placeholder stored as no tenant — _before_ validating the
-locale, so the 404 an unsupported locale throws (`notFound()`) is still
-themed; it then stores the locale and calls `setRequestLocale`. Entering
-twice with the same params is harmless; entering with different ones
-throws. It never reads `headers()` or `cookies()`, so routes stay static.
-`getContextTenantId()` and `getContextLocale()` throw an error naming
-`enterRequestContext()` when read before it ran; `peekContextTenantId()` is
-the 404 boundary's non-throwing read. `context-tenant.ts` serves, each
-`cache()`-deduped per request: the Sanity context with the locale applied
-(`getContextSanityContext`), the tenant base URL (`getContextBaseUrl`), the
-tenant's default and live locales (`getContextTenantLocales`) and capability
-checks (`isContextCapabilityEnabled`). The first three build from one read
-of the `tenants` row (archived rows included — the base URL applies
-`isTenantServable` and a `deprovisionedAt` check itself); the credentials
-come from `@blog/db`'s `toTenantSanityCredentials(row)`, which
-`getTenantSanityCredentials` also uses. Resolution matches
-`getTenantSanityContext`: no tenant serves the platform project; a tenant
-without credentials 404s in production and falls back to the platform
-project elsewhere.
+threaded by hand. It exports three functions. `enterRequestContext(params)`
+runs first in a route entry (the layout and its `generateMetadata` today;
+pages, their metadata and modules adopt it next): it 404s an unsupported
+locale, stores the tenant from the route param (the unresolved-tenant
+placeholder stored as no tenant) and the locale, calls `setRequestLocale`,
+and builds the context from one read of the `tenants` row. Entering twice
+with the same params is harmless; entering with different ones throws. It
+never reads `headers()` or `cookies()`, so routes stay static.
+`getRequestContext()` resolves one object — `tenantId`, `locale`,
+`sanityContext` (the locale applied), `metadataBase` (a ready `URL`), and
+the tenant's `defaultLocale` and `liveLocales` — which callers destructure;
+it holds stored values only, never flags derived from them, and throws an
+error naming `enterRequestContext()` when read before entry.
+`peekRequestContext()` is the 404 boundary's non-throwing variant. The row
+read includes archived rows (the base URL applies `isTenantServable` and a
+`deprovisionedAt` check itself), and the credentials come from `@blog/db`'s
+`toTenantSanityCredentials(row)`, which `getTenantSanityCredentials` also
+uses. Resolution matches `getTenantSanityContext`: no tenant serves the
+platform project; a tenant without credentials 404s in production and falls
+back to the platform project elsewhere.
 
 `app/global-not-found.tsx` (formerly the root `app/not-found.tsx`) serves
 URLs that match no route. It has no `[tenant]` route param to thread even
