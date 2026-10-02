@@ -13,6 +13,13 @@ import { isValidEmail } from '@web/utils/is-valid-email';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
 
+const ERROR_MESSAGE_KEYS = {
+  'already-subscribed': 'errorAlreadySubscribed',
+  unavailable: 'errorUnavailable',
+  invalid: 'errorInvalid',
+  'server-error': 'errorServer',
+} as const;
+
 const TRUST_CUE_ICONS = [ICONS.SHIELD_CHECK, ICONS.CLOSE];
 
 type TNewsletterFormProps = {
@@ -69,11 +76,7 @@ export const NewsletterForm = ({
     }
 
     setStatus('error');
-    setErrorMessage(
-      result.outcome === 'already-subscribed'
-        ? t('errorAlreadySubscribed')
-        : t('errorServer'),
-    );
+    setErrorMessage(t(ERROR_MESSAGE_KEYS[result.outcome]));
   };
 
   const sharedProps = {

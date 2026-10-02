@@ -1,5 +1,9 @@
-import { PRESET_ID, resolveTenantEmailBrand } from '@blog/config';
-import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
+import {
+  PRESET_ID,
+  resolveTenantEmailBrand,
+  TENANT_WRITE_REFUSAL,
+} from '@blog/config';
+import { TENANT_STATUS } from '@blog/db';
 import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
 
 const {
@@ -10,7 +14,8 @@ const {
   resolveTenantEmailIdentityMock,
   clearNewsletterSubscribedCookieMock,
 
-  isTenantActiveMock,
+  resolveWritableTenantMock,
+  resolveRequestTenantMock,
   getEmailConfigMock,
   getEmailTemplateMock,
 } = vi.hoisted(() => ({
@@ -20,7 +25,8 @@ const {
   sendEmailMock: vi.fn(),
   resolveTenantEmailIdentityMock: vi.fn(),
   clearNewsletterSubscribedCookieMock: vi.fn(),
-  isTenantActiveMock: vi.fn(),
+  resolveWritableTenantMock: vi.fn(),
+  resolveRequestTenantMock: vi.fn(),
   getEmailConfigMock: vi.fn(),
   getEmailTemplateMock: vi.fn(),
 }));
@@ -35,6 +41,11 @@ vi.mock('@blog/db', () => ({
     },
     emailConfig: { getEmailConfig: getEmailConfigMock },
     emailTemplates: { getEmailTemplate: getEmailTemplateMock },
+  },
+  TENANT_STATUS: {
+    ACTIVE: 'ACTIVE',
+    SUSPENDED: 'SUSPENDED',
+    ARCHIVED: 'ARCHIVED',
   },
   EMAIL_TEMPLATE_DEFAULT_COPY: {
     NEWSLETTER_CONFIRMATION: {
@@ -57,12 +68,14 @@ vi.mock('@web/server/newsletter/newsletter-subscribed-cookie', () => ({
   clearNewsletterSubscribedCookie: clearNewsletterSubscribedCookieMock,
 }));
 
-vi.mock('@web/server/tenant/get-request-tenant-id');
-
 vi.mock('@web/server/tenant/get-tenant-base-url');
 
-vi.mock('@web/server/tenant/is-tenant-active', () => ({
-  isTenantActive: isTenantActiveMock,
+vi.mock('@web/server/tenant/resolve-request-tenant', () => ({
+  resolveRequestTenant: resolveRequestTenantMock,
+}));
+
+vi.mock('@web/server/tenant/resolve-writable-tenant', () => ({
+  resolveWritableTenant: resolveWritableTenantMock,
 }));
 
 const TENANT_ID = 'tenant-1';
@@ -71,7 +84,6 @@ vi.mock('@web/utils/env/env', () => ({
   env: { NEWSLETTER_FROM_ADDRESS: undefined },
 }));
 
-const getRequestTenantIdMock = vi.mocked(getRequestTenantId);
 const getTenantBaseUrlMock = vi.mocked(getTenantBaseUrl);
 
 const session = {
@@ -83,10 +95,11 @@ describe('unsubscribeAction', () => {
     authMock.mockReset();
     unsubscribeMock.mockReset();
     clearNewsletterSubscribedCookieMock.mockReset();
-    getRequestTenantIdMock.mockReset();
-    getRequestTenantIdMock.mockResolvedValue(TENANT_ID);
-    isTenantActiveMock.mockReset();
-    isTenantActiveMock.mockResolvedValue(true);
+    resolveRequestTenantMock.mockReset();
+    resolveRequestTenantMock.mockResolvedValue({
+      id: TENANT_ID,
+      status: TENANT_STATUS.ACTIVE,
+    });
   });
 
   it('returns { ok: false } without unsubscribing when there is no session', async () => {
@@ -94,32 +107,42 @@ describe('unsubscribeAction', () => {
     const { unsubscribeAction } =
       await import('./newsletter-subscription-actions');
 
-    await expect(unsubscribeAction()).resolves.toEqual({ ok: false });
+    await expect(unsubscribeAction()).resolves.toEqual({
+      ok: false,
+      isUnavailable: false,
+    });
     expect(unsubscribeMock).not.toHaveBeenCalled();
     expect(clearNewsletterSubscribedCookieMock).not.toHaveBeenCalled();
   });
 
   it('returns { ok: false } without unsubscribing when no tenant resolves', async () => {
     authMock.mockResolvedValue(session);
-    getRequestTenantIdMock.mockResolvedValue(undefined);
+    resolveRequestTenantMock.mockResolvedValue(undefined);
     const { unsubscribeAction } =
       await import('./newsletter-subscription-actions');
 
-    await expect(unsubscribeAction()).resolves.toEqual({ ok: false });
+    await expect(unsubscribeAction()).resolves.toEqual({
+      ok: false,
+      isUnavailable: false,
+    });
     expect(unsubscribeMock).not.toHaveBeenCalled();
     expect(clearNewsletterSubscribedCookieMock).not.toHaveBeenCalled();
   });
 
-  it('returns { ok: false } without unsubscribing when the tenant is not ACTIVE', async () => {
-    authMock.mockResolvedValue(session);
-    isTenantActiveMock.mockResolvedValue(false);
-    const { unsubscribeAction } =
-      await import('./newsletter-subscription-actions');
+  it.each([TENANT_STATUS.SUSPENDED, TENANT_STATUS.ARCHIVED])(
+    'unsubscribes the session user when the tenant is %s',
+    async (status) => {
+      authMock.mockResolvedValue(session);
+      resolveRequestTenantMock.mockResolvedValue({ id: TENANT_ID, status });
+      unsubscribeMock.mockResolvedValue(undefined);
+      clearNewsletterSubscribedCookieMock.mockResolvedValue(undefined);
+      const { unsubscribeAction } =
+        await import('./newsletter-subscription-actions');
 
-    await expect(unsubscribeAction()).resolves.toEqual({ ok: false });
-    expect(unsubscribeMock).not.toHaveBeenCalled();
-    expect(clearNewsletterSubscribedCookieMock).not.toHaveBeenCalled();
-  });
+      await expect(unsubscribeAction()).resolves.toEqual({ ok: true });
+      expect(unsubscribeMock).toHaveBeenCalledWith(TENANT_ID, 'user-1');
+    },
+  );
 
   it('unsubscribes the session user, clears the cookie, and returns { ok: true }', async () => {
     authMock.mockResolvedValue(session);
@@ -140,7 +163,10 @@ describe('unsubscribeAction', () => {
     const { unsubscribeAction } =
       await import('./newsletter-subscription-actions');
 
-    await expect(unsubscribeAction()).resolves.toEqual({ ok: false });
+    await expect(unsubscribeAction()).resolves.toEqual({
+      ok: false,
+      isUnavailable: false,
+    });
     expect(errorSpy).toHaveBeenCalled();
     expect(clearNewsletterSubscribedCookieMock).not.toHaveBeenCalled();
     errorSpy.mockRestore();
@@ -177,12 +203,13 @@ describe('resendConfirmationAction', () => {
       }),
       brandName: 'Acme Blog',
     });
-    getRequestTenantIdMock.mockReset();
-    getRequestTenantIdMock.mockResolvedValue(TENANT_ID);
     getTenantBaseUrlMock.mockReset();
     getTenantBaseUrlMock.mockResolvedValue('https://example.com');
-    isTenantActiveMock.mockReset();
-    isTenantActiveMock.mockResolvedValue(true);
+    resolveWritableTenantMock.mockReset();
+    resolveWritableTenantMock.mockResolvedValue({
+      ok: true,
+      tenantId: TENANT_ID,
+    });
     getEmailConfigMock.mockReset();
     getEmailConfigMock.mockResolvedValue(undefined);
     getEmailTemplateMock.mockReset();
@@ -200,7 +227,10 @@ describe('resendConfirmationAction', () => {
     const { resendConfirmationAction } =
       await import('./newsletter-subscription-actions');
 
-    await expect(resendConfirmationAction()).resolves.toEqual({ ok: false });
+    await expect(resendConfirmationAction()).resolves.toEqual({
+      ok: false,
+      isUnavailable: false,
+    });
     expect(resendConfirmationMock).not.toHaveBeenCalled();
     expect(sendEmailMock).not.toHaveBeenCalled();
   });
@@ -210,28 +240,43 @@ describe('resendConfirmationAction', () => {
     const { resendConfirmationAction } =
       await import('./newsletter-subscription-actions');
 
-    await expect(resendConfirmationAction()).resolves.toEqual({ ok: false });
+    await expect(resendConfirmationAction()).resolves.toEqual({
+      ok: false,
+      isUnavailable: false,
+    });
     expect(resendConfirmationMock).not.toHaveBeenCalled();
   });
 
   it('returns { ok: false } without resending when no tenant resolves', async () => {
     authMock.mockResolvedValue(session);
-    getRequestTenantIdMock.mockResolvedValue(undefined);
+    resolveWritableTenantMock.mockResolvedValue({
+      ok: false,
+      reason: TENANT_WRITE_REFUSAL.UNRESOLVED,
+    });
     const { resendConfirmationAction } =
       await import('./newsletter-subscription-actions');
 
-    await expect(resendConfirmationAction()).resolves.toEqual({ ok: false });
+    await expect(resendConfirmationAction()).resolves.toEqual({
+      ok: false,
+      isUnavailable: false,
+    });
     expect(resendConfirmationMock).not.toHaveBeenCalled();
     expect(sendEmailMock).not.toHaveBeenCalled();
   });
 
-  it('returns { ok: false } without resending when the tenant is not ACTIVE', async () => {
+  it('returns { ok: false } without resending when the tenant is not ACTIVE, flagged unavailable', async () => {
     authMock.mockResolvedValue(session);
-    isTenantActiveMock.mockResolvedValue(false);
+    resolveWritableTenantMock.mockResolvedValue({
+      ok: false,
+      reason: TENANT_WRITE_REFUSAL.INACTIVE,
+    });
     const { resendConfirmationAction } =
       await import('./newsletter-subscription-actions');
 
-    await expect(resendConfirmationAction()).resolves.toEqual({ ok: false });
+    await expect(resendConfirmationAction()).resolves.toEqual({
+      ok: false,
+      isUnavailable: true,
+    });
     expect(resendConfirmationMock).not.toHaveBeenCalled();
     expect(sendEmailMock).not.toHaveBeenCalled();
   });
@@ -299,7 +344,10 @@ describe('resendConfirmationAction', () => {
     const { resendConfirmationAction } =
       await import('./newsletter-subscription-actions');
 
-    await expect(resendConfirmationAction()).resolves.toEqual({ ok: false });
+    await expect(resendConfirmationAction()).resolves.toEqual({
+      ok: false,
+      isUnavailable: false,
+    });
     expect(sendEmailMock).not.toHaveBeenCalled();
   });
 
@@ -315,7 +363,10 @@ describe('resendConfirmationAction', () => {
     const { resendConfirmationAction } =
       await import('./newsletter-subscription-actions');
 
-    await expect(resendConfirmationAction()).resolves.toEqual({ ok: false });
+    await expect(resendConfirmationAction()).resolves.toEqual({
+      ok: false,
+      isUnavailable: false,
+    });
     expect(errorSpy).toHaveBeenCalled();
     errorSpy.mockRestore();
   });

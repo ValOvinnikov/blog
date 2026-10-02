@@ -1,3 +1,4 @@
+import { TENANT_WRITE_REFUSAL } from '@blog/config';
 import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
 
 import { getBookmarkStatus, setBookmarkStatus } from './bookmark-actions';
@@ -5,13 +6,13 @@ import { getBookmarkStatus, setBookmarkStatus } from './bookmark-actions';
 const {
   authMock,
 
-  isTenantActiveMock,
+  resolveWritableTenantMock,
   isBookmarkedMock,
   addBookmarkMock,
   removeBookmarkMock,
 } = vi.hoisted(() => ({
   authMock: vi.fn(),
-  isTenantActiveMock: vi.fn(),
+  resolveWritableTenantMock: vi.fn(),
   isBookmarkedMock: vi.fn(),
   addBookmarkMock: vi.fn(),
   removeBookmarkMock: vi.fn(),
@@ -21,8 +22,8 @@ vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
 
 vi.mock('@web/server/tenant/get-request-tenant-id');
 
-vi.mock('@web/server/tenant/is-tenant-active', () => ({
-  isTenantActive: isTenantActiveMock,
+vi.mock('@web/server/tenant/resolve-writable-tenant', () => ({
+  resolveWritableTenant: resolveWritableTenantMock,
 }));
 
 vi.mock('@blog/db', () => ({
@@ -78,41 +79,51 @@ describe('getBookmarkStatus', () => {
 describe('setBookmarkStatus', () => {
   beforeEach(() => {
     authMock.mockReset();
-    getRequestTenantIdMock.mockReset();
-    getRequestTenantIdMock.mockResolvedValue(TENANT_ID);
-    isTenantActiveMock.mockReset();
-    isTenantActiveMock.mockResolvedValue(true);
+    resolveWritableTenantMock.mockReset();
+    resolveWritableTenantMock.mockResolvedValue({
+      ok: true,
+      tenantId: TENANT_ID,
+    });
     addBookmarkMock.mockReset();
     removeBookmarkMock.mockReset();
   });
 
-  it('returns { ok: false } without writing when there is no session', async () => {
+  it('returns a refusal without writing when there is no session', async () => {
     authMock.mockResolvedValue(null);
 
     await expect(setBookmarkStatus('post-1', true)).resolves.toEqual({
       ok: false,
+      isUnavailable: false,
     });
     expect(addBookmarkMock).not.toHaveBeenCalled();
     expect(removeBookmarkMock).not.toHaveBeenCalled();
   });
 
-  it('returns { ok: false } without writing when no tenant resolves', async () => {
+  it('returns a refusal without writing when no tenant resolves', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getRequestTenantIdMock.mockResolvedValue(undefined);
+    resolveWritableTenantMock.mockResolvedValue({
+      ok: false,
+      reason: TENANT_WRITE_REFUSAL.UNRESOLVED,
+    });
 
     await expect(setBookmarkStatus('post-1', true)).resolves.toEqual({
       ok: false,
+      isUnavailable: false,
     });
     expect(addBookmarkMock).not.toHaveBeenCalled();
     expect(removeBookmarkMock).not.toHaveBeenCalled();
   });
 
-  it('returns { ok: false } without writing when the tenant is not ACTIVE', async () => {
+  it('flags the refusal unavailable without writing when the tenant is not ACTIVE', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    isTenantActiveMock.mockResolvedValue(false);
+    resolveWritableTenantMock.mockResolvedValue({
+      ok: false,
+      reason: TENANT_WRITE_REFUSAL.INACTIVE,
+    });
 
     await expect(setBookmarkStatus('post-1', true)).resolves.toEqual({
       ok: false,
+      isUnavailable: true,
     });
     expect(addBookmarkMock).not.toHaveBeenCalled();
     expect(removeBookmarkMock).not.toHaveBeenCalled();
@@ -129,13 +140,14 @@ describe('setBookmarkStatus', () => {
     expect(removeBookmarkMock).not.toHaveBeenCalled();
   });
 
-  it('returns { ok: false } when addBookmark resolves a typed failure', async () => {
+  it('returns a refusal when addBookmark resolves a typed failure', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     addBookmarkMock.mockResolvedValue({ ok: false, error: 'DB_NOT_FOUND' });
 
     await expect(setBookmarkStatus('post-1', true)).resolves.toEqual({
       ok: false,
+      isUnavailable: false,
     });
 
     errorSpy.mockRestore();
@@ -156,13 +168,14 @@ describe('setBookmarkStatus', () => {
     expect(addBookmarkMock).not.toHaveBeenCalled();
   });
 
-  it('returns { ok: false } when the write throws', async () => {
+  it('returns a refusal when the write throws', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     addBookmarkMock.mockRejectedValue(new Error('boom'));
 
     await expect(setBookmarkStatus('post-1', true)).resolves.toEqual({
       ok: false,
+      isUnavailable: false,
     });
 
     errorSpy.mockRestore();

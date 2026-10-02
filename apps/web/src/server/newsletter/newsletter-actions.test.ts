@@ -1,5 +1,8 @@
-import { PRESET_ID, resolveTenantEmailBrand } from '@blog/config';
-import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
+import {
+  PRESET_ID,
+  resolveTenantEmailBrand,
+  TENANT_WRITE_REFUSAL,
+} from '@blog/config';
 import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
 
 const {
@@ -8,7 +11,7 @@ const {
   resolveTenantEmailIdentityMock,
   markNewsletterSubscribedMock,
 
-  isTenantActiveMock,
+  resolveWritableTenantMock,
   getEmailConfigMock,
   getEmailTemplateMock,
 } = vi.hoisted(() => ({
@@ -16,7 +19,7 @@ const {
   sendEmailMock: vi.fn(),
   resolveTenantEmailIdentityMock: vi.fn(),
   markNewsletterSubscribedMock: vi.fn(),
-  isTenantActiveMock: vi.fn(),
+  resolveWritableTenantMock: vi.fn(),
   getEmailConfigMock: vi.fn(),
   getEmailTemplateMock: vi.fn(),
 }));
@@ -48,12 +51,10 @@ vi.mock('@web/server/newsletter/newsletter-subscribed-cookie', () => ({
   markNewsletterSubscribed: markNewsletterSubscribedMock,
 }));
 
-vi.mock('@web/server/tenant/get-request-tenant-id');
-
 vi.mock('@web/server/tenant/get-tenant-base-url');
 
-vi.mock('@web/server/tenant/is-tenant-active', () => ({
-  isTenantActive: isTenantActiveMock,
+vi.mock('@web/server/tenant/resolve-writable-tenant', () => ({
+  resolveWritableTenant: resolveWritableTenantMock,
 }));
 
 const TENANT_ID = 'tenant-1';
@@ -62,7 +63,6 @@ vi.mock('@web/utils/env/env', () => ({
   env: { NEWSLETTER_FROM_ADDRESS: undefined },
 }));
 
-const getRequestTenantIdMock = vi.mocked(getRequestTenantId);
 const getTenantBaseUrlMock = vi.mocked(getTenantBaseUrl);
 
 const subscriber = {
@@ -90,12 +90,13 @@ describe('subscribeToNewsletterAction', () => {
       brandName: 'Acme Blog',
     });
     markNewsletterSubscribedMock.mockReset();
-    getRequestTenantIdMock.mockReset();
-    getRequestTenantIdMock.mockResolvedValue(TENANT_ID);
     getTenantBaseUrlMock.mockReset();
     getTenantBaseUrlMock.mockResolvedValue('https://example.com');
-    isTenantActiveMock.mockReset();
-    isTenantActiveMock.mockResolvedValue(true);
+    resolveWritableTenantMock.mockReset();
+    resolveWritableTenantMock.mockResolvedValue({
+      ok: true,
+      tenantId: TENANT_ID,
+    });
     getEmailConfigMock.mockReset();
     getEmailConfigMock.mockResolvedValue(undefined);
     getEmailTemplateMock.mockReset();
@@ -188,7 +189,10 @@ describe('subscribeToNewsletterAction', () => {
   });
 
   it('returns "server-error" without touching the db when no tenant resolves', async () => {
-    getRequestTenantIdMock.mockResolvedValue(undefined);
+    resolveWritableTenantMock.mockResolvedValue({
+      ok: false,
+      reason: TENANT_WRITE_REFUSAL.UNRESOLVED,
+    });
     const { subscribeToNewsletterAction } =
       await import('./newsletter-actions');
 
@@ -200,14 +204,17 @@ describe('subscribeToNewsletterAction', () => {
     expect(markNewsletterSubscribedMock).not.toHaveBeenCalled();
   });
 
-  it('returns "server-error" without touching the db when the tenant is not ACTIVE', async () => {
-    isTenantActiveMock.mockResolvedValue(false);
+  it('returns "unavailable" without touching the db when the tenant is not ACTIVE', async () => {
+    resolveWritableTenantMock.mockResolvedValue({
+      ok: false,
+      reason: TENANT_WRITE_REFUSAL.INACTIVE,
+    });
     const { subscribeToNewsletterAction } =
       await import('./newsletter-actions');
 
     await expect(
       subscribeToNewsletterAction('reader@example.com'),
-    ).resolves.toEqual({ outcome: 'server-error' });
+    ).resolves.toEqual({ outcome: 'unavailable' });
     expect(createPendingSubscriberMock).not.toHaveBeenCalled();
     expect(sendEmailMock).not.toHaveBeenCalled();
     expect(markNewsletterSubscribedMock).not.toHaveBeenCalled();
