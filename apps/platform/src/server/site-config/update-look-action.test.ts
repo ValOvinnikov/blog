@@ -3,6 +3,7 @@ import {
   AUDIT_TARGET_TYPE,
   DENSITY,
   FONT_CHOICE,
+  LANGUAGE_SWITCHER_STYLE,
   PRESET_ID,
   RADIUS_SCALE,
 } from '@blog/config';
@@ -51,6 +52,7 @@ const VALID_INPUT: TUpdateLookInput = {
   bodyFont: FONT_CHOICE.INTER,
   radiusScale: RADIUS_SCALE.SM,
   density: DENSITY.COMPACT,
+  languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_GLOBE,
 };
 
 describe(updateLookAction, () => {

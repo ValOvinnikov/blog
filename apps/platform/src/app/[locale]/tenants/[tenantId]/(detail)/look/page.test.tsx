@@ -19,7 +19,10 @@ vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     admins: { getAdminByUserId: getAdminByUserIdMock },
-    tenants: { getTenantById: getTenantByIdMock },
+    tenants: {
+      getTenantById: getTenantByIdMock,
+      getTenantLiveLocales: vi.fn().mockResolvedValue(['EN']),
+    },
     siteConfig: { getSiteConfig: getSiteConfigMock },
   },
 }));

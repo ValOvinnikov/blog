@@ -1,8 +1,10 @@
 import {
+  LANGUAGE_SWITCHER_STYLE,
   PRESET_ID,
   PRESET_REGISTRY,
   type TDensity,
   type TFontChoice,
+  type TLanguageSwitcherStyle,
   type TPresetId,
   type TRadiusScale,
 } from '@blog/config';
@@ -16,6 +18,7 @@ export type TLookFormValues = {
   bodyFont: TFontChoice;
   radiusScale: TRadiusScale;
   density: TDensity;
+  languageSwitcherStyle: TLanguageSwitcherStyle;
   logoAssetUrl: string | undefined;
   faviconAssetUrl: string | undefined;
 };
@@ -36,6 +39,7 @@ export const defaultLookFormValues = (): TLookFormValues => {
     bodyFont: consoleTokens.bodyFont,
     radiusScale: consoleTokens.radiusScale,
     density: consoleTokens.density,
+    languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
     logoAssetUrl: undefined,
     faviconAssetUrl: undefined,
   };
@@ -52,6 +56,7 @@ export const toLookFormValues = (
     bodyFont: siteConfig.bodyFont,
     radiusScale: siteConfig.radiusScale,
     density: siteConfig.density,
+    languageSwitcherStyle: siteConfig.languageSwitcherStyle,
     logoAssetUrl: siteConfig.logoAssetUrl,
     faviconAssetUrl: siteConfig.faviconAssetUrl,
   };

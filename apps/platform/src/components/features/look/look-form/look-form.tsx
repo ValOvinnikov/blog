@@ -25,6 +25,7 @@ export type TLookFormProps = {
   tenantName: string;
   primaryDomain: string;
   initialValues: TLookFormValues;
+  hasMultipleLanguages: boolean;
   archivedAt?: Date;
 };
 
@@ -37,8 +38,8 @@ export type TLookFormFieldSetter = <K extends keyof TLookFormValues>(
  * Applying a preset (via the picker or "Reset to preset") re-seeds every
  * `PRESET_REGISTRY` default — that's what "preset" means: a starting point,
  * not a locked-in choice. Individual controls remain freely adjustable
- * afterward. Brand images are independent of preset, so `current`'s asset
- * URLs carry through unchanged rather than being reset.
+ * afterward. Brand images and the language switcher style are independent
+ * of preset, so `current`'s values for them carry through unchanged.
  */
 const applyPresetDefaults = (
   preset: TPresetId,
@@ -54,6 +55,7 @@ const applyPresetDefaults = (
     bodyFont: tokens.bodyFont,
     radiusScale: tokens.radiusScale,
     density: tokens.density,
+    languageSwitcherStyle: current.languageSwitcherStyle,
     logoAssetUrl: current.logoAssetUrl,
     faviconAssetUrl: current.faviconAssetUrl,
   };
@@ -68,6 +70,7 @@ const valuesEqual = (a: TLookFormValues, b: TLookFormValues): boolean => {
     a.bodyFont === b.bodyFont &&
     a.radiusScale === b.radiusScale &&
     a.density === b.density &&
+    a.languageSwitcherStyle === b.languageSwitcherStyle &&
     a.logoAssetUrl === b.logoAssetUrl &&
     a.faviconAssetUrl === b.faviconAssetUrl
   );
@@ -78,6 +81,7 @@ export const LookForm = ({
   tenantName,
   primaryDomain,
   initialValues,
+  hasMultipleLanguages,
   archivedAt,
 }: TLookFormProps) => {
   const isArchived = Boolean(archivedAt);
@@ -98,6 +102,7 @@ export const LookForm = ({
           bodyFont: vals.bodyFont,
           radiusScale: vals.radiusScale,
           density: vals.density,
+          languageSwitcherStyle: vals.languageSwitcherStyle,
         }),
       onSuccess: (submittedValues) => {
         setSavedValues(submittedValues);
@@ -207,6 +212,8 @@ export const LookForm = ({
               bodyFont={values.bodyFont}
               radiusScale={values.radiusScale}
               density={values.density}
+              languageSwitcherStyle={values.languageSwitcherStyle}
+              hasMultipleLanguages={hasMultipleLanguages}
               onFieldChange={updateField}
               isArchived={isArchived}
               archivedNoticeId={archivedNoticeId}
