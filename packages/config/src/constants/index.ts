@@ -26,5 +26,6 @@ export * from './price-period';
 export * from './reserved-slug';
 export * from './size';
 export * from './taxonomy';
+export * from './tenant-write-refusal';
 export * from './timeline';
 export * from './toast';

@@ -130,6 +130,7 @@
     "saveAriaLabel": "Guardar artículo",
     "removeAriaLabel": "Quitar de guardados",
     "error": "No se pudo guardar. Vuelva a intentarlo.",
+    "errorUnavailable": "Los marcadores no están disponibles en este sitio en este momento.",
     "toastSavedMessage": "Añadido a guardados",
     "toastRemovedMessage": "Quitado de guardados",
     "toastRevertedMessage": "Deshecho",
@@ -150,7 +151,8 @@
     "successMessage": "Ya casi está — revise su bandeja de entrada para confirmar.",
     "errorInvalid": "Introduzca un correo electrónico válido.",
     "errorAlreadySubscribed": "Ese correo electrónico ya está suscrito.",
-    "errorServer": "Algo ha salido mal. Vuelva a intentarlo."
+    "errorServer": "Algo ha salido mal. Vuelva a intentarlo.",
+    "errorUnavailable": "Este sitio no acepta nuevas suscripciones en este momento."
   },
   "newsletterConfirm": {
     "confirmedTitle": "Suscripción confirmada",
@@ -159,6 +161,8 @@
     "invalidMessage": "Este enlace de confirmación no es válido o ha caducado.",
     "errorTitle": "Algo ha salido mal",
     "errorMessage": "No hemos podido confirmar su suscripción. Vuelva a intentarlo más tarde.",
+    "unavailableTitle": "No se puede confirmar ahora",
+    "unavailableMessage": "Este sitio no acepta cambios en este momento, por lo que no pudimos procesar tu enlace de confirmación.",
     "returnHome": "Volver al inicio"
   },
   "newsletterUnsubscribe": {
@@ -169,6 +173,10 @@
     "successMessage": "Ya no recibirá nuestro boletín.",
     "invalidTitle": "El enlace ya no es válido",
     "invalidMessage": "Este enlace de baja ya no es válido — es posible que ya se haya dado de baja.",
+    "errorTitle": "Algo salió mal",
+    "errorMessage": "No pudimos cancelar tu suscripción. Inténtalo de nuevo más tarde.",
+    "unavailableTitle": "No se puede cancelar la suscripción ahora",
+    "unavailableMessage": "Este sitio no acepta cambios en este momento, por lo que no pudimos procesar tu enlace para cancelar la suscripción.",
     "returnHome": "Volver al inicio"
   },
   "accountPage": {
@@ -201,9 +209,11 @@
       "unsubscribeToastLoadingMessage": "Dándole de baja…",
       "unsubscribeToastSuccessMessage": "Se ha dado de baja.",
       "unsubscribeError": "No se pudo tramitar la baja. Vuelva a intentarlo.",
+      "unsubscribeUnavailable": "Cancelar la suscripción no está disponible en este sitio en este momento.",
       "resendToastLoadingMessage": "Reenviando el correo de confirmación…",
       "resendToastSuccessMessage": "Correo de confirmación reenviado.",
-      "resendError": "No se pudo reenviar el correo de confirmación. Vuelva a intentarlo."
+      "resendError": "No se pudo reenviar el correo de confirmación. Vuelva a intentarlo.",
+      "resendUnavailable": "El reenvío no está disponible en este sitio en este momento."
     },
     "identity": {
       "heading": "Cuentas vinculadas",

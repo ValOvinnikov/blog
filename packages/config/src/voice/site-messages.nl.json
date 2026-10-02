@@ -130,6 +130,7 @@
     "saveAriaLabel": "Bericht bewaren",
     "removeAriaLabel": "Bladwijzer verwijderen",
     "error": "Dat kon niet worden bewaard. Probeer het opnieuw.",
+    "errorUnavailable": "Bladwijzers opslaan is op deze site momenteel niet beschikbaar.",
     "toastSavedMessage": "Bewaard in bladwijzers",
     "toastRemovedMessage": "Verwijderd uit bladwijzers",
     "toastRevertedMessage": "Teruggedraaid",
@@ -150,7 +151,8 @@
     "successMessage": "Bijna klaar — controleer uw inbox om te bevestigen.",
     "errorInvalid": "Voer een geldig e-mailadres in.",
     "errorAlreadySubscribed": "Dit e-mailadres is al geabonneerd.",
-    "errorServer": "Er is iets misgegaan. Probeer het opnieuw."
+    "errorServer": "Er is iets misgegaan. Probeer het opnieuw.",
+    "errorUnavailable": "Deze site neemt op dit moment geen nieuwe inschrijvingen aan."
   },
   "newsletterConfirm": {
     "confirmedTitle": "Abonnement bevestigd",
@@ -159,6 +161,8 @@
     "invalidMessage": "Deze bevestigingslink is ongeldig of verlopen.",
     "errorTitle": "Er is iets misgegaan",
     "errorMessage": "We konden uw abonnement niet bevestigen. Probeer het later opnieuw.",
+    "unavailableTitle": "Bevestigen kan nu niet",
+    "unavailableMessage": "Deze site accepteert op dit moment geen wijzigingen, dus we konden je bevestigingslink niet verwerken.",
     "returnHome": "Terug naar home"
   },
   "newsletterUnsubscribe": {
@@ -169,6 +173,10 @@
     "successMessage": "U ontvangt geen nieuwsbrief meer van ons.",
     "invalidTitle": "Link niet meer geldig",
     "invalidMessage": "Deze afmeldlink is niet meer geldig — mogelijk bent u al afgemeld.",
+    "errorTitle": "Er ging iets mis",
+    "errorMessage": "We konden je niet uitschrijven. Probeer het later opnieuw.",
+    "unavailableTitle": "Uitschrijven kan nu niet",
+    "unavailableMessage": "Deze site accepteert op dit moment geen wijzigingen, dus we konden je uitschrijflink niet verwerken.",
     "returnHome": "Terug naar home"
   },
   "accountPage": {
@@ -201,9 +209,11 @@
       "unsubscribeToastLoadingMessage": "Afmelden…",
       "unsubscribeToastSuccessMessage": "U bent afgemeld.",
       "unsubscribeError": "Afmelden is mislukt. Probeer het opnieuw.",
+      "unsubscribeUnavailable": "Uitschrijven is op deze site momenteel niet beschikbaar.",
       "resendToastLoadingMessage": "De bevestigingsmail wordt opnieuw verstuurd…",
       "resendToastSuccessMessage": "Bevestigingsmail opnieuw verstuurd.",
-      "resendError": "De bevestigingsmail kon niet opnieuw worden verstuurd. Probeer het opnieuw."
+      "resendError": "De bevestigingsmail kon niet opnieuw worden verstuurd. Probeer het opnieuw.",
+      "resendUnavailable": "Opnieuw verzenden is op deze site momenteel niet beschikbaar."
     },
     "identity": {
       "heading": "Gekoppelde accounts",
