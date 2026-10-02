@@ -233,7 +233,8 @@
       "PROVISIONED": "Tenant provisioned",
       "PROVISIONING_FAILED": "Provisioning failed",
       "SETTINGS_UPDATED": "Settings updated",
-      "DELETED": "Tenant deleted"
+      "DELETED": "Tenant deleted",
+      "READER_DATA_PURGED": "Reader data purged"
     }
   },
   "tenantDomainPage": {
@@ -557,6 +558,7 @@
       "REVOKE_SANITY_TOKENS": "Revoke Sanity tokens",
       "CLEAR_ARTIFACTS": "Clear provisioning artifacts",
       "ARCHIVE_TENANT": "Archive tenant",
+      "PURGE_READER_DATA": "Purge reader data",
       "INVALIDATE_TENANT_CACHE": "Invalidate cached pages"
     },
     "statusLabel": {

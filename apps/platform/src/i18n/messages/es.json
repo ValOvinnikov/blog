@@ -233,7 +233,8 @@
       "PROVISIONED": "Cliente aprovisionado",
       "PROVISIONING_FAILED": "Aprovisionamiento fallido",
       "SETTINGS_UPDATED": "Configuración actualizada",
-      "DELETED": "Cliente eliminado"
+      "DELETED": "Cliente eliminado",
+      "READER_DATA_PURGED": "Datos de lectores purgados"
     }
   },
   "tenantDomainPage": {
@@ -557,6 +558,7 @@
       "REVOKE_SANITY_TOKENS": "Revocar tokens de Sanity",
       "CLEAR_ARTIFACTS": "Eliminar artefactos de aprovisionamiento",
       "ARCHIVE_TENANT": "Archivar cliente",
+      "PURGE_READER_DATA": "Purgar datos de lectores",
       "INVALIDATE_TENANT_CACHE": "Invalidar páginas en caché"
     },
     "statusLabel": {
