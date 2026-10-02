@@ -1,9 +1,26 @@
+import type { TTenant } from '@blog/db/schema/tenants';
+import {
+  TENANT_ID_HEADER,
+  UNRESOLVED_TENANT_PLACEHOLDER,
+} from '@web/server/tenant/constants/constants';
+import {
+  resolveTenant,
+  resolveTenantById,
+} from '@web/server/tenant/resolve-tenant/resolve-tenant';
 import { isValidTenantId } from '@web/utils/is-tenant-shaped-path-segment';
 import { headers } from 'next/headers';
 import { cache } from 'react';
 
-import { TENANT_ID_HEADER } from './tenant-id-header';
-import { UNRESOLVED_TENANT_PLACEHOLDER } from './unresolved-tenant-placeholder';
+/** `proxy.ts` does not sanitise `x-tenant-id` on `/api/*` or dotted paths, so it is never trusted here. */
+export const resolveRequestTenant = cache(
+  async (tenant?: string): Promise<TTenant | undefined> => {
+    if (tenant === UNRESOLVED_TENANT_PLACEHOLDER) return undefined;
+    if (tenant) return resolveTenantById(tenant);
+
+    const host = (await headers()).get('host');
+    return resolveTenant(host);
+  },
+);
 
 /**
  * Preferring `tenant` over the header avoids the header read, which makes a route dynamic.

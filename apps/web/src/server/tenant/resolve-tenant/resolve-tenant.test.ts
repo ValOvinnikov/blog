@@ -1,7 +1,12 @@
-import { TENANT_STATUS } from '@blog/db';
+import { TENANT_PROVISIONING_STATUS, TENANT_STATUS } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
 
-import { resolveTenant, resolveTenantById } from './resolve-tenant';
+import {
+  isTenantServable,
+  resolveTenant,
+  resolveTenantById,
+  resolveTenantId,
+} from './resolve-tenant';
 
 const {
   getTenantByDomainMock,
@@ -223,5 +228,93 @@ describe(resolveTenantById, () => {
     );
 
     await expect(resolveTenantById('tenant-1')).resolves.toBeUndefined();
+  });
+});
+
+describe(isTenantServable, () => {
+  beforeEach(() => {
+    isProductionEnvironmentMock.mockReset();
+    isProductionEnvironmentMock.mockReturnValue(false);
+  });
+
+  it('accepts a READY tenant with credentials in production', () => {
+    isProductionEnvironmentMock.mockReturnValue(true);
+    const tenant = buildServableTenant({
+      provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
+    });
+
+    expect(isTenantServable(tenant)).toBe(true);
+  });
+
+  it('rejects a non-READY tenant in production even with credentials present', () => {
+    isProductionEnvironmentMock.mockReturnValue(true);
+    const tenant = buildServableTenant({
+      provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
+    });
+
+    expect(isTenantServable(tenant)).toBe(false);
+  });
+
+  it('rejects a tenant with no provisioningStatus recorded in production', () => {
+    isProductionEnvironmentMock.mockReturnValue(true);
+    const tenant = buildServableTenant({ provisioningStatus: null });
+
+    expect(isTenantServable(tenant)).toBe(false);
+  });
+
+  it('does not require READY outside production', () => {
+    isProductionEnvironmentMock.mockReturnValue(false);
+    const tenant = buildServableTenant({ provisioningStatus: null });
+
+    expect(isTenantServable(tenant)).toBe(true);
+  });
+
+  it('rejects an archived tenant regardless of provisioning status', () => {
+    isProductionEnvironmentMock.mockReturnValue(false);
+    const tenant = buildServableTenant({ status: TENANT_STATUS.ARCHIVED });
+
+    expect(isTenantServable(tenant)).toBe(false);
+  });
+
+  it('rejects a tenant missing Sanity credentials regardless of provisioning status', () => {
+    isProductionEnvironmentMock.mockReturnValue(true);
+    const tenant = buildServableTenant({
+      sanityProjectId: null,
+      provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
+    });
+
+    expect(isTenantServable(tenant)).toBe(false);
+  });
+});
+
+describe(resolveTenantId, () => {
+  beforeEach(() => {
+    getTenantByDomainMock.mockReset();
+    listTenantsMock.mockReset();
+    isProductionEnvironmentMock.mockReset();
+    isProductionEnvironmentMock.mockReturnValue(false);
+  });
+
+  it("delegates to resolveTenant and returns the resolved row's id", async () => {
+    getTenantByDomainMock.mockResolvedValue(buildServableTenant());
+
+    await expect(resolveTenantId('acme.example.com')).resolves.toBe('tenant-1');
+    expect(getTenantByDomainMock).toHaveBeenCalledWith('acme.example.com');
+  });
+
+  it('resolves undefined when resolveTenant resolves no tenant', async () => {
+    getTenantByDomainMock.mockResolvedValue(undefined);
+    listTenantsMock.mockResolvedValue([]);
+
+    await expect(
+      resolveTenantId('unknown.example.com'),
+    ).resolves.toBeUndefined();
+  });
+
+  it('passes a null host through unchanged', async () => {
+    listTenantsMock.mockResolvedValue([buildServableTenant()]);
+
+    await expect(resolveTenantId(null)).resolves.toBe('tenant-1');
+    expect(getTenantByDomainMock).not.toHaveBeenCalled();
   });
 });

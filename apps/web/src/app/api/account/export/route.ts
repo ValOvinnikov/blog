@@ -1,6 +1,6 @@
 import { queries } from '@blog/db';
 import { auth } from '@web/server/auth/auth';
-import { resolveTenantId } from '@web/server/tenant/resolve-tenant-id';
+import { resolveTenantId } from '@web/server/tenant/resolve-tenant/resolve-tenant';
 import { logger } from '@web/utils/logger/logger';
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';

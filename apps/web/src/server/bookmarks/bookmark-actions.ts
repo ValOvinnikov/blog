@@ -3,8 +3,8 @@
 import { TENANT_WRITE_REFUSAL } from '@blog/config';
 import { queries } from '@blog/db';
 import { auth } from '@web/server/auth/auth';
-import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
-import { resolveWritableTenant } from '@web/server/tenant/resolve-writable-tenant';
+import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
+import { resolveWritableTenant } from '@web/server/tenant/write-gate/write-gate';
 import { logger } from '@web/utils/logger/logger';
 
 export type TSetBookmarkResult =

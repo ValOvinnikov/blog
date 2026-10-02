@@ -6,10 +6,12 @@ import {
   type TTenantSanityContext,
 } from '@blog/service';
 import { routing } from '@web/i18n/routing';
-import { isPlatformFallbackAllowed } from '@web/server/tenant/is-platform-fallback-allowed';
-import { isTenantServable } from '@web/server/tenant/is-tenant-servable';
-import { toTenantBaseUrl } from '@web/server/tenant/to-tenant-base-url';
-import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/unresolved-tenant-placeholder';
+import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
+import {
+  isPlatformFallbackAllowed,
+  isTenantServable,
+} from '@web/server/tenant/resolve-tenant/resolve-tenant';
+import { toTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 import { isValidTenantId } from '@web/utils/is-tenant-shaped-path-segment';
 import { notFound } from 'next/navigation';
 import { hasLocale } from 'next-intl';

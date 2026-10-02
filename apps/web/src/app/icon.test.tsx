@@ -21,9 +21,12 @@ vi.mock('@blog/service', async (importOriginal) => {
   };
 });
 
-vi.mock('@web/server/tenant/get-host-tenant-sanity-context', () => ({
-  getHostTenantSanityContext: getHostTenantSanityContextMock,
-}));
+vi.mock(
+  '@web/server/tenant/tenant-sanity-context/tenant-sanity-context',
+  () => ({
+    getHostTenantSanityContext: getHostTenantSanityContextMock,
+  }),
+);
 
 const logo: ISanityImage = {
   assetId: 'image-abc123def-800x600-svg',

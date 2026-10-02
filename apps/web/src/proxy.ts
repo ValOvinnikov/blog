@@ -6,11 +6,13 @@ import createMiddleware from 'next-intl/middleware';
 
 import { buildTenantRouting, localeForPrefix } from './i18n/routing';
 import {
+  TENANT_ID_HEADER,
+  UNRESOLVED_TENANT_PLACEHOLDER,
+} from './server/tenant/constants/constants';
+import {
   resolveTenantRouting,
   type TTenantRouting,
-} from './server/tenant/resolve-tenant-routing';
-import { TENANT_ID_HEADER } from './server/tenant/tenant-id-header';
-import { UNRESOLVED_TENANT_PLACEHOLDER } from './server/tenant/unresolved-tenant-placeholder';
+} from './server/tenant/resolve-tenant/resolve-tenant';
 import { isProductionEnvironment } from './utils/is-production-environment';
 
 const intlMiddlewares = new Map<string, ReturnType<typeof createMiddleware>>();

@@ -2,7 +2,7 @@
  * @vitest-environment jsdom
  */
 import type { TFeedPost } from '@blog/service';
-import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
+import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 import { makeTagDetailPage } from '@web/testing/shared/tag/fixtures';
 import { notFound } from 'next/navigation';
 
@@ -27,11 +27,14 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-host-tenant-sanity-context', () => ({
-  getHostTenantSanityContext: getHostTenantSanityContextMock,
-}));
+vi.mock(
+  '@web/server/tenant/tenant-sanity-context/tenant-sanity-context',
+  () => ({
+    getHostTenantSanityContext: getHostTenantSanityContextMock,
+  }),
+);
 
-vi.mock('@web/server/tenant/get-tenant-base-url');
+vi.mock('@web/server/tenant/tenant-base-url/tenant-base-url');
 
 const getTenantBaseUrlMock = vi.mocked(getTenantBaseUrl);
 

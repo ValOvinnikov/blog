@@ -1,4 +1,4 @@
-import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
+import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
 
 import { getTenantPlan } from './get-tenant-plan';
 
@@ -6,7 +6,7 @@ const { getTenantByIdMock } = vi.hoisted(() => ({
   getTenantByIdMock: vi.fn(),
 }));
 
-vi.mock('@web/server/tenant/get-request-tenant-id');
+vi.mock('@web/server/tenant/request-tenant/request-tenant');
 
 vi.mock('@blog/db', () => ({
   queries: {

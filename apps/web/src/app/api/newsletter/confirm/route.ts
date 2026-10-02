@@ -1,6 +1,6 @@
 import { TENANT_WRITE_REFUSAL } from '@blog/config';
 import { queries } from '@blog/db';
-import { resolveWritableTenant } from '@web/server/tenant/resolve-writable-tenant';
+import { resolveWritableTenant } from '@web/server/tenant/write-gate/write-gate';
 import { logger } from '@web/utils/logger/logger';
 import type { NextResponse } from 'next/server';
 import { getLocale, getTranslations } from 'next-intl/server';

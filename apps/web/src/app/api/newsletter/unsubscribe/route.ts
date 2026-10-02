@@ -1,6 +1,6 @@
 import { routes } from '@blog/config';
 import { queries } from '@blog/db';
-import { resolveRequestTenant } from '@web/server/tenant/resolve-request-tenant';
+import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { logger } from '@web/utils/logger/logger';
 import type { NextResponse } from 'next/server';
 import { getLocale, getTranslations } from 'next-intl/server';

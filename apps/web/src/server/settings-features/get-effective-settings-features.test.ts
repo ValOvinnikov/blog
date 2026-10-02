@@ -1,4 +1,4 @@
-import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
+import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
 
 import { getEffectiveSettingsFeatures } from './get-effective-settings-features';
 
@@ -7,7 +7,7 @@ const { getSettingsFeaturesMock, getSiteConfigMock } = vi.hoisted(() => ({
   getSiteConfigMock: vi.fn(),
 }));
 
-vi.mock('@web/server/tenant/get-request-tenant-id');
+vi.mock('@web/server/tenant/request-tenant/request-tenant');
 
 vi.mock('@blog/db', () => ({
   queries: {

@@ -11,7 +11,7 @@ import {
   getRequestContext,
 } from '@web/server/request-context/request-context';
 import { getSiteSettings } from '@web/server/site-settings/get-site-settings';
-import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/unresolved-tenant-placeholder';
+import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { getThemeTokens } from '@web/utils/get-theme-tokens';
 import { isProductionEnvironment } from '@web/utils/is-production-environment';
 import { logger } from '@web/utils/logger/logger';
