@@ -357,9 +357,9 @@ tenant)`) is fine: that call is the component's contract with the outside.
     test covers what it renders.
 - **An edge fake is written once, next to the module it replaces.** Put the
   default fake in a `__mocks__/` directory beside the module's file
-  (`server/tenant/__mocks__/get-tenant-base-url.ts` for
-  `server/tenant/get-tenant-base-url.ts`); a test then writes
-  `vi.mock('@web/server/tenant/get-tenant-base-url')` with no factory and
+  (`server/tenant/tenant-base-url/__mocks__/tenant-base-url.ts` for
+  `server/tenant/tenant-base-url/tenant-base-url.ts`); a test then writes
+  `vi.mock('@web/server/tenant/tenant-base-url/tenant-base-url')` with no factory and
   Vitest picks it up, alias included. Platform is the same:
   `server/auth/__mocks__/auth.ts` serves every
   `vi.mock('@platform/server/auth/auth')`. Export each fake function as a

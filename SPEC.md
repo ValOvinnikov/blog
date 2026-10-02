@@ -1306,7 +1306,7 @@ bundled/preloaded. Fonts are self-hosted in both apps: Latin-subset variable
 woff2 files (SIL OFL, `OFL.txt` alongside) are committed beside each app's
 loaders, so no build fetches Google Fonts. `apps/web/src/proxy.ts` resolves the request's tenant from
 its `Host` header against `@blog/db`'s `tenant_domains`
-(`resolveTenantId()`, `apps/web/src/server/tenant/`), falling back to the
+(`resolveTenantId()`, `apps/web/src/server/tenant/resolve-tenant/`), falling back to the
 sole `tenants` row outside production (`isProductionEnvironment()` — never
 `NODE_ENV`, which is `production` on every Vercel build including the live
 `web-dev` deployment) and 404ing on an unmatched host in production; the
@@ -1326,9 +1326,10 @@ site. That last requirement is production-scoped because local and dev tenant
 rows predate provisioning tracking and legitimately carry no status; a null
 status is refused in production, never waved through. **Writes** are refused for any tenant
 that is not ACTIVE (`isTenantActive()`), so a SUSPENDED tenant's site stays
-readable while nothing new lands against it. Both live in
-`apps/web/src/server/tenant/`, and every tenant-scoped mutation checks the
-latter — one shared predicate rather than a per-call-site status check, since
+readable while nothing new lands against it. The first lives in
+`apps/web/src/server/tenant/resolve-tenant/` and the second in
+`write-gate/`, and every tenant-scoped mutation checks it — through
+`resolveWritableTenant` or the host write context's `isActive` — one shared predicate rather than a per-call-site status check, since
 independent predicates drift apart. The asymmetry is the point: a suspended
 tenant should still be visible, and a frozen or torn-down one should not
 accumulate rows that a later restore would have to reconcile.
@@ -1804,10 +1805,13 @@ in the build and scales into a per-page `staticPageGenerationTimeout` cliff.
 **The tenant reaches a route through its `[tenant]` path segment, not a
 request header.** `proxy.ts` resolves it from `Host` and writes it into the
 path by rewrite (invisible in the URL, as `localePrefix: 'never'` already
-hides the locale), and routes pass `params.tenant` down explicitly —
+hides the locale), and every `[tenant]/[locale]` layout, page and
+`generateMetadata` enters the request context from those params
+(`enterRequestContext`, `apps/web/src/server/request-context/`), which
+everything below it reads instead of receiving the tenant as a prop —
 `ITenantLocalizedParams` in `@blog/config` types the pair. The two functions
 that read the request (`getRequestTenantId`, `resolveRequestTenant`, in
-`apps/web/src/server/tenant/`) take the tenant as an argument and only touch
+`apps/web/src/server/tenant/request-tenant/`) take the tenant as an argument and only touch
 `headers()` when not given one. That fallback serves Server Actions and the
 root-level `Host`-resolved routes (`robots.ts`/`sitemap.ts`/`rss.xml`) — none
 of which have route params to thread — and also the `account`/`bookmarks`
