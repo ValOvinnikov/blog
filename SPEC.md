@@ -1381,8 +1381,7 @@ error naming `enterRequestContext()` when read before entry. The row
 read includes archived rows (the base URL applies `isTenantServable` and a
 `deprovisionedAt` check itself), and the credentials come from `@blog/db`'s
 `toTenantSanityCredentials(row)`, which `getTenantSanityCredentials` also
-uses. Resolution matches `getTenantSanityContext`: no tenant serves the
-platform project; a tenant without credentials 404s in production and falls
+uses. Resolution: no tenant serves the platform project; a tenant without credentials 404s in production and falls
 back to the platform project elsewhere.
 
 `app/global-not-found.tsx` (formerly the root `app/not-found.tsx`) serves
