@@ -102,7 +102,18 @@ vi.mock('@web/utils/is-web-analytics-enabled', () => ({
 }));
 
 vi.mock('@blog/db', () => ({
-  queries: { tenants: { getTenantLocales: getTenantLocalesMock } },
+  queries: {
+    tenants: {
+      getTenantLocales: getTenantLocalesMock,
+      selectLiveLocales: ({
+        locale,
+        additionalLocales,
+      }: {
+        locale: string;
+        additionalLocales: string[];
+      }) => [locale, ...additionalLocales],
+    },
+  },
 }));
 
 vi.mock('@web/utils/resolve-tenant-messages', () => ({
@@ -483,6 +494,65 @@ describe('LocaleLayout', () => {
         (child: React.ReactElement) => child?.type === SpeedInsights,
       ),
     ).toBe(false);
+  });
+
+  it('shows the language switcher in the header when its toggle is on', async () => {
+    getNavigationMock.mockResolvedValue({
+      ok: true,
+      data: { items: [], showLanguageSwitcher: true },
+    });
+    await setup();
+
+    expect(
+      within(screen.getByRole('banner')).getByRole('navigation', {
+        name: 'Language',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(screen.getByRole('contentinfo')).queryByRole('navigation', {
+        name: 'Language',
+      }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows the language switcher in the footer when its toggle is on', async () => {
+    getFooterMock.mockResolvedValue({
+      ok: true,
+      data: { social: [], showLanguageSwitcher: true },
+    });
+    await setup();
+
+    expect(
+      within(screen.getByRole('contentinfo')).getByRole('navigation', {
+        name: 'Language',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(screen.getByRole('banner')).queryByRole('navigation', {
+        name: 'Language',
+      }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows no language switcher with one live language, whatever the toggles say', async () => {
+    getTenantLocalesMock.mockResolvedValue({
+      defaultLocale: LOCALE_ISO_CODES.EN,
+      additionalLocales: [],
+      plan: 'FREE',
+    });
+    getNavigationMock.mockResolvedValue({
+      ok: true,
+      data: { items: [], showLanguageSwitcher: true },
+    });
+    getFooterMock.mockResolvedValue({
+      ok: true,
+      data: { social: [], showLanguageSwitcher: true },
+    });
+    await setup();
+
+    expect(
+      screen.queryByRole('navigation', { name: 'Language' }),
+    ).not.toBeInTheDocument();
   });
 
   it('adds a visible RSS feed link to the footer nav', async () => {

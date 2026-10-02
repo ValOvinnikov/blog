@@ -9,5 +9,6 @@ export type TRawFooter = NonNullable<InferResultType<typeof footerQuery>>;
 export function toFooter(raw: TRawFooter): TFooter {
   return {
     social: toSocialProfiles(raw.social),
+    showLanguageSwitcher: raw.showLanguageSwitcher ?? undefined,
   };
 }

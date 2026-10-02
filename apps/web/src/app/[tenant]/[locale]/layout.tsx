@@ -22,6 +22,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import { AuthMenu } from '@web/components/shared/auth-menu';
 import { BrandLockupLink } from '@web/components/shared/brand-lockup-link';
 import { DocumentShell } from '@web/components/shared/document-shell';
+import { LanguageSwitcher } from '@web/components/shared/language-switcher';
 import { SiteNavigation } from '@web/components/shared/site-navigation';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { SocialLinks } from '@web/components/shared/social-links';
@@ -67,20 +68,11 @@ export async function generateMetadata({
   const result =
     await service.global.siteSettings.v1.getSiteSettings(tenantContext);
 
-  // Every route's own `openGraph`/`twitter` replaces (not merges with) this
-  // root segment's. `metadataBase` inherits down, letting a leaf's relative
-  // fallback image path resolve to an absolute URL.
+  // `metadataBase` inherits down so a leaf's relative fallback image path resolves.
   const tenantBaseUrl = await getTenantBaseUrl(tenant);
   const metadataBase = tenantBaseUrl ? new URL(tenantBaseUrl) : undefined;
 
-  // Only the real production environment is indexable — see
-  // `isProductionEnvironment` and `robots.ts` for the full reasoning. This
-  // page-level meta tag is the primary de-indexing lever (unlike a robots.txt
-  // disallow, it survives a crawl and gets honored by the crawler), so it's
-  // applied here, ahead of the `!result.ok` guard, so it still lands even
-  // when site settings fail to load. Spread conditionally rather than
-  // assigning `robots: undefined` on production, keeping the key absent (not
-  // just falsy) when indexing is allowed.
+  // Ahead of the `!result.ok` guard so a non-production site stays noindex even when settings fail.
   const robotsMetadata = isProductionEnvironment()
     ? {}
     : { robots: { index: false, follow: false } };
@@ -152,9 +144,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
     logger.error('site_settings.layout_fetch_failed', {
       error: settingsResult.error,
     });
-    // Caught by `[tenant]/not-found.tsx`, not a boundary declared in this
-    // segment — a same-segment `not-found.tsx` only guards this layout's own
-    // children, not the layout itself.
+    // Caught by `[tenant]/not-found.tsx`: a same-segment boundary can't catch its own layout.
     notFound();
   }
 
@@ -173,6 +163,8 @@ export default async function LocaleLayout({ children, params }: TProps) {
     });
   }
   const navItems = navResult.ok ? navResult.data.items : [];
+  const hasHeaderLanguageSwitcher =
+    navResult.ok && navResult.data.showLanguageSwitcher === true;
 
   if (!footerResult.ok) {
     logger.error('footer.layout_fetch_failed', {
@@ -180,6 +172,23 @@ export default async function LocaleLayout({ children, params }: TProps) {
     });
   }
   const social = footerResult.ok ? footerResult.data.social : [];
+  const hasFooterLanguageSwitcher =
+    footerResult.ok && footerResult.data.showLanguageSwitcher === true;
+  const defaultLocale = tenantLocales?.defaultLocale ?? routing.defaultLocale;
+  const liveLocales = tenantLocales
+    ? queries.tenants.selectLiveLocales({
+        locale: tenantLocales.defaultLocale,
+        additionalLocales: tenantLocales.additionalLocales,
+        plan: tenantLocales.plan,
+      })
+    : [defaultLocale];
+  const languageSwitcher = (
+    <LanguageSwitcher
+      liveLocales={liveLocales}
+      currentLocale={locale}
+      defaultLocale={defaultLocale}
+    />
+  );
   const currentYear = new Date().getFullYear();
   const s = localeLayoutVariants();
   const oauthProviderIds = getEnabledOAuthProviderIds();
@@ -193,15 +202,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
     <DocumentShell lang={LOCALE_BCP47_TAGS[locale]}>
       <ThemeScope themeTokens={themeTokens}>
         <SanityImageBaseUrlProvider baseUrl={sanityImageBaseUrl}>
-          {/* `locale`, `now`, and `timeZone` are passed explicitly (not
-          inherited) so the page stays statically rendered —
-          `setRequestLocale` above already resolves them from the static
-          param rather than a dynamic API, but passing them here skips the
-          provider's own implicit resolution. `messages` is the base locale
-          messages with the tenant's voice overrides applied. Client
-          components that read the locale (next-intl
-          navigation `Link` in the post-list module) need this provider or
-          they throw "No intl context found". */}
+          {/* Passing `locale`, `now` and `timeZone` explicitly keeps the page statically rendered. */}
           <NextIntlClientProvider
             locale={locale}
             messages={messages}
@@ -225,6 +226,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
                         links={navItems}
                         actions={
                           <>
+                            {hasHeaderLanguageSwitcher && languageSwitcher}
                             <ThemeToggleButton />
                             <AuthMenu oauthProviderIds={oauthProviderIds} />
                           </>
@@ -236,6 +238,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
                       <Footer.Copyright title={brand.name} year={currentYear} />
                       <Footer.Nav>
                         <SocialLinks profiles={social} />
+                        {hasFooterLanguageSwitcher && languageSwitcher}
                         <NavLink
                           as={SmartLink}
                           href={routes.rssFeed()}
@@ -258,9 +261,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
             </SessionProvider>
           </NextIntlClientProvider>
         </SanityImageBaseUrlProvider>
-        {/* Both scripts 404 on a project without Speed Insights/Web Analytics
-          enabled in the Vercel dashboard, so `isWebAnalyticsEnabled()` must
-          gate them alongside the tenant's `ANALYTICS` capability. */}
+        {/* Both scripts 404 unless enabled in the Vercel dashboard. */}
         {analyticsEnabled && <SpeedInsights />}
         {analyticsEnabled && <Analytics />}
       </ThemeScope>

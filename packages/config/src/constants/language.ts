@@ -22,3 +22,11 @@ export const LOCALE_BCP47_TAGS = {
 } as const satisfies Record<keyof typeof LOCALE_ISO_CODES, string>;
 
 export type TLocaleBcp47Tag = TValueOf<typeof LOCALE_BCP47_TAGS>;
+
+export const LOCALE_ENDONYMS = {
+  EN: 'English',
+  NL: 'Nederlands',
+  FR: 'Français',
+  DE: 'Deutsch',
+  ES: 'Español',
+} as const satisfies Record<keyof typeof LOCALE_ISO_CODES, string>;

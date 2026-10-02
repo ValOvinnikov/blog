@@ -31,6 +31,9 @@
     "copied": "Gekopieerd",
     "linkCopied": "Link gekopieerd"
   },
+  "languageSwitcher": {
+    "ariaLabel": "Taal"
+  },
   "siteNavigation": {
     "toggleMenu": "Navigatiemenu openen of sluiten"
   },

@@ -31,6 +31,9 @@
     "copied": "Copied",
     "linkCopied": "Link copied"
   },
+  "languageSwitcher": {
+    "ariaLabel": "Language"
+  },
   "siteNavigation": {
     "toggleMenu": "Toggle navigation menu"
   },

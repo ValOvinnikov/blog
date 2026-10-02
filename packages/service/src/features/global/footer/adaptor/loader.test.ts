@@ -58,6 +58,22 @@ describe('getFooter', () => {
     ]);
   });
 
+  it('leaves the language switcher toggle undefined when unset', async () => {
+    mockRun.mockResolvedValue(makeRawFooter());
+
+    const result = await getFooter(tenant);
+
+    expect(result.showLanguageSwitcher).toBeUndefined();
+  });
+
+  it('passes the language switcher toggle through when set', async () => {
+    mockRun.mockResolvedValue(makeRawFooter({ showLanguageSwitcher: true }));
+
+    const result = await getFooter(tenant);
+
+    expect(result.showLanguageSwitcher).toBe(true);
+  });
+
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
     mockRun.mockResolvedValue(makeRawFooter());
 
