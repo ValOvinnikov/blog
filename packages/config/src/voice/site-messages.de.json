@@ -175,8 +175,6 @@
     "invalidMessage": "Dieser Abmeldelink ist nicht mehr gültig — möglicherweise sind Sie bereits abgemeldet.",
     "errorTitle": "Etwas ist schiefgelaufen",
     "errorMessage": "Wir konnten dich nicht abmelden. Bitte versuche es später erneut.",
-    "unavailableTitle": "Abmeldung derzeit nicht möglich",
-    "unavailableMessage": "Diese Website nimmt derzeit keine Änderungen an, daher konnten wir deinen Abmeldelink nicht verarbeiten.",
     "returnHome": "Zur Startseite"
   },
   "accountPage": {
@@ -209,7 +207,6 @@
       "unsubscribeToastLoadingMessage": "Abmeldung läuft…",
       "unsubscribeToastSuccessMessage": "Sie wurden abgemeldet.",
       "unsubscribeError": "Die Abmeldung ist fehlgeschlagen. Bitte versuchen Sie es erneut.",
-      "unsubscribeUnavailable": "Das Abmelden ist auf dieser Website derzeit nicht verfügbar.",
       "resendToastLoadingMessage": "Bestätigungs-E-Mail wird erneut gesendet…",
       "resendToastSuccessMessage": "Bestätigungs-E-Mail erneut gesendet.",
       "resendError": "Die Bestätigungs-E-Mail konnte nicht erneut gesendet werden. Bitte versuchen Sie es erneut.",

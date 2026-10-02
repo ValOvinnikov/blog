@@ -175,8 +175,6 @@
     "invalidMessage": "Ce lien de désabonnement n'est plus valide — vous êtes peut-être déjà désabonné.",
     "errorTitle": "Une erreur s'est produite",
     "errorMessage": "Nous n'avons pas pu vous désinscrire. Veuillez réessayer plus tard.",
-    "unavailableTitle": "Désinscription impossible pour le moment",
-    "unavailableMessage": "Ce site n'accepte pas de modifications pour le moment, nous n'avons donc pas pu traiter votre lien de désinscription.",
     "returnHome": "Retour à l'accueil"
   },
   "accountPage": {
@@ -209,7 +207,6 @@
       "unsubscribeToastLoadingMessage": "Désabonnement…",
       "unsubscribeToastSuccessMessage": "Vous avez été désabonné.",
       "unsubscribeError": "Le désabonnement a échoué. Veuillez réessayer.",
-      "unsubscribeUnavailable": "La désinscription n'est pas disponible sur ce site pour le moment.",
       "resendToastLoadingMessage": "Renvoi de l'e-mail de confirmation…",
       "resendToastSuccessMessage": "E-mail de confirmation renvoyé.",
       "resendError": "L'e-mail de confirmation n'a pas pu être renvoyé. Veuillez réessayer.",

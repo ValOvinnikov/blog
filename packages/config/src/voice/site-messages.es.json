@@ -175,8 +175,6 @@
     "invalidMessage": "Este enlace de baja ya no es válido — es posible que ya se haya dado de baja.",
     "errorTitle": "Algo salió mal",
     "errorMessage": "No pudimos cancelar tu suscripción. Inténtalo de nuevo más tarde.",
-    "unavailableTitle": "No se puede cancelar la suscripción ahora",
-    "unavailableMessage": "Este sitio no acepta cambios en este momento, por lo que no pudimos procesar tu enlace para cancelar la suscripción.",
     "returnHome": "Volver al inicio"
   },
   "accountPage": {
@@ -209,7 +207,6 @@
       "unsubscribeToastLoadingMessage": "Dándole de baja…",
       "unsubscribeToastSuccessMessage": "Se ha dado de baja.",
       "unsubscribeError": "No se pudo tramitar la baja. Vuelva a intentarlo.",
-      "unsubscribeUnavailable": "Cancelar la suscripción no está disponible en este sitio en este momento.",
       "resendToastLoadingMessage": "Reenviando el correo de confirmación…",
       "resendToastSuccessMessage": "Correo de confirmación reenviado.",
       "resendError": "No se pudo reenviar el correo de confirmación. Vuelva a intentarlo.",

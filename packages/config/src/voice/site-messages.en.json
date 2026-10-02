@@ -175,8 +175,6 @@
     "invalidMessage": "This unsubscribe link is no longer valid — you may already be unsubscribed.",
     "errorTitle": "Something went wrong",
     "errorMessage": "We couldn't unsubscribe you. Please try again later.",
-    "unavailableTitle": "Can't unsubscribe right now",
-    "unavailableMessage": "This site isn't accepting changes right now, so we couldn't process your unsubscribe link.",
     "returnHome": "Return home"
   },
   "accountPage": {
@@ -209,7 +207,6 @@
       "unsubscribeToastLoadingMessage": "Unsubscribing…",
       "unsubscribeToastSuccessMessage": "You've been unsubscribed.",
       "unsubscribeError": "Couldn't unsubscribe. Try again.",
-      "unsubscribeUnavailable": "Unsubscribing isn't available on this site right now.",
       "resendToastLoadingMessage": "Resending the confirmation email…",
       "resendToastSuccessMessage": "Confirmation email resent.",
       "resendError": "Couldn't resend the confirmation email. Try again.",

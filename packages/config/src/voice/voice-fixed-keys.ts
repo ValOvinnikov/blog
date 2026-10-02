@@ -62,7 +62,6 @@ export const VOICE_FIXED_KEYS = [
   'accountPage.newsletter.unsubscribeToastLoadingMessage',
   'accountPage.newsletter.unsubscribeToastSuccessMessage',
   'accountPage.newsletter.unsubscribeError',
-  'accountPage.newsletter.unsubscribeUnavailable',
   'accountPage.newsletter.resendToastLoadingMessage',
   'accountPage.newsletter.resendToastSuccessMessage',
   'accountPage.newsletter.resendError',
@@ -111,8 +110,6 @@ export const VOICE_FIXED_KEYS = [
   'newsletterUnsubscribe.invalidMessage',
   'newsletterUnsubscribe.errorTitle',
   'newsletterUnsubscribe.errorMessage',
-  'newsletterUnsubscribe.unavailableTitle',
-  'newsletterUnsubscribe.unavailableMessage',
   'newsletterUnsubscribe.returnHome',
 
   'authMenu.signIn',
