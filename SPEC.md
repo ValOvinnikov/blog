@@ -1522,12 +1522,16 @@ tenant-provisioning time — like `site_config`, an absent row is resolved
 lazily at read time by falling back to the tenant's current preset's
 `PRESET_REGISTRY[preset].featureDefaults` (`comments`/`ratings`/`bookmarks`
 default on, `newsletter`/`analytics` default off — a deliberate opt-in
-posture for the two `GROWTH`-only capabilities, not a "match legacy
+posture for `newsletter` and `analytics`, not a "match legacy
 behavior" default). Two gating layers stack on top of the tenant toggle,
 most-restrictive-wins: env-locked secrets (unchanged, pre-existing —
 `AUTH_*`, `ANTHROPIC_API_KEY`, `SANITY_REVALIDATE_SECRET`, …) and
 `@blog/db`'s `PLAN_REGISTRY` (`Record<TTenantPlan, TCapability[]>` — `FREE`
-entitles `comments`/`ratings`/`bookmarks`; `GROWTH` entitles all five).
+entitles `ratings`/`consentBanner`; `GROWTH` entitles all six:
+`comments`/`ratings`/`bookmarks`/`newsletter`/`analytics`/`consentBanner`).
+`comments` and `bookmarks` are `GROWTH`-only because each makes readers sign
+in — magic-link email on a shared Resend quota — and comments will carry
+moderation cost.
 `PLAN_REGISTRY` lives in `@blog/db`, not `@blog/config`, despite mirroring
 `PRESET_REGISTRY`'s shape: it keys off `TENANT_PLAN`, which `db` owns per
 its storage-layer-vocabulary exception, and `config` sits below `db` in the
@@ -1538,8 +1542,10 @@ resolves the two-layer check per request and never throws; a disabled
 capability is omitted silently at its own render site (`module_newsletter`
 in `renderModules`; the bookmark button on the post-detail page; Vercel
 Analytics/Speed Insights in `[locale]/layout.tsx`, ANDed with the
-pre-existing `WEB_ANALYTICS_ENABLED` env gate) — same pattern as an unknown
-module type,
+pre-existing `WEB_ANALYTICS_ENABLED` env gate; the header's `AuthMenu`, which
+`is-reader-account-enabled.ts` shows only when at least one of `bookmarks`/
+`comments`/`newsletter` is enabled, the same check that makes `/account` and
+`/bookmarks` answer 404 otherwise) — same pattern as an unknown module type,
 never a thrown error or a visible placeholder. `comments`/`ratings` have no
 render site yet in `apps/web` (no comments/ratings feature exists anywhere
 in the codebase today); their toggles and plan entitlement are wired
