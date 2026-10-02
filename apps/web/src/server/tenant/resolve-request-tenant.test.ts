@@ -222,16 +222,14 @@ describe('resolveRequestTenant memoization', () => {
       deprovisionedAt: null,
       provisioningStatus: null,
     });
-    vi.mocked(queries.tenants.toTenantSanityWriteCredentials).mockResolvedValue(
-      {
-        projectId: 'proj',
-        dataset: 'production',
-        token: 'write-tok',
-        status: TENANT_STATUS.ACTIVE,
-        deprovisionedAt: null,
-        provisioningStatus: null,
-      },
-    );
+    vi.mocked(queries.tenants.toTenantSanityWriteCredentials).mockReturnValue({
+      projectId: 'proj',
+      dataset: 'production',
+      token: 'write-tok',
+      status: TENANT_STATUS.ACTIVE,
+      deprovisionedAt: null,
+      provisioningStatus: null,
+    });
 
     vi.doMock('react', async (importOriginal) => {
       const actual = await importOriginal<typeof import('react')>();

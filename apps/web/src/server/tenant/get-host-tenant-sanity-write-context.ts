@@ -15,13 +15,6 @@ export type THostTenantSanityWriteContext =
     }
   | { isResolvable: false };
 
-/**
- * Write-credential counterpart to `getHostTenantSanityContext`. `tenantId`
- * distinguishes "no tenant resolved" (platform mode — `tenant` and `tenantId`
- * both undefined) from "a tenant resolved but has no usable write
- * credentials" (`tenant` undefined, `tenantId` set), which must fail loudly
- * rather than fall back to the platform's project.
- */
 export const getHostTenantSanityWriteContext = cache(
   async (): Promise<THostTenantSanityWriteContext> => {
     const resolvedTenant = await resolveRequestTenant();

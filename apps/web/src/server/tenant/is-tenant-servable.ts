@@ -2,9 +2,7 @@ import { TENANT_PROVISIONING_STATUS, TENANT_STATUS } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { isProductionEnvironment } from '@web/utils/is-production-environment';
 
-/**
- * Production additionally requires `provisioningStatus` READY: a failed run can leave credentials but no content. Local/dev rows predate `provisioningStatus` tracking.
- */
+/** Only production requires READY: local/dev rows predate `provisioningStatus`. */
 export const isTenantServable = (tenant: TTenant): boolean => {
   const hasCredentials =
     tenant.status !== TENANT_STATUS.ARCHIVED &&

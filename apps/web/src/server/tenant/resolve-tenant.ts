@@ -4,9 +4,6 @@ import type { TTenant } from '@blog/db/schema/tenants';
 import { isPlatformFallbackAllowed } from './is-platform-fallback-allowed';
 import { isTenantServable } from './is-tenant-servable';
 
-/**
- * A host matching a row that fails `isTenantServable` resolves to `undefined`, never the sole-tenant dev fallback, which is for "no domain matched".
- */
 export const resolveTenant = async (
   host: string | null,
 ): Promise<TTenant | undefined> => {
@@ -30,9 +27,6 @@ const resolveSoleTenant = async (): Promise<TTenant | undefined> => {
   return tenant && isTenantServable(tenant) ? tenant : undefined;
 };
 
-/**
- * No sole-tenant dev fallback: an id that fails to resolve is a data integrity gap, not "no host matched".
- */
 export const resolveTenantById = async (
   tenantId: string,
 ): Promise<TTenant | undefined> => {
