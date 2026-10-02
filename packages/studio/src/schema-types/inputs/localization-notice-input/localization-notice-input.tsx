@@ -1,4 +1,5 @@
 import { isLocaleIsoCode, type TLocaleIsoCode } from '@blog/config/constants';
+import { isLocalizedSchemaType } from '@blog/studio/schema-types/inputs/localization-notice-input/is-localized-schema-type';
 import {
   collectMissingLocales,
   formatLocaleList,
@@ -6,7 +7,7 @@ import {
   LOCALE_LABEL,
 } from '@blog/studio/schema-types/inputs/localization-notice-input/missing-locales';
 import { Card, Stack, Text } from '@sanity/ui';
-import type { InputProps, SchemaType } from 'sanity';
+import type { InputProps } from 'sanity';
 
 const LANGUAGE_FIELD = 'language';
 
@@ -45,11 +46,6 @@ const documentNotices = (
 
   return notices;
 };
-
-const isLocalizedSchemaType = (schemaType: SchemaType | undefined): boolean =>
-  schemaType !== undefined &&
-  (schemaType.name.startsWith('internationalizedArray') ||
-    isLocalizedSchemaType(schemaType.type));
 
 const fieldNotices = (
   value: unknown,
