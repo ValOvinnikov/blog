@@ -11,10 +11,12 @@ import {
 } from '@blog/config';
 import {
   DENSITY,
+  LANGUAGE_SWITCHER_STYLE,
   FONT_CHOICE,
   PRESET_ID,
   RADIUS_SCALE,
   type TDensity,
+  type TLanguageSwitcherStyle,
   type TFontChoice,
   type TPresetId,
   type TRadiusScale,
@@ -345,6 +347,14 @@ export const updateSiteConfigInputSchema = z.object({
     Object.values(RADIUS_SCALE) as [TRadiusScale, ...TRadiusScale[]],
   ),
   density: z.enum(Object.values(DENSITY) as [TDensity, ...TDensity[]]),
+  languageSwitcherStyle: z
+    .enum(
+      Object.values(LANGUAGE_SWITCHER_STYLE) as [
+        TLanguageSwitcherStyle,
+        ...TLanguageSwitcherStyle[],
+      ],
+    )
+    .optional(),
   logoAssetUrl: z.string().trim().url().nullable().optional(),
   faviconAssetUrl: z.string().trim().url().nullable().optional(),
 });
@@ -368,6 +378,9 @@ function presentOptionalFields(
   const fields: TSiteConfigWritable = {};
 
   if (parsed.logoHue !== undefined) fields.logoHue = parsed.logoHue;
+  if (parsed.languageSwitcherStyle !== undefined) {
+    fields.languageSwitcherStyle = parsed.languageSwitcherStyle;
+  }
   if (parsed.logoAssetUrl !== undefined) {
     fields.logoAssetUrl = parsed.logoAssetUrl;
   }

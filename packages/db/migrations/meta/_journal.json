@@ -232,6 +232,13 @@
       "when": 1790869895473,
       "tag": "0032_famous_hawkeye",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1790952495406,
+      "tag": "0033_open_steel_serpent",
+      "breakpoints": true
     }
   ]
 }
