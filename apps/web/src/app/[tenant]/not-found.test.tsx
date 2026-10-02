@@ -3,12 +3,12 @@ import TenantNotFound, { generateMetadata } from './not-found';
 const {
   standaloneNotFoundPageMock,
   buildNotFoundMetadataMock,
-  getRememberedTenantIdMock,
+  peekContextTenantIdMock,
   headersMock,
 } = vi.hoisted(() => ({
   standaloneNotFoundPageMock: vi.fn(),
   buildNotFoundMetadataMock: vi.fn(),
-  getRememberedTenantIdMock: vi.fn(),
+  peekContextTenantIdMock: vi.fn(),
   headersMock: vi.fn(),
 }));
 
@@ -20,8 +20,8 @@ vi.mock('@web/metadata/not-found-metadata', () => ({
   buildNotFoundMetadata: buildNotFoundMetadataMock,
 }));
 
-vi.mock('@web/server/tenant/remembered-tenant', () => ({
-  getRememberedTenantId: getRememberedTenantIdMock,
+vi.mock('@web/server/request-context/request-context', () => ({
+  peekContextTenantId: peekContextTenantIdMock,
 }));
 
 vi.mock('next/headers', () => ({ headers: headersMock }));
@@ -36,9 +36,9 @@ describe('TenantNotFound ([tenant] not-found route)', () => {
     });
   });
 
-  it('renders StandaloneNotFoundPage with the tenant remembered by the layout', async () => {
+  it('renders StandaloneNotFoundPage with the tenant the layout entered', async () => {
     const ui = { type: 'div', props: {} };
-    getRememberedTenantIdMock.mockReturnValue('tenant-1');
+    peekContextTenantIdMock.mockReturnValue('tenant-1');
     standaloneNotFoundPageMock.mockResolvedValue(ui);
 
     expect((await TenantNotFound()).props.children).toBe(ui);
@@ -48,9 +48,9 @@ describe('TenantNotFound ([tenant] not-found route)', () => {
     expect(headersMock).not.toHaveBeenCalled();
   });
 
-  it('renders StandaloneNotFoundPage with no tenant when the layout never remembered one, without reading headers', async () => {
+  it('renders StandaloneNotFoundPage with no tenant when no route entered one, without reading headers', async () => {
     const ui = { type: 'div', props: {} };
-    getRememberedTenantIdMock.mockReturnValue(undefined);
+    peekContextTenantIdMock.mockReturnValue(undefined);
     standaloneNotFoundPageMock.mockResolvedValue(ui);
 
     expect((await TenantNotFound()).props.children).toBe(ui);

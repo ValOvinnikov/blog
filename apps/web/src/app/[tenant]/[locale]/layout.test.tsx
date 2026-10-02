@@ -4,15 +4,21 @@ import {
   routes,
   SITE_MESSAGES as realMessages,
   SOCIAL_PLATFORMS,
-  type TLocaleIsoCode,
 } from '@blog/config';
 import userEvent from '@testing-library/user-event';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { ThemeScope } from '@web/components/shared/theme-scope';
 import { VoiceRichProvider } from '@web/context/voice-rich-provider';
-import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import {
+  getContextSanityContext,
+  getContextTenantLocales,
+  isContextCapabilityEnabled,
+} from '@web/server/request-context/context-tenant';
+import {
+  enterRequestContext,
+  getContextLocale,
+} from '@web/server/request-context/request-context';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
@@ -35,51 +41,39 @@ const {
   getNavigationMock,
   getFooterMock,
   getThemeTokensMock,
-  isCapabilityEnabledMock,
   isWebAnalyticsEnabledMock,
   resolveTenantMessagesMock,
-  getTenantLocalesMock,
   getMessagesMock,
   getNowMock,
   getTimeZoneMock,
   getTranslationsMock,
-  setRequestLocaleMock,
   isProductionEnvironmentMock,
   useSessionMock,
   getEnabledOAuthProviderIdsMock,
 
   getSanityImageBaseUrlMock,
   urlForSanityImageMock,
-  rememberRequestTenantIdMock,
 } = vi.hoisted(() => ({
   getSiteSettingsMock: vi.fn(),
   getNavigationMock: vi.fn(),
   getFooterMock: vi.fn(),
   getThemeTokensMock: vi.fn(),
-  isCapabilityEnabledMock: vi.fn(),
   isWebAnalyticsEnabledMock: vi.fn(),
   resolveTenantMessagesMock: vi.fn(),
-  getTenantLocalesMock: vi.fn(),
   getMessagesMock: vi.fn(),
   getNowMock: vi.fn(),
   getTimeZoneMock: vi.fn(),
   getTranslationsMock: vi.fn(),
-  setRequestLocaleMock: vi.fn(),
   isProductionEnvironmentMock: vi.fn(),
   useSessionMock: vi.fn(),
   getEnabledOAuthProviderIdsMock: vi.fn(),
   getSanityImageBaseUrlMock: vi.fn(),
   urlForSanityImageMock: vi.fn(),
-  rememberRequestTenantIdMock: vi.fn(),
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
+vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@web/server/tenant/get-tenant-base-url');
-
-vi.mock('@web/server/tenant/remembered-tenant', () => ({
-  rememberRequestTenantId: rememberRequestTenantIdMock,
-}));
+vi.mock('@web/server/request-context/context-tenant');
 
 vi.mock('@blog/auth/utils/oauth-providers/oauth-providers', () => ({
   getEnabledOAuthProviderIds: getEnabledOAuthProviderIdsMock,
@@ -93,16 +87,8 @@ vi.mock('@web/utils/get-theme-tokens', () => ({
   getThemeTokens: getThemeTokensMock,
 }));
 
-vi.mock('@web/server/settings-features/is-capability-enabled', () => ({
-  isCapabilityEnabled: isCapabilityEnabledMock,
-}));
-
 vi.mock('@web/utils/is-web-analytics-enabled', () => ({
   isWebAnalyticsEnabled: isWebAnalyticsEnabledMock,
-}));
-
-vi.mock('@blog/db', () => ({
-  queries: { tenants: { getTenantLocales: getTenantLocalesMock } },
 }));
 
 vi.mock('@web/utils/resolve-tenant-messages', () => ({
@@ -140,7 +126,6 @@ vi.mock('next-intl/server', () => ({
   getNow: getNowMock,
   getTimeZone: getTimeZoneMock,
   getTranslations: getTranslationsMock,
-  setRequestLocale: setRequestLocaleMock,
 }));
 
 vi.mock('next-auth/react', () => ({
@@ -150,8 +135,11 @@ vi.mock('next-auth/react', () => ({
   SessionProvider: ({ children }: { children: ReactNode }) => children,
 }));
 
-const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
-const getTenantBaseUrlMock = vi.mocked(getTenantBaseUrl);
+const enterRequestContextMock = vi.mocked(enterRequestContext);
+const getContextLocaleMock = vi.mocked(getContextLocale);
+const getContextSanityContextMock = vi.mocked(getContextSanityContext);
+const getContextTenantLocalesMock = vi.mocked(getContextTenantLocales);
+const isContextCapabilityEnabledMock = vi.mocked(isContextCapabilityEnabled);
 
 const brand = { name: 'Blog', logo: undefined };
 const now = new Date('2026-07-21T00:00:00.000Z');
@@ -181,12 +169,12 @@ describe('LocaleLayout', () => {
     getNavigationMock.mockResolvedValue({ ok: true, data: { items: [] } });
     getFooterMock.mockResolvedValue({ ok: true, data: { social: [] } });
     getThemeTokensMock.mockResolvedValue(THEME_TOKENS);
-    isCapabilityEnabledMock.mockResolvedValue(true);
+    isContextCapabilityEnabledMock.mockResolvedValue(true);
     isWebAnalyticsEnabledMock.mockReturnValue(false);
-    getTenantLocalesMock.mockResolvedValue({
+    getContextLocaleMock.mockReturnValue(LOCALE_ISO_CODES.EN);
+    getContextTenantLocalesMock.mockResolvedValue({
       defaultLocale: LOCALE_ISO_CODES.EN,
-      additionalLocales: [LOCALE_ISO_CODES.NL],
-      plan: 'GROWTH',
+      liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
     });
     resolveTenantMessagesMock.mockImplementation((messages: unknown) =>
       Promise.resolve({ messages, rich: {} }),
@@ -198,8 +186,9 @@ describe('LocaleLayout', () => {
     isProductionEnvironmentMock.mockReturnValue(true);
     useSessionMock.mockReturnValue({ data: null, status: 'unauthenticated' });
     getEnabledOAuthProviderIdsMock.mockReturnValue(['github', 'google']);
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
-    getTenantBaseUrlMock.mockResolvedValue(undefined);
+    getContextSanityContextMock.mockResolvedValue(
+      DEFAULT_TENANT_SANITY_CONTEXT,
+    );
     getSanityImageBaseUrlMock.mockReturnValue(
       'https://cdn.sanity.io/images/mock-project/mock-dataset/',
     );
@@ -285,16 +274,26 @@ describe('LocaleLayout', () => {
       errorSpy.mockRestore();
     });
 
-    it('forwards the tenant route param to getTenantSanityContext and getTenantBaseUrl', async () => {
-      await generateMetadata({
+    it('enters the request context from its route params', async () => {
+      const params = Promise.resolve({
+        tenant: 'tenant-1',
+        locale: LOCALE_ISO_CODES.EN,
+      });
+
+      await generateMetadata({ params });
+
+      expect(enterRequestContextMock).toHaveBeenCalledWith(params);
+    });
+
+    it("resolves relative metadata URLs against the tenant's base URL", async () => {
+      const metadata = await generateMetadata({
         params: Promise.resolve({
           tenant: 'tenant-1',
           locale: LOCALE_ISO_CODES.EN,
         }),
       });
 
-      expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
-      expect(getTenantBaseUrlMock).toHaveBeenCalledWith('tenant-1');
+      expect(metadata.metadataBase).toEqual(new URL('https://example.com'));
     });
   });
 
@@ -312,7 +311,6 @@ describe('LocaleLayout', () => {
     const sanityImageBaseUrlProvider = firstChildOf(themeScope);
     const provider = firstChildOf(sanityImageBaseUrlProvider);
 
-    expect(setRequestLocaleMock).toHaveBeenCalledWith(LOCALE_ISO_CODES.EN);
     expect(provider.props.locale).toBe(LOCALE_ISO_CODES.EN);
     expect(provider.props.messages).toBe(realMessages);
     expect(provider.props.now).toBe(now);
@@ -340,6 +338,7 @@ describe('LocaleLayout', () => {
   });
 
   it("serves another language's messages without the tenant's default-language voice pack", async () => {
+    getContextLocaleMock.mockReturnValue(LOCALE_ISO_CODES.NL);
     const themeScope = firstChildOf(
       await LocaleLayout({
         children: <div>content</div>,
@@ -357,6 +356,7 @@ describe('LocaleLayout', () => {
   });
 
   it('declares the served language on the document', async () => {
+    getContextLocaleMock.mockReturnValue(LOCALE_ISO_CODES.NL);
     const document = await LocaleLayout({
       children: <div>content</div>,
       params: Promise.resolve({
@@ -435,7 +435,7 @@ describe('LocaleLayout', () => {
 
   it('mounts Analytics and SpeedInsights when enabled and the capability is entitled', async () => {
     isWebAnalyticsEnabledMock.mockReturnValue(true);
-    isCapabilityEnabledMock.mockResolvedValue(true);
+    isContextCapabilityEnabledMock.mockResolvedValue(true);
 
     const themeScope = firstChildOf(
       await LocaleLayout({
@@ -461,7 +461,7 @@ describe('LocaleLayout', () => {
 
   it('omits Analytics and SpeedInsights when the ANALYTICS capability is not entitled', async () => {
     isWebAnalyticsEnabledMock.mockReturnValue(true);
-    isCapabilityEnabledMock.mockResolvedValue(false);
+    isContextCapabilityEnabledMock.mockResolvedValue(false);
 
     const themeScope = firstChildOf(
       await LocaleLayout({
@@ -578,7 +578,7 @@ describe('LocaleLayout', () => {
       dataset: 'production',
       token: 'tenant-token',
     };
-    getTenantSanityContextMock.mockResolvedValue(tenant);
+    getContextSanityContextMock.mockResolvedValue(tenant);
 
     await setup();
 
@@ -587,18 +587,11 @@ describe('LocaleLayout', () => {
     expect(getFooterMock).toHaveBeenCalledWith(tenant);
   });
 
-  it('forwards the tenant route param to every tenant-scoped loader', async () => {
+  it('forwards the entered tenant to every tenant-scoped loader', async () => {
     await setup();
 
-    expect(getTenantSanityContextMock).toHaveBeenCalledWith(
-      'tenant-1',
-      LOCALE_ISO_CODES.EN,
-    );
     expect(getThemeTokensMock).toHaveBeenCalledWith('tenant-1');
-    expect(isCapabilityEnabledMock).toHaveBeenCalledWith(
-      'ANALYTICS',
-      'tenant-1',
-    );
+    expect(isContextCapabilityEnabledMock).toHaveBeenCalledWith('ANALYTICS');
     expect(resolveTenantMessagesMock).toHaveBeenCalledWith(
       realMessages,
       'tenant-1',
@@ -634,16 +627,15 @@ describe('LocaleLayout', () => {
       errorSpy.mockRestore();
     });
 
-    it('remembers the tenant id ahead of the notFound() it throws', async () => {
+    it('enters the request context ahead of the notFound() it throws', async () => {
       const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       getSiteSettingsMock.mockResolvedValue({ ok: false, error: 'boom' });
 
       await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
 
-      expect(rememberRequestTenantIdMock).toHaveBeenCalledWith('tenant-1');
-      expect(
-        rememberRequestTenantIdMock.mock.invocationCallOrder[0],
-      ).toBeLessThan(vi.mocked(notFound).mock.invocationCallOrder[0]!);
+      expect(enterRequestContextMock.mock.invocationCallOrder[0]).toBeLessThan(
+        vi.mocked(notFound).mock.invocationCallOrder[0]!,
+      );
       errorSpy.mockRestore();
     });
   });
@@ -685,25 +677,6 @@ describe('LocaleLayout', () => {
         ),
       ).toBe(true);
       errorSpy.mockRestore();
-    });
-  });
-
-  describe('when the locale is invalid', () => {
-    it('remembers the tenant id before calling notFound()', async () => {
-      await expect(
-        LocaleLayout({
-          children: <div>content</div>,
-          params: Promise.resolve({
-            tenant: 'tenant-1',
-            locale: 'xx' as unknown as TLocaleIsoCode,
-          }),
-        }),
-      ).rejects.toThrow('NEXT_NOT_FOUND');
-
-      expect(rememberRequestTenantIdMock).toHaveBeenCalledWith('tenant-1');
-      expect(
-        rememberRequestTenantIdMock.mock.invocationCallOrder[0],
-      ).toBeLessThan(vi.mocked(notFound).mock.invocationCallOrder[0]!);
     });
   });
 });
