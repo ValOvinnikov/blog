@@ -37,9 +37,11 @@ describe(`<${LanguageSwitcher.name}/>`, () => {
   });
 
   describe('menu with code', () => {
-    it('renders a closed menu trigger naming the current language', () => {
+    beforeEach(() => {
       setup();
+    });
 
+    it('renders a closed menu trigger naming the current language', () => {
       const trigger = screen.getByRole('button', {
         name: 'Language: Nederlands',
       });
@@ -50,8 +52,6 @@ describe(`<${LanguageSwitcher.name}/>`, () => {
     });
 
     it('opens a menu of native names with the current language marked', async () => {
-      setup();
-
       await openMenu();
       const menu = screen.getByRole('menu', { name: 'Language' });
 
@@ -66,8 +66,6 @@ describe(`<${LanguageSwitcher.name}/>`, () => {
     });
 
     it('links each entry to its translation or the default-language page', async () => {
-      setup();
-
       await openMenu();
       const menu = screen.getByRole('menu', { name: 'Language' });
       const current = within(menu).getByRole('menuitem', {
@@ -82,8 +80,6 @@ describe(`<${LanguageSwitcher.name}/>`, () => {
     });
 
     it('closes on Escape and returns focus to the trigger', async () => {
-      setup();
-
       const trigger = await openMenu();
       await userEvent.keyboard('{Escape}');
 
@@ -92,8 +88,6 @@ describe(`<${LanguageSwitcher.name}/>`, () => {
     });
 
     it('remembers the chosen language', async () => {
-      setup();
-
       await openMenu();
       const french = within(
         screen.getByRole('menu', { name: 'Language' }),
