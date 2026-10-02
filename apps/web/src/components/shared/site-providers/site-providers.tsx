@@ -34,6 +34,7 @@ export const SiteProviders = async ({ children }: ISiteProvidersProps) => {
 
   return (
     <SanityImageBaseUrlProvider baseUrl={getSanityImageBaseUrl(sanityContext)}>
+      {/* locale, now and timeZone are passed explicitly so the provider never resolves them dynamically, keeping the page static. */}
       <NextIntlClientProvider
         locale={locale}
         messages={messages}
