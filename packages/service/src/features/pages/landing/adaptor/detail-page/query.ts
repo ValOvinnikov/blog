@@ -8,10 +8,8 @@ import { headingBlockFragment } from '@blog/service/shared/fragments/heading-blo
 import { moduleFragment } from '@blog/service/shared/fragments/module/module';
 import { seoFragment } from '@blog/service/shared/fragments/seo/seo';
 import type { TLocaleParams } from '@blog/service/shared/localization/locale-params';
-import { TRANSLATIONS_EXPRESSION } from '@blog/service/shared/localization/translations';
+import { translationsQuery } from '@blog/service/shared/localization/translations';
 import type { TRawModule } from '@blog/service/shared/transformers/module/to-module';
-
-import type { TLandingTranslation } from './types';
 
 export const landingPageQuery = q
   .parameters<TSlugParams & Partial<TLocaleParams>>()
@@ -39,6 +37,6 @@ export const landingPageQuery = q
       .nullable(),
     faqs: sub.raw(PAGE_FAQ_QUESTIONS_EXPRESSION, pageFaqQuestionsParser),
     seo: sub.field('seo').project(seoFragment).notNull(),
-    translations: sub.raw<TLandingTranslation[]>(TRANSLATIONS_EXPRESSION),
+    translations: translationsQuery,
   }))
   .nullable(true);

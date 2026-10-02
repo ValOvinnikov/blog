@@ -1,4 +1,4 @@
-const TRANSLATION_METADATA_TYPE = 'translation.metadata';
+export const TRANSLATION_METADATA_TYPE = 'translation.metadata' as const;
 
 export function buildTranslatedReferenceExpression(
   referenceField: string,

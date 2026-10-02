@@ -1,12 +1,17 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 
-import { TRANSLATIONS_EXPRESSION } from './translations';
+import { translationsQuery } from './translations';
 
 const { EN, NL } = LOCALE_ISO_CODES;
 
-function page(id: string, language: string, slug: string) {
-  return { _id: id, _type: 'page_landing', language, slug: { current: slug } };
+function page(id: string, language: string, slug?: string) {
+  return {
+    _id: id,
+    _type: 'page_landing',
+    language,
+    ...(slug ? { slug: { current: slug } } : {}),
+  };
 }
 
 function translation(id: string, language: string) {
@@ -21,12 +26,18 @@ const aboutEn = page('about-en', EN, 'about');
 const aboutNl = page('about-nl', NL, 'over-ons');
 const contact = page('contact', EN, 'contact');
 const pricing = page('pricing-en', EN, 'pricing');
+const draftOnlyPricingNl = page('drafts.pricing-nl', NL, 'prijzen');
+const team = page('team-en', EN, 'team');
+const slugless = page('team-nl', NL);
 
 const dataset = [
   aboutEn,
   aboutNl,
   contact,
   pricing,
+  draftOnlyPricingNl,
+  team,
+  slugless,
   {
     _id: 'meta-about',
     _type: 'translation.metadata',
@@ -40,13 +51,23 @@ const dataset = [
       translation('pricing-nl', NL),
     ],
   },
+  {
+    _id: 'meta-team',
+    _type: 'translation.metadata',
+    translations: [translation('team-en', EN), translation('team-nl', NL)],
+  },
 ];
 
-function resolve(root: unknown): Promise<unknown> {
-  return evaluateGroqExpression(TRANSLATIONS_EXPRESSION, dataset, root);
+function resolve(root: { _id: string }): Promise<unknown> {
+  return evaluateGroqExpression(
+    `*[_id == $id][0]{ "translations": ${translationsQuery.query} }.translations`,
+    dataset,
+    undefined,
+    { id: root._id },
+  );
 }
 
-describe('TRANSLATIONS_EXPRESSION', () => {
+describe('translationsQuery', () => {
   it('lists every translation, the page itself included', async () => {
     expect(await resolve(aboutEn)).toEqual([
       { language: EN, slug: 'about' },
@@ -61,11 +82,15 @@ describe('TRANSLATIONS_EXPRESSION', () => {
     ]);
   });
 
-  it('is empty when the page has no translation metadata', async () => {
-    expect(await resolve(contact)).toEqual([]);
+  it('is null when the page has no translation metadata', async () => {
+    expect(await resolve(contact)).toBeNull();
   });
 
   it('skips a translation that is not published', async () => {
     expect(await resolve(pricing)).toEqual([{ language: EN, slug: 'pricing' }]);
+  });
+
+  it('skips a published translation that has no slug', async () => {
+    expect(await resolve(team)).toEqual([{ language: EN, slug: 'team' }]);
   });
 });
