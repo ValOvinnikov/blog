@@ -5502,6 +5502,13 @@
           }
         },
         "optional": true
+      },
+      "showLanguageSwitcher": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
+        },
+        "optional": true
       }
     }
   },
@@ -5566,6 +5573,13 @@
               "name": "linkRef"
             }
           }
+        },
+        "optional": true
+      },
+      "showLanguageSwitcher": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
         },
         "optional": true
       }
