@@ -62,6 +62,7 @@ export function buildStarterDocuments(
     _id: STARTER_DOCUMENT_IDS.SITE,
     _type: 'settings_site',
     title: 'Site Settings',
+    currency: 'USD',
     brand: {
       _type: 'brand',
       name: tenant.name,

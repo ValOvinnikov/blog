@@ -28,6 +28,14 @@ describe(buildStarterDocuments, () => {
     expect(site).not.toHaveProperty('defaultOgImage');
   });
 
+  it('the site settings document seeds USD as the currency', () => {
+    const site = buildStarterDocuments(tenant).find(
+      (doc) => doc._type === 'settings_site',
+    );
+
+    expect(site).toHaveProperty('currency', 'USD');
+  });
+
   it('newsletter starter document carries both trust cue strings', () => {
     const newsletter = buildStarterDocuments(tenant).find(
       (doc) => doc._type === 'settings_newsletter',
