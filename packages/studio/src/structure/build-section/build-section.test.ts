@@ -19,6 +19,9 @@ const CHAINABLE_METHODS = [
   'schemaType',
   'documentId',
   'items',
+  'filter',
+  'params',
+  'initialValueTemplates',
 ] as const;
 
 const makeMockBuilder = (kind: string, documentType?: string): TMockBuilder => {
@@ -47,6 +50,8 @@ const makeMockStructureBuilder = () => ({
   ),
   document: vi.fn(() => makeMockBuilder('document')),
   list: vi.fn(() => makeMockBuilder('list')),
+  documentList: vi.fn(() => makeMockBuilder('documentList')),
+  initialValueTemplateItem: vi.fn((templateId: string) => ({ templateId })),
 });
 
 const asStructureBuilder = (S: ReturnType<typeof makeMockStructureBuilder>) =>
@@ -492,5 +497,64 @@ describe(buildSections, () => {
     ]);
     expect(callArgs(result[0]!, 'id')).toEqual(['modules']);
     expect(callArgs(result[2]!, 'id')).toEqual(['settings']);
+  });
+  describe('byLanguage items', () => {
+    const buildLanguageLists = () => {
+      const S = makeMockStructureBuilder();
+      const [item] = getGroupItems(S, [
+        {
+          items: [
+            {
+              schema: {
+                name: 'landingPage',
+                title: 'Landing Pages',
+                icon: List,
+              },
+              mode: 'byLanguage',
+            },
+          ],
+        },
+      ]);
+      const list = callArgs(item!, 'child')?.[0] as TMockBuilder;
+      return callArgs(list, 'items')?.[0] as TMockBuilder[];
+    };
+
+    const listOf = (languageItem: TMockBuilder) =>
+      callArgs(languageItem, 'child')?.[0] as TMockBuilder;
+
+    it('lists every locale by its own name, then a no-language list', () => {
+      const lists = buildLanguageLists();
+
+      expect(lists.map((list) => callArgs(list, 'title')?.[0])).toEqual([
+        'English',
+        'Nederlands',
+        'Français',
+        'Deutsch',
+        'Español',
+        'No language',
+      ]);
+    });
+
+    it('filters each language list to its language and creates pages in it', () => {
+      const [english] = buildLanguageLists();
+      const documentList = listOf(english!);
+
+      expect(callArgs(documentList, 'params')).toEqual([
+        { type: 'landingPage', language: 'EN' },
+      ]);
+      expect(callArgs(documentList, 'initialValueTemplates')).toEqual([
+        [{ templateId: 'landingPage-EN' }],
+      ]);
+    });
+
+    it('lists pages without a language and offers no way to create one', () => {
+      const noLanguage = buildLanguageLists().at(-1)!;
+      const documentList = listOf(noLanguage);
+
+      expect(callArgs(documentList, 'filter')).toEqual([
+        '_type == $type && !defined(language)',
+      ]);
+      expect(callArgs(documentList, 'initialValueTemplates')).toEqual([[]]);
+    });
   });
 });

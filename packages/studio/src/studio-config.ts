@@ -10,6 +10,7 @@ import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/
 import { createCapabilityWarningInput } from '@blog/studio/schema-types/inputs/capability-warning-input/capability-warning-input';
 import { createLocalizationNoticeInput } from '@blog/studio/schema-types/inputs/localization-notice-input/localization-notice-input';
 import { LOCALE_LABEL } from '@blog/studio/schema-types/inputs/localization-notice-input/missing-locales';
+import { orderLocales } from '@blog/studio/structure/locales/order-locales';
 import { codeInput } from '@sanity/code-input';
 import { documentInternationalization } from '@sanity/document-internationalization';
 import { visionTool } from '@sanity/vision';
@@ -18,7 +19,7 @@ import { structureTool } from 'sanity/structure';
 import { internationalizedArray } from 'sanity-plugin-internationalized-array';
 import { media, mediaAssetSource } from 'sanity-plugin-media';
 
-import { studioStructure } from './studio-structure';
+import { createStudioStructure } from './studio-structure';
 
 export type TBuildStudioConfigParams = {
   projectId: string;
@@ -57,12 +58,7 @@ export const buildStudioConfig = ({
   defaultLocale = LOCALE_ISO_CODES.EN,
   liveLocales,
 }: TBuildStudioConfigParams) => {
-  const offeredLocales = [
-    defaultLocale,
-    ...(liveLocales ?? Object.values(LOCALE_ISO_CODES)).filter(
-      (locale) => locale !== defaultLocale,
-    ),
-  ];
+  const offeredLocales = orderLocales(defaultLocale, liveLocales);
   const languages = offeredLocales.map((locale) => ({
     id: locale,
     title: LOCALE_LABEL[locale] ?? locale,
@@ -76,7 +72,7 @@ export const buildStudioConfig = ({
     basePath,
 
     plugins: [
-      structureTool({ structure: studioStructure }),
+      structureTool({ structure: createStudioStructure(offeredLocales) }),
       visionTool(),
       codeInput(),
       media(),
