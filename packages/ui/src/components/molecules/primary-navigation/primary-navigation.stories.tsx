@@ -75,6 +75,43 @@ export const MobileOpen: TStory = {
   },
 };
 
+export const MobileOpenWithPanelActions: TStory = {
+  globals: { viewport: 'phone' },
+  args: {
+    actions: <button type="button">Account</button>,
+    panelActions: (
+      <>
+        <button type="button">EN</button>
+        <button type="button">Toggle theme</button>
+      </>
+    ),
+    mobileToggle: {
+      isOpen: true,
+      onToggle: () => {},
+      ariaLabel: 'Toggle navigation menu',
+      panelId: 'primary-navigation-panel',
+    },
+  },
+};
+
+export const DesktopWithBothActions: TStory = {
+  args: {
+    actions: <button type="button">Account</button>,
+    panelActions: (
+      <>
+        <button type="button">EN</button>
+        <button type="button">Toggle theme</button>
+      </>
+    ),
+    mobileToggle: {
+      isOpen: false,
+      onToggle: () => {},
+      ariaLabel: 'Toggle navigation menu',
+      panelId: 'primary-navigation-panel',
+    },
+  },
+};
+
 const InteractiveMobileDemo = () => {
   const [isOpen, setIsOpen] = useState(false);
 
