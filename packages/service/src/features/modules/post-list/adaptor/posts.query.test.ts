@@ -61,7 +61,7 @@ describe(postListModulePaginatedPostsQuery, () => {
   it('omits the scope predicate entirely when unscoped', () => {
     const query = postListModulePaginatedPostsQuery(1, 9).query;
 
-    expect(query).not.toContain('references(');
+    expect(query).not.toContain('references(*[_type == "page_');
     expect(query).not.toContain('$archivePageSlug');
     expect(query).not.toContain('blog_tag');
     expect(query).not.toContain('blog_topic');

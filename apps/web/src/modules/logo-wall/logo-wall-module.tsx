@@ -10,8 +10,12 @@ export interface ILogoWallModuleProps {
   tenant: string;
 }
 
-export const LogoWallModule = async ({ id, tenant }: ILogoWallModuleProps) => {
-  const tenantContext = await getTenantSanityContext(tenant);
+export const LogoWallModule = async ({
+  id,
+  locale,
+  tenant,
+}: ILogoWallModuleProps) => {
+  const tenantContext = await getTenantSanityContext(tenant, locale);
   const result = await service.modules.logoWall.v1.getLogoWallModule(
     id,
     tenantContext,

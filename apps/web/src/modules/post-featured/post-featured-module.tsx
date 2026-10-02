@@ -15,9 +15,10 @@ export interface IPostFeaturedModuleProps {
 
 export const PostFeaturedModule = async ({
   id,
+  locale,
   tenant,
 }: IPostFeaturedModuleProps) => {
-  const tenantContext = await getTenantSanityContext(tenant);
+  const tenantContext = await getTenantSanityContext(tenant, locale);
   const result = await service.modules.postFeatured.v1.getPostFeatured(
     id,
     tenantContext,

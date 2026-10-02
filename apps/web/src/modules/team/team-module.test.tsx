@@ -77,7 +77,7 @@ describe(`<${TeamModule.name}/>`, () => {
     await setup();
 
     expect(getTeamModuleMock).toHaveBeenCalledWith('team-1', tenant);
-    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
+    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1', 'en');
   });
 
   it('renders nothing when the fetch fails', async () => {

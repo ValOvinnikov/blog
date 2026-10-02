@@ -1138,7 +1138,7 @@ export type Link = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  label?: string;
+  label?: InternationalizedArrayString;
   linkType?: 'INTERNAL' | 'EXTERNAL';
   internalReference?:
     | Page_homeReference
@@ -1149,9 +1149,15 @@ export type Link = {
     | Page_topicIndexReference
     | Page_tagReference
     | Page_tagIndexReference;
-  url?: string;
+  url?: InternationalizedArrayString;
   openInNewTab?: boolean;
 };
+
+export type InternationalizedArrayString = Array<
+  {
+    _key: string;
+  } & InternationalizedArrayStringValue
+>;
 
 export type Module_heroBlogReference = {
   _ref: string;
@@ -1745,12 +1751,6 @@ export type InternationalizedArrayText = Array<
   } & InternationalizedArrayTextValue
 >;
 
-export type InternationalizedArrayString = Array<
-  {
-    _key: string;
-  } & InternationalizedArrayStringValue
->;
-
 export type MediaFolderReference = {
   _ref: string;
   _type: 'reference';
@@ -1954,6 +1954,7 @@ export type AllSanitySchemaTypes =
   | Page_tagReference
   | Page_tagIndexReference
   | Link
+  | InternationalizedArrayString
   | Module_heroBlogReference
   | Module_ctaReference
   | Module_postLatestReference
@@ -1993,7 +1994,6 @@ export type AllSanitySchemaTypes =
   | InternationalizedArrayTextValue
   | InternationalizedArrayStringValue
   | InternationalizedArrayText
-  | InternationalizedArrayString
   | MediaFolderReference
   | MediaFolder
   | MediaTag

@@ -1,3 +1,4 @@
+import type { TLocaleIsoCode } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import type {
   TTenantProvisioningStatus,
@@ -12,6 +13,7 @@ export type TTenantSanityCredentials = {
   projectId: string;
   dataset: string;
   token: string;
+  defaultLocale: TLocaleIsoCode;
   status: TTenantStatus;
   deprovisionedAt: Date | null;
   provisioningStatus: TTenantProvisioningStatus | null;
@@ -51,6 +53,7 @@ export async function getTenantSanityCredentials(
       tenant.sanityReadTokenEncrypted,
       env.TENANT_TOKEN_ENCRYPTION_KEY,
     ),
+    defaultLocale: tenant.locale,
     status: tenant.status,
     deprovisionedAt: tenant.deprovisionedAt,
     provisioningStatus: tenant.provisioningStatus,

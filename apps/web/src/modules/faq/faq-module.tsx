@@ -10,8 +10,8 @@ export interface IFaqModuleProps {
   tenant: string;
 }
 
-export const FaqModule = async ({ id, tenant }: IFaqModuleProps) => {
-  const tenantContext = await getTenantSanityContext(tenant);
+export const FaqModule = async ({ id, locale, tenant }: IFaqModuleProps) => {
+  const tenantContext = await getTenantSanityContext(tenant, locale);
   const result = await service.modules.faq.v1.getFaqModule(id, tenantContext);
 
   if (!result.ok) {

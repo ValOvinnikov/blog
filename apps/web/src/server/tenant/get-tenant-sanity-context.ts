@@ -1,3 +1,4 @@
+import { isLocaleIsoCode } from '@blog/config';
 import { queries } from '@blog/db';
 import {
   getPlatformSanityContext,
@@ -26,7 +27,7 @@ import { getRequestTenantId } from './get-request-tenant-id';
  * also dedupes the credentials query across every page/module in one render
  * pass sharing the same argument, rather than one query per caller.
  */
-export const getTenantSanityContext = cache(
+const getTenantCredentials = cache(
   async (tenant?: string): Promise<TTenantSanityContext> => {
     const tenantId = await getRequestTenantId(tenant);
     if (!tenantId) return getPlatformSanityContext();
@@ -41,3 +42,14 @@ export const getTenantSanityContext = cache(
     return getPlatformSanityContext();
   },
 );
+
+// Localized fields resolve in `locale`; callers without the route's locale
+// (metadata, which never calls `setRequestLocale`) get the default language.
+export const getTenantSanityContext = async (
+  tenant?: string,
+  locale?: string,
+): Promise<TTenantSanityContext> => {
+  const context = await getTenantCredentials(tenant);
+
+  return locale && isLocaleIsoCode(locale) ? { ...context, locale } : context;
+};

@@ -14,9 +14,10 @@ export interface IPostLatestModuleProps {
 
 export const PostLatestModule = async ({
   id,
+  locale,
   tenant,
 }: IPostLatestModuleProps) => {
-  const tenantContext = await getTenantSanityContext(tenant);
+  const tenantContext = await getTenantSanityContext(tenant, locale);
   const result = await service.modules.postLatest.v1.getPostLatest(
     id,
     tenantContext,

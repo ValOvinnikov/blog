@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config';
 import { queries, TENANT_STATUS } from '@blog/db';
 import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
 
@@ -80,6 +81,7 @@ describe(getTenantSanityContext, () => {
       projectId: 'proj',
       dataset: 'production',
       token: 'tok',
+      defaultLocale: LOCALE_ISO_CODES.EN,
       status: TENANT_STATUS.ACTIVE,
       deprovisionedAt: null,
       provisioningStatus: null,
@@ -89,6 +91,7 @@ describe(getTenantSanityContext, () => {
       projectId: 'proj',
       dataset: 'production',
       token: 'tok',
+      defaultLocale: LOCALE_ISO_CODES.EN,
       status: TENANT_STATUS.ACTIVE,
       deprovisionedAt: null,
       provisioningStatus: null,
@@ -96,6 +99,34 @@ describe(getTenantSanityContext, () => {
     expect(queries.tenants.getTenantSanityCredentials).toHaveBeenCalledWith(
       'tenant-uuid',
     );
+  });
+
+  it("adds the route's locale for localized fields", async () => {
+    vi.mocked(getRequestTenantId).mockResolvedValue('tenant-uuid');
+    vi.mocked(queries.tenants.getTenantSanityCredentials).mockResolvedValue({
+      projectId: 'proj',
+      dataset: 'production',
+      token: 'tok',
+      defaultLocale: LOCALE_ISO_CODES.EN,
+      status: TENANT_STATUS.ACTIVE,
+      deprovisionedAt: null,
+      provisioningStatus: null,
+    });
+
+    await expect(
+      getTenantSanityContext('tenant-uuid', LOCALE_ISO_CODES.NL),
+    ).resolves.toMatchObject({
+      locale: LOCALE_ISO_CODES.NL,
+      defaultLocale: LOCALE_ISO_CODES.EN,
+    });
+  });
+
+  it('ignores a locale outside the supported list', async () => {
+    vi.mocked(getRequestTenantId).mockResolvedValue(undefined);
+
+    const context = await getTenantSanityContext(undefined, 'xx');
+
+    expect(context).toBe(platformTenant);
   });
 
   it('forwards an explicitly supplied tenant to getRequestTenantId', async () => {
@@ -124,6 +155,7 @@ describe('getTenantSanityContext memoization', () => {
       projectId: 'proj',
       dataset: 'production',
       token: 'tok',
+      defaultLocale: LOCALE_ISO_CODES.EN,
       status: TENANT_STATUS.ACTIVE,
       deprovisionedAt: null,
       provisioningStatus: null,

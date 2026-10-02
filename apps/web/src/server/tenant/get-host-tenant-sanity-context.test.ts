@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config';
 import { queries, TENANT_STATUS } from '@blog/db';
 
 import { getHostTenantSanityContext } from './get-host-tenant-sanity-context';
@@ -51,6 +52,7 @@ describe(getHostTenantSanityContext, () => {
       projectId: 'proj',
       dataset: 'production',
       token: 'tok',
+      defaultLocale: LOCALE_ISO_CODES.EN,
       status: TENANT_STATUS.ACTIVE,
       deprovisionedAt: null,
       provisioningStatus: null,
@@ -62,6 +64,7 @@ describe(getHostTenantSanityContext, () => {
         projectId: 'proj',
         dataset: 'production',
         token: 'tok',
+        defaultLocale: LOCALE_ISO_CODES.EN,
         status: TENANT_STATUS.ACTIVE,
         deprovisionedAt: null,
         provisioningStatus: null,
@@ -137,6 +140,7 @@ describe('getHostTenantSanityContext memoization', () => {
       projectId: 'proj',
       dataset: 'production',
       token: 'tok',
+      defaultLocale: LOCALE_ISO_CODES.EN,
       status: TENANT_STATUS.ACTIVE,
       deprovisionedAt: null,
       provisioningStatus: null,
