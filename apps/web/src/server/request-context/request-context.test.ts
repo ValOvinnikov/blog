@@ -258,35 +258,4 @@ describe('request-context', () => {
       expect(metadataBase).toEqual(new URL('https://example.com'));
     });
   });
-
-  describe('peekRequestContext', () => {
-    it('serves the entered context', async () => {
-      const { enterRequestContext, peekRequestContext } =
-        await loadRequestContext();
-
-      await enterRequestContext(params(TENANT_ID, LOCALE_ISO_CODES.EN));
-
-      await expect(peekRequestContext()).resolves.toMatchObject({
-        tenantId: TENANT_ID,
-      });
-    });
-
-    it('serves nothing before entry instead of throwing', async () => {
-      const { peekRequestContext } = await loadRequestContext();
-
-      await expect(peekRequestContext()).resolves.toBeUndefined();
-    });
-
-    it('serves nothing when entry threw a 404', async () => {
-      toTenantSanityCredentialsMock.mockReturnValue(undefined);
-      const { enterRequestContext, peekRequestContext } =
-        await loadRequestContext();
-
-      await expect(
-        enterRequestContext(params(TENANT_ID, LOCALE_ISO_CODES.EN)),
-      ).rejects.toThrow('NEXT_NOT_FOUND');
-
-      await expect(peekRequestContext()).resolves.toBeUndefined();
-    });
-  });
 });

@@ -8,7 +8,3 @@ export const enterRequestContext = vi.fn<typeof TModule.enterRequestContext>(
 export const getRequestContext = vi.fn<typeof TModule.getRequestContext>(
   async () => DEFAULT_REQUEST_CONTEXT,
 );
-
-export const peekRequestContext = vi.fn<typeof TModule.peekRequestContext>(
-  async () => DEFAULT_REQUEST_CONTEXT,
-);

@@ -121,8 +121,3 @@ export const getRequestContext = (): Promise<TRequestContext> => {
   }
   return context;
 };
-
-/** For a 404 boundary, which must render even when no route entered the context. */
-export const peekRequestContext = async (): Promise<
-  TRequestContext | undefined
-> => getStore().context?.catch(() => undefined);
