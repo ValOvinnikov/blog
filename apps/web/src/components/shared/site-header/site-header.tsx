@@ -11,7 +11,7 @@ import { getRequestContext } from '@web/server/request-context/request-context';
 import { isReaderAccountEnabled } from '@web/server/settings-features/is-reader-account-enabled';
 import { getLanguageSwitcherStyle } from '@web/server/site-config/get-language-switcher-style';
 import { getSiteSettings } from '@web/server/site-settings/get-site-settings';
-import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/unresolved-tenant-placeholder';
+import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { logger } from '@web/utils/logger/logger';
 
 export const SiteHeader = async () => {
