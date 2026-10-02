@@ -19,6 +19,9 @@ const { clearTenantArtifactsMock } = vi.hoisted(() => ({
 const { archiveTenantRowMock } = vi.hoisted(() => ({
   archiveTenantRowMock: vi.fn(),
 }));
+const { purgeTenantReaderDataMock } = vi.hoisted(() => ({
+  purgeTenantReaderDataMock: vi.fn(),
+}));
 const { invalidateTenantCacheMock } = vi.hoisted(() => ({
   invalidateTenantCacheMock: vi.fn(),
 }));
@@ -45,6 +48,9 @@ vi.mock('./steps/clear-artifacts', () => ({
 }));
 vi.mock('./steps/archive-tenant', () => ({
   archiveTenantRow: archiveTenantRowMock,
+}));
+vi.mock('./steps/purge-reader-data', () => ({
+  purgeTenantReaderData: purgeTenantReaderDataMock,
 }));
 vi.mock('./steps/invalidate-tenant-cache', () => ({
   invalidateTenantCache: invalidateTenantCacheMock,
@@ -78,6 +84,7 @@ beforeEach(() => {
   revokeTenantSanityTokensMock.mockReset().mockResolvedValue(undefined);
   clearTenantArtifactsMock.mockReset().mockResolvedValue(undefined);
   archiveTenantRowMock.mockReset().mockResolvedValue(undefined);
+  purgeTenantReaderDataMock.mockReset().mockResolvedValue(undefined);
   invalidateTenantCacheMock.mockReset().mockResolvedValue(undefined);
   reportDeprovisioningStepStatusMock.mockReset().mockResolvedValue(undefined);
   reportDeprovisioningRunStartMock.mockReset().mockResolvedValue(undefined);
@@ -94,6 +101,7 @@ describe(runSteps, () => {
     expect(revokeTenantSanityTokensMock).toHaveBeenCalledTimes(1);
     expect(clearTenantArtifactsMock).toHaveBeenCalledTimes(1);
     expect(archiveTenantRowMock).toHaveBeenCalledTimes(1);
+    expect(purgeTenantReaderDataMock).toHaveBeenCalledTimes(1);
     expect(invalidateTenantCacheMock).toHaveBeenCalledTimes(1);
   });
 
@@ -122,10 +130,13 @@ describe(runSteps, () => {
     expect(callOrder).toEqual(['revoke-sanity-tokens', 'clear-artifacts']);
   });
 
-  it('runs archive-tenant before invalidate-tenant-cache', async () => {
+  it('runs archive-tenant before purge-reader-data before invalidate-tenant-cache', async () => {
     const callOrder: string[] = [];
     archiveTenantRowMock.mockImplementation(async () => {
       callOrder.push('archive-tenant');
+    });
+    purgeTenantReaderDataMock.mockImplementation(async () => {
+      callOrder.push('purge-reader-data');
     });
     invalidateTenantCacheMock.mockImplementation(async () => {
       callOrder.push('invalidate-tenant-cache');
@@ -133,7 +144,11 @@ describe(runSteps, () => {
 
     await runSteps(baseTenant, env);
 
-    expect(callOrder).toEqual(['archive-tenant', 'invalidate-tenant-cache']);
+    expect(callOrder).toEqual([
+      'archive-tenant',
+      'purge-reader-data',
+      'invalidate-tenant-cache',
+    ]);
   });
 
   it('stops at the first failing step and never runs later steps', async () => {
@@ -147,16 +162,18 @@ describe(runSteps, () => {
     expect(revokeTenantSanityTokensMock).not.toHaveBeenCalled();
     expect(clearTenantArtifactsMock).not.toHaveBeenCalled();
     expect(archiveTenantRowMock).not.toHaveBeenCalled();
+    expect(purgeTenantReaderDataMock).not.toHaveBeenCalled();
     expect(invalidateTenantCacheMock).not.toHaveBeenCalled();
   });
 
-  it('reports failure but leaves the already-committed archive untouched when invalidate-tenant-cache fails', async () => {
+  it('reports failure but leaves the already-committed archive and purge untouched when invalidate-tenant-cache fails', async () => {
     invalidateTenantCacheMock.mockRejectedValue(new Error('missing config'));
 
     const result = await runSteps(baseTenant, env);
 
     expect(result).toEqual({ ok: false });
     expect(archiveTenantRowMock).toHaveBeenCalledTimes(1);
+    expect(purgeTenantReaderDataMock).toHaveBeenCalledTimes(1);
     expect(invalidateTenantCacheMock).toHaveBeenCalledTimes(1);
   });
 
@@ -169,6 +186,7 @@ describe(runSteps, () => {
       revokeTenantSanityTokensMock,
       clearTenantArtifactsMock,
       archiveTenantRowMock,
+      purgeTenantReaderDataMock,
       invalidateTenantCacheMock,
     ]) {
       expect(mock).toHaveBeenCalledWith(baseTenant, env);
@@ -190,6 +208,7 @@ describe(runSteps, () => {
       'REVOKE_SANITY_TOKENS',
       'CLEAR_ARTIFACTS',
       'ARCHIVE_TENANT',
+      'PURGE_READER_DATA',
       'INVALIDATE_TENANT_CACHE',
     ]) {
       expect(reportDeprovisioningStepStatusMock).toHaveBeenCalledWith({
@@ -282,6 +301,7 @@ describe(runDeprovisioning, () => {
     expect(revokeTenantSanityTokensMock).not.toHaveBeenCalled();
     expect(clearTenantArtifactsMock).not.toHaveBeenCalled();
     expect(archiveTenantRowMock).not.toHaveBeenCalled();
+    expect(purgeTenantReaderDataMock).not.toHaveBeenCalled();
     expect(invalidateTenantCacheMock).not.toHaveBeenCalled();
   });
 
@@ -291,6 +311,7 @@ describe(runDeprovisioning, () => {
     expect(result).toEqual({ ok: true });
     expect(removeTenantDomainMock).toHaveBeenCalledTimes(1);
     expect(archiveTenantRowMock).toHaveBeenCalledTimes(1);
+    expect(purgeTenantReaderDataMock).toHaveBeenCalledTimes(1);
     expect(invalidateTenantCacheMock).toHaveBeenCalledTimes(1);
   });
 
@@ -302,6 +323,7 @@ describe(runDeprovisioning, () => {
     expect(result).toEqual({ ok: true, skipped: true });
     expect(removeTenantDomainMock).not.toHaveBeenCalled();
     expect(archiveTenantRowMock).not.toHaveBeenCalled();
+    expect(purgeTenantReaderDataMock).not.toHaveBeenCalled();
     expect(invalidateTenantCacheMock).not.toHaveBeenCalled();
   });
 });

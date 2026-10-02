@@ -233,7 +233,8 @@
       "PROVISIONED": "Locataire provisionné",
       "PROVISIONING_FAILED": "Échec du provisionnement",
       "SETTINGS_UPDATED": "Paramètres mis à jour",
-      "DELETED": "Locataire supprimé"
+      "DELETED": "Locataire supprimé",
+      "READER_DATA_PURGED": "Données des lecteurs purgées"
     }
   },
   "tenantDomainPage": {
@@ -557,6 +558,7 @@
       "REVOKE_SANITY_TOKENS": "Révoquer les jetons Sanity",
       "CLEAR_ARTIFACTS": "Effacer les artefacts de provisionnement",
       "ARCHIVE_TENANT": "Archiver le locataire",
+      "PURGE_READER_DATA": "Purger les données des lecteurs",
       "INVALIDATE_TENANT_CACHE": "Invalider les pages en cache"
     },
     "statusLabel": {

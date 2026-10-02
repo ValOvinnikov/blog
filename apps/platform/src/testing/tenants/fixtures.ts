@@ -42,6 +42,7 @@ export const idleDeprovisioningSteps = (): TTenantDeprovisioningState => {
     [DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS]: idle,
     [DEPROVISIONING_STEP.CLEAR_ARTIFACTS]: idle,
     [DEPROVISIONING_STEP.ARCHIVE_TENANT]: idle,
+    [DEPROVISIONING_STEP.PURGE_READER_DATA]: idle,
     [DEPROVISIONING_STEP.INVALIDATE_TENANT_CACHE]: idle,
   };
 };
@@ -58,6 +59,7 @@ export const doneDeprovisioningSteps = (): TTenantDeprovisioningState => {
     [DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS]: done,
     [DEPROVISIONING_STEP.CLEAR_ARTIFACTS]: done,
     [DEPROVISIONING_STEP.ARCHIVE_TENANT]: done,
+    [DEPROVISIONING_STEP.PURGE_READER_DATA]: done,
     [DEPROVISIONING_STEP.INVALIDATE_TENANT_CACHE]: done,
   };
 };
