@@ -1,3 +1,5 @@
+import { LOCALE_ISO_CODES } from '@blog/config';
+
 import { formatRelativeTime } from './format-relative-time';
 
 const NOW = new Date('2026-08-26T12:00:00.000Z');
@@ -13,26 +15,43 @@ const t = (key: string, values?: Record<string, string | number>): string => {
 describe(formatRelativeTime, () => {
   it('renders "Just now" for an event less than a minute old', () => {
     const date = new Date('2026-08-26T11:59:31.000Z');
-    expect(formatRelativeTime(date, t, NOW)).toBe('Just now');
+    expect(formatRelativeTime(date, t, LOCALE_ISO_CODES.EN, NOW)).toBe(
+      'Just now',
+    );
   });
 
   it('renders minutes for an event under an hour old', () => {
     const date = new Date('2026-08-26T11:45:00.000Z');
-    expect(formatRelativeTime(date, t, NOW)).toBe('15m ago');
+    expect(formatRelativeTime(date, t, LOCALE_ISO_CODES.EN, NOW)).toBe(
+      '15m ago',
+    );
   });
 
   it('renders hours for an event under a day old', () => {
     const date = new Date('2026-08-26T10:00:00.000Z');
-    expect(formatRelativeTime(date, t, NOW)).toBe('2h ago');
+    expect(formatRelativeTime(date, t, LOCALE_ISO_CODES.EN, NOW)).toBe(
+      '2h ago',
+    );
   });
 
   it('renders days for an event under a week old', () => {
     const date = new Date('2026-08-24T12:00:00.000Z');
-    expect(formatRelativeTime(date, t, NOW)).toBe('2d ago');
+    expect(formatRelativeTime(date, t, LOCALE_ISO_CODES.EN, NOW)).toBe(
+      '2d ago',
+    );
   });
 
-  it('falls back to an absolute short date past a week old', () => {
-    const date = new Date('2026-08-12T14:22:00.000Z');
-    expect(formatRelativeTime(date, t, NOW)).toBe('Aug 12');
-  });
+  it.each([
+    [LOCALE_ISO_CODES.EN, 'Aug 12'],
+    [LOCALE_ISO_CODES.NL, '12 aug'],
+    [LOCALE_ISO_CODES.FR, '12 août'],
+    [LOCALE_ISO_CODES.DE, '12. Aug.'],
+    [LOCALE_ISO_CODES.ES, '12 ago'],
+  ])(
+    'falls back to an absolute short date in %s past a week old',
+    (locale, expected) => {
+      const date = new Date('2026-08-12T14:22:00.000Z');
+      expect(formatRelativeTime(date, t, locale, NOW)).toBe(expected);
+    },
+  );
 });
