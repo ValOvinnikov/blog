@@ -728,7 +728,7 @@
     "switchOn": "Activée",
     "switchOff": "Désactivée",
     "defaultHeading": "Langue par défaut",
-    "defaultDescription": "{language}. Chaque page est d'abord rédigée dans cette langue ; vous pouvez la définir dans les détails du locataire.",
+    "defaultDescription": "Chaque page est d'abord rédigée dans cette langue ; vous pouvez la définir dans les détails du locataire.",
     "additionalHeading": "Langues supplémentaires",
     "allowance": "{used} sur {allowed} langues supplémentaires utilisées avec votre formule.",
     "upgradeNotice": "Votre formule ne publie que la langue par défaut. Passez à une formule supérieure pour ajouter d'autres langues.",

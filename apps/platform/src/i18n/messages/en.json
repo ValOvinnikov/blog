@@ -728,7 +728,7 @@
     "switchOn": "On",
     "switchOff": "Off",
     "defaultHeading": "Default language",
-    "defaultDescription": "{language}. Every page is written in it first; set it in the tenant details.",
+    "defaultDescription": "Every page is written in it first; set it in the tenant details.",
     "additionalHeading": "Additional languages",
     "allowance": "{used} of {allowed} additional languages in use on your plan.",
     "upgradeNotice": "Your plan publishes the default language only. Upgrade to add more languages.",
