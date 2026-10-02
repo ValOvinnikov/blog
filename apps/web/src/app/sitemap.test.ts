@@ -11,6 +11,8 @@ const {
   getTopicIndexPageMock,
   getTagIndexPageMock,
   getHostTenantSanityContextMock,
+  resolveRequestTenantMock,
+  selectLiveLocalesMock,
 } = vi.hoisted(() => ({
   getPostParamsMock: vi.fn(),
   getTopicParamsMock: vi.fn(),
@@ -22,6 +24,16 @@ const {
   getTopicIndexPageMock: vi.fn(),
   getTagIndexPageMock: vi.fn(),
   getHostTenantSanityContextMock: vi.fn(),
+  resolveRequestTenantMock: vi.fn(),
+  selectLiveLocalesMock: vi.fn(),
+}));
+
+vi.mock('@web/server/tenant/resolve-request-tenant', () => ({
+  resolveRequestTenant: resolveRequestTenantMock,
+}));
+
+vi.mock('@blog/db', () => ({
+  queries: { tenants: { selectLiveLocales: selectLiveLocalesMock } },
 }));
 
 vi.mock('@web/server/tenant/get-host-tenant-sanity-context', () => ({
@@ -77,6 +89,8 @@ describe('sitemap', () => {
       tenant: undefined,
     });
     getTenantBaseUrlMock.mockResolvedValue('https://example.com');
+    resolveRequestTenantMock.mockResolvedValue({ id: 'tenant-1' });
+    selectLiveLocalesMock.mockReturnValue(['en']);
   });
 
   afterEach(() => {
@@ -91,6 +105,8 @@ describe('sitemap', () => {
     getTopicIndexPageMock.mockReset();
     getTagIndexPageMock.mockReset();
     getHostTenantSanityContextMock.mockReset();
+    resolveRequestTenantMock.mockReset();
+    selectLiveLocalesMock.mockReset();
     getTenantBaseUrlMock.mockReset();
   });
 
@@ -135,6 +151,24 @@ describe('sitemap', () => {
     expect(urls).toContain('https://example.com/topics/news');
     expect(urls).toContain('https://example.com/tags/typescript');
     expect(urls).toContain('https://example.com/about');
+  });
+
+  it("requests landing page slugs with the tenant's live languages", async () => {
+    mockAllEmpty();
+    const tenantRow = { id: 'tenant-1' };
+    const tenantContext = { projectId: 'p' };
+    resolveRequestTenantMock.mockResolvedValue(tenantRow);
+    getHostTenantSanityContextMock.mockResolvedValue({
+      isResolvable: true,
+      tenant: tenantContext,
+    });
+    selectLiveLocalesMock.mockReturnValue(['en', 'de']);
+    const sitemap = (await import('./sitemap')).default;
+
+    await sitemap();
+
+    expect(selectLiveLocalesMock).toHaveBeenCalledWith(tenantRow);
+    expect(getPageSlugsMock).toHaveBeenCalledWith(tenantContext, ['en', 'de']);
   });
 
   it('includes numbered topic and tag pagination pages', async () => {

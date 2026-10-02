@@ -1,8 +1,10 @@
 import { LOCALE_BCP47_TAGS, routes } from '@blog/config';
+import { queries } from '@blog/db';
 import { service } from '@blog/service';
 import { routing } from '@web/i18n/routing';
 import { getHostTenantSanityContext } from '@web/server/tenant/get-host-tenant-sanity-context';
 import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
+import { resolveRequestTenant } from '@web/server/tenant/resolve-request-tenant';
 import { logger } from '@web/utils/logger/logger';
 import type { MetadataRoute } from 'next';
 
@@ -51,6 +53,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
   const { tenant } = hostTenant;
 
+  const tenantRow = await resolveRequestTenant();
+  if (!tenantRow) {
+    return [];
+  }
+  const liveLocales = queries.tenants.selectLiveLocales(tenantRow);
+
   const [
     postParamsResult,
     topicParamsResult,
@@ -68,7 +76,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     service.pages.topic.v1.getTopicPaginationParams(tenant),
     service.pages.tag.v1.getTagPaginationParams(tenant),
     service.pages.blog.v1.getIndexPageParams(tenant),
-    service.pages.landing.v1.getPageSlugs(tenant),
+    service.pages.landing.v1.getPageSlugs(tenant, liveLocales),
     service.pages.topicIndex.v1.getIndexPage(tenant),
     service.pages.tagIndex.v1.getIndexPage(tenant),
   ]);
