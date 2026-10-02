@@ -6,7 +6,7 @@ import { Button } from '@blog/ui/components/atoms/button';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { TextInput } from '@blog/ui/components/atoms/text-input';
 import { useToast } from '@web/context/toast-provider';
-import { updateDisplayNameAction } from '@web/server/account/identity-actions';
+import { updateDisplayNameAction } from '@web/server/account/identity-actions/identity-actions';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';

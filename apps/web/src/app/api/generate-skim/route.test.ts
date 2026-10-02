@@ -30,7 +30,7 @@ vi.mock('@blog/service', () => ({
   getPlatformSanityWriteContext: getPlatformSanityWriteContextMock,
 }));
 
-vi.mock('@web/server/skim/generate-takeaways', () => ({
+vi.mock('@web/server/skim/generate-takeaways/generate-takeaways', () => ({
   generateTakeaways: generateTakeawaysMock,
   SKIM_GENERATION_MODEL: 'claude-haiku-4-5',
 }));

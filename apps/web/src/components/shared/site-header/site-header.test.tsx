@@ -1,8 +1,8 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import userEvent from '@testing-library/user-event';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { isReaderAccountEnabled } from '@web/server/settings-features/is-reader-account-enabled';
-import { getSiteSettings } from '@web/server/site-settings/get-site-settings';
+import { isReaderAccountEnabled } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
+import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
@@ -22,11 +22,11 @@ const {
 
 vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@web/server/site-settings/get-site-settings', () => ({
+vi.mock('@web/server/site-settings/get-site-settings/get-site-settings', () => ({
   getSiteSettings: vi.fn(),
 }));
 
-vi.mock('@web/server/settings-features/is-reader-account-enabled', () => ({
+vi.mock('@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled', () => ({
   isReaderAccountEnabled: vi.fn(),
 }));
 

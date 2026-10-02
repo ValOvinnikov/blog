@@ -2,7 +2,7 @@ import type { ITenantLocalizedParams } from '@blog/config';
 import { BookmarksPage } from '@web/components/pages/bookmarks-page';
 import { buildBookmarksMetadata } from '@web/metadata/bookmarks-metadata';
 import { enterRequestContext } from '@web/server/request-context/request-context';
-import { isReaderAccountEnabled } from '@web/server/settings-features/is-reader-account-enabled';
+import { isReaderAccountEnabled } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 

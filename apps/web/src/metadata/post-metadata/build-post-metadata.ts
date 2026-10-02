@@ -1,6 +1,6 @@
 import { routes } from '@blog/config';
 import { toMetadata } from '@web/metadata/to-metadata';
-import { getPostPage } from '@web/server/post/get-post-page';
+import { getPostPage } from '@web/server/post/get-post-page/get-post-page';
 import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 

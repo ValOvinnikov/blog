@@ -1,5 +1,5 @@
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
+import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
@@ -26,11 +26,11 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@web/server/settings-features/is-capability-enabled', () => ({
+vi.mock('@web/server/settings-features/is-capability-enabled/is-capability-enabled', () => ({
   isCapabilityEnabled: vi.fn(),
 }));
 
-vi.mock('@web/server/newsletter/newsletter-actions', () => ({
+vi.mock('@web/server/newsletter/newsletter-actions/newsletter-actions', () => ({
   subscribeToNewsletterAction: vi.fn(),
 }));
 

@@ -18,7 +18,7 @@ const { getPostPageMock } = vi.hoisted(() => ({
 
 vi.mock('@web/i18n/navigation');
 
-vi.mock('@web/server/post/get-post-page', () => ({
+vi.mock('@web/server/post/get-post-page/get-post-page', () => ({
   getPostPage: getPostPageMock,
 }));
 

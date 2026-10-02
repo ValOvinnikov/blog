@@ -27,7 +27,7 @@ vi.mock('@web/utils/report-client-error', () => ({
   reportClientError: reportClientErrorMock,
 }));
 
-vi.mock('@web/server/bookmarks/bookmark-actions', () => ({
+vi.mock('@web/server/bookmarks/bookmark-actions/bookmark-actions', () => ({
   getBookmarkStatus: getBookmarkStatusMock,
   setBookmarkStatus: setBookmarkStatusMock,
 }));

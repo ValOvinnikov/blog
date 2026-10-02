@@ -8,7 +8,7 @@ import { SmartLink } from '@web/components/shared/smart-link';
 import { SocialLinks } from '@web/components/shared/social-links';
 import { routing } from '@web/i18n/routing';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { getSiteSettings } from '@web/server/site-settings/get-site-settings';
+import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
 import { logger } from '@web/utils/logger/logger';
 import { getTranslations } from 'next-intl/server';
 

@@ -7,7 +7,7 @@ import { isSecretMatch } from '@blog/utils';
 import {
   generateTakeaways,
   SKIM_GENERATION_MODEL,
-} from '@web/server/skim/generate-takeaways';
+} from '@web/server/skim/generate-takeaways/generate-takeaways';
 import {
   getHostTenantSanityContext,
   getHostTenantSanityWriteContext,

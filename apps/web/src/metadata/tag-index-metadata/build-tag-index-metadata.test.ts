@@ -9,7 +9,7 @@ const { getTagIndexPageMock } = vi.hoisted(() => ({
   getTagIndexPageMock: vi.fn(),
 }));
 
-vi.mock('@web/server/tag-index/get-tag-index-page', () => ({
+vi.mock('@web/server/tag-index/get-tag-index-page/get-tag-index-page', () => ({
   getTagIndexPage: getTagIndexPageMock,
 }));
 

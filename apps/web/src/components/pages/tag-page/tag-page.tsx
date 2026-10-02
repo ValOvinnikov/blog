@@ -1,7 +1,7 @@
 import { TAXONOMY_KIND } from '@blog/config';
 import { TagBreadcrumbs } from '@web/components/features/tag/tag-breadcrumbs';
 import { PageShell } from '@web/components/page-templates/page-shell';
-import { getTagPage } from '@web/server/tag/get-tag-page';
+import { getTagPage } from '@web/server/tag/get-tag-page/get-tag-page';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 
 import { TagModuleRenderer } from './tag-module-renderer';

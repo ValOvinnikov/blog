@@ -8,8 +8,8 @@ import { SiteNavigation } from '@web/components/shared/site-navigation';
 import { ThemeToggleButton } from '@web/components/shared/theme-toggle-button';
 import { routing } from '@web/i18n/routing';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { isReaderAccountEnabled } from '@web/server/settings-features/is-reader-account-enabled';
-import { getSiteSettings } from '@web/server/site-settings/get-site-settings';
+import { isReaderAccountEnabled } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
+import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
 import { logger } from '@web/utils/logger/logger';
 
 export const SiteHeader = async () => {

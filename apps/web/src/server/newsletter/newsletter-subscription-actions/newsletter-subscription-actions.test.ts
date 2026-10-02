@@ -64,7 +64,7 @@ vi.mock('@web/utils/resolve-tenant-email-identity', () => ({
   resolveTenantEmailIdentity: resolveTenantEmailIdentityMock,
 }));
 
-vi.mock('@web/server/newsletter/newsletter-subscribed-cookie', () => ({
+vi.mock('@web/server/newsletter/newsletter-subscribed-cookie/newsletter-subscribed-cookie', () => ({
   clearNewsletterSubscribedCookie: clearNewsletterSubscribedCookieMock,
 }));
 
