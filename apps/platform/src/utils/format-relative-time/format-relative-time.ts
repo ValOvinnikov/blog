@@ -1,3 +1,5 @@
+import { LOCALE_BCP47_TAGS, type TLocaleIsoCode } from '@blog/config';
+
 const MINUTE_MS = 60 * 1000;
 const HOUR_MS = 60 * MINUTE_MS;
 const DAY_MS = 24 * HOUR_MS;
@@ -13,16 +15,11 @@ export type TRelativeTimeTranslator = (
   values?: Record<string, string | number>,
 ) => string;
 
-/**
- * Short relative time for recent events ("2h ago"), falling back to an
- * absolute short date (e.g. "Aug 12") once an event is more than a week
- * old — a relative label past that point stops being useful at a glance.
- * The relative labels route through `t`; the absolute-date fallback keeps
- * its own fixed `en-US` formatting (a separate, narrower concern).
- */
+/** Falls back to an absolute short date past a week, where a relative label stops being useful at a glance. */
 export const formatRelativeTime = (
   date: Date,
   t: TRelativeTimeTranslator,
+  locale: TLocaleIsoCode,
   now: Date = new Date(),
 ): string => {
   const diffMs = now.getTime() - date.getTime();
@@ -40,5 +37,8 @@ export const formatRelativeTime = (
     return t('relativeDaysAgo', { days: Math.floor(diffMs / DAY_MS) });
   }
 
-  return date.toLocaleDateString('en-US', DATE_FORMAT_OPTIONS);
+  return date.toLocaleDateString(
+    LOCALE_BCP47_TAGS[locale],
+    DATE_FORMAT_OPTIONS,
+  );
 };

@@ -8,7 +8,7 @@ import { StatusBadge } from '@platform/components/shared/status-badge';
 import { formatDate } from '@platform/utils/format-date/format-date';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { tenantStatusTone } from '@platform/utils/status-tone/status-tone';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { tenantsTableVariants } from './tenants-table-variants';
 
@@ -26,6 +26,7 @@ const manageHrefFor = (tenant: TTenant): string =>
 
 export const TenantsTable = ({ tenants }: TTenantsTableProps) => {
   const t = useTranslations('tenantsTable');
+  const locale = useLocale();
   const { card, table, head, row, cell, tname, name, domain, empty } =
     tenantsTableVariants();
 
@@ -67,7 +68,7 @@ export const TenantsTable = ({ tenants }: TTenantsTableProps) => {
               {t(`status.${tenant.status}`)}
             </StatusBadge>
           </td>
-          <td className={cell()}>{formatDate(tenant.createdAt)}</td>
+          <td className={cell()}>{formatDate(tenant.createdAt, locale)}</td>
           <td className={cell()}>
             <LinkButton
               href={manageHrefFor(tenant)}
