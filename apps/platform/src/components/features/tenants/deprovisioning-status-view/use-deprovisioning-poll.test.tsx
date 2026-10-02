@@ -49,13 +49,14 @@ describe(useDeprovisioningPoll, () => {
   });
 
   describe('STEP_ORDER', () => {
-    it('is the six core deprovisioning steps, in run order', () => {
+    it('is the seven core deprovisioning steps, in run order', () => {
       expect(STEP_ORDER).toEqual([
         DEPROVISIONING_STEP.REMOVE_DOMAIN,
         DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT,
         DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS,
         DEPROVISIONING_STEP.CLEAR_ARTIFACTS,
         DEPROVISIONING_STEP.ARCHIVE_TENANT,
+        DEPROVISIONING_STEP.PURGE_READER_DATA,
         DEPROVISIONING_STEP.INVALIDATE_TENANT_CACHE,
       ]);
     });

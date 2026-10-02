@@ -20,6 +20,7 @@ const ACTIVITY_GLYPH: Record<TAuditAction, string> = {
   [AUDIT_ACTION.PROVISIONING_FAILED]: '⚠',
   [AUDIT_ACTION.SETTINGS_UPDATED]: '⚙',
   [AUDIT_ACTION.DELETED]: '✕',
+  [AUDIT_ACTION.READER_DATA_PURGED]: '🗑',
 };
 
 export const RecentActivityCard = ({ events }: TRecentActivityCardProps) => {

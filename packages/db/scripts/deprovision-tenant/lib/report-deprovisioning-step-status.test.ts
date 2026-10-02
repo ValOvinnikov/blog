@@ -28,6 +28,7 @@ async function insertTenant(): Promise<string> {
         REVOKE_SANITY_TOKENS: { status: 'IDLE' },
         CLEAR_ARTIFACTS: { status: 'IDLE' },
         ARCHIVE_TENANT: { status: 'IDLE' },
+        PURGE_READER_DATA: { status: 'IDLE' },
         INVALIDATE_TENANT_CACHE: { status: 'IDLE' },
       },
     })
