@@ -13,19 +13,10 @@ export type THostTenantSanityContext =
   | { isResolvable: false };
 
 /**
- * Resolves tenant Sanity credentials for the routes `proxy.ts`'s matcher
- * excludes (any URL containing a dot — `sitemap.xml`, `rss.xml`, the
- * favicon, and the default OG/Twitter images) and which therefore never
- * receive the `x-tenant-id` header `getTenantSanityContext` reads.
- * `isResolvable: false` means production saw a host matching no servable
- * tenant — unmatched, archived, or still mid-provisioning — the caller must
- * render as though it has no content, never fall back to the platform's own
- * project. Outside production, an unresolved host resolves `tenant` to
- * `getPlatformSanityContext()` — the deliberate single-tenant dev/preview
- * fallback. A matched tenant whose credentials query still comes back
- * empty — a race against `resolveRequestTenant()`'s own servability check,
- * in practice — resolves the same way: `isResolvable: false` in production,
- * the platform fallback outside it.
+ * For routes `proxy.ts` excludes (URLs containing a dot), which never get the
+ * `x-tenant-id` header. `isResolvable: false` means production saw no servable
+ * tenant for the host — the caller must render as though it has no content,
+ * never fall back to the platform's own project.
  */
 export const getHostTenantSanityContext = cache(
   async (): Promise<THostTenantSanityContext> => {

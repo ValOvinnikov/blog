@@ -1,6 +1,8 @@
 import type { TCapability } from '@blog/config';
 import { PLAN_REGISTRY } from '@blog/db';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { getTenantPlan } from '@web/server/tenant/get-tenant-plan';
+import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/unresolved-tenant-placeholder';
 import { logger } from '@web/utils/logger/logger';
 
 import { getEffectiveSettingsFeatures } from './get-effective-settings-features';
@@ -15,8 +17,9 @@ import { getEffectiveSettingsFeatures } from './get-effective-settings-features'
  */
 export const isCapabilityEnabled = async (
   capability: TCapability,
-  tenant?: string,
 ): Promise<boolean> => {
+  const { tenantId } = await getRequestContext();
+  const tenant = tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER;
   const [planResult, featuresResult] = await Promise.all([
     getTenantPlan(tenant),
     getEffectiveSettingsFeatures(tenant),

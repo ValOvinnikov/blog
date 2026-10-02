@@ -2,8 +2,10 @@ import type { ITenantLocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
 import { HomePage } from '@web/components/pages/home-page';
 import { toMetadata } from '@web/metadata/to-metadata';
-import { enterRequestContext } from '@web/server/request-context/request-context';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import {
+  enterRequestContext,
+  getRequestContext,
+} from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 
@@ -15,9 +17,9 @@ type TProps = {
 export const revalidate = 21600;
 
 export async function generateMetadata({ params }: TProps): Promise<Metadata> {
-  const { tenant } = await params;
-  const tenantContext = await getTenantSanityContext(tenant);
-  const result = await service.pages.home.v1.getHomePage(tenantContext);
+  await enterRequestContext(params);
+  const { sanityContext } = await getRequestContext();
+  const result = await service.pages.home.v1.getHomePage(sanityContext);
 
   if (!result.ok) {
     logger.error('home_page.metadata_fetch_failed', { error: result.error });
@@ -28,7 +30,7 @@ export async function generateMetadata({ params }: TProps): Promise<Metadata> {
     return {};
   }
 
-  return toMetadata(result.data.seo, tenantContext, {
+  return toMetadata(result.data.seo, {
     canonical: '/',
     ogType: 'website',
     titleAbsolute: true,
@@ -36,8 +38,7 @@ export async function generateMetadata({ params }: TProps): Promise<Metadata> {
 }
 
 export default async function HomeRoute({ params }: TProps) {
-  const { locale, tenant } = await params;
   await enterRequestContext(params);
 
-  return <HomePage locale={locale} tenant={tenant} />;
+  return <HomePage />;
 }

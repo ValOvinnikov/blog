@@ -36,7 +36,7 @@ describe('AccountRoute', () => {
 
     expect(screen.getByTestId('account-page')).toBeInTheDocument();
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
-    expect(isReaderAccountEnabledMock).toHaveBeenCalledWith('tenant-1');
+    expect(isReaderAccountEnabledMock).toHaveBeenCalledWith();
   });
 
   it('answers 404 when the tenant has no reader-account capability enabled', async () => {

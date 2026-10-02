@@ -4,18 +4,15 @@ import {
   testBreadcrumbsJsonLdSchema,
   testNoJsonLdWithoutBaseUrl,
 } from '@web/testing/shared/breadcrumbs-page-contract/breadcrumbs-page-contract';
-import type { Mock } from 'vitest';
 
 interface IStaticBreadcrumbsContractOptions {
   setup: TAsyncSetup;
-  getTenantBaseUrlMock: Mock;
   label: string;
   path: string;
 }
 
 export const testStaticBreadcrumbsContract = ({
   setup,
-  getTenantBaseUrlMock,
   label,
   path,
 }: IStaticBreadcrumbsContractOptions) => {
@@ -33,11 +30,5 @@ export const testStaticBreadcrumbsContract = ({
   });
 
   testBreadcrumbsJsonLdSchema({ setup, itemPath: path });
-  testNoJsonLdWithoutBaseUrl({ setup, getTenantBaseUrlMock });
-
-  it('forwards the tenant to getTenantBaseUrl', async () => {
-    await setup();
-
-    expect(getTenantBaseUrlMock).toHaveBeenCalledWith('tenant-1');
-  });
+  testNoJsonLdWithoutBaseUrl({ setup });
 };

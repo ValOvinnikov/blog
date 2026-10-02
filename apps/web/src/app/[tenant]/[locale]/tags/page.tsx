@@ -12,13 +12,12 @@ type TProps = {
 export const revalidate = 21600;
 
 export async function generateMetadata({ params }: TProps): Promise<Metadata> {
-  const { tenant } = await params;
-  return buildTagIndexMetadata(tenant);
+  await enterRequestContext(params);
+  return buildTagIndexMetadata();
 }
 
 export default async function TagIndexRoute({ params }: TProps) {
-  const { locale, tenant } = await params;
   await enterRequestContext(params);
 
-  return <TagIndexPage locale={locale} tenant={tenant} />;
+  return <TagIndexPage />;
 }

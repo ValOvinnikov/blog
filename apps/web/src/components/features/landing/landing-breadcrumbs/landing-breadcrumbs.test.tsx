@@ -1,4 +1,3 @@
-import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
 import { customRenderAsync } from '@web/testing/custom-render';
 import { mockLandingPage } from '@web/testing/pages/landing-page/fixtures';
 import {
@@ -12,6 +11,8 @@ import {
 
 import { LandingBreadcrumbs } from './landing-breadcrumbs';
 
+vi.mock('@web/server/request-context/request-context');
+
 const { getLandingPageMock } = vi.hoisted(() => ({
   getLandingPageMock: vi.fn(),
 }));
@@ -22,20 +23,13 @@ vi.mock('@web/server/landing/get-landing-page', () => ({
   getLandingPage: getLandingPageMock,
 }));
 
-vi.mock('@web/server/tenant/get-tenant-base-url');
-
-const getTenantBaseUrlMock = vi.mocked(getTenantBaseUrl);
-
 const setup = customRenderAsync(LandingBreadcrumbs, {
   slug: 'about-us',
-  tenant: 'tenant-1',
 });
 
 describe(`<${LandingBreadcrumbs.name}/>`, () => {
   beforeEach(() => {
     getLandingPageMock.mockReset();
-    getTenantBaseUrlMock.mockReset();
-    getTenantBaseUrlMock.mockResolvedValue('https://example.com');
   });
 
   testNotFoundWithoutLog({ pageLoaderMock: getLandingPageMock, setup });
@@ -61,13 +55,12 @@ describe(`<${LandingBreadcrumbs.name}/>`, () => {
     pageLoaderMock: getLandingPageMock,
     setup,
     successData: mockLandingPage,
-    getTenantBaseUrlMock,
   });
   testForwardsArgsToLoader({
     pageLoaderMock: getLandingPageMock,
     setup,
     successData: mockLandingPage,
-    description: 'forwards the slug and tenant to getLandingPage',
-    expectedArgs: ['about-us', 'tenant-1'],
+    description: 'forwards the slug to getLandingPage',
+    expectedArgs: ['about-us'],
   });
 });

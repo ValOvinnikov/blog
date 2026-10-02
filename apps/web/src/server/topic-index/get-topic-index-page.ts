@@ -1,12 +1,11 @@
 import { service, type TTopicIndexPage } from '@blog/service';
 import type { TResult } from '@blog/utils';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { cache } from 'react';
 
-/** The shared topic-index loader every self-fetching part of `/topics` reads. */
 export const getTopicIndexPage = cache(
-  async (tenant: string): Promise<TResult<TTopicIndexPage | undefined>> => {
-    const tenantContext = await getTenantSanityContext(tenant);
-    return service.pages.topicIndex.v1.getIndexPage(tenantContext);
+  async (): Promise<TResult<TTopicIndexPage | undefined>> => {
+    const { sanityContext } = await getRequestContext();
+    return service.pages.topicIndex.v1.getIndexPage(sanityContext);
   },
 );

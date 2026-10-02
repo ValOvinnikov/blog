@@ -1,4 +1,3 @@
-import type { ITenantLocalizedParams } from '@blog/config';
 import { BlogPostingSchema } from '@web/components/features/post/blog-posting-schema';
 import { PostArticle } from '@web/components/features/post/post-article';
 import { PostBreadcrumbs } from '@web/components/features/post/post-breadcrumbs';
@@ -12,7 +11,7 @@ import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 import { BlogPostModuleRenderer } from './blog-post-module-renderer';
 import { blogPostPageVariants } from './blog-post-page-variants';
 
-type TBlogPostPageProps = ITenantLocalizedParams & { slug: string };
+type TBlogPostPageProps = { slug: string };
 
 const s = blogPostPageVariants();
 
@@ -24,8 +23,8 @@ const s = blogPostPageVariants();
  * composes every other concern as a self-fetching part reading the same
  * cached `getPostPage` loader.
  */
-export const BlogPostPage = async ({ slug, tenant }: TBlogPostPageProps) => {
-  const result = await getPostPage(slug, tenant);
+export const BlogPostPage = async ({ slug }: TBlogPostPageProps) => {
+  const result = await getPostPage(slug);
   const post = guardPageLoaderResult(result, 'blog_post_page.fetch_failed', {
     slug,
   });
@@ -34,8 +33,8 @@ export const BlogPostPage = async ({ slug, tenant }: TBlogPostPageProps) => {
 
   return (
     <>
-      <BlogPostingSchema slug={slug} tenant={tenant} />
-      <PostBreadcrumbs slug={slug} tenant={tenant} />
+      <BlogPostingSchema slug={slug} />
+      <PostBreadcrumbs slug={slug} />
 
       <main className={s.root()}>
         <div className={s.article()}>
@@ -45,7 +44,7 @@ export const BlogPostPage = async ({ slug, tenant }: TBlogPostPageProps) => {
               hasDeep={hasAsides}
               className={s.depthToggle()}
             />
-            <PostArticle slug={slug} tenant={tenant} />
+            <PostArticle slug={slug} />
             <SkimPanel takeaways={postTakeaways} />
           </DepthProvider>
         </div>

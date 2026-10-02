@@ -1,7 +1,6 @@
 import { routes } from '@blog/config';
 import { toMetadata } from '@web/metadata/to-metadata';
 import { getTagPage } from '@web/server/tag/get-tag-page';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
@@ -16,13 +15,11 @@ import { getTranslations } from 'next-intl/server';
  */
 export const buildTagMetadata = async (
   slug: string,
-  tenant: string,
   pageNumber?: number,
 ): Promise<Metadata> => {
-  const [result, t, tenantContext] = await Promise.all([
-    getTagPage(slug, tenant),
+  const [result, t] = await Promise.all([
+    getTagPage(slug),
     getTranslations('pagination'),
-    getTenantSanityContext(tenant),
   ]);
 
   if (!result.ok) {
@@ -46,7 +43,7 @@ export const buildTagMetadata = async (
             : undefined,
         };
 
-  return toMetadata(resolvedSeo, tenantContext, {
+  return toMetadata(resolvedSeo, {
     canonical: routes.tag(slug, pageNumber),
     ogType: 'website',
     feedUrl: routes.tagRssFeed(slug),

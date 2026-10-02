@@ -1,15 +1,14 @@
 import { TopicChipList } from '@web/components/shared/topic-chip-list';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { getTopicsSafely } from '@web/utils/get-topics-safely';
 
 export type TTopicChipsProps = {
   activeSlug: string;
-  tenant: string;
 };
 
-export const TopicChips = async ({ activeSlug, tenant }: TTopicChipsProps) => {
-  const tenantContext = await getTenantSanityContext(tenant);
-  const topics = await getTopicsSafely(tenantContext);
+export const TopicChips = async ({ activeSlug }: TTopicChipsProps) => {
+  const { sanityContext } = await getRequestContext();
+  const topics = await getTopicsSafely(sanityContext);
 
   return <TopicChipList topics={topics} activeSlug={activeSlug} />;
 };

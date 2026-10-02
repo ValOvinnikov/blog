@@ -2,7 +2,6 @@ import { CAPABILITY } from '@blog/config';
 import { service } from '@blog/service';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
-import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/unresolved-tenant-placeholder';
 import { logger } from '@web/utils/logger/logger';
 
 import { NewsletterModuleView } from './newsletter-module-view';
@@ -12,11 +11,8 @@ export interface INewsletterModuleProps {
 }
 
 export const NewsletterModule = async ({ id }: INewsletterModuleProps) => {
-  const { tenantId, sanityContext } = await getRequestContext();
-  const isEnabled = await isCapabilityEnabled(
-    CAPABILITY.NEWSLETTER,
-    tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER,
-  );
+  const { sanityContext } = await getRequestContext();
+  const isEnabled = await isCapabilityEnabled(CAPABILITY.NEWSLETTER);
   if (!isEnabled) return null;
 
   const [result, newsletterSettingsResult] = await Promise.all([

@@ -24,7 +24,7 @@ describe(isReaderAccountEnabled, () => {
     async (capability) => {
       enableOnly(capability);
 
-      await expect(isReaderAccountEnabled('tenant-1')).resolves.toBe(true);
+      await expect(isReaderAccountEnabled()).resolves.toBe(true);
     },
   );
 
@@ -35,17 +35,16 @@ describe(isReaderAccountEnabled, () => {
       CAPABILITY.CONSENT_BANNER,
     );
 
-    await expect(isReaderAccountEnabled('tenant-1')).resolves.toBe(false);
+    await expect(isReaderAccountEnabled()).resolves.toBe(false);
   });
 
-  it('checks each capability against the supplied tenant', async () => {
+  it('asks about each reader-account capability', async () => {
     enableOnly();
 
-    await isReaderAccountEnabled('tenant-1');
+    await isReaderAccountEnabled();
 
-    expect(isCapabilityEnabledMock).toHaveBeenCalledWith(
-      CAPABILITY.BOOKMARKS,
-      'tenant-1',
-    );
+    expect(isCapabilityEnabledMock).toHaveBeenCalledWith(CAPABILITY.BOOKMARKS);
+    expect(isCapabilityEnabledMock).toHaveBeenCalledWith(CAPABILITY.COMMENTS);
+    expect(isCapabilityEnabledMock).toHaveBeenCalledWith(CAPABILITY.NEWSLETTER);
   });
 });

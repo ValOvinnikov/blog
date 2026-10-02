@@ -10,7 +10,8 @@ type TProps = {
   params: Promise<ITenantLocalizedParams>;
 };
 
-export function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({ params }: TProps): Promise<Metadata> {
+  await enterRequestContext(params);
   return buildAccountMetadata();
 }
 
@@ -18,10 +19,9 @@ export function generateMetadata(): Promise<Metadata> {
 export const dynamic = 'force-dynamic';
 
 export default async function AccountRoute({ params }: TProps) {
-  const { tenant } = await params;
   await enterRequestContext(params);
 
-  if (!(await isReaderAccountEnabled(tenant))) {
+  if (!(await isReaderAccountEnabled())) {
     notFound();
   }
 

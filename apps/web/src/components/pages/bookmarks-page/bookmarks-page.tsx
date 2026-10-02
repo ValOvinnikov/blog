@@ -2,8 +2,7 @@ import { routes } from '@blog/config';
 import { queries } from '@blog/db';
 import { service } from '@blog/service';
 import { auth } from '@web/server/auth/auth';
-import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';
 import { redirect } from 'next/navigation';
 import { getFormatter, getTranslations } from 'next-intl/server';
@@ -31,23 +30,22 @@ export const BookmarksPage = async () => {
     redirect(routes.home());
   }
 
-  const tenantId = await getRequestTenantId();
+  const { tenantId, sanityContext } = await getRequestContext();
   if (!tenantId) {
     redirect(routes.home());
   }
 
-  const [bookmarks, t, format, tenant] = await Promise.all([
+  const [bookmarks, t, format] = await Promise.all([
     queries.bookmarks.listBookmarks(tenantId, userId),
     getTranslations('bookmarksPage'),
     getFormatter(),
-    getTenantSanityContext(),
   ]);
 
   const bookmarkOrder = bookmarks.map((bookmark) => bookmark.postId);
 
   const result = await service.entities.posts.v1.getPostsByIds(
     bookmarkOrder,
-    tenant,
+    sanityContext,
   );
 
   if (!result.ok) {

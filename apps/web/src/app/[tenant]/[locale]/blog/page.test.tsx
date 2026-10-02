@@ -43,6 +43,15 @@ describe('PostIndexRoute', () => {
 
       expect(metadata).toEqual({ title: 'Blog' });
     });
+
+    it('enters the request context with the route params', async () => {
+      const params: Parameters<typeof generateMetadata>[0]['params'] =
+        Promise.resolve({ tenant: 'tenant-1', locale: 'EN' });
+
+      await generateMetadata({ params });
+
+      expect(enterRequestContext).toHaveBeenCalledWith(params);
+    });
   });
 
   it('renders PostIndexPage for page 1', async () => {

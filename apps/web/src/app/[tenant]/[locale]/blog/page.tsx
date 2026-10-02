@@ -12,13 +12,12 @@ type TProps = {
 export const revalidate = 21600;
 
 export async function generateMetadata({ params }: TProps): Promise<Metadata> {
-  const { tenant } = await params;
-  return buildPostIndexMetadata(1, tenant);
+  await enterRequestContext(params);
+  return buildPostIndexMetadata(1);
 }
 
 export default async function PostIndexRoute({ params }: TProps) {
-  const { locale, tenant } = await params;
   await enterRequestContext(params);
 
-  return <PostIndexPage page={1} locale={locale} tenant={tenant} />;
+  return <PostIndexPage page={1} />;
 }

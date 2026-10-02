@@ -8,12 +8,10 @@ const READER_ACCOUNT_CAPABILITIES = [
   CAPABILITY.NEWSLETTER,
 ] as const;
 
-export const isReaderAccountEnabled = async (
-  tenant?: string,
-): Promise<boolean> => {
+export const isReaderAccountEnabled = async (): Promise<boolean> => {
   const enabled = await Promise.all(
     READER_ACCOUNT_CAPABILITIES.map((capability) =>
-      isCapabilityEnabled(capability, tenant),
+      isCapabilityEnabled(capability),
     ),
   );
   return enabled.some(Boolean);

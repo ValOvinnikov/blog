@@ -4,7 +4,6 @@ import {
 } from '@blog/config';
 import { permanentRedirect } from '@web/i18n/navigation';
 import { enterRequestContext } from '@web/server/request-context/request-context';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { customRenderAsync } from '@web/testing/custom-render';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
@@ -29,11 +28,8 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
-
 vi.mock('@web/i18n/navigation');
 
-const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
 const permanentRedirectMock = vi.mocked(permanentRedirect);
 
 const setup = customRenderAsync(TopicNumberedPage, {
@@ -50,10 +46,7 @@ describe('TopicNumberedPage', () => {
     expect(revalidate).toBe(CONTENT_ROUTE_REVALIDATE_SECONDS);
   });
 
-  beforeEach(() => {
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
-  });
+  beforeEach(() => {});
 
   describe('generateMetadata', () => {
     it('returns empty metadata for page 1', async () => {

@@ -1,34 +1,24 @@
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makePostCard } from '@web/testing/shared/post/fixtures';
 import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import {
+  DEFAULT_REQUEST_CONTEXT,
+  DEFAULT_TENANT_SANITY_CONTEXT,
+} from '@web/testing/shared/tenant/fixtures';
 import { redirect } from 'next/navigation';
 
 import { BookmarksPage } from './bookmarks-page';
 
-const {
-  authMock,
-  listBookmarksMock,
-  getPostsByIdsMock,
-  getRequestTenantIdMock,
-  getTenantSanityContextMock,
-} = vi.hoisted(() => ({
+vi.mock('@web/server/request-context/request-context');
+
+const { authMock, listBookmarksMock, getPostsByIdsMock } = vi.hoisted(() => ({
   authMock: vi.fn(),
   listBookmarksMock: vi.fn(),
   getPostsByIdsMock: vi.fn(),
-  getRequestTenantIdMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
 }));
 
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
-
-vi.mock('@web/server/tenant/get-request-tenant-id', () => ({
-  getRequestTenantId: getRequestTenantIdMock,
-}));
-
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
 
 vi.mock('@blog/db', () => ({
   queries: { bookmarks: { listBookmarks: listBookmarksMock } },
@@ -55,10 +45,6 @@ describe(`<${BookmarksPage.name}/>`, () => {
     authMock.mockReset();
     listBookmarksMock.mockReset();
     getPostsByIdsMock.mockReset();
-    getRequestTenantIdMock.mockReset();
-    getRequestTenantIdMock.mockResolvedValue(TENANT_ID);
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
   it('redirects home without querying bookmarks when there is no session', async () => {
@@ -73,7 +59,10 @@ describe(`<${BookmarksPage.name}/>`, () => {
 
   it('redirects home without querying bookmarks when no tenant resolves', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getRequestTenantIdMock.mockResolvedValue(undefined);
+    vi.mocked(getRequestContext).mockResolvedValueOnce({
+      ...DEFAULT_REQUEST_CONTEXT,
+      tenantId: undefined,
+    });
 
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
 
@@ -96,7 +85,7 @@ describe(`<${BookmarksPage.name}/>`, () => {
     );
   });
 
-  it('forwards the resolved tenant Sanity context to getPostsByIds', async () => {
+  it('forwards the request context Sanity context to getPostsByIds', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     listBookmarksMock.mockResolvedValue([]);
     getPostsByIdsMock.mockResolvedValue({ ok: true, data: [] });
@@ -105,7 +94,10 @@ describe(`<${BookmarksPage.name}/>`, () => {
       dataset: 'production',
       token: 'tenant-token',
     };
-    getTenantSanityContextMock.mockResolvedValue(tenant);
+    vi.mocked(getRequestContext).mockResolvedValueOnce({
+      ...DEFAULT_REQUEST_CONTEXT,
+      sanityContext: tenant,
+    });
 
     await setup();
 

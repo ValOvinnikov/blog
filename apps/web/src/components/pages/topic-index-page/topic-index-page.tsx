@@ -5,10 +5,8 @@ import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 
 import { TopicIndexModuleRenderer } from './topic-index-module-renderer';
 
-type TTopicIndexPageProps = { locale: string; tenant: string };
-
-export const TopicIndexPage = async ({ tenant }: TTopicIndexPageProps) => {
-  const result = await getTopicIndexPage(tenant);
+export const TopicIndexPage = async () => {
+  const result = await getTopicIndexPage();
   const { headingBlock, hero, modules } = guardPageLoaderResult(
     result,
     'topic_index_page.fetch_failed',
@@ -17,7 +15,7 @@ export const TopicIndexPage = async ({ tenant }: TTopicIndexPageProps) => {
   return (
     <PageShell>
       <PageShell.Breadcrumbs>
-        <TopicIndexBreadcrumbs tenant={tenant} />
+        <TopicIndexBreadcrumbs />
       </PageShell.Breadcrumbs>
       <TopicIndexModuleRenderer
         hero={hero}

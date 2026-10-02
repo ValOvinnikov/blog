@@ -16,13 +16,14 @@ export function generateStaticParams() {
 export const revalidate = 21600;
 
 export async function generateMetadata({ params }: TProps): Promise<Metadata> {
-  const { tenant, slug } = await params;
-  return buildPostMetadata(slug, tenant);
+  await enterRequestContext(params);
+  const { slug } = await params;
+  return buildPostMetadata(slug);
 }
 
 export default async function BlogPostSlugPage({ params }: TProps) {
-  const { locale, tenant, slug } = await params;
+  const { slug } = await params;
   await enterRequestContext(params);
 
-  return <BlogPostPage slug={slug} locale={locale} tenant={tenant} />;
+  return <BlogPostPage slug={slug} />;
 }
