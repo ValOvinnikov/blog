@@ -16,9 +16,7 @@ import type { TRawModule } from '@blog/service/shared/transformers/module/to-mod
 export const landingPageQuery = q
   .parameters<TSlugParams>()
   .star.filterByType('page_landing')
-  .filterRaw(
-    'slug.current == $slug && coalesce(language, $defaultLocale) == $locale',
-  )
+  .filterRaw('slug.current == $slug && language == $locale')
   .slice(0)
   .project((sub) => ({
     slug: sub.field('slug.current').notNull(),

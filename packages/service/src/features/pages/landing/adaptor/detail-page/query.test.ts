@@ -115,8 +115,8 @@ describe('landingPageQuery language scoping', () => {
     expect(await run('about', FR)).toBeNull();
   });
 
-  it('resolves a page with no language for the default language only', async () => {
-    expect(await run('legacy', EN)).toMatchObject({ slug: 'legacy' });
+  it('resolves nothing for a page with no language', async () => {
+    expect(await run('legacy', EN)).toBeNull();
     expect(await run('legacy', NL)).toBeNull();
   });
 

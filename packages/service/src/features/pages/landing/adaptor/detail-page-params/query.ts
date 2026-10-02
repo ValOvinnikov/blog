@@ -8,8 +8,8 @@ export type TLandingPageParamsQueryParams = {
 export const landingPageParamsQuery = q
   .parameters<TLandingPageParamsQueryParams>()
   .star.filterByType('page_landing')
-  .filterRaw('coalesce(language, $defaultLocale) in $liveLocales')
+  .filterRaw('language in $liveLocales')
   .project((sub) => ({
     slug: sub.field('slug.current').notNull(),
-    language: sub.raw<TLocaleIsoCode>('coalesce(language, $defaultLocale)'),
+    language: sub.field('language').notNull(),
   }));

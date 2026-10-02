@@ -97,7 +97,6 @@ describe('landingPageParamsQuery', () => {
     expect(await run([NL, EN])).toEqual([
       { slug: 'about', language: EN },
       { slug: 'over-ons', language: NL },
-      { slug: 'legacy', language: EN },
     ]);
   });
 });

@@ -5,7 +5,7 @@ import { buildTranslationsExpression } from './translations';
 
 const { EN, NL } = LOCALE_ISO_CODES;
 
-function page(id: string, language: string | undefined, slug: string) {
+function page(id: string, language: string, slug: string) {
   return { _id: id, _type: 'page_landing', language, slug: { current: slug } };
 }
 
@@ -19,7 +19,7 @@ function translation(id: string, language: string) {
 
 const aboutEn = page('about-en', EN, 'about');
 const aboutNl = page('about-nl', NL, 'over-ons');
-const contact = page('contact', undefined, 'contact');
+const contact = page('contact', EN, 'contact');
 
 const dataset = [
   aboutEn,
@@ -54,7 +54,7 @@ describe(buildTranslationsExpression, () => {
     ]);
   });
 
-  it('lists only the page itself, in the default language, when it has no translation metadata', async () => {
+  it('lists only the page itself when it has no translation metadata', async () => {
     expect(await resolve(contact)).toEqual([{ language: EN, slug: 'contact' }]);
   });
 });

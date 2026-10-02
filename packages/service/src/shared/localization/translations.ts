@@ -7,5 +7,5 @@ const TRANSLATION_METADATA_TYPE = 'translation.metadata';
 export function buildTranslationsExpression(): string {
   const metadata = `*[_type == "${TRANSLATION_METADATA_TYPE}" && references(^._id)][0]`;
 
-  return `coalesce(${metadata}.translations[defined(value->slug.current)]{"language": language, "slug": value->slug.current}, [{"language": coalesce(language, $defaultLocale), "slug": slug.current}])`;
+  return `coalesce(${metadata}.translations[defined(value->slug.current)]{"language": language, "slug": value->slug.current}, [{"language": language, "slug": slug.current}])`;
 }
