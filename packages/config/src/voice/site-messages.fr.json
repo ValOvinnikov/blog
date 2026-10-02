@@ -130,6 +130,7 @@
     "saveAriaLabel": "Enregistrer l'article",
     "removeAriaLabel": "Retirer des favoris",
     "error": "L'enregistrement a échoué. Veuillez réessayer.",
+    "errorUnavailable": "Les favoris ne sont pas disponibles sur ce site pour le moment.",
     "toastSavedMessage": "Ajouté aux favoris",
     "toastRemovedMessage": "Retiré des favoris",
     "toastRevertedMessage": "Annulé",
@@ -150,7 +151,8 @@
     "successMessage": "C'est presque fini — consultez votre boîte de réception pour confirmer.",
     "errorInvalid": "Saisissez une adresse e-mail valide.",
     "errorAlreadySubscribed": "Cette adresse e-mail est déjà abonnée.",
-    "errorServer": "Une erreur s'est produite. Veuillez réessayer."
+    "errorServer": "Une erreur s'est produite. Veuillez réessayer.",
+    "errorUnavailable": "Ce site n'accepte pas de nouvelles inscriptions pour le moment."
   },
   "newsletterConfirm": {
     "confirmedTitle": "Abonnement confirmé",
@@ -159,6 +161,8 @@
     "invalidMessage": "Ce lien de confirmation n'est pas valide ou a expiré.",
     "errorTitle": "Une erreur s'est produite",
     "errorMessage": "Nous n'avons pas pu confirmer votre abonnement. Veuillez réessayer plus tard.",
+    "unavailableTitle": "Confirmation impossible pour le moment",
+    "unavailableMessage": "Ce site n'accepte pas de modifications pour le moment, nous n'avons donc pas pu traiter votre lien de confirmation.",
     "returnHome": "Retour à l'accueil"
   },
   "newsletterUnsubscribe": {
@@ -169,6 +173,8 @@
     "successMessage": "Vous ne recevrez plus notre newsletter.",
     "invalidTitle": "Lien expiré",
     "invalidMessage": "Ce lien de désabonnement n'est plus valide — vous êtes peut-être déjà désabonné.",
+    "errorTitle": "Une erreur s'est produite",
+    "errorMessage": "Nous n'avons pas pu vous désinscrire. Veuillez réessayer plus tard.",
     "returnHome": "Retour à l'accueil"
   },
   "accountPage": {
@@ -203,7 +209,8 @@
       "unsubscribeError": "Le désabonnement a échoué. Veuillez réessayer.",
       "resendToastLoadingMessage": "Renvoi de l'e-mail de confirmation…",
       "resendToastSuccessMessage": "E-mail de confirmation renvoyé.",
-      "resendError": "L'e-mail de confirmation n'a pas pu être renvoyé. Veuillez réessayer."
+      "resendError": "L'e-mail de confirmation n'a pas pu être renvoyé. Veuillez réessayer.",
+      "resendUnavailable": "Le renvoi n'est pas disponible sur ce site pour le moment."
     },
     "identity": {
       "heading": "Comptes associés",

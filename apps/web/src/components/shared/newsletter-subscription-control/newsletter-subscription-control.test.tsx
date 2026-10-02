@@ -4,6 +4,11 @@ import { useRouter } from 'next/navigation';
 
 import { NewsletterSubscriptionControl } from './newsletter-subscription-control';
 
+type TToastPromise = (
+  promise: Promise<unknown>,
+  messages: { error: (failure: unknown) => { message: unknown } },
+) => Promise<unknown>;
+
 const {
   routerRefreshMock,
   unsubscribeActionMock,
@@ -13,7 +18,7 @@ const {
   routerRefreshMock: vi.fn(),
   unsubscribeActionMock: vi.fn(),
   resendConfirmationActionMock: vi.fn(),
-  toastPromiseMock: vi.fn((promise: Promise<unknown>) => promise),
+  toastPromiseMock: vi.fn<TToastPromise>((promise) => promise),
 }));
 
 vi.mocked(useRouter).mockReturnValue({
@@ -41,6 +46,16 @@ vi.mock('@web/context/toast-provider', () => ({
   }),
 }));
 
+const resolveErrorMessage = async (): Promise<unknown> => {
+  const { error } = toastPromiseMock.mock.calls[0]![1];
+  const settled = toastPromiseMock.mock.results[0]!.value as Promise<unknown>;
+  const failure = await settled.then(
+    () => undefined,
+    (reason: unknown) => reason,
+  );
+  return error(failure).message;
+};
+
 const setup = customRender(NewsletterSubscriptionControl, {
   action: 'unsubscribe' as const,
 });
@@ -50,7 +65,7 @@ describe(`<${NewsletterSubscriptionControl.name}/>`, () => {
     routerRefreshMock.mockReset();
     unsubscribeActionMock.mockReset();
     resendConfirmationActionMock.mockReset();
-    toastPromiseMock.mockImplementation((promise: Promise<unknown>) => promise);
+    toastPromiseMock.mockImplementation((promise) => promise);
   });
 
   it('renders the unsubscribe button copy for the "unsubscribe" action', () => {
@@ -84,8 +99,11 @@ describe(`<${NewsletterSubscriptionControl.name}/>`, () => {
     expect(toastPromiseMock).toHaveBeenCalledWith(expect.any(Promise), {
       loading: { message: 'Unsubscribing…' },
       success: { message: "You've been unsubscribed." },
-      error: { message: "Couldn't unsubscribe. Try again." },
+      error: expect.any(Function),
     });
+    await expect(resolveErrorMessage()).resolves.toBe(
+      "Couldn't unsubscribe. Try again.",
+    );
   });
 
   it('runs resendConfirmationAction through toast.promise and refreshes the router on success', async () => {
@@ -107,12 +125,18 @@ describe(`<${NewsletterSubscriptionControl.name}/>`, () => {
     expect(toastPromiseMock).toHaveBeenCalledWith(expect.any(Promise), {
       loading: { message: 'Resending the confirmation email…' },
       success: { message: 'Confirmation email resent.' },
-      error: { message: "Couldn't resend the confirmation email. Try again." },
+      error: expect.any(Function),
     });
+    await expect(resolveErrorMessage()).resolves.toBe(
+      "Couldn't resend the confirmation email. Try again.",
+    );
   });
 
   it('does not refresh the router when the action fails', async () => {
-    unsubscribeActionMock.mockResolvedValue({ ok: false });
+    unsubscribeActionMock.mockResolvedValue({
+      ok: false,
+      isUnavailable: false,
+    });
     const user = userEvent.setup();
     setup();
 
@@ -127,6 +151,26 @@ describe(`<${NewsletterSubscriptionControl.name}/>`, () => {
       ).toHaveAttribute('aria-busy', 'false');
     });
     expect(routerRefreshMock).not.toHaveBeenCalled();
+  });
+
+  it('toasts the unavailable copy for the "resend" action when it is refused as unavailable', async () => {
+    resendConfirmationActionMock.mockResolvedValue({
+      ok: false,
+      isUnavailable: true,
+    });
+    const user = userEvent.setup();
+    setup({ action: 'resend' });
+
+    await user.click(
+      screen.getByRole('button', { name: 'Resend confirmation' }),
+    );
+
+    await waitFor(() => {
+      expect(toastPromiseMock).toHaveBeenCalled();
+    });
+    await expect(resolveErrorMessage()).resolves.toBe(
+      "Resending isn't available on this site right now.",
+    );
   });
 
   it('marks the button aria-busy while the action is pending, and clears it once settled', async () => {

@@ -175,6 +175,20 @@ describe(`<${NewsletterForm.name}/>`, () => {
     );
   });
 
+  it('shows the unavailable message when the server action resolves "unavailable"', async () => {
+    subscribeToNewsletterActionMock.mockResolvedValue({
+      outcome: 'unavailable',
+    });
+    const user = userEvent.setup();
+    setup();
+
+    await typeAndSubmit(user, 'reader@example.com');
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      "This site isn't taking new subscriptions right now.",
+    );
+  });
+
   it('clears the inline validation error once the reader edits the email', async () => {
     const user = userEvent.setup();
     setup();

@@ -19,14 +19,6 @@ export type TBookmarkButtonProps = {
   className?: string;
 };
 
-/**
- * The save/remove toast carries an `undo` action (`performUndo`) that
- * re-applies the opposite value and confirms with its own async-revert-can-
- * fail `info`/`error` toast; that secondary error toast carries no further
- * `retry` action, to avoid an unbounded retry chain. The primary error toast
- * carries a `retry` action (`performToggle` re-run with the same target
- * value that just failed).
- */
 export const BookmarkButton = ({ postId, className }: TBookmarkButtonProps) => {
   const t = useTranslations('bookmarkButton');
   const toast = useToast();
@@ -48,11 +40,6 @@ export const BookmarkButton = ({ postId, className }: TBookmarkButtonProps) => {
         setIsResolved(true);
       })
       .catch((fetchError: unknown) => {
-        // A transient failure here (e.g. the db read throwing) must not
-        // leave the toggle permanently disabled with no explanation —
-        // resolve to "not bookmarked" and let the reader retry via a normal
-        // toggle, same recovery shape as `useCopyToClipboard`'s own
-        // `.then().catch()`.
         logger.error('bookmark_button.status_fetch_failed', {
           postId,
           error: fetchError,
@@ -79,7 +66,9 @@ export const BookmarkButton = ({ postId, className }: TBookmarkButtonProps) => {
       const result = await setBookmarkStatus(postId, reverted);
       if (!result.ok) {
         setIsBookmarked(committedValue);
-        toast.error({ message: t('error') });
+        toast.error({
+          message: t(result.isUnavailable ? 'errorUnavailable' : 'error'),
+        });
         return;
       }
 
@@ -87,8 +76,6 @@ export const BookmarkButton = ({ postId, className }: TBookmarkButtonProps) => {
     });
   };
 
-  // Shared by the click handler and the error toast's `retry` action, so a
-  // retry is literally the same attempt re-run against the same target value.
   const performToggle = (next: boolean) => {
     setIsBookmarked(next);
 
@@ -96,6 +83,10 @@ export const BookmarkButton = ({ postId, className }: TBookmarkButtonProps) => {
       const result = await setBookmarkStatus(postId, next);
       if (!result.ok) {
         setIsBookmarked(!next);
+        if (result.isUnavailable) {
+          toast.error({ message: t('errorUnavailable') });
+          return;
+        }
         toast.error({
           message: t('error'),
           action: {

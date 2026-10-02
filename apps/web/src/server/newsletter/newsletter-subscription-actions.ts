@@ -1,43 +1,35 @@
 'use server';
 
-import { routes } from '@blog/config';
+import { routes, TENANT_WRITE_REFUSAL } from '@blog/config';
 import { queries } from '@blog/db';
 import { buildNewsletterConfirmationEmail, sendEmail } from '@blog/email';
 import { auth } from '@web/server/auth/auth';
 import { clearNewsletterSubscribedCookie } from '@web/server/newsletter/newsletter-subscribed-cookie';
 import { resolveNewsletterEmailSettings } from '@web/server/newsletter/resolve-newsletter-email-settings';
-import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
 import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
-import { isTenantActive } from '@web/server/tenant/is-tenant-active';
+import { resolveRequestTenant } from '@web/server/tenant/resolve-request-tenant';
+import { resolveWritableTenant } from '@web/server/tenant/resolve-writable-tenant';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
 import { resolveTenantEmailIdentity } from '@web/utils/resolve-tenant-email-identity';
 
-export type TUnsubscribeResult = { ok: true } | { ok: false };
-export type TResendConfirmationActionResult = { ok: true } | { ok: false };
+type TSubscriptionWriteResult =
+  { ok: true } | { ok: false; isUnavailable: boolean };
 
-/**
- * `NewsletterSubscriptionControl`'s "unsubscribe" server write. Reads the
- * session itself rather than trusting a caller-supplied `userId`.
- * `queries.subscribers.unsubscribe` deletes the subscriber row
- * (idempotent no-op if none exists).
- *
- * Also clears `NEWSLETTER_SUBSCRIBED_COOKIE` — without this, the cookie
- * `subscribeToNewsletterAction` set at signup time keeps hiding
- * `NewsletterForm` for a reader who just unsubscribed.
- */
+export type TUnsubscribeResult = TSubscriptionWriteResult;
+export type TResendConfirmationActionResult = TSubscriptionWriteResult;
+
 export const unsubscribeAction = async (): Promise<TUnsubscribeResult> => {
   const session = await auth();
   const userId = session?.user?.id;
-  if (!userId) return { ok: false };
+  if (!userId) return { ok: false, isUnavailable: false };
 
-  const tenantId = await getRequestTenantId();
-  if (!tenantId) return { ok: false };
-
-  if (!(await isTenantActive(tenantId))) {
-    logger.warn('newsletter.unsubscribe_tenant_not_active', { tenantId });
-    return { ok: false };
+  const tenant = await resolveRequestTenant();
+  if (!tenant) {
+    logger.error('newsletter.unsubscribe_tenant_unresolved');
+    return { ok: false, isUnavailable: false };
   }
+  const { id: tenantId } = tenant;
 
   try {
     await queries.subscribers.unsubscribe(tenantId, userId);
@@ -45,7 +37,7 @@ export const unsubscribeAction = async (): Promise<TUnsubscribeResult> => {
     return { ok: true };
   } catch (error) {
     logger.error('newsletter.unsubscribe_failed', { error });
-    return { ok: false };
+    return { ok: false, isUnavailable: false };
   }
 };
 
@@ -57,37 +49,32 @@ const clearNewsletterSubscribedCookieSafely = async (): Promise<void> => {
   }
 };
 
-/**
- * `NewsletterSubscriptionControl`'s "resend confirmation" server write.
- * `queries.subscribers.resendConfirmation` only validates the pending row
- * still exists and hands back its unchanged `confirmationToken` — it never
- * sends email itself, so this action mirrors
- * `subscribeToNewsletterAction`'s email-sending block. The session's own
- * `email` is the `to` address since `resendConfirmation` doesn't return one.
- */
 export const resendConfirmationAction =
   async (): Promise<TResendConfirmationActionResult> => {
     const session = await auth();
     const userId = session?.user?.id;
     const email = session?.user?.email;
-    if (!userId || !email) return { ok: false };
+    if (!userId || !email) return { ok: false, isUnavailable: false };
 
-    const tenantId = await getRequestTenantId();
-    if (!tenantId) return { ok: false };
-
-    if (!(await isTenantActive(tenantId))) {
-      logger.warn('newsletter.resend_confirmation_tenant_not_active', {
-        tenantId,
-      });
-      return { ok: false };
+    const tenant = await resolveWritableTenant(
+      'newsletter.resend_confirmation',
+    );
+    if (!tenant.ok) {
+      const isUnavailable = tenant.reason === TENANT_WRITE_REFUSAL.INACTIVE;
+      if (isUnavailable) {
+        logger.warn('newsletter.resend_confirmation_tenant_not_active');
+      }
+      return { ok: false, isUnavailable };
     }
+    const { tenantId } = tenant;
 
     try {
       const result = await queries.subscribers.resendConfirmation(
         tenantId,
         userId,
       );
-      if (result.outcome === 'not-pending') return { ok: false };
+      if (result.outcome === 'not-pending')
+        return { ok: false, isUnavailable: false };
 
       const siteUrl = (await getTenantBaseUrl()) ?? '';
       const confirmationUrl = `${siteUrl}${routes.newsletterConfirm(result.confirmationToken)}`;
@@ -126,6 +113,6 @@ export const resendConfirmationAction =
       return { ok: true };
     } catch (error) {
       logger.error('newsletter.confirmation_resend_failed', { error });
-      return { ok: false };
+      return { ok: false, isUnavailable: false };
     }
   };

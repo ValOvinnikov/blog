@@ -1,12 +1,14 @@
 'use server';
 
+import { TENANT_WRITE_REFUSAL } from '@blog/config';
 import { queries } from '@blog/db';
 import { auth } from '@web/server/auth/auth';
 import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
-import { isTenantActive } from '@web/server/tenant/is-tenant-active';
+import { resolveWritableTenant } from '@web/server/tenant/resolve-writable-tenant';
 import { logger } from '@web/utils/logger/logger';
 
-export type TSetBookmarkResult = { ok: true } | { ok: false };
+export type TSetBookmarkResult =
+  { ok: true } | { ok: false; isUnavailable: boolean };
 
 export const getBookmarkStatus = async (postId: string): Promise<boolean> => {
   const session = await auth();
@@ -25,15 +27,17 @@ export const setBookmarkStatus = async (
 ): Promise<TSetBookmarkResult> => {
   const session = await auth();
   const userId = session?.user?.id;
-  if (!userId) return { ok: false };
+  if (!userId) return { ok: false, isUnavailable: false };
 
-  const tenantId = await getRequestTenantId();
-  if (!tenantId) return { ok: false };
-
-  if (!(await isTenantActive(tenantId))) {
-    logger.warn('bookmark.tenant_not_active', { postId, tenantId });
-    return { ok: false };
+  const tenant = await resolveWritableTenant('bookmark.set');
+  if (!tenant.ok) {
+    const isUnavailable = tenant.reason === TENANT_WRITE_REFUSAL.INACTIVE;
+    if (isUnavailable) {
+      logger.warn('bookmark.tenant_not_active', { postId });
+    }
+    return { ok: false, isUnavailable };
   }
+  const { tenantId } = tenant;
 
   try {
     if (isBookmarked) {
@@ -47,7 +51,7 @@ export const setBookmarkStatus = async (
           postId,
           error: result.error,
         });
-        return { ok: false };
+        return { ok: false, isUnavailable: false };
       }
     } else {
       await queries.bookmarks.removeBookmark(tenantId, userId, postId);
@@ -55,6 +59,6 @@ export const setBookmarkStatus = async (
     return { ok: true };
   } catch (error) {
     logger.error('bookmark.update_failed', { postId, error });
-    return { ok: false };
+    return { ok: false, isUnavailable: false };
   }
 };

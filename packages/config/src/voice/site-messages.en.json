@@ -130,6 +130,7 @@
     "saveAriaLabel": "Save post",
     "removeAriaLabel": "Remove bookmark",
     "error": "Couldn't save that. Try again.",
+    "errorUnavailable": "Bookmarking isn't available on this site right now.",
     "toastSavedMessage": "Saved to bookmarks",
     "toastRemovedMessage": "Removed from bookmarks",
     "toastRevertedMessage": "Reverted",
@@ -150,7 +151,8 @@
     "successMessage": "Almost there — check your inbox to confirm.",
     "errorInvalid": "Enter a valid email address.",
     "errorAlreadySubscribed": "That email is already subscribed.",
-    "errorServer": "Something went wrong. Please try again."
+    "errorServer": "Something went wrong. Please try again.",
+    "errorUnavailable": "This site isn't taking new subscriptions right now."
   },
   "newsletterConfirm": {
     "confirmedTitle": "Subscription confirmed",
@@ -159,6 +161,8 @@
     "invalidMessage": "This confirmation link is invalid or has expired.",
     "errorTitle": "Something went wrong",
     "errorMessage": "We couldn't confirm your subscription. Please try again later.",
+    "unavailableTitle": "Can't confirm right now",
+    "unavailableMessage": "This site isn't accepting changes right now, so we couldn't process your confirmation link.",
     "returnHome": "Return home"
   },
   "newsletterUnsubscribe": {
@@ -169,6 +173,8 @@
     "successMessage": "You will no longer receive newsletter emails from us.",
     "invalidTitle": "Link no longer valid",
     "invalidMessage": "This unsubscribe link is no longer valid — you may already be unsubscribed.",
+    "errorTitle": "Something went wrong",
+    "errorMessage": "We couldn't unsubscribe you. Please try again later.",
     "returnHome": "Return home"
   },
   "accountPage": {
@@ -203,7 +209,8 @@
       "unsubscribeError": "Couldn't unsubscribe. Try again.",
       "resendToastLoadingMessage": "Resending the confirmation email…",
       "resendToastSuccessMessage": "Confirmation email resent.",
-      "resendError": "Couldn't resend the confirmation email. Try again."
+      "resendError": "Couldn't resend the confirmation email. Try again.",
+      "resendUnavailable": "Resending isn't available on this site right now."
     },
     "identity": {
       "heading": "Connected accounts",

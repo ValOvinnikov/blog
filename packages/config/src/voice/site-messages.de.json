@@ -130,6 +130,7 @@
     "saveAriaLabel": "Beitrag merken",
     "removeAriaLabel": "Lesezeichen entfernen",
     "error": "Das konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+    "errorUnavailable": "Lesezeichen sind auf dieser Website derzeit nicht verfügbar.",
     "toastSavedMessage": "Zu Lesezeichen hinzugefügt",
     "toastRemovedMessage": "Aus Lesezeichen entfernt",
     "toastRevertedMessage": "Rückgängig gemacht",
@@ -150,7 +151,8 @@
     "successMessage": "Fast geschafft — prüfen Sie Ihr Postfach, um zu bestätigen.",
     "errorInvalid": "Geben Sie eine gültige E-Mail-Adresse ein.",
     "errorAlreadySubscribed": "Diese E-Mail-Adresse ist bereits angemeldet.",
-    "errorServer": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
+    "errorServer": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
+    "errorUnavailable": "Diese Website nimmt derzeit keine neuen Anmeldungen an."
   },
   "newsletterConfirm": {
     "confirmedTitle": "Anmeldung bestätigt",
@@ -159,6 +161,8 @@
     "invalidMessage": "Dieser Bestätigungslink ist ungültig oder abgelaufen.",
     "errorTitle": "Etwas ist schiefgelaufen",
     "errorMessage": "Wir konnten Ihre Anmeldung nicht bestätigen. Bitte versuchen Sie es später erneut.",
+    "unavailableTitle": "Bestätigung derzeit nicht möglich",
+    "unavailableMessage": "Diese Website nimmt derzeit keine Änderungen an, daher konnten wir deinen Bestätigungslink nicht verarbeiten.",
     "returnHome": "Zur Startseite"
   },
   "newsletterUnsubscribe": {
@@ -169,6 +173,8 @@
     "successMessage": "Sie erhalten keine Newsletter mehr von uns.",
     "invalidTitle": "Link nicht mehr gültig",
     "invalidMessage": "Dieser Abmeldelink ist nicht mehr gültig — möglicherweise sind Sie bereits abgemeldet.",
+    "errorTitle": "Etwas ist schiefgelaufen",
+    "errorMessage": "Wir konnten dich nicht abmelden. Bitte versuche es später erneut.",
     "returnHome": "Zur Startseite"
   },
   "accountPage": {
@@ -203,7 +209,8 @@
       "unsubscribeError": "Die Abmeldung ist fehlgeschlagen. Bitte versuchen Sie es erneut.",
       "resendToastLoadingMessage": "Bestätigungs-E-Mail wird erneut gesendet…",
       "resendToastSuccessMessage": "Bestätigungs-E-Mail erneut gesendet.",
-      "resendError": "Die Bestätigungs-E-Mail konnte nicht erneut gesendet werden. Bitte versuchen Sie es erneut."
+      "resendError": "Die Bestätigungs-E-Mail konnte nicht erneut gesendet werden. Bitte versuchen Sie es erneut.",
+      "resendUnavailable": "Das erneute Senden ist auf dieser Website derzeit nicht verfügbar."
     },
     "identity": {
       "heading": "Verknüpfte Konten",

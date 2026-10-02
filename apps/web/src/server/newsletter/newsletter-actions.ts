@@ -1,13 +1,12 @@
 'use server';
 
-import { routes } from '@blog/config';
+import { routes, TENANT_WRITE_REFUSAL } from '@blog/config';
 import { queries } from '@blog/db';
 import { buildNewsletterConfirmationEmail, sendEmail } from '@blog/email';
 import { markNewsletterSubscribed } from '@web/server/newsletter/newsletter-subscribed-cookie';
 import { resolveNewsletterEmailSettings } from '@web/server/newsletter/resolve-newsletter-email-settings';
-import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
 import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
-import { isTenantActive } from '@web/server/tenant/is-tenant-active';
+import { resolveWritableTenant } from '@web/server/tenant/resolve-writable-tenant';
 import { env } from '@web/utils/env/env';
 import { isValidEmail } from '@web/utils/is-valid-email';
 import { logger } from '@web/utils/logger/logger';
@@ -17,22 +16,9 @@ export type TSubscribeResult =
   | { outcome: 'success' }
   | { outcome: 'already-subscribed' }
   | { outcome: 'invalid' }
-  | { outcome: 'server-error' };
+  | { outcome: 'server-error' }
+  | { outcome: 'unavailable' };
 
-/**
- * `NewsletterForm`'s submit action. Re-validates the email format
- * server-side, then hands off to
- * `queries.subscribers.createPendingSubscriber`: a `'created'`/
- * `'already-pending'` outcome (re-)sends the confirmation email, while
- * `'already-active'` returns the inline error without emailing. Both
- * `'success'` and `'already-subscribed'` also set
- * `NEWSLETTER_SUBSCRIBED_COOKIE` — a signed-out reader has no session to key
- * "already subscribed" off, so the cookie is the durable signal
- * `NewsletterForm`'s render call-sites use to stop showing the form.
- *
- * A thrown error is caught and logged rather than left to reject the server
- * action — `NewsletterForm` only branches on the returned `outcome`.
- */
 export const subscribeToNewsletterAction = async (
   email: string,
 ): Promise<TSubscribeResult> => {
@@ -40,15 +26,15 @@ export const subscribeToNewsletterAction = async (
     return { outcome: 'invalid' };
   }
 
-  const tenantId = await getRequestTenantId();
-  if (!tenantId) {
+  const tenant = await resolveWritableTenant('newsletter.subscribe');
+  if (!tenant.ok) {
+    if (tenant.reason === TENANT_WRITE_REFUSAL.INACTIVE) {
+      logger.warn('newsletter.subscribe_tenant_not_active');
+      return { outcome: 'unavailable' };
+    }
     return { outcome: 'server-error' };
   }
-
-  if (!(await isTenantActive(tenantId))) {
-    logger.warn('newsletter.subscribe_tenant_not_active', { tenantId });
-    return { outcome: 'server-error' };
-  }
+  const { tenantId } = tenant;
 
   try {
     const result = await queries.subscribers.createPendingSubscriber(
@@ -73,11 +59,6 @@ export const subscribeToNewsletterAction = async (
     const unsubscribeUrl = `${siteUrl}${routes.newsletterUnsubscribe(subscriber.unsubscribeToken)}`;
     const { brand, brandName } = await resolveTenantEmailIdentity(tenantId);
 
-    // Resolved inside the action, not at module scope — the `'use client'`
-    // `NewsletterForm` imports this module, so an eager read of
-    // `env.NEWSLETTER_FROM_ADDRESS` (server-only) would throw under Vitest's
-    // jsdom environment; reading it lazily here keeps importing this module
-    // safe from a client boundary.
     const {
       subject,
       body,

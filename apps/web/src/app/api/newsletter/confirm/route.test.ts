@@ -1,24 +1,19 @@
+import { TENANT_WRITE_REFUSAL } from '@blog/config';
 import { getLocale } from 'next-intl/server';
 
 export {};
 
-const { confirmSubscriberMock, resolveTenantIdMock, isTenantActiveMock } =
-  vi.hoisted(() => ({
-    confirmSubscriberMock: vi.fn(),
-    resolveTenantIdMock: vi.fn(),
-    isTenantActiveMock: vi.fn(),
-  }));
+const { confirmSubscriberMock, resolveWritableTenantMock } = vi.hoisted(() => ({
+  confirmSubscriberMock: vi.fn(),
+  resolveWritableTenantMock: vi.fn(),
+}));
 
 vi.mock('@blog/db', () => ({
   queries: { subscribers: { confirmSubscriber: confirmSubscriberMock } },
 }));
 
-vi.mock('@web/server/tenant/resolve-tenant-id', () => ({
-  resolveTenantId: resolveTenantIdMock,
-}));
-
-vi.mock('@web/server/tenant/is-tenant-active', () => ({
-  isTenantActive: isTenantActiveMock,
+vi.mock('@web/server/tenant/resolve-writable-tenant', () => ({
+  resolveWritableTenant: resolveWritableTenantMock,
 }));
 
 const TENANT_ID = 'tenant-1';
@@ -35,10 +30,11 @@ const subscriber = {
 describe('GET /api/newsletter/confirm', () => {
   beforeEach(() => {
     confirmSubscriberMock.mockReset();
-    resolveTenantIdMock.mockReset();
-    resolveTenantIdMock.mockResolvedValue(TENANT_ID);
-    isTenantActiveMock.mockReset();
-    isTenantActiveMock.mockResolvedValue(true);
+    resolveWritableTenantMock.mockReset();
+    resolveWritableTenantMock.mockResolvedValue({
+      ok: true,
+      tenantId: TENANT_ID,
+    });
   });
 
   it('returns 400 without querying the db when no token is given', async () => {
@@ -88,23 +84,6 @@ describe('GET /api/newsletter/confirm', () => {
     expect(html).toContain('<html lang="fr">');
   });
 
-  it('resolves the tenant from the request Host header', async () => {
-    confirmSubscriberMock.mockResolvedValue({
-      outcome: 'confirmed',
-      subscriber,
-    });
-    const { GET } = await import('./route');
-
-    await GET(
-      new Request(
-        'https://example.com/api/newsletter/confirm?token=token-abc',
-        { headers: { host: 'acme.example.com' } },
-      ),
-    );
-
-    expect(resolveTenantIdMock).toHaveBeenCalledWith('acme.example.com');
-  });
-
   it('treats an already-confirmed token as success (idempotent)', async () => {
     confirmSubscriberMock.mockResolvedValue({
       outcome: 'already-confirmed',
@@ -132,27 +111,37 @@ describe('GET /api/newsletter/confirm', () => {
     expect(html).toContain('Invalid confirmation link');
   });
 
-  it('returns 403 without confirming when the resolved tenant is not ACTIVE', async () => {
-    isTenantActiveMock.mockResolvedValue(false);
+  it('returns 403 with the unavailable copy without confirming when the tenant is not ACTIVE', async () => {
+    resolveWritableTenantMock.mockResolvedValue({
+      ok: false,
+      reason: TENANT_WRITE_REFUSAL.INACTIVE,
+    });
     const { GET } = await import('./route');
 
     const response = await GET(
       new Request('https://example.com/api/newsletter/confirm?token=token-abc'),
     );
+    const html = await response.text();
 
     expect(response.status).toBe(403);
+    expect(html).toContain('Can&apos;t confirm right now');
     expect(confirmSubscriberMock).not.toHaveBeenCalled();
   });
 
-  it('returns 500 without querying the db when no tenant resolves', async () => {
-    resolveTenantIdMock.mockResolvedValue(undefined);
+  it('returns 404 with the error copy without querying the db when no tenant resolves', async () => {
+    resolveWritableTenantMock.mockResolvedValue({
+      ok: false,
+      reason: TENANT_WRITE_REFUSAL.UNRESOLVED,
+    });
     const { GET } = await import('./route');
 
     const response = await GET(
       new Request('https://example.com/api/newsletter/confirm?token=token-abc'),
     );
+    const html = await response.text();
 
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(404);
+    expect(html).toContain('Something went wrong');
     expect(confirmSubscriberMock).not.toHaveBeenCalled();
   });
 
