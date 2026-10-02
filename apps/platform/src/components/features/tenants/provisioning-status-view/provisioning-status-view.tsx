@@ -18,7 +18,7 @@ import { formatRelativeTime } from '@platform/utils/format-relative-time/format-
 import { provisioningStepTone } from '@platform/utils/status-tone/status-tone';
 import { useCollapseOnDone } from '@platform/utils/use-collapse-on-done/use-collapse-on-done';
 import { useRelativeTimeTick } from '@platform/utils/use-relative-time-tick/use-relative-time-tick';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useId } from 'react';
 
 import { RunCard } from './components/run-card/run-card';
@@ -34,19 +34,12 @@ type TProvisioningStatusViewProps = {
   ownerEmail: string | undefined;
 };
 
-/**
- * The wizard's remaining-steps view — the provisioning steps (Sanity project
- * → seed content → deploy Studio → persist read token → map domain → create
- * webhook) read live from `tenant.provisioningSteps`, each independently
- * retryable. The live polling, retry dispatch, and status-derivation behind
- * this all live in `useProvisioningPoll` — this component only renders what
- * it returns.
- */
 export const ProvisioningStatusView = ({
   tenant,
   ownerEmail,
 }: TProvisioningStatusViewProps) => {
   const t = useTranslations('provisioningStatusView');
+  const locale = useLocale();
   const {
     dispatchNotice,
     isStarting,
@@ -103,7 +96,7 @@ export const ProvisioningStatusView = ({
     const updatedAt = stepUpdatedAt[index];
     const relativeUpdatedAt =
       (isDone || isFailed) && updatedAt
-        ? formatRelativeTime(new Date(updatedAt), t)
+        ? formatRelativeTime(new Date(updatedAt), t, locale)
         : undefined;
 
     return {

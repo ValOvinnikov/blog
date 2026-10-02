@@ -1,9 +1,17 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
+import { LOCALE_BCP47_TAGS, LOCALE_ISO_CODES } from '@blog/config';
 import realMessages from '@platform/i18n/messages/en.json';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { notFound } from 'next/navigation';
+import type { ReactElement } from 'react';
 
 import LocaleLayout, { generateStaticParams } from './layout';
+
+type TAnyElement = ReactElement<Record<string, unknown>>;
+
+const firstChildOf = (node: TAnyElement): TAnyElement =>
+  [
+    (node.props as { children: TAnyElement | TAnyElement[] }).children,
+  ].flat()[0] as TAnyElement;
 
 const { getMessagesMock, setRequestLocaleMock } = vi.hoisted(() => ({
   getMessagesMock: vi.fn(),
@@ -12,6 +20,7 @@ const { getMessagesMock, setRequestLocaleMock } = vi.hoisted(() => ({
 
 vi.mock('next-intl/server', () => ({
   getMessages: getMessagesMock,
+  getTranslations: vi.fn(),
   setRequestLocale: setRequestLocaleMock,
 }));
 
@@ -46,14 +55,27 @@ describe('LocaleLayout', () => {
   });
 
   it('passes real messages and the resolved locale to NextIntlClientProvider', async () => {
-    const ui = await LocaleLayout({
-      children: <div>content</div>,
-      params: Promise.resolve({ locale: LOCALE_ISO_CODES.EN }),
-    });
+    const provider = firstChildOf(
+      firstChildOf(
+        await LocaleLayout({
+          children: <div>content</div>,
+          params: Promise.resolve({ locale: LOCALE_ISO_CODES.EN }),
+        }),
+      ),
+    );
 
     expect(setRequestLocaleMock).toHaveBeenCalledWith(LOCALE_ISO_CODES.EN);
-    expect(ui.props.locale).toBe(LOCALE_ISO_CODES.EN);
-    expect(ui.props.messages).toBe(realMessages);
+    expect(provider.props.locale).toBe(LOCALE_ISO_CODES.EN);
+    expect(provider.props.messages).toBe(realMessages);
+  });
+
+  it('declares the admin language on the document', async () => {
+    const document = await LocaleLayout({
+      children: <div>content</div>,
+      params: Promise.resolve({ locale: LOCALE_ISO_CODES.NL }),
+    });
+
+    expect(document.props.lang).toBe(LOCALE_BCP47_TAGS.NL);
   });
 
   it('renders children', async () => {

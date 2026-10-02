@@ -4,7 +4,7 @@ import { resolveDashboardTenant } from '@platform/server/auth/resolve-dashboard-
 import { getDomainVerificationStatus } from '@platform/server/provisioning/get-domain-verification-status';
 import { formatDate } from '@platform/utils/format-date/format-date';
 import type { Metadata } from 'next';
-import { getTranslations } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('pageMetadata');
@@ -14,11 +14,12 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function DashboardOverviewPage() {
   const { tenant } = await resolveDashboardTenant();
 
-  const [domainVerificationStatus, ownerEmail, ownerMembership] =
+  const [domainVerificationStatus, ownerEmail, ownerMembership, locale] =
     await Promise.all([
       getDomainVerificationStatus(tenant.primaryDomain),
       queries.memberships.getTenantOwnerEmail(tenant.id),
       queries.memberships.getTenantOwnerMembership(tenant.id),
+      getLocale(),
     ]);
 
   return (
@@ -27,7 +28,9 @@ export default async function DashboardOverviewPage() {
       domainVerificationStatus={domainVerificationStatus}
       ownerEmail={ownerEmail}
       ownerJoinedAt={
-        ownerMembership ? formatDate(ownerMembership.joinedAt) : undefined
+        ownerMembership
+          ? formatDate(ownerMembership.joinedAt, locale)
+          : undefined
       }
       ownerJoinedAtIso={ownerMembership?.joinedAt.toISOString()}
     />
