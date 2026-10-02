@@ -38,7 +38,7 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
     getSettingsFeaturesMock.mockResolvedValue(undefined);
     getSiteConfigMock.mockResolvedValue(undefined);
 
-    await setup();
+    await setup({ tenant: buildTenant('GROWTH') });
 
     expect(getSettingsFeaturesMock).toHaveBeenCalledWith('tenant-1');
     expect(screen.getByRole('switch', { name: 'Comments' })).toHaveAttribute(
@@ -90,7 +90,7 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
       faviconAssetUrl: undefined,
     });
 
-    await setup();
+    await setup({ tenant: buildTenant('GROWTH') });
 
     expect(getSiteConfigMock).toHaveBeenCalledWith('tenant-1');
     expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(

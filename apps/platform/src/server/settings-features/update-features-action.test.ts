@@ -49,9 +49,9 @@ const FREE_TENANT = { id: 'tenant-1', plan: 'FREE' };
 const GROWTH_TENANT = { id: 'tenant-2', plan: 'GROWTH' };
 
 const VALID_INPUT: TUpdateFeaturesInput = {
-  commentsEnabled: true,
+  commentsEnabled: false,
   ratingsEnabled: true,
-  bookmarksEnabled: true,
+  bookmarksEnabled: false,
   newsletterEnabled: false,
   analyticsEnabled: false,
   consentBannerEnabled: false,

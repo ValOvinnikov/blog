@@ -69,7 +69,7 @@ describe(`<${FeaturesPage.name}/>`, () => {
     getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });
     getTenantByIdMock.mockResolvedValue({
       id: 'tenant-1',
-      plan: 'FREE',
+      plan: 'GROWTH',
     });
     getSettingsFeaturesMock.mockResolvedValue(undefined);
     getSiteConfigMock.mockResolvedValue(undefined);
@@ -104,8 +104,16 @@ describe(`<${FeaturesPage.name}/>`, () => {
       'data-disabled',
       '',
     );
-    expect(
-      screen.getByRole('switch', { name: 'Comments' }),
-    ).not.toHaveAttribute('data-disabled');
+    expect(screen.getByRole('switch', { name: 'Comments' })).toHaveAttribute(
+      'data-disabled',
+      '',
+    );
+    expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(
+      'data-disabled',
+      '',
+    );
+    expect(screen.getByRole('switch', { name: 'Ratings' })).not.toHaveAttribute(
+      'data-disabled',
+    );
   });
 });
