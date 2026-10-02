@@ -22,5 +22,6 @@ export function toLandingPage(raw: TRawLandingPage): TLandingPage {
     modules: (raw.modules ?? []).map(toModule),
     faqs: resolveFaqs(raw.faqs),
     seo: resolveSeo(raw.seo),
+    translations: raw.translations,
   };
 }

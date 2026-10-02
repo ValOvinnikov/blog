@@ -7,12 +7,18 @@ import {
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
 import { moduleFragment } from '@blog/service/shared/fragments/module/module';
 import { seoFragment } from '@blog/service/shared/fragments/seo/seo';
+import {
+  buildTranslationsExpression,
+  type TRawTranslation,
+} from '@blog/service/shared/localization/translations';
 import type { TRawModule } from '@blog/service/shared/transformers/module/to-module';
 
 export const landingPageQuery = q
   .parameters<TSlugParams>()
   .star.filterByType('page_landing')
-  .filterBy('slug.current == $slug')
+  .filterRaw(
+    'slug.current == $slug && coalesce(language, $defaultLocale) == $locale',
+  )
   .slice(0)
   .project((sub) => ({
     slug: sub.field('slug.current').notNull(),
@@ -34,5 +40,6 @@ export const landingPageQuery = q
       .nullable(),
     faqs: sub.raw(PAGE_FAQ_QUESTIONS_EXPRESSION, pageFaqQuestionsParser),
     seo: sub.field('seo').project(seoFragment).notNull(),
+    translations: sub.raw<TRawTranslation[]>(buildTranslationsExpression()),
   }))
   .nullable(true);

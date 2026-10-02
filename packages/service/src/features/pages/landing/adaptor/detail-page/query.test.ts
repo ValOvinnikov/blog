@@ -1,5 +1,7 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { makeRawLandingPage } from '@blog/service/testing/pages/fixtures';
 import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
+import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 
 import { landingPageQuery } from './query';
 
@@ -52,5 +54,78 @@ describe('landingPageQuery', () => {
     const raw = { ...makeRawLandingPage(), faqs: [null] };
 
     expect(() => landingPageQuery.parse(raw)).toThrow();
+  });
+});
+
+describe('landingPageQuery language scoping', () => {
+  const { EN, NL, FR } = LOCALE_ISO_CODES;
+
+  function landing(
+    id: string,
+    slug: string,
+    heading: string,
+    language?: string,
+  ) {
+    return {
+      _id: id,
+      _type: 'page_landing',
+      slug: { current: slug },
+      headingBlock: { heading },
+      ...(language ? { language } : {}),
+    };
+  }
+
+  function link(language: string, id: string) {
+    return {
+      _key: language,
+      language,
+      value: { _type: 'reference', _ref: id },
+    };
+  }
+
+  const dataset = [
+    landing('about-en', 'about', 'About', EN),
+    landing('about-nl', 'about', 'Over ons', NL),
+    landing('legacy', 'legacy', 'Legacy'),
+    {
+      _id: 'meta-about',
+      _type: 'translation.metadata',
+      translations: [link(EN, 'about-en'), link(NL, 'about-nl')],
+    },
+  ];
+
+  function run(slug: string, locale: string): Promise<unknown> {
+    return evaluateGroqExpression(landingPageQuery.query, dataset, null, {
+      slug,
+      locale,
+      defaultLocale: EN,
+    });
+  }
+
+  it('resolves the same slug to a different page per language', async () => {
+    expect(await run('about', EN)).toMatchObject({
+      headingBlock: { heading: 'About' },
+    });
+    expect(await run('about', NL)).toMatchObject({
+      headingBlock: { heading: 'Over ons' },
+    });
+  });
+
+  it('resolves nothing for a language the page is not authored in', async () => {
+    expect(await run('about', FR)).toBeNull();
+  });
+
+  it('resolves a page with no language for the default language only', async () => {
+    expect(await run('legacy', EN)).toMatchObject({ slug: 'legacy' });
+    expect(await run('legacy', NL)).toBeNull();
+  });
+
+  it('returns the linked translations with their languages and slugs', async () => {
+    expect(await run('about', NL)).toMatchObject({
+      translations: [
+        { language: EN, slug: 'about' },
+        { language: NL, slug: 'about' },
+      ],
+    });
   });
 });
