@@ -45,7 +45,7 @@ const requireSchemaField = <TValue>(
   return value;
 };
 
-const NO_LANGUAGE_TITLE = 'No language';
+const ALL_PAGES_TITLE = 'All pages';
 
 const buildByLanguageItem = (
   S: StructureBuilder,
@@ -72,10 +72,9 @@ const buildByLanguageItem = (
       .id(id)
       .icon(icon)
       .child(
-        S.documentList()
+        S.documentTypeList(name)
           .id(id)
           .title(`${listTitle} ${title}`)
-          .schemaType(name)
           .filter(filter)
           .params({ type: name, ...params })
           .initialValueTemplates(
@@ -84,6 +83,8 @@ const buildByLanguageItem = (
             ),
           ),
       );
+
+  const templateIdFor = (locale: TLocaleIsoCode) => `${name}-${locale}`;
 
   return S.listItem()
     .title(title)
@@ -95,19 +96,20 @@ const buildByLanguageItem = (
         .items([
           ...locales.map((locale) =>
             languageList(
-              `${name}-${locale}`,
+              templateIdFor(locale),
               LOCALE_NATIVE_LABEL[locale],
               `_type == $type && ${LANGUAGE_FIELD} == $language`,
               { language: locale },
-              [`${name}-${locale}`],
+              [templateIdFor(locale)],
             ),
           ),
+          S.divider(),
           languageList(
-            `${name}-no-language`,
-            NO_LANGUAGE_TITLE,
-            `_type == $type && !defined(${LANGUAGE_FIELD})`,
+            `${name}-all`,
+            ALL_PAGES_TITLE,
+            '_type == $type',
             {},
-            [],
+            locales.map(templateIdFor),
           ),
         ]),
     );
