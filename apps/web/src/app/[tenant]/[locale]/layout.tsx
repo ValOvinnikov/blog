@@ -126,7 +126,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
     service.global.navigation.v1.getNavigation(sanityContext),
     service.global.footer.v1.getFooter(sanityContext),
     getThemeTokens(tenant),
-    isCapabilityEnabled(CAPABILITY.ANALYTICS, tenant),
+    isCapabilityEnabled(CAPABILITY.ANALYTICS),
     getMessages(),
     getNow(),
     getTimeZone(),

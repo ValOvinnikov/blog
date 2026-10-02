@@ -1,4 +1,3 @@
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { getTopicIndexPage } from './get-topic-index-page';
@@ -11,23 +10,18 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
+vi.mock('@web/server/request-context/request-context');
 
 describe(getTopicIndexPage, () => {
   beforeEach(() => {
     getIndexPageMock.mockReset();
-    vi.mocked(getTenantSanityContext).mockReset();
-    vi.mocked(getTenantSanityContext).mockResolvedValue(
-      DEFAULT_TENANT_SANITY_CONTEXT,
-    );
   });
 
   it('forwards the resolved tenant context to the topic index service', async () => {
     getIndexPageMock.mockResolvedValue({ ok: true, data: undefined });
 
-    await getTopicIndexPage('tenant-1');
+    await getTopicIndexPage();
 
-    expect(getTenantSanityContext).toHaveBeenCalledWith('tenant-1');
     expect(getIndexPageMock).toHaveBeenCalledWith(
       DEFAULT_TENANT_SANITY_CONTEXT,
     );
@@ -37,7 +31,7 @@ describe(getTopicIndexPage, () => {
     const result = { ok: true, data: { heading: 'Topics' } };
     getIndexPageMock.mockResolvedValue(result);
 
-    await expect(getTopicIndexPage('tenant-1')).resolves.toBe(result);
+    await expect(getTopicIndexPage()).resolves.toBe(result);
   });
 });
 
@@ -49,10 +43,6 @@ describe('getTopicIndexPage memoization', () => {
 
   it('dedupes the index-page query across one render pass with the same arguments', async () => {
     getIndexPageMock.mockReset();
-    vi.mocked(getTenantSanityContext).mockReset();
-    vi.mocked(getTenantSanityContext).mockResolvedValue(
-      DEFAULT_TENANT_SANITY_CONTEXT,
-    );
     getIndexPageMock.mockResolvedValue({ ok: true, data: undefined });
 
     vi.doMock('react', async (importOriginal) => {
@@ -76,8 +66,8 @@ describe('getTopicIndexPage memoization', () => {
     const { getTopicIndexPage: freshGetTopicIndexPage } =
       await import('./get-topic-index-page');
 
-    await freshGetTopicIndexPage('tenant-1');
-    await freshGetTopicIndexPage('tenant-1');
+    await freshGetTopicIndexPage();
+    await freshGetTopicIndexPage();
 
     expect(getIndexPageMock).toHaveBeenCalledTimes(1);
   });

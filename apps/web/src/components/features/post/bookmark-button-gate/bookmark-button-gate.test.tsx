@@ -23,7 +23,7 @@ vi.mock('next-auth/react', () => ({ useSession: vi.fn() }));
 
 const setup = customRenderServerAsync(
   BookmarkButtonGate,
-  { postId: 'post-1', tenant: 'tenant-1' },
+  { postId: 'post-1' },
   { wrapper: ToastProvider },
 );
 
@@ -56,11 +56,11 @@ describe(`<${BookmarkButtonGate.name}/>`, () => {
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
-  it('checks the bookmarks capability for the given tenant', async () => {
+  it('checks the bookmarks capability ', async () => {
     vi.mocked(isCapabilityEnabled).mockResolvedValueOnce(false);
 
     await setup();
 
-    expect(isCapabilityEnabled).toHaveBeenCalledWith('BOOKMARKS', 'tenant-1');
+    expect(isCapabilityEnabled).toHaveBeenCalledWith('BOOKMARKS');
   });
 });

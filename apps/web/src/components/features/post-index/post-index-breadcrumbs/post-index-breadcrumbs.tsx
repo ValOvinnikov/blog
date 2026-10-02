@@ -6,20 +6,14 @@ import {
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';
-import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { getTranslations } from 'next-intl/server';
 
-export type TPostIndexBreadcrumbsProps = {
-  tenant: string;
-};
-
-export const PostIndexBreadcrumbs = async ({
-  tenant,
-}: TPostIndexBreadcrumbsProps) => {
-  const [t, siteUrl] = await Promise.all([
+export const PostIndexBreadcrumbs = async () => {
+  const [t, { metadataBase }] = await Promise.all([
     getTranslations('breadcrumbs'),
-    getTenantBaseUrl(tenant),
+    getRequestContext(),
   ]);
 
   const breadcrumbTrail: IBreadcrumbItem[] = [
@@ -28,7 +22,7 @@ export const PostIndexBreadcrumbs = async ({
   ];
   const breadcrumbListSchema = buildBreadcrumbListSchema(
     breadcrumbTrail,
-    siteUrl ?? '',
+    metadataBase,
   );
 
   return (

@@ -4,14 +4,12 @@ import { isCapabilityEnabled } from '@web/server/settings-features/is-capability
 
 export type TBookmarkButtonGateProps = {
   postId: string;
-  tenant: string;
 };
 
 export const BookmarkButtonGate = async ({
   postId,
-  tenant,
 }: TBookmarkButtonGateProps) => {
-  const isEnabled = await isCapabilityEnabled(CAPABILITY.BOOKMARKS, tenant);
+  const isEnabled = await isCapabilityEnabled(CAPABILITY.BOOKMARKS);
   if (!isEnabled) return null;
 
   return <BookmarkButton postId={postId} />;

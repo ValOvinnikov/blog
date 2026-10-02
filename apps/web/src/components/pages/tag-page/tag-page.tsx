@@ -9,12 +9,10 @@ import { TagModuleRenderer } from './tag-module-renderer';
 type TTagPageProps = {
   slug: string;
   page?: number;
-  locale: string;
-  tenant: string;
 };
 
-export const TagPage = async ({ slug, page, tenant }: TTagPageProps) => {
-  const result = await getTagPage(slug, tenant);
+export const TagPage = async ({ slug, page }: TTagPageProps) => {
+  const result = await getTagPage(slug);
   const pageData = guardPageLoaderResult(result, 'tag_page.fetch_failed', {
     slug,
   });
@@ -25,7 +23,7 @@ export const TagPage = async ({ slug, page, tenant }: TTagPageProps) => {
   return (
     <PageShell>
       <PageShell.Breadcrumbs>
-        <TagBreadcrumbs slug={slug} tenant={tenant} />
+        <TagBreadcrumbs slug={slug} />
       </PageShell.Breadcrumbs>
       <TagModuleRenderer
         hero={hero}

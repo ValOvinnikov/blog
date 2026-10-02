@@ -1,6 +1,5 @@
 import { TAXONOMY_KIND } from '@blog/config';
 import { service } from '@blog/service';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import {
   customRenderServerAsync,
   screen,
@@ -35,10 +34,6 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
-
-vi.mock('@web/server/tenant/get-tenant-base-url');
-
 vi.mock('@web/utils/logger/logger');
 
 vi.mock('@web/i18n/navigation');
@@ -47,8 +42,6 @@ const getTopicPageMock = vi.mocked(service.pages.topic.v1.getTopicPage);
 
 const setup = customRenderServerAsync(TopicPage, {
   slug: 'news',
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${TopicPage.name}/>`, () => {
@@ -107,7 +100,6 @@ describe(`<${TopicPage.name}/>`, () => {
       'news',
       DEFAULT_TENANT_SANITY_CONTEXT,
     );
-    expect(getTenantSanityContext).toHaveBeenCalledWith('tenant-1');
   });
 
   it('renders the topic heading and supporting text inside main', async () => {

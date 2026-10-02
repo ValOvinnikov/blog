@@ -6,30 +6,26 @@ import {
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { getTagPage } from '@web/server/tag/get-tag-page';
-import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 import { getTranslations } from 'next-intl/server';
 
 export type TTagBreadcrumbsProps = {
   slug: string;
-  tenant: string;
 };
 
-export const TagBreadcrumbs = async ({
-  slug,
-  tenant,
-}: TTagBreadcrumbsProps) => {
-  const result = await getTagPage(slug, tenant);
+export const TagBreadcrumbs = async ({ slug }: TTagBreadcrumbsProps) => {
+  const result = await getTagPage(slug);
   const page = guardPageLoaderResult(result, 'tag_breadcrumbs.fetch_failed', {
     slug,
   });
   const { tag } = page;
 
-  const [t, siteUrl] = await Promise.all([
+  const [t, { metadataBase }] = await Promise.all([
     getTranslations('breadcrumbs'),
-    getTenantBaseUrl(tenant),
+    getRequestContext(),
   ]);
 
   const breadcrumbTrail: IBreadcrumbItem[] = [
@@ -38,7 +34,7 @@ export const TagBreadcrumbs = async ({
   ];
   const breadcrumbListSchema = buildBreadcrumbListSchema(
     breadcrumbTrail,
-    siteUrl ?? '',
+    metadataBase,
   );
 
   return (

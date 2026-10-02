@@ -1,7 +1,7 @@
 import { queries } from '@blog/db';
 import { NewsletterSubscriptionControl } from '@web/components/shared/newsletter-subscription-control';
 import { auth } from '@web/server/auth/auth';
-import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { getTranslations } from 'next-intl/server';
 
 import { NewsletterSectionView } from './newsletter-section-view';
@@ -12,7 +12,7 @@ export const NewsletterSection = async () => {
 
   const { id: userId, email } = session.user;
 
-  const tenantId = await getRequestTenantId();
+  const { tenantId } = await getRequestContext();
   if (!tenantId) return null;
 
   const status = await queries.subscribers.getSubscriptionStatus(

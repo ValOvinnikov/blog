@@ -13,10 +13,8 @@ vi.mock('@web/metadata/landing-page-metadata', () => ({
 }));
 
 vi.mock('@web/components/pages/landing-page', () => ({
-  LandingPage: ({ slug, locale }: { slug: string; locale: string }) => (
-    <div data-testid="landing-page">
-      {slug}-{locale}
-    </div>
+  LandingPage: ({ slug }: { slug: string }) => (
+    <div data-testid="landing-page">{slug}</div>
   ),
 }));
 
@@ -49,9 +47,22 @@ describe('LandingSlugPage', () => {
 
       expect(metadata).toEqual({ title: 'About Us' });
     });
+
+    it('enters the request context with the route params', async () => {
+      const params: Parameters<typeof generateMetadata>[0]['params'] =
+        Promise.resolve({
+          tenant: 'tenant-1',
+          locale: 'EN',
+          slug: 'about-us',
+        });
+
+      await generateMetadata({ params });
+
+      expect(enterRequestContext).toHaveBeenCalledWith(params);
+    });
   });
 
-  it('renders LandingPage with the resolved locale and slug', async () => {
+  it('renders LandingPage with the resolved slug', async () => {
     const ui = await LandingSlugPage({
       params: Promise.resolve({
         tenant: 'tenant-1',
@@ -60,7 +71,6 @@ describe('LandingSlugPage', () => {
       }),
     });
 
-    expect(ui.props.slug).toBe('about-us');
-    expect(ui.props.locale).toBe('EN');
+    expect(ui.props).toEqual({ slug: 'about-us' });
   });
 });

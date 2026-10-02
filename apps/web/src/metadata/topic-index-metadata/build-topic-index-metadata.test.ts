@@ -1,5 +1,4 @@
 import { urlForSanityImage } from '@blog/service';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
@@ -14,9 +13,7 @@ vi.mock('@web/server/topic-index/get-topic-index-page', () => ({
   getTopicIndexPage: getTopicIndexPageMock,
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
-
-const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
+vi.mock('@web/server/request-context/request-context');
 
 const ogImage = makeSanityImage();
 const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
@@ -35,19 +32,17 @@ const seo = makeSeo({
 describe('buildTopicIndexMetadata', () => {
   beforeEach(() => {
     getTopicIndexPageMock.mockReset();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
-  it('forwards the tenant to getTopicIndexPage, the loader TopicIndexPage reads', async () => {
+  it('reads the page through getTopicIndexPage, the loader TopicIndexPage reads', async () => {
     getTopicIndexPageMock.mockResolvedValue({
       ok: true,
       data: { headingBlock: { heading: 'Topics' }, seo, modules: [] },
     });
 
-    await buildTopicIndexMetadata('tenant-1');
+    await buildTopicIndexMetadata();
 
-    expect(getTopicIndexPageMock).toHaveBeenCalledWith('tenant-1');
+    expect(getTopicIndexPageMock).toHaveBeenCalledWith();
   });
 
   it('builds metadata from the resolved seo, self-canonical to /topics', async () => {
@@ -60,7 +55,7 @@ describe('buildTopicIndexMetadata', () => {
       },
     });
 
-    const metadata = await buildTopicIndexMetadata('tenant-1');
+    const metadata = await buildTopicIndexMetadata();
 
     expect(metadata.title).toBe('Topics');
     expect(metadata.description).toBe('Browse every post by topic.');
@@ -81,7 +76,7 @@ describe('buildTopicIndexMetadata', () => {
       error: new Error('boom'),
     });
 
-    const metadata = await buildTopicIndexMetadata('tenant-1');
+    const metadata = await buildTopicIndexMetadata();
 
     expect(metadata).toEqual({});
     expect(errorSpy).toHaveBeenCalledWith(
@@ -94,7 +89,7 @@ describe('buildTopicIndexMetadata', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getTopicIndexPageMock.mockResolvedValue({ ok: true, data: undefined });
 
-    const metadata = await buildTopicIndexMetadata('tenant-1');
+    const metadata = await buildTopicIndexMetadata();
 
     expect(metadata).toEqual({});
     expect(errorSpy).not.toHaveBeenCalled();

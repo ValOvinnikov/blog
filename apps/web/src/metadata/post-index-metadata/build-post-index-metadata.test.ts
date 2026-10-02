@@ -1,5 +1,4 @@
 import { urlForSanityImage } from '@blog/service';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
@@ -15,9 +14,7 @@ vi.mock('@web/server/post-index/get-post-index-page', () => ({
   getPostIndexPage: getPostIndexPageMock,
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
-
-const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
+vi.mock('@web/server/request-context/request-context');
 
 const ogImage = makeSanityImage();
 const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
@@ -36,11 +33,9 @@ const seo = makeSeo({
 describe('buildPostIndexMetadata', () => {
   beforeEach(() => {
     getPostIndexPageMock.mockReset();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
-  it('forwards the tenant to getPostIndexPage, the loader PostIndexPage reads', async () => {
+  it('reads the page through getPostIndexPage, the loader PostIndexPage reads', async () => {
     getPostIndexPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -51,9 +46,9 @@ describe('buildPostIndexMetadata', () => {
       },
     });
 
-    await buildPostIndexMetadata(1, 'tenant-1');
+    await buildPostIndexMetadata(1);
 
-    expect(getPostIndexPageMock).toHaveBeenCalledWith('tenant-1');
+    expect(getPostIndexPageMock).toHaveBeenCalledWith();
   });
 
   it('builds page-1 metadata from the resolved seo, self-canonical to /blog', async () => {
@@ -67,7 +62,7 @@ describe('buildPostIndexMetadata', () => {
       },
     });
 
-    const metadata = await buildPostIndexMetadata(1, 'tenant-1');
+    const metadata = await buildPostIndexMetadata(1);
 
     expect(metadata.title).toBe('The Blog');
     expect(metadata.description).toBe('All the posts.');
@@ -93,7 +88,7 @@ describe('buildPostIndexMetadata', () => {
       },
     });
 
-    const metadata = await buildPostIndexMetadata(2, 'tenant-1');
+    const metadata = await buildPostIndexMetadata(2);
 
     expect(metadata.title).toBe('The Blog – Page 2');
     expect(metadata.openGraph?.title).toBe('The Blog OG – Page 2');
@@ -116,7 +111,7 @@ describe('buildPostIndexMetadata', () => {
       },
     });
 
-    const metadata = await buildPostIndexMetadata(2, 'tenant-1');
+    const metadata = await buildPostIndexMetadata(2);
 
     expect(metadata.openGraph?.title).toBeUndefined();
     expect(metadata.twitter?.title).toBeUndefined();
@@ -129,7 +124,7 @@ describe('buildPostIndexMetadata', () => {
       error: new Error('boom'),
     });
 
-    const metadata = await buildPostIndexMetadata(1, 'tenant-1');
+    const metadata = await buildPostIndexMetadata(1);
 
     expect(metadata).toEqual({});
     expect(errorSpy).toHaveBeenCalledWith(
@@ -142,7 +137,7 @@ describe('buildPostIndexMetadata', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getPostIndexPageMock.mockResolvedValue({ ok: true, data: undefined });
 
-    const metadata = await buildPostIndexMetadata(1, 'tenant-1');
+    const metadata = await buildPostIndexMetadata(1);
 
     expect(metadata).toEqual({});
     expect(errorSpy).not.toHaveBeenCalled();

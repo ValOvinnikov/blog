@@ -1,4 +1,3 @@
-import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
 import { customRenderAsync } from '@web/testing/custom-render';
 import {
   testBreadcrumbsJsonLdSchema,
@@ -12,6 +11,8 @@ import { makeTopic } from '@web/testing/shared/topic/fixtures';
 
 import { TopicBreadcrumbs } from './topic-breadcrumbs';
 
+vi.mock('@web/server/request-context/request-context');
+
 const { getTopicPageMock } = vi.hoisted(() => ({
   getTopicPageMock: vi.fn(),
 }));
@@ -22,23 +23,16 @@ vi.mock('@web/server/topic/get-topic-page', () => ({
   getTopicPage: getTopicPageMock,
 }));
 
-vi.mock('@web/server/tenant/get-tenant-base-url');
-
-const getTenantBaseUrlMock = vi.mocked(getTenantBaseUrl);
-
 const topic = makeTopic({ title: 'News', slug: 'news' });
 const successData = { topic, modules: [], seo: {} };
 
 const setup = customRenderAsync(TopicBreadcrumbs, {
   slug: 'news',
-  tenant: 'tenant-1',
 });
 
 describe(`<${TopicBreadcrumbs.name}/>`, () => {
   beforeEach(() => {
     getTopicPageMock.mockReset();
-    getTenantBaseUrlMock.mockReset();
-    getTenantBaseUrlMock.mockResolvedValue('https://example.com');
   });
 
   testNotFoundWithoutLog({ pageLoaderMock: getTopicPageMock, setup });
@@ -64,13 +58,12 @@ describe(`<${TopicBreadcrumbs.name}/>`, () => {
     pageLoaderMock: getTopicPageMock,
     setup,
     successData,
-    getTenantBaseUrlMock,
   });
   testForwardsArgsToLoader({
     pageLoaderMock: getTopicPageMock,
     setup,
     successData,
-    description: 'forwards the slug and tenant to getTopicPage',
-    expectedArgs: ['news', 'tenant-1'],
+    description: 'forwards the slug to getTopicPage',
+    expectedArgs: ['news'],
   });
 });

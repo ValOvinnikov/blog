@@ -1,6 +1,5 @@
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
-import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/unresolved-tenant-placeholder';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
@@ -165,7 +164,7 @@ describe(`<${NewsletterModule.name}/>`, () => {
     expect(getNewsletterMock).not.toHaveBeenCalled();
   });
 
-  it('checks the capability for the request context tenant', async () => {
+  it('checks the NEWSLETTER capability', async () => {
     getNewsletterMock.mockResolvedValue({
       ok: false,
       error: new Error('boom'),
@@ -173,24 +172,6 @@ describe(`<${NewsletterModule.name}/>`, () => {
 
     await setup();
 
-    expect(isCapabilityEnabled).toHaveBeenCalledWith('NEWSLETTER', 'tenant-1');
-  });
-
-  it('checks the capability against the unresolved-tenant placeholder when the context has no tenant', async () => {
-    getRequestContextMock.mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
-      tenantId: undefined,
-    });
-    getNewsletterMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
-
-    await setup();
-
-    expect(isCapabilityEnabled).toHaveBeenCalledWith(
-      'NEWSLETTER',
-      UNRESOLVED_TENANT_PLACEHOLDER,
-    );
+    expect(isCapabilityEnabled).toHaveBeenCalledWith('NEWSLETTER');
   });
 });

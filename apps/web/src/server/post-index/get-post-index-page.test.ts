@@ -1,4 +1,3 @@
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { getPostIndexPage } from './get-post-index-page';
@@ -9,23 +8,18 @@ vi.mock('@blog/service', () => ({
   service: { pages: { blog: { v1: { getIndexPage: getIndexPageMock } } } },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
+vi.mock('@web/server/request-context/request-context');
 
 describe(getPostIndexPage, () => {
   beforeEach(() => {
     getIndexPageMock.mockReset();
-    vi.mocked(getTenantSanityContext).mockReset();
-    vi.mocked(getTenantSanityContext).mockResolvedValue(
-      DEFAULT_TENANT_SANITY_CONTEXT,
-    );
   });
 
   it('forwards the resolved tenant context to the blog index service', async () => {
     getIndexPageMock.mockResolvedValue({ ok: true, data: undefined });
 
-    await getPostIndexPage('tenant-1');
+    await getPostIndexPage();
 
-    expect(getTenantSanityContext).toHaveBeenCalledWith('tenant-1');
     expect(getIndexPageMock).toHaveBeenCalledWith(
       DEFAULT_TENANT_SANITY_CONTEXT,
     );
@@ -35,7 +29,7 @@ describe(getPostIndexPage, () => {
     const result = { ok: true, data: { title: 'Blog' } };
     getIndexPageMock.mockResolvedValue(result);
 
-    await expect(getPostIndexPage('tenant-1')).resolves.toBe(result);
+    await expect(getPostIndexPage()).resolves.toBe(result);
   });
 });
 
@@ -47,10 +41,6 @@ describe('getPostIndexPage memoization', () => {
 
   it('dedupes the index-page query across one render pass with the same arguments', async () => {
     getIndexPageMock.mockReset();
-    vi.mocked(getTenantSanityContext).mockReset();
-    vi.mocked(getTenantSanityContext).mockResolvedValue(
-      DEFAULT_TENANT_SANITY_CONTEXT,
-    );
     getIndexPageMock.mockResolvedValue({ ok: true, data: undefined });
 
     vi.doMock('react', async (importOriginal) => {
@@ -74,8 +64,8 @@ describe('getPostIndexPage memoization', () => {
     const { getPostIndexPage: freshGetPostIndexPage } =
       await import('./get-post-index-page');
 
-    await freshGetPostIndexPage('tenant-1');
-    await freshGetPostIndexPage('tenant-1');
+    await freshGetPostIndexPage();
+    await freshGetPostIndexPage();
 
     expect(getIndexPageMock).toHaveBeenCalledTimes(1);
   });

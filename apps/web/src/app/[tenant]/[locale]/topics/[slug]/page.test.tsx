@@ -47,6 +47,19 @@ describe('TopicDetailPage', () => {
 
       expect(metadata).toEqual({ title: 'Engineering' });
     });
+
+    it('enters the request context with the route params', async () => {
+      const params: Parameters<typeof generateMetadata>[0]['params'] =
+        Promise.resolve({
+          tenant: 'tenant-1',
+          locale: 'EN',
+          slug: 'engineering',
+        });
+
+      await generateMetadata({ params });
+
+      expect(enterRequestContext).toHaveBeenCalledWith(params);
+    });
   });
 
   it('renders TopicPage with the resolved slug', async () => {

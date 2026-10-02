@@ -10,7 +10,10 @@ const trail: IBreadcrumbItem[] = [
 
 describe(buildBreadcrumbListSchema, () => {
   it('builds a BreadcrumbList schema from the trail', () => {
-    const schema = buildBreadcrumbListSchema(trail, 'https://example.com');
+    const schema = buildBreadcrumbListSchema(
+      trail,
+      new URL('https://example.com'),
+    );
 
     expect(schema).toEqual({
       '@context': 'https://schema.org',
@@ -39,15 +42,21 @@ describe(buildBreadcrumbListSchema, () => {
   });
 
   it('assigns 1-based positions in trail order', () => {
-    const schema = buildBreadcrumbListSchema(trail, 'https://example.com');
+    const schema = buildBreadcrumbListSchema(
+      trail,
+      new URL('https://example.com'),
+    );
 
     expect(schema?.itemListElement.map((item) => item.position)).toEqual([
       1, 2, 3,
     ]);
   });
 
-  it('builds absolute item URLs from siteUrl and each item href', () => {
-    const schema = buildBreadcrumbListSchema(trail, 'https://blog.example.com');
+  it('builds absolute item URLs from the base URL and each item href', () => {
+    const schema = buildBreadcrumbListSchema(
+      trail,
+      new URL('https://blog.example.com'),
+    );
 
     expect(schema?.itemListElement.map((item) => item.item)).toEqual([
       'https://blog.example.com/',
@@ -56,8 +65,8 @@ describe(buildBreadcrumbListSchema, () => {
     ]);
   });
 
-  it('returns undefined when siteUrl is empty, rather than emitting a relative (invalid) url', () => {
-    const schema = buildBreadcrumbListSchema(trail, '');
+  it('returns undefined when there is no base URL, rather than emitting a relative (invalid) url', () => {
+    const schema = buildBreadcrumbListSchema(trail, undefined);
 
     expect(schema).toBeUndefined();
   });

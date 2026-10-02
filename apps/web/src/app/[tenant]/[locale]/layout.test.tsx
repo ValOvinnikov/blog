@@ -588,10 +588,7 @@ describe('LocaleLayout', () => {
     await setup();
 
     expect(getThemeTokensMock).toHaveBeenCalledWith('tenant-1');
-    expect(isCapabilityEnabledMock).toHaveBeenCalledWith(
-      'ANALYTICS',
-      'tenant-1',
-    );
+    expect(isCapabilityEnabledMock).toHaveBeenCalledWith('ANALYTICS');
     expect(resolveTenantMessagesMock).toHaveBeenCalledWith(
       realMessages,
       'tenant-1',

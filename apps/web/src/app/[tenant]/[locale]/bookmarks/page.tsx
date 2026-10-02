@@ -8,7 +8,8 @@ type TProps = {
   params: Promise<ITenantLocalizedParams>;
 };
 
-export function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({ params }: TProps): Promise<Metadata> {
+  await enterRequestContext(params);
   return buildBookmarksMetadata();
 }
 

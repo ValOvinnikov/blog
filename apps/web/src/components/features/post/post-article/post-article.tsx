@@ -12,8 +12,7 @@ import { PostShareLinks } from '@web/components/shared/post-share-links';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { getPostPage } from '@web/server/post/get-post-page';
-import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import {
   extractPostHeadings,
   MIN_H2_HEADINGS_FOR_RAIL,
@@ -25,7 +24,6 @@ import { postArticleVariants } from './post-article-variants';
 
 export type TPostArticleProps = {
   slug: string;
-  tenant: string;
 };
 
 const s = postArticleVariants();
@@ -41,8 +39,8 @@ const AUTHOR_AVATAR_TRANSFORM: TImageTransformOptions = {
   quality: 75,
 };
 
-export const PostArticle = async ({ slug, tenant }: TPostArticleProps) => {
-  const result = await getPostPage(slug, tenant);
+export const PostArticle = async ({ slug }: TPostArticleProps) => {
+  const result = await getPostPage(slug);
   const post = guardPageLoaderResult(result, 'post_article.fetch_failed', {
     slug,
   });
@@ -59,14 +57,14 @@ export const PostArticle = async ({ slug, tenant }: TPostArticleProps) => {
     heroImage,
   } = post;
 
-  const [format, blogPostT, siteUrl, tenantContext] = await Promise.all([
-    getFormatter(),
-    getTranslations('blogPostPage'),
-    getTenantBaseUrl(tenant),
-    getTenantSanityContext(tenant),
-  ]);
+  const [format, blogPostT, { metadataBase, sanityContext }] =
+    await Promise.all([
+      getFormatter(),
+      getTranslations('blogPostPage'),
+      getRequestContext(),
+    ]);
   const authorImageUrl = author.image
-    ? urlForSanityImage(author.image, tenantContext, AUTHOR_AVATAR_TRANSFORM)
+    ? urlForSanityImage(author.image, sanityContext, AUTHOR_AVATAR_TRANSFORM)
     : undefined;
 
   const formattedDate = format.dateTime(new Date(publishedAt), {
@@ -76,7 +74,9 @@ export const PostArticle = async ({ slug, tenant }: TPostArticleProps) => {
   });
   const headings = extractPostHeadings(body);
   const hasContentsRail = headings.length >= MIN_H2_HEADINGS_FOR_RAIL;
-  const url = `${siteUrl ?? ''}${routes.post(slug)}`;
+  const url = metadataBase
+    ? new URL(routes.post(slug), metadataBase).href
+    : routes.post(slug);
   const asideKindLabels: Record<TAsideKind, string> = {
     [ASIDE_KIND.WHY_NOT]: blogPostT('asideKind.WHY_NOT'),
     [ASIDE_KIND.DIGRESSION]: blogPostT('asideKind.DIGRESSION'),
@@ -112,7 +112,7 @@ export const PostArticle = async ({ slug, tenant }: TPostArticleProps) => {
           linkAs: SmartLink,
           share: (
             <div className={s.metaActions()}>
-              <BookmarkButtonGate postId={id} tenant={tenant} />
+              <BookmarkButtonGate postId={id} />
               <PostShareLinks url={url} title={title} />
             </div>
           ),

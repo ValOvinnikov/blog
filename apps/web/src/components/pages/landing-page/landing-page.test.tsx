@@ -1,6 +1,4 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
 import { service } from '@blog/service';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import {
   customRenderServerAsync,
   screen,
@@ -28,10 +26,6 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
-
-vi.mock('@web/server/tenant/get-tenant-base-url');
-
 vi.mock('@web/utils/logger/logger');
 
 vi.mock('@web/i18n/navigation');
@@ -42,8 +36,6 @@ const FAQ_PAGE_JSON_LD = '"@type":"FAQPage"';
 
 const setup = customRenderServerAsync(LandingPage, {
   slug: 'about-us',
-  locale: LOCALE_ISO_CODES.EN,
-  tenant: 'tenant-1',
 });
 
 describe(`<${LandingPage.name}/>`, () => {
@@ -79,7 +71,6 @@ describe(`<${LandingPage.name}/>`, () => {
       'about-us',
       DEFAULT_TENANT_SANITY_CONTEXT,
     );
-    expect(getTenantSanityContext).toHaveBeenCalledWith('tenant-1');
   });
 
   it('renders the page heading and supporting text inside main', async () => {
