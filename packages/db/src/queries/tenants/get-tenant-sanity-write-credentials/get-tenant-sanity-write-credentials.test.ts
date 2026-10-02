@@ -12,8 +12,12 @@ import { setTenantSanityWriteToken } from '@blog/db/queries/tenants/set-tenant-s
 import * as schema from '@blog/db/schema';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { eq } from 'drizzle-orm';
 
-import { getTenantSanityWriteCredentials } from './get-tenant-sanity-write-credentials';
+import {
+  getTenantSanityWriteCredentials,
+  toTenantSanityWriteCredentials,
+} from './get-tenant-sanity-write-credentials';
 
 async function insertTenant(): Promise<TTenant> {
   const result = await createTenant({
@@ -146,6 +150,56 @@ describe(getTenantSanityWriteCredentials, () => {
     delete process.env['TENANT_TOKEN_ENCRYPTION_KEY'];
 
     await expect(getTenantSanityWriteCredentials(tenant.id)).rejects.toThrow(
+      'TENANT_TOKEN_ENCRYPTION_KEY is not configured.',
+    );
+  });
+});
+
+describe(toTenantSanityWriteCredentials, () => {
+  async function insertTenantRow(): Promise<TTenant> {
+    const tenant = await insertTenant();
+    const [row] = await db()
+      .select()
+      .from(schema.tenants)
+      .where(eq(schema.tenants.id, tenant.id));
+    if (!row) throw new Error('setup: tenant row missing.');
+    return row;
+  }
+
+  it('maps a tenant row with a write token to decrypted credentials and servable state', async () => {
+    const tenant = await insertTenant();
+    await setTenantSanityWriteToken(tenant.id, 'sk-real-write-token-value');
+    const [row] = await db()
+      .select()
+      .from(schema.tenants)
+      .where(eq(schema.tenants.id, tenant.id));
+
+    expect(row && toTenantSanityWriteCredentials(row)).toEqual({
+      projectId: 'abc123',
+      dataset: 'production',
+      token: 'sk-real-write-token-value',
+      status: TENANT_STATUS.ACTIVE,
+      deprovisionedAt: null,
+      provisioningStatus: null,
+    });
+  });
+
+  it('returns undefined for a row with no write token', async () => {
+    expect(toTenantSanityWriteCredentials(await insertTenantRow())).toBe(
+      undefined,
+    );
+  });
+
+  it('throws when the encryption key is not configured', async () => {
+    const tenant = await insertTenant();
+    await setTenantSanityWriteToken(tenant.id, 'sk-real-write-token-value');
+    const [row] = await db()
+      .select()
+      .from(schema.tenants)
+      .where(eq(schema.tenants.id, tenant.id));
+    delete process.env['TENANT_TOKEN_ENCRYPTION_KEY'];
+
+    expect(() => row && toTenantSanityWriteCredentials(row)).toThrow(
       'TENANT_TOKEN_ENCRYPTION_KEY is not configured.',
     );
   });
