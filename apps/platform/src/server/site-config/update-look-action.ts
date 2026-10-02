@@ -5,10 +5,12 @@ import {
   AUDIT_TARGET_TYPE,
   DENSITY,
   FONT_CHOICE,
+  LANGUAGE_SWITCHER_STYLE,
   PRESET_ID,
   RADIUS_SCALE,
   type TDensity,
   type TFontChoice,
+  type TLanguageSwitcherStyle,
   type TPresetId,
   type TRadiusScale,
 } from '@blog/config';
@@ -37,6 +39,12 @@ const updateLookInputSchema = z.object({
     Object.values(RADIUS_SCALE) as [TRadiusScale, ...TRadiusScale[]],
   ),
   density: z.enum(Object.values(DENSITY) as [TDensity, ...TDensity[]]),
+  languageSwitcherStyle: z.enum(
+    Object.values(LANGUAGE_SWITCHER_STYLE) as [
+      TLanguageSwitcherStyle,
+      ...TLanguageSwitcherStyle[],
+    ],
+  ),
 });
 
 export type TUpdateLookInput = z.input<typeof updateLookInputSchema>;

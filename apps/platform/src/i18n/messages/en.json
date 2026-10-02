@@ -313,6 +313,14 @@
     "densityOptionLabel": {
       "DEFAULT": "Default",
       "COMPACT": "Compact"
+    },
+    "languageSwitcherLabel": "Language switcher",
+    "languageSwitcherDescription": "How the language switcher looks on desktop, in the header and footer.",
+    "languageSwitcherSingleLanguage": "Add another language in Languages settings to choose a style.",
+    "languageSwitcherOptionLabel": {
+      "MENU_CODE": "Menu with code",
+      "MENU_GLOBE": "Menu with globe",
+      "CODES": "Compact codes"
     }
   },
   "lookPreview": {

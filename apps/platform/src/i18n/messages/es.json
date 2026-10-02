@@ -313,6 +313,14 @@
     "densityOptionLabel": {
       "DEFAULT": "Predeterminada",
       "COMPACT": "Compacta"
+    },
+    "languageSwitcherLabel": "Selector de idioma",
+    "languageSwitcherDescription": "Cómo se ve el selector de idioma en escritorio, en el encabezado y el pie de página.",
+    "languageSwitcherSingleLanguage": "Añade otro idioma en Idiomas para elegir un estilo.",
+    "languageSwitcherOptionLabel": {
+      "MENU_CODE": "Menú con código",
+      "MENU_GLOBE": "Menú con globo",
+      "CODES": "Códigos compactos"
     }
   },
   "lookPreview": {

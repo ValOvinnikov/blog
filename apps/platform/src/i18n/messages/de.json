@@ -313,6 +313,14 @@
     "densityOptionLabel": {
       "DEFAULT": "Standard",
       "COMPACT": "Kompakt"
+    },
+    "languageSwitcherLabel": "Sprachauswahl",
+    "languageSwitcherDescription": "Wie die Sprachauswahl auf dem Desktop in Kopf- und Fußzeile aussieht.",
+    "languageSwitcherSingleLanguage": "Fügen Sie unter Sprachen eine weitere Sprache hinzu, um einen Stil zu wählen.",
+    "languageSwitcherOptionLabel": {
+      "MENU_CODE": "Menü mit Code",
+      "MENU_GLOBE": "Menü mit Globus",
+      "CODES": "Kompakte Codes"
     }
   },
   "lookPreview": {

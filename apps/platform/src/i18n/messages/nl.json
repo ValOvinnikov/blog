@@ -313,6 +313,14 @@
     "densityOptionLabel": {
       "DEFAULT": "Standaard",
       "COMPACT": "Compact"
+    },
+    "languageSwitcherLabel": "Taalkeuze",
+    "languageSwitcherDescription": "Hoe de taalkeuze er op desktop uitziet, in de header en footer.",
+    "languageSwitcherSingleLanguage": "Voeg eerst een andere taal toe bij Talen om een stijl te kiezen.",
+    "languageSwitcherOptionLabel": {
+      "MENU_CODE": "Menu met code",
+      "MENU_GLOBE": "Menu met wereldbol",
+      "CODES": "Compacte codes"
     }
   },
   "lookPreview": {
