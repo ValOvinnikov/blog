@@ -53,48 +53,51 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       'data-checked',
       '',
     );
-    expect(screen.getByRole('switch', { name: 'Newsletter' })).toHaveAttribute(
+    expect(screen.getByRole('switch', { name: 'Analytics' })).toHaveAttribute(
       'data-unchecked',
       '',
     );
-    expect(screen.getAllByRole('switch')).toHaveLength(4);
+    expect(screen.getAllByRole('switch')).toHaveLength(3);
   });
 
-  it('shows Comments and Ratings as "Coming soon" with no toggle, whatever the plan', () => {
+  it.each(['Comments', 'Ratings', 'Newsletter'])(
+    'shows %s as "Coming soon" with no toggle, whatever the plan',
+    (label) => {
+      setup({ entitledCapabilities: FREE_ENTITLED });
+
+      expect(screen.getByText(label)).toBeVisible();
+      expect(
+        screen.queryByRole('switch', { name: label }),
+      ).not.toBeInTheDocument();
+    },
+  );
+
+  it('badges exactly the three unfinished capabilities "Coming soon"', () => {
     setup();
 
-    expect(screen.getByText('Comments')).toBeVisible();
-    expect(screen.getByText('Ratings')).toBeVisible();
-    expect(screen.getAllByText('Coming soon')).toHaveLength(2);
-    expect(
-      screen.queryByRole('switch', { name: 'Comments' }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole('switch', { name: 'Ratings' }),
-    ).not.toBeInTheDocument();
+    expect(screen.getAllByText('Coming soon')).toHaveLength(3);
   });
 
   it('disables an out-of-plan toggle and shows a plan-locked badge, without hiding it', () => {
     setup({ entitledCapabilities: FREE_ENTITLED });
 
-    expect(screen.getByRole('switch', { name: 'Newsletter' })).toHaveAttribute(
-      'data-disabled',
-      '',
-    );
     expect(screen.getByRole('switch', { name: 'Analytics' })).toHaveAttribute(
       'data-disabled',
       '',
     );
     expect(
+      screen.getByRole('switch', { name: 'Cookie consent banner' }),
+    ).toHaveAttribute('data-disabled', '');
+    expect(
       screen.getByRole('switch', { name: 'Bookmarks' }),
     ).not.toHaveAttribute('data-disabled');
-    expect(screen.getAllByText('Growth plan')).toHaveLength(3);
+    expect(screen.getAllByText('Growth plan')).toHaveLength(2);
   });
 
   it('makes a locked toggle inert (unreachable and unclickable) while leaving an entitled toggle interactive, same as a provisioning-locked field', () => {
     setup({ entitledCapabilities: FREE_ENTITLED });
 
-    const lockedSwitch = screen.getByRole('switch', { name: 'Newsletter' });
+    const lockedSwitch = screen.getByRole('switch', { name: 'Analytics' });
     // eslint-disable-next-line testing-library/no-node-access
     const lockedWrapper = lockedSwitch.closest('div');
     expect(lockedWrapper?.getAttribute('inert')).toBe('');
@@ -140,14 +143,14 @@ describe(`<${FeaturesSettings.name}/>`, () => {
     setup();
 
     const saveButton = screen.getByRole('button', { name: 'Save changes' });
-    const newsletterSwitch = screen.getByRole('switch', {
-      name: 'Newsletter',
+    const analyticsSwitch = screen.getByRole('switch', {
+      name: 'Analytics',
     });
 
-    await user.click(newsletterSwitch);
+    await user.click(analyticsSwitch);
     expect(saveButton).toBeEnabled();
 
-    await user.click(newsletterSwitch);
+    await user.click(analyticsSwitch);
     expect(saveButton).toBeDisabled();
   });
 
@@ -157,7 +160,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
     setup({ saveAction });
 
     const saveButton = screen.getByRole('button', { name: 'Save changes' });
-    await user.click(screen.getByRole('switch', { name: 'Newsletter' }));
+    await user.click(screen.getByRole('switch', { name: 'Analytics' }));
     expect(saveButton).toBeEnabled();
 
     await user.click(saveButton);
@@ -185,7 +188,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
     const saveAction = vi.fn().mockResolvedValue({ ok: true });
     setup({ saveAction });
 
-    await user.click(screen.getByRole('switch', { name: 'Newsletter' }));
+    await user.click(screen.getByRole('switch', { name: 'Analytics' }));
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
     expect(await screen.findByText('Features saved.')).toBeVisible();
@@ -203,7 +206,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
     const user = userEvent.setup();
     setup({ saveAction });
 
-    await user.click(screen.getByRole('switch', { name: 'Newsletter' }));
+    await user.click(screen.getByRole('switch', { name: 'Analytics' }));
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
     expect(
@@ -219,7 +222,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
     const saveAction = vi.fn().mockResolvedValue({ ok: false });
     setup({ saveAction });
 
-    await user.click(screen.getByRole('switch', { name: 'Newsletter' }));
+    await user.click(screen.getByRole('switch', { name: 'Analytics' }));
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
     expect(await screen.findByRole('alert')).toHaveTextContent("Couldn't save");

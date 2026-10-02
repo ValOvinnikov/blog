@@ -33,7 +33,11 @@ export const CAPABILITY_TOGGLES: TCapabilityToggle[] = [
     isComingSoon: true,
   },
   { capability: CAPABILITY.BOOKMARKS, field: 'bookmarksEnabled' },
-  { capability: CAPABILITY.NEWSLETTER, field: 'newsletterEnabled' },
+  {
+    capability: CAPABILITY.NEWSLETTER,
+    field: 'newsletterEnabled',
+    isComingSoon: true,
+  },
   { capability: CAPABILITY.ANALYTICS, field: 'analyticsEnabled' },
   { capability: CAPABILITY.CONSENT_BANNER, field: 'consentBannerEnabled' },
 ];
@@ -64,6 +68,18 @@ export const clampToEntitlement = (
   const clamped = { ...values };
   for (const { capability, field } of CAPABILITY_TOGGLES) {
     if (!entitledCapabilities.includes(capability)) {
+      clamped[field] = false;
+    }
+  }
+  return clamped;
+};
+
+export const withComingSoonOff = (
+  values: TSettingsFeaturesValues,
+): TSettingsFeaturesValues => {
+  const clamped = { ...values };
+  for (const { field, isComingSoon } of CAPABILITY_TOGGLES) {
+    if (isComingSoon) {
       clamped[field] = false;
     }
   }

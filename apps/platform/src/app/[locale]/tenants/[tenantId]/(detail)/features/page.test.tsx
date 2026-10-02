@@ -96,10 +96,6 @@ describe(`<${FeaturesPage.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByRole('switch', { name: 'Newsletter' })).toHaveAttribute(
-      'data-disabled',
-      '',
-    );
     expect(screen.getByRole('switch', { name: 'Analytics' })).toHaveAttribute(
       'data-disabled',
       '',
