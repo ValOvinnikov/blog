@@ -1172,7 +1172,8 @@ that must exceed it, and an `isStartingAt` flag.
 
 **The currency is the site's, not the price's.** `settings_site.currency` is a
 required ISO 4217 code, offered as a dropdown of every code `Intl` supports;
-existing documents were backfilled with `USD` by a content migration.
+existing documents were backfilled with `USD` by a content migration, and a newly
+provisioned tenant's Site Settings is seeded with `USD`.
 `service.global.siteSettings.v1` projects it non-null.
 `service.modules.pricing.v1.getPricingModule` returns `TPricingModule`, whose
 tiers keep their prices in authored order and expose `highlightLabel` trimmed,
