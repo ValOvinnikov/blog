@@ -1,4 +1,3 @@
-import { isLocaleIsoCode } from '@blog/config/constants';
 import { resolveFaqs } from '@blog/service/shared/transformers/faq/resolve-faqs';
 import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
 import {
@@ -19,7 +18,7 @@ function toTranslations(
   translations: TRawLandingPage['translations'],
 ): TLandingTranslation[] {
   return (translations ?? []).flatMap(({ language, slug }) =>
-    language && slug && isLocaleIsoCode(language) ? [{ language, slug }] : [],
+    language && slug ? [{ language, slug }] : [],
   );
 }
 
