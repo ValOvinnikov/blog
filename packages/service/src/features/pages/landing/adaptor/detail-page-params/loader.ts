@@ -9,10 +9,10 @@ import { landingPageParamsQuery } from './query';
 
 export async function getPageSlugs(
   tenant: TTenantSanityContext,
-  liveLocales?: TLocaleIsoCode[],
+  liveLocales: TLocaleIsoCode[],
 ): Promise<{ slug: string; language: TLocaleIsoCode }[]> {
   return runQuery(landingPageParamsQuery, {
-    parameters: { liveLocales: liveLocales ?? null },
+    parameters: { liveLocales },
     tenant,
     ...isr('page_landing', tenant.projectId),
   });

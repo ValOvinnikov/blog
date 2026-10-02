@@ -11,7 +11,7 @@ export function createLandingPageService() {
         getPage(slug, tenant),
       ),
       getPageSlugs: safeAsync(
-        (tenant: TTenantSanityContext, liveLocales?: TLocaleIsoCode[]) =>
+        (tenant: TTenantSanityContext, liveLocales: TLocaleIsoCode[]) =>
           getPageSlugs(tenant, liveLocales),
       ),
     },
