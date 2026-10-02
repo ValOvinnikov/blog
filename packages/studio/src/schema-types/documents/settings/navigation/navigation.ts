@@ -1,3 +1,4 @@
+import { languageSwitcherField } from '@blog/studio/schema-types/fields/language-switcher-field/language-switcher-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { linkRefSchema } from '@blog/studio/schema-types/objects/link-ref/link-ref';
 import { Menu } from 'lucide-react';
@@ -19,5 +20,6 @@ export const navigationSettingsSchema = defineType({
       description: 'Top-level nav links rendered in the site header.',
       of: [defineArrayMember({ type: linkRefSchema.name })],
     }),
+    languageSwitcherField(),
   ],
 });

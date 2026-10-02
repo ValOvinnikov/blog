@@ -820,6 +820,7 @@ export type Settings_footer = {
       _key: string;
     } & SocialProfile
   >;
+  showLanguageSwitcher?: boolean;
 };
 
 export type Settings_navigation = {
@@ -834,6 +835,7 @@ export type Settings_navigation = {
       _key: string;
     } & LinkRef
   >;
+  showLanguageSwitcher?: boolean;
 };
 
 export type Settings_site = {

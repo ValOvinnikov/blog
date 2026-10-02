@@ -6,6 +6,7 @@ import {
 import { schemaTypes } from '@blog/studio/schema-types';
 import { migrationStateSchema } from '@blog/studio/schema-types/documents/system/migration-state/migration-state';
 import { createCapabilityWarningInput } from '@blog/studio/schema-types/inputs/capability-warning-input/capability-warning-input';
+import { createLanguageSwitcherField } from '@blog/studio/schema-types/inputs/language-switcher-field/language-switcher-field';
 import {
   createLocalizationNoticeInput,
   type TLocalizationNoticeOptions,
@@ -41,6 +42,15 @@ const localizationNotices = definePlugin<TLocalizationNoticeOptions>(
     },
   }),
 );
+
+const languageSwitcherVisibility = definePlugin<{
+  liveLocales: readonly TLocaleIsoCode[];
+}>(({ liveLocales }) => ({
+  name: 'language-switcher-visibility',
+  form: {
+    components: { field: createLanguageSwitcherField(liveLocales) },
+  },
+}));
 
 /**
  * Builds the full Studio config — schema, desk structure and plugins — shared
@@ -96,7 +106,10 @@ export const buildStudioConfig = ({
         fieldTypes: ['string', 'text'],
       }),
       ...(liveLocales
-        ? [localizationNotices({ liveLocales, defaultLocale })]
+        ? [
+            localizationNotices({ liveLocales, defaultLocale }),
+            languageSwitcherVisibility({ liveLocales }),
+          ]
         : []),
     ],
 
