@@ -2,6 +2,8 @@ import { tv } from 'tailwind-variants';
 
 export const languageSwitcherVariants = tv({
   slots: {
-    list: ['flex flex-wrap items-center gap-x-4 gap-y-2'],
+    root: ['flex items-center'],
+    desktopOnly: ['hidden lg:flex'],
+    mobileOnly: ['flex lg:hidden'],
   },
 });
