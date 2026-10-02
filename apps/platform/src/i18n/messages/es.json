@@ -728,7 +728,7 @@
     "switchOn": "Activado",
     "switchOff": "Desactivado",
     "defaultHeading": "Idioma predeterminado",
-    "defaultDescription": "{language}. Todas las páginas se escriben primero en este idioma; puede cambiarlo en los detalles del cliente.",
+    "defaultDescription": "Todas las páginas se escriben primero en este idioma; puede cambiarlo en los detalles del cliente.",
     "additionalHeading": "Idiomas adicionales",
     "allowance": "{used} de {allowed} idiomas adicionales en uso en su plan.",
     "upgradeNotice": "Su plan solo publica el idioma predeterminado. Mejore su plan para añadir más idiomas.",
