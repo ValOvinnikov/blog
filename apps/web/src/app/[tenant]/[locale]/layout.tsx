@@ -7,7 +7,6 @@ import {
   routes,
   SIZE,
 } from '@blog/config';
-import { queries } from '@blog/db';
 import {
   getSanityImageBaseUrl,
   service,
@@ -31,10 +30,12 @@ import { SanityImageBaseUrlProvider } from '@web/context/sanity-image-base-url-p
 import { ToastProvider } from '@web/context/toast-provider';
 import { VoiceRichProvider } from '@web/context/voice-rich-provider';
 import { routing } from '@web/i18n/routing';
+import {
+  enterRequestContext,
+  getRequestContext,
+} from '@web/server/request-context/request-context';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
-import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
-import { rememberRequestTenantId } from '@web/server/tenant/remembered-tenant';
+import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/unresolved-tenant-placeholder';
 import { getThemeTokens } from '@web/utils/get-theme-tokens';
 import { isProductionEnvironment } from '@web/utils/is-production-environment';
 import { isWebAnalyticsEnabled } from '@web/utils/is-web-analytics-enabled';
@@ -44,13 +45,12 @@ import { resolveVoiceRichFields } from '@web/utils/resolve-voice-rich-fields';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { SessionProvider } from 'next-auth/react';
-import { hasLocale, NextIntlClientProvider } from 'next-intl';
+import { NextIntlClientProvider } from 'next-intl';
 import {
   getMessages,
   getNow,
   getTimeZone,
   getTranslations,
-  setRequestLocale,
 } from 'next-intl/server';
 
 import { localeLayoutVariants } from './layout-variants';
@@ -62,25 +62,16 @@ type TGenerateMetadataProps = {
 export async function generateMetadata({
   params,
 }: TGenerateMetadataProps): Promise<Metadata> {
-  const { tenant } = await params;
-  const tenantContext = await getTenantSanityContext(tenant);
-  const result =
-    await service.global.siteSettings.v1.getSiteSettings(tenantContext);
-
+  await enterRequestContext(params);
   // Every route's own `openGraph`/`twitter` replaces (not merges with) this
   // root segment's. `metadataBase` inherits down, letting a leaf's relative
   // fallback image path resolve to an absolute URL.
-  const tenantBaseUrl = await getTenantBaseUrl(tenant);
-  const metadataBase = tenantBaseUrl ? new URL(tenantBaseUrl) : undefined;
+  const { sanityContext, metadataBase } = await getRequestContext();
+  const result =
+    await service.global.siteSettings.v1.getSiteSettings(sanityContext);
 
-  // Only the real production environment is indexable — see
-  // `isProductionEnvironment` and `robots.ts` for the full reasoning. This
-  // page-level meta tag is the primary de-indexing lever (unlike a robots.txt
-  // disallow, it survives a crawl and gets honored by the crawler), so it's
-  // applied here, ahead of the `!result.ok` guard, so it still lands even
-  // when site settings fail to load. Spread conditionally rather than
-  // assigning `robots: undefined` on production, keeping the key absent (not
-  // just falsy) when indexing is allowed.
+  // Applied ahead of the `!result.ok` guard so a non-production page stays
+  // de-indexed even when site settings fail to load.
   const robotsMetadata = isProductionEnvironment()
     ? {}
     : { robots: { index: false, follow: false } };
@@ -114,16 +105,12 @@ type TProps = {
 };
 
 export default async function LocaleLayout({ children, params }: TProps) {
-  const { locale, tenant } = await params;
-  rememberRequestTenantId(tenant);
-
-  if (!hasLocale(routing.locales, locale)) {
-    notFound();
-  }
-
-  setRequestLocale(locale);
-
-  const tenantContext = await getTenantSanityContext(tenant, locale);
+  await enterRequestContext(params);
+  const { tenantId, locale, sanityContext, defaultLocale } =
+    await getRequestContext();
+  // The tenant resolvers below read `headers()` when given no tenant; the
+  // placeholder keeps an unresolved tenant's render static.
+  const tenant = tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER;
   const [
     settingsResult,
     navResult,
@@ -134,18 +121,16 @@ export default async function LocaleLayout({ children, params }: TProps) {
     now,
     timeZone,
     t,
-    tenantLocales,
   ] = await Promise.all([
-    service.global.siteSettings.v1.getSiteSettings(tenantContext),
-    service.global.navigation.v1.getNavigation(tenantContext),
-    service.global.footer.v1.getFooter(tenantContext),
+    service.global.siteSettings.v1.getSiteSettings(sanityContext),
+    service.global.navigation.v1.getNavigation(sanityContext),
+    service.global.footer.v1.getFooter(sanityContext),
     getThemeTokens(tenant),
     isCapabilityEnabled(CAPABILITY.ANALYTICS, tenant),
     getMessages(),
     getNow(),
     getTimeZone(),
     getTranslations('rss'),
-    queries.tenants.getTenantLocales(tenant),
   ]);
 
   if (!settingsResult.ok) {
@@ -159,7 +144,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
   }
 
   const { messages, rich } =
-    locale === tenantLocales?.defaultLocale
+    locale === defaultLocale
       ? await resolveTenantMessages(baseMessages, tenant)
       : {
           messages: baseMessages,
@@ -185,23 +170,15 @@ export default async function LocaleLayout({ children, params }: TProps) {
   const oauthProviderIds = getEnabledOAuthProviderIds();
   const analyticsEnabled =
     isWebAnalyticsEnabled() && isAnalyticsCapabilityEnabled;
-  const sanityImageBaseUrl = getSanityImageBaseUrl(tenantContext);
+  const sanityImageBaseUrl = getSanityImageBaseUrl(sanityContext);
   const brandLogoUrl = brand.logo
-    ? urlForSanityImage(brand.logo, tenantContext)
+    ? urlForSanityImage(brand.logo, sanityContext)
     : undefined;
   return (
     <DocumentShell lang={LOCALE_BCP47_TAGS[locale]}>
       <ThemeScope themeTokens={themeTokens}>
         <SanityImageBaseUrlProvider baseUrl={sanityImageBaseUrl}>
-          {/* `locale`, `now`, and `timeZone` are passed explicitly (not
-          inherited) so the page stays statically rendered —
-          `setRequestLocale` above already resolves them from the static
-          param rather than a dynamic API, but passing them here skips the
-          provider's own implicit resolution. `messages` is the base locale
-          messages with the tenant's voice overrides applied. Client
-          components that read the locale (next-intl
-          navigation `Link` in the post-list module) need this provider or
-          they throw "No intl context found". */}
+          {/* `now` and `timeZone` are passed explicitly so the provider skips its own dynamic resolution. */}
           <NextIntlClientProvider
             locale={locale}
             messages={messages}
