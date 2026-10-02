@@ -106,8 +106,6 @@ const setup = customRenderAsync(LandingModuleRenderer, {
   hero: undefined,
   headingBlock: makeHeadingBlock({ heading: 'About Us' }),
   modules: [],
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${LandingModuleRenderer.name}/>`, () => {

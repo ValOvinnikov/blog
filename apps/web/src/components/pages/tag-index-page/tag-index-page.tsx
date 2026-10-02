@@ -7,7 +7,7 @@ import { TagIndexModuleRenderer } from './tag-index-module-renderer';
 
 type TTagIndexPageProps = { locale: string; tenant: string };
 
-export const TagIndexPage = async ({ locale, tenant }: TTagIndexPageProps) => {
+export const TagIndexPage = async ({ tenant }: TTagIndexPageProps) => {
   const result = await getTagIndexPage(tenant);
   const { headingBlock, hero, modules } = guardPageLoaderResult(
     result,
@@ -23,8 +23,6 @@ export const TagIndexPage = async ({ locale, tenant }: TTagIndexPageProps) => {
         hero={hero}
         headingBlock={headingBlock}
         modules={modules}
-        locale={locale}
-        tenant={tenant}
       />
     </PageShell>
   );

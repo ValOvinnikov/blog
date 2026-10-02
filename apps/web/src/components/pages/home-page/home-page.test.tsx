@@ -116,8 +116,6 @@ describe(`<${HomePage.name}/>`, () => {
         hero: { id: 'hero-1', type: 'module_hero' },
         headingBlock: makeHeadingBlock({ heading: 'Welcome to the blog' }),
         modules: [{ id: 'module-1', type: 'module_content' }],
-        locale: LOCALE_ISO_CODES.EN,
-        tenant: 'tenant-1',
       },
       undefined,
     );

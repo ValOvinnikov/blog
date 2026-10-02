@@ -1,18 +1,16 @@
 import { service } from '@blog/service';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';
 
 import { TeamModuleView } from './team-module-view';
 
 export interface ITeamModuleProps {
   id: string;
-  locale: string;
-  tenant: string;
 }
 
-export const TeamModule = async ({ id, locale, tenant }: ITeamModuleProps) => {
-  const tenantContext = await getTenantSanityContext(tenant, locale);
-  const result = await service.modules.team.v1.getTeamModule(id, tenantContext);
+export const TeamModule = async ({ id }: ITeamModuleProps) => {
+  const { sanityContext } = await getRequestContext();
+  const result = await service.modules.team.v1.getTeamModule(id, sanityContext);
 
   if (!result.ok) {
     logger.error('team_module.fetch_failed', { id, error: result.error });

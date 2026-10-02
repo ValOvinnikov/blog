@@ -1,6 +1,6 @@
 import { PRICE_PERIOD } from '@blog/config';
 import { service } from '@blog/service';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';
 import { toPricingPanels } from '@web/utils/to-pricing-panels';
 import { getTranslations } from 'next-intl/server';
@@ -9,19 +9,13 @@ import { PricingModuleView } from './pricing-module-view';
 
 export interface IPricingModuleProps {
   id: string;
-  locale: string;
-  tenant: string;
 }
 
-export const PricingModule = async ({
-  id,
-  locale,
-  tenant,
-}: IPricingModuleProps) => {
-  const tenantContext = await getTenantSanityContext(tenant);
+export const PricingModule = async ({ id }: IPricingModuleProps) => {
+  const { sanityContext, locale } = await getRequestContext();
   const [result, settingsResult, t] = await Promise.all([
-    service.modules.pricing.v1.getPricingModule(id, tenantContext),
-    service.global.siteSettings.v1.getSiteSettings(tenantContext),
+    service.modules.pricing.v1.getPricingModule(id, sanityContext),
+    service.global.siteSettings.v1.getSiteSettings(sanityContext),
     getTranslations('pricingModule'),
   ]);
 

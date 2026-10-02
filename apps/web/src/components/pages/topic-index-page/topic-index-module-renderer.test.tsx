@@ -61,8 +61,6 @@ const setup = customRenderAsync(TopicIndexModuleRenderer, {
   hero: undefined,
   headingBlock: makeHeadingBlock({ heading: 'Topics' }),
   modules: [],
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${TopicIndexModuleRenderer.name}/>`, () => {

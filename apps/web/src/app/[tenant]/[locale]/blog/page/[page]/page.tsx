@@ -2,10 +2,10 @@ import { routes, type ITenantLocalizedParams } from '@blog/config';
 import { PostIndexPage } from '@web/components/pages/post-index-page';
 import { permanentRedirect } from '@web/i18n/navigation';
 import { buildPostIndexMetadata } from '@web/metadata/post-index-metadata';
+import { enterRequestContext } from '@web/server/request-context/request-context';
 import { parsePageParam } from '@web/utils/parse-page-param/parse-page-param';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { setRequestLocale } from 'next-intl/server';
 
 type TProps = {
   params: Promise<ITenantLocalizedParams & { page: string }>;
@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: TProps): Promise<Metadata> {
 
 export default async function PostIndexNumberedPage({ params }: TProps) {
   const { locale, tenant, page: rawPage } = await params;
-  setRequestLocale(locale);
+  await enterRequestContext(params);
 
   const page = parsePageParam(rawPage);
 

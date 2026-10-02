@@ -9,7 +9,7 @@ import { HomeModuleRenderer } from './home-module-renderer';
 
 type THomePageProps = ITenantLocalizedParams;
 
-export const HomePage = async ({ locale, tenant }: THomePageProps) => {
+export const HomePage = async ({ tenant }: THomePageProps) => {
   const tenantContext = await getTenantSanityContext(tenant);
   const result = await service.pages.home.v1.getHomePage(tenantContext);
   const { headingBlock, hero, modules, faqs } = guardPageLoaderResult(
@@ -24,8 +24,6 @@ export const HomePage = async ({ locale, tenant }: THomePageProps) => {
         hero={hero}
         headingBlock={headingBlock}
         modules={modules}
-        locale={locale}
-        tenant={tenant}
       />
     </PageShell>
   );

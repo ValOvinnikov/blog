@@ -1,8 +1,8 @@
 import type { ITenantLocalizedParams } from '@blog/config';
 import { TopicPage } from '@web/components/pages/topic-page';
 import { buildTopicMetadata } from '@web/metadata/topic-metadata';
+import { enterRequestContext } from '@web/server/request-context/request-context';
 import type { Metadata } from 'next';
-import { setRequestLocale } from 'next-intl/server';
 
 type TProps = {
   params: Promise<ITenantLocalizedParams & { slug: string }>;
@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: TProps): Promise<Metadata> {
 
 export default async function TopicDetailPage({ params }: TProps) {
   const { locale, tenant, slug } = await params;
-  setRequestLocale(locale);
+  await enterRequestContext(params);
 
   return <TopicPage slug={slug} locale={locale} tenant={tenant} />;
 }

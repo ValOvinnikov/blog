@@ -1,9 +1,12 @@
 import { BRAND_VARIANT } from '@blog/config';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import {
+  DEFAULT_REQUEST_CONTEXT,
+  DEFAULT_TENANT_SANITY_CONTEXT,
+} from '@web/testing/shared/tenant/fixtures';
 
 import { PostFeaturedModule } from './post-featured-module';
 
@@ -21,9 +24,9 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
+vi.mock('@web/server/request-context/request-context');
 
-const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
+const getRequestContextMock = vi.mocked(getRequestContext);
 
 const makePost = (overrides: Record<string, unknown> = {}) => ({
   id: 'post-1',
@@ -38,15 +41,13 @@ const makePost = (overrides: Record<string, unknown> = {}) => ({
 
 const setup = customRenderAsync(PostFeaturedModule, {
   id: 'post-featured-1',
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${PostFeaturedModule.name}/>`, () => {
   beforeEach(() => {
     getPostFeaturedMock.mockReset();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
+    getRequestContextMock.mockReset();
+    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
   it('calls getPostFeatured with the module id and resolved tenant Sanity context', async () => {

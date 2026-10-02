@@ -67,8 +67,6 @@ const setup = customRenderAsync(PostIndexModuleRenderer, {
   hero: undefined,
   headingBlock: makeHeadingBlock({ heading: 'Notes on building things' }),
   modules: [],
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${PostIndexModuleRenderer.name}/>`, () => {
@@ -132,8 +130,6 @@ describe(`<${PostIndexModuleRenderer.name}/>`, () => {
     expect(postListModuleMock).toHaveBeenCalledWith(
       {
         id: 'post-list-1',
-        locale: 'en',
-        tenant: 'tenant-1',
         context: { page: 2 },
       },
       undefined,

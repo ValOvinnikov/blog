@@ -98,8 +98,6 @@ const setup = customRenderAsync(HomeModuleRenderer, {
   hero: undefined,
   headingBlock: makeHeadingBlock({ heading: 'Welcome to the blog' }),
   modules: [],
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${HomeModuleRenderer.name}/>`, () => {

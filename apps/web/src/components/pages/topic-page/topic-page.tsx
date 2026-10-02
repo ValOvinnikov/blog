@@ -14,12 +14,7 @@ type TTopicPageProps = {
   tenant: string;
 };
 
-export const TopicPage = async ({
-  slug,
-  page,
-  locale,
-  tenant,
-}: TTopicPageProps) => {
+export const TopicPage = async ({ slug, page, tenant }: TTopicPageProps) => {
   const result = await getTopicPage(slug, tenant);
   const pageData = guardPageLoaderResult(result, 'topic_page.fetch_failed', {
     slug,
@@ -37,8 +32,6 @@ export const TopicPage = async ({
         hero={hero}
         headingBlock={headingBlock}
         modules={modules}
-        locale={locale}
-        tenant={tenant}
         context={{
           page: currentPage,
           archive: { kind: TAXONOMY_KIND.TOPICS, slug, name: topic.title },

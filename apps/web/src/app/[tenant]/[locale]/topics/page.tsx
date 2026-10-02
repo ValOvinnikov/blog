@@ -1,8 +1,8 @@
 import type { ITenantLocalizedParams } from '@blog/config';
 import { TopicIndexPage } from '@web/components/pages/topic-index-page';
 import { buildTopicIndexMetadata } from '@web/metadata/topic-index-metadata';
+import { enterRequestContext } from '@web/server/request-context/request-context';
 import type { Metadata } from 'next';
-import { setRequestLocale } from 'next-intl/server';
 
 type TProps = {
   params: Promise<ITenantLocalizedParams>;
@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: TProps): Promise<Metadata> {
 
 export default async function TopicIndexRoute({ params }: TProps) {
   const { locale, tenant } = await params;
-  setRequestLocale(locale);
+  await enterRequestContext(params);
 
   return <TopicIndexPage locale={locale} tenant={tenant} />;
 }

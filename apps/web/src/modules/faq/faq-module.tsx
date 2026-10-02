@@ -1,18 +1,16 @@
 import { service } from '@blog/service';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';
 
 import { FaqModuleView } from './faq-module-view';
 
 export interface IFaqModuleProps {
   id: string;
-  locale: string;
-  tenant: string;
 }
 
-export const FaqModule = async ({ id, locale, tenant }: IFaqModuleProps) => {
-  const tenantContext = await getTenantSanityContext(tenant, locale);
-  const result = await service.modules.faq.v1.getFaqModule(id, tenantContext);
+export const FaqModule = async ({ id }: IFaqModuleProps) => {
+  const { sanityContext } = await getRequestContext();
+  const result = await service.modules.faq.v1.getFaqModule(id, sanityContext);
 
   if (!result.ok) {
     logger.error('faq_module.fetch_failed', { id, error: result.error });

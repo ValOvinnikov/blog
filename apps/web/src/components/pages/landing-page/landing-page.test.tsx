@@ -16,6 +16,8 @@ import { notFound } from 'next/navigation';
 
 import { LandingPage } from './landing-page';
 
+vi.mock('@web/server/request-context/request-context');
+
 vi.mock('@blog/service', () => ({
   service: {
     pages: { landing: { v1: { getPage: vi.fn() } } },

@@ -16,6 +16,8 @@ import { notFound } from 'next/navigation';
 
 import { PostIndexPage } from './post-index-page';
 
+vi.mock('@web/server/request-context/request-context');
+
 vi.mock('@blog/service', () => ({
   service: {
     pages: { blog: { v1: { getIndexPage: vi.fn() } } },
