@@ -6,10 +6,10 @@ import {
   type TTenantSanityContext,
 } from '@blog/service';
 import { routing } from '@web/i18n/routing';
+import { isPlatformFallbackAllowed } from '@web/server/tenant/is-platform-fallback-allowed';
 import { isTenantServable } from '@web/server/tenant/is-tenant-servable';
+import { toTenantBaseUrl } from '@web/server/tenant/to-tenant-base-url';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/unresolved-tenant-placeholder';
-import { env } from '@web/utils/env/env';
-import { isProductionEnvironment } from '@web/utils/is-production-environment';
 import { isValidTenantId } from '@web/utils/is-tenant-shaped-path-segment';
 import { notFound } from 'next/navigation';
 import { hasLocale } from 'next-intl';
@@ -52,7 +52,7 @@ const toSanityContext = (
   const credentials = row && queries.tenants.toTenantSanityCredentials(row);
   if (credentials) return credentials;
 
-  if (isProductionEnvironment()) {
+  if (!isPlatformFallbackAllowed()) {
     notFound();
   }
   return getPlatformSanityContext();
@@ -60,10 +60,7 @@ const toSanityContext = (
 
 const toMetadataBase = (row: TTenant | undefined): URL | undefined => {
   const isServable = row && !row.deprovisionedAt && isTenantServable(row);
-  const baseUrl =
-    isServable && row.primaryDomain
-      ? `https://${row.primaryDomain}`
-      : env.NEXT_PUBLIC_SITE_URL;
+  const baseUrl = toTenantBaseUrl(isServable ? row : undefined);
 
   return baseUrl ? new URL(baseUrl) : undefined;
 };

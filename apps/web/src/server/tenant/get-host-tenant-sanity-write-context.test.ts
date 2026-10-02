@@ -11,7 +11,7 @@ vi.mock('./resolve-request-tenant', () => ({
   resolveRequestTenant: vi.fn(),
 }));
 vi.mock('@blog/db', () => ({
-  queries: { tenants: { getTenantSanityWriteCredentials: vi.fn() } },
+  queries: { tenants: { toTenantSanityWriteCredentials: vi.fn() } },
   TENANT_STATUS: {
     ACTIVE: 'ACTIVE',
     SUSPENDED: 'SUSPENDED',
@@ -22,21 +22,23 @@ vi.mock('@web/utils/is-production-environment', () => ({
   isProductionEnvironment: isProductionEnvironmentMock,
 }));
 
+const ACTIVE_ROW = {
+  id: 'tenant-1',
+  status: TENANT_STATUS.ACTIVE,
+  deprovisionedAt: null,
+};
+
 describe(getHostTenantSanityWriteContext, () => {
   beforeEach(() => {
     isProductionEnvironmentMock.mockReset();
     isProductionEnvironmentMock.mockReturnValue(false);
     vi.mocked(resolveRequestTenant).mockReset();
-    vi.mocked(queries.tenants.getTenantSanityWriteCredentials).mockReset();
+    vi.mocked(queries.tenants.toTenantSanityWriteCredentials).mockReset();
   });
 
   it('resolves the tenant Sanity write credentials for a resolved tenant', async () => {
-    vi.mocked(resolveRequestTenant).mockResolvedValue({
-      id: 'tenant-1',
-    } as never);
-    vi.mocked(
-      queries.tenants.getTenantSanityWriteCredentials,
-    ).mockResolvedValue({
+    vi.mocked(resolveRequestTenant).mockResolvedValue(ACTIVE_ROW as never);
+    vi.mocked(queries.tenants.toTenantSanityWriteCredentials).mockReturnValue({
       projectId: 'proj',
       dataset: 'production',
       token: 'tok',
@@ -56,10 +58,24 @@ describe(getHostTenantSanityWriteContext, () => {
         provisioningStatus: null,
       },
       tenantId: 'tenant-1',
+      isActive: true,
     });
-    expect(
-      queries.tenants.getTenantSanityWriteCredentials,
-    ).toHaveBeenCalledWith('tenant-1');
+    expect(queries.tenants.toTenantSanityWriteCredentials).toHaveBeenCalledWith(
+      ACTIVE_ROW,
+    );
+  });
+
+  it('reports a suspended resolved tenant as not active', async () => {
+    vi.mocked(resolveRequestTenant).mockResolvedValue({
+      ...ACTIVE_ROW,
+      status: TENANT_STATUS.SUSPENDED,
+    } as never);
+
+    await expect(getHostTenantSanityWriteContext()).resolves.toMatchObject({
+      isResolvable: true,
+      tenantId: 'tenant-1',
+      isActive: false,
+    });
   });
 
   it('resolves as unresolvable in production when no tenant resolves', async () => {
@@ -70,7 +86,7 @@ describe(getHostTenantSanityWriteContext, () => {
       isResolvable: false,
     });
     expect(
-      queries.tenants.getTenantSanityWriteCredentials,
+      queries.tenants.toTenantSanityWriteCredentials,
     ).not.toHaveBeenCalled();
   });
 
@@ -81,21 +97,21 @@ describe(getHostTenantSanityWriteContext, () => {
       isResolvable: true,
       tenant: undefined,
       tenantId: undefined,
+      isActive: true,
     });
   });
 
   it('resolves with a defined tenantId but an undefined tenant when the resolved tenant has no usable write credentials', async () => {
-    vi.mocked(resolveRequestTenant).mockResolvedValue({
-      id: 'tenant-1',
-    } as never);
-    vi.mocked(
-      queries.tenants.getTenantSanityWriteCredentials,
-    ).mockResolvedValue(undefined);
+    vi.mocked(resolveRequestTenant).mockResolvedValue(ACTIVE_ROW as never);
+    vi.mocked(queries.tenants.toTenantSanityWriteCredentials).mockReturnValue(
+      undefined,
+    );
 
     await expect(getHostTenantSanityWriteContext()).resolves.toEqual({
       isResolvable: true,
       tenant: undefined,
       tenantId: 'tenant-1',
+      isActive: true,
     });
   });
 });
@@ -108,13 +124,9 @@ describe('getHostTenantSanityWriteContext memoization', () => {
 
   it('dedupes the host lookup and credentials query when called more than once in the same render pass', async () => {
     vi.mocked(resolveRequestTenant).mockReset();
-    vi.mocked(queries.tenants.getTenantSanityWriteCredentials).mockReset();
-    vi.mocked(resolveRequestTenant).mockResolvedValue({
-      id: 'tenant-1',
-    } as never);
-    vi.mocked(
-      queries.tenants.getTenantSanityWriteCredentials,
-    ).mockResolvedValue({
+    vi.mocked(queries.tenants.toTenantSanityWriteCredentials).mockReset();
+    vi.mocked(resolveRequestTenant).mockResolvedValue(ACTIVE_ROW as never);
+    vi.mocked(queries.tenants.toTenantSanityWriteCredentials).mockReturnValue({
       projectId: 'proj',
       dataset: 'production',
       token: 'tok',
@@ -151,7 +163,7 @@ describe('getHostTenantSanityWriteContext memoization', () => {
 
     expect(resolveRequestTenant).toHaveBeenCalledTimes(1);
     expect(
-      queries.tenants.getTenantSanityWriteCredentials,
+      queries.tenants.toTenantSanityWriteCredentials,
     ).toHaveBeenCalledTimes(1);
   });
 });

@@ -10,7 +10,6 @@ import {
 } from '@web/server/skim/generate-takeaways';
 import { getHostTenantSanityContext } from '@web/server/tenant/get-host-tenant-sanity-context';
 import { getHostTenantSanityWriteContext } from '@web/server/tenant/get-host-tenant-sanity-write-context';
-import { isTenantActive } from '@web/server/tenant/is-tenant-active';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
 import { NextResponse } from 'next/server';
@@ -22,25 +21,6 @@ export const runtime = 'nodejs';
 
 const requestBodySchema = z.object({ _id: z.string().min(1) });
 
-/**
- * POST /api/generate-skim?secret=… — the publish-time skim-generation
- * pipeline. Sanity's publish webhook (post `_type`) calls this; it reads the
- * published post body (service read path), asks Claude for 3–7 takeaways,
- * then patches them onto the post's *draft* (service write path) for a human
- * to review and approve in Studio via publish — never the published document.
- * No AI call ever happens on the reader path.
- *
- * Secret verification matches `/api/revalidate`'s *stance*, not its exact
- * mechanism — that route verifies an HMAC signature over the body
- * (`@sanity/webhook`'s `isValidSignature`); this one has no such helper for
- * a plain shared secret, so it does its own constant-time comparison
- * (`timingSafeEqual`) against `?secret=` instead. Same outcomes either way:
- * absent config (`ANTHROPIC_API_KEY`/`SANITY_GENERATE_SECRET`) → 503,
- * feature-flag-by-absence; a missing/wrong `?secret=` → 401. A
- * `SANITY_API_WRITE_TOKEN` that isn't configured surfaces the same way
- * (503) once the write step is reached — the reader path is unaffected by
- * any of these being absent.
- */
 export async function POST(request: Request): Promise<NextResponse> {
   const { SANITY_GENERATE_SECRET: secret, ANTHROPIC_API_KEY: apiKey } = env;
 
@@ -106,7 +86,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       { status: 503 },
     );
   }
-  if (writeTenant.tenantId && !(await isTenantActive(writeTenant.tenantId))) {
+  if (writeTenant.tenantId && !writeTenant.isActive) {
     logger.warn('generate_skim.tenant_not_active', {
       postId,
       tenantId: writeTenant.tenantId,

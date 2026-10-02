@@ -7,7 +7,6 @@ const {
   getHostTenantSanityContextMock,
   getHostTenantSanityWriteContextMock,
   getPlatformSanityWriteContextMock,
-  isTenantActiveMock,
 } = vi.hoisted(() => ({
   getPublishedPostBodyMock: vi.fn(),
   saveSkimDraftMock: vi.fn(),
@@ -15,7 +14,6 @@ const {
   getHostTenantSanityContextMock: vi.fn(),
   getHostTenantSanityWriteContextMock: vi.fn(),
   getPlatformSanityWriteContextMock: vi.fn(),
-  isTenantActiveMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -43,10 +41,6 @@ vi.mock('@web/server/tenant/get-host-tenant-sanity-context', () => ({
 
 vi.mock('@web/server/tenant/get-host-tenant-sanity-write-context', () => ({
   getHostTenantSanityWriteContext: getHostTenantSanityWriteContextMock,
-}));
-
-vi.mock('@web/server/tenant/is-tenant-active', () => ({
-  isTenantActive: isTenantActiveMock,
 }));
 
 vi.mock('@web/utils/logger/logger');
@@ -94,11 +88,10 @@ describe('POST /api/generate-skim', () => {
       isResolvable: true,
       tenant: undefined,
       tenantId: undefined,
+      isActive: true,
     });
     getPlatformSanityWriteContextMock.mockReset();
     getPlatformSanityWriteContextMock.mockReturnValue(platformTenant);
-    isTenantActiveMock.mockReset();
-    isTenantActiveMock.mockResolvedValue(true);
     loggerErrorMock.mockReset();
     loggerWarnMock.mockReset();
   });
@@ -295,6 +288,7 @@ describe('POST /api/generate-skim', () => {
       isResolvable: true,
       tenant,
       tenantId: 'tenant-1',
+      isActive: true,
     });
     getPublishedPostBodyMock.mockResolvedValue({ ok: true, data: [] });
     generateTakeawaysMock.mockResolvedValue(['a', 'b', 'c']);
@@ -304,6 +298,8 @@ describe('POST /api/generate-skim', () => {
     const response = await POST(makeRequest({ _id: 'post-1' }));
 
     expect(response.status).toBe(200);
+    expect(getHostTenantSanityContextMock).toHaveBeenCalledTimes(1);
+    expect(getHostTenantSanityWriteContextMock).toHaveBeenCalledTimes(1);
     expect(saveSkimDraftMock).toHaveBeenCalledWith(
       {
         postId: 'post-1',
@@ -320,6 +316,7 @@ describe('POST /api/generate-skim', () => {
       isResolvable: true,
       tenant: undefined,
       tenantId: 'tenant-1',
+      isActive: true,
     });
     const { POST } = await import('./route');
 
@@ -348,8 +345,8 @@ describe('POST /api/generate-skim', () => {
         token: 'tenant-write-token',
       },
       tenantId: 'tenant-1',
+      isActive: false,
     });
-    isTenantActiveMock.mockResolvedValue(false);
     const { POST } = await import('./route');
 
     const response = await POST(makeRequest({ _id: 'post-1' }));
@@ -359,7 +356,6 @@ describe('POST /api/generate-skim', () => {
     expect(json).toEqual({
       message: 'The requesting tenant is not permitted to write.',
     });
-    expect(isTenantActiveMock).toHaveBeenCalledWith('tenant-1');
     expect(loggerWarnMock).toHaveBeenCalledWith(
       'generate_skim.tenant_not_active',
       { postId: 'post-1', tenantId: 'tenant-1' },
@@ -379,8 +375,8 @@ describe('POST /api/generate-skim', () => {
       isResolvable: true,
       tenant,
       tenantId: 'tenant-1',
+      isActive: true,
     });
-    isTenantActiveMock.mockResolvedValue(true);
     getPublishedPostBodyMock.mockResolvedValue({ ok: true, data: [] });
     generateTakeawaysMock.mockResolvedValue(['a', 'b', 'c']);
     saveSkimDraftMock.mockResolvedValue({ ok: true, data: undefined });
@@ -389,7 +385,6 @@ describe('POST /api/generate-skim', () => {
     const response = await POST(makeRequest({ _id: 'post-1' }));
 
     expect(response.status).toBe(200);
-    expect(isTenantActiveMock).toHaveBeenCalledWith('tenant-1');
     expect(saveSkimDraftMock).toHaveBeenCalledWith(
       {
         postId: 'post-1',
@@ -405,6 +400,7 @@ describe('POST /api/generate-skim', () => {
       isResolvable: true,
       tenant: undefined,
       tenantId: undefined,
+      isActive: true,
     });
     getPublishedPostBodyMock.mockResolvedValue({ ok: true, data: [] });
     generateTakeawaysMock.mockResolvedValue(['a', 'b', 'c']);
@@ -414,7 +410,6 @@ describe('POST /api/generate-skim', () => {
     const response = await POST(makeRequest({ _id: 'post-1' }));
 
     expect(response.status).toBe(200);
-    expect(isTenantActiveMock).not.toHaveBeenCalled();
   });
 
   it('returns 404 without reading the post when the write-side tenant is unresolvable', async () => {
