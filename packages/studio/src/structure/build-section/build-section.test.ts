@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES, LOCALE_NATIVE_LABEL } from '@blog/config/constants';
 import { House, Link2, List, Settings, Tag } from 'lucide-react';
 import type { StructureBuilder } from 'sanity/structure';
 
@@ -526,11 +527,9 @@ describe(buildSections, () => {
       const lists = buildLanguageLists();
 
       expect(lists.map((list) => callArgs(list, 'title')?.[0])).toEqual([
-        'English',
-        'Nederlands',
-        'Français',
-        'Deutsch',
-        'Español',
+        ...Object.values(LOCALE_ISO_CODES).map(
+          (locale) => LOCALE_NATIVE_LABEL[locale],
+        ),
         'No language',
       ]);
     });

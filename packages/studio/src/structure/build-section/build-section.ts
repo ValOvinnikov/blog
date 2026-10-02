@@ -1,6 +1,9 @@
-import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config/constants';
+import {
+  LOCALE_ISO_CODES,
+  LOCALE_NATIVE_LABEL,
+  type TLocaleIsoCode,
+} from '@blog/config/constants';
 import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
-import { nativeLanguageName } from '@blog/studio/structure/locales/native-language-name';
 import type { ComponentType } from 'react';
 import type { SchemaTypeDefinition } from 'sanity';
 import type { ListItemBuilder, StructureBuilder } from 'sanity/structure';
@@ -93,7 +96,7 @@ const buildByLanguageItem = (
           ...locales.map((locale) =>
             languageList(
               `${name}-${locale}`,
-              nativeLanguageName(locale),
+              LOCALE_NATIVE_LABEL[locale],
               `_type == $type && ${LANGUAGE_FIELD} == $language`,
               { language: locale },
               [`${name}-${locale}`],
