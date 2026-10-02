@@ -1,3 +1,4 @@
+import { routing } from '@web/i18n/routing';
 import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
 
 const {
@@ -169,6 +170,20 @@ describe('sitemap', () => {
 
     expect(selectLiveLocalesMock).toHaveBeenCalledWith(tenantRow);
     expect(getPageSlugsMock).toHaveBeenCalledWith(tenantContext, ['en', 'de']);
+  });
+
+  it('falls back to the default language and still renders when the host has no tenant row', async () => {
+    mockAllEmpty();
+    resolveRequestTenantMock.mockResolvedValue(undefined);
+    const sitemap = (await import('./sitemap')).default;
+
+    const entries = await sitemap();
+
+    expect(selectLiveLocalesMock).not.toHaveBeenCalled();
+    expect(getPageSlugsMock).toHaveBeenCalledWith(undefined, [
+      routing.defaultLocale,
+    ]);
+    expect(entries.map((entry) => entry.url)).toContain('https://example.com/');
   });
 
   it('includes numbered topic and tag pagination pages', async () => {

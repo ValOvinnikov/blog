@@ -54,10 +54,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const { tenant } = hostTenant;
 
   const tenantRow = await resolveRequestTenant();
-  if (!tenantRow) {
-    return [];
-  }
-  const liveLocales = queries.tenants.selectLiveLocales(tenantRow);
+  const liveLocales = tenantRow
+    ? queries.tenants.selectLiveLocales(tenantRow)
+    : [routing.defaultLocale];
 
   const [
     postParamsResult,
