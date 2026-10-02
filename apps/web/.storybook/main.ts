@@ -72,12 +72,6 @@ const config: StorybookConfig = {
       '@web/utils/report-client-error': fileURLToPath(
         new URL('./mocks/report-client-error.ts', import.meta.url),
       ),
-      // `TopicsPage` fetches its page document through this loader, which
-      // chains into `getTenantSanityContext` (reads `headers()`) and a live
-      // Sanity call — neither works in Storybook.
-      '@web/server/topics-index/get-topics-index-page': fileURLToPath(
-        new URL('./mocks/get-topics-index-page.ts', import.meta.url),
-      ),
       // `TopicsPage` renders this for its breadcrumb trail, which resolves
       // the request tenant through `@blog/db` for its base URL — no
       // database connection is available in Storybook.
@@ -85,11 +79,6 @@ const config: StorybookConfig = {
         fileURLToPath(
           new URL('./mocks/topics-index-breadcrumbs.tsx', import.meta.url),
         ),
-      // `TagsPage` fetches its page document through this loader, same
-      // live-Sanity problem as the topic-index loader above.
-      '@web/server/tags-index/get-tags-index-page': fileURLToPath(
-        new URL('./mocks/get-tags-index-page.ts', import.meta.url),
-      ),
       // `TagsPage` renders this for its breadcrumb trail, same live-database
       // problem as the topic-index breadcrumbs above.
       '@web/components/features/tags-index/tags-index-breadcrumbs':
