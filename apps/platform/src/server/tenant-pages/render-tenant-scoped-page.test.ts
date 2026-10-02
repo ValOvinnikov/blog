@@ -30,6 +30,36 @@ describe('renderTenantScopedPage', () => {
   });
 });
 
+describe('renderTenantScopedPage with a plan-gated page', () => {
+  it("answers 404 when the tenant's plan cannot use the page", async () => {
+    const tenant = { id: 'tenant-1', plan: 'FREE' } as TTenant;
+    const PageContent = vi.fn();
+
+    await expect(
+      renderTenantScopedPage(
+        vi.fn().mockResolvedValue({ tenant }),
+        PageContent,
+        'languages',
+      ),
+    ).rejects.toThrow('NEXT_NOT_FOUND');
+
+    expect(PageContent).not.toHaveBeenCalled();
+  });
+
+  it("renders the page when the tenant's plan can use it", async () => {
+    const tenant = { id: 'tenant-1', plan: 'GROWTH' } as TTenant;
+    const PageContent = vi.fn().mockResolvedValue('rendered content');
+
+    await expect(
+      renderTenantScopedPage(
+        vi.fn().mockResolvedValue({ tenant }),
+        PageContent,
+        'languages',
+      ),
+    ).resolves.toBe('rendered content');
+  });
+});
+
 describe('tenantPageMetadata', () => {
   it('resolves the title for the given pageMetadata key', async () => {
     await expect(tenantPageMetadata('features')).resolves.toEqual({

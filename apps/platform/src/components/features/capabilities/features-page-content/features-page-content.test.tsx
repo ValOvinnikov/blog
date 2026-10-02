@@ -41,7 +41,7 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
     await setup();
 
     expect(getSettingsFeaturesMock).toHaveBeenCalledWith('tenant-1');
-    expect(screen.getByRole('switch', { name: 'Comments' })).toHaveAttribute(
+    expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(
       'data-checked',
       '',
     );
@@ -55,9 +55,9 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
     getSettingsFeaturesMock.mockResolvedValue({
       id: 'row-1',
       tenantId: 'tenant-1',
-      commentsEnabled: false,
+      commentsEnabled: true,
       ratingsEnabled: true,
-      bookmarksEnabled: true,
+      bookmarksEnabled: false,
       newsletterEnabled: true,
       analyticsEnabled: true,
       createdAt: new Date(),
@@ -67,7 +67,7 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
     await setup({ tenant: buildTenant('GROWTH') });
 
     expect(getSiteConfigMock).not.toHaveBeenCalled();
-    expect(screen.getByRole('switch', { name: 'Comments' })).toHaveAttribute(
+    expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(
       'data-unchecked',
       '',
     );

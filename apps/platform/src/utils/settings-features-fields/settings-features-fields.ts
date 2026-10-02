@@ -12,6 +12,7 @@ export type TSettingsFeaturesValues = {
 export type TCapabilityToggle = {
   capability: TCapability;
   field: keyof TSettingsFeaturesValues;
+  isComingSoon?: boolean;
 };
 
 /**
@@ -21,8 +22,16 @@ export type TCapabilityToggle = {
  * per capability before writing anything.
  */
 export const CAPABILITY_TOGGLES: TCapabilityToggle[] = [
-  { capability: CAPABILITY.COMMENTS, field: 'commentsEnabled' },
-  { capability: CAPABILITY.RATINGS, field: 'ratingsEnabled' },
+  {
+    capability: CAPABILITY.COMMENTS,
+    field: 'commentsEnabled',
+    isComingSoon: true,
+  },
+  {
+    capability: CAPABILITY.RATINGS,
+    field: 'ratingsEnabled',
+    isComingSoon: true,
+  },
   { capability: CAPABILITY.BOOKMARKS, field: 'bookmarksEnabled' },
   { capability: CAPABILITY.NEWSLETTER, field: 'newsletterEnabled' },
   { capability: CAPABILITY.ANALYTICS, field: 'analyticsEnabled' },

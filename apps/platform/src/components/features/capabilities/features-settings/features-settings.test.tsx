@@ -46,10 +46,10 @@ const setup = customRender(FeaturesSettings, {
 });
 
 describe(`<${FeaturesSettings.name}/>`, () => {
-  it('renders one toggle per v1 capability, reflecting the initial values', () => {
+  it('renders one toggle per built capability, reflecting the initial values', () => {
     setup();
 
-    expect(screen.getByRole('switch', { name: 'Comments' })).toHaveAttribute(
+    expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(
       'data-checked',
       '',
     );
@@ -57,7 +57,21 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       'data-unchecked',
       '',
     );
-    expect(screen.getAllByRole('switch')).toHaveLength(6);
+    expect(screen.getAllByRole('switch')).toHaveLength(4);
+  });
+
+  it('shows Comments and Ratings as "Coming soon" with no toggle, whatever the plan', () => {
+    setup();
+
+    expect(screen.getByText('Comments')).toBeVisible();
+    expect(screen.getByText('Ratings')).toBeVisible();
+    expect(screen.getAllByText('Coming soon')).toHaveLength(2);
+    expect(
+      screen.queryByRole('switch', { name: 'Comments' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('switch', { name: 'Ratings' }),
+    ).not.toBeInTheDocument();
   });
 
   it('disables an out-of-plan toggle and shows a plan-locked badge, without hiding it', () => {
@@ -72,7 +86,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       '',
     );
     expect(
-      screen.getByRole('switch', { name: 'Comments' }),
+      screen.getByRole('switch', { name: 'Bookmarks' }),
     ).not.toHaveAttribute('data-disabled');
     expect(screen.getAllByText('Growth plan')).toHaveLength(3);
   });
@@ -85,7 +99,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
     const lockedWrapper = lockedSwitch.closest('div');
     expect(lockedWrapper?.getAttribute('inert')).toBe('');
 
-    const entitledSwitch = screen.getByRole('switch', { name: 'Comments' });
+    const entitledSwitch = screen.getByRole('switch', { name: 'Bookmarks' });
     // eslint-disable-next-line testing-library/no-node-access
     const entitledWrapper = entitledSwitch.closest('div');
     expect(entitledWrapper?.hasAttribute('inert')).toBe(false);
@@ -107,9 +121,9 @@ describe(`<${FeaturesSettings.name}/>`, () => {
     const user = userEvent.setup();
     setup();
 
-    await user.click(screen.getByRole('switch', { name: 'Comments' }));
+    await user.click(screen.getByRole('switch', { name: 'Bookmarks' }));
 
-    expect(screen.getByRole('switch', { name: 'Comments' })).toHaveAttribute(
+    expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(
       'data-unchecked',
       '',
     );
@@ -156,12 +170,12 @@ describe(`<${FeaturesSettings.name}/>`, () => {
     const saveAction = vi.fn().mockResolvedValue({ ok: true });
     setup({ saveAction });
 
-    await user.click(screen.getByRole('switch', { name: 'Ratings' }));
+    await user.click(screen.getByRole('switch', { name: 'Bookmarks' }));
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
     expect(saveAction).toHaveBeenCalledWith('tenant-1', {
       ...INITIAL_VALUES,
-      ratingsEnabled: false,
+      bookmarksEnabled: false,
     });
   });
 
@@ -231,14 +245,14 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       const user = userEvent.setup();
       setup({ archivedAt: ARCHIVED_AT });
 
-      const commentsSwitch = screen.getByRole('switch', { name: 'Comments' });
-      expect(commentsSwitch).toHaveAttribute('data-disabled', '');
-      expect(commentsSwitch).toHaveAccessibleDescription(
+      const bookmarksSwitch = screen.getByRole('switch', { name: 'Bookmarks' });
+      expect(bookmarksSwitch).toHaveAttribute('data-disabled', '');
+      expect(bookmarksSwitch).toHaveAccessibleDescription(
         /This tenant is archived/,
       );
 
-      await user.click(commentsSwitch);
-      expect(commentsSwitch).toHaveAttribute('data-checked', '');
+      await user.click(bookmarksSwitch);
+      expect(bookmarksSwitch).toHaveAttribute('data-checked', '');
     });
   });
 
@@ -246,7 +260,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
     setup();
 
     expect(
-      screen.getByRole('switch', { name: 'Comments' }),
+      screen.getByRole('switch', { name: 'Bookmarks' }),
     ).not.toHaveAttribute('data-disabled');
   });
 });

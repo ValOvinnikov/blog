@@ -1,7 +1,12 @@
 import 'server-only';
 
 import type { TTenant } from '@blog/db/schema/tenants';
+import {
+  planPageAccess,
+  type TPlanPage,
+} from '@platform/utils/plan-page-access/plan-page-access';
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
 
@@ -19,8 +24,12 @@ type TTenantPageContent = (props: { tenant: TTenant }) => Promise<ReactNode>;
 export const renderTenantScopedPage = async <T extends { tenant: TTenant }>(
   resolveTenant: () => Promise<T>,
   PageContent: TTenantPageContent,
+  planGatedPage?: TPlanPage,
 ): Promise<ReactNode> => {
   const { tenant } = await resolveTenant();
+  if (planGatedPage && !planPageAccess(tenant.plan)[planGatedPage]) {
+    notFound();
+  }
   return PageContent({ tenant });
 };
 
