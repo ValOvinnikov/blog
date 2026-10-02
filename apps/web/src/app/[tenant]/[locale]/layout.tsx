@@ -21,6 +21,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import { AuthMenu } from '@web/components/shared/auth-menu';
 import { BrandLockupLink } from '@web/components/shared/brand-lockup-link';
 import { DocumentShell } from '@web/components/shared/document-shell';
+import { LanguageSwitcher } from '@web/components/shared/language-switcher';
 import { SiteNavigation } from '@web/components/shared/site-navigation';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { SocialLinks } from '@web/components/shared/social-links';
@@ -106,7 +107,7 @@ type TProps = {
 
 export default async function LocaleLayout({ children, params }: TProps) {
   await enterRequestContext(params);
-  const { tenantId, locale, sanityContext, defaultLocale } =
+  const { tenantId, locale, sanityContext, defaultLocale, liveLocales } =
     await getRequestContext();
   // The tenant resolvers below read `headers()` when given no tenant; the
   // placeholder keeps an unresolved tenant's render static.
@@ -158,6 +159,8 @@ export default async function LocaleLayout({ children, params }: TProps) {
     });
   }
   const navItems = navResult.ok ? navResult.data.items : [];
+  const hasHeaderLanguageSwitcher =
+    navResult.ok && navResult.data.showLanguageSwitcher === true;
 
   if (!footerResult.ok) {
     logger.error('footer.layout_fetch_failed', {
@@ -165,6 +168,15 @@ export default async function LocaleLayout({ children, params }: TProps) {
     });
   }
   const social = footerResult.ok ? footerResult.data.social : [];
+  const hasFooterLanguageSwitcher =
+    footerResult.ok && footerResult.data.showLanguageSwitcher === true;
+  const languageSwitcher = (
+    <LanguageSwitcher
+      liveLocales={liveLocales ?? [locale]}
+      currentLocale={locale}
+      defaultLocale={defaultLocale ?? routing.defaultLocale}
+    />
+  );
   const currentYear = new Date().getFullYear();
   const s = localeLayoutVariants();
   const oauthProviderIds = getEnabledOAuthProviderIds();
@@ -202,6 +214,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
                         links={navItems}
                         actions={
                           <>
+                            {hasHeaderLanguageSwitcher && languageSwitcher}
                             <ThemeToggleButton />
                             <AuthMenu oauthProviderIds={oauthProviderIds} />
                           </>
@@ -213,6 +226,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
                       <Footer.Copyright title={brand.name} year={currentYear} />
                       <Footer.Nav>
                         <SocialLinks profiles={social} />
+                        {hasFooterLanguageSwitcher && languageSwitcher}
                         <NavLink
                           as={SmartLink}
                           href={routes.rssFeed()}
