@@ -41,11 +41,11 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
     await setup();
 
     expect(getSettingsFeaturesMock).toHaveBeenCalledWith('tenant-1');
-    expect(screen.getByRole('switch', { name: 'Comments' })).toHaveAttribute(
+    expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(
       'data-checked',
       '',
     );
-    expect(screen.getByRole('switch', { name: 'Newsletter' })).toHaveAttribute(
+    expect(screen.getByRole('switch', { name: 'Analytics' })).toHaveAttribute(
       'data-unchecked',
       '',
     );
@@ -55,9 +55,9 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
     getSettingsFeaturesMock.mockResolvedValue({
       id: 'row-1',
       tenantId: 'tenant-1',
-      commentsEnabled: false,
+      commentsEnabled: true,
       ratingsEnabled: true,
-      bookmarksEnabled: true,
+      bookmarksEnabled: false,
       newsletterEnabled: true,
       analyticsEnabled: true,
       createdAt: new Date(),
@@ -67,11 +67,11 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
     await setup({ tenant: buildTenant('GROWTH') });
 
     expect(getSiteConfigMock).not.toHaveBeenCalled();
-    expect(screen.getByRole('switch', { name: 'Comments' })).toHaveAttribute(
+    expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(
       'data-unchecked',
       '',
     );
-    expect(screen.getByRole('switch', { name: 'Newsletter' })).toHaveAttribute(
+    expect(screen.getByRole('switch', { name: 'Analytics' })).toHaveAttribute(
       'data-checked',
       '',
     );
@@ -105,10 +105,6 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
 
     await setup({ tenant: buildTenant('FREE') });
 
-    expect(screen.getByRole('switch', { name: 'Newsletter' })).toHaveAttribute(
-      'data-disabled',
-      '',
-    );
     expect(screen.getByRole('switch', { name: 'Analytics' })).toHaveAttribute(
       'data-disabled',
       '',
@@ -122,19 +118,17 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
       commentsEnabled: true,
       ratingsEnabled: true,
       bookmarksEnabled: true,
-      newsletterEnabled: true,
-      analyticsEnabled: false,
+      newsletterEnabled: false,
+      analyticsEnabled: true,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
 
     await setup({ tenant: buildTenant('FREE') });
 
-    const newsletterSwitch = screen.getByRole('switch', {
-      name: 'Newsletter',
-    });
-    expect(newsletterSwitch).toHaveAttribute('data-unchecked', '');
-    expect(newsletterSwitch).toHaveAttribute('data-disabled', '');
+    const analyticsSwitch = screen.getByRole('switch', { name: 'Analytics' });
+    expect(analyticsSwitch).toHaveAttribute('data-unchecked', '');
+    expect(analyticsSwitch).toHaveAttribute('data-disabled', '');
   });
 
   it('enables every toggle for a GROWTH-plan tenant', async () => {
@@ -144,10 +138,10 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
     await setup({ tenant: buildTenant('GROWTH') });
 
     expect(
-      screen.getByRole('switch', { name: 'Newsletter' }),
+      screen.getByRole('switch', { name: 'Analytics' }),
     ).not.toHaveAttribute('data-disabled');
     expect(
-      screen.getByRole('switch', { name: 'Analytics' }),
+      screen.getByRole('switch', { name: 'Cookie consent banner' }),
     ).not.toHaveAttribute('data-disabled');
   });
 

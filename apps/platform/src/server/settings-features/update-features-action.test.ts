@@ -49,8 +49,8 @@ const FREE_TENANT = { id: 'tenant-1', plan: 'FREE' };
 const GROWTH_TENANT = { id: 'tenant-2', plan: 'GROWTH' };
 
 const VALID_INPUT: TUpdateFeaturesInput = {
-  commentsEnabled: true,
-  ratingsEnabled: true,
+  commentsEnabled: false,
+  ratingsEnabled: false,
   bookmarksEnabled: true,
   newsletterEnabled: false,
   analyticsEnabled: false,
@@ -120,7 +120,7 @@ describe(updateFeaturesAction, () => {
 
     const result = await updateFeaturesAction('tenant-1', {
       ...VALID_INPUT,
-      newsletterEnabled: true,
+      analyticsEnabled: true,
     });
 
     expect(result).toEqual({ ok: false });
@@ -138,15 +138,15 @@ describe(updateFeaturesAction, () => {
 
     const result = await updateFeaturesAction('tenant-1', {
       ...VALID_INPUT,
-      commentsEnabled: false,
-      newsletterEnabled: false,
+      bookmarksEnabled: false,
+      analyticsEnabled: false,
     });
 
     expect(result).toEqual({ ok: true });
     expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith('tenant-1', {
       ...VALID_INPUT,
-      commentsEnabled: false,
-      newsletterEnabled: false,
+      bookmarksEnabled: false,
+      analyticsEnabled: false,
     });
   });
 
@@ -159,16 +159,54 @@ describe(updateFeaturesAction, () => {
 
     const result = await updateFeaturesAction('tenant-2', {
       ...VALID_INPUT,
-      newsletterEnabled: true,
       analyticsEnabled: true,
     });
 
     expect(result).toEqual({ ok: true });
     expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith('tenant-2', {
       ...VALID_INPUT,
-      newsletterEnabled: true,
       analyticsEnabled: true,
     });
+  });
+
+  it('writes Comments, Ratings and Newsletter off even when the payload switches them on', async () => {
+    requireTenantMembershipMock.mockResolvedValue({
+      tenant: GROWTH_TENANT,
+      membership: { role: 'OWNER' },
+    });
+    upsertSettingsFeaturesMock.mockResolvedValue({});
+
+    const result = await updateFeaturesAction('tenant-2', {
+      ...VALID_INPUT,
+      commentsEnabled: true,
+      ratingsEnabled: true,
+      newsletterEnabled: true,
+    });
+
+    expect(result).toEqual({ ok: true });
+    expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(
+      'tenant-2',
+      VALID_INPUT,
+    );
+  });
+
+  it('does not reject a FREE tenant for switching on a "Coming soon" capability outside its plan', async () => {
+    requireTenantMembershipMock.mockResolvedValue({
+      tenant: FREE_TENANT,
+      membership: { role: 'OWNER' },
+    });
+    upsertSettingsFeaturesMock.mockResolvedValue({});
+
+    const result = await updateFeaturesAction('tenant-1', {
+      ...VALID_INPUT,
+      newsletterEnabled: true,
+    });
+
+    expect(result).toEqual({ ok: true });
+    expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(
+      'tenant-1',
+      VALID_INPUT,
+    );
   });
 
   it('reports failure instead of throwing when the write itself fails', async () => {
