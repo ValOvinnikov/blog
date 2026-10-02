@@ -773,7 +773,7 @@ passing the stored value straight through.
 more.** Where a module's array pairs `required()` with a `min()`, an empty list
 is a state the content model forbids, so `apps/web` does not check for it —
 `module_featureList`, `module_testimonial`, `module_logoWall`, `module_stats`,
-`module_faq` and `module_team` render whatever they are handed, in the module and in the view
+`module_faq`, `module_team` and `module_pricing` render whatever they are handed, in the module and in the view
 alike. The trade is deliberate: a document written around Studio's validation
 costs an empty section rather than a disappeared one, which is the cheaper
 failure and the visible one.
@@ -1147,6 +1147,61 @@ and puts a larger photo beside the text from `lg`, stacked below it. It ignores
 `displayMode` and `cardAlignment`, and carries none of the profile hero's
 eyebrow, heading slot or banner variant: the module heading and actions apply
 unchanged.
+
+**A price list is one module document holding its tiers inline.**
+`module_pricing` ("Pricing", under Modules → Conversion, allowed in
+`page_home.modules[]` and `page_landing.modules[]` only) carries
+`brandVariant`, `headingBlock`, 1 to 4 inline `pricingTier` objects (`required()`
+and `min(1)` both, because an array's `required()` passes an empty `[]` and
+`min()` passes a missing value), an optional one-line `footnote`, `ctaButtons`,
+`contentAlignment` and `layout`. The module is the reusable unit: the same price
+list on two pages is one document, and a promo is a deliberate copy. A tier is
+inline for the same reason a stat is: it belongs to this price list's argument.
+
+A `pricingTier` has a required `name`, a `description`, up to 3 `pricingPrice`
+objects (one per period; the first is the headline), a `priceLabel` required
+when there are no prices ("Let's talk"), up to 12 plain feature lines, its own
+`ctaButtons`, a `highlightLabel` and a `footnote`. The copy limits are errors,
+not warnings, because over-long copy breaks the card. **Filling `highlightLabel`
+is the highlight**: there is no separate toggle, the field has no initial value,
+and at most one tier per module may carry one. A `pricingPrice` has a `period`
+from `PRICE_PERIOD` (`ONE_TIME`, `HOUR`, `SESSION`, `MONTH`, `YEAR`; an
+UPPERCASE key/value constant in `@blog/config`'s `constants/price-period.ts`,
+with its `TPricePeriod` union), an `amount` (≥ 0, two decimals), an optional `compareAtAmount`
+that must exceed it, and an `isStartingAt` flag.
+
+**The currency is the site's, not the price's.** `settings_site.currency` is a
+required ISO 4217 code, offered as a dropdown of every code `Intl` supports;
+existing documents were backfilled with `USD` by a content migration.
+`service.global.siteSettings.v1` projects it non-null.
+`service.modules.pricing.v1.getPricingModule` returns `TPricingModule`, whose
+tiers keep their prices in authored order and expose `highlightLabel` trimmed,
+or `undefined` when empty. The view model has no `isHighlighted`; a consumer
+derives it from the label. Cache tags follow `module_stats`'.
+
+**`apps/web` formats every amount on the server, and the period switch only
+hides.** `PricingModule` reads the module, the site currency and the request
+locale. It formats with `Intl.NumberFormat(locale, { style: 'currency',
+currency, trailingZeroDisplay: 'stripIfInteger' })`, so £49 never renders as
+£49.00. A zero amount renders the translated "Free", and "From", the tab labels
+and the compare-at amount's screen-reader label come from the `pricingModule`
+messages. So does each period's text ("per month", "one-time"), which
+`PricingCard.Price` renders after the amount as given, adding no "/". When the tiers carry both
+`MONTH` and `YEAR` prices, `toPricingPanels` builds two panels, each heading a
+card with that tab's price, dropping the other tab's price, and listing the
+remaining prices as extra lines in authored order. A tier with no price for a
+tab heads that tab with its first price and that price's own period text,
+never a computed monthly equivalent. Both panels are
+server-rendered. `PricingPeriodSwitch`, the one `'use client'` leaf, composes
+`@blog/ui`'s `SegmentedControl` and toggles `hidden`, with Monthly showing first
+and without JS. With a single period there is no switch. Each tier renders
+through `@blog/ui`'s `PricingCard`, raised with its label as the badge when
+`highlightLabel` is set, and with `ActionGroup` inside its `Actions` slot. The
+grid is the module's own, not `CardGrid`: one tier is centred at card width,
+two sit side by side from `md`, three stack until `lg` and then sit 3-up, and
+four sit 2×2 from `md` and 4-up from `lg`, so no card is squeezed or orphaned.
+The module footnote is capped at `max-w-measure`. A compare-at amount shows on
+the headline price only, never on an extra line. No JSON-LD.
 
 `service.modules.<type>.v1` projects `brandVariant` as a required
 `TBrandVariantOf<...>` (narrowed per module to exactly the options its
