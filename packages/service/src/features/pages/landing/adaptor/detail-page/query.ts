@@ -7,16 +7,17 @@ import {
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
 import { moduleFragment } from '@blog/service/shared/fragments/module/module';
 import { seoFragment } from '@blog/service/shared/fragments/seo/seo';
-import {
-  buildTranslationsExpression,
-  type TRawTranslation,
-} from '@blog/service/shared/localization/translations';
+import type { TLocaleParams } from '@blog/service/shared/localization/locale-params';
+import { TRANSLATIONS_EXPRESSION } from '@blog/service/shared/localization/translations';
 import type { TRawModule } from '@blog/service/shared/transformers/module/to-module';
 
+import type { TLandingTranslation } from './types';
+
 export const landingPageQuery = q
-  .parameters<TSlugParams>()
+  .parameters<TSlugParams & Partial<TLocaleParams>>()
   .star.filterByType('page_landing')
-  .filterRaw('slug.current == $slug && language == $locale')
+  .filterBy('slug.current == $slug')
+  .filterBy('language == $locale')
   .slice(0)
   .project((sub) => ({
     slug: sub.field('slug.current').notNull(),
@@ -38,6 +39,6 @@ export const landingPageQuery = q
       .nullable(),
     faqs: sub.raw(PAGE_FAQ_QUESTIONS_EXPRESSION, pageFaqQuestionsParser),
     seo: sub.field('seo').project(seoFragment).notNull(),
-    translations: sub.raw<TRawTranslation[]>(buildTranslationsExpression()),
+    translations: sub.raw<TLandingTranslation[]>(TRANSLATIONS_EXPRESSION),
   }))
   .nullable(true);
