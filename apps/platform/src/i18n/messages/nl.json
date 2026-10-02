@@ -62,8 +62,7 @@
     "team": "Team",
     "provisioning": "Inrichting",
     "dangerZone": "Gevarenzone",
-    "badgeLater": "later",
-    "badgeThisMilestone": "deze mijlpaal",
+    "badgeComingSoon": "Binnenkort",
     "badgePlatform": "platform",
     "features": "Functies"
   },
@@ -691,6 +690,7 @@
     "alertSuccess": "Functies opgeslagen.",
     "alertError": "Opslaan mislukt. Probeer het opnieuw.",
     "planLockedBadge": "Growth-abonnement",
+    "comingSoonBadge": "Binnenkort",
     "switchOn": "Aan",
     "switchOff": "Uit",
     "capabilitiesHeading": "Mogelijkheden",

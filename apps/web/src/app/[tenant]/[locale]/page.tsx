@@ -2,10 +2,10 @@ import type { ITenantLocalizedParams } from '@blog/config';
 import { service } from '@blog/service';
 import { HomePage } from '@web/components/pages/home-page';
 import { toMetadata } from '@web/metadata/to-metadata';
+import { enterRequestContext } from '@web/server/request-context/request-context';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
-import { setRequestLocale } from 'next-intl/server';
 
 type TProps = {
   params: Promise<ITenantLocalizedParams>;
@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: TProps): Promise<Metadata> {
 
 export default async function HomeRoute({ params }: TProps) {
   const { locale, tenant } = await params;
-  setRequestLocale(locale);
+  await enterRequestContext(params);
 
   return <HomePage locale={locale} tenant={tenant} />;
 }

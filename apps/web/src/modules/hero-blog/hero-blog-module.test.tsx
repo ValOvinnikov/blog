@@ -1,4 +1,4 @@
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import {
@@ -6,7 +6,7 @@ import {
   makeStaleUnresolvedHeroBlogData,
   makeUnresolvedHeroBlogData,
 } from '@web/testing/modules/hero-blog/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { HeroBlogModule } from './hero-blog-module';
@@ -23,24 +23,22 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
+vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@web/utils/logger/logger');
 
-const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
+const getRequestContextMock = vi.mocked(getRequestContext);
 const loggerErrorMock = vi.mocked(logger.error);
 
 const setup = customRenderAsync(HeroBlogModule, {
   id: 'hero-blog-1',
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${HeroBlogModule.name}/>`, () => {
   beforeEach(() => {
     getHeroBlogMock.mockReset();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
+    getRequestContextMock.mockReset();
+    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
   it('forwards the resolved tenant Sanity context to getHeroBlog', async () => {
@@ -49,7 +47,10 @@ describe(`<${HeroBlogModule.name}/>`, () => {
       dataset: 'production',
       token: 'tenant-token',
     };
-    getTenantSanityContextMock.mockResolvedValue(tenant);
+    getRequestContextMock.mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      sanityContext: tenant,
+    });
     getHeroBlogMock.mockResolvedValue({
       ok: true,
       data: makeHeroBlogData(),
@@ -58,7 +59,6 @@ describe(`<${HeroBlogModule.name}/>`, () => {
     await setup();
 
     expect(getHeroBlogMock).toHaveBeenCalledWith('hero-blog-1', tenant);
-    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1', 'en');
   });
 
   it('renders nothing when the fetch fails', async () => {

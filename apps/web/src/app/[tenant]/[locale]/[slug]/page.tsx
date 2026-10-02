@@ -1,8 +1,8 @@
 import type { ITenantLocalizedParams } from '@blog/config';
 import { LandingPage } from '@web/components/pages/landing-page';
 import { buildLandingPageMetadata } from '@web/metadata/landing-page-metadata';
+import { enterRequestContext } from '@web/server/request-context/request-context';
 import type { Metadata } from 'next';
-import { setRequestLocale } from 'next-intl/server';
 
 type TProps = {
   params: Promise<ITenantLocalizedParams & { slug: string }>;
@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: TProps): Promise<Metadata> {
 
 export default async function LandingSlugPage({ params }: TProps) {
   const { locale, tenant, slug } = await params;
-  setRequestLocale(locale);
+  await enterRequestContext(params);
 
   return <LandingPage slug={slug} locale={locale} tenant={tenant} />;
 }

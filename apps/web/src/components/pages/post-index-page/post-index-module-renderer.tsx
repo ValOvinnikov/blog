@@ -32,8 +32,6 @@ export interface IPostIndexModuleRendererProps {
   hero: TMaybeUndefined<TModule<TPagePostIndexType>>;
   headingBlock: THeadingBlock;
   modules: TModule<TPagePostIndexType>[];
-  locale: string;
-  tenant: string;
   context?: TModuleComponentProps['context'];
   children?: ReactNode;
 }
@@ -42,20 +40,18 @@ export const PostIndexModuleRenderer = async ({
   hero,
   headingBlock,
   modules,
-  locale,
-  tenant,
   context,
   children,
 }: IPostIndexModuleRendererProps): Promise<ReactNode> => {
   const heroNode = hero
-    ? await renderHeroModule({ hero, map: POST_INDEX_MAP, locale, tenant })
+    ? await renderHeroModule({ hero, map: POST_INDEX_MAP })
     : null;
 
   return (
     <>
       {heroNode ?? <PageHeading headingBlock={headingBlock} />}
       {children}
-      {renderModules({ modules, map: POST_INDEX_MAP, locale, tenant, context })}
+      {renderModules({ modules, map: POST_INDEX_MAP, context })}
     </>
   );
 };

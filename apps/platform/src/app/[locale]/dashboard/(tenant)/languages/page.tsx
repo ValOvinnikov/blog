@@ -11,5 +11,9 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function DashboardLanguagesPage() {
-  return renderTenantScopedPage(resolveDashboardTenant, LanguagesPageContent);
+  return renderTenantScopedPage(
+    resolveDashboardTenant,
+    LanguagesPageContent,
+    'languages',
+  );
 }

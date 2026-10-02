@@ -62,8 +62,7 @@
     "team": "Team",
     "provisioning": "Provisioning",
     "dangerZone": "Danger zone",
-    "badgeLater": "later",
-    "badgeThisMilestone": "this milestone",
+    "badgeComingSoon": "Coming soon",
     "badgePlatform": "platform",
     "features": "Features"
   },
@@ -691,6 +690,7 @@
     "alertSuccess": "Features saved.",
     "alertError": "Couldn't save — try again.",
     "planLockedBadge": "Growth plan",
+    "comingSoonBadge": "Coming soon",
     "switchOn": "On",
     "switchOff": "Off",
     "capabilitiesHeading": "Capabilities",

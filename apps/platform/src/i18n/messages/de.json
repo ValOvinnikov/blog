@@ -62,8 +62,7 @@
     "team": "Team",
     "provisioning": "Bereitstellung",
     "dangerZone": "Gefahrenzone",
-    "badgeLater": "später",
-    "badgeThisMilestone": "dieser Meilenstein",
+    "badgeComingSoon": "Demnächst",
     "badgePlatform": "Plattform",
     "features": "Funktionen"
   },
@@ -691,6 +690,7 @@
     "alertSuccess": "Funktionen gespeichert.",
     "alertError": "Speichern fehlgeschlagen — bitte erneut versuchen.",
     "planLockedBadge": "Growth-Tarif",
+    "comingSoonBadge": "Demnächst",
     "switchOn": "An",
     "switchOff": "Aus",
     "capabilitiesHeading": "Funktionen",

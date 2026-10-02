@@ -55,25 +55,21 @@ export interface IHomeModuleRendererProps {
   hero: TMaybeUndefined<TModule<TPageHomeType>>;
   headingBlock: THeadingBlock;
   modules: TModule[];
-  locale: string;
-  tenant: string;
 }
 
 export const HomeModuleRenderer = async ({
   hero,
   headingBlock,
   modules,
-  locale,
-  tenant,
 }: IHomeModuleRendererProps): Promise<ReactNode> => {
   const heroNode = hero
-    ? await renderHeroModule({ hero, map: HOME_MAP, locale, tenant })
+    ? await renderHeroModule({ hero, map: HOME_MAP })
     : null;
 
   return (
     <>
       {heroNode ?? <PageHeading headingBlock={headingBlock} />}
-      {renderModules({ modules, map: HOME_MAP, locale, tenant })}
+      {renderModules({ modules, map: HOME_MAP })}
     </>
   );
 };

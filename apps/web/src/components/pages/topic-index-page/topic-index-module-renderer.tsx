@@ -30,19 +30,15 @@ export interface ITopicIndexModuleRendererProps {
   hero: TMaybeUndefined<TModule<TPageTopicIndexType>>;
   headingBlock: THeadingBlock;
   modules: TModule<TPageTopicIndexType>[];
-  locale: string;
-  tenant: string;
 }
 
 export const TopicIndexModuleRenderer = async ({
   hero,
   headingBlock,
   modules,
-  locale,
-  tenant,
 }: ITopicIndexModuleRendererProps): Promise<ReactNode> => {
   const heroNode = hero
-    ? await renderHeroModule({ hero, map: TOPIC_INDEX_MAP, locale, tenant })
+    ? await renderHeroModule({ hero, map: TOPIC_INDEX_MAP })
     : null;
 
   return (
@@ -50,7 +46,7 @@ export const TopicIndexModuleRenderer = async ({
       {heroNode ?? (
         <PageHeading headingBlock={headingBlock} hasTrailingSpace={false} />
       )}
-      {renderModules({ modules, map: TOPIC_INDEX_MAP, locale, tenant })}
+      {renderModules({ modules, map: TOPIC_INDEX_MAP })}
     </>
   );
 };

@@ -78,7 +78,7 @@ describe(`<${FeaturesPage.name}/>`, () => {
 
     expect(getSettingsFeaturesMock).toHaveBeenCalledWith('tenant-1');
     expect(screen.getByRole('heading', { name: 'Features' })).toBeVisible();
-    expect(screen.getByRole('switch', { name: 'Comments' })).toHaveAttribute(
+    expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(
       'data-checked',
       '',
     );
@@ -96,15 +96,7 @@ describe(`<${FeaturesPage.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByRole('switch', { name: 'Newsletter' })).toHaveAttribute(
-      'data-disabled',
-      '',
-    );
     expect(screen.getByRole('switch', { name: 'Analytics' })).toHaveAttribute(
-      'data-disabled',
-      '',
-    );
-    expect(screen.getByRole('switch', { name: 'Comments' })).toHaveAttribute(
       'data-disabled',
       '',
     );
@@ -112,8 +104,8 @@ describe(`<${FeaturesPage.name}/>`, () => {
       'data-disabled',
       '',
     );
-    expect(screen.getByRole('switch', { name: 'Ratings' })).not.toHaveAttribute(
-      'data-disabled',
-    );
+    expect(
+      screen.getByRole('switch', { name: 'Cookie consent banner' }),
+    ).not.toHaveAttribute('data-disabled');
   });
 });

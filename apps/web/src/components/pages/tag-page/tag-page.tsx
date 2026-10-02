@@ -13,12 +13,7 @@ type TTagPageProps = {
   tenant: string;
 };
 
-export const TagPage = async ({
-  slug,
-  page,
-  locale,
-  tenant,
-}: TTagPageProps) => {
+export const TagPage = async ({ slug, page, tenant }: TTagPageProps) => {
   const result = await getTagPage(slug, tenant);
   const pageData = guardPageLoaderResult(result, 'tag_page.fetch_failed', {
     slug,
@@ -41,8 +36,6 @@ export const TagPage = async ({
           page: currentPage,
           archive: { kind: TAXONOMY_KIND.TAGS, slug, name: tag.title },
         }}
-        locale={locale}
-        tenant={tenant}
       />
     </PageShell>
   );

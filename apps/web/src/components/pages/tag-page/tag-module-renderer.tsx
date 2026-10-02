@@ -34,8 +34,6 @@ export interface ITagModuleRendererProps {
   hasTrailingSpace?: boolean;
   modules: TModule<TPageTagType>[];
   context?: TModuleComponentProps['context'];
-  locale: string;
-  tenant: string;
 }
 
 export const TagModuleRenderer = async ({
@@ -44,12 +42,8 @@ export const TagModuleRenderer = async ({
   hasTrailingSpace,
   modules,
   context,
-  locale,
-  tenant,
 }: ITagModuleRendererProps): Promise<ReactNode> => {
-  const heroNode = hero
-    ? await renderHeroModule({ hero, map: TAG_MAP, locale, tenant })
-    : null;
+  const heroNode = hero ? await renderHeroModule({ hero, map: TAG_MAP }) : null;
 
   return (
     <>
@@ -59,7 +53,7 @@ export const TagModuleRenderer = async ({
           hasTrailingSpace={hasTrailingSpace}
         />
       )}
-      {renderModules({ modules, map: TAG_MAP, locale, tenant, context })}
+      {renderModules({ modules, map: TAG_MAP, context })}
     </>
   );
 };

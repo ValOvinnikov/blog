@@ -2,6 +2,7 @@ import {
   CONTENT_ROUTE_REVALIDATE_SECONDS,
   LOCALE_ISO_CODES,
 } from '@blog/config';
+import { enterRequestContext } from '@web/server/request-context/request-context';
 import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
@@ -11,6 +12,8 @@ import HomeRoute, { generateMetadata, revalidate } from './page';
 const { getHomePageMock } = vi.hoisted(() => ({
   getHomePageMock: vi.fn(),
 }));
+
+vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -35,6 +38,18 @@ const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
 describe('HomeRoute', () => {
   it('declares the shared content-route revalidate backstop', () => {
     expect(revalidate).toBe(CONTENT_ROUTE_REVALIDATE_SECONDS);
+  });
+
+  it('enters the request context with the route params', async () => {
+    const params = Promise.resolve({
+      tenant: 'tenant-1',
+      locale: LOCALE_ISO_CODES.EN,
+      slug: 'a-slug',
+    });
+
+    await HomeRoute({ params });
+
+    expect(enterRequestContext).toHaveBeenCalledWith(params);
   });
 
   it('renders HomePage with the resolved locale and tenant', async () => {

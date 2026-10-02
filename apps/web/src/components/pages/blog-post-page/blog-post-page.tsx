@@ -24,11 +24,7 @@ const s = blogPostPageVariants();
  * composes every other concern as a self-fetching part reading the same
  * cached `getPostPage` loader.
  */
-export const BlogPostPage = async ({
-  slug,
-  locale,
-  tenant,
-}: TBlogPostPageProps) => {
+export const BlogPostPage = async ({ slug, tenant }: TBlogPostPageProps) => {
   const result = await getPostPage(slug, tenant);
   const post = guardPageLoaderResult(result, 'blog_post_page.fetch_failed', {
     slug,
@@ -58,8 +54,6 @@ export const BlogPostPage = async ({
           <div className={s.modules()}>
             <BlogPostModuleRenderer
               modules={modules}
-              locale={locale}
-              tenant={tenant}
               context={{ post: { id } }}
             />
           </div>

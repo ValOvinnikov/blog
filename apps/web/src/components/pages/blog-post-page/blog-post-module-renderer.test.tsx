@@ -42,8 +42,6 @@ const loggerWarnMock = vi.mocked(logger.warn);
 
 const setup = customRender(BlogPostModuleRenderer, {
   modules: [] as TModule<TPagePostType>[],
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${BlogPostModuleRenderer.name}/>`, () => {

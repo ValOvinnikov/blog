@@ -61,8 +61,6 @@ const setup = customRenderAsync(TagIndexModuleRenderer, {
   hero: undefined,
   headingBlock: makeHeadingBlock({ heading: 'Tags' }),
   modules: [],
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${TagIndexModuleRenderer.name}/>`, () => {

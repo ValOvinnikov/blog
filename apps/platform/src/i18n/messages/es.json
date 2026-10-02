@@ -62,8 +62,7 @@
     "team": "Equipo",
     "provisioning": "Aprovisionamiento",
     "dangerZone": "Zona de peligro",
-    "badgeLater": "más adelante",
-    "badgeThisMilestone": "este hito",
+    "badgeComingSoon": "Próximamente",
     "badgePlatform": "plataforma",
     "features": "Funciones"
   },
@@ -691,6 +690,7 @@
     "alertSuccess": "Funciones guardadas.",
     "alertError": "No se pudo guardar. Vuelva a intentarlo.",
     "planLockedBadge": "Plan Growth",
+    "comingSoonBadge": "Próximamente",
     "switchOn": "Activado",
     "switchOff": "Desactivado",
     "capabilitiesHeading": "Funciones disponibles",

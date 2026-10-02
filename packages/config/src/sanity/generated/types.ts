@@ -220,7 +220,7 @@ export type Module_timeline = {
       _key: string;
     } & CtaButton
   >;
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  contentAlignment?: 'LEFT' | 'CENTER';
   itemAlignment?: 'LEFT' | 'CENTER';
   layout?: Layout;
 };

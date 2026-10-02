@@ -62,8 +62,7 @@
     "team": "Équipe",
     "provisioning": "Provisionnement",
     "dangerZone": "Zone de danger",
-    "badgeLater": "plus tard",
-    "badgeThisMilestone": "cette étape",
+    "badgeComingSoon": "Bientôt",
     "badgePlatform": "plateforme",
     "features": "Fonctionnalités"
   },
@@ -691,6 +690,7 @@
     "alertSuccess": "Fonctionnalités enregistrées.",
     "alertError": "Impossible d'enregistrer — veuillez réessayer.",
     "planLockedBadge": "Formule Growth",
+    "comingSoonBadge": "Bientôt",
     "switchOn": "Activé",
     "switchOff": "Désactivé",
     "capabilitiesHeading": "Fonctionnalités disponibles",

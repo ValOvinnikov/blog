@@ -12,6 +12,8 @@ vi.mock('@web/components/pages/account-page', () => ({
   AccountPage: () => <div data-testid="account-page" />,
 }));
 
+vi.mock('@web/server/request-context/request-context');
+
 vi.mock('@web/server/settings-features/is-reader-account-enabled', () => ({
   isReaderAccountEnabled: vi.fn(),
 }));

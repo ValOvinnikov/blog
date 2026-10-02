@@ -12,6 +12,8 @@ vi.mock('@web/components/pages/bookmarks-page', () => ({
   BookmarksPage: () => <div data-testid="bookmarks-page" />,
 }));
 
+vi.mock('@web/server/request-context/request-context');
+
 vi.mock('@web/server/settings-features/is-reader-account-enabled', () => ({
   isReaderAccountEnabled: vi.fn(),
 }));

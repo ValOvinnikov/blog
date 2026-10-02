@@ -17,6 +17,8 @@ import { notFound } from 'next/navigation';
 
 import { TagPage } from './tag-page';
 
+vi.mock('@web/server/request-context/request-context');
+
 vi.mock('@blog/service', () => ({
   service: {
     pages: { tag: { v1: { getTagPage: vi.fn() } } },

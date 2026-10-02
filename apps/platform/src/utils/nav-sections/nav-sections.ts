@@ -1,5 +1,12 @@
 import { ICONS } from '@blog/config';
-import type { TSidebarNavSection } from '@platform/components/features/layout/sidebar';
+import type {
+  TSidebarNavItem,
+  TSidebarNavSection,
+} from '@platform/components/features/layout/sidebar';
+import type {
+  TPlanPage,
+  TPlanPageAccess,
+} from '@platform/utils/plan-page-access/plan-page-access';
 import { adminRoutes } from '@platform/utils/routes/routes';
 
 /** Structurally compatible with both `useTranslations`'s and `getTranslations`'s return type, without fighting next-intl's per-namespace literal-key generic. */
@@ -43,64 +50,61 @@ type TTenantNavHrefs = {
   studio: string;
 };
 
-const configurationNavItems = (t: TNavTranslator, hrefs: TTenantNavHrefs) => {
-  const shipping = { label: t('badgeThisMilestone'), tone: 'neutral' } as const;
+const configurationNavItems = (
+  t: TNavTranslator,
+  hrefs: TTenantNavHrefs,
+  access: TPlanPageAccess,
+): TSidebarNavItem[] => {
+  const comingSoon = { label: t('badgeComingSoon'), tone: 'neutral' } as const;
+  const ifAccessible = (page: TPlanPage, item: TSidebarNavItem) =>
+    access[page] ? [item] : [];
 
   return [
-    {
-      label: t('look'),
-      icon: ICONS.PALETTE,
-      href: hrefs.look,
-    },
-    {
-      label: t('voice'),
-      icon: ICONS.QUOTE,
-      href: hrefs.voice,
-    },
-    {
-      label: t('features'),
-      icon: ICONS.SETTINGS,
-      href: hrefs.features,
-      badge: shipping,
-    },
-    {
+    { label: t('look'), icon: ICONS.PALETTE, href: hrefs.look },
+    { label: t('voice'), icon: ICONS.QUOTE, href: hrefs.voice },
+    { label: t('features'), icon: ICONS.SETTINGS, href: hrefs.features },
+    ...ifAccessible('languages', {
       label: t('languages'),
       icon: ICONS.BOOK,
       href: hrefs.languages,
-      badge: shipping,
-    },
-    {
-      label: t('domain'),
-      icon: ICONS.GLOBE,
-      href: hrefs.domain,
-      badge: shipping,
-    },
-    {
+    }),
+    { label: t('domain'), icon: ICONS.GLOBE, href: hrefs.domain },
+    ...ifAccessible('email', {
       label: t('email'),
       icon: ICONS.MAIL,
       href: hrefs.email,
-      badge: shipping,
-    },
+    }),
+    ...ifAccessible('subscribers', {
+      label: t('subscribers'),
+      icon: ICONS.MENU_ROWS,
+      badge: comingSoon,
+    }),
+    ...ifAccessible('comments', {
+      label: t('comments'),
+      icon: ICONS.COMMENT,
+      badge: comingSoon,
+    }),
+    ...ifAccessible('team', {
+      label: t('team'),
+      icon: ICONS.USERS,
+      badge: comingSoon,
+    }),
   ];
 };
 
-/** Studio edits the tenant's content rather than configuring the site, so it lives in its own Content section rather than alongside Look/Voice/Features/Domain. Shared by the `/tenants/{id}` and `/dashboard` sidebars, same as `configurationNavItems`. Carries no badge — it's live and routable today, unlike the "this milestone"/"later" items around it. */
+const EVERY_PAGE: TPlanPageAccess = {
+  languages: true,
+  email: true,
+  subscribers: true,
+  comments: true,
+  team: true,
+};
+
 const studioNavItem = (t: TNavTranslator, href: string) => ({
   label: t('studio'),
   icon: ICONS.STUDIO,
   href,
 });
-
-/** Tenant-facing destinations with no owner-actionable route yet — platform-only, and dropped from the owner-facing `/dashboard` tree entirely rather than shown as a permanently inert "later" badge. */
-const laterPlatformNavItems = (t: TNavTranslator) => {
-  const later = { label: t('badgeLater'), tone: 'warn' } as const;
-
-  return [
-    { label: t('subscribers'), icon: ICONS.MENU_ROWS, badge: later },
-    { label: t('comments'), icon: ICONS.COMMENT, badge: later },
-    { label: t('team'), icon: ICONS.USERS, badge: later },
-  ];
-};
 
 export const tenantNavSections = (
   t: TNavTranslator,
@@ -139,7 +143,7 @@ export const tenantNavSections = (
     },
     {
       label: t('configurationSectionLabel'),
-      items: [...configurationNavItems(t, hrefs), ...laterPlatformNavItems(t)],
+      items: configurationNavItems(t, hrefs, EVERY_PAGE),
     },
     {
       label: t('platformSectionLabel'),
@@ -161,9 +165,9 @@ export const tenantNavSections = (
   ];
 };
 
-/** The `/dashboard` counterpart to `tenantNavSections`'s Content/Configuration sections — same shipping destinations, routed under `/dashboard` instead of `/tenants/{id}`. Owners never get the Overview item (there's nothing at `/dashboard` distinct from the sections themselves), the platform-only Provisioning/Danger zone section, or the three not-yet-owner-actionable items (Subscribers, Comments, Team) — those are dropped entirely rather than shown as a permanently inert "later" badge. */
 export const dashboardNavSections = (
   t: TNavTranslator,
+  access: TPlanPageAccess,
 ): TSidebarNavSection[] => {
   const hrefs: TTenantNavHrefs = {
     look: adminRoutes.dashboardLook(),
@@ -182,7 +186,7 @@ export const dashboardNavSections = (
     },
     {
       label: t('configurationSectionLabel'),
-      items: configurationNavItems(t, hrefs),
+      items: configurationNavItems(t, hrefs, access),
     },
   ];
 };
