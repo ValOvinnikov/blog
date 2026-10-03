@@ -21,11 +21,4 @@ describe(toHeadingBlock, () => {
       supportingText: undefined,
     });
   });
-
-  it('renders an empty heading when a localized heading is missing in every language', () => {
-    expect(toHeadingBlock({ heading: null, supportingText: null })).toEqual({
-      heading: '',
-      supportingText: undefined,
-    });
-  });
 });

@@ -4,14 +4,9 @@ import type { InferFragmentType } from 'groqd';
 
 export type TRawHeadingBlock = InferFragmentType<typeof headingBlockFragment>;
 
-type TRawHeadingBlockInput = {
-  heading: string | null;
-  supportingText: string | null;
-};
-
-export function toHeadingBlock(raw: TRawHeadingBlockInput): THeadingBlock {
+export function toHeadingBlock(raw: TRawHeadingBlock): THeadingBlock {
   return {
-    heading: raw.heading ?? '',
+    heading: raw.heading,
     supportingText: raw.supportingText ?? undefined,
   };
 }

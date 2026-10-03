@@ -5,7 +5,7 @@ import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 
 import { ctaModuleQuery } from './query';
 
-const { EN, NL, FR } = LOCALE_ISO_CODES;
+const { EN, NL } = LOCALE_ISO_CODES;
 
 function localized(type: string, values: Partial<Record<string, unknown>>) {
   return Object.entries(values).map(([language, value]) => ({
@@ -59,12 +59,12 @@ const ctaDocument = {
 
 const imageAsset = { _id: 'image-1', _type: 'sanity.imageAsset' };
 
-async function resolveCta(document: Record<string, unknown>, locale: string) {
+async function runCta(document: Record<string, unknown>) {
   const raw = await evaluateGroqExpression(
     ctaModuleQuery.query,
     [document, imageAsset],
     undefined,
-    { id: 'cta-1', locale, defaultLocale: EN },
+    { id: 'cta-1' },
   );
 
   return ctaModuleQuery.parse(raw);
@@ -77,47 +77,47 @@ describe('ctaModuleQuery', () => {
     expect(() => ctaModuleQuery.parse(raw)).not.toThrow();
   });
 
-  it('resolves each text field in the requested language', async () => {
-    const cta = await resolveCta(ctaDocument, NL);
+  it('returns every language entry of each localized field', async () => {
+    const cta = await runCta(ctaDocument);
 
     expect(cta).toMatchObject({
-      eyebrow: 'Nieuwsbrief',
-      headingBlock: { heading: 'Abonneer' },
-      content: [{ children: [{ text: 'Lees verder.' }] }],
-      image: { alt: 'Een brief' },
-    });
-  });
-
-  it('falls back to the default-language value field by field', async () => {
-    const cta = await resolveCta(ctaDocument, NL);
-
-    expect(cta).toMatchObject({
-      headingBlock: { supportingText: 'New posts weekly.' },
-      footnote: 'Unsubscribe any time.',
-    });
-  });
-
-  it('uses the default language for a language with no translations', async () => {
-    const cta = await resolveCta(ctaDocument, FR);
-
-    expect(cta).toMatchObject({
-      eyebrow: 'Newsletter',
-      headingBlock: { heading: 'Subscribe' },
-      content: [{ children: [{ text: 'Read on.' }] }],
-      image: { alt: 'A letter' },
-    });
-  });
-
-  it('resolves a value missing in every language to nothing', async () => {
-    const cta = await resolveCta(
-      {
-        ...ctaDocument,
-        eyebrow: undefined,
-        content: undefined,
-        headingBlock: { _type: 'localizedHeadingBlock' },
+      eyebrow: [
+        { language: EN, value: 'Newsletter' },
+        { language: NL, value: 'Nieuwsbrief' },
+      ],
+      headingBlock: {
+        heading: [
+          { language: EN, value: 'Subscribe' },
+          { language: NL, value: 'Abonneer' },
+        ],
+        supportingText: [{ language: EN, value: 'New posts weekly.' }],
       },
-      NL,
-    );
+      footnote: [{ language: EN, value: 'Unsubscribe any time.' }],
+      image: {
+        alt: [
+          { language: EN, value: 'A letter' },
+          { language: NL, value: 'Een brief' },
+        ],
+      },
+    });
+  });
+
+  it('returns the content blocks of each language', async () => {
+    const cta = await runCta(ctaDocument);
+
+    expect(cta.content).toMatchObject([
+      { language: EN, value: [{ children: [{ text: 'Read on.' }] }] },
+      { language: NL, value: [{ children: [{ text: 'Lees verder.' }] }] },
+    ]);
+  });
+
+  it('returns nothing for a localized field with no entries', async () => {
+    const cta = await runCta({
+      ...ctaDocument,
+      eyebrow: undefined,
+      content: undefined,
+      headingBlock: { _type: 'localizedHeadingBlock' },
+    });
 
     expect(cta).toMatchObject({
       eyebrow: null,
