@@ -48,4 +48,47 @@ describe(toLanguageSwitcherLink, () => {
       }),
     ).toEqual({ href: '/blog', hrefLocale: EN });
   });
+
+  describe('with the current page translations', () => {
+    const translations = [
+      { language: EN, slug: 'about-us' },
+      { language: NL, slug: 'over-ons' },
+    ];
+
+    it('links a language to the translation that exists in it', () => {
+      expect(
+        toLanguageSwitcherLink({
+          locale: NL,
+          currentLocale: EN,
+          defaultLocale: EN,
+          pathname: '/about-us',
+          translations,
+        }),
+      ).toEqual({ href: '/nl/over-ons', hrefLocale: NL });
+    });
+
+    it('links the default language to its unprefixed translation', () => {
+      expect(
+        toLanguageSwitcherLink({
+          locale: EN,
+          currentLocale: NL,
+          defaultLocale: EN,
+          pathname: '/over-ons',
+          translations,
+        }),
+      ).toEqual({ href: '/about-us', hrefLocale: EN });
+    });
+
+    it('falls back to the default-language translation for a language without one', () => {
+      expect(
+        toLanguageSwitcherLink({
+          locale: FR,
+          currentLocale: NL,
+          defaultLocale: EN,
+          pathname: '/over-ons',
+          translations,
+        }),
+      ).toEqual({ href: '/about-us', hrefLocale: EN });
+    });
+  });
 });

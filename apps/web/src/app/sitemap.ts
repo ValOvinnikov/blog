@@ -1,4 +1,4 @@
-import { LOCALE_BCP47_TAGS, routes } from '@blog/config';
+import { LOCALE_BCP47_TAGS, routes, type TLocaleIsoCode } from '@blog/config';
 import { queries } from '@blog/db';
 import { service } from '@blog/service';
 import { routing } from '@web/i18n/routing';
@@ -6,6 +6,7 @@ import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 import { getHostTenantSanityContext } from '@web/server/tenant/tenant-sanity-context/tenant-sanity-context';
 import { logger } from '@web/utils/logger/logger';
+import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
 import type { MetadataRoute } from 'next';
 
 // Only `getPostParams()` projects a `publishedAt` field, so `lastModified`
@@ -26,6 +27,23 @@ const toEntry = (
         ]),
       ),
     },
+  };
+};
+
+const toLandingPageEntry = (
+  { slug, language }: { slug: string; language: TLocaleIsoCode },
+  defaultLocale: TLocaleIsoCode,
+  siteUrl: string,
+): MetadataRoute.Sitemap[number] => {
+  const url = `${siteUrl}${toLocalizedPathname({
+    href: routes.landingPage(slug),
+    locale: language,
+    defaultLocale,
+  })}`;
+
+  return {
+    url,
+    alternates: { languages: { [LOCALE_BCP47_TAGS[language]]: url } },
   };
 };
 
@@ -54,6 +72,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const { tenant } = hostTenant;
 
   const tenantRow = await resolveRequestTenant();
+  const defaultLocale = tenantRow?.locale ?? routing.defaultLocale;
   const liveLocales = tenantRow
     ? queries.tenants.selectLiveLocales(tenantRow)
     : [routing.defaultLocale];
@@ -171,8 +190,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...tagPages.map(({ slug, page }) =>
       toEntry(routes.tag(slug, Number(page)), siteUrl),
     ),
-    ...landingPageSlugs.map(({ slug }) =>
-      toEntry(routes.landingPage(slug), siteUrl),
+    ...landingPageSlugs.map((page) =>
+      toLandingPageEntry(page, defaultLocale, siteUrl),
     ),
   ];
 }
