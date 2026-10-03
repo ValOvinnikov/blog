@@ -1,4 +1,5 @@
 import type { TLocaleIsoCode } from '@blog/config/constants';
+import type { IGroqBuilder } from 'groqd';
 
 import { isr, q, runQuery, type TSlugParams } from './query';
 
@@ -72,12 +73,11 @@ describe('runQuery injected locale parameters', () => {
   });
 
   it('still requires the parameters the tenant does not inject', () => {
-    function run() {
-      // @ts-expect-error -- `slug` is not injected, so omitting it is a type error.
-      return runQuery(localizedQuery, { parameters: {}, tenant: testTenant });
-    }
+    type TConfig =
+      typeof localizedQuery extends IGroqBuilder<unknown, infer C> ? C : never;
+    type TOptions = Parameters<typeof runQuery<unknown, TConfig>>[1];
 
-    expectTypeOf(run).toBeFunction();
+    expectTypeOf<TOptions['parameters']>().toEqualTypeOf<{ slug: string }>();
   });
 });
 
