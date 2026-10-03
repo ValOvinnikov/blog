@@ -3,7 +3,6 @@ import {
   LOCALE_NATIVE_LABEL,
   type TLocaleIsoCode,
 } from '@blog/config';
-import type { TPageTranslation } from '@blog/service';
 import { toLanguageSwitcherLink } from '@web/utils/to-language-switcher-link/to-language-switcher-link';
 
 export type TLanguageEntry = {
@@ -21,7 +20,6 @@ type TLanguageEntriesParams = {
   currentLocale: TLocaleIsoCode;
   defaultLocale: TLocaleIsoCode;
   pathname: string;
-  translations?: readonly TPageTranslation[];
 };
 
 export const toLanguageEntries = ({
@@ -29,7 +27,6 @@ export const toLanguageEntries = ({
   currentLocale,
   defaultLocale,
   pathname,
-  translations,
 }: TLanguageEntriesParams): TLanguageEntry[] =>
   liveLocales.map((locale) => {
     const { href, hrefLocale } = toLanguageSwitcherLink({
@@ -37,7 +34,6 @@ export const toLanguageEntries = ({
       currentLocale,
       defaultLocale,
       pathname,
-      translations,
     });
 
     return {

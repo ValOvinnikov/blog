@@ -1,13 +1,10 @@
-import { routes, type TLocaleIsoCode } from '@blog/config';
-import type { TPageTranslation } from '@blog/service';
-import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
+import { LOCALE_BCP47_TAGS, type TLocaleIsoCode } from '@blog/config';
 
 type TLanguageSwitcherLinkParams = {
   locale: TLocaleIsoCode;
   currentLocale: TLocaleIsoCode;
   defaultLocale: TLocaleIsoCode;
   pathname: string;
-  translations?: readonly TPageTranslation[];
 };
 
 type TLanguageSwitcherLink = {
@@ -15,40 +12,30 @@ type TLanguageSwitcherLink = {
   hrefLocale: TLocaleIsoCode;
 };
 
+const toLocalizedPath = (
+  locale: TLocaleIsoCode,
+  defaultLocale: TLocaleIsoCode,
+  pathname: string,
+) => {
+  if (locale === defaultLocale) {
+    return pathname;
+  }
+
+  const prefix = `/${LOCALE_BCP47_TAGS[locale]}`;
+
+  return pathname === '/' ? prefix : `${prefix}${pathname}`;
+};
+
 export const toLanguageSwitcherLink = ({
   locale,
   currentLocale,
   defaultLocale,
   pathname,
-  translations = [],
 }: TLanguageSwitcherLinkParams): TLanguageSwitcherLink => {
-  const findTranslation = (language: TLocaleIsoCode) =>
-    translations.find((translation) => translation.language === language);
-  const translation = findTranslation(locale);
-
-  if (translation) {
-    return {
-      href: toLocalizedPathname({
-        href: routes.landingPage(translation.slug),
-        locale,
-        defaultLocale,
-      }),
-      hrefLocale: locale,
-    };
-  }
-
   const hrefLocale = locale === currentLocale ? locale : defaultLocale;
-  const defaultTranslation = findTranslation(defaultLocale);
 
   return {
-    href: toLocalizedPathname({
-      href:
-        locale !== currentLocale && defaultTranslation
-          ? routes.landingPage(defaultTranslation.slug)
-          : pathname,
-      locale: hrefLocale,
-      defaultLocale,
-    }),
+    href: toLocalizedPath(hrefLocale, defaultLocale, pathname),
     hrefLocale,
   };
 };

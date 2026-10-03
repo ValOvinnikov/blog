@@ -5,7 +5,6 @@ import {
   type TLanguageSwitcherStyle,
   type TLocaleIsoCode,
 } from '@blog/config';
-import type { TPageTranslation } from '@blog/service';
 import { usePathname } from '@web/i18n/navigation';
 import { useTranslations } from 'next-intl';
 
@@ -20,7 +19,6 @@ type TLanguageSwitcherProps = {
   liveLocales: readonly TLocaleIsoCode[];
   currentLocale: TLocaleIsoCode;
   defaultLocale: TLocaleIsoCode;
-  translations?: readonly TPageTranslation[];
   switcherStyle: TLanguageSwitcherStyle;
   isInFooter?: boolean;
   dataTestId?: string;
@@ -30,7 +28,6 @@ export const LanguageSwitcher = ({
   liveLocales,
   currentLocale,
   defaultLocale,
-  translations,
   switcherStyle,
   isInFooter = false,
   dataTestId,
@@ -47,7 +44,6 @@ export const LanguageSwitcher = ({
     currentLocale,
     defaultLocale,
     pathname,
-    translations,
   });
   const resolvedStyle =
     switcherStyle === LANGUAGE_SWITCHER_STYLE.CODES &&

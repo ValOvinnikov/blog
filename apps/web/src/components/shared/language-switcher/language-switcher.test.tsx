@@ -36,28 +36,6 @@ describe(`<${LanguageSwitcher.name}/>`, () => {
     ).not.toBeInTheDocument();
   });
 
-  it('links each language to the current page translation, and to the default-language page without one', async () => {
-    vi.mocked(usePathname).mockReturnValue('/over-ons');
-    setup({
-      translations: [
-        { language: EN, slug: 'about-us' },
-        { language: NL, slug: 'over-ons' },
-      ],
-    });
-    await openMenu();
-    const menu = screen.getByRole('menu', { name: 'Language' });
-
-    expect(
-      within(menu).getByRole('menuitem', { name: 'English' }),
-    ).toHaveAttribute('href', '/about-us');
-    expect(
-      within(menu).getByRole('menuitem', { name: 'Nederlands' }),
-    ).toHaveAttribute('href', '/nl/over-ons');
-    expect(
-      within(menu).getByRole('menuitem', { name: 'Français' }),
-    ).toHaveAttribute('href', '/about-us');
-  });
-
   describe('menu with code', () => {
     beforeEach(() => {
       setup();
