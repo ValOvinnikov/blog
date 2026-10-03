@@ -2,7 +2,7 @@ import {
   LANGUAGE_SWITCHER_STYLE,
   type TLanguageSwitcherStyle,
 } from '@blog/config';
-import { getSiteConfig } from '@web/server/site-config/get-site-config';
+import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
 import { logger } from '@web/utils/logger/logger';
 
 export const getLanguageSwitcherStyle = async (

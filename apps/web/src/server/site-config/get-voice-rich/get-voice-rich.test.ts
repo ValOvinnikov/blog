@@ -7,7 +7,7 @@ const { getSiteConfigMock, getMessagesMock } = vi.hoisted(() => ({
   getMessagesMock: vi.fn(),
 }));
 
-vi.mock('./get-site-config', () => ({
+vi.mock('@web/server/site-config/get-site-config/get-site-config', () => ({
   getSiteConfig: getSiteConfigMock,
 }));
 

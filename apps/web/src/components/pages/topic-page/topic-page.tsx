@@ -2,7 +2,7 @@ import { TAXONOMY_KIND } from '@blog/config';
 import { TopicBreadcrumbs } from '@web/components/features/topic/topic-breadcrumbs';
 import { TopicChips } from '@web/components/features/topic/topic-chips';
 import { PageShell } from '@web/components/page-templates/page-shell';
-import { getTopicPage } from '@web/server/topic/get-topic-page';
+import { getTopicPage } from '@web/server/topic/get-topic-page/get-topic-page';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 
 import { TopicModuleRenderer } from './topic-module-renderer';

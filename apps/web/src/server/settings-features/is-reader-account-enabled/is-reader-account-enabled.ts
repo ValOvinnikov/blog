@@ -1,6 +1,5 @@
 import { CAPABILITY } from '@blog/config';
-
-import { isCapabilityEnabled } from './is-capability-enabled';
+import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 
 const READER_ACCOUNT_CAPABILITIES = [
   CAPABILITY.BOOKMARKS,

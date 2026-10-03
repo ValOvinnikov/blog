@@ -57,7 +57,7 @@ vi.mock('@blog/db', () => ({
   },
 }));
 
-vi.mock('@web/server/revalidate/derive-revalidate-paths', () => ({
+vi.mock('@web/server/revalidate/derive-revalidate-paths/derive-revalidate-paths', () => ({
   POST_TYPE: 'page_post',
   isDerivableRevalidateType: isDerivableRevalidateTypeMock,
   deriveRevalidatePaths: deriveRevalidatePathsMock,
@@ -67,7 +67,7 @@ const { resolveReferencingModuleTagsMock } = vi.hoisted(() => ({
   resolveReferencingModuleTagsMock: vi.fn(),
 }));
 
-vi.mock('@web/server/revalidate/resolve-referencing-module-tags', () => ({
+vi.mock('@web/server/revalidate/resolve-referencing-module-tags/resolve-referencing-module-tags', () => ({
   resolveReferencingModuleTags: resolveReferencingModuleTagsMock,
 }));
 

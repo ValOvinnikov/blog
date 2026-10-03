@@ -5,7 +5,7 @@ import { useToast } from '@web/context/toast-provider';
 import {
   getBookmarkStatus,
   setBookmarkStatus,
-} from '@web/server/bookmarks/bookmark-actions';
+} from '@web/server/bookmarks/bookmark-actions/bookmark-actions';
 import { logger } from '@web/utils/logger/logger';
 import { reportClientError } from '@web/utils/report-client-error';
 import { useSession } from 'next-auth/react';

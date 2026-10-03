@@ -11,7 +11,7 @@ const { getLandingPageMock } = vi.hoisted(() => ({
   getLandingPageMock: vi.fn(),
 }));
 
-vi.mock('@web/server/landing/get-landing-page', () => ({
+vi.mock('@web/server/landing/get-landing-page/get-landing-page', () => ({
   getLandingPage: getLandingPageMock,
 }));
 

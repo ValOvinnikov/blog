@@ -1,6 +1,6 @@
 import { routes } from '@blog/config';
 import { toMetadata } from '@web/metadata/to-metadata';
-import { getPostIndexPage } from '@web/server/post-index/get-post-index-page';
+import { getPostIndexPage } from '@web/server/post-index/get-post-index-page/get-post-index-page';
 import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';

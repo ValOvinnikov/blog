@@ -1,7 +1,7 @@
 import { PRICE_PERIOD } from '@blog/config';
 import { service } from '@blog/service';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { getSiteSettings } from '@web/server/site-settings/get-site-settings';
+import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
 import { logger } from '@web/utils/logger/logger';
 import { toPricingPanels } from '@web/utils/to-pricing-panels';
 import { getTranslations } from 'next-intl/server';

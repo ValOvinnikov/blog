@@ -19,7 +19,7 @@ const { getLandingPageMock } = vi.hoisted(() => ({
 
 vi.mock('@web/i18n/navigation');
 
-vi.mock('@web/server/landing/get-landing-page', () => ({
+vi.mock('@web/server/landing/get-landing-page/get-landing-page', () => ({
   getLandingPage: getLandingPageMock,
 }));
 

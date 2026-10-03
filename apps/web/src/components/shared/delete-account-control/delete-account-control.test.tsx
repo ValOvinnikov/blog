@@ -13,7 +13,7 @@ const { signOutMock, deleteAccountActionMock, toastPromiseMock } = vi.hoisted(
 
 vi.mock('next-auth/react', () => ({ signOut: signOutMock }));
 
-vi.mock('@web/server/account/account-actions', () => ({
+vi.mock('@web/server/account/account-actions/account-actions', () => ({
   deleteAccountAction: deleteAccountActionMock,
 }));
 

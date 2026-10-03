@@ -4,11 +4,11 @@ import {
   resolveTenantEmailBrand,
 } from '@blog/config';
 import { queries } from '@blog/db';
-import { getSiteConfig } from '@web/server/site-config/get-site-config';
+import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
 
 import { resolveTenantEmailIdentity } from './resolve-tenant-email-identity';
 
-vi.mock('@web/server/site-config/get-site-config', () => ({
+vi.mock('@web/server/site-config/get-site-config/get-site-config', () => ({
   getSiteConfig: vi.fn(),
 }));
 

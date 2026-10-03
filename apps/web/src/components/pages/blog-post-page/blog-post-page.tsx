@@ -5,7 +5,7 @@ import { BackToTopButton } from '@web/components/shared/back-to-top-button';
 import { DepthToggle } from '@web/components/shared/depth-toggle';
 import { SkimPanel } from '@web/components/shared/skim-panel';
 import { DepthProvider } from '@web/context/depth-provider';
-import { getPostPage } from '@web/server/post/get-post-page';
+import { getPostPage } from '@web/server/post/get-post-page/get-post-page';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 
 import { BlogPostModuleRenderer } from './blog-post-module-renderer';

@@ -10,7 +10,7 @@ const { getPostPageMock } = vi.hoisted(() => ({
   getPostPageMock: vi.fn(),
 }));
 
-vi.mock('@web/server/post/get-post-page', () => ({
+vi.mock('@web/server/post/get-post-page/get-post-page', () => ({
   getPostPage: getPostPageMock,
 }));
 

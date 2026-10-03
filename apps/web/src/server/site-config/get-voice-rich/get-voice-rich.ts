@@ -1,4 +1,5 @@
 import type { TVoicePortableText } from '@blog/config';
+import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
 import { logger } from '@web/utils/logger/logger';
 import {
   resolveVoiceRichFields,
@@ -6,7 +7,6 @@ import {
 } from '@web/utils/resolve-voice-rich-fields';
 import { getMessages } from 'next-intl/server';
 
-import { getSiteConfig } from './get-site-config';
 
 /**
  * Resolves a single RICH voice field for a Server Component — the tenant's

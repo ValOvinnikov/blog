@@ -1,9 +1,9 @@
 import { PRESET_ID, PRESET_REGISTRY } from '@blog/config';
-import { getSiteConfig } from '@web/server/site-config/get-site-config';
+import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
 
 import { getThemeTokens } from './get-theme-tokens';
 
-vi.mock('@web/server/site-config/get-site-config', () => ({
+vi.mock('@web/server/site-config/get-site-config/get-site-config', () => ({
   getSiteConfig: vi.fn(),
 }));
 

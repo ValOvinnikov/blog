@@ -8,7 +8,7 @@ import {
 } from '@blog/config';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { NewsletterSignup } from '@blog/ui/components/organisms/newsletter-signup';
-import { subscribeToNewsletterAction } from '@web/server/newsletter/newsletter-actions';
+import { subscribeToNewsletterAction } from '@web/server/newsletter/newsletter-actions/newsletter-actions';
 import { isValidEmail } from '@web/utils/is-valid-email';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';

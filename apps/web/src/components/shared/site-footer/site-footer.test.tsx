@@ -1,6 +1,6 @@
 import { LOCALE_ISO_CODES, routes, SOCIAL_PLATFORMS } from '@blog/config';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { getSiteSettings } from '@web/server/site-settings/get-site-settings';
+import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
@@ -13,11 +13,11 @@ const { getFooterMock, getTranslationsMock } = vi.hoisted(() => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@web/server/site-config/get-language-switcher-style', () => ({
+vi.mock('@web/server/site-config/get-language-switcher-style/get-language-switcher-style', () => ({
   getLanguageSwitcherStyle: vi.fn().mockResolvedValue('MENU_CODE'),
 }));
 
-vi.mock('@web/server/site-settings/get-site-settings', () => ({
+vi.mock('@web/server/site-settings/get-site-settings/get-site-settings', () => ({
   getSiteSettings: vi.fn(),
 }));
 

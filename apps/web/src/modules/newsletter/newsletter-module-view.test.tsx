@@ -4,7 +4,7 @@ import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { NewsletterModuleView } from './newsletter-module-view';
 
-vi.mock('@web/server/newsletter/newsletter-actions', () => ({
+vi.mock('@web/server/newsletter/newsletter-actions/newsletter-actions', () => ({
   subscribeToNewsletterAction: vi.fn(),
 }));
 

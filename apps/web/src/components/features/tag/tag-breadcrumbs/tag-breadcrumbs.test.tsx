@@ -19,7 +19,7 @@ const { getTagPageMock } = vi.hoisted(() => ({
 
 vi.mock('@web/i18n/navigation');
 
-vi.mock('@web/server/tag/get-tag-page', () => ({
+vi.mock('@web/server/tag/get-tag-page/get-tag-page', () => ({
   getTagPage: getTagPageMock,
 }));
 

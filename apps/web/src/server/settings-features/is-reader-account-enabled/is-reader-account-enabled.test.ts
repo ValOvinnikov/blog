@@ -1,9 +1,9 @@
 import { CAPABILITY, type TCapability } from '@blog/config';
+import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 
-import { isCapabilityEnabled } from './is-capability-enabled';
 import { isReaderAccountEnabled } from './is-reader-account-enabled';
 
-vi.mock('./is-capability-enabled', () => ({
+vi.mock('@web/server/settings-features/is-capability-enabled/is-capability-enabled', () => ({
   isCapabilityEnabled: vi.fn(),
 }));
 

@@ -1,7 +1,7 @@
 import { EMAIL_TEMPLATE_TYPE } from '@blog/config/constants';
 import { EMAIL_TEMPLATE_DEFAULT_COPY, queries } from '@blog/db';
 import { isValidEmailAddress, type TPortableTextContent } from '@blog/email';
-import { resolveNewsletterFromAddress } from '@web/server/newsletter/newsletter-from-address';
+import { resolveNewsletterFromAddress } from '@web/server/newsletter/newsletter-from-address/newsletter-from-address';
 import { logger } from '@web/utils/logger/logger';
 
 export type TNewsletterEmailSettings = {
