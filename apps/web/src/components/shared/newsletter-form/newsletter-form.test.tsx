@@ -12,7 +12,7 @@ const { subscribeToNewsletterActionMock } = vi.hoisted(() => ({
   subscribeToNewsletterActionMock: vi.fn(),
 }));
 
-vi.mock('@web/server/newsletter/newsletter-actions', () => ({
+vi.mock('@web/server/newsletter/newsletter-actions/newsletter-actions', () => ({
   subscribeToNewsletterAction: subscribeToNewsletterActionMock,
 }));
 

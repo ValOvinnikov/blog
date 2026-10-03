@@ -12,7 +12,7 @@ import {
   enterRequestContext,
   getRequestContext,
 } from '@web/server/request-context/request-context';
-import { getSiteSettings } from '@web/server/site-settings/get-site-settings';
+import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
 import type { ReactElement } from 'react';
@@ -33,9 +33,12 @@ const { getThemeTokensMock, isProductionEnvironmentMock } = vi.hoisted(() => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@web/server/site-settings/get-site-settings', () => ({
-  getSiteSettings: vi.fn(),
-}));
+vi.mock(
+  '@web/server/site-settings/get-site-settings/get-site-settings',
+  () => ({
+    getSiteSettings: vi.fn(),
+  }),
+);
 
 vi.mock('@web/utils/is-production-environment', () => ({
   isProductionEnvironment: isProductionEnvironmentMock,

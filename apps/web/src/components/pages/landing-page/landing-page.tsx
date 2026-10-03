@@ -1,7 +1,7 @@
 import { FaqPageSchema } from '@web/components/features/faq-page-schema';
 import { LandingBreadcrumbs } from '@web/components/features/landing/landing-breadcrumbs';
 import { PageShell } from '@web/components/page-templates/page-shell';
-import { getLandingPage } from '@web/server/landing/get-landing-page';
+import { getLandingPage } from '@web/server/landing/get-landing-page/get-landing-page';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 
 import { LandingModuleRenderer } from './landing-module-renderer';

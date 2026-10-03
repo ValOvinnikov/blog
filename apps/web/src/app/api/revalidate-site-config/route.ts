@@ -55,9 +55,9 @@ const resolveTenantIdsToRevalidate = async (
  * On-demand revalidation endpoint for `apps/platform`'s Look/Voice/Features
  * saves — `@blog/db` writes there directly, with no wiring into this app's
  * cache, so without this call a save can take up to an hour to appear live
- * (see `@web/server/site-config/get-site-config`,
- * `@web/server/settings-features/get-effective-settings-features`,
- * `@web/server/settings-features/get-tenant-plan`). Verified with a plain shared secret
+ * (see `@web/server/site-config/get-site-config/get-site-config`,
+ * `@web/server/settings-features/get-effective-settings-features/get-effective-settings-features`,
+ * `@web/server/settings-features/get-tenant-plan/get-tenant-plan`). Verified with a plain shared secret
  * (`Authorization: Bearer <SITE_CONFIG_REVALIDATE_SECRET>`), not a signed
  * payload — this is a trusted internal service-to-service call between the
  * two apps, not a public webhook. Accepts an optional JSON body

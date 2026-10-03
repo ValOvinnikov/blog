@@ -7,7 +7,7 @@ import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { getTopicPage } from '@web/server/topic/get-topic-page';
+import { getTopicPage } from '@web/server/topic/get-topic-page/get-topic-page';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 import { getTranslations } from 'next-intl/server';

@@ -1,19 +1,25 @@
 import { CAPABILITY } from '@blog/config';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { getTenantPlan } from '@web/server/settings-features/get-tenant-plan';
+import { getEffectiveSettingsFeatures } from '@web/server/settings-features/get-effective-settings-features/get-effective-settings-features';
+import { getTenantPlan } from '@web/server/settings-features/get-tenant-plan/get-tenant-plan';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
-import { getEffectiveSettingsFeatures } from './get-effective-settings-features';
 import { isCapabilityEnabled } from './is-capability-enabled';
 
-vi.mock('@web/server/settings-features/get-tenant-plan', () => ({
-  getTenantPlan: vi.fn(),
-}));
+vi.mock(
+  '@web/server/settings-features/get-tenant-plan/get-tenant-plan',
+  () => ({
+    getTenantPlan: vi.fn(),
+  }),
+);
 vi.mock('@web/server/request-context/request-context');
-vi.mock('./get-effective-settings-features', () => ({
-  getEffectiveSettingsFeatures: vi.fn(),
-}));
+vi.mock(
+  '@web/server/settings-features/get-effective-settings-features/get-effective-settings-features',
+  () => ({
+    getEffectiveSettingsFeatures: vi.fn(),
+  }),
+);
 
 vi.mock('@blog/db', () => ({
   PLAN_REGISTRY: {

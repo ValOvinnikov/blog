@@ -2,7 +2,7 @@ import type { ITenantLocalizedParams } from '@blog/config';
 import { AccountPage } from '@web/components/pages/account-page';
 import { buildAccountMetadata } from '@web/metadata/account-metadata';
 import { enterRequestContext } from '@web/server/request-context/request-context';
-import { isReaderAccountEnabled } from '@web/server/settings-features/is-reader-account-enabled';
+import { isReaderAccountEnabled } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 

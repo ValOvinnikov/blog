@@ -1,6 +1,6 @@
 const CLIENT_LOG_ENDPOINT = '/api/client-log';
 
-// Kept in sync by hand with `@web/server/client-log/client-log-schema`'s
+// Kept in sync by hand with `@web/server/client-log/client-log-schema/client-log-schema`'s
 // caps — a client module can't import that server-only file without pulling
 // it into the browser bundle, so the two live as separately-documented
 // literals rather than a shared constant.

@@ -1,6 +1,6 @@
 import { ToastProvider } from '@web/context/toast-provider';
-import { getBookmarkStatus } from '@web/server/bookmarks/bookmark-actions';
-import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
+import { getBookmarkStatus } from '@web/server/bookmarks/bookmark-actions/bookmark-actions';
+import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import {
   customRenderServerAsync,
   screen,
@@ -10,11 +10,14 @@ import { useSession } from 'next-auth/react';
 
 import { BookmarkButtonGate } from './bookmark-button-gate';
 
-vi.mock('@web/server/settings-features/is-capability-enabled', () => ({
-  isCapabilityEnabled: vi.fn(),
-}));
+vi.mock(
+  '@web/server/settings-features/is-capability-enabled/is-capability-enabled',
+  () => ({
+    isCapabilityEnabled: vi.fn(),
+  }),
+);
 
-vi.mock('@web/server/bookmarks/bookmark-actions', () => ({
+vi.mock('@web/server/bookmarks/bookmark-actions/bookmark-actions', () => ({
   getBookmarkStatus: vi.fn(),
   setBookmarkStatus: vi.fn(),
 }));

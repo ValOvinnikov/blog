@@ -1,7 +1,7 @@
 import { CAPABILITY } from '@blog/config';
 import { service } from '@blog/service';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
+import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import { logger } from '@web/utils/logger/logger';
 
 import { NewsletterModuleView } from './newsletter-module-view';

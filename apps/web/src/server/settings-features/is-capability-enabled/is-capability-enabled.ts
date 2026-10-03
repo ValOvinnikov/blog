@@ -1,11 +1,10 @@
 import type { TCapability } from '@blog/config';
 import { PLAN_REGISTRY } from '@blog/db';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { getTenantPlan } from '@web/server/settings-features/get-tenant-plan';
+import { getEffectiveSettingsFeatures } from '@web/server/settings-features/get-effective-settings-features/get-effective-settings-features';
+import { getTenantPlan } from '@web/server/settings-features/get-tenant-plan/get-tenant-plan';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { logger } from '@web/utils/logger/logger';
-
-import { getEffectiveSettingsFeatures } from './get-effective-settings-features';
 
 /**
  * Most-restrictive-wins capability gate: a capability is enabled only when

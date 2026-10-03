@@ -10,7 +10,7 @@ import {
   enterRequestContext,
   getRequestContext,
 } from '@web/server/request-context/request-context';
-import { getSiteSettings } from '@web/server/site-settings/get-site-settings';
+import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { getThemeTokens } from '@web/utils/get-theme-tokens';
 import { isProductionEnvironment } from '@web/utils/is-production-environment';

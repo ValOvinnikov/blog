@@ -1,5 +1,5 @@
 import { JsonLd } from '@web/components/shared/json-ld';
-import { getPostPage } from '@web/server/post/get-post-page';
+import { getPostPage } from '@web/server/post/get-post-page/get-post-page';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { buildBlogPostingSchema } from '@web/utils/build-blog-posting-schema';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';

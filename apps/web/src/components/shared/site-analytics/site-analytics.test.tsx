@@ -1,14 +1,17 @@
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
-import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
+import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import { isWebAnalyticsEnabled } from '@web/utils/is-web-analytics-enabled';
 import type { ReactElement } from 'react';
 
 import { SiteAnalytics } from './site-analytics';
 
-vi.mock('@web/server/settings-features/is-capability-enabled', () => ({
-  isCapabilityEnabled: vi.fn(),
-}));
+vi.mock(
+  '@web/server/settings-features/is-capability-enabled/is-capability-enabled',
+  () => ({
+    isCapabilityEnabled: vi.fn(),
+  }),
+);
 
 vi.mock('@web/utils/is-web-analytics-enabled', () => ({
   isWebAnalyticsEnabled: vi.fn(),

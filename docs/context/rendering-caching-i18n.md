@@ -88,7 +88,7 @@
   Purging **resolved** paths does work — `revalidatePath('/<tenantId>/<locale>/
 blog/my-post')` matches the resolved-pathname tag exactly — and is how the
   route now purges a published `page_post` (#2666):
-  `@web/server/revalidate/derive-revalidate-paths` queries `@blog/service` for
+  `@web/server/revalidate/derive-revalidate-paths/derive-revalidate-paths` queries `@blog/service` for
   the post's own slug, every archive's current pagination extent
   (`getIndexPageParams`), and **every** tag/topic page of the tenant
   (`getTagParams`/`getTopicParams` for the page-1 slugs, `getTagPaginationParams`/

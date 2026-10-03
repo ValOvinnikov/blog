@@ -9,9 +9,12 @@ const { getTopicIndexPageMock } = vi.hoisted(() => ({
   getTopicIndexPageMock: vi.fn(),
 }));
 
-vi.mock('@web/server/topic-index/get-topic-index-page', () => ({
-  getTopicIndexPage: getTopicIndexPageMock,
-}));
+vi.mock(
+  '@web/server/topic-index/get-topic-index-page/get-topic-index-page',
+  () => ({
+    getTopicIndexPage: getTopicIndexPageMock,
+  }),
+);
 
 vi.mock('@web/server/request-context/request-context');
 

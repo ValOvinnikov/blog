@@ -1,6 +1,6 @@
 import { routes } from '@blog/config';
 import { toMetadata } from '@web/metadata/to-metadata';
-import { getTagIndexPage } from '@web/server/tag-index/get-tag-index-page';
+import { getTagIndexPage } from '@web/server/tag-index/get-tag-index-page/get-tag-index-page';
 import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 

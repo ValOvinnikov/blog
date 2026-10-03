@@ -11,7 +11,7 @@ import { PostContentsRail } from '@web/components/shared/post-contents-rail';
 import { PostShareLinks } from '@web/components/shared/post-share-links';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
-import { getPostPage } from '@web/server/post/get-post-page';
+import { getPostPage } from '@web/server/post/get-post-page/get-post-page';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {
   extractPostHeadings,

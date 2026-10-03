@@ -1,5 +1,5 @@
 import { service } from '@blog/service';
-import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
+import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import {
   customRenderServerAsync,
   screen,
@@ -28,11 +28,14 @@ vi.mock('@web/utils/logger/logger');
 
 vi.mock('@web/i18n/navigation');
 
-vi.mock('@web/server/settings-features/is-capability-enabled', () => ({
-  isCapabilityEnabled: vi.fn(),
-}));
+vi.mock(
+  '@web/server/settings-features/is-capability-enabled/is-capability-enabled',
+  () => ({
+    isCapabilityEnabled: vi.fn(),
+  }),
+);
 
-vi.mock('@web/server/bookmarks/bookmark-actions', () => ({
+vi.mock('@web/server/bookmarks/bookmark-actions/bookmark-actions', () => ({
   getBookmarkStatus: vi.fn(),
   setBookmarkStatus: vi.fn(),
 }));

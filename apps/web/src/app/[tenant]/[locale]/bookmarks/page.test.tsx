@@ -1,4 +1,4 @@
-import { isReaderAccountEnabled } from '@web/server/settings-features/is-reader-account-enabled';
+import { isReaderAccountEnabled } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { notFound } from 'next/navigation';
 
@@ -14,9 +14,12 @@ vi.mock('@web/components/pages/bookmarks-page', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@web/server/settings-features/is-reader-account-enabled', () => ({
-  isReaderAccountEnabled: vi.fn(),
-}));
+vi.mock(
+  '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled',
+  () => ({
+    isReaderAccountEnabled: vi.fn(),
+  }),
+);
 
 const isReaderAccountEnabledMock = vi.mocked(isReaderAccountEnabled);
 

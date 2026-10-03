@@ -45,8 +45,7 @@ export const env = createEnv({
     // bundle.
     // @env-optional
     WEB_ANALYTICS_ENABLED: z.enum(['true', 'false']).optional(),
-    // The newsletter confirmation email's `from` address
-    // (`@web/server/newsletter/newsletter-from-address.ts`): optional, falls
+    // The newsletter confirmation email's `from` address: optional, falls
     // back to Resend's own shared testing sender until a verified sending
     // domain is configured.
     // @env-optional

@@ -30,10 +30,13 @@ vi.mocked(useRouter).mockReturnValue({
   refresh: routerRefreshMock,
 } as unknown as ReturnType<typeof useRouter>);
 
-vi.mock('@web/server/newsletter/newsletter-subscription-actions', () => ({
-  unsubscribeAction: unsubscribeActionMock,
-  resendConfirmationAction: resendConfirmationActionMock,
-}));
+vi.mock(
+  '@web/server/newsletter/newsletter-subscription-actions/newsletter-subscription-actions',
+  () => ({
+    unsubscribeAction: unsubscribeActionMock,
+    resendConfirmationAction: resendConfirmationActionMock,
+  }),
+);
 
 vi.mock('@web/context/toast-provider', () => ({
   useToast: () => ({

@@ -3,8 +3,8 @@
 import { routes, TENANT_WRITE_REFUSAL } from '@blog/config';
 import { queries } from '@blog/db';
 import { buildNewsletterConfirmationEmail, sendEmail } from '@blog/email';
-import { markNewsletterSubscribed } from '@web/server/newsletter/newsletter-subscribed-cookie';
-import { resolveNewsletterEmailSettings } from '@web/server/newsletter/resolve-newsletter-email-settings';
+import { markNewsletterSubscribed } from '@web/server/newsletter/newsletter-subscribed-cookie/newsletter-subscribed-cookie';
+import { resolveNewsletterEmailSettings } from '@web/server/newsletter/resolve-newsletter-email-settings/resolve-newsletter-email-settings';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 import { resolveWritableTenant } from '@web/server/tenant/write-gate/write-gate';
 import { env } from '@web/utils/env/env';

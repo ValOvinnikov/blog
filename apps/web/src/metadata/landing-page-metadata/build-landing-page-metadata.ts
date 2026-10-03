@@ -1,7 +1,7 @@
 import { routes } from '@blog/config';
 import { routing } from '@web/i18n/routing';
 import { toMetadata } from '@web/metadata/to-metadata';
-import { getLandingPage } from '@web/server/landing/get-landing-page';
+import { getLandingPage } from '@web/server/landing/get-landing-page/get-landing-page';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';
 import { toLandingPageAlternates } from '@web/utils/to-landing-page-alternates';

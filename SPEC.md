@@ -1290,7 +1290,7 @@ storage cut over to Postgres by the config-to-Postgres transition's E5): a
 tenant's row in `@blog/db`'s `site_config` table (`preset` —
 `PRESET_ID.CONSOLE`/`EDITORIAL`, required, plus `accentHue`/`logoHue`/
 `headingFont`/`bodyFont`/`radiusScale`/`density`) is read via
-`apps/web/src/server/site-config/get-site-config.ts` and resolved by
+`apps/web/src/server/site-config/get-site-config/get-site-config.ts` and resolved by
 `apps/web/src/utils/to-theme-tokens.ts` against `@blog/config`'s
 `PRESET_REGISTRY` into a fully-populated `TThemeTokens` (never partial —
 every gap, and the case of no row existing at all, is filled by the preset's
@@ -1543,7 +1543,7 @@ moderation cost.
 its storage-layer-vocabulary exception, and `config` sits below `db` in the
 dependency graph so it cannot import that type — while both consumers
 already depend on `db` directly. `apps/web`'s
-`is-capability-enabled.ts` (`apps/web/src/server/settings-features/`)
+`is-capability-enabled.ts` (`apps/web/src/server/settings-features/is-capability-enabled/`)
 resolves the two-layer check per request and never throws; a disabled
 capability is omitted silently at its own render site (`module_newsletter`
 in `renderModules`; the bookmark button on the post-detail page; Vercel
