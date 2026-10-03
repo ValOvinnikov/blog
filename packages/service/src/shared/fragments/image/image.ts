@@ -1,5 +1,6 @@
 import type { PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config';
 import { q } from '@blog/service/sanity/query';
+import type { TLocaleParams } from '@blog/service/shared/localization/locale-params';
 
 export const sanityImageAssetFragment = q
   .fragmentForType<'sanity.imageAsset'>()
@@ -25,6 +26,31 @@ export const sanityImageFragment = q
   .fragmentForType<'imageWithAlt'>()
   .project((sub) => ({
     alt: sub.field('alt').notNull(),
+    hotspot: true,
+    crop: true,
+    asset: sub
+      .field('asset')
+      .deref()
+      .project(sanityImageAssetFragment)
+      .notNull(),
+  }));
+
+export const localizedSanityImageFragment = q
+  .parameters<TLocaleParams>()
+  .fragmentForType<'localizedImageWithAlt'>()
+  .project((sub) => ({
+    alt: sub.coalesce(
+      sub
+        .field('alt[]')
+        .filterBy('language == $locale')
+        .slice(0)
+        .field('value'),
+      sub
+        .field('alt[]')
+        .filterBy('language == $defaultLocale')
+        .slice(0)
+        .field('value'),
+    ),
     hotspot: true,
     crop: true,
     asset: sub

@@ -20,8 +20,11 @@ const isLocalizedItem = (item: unknown): item is TLocalizedItem =>
 const isLocalizedArray = (value: unknown): value is TLocalizedItem[] =>
   Array.isArray(value) && value.length > 0 && value.every(isLocalizedItem);
 
-const hasContent = (value: unknown): boolean =>
-  typeof value === 'string' ? value.trim().length > 0 : value !== undefined;
+const hasContent = (value: unknown): boolean => {
+  if (typeof value === 'string') return value.trim().length > 0;
+  if (Array.isArray(value)) return value.length > 0;
+  return value !== undefined;
+};
 
 export const getMissingLocales = (
   value: unknown,
@@ -33,6 +36,15 @@ export const getMissingLocales = (
     (locale) =>
       !items.some((item) => item.language === locale && hasContent(item.value)),
   );
+};
+
+export const getMissingTranslations = (
+  value: unknown,
+  liveLocales: readonly TLocaleIsoCode[],
+): TLocaleIsoCode[] => {
+  const missing = getMissingLocales(value, liveLocales);
+
+  return missing.length === liveLocales.length ? [] : missing;
 };
 
 const findLocalizedArrays = (value: unknown): TLocalizedItem[][] => {

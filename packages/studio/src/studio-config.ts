@@ -14,6 +14,7 @@ import {
   type TLocalizationNoticeOptions,
 } from '@blog/studio/schema-types/inputs/localization-notice-input/localization-notice-input';
 import { LOCALE_LABEL } from '@blog/studio/schema-types/inputs/localization-notice-input/missing-locales';
+import { listedTextSchema } from '@blog/studio/schema-types/portable-text/listed-text/listed-text';
 import { orderLocales } from '@blog/studio/structure/locales/order-locales';
 import { codeInput } from '@sanity/code-input';
 import { documentInternationalization } from '@sanity/document-internationalization';
@@ -97,7 +98,7 @@ export const buildStudioConfig = ({
       internationalizedArray({
         languages,
         defaultLanguages: [defaultLocale],
-        fieldTypes: ['string', 'text'],
+        fieldTypes: ['string', 'text', listedTextSchema.name],
       }),
       ...(liveLocales
         ? [

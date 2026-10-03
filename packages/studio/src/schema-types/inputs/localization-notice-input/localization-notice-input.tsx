@@ -4,7 +4,7 @@ import { isLocalizedSchemaType } from '@blog/studio/schema-types/inputs/localiza
 import {
   collectMissingLocales,
   formatLocaleList,
-  getMissingLocales,
+  getMissingTranslations,
   LOCALE_LABEL,
 } from '@blog/studio/schema-types/inputs/localization-notice-input/missing-locales';
 import {
@@ -65,7 +65,7 @@ const fieldNotices = (
   value: unknown,
   liveLocales: readonly TLocaleIsoCode[],
 ): string[] => {
-  const missing = getMissingLocales(value, liveLocales);
+  const missing = getMissingTranslations(value, liveLocales);
 
   return missing.length > 0 ? [`Missing: ${formatLocaleList(missing)}.`] : [];
 };

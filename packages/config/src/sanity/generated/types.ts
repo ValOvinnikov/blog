@@ -67,16 +67,16 @@ export type Module_cta = {
   _rev: string;
   title?: string;
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
-  headingBlock?: HeadingBlock;
-  eyebrow?: string;
-  image?: ImageWithAlt;
-  content?: ListedText;
+  headingBlock?: LocalizedHeadingBlock;
+  eyebrow?: InternationalizedArrayString;
+  image?: LocalizedImageWithAlt;
+  content?: InternationalizedArrayListedText;
   ctaButtons?: Array<
     {
       _key: string;
     } & CtaButton
   >;
-  footnote?: string;
+  footnote?: InternationalizedArrayString;
   variant?: 'BANNER' | 'SPLIT' | 'CALLOUT';
   bandTone?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
@@ -92,24 +92,17 @@ export type Module_cta = {
   };
 };
 
-export type ListedText = Array<{
-  children?: Array<{
-    marks?: Array<string>;
-    text?: string;
-    _type: 'span';
+export type InternationalizedArrayString = Array<
+  {
     _key: string;
-  }>;
-  style?: 'normal';
-  listItem?: 'bullet' | 'number';
-  markDefs?: Array<
-    {
-      _key: string;
-    } & LinkRef
-  >;
-  level?: number;
-  _type: 'block';
-  _key: string;
-}>;
+  } & InternationalizedArrayStringValue
+>;
+
+export type InternationalizedArrayListedText = Array<
+  {
+    _key: string;
+  } & InternationalizedArrayListedTextValue
+>;
 
 export type SanityImageAssetReference = {
   _ref: string;
@@ -118,13 +111,19 @@ export type SanityImageAssetReference = {
   [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
 };
 
-export type ImageWithAlt = {
-  _type: 'imageWithAlt';
+export type LocalizedImageWithAlt = {
+  _type: 'localizedImageWithAlt';
   asset?: SanityImageAssetReference;
   media?: unknown;
   hotspot?: SanityImageHotspot;
   crop?: SanityImageCrop;
-  alt?: string;
+  alt?: InternationalizedArrayString;
+};
+
+export type LocalizedHeadingBlock = {
+  _type: 'localizedHeadingBlock';
+  heading?: InternationalizedArrayString;
+  supportingText?: InternationalizedArrayText;
 };
 
 export type Module_content = {
@@ -549,6 +548,34 @@ export type InlineLink = {
     | 'RSS';
 };
 
+export type ImageWithAlt = {
+  _type: 'imageWithAlt';
+  asset?: SanityImageAssetReference;
+  media?: unknown;
+  hotspot?: SanityImageHotspot;
+  crop?: SanityImageCrop;
+  alt?: string;
+};
+
+export type ListedText = Array<{
+  children?: Array<{
+    marks?: Array<string>;
+    text?: string;
+    _type: 'span';
+    _key: string;
+  }>;
+  style?: 'normal';
+  listItem?: 'bullet' | 'number';
+  markDefs?: Array<
+    {
+      _key: string;
+    } & LinkRef
+  >;
+  level?: number;
+  _type: 'block';
+  _key: string;
+}>;
+
 export type ParagraphText = Array<{
   children?: Array<{
     marks?: Array<string>;
@@ -745,6 +772,12 @@ export type BodyImage = {
   alt?: string;
   layout?: 'INLINE' | 'FULL_BLEED' | 'FLOAT_LEFT' | 'FLOAT_RIGHT';
 };
+
+export type InternationalizedArrayText = Array<
+  {
+    _key: string;
+  } & InternationalizedArrayTextValue
+>;
 
 export type WideLayout = {
   _type: 'wideLayout';
@@ -1080,6 +1113,12 @@ export type Block_feature = {
   link?: LinkReference;
 };
 
+export type InternationalizedArrayListedTextValue = {
+  _type: 'internationalizedArrayListedTextValue';
+  value?: ListedText;
+  language?: string;
+};
+
 export type InternationalizedArrayTextValue = {
   _type: 'internationalizedArrayTextValue';
   value?: string;
@@ -1091,18 +1130,6 @@ export type InternationalizedArrayStringValue = {
   value?: string;
   language?: string;
 };
-
-export type InternationalizedArrayText = Array<
-  {
-    _key: string;
-  } & InternationalizedArrayTextValue
->;
-
-export type InternationalizedArrayString = Array<
-  {
-    _key: string;
-  } & InternationalizedArrayStringValue
->;
 
 export type TranslationMetadata = {
   _id: string;
@@ -1912,9 +1939,11 @@ export type AllSanitySchemaTypes =
   | HeadingBlock
   | Module_newsletter
   | Module_cta
-  | ListedText
+  | InternationalizedArrayString
+  | InternationalizedArrayListedText
   | SanityImageAssetReference
-  | ImageWithAlt
+  | LocalizedImageWithAlt
+  | LocalizedHeadingBlock
   | Module_content
   | ArticleText
   | Block_faqReference
@@ -1940,6 +1969,8 @@ export type AllSanitySchemaTypes =
   | Page_landingReference
   | Page_postIndexReference
   | InlineLink
+  | ImageWithAlt
+  | ListedText
   | ParagraphText
   | PricingTier
   | PricingPrice
@@ -1961,6 +1992,7 @@ export type AllSanitySchemaTypes =
   | LinkRef
   | Aside
   | BodyImage
+  | InternationalizedArrayText
   | WideLayout
   | HeroLayout
   | MigrationState
@@ -1972,10 +2004,9 @@ export type AllSanitySchemaTypes =
   | Block_faq
   | Block_testimonial
   | Block_feature
+  | InternationalizedArrayListedTextValue
   | InternationalizedArrayTextValue
   | InternationalizedArrayStringValue
-  | InternationalizedArrayText
-  | InternationalizedArrayString
   | TranslationMetadata
   | InternationalizedArrayReference
   | InternationalizedArrayReferenceValue
