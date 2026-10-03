@@ -6,6 +6,10 @@ import { moduleLayoutFragment } from '@blog/service/shared/fragments/layout/layo
 import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { listedTextBlockFragment } from '@blog/service/shared/fragments/portable-text/listed-text-block';
 import type { TLocaleParams } from '@blog/service/shared/localization/locale-params';
+import {
+  localizedField,
+  localizedProjectedField,
+} from '@blog/service/shared/localization/localized-value';
 
 export const ctaModuleQuery = q
   .parameters<TModuleQueryParams & TLocaleParams>()
@@ -16,33 +20,15 @@ export const ctaModuleQuery = q
     variant: sub.field('variant').notNull(),
     brandVariant: sub.field('brandVariant').notNull(),
     bandTone: sub.field('bandTone').nullable(true),
-    eyebrow: sub.coalesce(
-      sub
-        .field('eyebrow[]')
-        .filterBy('language == $locale')
-        .slice(0)
-        .field('value'),
-      sub
-        .field('eyebrow[]')
-        .filterBy('language == $defaultLocale')
-        .slice(0)
-        .field('value'),
-    ),
+    eyebrow: localizedField(sub, 'eyebrow'),
     headingBlock: sub
       .field('headingBlock')
       .project(localizedHeadingBlockFragment)
       .notNull(),
-    content: sub.coalesce(
+    content: localizedProjectedField(sub, (condition) =>
       sub
         .field('content[]')
-        .filterBy('language == $locale')
-        .slice(0)
-        .field('value[]')
-        .project(listedTextBlockFragment)
-        .nullable(true),
-      sub
-        .field('content[]')
-        .filterBy('language == $defaultLocale')
+        .filterBy(condition)
         .slice(0)
         .field('value[]')
         .project(listedTextBlockFragment)
@@ -57,18 +43,7 @@ export const ctaModuleQuery = q
     ...moduleContentAlignmentFragment,
     mobileMediaOrder: sub.field('mobileMediaOrder').nullable(true),
     ...ctaButtonsFragment,
-    footnote: sub.coalesce(
-      sub
-        .field('footnote[]')
-        .filterBy('language == $locale')
-        .slice(0)
-        .field('value'),
-      sub
-        .field('footnote[]')
-        .filterBy('language == $defaultLocale')
-        .slice(0)
-        .field('value'),
-    ),
+    footnote: localizedField(sub, 'footnote'),
     ...moduleLayoutFragment,
   }))
   .notNull();
