@@ -1,5 +1,5 @@
 import { imageHotspotOptions } from '@blog/studio/schema-types/fields/image-alt-field/image-alt-field';
-import { localizedStringValues } from '@blog/studio/schema-types/validation/localized-string-values/localized-string-values';
+import { validateDefaultLanguageFilled } from '@blog/studio/schema-types/validation/validate-default-language-filled/validate-default-language-filled';
 import { defineField, defineType } from 'sanity';
 
 export const localizedImageWithAltSchema = defineType({
@@ -17,11 +17,7 @@ export const localizedImageWithAltSchema = defineType({
       description:
         'Describe the image for screen readers and search engines, per language.',
       validation: (rule) =>
-        rule.custom((value) =>
-          localizedStringValues(value).length === 0
-            ? 'Describe the image.'
-            : true,
-        ),
+        rule.custom(validateDefaultLanguageFilled('Describe the image.')),
     }),
   ],
 });

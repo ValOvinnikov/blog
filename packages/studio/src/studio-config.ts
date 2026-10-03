@@ -15,6 +15,7 @@ import {
 } from '@blog/studio/schema-types/inputs/localization-notice-input/localization-notice-input';
 import { LOCALE_LABEL } from '@blog/studio/schema-types/inputs/localization-notice-input/missing-locales';
 import { listedTextSchema } from '@blog/studio/schema-types/portable-text/listed-text/listed-text';
+import { setDefaultLanguage } from '@blog/studio/schema-types/validation/default-language/default-language';
 import { orderLocales } from '@blog/studio/structure/locales/order-locales';
 import { codeInput } from '@sanity/code-input';
 import { documentInternationalization } from '@sanity/document-internationalization';
@@ -72,6 +73,8 @@ export const buildStudioConfig = ({
   defaultLocale = LOCALE_ISO_CODES.EN,
   liveLocales,
 }: TBuildStudioConfigParams) => {
+  setDefaultLanguage(defaultLocale);
+
   const offeredLocales = orderLocales(defaultLocale, liveLocales);
   const languages = offeredLocales.map((locale) => ({
     id: locale,

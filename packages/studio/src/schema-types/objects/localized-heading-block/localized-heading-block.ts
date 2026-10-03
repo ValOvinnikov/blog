@@ -1,5 +1,5 @@
 import { HEADING_REQUIRED_MESSAGE } from '@blog/studio/schema-types/objects/heading-block/heading-block';
-import { localizedStringValues } from '@blog/studio/schema-types/validation/localized-string-values/localized-string-values';
+import { validateDefaultLanguageFilled } from '@blog/studio/schema-types/validation/validate-default-language-filled/validate-default-language-filled';
 import { defineField, defineType } from 'sanity';
 
 export const localizedHeadingBlockSchema = defineType({
@@ -16,11 +16,7 @@ export const localizedHeadingBlockSchema = defineType({
       type: 'internationalizedArrayString',
       description: 'The heading text shown to readers, per language.',
       validation: (rule) =>
-        rule.custom((value) =>
-          localizedStringValues(value).length === 0
-            ? HEADING_REQUIRED_MESSAGE
-            : true,
-        ),
+        rule.custom(validateDefaultLanguageFilled(HEADING_REQUIRED_MESSAGE)),
     }),
     defineField({
       name: 'supportingText',
