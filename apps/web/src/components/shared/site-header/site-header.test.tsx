@@ -22,6 +22,10 @@ const {
 
 vi.mock('@web/server/request-context/request-context');
 
+vi.mock('@web/server/site-config/get-language-switcher-style/get-language-switcher-style', () => ({
+  getLanguageSwitcherStyle: vi.fn().mockResolvedValue('MENU_CODE'),
+}));
+
 vi.mock('@web/server/site-settings/get-site-settings/get-site-settings', () => ({
   getSiteSettings: vi.fn(),
 }));
@@ -91,6 +95,33 @@ describe(SiteHeader, () => {
         name: 'Language',
       }),
     ).toBeVisible();
+  });
+
+  it('puts the language pill and theme toggle in the open phone menu panel, leaving account in the bar', async () => {
+    getRequestContextMock.mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
+    });
+    getNavigationMock.mockResolvedValue({
+      ok: true,
+      data: { items: [], showLanguageSwitcher: true },
+    });
+
+    await setup();
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Toggle navigation menu' }),
+    );
+    const panelRow = screen.getByTestId('primary-navigation-panel-actions');
+
+    expect(
+      within(panelRow).getByRole('button', { name: 'Language: English' }),
+    ).toBeVisible();
+    expect(
+      within(panelRow).getByRole('button', { name: /Switch to/ }),
+    ).toBeVisible();
+    expect(
+      within(panelRow).queryByRole('button', { name: 'Sign in' }),
+    ).not.toBeInTheDocument();
   });
 
   it('hides the language switcher when its toggle is off', async () => {

@@ -13,6 +13,7 @@ import { siteNavigationVariants } from './site-navigation-variants';
 type TSiteNavigationProps = {
   links: ILink[];
   actions?: ReactNode;
+  panelActions?: ReactNode;
 };
 
 const isNavItemActive = (pathname: string, href: string): boolean => {
@@ -29,7 +30,11 @@ const isNavItemActive = (pathname: string, href: string): boolean => {
  * accessible name and closes the panel whenever the route changes (so a nav
  * link click never leaves it open on the next page).
  */
-export const SiteNavigation = ({ links, actions }: TSiteNavigationProps) => {
+export const SiteNavigation = ({
+  links,
+  actions,
+  panelActions,
+}: TSiteNavigationProps) => {
   const t = useTranslations('siteNavigation');
   const pathname = usePathname();
   const panelId = useId();
@@ -52,6 +57,7 @@ export const SiteNavigation = ({ links, actions }: TSiteNavigationProps) => {
       <PrimaryNavigation
         links={items}
         actions={actions}
+        panelActions={panelActions}
         linkAs={SmartLink}
         mobileToggle={{
           isOpen: open,
