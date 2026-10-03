@@ -13,6 +13,8 @@ import { imageWithAltSchema } from './image-with-alt/image-with-alt';
 import { inlineLinkSchema } from './inline-link/inline-link';
 import { layoutSchema } from './layout/layout';
 import { linkRefSchema } from './link-ref/link-ref';
+import { localizedHeadingBlockSchema } from './localized-heading-block/localized-heading-block';
+import { localizedImageWithAltSchema } from './localized-image-with-alt/localized-image-with-alt';
 import { logoItemSchema } from './logo-item/logo-item';
 import { openGraphSchema } from './open-graph/open-graph';
 import { postTakeawaysSchema } from './post-takeaways/post-takeaways';
@@ -30,6 +32,8 @@ export const objects = [
   wideLayoutSchema,
   headingBlockSchema,
   imageWithAltSchema,
+  localizedHeadingBlockSchema,
+  localizedImageWithAltSchema,
   bodyImageSchema,
   asideSchema,
   inlineLinkSchema,

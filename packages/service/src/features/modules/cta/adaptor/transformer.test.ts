@@ -7,24 +7,28 @@ import {
   CTA_VARIANT,
   LINK_TYPE,
 } from '@blog/config';
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import {
   makeRawContentBlock,
   makeRawContentMarkDef,
   makeRawCtaButton,
+  makeRawCtaImage,
   makeRawCtaModule,
 } from '@blog/service/testing/modules/fixtures';
-import {
-  makeRawHeadingBlock,
-  makeRawSanityImage,
-} from '@blog/service/testing/shared/fixtures';
+import { makeRawLocalizedEntries } from '@blog/service/testing/shared/fixtures';
 
 import { toCtaModule } from './transformer';
+
+const languages = {
+  locale: LOCALE_ISO_CODES.EN,
+  defaultLocale: LOCALE_ISO_CODES.EN,
+};
 
 describe('toCtaModule', () => {
   it('maps headingBlock and brandVariant', () => {
     const raw = makeRawCtaModule();
 
-    const cta = toCtaModule(raw);
+    const cta = toCtaModule(raw, languages);
 
     expect(cta.headingBlock).toEqual({
       heading: 'Subscribe to the newsletter',
@@ -36,7 +40,7 @@ describe('toCtaModule', () => {
   it('maps brandVariant straight through, including BRAND_PRIMARY', () => {
     const raw = makeRawCtaModule({ brandVariant: BRAND_VARIANT.BRAND_PRIMARY });
 
-    const cta = toCtaModule(raw);
+    const cta = toCtaModule(raw, languages);
 
     expect(cta.brandVariant).toBe(BRAND_VARIANT.BRAND_PRIMARY);
   });
@@ -44,7 +48,7 @@ describe('toCtaModule', () => {
   it('maps bandTone straight through', () => {
     const raw = makeRawCtaModule({ bandTone: BRAND_VARIANT.SECONDARY });
 
-    const cta = toCtaModule(raw);
+    const cta = toCtaModule(raw, languages);
 
     expect(cta.bandTone).toBe(BRAND_VARIANT.SECONDARY);
   });
@@ -52,7 +56,7 @@ describe('toCtaModule', () => {
   it('falls back to Primary when bandTone is absent', () => {
     const raw = makeRawCtaModule({ bandTone: null });
 
-    const cta = toCtaModule(raw);
+    const cta = toCtaModule(raw, languages);
 
     expect(cta.bandTone).toBe(BRAND_VARIANT.PRIMARY);
   });
@@ -60,7 +64,7 @@ describe('toCtaModule', () => {
   it('maps bandTone straight through, including BRAND_PRIMARY', () => {
     const raw = makeRawCtaModule({ bandTone: BRAND_VARIANT.BRAND_PRIMARY });
 
-    const cta = toCtaModule(raw);
+    const cta = toCtaModule(raw, languages);
 
     expect(cta.bandTone).toBe(BRAND_VARIANT.BRAND_PRIMARY);
   });
@@ -70,7 +74,7 @@ describe('toCtaModule', () => {
     (variant) => {
       const raw = makeRawCtaModule({ variant });
 
-      const cta = toCtaModule(raw);
+      const cta = toCtaModule(raw, languages);
 
       expect(cta.variant).toBe(variant);
     },
@@ -83,7 +87,7 @@ describe('toCtaModule', () => {
       contentPositionBanner: CONTENT_ALIGNMENT.LEFT,
     });
 
-    const cta = toCtaModule(raw);
+    const cta = toCtaModule(raw, languages);
 
     expect(cta.contentPosition).toBe(CONTENT_ALIGNMENT.RIGHT);
   });
@@ -95,7 +99,7 @@ describe('toCtaModule', () => {
       contentPositionBanner: CONTENT_ALIGNMENT.LEFT,
     });
 
-    const cta = toCtaModule(raw);
+    const cta = toCtaModule(raw, languages);
 
     expect(cta.contentPosition).toBe(CONTENT_ALIGNMENT.LEFT);
   });
@@ -106,7 +110,7 @@ describe('toCtaModule', () => {
       contentPositionBanner: CONTENT_ALIGNMENT.CENTER,
     });
 
-    const cta = toCtaModule(raw);
+    const cta = toCtaModule(raw, languages);
 
     expect(cta.contentPosition).toBe(CONTENT_ALIGNMENT.CENTER);
   });
@@ -118,7 +122,7 @@ describe('toCtaModule', () => {
       contentPositionBanner: CONTENT_ALIGNMENT.CENTER,
     });
 
-    const cta = toCtaModule(raw);
+    const cta = toCtaModule(raw, languages);
 
     expect(cta.contentPosition).toBeUndefined();
   });
@@ -133,14 +137,14 @@ describe('toCtaModule', () => {
       contentPositionBanner: null,
     });
 
-    expect(toCtaModule(splitRaw).contentPosition).toBeUndefined();
-    expect(toCtaModule(bannerRaw).contentPosition).toBeUndefined();
+    expect(toCtaModule(splitRaw, languages).contentPosition).toBeUndefined();
+    expect(toCtaModule(bannerRaw, languages).contentPosition).toBeUndefined();
   });
 
   it('leaves contentAlignment undefined when unset', () => {
     const raw = makeRawCtaModule({ contentAlignment: null });
 
-    const cta = toCtaModule(raw);
+    const cta = toCtaModule(raw, languages);
 
     expect(cta.contentAlignment).toBeUndefined();
   });
@@ -150,17 +154,20 @@ describe('toCtaModule', () => {
       contentAlignment: CONTENT_ALIGNMENT.CENTER,
     });
 
-    const cta = toCtaModule(raw);
+    const cta = toCtaModule(raw, languages);
 
     expect(cta.contentAlignment).toBe(CONTENT_ALIGNMENT.CENTER);
   });
 
   it('leaves supportingText undefined when not set (no faked default)', () => {
     const raw = makeRawCtaModule({
-      headingBlock: makeRawHeadingBlock('Subscribe to the newsletter'),
+      headingBlock: {
+        heading: makeRawLocalizedEntries('Subscribe to the newsletter'),
+        supportingText: null,
+      },
     });
 
-    const cta = toCtaModule(raw);
+    const cta = toCtaModule(raw, languages);
 
     expect(cta.headingBlock.supportingText).toBeUndefined();
   });
@@ -168,7 +175,7 @@ describe('toCtaModule', () => {
   it('leaves eyebrow and footnote undefined when unset', () => {
     const raw = makeRawCtaModule({ eyebrow: null, footnote: null });
 
-    const cta = toCtaModule(raw);
+    const cta = toCtaModule(raw, languages);
 
     expect(cta.eyebrow).toBeUndefined();
     expect(cta.footnote).toBeUndefined();
@@ -176,11 +183,11 @@ describe('toCtaModule', () => {
 
   it('maps eyebrow and footnote when authored', () => {
     const raw = makeRawCtaModule({
-      eyebrow: 'Limited time',
-      footnote: 'No spam, unsubscribe anytime.',
+      eyebrow: makeRawLocalizedEntries('Limited time'),
+      footnote: makeRawLocalizedEntries('No spam, unsubscribe anytime.'),
     });
 
-    const cta = toCtaModule(raw);
+    const cta = toCtaModule(raw, languages);
 
     expect(cta.eyebrow).toBe('Limited time');
     expect(cta.footnote).toBe('No spam, unsubscribe anytime.');
@@ -189,7 +196,7 @@ describe('toCtaModule', () => {
   it('leaves content undefined when unset', () => {
     const raw = makeRawCtaModule({ content: null });
 
-    const cta = toCtaModule(raw);
+    const cta = toCtaModule(raw, languages);
 
     expect(cta.content).toBeUndefined();
   });
@@ -204,16 +211,16 @@ describe('toCtaModule', () => {
         markDefs: null,
       },
     ];
-    const raw = makeRawCtaModule({ content: body });
+    const raw = makeRawCtaModule({ content: makeRawLocalizedEntries(body) });
 
-    const cta = toCtaModule(raw);
+    const cta = toCtaModule(raw, languages);
 
     expect(cta.content).toEqual([{ ...body[0], markDefs: undefined }]);
   });
 
   it('resolves an internal-document link inside content to a real href', () => {
     const raw = makeRawCtaModule({
-      content: [
+      content: makeRawLocalizedEntries([
         makeRawContentBlock({
           markDefs: [
             makeRawContentMarkDef({
@@ -227,10 +234,10 @@ describe('toCtaModule', () => {
             }),
           ],
         }),
-      ],
+      ]),
     });
 
-    const cta = toCtaModule(raw);
+    const cta = toCtaModule(raw, languages);
 
     expect(cta.content?.[0]?.markDefs?.[0]).toMatchObject({
       _key: 'mark-1',
@@ -241,7 +248,7 @@ describe('toCtaModule', () => {
 
   it('resolves an internal page_topic and page_landing reference the same way toLinkDocument does', () => {
     const topicRaw = makeRawCtaModule({
-      content: [
+      content: makeRawLocalizedEntries([
         makeRawContentBlock({
           markDefs: [
             makeRawContentMarkDef({
@@ -255,10 +262,10 @@ describe('toCtaModule', () => {
             }),
           ],
         }),
-      ],
+      ]),
     });
     const pageRaw = makeRawCtaModule({
-      content: [
+      content: makeRawLocalizedEntries([
         makeRawContentBlock({
           markDefs: [
             makeRawContentMarkDef({
@@ -272,20 +279,20 @@ describe('toCtaModule', () => {
             }),
           ],
         }),
-      ],
+      ]),
     });
 
-    expect(toCtaModule(topicRaw).content?.[0]?.markDefs?.[0]?.link?.href).toBe(
-      '/topics/engineering',
-    );
-    expect(toCtaModule(pageRaw).content?.[0]?.markDefs?.[0]?.link?.href).toBe(
-      '/about',
-    );
+    expect(
+      toCtaModule(topicRaw, languages).content?.[0]?.markDefs?.[0]?.link?.href,
+    ).toBe('/topics/engineering');
+    expect(
+      toCtaModule(pageRaw, languages).content?.[0]?.markDefs?.[0]?.link?.href,
+    ).toBe('/about');
   });
 
   it('keeps an external content link working as before', () => {
     const raw = makeRawCtaModule({
-      content: [
+      content: makeRawLocalizedEntries([
         makeRawContentBlock({
           markDefs: [
             makeRawContentMarkDef({
@@ -299,10 +306,10 @@ describe('toCtaModule', () => {
             }),
           ],
         }),
-      ],
+      ]),
     });
 
-    const cta = toCtaModule(raw);
+    const cta = toCtaModule(raw, languages);
 
     expect(cta.content?.[0]?.markDefs?.[0]?.link?.href).toBe(
       'https://example.com',
@@ -311,15 +318,15 @@ describe('toCtaModule', () => {
 
   it('degrades a dangling content link to an absent link rather than throwing', () => {
     const raw = makeRawCtaModule({
-      content: [
+      content: makeRawLocalizedEntries([
         makeRawContentBlock({
           markDefs: [makeRawContentMarkDef({ link: null })],
         }),
-      ],
+      ]),
     });
 
-    expect(() => toCtaModule(raw)).not.toThrow();
-    const cta = toCtaModule(raw);
+    expect(() => toCtaModule(raw, languages)).not.toThrow();
+    const cta = toCtaModule(raw, languages);
     expect(cta.content?.[0]?.markDefs?.[0]?.link).toBeUndefined();
     expect(cta.content?.[0]?.markDefs?.[0]?._key).toBe('mark-1');
   });
@@ -327,15 +334,15 @@ describe('toCtaModule', () => {
   it('leaves image undefined when unset', () => {
     const raw = makeRawCtaModule({ image: null });
 
-    const cta = toCtaModule(raw);
+    const cta = toCtaModule(raw, languages);
 
     expect(cta.image).toBeUndefined();
   });
 
   it('maps image when authored', () => {
-    const raw = makeRawCtaModule({ image: makeRawSanityImage() });
+    const raw = makeRawCtaModule({ image: makeRawCtaImage() });
 
-    const cta = toCtaModule(raw);
+    const cta = toCtaModule(raw, languages);
 
     expect(cta.image).toEqual({
       assetId: 'image-abc123-800x600-jpg',
@@ -350,7 +357,7 @@ describe('toCtaModule', () => {
   it('returns an empty array for an absent ctaButtons field', () => {
     const raw = makeRawCtaModule({ ctaButtons: null });
 
-    const cta = toCtaModule(raw);
+    const cta = toCtaModule(raw, languages);
 
     expect(cta.ctaButtons).toEqual([]);
   });
@@ -358,7 +365,7 @@ describe('toCtaModule', () => {
   it('returns an empty array when the ctaButtons array is present but empty', () => {
     const raw = makeRawCtaModule({ ctaButtons: [] });
 
-    const cta = toCtaModule(raw);
+    const cta = toCtaModule(raw, languages);
 
     expect(cta.ctaButtons).toEqual([]);
   });
@@ -368,7 +375,7 @@ describe('toCtaModule', () => {
       ctaButtons: [makeRawCtaButton()],
     });
 
-    const cta = toCtaModule(raw);
+    const cta = toCtaModule(raw, languages);
 
     expect(cta.ctaButtons).toEqual([
       {
@@ -403,7 +410,7 @@ describe('toCtaModule', () => {
       ],
     });
 
-    const cta = toCtaModule(raw);
+    const cta = toCtaModule(raw, languages);
 
     expect(cta.ctaButtons).toHaveLength(2);
     expect(cta.ctaButtons?.[0]).toMatchObject({
@@ -425,7 +432,7 @@ describe('toCtaModule', () => {
       ctaButtons: [makeRawCtaButton({ variant, appearance })],
     });
 
-    const cta = toCtaModule(raw);
+    const cta = toCtaModule(raw, languages);
 
     expect(cta.ctaButtons?.[0]).toMatchObject({ variant, appearance });
   });
@@ -445,7 +452,7 @@ describe('toCtaModule', () => {
       ],
     });
 
-    const cta = toCtaModule(raw);
+    const cta = toCtaModule(raw, languages);
 
     expect(cta.ctaButtons).toEqual([]);
   });
@@ -465,7 +472,7 @@ describe('toCtaModule', () => {
       ],
     });
 
-    const cta = toCtaModule(raw);
+    const cta = toCtaModule(raw, languages);
 
     expect(cta.ctaButtons?.[0]?.link.href).toBe('/blog/hello-world');
   });
@@ -481,7 +488,7 @@ describe('toCtaModule', () => {
       },
     });
 
-    const cta = toCtaModule(raw);
+    const cta = toCtaModule(raw, languages);
 
     expect(cta.layout).toEqual({
       spacingTop: 'LG',
@@ -495,8 +502,78 @@ describe('toCtaModule', () => {
   it('leaves layout undefined when the field is unset (no faked default)', () => {
     const raw = makeRawCtaModule({ layout: null });
 
-    const cta = toCtaModule(raw);
+    const cta = toCtaModule(raw, languages);
 
     expect(cta.layout).toBeUndefined();
+  });
+
+  describe('localized fields', () => {
+    const { EN, NL, FR } = LOCALE_ISO_CODES;
+    function entries<TValue>(values: Partial<Record<string, TValue>>) {
+      return Object.entries(values).map(([language, value]) => ({
+        language,
+        value: value ?? null,
+      }));
+    }
+    const raw = makeRawCtaModule({
+      eyebrow: entries({ [EN]: 'Newsletter', [NL]: 'Nieuwsbrief' }),
+      footnote: entries({ [EN]: 'Unsubscribe any time.' }),
+      headingBlock: {
+        heading: entries({ [EN]: 'Subscribe', [NL]: 'Abonneer' }),
+        supportingText: entries({ [EN]: 'New posts weekly.' }),
+      },
+      content: entries({
+        [EN]: [makeRawContentBlock({ text: 'Read on.' })],
+        [NL]: [makeRawContentBlock({ text: 'Lees verder.' })],
+      }),
+      image: {
+        ...makeRawCtaImage(),
+        alt: entries({ [EN]: 'A letter', [NL]: 'Een brief' }),
+      },
+    });
+
+    it('shows each field in the requested language', () => {
+      const cta = toCtaModule(raw, { locale: NL, defaultLocale: EN });
+
+      expect(cta.eyebrow).toBe('Nieuwsbrief');
+      expect(cta.headingBlock.heading).toBe('Abonneer');
+      expect(cta.content?.[0]?.children?.[0]?.text).toBe('Lees verder.');
+      expect(cta.image?.alt).toBe('Een brief');
+    });
+
+    it('falls back to the default language field by field', () => {
+      const cta = toCtaModule(raw, { locale: NL, defaultLocale: EN });
+
+      expect(cta.headingBlock.supportingText).toBe('New posts weekly.');
+      expect(cta.footnote).toBe('Unsubscribe any time.');
+    });
+
+    it('uses the default language when the requested one has no translations', () => {
+      const cta = toCtaModule(raw, { locale: FR, defaultLocale: EN });
+
+      expect(cta.eyebrow).toBe('Newsletter');
+      expect(cta.headingBlock.heading).toBe('Subscribe');
+    });
+
+    it('leaves a field missing in every language undefined', () => {
+      const cta = toCtaModule(
+        { ...raw, eyebrow: entries({ [FR]: 'Infolettre' }) },
+        { locale: NL, defaultLocale: EN },
+      );
+
+      expect(cta.eyebrow).toBeUndefined();
+    });
+
+    it('rejects a heading missing in every language', () => {
+      expect(() =>
+        toCtaModule(
+          {
+            ...raw,
+            headingBlock: { heading: null, supportingText: null },
+          },
+          { locale: NL, defaultLocale: EN },
+        ),
+      ).toThrow();
+    });
   });
 });

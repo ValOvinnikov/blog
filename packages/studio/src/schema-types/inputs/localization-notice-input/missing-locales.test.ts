@@ -1,6 +1,10 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 
-import { collectMissingLocales, getMissingLocales } from './missing-locales';
+import {
+  collectMissingLocales,
+  getMissingLocales,
+  getMissingTranslations,
+} from './missing-locales';
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
@@ -25,6 +29,14 @@ describe(getMissingLocales, () => {
     ).toEqual([NL]);
   });
 
+  it('treats empty formatted text as missing', () => {
+    const block = { _type: 'block', children: [] };
+
+    expect(
+      getMissingLocales([item(EN, [block]), item(NL, [])], [EN, NL]),
+    ).toEqual([NL]);
+  });
+
   it('reports every live language for an empty field', () => {
     expect(getMissingLocales(undefined, [EN, NL])).toEqual([EN, NL]);
   });
@@ -33,6 +45,19 @@ describe(getMissingLocales, () => {
     expect(
       getMissingLocales([item(EN, 'Hello'), item(FR, 'Bonjour')], [EN]),
     ).toEqual([]);
+  });
+});
+
+describe(getMissingTranslations, () => {
+  it('lists the languages a partly translated field is missing', () => {
+    expect(getMissingTranslations([item(EN, 'Hello')], [EN, NL, FR])).toEqual([
+      NL,
+      FR,
+    ]);
+  });
+
+  it('reports nothing for a field left empty in every language', () => {
+    expect(getMissingTranslations(undefined, [EN, NL])).toEqual([]);
   });
 });
 

@@ -1,5 +1,6 @@
 import type { PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config';
 import { q } from '@blog/service/sanity/query';
+import { localizedEntries } from '@blog/service/shared/localization/localized-entries';
 
 export const sanityImageAssetFragment = q
   .fragmentForType<'sanity.imageAsset'>()
@@ -25,6 +26,19 @@ export const sanityImageFragment = q
   .fragmentForType<'imageWithAlt'>()
   .project((sub) => ({
     alt: sub.field('alt').notNull(),
+    hotspot: true,
+    crop: true,
+    asset: sub
+      .field('asset')
+      .deref()
+      .project(sanityImageAssetFragment)
+      .notNull(),
+  }));
+
+export const localizedSanityImageFragment = q
+  .fragmentForType<'localizedImageWithAlt'>()
+  .project((sub) => ({
+    alt: localizedEntries(sub, 'alt'),
     hotspot: true,
     crop: true,
     asset: sub

@@ -14,12 +14,14 @@ import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-fi
 import { mediaOrderField } from '@blog/studio/schema-types/fields/media-order-field/media-order-field';
 import { spacingAndDividerFields } from '@blog/studio/schema-types/fields/spacing-and-divider-fields/spacing-and-divider-fields';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
-import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
-import { listedTextSchema } from '@blog/studio/schema-types/portable-text/listed-text/listed-text';
+import { localizedHeadingBlockField } from '@blog/studio/schema-types/objects/localized-heading-block/localized-heading-block-field';
+import { localizedImageWithAltSchema } from '@blog/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
+import { localizedStringValues } from '@blog/studio/schema-types/validation/localized-string-values/localized-string-values';
 import { toTitleCase } from '@blog/utils/primitives';
 import { Megaphone, SlidersHorizontal } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
+
+const FOOTNOTE_MAX_LENGTH = 120;
 
 type TCtaParent = { variant?: string; brandVariant?: string };
 
@@ -71,17 +73,17 @@ export const ctaSchema = defineType({
       description: 'Fill color of the card itself.',
       initialValue: BRAND_VARIANT.SECONDARY,
     }),
-    headingBlockField(),
+    localizedHeadingBlockField(),
     defineField({
       name: 'eyebrow',
       title: 'Eyebrow',
-      type: 'string',
-      description: 'Short line above the heading.',
+      type: 'internationalizedArrayString',
+      description: 'Short line above the heading, per language.',
     }),
     defineField({
       name: 'image',
       title: 'Image',
-      type: imageWithAltSchema.name,
+      type: localizedImageWithAltSchema.name,
       description: 'Optional image, placed according to the Variant.',
       validation: (rule) =>
         rule.custom<{ asset?: unknown }>((value, context) => {
@@ -100,16 +102,23 @@ export const ctaSchema = defineType({
     defineField({
       name: 'content',
       title: 'Content',
-      type: listedTextSchema.name,
-      description: 'Optional longer text below the heading.',
+      type: 'internationalizedArrayListedText',
+      description: 'Optional longer text below the heading, per language.',
     }),
     ctaButtonsField(),
     defineField({
       name: 'footnote',
       title: 'Footnote',
-      type: 'string',
-      description: 'Small print below the actions.',
-      validation: (rule) => rule.max(120),
+      type: 'internationalizedArrayString',
+      description: 'Small print below the actions, per language.',
+      validation: (rule) =>
+        rule.custom((value) =>
+          localizedStringValues(value).some(
+            (footnote) => footnote.length > FOOTNOTE_MAX_LENGTH,
+          )
+            ? `Keep each footnote to ${FOOTNOTE_MAX_LENGTH} characters or fewer.`
+            : true,
+        ),
     }),
     defineField({
       name: 'variant',
@@ -196,7 +205,7 @@ export const ctaSchema = defineType({
     prepare({ title, subtitle }) {
       return {
         title: title ?? 'Unknown',
-        subtitle,
+        subtitle: localizedStringValues(subtitle)[0],
       };
     },
   },

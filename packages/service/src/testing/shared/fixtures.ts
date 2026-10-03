@@ -1,5 +1,7 @@
 import { LINK_TYPE, SOCIAL_PLATFORMS } from '@blog/config';
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import type { postLinkFragment } from '@blog/service/shared/fragments/post/post-link';
+import type { TLocalizedEntry } from '@blog/service/shared/localization/localized-entries';
 import type { TRawFaqPageQuestion } from '@blog/service/shared/transformers/faq/resolve-faqs';
 import type { TRawHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
 import type { TRawSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image';
@@ -70,6 +72,13 @@ export function makeRawPersonBioBlock(
   overrides: Partial<TRawPersonBioBlock> & { text?: string } = {},
 ): TRawPersonBioBlock {
   return makeRawParagraphTextBlock<TRawPersonBioBlock>(overrides);
+}
+
+export function makeRawLocalizedEntries<TValue>(
+  value: TValue,
+  language: string = LOCALE_ISO_CODES.EN,
+): TLocalizedEntry<TValue>[] {
+  return [{ language, value }];
 }
 
 export function makeRawHeadingBlock(

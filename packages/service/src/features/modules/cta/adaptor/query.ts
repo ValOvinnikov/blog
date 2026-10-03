@@ -1,10 +1,14 @@
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
 import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
-import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
-import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
+import { localizedHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/localized-heading-block';
+import { localizedSanityImageFragment } from '@blog/service/shared/fragments/image/image';
 import { moduleLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { listedTextBlockFragment } from '@blog/service/shared/fragments/portable-text/listed-text-block';
+import {
+  localizedEntries,
+  localizedProjectedEntries,
+} from '@blog/service/shared/localization/localized-entries';
 
 export const ctaModuleQuery = q
   .parameters<TModuleQueryParams>()
@@ -15,22 +19,22 @@ export const ctaModuleQuery = q
     variant: sub.field('variant').notNull(),
     brandVariant: sub.field('brandVariant').notNull(),
     bandTone: sub.field('bandTone').nullable(true),
-    eyebrow: sub.field('eyebrow').nullable(true),
+    eyebrow: localizedEntries(sub, 'eyebrow'),
     headingBlock: sub
       .field('headingBlock')
-      .project(headingBlockFragment)
+      .project(localizedHeadingBlockFragment)
       .notNull(),
-    content: sub
-      .field('content[]')
-      .project(listedTextBlockFragment)
+    content: localizedProjectedEntries(sub, 'content', listedTextBlockFragment),
+    image: sub
+      .field('image')
+      .project(localizedSanityImageFragment)
       .nullable(true),
-    image: sub.field('image').project(sanityImageFragment).nullable(true),
     contentPositionSplit: sub.field('contentPositionSplit').nullable(true),
     contentPositionBanner: sub.field('contentPositionBanner').nullable(true),
     ...moduleContentAlignmentFragment,
     mobileMediaOrder: sub.field('mobileMediaOrder').nullable(true),
     ...ctaButtonsFragment,
-    footnote: sub.field('footnote').nullable(true),
+    footnote: localizedEntries(sub, 'footnote'),
     ...moduleLayoutFragment,
   }))
   .notNull();
