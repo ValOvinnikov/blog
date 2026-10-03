@@ -158,6 +158,27 @@ describe('sitemap', () => {
     expect(urls).toContain('https://example.com/about');
   });
 
+  it('keeps a single-language tenant landing entry as its own url and language alternate', async () => {
+    mockAllEmpty();
+    resolveRequestTenantMock.mockResolvedValue({
+      id: 'tenant-1',
+      locale: 'EN',
+    });
+    selectLiveLocalesMock.mockReturnValue(['EN']);
+    getPageSlugsMock.mockResolvedValue({
+      ok: true,
+      data: [{ slug: 'about', language: 'EN' }],
+    });
+    const sitemap = (await import('./sitemap')).default;
+
+    const entries = await sitemap();
+
+    expect(entries).toContainEqual({
+      url: 'https://example.com/about',
+      alternates: { languages: { en: 'https://example.com/about' } },
+    });
+  });
+
   it('lists each landing page under its own language prefix with that language as its alternate', async () => {
     mockAllEmpty();
     resolveRequestTenantMock.mockResolvedValue({

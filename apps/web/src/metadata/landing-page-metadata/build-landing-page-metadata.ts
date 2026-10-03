@@ -26,8 +26,11 @@ export const buildLandingPageMetadata = async (
   }
 
   const { seo, translations } = result.data;
-  const { locale, defaultLocale = routing.defaultLocale } =
-    await getRequestContext();
+  const {
+    locale,
+    defaultLocale = routing.defaultLocale,
+    liveLocales = [locale],
+  } = await getRequestContext();
   const metadata = await toMetadata(seo, {
     canonical: toLocalizedPathname({
       href: routes.landingPage(slug),
@@ -37,7 +40,11 @@ export const buildLandingPageMetadata = async (
     ogType: 'website',
   });
 
-  if (translations.length === 0) {
+  const liveTranslations = translations.filter(({ language }) =>
+    liveLocales.includes(language),
+  );
+
+  if (liveTranslations.every(({ language }) => language === locale)) {
     return metadata;
   }
 
@@ -45,7 +52,10 @@ export const buildLandingPageMetadata = async (
     ...metadata,
     alternates: {
       ...metadata.alternates,
-      languages: toLandingPageAlternates({ translations, defaultLocale }),
+      languages: toLandingPageAlternates({
+        translations: liveTranslations,
+        defaultLocale,
+      }),
     },
   };
 };

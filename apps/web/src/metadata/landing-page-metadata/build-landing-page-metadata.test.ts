@@ -32,7 +32,84 @@ const { EN, NL, DE } = LOCALE_ISO_CODES;
 describe('buildLandingPageMetadata', () => {
   beforeEach(() => {
     getLandingPageMock.mockReset();
-    vi.mocked(getRequestContext).mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
+    vi.mocked(getRequestContext).mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      liveLocales: [EN, NL],
+    });
+  });
+
+  it('adds no languages when the only translation is the page itself', async () => {
+    getLandingPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        ...mockLandingPage,
+        translations: [{ language: EN, slug: 'about-us' }],
+      },
+    });
+
+    const metadata = await buildLandingPageMetadata('about-us');
+
+    expect(metadata.alternates).toEqual({ canonical: '/about-us' });
+  });
+
+  it('leaves a non-live translation out of the hreflang list', async () => {
+    getLandingPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        ...mockLandingPage,
+        translations: [
+          { language: EN, slug: 'about-us' },
+          { language: NL, slug: 'over-ons' },
+          { language: DE, slug: 'ueber-uns' },
+        ],
+      },
+    });
+
+    const metadata = await buildLandingPageMetadata('about-us');
+
+    expect(metadata.alternates?.languages).toEqual({
+      en: '/about-us',
+      nl: '/nl/over-ons',
+      'x-default': '/about-us',
+    });
+  });
+
+  it('adds no languages when the only other translation is non-live', async () => {
+    getLandingPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        ...mockLandingPage,
+        translations: [
+          { language: EN, slug: 'about-us' },
+          { language: DE, slug: 'ueber-uns' },
+        ],
+      },
+    });
+
+    const metadata = await buildLandingPageMetadata('about-us');
+
+    expect(metadata.alternates).toEqual({ canonical: '/about-us' });
+  });
+
+  it('treats only the current language as live when the tenant has no live list', async () => {
+    vi.mocked(getRequestContext).mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      liveLocales: undefined,
+    });
+    getLandingPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        ...mockLandingPage,
+        translations: [
+          { language: EN, slug: 'about-us' },
+          { language: NL, slug: 'over-ons' },
+        ],
+      },
+    });
+
+    const metadata = await buildLandingPageMetadata('about-us');
+
+    expect(metadata.alternates).toEqual({ canonical: '/about-us' });
   });
 
   it('leaves the alternates without languages for a page with no translations', async () => {
@@ -98,6 +175,10 @@ describe('buildLandingPageMetadata', () => {
   });
 
   it('omits x-default when no translation exists in the default language', async () => {
+    vi.mocked(getRequestContext).mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      liveLocales: [EN, NL, DE],
+    });
     getLandingPageMock.mockResolvedValue({
       ok: true,
       data: {

@@ -9,8 +9,6 @@ import { logger } from '@web/utils/logger/logger';
 import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
 import type { MetadataRoute } from 'next';
 
-// Only `getPostParams()` projects a `publishedAt` field, so `lastModified`
-// stays unset for topic/tag/landing-page entries.
 const toEntry = (
   path: string,
   siteUrl: string,
@@ -47,17 +45,6 @@ const toLandingPageEntry = (
   };
 };
 
-/**
- * Site-wide sitemap covering every static and archive route, including
- * numbered pagination pages for consistency with the numbered `/blog/page/N`
- * entries — `itemsPerPage` here must match the page count each archive
- * route computes for its own range check (e.g. `PostIndexPage`, `TagPage`,
- * `TopicPage`) or the two disagree on how many pages exist.
- *
- * Returns an empty sitemap (logged) when no base URL resolves — every URL
- * in a sitemap must be absolute, so there is no meaningful relative
- * fallback.
- */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = await getTenantBaseUrl();
   if (!siteUrl) {
@@ -171,7 +158,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     toEntry(routes.home(), siteUrl),
     ...(blogParamsResult.ok ? [toEntry(routes.blogIndex(), siteUrl)] : []),
-    // `ok: true` alone doesn't mean the document exists — the loader is nullable.
     ...(topicIndexPageResult.ok && topicIndexPageResult.data
       ? [toEntry(routes.topics(), siteUrl)]
       : []),
