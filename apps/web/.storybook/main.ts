@@ -72,19 +72,6 @@ const config: StorybookConfig = {
       '@web/utils/report-client-error': fileURLToPath(
         new URL('./mocks/report-client-error.ts', import.meta.url),
       ),
-      // `TopicsPage` renders this for its breadcrumb trail, which resolves
-      // the request tenant through `@blog/db` for its base URL — no
-      // database connection is available in Storybook.
-      '@web/components/features/topics-index/topics-index-breadcrumbs':
-        fileURLToPath(
-          new URL('./mocks/topics-index-breadcrumbs.tsx', import.meta.url),
-        ),
-      // `TagsPage` renders this for its breadcrumb trail, same live-database
-      // problem as the topic-index breadcrumbs above.
-      '@web/components/features/tags-index/tags-index-breadcrumbs':
-        fileURLToPath(
-          new URL('./mocks/tags-index-breadcrumbs.tsx', import.meta.url),
-        ),
     };
     const encryptSecretMockPath = fileURLToPath(
       new URL('./mocks/encrypt-secret.ts', import.meta.url),
