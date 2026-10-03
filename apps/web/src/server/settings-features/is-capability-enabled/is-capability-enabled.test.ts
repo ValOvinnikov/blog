@@ -7,13 +7,19 @@ import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { isCapabilityEnabled } from './is-capability-enabled';
 
-vi.mock('@web/server/settings-features/get-tenant-plan/get-tenant-plan', () => ({
-  getTenantPlan: vi.fn(),
-}));
+vi.mock(
+  '@web/server/settings-features/get-tenant-plan/get-tenant-plan',
+  () => ({
+    getTenantPlan: vi.fn(),
+  }),
+);
 vi.mock('@web/server/request-context/request-context');
-vi.mock('@web/server/settings-features/get-effective-settings-features/get-effective-settings-features', () => ({
-  getEffectiveSettingsFeatures: vi.fn(),
-}));
+vi.mock(
+  '@web/server/settings-features/get-effective-settings-features/get-effective-settings-features',
+  () => ({
+    getEffectiveSettingsFeatures: vi.fn(),
+  }),
+);
 
 vi.mock('@blog/db', () => ({
   PLAN_REGISTRY: {

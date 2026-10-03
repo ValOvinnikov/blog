@@ -3,9 +3,12 @@ import { isCapabilityEnabled } from '@web/server/settings-features/is-capability
 
 import { isReaderAccountEnabled } from './is-reader-account-enabled';
 
-vi.mock('@web/server/settings-features/is-capability-enabled/is-capability-enabled', () => ({
-  isCapabilityEnabled: vi.fn(),
-}));
+vi.mock(
+  '@web/server/settings-features/is-capability-enabled/is-capability-enabled',
+  () => ({
+    isCapabilityEnabled: vi.fn(),
+  }),
+);
 
 const isCapabilityEnabledMock = vi.mocked(isCapabilityEnabled);
 

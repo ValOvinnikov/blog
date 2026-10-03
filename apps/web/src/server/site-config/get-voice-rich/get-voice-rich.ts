@@ -7,7 +7,6 @@ import {
 } from '@web/utils/resolve-voice-rich-fields';
 import { getMessages } from 'next-intl/server';
 
-
 /**
  * Resolves a single RICH voice field for a Server Component — the tenant's
  * stored override where one exists, otherwise the catalog default wrapped
