@@ -1,3 +1,5 @@
+import type { TLocaleIsoCode } from '@blog/config/constants';
+
 import { isr, q, runQuery, type TSlugParams } from './query';
 
 // `vi.mock`'s factory runs eagerly the moment `./client` first resolves
@@ -43,6 +45,39 @@ describe(runQuery, () => {
         tenant: testTenant,
       }),
     ).rejects.toThrow();
+  });
+});
+
+describe('runQuery injected locale parameters', () => {
+  const localizedQuery = q
+    .parameters<TSlugParams & { locale: TLocaleIsoCode }>()
+    .star.filterByType('page_landing')
+    .filterBy('slug.current == $slug')
+    .filterBy('language == $locale')
+    .slice(0)
+    .project((sub) => ({ slug: sub.field('slug.current').notNull() }))
+    .nullable(true);
+
+  it('runs a query that declares locale without the caller passing it', () => {
+    function run() {
+      return runQuery(localizedQuery, {
+        parameters: { slug: 'about' },
+        tenant: testTenant,
+      });
+    }
+
+    expectTypeOf(run).returns.resolves.toEqualTypeOf<{
+      slug: string;
+    } | null>();
+  });
+
+  it('still requires the parameters the tenant does not inject', () => {
+    function run() {
+      // @ts-expect-error -- `slug` is not injected, so omitting it is a type error.
+      return runQuery(localizedQuery, { parameters: {}, tenant: testTenant });
+    }
+
+    expectTypeOf(run).toBeFunction();
   });
 });
 

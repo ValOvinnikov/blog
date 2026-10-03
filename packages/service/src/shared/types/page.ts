@@ -1,6 +1,3 @@
-import type { TSlugParams } from '@blog/service/sanity/query';
-import type { TLocaleParams } from '@blog/service/shared/localization/locale-params';
+import type { TLocaleIsoCode } from '@blog/config/constants';
 
-type TLocaleQueryParams = Partial<TLocaleParams>;
-
-export type TLocalizedSlugParams = TSlugParams & TLocaleQueryParams;
+export type TLocalizedSlugParams = { slug: string; locale: TLocaleIsoCode };

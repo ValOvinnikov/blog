@@ -1,3 +1,4 @@
+import { toPageTranslations } from '@blog/service/shared/localization/to-page-translations';
 import { resolveFaqs } from '@blog/service/shared/transformers/faq/resolve-faqs';
 import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
 import {
@@ -8,19 +9,11 @@ import { resolveSeo } from '@blog/service/shared/transformers/seo/resolve-seo';
 import type { InferResultType } from 'groqd';
 
 import type { landingPageQuery } from './query';
-import type { TLandingPage, TLandingTranslation } from './types';
+import type { TLandingPage } from './types';
 
 export type TRawLandingPage = NonNullable<
   InferResultType<typeof landingPageQuery>
 >;
-
-function toTranslations(
-  translations: TRawLandingPage['translations'],
-): TLandingTranslation[] {
-  return (translations ?? []).flatMap(({ language, slug }) =>
-    language && slug ? [{ language, slug }] : [],
-  );
-}
 
 export function toLandingPage(raw: TRawLandingPage): TLandingPage {
   return {
@@ -30,6 +23,6 @@ export function toLandingPage(raw: TRawLandingPage): TLandingPage {
     modules: (raw.modules ?? []).map(toModule),
     faqs: resolveFaqs(raw.faqs),
     seo: resolveSeo(raw.seo),
-    translations: toTranslations(raw.translations),
+    translations: toPageTranslations(raw.translations),
   };
 }
