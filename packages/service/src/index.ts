@@ -149,6 +149,7 @@ export type {
 } from './features/modules/timeline';
 export type { THomePage } from './features/pages/home';
 export type { TLandingPage } from './features/pages/landing';
+export type { TPageTranslation } from './shared/localization/to-page-translations';
 export type {
   TPostDetail,
   TPostDetailAuthor,

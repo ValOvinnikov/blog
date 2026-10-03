@@ -3,8 +3,11 @@ import {
   type AllSanitySchemaTypes,
   type internalGroqTypeReferenceTo,
 } from '@blog/config';
-import { buildLocaleParams } from '@blog/service/shared/localization/locale-params';
-import { createGroqBuilder, makeSafeQueryRunner } from 'groqd';
+import {
+  buildLocaleParams,
+  type TLocaleParams,
+} from '@blog/service/shared/localization/locale-params';
+import { createGroqBuilder, type IGroqBuilder, type QueryConfig } from 'groqd';
 
 import { getClient, type TTenantSanityContext } from './client';
 
@@ -34,14 +37,26 @@ type TIsrOptions = {
   next: { revalidate: number; tags: string[] };
 };
 
-export const runQuery = makeSafeQueryRunner<TNextFetchOptions>(
-  (query, { parameters, next, tenant }) =>
-    getClient(tenant).fetch(
-      query,
-      { ...buildLocaleParams(tenant), ...parameters },
-      next ? { next } : undefined,
-    ),
-);
+type TCallerParameters<TParameters> = Omit<TParameters, keyof TLocaleParams>;
+
+type TParametersOption<TParameters> = unknown extends TParameters
+  ? { parameters?: Record<string, never> }
+  : Record<never, never> extends TCallerParameters<TParameters>
+    ? { parameters?: TCallerParameters<TParameters> }
+    : { parameters: TCallerParameters<TParameters> };
+
+export async function runQuery<TResult, TQueryConfig extends QueryConfig>(
+  builder: IGroqBuilder<TResult, TQueryConfig>,
+  options: TNextFetchOptions & TParametersOption<TQueryConfig['parameters']>,
+): Promise<TResult> {
+  const { parameters, next, tenant } = options;
+  const raw: unknown = await getClient(tenant).fetch(
+    builder.query,
+    { ...buildLocaleParams(tenant), ...parameters },
+    next ? { next } : undefined,
+  );
+  return builder.parse(raw);
+}
 
 /**
  * Tag-scope contract: a loader's `isr(...)` call must cover every document
