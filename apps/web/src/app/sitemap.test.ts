@@ -176,7 +176,7 @@ describe('sitemap', () => {
     expect(getPageSlugsMock).toHaveBeenCalledWith(tenantContext, ['en', 'de']);
   });
 
-  it('falls back to the default language and still renders when the host has no tenant row', async () => {
+  it('falls back to the default language when the host has no tenant row', async () => {
     mockAllEmpty();
     resolveRequestTenantMock.mockResolvedValue(undefined);
     const sitemap = (await import('./sitemap')).default;
