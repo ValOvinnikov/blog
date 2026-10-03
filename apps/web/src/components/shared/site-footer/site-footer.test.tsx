@@ -13,13 +13,19 @@ const { getFooterMock, getTranslationsMock } = vi.hoisted(() => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@web/server/site-config/get-language-switcher-style/get-language-switcher-style', () => ({
-  getLanguageSwitcherStyle: vi.fn().mockResolvedValue('MENU_CODE'),
-}));
+vi.mock(
+  '@web/server/site-config/get-language-switcher-style/get-language-switcher-style',
+  () => ({
+    getLanguageSwitcherStyle: vi.fn().mockResolvedValue('MENU_CODE'),
+  }),
+);
 
-vi.mock('@web/server/site-settings/get-site-settings/get-site-settings', () => ({
-  getSiteSettings: vi.fn(),
-}));
+vi.mock(
+  '@web/server/site-settings/get-site-settings/get-site-settings',
+  () => ({
+    getSiteSettings: vi.fn(),
+  }),
+);
 
 vi.mock('@blog/service', () => ({
   service: { global: { footer: { v1: { getFooter: getFooterMock } } } },

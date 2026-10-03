@@ -40,9 +40,12 @@ vi.mock('@blog/service', async (importOriginal) => {
 
 vi.mock('@web/utils/logger/logger');
 
-vi.mock('@web/server/settings-features/is-capability-enabled/is-capability-enabled', () => ({
-  isCapabilityEnabled: vi.fn(),
-}));
+vi.mock(
+  '@web/server/settings-features/is-capability-enabled/is-capability-enabled',
+  () => ({
+    isCapabilityEnabled: vi.fn(),
+  }),
+);
 
 vi.mock('@web/server/bookmarks/bookmark-actions/bookmark-actions', () => ({
   getBookmarkStatus: vi.fn(),

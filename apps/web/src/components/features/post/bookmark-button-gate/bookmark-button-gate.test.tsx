@@ -10,9 +10,12 @@ import { useSession } from 'next-auth/react';
 
 import { BookmarkButtonGate } from './bookmark-button-gate';
 
-vi.mock('@web/server/settings-features/is-capability-enabled/is-capability-enabled', () => ({
-  isCapabilityEnabled: vi.fn(),
-}));
+vi.mock(
+  '@web/server/settings-features/is-capability-enabled/is-capability-enabled',
+  () => ({
+    isCapabilityEnabled: vi.fn(),
+  }),
+);
 
 vi.mock('@web/server/bookmarks/bookmark-actions/bookmark-actions', () => ({
   getBookmarkStatus: vi.fn(),

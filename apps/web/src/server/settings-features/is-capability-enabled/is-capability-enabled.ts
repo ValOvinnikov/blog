@@ -6,7 +6,6 @@ import { getTenantPlan } from '@web/server/settings-features/get-tenant-plan/get
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { logger } from '@web/utils/logger/logger';
 
-
 /**
  * Most-restrictive-wins capability gate: a capability is enabled only when
  * the tenant's plan entitles it (`PLAN_REGISTRY`) *and* its own effective
