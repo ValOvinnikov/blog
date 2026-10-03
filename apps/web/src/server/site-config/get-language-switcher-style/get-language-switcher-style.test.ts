@@ -1,9 +1,9 @@
 import { LANGUAGE_SWITCHER_STYLE } from '@blog/config';
-import { getSiteConfig } from '@web/server/site-config/get-site-config';
+import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
 
 import { getLanguageSwitcherStyle } from './get-language-switcher-style';
 
-vi.mock('@web/server/site-config/get-site-config', () => ({
+vi.mock('@web/server/site-config/get-site-config/get-site-config', () => ({
   getSiteConfig: vi.fn(),
 }));
 vi.mock('@web/utils/logger/logger');
