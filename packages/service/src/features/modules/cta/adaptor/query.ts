@@ -6,10 +6,9 @@ import { moduleLayoutFragment } from '@blog/service/shared/fragments/layout/layo
 import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
 import { getLocalizedPortableTextField } from '@blog/service/shared/localization/get-localized-portable-text-field/get-localized-portable-text-field';
-import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
 
 export const ctaModuleQuery = q
-  .parameters<TModuleQueryParams & TLocaleParams>()
+  .parameters<TModuleQueryParams>()
   .star.filterByType('module_cta')
   .filterBy('_id == $id')
   .slice(0)
