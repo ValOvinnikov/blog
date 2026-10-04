@@ -1,13 +1,17 @@
 import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config';
+import type { TTenant } from '@blog/db/schema/tenants';
 import { logger } from '@web/utils/logger/logger';
 import { NextRequest, NextResponse } from 'next/server';
 
-const { resolveTenantRoutingMock, isProductionEnvironmentMock } = vi.hoisted(
-  () => ({
-    resolveTenantRoutingMock: vi.fn(),
-    isProductionEnvironmentMock: vi.fn(),
-  }),
-);
+const {
+  resolveTenantRoutingMock,
+  isProductionEnvironmentMock,
+  getTenantTranslationMapMock,
+} = vi.hoisted(() => ({
+  resolveTenantRoutingMock: vi.fn(),
+  isProductionEnvironmentMock: vi.fn(),
+  getTenantTranslationMapMock: vi.fn(),
+}));
 
 const intlMiddlewareMock = vi.fn<(request: NextRequest) => NextResponse>(() =>
   NextResponse.next(),
@@ -25,6 +29,11 @@ vi.mock('./server/tenant/resolve-tenant/resolve-tenant', () => ({
   resolveTenantRouting: resolveTenantRoutingMock,
 }));
 
+vi.mock(
+  '@web/server/translation-map/get-tenant-translation-map/get-tenant-translation-map',
+  () => ({ getTenantTranslationMap: getTenantTranslationMapMock }),
+);
+
 vi.mock('./utils/is-production-environment', () => ({
   isProductionEnvironment: isProductionEnvironmentMock,
 }));
@@ -39,7 +48,12 @@ const tenantRouting = (
   tenantId: string,
   defaultLocale: TLocaleIsoCode = LOCALE_ISO_CODES.EN,
   liveLocales: TLocaleIsoCode[] = [defaultLocale],
-) => ({ tenantId, defaultLocale, liveLocales });
+) => ({
+  tenant: { id: tenantId } as TTenant,
+  tenantId,
+  defaultLocale,
+  liveLocales,
+});
 
 const FOREIGN_TENANT_ID = 'a1b2c3d4-e5f6-4789-a012-3456789abcde';
 
@@ -524,5 +538,141 @@ describe('proxy language routing', () => {
         locales: [LOCALE_ISO_CODES.FR],
       }),
     );
+  });
+});
+
+describe('proxy language detection', () => {
+  const { EN, NL, FR } = LOCALE_ISO_CODES;
+  const BROWSER =
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.15';
+
+  const translationMap = {
+    groups: [
+      [
+        { documentType: 'page_landing', language: EN, slug: 'about' },
+        { documentType: 'page_landing', language: NL, slug: 'over-ons' },
+      ],
+    ],
+  };
+
+  const visit = (
+    pathname: string,
+    headers: Record<string, string> = {},
+    method = 'GET',
+  ) =>
+    proxy(
+      new NextRequest(`https://acme.example.com${pathname}`, {
+        method,
+        headers: {
+          host: 'acme.example.com',
+          'user-agent': BROWSER,
+          ...headers,
+        },
+      }),
+    );
+
+  const redirectPath = (response: NextResponse) =>
+    response.headers.get('location') &&
+    new URL(response.headers.get('location')!).pathname;
+
+  beforeEach(() => {
+    resolveTenantRoutingMock.mockReset();
+    resolveTenantRoutingMock.mockResolvedValue(
+      tenantRouting('tenant-1', EN, [EN, NL, FR]),
+    );
+    isProductionEnvironmentMock.mockReturnValue(true);
+    getTenantTranslationMapMock.mockReset();
+    getTenantTranslationMapMock.mockResolvedValue(translationMap);
+    intlMiddlewareMock.mockClear();
+  });
+
+  it("redirects to the page's translation in the browser's language", async () => {
+    const response = await visit('/about?ref=mail', {
+      'accept-language': 'nl-NL,nl;q=0.9,en;q=0.8',
+    });
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get('location')).toBe(
+      'https://acme.example.com/nl/over-ons?ref=mail',
+    );
+    expect(intlMiddlewareMock).not.toHaveBeenCalled();
+  });
+
+  it('forbids any cache from storing the visitor-specific redirect', async () => {
+    const response = await visit('/about', {
+      'accept-language': 'nl-NL,nl;q=0.9,en;q=0.8',
+    });
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get('cache-control')).toBe('private, no-store');
+  });
+
+  it('stays on the page when it has no translation in that language', async () => {
+    const response = await visit('/about', { 'accept-language': 'fr' });
+
+    expect(redirectPath(response)).toBeNull();
+    expect(intlMiddlewareMock).toHaveBeenCalled();
+  });
+
+  it('stays on a page outside the translation map', async () => {
+    const response = await visit('/blog', { 'accept-language': 'nl' });
+
+    expect(redirectPath(response)).toBeNull();
+  });
+
+  it('lets the remembered language override the browser language', async () => {
+    const remembersDefault = await visit('/about', {
+      'accept-language': 'nl',
+      cookie: 'NEXT_LOCALE=EN',
+    });
+    const remembersDutch = await visit('/about', {
+      'accept-language': 'fr',
+      cookie: 'NEXT_LOCALE=NL',
+    });
+
+    expect(redirectPath(remembersDefault)).toBeNull();
+    expect(redirectPath(remembersDutch)).toBe('/nl/over-ons');
+  });
+
+  it('never redirects a crawler', async () => {
+    const response = await visit('/about', {
+      'accept-language': 'nl',
+      'user-agent':
+        'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+    });
+
+    expect(redirectPath(response)).toBeNull();
+    expect(getTenantTranslationMapMock).not.toHaveBeenCalled();
+  });
+
+  it('never redirects a form submission', async () => {
+    const response = await visit('/about', { 'accept-language': 'nl' }, 'POST');
+
+    expect(redirectPath(response)).toBeNull();
+  });
+
+  it('leaves a language-prefixed URL alone', async () => {
+    await visit('/nl/over-ons', { 'accept-language': 'en' });
+
+    expect(getTenantTranslationMapMock).not.toHaveBeenCalled();
+    expect(intlMiddlewareMock).toHaveBeenCalled();
+  });
+
+  it('never looks a single-language tenant up', async () => {
+    resolveTenantRoutingMock.mockResolvedValue(tenantRouting('tenant-1', EN));
+
+    const response = await visit('/about', { 'accept-language': 'nl' });
+
+    expect(redirectPath(response)).toBeNull();
+    expect(getTenantTranslationMapMock).not.toHaveBeenCalled();
+  });
+
+  it('stays on the page when the map cannot be loaded', async () => {
+    getTenantTranslationMapMock.mockResolvedValue(undefined);
+
+    const response = await visit('/about', { 'accept-language': 'nl' });
+
+    expect(redirectPath(response)).toBeNull();
+    expect(intlMiddlewareMock).toHaveBeenCalled();
   });
 });

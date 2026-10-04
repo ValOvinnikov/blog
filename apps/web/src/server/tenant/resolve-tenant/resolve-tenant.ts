@@ -4,6 +4,7 @@ import type { TTenant } from '@blog/db/schema/tenants';
 import { isProductionEnvironment } from '@web/utils/is-production-environment';
 
 export type TTenantRouting = {
+  tenant: TTenant;
   tenantId: string;
   defaultLocale: TLocaleIsoCode;
   liveLocales: TLocaleIsoCode[];
@@ -74,6 +75,7 @@ export const resolveTenantRouting = async (
   }
 
   return {
+    tenant,
     tenantId: tenant.id,
     defaultLocale: tenant.locale,
     liveLocales: queries.tenants.selectLiveLocales(tenant),

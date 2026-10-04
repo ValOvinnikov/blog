@@ -24,6 +24,8 @@ export const routes = {
   newsletterUnsubscribe: (token: string) =>
     `/api/newsletter/unsubscribe?token=${encodeURIComponent(token)}`,
   landingPage: (slug: string) => `/${slug}`,
+  switchLanguage: (to: string, from: string) =>
+    `/api/switch-language?${new URLSearchParams({ to, from }).toString()}`,
   rssFeed: () => '/rss.xml',
   tagRssFeed: (slug: string) => `${routes.tag(slug)}/rss.xml`,
 } as const;

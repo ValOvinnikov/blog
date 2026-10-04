@@ -191,10 +191,12 @@ foundation goes in now, proven on two pilots first.
 - **Plugins on Sanity Studio v6.** Confirm `document-internationalization`
   and `internationalized-array` support v6 and its embedded mount. Pin the
   exact shape each one stores.
-- **Content-aware browser detection.** The proxy needs each page's
-  translations and slugs per language without a Sanity query on every
-  request. Options: a cached per-tenant translation map, or detection moved
-  into the page render. Pick one with its caching cost measured.
+- **Content-aware browser detection — settled (#4043).** The proxy reads
+  the cached per-tenant translation map. Its fetch carries the map's ISR tags,
+  so it is served from the Data Cache and purged by the same webhook as the
+  pages; only a miss reaches Sanity. Detection in the page render was
+  rejected: an ISR page is cached per URL and cannot vary by browser
+  language. The language switcher uses the same map through a switch route.
 - **How Studio is told a tenant's languages.** Through `StudioMount`'s plain
   string props, which must stay plain values so no built config leaves the
   package.

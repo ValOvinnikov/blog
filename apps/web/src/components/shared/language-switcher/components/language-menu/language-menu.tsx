@@ -5,7 +5,6 @@ import { Icon } from '@blog/ui/components/atoms/icon';
 import { PopoverMenu } from '@blog/ui/components/molecules/popover-menu';
 import type { TLanguageEntry } from '@web/components/shared/language-switcher/to-language-entries';
 import { usePopover } from '@web/hooks/use-popover';
-import { rememberLanguage } from '@web/utils/language-cookie/language-cookie';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 
@@ -74,12 +73,9 @@ export const LanguageMenu = ({
             as="a"
             href={entry.href}
             lang={entry.lang}
-            hrefLang={entry.hrefLang}
+            hrefLang={entry.lang}
             aria-current={entry.isCurrent ? 'page' : undefined}
-            onClick={() => {
-              rememberLanguage(entry.locale);
-              close();
-            }}
+            onClick={close}
             icon={
               <span className={checkSlot()}>
                 {entry.isCurrent && <Icon name={ICONS.CHECK} size={SIZE.SM} />}
