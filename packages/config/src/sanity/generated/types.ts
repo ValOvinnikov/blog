@@ -1042,13 +1042,6 @@ export type Settings_site = {
     | 'ZMW'
     | 'ZWG'
     | 'ZWL';
-  pricePeriodSuffix?: {
-    ONE_TIME?: InternationalizedArrayString;
-    HOUR?: InternationalizedArrayString;
-    SESSION?: InternationalizedArrayString;
-    MONTH?: InternationalizedArrayString;
-    YEAR?: InternationalizedArrayString;
-  };
 };
 
 export type Block_faq = {

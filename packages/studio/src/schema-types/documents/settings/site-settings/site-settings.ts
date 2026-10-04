@@ -1,8 +1,5 @@
-import { PRICE_PERIOD } from '@blog/config/constants';
-import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { brandSchema } from '@blog/studio/schema-types/objects/brand/brand';
-import { PRICING_PERIOD_TITLE } from '@blog/studio/schema-types/objects/pricing-price/pricing-price';
 import { Settings } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
@@ -41,20 +38,6 @@ export const siteSettingsSchema = defineType({
         list: currencyOptionList,
       },
       validation: (rule) => rule.required(),
-    }),
-    defineField({
-      name: 'pricePeriodSuffix',
-      title: 'Price Period Wording',
-      type: 'object',
-      description:
-        'How each period reads after a price on every pricing section, per language — for example “per month” or “/mo”. Left empty, the price shows no period.',
-      options: { collapsible: true, collapsed: true },
-      fields: Object.values(PRICE_PERIOD).map((period) =>
-        localizedOneLineTextField({
-          name: period,
-          title: PRICING_PERIOD_TITLE[period],
-        }),
-      ),
     }),
   ],
 });
