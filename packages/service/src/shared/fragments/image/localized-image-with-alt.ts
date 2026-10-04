@@ -7,9 +7,7 @@ export const localizedImageWithAltFragment = q
   .parameters<TLocaleParams>()
   .fragmentForType<'localizedImageWithAlt'>()
   .project((sub) => ({
-    alt: getLocalizedField(sub, (filter) =>
-      sub.field('alt[]').filterBy(filter).slice(0).field('value'),
-    ).notNull(),
+    alt: getLocalizedField(sub, 'alt').notNull(),
     hotspot: true,
     crop: true,
     asset: sub

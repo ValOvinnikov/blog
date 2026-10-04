@@ -6,10 +6,6 @@ export const localizedHeadingBlockFragment = q
   .parameters<TLocaleParams>()
   .fragmentForType<'localizedHeadingBlock'>()
   .project((sub) => ({
-    heading: getLocalizedField(sub, (filter) =>
-      sub.field('heading[]').filterBy(filter).slice(0).field('value'),
-    ).notNull(),
-    supportingText: getLocalizedField(sub, (filter) =>
-      sub.field('supportingText[]').filterBy(filter).slice(0).field('value'),
-    ),
+    heading: getLocalizedField(sub, 'heading').notNull(),
+    supportingText: getLocalizedField(sub, 'supportingText'),
   }));
