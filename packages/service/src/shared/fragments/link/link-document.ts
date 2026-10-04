@@ -20,11 +20,11 @@ export const linkDocumentFragment = localeQ
         sub
           .field('internalReference')
           .deref()
-          .project(() => ({
-            translated: localeQ.star
+          .asCombined()
+          .project((page) => ({
+            translated: page.star
               .filterByType('translation.metadata')
-              // groqd's typed filterBy rejects `references(^._id)` when the parent is a union of page types
-              .filterRaw('references(^._id)')
+              .filterBy('references(^._id)')
               .slice(0)
               .field('translations[]')
               .filterBy(filter)
@@ -40,14 +40,10 @@ export const linkDocumentFragment = localeQ
       sub
         .field('internalReference')
         .deref()
-        .project((page) => ({
+        .asCombined()
+        .project((ref) => ({
           _type: true,
-          slug: page.selectByType({
-            page_landing: (s) => s.field('slug.current'),
-            page_post: (s) => s.field('slug.current'),
-            page_tag: (s) => s.field('slug.current'),
-            page_topic: (s) => s.field('slug.current'),
-          }),
+          slug: ref.field('slug.current').nullable(true),
         })),
     ),
     url: getLocalizedField(sub, (filter) =>

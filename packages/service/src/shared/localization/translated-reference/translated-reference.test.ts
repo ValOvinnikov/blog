@@ -19,10 +19,11 @@ const query = localeQ.star
         sub
           .field('internalReference')
           .deref()
-          .project(() => ({
-            translated: localeQ.star
+          .asCombined()
+          .project((page) => ({
+            translated: page.star
               .filterByType('translation.metadata')
-              .filterRaw('references(^._id)')
+              .filterBy('references(^._id)')
               .slice(0)
               .field('translations[]')
               .filterBy(filter)
@@ -35,6 +36,7 @@ const query = localeQ.star
       sub
         .field('internalReference')
         .deref()
+        .asCombined()
         .project(() => ({ _id: true })),
     ),
   }));
