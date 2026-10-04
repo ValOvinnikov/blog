@@ -38,6 +38,7 @@ type TCachedDocumentType =
   | 'settings_newsletter'
   | 'settings_theme'
   | 'link'
+  | 'translation.metadata'
   | 'block_feature'
   | 'block_testimonial'
   | 'block_faq';
@@ -97,6 +98,7 @@ const REVALIDATE_TAGS = {
   module_timeline: ['modules:timeline'],
   module_pricing: ['modules:pricing'],
   link: ['link'],
+  'translation.metadata': ['translation.metadata'],
   block_feature: ['block_feature'],
   block_testimonial: ['block_testimonial'],
   block_faq: ['block_faq'],
