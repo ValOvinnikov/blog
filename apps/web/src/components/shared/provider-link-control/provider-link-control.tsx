@@ -6,7 +6,7 @@ import { useToast } from '@web/context/toast-provider';
 import {
   unlinkProviderAction,
   type TLinkableProvider,
-} from '@web/server/account/identity-actions';
+} from '@web/server/account/identity-actions/identity-actions';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { useTranslations } from 'next-intl';

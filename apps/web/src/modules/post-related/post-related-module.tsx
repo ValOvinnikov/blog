@@ -1,6 +1,6 @@
 import { service } from '@blog/service';
 import type { TModuleComponentProps } from '@web/modules/module-renderer';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';
 import { renderPostCardImage } from '@web/utils/render-post-card-image';
 import { toPostListItems } from '@web/utils/to-post-list-items';
@@ -9,13 +9,8 @@ import { PostRelatedModuleView } from './post-related-module-view';
 
 export type TPostRelatedModuleProps = TModuleComponentProps;
 
-/**
- * This module only ever sits on a post page's `modules[]`, so a missing
- * `context.post` means the renderer didn't supply the anchor post.
- */
 export const PostRelatedModule = async ({
   id,
-  tenant,
   context,
 }: TPostRelatedModuleProps) => {
   const postId = context?.post?.id;
@@ -24,11 +19,11 @@ export const PostRelatedModule = async ({
     return null;
   }
 
-  const tenantContext = await getTenantSanityContext(tenant);
+  const { sanityContext } = await getRequestContext();
   const result = await service.modules.postRelated.v1.getPostRelated(
     id,
     postId,
-    tenantContext,
+    sanityContext,
   );
 
   if (!result.ok) {

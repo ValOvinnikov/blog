@@ -1,20 +1,18 @@
 import { service } from '@blog/service';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';
 
 import { HeroBlogModuleView } from './hero-blog-module-view';
 
 export interface IHeroBlogModuleProps {
   id: string;
-  locale: string;
-  tenant: string;
 }
 
-export const HeroBlogModule = async ({ id, tenant }: IHeroBlogModuleProps) => {
-  const tenantContext = await getTenantSanityContext(tenant);
+export const HeroBlogModule = async ({ id }: IHeroBlogModuleProps) => {
+  const { sanityContext } = await getRequestContext();
   const result = await service.modules.heroBlog.v1.getHeroBlog(
     id,
-    tenantContext,
+    sanityContext,
   );
 
   if (!result.ok) {

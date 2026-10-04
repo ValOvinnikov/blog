@@ -1,6 +1,5 @@
 import { TAXONOMY_KIND } from '@blog/config';
 import { service } from '@blog/service';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import {
   customRenderServerAsync,
   screen,
@@ -17,6 +16,8 @@ import { notFound } from 'next/navigation';
 
 import { TagPage } from './tag-page';
 
+vi.mock('@web/server/request-context/request-context');
+
 vi.mock('@blog/service', () => ({
   service: {
     pages: { tag: { v1: { getTagPage: vi.fn() } } },
@@ -28,10 +29,6 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
-
-vi.mock('@web/server/tenant/get-tenant-base-url');
-
 vi.mock('@web/utils/logger/logger');
 
 vi.mock('@web/i18n/navigation');
@@ -40,8 +37,6 @@ const getTagPageMock = vi.mocked(service.pages.tag.v1.getTagPage);
 
 const setup = customRenderServerAsync(TagPage, {
   slug: 'typescript',
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${TagPage.name}/>`, () => {
@@ -88,7 +83,6 @@ describe(`<${TagPage.name}/>`, () => {
       'typescript',
       DEFAULT_TENANT_SANITY_CONTEXT,
     );
-    expect(getTenantSanityContext).toHaveBeenCalledWith('tenant-1');
   });
 
   it('renders the tag heading and supporting text inside main', async () => {

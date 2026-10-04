@@ -1,8 +1,11 @@
 import { BRAND_VARIANT, TAXONOMY_KIND } from '@blog/config';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import {
+  DEFAULT_REQUEST_CONTEXT,
+  DEFAULT_TENANT_SANITY_CONTEXT,
+} from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
 
 import { TaxonomyListModule } from './taxonomy-list-module';
@@ -21,9 +24,9 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
+vi.mock('@web/server/request-context/request-context');
 
-const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
+const getRequestContextMock = vi.mocked(getRequestContext);
 
 const topicsResult = (entries: unknown[] = [], showLatestPosts = true) => ({
   ok: true,
@@ -74,15 +77,13 @@ const entry = {
 describe(`<${TaxonomyListModule.name}/>`, () => {
   beforeEach(() => {
     getTaxonomyListMock.mockReset();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
+    getRequestContextMock.mockReset();
+    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
   describe('modules[] placement', () => {
     const setup = customRenderAsync(TaxonomyListModule, {
       id: 'taxonomy-list-1',
-      locale: 'en',
-      tenant: 'tenant-1',
     });
 
     it('forwards the tenant Sanity context to getTaxonomyList', async () => {
@@ -90,7 +91,6 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
 
       await setup();
 
-      expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
       expect(getTaxonomyListMock).toHaveBeenCalledWith(
         'taxonomy-list-1',
         DEFAULT_TENANT_SANITY_CONTEXT,

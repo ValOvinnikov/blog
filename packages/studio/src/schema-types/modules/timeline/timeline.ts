@@ -71,16 +71,19 @@ export const timelineSchema = defineType({
       validation: (rule) => rule.required(),
     }),
     ctaButtonsField(),
-    ...alignmentFields([
-      {
-        name: 'itemAlignment',
-        title: 'Item Alignment',
-        description: 'Aligns the marker and text within each timeline item.',
-        allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
-        initialValue: CONTENT_ALIGNMENT.LEFT,
-        validation: (rule) => rule.required(),
-      },
-    ]),
+    ...alignmentFields(
+      [
+        {
+          name: 'itemAlignment',
+          title: 'Item Alignment',
+          description: 'Aligns the marker and text within each timeline item.',
+          allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
+          initialValue: CONTENT_ALIGNMENT.LEFT,
+          validation: (rule) => rule.required(),
+        },
+      ],
+      { allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER] },
+    ),
     layoutField,
   ],
   preview: {

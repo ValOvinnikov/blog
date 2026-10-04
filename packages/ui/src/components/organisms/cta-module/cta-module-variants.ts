@@ -7,11 +7,13 @@ import {
 } from '@blog/config';
 import {
   AZURE_SCRIM_CENTER,
-  AZURE_SCRIM_LEFT,
-  AZURE_SCRIM_RIGHT,
+  AZURE_SCRIM_CENTER_BELOW_SM,
+  AZURE_SCRIM_LEFT_FROM_SM,
+  AZURE_SCRIM_RIGHT_FROM_SM,
   NEUTRAL_SCRIM_CENTER,
-  NEUTRAL_SCRIM_LEFT,
-  NEUTRAL_SCRIM_RIGHT,
+  NEUTRAL_SCRIM_CENTER_BELOW_SM,
+  NEUTRAL_SCRIM_LEFT_FROM_SM,
+  NEUTRAL_SCRIM_RIGHT_FROM_SM,
   tv,
 } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
@@ -45,7 +47,7 @@ export const ctaModuleVariants = tv({
         root: [
           'left-1/2 mx-0 w-screen max-w-none -translate-x-1/2',
           'rounded-none border-0 shadow-none',
-          'min-h-[280px] justify-center px-7 sm:px-10',
+          'min-h-[calc(var(--banner-top)+var(--banner-bottom))] justify-center px-7 sm:px-10',
         ],
         body: ['max-w-measure', 'text-prose'],
         heading: ['text-white'],
@@ -104,18 +106,26 @@ export const ctaModuleVariants = tv({
       true: { root: ['mt-0'] },
     },
     spacingTop: {
-      [SPACING_SCALE.NONE]: { root: ['pt-6 sm:pt-6'] },
-      [SPACING_SCALE.SM]: { root: ['pt-8 sm:pt-8'] },
-      [SPACING_SCALE.MD]: { root: ['pt-12 sm:pt-12'] },
-      [SPACING_SCALE.LG]: { root: ['pt-16 sm:pt-16'] },
-      [SPACING_SCALE.XL]: { root: ['pt-24 sm:pt-24'] },
+      [SPACING_SCALE.NONE]: { root: ['pt-6 sm:pt-6', '[--banner-top:6rem]'] },
+      [SPACING_SCALE.SM]: { root: ['pt-8 sm:pt-8', '[--banner-top:7rem]'] },
+      [SPACING_SCALE.MD]: { root: ['pt-12 sm:pt-12', '[--banner-top:10rem]'] },
+      [SPACING_SCALE.LG]: { root: ['pt-16 sm:pt-16', '[--banner-top:13rem]'] },
+      [SPACING_SCALE.XL]: { root: ['pt-24 sm:pt-24', '[--banner-top:18rem]'] },
     },
     spacingBottom: {
-      [SPACING_SCALE.NONE]: { root: ['pb-6 sm:pb-6'] },
-      [SPACING_SCALE.SM]: { root: ['pb-8 sm:pb-8'] },
-      [SPACING_SCALE.MD]: { root: ['pb-12 sm:pb-12'] },
-      [SPACING_SCALE.LG]: { root: ['pb-16 sm:pb-16'] },
-      [SPACING_SCALE.XL]: { root: ['pb-24 sm:pb-24'] },
+      [SPACING_SCALE.NONE]: {
+        root: ['pb-6 sm:pb-6', '[--banner-bottom:6rem]'],
+      },
+      [SPACING_SCALE.SM]: { root: ['pb-8 sm:pb-8', '[--banner-bottom:7rem]'] },
+      [SPACING_SCALE.MD]: {
+        root: ['pb-12 sm:pb-12', '[--banner-bottom:10rem]'],
+      },
+      [SPACING_SCALE.LG]: {
+        root: ['pb-16 sm:pb-16', '[--banner-bottom:13rem]'],
+      },
+      [SPACING_SCALE.XL]: {
+        root: ['pb-24 sm:pb-24', '[--banner-bottom:18rem]'],
+      },
     },
   },
   compoundVariants: [
@@ -138,7 +148,9 @@ export const ctaModuleVariants = tv({
       variant: CTA_VARIANT.BANNER,
       tone: BRAND_VARIANT.BRAND_PRIMARY,
       position: CONTENT_ALIGNMENT.LEFT,
-      class: { overlay: [AZURE_SCRIM_LEFT] },
+      class: {
+        overlay: [AZURE_SCRIM_CENTER_BELOW_SM, AZURE_SCRIM_LEFT_FROM_SM],
+      },
     },
     {
       variant: CTA_VARIANT.BANNER,
@@ -150,13 +162,17 @@ export const ctaModuleVariants = tv({
       variant: CTA_VARIANT.BANNER,
       tone: BRAND_VARIANT.BRAND_PRIMARY,
       position: CONTENT_ALIGNMENT.RIGHT,
-      class: { overlay: [AZURE_SCRIM_RIGHT] },
+      class: {
+        overlay: [AZURE_SCRIM_CENTER_BELOW_SM, AZURE_SCRIM_RIGHT_FROM_SM],
+      },
     },
     {
       variant: CTA_VARIANT.BANNER,
       tone: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
       position: CONTENT_ALIGNMENT.LEFT,
-      class: { overlay: [NEUTRAL_SCRIM_LEFT] },
+      class: {
+        overlay: [NEUTRAL_SCRIM_CENTER_BELOW_SM, NEUTRAL_SCRIM_LEFT_FROM_SM],
+      },
     },
     {
       variant: CTA_VARIANT.BANNER,
@@ -168,12 +184,14 @@ export const ctaModuleVariants = tv({
       variant: CTA_VARIANT.BANNER,
       tone: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
       position: CONTENT_ALIGNMENT.RIGHT,
-      class: { overlay: [NEUTRAL_SCRIM_RIGHT] },
+      class: {
+        overlay: [NEUTRAL_SCRIM_CENTER_BELOW_SM, NEUTRAL_SCRIM_RIGHT_FROM_SM],
+      },
     },
     {
       variant: CTA_VARIANT.BANNER,
       position: CONTENT_ALIGNMENT.LEFT,
-      class: { root: ['items-start'] },
+      class: { root: ['items-center sm:items-start'] },
     },
     {
       variant: CTA_VARIANT.BANNER,
@@ -183,7 +201,17 @@ export const ctaModuleVariants = tv({
     {
       variant: CTA_VARIANT.BANNER,
       position: CONTENT_ALIGNMENT.RIGHT,
-      class: { root: ['items-end'] },
+      class: { root: ['items-center sm:items-end'] },
+    },
+    {
+      variant: CTA_VARIANT.BANNER,
+      position: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.RIGHT],
+      class: {
+        root: ['max-sm:text-center'],
+        group: ['max-sm:mx-auto'],
+        footnote: ['max-sm:mx-auto'],
+        actions: ['max-sm:justify-center'],
+      },
     },
     {
       variant: CTA_VARIANT.SPLIT,

@@ -1,4 +1,5 @@
-import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
+import { routing } from '@web/i18n/routing';
+import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 
 const {
   getPostParamsMock,
@@ -11,6 +12,8 @@ const {
   getTopicIndexPageMock,
   getTagIndexPageMock,
   getHostTenantSanityContextMock,
+  resolveRequestTenantMock,
+  selectLiveLocalesMock,
 } = vi.hoisted(() => ({
   getPostParamsMock: vi.fn(),
   getTopicParamsMock: vi.fn(),
@@ -22,13 +25,26 @@ const {
   getTopicIndexPageMock: vi.fn(),
   getTagIndexPageMock: vi.fn(),
   getHostTenantSanityContextMock: vi.fn(),
+  resolveRequestTenantMock: vi.fn(),
+  selectLiveLocalesMock: vi.fn(),
 }));
 
-vi.mock('@web/server/tenant/get-host-tenant-sanity-context', () => ({
-  getHostTenantSanityContext: getHostTenantSanityContextMock,
+vi.mock('@web/server/tenant/request-tenant/request-tenant', () => ({
+  resolveRequestTenant: resolveRequestTenantMock,
 }));
 
-vi.mock('@web/server/tenant/get-tenant-base-url');
+vi.mock('@blog/db', () => ({
+  queries: { tenants: { selectLiveLocales: selectLiveLocalesMock } },
+}));
+
+vi.mock(
+  '@web/server/tenant/tenant-sanity-context/tenant-sanity-context',
+  () => ({
+    getHostTenantSanityContext: getHostTenantSanityContextMock,
+  }),
+);
+
+vi.mock('@web/server/tenant/tenant-base-url/tenant-base-url');
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -70,13 +86,16 @@ const mockAllEmpty = () => {
 
 describe('sitemap', () => {
   beforeEach(async () => {
-    const fresh = await import('@web/server/tenant/get-tenant-base-url');
+    const fresh =
+      await import('@web/server/tenant/tenant-base-url/tenant-base-url');
     getTenantBaseUrlMock = vi.mocked(fresh.getTenantBaseUrl);
     getHostTenantSanityContextMock.mockResolvedValue({
       isResolvable: true,
       tenant: undefined,
     });
     getTenantBaseUrlMock.mockResolvedValue('https://example.com');
+    resolveRequestTenantMock.mockResolvedValue({ id: 'tenant-1' });
+    selectLiveLocalesMock.mockReturnValue(['en']);
   });
 
   afterEach(() => {
@@ -91,6 +110,8 @@ describe('sitemap', () => {
     getTopicIndexPageMock.mockReset();
     getTagIndexPageMock.mockReset();
     getHostTenantSanityContextMock.mockReset();
+    resolveRequestTenantMock.mockReset();
+    selectLiveLocalesMock.mockReset();
     getTenantBaseUrlMock.mockReset();
   });
 
@@ -117,7 +138,7 @@ describe('sitemap', () => {
     });
     getPageSlugsMock.mockResolvedValue({
       ok: true,
-      data: [{ slug: 'about' }],
+      data: [{ slug: 'about', language: 'EN' }],
     });
     const sitemap = (await import('./sitemap')).default;
 
@@ -135,6 +156,91 @@ describe('sitemap', () => {
     expect(urls).toContain('https://example.com/topics/news');
     expect(urls).toContain('https://example.com/tags/typescript');
     expect(urls).toContain('https://example.com/about');
+  });
+
+  it('keeps a single-language tenant landing entry as its own url and language alternate', async () => {
+    mockAllEmpty();
+    resolveRequestTenantMock.mockResolvedValue({
+      id: 'tenant-1',
+      locale: 'EN',
+    });
+    selectLiveLocalesMock.mockReturnValue(['EN']);
+    getPageSlugsMock.mockResolvedValue({
+      ok: true,
+      data: [{ slug: 'about', language: 'EN' }],
+    });
+    const sitemap = (await import('./sitemap')).default;
+
+    const entries = await sitemap();
+
+    expect(entries).toContainEqual({
+      url: 'https://example.com/about',
+      alternates: { languages: { en: 'https://example.com/about' } },
+    });
+  });
+
+  it('lists each landing page under its own language prefix with that language as its alternate', async () => {
+    mockAllEmpty();
+    resolveRequestTenantMock.mockResolvedValue({
+      id: 'tenant-1',
+      locale: 'EN',
+    });
+    selectLiveLocalesMock.mockReturnValue(['EN', 'NL']);
+    getPageSlugsMock.mockResolvedValue({
+      ok: true,
+      data: [
+        { slug: 'about', language: 'EN' },
+        { slug: 'over-ons', language: 'NL' },
+      ],
+    });
+    const sitemap = (await import('./sitemap')).default;
+
+    const entries = await sitemap();
+
+    expect(entries).toContainEqual(
+      expect.objectContaining({
+        url: 'https://example.com/about',
+        alternates: { languages: { en: 'https://example.com/about' } },
+      }),
+    );
+    expect(entries).toContainEqual(
+      expect.objectContaining({
+        url: 'https://example.com/nl/over-ons',
+        alternates: { languages: { nl: 'https://example.com/nl/over-ons' } },
+      }),
+    );
+  });
+
+  it("requests landing page slugs with the tenant's live languages", async () => {
+    mockAllEmpty();
+    const tenantRow = { id: 'tenant-1' };
+    const tenantContext = { projectId: 'p' };
+    resolveRequestTenantMock.mockResolvedValue(tenantRow);
+    getHostTenantSanityContextMock.mockResolvedValue({
+      isResolvable: true,
+      tenant: tenantContext,
+    });
+    selectLiveLocalesMock.mockReturnValue(['en', 'de']);
+    const sitemap = (await import('./sitemap')).default;
+
+    await sitemap();
+
+    expect(selectLiveLocalesMock).toHaveBeenCalledWith(tenantRow);
+    expect(getPageSlugsMock).toHaveBeenCalledWith(tenantContext, ['en', 'de']);
+  });
+
+  it('falls back to the default language when the host has no tenant row', async () => {
+    mockAllEmpty();
+    resolveRequestTenantMock.mockResolvedValue(undefined);
+    const sitemap = (await import('./sitemap')).default;
+
+    const entries = await sitemap();
+
+    expect(selectLiveLocalesMock).not.toHaveBeenCalled();
+    expect(getPageSlugsMock).toHaveBeenCalledWith(undefined, [
+      routing.defaultLocale,
+    ]);
+    expect(entries.map((entry) => entry.url)).toContain('https://example.com/');
   });
 
   it('includes numbered topic and tag pagination pages', async () => {

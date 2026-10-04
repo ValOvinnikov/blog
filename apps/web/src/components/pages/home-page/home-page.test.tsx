@@ -1,30 +1,31 @@
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
 
 import { HomePage } from './home-page';
 
-const { getHomePageMock, getTenantSanityContextMock, homeModuleRendererMock } =
-  vi.hoisted(() => ({
-    getHomePageMock: vi.fn(),
-    getTenantSanityContextMock: vi.fn(),
-    homeModuleRendererMock: vi.fn(
-      ({
-        hero,
-        headingBlock,
-        modules,
-      }: {
-        hero?: { id: string };
-        headingBlock: { heading: string };
-        modules: { id: string }[];
-      }) => (
-        <div data-testid="home-module-renderer">
-          {hero ? hero.id : headingBlock.heading} — {modules.length} modules
-        </div>
-      ),
+const { getHomePageMock, homeModuleRendererMock } = vi.hoisted(() => ({
+  getHomePageMock: vi.fn(),
+  homeModuleRendererMock: vi.fn(
+    ({
+      hero,
+      headingBlock,
+      modules,
+    }: {
+      hero?: { id: string };
+      headingBlock: { heading: string };
+      modules: { id: string }[];
+    }) => (
+      <div data-testid="home-module-renderer">
+        {hero ? hero.id : headingBlock.heading} — {modules.length} modules
+      </div>
     ),
-  }));
+  ),
+}));
+
+vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -34,24 +35,15 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
-
 vi.mock('./home-module-renderer', () => ({
   HomeModuleRenderer: homeModuleRendererMock,
 }));
 
-const setup = customRenderAsync(HomePage, {
-  locale: 'en',
-  tenant: 'tenant-1',
-});
+const setup = customRenderAsync(HomePage, {});
 
 describe(`<${HomePage.name}/>`, () => {
   beforeEach(() => {
     getHomePageMock.mockReset();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
   it('calls notFound() and logs when the fetch fails', async () => {
@@ -115,8 +107,6 @@ describe(`<${HomePage.name}/>`, () => {
         hero: { id: 'hero-1', type: 'module_hero' },
         headingBlock: makeHeadingBlock({ heading: 'Welcome to the blog' }),
         modules: [{ id: 'module-1', type: 'module_content' }],
-        locale: 'en',
-        tenant: 'tenant-1',
       },
       undefined,
     );
@@ -147,13 +137,16 @@ describe(`<${HomePage.name}/>`, () => {
     );
   });
 
-  it('forwards the resolved tenant Sanity context to getHomePage', async () => {
+  it('forwards the request context Sanity context to getHomePage', async () => {
     const tenant = {
       projectId: 'tenant-project',
       dataset: 'production',
       token: 'tenant-token',
     };
-    getTenantSanityContextMock.mockResolvedValue(tenant);
+    vi.mocked(getRequestContext).mockResolvedValueOnce({
+      ...DEFAULT_REQUEST_CONTEXT,
+      sanityContext: tenant,
+    });
     getHomePageMock.mockResolvedValue({
       ok: true,
       data: {

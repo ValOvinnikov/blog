@@ -15,5 +15,6 @@ export const navigationQuery = q.star
           .notNull(),
       }))
       .nullable(true),
+    showLanguageSwitcher: sub.field('showLanguageSwitcher').nullable(true),
   }))
   .notNull();

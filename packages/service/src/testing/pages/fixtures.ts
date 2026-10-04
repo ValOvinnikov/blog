@@ -184,6 +184,7 @@ export function makeRawLandingPage(
     ],
     faqs: [makeRawFaqPageQuestion()],
     seo: makeRawSeo(),
+    translations: [{ language: 'EN', slug: 'about' }],
     ...overrides,
   };
 }

@@ -1,10 +1,10 @@
 import { BRAND_VARIANT, HERO_VARIANT } from '@blog/config';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { STATIC_SANITY_IMAGE_BASE_URL } from '@web/testing/providers';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { HeroStatementModule } from './hero-statement-module';
 
@@ -20,9 +20,9 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
+vi.mock('@web/server/request-context/request-context');
 
-const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
+const getRequestContextMock = vi.mocked(getRequestContext);
 
 const makeHeroStatementData = (overrides: Record<string, unknown> = {}) => ({
   brandVariant: BRAND_VARIANT.PRIMARY,
@@ -40,15 +40,13 @@ const makeHeroStatementData = (overrides: Record<string, unknown> = {}) => ({
 
 const setup = customRenderAsync(HeroStatementModule, {
   id: 'hero-statement-1',
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${HeroStatementModule.name}/>`, () => {
   beforeEach(() => {
     getHeroStatementMock.mockReset();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
+    getRequestContextMock.mockReset();
+    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
   it('forwards the resolved tenant Sanity context to getHeroStatement', async () => {
@@ -57,7 +55,10 @@ describe(`<${HeroStatementModule.name}/>`, () => {
       dataset: 'production',
       token: 'tenant-token',
     };
-    getTenantSanityContextMock.mockResolvedValue(tenant);
+    getRequestContextMock.mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      sanityContext: tenant,
+    });
     getHeroStatementMock.mockResolvedValue({
       ok: true,
       data: makeHeroStatementData(),
@@ -69,7 +70,6 @@ describe(`<${HeroStatementModule.name}/>`, () => {
       'hero-statement-1',
       tenant,
     );
-    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
   });
 
   it('renders nothing when the fetch fails', async () => {

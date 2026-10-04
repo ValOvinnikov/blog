@@ -1,8 +1,8 @@
-import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
+import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { NewsletterModule } from './newsletter-module';
 
@@ -24,22 +24,23 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
+vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@web/server/settings-features/is-capability-enabled', () => ({
-  isCapabilityEnabled: vi.fn(),
-}));
+vi.mock(
+  '@web/server/settings-features/is-capability-enabled/is-capability-enabled',
+  () => ({
+    isCapabilityEnabled: vi.fn(),
+  }),
+);
 
-vi.mock('@web/server/newsletter/newsletter-actions', () => ({
+vi.mock('@web/server/newsletter/newsletter-actions/newsletter-actions', () => ({
   subscribeToNewsletterAction: vi.fn(),
 }));
 
-const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
+const getRequestContextMock = vi.mocked(getRequestContext);
 
 const setup = customRenderAsync(NewsletterModule, {
   id: 'newsletter-1',
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${NewsletterModule.name}/>`, () => {
@@ -52,8 +53,8 @@ describe(`<${NewsletterModule.name}/>`, () => {
     });
     vi.mocked(isCapabilityEnabled).mockReset();
     vi.mocked(isCapabilityEnabled).mockResolvedValue(true);
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
+    getRequestContextMock.mockReset();
+    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
   it('renders nothing when the fetch fails', async () => {
@@ -143,7 +144,10 @@ describe(`<${NewsletterModule.name}/>`, () => {
       dataset: 'production',
       token: 'tenant-token',
     };
-    getTenantSanityContextMock.mockResolvedValue(tenant);
+    getRequestContextMock.mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      sanityContext: tenant,
+    });
     getNewsletterMock.mockResolvedValue({
       ok: false,
       error: new Error('boom'),
@@ -152,7 +156,6 @@ describe(`<${NewsletterModule.name}/>`, () => {
     await setup();
 
     expect(getNewsletterMock).toHaveBeenCalledWith('newsletter-1', tenant);
-    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
   });
 
   it('renders nothing, without fetching, when the NEWSLETTER capability is off', async () => {
@@ -164,7 +167,7 @@ describe(`<${NewsletterModule.name}/>`, () => {
     expect(getNewsletterMock).not.toHaveBeenCalled();
   });
 
-  it('forwards the tenant route param to isCapabilityEnabled', async () => {
+  it('checks the NEWSLETTER capability', async () => {
     getNewsletterMock.mockResolvedValue({
       ok: false,
       error: new Error('boom'),
@@ -172,6 +175,6 @@ describe(`<${NewsletterModule.name}/>`, () => {
 
     await setup();
 
-    expect(isCapabilityEnabled).toHaveBeenCalledWith('NEWSLETTER', 'tenant-1');
+    expect(isCapabilityEnabled).toHaveBeenCalledWith('NEWSLETTER');
   });
 });

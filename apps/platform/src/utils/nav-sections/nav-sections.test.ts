@@ -1,4 +1,6 @@
+import { ICON_REGISTRY } from '@platform/components/shared/icon/icon-registry';
 import messages from '@platform/i18n/messages/en.json';
+import type { TPlanPageAccess } from '@platform/utils/plan-page-access/plan-page-access';
 import { createTranslator } from 'next-intl';
 
 import {
@@ -109,45 +111,51 @@ describe('tenantNavSections', () => {
     expect(voice?.badge).toBeUndefined();
   });
 
-  it('still badges Features, Domain and Email "this milestone" in neutral tone', () => {
+  it('leaves Features, Languages, Domain and Email unbadged', () => {
     const [, , configuration] = tenantNavSections(t, 'tenant-1', 'Acme Co');
-    const features = configuration!.items.find(
-      (item) => item.label === 'Features',
-    );
-    const domain = configuration!.items.find((item) => item.label === 'Domain');
-    const email = configuration!.items.find((item) => item.label === 'Email');
-
-    expect(features?.badge).toEqual({
-      label: 'this milestone',
-      tone: 'neutral',
-    });
-    expect(domain?.badge).toEqual({
-      label: 'this milestone',
-      tone: 'neutral',
-    });
-    expect(email?.badge).toEqual({ label: 'this milestone', tone: 'neutral' });
-  });
-
-  it('badges the remaining three unbuilt destinations "later" in warn tone, with no href, inside the Configuration section', () => {
-    const [, , configuration] = tenantNavSections(t, 'tenant-1', 'Acme Co');
-    const later = configuration!.items.filter(
-      (item) => item.badge?.label === 'later',
+    const shipped = configuration!.items.filter((item) =>
+      ['Features', 'Languages', 'Domain', 'Email'].includes(item.label),
     );
 
-    expect(later).toHaveLength(3);
-    for (const item of later) {
-      expect(item.href).toBeUndefined();
-      expect(item.badge?.tone).toBe('warn');
+    expect(shipped).toHaveLength(4);
+    for (const item of shipped) {
+      expect(item.badge).toBeUndefined();
     }
   });
 
-  it('lists the eight Configuration-section destinations, Look through Team, with no Studio', () => {
+  it('shows Subscribers, Comments and Team as non-interactive "Coming soon" entries', () => {
+    const [, , configuration] = tenantNavSections(t, 'tenant-1', 'Acme Co');
+    const comingSoon = configuration!.items.filter(
+      (item) => item.badge?.label === 'Coming soon',
+    );
+
+    expect(comingSoon.map((item) => item.label)).toEqual([
+      'Subscribers',
+      'Comments',
+      'Team',
+    ]);
+    for (const item of comingSoon) {
+      expect(item.href).toBeUndefined();
+    }
+  });
+
+  it('carries no "this milestone" or "later" badge on any entry', () => {
+    const labels = tenantNavSections(t, 'tenant-1', 'Acme Co').flatMap(
+      (section) => section.items.map((item) => item.badge?.label),
+    );
+
+    expect(labels).not.toContain('this milestone');
+    expect(labels).not.toContain('later');
+  });
+
+  it('lists the nine Configuration-section destinations, Look through Team, with no Studio', () => {
     const [, , configuration] = tenantNavSections(t, 'tenant-1', 'Acme Co');
 
     expect(configuration!.items.map((item) => item.label)).toEqual([
       'Look',
       'Voice',
       'Features',
+      'Languages',
       'Domain',
       'Email',
       'Subscribers',
@@ -174,45 +182,102 @@ describe('tenantNavSections', () => {
   });
 });
 
+const EVERY_PAGE: TPlanPageAccess = {
+  languages: true,
+  email: true,
+  subscribers: true,
+  comments: true,
+  team: true,
+};
+
+const NO_PAGE: TPlanPageAccess = {
+  languages: false,
+  email: false,
+  subscribers: false,
+  comments: false,
+  team: false,
+};
+
+const configurationLabels = (access: TPlanPageAccess) => {
+  const [, configuration] = dashboardNavSections(t, access);
+  return configuration!.items.map((item) => item.label);
+};
+
 describe('dashboardNavSections', () => {
-  it('lists exactly two sections: Content (Studio) and Configuration (Look, Voice, Features, Domain, Email)', () => {
-    const [content, configuration] = dashboardNavSections(t);
+  it('lists Content (Studio) and Configuration, with every page the plan can use', () => {
+    const [content, configuration] = dashboardNavSections(t, EVERY_PAGE);
 
     expect(content!.label).toBe('Content');
     expect(configuration!.label).toBe('Configuration');
     expect(content!.items.map((item) => item.label)).toEqual(['Studio']);
-    expect(configuration!.items.map((item) => item.label)).toEqual([
+    expect(configurationLabels(EVERY_PAGE)).toEqual([
+      'Look',
+      'Voice',
+      'Features',
+      'Languages',
+      'Domain',
+      'Email',
+      'Subscribers',
+      'Comments',
+      'Team',
+    ]);
+  });
+
+  it('keeps only the pages every plan can use when the plan allows none of the gated ones', () => {
+    expect(configurationLabels(NO_PAGE)).toEqual([
       'Look',
       'Voice',
       'Features',
       'Domain',
-      'Email',
     ]);
   });
 
-  it('gives Look, Voice, Features, Domain, Email and Studio their /dashboard hrefs', () => {
-    const [content, configuration] = dashboardNavSections(t);
-    const look = configuration!.items.find((item) => item.label === 'Look');
-    const voice = configuration!.items.find((item) => item.label === 'Voice');
-    const features = configuration!.items.find(
-      (item) => item.label === 'Features',
+  it.each([
+    ['languages', 'Languages'],
+    ['email', 'Email'],
+    ['subscribers', 'Subscribers'],
+    ['comments', 'Comments'],
+    ['team', 'Team'],
+  ] as const)('shows %s only when the plan can use it', (page, label) => {
+    expect(configurationLabels({ ...NO_PAGE, [page]: true })).toContain(label);
+    expect(configurationLabels({ ...EVERY_PAGE, [page]: false })).not.toContain(
+      label,
     );
-    const domain = configuration!.items.find((item) => item.label === 'Domain');
-    const email = configuration!.items.find((item) => item.label === 'Email');
-    const studio = content!.items.find((item) => item.label === 'Studio');
+  });
 
-    expect(look?.href).toBe('/dashboard/look');
-    expect(voice?.href).toBe('/dashboard/voice');
-    expect(features?.href).toBe('/dashboard/features');
-    expect(domain?.href).toBe('/dashboard/domain');
-    expect(email?.href).toBe('/dashboard/email');
-    expect(studio?.href).toBe('/dashboard/studio');
-    expect(studio?.badge).toBeUndefined();
+  it('shows Subscribers, Comments and Team as non-interactive "Coming soon" entries', () => {
+    const [, configuration] = dashboardNavSections(t, EVERY_PAGE);
+    const comingSoon = configuration!.items.filter(
+      (item) => item.badge?.label === 'Coming soon',
+    );
+
+    expect(comingSoon.map((item) => item.label)).toEqual([
+      'Subscribers',
+      'Comments',
+      'Team',
+    ]);
+    for (const item of comingSoon) {
+      expect(item.href).toBeUndefined();
+    }
+  });
+
+  it('gives Look, Voice, Features, Languages, Domain, Email and Studio their /dashboard hrefs', () => {
+    const [content, configuration] = dashboardNavSections(t, EVERY_PAGE);
+    const hrefOf = (label: string) =>
+      configuration!.items.find((item) => item.label === label)?.href;
+
+    expect(hrefOf('Look')).toBe('/dashboard/look');
+    expect(hrefOf('Voice')).toBe('/dashboard/voice');
+    expect(hrefOf('Features')).toBe('/dashboard/features');
+    expect(hrefOf('Languages')).toBe('/dashboard/languages');
+    expect(hrefOf('Domain')).toBe('/dashboard/domain');
+    expect(hrefOf('Email')).toBe('/dashboard/email');
+    expect(content!.items[0]).toMatchObject({ href: '/dashboard/studio' });
+    expect(content!.items[0]?.badge).toBeUndefined();
   });
 
   it('never includes Overview, Provisioning or Danger zone — those are platform-only', () => {
-    const sections = dashboardNavSections(t);
-    const labels = sections.flatMap((section) =>
+    const labels = dashboardNavSections(t, EVERY_PAGE).flatMap((section) =>
       section.items.map((item) => item.label),
     );
 
@@ -220,15 +285,19 @@ describe('dashboardNavSections', () => {
     expect(labels).not.toContain('Provisioning');
     expect(labels).not.toContain('Danger zone');
   });
+});
 
-  it('drops Subscribers, Comments and Team entirely — no owner-actionable route exists for them yet', () => {
-    const sections = dashboardNavSections(t);
-    const labels = sections.flatMap((section) =>
-      section.items.map((item) => item.label),
-    );
+describe('nav section icons', () => {
+  it('has a registered glyph for every icon a nav item references', () => {
+    const items = [
+      ...operatorNavSections(t),
+      ...tenantNavSections(t, 'tenant-1', 'Acme'),
+    ].flatMap((section) => section.items);
 
-    expect(labels).not.toContain('Subscribers');
-    expect(labels).not.toContain('Comments');
-    expect(labels).not.toContain('Team');
+    const missing = items
+      .filter((item) => !ICON_REGISTRY[item.icon])
+      .map((item) => item.label);
+
+    expect(missing).toEqual([]);
   });
 });

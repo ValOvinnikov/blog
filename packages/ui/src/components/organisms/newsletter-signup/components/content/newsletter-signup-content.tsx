@@ -83,6 +83,8 @@ export const NewsletterSignupContent = ({
           type={ALERT_TYPE.ERROR}
           message={errorMessage}
           id={errorMessageId}
+          hasIcon={false}
+          className={s.errorAlert()}
         />
       )}
     </form>

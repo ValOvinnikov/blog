@@ -1,0 +1,747 @@
+{
+  "pageMetadata": {
+    "root": "Admin",
+    "tenants": "Mandanten · Admin",
+    "tenant": "Mandant · Admin",
+    "look": "Erscheinungsbild · Admin",
+    "voice": "Tonalität · Admin",
+    "selectTenant": "Arbeitsbereich wählen · Admin",
+    "addTenant": "Mandant hinzufügen · Admin",
+    "tenantOverview": "Mandantenübersicht · Admin",
+    "tenantProvisioning": "Bereitstellung · Admin",
+    "tenantDanger": "Gefahrenzone · Admin",
+    "tenantDomain": "Domain · Admin",
+    "features": "Funktionen · Admin",
+    "languages": "Sprachen · Admin",
+    "studio": "Studio · Admin",
+    "findings": "Befunde · Admin",
+    "email": "E-Mail · Admin"
+  },
+  "workspacePendingPage": {
+    "heading": "Ihr Arbeitsbereich ist noch nicht bereit",
+    "description": "Das kann passieren, während ein Arbeitsbereich eingerichtet wird oder wenn dabei etwas schiefgelaufen ist. Laden Sie die Seite in ein paar Minuten neu oder wenden Sie sich an die Person, die Sie eingeladen hat, falls das Problem bestehen bleibt."
+  },
+  "sidebar": {
+    "brandName": "Valstack",
+    "brandTagline": "admin",
+    "collapseToggle": "Seitenleiste einklappen",
+    "expandToggle": "Seitenleiste ausklappen"
+  },
+  "tenantSwitcher": {
+    "archived": "Archiviert"
+  },
+  "toastProvider": {
+    "viewportAriaLabel": "Benachrichtigungen",
+    "dismissLabel": "Benachrichtigung schließen",
+    "mergeCountSuffix": " ×{count}"
+  },
+  "topbarNavMenu": {
+    "triggerLabel": "Menü"
+  },
+  "topbar": {
+    "breadcrumbAriaLabel": "Brotkrumennavigation"
+  },
+  "navSections": {
+    "platformLabel": "Plattform",
+    "platformSectionLabel": "Plattformaktionen",
+    "contentSectionLabel": "Inhalte",
+    "configurationSectionLabel": "Konfiguration",
+    "tenants": "Mandanten",
+    "addTenant": "Mandant hinzufügen",
+    "findings": "Befunde",
+    "tenantLabel": "Mandant · {tenantName}",
+    "overview": "Übersicht",
+    "look": "Erscheinungsbild",
+    "voice": "Tonalität",
+    "languages": "Sprachen",
+    "domain": "Domain",
+    "studio": "Studio",
+    "email": "E-Mail",
+    "subscribers": "Abonnenten",
+    "comments": "Kommentare",
+    "team": "Team",
+    "provisioning": "Bereitstellung",
+    "dangerZone": "Gefahrenzone",
+    "badgeComingSoon": "Demnächst",
+    "badgePlatform": "Plattform",
+    "features": "Funktionen"
+  },
+  "tenantLayout": {
+    "scopeLabel": "Mandant"
+  },
+  "dashboardLayout": {
+    "yourSiteLabel": "Ihre Website"
+  },
+  "dashboardTenantPicker": {
+    "heading": "Arbeitsbereich wählen",
+    "description": "Sie haben Zugriff auf mehr als einen Arbeitsbereich. Wählen Sie einen aus, um fortzufahren."
+  },
+  "tenantsView": {
+    "title": "Mandanten",
+    "description": "Jede Website der Plattform, gelesen aus der echten Tabelle <code>tenants</code>.",
+    "addTenant": "+ Mandant hinzufügen"
+  },
+  "emailAlertsBanner": {
+    "title": "E-Mail-Benachrichtigungen nicht eingerichtet",
+    "description": "RESEND_API_KEY ist nicht gesetzt, daher erhalten Operatoren keine E-Mail, wenn ein Mandant Aufmerksamkeit benötigt — prüfen Sie diese Seite manuell."
+  },
+  "tenantsTable": {
+    "empty": "Noch keine Mandanten.",
+    "columnTenant": "Mandant",
+    "columnPlan": "Tarif",
+    "columnStatus": "Status",
+    "columnCreated": "Erstellt",
+    "status": {
+      "ACTIVE": "Aktiv",
+      "SUSPENDED": "Gesperrt",
+      "ARCHIVED": "Archiviert"
+    },
+    "plan": {
+      "FREE": "Free",
+      "GROWTH": "Growth"
+    },
+    "manage": "Verwalten",
+    "manageAriaLabel": "{tenantName} verwalten"
+  },
+  "findingsView": {
+    "title": "Befunde",
+    "description": "Betriebliche Zustände, die von geplanten Prüfläufen über alle Mandanten hinweg erkannt wurden."
+  },
+  "findingsTable": {
+    "columnTenant": "Mandant",
+    "columnSource": "Quelle",
+    "columnKind": "Art",
+    "columnSeverity": "Schweregrad",
+    "columnLastSeen": "Zuletzt gesehen",
+    "noTenant": "— plattformweit",
+    "empty": "Keine offenen Befunde. Alles in Ordnung."
+  },
+  "findingsCard": {
+    "title": "Offene Befunde",
+    "empty": "Keine offenen Befunde für diesen Mandanten — alles in Ordnung.",
+    "detailsToggle": "Details",
+    "columnLevel": "Stufe",
+    "columnDocument": "Dokument",
+    "columnMessage": "Meldung"
+  },
+  "findingSeverityLabel": {
+    "INFO": "Info",
+    "WARNING": "Warnung",
+    "CRITICAL": "Kritisch"
+  },
+  "sanityValidationMarkerLabel": {
+    "error": "Fehler",
+    "warning": "Warnung",
+    "info": "Info"
+  },
+  "findingSourceLabel": {
+    "DOCUMENT_VALIDATION": "Dokumentvalidierung",
+    "TENANT_PROVISIONING": "Mandantenbereitstellung",
+    "RECHECK_TENANT_OWNERS": "Inhaberprüfung",
+    "DOMAIN_VERIFICATION": "Domainverifizierung",
+    "SITE_CONFIG_REVALIDATION": "Revalidierung der Website-Konfiguration"
+  },
+  "findingKindLabel": {
+    "SCHEMA_VALIDATION_ERROR": "Schema-Validierungsfehler",
+    "PROVISIONING_STEP_FAILED": "Bereitstellungsschritt fehlgeschlagen",
+    "OWNER_CHECK_STALLED": "Inhaberprüfung ins Stocken geraten",
+    "OWNER_CHECK_AMBIGUOUS": "Inhaberprüfung nicht eindeutig",
+    "DOMAIN_NOT_ADDED": "Domain nicht hinzugefügt",
+    "REVALIDATION_FAILED": "Revalidierung fehlgeschlagen"
+  },
+  "ownerHomePage": {
+    "description": "Ihre Website auf einen Blick. Alles hier ist live.",
+    "yourSiteCardTitle": "Ihre Website",
+    "readOnlyBadge": "schreibgeschützt",
+    "nameLabel": "Name",
+    "publicDomainLabel": "Öffentliche Domain",
+    "planLabel": "Tarif",
+    "localeLabel": "Sprache",
+    "openPublicDomainAriaLabel": "{domain} in neuem Tab öffnen",
+    "readOnlyHint": "Soll einer dieser Werte geändert werden? Wenden Sie sich an Ihren Plattform-Ansprechpartner — diese Werte sind fest im Hosting Ihrer Website hinterlegt.",
+    "makeItYoursCardTitle": "Passen Sie sie an",
+    "makeItYoursSupportingText": "Änderungen sind sofort live",
+    "lookTileTitle": "Erscheinungsbild",
+    "lookTileDescription": "Farben, Schriften, Logo, Dichte",
+    "voiceTileTitle": "Tonalität",
+    "voiceTileDescription": "Die Formulierungen Ihrer Website",
+    "featuresTileTitle": "Funktionen",
+    "featuresTileDescription": "Kommentare, Lesezeichen, Newsletter"
+  },
+  "provisioningBanner": {
+    "readyTitle": "Bereitgestellt",
+    "readyDescription": "Alle Schritte abgeschlossen.",
+    "viewStepsButton": "Schritte anzeigen",
+    "runningTitle": "Bereitstellung — Schritt {step} von {total}",
+    "runningDescription": "Diese Seite aktualisiert sich automatisch.",
+    "failedTitle": "Bereitstellung bei Schritt {step} von {total} fehlgeschlagen",
+    "failedDescription": "{step} — {reason}",
+    "failedDescriptionFallback": "Dieser Schritt ist fehlgeschlagen — öffnen Sie die Schritte, um ihn erneut auszuführen.",
+    "ownerElevationBadge": {
+      "STALLED": "Inhabereinladung ausstehend",
+      "AMBIGUOUS_MEMBERSHIP": "Inhabermitgliedschaft unklar"
+    },
+    "ownerElevationDescription": {
+      "STALLED": "Der Inhaber hat die Einladung noch nicht angenommen — nichts ist fehlgeschlagen, aber bis dahin kann er seine eigenen Inhalte nicht bearbeiten.",
+      "AMBIGUOUS_MEMBERSHIP": "Mehr als eine Mitgliedschaft passt zum Inhaber dieses Mandanten — klären Sie das manuell in Sanity Manage."
+    }
+  },
+  "tenantOverviewPage": {
+    "openSiteAction": "Website öffnen",
+    "domainCardTitle": "Domain",
+    "dnsLinkButton": "DNS",
+    "publicDomainLabel": "Öffentliche Domain",
+    "lastCheckedLabel": "Zuletzt geprüft",
+    "lastCheckedJustNow": "Gerade eben",
+    "dnsStatus": {
+      "NOT_CONFIGURED": "Nicht verfügbar",
+      "NOT_ADDED": "Noch nicht hinzugefügt",
+      "PENDING": "Ausstehend — wartet auf DNS",
+      "VERIFIED": "Verifiziert",
+      "ERROR": "Prüfung fehlgeschlagen"
+    },
+    "ownerCardTitle": "Inhaber",
+    "emailLabel": "E-Mail",
+    "roleLabel": "Rolle",
+    "ownerRoleBadge": "INHABER",
+    "ownerInvitedPendingBadge": "Eingeladen, ausstehend",
+    "joinedLabel": "Beigetreten",
+    "contentWorkspaceCardTitle": "Inhaltsbereich",
+    "platformBadge": "Plattform",
+    "sanityProjectLabel": "Sanity-Projekt",
+    "datasetLabel": "Dataset",
+    "readTokenLabel": "Lese-Token",
+    "readTokenStored": "Gespeichert",
+    "readTokenNotSet": "Nicht gesetzt",
+    "revalidateHookLabel": "Revalidierungs-Hook",
+    "revalidateHookActive": "Aktiv",
+    "revalidateHookNotSet": "Nicht gesetzt",
+    "notSetValue": "Nicht gesetzt",
+    "recentActivityCardTitle": "Letzte Aktivitäten",
+    "recentActivitySourceLabel": "Systemprotokoll",
+    "activityEmpty": "Noch keine Aktivitäten erfasst.",
+    "relativeJustNow": "Gerade eben",
+    "relativeMinutesAgo": "vor {minutes} Min.",
+    "relativeHoursAgo": "vor {hours} Std.",
+    "relativeDaysAgo": "vor {days} Tg.",
+    "activityAction": {
+      "CREATED": "Mandant erstellt",
+      "DEPROVISION_REQUESTED": "Deprovisionierung angefordert",
+      "DEPROVISIONED": "Mandant deprovisioniert",
+      "REACTIVATED": "Mandant reaktiviert",
+      "PROVISIONED": "Mandant bereitgestellt",
+      "PROVISIONING_FAILED": "Bereitstellung fehlgeschlagen",
+      "SETTINGS_UPDATED": "Einstellungen aktualisiert",
+      "DELETED": "Mandant gelöscht",
+      "READER_DATA_PURGED": "Leserdaten gelöscht"
+    }
+  },
+  "tenantDomainPage": {
+    "pageTitle": "Domain",
+    "subCopy": "Der einzige Teil der Einrichtung, den Sie selbst abschließen müssen.",
+    "cardTitle": "{domain} auf uns verweisen",
+    "checkedHint": "Gerade eben geprüft",
+    "bodyCopy": "Fügen Sie diese Einträge bei Ihrem DNS-Anbieter hinzu. Die Verifizierung ist in der Regel innerhalb einer Stunde abgeschlossen.",
+    "columnType": "Typ",
+    "columnName": "Name",
+    "columnValue": "Wert",
+    "verifiedEmptyState": "Diese Domain ist verifiziert — es gibt nichts mehr zu konfigurieren.",
+    "unavailableState": "DNS-Einträge sind derzeit nicht verfügbar.",
+    "dnsStatus": {
+      "NOT_CONFIGURED": "Nicht verfügbar",
+      "NOT_ADDED": "Noch nicht hinzugefügt",
+      "PENDING": "Wartet auf DNS",
+      "VERIFIED": "Verifiziert",
+      "ERROR": "Prüfung fehlgeschlagen"
+    }
+  },
+  "presetPicker": {
+    "ariaLabel": "Vorlage",
+    "console": "Console",
+    "consoleDescription": "Monospace, präzise und technisch.",
+    "consoleMiniPrimary": "Build-Log",
+    "consoleMiniSecondary": "Ohne Drama ausgeliefert",
+    "editorial": "Editorial",
+    "editorialDescription": "Serifen, warm und magazinartig.",
+    "editorialMiniPrimary": "Feldnotizen",
+    "editorialMiniSecondary": "Berichte von der Küste"
+  },
+  "logoHueField": {
+    "followAccentHue": "Akzentfarbton übernehmen",
+    "logoHueAriaLabel": "Logo-Farbton",
+    "followsAccent": "folgt Akzent",
+    "hueValue": "Farbton {hue}°"
+  },
+  "lookForm": {
+    "heading": "Erscheinungsbild",
+    "subtitle": "Gestalten Sie diese Website. Alles wird unten sofort in der Vorschau angezeigt — live ist erst, was Sie speichern.",
+    "resetButton": "Auf Vorlage zurücksetzen",
+    "saveButton": "Änderungen speichern",
+    "savingButton": "Wird gespeichert…",
+    "alertSuccess": "In site_config gespeichert.",
+    "alertError": "Die Einstellungen zum Erscheinungsbild konnten nicht gespeichert werden — bitte erneut versuchen.",
+    "basicHeading": "Grundlagen",
+    "basicDescription": "Was die meisten Mandanten anpassen",
+    "presetLabel": "Vorlage",
+    "presetDescription": "Der Ausgangspunkt, den fast jeder Mandant wählt. Legt Akzentfarbton, Überschriften- und Fließtextschrift, Eckenradius und Dichte fest.",
+    "accentHueLabel": "Akzentfarbton",
+    "accentHueDescription": "Nur der Farbton ändert sich — Helligkeit und Chroma sind fest (OKLCH), sodass der Kontrast WCAG-geprüft bleibt.",
+    "logoHueLabel": "Logo-Farbton",
+    "logoHueDescription": "Färbt die Tonstufen der Wortmarke (--logo-1/2/3). Folgt dem Akzentfarbton, sofern Sie ihn nicht festlegen.",
+    "brandImagesLabel": "Markenbilder",
+    "brandImagesDescription": "Gespeichert in Vercel Blob — ohne Transformationen zur Laufzeit, also wird genau das ausgeliefert, was Sie hochladen.",
+    "logoFieldLabel": "Logo",
+    "logoFieldHint": "PNG, JPEG, WebP oder SVG · ersatzweise wird die Polygon-Wortmarke verwendet",
+    "faviconFieldLabel": "Favicon",
+    "faviconFieldHint": "Bitte bereits quadratisch zuschneiden — Blob kann das nicht für Sie übernehmen (bei einem SVG zählt die viewBox als Form). Nicht quadratische Uploads werden abgelehnt.",
+    "advancedSummary": "Erweitert",
+    "optionalTag": "optional",
+    "headingFontLabel": "Überschriftenschrift",
+    "headingFontDescription": "Feste Auswahl von fünf (statische next/font-Loader). Jede wird in ihrer eigenen Schrift dargestellt.",
+    "bodyFontLabel": "Fließtextschrift",
+    "radiusScaleLabel": "Eckenradius",
+    "radiusScaleDescription": "Rundung der Ecken auf allen Flächen.",
+    "densityLabel": "Dichte",
+    "densityDescription": "Abstände und Größe der Bedienelemente.",
+    "footerNote": "Eckenradius und Dichte werden mit dem restlichen Formular gespeichert, wirken sich aber noch nicht auf die Vorschau oben aus.",
+    "radiusScaleOptionLabel": {
+      "SM": "Klein",
+      "MD": "Mittel",
+      "LG": "Groß",
+      "XL": "Sehr groß"
+    },
+    "densityOptionLabel": {
+      "DEFAULT": "Standard",
+      "COMPACT": "Kompakt"
+    },
+    "languageSwitcherLabel": "Sprachauswahl",
+    "languageSwitcherDescription": "Wie die Sprachauswahl auf dem Desktop in Kopf- und Fußzeile aussieht.",
+    "languageSwitcherSingleLanguage": "Fügen Sie unter Sprachen eine weitere Sprache hinzu, um einen Stil zu wählen.",
+    "languageSwitcherOptionLabel": {
+      "MENU_CODE": "Menü mit Code",
+      "MENU_GLOBE": "Menü mit Globus",
+      "CODES": "Kompakte Codes"
+    }
+  },
+  "lookPreview": {
+    "modeLight": "Hell",
+    "modeDark": "Dunkel",
+    "previewColorSchemeAriaLabel": "Farbschema der Vorschau",
+    "livePreviewHeading": "Live-Vorschau",
+    "livePreviewDescription": "Echte @blog/ui-Primitive",
+    "sampleHeading": "Gezeitentabellen lesen",
+    "samplePara": "Ein kurzer Bericht, der Überschriften- und Fließtextschrift, Akzent, Logo-Töne und Eckenradius zusammen zeigt.",
+    "subscribeButton": "Abonnieren",
+    "readMoreButton": "Weiterlesen",
+    "readTimeChip": "4 Min. Lesezeit",
+    "previewNote": "Ungespeicherter Formularzustand → CSS Custom Properties, passend zur OKLCH-Abstufung in Produktion. Hier ist nichts live, bis Sie speichern.",
+    "fullPagePreviewHeading": "Ganzseitige Vorschau",
+    "fullPagePreviewDescription": "Reserviert — zeigt Änderungen erst nach dem Speichern",
+    "deviceUrl": "{primaryDomain}",
+    "framePlaceholder": "Iframe der echten Website im Vorschaumodus. Zeigt Änderungen erst nach dem Speichern (oder über eine Vorschau-URL) — Platz und Routing sind bereits reserviert."
+  },
+  "brandAssetField": {
+    "unexpectedError": "Etwas ist schiefgelaufen — bitte erneut versuchen.",
+    "currentAlt": "Aktuelles {label}",
+    "uploading": "Wird hochgeladen…",
+    "replace": "{label} ersetzen",
+    "upload": "{label} hochladen",
+    "remove": "Entfernen"
+  },
+  "emailForm": {
+    "pageHeading": "E-Mail",
+    "pageSubtitle": "Absenderidentität und Texte je Vorlage für jede E-Mail, die dieser Mandant versendet."
+  },
+  "emailSettingsForm": {
+    "heading": "E-Mail-Einstellungen",
+    "description": "Gilt für jede E-Mail, die dieser Mandant versendet. Leere Felder verwenden den Produktstandard.",
+    "senderNameLabel": "Absendername",
+    "senderNameHint": "Der Anzeigename der Absenderadresse — unabhängig vom Website-Titel.",
+    "replyToLabel": "Antwortadresse",
+    "replyToHint": "Wohin Antworten auf E-Mails dieses Mandanten geleitet werden.",
+    "footerAddressLabel": "Postanschrift in der Fußzeile",
+    "footerAddressHint": "Für Massen-E-Mails gesetzlich vorgeschrieben — wird in der Fußzeile jeder E-Mail dieses Mandanten angezeigt.",
+    "logoLabel": "E-Mail-Logo",
+    "logoHint": "Ohne Angabe wird der Produktstandard verwendet. Eine Vorlage kann dies unten mit einem eigenen Logo überschreiben.",
+    "saveButton": "Änderungen speichern",
+    "savingButton": "Wird gespeichert…",
+    "alertSuccess": "E-Mail-Einstellungen gespeichert.",
+    "alertError": "Die E-Mail-Einstellungen konnten nicht gespeichert werden — bitte erneut versuchen."
+  },
+  "emailLogoField": {
+    "unexpectedError": "Etwas ist schiefgelaufen — bitte erneut versuchen.",
+    "currentAlt": "Aktuelles {label}",
+    "uploading": "Wird hochgeladen…",
+    "replace": "{label} ersetzen",
+    "upload": "{label} hochladen",
+    "remove": "Entfernen",
+    "unsupportedType": "Wählen Sie ein PNG-, JPEG- oder GIF-Bild — SVG und WebP werden von gängigen E-Mail-Programmen nicht unterstützt.",
+    "tooLarge": "Diese Datei ist zu groß — die Grenze liegt bei {limit}."
+  },
+  "emailTemplatesSection": {
+    "heading": "Vorlagen",
+    "description": "Betreff, Text und Logo für jeden Vorlagentyp. Werden alle eigenen Texte entfernt, wird der Produktstandard verwendet.",
+    "segmentedControlAriaLabel": "E-Mail-Vorlage zum Bearbeiten wählen"
+  },
+  "emailTemplateEditor": {
+    "subjectLabel": "Betreff",
+    "subjectHint": "Leer bedeutet: Standardbetreff des Produkts.",
+    "bodyLabel": "Text",
+    "bodyHint": "Die Anmeldeschaltfläche, der Einladungslink oder der Abmeldelink wird immer darunter angezeigt — er lässt sich hier nicht entfernen.",
+    "logoLabel": "Vorlagen-Logo",
+    "logoHint": "Überschreibt das E-Mail-Logo des Mandanten nur für diese Vorlage.",
+    "saveButton": "Änderungen speichern",
+    "savingButton": "Wird gespeichert…",
+    "alertSuccess": "Vorlage gespeichert.",
+    "alertError": "Diese Vorlage konnte nicht gespeichert werden — bitte erneut versuchen.",
+    "previewHeading": "Vorschau",
+    "previewIframeTitle": "E-Mail-Vorschau",
+    "actionLockedNote": "Die Schaltfläche unten wird immer angezeigt und kann hier nicht bearbeitet werden.",
+    "templateTypeLabel": {
+      "MAGIC_LINK": "Anmeldelink",
+      "TENANT_INVITE": "Teameinladung",
+      "NEWSLETTER_CONFIRMATION": "Newsletter-Bestätigung"
+    },
+    "templateTypeDescription": {
+      "MAGIC_LINK": "Wird gesendet, wenn sich jemand auf der Website dieses Mandanten anmeldet.",
+      "TENANT_INVITE": "Wird gesendet, wenn jemand in das Team dieses Mandanten eingeladen wird.",
+      "NEWSLETTER_CONFIRMATION": "Wird gesendet, um ein Newsletter-Abonnement zu bestätigen."
+    },
+    "previewActionLabel": {
+      "MAGIC_LINK": "Anmelden",
+      "TENANT_INVITE": "Einladung annehmen",
+      "NEWSLETTER_CONFIRMATION": "Abonnement bestätigen"
+    }
+  },
+  "portableTextEditorToolbar": {
+    "bold": "Fett",
+    "italic": "Kursiv",
+    "heading": "Überschrift",
+    "bulletList": "Aufzählung",
+    "numberedList": "Nummerierte Liste",
+    "link": "Link",
+    "removeLink": "Link entfernen",
+    "linkUrlLabel": "Link-URL",
+    "linkApply": "Übernehmen",
+    "linkCancel": "Abbrechen"
+  },
+  "voiceSettings": {
+    "heading": "Tonalität",
+    "description": "Die Worte, die die Website selbst verwendet. Jedes Feld hat bereits einen sinnvollen Standardwert.",
+    "saveButton": "Änderungen speichern",
+    "savingButton": "Wird gespeichert…",
+    "alertSuccess": "voiceOverrides gespeichert.",
+    "alertError": "Speichern fehlgeschlagen — bitte erneut versuchen.",
+    "basicHeading": "Grundlagen",
+    "basicAlert": "Hier ist nichts erforderlich. Die Website hat bereits sinnvolle Standardtexte. Die meisten Mandanten öffnen die erweiterten Felder unten nie.",
+    "advancedSummary": "Erweitert — 8 ausgewählte Texte, 2 Gruppen",
+    "advancedOverrideInfo": "Jedes Feld ist eine Überschreibung. Lassen Sie ein Feld leer, um den Standardtext der Website zu verwenden — ein geleertes Feld kehrt zu diesem Standard zurück und setzt den Text nicht auf leer."
+  },
+  "voiceFieldGroup": {
+    "fieldCount": "{count, plural, one {# Feld} other {# Felder}}"
+  },
+  "voiceFieldGroups": {
+    "notFoundPage": "404-Seite",
+    "emptyStates": "Leere Zustände"
+  },
+  "voiceFieldLabels": {
+    "notFoundHeading": "404 – Überschrift",
+    "notFoundSupportingText": "404 – Begleittext",
+    "notFoundReturnHome": "404 – Link zur Startseite",
+    "blogListEmpty": "Blogliste leer",
+    "topicEmpty": "Thema leer",
+    "tagEmpty": "Schlagwort leer",
+    "topicsEmpty": "Themen leer",
+    "bookmarksEmpty": "Lesezeichen leer"
+  },
+  "addTenantWizard": {
+    "heading": "Mandant hinzufügen",
+    "railAriaLabel": "Bereitstellungsschritte",
+    "steps": {
+      "details": {
+        "title": "Details",
+        "description": "Name, Domain, Tarif"
+      }
+    },
+    "stepDescriptions": {
+      "SANITY_PROJECT": "Erstellen + konfigurieren",
+      "SEED_CONTENT": "Startdokumente",
+      "PERSIST_TOKEN": "Lesezugangsdaten",
+      "MAP_DOMAIN": "DNS + Verifizierung",
+      "CREATE_WEBHOOK": "CMS zur Website",
+      "VERIFY_CONTENT": "Prüfung der Startinhalte"
+    }
+  },
+  "tenantDetailsForm": {
+    "heading": "Mandantendetails",
+    "description": "Der schnelle Teil. Alles danach läuft automatisch, und jeder Schritt lässt sich nach einem Fehler fortsetzen.",
+    "nameLabel": "Mandantenname",
+    "domainLabel": "Domain",
+    "domainHint": "Die öffentliche Domain, unter der die Website dieses Mandanten erreichbar ist.",
+    "planLabel": "Tarif",
+    "planOptionFree": "Free",
+    "planOptionGrowth": "Growth",
+    "ownerEmailLabel": "E-Mail des Inhabers",
+    "ownerEmailHint": "Die Person, die diesen Mandanten verwaltet. Ein bestehendes Konto erhält sofort Zugriff; eine neue Adresse erhält eine Einladung per E-Mail zur Anmeldung.",
+    "submitButton": "Bereitstellung starten",
+    "confirmOwnerInviteButton": "Bestätigen und Inhaber einladen",
+    "submittingBeginButton": "Bereitstellung wird gestartet…",
+    "submittingInviteButton": "Inhaber wird eingeladen…"
+  },
+  "provisioningStatusView": {
+    "pageTitle": "Bereitstellung",
+    "description": "{tenantName} · jeder Schritt lässt sich unabhängig fortsetzen.",
+    "stepsCardTitle": "Schritte",
+    "stepsCompletionBadge": "{done} von {total} erledigt",
+    "stepLabel": {
+      "SANITY_PROJECT": "Arbeitsbereich erstellen",
+      "SEED_CONTENT": "Startinhalte anlegen",
+      "PERSIST_TOKEN": "Lesezugangsdaten ausstellen",
+      "MAP_DOMAIN": "Domain verbinden",
+      "CREATE_WEBHOOK": "CMS mit Website verbinden",
+      "VERIFY_CONTENT": "Inhalte auf Bereitschaft prüfen"
+    },
+    "statusLabel": {
+      "IDLE": "Nicht gestartet",
+      "RUNNING": "Läuft…",
+      "DONE": "Abgeschlossen",
+      "FAILED": "Fehlgeschlagen"
+    },
+    "retryButton": "Bereitstellung erneut versuchen",
+    "retryingButton": "Bereitstellung wird erneut versucht…",
+    "startButton": "Bereitstellung starten",
+    "startingButton": "Wird gestartet…",
+    "startError": "Die Bereitstellung konnte nicht gestartet werden — bitte erneut versuchen.",
+    "startErrorNotFound": "Dieser Mandant wurde nicht gefunden — laden Sie die Seite neu und versuchen Sie es erneut.",
+    "startErrorArchived": "Dieser Mandant ist archiviert; die Bereitstellung kann nicht gestartet werden.",
+    "startNoticeAlreadyInProgress": "Für diesen Mandanten läuft bereits eine Bereitstellung — diese Seite aktualisiert sich automatisch, sobald sie abgeschlossen ist.",
+    "pollErrorWarning": "Der aktuelle Status konnte nicht abgerufen werden — neuer Versuch erfolgt automatisch.",
+    "errorKind": {
+      "permission": {
+        "headline": "Fehlende Berechtigung für diesen Schritt",
+        "body": "Die Zugangsdaten für die Bereitstellung dürfen nicht ausführen, was dieser Schritt benötigt — häufig das Einladen eines Projektmitglieds oder das Erteilen von Zugriff. Eventuell muss er manuell in Sanity Manage oder im Vercel-Dashboard abgeschlossen werden.",
+        "nextStep": "Erteilen Sie die fehlende Berechtigung und versuchen Sie es dann erneut."
+      },
+      "duplicate": {
+        "headline": "Bereits von einem anderen Mandanten verwendet",
+        "body": "Etwas, das dieser Schritt anlegen möchte — ein Projekt-Handle, eine E-Mail-Einladung oder eine Domain — ist bereits anderweitig vergeben.",
+        "nextStep": "Lösen Sie den Konflikt und versuchen Sie es dann erneut."
+      },
+      "network": {
+        "headline": "Bereitstellungsdienst nicht erreichbar",
+        "body": "Die Anfrage an Sanity oder Vercel hat das Zeitlimit überschritten oder die Verbindung wurde vorzeitig getrennt. Das ist oft nur vorübergehend.",
+        "nextStep": "Warten Sie einen Moment und versuchen Sie es dann erneut."
+      },
+      "unknown": {
+        "headline": "Dieser Schritt ist fehlgeschlagen",
+        "body": "Bei der Bereitstellung ist ein noch unbekannter Fehler aufgetreten. Die technischen Details unten können bei der Diagnose helfen.",
+        "nextStep": "Versuchen Sie es erneut oder prüfen Sie die technischen Details, bevor Sie um Hilfe bitten."
+      }
+    },
+    "technicalDetailsToggle": "Technische Details",
+    "ownerLabel": "Inhaber",
+    "ownerInvitedPendingBadge": "Eingeladen, ausstehend",
+    "stepRunningNow": "jetzt",
+    "relativeJustNow": "Gerade eben",
+    "relativeMinutesAgo": "vor {minutes} Min.",
+    "relativeHoursAgo": "vor {hours} Std.",
+    "relativeDaysAgo": "vor {days} Tg.",
+    "runCardTitle": "Lauf",
+    "runStartedLabel": "Gestartet",
+    "runFinishedLabel": "Beendet",
+    "runRegistryLabel": "Registry",
+    "runStartedPending": "Warten auf den Start des Laufs…",
+    "runFinishedPending": "—",
+    "runWorkflowLogLink": "Workflow-Protokoll"
+  },
+  "deprovisioningStatusView": {
+    "cardTitle": "Fortschritt der Deprovisionierung",
+    "stepsCompletionBadge": "{done} von {total} erledigt",
+    "startingBadge": "Wird gestartet…",
+    "preRunStepStatusLabel": "In Warteschlange",
+    "stepLabel": {
+      "REMOVE_DOMAIN": "Domain entfernen",
+      "ARCHIVE_SANITY_PROJECT": "Sanity-Projekt archivieren",
+      "REVOKE_SANITY_TOKENS": "Sanity-Tokens widerrufen",
+      "CLEAR_ARTIFACTS": "Bereitstellungsartefakte entfernen",
+      "ARCHIVE_TENANT": "Mandant archivieren",
+      "PURGE_READER_DATA": "Leserdaten löschen",
+      "INVALIDATE_TENANT_CACHE": "Zwischengespeicherte Seiten invalidieren"
+    },
+    "statusLabel": {
+      "IDLE": "Nicht gestartet",
+      "RUNNING": "Läuft…",
+      "DONE": "Abgeschlossen",
+      "FAILED": "Fehlgeschlagen"
+    },
+    "stepRunningNow": "jetzt",
+    "failedStepLabel": "Fehlgeschlagen bei „{step}“.",
+    "errorKind": {
+      "permission": {
+        "headline": "Fehlende Berechtigung für diesen Schritt",
+        "body": "Die Zugangsdaten für den Rückbau dürfen nicht ausführen, was dieser Schritt benötigt — häufig das Widerrufen eines Tokens oder das Entfernen eines Projektmitglieds. Eventuell muss er manuell in Sanity Manage oder im Vercel-Dashboard abgeschlossen werden.",
+        "nextStep": "Erteilen Sie die fehlende Berechtigung und starten Sie den Rückbau dann erneut."
+      },
+      "duplicate": {
+        "headline": "Bereits anderweitig in Verwendung",
+        "body": "Etwas, das dieser Schritt entfernen oder neu zuweisen möchte — eine Domain-Zuordnung, ein Token — ist bereits anderweitig vergeben oder referenziert.",
+        "nextStep": "Lösen Sie den Konflikt und starten Sie den Rückbau dann erneut."
+      },
+      "network": {
+        "headline": "Rückbaudienst nicht erreichbar",
+        "body": "Die Anfrage an Sanity oder Vercel hat das Zeitlimit überschritten oder die Verbindung wurde vorzeitig getrennt. Das ist oft nur vorübergehend.",
+        "nextStep": "Warten Sie einen Moment und starten Sie den Rückbau dann erneut."
+      },
+      "unknown": {
+        "headline": "Dieser Schritt ist fehlgeschlagen",
+        "body": "Beim Rückbau ist ein noch unbekannter Fehler aufgetreten. Die technischen Details unten können bei der Diagnose helfen.",
+        "nextStep": "Starten Sie den Rückbau erneut oder prüfen Sie die technischen Details, bevor Sie um Hilfe bitten."
+      }
+    },
+    "technicalDetailsToggle": "Technische Details",
+    "relativeJustNow": "Gerade eben",
+    "relativeMinutesAgo": "vor {minutes} Min.",
+    "relativeHoursAgo": "vor {hours} Std.",
+    "relativeDaysAgo": "vor {days} Tg.",
+    "runCardTitle": "Lauf",
+    "runStartedLabel": "Gestartet",
+    "runFinishedLabel": "Beendet",
+    "runFinishedPending": "—",
+    "runWorkflowLogLink": "Workflow-Protokoll"
+  },
+  "tenantDangerPage": {
+    "title": "Gefahrenzone",
+    "description": "Unwiderrufliche Aktionen für diesen Mandanten. Nur für Superadmins.",
+    "historyHeading": "Rückbau-Verlauf"
+  },
+  "studioPage": {
+    "title": "Studio",
+    "notProvisionedTitle": "Studio ist noch nicht bereit",
+    "notProvisionedDescription": "Die Bereitstellung des Sanity-Projekts dieses Mandanten ist noch nicht abgeschlossen. Versuchen Sie es erneut, sobald die Bereitstellung fertig ist."
+  },
+  "tenantDetailsPanel": {
+    "heading": "Mandantendetails",
+    "fieldsGroupLabel": "Felder der Mandantendetails",
+    "nameLabel": "Name",
+    "domainLabel": "Primäre Domain",
+    "ownerEmailLabel": "E-Mail des Inhabers",
+    "planLabel": "Tarif",
+    "planOptionFree": "Free",
+    "planOptionGrowth": "Growth",
+    "localeLabel": "Standardsprache",
+    "saveButton": "Änderungen speichern",
+    "savingButton": "Wird gespeichert…",
+    "alertSuccess": "Mandantendetails gespeichert.",
+    "provisioningStartedError": "Die Bereitstellung dieses Mandanten hat bereits begonnen; seine Details können nicht mehr bearbeitet werden.",
+    "archivedError": "Dieser Mandant ist archiviert; seine Details können nicht mehr bearbeitet werden.",
+    "notFoundError": "Mandant nicht gefunden.",
+    "ownerAlreadyJoinedError": "Der Inhaber dieses Mandanten hat sich bereits angemeldet, daher kann seine E-Mail-Adresse hier nicht mehr korrigiert werden — dies würde stattdessen die Inhaberschaft übertragen.",
+    "ownerEmailTakenError": "Für diese E-Mail-Adresse gibt es bei diesem Mandanten bereits eine ausstehende Einladung.",
+    "lockedAnnouncement": "Einige Felder der Mandantendetails sind jetzt gesperrt.",
+    "unlockedAnnouncement": "Weitere Felder der Mandantendetails sind jetzt bearbeitbar.",
+    "fieldLockedReasonStep": "Gesperrt — der Schritt „{step}“ ist bereits abgeschlossen und hat diesen Wert verwendet.",
+    "fieldLockedReasonRunning": "Gesperrt, während die Bereitstellung läuft.",
+    "fieldLockedReasonSucceeded": "Gesperrt — die Bereitstellung ist bereits abgeschlossen.",
+    "fieldLockedReasonArchived": "Gesperrt — dieser Mandant ist archiviert.",
+    "localeIsAdditionalError": "Diese Sprache ist bereits eine zusätzliche Sprache. Entfernen Sie sie zuerst dort.",
+    "localeInvalidError": "Wählen Sie eine unterstützte Sprache."
+  },
+  "archivedTenantNotice": {
+    "title": "Dieser Mandant ist archiviert",
+    "description": "Deprovisioniert am {date}. Alles auf diesen Seiten ist schreibgeschützt."
+  },
+  "archivedTenantsToggle": {
+    "ariaLabel": "Sichtbarkeit der Mandanten",
+    "activeOption": "Aktiv",
+    "allOption": "Alle"
+  },
+  "deprovisionTenantControl": {
+    "cardTitle": "Diesen Mandanten deprovisionieren",
+    "archivedCardTitle": "Diesen Mandanten endgültig löschen",
+    "description": "Entfernt die eigene Domain des Mandanten, löscht sein Studio-Projekt und archiviert sein Sanity-Projekt, damit keine Kosten mehr anfallen, statt es zu löschen. Der Mandanteneintrag selbst wird archiviert, nicht gelöscht. Dies kann nicht rückgängig gemacht werden.",
+    "triggerButton": "Deprovisionieren",
+    "inProgressHint": "Für diesen Mandanten läuft bereits eine Deprovisionierung.",
+    "dialogTitle": "{name} deprovisionieren",
+    "dialogDescription": "Dies startet deprovision-tenant.yml, das jede bereitgestellte Ressource dieses Mandanten abbaut. Geben Sie zur Bestätigung den Namen des Mandanten ein.",
+    "confirmLabel": "Zur Bestätigung „{name}“ eingeben",
+    "confirmHint": "Muss exakt mit dem Namen des Mandanten übereinstimmen.",
+    "dryRunLabel": "Probelauf (nur Vorschau, nichts wird gelöscht)",
+    "cancelButton": "Abbrechen",
+    "confirmButton": "Deprovisionieren",
+    "confirmingButton": "Wird gestartet…",
+    "deleteDescription": "Entfernt diesen Mandanten und jeden abhängigen Eintrag (Mitgliedschaften, Abonnenten, Lesezeichen, Domains, Website-Konfiguration) endgültig aus der Datenbank. Dies kann nicht rückgängig gemacht werden und gibt die Domain zur erneuten Verwendung frei.",
+    "deleteTriggerButton": "Mandant endgültig löschen",
+    "deleteDialogTitle": "{name} löschen",
+    "deleteDialogDescription": "Dies löscht den Mandanteneintrag und alles, was davon abhängt, endgültig. Geben Sie zur Bestätigung den Namen des Mandanten ein.",
+    "deleteConfirmLabel": "Zur Bestätigung „{name}“ eingeben",
+    "deleteConfirmHint": "Muss exakt mit dem Namen des Mandanten übereinstimmen.",
+    "deleteConfirmButton": "Löschen",
+    "deleteConfirmingButton": "Wird gelöscht…"
+  },
+  "reactivateTenantControl": {
+    "cardTitle": "Diesen Mandanten reaktivieren",
+    "description": "Bringt einen archivierten Mandanten wieder online, indem die Bereitstellung erneut ausgeführt wird: Der Mandanteneintrag und sein Sanity-Projekt werden aus dem Archiv geholt, die eigene Domain wird neu zugeordnet und der Revalidierungs-Webhook neu erstellt. Verwenden Sie dies, statt einen versehentlich deprovisionierten Mandanten zu löschen.",
+    "triggerButton": "Mandant reaktivieren",
+    "dialogTitle": "{name} reaktivieren",
+    "dialogDescription": "Dies startet provision-tenant.yml, das jede bereitgestellte Ressource dieses Mandanten wiederherstellt. Geben Sie zur Bestätigung den Namen des Mandanten ein.",
+    "confirmLabel": "Zur Bestätigung „{name}“ eingeben",
+    "confirmHint": "Muss exakt mit dem Namen des Mandanten übereinstimmen.",
+    "cancelButton": "Abbrechen",
+    "confirmButton": "Reaktivieren",
+    "confirmingButton": "Wird gestartet…"
+  },
+  "featuresSettings": {
+    "heading": "Funktionen",
+    "description": "Schalten Sie Funktionen für Mandanten ein oder aus. Gesperrte Schalter erfordern den Growth-Tarif.",
+    "saveButton": "Änderungen speichern",
+    "savingButton": "Wird gespeichert…",
+    "alertSuccess": "Funktionen gespeichert.",
+    "alertError": "Speichern fehlgeschlagen — bitte erneut versuchen.",
+    "planLockedBadge": "Growth-Tarif",
+    "comingSoonBadge": "Demnächst",
+    "switchOn": "An",
+    "switchOff": "Aus",
+    "capabilitiesHeading": "Funktionen",
+    "toggleLabel": {
+      "COMMENTS": "Kommentare",
+      "RATINGS": "Bewertungen",
+      "BOOKMARKS": "Lesezeichen",
+      "NEWSLETTER": "Newsletter",
+      "ANALYTICS": "Analytics",
+      "CONSENT_BANNER": "Cookie-Einwilligungsbanner"
+    },
+    "toggleDescription": {
+      "COMMENTS": "Leser können Beiträge kommentieren.",
+      "RATINGS": "Leser können Beiträge bewerten.",
+      "BOOKMARKS": "Leser können Beiträge für später merken.",
+      "NEWSLETTER": "Das Newsletter-Anmeldeformular auf der Website anzeigen.",
+      "ANALYTICS": "Analyse-Tracking auf der Website aktivieren.",
+      "CONSENT_BANNER": "Besuchern ein Cookie-Einwilligungsbanner anzeigen, bevor nicht notwendige Cookies oder Skripte geladen werden."
+    }
+  },
+  "languageNames": {
+    "EN": "Englisch",
+    "NL": "Niederländisch",
+    "FR": "Französisch",
+    "DE": "Deutsch",
+    "ES": "Spanisch"
+  },
+  "languagesSettings": {
+    "heading": "Sprachen",
+    "description": "Wählen Sie, in welchen Sprachen die Website neben ihrer Standardsprache veröffentlicht wird.",
+    "saveButton": "Änderungen speichern",
+    "savingButton": "Wird gespeichert…",
+    "alertSuccess": "Sprachen gespeichert.",
+    "alertError": "Speichern fehlgeschlagen — bitte erneut versuchen.",
+    "switchOn": "An",
+    "switchOff": "Aus",
+    "defaultHeading": "Standardsprache",
+    "defaultDescription": "Jede Seite wird zuerst in dieser Sprache verfasst; festgelegt wird sie in den Mandantendetails.",
+    "additionalHeading": "Zusätzliche Sprachen",
+    "allowance": "{used} von {allowed} zusätzlichen Sprachen Ihres Tarifs in Verwendung.",
+    "upgradeNotice": "Ihr Tarif veröffentlicht nur die Standardsprache. Führen Sie ein Upgrade durch, um weitere Sprachen hinzuzufügen.",
+    "downgradeNotice": "Ihr Tarif veröffentlicht {allowed, plural, one {# zusätzliche Sprache} other {# zusätzliche Sprachen}}, gespeichert sind jedoch {stored}. Wählen Sie, welche live bleiben — die anderen bleiben erhalten, und nichts wird gelöscht.",
+    "keptBadge": "Erhalten, in Ihrem Tarif nicht live",
+    "planLockedBadge": "Nicht in Ihrem Tarif"
+  }
+}

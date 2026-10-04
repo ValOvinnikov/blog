@@ -243,6 +243,60 @@ export const BannerSpacingXl: TStory = {
   },
 };
 
+export const BannerPositionBySpacing: TStory = {
+  args: { ...BannerDefault.args },
+  parameters: { layout: 'fullscreen' },
+  render: (args) => (
+    <div className="flex flex-col gap-10">
+      {objectKeys(ctaModuleVariants.variants.position).map((position) =>
+        objectKeys(ctaModuleVariants.variants.spacingTop).map((spacing) => (
+          <CtaModule
+            key={`${position}-${spacing}`}
+            {...args}
+            heading={`${position} / ${spacing}`}
+            contentPosition={position}
+            contentAlignment={position}
+            spacingTop={spacing}
+            spacingBottom={spacing}
+          />
+        )),
+      )}
+    </div>
+  ),
+};
+
+export const BannerMismatchedPositionAndAlignment: TStory = {
+  args: { ...BannerDefault.args },
+  parameters: { layout: 'fullscreen' },
+  render: (args) => (
+    <div className="flex flex-col gap-10">
+      {objectKeys(ctaModuleVariants.variants.position).map((position) =>
+        objectKeys(ctaModuleVariants.variants.alignment)
+          .filter((alignment) => alignment !== position)
+          .map((alignment) => (
+            <CtaModule
+              key={`${position}-${alignment}`}
+              {...args}
+              heading={`${position} position / ${alignment} text`}
+              contentPosition={position}
+              contentAlignment={alignment}
+            />
+          )),
+      )}
+    </div>
+  ),
+};
+
+export const BannerPositionBySpacingPhone: TStory = {
+  ...BannerPositionBySpacing,
+  globals: { viewport: 'phone' },
+};
+
+export const BannerMismatchedPositionAndAlignmentPhone: TStory = {
+  ...BannerMismatchedPositionAndAlignment,
+  globals: { viewport: 'phone' },
+};
+
 export const Wrapped: TStory = {
   args: {
     isWrapped: true,

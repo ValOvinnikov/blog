@@ -1,6 +1,6 @@
 import { ToastProvider } from '@web/context/toast-provider';
-import { getBookmarkStatus } from '@web/server/bookmarks/bookmark-actions';
-import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
+import { getBookmarkStatus } from '@web/server/bookmarks/bookmark-actions/bookmark-actions';
+import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import {
   customRenderServerAsync,
   screen,
@@ -10,11 +10,14 @@ import { useSession } from 'next-auth/react';
 
 import { BookmarkButtonGate } from './bookmark-button-gate';
 
-vi.mock('@web/server/settings-features/is-capability-enabled', () => ({
-  isCapabilityEnabled: vi.fn(),
-}));
+vi.mock(
+  '@web/server/settings-features/is-capability-enabled/is-capability-enabled',
+  () => ({
+    isCapabilityEnabled: vi.fn(),
+  }),
+);
 
-vi.mock('@web/server/bookmarks/bookmark-actions', () => ({
+vi.mock('@web/server/bookmarks/bookmark-actions/bookmark-actions', () => ({
   getBookmarkStatus: vi.fn(),
   setBookmarkStatus: vi.fn(),
 }));
@@ -23,7 +26,7 @@ vi.mock('next-auth/react', () => ({ useSession: vi.fn() }));
 
 const setup = customRenderServerAsync(
   BookmarkButtonGate,
-  { postId: 'post-1', tenant: 'tenant-1' },
+  { postId: 'post-1' },
   { wrapper: ToastProvider },
 );
 
@@ -56,11 +59,11 @@ describe(`<${BookmarkButtonGate.name}/>`, () => {
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
-  it('checks the bookmarks capability for the given tenant', async () => {
+  it('checks the bookmarks capability ', async () => {
     vi.mocked(isCapabilityEnabled).mockResolvedValueOnce(false);
 
     await setup();
 
-    expect(isCapabilityEnabled).toHaveBeenCalledWith('BOOKMARKS', 'tenant-1');
+    expect(isCapabilityEnabled).toHaveBeenCalledWith('BOOKMARKS');
   });
 });

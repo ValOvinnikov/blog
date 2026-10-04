@@ -1,6 +1,12 @@
-import { CONTENT_ROUTE_REVALIDATE_SECONDS } from '@blog/config';
+import {
+  CONTENT_ROUTE_REVALIDATE_SECONDS,
+  LOCALE_ISO_CODES,
+} from '@blog/config';
+import { enterRequestContext } from '@web/server/request-context/request-context';
 
 import BlogPostSlugPage, { generateMetadata, revalidate } from './page';
+
+vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@web/metadata/post-metadata', () => ({
   buildPostMetadata: vi.fn().mockResolvedValue({ title: 'Hello World' }),
@@ -17,6 +23,18 @@ describe('BlogPostSlugPage', () => {
     expect(revalidate).toBe(CONTENT_ROUTE_REVALIDATE_SECONDS);
   });
 
+  it('enters the request context with the route params', async () => {
+    const params = Promise.resolve({
+      tenant: 'tenant-1',
+      locale: LOCALE_ISO_CODES.EN,
+      slug: 'a-slug',
+    });
+
+    await BlogPostSlugPage({ params });
+
+    expect(enterRequestContext).toHaveBeenCalledWith(params);
+  });
+
   describe('generateMetadata', () => {
     it('delegates to buildPostMetadata with the resolved slug', async () => {
       const metadata = await generateMetadata({
@@ -28,6 +46,19 @@ describe('BlogPostSlugPage', () => {
       });
 
       expect(metadata).toEqual({ title: 'Hello World' });
+    });
+
+    it('enters the request context with the route params', async () => {
+      const params: Parameters<typeof generateMetadata>[0]['params'] =
+        Promise.resolve({
+          tenant: 'tenant-1',
+          locale: 'EN',
+          slug: 'hello-world',
+        });
+
+      await generateMetadata({ params });
+
+      expect(enterRequestContext).toHaveBeenCalledWith(params);
     });
   });
 

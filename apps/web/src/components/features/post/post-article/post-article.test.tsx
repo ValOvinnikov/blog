@@ -6,9 +6,8 @@ import {
 } from '@blog/service';
 import userEvent from '@testing-library/user-event';
 import { ToastProvider } from '@web/context/toast-provider';
-import { getBookmarkStatus } from '@web/server/bookmarks/bookmark-actions';
-import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getBookmarkStatus } from '@web/server/bookmarks/bookmark-actions/bookmark-actions';
+import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import {
   customRenderServerAsync,
   screen,
@@ -27,6 +26,8 @@ import { useSession } from 'next-auth/react';
 
 import { PostArticle } from './post-article';
 
+vi.mock('@web/server/request-context/request-context');
+
 vi.mock('@web/i18n/navigation');
 
 vi.mock('@blog/service', async (importOriginal) => {
@@ -37,17 +38,16 @@ vi.mock('@blog/service', async (importOriginal) => {
   };
 });
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
-
-vi.mock('@web/server/tenant/get-tenant-base-url');
-
 vi.mock('@web/utils/logger/logger');
 
-vi.mock('@web/server/settings-features/is-capability-enabled', () => ({
-  isCapabilityEnabled: vi.fn(),
-}));
+vi.mock(
+  '@web/server/settings-features/is-capability-enabled/is-capability-enabled',
+  () => ({
+    isCapabilityEnabled: vi.fn(),
+  }),
+);
 
-vi.mock('@web/server/bookmarks/bookmark-actions', () => ({
+vi.mock('@web/server/bookmarks/bookmark-actions/bookmark-actions', () => ({
   getBookmarkStatus: vi.fn(),
   setBookmarkStatus: vi.fn(),
 }));
@@ -58,7 +58,7 @@ const getPostMock = vi.mocked(service.pages.post.v1.getPost);
 
 const setup = customRenderServerAsync(
   PostArticle,
-  { slug: 'hello-world', tenant: 'tenant-1' },
+  { slug: 'hello-world' },
   { wrapper: ToastProvider },
 );
 
@@ -102,7 +102,6 @@ describe(`<${PostArticle.name}/>`, () => {
       'hello-world',
       DEFAULT_TENANT_SANITY_CONTEXT,
     );
-    expect(getTenantSanityContext).toHaveBeenCalledWith('tenant-1');
   });
 
   it('renders the post title, lead, author, and body', async () => {

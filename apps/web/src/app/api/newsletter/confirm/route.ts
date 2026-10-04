@@ -1,24 +1,12 @@
+import { TENANT_WRITE_REFUSAL } from '@blog/config';
 import { queries } from '@blog/db';
-import { isTenantActive } from '@web/server/tenant/is-tenant-active';
-import { resolveTenantId } from '@web/server/tenant/resolve-tenant-id';
+import { resolveWritableTenant } from '@web/server/tenant/write-gate/write-gate';
 import { logger } from '@web/utils/logger/logger';
 import type { NextResponse } from 'next/server';
 import { getLocale, getTranslations } from 'next-intl/server';
 
 import { renderResultResponse } from '../newsletter-result-page';
 
-/**
- * `GET /api/newsletter/confirm?token=…` — the double opt-in confirmation link
- * every newsletter confirmation email points at. Flips the matching
- * `subscribers` row from `pending` to `active` via
- * `queries.subscribers.confirmSubscriber` and renders a plain result page;
- * `confirmed`/`already-confirmed` both read as success (the query's own
- * idempotency guarantee).
- *
- * `/api` routes are excluded from `proxy.ts`'s matcher, so the `x-tenant-id`
- * header it threads to Server Components/Actions never reaches here — this
- * route resolves the tenant directly from its own request's `Host` header.
- */
 export async function GET(request: Request): Promise<NextResponse> {
   const token = new URL(request.url).searchParams.get('token');
   const [lang, t] = await Promise.all([
@@ -40,9 +28,20 @@ export async function GET(request: Request): Promise<NextResponse> {
   }
 
   try {
-    const host = request.headers.get('host');
-    const tenantId = await resolveTenantId(host);
-    if (!tenantId) {
+    const tenant = await resolveWritableTenant('newsletter.confirm');
+    if (!tenant.ok) {
+      if (tenant.reason === TENANT_WRITE_REFUSAL.INACTIVE) {
+        logger.warn('newsletter.confirm_tenant_not_active');
+        return renderResultResponse(
+          {
+            lang,
+            title: t('unavailableTitle'),
+            message: t('unavailableMessage'),
+            returnHomeLabel,
+          },
+          403,
+        );
+      }
       return renderResultResponse(
         {
           lang,
@@ -50,22 +49,10 @@ export async function GET(request: Request): Promise<NextResponse> {
           message: t('errorMessage'),
           returnHomeLabel,
         },
-        500,
+        404,
       );
     }
-
-    if (!(await isTenantActive(tenantId))) {
-      logger.warn('newsletter.confirm_tenant_not_active', { tenantId });
-      return renderResultResponse(
-        {
-          lang,
-          title: t('errorTitle'),
-          message: t('errorMessage'),
-          returnHomeLabel,
-        },
-        403,
-      );
-    }
+    const { tenantId } = tenant;
 
     const result = await queries.subscribers.confirmSubscriber(tenantId, token);
 

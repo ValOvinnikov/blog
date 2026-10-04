@@ -159,6 +159,15 @@ relative paths only within a single slice (`./query`, `./types`).
   each exporting its `TRaw*` input type (`InferFragmentType<typeof fragment>`)
   **and** the view-model `T*` type, both co-located and re-exported for web via
   `src/index.ts`).
+- **Every file under a `shared/<kind>/` directory lives in a domain folder,
+  never flat in the kind directory.** `shared/fragments/heading-block/heading-block.ts`
+  is the shape; `shared/expressions/display-mode.ts` is the drift this
+  rule stops. The folder is named for the domain, holds that domain's files
+  and their co-located tests, and a new file joins an existing domain folder
+  before it starts a new one. This holds for every kind — `fragments/`,
+  `transformers/`, `expressions/`, `localization/`, `types/` and any added
+  later. A flat file already on `main` moves in its own change, not as a
+  side effect of a feature diff.
 - **Naming in `shared/` follows five rules.** They were implicit and
   partly contradictory until #3548's audit; a new file copies whichever
   neighbour it was modelled on, so the rule is written here rather than
@@ -185,6 +194,33 @@ relative paths only within a single slice (`./query`, `./types`).
   non-exported fragment) instead of creating a shared file. Don't overload files.
 
 ## GROQ query conventions (groqd)
+
+**Typed builders over string literals — mandatory.** Write every query, filter
+and expression with groqd's typed API; a GROQ string literal or `sub.raw()` is
+allowed **only when the typed API cannot express it**, and then carries a
+one-line comment naming what is missing. In particular:
+
+- **Filters use `.filterBy('field == $param')`**, never a raw `[...]` filter
+  string. `filterBy` checks the field and the declared parameter, so a
+  `$locale` the query does not declare fails type-check instead of at runtime.
+- **`coalesce` uses `sub.coalesce(...)`**, never a `` `coalesce(${field}…)` ``
+  template. Picking a localized value is
+  `sub.coalesce(sub.field('eyebrow[]').filterBy('language == $locale').slice(0).field('value'), sub.field('eyebrow[]').filterBy('language == $defaultLocale').slice(0).field('value'))`,
+  with `TLocaleParams` in the query's declared parameters (`runQuery` injects
+  them, so callers still never pass them).
+- **No string-built helpers** that return GROQ text for interpolation
+  (`build*Expression(field)`). A shared helper takes and returns groqd
+  builders, so its result type is inferred, not asserted with `raw<T>()`.
+- **A Sanity `_type` is written inline where the query uses it** —
+  `.filterByType('translation.metadata')`, `fragmentForType<'link'>()`.
+  groqd checks that literal against the generated schema, so a service-local
+  constant (`export const CTA_DOCUMENT_TYPE = 'module_cta'`)
+  adds nothing, and importing it from a sibling file couples two queries
+  through a string.
+- **A reference that can point to several document types is read with `.deref().asCombined()`** before projecting a field only some of them have (`slug.current` on a link target) or filtering on its parent (`references(^._id)`). Never list the types by hand in a `selectByType` just to reach a field — a new type silently drops out of the list.
+- **A cast to satisfy groqd (`as never`, `as unknown as`) is the same
+  failure** — it means the typed route was abandoned. Stop and report it
+  rather than ship the cast.
 
 Typegen marks **every** field optional regardless of schema `.required()` rules
 (validation is runtime, not reflected in types). We restore the schema contract

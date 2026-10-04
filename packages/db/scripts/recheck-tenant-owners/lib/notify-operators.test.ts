@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { TENANT_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
@@ -14,7 +15,7 @@ function tenant(overrides: Partial<TTenant> = {}): TTenant {
     sanityProjectId: 'proj-acme',
     sanityDataset: 'production',
     sanityReadTokenEncrypted: null,
-    locale: 'en',
+    locale: LOCALE_ISO_CODES.EN,
     plan: 'FREE',
     status: TENANT_STATUS.ACTIVE,
     provisioningStatus: 'READY',

@@ -13,3 +13,5 @@ export const TIMELINE_ORIENTATION = {
 } as const;
 
 export type TTimelineOrientation = TValueOf<typeof TIMELINE_ORIENTATION>;
+
+export const TIMELINE_HORIZONTAL_ITEM_CAP = 5;

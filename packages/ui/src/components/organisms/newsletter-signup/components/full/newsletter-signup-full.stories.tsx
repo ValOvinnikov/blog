@@ -82,18 +82,48 @@ export const Centered: TStory = {
   args: { align: CONTENT_ALIGNMENT.CENTER, trustCues },
 };
 
-// The pitch/form panes collapse from two columns to one at a real `md:`
-// media-query breakpoint (not a container query), so this story pins the
-// viewport to show the stacked mobile state — same precedent as
-// `PrimaryNavigation`'s `MobileClosed`/`MobileOpen` stories.
+export const RightAligned: TStory = {
+  args: { align: CONTENT_ALIGNMENT.RIGHT, trustCues },
+};
+
 export const MobilePhone: TStory = {
   globals: { viewport: 'phone' },
   args: { trustCues },
 };
 
-// `withThemeByClassName` drives the toolbar's light/dark toggle globally;
-// pinning it here gives the dark surface/accent/divider treatment its own
-// dedicated doc entry instead of relying on someone flipping the toolbar.
+export const NarrowContainer: TStory = {
+  decorators: [
+    (Story) => (
+      <div className="max-w-prose">
+        <Story />
+      </div>
+    ),
+  ],
+  args: { trustCues },
+};
+
+export const WideContainer: TStory = {
+  decorators: [
+    (Story) => (
+      <div className="max-w-6xl">
+        <Story />
+      </div>
+    ),
+  ],
+  args: { trustCues },
+};
+
+export const BrandPrimaryBand: TStory = {
+  decorators: [
+    (Story) => (
+      <div className="surface-brand-primary bg-brand-primary-muted p-8">
+        <Story />
+      </div>
+    ),
+  ],
+  args: { trustCues },
+};
+
 export const DarkTheme: TStory = {
   globals: { theme: 'dark' },
   args: { trustCues },

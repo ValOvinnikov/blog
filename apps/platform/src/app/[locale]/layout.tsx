@@ -1,17 +1,29 @@
-import type { ILocalizedParams } from '@blog/config';
+import '../../../index.css';
+
+import { LOCALE_BCP47_TAGS } from '@blog/config';
 import { ToastProvider } from '@platform/context/toast-provider';
 import { routing } from '@platform/i18n/routing';
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
-import { getMessages, setRequestLocale } from 'next-intl/server';
+import {
+  getMessages,
+  getTranslations,
+  setRequestLocale,
+} from 'next-intl/server';
 
 type TProps = {
   children: React.ReactNode;
-  params: Promise<ILocalizedParams>;
+  params: Promise<{ locale: string }>;
 };
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('pageMetadata');
+  return { title: t('root') };
 }
 
 export default async function LocaleLayout({ children, params }: TProps) {
@@ -26,8 +38,12 @@ export default async function LocaleLayout({ children, params }: TProps) {
   const messages = await getMessages();
 
   return (
-    <NextIntlClientProvider locale={locale} messages={messages}>
-      <ToastProvider>{children}</ToastProvider>
-    </NextIntlClientProvider>
+    <html lang={LOCALE_BCP47_TAGS[locale]}>
+      <body>
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <ToastProvider>{children}</ToastProvider>
+        </NextIntlClientProvider>
+      </body>
+    </html>
   );
 }

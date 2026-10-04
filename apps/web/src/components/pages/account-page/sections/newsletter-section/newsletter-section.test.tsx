@@ -1,15 +1,18 @@
 import { queries } from '@blog/db';
 import { ToastProvider } from '@web/context/toast-provider';
 import { auth } from '@web/server/auth/auth';
-import { getRequestTenantId } from '@web/server/tenant/get-request-tenant-id';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderServerAsync, screen } from '@web/testing/custom-render';
-import { DEFAULT_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
+import {
+  DEFAULT_REQUEST_CONTEXT,
+  DEFAULT_TENANT_ID,
+} from '@web/testing/shared/tenant/fixtures';
 
 import { NewsletterSection } from './newsletter-section';
 
 vi.mock('@web/server/auth/auth', () => ({ auth: vi.fn() }));
 
-vi.mock('@web/server/tenant/get-request-tenant-id');
+vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@blog/db', () => ({
   queries: { subscribers: { getSubscriptionStatus: vi.fn() } },
@@ -47,7 +50,10 @@ describe(`<${NewsletterSection.name}/>`, () => {
   });
 
   it('renders nothing when no tenant resolves', async () => {
-    vi.mocked(getRequestTenantId).mockResolvedValueOnce(undefined);
+    vi.mocked(getRequestContext).mockResolvedValueOnce({
+      ...DEFAULT_REQUEST_CONTEXT,
+      tenantId: undefined,
+    });
 
     await setup();
 

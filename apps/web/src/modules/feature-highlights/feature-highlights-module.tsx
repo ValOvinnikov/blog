@@ -1,24 +1,21 @@
 import { service } from '@blog/service';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';
 
 import { FeatureHighlightsModuleView } from './feature-highlights-module-view';
 
 export interface IFeatureHighlightsModuleProps {
   id: string;
-  locale: string;
-  tenant: string;
 }
 
 export const FeatureHighlightsModule = async ({
   id,
-  tenant,
 }: IFeatureHighlightsModuleProps) => {
-  const tenantContext = await getTenantSanityContext(tenant);
+  const { sanityContext } = await getRequestContext();
   const result =
     await service.modules.featureHighlights.v1.getFeatureHighlightsModule(
       id,
-      tenantContext,
+      sanityContext,
     );
 
   if (!result.ok) {

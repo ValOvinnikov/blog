@@ -1,4 +1,4 @@
-import { SITE_MESSAGES } from '@blog/config';
+import { LOCALE_ISO_CODES, SITE_MESSAGES } from '@blog/config';
 import userEvent from '@testing-library/user-event';
 import { customRender, render, screen } from '@web/testing/custom-render';
 import { NextIntlClientProvider } from 'next-intl';
@@ -97,13 +97,19 @@ describe(`<${LocaleErrorPage.name}/>`, () => {
 
   it("does not re-report when `t`'s identity changes but the error does not", () => {
     const { rerender } = render(
-      <NextIntlClientProvider locale="en" messages={{ ...SITE_MESSAGES }}>
+      <NextIntlClientProvider
+        locale={LOCALE_ISO_CODES.EN}
+        messages={{ ...SITE_MESSAGES }}
+      >
         <LocaleErrorPage error={error} reset={reset} />
       </NextIntlClientProvider>,
     );
 
     rerender(
-      <NextIntlClientProvider locale="en" messages={{ ...SITE_MESSAGES }}>
+      <NextIntlClientProvider
+        locale={LOCALE_ISO_CODES.EN}
+        messages={{ ...SITE_MESSAGES }}
+      >
         <LocaleErrorPage error={error} reset={reset} />
       </NextIntlClientProvider>,
     );

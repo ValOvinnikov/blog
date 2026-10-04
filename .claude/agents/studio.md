@@ -259,6 +259,9 @@ copy-then-delete migration rather than a rename. Use:
 
 - `defineType` / `defineField` / `defineArrayMember` everywhere for typed schemas.
 - `validation: (rule) => rule.required()` on every field the frontend assumes.
+- No boolean that only switches an optional field on. A filled field is the
+  switch, and it gets no `initialValue` (`studio-schema-practices` → "No
+  toggle beside the field it switches on").
 - `image` fields: `options: { hotspot: true }` and a **required `alt`** field.
 - Rich text (`richText`): block + `imageWithAlt` + `code` (via
   `@sanity/code-input`).

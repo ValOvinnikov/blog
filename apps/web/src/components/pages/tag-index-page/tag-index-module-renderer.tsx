@@ -29,19 +29,15 @@ export interface ITagIndexModuleRendererProps {
   hero: TMaybeUndefined<TModule<TPageTagIndexType>>;
   headingBlock: THeadingBlock;
   modules: TModule<TPageTagIndexType>[];
-  locale: string;
-  tenant: string;
 }
 
 export const TagIndexModuleRenderer = async ({
   hero,
   headingBlock,
   modules,
-  locale,
-  tenant,
 }: ITagIndexModuleRendererProps): Promise<ReactNode> => {
   const heroNode = hero
-    ? await renderHeroModule({ hero, map: TAG_INDEX_MAP, locale, tenant })
+    ? await renderHeroModule({ hero, map: TAG_INDEX_MAP })
     : null;
 
   return (
@@ -49,7 +45,7 @@ export const TagIndexModuleRenderer = async ({
       {heroNode ?? (
         <PageHeading headingBlock={headingBlock} hasTrailingSpace={false} />
       )}
-      {renderModules({ modules, map: TAG_INDEX_MAP, locale, tenant })}
+      {renderModules({ modules, map: TAG_INDEX_MAP })}
     </>
   );
 };

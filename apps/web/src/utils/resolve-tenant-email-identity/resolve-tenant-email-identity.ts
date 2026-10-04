@@ -1,6 +1,6 @@
 import type { TTenantEmailBrand } from '@blog/config';
 import { queries } from '@blog/db';
-import { getSiteConfig } from '@web/server/site-config/get-site-config';
+import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
 import { logger } from '@web/utils/logger/logger';
 import { toTenantEmailBrand } from '@web/utils/to-tenant-email-brand';
 

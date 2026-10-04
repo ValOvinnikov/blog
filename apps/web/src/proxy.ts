@@ -1,15 +1,61 @@
+import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config';
 import { isTenantShapedPathSegment } from '@web/utils/is-tenant-shaped-path-segment';
 import { logger } from '@web/utils/logger/logger';
 import { NextResponse, type NextRequest } from 'next/server';
 import createMiddleware from 'next-intl/middleware';
 
-import { routing } from './i18n/routing';
-import { resolveTenantId } from './server/tenant/resolve-tenant-id';
-import { TENANT_ID_HEADER } from './server/tenant/tenant-id-header';
-import { UNRESOLVED_TENANT_PLACEHOLDER } from './server/tenant/unresolved-tenant-placeholder';
+import { buildTenantRouting, localeForPrefix } from './i18n/routing';
+import {
+  TENANT_ID_HEADER,
+  UNRESOLVED_TENANT_PLACEHOLDER,
+} from './server/tenant/constants/constants';
+import {
+  resolveTenantRouting,
+  type TTenantRouting,
+} from './server/tenant/resolve-tenant/resolve-tenant';
 import { isProductionEnvironment } from './utils/is-production-environment';
 
-const handleI18nRouting = createMiddleware(routing);
+const intlMiddlewares = new Map<string, ReturnType<typeof createMiddleware>>();
+
+const getIntlMiddleware = (
+  defaultLocale: TLocaleIsoCode,
+  liveLocales: readonly TLocaleIsoCode[],
+) => {
+  const key = [defaultLocale, ...liveLocales].join(',');
+  const cached = intlMiddlewares.get(key);
+  if (cached) {
+    return cached;
+  }
+
+  const middleware = createMiddleware(
+    buildTenantRouting(defaultLocale, liveLocales),
+  );
+  intlMiddlewares.set(key, middleware);
+  return middleware;
+};
+
+const SINGLE_DEFAULT_ROUTING = {
+  defaultLocale: LOCALE_ISO_CODES.EN,
+  liveLocales: [LOCALE_ISO_CODES.EN],
+} as const;
+
+// A prefix for a supported language the tenant doesn't serve (switched off
+// by a downgrade) redirects to the same path in the default language.
+const redirectSwitchedOffLocale = (
+  request: NextRequest,
+  firstSegment: string,
+  liveLocales: readonly TLocaleIsoCode[],
+): NextResponse | undefined => {
+  const prefixedLocale = localeForPrefix(firstSegment);
+  if (!prefixedLocale || liveLocales.includes(prefixedLocale)) {
+    return undefined;
+  }
+
+  const target = request.nextUrl.clone();
+  target.pathname =
+    request.nextUrl.pathname.slice(firstSegment.length + 1) || '/';
+  return NextResponse.redirect(target);
+};
 
 const DOTTED_PATH_PATTERN = /\./;
 
@@ -92,13 +138,15 @@ export default async function proxy(
 
   const host = request.headers.get('host');
 
-  let tenantId: string | undefined;
+  let tenantRouting: TTenantRouting | undefined;
   try {
-    tenantId = await resolveTenantId(host);
+    tenantRouting = await resolveTenantRouting(host);
   } catch (error) {
     logger.error('proxy.tenant_lookup_failed', { host, error });
     return new NextResponse(null, { status: 503 });
   }
+
+  const tenantId = tenantRouting?.tenantId;
 
   if (!tenantId && isProductionEnvironment()) {
     return new NextResponse(null, { status: 404 });
@@ -109,7 +157,19 @@ export default async function proxy(
     request.headers.set(TENANT_ID_HEADER, tenantId);
   }
 
-  const intlResponse = handleI18nRouting(request);
+  const { defaultLocale, liveLocales } =
+    tenantRouting ?? SINGLE_DEFAULT_ROUTING;
+
+  const switchedOffRedirect = redirectSwitchedOffLocale(
+    request,
+    firstSegment,
+    liveLocales,
+  );
+  if (switchedOffRedirect) {
+    return switchedOffRedirect;
+  }
+
+  const intlResponse = getIntlMiddleware(defaultLocale, liveLocales)(request);
 
   return prependTenantSegment(
     intlResponse,

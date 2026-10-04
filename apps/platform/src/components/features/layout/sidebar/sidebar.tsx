@@ -26,7 +26,7 @@ type TSidebarNavItemBase = {
  * current route, not passed in — or, with no `href`, renders as an inert
  * row. Never an `<a>` with nowhere to go.
  */
-type TSidebarNavItem = TSidebarNavItemBase &
+export type TSidebarNavItem = TSidebarNavItemBase &
   (
     | { href: string; disabledReason?: never }
     | { href?: undefined; disabledReason?: string }

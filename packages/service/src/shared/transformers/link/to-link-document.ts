@@ -12,7 +12,7 @@ export type TRawLinkDocument = InferFragmentType<typeof linkDocumentFragment>;
 export function toLinkDocument(
   raw: TRawLinkDocument | null | undefined,
 ): TMaybeUndefined<ILink> {
-  if (!raw) return undefined;
+  if (!raw?.label) return undefined;
 
   const href =
     raw.linkType === LINK_TYPE.INTERNAL

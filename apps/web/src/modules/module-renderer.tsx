@@ -5,8 +5,6 @@ import type { ReactNode } from 'react';
 
 export type TModuleComponentProps = {
   id: string;
-  locale: string;
-  tenant: string;
   context?: {
     post?: { id: string };
     page?: number;
@@ -28,16 +26,12 @@ type TModuleMap = Partial<
 export interface IRenderModulesProps {
   modules: TModule[];
   map: TModuleMap;
-  locale: string;
-  tenant: string;
   context?: TModuleComponentProps['context'];
 }
 
 export const renderModules = ({
   modules,
   map,
-  locale,
-  tenant,
   context,
 }: IRenderModulesProps): ReactNode =>
   modules.map((module) => {
@@ -50,29 +44,17 @@ export const renderModules = ({
       return null;
     }
 
-    return (
-      <Component
-        key={module.id}
-        id={module.id}
-        locale={locale}
-        tenant={tenant}
-        context={context}
-      />
-    );
+    return <Component key={module.id} id={module.id} context={context} />;
   });
 
 export interface IRenderHeroModuleProps {
   hero: TModule;
   map: TModuleMap;
-  locale: string;
-  tenant: string;
 }
 
 export const renderHeroModule = async ({
   hero,
   map,
-  locale,
-  tenant,
 }: IRenderHeroModuleProps): Promise<ReactNode> => {
   const Component = map[hero.type];
 
@@ -81,5 +63,5 @@ export const renderHeroModule = async ({
     return null;
   }
 
-  return Component({ id: hero.id, locale, tenant });
+  return Component({ id: hero.id });
 };

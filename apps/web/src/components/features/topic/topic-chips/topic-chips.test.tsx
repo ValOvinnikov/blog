@@ -1,9 +1,10 @@
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { makeTopicWithPostCount } from '@web/testing/shared/topic/fixtures';
 
 import { TopicChips } from './topic-chips';
+
+vi.mock('@web/server/request-context/request-context');
 
 const { getTopicsSafelyMock } = vi.hoisted(() => ({
   getTopicsSafelyMock: vi.fn(),
@@ -15,20 +16,13 @@ vi.mock('@web/utils/get-topics-safely', () => ({
   getTopicsSafely: getTopicsSafelyMock,
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
-
-const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
-
 const setup = customRenderAsync(TopicChips, {
   activeSlug: 'news',
-  tenant: 'tenant-1',
 });
 
 describe(`<${TopicChips.name}/>`, () => {
   beforeEach(() => {
     getTopicsSafelyMock.mockReset();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
   it('renders the topic chip row with the current topic highlighted', async () => {
@@ -66,12 +60,11 @@ describe(`<${TopicChips.name}/>`, () => {
     ).not.toBeInTheDocument();
   });
 
-  it('resolves the tenant Sanity context, then forwards it to getTopicsSafely', async () => {
+  it('forwards the request context Sanity context to getTopicsSafely', async () => {
     getTopicsSafelyMock.mockResolvedValue([]);
 
     await setup();
 
-    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
     expect(getTopicsSafelyMock).toHaveBeenCalledWith(
       DEFAULT_TENANT_SANITY_CONTEXT,
     );

@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import {
   TENANT_PLAN,
   TENANT_PROVISIONING_STATUS,
@@ -23,7 +24,7 @@ const baseTenant = {
   primaryDomain: 'acme.example.com',
   sanityProjectId: 'p1',
   sanityDataset: 'production',
-  locale: 'en',
+  locale: LOCALE_ISO_CODES.EN,
   plan: TENANT_PLAN.FREE,
 };
 

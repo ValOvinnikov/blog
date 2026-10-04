@@ -54,6 +54,24 @@ describe('getNavigation', () => {
     ]);
   });
 
+  it('leaves the language switcher toggle undefined when unset', async () => {
+    mockRun.mockResolvedValue(makeRawNavigation());
+
+    const result = await getNavigation(tenant);
+
+    expect(result.showLanguageSwitcher).toBeUndefined();
+  });
+
+  it('passes the language switcher toggle through when set', async () => {
+    mockRun.mockResolvedValue(
+      makeRawNavigation({ showLanguageSwitcher: true }),
+    );
+
+    const result = await getNavigation(tenant);
+
+    expect(result.showLanguageSwitcher).toBe(true);
+  });
+
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
     mockRun.mockResolvedValue(makeRawNavigation());
 

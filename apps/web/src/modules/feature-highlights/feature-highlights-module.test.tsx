@@ -1,9 +1,9 @@
 import { BRAND_VARIANT, MEDIA_ORDER } from '@blog/config';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeFeatureHighlightItem } from '@web/testing/modules/feature-highlights/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { FeatureHighlightsModule } from './feature-highlights-module';
 
@@ -23,9 +23,9 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
+vi.mock('@web/server/request-context/request-context');
 
-const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
+const getRequestContextMock = vi.mocked(getRequestContext);
 
 const baseModule = {
   brandVariant: BRAND_VARIANT.PRIMARY,
@@ -38,15 +38,13 @@ const baseModule = {
 
 const setup = customRenderAsync(FeatureHighlightsModule, {
   id: 'feature-highlights-1',
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${FeatureHighlightsModule.name}/>`, () => {
   beforeEach(() => {
     getFeatureHighlightsModuleMock.mockReset();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
+    getRequestContextMock.mockReset();
+    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
   it('calls getFeatureHighlightsModule with the module id and tenant context', async () => {
@@ -55,7 +53,10 @@ describe(`<${FeatureHighlightsModule.name}/>`, () => {
       dataset: 'production',
       token: 'tenant-token',
     };
-    getTenantSanityContextMock.mockResolvedValue(tenant);
+    getRequestContextMock.mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      sanityContext: tenant,
+    });
     getFeatureHighlightsModuleMock.mockResolvedValue({
       ok: true,
       data: { ...baseModule, highlights: [] },
@@ -67,7 +68,6 @@ describe(`<${FeatureHighlightsModule.name}/>`, () => {
       'feature-highlights-1',
       tenant,
     );
-    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
   });
 
   it('renders nothing when the fetch fails', async () => {

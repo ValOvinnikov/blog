@@ -62,8 +62,9 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
     expect(screen.getByText('Revoke Sanity tokens')).toBeVisible();
     expect(screen.getByText('Clear provisioning artifacts')).toBeVisible();
     expect(screen.getByText('Archive tenant')).toBeVisible();
+    expect(screen.getByText('Purge reader data')).toBeVisible();
     expect(screen.getByText('Invalidate cached pages')).toBeVisible();
-    expect(screen.getAllByText('Queued').length).toBe(6);
+    expect(screen.getAllByText('Queued').length).toBe(7);
     expect(screen.queryByText('Not started')).not.toBeInTheDocument();
   });
 
@@ -89,7 +90,7 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
     );
 
     expect(screen.getByText('Starting…')).toBeVisible();
-    expect(screen.getAllByText('Queued').length).toBe(6);
+    expect(screen.getAllByText('Queued').length).toBe(7);
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
@@ -113,10 +114,11 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
     expect(screen.getByText('Revoke Sanity tokens')).toBeVisible();
     expect(screen.getByText('Clear provisioning artifacts')).toBeVisible();
     expect(screen.getByText('Archive tenant')).toBeVisible();
+    expect(screen.getByText('Purge reader data')).toBeVisible();
     expect(screen.getByText('Invalidate cached pages')).toBeVisible();
   });
 
-  it('shows a 0 of 6 done badge in the steps card summary when nothing has completed yet', () => {
+  it('shows a 0 of 7 done badge in the steps card summary when nothing has completed yet', () => {
     const tenant = makeTenant({
       deprovisioningSteps: {
         ...idleDeprovisioningSteps(),
@@ -125,7 +127,7 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
     });
     render(<Wrapper tenant={tenant} />);
 
-    expect(screen.getByText('0 of 6 done')).toBeVisible();
+    expect(screen.getByText('0 of 7 done')).toBeVisible();
   });
 
   it('shows the Running badge while a step is in progress, with no error card', () => {

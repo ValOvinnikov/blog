@@ -132,7 +132,7 @@ configs/
 | `@blog/db`       | `config`, `utils`, Drizzle/Neon SDKs (+ `@sanity/client`, scoped¹; `@blog/insight`'s `sanitizeLogMessage`, scoped²) | Typed query/mutation functions over Neon Postgres (Auth.js adapter tables, comments, ratings, bookmarks, subscribers, the `tenants`/`tenant_domains`/`memberships`/`membership_invites` registry, the global `admins` table, the tenant-scoped `site_config`, `settings_features` and `email_config` tables, the tenant's per-template `email_templates` copy (subject/body-as-Portable-Text-`jsonb`/logo, merged over product defaults per field via `getEmailTemplate`/`listEmailTemplates` — see `EMAIL_TEMPLATE_DEFAULT_COPY`), the append-only `audit_events` log, and the `findings` operational-conditions store) — the relational sibling to `service`, not a dependent of it. Also owns the vocabulary for the tables it stores (`TENANT_STATUS`, `TENANT_PLAN`, `PLAN_REGISTRY`, `MEMBERSHIP_ROLE`, `ADMIN_ROLE`, `GRANTED_VIA`, `TENANT_PROVISIONING_*` — some `pgEnum`-backed, some plain typed columns), reachable from the package root and, for client components, from `@blog/db/constants`. That subpath resolves through the workspace's standard `@blog/db/*` alias, not a curated `exports` entry, and nothing enforces the split: a client component importing the root barrel breaks the Next build, because the barrel re-exports `client.ts` and its `server-only` import                                                                | import React, `@blog/ui`, `@blog/service`, or any Sanity SDK outside the scoped exception below; be imported by `studio`/`service`/`ui`                                                                                                                                  |
 | `@blog/auth`     | `db`, `config`, `utils`, `next-auth`/`@auth/*`                                                                      | The Auth.js configuration both apps pass to their own `NextAuth()` call — providers, the Drizzle adapter over `db`'s tables, `database` session strategy, cookie options (only the session cookie's cross-subdomain `Domain`, and only when the optional `AUTH_COOKIE_DOMAIN` is set — unset, no `cookies` key is returned at all, which is the correct state locally and on any `*.vercel.app` origin), and the `session` callback plus module augmentation that put `user.id` on `session.user` (type and fulfilling logic kept together so an app cannot inherit the type without the value). Exports configuration, never a constructed NextAuth instance.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | import React components, `@blog/ui`, `@blog/service`, or Sanity; be imported by `@blog/db`; decide authorization                                                                                                                                                         |
 | `@blog/ui`       | `config` (types + tokens)                                                                                           | Atomic-design components up to organisms (pure, prop-driven, polymorphic `as`/`linkAs` slots). No template layer — page composition belongs in `web`. Prop types are **closed** — each component enumerates exactly what it supports, rather than inheriting the DOM surface; see §18.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | import `service`/`sanity`/`fetch`; use `'use client'` (the directive appears nowhere in the package — `Carousel` is client-only via `useEmblaCarousel`, and its consumer declares the boundary); `extends` a DOM prop set or spread `...rest` onto an element (§18)      |
-| `@blog/studio`   | `config` (constants), `utils`                                                                                       | Sanity Studio **as a library, not a deployed app** — schema types (source of truth), desk structure, content migrations, and the `StudioMount` component, which takes plain string props (`projectId`, `dataset`, `basePath`, `title`) and builds the Studio config internally. `apps/platform` mounts it; that is what lets one Studio serve every tenant. The one package permitted a `'use client'` directive, scoped to that component.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | hand-write shapes typegen should produce; export a _built_ Studio config object — a Server Component calling the builder drags the Sanity SDK into the RSC graph, where `swr`, `sanity`'s bundled CSS and `sanity-plugin-media` break under the `react-server` condition |
+| `@blog/studio`   | `config` (constants), `utils`                                                                                       | Sanity Studio **as a library, not a deployed app** — schema types (source of truth), desk structure, content migrations, and the `StudioMount` component, which takes plain props (`projectId`, `dataset`, `basePath`, `title`, optional `enabledCapabilities`) and builds the Studio config internally. `apps/platform` mounts it; that is what lets one Studio serve every tenant. The one package permitted a `'use client'` directive, scoped to that component.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | hand-write shapes typegen should produce; export a _built_ Studio config object — a Server Component calling the builder drags the Sanity SDK into the RSC graph, where `swr`, `sanity`'s bundled CSS and `sanity-plugin-media` break under the `react-server` condition |
 | `web` (app)      | `ui`, `service`, `db`, `auth`, `config`, utils                                                                      | Routes, metadata, feeds, i18n, page composition; owns `PortableText` and all framework-coupled wrappers (`SanityImage`, `SmartLink`, theme toggle)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | write GROQ; import Sanity SDKs; put data logic in components                                                                                                                                                                                                             |
 | `platform` (app) | `db`, `auth`, `config`, `utils`, `email`, `studio` (+ `@blog/ui`, scoped³)                                          | Operator/tenant admin panel — its own deployment and domain, running the same Auth.js configuration as `web` via the shared `@blog/auth` package (a shared config, not a shared sign-in: each origin holds its own session — see the `AUTH_COOKIE_DOMAIN` note below). Routes, Server Actions, and Base UI form surfaces, styled from its own presentational primitives (Text, Card, Icon, Button, …) rather than `@blog/ui`. Its own UI copy runs through `next-intl`, mirroring `web`'s convention (`apps/platform/src/i18n/`, single `en.json` to start) — decided 2026-08-14; retrofit of existing hardcoded strings is tracked separately, not a blocker on other admin work.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | import Sanity SDKs or `@blog/service` **directly** — mount `@blog/studio` instead; add components to `@blog/ui`; import `@blog/ui` outside the scoped exception below                                                                                                    |
 
@@ -773,7 +773,7 @@ passing the stored value straight through.
 more.** Where a module's array pairs `required()` with a `min()`, an empty list
 is a state the content model forbids, so `apps/web` does not check for it —
 `module_featureList`, `module_testimonial`, `module_logoWall`, `module_stats`,
-`module_faq` and `module_team` render whatever they are handed, in the module and in the view
+`module_faq`, `module_team` and `module_pricing` render whatever they are handed, in the module and in the view
 alike. The trade is deliberate: a document written around Studio's validation
 costs an empty section rather than a disappeared one, which is the cheaper
 failure and the visible one.
@@ -1031,6 +1031,50 @@ rather than a run of rows with a hole in it. The page loses the section and keep
 rendering, as everywhere else in this family. `image` is therefore required in
 the view model, exactly as it is for the logo wall.
 
+**A process and a history are one module, and the marker style is what separates
+them.** `module_timeline` ("Timeline") holds inline `timelineItem` objects for
+the same reason the highlights and the figures are inline: a sequence tells one
+page's story in order and never recombines, so there is no Explainers `block_*`,
+no reference picker and no second revalidation tag. `markerStyle`
+(`TIMELINE_MARKER_STYLE`) chooses **Numbered**, where 1, 2, 3 are generated from
+the authored order, or **Labelled**, where each item carries its own short
+marker such as "2019" or "Week 1". A `timelineItem` ("Step") carries that
+`marker` — free text, max 16, required and shown only when Labelled — a required
+`heading` (max 80, rendered `<h3>`) and an optional `paragraphText` `body`.
+There is no image, icon, button or date per item: an item is read as one line of
+a sequence, not as a card. The module holds 2 to 8 of them, with `required()`
+before `min(2)` and `max(8)` each its own rule chain, and no `unique()` because
+inline objects have no id to compare. It is offered on `page_home` and
+`page_landing` only, under **Modules → Explainers**.
+
+**Horizontal is capped at five items by a publishing rule, and the web layer
+still assumes it can be broken.** `orientation` (`TIMELINE_ORIENTATION`) is
+Vertical or Horizontal; Horizontal applies from `lg`, while phones and `md`
+always show the vertical line, decided in `lg:`-prefixed classes rather than any
+JS breakpoint. A custom rule rejects a Horizontal module holding more than
+`TIMELINE_HORIZONTAL_ITEM_CAP` items, so an author cannot publish one — but
+`apps/web` still falls back to Vertical above that count rather than trusting it,
+because legacy and API-written documents reach the view by paths Studio
+validation never sees, and **nothing is ever hidden**: a 6-item Horizontal
+timeline that reaches the page renders vertically with every item intact. That
+cap lives in `@blog/config` precisely so the publishing rule and the rendering
+fallback cannot drift apart — it is one number read by `packages/studio`'s
+validator and by the module view, never two.
+
+**Two alignments do two different jobs.** Content Alignment places the module
+heading and its actions, as everywhere else in this family; **Item Alignment**
+(Left or Center, following `module_featureList`'s Card Alignment) places the
+timeline itself — Center on Horizontal centres each marker over its text, and on
+Vertical centres the list as a block while keeping the text beside the line.
+Both are emitted `Content Alignment · Item Alignment` by the shared
+`alignmentFields` helper, which orders its baseline field before any extra a
+module adds. `@blog/ui`'s `Timeline` renders an `<ol>` in both orientations, and
+a Numbered marker is `aria-hidden` so the ordinal is not announced twice over
+the list's own; a Labelled marker carries real content and stays exposed. Item
+headings are `<h3>`, so the module heading above them is an `<h2>` — the one
+constraint `apps/web` must honour to keep the page outline unbroken. There is
+one `ctaButtonsField()` under the timeline and no JSON-LD.
+
 **A question is a document, and that is the opposite call from a figure.**
 `block_faq` ("FAQ Item") carries a `title` — its Studio label — a required
 `question`, and a required `answer` in `listedText`. It sits under **Blocks →
@@ -1103,6 +1147,62 @@ and puts a larger photo beside the text from `lg`, stacked below it. It ignores
 `displayMode` and `cardAlignment`, and carries none of the profile hero's
 eyebrow, heading slot or banner variant: the module heading and actions apply
 unchanged.
+
+**A price list is one module document holding its tiers inline.**
+`module_pricing` ("Pricing", under Modules → Conversion, allowed in
+`page_home.modules[]` and `page_landing.modules[]` only) carries
+`brandVariant`, `headingBlock`, 1 to 4 inline `pricingTier` objects (`required()`
+and `min(1)` both, because an array's `required()` passes an empty `[]` and
+`min()` passes a missing value), an optional one-line `footnote`, `ctaButtons`,
+`contentAlignment` and `layout`. The module is the reusable unit: the same price
+list on two pages is one document, and a promo is a deliberate copy. A tier is
+inline for the same reason a stat is: it belongs to this price list's argument.
+
+A `pricingTier` has a required `name`, a `description`, up to 3 `pricingPrice`
+objects (one per period; the first is the headline), a `priceLabel` required
+when there are no prices ("Let's talk"), up to 12 plain feature lines, its own
+`ctaButtons`, a `highlightLabel` and a `footnote`. The copy limits are errors,
+not warnings, because over-long copy breaks the card. **Filling `highlightLabel`
+is the highlight**: there is no separate toggle, the field has no initial value,
+and at most one tier per module may carry one. A `pricingPrice` has a `period`
+from `PRICE_PERIOD` (`ONE_TIME`, `HOUR`, `SESSION`, `MONTH`, `YEAR`; an
+UPPERCASE key/value constant in `@blog/config`'s `constants/price-period.ts`,
+with its `TPricePeriod` union), an `amount` (≥ 0, two decimals), an optional `compareAtAmount`
+that must exceed it, and an `isStartingAt` flag.
+
+**The currency is the site's, not the price's.** `settings_site.currency` is a
+required ISO 4217 code, offered as a dropdown of every code `Intl` supports;
+existing documents were backfilled with `USD` by a content migration, and a newly
+provisioned tenant's Site Settings is seeded with `USD`.
+`service.global.siteSettings.v1` projects it non-null.
+`service.modules.pricing.v1.getPricingModule` returns `TPricingModule`, whose
+tiers keep their prices in authored order and expose `highlightLabel` trimmed,
+or `undefined` when empty. The view model has no `isHighlighted`; a consumer
+derives it from the label. Cache tags follow `module_stats`'.
+
+**`apps/web` formats every amount on the server, and the period switch only
+hides.** `PricingModule` reads the module, the site currency and the request
+locale. It formats with `Intl.NumberFormat(locale, { style: 'currency',
+currency, trailingZeroDisplay: 'stripIfInteger' })`, so £49 never renders as
+£49.00. A zero amount renders the translated "Free", and "From", the tab labels
+and the compare-at amount's screen-reader label come from the `pricingModule`
+messages. So does each period's text ("per month", "one-time"), which
+`PricingCard.Price` renders after the amount as given, adding no "/". When the tiers carry both
+`MONTH` and `YEAR` prices, `toPricingPanels` builds two panels, each heading a
+card with that tab's price, dropping the other tab's price, and listing the
+remaining prices as extra lines in authored order. A tier with no price for a
+tab heads that tab with its first price and that price's own period text,
+never a computed monthly equivalent. Both panels are
+server-rendered. `PricingPeriodSwitch`, the one `'use client'` leaf, composes
+`@blog/ui`'s `SegmentedControl` and toggles `hidden`, with Monthly showing first
+and without JS. With a single period there is no switch. Each tier renders
+through `@blog/ui`'s `PricingCard`, raised with its label as the badge when
+`highlightLabel` is set, and with `ActionGroup` inside its `Actions` slot. The
+grid is the module's own, not `CardGrid`: one tier is centred at card width,
+two sit side by side from `md`, three stack until `lg` and then sit 3-up, and
+four sit 2×2 from `md` and 4-up from `lg`, so no card is squeezed or orphaned.
+The module footnote is capped at `max-w-measure`. A compare-at amount shows on
+the headline price only, never on an extra line. No JSON-LD.
 
 `service.modules.<type>.v1` projects `brandVariant` as a required
 `TBrandVariantOf<...>` (narrowed per module to exactly the options its
@@ -1190,7 +1290,7 @@ storage cut over to Postgres by the config-to-Postgres transition's E5): a
 tenant's row in `@blog/db`'s `site_config` table (`preset` —
 `PRESET_ID.CONSOLE`/`EDITORIAL`, required, plus `accentHue`/`logoHue`/
 `headingFont`/`bodyFont`/`radiusScale`/`density`) is read via
-`apps/web/src/server/site-config/get-site-config.ts` and resolved by
+`apps/web/src/server/site-config/get-site-config/get-site-config.ts` and resolved by
 `apps/web/src/utils/to-theme-tokens.ts` against `@blog/config`'s
 `PRESET_REGISTRY` into a fully-populated `TThemeTokens` (never partial —
 every gap, and the case of no row existing at all, is filled by the preset's
@@ -1199,12 +1299,14 @@ own default). `apps/web`'s `[locale]/layout.tsx` fetches this once per request
 which injects the resolved tokens as a server-rendered `<style>` block
 declaring CSS custom properties under both `:root` and `.dark`
 (carrying `precedence`/`href` so React hoists it into `<head>` from wherever
-it mounts), and selects the matching `next/font/google`
+it mounts), and selects the matching `next/font/local`
 pair (`headingFont`/`bodyFont`) via a per-font dynamically imported loader
 module so only the two fonts actually resolved for that render are
-bundled/preloaded. `apps/web/src/proxy.ts` resolves the request's tenant from
+bundled/preloaded. Fonts are self-hosted in both apps: Latin-subset variable
+woff2 files (SIL OFL, `OFL.txt` alongside) are committed beside each app's
+loaders, so no build fetches Google Fonts. `apps/web/src/proxy.ts` resolves the request's tenant from
 its `Host` header against `@blog/db`'s `tenant_domains`
-(`resolveTenantId()`, `apps/web/src/server/tenant/`), falling back to the
+(`resolveTenantId()`, `apps/web/src/server/tenant/resolve-tenant/`), falling back to the
 sole `tenants` row outside production (`isProductionEnvironment()` — never
 `NODE_ENV`, which is `production` on every Vercel build including the live
 `web-dev` deployment) and 404ing on an unmatched host in production; the
@@ -1224,9 +1326,10 @@ site. That last requirement is production-scoped because local and dev tenant
 rows predate provisioning tracking and legitimately carry no status; a null
 status is refused in production, never waved through. **Writes** are refused for any tenant
 that is not ACTIVE (`isTenantActive()`), so a SUSPENDED tenant's site stays
-readable while nothing new lands against it. Both live in
-`apps/web/src/server/tenant/`, and every tenant-scoped mutation checks the
-latter — one shared predicate rather than a per-call-site status check, since
+readable while nothing new lands against it. The first lives in
+`apps/web/src/server/tenant/resolve-tenant/` and the second in
+`write-gate/`, and every tenant-scoped mutation checks it — through
+`resolveWritableTenant` or the host write context's `isActive` — one shared predicate rather than a per-call-site status check, since
 independent predicates drift apart. The asymmetry is the point: a suspended
 tenant should still be visible, and a frozen or torn-down one should not
 accumulate rows that a later restore would have to reconcile.
@@ -1238,40 +1341,59 @@ per-request `getRequestTenantId()` and caches per tenant — both the
 (`buildSiteConfigCacheTag`/`buildSettingsFeaturesCacheTag`/
 `buildTenantPlanCacheTag`, `apps/web/src/utils/tenant-cache-tags/`) — closing
 the leak where every tenant was served the first `tenants` row's config
-(#2477). The **root layout (`app/layout.tsx`) is tenant-independent** — it
-owns only the static document shell (`<html lang>`, the Sanity CDN
-preconnect, the dark-mode bootstrap script, `<body>`) and reads no Dynamic
-API. Theme tokens, font variables, analytics gating and the tenant's voice
-overrides all resolve in `[locale]/layout.tsx`. **There are two
-`not-found.tsx` boundaries outside `[tenant]/[locale]/layout.tsx`'s own
-children.** `app/[tenant]/not-found.tsx` exists because a segment's own
+(#2477). **There is no `app/layout.tsx`: `[tenant]/[locale]/layout.tsx` is
+the root layout** and renders the document shell through `DocumentShell`
+(`<html lang>` set to the served language's BCP 47 tag from the route
+param, the Sanity CDN preconnect, the dark-mode bootstrap script, `<body>`),
+so `lang` follows the language without a Dynamic API. The layout keeps the
+theme tokens and font variables (`ThemeScope`) and the `notFound()` on a
+site-settings failure, and composes the rest from components that load
+their own data through the request context: `SiteHeader`, `SiteFooter`,
+`SiteProviders` (intl, session, toast, the tenant's voice overrides) and
+`SiteAnalytics` (`apps/web/src/components/shared/`). Site settings come
+from one per-request loader, `apps/web/src/server/site-settings/`, shared
+by `generateMetadata`, the layout, the header, the footer and any module
+that needs them. **There are two 404 boundaries above it, and each renders
+its own English `DocumentShell`:** `app/[tenant]/not-found.tsx` and
+`app/global-not-found.tsx` (enabled by `experimental.globalNotFound`, since
+there is no single root layout to compose a 404 from).
+`app/[tenant]/not-found.tsx` exists because a segment's own
 `not-found.tsx` wraps only that segment's children, never its own layout,
 so a `notFound()` thrown inside `[tenant]/[locale]/layout.tsx` itself is
 catchable only one segment up — without it that throw escaped to a 500 on
 every route. That is a Next.js file-convention rule, independent of the
-route's static/dynamic classification. `[tenant]/[locale]/layout.tsx` seeds
-`rememberRequestTenantId(tenant)` from its own route param immediately after
-awaiting `params`, ahead of both of its `notFound()` calls, and
-`app/[tenant]/not-found.tsx` reads it back with `getRememberedTenantId()`
-rather than the request header — a real `headers()` read there, on the same
-prerendered `/[tenant]/[locale]` route, would be expected to bail the render
-out of static and — with no `pages/500.html` to fall back on — return a
-bare 500 in place of the 404, the same failure #3191 fixed at the root
-boundary. Tokens and voice overrides come from the `@blog/db` `site_config`
-row rather than the Sanity `settings_site` fetch whose failure can be what
-raised the 404, so the _data_ a themed render would use is unaffected by
-that failure — but whether it renders themed at all turns on whether
-`getRememberedTenantId()` can still see what `rememberRequestTenantId`
-wrote into its `cache()`-scoped store once `notFound()` has unwound the
-throwing render, and that hand-off isn't independently verified against a
-real layout-level `notFound()` in a production build: every existing test
-of this path mocks `getRememberedTenantId` directly rather than exercising
-the store. If the hand-off doesn't survive, `getRememberedTenantId()`
-returns `undefined` and the boundary renders unthemed — a graceful
-fallback, never a 500.
+route's static/dynamic classification. Like `app/global-not-found.tsx`,
+`app/[tenant]/not-found.tsx` resolves no tenant and renders unthemed —
+including the 404 a site-settings failure or an unsupported locale raises
+in the layout. It must never read `headers()`: on the same prerendered
+`/[tenant]/[locale]` route that would be expected to bail the render out of
+static and — with no `pages/500.html` to fall back on — return a bare 500 in
+place of the 404, the same failure #3191 fixed at the root boundary.
 
-The root `app/not-found.tsx` boundary has no `[tenant]` route param to
-thread even when one exists in the URL, and never resolves a tenant at all:
+**The request context** (`apps/web/src/server/request-context/`) is where a
+`[tenant]/[locale]` request's tenant-wide values live, so they are not
+threaded by hand. It exports two functions. `enterRequestContext(params)`
+runs first in a route entry (the layout and its `generateMetadata` today;
+pages, their metadata and modules adopt it next): it 404s an unsupported
+locale, stores the tenant from the route param (the unresolved-tenant
+placeholder stored as no tenant) and the locale, calls `setRequestLocale`,
+and builds the context from one read of the `tenants` row. Entering twice
+with the same params is harmless; entering with different ones throws. It
+never reads `headers()` or `cookies()`, so routes stay static.
+`getRequestContext()` resolves one object — `tenantId`, `locale`,
+`sanityContext` (the locale applied), `metadataBase` (a ready `URL`), and
+the tenant's `defaultLocale` and `liveLocales` — which callers destructure;
+it holds stored values only, never flags derived from them, and throws an
+error naming `enterRequestContext()` when read before entry. The row
+read includes archived rows (the base URL applies `isTenantServable` and a
+`deprovisionedAt` check itself), and the credentials come from `@blog/db`'s
+`toTenantSanityCredentials(row)`, which `getTenantSanityCredentials` also
+uses. Resolution: no tenant serves the platform project; a tenant without credentials 404s in production and falls
+back to the platform project elsewhere.
+
+`app/global-not-found.tsx` (formerly the root `app/not-found.tsx`) serves
+URLs that match no route. It has no `[tenant]` route param to thread even
+when one exists in the URL, and never resolves a tenant at all:
 it renders `StandaloneNotFoundPage` with no argument, always falling back to
 default theme tokens and base messages. What was actually checked: curling
 four content-404 URLs against a production build — `/tags` (an index page
@@ -1295,8 +1417,9 @@ can't be the whole explanation on its own — it would equally predict
 `app/[tenant]/not-found.tsx` being bypassed for the layout's own throw,
 which the paragraph above says it is not. `i18n/request.ts`
 is likewise tenant-independent, returning the base locale messages only.
-This split exists because the root layout and `getRequestConfig` both sit
-above any future `[tenant]` route segment and so can never receive it as a
+This split exists because `getRequestConfig` (and, before `<html lang>`
+moved into `[tenant]/[locale]/layout.tsx`, the old `app/layout.tsx`) sits
+above the `[tenant]` route segment and so can never receive it as a
 param — while either resolved tenant state, every route stayed dynamic
 regardless of its path. `/_not-found` renders outside `[locale]/layout.tsx`
 and had no `headers()` dependency before #2477 (`getSiteConfig()` previously
@@ -1317,7 +1440,7 @@ Next had already committed to a static/ISR shape at build time, and
 encountering a Dynamic API call while serving that fallback errored instead
 of quietly reclassifying. This distinction is inferred from the two
 observed outcomes here, not verified against Next's own source or docs — so
-`app/not-found.tsx` avoids the read rather than relying on any general claim
+`app/global-not-found.tsx` avoids the read rather than relying on any general claim
 about when Next treats it as fatal. The
 Sanity `settings_theme` schema this superseded is
 retained only as a rollback path (unused by any read path) until the
@@ -1405,24 +1528,30 @@ tenant-provisioning time — like `site_config`, an absent row is resolved
 lazily at read time by falling back to the tenant's current preset's
 `PRESET_REGISTRY[preset].featureDefaults` (`comments`/`ratings`/`bookmarks`
 default on, `newsletter`/`analytics` default off — a deliberate opt-in
-posture for the two `GROWTH`-only capabilities, not a "match legacy
+posture for `newsletter` and `analytics`, not a "match legacy
 behavior" default). Two gating layers stack on top of the tenant toggle,
 most-restrictive-wins: env-locked secrets (unchanged, pre-existing —
 `AUTH_*`, `ANTHROPIC_API_KEY`, `SANITY_REVALIDATE_SECRET`, …) and
 `@blog/db`'s `PLAN_REGISTRY` (`Record<TTenantPlan, TCapability[]>` — `FREE`
-entitles `comments`/`ratings`/`bookmarks`; `GROWTH` entitles all five).
+entitles `ratings`/`consentBanner`; `GROWTH` entitles all six:
+`comments`/`ratings`/`bookmarks`/`newsletter`/`analytics`/`consentBanner`).
+`comments` and `bookmarks` are `GROWTH`-only because each makes readers sign
+in — magic-link email on a shared Resend quota — and comments will carry
+moderation cost.
 `PLAN_REGISTRY` lives in `@blog/db`, not `@blog/config`, despite mirroring
 `PRESET_REGISTRY`'s shape: it keys off `TENANT_PLAN`, which `db` owns per
 its storage-layer-vocabulary exception, and `config` sits below `db` in the
 dependency graph so it cannot import that type — while both consumers
 already depend on `db` directly. `apps/web`'s
-`is-capability-enabled.ts` (`apps/web/src/server/settings-features/`)
+`is-capability-enabled.ts` (`apps/web/src/server/settings-features/is-capability-enabled/`)
 resolves the two-layer check per request and never throws; a disabled
 capability is omitted silently at its own render site (`module_newsletter`
 in `renderModules`; the bookmark button on the post-detail page; Vercel
 Analytics/Speed Insights in `[locale]/layout.tsx`, ANDed with the
-pre-existing `WEB_ANALYTICS_ENABLED` env gate) — same pattern as an unknown
-module type,
+pre-existing `WEB_ANALYTICS_ENABLED` env gate; the header's `AuthMenu`, which
+`is-reader-account-enabled.ts` shows only when at least one of `bookmarks`/
+`comments`/`newsletter` is enabled, the same check that makes `/account` and
+`/bookmarks` answer 404 otherwise) — same pattern as an unknown module type,
 never a thrown error or a visible placeholder. `comments`/`ratings` have no
 render site yet in `apps/web` (no comments/ratings feature exists anywhere
 in the codebase today); their toggles and plan entitlement are wired
@@ -1433,6 +1562,40 @@ toggle, rejecting the whole save if a submitted toggle exceeds the tenant's
 plan, since a disabled client control is never the real gate. Validation
 limits and layout thresholds (mentioned in the original phase scope) were
 cut with no concrete values ever specified; tracked separately (#1920).
+
+**"Coming soon" capabilities.** A capability that is not finished end to end
+— today `comments` and `ratings` (no public-site implementation) and
+`newsletter` (readers can subscribe, but no tenant can send an issue yet) — is
+flagged `isComingSoon` in `apps/platform`'s `CAPABILITY_TOGGLES`. The Features
+tab renders it as a read-only "Coming soon" row with no switch, loads it off,
+and the save action writes it off whatever the payload says, so the row cannot
+be bypassed by a crafted request. Plan-locked toggles keep their "Growth plan"
+lock. Shipping one of these features is a matter of dropping its flag.
+
+**Plan-aware navigation.** `apps/platform`'s `planPageAccess(plan)` derives
+which plan-gated pages a tenant can use: Languages when `PLAN_LOCALE_LIMIT`
+allows a language beyond the default; Email when `PLAN_REGISTRY` holds any of
+`bookmarks`/`comments`/`newsletter` (the capabilities that make the site send
+email); Subscribers with `newsletter`; Comments with `comments`; Team on any
+plan but `FREE`. The tenant's own `/dashboard` sidebar omits what the plan
+cannot use, and a gated dashboard page answers 404 for such a tenant. The
+operator's `/tenants/{id}` view ignores the plan and shows every entry and
+page, so a downgraded tenant's data stays reachable. Roadmap entries with no
+page yet (Subscribers, Comments, Team) render as non-interactive "Coming soon"
+items in both views; no entry carries a progress badge.
+
+**Studio capability warning.** `@blog/studio`'s `StudioMount` takes an optional
+`enabledCapabilities?: readonly TCapability[]`. When it is supplied, a
+type→capability map in the package (`module_newsletter` → `NEWSLETTER`)
+drives a warning banner at the top of any document of a mapped type whose
+capability is missing from the list; omitting the prop shows no banner.
+`apps/platform`'s `StudioMountView` resolves the list per request on the
+server (`getEnabledCapabilities`): a capability is included only when the
+tenant's `PLAN_REGISTRY` entitlement _and_ its effective `settings_features`
+toggle both allow it — the same most-restrictive-wins semantics as
+`apps/web`'s `is-capability-enabled.ts`. Unlike the web check, a failed read throws and fails the Studio page rather
+than showing a false warning. Because it is read on each Studio load,
+turning a feature on clears the warning on the next load.
 
 **Curated UI copy lives in Voice, not on modules.** Empty-state and other
 curated UI strings have exactly one authorable home: the tenant's
@@ -1642,17 +1805,20 @@ in the build and scales into a per-page `staticPageGenerationTimeout` cliff.
 **The tenant reaches a route through its `[tenant]` path segment, not a
 request header.** `proxy.ts` resolves it from `Host` and writes it into the
 path by rewrite (invisible in the URL, as `localePrefix: 'never'` already
-hides the locale), and routes pass `params.tenant` down explicitly —
+hides the locale), and every `[tenant]/[locale]` layout, page and
+`generateMetadata` enters the request context from those params
+(`enterRequestContext`, `apps/web/src/server/request-context/`), which
+everything below it reads instead of receiving the tenant as a prop —
 `ITenantLocalizedParams` in `@blog/config` types the pair. The two functions
 that read the request (`getRequestTenantId`, `resolveRequestTenant`, in
-`apps/web/src/server/tenant/`) take the tenant as an argument and only touch
+`apps/web/src/server/tenant/request-tenant/`) take the tenant as an argument and only touch
 `headers()` when not given one. That fallback serves Server Actions and the
 root-level `Host`-resolved routes (`robots.ts`/`sitemap.ts`/`rss.xml`) — none
 of which have route params to thread — and also the `account`/`bookmarks`
 compositions, which do sit under a route carrying `tenant` but deliberately
 leave it unthreaded: `force-dynamic` already excludes them from the cache,
-so resolving from the request costs them nothing. The root `app/not-found.tsx`
-boundary reads neither function: it renders unthemed rather than resolving a
+so resolving from the request costs them nothing. `app/global-not-found.tsx`
+reads neither function: it renders unthemed rather than resolving a
 tenant at all — a `headers()` read there was what produced #3191's 500 (see
 above), so it avoids the read rather than resolving a tenant a different way.
 
@@ -1669,7 +1835,7 @@ layers below it.
 
 Client-side error capture is a self-hosted route, not a third-party SDK
 (`web`'s Lighthouse performance budget rules out shipping an SDK on every
-page view): `app/error.tsx`/`app/global-error.tsx` report render failures on
+page view): `[tenant]/[locale]/error.tsx`/`app/global-error.tsx` report render failures on
 mount, and the two existing explicit client catches report alongside their
 `logger.*` calls, all via `@web/utils/report-client-error`
 (`navigator.sendBeacon`, falling back to `fetch(..., { keepalive: true })`;

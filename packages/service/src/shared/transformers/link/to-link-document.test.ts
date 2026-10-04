@@ -92,13 +92,18 @@ describe(toLinkDocument, () => {
     expect(result).toBeUndefined();
   });
 
-  it('returns undefined for a dangling/unresolvable reference type', () => {
+  it('returns undefined when the link has no label in the requested or default language', () => {
+    const result = toLinkDocument(makeRawInternalLinkDocument({ label: null }));
+
+    expect(result).toBeUndefined();
+  });
+
+  it('returns undefined when the referenced page has no slug', () => {
     const result = toLinkDocument(
       makeRawInternalLinkDocument({
         internalReference: {
-          // @ts-expect-error — simulating a reference target outside the known union (schema drift).
-          _type: 'page_unknown',
-          slug: 'whatever',
+          _type: 'page_landing',
+          slug: null,
         },
       }),
     );

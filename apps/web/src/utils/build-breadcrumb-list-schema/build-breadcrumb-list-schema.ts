@@ -1,4 +1,7 @@
 import type { IBreadcrumbItem } from '@blog/ui/components/molecules/breadcrumbs';
+import { routing } from '@web/i18n/routing';
+import { getRequestContext } from '@web/server/request-context/request-context';
+import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
 
 export type TBreadcrumbListSchema = {
   '@context': 'https://schema.org';
@@ -11,32 +14,15 @@ export type TBreadcrumbListSchema = {
   }>;
 };
 
-/**
- * Builds a `BreadcrumbList` JSON-LD schema object from the same trail fed
- * into the `Breadcrumbs` component — feed the result straight into
- * `<JsonLd schema={...} />`.
- *
- * `position` is 1-based per schema.org's `ListItem` convention. `item` is an
- * absolute URL (`siteUrl` + the item's relative `href`) since schema.org
- * requires `ListItem.item` to be absolute.
- *
- * Returns `undefined` when `siteUrl` is empty, mirroring how
- * `[tenant]/[locale]/layout.tsx` treats an unresolved base URL as "no
- * `metadataBase`" rather than defaulting to `''` — schema.org's
- * `ListItem.item` must be absolute, so silently concatenating an empty
- * `siteUrl` with each item's relative `href` would produce invalid
- * (relative) `item` URLs and fail structured-data validation. Callers skip
- * rendering `<JsonLd>` entirely when this returns `undefined`.
- *
- * @example
- * const schema = buildBreadcrumbListSchema(trail, (await getTenantBaseUrl()) ?? '');
- * return schema ? <JsonLd schema={schema} /> : null;
- */
-export const buildBreadcrumbListSchema = (
+export const buildBreadcrumbListSchema = async (
   items: IBreadcrumbItem[],
-  siteUrl: string,
-): TBreadcrumbListSchema | undefined => {
-  if (!siteUrl) return undefined;
+): Promise<TBreadcrumbListSchema | undefined> => {
+  const {
+    metadataBase,
+    locale,
+    defaultLocale = routing.defaultLocale,
+  } = await getRequestContext();
+  if (!metadataBase) return undefined;
 
   return {
     '@context': 'https://schema.org',
@@ -45,7 +31,10 @@ export const buildBreadcrumbListSchema = (
       '@type': 'ListItem',
       position: index + 1,
       name: item.label,
-      item: `${siteUrl}${item.href}`,
+      item: new URL(
+        toLocalizedPathname({ href: item.href, locale, defaultLocale }),
+        metadataBase,
+      ).href,
     })),
   };
 };

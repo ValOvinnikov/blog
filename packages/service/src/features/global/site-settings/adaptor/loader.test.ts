@@ -193,6 +193,14 @@ describe('getSiteSettings', () => {
     );
   });
 
+  it('returns the currency code', async () => {
+    mockRun.mockResolvedValue(makeRawSiteSettings({ currency: 'EUR' }));
+
+    const result = await getSiteSettings(tenant);
+
+    expect(result.currency).toBe('EUR');
+  });
+
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
     mockRun.mockResolvedValue(makeRawSiteSettings());
 

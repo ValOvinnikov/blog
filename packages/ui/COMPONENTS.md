@@ -2,14 +2,14 @@
 
 # @blog/ui component index
 
-_58 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
+_59 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
 
 ## Atoms
 
 ### Alert — `components/atoms/alert/alert.tsx`
 
 A static, type-coded inline message block for form feedback (confirmations, warnings, and errors).
-Props: type: NonNullable<TAlertVariants['type']> · message: string · id?: string _(extends IWithClassName, IWithDataTestId)_
+Props: type: NonNullable<TAlertVariants['type']> · message: string · id?: string · hasIcon?: boolean _(extends IWithClassName, IWithDataTestId)_
 Variants: type: ALERT_TYPE.SUCCESS|ALERT_TYPE.WARNING|ALERT_TYPE.ERROR|ALERT_TYPE.INFO
 
 ### Avatar — `components/atoms/avatar/avatar.tsx`
@@ -246,7 +246,7 @@ Slots:
 - **PricingCard.Badge** — The raised-tier callout pinned to the top edge of a highlighted `PricingCard`. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **PricingCard.Name** — The `<h3>` naming a `PricingCard`'s tier. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **PricingCard.Description** — The one- or two-line summary of a `PricingCard`'s tier, below its `Name`. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **PricingCard.Price** — A `PricingCard`'s headline price, taking pre-formatted strings and never formatting currency or numbers itself; a `compareAt` value renders struck through with a screen-reader-only "Regular price" prefix. Props: amount: string · compareAt?: string · period?: string · prefix?: string _(extends IWithClassName, IWithDataTestId)_
+- **PricingCard.Price** — A `PricingCard`'s headline price, taking pre-formatted strings and never formatting currency or numbers itself. Props: amount: string · period?: string · prefix?: string _(extends IWithClassName, IWithDataTestId, ( | { compareAt?: undefined; compareAtLabel?: n…)_
 - **PricingCard.Extra** — One smaller price line below a `PricingCard`'s headline `Price` (e.g. a one-time setup fee). Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **PricingCard.Features** — The checklist of what a `PricingCard`'s tier includes; grows to fill the card's remaining height so `Actions` lines up across neighbouring cards. Props: items: string[] _(extends IWithClassName, IWithDataTestId)_
 - **PricingCard.Actions** — The stacked, full-width call-to-action slot of a `PricingCard`; the caller fills it with its own action buttons. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
@@ -254,8 +254,8 @@ Slots:
 
 ### PrimaryNavigation — `components/molecules/primary-navigation/primary-navigation.tsx`
 
-Top-level `<nav>` landmark composing `NavLink` items with an optional trailing `actions` slot (e.g. a theme toggle or menu button).
-Props: links: INavItem[] · actions?: ReactNode · ariaLabel?: string · linkAs?: TAnchorElementType · mobileToggle?: TPrimaryNavigationMobileToggleProps _(extends IWithClassName, IWithDataTestId)_
+Top-level `<nav>` landmark composing `NavLink` items with trailing `actions`, which stay in the bar, and `panelActions`, which move into the mobile panel below `lg`.
+Props: links: INavItem[] · actions?: ReactNode · panelActions?: ReactNode · ariaLabel?: string · linkAs?: TAnchorElementType · mobileToggle?: TPrimaryNavigationMobileToggleProps _(extends IWithClassName, IWithDataTestId)_
 Variants: collapsible: (boolean)
 
 ### QuoteCard — `components/molecules/quote-card/quote-card.tsx`
@@ -396,13 +396,26 @@ A pure, controlled subscribe form built on the `TextInput` atom, exposed as two 
 Compound component:
 
 - **NewsletterSignup.Full** — The rich, tinted panel signup form used by the site footer and the CMS page-builder module. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading: string · headingId?: string · supportingText?: string · errorMessage?: string · errorMessageId?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string · trustCues?: INewsletterSignupTrustCue[] · align?: TNewsletterSignupVariants['align'] _(extends IWithClassName, IWithDataTestId)_
-- **NewsletterSignup.Compact** — A slim single-row subscribe strip for the end of every article. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading: string · headingId?: string · prefix?: ReactNode · errorMessage?: string · errorMessageId?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string _(extends IWithClassName, IWithDataTestId)_
+- **NewsletterSignup.Compact** — A slim single-row subscribe strip for the end of every article. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading: string · headingId?: string · prefix?: ReactNode · errorMessage?: string · errorMessageId?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string · align?: TNewsletterSignupVariants['align'] _(extends IWithClassName, IWithDataTestId)_
 
 ### Pagination — `components/organisms/pagination/pagination.tsx`
 
 Prev/next + numbered links for paginated listings, route-agnostic (`createHref`) and polymorphic (`linkAs`); renders nothing when there is a single page.
 Props: currentPage: number · totalPages: number · createHref: (page: number) => string · ariaLabel: string · previousLabel: string · nextLabel: string · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
 Variants: current: (boolean)
+
+### Timeline — `components/organisms/timeline/timeline.tsx`
+
+A sequence of steps or milestones that reads as one connected line.
+Props: orientation: TTimelineOrientation · itemAlignment: Extract<TContentAlignment, 'LEFT' | 'CENTER'> · markerStyle: TTimelineMarkerStyle · children?: TCompoundChildren<Pick<typeof TimelineParts, 'Item'>> _(extends IWithClassName, IWithDataTestId)_
+Variants: orientation: TIMELINE_ORIENTATION.VERTICAL|TIMELINE_ORIENTATION.HORIZONTAL · itemAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER · markerStyle: TIMELINE_MARKER_STYLE.NUMBERED|TIMELINE_MARKER_STYLE.LABELLED
+
+Slots:
+
+- **Timeline.Item** — One step on the timeline: a marker, a heading and optional supporting copy. Props: orientation?: TTimelineOrientation · itemAlignment?: Extract<TContentAlignment, 'LEFT' | 'CENTER'> · children?: TCompoundChildren<typeof TimelineItemParts> _(extends IWithClassName, IWithDataTestId)_ · Variants: orientation: TIMELINE_ORIENTATION.VERTICAL|TIMELINE_ORIENTATION.HORIZONTAL · itemAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER
+- **Timeline.Marker** — The badge on a timeline item showing its step number or label. Props: markerStyle: TTimelineMarkerStyle · children: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: markerStyle: TIMELINE_MARKER_STYLE.NUMBERED|TIMELINE_MARKER_STYLE.LABELLED
+- **Timeline.Heading** — The title of a single step. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Timeline.Body** — Supporting copy for a `Timeline.Item`. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### ToastViewport — `components/organisms/toast-viewport/toast-viewport.tsx`
 

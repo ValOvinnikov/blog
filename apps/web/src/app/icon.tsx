@@ -4,7 +4,7 @@ import {
   type TSanityProjectRef,
   urlForSanityImage,
 } from '@blog/service';
-import { getHostTenantSanityContext } from '@web/server/tenant/get-host-tenant-sanity-context';
+import { getHostTenantSanityContext } from '@web/server/tenant/tenant-sanity-context/tenant-sanity-context';
 import { logger } from '@web/utils/logger/logger';
 
 export const contentType = 'image/svg+xml';

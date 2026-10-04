@@ -3,7 +3,10 @@ import type { TTenant } from '@blog/db/schema/tenants';
 import { FeaturesSettings } from '@platform/components/features/capabilities/features-settings';
 import { getSettingsFeaturesOrDefaults } from '@platform/server/settings-features/settings-features-or-defaults';
 import { updateFeaturesAction } from '@platform/server/settings-features/update-features-action';
-import { clampToEntitlement } from '@platform/utils/settings-features-fields/settings-features-fields';
+import {
+  clampToEntitlement,
+  withComingSoonOff,
+} from '@platform/utils/settings-features-fields/settings-features-fields';
 
 export type TFeaturesPageContentProps = {
   tenant: TTenant;
@@ -21,9 +24,8 @@ export const FeaturesPageContent = async ({
   const rawInitialValues = await getSettingsFeaturesOrDefaults(tenant.id);
   // A plan downgrade can leave a stale `true` for a now-unentitled
   // capability in the saved row — clamp it before the form ever renders it.
-  const initialValues = clampToEntitlement(
-    rawInitialValues,
-    entitledCapabilities,
+  const initialValues = withComingSoonOff(
+    clampToEntitlement(rawInitialValues, entitledCapabilities),
   );
 
   return (

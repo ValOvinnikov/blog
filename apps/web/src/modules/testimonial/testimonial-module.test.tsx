@@ -1,9 +1,9 @@
 import { BRAND_VARIANT, CONTENT_ALIGNMENT, DISPLAY_MODE } from '@blog/config';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeTestimonialItem } from '@web/testing/modules/testimonial/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { TestimonialModule } from './testimonial-module';
 
@@ -21,9 +21,9 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
+vi.mock('@web/server/request-context/request-context');
 
-const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
+const getRequestContextMock = vi.mocked(getRequestContext);
 
 const baseModule = {
   brandVariant: BRAND_VARIANT.PRIMARY,
@@ -37,15 +37,13 @@ const baseModule = {
 
 const setup = customRenderAsync(TestimonialModule, {
   id: 'testimonial-1',
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${TestimonialModule.name}/>`, () => {
   beforeEach(() => {
     getTestimonialModuleMock.mockReset();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
+    getRequestContextMock.mockReset();
+    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
   it('calls getTestimonialModule with the module id and the tenant Sanity context', async () => {
@@ -54,7 +52,10 @@ describe(`<${TestimonialModule.name}/>`, () => {
       dataset: 'production',
       token: 'tenant-token',
     };
-    getTenantSanityContextMock.mockResolvedValue(tenant);
+    getRequestContextMock.mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      sanityContext: tenant,
+    });
     getTestimonialModuleMock.mockResolvedValue({
       ok: true,
       data: {
@@ -69,7 +70,6 @@ describe(`<${TestimonialModule.name}/>`, () => {
       'testimonial-1',
       tenant,
     );
-    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
   });
 
   it('renders nothing when the fetch fails', async () => {

@@ -10,7 +10,7 @@ const { authMock, exportAccountDataMock, resolveTenantIdMock, headersMock } =
 
 vi.mock('@web/server/auth/auth', () => ({ auth: authMock }));
 
-vi.mock('@web/server/tenant/resolve-tenant-id', () => ({
+vi.mock('@web/server/tenant/resolve-tenant/resolve-tenant', () => ({
   resolveTenantId: resolveTenantIdMock,
 }));
 

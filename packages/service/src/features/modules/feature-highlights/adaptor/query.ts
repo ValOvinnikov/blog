@@ -5,7 +5,7 @@ import { headingBlockFragment } from '@blog/service/shared/fragments/heading-blo
 import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
 import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
-import { listedTextBlockFragment } from '@blog/service/shared/fragments/portable-text/listed-text-block';
+import { textBlockFragment } from '@blog/service/shared/fragments/portable-text/text-block';
 
 export const featureHighlightsModuleQuery = q
   .parameters<TModuleQueryParams>()
@@ -23,10 +23,7 @@ export const featureHighlightsModuleQuery = q
       .project((highlightSub) => ({
         _key: true,
         heading: highlightSub.field('heading').notNull(),
-        body: highlightSub
-          .field('body[]')
-          .project(listedTextBlockFragment)
-          .notNull(),
+        body: highlightSub.field('body[]').project(textBlockFragment).notNull(),
         image: highlightSub
           .field('image')
           .project(sanityImageFragment)

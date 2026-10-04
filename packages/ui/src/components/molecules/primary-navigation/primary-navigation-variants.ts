@@ -16,6 +16,11 @@ export const primaryNavigationVariants = tv({
       'rounded-md px-3 py-2',
       'hover:bg-surface-2',
     ],
+    barPanelActions: ['flex shrink-0 items-center gap-x-4'],
+    panelActionsRow: [
+      'flex w-full items-center gap-3',
+      'mt-2 border-t border-border px-3 pt-3',
+    ],
   },
   variants: {
     collapsible: {
@@ -23,6 +28,7 @@ export const primaryNavigationVariants = tv({
         links: ['hidden lg:flex'],
         toggle: ['lg:hidden'],
         panel: ['lg:hidden'],
+        barPanelActions: ['hidden lg:flex'],
       },
     },
   },

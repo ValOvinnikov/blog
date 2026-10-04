@@ -25,5 +25,6 @@ export function toSiteSettings(raw: TRawSiteSettings): TSiteSettings {
       tagline,
       logo: toSanityImage(raw.brand.logo),
     },
+    currency: raw.currency,
   };
 }

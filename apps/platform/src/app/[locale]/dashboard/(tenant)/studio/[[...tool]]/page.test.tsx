@@ -23,6 +23,10 @@ const {
 
 vi.mock('@platform/server/auth/auth');
 
+vi.mock('@platform/server/settings-features/get-enabled-capabilities', () => ({
+  getEnabledCapabilities: vi.fn().mockResolvedValue([]),
+}));
+
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
@@ -30,6 +34,7 @@ vi.mock('@blog/db', async () => ({
     tenants: {
       listTenantsByIds: listTenantsByIdsMock,
       getTenantSanityCredentials: getTenantSanityCredentialsMock,
+      getTenantLiveLocales: vi.fn().mockResolvedValue([]),
     },
     admins: { getAdminByUserId: getAdminByUserIdMock },
   },

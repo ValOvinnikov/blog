@@ -1,3 +1,6 @@
+import type { TLocaleIsoCode } from '@blog/config/constants';
+import type { IGroqBuilder } from 'groqd';
+
 import { isr, q, runQuery, type TSlugParams } from './query';
 
 // `vi.mock`'s factory runs eagerly the moment `./client` first resolves
@@ -46,6 +49,38 @@ describe(runQuery, () => {
   });
 });
 
+describe('runQuery injected locale parameters', () => {
+  const localizedQuery = q
+    .parameters<TSlugParams & { locale: TLocaleIsoCode }>()
+    .star.filterByType('page_landing')
+    .filterBy('slug.current == $slug')
+    .filterBy('language == $locale')
+    .slice(0)
+    .project((sub) => ({ slug: sub.field('slug.current').notNull() }))
+    .nullable(true);
+
+  it('runs a query that declares locale without the caller passing it', () => {
+    function run() {
+      return runQuery(localizedQuery, {
+        parameters: { slug: 'about' },
+        tenant: testTenant,
+      });
+    }
+
+    expectTypeOf(run).returns.resolves.toEqualTypeOf<{
+      slug: string;
+    } | null>();
+  });
+
+  it('still requires the parameters the tenant does not inject', () => {
+    type TConfig =
+      typeof localizedQuery extends IGroqBuilder<unknown, infer C> ? C : never;
+    type TOptions = Parameters<typeof runQuery<unknown, TConfig>>[1];
+
+    expectTypeOf<TOptions['parameters']>().toEqualTypeOf<{ slug: string }>();
+  });
+});
+
 describe(isr, () => {
   it('rejects a call site that omits the project id at compile time', () => {
     // @ts-expect-error -- `scopeProjectId` is required; there is no unscoped form that silently shares a cache tag across tenants.
@@ -89,5 +124,35 @@ describe('runQuery tenant threading', () => {
     });
 
     expect(getClientMock).toHaveBeenCalledWith(testTenant);
+  });
+
+  it("sends the tenant's request and default language as query params", async () => {
+    mockFetch.mockResolvedValue(null);
+
+    const query = q.star.filterByType('page_post').slice(0);
+    await runQuery(query, {
+      tenant: { ...testTenant, locale: 'NL', defaultLocale: 'DE' },
+    }).catch(() => {});
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.any(String),
+      { locale: 'NL', defaultLocale: 'DE' },
+      undefined,
+    );
+  });
+
+  it('defaults the request language to the default language', async () => {
+    mockFetch.mockResolvedValue(null);
+
+    const query = q.star.filterByType('page_post').slice(0);
+    await runQuery(query, {
+      tenant: { ...testTenant, defaultLocale: 'DE' },
+    }).catch(() => {});
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.any(String),
+      { locale: 'DE', defaultLocale: 'DE' },
+      undefined,
+    );
   });
 });

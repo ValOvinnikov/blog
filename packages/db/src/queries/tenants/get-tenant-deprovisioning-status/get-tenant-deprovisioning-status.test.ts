@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import type { TTenantDeprovisioningState } from '@blog/db/schema/tenants';
@@ -23,6 +24,7 @@ describe(getTenantDeprovisioningStatus, () => {
       REVOKE_SANITY_TOKENS: { status: 'IDLE' },
       CLEAR_ARTIFACTS: { status: 'IDLE' },
       ARCHIVE_TENANT: { status: 'IDLE' },
+      PURGE_READER_DATA: { status: 'IDLE' },
       INVALIDATE_TENANT_CACHE: { status: 'IDLE' },
     };
     const [tenant] = await db()
@@ -30,7 +32,7 @@ describe(getTenantDeprovisioningStatus, () => {
       .values({
         name: 'Acme',
         primaryDomain: 'acme.example.com',
-        locale: 'en',
+        locale: LOCALE_ISO_CODES.EN,
         plan: TENANT_PLAN.FREE,
         status: TENANT_STATUS.ACTIVE,
         deprovisioningSteps,
@@ -61,7 +63,7 @@ describe(getTenantDeprovisioningStatus, () => {
       .values({
         name: 'Never Deprovisioned',
         primaryDomain: 'never.example.com',
-        locale: 'en',
+        locale: LOCALE_ISO_CODES.EN,
         plan: TENANT_PLAN.FREE,
         status: TENANT_STATUS.ACTIVE,
       })
@@ -84,7 +86,7 @@ describe(getTenantDeprovisioningStatus, () => {
       .values({
         name: 'Deprovisioned',
         primaryDomain: 'gone.example.com',
-        locale: 'en',
+        locale: LOCALE_ISO_CODES.EN,
         plan: TENANT_PLAN.FREE,
         status: TENANT_STATUS.ARCHIVED,
         deprovisionedAt,

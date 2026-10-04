@@ -69,8 +69,6 @@ const setup = customRenderAsync(TagModuleRenderer, {
   headingBlock: makeHeadingBlock({ heading: 'TypeScript' }),
   hasTrailingSpace: false,
   modules: [],
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${TagModuleRenderer.name}/>`, () => {

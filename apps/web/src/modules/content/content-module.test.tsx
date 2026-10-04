@@ -1,9 +1,9 @@
 import { BRAND_VARIANT } from '@blog/config';
 import type { TPortableTextBody } from '@blog/service';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, within } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { ContentModule } from './content-module';
 
@@ -19,21 +19,19 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
+vi.mock('@web/server/request-context/request-context');
 
-const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
+const getRequestContextMock = vi.mocked(getRequestContext);
 
 const setup = customRenderAsync(ContentModule, {
   id: 'content-1',
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${ContentModule.name}/>`, () => {
   beforeEach(() => {
     getContentMock.mockReset();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
+    getRequestContextMock.mockReset();
+    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
   it('forwards the resolved tenant Sanity context to getContent', async () => {
@@ -42,7 +40,10 @@ describe(`<${ContentModule.name}/>`, () => {
       dataset: 'production',
       token: 'tenant-token',
     };
-    getTenantSanityContextMock.mockResolvedValue(tenant);
+    getRequestContextMock.mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      sanityContext: tenant,
+    });
     getContentMock.mockResolvedValue({
       ok: true,
       data: {
@@ -55,7 +56,6 @@ describe(`<${ContentModule.name}/>`, () => {
     await setup();
 
     expect(getContentMock).toHaveBeenCalledWith('content-1', tenant);
-    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
   });
 
   it('renders nothing when the fetch fails', async () => {

@@ -1,4 +1,10 @@
-import { DENSITY, FONT_CHOICE, PRESET_ID, RADIUS_SCALE } from '@blog/config';
+import {
+  DENSITY,
+  FONT_CHOICE,
+  LANGUAGE_SWITCHER_STYLE,
+  PRESET_ID,
+  RADIUS_SCALE,
+} from '@blog/config';
 import type { TSiteConfigResult } from '@blog/db/queries/site-config';
 
 import { defaultLookFormValues, toLookFormValues } from './default-look-values';
@@ -13,6 +19,7 @@ describe(defaultLookFormValues, () => {
       bodyFont: FONT_CHOICE.NEWSREADER,
       radiusScale: RADIUS_SCALE.MD,
       density: DENSITY.DEFAULT,
+      languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
       logoAssetUrl: undefined,
       faviconAssetUrl: undefined,
     });
@@ -31,6 +38,7 @@ describe(toLookFormValues, () => {
       bodyFont: FONT_CHOICE.INTER,
       radiusScale: RADIUS_SCALE.LG,
       density: DENSITY.COMPACT,
+      languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
       logoAssetUrl: 'https://example.blob.vercel-storage.com/logo.png',
       faviconAssetUrl: 'https://example.blob.vercel-storage.com/favicon.png',
       voiceOverrides: {},
@@ -46,6 +54,7 @@ describe(toLookFormValues, () => {
       bodyFont: FONT_CHOICE.INTER,
       radiusScale: RADIUS_SCALE.LG,
       density: DENSITY.COMPACT,
+      languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
       logoAssetUrl: 'https://example.blob.vercel-storage.com/logo.png',
       faviconAssetUrl: 'https://example.blob.vercel-storage.com/favicon.png',
     });

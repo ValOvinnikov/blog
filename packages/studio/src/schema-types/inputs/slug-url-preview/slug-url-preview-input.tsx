@@ -12,7 +12,7 @@ import type { SlugInputProps } from 'sanity';
 export const createSlugUrlPreviewInput = (routePrefix: string) => {
   return function SlugUrlPreviewInput(props: SlugInputProps) {
     return (
-      <Stack space={2}>
+      <Stack gap={2}>
         {props.renderDefault(props)}
         <Card tone="transparent" padding={3} radius={2}>
           <Text size={1} muted={true}>

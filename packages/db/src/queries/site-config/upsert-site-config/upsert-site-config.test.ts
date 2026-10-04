@@ -1,6 +1,7 @@
 import {
   DENSITY,
   FONT_CHOICE,
+  LANGUAGE_SWITCHER_STYLE,
   PRESET_ID,
   RADIUS_SCALE,
 } from '@blog/config/constants';
@@ -143,6 +144,55 @@ describe(upsertSiteConfig, () => {
 
     await expect(
       upsertSiteConfig(tenantId, { ...baseInput, accentHue: 400 }),
+    ).rejects.toThrow();
+  });
+
+  it('gives a new config the menu-with-code language switcher style', async () => {
+    const { id: tenantId } = await insertTestTenant(db());
+
+    const result = expectOk(await upsertSiteConfig(tenantId, baseInput));
+
+    expect(result.languageSwitcherStyle).toBe(
+      LANGUAGE_SWITCHER_STYLE.MENU_CODE,
+    );
+  });
+
+  it('stores a chosen language switcher style', async () => {
+    const { id: tenantId } = await insertTestTenant(db());
+
+    const result = expectOk(
+      await upsertSiteConfig(tenantId, {
+        ...baseInput,
+        languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
+      }),
+    );
+
+    expect(result.languageSwitcherStyle).toBe(LANGUAGE_SWITCHER_STYLE.CODES);
+  });
+
+  it('keeps the language switcher style when a save omits it', async () => {
+    const { id: tenantId } = await insertTestTenant(db());
+    await upsertSiteConfig(tenantId, {
+      ...baseInput,
+      languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_GLOBE,
+    });
+
+    const result = expectOk(
+      await upsertSiteConfig(tenantId, { ...baseInput, accentHue: 28 }),
+    );
+
+    expect(result.languageSwitcherStyle).toBe(
+      LANGUAGE_SWITCHER_STYLE.MENU_GLOBE,
+    );
+  });
+
+  it('rejects an unknown language switcher style', async () => {
+    const { id: tenantId } = await insertTestTenant(db());
+    const languageSwitcherStyle =
+      'DROPDOWN' as TUpdateSiteConfigInput['languageSwitcherStyle'];
+
+    await expect(
+      upsertSiteConfig(tenantId, { ...baseInput, languageSwitcherStyle }),
     ).rejects.toThrow();
   });
 

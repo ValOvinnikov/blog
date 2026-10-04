@@ -1,4 +1,3 @@
-import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
 import { customRenderAsync } from '@web/testing/custom-render';
 import { mockPostDetail } from '@web/testing/pages/blog-post-page/fixtures';
 import {
@@ -11,30 +10,25 @@ import {
 
 import { PostBreadcrumbs } from './post-breadcrumbs';
 
+vi.mock('@web/server/request-context/request-context');
+
 const { getPostPageMock } = vi.hoisted(() => ({
   getPostPageMock: vi.fn(),
 }));
 
 vi.mock('@web/i18n/navigation');
 
-vi.mock('@web/server/post/get-post-page', () => ({
+vi.mock('@web/server/post/get-post-page/get-post-page', () => ({
   getPostPage: getPostPageMock,
 }));
 
-vi.mock('@web/server/tenant/get-tenant-base-url');
-
-const getTenantBaseUrlMock = vi.mocked(getTenantBaseUrl);
-
 const setup = customRenderAsync(PostBreadcrumbs, {
   slug: 'hello-world',
-  tenant: 'tenant-1',
 });
 
 describe(`<${PostBreadcrumbs.name}/>`, () => {
   beforeEach(() => {
     getPostPageMock.mockReset();
-    getTenantBaseUrlMock.mockReset();
-    getTenantBaseUrlMock.mockResolvedValue('https://example.com');
   });
 
   testNotFoundWithoutLog({ pageLoaderMock: getPostPageMock, setup });
@@ -59,7 +53,7 @@ describe(`<${PostBreadcrumbs.name}/>`, () => {
     pageLoaderMock: getPostPageMock,
     setup,
     successData: mockPostDetail,
-    description: 'forwards the slug and tenant to getPostPage',
-    expectedArgs: ['hello-world', 'tenant-1'],
+    description: 'forwards the slug to getPostPage',
+    expectedArgs: ['hello-world'],
   });
 });

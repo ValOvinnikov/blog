@@ -14,6 +14,7 @@ export function makeRawSiteSettings(
       tagline: null,
       logo: makeRawSanityImage('Logo'),
     },
+    currency: 'USD',
     ...overrides,
   };
 }
@@ -23,6 +24,7 @@ export function makeRawNavigation(
 ): TRawNavigation {
   return {
     items: null,
+    showLanguageSwitcher: null,
     ...overrides,
   };
 }
@@ -30,6 +32,7 @@ export function makeRawNavigation(
 export function makeRawFooter(overrides: Partial<TRawFooter> = {}): TRawFooter {
   return {
     social: null,
+    showLanguageSwitcher: null,
     ...overrides,
   };
 }

@@ -22,12 +22,7 @@ export type TTenantPlan = TValueOf<typeof TENANT_PLAN>;
 // `@blog/config` because it keys off `TENANT_PLAN`, which this package owns
 // (config sits below db in the dependency graph and cannot import it).
 export const PLAN_REGISTRY: Record<TTenantPlan, TCapability[]> = {
-  [TENANT_PLAN.FREE]: [
-    CAPABILITY.COMMENTS,
-    CAPABILITY.RATINGS,
-    CAPABILITY.BOOKMARKS,
-    CAPABILITY.CONSENT_BANNER,
-  ],
+  [TENANT_PLAN.FREE]: [CAPABILITY.RATINGS, CAPABILITY.CONSENT_BANNER],
   [TENANT_PLAN.GROWTH]: [
     CAPABILITY.COMMENTS,
     CAPABILITY.RATINGS,
@@ -36,4 +31,10 @@ export const PLAN_REGISTRY: Record<TTenantPlan, TCapability[]> = {
     CAPABILITY.ANALYTICS,
     CAPABILITY.CONSENT_BANNER,
   ],
+};
+
+// Includes the default locale.
+export const PLAN_LOCALE_LIMIT: Record<TTenantPlan, number> = {
+  [TENANT_PLAN.FREE]: 1,
+  [TENANT_PLAN.GROWTH]: 3,
 };

@@ -6,7 +6,7 @@ import { ExternalLinkButton } from '@platform/components/shared/external-link-bu
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { formatDateTime } from '@platform/utils/format-date-time/format-date-time';
 import { formatRelativeTime } from '@platform/utils/format-relative-time/format-relative-time';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
 import { runCardVariants } from './run-card-variants';
@@ -18,6 +18,7 @@ type TRunCardProps = {
 
 export const RunCard = ({ run, actions }: TRunCardProps) => {
   const t = useTranslations('provisioningStatusView');
+  const locale = useLocale();
   const { workflowLogLink } = runCardVariants();
 
   return (
@@ -32,8 +33,8 @@ export const RunCard = ({ run, actions }: TRunCardProps) => {
           <DetailList.Row label={t('runStartedLabel')}>
             {run.startedAt ? (
               <time dateTime={run.startedAt}>
-                {formatRelativeTime(new Date(run.startedAt), t)} ·{' '}
-                {formatDateTime(run.startedAt)}
+                {formatRelativeTime(new Date(run.startedAt), t, locale)} ·{' '}
+                {formatDateTime(run.startedAt, locale)}
               </time>
             ) : (
               t('runStartedPending')
@@ -42,8 +43,9 @@ export const RunCard = ({ run, actions }: TRunCardProps) => {
           <DetailList.Row label={t('runFinishedLabel')}>
             {run.finishedAt ? (
               <time dateTime={run.finishedAt}>
-                {formatRelativeTime(new Date(run.finishedAt), t)} ·{' '}
-                {formatDateTime(run.finishedAt) ?? t('runFinishedPending')}
+                {formatRelativeTime(new Date(run.finishedAt), t, locale)} ·{' '}
+                {formatDateTime(run.finishedAt, locale) ??
+                  t('runFinishedPending')}
               </time>
             ) : (
               t('runFinishedPending')

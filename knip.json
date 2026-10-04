@@ -34,8 +34,16 @@
       // A top-level `ignore` cannot do this: it has no effect on the default
       // graph, so knip raises a config hint and the required check treats
       // hints as errors. Repeated per workspace below, extensions included,
-      // because `project` replaces the default rather than extending it.
-      "project": ["**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}!", "!src/testing/**!"]
+      // because `project` replaces the default rather than extending it. The
+      // same negation drops every other file that never ships: migrations,
+      // CLI scripts and config, test setup, e2e, Storybook.
+      "project": [
+        "**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}!",
+        "!src/testing/**!",
+        "!migrations/**!",
+        "!scripts/**!",
+        "!sanity-env.ts!"
+      ]
     },
     "packages/service": {
       // Reachable only through a string in vitest.config.ts's `resolve.alias`,
@@ -93,7 +101,9 @@
       ],
       "project": [
         "**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx,mdx,css}!",
-        "!src/testing/**!"
+        "!src/testing/**!",
+        "!src/vitest-setup.ts!",
+        "!e2e/**!"
       ],
       // Referenced only as a Turbopack loader string (next.config.ts
       // `turbopack.rules['*.svg'].loaders: ['@svgr/webpack']`) — knip's
@@ -106,13 +116,23 @@
       // `import ... from '@blog/db'` in apps/web.
       "ignoreDependencies": ["@svgr/webpack"]
     },
+    ".": {
+      "project": ["**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}!", "!scripts/**!"]
+    },
+    "packages/ui": {
+      "project": [
+        "**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx,mdx,css}!",
+        "!.storybook/**!"
+      ]
+    },
     "packages/insight": {
       "project": ["**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}!", "!src/testing/**!"]
     },
     "apps/platform": {
       "project": [
         "**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx,css}!",
-        "!src/testing/**!"
+        "!src/testing/**!",
+        "!src/vitest-setup.ts!"
       ],
       // Referenced only as a Turbopack loader string (next.config.ts
       // `turbopack.rules['*.svg'].loaders: ['@svgr/webpack']`) — knip's

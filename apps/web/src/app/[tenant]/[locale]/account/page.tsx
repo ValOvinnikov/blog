@@ -1,14 +1,17 @@
 import type { ITenantLocalizedParams } from '@blog/config';
 import { AccountPage } from '@web/components/pages/account-page';
 import { buildAccountMetadata } from '@web/metadata/account-metadata';
+import { enterRequestContext } from '@web/server/request-context/request-context';
+import { isReaderAccountEnabled } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
 import type { Metadata } from 'next';
-import { setRequestLocale } from 'next-intl/server';
+import { notFound } from 'next/navigation';
 
 type TProps = {
   params: Promise<ITenantLocalizedParams>;
 };
 
-export function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({ params }: TProps): Promise<Metadata> {
+  await enterRequestContext(params);
   return buildAccountMetadata();
 }
 
@@ -16,8 +19,11 @@ export function generateMetadata(): Promise<Metadata> {
 export const dynamic = 'force-dynamic';
 
 export default async function AccountRoute({ params }: TProps) {
-  const { locale } = await params;
-  setRequestLocale(locale);
+  await enterRequestContext(params);
+
+  if (!(await isReaderAccountEnabled())) {
+    notFound();
+  }
 
   return <AccountPage />;
 }

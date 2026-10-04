@@ -1,5 +1,4 @@
 import { urlForSanityImage } from '@blog/service';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
@@ -10,13 +9,11 @@ const { getTopicPageMock } = vi.hoisted(() => ({
   getTopicPageMock: vi.fn(),
 }));
 
-vi.mock('@web/server/topic/get-topic-page', () => ({
+vi.mock('@web/server/topic/get-topic-page/get-topic-page', () => ({
   getTopicPage: getTopicPageMock,
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
-
-const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
+vi.mock('@web/server/request-context/request-context');
 
 const ogImage = makeSanityImage();
 const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
@@ -35,19 +32,17 @@ const seo = makeSeo({
 describe('buildTopicMetadata', () => {
   beforeEach(() => {
     getTopicPageMock.mockReset();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
-  it('forwards the slug and tenant to getTopicPage, the loader TopicPage reads', async () => {
+  it('forwards the slug to getTopicPage, the loader TopicPage reads', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,
       data: { topic: {}, modules: [], seo },
     });
 
-    await buildTopicMetadata('engineering', 'tenant-1');
+    await buildTopicMetadata('engineering');
 
-    expect(getTopicPageMock).toHaveBeenCalledWith('engineering', 'tenant-1');
+    expect(getTopicPageMock).toHaveBeenCalledWith('engineering');
   });
 
   it('builds page-1 metadata from the resolved seo, self-canonical to /topics/[slug]', async () => {
@@ -56,7 +51,7 @@ describe('buildTopicMetadata', () => {
       data: { topic: {}, modules: [], seo },
     });
 
-    const metadata = await buildTopicMetadata('engineering', 'tenant-1');
+    const metadata = await buildTopicMetadata('engineering');
 
     expect(metadata.title).toBe('Engineering');
     expect(metadata.description).toBe('Posts about building things.');
@@ -76,7 +71,7 @@ describe('buildTopicMetadata', () => {
       error: new Error('boom'),
     });
 
-    const metadata = await buildTopicMetadata('engineering', 'tenant-1');
+    const metadata = await buildTopicMetadata('engineering');
 
     expect(metadata).toEqual({});
   });
@@ -87,7 +82,7 @@ describe('buildTopicMetadata', () => {
       data: { topic: {}, modules: [], seo },
     });
 
-    const metadata = await buildTopicMetadata('engineering', 'tenant-1', 2);
+    const metadata = await buildTopicMetadata('engineering', 2);
 
     expect(metadata.title).toBe('Engineering – Page 2');
     expect(metadata.openGraph?.title).toBe('Engineering OG – Page 2');
@@ -101,7 +96,7 @@ describe('buildTopicMetadata', () => {
       data: { topic: {}, modules: [], seo: makeSeo({ ogTitle: undefined }) },
     });
 
-    const metadata = await buildTopicMetadata('engineering', 'tenant-1', 2);
+    const metadata = await buildTopicMetadata('engineering', 2);
 
     expect(metadata.openGraph?.title).toBeUndefined();
     expect(metadata.twitter?.title).toBeUndefined();
@@ -113,7 +108,7 @@ describe('buildTopicMetadata', () => {
       error: new Error('boom'),
     });
 
-    const metadata = await buildTopicMetadata('missing', 'tenant-1', 2);
+    const metadata = await buildTopicMetadata('missing', 2);
 
     expect(metadata).toEqual({});
   });
@@ -122,7 +117,7 @@ describe('buildTopicMetadata', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getTopicPageMock.mockResolvedValue({ ok: true, data: undefined });
 
-    const metadata = await buildTopicMetadata('missing', 'tenant-1');
+    const metadata = await buildTopicMetadata('missing');
 
     expect(metadata).toEqual({});
     expect(errorSpy).not.toHaveBeenCalled();

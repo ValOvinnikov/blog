@@ -2,9 +2,11 @@
 
 import {
   DENSITY,
+  LANGUAGE_SWITCHER_STYLE,
   RADIUS_SCALE,
   type TDensity,
   type TFontChoice,
+  type TLanguageSwitcherStyle,
   type TRadiusScale,
 } from '@blog/config';
 import { FontPicker } from '@platform/components/shared/font-picker';
@@ -19,6 +21,8 @@ export type TLookFormAdvancedSectionProps = {
   bodyFont: TFontChoice;
   radiusScale: TRadiusScale;
   density: TDensity;
+  languageSwitcherStyle: TLanguageSwitcherStyle;
+  hasMultipleLanguages: boolean;
   onFieldChange: TLookFormFieldSetter;
   isArchived: boolean;
   archivedNoticeId: string;
@@ -29,6 +33,8 @@ export const LookFormAdvancedSection = ({
   bodyFont,
   radiusScale,
   density,
+  languageSwitcherStyle,
+  hasMultipleLanguages,
   onFieldChange,
   isArchived,
   archivedNoticeId,
@@ -47,10 +53,18 @@ export const LookFormAdvancedSection = ({
     label: t(`densityOptionLabel.${option}`),
   }));
 
+  const languageSwitcherOptions = Object.values(LANGUAGE_SWITCHER_STYLE).map(
+    (style) => ({
+      value: style,
+      label: t(`languageSwitcherOptionLabel.${style}`),
+    }),
+  );
+
   const headingFontLabel = t('headingFontLabel');
   const bodyFontLabel = t('bodyFontLabel');
   const radiusScaleLabel = t('radiusScaleLabel');
   const densityLabel = t('densityLabel');
+  const languageSwitcherLabel = t('languageSwitcherLabel');
 
   return (
     <>
@@ -101,6 +115,27 @@ export const LookFormAdvancedSection = ({
           isDisabled={isArchived}
           aria-describedby={archivedDescribedBy}
         />
+      </div>
+
+      <div className={field()}>
+        <span className={fieldLabel()}>{languageSwitcherLabel}</span>
+        {hasMultipleLanguages ? (
+          <>
+            <p className={fieldHint()}>{t('languageSwitcherDescription')}</p>
+            <SegmentedControl<TLanguageSwitcherStyle>
+              ariaLabel={languageSwitcherLabel}
+              options={languageSwitcherOptions}
+              value={languageSwitcherStyle}
+              onChange={(style) =>
+                onFieldChange('languageSwitcherStyle', style)
+              }
+              isDisabled={isArchived}
+              aria-describedby={archivedDescribedBy}
+            />
+          </>
+        ) : (
+          <p className={fieldHint()}>{t('languageSwitcherSingleLanguage')}</p>
+        )}
       </div>
     </>
   );

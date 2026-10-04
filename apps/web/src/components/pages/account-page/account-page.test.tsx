@@ -7,6 +7,8 @@ import { redirect } from 'next/navigation';
 
 import { AccountPage } from './account-page';
 
+vi.mock('@web/server/request-context/request-context');
+
 vi.mock('@web/server/auth/auth', () => ({ auth: vi.fn() }));
 
 vi.mock('@blog/db', () => ({
@@ -16,7 +18,7 @@ vi.mock('@blog/db', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-request-tenant-id');
+vi.mock('@web/server/tenant/request-tenant/request-tenant');
 
 vi.mock('@web/i18n/navigation');
 

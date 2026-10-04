@@ -12,6 +12,7 @@
     "tenantDanger": "Danger zone · Admin",
     "tenantDomain": "Domain · Admin",
     "features": "Features · Admin",
+    "languages": "Languages · Admin",
     "studio": "Studio · Admin",
     "findings": "Findings · Admin",
     "email": "Email · Admin"
@@ -52,6 +53,7 @@
     "overview": "Overview",
     "look": "Look",
     "voice": "Voice",
+    "languages": "Languages",
     "domain": "Domain",
     "studio": "Studio",
     "email": "Email",
@@ -60,8 +62,7 @@
     "team": "Team",
     "provisioning": "Provisioning",
     "dangerZone": "Danger zone",
-    "badgeLater": "later",
-    "badgeThisMilestone": "this milestone",
+    "badgeComingSoon": "Coming soon",
     "badgePlatform": "platform",
     "features": "Features"
   },
@@ -231,7 +232,8 @@
       "PROVISIONED": "Tenant provisioned",
       "PROVISIONING_FAILED": "Provisioning failed",
       "SETTINGS_UPDATED": "Settings updated",
-      "DELETED": "Tenant deleted"
+      "DELETED": "Tenant deleted",
+      "READER_DATA_PURGED": "Reader data purged"
     }
   },
   "tenantDomainPage": {
@@ -311,6 +313,14 @@
     "densityOptionLabel": {
       "DEFAULT": "Default",
       "COMPACT": "Compact"
+    },
+    "languageSwitcherLabel": "Language switcher",
+    "languageSwitcherDescription": "How the language switcher looks on desktop, in the header and footer.",
+    "languageSwitcherSingleLanguage": "Add another language in Languages settings to choose a style.",
+    "languageSwitcherOptionLabel": {
+      "MENU_CODE": "Menu with code",
+      "MENU_GLOBE": "Menu with globe",
+      "CODES": "Compact codes"
     }
   },
   "lookPreview": {
@@ -555,6 +565,7 @@
       "REVOKE_SANITY_TOKENS": "Revoke Sanity tokens",
       "CLEAR_ARTIFACTS": "Clear provisioning artifacts",
       "ARCHIVE_TENANT": "Archive tenant",
+      "PURGE_READER_DATA": "Purge reader data",
       "INVALIDATE_TENANT_CACHE": "Invalidate cached pages"
     },
     "statusLabel": {
@@ -617,7 +628,7 @@
     "planLabel": "Plan",
     "planOptionFree": "Free",
     "planOptionGrowth": "Growth",
-    "localeLabel": "Locale",
+    "localeLabel": "Default language",
     "saveButton": "Save changes",
     "savingButton": "Saving…",
     "alertSuccess": "Tenant details saved.",
@@ -631,7 +642,9 @@
     "fieldLockedReasonStep": "Locked — the \"{step}\" step has already completed and used this value.",
     "fieldLockedReasonRunning": "Locked while provisioning is running.",
     "fieldLockedReasonSucceeded": "Locked — provisioning has already finished.",
-    "fieldLockedReasonArchived": "Locked — this tenant is archived."
+    "fieldLockedReasonArchived": "Locked — this tenant is archived.",
+    "localeIsAdditionalError": "This language is already an additional language. Remove it there first.",
+    "localeInvalidError": "Choose a supported language."
   },
   "archivedTenantNotice": {
     "title": "This tenant is archived",
@@ -685,6 +698,7 @@
     "alertSuccess": "Features saved.",
     "alertError": "Couldn't save — try again.",
     "planLockedBadge": "Growth plan",
+    "comingSoonBadge": "Coming soon",
     "switchOn": "On",
     "switchOff": "Off",
     "capabilitiesHeading": "Capabilities",
@@ -704,5 +718,30 @@
       "ANALYTICS": "Enable on-site analytics tracking.",
       "CONSENT_BANNER": "Show visitors a cookie-consent banner before non-essential cookies or scripts load."
     }
+  },
+  "languageNames": {
+    "EN": "English",
+    "NL": "Dutch",
+    "FR": "French",
+    "DE": "German",
+    "ES": "Spanish"
+  },
+  "languagesSettings": {
+    "heading": "Languages",
+    "description": "Choose which languages the site is published in, besides its default language.",
+    "saveButton": "Save changes",
+    "savingButton": "Saving…",
+    "alertSuccess": "Languages saved.",
+    "alertError": "Couldn't save — try again.",
+    "switchOn": "On",
+    "switchOff": "Off",
+    "defaultHeading": "Default language",
+    "defaultDescription": "Every page is written in it first; set it in the tenant details.",
+    "additionalHeading": "Additional languages",
+    "allowance": "{used} of {allowed} additional languages in use on your plan.",
+    "upgradeNotice": "Your plan publishes the default language only. Upgrade to add more languages.",
+    "downgradeNotice": "Your plan publishes {allowed, plural, one {# additional language} other {# additional languages}}, but {stored} are saved. Choose which stay live — the others are kept and nothing is deleted.",
+    "keptBadge": "Kept, not live on your plan",
+    "planLockedBadge": "Not on your plan"
   }
 }

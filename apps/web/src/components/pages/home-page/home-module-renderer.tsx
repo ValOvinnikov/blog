@@ -22,10 +22,12 @@ import {
 import { NewsletterModule } from '@web/modules/newsletter/newsletter-module';
 import { PostFeaturedModule } from '@web/modules/post-featured/post-featured-module';
 import { PostLatestModule } from '@web/modules/post-latest/post-latest-module';
+import { PricingModule } from '@web/modules/pricing/pricing-module';
 import { StatsModule } from '@web/modules/stats/stats-module';
 import { TaxonomyListModule } from '@web/modules/taxonomy-list/taxonomy-list-module';
 import { TeamModule } from '@web/modules/team/team-module';
 import { TestimonialModule } from '@web/modules/testimonial/testimonial-module';
+import { TimelineModule } from '@web/modules/timeline/timeline-module';
 import type { ReactNode } from 'react';
 
 const HOME_MAP: Partial<Record<TPageHomeType, TModuleComponent>> = {
@@ -45,31 +47,29 @@ const HOME_MAP: Partial<Record<TPageHomeType, TModuleComponent>> = {
   module_stats: StatsModule,
   module_faq: FaqModule,
   module_team: TeamModule,
+  module_pricing: PricingModule,
+  module_timeline: TimelineModule,
 };
 
 export interface IHomeModuleRendererProps {
   hero: TMaybeUndefined<TModule<TPageHomeType>>;
   headingBlock: THeadingBlock;
   modules: TModule[];
-  locale: string;
-  tenant: string;
 }
 
 export const HomeModuleRenderer = async ({
   hero,
   headingBlock,
   modules,
-  locale,
-  tenant,
 }: IHomeModuleRendererProps): Promise<ReactNode> => {
   const heroNode = hero
-    ? await renderHeroModule({ hero, map: HOME_MAP, locale, tenant })
+    ? await renderHeroModule({ hero, map: HOME_MAP })
     : null;
 
   return (
     <>
       {heroNode ?? <PageHeading headingBlock={headingBlock} />}
-      {renderModules({ modules, map: HOME_MAP, locale, tenant })}
+      {renderModules({ modules, map: HOME_MAP })}
     </>
   );
 };

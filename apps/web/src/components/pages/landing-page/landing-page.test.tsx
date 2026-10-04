@@ -1,5 +1,6 @@
+import { LOCALE_ISO_CODES } from '@blog/config';
 import { service } from '@blog/service';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import {
   customRenderServerAsync,
   screen,
@@ -9,11 +10,16 @@ import { makeCtaModuleData } from '@web/testing/modules/cta/fixtures';
 import { makeHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
 import { mockLandingPage } from '@web/testing/pages/landing-page/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import {
+  DEFAULT_REQUEST_CONTEXT,
+  DEFAULT_TENANT_SANITY_CONTEXT,
+} from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 
 import { LandingPage } from './landing-page';
+
+vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -25,10 +31,6 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
-
-vi.mock('@web/server/tenant/get-tenant-base-url');
-
 vi.mock('@web/utils/logger/logger');
 
 vi.mock('@web/i18n/navigation');
@@ -39,8 +41,6 @@ const FAQ_PAGE_JSON_LD = '"@type":"FAQPage"';
 
 const setup = customRenderServerAsync(LandingPage, {
   slug: 'about-us',
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${LandingPage.name}/>`, () => {
@@ -69,6 +69,25 @@ describe(`<${LandingPage.name}/>`, () => {
     expect(logger.error).not.toHaveBeenCalled();
   });
 
+  it('calls notFound() when the slug exists only in another language', async () => {
+    vi.mocked(getRequestContext).mockResolvedValueOnce({
+      ...DEFAULT_REQUEST_CONTEXT,
+      locale: LOCALE_ISO_CODES.NL,
+      sanityContext: {
+        ...DEFAULT_TENANT_SANITY_CONTEXT,
+        locale: LOCALE_ISO_CODES.NL,
+      },
+    });
+    getPageMock.mockImplementation(async (_slug, tenant) => ({
+      ok: true,
+      data: tenant.locale === LOCALE_ISO_CODES.EN ? mockLandingPage : undefined,
+    }));
+
+    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+
+    expect(vi.mocked(notFound)).toHaveBeenCalled();
+  });
+
   it('fetches the page for the given slug with the tenant context', async () => {
     await setup();
 
@@ -76,7 +95,6 @@ describe(`<${LandingPage.name}/>`, () => {
       'about-us',
       DEFAULT_TENANT_SANITY_CONTEXT,
     );
-    expect(getTenantSanityContext).toHaveBeenCalledWith('tenant-1');
   });
 
   it('renders the page heading and supporting text inside main', async () => {

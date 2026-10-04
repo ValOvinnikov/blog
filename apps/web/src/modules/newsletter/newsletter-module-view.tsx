@@ -1,6 +1,7 @@
 import { NEWSLETTER_VARIANT, type TMaybeUndefined } from '@blog/config';
 import type { TNewsletterModule } from '@blog/service';
 import { NewsletterForm } from '@web/components/shared/newsletter-form';
+import { NewsletterSubscribedGate } from '@web/components/shared/newsletter-subscribed-gate';
 import { Section } from '@web/components/shared/section';
 
 export interface INewsletterModuleViewProps extends TNewsletterModule {
@@ -23,20 +24,22 @@ export const NewsletterModuleView = ({
     variant === NEWSLETTER_VARIANT.COMPACT ? 'compact' : 'full';
 
   return (
-    <Section
-      brandVariant={brandVariant}
-      layout={layout}
-      titleId={titleId}
-      dataTestId={`newsletter-module-${id}`}
-    >
-      <NewsletterForm
-        variant={formVariant}
-        heading={heading}
-        headingId={titleId}
-        supportingText={supportingText}
-        trustCues={trustCues}
-        align={contentAlignment}
-      />
-    </Section>
+    <NewsletterSubscribedGate>
+      <Section
+        brandVariant={brandVariant}
+        layout={layout}
+        titleId={titleId}
+        dataTestId={`newsletter-module-${id}`}
+      >
+        <NewsletterForm
+          variant={formVariant}
+          heading={heading}
+          headingId={titleId}
+          supportingText={supportingText}
+          trustCues={trustCues}
+          align={contentAlignment}
+        />
+      </Section>
+    </NewsletterSubscribedGate>
   );
 };

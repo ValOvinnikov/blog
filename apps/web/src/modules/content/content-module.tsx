@@ -1,18 +1,16 @@
 import { service } from '@blog/service';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';
 
 import { ContentModuleView } from './content-module-view';
 
 export interface IContentModuleProps {
   id: string;
-  locale: string;
-  tenant: string;
 }
 
-export const ContentModule = async ({ id, tenant }: IContentModuleProps) => {
-  const tenantContext = await getTenantSanityContext(tenant);
-  const result = await service.modules.content.v1.getContent(id, tenantContext);
+export const ContentModule = async ({ id }: IContentModuleProps) => {
+  const { sanityContext } = await getRequestContext();
+  const result = await service.modules.content.v1.getContent(id, sanityContext);
 
   if (!result.ok) {
     logger.error('content_module.fetch_failed', {

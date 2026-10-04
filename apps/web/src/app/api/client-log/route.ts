@@ -1,8 +1,8 @@
-import { isClientLogRateLimited } from '@web/server/client-log/client-log-rate-limiter';
+import { isClientLogRateLimited } from '@web/server/client-log/client-log-rate-limiter/client-log-rate-limiter';
 import {
   clientLogSchema,
   sanitizeClientLogPayload,
-} from '@web/server/client-log/client-log-schema';
+} from '@web/server/client-log/client-log-schema/client-log-schema';
 import { logger } from '@web/utils/logger/logger';
 import { NextResponse } from 'next/server';
 

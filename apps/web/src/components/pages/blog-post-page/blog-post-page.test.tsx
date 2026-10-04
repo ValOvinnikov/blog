@@ -1,6 +1,5 @@
 import { service } from '@blog/service';
-import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import {
   customRenderServerAsync,
   screen,
@@ -13,6 +12,8 @@ import { notFound } from 'next/navigation';
 
 import { BlogPostPage } from './blog-post-page';
 
+vi.mock('@web/server/request-context/request-context');
+
 vi.mock('@blog/service', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@blog/service')>();
   return {
@@ -23,19 +24,18 @@ vi.mock('@blog/service', async (importOriginal) => {
   };
 });
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
-
-vi.mock('@web/server/tenant/get-tenant-base-url');
-
 vi.mock('@web/utils/logger/logger');
 
 vi.mock('@web/i18n/navigation');
 
-vi.mock('@web/server/settings-features/is-capability-enabled', () => ({
-  isCapabilityEnabled: vi.fn(),
-}));
+vi.mock(
+  '@web/server/settings-features/is-capability-enabled/is-capability-enabled',
+  () => ({
+    isCapabilityEnabled: vi.fn(),
+  }),
+);
 
-vi.mock('@web/server/bookmarks/bookmark-actions', () => ({
+vi.mock('@web/server/bookmarks/bookmark-actions/bookmark-actions', () => ({
   getBookmarkStatus: vi.fn(),
   setBookmarkStatus: vi.fn(),
 }));
@@ -44,8 +44,6 @@ const getPostMock = vi.mocked(service.pages.post.v1.getPost);
 
 const setup = customRenderServerAsync(BlogPostPage, {
   slug: 'hello-world',
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${BlogPostPage.name}/>`, () => {
@@ -85,7 +83,6 @@ describe(`<${BlogPostPage.name}/>`, () => {
       'hello-world',
       DEFAULT_TENANT_SANITY_CONTEXT,
     );
-    expect(getTenantSanityContext).toHaveBeenCalledWith('tenant-1');
   });
 
   it('renders the breadcrumb trail outside main', async () => {

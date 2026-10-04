@@ -5,8 +5,8 @@ import {
   deriveRevalidatePaths,
   isDerivableRevalidateType,
   POST_TYPE,
-} from '@web/server/revalidate/derive-revalidate-paths';
-import { resolveReferencingModuleTags } from '@web/server/revalidate/resolve-referencing-module-tags';
+} from '@web/server/revalidate/derive-revalidate-paths/derive-revalidate-paths';
+import { resolveReferencingModuleTags } from '@web/server/revalidate/resolve-referencing-module-tags/resolve-referencing-module-tags';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
 import { getRevalidateTagsForType } from '@web/utils/revalidate-tags';

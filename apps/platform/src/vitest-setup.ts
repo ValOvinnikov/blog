@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config';
 import { createTranslator } from 'next-intl';
 
 import '@testing-library/jest-dom/vitest';
@@ -20,6 +21,7 @@ const createLooseTranslator = createTranslator as unknown as (config: {
 
 vi.mock('next-intl/server', () => ({
   setRequestLocale: vi.fn(),
+  getLocale: vi.fn(async () => LOCALE_ISO_CODES.EN),
   getTranslations: vi.fn(async (arg?: TGetTranslationsArg) =>
     createLooseTranslator({
       locale: 'en',
@@ -80,18 +82,13 @@ if (typeof globalThis.ResizeObserver === 'undefined') {
   vi.stubGlobal('ResizeObserver', NoopResizeObserver);
 }
 
-// next/font/google loaders need a Next build transform Vitest does not run.
-vi.mock('next/font/google', () => {
-  const createFontMock = (fontName: string) => () => ({
-    className: `mock-${fontName}-className`,
-    style: { fontFamily: `mock-${fontName}-font-family` },
-  });
-
-  return {
-    Space_Grotesk: createFontMock('space-grotesk'),
-    Newsreader: createFontMock('newsreader'),
-    JetBrains_Mono: createFontMock('jetbrains-mono'),
-    Fraunces: createFontMock('fraunces'),
-    Inter: createFontMock('inter'),
-  };
-});
+// next/font/local relies on a Next build transform Vitest does not run.
+vi.mock('next/font/local', () => ({
+  default: ({ src }: { src: { path: string }[] }) => {
+    const fontName = src[0]?.path.split('/').pop()?.replace('.woff2', '');
+    return {
+      className: `mock-${fontName}-className`,
+      style: { fontFamily: `mock-${fontName}-font-family` },
+    };
+  },
+}));

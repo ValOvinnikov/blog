@@ -5,7 +5,7 @@ import { useToast } from '@web/context/toast-provider';
 import {
   resendConfirmationAction,
   unsubscribeAction,
-} from '@web/server/newsletter/newsletter-subscription-actions';
+} from '@web/server/newsletter/newsletter-subscription-actions/newsletter-subscription-actions';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useTransition } from 'react';
@@ -14,12 +14,6 @@ export type TNewsletterSubscriptionControlProps = {
   action: 'unsubscribe' | 'resend';
 };
 
-/**
- * Mirrors `DeleteAccountControl`'s pattern, but a successful unsubscribe/resend
- * calls `router.refresh()` instead of navigating away, so it re-runs
- * `NewsletterSection`'s server-side `getSubscriptionStatus` call and the UI
- * reflects the new state.
- */
 export const NewsletterSubscriptionControl = ({
   action,
 }: TNewsletterSubscriptionControlProps) => {
@@ -39,24 +33,32 @@ export const NewsletterSubscriptionControl = ({
 
   const handleClick = () => {
     startTransition(async () => {
+      let isUnavailable = false;
       try {
         await toast.promise(
           (async () => {
             const result = isUnsubscribe
               ? await unsubscribeAction()
               : await resendConfirmationAction();
-            if (!result.ok) throw new Error(`Failed to ${action}`);
+            if (!result.ok) {
+              isUnavailable = result.isUnavailable;
+              throw new Error(`Failed to ${action}`);
+            }
             return result;
           })(),
           {
             loading: { message: t(loadingMessageKey) },
             success: { message: t(successMessageKey) },
-            error: { message: t(errorMessageKey) },
+            error: () => ({
+              message: t(
+                isUnavailable && !isUnsubscribe
+                  ? 'resendUnavailable'
+                  : errorMessageKey,
+              ),
+            }),
           },
         );
       } catch {
-        // Already surfaced via the `toast.promise` error branch above —
-        // swallow here so a failed action doesn't refresh the section below.
         return;
       }
 

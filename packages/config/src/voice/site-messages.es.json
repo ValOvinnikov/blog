@@ -1,0 +1,263 @@
+{
+  "pagination": {
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "pageSuffix": "– Página {page}"
+  },
+  "breadcrumbs": {
+    "home": "Inicio",
+    "ariaLabel": "Ruta de navegación",
+    "topics": "Temas",
+    "tags": "Etiquetas",
+    "blog": "Blog"
+  },
+  "notFound": {
+    "eyebrow": "404",
+    "heading": "Página no encontrada",
+    "supportingText": "La página que busca no existe.",
+    "returnHome": "Volver al inicio"
+  },
+  "localeErrorPage": {
+    "title": "Algo ha salido mal",
+    "announcement": "Algo ha salido mal. Puede volver a intentarlo o ir al inicio.",
+    "description": "Se ha producido un error inesperado al mostrar esta página. Puede volver a intentarlo o regresar a la página de inicio.",
+    "retry": "Volver a intentarlo",
+    "goHome": "Ir al inicio"
+  },
+  "postShare": {
+    "shareAriaLabel": "Compartir «{title}»",
+    "panelAriaLabel": "Opciones para compartir",
+    "copyLink": "Copiar enlace",
+    "copied": "Copiado",
+    "linkCopied": "Enlace copiado"
+  },
+  "languageSwitcher": {
+    "ariaLabel": "Idioma",
+    "menuAriaLabel": "Idioma: {language}"
+  },
+  "siteNavigation": {
+    "toggleMenu": "Abrir o cerrar el menú de navegación"
+  },
+  "brandLockupLink": {
+    "ariaLabel": "Inicio"
+  },
+  "socialLinks": {
+    "linkAriaLabel": "Perfil de {platform}",
+    "listAriaLabel": "Perfiles"
+  },
+  "topicChipList": {
+    "ariaLabel": "Temas",
+    "all": "Todos"
+  },
+  "blogListPage": {
+    "empty": "Todavía no hay artículos.",
+    "paginationAriaLabel": "Páginas del blog"
+  },
+  "blogPostPage": {
+    "depthToggle": {
+      "ariaLabel": "Profundidad de lectura",
+      "skim": "30 s",
+      "read": "Leer",
+      "deep": "A fondo"
+    },
+    "skimPanel": {
+      "label": "Resumen en 30 segundos",
+      "readFullArticle": "Leer el artículo completo"
+    },
+    "asideKind": {
+      "WHY_NOT": "Por qué no X",
+      "DIGRESSION": "Digresión",
+      "CONTEXT": "Contexto"
+    },
+    "backToTop": {
+      "ariaLabel": "Volver arriba"
+    }
+  },
+  "postContentsRail": {
+    "label": "Temas"
+  },
+  "topicPage": {
+    "empty": "Todavía no hay artículos sobre {name}.",
+    "paginationAriaLabel": "Páginas de {name}"
+  },
+  "tagPage": {
+    "empty": "Todavía no hay artículos con la etiqueta {name}.",
+    "paginationAriaLabel": "Páginas de {name}"
+  },
+  "taxonomyListModule": {
+    "topics": {
+      "postsCount": "{count, plural, one {1 artículo} other {{count} artículos}}",
+      "latestPostsLabel": "Lo último en {name}",
+      "empty": "Todavía no hay temas."
+    },
+    "tags": {
+      "postsCount": "{count, plural, one {1 artículo} other {{count} artículos}}",
+      "latestPostsLabel": "Lo último en {name}",
+      "empty": "Todavía no hay etiquetas."
+    }
+  },
+  "rss": {
+    "fallbackTitle": "Blog",
+    "feedLinkLabel": "Canal RSS"
+  },
+  "authMenu": {
+    "signIn": "Iniciar sesión",
+    "panelAriaLabel": "Opciones de inicio de sesión",
+    "signInHeading": "Iniciar sesión",
+    "accountHeading": "Cuenta",
+    "chooseProviderPrompt": "Elija un método de inicio de sesión",
+    "continueWithGithub": "Continuar con GitHub",
+    "continueWithGoogle": "Continuar con Google",
+    "continueWithEmail": "Continuar con correo electrónico",
+    "redirectHint": "Volverá a este artículo — nunca pierde el punto donde estaba.",
+    "emailAriaLabel": "Correo electrónico",
+    "emailPlaceholder": "nombre@ejemplo.com",
+    "sendLink": "Enviar enlace",
+    "sending": "Enviando…",
+    "checkYourInbox": "Revise su bandeja de entrada para encontrar el enlace de inicio de sesión.",
+    "emailError": "No se pudo enviar el enlace. Vuelva a intentarlo.",
+    "oauthError": "No se pudo iniciar sesión. Vuelva a intentarlo.",
+    "accountMenuAriaLabel": "Menú de la cuenta",
+    "signOut": "Cerrar sesión",
+    "loadingAccountStatus": "Cargando el estado de la cuenta",
+    "myBookmarks": "Mis guardados",
+    "accountSettings": "Configuración de la cuenta"
+  },
+  "toastProvider": {
+    "viewportAriaLabel": "Notificaciones",
+    "dismissLabel": "Cerrar notificación",
+    "mergeCountSuffix": " ×{count}"
+  },
+  "bookmarkButton": {
+    "save": "Guardar",
+    "saved": "Guardado",
+    "saveAriaLabel": "Guardar artículo",
+    "removeAriaLabel": "Quitar de guardados",
+    "error": "No se pudo guardar. Vuelva a intentarlo.",
+    "errorUnavailable": "Los marcadores no están disponibles en este sitio en este momento.",
+    "toastSavedMessage": "Añadido a guardados",
+    "toastRemovedMessage": "Quitado de guardados",
+    "toastRevertedMessage": "Deshecho",
+    "toastUndoLabel": "Deshacer",
+    "toastRetryLabel": "Reintentar"
+  },
+  "bookmarksPage": {
+    "title": "Mis guardados",
+    "listHeading": "Artículos guardados",
+    "metaDescription": "Artículos que ha guardado para leer más tarde.",
+    "empty": "Todavía no hay guardados — guarde un artículo para encontrarlo aquí.",
+    "hint": "{count, plural, one {1 guardado} other {{count} guardados}}"
+  },
+  "newsletterForm": {
+    "submitLabel": "Suscribirse",
+    "emailAriaLabel": "Correo electrónico",
+    "placeholder": "nombre@ejemplo.com",
+    "successMessage": "Ya casi está — revise su bandeja de entrada para confirmar.",
+    "errorInvalid": "Introduzca un correo electrónico válido.",
+    "errorAlreadySubscribed": "Ese correo electrónico ya está suscrito.",
+    "errorServer": "Algo ha salido mal. Vuelva a intentarlo.",
+    "errorUnavailable": "Este sitio no acepta nuevas suscripciones en este momento."
+  },
+  "newsletterConfirm": {
+    "confirmedTitle": "Suscripción confirmada",
+    "confirmedMessage": "Su suscripción está confirmada. ¡Gracias por registrarse!",
+    "invalidTitle": "Enlace de confirmación no válido",
+    "invalidMessage": "Este enlace de confirmación no es válido o ha caducado.",
+    "errorTitle": "Algo ha salido mal",
+    "errorMessage": "No hemos podido confirmar su suscripción. Vuelva a intentarlo más tarde.",
+    "unavailableTitle": "No se puede confirmar ahora",
+    "unavailableMessage": "Este sitio no acepta cambios en este momento, por lo que no pudimos procesar tu enlace de confirmación.",
+    "returnHome": "Volver al inicio"
+  },
+  "newsletterUnsubscribe": {
+    "confirmTitle": "Darse de baja de nuestro boletín",
+    "confirmMessage": "Haga clic en el botón de abajo para confirmar que ya no desea recibir nuestro boletín.",
+    "confirmButtonLabel": "Confirmar la baja",
+    "successTitle": "Se ha dado de baja",
+    "successMessage": "Ya no recibirá nuestro boletín.",
+    "invalidTitle": "El enlace ya no es válido",
+    "invalidMessage": "Este enlace de baja ya no es válido — es posible que ya se haya dado de baja.",
+    "errorTitle": "Algo salió mal",
+    "errorMessage": "No pudimos cancelar tu suscripción. Inténtalo de nuevo más tarde.",
+    "returnHome": "Volver al inicio"
+  },
+  "accountPage": {
+    "title": "Cuenta",
+    "metaDescription": "Gestione su privacidad y sus datos — exporte o elimine su cuenta.",
+    "privacy": {
+      "heading": "Privacidad",
+      "exportLabel": "Exportar mis datos",
+      "exportDescription": "Descargue su perfil y sus guardados en un único archivo JSON.",
+      "exportButton": "Solicitar exportación",
+      "deleteLabel": "Eliminar cuenta",
+      "deleteDescription": "Irreversible. Su perfil y sus guardados se borran y se cierran todas las sesiones. Escriba su nombre de usuario para activar el botón.",
+      "deleteConfirmAriaLabel": "Escriba su nombre de usuario para confirmar la eliminación",
+      "deleteConfirmPlaceholder": "Escriba {handle} para confirmar",
+      "deleteButton": "Eliminar cuenta",
+      "deleteToastLoadingMessage": "Eliminando su cuenta…",
+      "deleteToastSuccessMessage": "Su cuenta se ha eliminado.",
+      "deleteError": "No se pudo eliminar su cuenta. Vuelva a intentarlo."
+    },
+    "newsletter": {
+      "heading": "Boletín",
+      "label": "Boletín",
+      "activeBadge": "Suscrito",
+      "activeDescriptionPrefix": "Artículos semanales enviados a",
+      "activeDescriptionSuffix": "(el correo de su cuenta — de solo lectura en la v1).",
+      "unsubscribeButton": "Darse de baja",
+      "pendingBadge": "Pendiente de confirmación",
+      "pendingDescription": "Todavía no se ha hecho clic en el enlace de confirmación. Vuelva a enviarlo si nunca llegó.",
+      "resendButton": "Reenviar confirmación",
+      "unsubscribeToastLoadingMessage": "Dándole de baja…",
+      "unsubscribeToastSuccessMessage": "Se ha dado de baja.",
+      "unsubscribeError": "No se pudo tramitar la baja. Vuelva a intentarlo.",
+      "resendToastLoadingMessage": "Reenviando el correo de confirmación…",
+      "resendToastSuccessMessage": "Correo de confirmación reenviado.",
+      "resendError": "No se pudo reenviar el correo de confirmación. Vuelva a intentarlo.",
+      "resendUnavailable": "El reenvío no está disponible en este sitio en este momento."
+    },
+    "identity": {
+      "heading": "Cuentas vinculadas",
+      "githubLabel": "GitHub",
+      "googleLabel": "Google",
+      "emailLinkLabel": "Enlace por correo",
+      "linkedStatus": "Vinculada",
+      "linkButton": "Vincular",
+      "unlinkButton": "Desvincular",
+      "lastMethodNotice": "Último método disponible — no se puede desvincular",
+      "unlinkToastLoadingMessage": "Desvinculando su cuenta…",
+      "unlinkToastSuccessMessage": "Cuenta desvinculada.",
+      "unlinkError": "No se pudo desvincular. Vuelva a intentarlo.",
+      "unlinkLastMethodError": "Es su único método de inicio de sesión disponible — vincule otro antes de desvincular este.",
+      "displayNameLabel": "Nombre visible",
+      "displayNameDescription": "Sustituye su nombre de usuario del proveedor en todos los lugares donde aparecen sus comentarios.",
+      "displayNameAriaLabel": "Nombre visible",
+      "saveButton": "Guardar",
+      "saveToastLoadingMessage": "Guardando su nombre visible…",
+      "saveToastSuccessMessage": "Nombre visible actualizado.",
+      "saveError": "No se pudo actualizar su nombre visible. Vuelva a intentarlo."
+    }
+  },
+  "carousel": {
+    "previousAriaLabel": "Diapositiva anterior",
+    "nextAriaLabel": "Diapositiva siguiente",
+    "regionLabel": "Carrusel {title}"
+  },
+  "pricingModule": {
+    "free": "Gratis",
+    "from": "Desde",
+    "compareAtLabel": "Precio habitual",
+    "period": {
+      "ONE_TIME": "pago único",
+      "HOUR": "por hora",
+      "SESSION": "por sesión",
+      "MONTH": "al mes",
+      "YEAR": "al año"
+    },
+    "tabs": {
+      "MONTH": "Mensual",
+      "YEAR": "Anual"
+    },
+    "periodSwitchLabel": "Periodo de facturación"
+  }
+}

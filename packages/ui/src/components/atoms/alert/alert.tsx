@@ -20,6 +20,7 @@ export type TAlertProps = IWithClassName &
     type: NonNullable<TAlertVariants['type']>;
     message: string;
     id?: string;
+    hasIcon?: boolean;
   };
 
 /** A static, type-coded inline message block for form feedback (confirmations, warnings, and errors). */
@@ -29,6 +30,7 @@ export const Alert = ({
   className,
   dataTestId,
   id,
+  hasIcon = true,
 }: TAlertProps) => {
   const role = type === ALERT_TYPE.ERROR ? 'alert' : 'status';
 
@@ -39,7 +41,7 @@ export const Alert = ({
       data-testid={dataTestId}
       className={alertVariants({ type, class: className })}
     >
-      <Icon name={ALERT_ICON[type]} />
+      {hasIcon && <Icon name={ALERT_ICON[type]} dataTestId="alert-icon" />}
       <span>{message}</span>
     </div>
   );

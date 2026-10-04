@@ -1,6 +1,4 @@
 import { service, type TTopicIndexPage } from '@blog/service';
-import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import {
   customRenderServerAsync,
   screen,
@@ -16,6 +14,8 @@ import { notFound } from 'next/navigation';
 
 import { TopicIndexPage } from './topic-index-page';
 
+vi.mock('@web/server/request-context/request-context');
+
 vi.mock('@blog/service', () => ({
   service: {
     pages: { topicIndex: { v1: { getIndexPage: vi.fn() } } },
@@ -25,10 +25,6 @@ vi.mock('@blog/service', () => ({
     },
   },
 }));
-
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
-
-vi.mock('@web/server/tenant/get-tenant-base-url');
 
 vi.mock('@web/utils/logger/logger');
 
@@ -46,10 +42,7 @@ const topicIndexPage: TTopicIndexPage = {
   seo: makeSeo(),
 };
 
-const setup = customRenderServerAsync(TopicIndexPage, {
-  locale: 'en',
-  tenant: 'tenant-1',
-});
+const setup = customRenderServerAsync(TopicIndexPage, {});
 
 describe(`<${TopicIndexPage.name}/>`, () => {
   beforeEach(() => {
@@ -88,14 +81,12 @@ describe(`<${TopicIndexPage.name}/>`, () => {
     expect(logger.error).not.toHaveBeenCalled();
   });
 
-  it('fetches the index page and breadcrumb base URL for the tenant', async () => {
+  it('fetches the index page with the request context Sanity context', async () => {
     await setup();
 
-    expect(getTenantSanityContext).toHaveBeenCalledWith('tenant-1');
     expect(getIndexPageMock).toHaveBeenCalledWith(
       DEFAULT_TENANT_SANITY_CONTEXT,
     );
-    expect(getTenantBaseUrl).toHaveBeenCalledWith('tenant-1');
   });
 
   it('renders the heading and supporting text inside main', async () => {

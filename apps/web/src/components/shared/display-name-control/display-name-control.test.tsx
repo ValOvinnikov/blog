@@ -20,7 +20,7 @@ vi.mocked(useRouter).mockReturnValue({
   refresh: routerRefreshMock,
 } as unknown as ReturnType<typeof useRouter>);
 
-vi.mock('@web/server/account/identity-actions', () => ({
+vi.mock('@web/server/account/identity-actions/identity-actions', () => ({
   updateDisplayNameAction: updateDisplayNameActionMock,
 }));
 

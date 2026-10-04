@@ -77,7 +77,7 @@ export const featureBlockSchema = defineType({
   preview: {
     select: {
       title: 'title',
-      linkLabel: 'link.label',
+      linkLabel: 'link.label.0.value',
       media: 'image',
     },
     prepare({ title, linkLabel, media }) {

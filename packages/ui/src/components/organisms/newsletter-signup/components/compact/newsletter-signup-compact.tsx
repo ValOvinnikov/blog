@@ -9,7 +9,10 @@ import {
 import { Alert } from '@blog/ui/components/atoms/alert';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { NewsletterSignupContent } from '@blog/ui/components/organisms/newsletter-signup/components/content/newsletter-signup-content';
-import { newsletterSignupVariants } from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup-variants';
+import {
+  newsletterSignupVariants,
+  type TNewsletterSignupVariants,
+} from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup-variants';
 import type { ReactNode } from 'react';
 
 export type TNewsletterSignupCompactProps = IWithClassName &
@@ -27,6 +30,7 @@ export type TNewsletterSignupCompactProps = IWithClassName &
     submitLabel: string;
     emailAriaLabel: string;
     placeholder?: string;
+    align?: TNewsletterSignupVariants['align'];
   };
 
 /** A slim single-row subscribe strip for the end of every article. */
@@ -44,11 +48,12 @@ export const NewsletterSignupCompact = ({
   submitLabel,
   emailAriaLabel,
   placeholder,
+  align,
   className,
   dataTestId,
 }: TNewsletterSignupCompactProps) => {
   const isSuccess = status === 'success';
-  const s = newsletterSignupVariants({ variant: 'compact' });
+  const s = newsletterSignupVariants({ variant: 'compact', align });
 
   return (
     <div className={s.root({ class: className })} data-testid={dataTestId}>

@@ -13,7 +13,7 @@ import { formatRelativeTime } from '@platform/utils/format-relative-time/format-
 import { provisioningStepTone } from '@platform/utils/status-tone/status-tone';
 import { useCollapseOnDone } from '@platform/utils/use-collapse-on-done/use-collapse-on-done';
 import { useRelativeTimeTick } from '@platform/utils/use-relative-time-tick/use-relative-time-tick';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { RunCard } from './components/run-card/run-card';
 import { deprovisioningStatusViewVariants } from './deprovisioning-status-view-variants';
@@ -26,16 +26,12 @@ export type TDeprovisioningStatusViewProps = {
   poll: TUseDeprovisioningPollResult;
 };
 
-/**
- * The danger page's live teardown-progress view — the six deprovisioning
- * steps read from the poll result its caller derived, paired with the run
- * card. There is no retry control here: a failed run is re-dispatched
- * through `DeprovisionTenantControl`, rendered above this by the page.
- */
+/** No retry control: a failed run is re-dispatched through `DeprovisionTenantControl`, which the page renders above this. */
 export const DeprovisioningStatusView = ({
   poll,
 }: TDeprovisioningStatusViewProps) => {
   const t = useTranslations('deprovisioningStatusView');
+  const locale = useLocale();
   const {
     deprovisioningSteps,
     stepStatuses,
@@ -80,7 +76,7 @@ export const DeprovisioningStatusView = ({
     const updatedAt = stepUpdatedAt[index];
     const relativeUpdatedAt =
       (isStepDone || isStepFailed) && updatedAt
-        ? formatRelativeTime(new Date(updatedAt), t)
+        ? formatRelativeTime(new Date(updatedAt), t, locale)
         : undefined;
 
     return {

@@ -1,5 +1,4 @@
 import { type TPostDetail, urlForSanityImage } from '@blog/service';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
@@ -10,13 +9,11 @@ const { getPostPageMock } = vi.hoisted(() => ({
   getPostPageMock: vi.fn(),
 }));
 
-vi.mock('@web/server/post/get-post-page', () => ({
+vi.mock('@web/server/post/get-post-page/get-post-page', () => ({
   getPostPage: getPostPageMock,
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context');
-
-const getTenantSanityContextMock = vi.mocked(getTenantSanityContext);
+vi.mock('@web/server/request-context/request-context');
 
 const ogImage = makeSanityImage();
 const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
@@ -65,23 +62,21 @@ const basePost: TPostDetail = {
 describe('buildPostMetadata', () => {
   beforeEach(() => {
     getPostPageMock.mockReset();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
-  it('forwards the slug and tenant to getPostPage, the loader BlogPostPage reads', async () => {
+  it('forwards the slug to getPostPage, the loader BlogPostPage reads', async () => {
     getPostPageMock.mockResolvedValue({ ok: true, data: basePost });
 
-    await buildPostMetadata('hello-world', 'tenant-1');
+    await buildPostMetadata('hello-world');
 
-    expect(getPostPageMock).toHaveBeenCalledWith('hello-world', 'tenant-1');
+    expect(getPostPageMock).toHaveBeenCalledWith('hello-world');
   });
 
   it('returns empty metadata without logging when no page_post matches the slug', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getPostPageMock.mockResolvedValue({ ok: true, data: undefined });
 
-    const metadata = await buildPostMetadata('missing', 'tenant-1');
+    const metadata = await buildPostMetadata('missing');
 
     expect(metadata).toEqual({});
     expect(errorSpy).not.toHaveBeenCalled();
@@ -92,7 +87,7 @@ describe('buildPostMetadata', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getPostPageMock.mockResolvedValue({ ok: false, error: new Error('boom') });
 
-    const metadata = await buildPostMetadata('hello-world', 'tenant-1');
+    const metadata = await buildPostMetadata('hello-world');
 
     expect(metadata).toEqual({});
     errorSpy.mockRestore();
@@ -101,7 +96,7 @@ describe('buildPostMetadata', () => {
   it('passes the already-resolved seo through to toMetadata', async () => {
     getPostPageMock.mockResolvedValue({ ok: true, data: basePost });
 
-    const metadata = await buildPostMetadata('hello-world', 'tenant-1');
+    const metadata = await buildPostMetadata('hello-world');
 
     expect(metadata.title).toBe('Hello World');
     expect(metadata.description).toBe(
@@ -120,7 +115,7 @@ describe('buildPostMetadata', () => {
   it('sets openGraph.publishedTime from post.publishedAt', async () => {
     getPostPageMock.mockResolvedValue({ ok: true, data: basePost });
 
-    const metadata = await buildPostMetadata('hello-world', 'tenant-1');
+    const metadata = await buildPostMetadata('hello-world');
 
     expect(
       (metadata.openGraph as { publishedTime?: string })?.publishedTime,
@@ -130,7 +125,7 @@ describe('buildPostMetadata', () => {
   it('sets openGraph.authors from post.author.name', async () => {
     getPostPageMock.mockResolvedValue({ ok: true, data: basePost });
 
-    const metadata = await buildPostMetadata('hello-world', 'tenant-1');
+    const metadata = await buildPostMetadata('hello-world');
 
     expect((metadata.openGraph as { authors?: string[] })?.authors).toEqual([
       'Jane Doe',

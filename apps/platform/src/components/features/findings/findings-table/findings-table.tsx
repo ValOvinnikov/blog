@@ -6,7 +6,7 @@ import { StatusBadge } from '@platform/components/shared/status-badge';
 import { formatDate } from '@platform/utils/format-date/format-date';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { findingSeverityTone } from '@platform/utils/status-tone/status-tone';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 import { findingsTableVariants } from './findings-table-variants';
 
@@ -20,6 +20,7 @@ export const FindingsTable = ({
   tenantNamesById,
 }: TFindingsTableProps) => {
   const t = useTranslations('findingsTable');
+  const locale = useLocale();
   const tSeverity = useTranslations('findingSeverityLabel');
   const tSource = useTranslations('findingSourceLabel');
   const tKind = useTranslations('findingKindLabel');
@@ -67,7 +68,7 @@ export const FindingsTable = ({
           </td>
           <td className={cell()}>
             <time dateTime={finding.lastSeenAt.toISOString()}>
-              {formatDate(finding.lastSeenAt)}
+              {formatDate(finding.lastSeenAt, locale)}
             </time>
           </td>
         </tr>
