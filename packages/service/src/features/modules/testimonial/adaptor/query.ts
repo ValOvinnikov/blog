@@ -9,7 +9,7 @@ import { sanityImageFragment } from '@blog/service/shared/fragments/image/image'
 import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document';
 import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
-import { listedTextBlockFragment } from '@blog/service/shared/fragments/portable-text/listed-text-block';
+import { textBlockFragment } from '@blog/service/shared/fragments/portable-text/text-block';
 
 export const testimonialModuleQuery = q
   .parameters<TModuleQueryParams>()
@@ -28,10 +28,7 @@ export const testimonialModuleQuery = q
       .project((itemSub) => ({
         _id: true,
         name: itemSub.field('name').notNull(),
-        quote: itemSub
-          .field('quote[]')
-          .project(listedTextBlockFragment)
-          .notNull(),
+        quote: itemSub.field('quote[]').project(textBlockFragment).notNull(),
         role: itemSub.field('role').nullable(true),
         image: itemSub
           .field('image')

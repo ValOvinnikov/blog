@@ -3,7 +3,7 @@ import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-butto
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
 import { moduleLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
-import { listedTextBlockFragment } from '@blog/service/shared/fragments/portable-text/listed-text-block';
+import { textBlockFragment } from '@blog/service/shared/fragments/portable-text/text-block';
 
 export const faqModuleQuery = q
   .parameters<TModuleQueryParams>()
@@ -24,7 +24,7 @@ export const faqModuleQuery = q
         question: questionSub.field('question').notNull(),
         answer: questionSub
           .field('answer[]')
-          .project(listedTextBlockFragment)
+          .project(textBlockFragment)
           .notNull(),
       }))
       .notNull(),

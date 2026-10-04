@@ -1,7 +1,7 @@
 import { q } from '@blog/service/sanity/query';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
 import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document';
-import { paragraphTextBlockFragment } from '@blog/service/shared/fragments/portable-text/paragraph-text-block';
+import { textBlockFragment } from '@blog/service/shared/fragments/portable-text/text-block';
 import { socialProfileFragment } from '@blog/service/shared/fragments/social-profile/social-profile';
 
 export const personCardFragment = q
@@ -22,7 +22,7 @@ export const personDetailFragment = q
   .project((sub) => ({
     ...personCardFragment,
     role: sub.field('role').nullable(true),
-    bio: sub.field('bio[]').project(paragraphTextBlockFragment).nullable(true),
+    bio: sub.field('bio[]').project(textBlockFragment).nullable(true),
     socialLinks: sub
       .field('socialLinks[]')
       .project(socialProfileFragment)
