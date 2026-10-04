@@ -2,23 +2,14 @@ import { CTA_VARIANT } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { makeRawCtaModule } from '@blog/service/testing/modules/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import {
+  localizedStrings,
+  localizedValues,
+} from '@blog/service/testing/shared/localized';
 
 import { ctaModuleQuery } from './query';
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
-
-function localized(type: string, values: Partial<Record<string, unknown>>) {
-  return Object.entries(values).map(([language, value]) => ({
-    _key: language,
-    _type: type,
-    language,
-    value,
-  }));
-}
-
-function strings(values: Partial<Record<string, string>>) {
-  return localized('internationalizedArrayStringValue', values);
-}
 
 function paragraph(text: string) {
   return [
@@ -39,23 +30,23 @@ const ctaDocument = {
   brandVariant: 'PRIMARY',
   headingBlock: {
     _type: 'localizedHeadingBlock',
-    heading: strings({ [EN]: 'Subscribe', [NL]: 'Abonneer' }),
-    supportingText: localized('internationalizedArrayTextValue', {
+    heading: localizedStrings({ [EN]: 'Subscribe', [NL]: 'Abonneer' }),
+    supportingText: localizedValues('internationalizedArrayTextValue', {
       [EN]: 'New posts weekly.',
       [NL]: 'Wekelijks nieuwe berichten.',
     }),
   },
-  footnote: strings({
+  footnote: localizedStrings({
     [EN]: 'Unsubscribe any time.',
     [NL]: 'Altijd opzegbaar.',
   }),
   image: {
     _type: 'localizedImageWithAlt',
     asset: { _type: 'reference', _ref: 'image-1' },
-    alt: strings({ [EN]: 'A letter', [NL]: 'Een brief' }),
+    alt: localizedStrings({ [EN]: 'A letter', [NL]: 'Een brief' }),
   },
-  eyebrow: strings({ [EN]: 'Newsletter', [NL]: 'Nieuwsbrief' }),
-  content: localized('internationalizedArrayListedTextValue', {
+  eyebrow: localizedStrings({ [EN]: 'Newsletter', [NL]: 'Nieuwsbrief' }),
+  content: localizedValues('internationalizedArrayListedTextValue', {
     [EN]: paragraph('Read on.'),
     [NL]: paragraph('Lees verder.'),
   }),
@@ -120,7 +111,7 @@ describe('ctaModuleQuery', () => {
         footnote: undefined,
         headingBlock: {
           _type: 'localizedHeadingBlock',
-          heading: strings({ [EN]: 'Subscribe' }),
+          heading: localizedStrings({ [EN]: 'Subscribe' }),
         },
       },
       NL,

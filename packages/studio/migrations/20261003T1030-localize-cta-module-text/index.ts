@@ -1,7 +1,12 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { at, defineMigration, set } from 'sanity/migrate';
 
-type TSanityObject = { _type?: string; [field: string]: unknown };
+import {
+  inDefaultLocale,
+  localizeHeadingBlock,
+  localizeImage,
+  localizeStringField,
+  type TSanityObject,
+} from '../lib/localize-into-default-locale';
 
 type TCtaDoc = {
   headingBlock?: TSanityObject;
@@ -11,73 +16,12 @@ type TCtaDoc = {
   image?: TSanityObject;
 };
 
-// Every tenant's default language is English when this runs.
-const DEFAULT_LOCALE = LOCALE_ISO_CODES.EN;
-
-const inDefaultLocale = (type: string, value: unknown) => [
-  { _key: DEFAULT_LOCALE, _type: type, language: DEFAULT_LOCALE, value },
-];
-
-const localizedString = (value: unknown) =>
-  typeof value === 'string'
-    ? inDefaultLocale('internationalizedArrayStringValue', value)
-    : value;
-
 const isPortableText = (value: unknown): value is unknown[] =>
   Array.isArray(value) &&
   value.length > 0 &&
   value.every(
     (item) => (item as { _type?: unknown } | null)?._type === 'block',
   );
-
-const localizeHeadingBlock = (headingBlock: TCtaDoc['headingBlock']) => {
-  if (!headingBlock || headingBlock._type === 'localizedHeadingBlock') {
-    return [];
-  }
-
-  const { heading, supportingText, ...rest } = headingBlock;
-
-  return [
-    at(
-      'headingBlock',
-      set({
-        ...rest,
-        _type: 'localizedHeadingBlock',
-        ...(heading === undefined ? {} : { heading: localizedString(heading) }),
-        ...(typeof supportingText === 'string'
-          ? {
-              supportingText: inDefaultLocale(
-                'internationalizedArrayTextValue',
-                supportingText,
-              ),
-            }
-          : {}),
-      }),
-    ),
-  ];
-};
-
-const localizeImage = (image: TCtaDoc['image']) => {
-  if (!image || image._type === 'localizedImageWithAlt') {
-    return [];
-  }
-
-  const { alt, ...rest } = image;
-
-  return [
-    at(
-      'image',
-      set({
-        ...rest,
-        _type: 'localizedImageWithAlt',
-        ...(alt === undefined ? {} : { alt: localizedString(alt) }),
-      }),
-    ),
-  ];
-};
-
-const localizeStringField = (field: 'eyebrow' | 'footnote', value: unknown) =>
-  typeof value === 'string' ? [at(field, set(localizedString(value)))] : [];
 
 const localizeContent = (content: unknown) =>
   isPortableText(content)
