@@ -1,4 +1,4 @@
-import type { TLocaleIsoCode } from '@blog/config';
+import type { TLocaleIsoCode, TMaybeUndefined } from '@blog/config';
 import { queries } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
 import {
@@ -20,29 +20,29 @@ import { setRequestLocale } from 'next-intl/server';
 import { cache } from 'react';
 
 export type TRequestContext = {
-  tenantId: string | undefined;
+  tenantId: TMaybeUndefined<string>;
   locale: TLocaleIsoCode;
   sanityContext: TTenantSanityContext;
-  metadataBase: URL | undefined;
-  defaultLocale: TLocaleIsoCode | undefined;
-  liveLocales: TLocaleIsoCode[] | undefined;
+  metadataBase: TMaybeUndefined<URL>;
+  defaultLocale: TMaybeUndefined<TLocaleIsoCode>;
+  liveLocales: TMaybeUndefined<TLocaleIsoCode[]>;
 };
 
 export type TNotFoundContext = {
-  tenantId: string | undefined;
+  tenantId: TMaybeUndefined<string>;
   locale: TLocaleIsoCode;
   isDefaultLocale: boolean;
 };
 
 type TRouteParams = { tenant: string; locale: string };
 
-type TRequestedRoute = { tenantId: string | undefined; locale: string };
+type TRequestedRoute = { tenantId: TMaybeUndefined<string>; locale: string };
 
 type TRequestContextStore = {
   requestedRoute: Promise<TRequestedRoute>;
   recordRequestedRoute: (route: TRequestedRoute) => void;
-  tenantRow?: Promise<TTenant | undefined>;
-  entry?: { tenantId: string | undefined; locale: TLocaleIsoCode };
+  tenantRow?: Promise<TMaybeUndefined<TTenant>>;
+  entry?: { tenantId: TMaybeUndefined<string>; locale: TLocaleIsoCode };
   context?: Promise<TRequestContext>;
 };
 
@@ -58,21 +58,21 @@ const getStore = cache((): TRequestContextStore => {
 // Archived and deprovisioned rows included: credentials and locales never
 // filtered on them, and the base URL applies its own servability gate.
 const loadTenantRow = async (
-  tenantId: string | undefined,
-): Promise<TTenant | undefined> =>
+  tenantId: TMaybeUndefined<string>,
+): Promise<TMaybeUndefined<TTenant>> =>
   tenantId && isValidTenantId(tenantId)
     ? queries.tenants.getTenantById(tenantId, { includeArchived: true })
     : undefined;
 
 const loadTenantRowOnce = (
   store: TRequestContextStore,
-  tenantId: string | undefined,
-): Promise<TTenant | undefined> =>
+  tenantId: TMaybeUndefined<string>,
+): Promise<TMaybeUndefined<TTenant>> =>
   (store.tenantRow ??= loadTenantRow(tenantId));
 
 const toSanityContext = (
-  tenantId: string | undefined,
-  row: TTenant | undefined,
+  tenantId: TMaybeUndefined<string>,
+  row: TMaybeUndefined<TTenant>,
 ): TTenantSanityContext => {
   if (!tenantId) return getPlatformSanityContext();
 
@@ -85,7 +85,9 @@ const toSanityContext = (
   return getPlatformSanityContext();
 };
 
-const toMetadataBase = (row: TTenant | undefined): URL | undefined => {
+const toMetadataBase = (
+  row: TMaybeUndefined<TTenant>,
+): TMaybeUndefined<URL> => {
   const isServable = row && !row.deprovisionedAt && isTenantServable(row);
   const baseUrl = toTenantBaseUrl(isServable ? row : undefined);
 
@@ -94,7 +96,7 @@ const toMetadataBase = (row: TTenant | undefined): URL | undefined => {
 
 const buildRequestContext = async (
   store: TRequestContextStore,
-  tenantId: string | undefined,
+  tenantId: TMaybeUndefined<string>,
   locale: TLocaleIsoCode,
 ): Promise<TRequestContext> => {
   const row = await loadTenantRowOnce(store, tenantId);
@@ -150,8 +152,8 @@ export const getRequestContext = (): Promise<TRequestContext> => {
 
 const loadTenantRowForNotFound = async (
   store: TRequestContextStore,
-  tenantId: string | undefined,
-): Promise<TTenant | undefined> => {
+  tenantId: TMaybeUndefined<string>,
+): Promise<TMaybeUndefined<TTenant>> => {
   try {
     return await loadTenantRowOnce(store, tenantId);
   } catch (error) {
