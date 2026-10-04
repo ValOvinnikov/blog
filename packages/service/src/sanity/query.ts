@@ -25,7 +25,7 @@ export const q = createGroqBuilder<TSchemaConfig>();
 
 export type TSlugParams = { slug: string };
 
-export type TModuleQueryParams = { id: string };
+export type TModuleQueryParams = { id: string } & TLocaleParams;
 
 type TNextFetchOptions = {
   next?: { revalidate?: number | false; tags?: string[] };

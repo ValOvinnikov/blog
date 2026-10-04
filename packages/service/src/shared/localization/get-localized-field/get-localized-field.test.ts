@@ -1,9 +1,14 @@
+import type {
+  InternationalizedArrayReference,
+  InternationalizedArrayString,
+  Module_cta,
+} from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { q } from '@blog/service/sanity/query';
 import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 
-import { getLocalizedField } from './get-localized-field';
+import { getLocalizedField, type TLocalizedKey } from './get-localized-field';
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
@@ -12,9 +17,7 @@ const query = q
   .star.filterByType('link')
   .slice(0)
   .project((sub) => ({
-    label: getLocalizedField(sub, (filter) =>
-      sub.field('label[]').filterBy(filter).slice(0).field('value'),
-    ),
+    label: getLocalizedField(sub, 'label'),
   }));
 
 const document = {
@@ -52,5 +55,36 @@ describe(getLocalizedField, () => {
         FR,
       ),
     ).toEqual({ label: null });
+  });
+});
+
+const typedQuery = q
+  .parameters<TLocaleParams>()
+  .star.filterByType('module_cta')
+  .slice(0)
+  .project((sub) => ({
+    eyebrow: getLocalizedField(sub, 'eyebrow'),
+  }));
+
+describe('getLocalizedField types', () => {
+  it('infers a string for a plain field', () => {
+    expectTypeOf(typedQuery.parse).returns.toEqualTypeOf<{
+      eyebrow: string | null;
+    } | null>();
+  });
+
+  it('accepts only string-valued localized fields as the field name', () => {
+    expectTypeOf<TLocalizedKey<Module_cta>>().toEqualTypeOf<
+      'eyebrow' | 'footnote'
+    >();
+  });
+
+  it('rejects an internationalized array that is not string-valued', () => {
+    type TScope = {
+      label: InternationalizedArrayString;
+      target: InternationalizedArrayReference;
+    };
+
+    expectTypeOf<TLocalizedKey<TScope>>().toEqualTypeOf<'label'>();
   });
 });

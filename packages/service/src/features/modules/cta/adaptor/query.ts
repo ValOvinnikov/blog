@@ -1,10 +1,11 @@
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
 import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
-import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
-import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
+import { localizedHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/localized-heading-block';
+import { localizedImageWithAltFragment } from '@blog/service/shared/fragments/image/localized-image-with-alt';
 import { moduleLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
-import { listedTextBlockFragment } from '@blog/service/shared/fragments/portable-text/listed-text-block';
+import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
+import { getLocalizedPortableTextBlock } from '@blog/service/shared/localization/get-localized-portable-text-block/get-localized-portable-text-block';
 
 export const ctaModuleQuery = q
   .parameters<TModuleQueryParams>()
@@ -15,22 +16,22 @@ export const ctaModuleQuery = q
     variant: sub.field('variant').notNull(),
     brandVariant: sub.field('brandVariant').notNull(),
     bandTone: sub.field('bandTone').nullable(true),
-    eyebrow: sub.field('eyebrow').nullable(true),
+    eyebrow: getLocalizedField(sub, 'eyebrow'),
     headingBlock: sub
       .field('headingBlock')
-      .project(headingBlockFragment)
+      .project(localizedHeadingBlockFragment)
       .notNull(),
-    content: sub
-      .field('content[]')
-      .project(listedTextBlockFragment)
+    content: getLocalizedPortableTextBlock(sub, 'content'),
+    image: sub
+      .field('image')
+      .project(localizedImageWithAltFragment)
       .nullable(true),
-    image: sub.field('image').project(sanityImageFragment).nullable(true),
     contentPositionSplit: sub.field('contentPositionSplit').nullable(true),
     contentPositionBanner: sub.field('contentPositionBanner').nullable(true),
     ...moduleContentAlignmentFragment,
     mobileMediaOrder: sub.field('mobileMediaOrder').nullable(true),
     ...ctaButtonsFragment,
-    footnote: sub.field('footnote').nullable(true),
+    footnote: getLocalizedField(sub, 'footnote'),
     ...moduleLayoutFragment,
   }))
   .notNull();

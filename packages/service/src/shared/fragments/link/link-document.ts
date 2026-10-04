@@ -9,9 +9,7 @@ const localeQ = q.parameters<TLocaleParams>();
 export const linkDocumentFragment = localeQ
   .fragmentForType<'link'>()
   .project((sub) => ({
-    label: getLocalizedField(sub, (filter) =>
-      sub.field('label[]').filterBy(filter).slice(0).field('value'),
-    ),
+    label: getLocalizedField(sub, 'label'),
     linkType: sub.field('linkType').notNull(),
     openInNewTab: sub.field('openInNewTab').nullable(true),
     internalReference: translatedReference(
@@ -46,7 +44,5 @@ export const linkDocumentFragment = localeQ
           slug: ref.field('slug.current').nullable(true),
         })),
     ),
-    url: getLocalizedField(sub, (filter) =>
-      sub.field('url[]').filterBy(filter).slice(0).field('value'),
-    ),
+    url: getLocalizedField(sub, 'url'),
   }));

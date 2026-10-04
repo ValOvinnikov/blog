@@ -3,7 +3,7 @@ import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-butto
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
 import { moduleLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
-import { paragraphTextBlockFragment } from '@blog/service/shared/fragments/portable-text/paragraph-text-block';
+import { textBlockFragment } from '@blog/service/shared/fragments/portable-text/text-block';
 
 export const timelineModuleQuery = q
   .parameters<TModuleQueryParams>()
@@ -23,10 +23,7 @@ export const timelineModuleQuery = q
         _key: true,
         marker: itemSub.field('marker').nullable(true),
         heading: itemSub.field('heading').notNull(),
-        body: itemSub
-          .field('body[]')
-          .project(paragraphTextBlockFragment)
-          .nullable(true),
+        body: itemSub.field('body[]').project(textBlockFragment).nullable(true),
       }))
       .notNull(),
     orientation: sub.field('orientation').notNull(),
