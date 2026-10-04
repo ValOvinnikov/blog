@@ -1,3 +1,7 @@
+import type {
+  InternationalizedArrayString,
+  InternationalizedArrayText,
+} from '@blog/config';
 import type { TLocaleIsoCode } from '@blog/config/constants';
 import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
 import type { GroqBuilder, GroqBuilderSubquery, QueryConfig } from 'groqd';
@@ -12,35 +16,34 @@ export type TLocaleQueryConfig = {
   scope: { $locale: TLocaleIsoCode; $defaultLocale: TLocaleIsoCode };
 };
 
-export type TLocalizedEntries<TValue> = Array<{
-  language?: string;
-  value?: TValue;
-}>;
+type TPlainLocalizedArray =
+  InternationalizedArrayString | InternationalizedArrayText;
 
-export type TLocalizedKey<TScope, TValue = unknown> = {
-  [TKey in keyof TScope & string]-?: NonNullable<
-    TScope[TKey]
-  > extends TLocalizedEntries<TValue>
+export type TLocalizedKey<
+  TScope,
+  TArray extends unknown[] = TPlainLocalizedArray,
+> = {
+  [TKey in keyof TScope & string]-?: NonNullable<TScope[TKey]> extends TArray
     ? TKey
     : never;
 }[keyof TScope & string];
 
 export type TLocalizedValue<TScope, TKey extends keyof TScope> =
-  NonNullable<TScope[TKey]> extends Array<{ value?: infer TValue }>
-    ? NonNullable<TValue>
+  NonNullable<TScope[TKey]> extends TPlainLocalizedArray
+    ? NonNullable<NonNullable<TScope[TKey]>[number]['value']>
     : never;
 
 export function getLocalizedField<
   TScope,
   TConfig extends QueryConfig,
-  TKey extends TLocalizedKey<NonNullable<TScope>, string>,
+  TKey extends TLocalizedKey<NonNullable<TScope>>,
 >(
   sub: GroqBuilderSubquery<TScope, TConfig>,
   field: TKey,
 ): GroqBuilder<TLocalizedValue<NonNullable<TScope>, TKey> | null, TConfig>;
 export function getLocalizedField(
   sub: GroqBuilderSubquery<
-    Record<string, TLocalizedEntries<string>>,
+    Record<string, TPlainLocalizedArray>,
     TLocaleQueryConfig
   >,
   field: string,

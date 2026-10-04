@@ -1,4 +1,7 @@
-import type { ListedText, Module_cta } from '@blog/config';
+import type {
+  InternationalizedArrayListedText,
+  Module_cta,
+} from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { q } from '@blog/service/sanity/query';
 import type { listedTextBlockFragment } from '@blog/service/shared/fragments/portable-text/listed-text-block';
@@ -72,7 +75,7 @@ describe('getLocalizedPortableTextBlock types', () => {
 
   it('accepts only block-array localized fields as the field name', () => {
     expectTypeOf<
-      TLocalizedKey<Module_cta, ListedText>
+      TLocalizedKey<Module_cta, InternationalizedArrayListedText>
     >().toEqualTypeOf<'content'>();
   });
 });

@@ -1,4 +1,8 @@
-import type { Module_cta } from '@blog/config';
+import type {
+  InternationalizedArrayReference,
+  InternationalizedArrayString,
+  Module_cta,
+} from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { q } from '@blog/service/sanity/query';
 import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
@@ -70,8 +74,17 @@ describe('getLocalizedField types', () => {
   });
 
   it('accepts only string-valued localized fields as the field name', () => {
-    expectTypeOf<TLocalizedKey<Module_cta, string>>().toEqualTypeOf<
+    expectTypeOf<TLocalizedKey<Module_cta>>().toEqualTypeOf<
       'eyebrow' | 'footnote'
     >();
+  });
+
+  it('rejects an internationalized array that is not string-valued', () => {
+    type TScope = {
+      label: InternationalizedArrayString;
+      target: InternationalizedArrayReference;
+    };
+
+    expectTypeOf<TLocalizedKey<TScope>>().toEqualTypeOf<'label'>();
   });
 });
