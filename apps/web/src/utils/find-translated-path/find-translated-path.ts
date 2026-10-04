@@ -1,4 +1,8 @@
-import { routes, type TLocaleIsoCode } from '@blog/config';
+import {
+  routes,
+  type TLocaleIsoCode,
+  type TMaybeUndefined,
+} from '@blog/config';
 import { service, type TTranslationMap } from '@blog/service';
 import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
 
@@ -10,7 +14,7 @@ type TFindTranslatedPathParams = {
   defaultLocale: TLocaleIsoCode;
 };
 
-const toLandingSlug = (pathname: string): string | undefined => {
+const toLandingSlug = (pathname: string): TMaybeUndefined<string> => {
   const segments = pathname.split('/').filter(Boolean);
   if (segments.length !== 1) {
     return undefined;
@@ -29,7 +33,7 @@ export const findTranslatedPath = ({
   fromLocale,
   toLocale,
   defaultLocale,
-}: TFindTranslatedPathParams): string | undefined => {
+}: TFindTranslatedPathParams): TMaybeUndefined<string> => {
   if (fromLocale === toLocale) {
     return toLocalizedPathname({
       href: pathname,

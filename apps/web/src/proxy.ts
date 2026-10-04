@@ -1,4 +1,4 @@
-import type { TLocaleIsoCode } from '@blog/config';
+import type { TLocaleIsoCode, TMaybeUndefined } from '@blog/config';
 import { getTenantTranslationMap } from '@web/server/translation-map/get-tenant-translation-map/get-tenant-translation-map';
 import { findTranslatedPath } from '@web/utils/find-translated-path';
 import { isCrawler } from '@web/utils/is-crawler';
@@ -66,8 +66,8 @@ const DETECTABLE_METHODS = new Set(['GET', 'HEAD']);
 const redirectToPreferredTranslation = async (
   request: NextRequest,
   firstSegment: string,
-  tenantRouting: TTenantRouting | undefined,
-): Promise<NextResponse | undefined> => {
+  tenantRouting: TMaybeUndefined<TTenantRouting>,
+): Promise<TMaybeUndefined<NextResponse>> => {
   if (
     !tenantRouting ||
     tenantRouting.liveLocales.length < 2 ||

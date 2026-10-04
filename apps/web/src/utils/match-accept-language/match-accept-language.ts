@@ -1,8 +1,14 @@
-import { LOCALE_BCP47_TAGS, type TLocaleIsoCode } from '@blog/config';
+import {
+  LOCALE_BCP47_TAGS,
+  type TLocaleIsoCode,
+  type TMaybeUndefined,
+} from '@blog/config';
 
 type TWeightedLanguage = { primaryTag: string; quality: number };
 
-const toWeightedLanguage = (part: string): TWeightedLanguage | undefined => {
+const toWeightedLanguage = (
+  part: string,
+): TMaybeUndefined<TWeightedLanguage> => {
   const [range = '', ...parameters] = part.trim().split(';');
   const primaryTag = range.trim().split('-')[0]?.toLowerCase() ?? '';
   const qualityParameter = parameters
@@ -19,7 +25,7 @@ const toWeightedLanguage = (part: string): TWeightedLanguage | undefined => {
 export const matchAcceptLanguage = (
   header: string | null,
   liveLocales: readonly TLocaleIsoCode[],
-): TLocaleIsoCode | undefined => {
+): TMaybeUndefined<TLocaleIsoCode> => {
   const preferences = (header ?? '')
     .split(',')
     .flatMap((part) => toWeightedLanguage(part) ?? [])

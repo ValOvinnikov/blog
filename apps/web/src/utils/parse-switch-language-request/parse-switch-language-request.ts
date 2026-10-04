@@ -1,10 +1,10 @@
-import type { TLocaleIsoCode } from '@blog/config';
+import type { TLocaleIsoCode, TMaybeUndefined } from '@blog/config';
 
 type TSwitchLanguageRequest = { to: TLocaleIsoCode; from: string };
 
 const SITE_ORIGIN_PROBE = 'https://site.invalid';
 
-const toInSitePathname = (from: string | null): string | undefined => {
+const toInSitePathname = (from: string | null): TMaybeUndefined<string> => {
   if (!from?.startsWith('/')) {
     return undefined;
   }
@@ -15,7 +15,7 @@ const toInSitePathname = (from: string | null): string | undefined => {
 export const parseSwitchLanguageRequest = (
   searchParams: URLSearchParams,
   liveLocales: readonly TLocaleIsoCode[],
-): TSwitchLanguageRequest | undefined => {
+): TMaybeUndefined<TSwitchLanguageRequest> => {
   const to = liveLocales.find((locale) => locale === searchParams.get('to'));
   const from = toInSitePathname(searchParams.get('from'));
 
