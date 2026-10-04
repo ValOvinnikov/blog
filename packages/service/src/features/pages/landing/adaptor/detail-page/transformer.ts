@@ -1,4 +1,4 @@
-import { toPageTranslations } from '@blog/service/shared/localization/to-page-translations';
+import { toPageTranslations } from '@blog/service/shared/localization/page-translations/to-page-translations';
 import { resolveFaqs } from '@blog/service/shared/transformers/faq/resolve-faqs';
 import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
 import {

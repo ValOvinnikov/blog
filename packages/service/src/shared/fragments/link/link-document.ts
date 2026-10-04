@@ -1,18 +1,52 @@
 import { q } from '@blog/service/sanity/query';
-import { buildLocalizedValueExpression } from '@blog/service/shared/localization/localized-value';
-import { buildTranslatedReferenceExpression } from '@blog/service/shared/localization/translated-reference';
+import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
+import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
+import { translatedReference } from '@blog/service/shared/localization/translated-reference/translated-reference';
 
-type TLinkTarget = { _type: string; slug: string | null };
+const localeQ = q.parameters<TLocaleParams>();
 
 // Projected unconditionally — groqd's `sub.conditional()` union silently drops the matching branch's own field at parse time.
-export const linkDocumentFragment = q
+export const linkDocumentFragment = localeQ
   .fragmentForType<'link'>()
   .project((sub) => ({
-    label: sub.raw<string | null>(buildLocalizedValueExpression('label')),
+    label: getLocalizedField(sub, (filter) =>
+      sub.field('label[]').filterBy(filter).slice(0).field('value'),
+    ),
     linkType: sub.field('linkType').notNull(),
     openInNewTab: sub.field('openInNewTab').nullable(true),
-    internalReference: sub.raw<TLinkTarget | null>(
-      `${buildTranslatedReferenceExpression('internalReference')}{_type, "slug": slug.current}`,
+    internalReference: translatedReference(
+      sub,
+      (filter) =>
+        sub
+          .field('internalReference')
+          .deref()
+          .asCombined()
+          .project((page) => ({
+            translated: page.star
+              .filterByType('translation.metadata')
+              .filterBy('references(^._id)')
+              .slice(0)
+              .field('translations[]')
+              .filterBy(filter)
+              .slice(0)
+              .field('value')
+              .deref()
+              .project((target) => ({
+                _type: true,
+                slug: target.field('slug.current').nullable(true),
+              })),
+          }))
+          .field('translated'),
+      sub
+        .field('internalReference')
+        .deref()
+        .asCombined()
+        .project((ref) => ({
+          _type: true,
+          slug: ref.field('slug.current').nullable(true),
+        })),
     ),
-    url: sub.raw<string | null>(buildLocalizedValueExpression('url')),
+    url: getLocalizedField(sub, (filter) =>
+      sub.field('url[]').filterBy(filter).slice(0).field('value'),
+    ),
   }));
