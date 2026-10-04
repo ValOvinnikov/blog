@@ -1,10 +1,8 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import {
   makeRawCtaButton,
   makeRawCtaModule,
 } from '@blog/service/testing/modules/fixtures';
-import { makeRawLocalizedEntries } from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getCta } from './loader';
@@ -26,27 +24,6 @@ describe('getCta', () => {
 
     expect(cta.headingBlock.heading).toBe('Subscribe to the newsletter');
     expect(cta.ctaButtons?.[0]?.link.href).toBe('/newsletter');
-  });
-
-  it('resolves each field in the tenant locale, falling back to its default', async () => {
-    const { EN, NL } = LOCALE_ISO_CODES;
-    mockRun.mockResolvedValueOnce(
-      makeRawCtaModule({
-        eyebrow: [
-          { language: EN, value: 'Newsletter' },
-          { language: NL, value: 'Nieuwsbrief' },
-        ],
-        footnote: makeRawLocalizedEntries('Unsubscribe any time.', EN),
-      }),
-    );
-
-    const cta = await getCta(
-      'cta-1',
-      makeTenant({ locale: NL, defaultLocale: EN }),
-    );
-
-    expect(cta.eyebrow).toBe('Nieuwsbrief');
-    expect(cta.footnote).toBe('Unsubscribe any time.');
   });
 
   it('propagates when the module document is missing', async () => {

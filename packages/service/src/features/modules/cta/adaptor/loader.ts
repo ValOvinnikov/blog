@@ -3,7 +3,6 @@ import {
   runQuery,
   type TTenantSanityContext,
 } from '@blog/service/sanity/query';
-import { buildLocaleParams } from '@blog/service/shared/localization/locale-params';
 
 import { ctaModuleQuery } from './query';
 import { toCtaModule } from './transformer';
@@ -35,5 +34,5 @@ export async function getCta(
     ),
   });
 
-  return toCtaModule(raw, buildLocaleParams(tenant));
+  return toCtaModule(raw);
 }

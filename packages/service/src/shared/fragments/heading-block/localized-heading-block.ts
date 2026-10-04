@@ -1,9 +1,15 @@
 import { q } from '@blog/service/sanity/query';
-import { localizedEntries } from '@blog/service/shared/localization/localized-entries';
+import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
+import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
 
 export const localizedHeadingBlockFragment = q
+  .parameters<TLocaleParams>()
   .fragmentForType<'localizedHeadingBlock'>()
   .project((sub) => ({
-    heading: localizedEntries(sub, 'heading'),
-    supportingText: localizedEntries(sub, 'supportingText'),
+    heading: getLocalizedField(sub, (filter) =>
+      sub.field('heading[]').filterBy(filter).slice(0).field('value'),
+    ).notNull(),
+    supportingText: getLocalizedField(sub, (filter) =>
+      sub.field('supportingText[]').filterBy(filter).slice(0).field('value'),
+    ),
   }));

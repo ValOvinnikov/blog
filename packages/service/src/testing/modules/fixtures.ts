@@ -42,16 +42,12 @@ import type { TRawTimelineModule } from '@blog/service/features/modules/timeline
 import type { TRawCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button';
 import {
   makeRawHeadingBlock,
-  makeRawLocalizedEntries,
   makeRawParagraphTextBlock,
   makeRawPortableTextMarkDef,
   makeRawSanityImage,
 } from '@blog/service/testing/shared/fixtures';
 
-type TRawCtaImage = NonNullable<TRawCtaModule['image']>;
-type TRawCtaContentBlock = NonNullable<
-  NonNullable<TRawCtaModule['content']>[number]['value']
->[number];
+type TRawCtaContentBlock = NonNullable<TRawCtaModule['content']>[number];
 type TRawCtaContentMarkDef = NonNullable<
   TRawCtaContentBlock['markDefs']
 >[number];
@@ -247,10 +243,9 @@ export function makeRawCtaModule(
     brandVariant: BRAND_VARIANT.PRIMARY,
     bandTone: BRAND_VARIANT.PRIMARY,
     eyebrow: null,
-    headingBlock: {
-      heading: makeRawLocalizedEntries('Subscribe to the newsletter'),
-      supportingText: makeRawLocalizedEntries('Get new posts in your inbox.'),
-    },
+    headingBlock: makeRawHeadingBlock('Subscribe to the newsletter', {
+      supportingText: 'Get new posts in your inbox.',
+    }),
     content: null,
     image: null,
     contentPositionSplit: null,
@@ -261,13 +256,6 @@ export function makeRawCtaModule(
     footnote: null,
     layout: null,
     ...overrides,
-  };
-}
-
-export function makeRawCtaImage(alt = 'Alt text'): TRawCtaImage {
-  return {
-    ...makeRawSanityImage(),
-    alt: makeRawLocalizedEntries(alt),
   };
 }
 
