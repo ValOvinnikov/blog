@@ -8,12 +8,14 @@ import { setRequestLocale } from 'next-intl/server';
 import type * as TModule from './request-context';
 
 const {
+  loggerErrorMock,
   getTenantByIdMock,
   toTenantSanityCredentialsMock,
   selectLiveLocalesMock,
   isProductionEnvironmentMock,
   isTenantServableMock,
 } = vi.hoisted(() => ({
+  loggerErrorMock: vi.fn(),
   getTenantByIdMock: vi.fn(),
   toTenantSanityCredentialsMock: vi.fn(),
   selectLiveLocalesMock: vi.fn(),
@@ -36,6 +38,9 @@ vi.mock('@blog/service', () => ({
     dataset: 'platform-dataset',
     token: 'platform-token',
   }),
+}));
+vi.mock('@web/utils/logger/logger', () => ({
+  logger: { error: loggerErrorMock },
 }));
 vi.mock('@web/utils/is-production-environment', () => ({
   isProductionEnvironment: isProductionEnvironmentMock,
@@ -262,6 +267,114 @@ describe('request-context', () => {
       );
 
       expect(metadataBase).toEqual(new URL('https://example.com'));
+    });
+  });
+
+  describe('getNotFoundContext', () => {
+    const enterAndReadNotFound = async (tenant: string, locale: string) => {
+      const { enterRequestContext, getNotFoundContext } =
+        await loadRequestContext();
+      const notFoundContext = getNotFoundContext();
+      await enterRequestContext(params(tenant, locale)).catch(() => {});
+      return notFoundContext;
+    };
+
+    it('serves the entered language when it is live', async () => {
+      await expect(
+        enterAndReadNotFound(TENANT_ID, LOCALE_ISO_CODES.NL),
+      ).resolves.toEqual({
+        tenantId: TENANT_ID,
+        locale: LOCALE_ISO_CODES.NL,
+        isDefaultLocale: false,
+      });
+    });
+
+    it("serves the tenant's default language in that language", async () => {
+      getTenantByIdMock.mockResolvedValue(
+        buildTenantRow({ locale: LOCALE_ISO_CODES.NL }),
+      );
+
+      await expect(
+        enterAndReadNotFound(TENANT_ID, LOCALE_ISO_CODES.NL),
+      ).resolves.toMatchObject({
+        locale: LOCALE_ISO_CODES.NL,
+        isDefaultLocale: true,
+      });
+    });
+
+    it("falls back to the tenant's default language for an invalid one", async () => {
+      getTenantByIdMock.mockResolvedValue(
+        buildTenantRow({ locale: LOCALE_ISO_CODES.DE }),
+      );
+      selectLiveLocalesMock.mockReturnValue([LOCALE_ISO_CODES.DE]);
+
+      await expect(enterAndReadNotFound(TENANT_ID, 'xx')).resolves.toEqual({
+        tenantId: TENANT_ID,
+        locale: LOCALE_ISO_CODES.DE,
+        isDefaultLocale: true,
+      });
+    });
+
+    it("falls back to the tenant's default language for a switched-off one", async () => {
+      selectLiveLocalesMock.mockReturnValue([LOCALE_ISO_CODES.EN]);
+
+      await expect(
+        enterAndReadNotFound(TENANT_ID, LOCALE_ISO_CODES.NL),
+      ).resolves.toMatchObject({
+        locale: LOCALE_ISO_CODES.EN,
+        isDefaultLocale: true,
+      });
+    });
+
+    it('serves the tenant language when its Sanity credentials 404 the layout', async () => {
+      toTenantSanityCredentialsMock.mockReturnValue(undefined);
+
+      await expect(
+        enterAndReadNotFound(TENANT_ID, LOCALE_ISO_CODES.NL),
+      ).resolves.toMatchObject({ locale: LOCALE_ISO_CODES.NL });
+    });
+
+    it('shares the tenants row read with the request context', async () => {
+      await enterAndReadNotFound(TENANT_ID, LOCALE_ISO_CODES.EN);
+
+      expect(getTenantByIdMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('serves the entered language and logs when the tenants row cannot be read', async () => {
+      const error = new Error('db down');
+      getTenantByIdMock.mockRejectedValue(error);
+
+      await expect(
+        enterAndReadNotFound(TENANT_ID, LOCALE_ISO_CODES.NL),
+      ).resolves.toMatchObject({ locale: LOCALE_ISO_CODES.NL });
+      expect(loggerErrorMock).toHaveBeenCalledWith(
+        'request_context.not_found_tenant_load_failed',
+        { error },
+      );
+    });
+
+    describe('with no tenant entered', () => {
+      it('serves the entered language', async () => {
+        await expect(
+          enterAndReadNotFound(
+            UNRESOLVED_TENANT_PLACEHOLDER,
+            LOCALE_ISO_CODES.FR,
+          ),
+        ).resolves.toEqual({
+          tenantId: undefined,
+          locale: LOCALE_ISO_CODES.FR,
+          isDefaultLocale: false,
+        });
+      });
+
+      it('falls back to English for an invalid language', async () => {
+        await expect(
+          enterAndReadNotFound(UNRESOLVED_TENANT_PLACEHOLDER, 'xx'),
+        ).resolves.toMatchObject({
+          locale: LOCALE_ISO_CODES.EN,
+          isDefaultLocale: true,
+        });
+      });
     });
   });
 });

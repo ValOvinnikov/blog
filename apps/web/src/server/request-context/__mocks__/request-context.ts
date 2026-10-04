@@ -8,3 +8,11 @@ export const enterRequestContext = vi.fn<typeof TModule.enterRequestContext>(
 export const getRequestContext = vi.fn<typeof TModule.getRequestContext>(
   async () => DEFAULT_REQUEST_CONTEXT,
 );
+
+export const getNotFoundContext = vi.fn<typeof TModule.getNotFoundContext>(
+  async () => ({
+    tenantId: DEFAULT_REQUEST_CONTEXT.tenantId,
+    locale: DEFAULT_REQUEST_CONTEXT.locale,
+    isDefaultLocale: true,
+  }),
+);

@@ -1,11 +1,16 @@
-import { LOCALE_ISO_CODES, type TThemeTokens } from '@blog/config';
+import {
+  LOCALE_ISO_CODES,
+  SITE_MESSAGES_BY_LOCALE,
+  type TLocaleIsoCode,
+  type TThemeTokens,
+} from '@blog/config';
 import { NotFoundPage } from '@web/components/pages/not-found-page';
 import { ThemeScope } from '@web/components/shared/theme-scope';
 import { getThemeTokens } from '@web/utils/get-theme-tokens';
 import { resolveTenantMessages } from '@web/utils/resolve-tenant-messages';
 import { toThemeTokens } from '@web/utils/to-theme-tokens';
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages, setRequestLocale } from 'next-intl/server';
+import { setRequestLocale } from 'next-intl/server';
 
 type TNotFoundThemeContext = {
   messages: Record<string, unknown>;
@@ -15,37 +20,42 @@ type TNotFoundThemeContext = {
 const resolveTenantThemeContext = async (
   baseMessages: Record<string, unknown>,
   tenant: string,
+  hasVoiceOverrides: boolean,
 ): Promise<TNotFoundThemeContext> => {
-  const [resolved, themeTokens] = await Promise.all([
-    resolveTenantMessages(baseMessages, tenant),
+  const [messages, themeTokens] = await Promise.all([
+    hasVoiceOverrides
+      ? resolveTenantMessages(baseMessages, tenant).then(
+          (resolved) => resolved.messages,
+        )
+      : baseMessages,
     getThemeTokens(tenant),
   ]);
 
-  return { messages: resolved.messages, themeTokens };
+  return { messages, themeTokens };
 };
 
 type TStandaloneNotFoundPageProps = {
   tenant?: string;
+  locale?: TLocaleIsoCode;
+  hasVoiceOverrides?: boolean;
 };
 
-/**
- * StandaloneNotFoundPage — the body every `not-found.tsx` boundary outside
- * `[tenant]/[locale]/layout.tsx`'s children renders, since neither receives
- * route params to inherit theme/locale context from.
- */
+/** The body of every `not-found.tsx` boundary that renders outside `[tenant]/[locale]/layout.tsx`'s providers. */
 export const StandaloneNotFoundPage = async ({
   tenant,
+  locale = LOCALE_ISO_CODES.EN,
+  hasVoiceOverrides = true,
 }: TStandaloneNotFoundPageProps = {}) => {
-  setRequestLocale(LOCALE_ISO_CODES.EN);
-  const baseMessages = await getMessages();
+  setRequestLocale(locale);
+  const baseMessages = SITE_MESSAGES_BY_LOCALE[locale];
 
   const { messages, themeTokens } = tenant
-    ? await resolveTenantThemeContext(baseMessages, tenant)
+    ? await resolveTenantThemeContext(baseMessages, tenant, hasVoiceOverrides)
     : { messages: baseMessages, themeTokens: toThemeTokens(undefined) };
 
   return (
     <ThemeScope themeTokens={themeTokens}>
-      <NextIntlClientProvider locale={LOCALE_ISO_CODES.EN} messages={messages}>
+      <NextIntlClientProvider locale={locale} messages={messages}>
         <NotFoundPage />
       </NextIntlClientProvider>
     </ThemeScope>

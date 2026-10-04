@@ -1,4 +1,4 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
+import { LOCALE_ISO_CODES, SITE_MESSAGES_BY_LOCALE } from '@blog/config';
 import { NotFoundPage } from '@web/components/pages/not-found-page';
 import { ThemeScope } from '@web/components/shared/theme-scope';
 import { NextIntlClientProvider } from 'next-intl';
@@ -6,13 +6,11 @@ import { NextIntlClientProvider } from 'next-intl';
 import { StandaloneNotFoundPage } from './standalone-not-found-page';
 
 const {
-  getMessagesMock,
   setRequestLocaleMock,
   getThemeTokensMock,
   resolveTenantMessagesMock,
   toThemeTokensMock,
 } = vi.hoisted(() => ({
-  getMessagesMock: vi.fn(),
   setRequestLocaleMock: vi.fn(),
   getThemeTokensMock: vi.fn(),
   resolveTenantMessagesMock: vi.fn(),
@@ -20,7 +18,6 @@ const {
 }));
 
 vi.mock('next-intl/server', () => ({
-  getMessages: getMessagesMock,
   setRequestLocale: setRequestLocaleMock,
 }));
 
@@ -36,7 +33,7 @@ vi.mock('@web/utils/to-theme-tokens', () => ({
   toThemeTokens: toThemeTokensMock,
 }));
 
-const messages = { notFound: { commandNotFound: 'Not found' } };
+const messages = SITE_MESSAGES_BY_LOCALE.EN;
 const voicedMessages = { notFound: { commandNotFound: 'command not found' } };
 
 const THEME_TOKENS = {
@@ -57,7 +54,6 @@ const DEFAULT_THEME_TOKENS = {
 
 describe(`<${StandaloneNotFoundPage.name}/>`, () => {
   beforeEach(() => {
-    getMessagesMock.mockResolvedValue(messages);
     getThemeTokensMock.mockResolvedValue(THEME_TOKENS);
     resolveTenantMessagesMock.mockResolvedValue({
       messages: voicedMessages,
@@ -66,13 +62,20 @@ describe(`<${StandaloneNotFoundPage.name}/>`, () => {
     toThemeTokensMock.mockReturnValue(DEFAULT_THEME_TOKENS);
   });
 
-  it('pins the request locale before resolving messages', async () => {
-    await StandaloneNotFoundPage();
+  it('renders in English by default', async () => {
+    const ui = await StandaloneNotFoundPage();
 
     expect(setRequestLocaleMock).toHaveBeenCalledWith(LOCALE_ISO_CODES.EN);
-    expect(setRequestLocaleMock.mock.invocationCallOrder[0]).toBeLessThan(
-      getMessagesMock.mock.invocationCallOrder[0]!,
-    );
+    expect(ui.props.children.props.locale).toBe(LOCALE_ISO_CODES.EN);
+  });
+
+  it('renders in the given language with its messages', async () => {
+    const ui = await StandaloneNotFoundPage({ locale: LOCALE_ISO_CODES.NL });
+    const provider = ui.props.children;
+
+    expect(setRequestLocaleMock).toHaveBeenCalledWith(LOCALE_ISO_CODES.NL);
+    expect(provider.props.locale).toBe(LOCALE_ISO_CODES.NL);
+    expect(provider.props.messages).toBe(SITE_MESSAGES_BY_LOCALE.NL);
   });
 
   describe('given a tenant', () => {
@@ -92,6 +95,18 @@ describe(`<${StandaloneNotFoundPage.name}/>`, () => {
 
       expect(ui.type).toBe(ThemeScope);
       expect(ui.props.themeTokens).toBe(THEME_TOKENS);
+    });
+
+    it('keeps the base messages but the tenant theme without voice overrides', async () => {
+      const ui = await StandaloneNotFoundPage({
+        tenant: 'tenant-1',
+        locale: LOCALE_ISO_CODES.NL,
+        hasVoiceOverrides: false,
+      });
+
+      expect(resolveTenantMessagesMock).not.toHaveBeenCalled();
+      expect(ui.props.themeTokens).toBe(THEME_TOKENS);
+      expect(ui.props.children.props.messages).toBe(SITE_MESSAGES_BY_LOCALE.NL);
     });
 
     it('wraps NotFoundPage in its own NextIntlClientProvider, independent of any ancestor provider', async () => {
