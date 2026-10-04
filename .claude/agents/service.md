@@ -211,6 +211,12 @@ one-line comment naming what is missing. In particular:
 - **No string-built helpers** that return GROQ text for interpolation
   (`build*Expression(field)`). A shared helper takes and returns groqd
   builders, so its result type is inferred, not asserted with `raw<T>()`.
+- **A Sanity `_type` is written inline where the query uses it** —
+  `.filterByType('translation.metadata')`, `fragmentForType<'link'>()`.
+  groqd checks that literal against the generated schema, so a service-local
+  constant (`export const TRANSLATION_METADATA_TYPE = 'translation.metadata'`)
+  adds nothing, and importing it from a sibling file couples two queries
+  through a string.
 - **A cast to satisfy groqd (`as never`, `as unknown as`) is the same
   failure** — it means the typed route was abandoned. Stop and report it
   rather than ship the cast.
