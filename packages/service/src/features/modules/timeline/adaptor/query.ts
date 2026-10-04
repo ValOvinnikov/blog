@@ -2,7 +2,7 @@ import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
 import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
 import { moduleLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
-import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
+import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { paragraphTextBlockFragment } from '@blog/service/shared/fragments/portable-text/paragraph-text-block';
 
 export const timelineModuleQuery = q
@@ -31,7 +31,7 @@ export const timelineModuleQuery = q
       .notNull(),
     orientation: sub.field('orientation').notNull(),
     ...ctaButtonsFragment,
-    ...moduleContentAlignmentFragment,
+    ...moduleContentAlignmentLeftCenterFragment,
     itemAlignment: sub.field('itemAlignment').notNull(),
     ...moduleLayoutFragment,
   }))
