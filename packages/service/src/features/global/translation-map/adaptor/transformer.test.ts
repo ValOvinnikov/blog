@@ -44,6 +44,18 @@ const dataset = [
   metadata('meta-team', [EN, 'team-en'], [NL, 'team-nl']),
 ];
 
+function groupWithSlug(
+  groups: Awaited<ReturnType<typeof buildMap>>['groups'],
+  language: string,
+  slug: string,
+) {
+  return groups.find((group) =>
+    group.some(
+      (member) => member.language === language && member.slug === slug,
+    ),
+  );
+}
+
 async function buildMap(documents: unknown[]) {
   const raw = await evaluateGroqExpression(
     translationMapQuery.query,
@@ -57,7 +69,7 @@ describe('toTranslationMap', () => {
   it('groups every language of a translated page with its slug', async () => {
     const { groups } = await buildMap(dataset);
 
-    expect(groups[0]).toEqual([
+    expect(groupWithSlug(groups, EN, 'about')).toEqual([
       { documentType: 'page_landing', language: EN, slug: 'about' },
       { documentType: 'page_landing', language: NL, slug: 'over-ons' },
       { documentType: 'page_landing', language: DE, slug: 'ueber-uns' },
@@ -67,7 +79,7 @@ describe('toTranslationMap', () => {
   it('drops a translation that exists only as a draft', async () => {
     const { groups } = await buildMap(dataset);
 
-    expect(groups[1]).toEqual([
+    expect(groupWithSlug(groups, EN, 'pricing')).toEqual([
       { documentType: 'page_landing', language: EN, slug: 'pricing' },
     ]);
   });
@@ -75,7 +87,7 @@ describe('toTranslationMap', () => {
   it('drops a published translation that has no slug', async () => {
     const { groups } = await buildMap(dataset);
 
-    expect(groups[2]).toEqual([
+    expect(groupWithSlug(groups, EN, 'team')).toEqual([
       { documentType: 'page_landing', language: EN, slug: 'team' },
     ]);
   });
@@ -97,7 +109,7 @@ describe('findTranslationGroup', () => {
         language: NL,
         slug: 'over-ons',
       }),
-    ).toEqual(map.groups[0]);
+    ).toEqual(groupWithSlug(map.groups, EN, 'about'));
   });
 
   it('is undefined when the slug matches no member', async () => {
