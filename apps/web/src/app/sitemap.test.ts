@@ -138,7 +138,7 @@ describe('sitemap', () => {
     });
     getPageSlugsMock.mockResolvedValue({
       ok: true,
-      data: [{ slug: 'about' }],
+      data: [{ slug: 'about', language: 'EN' }],
     });
     const sitemap = (await import('./sitemap')).default;
 
@@ -156,6 +156,59 @@ describe('sitemap', () => {
     expect(urls).toContain('https://example.com/topics/news');
     expect(urls).toContain('https://example.com/tags/typescript');
     expect(urls).toContain('https://example.com/about');
+  });
+
+  it('keeps a single-language tenant landing entry as its own url and language alternate', async () => {
+    mockAllEmpty();
+    resolveRequestTenantMock.mockResolvedValue({
+      id: 'tenant-1',
+      locale: 'EN',
+    });
+    selectLiveLocalesMock.mockReturnValue(['EN']);
+    getPageSlugsMock.mockResolvedValue({
+      ok: true,
+      data: [{ slug: 'about', language: 'EN' }],
+    });
+    const sitemap = (await import('./sitemap')).default;
+
+    const entries = await sitemap();
+
+    expect(entries).toContainEqual({
+      url: 'https://example.com/about',
+      alternates: { languages: { en: 'https://example.com/about' } },
+    });
+  });
+
+  it('lists each landing page under its own language prefix with that language as its alternate', async () => {
+    mockAllEmpty();
+    resolveRequestTenantMock.mockResolvedValue({
+      id: 'tenant-1',
+      locale: 'EN',
+    });
+    selectLiveLocalesMock.mockReturnValue(['EN', 'NL']);
+    getPageSlugsMock.mockResolvedValue({
+      ok: true,
+      data: [
+        { slug: 'about', language: 'EN' },
+        { slug: 'over-ons', language: 'NL' },
+      ],
+    });
+    const sitemap = (await import('./sitemap')).default;
+
+    const entries = await sitemap();
+
+    expect(entries).toContainEqual(
+      expect.objectContaining({
+        url: 'https://example.com/about',
+        alternates: { languages: { en: 'https://example.com/about' } },
+      }),
+    );
+    expect(entries).toContainEqual(
+      expect.objectContaining({
+        url: 'https://example.com/nl/over-ons',
+        alternates: { languages: { nl: 'https://example.com/nl/over-ons' } },
+      }),
+    );
   });
 
   it("requests landing page slugs with the tenant's live languages", async () => {
