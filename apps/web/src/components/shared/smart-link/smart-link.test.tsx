@@ -1,4 +1,8 @@
+import { LOCALE_ISO_CODES, routes } from '@blog/config';
+import { render } from '@testing-library/react';
 import { customRender, screen } from '@web/testing/custom-render';
+import { NextIntlClientProvider } from 'next-intl';
+import type { ReactNode } from 'react';
 
 import { SmartLink } from './smart-link';
 
@@ -15,6 +19,26 @@ describe(`<${SmartLink.name}/>`, () => {
     expect(link).toHaveAttribute('href', '/blog/hello-world');
     expect(link).not.toHaveAttribute('target');
     expect(link).not.toHaveAttribute('rel');
+  });
+
+  it('prefixes an internal landing page href with a non-default language', () => {
+    const DutchProviders = ({ children }: { children: ReactNode }) => (
+      <NextIntlClientProvider locale={LOCALE_ISO_CODES.NL} messages={{}}>
+        {children}
+      </NextIntlClientProvider>
+    );
+
+    render(
+      <SmartLink href={routes.landingPage('over-ons')}>Over ons</SmartLink>,
+      {
+        wrapper: DutchProviders,
+      },
+    );
+
+    expect(screen.getByRole('link', { name: 'Over ons' })).toHaveAttribute(
+      'href',
+      '/nl/over-ons',
+    );
   });
 
   it('renders an absolute external href through the locale-aware Link, adding rel for a new tab', () => {
