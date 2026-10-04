@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { screen, within } from '@web/testing/custom-render';
 import type { TAsyncSetup } from '@web/testing/shared/async-setup/async-setup';
@@ -103,6 +104,20 @@ export const testBreadcrumbsJsonLdSchema = <TData,>({
     expect(script.textContent).toContain('"@type":"BreadcrumbList"');
     expect(script.textContent).toContain(
       `"item":"https://example.com${itemPath}"`,
+    );
+  });
+
+  it('prefixes the JSON-LD item URLs with the language on a non-default-language page', async () => {
+    pageLoaderMock?.mockResolvedValue({ ok: true, data: successData });
+    vi.mocked(getRequestContext).mockResolvedValueOnce({
+      ...DEFAULT_REQUEST_CONTEXT,
+      locale: LOCALE_ISO_CODES.NL,
+    });
+
+    await setup();
+
+    expect(screen.getByTestId('json-ld-script').textContent).toContain(
+      `"item":"https://example.com/nl${itemPath}"`,
     );
   });
 };

@@ -1,4 +1,7 @@
 import type { IBreadcrumbItem } from '@blog/ui/components/molecules/breadcrumbs';
+import { routing } from '@web/i18n/routing';
+import { getRequestContext } from '@web/server/request-context/request-context';
+import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
 
 export type TBreadcrumbListSchema = {
   '@context': 'https://schema.org';
@@ -11,11 +14,15 @@ export type TBreadcrumbListSchema = {
   }>;
 };
 
-export const buildBreadcrumbListSchema = (
+export const buildBreadcrumbListSchema = async (
   items: IBreadcrumbItem[],
-  base: URL | undefined,
-): TBreadcrumbListSchema | undefined => {
-  if (!base) return undefined;
+): Promise<TBreadcrumbListSchema | undefined> => {
+  const {
+    metadataBase,
+    locale,
+    defaultLocale = routing.defaultLocale,
+  } = await getRequestContext();
+  if (!metadataBase) return undefined;
 
   return {
     '@context': 'https://schema.org',
@@ -24,7 +31,10 @@ export const buildBreadcrumbListSchema = (
       '@type': 'ListItem',
       position: index + 1,
       name: item.label,
-      item: new URL(item.href, base).href,
+      item: new URL(
+        toLocalizedPathname({ href: item.href, locale, defaultLocale }),
+        metadataBase,
+      ).href,
     })),
   };
 };
