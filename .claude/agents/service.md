@@ -161,7 +161,7 @@ relative paths only within a single slice (`./query`, `./types`).
   `src/index.ts`).
 - **Every file under a `shared/<kind>/` directory lives in a domain folder,
   never flat in the kind directory.** `shared/fragments/heading-block/heading-block.ts`
-  is the shape; `shared/localization/localized-value.ts` is the drift this
+  is the shape; `shared/expressions/display-mode.ts` is the drift this
   rule stops. The folder is named for the domain, holds that domain's files
   and their co-located tests, and a new file joins an existing domain folder
   before it starts a new one. This holds for every kind — `fragments/`,
@@ -214,9 +214,10 @@ one-line comment naming what is missing. In particular:
 - **A Sanity `_type` is written inline where the query uses it** —
   `.filterByType('translation.metadata')`, `fragmentForType<'link'>()`.
   groqd checks that literal against the generated schema, so a service-local
-  constant (`export const TRANSLATION_METADATA_TYPE = 'translation.metadata'`)
+  constant (`export const CTA_DOCUMENT_TYPE = 'module_cta'`)
   adds nothing, and importing it from a sibling file couples two queries
   through a string.
+- **A reference that can point to several document types is read with `.deref().asCombined()`** before projecting a field only some of them have (`slug.current` on a link target) or filtering on its parent (`references(^._id)`). Never list the types by hand in a `selectByType` just to reach a field — a new type silently drops out of the list.
 - **A cast to satisfy groqd (`as never`, `as unknown as`) is the same
   failure** — it means the typed route was abandoned. Stop and report it
   rather than ship the cast.
