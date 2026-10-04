@@ -1,8 +1,7 @@
 import { q } from '@blog/service/sanity/query';
-import { TRANSLATION_METADATA_TYPE } from '@blog/service/shared/localization/translation-metadata/translation-metadata-type';
 
 export const translationsQuery = q.star
-  .filterByType(TRANSLATION_METADATA_TYPE)
+  .filterByType('translation.metadata')
   // groqd's typed filterBy rejects `references(^._id)` here because the parent scope is not typed
   .filterRaw('references(^._id)')
   .slice(0)

@@ -1,8 +1,7 @@
 import { q } from '@blog/service/sanity/query';
-import { TRANSLATION_METADATA_TYPE } from '@blog/service/shared/localization/translation-metadata/translation-metadata-type';
 
 export const translationMapQuery = q.star
-  .filterByType(TRANSLATION_METADATA_TYPE)
+  .filterByType('translation.metadata')
   .project((group) => ({
     entries: group
       .field('translations[]')
