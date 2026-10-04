@@ -2,6 +2,7 @@ import { q } from '@blog/service/sanity/query';
 import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
 import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
 import { translatedReference } from '@blog/service/shared/localization/translated-reference/translated-reference';
+import { TRANSLATION_METADATA_TYPE } from '@blog/service/shared/localization/translation-metadata/translation-metadata-type';
 
 const localeQ = q.parameters<TLocaleParams>();
 
@@ -21,7 +22,7 @@ export const linkDocumentFragment = localeQ
           .asCombined()
           .project((page) => ({
             translated: page.star
-              .filterByType('translation.metadata')
+              .filterByType(TRANSLATION_METADATA_TYPE)
               .filterBy('references(^._id)')
               .slice(0)
               .field('translations[]')
