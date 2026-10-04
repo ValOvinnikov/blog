@@ -1,6 +1,7 @@
 import type {
   TBrandVariantOf,
   TContentAlignment,
+  TContentAlignmentOf,
   TLayout,
   TMaybeUndefined,
   THeadingBlock,
@@ -24,9 +25,7 @@ export type TTimelineModule = {
   items: TTimelineItem[];
   orientation: TTimelineOrientation;
   ctaButtons: TCtaButton[];
-  contentAlignment: TMaybeUndefined<
-    Extract<TContentAlignment, 'LEFT' | 'CENTER'>
-  >;
+  contentAlignment: TMaybeUndefined<TContentAlignmentOf<'LEFT' | 'CENTER'>>;
   itemAlignment: Extract<TContentAlignment, 'LEFT' | 'CENTER'>;
   layout: TMaybeUndefined<TLayout>;
 };
