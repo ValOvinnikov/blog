@@ -1,11 +1,12 @@
 import { LOCALE_BCP47_TAGS, routes, type TLocaleIsoCode } from '@blog/config';
 import { queries } from '@blog/db';
-import { service } from '@blog/service';
+import { service, type TTranslationMap } from '@blog/service';
 import { routing } from '@web/i18n/routing';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 import { getHostTenantSanityContext } from '@web/server/tenant/tenant-sanity-context/tenant-sanity-context';
 import { logger } from '@web/utils/logger/logger';
+import { toLandingPageAlternates } from '@web/utils/to-landing-page-alternates';
 import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
 import type { MetadataRoute } from 'next';
 
@@ -28,20 +29,54 @@ const toEntry = (
   };
 };
 
-const toLandingPageEntry = (
-  { slug, language }: { slug: string; language: TLocaleIsoCode },
-  defaultLocale: TLocaleIsoCode,
-  siteUrl: string,
-): MetadataRoute.Sitemap[number] => {
+const LANDING_PAGE_DOCUMENT_TYPE = 'page_landing';
+
+type TLandingPageEntryParams = {
+  page: { slug: string; language: TLocaleIsoCode };
+  translationMap: TTranslationMap;
+  liveLocales: readonly TLocaleIsoCode[];
+  defaultLocale: TLocaleIsoCode;
+  siteUrl: string;
+};
+
+const toLandingPageEntry = ({
+  page,
+  translationMap,
+  liveLocales,
+  defaultLocale,
+  siteUrl,
+}: TLandingPageEntryParams): MetadataRoute.Sitemap[number] => {
   const url = `${siteUrl}${toLocalizedPathname({
-    href: routes.landingPage(slug),
-    locale: language,
+    href: routes.landingPage(page.slug),
+    locale: page.language,
     defaultLocale,
   })}`;
+  const liveTranslations = (
+    service.global.translationMap.v1.findTranslationGroup(translationMap, {
+      documentType: LANDING_PAGE_DOCUMENT_TYPE,
+      ...page,
+    }) ?? []
+  ).filter(({ language }) => liveLocales.includes(language));
+
+  if (liveTranslations.length < 2) {
+    return {
+      url,
+      alternates: { languages: { [LOCALE_BCP47_TAGS[page.language]]: url } },
+    };
+  }
 
   return {
     url,
-    alternates: { languages: { [LOCALE_BCP47_TAGS[language]]: url } },
+    alternates: {
+      languages: Object.fromEntries(
+        Object.entries(
+          toLandingPageAlternates({
+            translations: liveTranslations,
+            defaultLocale,
+          }),
+        ).map(([language, path]) => [language, `${siteUrl}${path}`]),
+      ),
+    },
   };
 };
 
@@ -74,6 +109,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     landingPageSlugsResult,
     topicIndexPageResult,
     tagIndexPageResult,
+    translationMapResult,
   ] = await Promise.all([
     service.pages.post.v1.getPostParams(tenant),
     service.pages.topic.v1.getTopicParams(tenant),
@@ -84,6 +120,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     service.pages.landing.v1.getPageSlugs(tenant, liveLocales),
     service.pages.topicIndex.v1.getIndexPage(tenant),
     service.pages.tagIndex.v1.getIndexPage(tenant),
+    service.global.translationMap.v1.getTranslationMap(tenant),
   ]);
 
   if (!postParamsResult.ok) {
@@ -155,6 +192,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
   }
 
+  if (!translationMapResult.ok) {
+    logger.error('sitemap.translation_map_fetch_failed', {
+      error: translationMapResult.error,
+    });
+  }
+  const translationMap = translationMapResult.ok
+    ? translationMapResult.data
+    : { groups: [] };
+
   return [
     toEntry(routes.home(), siteUrl),
     ...(blogParamsResult.ok ? [toEntry(routes.blogIndex(), siteUrl)] : []),
@@ -177,7 +223,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       toEntry(routes.tag(slug, Number(page)), siteUrl),
     ),
     ...landingPageSlugs.map((page) =>
-      toLandingPageEntry(page, defaultLocale, siteUrl),
+      toLandingPageEntry({
+        page,
+        translationMap,
+        liveLocales,
+        defaultLocale,
+        siteUrl,
+      }),
     ),
   ];
 }

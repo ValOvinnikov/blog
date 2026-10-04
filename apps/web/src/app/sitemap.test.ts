@@ -14,6 +14,7 @@ const {
   getHostTenantSanityContextMock,
   resolveRequestTenantMock,
   selectLiveLocalesMock,
+  getTranslationMapMock,
 } = vi.hoisted(() => ({
   getPostParamsMock: vi.fn(),
   getTopicParamsMock: vi.fn(),
@@ -27,6 +28,7 @@ const {
   getHostTenantSanityContextMock: vi.fn(),
   resolveRequestTenantMock: vi.fn(),
   selectLiveLocalesMock: vi.fn(),
+  getTranslationMapMock: vi.fn(),
 }));
 
 vi.mock('@web/server/tenant/request-tenant/request-tenant', () => ({
@@ -46,8 +48,18 @@ vi.mock(
 
 vi.mock('@web/server/tenant/tenant-base-url/tenant-base-url');
 
-vi.mock('@blog/service', () => ({
+vi.mock('@blog/service', async (importOriginal) => ({
   service: {
+    global: {
+      translationMap: {
+        v1: {
+          getTranslationMap: getTranslationMapMock,
+          findTranslationGroup: (
+            await importOriginal<typeof import('@blog/service')>()
+          ).service.global.translationMap.v1.findTranslationGroup,
+        },
+      },
+    },
     pages: {
       post: { v1: { getPostParams: getPostParamsMock } },
       topic: {
@@ -82,6 +94,7 @@ const mockAllEmpty = () => {
   getPageSlugsMock.mockResolvedValue({ ok: true, data: [] });
   getTopicIndexPageMock.mockResolvedValue({ ok: true, data: {} });
   getTagIndexPageMock.mockResolvedValue({ ok: true, data: {} });
+  getTranslationMapMock.mockResolvedValue({ ok: true, data: { groups: [] } });
 };
 
 describe('sitemap', () => {
@@ -112,6 +125,7 @@ describe('sitemap', () => {
     getHostTenantSanityContextMock.mockReset();
     resolveRequestTenantMock.mockReset();
     selectLiveLocalesMock.mockReset();
+    getTranslationMapMock.mockReset();
     getTenantBaseUrlMock.mockReset();
   });
 
@@ -209,6 +223,103 @@ describe('sitemap', () => {
         alternates: { languages: { nl: 'https://example.com/nl/over-ons' } },
       }),
     );
+  });
+
+  const aboutTranslations = {
+    groups: [
+      [
+        { documentType: 'page_landing', language: 'EN', slug: 'about' },
+        { documentType: 'page_landing', language: 'NL', slug: 'over-ons' },
+        { documentType: 'page_landing', language: 'DE', slug: 'ueber-uns' },
+      ],
+    ],
+  };
+  const aboutAlternates = {
+    en: 'https://example.com/about',
+    nl: 'https://example.com/nl/over-ons',
+    'x-default': 'https://example.com/about',
+  };
+
+  const mockTranslatedAbout = () => {
+    mockAllEmpty();
+    resolveRequestTenantMock.mockResolvedValue({
+      id: 'tenant-1',
+      locale: 'EN',
+    });
+    selectLiveLocalesMock.mockReturnValue(['EN', 'NL']);
+    getPageSlugsMock.mockResolvedValue({
+      ok: true,
+      data: [
+        { slug: 'about', language: 'EN' },
+        { slug: 'over-ons', language: 'NL' },
+        { slug: 'pricing', language: 'EN' },
+      ],
+    });
+    getTranslationMapMock.mockResolvedValue({
+      ok: true,
+      data: aboutTranslations,
+    });
+  };
+
+  it("lists every live translation and the default-language x-default on each translation's entry", async () => {
+    mockTranslatedAbout();
+    const sitemap = (await import('./sitemap')).default;
+
+    const entries = await sitemap();
+
+    expect(entries).toContainEqual({
+      url: 'https://example.com/about',
+      alternates: { languages: aboutAlternates },
+    });
+    expect(entries).toContainEqual({
+      url: 'https://example.com/nl/over-ons',
+      alternates: { languages: aboutAlternates },
+    });
+  });
+
+  it('keeps an untranslated landing page entry as its own language alternate', async () => {
+    mockTranslatedAbout();
+    const sitemap = (await import('./sitemap')).default;
+
+    const entries = await sitemap();
+
+    expect(entries).toContainEqual({
+      url: 'https://example.com/pricing',
+      alternates: { languages: { en: 'https://example.com/pricing' } },
+    });
+  });
+
+  it('keeps a single-language tenant landing entry unchanged when its page has translations', async () => {
+    mockTranslatedAbout();
+    selectLiveLocalesMock.mockReturnValue(['EN']);
+    getPageSlugsMock.mockResolvedValue({
+      ok: true,
+      data: [{ slug: 'about', language: 'EN' }],
+    });
+    const sitemap = (await import('./sitemap')).default;
+
+    const entries = await sitemap();
+
+    expect(entries).toContainEqual({
+      url: 'https://example.com/about',
+      alternates: { languages: { en: 'https://example.com/about' } },
+    });
+  });
+
+  it('keeps each landing page as its own language alternate when the translation map fetch fails', async () => {
+    mockTranslatedAbout();
+    getTranslationMapMock.mockResolvedValue({
+      ok: false,
+      error: new Error('boom'),
+    });
+    const sitemap = (await import('./sitemap')).default;
+
+    const entries = await sitemap();
+
+    expect(entries).toContainEqual({
+      url: 'https://example.com/nl/over-ons',
+      alternates: { languages: { nl: 'https://example.com/nl/over-ons' } },
+    });
   });
 
   it("requests landing page slugs with the tenant's live languages", async () => {
