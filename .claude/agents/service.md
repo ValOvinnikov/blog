@@ -204,10 +204,19 @@ one-line comment naming what is missing. In particular:
   string. `filterBy` checks the field and the declared parameter, so a
   `$locale` the query does not declare fails type-check instead of at runtime.
 - **`coalesce` uses `sub.coalesce(...)`**, never a `` `coalesce(${field}…)` ``
-  template. Picking a localized value is
-  `sub.coalesce(sub.field('eyebrow[]').filterBy('language == $locale').slice(0).field('value'), sub.field('eyebrow[]').filterBy('language == $defaultLocale').slice(0).field('value'))`,
-  with `TLocaleParams` in the query's declared parameters (`runQuery` injects
-  them, so callers still never pass them).
+  template.
+- **A localized field is read with the shared helpers, by field name only** —
+  `getLocalizedField(sub, 'eyebrow')` for one-line and multiline text,
+  `getLocalizedPortableTextBlock(sub, 'content')` for listed or paragraph
+  text. Both pick the request's language, then the default, and accept only
+  fields whose generated type is an internationalized array. Never
+  hand-write the `coalesce` per field. `TModuleQueryParams` already carries
+  `TLocaleParams`, and `runQuery` injects them, so callers never pass them.
+- **The one sanctioned escape hatch is a helper's loose implementation
+  signature.** groqd cannot type a field name inside a generic function, so
+  those two helpers expose a strict public overload over an implementation
+  typed on the generated array types. Their query tests are what prove the
+  result; don't copy the pattern elsewhere without the same reason and tests.
 - **No string-built helpers** that return GROQ text for interpolation
   (`build*Expression(field)`). A shared helper takes and returns groqd
   builders, so its result type is inferred, not asserted with `raw<T>()`.
