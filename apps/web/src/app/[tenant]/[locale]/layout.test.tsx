@@ -33,9 +33,12 @@ const { getThemeTokensMock, isProductionEnvironmentMock } = vi.hoisted(() => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@web/server/site-settings/get-site-settings/get-site-settings', () => ({
-  getSiteSettings: vi.fn(),
-}));
+vi.mock(
+  '@web/server/site-settings/get-site-settings/get-site-settings',
+  () => ({
+    getSiteSettings: vi.fn(),
+  }),
+);
 
 vi.mock('@web/utils/is-production-environment', () => ({
   isProductionEnvironment: isProductionEnvironmentMock,

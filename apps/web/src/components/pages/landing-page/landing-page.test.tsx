@@ -1,4 +1,6 @@
+import { LOCALE_ISO_CODES } from '@blog/config';
 import { service } from '@blog/service';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import {
   customRenderServerAsync,
   screen,
@@ -8,7 +10,10 @@ import { makeCtaModuleData } from '@web/testing/modules/cta/fixtures';
 import { makeHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
 import { mockLandingPage } from '@web/testing/pages/landing-page/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import {
+  DEFAULT_REQUEST_CONTEXT,
+  DEFAULT_TENANT_SANITY_CONTEXT,
+} from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 
@@ -62,6 +67,25 @@ describe(`<${LandingPage.name}/>`, () => {
 
     expect(vi.mocked(notFound)).toHaveBeenCalled();
     expect(logger.error).not.toHaveBeenCalled();
+  });
+
+  it('calls notFound() when the slug exists only in another language', async () => {
+    vi.mocked(getRequestContext).mockResolvedValueOnce({
+      ...DEFAULT_REQUEST_CONTEXT,
+      locale: LOCALE_ISO_CODES.NL,
+      sanityContext: {
+        ...DEFAULT_TENANT_SANITY_CONTEXT,
+        locale: LOCALE_ISO_CODES.NL,
+      },
+    });
+    getPageMock.mockImplementation(async (_slug, tenant) => ({
+      ok: true,
+      data: tenant.locale === LOCALE_ISO_CODES.EN ? mockLandingPage : undefined,
+    }));
+
+    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+
+    expect(vi.mocked(notFound)).toHaveBeenCalled();
   });
 
   it('fetches the page for the given slug with the tenant context', async () => {

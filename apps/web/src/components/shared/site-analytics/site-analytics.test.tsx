@@ -6,9 +6,12 @@ import type { ReactElement } from 'react';
 
 import { SiteAnalytics } from './site-analytics';
 
-vi.mock('@web/server/settings-features/is-capability-enabled/is-capability-enabled', () => ({
-  isCapabilityEnabled: vi.fn(),
-}));
+vi.mock(
+  '@web/server/settings-features/is-capability-enabled/is-capability-enabled',
+  () => ({
+    isCapabilityEnabled: vi.fn(),
+  }),
+);
 
 vi.mock('@web/utils/is-web-analytics-enabled', () => ({
   isWebAnalyticsEnabled: vi.fn(),

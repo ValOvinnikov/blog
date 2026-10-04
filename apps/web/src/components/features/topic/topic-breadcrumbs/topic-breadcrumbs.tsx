@@ -6,7 +6,6 @@ import {
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';
-import { getRequestContext } from '@web/server/request-context/request-context';
 import { getTopicPage } from '@web/server/topic/get-topic-page/get-topic-page';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
@@ -23,19 +22,13 @@ export const TopicBreadcrumbs = async ({ slug }: TTopicBreadcrumbsProps) => {
   });
   const { topic } = page;
 
-  const [t, { metadataBase }] = await Promise.all([
-    getTranslations('breadcrumbs'),
-    getRequestContext(),
-  ]);
+  const t = await getTranslations('breadcrumbs');
 
   const breadcrumbTrail: IBreadcrumbItem[] = [
     { label: t('home'), href: routes.home() },
     { label: topic.title, href: routes.topic(slug) },
   ];
-  const breadcrumbListSchema = buildBreadcrumbListSchema(
-    breadcrumbTrail,
-    metadataBase,
-  );
+  const breadcrumbListSchema = await buildBreadcrumbListSchema(breadcrumbTrail);
 
   return (
     <>

@@ -7,7 +7,7 @@ import {
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
 import { moduleFragment } from '@blog/service/shared/fragments/module/module';
 import { seoFragment } from '@blog/service/shared/fragments/seo/seo';
-import { translationsQuery } from '@blog/service/shared/localization/translations';
+import { translationsQuery } from '@blog/service/shared/localization/page-translations/translations';
 import type { TRawModule } from '@blog/service/shared/transformers/module/to-module';
 import type { TLocalizedSlugParams } from '@blog/service/shared/types/page';
 

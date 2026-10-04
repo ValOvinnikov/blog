@@ -22,17 +22,26 @@ const {
 
 vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@web/server/site-config/get-language-switcher-style/get-language-switcher-style', () => ({
-  getLanguageSwitcherStyle: vi.fn().mockResolvedValue('MENU_CODE'),
-}));
+vi.mock(
+  '@web/server/site-config/get-language-switcher-style/get-language-switcher-style',
+  () => ({
+    getLanguageSwitcherStyle: vi.fn().mockResolvedValue('MENU_CODE'),
+  }),
+);
 
-vi.mock('@web/server/site-settings/get-site-settings/get-site-settings', () => ({
-  getSiteSettings: vi.fn(),
-}));
+vi.mock(
+  '@web/server/site-settings/get-site-settings/get-site-settings',
+  () => ({
+    getSiteSettings: vi.fn(),
+  }),
+);
 
-vi.mock('@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled', () => ({
-  isReaderAccountEnabled: vi.fn(),
-}));
+vi.mock(
+  '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled',
+  () => ({
+    isReaderAccountEnabled: vi.fn(),
+  }),
+);
 
 vi.mock('@blog/auth/utils/oauth-providers/oauth-providers', () => ({
   getEnabledOAuthProviderIds: getEnabledOAuthProviderIdsMock,
