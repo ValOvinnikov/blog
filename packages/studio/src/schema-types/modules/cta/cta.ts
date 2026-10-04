@@ -11,11 +11,14 @@ import { isBannerVariantDocument } from '@blog/studio/schema-types/fields/banner
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { containerWidthField } from '@blog/studio/schema-types/fields/container-width-field/container-width-field';
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
+import { localizedListedTextField } from '@blog/studio/schema-types/fields/localized-listed-text-field/localized-listed-text-field';
+import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
 import { mediaOrderField } from '@blog/studio/schema-types/fields/media-order-field/media-order-field';
 import { spacingAndDividerFields } from '@blog/studio/schema-types/fields/spacing-and-divider-fields/spacing-and-divider-fields';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { localizedHeadingBlockField } from '@blog/studio/schema-types/objects/localized-heading-block/localized-heading-block-field';
 import { localizedImageWithAltSchema } from '@blog/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
+import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
 import { localizedStringValues } from '@blog/studio/schema-types/validation/localized-string-values/localized-string-values';
 import { toTitleCase } from '@blog/utils/primitives';
 import { Megaphone, SlidersHorizontal } from 'lucide-react';
@@ -74,10 +77,9 @@ export const ctaSchema = defineType({
       initialValue: BRAND_VARIANT.SECONDARY,
     }),
     localizedHeadingBlockField(),
-    defineField({
+    localizedOneLineTextField({
       name: 'eyebrow',
       title: 'Eyebrow',
-      type: 'internationalizedArrayString',
       description: 'Short line above the heading, per language.',
     }),
     defineField({
@@ -99,17 +101,13 @@ export const ctaSchema = defineType({
           return true;
         }),
     }),
-    defineField({
-      name: 'content',
-      title: 'Content',
-      type: 'internationalizedArrayListedText',
+    localizedListedTextField({
       description: 'Optional longer text below the heading, per language.',
     }),
     ctaButtonsField(),
-    defineField({
+    localizedOneLineTextField({
       name: 'footnote',
       title: 'Footnote',
-      type: 'internationalizedArrayString',
       description: 'Small print below the actions, per language.',
       validation: (rule) =>
         rule.custom((value) =>
@@ -205,7 +203,7 @@ export const ctaSchema = defineType({
     prepare({ title, subtitle }) {
       return {
         title: title ?? 'Unknown',
-        subtitle: localizedStringValues(subtitle)[0],
+        subtitle: defaultLanguageValue(subtitle),
       };
     },
   },

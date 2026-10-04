@@ -1,6 +1,7 @@
 import { imageHotspotOptions } from '@blog/studio/schema-types/fields/image-alt-field/image-alt-field';
+import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
 import { validateDefaultLanguageFilled } from '@blog/studio/schema-types/validation/validate-default-language-filled/validate-default-language-filled';
-import { defineField, defineType } from 'sanity';
+import { defineType } from 'sanity';
 
 export const localizedImageWithAltSchema = defineType({
   name: 'localizedImageWithAlt',
@@ -10,10 +11,9 @@ export const localizedImageWithAltSchema = defineType({
     'An image together with its alt text per language, for accessibility and search engines.',
   options: imageHotspotOptions,
   fields: [
-    defineField({
+    localizedOneLineTextField({
       name: 'alt',
       title: 'Alternative Text',
-      type: 'internationalizedArrayString',
       description:
         'Describe the image for screen readers and search engines, per language.',
       validation: (rule) =>
