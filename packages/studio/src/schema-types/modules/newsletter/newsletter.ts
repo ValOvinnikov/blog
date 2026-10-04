@@ -6,8 +6,8 @@ import {
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
+import { localizedHeadingBlockField } from '@blog/studio/schema-types/objects/localized-heading-block/localized-heading-block-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { toTitleCase } from '@blog/utils/primitives';
 import { Mail } from 'lucide-react';
@@ -26,7 +26,7 @@ export const newsletterSchema = defineType({
       list: FULL_BRAND_VARIANT_LIST,
       initialValue: BRAND_VARIANT.PRIMARY,
     }),
-    headingBlockField(),
+    localizedHeadingBlockField(),
     defineField({
       name: 'variant',
       title: 'Variant',
