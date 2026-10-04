@@ -1174,11 +1174,6 @@ that must exceed it, and an `isStartingAt` flag.
 required ISO 4217 code, offered as a dropdown of every code `Intl` supports;
 existing documents were backfilled with `USD` by a content migration, and a newly
 provisioned tenant's Site Settings is seeded with `USD`.
-`settings_site.pricePeriodSuffix` holds one field-level localized string per
-`PRICE_PERIOD`, the editor's wording for that period ("per month", "/mo");
-existing documents were seeded with the English catalogue wording by a content
-migration, while a newly provisioned tenant starts with none. The pricing
-module still reads period text from the `pricingModule` messages below.
 `service.global.siteSettings.v1` projects it non-null.
 `service.modules.pricing.v1.getPricingModule` returns `TPricingModule`, whose
 tiers keep their prices in authored order and expose `highlightLabel` trimmed,
