@@ -10,6 +10,7 @@ import { createNavigationService } from './features/global/navigation';
 import { createNewsletterSettingsService } from './features/global/newsletter-settings';
 import { createSiteSettingsService } from './features/global/site-settings';
 import { createThemeSettingsService } from './features/global/theme-settings';
+import { createTranslationMapService } from './features/global/translation-map';
 import { createContentModuleService } from './features/modules/content';
 import { createCtaModuleService } from './features/modules/cta';
 import { createFaqModuleService } from './features/modules/faq';
@@ -89,6 +90,7 @@ export const service = {
     footer: createFooterService(),
     newsletterSettings: createNewsletterSettingsService(),
     themeSettings: createThemeSettingsService(),
+    translationMap: createTranslationMapService(),
   },
 };
 
@@ -104,6 +106,11 @@ export type { TNavigation } from './features/global/navigation';
 export type { TNewsletterSettings } from './features/global/newsletter-settings';
 export type { TBrand, TSiteSettings } from './features/global/site-settings';
 export type { TThemeTokens } from './features/global/theme-settings';
+export type {
+  TTranslationEntry,
+  TTranslationGroup,
+  TTranslationMap,
+} from './features/global/translation-map';
 export type { TContentModule } from './features/modules/content';
 export type { TCtaModule } from './features/modules/cta';
 export type { TFaqModule, TFaqQuestion } from './features/modules/faq';
