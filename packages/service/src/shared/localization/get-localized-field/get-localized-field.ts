@@ -28,11 +28,6 @@ export type TLocalizedKey<
     : never;
 }[keyof TScope & string];
 
-export type TLocalizedValue<TScope, TKey extends keyof TScope> =
-  NonNullable<TScope[TKey]> extends TPlainLocalizedArray
-    ? NonNullable<NonNullable<TScope[TKey]>[number]['value']>
-    : never;
-
 export function getLocalizedField<
   TScope,
   TConfig extends QueryConfig,
@@ -40,7 +35,7 @@ export function getLocalizedField<
 >(
   sub: GroqBuilderSubquery<TScope, TConfig>,
   field: TKey,
-): GroqBuilder<TLocalizedValue<NonNullable<TScope>, TKey> | null, TConfig>;
+): GroqBuilder<string | null, TConfig>;
 export function getLocalizedField(
   sub: GroqBuilderSubquery<
     Record<string, TPlainLocalizedArray>,
