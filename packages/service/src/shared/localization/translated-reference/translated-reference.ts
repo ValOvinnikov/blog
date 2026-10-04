@@ -1,4 +1,4 @@
-import type { TLanguageFilter } from '@blog/service/shared/localization/localized-value/localized-value';
+import type { TLanguageFilter } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
 import type { GroqBuilderSubquery, IGroqBuilder, QueryConfig } from 'groqd';
 
 export function translatedReference<

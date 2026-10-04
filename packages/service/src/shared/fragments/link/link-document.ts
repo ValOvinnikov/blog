@@ -1,6 +1,6 @@
 import { q } from '@blog/service/sanity/query';
+import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
 import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
-import { localizedValue } from '@blog/service/shared/localization/localized-value/localized-value';
 import { translatedReference } from '@blog/service/shared/localization/translated-reference/translated-reference';
 
 const localeQ = q.parameters<TLocaleParams>();
@@ -9,7 +9,7 @@ const localeQ = q.parameters<TLocaleParams>();
 export const linkDocumentFragment = localeQ
   .fragmentForType<'link'>()
   .project((sub) => ({
-    label: localizedValue(sub, (filter) =>
+    label: getLocalizedField(sub, (filter) =>
       sub.field('label[]').filterBy(filter).slice(0).field('value'),
     ),
     linkType: sub.field('linkType').notNull(),
@@ -50,7 +50,7 @@ export const linkDocumentFragment = localeQ
           }),
         })),
     ),
-    url: localizedValue(sub, (filter) =>
+    url: getLocalizedField(sub, (filter) =>
       sub.field('url[]').filterBy(filter).slice(0).field('value'),
     ),
   }));

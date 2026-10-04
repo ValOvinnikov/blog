@@ -3,7 +3,7 @@ import { q } from '@blog/service/sanity/query';
 import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 
-import { localizedValue } from './localized-value';
+import { getLocalizedField } from './get-localized-field';
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
@@ -12,7 +12,7 @@ const query = q
   .star.filterByType('link')
   .slice(0)
   .project((sub) => ({
-    label: localizedValue(sub, (filter) =>
+    label: getLocalizedField(sub, (filter) =>
       sub.field('label[]').filterBy(filter).slice(0).field('value'),
     ),
   }));
@@ -36,7 +36,7 @@ function resolve(root: unknown, locale: string): Promise<unknown> {
   );
 }
 
-describe(localizedValue, () => {
+describe(getLocalizedField, () => {
   it('resolves the value in the requested language', async () => {
     expect(await resolve(document, NL)).toEqual({ label: 'Hallo' });
   });

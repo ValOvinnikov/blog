@@ -3,7 +3,7 @@ import type { GroqBuilderSubquery, IGroqBuilder, QueryConfig } from 'groqd';
 export type TLanguageFilter =
   'language == $locale' | 'language == $defaultLocale';
 
-export function localizedValue<
+export function getLocalizedField<
   TScope,
   TConfig extends QueryConfig,
   TValue extends IGroqBuilder,
