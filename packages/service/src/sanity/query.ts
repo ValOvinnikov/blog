@@ -6,7 +6,7 @@ import {
 import {
   buildLocaleParams,
   type TLocaleParams,
-} from '@blog/service/shared/localization/locale-params';
+} from '@blog/service/shared/localization/locale-params/locale-params';
 import { createGroqBuilder, type IGroqBuilder, type QueryConfig } from 'groqd';
 
 import { getClient, type TTenantSanityContext } from './client';
