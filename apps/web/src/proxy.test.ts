@@ -598,6 +598,15 @@ describe('proxy language detection', () => {
     expect(intlMiddlewareMock).not.toHaveBeenCalled();
   });
 
+  it('forbids any cache from storing the visitor-specific redirect', async () => {
+    const response = await visit('/about', {
+      'accept-language': 'nl-NL,nl;q=0.9,en;q=0.8',
+    });
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get('cache-control')).toBe('private, no-store');
+  });
+
   it('stays on the page when it has no translation in that language', async () => {
     const response = await visit('/about', { 'accept-language': 'fr' });
 

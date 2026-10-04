@@ -76,6 +76,13 @@ describe('GET /api/switch-language', () => {
     expect(getTenantTranslationMapMock).toHaveBeenCalledWith(tenant);
   });
 
+  it('forbids any cache from storing the redirect', async () => {
+    const response = await switchTo(NL, '/about');
+
+    expect(response.status).toBe(307);
+    expect(response.headers.get('cache-control')).toBe('private, no-store');
+  });
+
   it("redirects to the language's home page when the page has no translation", async () => {
     const response = await switchTo(FR, '/about');
 

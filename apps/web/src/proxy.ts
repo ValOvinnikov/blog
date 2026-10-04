@@ -6,6 +6,7 @@ import { isTenantShapedPathSegment } from '@web/utils/is-tenant-shaped-path-segm
 import { readRememberedLanguage } from '@web/utils/language-cookie';
 import { logger } from '@web/utils/logger/logger';
 import { matchAcceptLanguage } from '@web/utils/match-accept-language';
+import { privateRedirect } from '@web/utils/private-redirect';
 import { NextResponse, type NextRequest } from 'next/server';
 import createMiddleware from 'next-intl/middleware';
 
@@ -102,7 +103,7 @@ const redirectToPreferredTranslation = async (
 
   const target = request.nextUrl.clone();
   target.pathname = translatedPath;
-  return NextResponse.redirect(target);
+  return privateRedirect(target);
 };
 
 const DOTTED_PATH_PATTERN = /\./;

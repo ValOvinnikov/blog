@@ -5,6 +5,7 @@ import { isPlatformFallbackAllowed } from '@web/server/tenant/resolve-tenant/res
 import { getTenantTranslationMap } from '@web/server/translation-map/get-tenant-translation-map/get-tenant-translation-map';
 import { rememberLanguage } from '@web/utils/language-cookie';
 import { parseSwitchLanguageRequest } from '@web/utils/parse-switch-language-request';
+import { privateRedirect } from '@web/utils/private-redirect';
 import { toSwitchLanguageTarget } from '@web/utils/to-switch-language-target';
 import { NextResponse, type NextRequest } from 'next/server';
 
@@ -46,7 +47,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   });
   target.search = '';
 
-  const response = NextResponse.redirect(target);
+  const response = privateRedirect(target);
   rememberLanguage(response.cookies, to);
   return response;
 }
