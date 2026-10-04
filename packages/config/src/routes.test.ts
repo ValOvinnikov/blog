@@ -22,6 +22,12 @@ describe('routes', () => {
     expect(routes.landingPage('about')).toBe('/about');
   });
 
+  it('builds the language-switch path with the current page encoded', () => {
+    expect(routes.switchLanguage('NL', '/nl/over ons')).toBe(
+      '/api/switch-language?to=NL&from=%2Fnl%2Fover+ons',
+    );
+  });
+
   it('builds page 1 of a topic without a page segment', () => {
     expect(routes.topic('design')).toBe('/topics/design');
     expect(routes.topic('design', 1)).toBe('/topics/design');

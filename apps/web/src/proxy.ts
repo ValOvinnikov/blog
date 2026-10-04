@@ -1,10 +1,19 @@
-import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config';
+import type { TLocaleIsoCode } from '@blog/config';
+import { getTenantTranslationMap } from '@web/server/translation-map/get-tenant-translation-map/get-tenant-translation-map';
+import { findTranslatedPath } from '@web/utils/find-translated-path';
+import { isCrawler } from '@web/utils/is-crawler';
 import { isTenantShapedPathSegment } from '@web/utils/is-tenant-shaped-path-segment';
+import { readRememberedLanguage } from '@web/utils/language-cookie';
 import { logger } from '@web/utils/logger/logger';
+import { matchAcceptLanguage } from '@web/utils/match-accept-language';
 import { NextResponse, type NextRequest } from 'next/server';
 import createMiddleware from 'next-intl/middleware';
 
-import { buildTenantRouting, localeForPrefix } from './i18n/routing';
+import {
+  buildTenantRouting,
+  localeForPrefix,
+  SINGLE_LANGUAGE_ROUTING,
+} from './i18n/routing';
 import {
   TENANT_ID_HEADER,
   UNRESOLVED_TENANT_PLACEHOLDER,
@@ -34,11 +43,6 @@ const getIntlMiddleware = (
   return middleware;
 };
 
-const SINGLE_DEFAULT_ROUTING = {
-  defaultLocale: LOCALE_ISO_CODES.EN,
-  liveLocales: [LOCALE_ISO_CODES.EN],
-} as const;
-
 // A prefix for a supported language the tenant doesn't serve (switched off
 // by a downgrade) redirects to the same path in the default language.
 const redirectSwitchedOffLocale = (
@@ -54,6 +58,50 @@ const redirectSwitchedOffLocale = (
   const target = request.nextUrl.clone();
   target.pathname =
     request.nextUrl.pathname.slice(firstSegment.length + 1) || '/';
+  return NextResponse.redirect(target);
+};
+
+const DETECTABLE_METHODS = new Set(['GET', 'HEAD']);
+
+const redirectToPreferredTranslation = async (
+  request: NextRequest,
+  firstSegment: string,
+  tenantRouting: TTenantRouting | undefined,
+): Promise<NextResponse | undefined> => {
+  if (
+    !tenantRouting ||
+    tenantRouting.liveLocales.length < 2 ||
+    !DETECTABLE_METHODS.has(request.method) ||
+    localeForPrefix(firstSegment) ||
+    isCrawler(request.headers.get('user-agent'))
+  ) {
+    return undefined;
+  }
+
+  const { tenant, defaultLocale, liveLocales } = tenantRouting;
+  const preferredLocale =
+    readRememberedLanguage(request.cookies, liveLocales) ??
+    matchAcceptLanguage(request.headers.get('accept-language'), liveLocales);
+  if (!preferredLocale || preferredLocale === defaultLocale) {
+    return undefined;
+  }
+
+  const translationMap = await getTenantTranslationMap(tenant);
+  const translatedPath =
+    translationMap &&
+    findTranslatedPath({
+      translationMap,
+      pathname: request.nextUrl.pathname,
+      fromLocale: defaultLocale,
+      toLocale: preferredLocale,
+      defaultLocale,
+    });
+  if (!translatedPath) {
+    return undefined;
+  }
+
+  const target = request.nextUrl.clone();
+  target.pathname = translatedPath;
   return NextResponse.redirect(target);
 };
 
@@ -158,7 +206,7 @@ export default async function proxy(
   }
 
   const { defaultLocale, liveLocales } =
-    tenantRouting ?? SINGLE_DEFAULT_ROUTING;
+    tenantRouting ?? SINGLE_LANGUAGE_ROUTING;
 
   const switchedOffRedirect = redirectSwitchedOffLocale(
     request,
@@ -167,6 +215,15 @@ export default async function proxy(
   );
   if (switchedOffRedirect) {
     return switchedOffRedirect;
+  }
+
+  const translationRedirect = await redirectToPreferredTranslation(
+    request,
+    firstSegment,
+    tenantRouting,
+  );
+  if (translationRedirect) {
+    return translationRedirect;
   }
 
   const intlResponse = getIntlMiddleware(defaultLocale, liveLocales)(request);

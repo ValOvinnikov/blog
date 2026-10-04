@@ -2,7 +2,6 @@
 
 import { NavLink } from '@blog/ui/components/atoms/nav-link';
 import type { TLanguageEntry } from '@web/components/shared/language-switcher/to-language-entries';
-import { rememberLanguage } from '@web/utils/language-cookie/language-cookie';
 
 import { languageCodesVariants } from './language-codes-variants';
 
@@ -24,11 +23,10 @@ export const LanguageCodes = ({
           <NavLink
             href={entry.href}
             lang={entry.lang}
-            hrefLang={entry.hrefLang}
+            hrefLang={entry.lang}
             title={entry.label}
             aria-label={entry.label}
             isActive={entry.isCurrent}
-            onClick={() => rememberLanguage(entry.locale)}
             className={link()}
           >
             {entry.code}

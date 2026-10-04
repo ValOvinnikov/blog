@@ -29,6 +29,11 @@ export const routing = buildTenantRouting(
   Object.values(LOCALE_ISO_CODES),
 );
 
+export const SINGLE_LANGUAGE_ROUTING = {
+  defaultLocale: LOCALE_ISO_CODES.EN,
+  liveLocales: [LOCALE_ISO_CODES.EN],
+} as const;
+
 export const localeForPrefix = (segment: string): TLocaleIsoCode | undefined =>
   Object.values(LOCALE_ISO_CODES).find(
     (locale) => LOCALE_BCP47_TAGS[locale] === segment.toLowerCase(),

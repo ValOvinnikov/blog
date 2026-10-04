@@ -25,7 +25,6 @@ const openMenu = async (name = 'Language: Nederlands') => {
 describe(`<${LanguageSwitcher.name}/>`, () => {
   beforeEach(() => {
     vi.mocked(usePathname).mockReturnValue('/blog');
-    document.cookie = 'NEXT_LOCALE=; max-age=0; path=/';
   });
 
   it('renders nothing with one live language', () => {
@@ -65,7 +64,7 @@ describe(`<${LanguageSwitcher.name}/>`, () => {
       ).toHaveAttribute('aria-current', 'page');
     });
 
-    it('links each entry to its translation or the default-language page', async () => {
+    it('links each entry to the language switch for the current page', async () => {
       await openMenu();
       const menu = screen.getByRole('menu', { name: 'Language' });
       const current = within(menu).getByRole('menuitem', {
@@ -73,10 +72,16 @@ describe(`<${LanguageSwitcher.name}/>`, () => {
       });
       const french = within(menu).getByRole('menuitem', { name: 'Français' });
 
-      expect(current).toHaveAttribute('href', '/nl/blog');
-      expect(french).toHaveAttribute('href', '/blog');
+      expect(current).toHaveAttribute(
+        'href',
+        '/api/switch-language?to=NL&from=%2Fnl%2Fblog',
+      );
+      expect(french).toHaveAttribute(
+        'href',
+        '/api/switch-language?to=FR&from=%2Fnl%2Fblog',
+      );
       expect(french).toHaveAttribute('lang', 'fr');
-      expect(french).toHaveAttribute('hreflang', 'en');
+      expect(french).toHaveAttribute('hreflang', 'fr');
     });
 
     it('closes on Escape and returns focus to the trigger', async () => {
@@ -85,17 +90,6 @@ describe(`<${LanguageSwitcher.name}/>`, () => {
 
       expect(trigger).toHaveAttribute('aria-expanded', 'false');
       expect(trigger).toHaveFocus();
-    });
-
-    it('remembers the chosen language', async () => {
-      await openMenu();
-      const french = within(
-        screen.getByRole('menu', { name: 'Language' }),
-      ).getByRole('menuitem', { name: 'Français' });
-      french.addEventListener('click', (event) => event.preventDefault());
-      await userEvent.click(french);
-
-      expect(document.cookie).toContain('NEXT_LOCALE=FR');
     });
   });
 
