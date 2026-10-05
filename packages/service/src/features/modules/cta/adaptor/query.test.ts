@@ -5,23 +5,12 @@ import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import {
   localizedStrings,
   localizedValues,
+  paragraphBlocks,
 } from '@blog/service/testing/shared/localized';
 
 import { ctaModuleQuery } from './query';
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
-
-function paragraph(text: string) {
-  return [
-    {
-      _type: 'block',
-      _key: text,
-      style: 'normal',
-      children: [{ _type: 'span', _key: 'span', text, marks: [] }],
-      markDefs: [],
-    },
-  ];
-}
 
 const ctaDocument = {
   _id: 'cta-1',
@@ -47,8 +36,8 @@ const ctaDocument = {
   },
   eyebrow: localizedStrings({ [EN]: 'Newsletter', [NL]: 'Nieuwsbrief' }),
   content: localizedValues('internationalizedArrayListedTextValue', {
-    [EN]: paragraph('Read on.'),
-    [NL]: paragraph('Lees verder.'),
+    [EN]: paragraphBlocks('Read on.'),
+    [NL]: paragraphBlocks('Lees verder.'),
   }),
 };
 

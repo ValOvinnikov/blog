@@ -1315,7 +1315,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "headingBlock"
+          "name": "localizedHeadingBlock"
         },
         "optional": true
       },
@@ -4153,14 +4153,16 @@
         "marker": {
           "type": "objectAttribute",
           "value": {
-            "type": "string"
+            "type": "inline",
+            "name": "internationalizedArrayString"
           },
           "optional": true
         },
         "heading": {
           "type": "objectAttribute",
           "value": {
-            "type": "string"
+            "type": "inline",
+            "name": "internationalizedArrayString"
           },
           "optional": true
         },
@@ -4168,9 +4170,31 @@
           "type": "objectAttribute",
           "value": {
             "type": "inline",
-            "name": "paragraphText"
+            "name": "internationalizedArrayParagraphText"
           },
           "optional": true
+        }
+      }
+    }
+  },
+  {
+    "name": "internationalizedArrayParagraphText",
+    "type": "type",
+    "value": {
+      "type": "array",
+      "of": {
+        "type": "object",
+        "attributes": {
+          "_key": {
+            "type": "objectAttribute",
+            "value": {
+              "type": "string"
+            }
+          }
+        },
+        "rest": {
+          "type": "inline",
+          "name": "internationalizedArrayParagraphTextValue"
         }
       }
     }
@@ -6766,6 +6790,37 @@
           "name": "link.reference"
         },
         "optional": true
+      }
+    }
+  },
+  {
+    "name": "internationalizedArrayParagraphTextValue",
+    "type": "type",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "internationalizedArrayParagraphTextValue"
+          }
+        },
+        "value": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "inline",
+            "name": "paragraphText"
+          },
+          "optional": true
+        },
+        "language": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        }
       }
     }
   },

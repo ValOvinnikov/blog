@@ -1,19 +1,36 @@
 import { TIMELINE_MARKER_STYLE } from '@blog/config/constants';
+import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
+import { localizedParagraphTextField } from '@blog/studio/schema-types/fields/localized-paragraph-text-field/localized-paragraph-text-field';
 import type { TTimelineDocument } from '@blog/studio/schema-types/modules/timeline/timeline-document';
-import { paragraphTextSchema } from '@blog/studio/schema-types/portable-text/paragraph-text/paragraph-text';
 import {
   toPlainText,
   type TPlainTextBlock,
 } from '@blog/studio/schema-types/portable-text/to-plain-text/to-plain-text';
+import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
+import { localizedStringValues } from '@blog/studio/schema-types/validation/localized-string-values/localized-string-values';
+import { validateDefaultLanguageFilled } from '@blog/studio/schema-types/validation/validate-default-language-filled/validate-default-language-filled';
 import { validateTimelineMarkerRequired } from '@blog/studio/schema-types/validation/validate-timeline-marker-required/validate-timeline-marker-required';
 import { CircleDot } from 'lucide-react';
-import { defineField, defineType } from 'sanity';
+import { defineType } from 'sanity';
 
 const isNumbered = (document: unknown): boolean =>
   (document as TTimelineDocument | undefined)?.markerStyle ===
   TIMELINE_MARKER_STYLE.NUMBERED;
 
+const MARKER_MAX_LENGTH = 16;
+const HEADING_MAX_LENGTH = 80;
 const BODY_MAX_LENGTH = 300;
+
+const isAnyLongerThan = (value: unknown, maxLength: number) =>
+  localizedStringValues(value).some((text) => text.length > maxLength);
+
+const isAnyBodyTooLong = (value: unknown) =>
+  Array.isArray(value) &&
+  value.some(
+    (entry) =>
+      toPlainText((entry as { value?: TPlainTextBlock[] } | null)?.value ?? [])
+        .length > BODY_MAX_LENGTH,
+  );
 
 export const timelineItemSchema = defineType({
   name: 'timelineItem',
@@ -23,36 +40,43 @@ export const timelineItemSchema = defineType({
     'One step or milestone on a timeline, with its own marker, heading and text.',
   icon: CircleDot,
   fields: [
-    defineField({
+    localizedOneLineTextField({
       name: 'marker',
       title: 'Marker',
-      type: 'string',
-      description: 'A short label on the line: a year, a quarter, "Week 1".',
+      description:
+        'A short label on the line, per language: a year, a quarter, "Week 1".',
       hidden: ({ document }) => isNumbered(document),
       validation: (rule) => [
         rule.custom(validateTimelineMarkerRequired),
-        rule.max(16).error('Keep the marker under 16 characters.'),
+        rule.custom((value) =>
+          isAnyLongerThan(value, MARKER_MAX_LENGTH)
+            ? `Keep the marker under ${MARKER_MAX_LENGTH} characters.`
+            : true,
+        ),
       ],
     }),
-    defineField({
+    localizedOneLineTextField({
       name: 'heading',
       title: 'Heading',
-      type: 'string',
-      description: 'What happens at this step, in a few words.',
+      description: 'What happens at this step, in a few words, per language.',
       validation: (rule) => [
-        rule.required().error('Give the item a heading.'),
-        rule.max(80).error('Keep the heading under 80 characters.'),
+        rule.custom(validateDefaultLanguageFilled('Give the item a heading.')),
+        rule.custom((value) =>
+          isAnyLongerThan(value, HEADING_MAX_LENGTH)
+            ? `Keep the heading under ${HEADING_MAX_LENGTH} characters.`
+            : true,
+        ),
       ],
     }),
-    defineField({
+    localizedParagraphTextField({
       name: 'body',
       title: 'Body',
-      type: paragraphTextSchema.name,
-      description: 'A sentence or two describing this step or milestone.',
+      description:
+        'A sentence or two describing this step or milestone, per language.',
       validation: (rule) =>
         rule
-          .custom((blocks: TPlainTextBlock[] | undefined) =>
-            toPlainText(blocks).length > BODY_MAX_LENGTH
+          .custom((value) =>
+            isAnyBodyTooLong(value)
               ? "An item's text reads best as a sentence or two."
               : true,
           )
@@ -64,10 +88,10 @@ export const timelineItemSchema = defineType({
       marker: 'marker',
       heading: 'heading',
     },
-    prepare({ marker, heading }: { marker?: string; heading?: string }) {
+    prepare({ marker, heading }: { marker?: unknown; heading?: unknown }) {
       return {
-        title: heading ?? 'Untitled',
-        subtitle: marker,
+        title: defaultLanguageValue(heading) ?? 'Untitled',
+        subtitle: defaultLanguageValue(marker),
       };
     },
   },

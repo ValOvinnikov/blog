@@ -1,9 +1,10 @@
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
 import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
-import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
+import { localizedHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/localized-heading-block';
 import { moduleLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
-import { textBlockFragment } from '@blog/service/shared/fragments/portable-text/text-block';
+import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
+import { getLocalizedPortableTextBlock } from '@blog/service/shared/localization/get-localized-portable-text-block/get-localized-portable-text-block';
 
 export const timelineModuleQuery = q
   .parameters<TModuleQueryParams>()
@@ -14,16 +15,16 @@ export const timelineModuleQuery = q
     brandVariant: sub.field('brandVariant').notNull(),
     headingBlock: sub
       .field('headingBlock')
-      .project(headingBlockFragment)
+      .project(localizedHeadingBlockFragment)
       .notNull(),
     markerStyle: sub.field('markerStyle').notNull(),
     items: sub
       .field('items[]')
       .project((itemSub) => ({
         _key: true,
-        marker: itemSub.field('marker').nullable(true),
-        heading: itemSub.field('heading').notNull(),
-        body: itemSub.field('body[]').project(textBlockFragment).nullable(true),
+        marker: getLocalizedField(itemSub, 'marker'),
+        heading: getLocalizedField(itemSub, 'heading').notNull(),
+        body: getLocalizedPortableTextBlock(itemSub, 'body'),
       }))
       .notNull(),
     orientation: sub.field('orientation').notNull(),
