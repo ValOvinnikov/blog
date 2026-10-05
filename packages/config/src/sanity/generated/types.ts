@@ -413,7 +413,7 @@ export type Module_postRelated = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  headingBlock?: HeadingBlock;
+  headingBlock?: LocalizedHeadingBlock;
   limit?: number;
   showImages?: boolean;
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
@@ -435,7 +435,7 @@ export type Module_postFeatured = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  headingBlock?: HeadingBlock;
+  headingBlock?: LocalizedHeadingBlock;
   postSource?: 'PINNED' | 'NEWEST_FEATURED';
   posts?: Array<
     {
@@ -473,7 +473,7 @@ export type Module_postList = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  headingBlock?: HeadingBlock;
+  headingBlock?: LocalizedHeadingBlock;
   pageSize?: number;
   showImages?: boolean;
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
@@ -1628,7 +1628,7 @@ export type Module_taxonomyList = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  headingBlock?: HeadingBlock;
+  headingBlock?: LocalizedHeadingBlock;
   taxonomy?: 'TOPICS' | 'TAGS';
   sortOrder?: 'ALPHABETICAL' | 'MOST_POSTS';
   limit?: number;

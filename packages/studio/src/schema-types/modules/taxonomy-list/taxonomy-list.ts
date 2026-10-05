@@ -2,7 +2,7 @@ import { TAXONOMY_KIND, TAXONOMY_SORT } from '@blog/config/constants';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
+import { localizedHeadingBlockField } from '@blog/studio/schema-types/objects/localized-heading-block/localized-heading-block-field';
 import { wideLayoutField } from '@blog/studio/schema-types/objects/wide-layout/wide-layout-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { toTitleCase } from '@blog/utils/primitives';
@@ -28,7 +28,7 @@ export const taxonomyListSchema = defineType({
   fields: [
     titleField(),
     brandVariantField(),
-    headingBlockField(),
+    localizedHeadingBlockField(),
     defineField({
       name: 'taxonomy',
       title: 'Taxonomy',
