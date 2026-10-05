@@ -16,7 +16,7 @@ export const pagesSection: TStructureSection = {
   groups: [
     {
       title: 'Home',
-      items: [{ schema: homePageSchema, mode: 'singleton' }],
+      items: [{ schema: homePageSchema, mode: 'onePerLanguage' }],
     },
     {
       title: 'Landing',

@@ -7,6 +7,7 @@ export const translationMapQuery = q.star
       .field('translations[]')
       .field('value')
       .deref()
+      .asCombined()
       .filterBy('slug.current != null')
       .project((target) => ({
         documentType: target.field('_type'),

@@ -1,4 +1,5 @@
 import { LOCALE_ISO_CODES, LOCALE_NATIVE_LABEL } from '@blog/config/constants';
+import { evaluate, parse } from 'groq-js';
 import { House, Link2, List, Settings, Tag } from 'lucide-react';
 import type { StructureBuilder } from 'sanity/structure';
 
@@ -23,6 +24,7 @@ const CHAINABLE_METHODS = [
   'filter',
   'params',
   'initialValueTemplates',
+  'initialValueTemplate',
 ] as const;
 
 const makeMockBuilder = (kind: string, documentType?: string): TMockBuilder => {
@@ -40,7 +42,17 @@ const makeMockBuilder = (kind: string, documentType?: string): TMockBuilder => {
 const callArgs = (builder: TMockBuilder, method: string) =>
   builder.calls.find((call) => call.method === method)?.args;
 
-const makeMockStructureBuilder = () => ({
+const makeMockStructureBuilder = (dataset: Record<string, unknown>[] = []) => ({
+  context: {
+    getClient: () => ({
+      fetch: async (query: string, params: Record<string, unknown>) =>
+        (await evaluate(parse(query), { dataset, params })).get(),
+    }),
+  },
+  component: vi.fn((component: unknown) => ({
+    ...makeMockBuilder('component'),
+    component,
+  })),
   divider: vi.fn(() => makeMockBuilder('divider')),
   listItem: vi.fn(() => makeMockBuilder('listItem')),
   documentTypeListItem: vi.fn((documentType: string) =>
@@ -580,6 +592,95 @@ describe(buildSections, () => {
       expect(lists.map((list) => listOf(list).documentType)).toEqual(
         lists.map(() => 'landingPage'),
       );
+    });
+  });
+
+  describe('onePerLanguage items', () => {
+    const { EN, NL, DE } = LOCALE_ISO_CODES;
+
+    const buildHomeItems = (dataset: Record<string, unknown>[]) => {
+      const S = makeMockStructureBuilder(dataset);
+      const [section] = buildSections(
+        asStructureBuilder(S),
+        [
+          {
+            title: 'Pages',
+            id: 'pages',
+            icon: List,
+            groups: [
+              {
+                items: [
+                  {
+                    schema: { name: 'homePage', title: 'Home', icon: House },
+                    mode: 'onePerLanguage',
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+        [NL, EN, DE],
+      ) as unknown as TMockBuilder[];
+      const list = callArgs(section!, 'child')?.[0] as TMockBuilder;
+      return callArgs(list, 'items')?.[0] as TMockBuilder[];
+    };
+
+    const resolveChild = async (item: TMockBuilder) => {
+      const resolver = callArgs(
+        item,
+        'child',
+      )?.[0] as () => Promise<TMockBuilder>;
+      return resolver();
+    };
+
+    it('lists one entry per language by its own name, default language first', () => {
+      const items = buildHomeItems([]);
+
+      expect(items.map((item) => callArgs(item, 'title')?.[0])).toEqual([
+        LOCALE_NATIVE_LABEL[NL],
+        LOCALE_NATIVE_LABEL[EN],
+        LOCALE_NATIVE_LABEL[DE],
+      ]);
+    });
+
+    it("opens the language's own document by its published id", async () => {
+      const [, english] = buildHomeItems([
+        { _id: 'home-nl', _type: 'homePage', language: NL },
+        { _id: 'drafts.home-en', _type: 'homePage', language: EN },
+      ]);
+
+      const child = await resolveChild(english!);
+
+      expect(child.kind).toBe('document');
+      expect(callArgs(child, 'documentId')).toEqual(['home-en']);
+    });
+
+    it('opens a document without a language under the default language', async () => {
+      const [dutch] = buildHomeItems([{ _id: 'homePage', _type: 'homePage' }]);
+
+      const child = await resolveChild(dutch!);
+
+      expect(callArgs(child, 'documentId')).toEqual(['homePage']);
+    });
+
+    it('creates the default-language document in its language when there is none', async () => {
+      const [dutch] = buildHomeItems([]);
+
+      const child = await resolveChild(dutch!);
+
+      expect(child.kind).toBe('document');
+      expect(callArgs(child, 'initialValueTemplate')).toEqual(['homePage-NL']);
+    });
+
+    it('points a missing translation at the default-language document', async () => {
+      const [, english] = buildHomeItems([
+        { _id: 'drafts.home-nl', _type: 'homePage', language: NL },
+      ]);
+
+      const child = await resolveChild(english!);
+
+      expect(child.kind).toBe('component');
+      expect(callArgs(child, 'title')).toEqual(['English Home']);
     });
   });
 });

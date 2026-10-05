@@ -7,9 +7,10 @@ import { heroMediaOrderSplitField } from '@blog/studio/schema-types/fields/hero-
 import { heroVariantField } from '@blog/studio/schema-types/fields/hero-variant-field/hero-variant-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { heroFieldsets } from '@blog/studio/schema-types/modules/hero-fieldsets/hero-fieldsets';
-import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { heroLayoutField } from '@blog/studio/schema-types/objects/hero-layout/hero-layout-field';
-import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
+import { localizedHeadingBlockField } from '@blog/studio/schema-types/objects/localized-heading-block/localized-heading-block-field';
+import { localizedImageWithAltSchema } from '@blog/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
+import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
 import { UserCircle } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
@@ -24,7 +25,7 @@ export const heroProfileSchema = defineType({
   fields: [
     titleField(),
     brandVariantField({ list: FULL_BRAND_VARIANT_LIST }),
-    headingBlockField(),
+    localizedHeadingBlockField(),
     defineField({
       name: 'eyebrow',
       title: 'Eyebrow',
@@ -46,7 +47,7 @@ export const heroProfileSchema = defineType({
     defineField({
       name: 'image',
       title: 'Image',
-      type: imageWithAltSchema.name,
+      type: localizedImageWithAltSchema.name,
       description:
         "Upload an image to use it here. Stacked and Split fall back to the author's photo; the Banner shows the brand band without one.",
     }),
@@ -87,7 +88,7 @@ export const heroProfileSchema = defineType({
     prepare({ title, subtitle }) {
       return {
         title: title ?? 'Unknown',
-        subtitle: subtitle ? String(subtitle) : 'No heading yet',
+        subtitle: defaultLanguageValue(subtitle) ?? 'No heading yet',
       };
     },
   },
