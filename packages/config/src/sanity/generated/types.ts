@@ -277,12 +277,6 @@ export type Module_team = {
   layout?: WideLayout;
 };
 
-export type HeadingBlock = {
-  _type: 'headingBlock';
-  heading?: string;
-  supportingText?: string;
-};
-
 export type Block_testimonialReference = {
   _ref: string;
   _type: 'reference';
@@ -313,6 +307,12 @@ export type Module_testimonial = {
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   cardAlignment?: 'LEFT' | 'CENTER';
   layout?: WideLayout;
+};
+
+export type HeadingBlock = {
+  _type: 'headingBlock';
+  heading?: string;
+  supportingText?: string;
 };
 
 export type Module_logoWall = {
@@ -1973,9 +1973,9 @@ export type AllSanitySchemaTypes =
   | Module_stats
   | PersonReference
   | Module_team
-  | HeadingBlock
   | Block_testimonialReference
   | Module_testimonial
+  | HeadingBlock
   | Module_logoWall
   | Layout
   | Module_featureHighlights
