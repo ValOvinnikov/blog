@@ -403,10 +403,16 @@ when set) and a `modules` array. What differs per page is which module types
 each slot accepts.
 
 `heroField({ allow })` (`schema-types/fields/hero-field/hero-field.ts`) and
-`modulesField({ allow, description?, once? })`
+`modulesField({ extend?, description?, once? })`
 (`schema-types/fields/modules-field/modules-field.ts`) build both — one strong
 `reference` array member per allowed type, defined in one place rather than
-duplicated per page.
+duplicated per page. Every `modules[]` accepts `cta` and `newsletter` by
+default; `extend` adds the page's own modules on top.
+
+`modules[]`'s Add item menu groups the allowed modules by kind — Explainers,
+Proof, Conversion, Posts — then by title, with one tab per kind the page
+allows. The kinds come from `structure/module-kinds/module-kinds.ts`, which
+the sidebar's Modules section reads too, so the two stay in step.
 
 | Page                               | Hero slot accepts                          | `modules[]` accepts                                                                                        |
 | ---------------------------------- | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------- |

@@ -1234,13 +1234,6 @@ export type Module_heroStatementReference = {
   [internalGroqTypeReferenceTo]?: 'module_heroStatement';
 };
 
-export type Module_ctaReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'module_cta';
-};
-
 export type Module_contentReference = {
   _ref: string;
   _type: 'reference';
@@ -1262,13 +1255,6 @@ export type Module_featureHighlightsReference = {
   [internalGroqTypeReferenceTo]?: 'module_featureHighlights';
 };
 
-export type Module_postFeaturedReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'module_postFeatured';
-};
-
 export type Module_featureListReference = {
   _ref: string;
   _type: 'reference';
@@ -1276,11 +1262,11 @@ export type Module_featureListReference = {
   [internalGroqTypeReferenceTo]?: 'module_featureList';
 };
 
-export type Module_postLatestReference = {
+export type Module_timelineReference = {
   _ref: string;
   _type: 'reference';
   _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'module_postLatest';
+  [internalGroqTypeReferenceTo]?: 'module_timeline';
 };
 
 export type Module_logoWallReference = {
@@ -1290,32 +1276,11 @@ export type Module_logoWallReference = {
   [internalGroqTypeReferenceTo]?: 'module_logoWall';
 };
 
-export type Module_newsletterReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'module_newsletter';
-};
-
-export type Module_pricingReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'module_pricing';
-};
-
 export type Module_statsReference = {
   _ref: string;
   _type: 'reference';
   _weak?: boolean;
   [internalGroqTypeReferenceTo]?: 'module_stats';
-};
-
-export type Module_taxonomyListReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'module_taxonomyList';
 };
 
 export type Module_teamReference = {
@@ -1332,11 +1297,46 @@ export type Module_testimonialReference = {
   [internalGroqTypeReferenceTo]?: 'module_testimonial';
 };
 
-export type Module_timelineReference = {
+export type Module_ctaReference = {
   _ref: string;
   _type: 'reference';
   _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'module_timeline';
+  [internalGroqTypeReferenceTo]?: 'module_cta';
+};
+
+export type Module_newsletterReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_newsletter';
+};
+
+export type Module_pricingReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_pricing';
+};
+
+export type Module_postFeaturedReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_postFeatured';
+};
+
+export type Module_postLatestReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_postLatest';
+};
+
+export type Module_taxonomyListReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_taxonomyList';
 };
 
 export type Template_home = {
@@ -1353,9 +1353,6 @@ export type Template_home = {
   modules?: Array<
     | ({
         _key: string;
-      } & Module_ctaReference)
-    | ({
-        _key: string;
       } & Module_contentReference)
     | ({
         _key: string;
@@ -1365,28 +1362,16 @@ export type Template_home = {
       } & Module_featureHighlightsReference)
     | ({
         _key: string;
-      } & Module_postFeaturedReference)
-    | ({
-        _key: string;
       } & Module_featureListReference)
     | ({
         _key: string;
-      } & Module_postLatestReference)
+      } & Module_timelineReference)
     | ({
         _key: string;
       } & Module_logoWallReference)
     | ({
         _key: string;
-      } & Module_newsletterReference)
-    | ({
-        _key: string;
-      } & Module_pricingReference)
-    | ({
-        _key: string;
       } & Module_statsReference)
-    | ({
-        _key: string;
-      } & Module_taxonomyListReference)
     | ({
         _key: string;
       } & Module_teamReference)
@@ -1395,7 +1380,22 @@ export type Template_home = {
       } & Module_testimonialReference)
     | ({
         _key: string;
-      } & Module_timelineReference)
+      } & Module_ctaReference)
+    | ({
+        _key: string;
+      } & Module_newsletterReference)
+    | ({
+        _key: string;
+      } & Module_pricingReference)
+    | ({
+        _key: string;
+      } & Module_postFeaturedReference)
+    | ({
+        _key: string;
+      } & Module_postLatestReference)
+    | ({
+        _key: string;
+      } & Module_taxonomyListReference)
   >;
 };
 
@@ -1555,10 +1555,10 @@ export type Page_tagIndex = {
       } & Module_ctaReference)
     | ({
         _key: string;
-      } & Module_postLatestReference)
+      } & Module_newsletterReference)
     | ({
         _key: string;
-      } & Module_newsletterReference)
+      } & Module_postLatestReference)
     | ({
         _key: string;
       } & Module_taxonomyListReference)
@@ -1591,10 +1591,10 @@ export type Page_tag = {
       } & Module_ctaReference)
     | ({
         _key: string;
-      } & Module_postLatestReference)
+      } & Module_newsletterReference)
     | ({
         _key: string;
-      } & Module_newsletterReference)
+      } & Module_postLatestReference)
     | ({
         _key: string;
       } & Module_postListReference)
@@ -1637,10 +1637,10 @@ export type Page_topicIndex = {
       } & Module_ctaReference)
     | ({
         _key: string;
-      } & Module_postLatestReference)
+      } & Module_newsletterReference)
     | ({
         _key: string;
-      } & Module_newsletterReference)
+      } & Module_postLatestReference)
     | ({
         _key: string;
       } & Module_taxonomyListReference)
@@ -1683,10 +1683,10 @@ export type Page_topic = {
       } & Module_ctaReference)
     | ({
         _key: string;
-      } & Module_postLatestReference)
+      } & Module_newsletterReference)
     | ({
         _key: string;
-      } & Module_newsletterReference)
+      } & Module_postLatestReference)
     | ({
         _key: string;
       } & Module_postListReference)
@@ -1723,10 +1723,10 @@ export type Page_postIndex = {
       } & Module_ctaReference)
     | ({
         _key: string;
-      } & Module_postFeaturedReference)
+      } & Module_newsletterReference)
     | ({
         _key: string;
-      } & Module_newsletterReference)
+      } & Module_postFeaturedReference)
     | ({
         _key: string;
       } & Module_postListReference)
@@ -1772,9 +1772,6 @@ export type Template_landing = {
   modules?: Array<
     | ({
         _key: string;
-      } & Module_ctaReference)
-    | ({
-        _key: string;
       } & Module_contentReference)
     | ({
         _key: string;
@@ -1784,28 +1781,16 @@ export type Template_landing = {
       } & Module_featureHighlightsReference)
     | ({
         _key: string;
-      } & Module_postFeaturedReference)
-    | ({
-        _key: string;
       } & Module_featureListReference)
     | ({
         _key: string;
-      } & Module_postLatestReference)
+      } & Module_timelineReference)
     | ({
         _key: string;
       } & Module_logoWallReference)
     | ({
         _key: string;
-      } & Module_newsletterReference)
-    | ({
-        _key: string;
-      } & Module_pricingReference)
-    | ({
-        _key: string;
       } & Module_statsReference)
-    | ({
-        _key: string;
-      } & Module_taxonomyListReference)
     | ({
         _key: string;
       } & Module_teamReference)
@@ -1814,7 +1799,22 @@ export type Template_landing = {
       } & Module_testimonialReference)
     | ({
         _key: string;
-      } & Module_timelineReference)
+      } & Module_ctaReference)
+    | ({
+        _key: string;
+      } & Module_newsletterReference)
+    | ({
+        _key: string;
+      } & Module_pricingReference)
+    | ({
+        _key: string;
+      } & Module_postFeaturedReference)
+    | ({
+        _key: string;
+      } & Module_postLatestReference)
+    | ({
+        _key: string;
+      } & Module_taxonomyListReference)
   >;
 };
 
@@ -2089,21 +2089,21 @@ export type AllSanitySchemaTypes =
   | Module_heroBlogReference
   | Module_heroProfileReference
   | Module_heroStatementReference
-  | Module_ctaReference
   | Module_contentReference
   | Module_faqReference
   | Module_featureHighlightsReference
-  | Module_postFeaturedReference
   | Module_featureListReference
-  | Module_postLatestReference
+  | Module_timelineReference
   | Module_logoWallReference
-  | Module_newsletterReference
-  | Module_pricingReference
   | Module_statsReference
-  | Module_taxonomyListReference
   | Module_teamReference
   | Module_testimonialReference
-  | Module_timelineReference
+  | Module_ctaReference
+  | Module_newsletterReference
+  | Module_pricingReference
+  | Module_postFeaturedReference
+  | Module_postLatestReference
+  | Module_taxonomyListReference
   | Template_home
   | Module_heroBlog
   | Blog_tagReference

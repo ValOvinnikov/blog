@@ -2,9 +2,7 @@ import { PAGE_POST_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/
 import { heroField } from '@blog/studio/schema-types/fields/hero-field/hero-field';
 import { modulesField } from '@blog/studio/schema-types/fields/modules-field/modules-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
 import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
-import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
 import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
@@ -36,10 +34,8 @@ export const postIndexPageSchema = defineType({
     headingBlockField(),
     heroField({ allow: [heroBlogSchema.name] }),
     modulesField({
-      allow: [
+      extend: [
         postListSchema.name,
-        ctaSchema.name,
-        newsletterSchema.name,
         postFeaturedSchema.name,
         taxonomyListSchema.name,
       ],

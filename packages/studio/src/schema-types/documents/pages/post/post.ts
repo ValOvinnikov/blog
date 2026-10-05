@@ -6,8 +6,6 @@ import { modulesField } from '@blog/studio/schema-types/fields/modules-field/mod
 import { slugField } from '@blog/studio/schema-types/fields/slug-field/slug-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { createSlugUrlPreviewInput } from '@blog/studio/schema-types/inputs/slug-url-preview/slug-url-preview-input';
-import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
-import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
 import { postRelatedSchema } from '@blog/studio/schema-types/modules/post-related/post-related';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
@@ -86,7 +84,7 @@ export const postPageSchema = defineType({
       validation: (rule) => rule.max(6).unique(),
     }),
     modulesField({
-      allow: [postRelatedSchema.name, newsletterSchema.name, ctaSchema.name],
+      extend: [postRelatedSchema.name],
       once: [postRelatedSchema.name],
     }),
     defineField({

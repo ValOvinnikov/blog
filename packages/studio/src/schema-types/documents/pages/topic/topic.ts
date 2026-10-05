@@ -5,9 +5,7 @@ import { modulesField } from '@blog/studio/schema-types/fields/modules-field/mod
 import { slugField } from '@blog/studio/schema-types/fields/slug-field/slug-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { createSlugUrlPreviewInput } from '@blog/studio/schema-types/inputs/slug-url-preview/slug-url-preview-input';
-import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
 import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
-import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
@@ -55,11 +53,9 @@ export const topicPageSchema = defineType({
     headingBlockField(),
     heroField({ allow: [heroBlogSchema.name] }),
     modulesField({
-      allow: [
+      extend: [
         postListSchema.name,
         postLatestSchema.name,
-        ctaSchema.name,
-        newsletterSchema.name,
         taxonomyListSchema.name,
       ],
       once: [postListSchema.name],
