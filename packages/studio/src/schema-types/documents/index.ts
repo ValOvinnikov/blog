@@ -15,7 +15,6 @@ import { topicIndexPageSchema } from './pages/topic-index/topic-index';
 import { personSchema } from './person/person';
 import { footerSettingsSchema } from './settings/footer/footer';
 import { navigationSettingsSchema } from './settings/navigation/navigation';
-import { newsletterSettingsSchema } from './settings/newsletter/newsletter';
 import { siteSettingsSchema } from './settings/site-settings/site-settings';
 import { themeSettingsSchema } from './settings/theme/theme';
 import { migrationStateSchema } from './system/migration-state/migration-state';
@@ -43,7 +42,6 @@ export const documents = [
   siteSettingsSchema,
   navigationSettingsSchema,
   footerSettingsSchema,
-  newsletterSettingsSchema,
   themeSettingsSchema,
   migrationStateSchema,
 ];

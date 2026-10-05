@@ -40,7 +40,7 @@ Studio from one deployment.
   `page_postIndex`, `page_landing`, `page_post`, `page_tag`,
   `page_topic`, `page_tagIndex`, `page_topicIndex`), `person/` (`person`),
   and `settings/` (singletons: `settings_site`, `settings_navigation`,
-  `settings_footer`, `settings_newsletter`, `settings_theme`).
+  `settings_footer`, `settings_theme`).
   `page_postIndex` is the post-index singleton.
 - `src/schema-types/modules/` — reusable page modules (`module_content`,
   `module_cta`, `module_hero`, `module_heroBlog`, `module_newsletter`,

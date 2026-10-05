@@ -23,8 +23,7 @@ const POST_RELATED_HEADING_BLOCK_EXEMPTION: TExemptField[] = [
 const NEWSLETTER_HEADING_BLOCK_EXEMPTION: TExemptField[] = [
   {
     name: 'headingBlock',
-    reason:
-      'sharedNewsletterModule sets sectionHeader, not headingBlock',
+    reason: 'sharedNewsletterModule sets sectionHeader, not headingBlock',
   },
 ];
 

@@ -536,13 +536,6 @@ separator: BRAND_TAGLINE_SEPARATORS }`, replacing a plain string so the
   below), items (links).
 - `settings_footer` (singleton) — `titleField` (bare; see helper note below),
   `social` (social links).
-- `settings_newsletter` (singleton) — `titleField` (bare; see helper note
-  below), `heading` (required, max 80), `description` (optional, max 300),
-  `trustCues` (optional, max 2 phrases of 40 characters) — the CMS-authored
-  source of the newsletter form's copy wherever
-  it's rendered outside the `module_newsletter` page-builder placement. Lives
-  in the desk's **Blog** section, directly after Authors, not the top-level
-  Settings group.
 - `migrationState` — the system ledger recording which content migrations in
   `packages/studio/migrations/` have run. `studio-config.ts` hides it from
   document actions and the new-document menu; it is never authored by hand.

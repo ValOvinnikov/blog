@@ -1,6 +1,5 @@
 import type { TRawFooter } from '@blog/service/features/global/footer/adaptor/transformer';
 import type { TRawNavigation } from '@blog/service/features/global/navigation/adaptor/transformer';
-import type { TRawNewsletterSettings } from '@blog/service/features/global/newsletter-settings/adaptor/transformer';
 import type { TRawSiteSettings } from '@blog/service/features/global/site-settings/adaptor/transformer';
 import type { TRawThemeSettings } from '@blog/service/features/global/theme-settings/adaptor/transformer';
 import { makeRawSanityImage } from '@blog/service/testing/shared/fixtures';
@@ -33,17 +32,6 @@ export function makeRawFooter(overrides: Partial<TRawFooter> = {}): TRawFooter {
   return {
     social: null,
     showLanguageSwitcher: null,
-    ...overrides,
-  };
-}
-
-export function makeRawNewsletterSettings(
-  overrides: Partial<TRawNewsletterSettings> = {},
-): TRawNewsletterSettings {
-  return {
-    heading: 'Stay in the loop',
-    description: 'Get new posts in your inbox.',
-    trustCues: ['No spam', 'Unsubscribe anytime'],
     ...overrides,
   };
 }

@@ -863,18 +863,6 @@ export type Settings_theme = {
   density?: 'DEFAULT' | 'COMPACT';
 };
 
-export type Settings_newsletter = {
-  _id: string;
-  _type: 'settings_newsletter';
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  heading?: string;
-  description?: string;
-  trustCues?: Array<string>;
-};
-
 export type Settings_footer = {
   _id: string;
   _type: 'settings_footer';
@@ -2118,7 +2106,6 @@ export type AllSanitySchemaTypes =
   | HeroLayout
   | MigrationState
   | Settings_theme
-  | Settings_newsletter
   | Settings_footer
   | Settings_navigation
   | Settings_site
