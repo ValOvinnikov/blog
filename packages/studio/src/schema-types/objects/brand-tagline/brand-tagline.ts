@@ -16,7 +16,7 @@ export const brandTaglineSchema = defineType({
       title: 'Items',
       type: 'array',
       description:
-        'Up to 4 short segments (e.g. "build 2026.07", "online"), joined with the separator below. Every language shares the list; only the wording is translated.',
+        'Up to 4 short segments (e.g. "build 2026.07", "online"), joined with the separator below.',
       of: [defineArrayMember({ type: brandTaglineItemSchema.name })],
       validation: (rule) => rule.max(4),
     }),
