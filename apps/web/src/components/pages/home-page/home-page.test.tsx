@@ -1,8 +1,9 @@
+import { LOCALE_ISO_CODES } from '@blog/config';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 
 import { HomePage } from './home-page';
 
@@ -44,6 +45,7 @@ const setup = customRenderAsync(HomePage, {});
 describe(`<${HomePage.name}/>`, () => {
   beforeEach(() => {
     getHomePageMock.mockReset();
+    vi.mocked(getRequestContext).mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
   it('calls notFound() and logs when the fetch fails', async () => {
@@ -70,6 +72,20 @@ describe(`<${HomePage.name}/>`, () => {
     expect(errorSpy).not.toHaveBeenCalled();
 
     errorSpy.mockRestore();
+  });
+
+  it('redirects to / when this language has no Home of its own', async () => {
+    vi.mocked(getRequestContext).mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      locale: LOCALE_ISO_CODES.NL,
+      liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
+    });
+    getHomePageMock.mockResolvedValue({ ok: true, data: undefined });
+
+    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+
+    expect(vi.mocked(redirect)).toHaveBeenCalledWith('/');
+    expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 
   it('renders through PageShell: the module renderer inside a single main landmark', async () => {
