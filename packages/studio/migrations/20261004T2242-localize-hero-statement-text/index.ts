@@ -2,15 +2,15 @@ import { defineMigration } from 'sanity/migrate';
 
 import {
   localizeHeadingBlock,
-  localizeImage,
-  localizeStringField,
-  type TSanityObject,
-} from '../lib/localize-into-default-locale';
+  type THeadingBlockValue,
+} from '../lib/localize-heading-block';
+import { localizeImage, type TImageValue } from '../lib/localize-image';
+import { localizeStringField } from '../lib/localize-string-field';
 
 type THeroStatementDoc = {
-  headingBlock?: TSanityObject;
+  headingBlock?: THeadingBlockValue;
   eyebrow?: unknown;
-  image?: TSanityObject;
+  image?: TImageValue;
 };
 
 export const localizeHeroStatementModule = (doc: THeroStatementDoc) => {

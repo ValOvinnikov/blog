@@ -1,19 +1,19 @@
 import { at, defineMigration, set } from 'sanity/migrate';
 
+import { inDefaultLocale } from '../lib/in-default-locale';
 import {
-  inDefaultLocale,
   localizeHeadingBlock,
-  localizeImage,
-  localizeStringField,
-  type TSanityObject,
-} from '../lib/localize-into-default-locale';
+  type THeadingBlockValue,
+} from '../lib/localize-heading-block';
+import { localizeImage, type TImageValue } from '../lib/localize-image';
+import { localizeStringField } from '../lib/localize-string-field';
 
 type TCtaDoc = {
-  headingBlock?: TSanityObject;
+  headingBlock?: THeadingBlockValue;
   eyebrow?: unknown;
   footnote?: unknown;
   content?: unknown;
-  image?: TSanityObject;
+  image?: TImageValue;
 };
 
 const isPortableText = (value: unknown): value is unknown[] =>

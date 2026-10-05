@@ -53,10 +53,16 @@ export type Module_newsletter = {
   _rev: string;
   title?: string;
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
-  headingBlock?: HeadingBlock;
+  headingBlock?: LocalizedHeadingBlock;
   variant?: 'FULL' | 'COMPACT';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   layout?: Layout;
+};
+
+export type LocalizedHeadingBlock = {
+  _type: 'localizedHeadingBlock';
+  heading?: InternationalizedArrayString;
+  supportingText?: InternationalizedArrayText;
 };
 
 export type Module_cta = {
@@ -118,12 +124,6 @@ export type LocalizedImageWithAlt = {
   hotspot?: SanityImageHotspot;
   crop?: SanityImageCrop;
   alt?: InternationalizedArrayString;
-};
-
-export type LocalizedHeadingBlock = {
-  _type: 'localizedHeadingBlock';
-  heading?: InternationalizedArrayString;
-  supportingText?: InternationalizedArrayText;
 };
 
 export type Module_content = {
@@ -1938,12 +1938,12 @@ export type AllSanitySchemaTypes =
   | Module_pricing
   | HeadingBlock
   | Module_newsletter
+  | LocalizedHeadingBlock
   | Module_cta
   | InternationalizedArrayString
   | InternationalizedArrayListedText
   | SanityImageAssetReference
   | LocalizedImageWithAlt
-  | LocalizedHeadingBlock
   | Module_content
   | ArticleText
   | Block_faqReference
