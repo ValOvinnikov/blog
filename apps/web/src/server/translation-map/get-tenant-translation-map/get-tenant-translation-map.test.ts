@@ -17,7 +17,7 @@ vi.mock('@web/utils/logger/logger');
 
 const tenant = { id: 'tenant-1' } as TTenant;
 const credentials = { projectId: 'proj', dataset: 'production', token: 'tok' };
-const translationMap = { groups: [] };
+const translationMap = { groups: [], homeLanguages: [] };
 
 const toCredentials = vi.mocked(queries.tenants.toTenantSanityCredentials);
 const getTranslationMap = vi.mocked(

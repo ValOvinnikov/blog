@@ -547,6 +547,7 @@ describe('proxy language detection', () => {
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.15';
 
   const translationMap = {
+    homeLanguages: [],
     groups: [
       [
         { documentType: 'page_landing', language: EN, slug: 'about' },

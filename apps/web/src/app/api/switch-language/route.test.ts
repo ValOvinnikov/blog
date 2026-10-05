@@ -35,6 +35,7 @@ const { GET } = await import('./route');
 const tenant = { id: 'tenant-1', locale: EN } as TTenant;
 
 const translationMap = {
+  homeLanguages: [],
   groups: [
     [
       { documentType: 'page_landing', language: EN, slug: 'about' },

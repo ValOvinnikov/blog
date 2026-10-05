@@ -94,7 +94,10 @@ const mockAllEmpty = () => {
   getPageSlugsMock.mockResolvedValue({ ok: true, data: [] });
   getTopicIndexPageMock.mockResolvedValue({ ok: true, data: {} });
   getTagIndexPageMock.mockResolvedValue({ ok: true, data: {} });
-  getTranslationMapMock.mockResolvedValue({ ok: true, data: { groups: [] } });
+  getTranslationMapMock.mockResolvedValue({
+    ok: true,
+    data: { groups: [], homeLanguages: [] },
+  });
 };
 
 describe('sitemap', () => {
@@ -226,6 +229,7 @@ describe('sitemap', () => {
   });
 
   const aboutTranslations = {
+    homeLanguages: [],
     groups: [
       [
         { documentType: 'page_landing', language: 'EN', slug: 'about' },

@@ -6,6 +6,7 @@ import { findTranslatedPath } from './find-translated-path';
 const { EN, NL, FR, DE } = LOCALE_ISO_CODES;
 
 const translationMap: TTranslationMap = {
+  homeLanguages: [],
   groups: [
     [
       { documentType: 'page_landing', language: EN, slug: 'about' },
