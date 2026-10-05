@@ -10,6 +10,7 @@ import {
   type DocumentActionComponent,
   type DocumentActionsContext,
   type InputProps,
+  type ItemProps,
 } from 'sanity';
 
 import { buildStudioConfig } from './studio-config';
@@ -104,6 +105,20 @@ describe(buildStudioConfig, () => {
   );
 
   describe('capability warning', () => {
+    const componentsFor = (enabledCapabilities: TCapability[]) => {
+      const components = buildStudioConfig({
+        projectId: 'test-project',
+        dataset: 'test-dataset',
+        title: 'Test Studio',
+        enabledCapabilities,
+      }).form?.components;
+      if (!components?.input || !components.item) {
+        throw new Error('capability components not registered');
+      }
+
+      return { input: components.input, item: components.item };
+    };
+
     const renderRootInput = (
       enabledCapabilities: TCapability[] | undefined,
       typeName: string,
@@ -162,5 +177,63 @@ describe(buildStudioConfig, () => {
 
       expect(html).not.toContain('Features');
     });
+
+    it('marks a gated module in the picker when its capability is off', () => {
+      const { input } = componentsFor([CAPABILITY.COMMENTS]);
+      const renderDefault = vi.fn(() => createElement('div'));
+      const props = {
+        path: ['modules'],
+        schemaType: {
+          name: 'array',
+          jsonType: 'array',
+          of: [{ name: 'module_newsletter', title: 'Newsletter' }],
+        },
+        renderDefault,
+      } as unknown as InputProps;
+
+      renderToStaticMarkup(createElement(input, props));
+
+      expect(renderDefault).toHaveBeenCalledWith(
+        expect.objectContaining({
+          schemaType: expect.objectContaining({
+            of: [
+              expect.objectContaining({
+                title: 'Newsletter (off in Features)',
+              }),
+            ],
+          }),
+        }),
+      );
+    });
+
+    it.each([
+      ['off', [CAPABILITY.COMMENTS], 1],
+      ['on', [CAPABILITY.NEWSLETTER], 0],
+    ])(
+      'adds %s-state warnings to a page item',
+      (_state, enabledCapabilities, expectedWarnings) => {
+        const { item } = componentsFor(enabledCapabilities);
+        const renderDefault = vi.fn(() => createElement('div'));
+        const props = {
+          path: ['modules', { _key: 'a' }],
+          schemaType: { name: 'module_newsletter' },
+          validation: [],
+          renderDefault,
+        } as unknown as ItemProps;
+
+        renderToStaticMarkup(createElement(item, props));
+
+        expect(renderDefault).toHaveBeenCalledWith(
+          expect.objectContaining({
+            validation: Array.from({ length: expectedWarnings }, () =>
+              expect.objectContaining({
+                level: 'warning',
+                path: ['modules', { _key: 'a' }],
+              }),
+            ),
+          }),
+        );
+      },
+    );
   });
 });
