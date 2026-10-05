@@ -1,6 +1,6 @@
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
 import { moduleLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
-import { portableTextBodyItemFragment } from '@blog/service/shared/fragments/portable-text/portable-text-body-item';
+import { getLocalizedArticleText } from '@blog/service/shared/localization/get-localized-article-text/get-localized-article-text';
 
 export const contentModuleQuery = q
   .parameters<TModuleQueryParams>()
@@ -9,7 +9,7 @@ export const contentModuleQuery = q
   .slice(0)
   .project((sub) => ({
     brandVariant: sub.field('brandVariant').notNull(),
-    body: sub.field('body[]').project(portableTextBodyItemFragment).notNull(),
+    body: getLocalizedArticleText(sub, 'body').notNull(),
     ...moduleLayoutFragment,
   }))
   .notNull();

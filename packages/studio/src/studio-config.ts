@@ -19,6 +19,7 @@ import {
   createTranslationLinkInput,
   type TTranslationLinkOptions,
 } from '@blog/studio/schema-types/inputs/translation-link-input/translation-link-input';
+import { articleTextSchema } from '@blog/studio/schema-types/portable-text/article-text/article-text';
 import { listedTextSchema } from '@blog/studio/schema-types/portable-text/listed-text/listed-text';
 import { paragraphTextSchema } from '@blog/studio/schema-types/portable-text/paragraph-text/paragraph-text';
 import { setDefaultLanguage } from '@blog/studio/schema-types/validation/default-language/default-language';
@@ -125,6 +126,7 @@ export const buildStudioConfig = ({
           'text',
           listedTextSchema.name,
           paragraphTextSchema.name,
+          articleTextSchema.name,
         ],
       }),
       ...(liveLocales
