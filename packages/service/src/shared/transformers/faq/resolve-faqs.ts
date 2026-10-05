@@ -1,4 +1,4 @@
-import type { pageFaqQuestionsParser } from '@blog/service/shared/expressions/page-faq-questions';
+import type { pageFaqQuestionsParser } from '@blog/service/shared/expressions/faq/page-faq-questions';
 import type { z } from 'zod';
 
 export type TRawFaqPageQuestion = z.infer<

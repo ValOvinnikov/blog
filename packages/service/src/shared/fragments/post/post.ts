@@ -3,7 +3,7 @@ import { q } from '@blog/service/sanity/query';
 import {
   WORD_COUNT_EXPRESSION,
   wordCountParser,
-} from '@blog/service/shared/expressions/word-count';
+} from '@blog/service/shared/expressions/post/word-count';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
 import { moduleFragment } from '@blog/service/shared/fragments/module/module';
