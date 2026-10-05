@@ -4,6 +4,7 @@ import { blockTestimonialSchema } from './blocks/testimonial/testimonial';
 import { tagSchema } from './blog/tag/tag';
 import { topicSchema } from './blog/topic/topic';
 import { linkSchema } from './link/link';
+import { pageTemplateSchema } from './page-template/page-template';
 import { homePageSchema } from './pages/home/home';
 import { landingPageSchema } from './pages/landing/landing';
 import { postPageSchema } from './pages/post/post';
@@ -28,6 +29,7 @@ export const documents = [
   blockTestimonialSchema,
   faqBlockSchema,
   linkSchema,
+  pageTemplateSchema,
   landingPageSchema,
   homePageSchema,
   postIndexPageSchema,

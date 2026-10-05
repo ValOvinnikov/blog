@@ -16,7 +16,10 @@ export async function getPage(
   const raw = await runQuery(landingPageQuery, {
     parameters: { slug },
     tenant,
-    ...isr(['page_landing', 'modules:faq', 'block_faq'], tenant.projectId),
+    ...isr(
+      ['page_landing', 'page_template', 'modules:faq', 'block_faq'],
+      tenant.projectId,
+    ),
   });
   if (!raw) return undefined;
 

@@ -15,7 +15,10 @@ export async function getHomePage(
 ): Promise<TMaybeUndefined<THomePage>> {
   const raw = await runQuery(homePageQuery, {
     tenant,
-    ...isr(['homePage', 'modules:faq', 'block_faq'], tenant.projectId),
+    ...isr(
+      ['homePage', 'page_template', 'modules:faq', 'block_faq'],
+      tenant.projectId,
+    ),
   });
   if (!raw) return undefined;
 

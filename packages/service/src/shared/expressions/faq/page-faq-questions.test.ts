@@ -14,10 +14,15 @@ import {
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
 const root = {
-  modules: [{ _type: 'reference', _ref: 'module-faq-a' }],
+  template: { _type: 'reference', _ref: 'template-a' },
 };
 
 const dataset = [
+  {
+    _id: 'template-a',
+    _type: 'page_template',
+    modules: [{ _type: 'reference', _ref: 'module-faq-a' }],
+  },
   {
     _id: 'module-faq-a',
     _type: 'module_faq',

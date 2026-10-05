@@ -1,11 +1,10 @@
 import type {
   internalGroqTypeReferenceTo,
-  Page_home,
-  Page_landing,
   Page_post,
   Page_postIndex,
   Page_tag,
   Page_tagIndex,
+  Page_template,
   Page_topic,
   Page_topicIndex,
 } from '@blog/config/sanity/generated/types';
@@ -28,10 +27,12 @@ type THeroKind<TPage extends { hero?: unknown }> = TReferencedType<
 type TModuleKind<TPage extends { modules?: readonly unknown[] }> =
   TReferencedType<NonNullable<TPage['modules']>[number]>;
 
-export type TPageHomeType = THeroKind<Page_home> | TModuleKind<Page_home>;
+export type TPageTemplateType =
+  THeroKind<Page_template> | TModuleKind<Page_template>;
 
-export type TPageLandingType =
-  THeroKind<Page_landing> | TModuleKind<Page_landing>;
+export type TPageHomeType = TPageTemplateType;
+
+export type TPageLandingType = TPageTemplateType;
 
 export type TPagePostIndexType =
   THeroKind<Page_postIndex> | TModuleKind<Page_postIndex>;

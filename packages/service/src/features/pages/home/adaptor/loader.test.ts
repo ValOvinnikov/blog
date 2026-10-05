@@ -147,6 +147,7 @@ describe('getHomePage', () => {
         next: expect.objectContaining({
           tags: [
             't:tenant-a:homePage',
+            't:tenant-a:page_template',
             't:tenant-a:modules:faq',
             't:tenant-a:block_faq',
           ],

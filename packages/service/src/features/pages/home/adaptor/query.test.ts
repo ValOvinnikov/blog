@@ -116,3 +116,54 @@ describe('homePageQuery language scoping', () => {
     });
   });
 });
+
+describe('homePageQuery template layout', () => {
+  const { EN, NL } = LOCALE_ISO_CODES;
+
+  function home(id: string, language: string, template?: string) {
+    return {
+      _id: id,
+      _type: 'page_home',
+      language,
+      headingBlock: { heading: id },
+      ...(template ? { template: { _type: 'reference', _ref: template } } : {}),
+    };
+  }
+
+  const dataset = [
+    home('page_home', EN, 'template-home'),
+    home('home-nl', NL, 'template-home'),
+    {
+      _id: 'template-home',
+      _type: 'page_template',
+      hero: { _type: 'reference', _ref: 'hero-1' },
+      modules: [{ _key: 'a', _type: 'reference', _ref: 'post-latest-1' }],
+    },
+    { _id: 'hero-1', _type: 'module_heroBlog' },
+    { _id: 'post-latest-1', _type: 'module_postLatest' },
+  ];
+
+  function run(data: unknown[], locale: string): Promise<unknown> {
+    return evaluateGroqExpression(homePageQuery.query, data, null, {
+      locale,
+      defaultLocale: EN,
+    });
+  }
+
+  it.each([EN, NL])(
+    'resolves the hero and modules of the template the %s Home references',
+    async (locale) => {
+      expect(await run(dataset, locale)).toMatchObject({
+        hero: { _id: 'hero-1', _type: 'module_heroBlog' },
+        modules: [{ _id: 'post-latest-1', _type: 'module_postLatest' }],
+      });
+    },
+  );
+
+  it('resolves no hero and no modules for a Home without a template', async () => {
+    expect(await run([home('page_home', EN)], EN)).toMatchObject({
+      hero: null,
+      modules: null,
+    });
+  });
+});

@@ -129,3 +129,63 @@ describe('landingPageQuery language scoping', () => {
     });
   });
 });
+
+describe('landingPageQuery template layout', () => {
+  const { EN, NL } = LOCALE_ISO_CODES;
+
+  function landing(id: string, language: string, template?: string) {
+    return {
+      _id: id,
+      _type: 'page_landing',
+      slug: { current: 'about' },
+      language,
+      headingBlock: { heading: id },
+      ...(template ? { template: { _type: 'reference', _ref: template } } : {}),
+    };
+  }
+
+  const dataset = [
+    landing('about-en', EN, 'template-about'),
+    landing('about-nl', NL, 'template-about'),
+    {
+      _id: 'template-about',
+      _type: 'page_template',
+      hero: { _type: 'reference', _ref: 'hero-1' },
+      modules: [
+        { _key: 'a', _type: 'reference', _ref: 'content-1' },
+        { _key: 'b', _type: 'reference', _ref: 'cta-1' },
+      ],
+    },
+    { _id: 'hero-1', _type: 'module_heroStatement' },
+    { _id: 'content-1', _type: 'module_content' },
+    { _id: 'cta-1', _type: 'module_cta' },
+  ];
+
+  function run(data: unknown[], locale: string): Promise<unknown> {
+    return evaluateGroqExpression(landingPageQuery.query, data, null, {
+      slug: 'about',
+      locale,
+      defaultLocale: EN,
+    });
+  }
+
+  it.each([EN, NL])(
+    'resolves the hero and modules of the template the %s page references',
+    async (locale) => {
+      expect(await run(dataset, locale)).toMatchObject({
+        hero: { _id: 'hero-1', _type: 'module_heroStatement' },
+        modules: [
+          { _id: 'content-1', _type: 'module_content' },
+          { _id: 'cta-1', _type: 'module_cta' },
+        ],
+      });
+    },
+  );
+
+  it('resolves no hero and no modules for a page without a template', async () => {
+    expect(await run([landing('about-en', EN)], EN)).toMatchObject({
+      hero: null,
+      modules: null,
+    });
+  });
+});
