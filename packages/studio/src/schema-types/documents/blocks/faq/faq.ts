@@ -19,15 +19,14 @@ export const faqBlockSchema = defineType({
     localizedOneLineTextField({
       name: 'question',
       title: 'Question',
-      description: 'The question as a visitor would ask it, per language.',
+      description: 'The question as a visitor would ask it.',
       validation: (rule) =>
         rule.custom(validateDefaultLanguageFilled('Enter the question.')),
     }),
     localizedListedTextField({
       name: 'answer',
       title: 'Answer',
-      description:
-        'The answer, with bold, italics, lists and links, per language.',
+      description: 'The answer, with bold, italics, lists and links.',
       validation: (rule) =>
         rule.custom(
           validateDefaultLanguageBlocksFilled('Answer the question.'),

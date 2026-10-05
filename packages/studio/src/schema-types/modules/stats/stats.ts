@@ -44,7 +44,7 @@ export const statsSchema = defineType({
       name: 'footnote',
       title: 'Footnote',
       description:
-        'One line under the figures, per language — the period, the source, or a caveat.',
+        'One line under the figures — the period, the source, or a caveat.',
       validation: (rule) =>
         rule
           .custom(

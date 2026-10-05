@@ -54,7 +54,7 @@ export const linkSchema = defineType({
       title: 'Label',
       type: 'internationalizedArrayString',
       description:
-        'The visible link text readers see wherever this link is used, per language.',
+        'The visible link text readers see wherever this link is used.',
       validation: (rule) =>
         rule.custom((value) => {
           const labels = localizedStringValues(value);
@@ -102,8 +102,7 @@ export const linkSchema = defineType({
       name: 'url',
       title: 'External Link',
       type: 'internationalizedArrayString',
-      description:
-        'The full web address this links to, including https://, per language.',
+      description: 'The full web address this links to, including https://.',
       hidden: ({ document }) => !isLinkType(document, LINK_TYPE.EXTERNAL),
       validation: (rule) =>
         rule.custom((value, context) => {

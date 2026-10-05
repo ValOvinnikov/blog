@@ -8,14 +8,13 @@ export const localizedImageWithAltSchema = defineType({
   title: 'Image with Alt Text',
   type: 'image',
   description:
-    'An image together with its alt text per language, for accessibility and search engines.',
+    'An image together with its alt text, for accessibility and search engines.',
   options: imageHotspotOptions,
   fields: [
     localizedOneLineTextField({
       name: 'alt',
       title: 'Alternative Text',
-      description:
-        'Describe the image for screen readers and search engines, per language.',
+      description: 'Describe the image for screen readers and search engines.',
       validation: (rule) =>
         rule.custom(validateDefaultLanguageFilled('Describe the image.')),
     }),

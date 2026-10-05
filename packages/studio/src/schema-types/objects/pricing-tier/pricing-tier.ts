@@ -34,7 +34,7 @@ export const pricingTierSchema = defineType({
     localizedOneLineTextField({
       name: 'name',
       title: 'Name',
-      description: 'The plan name shown at the top of the tier, per language.',
+      description: 'The plan name shown at the top of the tier.',
       validation: (rule) => [
         rule.custom(validateDefaultLanguageFilled('Give the tier a name.')),
         rule.custom(
@@ -48,8 +48,7 @@ export const pricingTierSchema = defineType({
     localizedOneLineTextField({
       name: 'description',
       title: 'Description',
-      description:
-        'A line under the name saying who this plan is for, per language.',
+      description: 'A line under the name saying who this plan is for.',
       validation: (rule) =>
         rule.custom(
           validateLocalizedMaxLength(
@@ -74,7 +73,7 @@ export const pricingTierSchema = defineType({
       name: 'priceLabel',
       title: 'Price Label',
       description:
-        'Shown instead of a price for a tier with none, such as "Contact us", per language.',
+        'Shown instead of a price for a tier with none, such as "Contact us".',
       validation: (rule) => [
         rule.custom(
           validateLocalizedMaxLength(
@@ -99,7 +98,7 @@ export const pricingTierSchema = defineType({
       name: 'highlightLabel',
       title: 'Highlight Label',
       description:
-        'Fill this in to recommend the tier: it stands out from the others and carries this text as its badge, per language.',
+        'Fill this in to recommend the tier: it stands out from the others and carries this text as its badge.',
       validation: (rule) =>
         rule.custom(
           validateLocalizedMaxLength(
@@ -111,8 +110,7 @@ export const pricingTierSchema = defineType({
     localizedOneLineTextField({
       name: 'footnote',
       title: 'Footnote',
-      description:
-        'A short note under the tier, per language — terms, taxes, or a caveat.',
+      description: 'A short note under the tier — terms, taxes, or a caveat.',
       validation: (rule) =>
         rule.custom(
           validateLocalizedMaxLength(
