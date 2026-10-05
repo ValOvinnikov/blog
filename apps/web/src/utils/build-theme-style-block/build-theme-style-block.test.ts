@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
+
 import type { TThemeTokens } from '@blog/config';
 
 import { buildThemeStyleBlock } from './build-theme-style-block';
@@ -10,6 +13,27 @@ const CONSOLE_TOKENS: TThemeTokens = {
   radiusScale: 'MD',
   density: 'DEFAULT',
 };
+
+const RADIUS_TOKENS = [
+  '--radius-sm',
+  '--radius',
+  '--radius-md',
+  '--radius-lg',
+  '--radius-xl',
+];
+
+const SPACING_TOKENS = [
+  '--spacing-gutter',
+  '--spacing-section',
+  '--spacing-page-y',
+  '--spacing-site-x',
+  '--spacing-site-y',
+  '--spacing-card-x',
+  '--spacing-card-y',
+];
+
+const readPixels = (css: string, token: string): number =>
+  Number(css.match(new RegExp(`${token}: (\\d+)px;`))?.[1]);
 
 describe('buildThemeStyleBlock', () => {
   it('reproduces the static Console defaults for the no-settings_theme-document case', () => {
@@ -78,5 +102,60 @@ describe('buildThemeStyleBlock', () => {
 
     expect(css).toContain('--brand-primary: oklch(0.53 0.17 28);');
     expect(css).toContain('--logo-1: oklch(0.52 0.17 28);');
+  });
+
+  it('reproduces theme.css radius and layout spacing at MD radius and DEFAULT density', () => {
+    const themeCss = readFileSync(
+      createRequire(import.meta.url).resolve('@blog/tailwind-config/theme.css'),
+      'utf8',
+    );
+    const staticDeclarations = themeCss.match(
+      /--(radius[\w-]*|spacing-(gutter|section|page-y|site-x|site-y|card-x|card-y)): [^;]+;/g,
+    );
+
+    expect(staticDeclarations).toHaveLength(12);
+
+    const css = buildThemeStyleBlock(CONSOLE_TOKENS);
+
+    staticDeclarations?.forEach((declaration) => {
+      expect(css).toContain(declaration);
+    });
+  });
+
+  it.each(RADIUS_TOKENS)(
+    'rounds %s more at each larger radius scale',
+    (token) => {
+      const sizes = (['SM', 'MD', 'LG', 'XL'] as const).map((radiusScale) =>
+        readPixels(
+          buildThemeStyleBlock({ ...CONSOLE_TOKENS, radiusScale }),
+          token,
+        ),
+      );
+
+      expect(sizes).toEqual([...sizes].sort((a, b) => a - b));
+      expect(new Set(sizes).size).toBe(sizes.length);
+    },
+  );
+
+  it.each(SPACING_TOKENS)('changes %s at COMPACT density', (token) => {
+    const declaration = new RegExp(`${token}: [^;]+;`);
+    const defaultCss = buildThemeStyleBlock(CONSOLE_TOKENS);
+    const compactCss = buildThemeStyleBlock({
+      ...CONSOLE_TOKENS,
+      density: 'COMPACT',
+    });
+
+    expect(compactCss.match(declaration)?.[0]).toBeDefined();
+    expect(compactCss.match(declaration)?.[0]).not.toBe(
+      defaultCss.match(declaration)?.[0],
+    );
+  });
+
+  it('keeps radius and density out of the .dark block', () => {
+    const css = buildThemeStyleBlock(CONSOLE_TOKENS);
+    const darkBlock = css.slice(css.indexOf('.dark'));
+
+    expect(darkBlock).not.toContain('--radius');
+    expect(darkBlock).not.toContain('--spacing-');
   });
 });

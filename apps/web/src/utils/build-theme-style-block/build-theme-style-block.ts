@@ -1,12 +1,64 @@
-import type { TThemeTokens } from '@blog/config';
+import {
+  DENSITY,
+  RADIUS_SCALE,
+  type TDensity,
+  type TRadiusScale,
+  type TThemeTokens,
+} from '@blog/config';
 
-/**
- * Fixed light/dark L·C recipe for the accent and logo token families
- * (`configs/tailwind/theme.css`'s `:root`/`.dark`) — lightness and chroma
- * stay constant across tenants so contrast ratios hold, and only hue rotates
- * per `accentHue`/`logoHue`. `--brand-primary-contrast` is achromatic by
- * design and never varies with hue.
- */
+const RADIUS_DECLARATIONS: Record<TRadiusScale, string[]> = {
+  [RADIUS_SCALE.SM]: [
+    '--radius-sm: 2px;',
+    '--radius: 3px;',
+    '--radius-md: 3px;',
+    '--radius-lg: 5px;',
+    '--radius-xl: 6px;',
+  ],
+  [RADIUS_SCALE.MD]: [
+    '--radius-sm: 3px;',
+    '--radius: 6px;',
+    '--radius-md: 6px;',
+    '--radius-lg: 10px;',
+    '--radius-xl: 12px;',
+  ],
+  [RADIUS_SCALE.LG]: [
+    '--radius-sm: 5px;',
+    '--radius: 9px;',
+    '--radius-md: 9px;',
+    '--radius-lg: 15px;',
+    '--radius-xl: 18px;',
+  ],
+  [RADIUS_SCALE.XL]: [
+    '--radius-sm: 6px;',
+    '--radius: 12px;',
+    '--radius-md: 12px;',
+    '--radius-lg: 20px;',
+    '--radius-xl: 24px;',
+  ],
+};
+
+const DENSITY_DECLARATIONS: Record<TDensity, string[]> = {
+  [DENSITY.DEFAULT]: [
+    '--spacing-gutter: clamp(1rem, 5vw, 2.5rem);',
+    '--spacing-section: clamp(3rem, 8vw, 6rem);',
+    '--spacing-page-y: clamp(1.5rem, 4vw, 2.5rem);',
+    '--spacing-site-x: 1.5rem;',
+    '--spacing-site-y: 1.375rem;',
+    '--spacing-card-x: 1rem;',
+    '--spacing-card-y: 0.875rem;',
+  ],
+  [DENSITY.COMPACT]: [
+    '--spacing-gutter: clamp(0.75rem, 3.75vw, 1.875rem);',
+    '--spacing-section: clamp(2.25rem, 6vw, 4.5rem);',
+    '--spacing-page-y: clamp(1.125rem, 3vw, 1.875rem);',
+    '--spacing-site-x: 1.125rem;',
+    '--spacing-site-y: 1rem;',
+    '--spacing-card-x: 0.75rem;',
+    '--spacing-card-y: 0.625rem;',
+  ],
+};
+
+// Lightness and chroma stay fixed across tenants so contrast ratios hold; only the hue varies.
 const buildAccentTokens = (hue: number, isDark: boolean): string => {
   if (isDark) {
     return [
@@ -46,30 +98,23 @@ const buildLogoTokens = (hue: number, isDark: boolean): string => {
 };
 
 /**
- * Builds the server-rendered `<style>` block content injecting the resolved
- * theme tokens as CSS custom properties under `:root`/`.dark` — the runtime
- * counterpart to `configs/tailwind/theme.css`'s static defaults, which stay
- * byte-identical to the Console preset's own resolved values (the "no
- * `settings_theme` document" safety net). `accentHue` and `logoHue` are
- * applied independently since a tenant's brand accent and logo mark don't
- * always share one hue.
- *
- * Emits raw `oklch()` CSS rather than pre-converting to hex: every modern
- * browser resolves it natively, and this token only exists to become a CSS
- * custom property, so a hex round-trip would add nothing.
- *
- * @example
- * buildThemeStyleBlock({ accentHue: 250, logoHue: 250, ... }) // ':root { --brand-primary: oklch(...); ... }\n.dark { ... }'
+ * The site's runtime overrides for `configs/tailwind/theme.css`, whose static
+ * defaults must stay identical to the Console preset's output so a site with
+ * no saved look renders the same.
  */
 export const buildThemeStyleBlock = ({
   accentHue,
   logoHue,
+  radiusScale,
+  density,
 }: TThemeTokens): string => {
   const resolvedLogoHue = logoHue ?? accentHue;
 
   return `:root {
     ${buildAccentTokens(accentHue, false)}
     ${buildLogoTokens(resolvedLogoHue, false)}
+    ${RADIUS_DECLARATIONS[radiusScale].join('\n    ')}
+    ${DENSITY_DECLARATIONS[density].join('\n    ')}
     --font-ui: var(--font-mono-family);
 }
 .dark {

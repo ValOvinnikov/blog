@@ -1299,7 +1299,12 @@ own default). `apps/web`'s `[locale]/layout.tsx` fetches this once per request
 which injects the resolved tokens as a server-rendered `<style>` block
 declaring CSS custom properties under both `:root` and `.dark`
 (carrying `precedence`/`href` so React hoists it into `<head>` from wherever
-it mounts), and selects the matching `next/font/local`
+it mounts). The accent and logo colours go in both; `radiusScale` sets the
+five `--radius*` tokens and `density` the seven layout `--spacing-*` tokens
+(`gutter`, `section`, `page-y`, `site-x/y`, `card-x/y`) under `:root` only.
+`MD` and `DEFAULT` reproduce `configs/tailwind/theme.css`'s static values, so
+a site with no saved look renders as the defaults; `density` does not touch
+Tailwind's base `--spacing`, so control sizes stay fixed. It also selects the matching `next/font/local`
 pair (`headingFont`/`bodyFont`) via a per-font dynamically imported loader
 module so only the two fonts actually resolved for that render are
 bundled/preloaded. Fonts are self-hosted in both apps: Latin-subset variable
