@@ -16,7 +16,7 @@ export const pricingFeatureSchema = defineType({
     localizedOneLineTextField({
       name: 'text',
       title: 'Text',
-      description: 'What the tier includes, in one line, per language.',
+      description: 'What the tier includes, in one line.',
       validation: (rule) =>
         rule.custom(
           validateLocalizedMaxLength(

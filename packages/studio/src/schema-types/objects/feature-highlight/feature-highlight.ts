@@ -19,15 +19,14 @@ export const featureHighlightSchema = defineType({
     localizedOneLineTextField({
       name: 'heading',
       title: 'Heading',
-      description: 'The point this row makes, in a few words, per language.',
+      description: 'The point this row makes, in a few words.',
       validation: (rule) =>
         rule.custom(validateDefaultLanguageFilled('Give the row a heading.')),
     }),
     localizedListedTextField({
       name: 'body',
       title: 'Body',
-      description:
-        'The explanation behind it, in a sentence or two, per language.',
+      description: 'The explanation behind it, in a sentence or two.',
       validation: (rule) =>
         rule.custom(
           validateDefaultLanguageBlocksFilled('Explain the point of this row.'),

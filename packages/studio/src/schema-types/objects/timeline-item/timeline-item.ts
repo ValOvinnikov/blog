@@ -40,8 +40,7 @@ export const timelineItemSchema = defineType({
     localizedOneLineTextField({
       name: 'marker',
       title: 'Marker',
-      description:
-        'A short label on the line, per language: a year, a quarter, "Week 1".',
+      description: 'A short label on the line: a year, a quarter, "Week 1".',
       hidden: ({ document }) => isNumbered(document),
       validation: (rule) => [
         rule.custom(validateTimelineMarkerRequired),
@@ -56,7 +55,7 @@ export const timelineItemSchema = defineType({
     localizedOneLineTextField({
       name: 'heading',
       title: 'Heading',
-      description: 'What happens at this step, in a few words, per language.',
+      description: 'What happens at this step, in a few words.',
       validation: (rule) => [
         rule.custom(validateDefaultLanguageFilled('Give the item a heading.')),
         rule.custom(
@@ -70,8 +69,7 @@ export const timelineItemSchema = defineType({
     localizedParagraphTextField({
       name: 'body',
       title: 'Body',
-      description:
-        'A sentence or two describing this step or milestone, per language.',
+      description: 'A sentence or two describing this step or milestone.',
       validation: (rule) =>
         rule
           .custom((value) =>

@@ -18,7 +18,7 @@ export const statSchema = defineType({
     localizedOneLineTextField({
       name: 'value',
       title: 'Value',
-      description: 'The figure as it should read, per language. Kept short.',
+      description: 'The figure as it should read. Kept short.',
       validation: (rule) => [
         rule.custom(validateDefaultLanguageFilled('Add the figure.')),
         rule
@@ -34,8 +34,7 @@ export const statSchema = defineType({
     localizedOneLineTextField({
       name: 'label',
       title: 'Label',
-      description:
-        'What the figure counts, per language. A few words, not a sentence.',
+      description: 'What the figure counts. A few words, not a sentence.',
       validation: (rule) => [
         rule.custom(validateDefaultLanguageFilled('Add a label.')),
         rule
@@ -52,7 +51,7 @@ export const statSchema = defineType({
       name: 'description',
       title: 'Description',
       description:
-        'Optional line of context under the label, per language — scope, period, or sample.',
+        'Optional line of context under the label — scope, period, or sample.',
     }),
   ],
   preview: {

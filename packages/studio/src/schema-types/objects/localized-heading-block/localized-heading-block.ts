@@ -8,14 +8,13 @@ export const localizedHeadingBlockSchema = defineType({
   name: 'localizedHeadingBlock',
   title: 'Heading Block',
   type: 'object',
-  description:
-    'The main heading and its optional supporting line, per language.',
+  description: 'The main heading and its optional supporting line.',
   options: { collapsible: true, collapsed: false },
   fields: [
     localizedOneLineTextField({
       name: 'heading',
       title: 'Heading',
-      description: 'The heading text shown to readers, per language.',
+      description: 'The heading text shown to readers.',
       validation: (rule) =>
         rule.custom(validateDefaultLanguageFilled(HEADING_REQUIRED_MESSAGE)),
     }),
@@ -23,7 +22,7 @@ export const localizedHeadingBlockSchema = defineType({
       name: 'supportingText',
       title: 'Supporting Text',
       description:
-        'Optional line of supporting text shown beneath the heading, per language.',
+        'Optional line of supporting text shown beneath the heading.',
     }),
   ],
 });
