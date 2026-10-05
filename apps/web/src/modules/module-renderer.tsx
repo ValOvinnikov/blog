@@ -8,7 +8,12 @@ export type TModuleComponentProps = {
   context?: {
     post?: { id: string };
     page?: number;
-    archive?: { kind: TTaxonomyKind; slug: string; name: string };
+    archive?: {
+      id: string;
+      kind: TTaxonomyKind;
+      slug: string;
+      name: string;
+    };
   };
 };
 

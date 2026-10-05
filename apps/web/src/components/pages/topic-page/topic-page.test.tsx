@@ -1,4 +1,3 @@
-import { TAXONOMY_KIND } from '@blog/config';
 import { service } from '@blog/service';
 import {
   customRenderServerAsync,
@@ -210,7 +209,7 @@ describe(`<${TopicPage.name}/>`, () => {
         'list-1',
         DEFAULT_TENANT_SANITY_CONTEXT,
         expected,
-        { kind: TAXONOMY_KIND.TOPICS, slug: 'news' },
+        { termId: 'topic-1' },
       );
     },
   );
