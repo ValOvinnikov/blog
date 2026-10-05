@@ -1,10 +1,9 @@
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
 import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
+import { blockFaqProjection } from '@blog/service/shared/fragments/faq/block-faq';
 import { localizedHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/localized-heading-block';
 import { moduleLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
-import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
-import { getLocalizedPortableTextBlock } from '@blog/service/shared/localization/get-localized-portable-text-block/get-localized-portable-text-block';
 
 export const faqModuleQuery = q
   .parameters<TModuleQueryParams>()
@@ -20,11 +19,11 @@ export const faqModuleQuery = q
     questions: sub
       .field('questions[]')
       .deref()
-      .project((questionSub) => ({
-        _id: true,
-        question: getLocalizedField(questionSub, 'question').notNull(),
-        answer: getLocalizedPortableTextBlock(questionSub, 'answer').notNull(),
-      }))
+      .project((questionSub) => {
+        const { _id, question, answer } = blockFaqProjection(questionSub);
+
+        return { _id, question: question.notNull(), answer: answer.notNull() };
+      })
       .notNull(),
     ...ctaButtonsFragment,
     ...moduleContentAlignmentLeftCenterFragment,

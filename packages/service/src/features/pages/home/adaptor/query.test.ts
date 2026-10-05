@@ -50,14 +50,4 @@ describe('homePageQuery', () => {
 
     expect(() => homePageQuery.parse(raw)).not.toThrow();
   });
-
-  it('queries every module_faq question across the page', () => {
-    expect(homePageQuery.query).toContain('_type == "module_faq"');
-  });
-
-  it('rejects a page whose faqs contain a null entry', () => {
-    const raw = { ...makeRawHomePage(), faqs: [null] };
-
-    expect(() => homePageQuery.parse(raw)).toThrow();
-  });
 });

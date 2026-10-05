@@ -1,13 +1,20 @@
+import { getFaqQuestions } from '@blog/service/shared/adaptors/faq-questions/loader';
 import { mockRun } from '@blog/service/testing/mock-run-query';
+import { makeRawFaqModuleQuestions } from '@blog/service/testing/modules/fixtures';
 import { makeRawLandingPage } from '@blog/service/testing/pages/fixtures';
 import {
-  makeRawFaqPageQuestion,
   makeRawHeadingBlock,
   makeRawSeo,
 } from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getPage } from './loader';
+
+vi.mock('@blog/service/shared/adaptors/faq-questions/loader', () => ({
+  getFaqQuestions: vi.fn(),
+}));
+
+const mockFaqQuestions = vi.mocked(getFaqQuestions);
 
 vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
@@ -92,24 +99,41 @@ describe('getPage', () => {
     expect(page.seo.ogTitle).toBeUndefined();
   });
 
-  it('dedupes a question referenced by two module_faq modules', async () => {
-    const shared = makeRawFaqPageQuestion({ id: 'block-faq-1' });
+  it('builds the faqs from the FAQ modules, in page order, with one request', async () => {
     mockRun.mockResolvedValueOnce(
-      makeRawLandingPage({ faqs: [shared, shared] }),
+      makeRawLandingPage({
+        modules: [
+          { _id: 'faq-b', _type: 'module_faq' },
+          { _id: 'cta-1', _type: 'module_cta' },
+          { _id: 'faq-a', _type: 'module_faq' },
+        ],
+      }),
     );
+    mockFaqQuestions.mockResolvedValueOnce([makeRawFaqModuleQuestions()]);
 
     const page = await getPage('about', tenant);
-    if (!page) throw new Error('expected a landing page');
+    if (!page) throw new Error('expected a page');
 
-    expect(page.faqs).toEqual([shared]);
+    expect(mockFaqQuestions).toHaveBeenCalledExactlyOnceWith(
+      ['faq-b', 'faq-a'],
+      tenant,
+    );
+    expect(page.faqs).toEqual([
+      {
+        id: 'block-faq-1',
+        question: 'How long does onboarding take?',
+        answer: 'Most teams are live within a week.',
+      },
+    ]);
   });
 
-  it('returns an empty faqs list when the page has no FAQ module', async () => {
-    mockRun.mockResolvedValueOnce(makeRawLandingPage({ faqs: [] }));
+  it('makes no FAQ-questions request when the page has no FAQ module', async () => {
+    mockRun.mockResolvedValueOnce(makeRawLandingPage());
 
     const page = await getPage('about', tenant);
-    if (!page) throw new Error('expected a landing page');
+    if (!page) throw new Error('expected a page');
 
+    expect(mockFaqQuestions).not.toHaveBeenCalled();
     expect(page.faqs).toEqual([]);
   });
 
@@ -131,11 +155,7 @@ describe('getPage', () => {
       expect.objectContaining({
         tenant,
         next: expect.objectContaining({
-          tags: [
-            't:tenant-a:page_landing',
-            't:tenant-a:modules:faq',
-            't:tenant-a:block_faq',
-          ],
+          tags: ['t:tenant-a:page_landing'],
         }),
       }),
     );

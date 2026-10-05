@@ -39,6 +39,7 @@ import type { TRawTaxonomyListModule } from '@blog/service/features/modules/taxo
 import type { TRawTeamModule } from '@blog/service/features/modules/team/adaptor/transformer';
 import type { TRawTestimonialModule } from '@blog/service/features/modules/testimonial/adaptor/transformer';
 import type { TRawTimelineModule } from '@blog/service/features/modules/timeline/adaptor/transformer';
+import type { TFaqModuleQuestions } from '@blog/service/shared/adaptors/faq-questions/types';
 import type { TRawCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button';
 import {
   makeRawHeadingBlock,
@@ -600,6 +601,16 @@ export function makeRawFaqQuestionItem(
     answer: [
       makeRawContentBlock({ text: 'Most teams are live within a week.' }),
     ],
+    ...overrides,
+  };
+}
+
+export function makeRawFaqModuleQuestions(
+  overrides: Partial<TFaqModuleQuestions> = {},
+): TFaqModuleQuestions {
+  return {
+    _id: 'module-faq-1',
+    questions: [makeRawFaqQuestionItem()],
     ...overrides,
   };
 }

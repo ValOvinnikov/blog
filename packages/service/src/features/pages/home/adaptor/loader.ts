@@ -4,6 +4,7 @@ import {
   runQuery,
   type TTenantSanityContext,
 } from '@blog/service/sanity/query';
+import { getPageFaqs } from '@blog/service/shared/adaptors/faq-questions/page-faqs';
 
 import { homePageQuery } from './query';
 import { toHomePage } from './transformer';
@@ -14,9 +15,9 @@ export async function getHomePage(
 ): Promise<TMaybeUndefined<THomePage>> {
   const raw = await runQuery(homePageQuery, {
     tenant,
-    ...isr(['homePage', 'modules:faq', 'block_faq'], tenant.projectId),
+    ...isr('homePage', tenant.projectId),
   });
   if (!raw) return undefined;
 
-  return toHomePage(raw);
+  return toHomePage(raw, await getPageFaqs(raw.modules, tenant));
 }
