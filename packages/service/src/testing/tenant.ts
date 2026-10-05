@@ -1,4 +1,4 @@
-import type { TTenantSanityContext } from '@blog/service/sanity/query';
+import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
 
 export function makeTenant(
   overrides: Partial<TTenantSanityContext> = {},

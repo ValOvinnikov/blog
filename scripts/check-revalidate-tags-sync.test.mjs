@@ -146,7 +146,7 @@ describe('collectTagsFromSource', () => {
     const { tags, unresolved } = collectTagsFromSource(
       '/virtual/loader.ts',
       `
-        import { isr as buildCacheOptions } from '@blog/service/sanity/query';
+        import { isr as buildCacheOptions } from '@blog/service/sanity/query/isr';
         buildCacheOptions('post', tenant.projectId);
       `,
     );

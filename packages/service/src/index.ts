@@ -170,7 +170,7 @@ export type { TTopicIndexPage } from './features/pages/topic-index';
 export { urlForImage, urlForSanityImage } from './sanity/image';
 export type { TSanityProjectRef, TImageTransformOptions } from './sanity/image';
 export { getSanityImageBaseUrl } from './sanity/image-base-url';
-export type { TTenantSanityContext } from './sanity/query';
+export type { TTenantSanityContext } from './sanity/client';
 export { getPlatformSanityContext } from './sanity/client';
 export { getPlatformSanityWriteContext } from './sanity/write-client';
 export type { TCtaButton } from './shared/transformers/cta/to-cta-button';

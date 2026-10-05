@@ -1,4 +1,4 @@
-import { q } from '@blog/service/sanity/query';
+import { q } from '@blog/service/sanity/query/query';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/post/published-post';
 
 // Keyed by `_id` (the webhook payload's document id), not slug — this is the

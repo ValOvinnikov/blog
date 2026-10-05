@@ -1,5 +1,5 @@
 import { TAXONOMY_KIND, TAXONOMY_SORT } from '@blog/config';
-import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
+import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/post/published-post';
 import { localizedHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/localized-heading-block';
 import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';

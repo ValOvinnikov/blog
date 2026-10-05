@@ -1,5 +1,5 @@
 import { POST_SOURCE } from '@blog/config';
-import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
+import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/post/published-post';
 import { ctaSecondaryButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
 import { localizedImageWithAltFragment } from '@blog/service/shared/fragments/image/localized-image-with-alt';

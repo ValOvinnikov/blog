@@ -1,5 +1,5 @@
 import type { PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config';
-import { q } from '@blog/service/sanity/query';
+import { q } from '@blog/service/sanity/query/query';
 
 export const sanityImageAssetFragment = q
   .fragmentForType<'sanity.imageAsset'>()

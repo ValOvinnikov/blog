@@ -1,4 +1,4 @@
-import { q } from '@blog/service/sanity/query';
+import { q } from '@blog/service/sanity/query/query';
 import { localizedImageWithAltFragment } from '@blog/service/shared/fragments/image/localized-image-with-alt';
 import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document';
 import { socialProfileFragment } from '@blog/service/shared/fragments/social-profile/social-profile';

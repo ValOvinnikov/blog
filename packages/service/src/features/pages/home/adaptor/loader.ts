@@ -1,9 +1,9 @@
 import type { TMaybeUndefined } from '@blog/config';
+import { isr } from '@blog/service/sanity/query/isr';
 import {
-  isr,
   runQuery,
   type TTenantSanityContext,
-} from '@blog/service/sanity/query';
+} from '@blog/service/sanity/query/query';
 import { getPageFaqs } from '@blog/service/shared/adaptors/faq-questions/page-faqs';
 import { buildLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
 

@@ -1,4 +1,4 @@
-import { q } from '@blog/service/sanity/query';
+import { q } from '@blog/service/sanity/query/query';
 import { socialProfileFragment } from '@blog/service/shared/fragments/social-profile/social-profile';
 
 export const footerQuery = q.star

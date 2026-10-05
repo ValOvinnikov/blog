@@ -1,5 +1,5 @@
 import type { TContentAlignment, TContentAlignmentOf } from '@blog/config';
-import { q } from '@blog/service/sanity/query';
+import { q } from '@blog/service/sanity/query/query';
 
 export const moduleContentAlignmentFragment = q
   .fragment<{ contentAlignment?: TContentAlignment }>()

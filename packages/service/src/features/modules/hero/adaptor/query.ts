@@ -1,4 +1,4 @@
-import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
+import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
 import { moduleHeroLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { inlineLinkFragment } from '@blog/service/shared/fragments/link/inline-link';

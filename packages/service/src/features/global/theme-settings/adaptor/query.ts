@@ -1,4 +1,4 @@
-import { q } from '@blog/service/sanity/query';
+import { q } from '@blog/service/sanity/query/query';
 
 // `settings_theme` is a tenant-optional singleton — a fresh dataset has no
 // document yet, so the whole projection (and every field on it) is nullable;

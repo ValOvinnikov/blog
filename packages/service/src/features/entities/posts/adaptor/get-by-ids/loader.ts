@@ -1,8 +1,8 @@
+import { isr } from '@blog/service/sanity/query/isr';
 import {
-  isr,
   runQuery,
   type TTenantSanityContext,
-} from '@blog/service/sanity/query';
+} from '@blog/service/sanity/query/query';
 import type { TPostCard } from '@blog/service/shared/transformers/post/to-post-card';
 
 import { postsByIdsQuery } from './query';

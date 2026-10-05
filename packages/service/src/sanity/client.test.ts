@@ -22,7 +22,9 @@ describe('Sanity client module loading', () => {
     delete process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'];
     vi.resetModules();
 
-    await expect(import('./query')).resolves.toHaveProperty('runQuery');
+    await expect(
+      import('@blog/service/sanity/query/query'),
+    ).resolves.toHaveProperty('runQuery');
   });
 
   it('does not create a Sanity client while importing image helpers without a project id', async () => {

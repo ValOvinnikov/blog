@@ -12,8 +12,10 @@ import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getPost } from './loader';
 
-vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
+vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
+  ...(await importOriginal<
+    typeof import('@blog/service/sanity/query/query')
+  >()),
   runQuery: vi.fn(),
 }));
 

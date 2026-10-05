@@ -3,7 +3,7 @@ import type {
   Module_cta,
 } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { q } from '@blog/service/sanity/query';
+import { q } from '@blog/service/sanity/query/query';
 import type { textBlockFragment } from '@blog/service/shared/fragments/portable-text/text-block';
 import type { TLocalizedKey } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
 import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';

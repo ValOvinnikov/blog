@@ -1,4 +1,4 @@
-import { q } from '@blog/service/sanity/query';
+import { q } from '@blog/service/sanity/query/query';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/post/published-post';
 import { postFeedFragment } from '@blog/service/shared/fragments/post/post-feed';
 

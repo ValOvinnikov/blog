@@ -1,6 +1,6 @@
 import { LINK_TYPE } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { q } from '@blog/service/sanity/query';
+import { q } from '@blog/service/sanity/query/query';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import { localizedStrings } from '@blog/service/testing/shared/localized';
 
