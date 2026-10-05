@@ -1465,7 +1465,13 @@ export type Page_post = {
       } & Module_newsletterReference)
     | ({
         _key: string;
+      } & Module_postLatestReference)
+    | ({
+        _key: string;
       } & Module_postRelatedReference)
+    | ({
+        _key: string;
+      } & Module_taxonomyListReference)
   >;
   publishedAt?: string;
   postTakeaways?: PostTakeaways;
@@ -1552,6 +1558,9 @@ export type Page_tagIndex = {
   modules?: Array<
     | ({
         _key: string;
+      } & Module_contentReference)
+    | ({
+        _key: string;
       } & Module_ctaReference)
     | ({
         _key: string;
@@ -1586,6 +1595,12 @@ export type Page_tag = {
   headingBlock?: HeadingBlock;
   hero?: Module_heroBlogReference;
   modules?: Array<
+    | ({
+        _key: string;
+      } & Module_contentReference)
+    | ({
+        _key: string;
+      } & Module_faqReference)
     | ({
         _key: string;
       } & Module_ctaReference)
@@ -1634,6 +1649,9 @@ export type Page_topicIndex = {
   modules?: Array<
     | ({
         _key: string;
+      } & Module_contentReference)
+    | ({
+        _key: string;
       } & Module_ctaReference)
     | ({
         _key: string;
@@ -1680,6 +1698,12 @@ export type Page_topic = {
   modules?: Array<
     | ({
         _key: string;
+      } & Module_contentReference)
+    | ({
+        _key: string;
+      } & Module_faqReference)
+    | ({
+        _key: string;
       } & Module_ctaReference)
     | ({
         _key: string;
@@ -1720,6 +1744,9 @@ export type Page_postIndex = {
   modules?: Array<
     | ({
         _key: string;
+      } & Module_contentReference)
+    | ({
+        _key: string;
       } & Module_ctaReference)
     | ({
         _key: string;
@@ -1727,6 +1754,9 @@ export type Page_postIndex = {
     | ({
         _key: string;
       } & Module_postFeaturedReference)
+    | ({
+        _key: string;
+      } & Module_postLatestReference)
     | ({
         _key: string;
       } & Module_postListReference)

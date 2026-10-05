@@ -2,6 +2,7 @@ import type { TTaxonomyKind } from '@blog/config/constants';
 import { heroField } from '@blog/studio/schema-types/fields/hero-field/hero-field';
 import { modulesField } from '@blog/studio/schema-types/fields/modules-field/modules-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { contentSchema } from '@blog/studio/schema-types/modules/content/content';
 import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
@@ -60,7 +61,11 @@ export const taxonomyIndexPage = ({
       headingBlockField(),
       heroField({ allow: [heroBlogSchema.name] }),
       modulesField({
-        extend: [taxonomyListSchema.name, postLatestSchema.name],
+        extend: [
+          taxonomyListSchema.name,
+          postLatestSchema.name,
+          contentSchema.name,
+        ],
         once: [taxonomyListSchema.name],
       }),
       seoField(),

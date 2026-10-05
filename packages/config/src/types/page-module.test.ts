@@ -35,7 +35,11 @@ describe('page module type unions', () => {
 
   it('resolves page_post from modules[] alone', () => {
     expectTypeOf<TPagePostType>().toEqualTypeOf<
-      'module_postRelated' | 'module_newsletter' | 'module_cta'
+      | 'module_postRelated'
+      | 'module_newsletter'
+      | 'module_cta'
+      | 'module_postLatest'
+      | 'module_taxonomyList'
     >();
   });
 
@@ -70,6 +74,8 @@ describe('page module type unions', () => {
       | 'module_newsletter'
       | 'module_postFeatured'
       | 'module_taxonomyList'
+      | 'module_content'
+      | 'module_postLatest'
     >();
   });
 
@@ -81,6 +87,8 @@ describe('page module type unions', () => {
       | 'module_cta'
       | 'module_newsletter'
       | 'module_taxonomyList'
+      | 'module_content'
+      | 'module_faq'
     >();
   });
 
@@ -91,6 +99,7 @@ describe('page module type unions', () => {
       | 'module_postLatest'
       | 'module_cta'
       | 'module_newsletter'
+      | 'module_content'
     >();
   });
 
@@ -102,6 +111,8 @@ describe('page module type unions', () => {
       | 'module_cta'
       | 'module_newsletter'
       | 'module_taxonomyList'
+      | 'module_content'
+      | 'module_faq'
     >();
   });
 
@@ -112,6 +123,7 @@ describe('page module type unions', () => {
       | 'module_postLatest'
       | 'module_cta'
       | 'module_newsletter'
+      | 'module_content'
     >();
   });
 });
