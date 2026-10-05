@@ -1,9 +1,21 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import {
+  localizedStrings,
+  localizedValues,
+  paragraphBlocks,
+} from '@blog/service/testing/shared/localized';
 
 import {
   PAGE_FAQ_QUESTIONS_EXPRESSION,
   pageFaqQuestionsParser,
 } from './page-faq-questions';
+
+const { EN, NL, FR } = LOCALE_ISO_CODES;
+
+const root = {
+  modules: [{ _type: 'reference', _ref: 'module-faq-a' }],
+};
 
 const dataset = [
   {
@@ -17,20 +29,26 @@ const dataset = [
   {
     _id: 'block-faq-ok',
     _type: 'block_faq',
-    question: 'How much?',
-    answer: [
-      {
-        _type: 'block',
-        children: [{ _type: 'span', text: 'It depends.' }],
-      },
-    ],
+    question: localizedStrings({ [EN]: 'How much?', [NL]: 'Hoeveel?' }),
+    answer: localizedValues('internationalizedArrayListedTextValue', {
+      [EN]: paragraphBlocks('It depends.'),
+      [NL]: paragraphBlocks('Dat hangt ervan af.'),
+    }),
   },
 ];
+
+async function runPageFaqs(locale: string) {
+  return pageFaqQuestionsParser.parse(
+    await evaluateGroqExpression(PAGE_FAQ_QUESTIONS_EXPRESSION, dataset, root, {
+      locale,
+      defaultLocale: EN,
+    }),
+  );
+}
 
 describe('PAGE_FAQ_QUESTIONS_EXPRESSION', () => {
   it('filters modules to module_faq before flattening their questions', () => {
     expect(PAGE_FAQ_QUESTIONS_EXPRESSION).toContain('_type == "module_faq"');
-    expect(PAGE_FAQ_QUESTIONS_EXPRESSION).toContain('pt::text(answer)');
   });
 
   it('coalesces to an empty array when the page has no modules', () => {
@@ -52,19 +70,23 @@ describe('PAGE_FAQ_QUESTIONS_EXPRESSION', () => {
   });
 
   it('drops a question whose block_faq reference is dangling', async () => {
-    const root = {
-      modules: [{ _type: 'reference', _ref: 'module-faq-a' }],
-    };
+    expect(await runPageFaqs(EN)).toEqual([
+      { id: 'block-faq-ok', question: 'How much?', answer: 'It depends.' },
+    ]);
+  });
 
-    const parsed = pageFaqQuestionsParser.parse(
-      await evaluateGroqExpression(
-        PAGE_FAQ_QUESTIONS_EXPRESSION,
-        dataset,
-        root,
-      ),
-    );
+  it('reads each question and answer in the visitor language', async () => {
+    expect(await runPageFaqs(NL)).toEqual([
+      {
+        id: 'block-faq-ok',
+        question: 'Hoeveel?',
+        answer: 'Dat hangt ervan af.',
+      },
+    ]);
+  });
 
-    expect(parsed).toEqual([
+  it('falls back to the default language', async () => {
+    expect(await runPageFaqs(FR)).toEqual([
       { id: 'block-faq-ok', question: 'How much?', answer: 'It depends.' },
     ]);
   });

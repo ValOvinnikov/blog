@@ -4,8 +4,8 @@ import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fiel
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
+import { localizedHeadingBlockField } from '@blog/studio/schema-types/objects/localized-heading-block/localized-heading-block-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { MessageCircleQuestion } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
@@ -20,7 +20,7 @@ export const faqSchema = defineType({
   fields: [
     titleField(),
     brandVariantField(),
-    headingBlockField(),
+    localizedHeadingBlockField(),
     defineField({
       name: 'questions',
       title: 'Questions',
