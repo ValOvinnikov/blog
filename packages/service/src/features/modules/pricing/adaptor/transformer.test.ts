@@ -30,7 +30,10 @@ describe('toPricingModule', () => {
             }),
           ],
           priceLabel: null,
-          features: ['Unlimited posts', 'Priority support'],
+          features: [
+            { _key: 'feature-1', text: 'Unlimited posts' },
+            { _key: 'feature-2', text: 'Priority support' },
+          ],
           ctaButtons: [makeRawCtaButton()],
           highlightLabel: 'Most popular',
           footnote: 'Billed annually',
@@ -65,6 +68,25 @@ describe('toPricingModule', () => {
       },
     ]);
     expect(module.tiers[0]?.ctaButtons).toHaveLength(1);
+  });
+
+  it('drops a feature with no text in either language', () => {
+    const raw = makeRawPricingModule({
+      tiers: [
+        makeRawPricingTier({
+          features: [
+            { _key: 'feature-1', text: 'Unlimited posts' },
+            { _key: 'feature-2', text: null },
+            { _key: 'feature-3', text: 'Priority support' },
+          ],
+        }),
+      ],
+    });
+
+    expect(toPricingModule(raw).tiers[0]?.features).toEqual([
+      'Unlimited posts',
+      'Priority support',
+    ]);
   });
 
   it('keeps tiers in authored order', () => {

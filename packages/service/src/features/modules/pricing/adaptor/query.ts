@@ -1,7 +1,8 @@
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
 import { ctaButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
-import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
+import { localizedHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/localized-heading-block';
 import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
 
 export const pricingModuleQuery = q
   .parameters<TModuleQueryParams>()
@@ -12,14 +13,14 @@ export const pricingModuleQuery = q
     brandVariant: sub.field('brandVariant').notNull(),
     headingBlock: sub
       .field('headingBlock')
-      .project(headingBlockFragment)
+      .project(localizedHeadingBlockFragment)
       .notNull(),
     tiers: sub
       .field('tiers[]')
       .project((tierSub) => ({
         _key: true,
-        name: tierSub.field('name').notNull(),
-        description: tierSub.field('description').nullable(true),
+        name: getLocalizedField(tierSub, 'name').notNull(),
+        description: getLocalizedField(tierSub, 'description'),
         prices: tierSub
           .field('prices[]')
           .project((priceSub) => ({
@@ -30,17 +31,23 @@ export const pricingModuleQuery = q
             isStartingAt: priceSub.field('isStartingAt').nullable(true),
           }))
           .nullable(true),
-        priceLabel: tierSub.field('priceLabel').nullable(true),
-        features: tierSub.field('features[]').nullable(true),
+        priceLabel: getLocalizedField(tierSub, 'priceLabel'),
+        features: tierSub
+          .field('features[]')
+          .project((featureSub) => ({
+            _key: true,
+            text: getLocalizedField(featureSub, 'text'),
+          }))
+          .nullable(true),
         ctaButtons: tierSub
           .field('ctaButtons[]')
           .project(ctaButtonFragment)
           .nullable(true),
-        highlightLabel: tierSub.field('highlightLabel').nullable(true),
-        footnote: tierSub.field('footnote').nullable(true),
+        highlightLabel: getLocalizedField(tierSub, 'highlightLabel'),
+        footnote: getLocalizedField(tierSub, 'footnote'),
       }))
       .notNull(),
-    footnote: sub.field('footnote').nullable(true),
+    footnote: getLocalizedField(sub, 'footnote'),
     ctaButtons: sub
       .field('ctaButtons[]')
       .project(ctaButtonFragment)

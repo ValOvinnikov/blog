@@ -1,15 +1,12 @@
 import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
 import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
-import { localizedStringValues } from '@blog/studio/schema-types/validation/localized-string-values/localized-string-values';
 import { validateDefaultLanguageFilled } from '@blog/studio/schema-types/validation/validate-default-language-filled/validate-default-language-filled';
+import { validateLocalizedMaxLength } from '@blog/studio/schema-types/validation/validate-localized-max-length/validate-localized-max-length';
 import { Hash } from 'lucide-react';
 import { defineType } from 'sanity';
 
 const VALUE_MAX_LENGTH = 8;
 const LABEL_MAX_LENGTH = 48;
-
-const isAnyLongerThan = (value: unknown, maxLength: number) =>
-  localizedStringValues(value).some((text) => text.length > maxLength);
 
 export const statSchema = defineType({
   name: 'stat',
@@ -25,10 +22,11 @@ export const statSchema = defineType({
       validation: (rule) => [
         rule.custom(validateDefaultLanguageFilled('Add the figure.')),
         rule
-          .custom((value) =>
-            isAnyLongerThan(value, VALUE_MAX_LENGTH)
-              ? 'Long values stop reading as a figure — try an abbreviation like 2.4M.'
-              : true,
+          .custom(
+            validateLocalizedMaxLength(
+              VALUE_MAX_LENGTH,
+              'Long values stop reading as a figure — try an abbreviation like 2.4M.',
+            ),
           )
           .warning(),
       ],
@@ -41,10 +39,11 @@ export const statSchema = defineType({
       validation: (rule) => [
         rule.custom(validateDefaultLanguageFilled('Add a label.')),
         rule
-          .custom((value) =>
-            isAnyLongerThan(value, LABEL_MAX_LENGTH)
-              ? 'Long labels wrap under narrow columns — a few words reads best.'
-              : true,
+          .custom(
+            validateLocalizedMaxLength(
+              LABEL_MAX_LENGTH,
+              'Long labels wrap under narrow columns — a few words reads best.',
+            ),
           )
           .warning(),
       ],

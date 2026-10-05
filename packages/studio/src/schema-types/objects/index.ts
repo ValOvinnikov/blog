@@ -18,6 +18,7 @@ import { localizedImageWithAltSchema } from './localized-image-with-alt/localize
 import { logoItemSchema } from './logo-item/logo-item';
 import { openGraphSchema } from './open-graph/open-graph';
 import { postTakeawaysSchema } from './post-takeaways/post-takeaways';
+import { pricingFeatureSchema } from './pricing-feature/pricing-feature';
 import { pricingPriceSchema } from './pricing-price/pricing-price';
 import { pricingTierSchema } from './pricing-tier/pricing-tier';
 import { seoSchema } from './seo/seo';
@@ -51,5 +52,6 @@ export const objects = [
   statSchema,
   timelineItemSchema,
   pricingPriceSchema,
+  pricingFeatureSchema,
   pricingTierSchema,
 ];
