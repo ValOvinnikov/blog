@@ -33,6 +33,7 @@ export const makeTopicDetailPage = (
     headingBlock: makeHeadingBlock({ heading: 'Engineering' }),
     hero: undefined,
     modules: [],
+    faqs: [],
     seo: {
       title: 'Engineering',
       description: 'Posts about building things.',
