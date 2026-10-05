@@ -1,27 +1,20 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { at, defineMigration, set } from 'sanity/migrate';
+
+import { inDefaultLocale, localizedString } from '../lib/in-default-locale';
+import {
+  localizeHeadingBlock,
+  type THeadingBlockValue,
+} from '../lib/localize-heading-block';
 
 type TSanityObject = { _type?: string; [field: string]: unknown };
 
 type TCtaDoc = {
-  headingBlock?: TSanityObject;
+  headingBlock?: THeadingBlockValue;
   eyebrow?: unknown;
   footnote?: unknown;
   content?: unknown;
   image?: TSanityObject;
 };
-
-// Every tenant's default language is English when this runs.
-const DEFAULT_LOCALE = LOCALE_ISO_CODES.EN;
-
-const inDefaultLocale = (type: string, value: unknown) => [
-  { _key: DEFAULT_LOCALE, _type: type, language: DEFAULT_LOCALE, value },
-];
-
-const localizedString = (value: unknown) =>
-  typeof value === 'string'
-    ? inDefaultLocale('internationalizedArrayStringValue', value)
-    : value;
 
 const isPortableText = (value: unknown): value is unknown[] =>
   Array.isArray(value) &&
@@ -29,33 +22,6 @@ const isPortableText = (value: unknown): value is unknown[] =>
   value.every(
     (item) => (item as { _type?: unknown } | null)?._type === 'block',
   );
-
-const localizeHeadingBlock = (headingBlock: TCtaDoc['headingBlock']) => {
-  if (!headingBlock || headingBlock._type === 'localizedHeadingBlock') {
-    return [];
-  }
-
-  const { heading, supportingText, ...rest } = headingBlock;
-
-  return [
-    at(
-      'headingBlock',
-      set({
-        ...rest,
-        _type: 'localizedHeadingBlock',
-        ...(heading === undefined ? {} : { heading: localizedString(heading) }),
-        ...(typeof supportingText === 'string'
-          ? {
-              supportingText: inDefaultLocale(
-                'internationalizedArrayTextValue',
-                supportingText,
-              ),
-            }
-          : {}),
-      }),
-    ),
-  ];
-};
 
 const localizeImage = (image: TCtaDoc['image']) => {
   if (!image || image._type === 'localizedImageWithAlt') {
