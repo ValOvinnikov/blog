@@ -3,7 +3,7 @@ import {
   SHOW_IMAGES_EXPRESSION,
   showImagesParser,
 } from '@blog/service/shared/expressions/module/show-images';
-import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
+import { localizedHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/localized-heading-block';
 import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 
@@ -16,7 +16,7 @@ export const postListModuleQuery = q
     brandVariant: sub.field('brandVariant').notNull(),
     headingBlock: sub
       .field('headingBlock')
-      .project(headingBlockFragment)
+      .project(localizedHeadingBlockFragment)
       .notNull(),
     pageSize: sub.field('pageSize').notNull(),
     ...moduleWideLayoutFragment,
