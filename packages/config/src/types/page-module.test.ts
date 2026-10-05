@@ -10,7 +10,7 @@ import type {
 } from './page-module';
 
 describe('page module type unions', () => {
-  it('resolves page_home to its heroField and modulesField({ allow }) kinds', () => {
+  it('resolves page_home from the heroField and modulesField({ allow }) kinds of template_home', () => {
     expectTypeOf<TPageHomeType>().toEqualTypeOf<
       | 'module_heroBlog'
       | 'module_heroStatement'
@@ -39,7 +39,7 @@ describe('page module type unions', () => {
     >();
   });
 
-  it('resolves page_landing', () => {
+  it('resolves page_landing from template_landing', () => {
     expectTypeOf<TPageLandingType>().toEqualTypeOf<
       | 'module_heroBlog'
       | 'module_heroStatement'

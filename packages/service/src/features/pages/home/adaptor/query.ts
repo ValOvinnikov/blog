@@ -19,12 +19,16 @@ export const homePageQuery = q
       .project(headingBlockFragment)
       .notNull(),
     hero: sub
+      .field('template')
+      .deref()
       .field('hero')
       .deref()
       .project(moduleFragment)
       .as<TRawModule<TPageHomeType>>()
       .nullable(),
     modules: sub
+      .field('template')
+      .deref()
       .field('modules[]')
       .deref()
       .project(moduleFragment)

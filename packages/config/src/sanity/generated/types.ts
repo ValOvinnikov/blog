@@ -1193,6 +1193,26 @@ export type InternationalizedArrayReferenceValue = {
   language?: string;
 };
 
+export type Template_homeReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'template_home';
+};
+
+export type Page_home = {
+  _id: string;
+  _type: 'page_home';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  language?: 'EN' | 'NL' | 'FR' | 'DE' | 'ES';
+  title?: string;
+  headingBlock?: HeadingBlock;
+  template?: Template_homeReference;
+  seo?: Seo;
+};
+
 export type Module_heroBlogReference = {
   _ref: string;
   _type: 'reference';
@@ -1319,15 +1339,13 @@ export type Module_timelineReference = {
   [internalGroqTypeReferenceTo]?: 'module_timeline';
 };
 
-export type Page_home = {
+export type Template_home = {
   _id: string;
-  _type: 'page_home';
+  _type: 'template_home';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  language?: 'EN' | 'NL' | 'FR' | 'DE' | 'ES';
   title?: string;
-  headingBlock?: HeadingBlock;
   hero?:
     | Module_heroBlogReference
     | Module_heroProfileReference
@@ -1379,7 +1397,6 @@ export type Page_home = {
         _key: string;
       } & Module_timelineReference)
   >;
-  seo?: Seo;
 };
 
 export type Module_heroBlog = {
@@ -1720,6 +1737,13 @@ export type Page_postIndex = {
   seo?: Seo;
 };
 
+export type Template_landingReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'template_landing';
+};
+
 export type Page_landing = {
   _id: string;
   _type: 'page_landing';
@@ -1730,6 +1754,17 @@ export type Page_landing = {
   title?: string;
   slug?: Slug;
   headingBlock?: HeadingBlock;
+  template?: Template_landingReference;
+  seo?: Seo;
+};
+
+export type Template_landing = {
+  _id: string;
+  _type: 'template_landing';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
   hero?:
     | Module_heroBlogReference
     | Module_heroProfileReference
@@ -1781,7 +1816,6 @@ export type Page_landing = {
         _key: string;
       } & Module_timelineReference)
   >;
-  seo?: Seo;
 };
 
 export type Module_heroStatement = {
@@ -2050,6 +2084,8 @@ export type AllSanitySchemaTypes =
   | InternationalizedArrayReference
   | Page_homeReference
   | InternationalizedArrayReferenceValue
+  | Template_homeReference
+  | Page_home
   | Module_heroBlogReference
   | Module_heroProfileReference
   | Module_heroStatementReference
@@ -2068,7 +2104,7 @@ export type AllSanitySchemaTypes =
   | Module_teamReference
   | Module_testimonialReference
   | Module_timelineReference
-  | Page_home
+  | Template_home
   | Module_heroBlog
   | Blog_tagReference
   | Module_postRelatedReference
@@ -2089,7 +2125,9 @@ export type AllSanitySchemaTypes =
   | Page_topic
   | Blog_topic
   | Page_postIndex
+  | Template_landingReference
   | Page_landing
+  | Template_landing
   | Module_heroStatement
   | Module_heroProfile
   | MediaFolderReference

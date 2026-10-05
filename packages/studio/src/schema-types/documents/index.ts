@@ -19,6 +19,8 @@ import { newsletterSettingsSchema } from './settings/newsletter/newsletter';
 import { siteSettingsSchema } from './settings/site-settings/site-settings';
 import { themeSettingsSchema } from './settings/theme/theme';
 import { migrationStateSchema } from './system/migration-state/migration-state';
+import { homeTemplateSchema } from './templates/home/home';
+import { landingTemplateSchema } from './templates/landing/landing';
 
 export const documents = [
   personSchema,
@@ -28,6 +30,8 @@ export const documents = [
   blockTestimonialSchema,
   faqBlockSchema,
   linkSchema,
+  homeTemplateSchema,
+  landingTemplateSchema,
   landingPageSchema,
   homePageSchema,
   postIndexPageSchema,

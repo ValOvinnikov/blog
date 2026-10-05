@@ -29,6 +29,8 @@ type TCachedDocumentType =
   | 'page_landing'
   | 'page_post'
   | 'page_home'
+  | 'template_home'
+  | 'template_landing'
   | 'person'
   | 'blog_topic'
   | 'blog_tag'
@@ -71,6 +73,8 @@ const REVALIDATE_TAGS = {
   page_home: ['homePage'],
   page_postIndex: ['page_postIndex'],
   page_landing: ['page_landing'],
+  template_home: ['homePage', 'template_home'],
+  template_landing: ['page_landing', 'template_landing'],
   page_post: ['page_post', 'posts', 'author', 'topic', 'tag'],
   page_tag: ['page_tag'],
   page_topic: ['page_topic'],
