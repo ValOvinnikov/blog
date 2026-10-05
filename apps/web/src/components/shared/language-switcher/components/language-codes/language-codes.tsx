@@ -14,12 +14,12 @@ export const LanguageCodes = ({
   entries,
   isInFooter = false,
 }: TLanguageCodesProps) => {
-  const { list, item, link } = languageCodesVariants({ isInFooter });
+  const { list, link } = languageCodesVariants({ isInFooter });
 
   return (
     <ul className={list()}>
       {entries.map((entry) => (
-        <li key={entry.locale} className={item()}>
+        <li key={entry.locale}>
           <NavLink
             href={entry.href}
             lang={entry.lang}
