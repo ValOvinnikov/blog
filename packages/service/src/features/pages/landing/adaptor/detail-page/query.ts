@@ -5,7 +5,7 @@ import { moduleFragment } from '@blog/service/shared/fragments/module/module';
 import { seoFragment } from '@blog/service/shared/fragments/seo/seo';
 import { translationsQuery } from '@blog/service/shared/localization/page-translations/translations';
 import type { TRawModule } from '@blog/service/shared/transformers/module/to-module';
-import type { TLocalizedSlugParams } from '@blog/service/shared/types/page';
+import type { TLocalizedSlugParams } from '@blog/service/shared/types/page/localized-slug-params';
 
 export const landingPageQuery = q
   .parameters<TLocalizedSlugParams>()
