@@ -199,7 +199,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
   const translationMap = translationMapResult.ok
     ? translationMapResult.data
-    : { groups: [] };
+    : { groups: [], homeLanguages: [] };
 
   return [
     toEntry(routes.home(), siteUrl),

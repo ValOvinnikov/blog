@@ -1,8 +1,8 @@
 import { q } from '@blog/service/sanity/query';
+import { homeLanguagesQuery } from '@blog/service/shared/localization/home-languages/home-languages';
 
-export const translationMapQuery = q.star
-  .filterByType('translation.metadata')
-  .project((group) => ({
+export const translationMapQuery = q.project((root) => ({
+  groups: root.star.filterByType('translation.metadata').project((group) => ({
     entries: group
       .field('translations[]')
       .field('value')
@@ -15,4 +15,6 @@ export const translationMapQuery = q.star
         slug: target.field('slug.current').nullable(true),
       }))
       .nullable(true),
-  }));
+  })),
+  homes: homeLanguagesQuery,
+}));

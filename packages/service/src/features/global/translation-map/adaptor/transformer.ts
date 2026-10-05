@@ -1,3 +1,5 @@
+import type { TLocaleIsoCode } from '@blog/config/constants';
+import { toHomeLanguages } from '@blog/service/shared/localization/home-languages/to-home-languages';
 import type { InferResultType } from 'groqd';
 
 import type { translationMapQuery } from './query';
@@ -9,13 +11,17 @@ import type {
 
 export type TRawTranslationMap = InferResultType<typeof translationMapQuery>;
 
-export function toTranslationMap(raw: TRawTranslationMap): TTranslationMap {
+export function toTranslationMap(
+  raw: TRawTranslationMap,
+  defaultLocale: TLocaleIsoCode,
+): TTranslationMap {
   return {
-    groups: raw.map(({ entries }) =>
+    groups: raw.groups.map(({ entries }) =>
       (entries ?? []).flatMap(({ documentType, language, slug }) =>
         language && slug ? [{ documentType, language, slug }] : [],
       ),
     ),
+    homeLanguages: toHomeLanguages(raw.homes, defaultLocale),
   };
 }
 

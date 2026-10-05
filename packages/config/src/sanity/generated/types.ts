@@ -128,38 +128,14 @@ export type Module_content = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  body?: ArticleText;
+  body?: InternationalizedArrayArticleText;
   layout?: Layout;
 };
 
-export type ArticleText = Array<
-  | {
-      children?: Array<{
-        marks?: Array<string>;
-        text?: string;
-        _type: 'span';
-        _key: string;
-      }>;
-      style?: 'normal' | 'h2' | 'h3' | 'h4' | 'blockquote';
-      listItem?: 'bullet' | 'number';
-      markDefs?: Array<
-        {
-          _key: string;
-        } & LinkRef
-      >;
-      level?: number;
-      _type: 'block';
-      _key: string;
-    }
-  | ({
-      _key: string;
-    } & BodyImage)
-  | ({
-      _key: string;
-    } & Code)
-  | ({
-      _key: string;
-    } & Aside)
+export type InternationalizedArrayArticleText = Array<
+  {
+    _key: string;
+  } & InternationalizedArrayArticleTextValue
 >;
 
 export type Block_faqReference = {
@@ -413,7 +389,7 @@ export type Module_postRelated = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  headingBlock?: HeadingBlock;
+  headingBlock?: LocalizedHeadingBlock;
   limit?: number;
   showImages?: boolean;
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
@@ -435,7 +411,7 @@ export type Module_postFeatured = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  headingBlock?: HeadingBlock;
+  headingBlock?: LocalizedHeadingBlock;
   postSource?: 'PINNED' | 'NEWEST_FEATURED';
   posts?: Array<
     {
@@ -473,7 +449,7 @@ export type Module_postList = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  headingBlock?: HeadingBlock;
+  headingBlock?: LocalizedHeadingBlock;
   pageSize?: number;
   showImages?: boolean;
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
@@ -594,6 +570,36 @@ export type ParagraphText = Array<{
   _type: 'block';
   _key: string;
 }>;
+
+export type ArticleText = Array<
+  | {
+      children?: Array<{
+        marks?: Array<string>;
+        text?: string;
+        _type: 'span';
+        _key: string;
+      }>;
+      style?: 'normal' | 'h2' | 'h3' | 'h4' | 'blockquote';
+      listItem?: 'bullet' | 'number';
+      markDefs?: Array<
+        {
+          _key: string;
+        } & LinkRef
+      >;
+      level?: number;
+      _type: 'block';
+      _key: string;
+    }
+  | ({
+      _key: string;
+    } & BodyImage)
+  | ({
+      _key: string;
+    } & Code)
+  | ({
+      _key: string;
+    } & Aside)
+>;
 
 export type PricingTier = {
   _type: 'pricingTier';
@@ -1122,6 +1128,12 @@ export type Block_feature = {
   link?: LinkReference;
 };
 
+export type InternationalizedArrayArticleTextValue = {
+  _type: 'internationalizedArrayArticleTextValue';
+  value?: ArticleText;
+  language?: string;
+};
+
 export type InternationalizedArrayParagraphTextValue = {
   _type: 'internationalizedArrayParagraphTextValue';
   value?: ParagraphText;
@@ -1380,9 +1392,9 @@ export type Module_heroBlog = {
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
   postSource?: 'PINNED' | 'NEWEST_FEATURED';
   post?: Page_postReference;
-  image?: ImageWithAlt;
-  eyebrow?: string;
-  primaryActionLabel?: string;
+  image?: LocalizedImageWithAlt;
+  eyebrow?: InternationalizedArrayString;
+  primaryActionLabel?: InternationalizedArrayString;
   primaryActionAppearance?: 'CONTAINED' | 'INLINE';
   secondaryAction?: CtaSecondaryButton;
   variant?: 'SPLIT' | 'STACKED' | 'BANNER';
@@ -1628,7 +1640,7 @@ export type Module_taxonomyList = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  headingBlock?: HeadingBlock;
+  headingBlock?: LocalizedHeadingBlock;
   taxonomy?: 'TOPICS' | 'TAGS';
   sortOrder?: 'ALPHABETICAL' | 'MOST_POSTS';
   limit?: number;
@@ -1966,7 +1978,7 @@ export type AllSanitySchemaTypes =
   | SanityImageAssetReference
   | LocalizedImageWithAlt
   | Module_content
-  | ArticleText
+  | InternationalizedArrayArticleText
   | Block_faqReference
   | Module_faq
   | Module_timeline
@@ -1994,6 +2006,7 @@ export type AllSanitySchemaTypes =
   | ImageWithAlt
   | ListedText
   | ParagraphText
+  | ArticleText
   | PricingTier
   | PricingFeature
   | PricingPrice
@@ -2027,6 +2040,7 @@ export type AllSanitySchemaTypes =
   | Block_faq
   | Block_testimonial
   | Block_feature
+  | InternationalizedArrayArticleTextValue
   | InternationalizedArrayParagraphTextValue
   | InternationalizedArrayListedTextValue
   | InternationalizedArrayTextValue

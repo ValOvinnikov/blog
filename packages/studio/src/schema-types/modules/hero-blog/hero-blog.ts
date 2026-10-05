@@ -12,12 +12,15 @@ import {
   heroMediaOrderStackedField,
 } from '@blog/studio/schema-types/fields/hero-media-order-fields/hero-media-order-fields';
 import { heroVariantField } from '@blog/studio/schema-types/fields/hero-variant-field/hero-variant-field';
+import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { publishedPostFilter } from '@blog/studio/schema-types/filters/published-post';
 import { heroFieldsets } from '@blog/studio/schema-types/modules/hero-fieldsets/hero-fieldsets';
 import { ctaSecondaryButtonSchema } from '@blog/studio/schema-types/objects/cta-button/cta-button';
 import { heroLayoutField } from '@blog/studio/schema-types/objects/hero-layout/hero-layout-field';
-import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
+import { localizedImageWithAltSchema } from '@blog/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
+import { validateDefaultLanguageFilled } from '@blog/studio/schema-types/validation/validate-default-language-filled/validate-default-language-filled';
+import { validateLocalizedMaxLength } from '@blog/studio/schema-types/validation/validate-localized-max-length/validate-localized-max-length';
 import { validateNewestFeaturedHasCandidate } from '@blog/studio/schema-types/validation/validate-newest-featured-has-candidate/validate-newest-featured-has-candidate';
 import { toTitleCase } from '@blog/utils/primitives';
 import { Star } from 'lucide-react';
@@ -30,6 +33,7 @@ type THeroBlogDocument = {
 
 const FIELDSET_POST = 'post';
 const FIELDSET_PRIMARY_ACTION = 'primaryAction';
+const PRIMARY_ACTION_LABEL_MAX_LENGTH = 40;
 
 export const heroBlogSchema = defineType({
   name: 'module_heroBlog',
@@ -96,24 +100,30 @@ export const heroBlogSchema = defineType({
     defineField({
       name: 'image',
       title: 'Image',
-      type: imageWithAltSchema.name,
+      type: localizedImageWithAltSchema.name,
       description:
         "Upload an image to use it here. Falls back to the post's own hero image when left empty.",
     }),
-    defineField({
+    localizedOneLineTextField({
       name: 'eyebrow',
       title: 'Eyebrow',
-      type: 'string',
       description:
         "Short line above the heading. Defaults to the post's topic.",
     }),
-    defineField({
+    localizedOneLineTextField({
       name: 'primaryActionLabel',
       title: 'Label',
-      type: 'string',
-      description: 'Text of the action.',
+      description: 'Text of the action, per language.',
       fieldset: FIELDSET_PRIMARY_ACTION,
-      validation: (rule) => rule.required().max(40),
+      validation: (rule) => [
+        rule.custom(validateDefaultLanguageFilled('Give the action a label.')),
+        rule.custom(
+          validateLocalizedMaxLength(
+            PRIMARY_ACTION_LABEL_MAX_LENGTH,
+            `Keep the label under ${PRIMARY_ACTION_LABEL_MAX_LENGTH} characters.`,
+          ),
+        ),
+      ],
     }),
     defineField({
       name: 'primaryActionAppearance',

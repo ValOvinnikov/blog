@@ -6,6 +6,7 @@ import { toSwitchLanguageTarget } from './to-switch-language-target';
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
 const translationMap: TTranslationMap = {
+  homeLanguages: [],
   groups: [
     [
       { documentType: 'page_landing', language: EN, slug: 'about' },

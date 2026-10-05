@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import type { TRawHomePage } from '@blog/service/features/pages/home/adaptor/transformer';
 import type { TRawLandingPage } from '@blog/service/features/pages/landing/adaptor/detail-page/transformer';
 import type { TRawPostDetail } from '@blog/service/features/pages/post/adaptor/detail-page/transformer';
@@ -101,6 +102,7 @@ export function makeRawHomePage(
       { _id: 'cta-1', _type: 'module_cta' },
     ],
     seo: makeRawSeo(),
+    translations: [{ language: LOCALE_ISO_CODES.EN }],
     ...overrides,
   };
 }

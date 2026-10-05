@@ -9,7 +9,7 @@ import { privateRedirect } from '@web/utils/private-redirect';
 import { toSwitchLanguageTarget } from '@web/utils/to-switch-language-target';
 import { NextResponse, type NextRequest } from 'next/server';
 
-const EMPTY_TRANSLATION_MAP = { groups: [] };
+const EMPTY_TRANSLATION_MAP = { groups: [], homeLanguages: [] };
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const tenant = await resolveRequestTenant();

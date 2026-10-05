@@ -49,10 +49,6 @@ const makeMockStructureBuilder = (dataset: Record<string, unknown>[] = []) => ({
         (await evaluate(parse(query), { dataset, params })).get(),
     }),
   },
-  component: vi.fn((component: unknown) => ({
-    ...makeMockBuilder('component'),
-    component,
-  })),
   divider: vi.fn(() => makeMockBuilder('divider')),
   listItem: vi.fn(() => makeMockBuilder('listItem')),
   documentTypeListItem: vi.fn((documentType: string) =>
@@ -598,7 +594,7 @@ describe(buildSections, () => {
   describe('onePerLanguage items', () => {
     const { EN, NL, DE } = LOCALE_ISO_CODES;
 
-    const buildHomeItems = (dataset: Record<string, unknown>[]) => {
+    const buildHomeEntries = (dataset: Record<string, unknown>[]) => {
       const S = makeMockStructureBuilder(dataset);
       const [section] = buildSections(
         asStructureBuilder(S),
@@ -624,6 +620,23 @@ describe(buildSections, () => {
       const list = callArgs(section!, 'child')?.[0] as TMockBuilder;
       return callArgs(list, 'items')?.[0] as TMockBuilder[];
     };
+
+    const buildHomeItems = (dataset: Record<string, unknown>[]) => {
+      const [home] = buildHomeEntries(dataset);
+      const languages = callArgs(home!, 'child')?.[0] as TMockBuilder;
+      return callArgs(languages, 'items')?.[0] as TMockBuilder[];
+    };
+
+    it('shows one Home entry that opens its language list', () => {
+      const entries = buildHomeEntries([]);
+      const languages = callArgs(entries[0]!, 'child')?.[0] as TMockBuilder;
+
+      expect(entries).toHaveLength(1);
+      expect(callArgs(entries[0]!, 'title')).toEqual(['Home']);
+      expect(callArgs(entries[0]!, 'id')).toEqual(['homePage']);
+      expect(languages.kind).toBe('list');
+      expect(callArgs(languages, 'title')).toEqual(['Home']);
+    });
 
     const resolveChild = async (item: TMockBuilder) => {
       const resolver = callArgs(
@@ -672,15 +685,17 @@ describe(buildSections, () => {
       expect(callArgs(child, 'initialValueTemplate')).toEqual(['homePage-NL']);
     });
 
-    it('points a missing translation at the default-language document', async () => {
+    it('opens a new document in a language that has none', async () => {
       const [, english] = buildHomeItems([
-        { _id: 'drafts.home-nl', _type: 'homePage', language: NL },
+        { _id: 'homePage', _type: 'homePage', language: NL },
       ]);
 
       const child = await resolveChild(english!);
 
-      expect(child.kind).toBe('component');
-      expect(callArgs(child, 'title')).toEqual(['English Home']);
+      expect(child.kind).toBe('document');
+      expect(callArgs(child, 'schemaType')).toEqual(['homePage']);
+      expect(callArgs(child, 'initialValueTemplate')).toEqual(['homePage-EN']);
+      expect(callArgs(child, 'documentId')).not.toEqual(['homePage']);
     });
   });
 });

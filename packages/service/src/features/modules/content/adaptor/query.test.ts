@@ -1,9 +1,50 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { makeRawContentModule } from '@blog/service/testing/modules/fixtures';
 import { makeRawExternalLinkDocument } from '@blog/service/testing/shared/fixtures';
+import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import {
+  localizedValues,
+  paragraphBlocks,
+} from '@blog/service/testing/shared/localized';
 
 import { contentModuleQuery } from './query';
 
+const { EN, NL, FR } = LOCALE_ISO_CODES;
+
+const contentDocument = {
+  _id: 'content-1',
+  _type: 'module_content',
+  brandVariant: 'PRIMARY',
+  body: localizedValues('internationalizedArrayArticleTextValue', {
+    [EN]: paragraphBlocks('Read on.'),
+    [NL]: paragraphBlocks('Lees verder.'),
+  }),
+};
+
+async function runContent(locale: string) {
+  const raw = await evaluateGroqExpression(
+    contentModuleQuery.query,
+    [contentDocument],
+    undefined,
+    { id: 'content-1', locale, defaultLocale: EN },
+  );
+
+  return contentModuleQuery.parse(raw);
+}
+
 describe('contentModuleQuery', () => {
+  it('resolves the body in the requested language', async () => {
+    expect((await runContent(NL)).body).toMatchObject([
+      { children: [{ text: 'Lees verder.' }] },
+    ]);
+  });
+
+  it('falls back to the default-language body', async () => {
+    expect((await runContent(FR)).body).toMatchObject([
+      { children: [{ text: 'Read on.' }] },
+    ]);
+  });
+
   it('parses a body containing only a text block', () => {
     const raw = makeRawContentModule();
 
