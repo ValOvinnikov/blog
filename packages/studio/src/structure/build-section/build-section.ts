@@ -4,6 +4,7 @@ import {
   type TLocaleIsoCode,
 } from '@blog/config/constants';
 import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
+import { isSingleLanguage } from '@blog/studio/structure/locales/is-single-language';
 import type { ComponentType } from 'react';
 import { getPublishedId, type SchemaTypeDefinition } from 'sanity';
 import type { ListItemBuilder, StructureBuilder } from 'sanity/structure';
@@ -47,17 +48,18 @@ const requireSchemaField = <TValue>(
 
 const ALL_PAGES_TITLE = 'All pages';
 
+type TPageItem = {
+  name: string;
+  title: string;
+  icon: TStructureSchema['icon'];
+};
+
+const templateIdFor = (name: string, locale: TLocaleIsoCode) =>
+  `${name}-${locale}`;
+
 const buildByLanguageItem = (
   S: StructureBuilder,
-  {
-    name,
-    title,
-    icon,
-  }: {
-    name: string;
-    title: string;
-    icon: TStructureSchema['icon'];
-  },
+  { name, title, icon }: TPageItem,
   locales: readonly TLocaleIsoCode[],
 ): ListItemBuilder => {
   const languageList = (
@@ -84,7 +86,22 @@ const buildByLanguageItem = (
           ),
       );
 
-  const templateIdFor = (locale: TLocaleIsoCode) => `${name}-${locale}`;
+  if (isSingleLanguage(locales)) {
+    const [defaultLocale = LOCALE_ISO_CODES.EN] = locales;
+
+    return S.listItem()
+      .title(title)
+      .id(name)
+      .icon(icon)
+      .child(
+        S.documentTypeList(name)
+          .id(name)
+          .title(title)
+          .initialValueTemplates([
+            S.initialValueTemplateItem(templateIdFor(name, defaultLocale)),
+          ]),
+      );
+  }
 
   return S.listItem()
     .title(title)
@@ -96,11 +113,11 @@ const buildByLanguageItem = (
         .items([
           ...locales.map((locale) =>
             languageList(
-              templateIdFor(locale),
+              templateIdFor(name, locale),
               LOCALE_NATIVE_LABEL[locale],
               `_type == $type && ${LANGUAGE_FIELD} == $language`,
               { language: locale },
-              [templateIdFor(locale)],
+              [templateIdFor(name, locale)],
             ),
           ),
           S.divider(),
@@ -109,7 +126,7 @@ const buildByLanguageItem = (
             ALL_PAGES_TITLE,
             '_type == $type',
             {},
-            locales.map(templateIdFor),
+            locales.map((locale) => templateIdFor(name, locale)),
           ),
         ]),
     );
@@ -120,21 +137,12 @@ const ONE_PER_LANGUAGE_QUERY = `*[_type == $type && coalesce(${LANGUAGE_FIELD}, 
 
 const buildOnePerLanguageItem = (
   S: StructureBuilder,
-  {
-    name,
-    title,
-    icon,
-  }: {
-    name: string;
-    title: string;
-    icon: TStructureSchema['icon'];
-  },
+  { name, title, icon }: TPageItem,
   locales: readonly TLocaleIsoCode[],
 ): ListItemBuilder => {
   const [defaultLocale = LOCALE_ISO_CODES.EN] = locales;
 
   const resolveDocument = async (locale: TLocaleIsoCode) => {
-    const templateId = `${name}-${locale}`;
     const current = await S.context
       .getClient({ apiVersion: ONE_PER_LANGUAGE_API_VERSION })
       .fetch<string | null>(ONE_PER_LANGUAGE_QUERY, {
@@ -150,26 +158,28 @@ const buildOnePerLanguageItem = (
     return S.document()
       .schemaType(name)
       .documentId(locale === defaultLocale ? name : crypto.randomUUID())
-      .initialValueTemplate(templateId);
+      .initialValueTemplate(templateIdFor(name, locale));
   };
 
-  return S.listItem()
-    .title(title)
-    .id(name)
-    .icon(icon)
-    .child(
-      S.list()
-        .title(title)
-        .items(
-          locales.map((locale) =>
-            S.listItem()
-              .title(LOCALE_NATIVE_LABEL[locale])
-              .id(`${name}-${locale}`)
-              .icon(icon)
-              .child(() => resolveDocument(locale)),
-          ),
+  const item = S.listItem().title(title).id(name).icon(icon);
+
+  if (isSingleLanguage(locales)) {
+    return item.child(() => resolveDocument(defaultLocale));
+  }
+
+  return item.child(
+    S.list()
+      .title(title)
+      .items(
+        locales.map((locale) =>
+          S.listItem()
+            .title(LOCALE_NATIVE_LABEL[locale])
+            .id(templateIdFor(name, locale))
+            .icon(icon)
+            .child(() => resolveDocument(locale)),
         ),
-    );
+      ),
+  );
 };
 
 const buildGroupItem = (

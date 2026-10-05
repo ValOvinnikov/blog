@@ -24,6 +24,7 @@ import { articleTextSchema } from '@blog/studio/schema-types/portable-text/artic
 import { listedTextSchema } from '@blog/studio/schema-types/portable-text/listed-text/listed-text';
 import { paragraphTextSchema } from '@blog/studio/schema-types/portable-text/paragraph-text/paragraph-text';
 import { setDefaultLanguage } from '@blog/studio/schema-types/validation/default-language/default-language';
+import { isSingleLanguage } from '@blog/studio/structure/locales/is-single-language';
 import { orderLocales } from '@blog/studio/structure/locales/order-locales';
 import { codeInput } from '@sanity/code-input';
 import { documentInternationalization } from '@sanity/document-internationalization';
@@ -108,6 +109,7 @@ export const buildStudioConfig = ({
         supportedLanguages: languages,
         schemaTypes: TRANSLATED_DOCUMENT_TYPES,
         languageField: LANGUAGE_FIELD,
+        hideLanguageFilter: isSingleLanguage(offeredLocales),
       }),
       translationLinks({
         schemaTypes: ONE_PER_LANGUAGE_DOCUMENT_TYPES,
