@@ -3,6 +3,7 @@ import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
 import { localizedHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/localized-heading-block';
 import { moduleLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
+import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
 import { z } from 'zod';
 
 const NEWSLETTER_VARIANT_EXPRESSION = `coalesce(variant, "${NEWSLETTER_VARIANT.FULL}")`;
@@ -23,6 +24,12 @@ export const newsletterModuleQuery = q
       .project(localizedHeadingBlockFragment)
       .notNull(),
     variant: sub.raw(NEWSLETTER_VARIANT_EXPRESSION, newsletterVariantParser),
+    trustCues: sub
+      .field('trustCues[]')
+      .project((cueSub) => ({
+        text: getLocalizedField(cueSub, 'text'),
+      }))
+      .nullable(true),
     ...moduleLayoutFragment,
     ...moduleContentAlignmentFragment,
   }))

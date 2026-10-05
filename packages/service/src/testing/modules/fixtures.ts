@@ -329,6 +329,7 @@ export function makeRawNewsletterModule(
       supportingText: 'Get new posts in your inbox.',
     }),
     variant: NEWSLETTER_VARIANT.FULL,
+    trustCues: null,
     layout: null,
     contentAlignment: null,
     ...overrides,
