@@ -4,16 +4,15 @@ import {
   type internalGroqTypeReferenceTo,
 } from '@blog/config';
 import {
+  getClient,
+  type TTenantSanityContext,
+} from '@blog/service/sanity/client/client';
+import {
   buildLocaleParams,
   type TLocaleParams,
 } from '@blog/service/shared/localization/locale-params/locale-params';
 import { createGroqBuilder, type IGroqBuilder, type QueryConfig } from 'groqd';
 
-import { getClient, type TTenantSanityContext } from './client';
-
-// Re-exported so downstream loaders/callers can `import { ...,
-// type TTenantSanityContext } from '@blog/service/sanity/query'` without
-// also reaching into './client' directly.
 export type { TTenantSanityContext };
 
 type TSchemaConfig = {

@@ -1,4 +1,4 @@
-import type { TTenantSanityContext } from './client';
+import type { TTenantSanityContext } from '@blog/service/sanity/client/client';
 
 describe('Sanity write client module loading', () => {
   const originalProjectId = process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'];
@@ -71,6 +71,40 @@ describe('Sanity write client module loading', () => {
 
     expect(first).toBe(second);
     expect(createClientMock).toHaveBeenCalledTimes(1);
+
+    vi.doUnmock('next-sanity');
+  });
+
+  it('rebuilds the cached write client when the token changes for the same project/dataset', async () => {
+    vi.resetModules();
+
+    const createClientMock = vi.fn().mockImplementation(() => ({}));
+    vi.doMock('next-sanity', () => ({ createClient: createClientMock }));
+
+    const { getWriteClient } = await import('./write-client');
+    const first = getWriteClient({
+      projectId: 'tenant-a',
+      dataset: 'production',
+      token: 'tok-old',
+    });
+    const second = getWriteClient({
+      projectId: 'tenant-a',
+      dataset: 'production',
+      token: 'tok-new',
+    });
+
+    expect(second).not.toBe(first);
+    expect(createClientMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({ token: 'tok-new' }),
+    );
+    expect(
+      getWriteClient({
+        projectId: 'tenant-a',
+        dataset: 'production',
+        token: 'tok-new',
+      }),
+    ).toBe(second);
+    expect(createClientMock).toHaveBeenCalledTimes(2);
 
     vi.doUnmock('next-sanity');
   });

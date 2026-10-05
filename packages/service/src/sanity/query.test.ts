@@ -3,17 +3,15 @@ import type { IGroqBuilder } from 'groqd';
 
 import { isr, q, runQuery, type TSlugParams } from './query';
 
-// `vi.mock`'s factory runs eagerly the moment `./client` first resolves
-// (importing `./query` above triggers that), so the mocks it returns must be
-// initialized via `vi.hoisted` — a plain `const` declared after `vi.mock`
-// hits the temporal dead zone.
 const { mockFetch, getClientMock } = vi.hoisted(() => {
   const mockFetch = vi.fn();
   const getClientMock = vi.fn(() => ({ fetch: mockFetch }));
   return { mockFetch, getClientMock };
 });
 
-vi.mock('./client', () => ({ getClient: getClientMock }));
+vi.mock('@blog/service/sanity/client/client', () => ({
+  getClient: getClientMock,
+}));
 
 const testTenant = {
   projectId: 'tenant-a',
@@ -115,13 +113,7 @@ describe('runQuery tenant threading', () => {
     mockFetch.mockResolvedValue(null);
 
     const query = q.star.filterByType('page_post').slice(0);
-    await runQuery(query, { tenant: testTenant }).catch(() => {
-      // The slice(0)+notNull edge case from the test above doesn't apply
-      // here (no .notNull() fragment); a null fetch resolves to null, not a
-      // throw, for this unprojected query — this test only cares that
-      // `getClient` (mocked via vi.mock('./client', ...) above) is called
-      // with the tenant argument, not with the query's result shape.
-    });
+    await runQuery(query, { tenant: testTenant }).catch(() => {});
 
     expect(getClientMock).toHaveBeenCalledWith(testTenant);
   });
