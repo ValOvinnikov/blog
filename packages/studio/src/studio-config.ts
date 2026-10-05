@@ -4,6 +4,7 @@ import {
   type TLocaleIsoCode,
 } from '@blog/config/constants';
 import { schemaTypes } from '@blog/studio/schema-types';
+import { PAGE_HOME_TYPE } from '@blog/studio/schema-types/documents/pages/home/home-type';
 import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
 import { migrationStateSchema } from '@blog/studio/schema-types/documents/system/migration-state/migration-state';
 import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
@@ -38,7 +39,7 @@ export type TBuildStudioConfigParams = {
   liveLocales?: readonly TLocaleIsoCode[];
 };
 
-const TRANSLATED_DOCUMENT_TYPES: string[] = [PAGE_LANDING_TYPE];
+const TRANSLATED_DOCUMENT_TYPES: string[] = [PAGE_HOME_TYPE, PAGE_LANDING_TYPE];
 
 const localizationNotices = definePlugin<TLocalizationNoticeOptions>(
   (options) => ({

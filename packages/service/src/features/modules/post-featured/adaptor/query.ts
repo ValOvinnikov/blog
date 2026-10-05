@@ -3,12 +3,12 @@ import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
 import {
   DISPLAY_MODE_EXPRESSION,
   displayModeParser,
-} from '@blog/service/shared/expressions/display-mode';
-import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/published-post';
+} from '@blog/service/shared/expressions/module/display-mode';
 import {
   SHOW_IMAGES_EXPRESSION,
   showImagesParser,
-} from '@blog/service/shared/expressions/show-images';
+} from '@blog/service/shared/expressions/module/show-images';
+import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/post/published-post';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
 import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';

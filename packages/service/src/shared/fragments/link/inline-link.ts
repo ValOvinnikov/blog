@@ -1,13 +1,8 @@
 import { q } from '@blog/service/sanity/query';
 import {
+  TOPIC_ARCHIVE_PAGE_SLUG_EXPRESSION,
   archivePageSlugParser,
-  buildArchivePageSlugExpression,
-} from '@blog/service/shared/expressions/archive-page-slug';
-
-const TOPIC_ARCHIVE_PAGE_SLUG_EXPRESSION = buildArchivePageSlugExpression(
-  'page_topic',
-  'topic',
-);
+} from '@blog/service/shared/expressions/archive-page/archive-page-slug';
 
 export const inlineLinkFragment = q
   .fragmentForType<'inlineLink'>()

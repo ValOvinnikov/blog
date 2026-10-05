@@ -2,7 +2,7 @@ import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
 import {
   DISPLAY_MODE_EXPRESSION,
   displayModeParser,
-} from '@blog/service/shared/expressions/display-mode';
+} from '@blog/service/shared/expressions/module/display-mode';
 import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';

@@ -29,6 +29,7 @@ export const linkDocumentFragment = localeQ
               .slice(0)
               .field('value')
               .deref()
+              .asCombined()
               .project((target) => ({
                 _type: true,
                 slug: target.field('slug.current').nullable(true),
