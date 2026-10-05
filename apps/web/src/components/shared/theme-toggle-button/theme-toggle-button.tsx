@@ -37,7 +37,7 @@ export const ThemeToggleButton = () => {
       isDark={isDark}
       onToggle={handleToggle}
       isMounted={mounted}
-      className={headerControlVariants({ shape: 'square' })}
+      className={headerControlVariants({ shape: 'square', isRound: true })}
     />
   );
 };

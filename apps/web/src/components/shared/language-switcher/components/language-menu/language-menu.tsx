@@ -37,7 +37,10 @@ export const LanguageMenu = ({
   });
   const triggerClassName = isInFooter
     ? footerTrigger()
-    : headerControlVariants({ shape: hasGlobe ? 'square' : 'label' });
+    : headerControlVariants({
+        shape: hasGlobe ? 'square' : 'label',
+        isRound: true,
+      });
 
   if (!current) {
     return null;
