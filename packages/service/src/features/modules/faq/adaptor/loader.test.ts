@@ -65,6 +65,8 @@ describe(getFaqModule, () => {
             't:tenant-a:link',
             't:tenant-a:homePage',
             't:tenant-a:page_landing',
+            't:tenant-a:page_topic',
+            't:tenant-a:page_tag',
           ],
         }),
       }),

@@ -23,6 +23,8 @@ export async function getFaqModule(
         'link',
         'homePage',
         'page_landing',
+        'page_topic',
+        'page_tag',
       ],
       tenant.projectId,
     ),

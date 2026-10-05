@@ -1,3 +1,4 @@
+import type { TFaqPageQuestion } from '@blog/service/shared/transformers/faq/resolve-faqs';
 import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
 import {
   toHeroSlot,
@@ -12,7 +13,10 @@ import type { TTopicDetailPage } from './types';
 
 export type TRawTopicPage = NonNullable<InferResultType<typeof topicPageQuery>>;
 
-export function toTopicDetailPage(rawPage: TRawTopicPage): TTopicDetailPage {
+export function toTopicDetailPage(
+  rawPage: TRawTopicPage,
+  faqs: TFaqPageQuestion[],
+): TTopicDetailPage {
   const topic = toTopic(rawPage.topic);
 
   return {
@@ -20,6 +24,7 @@ export function toTopicDetailPage(rawPage: TRawTopicPage): TTopicDetailPage {
     headingBlock: toHeadingBlock(rawPage.headingBlock),
     hero: toHeroSlot(rawPage.hero),
     modules: (rawPage.modules ?? []).map(toModule),
+    faqs,
     seo: resolveSeo(rawPage.seo),
   };
 }
