@@ -8,6 +8,7 @@ export const translationsQuery = q.star
   .field('translations[]')
   .field('value')
   .deref()
+  .asCombined()
   .filterBy('slug.current != null')
   .project((t) => ({
     language: t.field('language').nullable(true),
