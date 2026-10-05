@@ -1,4 +1,4 @@
-import { q } from '@blog/service/sanity/query';
+import { q } from '@blog/service/sanity/query/query';
 import type { TRawModule } from '@blog/service/shared/transformers/module/to-module';
 
 export const moduleFragment = q.fragment<TRawModule>().project(() => ({

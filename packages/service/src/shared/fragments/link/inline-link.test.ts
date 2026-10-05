@@ -1,5 +1,5 @@
 import { LINK_TYPE } from '@blog/config';
-import { q } from '@blog/service/sanity/query';
+import { q } from '@blog/service/sanity/query/query';
 
 import { inlineLinkFragment } from './inline-link';
 

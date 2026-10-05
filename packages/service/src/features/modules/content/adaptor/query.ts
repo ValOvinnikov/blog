@@ -1,4 +1,4 @@
-import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
+import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
 import { moduleLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { getLocalizedArticleText } from '@blog/service/shared/localization/get-localized-article-text/get-localized-article-text';
 

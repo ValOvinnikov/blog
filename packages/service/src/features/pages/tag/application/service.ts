@@ -1,7 +1,7 @@
 import { getTagPage } from '@blog/service/features/pages/tag/adaptor/detail-page/loader';
 import { getTagParams } from '@blog/service/features/pages/tag/adaptor/detail-page-params/loader';
 import { getTagPaginationParams } from '@blog/service/features/pages/tag/adaptor/pagination-params/loader';
-import type { TTenantSanityContext } from '@blog/service/sanity/query';
+import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
 import { safeAsync } from '@blog/utils';
 
 export function createTagService() {

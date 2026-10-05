@@ -1,5 +1,5 @@
 import type { TPagePostType } from '@blog/config';
-import { q } from '@blog/service/sanity/query';
+import { q } from '@blog/service/sanity/query/query';
 import {
   WORD_COUNT_EXPRESSION,
   wordCountParser,

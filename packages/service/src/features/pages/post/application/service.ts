@@ -1,6 +1,6 @@
 import { getPost } from '@blog/service/features/pages/post/adaptor/detail-page/loader';
 import { getPostParams } from '@blog/service/features/pages/post/adaptor/detail-page-params/loader';
-import type { TTenantSanityContext } from '@blog/service/sanity/query';
+import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
 import { safeAsync } from '@blog/utils';
 
 export function createPostService() {

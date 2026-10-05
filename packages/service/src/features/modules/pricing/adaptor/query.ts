@@ -1,4 +1,4 @@
-import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
+import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
 import { ctaButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
 import { localizedHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/localized-heading-block';
 import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';

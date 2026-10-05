@@ -41,7 +41,7 @@ When invoked, before writing any code:
 
 All source files live under `packages/service/src/`. Import across the package
 with the workspace's **own-name alias** (`@blog/service/*` → `./src/*`, from
-tsconfig `paths`) — e.g. `import { q } from '@blog/service/sanity/query'`,
+tsconfig `paths`) — e.g. `import { q } from '@blog/service/sanity/query/query'`,
 `import { toLink } from '@blog/service/shared/transformers/to-link'`. Use
 relative paths only within a single slice (`./query`, `./types`).
 
@@ -68,7 +68,8 @@ relative paths only within a single slice (`./query`, `./types`).
 
 - A configured client in `sanity/client.ts` reading `NEXT_PUBLIC_SANITY_PROJECT_ID`,
   `NEXT_PUBLIC_SANITY_DATASET`, and (for drafts) `SANITY_API_READ_TOKEN`.
-- `sanity/query.ts` — the groqd builder (`q`), `runQuery` (safe runner), `isr()`.
+- `sanity/query/query.ts` — the groqd builder (`q`) and `runQuery` (safe runner);
+  `sanity/query/isr.ts` — `isr()`, the cache-tag helper.
 - `urlForImage` (`sanity/image.ts`) on `@sanity/image-url`.
 - The `service` facade — the only public surface (`src/index.ts`), grouped by
   domain and version: `service.pages.post.v1.getPost(slug)`,

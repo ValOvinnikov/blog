@@ -1,5 +1,5 @@
 import type { CtaButton } from '@blog/config';
-import { q } from '@blog/service/sanity/query';
+import { q } from '@blog/service/sanity/query/query';
 import { ctaButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
 
 export const ctaButtonsFragment = q

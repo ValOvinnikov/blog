@@ -1,4 +1,4 @@
-import { q } from '@blog/service/sanity/query';
+import { q } from '@blog/service/sanity/query/query';
 
 export const translationsQuery = q.star
   .filterByType('translation.metadata')

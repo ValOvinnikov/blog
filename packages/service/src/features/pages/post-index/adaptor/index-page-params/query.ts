@@ -1,4 +1,4 @@
-import { q } from '@blog/service/sanity/query';
+import { q } from '@blog/service/sanity/query/query';
 import {
   FIRST_POST_LIST_PAGE_SIZE_EXPRESSION,
   firstPostListPageSizeParser,
