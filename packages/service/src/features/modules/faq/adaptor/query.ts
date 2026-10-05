@@ -1,6 +1,6 @@
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
 import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
-import { blockFaqProjection } from '@blog/service/shared/fragments/faq/block-faq';
+import { blockFaqFragment } from '@blog/service/shared/fragments/faq/block-faq';
 import { localizedHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/localized-heading-block';
 import { moduleLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
@@ -20,7 +20,7 @@ export const faqModuleQuery = q
       .field('questions[]')
       .deref()
       .project((questionSub) => {
-        const { _id, question, answer } = blockFaqProjection(questionSub);
+        const { _id, question, answer } = blockFaqFragment(questionSub);
 
         return { _id, question: question.notNull(), answer: answer.notNull() };
       })

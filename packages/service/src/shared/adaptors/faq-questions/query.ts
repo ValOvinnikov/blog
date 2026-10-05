@@ -1,5 +1,5 @@
 import { q } from '@blog/service/sanity/query';
-import { blockFaqProjection } from '@blog/service/shared/fragments/faq/block-faq';
+import { blockFaqFragment } from '@blog/service/shared/fragments/faq/block-faq';
 import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
 
 export const faqQuestionsQuery = q
@@ -12,6 +12,6 @@ export const faqQuestionsQuery = q
       .field('questions[]')
       .filterRaw('defined(@->_id)')
       .deref()
-      .project((questionSub) => blockFaqProjection(questionSub))
+      .project((questionSub) => blockFaqFragment(questionSub))
       .nullable(true),
   }));

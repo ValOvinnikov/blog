@@ -3,7 +3,7 @@ import { getLocalizedField } from '@blog/service/shared/localization/get-localiz
 import { getLocalizedPortableTextBlock } from '@blog/service/shared/localization/get-localized-portable-text-block/get-localized-portable-text-block';
 import type { GroqBuilderSubquery, QueryConfig } from 'groqd';
 
-export function blockFaqProjection<TConfig extends QueryConfig>(
+export function blockFaqFragment<TConfig extends QueryConfig>(
   sub: GroqBuilderSubquery<Block_faq, TConfig>,
 ) {
   return {
