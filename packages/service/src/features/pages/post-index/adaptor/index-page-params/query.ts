@@ -2,8 +2,8 @@ import { q } from '@blog/service/sanity/query';
 import {
   FIRST_POST_LIST_PAGE_SIZE_EXPRESSION,
   firstPostListPageSizeParser,
-} from '@blog/service/shared/expressions/first-post-list-page-size';
-import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/published-post';
+} from '@blog/service/shared/expressions/module/first-post-list-page-size';
+import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/post/published-post';
 
 export const indexPageParamsQuery = q.star
   .filterByType('page_postIndex')

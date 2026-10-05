@@ -3,7 +3,7 @@ import { q } from '@blog/service/sanity/query';
 import {
   PAGE_FAQ_QUESTIONS_EXPRESSION,
   pageFaqQuestionsParser,
-} from '@blog/service/shared/expressions/page-faq-questions';
+} from '@blog/service/shared/expressions/faq/page-faq-questions';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
 import { moduleFragment } from '@blog/service/shared/fragments/module/module';
 import { seoFragment } from '@blog/service/shared/fragments/seo/seo';
