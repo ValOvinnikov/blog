@@ -5,6 +5,7 @@ import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-fi
 import { heroContentPositionFields } from '@blog/studio/schema-types/fields/hero-content-position-fields/hero-content-position-fields';
 import { heroMediaOrderSplitField } from '@blog/studio/schema-types/fields/hero-media-order-fields/hero-media-order-fields';
 import { heroVariantField } from '@blog/studio/schema-types/fields/hero-variant-field/hero-variant-field';
+import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { heroFieldsets } from '@blog/studio/schema-types/modules/hero-fieldsets/hero-fieldsets';
 import { heroLayoutField } from '@blog/studio/schema-types/objects/hero-layout/hero-layout-field';
@@ -26,10 +27,9 @@ export const heroProfileSchema = defineType({
     titleField(),
     brandVariantField({ list: FULL_BRAND_VARIANT_LIST }),
     localizedHeadingBlockField(),
-    defineField({
+    localizedOneLineTextField({
       name: 'eyebrow',
       title: 'Eyebrow',
-      type: 'string',
       description: 'Short line above the heading.',
       hidden: ({ parent }) =>
         (parent as { showRole?: boolean } | undefined)?.showRole !== false,

@@ -1818,7 +1818,7 @@ export type Module_heroProfile = {
   title?: string;
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
   headingBlock?: LocalizedHeadingBlock;
-  eyebrow?: string;
+  eyebrow?: InternationalizedArrayString;
   author?: PersonReference;
   image?: LocalizedImageWithAlt;
   ctaButtons?: Array<
