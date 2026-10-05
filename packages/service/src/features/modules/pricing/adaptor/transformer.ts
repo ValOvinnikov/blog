@@ -27,7 +27,9 @@ function toPricingTiers(raw: TRawPricingModule['tiers']): TPricingTier[] {
       description: tier.description ?? undefined,
       prices: toPricingPrices(tier.prices),
       priceLabel: tier.priceLabel ?? undefined,
-      features: tier.features ?? [],
+      features: (tier.features ?? []).flatMap((feature) =>
+        feature.text ? [feature.text] : [],
+      ),
       ctaButtons: toCtaButtons(tier.ctaButtons),
       highlightLabel: tier.highlightLabel?.trim() || undefined,
       footnote: tier.footnote ?? undefined,

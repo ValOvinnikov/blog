@@ -23,13 +23,13 @@ export type Module_pricing = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  headingBlock?: HeadingBlock;
+  headingBlock?: LocalizedHeadingBlock;
   tiers?: Array<
     {
       _key: string;
     } & PricingTier
   >;
-  footnote?: string;
+  footnote?: InternationalizedArrayString;
   ctaButtons?: Array<
     {
       _key: string;
@@ -39,10 +39,16 @@ export type Module_pricing = {
   layout?: WideLayout;
 };
 
-export type HeadingBlock = {
-  _type: 'headingBlock';
-  heading?: string;
-  supportingText?: string;
+export type InternationalizedArrayString = Array<
+  {
+    _key: string;
+  } & InternationalizedArrayStringValue
+>;
+
+export type LocalizedHeadingBlock = {
+  _type: 'localizedHeadingBlock';
+  heading?: InternationalizedArrayString;
+  supportingText?: InternationalizedArrayText;
 };
 
 export type Module_newsletter = {
@@ -57,12 +63,6 @@ export type Module_newsletter = {
   variant?: 'FULL' | 'COMPACT';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   layout?: Layout;
-};
-
-export type LocalizedHeadingBlock = {
-  _type: 'localizedHeadingBlock';
-  heading?: InternationalizedArrayString;
-  supportingText?: InternationalizedArrayText;
 };
 
 export type Module_cta = {
@@ -97,12 +97,6 @@ export type Module_cta = {
     dividerBottom?: boolean;
   };
 };
-
-export type InternationalizedArrayString = Array<
-  {
-    _key: string;
-  } & InternationalizedArrayStringValue
->;
 
 export type InternationalizedArrayListedText = Array<
   {
@@ -196,6 +190,12 @@ export type Module_faq = {
   >;
   contentAlignment?: 'LEFT' | 'CENTER';
   layout?: Layout;
+};
+
+export type HeadingBlock = {
+  _type: 'headingBlock';
+  heading?: string;
+  supportingText?: string;
 };
 
 export type Module_timeline = {
@@ -597,22 +597,31 @@ export type ParagraphText = Array<{
 
 export type PricingTier = {
   _type: 'pricingTier';
-  name?: string;
-  description?: string;
+  name?: InternationalizedArrayString;
+  description?: InternationalizedArrayString;
   prices?: Array<
     {
       _key: string;
     } & PricingPrice
   >;
-  priceLabel?: string;
-  features?: Array<string>;
+  priceLabel?: InternationalizedArrayString;
+  features?: Array<
+    {
+      _key: string;
+    } & PricingFeature
+  >;
   ctaButtons?: Array<
     {
       _key: string;
     } & CtaButton
   >;
-  highlightLabel?: string;
-  footnote?: string;
+  highlightLabel?: InternationalizedArrayString;
+  footnote?: InternationalizedArrayString;
+};
+
+export type PricingFeature = {
+  _type: 'pricingFeature';
+  text?: InternationalizedArrayString;
 };
 
 export type PricingPrice = {
@@ -1948,11 +1957,10 @@ export type Geopoint = {
 
 export type AllSanitySchemaTypes =
   | Module_pricing
-  | HeadingBlock
-  | Module_newsletter
-  | LocalizedHeadingBlock
-  | Module_cta
   | InternationalizedArrayString
+  | LocalizedHeadingBlock
+  | Module_newsletter
+  | Module_cta
   | InternationalizedArrayListedText
   | SanityImageAssetReference
   | LocalizedImageWithAlt
@@ -1960,6 +1968,7 @@ export type AllSanitySchemaTypes =
   | ArticleText
   | Block_faqReference
   | Module_faq
+  | HeadingBlock
   | Module_timeline
   | Module_stats
   | PersonReference
@@ -1985,6 +1994,7 @@ export type AllSanitySchemaTypes =
   | ListedText
   | ParagraphText
   | PricingTier
+  | PricingFeature
   | PricingPrice
   | TimelineItem
   | InternationalizedArrayParagraphText

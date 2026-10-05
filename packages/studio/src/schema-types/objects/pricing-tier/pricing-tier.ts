@@ -1,13 +1,23 @@
 import { type TPricePeriod } from '@blog/config/constants';
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
+import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
+import { pricingFeatureSchema } from '@blog/studio/schema-types/objects/pricing-feature/pricing-feature';
 import {
   PRICING_PERIOD_TITLE,
   pricingPriceSchema,
 } from '@blog/studio/schema-types/objects/pricing-price/pricing-price';
+import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
+import { validateDefaultLanguageFilled } from '@blog/studio/schema-types/validation/validate-default-language-filled/validate-default-language-filled';
+import { validateLocalizedMaxLength } from '@blog/studio/schema-types/validation/validate-localized-max-length/validate-localized-max-length';
 import { validatePricingPricePeriodsUnique } from '@blog/studio/schema-types/validation/validate-pricing-price-periods-unique/validate-pricing-price-periods-unique';
 import { validatePricingTierPriceLabelRequired } from '@blog/studio/schema-types/validation/validate-pricing-tier-price-label-required/validate-pricing-tier-price-label-required';
 import { CreditCard } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
+
+const NAME_MAX_LENGTH = 40;
+const DESCRIPTION_MAX_LENGTH = 160;
+const LABEL_MAX_LENGTH = 24;
+const FOOTNOTE_MAX_LENGTH = 120;
 
 type TPricingTierPricePreviewItem = {
   amount?: number;
@@ -21,22 +31,32 @@ export const pricingTierSchema = defineType({
   description: 'One column of the pricing table — a plan and its prices.',
   icon: CreditCard,
   fields: [
-    defineField({
+    localizedOneLineTextField({
       name: 'name',
       title: 'Name',
-      type: 'string',
-      description: 'The plan name shown at the top of the tier.',
-      validation: (rule) => rule.required().max(40),
+      description: 'The plan name shown at the top of the tier, per language.',
+      validation: (rule) => [
+        rule.custom(validateDefaultLanguageFilled('Give the tier a name.')),
+        rule.custom(
+          validateLocalizedMaxLength(
+            NAME_MAX_LENGTH,
+            `Keep the name under ${NAME_MAX_LENGTH} characters.`,
+          ),
+        ),
+      ],
     }),
-    defineField({
+    localizedOneLineTextField({
       name: 'description',
       title: 'Description',
-      type: 'string',
-      description: 'A line under the name saying who this plan is for.',
+      description:
+        'A line under the name saying who this plan is for, per language.',
       validation: (rule) =>
-        rule
-          .max(160)
-          .error('Long descriptions crowd a narrow card — keep it brief.'),
+        rule.custom(
+          validateLocalizedMaxLength(
+            DESCRIPTION_MAX_LENGTH,
+            'Long descriptions crowd a narrow card — keep it brief.',
+          ),
+        ),
     }),
     defineField({
       name: 'prices',
@@ -50,14 +70,18 @@ export const pricingTierSchema = defineType({
         rule.custom(validatePricingPricePeriodsUnique),
       ],
     }),
-    defineField({
+    localizedOneLineTextField({
       name: 'priceLabel',
       title: 'Price Label',
-      type: 'string',
       description:
-        'Shown instead of a price for a tier with none, such as "Contact us".',
+        'Shown instead of a price for a tier with none, such as "Contact us", per language.',
       validation: (rule) => [
-        rule.max(24),
+        rule.custom(
+          validateLocalizedMaxLength(
+            LABEL_MAX_LENGTH,
+            `Keep the label under ${LABEL_MAX_LENGTH} characters.`,
+          ),
+        ),
         rule.custom(validatePricingTierPriceLabelRequired),
       ],
     }),
@@ -65,31 +89,37 @@ export const pricingTierSchema = defineType({
       name: 'features',
       title: 'Features',
       type: 'array',
-      description: 'What this tier includes, one line each.',
-      of: [
-        defineArrayMember({
-          type: 'string',
-          validation: (rule) => rule.max(80),
-        }),
-      ],
+      description:
+        'What this tier includes, one line each. Every language shares the list; only the wording is translated.',
+      of: [defineArrayMember({ type: pricingFeatureSchema.name })],
       validation: (rule) => rule.max(12),
     }),
     ctaButtonsField(),
-    defineField({
+    localizedOneLineTextField({
       name: 'highlightLabel',
       title: 'Highlight Label',
-      type: 'string',
       description:
-        'Fill this in to recommend the tier: it stands out from the others and carries this text as its badge.',
-      validation: (rule) => rule.max(24),
+        'Fill this in to recommend the tier: it stands out from the others and carries this text as its badge, per language.',
+      validation: (rule) =>
+        rule.custom(
+          validateLocalizedMaxLength(
+            LABEL_MAX_LENGTH,
+            `Keep the label under ${LABEL_MAX_LENGTH} characters.`,
+          ),
+        ),
     }),
-    defineField({
+    localizedOneLineTextField({
       name: 'footnote',
       title: 'Footnote',
-      type: 'string',
-      description: 'A short note under the tier — terms, taxes, or a caveat.',
+      description:
+        'A short note under the tier, per language — terms, taxes, or a caveat.',
       validation: (rule) =>
-        rule.max(120).error('A footnote is one line, not a paragraph.'),
+        rule.custom(
+          validateLocalizedMaxLength(
+            FOOTNOTE_MAX_LENGTH,
+            'A footnote is one line, not a paragraph.',
+          ),
+        ),
     }),
   ],
   preview: {
@@ -99,6 +129,7 @@ export const pricingTierSchema = defineType({
       highlightLabel: 'highlightLabel',
     },
     prepare({ name, prices, highlightLabel }) {
+      const tierName = defaultLanguageValue(name) ?? 'Unknown';
       const firstPrice = (
         prices as TPricingTierPricePreviewItem[] | undefined
       )?.[0];
@@ -108,9 +139,10 @@ export const pricingTierSchema = defineType({
           : undefined;
 
       return {
-        title: String(highlightLabel ?? '').trim()
-          ? `★ ${String(name ?? 'Unknown')}`
-          : String(name ?? 'Unknown'),
+        title:
+          defaultLanguageValue(highlightLabel) === undefined
+            ? tierName
+            : `★ ${tierName}`,
         subtitle: priceSubtitle,
       };
     },

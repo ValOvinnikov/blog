@@ -7,8 +7,8 @@ import {
   type TPlainTextBlock,
 } from '@blog/studio/schema-types/portable-text/to-plain-text/to-plain-text';
 import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
-import { localizedStringValues } from '@blog/studio/schema-types/validation/localized-string-values/localized-string-values';
 import { validateDefaultLanguageFilled } from '@blog/studio/schema-types/validation/validate-default-language-filled/validate-default-language-filled';
+import { validateLocalizedMaxLength } from '@blog/studio/schema-types/validation/validate-localized-max-length/validate-localized-max-length';
 import { validateTimelineMarkerRequired } from '@blog/studio/schema-types/validation/validate-timeline-marker-required/validate-timeline-marker-required';
 import { CircleDot } from 'lucide-react';
 import { defineType } from 'sanity';
@@ -20,9 +20,6 @@ const isNumbered = (document: unknown): boolean =>
 const MARKER_MAX_LENGTH = 16;
 const HEADING_MAX_LENGTH = 80;
 const BODY_MAX_LENGTH = 300;
-
-const isAnyLongerThan = (value: unknown, maxLength: number) =>
-  localizedStringValues(value).some((text) => text.length > maxLength);
 
 const isAnyBodyTooLong = (value: unknown) =>
   Array.isArray(value) &&
@@ -48,10 +45,11 @@ export const timelineItemSchema = defineType({
       hidden: ({ document }) => isNumbered(document),
       validation: (rule) => [
         rule.custom(validateTimelineMarkerRequired),
-        rule.custom((value) =>
-          isAnyLongerThan(value, MARKER_MAX_LENGTH)
-            ? `Keep the marker under ${MARKER_MAX_LENGTH} characters.`
-            : true,
+        rule.custom(
+          validateLocalizedMaxLength(
+            MARKER_MAX_LENGTH,
+            `Keep the marker under ${MARKER_MAX_LENGTH} characters.`,
+          ),
         ),
       ],
     }),
@@ -61,10 +59,11 @@ export const timelineItemSchema = defineType({
       description: 'What happens at this step, in a few words, per language.',
       validation: (rule) => [
         rule.custom(validateDefaultLanguageFilled('Give the item a heading.')),
-        rule.custom((value) =>
-          isAnyLongerThan(value, HEADING_MAX_LENGTH)
-            ? `Keep the heading under ${HEADING_MAX_LENGTH} characters.`
-            : true,
+        rule.custom(
+          validateLocalizedMaxLength(
+            HEADING_MAX_LENGTH,
+            `Keep the heading under ${HEADING_MAX_LENGTH} characters.`,
+          ),
         ),
       ],
     }),

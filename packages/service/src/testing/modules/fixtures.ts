@@ -408,7 +408,10 @@ export function makeRawPricingTier(
     description: null,
     prices: [makeRawPricingPrice()],
     priceLabel: null,
-    features: ['Unlimited posts', 'Priority support'],
+    features: [
+      { _key: 'feature-1', text: 'Unlimited posts' },
+      { _key: 'feature-2', text: 'Priority support' },
+    ],
     ctaButtons: null,
     highlightLabel: null,
     footnote: null,

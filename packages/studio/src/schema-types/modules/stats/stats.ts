@@ -8,7 +8,7 @@ import { localizedHeadingBlockField } from '@blog/studio/schema-types/objects/lo
 import { statSchema } from '@blog/studio/schema-types/objects/stat/stat';
 import { wideLayoutField } from '@blog/studio/schema-types/objects/wide-layout/wide-layout-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
-import { localizedStringValues } from '@blog/studio/schema-types/validation/localized-string-values/localized-string-values';
+import { validateLocalizedMaxLength } from '@blog/studio/schema-types/validation/validate-localized-max-length/validate-localized-max-length';
 import { ChartBar } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
@@ -47,12 +47,11 @@ export const statsSchema = defineType({
         'One line under the figures, per language — the period, the source, or a caveat.',
       validation: (rule) =>
         rule
-          .custom((value) =>
-            localizedStringValues(value).some(
-              (footnote) => footnote.length > FOOTNOTE_MAX_LENGTH,
-            )
-              ? 'A footnote is one line, not a paragraph.'
-              : true,
+          .custom(
+            validateLocalizedMaxLength(
+              FOOTNOTE_MAX_LENGTH,
+              'A footnote is one line, not a paragraph.',
+            ),
           )
           .warning(),
     }),

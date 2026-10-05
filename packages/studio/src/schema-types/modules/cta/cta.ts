@@ -19,7 +19,7 @@ import { titleField } from '@blog/studio/schema-types/fields/title-field/title-f
 import { localizedHeadingBlockField } from '@blog/studio/schema-types/objects/localized-heading-block/localized-heading-block-field';
 import { localizedImageWithAltSchema } from '@blog/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
 import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
-import { localizedStringValues } from '@blog/studio/schema-types/validation/localized-string-values/localized-string-values';
+import { validateLocalizedMaxLength } from '@blog/studio/schema-types/validation/validate-localized-max-length/validate-localized-max-length';
 import { toTitleCase } from '@blog/utils/primitives';
 import { Megaphone, SlidersHorizontal } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
@@ -110,12 +110,11 @@ export const ctaSchema = defineType({
       title: 'Footnote',
       description: 'Small print below the actions, per language.',
       validation: (rule) =>
-        rule.custom((value) =>
-          localizedStringValues(value).some(
-            (footnote) => footnote.length > FOOTNOTE_MAX_LENGTH,
-          )
-            ? `Keep each footnote to ${FOOTNOTE_MAX_LENGTH} characters or fewer.`
-            : true,
+        rule.custom(
+          validateLocalizedMaxLength(
+            FOOTNOTE_MAX_LENGTH,
+            `Keep each footnote to ${FOOTNOTE_MAX_LENGTH} characters or fewer.`,
+          ),
         ),
     }),
     defineField({
