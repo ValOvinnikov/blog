@@ -1,16 +1,7 @@
+import { makeRawParagraphTextBlock } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 
 import { WORD_COUNT_EXPRESSION } from './word-count';
-
-function block(key: string, text: string) {
-  return {
-    _key: key,
-    _type: 'block',
-    style: 'normal',
-    markDefs: [],
-    children: [{ _key: `${key}-span`, _type: 'span', text, marks: [] }],
-  };
-}
 
 function wordCountOf(post: Record<string, unknown>) {
   return evaluateGroqExpression(WORD_COUNT_EXPRESSION, [], {
@@ -22,7 +13,12 @@ function wordCountOf(post: Record<string, unknown>) {
 describe('WORD_COUNT_EXPRESSION', () => {
   it('counts the words of a single block of article text', async () => {
     const count = await wordCountOf({
-      content: [block('a', 'one two three four five')],
+      content: [
+        makeRawParagraphTextBlock({
+          _key: 'a',
+          text: 'one two three four five',
+        }),
+      ],
     });
 
     expect(count).toBe(5);
@@ -30,7 +26,10 @@ describe('WORD_COUNT_EXPRESSION', () => {
 
   it('counts words across multiple blocks', async () => {
     const count = await wordCountOf({
-      content: [block('a', 'one two three'), block('b', 'four five six')],
+      content: [
+        makeRawParagraphTextBlock({ _key: 'a', text: 'one two three' }),
+        makeRawParagraphTextBlock({ _key: 'b', text: 'four five six' }),
+      ],
     });
 
     expect(count).toBe(6);
@@ -39,9 +38,9 @@ describe('WORD_COUNT_EXPRESSION', () => {
   it('ignores non-text blocks between paragraphs', async () => {
     const count = await wordCountOf({
       content: [
-        block('a', 'one two three'),
-        { _type: 'imageWithAlt', _key: 'i' },
-        block('b', 'four five six'),
+        makeRawParagraphTextBlock({ _key: 'a', text: 'one two three' }),
+        { _type: 'bodyImage', _key: 'i' },
+        makeRawParagraphTextBlock({ _key: 'b', text: 'four five six' }),
       ],
     });
 
