@@ -20,7 +20,15 @@ const {
   postListModuleMock,
   taxonomyListModuleMock,
   heroBlogModuleMock,
+  contentModuleMock,
+  faqModuleMock,
 } = vi.hoisted(() => ({
+  faqModuleMock: vi.fn(({ id }: { id: string }) => (
+    <div data-testid="stub-faq">{id}</div>
+  )),
+  contentModuleMock: vi.fn(({ id }: { id: string }) => (
+    <div data-testid="stub-content">{id}</div>
+  )),
   ctaModuleMock: vi.fn(({ id }: { id: string }) => (
     <div data-testid="stub-cta">{id}</div>
   )),
@@ -60,6 +68,14 @@ vi.mock('@web/modules/hero-blog/hero-blog-module', () => ({
   HeroBlogModule: heroBlogModuleMock,
 }));
 
+vi.mock('@web/modules/content/content-module', () => ({
+  ContentModule: contentModuleMock,
+}));
+
+vi.mock('@web/modules/faq/faq-module', () => ({
+  FaqModule: faqModuleMock,
+}));
+
 vi.mock('@web/utils/logger/logger');
 
 const loggerWarnMock = vi.mocked(logger.warn);
@@ -90,7 +106,7 @@ describe(`<${TagModuleRenderer.name}/>`, () => {
   testWarnsForUnknownModule({
     setup,
     loggerWarnMock,
-    unknownModule: { id: 'content-1', type: 'module_content' },
+    unknownModule: { id: 'stats-1', type: 'module_stats' },
     description:
       'renders nothing and warns once for a module absent from the tag page allow-list',
   });
@@ -102,6 +118,8 @@ describe(`<${TagModuleRenderer.name}/>`, () => {
       { id: 'taxonomy-list-1', type: 'module_taxonomyList' },
       { id: 'cta-1', type: 'module_cta' },
       { id: 'newsletter-1', type: 'module_newsletter' },
+      { id: 'content-1', type: 'module_content' },
+      { id: 'faq-1', type: 'module_faq' },
     ],
     expectedOrder: [
       'post-list-1',
@@ -109,6 +127,8 @@ describe(`<${TagModuleRenderer.name}/>`, () => {
       'taxonomy-list-1',
       'cta-1',
       'newsletter-1',
+      'content-1',
+      'faq-1',
     ],
   });
 });

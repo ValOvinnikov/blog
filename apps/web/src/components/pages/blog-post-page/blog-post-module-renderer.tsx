@@ -7,13 +7,17 @@ import {
   type TModuleComponentProps,
 } from '@web/modules/module-renderer';
 import { NewsletterModule } from '@web/modules/newsletter/newsletter-module';
+import { PostLatestModule } from '@web/modules/post-latest/post-latest-module';
 import { PostRelatedModule } from '@web/modules/post-related/post-related-module';
+import { TaxonomyListModule } from '@web/modules/taxonomy-list/taxonomy-list-module';
 import type { ReactNode } from 'react';
 
 const BLOG_POST_MAP: Partial<Record<TPagePostType, TModuleComponent>> = {
   module_postRelated: PostRelatedModule,
   module_newsletter: NewsletterModule,
   module_cta: CtaModule,
+  module_postLatest: PostLatestModule,
+  module_taxonomyList: TaxonomyListModule,
 };
 
 export interface IBlogPostModuleRendererProps {
