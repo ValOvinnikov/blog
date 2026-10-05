@@ -5,6 +5,7 @@ import { localizedImageWithAltFragment } from '@blog/service/shared/fragments/im
 import { moduleHeroLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { personDetailFragment } from '@blog/service/shared/fragments/person/person';
+import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
 import { z } from 'zod';
 
 export const heroProfileModuleQuery = q
@@ -15,7 +16,7 @@ export const heroProfileModuleQuery = q
   .project((sub) => ({
     brandVariant: sub.field('brandVariant').notNull(),
     variant: sub.field('variant').notNull(),
-    eyebrow: sub.field('eyebrow').nullable(true),
+    eyebrow: getLocalizedField(sub, 'eyebrow'),
     headingBlock: sub
       .field('headingBlock')
       .project(localizedHeadingBlockFragment)

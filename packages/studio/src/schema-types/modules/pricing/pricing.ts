@@ -42,7 +42,7 @@ export const pricingSchema = defineType({
       name: 'footnote',
       title: 'Footnote',
       description:
-        'One line under the tiers, per language — the currency, taxes, or a caveat.',
+        'One line under the tiers — the currency, taxes, or a caveat.',
       validation: (rule) =>
         rule.custom(
           validateLocalizedMaxLength(

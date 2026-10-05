@@ -4,8 +4,8 @@ import { toMetadata } from '@web/metadata/to-metadata';
 import { getLandingPage } from '@web/server/landing/get-landing-page/get-landing-page';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';
-import { toLandingPageAlternates } from '@web/utils/to-landing-page-alternates';
 import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
+import { withLanguageAlternates } from '@web/utils/with-language-alternates';
 import type { Metadata } from 'next';
 
 export const buildLandingPageMetadata = async (
@@ -40,22 +40,13 @@ export const buildLandingPageMetadata = async (
     ogType: 'website',
   });
 
-  const liveTranslations = translations.filter(({ language }) =>
-    liveLocales.includes(language),
-  );
-
-  if (liveTranslations.every(({ language }) => language === locale)) {
-    return metadata;
-  }
-
-  return {
-    ...metadata,
-    alternates: {
-      ...metadata.alternates,
-      languages: toLandingPageAlternates({
-        translations: liveTranslations,
-        defaultLocale,
-      }),
-    },
-  };
+  return withLanguageAlternates(metadata, {
+    pages: translations.map(({ language, slug: translatedSlug }) => ({
+      language,
+      href: routes.landingPage(translatedSlug),
+    })),
+    locale,
+    liveLocales,
+    defaultLocale,
+  });
 };

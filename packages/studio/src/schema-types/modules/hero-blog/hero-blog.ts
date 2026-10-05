@@ -113,7 +113,7 @@ export const heroBlogSchema = defineType({
     localizedOneLineTextField({
       name: 'primaryActionLabel',
       title: 'Label',
-      description: 'Text of the action, per language.',
+      description: 'Text of the action.',
       fieldset: FIELDSET_PRIMARY_ACTION,
       validation: (rule) => [
         rule.custom(validateDefaultLanguageFilled('Give the action a label.')),

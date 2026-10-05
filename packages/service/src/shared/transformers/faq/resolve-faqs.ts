@@ -1,9 +1,5 @@
-import type { pageFaqQuestionsParser } from '@blog/service/shared/expressions/faq/page-faq-questions';
-import type { z } from 'zod';
-
-export type TRawFaqPageQuestion = z.infer<
-  typeof pageFaqQuestionsParser
->[number];
+import { portableTextToPlainText } from '@blog/config';
+import type { TFaqModuleQuestions } from '@blog/service/shared/adaptors/faq-questions/types';
 
 export type TFaqPageQuestion = {
   id: string;
@@ -11,14 +7,22 @@ export type TFaqPageQuestion = {
   answer: string;
 };
 
-export function resolveFaqs(raw: TRawFaqPageQuestion[]): TFaqPageQuestion[] {
+export function resolveFaqs(
+  modules: TFaqModuleQuestions[],
+): TFaqPageQuestion[] {
   const seen = new Set<string>();
   const faqs: TFaqPageQuestion[] = [];
 
-  for (const question of raw) {
-    if (seen.has(question.id)) continue;
-    seen.add(question.id);
-    faqs.push(question);
+  for (const { questions } of modules) {
+    for (const { _id, question, answer: blocks } of questions ?? []) {
+      if (seen.has(_id)) continue;
+
+      const answer = portableTextToPlainText(blocks);
+      if (!question || !answer) continue;
+
+      seen.add(_id);
+      faqs.push({ id: _id, question, answer });
+    }
   }
 
   return faqs;

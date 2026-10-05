@@ -80,7 +80,7 @@ export const ctaSchema = defineType({
     localizedOneLineTextField({
       name: 'eyebrow',
       title: 'Eyebrow',
-      description: 'Short line above the heading, per language.',
+      description: 'Short line above the heading.',
     }),
     defineField({
       name: 'image',
@@ -102,13 +102,13 @@ export const ctaSchema = defineType({
         }),
     }),
     localizedListedTextField({
-      description: 'Optional longer text below the heading, per language.',
+      description: 'Optional longer text below the heading.',
     }),
     ctaButtonsField(),
     localizedOneLineTextField({
       name: 'footnote',
       title: 'Footnote',
-      description: 'Small print below the actions, per language.',
+      description: 'Small print below the actions.',
       validation: (rule) =>
         rule.custom(
           validateLocalizedMaxLength(

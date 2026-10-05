@@ -4,6 +4,7 @@ import {
   runQuery,
   type TTenantSanityContext,
 } from '@blog/service/sanity/query';
+import { getPageFaqs } from '@blog/service/shared/adaptors/faq-questions/page-faqs';
 import { buildLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
 
 import { homePageQuery } from './query';
@@ -15,12 +16,13 @@ export async function getHomePage(
 ): Promise<TMaybeUndefined<THomePage>> {
   const raw = await runQuery(homePageQuery, {
     tenant,
-    ...isr(
-      ['homePage', 'page_template', 'modules:faq', 'block_faq'],
-      tenant.projectId,
-    ),
+    ...isr(['homePage', 'page_template'], tenant.projectId),
   });
   if (!raw) return undefined;
 
-  return toHomePage(raw, buildLocaleParams(tenant).defaultLocale);
+  return toHomePage(
+    raw,
+    buildLocaleParams(tenant).defaultLocale,
+    await getPageFaqs(raw.modules, tenant),
+  );
 }

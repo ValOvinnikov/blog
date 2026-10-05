@@ -158,7 +158,13 @@ relative paths only within a single slice (`./query`, `./types`).
   transformer per file** — including `build-image-url.ts` (raw image → URL) —
   each exporting its `TRaw*` input type (`InferFragmentType<typeof fragment>`)
   **and** the view-model `T*` type, both co-located and re-exported for web via
-  `src/index.ts`).
+  `src/index.ts`), and `adaptors/` (a read that other loaders reuse, laid out
+  as a feature slice — `query.ts` · `transformer.ts` · `types.ts` · thin
+  `loader.ts` — in a domain folder, e.g. `adaptors/faq-questions/`).
+- **`shared/adaptors/` is never exposed to web.** It has no `application/`
+  service and nothing in it is exported from `src/index.ts`; only other
+  loaders import it. A read web needs directly is a feature under
+  `features/entities/`, which is public like `pages` and `modules`.
 - **Every file under a `shared/<kind>/` directory lives in a domain folder,
   never flat in the kind directory.** `shared/fragments/heading-block/heading-block.ts`
   is the shape. The folder is named for the domain, holds that domain's files

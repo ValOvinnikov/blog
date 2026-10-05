@@ -32,7 +32,7 @@ export const heroStatementSchema = defineType({
     localizedOneLineTextField({
       name: 'eyebrow',
       title: 'Eyebrow',
-      description: 'Short line above the heading, per language.',
+      description: 'Short line above the heading.',
     }),
     heroImageField(),
     ctaButtonsField(),

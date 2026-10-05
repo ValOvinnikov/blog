@@ -1,6 +1,5 @@
 import { LINK_TYPE, SOCIAL_PLATFORMS } from '@blog/config';
 import type { postLinkFragment } from '@blog/service/shared/fragments/post/post-link';
-import type { TRawFaqPageQuestion } from '@blog/service/shared/transformers/faq/resolve-faqs';
 import type { TRawHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
 import type { TRawSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image';
 import type { TRawLinkDocument } from '@blog/service/shared/transformers/link/to-link-document';
@@ -90,17 +89,6 @@ export function makeRawPostLink(
     _id: 'post-1',
     headingBlock: { heading: 'Hello World' },
     slug: 'hello-world',
-    ...overrides,
-  };
-}
-
-export function makeRawFaqPageQuestion(
-  overrides: Partial<TRawFaqPageQuestion> = {},
-): TRawFaqPageQuestion {
-  return {
-    id: 'block-faq-1',
-    question: 'How long does onboarding take?',
-    answer: 'Most teams are live within a week.',
     ...overrides,
   };
 }

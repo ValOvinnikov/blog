@@ -1,6 +1,6 @@
-import { LOCALE_BCP47_TAGS, routes, type TLocaleIsoCode } from '@blog/config';
+import { routes, type TLocaleIsoCode } from '@blog/config';
 import type { TPageTranslation } from '@blog/service';
-import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
+import { toLanguageAlternates } from '@web/utils/to-language-alternates';
 
 type TLandingPageAlternatesParams = {
   translations: readonly TPageTranslation[];
@@ -10,24 +10,11 @@ type TLandingPageAlternatesParams = {
 export const toLandingPageAlternates = ({
   translations,
   defaultLocale,
-}: TLandingPageAlternatesParams): Record<string, string> => {
-  const pathFor = ({ language, slug }: TPageTranslation) =>
-    toLocalizedPathname({
+}: TLandingPageAlternatesParams): Record<string, string> =>
+  toLanguageAlternates({
+    pages: translations.map(({ language, slug }) => ({
+      language,
       href: routes.landingPage(slug),
-      locale: language,
-      defaultLocale,
-    });
-  const defaultTranslation = translations.find(
-    ({ language }) => language === defaultLocale,
-  );
-
-  return {
-    ...Object.fromEntries(
-      translations.map((translation) => [
-        LOCALE_BCP47_TAGS[translation.language],
-        pathFor(translation),
-      ]),
-    ),
-    ...(defaultTranslation && { 'x-default': pathFor(defaultTranslation) }),
-  };
-};
+    })),
+    defaultLocale,
+  });

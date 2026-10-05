@@ -268,7 +268,7 @@ export type Module_testimonial = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  headingBlock?: HeadingBlock;
+  headingBlock?: LocalizedHeadingBlock;
   testimonials?: Array<
     {
       _key: string;
@@ -283,12 +283,6 @@ export type Module_testimonial = {
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   cardAlignment?: 'LEFT' | 'CENTER';
   layout?: WideLayout;
-};
-
-export type HeadingBlock = {
-  _type: 'headingBlock';
-  heading?: string;
-  supportingText?: string;
 };
 
 export type Module_logoWall = {
@@ -439,6 +433,12 @@ export type Module_postLatest = {
   displayMode?: 'GRID' | 'CAROUSEL';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   layout?: WideLayout;
+};
+
+export type HeadingBlock = {
+  _type: 'headingBlock';
+  heading?: string;
+  supportingText?: string;
 };
 
 export type Module_postList = {
@@ -1078,9 +1078,9 @@ export type Block_testimonial = {
   _rev: string;
   title?: string;
   name?: string;
-  quote?: ListedText;
-  role?: string;
-  image?: ImageWithAlt;
+  quote?: InternationalizedArrayListedText;
+  role?: InternationalizedArrayString;
+  image?: LocalizedImageWithAlt;
   link?: LinkReference;
 };
 
@@ -1433,7 +1433,7 @@ export type Module_heroProfile = {
   title?: string;
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
   headingBlock?: LocalizedHeadingBlock;
-  eyebrow?: string;
+  eyebrow?: InternationalizedArrayString;
   author?: PersonReference;
   image?: LocalizedImageWithAlt;
   ctaButtons?: Array<
@@ -1954,7 +1954,6 @@ export type AllSanitySchemaTypes =
   | Module_team
   | Block_testimonialReference
   | Module_testimonial
-  | HeadingBlock
   | Module_logoWall
   | Layout
   | Module_featureHighlights
@@ -1964,6 +1963,7 @@ export type AllSanitySchemaTypes =
   | Page_postReference
   | Module_postFeatured
   | Module_postLatest
+  | HeadingBlock
   | Module_postList
   | Module_hero
   | Blog_topicReference
