@@ -9,6 +9,7 @@ import { TextInput } from '@blog/ui/components/atoms/text-input';
 import { PopoverMenu } from '@blog/ui/components/molecules/popover-menu';
 import { authMenuVariants } from '@web/components/shared/auth-menu/auth-menu-variants';
 import { useEmailSignIn } from '@web/components/shared/auth-menu/hooks/use-email-sign-in';
+import { headerControlVariants } from '@web/components/shared/header-control';
 import { signIn } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import type { RefObject } from 'react';
@@ -96,6 +97,7 @@ export const SignInMenu = ({
         panelId={panelId}
         onClick={toggle}
         variant="bordered"
+        className={headerControlVariants()}
       >
         {t('signIn')}
       </PopoverMenu.Trigger>
