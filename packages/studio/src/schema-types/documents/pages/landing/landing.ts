@@ -1,6 +1,6 @@
 import { RESERVED_SLUGS, type TLocaleIsoCode } from '@blog/config/constants';
 import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
-import { TEMPLATE_LANDING_TYPE } from '@blog/studio/schema-types/documents/templates/landing/landing-type';
+import { landingTemplateSchema } from '@blog/studio/schema-types/documents/templates/landing/landing';
 import {
   LANGUAGE_FIELD,
   languageField,
@@ -62,7 +62,7 @@ export const landingPageSchema = defineType({
       },
     }),
     headingBlockField(),
-    templateField({ type: TEMPLATE_LANDING_TYPE }),
+    templateField({ type: landingTemplateSchema.name }),
     seoField(),
   ],
 });

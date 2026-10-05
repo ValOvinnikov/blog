@@ -1,4 +1,3 @@
-import { TEMPLATE_LANDING_TYPE } from '@blog/studio/schema-types/documents/templates/landing/landing-type';
 import { heroField } from '@blog/studio/schema-types/fields/hero-field/hero-field';
 import { modulesField } from '@blog/studio/schema-types/fields/modules-field/modules-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
@@ -24,7 +23,7 @@ import { FileText } from 'lucide-react';
 import { defineType } from 'sanity';
 
 export const landingTemplateSchema = defineType({
-  name: TEMPLATE_LANDING_TYPE,
+  name: 'template_landing',
   title: 'Landing Template',
   type: 'document',
   description:

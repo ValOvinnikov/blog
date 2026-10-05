@@ -1,6 +1,6 @@
 import type { TLocaleIsoCode } from '@blog/config/constants';
 import { PAGE_HOME_TYPE } from '@blog/studio/schema-types/documents/pages/home/home-type';
-import { TEMPLATE_HOME_TYPE } from '@blog/studio/schema-types/documents/templates/home/home-type';
+import { homeTemplateSchema } from '@blog/studio/schema-types/documents/templates/home/home';
 import {
   LANGUAGE_FIELD,
   languageField,
@@ -42,7 +42,7 @@ export const homePageSchema = defineType({
     languageField(),
     titleField(),
     headingBlockField(),
-    templateField({ type: TEMPLATE_HOME_TYPE }),
+    templateField({ type: homeTemplateSchema.name }),
     seoField(),
   ],
 });
