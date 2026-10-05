@@ -4,7 +4,10 @@ import { localizedString } from './in-default-locale';
 
 export type TImageValue = { _type?: string; [field: string]: unknown };
 
-export const localizeImage = (image: TImageValue | undefined): NodePatch[] => {
+export const localizeImage = (
+  path: Parameters<typeof at>[0],
+  image: TImageValue | undefined,
+): NodePatch[] => {
   if (!image || image._type === 'localizedImageWithAlt') {
     return [];
   }
@@ -13,7 +16,7 @@ export const localizeImage = (image: TImageValue | undefined): NodePatch[] => {
 
   return [
     at(
-      'image',
+      path,
       set({
         ...rest,
         _type: 'localizedImageWithAlt',

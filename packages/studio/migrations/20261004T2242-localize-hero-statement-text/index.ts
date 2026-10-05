@@ -17,7 +17,7 @@ export const localizeHeroStatementModule = (doc: THeroStatementDoc) => {
   const patches = [
     ...localizeHeadingBlock(doc.headingBlock),
     ...localizeStringField('eyebrow', doc.eyebrow),
-    ...localizeImage(doc.image),
+    ...localizeImage('image', doc.image),
   ];
 
   return patches.length > 0 ? patches : undefined;

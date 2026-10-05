@@ -1,11 +1,12 @@
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
 import { ctaSecondaryButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
 import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
-import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
-import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
+import { localizedHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/localized-heading-block';
+import { localizedImageWithAltFragment } from '@blog/service/shared/fragments/image/localized-image-with-alt';
 import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
-import { textBlockFragment } from '@blog/service/shared/fragments/portable-text/text-block';
+import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
+import { getLocalizedPortableTextBlock } from '@blog/service/shared/localization/get-localized-portable-text-block/get-localized-portable-text-block';
 
 export const featureHighlightsModuleQuery = q
   .parameters<TModuleQueryParams>()
@@ -16,17 +17,17 @@ export const featureHighlightsModuleQuery = q
     brandVariant: sub.field('brandVariant').notNull(),
     headingBlock: sub
       .field('headingBlock')
-      .project(headingBlockFragment)
+      .project(localizedHeadingBlockFragment)
       .notNull(),
     highlights: sub
       .field('highlights[]')
       .project((highlightSub) => ({
         _key: true,
-        heading: highlightSub.field('heading').notNull(),
-        body: highlightSub.field('body[]').project(textBlockFragment).notNull(),
+        heading: getLocalizedField(highlightSub, 'heading').notNull(),
+        body: getLocalizedPortableTextBlock(highlightSub, 'body').notNull(),
         image: highlightSub
           .field('image')
-          .project(sanityImageFragment)
+          .project(localizedImageWithAltFragment)
           .notNull(),
         action: highlightSub
           .field('action')

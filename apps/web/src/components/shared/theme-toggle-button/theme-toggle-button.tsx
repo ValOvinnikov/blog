@@ -1,6 +1,7 @@
 'use client';
 
 import { ThemeToggle } from '@blog/ui/components/atoms/theme-toggle';
+import { headerControlVariants } from '@web/components/shared/header-control';
 import { useEffect, useState } from 'react';
 
 export const ThemeToggleButton = () => {
@@ -32,6 +33,11 @@ export const ThemeToggleButton = () => {
   };
 
   return (
-    <ThemeToggle isDark={isDark} onToggle={handleToggle} isMounted={mounted} />
+    <ThemeToggle
+      isDark={isDark}
+      onToggle={handleToggle}
+      isMounted={mounted}
+      className={headerControlVariants({ shape: 'square' })}
+    />
   );
 };

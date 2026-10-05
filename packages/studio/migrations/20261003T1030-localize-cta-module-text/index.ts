@@ -20,13 +20,9 @@ export const localizeCtaModule = (doc: TCtaDoc) => {
   const patches = [
     ...localizeHeadingBlock(doc.headingBlock),
     ...localizeStringField('eyebrow', doc.eyebrow),
-    ...localizePortableTextField(
-      'content',
-      doc.content,
-      'internationalizedArrayListedTextValue',
-    ),
+    ...localizePortableTextField('content', doc.content),
     ...localizeStringField('footnote', doc.footnote),
-    ...localizeImage(doc.image),
+    ...localizeImage('image', doc.image),
   ];
 
   return patches.length > 0 ? patches : undefined;

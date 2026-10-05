@@ -5,10 +5,41 @@ import { localizePortableTextField } from './localize-portable-text-field';
 
 const { EN } = LOCALE_ISO_CODES;
 
-const blocks = [{ _type: 'block', _key: 'b1', children: [] }];
+const blocks = [{ _type: 'block', _key: 'block-1', children: [] }];
 
 describe(localizePortableTextField, () => {
-  it('moves plain portable text into the default language', () => {
+  it('moves plain Portable Text into the default language', () => {
+    expect(localizePortableTextField('content', blocks)).toEqual([
+      at(
+        'content',
+        set([
+          {
+            _key: EN,
+            _type: 'internationalizedArrayListedTextValue',
+            language: EN,
+            value: blocks,
+          },
+        ]),
+      ),
+    ]);
+  });
+
+  it('leaves an already localized, empty or missing value alone', () => {
+    expect(
+      localizePortableTextField('content', [
+        {
+          _key: EN,
+          _type: 'internationalizedArrayListedTextValue',
+          language: EN,
+          value: blocks,
+        },
+      ]),
+    ).toEqual([]);
+    expect(localizePortableTextField('content', [])).toEqual([]);
+    expect(localizePortableTextField('content', undefined)).toEqual([]);
+  });
+
+  it('moves plain Portable Text into the given localized value type', () => {
     expect(
       localizePortableTextField(
         'body',
@@ -28,19 +59,5 @@ describe(localizePortableTextField, () => {
         ]),
       ),
     ]);
-  });
-
-  it('leaves an already localized, empty or missing value alone', () => {
-    const type = 'internationalizedArrayParagraphTextValue';
-
-    expect(
-      localizePortableTextField(
-        'body',
-        [{ _key: EN, _type: type, language: EN, value: blocks }],
-        type,
-      ),
-    ).toEqual([]);
-    expect(localizePortableTextField('body', [], type)).toEqual([]);
-    expect(localizePortableTextField('body', undefined, type)).toEqual([]);
   });
 });

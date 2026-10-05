@@ -2361,7 +2361,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "headingBlock"
+          "name": "localizedHeadingBlock"
         },
         "optional": true
       },
@@ -4461,7 +4461,8 @@
         "heading": {
           "type": "objectAttribute",
           "value": {
-            "type": "string"
+            "type": "inline",
+            "name": "internationalizedArrayString"
           },
           "optional": true
         },
@@ -4469,7 +4470,7 @@
           "type": "objectAttribute",
           "value": {
             "type": "inline",
-            "name": "listedText"
+            "name": "internationalizedArrayListedText"
           },
           "optional": true
         },
@@ -4477,7 +4478,7 @@
           "type": "objectAttribute",
           "value": {
             "type": "inline",
-            "name": "imageWithAlt"
+            "name": "localizedImageWithAlt"
           },
           "optional": true
         },

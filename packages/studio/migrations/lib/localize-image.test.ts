@@ -10,7 +10,7 @@ const asset = { _type: 'reference', _ref: 'image-1' };
 describe(localizeImage, () => {
   it('keeps the image and moves its alt text into the default language', () => {
     expect(
-      localizeImage({ _type: 'imageWithAlt', asset, alt: 'A desk' }),
+      localizeImage('image', { _type: 'imageWithAlt', asset, alt: 'A desk' }),
     ).toEqual([
       at(
         'image',
@@ -31,12 +31,12 @@ describe(localizeImage, () => {
   });
 
   it('leaves an already localized image alone', () => {
-    expect(localizeImage({ _type: 'localizedImageWithAlt', asset })).toEqual(
-      [],
-    );
+    expect(
+      localizeImage('image', { _type: 'localizedImageWithAlt', asset }),
+    ).toEqual([]);
   });
 
   it('leaves a missing image alone', () => {
-    expect(localizeImage(undefined)).toEqual([]);
+    expect(localizeImage('image', undefined)).toEqual([]);
   });
 });
