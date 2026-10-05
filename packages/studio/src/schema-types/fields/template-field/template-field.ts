@@ -7,7 +7,7 @@ export const templateField = ({ type }: { type: string }) =>
     title: 'Template',
     type: 'reference',
     description:
-      'The hero and modules this page shows. Every language of a page usually shares one template; edit it under Templates.',
+      'The hero and modules this page shows. Edit it under Templates.',
     to: [{ type }],
     options: { documentInternationalization: { exclude: true } },
     validation: (rule) => [

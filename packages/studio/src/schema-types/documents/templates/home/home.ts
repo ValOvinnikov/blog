@@ -26,8 +26,7 @@ export const homeTemplateSchema = defineType({
   name: 'template_home',
   title: 'Home Template',
   type: 'document',
-  description:
-    'The hero and modules the Home page shows, shared by every language of it.',
+  description: 'The hero and modules the Home page shows.',
   icon: House,
   preview: {
     select: { title: 'title' },

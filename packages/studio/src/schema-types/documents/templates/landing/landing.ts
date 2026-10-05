@@ -26,8 +26,7 @@ export const landingTemplateSchema = defineType({
   name: 'template_landing',
   title: 'Landing Template',
   type: 'document',
-  description:
-    'The hero and modules a Landing page shows, shared by every language of that page.',
+  description: 'The hero and modules a Landing page shows.',
   icon: FileText,
   preview: {
     select: { title: 'title' },
