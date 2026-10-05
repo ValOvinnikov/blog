@@ -27,18 +27,8 @@ export const pagesSection: TStructureSection = {
       items: [
         { schema: postIndexPageSchema, mode: 'singleton' },
         { schema: postPageSchema },
-      ],
-    },
-    {
-      title: 'Topics',
-      items: [
         { schema: topicIndexPageSchema, mode: 'singleton' },
         { schema: topicPageSchema },
-      ],
-    },
-    {
-      title: 'Tags',
-      items: [
         { schema: tagIndexPageSchema, mode: 'singleton' },
         { schema: tagPageSchema },
       ],
