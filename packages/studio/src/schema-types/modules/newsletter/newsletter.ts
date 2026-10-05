@@ -46,8 +46,7 @@ export const newsletterSchema = defineType({
       name: 'trustCues',
       title: 'Trust Cues',
       type: 'array',
-      description:
-        'Short reassurances shown under the signup form. Every language shares the list; only the wording is translated.',
+      description: 'Short reassurances shown under the signup form.',
       of: [defineArrayMember({ type: newsletterTrustCueSchema.name })],
       validation: (rule) => rule.max(2),
     }),
