@@ -27,7 +27,7 @@ export const actionGroupVariants = tv({
     {
       isOnDark: true,
       isInline: true,
-      class: ['hover:text-white/80'],
+      class: ['hover:text-white'],
     },
   ],
 });
