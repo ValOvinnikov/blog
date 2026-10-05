@@ -2,6 +2,7 @@ import { asideSchema } from './aside/aside';
 import { bodyImageSchema } from './body-image/body-image';
 import { brandSchema } from './brand/brand';
 import { brandTaglineSchema } from './brand-tagline/brand-tagline';
+import { brandTaglineItemSchema } from './brand-tagline-item/brand-tagline-item';
 import {
   ctaButtonSchema,
   ctaSecondaryButtonSchema,
@@ -46,6 +47,7 @@ export const objects = [
   featureHighlightSchema,
   openGraphSchema,
   seoSchema,
+  brandTaglineItemSchema,
   brandTaglineSchema,
   brandSchema,
   postTakeawaysSchema,

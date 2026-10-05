@@ -668,8 +668,17 @@ export type Brand = {
 
 export type BrandTagline = {
   _type: 'brandTagline';
-  items?: Array<string>;
+  items?: Array<
+    {
+      _key: string;
+    } & BrandTaglineItem
+  >;
   separator?: 'DOT' | 'PIPE' | 'BULLET' | 'SLASH';
+};
+
+export type BrandTaglineItem = {
+  _type: 'brandTaglineItem';
+  text?: InternationalizedArrayString;
 };
 
 export type Seo = {
@@ -2049,6 +2058,7 @@ export type AllSanitySchemaTypes =
   | PostTakeaways
   | Brand
   | BrandTagline
+  | BrandTaglineItem
   | Seo
   | OpenGraph
   | FeatureHighlight

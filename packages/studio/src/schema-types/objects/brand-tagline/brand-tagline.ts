@@ -2,8 +2,9 @@ import {
   BRAND_TAGLINE_SEPARATOR_CHARS,
   BRAND_TAGLINE_SEPARATORS,
 } from '@blog/config/constants';
+import { brandTaglineItemSchema } from '@blog/studio/schema-types/objects/brand-tagline-item/brand-tagline-item';
 import { toTitleCase } from '@blog/utils/primitives';
-import { defineField, defineType } from 'sanity';
+import { defineArrayMember, defineField, defineType } from 'sanity';
 
 export const brandTaglineSchema = defineType({
   name: 'brandTagline',
@@ -15,8 +16,8 @@ export const brandTaglineSchema = defineType({
       title: 'Items',
       type: 'array',
       description:
-        'Up to 4 short segments (e.g. "build 2026.07", "online"), joined with the separator below.',
-      of: [{ type: 'string', validation: (rule) => rule.min(1).max(15) }],
+        'Up to 4 short segments (e.g. "build 2026.07", "online"), joined with the separator below. Every language shares the list; only the wording is translated.',
+      of: [defineArrayMember({ type: brandTaglineItemSchema.name })],
       validation: (rule) => rule.max(4),
     }),
     defineField({

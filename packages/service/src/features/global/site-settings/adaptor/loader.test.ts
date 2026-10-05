@@ -18,6 +18,13 @@ vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
 
 const tenant = makeTenant();
 
+function taglineItems(...texts: (string | null)[]) {
+  return texts.map((text, index) => ({
+    _key: `item-${String(index + 1)}`,
+    text,
+  }));
+}
+
 describe('getSiteSettings', () => {
   it('throws when site settings document does not exist', async () => {
     mockRun.mockResolvedValue(null);
@@ -31,7 +38,7 @@ describe('getSiteSettings', () => {
         brand: {
           name: 'Awesome Blog',
           tagline: {
-            items: ['build 2026.07', 'online'],
+            items: taglineItems('build 2026.07', 'online'),
             separator: BRAND_TAGLINE_SEPARATORS.DOT,
           },
           logo: makeRawSanityImage('Logo'),
@@ -69,7 +76,7 @@ describe('getSiteSettings', () => {
         brand: {
           name: 'Awesome Blog',
           tagline: {
-            items: ['build 2026.07', 'online'],
+            items: taglineItems('build 2026.07', 'online'),
             separator: BRAND_TAGLINE_SEPARATORS.PIPE,
           },
           logo: makeRawSanityImage('Logo'),
@@ -90,7 +97,7 @@ describe('getSiteSettings', () => {
         brand: {
           name: 'Awesome Blog',
           tagline: {
-            items: ['build 2026.07', 'online'],
+            items: taglineItems('build 2026.07', 'online'),
             separator: BRAND_TAGLINE_SEPARATORS.BULLET,
           },
           logo: makeRawSanityImage('Logo'),
@@ -111,7 +118,7 @@ describe('getSiteSettings', () => {
         brand: {
           name: 'Awesome Blog',
           tagline: {
-            items: ['build 2026.07', 'online'],
+            items: taglineItems('build 2026.07', 'online'),
             separator: BRAND_TAGLINE_SEPARATORS.SLASH,
           },
           logo: makeRawSanityImage('Logo'),
@@ -132,7 +139,7 @@ describe('getSiteSettings', () => {
         brand: {
           name: 'Awesome Blog',
           tagline: {
-            items: ['online'],
+            items: taglineItems('online'),
             separator: BRAND_TAGLINE_SEPARATORS.DOT,
           },
           logo: makeRawSanityImage('Logo'),
@@ -143,6 +150,27 @@ describe('getSiteSettings', () => {
     const result = await getSiteSettings(tenant);
 
     expect(result.brand.tagline).toBe('online');
+  });
+
+  it('skips tagline items with no text in either language', async () => {
+    mockRun.mockResolvedValue(
+      makeRawSiteSettings({
+        brand: {
+          name: 'Awesome Blog',
+          tagline: {
+            items: taglineItems('build 2026.07', null, 'online'),
+            separator: BRAND_TAGLINE_SEPARATORS.DOT,
+          },
+          logo: makeRawSanityImage('Logo'),
+        },
+      }),
+    );
+
+    const result = await getSiteSettings(tenant);
+
+    expect(result.brand.tagline).toBe(
+      `build 2026.07 ${BRAND_TAGLINE_SEPARATOR_CHARS.DOT} online`,
+    );
   });
 
   it('maps an empty tagline items list to undefined', async () => {
