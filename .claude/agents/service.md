@@ -161,8 +161,7 @@ relative paths only within a single slice (`./query`, `./types`).
   `src/index.ts`).
 - **Every file under a `shared/<kind>/` directory lives in a domain folder,
   never flat in the kind directory.** `shared/fragments/heading-block/heading-block.ts`
-  is the shape; `shared/expressions/display-mode.ts` is the drift this
-  rule stops. The folder is named for the domain, holds that domain's files
+  is the shape. The folder is named for the domain, holds that domain's files
   and their co-located tests, and a new file joins an existing domain folder
   before it starts a new one. This holds for every kind — `fragments/`,
   `transformers/`, `expressions/`, `localization/`, `types/` and any added
