@@ -15,6 +15,7 @@ import {
   type TLocalizationNoticeOptions,
 } from '@blog/studio/schema-types/inputs/localization-notice-input/localization-notice-input';
 import { LOCALE_LABEL } from '@blog/studio/schema-types/inputs/localization-notice-input/missing-locales';
+import { articleTextSchema } from '@blog/studio/schema-types/portable-text/article-text/article-text';
 import { listedTextSchema } from '@blog/studio/schema-types/portable-text/listed-text/listed-text';
 import { paragraphTextSchema } from '@blog/studio/schema-types/portable-text/paragraph-text/paragraph-text';
 import { setDefaultLanguage } from '@blog/studio/schema-types/validation/default-language/default-language';
@@ -108,6 +109,7 @@ export const buildStudioConfig = ({
           'text',
           listedTextSchema.name,
           paragraphTextSchema.name,
+          articleTextSchema.name,
         ],
       }),
       ...(liveLocales
