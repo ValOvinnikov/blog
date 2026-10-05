@@ -232,13 +232,13 @@ export type Module_stats = {
   _rev: string;
   title?: string;
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
-  headingBlock?: HeadingBlock;
+  headingBlock?: LocalizedHeadingBlock;
   stats?: Array<
     {
       _key: string;
     } & Stat
   >;
-  footnote?: string;
+  footnote?: InternationalizedArrayString;
   ctaButtons?: Array<
     {
       _key: string;
@@ -632,9 +632,9 @@ export type TimelineItem = {
 
 export type Stat = {
   _type: 'stat';
-  value?: string;
-  label?: string;
-  description?: string;
+  value?: InternationalizedArrayString;
+  label?: InternationalizedArrayString;
+  description?: InternationalizedArrayString;
 };
 
 export type PostTakeaways = {
