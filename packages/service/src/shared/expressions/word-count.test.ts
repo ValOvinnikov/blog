@@ -29,13 +29,23 @@ describe('WORD_COUNT_EXPRESSION', () => {
   });
 
   it('counts words across multiple blocks', async () => {
-    const first = block('a', 'one two three');
-    const second = block('b', 'four five six');
+    const count = await wordCountOf({
+      content: [block('a', 'one two three'), block('b', 'four five six')],
+    });
 
-    const single = (await wordCountOf({ content: [first] })) as number;
-    const both = (await wordCountOf({ content: [first, second] })) as number;
+    expect(count).toBe(6);
+  });
 
-    expect(both).toBeGreaterThan(single);
+  it('ignores non-text blocks between paragraphs', async () => {
+    const count = await wordCountOf({
+      content: [
+        block('a', 'one two three'),
+        { _type: 'imageWithAlt', _key: 'i' },
+        block('b', 'four five six'),
+      ],
+    });
+
+    expect(count).toBe(6);
   });
 
   it('yields zero when the post has no article text', async () => {
