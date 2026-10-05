@@ -543,7 +543,9 @@ post became modules in that array: related reading is `module_postRelated`
 `newsletterEnabled` boolean — which is why `page_post` has no such field.
 `module_newsletter` carries a `variant` (`NEWSLETTER_VARIANT`,
 `FULL`/`COMPACT`, coalesced to `FULL` at the query since the schema field is
-optional) selecting which form of the signup it renders.
+optional) selecting which form of the signup it renders, and its own
+`trustCues`: at most two `newsletterTrustCue` items, one list shared by every
+language with each item's `text` translated.
 
 **A view model's nullability mirrors the schema's validation.** Where a
 `page_post` field is `required()` in the Studio, `@blog/service` projects it
