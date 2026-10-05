@@ -118,17 +118,19 @@ const buildByLanguageItem = (
 const ONE_PER_LANGUAGE_API_VERSION = '2024-01-01';
 const ONE_PER_LANGUAGE_QUERY = `*[_type == $type && coalesce(${LANGUAGE_FIELD}, $defaultLanguage) == $language] | order(_updatedAt desc)[0]._id`;
 
-const buildOnePerLanguageItems = (
+const buildOnePerLanguageItem = (
   S: StructureBuilder,
   {
     name,
+    title,
     icon,
   }: {
     name: string;
+    title: string;
     icon: TStructureSchema['icon'];
   },
   locales: readonly TLocaleIsoCode[],
-): ListItemBuilder[] => {
+): ListItemBuilder => {
   const [defaultLocale = LOCALE_ISO_CODES.EN] = locales;
 
   const resolveDocument = async (locale: TLocaleIsoCode) => {
@@ -151,51 +153,43 @@ const buildOnePerLanguageItems = (
       .initialValueTemplate(templateId);
   };
 
-  return locales.map((locale) =>
-    S.listItem()
-      .title(LOCALE_NATIVE_LABEL[locale])
-      .id(`${name}-${locale}`)
-      .icon(icon)
-      .child(() => resolveDocument(locale)),
-  );
-};
-
-const buildGroupItems = (
-  S: StructureBuilder,
-  item: TStructureGroupItem,
-  locales: readonly TLocaleIsoCode[],
-): ListItemBuilder[] => {
-  const { name } = item.schema;
-  const title = requireSchemaField(item.schema.title, name, 'title');
-  const icon = requireSchemaField(item.schema.icon, name, 'icon');
-
-  if (item.mode === 'onePerLanguage') {
-    return buildOnePerLanguageItems(S, { name, icon }, locales);
-  }
-
-  return [buildGroupItem(S, { name, title, icon, mode: item.mode }, locales)];
+  return S.listItem()
+    .title(title)
+    .id(name)
+    .icon(icon)
+    .child(
+      S.list()
+        .title(title)
+        .items(
+          locales.map((locale) =>
+            S.listItem()
+              .title(LOCALE_NATIVE_LABEL[locale])
+              .id(`${name}-${locale}`)
+              .icon(icon)
+              .child(() => resolveDocument(locale)),
+          ),
+        ),
+    );
 };
 
 const buildGroupItem = (
   S: StructureBuilder,
-  {
-    name,
-    title,
-    icon,
-    mode,
-  }: {
-    name: string;
-    title: string;
-    icon: TStructureSchema['icon'];
-    mode: TStructureGroupItem['mode'];
-  },
+  item: TStructureGroupItem,
   locales: readonly TLocaleIsoCode[],
 ): ListItemBuilder => {
-  if (mode === 'byLanguage') {
+  const { name } = item.schema;
+  const title = requireSchemaField(item.schema.title, name, 'title');
+  const icon = requireSchemaField(item.schema.icon, name, 'icon');
+
+  if (item.mode === 'byLanguage') {
     return buildByLanguageItem(S, { name, title, icon }, locales);
   }
 
-  if (mode === 'singleton') {
+  if (item.mode === 'onePerLanguage') {
+    return buildOnePerLanguageItem(S, { name, title, icon }, locales);
+  }
+
+  if (item.mode === 'singleton') {
     return S.listItem()
       .title(title)
       .id(name)
@@ -219,7 +213,7 @@ const buildGroupedListItems = (
         : group.dividerBefore
           ? [S.divider()]
           : []),
-      ...group.items.flatMap((item) => buildGroupItems(S, item, locales)),
+      ...group.items.map((item) => buildGroupItem(S, item, locales)),
     ]);
 
 const getFlattenableItem = (

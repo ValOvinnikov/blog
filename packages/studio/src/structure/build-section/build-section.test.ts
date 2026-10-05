@@ -594,7 +594,7 @@ describe(buildSections, () => {
   describe('onePerLanguage items', () => {
     const { EN, NL, DE } = LOCALE_ISO_CODES;
 
-    const buildHomeItems = (dataset: Record<string, unknown>[]) => {
+    const buildHomeEntries = (dataset: Record<string, unknown>[]) => {
       const S = makeMockStructureBuilder(dataset);
       const [section] = buildSections(
         asStructureBuilder(S),
@@ -620,6 +620,23 @@ describe(buildSections, () => {
       const list = callArgs(section!, 'child')?.[0] as TMockBuilder;
       return callArgs(list, 'items')?.[0] as TMockBuilder[];
     };
+
+    const buildHomeItems = (dataset: Record<string, unknown>[]) => {
+      const [home] = buildHomeEntries(dataset);
+      const languages = callArgs(home!, 'child')?.[0] as TMockBuilder;
+      return callArgs(languages, 'items')?.[0] as TMockBuilder[];
+    };
+
+    it('shows one Home entry that opens its language list', () => {
+      const entries = buildHomeEntries([]);
+      const languages = callArgs(entries[0]!, 'child')?.[0] as TMockBuilder;
+
+      expect(entries).toHaveLength(1);
+      expect(callArgs(entries[0]!, 'title')).toEqual(['Home']);
+      expect(callArgs(entries[0]!, 'id')).toEqual(['homePage']);
+      expect(languages.kind).toBe('list');
+      expect(callArgs(languages, 'title')).toEqual(['Home']);
+    });
 
     const resolveChild = async (item: TMockBuilder) => {
       const resolver = callArgs(
