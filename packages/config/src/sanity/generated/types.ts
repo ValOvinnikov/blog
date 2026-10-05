@@ -356,7 +356,7 @@ export type Module_featureHighlights = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  headingBlock?: HeadingBlock;
+  headingBlock?: LocalizedHeadingBlock;
   highlights?: Array<
     {
       _key: string;
@@ -673,9 +673,9 @@ export type OpenGraph = {
 
 export type FeatureHighlight = {
   _type: 'featureHighlight';
-  heading?: string;
-  body?: ListedText;
-  image?: ImageWithAlt;
+  heading?: InternationalizedArrayString;
+  body?: InternationalizedArrayListedText;
+  image?: LocalizedImageWithAlt;
   action?: CtaSecondaryButton;
 };
 

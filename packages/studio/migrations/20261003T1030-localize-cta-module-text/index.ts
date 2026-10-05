@@ -1,11 +1,11 @@
-import { at, defineMigration, set } from 'sanity/migrate';
+import { defineMigration } from 'sanity/migrate';
 
-import { inDefaultLocale } from '../lib/in-default-locale';
 import {
   localizeHeadingBlock,
   type THeadingBlockValue,
 } from '../lib/localize-heading-block';
 import { localizeImage, type TImageValue } from '../lib/localize-image';
+import { localizePortableTextField } from '../lib/localize-portable-text-field';
 import { localizeStringField } from '../lib/localize-string-field';
 
 type TCtaDoc = {
@@ -16,32 +16,13 @@ type TCtaDoc = {
   image?: TImageValue;
 };
 
-const isPortableText = (value: unknown): value is unknown[] =>
-  Array.isArray(value) &&
-  value.length > 0 &&
-  value.every(
-    (item) => (item as { _type?: unknown } | null)?._type === 'block',
-  );
-
-const localizeContent = (content: unknown) =>
-  isPortableText(content)
-    ? [
-        at(
-          'content',
-          set(
-            inDefaultLocale('internationalizedArrayListedTextValue', content),
-          ),
-        ),
-      ]
-    : [];
-
 export const localizeCtaModule = (doc: TCtaDoc) => {
   const patches = [
     ...localizeHeadingBlock(doc.headingBlock),
     ...localizeStringField('eyebrow', doc.eyebrow),
-    ...localizeContent(doc.content),
+    ...localizePortableTextField('content', doc.content),
     ...localizeStringField('footnote', doc.footnote),
-    ...localizeImage(doc.image),
+    ...localizeImage('image', doc.image),
   ];
 
   return patches.length > 0 ? patches : undefined;
