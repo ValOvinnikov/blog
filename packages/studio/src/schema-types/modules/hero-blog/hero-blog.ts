@@ -108,7 +108,7 @@ export const heroBlogSchema = defineType({
       name: 'eyebrow',
       title: 'Eyebrow',
       description:
-        "Short line above the heading, per language. Defaults to the post's topic.",
+        "Short line above the heading. Defaults to the post's topic.",
     }),
     localizedOneLineTextField({
       name: 'primaryActionLabel',
