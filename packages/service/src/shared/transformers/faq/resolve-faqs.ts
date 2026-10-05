@@ -7,25 +7,6 @@ export type TFaqPageQuestion = {
   answer: string;
 };
 
-type TQuestion = NonNullable<TFaqModuleQuestions['questions']>[number];
-
-type TAnswerBlock = NonNullable<TQuestion['answer']>[number];
-
-function answerToPlainText(blocks: TAnswerBlock[] | null) {
-  return portableTextToPlainText(
-    blocks?.map((block) => ({
-      _type: 'block',
-      _key: block._key,
-      style: 'normal',
-      children: (block.children ?? []).map((span) => ({
-        _type: 'span',
-        _key: span._key,
-        text: span.text ?? '',
-      })),
-    })),
-  );
-}
-
 export function resolveFaqs(
   modules: TFaqModuleQuestions[],
 ): TFaqPageQuestion[] {
@@ -36,7 +17,7 @@ export function resolveFaqs(
     for (const { _id, question, answer: blocks } of questions ?? []) {
       if (seen.has(_id)) continue;
 
-      const answer = answerToPlainText(blocks);
+      const answer = portableTextToPlainText(blocks);
       if (!question || !answer) continue;
 
       seen.add(_id);
