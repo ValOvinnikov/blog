@@ -5,7 +5,12 @@ import {
   PRESET_ID,
   RADIUS_SCALE,
 } from '@blog/config';
-import { customRender, screen, waitFor } from '@platform/testing/custom-render';
+import {
+  customRender,
+  screen,
+  waitFor,
+  within,
+} from '@platform/testing/custom-render';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import userEvent from '@testing-library/user-event';
 
@@ -126,11 +131,19 @@ describe(`<${LookForm.name}/>`, () => {
     });
   });
 
+  it('shows the language switcher style outside the collapsed Advanced section', () => {
+    setup();
+
+    expect(screen.getByRole('button', { name: 'Compact codes' })).toBeVisible();
+    expect(
+      within(screen.getByTestId('disclosure')).queryByText('Language switcher'),
+    ).not.toBeInTheDocument();
+  });
+
   it('saves the chosen language switcher style', async () => {
     const user = userEvent.setup();
     setup();
 
-    await user.click(screen.getByText('Advanced'));
     await user.click(screen.getByRole('button', { name: 'Compact codes' }));
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
@@ -144,11 +157,8 @@ describe(`<${LookForm.name}/>`, () => {
     });
   });
 
-  it('shows a note instead of the language switcher choice with one live language', async () => {
-    const user = userEvent.setup();
+  it('shows a note instead of the language switcher choice with one live language', () => {
     setup({ hasMultipleLanguages: false });
-
-    await user.click(screen.getByText('Advanced'));
 
     expect(
       screen.getByText(
