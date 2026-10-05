@@ -20,8 +20,7 @@ export const contentSchema = defineType({
     localizedArticleTextField({
       name: 'body',
       title: 'Body',
-      description:
-        'The text itself, with images and code blocks as needed, per language.',
+      description: 'The text itself, with images and code blocks as needed.',
       validation: (rule) =>
         rule.custom(
           validateDefaultLanguageBlocksFilled(
