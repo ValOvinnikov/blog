@@ -12,12 +12,8 @@ const isPortableText = (value: unknown): value is unknown[] =>
 export const localizePortableTextField = (
   path: Parameters<typeof at>[0],
   value: unknown,
+  valueType = 'internationalizedArrayListedTextValue',
 ): NodePatch[] =>
   isPortableText(value)
-    ? [
-        at(
-          path,
-          set(inDefaultLocale('internationalizedArrayListedTextValue', value)),
-        ),
-      ]
+    ? [at(path, set(inDefaultLocale(valueType, value)))]
     : [];

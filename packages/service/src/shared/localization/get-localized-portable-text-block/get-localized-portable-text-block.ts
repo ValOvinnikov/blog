@@ -1,4 +1,7 @@
-import type { InternationalizedArrayListedText } from '@blog/config';
+import type {
+  InternationalizedArrayListedText,
+  InternationalizedArrayParagraphText,
+} from '@blog/config';
 import { textBlockFragment } from '@blog/service/shared/fragments/portable-text/text-block';
 import type {
   TLanguageFilter,
@@ -14,20 +17,20 @@ import type {
 
 type TTextBlock = InferFragmentType<typeof textBlockFragment>;
 
+type TLocalizedPortableText =
+  InternationalizedArrayListedText | InternationalizedArrayParagraphText;
+
 export function getLocalizedPortableTextBlock<
   TScope,
   TConfig extends QueryConfig,
-  TKey extends TLocalizedKey<
-    NonNullable<TScope>,
-    InternationalizedArrayListedText
-  >,
+  TKey extends TLocalizedKey<NonNullable<TScope>, TLocalizedPortableText>,
 >(
   sub: GroqBuilderSubquery<TScope, TConfig>,
   field: TKey,
 ): GroqBuilder<TTextBlock[] | null, TConfig>;
 export function getLocalizedPortableTextBlock(
   sub: GroqBuilderSubquery<
-    Record<string, InternationalizedArrayListedText>,
+    Record<string, TLocalizedPortableText>,
     TLocaleQueryConfig
   >,
   field: string,

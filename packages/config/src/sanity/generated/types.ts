@@ -206,7 +206,7 @@ export type Module_timeline = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  headingBlock?: HeadingBlock;
+  headingBlock?: LocalizedHeadingBlock;
   markerStyle?: 'NUMBERED' | 'LABELLED';
   items?: Array<
     {
@@ -625,10 +625,16 @@ export type PricingPrice = {
 
 export type TimelineItem = {
   _type: 'timelineItem';
-  marker?: string;
-  heading?: string;
-  body?: ParagraphText;
+  marker?: InternationalizedArrayString;
+  heading?: InternationalizedArrayString;
+  body?: InternationalizedArrayParagraphText;
 };
+
+export type InternationalizedArrayParagraphText = Array<
+  {
+    _key: string;
+  } & InternationalizedArrayParagraphTextValue
+>;
 
 export type Stat = {
   _type: 'stat';
@@ -1105,6 +1111,12 @@ export type Block_feature = {
     | 'CAMERA';
   image?: ImageWithAlt;
   link?: LinkReference;
+};
+
+export type InternationalizedArrayParagraphTextValue = {
+  _type: 'internationalizedArrayParagraphTextValue';
+  value?: ParagraphText;
+  language?: string;
 };
 
 export type InternationalizedArrayListedTextValue = {
@@ -1975,6 +1987,7 @@ export type AllSanitySchemaTypes =
   | PricingTier
   | PricingPrice
   | TimelineItem
+  | InternationalizedArrayParagraphText
   | Stat
   | PostTakeaways
   | Brand
@@ -2003,6 +2016,7 @@ export type AllSanitySchemaTypes =
   | Block_faq
   | Block_testimonial
   | Block_feature
+  | InternationalizedArrayParagraphTextValue
   | InternationalizedArrayListedTextValue
   | InternationalizedArrayTextValue
   | InternationalizedArrayStringValue

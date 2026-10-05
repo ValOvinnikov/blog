@@ -38,4 +38,26 @@ describe(localizePortableTextField, () => {
     expect(localizePortableTextField('content', [])).toEqual([]);
     expect(localizePortableTextField('content', undefined)).toEqual([]);
   });
+
+  it('moves plain Portable Text into the given localized value type', () => {
+    expect(
+      localizePortableTextField(
+        'body',
+        blocks,
+        'internationalizedArrayParagraphTextValue',
+      ),
+    ).toEqual([
+      at(
+        'body',
+        set([
+          {
+            _key: EN,
+            _type: 'internationalizedArrayParagraphTextValue',
+            language: EN,
+            value: blocks,
+          },
+        ]),
+      ),
+    ]);
+  });
 });

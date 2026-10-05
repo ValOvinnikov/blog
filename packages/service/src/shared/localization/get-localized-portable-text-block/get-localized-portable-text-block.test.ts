@@ -8,6 +8,7 @@ import type { textBlockFragment } from '@blog/service/shared/fragments/portable-
 import type { TLocalizedKey } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
 import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import { paragraphBlocks } from '@blog/service/testing/shared/localized';
 import type { InferFragmentType } from 'groqd';
 
 import { getLocalizedPortableTextBlock } from './get-localized-portable-text-block';
@@ -22,18 +23,6 @@ const query = q
     content: getLocalizedPortableTextBlock(sub, 'content'),
   }));
 
-function paragraph(text: string) {
-  return [
-    {
-      _type: 'block',
-      _key: text,
-      style: 'normal',
-      children: [{ _type: 'span', _key: 'span', text, marks: [] }],
-      markDefs: [],
-    },
-  ];
-}
-
 function resolve(content: unknown[], locale: string) {
   return evaluateGroqExpression(
     query.query,
@@ -43,8 +32,12 @@ function resolve(content: unknown[], locale: string) {
   );
 }
 
-const english = { _key: EN, language: EN, value: paragraph('Read on.') };
-const dutch = { _key: NL, language: NL, value: paragraph('Lees verder.') };
+const english = { _key: EN, language: EN, value: paragraphBlocks('Read on.') };
+const dutch = {
+  _key: NL,
+  language: NL,
+  value: paragraphBlocks('Lees verder.'),
+};
 
 describe(getLocalizedPortableTextBlock, () => {
   it('resolves the blocks in the requested language', async () => {

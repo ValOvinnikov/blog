@@ -13,3 +13,15 @@ export function localizedValues(
 export function localizedStrings(values: Partial<Record<string, string>>) {
   return localizedValues('internationalizedArrayStringValue', values);
 }
+
+export function paragraphBlocks(text: string) {
+  return [
+    {
+      _type: 'block',
+      _key: text,
+      style: 'normal',
+      children: [{ _type: 'span', _key: 'span', text, marks: [] }],
+      markDefs: [],
+    },
+  ];
+}

@@ -15,6 +15,7 @@ import {
 } from '@blog/studio/schema-types/inputs/localization-notice-input/localization-notice-input';
 import { LOCALE_LABEL } from '@blog/studio/schema-types/inputs/localization-notice-input/missing-locales';
 import { listedTextSchema } from '@blog/studio/schema-types/portable-text/listed-text/listed-text';
+import { paragraphTextSchema } from '@blog/studio/schema-types/portable-text/paragraph-text/paragraph-text';
 import { setDefaultLanguage } from '@blog/studio/schema-types/validation/default-language/default-language';
 import { orderLocales } from '@blog/studio/structure/locales/order-locales';
 import { codeInput } from '@sanity/code-input';
@@ -101,7 +102,12 @@ export const buildStudioConfig = ({
       internationalizedArray({
         languages,
         defaultLanguages: [defaultLocale],
-        fieldTypes: ['string', 'text', listedTextSchema.name],
+        fieldTypes: [
+          'string',
+          'text',
+          listedTextSchema.name,
+          paragraphTextSchema.name,
+        ],
       }),
       ...(liveLocales
         ? [
