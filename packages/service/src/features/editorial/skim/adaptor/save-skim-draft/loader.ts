@@ -1,5 +1,5 @@
 import type { PostTakeaways } from '@blog/config';
-import type { TTenantSanityContext } from '@blog/service/sanity/query';
+import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
 import { getWriteClient } from '@blog/service/sanity/write-client/write-client';
 
 import type { TSaveSkimDraftInput } from './types';

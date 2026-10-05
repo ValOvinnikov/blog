@@ -1,4 +1,4 @@
-import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
+import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
 import {
   SHOW_IMAGES_EXPRESSION,
   showImagesParser,

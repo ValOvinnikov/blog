@@ -1,4 +1,4 @@
-import { q } from '@blog/service/sanity/query';
+import { q } from '@blog/service/sanity/query/query';
 import { blockFaqFragment } from '@blog/service/shared/fragments/faq/block-faq';
 import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
 

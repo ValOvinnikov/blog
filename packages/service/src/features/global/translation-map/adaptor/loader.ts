@@ -1,8 +1,8 @@
+import { isr } from '@blog/service/sanity/query/isr';
 import {
-  isr,
   runQuery,
   type TTenantSanityContext,
-} from '@blog/service/sanity/query';
+} from '@blog/service/sanity/query/query';
 import { buildLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
 
 import { translationMapQuery } from './query';

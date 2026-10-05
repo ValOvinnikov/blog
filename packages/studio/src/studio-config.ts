@@ -9,6 +9,7 @@ import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/lan
 import { migrationStateSchema } from '@blog/studio/schema-types/documents/system/migration-state/migration-state';
 import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
 import { createCapabilityWarningInput } from '@blog/studio/schema-types/inputs/capability-warning-input/capability-warning-input';
+import { createCapabilityWarningItem } from '@blog/studio/schema-types/inputs/capability-warning-input/capability-warning-item';
 import { createLanguageSwitcherField } from '@blog/studio/schema-types/inputs/language-switcher-field/language-switcher-field';
 import {
   createLocalizationNoticeInput,
@@ -73,13 +74,7 @@ const languageSwitcherVisibility = definePlugin<{
   },
 }));
 
-/**
- * Builds the full Studio config — schema, desk structure and plugins — shared
- * by every entry point (`sanity.config.ts` for the CLI, and the mount
- * component for `apps/platform`). Kept directive-free so it can be called
- * from both a plain Sanity CLI context and from behind a `'use client'`
- * boundary without duplicating the desk structure.
- */
+// Directive-free: both the Sanity CLI and the `'use client'` mount call it.
 export const buildStudioConfig = ({
   projectId,
   dataset,
@@ -152,6 +147,7 @@ export const buildStudioConfig = ({
       ...(enabledCapabilities && {
         components: {
           input: createCapabilityWarningInput(enabledCapabilities),
+          item: createCapabilityWarningItem(enabledCapabilities),
         },
       }),
     },

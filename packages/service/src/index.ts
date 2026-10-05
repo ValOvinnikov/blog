@@ -171,7 +171,7 @@ export { urlForImage, urlForSanityImage } from './sanity/image/image';
 export type { TImageTransformOptions } from './sanity/image/image';
 export type { TSanityProjectRef } from './sanity/project-cache/project-cache';
 export { getSanityImageBaseUrl } from './sanity/image/image-base-url';
-export type { TTenantSanityContext } from './sanity/query';
+export type { TTenantSanityContext } from './sanity/client/client';
 export { getPlatformSanityContext } from './sanity/client/client';
 export { getPlatformSanityWriteContext } from './sanity/write-client/write-client';
 export type { TCtaButton } from './shared/transformers/cta/to-cta-button';

@@ -1,5 +1,5 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
-import { q } from '@blog/service/sanity/query';
+import { q } from '@blog/service/sanity/query/query';
 import {
   makeRawExternalLinkDocument,
   makeRawPortableTextMarkDef,

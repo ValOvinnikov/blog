@@ -3,6 +3,7 @@ import {
   toLanguageAlternates,
   type TLanguagePage,
 } from '@web/utils/to-language-alternates';
+import { toLiveLanguagePages } from '@web/utils/to-live-language-pages';
 import type { Metadata } from 'next';
 
 type TWithLanguageAlternatesParams = {
@@ -16,9 +17,7 @@ export const withLanguageAlternates = (
   metadata: Metadata,
   { pages, locale, liveLocales, defaultLocale }: TWithLanguageAlternatesParams,
 ): Metadata => {
-  const livePages = pages.filter(({ language }) =>
-    liveLocales.includes(language),
-  );
+  const livePages = toLiveLanguagePages({ pages, liveLocales });
 
   if (livePages.every(({ language }) => language === locale)) {
     return metadata;

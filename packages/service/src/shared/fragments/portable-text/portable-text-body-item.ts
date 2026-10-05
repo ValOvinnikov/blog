@@ -1,5 +1,5 @@
 import type { ArticleText } from '@blog/config';
-import { q } from '@blog/service/sanity/query';
+import { q } from '@blog/service/sanity/query/query';
 import { bodyImageFragment } from '@blog/service/shared/fragments/image/image';
 import { portableTextMarkDefFragment } from '@blog/service/shared/fragments/portable-text/portable-text-mark-def';
 import { textBlockFragment } from '@blog/service/shared/fragments/portable-text/text-block';

@@ -1,4 +1,4 @@
-import { q } from '@blog/service/sanity/query';
+import { q } from '@blog/service/sanity/query/query';
 import {
   TOPIC_ARCHIVE_PAGE_SLUG_EXPRESSION,
   archivePageSlugParser,

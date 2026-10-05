@@ -16,8 +16,10 @@ vi.mock('@blog/service/shared/adaptors/faq-questions/loader', () => ({
 
 const mockFaqQuestions = vi.mocked(getFaqQuestions);
 
-vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
+vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
+  ...(await importOriginal<
+    typeof import('@blog/service/sanity/query/query')
+  >()),
   runQuery: vi.fn(),
 }));
 

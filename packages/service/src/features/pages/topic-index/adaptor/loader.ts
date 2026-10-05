@@ -1,9 +1,9 @@
 import type { TMaybeUndefined } from '@blog/config';
+import { isr } from '@blog/service/sanity/query/isr';
 import {
-  isr,
   runQuery,
   type TTenantSanityContext,
-} from '@blog/service/sanity/query';
+} from '@blog/service/sanity/query/query';
 
 import { topicIndexPageQuery } from './query';
 import { toTopicIndexPage } from './transformer';

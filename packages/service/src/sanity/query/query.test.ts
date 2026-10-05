@@ -1,7 +1,7 @@
 import type { TLocaleIsoCode } from '@blog/config/constants';
 import type { IGroqBuilder } from 'groqd';
 
-import { isr, q, runQuery, type TSlugParams } from './query';
+import { q, runQuery, type TSlugParams } from './query';
 
 const { mockFetch, getClientMock } = vi.hoisted(() => {
   const mockFetch = vi.fn();
@@ -19,14 +19,6 @@ const testTenant = {
   token: 'tok',
 };
 
-/**
- * `.notNull()` fragment fields on a `slice(0)` query make groqd's
- * `builder.parse()` throw — not resolve `null` — when Sanity genuinely
- * returns `null` for "no document matched". A loader's `if (!raw) return
- * null` guard is therefore unreachable for a genuinely-missing document;
- * `runQuery` throws before it, and `safeAsync` at the service boundary is
- * what turns that throw into a clean `ok: false`.
- */
 describe(runQuery, () => {
   it('rejects, rather than resolving to a falsy value, when the fetch resolves null for a slice(0)+notNull query', async () => {
     mockFetch.mockResolvedValue(null);
@@ -76,28 +68,6 @@ describe('runQuery injected locale parameters', () => {
     type TOptions = Parameters<typeof runQuery<unknown, TConfig>>[1];
 
     expectTypeOf<TOptions['parameters']>().toEqualTypeOf<{ slug: string }>();
-  });
-});
-
-describe(isr, () => {
-  it('rejects a call site that omits the project id at compile time', () => {
-    // @ts-expect-error -- `scopeProjectId` is required; there is no unscoped form that silently shares a cache tag across tenants.
-    isr(['posts', 'author']);
-  });
-
-  it('prefixes every tag with t:<projectId>:', () => {
-    expect(isr(['posts', 'author'], 'tenant-a')).toEqual({
-      next: {
-        revalidate: 3600,
-        tags: ['t:tenant-a:posts', 't:tenant-a:author'],
-      },
-    });
-  });
-
-  it('accepts a single tag string the same as an array of one', () => {
-    expect(isr('posts', 'tenant-a')).toEqual({
-      next: { revalidate: 3600, tags: ['t:tenant-a:posts'] },
-    });
   });
 });
 

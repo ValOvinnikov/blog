@@ -1,7 +1,7 @@
 import { getAllPublishedPosts } from '@blog/service/features/entities/posts/adaptor/all-published/loader';
 import { getPostsByIds } from '@blog/service/features/entities/posts/adaptor/get-by-ids/loader';
 import { getPublishedPostsByTag } from '@blog/service/features/entities/posts/adaptor/tag-scoped-published/loader';
-import type { TTenantSanityContext } from '@blog/service/sanity/query';
+import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
 import { safeAsync } from '@blog/utils';
 
 export function createPostsService() {

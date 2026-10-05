@@ -1,5 +1,5 @@
 import type { HeroLayout, Layout, WideLayout } from '@blog/config';
-import { q } from '@blog/service/sanity/query';
+import { q } from '@blog/service/sanity/query/query';
 
 export const layoutFragment = q.fragmentForType<'layout'>().project((sub) => ({
   spacingTop: sub.field('spacingTop').nullable(true),
