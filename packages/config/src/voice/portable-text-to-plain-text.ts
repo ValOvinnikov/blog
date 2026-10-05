@@ -1,7 +1,9 @@
-import type { TVoicePortableText } from './voice-portable-text';
+type TPlainTextBlocks = ReadonlyArray<{
+  children?: ReadonlyArray<{ text?: string | null }> | null;
+}>;
 
 export function portableTextToPlainText(
-  value: TVoicePortableText | undefined,
+  value: TPlainTextBlocks | null | undefined,
 ): string {
   if (!value || value.length === 0) return '';
 

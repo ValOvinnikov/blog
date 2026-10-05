@@ -50,6 +50,12 @@ describe(portableTextToPlainText, () => {
     expect(portableTextToPlainText(value)).toBe('First. Second.');
   });
 
+  it('converts blocks that carry only children text', () => {
+    expect(
+      portableTextToPlainText([{ children: [{ text: 'Bare block.' }] }]),
+    ).toBe('Bare block.');
+  });
+
   it('returns an empty string for an empty value', () => {
     expect(portableTextToPlainText([])).toBe('');
   });
