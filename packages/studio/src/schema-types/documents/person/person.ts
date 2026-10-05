@@ -43,7 +43,7 @@ export const personSchema = defineType({
       name: 'role',
       title: 'Role',
       description:
-        'Job title or role shown beneath their name (e.g. "Senior Engineer"), per language.',
+        'Job title or role shown beneath their name (e.g. "Senior Engineer").',
       validation: (rule) =>
         rule.custom(
           validateLocalizedMaxLength(
