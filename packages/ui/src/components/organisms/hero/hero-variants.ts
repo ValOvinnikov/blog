@@ -115,17 +115,7 @@ export const heroVariants = tv({
     },
     {
       variant: HERO_VARIANT.STACKED,
-      class: { media: ['w-full max-w-post'] },
-    },
-    {
-      variant: HERO_VARIANT.STACKED,
-      alignment: CONTENT_ALIGNMENT.CENTER,
-      class: { media: ['mx-auto'] },
-    },
-    {
-      variant: HERO_VARIANT.STACKED,
-      alignment: CONTENT_ALIGNMENT.RIGHT,
-      class: { media: ['ml-auto'] },
+      class: { media: ['w-full'] },
     },
     {
       variant: HERO_VARIANT.STACKED,
