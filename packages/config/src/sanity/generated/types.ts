@@ -1392,9 +1392,9 @@ export type Module_heroBlog = {
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
   postSource?: 'PINNED' | 'NEWEST_FEATURED';
   post?: Page_postReference;
-  image?: ImageWithAlt;
-  eyebrow?: string;
-  primaryActionLabel?: string;
+  image?: LocalizedImageWithAlt;
+  eyebrow?: InternationalizedArrayString;
+  primaryActionLabel?: InternationalizedArrayString;
   primaryActionAppearance?: 'CONTAINED' | 'INLINE';
   secondaryAction?: CtaSecondaryButton;
   variant?: 'SPLIT' | 'STACKED' | 'BANNER';
