@@ -4,12 +4,13 @@ import {
   displayModeParser,
 } from '@blog/service/shared/expressions/module/display-mode';
 import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
-import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
-import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
+import { localizedHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/localized-heading-block';
+import { localizedImageWithAltFragment } from '@blog/service/shared/fragments/image/localized-image-with-alt';
 import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document';
 import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
-import { textBlockFragment } from '@blog/service/shared/fragments/portable-text/text-block';
+import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
+import { getLocalizedPortableTextBlock } from '@blog/service/shared/localization/get-localized-portable-text-block/get-localized-portable-text-block';
 
 export const testimonialModuleQuery = q
   .parameters<TModuleQueryParams>()
@@ -20,7 +21,7 @@ export const testimonialModuleQuery = q
     brandVariant: sub.field('brandVariant').notNull(),
     headingBlock: sub
       .field('headingBlock')
-      .project(headingBlockFragment)
+      .project(localizedHeadingBlockFragment)
       .notNull(),
     testimonials: sub
       .field('testimonials[]')
@@ -28,11 +29,11 @@ export const testimonialModuleQuery = q
       .project((itemSub) => ({
         _id: true,
         name: itemSub.field('name').notNull(),
-        quote: itemSub.field('quote[]').project(textBlockFragment).notNull(),
-        role: itemSub.field('role').nullable(true),
+        quote: getLocalizedPortableTextBlock(itemSub, 'quote').notNull(),
+        role: getLocalizedField(itemSub, 'role'),
         image: itemSub
           .field('image')
-          .project(sanityImageFragment)
+          .project(localizedImageWithAltFragment)
           .nullable(true),
         link: itemSub
           .field('link')
