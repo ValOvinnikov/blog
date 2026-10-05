@@ -1,4 +1,9 @@
-import { CAPABILITY, type TCapability } from '@blog/config/constants';
+import {
+  CAPABILITY,
+  LOCALE_ISO_CODES,
+  type TCapability,
+  type TLocaleIsoCode,
+} from '@blog/config/constants';
 import { PAGE_HOME_TYPE } from '@blog/studio/schema-types/documents/pages/home/home-type';
 import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
 import { migrationStateSchema } from '@blog/studio/schema-types/documents/system/migration-state/migration-state';
@@ -103,6 +108,43 @@ describe(buildStudioConfig, () => {
       expect(ids).toEqual([`${type}-EN`, 'page_post']);
     },
   );
+
+  describe('translations menu', () => {
+    const languageFilterFor = (liveLocales: TLocaleIsoCode[]) => {
+      const plugin = buildStudioConfig({
+        projectId: 'test-project',
+        dataset: 'test-dataset',
+        title: 'Test Studio',
+        liveLocales,
+      }).plugins?.find(
+        (entry) =>
+          typeof entry === 'object' &&
+          entry.name === '@sanity/document-internationalization',
+      );
+      const filter =
+        typeof plugin === 'object'
+          ? plugin.document?.unstable_languageFilter
+          : undefined;
+      if (typeof filter !== 'function') {
+        throw new Error('expected the translations plugin language filter');
+      }
+
+      return filter([], {
+        schemaType: PAGE_HOME_TYPE,
+        documentId: 'homePage',
+      } as Parameters<typeof filter>[1]);
+    };
+
+    it('offers no Translations menu with one live language', () => {
+      expect(languageFilterFor([LOCALE_ISO_CODES.EN])).toHaveLength(0);
+    });
+
+    it('offers the Translations menu with two live languages', () => {
+      expect(
+        languageFilterFor([LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL]),
+      ).toHaveLength(1);
+    });
+  });
 
   describe('capability warning', () => {
     const componentsFor = (enabledCapabilities: TCapability[]) => {

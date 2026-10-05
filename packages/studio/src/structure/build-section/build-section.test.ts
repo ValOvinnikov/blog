@@ -1,4 +1,8 @@
-import { LOCALE_ISO_CODES, LOCALE_NATIVE_LABEL } from '@blog/config/constants';
+import {
+  LOCALE_ISO_CODES,
+  LOCALE_NATIVE_LABEL,
+  type TLocaleIsoCode,
+} from '@blog/config/constants';
 import { evaluate, parse } from 'groq-js';
 import { House, Link2, List, Settings, Tag } from 'lucide-react';
 import type { StructureBuilder } from 'sanity/structure';
@@ -69,23 +73,31 @@ const asStructureBuilder = (S: ReturnType<typeof makeMockStructureBuilder>) =>
 const buildOneSection = (
   S: ReturnType<typeof makeMockStructureBuilder>,
   section: TStructureSection,
+  locales?: readonly TLocaleIsoCode[],
 ): TMockBuilder => {
-  const [result] = buildSections(asStructureBuilder(S), [
-    section,
-  ]) as unknown as TMockBuilder[];
+  const [result] = buildSections(
+    asStructureBuilder(S),
+    [section],
+    locales,
+  ) as unknown as TMockBuilder[];
   return result!;
 };
 
 const getGroupItems = (
   S: ReturnType<typeof makeMockStructureBuilder>,
   groups: TStructureSection['groups'],
+  locales?: readonly TLocaleIsoCode[],
 ): TMockBuilder[] => {
-  const sectionItem = buildOneSection(S, {
-    title: 'Section',
-    id: 'section',
-    icon: List,
-    groups,
-  });
+  const sectionItem = buildOneSection(
+    S,
+    {
+      title: 'Section',
+      id: 'section',
+      icon: List,
+      groups,
+    },
+    locales,
+  );
   const childList = callArgs(sectionItem, 'child')?.[0] as TMockBuilder;
   return callArgs(childList, 'items')?.[0] as TMockBuilder[];
 };
@@ -508,25 +520,73 @@ describe(buildSections, () => {
     expect(callArgs(result[2]!, 'id')).toEqual(['settings']);
   });
   describe('byLanguage items', () => {
-    const buildLanguageLists = () => {
+    const buildLandingItem = (locales?: readonly TLocaleIsoCode[]) => {
       const S = makeMockStructureBuilder();
-      const [item] = getGroupItems(S, [
-        {
-          items: [
-            {
-              schema: {
-                name: 'landingPage',
-                title: 'Landing Pages',
-                icon: List,
+      const [item] = getGroupItems(
+        S,
+        [
+          {
+            items: [
+              {
+                schema: {
+                  name: 'landingPage',
+                  title: 'Landing Pages',
+                  icon: List,
+                },
+                mode: 'byLanguage',
               },
-              mode: 'byLanguage',
-            },
-          ],
-        },
-      ]);
-      const list = callArgs(item!, 'child')?.[0] as TMockBuilder;
+            ],
+          },
+        ],
+        locales,
+      );
+      return { S, item: item! };
+    };
+
+    const buildLanguageLists = (locales?: readonly TLocaleIsoCode[]) => {
+      const { item } = buildLandingItem(locales);
+      const list = callArgs(item, 'child')?.[0] as TMockBuilder;
       return callArgs(list, 'items')?.[0] as TMockBuilder[];
     };
+
+    it('shows one plain list of every page with one live language, creating pages in it', () => {
+      const { S, item } = buildLandingItem([LOCALE_ISO_CODES.NL]);
+      const documentList = callArgs(item, 'child')?.[0] as TMockBuilder;
+
+      expect(callArgs(item, 'title')).toEqual(['Landing Pages']);
+      expect(documentList.kind).toBe('documentTypeList');
+      expect(documentList.documentType).toBe('landingPage');
+      expect(callArgs(documentList, 'title')).toEqual(['Landing Pages']);
+      expect(callArgs(documentList, 'filter')).toBeUndefined();
+      expect(callArgs(documentList, 'initialValueTemplates')).toEqual([
+        [{ templateId: 'landingPage-NL' }],
+      ]);
+      expect(S.list).toHaveBeenCalledTimes(1);
+      expect(S.divider).not.toHaveBeenCalled();
+    });
+
+    it('keeps a list per language and all pages with two live languages', () => {
+      const lists = buildLanguageLists([
+        LOCALE_ISO_CODES.EN,
+        LOCALE_ISO_CODES.NL,
+      ]);
+
+      expect(lists.map((list) => list.kind)).toEqual([
+        'listItem',
+        'listItem',
+        'divider',
+        'listItem',
+      ]);
+      expect(
+        lists
+          .filter((list) => list.kind === 'listItem')
+          .map((list) => callArgs(list, 'title')?.[0]),
+      ).toEqual([
+        LOCALE_NATIVE_LABEL[LOCALE_ISO_CODES.EN],
+        LOCALE_NATIVE_LABEL[LOCALE_ISO_CODES.NL],
+        'All pages',
+      ]);
+    });
 
     const listOf = (languageItem: TMockBuilder) =>
       callArgs(languageItem, 'child')?.[0] as TMockBuilder;
@@ -594,7 +654,10 @@ describe(buildSections, () => {
   describe('onePerLanguage items', () => {
     const { EN, NL, DE } = LOCALE_ISO_CODES;
 
-    const buildHomeEntries = (dataset: Record<string, unknown>[]) => {
+    const buildHomeEntries = (
+      dataset: Record<string, unknown>[],
+      locales: readonly TLocaleIsoCode[] = [NL, EN, DE],
+    ) => {
       const S = makeMockStructureBuilder(dataset);
       const [section] = buildSections(
         asStructureBuilder(S),
@@ -615,7 +678,7 @@ describe(buildSections, () => {
             ],
           },
         ],
-        [NL, EN, DE],
+        locales,
       ) as unknown as TMockBuilder[];
       const list = callArgs(section!, 'child')?.[0] as TMockBuilder;
       return callArgs(list, 'items')?.[0] as TMockBuilder[];
@@ -625,6 +688,14 @@ describe(buildSections, () => {
       const [home] = buildHomeEntries(dataset);
       const languages = callArgs(home!, 'child')?.[0] as TMockBuilder;
       return callArgs(languages, 'items')?.[0] as TMockBuilder[];
+    };
+
+    const resolveChild = async (item: TMockBuilder) => {
+      const resolver = callArgs(
+        item,
+        'child',
+      )?.[0] as () => Promise<TMockBuilder>;
+      return resolver();
     };
 
     it('shows one Home entry that opens its language list', () => {
@@ -638,13 +709,40 @@ describe(buildSections, () => {
       expect(callArgs(languages, 'title')).toEqual(['Home']);
     });
 
-    const resolveChild = async (item: TMockBuilder) => {
-      const resolver = callArgs(
-        item,
-        'child',
-      )?.[0] as () => Promise<TMockBuilder>;
-      return resolver();
-    };
+    it('opens the default-language Home directly with one live language', async () => {
+      const [home, ...rest] = buildHomeEntries(
+        [{ _id: 'home-nl', _type: 'homePage', language: NL }],
+        [NL],
+      );
+
+      const child = await resolveChild(home!);
+
+      expect(rest).toHaveLength(0);
+      expect(callArgs(home!, 'title')).toEqual(['Home']);
+      expect(child.kind).toBe('document');
+      expect(callArgs(child, 'documentId')).toEqual(['home-nl']);
+    });
+
+    it('creates the default-language Home with one live language when there is none', async () => {
+      const [home] = buildHomeEntries([], [NL]);
+
+      const child = await resolveChild(home!);
+
+      expect(callArgs(child, 'documentId')).toEqual(['homePage']);
+      expect(callArgs(child, 'initialValueTemplate')).toEqual(['homePage-NL']);
+    });
+
+    it('keeps one entry per language with two live languages', () => {
+      const [home] = buildHomeEntries([], [NL, EN]);
+      const languages = callArgs(home!, 'child')?.[0] as TMockBuilder;
+      const items = callArgs(languages, 'items')?.[0] as TMockBuilder[];
+
+      expect(languages.kind).toBe('list');
+      expect(items.map((item) => callArgs(item, 'title')?.[0])).toEqual([
+        LOCALE_NATIVE_LABEL[NL],
+        LOCALE_NATIVE_LABEL[EN],
+      ]);
+    });
 
     it('lists one entry per language by its own name, default language first', () => {
       const items = buildHomeItems([]);
