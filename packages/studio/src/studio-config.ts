@@ -15,6 +15,10 @@ import {
   type TLocalizationNoticeOptions,
 } from '@blog/studio/schema-types/inputs/localization-notice-input/localization-notice-input';
 import { LOCALE_LABEL } from '@blog/studio/schema-types/inputs/localization-notice-input/missing-locales';
+import {
+  createTranslationLinkInput,
+  type TTranslationLinkOptions,
+} from '@blog/studio/schema-types/inputs/translation-link-input/translation-link-input';
 import { listedTextSchema } from '@blog/studio/schema-types/portable-text/listed-text/listed-text';
 import { paragraphTextSchema } from '@blog/studio/schema-types/portable-text/paragraph-text/paragraph-text';
 import { setDefaultLanguage } from '@blog/studio/schema-types/validation/default-language/default-language';
@@ -40,6 +44,15 @@ export type TBuildStudioConfigParams = {
 };
 
 const TRANSLATED_DOCUMENT_TYPES: string[] = [PAGE_HOME_TYPE, PAGE_LANDING_TYPE];
+
+const ONE_PER_LANGUAGE_DOCUMENT_TYPES: string[] = [PAGE_HOME_TYPE];
+
+const translationLinks = definePlugin<TTranslationLinkOptions>((options) => ({
+  name: 'translation-links',
+  form: {
+    components: { input: createTranslationLinkInput(options) },
+  },
+}));
 
 const localizationNotices = definePlugin<TLocalizationNoticeOptions>(
   (options) => ({
@@ -99,6 +112,10 @@ export const buildStudioConfig = ({
         supportedLanguages: languages,
         schemaTypes: TRANSLATED_DOCUMENT_TYPES,
         languageField: LANGUAGE_FIELD,
+      }),
+      translationLinks({
+        schemaTypes: ONE_PER_LANGUAGE_DOCUMENT_TYPES,
+        defaultLocale,
       }),
       internationalizedArray({
         languages,
