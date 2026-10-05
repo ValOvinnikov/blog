@@ -4,7 +4,6 @@ import { blockTestimonialSchema } from './blocks/testimonial/testimonial';
 import { tagSchema } from './blog/tag/tag';
 import { topicSchema } from './blog/topic/topic';
 import { linkSchema } from './link/link';
-import { pageTemplateSchema } from './page-template/page-template';
 import { homePageSchema } from './pages/home/home';
 import { landingPageSchema } from './pages/landing/landing';
 import { postPageSchema } from './pages/post/post';
@@ -20,6 +19,8 @@ import { newsletterSettingsSchema } from './settings/newsletter/newsletter';
 import { siteSettingsSchema } from './settings/site-settings/site-settings';
 import { themeSettingsSchema } from './settings/theme/theme';
 import { migrationStateSchema } from './system/migration-state/migration-state';
+import { homeTemplateSchema } from './templates/home/home';
+import { landingTemplateSchema } from './templates/landing/landing';
 
 export const documents = [
   personSchema,
@@ -29,7 +30,8 @@ export const documents = [
   blockTestimonialSchema,
   faqBlockSchema,
   linkSchema,
-  pageTemplateSchema,
+  homeTemplateSchema,
+  landingTemplateSchema,
   landingPageSchema,
   homePageSchema,
   postIndexPageSchema,

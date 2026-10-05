@@ -1193,11 +1193,11 @@ export type InternationalizedArrayReferenceValue = {
   language?: string;
 };
 
-export type Page_templateReference = {
+export type Template_homeReference = {
   _ref: string;
   _type: 'reference';
   _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'page_template';
+  [internalGroqTypeReferenceTo]?: 'template_home';
 };
 
 export type Page_home = {
@@ -1209,7 +1209,7 @@ export type Page_home = {
   language?: 'EN' | 'NL' | 'FR' | 'DE' | 'ES';
   title?: string;
   headingBlock?: HeadingBlock;
-  template?: Page_templateReference;
+  template?: Template_homeReference;
   seo?: Seo;
 };
 
@@ -1339,9 +1339,9 @@ export type Module_timelineReference = {
   [internalGroqTypeReferenceTo]?: 'module_timeline';
 };
 
-export type Page_template = {
+export type Template_home = {
   _id: string;
-  _type: 'page_template';
+  _type: 'template_home';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -1397,59 +1397,6 @@ export type Page_template = {
         _key: string;
       } & Module_timelineReference)
   >;
-};
-
-export type Module_heroStatement = {
-  _id: string;
-  _type: 'module_heroStatement';
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
-  headingBlock?: LocalizedHeadingBlock;
-  eyebrow?: InternationalizedArrayString;
-  image?: LocalizedImageWithAlt;
-  ctaButtons?: Array<
-    {
-      _key: string;
-    } & CtaButton
-  >;
-  variant?: 'SPLIT' | 'STACKED' | 'BANNER';
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
-  contentPositionSplit?: 'LEFT' | 'RIGHT';
-  contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
-  mediaOrderSplit?: 'LAST' | 'FIRST';
-  mediaOrderStacked?: 'LAST' | 'FIRST';
-  layout?: HeroLayout;
-};
-
-export type Module_heroProfile = {
-  _id: string;
-  _type: 'module_heroProfile';
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
-  headingBlock?: LocalizedHeadingBlock;
-  eyebrow?: InternationalizedArrayString;
-  author?: PersonReference;
-  image?: LocalizedImageWithAlt;
-  ctaButtons?: Array<
-    {
-      _key: string;
-    } & CtaButton
-  >;
-  showSocialLinks?: boolean;
-  showRole?: boolean;
-  showBio?: boolean;
-  variant?: 'SPLIT' | 'STACKED' | 'BANNER';
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
-  contentPositionSplit?: 'LEFT' | 'RIGHT';
-  contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
-  mediaOrderSplit?: 'LAST' | 'FIRST';
-  layout?: HeroLayout;
 };
 
 export type Module_heroBlog = {
@@ -1790,6 +1737,13 @@ export type Page_postIndex = {
   seo?: Seo;
 };
 
+export type Template_landingReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'template_landing';
+};
+
 export type Page_landing = {
   _id: string;
   _type: 'page_landing';
@@ -1800,8 +1754,121 @@ export type Page_landing = {
   title?: string;
   slug?: Slug;
   headingBlock?: HeadingBlock;
-  template?: Page_templateReference;
+  template?: Template_landingReference;
   seo?: Seo;
+};
+
+export type Template_landing = {
+  _id: string;
+  _type: 'template_landing';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  hero?:
+    | Module_heroBlogReference
+    | Module_heroProfileReference
+    | Module_heroStatementReference;
+  modules?: Array<
+    | ({
+        _key: string;
+      } & Module_ctaReference)
+    | ({
+        _key: string;
+      } & Module_contentReference)
+    | ({
+        _key: string;
+      } & Module_faqReference)
+    | ({
+        _key: string;
+      } & Module_featureHighlightsReference)
+    | ({
+        _key: string;
+      } & Module_postFeaturedReference)
+    | ({
+        _key: string;
+      } & Module_featureListReference)
+    | ({
+        _key: string;
+      } & Module_postLatestReference)
+    | ({
+        _key: string;
+      } & Module_logoWallReference)
+    | ({
+        _key: string;
+      } & Module_newsletterReference)
+    | ({
+        _key: string;
+      } & Module_pricingReference)
+    | ({
+        _key: string;
+      } & Module_statsReference)
+    | ({
+        _key: string;
+      } & Module_taxonomyListReference)
+    | ({
+        _key: string;
+      } & Module_teamReference)
+    | ({
+        _key: string;
+      } & Module_testimonialReference)
+    | ({
+        _key: string;
+      } & Module_timelineReference)
+  >;
+};
+
+export type Module_heroStatement = {
+  _id: string;
+  _type: 'module_heroStatement';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
+  headingBlock?: LocalizedHeadingBlock;
+  eyebrow?: InternationalizedArrayString;
+  image?: LocalizedImageWithAlt;
+  ctaButtons?: Array<
+    {
+      _key: string;
+    } & CtaButton
+  >;
+  variant?: 'SPLIT' | 'STACKED' | 'BANNER';
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  contentPositionSplit?: 'LEFT' | 'RIGHT';
+  contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
+  mediaOrderSplit?: 'LAST' | 'FIRST';
+  mediaOrderStacked?: 'LAST' | 'FIRST';
+  layout?: HeroLayout;
+};
+
+export type Module_heroProfile = {
+  _id: string;
+  _type: 'module_heroProfile';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
+  headingBlock?: LocalizedHeadingBlock;
+  eyebrow?: InternationalizedArrayString;
+  author?: PersonReference;
+  image?: LocalizedImageWithAlt;
+  ctaButtons?: Array<
+    {
+      _key: string;
+    } & CtaButton
+  >;
+  showSocialLinks?: boolean;
+  showRole?: boolean;
+  showBio?: boolean;
+  variant?: 'SPLIT' | 'STACKED' | 'BANNER';
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  contentPositionSplit?: 'LEFT' | 'RIGHT';
+  contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
+  mediaOrderSplit?: 'LAST' | 'FIRST';
+  layout?: HeroLayout;
 };
 
 export type MediaFolderReference = {
@@ -2017,7 +2084,7 @@ export type AllSanitySchemaTypes =
   | InternationalizedArrayReference
   | Page_homeReference
   | InternationalizedArrayReferenceValue
-  | Page_templateReference
+  | Template_homeReference
   | Page_home
   | Module_heroBlogReference
   | Module_heroProfileReference
@@ -2037,9 +2104,7 @@ export type AllSanitySchemaTypes =
   | Module_teamReference
   | Module_testimonialReference
   | Module_timelineReference
-  | Page_template
-  | Module_heroStatement
-  | Module_heroProfile
+  | Template_home
   | Module_heroBlog
   | Blog_tagReference
   | Module_postRelatedReference
@@ -2060,7 +2125,11 @@ export type AllSanitySchemaTypes =
   | Page_topic
   | Blog_topic
   | Page_postIndex
+  | Template_landingReference
   | Page_landing
+  | Template_landing
+  | Module_heroStatement
+  | Module_heroProfile
   | MediaFolderReference
   | MediaFolder
   | MediaTag

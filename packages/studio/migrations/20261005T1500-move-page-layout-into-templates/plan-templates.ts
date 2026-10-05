@@ -7,8 +7,14 @@ const DEFAULT_LOCALE = LOCALE_ISO_CODES.EN;
 const DRAFTS_PREFIX = 'drafts.';
 const TEMPLATE_PREFIX = 'template-';
 
+const TEMPLATE_TYPE_BY_PAGE_TYPE: Record<string, string> = {
+  page_home: 'template_home',
+  page_landing: 'template_landing',
+};
+
 export type TLayoutPage = {
   _id: string;
+  _type: string;
   language?: string;
   title?: string;
   hero?: unknown;
@@ -19,6 +25,7 @@ export type TTranslationGroup = { pageIds: string[] };
 
 export type TPlannedTemplate = {
   _id: string;
+  _type: string;
   title?: string;
   hero?: unknown;
   modules?: unknown;
@@ -66,10 +73,13 @@ export const planTemplates = (
     const source =
       sources.find((page) => page && isDefaultLanguage(page)) ?? sources[0];
 
-    if (!source) continue;
+    const templateType = source && TEMPLATE_TYPE_BY_PAGE_TYPE[source._type];
+
+    if (!source || !templateType) continue;
 
     const template: TPlannedTemplate = {
       _id: withPrefix(bareId(source._id), TEMPLATE_PREFIX),
+      _type: templateType,
       title: source.title,
       hero: source.hero,
       modules: source.modules,

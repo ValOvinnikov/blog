@@ -19,9 +19,9 @@ import {
 } from './plan-templates';
 
 const PAGE_TYPES = ['page_home', 'page_landing'];
-const TEMPLATE_TYPE = 'page_template';
 
-const PAGES_QUERY = '*[_type in $types]{ _id, language, title, hero, modules }';
+const PAGES_QUERY =
+  '*[_type in $types]{ _id, _type, language, title, hero, modules }';
 const GROUPS_QUERY =
   '*[_type == "translation.metadata"]{ "pageIds": coalesce(translations[].value._ref, []) }';
 
@@ -66,7 +66,7 @@ const migratePage = (
   const pagePatch = patch(doc._id, patches);
 
   return template && !doc.template
-    ? [createIfNotExists({ _type: TEMPLATE_TYPE, ...template }), pagePatch]
+    ? [createIfNotExists(template), pagePatch]
     : [pagePatch];
 };
 

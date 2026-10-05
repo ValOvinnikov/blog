@@ -7,11 +7,11 @@ import { taxonomySection } from './taxonomy-section';
 import { templatesSection } from './templates-section';
 
 export const sections = [
-  pagesSection,
-  taxonomySection,
   peopleSection,
-  templatesSection,
   modulesSection,
   blocksSection,
+  taxonomySection,
+  pagesSection,
+  templatesSection,
   settingsSection,
 ];

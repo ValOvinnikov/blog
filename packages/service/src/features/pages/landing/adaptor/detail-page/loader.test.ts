@@ -155,7 +155,7 @@ describe('getPage', () => {
       expect.objectContaining({
         tenant,
         next: expect.objectContaining({
-          tags: ['t:tenant-a:page_landing', 't:tenant-a:page_template'],
+          tags: ['t:tenant-a:page_landing', 't:tenant-a:template_landing'],
         }),
       }),
     );

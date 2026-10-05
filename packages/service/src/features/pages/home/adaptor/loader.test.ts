@@ -171,7 +171,7 @@ describe('getHomePage', () => {
       expect.objectContaining({
         tenant,
         next: expect.objectContaining({
-          tags: ['t:tenant-a:homePage', 't:tenant-a:page_template'],
+          tags: ['t:tenant-a:homePage', 't:tenant-a:template_home'],
         }),
       }),
     );

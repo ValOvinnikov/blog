@@ -4,9 +4,10 @@ import type {
   Page_postIndex,
   Page_tag,
   Page_tagIndex,
-  Page_template,
   Page_topic,
   Page_topicIndex,
+  Template_home,
+  Template_landing,
 } from '@blog/config/sanity/generated/types';
 
 /**
@@ -27,12 +28,11 @@ type THeroKind<TPage extends { hero?: unknown }> = TReferencedType<
 type TModuleKind<TPage extends { modules?: readonly unknown[] }> =
   TReferencedType<NonNullable<TPage['modules']>[number]>;
 
-export type TPageTemplateType =
-  THeroKind<Page_template> | TModuleKind<Page_template>;
+export type TPageHomeType =
+  THeroKind<Template_home> | TModuleKind<Template_home>;
 
-export type TPageHomeType = TPageTemplateType;
-
-export type TPageLandingType = TPageTemplateType;
+export type TPageLandingType =
+  THeroKind<Template_landing> | TModuleKind<Template_landing>;
 
 export type TPagePostIndexType =
   THeroKind<Page_postIndex> | TModuleKind<Page_postIndex>;

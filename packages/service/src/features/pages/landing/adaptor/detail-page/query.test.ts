@@ -139,7 +139,7 @@ describe('landingPageQuery template layout', () => {
     landing('about-nl', NL, 'template-about'),
     {
       _id: 'template-about',
-      _type: 'page_template',
+      _type: 'template_landing',
       hero: { _type: 'reference', _ref: 'hero-1' },
       modules: [
         { _key: 'a', _type: 'reference', _ref: 'content-1' },

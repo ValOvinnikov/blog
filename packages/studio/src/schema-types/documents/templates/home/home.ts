@@ -1,4 +1,4 @@
-import { PAGE_TEMPLATE_TYPE } from '@blog/studio/schema-types/documents/page-template/page-template-type';
+import { TEMPLATE_HOME_TYPE } from '@blog/studio/schema-types/documents/templates/home/home-type';
 import { heroField } from '@blog/studio/schema-types/fields/hero-field/hero-field';
 import { modulesField } from '@blog/studio/schema-types/fields/modules-field/modules-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
@@ -20,16 +20,16 @@ import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-l
 import { teamSchema } from '@blog/studio/schema-types/modules/team/team';
 import { testimonialSchema } from '@blog/studio/schema-types/modules/testimonial/testimonial';
 import { timelineSchema } from '@blog/studio/schema-types/modules/timeline/timeline';
-import { LayoutTemplate } from 'lucide-react';
+import { House } from 'lucide-react';
 import { defineType } from 'sanity';
 
-export const pageTemplateSchema = defineType({
-  name: PAGE_TEMPLATE_TYPE,
-  title: 'Page Template',
+export const homeTemplateSchema = defineType({
+  name: TEMPLATE_HOME_TYPE,
+  title: 'Home Template',
   type: 'document',
   description:
-    'The hero and modules a page shows, shared by every language of that page.',
-  icon: LayoutTemplate,
+    'The hero and modules the Home page shows, shared by every language of it.',
+  icon: House,
   preview: {
     select: { title: 'title' },
   },
@@ -46,10 +46,10 @@ export const pageTemplateSchema = defineType({
       allow: [
         contentSchema.name,
         ctaSchema.name,
-        postLatestSchema.name,
-        postFeaturedSchema.name,
         newsletterSchema.name,
+        postLatestSchema.name,
         taxonomyListSchema.name,
+        postFeaturedSchema.name,
         featureListSchema.name,
         featureHighlightsSchema.name,
         logoWallSchema.name,

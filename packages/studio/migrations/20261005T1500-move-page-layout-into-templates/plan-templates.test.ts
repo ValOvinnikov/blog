@@ -7,14 +7,28 @@ describe(planTemplates, () => {
   it("gives every page in a translation group the default-language page's layout", () => {
     const plan = planTemplates(
       [
-        { _id: 'about-nl', language: 'NL', title: 'Over ons', modules: [] },
-        { _id: 'about-en', language: 'EN', title: 'About', hero, modules },
+        {
+          _id: 'about-nl',
+          _type: 'page_landing',
+          language: 'NL',
+          title: 'Over ons',
+          modules: [],
+        },
+        {
+          _id: 'about-en',
+          _type: 'page_landing',
+          language: 'EN',
+          title: 'About',
+          hero,
+          modules,
+        },
       ],
       [{ pageIds: ['about-en', 'about-nl'] }],
     );
 
     const expected = {
       _id: 'template-about-en',
+      _type: 'template_landing',
       title: 'About',
       hero,
       modules,
@@ -24,10 +38,14 @@ describe(planTemplates, () => {
   });
 
   it('gives a standalone page a template of its own', () => {
-    const plan = planTemplates([{ _id: 'page_home', title: 'Home', hero }], []);
+    const plan = planTemplates(
+      [{ _id: 'page_home', _type: 'page_home', title: 'Home', hero }],
+      [],
+    );
 
     expect(plan.get('page_home')).toEqual({
       _id: 'template-page_home',
+      _type: 'template_home',
       title: 'Home',
       hero,
       modules: undefined,
@@ -37,8 +55,20 @@ describe(planTemplates, () => {
   it('takes the layout from the published page over its draft', () => {
     const plan = planTemplates(
       [
-        { _id: 'drafts.about-en', language: 'EN', title: 'Draft', modules: [] },
-        { _id: 'about-en', language: 'EN', title: 'About', modules },
+        {
+          _id: 'drafts.about-en',
+          _type: 'page_landing',
+          language: 'EN',
+          title: 'Draft',
+          modules: [],
+        },
+        {
+          _id: 'about-en',
+          _type: 'page_landing',
+          language: 'EN',
+          title: 'About',
+          modules,
+        },
       ],
       [],
     );
@@ -48,7 +78,15 @@ describe(planTemplates, () => {
 
   it('takes the layout from a draft-only page', () => {
     const plan = planTemplates(
-      [{ _id: 'drafts.contact', language: 'EN', title: 'Contact', modules }],
+      [
+        {
+          _id: 'drafts.contact',
+          _type: 'page_landing',
+          language: 'EN',
+          title: 'Contact',
+          modules,
+        },
+      ],
       [],
     );
 

@@ -125,7 +125,7 @@ describe('homePageQuery template layout', () => {
     home('home-nl', NL, 'template-home'),
     {
       _id: 'template-home',
-      _type: 'page_template',
+      _type: 'template_home',
       hero: { _type: 'reference', _ref: 'hero-1' },
       modules: [{ _key: 'a', _type: 'reference', _ref: 'post-latest-1' }],
     },

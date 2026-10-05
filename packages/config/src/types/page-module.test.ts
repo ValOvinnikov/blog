@@ -5,14 +5,13 @@ import type {
   TPagePostType,
   TPageTagIndexType,
   TPageTagType,
-  TPageTemplateType,
   TPageTopicIndexType,
   TPageTopicType,
 } from './page-module';
 
 describe('page module type unions', () => {
-  it('resolves page_template to its heroField and modulesField({ allow }) kinds', () => {
-    expectTypeOf<TPageTemplateType>().toEqualTypeOf<
+  it('resolves page_home from the heroField and modulesField({ allow }) kinds of template_home', () => {
+    expectTypeOf<TPageHomeType>().toEqualTypeOf<
       | 'module_heroBlog'
       | 'module_heroStatement'
       | 'module_heroProfile'
@@ -40,9 +39,27 @@ describe('page module type unions', () => {
     >();
   });
 
-  it('gives page_home and page_landing the module kinds of the template they reference', () => {
-    expectTypeOf<TPageHomeType>().toEqualTypeOf<TPageTemplateType>();
-    expectTypeOf<TPageLandingType>().toEqualTypeOf<TPageTemplateType>();
+  it('resolves page_landing from template_landing', () => {
+    expectTypeOf<TPageLandingType>().toEqualTypeOf<
+      | 'module_heroBlog'
+      | 'module_heroStatement'
+      | 'module_heroProfile'
+      | 'module_content'
+      | 'module_cta'
+      | 'module_postLatest'
+      | 'module_postFeatured'
+      | 'module_newsletter'
+      | 'module_taxonomyList'
+      | 'module_featureList'
+      | 'module_featureHighlights'
+      | 'module_logoWall'
+      | 'module_testimonial'
+      | 'module_stats'
+      | 'module_timeline'
+      | 'module_faq'
+      | 'module_team'
+      | 'module_pricing'
+    >();
   });
 
   it('resolves page_postIndex', () => {

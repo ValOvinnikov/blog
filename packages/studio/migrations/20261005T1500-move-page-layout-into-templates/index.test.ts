@@ -51,7 +51,7 @@ const templateCreate = {
   type: 'createIfNotExists',
   document: {
     _id: 'template-about-en',
-    _type: 'page_template',
+    _type: 'template_landing',
     title: 'About',
     hero,
     modules,
@@ -106,7 +106,7 @@ describe('move-page-layout-into-templates migration', () => {
         type: 'createIfNotExists',
         document: {
           _id: 'template-page_home',
-          _type: 'page_template',
+          _type: 'template_home',
           title: 'Home',
           modules,
         },
