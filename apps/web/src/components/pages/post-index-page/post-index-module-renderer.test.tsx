@@ -19,7 +19,15 @@ const {
   postListModuleMock,
   taxonomyListModuleMock,
   heroBlogModuleMock,
+  contentModuleMock,
+  postLatestModuleMock,
 } = vi.hoisted(() => ({
+  postLatestModuleMock: vi.fn(({ id }: { id: string }) => (
+    <div data-testid="stub-post-latest">{id}</div>
+  )),
+  contentModuleMock: vi.fn(({ id }: { id: string }) => (
+    <div data-testid="stub-content">{id}</div>
+  )),
   ctaModuleMock: vi.fn(({ id }: { id: string }) => (
     <div data-testid="stub-cta">{id}</div>
   )),
@@ -57,6 +65,14 @@ vi.mock('@web/modules/taxonomy-list/taxonomy-list-module', () => ({
 }));
 vi.mock('@web/modules/hero-blog/hero-blog-module', () => ({
   HeroBlogModule: heroBlogModuleMock,
+}));
+
+vi.mock('@web/modules/content/content-module', () => ({
+  ContentModule: contentModuleMock,
+}));
+
+vi.mock('@web/modules/post-latest/post-latest-module', () => ({
+  PostLatestModule: postLatestModuleMock,
 }));
 
 vi.mock('@web/utils/logger/logger');
@@ -99,7 +115,7 @@ describe(`<${PostIndexModuleRenderer.name}/>`, () => {
   testWarnsForUnknownModule({
     setup,
     loggerWarnMock,
-    unknownModule: { id: 'content-1', type: 'module_content' },
+    unknownModule: { id: 'stats-1', type: 'module_stats' },
     description:
       'renders nothing and warns once for a module absent from the post index allow-list',
   });
@@ -111,6 +127,8 @@ describe(`<${PostIndexModuleRenderer.name}/>`, () => {
       { id: 'cta-1', type: 'module_cta' },
       { id: 'newsletter-1', type: 'module_newsletter' },
       { id: 'post-featured-1', type: 'module_postFeatured' },
+      { id: 'content-1', type: 'module_content' },
+      { id: 'post-latest-1', type: 'module_postLatest' },
     ],
     expectedOrder: [
       'post-list-1',
@@ -118,6 +136,8 @@ describe(`<${PostIndexModuleRenderer.name}/>`, () => {
       'cta-1',
       'newsletter-1',
       'post-featured-1',
+      'content-1',
+      'post-latest-1',
     ],
   });
 

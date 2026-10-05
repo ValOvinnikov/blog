@@ -5,6 +5,7 @@ import type {
 } from '@blog/config';
 import type { TModule } from '@blog/service';
 import { PageHeading } from '@web/components/shared/page-heading';
+import { ContentModule } from '@web/modules/content/content-module';
 import { CtaModule } from '@web/modules/cta/cta-module';
 import { HeroBlogModule } from '@web/modules/hero-blog/hero-blog-module';
 import {
@@ -15,6 +16,7 @@ import {
 } from '@web/modules/module-renderer';
 import { NewsletterModule } from '@web/modules/newsletter/newsletter-module';
 import { PostFeaturedModule } from '@web/modules/post-featured/post-featured-module';
+import { PostLatestModule } from '@web/modules/post-latest/post-latest-module';
 import { PostListModule } from '@web/modules/post-list/post-list-module';
 import { TaxonomyListModule } from '@web/modules/taxonomy-list/taxonomy-list-module';
 import type { ReactNode } from 'react';
@@ -26,6 +28,8 @@ const POST_INDEX_MAP: Partial<Record<TPagePostIndexType, TModuleComponent>> = {
   module_cta: CtaModule,
   module_newsletter: NewsletterModule,
   module_postFeatured: PostFeaturedModule,
+  module_content: ContentModule,
+  module_postLatest: PostLatestModule,
 };
 
 export interface IPostIndexModuleRendererProps {

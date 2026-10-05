@@ -19,7 +19,11 @@ const {
   postLatestModuleMock,
   taxonomyListModuleMock,
   heroBlogModuleMock,
+  contentModuleMock,
 } = vi.hoisted(() => ({
+  contentModuleMock: vi.fn(({ id }: { id: string }) => (
+    <div data-testid="stub-content">{id}</div>
+  )),
   ctaModuleMock: vi.fn(({ id }: { id: string }) => (
     <div data-testid="stub-cta">{id}</div>
   )),
@@ -51,6 +55,10 @@ vi.mock('@web/modules/taxonomy-list/taxonomy-list-module', () => ({
 }));
 vi.mock('@web/modules/hero-blog/hero-blog-module', () => ({
   HeroBlogModule: heroBlogModuleMock,
+}));
+
+vi.mock('@web/modules/content/content-module', () => ({
+  ContentModule: contentModuleMock,
 }));
 
 vi.mock('@web/utils/logger/logger');
@@ -93,12 +101,14 @@ describe(`<${TagIndexModuleRenderer.name}/>`, () => {
       { id: 'post-latest-1', type: 'module_postLatest' },
       { id: 'cta-1', type: 'module_cta' },
       { id: 'newsletter-1', type: 'module_newsletter' },
+      { id: 'content-1', type: 'module_content' },
     ],
     expectedOrder: [
       'taxonomy-list-1',
       'post-latest-1',
       'cta-1',
       'newsletter-1',
+      'content-1',
     ],
   });
 });
