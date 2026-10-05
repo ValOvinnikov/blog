@@ -56,7 +56,7 @@ describe('retire-newsletter-settings migration', () => {
     },
   );
 
-  it('rejects, aborting the run, while a module still lacks the copied cues', async () => {
+  it('keeps the settings while a module still lacks the copied cues', async () => {
     const doc = {
       ...baseDoc,
       _id: 'settings-newsletter',
@@ -67,8 +67,6 @@ describe('retire-newsletter-settings migration', () => {
       modules: [{ _id: 'newsletter-1' }],
     });
 
-    await expect(migration.migrate.document(doc, context)).rejects.toThrow(
-      /newsletter-1/,
-    );
+    expect(await migration.migrate.document(doc, context)).toEqual([]);
   });
 });

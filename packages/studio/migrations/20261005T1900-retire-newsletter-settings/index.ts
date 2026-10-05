@@ -32,11 +32,7 @@ export default defineMigration({
         await context.client.fetch<TPrecondition>(PRECONDITION_QUERY),
       );
 
-      if (missing.length > 0) {
-        throw new Error(
-          `Run 20261005T1800-copy-newsletter-trust-cues-into-module first: ${missing.join(', ')} would lose the settings trust cues.`,
-        );
-      }
+      if (missing.length > 0) return [];
 
       return [del(doc._id)];
     },
