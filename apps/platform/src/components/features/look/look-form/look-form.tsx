@@ -18,6 +18,7 @@ import { useId, useState } from 'react';
 import { LookFormAdvancedSection } from './look-form-advanced-section';
 import { LookFormBasicSection } from './look-form-basic-section';
 import { LookFormImagesSection } from './look-form-images-section';
+import { LookFormLanguageSwitcherSection } from './look-form-language-switcher-section';
 import { lookFormVariants } from './look-form-variants';
 
 export type TLookFormProps = {
@@ -196,6 +197,13 @@ export const LookForm = ({
                 isArchived={isArchived}
                 archivedNoticeId={archivedNoticeId}
               />
+              <LookFormLanguageSwitcherSection
+                languageSwitcherStyle={values.languageSwitcherStyle}
+                hasMultipleLanguages={hasMultipleLanguages}
+                onFieldChange={updateField}
+                isArchived={isArchived}
+                archivedNoticeId={archivedNoticeId}
+              />
             </Card.Body>
           </Card>
 
@@ -212,8 +220,6 @@ export const LookForm = ({
               bodyFont={values.bodyFont}
               radiusScale={values.radiusScale}
               density={values.density}
-              languageSwitcherStyle={values.languageSwitcherStyle}
-              hasMultipleLanguages={hasMultipleLanguages}
               onFieldChange={updateField}
               isArchived={isArchived}
               archivedNoticeId={archivedNoticeId}
