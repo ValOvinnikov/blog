@@ -15,10 +15,10 @@ export const NewsletterModule = async ({ id }: INewsletterModuleProps) => {
   const isEnabled = await isCapabilityEnabled(CAPABILITY.NEWSLETTER);
   if (!isEnabled) return null;
 
-  const [result, newsletterSettingsResult] = await Promise.all([
-    service.modules.newsletter.v1.getNewsletter(id, sanityContext),
-    service.global.newsletterSettings.v1.getNewsletterSettings(sanityContext),
-  ]);
+  const result = await service.modules.newsletter.v1.getNewsletter(
+    id,
+    sanityContext,
+  );
 
   if (!result.ok) {
     logger.error('newsletter_module.fetch_failed', {
@@ -28,16 +28,5 @@ export const NewsletterModule = async ({ id }: INewsletterModuleProps) => {
     return null;
   }
 
-  if (!newsletterSettingsResult.ok) {
-    logger.error('newsletter_module.newsletter_settings_fetch_failed', {
-      error: newsletterSettingsResult.error,
-    });
-  }
-  const trustCues = newsletterSettingsResult.ok
-    ? newsletterSettingsResult.data.trustCues
-    : undefined;
-
-  return (
-    <NewsletterModuleView id={id} {...result.data} trustCues={trustCues} />
-  );
+  return <NewsletterModuleView id={id} {...result.data} />;
 };

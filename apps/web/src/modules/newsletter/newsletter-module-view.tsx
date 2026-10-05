@@ -1,4 +1,4 @@
-import { NEWSLETTER_VARIANT, type TMaybeUndefined } from '@blog/config';
+import { NEWSLETTER_VARIANT } from '@blog/config';
 import type { TNewsletterModule } from '@blog/service';
 import { NewsletterForm } from '@web/components/shared/newsletter-form';
 import { NewsletterSubscribedGate } from '@web/components/shared/newsletter-subscribed-gate';
@@ -6,7 +6,6 @@ import { Section } from '@web/components/shared/section';
 
 export interface INewsletterModuleViewProps extends TNewsletterModule {
   id: string;
-  trustCues: TMaybeUndefined<string[]>;
 }
 
 export const NewsletterModuleView = ({

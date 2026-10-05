@@ -6,20 +6,14 @@ import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { NewsletterModule } from './newsletter-module';
 
-const { getNewsletterMock, getNewsletterSettingsMock } = vi.hoisted(() => ({
+const { getNewsletterMock } = vi.hoisted(() => ({
   getNewsletterMock: vi.fn(),
-  getNewsletterSettingsMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
   service: {
     modules: {
       newsletter: { v1: { getNewsletter: getNewsletterMock } },
-    },
-    global: {
-      newsletterSettings: {
-        v1: { getNewsletterSettings: getNewsletterSettingsMock },
-      },
     },
   },
 }));
@@ -46,11 +40,6 @@ const setup = customRenderAsync(NewsletterModule, {
 describe(`<${NewsletterModule.name}/>`, () => {
   beforeEach(() => {
     getNewsletterMock.mockReset();
-    getNewsletterSettingsMock.mockReset();
-    getNewsletterSettingsMock.mockResolvedValue({
-      ok: true,
-      data: { heading: 'Get new posts', trustCues: undefined },
-    });
     vi.mocked(isCapabilityEnabled).mockReset();
     vi.mocked(isCapabilityEnabled).mockResolvedValue(true);
     getRequestContextMock.mockReset();
@@ -68,22 +57,16 @@ describe(`<${NewsletterModule.name}/>`, () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('passes the settings-sourced trustCues through to the rendered form', async () => {
+  it("renders the module's own trust cues in the form", async () => {
     getNewsletterMock.mockResolvedValue({
       ok: true,
       data: {
         brandVariant: 'PRIMARY',
         headingBlock: makeHeadingBlock({ heading: 'Get new posts' }),
         variant: 'FULL',
+        trustCues: ['No spam', 'Unsubscribe anytime'],
         layout: undefined,
         contentAlignment: undefined,
-      },
-    });
-    getNewsletterSettingsMock.mockResolvedValue({
-      ok: true,
-      data: {
-        heading: 'Get new posts',
-        trustCues: ['No spam', 'Unsubscribe anytime'],
       },
     });
 
@@ -103,6 +86,7 @@ describe(`<${NewsletterModule.name}/>`, () => {
           supportingText: 'Only shown in the full form.',
         }),
         variant: 'COMPACT',
+        trustCues: undefined,
         layout: undefined,
         contentAlignment: undefined,
       },
@@ -114,28 +98,6 @@ describe(`<${NewsletterModule.name}/>`, () => {
     expect(
       screen.queryByText('Only shown in the full form.'),
     ).not.toBeInTheDocument();
-  });
-
-  it('renders no trust cues, without failing, when the newsletter settings fetch fails', async () => {
-    getNewsletterMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: 'PRIMARY',
-        headingBlock: makeHeadingBlock({ heading: 'Get new posts' }),
-        variant: 'FULL',
-        layout: undefined,
-        contentAlignment: undefined,
-      },
-    });
-    getNewsletterSettingsMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
-
-    await setup();
-
-    expect(screen.getByText('Get new posts')).toBeVisible();
-    expect(screen.queryByText('No spam')).not.toBeInTheDocument();
   });
 
   it('forwards the resolved tenant Sanity context to getNewsletter', async () => {
