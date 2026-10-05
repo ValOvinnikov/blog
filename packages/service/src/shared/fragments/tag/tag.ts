@@ -1,22 +1,17 @@
 import { q } from '@blog/service/sanity/query';
 import {
+  TAG_ARCHIVE_PAGE_SLUG_EXPRESSION,
   archivePageSlugParser,
-  buildArchivePageSlugExpression,
-} from '@blog/service/shared/expressions/archive-page-slug';
+} from '@blog/service/shared/expressions/archive-page/archive-page-slug';
 import {
   POST_COUNT_EXPRESSION,
   postCountParser,
-} from '@blog/service/shared/expressions/post-count';
-
-const ARCHIVE_PAGE_SLUG_EXPRESSION = buildArchivePageSlugExpression(
-  'page_tag',
-  'tag',
-);
+} from '@blog/service/shared/expressions/post/post-count';
 
 export const tagFragment = q.fragmentForType<'blog_tag'>().project((sub) => ({
   _id: true,
   title: sub.field('title').notNull(),
-  slug: sub.raw(ARCHIVE_PAGE_SLUG_EXPRESSION, archivePageSlugParser),
+  slug: sub.raw(TAG_ARCHIVE_PAGE_SLUG_EXPRESSION, archivePageSlugParser),
 }));
 
 export const tagWithPostCountFragment = q

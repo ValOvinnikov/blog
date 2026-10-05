@@ -1,6 +1,6 @@
 import { POST_SOURCE } from '@blog/config';
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
-import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/published-post';
+import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/post/published-post';
 import { ctaSecondaryButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
 import { moduleHeroLayoutFragment } from '@blog/service/shared/fragments/layout/layout';

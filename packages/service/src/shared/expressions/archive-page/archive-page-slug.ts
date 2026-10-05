@@ -7,4 +7,12 @@ export function buildArchivePageSlugExpression(
   return `coalesce(*[_type == "${archivePageType}" && ${referenceField}._ref == ^._id][0].slug.current, slug.current)`;
 }
 
+export const TAG_ARCHIVE_PAGE_SLUG_EXPRESSION = buildArchivePageSlugExpression(
+  'page_tag',
+  'tag',
+);
+
+export const TOPIC_ARCHIVE_PAGE_SLUG_EXPRESSION =
+  buildArchivePageSlugExpression('page_topic', 'topic');
+
 export const archivePageSlugParser = z.string();
