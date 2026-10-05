@@ -32,7 +32,12 @@ export const TagPage = async ({ slug, page }: TTagPageProps) => {
         modules={modules}
         context={{
           page: currentPage,
-          archive: { kind: TAXONOMY_KIND.TAGS, slug, name: tag.title },
+          archive: {
+            id: tag.id,
+            kind: TAXONOMY_KIND.TAGS,
+            slug,
+            name: tag.title,
+          },
         }}
       />
     </PageShell>

@@ -32,7 +32,12 @@ export const TopicPage = async ({ slug, page }: TTopicPageProps) => {
         modules={modules}
         context={{
           page: currentPage,
-          archive: { kind: TAXONOMY_KIND.TOPICS, slug, name: topic.title },
+          archive: {
+            id: topic.id,
+            kind: TAXONOMY_KIND.TOPICS,
+            slug,
+            name: topic.title,
+          },
         }}
       >
         <TopicChips activeSlug={slug} />

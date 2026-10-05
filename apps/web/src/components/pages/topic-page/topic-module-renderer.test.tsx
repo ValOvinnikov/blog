@@ -123,7 +123,7 @@ describe(`<${TopicModuleRenderer.name}/>`, () => {
       modules: [{ id: 'post-list-1', type: 'module_postList' }],
       context: {
         page: 2,
-        archive: { kind: 'TOPICS', slug: 'news', name: 'News' },
+        archive: { id: 'topic-1', kind: 'TOPICS', slug: 'news', name: 'News' },
       },
     });
 
@@ -132,7 +132,12 @@ describe(`<${TopicModuleRenderer.name}/>`, () => {
         id: 'post-list-1',
         context: {
           page: 2,
-          archive: { kind: 'TOPICS', slug: 'news', name: 'News' },
+          archive: {
+            id: 'topic-1',
+            kind: 'TOPICS',
+            slug: 'news',
+            name: 'News',
+          },
         },
       }),
       undefined,

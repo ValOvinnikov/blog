@@ -1,4 +1,3 @@
-import { TAXONOMY_KIND } from '@blog/config';
 import { service } from '@blog/service';
 import {
   customRenderServerAsync,
@@ -174,7 +173,7 @@ describe(`<${TagPage.name}/>`, () => {
         'list-1',
         DEFAULT_TENANT_SANITY_CONTEXT,
         expected,
-        { kind: TAXONOMY_KIND.TAGS, slug: 'typescript' },
+        { termId: 'tag-1' },
       );
     },
   );

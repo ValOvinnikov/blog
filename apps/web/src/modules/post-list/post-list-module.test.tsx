@@ -324,7 +324,12 @@ describe(`<${PostListModule.name}/>`, () => {
     await setup({
       context: {
         page: 2,
-        archive: { kind: TAXONOMY_KIND.TOPICS, slug: 'news', name: 'News' },
+        archive: {
+          id: 'topic-1',
+          kind: TAXONOMY_KIND.TOPICS,
+          slug: 'news',
+          name: 'News',
+        },
       },
     });
 
@@ -341,7 +346,7 @@ describe(`<${PostListModule.name}/>`, () => {
       'post-list-1',
       DEFAULT_TENANT_SANITY_CONTEXT,
       2,
-      { kind: TAXONOMY_KIND.TOPICS, slug: 'news' },
+      { termId: 'topic-1' },
     );
 
     const previousLink = screen.getByRole('link', { name: 'Previous' });
@@ -379,6 +384,7 @@ describe(`<${PostListModule.name}/>`, () => {
       context: {
         page: 2,
         archive: {
+          id: 'tag-1',
           kind: TAXONOMY_KIND.TAGS,
           slug: 'typescript',
           name: 'TypeScript',
@@ -399,7 +405,7 @@ describe(`<${PostListModule.name}/>`, () => {
       'post-list-1',
       DEFAULT_TENANT_SANITY_CONTEXT,
       2,
-      { kind: TAXONOMY_KIND.TAGS, slug: 'typescript' },
+      { termId: 'tag-1' },
     );
 
     const previousLink = screen.getByRole('link', { name: 'Previous' });
@@ -426,6 +432,7 @@ describe(`<${PostListModule.name}/>`, () => {
     await setup({
       context: {
         archive: {
+          id: 'tag-1',
           kind: TAXONOMY_KIND.TAGS,
           slug: 'typescript',
           name: 'TypeScript',

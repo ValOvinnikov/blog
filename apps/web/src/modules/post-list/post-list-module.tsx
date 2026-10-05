@@ -43,7 +43,7 @@ export const PostListModule = async ({ id, context }: TPostListModuleProps) => {
       id,
       sanityContext,
       resolvedPage,
-      archive && { kind: archive.kind, slug: archive.slug },
+      archive && { termId: archive.id },
     ),
     getTranslations('pagination'),
     getTranslations(archive ? ARCHIVE_NAMESPACE[archive.kind] : 'blogListPage'),
