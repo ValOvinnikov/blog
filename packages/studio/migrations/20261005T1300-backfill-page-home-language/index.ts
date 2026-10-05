@@ -6,8 +6,8 @@ import {
 } from '../lib/backfill-language';
 
 export default defineMigration({
-  title: 'Backfill page_landing language to EN',
-  documentTypes: ['page_landing'],
+  title: 'Backfill page_home language to EN',
+  documentTypes: ['page_home'],
   migrate: {
     document(doc) {
       return backfillLanguage(doc as TTranslatedDoc);

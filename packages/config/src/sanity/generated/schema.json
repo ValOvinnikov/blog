@@ -7058,6 +7058,36 @@
     }
   },
   {
+    "type": "type",
+    "name": "page_home.reference",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_ref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          }
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "reference"
+          }
+        },
+        "_weak": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      },
+      "dereferencesTo": "page_home"
+    }
+  },
+  {
     "name": "internationalizedArrayReferenceValue",
     "type": "type",
     "value": {
@@ -7073,8 +7103,17 @@
         "value": {
           "type": "objectAttribute",
           "value": {
-            "type": "inline",
-            "name": "page_landing.reference"
+            "type": "union",
+            "of": [
+              {
+                "type": "inline",
+                "name": "page_home.reference"
+              },
+              {
+                "type": "inline",
+                "name": "page_landing.reference"
+              }
+            ]
           },
           "optional": true
         },
@@ -7629,7 +7668,7 @@
     }
   },
   {
-    "name": "page_landing",
+    "name": "page_home",
     "type": "document",
     "attributes": {
       "_id": {
@@ -7642,7 +7681,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "string",
-          "value": "page_landing"
+          "value": "page_home"
         }
       },
       "_createdAt": {
@@ -7696,14 +7735,6 @@
         "type": "objectAttribute",
         "value": {
           "type": "string"
-        },
-        "optional": true
-      },
-      "slug": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "inline",
-          "name": "slug"
         },
         "optional": true
       },
@@ -8598,36 +8629,6 @@
         },
         "optional": true
       }
-    }
-  },
-  {
-    "type": "type",
-    "name": "page_home.reference",
-    "value": {
-      "type": "object",
-      "attributes": {
-        "_ref": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          }
-        },
-        "_type": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string",
-            "value": "reference"
-          }
-        },
-        "_weak": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "boolean"
-          },
-          "optional": true
-        }
-      },
-      "dereferencesTo": "page_home"
     }
   },
   {
@@ -9993,7 +9994,7 @@
     }
   },
   {
-    "name": "page_home",
+    "name": "page_landing",
     "type": "document",
     "attributes": {
       "_id": {
@@ -10006,7 +10007,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "string",
-          "value": "page_home"
+          "value": "page_landing"
         }
       },
       "_createdAt": {
@@ -10027,10 +10028,47 @@
           "type": "string"
         }
       },
+      "language": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "EN"
+            },
+            {
+              "type": "string",
+              "value": "NL"
+            },
+            {
+              "type": "string",
+              "value": "FR"
+            },
+            {
+              "type": "string",
+              "value": "DE"
+            },
+            {
+              "type": "string",
+              "value": "ES"
+            }
+          ]
+        },
+        "optional": true
+      },
       "title": {
         "type": "objectAttribute",
         "value": {
           "type": "string"
+        },
+        "optional": true
+      },
+      "slug": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "slug"
         },
         "optional": true
       },

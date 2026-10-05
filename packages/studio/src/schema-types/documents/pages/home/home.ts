@@ -1,7 +1,13 @@
+import type { TLocaleIsoCode } from '@blog/config/constants';
 import { PAGE_HOME_TYPE } from '@blog/studio/schema-types/documents/pages/home/home-type';
 import { heroField } from '@blog/studio/schema-types/fields/hero-field/hero-field';
+import {
+  LANGUAGE_FIELD,
+  languageField,
+} from '@blog/studio/schema-types/fields/language-field/language-field';
 import { modulesField } from '@blog/studio/schema-types/fields/modules-field/modules-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { LOCALE_LABEL } from '@blog/studio/schema-types/inputs/localization-notice-input/missing-locales';
 import { contentSchema } from '@blog/studio/schema-types/modules/content/content';
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
 import { faqSchema } from '@blog/studio/schema-types/modules/faq/faq';
@@ -22,6 +28,7 @@ import { testimonialSchema } from '@blog/studio/schema-types/modules/testimonial
 import { timelineSchema } from '@blog/studio/schema-types/modules/timeline/timeline';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
+import { validateOnePerLanguage } from '@blog/studio/schema-types/validation/validate-one-per-language/validate-one-per-language';
 import { House } from 'lucide-react';
 import { defineType } from 'sanity';
 
@@ -35,15 +42,22 @@ export const homePageSchema = defineType({
   preview: {
     select: {
       title: 'title',
+      language: LANGUAGE_FIELD,
     },
-    prepare({ title }) {
-      return {
-        title: title ?? 'Unknown',
-        subtitle: 'Home singleton',
-      };
-    },
+    prepare: ({
+      title,
+      language,
+    }: {
+      title?: string;
+      language?: TLocaleIsoCode;
+    }) => ({
+      title: title ?? 'Unknown',
+      subtitle: language ? LOCALE_LABEL[language] : undefined,
+    }),
   },
+  validation: (rule) => rule.custom(validateOnePerLanguage),
   fields: [
+    languageField(),
     titleField(),
     headingBlockField(),
     heroField({

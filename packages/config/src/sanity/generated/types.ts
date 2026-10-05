@@ -1168,9 +1168,16 @@ export type InternationalizedArrayReference = Array<
   } & InternationalizedArrayReferenceValue
 >;
 
+export type Page_homeReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_home';
+};
+
 export type InternationalizedArrayReferenceValue = {
   _type: 'internationalizedArrayReferenceValue';
-  value?: Page_landingReference;
+  value?: Page_homeReference | Page_landingReference;
   language?: string;
 };
 
@@ -1300,15 +1307,14 @@ export type Module_timelineReference = {
   [internalGroqTypeReferenceTo]?: 'module_timeline';
 };
 
-export type Page_landing = {
+export type Page_home = {
   _id: string;
-  _type: 'page_landing';
+  _type: 'page_home';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
   language?: 'EN' | 'NL' | 'FR' | 'DE' | 'ES';
   title?: string;
-  slug?: Slug;
   headingBlock?: HeadingBlock;
   hero?:
     | Module_heroBlogReference
@@ -1453,13 +1459,6 @@ export type Person = {
     } & SocialProfile
   >;
   profilePage?: LinkReference;
-};
-
-export type Page_homeReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'page_home';
 };
 
 export type Page_topicReference = {
@@ -1709,13 +1708,15 @@ export type Page_postIndex = {
   seo?: Seo;
 };
 
-export type Page_home = {
+export type Page_landing = {
   _id: string;
-  _type: 'page_home';
+  _type: 'page_landing';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  language?: 'EN' | 'NL' | 'FR' | 'DE' | 'ES';
   title?: string;
+  slug?: Slug;
   headingBlock?: HeadingBlock;
   hero?:
     | Module_heroBlogReference
@@ -2033,6 +2034,7 @@ export type AllSanitySchemaTypes =
   | InternationalizedArrayText
   | TranslationMetadata
   | InternationalizedArrayReference
+  | Page_homeReference
   | InternationalizedArrayReferenceValue
   | Module_heroBlogReference
   | Module_heroProfileReference
@@ -2052,13 +2054,12 @@ export type AllSanitySchemaTypes =
   | Module_teamReference
   | Module_testimonialReference
   | Module_timelineReference
-  | Page_landing
+  | Page_home
   | Module_heroBlog
   | Blog_tagReference
   | Module_postRelatedReference
   | Page_post
   | Person
-  | Page_homeReference
   | Page_topicReference
   | Page_topicIndexReference
   | Page_tagReference
@@ -2074,7 +2075,7 @@ export type AllSanitySchemaTypes =
   | Page_topic
   | Blog_topic
   | Page_postIndex
-  | Page_home
+  | Page_landing
   | Module_heroStatement
   | Module_heroProfile
   | MediaFolderReference
