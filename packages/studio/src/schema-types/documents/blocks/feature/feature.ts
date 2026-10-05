@@ -1,8 +1,9 @@
 import { FEATURE_ICONS } from '@blog/config/constants';
 import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
-import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
+import { localizedHeadingBlockField } from '@blog/studio/schema-types/objects/localized-heading-block/localized-heading-block-field';
+import { localizedImageWithAltSchema } from '@blog/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
+import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
 import { toTitleCase } from '@blog/utils/primitives';
 import { IdCard } from 'lucide-react';
 import {
@@ -43,7 +44,7 @@ export const featureBlockSchema = defineType({
   icon: IdCard,
   fields: [
     titleField(),
-    headingBlockField(),
+    localizedHeadingBlockField(),
     defineField({
       name: 'icon',
       title: 'Icon',
@@ -61,7 +62,7 @@ export const featureBlockSchema = defineType({
     defineField({
       name: 'image',
       title: 'Image',
-      type: imageWithAltSchema.name,
+      type: localizedImageWithAltSchema.name,
       description:
         "The image shown for this card, cropped to the shape chosen on the Features module. Takes priority over the card's icon when both are set.",
       validation: (rule) => rule.custom(validateFeatureHasVisual),
@@ -77,13 +78,13 @@ export const featureBlockSchema = defineType({
   preview: {
     select: {
       title: 'title',
-      linkLabel: 'link.label.0.value',
+      linkLabel: 'link.label',
       media: 'image',
     },
     prepare({ title, linkLabel, media }) {
       return {
         title: String(title ?? 'Unknown'),
-        subtitle: typeof linkLabel === 'string' ? linkLabel : 'No link',
+        subtitle: defaultLanguageValue(linkLabel) ?? 'No link',
         media: media ?? undefined,
       };
     },

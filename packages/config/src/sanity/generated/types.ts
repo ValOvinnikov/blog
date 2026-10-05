@@ -387,7 +387,7 @@ export type Module_featureList = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  headingBlock?: HeadingBlock;
+  headingBlock?: LocalizedHeadingBlock;
   features?: Array<
     {
       _key: string;
@@ -1085,7 +1085,7 @@ export type Block_feature = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  headingBlock?: HeadingBlock;
+  headingBlock?: LocalizedHeadingBlock;
   icon?:
     | 'CODE'
     | 'LAYERS'
@@ -1118,7 +1118,7 @@ export type Block_feature = {
     | 'GLOBE'
     | 'MAP_PIN'
     | 'CAMERA';
-  image?: ImageWithAlt;
+  image?: LocalizedImageWithAlt;
   link?: LinkReference;
 };
 
