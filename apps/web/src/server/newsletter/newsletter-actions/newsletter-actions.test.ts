@@ -3,6 +3,7 @@ import {
   resolveTenantEmailBrand,
   TENANT_WRITE_REFUSAL,
 } from '@blog/config';
+import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 
 const {
@@ -56,6 +57,13 @@ vi.mock(
 
 vi.mock('@web/server/tenant/tenant-base-url/tenant-base-url');
 
+vi.mock(
+  '@web/server/settings-features/is-capability-enabled/is-capability-enabled',
+  () => ({
+    isCapabilityEnabled: vi.fn(),
+  }),
+);
+
 vi.mock('@web/server/tenant/write-gate/write-gate', () => ({
   resolveWritableTenant: resolveWritableTenantMock,
 }));
@@ -67,6 +75,7 @@ vi.mock('@web/utils/env/env', () => ({
 }));
 
 const getTenantBaseUrlMock = vi.mocked(getTenantBaseUrl);
+const isCapabilityEnabledMock = vi.mocked(isCapabilityEnabled);
 
 const subscriber = {
   id: 'sub-1',
@@ -95,6 +104,8 @@ describe('subscribeToNewsletterAction', () => {
     markNewsletterSubscribedMock.mockReset();
     getTenantBaseUrlMock.mockReset();
     getTenantBaseUrlMock.mockResolvedValue('https://example.com');
+    isCapabilityEnabledMock.mockReset();
+    isCapabilityEnabledMock.mockResolvedValue(true);
     resolveWritableTenantMock.mockReset();
     resolveWritableTenantMock.mockResolvedValue({
       ok: true,
@@ -221,6 +232,22 @@ describe('subscribeToNewsletterAction', () => {
     expect(createPendingSubscriberMock).not.toHaveBeenCalled();
     expect(sendEmailMock).not.toHaveBeenCalled();
     expect(markNewsletterSubscribedMock).not.toHaveBeenCalled();
+  });
+
+  it('returns "unavailable" without writing a subscriber or sending an email when the Newsletter capability is off', async () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    isCapabilityEnabledMock.mockResolvedValue(false);
+    const { subscribeToNewsletterAction } =
+      await import('./newsletter-actions');
+
+    await expect(
+      subscribeToNewsletterAction('reader@example.com'),
+    ).resolves.toEqual({ outcome: 'unavailable' });
+    expect(isCapabilityEnabledMock).toHaveBeenCalledWith('NEWSLETTER');
+    expect(createPendingSubscriberMock).not.toHaveBeenCalled();
+    expect(sendEmailMock).not.toHaveBeenCalled();
+    expect(markNewsletterSubscribedMock).not.toHaveBeenCalled();
+    warnSpy.mockRestore();
   });
 
   it('returns "server-error" and logs when createPendingSubscriber fails', async () => {

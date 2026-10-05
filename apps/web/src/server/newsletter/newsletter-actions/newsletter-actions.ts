@@ -1,10 +1,11 @@
 'use server';
 
-import { routes, TENANT_WRITE_REFUSAL } from '@blog/config';
+import { CAPABILITY, routes, TENANT_WRITE_REFUSAL } from '@blog/config';
 import { queries } from '@blog/db';
 import { buildNewsletterConfirmationEmail, sendEmail } from '@blog/email';
 import { markNewsletterSubscribed } from '@web/server/newsletter/newsletter-subscribed-cookie/newsletter-subscribed-cookie';
 import { resolveNewsletterEmailSettings } from '@web/server/newsletter/resolve-newsletter-email-settings/resolve-newsletter-email-settings';
+import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 import { resolveWritableTenant } from '@web/server/tenant/write-gate/write-gate';
 import { env } from '@web/utils/env/env';
@@ -35,6 +36,11 @@ export const subscribeToNewsletterAction = async (
     return { outcome: 'server-error' };
   }
   const { tenantId } = tenant;
+
+  if (!(await isCapabilityEnabled(CAPABILITY.NEWSLETTER))) {
+    logger.warn('newsletter.subscribe_capability_disabled');
+    return { outcome: 'unavailable' };
+  }
 
   try {
     const result = await queries.subscribers.createPendingSubscriber(
