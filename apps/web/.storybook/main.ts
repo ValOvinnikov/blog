@@ -73,6 +73,20 @@ const config: StorybookConfig = {
       '@web/utils/report-client-error': fileURLToPath(
         new URL('./mocks/report-client-error.ts', import.meta.url),
       ),
+      // `TopicIndexPage`/`TagIndexPage` (and their breadcrumbs, via
+      // `buildBreadcrumbListSchema`) read the request context — which throws
+      // outside a real Next.js request — before reaching `@blog/service`.
+      '@web/server/request-context/request-context': fileURLToPath(
+        new URL('./mocks/request-context.ts', import.meta.url),
+      ),
+      '@web/server/topic-index/get-topic-index-page/get-topic-index-page':
+        fileURLToPath(
+          new URL('./mocks/get-topic-index-page.ts', import.meta.url),
+        ),
+      '@web/server/tag-index/get-tag-index-page/get-tag-index-page':
+        fileURLToPath(
+          new URL('./mocks/get-tag-index-page.ts', import.meta.url),
+        ),
     };
     const encryptSecretMockPath = fileURLToPath(
       new URL('./mocks/encrypt-secret.ts', import.meta.url),
