@@ -263,7 +263,7 @@ export type Module_team = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  headingBlock?: HeadingBlock;
+  headingBlock?: LocalizedHeadingBlock;
   members?: Array<
     {
       _key: string;
@@ -1444,9 +1444,9 @@ export type Person = {
   _updatedAt: string;
   _rev: string;
   name?: string;
-  image?: ImageWithAlt;
-  bio?: ParagraphText;
-  role?: string;
+  image?: LocalizedImageWithAlt;
+  bio?: InternationalizedArrayParagraphText;
+  role?: InternationalizedArrayString;
   socialLinks?: Array<
     {
       _key: string;
@@ -1804,10 +1804,10 @@ export type Module_heroProfile = {
   _rev: string;
   title?: string;
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
-  headingBlock?: HeadingBlock;
+  headingBlock?: LocalizedHeadingBlock;
   eyebrow?: string;
   author?: PersonReference;
-  image?: ImageWithAlt;
+  image?: LocalizedImageWithAlt;
   ctaButtons?: Array<
     {
       _key: string;
