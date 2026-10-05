@@ -19,10 +19,14 @@ import CheckSheetComponent from '@blog/ui/assets/icons/check-sheet.svg';
 import CheckSheetUrl from '@blog/ui/assets/icons/check-sheet.svg?url';
 import CheckComponent from '@blog/ui/assets/icons/check.svg';
 import CheckUrl from '@blog/ui/assets/icons/check.svg?url';
+import ChevronDownComponent from '@blog/ui/assets/icons/chevron-down.svg';
+import ChevronDownUrl from '@blog/ui/assets/icons/chevron-down.svg?url';
 import ChevronLeftComponent from '@blog/ui/assets/icons/chevron-left.svg';
 import ChevronLeftUrl from '@blog/ui/assets/icons/chevron-left.svg?url';
 import ChevronRightComponent from '@blog/ui/assets/icons/chevron-right.svg';
 import ChevronRightUrl from '@blog/ui/assets/icons/chevron-right.svg?url';
+import ChevronUpComponent from '@blog/ui/assets/icons/chevron-up.svg';
+import ChevronUpUrl from '@blog/ui/assets/icons/chevron-up.svg?url';
 import ClockComponent from '@blog/ui/assets/icons/clock.svg';
 import ClockUrl from '@blog/ui/assets/icons/clock.svg?url';
 import CloseComponent from '@blog/ui/assets/icons/close.svg';
@@ -151,6 +155,11 @@ export const ICON_REGISTRY: Record<TIconName, TIconRegistryEntry> = {
     component: ChevronRightComponent,
     url: ChevronRightUrl,
   },
+  [ICONS.CHEVRON_DOWN]: {
+    component: ChevronDownComponent,
+    url: ChevronDownUrl,
+  },
+  [ICONS.CHEVRON_UP]: { component: ChevronUpComponent, url: ChevronUpUrl },
   [ICONS.EXTERNAL_LINK]: {
     component: ExternalLinkComponent,
     url: ExternalLinkUrl,
