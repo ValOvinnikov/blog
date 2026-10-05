@@ -49,10 +49,6 @@ const makeMockStructureBuilder = (dataset: Record<string, unknown>[] = []) => ({
         (await evaluate(parse(query), { dataset, params })).get(),
     }),
   },
-  component: vi.fn((component: unknown) => ({
-    ...makeMockBuilder('component'),
-    component,
-  })),
   divider: vi.fn(() => makeMockBuilder('divider')),
   listItem: vi.fn(() => makeMockBuilder('listItem')),
   documentTypeListItem: vi.fn((documentType: string) =>
@@ -672,15 +668,17 @@ describe(buildSections, () => {
       expect(callArgs(child, 'initialValueTemplate')).toEqual(['homePage-NL']);
     });
 
-    it('points a missing translation at the default-language document', async () => {
+    it('opens a new document in a language that has none', async () => {
       const [, english] = buildHomeItems([
-        { _id: 'drafts.home-nl', _type: 'homePage', language: NL },
+        { _id: 'homePage', _type: 'homePage', language: NL },
       ]);
 
       const child = await resolveChild(english!);
 
-      expect(child.kind).toBe('component');
-      expect(callArgs(child, 'title')).toEqual(['English Home']);
+      expect(child.kind).toBe('document');
+      expect(callArgs(child, 'schemaType')).toEqual(['homePage']);
+      expect(callArgs(child, 'initialValueTemplate')).toEqual(['homePage-EN']);
+      expect(callArgs(child, 'documentId')).not.toEqual(['homePage']);
     });
   });
 });
