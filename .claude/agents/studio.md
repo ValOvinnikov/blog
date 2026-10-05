@@ -163,12 +163,12 @@ follows this taxonomy, in this order:
 | Group      | Job                                    | Modules                                                                        |
 | ---------- | -------------------------------------- | ------------------------------------------------------------------------------ |
 | Heroes     | open a page                            | `module_hero*` — the `hero` slot's family, never placeable in `modules[]`      |
-| Posts      | show the writing                       | `module_post*`, `module_taxonomy*` — listings fed by post and taxonomy queries |
 | Projects   | show the work                          | `module_project*` — listings fed by project queries                            |
 | Explainers | explain an offer, a story or a process | content, features, feature highlights, timeline, FAQ                           |
 | Proof      | back up a claim                        | testimonials, logo wall, stats                                                 |
 | Media      | show images or video                   | gallery, embed                                                                 |
 | Conversion | get the visitor to act                 | call to action, newsletter, pricing, contact form                              |
+| Posts      | show the writing                       | `module_post*`, `module_taxonomy*` — listings fed by post and taxonomy queries |
 
 A group enters the desk with its first module and is never listed empty. A
 new module's ticket names its group in `## Scope`; a module whose job fits

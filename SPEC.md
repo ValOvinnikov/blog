@@ -371,7 +371,7 @@ is registered in `modules` like any other module, and the pages name the
 kinds they accept.
 
 **A page accepts only the hero kinds it names.** `heroField({ allow })`
-takes an explicit list per page, the way `modulesField({ allow })` already
+takes an explicit list per page, the way `modulesField({ extend })` already
 does, so the registry is no longer what a page's `hero` `to:` points at.
 `page_home` and `page_landing` accept Blog, Statement and Profile.
 `page_postIndex`,

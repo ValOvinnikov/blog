@@ -2,7 +2,6 @@ import { heroField } from '@blog/studio/schema-types/fields/hero-field/hero-fiel
 import { modulesField } from '@blog/studio/schema-types/fields/modules-field/modules-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { contentSchema } from '@blog/studio/schema-types/modules/content/content';
-import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
 import { faqSchema } from '@blog/studio/schema-types/modules/faq/faq';
 import { featureHighlightsSchema } from '@blog/studio/schema-types/modules/feature-highlights/feature-highlights';
 import { featureListSchema } from '@blog/studio/schema-types/modules/feature-list/feature-list';
@@ -10,7 +9,6 @@ import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero
 import { heroProfileSchema } from '@blog/studio/schema-types/modules/hero-profile/hero-profile';
 import { heroStatementSchema } from '@blog/studio/schema-types/modules/hero-statement/hero-statement';
 import { logoWallSchema } from '@blog/studio/schema-types/modules/logo-wall/logo-wall';
-import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import { pricingSchema } from '@blog/studio/schema-types/modules/pricing/pricing';
@@ -41,12 +39,10 @@ export const landingTemplateSchema = defineType({
       ],
     }),
     modulesField({
-      allow: [
+      extend: [
         contentSchema.name,
-        ctaSchema.name,
         postLatestSchema.name,
         postFeaturedSchema.name,
-        newsletterSchema.name,
         taxonomyListSchema.name,
         featureListSchema.name,
         featureHighlightsSchema.name,

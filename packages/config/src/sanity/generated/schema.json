@@ -7401,36 +7401,6 @@
   },
   {
     "type": "type",
-    "name": "module_cta.reference",
-    "value": {
-      "type": "object",
-      "attributes": {
-        "_ref": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          }
-        },
-        "_type": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string",
-            "value": "reference"
-          }
-        },
-        "_weak": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "boolean"
-          },
-          "optional": true
-        }
-      },
-      "dereferencesTo": "module_cta"
-    }
-  },
-  {
-    "type": "type",
     "name": "module_content.reference",
     "value": {
       "type": "object",
@@ -7521,36 +7491,6 @@
   },
   {
     "type": "type",
-    "name": "module_postFeatured.reference",
-    "value": {
-      "type": "object",
-      "attributes": {
-        "_ref": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          }
-        },
-        "_type": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string",
-            "value": "reference"
-          }
-        },
-        "_weak": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "boolean"
-          },
-          "optional": true
-        }
-      },
-      "dereferencesTo": "module_postFeatured"
-    }
-  },
-  {
-    "type": "type",
     "name": "module_featureList.reference",
     "value": {
       "type": "object",
@@ -7581,7 +7521,7 @@
   },
   {
     "type": "type",
-    "name": "module_postLatest.reference",
+    "name": "module_timeline.reference",
     "value": {
       "type": "object",
       "attributes": {
@@ -7606,7 +7546,7 @@
           "optional": true
         }
       },
-      "dereferencesTo": "module_postLatest"
+      "dereferencesTo": "module_timeline"
     }
   },
   {
@@ -7641,66 +7581,6 @@
   },
   {
     "type": "type",
-    "name": "module_newsletter.reference",
-    "value": {
-      "type": "object",
-      "attributes": {
-        "_ref": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          }
-        },
-        "_type": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string",
-            "value": "reference"
-          }
-        },
-        "_weak": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "boolean"
-          },
-          "optional": true
-        }
-      },
-      "dereferencesTo": "module_newsletter"
-    }
-  },
-  {
-    "type": "type",
-    "name": "module_pricing.reference",
-    "value": {
-      "type": "object",
-      "attributes": {
-        "_ref": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          }
-        },
-        "_type": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string",
-            "value": "reference"
-          }
-        },
-        "_weak": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "boolean"
-          },
-          "optional": true
-        }
-      },
-      "dereferencesTo": "module_pricing"
-    }
-  },
-  {
-    "type": "type",
     "name": "module_stats.reference",
     "value": {
       "type": "object",
@@ -7727,36 +7607,6 @@
         }
       },
       "dereferencesTo": "module_stats"
-    }
-  },
-  {
-    "type": "type",
-    "name": "module_taxonomyList.reference",
-    "value": {
-      "type": "object",
-      "attributes": {
-        "_ref": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          }
-        },
-        "_type": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string",
-            "value": "reference"
-          }
-        },
-        "_weak": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "boolean"
-          },
-          "optional": true
-        }
-      },
-      "dereferencesTo": "module_taxonomyList"
     }
   },
   {
@@ -7821,7 +7671,7 @@
   },
   {
     "type": "type",
-    "name": "module_timeline.reference",
+    "name": "module_cta.reference",
     "value": {
       "type": "object",
       "attributes": {
@@ -7846,7 +7696,157 @@
           "optional": true
         }
       },
-      "dereferencesTo": "module_timeline"
+      "dereferencesTo": "module_cta"
+    }
+  },
+  {
+    "type": "type",
+    "name": "module_newsletter.reference",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_ref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          }
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "reference"
+          }
+        },
+        "_weak": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      },
+      "dereferencesTo": "module_newsletter"
+    }
+  },
+  {
+    "type": "type",
+    "name": "module_pricing.reference",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_ref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          }
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "reference"
+          }
+        },
+        "_weak": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      },
+      "dereferencesTo": "module_pricing"
+    }
+  },
+  {
+    "type": "type",
+    "name": "module_postFeatured.reference",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_ref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          }
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "reference"
+          }
+        },
+        "_weak": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      },
+      "dereferencesTo": "module_postFeatured"
+    }
+  },
+  {
+    "type": "type",
+    "name": "module_postLatest.reference",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_ref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          }
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "reference"
+          }
+        },
+        "_weak": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      },
+      "dereferencesTo": "module_postLatest"
+    }
+  },
+  {
+    "type": "type",
+    "name": "module_taxonomyList.reference",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_ref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          }
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "reference"
+          }
+        },
+        "_weak": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      },
+      "dereferencesTo": "module_taxonomyList"
     }
   },
   {
@@ -7931,21 +7931,6 @@
                 },
                 "rest": {
                   "type": "inline",
-                  "name": "module_cta.reference"
-                }
-              },
-              {
-                "type": "object",
-                "attributes": {
-                  "_key": {
-                    "type": "objectAttribute",
-                    "value": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "rest": {
-                  "type": "inline",
                   "name": "module_content.reference"
                 }
               },
@@ -7991,21 +7976,6 @@
                 },
                 "rest": {
                   "type": "inline",
-                  "name": "module_postFeatured.reference"
-                }
-              },
-              {
-                "type": "object",
-                "attributes": {
-                  "_key": {
-                    "type": "objectAttribute",
-                    "value": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "rest": {
-                  "type": "inline",
                   "name": "module_featureList.reference"
                 }
               },
@@ -8021,7 +7991,7 @@
                 },
                 "rest": {
                   "type": "inline",
-                  "name": "module_postLatest.reference"
+                  "name": "module_timeline.reference"
                 }
               },
               {
@@ -8051,52 +8021,7 @@
                 },
                 "rest": {
                   "type": "inline",
-                  "name": "module_newsletter.reference"
-                }
-              },
-              {
-                "type": "object",
-                "attributes": {
-                  "_key": {
-                    "type": "objectAttribute",
-                    "value": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "rest": {
-                  "type": "inline",
-                  "name": "module_pricing.reference"
-                }
-              },
-              {
-                "type": "object",
-                "attributes": {
-                  "_key": {
-                    "type": "objectAttribute",
-                    "value": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "rest": {
-                  "type": "inline",
                   "name": "module_stats.reference"
-                }
-              },
-              {
-                "type": "object",
-                "attributes": {
-                  "_key": {
-                    "type": "objectAttribute",
-                    "value": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "rest": {
-                  "type": "inline",
-                  "name": "module_taxonomyList.reference"
                 }
               },
               {
@@ -8141,7 +8066,82 @@
                 },
                 "rest": {
                   "type": "inline",
-                  "name": "module_timeline.reference"
+                  "name": "module_cta.reference"
+                }
+              },
+              {
+                "type": "object",
+                "attributes": {
+                  "_key": {
+                    "type": "objectAttribute",
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "rest": {
+                  "type": "inline",
+                  "name": "module_newsletter.reference"
+                }
+              },
+              {
+                "type": "object",
+                "attributes": {
+                  "_key": {
+                    "type": "objectAttribute",
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "rest": {
+                  "type": "inline",
+                  "name": "module_pricing.reference"
+                }
+              },
+              {
+                "type": "object",
+                "attributes": {
+                  "_key": {
+                    "type": "objectAttribute",
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "rest": {
+                  "type": "inline",
+                  "name": "module_postFeatured.reference"
+                }
+              },
+              {
+                "type": "object",
+                "attributes": {
+                  "_key": {
+                    "type": "objectAttribute",
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "rest": {
+                  "type": "inline",
+                  "name": "module_postLatest.reference"
+                }
+              },
+              {
+                "type": "object",
+                "attributes": {
+                  "_key": {
+                    "type": "objectAttribute",
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "rest": {
+                  "type": "inline",
+                  "name": "module_taxonomyList.reference"
                 }
               }
             ]
@@ -9108,7 +9108,7 @@
                 },
                 "rest": {
                   "type": "inline",
-                  "name": "module_postLatest.reference"
+                  "name": "module_newsletter.reference"
                 }
               },
               {
@@ -9123,7 +9123,7 @@
                 },
                 "rest": {
                   "type": "inline",
-                  "name": "module_newsletter.reference"
+                  "name": "module_postLatest.reference"
                 }
               },
               {
@@ -9302,7 +9302,7 @@
                 },
                 "rest": {
                   "type": "inline",
-                  "name": "module_postLatest.reference"
+                  "name": "module_newsletter.reference"
                 }
               },
               {
@@ -9317,7 +9317,7 @@
                 },
                 "rest": {
                   "type": "inline",
-                  "name": "module_newsletter.reference"
+                  "name": "module_postLatest.reference"
                 }
               },
               {
@@ -9546,7 +9546,7 @@
                 },
                 "rest": {
                   "type": "inline",
-                  "name": "module_postLatest.reference"
+                  "name": "module_newsletter.reference"
                 }
               },
               {
@@ -9561,7 +9561,7 @@
                 },
                 "rest": {
                   "type": "inline",
-                  "name": "module_newsletter.reference"
+                  "name": "module_postLatest.reference"
                 }
               },
               {
@@ -9856,7 +9856,7 @@
                 },
                 "rest": {
                   "type": "inline",
-                  "name": "module_postLatest.reference"
+                  "name": "module_newsletter.reference"
                 }
               },
               {
@@ -9871,7 +9871,7 @@
                 },
                 "rest": {
                   "type": "inline",
-                  "name": "module_newsletter.reference"
+                  "name": "module_postLatest.reference"
                 }
               },
               {
@@ -10070,7 +10070,7 @@
                 },
                 "rest": {
                   "type": "inline",
-                  "name": "module_postFeatured.reference"
+                  "name": "module_newsletter.reference"
                 }
               },
               {
@@ -10085,7 +10085,7 @@
                 },
                 "rest": {
                   "type": "inline",
-                  "name": "module_newsletter.reference"
+                  "name": "module_postFeatured.reference"
                 }
               },
               {
@@ -10350,21 +10350,6 @@
                 },
                 "rest": {
                   "type": "inline",
-                  "name": "module_cta.reference"
-                }
-              },
-              {
-                "type": "object",
-                "attributes": {
-                  "_key": {
-                    "type": "objectAttribute",
-                    "value": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "rest": {
-                  "type": "inline",
                   "name": "module_content.reference"
                 }
               },
@@ -10410,21 +10395,6 @@
                 },
                 "rest": {
                   "type": "inline",
-                  "name": "module_postFeatured.reference"
-                }
-              },
-              {
-                "type": "object",
-                "attributes": {
-                  "_key": {
-                    "type": "objectAttribute",
-                    "value": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "rest": {
-                  "type": "inline",
                   "name": "module_featureList.reference"
                 }
               },
@@ -10440,7 +10410,7 @@
                 },
                 "rest": {
                   "type": "inline",
-                  "name": "module_postLatest.reference"
+                  "name": "module_timeline.reference"
                 }
               },
               {
@@ -10470,52 +10440,7 @@
                 },
                 "rest": {
                   "type": "inline",
-                  "name": "module_newsletter.reference"
-                }
-              },
-              {
-                "type": "object",
-                "attributes": {
-                  "_key": {
-                    "type": "objectAttribute",
-                    "value": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "rest": {
-                  "type": "inline",
-                  "name": "module_pricing.reference"
-                }
-              },
-              {
-                "type": "object",
-                "attributes": {
-                  "_key": {
-                    "type": "objectAttribute",
-                    "value": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "rest": {
-                  "type": "inline",
                   "name": "module_stats.reference"
-                }
-              },
-              {
-                "type": "object",
-                "attributes": {
-                  "_key": {
-                    "type": "objectAttribute",
-                    "value": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "rest": {
-                  "type": "inline",
-                  "name": "module_taxonomyList.reference"
                 }
               },
               {
@@ -10560,7 +10485,82 @@
                 },
                 "rest": {
                   "type": "inline",
-                  "name": "module_timeline.reference"
+                  "name": "module_cta.reference"
+                }
+              },
+              {
+                "type": "object",
+                "attributes": {
+                  "_key": {
+                    "type": "objectAttribute",
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "rest": {
+                  "type": "inline",
+                  "name": "module_newsletter.reference"
+                }
+              },
+              {
+                "type": "object",
+                "attributes": {
+                  "_key": {
+                    "type": "objectAttribute",
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "rest": {
+                  "type": "inline",
+                  "name": "module_pricing.reference"
+                }
+              },
+              {
+                "type": "object",
+                "attributes": {
+                  "_key": {
+                    "type": "objectAttribute",
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "rest": {
+                  "type": "inline",
+                  "name": "module_postFeatured.reference"
+                }
+              },
+              {
+                "type": "object",
+                "attributes": {
+                  "_key": {
+                    "type": "objectAttribute",
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "rest": {
+                  "type": "inline",
+                  "name": "module_postLatest.reference"
+                }
+              },
+              {
+                "type": "object",
+                "attributes": {
+                  "_key": {
+                    "type": "objectAttribute",
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "rest": {
+                  "type": "inline",
+                  "name": "module_taxonomyList.reference"
                 }
               }
             ]

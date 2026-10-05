@@ -19,17 +19,6 @@ import { timelineSchema } from '@blog/studio/schema-types/modules/timeline/timel
 
 export const moduleKinds = [
   {
-    name: 'posts',
-    title: 'Posts',
-    modules: [
-      postListSchema,
-      postLatestSchema,
-      postFeaturedSchema,
-      postRelatedSchema,
-      taxonomyListSchema,
-    ],
-  },
-  {
     name: 'explainers',
     title: 'Explainers',
     modules: [
@@ -49,6 +38,17 @@ export const moduleKinds = [
     name: 'conversion',
     title: 'Conversion',
     modules: [ctaSchema, newsletterSchema, pricingSchema],
+  },
+  {
+    name: 'posts',
+    title: 'Posts',
+    modules: [
+      postListSchema,
+      postLatestSchema,
+      postFeaturedSchema,
+      postRelatedSchema,
+      taxonomyListSchema,
+    ],
   },
 ];
 
