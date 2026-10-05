@@ -323,7 +323,7 @@ export type Module_logoWall = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  headingBlock?: HeadingBlock;
+  headingBlock?: LocalizedHeadingBlock;
   logos?: Array<
     {
       _key: string;
