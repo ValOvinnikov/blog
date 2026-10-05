@@ -3,6 +3,7 @@
 import { ICONS, LANGUAGE_SWITCHER_STYLE, SIZE } from '@blog/config';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { PopoverMenu } from '@blog/ui/components/molecules/popover-menu';
+import { headerControlVariants } from '@web/components/shared/header-control';
 import type { TLanguageEntry } from '@web/components/shared/language-switcher/to-language-entries';
 import { usePopover } from '@web/hooks/use-popover';
 import { useTranslations } from 'next-intl';
@@ -30,11 +31,13 @@ export const LanguageMenu = ({
   const { open, toggle, close, triggerRef, panelRef } = usePopover();
   const current = entries.find((entry) => entry.isCurrent) ?? entries[0];
   const hasGlobe = menuStyle === LANGUAGE_SWITCHER_STYLE.MENU_GLOBE;
-  const triggerKind = isInFooter ? 'text' : hasGlobe ? 'globe' : 'pill';
-  const { trigger, caret, panel, checkSlot } = languageMenuVariants({
-    trigger: triggerKind,
-    opensUpward: isInFooter,
+  const isHeaderPill = !isInFooter && !hasGlobe;
+  const { footerTrigger, caret, panel, checkSlot } = languageMenuVariants({
+    isInFooter,
   });
+  const triggerClassName = isInFooter
+    ? footerTrigger()
+    : headerControlVariants({ shape: hasGlobe ? 'square' : 'label' });
 
   if (!current) {
     return null;
@@ -48,16 +51,17 @@ export const LanguageMenu = ({
         isOpen={open}
         panelId={panelId}
         onClick={toggle}
-        variant={triggerKind === 'pill' ? 'bordered' : undefined}
-        className={trigger()}
+        variant={isInFooter ? undefined : 'bordered'}
+        className={triggerClassName}
       >
         {hasGlobe && <Icon name={ICONS.GLOBE} size={SIZE.SM} />}
-        {triggerKind === 'pill' && current.code}
         {isInFooter && current.label}
-        {triggerKind !== 'globe' && (
-          <span aria-hidden="true" className={caret()}>
-            {isInFooter ? '▴' : '▾'}
-          </span>
+        {isHeaderPill && current.code}
+        {(isInFooter || isHeaderPill) && (
+          <Icon
+            name={isInFooter ? ICONS.CHEVRON_UP : ICONS.CHEVRON_DOWN}
+            className={caret()}
+          />
         )}
       </PopoverMenu.Trigger>
       <PopoverMenu.Panel
