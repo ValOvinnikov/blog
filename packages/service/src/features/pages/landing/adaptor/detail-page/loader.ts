@@ -4,6 +4,7 @@ import {
   runQuery,
   type TTenantSanityContext,
 } from '@blog/service/sanity/query';
+import { getPageFaqs } from '@blog/service/shared/adaptors/faq-questions/page-faqs';
 
 import { landingPageQuery } from './query';
 import { toLandingPage } from './transformer';
@@ -16,9 +17,9 @@ export async function getPage(
   const raw = await runQuery(landingPageQuery, {
     parameters: { slug },
     tenant,
-    ...isr(['page_landing', 'modules:faq', 'block_faq'], tenant.projectId),
+    ...isr('page_landing', tenant.projectId),
   });
   if (!raw) return undefined;
 
-  return toLandingPage(raw);
+  return toLandingPage(raw, await getPageFaqs(raw.modules, tenant));
 }
