@@ -6,7 +6,7 @@ import { findTranslatedPath } from './find-translated-path';
 const { EN, NL, FR, DE } = LOCALE_ISO_CODES;
 
 const translationMap: TTranslationMap = {
-  homeLanguages: [],
+  homeLanguages: [EN, NL],
   groups: [
     [
       { documentType: 'page_landing', language: EN, slug: 'about' },
@@ -49,7 +49,18 @@ describe(findTranslatedPath, () => {
   it('is undefined for a page outside the map', () => {
     expect(find('/blog')).toBeUndefined();
     expect(find('/blog/about')).toBeUndefined();
-    expect(find('/')).toBeUndefined();
+  });
+
+  it("finds another language's Home under its prefix", () => {
+    expect(find('/')).toBe('/nl');
+  });
+
+  it('finds the default-language Home without a prefix', () => {
+    expect(find('/', NL, EN)).toBe('/');
+  });
+
+  it('is undefined for a language without a Home', () => {
+    expect(find('/', EN, FR)).toBeUndefined();
   });
 
   it('keeps the same page when the language does not change', () => {

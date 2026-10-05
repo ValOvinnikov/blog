@@ -7,6 +7,7 @@ import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base
 import { getHostTenantSanityContext } from '@web/server/tenant/tenant-sanity-context/tenant-sanity-context';
 import { logger } from '@web/utils/logger/logger';
 import { toLandingPageAlternates } from '@web/utils/to-landing-page-alternates';
+import { toLanguageAlternates } from '@web/utils/to-language-alternates';
 import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
 import type { MetadataRoute } from 'next';
 
@@ -27,6 +28,60 @@ const toEntry = (
       ),
     },
   };
+};
+
+const toAbsoluteAlternates = (
+  alternates: Record<string, string>,
+  siteUrl: string,
+): Record<string, string> =>
+  Object.fromEntries(
+    Object.entries(alternates).map(([language, path]) => [
+      language,
+      `${siteUrl}${path}`,
+    ]),
+  );
+
+type THomePageEntriesParams = {
+  homeLanguages: readonly TLocaleIsoCode[];
+  liveLocales: readonly TLocaleIsoCode[];
+  defaultLocale: TLocaleIsoCode;
+  siteUrl: string;
+};
+
+const toHomePageEntries = ({
+  homeLanguages,
+  liveLocales,
+  defaultLocale,
+  siteUrl,
+}: THomePageEntriesParams): MetadataRoute.Sitemap => {
+  const languages = [
+    defaultLocale,
+    ...homeLanguages.filter(
+      (language) =>
+        language !== defaultLocale && liveLocales.includes(language),
+    ),
+  ];
+
+  if (languages.length < 2) {
+    return [toEntry(routes.home(), siteUrl)];
+  }
+
+  const alternates = toAbsoluteAlternates(
+    toLanguageAlternates({
+      pages: languages.map((language) => ({ language, href: routes.home() })),
+      defaultLocale,
+    }),
+    siteUrl,
+  );
+
+  return languages.map((language) => ({
+    url: `${siteUrl}${toLocalizedPathname({
+      href: routes.home(),
+      locale: language,
+      defaultLocale,
+    })}`,
+    alternates: { languages: alternates },
+  }));
 };
 
 const LANDING_PAGE_DOCUMENT_TYPE = 'page_landing';
@@ -68,13 +123,12 @@ const toLandingPageEntry = ({
   return {
     url,
     alternates: {
-      languages: Object.fromEntries(
-        Object.entries(
-          toLandingPageAlternates({
-            translations: liveTranslations,
-            defaultLocale,
-          }),
-        ).map(([language, path]) => [language, `${siteUrl}${path}`]),
+      languages: toAbsoluteAlternates(
+        toLandingPageAlternates({
+          translations: liveTranslations,
+          defaultLocale,
+        }),
+        siteUrl,
       ),
     },
   };
@@ -202,7 +256,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     : { groups: [], homeLanguages: [] };
 
   return [
-    toEntry(routes.home(), siteUrl),
+    ...toHomePageEntries({
+      homeLanguages: translationMap.homeLanguages,
+      liveLocales,
+      defaultLocale,
+      siteUrl,
+    }),
     ...(blogParamsResult.ok ? [toEntry(routes.blogIndex(), siteUrl)] : []),
     ...(topicIndexPageResult.ok && topicIndexPageResult.data
       ? [toEntry(routes.topics(), siteUrl)]
