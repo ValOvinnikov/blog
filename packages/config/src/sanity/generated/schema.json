@@ -8107,21 +8107,23 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "imageWithAlt"
+          "name": "localizedImageWithAlt"
         },
         "optional": true
       },
       "eyebrow": {
         "type": "objectAttribute",
         "value": {
-          "type": "string"
+          "type": "inline",
+          "name": "internationalizedArrayString"
         },
         "optional": true
       },
       "primaryActionLabel": {
         "type": "objectAttribute",
         "value": {
-          "type": "string"
+          "type": "inline",
+          "name": "internationalizedArrayString"
         },
         "optional": true
       },

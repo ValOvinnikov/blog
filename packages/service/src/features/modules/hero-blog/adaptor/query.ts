@@ -2,10 +2,11 @@ import { POST_SOURCE } from '@blog/config';
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/post/published-post';
 import { ctaSecondaryButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
-import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
+import { localizedImageWithAltFragment } from '@blog/service/shared/fragments/image/localized-image-with-alt';
 import { moduleHeroLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { postCardFragment } from '@blog/service/shared/fragments/post/post';
+import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
 
 const newestFeaturedPostQuery = q.star
   .filterByType('page_post')
@@ -34,9 +35,12 @@ export const heroBlogModuleQuery = q
         newestFeaturedPostQuery,
       )
       .nullable(true),
-    eyebrow: sub.field('eyebrow').nullable(true),
-    image: sub.field('image').project(sanityImageFragment).nullable(true),
-    primaryActionLabel: sub.field('primaryActionLabel').notNull(),
+    eyebrow: getLocalizedField(sub, 'eyebrow'),
+    image: sub
+      .field('image')
+      .project(localizedImageWithAltFragment)
+      .nullable(true),
+    primaryActionLabel: getLocalizedField(sub, 'primaryActionLabel').notNull(),
     primaryActionAppearance: sub.field('primaryActionAppearance').notNull(),
     secondaryAction: sub
       .field('secondaryAction')
