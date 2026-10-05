@@ -1,4 +1,4 @@
-import { routes } from '@blog/config';
+import { LOCALE_BCP47_TAGS, routes } from '@blog/config';
 import { routing } from '@web/i18n/routing';
 import { toMetadata } from '@web/metadata/to-metadata';
 import { getLandingPage } from '@web/server/landing/get-landing-page/get-landing-page';
@@ -31,25 +31,38 @@ export const buildLandingPageMetadata = async (
     defaultLocale = routing.defaultLocale,
     liveLocales = [locale],
   } = await getRequestContext();
-  const metadata = await toMetadata(seo, {
-    canonical: toLocalizedPathname({
-      href: routes.landingPage(slug),
-      locale,
-      defaultLocale,
-    }),
-    ogType: 'website',
+  const canonical = toLocalizedPathname({
+    href: routes.landingPage(slug),
+    locale,
+    defaultLocale,
   });
+  const metadata = await toMetadata(seo, { canonical, ogType: 'website' });
 
   const liveTranslations = translations.filter(({ language }) =>
     liveLocales.includes(language),
   );
+  const alternateLocales = liveTranslations
+    .filter(({ language }) => language !== locale)
+    .map(({ language }) => LOCALE_BCP47_TAGS[language]);
+
+  const localizedMetadata: Metadata = {
+    ...metadata,
+    openGraph: {
+      ...metadata.openGraph,
+      locale: LOCALE_BCP47_TAGS[locale],
+      url: canonical,
+      ...(alternateLocales.length > 0 && {
+        alternateLocale: alternateLocales,
+      }),
+    },
+  };
 
   if (liveTranslations.every(({ language }) => language === locale)) {
-    return metadata;
+    return localizedMetadata;
   }
 
   return {
-    ...metadata,
+    ...localizedMetadata,
     alternates: {
       ...metadata.alternates,
       languages: toLandingPageAlternates({

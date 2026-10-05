@@ -221,6 +221,63 @@ describe('buildLandingPageMetadata', () => {
     ]);
   });
 
+  it('emits locale, alternate locale and url for an EN page with a live NL translation', async () => {
+    getLandingPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        ...mockLandingPage,
+        translations: [
+          { language: EN, slug: 'about-us' },
+          { language: NL, slug: 'over-ons' },
+        ],
+      },
+    });
+
+    const metadata = await buildLandingPageMetadata('about-us');
+
+    expect(metadata.openGraph?.locale).toBe('en');
+    expect(metadata.openGraph?.alternateLocale).toEqual(['nl']);
+    expect(metadata.openGraph?.url).toBe(metadata.alternates?.canonical);
+  });
+
+  it('emits locale, alternate locale and url for the NL translation of the same page', async () => {
+    vi.mocked(getRequestContext).mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      locale: NL,
+      liveLocales: [EN, NL],
+    });
+    getLandingPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        ...mockLandingPage,
+        slug: 'over-ons',
+        translations: [
+          { language: EN, slug: 'about-us' },
+          { language: NL, slug: 'over-ons' },
+        ],
+      },
+    });
+
+    const metadata = await buildLandingPageMetadata('over-ons');
+
+    expect(metadata.openGraph?.locale).toBe('nl');
+    expect(metadata.openGraph?.alternateLocale).toEqual(['en']);
+    expect(metadata.openGraph?.url).toBe(metadata.alternates?.canonical);
+  });
+
+  it('emits only locale and url, with no alternate locale, for a page with no translation', async () => {
+    getLandingPageMock.mockResolvedValue({
+      ok: true,
+      data: { ...mockLandingPage, translations: [] },
+    });
+
+    const metadata = await buildLandingPageMetadata('about-us');
+
+    expect(metadata.openGraph?.locale).toBe('en');
+    expect(metadata.openGraph?.alternateLocale).toBeUndefined();
+    expect(metadata.openGraph?.url).toBe('/about-us');
+  });
+
   it('returns empty metadata and logs when the page fetch fails', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getLandingPageMock.mockResolvedValue({
