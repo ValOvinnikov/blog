@@ -1,10 +1,11 @@
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { localizedArticleTextField } from '@blog/studio/schema-types/fields/localized-article-text-field/localized-article-text-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
-import { articleTextSchema } from '@blog/studio/schema-types/portable-text/article-text/article-text';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
+import { validateDefaultLanguageBlocksFilled } from '@blog/studio/schema-types/validation/validate-default-language-blocks-filled/validate-default-language-blocks-filled';
 import { FileText } from 'lucide-react';
-import { defineField, defineType } from 'sanity';
+import { defineType } from 'sanity';
 
 export const contentSchema = defineType({
   name: 'module_content',
@@ -16,12 +17,16 @@ export const contentSchema = defineType({
   fields: [
     titleField(),
     brandVariantField(),
-    defineField({
+    localizedArticleTextField({
       name: 'body',
       title: 'Body',
-      type: articleTextSchema.name,
       description: 'The text itself, with images and code blocks as needed.',
-      validation: (rule) => rule.required(),
+      validation: (rule) =>
+        rule.custom(
+          validateDefaultLanguageBlocksFilled(
+            'Write the body of this section.',
+          ),
+        ),
     }),
     layoutField,
   ],

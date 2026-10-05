@@ -60,4 +60,31 @@ describe(localizePortableTextField, () => {
       ),
     ]);
   });
+
+  it('moves Portable Text with embedded objects into the default language', () => {
+    const article = [
+      ...blocks,
+      { _type: 'bodyImage', _key: 'image-1', alt: 'A diagram' },
+    ];
+
+    expect(
+      localizePortableTextField(
+        'body',
+        article,
+        'internationalizedArrayArticleTextValue',
+      ),
+    ).toEqual([
+      at(
+        'body',
+        set([
+          {
+            _key: EN,
+            _type: 'internationalizedArrayArticleTextValue',
+            language: EN,
+            value: article,
+          },
+        ]),
+      ),
+    ]);
+  });
 });

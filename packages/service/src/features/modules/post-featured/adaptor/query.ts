@@ -9,7 +9,7 @@ import {
   showImagesParser,
 } from '@blog/service/shared/expressions/module/show-images';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/post/published-post';
-import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
+import { localizedHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/localized-heading-block';
 import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { postCardFragment } from '@blog/service/shared/fragments/post/post';
@@ -31,7 +31,7 @@ export const postFeaturedModuleQuery = q
     brandVariant: sub.field('brandVariant').notNull(),
     headingBlock: sub
       .field('headingBlock')
-      .project(headingBlockFragment)
+      .project(localizedHeadingBlockFragment)
       .notNull(),
     postSource: sub.field('postSource').notNull(),
     posts: sub

@@ -94,7 +94,10 @@ const mockAllEmpty = () => {
   getPageSlugsMock.mockResolvedValue({ ok: true, data: [] });
   getTopicIndexPageMock.mockResolvedValue({ ok: true, data: {} });
   getTagIndexPageMock.mockResolvedValue({ ok: true, data: {} });
-  getTranslationMapMock.mockResolvedValue({ ok: true, data: { groups: [] } });
+  getTranslationMapMock.mockResolvedValue({
+    ok: true,
+    data: { groups: [], homeLanguages: [] },
+  });
 };
 
 describe('sitemap', () => {
@@ -226,6 +229,7 @@ describe('sitemap', () => {
   });
 
   const aboutTranslations = {
+    homeLanguages: [],
     groups: [
       [
         { documentType: 'page_landing', language: 'EN', slug: 'about' },
@@ -275,6 +279,58 @@ describe('sitemap', () => {
       url: 'https://example.com/nl/over-ons',
       alternates: { languages: aboutAlternates },
     });
+  });
+
+  const homeAlternates = {
+    en: 'https://example.com/',
+    nl: 'https://example.com/nl',
+    'x-default': 'https://example.com/',
+  };
+
+  const mockHomes = (homeLanguages: string[]) => {
+    mockAllEmpty();
+    resolveRequestTenantMock.mockResolvedValue({
+      id: 'tenant-1',
+      locale: 'EN',
+    });
+    selectLiveLocalesMock.mockReturnValue(['EN', 'NL']);
+    getTranslationMapMock.mockResolvedValue({
+      ok: true,
+      data: { groups: [], homeLanguages },
+    });
+  };
+
+  it('lists each live Home with every live Home as an alternate', async () => {
+    mockHomes(['EN', 'NL', 'DE']);
+    const sitemap = (await import('./sitemap')).default;
+
+    const entries = await sitemap();
+
+    expect(entries).toContainEqual({
+      url: 'https://example.com/',
+      alternates: { languages: homeAlternates },
+    });
+    expect(entries).toContainEqual({
+      url: 'https://example.com/nl',
+      alternates: { languages: homeAlternates },
+    });
+    expect(entries).not.toContainEqual(
+      expect.objectContaining({ url: 'https://example.com/de' }),
+    );
+  });
+
+  it('keeps the default-language Home as its own entry when no other language has one', async () => {
+    mockHomes(['EN']);
+    const sitemap = (await import('./sitemap')).default;
+
+    const entries = await sitemap();
+
+    expect(
+      entries.filter(({ url }) => url.startsWith('https://example.com/nl')),
+    ).toEqual([]);
+    expect(entries).toContainEqual(
+      expect.objectContaining({ url: 'https://example.com/' }),
+    );
   });
 
   it('keeps an untranslated landing page entry as its own language alternate', async () => {

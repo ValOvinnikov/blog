@@ -42,6 +42,16 @@ export const findTranslatedPath = ({
     });
   }
 
+  if (pathname === routes.home()) {
+    return translationMap.homeLanguages.includes(toLocale)
+      ? toLocalizedPathname({
+          href: routes.home(),
+          locale: toLocale,
+          defaultLocale,
+        })
+      : undefined;
+  }
+
   const slug = toLandingSlug(pathname);
   if (!slug) {
     return undefined;
