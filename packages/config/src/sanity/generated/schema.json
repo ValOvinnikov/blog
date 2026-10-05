@@ -1148,7 +1148,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "headingBlock"
+          "name": "localizedHeadingBlock"
         },
         "optional": true
       },
@@ -1220,36 +1220,6 @@
           "name": "layout"
         },
         "optional": true
-      }
-    }
-  },
-  {
-    "name": "headingBlock",
-    "type": "type",
-    "value": {
-      "type": "object",
-      "attributes": {
-        "_type": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string",
-            "value": "headingBlock"
-          }
-        },
-        "heading": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          },
-          "optional": true
-        },
-        "supportingText": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          },
-          "optional": true
-        }
       }
     }
   },
@@ -2032,6 +2002,36 @@
           "name": "wideLayout"
         },
         "optional": true
+      }
+    }
+  },
+  {
+    "name": "headingBlock",
+    "type": "type",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "headingBlock"
+          }
+        },
+        "heading": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "supportingText": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        }
       }
     }
   },
@@ -6539,7 +6539,8 @@
       "question": {
         "type": "objectAttribute",
         "value": {
-          "type": "string"
+          "type": "inline",
+          "name": "internationalizedArrayString"
         },
         "optional": true
       },
@@ -6547,7 +6548,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "listedText"
+          "name": "internationalizedArrayListedText"
         },
         "optional": true
       }
