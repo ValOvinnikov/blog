@@ -22,6 +22,23 @@ const newsletterDocument = {
       [NL]: 'Wekelijks nieuwe berichten.',
     }),
   },
+  trustCues: [
+    {
+      _key: 'cue-1',
+      _type: 'newsletterTrustCue',
+      text: localizedValues('internationalizedArrayStringValue', {
+        [EN]: 'No spam',
+        [NL]: 'Geen spam',
+      }),
+    },
+    {
+      _key: 'cue-2',
+      _type: 'newsletterTrustCue',
+      text: localizedValues('internationalizedArrayStringValue', {
+        [EN]: 'Unsubscribe anytime',
+      }),
+    },
+  ],
 };
 
 async function runNewsletter(
@@ -55,6 +72,7 @@ describe('newsletterModuleQuery', () => {
       brandVariant: 'PRIMARY',
       headingBlock: makeRawHeadingBlock('Stay in the loop'),
       variant: 'COMPACT',
+      trustCues: null,
       layout: null,
       contentAlignment: null,
     };
@@ -78,6 +96,24 @@ describe('newsletterModuleQuery', () => {
       heading: 'Stay in the loop',
       supportingText: 'New posts weekly.',
     });
+  });
+
+  it('picks each trust cue in the visitor language, falling back to the default', async () => {
+    const newsletter = await runNewsletter(newsletterDocument, NL);
+
+    expect(newsletter.trustCues).toEqual([
+      { text: 'Geen spam' },
+      { text: 'Unsubscribe anytime' },
+    ]);
+  });
+
+  it('returns no trust cues when the module has none', async () => {
+    const newsletter = await runNewsletter(
+      { ...newsletterDocument, trustCues: undefined },
+      NL,
+    );
+
+    expect(newsletter.trustCues).toBeNull();
   });
 
   it('fails when the heading is missing in both languages', async () => {

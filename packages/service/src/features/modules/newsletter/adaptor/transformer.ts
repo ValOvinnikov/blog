@@ -16,6 +16,7 @@ export function toNewsletterModule(
     brandVariant: raw.brandVariant,
     headingBlock: toHeadingBlock(raw.headingBlock),
     variant: raw.variant,
+    trustCues: raw.trustCues?.flatMap((cue) => (cue.text ? [cue.text] : [])),
     layout: toLayout(raw.layout),
     contentAlignment: raw.contentAlignment ?? undefined,
   };

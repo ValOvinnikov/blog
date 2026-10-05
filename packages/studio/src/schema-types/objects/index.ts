@@ -16,6 +16,7 @@ import { linkRefSchema } from './link-ref/link-ref';
 import { localizedHeadingBlockSchema } from './localized-heading-block/localized-heading-block';
 import { localizedImageWithAltSchema } from './localized-image-with-alt/localized-image-with-alt';
 import { logoItemSchema } from './logo-item/logo-item';
+import { newsletterTrustCueSchema } from './newsletter-trust-cue/newsletter-trust-cue';
 import { openGraphSchema } from './open-graph/open-graph';
 import { postTakeawaysSchema } from './post-takeaways/post-takeaways';
 import { pricingFeatureSchema } from './pricing-feature/pricing-feature';
@@ -54,4 +55,5 @@ export const objects = [
   pricingPriceSchema,
   pricingFeatureSchema,
   pricingTierSchema,
+  newsletterTrustCueSchema,
 ];

@@ -61,6 +61,11 @@ export type Module_newsletter = {
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
   headingBlock?: LocalizedHeadingBlock;
   variant?: 'FULL' | 'COMPACT';
+  trustCues?: Array<
+    {
+      _key: string;
+    } & NewsletterTrustCue
+  >;
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   layout?: Layout;
 };
@@ -594,6 +599,11 @@ export type ArticleText = Array<
       _key: string;
     } & Aside)
 >;
+
+export type NewsletterTrustCue = {
+  _type: 'newsletterTrustCue';
+  text?: InternationalizedArrayString;
+};
 
 export type PricingTier = {
   _type: 'pricingTier';
@@ -2040,6 +2050,7 @@ export type AllSanitySchemaTypes =
   | ListedText
   | ParagraphText
   | ArticleText
+  | NewsletterTrustCue
   | PricingTier
   | PricingFeature
   | PricingPrice
