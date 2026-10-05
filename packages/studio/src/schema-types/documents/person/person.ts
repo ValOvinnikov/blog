@@ -37,7 +37,7 @@ export const personSchema = defineType({
       name: 'bio',
       title: 'Bio',
       description:
-        "Short biography shown on this person's profile hero, and on their team card when that module's Show Bios is on, per language.",
+        "Short biography shown on this person's profile hero, and on their team card when that module's Show Bios is on.",
     }),
     localizedOneLineTextField({
       name: 'role',
