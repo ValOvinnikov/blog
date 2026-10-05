@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawHomePage } from '@blog/service/testing/pages/fixtures';
 import {
@@ -108,6 +109,22 @@ describe('getHomePage', () => {
     if (!page) throw new Error('expected a home page');
 
     expect(page.faqs).toEqual([]);
+  });
+
+  it('lists the Home translations, counting a Home with no language as the default', async () => {
+    mockRun.mockResolvedValueOnce(
+      makeRawHomePage({
+        translations: [{ language: null }, { language: LOCALE_ISO_CODES.NL }],
+      }),
+    );
+
+    const page = await getHomePage(tenant);
+    if (!page) throw new Error('expected a home page');
+
+    expect(page.translations).toEqual([
+      LOCALE_ISO_CODES.EN,
+      LOCALE_ISO_CODES.NL,
+    ]);
   });
 
   it('resolves undefined, rather than rejecting, when no page_home document exists', async () => {

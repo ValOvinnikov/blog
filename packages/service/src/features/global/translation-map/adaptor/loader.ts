@@ -3,6 +3,7 @@ import {
   runQuery,
   type TTenantSanityContext,
 } from '@blog/service/sanity/query';
+import { buildLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
 
 import { translationMapQuery } from './query';
 import { toTranslationMap } from './transformer';
@@ -13,7 +14,10 @@ export async function getTranslationMap(
 ): Promise<TTranslationMap> {
   const raw = await runQuery(translationMapQuery, {
     tenant,
-    ...isr(['translation.metadata', 'page_landing'], tenant.projectId),
+    ...isr(
+      ['translation.metadata', 'page_landing', 'homePage'],
+      tenant.projectId,
+    ),
   });
-  return toTranslationMap(raw);
+  return toTranslationMap(raw, buildLocaleParams(tenant).defaultLocale);
 }

@@ -62,7 +62,7 @@ async function buildMap(documents: unknown[]) {
     documents,
     undefined,
   );
-  return toTranslationMap(raw as TRawTranslationMap);
+  return toTranslationMap(raw as TRawTranslationMap, EN);
 }
 
 describe('toTranslationMap', () => {
@@ -95,7 +95,27 @@ describe('toTranslationMap', () => {
   it('is empty for a tenant with no translations', async () => {
     expect(await buildMap([page('about-en', EN, 'about')])).toEqual({
       groups: [],
+      homeLanguages: [],
     });
+  });
+
+  it('lists every language that has a Home, linked or not', async () => {
+    const { homeLanguages } = await buildMap([
+      ...dataset,
+      { _id: 'page_home', _type: 'page_home', language: EN },
+      { _id: 'home-nl', _type: 'page_home', language: NL },
+    ]);
+
+    expect(homeLanguages).toEqual([EN, NL]);
+  });
+
+  it('counts a Home with no language as the default language', async () => {
+    const { homeLanguages } = await buildMap([
+      { _id: 'page_home', _type: 'page_home' },
+      { _id: 'home-de', _type: 'page_home', language: DE },
+    ]);
+
+    expect(homeLanguages).toEqual([EN, DE]);
   });
 });
 
