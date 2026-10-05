@@ -15,11 +15,7 @@ export const faqPageDocuments = [
   {
     _id: 'module-faq-a',
     _type: 'module_faq',
-    questions: [
-      reference('question-ok'),
-      reference('question-deleted'),
-      reference('question-untranslated'),
-    ],
+    questions: [reference('question-ok'), reference('question-untranslated')],
   },
   {
     _id: 'module-faq-b',

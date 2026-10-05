@@ -10,7 +10,6 @@ export const faqQuestionsQuery = q
     _id: true,
     questions: sub
       .field('questions[]')
-      .filterRaw('defined(@->_id)')
       .deref()
       .project((questionSub) => blockFaqFragment(questionSub))
       .nullable(true),

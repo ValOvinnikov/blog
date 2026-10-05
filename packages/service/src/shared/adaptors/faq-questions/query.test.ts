@@ -41,7 +41,7 @@ describe('faqQuestionsQuery', () => {
     ]);
   });
 
-  it('leaves out a deleted question and one with no text in either language, and still parses', async () => {
+  it('leaves out a question with no text in either language', async () => {
     const faqs = await runFaqs(EN, ['module-faq-a']);
 
     expect(faqs.map(({ id }) => id)).toEqual(['question-ok']);
