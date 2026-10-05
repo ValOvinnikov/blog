@@ -1,8 +1,9 @@
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
 import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
-import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
+import { localizedHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/localized-heading-block';
 import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
+import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
 
 export const statsModuleQuery = q
   .parameters<TModuleQueryParams>()
@@ -13,18 +14,18 @@ export const statsModuleQuery = q
     brandVariant: sub.field('brandVariant').notNull(),
     headingBlock: sub
       .field('headingBlock')
-      .project(headingBlockFragment)
+      .project(localizedHeadingBlockFragment)
       .notNull(),
     stats: sub
       .field('stats[]')
       .project((statSub) => ({
         _key: true,
-        value: statSub.field('value').notNull(),
-        label: statSub.field('label').notNull(),
-        description: statSub.field('description').nullable(true),
+        value: getLocalizedField(statSub, 'value').notNull(),
+        label: getLocalizedField(statSub, 'label').notNull(),
+        description: getLocalizedField(statSub, 'description'),
       }))
       .notNull(),
-    footnote: sub.field('footnote').nullable(true),
+    footnote: getLocalizedField(sub, 'footnote'),
     ...ctaButtonsFragment,
     ...moduleContentAlignmentFragment,
     ...moduleWideLayoutFragment,

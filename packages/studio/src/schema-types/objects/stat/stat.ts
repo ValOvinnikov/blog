@@ -1,5 +1,15 @@
+import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
+import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
+import { localizedStringValues } from '@blog/studio/schema-types/validation/localized-string-values/localized-string-values';
+import { validateDefaultLanguageFilled } from '@blog/studio/schema-types/validation/validate-default-language-filled/validate-default-language-filled';
 import { Hash } from 'lucide-react';
-import { defineField, defineType } from 'sanity';
+import { defineType } from 'sanity';
+
+const VALUE_MAX_LENGTH = 8;
+const LABEL_MAX_LENGTH = 48;
+
+const isAnyLongerThan = (value: unknown, maxLength: number) =>
+  localizedStringValues(value).some((text) => text.length > maxLength);
 
 export const statSchema = defineType({
   name: 'stat',
@@ -8,46 +18,54 @@ export const statSchema = defineType({
   description: 'One figure and what it counts, for a band of stats.',
   icon: Hash,
   fields: [
-    defineField({
+    localizedOneLineTextField({
       name: 'value',
       title: 'Value',
-      type: 'string',
-      description: 'The figure as it should read. Kept short.',
+      description: 'The figure as it should read, per language. Kept short.',
       validation: (rule) => [
-        rule.required(),
+        rule.custom(validateDefaultLanguageFilled('Add the figure.')),
         rule
-          .max(8)
-          .warning(
-            'Long values stop reading as a figure — try an abbreviation like 2.4M.',
-          ),
+          .custom((value) =>
+            isAnyLongerThan(value, VALUE_MAX_LENGTH)
+              ? 'Long values stop reading as a figure — try an abbreviation like 2.4M.'
+              : true,
+          )
+          .warning(),
       ],
     }),
-    defineField({
+    localizedOneLineTextField({
       name: 'label',
       title: 'Label',
-      type: 'string',
-      description: 'What the figure counts. A few words, not a sentence.',
+      description:
+        'What the figure counts, per language. A few words, not a sentence.',
       validation: (rule) => [
-        rule.required(),
+        rule.custom(validateDefaultLanguageFilled('Add a label.')),
         rule
-          .max(48)
-          .warning(
-            'Long labels wrap under narrow columns — a few words reads best.',
-          ),
+          .custom((value) =>
+            isAnyLongerThan(value, LABEL_MAX_LENGTH)
+              ? 'Long labels wrap under narrow columns — a few words reads best.'
+              : true,
+          )
+          .warning(),
       ],
     }),
-    defineField({
+    localizedOneLineTextField({
       name: 'description',
       title: 'Description',
-      type: 'string',
       description:
-        'Optional line of context under the label — scope, period, or sample.',
+        'Optional line of context under the label, per language — scope, period, or sample.',
     }),
   ],
   preview: {
     select: {
-      title: 'value',
-      subtitle: 'label',
+      value: 'value',
+      label: 'label',
+    },
+    prepare({ value, label }) {
+      return {
+        title: defaultLanguageValue(value),
+        subtitle: defaultLanguageValue(label),
+      };
     },
   },
 });
