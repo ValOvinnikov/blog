@@ -1,19 +1,19 @@
 import { at, defineMigration, set } from 'sanity/migrate';
 
-import { inDefaultLocale, localizedString } from '../lib/in-default-locale';
+import { inDefaultLocale } from '../lib/in-default-locale';
 import {
   localizeHeadingBlock,
   type THeadingBlockValue,
 } from '../lib/localize-heading-block';
-
-type TSanityObject = { _type?: string; [field: string]: unknown };
+import { localizeImage, type TImageValue } from '../lib/localize-image';
+import { localizeStringField } from '../lib/localize-string-field';
 
 type TCtaDoc = {
   headingBlock?: THeadingBlockValue;
   eyebrow?: unknown;
   footnote?: unknown;
   content?: unknown;
-  image?: TSanityObject;
+  image?: TImageValue;
 };
 
 const isPortableText = (value: unknown): value is unknown[] =>
@@ -22,28 +22,6 @@ const isPortableText = (value: unknown): value is unknown[] =>
   value.every(
     (item) => (item as { _type?: unknown } | null)?._type === 'block',
   );
-
-const localizeImage = (image: TCtaDoc['image']) => {
-  if (!image || image._type === 'localizedImageWithAlt') {
-    return [];
-  }
-
-  const { alt, ...rest } = image;
-
-  return [
-    at(
-      'image',
-      set({
-        ...rest,
-        _type: 'localizedImageWithAlt',
-        ...(alt === undefined ? {} : { alt: localizedString(alt) }),
-      }),
-    ),
-  ];
-};
-
-const localizeStringField = (field: 'eyebrow' | 'footnote', value: unknown) =>
-  typeof value === 'string' ? [at(field, set(localizedString(value)))] : [];
 
 const localizeContent = (content: unknown) =>
   isPortableText(content)

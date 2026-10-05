@@ -1,19 +1,11 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import { localizedValues } from '@blog/service/testing/shared/localized';
 
 import { newsletterModuleQuery } from './query';
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
-
-function localized(type: string, values: Partial<Record<string, string>>) {
-  return Object.entries(values).map(([language, value]) => ({
-    _key: language,
-    _type: type,
-    language,
-    value,
-  }));
-}
 
 const newsletterDocument = {
   _id: 'newsletter-1',
@@ -21,11 +13,11 @@ const newsletterDocument = {
   brandVariant: 'PRIMARY',
   headingBlock: {
     _type: 'localizedHeadingBlock',
-    heading: localized('internationalizedArrayStringValue', {
+    heading: localizedValues('internationalizedArrayStringValue', {
       [EN]: 'Stay in the loop',
       [NL]: 'Blijf op de hoogte',
     }),
-    supportingText: localized('internationalizedArrayTextValue', {
+    supportingText: localizedValues('internationalizedArrayTextValue', {
       [EN]: 'New posts weekly.',
       [NL]: 'Wekelijks nieuwe berichten.',
     }),

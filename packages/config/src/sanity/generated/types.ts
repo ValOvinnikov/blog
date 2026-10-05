@@ -773,12 +773,6 @@ export type BodyImage = {
   layout?: 'INLINE' | 'FULL_BLEED' | 'FLOAT_LEFT' | 'FLOAT_RIGHT';
 };
 
-export type InternationalizedArrayText = Array<
-  {
-    _key: string;
-  } & InternationalizedArrayTextValue
->;
-
 export type WideLayout = {
   _type: 'wideLayout';
   spacingTop?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
@@ -1130,6 +1124,12 @@ export type InternationalizedArrayStringValue = {
   value?: string;
   language?: string;
 };
+
+export type InternationalizedArrayText = Array<
+  {
+    _key: string;
+  } & InternationalizedArrayTextValue
+>;
 
 export type TranslationMetadata = {
   _id: string;
@@ -1758,9 +1758,9 @@ export type Module_heroStatement = {
   _rev: string;
   title?: string;
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
-  headingBlock?: HeadingBlock;
-  eyebrow?: string;
-  image?: ImageWithAlt;
+  headingBlock?: LocalizedHeadingBlock;
+  eyebrow?: InternationalizedArrayString;
+  image?: LocalizedImageWithAlt;
   ctaButtons?: Array<
     {
       _key: string;
@@ -1992,7 +1992,6 @@ export type AllSanitySchemaTypes =
   | LinkRef
   | Aside
   | BodyImage
-  | InternationalizedArrayText
   | WideLayout
   | HeroLayout
   | MigrationState
@@ -2007,6 +2006,7 @@ export type AllSanitySchemaTypes =
   | InternationalizedArrayListedTextValue
   | InternationalizedArrayTextValue
   | InternationalizedArrayStringValue
+  | InternationalizedArrayText
   | TranslationMetadata
   | InternationalizedArrayReference
   | InternationalizedArrayReferenceValue

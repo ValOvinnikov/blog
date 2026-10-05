@@ -2,6 +2,7 @@ import { LINK_TYPE } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { q } from '@blog/service/sanity/query';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import { localizedStrings } from '@blog/service/testing/shared/localized';
 
 import { linkDocumentFragment } from './link-document';
 
@@ -12,15 +13,6 @@ const linkDocQuery = q.star
   .slice(0)
   .project(linkDocumentFragment)
   .notNull();
-
-function localized(values: Partial<Record<string, string>>) {
-  return Object.entries(values).map(([language, value]) => ({
-    _key: language,
-    _type: 'internationalizedArrayStringValue',
-    language,
-    value,
-  }));
-}
 
 function reference(id: string) {
   return { _type: 'reference', _ref: id };
@@ -54,7 +46,7 @@ describe('linkDocumentFragment', () => {
     const result = await resolveLink(
       {
         linkType: LINK_TYPE.INTERNAL,
-        label: localized({ [EN]: 'About us', [NL]: 'Over ons' }),
+        label: localizedStrings({ [EN]: 'About us', [NL]: 'Over ons' }),
         internalReference: reference('contact-en'),
       },
       NL,
@@ -67,7 +59,7 @@ describe('linkDocumentFragment', () => {
     const result = await resolveLink(
       {
         linkType: LINK_TYPE.INTERNAL,
-        label: localized({ [EN]: 'About us' }),
+        label: localizedStrings({ [EN]: 'About us' }),
         internalReference: reference('contact-en'),
       },
       FR,
@@ -80,7 +72,7 @@ describe('linkDocumentFragment', () => {
     const result = await resolveLink(
       {
         linkType: LINK_TYPE.INTERNAL,
-        label: localized({ [EN]: 'About us' }),
+        label: localizedStrings({ [EN]: 'About us' }),
         internalReference: reference('about-en'),
       },
       NL,
@@ -95,7 +87,7 @@ describe('linkDocumentFragment', () => {
     const result = await resolveLink(
       {
         linkType: LINK_TYPE.INTERNAL,
-        label: localized({ [EN]: 'Contact' }),
+        label: localizedStrings({ [EN]: 'Contact' }),
         internalReference: reference('contact-en'),
       },
       NL,
@@ -109,8 +101,8 @@ describe('linkDocumentFragment', () => {
   it('resolves an external url in the requested language, falling back to the default', async () => {
     const link = {
       linkType: LINK_TYPE.EXTERNAL,
-      label: localized({ [EN]: 'Docs' }),
-      url: localized({
+      label: localizedStrings({ [EN]: 'Docs' }),
+      url: localizedStrings({
         [EN]: 'https://example.com/en',
         [NL]: 'https://example.com/nl',
       }),
