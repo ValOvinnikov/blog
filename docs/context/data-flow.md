@@ -30,7 +30,7 @@ apps/web
   read and write paths below.
 - **The read path is tenant-aware.** Every `service.*.v1.*` loader accepts an
   optional `tenant?: TTenantSanityContext` argument
-  (`packages/service/src/sanity/client.ts`); `getClient(tenant)` builds — and
+  (`packages/service/src/sanity/client/client.ts`); `getClient(tenant)` builds — and
   LRU-caches, keyed by `projectId:dataset` — a Sanity client scoped to that
   tenant's own project, dataset, and read token, falling back to the legacy
   env-configured client (`SANITY_API_READ_TOKEN`) when `tenant` is omitted.
@@ -88,7 +88,7 @@ apps/web
 - **Service also has a scoped write path, `service.editorial.*`** (e.g.
   `service.editorial.skim.v1`, added for the choose-your-depth reading
   pipeline, #957) — separate from the read-only flow described above.
-  `packages/service/src/sanity/write-client.ts`'s `getWriteClient()` is a
+  `packages/service/src/sanity/write-client/write-client.ts`'s `getWriteClient()` is a
   distinct client from the page-render read client, and is itself
   tenant-aware the same way `getClient()` is: called with no argument it
   falls back to `SANITY_API_WRITE_TOKEN` (server-only, never bundled to the

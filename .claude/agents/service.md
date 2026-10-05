@@ -66,11 +66,11 @@ relative paths only within a single slice (`./query`, `./types`).
 
 ## What you build
 
-- A configured client in `sanity/client.ts` reading `NEXT_PUBLIC_SANITY_PROJECT_ID`,
+- A configured client in `sanity/client/client.ts` reading `NEXT_PUBLIC_SANITY_PROJECT_ID`,
   `NEXT_PUBLIC_SANITY_DATASET`, and (for drafts) `SANITY_API_READ_TOKEN`.
 - `sanity/query/query.ts` — the groqd builder (`q`) and `runQuery` (safe runner);
   `sanity/query/isr.ts` — `isr()`, the cache-tag helper.
-- `urlForImage` (`sanity/image.ts`) on `@sanity/image-url`.
+- `urlForImage` (`sanity/image/image.ts`) on `@sanity/image-url`.
 - The `service` facade — the only public surface (`src/index.ts`), grouped by
   domain and version: `service.pages.post.v1.getPost(slug)`,
   `service.pages.author.v1.getAuthorParams()`.

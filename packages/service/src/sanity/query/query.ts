@@ -5,7 +5,7 @@ import type {
 import {
   getClient,
   type TTenantSanityContext,
-} from '@blog/service/sanity/client';
+} from '@blog/service/sanity/client/client';
 import {
   buildLocaleParams,
   type TLocaleParams,

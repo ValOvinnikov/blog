@@ -1,9 +1,9 @@
-import { getWriteClient } from '@blog/service/sanity/write-client';
+import { getWriteClient } from '@blog/service/sanity/write-client/write-client';
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { saveSkimDraft } from './loader';
 
-vi.mock('@blog/service/sanity/write-client', () => ({
+vi.mock('@blog/service/sanity/write-client/write-client', () => ({
   getWriteClient: vi.fn(),
 }));
 

@@ -1,5 +1,5 @@
 import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config/constants';
-import type { TTenantSanityContext } from '@blog/service/sanity/client';
+import type { TTenantSanityContext } from '@blog/service/sanity/client/client';
 
 export type TLocaleParams = {
   locale: TLocaleIsoCode;

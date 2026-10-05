@@ -31,7 +31,9 @@ describe('Sanity client module loading', () => {
     delete process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'];
     vi.resetModules();
 
-    await expect(import('./image')).resolves.toHaveProperty('urlForImage');
+    await expect(
+      import('@blog/service/sanity/image/image'),
+    ).resolves.toHaveProperty('urlForImage');
   });
 
   it('rejects a call site that omits tenant context at compile time', async () => {

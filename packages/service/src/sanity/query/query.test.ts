@@ -9,7 +9,9 @@ const { mockFetch, getClientMock } = vi.hoisted(() => {
   return { mockFetch, getClientMock };
 });
 
-vi.mock('@blog/service/sanity/client', () => ({ getClient: getClientMock }));
+vi.mock('@blog/service/sanity/client/client', () => ({
+  getClient: getClientMock,
+}));
 
 const testTenant = {
   projectId: 'tenant-a',
