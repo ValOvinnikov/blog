@@ -8,6 +8,7 @@ import { getHostTenantSanityContext } from '@web/server/tenant/tenant-sanity-con
 import { logger } from '@web/utils/logger/logger';
 import { toLandingPageAlternates } from '@web/utils/to-landing-page-alternates';
 import { toLanguageAlternates } from '@web/utils/to-language-alternates';
+import { toLiveLanguagePages } from '@web/utils/to-live-language-pages';
 import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
 import type { MetadataRoute } from 'next';
 
@@ -106,12 +107,14 @@ const toLandingPageEntry = ({
     locale: page.language,
     defaultLocale,
   })}`;
-  const liveTranslations = (
-    service.global.translationMap.v1.findTranslationGroup(translationMap, {
-      documentType: LANDING_PAGE_DOCUMENT_TYPE,
-      ...page,
-    }) ?? []
-  ).filter(({ language }) => liveLocales.includes(language));
+  const liveTranslations = toLiveLanguagePages({
+    pages:
+      service.global.translationMap.v1.findTranslationGroup(translationMap, {
+        documentType: LANDING_PAGE_DOCUMENT_TYPE,
+        ...page,
+      }) ?? [],
+    liveLocales,
+  });
 
   if (liveTranslations.length < 2) {
     return {
