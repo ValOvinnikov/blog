@@ -1,3 +1,5 @@
+import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+
 import {
   relatedByTagsQuery,
   relatedByTopicQuery,
@@ -22,6 +24,39 @@ describe('relatedByTagsQuery', () => {
 
   it('excludes posts whose publishedAt is in the future', () => {
     expect(relatedByTagsQuery.query).toContain('publishedAt <= now()');
+  });
+
+  describe('candidate selection', () => {
+    function post(id: string, tagRefs: string[]) {
+      return {
+        _id: id,
+        _type: 'page_post',
+        publishedAt: '2020-01-01T00:00:00Z',
+        tags: tagRefs.map((ref) => ({ _key: `${id}-${ref}`, _ref: ref })),
+      };
+    }
+    const dataset = [
+      post('anchor', ['tag-a', 'tag-b']),
+      post('shares-a', ['tag-a', 'tag-z']),
+      post('shares-b', ['tag-b']),
+      post('shares-none', ['tag-z']),
+      post('untagged', []),
+      { ...post('future', ['tag-a']), publishedAt: '2999-01-01T00:00:00Z' },
+    ];
+
+    it('returns posts sharing a tag, excluding the anchor and posts sharing none', async () => {
+      const raw = (await evaluateGroqExpression(
+        relatedByTagsQuery.query,
+        dataset,
+        undefined,
+        { currentId: 'anchor', tagIds: ['tag-a', 'tag-b'] },
+      )) as { _id: string }[];
+
+      expect(raw.map((candidate) => candidate._id).sort()).toEqual([
+        'shares-a',
+        'shares-b',
+      ]);
+    });
   });
 });
 

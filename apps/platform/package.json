@@ -38,7 +38,7 @@
     "react-dom": "catalog:",
     "server-only": "^0.0.1",
     "tailwind-variants": "^3.2.2",
-    "tldts": "^7.4.7",
+    "tldts": "^7.4.16",
     "zod": "catalog:"
   },
   "devDependencies": {
