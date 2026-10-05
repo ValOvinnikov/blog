@@ -427,18 +427,12 @@ export type Module_postLatest = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  headingBlock?: HeadingBlock;
+  headingBlock?: LocalizedHeadingBlock;
   limit?: number;
   showImages?: boolean;
   displayMode?: 'GRID' | 'CAROUSEL';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   layout?: WideLayout;
-};
-
-export type HeadingBlock = {
-  _type: 'headingBlock';
-  heading?: string;
-  supportingText?: string;
 };
 
 export type Module_postList = {
@@ -792,6 +786,12 @@ export type BodyImage = {
   crop?: SanityImageCrop;
   alt?: string;
   layout?: 'INLINE' | 'FULL_BLEED' | 'FLOAT_LEFT' | 'FLOAT_RIGHT';
+};
+
+export type HeadingBlock = {
+  _type: 'headingBlock';
+  heading?: string;
+  supportingText?: string;
 };
 
 export type WideLayout = {
@@ -2030,7 +2030,6 @@ export type AllSanitySchemaTypes =
   | Page_postReference
   | Module_postFeatured
   | Module_postLatest
-  | HeadingBlock
   | Module_postList
   | Module_hero
   | Blog_topicReference
@@ -2063,6 +2062,7 @@ export type AllSanitySchemaTypes =
   | LinkRef
   | Aside
   | BodyImage
+  | HeadingBlock
   | WideLayout
   | HeroLayout
   | MigrationState
