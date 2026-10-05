@@ -5,6 +5,8 @@ import { modulesField } from '@blog/studio/schema-types/fields/modules-field/mod
 import { slugField } from '@blog/studio/schema-types/fields/slug-field/slug-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { createSlugUrlPreviewInput } from '@blog/studio/schema-types/inputs/slug-url-preview/slug-url-preview-input';
+import { contentSchema } from '@blog/studio/schema-types/modules/content/content';
+import { faqSchema } from '@blog/studio/schema-types/modules/faq/faq';
 import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
@@ -57,6 +59,8 @@ export const topicPageSchema = defineType({
         postListSchema.name,
         postLatestSchema.name,
         taxonomyListSchema.name,
+        contentSchema.name,
+        faqSchema.name,
       ],
       once: [postListSchema.name],
     }),

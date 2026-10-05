@@ -6,7 +6,9 @@ import { modulesField } from '@blog/studio/schema-types/fields/modules-field/mod
 import { slugField } from '@blog/studio/schema-types/fields/slug-field/slug-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { createSlugUrlPreviewInput } from '@blog/studio/schema-types/inputs/slug-url-preview/slug-url-preview-input';
+import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import { postRelatedSchema } from '@blog/studio/schema-types/modules/post-related/post-related';
+import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
 import { postTakeawaysSchema } from '@blog/studio/schema-types/objects/post-takeaways/post-takeaways';
@@ -84,7 +86,11 @@ export const postPageSchema = defineType({
       validation: (rule) => rule.max(6).unique(),
     }),
     modulesField({
-      extend: [postRelatedSchema.name],
+      extend: [
+        postRelatedSchema.name,
+        postLatestSchema.name,
+        taxonomyListSchema.name,
+      ],
       once: [postRelatedSchema.name],
     }),
     defineField({

@@ -2,8 +2,10 @@ import { PAGE_POST_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/
 import { heroField } from '@blog/studio/schema-types/fields/hero-field/hero-field';
 import { modulesField } from '@blog/studio/schema-types/fields/modules-field/modules-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
+import { contentSchema } from '@blog/studio/schema-types/modules/content/content';
 import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
+import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
@@ -38,6 +40,8 @@ export const postIndexPageSchema = defineType({
         postListSchema.name,
         postFeaturedSchema.name,
         taxonomyListSchema.name,
+        contentSchema.name,
+        postLatestSchema.name,
       ],
       once: [postListSchema.name],
     }),
