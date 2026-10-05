@@ -1,9 +1,14 @@
 import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
-import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
+import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
+import { localizedParagraphTextField } from '@blog/studio/schema-types/fields/localized-paragraph-text-field/localized-paragraph-text-field';
+import { localizedImageWithAltSchema } from '@blog/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
 import { socialProfileSchema } from '@blog/studio/schema-types/objects/social-profile/social-profile';
-import { paragraphTextSchema } from '@blog/studio/schema-types/portable-text/paragraph-text/paragraph-text';
+import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
+import { validateLocalizedMaxLength } from '@blog/studio/schema-types/validation/validate-localized-max-length/validate-localized-max-length';
 import { UserRound } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
+
+const ROLE_MAX_LENGTH = 100;
 
 export const personSchema = defineType({
   name: 'person',
@@ -24,24 +29,28 @@ export const personSchema = defineType({
     defineField({
       name: 'image',
       title: 'Image',
-      type: imageWithAltSchema.name,
+      type: localizedImageWithAltSchema.name,
       description:
         "Photo shown on posts, this person's profile hero, and their team card. Leave empty to show initials instead.",
     }),
-    defineField({
+    localizedParagraphTextField({
       name: 'bio',
       title: 'Bio',
-      type: paragraphTextSchema.name,
       description:
-        "Short biography shown on this person's profile hero, and on their team card when that module's Show Bios is on.",
+        "Short biography shown on this person's profile hero, and on their team card when that module's Show Bios is on, per language.",
     }),
-    defineField({
+    localizedOneLineTextField({
       name: 'role',
       title: 'Role',
-      type: 'string',
       description:
-        'Job title or role shown beneath their name (e.g. "Senior Engineer").',
-      validation: (rule) => rule.max(100),
+        'Job title or role shown beneath their name (e.g. "Senior Engineer"), per language.',
+      validation: (rule) =>
+        rule.custom(
+          validateLocalizedMaxLength(
+            ROLE_MAX_LENGTH,
+            `Keep the role under ${ROLE_MAX_LENGTH} characters.`,
+          ),
+        ),
     }),
     defineField({
       name: 'socialLinks',
@@ -62,7 +71,15 @@ export const personSchema = defineType({
   preview: {
     select: {
       title: 'name',
+      role: 'role',
       media: 'image',
+    },
+    prepare({ title, role, media }) {
+      return {
+        title,
+        subtitle: defaultLanguageValue(role),
+        media,
+      };
     },
   },
 });

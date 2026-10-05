@@ -1689,7 +1689,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "headingBlock"
+          "name": "localizedHeadingBlock"
         },
         "optional": true
       },
@@ -8549,7 +8549,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "imageWithAlt"
+          "name": "localizedImageWithAlt"
         },
         "optional": true
       },
@@ -8557,14 +8557,15 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "paragraphText"
+          "name": "internationalizedArrayParagraphText"
         },
         "optional": true
       },
       "role": {
         "type": "objectAttribute",
         "value": {
-          "type": "string"
+          "type": "inline",
+          "name": "internationalizedArrayString"
         },
         "optional": true
       },
@@ -10610,7 +10611,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "headingBlock"
+          "name": "localizedHeadingBlock"
         },
         "optional": true
       },
@@ -10633,7 +10634,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "imageWithAlt"
+          "name": "localizedImageWithAlt"
         },
         "optional": true
       },
