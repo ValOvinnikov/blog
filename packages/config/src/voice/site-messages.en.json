@@ -262,11 +262,11 @@
   },
   "consent": {
     "banner": {
-      "heading": "Cookie settings",
+      "heading": "Cookies on this site",
       "message": "We use cookies only for what is necessary to run this site, unless you allow external media. You can change your choice at any time via Cookie settings in the footer.",
       "acceptLabel": "Accept all",
       "rejectLabel": "Reject all",
-      "settingsLabel": "Cookie settings"
+      "settingsLabel": "Settings"
     },
     "preferences": {
       "heading": "Cookie settings",

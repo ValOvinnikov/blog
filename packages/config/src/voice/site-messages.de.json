@@ -262,7 +262,7 @@
   },
   "consent": {
     "banner": {
-      "heading": "Cookie-Einstellungen",
+      "heading": "Cookies auf dieser Website",
       "message": "Wir verwenden nur Cookies, die für den Betrieb dieser Website notwendig sind, es sei denn, du erlaubst externe Medien. Du kannst deine Auswahl jederzeit über Cookie-Einstellungen im Footer ändern.",
       "acceptLabel": "Alle akzeptieren",
       "rejectLabel": "Alle ablehnen",
