@@ -12,7 +12,6 @@ import { LandingSlugUrlPreviewInput } from '@blog/studio/schema-types/inputs/lan
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
 import { languagePreview } from '@blog/studio/schema-types/preview/language-preview/language-preview';
-import { LANDING_PARENT_FIELD } from '@blog/studio/schema-types/queries/landing-parent-chain/landing-parent-chain';
 import { validateLandingParent } from '@blog/studio/schema-types/validation/validate-landing-parent/validate-landing-parent';
 import { validateSlugUniqueInLanguage } from '@blog/studio/schema-types/validation/validate-slug-unique-in-language/validate-slug-unique-in-language';
 import { FileText } from 'lucide-react';
@@ -49,12 +48,12 @@ export const landingPageSchema = defineType({
     languageField(),
     titleField(),
     defineField({
-      name: LANDING_PARENT_FIELD,
+      name: 'parent',
       title: 'Parent Page',
       type: 'reference',
       to: [{ type: PAGE_LANDING_TYPE }],
       description:
-        "Places this page beneath another page, so its address continues from the parent's — e.g. /modules/faq. Leave empty for a top-level page.",
+        'The page this one sits under, e.g. Modules for /modules/faq. Leave empty for a top-level page.',
       options: { filter: otherPageInSameLanguage, disableNew: true },
       validation: (rule) => rule.custom(validateLandingParent),
     }),

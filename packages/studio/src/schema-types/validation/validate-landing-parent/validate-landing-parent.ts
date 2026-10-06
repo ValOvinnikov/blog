@@ -3,7 +3,6 @@ import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/
 import {
   flattenLandingParentChain,
   LANDING_PARENT_CHAIN_PROJECTION,
-  LANDING_PARENT_FIELD,
   type TLandingParentChainNode,
 } from '@blog/studio/schema-types/queries/landing-parent-chain/landing-parent-chain';
 import { fetchDraftsFailSafe } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
@@ -27,11 +26,11 @@ export const LANDING_PARENT_DEPTH_ERROR = `Pages nest at most ${LANDING_PAGE_MAX
 const nestChildren = (levels: number): string =>
   levels === 0
     ? '{ _id }'
-    : `{ _id, "children": *[_type == $type && ${LANDING_PARENT_FIELD}._ref == ^._id]${nestChildren(levels - 1)} }`;
+    : `{ _id, "children": *[_type == $type && parent._ref == ^._id]${nestChildren(levels - 1)} }`;
 
 const PARENT_PLACEMENT_QUERY = `{
   "ancestors": *[_id == $parentId][0]${LANDING_PARENT_CHAIN_PROJECTION},
-  "descendants": *[_type == $type && ${LANDING_PARENT_FIELD}._ref == $id]${nestChildren(LANDING_PAGE_MAX_DEPTH - 2)}
+  "descendants": *[_type == $type && parent._ref == $id]${nestChildren(LANDING_PAGE_MAX_DEPTH - 2)}
 }`;
 
 const subtreeHeight = (nodes: TDescendant[] | null | undefined): number =>

@@ -6,7 +6,6 @@ import {
 import {
   flattenLandingParentChain,
   LANDING_PARENT_CHAIN_PROJECTION,
-  LANDING_PARENT_FIELD,
   type TLandingParentChainNode,
 } from '@blog/studio/schema-types/queries/landing-parent-chain/landing-parent-chain';
 import { useEffect, useState } from 'react';
@@ -53,7 +52,7 @@ const useAncestorSlugs = (parentId: string | undefined) => {
 };
 
 export const LandingSlugUrlPreviewInput = (props: SlugInputProps) => {
-  const parent = useFormValue([LANDING_PARENT_FIELD]) as Reference | undefined;
+  const parent = useFormValue(['parent']) as Reference | undefined;
   const ancestorSlugs = useAncestorSlugs(parent?._ref);
 
   return (
