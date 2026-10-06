@@ -11202,20 +11202,6 @@
         },
         "optional": true
       },
-      "sectionNavigation": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "boolean"
-        },
-        "optional": true
-      },
-      "showSectionNavigation": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "boolean"
-        },
-        "optional": true
-      },
       "headingBlock": {
         "type": "objectAttribute",
         "value": {
@@ -11229,6 +11215,20 @@
         "value": {
           "type": "inline",
           "name": "template_landing.reference"
+        },
+        "optional": true
+      },
+      "sectionNavigation": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
+        },
+        "optional": true
+      },
+      "showSectionNavigation": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
         },
         "optional": true
       },

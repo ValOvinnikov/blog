@@ -21,4 +21,11 @@ describe(toHeadingBlock, () => {
       supportingText: undefined,
     });
   });
+
+  it.each([null, undefined])(
+    'returns undefined for an absent headingBlock (%s)',
+    (raw) => {
+      expect(toHeadingBlock(raw)).toBeUndefined();
+    },
+  );
 });
