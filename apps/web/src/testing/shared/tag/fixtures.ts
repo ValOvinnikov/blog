@@ -23,6 +23,7 @@ export const makeTagDetailPage = (
     headingBlock: makeHeadingBlock({ heading: 'TypeScript' }),
     hero: undefined,
     modules: [],
+    faqs: [],
     seo: {
       title: 'TypeScript',
       description: 'Posts about TypeScript.',

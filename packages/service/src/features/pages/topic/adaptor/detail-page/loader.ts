@@ -4,6 +4,7 @@ import {
   runQuery,
   type TTenantSanityContext,
 } from '@blog/service/sanity/query/query';
+import { getPageFaqs } from '@blog/service/shared/adaptors/faq-questions/page-faqs';
 
 import { topicPageQuery } from './query';
 import { toTopicDetailPage } from './transformer';
@@ -20,5 +21,5 @@ export async function getTopicPage(
   });
   if (!rawPage) return undefined;
 
-  return toTopicDetailPage(rawPage);
+  return toTopicDetailPage(rawPage, await getPageFaqs(rawPage.modules, tenant));
 }

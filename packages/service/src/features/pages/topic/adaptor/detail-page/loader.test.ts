@@ -1,4 +1,6 @@
+import { getFaqQuestions } from '@blog/service/shared/adaptors/faq-questions/loader';
 import { mockRun } from '@blog/service/testing/mock-run-query';
+import { makeRawFaqModuleQuestions } from '@blog/service/testing/modules/fixtures';
 import { makeRawTopicPage } from '@blog/service/testing/pages/fixtures';
 import {
   makeRawHeadingBlock,
@@ -7,6 +9,12 @@ import {
 import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getTopicPage } from './loader';
+
+vi.mock('@blog/service/shared/adaptors/faq-questions/loader', () => ({
+  getFaqQuestions: vi.fn(),
+}));
+
+const mockFaqQuestions = vi.mocked(getFaqQuestions);
 
 vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
   ...(await importOriginal<
@@ -131,6 +139,44 @@ describe('getTopicPage', () => {
     );
 
     await expect(getTopicPage('engineering', tenant)).rejects.toThrow();
+  });
+
+  it('builds the faqs from the FAQ modules, in page order, with one request', async () => {
+    mockRun.mockResolvedValueOnce(
+      makeRawTopicPage({
+        modules: [
+          { _id: 'faq-b', _type: 'module_faq' },
+          { _id: 'cta-1', _type: 'module_cta' },
+          { _id: 'faq-a', _type: 'module_faq' },
+        ],
+      }),
+    );
+    mockFaqQuestions.mockResolvedValueOnce([makeRawFaqModuleQuestions()]);
+
+    const result = await getTopicPage('engineering', tenant);
+    if (!result) throw new Error('expected a topic page');
+
+    expect(mockFaqQuestions).toHaveBeenCalledExactlyOnceWith(
+      ['faq-b', 'faq-a'],
+      tenant,
+    );
+    expect(result.faqs).toEqual([
+      {
+        id: 'block-faq-1',
+        question: 'How long does onboarding take?',
+        answer: 'Most teams are live within a week.',
+      },
+    ]);
+  });
+
+  it('makes no FAQ-questions request when the page has no FAQ module', async () => {
+    mockRun.mockResolvedValueOnce(makeRawTopicPage({ modules: [] }));
+
+    const result = await getTopicPage('engineering', tenant);
+    if (!result) throw new Error('expected a topic page');
+
+    expect(mockFaqQuestions).not.toHaveBeenCalled();
+    expect(result.faqs).toEqual([]);
   });
 
   it('passes the slug as a query parameter', async () => {
