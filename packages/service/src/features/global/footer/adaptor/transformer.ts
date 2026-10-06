@@ -10,5 +10,6 @@ export function toFooter(raw: TRawFooter): TFooter {
   return {
     social: toSocialProfiles(raw.social),
     showLanguageSwitcher: raw.showLanguageSwitcher ?? undefined,
+    showRssFeed: raw.showRssFeed ?? true,
   };
 }

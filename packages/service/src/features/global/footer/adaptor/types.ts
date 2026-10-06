@@ -3,4 +3,5 @@ import type { TSocialProfile } from '@blog/service/shared/transformers/social-pr
 export type TFooter = {
   social: TSocialProfile[];
   showLanguageSwitcher?: boolean;
+  showRssFeed: boolean;
 };
