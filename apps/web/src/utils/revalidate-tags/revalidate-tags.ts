@@ -44,6 +44,7 @@ type TCachedDocumentType =
   | 'settings_footer'
   | 'settings_theme'
   | 'link'
+  | 'redirect'
   | 'translation.metadata'
   | 'block_feature'
   | 'block_testimonial'
@@ -110,6 +111,7 @@ const REVALIDATE_TAGS = {
   module_timeline: ['modules:timeline'],
   module_pricing: ['modules:pricing'],
   link: ['link'],
+  redirect: ['redirect'],
   'translation.metadata': ['translation.metadata'],
   block_feature: ['block_feature'],
   block_testimonial: ['block_testimonial'],
