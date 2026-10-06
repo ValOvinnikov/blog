@@ -5,8 +5,8 @@ import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-fi
 import { displayModeField } from '@blog/studio/schema-types/fields/display-mode-field/display-mode-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
-import { localizedHeadingBlockField } from '@blog/studio/schema-types/objects/localized-heading-block/localized-heading-block-field';
 import { logoItemSchema } from '@blog/studio/schema-types/objects/logo-item/logo-item';
+import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { Images } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
@@ -21,7 +21,7 @@ export const logoWallSchema = defineType({
   fields: [
     titleField(),
     brandVariantField(),
-    localizedHeadingBlockField(),
+    moduleHeadingBlockField(),
     defineField({
       name: 'logos',
       title: 'Logos',

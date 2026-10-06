@@ -4,7 +4,7 @@ import {
   displayModeParser,
 } from '@blog/service/shared/expressions/module/display-mode';
 import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
-import { localizedHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/localized-heading-block';
+import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
 import { localizedImageWithAltFragment } from '@blog/service/shared/fragments/image/localized-image-with-alt';
 import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document';
@@ -19,7 +19,7 @@ export const featureListModuleQuery = q
     brandVariant: sub.field('brandVariant').notNull(),
     headingBlock: sub
       .field('headingBlock')
-      .project(localizedHeadingBlockFragment)
+      .project(moduleHeadingBlockFragment)
       .notNull(),
     features: sub
       .field('features[]')
@@ -28,7 +28,7 @@ export const featureListModuleQuery = q
         _id: true,
         headingBlock: featureSub
           .field('headingBlock')
-          .project(localizedHeadingBlockFragment)
+          .project(moduleHeadingBlockFragment)
           .notNull(),
         icon: featureSub.field('icon').nullable(true),
         image: featureSub

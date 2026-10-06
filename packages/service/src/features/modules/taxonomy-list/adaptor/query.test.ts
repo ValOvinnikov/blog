@@ -12,7 +12,7 @@ const moduleDocument = {
   _type: 'module_taxonomyList',
   brandVariant: 'PRIMARY',
   headingBlock: {
-    _type: 'localizedHeadingBlock',
+    _type: 'moduleHeadingBlock',
     heading: localizedStrings({
       [EN]: 'Latest posts',
       [NL]: 'Nieuwste berichten',

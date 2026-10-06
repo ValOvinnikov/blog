@@ -16,7 +16,7 @@ const pricingDocument = {
   _type: 'module_pricing',
   brandVariant: 'PRIMARY',
   headingBlock: {
-    _type: 'localizedHeadingBlock',
+    _type: 'moduleHeadingBlock',
     heading: localizedStrings({ [EN]: 'Plans', [NL]: 'Abonnementen' }),
   },
   tiers: [

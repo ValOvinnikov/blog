@@ -12,7 +12,7 @@ const newsletterDocument = {
   _type: 'module_newsletter',
   brandVariant: 'PRIMARY',
   headingBlock: {
-    _type: 'localizedHeadingBlock',
+    _type: 'moduleHeadingBlock',
     heading: localizedValues('internationalizedArrayStringValue', {
       [EN]: 'Stay in the loop',
       [NL]: 'Blijf op de hoogte',
@@ -121,7 +121,7 @@ describe('newsletterModuleQuery', () => {
       runNewsletter(
         {
           ...newsletterDocument,
-          headingBlock: { _type: 'localizedHeadingBlock' },
+          headingBlock: { _type: 'moduleHeadingBlock' },
         },
         NL,
       ),

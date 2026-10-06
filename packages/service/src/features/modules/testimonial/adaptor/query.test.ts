@@ -29,7 +29,7 @@ const testimonialModuleDocument = {
   _type: 'module_testimonial',
   brandVariant: 'PRIMARY',
   headingBlock: {
-    _type: 'localizedHeadingBlock',
+    _type: 'moduleHeadingBlock',
     heading: localizedStrings({
       [EN]: 'What people say',
       [NL]: 'Wat mensen zeggen',
