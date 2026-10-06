@@ -1,16 +1,11 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 
-import { withPrefix } from '../lib/with-prefix';
+import { withPrefix } from './with-prefix';
 
 // Every tenant's default language is English when this runs.
 const DEFAULT_LOCALE = LOCALE_ISO_CODES.EN;
 const DRAFTS_PREFIX = 'drafts.';
 const TEMPLATE_PREFIX = 'template-';
-
-const TEMPLATE_TYPE_BY_PAGE_TYPE: Record<string, string> = {
-  page_home: 'template_home',
-  page_landing: 'template_landing',
-};
 
 export type TLayoutPage = {
   _id: string;
@@ -22,6 +17,8 @@ export type TLayoutPage = {
 };
 
 export type TTranslationGroup = { pageIds: string[] };
+
+export type TTemplateTypeByPageType = Record<string, string>;
 
 export type TPlannedTemplate = {
   _id: string;
@@ -44,6 +41,7 @@ const pickSource = (versions: TLayoutPage[]) =>
 export const planTemplates = (
   pages: TLayoutPage[],
   groups: TTranslationGroup[],
+  templateTypeByPageType: TTemplateTypeByPageType,
 ): Map<string, TPlannedTemplate> => {
   const versionsById = new Map<string, TLayoutPage[]>();
 
@@ -73,7 +71,7 @@ export const planTemplates = (
     const source =
       sources.find((page) => page && isDefaultLanguage(page)) ?? sources[0];
 
-    const templateType = source && TEMPLATE_TYPE_BY_PAGE_TYPE[source._type];
+    const templateType = source && templateTypeByPageType[source._type];
 
     if (!source || !templateType) continue;
 

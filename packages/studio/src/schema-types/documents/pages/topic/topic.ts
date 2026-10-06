@@ -1,16 +1,10 @@
 import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic/topic';
 import { PAGE_TOPIC_TYPE } from '@blog/studio/schema-types/documents/pages/topic/topic-type';
-import { heroField } from '@blog/studio/schema-types/fields/hero-field/hero-field';
-import { modulesField } from '@blog/studio/schema-types/fields/modules-field/modules-field';
+import { topicTemplateSchema } from '@blog/studio/schema-types/documents/templates/topic/topic';
 import { slugField } from '@blog/studio/schema-types/fields/slug-field/slug-field';
+import { templateField } from '@blog/studio/schema-types/fields/template-field/template-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { createSlugUrlPreviewInput } from '@blog/studio/schema-types/inputs/slug-url-preview/slug-url-preview-input';
-import { contentSchema } from '@blog/studio/schema-types/modules/content/content';
-import { faqSchema } from '@blog/studio/schema-types/modules/faq/faq';
-import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
-import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
-import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
-import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
 import { validateUniqueTaxonomyReference } from '@blog/studio/schema-types/validation/validate-unique-taxonomy-reference/validate-unique-taxonomy-reference';
@@ -53,17 +47,7 @@ export const topicPageSchema = defineType({
           ),
     }),
     headingBlockField(),
-    heroField({ allow: [heroBlogSchema.name] }),
-    modulesField({
-      extend: [
-        postListSchema.name,
-        postLatestSchema.name,
-        taxonomyListSchema.name,
-        contentSchema.name,
-        faqSchema.name,
-      ],
-      once: [postListSchema.name],
-    }),
+    templateField({ type: topicTemplateSchema.name }),
     seoField(),
   ],
   preview: {

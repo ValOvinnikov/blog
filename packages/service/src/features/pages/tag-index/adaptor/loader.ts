@@ -14,7 +14,10 @@ export async function getIndexPage(
 ): Promise<TMaybeUndefined<TTagIndexPage>> {
   const rawPage = await runQuery(tagIndexPageQuery, {
     tenant,
-    ...isr(['page_tagIndex', 'modules:taxonomyList'], tenant.projectId),
+    ...isr(
+      ['page_tagIndex', 'template_tagIndex', 'modules:taxonomyList'],
+      tenant.projectId,
+    ),
   });
   if (!rawPage) return undefined;
 

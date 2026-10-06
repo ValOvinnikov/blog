@@ -12,7 +12,10 @@ export async function getTagPaginationParams(
 ): Promise<{ slug: string; page: string }[]> {
   const tagPages = await runQuery(tagPaginationParamsQuery, {
     tenant,
-    ...isr(['page_tag', 'modules:postList', 'posts', 'tag'], tenant.projectId),
+    ...isr(
+      ['page_tag', 'template_tag', 'modules:postList', 'posts', 'tag'],
+      tenant.projectId,
+    ),
   });
   return toPaginationParams(tagPages);
 }

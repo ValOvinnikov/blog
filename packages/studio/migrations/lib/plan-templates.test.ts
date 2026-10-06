@@ -2,6 +2,10 @@ import { planTemplates } from './plan-templates';
 
 const hero = { _type: 'reference', _ref: 'hero-1' };
 const modules = [{ _key: 'm1', _type: 'module_cta', _ref: 'cta-1' }];
+const templateTypes = {
+  page_home: 'template_home',
+  page_landing: 'template_landing',
+};
 
 describe(planTemplates, () => {
   it("gives every page in a translation group the default-language page's layout", () => {
@@ -24,6 +28,7 @@ describe(planTemplates, () => {
         },
       ],
       [{ pageIds: ['about-en', 'about-nl'] }],
+      templateTypes,
     );
 
     const expected = {
@@ -41,6 +46,7 @@ describe(planTemplates, () => {
     const plan = planTemplates(
       [{ _id: 'page_home', _type: 'page_home', title: 'Home', hero }],
       [],
+      templateTypes,
     );
 
     expect(plan.get('page_home')).toEqual({
@@ -50,6 +56,16 @@ describe(planTemplates, () => {
       hero,
       modules: undefined,
     });
+  });
+
+  it('skips a page whose type has no template type', () => {
+    const plan = planTemplates(
+      [{ _id: 'post-1', _type: 'page_post', title: 'Post', modules }],
+      [],
+      templateTypes,
+    );
+
+    expect(plan.has('post-1')).toBe(false);
   });
 
   it('takes the layout from the published page over its draft', () => {
@@ -71,6 +87,7 @@ describe(planTemplates, () => {
         },
       ],
       [],
+      templateTypes,
     );
 
     expect(plan.get('about-en')).toMatchObject({ title: 'About', modules });
@@ -88,6 +105,7 @@ describe(planTemplates, () => {
         },
       ],
       [],
+      templateTypes,
     );
 
     expect(plan.get('contact')).toMatchObject({

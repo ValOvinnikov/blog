@@ -25,7 +25,13 @@ const TAXONOMY_LIST_HEADING_BLOCK_EXEMPTION: TExemptField[] = [
   },
 ];
 
+const PAGE_TEMPLATE_EXEMPTION: TExemptField = {
+  name: 'template',
+  reason: 'this migration creates page_topicIndex with no template reference',
+};
+
 const TOPIC_INDEX_PAGE_HEADING_BLOCK_EXEMPTION: TExemptField[] = [
+  PAGE_TEMPLATE_EXEMPTION,
   {
     name: 'headingBlock',
     reason:

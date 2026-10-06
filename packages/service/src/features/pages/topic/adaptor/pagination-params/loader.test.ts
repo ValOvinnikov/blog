@@ -39,6 +39,7 @@ describe('getTopicPaginationParams', () => {
         next: expect.objectContaining({
           tags: [
             't:tenant-a:page_topic',
+            't:tenant-a:template_topic',
             't:tenant-a:modules:postList',
             't:tenant-a:posts',
             't:tenant-a:topic',

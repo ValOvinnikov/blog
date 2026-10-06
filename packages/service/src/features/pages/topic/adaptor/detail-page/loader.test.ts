@@ -209,7 +209,11 @@ describe('getTopicPage', () => {
       expect.objectContaining({
         tenant,
         next: expect.objectContaining({
-          tags: ['t:tenant-a:page_topic', 't:tenant-a:topic'],
+          tags: [
+            't:tenant-a:page_topic',
+            't:tenant-a:template_topic',
+            't:tenant-a:topic',
+          ],
         }),
       }),
     );

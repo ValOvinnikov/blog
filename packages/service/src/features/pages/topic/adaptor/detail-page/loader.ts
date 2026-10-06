@@ -17,7 +17,7 @@ export async function getTopicPage(
   const rawPage = await runQuery(topicPageQuery, {
     parameters: { slug },
     tenant,
-    ...isr(['page_topic', 'topic'], tenant.projectId),
+    ...isr(['page_topic', 'template_topic', 'topic'], tenant.projectId),
   });
   if (!rawPage) return undefined;
 

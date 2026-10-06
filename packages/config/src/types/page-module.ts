@@ -1,13 +1,13 @@
 import type {
   internalGroqTypeReferenceTo,
   Page_post,
-  Page_postIndex,
-  Page_tag,
-  Page_tagIndex,
-  Page_topic,
-  Page_topicIndex,
   Template_home,
   Template_landing,
+  Template_postIndex,
+  Template_tag,
+  Template_tagIndex,
+  Template_topic,
+  Template_topicIndex,
 } from '@blog/config/sanity/generated/types';
 
 /**
@@ -35,17 +35,18 @@ export type TPageLandingType =
   THeroKind<Template_landing> | TModuleKind<Template_landing>;
 
 export type TPagePostIndexType =
-  THeroKind<Page_postIndex> | TModuleKind<Page_postIndex>;
+  THeroKind<Template_postIndex> | TModuleKind<Template_postIndex>;
 
 /** `page_post` has no `hero` field, so its union comes from `modules[]` alone. */
 export type TPagePostType = TModuleKind<Page_post>;
 
-export type TPageTagType = THeroKind<Page_tag> | TModuleKind<Page_tag>;
+export type TPageTagType = THeroKind<Template_tag> | TModuleKind<Template_tag>;
 
 export type TPageTagIndexType =
-  THeroKind<Page_tagIndex> | TModuleKind<Page_tagIndex>;
+  THeroKind<Template_tagIndex> | TModuleKind<Template_tagIndex>;
 
-export type TPageTopicType = THeroKind<Page_topic> | TModuleKind<Page_topic>;
+export type TPageTopicType =
+  THeroKind<Template_topic> | TModuleKind<Template_topic>;
 
 export type TPageTopicIndexType =
-  THeroKind<Page_topicIndex> | TModuleKind<Page_topicIndex>;
+  THeroKind<Template_topicIndex> | TModuleKind<Template_topicIndex>;

@@ -116,7 +116,11 @@ describe('getIndexPage', () => {
       expect.objectContaining({
         tenant,
         next: expect.objectContaining({
-          tags: ['t:tenant-a:page_tagIndex', 't:tenant-a:modules:taxonomyList'],
+          tags: [
+            't:tenant-a:page_tagIndex',
+            't:tenant-a:template_tagIndex',
+            't:tenant-a:modules:taxonomyList',
+          ],
         }),
       }),
     );

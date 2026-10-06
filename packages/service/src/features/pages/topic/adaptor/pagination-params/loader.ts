@@ -13,7 +13,7 @@ export async function getTopicPaginationParams(
   const topicPages = await runQuery(topicPaginationParamsQuery, {
     tenant,
     ...isr(
-      ['page_topic', 'modules:postList', 'posts', 'topic'],
+      ['page_topic', 'template_topic', 'modules:postList', 'posts', 'topic'],
       tenant.projectId,
     ),
   });

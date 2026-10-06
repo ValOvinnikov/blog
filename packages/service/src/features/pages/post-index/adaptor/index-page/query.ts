@@ -14,12 +14,16 @@ export const blogPageQuery = q.star
       .project(headingBlockFragment)
       .notNull(),
     hero: sub
+      .field('template')
+      .deref()
       .field('hero')
       .deref()
       .project(moduleFragment)
       .as<TRawModule<TPagePostIndexType>>()
       .nullable(),
     modules: sub
+      .field('template')
+      .deref()
       .field('modules[]')
       .deref()
       .project(moduleFragment)

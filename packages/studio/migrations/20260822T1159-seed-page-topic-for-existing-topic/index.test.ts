@@ -25,6 +25,11 @@ const HEADING_BLOCK_EXEMPTION: TExemptField[] = [
   },
 ];
 
+const PAGE_TEMPLATE_EXEMPTION: TExemptField = {
+  name: 'template',
+  reason: 'this migration creates page_topic with no template reference',
+};
+
 const baseDoc = {
   _createdAt: '2026-01-01T00:00:00Z',
   _updatedAt: '2026-01-01T00:00:00Z',
@@ -68,11 +73,10 @@ describe('seed-page-topic-for-existing-topic migration', () => {
       postListPayload,
       HEADING_BLOCK_EXEMPTION,
     );
-    assertSatisfiesRequiredFields(
-      topicPageSchema,
-      pageTopicPayload,
-      HEADING_BLOCK_EXEMPTION,
-    );
+    assertSatisfiesRequiredFields(topicPageSchema, pageTopicPayload, [
+      ...HEADING_BLOCK_EXEMPTION,
+      PAGE_TEMPLATE_EXEMPTION,
+    ]);
 
     expect(migration.migrate.document(topicDoc)).toEqual([
       createIfNotExists(postListPayload),
@@ -115,11 +119,10 @@ describe('seed-page-topic-for-existing-topic migration', () => {
       seo: { _type: 'seo', metaTitle: buildTopicMetaTitle('TypeScript') },
     };
 
-    assertSatisfiesRequiredFields(
-      topicPageSchema,
-      pageTopicPayload,
-      HEADING_BLOCK_EXEMPTION,
-    );
+    assertSatisfiesRequiredFields(topicPageSchema, pageTopicPayload, [
+      ...HEADING_BLOCK_EXEMPTION,
+      PAGE_TEMPLATE_EXEMPTION,
+    ]);
 
     expect(pageTopicMutation).toEqual(createIfNotExists(pageTopicPayload));
   });

@@ -1,10 +1,6 @@
 import type { TTaxonomyKind } from '@blog/config/constants';
-import { heroField } from '@blog/studio/schema-types/fields/hero-field/hero-field';
-import { modulesField } from '@blog/studio/schema-types/fields/modules-field/modules-field';
+import { templateField } from '@blog/studio/schema-types/fields/template-field/template-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { contentSchema } from '@blog/studio/schema-types/modules/content/content';
-import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
-import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
@@ -20,6 +16,7 @@ type TTaxonomyIndexPageOptions = {
   kind: TTaxonomyKind;
   taxonomyKindMismatchError: string;
   previewSubtitle: string;
+  templateType: string;
 };
 
 export const taxonomyIndexPage = ({
@@ -30,6 +27,7 @@ export const taxonomyIndexPage = ({
   kind,
   taxonomyKindMismatchError,
   previewSubtitle,
+  templateType,
 }: TTaxonomyIndexPageOptions) =>
   defineType({
     name,
@@ -59,15 +57,7 @@ export const taxonomyIndexPage = ({
     fields: [
       titleField(),
       headingBlockField(),
-      heroField({ allow: [heroBlogSchema.name] }),
-      modulesField({
-        extend: [
-          taxonomyListSchema.name,
-          postLatestSchema.name,
-          contentSchema.name,
-        ],
-        once: [taxonomyListSchema.name],
-      }),
+      templateField({ type: templateType }),
       seoField(),
       defineField({
         name: 'taxonomyList',
