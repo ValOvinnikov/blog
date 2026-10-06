@@ -7403,6 +7403,10 @@
               },
               {
                 "type": "inline",
+                "name": "page_post.reference"
+              },
+              {
+                "type": "inline",
                 "name": "page_topic.reference"
               },
               {
@@ -8747,6 +8751,35 @@
         "value": {
           "type": "string"
         }
+      },
+      "language": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "EN"
+            },
+            {
+              "type": "string",
+              "value": "NL"
+            },
+            {
+              "type": "string",
+              "value": "FR"
+            },
+            {
+              "type": "string",
+              "value": "DE"
+            },
+            {
+              "type": "string",
+              "value": "ES"
+            }
+          ]
+        },
+        "optional": true
       },
       "title": {
         "type": "objectAttribute",
