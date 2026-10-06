@@ -31,6 +31,16 @@ describe('toNewsletterModule', () => {
     expect(module.brandVariant).toBe(BRAND_VARIANT.SECONDARY);
   });
 
+  it('passes BRAND_PRIMARY through', () => {
+    const raw = makeRawNewsletterModule({
+      brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
+    });
+
+    const module = toNewsletterModule(raw);
+
+    expect(module.brandVariant).toBe(BRAND_VARIANT.BRAND_PRIMARY);
+  });
+
   it('maps variant straight through', () => {
     const raw = makeRawNewsletterModule({
       variant: NEWSLETTER_VARIANT.COMPACT,
@@ -39,6 +49,24 @@ describe('toNewsletterModule', () => {
     const module = toNewsletterModule(raw);
 
     expect(module.variant).toBe(NEWSLETTER_VARIANT.COMPACT);
+  });
+
+  it('flattens the trust cues to their text, skipping a cue with none', () => {
+    const raw = makeRawNewsletterModule({
+      trustCues: [{ text: 'No spam' }, { text: null }, { text: 'Weekly' }],
+    });
+
+    const module = toNewsletterModule(raw);
+
+    expect(module.trustCues).toEqual(['No spam', 'Weekly']);
+  });
+
+  it('leaves trustCues undefined when none are authored (no faked default)', () => {
+    const raw = makeRawNewsletterModule({ trustCues: null });
+
+    const module = toNewsletterModule(raw);
+
+    expect(module.trustCues).toBeUndefined();
   });
 
   it('leaves supportingText undefined when not set (no faked default)', () => {

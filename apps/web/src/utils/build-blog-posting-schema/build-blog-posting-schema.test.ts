@@ -36,7 +36,7 @@ const post: TPostDetail = {
   author: {
     id: 'author-1',
     name: 'Jane Doe',
-    profilePageHref: '/jane-doe',
+    profileUrl: '/jane-doe',
     image: undefined,
     role: undefined,
     bio: undefined,
@@ -54,7 +54,11 @@ const post: TPostDetail = {
 
 describe(buildBlogPostingSchema, () => {
   it('maps a post detail to a BlogPosting schema', () => {
-    const schema = buildBlogPostingSchema(post, 'https://example.com', project);
+    const schema = buildBlogPostingSchema(
+      post,
+      new URL('https://example.com'),
+      project,
+    );
 
     expect(schema).toEqual({
       '@context': 'https://schema.org',
@@ -73,25 +77,25 @@ describe(buildBlogPostingSchema, () => {
   it('omits image when the post has no hero image', () => {
     const schema = buildBlogPostingSchema(
       { ...post, heroImage: undefined },
-      'https://example.com',
+      new URL('https://example.com'),
       project,
     );
 
     expect(schema?.image).toBeUndefined();
   });
 
-  it('builds an absolute url from siteUrl and the post slug', () => {
+  it('builds an absolute url from the base URL and the post slug', () => {
     const schema = buildBlogPostingSchema(
       { ...post, slug: 'another-post' },
-      'https://blog.example.com',
+      new URL('https://blog.example.com'),
       project,
     );
 
     expect(schema?.url).toBe('https://blog.example.com/blog/another-post');
   });
 
-  it('returns undefined when siteUrl is empty, rather than emitting a relative (invalid) url', () => {
-    const schema = buildBlogPostingSchema(post, '', project);
+  it('returns undefined when there is no base URL, rather than emitting a relative (invalid) url', () => {
+    const schema = buildBlogPostingSchema(post, undefined, project);
 
     expect(schema).toBeUndefined();
   });
@@ -105,7 +109,7 @@ describe(buildBlogPostingSchema, () => {
           { id: 'tag-2', title: 'React', slug: 'react' },
         ],
       },
-      'https://example.com',
+      new URL('https://example.com'),
       project,
     );
 
@@ -113,7 +117,11 @@ describe(buildBlogPostingSchema, () => {
   });
 
   it('omits keywords when the post has no tags', () => {
-    const schema = buildBlogPostingSchema(post, 'https://example.com', project);
+    const schema = buildBlogPostingSchema(
+      post,
+      new URL('https://example.com'),
+      project,
+    );
 
     expect(schema?.keywords).toBeUndefined();
   });
@@ -121,7 +129,7 @@ describe(buildBlogPostingSchema, () => {
   it('omits description for a sparse post without throwing', () => {
     const schema = buildBlogPostingSchema(
       { ...post, excerpt: undefined },
-      'https://example.com',
+      new URL('https://example.com'),
       project,
     );
 

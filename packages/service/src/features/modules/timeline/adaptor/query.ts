@@ -1,8 +1,10 @@
-import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
-import { ctaButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
-import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
-import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
-import { paragraphTextBlockFragment } from '@blog/service/shared/fragments/portable-text/paragraph-text-block';
+import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
+import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
+import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
+import { moduleLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
+import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
+import { getLocalizedPortableTextBlock } from '@blog/service/shared/localization/get-localized-portable-text-block/get-localized-portable-text-block';
 
 export const timelineModuleQuery = q
   .parameters<TModuleQueryParams>()
@@ -13,28 +15,22 @@ export const timelineModuleQuery = q
     brandVariant: sub.field('brandVariant').notNull(),
     headingBlock: sub
       .field('headingBlock')
-      .project(headingBlockFragment)
+      .project(moduleHeadingBlockFragment)
       .notNull(),
     markerStyle: sub.field('markerStyle').notNull(),
     items: sub
       .field('items[]')
       .project((itemSub) => ({
         _key: true,
-        marker: itemSub.field('marker').nullable(true),
-        heading: itemSub.field('heading').notNull(),
-        body: itemSub
-          .field('body[]')
-          .project(paragraphTextBlockFragment)
-          .nullable(true),
+        marker: getLocalizedField(itemSub, 'marker'),
+        heading: getLocalizedField(itemSub, 'heading').notNull(),
+        body: getLocalizedPortableTextBlock(itemSub, 'body'),
       }))
       .notNull(),
     orientation: sub.field('orientation').notNull(),
-    ctaButtons: sub
-      .field('ctaButtons[]')
-      .project(ctaButtonFragment)
-      .nullable(true),
-    contentAlignment: sub.field('contentAlignment').nullable(true),
+    ...ctaButtonsFragment,
+    ...moduleContentAlignmentLeftCenterFragment,
     itemAlignment: sub.field('itemAlignment').notNull(),
-    layout: sub.field('layout').project(layoutFragment).nullable(true),
+    ...moduleLayoutFragment,
   }))
   .notNull();

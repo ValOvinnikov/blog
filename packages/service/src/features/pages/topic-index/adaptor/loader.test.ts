@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawTopicIndexPage } from '@blog/service/testing/pages/fixtures';
 import {
@@ -8,8 +9,10 @@ import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getIndexPage } from './loader';
 
-vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
+vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
+  ...(await importOriginal<
+    typeof import('@blog/service/sanity/query/query')
+  >()),
   runQuery: vi.fn(),
 }));
 
@@ -104,6 +107,22 @@ describe('getIndexPage', () => {
     expect(result).toBeUndefined();
   });
 
+  it('lists the page translations, counting a page with no language as the default', async () => {
+    mockRun.mockResolvedValueOnce(
+      makeRawTopicIndexPage({
+        translations: [{ language: null }, { language: LOCALE_ISO_CODES.NL }],
+      }),
+    );
+
+    const result = await getIndexPage(tenant);
+    if (!result) throw new Error('expected a topic index page');
+
+    expect(result.translations).toEqual([
+      LOCALE_ISO_CODES.EN,
+      LOCALE_ISO_CODES.NL,
+    ]);
+  });
+
   it('threads tenant context into the query and scopes its tags to it', async () => {
     mockRun.mockResolvedValueOnce(makeRawTopicIndexPage());
 
@@ -116,6 +135,7 @@ describe('getIndexPage', () => {
         next: expect.objectContaining({
           tags: [
             't:tenant-a:page_topicIndex',
+            't:tenant-a:template_topicIndex',
             't:tenant-a:modules:taxonomyList',
           ],
         }),

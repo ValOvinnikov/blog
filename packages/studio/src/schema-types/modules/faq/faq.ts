@@ -1,10 +1,11 @@
+import { CONTENT_ALIGNMENT } from '@blog/config/constants';
 import { faqBlockSchema } from '@blog/studio/schema-types/documents/blocks/faq/faq';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
+import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { MessageCircleQuestion } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
@@ -19,7 +20,7 @@ export const faqSchema = defineType({
   fields: [
     titleField(),
     brandVariantField(),
-    headingBlockField(),
+    moduleHeadingBlockField(),
     defineField({
       name: 'questions',
       title: 'Questions',
@@ -44,7 +45,9 @@ export const faqSchema = defineType({
       ],
     }),
     ctaButtonsField(),
-    ...alignmentFields([]),
+    ...alignmentFields([], {
+      allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
+    }),
     layoutField,
   ],
   preview: {

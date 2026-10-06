@@ -1,8 +1,8 @@
 import type { ITenantLocalizedParams } from '@blog/config';
 import { BlogPostPage } from '@web/components/pages/blog-post-page';
 import { buildPostMetadata } from '@web/metadata/post-metadata';
+import { enterRequestContext } from '@web/server/request-context/request-context';
 import type { Metadata } from 'next';
-import { setRequestLocale } from 'next-intl/server';
 
 type TProps = {
   params: Promise<ITenantLocalizedParams & { slug: string }>;
@@ -16,13 +16,14 @@ export function generateStaticParams() {
 export const revalidate = 21600;
 
 export async function generateMetadata({ params }: TProps): Promise<Metadata> {
-  const { tenant, slug } = await params;
-  return buildPostMetadata(slug, tenant);
+  await enterRequestContext(params);
+  const { slug } = await params;
+  return buildPostMetadata(slug);
 }
 
 export default async function BlogPostSlugPage({ params }: TProps) {
-  const { locale, tenant, slug } = await params;
-  setRequestLocale(locale);
+  const { slug } = await params;
+  await enterRequestContext(params);
 
-  return <BlogPostPage slug={slug} locale={locale} tenant={tenant} />;
+  return <BlogPostPage slug={slug} />;
 }

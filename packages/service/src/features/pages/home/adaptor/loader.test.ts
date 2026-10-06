@@ -1,7 +1,9 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { getFaqQuestions } from '@blog/service/shared/adaptors/faq-questions/loader';
 import { mockRun } from '@blog/service/testing/mock-run-query';
+import { makeRawFaqModuleQuestions } from '@blog/service/testing/modules/fixtures';
 import { makeRawHomePage } from '@blog/service/testing/pages/fixtures';
 import {
-  makeRawFaqPageQuestion,
   makeRawHeadingBlock,
   makeRawSeo,
 } from '@blog/service/testing/shared/fixtures';
@@ -9,8 +11,16 @@ import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getHomePage } from './loader';
 
-vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
+vi.mock('@blog/service/shared/adaptors/faq-questions/loader', () => ({
+  getFaqQuestions: vi.fn(),
+}));
+
+const mockFaqQuestions = vi.mocked(getFaqQuestions);
+
+vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
+  ...(await importOriginal<
+    typeof import('@blog/service/sanity/query/query')
+  >()),
   runQuery: vi.fn(),
 }));
 
@@ -91,23 +101,58 @@ describe('getHomePage', () => {
     expect(page.seo.ogTitle).toBeUndefined();
   });
 
-  it('dedupes a question referenced by two module_faq modules', async () => {
-    const shared = makeRawFaqPageQuestion({ id: 'block-faq-1' });
-    mockRun.mockResolvedValueOnce(makeRawHomePage({ faqs: [shared, shared] }));
+  it('builds the faqs from the FAQ modules, in page order, with one request', async () => {
+    mockRun.mockResolvedValueOnce(
+      makeRawHomePage({
+        modules: [
+          { _id: 'faq-b', _type: 'module_faq' },
+          { _id: 'cta-1', _type: 'module_cta' },
+          { _id: 'faq-a', _type: 'module_faq' },
+        ],
+      }),
+    );
+    mockFaqQuestions.mockResolvedValueOnce([makeRawFaqModuleQuestions()]);
 
     const page = await getHomePage(tenant);
-    if (!page) throw new Error('expected a home page');
+    if (!page) throw new Error('expected a page');
 
-    expect(page.faqs).toEqual([shared]);
+    expect(mockFaqQuestions).toHaveBeenCalledExactlyOnceWith(
+      ['faq-b', 'faq-a'],
+      tenant,
+    );
+    expect(page.faqs).toEqual([
+      {
+        id: 'block-faq-1',
+        question: 'How long does onboarding take?',
+        answer: 'Most teams are live within a week.',
+      },
+    ]);
   });
 
-  it('returns an empty faqs list when the page has no FAQ module', async () => {
-    mockRun.mockResolvedValueOnce(makeRawHomePage({ faqs: [] }));
+  it('makes no FAQ-questions request when the page has no FAQ module', async () => {
+    mockRun.mockResolvedValueOnce(makeRawHomePage());
+
+    const page = await getHomePage(tenant);
+    if (!page) throw new Error('expected a page');
+
+    expect(mockFaqQuestions).not.toHaveBeenCalled();
+    expect(page.faqs).toEqual([]);
+  });
+
+  it('lists the Home translations, counting a Home with no language as the default', async () => {
+    mockRun.mockResolvedValueOnce(
+      makeRawHomePage({
+        translations: [{ language: null }, { language: LOCALE_ISO_CODES.NL }],
+      }),
+    );
 
     const page = await getHomePage(tenant);
     if (!page) throw new Error('expected a home page');
 
-    expect(page.faqs).toEqual([]);
+    expect(page.translations).toEqual([
+      LOCALE_ISO_CODES.EN,
+      LOCALE_ISO_CODES.NL,
+    ]);
   });
 
   it('resolves undefined, rather than rejecting, when no page_home document exists', async () => {
@@ -128,11 +173,7 @@ describe('getHomePage', () => {
       expect.objectContaining({
         tenant,
         next: expect.objectContaining({
-          tags: [
-            't:tenant-a:homePage',
-            't:tenant-a:modules:faq',
-            't:tenant-a:block_faq',
-          ],
+          tags: ['t:tenant-a:homePage', 't:tenant-a:template_home'],
         }),
       }),
     );

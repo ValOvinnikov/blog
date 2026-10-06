@@ -41,7 +41,7 @@ When invoked, before writing any code:
 
 All source files live under `packages/service/src/`. Import across the package
 with the workspace's **own-name alias** (`@blog/service/*` → `./src/*`, from
-tsconfig `paths`) — e.g. `import { q } from '@blog/service/sanity/query'`,
+tsconfig `paths`) — e.g. `import { q } from '@blog/service/sanity/query/query'`,
 `import { toLink } from '@blog/service/shared/transformers/to-link'`. Use
 relative paths only within a single slice (`./query`, `./types`).
 
@@ -66,10 +66,11 @@ relative paths only within a single slice (`./query`, `./types`).
 
 ## What you build
 
-- A configured client in `sanity/client.ts` reading `NEXT_PUBLIC_SANITY_PROJECT_ID`,
+- A configured client in `sanity/client/client.ts` reading `NEXT_PUBLIC_SANITY_PROJECT_ID`,
   `NEXT_PUBLIC_SANITY_DATASET`, and (for drafts) `SANITY_API_READ_TOKEN`.
-- `sanity/query.ts` — the groqd builder (`q`), `runQuery` (safe runner), `isr()`.
-- `urlForImage` (`sanity/image.ts`) on `@sanity/image-url`.
+- `sanity/query/query.ts` — the groqd builder (`q`) and `runQuery` (safe runner);
+  `sanity/query/isr.ts` — `isr()`, the cache-tag helper.
+- `urlForImage` (`sanity/image/image.ts`) on `@sanity/image-url`.
 - The `service` facade — the only public surface (`src/index.ts`), grouped by
   domain and version: `service.pages.post.v1.getPost(slug)`,
   `service.pages.author.v1.getAuthorParams()`.
@@ -158,7 +159,21 @@ relative paths only within a single slice (`./query`, `./types`).
   transformer per file** — including `build-image-url.ts` (raw image → URL) —
   each exporting its `TRaw*` input type (`InferFragmentType<typeof fragment>`)
   **and** the view-model `T*` type, both co-located and re-exported for web via
-  `src/index.ts`).
+  `src/index.ts`), and `adaptors/` (a read that other loaders reuse, laid out
+  as a feature slice — `query.ts` · `transformer.ts` · `types.ts` · thin
+  `loader.ts` — in a domain folder, e.g. `adaptors/faq-questions/`).
+- **`shared/adaptors/` is never exposed to web.** It has no `application/`
+  service and nothing in it is exported from `src/index.ts`; only other
+  loaders import it. A read web needs directly is a feature under
+  `features/entities/`, which is public like `pages` and `modules`.
+- **Every file under a `shared/<kind>/` directory lives in a domain folder,
+  never flat in the kind directory.** `shared/fragments/heading-block/heading-block.ts`
+  is the shape. The folder is named for the domain, holds that domain's files
+  and their co-located tests, and a new file joins an existing domain folder
+  before it starts a new one. This holds for every kind — `fragments/`,
+  `transformers/`, `expressions/`, `localization/`, `types/` and any added
+  later. A flat file already on `main` moves in its own change, not as a
+  side effect of a feature diff.
 - **Naming in `shared/` follows five rules.** They were implicit and
   partly contradictory until #3548's audit; a new file copies whichever
   neighbour it was modelled on, so the rule is written here rather than
@@ -185,6 +200,42 @@ relative paths only within a single slice (`./query`, `./types`).
   non-exported fragment) instead of creating a shared file. Don't overload files.
 
 ## GROQ query conventions (groqd)
+
+**Typed builders over string literals — mandatory.** Write every query, filter
+and expression with groqd's typed API; a GROQ string literal or `sub.raw()` is
+allowed **only when the typed API cannot express it**, and then carries a
+one-line comment naming what is missing. In particular:
+
+- **Filters use `.filterBy('field == $param')`**, never a raw `[...]` filter
+  string. `filterBy` checks the field and the declared parameter, so a
+  `$locale` the query does not declare fails type-check instead of at runtime.
+- **`coalesce` uses `sub.coalesce(...)`**, never a `` `coalesce(${field}…)` ``
+  template.
+- **A localized field is read with the shared helpers, by field name only** —
+  `getLocalizedField(sub, 'eyebrow')` for one-line and multiline text,
+  `getLocalizedPortableTextBlock(sub, 'content')` for listed or paragraph
+  text. Both pick the request's language, then the default, and accept only
+  fields whose generated type is an internationalized array. Never
+  hand-write the `coalesce` per field. `TModuleQueryParams` already carries
+  `TLocaleParams`, and `runQuery` injects them, so callers never pass them.
+- **The one sanctioned escape hatch is a helper's loose implementation
+  signature.** groqd cannot type a field name inside a generic function, so
+  those two helpers expose a strict public overload over an implementation
+  typed on the generated array types. Their query tests are what prove the
+  result; don't copy the pattern elsewhere without the same reason and tests.
+- **No string-built helpers** that return GROQ text for interpolation
+  (`build*Expression(field)`). A shared helper takes and returns groqd
+  builders, so its result type is inferred, not asserted with `raw<T>()`.
+- **A Sanity `_type` is written inline where the query uses it** —
+  `.filterByType('translation.metadata')`, `fragmentForType<'link'>()`.
+  groqd checks that literal against the generated schema, so a service-local
+  constant (`export const CTA_DOCUMENT_TYPE = 'module_cta'`)
+  adds nothing, and importing it from a sibling file couples two queries
+  through a string.
+- **A reference that can point to several document types is read with `.deref().asCombined()`** before projecting a field only some of them have (`slug.current` on a link target) or filtering on its parent (`references(^._id)`). Never list the types by hand in a `selectByType` just to reach a field — a new type silently drops out of the list.
+- **A cast to satisfy groqd (`as never`, `as unknown as`) is the same
+  failure** — it means the typed route was abandoned. Stop and report it
+  rather than ship the cast.
 
 Typegen marks **every** field optional regardless of schema `.required()` rules
 (validation is runtime, not reflected in types). We restore the schema contract
@@ -335,10 +386,26 @@ uncommitted changes from ending its turn at all.
 
 ## Reuse before you create
 
-Before adding a function, type, schema definition, field helper or constant,
-search this workspace for one that already does the job. A near-duplicate is
-the most expensive kind of mistake to find later, because nothing fails — both
-versions work.
+Before adding a function, type, schema definition, field helper, constant,
+component, test fake, fixture or builder, search the **whole repo** for one
+that already does the job — every app and package, including their
+`testing/` and `__mocks__/` folders, not just this workspace. A
+near-duplicate is the most expensive kind of mistake to find later, because
+nothing fails — both versions work.
+
+A match you cannot import is not permission to copy it. If it lives in a
+package this layer may depend on, use it. If it lives where this layer may
+not reach — the other app (`apps/web` and `apps/platform` share no code) or
+a package the layer contracts forbid — name the match in your report
+instead of copying it silently.
+
+If what you are about to write would be a second copy of something you may
+import — a function, component, hook, test fake, fixture or builder — move it
+to the folder that owns its kind (`shared/`, `testing/`, `__mocks__/`, one
+per file) and point every call site at it, in this change. Two copies that
+were both there before you started and that you add nothing to: report them,
+don't extract them (CLAUDE.md → "Duplication that already existed is filed,
+not fixed inline").
 
 If something similar exists and it is not obvious whether to extend it or add
 alongside it, **do not settle that quietly**. Check who calls the existing one

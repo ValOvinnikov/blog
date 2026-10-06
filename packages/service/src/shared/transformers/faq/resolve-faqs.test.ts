@@ -1,4 +1,7 @@
-import { makeRawFaqPageQuestion } from '@blog/service/testing/shared/fixtures';
+import {
+  makeRawFaqModuleQuestions,
+  makeRawFaqQuestionItem,
+} from '@blog/service/testing/modules/fixtures';
 
 import { resolveFaqs } from './resolve-faqs';
 
@@ -7,23 +10,55 @@ describe(resolveFaqs, () => {
     expect(resolveFaqs([])).toEqual([]);
   });
 
-  it('keeps every question in first-seen order', () => {
-    const first = makeRawFaqPageQuestion({ id: 'block-faq-1' });
-    const second = makeRawFaqPageQuestion({ id: 'block-faq-2' });
+  it('flattens the questions of several modules in first-seen order', () => {
+    const faqs = resolveFaqs([
+      makeRawFaqModuleQuestions({
+        questions: [makeRawFaqQuestionItem({ _id: 'block-faq-1' })],
+      }),
+      makeRawFaqModuleQuestions({
+        questions: [makeRawFaqQuestionItem({ _id: 'block-faq-2' })],
+      }),
+    ]);
 
-    expect(resolveFaqs([first, second])).toEqual([first, second]);
+    expect(faqs.map(({ id }) => id)).toEqual(['block-faq-1', 'block-faq-2']);
+  });
+
+  it('turns the answer blocks into plain text', () => {
+    const [faq] = resolveFaqs([makeRawFaqModuleQuestions()]);
+
+    expect(faq).toEqual({
+      id: 'block-faq-1',
+      question: 'How long does onboarding take?',
+      answer: 'Most teams are live within a week.',
+    });
   });
 
   it('dedupes a question referenced by two modules, keeping its first occurrence', () => {
-    const shared = makeRawFaqPageQuestion({ id: 'block-faq-1' });
-    const other = makeRawFaqPageQuestion({
-      id: 'block-faq-2',
-      question: 'A different question',
-      answer: 'A different answer.',
-    });
+    const module = makeRawFaqModuleQuestions();
 
-    const faqs = resolveFaqs([shared, other, shared]);
+    expect(resolveFaqs([module, module])).toHaveLength(1);
+  });
 
-    expect(faqs).toEqual([shared, other]);
+  it('drops a question with no text in either language', () => {
+    const faqs = resolveFaqs([
+      makeRawFaqModuleQuestions({
+        questions: [
+          makeRawFaqQuestionItem({
+            _id: 'no-question',
+            question: null as never,
+          }),
+          makeRawFaqQuestionItem({ _id: 'no-answer', answer: null as never }),
+          makeRawFaqQuestionItem({ _id: 'empty-answer', answer: [] }),
+        ],
+      }),
+    ]);
+
+    expect(faqs).toEqual([]);
+  });
+
+  it('keeps a module whose questions are unset out of the list', () => {
+    expect(
+      resolveFaqs([makeRawFaqModuleQuestions({ questions: null })]),
+    ).toEqual([]);
   });
 });

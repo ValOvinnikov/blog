@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config';
 import {
   DEPROVISIONING_STEP,
   TENANT_PLAN,
@@ -41,6 +42,7 @@ export const idleDeprovisioningSteps = (): TTenantDeprovisioningState => {
     [DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS]: idle,
     [DEPROVISIONING_STEP.CLEAR_ARTIFACTS]: idle,
     [DEPROVISIONING_STEP.ARCHIVE_TENANT]: idle,
+    [DEPROVISIONING_STEP.PURGE_READER_DATA]: idle,
     [DEPROVISIONING_STEP.INVALIDATE_TENANT_CACHE]: idle,
   };
 };
@@ -57,6 +59,7 @@ export const doneDeprovisioningSteps = (): TTenantDeprovisioningState => {
     [DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS]: done,
     [DEPROVISIONING_STEP.CLEAR_ARTIFACTS]: done,
     [DEPROVISIONING_STEP.ARCHIVE_TENANT]: done,
+    [DEPROVISIONING_STEP.PURGE_READER_DATA]: done,
     [DEPROVISIONING_STEP.INVALIDATE_TENANT_CACHE]: done,
   };
 };
@@ -87,7 +90,8 @@ export const makeTenant = (overrides: Partial<TTenant> = {}): TTenant => {
     sanityDataset: null,
     sanityReadTokenEncrypted: null,
     sanityWriteTokenEncrypted: null,
-    locale: 'EN',
+    locale: LOCALE_ISO_CODES.EN,
+    additionalLocales: [],
     plan: TENANT_PLAN.FREE,
     status: TENANT_STATUS.ACTIVE,
     provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
@@ -112,7 +116,7 @@ export const makeReadyTenant = (overrides: Partial<TTenant> = {}): TTenant => {
   return makeTenant({
     sanityProjectId: 'proj-1',
     sanityDataset: 'production',
-    locale: 'en',
+    locale: LOCALE_ISO_CODES.EN,
     provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
     provisioningSteps: doneProvisioningSteps(),
     seededAt: new Date('2026-01-01T00:00:00.000Z'),

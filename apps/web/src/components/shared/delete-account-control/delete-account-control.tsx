@@ -4,7 +4,7 @@ import { routes } from '@blog/config';
 import { Button } from '@blog/ui/components/atoms/button';
 import { TextInput } from '@blog/ui/components/atoms/text-input';
 import { useToast } from '@web/context/toast-provider';
-import { deleteAccountAction } from '@web/server/account/account-actions';
+import { deleteAccountAction } from '@web/server/account/account-actions/account-actions';
 import { signOut } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';

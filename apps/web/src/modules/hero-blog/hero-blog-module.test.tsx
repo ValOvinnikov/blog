@@ -1,3 +1,4 @@
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import {
@@ -5,16 +6,14 @@ import {
   makeStaleUnresolvedHeroBlogData,
   makeUnresolvedHeroBlogData,
 } from '@web/testing/modules/hero-blog/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { logger } from '@web/utils/logger/logger';
 
 import { HeroBlogModule } from './hero-blog-module';
 
-const { getHeroBlogMock, getTenantSanityContextMock, loggerErrorMock } =
-  vi.hoisted(() => ({
-    getHeroBlogMock: vi.fn(),
-    getTenantSanityContextMock: vi.fn(),
-    loggerErrorMock: vi.fn(),
-  }));
+const { getHeroBlogMock } = vi.hoisted(() => ({
+  getHeroBlogMock: vi.fn(),
+}));
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -24,30 +23,22 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
+vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@web/utils/logger/logger', () => ({
-  logger: {
-    error: loggerErrorMock,
-    warn: vi.fn(),
-    info: vi.fn(),
-    debug: vi.fn(),
-  },
-}));
+vi.mock('@web/utils/logger/logger');
+
+const getRequestContextMock = vi.mocked(getRequestContext);
+const loggerErrorMock = vi.mocked(logger.error);
 
 const setup = customRenderAsync(HeroBlogModule, {
   id: 'hero-blog-1',
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${HeroBlogModule.name}/>`, () => {
   beforeEach(() => {
     getHeroBlogMock.mockReset();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
+    getRequestContextMock.mockReset();
+    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
   it('forwards the resolved tenant Sanity context to getHeroBlog', async () => {
@@ -56,7 +47,10 @@ describe(`<${HeroBlogModule.name}/>`, () => {
       dataset: 'production',
       token: 'tenant-token',
     };
-    getTenantSanityContextMock.mockResolvedValue(tenant);
+    getRequestContextMock.mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      sanityContext: tenant,
+    });
     getHeroBlogMock.mockResolvedValue({
       ok: true,
       data: makeHeroBlogData(),
@@ -65,7 +59,6 @@ describe(`<${HeroBlogModule.name}/>`, () => {
     await setup();
 
     expect(getHeroBlogMock).toHaveBeenCalledWith('hero-blog-1', tenant);
-    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
   });
 
   it('renders nothing when the fetch fails', async () => {
@@ -89,7 +82,7 @@ describe(`<${HeroBlogModule.name}/>`, () => {
     ).toBeVisible();
   });
 
-  it('logs and renders nothing when no post resolves (unfeatured, unpublished, or deleted after publish)', async () => {
+  it('logs and renders nothing when no post resolves', async () => {
     getHeroBlogMock.mockResolvedValue({
       ok: true,
       data: makeUnresolvedHeroBlogData(),
@@ -104,7 +97,7 @@ describe(`<${HeroBlogModule.name}/>`, () => {
     );
   });
 
-  it('logs and renders nothing for a stale hasPost: false result that still carries a heading', async () => {
+  it('logs and renders nothing for a stale hasPost: false result carrying a heading', async () => {
     getHeroBlogMock.mockResolvedValue({
       ok: true,
       data: makeStaleUnresolvedHeroBlogData(

@@ -1,18 +1,15 @@
+import { auth } from '@platform/server/auth/auth';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import type { Session } from 'next-auth';
 
-const {
-  authMock,
-  getMembershipMock,
-  getAdminByUserIdMock,
-  listTenantsByIdsMock,
-} = vi.hoisted(() => ({
-  authMock: vi.fn(),
-  getMembershipMock: vi.fn(),
-  getAdminByUserIdMock: vi.fn(),
-  listTenantsByIdsMock: vi.fn(),
-}));
+const { getMembershipMock, getAdminByUserIdMock, listTenantsByIdsMock } =
+  vi.hoisted(() => ({
+    getMembershipMock: vi.fn(),
+    getAdminByUserIdMock: vi.fn(),
+    listTenantsByIdsMock: vi.fn(),
+  }));
 
-vi.mock('@platform/server/auth/auth', () => ({ auth: authMock }));
+vi.mock('@platform/server/auth/auth');
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
@@ -22,6 +19,8 @@ vi.mock('@blog/db', async () => ({
     tenants: { listTenantsByIds: listTenantsByIdsMock },
   },
 }));
+
+const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 describe('GET /api/dashboard/select-tenant', () => {
   beforeEach(() => {
@@ -62,7 +61,7 @@ describe('GET /api/dashboard/select-tenant', () => {
     expect(getMembershipMock).not.toHaveBeenCalled();
   });
 
-  it('returns 404 without setting a cookie or naming an authorization route when the session has no membership on the requested tenant and is not a SUPERADMIN', async () => {
+  it('returns 404 with no cookie for a non-SUPERADMIN with no membership on the tenant', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getMembershipMock.mockResolvedValue(undefined);
     getAdminByUserIdMock.mockResolvedValue(undefined);
@@ -104,7 +103,7 @@ describe('GET /api/dashboard/select-tenant', () => {
     expect(response.cookies.get('admin-active-tenant')).toBeUndefined();
   });
 
-  it('sets the active-tenant cookie and redirects to /dashboard for a verified membership', async () => {
+  it('sets the active-tenant cookie and redirects to /dashboard for a membership', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getMembershipMock.mockResolvedValue({
       id: 'm-1',
@@ -127,7 +126,7 @@ describe('GET /api/dashboard/select-tenant', () => {
     expect(getAdminByUserIdMock).not.toHaveBeenCalled();
   });
 
-  it('sets the active-tenant cookie and redirects to /dashboard for a SUPERADMIN with no real membership on an existing tenant', async () => {
+  it('sets the cookie and redirects to /dashboard for a SUPERADMIN with no membership', async () => {
     authMock.mockResolvedValue({ user: { id: 'super-1' } });
     getMembershipMock.mockResolvedValue(undefined);
     getAdminByUserIdMock.mockResolvedValue({

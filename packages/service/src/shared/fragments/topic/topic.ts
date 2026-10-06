@@ -1,28 +1,24 @@
-import { q } from '@blog/service/sanity/query';
-import {
-  archivePageSlugParser,
-  buildArchivePageSlugExpression,
-} from '@blog/service/shared/expressions/archive-page-slug';
+import { q } from '@blog/service/sanity/query/query';
 import {
   POST_COUNT_EXPRESSION,
   postCountParser,
-} from '@blog/service/shared/expressions/post-count';
+} from '@blog/service/shared/expressions/post/post-count';
+import { topicArchivePageSlugFragment } from '@blog/service/shared/fragments/archive-page/archive-page-slug';
+import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
+import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
 
-const ARCHIVE_PAGE_SLUG_EXPRESSION = buildArchivePageSlugExpression(
-  'page_topic',
-  'topic',
-);
+const localeQ = q.parameters<TLocaleParams>();
 
-export const topicFragment = q
+export const topicFragment = localeQ
   .fragmentForType<'blog_topic'>()
   .project((sub) => ({
     _id: true,
-    title: sub.field('title').notNull(),
-    slug: sub.raw(ARCHIVE_PAGE_SLUG_EXPRESSION, archivePageSlugParser),
-    description: sub.field('description').nullable(true),
+    title: getLocalizedField(sub, 'title').notNull(),
+    slug: topicArchivePageSlugFragment,
+    description: getLocalizedField(sub, 'description'),
   }));
 
-export const topicWithPostCountFragment = q
+export const topicWithPostCountFragment = localeQ
   .fragmentForType<'blog_topic'>()
   .project((sub) => ({
     ...topicFragment,

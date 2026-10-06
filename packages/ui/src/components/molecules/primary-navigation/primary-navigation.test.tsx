@@ -37,6 +37,11 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
     expect(screen.getByRole('button', { name: 'Toggle' })).toBeVisible();
   });
 
+  it('renders panelActions in the bar when there is no mobile toggle', () => {
+    setup({ panelActions: <button type="button">Language</button> });
+    expect(screen.getByRole('button', { name: 'Language' })).toBeVisible();
+  });
+
   it('renders without actions when omitted', () => {
     setup();
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
@@ -153,6 +158,30 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
           within(panel).getByRole('link', { name: link.label }),
         ).toBeVisible();
       }
+    });
+
+    it('shows panelActions as a row in the open panel', () => {
+      setup({
+        panelActions: <button type="button">Language</button>,
+        mobileToggle: { isOpen: true, onToggle: () => {}, ariaLabel, panelId },
+      });
+
+      expect(
+        within(
+          screen.getByTestId('primary-navigation-panel-actions'),
+        ).getByRole('button', { name: 'Language' }),
+      ).toBeVisible();
+    });
+
+    it('leaves panelActions out of the closed panel', () => {
+      setup({
+        panelActions: <button type="button">Language</button>,
+        mobileToggle: { isOpen: false, onToggle: () => {}, ariaLabel, panelId },
+      });
+
+      expect(
+        screen.queryByTestId('primary-navigation-panel-actions'),
+      ).not.toBeInTheDocument();
     });
 
     it('calls onToggle when the toggle button is clicked', async () => {

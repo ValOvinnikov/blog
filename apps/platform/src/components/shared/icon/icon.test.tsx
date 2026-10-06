@@ -11,11 +11,12 @@ describe(Icon, () => {
 
   it('exposes an accessible name when one is given', () => {
     render(<Icon name={ICONS.WARNING} ariaLabel="Warning" />);
-    expect(screen.getByLabelText('Warning')).toBeInTheDocument();
+    expect(screen.getByLabelText('Warning')).toBeVisible();
   });
 
   it('renders a glyph for every icon admin references', () => {
     const used = [
+      ICONS.BOOK,
       ICONS.CHECK_SHEET,
       ICONS.CHEVRON_RIGHT,
       ICONS.COMMENT,
@@ -34,7 +35,7 @@ describe(Icon, () => {
     ];
     for (const name of used) {
       const { unmount } = render(<Icon name={name} />);
-      expect(screen.getByTestId('icon')).toBeInTheDocument();
+      expect(screen.getByTestId('icon')).toBeVisible();
       unmount();
     }
   });

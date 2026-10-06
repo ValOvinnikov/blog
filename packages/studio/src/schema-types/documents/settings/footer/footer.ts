@@ -1,3 +1,4 @@
+import { languageSwitcherField } from '@blog/studio/schema-types/fields/language-switcher-field/language-switcher-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { socialProfileSchema } from '@blog/studio/schema-types/objects/social-profile/social-profile';
 import { PanelBottom } from 'lucide-react';
@@ -19,5 +20,6 @@ export const footerSettingsSchema = defineType({
       description: 'Social profile links shown in the site footer.',
       of: [defineArrayMember({ type: socialProfileSchema.name })],
     }),
+    languageSwitcherField(),
   ],
 });

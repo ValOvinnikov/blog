@@ -1,12 +1,8 @@
 import { defineField } from 'sanity';
 
-import { headingBlockSchema } from './heading-block';
+import { HEADING_REQUIRED_MESSAGE, headingBlockSchema } from './heading-block';
 
-/**
- * The shared `headingBlock` object field. Required so the object itself is
- * always present; its nested `heading` field carries its own `required()`,
- * since Sanity never descends into an absent object to evaluate that rule.
- */
+// Sanity never evaluates the nested heading rule for an absent object.
 export const headingBlockField = () =>
   defineField({
     name: 'headingBlock',
@@ -14,5 +10,8 @@ export const headingBlockField = () =>
     type: headingBlockSchema.name,
     description:
       'The heading shown at the top of this page or module, with its optional supporting line.',
-    validation: (rule) => rule.required(),
+    validation: (rule) =>
+      rule.custom((value) =>
+        value === undefined ? HEADING_REQUIRED_MESSAGE : true,
+      ),
   });

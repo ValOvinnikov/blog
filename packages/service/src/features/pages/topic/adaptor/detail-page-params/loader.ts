@@ -1,15 +1,18 @@
+import type { TLocaleIsoCode } from '@blog/config/constants';
+import { isr } from '@blog/service/sanity/query/isr';
 import {
-  isr,
   runQuery,
   type TTenantSanityContext,
-} from '@blog/service/sanity/query';
+} from '@blog/service/sanity/query/query';
 
 import { topicParamsQuery } from './query';
 
 export async function getTopicParams(
   tenant: TTenantSanityContext,
-): Promise<{ slug: string }[]> {
+  liveLocales: TLocaleIsoCode[],
+): Promise<{ slug: string; language: TLocaleIsoCode }[]> {
   return runQuery(topicParamsQuery, {
+    parameters: { liveLocales },
     tenant,
     ...isr('page_topic', tenant.projectId),
   });

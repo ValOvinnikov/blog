@@ -1,11 +1,8 @@
 import { customRender, screen } from '@web/testing/custom-render';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { TopicChipList } from './topic-chip-list';
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
+vi.mock('@web/i18n/navigation');
 
 const topics = [
   {
@@ -88,5 +85,27 @@ describe(`<${TopicChipList.name}/>`, () => {
     expect(screen.getByRole('link', { name: 'Design' })).not.toHaveAttribute(
       'aria-current',
     );
+  });
+
+  it('renders a topic with no archive page as plain text, never current', () => {
+    setup({
+      topics: [
+        ...topics,
+        {
+          id: 'topic-3',
+          title: 'Culture',
+          slug: undefined,
+          description: undefined,
+          postCount: 2,
+        },
+      ],
+    });
+
+    const chip = screen.getByText('Culture');
+    expect(chip).toBeVisible();
+    expect(chip).not.toHaveAttribute('aria-current');
+    expect(
+      screen.queryByRole('link', { name: 'Culture' }),
+    ).not.toBeInTheDocument();
   });
 });

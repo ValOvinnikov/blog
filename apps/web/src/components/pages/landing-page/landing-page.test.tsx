@@ -1,177 +1,192 @@
-import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { LOCALE_ISO_CODES } from '@blog/config';
+import { service } from '@blog/service';
+import { getRequestContext } from '@web/server/request-context/request-context';
+import {
+  customRenderServerAsync,
+  screen,
+  within,
+} from '@web/testing/custom-render';
+import { makeCtaModuleData } from '@web/testing/modules/cta/fixtures';
+import { makeHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
 import { mockLandingPage } from '@web/testing/pages/landing-page/fixtures';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import {
+  DEFAULT_REQUEST_CONTEXT,
+  DEFAULT_TENANT_SANITY_CONTEXT,
+} from '@web/testing/shared/tenant/fixtures';
+import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 
 import { LandingPage } from './landing-page';
 
-const { getLandingPageMock, landingModuleRendererMock } = vi.hoisted(() => ({
-  getLandingPageMock: vi.fn(),
-  landingModuleRendererMock: vi.fn(
-    ({
-      hero,
-      headingBlock,
-      modules,
-    }: {
-      hero?: { id: string };
-      headingBlock: { heading: string };
-      modules: { id: string }[];
-    }) => (
-      <div data-testid="landing-module-renderer">
-        {hero ? hero.id : headingBlock.heading} — {modules.length} modules
-      </div>
-    ),
-  ),
+vi.mock('@web/server/request-context/request-context');
+
+vi.mock('@blog/service', () => ({
+  service: {
+    pages: { landing: { v1: { getPage: vi.fn() } } },
+    modules: {
+      cta: { v1: { getCta: vi.fn() } },
+      heroBlog: { v1: { getHeroBlog: vi.fn() } },
+    },
+  },
 }));
 
-vi.mock('@web/server/landing/get-landing-page', () => ({
-  getLandingPage: getLandingPageMock,
-}));
+vi.mock('@web/utils/logger/logger');
 
-vi.mock('@web/components/features/landing/landing-breadcrumbs', () => ({
-  LandingBreadcrumbs: ({ slug, tenant }: { slug: string; tenant: string }) => (
-    <div data-testid="landing-breadcrumbs">
-      {slug}:{tenant}
-    </div>
-  ),
-}));
+vi.mock('@web/i18n/navigation');
 
-vi.mock('./landing-module-renderer', () => ({
-  LandingModuleRenderer: landingModuleRendererMock,
-}));
+const getPageMock = vi.mocked(service.pages.landing.v1.getPage);
 
-const setup = customRenderAsync(LandingPage, {
-  slug: 'about-us',
-  locale: 'EN',
-  tenant: 'tenant-1',
+const FAQ_PAGE_JSON_LD = '"@type":"FAQPage"';
+
+const setup = customRenderServerAsync(LandingPage, {
+  path: 'about-us',
 });
 
 describe(`<${LandingPage.name}/>`, () => {
   beforeEach(() => {
-    getLandingPageMock.mockReset();
+    getPageMock.mockResolvedValue({ ok: true, data: mockLandingPage });
   });
 
-  it('calls notFound() and logs when the fetch fails', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getLandingPageMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
+  it('logs and calls notFound() when the fetch fails', async () => {
+    getPageMock.mockResolvedValueOnce({ ok: false, error: new Error('boom') });
 
-    await expect(setup({ slug: 'missing' })).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
 
-    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('landing_page.fetch_failed'),
+    expect(vi.mocked(notFound)).toHaveBeenCalled();
+    expect(logger.error).toHaveBeenCalledWith(
+      'landing_page.fetch_failed',
+      expect.objectContaining({ path: 'about-us' }),
     );
-    errorSpy.mockRestore();
   });
 
-  it('calls notFound() without logging when the page simply does not exist', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getLandingPageMock.mockResolvedValue({ ok: true, data: undefined });
+  it('calls notFound() without logging when the page does not exist', async () => {
+    getPageMock.mockResolvedValueOnce({ ok: true, data: undefined });
 
-    await expect(setup({ slug: 'missing' })).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
 
-    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    expect(errorSpy).not.toHaveBeenCalled();
-    errorSpy.mockRestore();
+    expect(vi.mocked(notFound)).toHaveBeenCalled();
+    expect(logger.error).not.toHaveBeenCalled();
   });
 
-  it('renders the parts in order: breadcrumbs, then the module renderer', async () => {
-    getLandingPageMock.mockResolvedValue({ ok: true, data: mockLandingPage });
+  it('calls notFound() when the slug exists only in another language', async () => {
+    vi.mocked(getRequestContext).mockResolvedValueOnce({
+      ...DEFAULT_REQUEST_CONTEXT,
+      locale: LOCALE_ISO_CODES.NL,
+      sanityContext: {
+        ...DEFAULT_TENANT_SANITY_CONTEXT,
+        locale: LOCALE_ISO_CODES.NL,
+      },
+    });
+    getPageMock.mockImplementation(async (_segments, tenant) => ({
+      ok: true,
+      data: tenant.locale === LOCALE_ISO_CODES.EN ? mockLandingPage : undefined,
+    }));
 
+    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+
+    expect(vi.mocked(notFound)).toHaveBeenCalled();
+  });
+
+  it('fetches the page for the given path with the tenant context', async () => {
     await setup();
 
-    const order = screen
-      .getAllByTestId(/.+/)
-      .map((el) => el.getAttribute('data-testid'));
-
-    expect(order).toEqual(['landing-breadcrumbs', 'landing-module-renderer']);
+    expect(getPageMock).toHaveBeenCalledWith(
+      ['about-us'],
+      DEFAULT_TENANT_SANITY_CONTEXT,
+    );
   });
 
-  it('renders through PageShell: breadcrumbs outside the main landmark, module renderer inside it', async () => {
-    getLandingPageMock.mockResolvedValue({ ok: true, data: mockLandingPage });
+  it('renders the page heading and supporting text inside main', async () => {
+    getPageMock.mockResolvedValueOnce({
+      ok: true,
+      data: {
+        ...mockLandingPage,
+        headingBlock: makeHeadingBlock({
+          heading: 'About Us',
+          supportingText: 'Who we are.',
+        }),
+      },
+    });
 
     await setup();
 
     const main = screen.getByRole('main');
-    expect(main).toContainElement(
-      screen.getByTestId('landing-module-renderer'),
-    );
     expect(
-      screen.getByTestId('landing-breadcrumbs').closest('main'),
-    ).toBeNull();
+      within(main).getByRole('heading', { level: 1, name: 'About Us' }),
+    ).toBeVisible();
+    expect(within(main).getByText('Who we are.')).toBeVisible();
   });
 
-  it('forwards the slug and tenant to LandingBreadcrumbs', async () => {
-    getLandingPageMock.mockResolvedValue({ ok: true, data: mockLandingPage });
-
+  it('renders the breadcrumb trail outside main', async () => {
     await setup();
 
-    expect(screen.getByTestId('landing-breadcrumbs')).toHaveTextContent(
-      'about-us:tenant-1',
-    );
+    const breadcrumbs = screen.getByRole('navigation', { name: 'Breadcrumb' });
+    expect(
+      within(breadcrumbs).getByRole('link', { name: 'Home' }),
+    ).toBeVisible();
+    expect(within(breadcrumbs).getByText('About Us')).toBeVisible();
+    expect(screen.getByRole('main')).not.toContainElement(breadcrumbs);
   });
 
-  it('dispatches LandingModuleRenderer with the fetched hero, heading, and modules', async () => {
-    getLandingPageMock.mockResolvedValue({
+  it('renders the authored modules inside main', async () => {
+    getPageMock.mockResolvedValueOnce({
       ok: true,
       data: {
         ...mockLandingPage,
-        hero: { id: 'hero-1', type: 'module_hero' },
-        modules: [{ id: 'module-1', type: 'module_content' }],
+        modules: [{ id: 'cta-1', type: 'module_cta' }],
       },
+    });
+    vi.mocked(service.modules.cta.v1.getCta).mockResolvedValueOnce({
+      ok: true,
+      data: makeCtaModuleData({
+        headingBlock: makeHeadingBlock({ heading: 'Join the list' }),
+      }),
     });
 
     await setup();
 
-    expect(landingModuleRendererMock).toHaveBeenCalledWith(
-      {
-        hero: { id: 'hero-1', type: 'module_hero' },
-        headingBlock: mockLandingPage.headingBlock,
-        modules: [{ id: 'module-1', type: 'module_content' }],
-        locale: 'EN',
-        tenant: 'tenant-1',
+    expect(
+      within(screen.getByRole('main')).getByRole('region', {
+        name: 'Join the list',
+      }),
+    ).toBeVisible();
+  });
+
+  it('renders the hero in place of the page heading when one is set', async () => {
+    getPageMock.mockResolvedValueOnce({
+      ok: true,
+      data: {
+        ...mockLandingPage,
+        hero: { id: 'hero-1', type: 'module_heroBlog' },
       },
-      undefined,
-    );
-    expect(screen.getByTestId('landing-module-renderer')).toHaveTextContent(
-      'hero-1 — 1 modules',
-    );
-  });
-
-  it('dispatches LandingModuleRenderer with no hero when the page has none', async () => {
-    getLandingPageMock.mockResolvedValue({ ok: true, data: mockLandingPage });
+    });
+    vi.mocked(service.modules.heroBlog.v1.getHeroBlog).mockResolvedValueOnce({
+      ok: true,
+      data: makeHeroBlogData({ heading: 'Meet the team' }),
+    });
 
     await setup();
 
-    expect(landingModuleRendererMock).toHaveBeenCalledWith(
-      expect.objectContaining({ hero: undefined }),
-      undefined,
-    );
-    expect(screen.getByTestId('landing-module-renderer')).toHaveTextContent(
-      'About Us — 0 modules',
-    );
-  });
-
-  it('forwards the resolved slug/tenant to getLandingPage', async () => {
-    getLandingPageMock.mockResolvedValue({ ok: true, data: mockLandingPage });
-
-    await setup();
-
-    expect(getLandingPageMock).toHaveBeenCalledWith('about-us', 'tenant-1');
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Meet the team' }),
+    ).toBeVisible();
+    expect(
+      screen.queryByRole('heading', { level: 1, name: 'About Us' }),
+    ).not.toBeInTheDocument();
   });
 
   it('renders no FAQPage JSON-LD when the page has no FAQ questions', async () => {
-    getLandingPageMock.mockResolvedValue({ ok: true, data: mockLandingPage });
-
     await setup();
 
-    expect(screen.queryByTestId('json-ld-script')).not.toBeInTheDocument();
+    const scripts = screen.getAllByTestId('json-ld-script');
+    expect(
+      scripts.some((script) => script.textContent?.includes(FAQ_PAGE_JSON_LD)),
+    ).toBe(false);
   });
 
   it('renders the FAQPage JSON-LD when the page has FAQ questions', async () => {
-    getLandingPageMock.mockResolvedValue({
+    getPageMock.mockResolvedValueOnce({
       ok: true,
       data: {
         ...mockLandingPage,
@@ -187,7 +202,9 @@ describe(`<${LandingPage.name}/>`, () => {
 
     await setup();
 
-    const script = screen.getByTestId('json-ld-script');
-    expect(script.textContent).toContain('"@type":"FAQPage"');
+    const scripts = screen.getAllByTestId('json-ld-script');
+    expect(
+      scripts.some((script) => script.textContent?.includes(FAQ_PAGE_JSON_LD)),
+    ).toBe(true);
   });
 });

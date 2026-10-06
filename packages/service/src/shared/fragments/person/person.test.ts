@@ -1,11 +1,20 @@
-import { q } from '@blog/service/sanity/query';
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { q } from '@blog/service/sanity/query/query';
 import {
   makeRawExternalLinkDocument,
   makeRawPortableTextMarkDef,
   makeRawSanityImage,
 } from '@blog/service/testing/shared/fixtures';
+import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import {
+  localizedStrings,
+  localizedValues,
+  paragraphBlocks,
+} from '@blog/service/testing/shared/localized';
 
 import { personCardFragment, personDetailFragment } from './person';
+
+const { EN, NL, FR } = LOCALE_ISO_CODES;
 
 const authorCardDocQuery = q.star
   .filterByType('person')
@@ -125,5 +134,54 @@ describe('personDetailFragment', () => {
         }),
       },
     ]);
+  });
+});
+
+describe('personDetailFragment per language', () => {
+  const personDocument = {
+    _id: 'person-1',
+    _type: 'person',
+    name: 'Jane Doe',
+    image: {
+      _type: 'localizedImageWithAlt',
+      asset: { _type: 'reference', _ref: 'image-1' },
+      alt: localizedStrings({ [EN]: 'Jane smiling', [NL]: 'Jane lacht' }),
+    },
+    role: localizedStrings({ [EN]: 'Founder', [NL]: 'Oprichter' }),
+    bio: localizedValues('internationalizedArrayParagraphTextValue', {
+      [EN]: paragraphBlocks('Writes about design.'),
+      [NL]: paragraphBlocks('Schrijft over ontwerp.'),
+    }),
+  };
+
+  const imageAsset = { _id: 'image-1', _type: 'sanity.imageAsset' };
+
+  async function runPerson(locale: string) {
+    const raw = await evaluateGroqExpression(
+      authorDetailDocQuery.query,
+      [personDocument, imageAsset],
+      undefined,
+      { locale, defaultLocale: EN },
+    );
+
+    return authorDetailDocQuery.parse(raw);
+  }
+
+  it('picks the role, bio and photo alt in the visitor language', async () => {
+    expect(await runPerson(NL)).toMatchObject({
+      name: 'Jane Doe',
+      role: 'Oprichter',
+      bio: [{ children: [{ text: 'Schrijft over ontwerp.' }] }],
+      image: { alt: 'Jane lacht' },
+    });
+  });
+
+  it('falls back to the default language for the role, bio and photo alt', async () => {
+    expect(await runPerson(FR)).toMatchObject({
+      name: 'Jane Doe',
+      role: 'Founder',
+      bio: [{ children: [{ text: 'Writes about design.' }] }],
+      image: { alt: 'Jane smiling' },
+    });
   });
 });

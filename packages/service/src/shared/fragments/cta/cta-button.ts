@@ -1,4 +1,4 @@
-import { q } from '@blog/service/sanity/query';
+import { q } from '@blog/service/sanity/query/query';
 import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document';
 
 export const ctaButtonFragment = q

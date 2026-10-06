@@ -1,11 +1,8 @@
 import { renderElement, screen } from '@web/testing/custom-render';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { MediaCardItem, type IMediaCardData } from './media-card-item';
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
+vi.mock('@web/i18n/navigation');
 
 const item: IMediaCardData = {
   id: 'post-1',
@@ -56,8 +53,8 @@ describe(`<${MediaCardItem.name}/>`, () => {
       />,
     );
 
-    expect(screen.getByTestId('media-card-media')).toBeInTheDocument();
-    expect(screen.getByTestId('post-image')).toBeInTheDocument();
+    expect(screen.getByTestId('media-card-media')).toBeVisible();
+    expect(screen.getByTestId('post-image')).toBeVisible();
   });
 
   it('renders the formatted date and reading time', () => {
@@ -76,7 +73,7 @@ describe(`<${MediaCardItem.name}/>`, () => {
   it('forwards dataTestId to the underlying MediaCard', () => {
     renderElement(<MediaCardItem item={item} dataTestId="lead-card" />);
 
-    expect(screen.getByTestId('lead-card')).toBeInTheDocument();
+    expect(screen.getByTestId('lead-card')).toBeVisible();
   });
 
   it('renders no dataTestId on the underlying MediaCard when omitted', () => {

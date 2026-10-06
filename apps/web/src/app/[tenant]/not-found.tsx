@@ -1,6 +1,8 @@
+import { LOCALE_BCP47_TAGS } from '@blog/config';
 import { StandaloneNotFoundPage } from '@web/components/pages/standalone-not-found-page';
+import { DocumentShell } from '@web/components/shared/document-shell';
 import { buildNotFoundMetadata } from '@web/metadata/not-found-metadata';
-import { getRememberedTenantId } from '@web/server/tenant/remembered-tenant';
+import { getNotFoundContext } from '@web/server/request-context/request-context';
 import type { Metadata } from 'next';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -8,10 +10,20 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 /**
- * Catches a `notFound()` thrown by `[tenant]/[locale]/layout.tsx` itself
- * (e.g. a missing `settings_site`, an invalid locale), reading the tenant
- * the layout remembered before it threw rather than the request header.
+ * Catches a `notFound()` thrown by `[tenant]/[locale]/layout.tsx` itself,
+ * which a same-segment boundary cannot; it sits above that layout, so it owns
+ * the document. Must never call `headers()`.
  */
 export default async function TenantNotFound() {
-  return await StandaloneNotFoundPage({ tenant: getRememberedTenantId() });
+  const { tenantId, locale, isDefaultLocale } = await getNotFoundContext();
+
+  return (
+    <DocumentShell lang={LOCALE_BCP47_TAGS[locale]}>
+      {await StandaloneNotFoundPage({
+        tenant: tenantId,
+        locale,
+        hasVoiceOverrides: isDefaultLocale,
+      })}
+    </DocumentShell>
+  );
 }

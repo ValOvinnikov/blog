@@ -29,15 +29,22 @@ type TCachedDocumentType =
   | 'page_landing'
   | 'page_post'
   | 'page_home'
+  | 'template_home'
+  | 'template_landing'
+  | 'template_postIndex'
+  | 'template_topicIndex'
+  | 'template_tagIndex'
+  | 'template_topic'
+  | 'template_tag'
   | 'person'
   | 'blog_topic'
   | 'blog_tag'
   | 'settings_site'
   | 'settings_navigation'
   | 'settings_footer'
-  | 'settings_newsletter'
   | 'settings_theme'
   | 'link'
+  | 'translation.metadata'
   | 'block_feature'
   | 'block_testimonial'
   | 'block_faq';
@@ -65,11 +72,17 @@ const REVALIDATE_TAGS = {
   settings_site: ['site-settings'],
   settings_navigation: ['navigation'],
   settings_footer: ['footer'],
-  settings_newsletter: ['newsletter-settings'],
   settings_theme: ['theme-settings'],
   page_home: ['homePage'],
   page_postIndex: ['page_postIndex'],
   page_landing: ['page_landing'],
+  template_home: ['homePage', 'template_home'],
+  template_landing: ['page_landing', 'template_landing'],
+  template_postIndex: ['page_postIndex', 'template_postIndex'],
+  template_topicIndex: ['page_topicIndex', 'template_topicIndex'],
+  template_tagIndex: ['page_tagIndex', 'template_tagIndex'],
+  template_topic: ['page_topic', 'template_topic'],
+  template_tag: ['page_tag', 'template_tag'],
   page_post: ['page_post', 'posts', 'author', 'topic', 'tag'],
   page_tag: ['page_tag'],
   page_topic: ['page_topic'],
@@ -97,6 +110,7 @@ const REVALIDATE_TAGS = {
   module_timeline: ['modules:timeline'],
   module_pricing: ['modules:pricing'],
   link: ['link'],
+  'translation.metadata': ['translation.metadata'],
   block_feature: ['block_feature'],
   block_testimonial: ['block_testimonial'],
   block_faq: ['block_faq'],

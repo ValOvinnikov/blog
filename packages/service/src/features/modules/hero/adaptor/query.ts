@@ -1,6 +1,6 @@
-import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
+import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
-import { heroLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { moduleHeroLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { inlineLinkFragment } from '@blog/service/shared/fragments/link/inline-link';
 import { postCardFragment } from '@blog/service/shared/fragments/post/post';
 
@@ -32,6 +32,6 @@ export const heroModuleQuery = q
       .field('secondaryAction')
       .project(inlineLinkFragment)
       .nullable(true),
-    layout: sub.field('layout').project(heroLayoutFragment).nullable(true),
+    ...moduleHeroLayoutFragment,
   }))
   .notNull();

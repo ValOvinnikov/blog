@@ -1,11 +1,8 @@
-import {
-  type TSanityProjectRef,
-  type TSeoResolved,
-  urlForSanityImage,
-} from '@blog/service';
+import { type TSeoResolved, urlForSanityImage } from '@blog/service';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import type { Metadata } from 'next';
 
-type TToMetadataOptions = {
+export type TToMetadataOptions = {
   canonical: string;
   ogType: 'website' | 'article';
   titleAbsolute?: boolean;
@@ -19,18 +16,15 @@ type TToMetadataOptions = {
 /**
  * Unauthored fields pass through as `undefined` so they are omitted rather
  * than inheriting a parent segment's value.
- *
- * @example
- * return toMetadata(result.data.seo, tenantContext, { canonical: '/', ogType: 'website', titleAbsolute: true });
  */
-export const toMetadata = (
+export const toMetadata = async (
   seo: TSeoResolved,
-  project: TSanityProjectRef,
   opts: TToMetadataOptions,
-): Metadata => {
+): Promise<Metadata> => {
   const { canonical, ogType, titleAbsolute, feedUrl, article } = opts;
+  const { sanityContext } = await getRequestContext();
   const ogImageUrl = seo.ogImage
-    ? urlForSanityImage(seo.ogImage, project)
+    ? urlForSanityImage(seo.ogImage, sanityContext)
     : undefined;
   const ogImages = ogImageUrl ? [{ url: ogImageUrl }] : undefined;
   const twitterImages = ogImageUrl ? [ogImageUrl] : undefined;

@@ -1,21 +1,25 @@
+import type { TLocaleIsoCode } from '@blog/config/constants';
+import { isr } from '@blog/service/sanity/query/isr';
 import {
-  isr,
   runQuery,
   type TTenantSanityContext,
-} from '@blog/service/sanity/query';
-import { toPaginationParams } from '@blog/service/shared/transformers/pagination/to-pagination-params';
+} from '@blog/service/sanity/query/query';
+import { getPaginationParamsWithPageSizes } from '@blog/service/shared/adaptors/post-list-page-size/pagination-params';
+import type { TPaginationParam } from '@blog/service/shared/transformers/pagination/to-pagination-params';
 
 import { topicPaginationParamsQuery } from './query';
 
 export async function getTopicPaginationParams(
   tenant: TTenantSanityContext,
-): Promise<{ slug: string; page: string }[]> {
+  liveLocales: TLocaleIsoCode[],
+): Promise<TPaginationParam[]> {
   const topicPages = await runQuery(topicPaginationParamsQuery, {
+    parameters: { liveLocales },
     tenant,
     ...isr(
-      ['page_topic', 'modules:postList', 'posts', 'topic'],
+      ['page_topic', 'template_topic', 'posts', 'topic'],
       tenant.projectId,
     ),
   });
-  return toPaginationParams(topicPages);
+  return getPaginationParamsWithPageSizes(topicPages, tenant);
 }

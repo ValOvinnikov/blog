@@ -4,7 +4,7 @@ export const featureHighlightRowVariants = tv({
   slots: {
     root: [
       'grid grid-cols-1 gap-8',
-      'md:grid-cols-2 md:items-center md:gap-12',
+      'lg:grid-cols-2 lg:items-center lg:gap-12',
     ],
     media: [],
     text: ['flex flex-col items-start gap-4 text-left'],
@@ -16,14 +16,8 @@ export const featureHighlightRowVariants = tv({
     mediaSide: {
       start: {},
       end: {
-        media: ['md:order-2'],
-        text: ['md:order-1'],
-      },
-    },
-    hasImage: {
-      true: {},
-      false: {
-        text: ['md:col-span-2'],
+        media: ['lg:order-2'],
+        text: ['lg:order-1'],
       },
     },
   },

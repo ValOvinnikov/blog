@@ -7,26 +7,20 @@ import {
   testNotFoundOnFetchFailure,
   testNotFoundWithoutLog,
 } from '@web/testing/shared/breadcrumbs-page-contract/breadcrumbs-page-contract';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 import { makeTopic } from '@web/testing/shared/topic/fixtures';
 
 import { TopicBreadcrumbs } from './topic-breadcrumbs';
 
-const { getTopicPageMock, getTenantBaseUrlMock } = vi.hoisted(() => ({
+vi.mock('@web/server/request-context/request-context');
+
+const { getTopicPageMock } = vi.hoisted(() => ({
   getTopicPageMock: vi.fn(),
-  getTenantBaseUrlMock: vi.fn(),
 }));
 
-vi.mock('@web/server/topic/get-topic-page', () => ({
+vi.mock('@web/i18n/navigation');
+
+vi.mock('@web/server/topic/get-topic-page/get-topic-page', () => ({
   getTopicPage: getTopicPageMock,
-}));
-
-vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
-  getTenantBaseUrl: getTenantBaseUrlMock,
-}));
-
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
 }));
 
 const topic = makeTopic({ title: 'News', slug: 'news' });
@@ -34,14 +28,11 @@ const successData = { topic, modules: [], seo: {} };
 
 const setup = customRenderAsync(TopicBreadcrumbs, {
   slug: 'news',
-  tenant: 'tenant-1',
 });
 
 describe(`<${TopicBreadcrumbs.name}/>`, () => {
   beforeEach(() => {
     getTopicPageMock.mockReset();
-    getTenantBaseUrlMock.mockReset();
-    getTenantBaseUrlMock.mockResolvedValue('https://example.com');
   });
 
   testNotFoundWithoutLog({ pageLoaderMock: getTopicPageMock, setup });
@@ -67,13 +58,12 @@ describe(`<${TopicBreadcrumbs.name}/>`, () => {
     pageLoaderMock: getTopicPageMock,
     setup,
     successData,
-    getTenantBaseUrlMock,
   });
   testForwardsArgsToLoader({
     pageLoaderMock: getTopicPageMock,
     setup,
     successData,
-    description: 'forwards the slug and tenant to getTopicPage',
-    expectedArgs: ['news', 'tenant-1'],
+    description: 'forwards the slug to getTopicPage',
+    expectedArgs: ['news'],
   });
 });

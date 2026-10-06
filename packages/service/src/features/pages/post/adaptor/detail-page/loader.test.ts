@@ -12,8 +12,10 @@ import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getPost } from './loader';
 
-vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
+vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
+  ...(await importOriginal<
+    typeof import('@blog/service/sanity/query/query')
+  >()),
   runQuery: vi.fn(),
 }));
 
@@ -81,7 +83,7 @@ describe('getPost', () => {
     expect(result.author).toEqual({
       id: 'author-9',
       name: 'Jane Doe',
-      profilePageHref: '/jane-doe',
+      profileUrl: '/jane-doe',
       image: expect.objectContaining({ assetId: 'image-abc123-800x600-jpg' }),
       role: 'Editor',
       bio: undefined,
@@ -109,7 +111,7 @@ describe('getPost', () => {
     const result = await getPost('hello-world', tenant);
     if (!result) throw new Error('expected a post detail');
 
-    expect(result.author.profilePageHref).toBe('/tags/news');
+    expect(result.author.profileUrl).toBe('/tags/news');
   });
 
   it('maps the author socialLinks through the shared social profile resolver', async () => {

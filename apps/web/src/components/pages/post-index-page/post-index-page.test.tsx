@@ -1,72 +1,74 @@
-import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { LOCALE_ISO_CODES } from '@blog/config';
+import { service, type TBlogIndexPage } from '@blog/service';
+import { getRequestContext } from '@web/server/request-context/request-context';
+import {
+  customRenderServerAsync,
+  screen,
+  within,
+} from '@web/testing/custom-render';
+import { makeCtaModuleData } from '@web/testing/modules/cta/fixtures';
+import { makeHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { notFound } from 'next/navigation';
-import type { ReactNode } from 'react';
+import { makeSeo } from '@web/testing/shared/seo/fixtures';
+import {
+  DEFAULT_TENANT_SANITY_CONTEXT,
+  DEFAULT_REQUEST_CONTEXT,
+} from '@web/testing/shared/tenant/fixtures';
+import { makeTopicWithPostCount } from '@web/testing/shared/topic/fixtures';
+import { logger } from '@web/utils/logger/logger';
+import { notFound, redirect } from 'next/navigation';
 
 import { PostIndexPage } from './post-index-page';
 
-const { getPostIndexPageMock, postIndexModuleRendererMock } = vi.hoisted(
-  () => ({
-    getPostIndexPageMock: vi.fn(),
-    postIndexModuleRendererMock: vi.fn(
-      ({
-        hero,
-        headingBlock,
-        modules,
-        context,
-        children,
-      }: {
-        hero?: { id: string };
-        headingBlock: { heading: string };
-        modules: { id: string; type: string }[];
-        context?: { page: number };
-        children?: ReactNode;
-      }) => (
-        <div data-testid="post-index-module-renderer">
-          {hero ? hero.id : headingBlock.heading} —{' '}
-          {modules.map((module) => module.type).join(',')} — page{' '}
-          {context?.page}
-          {children}
-        </div>
-      ),
-    ),
+vi.mock('@web/server/request-context/request-context');
+
+vi.mock('@blog/service', () => ({
+  service: {
+    pages: { blog: { v1: { getIndexPage: vi.fn() } } },
+    entities: { topics: { v1: { getTopics: vi.fn() } } },
+    modules: {
+      cta: { v1: { getCta: vi.fn() } },
+      heroBlog: { v1: { getHeroBlog: vi.fn() } },
+      postList: { v1: { getPostList: vi.fn() } },
+    },
+  },
+}));
+
+vi.mock('@web/utils/logger/logger');
+
+vi.mock('@web/i18n/navigation');
+
+const getIndexPageMock = vi.mocked(service.pages.blog.v1.getIndexPage);
+
+const indexPage: TBlogIndexPage = {
+  headingBlock: makeHeadingBlock({
+    heading: 'Blog',
+    supportingText: 'Notes from the team.',
   }),
-);
+  hero: undefined,
+  modules: [],
+  seo: makeSeo(),
+  translations: [LOCALE_ISO_CODES.EN],
+};
 
-vi.mock('@web/server/post-index/get-post-index-page', () => ({
-  getPostIndexPage: getPostIndexPageMock,
-}));
-
-vi.mock('@web/components/features/post-index/post-index-breadcrumbs', () => ({
-  PostIndexBreadcrumbs: ({ tenant }: { tenant: string }) => (
-    <div data-testid="post-index-breadcrumbs">{tenant}</div>
-  ),
-}));
-
-vi.mock('@web/components/features/post-index/post-index-topic-chips', () => ({
-  PostIndexTopicChips: ({ tenant }: { tenant: string }) => (
-    <div data-testid="post-index-topic-chips">{tenant}</div>
-  ),
-}));
-
-vi.mock('./post-index-module-renderer', () => ({
-  PostIndexModuleRenderer: postIndexModuleRendererMock,
-}));
-
-const setup = customRenderAsync(PostIndexPage, {
+const setup = customRenderServerAsync(PostIndexPage, {
   page: 1,
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${PostIndexPage.name}/>`, () => {
   beforeEach(() => {
-    getPostIndexPageMock.mockReset();
+    vi.mocked(getRequestContext).mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
+    getIndexPageMock.mockResolvedValue({ ok: true, data: indexPage });
+    vi.mocked(service.entities.topics.v1.getTopics).mockResolvedValue({
+      ok: true,
+      data: [
+        makeTopicWithPostCount({ title: 'Engineering', slug: 'engineering' }),
+      ],
+    });
   });
 
-  it('calls notFound() when the fetch fails', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getPostIndexPageMock.mockResolvedValue({
+  it('logs and calls notFound() when the fetch fails', async () => {
+    getIndexPageMock.mockResolvedValueOnce({
       ok: false,
       error: new Error('boom'),
     });
@@ -74,200 +76,140 @@ describe(`<${PostIndexPage.name}/>`, () => {
     await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('post_index_page.fetch_failed'),
+    expect(logger.error).toHaveBeenCalledWith(
+      'post_index_page.fetch_failed',
+      expect.anything(),
     );
-
-    errorSpy.mockRestore();
   });
 
-  it('calls notFound() without logging when the index page simply does not exist', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getPostIndexPageMock.mockResolvedValue({ ok: true, data: undefined });
+  it('calls notFound() without logging when the index page does not exist', async () => {
+    getIndexPageMock.mockResolvedValueOnce({ ok: true, data: undefined });
 
     await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    expect(errorSpy).not.toHaveBeenCalled();
-
-    errorSpy.mockRestore();
+    expect(logger.error).not.toHaveBeenCalled();
   });
 
-  it('dispatches PostIndexModuleRenderer with the fetched page shell', async () => {
-    getPostIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
-        modules: [],
-      },
+  it('redirects to / when this language has no post index page of its own', async () => {
+    vi.mocked(getRequestContext).mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      locale: LOCALE_ISO_CODES.NL,
+      liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
     });
+    getIndexPageMock.mockResolvedValueOnce({ ok: true, data: undefined });
 
-    await setup();
+    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
 
-    expect(postIndexModuleRendererMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
-        locale: 'en',
-        tenant: 'tenant-1',
-      }),
-      undefined,
-    );
-    expect(screen.getByTestId('post-index-module-renderer')).toHaveTextContent(
-      'Blog',
-    );
+    expect(vi.mocked(redirect)).toHaveBeenCalledWith('/');
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 
-  it('renders the parts in order: breadcrumbs, then the module renderer with the topic chips nested inside', async () => {
-    getPostIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
-        modules: [
-          { id: 'post-list-1', type: 'module_postList' },
-          { id: 'newsletter-1', type: 'module_newsletter' },
-        ],
-      },
-    });
-
+  it('fetches the index page with the tenant context', async () => {
     await setup();
 
-    const order = screen
-      .getAllByTestId(/.+/)
-      .map((el) => el.getAttribute('data-testid'));
-
-    expect(order).toEqual([
-      'post-index-breadcrumbs',
-      'post-index-module-renderer',
-      'post-index-topic-chips',
-    ]);
+    expect(getIndexPageMock).toHaveBeenCalledWith(
+      DEFAULT_TENANT_SANITY_CONTEXT,
+    );
   });
 
-  it('renders through PageShell: breadcrumbs outside main, the module renderer inside it', async () => {
-    getPostIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
-        modules: [],
-      },
-    });
-
+  it('renders the page heading and supporting text inside main', async () => {
     await setup();
 
     const main = screen.getByRole('main');
-    expect(main).toContainElement(
-      screen.getByTestId('post-index-module-renderer'),
-    );
     expect(
-      screen.getByTestId('post-index-breadcrumbs').closest('main'),
-    ).toBeNull();
+      within(main).getByRole('heading', { level: 1, name: 'Blog' }),
+    ).toBeVisible();
+    expect(within(main).getByText('Notes from the team.')).toBeVisible();
+    expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 
-  it('passes the current page as context to PostIndexModuleRenderer', async () => {
-    getPostIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
-        modules: [],
-      },
+  it('renders the breadcrumb trail outside main', async () => {
+    await setup();
+
+    const breadcrumbs = screen.getByRole('navigation', { name: 'Breadcrumb' });
+    expect(
+      within(breadcrumbs).getByRole('link', { name: 'Home' }),
+    ).toBeVisible();
+    expect(within(breadcrumbs).getByText('Blog')).toBeVisible();
+    expect(screen.getByRole('main')).not.toContainElement(breadcrumbs);
+  });
+
+  it('renders the tenant topic chips inside main', async () => {
+    await setup();
+
+    const topics = within(screen.getByRole('main')).getByRole('navigation', {
+      name: 'Topics',
     });
-
-    await setup({ page: 2 });
-
-    expect(postIndexModuleRendererMock).toHaveBeenCalledWith(
-      expect.objectContaining({ context: { page: 2 } }),
-      undefined,
+    expect(
+      within(topics).getByRole('link', { name: 'Engineering' }),
+    ).toHaveAttribute('href', '/topics/engineering');
+    expect(service.entities.topics.v1.getTopics).toHaveBeenCalledWith(
+      DEFAULT_TENANT_SANITY_CONTEXT,
     );
   });
 
-  it('passes an empty modules array to PostIndexModuleRenderer when the editor has not added any', async () => {
-    getPostIndexPageMock.mockResolvedValue({
+  it('renders the authored modules inside main', async () => {
+    getIndexPageMock.mockResolvedValueOnce({
       ok: true,
-      data: {
-        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
-        modules: [],
-      },
+      data: { ...indexPage, modules: [{ id: 'cta-1', type: 'module_cta' }] },
     });
-
-    await setup();
-
-    expect(postIndexModuleRendererMock).toHaveBeenCalledWith(
-      expect.objectContaining({ modules: [], locale: 'en' }),
-      undefined,
-    );
-  });
-
-  it('passes the page-builder modules through to PostIndexModuleRenderer, including the post list module', async () => {
-    getPostIndexPageMock.mockResolvedValue({
+    vi.mocked(service.modules.cta.v1.getCta).mockResolvedValueOnce({
       ok: true,
-      data: {
-        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
-        modules: [
-          { id: 'post-list-1', type: 'module_postList' },
-          { id: 'newsletter-1', type: 'module_newsletter' },
-        ],
-      },
-    });
-
-    await setup();
-
-    expect(postIndexModuleRendererMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        modules: [
-          { id: 'post-list-1', type: 'module_postList' },
-          { id: 'newsletter-1', type: 'module_newsletter' },
-        ],
-        locale: 'en',
+      data: makeCtaModuleData({
+        headingBlock: makeHeadingBlock({ heading: 'Join the list' }),
       }),
-      undefined,
-    );
-    expect(screen.getByTestId('post-index-module-renderer')).toHaveTextContent(
-      'module_postList,module_newsletter',
-    );
-  });
-
-  it('dispatches PostIndexModuleRenderer with the hero when a hero is set', async () => {
-    getPostIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
-        hero: { id: 'hero-1', type: 'module_hero' },
-        modules: [],
-      },
     });
 
     await setup();
 
-    expect(postIndexModuleRendererMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        hero: { id: 'hero-1', type: 'module_hero' },
-        locale: 'en',
-        tenant: 'tenant-1',
+    expect(
+      within(screen.getByRole('main')).getByRole('region', {
+        name: 'Join the list',
       }),
-      undefined,
-    );
-    expect(screen.getByTestId('post-index-module-renderer')).toHaveTextContent(
-      'hero-1',
-    );
+    ).toBeVisible();
   });
 
-  it('forwards the tenant to getPostIndexPage, PostIndexBreadcrumbs, and PostIndexTopicChips', async () => {
-    getPostIndexPageMock.mockResolvedValue({
+  it('renders the hero in place of the page heading when one is set', async () => {
+    getIndexPageMock.mockResolvedValueOnce({
       ok: true,
-      data: {
-        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
-        modules: [],
-      },
+      data: { ...indexPage, hero: { id: 'hero-1', type: 'module_heroBlog' } },
+    });
+    vi.mocked(service.modules.heroBlog.v1.getHeroBlog).mockResolvedValueOnce({
+      ok: true,
+      data: makeHeroBlogData({ heading: 'Everything we write' }),
     });
 
     await setup();
 
-    expect(getPostIndexPageMock).toHaveBeenCalledWith('tenant-1');
-    expect(screen.getByTestId('post-index-breadcrumbs')).toHaveTextContent(
-      'tenant-1',
-    );
-    expect(screen.getByTestId('post-index-topic-chips')).toHaveTextContent(
-      'tenant-1',
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Everything we write' }),
+    ).toBeVisible();
+    expect(
+      screen.queryByRole('heading', { level: 1, name: 'Blog' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('loads post lists for the current page with no archive scope', async () => {
+    getIndexPageMock.mockResolvedValueOnce({
+      ok: true,
+      data: {
+        ...indexPage,
+        modules: [{ id: 'list-1', type: 'module_postList' }],
+      },
+    });
+    vi.mocked(service.modules.postList.v1.getPostList).mockResolvedValueOnce({
+      ok: false,
+      error: new Error('boom'),
+    });
+
+    await expect(setup({ page: 2 })).rejects.toThrow('NEXT_NOT_FOUND');
+
+    expect(service.modules.postList.v1.getPostList).toHaveBeenCalledWith(
+      'list-1',
+      DEFAULT_TENANT_SANITY_CONTEXT,
+      2,
+      undefined,
     );
   });
 });

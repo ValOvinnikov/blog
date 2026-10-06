@@ -25,9 +25,6 @@ const escapeJsonForScript = (json: string): string => {
  * prematurely close the script element; this is the only reason
  * `dangerouslySetInnerHTML` is safe here — the input is always a plain
  * serialized object, never raw HTML.
- *
- * @example
- * <JsonLd schema={buildBlogPostingSchema(post, siteUrl, tenantContext)} />
  */
 export const JsonLd = ({ schema }: TJsonLdProps) => {
   const serialized = escapeJsonForScript(JSON.stringify(schema));

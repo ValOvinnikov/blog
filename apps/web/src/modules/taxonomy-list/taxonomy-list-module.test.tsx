@@ -1,16 +1,20 @@
 import { BRAND_VARIANT, TAXONOMY_KIND } from '@blog/config';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import {
+  DEFAULT_REQUEST_CONTEXT,
+  DEFAULT_TENANT_SANITY_CONTEXT,
+} from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
 
 import { TaxonomyListModule } from './taxonomy-list-module';
 
-const { getTaxonomyListMock, getTenantSanityContextMock } = vi.hoisted(() => ({
+const { getTaxonomyListMock } = vi.hoisted(() => ({
   getTaxonomyListMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
 }));
+
+vi.mock('@web/i18n/navigation');
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -20,13 +24,9 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
+vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
+const getRequestContextMock = vi.mocked(getRequestContext);
 
 const topicsResult = (entries: unknown[] = [], showLatestPosts = true) => ({
   ok: true,
@@ -77,23 +77,20 @@ const entry = {
 describe(`<${TaxonomyListModule.name}/>`, () => {
   beforeEach(() => {
     getTaxonomyListMock.mockReset();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
+    getRequestContextMock.mockReset();
+    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
   describe('modules[] placement', () => {
     const setup = customRenderAsync(TaxonomyListModule, {
       id: 'taxonomy-list-1',
-      locale: 'en',
-      tenant: 'tenant-1',
     });
 
-    it('resolves the tenant Sanity context from the tenant slug and forwards it to getTaxonomyList', async () => {
+    it('forwards the tenant Sanity context to getTaxonomyList', async () => {
       getTaxonomyListMock.mockResolvedValue(topicsResult());
 
       await setup();
 
-      expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
       expect(getTaxonomyListMock).toHaveBeenCalledWith(
         'taxonomy-list-1',
         DEFAULT_TENANT_SANITY_CONTEXT,
@@ -110,7 +107,21 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
       expect(screen.getByText('5 posts')).toBeVisible();
       expect(
         screen.getByRole('heading', { level: 2, name: 'Topics' }),
-      ).toBeInTheDocument();
+      ).toBeVisible();
+    });
+
+    it('omits an entry with no archive page', async () => {
+      getTaxonomyListMock.mockResolvedValue(
+        topicsResult([
+          entry,
+          { ...entry, id: 'topic-2', title: 'Design', slug: undefined },
+        ]),
+      );
+
+      await setup();
+
+      expect(screen.getByRole('link', { name: /Engineering/ })).toBeVisible();
+      expect(screen.queryByText('Design')).not.toBeInTheDocument();
     });
 
     it('derives titleId and dataTestId from the module id', async () => {
@@ -142,7 +153,7 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
       expect(screen.getByText('5 posts')).toBeVisible();
       expect(
         screen.getByRole('heading', { level: 2, name: 'Tags' }),
-      ).toBeInTheDocument();
+      ).toBeVisible();
     });
 
     it('renders a labeled section with the topics empty message when entries is empty', async () => {
@@ -197,7 +208,7 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
       );
     });
 
-    it('omits the latest-posts list when showLatestPosts is off, even though the entry has posts', async () => {
+    it('omits the latest-posts list when showLatestPosts is off', async () => {
       getTaxonomyListMock.mockResolvedValue(topicsResult([entry], false));
 
       await setup();
@@ -207,7 +218,7 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
       ).not.toBeInTheDocument();
     });
 
-    it('omits the latest-posts list when the entry has no posts, even though the flag is on', async () => {
+    it('omits the latest-posts list when the entry has no posts, even with the flag on', async () => {
       getTaxonomyListMock.mockResolvedValue(
         topicsResult([{ ...entry, latestPosts: [] }], true),
       );

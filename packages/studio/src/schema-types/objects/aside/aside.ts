@@ -1,17 +1,12 @@
 import { ASIDE_KIND } from '@blog/config/constants';
 import { paragraphTextSchema } from '@blog/studio/schema-types/portable-text/paragraph-text/paragraph-text';
+import {
+  toPlainText,
+  type TPlainTextBlock,
+} from '@blog/studio/schema-types/portable-text/to-plain-text/to-plain-text';
 import { toTitleCase } from '@blog/utils/primitives';
 import { MessageSquareText } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
-
-type TAsideBlock = { children?: { text?: string }[] };
-
-const toPlainText = (blocks: TAsideBlock[] = []) =>
-  blocks
-    .flatMap((block) => block.children ?? [])
-    .map((child) => child.text ?? '')
-    .join(' ')
-    .trim();
 
 const excerpt = (text: string, wordCount = 12) => {
   const words = text.split(/\s+/).filter(Boolean);
@@ -54,7 +49,7 @@ export const asideSchema = defineType({
   ],
   preview: {
     select: { kind: 'kind', body: 'body' },
-    prepare({ kind, body }: { kind?: string; body?: TAsideBlock[] }) {
+    prepare({ kind, body }: { kind?: string; body?: TPlainTextBlock[] }) {
       return {
         title: kind ? toTitleCase(kind) : 'Unknown',
         subtitle: body ? excerpt(toPlainText(body)) : '',

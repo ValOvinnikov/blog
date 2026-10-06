@@ -199,6 +199,23 @@ so a reader can tell a decision was made from the code alone.
 The `modeFieldPair` factory above keeps `layout: 'radio'` because its mode
 field gates a conditional custom field, not because it is `required()`.
 
+### No toggle beside the field it switches on
+
+When a boolean's only job is to switch an optional field on, drop the boolean.
+A filled field is the switch. A pricing tier is highlighted when its
+`highlightLabel` is filled; it has no `isHighlighted` toggle. With two fields,
+the toggle can be off while the label is filled, and the editor can't tell
+which one wins. When a view needs the boolean, the consumer derives it from
+the filled field.
+
+A field that acts as the switch gets **no `initialValue`**. A default would
+switch it on for every new item, so a new pricing tier would start out
+highlighted.
+
+Keep a separate boolean only when it means something the field can't express
+on its own, for example a flag that changes behaviour while the field keeps
+its value.
+
 ## Migration quality
 
 - **Idempotency via target-state guard, symmetric across all document types.**
@@ -213,10 +230,11 @@ field gates a conditional custom field, not because it is `required()`.
 - **Every migration ships a co-located test** (`*.test.ts`): the transform on
   a representative fixture, and a re-run on already-migrated input proving
   it's a no-op (idempotency). See `testing-practices`.
-- **Header comment = operator manual:** what it transforms, the
-  export → dry → inspect → human-gated run workflow, and the deploy-ordering
-  constraint (migrate production **before** deploying code that expects the
-  new shape).
+- **No header comment.** The export → dry → inspect → human-gated run
+  workflow lives in `migrations/README.md`, and what a migration transforms
+  goes in its PR description (CLAUDE.md → "Comments default to zero"). The
+  deploy-ordering constraint still holds: migrate production **before**
+  deploying code that expects the new shape.
 - Stored values written by the migration come from the same `@blog/config`
   constants the schema uses.
 

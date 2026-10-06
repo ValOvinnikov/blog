@@ -1,4 +1,4 @@
-import { q } from '@blog/service/sanity/query';
+import { q } from '@blog/service/sanity/query/query';
 
 import { topicFragment } from './topic';
 
@@ -30,21 +30,14 @@ describe('topicFragment', () => {
     expect(() => topicDocQuery.parse(projected)).toThrow();
   });
 
-  it('throws when the resolved slug is missing', () => {
+  it('accepts a topic with no topic page as a null slug', () => {
     const projected = {
       _id: 'topic-3',
-      title: 'No Slug',
+      title: 'No Page',
       slug: null,
       description: null,
     };
 
-    expect(() => topicDocQuery.parse(projected)).toThrow();
-  });
-
-  it('resolves the slug from the topic page referencing this topic, falling back to the topic own slug', () => {
-    expect(topicDocQuery.query).toContain(
-      '_type == "page_topic" && topic._ref == ^._id',
-    );
-    expect(topicDocQuery.query).toContain('coalesce(');
+    expect(topicDocQuery.parse(projected)).toEqual(projected);
   });
 });

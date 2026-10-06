@@ -1,7 +1,13 @@
-import { JetBrains_Mono } from 'next/font/google';
+import localFont from 'next/font/local';
 
-export const jetbrainsMono = JetBrains_Mono({
-  subsets: ['latin'],
-  weight: ['400', '500'],
+export const jetbrainsMono = localFont({
+  src: [
+    {
+      path: './fonts/jetbrains-mono.woff2',
+      weight: '400 500',
+      style: 'normal',
+    },
+  ],
+  display: 'swap',
   preload: false,
 });

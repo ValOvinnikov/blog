@@ -1,0 +1,263 @@
+{
+  "pagination": {
+    "previous": "Zurück",
+    "next": "Weiter",
+    "pageSuffix": "– Seite {page}"
+  },
+  "breadcrumbs": {
+    "home": "Startseite",
+    "ariaLabel": "Brotkrumennavigation",
+    "topics": "Themen",
+    "tags": "Schlagwörter",
+    "blog": "Blog"
+  },
+  "notFound": {
+    "eyebrow": "404",
+    "heading": "Seite nicht gefunden",
+    "supportingText": "Die gesuchte Seite existiert nicht.",
+    "returnHome": "Zur Startseite"
+  },
+  "localeErrorPage": {
+    "title": "Etwas ist schiefgelaufen",
+    "announcement": "Etwas ist schiefgelaufen. Sie können es erneut versuchen oder zur Startseite gehen.",
+    "description": "Beim Darstellen dieser Seite ist ein unerwarteter Fehler aufgetreten. Sie können es erneut versuchen oder zur Startseite zurückkehren.",
+    "retry": "Erneut versuchen",
+    "goHome": "Zur Startseite"
+  },
+  "postShare": {
+    "shareAriaLabel": "„{title}“ teilen",
+    "panelAriaLabel": "Optionen zum Teilen",
+    "copyLink": "Link kopieren",
+    "copied": "Kopiert",
+    "linkCopied": "Link kopiert"
+  },
+  "languageSwitcher": {
+    "ariaLabel": "Sprache",
+    "menuAriaLabel": "Sprache: {language}"
+  },
+  "siteNavigation": {
+    "toggleMenu": "Navigationsmenü öffnen oder schließen"
+  },
+  "brandLockupLink": {
+    "ariaLabel": "Startseite"
+  },
+  "socialLinks": {
+    "linkAriaLabel": "{platform}-Profil",
+    "listAriaLabel": "Profile"
+  },
+  "topicChipList": {
+    "ariaLabel": "Themen",
+    "all": "Alle"
+  },
+  "blogListPage": {
+    "empty": "Noch keine Beiträge.",
+    "paginationAriaLabel": "Blogseiten"
+  },
+  "blogPostPage": {
+    "depthToggle": {
+      "ariaLabel": "Lesetiefe",
+      "skim": "30 s",
+      "read": "Lesen",
+      "deep": "Vertiefen"
+    },
+    "skimPanel": {
+      "label": "Zusammenfassung in 30 Sekunden",
+      "readFullArticle": "Ganzen Artikel lesen"
+    },
+    "asideKind": {
+      "WHY_NOT": "Warum nicht X",
+      "DIGRESSION": "Exkurs",
+      "CONTEXT": "Kontext"
+    },
+    "backToTop": {
+      "ariaLabel": "Nach oben"
+    }
+  },
+  "postContentsRail": {
+    "label": "Themen"
+  },
+  "topicPage": {
+    "empty": "Noch keine Beiträge zu {name}.",
+    "paginationAriaLabel": "Seiten zu {name}"
+  },
+  "tagPage": {
+    "empty": "Noch keine Beiträge mit dem Schlagwort {name}.",
+    "paginationAriaLabel": "Seiten zu {name}"
+  },
+  "taxonomyListModule": {
+    "topics": {
+      "postsCount": "{count, plural, one {1 Beitrag} other {{count} Beiträge}}",
+      "latestPostsLabel": "Neueste Beiträge zu {name}",
+      "empty": "Noch keine Themen."
+    },
+    "tags": {
+      "postsCount": "{count, plural, one {1 Beitrag} other {{count} Beiträge}}",
+      "latestPostsLabel": "Neueste Beiträge zu {name}",
+      "empty": "Noch keine Schlagwörter."
+    }
+  },
+  "rss": {
+    "fallbackTitle": "Blog",
+    "feedLinkLabel": "RSS-Feed"
+  },
+  "authMenu": {
+    "signIn": "Anmelden",
+    "panelAriaLabel": "Anmeldeoptionen",
+    "signInHeading": "Anmelden",
+    "accountHeading": "Konto",
+    "chooseProviderPrompt": "Wählen Sie eine Anmeldemethode",
+    "continueWithGithub": "Weiter mit GitHub",
+    "continueWithGoogle": "Weiter mit Google",
+    "continueWithEmail": "Weiter mit E-Mail",
+    "redirectHint": "Sie kehren zu diesem Artikel zurück — Ihre Stelle geht nie verloren.",
+    "emailAriaLabel": "E-Mail-Adresse",
+    "emailPlaceholder": "name@beispiel.de",
+    "sendLink": "Link senden",
+    "sending": "Wird gesendet…",
+    "checkYourInbox": "Prüfen Sie Ihr Postfach auf einen Anmeldelink.",
+    "emailError": "Der Link konnte nicht gesendet werden. Bitte versuchen Sie es erneut.",
+    "oauthError": "Die Anmeldung ist fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    "accountMenuAriaLabel": "Kontomenü",
+    "signOut": "Abmelden",
+    "loadingAccountStatus": "Kontostatus wird geladen",
+    "myBookmarks": "Meine Lesezeichen",
+    "accountSettings": "Kontoeinstellungen"
+  },
+  "toastProvider": {
+    "viewportAriaLabel": "Benachrichtigungen",
+    "dismissLabel": "Benachrichtigung schließen",
+    "mergeCountSuffix": " ×{count}"
+  },
+  "bookmarkButton": {
+    "save": "Merken",
+    "saved": "Gemerkt",
+    "saveAriaLabel": "Beitrag merken",
+    "removeAriaLabel": "Lesezeichen entfernen",
+    "error": "Das konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+    "errorUnavailable": "Lesezeichen sind auf dieser Website derzeit nicht verfügbar.",
+    "toastSavedMessage": "Zu Lesezeichen hinzugefügt",
+    "toastRemovedMessage": "Aus Lesezeichen entfernt",
+    "toastRevertedMessage": "Rückgängig gemacht",
+    "toastUndoLabel": "Rückgängig",
+    "toastRetryLabel": "Erneut versuchen"
+  },
+  "bookmarksPage": {
+    "title": "Meine Lesezeichen",
+    "listHeading": "Gemerkte Beiträge",
+    "metaDescription": "Beiträge, die Sie für später gemerkt haben.",
+    "empty": "Noch keine Lesezeichen — merken Sie sich einen Beitrag, um ihn hier wiederzufinden.",
+    "hint": "{count, plural, one {1 gemerkt} other {{count} gemerkt}}"
+  },
+  "newsletterForm": {
+    "submitLabel": "Abonnieren",
+    "emailAriaLabel": "E-Mail-Adresse",
+    "placeholder": "name@beispiel.de",
+    "successMessage": "Fast geschafft — prüfen Sie Ihr Postfach, um zu bestätigen.",
+    "errorInvalid": "Geben Sie eine gültige E-Mail-Adresse ein.",
+    "errorAlreadySubscribed": "Diese E-Mail-Adresse ist bereits angemeldet.",
+    "errorServer": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
+    "errorUnavailable": "Diese Website nimmt derzeit keine neuen Anmeldungen an."
+  },
+  "newsletterConfirm": {
+    "confirmedTitle": "Anmeldung bestätigt",
+    "confirmedMessage": "Ihre Anmeldung ist bestätigt. Vielen Dank!",
+    "invalidTitle": "Ungültiger Bestätigungslink",
+    "invalidMessage": "Dieser Bestätigungslink ist ungültig oder abgelaufen.",
+    "errorTitle": "Etwas ist schiefgelaufen",
+    "errorMessage": "Wir konnten Ihre Anmeldung nicht bestätigen. Bitte versuchen Sie es später erneut.",
+    "unavailableTitle": "Bestätigung derzeit nicht möglich",
+    "unavailableMessage": "Diese Website nimmt derzeit keine Änderungen an, daher konnten wir deinen Bestätigungslink nicht verarbeiten.",
+    "returnHome": "Zur Startseite"
+  },
+  "newsletterUnsubscribe": {
+    "confirmTitle": "Vom Newsletter abmelden",
+    "confirmMessage": "Klicken Sie auf die Schaltfläche unten, um zu bestätigen, dass Sie keine Newsletter mehr von uns erhalten möchten.",
+    "confirmButtonLabel": "Abmeldung bestätigen",
+    "successTitle": "Sie sind abgemeldet",
+    "successMessage": "Sie erhalten keine Newsletter mehr von uns.",
+    "invalidTitle": "Link nicht mehr gültig",
+    "invalidMessage": "Dieser Abmeldelink ist nicht mehr gültig — möglicherweise sind Sie bereits abgemeldet.",
+    "errorTitle": "Etwas ist schiefgelaufen",
+    "errorMessage": "Wir konnten dich nicht abmelden. Bitte versuche es später erneut.",
+    "returnHome": "Zur Startseite"
+  },
+  "accountPage": {
+    "title": "Konto",
+    "metaDescription": "Verwalten Sie Ihre Privatsphäre und Daten — exportieren oder löschen Sie Ihr Konto.",
+    "privacy": {
+      "heading": "Datenschutz",
+      "exportLabel": "Meine Daten exportieren",
+      "exportDescription": "Laden Sie Ihr Profil und Ihre Lesezeichen als ein JSON-Archiv herunter.",
+      "exportButton": "Export anfordern",
+      "deleteLabel": "Konto löschen",
+      "deleteDescription": "Unwiderruflich. Ihr Profil und Ihre Lesezeichen werden gelöscht und alle Sitzungen beendet. Geben Sie Ihren Benutzernamen ein, um die Schaltfläche zu aktivieren.",
+      "deleteConfirmAriaLabel": "Geben Sie Ihren Benutzernamen ein, um das Löschen zu bestätigen",
+      "deleteConfirmPlaceholder": "Zum Bestätigen {handle} eingeben",
+      "deleteButton": "Konto löschen",
+      "deleteToastLoadingMessage": "Ihr Konto wird gelöscht…",
+      "deleteToastSuccessMessage": "Ihr Konto wurde gelöscht.",
+      "deleteError": "Ihr Konto konnte nicht gelöscht werden. Bitte versuchen Sie es erneut."
+    },
+    "newsletter": {
+      "heading": "Newsletter",
+      "label": "Newsletter",
+      "activeBadge": "Abonniert",
+      "activeDescriptionPrefix": "Wöchentliche Beiträge an",
+      "activeDescriptionSuffix": "(die E-Mail-Adresse Ihres Kontos — in v1 schreibgeschützt).",
+      "unsubscribeButton": "Abmelden",
+      "pendingBadge": "Bestätigung ausstehend",
+      "pendingDescription": "Der Bestätigungslink wurde noch nicht angeklickt. Senden Sie ihn erneut, falls er nie angekommen ist.",
+      "resendButton": "Bestätigung erneut senden",
+      "unsubscribeToastLoadingMessage": "Abmeldung läuft…",
+      "unsubscribeToastSuccessMessage": "Sie wurden abgemeldet.",
+      "unsubscribeError": "Die Abmeldung ist fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "resendToastLoadingMessage": "Bestätigungs-E-Mail wird erneut gesendet…",
+      "resendToastSuccessMessage": "Bestätigungs-E-Mail erneut gesendet.",
+      "resendError": "Die Bestätigungs-E-Mail konnte nicht erneut gesendet werden. Bitte versuchen Sie es erneut.",
+      "resendUnavailable": "Das erneute Senden ist auf dieser Website derzeit nicht verfügbar."
+    },
+    "identity": {
+      "heading": "Verknüpfte Konten",
+      "githubLabel": "GitHub",
+      "googleLabel": "Google",
+      "emailLinkLabel": "E-Mail-Link",
+      "linkedStatus": "Verknüpft",
+      "linkButton": "Verknüpfen",
+      "unlinkButton": "Trennen",
+      "lastMethodNotice": "Letzte verbleibende Methode — kann nicht getrennt werden",
+      "unlinkToastLoadingMessage": "Ihr Konto wird getrennt…",
+      "unlinkToastSuccessMessage": "Konto getrennt.",
+      "unlinkError": "Das Trennen ist fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "unlinkLastMethodError": "Das ist Ihre einzige verbleibende Anmeldemethode — verknüpfen Sie zuerst eine andere, bevor Sie diese trennen.",
+      "displayNameLabel": "Anzeigename",
+      "displayNameDescription": "Ersetzt Ihren Benutzernamen beim Anbieter überall dort, wo Ihre Kommentare erscheinen.",
+      "displayNameAriaLabel": "Anzeigename",
+      "saveButton": "Speichern",
+      "saveToastLoadingMessage": "Ihr Anzeigename wird gespeichert…",
+      "saveToastSuccessMessage": "Anzeigename aktualisiert.",
+      "saveError": "Ihr Anzeigename konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut."
+    }
+  },
+  "carousel": {
+    "previousAriaLabel": "Vorherige Folie",
+    "nextAriaLabel": "Nächste Folie",
+    "regionLabel": "Karussell {title}"
+  },
+  "pricingModule": {
+    "free": "Kostenlos",
+    "from": "Ab",
+    "compareAtLabel": "Regulärer Preis",
+    "period": {
+      "ONE_TIME": "einmalig",
+      "HOUR": "pro Stunde",
+      "SESSION": "pro Sitzung",
+      "MONTH": "pro Monat",
+      "YEAR": "pro Jahr"
+    },
+    "tabs": {
+      "MONTH": "Monatlich",
+      "YEAR": "Jährlich"
+    },
+    "periodSwitchLabel": "Abrechnungszeitraum"
+  }
+}

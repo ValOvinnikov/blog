@@ -55,9 +55,10 @@ const config: StorybookConfig = {
     config.resolve ??= {};
     config.resolve.alias = {
       ...config.resolve.alias,
-      '@web/server/newsletter/newsletter-actions': fileURLToPath(
-        new URL('./mocks/newsletter-actions.ts', import.meta.url),
-      ),
+      '@web/server/newsletter/newsletter-actions/newsletter-actions':
+        fileURLToPath(
+          new URL('./mocks/newsletter-actions.ts', import.meta.url),
+        ),
       // `IdentitySection`/`NewsletterSection` (the account-page section
       // wrappers) import this. Their folder's barrel also re-exports the
       // pure view alongside the wrapper, so any story that pulls the view
@@ -72,29 +73,19 @@ const config: StorybookConfig = {
       '@web/utils/report-client-error': fileURLToPath(
         new URL('./mocks/report-client-error.ts', import.meta.url),
       ),
-      // `TopicsPage` fetches its page document through this loader, which
-      // chains into `getTenantSanityContext` (reads `headers()`) and a live
-      // Sanity call — neither works in Storybook.
-      '@web/server/topics-index/get-topics-index-page': fileURLToPath(
-        new URL('./mocks/get-topics-index-page.ts', import.meta.url),
+      // `TopicIndexPage`/`TagIndexPage` (and their breadcrumbs, via
+      // `buildBreadcrumbListSchema`) read the request context — which throws
+      // outside a real Next.js request — before reaching `@blog/service`.
+      '@web/server/request-context/request-context': fileURLToPath(
+        new URL('./mocks/request-context.ts', import.meta.url),
       ),
-      // `TopicsPage` renders this for its breadcrumb trail, which resolves
-      // the request tenant through `@blog/db` for its base URL — no
-      // database connection is available in Storybook.
-      '@web/components/features/topics-index/topics-index-breadcrumbs':
+      '@web/server/topic-index/get-topic-index-page/get-topic-index-page':
         fileURLToPath(
-          new URL('./mocks/topics-index-breadcrumbs.tsx', import.meta.url),
+          new URL('./mocks/get-topic-index-page.ts', import.meta.url),
         ),
-      // `TagsPage` fetches its page document through this loader, same
-      // live-Sanity problem as the topic-index loader above.
-      '@web/server/tags-index/get-tags-index-page': fileURLToPath(
-        new URL('./mocks/get-tags-index-page.ts', import.meta.url),
-      ),
-      // `TagsPage` renders this for its breadcrumb trail, same live-database
-      // problem as the topic-index breadcrumbs above.
-      '@web/components/features/tags-index/tags-index-breadcrumbs':
+      '@web/server/tag-index/get-tag-index-page/get-tag-index-page':
         fileURLToPath(
-          new URL('./mocks/tags-index-breadcrumbs.tsx', import.meta.url),
+          new URL('./mocks/get-tag-index-page.ts', import.meta.url),
         ),
     };
     const encryptSecretMockPath = fileURLToPath(

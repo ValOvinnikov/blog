@@ -14,6 +14,7 @@ import { Hero, type THeroProps } from '@blog/ui/components/organisms/hero';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { Section } from '@web/components/shared/section';
+import { resolveHeroLayout } from '@web/utils/resolve-hero-layout';
 
 export interface IHeroModuleShellProps extends IWithDataTestId {
   brandVariant: TBrandVariant;
@@ -27,7 +28,6 @@ export interface IHeroModuleShellProps extends IWithDataTestId {
   mediaOrder: TMaybeUndefined<TMediaOrder>;
   layout: TMaybeUndefined<TLayout>;
   ctaButtons: TCtaButton[];
-  ctaClassName?: string;
   sanityImage: TMaybeUndefined<ISanityImage>;
   children?: THeroProps['children'];
 }
@@ -45,17 +45,20 @@ export const HeroModuleShell = ({
   layout,
   dataTestId,
   ctaButtons,
-  ctaClassName,
   sanityImage,
   children,
 }: IHeroModuleShellProps) => {
+  const isBanner = variant === HERO_VARIANT.BANNER;
+  const {
+    sectionBrandVariant,
+    sectionLayout,
+    heroSpacingTop,
+    heroSpacingBottom,
+  } = resolveHeroLayout({ variant, brandVariant, layout });
   const heroChildren = [
     ctaButtons.length > 0 && (
-      <Hero.Cta className={ctaClassName}>
-        <ActionGroup
-          actions={ctaButtons}
-          isOnDark={variant === HERO_VARIANT.BANNER}
-        />
+      <Hero.Cta>
+        <ActionGroup actions={ctaButtons} isOnDark={isBanner} />
       </Hero.Cta>
     ),
     sanityImage && (
@@ -67,7 +70,7 @@ export const HeroModuleShell = ({
           sizes="(min-width: 1024px) 50vw, 100vw"
           priority={true}
           className="size-full object-cover"
-          alt={variant === HERO_VARIANT.BANNER ? '' : undefined}
+          alt={isBanner ? '' : undefined}
         />
       </Hero.Media>
     ),
@@ -76,8 +79,8 @@ export const HeroModuleShell = ({
 
   return (
     <Section
-      brandVariant={brandVariant}
-      layout={layout}
+      brandVariant={sectionBrandVariant}
+      layout={sectionLayout}
       titleId={titleId}
       dataTestId={dataTestId}
     >
@@ -91,6 +94,8 @@ export const HeroModuleShell = ({
         contentPosition={contentPosition}
         contentAlignment={contentAlignment}
         mediaOrder={mediaOrder}
+        spacingTop={heroSpacingTop}
+        spacingBottom={heroSpacingBottom}
       >
         {heroChildren}
       </Hero>

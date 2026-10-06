@@ -13,6 +13,7 @@ export type TUpdateSettingsFeaturesInput = {
   bookmarksEnabled?: boolean;
   newsletterEnabled?: boolean;
   analyticsEnabled?: boolean;
+  consentBannerEnabled?: boolean;
 };
 
 type TSettingsFeaturesWritable = Partial<typeof settingsFeatures.$inferInsert>;
@@ -36,6 +37,9 @@ function presentFields(
   }
   if (input.analyticsEnabled !== undefined) {
     fields.analyticsEnabled = input.analyticsEnabled;
+  }
+  if (input.consentBannerEnabled !== undefined) {
+    fields.consentBannerEnabled = input.consentBannerEnabled;
   }
 
   return fields;

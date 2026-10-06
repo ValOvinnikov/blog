@@ -8,7 +8,6 @@ const STARTER_DOCUMENT_IDS = {
   NAVIGATION: 'provisioning.settings.navigation',
   FOOTER: 'provisioning.settings.footer',
   THEME: 'provisioning.settings.theme',
-  NEWSLETTER: 'provisioning.settings.newsletter',
   SITE: 'provisioning.settings.site',
   HOME: 'provisioning.settings.home',
 } as const;
@@ -50,18 +49,11 @@ export function buildStarterDocuments(
     preset: PRESET_ID.CONSOLE,
   };
 
-  const newsletter: TSanityDocument = {
-    _id: STARTER_DOCUMENT_IDS.NEWSLETTER,
-    _type: 'settings_newsletter',
-    title: 'Newsletter',
-    heading: 'Subscribe for updates',
-    trustCues: ['No spam', 'Unsubscribe anytime'],
-  };
-
   const site: TSanityDocument = {
     _id: STARTER_DOCUMENT_IDS.SITE,
     _type: 'settings_site',
     title: 'Site Settings',
+    currency: 'USD',
     brand: {
       _type: 'brand',
       name: tenant.name,
@@ -90,5 +82,5 @@ export function buildStarterDocuments(
     },
   };
 
-  return [navigation, footer, theme, newsletter, site, home];
+  return [navigation, footer, theme, site, home];
 }

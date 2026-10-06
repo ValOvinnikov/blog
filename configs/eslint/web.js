@@ -31,7 +31,7 @@ const sanityRestrictedGroup = {
 const webTestingRestrictedGroup = {
   group: ['@web/testing', '@web/testing/*', '**/testing/**'],
   message:
-    'src/testing/ holds test-only helpers (custom renders, fixtures) that would drag @testing-library/react and its fixtures into the production bundle — import it only from *.test.{ts,tsx}, other src/testing files, *.stories.{ts,tsx}, or .storybook config.',
+    'src/testing/ holds test-only helpers (custom renders, fixtures) that would drag @testing-library/react and its fixtures into the production bundle — import it only from *.test.{ts,tsx}, other src/testing files, *.stories.{ts,tsx}, __mocks__ fakes, or .storybook config.',
 };
 
 const TESTING_IMPORT_ALLOWED_FILES = [
@@ -39,6 +39,7 @@ const TESTING_IMPORT_ALLOWED_FILES = [
   'src/testing/**/*.{ts,tsx}',
   '**/*.stories.{ts,tsx}',
   '.storybook/**/*.{ts,tsx}',
+  '**/__mocks__/*.{ts,tsx}',
 ];
 
 /** @type {import("eslint").Linter.Config[]} */
@@ -54,7 +55,7 @@ export default [
       'check-file/folder-naming-convention': [
         'error',
         {
-          'src/!(app)/**/': 'KEBAB_CASE',
+          'src/!(app)/**/!(__mocks__)/': 'KEBAB_CASE',
         },
       ],
     },
@@ -101,7 +102,13 @@ export default [
   {
     // Next.js reserved exports (generateMetadata, route verbs, ...) stay as
     // function declarations — framework API surface, not app code.
-    files: ['**/page.tsx', '**/layout.tsx', '**/route.ts', '**/not-found.tsx'],
+    files: [
+      '**/page.tsx',
+      '**/layout.tsx',
+      '**/route.ts',
+      '**/not-found.tsx',
+      '**/global-not-found.tsx',
+    ],
     rules: {
       'func-style': 'off',
     },

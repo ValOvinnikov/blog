@@ -1,20 +1,22 @@
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import { auth } from '@platform/server/auth/auth';
+import { logger } from '@platform/utils/logger/logger';
+import type { Session } from 'next-auth';
 
-const { authMock, insertAuditEventMock, loggerErrorMock } = vi.hoisted(() => ({
-  authMock: vi.fn(),
+const { insertAuditEventMock } = vi.hoisted(() => ({
   insertAuditEventMock: vi.fn(),
-  loggerErrorMock: vi.fn(),
 }));
 
-vi.mock('@platform/server/auth/auth', () => ({ auth: authMock }));
+vi.mock('@platform/server/auth/auth');
 
-vi.mock('@platform/utils/logger/logger', () => ({
-  logger: { error: loggerErrorMock },
-}));
+vi.mock('@platform/utils/logger/logger');
 
 vi.mock('@blog/db', () => ({
   queries: { auditEvents: { insertAuditEvent: insertAuditEventMock } },
 }));
+
+const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
+const loggerErrorMock = vi.mocked(logger.error);
 
 describe('recordAuditEvent', () => {
   beforeEach(() => {

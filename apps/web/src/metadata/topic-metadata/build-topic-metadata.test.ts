@@ -1,22 +1,24 @@
+import { LOCALE_ISO_CODES } from '@blog/config';
 import { urlForSanityImage } from '@blog/service';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import {
+  DEFAULT_REQUEST_CONTEXT,
+  DEFAULT_TENANT_SANITY_CONTEXT,
+} from '@web/testing/shared/tenant/fixtures';
 
 import { buildTopicMetadata } from './build-topic-metadata';
 
-const { getTopicPageMock, getTenantSanityContextMock } = vi.hoisted(() => ({
+const { getTopicPageMock } = vi.hoisted(() => ({
   getTopicPageMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
 }));
 
-vi.mock('@web/server/topic/get-topic-page', () => ({
+vi.mock('@web/server/topic/get-topic-page/get-topic-page', () => ({
   getTopicPage: getTopicPageMock,
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
+vi.mock('@web/server/request-context/request-context');
 
 const ogImage = makeSanityImage();
 const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
@@ -35,28 +37,26 @@ const seo = makeSeo({
 describe('buildTopicMetadata', () => {
   beforeEach(() => {
     getTopicPageMock.mockReset();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
-  it('forwards the slug and tenant to getTopicPage — the same cached loader TopicPage reads', async () => {
+  it('forwards the slug to getTopicPage, the loader TopicPage reads', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,
-      data: { topic: {}, modules: [], seo },
+      data: { topic: {}, modules: [], seo, translations: [] },
     });
 
-    await buildTopicMetadata('engineering', 'tenant-1');
+    await buildTopicMetadata('engineering');
 
-    expect(getTopicPageMock).toHaveBeenCalledWith('engineering', 'tenant-1');
+    expect(getTopicPageMock).toHaveBeenCalledWith('engineering');
   });
 
   it('builds page-1 metadata from the resolved seo, self-canonical to /topics/[slug]', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,
-      data: { topic: {}, modules: [], seo },
+      data: { topic: {}, modules: [], seo, translations: [] },
     });
 
-    const metadata = await buildTopicMetadata('engineering', 'tenant-1');
+    const metadata = await buildTopicMetadata('engineering');
 
     expect(metadata.title).toBe('Engineering');
     expect(metadata.description).toBe('Posts about building things.');
@@ -76,18 +76,18 @@ describe('buildTopicMetadata', () => {
       error: new Error('boom'),
     });
 
-    const metadata = await buildTopicMetadata('engineering', 'tenant-1');
+    const metadata = await buildTopicMetadata('engineering');
 
     expect(metadata).toEqual({});
   });
 
-  it('builds page-N metadata with a "– Page N" suffix, self-canonical to /topics/[slug]/page/N — never /topics/[slug]', async () => {
+  it('builds page-N metadata with a "– Page N" suffix, self-canonical to its own URL', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,
-      data: { topic: {}, modules: [], seo },
+      data: { topic: {}, modules: [], seo, translations: [] },
     });
 
-    const metadata = await buildTopicMetadata('engineering', 'tenant-1', 2);
+    const metadata = await buildTopicMetadata('engineering', 2);
 
     expect(metadata.title).toBe('Engineering – Page 2');
     expect(metadata.openGraph?.title).toBe('Engineering OG – Page 2');
@@ -95,13 +95,18 @@ describe('buildTopicMetadata', () => {
     expect(metadata.alternates?.canonical).not.toBe('/topics/engineering');
   });
 
-  it('leaves ogTitle omitted on page 2+ when unauthored, rather than suffixing "undefined"', async () => {
+  it('leaves ogTitle omitted on page 2+ when unauthored, never suffixing "undefined"', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,
-      data: { topic: {}, modules: [], seo: makeSeo({ ogTitle: undefined }) },
+      data: {
+        topic: {},
+        modules: [],
+        seo: makeSeo({ ogTitle: undefined }),
+        translations: [],
+      },
     });
 
-    const metadata = await buildTopicMetadata('engineering', 'tenant-1', 2);
+    const metadata = await buildTopicMetadata('engineering', 2);
 
     expect(metadata.openGraph?.title).toBeUndefined();
     expect(metadata.twitter?.title).toBeUndefined();
@@ -113,7 +118,7 @@ describe('buildTopicMetadata', () => {
       error: new Error('boom'),
     });
 
-    const metadata = await buildTopicMetadata('missing', 'tenant-1', 2);
+    const metadata = await buildTopicMetadata('missing', 2);
 
     expect(metadata).toEqual({});
   });
@@ -122,10 +127,60 @@ describe('buildTopicMetadata', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getTopicPageMock.mockResolvedValue({ ok: true, data: undefined });
 
-    const metadata = await buildTopicMetadata('missing', 'tenant-1');
+    const metadata = await buildTopicMetadata('missing');
 
     expect(metadata).toEqual({});
     expect(errorSpy).not.toHaveBeenCalled();
     errorSpy.mockRestore();
+  });
+});
+
+describe('buildTopicMetadata per language', () => {
+  const { EN, NL, DE } = LOCALE_ISO_CODES;
+
+  beforeEach(() => {
+    getTopicPageMock.mockReset();
+    vi.mocked(getRequestContext).mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      locale: NL,
+      liveLocales: [EN, NL],
+    });
+    getTopicPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        topic: {},
+        modules: [],
+        seo,
+        translations: [
+          { language: EN, slug: 'design' },
+          { language: NL, slug: 'ontwerp' },
+          { language: DE, slug: 'gestaltung' },
+        ],
+      },
+    });
+  });
+
+  afterEach(() => {
+    vi.mocked(getRequestContext).mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
+  });
+
+  it('lists each live language under its own slug as hreflang, canonical to its own prefixed address', async () => {
+    const metadata = await buildTopicMetadata('ontwerp');
+
+    expect(metadata.alternates).toMatchObject({
+      canonical: '/nl/topics/ontwerp',
+      languages: {
+        en: '/topics/design',
+        nl: '/nl/topics/ontwerp',
+        'x-default': '/topics/design',
+      },
+    });
+  });
+
+  it('lists no hreflang past page 1', async () => {
+    const metadata = await buildTopicMetadata('ontwerp', 2);
+
+    expect(metadata.alternates?.canonical).toBe('/nl/topics/ontwerp/page/2');
+    expect(metadata.alternates?.languages).toBeUndefined();
   });
 });

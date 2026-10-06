@@ -1,8 +1,9 @@
 import { TAXONOMY_KIND, TAXONOMY_SORT } from '@blog/config';
-import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
-import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/published-post';
-import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
-import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
+import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/post/published-post';
+import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
+import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { postLinkFragment } from '@blog/service/shared/fragments/post/post-link';
 import { tagWithPostCountFragment } from '@blog/service/shared/fragments/tag/tag';
 import { topicWithPostCountFragment } from '@blog/service/shared/fragments/topic/topic';
@@ -23,7 +24,6 @@ const showLatestPostsParser = z.boolean();
 
 const topicEntriesQuery = q.star
   .filterByType('blog_topic')
-  .order('title asc')
   .project((sub) => ({
     ...topicWithPostCountFragment,
     latestPosts: sub.star
@@ -33,11 +33,11 @@ const topicEntriesQuery = q.star
       .order('publishedAt desc')
       .slice(0, LATEST_POSTS_LIMIT)
       .project(postLinkFragment),
-  }));
+  }))
+  .order('title asc');
 
 const tagEntriesQuery = q.star
   .filterByType('blog_tag')
-  .order('title asc')
   .project((sub) => ({
     ...tagWithPostCountFragment,
     latestPosts: sub.star
@@ -47,7 +47,8 @@ const tagEntriesQuery = q.star
       .order('publishedAt desc')
       .slice(0, LATEST_POSTS_LIMIT)
       .project(postLinkFragment),
-  }));
+  }))
+  .order('title asc');
 
 export const taxonomyListModuleQuery = q
   .parameters<TModuleQueryParams>()
@@ -58,10 +59,10 @@ export const taxonomyListModuleQuery = q
     brandVariant: sub.field('brandVariant').notNull(),
     headingBlock: sub
       .field('headingBlock')
-      .project(headingBlockFragment)
+      .project(moduleHeadingBlockFragment)
       .notNull(),
-    layout: sub.field('layout').project(layoutFragment).nullable(true),
-    contentAlignment: sub.field('contentAlignment').nullable(true),
+    ...moduleWideLayoutFragment,
+    ...moduleContentAlignmentFragment,
     taxonomy: sub.raw('taxonomy', taxonomyParser),
     sortOrder: sub.raw(
       `coalesce(sortOrder, "${TAXONOMY_SORT.ALPHABETICAL}")`,

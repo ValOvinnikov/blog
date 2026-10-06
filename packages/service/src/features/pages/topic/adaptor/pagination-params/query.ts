@@ -1,25 +1,21 @@
-import { q } from '@blog/service/sanity/query';
-import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/published-post';
-import { z } from 'zod';
+import type { TLocaleIsoCode } from '@blog/config/constants';
+import { q } from '@blog/service/sanity/query/query';
+import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/post/published-post';
 
-const FIRST_POST_LIST_PAGE_SIZE_EXPRESSION =
-  'modules[]->[_type == "module_postList"][0].pageSize';
-
-// `^.topic._ref` (GROQ's parent-scope operator) correlates each `page_post`
-// back to the enclosing `page_topic` document's own topic reference within
-// this per-item projection — one round-trip for every topic page's slug,
-// post count, and archive page size, no per-slug fan-out. Matching by
-// reference identity (`references(...)`), not slug, avoids reading the
-// deprecated `blog_topic.slug` and stays correct even if `page_topic.slug`
-// (independently editable) drifts from the referenced topic's slug.
-export const topicPaginationParamsQuery = q.star
-  .filterByType('page_topic')
+export const topicPaginationParamsQuery = q
+  .parameters<{ liveLocales: TLocaleIsoCode[] }>()
+  .star.filterByType('page_topic')
+  // groqd's typed filterBy has no `in` operator
+  .filterRaw('language in $liveLocales')
   .project((sub) => ({
     slug: sub.field('slug.current').notNull(),
-    pageSize: sub.raw(
-      FIRST_POST_LIST_PAGE_SIZE_EXPRESSION,
-      z.number().nullable(),
-    ),
+    language: sub.field('language').notNull(),
+    moduleRefs: sub
+      .field('template')
+      .deref()
+      .field('modules[]')
+      .project(() => ({ _ref: true }))
+      .nullable(true),
     postCount: sub
       .count(
         sub.star

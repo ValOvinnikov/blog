@@ -1,7 +1,11 @@
 import { LINK_TYPE } from '@blog/config';
-import { q } from '@blog/service/sanity/query';
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { q } from '@blog/service/sanity/query/query';
+import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 
 import { inlineLinkFragment } from './inline-link';
+
+const { EN } = LOCALE_ISO_CODES;
 
 const inlineLinkDocQuery = q.star
   .filterByType('inlineLink')
@@ -23,9 +27,28 @@ describe('inlineLinkFragment', () => {
     expect(inlineLinkDocQuery.parse(raw)).toEqual(raw);
   });
 
-  it('resolves the blog_topic branch from the topic page referencing it, falling back to the topic own slug', () => {
-    expect(inlineLinkDocQuery.query).toContain(
-      '_type == "blog_topic" => coalesce(*[_type == "page_topic" && topic._ref == ^._id][0].slug.current, slug.current)',
-    );
+  it('links a nested landing page to its full path', async () => {
+    const dataset = [
+      {
+        _id: 'link-1',
+        _type: 'inlineLink',
+        label: 'FAQ',
+        linkType: LINK_TYPE.INTERNAL,
+        internalReference: { _type: 'reference', _ref: 'faq' },
+      },
+      { _id: 'modules', _type: 'page_landing', slug: { current: 'modules' } },
+      {
+        _id: 'faq',
+        _type: 'page_landing',
+        slug: { current: 'faq' },
+        parent: { _type: 'reference', _ref: 'modules' },
+      },
+    ];
+
+    expect(
+      await evaluateGroqExpression(inlineLinkDocQuery.query, dataset, null, {
+        locale: EN,
+      }),
+    ).toMatchObject({ internalReference: { slug: 'modules/faq' } });
   });
 });

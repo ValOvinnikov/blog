@@ -1,4 +1,3 @@
-import type { ITenantLocalizedParams } from '@blog/config';
 import { BlogPostingSchema } from '@web/components/features/post/blog-posting-schema';
 import { PostArticle } from '@web/components/features/post/post-article';
 import { PostBreadcrumbs } from '@web/components/features/post/post-breadcrumbs';
@@ -6,13 +5,13 @@ import { BackToTopButton } from '@web/components/shared/back-to-top-button';
 import { DepthToggle } from '@web/components/shared/depth-toggle';
 import { SkimPanel } from '@web/components/shared/skim-panel';
 import { DepthProvider } from '@web/context/depth-provider';
-import { getPostPage } from '@web/server/post/get-post-page';
+import { getPostPage } from '@web/server/post/get-post-page/get-post-page';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 
 import { BlogPostModuleRenderer } from './blog-post-module-renderer';
 import { blogPostPageVariants } from './blog-post-page-variants';
 
-type TBlogPostPageProps = ITenantLocalizedParams & { slug: string };
+type TBlogPostPageProps = { slug: string };
 
 const s = blogPostPageVariants();
 
@@ -24,12 +23,8 @@ const s = blogPostPageVariants();
  * composes every other concern as a self-fetching part reading the same
  * cached `getPostPage` loader.
  */
-export const BlogPostPage = async ({
-  slug,
-  locale,
-  tenant,
-}: TBlogPostPageProps) => {
-  const result = await getPostPage(slug, tenant);
+export const BlogPostPage = async ({ slug }: TBlogPostPageProps) => {
+  const result = await getPostPage(slug);
   const post = guardPageLoaderResult(result, 'blog_post_page.fetch_failed', {
     slug,
   });
@@ -38,26 +33,30 @@ export const BlogPostPage = async ({
 
   return (
     <>
-      <BlogPostingSchema slug={slug} tenant={tenant} />
-      <PostBreadcrumbs slug={slug} tenant={tenant} />
+      <BlogPostingSchema slug={slug} />
+      <PostBreadcrumbs slug={slug} />
 
       <main className={s.root()}>
-        <DepthProvider hasSkim={hasSkim} hasDeep={hasAsides}>
-          <DepthToggle
-            hasSkim={hasSkim}
-            hasDeep={hasAsides}
-            className={s.depthToggle()}
-          />
-          <PostArticle slug={slug} tenant={tenant} />
-          <SkimPanel takeaways={postTakeaways} />
-        </DepthProvider>
+        <div className={s.article()}>
+          <DepthProvider hasSkim={hasSkim} hasDeep={hasAsides}>
+            <DepthToggle
+              hasSkim={hasSkim}
+              hasDeep={hasAsides}
+              className={s.depthToggle()}
+            />
+            <PostArticle slug={slug} />
+            <SkimPanel takeaways={postTakeaways} />
+          </DepthProvider>
+        </div>
 
-        <BlogPostModuleRenderer
-          modules={modules}
-          locale={locale}
-          tenant={tenant}
-          context={{ post: { id } }}
-        />
+        {modules.length > 0 && (
+          <div className={s.modules()}>
+            <BlogPostModuleRenderer
+              modules={modules}
+              context={{ post: { id } }}
+            />
+          </div>
+        )}
       </main>
 
       <BackToTopButton />

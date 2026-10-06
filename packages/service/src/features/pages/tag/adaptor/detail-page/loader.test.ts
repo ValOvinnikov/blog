@@ -1,4 +1,6 @@
+import { getFaqQuestions } from '@blog/service/shared/adaptors/faq-questions/loader';
 import { mockRun } from '@blog/service/testing/mock-run-query';
+import { makeRawFaqModuleQuestions } from '@blog/service/testing/modules/fixtures';
 import { makeRawTagPage } from '@blog/service/testing/pages/fixtures';
 import {
   makeRawHeadingBlock,
@@ -8,8 +10,16 @@ import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getTagPage } from './loader';
 
-vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
+vi.mock('@blog/service/shared/adaptors/faq-questions/loader', () => ({
+  getFaqQuestions: vi.fn(),
+}));
+
+const mockFaqQuestions = vi.mocked(getFaqQuestions);
+
+vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
+  ...(await importOriginal<
+    typeof import('@blog/service/sanity/query/query')
+  >()),
   runQuery: vi.fn(),
 }));
 
@@ -129,6 +139,44 @@ describe('getTagPage', () => {
     await expect(getTagPage('typescript', tenant)).rejects.toThrow();
   });
 
+  it('builds the faqs from the FAQ modules, in page order, with one request', async () => {
+    mockRun.mockResolvedValueOnce(
+      makeRawTagPage({
+        modules: [
+          { _id: 'faq-b', _type: 'module_faq' },
+          { _id: 'cta-1', _type: 'module_cta' },
+          { _id: 'faq-a', _type: 'module_faq' },
+        ],
+      }),
+    );
+    mockFaqQuestions.mockResolvedValueOnce([makeRawFaqModuleQuestions()]);
+
+    const result = await getTagPage('typescript', tenant);
+    if (!result) throw new Error('expected a tag page');
+
+    expect(mockFaqQuestions).toHaveBeenCalledExactlyOnceWith(
+      ['faq-b', 'faq-a'],
+      tenant,
+    );
+    expect(result.faqs).toEqual([
+      {
+        id: 'block-faq-1',
+        question: 'How long does onboarding take?',
+        answer: 'Most teams are live within a week.',
+      },
+    ]);
+  });
+
+  it('makes no FAQ-questions request when the page has no FAQ module', async () => {
+    mockRun.mockResolvedValueOnce(makeRawTagPage({ modules: [] }));
+
+    const result = await getTagPage('typescript', tenant);
+    if (!result) throw new Error('expected a tag page');
+
+    expect(mockFaqQuestions).not.toHaveBeenCalled();
+    expect(result.faqs).toEqual([]);
+  });
+
   it('passes the slug as a query parameter', async () => {
     mockRun.mockResolvedValueOnce(makeRawTagPage());
 
@@ -159,7 +207,11 @@ describe('getTagPage', () => {
       expect.objectContaining({
         tenant,
         next: expect.objectContaining({
-          tags: ['t:tenant-a:page_tag', 't:tenant-a:tag'],
+          tags: [
+            't:tenant-a:page_tag',
+            't:tenant-a:template_tag',
+            't:tenant-a:tag',
+          ],
         }),
       }),
     );

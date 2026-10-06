@@ -1,17 +1,10 @@
+import { env } from '@platform/utils/env/env';
+
 import { dispatchProvisioningWorkflow } from './dispatch-provisioning-workflow';
 
-const { envMock } = vi.hoisted(() => ({
-  envMock: {
-    TENANT_PROVISIONING_GITHUB_TOKEN: undefined as string | undefined,
-    TENANT_PROVISIONING_GITHUB_REPO: undefined as string | undefined,
-    TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE: undefined as
-      string | undefined,
-    TENANT_PROVISIONING_DATASET: undefined as
-      'development' | 'production' | undefined,
-  },
-}));
+vi.mock('@platform/utils/env/env');
 
-vi.mock('@platform/utils/env/env', () => ({ env: envMock }));
+const envMock: Partial<Record<keyof typeof env, string>> = env;
 
 describe(dispatchProvisioningWorkflow, () => {
   const fetchMock = vi.fn();
@@ -43,7 +36,7 @@ describe(dispatchProvisioningWorkflow, () => {
     expect(result).toBe(false);
   });
 
-  it('POSTs a workflow_dispatch request with the tenant id as an input, and returns true', async () => {
+  it('POSTs a workflow_dispatch with the tenant id as an input, and returns true', async () => {
     fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
 
     const result = await dispatchProvisioningWorkflow('tenant-1');
@@ -74,7 +67,7 @@ describe(dispatchProvisioningWorkflow, () => {
     );
   });
 
-  it('includes adminAppBaseUrl in the dispatch body when the local-dev override is configured', async () => {
+  it('sends adminAppBaseUrl when the local-dev override is configured', async () => {
     envMock.TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE =
       'https://tenant-dev.tailnet.ts.net';
     fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
@@ -97,7 +90,7 @@ describe(dispatchProvisioningWorkflow, () => {
     );
   });
 
-  it('omits tenantSanityDataset and environment from the dispatch body when neither the override nor the dataset var is configured', async () => {
+  it('omits tenantSanityDataset and environment when neither override nor dataset set', async () => {
     fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
 
     await dispatchProvisioningWorkflow('tenant-1');
@@ -110,7 +103,7 @@ describe(dispatchProvisioningWorkflow, () => {
     );
   });
 
-  it('sends tenantSanityDataset and environment from TENANT_PROVISIONING_DATASET when the base-url override is not configured', async () => {
+  it('sends tenantSanityDataset and environment from the dataset with no override', async () => {
     envMock.TENANT_PROVISIONING_DATASET = 'production';
     fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
 
@@ -131,7 +124,7 @@ describe(dispatchProvisioningWorkflow, () => {
     );
   });
 
-  it('always sends tenantSanityDataset and environment "development" when the base-url override is configured, even if TENANT_PROVISIONING_DATASET is set to production', async () => {
+  it('sends "development" for dataset and environment whenever the override is set', async () => {
     envMock.TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE =
       'https://tenant-dev.tailnet.ts.net';
     envMock.TENANT_PROVISIONING_DATASET = 'production';
@@ -155,7 +148,7 @@ describe(dispatchProvisioningWorkflow, () => {
     );
   });
 
-  it('never throws, and returns false, when the dispatch call responds with a non-2xx status (e.g. the workflow not existing yet)', async () => {
+  it('returns false without throwing when the dispatch responds non-2xx', async () => {
     fetchMock.mockResolvedValue(new Response(null, { status: 404 }));
 
     await expect(dispatchProvisioningWorkflow('tenant-1')).resolves.toBe(false);

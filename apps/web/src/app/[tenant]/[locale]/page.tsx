@@ -1,11 +1,8 @@
 import type { ITenantLocalizedParams } from '@blog/config';
-import { service } from '@blog/service';
 import { HomePage } from '@web/components/pages/home-page';
-import { toMetadata } from '@web/metadata/to-metadata';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
-import { logger } from '@web/utils/logger/logger';
+import { buildHomePageMetadata } from '@web/metadata/home-page-metadata';
+import { enterRequestContext } from '@web/server/request-context/request-context';
 import type { Metadata } from 'next';
-import { setRequestLocale } from 'next-intl/server';
 
 type TProps = {
   params: Promise<ITenantLocalizedParams>;
@@ -15,29 +12,12 @@ type TProps = {
 export const revalidate = 21600;
 
 export async function generateMetadata({ params }: TProps): Promise<Metadata> {
-  const { tenant } = await params;
-  const tenantContext = await getTenantSanityContext(tenant);
-  const result = await service.pages.home.v1.getHomePage(tenantContext);
-
-  if (!result.ok) {
-    logger.error('home_page.metadata_fetch_failed', { error: result.error });
-    return {};
-  }
-
-  if (!result.data) {
-    return {};
-  }
-
-  return toMetadata(result.data.seo, tenantContext, {
-    canonical: '/',
-    ogType: 'website',
-    titleAbsolute: true,
-  });
+  await enterRequestContext(params);
+  return buildHomePageMetadata();
 }
 
 export default async function HomeRoute({ params }: TProps) {
-  const { locale, tenant } = await params;
-  setRequestLocale(locale);
+  await enterRequestContext(params);
 
-  return <HomePage locale={locale} tenant={tenant} />;
+  return <HomePage />;
 }

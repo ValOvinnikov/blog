@@ -1,3 +1,5 @@
+import { logger } from '@web/utils/logger/logger';
+
 import { SANITY_OPERATION_HEADER, SANITY_PROJECT_ID_HEADER } from './route';
 
 const { isValidSignatureMock } = vi.hoisted(() => ({
@@ -55,33 +57,30 @@ vi.mock('@blog/db', () => ({
   },
 }));
 
-vi.mock('@web/server/revalidate/derive-revalidate-paths', () => ({
-  POST_TYPE: 'page_post',
-  isDerivableRevalidateType: isDerivableRevalidateTypeMock,
-  deriveRevalidatePaths: deriveRevalidatePathsMock,
-}));
+vi.mock(
+  '@web/server/revalidate/derive-revalidate-paths/derive-revalidate-paths',
+  () => ({
+    POST_TYPE: 'page_post',
+    isDerivableRevalidateType: isDerivableRevalidateTypeMock,
+    deriveRevalidatePaths: deriveRevalidatePathsMock,
+  }),
+);
 
 const { resolveReferencingModuleTagsMock } = vi.hoisted(() => ({
   resolveReferencingModuleTagsMock: vi.fn(),
 }));
 
-vi.mock('@web/server/revalidate/resolve-referencing-module-tags', () => ({
-  resolveReferencingModuleTags: resolveReferencingModuleTagsMock,
-}));
+vi.mock(
+  '@web/server/revalidate/resolve-referencing-module-tags/resolve-referencing-module-tags',
+  () => ({
+    resolveReferencingModuleTags: resolveReferencingModuleTagsMock,
+  }),
+);
 
-const { loggerErrorMock, loggerWarnMock } = vi.hoisted(() => ({
-  loggerErrorMock: vi.fn(),
-  loggerWarnMock: vi.fn(),
-}));
+vi.mock('@web/utils/logger/logger');
 
-vi.mock('@web/utils/logger/logger', () => ({
-  logger: {
-    error: loggerErrorMock,
-    warn: loggerWarnMock,
-    info: vi.fn(),
-    debug: vi.fn(),
-  },
-}));
+let loggerErrorMock = vi.mocked(logger.error);
+let loggerWarnMock = vi.mocked(logger.warn);
 
 const makeRequest = (
   body: unknown,
@@ -100,7 +99,10 @@ const makeRequest = (
 };
 
 describe('POST /api/revalidate', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
+    const fresh = await import('@web/utils/logger/logger');
+    loggerErrorMock = vi.mocked(fresh.logger.error);
+    loggerWarnMock = vi.mocked(fresh.logger.warn);
     isValidSignatureMock.mockReset();
     revalidateTagMock.mockReset();
     revalidatePathMock.mockReset();
@@ -122,7 +124,7 @@ describe('POST /api/revalidate', () => {
     vi.resetModules();
   });
 
-  it('revalidates page_post, posts, author, topic, and tag tags for a valid page_post webhook', async () => {
+  it('revalidates page_post, posts, author, topic and tag tags for a page_post webhook', async () => {
     isValidSignatureMock.mockResolvedValue(true);
     const { POST } = await import('./route');
 
@@ -153,7 +155,7 @@ describe('POST /api/revalidate', () => {
     expect(revalidatePathMock).toHaveBeenCalledTimes(1);
   });
 
-  it('revalidates both the legacy tag and the tenant-scoped tag when sanity-project-id is present', async () => {
+  it('revalidates the legacy and tenant-scoped tags when sanity-project-id is present', async () => {
     isValidSignatureMock.mockResolvedValue(true);
     const { POST } = await import('./route');
 
@@ -249,7 +251,7 @@ describe('POST /api/revalidate', () => {
   });
 
   describe('tenant lookup failures', () => {
-    it('returns a non-2xx and revalidates nothing when getTenantIdBySanityProjectId throws', async () => {
+    it('returns non-2xx and revalidates nothing when the project-id lookup throws', async () => {
       isValidSignatureMock.mockResolvedValue(true);
       getTenantIdBySanityProjectIdMock.mockRejectedValue(
         new Error('connection terminated'),
@@ -581,7 +583,7 @@ describe('POST /api/revalidate', () => {
       expect(json.pathPurged).toBe(true);
     });
 
-    it('falls back to the whole-site purge and logs when the tenant Sanity credentials cannot be resolved', async () => {
+    it('falls back to the whole-site purge and logs when tenant credentials are missing', async () => {
       isValidSignatureMock.mockResolvedValue(true);
       getTenantIdBySanityProjectIdMock.mockResolvedValue('tenant-uuid-1');
       isDerivableRevalidateTypeMock.mockReturnValue(true);
@@ -607,7 +609,7 @@ describe('POST /api/revalidate', () => {
       expect(revalidatePathMock).toHaveBeenCalledWith('/', 'layout');
     });
 
-    it('still runs the whole-site fallback purge when getTenantSanityCredentials throws (e.g. a missing encryption key or a transient DB error)', async () => {
+    it('still runs the whole-site fallback purge when the credentials lookup throws', async () => {
       isValidSignatureMock.mockResolvedValue(true);
       getTenantIdBySanityProjectIdMock.mockResolvedValue('tenant-uuid-1');
       isDerivableRevalidateTypeMock.mockReturnValue(true);
@@ -636,7 +638,7 @@ describe('POST /api/revalidate', () => {
       expect(revalidatePathMock).toHaveBeenCalledWith('/', 'layout');
     });
 
-    it('falls back to the whole-site purge and logs when the derivation itself cannot resolve the paths', async () => {
+    it('falls back to the whole-site purge and logs when the paths cannot be derived', async () => {
       isValidSignatureMock.mockResolvedValue(true);
       getTenantIdBySanityProjectIdMock.mockResolvedValue('tenant-uuid-1');
       isDerivableRevalidateTypeMock.mockReturnValue(true);
@@ -665,7 +667,7 @@ describe('POST /api/revalidate', () => {
       expect(revalidatePathMock).toHaveBeenCalledWith('/', 'layout');
     });
 
-    it('falls back to the whole-site purge and logs with reason tenant_unresolved when no tenant resolves', async () => {
+    it('falls back to the whole-site purge, logging tenant_unresolved, with no tenant', async () => {
       isValidSignatureMock.mockResolvedValue(true);
       const { POST } = await import('./route');
 
@@ -683,7 +685,7 @@ describe('POST /api/revalidate', () => {
       expect(revalidatePathMock).toHaveBeenCalledWith('/', 'layout');
     });
 
-    it('falls back to the whole-site purge and logs with reason unsupported_type for a type without a precise derivation', async () => {
+    it('falls back to the whole-site purge, logging unsupported_type, for a new type', async () => {
       isValidSignatureMock.mockResolvedValue(true);
       getTenantIdBySanityProjectIdMock.mockResolvedValue('tenant-uuid-1');
       isDerivableRevalidateTypeMock.mockReturnValue(false);
@@ -703,7 +705,7 @@ describe('POST /api/revalidate', () => {
       expect(revalidatePathMock).toHaveBeenCalledWith('/', 'layout');
     });
 
-    it('still resolves tenant credentials for a type without a precise derivation, since the module lookup needs them', async () => {
+    it('still resolves tenant credentials for an unknown type, for the module lookup', async () => {
       isValidSignatureMock.mockResolvedValue(true);
       getTenantIdBySanityProjectIdMock.mockResolvedValue('tenant-uuid-1');
       isDerivableRevalidateTypeMock.mockReturnValue(false);

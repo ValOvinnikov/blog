@@ -1,10 +1,11 @@
 'use client';
 
-import { Switch } from '@base-ui/react/switch';
 import type { TCapability } from '@blog/config';
 import { Card } from '@platform/components/shared/card';
 import { SettingRow } from '@platform/components/shared/setting-row';
 import { SettingsFormShell } from '@platform/components/shared/settings-form-shell';
+import { StatusBadge } from '@platform/components/shared/status-badge';
+import { Switch } from '@platform/components/shared/switch';
 import { useToast } from '@platform/context/toast-provider';
 import {
   CAPABILITY_TOGGLES,
@@ -14,8 +15,6 @@ import { useFormSubmission } from '@platform/utils/use-form-submission/use-form-
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
-
-import { featuresSettingsVariants } from './features-settings-variants';
 
 const valuesEqual = (
   a: TSettingsFeaturesValues,
@@ -69,8 +68,6 @@ export const FeaturesSettings = ({
 
   const isDirty = !valuesEqual(values, savedValues);
 
-  const { switchTrack, switchThumb, switchLabel } = featuresSettingsVariants();
-
   const handleToggle = (
     field: keyof TSettingsFeaturesValues,
     checked: boolean,
@@ -95,31 +92,42 @@ export const FeaturesSettings = ({
       <Card>
         <Card.Header title={t('capabilitiesHeading')} headingLevel={2} />
         <Card.Body>
-          {CAPABILITY_TOGGLES.map(({ capability, field }) => {
+          {CAPABILITY_TOGGLES.map(({ capability, field, isComingSoon }) => {
             const isLocked = !entitledCapabilities.includes(capability);
             const label = t(`toggleLabel.${capability}`);
+            const description = t(`toggleDescription.${capability}`);
+
+            if (isComingSoon) {
+              return (
+                <SettingRow
+                  key={capability}
+                  label={label}
+                  description={description}
+                >
+                  <StatusBadge hasDot={false}>
+                    {t('comingSoonBadge')}
+                  </StatusBadge>
+                </SettingRow>
+              );
+            }
 
             return (
               <SettingRow
                 key={capability}
                 label={label}
-                description={t(`toggleDescription.${capability}`)}
+                description={description}
                 isLocked={isLocked}
                 lockedReason={isLocked ? t('planLockedBadge') : undefined}
               >
-                <Switch.Root
-                  checked={values[field]}
+                <Switch
+                  isChecked={values[field]}
                   onCheckedChange={(checked) => handleToggle(field, checked)}
-                  disabled={isLocked || isPending || isArchived}
-                  aria-label={label}
+                  isDisabled={isLocked || isPending || isArchived}
+                  ariaLabel={label}
+                  onLabel={t('switchOn')}
+                  offLabel={t('switchOff')}
                   aria-describedby={isArchived ? archivedNoticeId : undefined}
-                  className={switchTrack()}
-                >
-                  <Switch.Thumb className={switchThumb()} />
-                </Switch.Root>
-                <span className={switchLabel()}>
-                  {values[field] ? t('switchOn') : t('switchOff')}
-                </span>
+                />
               </SettingRow>
             );
           })}

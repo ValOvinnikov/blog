@@ -6,11 +6,23 @@ const PRICE_LABEL_REQUIRED_MESSAGE = 'Add a label when the tier has no prices.';
 const buildContext = (prices?: unknown[]): ValidationContext =>
   ({ parent: { prices } }) as unknown as ValidationContext;
 
+const label = (language: string, value: string) => [
+  { _key: language, language, value },
+];
+
 describe(validatePricingTierPriceLabelRequired, () => {
   it.each([
     ['the tier has prices and no label', [{ period: 'MONTH' }], undefined],
-    ['the tier has prices and a label', [{ period: 'MONTH' }], 'Custom'],
-    ['the tier has no prices but has a label', [], 'Contact us'],
+    [
+      'the tier has prices and a label',
+      [{ period: 'MONTH' }],
+      label('EN', 'Custom'),
+    ],
+    [
+      'the tier has no prices but has a default-language label',
+      [],
+      label('EN', 'Contact us'),
+    ],
   ])('passes when %s', (_description, prices, priceLabel) => {
     expect(
       validatePricingTierPriceLabelRequired(priceLabel, buildContext(prices)),
@@ -26,6 +38,15 @@ describe(validatePricingTierPriceLabelRequired, () => {
   it('fails with the required-label message when prices is undefined and no label', () => {
     expect(
       validatePricingTierPriceLabelRequired(undefined, buildContext(undefined)),
+    ).toBe(PRICE_LABEL_REQUIRED_MESSAGE);
+  });
+
+  it('fails with the required-label message when the label is only in another language', () => {
+    expect(
+      validatePricingTierPriceLabelRequired(
+        label('NL', 'Neem contact op'),
+        buildContext([]),
+      ),
     ).toBe(PRICE_LABEL_REQUIRED_MESSAGE);
   });
 });

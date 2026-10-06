@@ -8,6 +8,7 @@ import {
 } from '@web/components/shared/media-card-item';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';
+import { moduleGridActionsVariants } from '@web/utils/module-grid-actions-variants';
 
 import { postFeaturedModuleViewVariants } from './post-featured-module-view-variants';
 
@@ -32,7 +33,8 @@ export const PostFeaturedModuleView = ({
   hasImages,
   displayMode,
 }: IPostFeaturedModuleViewProps) => {
-  const s = postFeaturedModuleViewVariants();
+  const v = postFeaturedModuleViewVariants();
+  const s = moduleGridActionsVariants();
 
   const { heading } = headingBlock;
 
@@ -51,6 +53,7 @@ export const PostFeaturedModuleView = ({
         id={titleId}
         level={2}
         align={contentAlignment}
+        variant="section"
       />
       {leadPost && displayMode === DISPLAY_MODE.CAROUSEL && (
         <CardCarousel
@@ -58,10 +61,11 @@ export const PostFeaturedModuleView = ({
           hasImages={hasImages}
           title={heading}
           tone={brandVariant}
+          contentAlignment={contentAlignment}
         />
       )}
       {leadPost && displayMode !== DISPLAY_MODE.CAROUSEL && (
-        <div className={s.leadGroup()}>
+        <div className={v.leadGroup()}>
           <MediaCardItem
             item={leadPost}
             isLead={true}

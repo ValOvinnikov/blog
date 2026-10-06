@@ -1,8 +1,8 @@
+import { isr } from '@blog/service/sanity/query/isr';
 import {
-  isr,
   runQuery,
   type TTenantSanityContext,
-} from '@blog/service/sanity/query';
+} from '@blog/service/sanity/query/query';
 
 import { RELATED_POSTS_TOPIC_CANDIDATE_MULTIPLIER } from './constants';
 import {

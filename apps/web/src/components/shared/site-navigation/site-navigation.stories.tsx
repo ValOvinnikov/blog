@@ -1,6 +1,13 @@
-import type { ILink } from '@blog/config';
+import {
+  LANGUAGE_SWITCHER_STYLE,
+  LOCALE_ISO_CODES,
+  type ILink,
+} from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { AuthMenu } from '@web/components/shared/auth-menu';
+import { LanguageSwitcher } from '@web/components/shared/language-switcher';
 import { ThemeToggleButton } from '@web/components/shared/theme-toggle-button';
+import { SessionProvider } from 'next-auth/react';
 import { userEvent, within } from 'storybook/test';
 
 import { SiteNavigation } from './site-navigation';
@@ -64,6 +71,52 @@ export const MobileOpen: TStory = {
     const canvas = within(canvasElement);
     await userEvent.click(
       canvas.getByRole('button', { name: /Toggle navigation menu/ }),
+    );
+  },
+};
+
+const { EN, NL, FR } = LOCALE_ISO_CODES;
+
+const headerControls = {
+  panelActions: (
+    <>
+      <LanguageSwitcher
+        liveLocales={[EN, NL, FR]}
+        currentLocale={NL}
+        defaultLocale={EN}
+        switcherStyle={LANGUAGE_SWITCHER_STYLE.MENU_CODE}
+      />
+      <ThemeToggleButton />
+    </>
+  ),
+  actions: <AuthMenu oauthProviderIds={['github']} />,
+};
+
+const withSignedOutSession: NonNullable<TStory['decorators']> = [
+  (Story) => (
+    <SessionProvider session={null}>
+      <Story />
+    </SessionProvider>
+  ),
+];
+
+export const HeaderControls: TStory = {
+  globals: { viewport: 'desktop' },
+  decorators: withSignedOutSession,
+  args: headerControls,
+};
+
+export const MobilePanelLanguageMenuOpen: TStory = {
+  globals: { viewport: 'mobile' },
+  decorators: withSignedOutSession,
+  args: headerControls,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(
+      canvas.getByRole('button', { name: /Toggle navigation menu/ }),
+    );
+    await userEvent.click(
+      await canvas.findByRole('button', { name: 'Language: Nederlands' }),
     );
   },
 };

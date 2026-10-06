@@ -10,8 +10,10 @@ export const iconButtonVariants = tv({
     'hover:border-border-emphasis hover:bg-surface-2 hover:text-text',
     'cursor-pointer',
     'focus-visible:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
-    'focus-visible:ring-offset-2',
+    'focus-visible:ring-offset-2 focus-visible:ring-offset-ambient',
+    'hover:ring-offset-ambient',
     'disabled:pointer-events-none disabled:opacity-50',
+    'aria-disabled:pointer-events-none aria-disabled:opacity-50',
   ],
   variants: {
     variant: {
@@ -35,18 +37,9 @@ export const iconButtonVariants = tv({
       ],
     },
     tone: {
-      [BRAND_VARIANT.PRIMARY]: [
-        'focus-visible:ring-offset-primary',
-        'hover:ring-offset-primary',
-      ],
-      [BRAND_VARIANT.SECONDARY]: [
-        'focus-visible:ring-offset-secondary',
-        'hover:ring-offset-secondary',
-      ],
-      [BRAND_VARIANT.BRAND_PRIMARY]: [
-        'focus-visible:ring-offset-brand-primary-muted',
-        'hover:ring-offset-brand-primary-muted',
-      ],
+      [BRAND_VARIANT.PRIMARY]: [],
+      [BRAND_VARIANT.SECONDARY]: [],
+      [BRAND_VARIANT.BRAND_PRIMARY]: [],
     },
   },
   compoundVariants: [

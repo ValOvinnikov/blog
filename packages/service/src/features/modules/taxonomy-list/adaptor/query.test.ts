@@ -1,6 +1,36 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { makeRawTaxonomyListModule } from '@blog/service/testing/modules/fixtures';
+import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import { localizedStrings } from '@blog/service/testing/shared/localized';
 
 import { taxonomyListModuleQuery } from './query';
+
+const { EN, NL, FR } = LOCALE_ISO_CODES;
+
+const moduleDocument = {
+  _id: 'module-1',
+  _type: 'module_taxonomyList',
+  brandVariant: 'PRIMARY',
+  headingBlock: {
+    _type: 'moduleHeadingBlock',
+    heading: localizedStrings({
+      [EN]: 'Latest posts',
+      [NL]: 'Nieuwste berichten',
+    }),
+  },
+  taxonomy: 'TOPICS',
+};
+
+async function runTaxonomyList(locale: string) {
+  const raw = await evaluateGroqExpression(
+    taxonomyListModuleQuery.query,
+    [moduleDocument],
+    undefined,
+    { id: 'module-1', locale, defaultLocale: EN },
+  );
+
+  return taxonomyListModuleQuery.parse(raw);
+}
 
 describe('taxonomyListModuleQuery', () => {
   it('filters to module_taxonomyList documents by id', () => {
@@ -69,5 +99,16 @@ describe('taxonomyListModuleQuery', () => {
   it('projects only the id, heading and slug for each latest post', () => {
     expect(taxonomyListModuleQuery.query).toContain('"slug": slug.current');
     expect(taxonomyListModuleQuery.query).not.toContain('wordCount');
+  });
+  it('picks the heading in the visitor language', async () => {
+    const { headingBlock } = await runTaxonomyList(NL);
+
+    expect(headingBlock.heading).toBe('Nieuwste berichten');
+  });
+
+  it('falls back to the default language for the heading', async () => {
+    const { headingBlock } = await runTaxonomyList(FR);
+
+    expect(headingBlock.heading).toBe('Latest posts');
   });
 });

@@ -1,16 +1,17 @@
 import { BRAND_VARIANT } from '@blog/config';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeFaqQuestion } from '@web/testing/modules/faq/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { FaqModule } from './faq-module';
 
-const { getFaqModuleMock, getTenantSanityContextMock } = vi.hoisted(() => ({
+const { getFaqModuleMock } = vi.hoisted(() => ({
   getFaqModuleMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
 }));
+
+vi.mock('@web/i18n/navigation');
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -20,13 +21,9 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
+vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
+const getRequestContextMock = vi.mocked(getRequestContext);
 
 const baseModule = {
   brandVariant: BRAND_VARIANT.PRIMARY,
@@ -38,24 +35,25 @@ const baseModule = {
 
 const setup = customRenderAsync(FaqModule, {
   id: 'faq-1',
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${FaqModule.name}/>`, () => {
   beforeEach(() => {
     getFaqModuleMock.mockReset();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
+    getRequestContextMock.mockReset();
+    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
-  it('calls getFaqModule with the module id and the tenant Sanity context resolved from the tenant slug', async () => {
+  it('calls getFaqModule with the module id and the tenant Sanity context', async () => {
     const tenant = {
       projectId: 'tenant-project',
       dataset: 'production',
       token: 'tenant-token',
     };
-    getTenantSanityContextMock.mockResolvedValue(tenant);
+    getRequestContextMock.mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      sanityContext: tenant,
+    });
     getFaqModuleMock.mockResolvedValue({
       ok: true,
       data: { ...baseModule, questions: [] },
@@ -64,7 +62,6 @@ describe(`<${FaqModule.name}/>`, () => {
     await setup();
 
     expect(getFaqModuleMock).toHaveBeenCalledWith('faq-1', tenant);
-    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
   });
 
   it('renders nothing when the fetch fails', async () => {
@@ -92,9 +89,9 @@ describe(`<${FaqModule.name}/>`, () => {
 
     expect(
       screen.getByRole('button', { name: 'Do you offer refunds?' }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
     expect(
       screen.getByRole('button', { name: 'Is there a free trial?' }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
   });
 });

@@ -8,11 +8,17 @@ import {
 } from '@blog/config';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { NewsletterSignup } from '@blog/ui/components/organisms/newsletter-signup';
-import { subscribeToNewsletterAction } from '@web/server/newsletter/newsletter-actions';
-import { hasNewsletterSubscribedCookie } from '@web/utils/has-newsletter-subscribed-cookie';
+import { subscribeToNewsletterAction } from '@web/server/newsletter/newsletter-actions/newsletter-actions';
 import { isValidEmail } from '@web/utils/is-valid-email';
 import { useTranslations } from 'next-intl';
-import { useEffect, useId, useState } from 'react';
+import { useId, useState } from 'react';
+
+const ERROR_MESSAGE_KEYS = {
+  'already-subscribed': 'errorAlreadySubscribed',
+  unavailable: 'errorUnavailable',
+  invalid: 'errorInvalid',
+  'server-error': 'errorServer',
+} as const;
 
 const TRUST_CUE_ICONS = [ICONS.SHIELD_CHECK, ICONS.CLOSE];
 
@@ -26,17 +32,6 @@ type TNewsletterFormProps = {
   className?: string;
 };
 
-/**
- * Subscription isn't tied to a session (a signed-out reader can subscribe),
- * so there's no account-based way to know a reader already subscribed;
- * `subscribeToNewsletterAction` sets a long-lived cookie instead, and this
- * is the single component both the `full` and `compact` render call sites
- * go through, so the gate lives here once. Both call sites are statically
- * rendered with ISR, so reading the cookie via `next/headers`'s `cookies()`
- * server-side would opt them out of static rendering — instead this renders
- * nothing until a mount effect resolves the cookie client-side, matching
- * server and first-client render so there's no hydration mismatch.
- */
 export const NewsletterForm = ({
   variant,
   heading,
@@ -52,18 +47,16 @@ export const NewsletterForm = ({
   const [errorMessage, setErrorMessage] = useState<string | undefined>(
     undefined,
   );
-  const [mounted, setMounted] = useState(false);
-  const [isSubscribed, setIsSubscribed] = useState(false);
   const errorMessageId = useId();
 
-  useEffect(() => {
-    // Reads DOM state (`document.cookie`) set by a prior visit's successful
-    // subscribe — no external-store subscription to move this into (same
-    // pattern as ThemeToggleButton's `document.documentElement` read).
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setIsSubscribed(hasNewsletterSubscribedCookie(document.cookie));
-    setMounted(true);
-  }, []);
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
+
+    if (status === 'error') {
+      setStatus('idle');
+      setErrorMessage(undefined);
+    }
+  };
 
   const handleSubmit = async () => {
     if (!isValidEmail(email)) {
@@ -83,18 +76,12 @@ export const NewsletterForm = ({
     }
 
     setStatus('error');
-    setErrorMessage(
-      result.outcome === 'already-subscribed'
-        ? t('errorAlreadySubscribed')
-        : t('errorServer'),
-    );
+    setErrorMessage(t(ERROR_MESSAGE_KEYS[result.outcome]));
   };
-
-  if (!mounted || isSubscribed) return null;
 
   const sharedProps = {
     email,
-    onChange: setEmail,
+    onChange: handleEmailChange,
     onSubmit: handleSubmit,
     status,
     heading,
@@ -105,6 +92,7 @@ export const NewsletterForm = ({
     submitLabel: t('submitLabel'),
     emailAriaLabel: t('emailAriaLabel'),
     placeholder: t('placeholder'),
+    align,
     className,
   };
 
@@ -127,7 +115,6 @@ export const NewsletterForm = ({
       {...sharedProps}
       supportingText={supportingText}
       trustCues={trustCueItems}
-      align={align}
     />
   );
 };

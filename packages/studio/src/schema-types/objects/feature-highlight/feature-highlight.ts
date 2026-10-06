@@ -1,6 +1,11 @@
+import { localizedListedTextField } from '@blog/studio/schema-types/fields/localized-listed-text-field/localized-listed-text-field';
+import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
 import { ctaSecondaryButtonSchema } from '@blog/studio/schema-types/objects/cta-button/cta-button';
-import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
-import { listedTextSchema } from '@blog/studio/schema-types/portable-text/listed-text/listed-text';
+import { localizedImageWithAltSchema } from '@blog/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
+import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
+import { validateDefaultLanguageBlocksFilled } from '@blog/studio/schema-types/validation/validate-default-language-blocks-filled/validate-default-language-blocks-filled';
+import { validateDefaultLanguageFilled } from '@blog/studio/schema-types/validation/validate-default-language-filled/validate-default-language-filled';
+import { validateImageHasAsset } from '@blog/studio/schema-types/validation/validate-image-has-asset/validate-image-has-asset';
 import { Columns2 } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
@@ -11,27 +16,30 @@ export const featureHighlightSchema = defineType({
   description: 'One row of the story, pairing an image with its text.',
   icon: Columns2,
   fields: [
-    defineField({
+    localizedOneLineTextField({
       name: 'heading',
       title: 'Heading',
-      type: 'string',
       description: 'The point this row makes, in a few words.',
-      validation: (rule) => rule.required().error('Give the row a heading.'),
+      validation: (rule) =>
+        rule.custom(validateDefaultLanguageFilled('Give the row a heading.')),
     }),
-    defineField({
+    localizedListedTextField({
       name: 'body',
       title: 'Body',
-      type: listedTextSchema.name,
       description: 'The explanation behind it, in a sentence or two.',
-      validation: (rule) => rule.required(),
+      validation: (rule) =>
+        rule.custom(
+          validateDefaultLanguageBlocksFilled('Explain the point of this row.'),
+        ),
     }),
     defineField({
       name: 'image',
       title: 'Image',
-      type: imageWithAltSchema.name,
+      type: localizedImageWithAltSchema.name,
       description:
         'Shown at 4:3 beside the text. Product screenshots and illustrations work best.',
-      validation: (rule) => rule.required(),
+      validation: (rule) =>
+        rule.custom(validateImageHasAsset('Add an image for this row.')),
     }),
     defineField({
       name: 'action',
@@ -42,8 +50,14 @@ export const featureHighlightSchema = defineType({
   ],
   preview: {
     select: {
-      title: 'heading',
+      heading: 'heading',
       media: 'image',
+    },
+    prepare({ heading, media }) {
+      return {
+        title: defaultLanguageValue(heading),
+        media,
+      };
     },
   },
 });

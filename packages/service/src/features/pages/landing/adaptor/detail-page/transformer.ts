@@ -1,4 +1,5 @@
-import { resolveFaqs } from '@blog/service/shared/transformers/faq/resolve-faqs';
+import { toPageTranslations } from '@blog/service/shared/localization/page-translations/to-page-translations';
+import type { TFaqPageQuestion } from '@blog/service/shared/transformers/faq/resolve-faqs';
 import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
 import {
   toHeroSlot,
@@ -14,13 +15,17 @@ export type TRawLandingPage = NonNullable<
   InferResultType<typeof landingPageQuery>
 >;
 
-export function toLandingPage(raw: TRawLandingPage): TLandingPage {
+export function toLandingPage(
+  raw: TRawLandingPage,
+  faqs: TFaqPageQuestion[],
+): TLandingPage {
   return {
-    slug: raw.slug,
+    path: raw.path,
     headingBlock: toHeadingBlock(raw.headingBlock),
     hero: toHeroSlot(raw.hero),
     modules: (raw.modules ?? []).map(toModule),
-    faqs: resolveFaqs(raw.faqs),
+    faqs,
     seo: resolveSeo(raw.seo),
+    translations: toPageTranslations(raw.translations),
   };
 }

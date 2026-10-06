@@ -1,23 +1,28 @@
+import { LOCALE_ISO_CODES } from '@blog/config';
 import { urlForSanityImage } from '@blog/service';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import {
+  DEFAULT_REQUEST_CONTEXT,
+  DEFAULT_TENANT_SANITY_CONTEXT,
+} from '@web/testing/shared/tenant/fixtures';
 
 import { buildPostIndexMetadata } from './build-post-index-metadata';
 
-const { getPostIndexPageMock, getTenantSanityContextMock } = vi.hoisted(() => ({
+const { getPostIndexPageMock } = vi.hoisted(() => ({
   getPostIndexPageMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
 }));
 
-vi.mock('@web/server/post-index/get-post-index-page', () => ({
-  getPostIndexPage: getPostIndexPageMock,
-}));
+vi.mock(
+  '@web/server/post-index/get-post-index-page/get-post-index-page',
+  () => ({
+    getPostIndexPage: getPostIndexPageMock,
+  }),
+);
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
+vi.mock('@web/server/request-context/request-context');
 
 const ogImage = makeSanityImage();
 const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
@@ -36,11 +41,10 @@ const seo = makeSeo({
 describe('buildPostIndexMetadata', () => {
   beforeEach(() => {
     getPostIndexPageMock.mockReset();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
+    vi.mocked(getRequestContext).mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
-  it('forwards the slug-less tenant to getPostIndexPage — the same cached loader PostIndexPage reads', async () => {
+  it('reads the page through getPostIndexPage, the loader PostIndexPage reads', async () => {
     getPostIndexPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -48,12 +52,13 @@ describe('buildPostIndexMetadata', () => {
         headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         seo,
         modules: [],
+        translations: [LOCALE_ISO_CODES.EN],
       },
     });
 
-    await buildPostIndexMetadata(1, 'tenant-1');
+    await buildPostIndexMetadata(1);
 
-    expect(getPostIndexPageMock).toHaveBeenCalledWith('tenant-1');
+    expect(getPostIndexPageMock).toHaveBeenCalledWith();
   });
 
   it('builds page-1 metadata from the resolved seo, self-canonical to /blog', async () => {
@@ -64,10 +69,11 @@ describe('buildPostIndexMetadata', () => {
         headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         seo,
         modules: [],
+        translations: [LOCALE_ISO_CODES.EN],
       },
     });
 
-    const metadata = await buildPostIndexMetadata(1, 'tenant-1');
+    const metadata = await buildPostIndexMetadata(1);
 
     expect(metadata.title).toBe('The Blog');
     expect(metadata.description).toBe('All the posts.');
@@ -82,7 +88,7 @@ describe('buildPostIndexMetadata', () => {
     });
   });
 
-  it('builds page-N metadata with a "– Page N" suffix, self-canonical to /blog/page/N — never /blog', async () => {
+  it('builds page-N metadata with a "– Page N" suffix, canonical to /blog/page/N', async () => {
     getPostIndexPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -90,10 +96,11 @@ describe('buildPostIndexMetadata', () => {
         headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         seo,
         modules: [],
+        translations: [LOCALE_ISO_CODES.EN],
       },
     });
 
-    const metadata = await buildPostIndexMetadata(2, 'tenant-1');
+    const metadata = await buildPostIndexMetadata(2);
 
     expect(metadata.title).toBe('The Blog – Page 2');
     expect(metadata.openGraph?.title).toBe('The Blog OG – Page 2');
@@ -105,7 +112,7 @@ describe('buildPostIndexMetadata', () => {
     });
   });
 
-  it('leaves ogTitle omitted on page 2+ when unauthored, rather than suffixing "undefined"', async () => {
+  it('leaves ogTitle omitted on page 2+ when unauthored, never suffixing "undefined"', async () => {
     getPostIndexPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -113,10 +120,11 @@ describe('buildPostIndexMetadata', () => {
         headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         seo: makeSeo({ title: 'The Blog', ogTitle: undefined }),
         modules: [],
+        translations: [LOCALE_ISO_CODES.EN],
       },
     });
 
-    const metadata = await buildPostIndexMetadata(2, 'tenant-1');
+    const metadata = await buildPostIndexMetadata(2);
 
     expect(metadata.openGraph?.title).toBeUndefined();
     expect(metadata.twitter?.title).toBeUndefined();
@@ -129,7 +137,7 @@ describe('buildPostIndexMetadata', () => {
       error: new Error('boom'),
     });
 
-    const metadata = await buildPostIndexMetadata(1, 'tenant-1');
+    const metadata = await buildPostIndexMetadata(1);
 
     expect(metadata).toEqual({});
     expect(errorSpy).toHaveBeenCalledWith(
@@ -142,10 +150,60 @@ describe('buildPostIndexMetadata', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getPostIndexPageMock.mockResolvedValue({ ok: true, data: undefined });
 
-    const metadata = await buildPostIndexMetadata(1, 'tenant-1');
+    const metadata = await buildPostIndexMetadata(1);
 
     expect(metadata).toEqual({});
     expect(errorSpy).not.toHaveBeenCalled();
     errorSpy.mockRestore();
+  });
+
+  it('lists every live language with its own page as hreflang, canonical to its own prefixed address', async () => {
+    const { EN, NL, DE } = LOCALE_ISO_CODES;
+    const translations = [EN, NL, DE];
+    vi.mocked(getRequestContext).mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      locale: NL,
+      liveLocales: [EN, NL],
+    });
+    getPostIndexPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
+        seo,
+        modules: [],
+        translations,
+      },
+    });
+
+    const metadata = await buildPostIndexMetadata(1);
+
+    expect(metadata.alternates).toMatchObject({
+      canonical: '/nl/blog',
+      languages: { en: '/blog', nl: '/nl/blog', 'x-default': '/blog' },
+    });
+  });
+
+  it('lists no hreflang past page 1', async () => {
+    const { EN, NL } = LOCALE_ISO_CODES;
+    const translations = [EN, NL];
+    vi.mocked(getRequestContext).mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      locale: NL,
+      liveLocales: [EN, NL],
+    });
+    getPostIndexPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
+        seo,
+        modules: [],
+        translations,
+      },
+    });
+
+    const metadata = await buildPostIndexMetadata(2);
+
+    expect(metadata.alternates?.canonical).toBe('/nl/blog/page/2');
+    expect(metadata.alternates?.languages).toBeUndefined();
   });
 });

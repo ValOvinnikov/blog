@@ -1,17 +1,11 @@
 import { routes } from '@blog/config';
-import { toMetadata } from '@web/metadata/to-metadata';
-import { getTagIndexPage } from '@web/server/tag-index/get-tag-index-page';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { toLocalizedPageMetadata } from '@web/metadata/to-localized-page-metadata';
+import { getTagIndexPage } from '@web/server/tag-index/get-tag-index-page/get-tag-index-page';
 import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 
-export const buildTagIndexMetadata = async (
-  tenant: string,
-): Promise<Metadata> => {
-  const [result, tenantContext] = await Promise.all([
-    getTagIndexPage(tenant),
-    getTenantSanityContext(tenant),
-  ]);
+export const buildTagIndexMetadata = async (): Promise<Metadata> => {
+  const result = await getTagIndexPage();
 
   if (!result.ok) {
     logger.error('tag_index_metadata.fetch_failed', { error: result.error });
@@ -22,10 +16,12 @@ export const buildTagIndexMetadata = async (
     return {};
   }
 
-  const { seo } = result.data;
+  const { seo, translations } = result.data;
+  const href = routes.tags();
 
-  return toMetadata(seo, tenantContext, {
-    canonical: routes.tags(),
+  return toLocalizedPageMetadata(seo, {
+    href,
+    translations: translations.map((language) => ({ language, href })),
     ogType: 'website',
   });
 };

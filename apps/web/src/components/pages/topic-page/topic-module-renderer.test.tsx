@@ -7,6 +7,7 @@ import {
   testResolvedHero,
   testWarnsForUnknownModule,
 } from '@web/testing/shared/module-renderer-contract/module-renderer-contract';
+import { logger } from '@web/utils/logger/logger';
 import type { ReactNode } from 'react';
 
 import { TopicModuleRenderer } from './topic-module-renderer';
@@ -18,8 +19,15 @@ const {
   postListModuleMock,
   taxonomyListModuleMock,
   heroBlogModuleMock,
-  loggerWarnMock,
+  contentModuleMock,
+  faqModuleMock,
 } = vi.hoisted(() => ({
+  faqModuleMock: vi.fn(({ id }: { id: string }) => (
+    <div data-testid="stub-faq">{id}</div>
+  )),
+  contentModuleMock: vi.fn(({ id }: { id: string }) => (
+    <div data-testid="stub-content">{id}</div>
+  )),
   ctaModuleMock: vi.fn(({ id }: { id: string }) => (
     <div data-testid="stub-cta">{id}</div>
   )),
@@ -40,7 +48,6 @@ const {
       <h1 data-testid="stub-hero">{id}</h1>
     ),
   ),
-  loggerWarnMock: vi.fn(),
 }));
 
 vi.mock('@web/modules/cta/cta-module', () => ({ CtaModule: ctaModuleMock }));
@@ -60,21 +67,22 @@ vi.mock('@web/modules/hero-blog/hero-blog-module', () => ({
   HeroBlogModule: heroBlogModuleMock,
 }));
 
-vi.mock('@web/utils/logger/logger', () => ({
-  logger: {
-    error: vi.fn(),
-    warn: loggerWarnMock,
-    info: vi.fn(),
-    debug: vi.fn(),
-  },
+vi.mock('@web/modules/content/content-module', () => ({
+  ContentModule: contentModuleMock,
 }));
+
+vi.mock('@web/modules/faq/faq-module', () => ({
+  FaqModule: faqModuleMock,
+}));
+
+vi.mock('@web/utils/logger/logger');
+
+const loggerWarnMock = vi.mocked(logger.warn);
 
 const setup = customRenderAsync(TopicModuleRenderer, {
   hero: undefined,
   headingBlock: makeHeadingBlock({ heading: 'News' }),
   modules: [],
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${TopicModuleRenderer.name}/>`, () => {
@@ -104,7 +112,7 @@ describe(`<${TopicModuleRenderer.name}/>`, () => {
   testWarnsForUnknownModule({
     setup,
     loggerWarnMock,
-    unknownModule: { id: 'content-1', type: 'module_content' },
+    unknownModule: { id: 'stats-1', type: 'module_stats' },
     description:
       'renders nothing and warns once for a module absent from the topic page allow-list',
   });
@@ -116,6 +124,8 @@ describe(`<${TopicModuleRenderer.name}/>`, () => {
       { id: 'taxonomy-list-1', type: 'module_taxonomyList' },
       { id: 'cta-1', type: 'module_cta' },
       { id: 'newsletter-1', type: 'module_newsletter' },
+      { id: 'content-1', type: 'module_content' },
+      { id: 'faq-1', type: 'module_faq' },
     ],
     expectedOrder: [
       'post-list-1',
@@ -123,6 +133,8 @@ describe(`<${TopicModuleRenderer.name}/>`, () => {
       'taxonomy-list-1',
       'cta-1',
       'newsletter-1',
+      'content-1',
+      'faq-1',
     ],
   });
 
@@ -131,7 +143,7 @@ describe(`<${TopicModuleRenderer.name}/>`, () => {
       modules: [{ id: 'post-list-1', type: 'module_postList' }],
       context: {
         page: 2,
-        archive: { kind: 'TOPICS', slug: 'news', name: 'News' },
+        archive: { id: 'topic-1', kind: 'TOPICS', slug: 'news', name: 'News' },
       },
     });
 
@@ -140,7 +152,12 @@ describe(`<${TopicModuleRenderer.name}/>`, () => {
         id: 'post-list-1',
         context: {
           page: 2,
-          archive: { kind: 'TOPICS', slug: 'news', name: 'News' },
+          archive: {
+            id: 'topic-1',
+            kind: 'TOPICS',
+            slug: 'news',
+            name: 'News',
+          },
         },
       }),
       undefined,

@@ -1,13 +1,18 @@
-import { NEWSLETTER_VARIANT } from '@blog/config/constants';
+import {
+  BRAND_VARIANT,
+  FULL_BRAND_VARIANT_LIST,
+  NEWSLETTER_VARIANT,
+} from '@blog/config/constants';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
+import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
+import { newsletterTrustCueSchema } from '@blog/studio/schema-types/objects/newsletter-trust-cue/newsletter-trust-cue';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { toTitleCase } from '@blog/utils/primitives';
 import { Mail } from 'lucide-react';
-import { defineField, defineType } from 'sanity';
+import { defineArrayMember, defineField, defineType } from 'sanity';
 
 export const newsletterSchema = defineType({
   name: 'module_newsletter',
@@ -18,8 +23,11 @@ export const newsletterSchema = defineType({
   icon: Mail,
   fields: [
     titleField(),
-    brandVariantField(),
-    headingBlockField(),
+    brandVariantField({
+      list: FULL_BRAND_VARIANT_LIST,
+      initialValue: BRAND_VARIANT.PRIMARY,
+    }),
+    moduleHeadingBlockField(),
     defineField({
       name: 'variant',
       title: 'Variant',
@@ -33,6 +41,14 @@ export const newsletterSchema = defineType({
         })),
       },
       initialValue: NEWSLETTER_VARIANT.FULL,
+    }),
+    defineField({
+      name: 'trustCues',
+      title: 'Trust Cues',
+      type: 'array',
+      description: 'Short reassurances shown under the signup form.',
+      of: [defineArrayMember({ type: newsletterTrustCueSchema.name })],
+      validation: (rule) => rule.max(2),
     }),
     ...alignmentFields([], {
       title: 'Heading Alignment',

@@ -3,8 +3,10 @@ import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getReferencingModuleIds } from './loader';
 
-vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
+vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
+  ...(await importOriginal<
+    typeof import('@blog/service/sanity/query/query')
+  >()),
   runQuery: vi.fn(),
 }));
 
@@ -12,7 +14,8 @@ const tenant = makeTenant();
 
 describe(getReferencingModuleIds, () => {
   it('returns every module id the lookup resolves', async () => {
-    mockRun.mockResolvedValue(['module-a', 'module-b']);
+    mockRun.mockResolvedValueOnce(['link-a']);
+    mockRun.mockResolvedValueOnce(['module-a', 'module-b']);
 
     const result = await getReferencingModuleIds('page_post-1', tenant);
 
@@ -20,35 +23,49 @@ describe(getReferencingModuleIds, () => {
   });
 
   it('returns an empty list when nothing references the document', async () => {
-    mockRun.mockResolvedValue([]);
+    mockRun.mockResolvedValueOnce([]);
+    mockRun.mockResolvedValueOnce([]);
 
     const result = await getReferencingModuleIds('page_post-1', tenant);
 
     expect(result).toEqual([]);
   });
 
-  it('threads the document id and tenant context into runQuery', async () => {
-    mockRun.mockResolvedValue([]);
+  it('looks up the links first, then passes their ids to the module lookup', async () => {
+    mockRun.mockResolvedValueOnce(['link-a', 'link-b']);
+    mockRun.mockResolvedValueOnce([]);
 
     await getReferencingModuleIds('page_post-1', tenant);
 
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        parameters: { documentId: 'page_post-1' },
-        tenant,
-      }),
+    expect(mockRun.mock.calls.map(([, options]) => options.parameters)).toEqual(
+      [
+        { documentId: 'page_post-1' },
+        { documentId: 'page_post-1', linkIds: ['link-a', 'link-b'] },
+      ],
     );
   });
 
-  it('never caches the lookup, so a purge decision cannot outlive the change that triggered it', async () => {
-    mockRun.mockResolvedValue([]);
+  it('threads the tenant context into both lookups', async () => {
+    mockRun.mockResolvedValueOnce([]);
+    mockRun.mockResolvedValueOnce([]);
 
     await getReferencingModuleIds('page_post-1', tenant);
 
-    expect(mockRun).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({ next: { revalidate: 0 } }),
-    );
+    expect(mockRun.mock.calls.map(([, options]) => options.tenant)).toEqual([
+      tenant,
+      tenant,
+    ]);
+  });
+
+  it('never caches either lookup, so a purge decision cannot outlive the change that triggered it', async () => {
+    mockRun.mockResolvedValueOnce([]);
+    mockRun.mockResolvedValueOnce([]);
+
+    await getReferencingModuleIds('page_post-1', tenant);
+
+    expect(mockRun.mock.calls.map(([, options]) => options.next)).toEqual([
+      { revalidate: 0 },
+      { revalidate: 0 },
+    ]);
   });
 });

@@ -1,7 +1,7 @@
 import {
   runQuery,
   type TTenantSanityContext,
-} from '@blog/service/sanity/query';
+} from '@blog/service/sanity/query/query';
 
 import { publishedPostBodyQuery } from './query';
 import type { TPostBody } from './types';

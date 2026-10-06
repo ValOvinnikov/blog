@@ -55,9 +55,9 @@ export const ArticleHeader = ({
           {title}
         </Heading>
         {lead && (
-          <Text variant="lead" className={s.lead()}>
-            {lead}
-          </Text>
+          <div className={s.lead()}>
+            <Text variant="lead">{lead}</Text>
+          </div>
         )}
         {meta && (
           <div className={s.meta()}>

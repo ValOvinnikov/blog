@@ -3,41 +3,33 @@ import {
   AUDIT_TARGET_TYPE,
   DENSITY,
   FONT_CHOICE,
+  LANGUAGE_SWITCHER_STYLE,
   PRESET_ID,
   RADIUS_SCALE,
 } from '@blog/config';
+import { auth } from '@platform/server/auth/auth';
+import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { logger } from '@platform/utils/logger/logger';
+import type { Session } from 'next-auth';
 
 import { updateLookAction, type TUpdateLookInput } from './update-look-action';
 
-const {
-  requireTenantMembershipMock,
-  authMock,
-  upsertSiteConfigMock,
-  revalidateSiteConfigMock,
-  insertAuditEventMock,
-  loggerErrorMock,
-} = vi.hoisted(() => ({
-  requireTenantMembershipMock: vi.fn(),
-  authMock: vi.fn(),
-  upsertSiteConfigMock: vi.fn(),
-  revalidateSiteConfigMock: vi.fn(),
-  insertAuditEventMock: vi.fn(),
-  loggerErrorMock: vi.fn(),
-}));
+const { upsertSiteConfigMock, revalidateSiteConfigMock, insertAuditEventMock } =
+  vi.hoisted(() => ({
+    upsertSiteConfigMock: vi.fn(),
+    revalidateSiteConfigMock: vi.fn(),
+    insertAuditEventMock: vi.fn(),
+  }));
 
-vi.mock('@platform/server/auth/require-tenant-membership', () => ({
-  requireTenantMembership: requireTenantMembershipMock,
-}));
+vi.mock('@platform/server/auth/require-tenant-membership');
 
-vi.mock('@platform/server/auth/auth', () => ({ auth: authMock }));
+vi.mock('@platform/server/auth/auth');
 
 vi.mock('@platform/server/site-config/revalidate-site-config', () => ({
   revalidateSiteConfig: revalidateSiteConfigMock,
 }));
 
-vi.mock('@platform/utils/logger/logger', () => ({
-  logger: { error: loggerErrorMock },
-}));
+vi.mock('@platform/utils/logger/logger');
 
 vi.mock('@blog/db', () => ({
   queries: {
@@ -45,6 +37,12 @@ vi.mock('@blog/db', () => ({
     auditEvents: { insertAuditEvent: insertAuditEventMock },
   },
 }));
+
+const requireTenantMembershipMock = vi.mocked<
+  (tenantId: string) => Promise<unknown>
+>(requireTenantMembership);
+const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
+const loggerErrorMock = vi.mocked(logger.error);
 
 const VALID_INPUT: TUpdateLookInput = {
   preset: PRESET_ID.EDITORIAL,
@@ -54,6 +52,7 @@ const VALID_INPUT: TUpdateLookInput = {
   bodyFont: FONT_CHOICE.INTER,
   radiusScale: RADIUS_SCALE.SM,
   density: DENSITY.COMPACT,
+  languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_GLOBE,
 };
 
 describe(updateLookAction, () => {
@@ -71,7 +70,7 @@ describe(updateLookAction, () => {
     loggerErrorMock.mockReset();
   });
 
-  it('re-resolves the tenant from the session against the routed tenant id before writing anything', async () => {
+  it('re-resolves the tenant from the session against the routed id before writing', async () => {
     requireTenantMembershipMock.mockResolvedValue({
       tenant: { id: 'tenant-1' },
       membership: { role: 'OWNER' },
@@ -121,7 +120,7 @@ describe(updateLookAction, () => {
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
-  it('records a SETTINGS_UPDATED audit event against the site config, with the operator as actor', async () => {
+  it('records a SETTINGS_UPDATED audit event on the site config by the operator', async () => {
     requireTenantMembershipMock.mockResolvedValue({
       tenant: { id: 'tenant-1' },
       membership: { role: 'OWNER' },

@@ -8,12 +8,14 @@ import {
   heroMediaOrderStackedField,
 } from '@blog/studio/schema-types/fields/hero-media-order-fields/hero-media-order-fields';
 import { heroVariantField } from '@blog/studio/schema-types/fields/hero-variant-field/hero-variant-field';
+import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { heroFieldsets } from '@blog/studio/schema-types/modules/hero-fieldsets/hero-fieldsets';
-import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { heroLayoutField } from '@blog/studio/schema-types/objects/hero-layout/hero-layout-field';
+import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
+import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
 import { Quote } from 'lucide-react';
-import { defineField, defineType } from 'sanity';
+import { defineType } from 'sanity';
 
 export const heroStatementSchema = defineType({
   name: 'module_heroStatement',
@@ -26,11 +28,10 @@ export const heroStatementSchema = defineType({
   fields: [
     titleField(),
     brandVariantField({ list: FULL_BRAND_VARIANT_LIST }),
-    headingBlockField(),
-    defineField({
+    moduleHeadingBlockField(),
+    localizedOneLineTextField({
       name: 'eyebrow',
       title: 'Eyebrow',
-      type: 'string',
       description: 'Short line above the heading.',
     }),
     heroImageField(),
@@ -49,7 +50,7 @@ export const heroStatementSchema = defineType({
     prepare({ title, subtitle }) {
       return {
         title: title ?? 'Unknown',
-        subtitle: subtitle ? String(subtitle) : 'No heading yet',
+        subtitle: defaultLanguageValue(subtitle),
       };
     },
   },

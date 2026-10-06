@@ -1,5 +1,5 @@
 import type {
-  TBrandVariantOf,
+  TBrandVariant,
   TContentAlignment,
   THeadingBlock,
   TLayout,
@@ -8,9 +8,10 @@ import type {
 } from '@blog/config';
 
 export type TNewsletterModule = {
-  brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
+  brandVariant: TBrandVariant;
   headingBlock: THeadingBlock;
   variant: TNewsletterVariant;
+  trustCues: TMaybeUndefined<string[]>;
   layout: TMaybeUndefined<TLayout>;
   contentAlignment: TMaybeUndefined<TContentAlignment>;
 };

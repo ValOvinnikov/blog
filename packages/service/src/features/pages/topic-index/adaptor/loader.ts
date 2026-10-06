@@ -1,9 +1,10 @@
 import type { TMaybeUndefined } from '@blog/config';
+import { isr } from '@blog/service/sanity/query/isr';
 import {
-  isr,
   runQuery,
   type TTenantSanityContext,
-} from '@blog/service/sanity/query';
+} from '@blog/service/sanity/query/query';
+import { buildLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
 
 import { topicIndexPageQuery } from './query';
 import { toTopicIndexPage } from './transformer';
@@ -14,9 +15,12 @@ export async function getIndexPage(
 ): Promise<TMaybeUndefined<TTopicIndexPage>> {
   const rawPage = await runQuery(topicIndexPageQuery, {
     tenant,
-    ...isr(['page_topicIndex', 'modules:taxonomyList'], tenant.projectId),
+    ...isr(
+      ['page_topicIndex', 'template_topicIndex', 'modules:taxonomyList'],
+      tenant.projectId,
+    ),
   });
   if (!rawPage) return undefined;
 
-  return toTopicIndexPage(rawPage);
+  return toTopicIndexPage(rawPage, buildLocaleParams(tenant).defaultLocale);
 }

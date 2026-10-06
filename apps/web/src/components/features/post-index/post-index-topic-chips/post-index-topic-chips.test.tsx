@@ -1,25 +1,19 @@
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { makeTopicWithPostCount } from '@web/testing/shared/topic/fixtures';
 
 import { PostIndexTopicChips } from './post-index-topic-chips';
 
-const { getTopicsSafelyMock, getTenantSanityContextMock } = vi.hoisted(() => ({
+vi.mock('@web/server/request-context/request-context');
+
+const { getTopicsSafelyMock } = vi.hoisted(() => ({
   getTopicsSafelyMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
 }));
+
+vi.mock('@web/i18n/navigation');
 
 vi.mock('@web/utils/get-topics-safely', () => ({
   getTopicsSafely: getTopicsSafelyMock,
-}));
-
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
-
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
 }));
 
 const setup = customRenderAsync(PostIndexTopicChips, { tenant: 'tenant-1' });
@@ -27,8 +21,6 @@ const setup = customRenderAsync(PostIndexTopicChips, { tenant: 'tenant-1' });
 describe(`<${PostIndexTopicChips.name}/>`, () => {
   beforeEach(() => {
     getTopicsSafelyMock.mockReset();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
   it('renders the topic chip row from the fetched topics', async () => {
@@ -58,12 +50,11 @@ describe(`<${PostIndexTopicChips.name}/>`, () => {
     ).not.toBeInTheDocument();
   });
 
-  it('resolves the tenant Sanity context, then forwards it to getTopicsSafely', async () => {
+  it('forwards the request context Sanity context to getTopicsSafely', async () => {
     getTopicsSafelyMock.mockResolvedValue([]);
 
     await setup();
 
-    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
     expect(getTopicsSafelyMock).toHaveBeenCalledWith(
       DEFAULT_TENANT_SANITY_CONTEXT,
     );

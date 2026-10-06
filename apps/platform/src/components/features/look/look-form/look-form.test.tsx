@@ -1,5 +1,16 @@
-import { DENSITY, FONT_CHOICE, PRESET_ID, RADIUS_SCALE } from '@blog/config';
-import { customRender, screen, waitFor } from '@platform/testing/custom-render';
+import {
+  DENSITY,
+  FONT_CHOICE,
+  LANGUAGE_SWITCHER_STYLE,
+  PRESET_ID,
+  RADIUS_SCALE,
+} from '@blog/config';
+import {
+  customRender,
+  screen,
+  waitFor,
+  within,
+} from '@platform/testing/custom-render';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import userEvent from '@testing-library/user-event';
 
@@ -34,6 +45,7 @@ const setup = customRender(LookForm, {
   tenantName: 'Acme Inc.',
   primaryDomain: 'acme.example.com',
   initialValues: defaultLookFormValues(),
+  hasMultipleLanguages: true,
 });
 
 describe(`<${LookForm.name}/>`, () => {
@@ -67,12 +79,10 @@ describe(`<${LookForm.name}/>`, () => {
   it('shows the favicon square requirement before any file is chosen', () => {
     setup();
 
-    expect(
-      screen.getByRole('button', { name: 'Upload logo' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Upload logo' })).toBeVisible();
     expect(
       screen.getByRole('button', { name: 'Upload favicon' }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
     expect(screen.getByText(/Pre-cropped square, please/)).toBeVisible();
   });
 
@@ -87,7 +97,7 @@ describe(`<${LookForm.name}/>`, () => {
 
     await user.click(screen.getByRole('radio', { name: 'Editorial' }));
 
-    expect(screen.getByAltText('Current logo')).toBeInTheDocument();
+    expect(screen.getByAltText('Current logo')).toBeVisible();
   });
 
   it("choosing a preset resets every one of that preset's defaults", async () => {
@@ -116,8 +126,48 @@ describe(`<${LookForm.name}/>`, () => {
         bodyFont: FONT_CHOICE.NEWSREADER,
         radiusScale: RADIUS_SCALE.MD,
         density: DENSITY.DEFAULT,
+        languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
       });
     });
+  });
+
+  it('shows the language switcher style outside the collapsed Advanced section', () => {
+    setup();
+
+    expect(screen.getByRole('button', { name: 'Compact codes' })).toBeVisible();
+    expect(
+      within(screen.getByTestId('disclosure')).queryByText('Language switcher'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('saves the chosen language switcher style', async () => {
+    const user = userEvent.setup();
+    setup();
+
+    await user.click(screen.getByRole('button', { name: 'Compact codes' }));
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    await waitFor(() => {
+      expect(updateLookActionMock).toHaveBeenCalledWith(
+        'tenant-1',
+        expect.objectContaining({
+          languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
+        }),
+      );
+    });
+  });
+
+  it('shows a note instead of the language switcher choice with one live language', () => {
+    setup({ hasMultipleLanguages: false });
+
+    expect(
+      screen.getByText(
+        'Add another language in Languages settings to choose a style.',
+      ),
+    ).toBeVisible();
+    expect(
+      screen.queryByRole('button', { name: 'Compact codes' }),
+    ).not.toBeInTheDocument();
   });
 
   it('shows a save-confirmation toast once the save resolves', async () => {

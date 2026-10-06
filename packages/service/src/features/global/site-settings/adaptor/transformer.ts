@@ -10,7 +10,9 @@ export type TRawSiteSettings = NonNullable<
 >;
 
 export function toSiteSettings(raw: TRawSiteSettings): TSiteSettings {
-  const taglineItems = raw.brand.tagline?.items ?? [];
+  const taglineItems = (raw.brand.tagline?.items ?? []).flatMap((item) =>
+    item.text ? [item.text] : [],
+  );
   const taglineSeparator = raw.brand.tagline?.separator;
   const tagline =
     taglineItems.length && taglineSeparator
@@ -25,5 +27,6 @@ export function toSiteSettings(raw: TRawSiteSettings): TSiteSettings {
       tagline,
       logo: toSanityImage(raw.brand.logo),
     },
+    currency: raw.currency,
   };
 }

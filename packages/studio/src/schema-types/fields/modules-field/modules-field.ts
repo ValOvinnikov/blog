@@ -1,3 +1,9 @@
+import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
+import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
+import {
+  moduleInsertMenuGroups,
+  sortModulesByKind,
+} from '@blog/studio/structure/module-kinds/module-kinds';
 import { defineArrayMember, defineField } from 'sanity';
 
 type TModuleReference = { _type?: string; _key?: string };
@@ -7,22 +13,20 @@ const ONCE_ERROR = 'Only one module of this type is allowed per page.';
 const modulePath = (module: TModuleReference, index: number) =>
   module._key ? [{ _key: module._key }] : [index];
 
-/**
- * `allow` is typed `string[]` rather than a module-type union: `defineType(...)`
- * widens `.name` to `string`, so callers pass e.g. `postListSchema.name` /
- * `ctaSchema.name` directly. Sanity validates the referenced type names exist
- * at `schema extract` time regardless.
- */
+const DEFAULT_MODULES = [ctaSchema.name, newsletterSchema.name];
+
 export const modulesField = ({
-  allow,
+  extend = [],
   description,
   once,
 }: {
-  allow: string[];
+  extend?: string[];
   description?: string;
   once?: string[];
-}) =>
-  defineField({
+}) => {
+  const allow = sortModulesByKind([...DEFAULT_MODULES, ...extend]);
+
+  return defineField({
     name: 'modules',
     title: 'Modules',
     type: 'array',
@@ -30,6 +34,7 @@ export const modulesField = ({
     of: allow.map((type) =>
       defineArrayMember({ name: type, type: 'reference', to: [{ type }] }),
     ),
+    options: { insertMenu: { groups: moduleInsertMenuGroups(allow) } },
     validation: (rule) => {
       // `unique()` compares array items by `_ref` for reference-typed array
       // members, so this rejects the same module document being referenced
@@ -61,3 +66,4 @@ export const modulesField = ({
       });
     },
   });
+};

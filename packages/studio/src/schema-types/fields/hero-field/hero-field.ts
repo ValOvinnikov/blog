@@ -1,3 +1,4 @@
+import { sortModulesByKind } from '@blog/studio/structure/module-kinds/module-kinds';
 import { defineField } from 'sanity';
 
 export const heroField = ({ allow }: { allow: string[] }) =>
@@ -6,5 +7,5 @@ export const heroField = ({ allow }: { allow: string[] }) =>
     title: 'Hero',
     type: 'reference',
     description: "Optional. Replaces the page's heading and owns the h1.",
-    to: allow.map((type) => ({ type })),
+    to: sortModulesByKind(allow).map((type) => ({ type })),
   });

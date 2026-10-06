@@ -7,16 +7,24 @@ import {
   type TCtaVariant,
 } from '@blog/config/constants';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
+import { isBannerVariantDocument } from '@blog/studio/schema-types/fields/banner-variant-document-predicate/banner-variant-document-predicate';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { containerWidthField } from '@blog/studio/schema-types/fields/container-width-field/container-width-field';
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
+import { localizedListedTextField } from '@blog/studio/schema-types/fields/localized-listed-text-field/localized-listed-text-field';
+import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
+import { mediaOrderField } from '@blog/studio/schema-types/fields/media-order-field/media-order-field';
+import { spacingAndDividerFields } from '@blog/studio/schema-types/fields/spacing-and-divider-fields/spacing-and-divider-fields';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
-import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
-import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
-import { listedTextSchema } from '@blog/studio/schema-types/portable-text/listed-text/listed-text';
+import { localizedImageWithAltSchema } from '@blog/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
+import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
+import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
+import { validateLocalizedMaxLength } from '@blog/studio/schema-types/validation/validate-localized-max-length/validate-localized-max-length';
 import { toTitleCase } from '@blog/utils/primitives';
-import { Megaphone } from 'lucide-react';
+import { Megaphone, SlidersHorizontal } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
+
+const FOOTNOTE_MAX_LENGTH = 120;
 
 type TCtaParent = { variant?: string; brandVariant?: string };
 
@@ -32,6 +40,28 @@ const isBannerVariant = ({ parent }: { parent?: unknown }) =>
 const isNotBannerVariant = ({ parent }: { parent?: unknown }) =>
   !isVariant(parent, CTA_VARIANT.BANNER);
 
+const ctaLayoutField = () => {
+  const layoutSpacingAndDividerFields = spacingAndDividerFields({
+    spacingDescriptionSuffix: ' On a Banner, this sets the Banner’s height.',
+    dividerHidden: isBannerVariantDocument,
+  });
+
+  return defineField({
+    name: 'layout',
+    title: 'Layout',
+    type: 'object',
+    description:
+      'Optional visual overrides — spacing, container width, dividers.',
+    icon: SlidersHorizontal,
+    options: { collapsible: true, collapsed: true },
+    fields: [
+      ...layoutSpacingAndDividerFields.slice(0, 2),
+      containerWidthField({ hidden: isBannerVariantDocument }),
+      ...layoutSpacingAndDividerFields.slice(2),
+    ],
+  });
+};
+
 export const ctaSchema = defineType({
   name: 'module_cta',
   title: 'Call to Action',
@@ -46,24 +76,23 @@ export const ctaSchema = defineType({
       description: 'Fill color of the card itself.',
       initialValue: BRAND_VARIANT.SECONDARY,
     }),
-    headingBlockField(),
-    defineField({
+    moduleHeadingBlockField(),
+    localizedOneLineTextField({
       name: 'eyebrow',
       title: 'Eyebrow',
-      type: 'string',
       description: 'Short line above the heading.',
     }),
     defineField({
       name: 'image',
       title: 'Image',
-      type: imageWithAltSchema.name,
+      type: localizedImageWithAltSchema.name,
       description: 'Optional image, placed according to the Variant.',
       validation: (rule) =>
-        rule.custom((value, context) => {
+        rule.custom<{ asset?: unknown }>((value, context) => {
           const variant = (context.parent as TCtaParent | undefined)?.variant;
 
           if (
-            !value &&
+            !value?.asset &&
             (variant === CTA_VARIANT.BANNER || variant === CTA_VARIANT.SPLIT)
           ) {
             return 'Image is required for the Banner and Split variants.';
@@ -72,19 +101,21 @@ export const ctaSchema = defineType({
           return true;
         }),
     }),
-    defineField({
-      name: 'content',
-      title: 'Content',
-      type: listedTextSchema.name,
+    localizedListedTextField({
       description: 'Optional longer text below the heading.',
     }),
     ctaButtonsField(),
-    defineField({
+    localizedOneLineTextField({
       name: 'footnote',
       title: 'Footnote',
-      type: 'string',
       description: 'Small print below the actions.',
-      validation: (rule) => rule.max(120),
+      validation: (rule) =>
+        rule.custom(
+          validateLocalizedMaxLength(
+            FOOTNOTE_MAX_LENGTH,
+            `Keep each footnote to ${FOOTNOTE_MAX_LENGTH} characters or fewer.`,
+          ),
+        ),
     }),
     defineField({
       name: 'variant',
@@ -153,23 +184,15 @@ export const ctaSchema = defineType({
         hidden: isNotBannerVariant,
       },
     ]),
-    defineField({
+    mediaOrderField({
       name: 'mobileMediaOrder',
       title: 'Mobile Media Order',
-      type: 'string',
       description:
         'Whether the image comes before or after the text once the columns stack on small screens.',
-      options: {
-        layout: 'dropdown',
-        list: Object.values(MEDIA_ORDER).map((value) => ({
-          title: toTitleCase(value),
-          value,
-        })),
-      },
       initialValue: MEDIA_ORDER.LAST,
       hidden: isNotSplitVariant,
     }),
-    layoutField,
+    ctaLayoutField(),
   ],
   preview: {
     select: {
@@ -179,7 +202,7 @@ export const ctaSchema = defineType({
     prepare({ title, subtitle }) {
       return {
         title: title ?? 'Unknown',
-        subtitle,
+        subtitle: defaultLanguageValue(subtitle),
       };
     },
   },

@@ -1,27 +1,27 @@
 import type { TPageTagType } from '@blog/config';
-import { q, type TSlugParams } from '@blog/service/sanity/query';
+import { q } from '@blog/service/sanity/query/query';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
 import { moduleFragment } from '@blog/service/shared/fragments/module/module';
 import { seoFragment } from '@blog/service/shared/fragments/seo/seo';
 import { tagFragment } from '@blog/service/shared/fragments/tag/tag';
+import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
+import { translationsQuery } from '@blog/service/shared/localization/page-translations/translations';
 import type { TRawModule } from '@blog/service/shared/transformers/module/to-module';
+import type { TLocalizedSlugParams } from '@blog/service/shared/types/page/localized-slug-params';
 
 export const tagPageQuery = q
-  .parameters<TSlugParams>()
+  .parameters<TLocalizedSlugParams>()
   .star.filterByType('page_tag')
   .filterBy('slug.current == $slug')
+  .filterBy('language == $locale')
   .slice(0)
   .project((sub) => ({
-    // The tag *page* needs more than the minimal `{_id,title,slug}` chip
-    // shape `tagFragment` provides (that stays minimal for the post-detail
-    // tags projection) — it also needs `description` to derive its own
-    // metadata, so it spreads `tagFragment` and adds the extra field.
     tag: sub
       .field('tag')
       .deref()
       .project((tagSub) => ({
         ...tagFragment,
-        description: tagSub.field('description').nullable(true),
+        description: getLocalizedField(tagSub, 'description'),
       }))
       .notNull(),
     headingBlock: sub
@@ -29,17 +29,22 @@ export const tagPageQuery = q
       .project(headingBlockFragment)
       .notNull(),
     hero: sub
+      .field('template')
+      .deref()
       .field('hero')
       .deref()
       .project(moduleFragment)
       .as<TRawModule<TPageTagType>>()
       .nullable(),
     modules: sub
+      .field('template')
+      .deref()
       .field('modules[]')
       .deref()
       .project(moduleFragment)
       .as<TRawModule<TPageTagType>[]>()
       .nullable(),
     seo: sub.field('seo').project(seoFragment).notNull(),
+    translations: translationsQuery,
   }))
   .nullable(true);

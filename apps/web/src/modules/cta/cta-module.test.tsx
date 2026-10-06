@@ -1,11 +1,11 @@
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync } from '@web/testing/custom-render';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { CtaModule } from './cta-module';
 
-const { getCtaMock, getTenantSanityContextMock } = vi.hoisted(() => ({
+const { getCtaMock } = vi.hoisted(() => ({
   getCtaMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -16,21 +16,19 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
+vi.mock('@web/server/request-context/request-context');
+
+const getRequestContextMock = vi.mocked(getRequestContext);
 
 const setup = customRenderAsync(CtaModule, {
   id: 'cta-1',
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${CtaModule.name}/>`, () => {
   beforeEach(() => {
     getCtaMock.mockReset();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
+    getRequestContextMock.mockReset();
+    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
   it('renders nothing when the fetch fails', async () => {
@@ -47,12 +45,14 @@ describe(`<${CtaModule.name}/>`, () => {
       dataset: 'production',
       token: 'tenant-token',
     };
-    getTenantSanityContextMock.mockResolvedValue(tenant);
+    getRequestContextMock.mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      sanityContext: tenant,
+    });
     getCtaMock.mockResolvedValue({ ok: false, error: new Error('boom') });
 
     await setup();
 
     expect(getCtaMock).toHaveBeenCalledWith('cta-1', tenant);
-    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
   });
 });

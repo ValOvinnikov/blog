@@ -2,10 +2,10 @@ import { routes, type ITenantLocalizedParams } from '@blog/config';
 import { PostIndexPage } from '@web/components/pages/post-index-page';
 import { permanentRedirect } from '@web/i18n/navigation';
 import { buildPostIndexMetadata } from '@web/metadata/post-index-metadata';
+import { enterRequestContext } from '@web/server/request-context/request-context';
 import { parsePageParam } from '@web/utils/parse-page-param/parse-page-param';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { setRequestLocale } from 'next-intl/server';
 
 type TProps = {
   params: Promise<ITenantLocalizedParams & { page: string }>;
@@ -19,15 +19,16 @@ export function generateStaticParams() {
 export const revalidate = 21600;
 
 export async function generateMetadata({ params }: TProps): Promise<Metadata> {
-  const { tenant, page: rawPage } = await params;
+  await enterRequestContext(params);
+  const { page: rawPage } = await params;
   const page = parsePageParam(rawPage);
   if (page === null || page < 2) return {};
-  return buildPostIndexMetadata(page, tenant);
+  return buildPostIndexMetadata(page);
 }
 
 export default async function PostIndexNumberedPage({ params }: TProps) {
-  const { locale, tenant, page: rawPage } = await params;
-  setRequestLocale(locale);
+  const { locale, page: rawPage } = await params;
+  await enterRequestContext(params);
 
   const page = parsePageParam(rawPage);
 
@@ -41,5 +42,5 @@ export default async function PostIndexNumberedPage({ params }: TProps) {
     permanentRedirect({ href: routes.blogIndex(1), locale });
   }
 
-  return <PostIndexPage page={page} locale={locale} tenant={tenant} />;
+  return <PostIndexPage page={page} />;
 }

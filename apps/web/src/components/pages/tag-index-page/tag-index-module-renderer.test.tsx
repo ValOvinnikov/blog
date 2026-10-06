@@ -8,6 +8,7 @@ import {
   testResolvedHero,
   testWarnsForUnknownModule,
 } from '@web/testing/shared/module-renderer-contract/module-renderer-contract';
+import { logger } from '@web/utils/logger/logger';
 import type { ReactNode } from 'react';
 
 import { TagIndexModuleRenderer } from './tag-index-module-renderer';
@@ -18,8 +19,11 @@ const {
   postLatestModuleMock,
   taxonomyListModuleMock,
   heroBlogModuleMock,
-  loggerWarnMock,
+  contentModuleMock,
 } = vi.hoisted(() => ({
+  contentModuleMock: vi.fn(({ id }: { id: string }) => (
+    <div data-testid="stub-content">{id}</div>
+  )),
   ctaModuleMock: vi.fn(({ id }: { id: string }) => (
     <div data-testid="stub-cta">{id}</div>
   )),
@@ -37,7 +41,6 @@ const {
       <h1 data-testid="stub-hero">{id}</h1>
     ),
   ),
-  loggerWarnMock: vi.fn(),
 }));
 
 vi.mock('@web/modules/cta/cta-module', () => ({ CtaModule: ctaModuleMock }));
@@ -54,21 +57,18 @@ vi.mock('@web/modules/hero-blog/hero-blog-module', () => ({
   HeroBlogModule: heroBlogModuleMock,
 }));
 
-vi.mock('@web/utils/logger/logger', () => ({
-  logger: {
-    error: vi.fn(),
-    warn: loggerWarnMock,
-    info: vi.fn(),
-    debug: vi.fn(),
-  },
+vi.mock('@web/modules/content/content-module', () => ({
+  ContentModule: contentModuleMock,
 }));
+
+vi.mock('@web/utils/logger/logger');
+
+const loggerWarnMock = vi.mocked(logger.warn);
 
 const setup = customRenderAsync(TagIndexModuleRenderer, {
   hero: undefined,
   headingBlock: makeHeadingBlock({ heading: 'Tags' }),
   modules: [],
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${TagIndexModuleRenderer.name}/>`, () => {
@@ -101,12 +101,14 @@ describe(`<${TagIndexModuleRenderer.name}/>`, () => {
       { id: 'post-latest-1', type: 'module_postLatest' },
       { id: 'cta-1', type: 'module_cta' },
       { id: 'newsletter-1', type: 'module_newsletter' },
+      { id: 'content-1', type: 'module_content' },
     ],
     expectedOrder: [
       'taxonomy-list-1',
       'post-latest-1',
       'cta-1',
       'newsletter-1',
+      'content-1',
     ],
   });
 });

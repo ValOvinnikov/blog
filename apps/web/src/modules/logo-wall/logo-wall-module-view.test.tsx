@@ -3,17 +3,14 @@ import { customRender, screen } from '@web/testing/custom-render';
 import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
 import { makeLogoItem } from '@web/testing/modules/logo-wall/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { LogoWallModuleView } from './logo-wall-module-view';
-
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
 
 const { LogoWallCarousel } = vi.hoisted(() => ({
   LogoWallCarousel: vi.fn(() => <div data-testid="logo-wall-carousel-stub" />),
 }));
+
+vi.mock('@web/i18n/navigation');
 
 vi.mock('./components/logo-wall-carousel/logo-wall-carousel', () => ({
   LogoWallCarousel,
@@ -56,9 +53,7 @@ describe(`<${LogoWallModuleView.name}/>`, () => {
 
     it('renders every logo as an image named after the company, never as visible text', () => {
       logos.forEach((logo) => {
-        expect(
-          screen.getByRole('img', { name: logo.name }),
-        ).toBeInTheDocument();
+        expect(screen.getByRole('img', { name: logo.name })).toBeVisible();
       });
       expect(LogoWallCarousel).not.toHaveBeenCalled();
     });
@@ -97,14 +92,8 @@ describe(`<${LogoWallModuleView.name}/>`, () => {
     setup({ displayMode: DISPLAY_MODE.CAROUSEL });
 
     expect(LogoWallCarousel).toHaveBeenCalledTimes(1);
-    expect(screen.getByTestId('logo-wall-carousel-stub')).toBeInTheDocument();
+    expect(screen.getByTestId('logo-wall-carousel-stub')).toBeVisible();
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
-  });
-
-  it('renders nothing when logos is empty, never an empty landmark with a dangling aria-labelledby', () => {
-    const { container } = setup({ logos: [] });
-
-    expect(container).toBeEmptyDOMElement();
   });
 
   it('renders the resolved cta buttons when present', () => {

@@ -1,24 +1,24 @@
+import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { redirect } from 'next/navigation';
+import type { Session } from 'next-auth';
 
 import FeaturesPage from './page';
 
 const {
-  authMock,
   getAdminByUserIdMock,
   getTenantByIdMock,
   getSettingsFeaturesMock,
   getSiteConfigMock,
 } = vi.hoisted(() => ({
-  authMock: vi.fn(),
   getAdminByUserIdMock: vi.fn(),
   getTenantByIdMock: vi.fn(),
   getSettingsFeaturesMock: vi.fn(),
   getSiteConfigMock: vi.fn(),
 }));
 
-vi.mock('@platform/server/auth/auth', () => ({ auth: authMock }));
+vi.mock('@platform/server/auth/auth');
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
@@ -29,6 +29,8 @@ vi.mock('@blog/db', async () => ({
     siteConfig: { getSiteConfig: getSiteConfigMock },
   },
 }));
+
+const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 const setup = customRenderAsync(FeaturesPage, {
   params: Promise.resolve({ tenantId: 'tenant-1' }),
@@ -62,12 +64,12 @@ describe(`<${FeaturesPage.name}/>`, () => {
     expect(getSettingsFeaturesMock).not.toHaveBeenCalled();
   });
 
-  it('renders the preset featureDefaults for a platform operator with no settings_features row yet', async () => {
+  it('renders preset featureDefaults for an operator with no settings_features row', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });
     getTenantByIdMock.mockResolvedValue({
       id: 'tenant-1',
-      plan: 'FREE',
+      plan: 'GROWTH',
     });
     getSettingsFeaturesMock.mockResolvedValue(undefined);
     getSiteConfigMock.mockResolvedValue(undefined);
@@ -76,7 +78,7 @@ describe(`<${FeaturesPage.name}/>`, () => {
 
     expect(getSettingsFeaturesMock).toHaveBeenCalledWith('tenant-1');
     expect(screen.getByRole('heading', { name: 'Features' })).toBeVisible();
-    expect(screen.getByRole('switch', { name: 'Comments' })).toHaveAttribute(
+    expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(
       'data-checked',
       '',
     );
@@ -94,16 +96,16 @@ describe(`<${FeaturesPage.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByRole('switch', { name: 'Newsletter' })).toHaveAttribute(
-      'data-disabled',
-      '',
-    );
     expect(screen.getByRole('switch', { name: 'Analytics' })).toHaveAttribute(
       'data-disabled',
       '',
     );
+    expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(
+      'data-disabled',
+      '',
+    );
     expect(
-      screen.getByRole('switch', { name: 'Comments' }),
+      screen.getByRole('switch', { name: 'Cookie consent banner' }),
     ).not.toHaveAttribute('data-disabled');
   });
 });

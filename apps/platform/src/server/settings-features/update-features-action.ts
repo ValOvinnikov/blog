@@ -6,7 +6,10 @@ import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { logger } from '@platform/utils/logger/logger';
-import { CAPABILITY_TOGGLES } from '@platform/utils/settings-features-fields/settings-features-fields';
+import {
+  CAPABILITY_TOGGLES,
+  withComingSoonOff,
+} from '@platform/utils/settings-features-fields/settings-features-fields';
 import { z } from 'zod';
 
 const updateFeaturesInputSchema = z.object({
@@ -15,15 +18,16 @@ const updateFeaturesInputSchema = z.object({
   bookmarksEnabled: z.boolean(),
   newsletterEnabled: z.boolean(),
   analyticsEnabled: z.boolean(),
+  consentBannerEnabled: z.boolean(),
 });
 
 export type TUpdateFeaturesInput = z.input<typeof updateFeaturesInputSchema>;
 export type TUpdateFeaturesResult = { ok: true } | { ok: false };
 
 /**
- * The Features tab's save action. Rejects the whole save (writes nothing)
- * if any toggle in the payload exceeds `PLAN_REGISTRY[tenant.plan]`, rather
- * than silently dropping just that field.
+ * The Features tab's save action. A "Coming soon" capability is always
+ * written off; any other toggle exceeding `PLAN_REGISTRY[tenant.plan]`
+ * rejects the whole save rather than silently dropping just that field.
  */
 export const updateFeaturesAction = async (
   tenantId: string,
@@ -33,11 +37,11 @@ export const updateFeaturesAction = async (
   if (!parsed.success) return { ok: false };
 
   const { tenant } = await requireTenantMembership(tenantId);
+  const values = withComingSoonOff(parsed.data);
 
   const entitled = PLAN_REGISTRY[tenant.plan];
   const outOfPlan = CAPABILITY_TOGGLES.filter(
-    ({ capability, field }) =>
-      parsed.data[field] === true && !entitled.includes(capability),
+    ({ capability, field }) => values[field] && !entitled.includes(capability),
   );
 
   if (outOfPlan.length > 0) {
@@ -50,17 +54,14 @@ export const updateFeaturesAction = async (
   }
 
   try {
-    await queries.settingsFeatures.upsertSettingsFeatures(
-      tenant.id,
-      parsed.data,
-    );
+    await queries.settingsFeatures.upsertSettingsFeatures(tenant.id, values);
     await revalidateSiteConfig(tenant.id);
     await recordAuditEvent({
       logEvent: 'settings_features.update_audit_failed',
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SETTINGS_FEATURES,
       targetId: tenant.id,
-      details: parsed.data,
+      details: values,
     });
     return { ok: true };
   } catch (error) {

@@ -1,12 +1,12 @@
-import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
-import {
-  ctaButtonFragment,
-  ctaSecondaryButtonFragment,
-} from '@blog/service/shared/fragments/cta/cta-button';
-import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
-import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
-import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
-import { listedTextBlockFragment } from '@blog/service/shared/fragments/portable-text/listed-text-block';
+import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
+import { ctaSecondaryButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
+import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
+import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
+import { localizedImageWithAltFragment } from '@blog/service/shared/fragments/image/localized-image-with-alt';
+import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
+import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
+import { getLocalizedPortableTextBlock } from '@blog/service/shared/localization/get-localized-portable-text-block/get-localized-portable-text-block';
 
 export const featureHighlightsModuleQuery = q
   .parameters<TModuleQueryParams>()
@@ -17,20 +17,17 @@ export const featureHighlightsModuleQuery = q
     brandVariant: sub.field('brandVariant').notNull(),
     headingBlock: sub
       .field('headingBlock')
-      .project(headingBlockFragment)
+      .project(moduleHeadingBlockFragment)
       .notNull(),
     highlights: sub
       .field('highlights[]')
       .project((highlightSub) => ({
         _key: true,
-        heading: highlightSub.field('heading').notNull(),
-        body: highlightSub
-          .field('body[]')
-          .project(listedTextBlockFragment)
-          .notNull(),
+        heading: getLocalizedField(highlightSub, 'heading').notNull(),
+        body: getLocalizedPortableTextBlock(highlightSub, 'body').notNull(),
         image: highlightSub
           .field('image')
-          .project(sanityImageFragment)
+          .project(localizedImageWithAltFragment)
           .notNull(),
         action: highlightSub
           .field('action')
@@ -38,12 +35,9 @@ export const featureHighlightsModuleQuery = q
           .nullable(true),
       }))
       .notNull(),
-    ctaButtons: sub
-      .field('ctaButtons[]')
-      .project(ctaButtonFragment)
-      .nullable(true),
+    ...ctaButtonsFragment,
     mediaOrder: sub.field('mediaOrder').notNull(),
-    contentAlignment: sub.field('contentAlignment').nullable(true),
-    layout: sub.field('layout').project(layoutFragment).nullable(true),
+    ...moduleContentAlignmentFragment,
+    ...moduleWideLayoutFragment,
   }))
   .notNull();

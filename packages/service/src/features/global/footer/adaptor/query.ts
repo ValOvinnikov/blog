@@ -1,4 +1,4 @@
-import { q } from '@blog/service/sanity/query';
+import { q } from '@blog/service/sanity/query/query';
 import { socialProfileFragment } from '@blog/service/shared/fragments/social-profile/social-profile';
 
 export const footerQuery = q.star
@@ -6,5 +6,6 @@ export const footerQuery = q.star
   .slice(0)
   .project((sub) => ({
     social: sub.field('social[]').project(socialProfileFragment).nullable(true),
+    showLanguageSwitcher: sub.field('showLanguageSwitcher').nullable(true),
   }))
   .notNull();

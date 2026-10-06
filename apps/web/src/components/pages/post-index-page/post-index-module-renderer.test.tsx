@@ -7,6 +7,7 @@ import {
   testResolvedHero,
   testWarnsForUnknownModule,
 } from '@web/testing/shared/module-renderer-contract/module-renderer-contract';
+import { logger } from '@web/utils/logger/logger';
 import type { ReactNode } from 'react';
 
 import { PostIndexModuleRenderer } from './post-index-module-renderer';
@@ -18,8 +19,15 @@ const {
   postListModuleMock,
   taxonomyListModuleMock,
   heroBlogModuleMock,
-  loggerWarnMock,
+  contentModuleMock,
+  postLatestModuleMock,
 } = vi.hoisted(() => ({
+  postLatestModuleMock: vi.fn(({ id }: { id: string }) => (
+    <div data-testid="stub-post-latest">{id}</div>
+  )),
+  contentModuleMock: vi.fn(({ id }: { id: string }) => (
+    <div data-testid="stub-content">{id}</div>
+  )),
   ctaModuleMock: vi.fn(({ id }: { id: string }) => (
     <div data-testid="stub-cta">{id}</div>
   )),
@@ -40,7 +48,6 @@ const {
       <h1 data-testid="stub-hero">{id}</h1>
     ),
   ),
-  loggerWarnMock: vi.fn(),
 }));
 
 vi.mock('@web/modules/cta/cta-module', () => ({ CtaModule: ctaModuleMock }));
@@ -60,21 +67,22 @@ vi.mock('@web/modules/hero-blog/hero-blog-module', () => ({
   HeroBlogModule: heroBlogModuleMock,
 }));
 
-vi.mock('@web/utils/logger/logger', () => ({
-  logger: {
-    error: vi.fn(),
-    warn: loggerWarnMock,
-    info: vi.fn(),
-    debug: vi.fn(),
-  },
+vi.mock('@web/modules/content/content-module', () => ({
+  ContentModule: contentModuleMock,
 }));
+
+vi.mock('@web/modules/post-latest/post-latest-module', () => ({
+  PostLatestModule: postLatestModuleMock,
+}));
+
+vi.mock('@web/utils/logger/logger');
+
+const loggerWarnMock = vi.mocked(logger.warn);
 
 const setup = customRenderAsync(PostIndexModuleRenderer, {
   hero: undefined,
   headingBlock: makeHeadingBlock({ heading: 'Notes on building things' }),
   modules: [],
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${PostIndexModuleRenderer.name}/>`, () => {
@@ -107,7 +115,7 @@ describe(`<${PostIndexModuleRenderer.name}/>`, () => {
   testWarnsForUnknownModule({
     setup,
     loggerWarnMock,
-    unknownModule: { id: 'content-1', type: 'module_content' },
+    unknownModule: { id: 'stats-1', type: 'module_stats' },
     description:
       'renders nothing and warns once for a module absent from the post index allow-list',
   });
@@ -119,6 +127,8 @@ describe(`<${PostIndexModuleRenderer.name}/>`, () => {
       { id: 'cta-1', type: 'module_cta' },
       { id: 'newsletter-1', type: 'module_newsletter' },
       { id: 'post-featured-1', type: 'module_postFeatured' },
+      { id: 'content-1', type: 'module_content' },
+      { id: 'post-latest-1', type: 'module_postLatest' },
     ],
     expectedOrder: [
       'post-list-1',
@@ -126,6 +136,8 @@ describe(`<${PostIndexModuleRenderer.name}/>`, () => {
       'cta-1',
       'newsletter-1',
       'post-featured-1',
+      'content-1',
+      'post-latest-1',
     ],
   });
 
@@ -138,8 +150,6 @@ describe(`<${PostIndexModuleRenderer.name}/>`, () => {
     expect(postListModuleMock).toHaveBeenCalledWith(
       {
         id: 'post-list-1',
-        locale: 'en',
-        tenant: 'tenant-1',
         context: { page: 2 },
       },
       undefined,

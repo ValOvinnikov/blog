@@ -1,18 +1,15 @@
 import { tagSchema } from '@blog/studio/schema-types/documents/blog/tag/tag';
 import { PAGE_TAG_TYPE } from '@blog/studio/schema-types/documents/pages/tag/tag-type';
-import { heroField } from '@blog/studio/schema-types/fields/hero-field/hero-field';
-import { modulesField } from '@blog/studio/schema-types/fields/modules-field/modules-field';
+import { tagTemplateSchema } from '@blog/studio/schema-types/documents/templates/tag/tag';
+import { languageField } from '@blog/studio/schema-types/fields/language-field/language-field';
 import { slugField } from '@blog/studio/schema-types/fields/slug-field/slug-field';
+import { templateField } from '@blog/studio/schema-types/fields/template-field/template-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { createSlugUrlPreviewInput } from '@blog/studio/schema-types/inputs/slug-url-preview/slug-url-preview-input';
-import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
-import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
-import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
-import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
-import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
-import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
+import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
+import { validateSlugUniqueInLanguage } from '@blog/studio/schema-types/validation/validate-slug-unique-in-language/validate-slug-unique-in-language';
 import { validateUniqueTaxonomyReference } from '@blog/studio/schema-types/validation/validate-unique-taxonomy-reference/validate-unique-taxonomy-reference';
 import { Tag } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
@@ -20,7 +17,7 @@ import { defineField, defineType } from 'sanity';
 const tagSlugUrlPreviewInput = createSlugUrlPreviewInput('/tags/');
 
 const TAG_UNIQUENESS_ERROR =
-  'Another Tag Page already references this tag — each tag can only back one Tag Page.';
+  'Another Tag Page in this language already references this tag — each tag can only back one Tag Page per language.';
 
 export const tagPageSchema = defineType({
   name: PAGE_TAG_TYPE,
@@ -30,10 +27,12 @@ export const tagPageSchema = defineType({
     'The archive page for one tag, listing the posts labeled with it.',
   icon: Tag,
   fields: [
+    languageField(),
     titleField(),
     slugField({
       description: 'URL path segment — auto-generated from title.',
       previewInput: tagSlugUrlPreviewInput,
+      isUnique: validateSlugUniqueInLanguage,
     }),
     defineField({
       name: 'tag',
@@ -53,17 +52,7 @@ export const tagPageSchema = defineType({
           ),
     }),
     headingBlockField(),
-    heroField({ allow: [heroBlogSchema.name] }),
-    modulesField({
-      allow: [
-        postListSchema.name,
-        postLatestSchema.name,
-        ctaSchema.name,
-        newsletterSchema.name,
-        taxonomyListSchema.name,
-      ],
-      once: [postListSchema.name],
-    }),
+    templateField({ type: tagTemplateSchema.name }),
     seoField(),
   ],
   preview: {
@@ -72,9 +61,11 @@ export const tagPageSchema = defineType({
       tagTitle: 'tag.title',
     },
     prepare({ title, tagTitle }) {
+      const tagName = defaultLanguageValue(tagTitle);
+
       return {
         title: title ?? 'Unknown',
-        subtitle: tagTitle ? `Tag: ${String(tagTitle)}` : undefined,
+        subtitle: tagName ? `Tag: ${tagName}` : undefined,
       };
     },
   },

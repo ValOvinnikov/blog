@@ -7,8 +7,8 @@ import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fiel
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
+import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
 import { timelineItemSchema } from '@blog/studio/schema-types/objects/timeline-item/timeline-item';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { validateTimelineHorizontalItemCap } from '@blog/studio/schema-types/validation/validate-timeline-horizontal-item-cap/validate-timeline-horizontal-item-cap';
@@ -26,7 +26,7 @@ export const timelineSchema = defineType({
   fields: [
     titleField(),
     brandVariantField(),
-    headingBlockField(),
+    moduleHeadingBlockField(),
     defineField({
       name: 'markerStyle',
       title: 'Marker Style',
@@ -71,16 +71,19 @@ export const timelineSchema = defineType({
       validation: (rule) => rule.required(),
     }),
     ctaButtonsField(),
-    ...alignmentFields([
-      {
-        name: 'itemAlignment',
-        title: 'Item Alignment',
-        description: 'Aligns the marker and text within each timeline item.',
-        allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
-        initialValue: CONTENT_ALIGNMENT.LEFT,
-        validation: (rule) => rule.required(),
-      },
-    ]),
+    ...alignmentFields(
+      [
+        {
+          name: 'itemAlignment',
+          title: 'Item Alignment',
+          description: 'Aligns the marker and text within each timeline item.',
+          allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
+          initialValue: CONTENT_ALIGNMENT.LEFT,
+          validation: (rule) => rule.required(),
+        },
+      ],
+      { allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER] },
+    ),
     layoutField,
   ],
   preview: {

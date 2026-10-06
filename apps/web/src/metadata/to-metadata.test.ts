@@ -1,9 +1,6 @@
 import type { ISanityImage } from '@blog/config';
-import {
-  type TSanityProjectRef,
-  type TSeoResolved,
-  urlForSanityImage,
-} from '@blog/service';
+import { type TSeoResolved, urlForSanityImage } from '@blog/service';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import {
   resolveOpenGraph,
   resolveTwitter,
@@ -14,10 +11,7 @@ import { toMetadata } from './to-metadata';
 type TOpenGraphWithType = { type?: string };
 type TTwitterWithCard = { card?: string };
 
-const project: TSanityProjectRef = {
-  projectId: 'test-project',
-  dataset: 'test-dataset',
-};
+vi.mock('@web/server/request-context/request-context');
 
 const ogImage: ISanityImage = {
   assetId: 'image-6205dacc42424f7a83d8e20a7000d895f7cdc7de-800x600-jpg',
@@ -28,7 +22,10 @@ const ogImage: ISanityImage = {
   dimensions: { width: 800, height: 600, aspectRatio: 800 / 600 },
 };
 
-const EXPECTED_OG_IMAGE_URL = urlForSanityImage(ogImage, project);
+const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
+  ogImage,
+  DEFAULT_TENANT_SANITY_CONTEXT,
+);
 
 const seo: TSeoResolved = {
   title: 'The Blog',
@@ -39,8 +36,8 @@ const seo: TSeoResolved = {
 };
 
 describe('toMetadata', () => {
-  it('maps canonical, description, and ogType', () => {
-    const metadata = toMetadata(seo, project, {
+  it('maps canonical, description, and ogType', async () => {
+    const metadata = await toMetadata(seo, {
       canonical: '/blog',
       ogType: 'website',
     });
@@ -52,8 +49,8 @@ describe('toMetadata', () => {
     );
   });
 
-  it('maps title as a plain string when titleAbsolute is not set', () => {
-    const metadata = toMetadata(seo, project, {
+  it('maps title as a plain string when titleAbsolute is not set', async () => {
+    const metadata = await toMetadata(seo, {
       canonical: '/blog',
       ogType: 'website',
     });
@@ -61,8 +58,8 @@ describe('toMetadata', () => {
     expect(metadata.title).toBe('The Blog');
   });
 
-  it('maps title as an absolute title object when titleAbsolute is true', () => {
-    const metadata = toMetadata(seo, project, {
+  it('maps title as an absolute title object when titleAbsolute is true', async () => {
+    const metadata = await toMetadata(seo, {
       canonical: '/',
       ogType: 'website',
       titleAbsolute: true,
@@ -71,8 +68,8 @@ describe('toMetadata', () => {
     expect(metadata.title).toEqual({ absolute: 'The Blog' });
   });
 
-  it('maps ogType article', () => {
-    const metadata = toMetadata(seo, project, {
+  it('maps ogType article', async () => {
+    const metadata = await toMetadata(seo, {
       canonical: '/blog/my-post',
       ogType: 'article',
     });
@@ -82,8 +79,8 @@ describe('toMetadata', () => {
     );
   });
 
-  it('maps openGraph title/description/images from ogTitle/ogDescription/ogImage', () => {
-    const metadata = toMetadata(seo, project, {
+  it('maps openGraph title/description/images from ogTitle/ogDescription/ogImage', async () => {
+    const metadata = await toMetadata(seo, {
       canonical: '/blog',
       ogType: 'website',
     });
@@ -95,19 +92,22 @@ describe('toMetadata', () => {
     ]);
   });
 
-  it('omits openGraph and twitter images when ogImage is absent', () => {
-    const metadata = toMetadata({ ...seo, ogImage: undefined }, project, {
-      canonical: '/',
-      ogType: 'website',
-    });
+  it('omits openGraph and twitter images when ogImage is absent', async () => {
+    const metadata = await toMetadata(
+      { ...seo, ogImage: undefined },
+      {
+        canonical: '/',
+        ogType: 'website',
+      },
+    );
 
     expect(metadata.openGraph?.images).toBeUndefined();
     expect(metadata.twitter?.images).toBeUndefined();
     expect((metadata.twitter as TTwitterWithCard | null)?.card).toBe('summary');
   });
 
-  it('omits description, openGraph.title/description, and twitter.title/description when the source fields are absent', () => {
-    const metadata = toMetadata(
+  it('omits description, openGraph.title/description, and twitter.title/description when the source fields are absent', async () => {
+    const metadata = await toMetadata(
       {
         title: 'Example Title',
         description: undefined,
@@ -115,7 +115,6 @@ describe('toMetadata', () => {
         ogDescription: undefined,
         ogImage: undefined,
       },
-      project,
       { canonical: '/', ogType: 'website' },
     );
 
@@ -127,8 +126,8 @@ describe('toMetadata', () => {
     expect(metadata.twitter?.description).toBeUndefined();
   });
 
-  it('maps twitter card, title, description, and images', () => {
-    const metadata = toMetadata(seo, project, {
+  it('maps twitter card, title, description, and images', async () => {
+    const metadata = await toMetadata(seo, {
       canonical: '/blog',
       ogType: 'website',
     });
@@ -141,8 +140,8 @@ describe('toMetadata', () => {
     expect(metadata.twitter?.images).toEqual([EXPECTED_OG_IMAGE_URL]);
   });
 
-  it('adds openGraph.publishedTime and authors for article type when provided', () => {
-    const metadata = toMetadata(seo, project, {
+  it('adds openGraph.publishedTime and authors for article type when provided', async () => {
+    const metadata = await toMetadata(seo, {
       canonical: '/blog/my-post',
       ogType: 'article',
       article: {
@@ -159,8 +158,8 @@ describe('toMetadata', () => {
     ]);
   });
 
-  it('omits openGraph.publishedTime and authors when article option is not passed', () => {
-    const metadata = toMetadata(seo, project, {
+  it('omits openGraph.publishedTime and authors when article option is not passed', async () => {
+    const metadata = await toMetadata(seo, {
       canonical: '/blog',
       ogType: 'website',
     });
@@ -173,8 +172,8 @@ describe('toMetadata', () => {
     ).toBeUndefined();
   });
 
-  it('adds alternates.types["application/rss+xml"] when feedUrl is provided', () => {
-    const metadata = toMetadata(seo, project, {
+  it('adds alternates.types["application/rss+xml"] when feedUrl is provided', async () => {
+    const metadata = await toMetadata(seo, {
       canonical: '/blog',
       ogType: 'website',
       feedUrl: '/rss.xml',
@@ -186,8 +185,8 @@ describe('toMetadata', () => {
     expect(metadata.alternates?.canonical).toBe('/blog');
   });
 
-  it('omits alternates.types when feedUrl is not provided', () => {
-    const metadata = toMetadata(seo, project, {
+  it('omits alternates.types when feedUrl is not provided', async () => {
+    const metadata = await toMetadata(seo, {
       canonical: '/blog',
       ogType: 'website',
     });
@@ -204,10 +203,13 @@ describe('toMetadata output resolved by Next itself', () => {
   };
 
   it('resolves openGraph.images to undefined, never an injected default, when ogImage is absent', async () => {
-    const metadata = toMetadata({ ...seo, ogImage: undefined }, project, {
-      canonical: '/',
-      ogType: 'website',
-    });
+    const metadata = await toMetadata(
+      { ...seo, ogImage: undefined },
+      {
+        canonical: '/',
+        ogType: 'website',
+      },
+    );
 
     const resolved = await resolveOpenGraph(
       metadata.openGraph,
@@ -220,11 +222,14 @@ describe('toMetadata output resolved by Next itself', () => {
     expect(resolved?.images).toBeUndefined();
   });
 
-  it('resolves twitter.images to undefined, never an injected default, when ogImage is absent', () => {
-    const metadata = toMetadata({ ...seo, ogImage: undefined }, project, {
-      canonical: '/',
-      ogType: 'website',
-    });
+  it('resolves twitter.images to undefined, never an injected default, when ogImage is absent', async () => {
+    const metadata = await toMetadata(
+      { ...seo, ogImage: undefined },
+      {
+        canonical: '/',
+        ogType: 'website',
+      },
+    );
 
     const resolved = resolveTwitter(
       metadata.twitter,
@@ -237,7 +242,7 @@ describe('toMetadata output resolved by Next itself', () => {
   });
 
   it('still resolves an explicit ogImage unchanged (no fallback applied)', async () => {
-    const metadata = toMetadata(seo, project, {
+    const metadata = await toMetadata(seo, {
       canonical: '/blog',
       ogType: 'website',
     });

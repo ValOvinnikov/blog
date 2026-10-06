@@ -1,4 +1,10 @@
-import type { TTopic, TTopicWithPostCount } from '@blog/service';
+import { LOCALE_ISO_CODES } from '@blog/config';
+import type {
+  TTopic,
+  TTopicDetailPage,
+  TTopicWithPostCount,
+} from '@blog/service';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 export const makeTopic = (overrides: Partial<TTopic> = {}): TTopic => {
   return {
@@ -16,6 +22,27 @@ export const makeTopicWithPostCount = (
   return {
     ...makeTopic(),
     postCount: 0,
+    ...overrides,
+  };
+};
+
+export const makeTopicDetailPage = (
+  overrides: Partial<TTopicDetailPage> = {},
+): TTopicDetailPage => {
+  return {
+    topic: makeTopic(),
+    headingBlock: makeHeadingBlock({ heading: 'Engineering' }),
+    hero: undefined,
+    modules: [],
+    faqs: [],
+    seo: {
+      title: 'Engineering',
+      description: 'Posts about building things.',
+      ogTitle: 'Engineering',
+      ogDescription: 'Posts about building things.',
+      ogImage: undefined,
+    },
+    translations: [{ language: LOCALE_ISO_CODES.EN, slug: 'engineering' }],
     ...overrides,
   };
 };

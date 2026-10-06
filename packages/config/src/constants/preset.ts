@@ -42,6 +42,14 @@ export const DENSITY = {
 
 export type TDensity = TValueOf<typeof DENSITY>;
 
+export const LANGUAGE_SWITCHER_STYLE = {
+  MENU_CODE: 'MENU_CODE',
+  MENU_GLOBE: 'MENU_GLOBE',
+  CODES: 'CODES',
+} as const;
+
+export type TLanguageSwitcherStyle = TValueOf<typeof LANGUAGE_SWITCHER_STYLE>;
+
 export type TThemeTokens = {
   accentHue: number;
   logoHue?: number;
@@ -71,6 +79,7 @@ export const PRESET_REGISTRY: Record<TPresetId, TPresetBundle> = {
       [CAPABILITY.BOOKMARKS]: true,
       [CAPABILITY.NEWSLETTER]: false,
       [CAPABILITY.ANALYTICS]: false,
+      [CAPABILITY.CONSENT_BANNER]: false,
     },
   },
   [PRESET_ID.EDITORIAL]: {
@@ -87,6 +96,7 @@ export const PRESET_REGISTRY: Record<TPresetId, TPresetBundle> = {
       [CAPABILITY.BOOKMARKS]: true,
       [CAPABILITY.NEWSLETTER]: false,
       [CAPABILITY.ANALYTICS]: false,
+      [CAPABILITY.CONSENT_BANNER]: false,
     },
   },
 };

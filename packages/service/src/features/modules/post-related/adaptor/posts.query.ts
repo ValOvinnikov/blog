@@ -1,5 +1,5 @@
-import { q } from '@blog/service/sanity/query';
-import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/published-post';
+import { q } from '@blog/service/sanity/query/query';
+import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/post/published-post';
 import { postCardFragment } from '@blog/service/shared/fragments/post/post';
 
 import { RELATED_POSTS_TAG_CANDIDATE_LIMIT } from './constants';
@@ -47,7 +47,7 @@ export const relatedPostAnchorQuery = q
 export const relatedByTagsQuery = q
   .parameters<TRelatedByTagsParams>()
   .star.filterByType('page_post')
-  .filterRaw('_id != $currentId && count((tags[]->_id)[@ in $tagIds]) > 0')
+  .filterRaw('_id != $currentId && count(tags[_ref in $tagIds]) > 0')
   .filterRaw(PUBLISHED_POST_FILTER)
   .order('publishedAt desc')
   .slice(0, RELATED_POSTS_TAG_CANDIDATE_LIMIT)

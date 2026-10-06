@@ -31,6 +31,7 @@ export const tv = createTV({
               'hero',
               'title-xl',
               'title-2xl',
+              'title-section',
               'title-3xl',
               'post-title',
               'prose',

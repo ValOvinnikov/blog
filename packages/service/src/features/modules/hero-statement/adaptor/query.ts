@@ -1,8 +1,10 @@
-import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
-import { ctaButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
-import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
-import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
-import { heroLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
+import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
+import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
+import { localizedImageWithAltFragment } from '@blog/service/shared/fragments/image/localized-image-with-alt';
+import { moduleHeroLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
+import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
 
 export const heroStatementModuleQuery = q
   .parameters<TModuleQueryParams>()
@@ -12,21 +14,21 @@ export const heroStatementModuleQuery = q
   .project((sub) => ({
     brandVariant: sub.field('brandVariant').notNull(),
     variant: sub.field('variant').notNull(),
-    eyebrow: sub.field('eyebrow').nullable(true),
+    eyebrow: getLocalizedField(sub, 'eyebrow'),
     headingBlock: sub
       .field('headingBlock')
-      .project(headingBlockFragment)
+      .project(moduleHeadingBlockFragment)
       .notNull(),
-    image: sub.field('image').project(sanityImageFragment).nullable(true),
-    ctaButtons: sub
-      .field('ctaButtons[]')
-      .project(ctaButtonFragment)
+    image: sub
+      .field('image')
+      .project(localizedImageWithAltFragment)
       .nullable(true),
+    ...ctaButtonsFragment,
     contentPositionSplit: sub.field('contentPositionSplit').nullable(true),
     contentPositionBanner: sub.field('contentPositionBanner').nullable(true),
-    contentAlignment: sub.field('contentAlignment').nullable(true),
+    ...moduleContentAlignmentFragment,
     mediaOrderSplit: sub.field('mediaOrderSplit').nullable(true),
     mediaOrderStacked: sub.field('mediaOrderStacked').nullable(true),
-    layout: sub.field('layout').project(heroLayoutFragment).nullable(true),
+    ...moduleHeroLayoutFragment,
   }))
   .notNull();

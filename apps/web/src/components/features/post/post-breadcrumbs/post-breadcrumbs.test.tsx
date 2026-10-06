@@ -1,4 +1,4 @@
-import { customRenderAsync } from '@web/testing/custom-render';
+import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { mockPostDetail } from '@web/testing/pages/blog-post-page/fixtures';
 import {
   testBreadcrumbsJsonLdSchema,
@@ -7,37 +7,28 @@ import {
   testNotFoundOnFetchFailure,
   testNotFoundWithoutLog,
 } from '@web/testing/shared/breadcrumbs-page-contract/breadcrumbs-page-contract';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { PostBreadcrumbs } from './post-breadcrumbs';
 
-const { getPostPageMock, getTenantBaseUrlMock } = vi.hoisted(() => ({
+vi.mock('@web/server/request-context/request-context');
+
+const { getPostPageMock } = vi.hoisted(() => ({
   getPostPageMock: vi.fn(),
-  getTenantBaseUrlMock: vi.fn(),
 }));
 
-vi.mock('@web/server/post/get-post-page', () => ({
+vi.mock('@web/i18n/navigation');
+
+vi.mock('@web/server/post/get-post-page/get-post-page', () => ({
   getPostPage: getPostPageMock,
-}));
-
-vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
-  getTenantBaseUrl: getTenantBaseUrlMock,
-}));
-
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
 }));
 
 const setup = customRenderAsync(PostBreadcrumbs, {
   slug: 'hello-world',
-  tenant: 'tenant-1',
 });
 
 describe(`<${PostBreadcrumbs.name}/>`, () => {
   beforeEach(() => {
     getPostPageMock.mockReset();
-    getTenantBaseUrlMock.mockReset();
-    getTenantBaseUrlMock.mockResolvedValue('https://example.com');
   });
 
   testNotFoundWithoutLog({ pageLoaderMock: getPostPageMock, setup });
@@ -62,7 +53,25 @@ describe(`<${PostBreadcrumbs.name}/>`, () => {
     pageLoaderMock: getPostPageMock,
     setup,
     successData: mockPostDetail,
-    description: 'forwards the slug and tenant to getPostPage',
-    expectedArgs: ['hello-world', 'tenant-1'],
+    description: 'forwards the slug to getPostPage',
+    expectedArgs: ['hello-world'],
+  });
+
+  describe('when the topic has no topic page', () => {
+    it('omits the topic crumb', async () => {
+      getPostPageMock.mockResolvedValue({
+        ok: true,
+        data: {
+          ...mockPostDetail,
+          topic: { ...mockPostDetail.topic, slug: undefined },
+        },
+      });
+
+      await setup();
+
+      const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
+      expect(within(nav).getByRole('link', { name: 'Home' })).toBeVisible();
+      expect(within(nav).queryByText('Engineering')).not.toBeInTheDocument();
+    });
   });
 });

@@ -5,8 +5,10 @@ import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getFaqModule } from './loader';
 
-vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
+vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
+  ...(await importOriginal<
+    typeof import('@blog/service/sanity/query/query')
+  >()),
   runQuery: vi.fn(),
 }));
 
@@ -63,6 +65,8 @@ describe(getFaqModule, () => {
             't:tenant-a:link',
             't:tenant-a:homePage',
             't:tenant-a:page_landing',
+            't:tenant-a:page_topic',
+            't:tenant-a:page_tag',
           ],
         }),
       }),

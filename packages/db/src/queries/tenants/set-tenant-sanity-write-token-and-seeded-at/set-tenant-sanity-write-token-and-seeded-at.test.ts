@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import { createTenant } from '@blog/db/queries/tenants/create-tenant';
 import * as schema from '@blog/db/schema';
@@ -13,7 +14,7 @@ async function insertTenant(): Promise<TTenant> {
     primaryDomain: 'acme.example.com',
     sanityProjectId: 'abc123',
     sanityDataset: 'production',
-    locale: 'en',
+    locale: LOCALE_ISO_CODES.EN,
     plan: TENANT_PLAN.FREE,
     status: TENANT_STATUS.ACTIVE,
   });

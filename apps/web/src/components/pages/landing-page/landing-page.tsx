@@ -1,37 +1,30 @@
-import type { ITenantLocalizedParams } from '@blog/config';
 import { FaqPageSchema } from '@web/components/features/faq-page-schema';
 import { LandingBreadcrumbs } from '@web/components/features/landing/landing-breadcrumbs';
 import { PageShell } from '@web/components/page-templates/page-shell';
-import { getLandingPage } from '@web/server/landing/get-landing-page';
+import { getLandingPage } from '@web/server/landing/get-landing-page/get-landing-page';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 
 import { LandingModuleRenderer } from './landing-module-renderer';
 
-type TLandingPageProps = ITenantLocalizedParams & { slug: string };
+type TLandingPageProps = { path: string };
 
-export const LandingPage = async ({
-  slug,
-  locale,
-  tenant,
-}: TLandingPageProps) => {
-  const result = await getLandingPage(slug, tenant);
+export const LandingPage = async ({ path }: TLandingPageProps) => {
+  const result = await getLandingPage(path);
   const page = guardPageLoaderResult(result, 'landing_page.fetch_failed', {
-    slug,
+    path,
   });
   const { headingBlock, hero, modules, faqs } = page;
 
   return (
     <PageShell>
       <PageShell.Breadcrumbs>
-        <LandingBreadcrumbs slug={slug} tenant={tenant} />
+        <LandingBreadcrumbs path={path} />
       </PageShell.Breadcrumbs>
       <FaqPageSchema faqs={faqs} />
       <LandingModuleRenderer
         hero={hero}
         headingBlock={headingBlock}
         modules={modules}
-        locale={locale}
-        tenant={tenant}
       />
     </PageShell>
   );

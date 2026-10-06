@@ -1,13 +1,18 @@
+import { BRAND_VARIANT, FULL_BRAND_VARIANT_LIST } from '@blog/config/constants';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
+import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
-import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
+import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
 import { statSchema } from '@blog/studio/schema-types/objects/stat/stat';
+import { wideLayoutField } from '@blog/studio/schema-types/objects/wide-layout/wide-layout-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
+import { validateLocalizedMaxLength } from '@blog/studio/schema-types/validation/validate-localized-max-length/validate-localized-max-length';
 import { ChartBar } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
+
+const FOOTNOTE_MAX_LENGTH = 160;
 
 export const statsSchema = defineType({
   name: 'module_stats',
@@ -18,8 +23,11 @@ export const statsSchema = defineType({
   icon: ChartBar,
   fields: [
     titleField(),
-    brandVariantField(),
-    headingBlockField(),
+    brandVariantField({
+      list: FULL_BRAND_VARIANT_LIST,
+      initialValue: BRAND_VARIANT.PRIMARY,
+    }),
+    moduleHeadingBlockField(),
     defineField({
       name: 'stats',
       title: 'Stats',
@@ -32,21 +40,27 @@ export const statsSchema = defineType({
         rule.max(6).error('A stats band holds at most six figures.'),
       ],
     }),
-    defineField({
+    localizedOneLineTextField({
       name: 'footnote',
       title: 'Footnote',
-      type: 'string',
       description:
         'One line under the figures — the period, the source, or a caveat.',
       validation: (rule) =>
-        rule.max(160).warning('A footnote is one line, not a paragraph.'),
+        rule
+          .custom(
+            validateLocalizedMaxLength(
+              FOOTNOTE_MAX_LENGTH,
+              'A footnote is one line, not a paragraph.',
+            ),
+          )
+          .warning(),
     }),
     ctaButtonsField(),
     ...alignmentFields([], {
       description:
         'Horizontal alignment of the heading, supporting text, figures and actions.',
     }),
-    layoutField,
+    wideLayoutField,
   ],
   preview: {
     select: {

@@ -229,9 +229,11 @@ its blast radius was never put to the user.
 
 ### Reuse before you create
 
-**Search for what already exists before adding a function, schema type, field
-helper, constant or type.** A near-duplicate is the most expensive kind of
-mistake to find later, because nothing fails — both versions work.
+**Search the whole repo for what already exists before adding a function,
+schema type, field helper, constant, type, component, test fake or fixture** —
+every app and package, not just the one being changed. A near-duplicate is the
+most expensive kind of mistake to find later, because nothing fails — both
+versions work.
 
 When you or a subagent notices something similar already exists and it is not
 obvious whether to extend it or add alongside it, that is **not** a judgement
@@ -240,28 +242,26 @@ call to settle quietly. Investigate properly — who calls the existing one, wha
 is still unclear, ask. A subagent reporting "there was already an X, but I added
 a new one because…" is a flag to raise, not a decision to rubber-stamp.
 
-**Creating a shared file is not an inline fix.** "Findings found mid-work get
-fixed in the current work" (below) holds for changes confined to the ticket's
-own files. When the fix means **adding a new file other tickets will plausibly
-touch** — a helper in a `shared/`/`testing/` directory, a transformer, a
-constant module — prefer filing it over extracting it inline while parallel
-sessions are running. Two sessions applying "never write the third copy" to the
-same duplication converge on the same path _and_ the same name, because the
-conventions here are specific enough to determine both; neither can see the
-other's branch, so git first reports it as an add/add conflict at merge, and
-whichever branch merges second pays the rework. It happened twice on
-2026-09-18 within hours: `packages/studio/src/testing/`'s field-lookup helpers
-(#3340 vs. #3248) and `packages/service/src/shared/transformers/to-cta-buttons.ts`
-(#3249 vs. a concurrent session). Both resolved the same way — **whatever is on
-`main` wins and the branch adopts it**, regardless of which was written first.
-Inline fixes scoped to files the ticket already touches are unaffected.
+**A second copy moves to a shared folder in the change that would create it.**
+When a diff would add code that already exists elsewhere in the repo — a
+function, component, hook, test fake, fixture or builder — the diff moves it to
+the folder that owns its kind (`shared/`, `testing/`, `__mocks__/`, one per
+file) and points every call site at it. Writing the second copy "for now" is a
+blocking review finding, whoever owns the files it lands in. The one limit is
+the layer contracts: `apps/web` and `apps/platform` share no code, so a match in
+the other app is reported, not extracted.
 
-This scopes the reviewer's duplication rule rather than contradicting it. A
-copied helper or block **inside the ticket's own files** is still blocking and
-fixed in place. A finding whose fix is a **new shared file** is blocking only
-when the ticket's own scope is that extraction (a dedupe ticket, a "fold X
-into a shared helper" ticket); otherwise the reviewer files it, and the PR
-ships with the copy it inherited.
+**Duplication that already existed is filed, not fixed inline.** When a diff
+finds two copies that were both on `main` before it and adds no third, the fix
+is a new shared file other tickets will plausibly touch, so the reviewer files
+it and the PR ships as is — unless extracting it is the ticket's own scope. The
+reason is parallel sessions: two of them extracting the same duplication
+converge on the same path _and_ name, because the conventions here determine
+both, and git reports an add/add conflict at merge. It happened twice on
+2026-09-18 (`packages/studio/src/testing/`'s field-lookup helpers, #3340 vs.
+#3248; `packages/service/src/shared/transformers/to-cta-buttons.ts`, #3249 vs.
+a concurrent session). When a collision happens anyway, **whatever is on `main`
+wins and the branch adopts it**, regardless of which was written first.
 
 ## Mid-task decisions land in the ticket/spec before work continues
 
@@ -545,6 +545,10 @@ silently unindexed). Never hand-edit it; fix the source and regenerate. A future
   `apps/web`.
 - `vercel:next-cache-components` for caching, ISR, or Partial Prerendering
   work in `apps/web`.
+- `vercel:react-best-practices` for performance work in `apps/web` or
+  `apps/platform` — request waterfalls, the RSC boundary, client bundle
+  size, re-renders. `react-component-practices` → "Vercel's React rules"
+  lists which of its rules apply and which this repo overrides.
 - `vercel:deployments-cicd` when changing the deploy pipeline or
   `.github/workflows/` CI config.
 - `frontend-design:frontend-design` for visual design work in `packages/ui`
@@ -960,6 +964,12 @@ main` fires no workflow. CodeQL runs here through GitHub's _default setup_
   changes agent tooling (`.claude/` hooks/agents/skills/settings) updates
   [`docs/context/claude-code.md`](docs/context/claude-code.md).
 - `.claude/skills/` is the single home for skills — edit one copy, no mirror.
+- **A rule added to a skill or agent guide for one app covers the other
+  too.** `apps/web` and `apps/platform` share every convention unless the
+  guide names a reason one of them differs (platform has no `modules/`, no
+  page builder, no SEO surface). When a rule lands in `web.md`, check
+  `platform-app.md` states the same thing, and the reverse. The same goes
+  for a shared skill whose examples name only one app.
 
 ## Reporting to the user
 
@@ -1504,9 +1514,14 @@ must not attempt `gh project item-edit` or equivalent. Instead it signals
 status the way the board tooling already knows how to read
 (`board-keeper.md` Step 3's evidence table):
 
-- **Starting:** comment on the issue ("starting work in a cloud session"). A
-  web/remote session names its own branch `<type>/<n>-<slug>` — a pushed
-  branch with that name is the In Progress signal. The GitHub Actions
+- **Starting:** comment on the issue ("starting work in a cloud session"),
+  then rename the branch before the first push. A web/remote session starts
+  on a generated name like `claude/optimistic-noether-isuljn`, which carries
+  no issue number, so nothing can read it. Rename it to `<type>/<n>-<slug>`,
+  with the slug taken from the ticket title
+  (`git branch -m feat/3952-team-single-member` for "feat(studio): a Team
+  may have a single member"). A pushed branch with that name is the In Progress
+  signal. The GitHub Actions
   `@claude` path can't control this: `claude-code-action` generates its own
   branch as `claude/issue-<n>-<timestamp>`, which `board-keeper.md`'s Step 2
   also recognizes as an In Progress signal.
@@ -1522,9 +1537,13 @@ status the way the board tooling already knows how to read
   from the already-pushed branch without needing a checkout.
 - **Done:** the merged `Closes #n` PR is the Done signal; nothing extra.
 
-The board catches up when any local session dispatches `board-keeper`
-(targeted trigger or sweep) — its existing branch/PR inference turns that
-evidence into status writes.
+**The board updates itself from that evidence — no local session needed.**
+`.github/workflows/board-auto-sync.yml` moves issue `#n` to In Progress when a
+branch named for it is pushed, and to Code Review when its PR opens, and
+confirms each write. So a cloud session reports the evidence it left and
+stops there. It never tells the user the board is waiting on a local
+`board-keeper` run; that only catches up what the workflow can't see, such as
+a branch with a generated name.
 
 ## Deployment
 

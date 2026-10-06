@@ -1,16 +1,10 @@
 import { TopicChipList } from '@web/components/shared/topic-chip-list';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { getTopicsSafely } from '@web/utils/get-topics-safely';
 
-export type TPostIndexTopicChipsProps = {
-  tenant: string;
-};
-
-export const PostIndexTopicChips = async ({
-  tenant,
-}: TPostIndexTopicChipsProps) => {
-  const tenantContext = await getTenantSanityContext(tenant);
-  const topics = await getTopicsSafely(tenantContext);
+export const PostIndexTopicChips = async () => {
+  const { sanityContext } = await getRequestContext();
+  const topics = await getTopicsSafely(sanityContext);
 
   return <TopicChipList topics={topics} />;
 };

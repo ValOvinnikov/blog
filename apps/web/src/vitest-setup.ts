@@ -1,25 +1,12 @@
-import { SITE_MESSAGES } from '@blog/config';
+import { LOCALE_ISO_CODES, SITE_MESSAGES } from '@blog/config';
 import { createTranslator } from 'next-intl';
 
 import '@testing-library/jest-dom/vitest';
 
-// Placeholder values for the validated env module (`@/utils/env/env`) so
-// components/routes that read it can render under Vitest without requiring
-// a real `.env` file. Tests never hit the network, so these values only need
-// to satisfy the Zod schema shape.
 process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ??= 'test-project';
 process.env.NEXT_PUBLIC_SANITY_DATASET ??= 'test-dataset';
 process.env.NEXT_PUBLIC_SITE_URL ??= 'https://example.com';
 
-// jsdom has no `IntersectionObserver` — `useActiveHeadingId` (behind
-// `PostContentsRail`) constructs one unconditionally in an effect, so any
-// test that renders it without mocking the hook itself would otherwise throw
-// `ReferenceError: IntersectionObserver is not defined`. A global no-op stub
-// here matches this file's other environment gap-fills (`next/font/google`,
-// `next-intl/server`) — tests that need to assert on actual intersection
-// behaviour (`use-active-heading-id.test.tsx`) install their own richer fake
-// via `vi.stubGlobal` in a scoped `beforeEach`/`afterEach`, which overrides
-// this default for the duration of that suite only.
 class NoopIntersectionObserver implements IntersectionObserver {
   root = null;
   rootMargin = '';
@@ -35,18 +22,64 @@ class NoopIntersectionObserver implements IntersectionObserver {
 
 vi.stubGlobal('IntersectionObserver', NoopIntersectionObserver);
 
+class NoopResizeObserver implements ResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+
+vi.stubGlobal('ResizeObserver', NoopResizeObserver);
+
+vi.stubGlobal('matchMedia', (query: string): MediaQueryList => ({
+  matches: false,
+  media: query,
+  onchange: null,
+  addListener() {},
+  removeListener() {},
+  addEventListener() {},
+  removeEventListener() {},
+  dispatchEvent: () => false,
+}));
+
+// jsdom lays nothing out, so Embla would measure every slide at 0px and never
+// show its controls: give carousel slides a width that overflows the track.
+const CAROUSEL_TRACK_WIDTH = 400;
+const CAROUSEL_SLIDE_WIDTH = 300;
+
+const isInCarousel = (element: HTMLElement) =>
+  element.closest('[aria-roledescription="carousel"]') !== null;
+
+const isCarouselSlide = (element: HTMLElement) =>
+  element.tagName === 'LI' && isInCarousel(element);
+
+if (typeof HTMLElement !== 'undefined') {
+  Object.defineProperties(HTMLElement.prototype, {
+    offsetWidth: {
+      configurable: true,
+      get(this: HTMLElement) {
+        if (isCarouselSlide(this)) return CAROUSEL_SLIDE_WIDTH;
+        return isInCarousel(this) ? CAROUSEL_TRACK_WIDTH : 0;
+      },
+    },
+    offsetLeft: {
+      configurable: true,
+      get(this: HTMLElement) {
+        if (!isCarouselSlide(this)) return 0;
+        const siblings = Array.from(this.parentElement?.children ?? []);
+        return siblings.indexOf(this) * CAROUSEL_SLIDE_WIDTH;
+      },
+    },
+  });
+}
+
 type TGetTranslationsArg = string | { namespace?: string } | undefined;
 type TTranslationValues = Record<string, string | number>;
 
 const toNamespace = (arg: TGetTranslationsArg): string | undefined =>
   typeof arg === 'string' ? arg : arg?.namespace;
 
-// `createTranslator`'s `Namespace` type parameter is a `const` generic
-// inferred as a literal union from the *actual* messages shape, so it
-// rejects the plain `string | undefined` this mock resolves a namespace to
-// at runtime. Widened once here to the shape every call site below actually
-// uses (`t(key, values)`), rather than fighting the literal-union inference
-// per call.
+// `createTranslator` infers its namespace as a literal union from the messages
+// shape, which rejects the plain string this mock resolves at runtime.
 type TLooseTranslator = (key: string, values?: TTranslationValues) => string;
 const createLooseTranslator = createTranslator as unknown as (config: {
   locale: string;
@@ -54,25 +87,12 @@ const createLooseTranslator = createTranslator as unknown as (config: {
   namespace?: string;
 }) => TLooseTranslator;
 
-// `next-intl/server`'s `setRequestLocale` is called by every locale-aware
-// layout/page but never asserted on — stub it globally so individual test
-// files don't repeat the mock. `getLocale` resolves to the same `en` this
-// mock's other stubs render under; a test that needs a different resolved
-// locale overrides it locally (e.g. the newsletter confirm route's test).
-// `getTranslations` is stubbed as a minimal
-// stand-in that resolves real strings from `@blog/config`'s `SITE_MESSAGES`
-// catalog via next-intl's own `createTranslator` (full ICU — interpolation,
-// plurals, select) so component tests assert on the actual rendered copy
-// instead of a fake. `getFormatter` is stubbed the same way for `dateTime`:
-// it delegates to the real `Intl.DateTimeFormat` (via `toLocaleDateString`)
-// under the `en` locale that catalog represents, so tests assert the real
-// rendered date string instead of a fake.
 vi.mock('next-intl/server', () => ({
   setRequestLocale: vi.fn(),
   getLocale: vi.fn(async () => 'en'),
   getTranslations: vi.fn(async (arg?: TGetTranslationsArg) =>
     createLooseTranslator({
-      locale: 'en',
+      locale: LOCALE_ISO_CODES.EN,
       messages: SITE_MESSAGES,
       namespace: toNamespace(arg),
     }),
@@ -83,50 +103,17 @@ vi.mock('next-intl/server', () => ({
   })),
 }));
 
-// `next/font/google`'s loader functions (`Space_Grotesk`, `Newsreader`,
-// `JetBrains_Mono`, `Fraunces`, `Inter` — see `@web/config/fonts`) rely on a
-// Next.js build-time transform that doesn't exist under Vitest, so calling
-// them directly throws ("... is not a function"). Stubbed globally, not just
-// in a single layout's test, because `fonts.ts` is evaluated at module load
-// time by anything that imports `[tenant]/[locale]/layout.tsx` or the root
-// `not-found.tsx` (directly or transitively) — same reasoning as the
-// `next-intl/server`/`next/navigation` mocks above. The stub returns the
-// shape consumers read: a `className` string plus a `variable` string
-// derived from the `variable` option, since `resolveFontVariableClassName`
-// reads `.variable` off the selected font exports to build the tenant
-// layout's font-variable wrapper className.
-vi.mock('next/font/google', () => {
-  const createFontMock =
-    (fontName: string) =>
-    ({ variable }: { variable?: string } = {}) => ({
-      className: `mock-${fontName}-className`,
-      variable: variable ?? `mock-${fontName}-variable`,
-    });
+// `next/font/local` relies on a Next build-time transform and throws when
+// `@web/config/fonts` is evaluated under Vitest.
+vi.mock('next/font/local', () => ({
+  default: ({ variable }: { variable?: string } = {}) => ({
+    className: 'mock-font-className',
+    variable: variable ?? 'mock-font-variable',
+  }),
+}));
 
-  return {
-    Space_Grotesk: createFontMock('space-grotesk'),
-    Newsreader: createFontMock('newsreader'),
-    JetBrains_Mono: createFontMock('jetbrains-mono'),
-    Fraunces: createFontMock('fraunces'),
-    Inter: createFontMock('inter'),
-  };
-});
-
-// `next/navigation`'s `notFound()` must keep throwing so components short-
-// circuit exactly as it does at runtime (Next renders the not-found boundary
-// via a thrown NEXT_NOT_FOUND digest). Tests that assert on it import the
-// binding directly: `import { notFound } from 'next/navigation';` then
-// `expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1)`. Cleared before each
-// test so call counts never leak across `it`s.
-//
-// `usePathname`/`useRouter`/`redirect`/`permanentRedirect` are stubbed here
-// too — not because any test asserts on them directly (tests that care mock
-// the higher-level `@web/i18n/navigation` module instead, which never
-// reaches this one), but because `SmartLink` renders next-intl's `Link`,
-// whose internals (`createSharedNavigationFns`, `BaseLink`) read these
-// bindings off `next/navigation` unconditionally while wiring up navigation,
-// even when a test never calls them. `redirect`/`permanentRedirect` mirror
-// `notFound`'s throw-to-short-circuit behavior for the same reason.
+// next-intl's `Link` reads `usePathname`/`useRouter` off `next/navigation`
+// even when a test never navigates.
 vi.mock('next/navigation', () => ({
   notFound: vi.fn(() => {
     throw new Error('NEXT_NOT_FOUND');

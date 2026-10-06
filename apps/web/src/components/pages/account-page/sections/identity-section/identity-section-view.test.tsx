@@ -14,7 +14,7 @@ describe(`<${IdentitySectionView.name}/>`, () => {
     ).toBeVisible();
   });
 
-  it('renders each provider name as a level-3 heading, keeping the rows in the page heading outline', () => {
+  it('renders each provider name as a level-3 heading', () => {
     setup();
 
     expect(

@@ -3,35 +3,26 @@ import {
   AUDIT_TARGET_TYPE,
   EMAIL_TEMPLATE_TYPE,
 } from '@blog/config';
+import { auth } from '@platform/server/auth/auth';
+import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { logger } from '@platform/utils/logger/logger';
+import type { Session } from 'next-auth';
 
 import {
   updateEmailTemplateAction,
   type TUpdateEmailTemplateInput,
 } from './update-email-template-action';
 
-const {
-  requireTenantMembershipMock,
-  authMock,
-  upsertEmailTemplateMock,
-  insertAuditEventMock,
-  loggerErrorMock,
-} = vi.hoisted(() => ({
-  requireTenantMembershipMock: vi.fn(),
-  authMock: vi.fn(),
+const { upsertEmailTemplateMock, insertAuditEventMock } = vi.hoisted(() => ({
   upsertEmailTemplateMock: vi.fn(),
   insertAuditEventMock: vi.fn(),
-  loggerErrorMock: vi.fn(),
 }));
 
-vi.mock('@platform/server/auth/require-tenant-membership', () => ({
-  requireTenantMembership: requireTenantMembershipMock,
-}));
+vi.mock('@platform/server/auth/require-tenant-membership');
 
-vi.mock('@platform/server/auth/auth', () => ({ auth: authMock }));
+vi.mock('@platform/server/auth/auth');
 
-vi.mock('@platform/utils/logger/logger', () => ({
-  logger: { error: loggerErrorMock },
-}));
+vi.mock('@platform/utils/logger/logger');
 
 vi.mock('@blog/db', () => ({
   queries: {
@@ -39,6 +30,12 @@ vi.mock('@blog/db', () => ({
     auditEvents: { insertAuditEvent: insertAuditEventMock },
   },
 }));
+
+const requireTenantMembershipMock = vi.mocked<
+  (tenantId: string) => Promise<unknown>
+>(requireTenantMembership);
+const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
+const loggerErrorMock = vi.mocked(logger.error);
 
 const mockMembershipAndUpsert = (
   upsertResult: Partial<{
@@ -89,7 +86,7 @@ describe(updateEmailTemplateAction, () => {
     loggerErrorMock.mockReset();
   });
 
-  it('re-resolves the tenant from the session against the routed tenant id before writing anything', async () => {
+  it('re-resolves the tenant from the session against the routed id before writing', async () => {
     mockMembershipAndUpsert();
 
     const result = await updateEmailTemplateAction(
@@ -274,7 +271,7 @@ describe(updateEmailTemplateAction, () => {
     );
   });
 
-  it('reports failure instead of throwing when the write itself fails, and records no audit event', async () => {
+  it('reports failure without throwing, and no audit event, when the write fails', async () => {
     requireTenantMembershipMock.mockResolvedValue({
       tenant: { id: 'tenant-1' },
       membership: { role: 'OWNER' },

@@ -3,13 +3,8 @@ import { customRender, screen } from '@web/testing/custom-render';
 import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
 import { makeTestimonialItem } from '@web/testing/modules/testimonial/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { TestimonialModuleView } from './testimonial-module-view';
-
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
 
 const { TestimonialCarousel } = vi.hoisted(() => ({
   TestimonialCarousel: vi.fn(() => (
@@ -17,7 +12,11 @@ const { TestimonialCarousel } = vi.hoisted(() => ({
   )),
 }));
 
-vi.mock('./testimonial-carousel', () => ({ TestimonialCarousel }));
+vi.mock('@web/i18n/navigation');
+
+vi.mock('./components/testimonial-carousel/testimonial-carousel', () => ({
+  TestimonialCarousel,
+}));
 
 const items = [
   makeTestimonialItem({ id: 'testimonial-1', name: 'Jordan Reyes' }),
@@ -60,7 +59,7 @@ describe(`<${TestimonialModuleView.name}/>`, () => {
       items.forEach((item) => {
         expect(
           screen.getByText(item.name, { ignore: '.sr-only' }),
-        ).toBeInTheDocument();
+        ).toBeVisible();
       });
       expect(TestimonialCarousel).not.toHaveBeenCalled();
     });
@@ -80,18 +79,12 @@ describe(`<${TestimonialModuleView.name}/>`, () => {
     expect(TestimonialCarousel).not.toHaveBeenCalled();
   });
 
-  it('renders the carousel instead of the grid when displayMode is CAROUSEL and there is more than one testimonial', () => {
+  it('renders the carousel instead of the grid for CAROUSEL with several testimonials', () => {
     setup({ displayMode: DISPLAY_MODE.CAROUSEL });
 
     expect(TestimonialCarousel).toHaveBeenCalledTimes(1);
-    expect(screen.getByTestId('testimonial-carousel-stub')).toBeInTheDocument();
+    expect(screen.getByTestId('testimonial-carousel-stub')).toBeVisible();
     expect(screen.queryByRole('blockquote')).not.toBeInTheDocument();
-  });
-
-  it('renders nothing when testimonials is empty, never an empty landmark with a dangling aria-labelledby', () => {
-    const { container } = setup({ testimonials: [] });
-
-    expect(container).toBeEmptyDOMElement();
   });
 
   it('renders the resolved cta buttons when present', () => {

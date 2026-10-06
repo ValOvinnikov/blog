@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config/constants';
 import {
   TENANT_PLAN,
   TENANT_STATUS,
@@ -21,6 +22,11 @@ import {
 export const tenantPlanEnum = pgEnum(
   'tenant_plan',
   Object.values(TENANT_PLAN) as [TTenantPlan, ...TTenantPlan[]],
+);
+
+export const localeCodeEnum = pgEnum(
+  'locale_code',
+  Object.values(LOCALE_ISO_CODES) as [TLocaleIsoCode, ...TLocaleIsoCode[]],
 );
 
 export const tenantStatusEnum = pgEnum(
@@ -104,7 +110,11 @@ export const tenants = pgTable('tenants', {
   // (rather than revoked) so later writes can target this tenant's own
   // project instead of the platform's.
   sanityWriteTokenEncrypted: text('sanity_write_token_encrypted'),
-  locale: text('locale').notNull(),
+  locale: localeCodeEnum('locale').notNull(),
+  additionalLocales: localeCodeEnum('additional_locales')
+    .array()
+    .notNull()
+    .default([]),
   plan: tenantPlanEnum('plan').notNull(),
   status: tenantStatusEnum('status').notNull(),
   // Plain `text`, not a pgEnum, mirroring `TENANT_PROVISIONING_STATUS`'s own

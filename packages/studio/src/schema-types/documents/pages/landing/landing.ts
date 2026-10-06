@@ -1,92 +1,71 @@
-import { RESERVED_SLUGS } from '@blog/config/constants';
 import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
-import { heroField } from '@blog/studio/schema-types/fields/hero-field/hero-field';
-import { modulesField } from '@blog/studio/schema-types/fields/modules-field/modules-field';
+import { landingTemplateSchema } from '@blog/studio/schema-types/documents/templates/landing/landing';
+import {
+  LANGUAGE_FIELD,
+  languageField,
+} from '@blog/studio/schema-types/fields/language-field/language-field';
 import { slugField } from '@blog/studio/schema-types/fields/slug-field/slug-field';
+import { templateField } from '@blog/studio/schema-types/fields/template-field/template-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { createSlugUrlPreviewInput } from '@blog/studio/schema-types/inputs/slug-url-preview/slug-url-preview-input';
-import { contentSchema } from '@blog/studio/schema-types/modules/content/content';
-import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
-import { faqSchema } from '@blog/studio/schema-types/modules/faq/faq';
-import { featureHighlightsSchema } from '@blog/studio/schema-types/modules/feature-highlights/feature-highlights';
-import { featureListSchema } from '@blog/studio/schema-types/modules/feature-list/feature-list';
-import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
-import { heroProfileSchema } from '@blog/studio/schema-types/modules/hero-profile/hero-profile';
-import { heroStatementSchema } from '@blog/studio/schema-types/modules/hero-statement/hero-statement';
-import { logoWallSchema } from '@blog/studio/schema-types/modules/logo-wall/logo-wall';
-import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
-import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
-import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
-import { pricingSchema } from '@blog/studio/schema-types/modules/pricing/pricing';
-import { statsSchema } from '@blog/studio/schema-types/modules/stats/stats';
-import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
-import { teamSchema } from '@blog/studio/schema-types/modules/team/team';
-import { testimonialSchema } from '@blog/studio/schema-types/modules/testimonial/testimonial';
-import { timelineSchema } from '@blog/studio/schema-types/modules/timeline/timeline';
+import { LandingSlugUrlPreviewInput } from '@blog/studio/schema-types/inputs/landing-slug-url-preview/landing-slug-url-preview-input';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
+import { languagePreview } from '@blog/studio/schema-types/preview/language-preview/language-preview';
+import { validateLandingParent } from '@blog/studio/schema-types/validation/validate-landing-parent/validate-landing-parent';
+import { validateLandingSlug } from '@blog/studio/schema-types/validation/validate-landing-slug/validate-landing-slug';
+import { validateLandingSlugUniqueAmongSiblings } from '@blog/studio/schema-types/validation/validate-landing-slug-unique-among-siblings/validate-landing-slug-unique-among-siblings';
 import { FileText } from 'lucide-react';
-import { defineType } from 'sanity';
+import {
+  defineField,
+  defineType,
+  getDraftId,
+  getPublishedId,
+  type ReferenceFilterResolver,
+} from 'sanity';
 
-const landingSlugUrlPreviewInput = createSlugUrlPreviewInput('/');
+const otherPageInSameLanguage: ReferenceFilterResolver = ({ document }) => {
+  const language = document[LANGUAGE_FIELD];
+
+  return {
+    filter: `coalesce(${LANGUAGE_FIELD}, "") == $language && !(_id in [$id, $draftId])`,
+    params: {
+      language: typeof language === 'string' ? language : '',
+      id: getPublishedId(document._id),
+      draftId: getDraftId(document._id),
+    },
+  };
+};
 
 export const landingPageSchema = defineType({
   name: PAGE_LANDING_TYPE,
   title: 'Landing Page',
   type: 'document',
   description:
-    'A standalone page built from modules, used for marketing or informational content at its own URL.',
+    'A standalone page at its own URL, showing the hero and modules of its template — for marketing or informational content.',
   icon: FileText,
-  preview: {
-    select: {
-      title: 'title',
-    },
-  },
+  preview: languagePreview,
   fields: [
+    languageField(),
     titleField(),
+    defineField({
+      name: 'parent',
+      title: 'Parent Page',
+      type: 'reference',
+      to: [{ type: PAGE_LANDING_TYPE }],
+      description:
+        'The page this one sits under, e.g. Modules for /modules/faq. Leave empty for a top-level page.',
+      options: { filter: otherPageInSameLanguage, disableNew: true },
+      validation: (rule) => rule.custom(validateLandingParent),
+    }),
     slugField({
-      description: 'URL path segment — auto-generated from title.',
-      previewInput: landingSlugUrlPreviewInput,
-      validateSlug: (value) => {
-        const current = value?.current;
-
-        if (
-          current &&
-          (RESERVED_SLUGS as readonly string[]).includes(current)
-        ) {
-          return `"${current}" is a reserved path and can't be used as a page slug.`;
-        }
-
-        return true;
-      },
+      description:
+        'The last part of the URL — auto-generated from title. To nest this page, choose a parent page instead.',
+      previewInput: LandingSlugUrlPreviewInput,
+      isUnique: validateLandingSlugUniqueAmongSiblings,
+      validateSlug: validateLandingSlug,
     }),
     headingBlockField(),
-    heroField({
-      allow: [
-        heroBlogSchema.name,
-        heroStatementSchema.name,
-        heroProfileSchema.name,
-      ],
-    }),
-    modulesField({
-      allow: [
-        contentSchema.name,
-        ctaSchema.name,
-        postLatestSchema.name,
-        postFeaturedSchema.name,
-        newsletterSchema.name,
-        taxonomyListSchema.name,
-        featureListSchema.name,
-        featureHighlightsSchema.name,
-        logoWallSchema.name,
-        testimonialSchema.name,
-        teamSchema.name,
-        statsSchema.name,
-        timelineSchema.name,
-        faqSchema.name,
-        pricingSchema.name,
-      ],
-    }),
+    templateField({ type: landingTemplateSchema.name }),
     seoField(),
   ],
 });

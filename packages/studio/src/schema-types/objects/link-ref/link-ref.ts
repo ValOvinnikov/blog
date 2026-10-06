@@ -21,7 +21,7 @@ export const linkRefSchema = defineType({
   preview: {
     select: {
       title: 'link.title',
-      label: 'link.label',
+      label: 'link.label.0.value',
     },
     prepare({ title, label }) {
       return {

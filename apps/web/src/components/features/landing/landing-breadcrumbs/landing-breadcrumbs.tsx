@@ -6,42 +6,33 @@ import {
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';
-import { getLandingPage } from '@web/server/landing/get-landing-page';
-import { getTenantBaseUrl } from '@web/server/tenant/get-tenant-base-url';
+import { getLandingPage } from '@web/server/landing/get-landing-page/get-landing-page';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 import { getTranslations } from 'next-intl/server';
 
 export type TLandingBreadcrumbsProps = {
-  slug: string;
-  tenant: string;
+  path: string;
 };
 
 export const LandingBreadcrumbs = async ({
-  slug,
-  tenant,
+  path,
 }: TLandingBreadcrumbsProps) => {
-  const result = await getLandingPage(slug, tenant);
+  const result = await getLandingPage(path);
   const page = guardPageLoaderResult(
     result,
     'landing_breadcrumbs.fetch_failed',
-    { slug },
+    { path },
   );
   const { headingBlock } = page;
 
-  const [t, siteUrl] = await Promise.all([
-    getTranslations('breadcrumbs'),
-    getTenantBaseUrl(tenant),
-  ]);
+  const t = await getTranslations('breadcrumbs');
 
   const breadcrumbTrail: IBreadcrumbItem[] = [
     { label: t('home'), href: routes.home() },
-    { label: headingBlock.heading, href: routes.landingPage(slug) },
+    { label: headingBlock.heading, href: routes.landingPage(path) },
   ];
-  const breadcrumbListSchema = buildBreadcrumbListSchema(
-    breadcrumbTrail,
-    siteUrl ?? '',
-  );
+  const breadcrumbListSchema = await buildBreadcrumbListSchema(breadcrumbTrail);
 
   return (
     <>

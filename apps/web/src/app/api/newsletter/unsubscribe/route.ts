@@ -1,7 +1,6 @@
 import { routes } from '@blog/config';
 import { queries } from '@blog/db';
-import { isTenantActive } from '@web/server/tenant/is-tenant-active';
-import { resolveTenantId } from '@web/server/tenant/resolve-tenant-id';
+import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { logger } from '@web/utils/logger/logger';
 import type { NextResponse } from 'next/server';
 import { getLocale, getTranslations } from 'next-intl/server';
@@ -13,13 +12,6 @@ import {
 
 import { renderConfirmResponse } from './unsubscribe-page';
 
-/**
- * `GET /api/newsletter/unsubscribe?token=…` renders a confirmation page
- * whose single button `POST`s to this same URL. It never touches the
- * database — inbox scanners and link-prefetchers issue a `GET` on every URL
- * in an email, and a `GET` that unsubscribed would do so silently and
- * invisibly. The actual unsubscribe happens only in `POST` below.
- */
 export async function GET(request: Request): Promise<NextResponse> {
   const token = new URL(request.url).searchParams.get('token');
   const [lang, t] = await Promise.all([
@@ -50,13 +42,6 @@ export async function GET(request: Request): Promise<NextResponse> {
   });
 }
 
-/**
- * `POST /api/newsletter/unsubscribe?token=…` performs the unsubscribe via
- * `queries.subscribers.unsubscribeByToken` and is simultaneously the RFC
- * 8058 one-click endpoint mail clients `POST` to directly.
- * `unsubscribeByToken`'s `not-found` outcome means "already unsubscribed",
- * not an error — the row is deleted on success.
- */
 export async function POST(request: Request): Promise<NextResponse> {
   const token = new URL(request.url).searchParams.get('token');
   const [lang, t] = await Promise.all([
@@ -64,6 +49,12 @@ export async function POST(request: Request): Promise<NextResponse> {
     getTranslations('newsletterUnsubscribe'),
   ]);
   const returnHomeLabel = t('returnHome');
+  const errorCopy: TResultPageCopy = {
+    lang,
+    title: t('errorTitle'),
+    message: t('errorMessage'),
+    returnHomeLabel,
+  };
   const invalidCopy: TResultPageCopy = {
     lang,
     title: t('invalidTitle'),
@@ -76,17 +67,12 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
 
   try {
-    const host = request.headers.get('host');
-    const tenantId = await resolveTenantId(host);
-    if (!tenantId) {
-      logger.error('newsletter.unsubscribe_tenant_unresolved', { host });
-      return renderResultResponse(invalidCopy, 200);
+    const tenant = await resolveRequestTenant();
+    if (!tenant) {
+      logger.error('newsletter.unsubscribe_link_tenant_unresolved');
+      return renderResultResponse(errorCopy, 404);
     }
-
-    if (!(await isTenantActive(tenantId))) {
-      logger.warn('newsletter.unsubscribe_tenant_not_active', { tenantId });
-      return renderResultResponse(invalidCopy, 200);
-    }
+    const { id: tenantId } = tenant;
 
     const result = await queries.subscribers.unsubscribeByToken(
       tenantId,
@@ -107,7 +93,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       200,
     );
   } catch (error) {
-    logger.error('newsletter.unsubscribe_failed', { error });
-    return renderResultResponse(invalidCopy, 200);
+    logger.error('newsletter.unsubscribe_link_failed', { error });
+    return renderResultResponse(errorCopy, 500);
   }
 }

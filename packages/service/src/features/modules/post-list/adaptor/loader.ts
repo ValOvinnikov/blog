@@ -1,8 +1,8 @@
+import { isr } from '@blog/service/sanity/query/isr';
 import {
-  isr,
   runQuery,
   type TTenantSanityContext,
-} from '@blog/service/sanity/query';
+} from '@blog/service/sanity/query/query';
 import { toTotalPages } from '@blog/utils';
 
 import {
@@ -28,7 +28,7 @@ export async function getPostList(
   const rawPosts = await runQuery(
     postListModulePaginatedPostsQuery(page, raw.pageSize, scope),
     {
-      parameters: scope ? { archivePageSlug: scope.slug } : {},
+      parameters: scope ? { termId: scope.termId } : {},
       tenant,
       ...isr(['posts', 'author', 'topic', 'tag'], tenant.projectId),
     },

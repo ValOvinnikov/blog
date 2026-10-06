@@ -1,5 +1,5 @@
 import { getFooter } from '@blog/service/features/global/footer/adaptor/loader';
-import type { TTenantSanityContext } from '@blog/service/sanity/query';
+import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
 import { safeAsync } from '@blog/utils';
 
 export function createFooterService() {

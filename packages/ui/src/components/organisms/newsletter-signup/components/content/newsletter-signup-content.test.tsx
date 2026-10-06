@@ -105,7 +105,7 @@ describe(`<${NewsletterSignupContent.name}/>`, () => {
     setup({ status: 'submitting' });
 
     const button = screen.getByRole('button', { name: 'Subscribe' });
-    expect(screen.getByTestId('newsletter-signup-spinner')).toBeInTheDocument();
+    expect(screen.getByTestId('newsletter-signup-spinner')).toBeVisible();
     expect(button).toContainElement(
       screen.getByTestId('newsletter-signup-spinner'),
     );
@@ -117,6 +117,16 @@ describe(`<${NewsletterSignupContent.name}/>`, () => {
 
     expect(screen.getByRole('alert')).toHaveTextContent(errorMessage);
     expect(screen.getByRole('textbox')).toHaveAttribute('aria-invalid', 'true');
+  });
+
+  it('renders the error message without an icon', () => {
+    setup({
+      status: 'error',
+      errorMessage: 'That email is already subscribed.',
+    });
+
+    expect(screen.getByRole('alert')).toBeVisible();
+    expect(screen.queryByTestId('alert-icon')).not.toBeInTheDocument();
   });
 
   it('does not render an error when status is not error', () => {

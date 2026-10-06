@@ -19,7 +19,7 @@ describe(StatusBadge, () => {
 
   it('renders the tone dot by default', () => {
     render(<StatusBadge tone="ok">Active</StatusBadge>);
-    expect(screen.getByTestId('status-badge-dot')).toBeInTheDocument();
+    expect(screen.getByTestId('status-badge-dot')).toBeVisible();
   });
 
   it('omits the tone dot when hasDot is false', () => {

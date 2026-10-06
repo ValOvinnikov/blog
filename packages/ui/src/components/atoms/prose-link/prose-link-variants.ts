@@ -2,9 +2,11 @@ import { tv } from '@blog/ui/lib/styling';
 
 export const proseLinkVariants = tv({
   base: [
-    'text-brand-primary underline decoration-border-strong underline-offset-2',
-    'transition-colors duration-base ease-smooth hover:text-brand-primary-hover',
+    'text-brand-primary underline decoration-border-strong decoration-1 underline-offset-2',
+    'transition-colors duration-base ease-smooth',
+    'hover:text-brand-primary-hover hover:decoration-current hover:decoration-2',
+    'rounded-sm',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
-    'focus-visible:ring-offset-2 focus-visible:ring-offset-primary',
+    'focus-visible:ring-offset-2 focus-visible:ring-offset-ambient',
   ],
 });

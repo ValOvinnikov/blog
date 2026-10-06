@@ -1,5 +1,6 @@
 'use client';
 
+import type { TCapability, TLocaleIsoCode } from '@blog/config/constants';
 import type { FC } from 'react';
 import { StudioLayout, StudioProvider } from 'sanity';
 
@@ -10,6 +11,9 @@ export type TStudioMountProps = {
   dataset: string;
   basePath: string;
   title: string;
+  enabledCapabilities?: readonly TCapability[];
+  defaultLocale?: TLocaleIsoCode;
+  liveLocales?: readonly TLocaleIsoCode[];
 };
 
 // Fills the parent slot instead of assuming the viewport, unlike
@@ -29,8 +33,19 @@ export const StudioMount: FC<TStudioMountProps> = ({
   dataset,
   basePath,
   title,
+  enabledCapabilities,
+  defaultLocale,
+  liveLocales,
 }) => {
-  const config = buildStudioConfig({ projectId, dataset, basePath, title });
+  const config = buildStudioConfig({
+    projectId,
+    dataset,
+    basePath,
+    title,
+    enabledCapabilities,
+    defaultLocale,
+    liveLocales,
+  });
 
   return (
     <div style={containerStyle}>

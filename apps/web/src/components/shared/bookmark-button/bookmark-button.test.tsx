@@ -27,7 +27,7 @@ vi.mock('@web/utils/report-client-error', () => ({
   reportClientError: reportClientErrorMock,
 }));
 
-vi.mock('@web/server/bookmarks/bookmark-actions', () => ({
+vi.mock('@web/server/bookmarks/bookmark-actions/bookmark-actions', () => ({
   getBookmarkStatus: getBookmarkStatusMock,
   setBookmarkStatus: setBookmarkStatusMock,
 }));
@@ -205,7 +205,10 @@ describe(`<${BookmarkButton.name}/>`, () => {
       status: 'authenticated',
     });
     getBookmarkStatusMock.mockResolvedValue(false);
-    setBookmarkStatusMock.mockResolvedValue({ ok: false });
+    setBookmarkStatusMock.mockResolvedValue({
+      ok: false,
+      isUnavailable: false,
+    });
     const user = userEvent.setup();
 
     setup();
@@ -227,6 +230,63 @@ describe(`<${BookmarkButton.name}/>`, () => {
     });
     expect(toastSuccessMock).not.toHaveBeenCalled();
     expect(toastInfoMock).not.toHaveBeenCalled();
+  });
+
+  it('shows the unavailable toast with no Retry action when the write is refused as unavailable', async () => {
+    useSessionMock.mockReturnValue({
+      data: { user: { id: 'user-1' } },
+      status: 'authenticated',
+    });
+    getBookmarkStatusMock.mockResolvedValue(false);
+    setBookmarkStatusMock.mockResolvedValue({
+      ok: false,
+      isUnavailable: true,
+    });
+    const user = userEvent.setup();
+
+    setup();
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Save post' })).toBeEnabled();
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Save post' }));
+
+    await waitFor(() => {
+      expect(toastErrorMock).toHaveBeenCalledWith({
+        message: "Bookmarking isn't available on this site right now.",
+      });
+    });
+  });
+
+  it('shows the unavailable toast when the undo write is refused as unavailable', async () => {
+    useSessionMock.mockReturnValue({
+      data: { user: { id: 'user-1' } },
+      status: 'authenticated',
+    });
+    getBookmarkStatusMock.mockResolvedValue(false);
+    setBookmarkStatusMock
+      .mockResolvedValueOnce({ ok: true })
+      .mockResolvedValueOnce({ ok: false, isUnavailable: true });
+    const user = userEvent.setup();
+
+    setup();
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Save post' })).toBeEnabled();
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Save post' }));
+    await waitFor(() => {
+      expect(toastSuccessMock).toHaveBeenCalled();
+    });
+
+    const { action } = toastSuccessMock.mock.calls[0]![0];
+    await act(async () => action.onAct());
+
+    await waitFor(() => {
+      expect(toastErrorMock).toHaveBeenCalledWith({
+        message: "Bookmarking isn't available on this site right now.",
+      });
+    });
   });
 
   it('undoes a successful save: reverts state, re-invokes setBookmarkStatus, and shows a reverted-state info toast', async () => {
@@ -310,7 +370,7 @@ describe(`<${BookmarkButton.name}/>`, () => {
     getBookmarkStatusMock.mockResolvedValue(false);
     setBookmarkStatusMock
       .mockResolvedValueOnce({ ok: true })
-      .mockResolvedValueOnce({ ok: false });
+      .mockResolvedValueOnce({ ok: false, isUnavailable: false });
     const user = userEvent.setup();
 
     setup();
@@ -345,7 +405,7 @@ describe(`<${BookmarkButton.name}/>`, () => {
     });
     getBookmarkStatusMock.mockResolvedValue(false);
     setBookmarkStatusMock
-      .mockResolvedValueOnce({ ok: false })
+      .mockResolvedValueOnce({ ok: false, isUnavailable: false })
       .mockResolvedValueOnce({ ok: true });
     const user = userEvent.setup();
 
@@ -381,7 +441,10 @@ describe(`<${BookmarkButton.name}/>`, () => {
       status: 'authenticated',
     });
     getBookmarkStatusMock.mockResolvedValue(false);
-    setBookmarkStatusMock.mockResolvedValue({ ok: false });
+    setBookmarkStatusMock.mockResolvedValue({
+      ok: false,
+      isUnavailable: false,
+    });
     const user = userEvent.setup();
 
     setup();

@@ -1,14 +1,18 @@
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
+import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
-import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
+import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
 import { pricingTierSchema } from '@blog/studio/schema-types/objects/pricing-tier/pricing-tier';
+import { wideLayoutField } from '@blog/studio/schema-types/objects/wide-layout/wide-layout-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
+import { validateLocalizedMaxLength } from '@blog/studio/schema-types/validation/validate-localized-max-length/validate-localized-max-length';
 import { validatePricingSingleHighlightedTier } from '@blog/studio/schema-types/validation/validate-pricing-single-highlighted-tier/validate-pricing-single-highlighted-tier';
 import { DollarSign } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
+
+const FOOTNOTE_MAX_LENGTH = 160;
 
 export const pricingSchema = defineType({
   name: 'module_pricing',
@@ -19,7 +23,7 @@ export const pricingSchema = defineType({
   fields: [
     titleField(),
     brandVariantField(),
-    headingBlockField(),
+    moduleHeadingBlockField(),
     defineField({
       name: 'tiers',
       title: 'Tiers',
@@ -34,21 +38,25 @@ export const pricingSchema = defineType({
         rule.custom(validatePricingSingleHighlightedTier),
       ],
     }),
-    defineField({
+    localizedOneLineTextField({
       name: 'footnote',
       title: 'Footnote',
-      type: 'string',
       description:
         'One line under the tiers — the currency, taxes, or a caveat.',
       validation: (rule) =>
-        rule.max(160).error('A footnote is one line, not a paragraph.'),
+        rule.custom(
+          validateLocalizedMaxLength(
+            FOOTNOTE_MAX_LENGTH,
+            'A footnote is one line, not a paragraph.',
+          ),
+        ),
     }),
     ctaButtonsField(),
     ...alignmentFields([], {
       description:
         'Horizontal alignment of the heading, period switch, footnote and actions. Card content is always left-aligned.',
     }),
-    layoutField,
+    wideLayoutField,
   ],
   preview: {
     select: {

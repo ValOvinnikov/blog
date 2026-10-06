@@ -2,21 +2,21 @@
 
 # @blog/ui component index
 
-_62 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
+_63 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
 
 ## Atoms
 
 ### Alert — `components/atoms/alert/alert.tsx`
 
 A static, type-coded inline message block for form feedback (confirmations, warnings, and errors).
-Props: type: NonNullable<TAlertVariants['type']> · message: string · id?: string _(extends IWithClassName, IWithDataTestId)_
+Props: type: NonNullable<TAlertVariants['type']> · message: string · id?: string · hasIcon?: boolean _(extends IWithClassName, IWithDataTestId)_
 Variants: type: ALERT_TYPE.SUCCESS|ALERT_TYPE.WARNING|ALERT_TYPE.ERROR|ALERT_TYPE.INFO
 
 ### Avatar — `components/atoms/avatar/avatar.tsx`
 
 Renders a provided image, or an initials badge derived from `name` when no image is supplied.
-Props: src?: string · alt: string · name: string · size?: TAvatarVariants['size'] · className?: string · onImageError?: () => void _(extends IWithDataTestId)_
-Variants: size: SIZE.SM|SIZE.MD|SIZE.LG|SIZE.XL|SIZE.XXL
+Props: src?: string · alt: string · name: string · size?: TAvatarVariants['size'] · shape?: TAvatarVariants['shape'] · className?: string · onImageError?: () => void _(extends IWithDataTestId)_
+Variants: size: SIZE.SM|SIZE.MD|SIZE.LG|SIZE.XL|SIZE.XXL · shape: circle|square
 
 ### BackToTop — `components/atoms/back-to-top/back-to-top.tsx`
 
@@ -57,7 +57,7 @@ Variants: hasHref: (boolean)
 
 Semantic heading — `level` picks the rendered `h1`–`h4` tag for the page outline, independently of `visual`, which drives the rendered size instead (e.g. a deep Portable Text heading can still read as subordinate to the page's title).
 Props: level: THeadingLevel · visual?: THeadingVariants['visual'] · size?: THeadingVariants['size'] · id?: string · style?: CSSProperties · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-Variants: visual: hero|post|card|section|prose-h2|prose-h3|prose-h4|preview|copy · size: SIZE.XS|SIZE.SM|SIZE.MD|SIZE.LG|SIZE.XL|SIZE.XXL
+Variants: visual: hero|post|card|page|section|prose-h2|prose-h3|prose-h4|preview|copy · size: SIZE.XS|SIZE.SM|SIZE.MD|SIZE.LG|SIZE.XL|SIZE.XXL
 
 ### Icon — `components/atoms/icon/icon.tsx`
 
@@ -68,7 +68,7 @@ Variants: size: SIZE.SM|SIZE.MD|SIZE.LG
 ### IconButton — `components/atoms/icon-button/icon-button.tsx`
 
 A compact button for icon, labelled, or avatar-triggered actions: a 22×22 icon-only default, a `bordered` variant sized to its text label, a 32×32 circular `avatar` variant, and a 36×36 outlined `control` variant for a standalone control (e.g. carousel navigation).
-Props: ariaLabel: string · title?: string · children: ReactNode · onClick?: MouseEventHandler<HTMLButtonElement> · isDisabled?: boolean · isInert?: boolean · tone?: TBrandVariant · 'aria-expanded'?: AriaAttributes['aria-expanded'] · 'aria-controls'?: AriaAttributes['aria-controls'] · 'aria-haspopup'?: AriaAttributes['aria-haspopup'] · ref?: Ref<HTMLButtonElement> _(extends IWithClassName, TIconButtonVariants, IWithDataTestId)_
+Props: ariaLabel: string · title?: string · children: ReactNode · onClick?: MouseEventHandler<HTMLButtonElement> · isDisabled?: boolean · isFocusableWhenDisabled?: boolean · isInert?: boolean · tone?: TBrandVariant · 'aria-expanded'?: AriaAttributes['aria-expanded'] · 'aria-controls'?: AriaAttributes['aria-controls'] · 'aria-haspopup'?: AriaAttributes['aria-haspopup'] · ref?: Ref<HTMLButtonElement> _(extends IWithClassName, TIconButtonVariants, IWithDataTestId)_
 Variants: variant: bordered|avatar|control · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY|BRAND_VARIANT.BRAND_PRIMARY
 
 ### InlineCode — `components/atoms/inline-code/inline-code.tsx`
@@ -142,7 +142,7 @@ Variants: variant: default|accent · interactive: (boolean)
 
 The body-copy paragraph primitive: applies a `variant` from the type scale to a `<p>`.
 Props: style?: CSSProperties · children?: ReactNode _(extends IWithClassName, TTextVariants, IWithDataTestId)_
-Variants: variant: lead|muted|hero|card|supporting|statement|meta|emphasis
+Variants: variant: lead|muted|hero|card|supporting|statement|meta|emphasis|footnote
 
 ### TextInput — `components/atoms/text-input/text-input.tsx`
 
@@ -212,8 +212,8 @@ Props: className?: string _(extends IWithDataTestId, VariantProps<typeof buttonV
 ### LogoTile — `components/molecules/logo-tile/logo-tile.tsx`
 
 A fixed-size card that frames a single logo, so transparent and opaque-background assets sit inside identical bounds.
-Props: children: ReactNode · isInteractive?: TLogoTileVariants['isInteractive'] · aspectRatio?: number _(extends IWithClassName, IWithDataTestId)_
-Variants: isInteractive: (boolean) · hasAspectRatio: (boolean)
+Props: children: ReactNode · isInteractive?: TLogoTileVariants['isInteractive'] · aspectRatio?: number · darkLogo?: ReactNode · darkAspectRatio?: number _(extends IWithClassName, IWithDataTestId)_
+Variants: isInteractive: (boolean)
 
 ### MediaCard — `components/molecules/media-card/media-card.tsx`
 
@@ -223,7 +223,7 @@ Variants: isSplit: (boolean) · isLead: (boolean) · align: left|center · isInt
 
 Slots:
 
-- **MediaCard.Media** — The media region of a `MediaCard`; a styled `<div>` wrapper you fill with an image or `MediaFrame`. Props: isLead?: TMediaCardMediaVariants['isLead'] · shape?: TMediaCardMediaVariants['shape'] · align?: TMediaCardMediaVariants['align'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: shape: wide|square|circle|icon · isLead: (boolean) · align: left|center
+- **MediaCard.Media** — The media region of a `MediaCard`, reserving a consistent shape for its visual content regardless of what fills it. Props: isLead?: TMediaCardMediaVariants['isLead'] · shape?: TMediaCardMediaVariants['shape'] · align?: TMediaCardMediaVariants['align'] · iconPanel?: TMediaCardMediaVariants['iconPanel'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: shape: wide|wideFlat|square|circle|icon · isLead: (boolean) · align: left|center · iconPanel: (boolean)
 - **MediaCard.Meta** — Compact metadata row for cards. Props: dateValue: string · dateLabel: string · readingTime?: string _(extends IWithClassName, IWithDataTestId)_
 - **MediaCard.Title** — The heading inside a `MediaCard`, rendered at the caller-specified heading depth with the card title's visual treatment. Props: level: THeadingLevel · isLead?: boolean · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **MediaCard.Footer** — The byline row at the bottom of a `MediaCard`. Props: authorName?: string · authorAvatarSrc?: string · publishedAt?: string · formattedDate?: string · topic?: string · leadingIcon?: ReactNode · trailingIcon?: ReactNode _(extends IWithClassName, IWithDataTestId)_
@@ -266,7 +266,7 @@ Slots:
 - **PricingCard.Badge** — The raised-tier callout pinned to the top edge of a highlighted `PricingCard`. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **PricingCard.Name** — The `<h3>` naming a `PricingCard`'s tier. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **PricingCard.Description** — The one- or two-line summary of a `PricingCard`'s tier, below its `Name`. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **PricingCard.Price** — A `PricingCard`'s headline price, taking pre-formatted strings and never formatting currency or numbers itself; a `compareAt` value renders struck through with a screen-reader-only "Regular price" prefix. Props: amount: string · compareAt?: string · period?: string · prefix?: string _(extends IWithClassName, IWithDataTestId)_
+- **PricingCard.Price** — A `PricingCard`'s headline price, taking pre-formatted strings and never formatting currency or numbers itself. Props: amount: string · period?: string · prefix?: string _(extends IWithClassName, IWithDataTestId, ( | { compareAt?: undefined; compareAtLabel?: n…)_
 - **PricingCard.Extra** — One smaller price line below a `PricingCard`'s headline `Price` (e.g. a one-time setup fee). Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **PricingCard.Features** — The checklist of what a `PricingCard`'s tier includes; grows to fill the card's remaining height so `Actions` lines up across neighbouring cards. Props: items: string[] _(extends IWithClassName, IWithDataTestId)_
 - **PricingCard.Actions** — The stacked, full-width call-to-action slot of a `PricingCard`; the caller fills it with its own action buttons. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
@@ -274,8 +274,8 @@ Slots:
 
 ### PrimaryNavigation — `components/molecules/primary-navigation/primary-navigation.tsx`
 
-Top-level `<nav>` landmark composing `NavLink` items with an optional trailing `actions` slot (e.g. a theme toggle or menu button).
-Props: links: INavItem[] · actions?: ReactNode · ariaLabel?: string · linkAs?: TAnchorElementType · mobileToggle?: TPrimaryNavigationMobileToggleProps _(extends IWithClassName, IWithDataTestId)_
+Top-level `<nav>` landmark composing `NavLink` items with trailing `actions`, which stay in the bar, and `panelActions`, which move into the mobile panel below `lg`.
+Props: links: INavItem[] · actions?: ReactNode · panelActions?: ReactNode · ariaLabel?: string · linkAs?: TAnchorElementType · mobileToggle?: TPrimaryNavigationMobileToggleProps _(extends IWithClassName, IWithDataTestId)_
 Variants: collapsible: (boolean)
 
 ### QuoteCard — `components/molecules/quote-card/quote-card.tsx`
@@ -288,7 +288,7 @@ Slots:
 
 - **QuoteCard.Quote** — The quote slot of a `QuoteCard`; owns the figure's `<blockquote>`, so the caller passes the quote's inner content and never a `<blockquote>` of its own. Props: isSpotlight?: TQuoteCardQuoteVariants['isSpotlight'] · children: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: isSpotlight: (boolean)
 - **QuoteCard.Avatar** — The avatar slot of a `QuoteCard`; positions the caller's own `Avatar` element beside the quoted person's name. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **QuoteCard.Name** — The name slot of a `QuoteCard`; wraps the quoted person's link or text in the tone-matched link/focus treatment, on an element the component itself owns rather than the caller's link or text. Props: isSpotlight?: TQuoteCardNameVariants['isSpotlight'] · tone?: TQuoteCardNameVariants['tone'] · children: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: isSpotlight: (boolean) · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY
+- **QuoteCard.Name** — The name slot of a `QuoteCard`; wraps the quoted person's link or text in the link/focus treatment, on an element the component itself owns rather than the caller's link or text. Props: isSpotlight?: TQuoteCardNameVariants['isSpotlight'] · tone?: TQuoteCardNameVariants['tone'] · children: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: isSpotlight: (boolean) · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY
 
 ### SettingRow — `components/molecules/setting-row/setting-row.tsx`
 
@@ -359,8 +359,8 @@ Variants: columns: 1|2|3|4
 ### Carousel — `components/organisms/carousel/carousel.tsx`
 
 Scrolls through a row of items, revealing more of them as the viewport widens.
-Props: items: readonly T[] · renderItem: (args: { item: T; index: number }) => ReactNode · getItemKey?: (args: { item: T; index: number }) => Key · ariaLabel: string · previousLabel: string · nextLabel: string · tone?: TBrandVariant _(extends IWithClassName, IWithDataTestId)_
-Variants: isEnhanced: (boolean)
+Props: items: readonly T[] · renderItem: (args: { item: T; index: number }) => ReactNode · getItemKey?: (args: { item: T; index: number }) => Key · ariaLabel: string · previousLabel: string · nextLabel: string · tone?: TBrandVariant · slideSize?: TCarouselVariants['slideSize'] · contentAlignment?: TCarouselVariants['alignment'] _(extends IWithClassName, IWithDataTestId)_
+Variants: slideSize: fraction|stepped|content · alignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER
 
 ### ContentModule — `components/organisms/content-module/content-module.tsx`
 
@@ -371,8 +371,8 @@ Variants: wrapped: (boolean)
 ### CtaModule — `components/organisms/cta-module/cta-module.tsx`
 
 Page-builder organism rendering a call-to-action in one of three layouts.
-Props: variant: TCtaVariant · tone: TBrandVariant · eyebrow?: string · heading: string · headingId?: string · supportingText?: string · content?: ReactNode · image?: ReactNode · actions?: ReactNode · footnote?: string · contentPosition?: TContentAlignment · contentAlignment?: TContentAlignment · mobileMediaOrder?: TMediaOrder · isWrapped?: TCtaModuleVariants['wrapped'] _(extends IWithClassName, IWithDataTestId)_
-Variants: variant: CTA_VARIANT.BANNER|CTA_VARIANT.SPLIT|CTA_VARIANT.CALLOUT · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY|BRAND_VARIANT.BRAND_PRIMARY · position: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · alignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · mobileMediaOrder: MEDIA_ORDER.FIRST|MEDIA_ORDER.LAST · wrapped: (boolean)
+Props: variant: TCtaVariant · tone: TBrandVariant · eyebrow?: string · heading: string · headingId?: string · supportingText?: string · content?: ReactNode · image?: ReactNode · actions?: ReactNode · footnote?: string · contentPosition?: TContentAlignment · contentAlignment?: TContentAlignment · mobileMediaOrder?: TMediaOrder · isWrapped?: TCtaModuleVariants['wrapped'] · spacingTop?: TSpacingScale · spacingBottom?: TSpacingScale _(extends IWithClassName, IWithDataTestId)_
+Variants: variant: CTA_VARIANT.BANNER|CTA_VARIANT.SPLIT|CTA_VARIANT.CALLOUT · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY|BRAND_VARIANT.BRAND_PRIMARY · position: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · alignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · mobileMediaOrder: MEDIA_ORDER.FIRST|MEDIA_ORDER.LAST · wrapped: (boolean) · spacingTop: SPACING_SCALE.NONE|SPACING_SCALE.SM|SPACING_SCALE.MD|SPACING_SCALE.LG|SPACING_SCALE.XL · spacingBottom: SPACING_SCALE.NONE|SPACING_SCALE.SM|SPACING_SCALE.MD|SPACING_SCALE.LG|SPACING_SCALE.XL
 
 ### Footer — `components/organisms/footer/footer.tsx`
 
@@ -398,13 +398,13 @@ Slots:
 ### Hero — `components/organisms/hero/hero.tsx`
 
 The page-top hero band shared by every hero kind: renders `title` as an `<h1>` with optional `eyebrow`/`excerpt`, plus `Hero.Avatar`, `Hero.Body`, `Hero.Cta`, `Hero.Media`, and `Hero.Social` slots.
-Props: title: string · titleId: string · eyebrow?: string · excerpt?: string · variant?: THeroVariant · contentPosition?: TContentAlignment · contentAlignment?: TContentAlignment · mediaOrder?: TMediaOrder · tone: TBrandVariant · children?: TCompoundChildren<typeof HeroParts> _(extends IWithClassName, IWithDataTestId)_
-Variants: variant: HERO_VARIANT.SPLIT|HERO_VARIANT.STACKED|HERO_VARIANT.BANNER · hasMedia: (boolean) · position: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · alignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · mediaOrder: MEDIA_ORDER.FIRST|MEDIA_ORDER.LAST · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY|BRAND_VARIANT.BRAND_PRIMARY
+Props: title: string · titleId: string · eyebrow?: string · excerpt?: string · variant?: THeroVariant · contentPosition?: TContentAlignment · contentAlignment?: TContentAlignment · mediaOrder?: TMediaOrder · tone: TBrandVariant · spacingTop?: TSpacingScale · spacingBottom?: TSpacingScale · children?: TCompoundChildren<typeof HeroParts> _(extends IWithClassName, IWithDataTestId)_
+Variants: variant: HERO_VARIANT.SPLIT|HERO_VARIANT.STACKED|HERO_VARIANT.BANNER · hasMedia: (boolean) · position: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · alignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · mediaOrder: MEDIA_ORDER.FIRST|MEDIA_ORDER.LAST · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY|BRAND_VARIANT.BRAND_PRIMARY · spacingTop: SPACING_SCALE.NONE|SPACING_SCALE.SM|SPACING_SCALE.MD|SPACING_SCALE.LG|SPACING_SCALE.XL · spacingBottom: SPACING_SCALE.NONE|SPACING_SCALE.SM|SPACING_SCALE.MD|SPACING_SCALE.LG|SPACING_SCALE.XL
 
 Slots:
 
 - **Hero.Avatar** — The portrait slot of a `Hero`, rendered before the eyebrow; a styled `<div>` for the caller's own `Avatar` or image. Props: contentAlignment?: THeroAvatarVariants['contentAlignment'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: contentAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT
-- **Hero.Media** — The media slot of a `Hero`; frames its content via `MediaFrame`, at a configurable ratio (16:9 by default). Props: isFramed?: boolean · ratio?: TMediaFrameRatio · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: ratio: video|square|portrait|classic
+- **Hero.Media** — The media slot of a `Hero`; frames its content via `MediaFrame`, at a configurable ratio (16:9 by default). Props: isFramed?: boolean · ratio?: TMediaFrameRatio · variant?: THeroVariant · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: ratio: video|square|portrait|classic · variant: HERO_VARIANT.SPLIT|HERO_VARIANT.STACKED|HERO_VARIANT.BANNER
 - **Hero.Body** — The rich body-copy slot of a `Hero`, rendered after the excerpt and before `Hero.Cta`. Props: contentAlignment?: THeroBodyVariants['contentAlignment'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: contentAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT
 - **Hero.Cta** — The call-to-action slot of a Hero. Props: contentAlignment?: THeroCtaVariants['contentAlignment'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: contentAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT
 - **Hero.Social** — The trailing slot of a `Hero`, rendered after `Hero.Cta`; a styled `<div>` for the caller's own social links, typically a labelled list. Props: contentAlignment?: THeroSocialVariants['contentAlignment'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: contentAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT
@@ -416,13 +416,26 @@ A pure, controlled subscribe form built on the `TextInput` atom, exposed as two 
 Compound component:
 
 - **NewsletterSignup.Full** — The rich, tinted panel signup form used by the site footer and the CMS page-builder module. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading: string · headingId?: string · supportingText?: string · errorMessage?: string · errorMessageId?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string · trustCues?: INewsletterSignupTrustCue[] · align?: TNewsletterSignupVariants['align'] _(extends IWithClassName, IWithDataTestId)_
-- **NewsletterSignup.Compact** — A slim single-row subscribe strip for the end of every article. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading: string · headingId?: string · prefix?: ReactNode · errorMessage?: string · errorMessageId?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string _(extends IWithClassName, IWithDataTestId)_
+- **NewsletterSignup.Compact** — A slim single-row subscribe strip for the end of every article. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading: string · headingId?: string · prefix?: ReactNode · errorMessage?: string · errorMessageId?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string · align?: TNewsletterSignupVariants['align'] _(extends IWithClassName, IWithDataTestId)_
 
 ### Pagination — `components/organisms/pagination/pagination.tsx`
 
 Prev/next + numbered links for paginated listings, route-agnostic (`createHref`) and polymorphic (`linkAs`); renders nothing when there is a single page.
 Props: currentPage: number · totalPages: number · createHref: (page: number) => string · ariaLabel: string · previousLabel: string · nextLabel: string · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
 Variants: current: (boolean)
+
+### Timeline — `components/organisms/timeline/timeline.tsx`
+
+A sequence of steps or milestones that reads as one connected line.
+Props: orientation: TTimelineOrientation · itemAlignment: Extract<TContentAlignment, 'LEFT' | 'CENTER'> · markerStyle: TTimelineMarkerStyle · children?: TCompoundChildren<Pick<typeof TimelineParts, 'Item'>> _(extends IWithClassName, IWithDataTestId)_
+Variants: orientation: TIMELINE_ORIENTATION.VERTICAL|TIMELINE_ORIENTATION.HORIZONTAL · itemAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER · markerStyle: TIMELINE_MARKER_STYLE.NUMBERED|TIMELINE_MARKER_STYLE.LABELLED
+
+Slots:
+
+- **Timeline.Item** — One step on the timeline: a marker, a heading and optional supporting copy. Props: orientation?: TTimelineOrientation · itemAlignment?: Extract<TContentAlignment, 'LEFT' | 'CENTER'> · children?: TCompoundChildren<typeof TimelineItemParts> _(extends IWithClassName, IWithDataTestId)_ · Variants: orientation: TIMELINE_ORIENTATION.VERTICAL|TIMELINE_ORIENTATION.HORIZONTAL · itemAlignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER
+- **Timeline.Marker** — The badge on a timeline item showing its step number or label. Props: markerStyle: TTimelineMarkerStyle · children: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: markerStyle: TIMELINE_MARKER_STYLE.NUMBERED|TIMELINE_MARKER_STYLE.LABELLED
+- **Timeline.Heading** — The title of a single step. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Timeline.Body** — Supporting copy for a `Timeline.Item`. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### ToastViewport — `components/organisms/toast-viewport/toast-viewport.tsx`
 

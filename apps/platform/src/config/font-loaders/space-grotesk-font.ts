@@ -1,7 +1,9 @@
-import { Space_Grotesk } from 'next/font/google';
+import localFont from 'next/font/local';
 
-export const spaceGrotesk = Space_Grotesk({
-  subsets: ['latin'],
-  weight: ['500', '600'],
+export const spaceGrotesk = localFont({
+  src: [
+    { path: './fonts/space-grotesk.woff2', weight: '500 600', style: 'normal' },
+  ],
+  display: 'swap',
   preload: false,
 });

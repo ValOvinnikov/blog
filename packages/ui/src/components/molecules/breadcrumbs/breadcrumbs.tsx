@@ -1,4 +1,5 @@
 import {
+  A_AS_CONST,
   ICONS,
   SIZE,
   type IWithClassName,
@@ -6,7 +7,6 @@ import {
 } from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
 import { Icon } from '@blog/ui/components/atoms/icon';
-import { resolveComponent } from '@blog/ui/lib/react';
 
 import { breadcrumbsVariants } from './breadcrumbs-variants';
 
@@ -32,7 +32,7 @@ export const Breadcrumbs = ({
   className,
   dataTestId,
 }: TBreadcrumbsProps) => {
-  const LinkComponent = resolveComponent(linkAs, 'a');
+  const LinkComponent = linkAs ?? A_AS_CONST;
   const lastIndex = items.length - 1;
 
   return (

@@ -87,9 +87,8 @@
   wrapper (the region between `<Header>` and `<Footer>`, #973) — individual
   page/template roots under `[locale]/` set no background of their own and
   inherit it (home, blog index, post detail, topics, generic pages). The
-  exceptions are the two `not-found.tsx` boundaries — `app/not-found.tsx` and
-  `app/[tenant]/not-found.tsx` — which render _outside_ the `[locale]` layout
-  (Next's not-found boundary), so they can't inherit that wrapper; the shared
+  exceptions are the two 404 boundaries — `app/global-not-found.tsx` and
+  `app/[tenant]/not-found.tsx` — which render _outside_ the `[locale]` layout, so they can't inherit that wrapper; the shared
   template they both render keeps `--bg-subtle` on its root to stay visually
   consistent with the rest of the site. The footer sits flush below the
   canvas on its own `--accent-muted` band.

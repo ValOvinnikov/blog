@@ -3,7 +3,7 @@ import { queries } from '@blog/db';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { DisplayNameControl } from '@web/components/shared/display-name-control';
 import { ProviderLinkControl } from '@web/components/shared/provider-link-control';
-import type { TLinkableProvider } from '@web/server/account/identity-actions';
+import type { TLinkableProvider } from '@web/server/account/identity-actions/identity-actions';
 import { auth } from '@web/server/auth/auth';
 import { getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';

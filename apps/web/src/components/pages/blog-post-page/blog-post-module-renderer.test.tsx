@@ -1,6 +1,7 @@
 import type { TPagePostType } from '@blog/config';
 import type { TModule } from '@blog/service';
 import { customRender, screen } from '@web/testing/custom-render';
+import { logger } from '@web/utils/logger/logger';
 
 import { BlogPostModuleRenderer } from './blog-post-module-renderer';
 
@@ -8,8 +9,15 @@ const {
   ctaModuleMock,
   newsletterModuleMock,
   postRelatedModuleMock,
-  loggerWarnMock,
+  postLatestModuleMock,
+  taxonomyListModuleMock,
 } = vi.hoisted(() => ({
+  taxonomyListModuleMock: vi.fn(({ id }: { id: string }) => (
+    <div data-testid="stub-taxonomy-list">{id}</div>
+  )),
+  postLatestModuleMock: vi.fn(({ id }: { id: string }) => (
+    <div data-testid="stub-post-latest">{id}</div>
+  )),
   ctaModuleMock: vi.fn(({ id }: { id: string }) => (
     <div data-testid="stub-cta">{id}</div>
   )),
@@ -23,7 +31,6 @@ const {
       </div>
     ),
   ),
-  loggerWarnMock: vi.fn(),
 }));
 
 vi.mock('@web/modules/cta/cta-module', () => ({ CtaModule: ctaModuleMock }));
@@ -34,19 +41,20 @@ vi.mock('@web/modules/post-related/post-related-module', () => ({
   PostRelatedModule: postRelatedModuleMock,
 }));
 
-vi.mock('@web/utils/logger/logger', () => ({
-  logger: {
-    error: vi.fn(),
-    warn: loggerWarnMock,
-    info: vi.fn(),
-    debug: vi.fn(),
-  },
+vi.mock('@web/modules/post-latest/post-latest-module', () => ({
+  PostLatestModule: postLatestModuleMock,
 }));
+
+vi.mock('@web/modules/taxonomy-list/taxonomy-list-module', () => ({
+  TaxonomyListModule: taxonomyListModuleMock,
+}));
+
+vi.mock('@web/utils/logger/logger');
+
+const loggerWarnMock = vi.mocked(logger.warn);
 
 const setup = customRender(BlogPostModuleRenderer, {
   modules: [] as TModule<TPagePostType>[],
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${BlogPostModuleRenderer.name}/>`, () => {
@@ -56,6 +64,8 @@ describe(`<${BlogPostModuleRenderer.name}/>`, () => {
         { id: 'related-1', type: 'module_postRelated' },
         { id: 'newsletter-1', type: 'module_newsletter' },
         { id: 'cta-1', type: 'module_cta' },
+        { id: 'post-latest-1', type: 'module_postLatest' },
+        { id: 'taxonomy-list-1', type: 'module_taxonomyList' },
       ],
     });
 
@@ -64,6 +74,8 @@ describe(`<${BlogPostModuleRenderer.name}/>`, () => {
       'stub-post-related',
       'stub-newsletter',
       'stub-cta',
+      'stub-post-latest',
+      'stub-taxonomy-list',
     ]);
   });
 

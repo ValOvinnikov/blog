@@ -32,7 +32,7 @@ vi.mocked(useRouter).mockReturnValue({
 
 vi.mock('next-auth/react', () => ({ signIn: signInMock }));
 
-vi.mock('@web/server/account/identity-actions', () => ({
+vi.mock('@web/server/account/identity-actions/identity-actions', () => ({
   unlinkProviderAction: unlinkProviderActionMock,
 }));
 

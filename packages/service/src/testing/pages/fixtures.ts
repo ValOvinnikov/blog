@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import type { TRawHomePage } from '@blog/service/features/pages/home/adaptor/transformer';
 import type { TRawLandingPage } from '@blog/service/features/pages/landing/adaptor/detail-page/transformer';
 import type { TRawPostDetail } from '@blog/service/features/pages/post/adaptor/detail-page/transformer';
@@ -12,7 +13,6 @@ import {
   makeRawTopic,
 } from '@blog/service/testing/entities/fixtures';
 import {
-  makeRawFaqPageQuestion,
   makeRawHeadingBlock,
   makeRawSanityImage,
   makeRawSeo,
@@ -101,8 +101,8 @@ export function makeRawHomePage(
       { _id: 'post-latest-1', _type: 'module_postLatest' },
       { _id: 'cta-1', _type: 'module_cta' },
     ],
-    faqs: [makeRawFaqPageQuestion()],
     seo: makeRawSeo(),
+    translations: [{ language: LOCALE_ISO_CODES.EN }],
     ...overrides,
   };
 }
@@ -117,6 +117,7 @@ export function makeRawBlogPage(
     hero: null,
     modules: [],
     seo: makeRawSeo(),
+    translations: [{ language: LOCALE_ISO_CODES.EN }],
     ...overrides,
   };
 }
@@ -129,6 +130,7 @@ export function makeRawTopicIndexPage(
     hero: null,
     modules: [{ _id: 'taxonomy-list-1', _type: 'module_taxonomyList' }],
     seo: makeRawSeo(),
+    translations: [{ language: LOCALE_ISO_CODES.EN }],
     ...overrides,
   };
 }
@@ -141,6 +143,7 @@ export function makeRawTagIndexPage(
     hero: null,
     modules: [{ _id: 'taxonomy-list-1', _type: 'module_taxonomyList' }],
     seo: makeRawSeo(),
+    translations: [{ language: LOCALE_ISO_CODES.EN }],
     ...overrides,
   };
 }
@@ -154,6 +157,7 @@ export function makeRawTopicPage(
     hero: null,
     modules: [{ _id: 'post-list-1', _type: 'module_postList' }],
     seo: makeRawSeo(),
+    translations: [{ language: 'EN', slug: 'engineering' }],
     ...overrides,
   };
 }
@@ -167,6 +171,7 @@ export function makeRawTagPage(
     hero: null,
     modules: [{ _id: 'post-list-1', _type: 'module_postList' }],
     seo: makeRawSeo(),
+    translations: [{ language: 'EN', slug: 'typescript' }],
     ...overrides,
   };
 }
@@ -175,15 +180,15 @@ export function makeRawLandingPage(
   overrides: Partial<TRawLandingPage> = {},
 ): TRawLandingPage {
   return {
-    slug: 'about',
+    path: 'about',
     headingBlock: makeRawHeadingBlock('About Us'),
     hero: null,
     modules: [
       { _id: 'content-1', _type: 'module_content' },
       { _id: 'cta-1', _type: 'module_cta' },
     ],
-    faqs: [makeRawFaqPageQuestion()],
     seo: makeRawSeo(),
+    translations: [{ language: 'EN', slug: 'about' }],
     ...overrides,
   };
 }

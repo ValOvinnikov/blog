@@ -34,7 +34,7 @@ describe(`<${Toast.name}/>`, () => {
 
   it('renders the type glyph using the Icon component, not a raw glyph span', () => {
     setup();
-    expect(screen.getByTestId('toast-icon')).toBeInTheDocument();
+    expect(screen.getByTestId('toast-icon')).toBeVisible();
     expect(screen.queryByText('✓')).not.toBeInTheDocument();
   });
 
@@ -60,7 +60,7 @@ describe(`<${Toast.name}/>`, () => {
   it('renders the dismiss button using the close icon, not a raw glyph', () => {
     setup();
     const dismissButton = screen.getByRole('button', { name: dismissLabel });
-    expect(screen.getByTestId('toast-dismiss-icon')).toBeInTheDocument();
+    expect(screen.getByTestId('toast-dismiss-icon')).toBeVisible();
     expect(dismissButton).not.toHaveTextContent('✕');
   });
 
@@ -94,7 +94,7 @@ describe(`<${Toast.name}/>`, () => {
 
   it('renders a timer bar when durationMs is set', () => {
     setup({ durationMs: 3600, dataTestId: 'toast' });
-    expect(screen.getByTestId('toast-timer')).toBeInTheDocument();
+    expect(screen.getByTestId('toast-timer')).toBeVisible();
   });
 
   it('renders no timer bar when durationMs is undefined (sticky)', () => {

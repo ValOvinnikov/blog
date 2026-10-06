@@ -1,17 +1,21 @@
 import { BRAND_VARIANT, TAXONOMY_KIND } from '@blog/config';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import {
+  DEFAULT_REQUEST_CONTEXT,
+  DEFAULT_TENANT_SANITY_CONTEXT,
+} from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
 
 import { PostListModule } from './post-list-module';
 
-const { getPostListMock, getTenantSanityContextMock } = vi.hoisted(() => ({
+const { getPostListMock } = vi.hoisted(() => ({
   getPostListMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
 }));
+
+vi.mock('@web/i18n/navigation');
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -21,25 +25,19 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
+vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
+const getRequestContextMock = vi.mocked(getRequestContext);
 
 const setup = customRenderAsync(PostListModule, {
   id: 'post-list-1',
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${PostListModule.name}/>`, () => {
   beforeEach(() => {
     getPostListMock.mockReset();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
+    getRequestContextMock.mockReset();
+    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
   it('logs and calls notFound() when the fetch fails', async () => {
@@ -113,7 +111,10 @@ describe(`<${PostListModule.name}/>`, () => {
       dataset: 'production',
       token: 'tenant-token',
     };
-    getTenantSanityContextMock.mockResolvedValue(tenant);
+    getRequestContextMock.mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      sanityContext: tenant,
+    });
     getPostListMock.mockResolvedValue({
       ok: true,
       data: {
@@ -135,7 +136,6 @@ describe(`<${PostListModule.name}/>`, () => {
       1,
       undefined,
     );
-    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
   });
 
   it('renders the i18n default empty message when zero posts resolve, unconditionally', async () => {
@@ -154,7 +154,7 @@ describe(`<${PostListModule.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByText('No posts yet.')).toBeInTheDocument();
+    expect(screen.getByText('No posts yet.')).toBeVisible();
   });
 
   it('renders a pager with a fully translated aria-label and correct hrefs', async () => {
@@ -184,7 +184,7 @@ describe(`<${PostListModule.name}/>`, () => {
     await setup({ context: { page: 2 } });
 
     const nav = screen.getByRole('navigation', { name: 'Blog pages' });
-    expect(nav).toBeInTheDocument();
+    expect(nav).toBeVisible();
 
     const previousLink = screen.getByRole('link', { name: 'Previous' });
     expect(previousLink).toHaveAttribute('href', '/blog');
@@ -231,7 +231,7 @@ describe(`<${PostListModule.name}/>`, () => {
     await setup({ context: { page: 1 } });
 
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
-    expect(screen.getByText('No posts yet.')).toBeInTheDocument();
+    expect(screen.getByText('No posts yet.')).toBeVisible();
   });
 
   it('renders each post image when showImages is true', async () => {
@@ -263,9 +263,7 @@ describe(`<${PostListModule.name}/>`, () => {
 
     await setup();
 
-    expect(
-      screen.getByRole('img', { name: sanityImage.alt }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: sanityImage.alt })).toBeVisible();
   });
 
   it('renders no post images when showImages is false', async () => {
@@ -299,7 +297,7 @@ describe(`<${PostListModule.name}/>`, () => {
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
-  it('derives href, aria-label, empty message, and titleId from context.archive (topic kind)', async () => {
+  it('derives href, aria-label, empty message and titleId from a topic archive', async () => {
     getPostListMock.mockResolvedValue({
       ok: true,
       data: {
@@ -326,7 +324,12 @@ describe(`<${PostListModule.name}/>`, () => {
     await setup({
       context: {
         page: 2,
-        archive: { kind: TAXONOMY_KIND.TOPICS, slug: 'news', name: 'News' },
+        archive: {
+          id: 'topic-1',
+          kind: TAXONOMY_KIND.TOPICS,
+          slug: 'news',
+          name: 'News',
+        },
       },
     });
 
@@ -338,12 +341,12 @@ describe(`<${PostListModule.name}/>`, () => {
     ).toHaveAttribute('aria-labelledby', 'topic-posts-title');
     expect(
       screen.getByRole('navigation', { name: 'News pages' }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
     expect(getPostListMock).toHaveBeenCalledWith(
       'post-list-1',
       DEFAULT_TENANT_SANITY_CONTEXT,
       2,
-      { kind: TAXONOMY_KIND.TOPICS, slug: 'news' },
+      { termId: 'topic-1' },
     );
 
     const previousLink = screen.getByRole('link', { name: 'Previous' });
@@ -381,6 +384,7 @@ describe(`<${PostListModule.name}/>`, () => {
       context: {
         page: 2,
         archive: {
+          id: 'tag-1',
           kind: TAXONOMY_KIND.TAGS,
           slug: 'typescript',
           name: 'TypeScript',
@@ -396,12 +400,12 @@ describe(`<${PostListModule.name}/>`, () => {
     ).toHaveAttribute('id', 'tag-posts-title');
     expect(
       screen.getByRole('navigation', { name: 'TypeScript pages' }),
-    ).toBeInTheDocument();
+    ).toBeVisible();
     expect(getPostListMock).toHaveBeenCalledWith(
       'post-list-1',
       DEFAULT_TENANT_SANITY_CONTEXT,
       2,
-      { kind: TAXONOMY_KIND.TAGS, slug: 'typescript' },
+      { termId: 'tag-1' },
     );
 
     const previousLink = screen.getByRole('link', { name: 'Previous' });
@@ -428,6 +432,7 @@ describe(`<${PostListModule.name}/>`, () => {
     await setup({
       context: {
         archive: {
+          id: 'tag-1',
           kind: TAXONOMY_KIND.TAGS,
           slug: 'typescript',
           name: 'TypeScript',
@@ -435,9 +440,7 @@ describe(`<${PostListModule.name}/>`, () => {
       },
     });
 
-    expect(
-      screen.getByText('No posts tagged TypeScript yet.'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('No posts tagged TypeScript yet.')).toBeVisible();
     expect(
       screen.getByRole('heading', {
         level: 2,
@@ -465,6 +468,6 @@ describe(`<${PostListModule.name}/>`, () => {
     expect(
       screen.getByRole('heading', { level: 2, name: 'All posts' }),
     ).toHaveAttribute('id', 'blog-posts-title');
-    expect(screen.getByText('No posts yet.')).toBeInTheDocument();
+    expect(screen.getByText('No posts yet.')).toBeVisible();
   });
 });

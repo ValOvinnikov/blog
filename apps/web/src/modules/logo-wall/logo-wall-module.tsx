@@ -1,20 +1,18 @@
 import { service } from '@blog/service';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';
 
 import { LogoWallModuleView } from './logo-wall-module-view';
 
 export interface ILogoWallModuleProps {
   id: string;
-  locale: string;
-  tenant: string;
 }
 
-export const LogoWallModule = async ({ id, tenant }: ILogoWallModuleProps) => {
-  const tenantContext = await getTenantSanityContext(tenant);
+export const LogoWallModule = async ({ id }: ILogoWallModuleProps) => {
+  const { sanityContext } = await getRequestContext();
   const result = await service.modules.logoWall.v1.getLogoWallModule(
     id,
-    tenantContext,
+    sanityContext,
   );
 
   if (!result.ok) {
@@ -24,8 +22,6 @@ export const LogoWallModule = async ({ id, tenant }: ILogoWallModuleProps) => {
     });
     return null;
   }
-  if (result.data.logos.length === 0) return null;
-
   return (
     <LogoWallModuleView
       {...result.data}

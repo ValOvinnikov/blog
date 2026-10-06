@@ -1,23 +1,18 @@
 import { service } from '@blog/service';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';
 
 import { TestimonialModuleView } from './testimonial-module-view';
 
 export interface ITestimonialModuleProps {
   id: string;
-  locale: string;
-  tenant: string;
 }
 
-export const TestimonialModule = async ({
-  id,
-  tenant,
-}: ITestimonialModuleProps) => {
-  const tenantContext = await getTenantSanityContext(tenant);
+export const TestimonialModule = async ({ id }: ITestimonialModuleProps) => {
+  const { sanityContext } = await getRequestContext();
   const result = await service.modules.testimonial.v1.getTestimonialModule(
     id,
-    tenantContext,
+    sanityContext,
   );
 
   if (!result.ok) {
@@ -27,8 +22,6 @@ export const TestimonialModule = async ({
     });
     return null;
   }
-  if (result.data.testimonials.length === 0) return null;
-
   return (
     <TestimonialModuleView
       {...result.data}

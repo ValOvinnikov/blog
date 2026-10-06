@@ -8,6 +8,7 @@ import {
   type TContentAlignment,
   type THeroVariant,
   type TMediaOrder,
+  type TSpacingScale,
 } from '@blog/config';
 import { Eyebrow } from '@blog/ui/components/atoms/eyebrow';
 import { Heading } from '@blog/ui/components/atoms/heading';
@@ -45,6 +46,8 @@ export type THeroProps = IWithClassName &
     contentAlignment?: TContentAlignment;
     mediaOrder?: TMediaOrder;
     tone: TBrandVariant;
+    spacingTop?: TSpacingScale;
+    spacingBottom?: TSpacingScale;
     children?: TCompoundChildren<typeof HeroParts>;
   };
 
@@ -59,6 +62,8 @@ const HeroRoot = ({
   contentAlignment,
   mediaOrder,
   tone,
+  spacingTop,
+  spacingBottom,
   children,
   className,
   dataTestId,
@@ -85,6 +90,8 @@ const HeroRoot = ({
     alignment: resolvedAlignment,
     mediaOrder: resolvedMediaOrder,
     tone,
+    spacingTop: isBanner ? spacingTop : undefined,
+    spacingBottom: isBanner ? spacingBottom : undefined,
   });
 
   return (
@@ -96,26 +103,28 @@ const HeroRoot = ({
               contentAlignment: resolvedAlignment,
             })}
           {eyebrow && <Eyebrow className={s.eyebrow()}>{eyebrow}</Eyebrow>}
-          <div className={s.title()}>
-            <Heading
-              id={titleId}
-              level={1}
-              visual="hero"
-              className={s.heading()}
-            >
-              {title}
-            </Heading>
+          <div className={s.group()}>
+            <div className={s.title()}>
+              <Heading
+                id={titleId}
+                level={1}
+                visual="hero"
+                className={s.heading()}
+              >
+                {title}
+              </Heading>
+            </div>
+            {excerpt && (
+              <Text variant="hero" className={s.excerpt()}>
+                {excerpt}
+              </Text>
+            )}
+            {slots.Body &&
+              cloneElement(slots.Body, {
+                contentAlignment: resolvedAlignment,
+                className: s.body(),
+              })}
           </div>
-          {excerpt && (
-            <Text variant="hero" className={s.excerpt()}>
-              {excerpt}
-            </Text>
-          )}
-          {slots.Body &&
-            cloneElement(slots.Body, {
-              contentAlignment: resolvedAlignment,
-              className: s.body(),
-            })}
           {slots.Cta &&
             cloneElement(slots.Cta, {
               contentAlignment: resolvedAlignment,
@@ -127,9 +136,10 @@ const HeroRoot = ({
         </div>
         {slots.Media && (
           <div className={s.media()} data-testid="hero-media">
-            {isBanner
-              ? cloneElement(slots.Media, { isFramed: false })
-              : slots.Media}
+            {cloneElement(
+              slots.Media,
+              isBanner ? { isFramed: false } : { variant: resolvedVariant },
+            )}
           </div>
         )}
         {isBanner && (

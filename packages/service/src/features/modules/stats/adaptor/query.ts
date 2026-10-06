@@ -1,7 +1,9 @@
-import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
-import { ctaButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
-import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
-import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
+import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
+import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
+import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
+import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
 
 export const statsModuleQuery = q
   .parameters<TModuleQueryParams>()
@@ -12,23 +14,20 @@ export const statsModuleQuery = q
     brandVariant: sub.field('brandVariant').notNull(),
     headingBlock: sub
       .field('headingBlock')
-      .project(headingBlockFragment)
+      .project(moduleHeadingBlockFragment)
       .notNull(),
     stats: sub
       .field('stats[]')
       .project((statSub) => ({
         _key: true,
-        value: statSub.field('value').notNull(),
-        label: statSub.field('label').notNull(),
-        description: statSub.field('description').nullable(true),
+        value: getLocalizedField(statSub, 'value').notNull(),
+        label: getLocalizedField(statSub, 'label').notNull(),
+        description: getLocalizedField(statSub, 'description'),
       }))
       .notNull(),
-    footnote: sub.field('footnote').nullable(true),
-    ctaButtons: sub
-      .field('ctaButtons[]')
-      .project(ctaButtonFragment)
-      .nullable(true),
-    contentAlignment: sub.field('contentAlignment').nullable(true),
-    layout: sub.field('layout').project(layoutFragment).nullable(true),
+    footnote: getLocalizedField(sub, 'footnote'),
+    ...ctaButtonsFragment,
+    ...moduleContentAlignmentFragment,
+    ...moduleWideLayoutFragment,
   }))
   .notNull();

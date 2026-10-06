@@ -8,8 +8,8 @@ import { brandVariantField } from '@blog/studio/schema-types/fields/brand-varian
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { displayModeField } from '@blog/studio/schema-types/fields/display-mode-field/display-mode-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
-import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
+import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
+import { wideLayoutField } from '@blog/studio/schema-types/objects/wide-layout/wide-layout-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { toTitleCase } from '@blog/utils/primitives';
 import { Users } from 'lucide-react';
@@ -20,18 +20,18 @@ export const teamSchema = defineType({
   title: 'Team',
   type: 'document',
   description:
-    'A grid of people shown as cards, each drawn from an existing Person — used to introduce a team, staff, or contributors.',
+    'People drawn from existing Persons, shown as a single spotlight or a set of cards — used to introduce a founder, a team, staff, or contributors.',
   icon: Users,
   fields: [
     titleField(),
     brandVariantField(),
-    headingBlockField(),
+    moduleHeadingBlockField(),
     defineField({
       name: 'members',
       title: 'Members',
       type: 'array',
       description:
-        'The people on this team, in the order they should appear. Each is a Person, edited under People.',
+        'The people on this team, in the order they should appear. Each is a Person, edited under People. One person renders as a single spotlight; two or more as cards.',
       of: [
         defineArrayMember({
           type: 'reference',
@@ -39,12 +39,8 @@ export const teamSchema = defineType({
         }),
       ],
       validation: (rule) => [
-        rule.required().error('Add at least two people.'),
-        rule
-          .min(2)
-          .error(
-            'A team needs at least two people. For one person, use a Profile Hero.',
-          ),
+        rule.required().error('Add at least one person.'),
+        rule.min(1).error('Add at least one person.'),
         rule.max(12).error('A team holds at most twelve people.'),
         rule.unique(),
       ],
@@ -91,8 +87,10 @@ export const teamSchema = defineType({
       validation: (rule) => rule.required(),
     }),
     ctaButtonsField(),
-    ...alignmentFields([]),
-    layoutField,
+    ...alignmentFields([], {
+      allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
+    }),
+    wideLayoutField,
   ],
   preview: {
     select: {

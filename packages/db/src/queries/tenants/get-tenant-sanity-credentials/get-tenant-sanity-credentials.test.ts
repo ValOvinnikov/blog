@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import {
   TENANT_PLAN,
   TENANT_PROVISIONING_STATUS,
@@ -19,7 +20,7 @@ async function insertTenant(): Promise<TTenant> {
     primaryDomain: 'acme.example.com',
     sanityProjectId: 'abc123',
     sanityDataset: 'production',
-    locale: 'en',
+    locale: LOCALE_ISO_CODES.EN,
     plan: TENANT_PLAN.FREE,
     status: TENANT_STATUS.ACTIVE,
   });
@@ -59,6 +60,7 @@ describe(getTenantSanityCredentials, () => {
       projectId: 'abc123',
       dataset: 'production',
       token: 'sk-real-token-value',
+      defaultLocale: LOCALE_ISO_CODES.EN,
       status: TENANT_STATUS.ACTIVE,
       deprovisionedAt: null,
       provisioningStatus: null,

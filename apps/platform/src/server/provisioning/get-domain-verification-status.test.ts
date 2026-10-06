@@ -1,14 +1,10 @@
+import { env } from '@platform/utils/env/env';
+
 import { getDomainVerificationStatus } from './get-domain-verification-status';
 
-const { envMock } = vi.hoisted(() => ({
-  envMock: {
-    VERCEL_API_TOKEN: undefined as string | undefined,
-    VERCEL_PROJECT_ID_WEB: undefined as string | undefined,
-    VERCEL_TEAM_ID: undefined as string | undefined,
-  },
-}));
+vi.mock('@platform/utils/env/env');
 
-vi.mock('@platform/utils/env/env', () => ({ env: envMock }));
+const envMock: Partial<Record<keyof typeof env, string>> = env;
 
 describe(getDomainVerificationStatus, () => {
   const fetchMock = vi.fn();

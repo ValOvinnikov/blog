@@ -1,21 +1,18 @@
 import { CAPABILITY, type TCapability } from '@blog/config';
 
-/**
- * The five `settings_features` toggle columns, keyed the same way
- * `@blog/db`'s `getSettingsFeatures`/`upsertSettingsFeatures` already are —
- * this is the admin-side view-model shape, not a redeclaration of the row.
- */
 export type TSettingsFeaturesValues = {
   commentsEnabled: boolean;
   ratingsEnabled: boolean;
   bookmarksEnabled: boolean;
   newsletterEnabled: boolean;
   analyticsEnabled: boolean;
+  consentBannerEnabled: boolean;
 };
 
 export type TCapabilityToggle = {
   capability: TCapability;
   field: keyof TSettingsFeaturesValues;
+  isComingSoon?: boolean;
 };
 
 /**
@@ -25,11 +22,24 @@ export type TCapabilityToggle = {
  * per capability before writing anything.
  */
 export const CAPABILITY_TOGGLES: TCapabilityToggle[] = [
-  { capability: CAPABILITY.COMMENTS, field: 'commentsEnabled' },
-  { capability: CAPABILITY.RATINGS, field: 'ratingsEnabled' },
+  {
+    capability: CAPABILITY.COMMENTS,
+    field: 'commentsEnabled',
+    isComingSoon: true,
+  },
+  {
+    capability: CAPABILITY.RATINGS,
+    field: 'ratingsEnabled',
+    isComingSoon: true,
+  },
   { capability: CAPABILITY.BOOKMARKS, field: 'bookmarksEnabled' },
-  { capability: CAPABILITY.NEWSLETTER, field: 'newsletterEnabled' },
+  {
+    capability: CAPABILITY.NEWSLETTER,
+    field: 'newsletterEnabled',
+    isComingSoon: true,
+  },
   { capability: CAPABILITY.ANALYTICS, field: 'analyticsEnabled' },
+  { capability: CAPABILITY.CONSENT_BANNER, field: 'consentBannerEnabled' },
 ];
 
 /** Converts a `PRESET_REGISTRY[preset].featureDefaults` map into the column-keyed view-model shape. */
@@ -58,6 +68,18 @@ export const clampToEntitlement = (
   const clamped = { ...values };
   for (const { capability, field } of CAPABILITY_TOGGLES) {
     if (!entitledCapabilities.includes(capability)) {
+      clamped[field] = false;
+    }
+  }
+  return clamped;
+};
+
+export const withComingSoonOff = (
+  values: TSettingsFeaturesValues,
+): TSettingsFeaturesValues => {
+  const clamped = { ...values };
+  for (const { field, isComingSoon } of CAPABILITY_TOGGLES) {
+    if (isComingSoon) {
       clamped[field] = false;
     }
   }

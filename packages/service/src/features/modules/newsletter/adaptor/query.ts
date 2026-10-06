@@ -1,7 +1,9 @@
 import { NEWSLETTER_VARIANT } from '@blog/config';
-import { q, type TModuleQueryParams } from '@blog/service/sanity/query';
-import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
-import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
+import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
+import { moduleLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
+import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
 import { z } from 'zod';
 
 const NEWSLETTER_VARIANT_EXPRESSION = `coalesce(variant, "${NEWSLETTER_VARIANT.FULL}")`;
@@ -19,10 +21,16 @@ export const newsletterModuleQuery = q
     brandVariant: sub.field('brandVariant').notNull(),
     headingBlock: sub
       .field('headingBlock')
-      .project(headingBlockFragment)
+      .project(moduleHeadingBlockFragment)
       .notNull(),
     variant: sub.raw(NEWSLETTER_VARIANT_EXPRESSION, newsletterVariantParser),
-    layout: sub.field('layout').project(layoutFragment).nullable(true),
-    contentAlignment: sub.field('contentAlignment').nullable(true),
+    trustCues: sub
+      .field('trustCues[]')
+      .project((cueSub) => ({
+        text: getLocalizedField(cueSub, 'text'),
+      }))
+      .nullable(true),
+    ...moduleLayoutFragment,
+    ...moduleContentAlignmentFragment,
   }))
   .notNull();

@@ -1,14 +1,15 @@
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeStatsModule } from '@web/testing/modules/stats/fixtures';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { StatsModule } from './stats-module';
 
-const { getStatsModuleMock, getTenantSanityContextMock } = vi.hoisted(() => ({
+const { getStatsModuleMock } = vi.hoisted(() => ({
   getStatsModuleMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
 }));
+
+vi.mock('@web/i18n/navigation');
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -18,57 +19,42 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
+vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
+const getRequestContextMock = vi.mocked(getRequestContext);
 
 const setup = customRenderAsync(StatsModule, {
   id: 'stats-1',
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${StatsModule.name}/>`, () => {
   beforeEach(() => {
     getStatsModuleMock.mockReset();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
+    getRequestContextMock.mockReset();
+    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
-  it('calls getStatsModule with the module id and the tenant Sanity context resolved from the tenant slug', async () => {
+  it('calls getStatsModule with the module id and the tenant Sanity context', async () => {
     const tenant = {
       projectId: 'tenant-project',
       dataset: 'production',
       token: 'tenant-token',
     };
-    getTenantSanityContextMock.mockResolvedValue(tenant);
+    getRequestContextMock.mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      sanityContext: tenant,
+    });
     getStatsModuleMock.mockResolvedValue({ ok: true, data: makeStatsModule() });
 
     await setup();
 
     expect(getStatsModuleMock).toHaveBeenCalledWith('stats-1', tenant);
-    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
   });
 
   it('renders nothing when the fetch fails', async () => {
     getStatsModuleMock.mockResolvedValue({
       ok: false,
       error: new Error('boom'),
-    });
-
-    const { container } = await setup();
-
-    expect(container).toBeEmptyDOMElement();
-  });
-
-  it('renders nothing when the stats degrade to an empty list, never an empty landmark with a dangling aria-labelledby', async () => {
-    getStatsModuleMock.mockResolvedValue({
-      ok: true,
-      data: makeStatsModule({ stats: [] }),
     });
 
     const { container } = await setup();

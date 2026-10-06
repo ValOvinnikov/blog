@@ -1,4 +1,8 @@
-import { POST_SOURCE, type TPostSource } from '@blog/config/constants';
+import {
+  CONTENT_ALIGNMENT,
+  POST_SOURCE,
+  type TPostSource,
+} from '@blog/config/constants';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
@@ -6,8 +10,8 @@ import { displayModeField } from '@blog/studio/schema-types/fields/display-mode-
 import { showImagesField } from '@blog/studio/schema-types/fields/show-images-field/show-images-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { publishedPostFilter } from '@blog/studio/schema-types/filters/published-post';
-import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
-import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
+import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
+import { wideLayoutField } from '@blog/studio/schema-types/objects/wide-layout/wide-layout-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { validateNewestFeaturedHasCandidate } from '@blog/studio/schema-types/validation/validate-newest-featured-has-candidate/validate-newest-featured-has-candidate';
 import { toTitleCase } from '@blog/utils/primitives';
@@ -38,7 +42,7 @@ export const postFeaturedSchema = defineType({
   fields: [
     titleField(),
     brandVariantField(),
-    headingBlockField(),
+    moduleHeadingBlockField(),
     defineField({
       name: 'postSource',
       title: 'Source',
@@ -73,19 +77,18 @@ export const postFeaturedSchema = defineType({
       hidden: ({ parent }) =>
         (parent as TPostFeaturedDocument | undefined)?.postSource !==
         POST_SOURCE.PINNED,
-      validation: (rule) =>
-        rule
-          .unique()
-          .max(3)
-          .error('A spotlight holds at most three posts.')
-          .custom((value, context) => {
-            const parent = context.parent as TPostFeaturedDocument | undefined;
+      validation: (rule) => [
+        rule.unique().error('A post can only be pinned once.'),
+        rule.max(3).error('A spotlight holds at most three posts.'),
+        rule.custom((value, context) => {
+          const parent = context.parent as TPostFeaturedDocument | undefined;
 
-            return parent?.postSource === POST_SOURCE.PINNED &&
-              (!value || value.length === 0)
-              ? 'Pin at least one post, or switch the source to Newest featured.'
-              : true;
-          }),
+          return parent?.postSource === POST_SOURCE.PINNED &&
+            (!value || value.length === 0)
+            ? 'Pin at least one post, or switch the source to Newest featured.'
+            : true;
+        }),
+      ],
     }),
     defineField({
       name: 'limit',
@@ -113,10 +116,12 @@ export const postFeaturedSchema = defineType({
     showImagesField(),
     displayModeField(),
     ...alignmentFields([], {
+      allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
       title: 'Heading Alignment',
-      description: 'Horizontal alignment of the heading and supporting text.',
+      description:
+        'Horizontal alignment of the heading, supporting text and, in a carousel that fits, the cards.',
     }),
-    layoutField,
+    wideLayoutField,
   ],
   preview: {
     select: {

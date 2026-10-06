@@ -1,11 +1,12 @@
+import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { redirect } from 'next/navigation';
+import type { Session } from 'next-auth';
 
 import DashboardTenantLayout from './layout';
 
 const {
-  authMock,
   listMembershipsForUserMock,
   listTenantsByIdsMock,
   listTenantsMock,
@@ -13,7 +14,6 @@ const {
   cookiesMock,
   resolveIsSidebarCollapsedMock,
 } = vi.hoisted(() => ({
-  authMock: vi.fn(),
   listMembershipsForUserMock: vi.fn(),
   listTenantsByIdsMock: vi.fn(),
   listTenantsMock: vi.fn(),
@@ -22,7 +22,7 @@ const {
   resolveIsSidebarCollapsedMock: vi.fn(),
 }));
 
-vi.mock('@platform/server/auth/auth', () => ({ auth: authMock }));
+vi.mock('@platform/server/auth/auth');
 
 vi.mock('@platform/server/layout/resolve-is-sidebar-collapsed', () => ({
   resolveIsSidebarCollapsed: resolveIsSidebarCollapsedMock,
@@ -42,15 +42,19 @@ vi.mock('@blog/db', async () => ({
 
 vi.mock('next/headers', () => ({ cookies: cookiesMock }));
 
+const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
+
 const tenant1 = {
   id: 'tenant-1',
   name: 'Acme Inc.',
   primaryDomain: 'acme.com',
+  plan: 'FREE',
 };
 const tenant2 = {
   id: 'tenant-2',
   name: 'Globex Corp.',
   primaryDomain: 'globex.com',
+  plan: 'GROWTH',
 };
 const membership1 = {
   id: 'm-1',
@@ -106,7 +110,7 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
     expect(redirect).toHaveBeenCalledWith('/workspace-pending');
   });
 
-  it('renders the gated content directly for a user with exactly one membership, with no switcher', async () => {
+  it('renders the gated content with no switcher for a user with one membership', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     listMembershipsForUserMock.mockResolvedValue([membership1]);
     listTenantsByIdsMock.mockResolvedValue([tenant1]);
@@ -120,7 +124,7 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
     ).not.toBeInTheDocument();
   });
 
-  it('redirects to the picker for a user with multiple memberships and no active-tenant cookie', async () => {
+  it('redirects to the picker for several memberships and no active-tenant cookie', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     listMembershipsForUserMock.mockResolvedValue([membership1, membership2]);
     listTenantsByIdsMock.mockResolvedValue([tenant1, tenant2]);
@@ -131,7 +135,7 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
     expect(redirect).toHaveBeenCalledWith('/dashboard/select-tenant');
   });
 
-  it('renders the active tenant and a switcher for a user with multiple memberships once the cookie is set', async () => {
+  it('renders the active tenant and a switcher for several memberships with the cookie', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     listMembershipsForUserMock.mockResolvedValue([membership1, membership2]);
     listTenantsByIdsMock.mockResolvedValue([tenant1, tenant2]);
@@ -143,7 +147,7 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
     expect(screen.getByRole('button', { name: /globex/i })).toBeVisible();
   });
 
-  it('shows the Tenant nav destinations under /dashboard hrefs, without a Platform section', async () => {
+  it('shows Tenant nav destinations under /dashboard, without a Platform section', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     listMembershipsForUserMock.mockResolvedValue([membership1]);
     listTenantsByIdsMock.mockResolvedValue([tenant1]);
@@ -157,7 +161,39 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
     expect(screen.queryByText('Platform')).not.toBeInTheDocument();
   });
 
-  it('shows the real platform role, never OWNER, for a SUPERADMIN with no real memberships row', async () => {
+  it('hides Languages and Team from a FREE tenant', async () => {
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    listMembershipsForUserMock.mockResolvedValue([membership1, membership2]);
+    listTenantsByIdsMock.mockResolvedValue([tenant1, tenant2]);
+    mockCookie('tenant-1');
+
+    await setup();
+
+    expect(
+      screen.queryByRole('link', { name: /languages/i }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText('Team')).not.toBeInTheDocument();
+  });
+
+  it('shows Languages as a link and Team as "Coming soon" to a GROWTH tenant', async () => {
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    listMembershipsForUserMock.mockResolvedValue([membership1, membership2]);
+    listTenantsByIdsMock.mockResolvedValue([tenant1, tenant2]);
+    mockCookie('tenant-2');
+
+    await setup();
+
+    expect(screen.getByRole('link', { name: /languages/i })).toHaveAttribute(
+      'href',
+      '/dashboard/languages',
+    );
+    expect(screen.getByText('Team')).toBeVisible();
+    expect(
+      screen.queryByRole('link', { name: /team/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows the platform role, never OWNER, for a SUPERADMIN with no memberships row', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue({
       id: 'admin-1',

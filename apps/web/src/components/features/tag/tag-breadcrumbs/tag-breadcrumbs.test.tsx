@@ -7,26 +7,20 @@ import {
   testNotFoundOnFetchFailure,
   testNotFoundWithoutLog,
 } from '@web/testing/shared/breadcrumbs-page-contract/breadcrumbs-page-contract';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 import { makeTag } from '@web/testing/shared/tag/fixtures';
 
 import { TagBreadcrumbs } from './tag-breadcrumbs';
 
-const { getTagPageMock, getTenantBaseUrlMock } = vi.hoisted(() => ({
+vi.mock('@web/server/request-context/request-context');
+
+const { getTagPageMock } = vi.hoisted(() => ({
   getTagPageMock: vi.fn(),
-  getTenantBaseUrlMock: vi.fn(),
 }));
 
-vi.mock('@web/server/tag/get-tag-page', () => ({
+vi.mock('@web/i18n/navigation');
+
+vi.mock('@web/server/tag/get-tag-page/get-tag-page', () => ({
   getTagPage: getTagPageMock,
-}));
-
-vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
-  getTenantBaseUrl: getTenantBaseUrlMock,
-}));
-
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
 }));
 
 const tag = makeTag({ title: 'TypeScript', slug: 'typescript' });
@@ -34,14 +28,11 @@ const successData = { tag, modules: [], seo: {} };
 
 const setup = customRenderAsync(TagBreadcrumbs, {
   slug: 'typescript',
-  tenant: 'tenant-1',
 });
 
 describe(`<${TagBreadcrumbs.name}/>`, () => {
   beforeEach(() => {
     getTagPageMock.mockReset();
-    getTenantBaseUrlMock.mockReset();
-    getTenantBaseUrlMock.mockResolvedValue('https://example.com');
   });
 
   testNotFoundWithoutLog({ pageLoaderMock: getTagPageMock, setup });
@@ -67,13 +58,12 @@ describe(`<${TagBreadcrumbs.name}/>`, () => {
     pageLoaderMock: getTagPageMock,
     setup,
     successData,
-    getTenantBaseUrlMock,
   });
   testForwardsArgsToLoader({
     pageLoaderMock: getTagPageMock,
     setup,
     successData,
-    description: 'forwards the slug and tenant to getTagPage',
-    expectedArgs: ['typescript', 'tenant-1'],
+    description: 'forwards the slug to getTagPage',
+    expectedArgs: ['typescript'],
   });
 });

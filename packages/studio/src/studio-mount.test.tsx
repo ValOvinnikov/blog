@@ -1,3 +1,4 @@
+import { CAPABILITY } from '@blog/config/constants';
 import { renderToStaticMarkup } from 'react-dom/server';
 
 import { StudioMount } from './studio-mount';
@@ -29,11 +30,13 @@ vi.mock('sanity', async () => {
         dataset: string;
         basePath?: string;
         title: string;
+        form?: { components?: { input?: unknown } };
       };
       children: React.ReactNode;
     }) => (
       <div data-testid="studio-provider-mock">
         {config.projectId}:{config.dataset}:{config.basePath}:{config.title}
+        {config.form?.components?.input ? 'has-input-override' : null}
         {children}
       </div>
     ),
@@ -56,5 +59,19 @@ describe(StudioMount, () => {
       'test-project:test-dataset:/dashboard/studio:Test Studio',
     );
     expect(html).toContain('studio-layout-mock');
+  });
+
+  it('passes enabledCapabilities through to the built config', () => {
+    const html = renderToStaticMarkup(
+      <StudioMount
+        projectId="p"
+        dataset="d"
+        basePath="/s"
+        title="T"
+        enabledCapabilities={[CAPABILITY.NEWSLETTER]}
+      />,
+    );
+
+    expect(html).toContain('has-input-override');
   });
 });

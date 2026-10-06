@@ -3,6 +3,7 @@ import { tv } from 'tailwind-variants';
 
 export const contentModuleViewVariants = tv({
   slots: {
-    prose: proseMeasureCapSlot,
+    root: ['flex justify-center', '[&>div]:w-full'],
+    prose: ['text-left', ...proseMeasureCapSlot],
   },
 });

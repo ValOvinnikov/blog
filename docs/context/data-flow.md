@@ -30,20 +30,22 @@ apps/web
   read and write paths below.
 - **The read path is tenant-aware.** Every `service.*.v1.*` loader accepts an
   optional `tenant?: TTenantSanityContext` argument
-  (`packages/service/src/sanity/client.ts`); `getClient(tenant)` builds — and
+  (`packages/service/src/sanity/client/client.ts`); `getClient(tenant)` builds — and
   LRU-caches, keyed by `projectId:dataset` — a Sanity client scoped to that
   tenant's own project, dataset, and read token, falling back to the legacy
   env-configured client (`SANITY_API_READ_TOKEN`) when `tenant` is omitted.
-  `apps/web` resolves the current request's tenant once per render:
-  `getTenantSanityContext()` (`apps/web/src/server/tenant/`, wrapped in
-  React's `cache()`) reads the tenant id `apps/web/src/proxy.ts` already
-  resolved from the request's `Host` header and threaded via the
-  `x-tenant-id` header, decrypts that tenant's read credentials fresh from
-  `@blog/db` on every request (never cached across requests), and the result
-  is passed into each page's and module's loader call — so a single request
-  only ever touches one tenant's content. Outside production, or before a
-  tenant has credentials provisioned, this resolves to `undefined` and
-  loaders fall back to the legacy single-tenant client. A parallel
+  `apps/web` resolves the current request's tenant once per render through
+  the request context (`apps/web/src/server/request-context/`): every
+  `[tenant]/[locale]` layout, page and `generateMetadata` calls
+  `enterRequestContext(params)` with the `[tenant]` segment
+  `apps/web/src/proxy.ts` wrote into the path, and readers call
+  `getRequestContext()`, whose `sanityContext` carries that tenant's read
+  credentials — decrypted fresh from `@blog/db` per request, never cached
+  across requests — with the route's locale applied. Every page, module,
+  loader and metadata builder takes it from there, so a single request only
+  ever touches one tenant's content. With no tenant resolved it is the
+  platform's own project; a tenant without credentials 404s in production
+  and falls back to the platform project elsewhere. A parallel
   `getHostTenantSanityContext()` resolves the same way but reads the `Host`
   header directly, for the handful of routes `proxy.ts`'s matcher excludes
   (`/api/*`, `sitemap.xml`, `rss.xml`, the favicon, the default OG/Twitter
@@ -86,7 +88,7 @@ apps/web
 - **Service also has a scoped write path, `service.editorial.*`** (e.g.
   `service.editorial.skim.v1`, added for the choose-your-depth reading
   pipeline, #957) — separate from the read-only flow described above.
-  `packages/service/src/sanity/write-client.ts`'s `getWriteClient()` is a
+  `packages/service/src/sanity/write-client/write-client.ts`'s `getWriteClient()` is a
   distinct client from the page-render read client, and is itself
   tenant-aware the same way `getClient()` is: called with no argument it
   falls back to `SANITY_API_WRITE_TOKEN` (server-only, never bundled to the
@@ -98,11 +100,11 @@ apps/web
   `POST /api/generate-skim` route, the only caller, resolves this tenant
   context straight from the request's `Host` header via
   `getHostTenantSanityWriteContext()`
-  (`apps/web/src/server/tenant/get-host-tenant-sanity-write-context.ts`, the
-  write-side counterpart to `getHostTenantSanityContext()` above, not to
-  `getTenantSanityContext()` — `/api/*` is one of the routes `proxy.ts`'s
-  matcher excludes, so `x-tenant-id` is never set here) rather than through
-  the header-threading page renders use. Unlike the read side, the write
+  (`apps/web/src/server/tenant/tenant-sanity-context/tenant-sanity-context.ts`, the
+  write-side counterpart to `getHostTenantSanityContext()` above, not to the
+  request context — `/api/*` is one of the routes `proxy.ts`'s matcher
+  excludes, so no `[tenant]` segment is ever written here) rather than
+  through the route-param context page renders use. Unlike the read side, the write
   route distinguishes "no tenant resolved at all" (dev/local only — a
   production request with no matching host never reaches this far) from "a
   tenant resolved but has no usable write credentials": only the former

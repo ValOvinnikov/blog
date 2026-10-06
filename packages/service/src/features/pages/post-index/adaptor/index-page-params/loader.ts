@@ -1,8 +1,9 @@
+import { isr } from '@blog/service/sanity/query/isr';
 import {
-  isr,
   runQuery,
   type TTenantSanityContext,
-} from '@blog/service/sanity/query';
+} from '@blog/service/sanity/query/query';
+import { getFirstPostListPageSizes } from '@blog/service/shared/adaptors/post-list-page-size/page-sizes';
 
 import { indexPageParamsQuery } from './query';
 import { toIndexPageParams } from './transformer';
@@ -12,7 +13,12 @@ export async function getIndexPageParams(
 ): Promise<{ page: string }[]> {
   const raw = await runQuery(indexPageParamsQuery, {
     tenant,
-    ...isr(['posts', 'page_postIndex', 'modules:postList'], tenant.projectId),
+    ...isr(['posts', 'page_postIndex', 'template_postIndex'], tenant.projectId),
   });
-  return toIndexPageParams(raw);
+  const [pageSize = null] = await getFirstPostListPageSizes(
+    [raw.moduleRefs],
+    tenant,
+  );
+
+  return toIndexPageParams({ blogPosts: raw.blogPosts, pageSize });
 }

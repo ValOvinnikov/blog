@@ -2,6 +2,7 @@ import { asideSchema } from './aside/aside';
 import { bodyImageSchema } from './body-image/body-image';
 import { brandSchema } from './brand/brand';
 import { brandTaglineSchema } from './brand-tagline/brand-tagline';
+import { brandTaglineItemSchema } from './brand-tagline-item/brand-tagline-item';
 import {
   ctaButtonSchema,
   ctaSecondaryButtonSchema,
@@ -13,21 +14,29 @@ import { imageWithAltSchema } from './image-with-alt/image-with-alt';
 import { inlineLinkSchema } from './inline-link/inline-link';
 import { layoutSchema } from './layout/layout';
 import { linkRefSchema } from './link-ref/link-ref';
+import { localizedImageWithAltSchema } from './localized-image-with-alt/localized-image-with-alt';
 import { logoItemSchema } from './logo-item/logo-item';
+import { moduleHeadingBlockSchema } from './module-heading-block/module-heading-block';
+import { newsletterTrustCueSchema } from './newsletter-trust-cue/newsletter-trust-cue';
 import { openGraphSchema } from './open-graph/open-graph';
 import { postTakeawaysSchema } from './post-takeaways/post-takeaways';
+import { pricingFeatureSchema } from './pricing-feature/pricing-feature';
 import { pricingPriceSchema } from './pricing-price/pricing-price';
 import { pricingTierSchema } from './pricing-tier/pricing-tier';
 import { seoSchema } from './seo/seo';
 import { socialProfileSchema } from './social-profile/social-profile';
 import { statSchema } from './stat/stat';
 import { timelineItemSchema } from './timeline-item/timeline-item';
+import { wideLayoutSchema } from './wide-layout/wide-layout';
 
 export const objects = [
   layoutSchema,
   heroLayoutSchema,
+  wideLayoutSchema,
   headingBlockSchema,
   imageWithAltSchema,
+  moduleHeadingBlockSchema,
+  localizedImageWithAltSchema,
   bodyImageSchema,
   asideSchema,
   inlineLinkSchema,
@@ -39,11 +48,14 @@ export const objects = [
   featureHighlightSchema,
   openGraphSchema,
   seoSchema,
+  brandTaglineItemSchema,
   brandTaglineSchema,
   brandSchema,
   postTakeawaysSchema,
   statSchema,
   timelineItemSchema,
   pricingPriceSchema,
+  pricingFeatureSchema,
   pricingTierSchema,
+  newsletterTrustCueSchema,
 ];

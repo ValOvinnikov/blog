@@ -3,13 +3,10 @@ import { customRender, screen } from '@web/testing/custom-render';
 import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
 import { makeStatItem } from '@web/testing/modules/stats/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { StatsModuleView } from './stats-module-view';
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
+vi.mock('@web/i18n/navigation');
 
 const dataTestId = 'stats-module-stats-1';
 
@@ -63,11 +60,5 @@ describe(`<${StatsModuleView.name}/>`, () => {
       'href',
       '/blog',
     );
-  });
-
-  it('renders nothing when stats is empty, never an empty landmark with a dangling aria-labelledby', () => {
-    const { container } = setup({ stats: [] });
-
-    expect(container).toBeEmptyDOMElement();
   });
 });

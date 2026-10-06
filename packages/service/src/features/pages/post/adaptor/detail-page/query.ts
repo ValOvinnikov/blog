@@ -1,5 +1,5 @@
-import { q, type TSlugParams } from '@blog/service/sanity/query';
-import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/published-post';
+import { q, type TSlugParams } from '@blog/service/sanity/query/query';
+import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/post/published-post';
 import { postDetailFragment } from '@blog/service/shared/fragments/post/post';
 
 // A post's content and its page are the same `page_post` document. Gating

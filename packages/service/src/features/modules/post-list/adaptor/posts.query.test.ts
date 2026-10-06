@@ -1,4 +1,4 @@
-import { TAXONOMY_KIND } from '@blog/config';
+import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 
 import { postListModulePaginatedPostsQuery } from './posts.query';
 
@@ -32,38 +32,66 @@ describe(postListModulePaginatedPostsQuery, () => {
     );
   });
 
-  it('scopes posts to a tag by the term the archive page references', () => {
-    const query = postListModulePaginatedPostsQuery(1, 9, {
-      kind: TAXONOMY_KIND.TAGS,
-      slug: 'engineering',
-    }).query;
+  describe('scoping', () => {
+    function post(id: string, refs: { tag?: string; topic?: string }) {
+      return {
+        _id: id,
+        _type: 'page_post',
+        publishedAt: '2020-01-01T00:00:00Z',
+        tags: refs.tag ? [{ _key: id, _ref: refs.tag }] : [],
+        topic: refs.topic ? { _ref: refs.topic } : undefined,
+      };
+    }
+    const dataset = [
+      post('a', { tag: 'tag-1' }),
+      post('b', { tag: 'tag-1', topic: 'topic-1' }),
+      post('c', { topic: 'topic-1' }),
+      post('d', { tag: 'tag-2' }),
+      {
+        ...post('future', { tag: 'tag-1' }),
+        publishedAt: '2999-01-01T00:00:00Z',
+      },
+    ];
 
-    expect(query).toContain(
-      'references(*[_type == "page_tag" && slug.current == $archivePageSlug][0].tag._ref)',
-    );
-    expect(query).not.toContain('blog_tag');
-    expect(query).not.toContain('blog_topic');
-  });
+    async function run(termId?: string) {
+      const query = postListModulePaginatedPostsQuery(
+        1,
+        10,
+        termId ? { termId } : undefined,
+      ).query;
 
-  it('scopes posts to a topic by the term the archive page references', () => {
-    const query = postListModulePaginatedPostsQuery(1, 9, {
-      kind: TAXONOMY_KIND.TOPICS,
-      slug: 'news',
-    }).query;
+      return (await evaluateGroqExpression(
+        query,
+        dataset,
+        undefined,
+        termId ? { termId } : {},
+      )) as { posts: { _id: string }[]; total: number };
+    }
 
-    expect(query).toContain(
-      'references(*[_type == "page_topic" && slug.current == $archivePageSlug][0].topic._ref)',
-    );
-    expect(query).not.toContain('blog_topic');
-    expect(query).not.toContain('blog_tag');
-  });
+    it('returns only published posts referencing a tag, and counts only those', async () => {
+      const result = await run('tag-1');
 
-  it('omits the scope predicate entirely when unscoped', () => {
-    const query = postListModulePaginatedPostsQuery(1, 9).query;
+      expect(result.posts.map((p) => p._id).sort()).toEqual(['a', 'b']);
+      expect(result.total).toBe(2);
+    });
 
-    expect(query).not.toContain('references(');
-    expect(query).not.toContain('$archivePageSlug');
-    expect(query).not.toContain('blog_tag');
-    expect(query).not.toContain('blog_topic');
+    it('returns only published posts referencing a topic', async () => {
+      const result = await run('topic-1');
+
+      expect(result.posts.map((p) => p._id).sort()).toEqual(['b', 'c']);
+      expect(result.total).toBe(2);
+    });
+
+    it('returns every published post when unscoped', async () => {
+      const result = await run();
+
+      expect(result.posts.map((p) => p._id).sort()).toEqual([
+        'a',
+        'b',
+        'c',
+        'd',
+      ]);
+      expect(result.total).toBe(4);
+    });
   });
 });

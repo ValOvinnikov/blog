@@ -1,34 +1,19 @@
 import { customRenderAsync } from '@web/testing/custom-render';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 import { testStaticBreadcrumbsContract } from '@web/testing/shared/static-breadcrumbs-contract/static-breadcrumbs-contract';
 
 import { TopicIndexBreadcrumbs } from './topic-index-breadcrumbs';
 
-const { getTenantBaseUrlMock } = vi.hoisted(() => ({
-  getTenantBaseUrlMock: vi.fn(),
-}));
+vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
-  getTenantBaseUrl: getTenantBaseUrlMock,
-}));
+vi.mock('@web/i18n/navigation');
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
-
-const setup = customRenderAsync(TopicIndexBreadcrumbs, {
-  tenant: 'tenant-1',
-});
+const setup = customRenderAsync(TopicIndexBreadcrumbs, {});
 
 describe(`<${TopicIndexBreadcrumbs.name}/>`, () => {
-  beforeEach(() => {
-    getTenantBaseUrlMock.mockReset();
-    getTenantBaseUrlMock.mockResolvedValue('https://example.com');
-  });
+  beforeEach(() => {});
 
   testStaticBreadcrumbsContract({
     setup,
-    getTenantBaseUrlMock,
     label: 'Topics',
     path: '/topics',
   });

@@ -1,4 +1,4 @@
-import { q } from '@blog/service/sanity/query';
+import { q } from '@blog/service/sanity/query/query';
 
 /**
  * The minimal projection for a post referenced as a link (e.g. a taxonomy

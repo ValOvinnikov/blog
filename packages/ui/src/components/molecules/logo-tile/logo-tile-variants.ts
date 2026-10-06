@@ -3,8 +3,8 @@ import type { VariantProps } from 'tailwind-variants';
 
 export const logoTileVariants = tv({
   base: [
-    'grid w-[192px] h-[88px] place-items-center',
-    'rounded-lg border border-border bg-surface',
+    'relative grid w-[192px] h-[88px] place-items-center',
+    'rounded-lg border border-border dark:border-border-strong bg-surface',
     'px-card-x py-card-y',
   ],
   variants: {
@@ -13,23 +13,18 @@ export const logoTileVariants = tv({
         'opacity-80 transition-opacity duration-base ease-smooth',
         'hover:opacity-100 focus-within:opacity-100',
         'motion-reduce:transition-none',
+        'hover:border-border-strong dark:hover:border-border-emphasis',
+        'has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-brand-primary',
+        'has-[a:focus-visible]:ring-offset-2 has-[a:focus-visible]:ring-offset-ambient',
+        '[&_a]:flex [&_a]:size-full [&_a]:items-center [&_a]:justify-center',
+        '[&_a]:outline-none',
+        "[&_a]:after:absolute [&_a]:after:inset-0 [&_a]:after:rounded-lg [&_a]:after:content-['']",
       ],
       false: [],
-    },
-    hasAspectRatio: {
-      true: [
-        '[&_img]:aspect-[var(--logo-aspect)] [&_img]:h-auto',
-        '[&_img]:w-[min(calc(2.25rem*var(--logo-aspect)),100%)]',
-        '[&_img]:object-fill [&_img]:block',
-      ],
-      false: [
-        '[&_img]:block [&_img]:max-h-9 [&_img]:w-auto [&_img]:max-w-full',
-      ],
     },
   },
   defaultVariants: {
     isInteractive: false,
-    hasAspectRatio: false,
   },
 });
 

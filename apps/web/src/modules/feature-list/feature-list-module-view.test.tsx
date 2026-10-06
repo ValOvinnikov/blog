@@ -8,13 +8,8 @@ import { customRender, screen } from '@web/testing/custom-render';
 import { ctaActionsDemo } from '@web/testing/modules/cta/fixtures';
 import { makeFeatureListItem } from '@web/testing/modules/feature-list/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 
 import { FeatureListModuleView } from './feature-list-module-view';
-
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
 
 const { FeatureListCarousel } = vi.hoisted(() => ({
   FeatureListCarousel: vi.fn(() => (
@@ -22,7 +17,11 @@ const { FeatureListCarousel } = vi.hoisted(() => ({
   )),
 }));
 
-vi.mock('./feature-list-carousel', () => ({ FeatureListCarousel }));
+vi.mock('@web/i18n/navigation');
+
+vi.mock('./components/feature-list-carousel/feature-list-carousel', () => ({
+  FeatureListCarousel,
+}));
 
 const items = [
   makeFeatureListItem({
@@ -74,7 +73,7 @@ describe(`<${FeatureListModuleView.name}/>`, () => {
           level: 3,
           name: item.headingBlock.heading,
         }),
-      ).toBeInTheDocument();
+      ).toBeVisible();
     });
   });
 
@@ -90,9 +89,7 @@ describe(`<${FeatureListModuleView.name}/>`, () => {
         expectedCarousel ? 1 : 0,
       );
       if (expectedCarousel) {
-        expect(
-          screen.getByTestId('feature-list-carousel-stub'),
-        ).toBeInTheDocument();
+        expect(screen.getByTestId('feature-list-carousel-stub')).toBeVisible();
         expect(FeatureListCarousel).toHaveBeenCalledWith(
           expect.objectContaining({ items }),
           undefined,
@@ -101,12 +98,6 @@ describe(`<${FeatureListModuleView.name}/>`, () => {
       }
     },
   );
-
-  it('renders nothing when items is empty, never an empty landmark with a dangling aria-labelledby', () => {
-    const { container } = setup({ items: [] });
-
-    expect(container).toBeEmptyDOMElement();
-  });
 
   it('renders no action group when there are no cta buttons', () => {
     setup();

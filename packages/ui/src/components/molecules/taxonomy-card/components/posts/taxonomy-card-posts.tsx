@@ -1,6 +1,9 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import {
+  A_AS_CONST,
+  type IWithClassName,
+  type IWithDataTestId,
+} from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
-import { resolveComponent } from '@blog/ui/lib/react';
 
 import { taxonomyCardPostsVariants } from './taxonomy-card-posts-variants';
 
@@ -29,7 +32,7 @@ export const TaxonomyCardPosts = ({
 }: TTaxonomyCardPostsProps) => {
   if (posts.length === 0) return null;
 
-  const LinkComponent = resolveComponent(linkAs, 'a');
+  const LinkComponent = linkAs ?? A_AS_CONST;
 
   return (
     <ul

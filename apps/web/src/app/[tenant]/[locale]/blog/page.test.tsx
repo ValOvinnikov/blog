@@ -1,6 +1,12 @@
-import { CONTENT_ROUTE_REVALIDATE_SECONDS } from '@blog/config';
+import {
+  CONTENT_ROUTE_REVALIDATE_SECONDS,
+  LOCALE_ISO_CODES,
+} from '@blog/config';
+import { enterRequestContext } from '@web/server/request-context/request-context';
 
 import PostIndexRoute, { generateMetadata, revalidate } from './page';
+
+vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@web/metadata/post-index-metadata', () => ({
   buildPostIndexMetadata: vi.fn().mockResolvedValue({ title: 'Blog' }),
@@ -17,6 +23,18 @@ describe('PostIndexRoute', () => {
     expect(revalidate).toBe(CONTENT_ROUTE_REVALIDATE_SECONDS);
   });
 
+  it('enters the request context with the route params', async () => {
+    const params = Promise.resolve({
+      tenant: 'tenant-1',
+      locale: LOCALE_ISO_CODES.EN,
+      slug: 'a-slug',
+    });
+
+    await PostIndexRoute({ params });
+
+    expect(enterRequestContext).toHaveBeenCalledWith(params);
+  });
+
   describe('generateMetadata', () => {
     it('delegates to buildPostIndexMetadata for page 1', async () => {
       const metadata = await generateMetadata({
@@ -24,6 +42,15 @@ describe('PostIndexRoute', () => {
       });
 
       expect(metadata).toEqual({ title: 'Blog' });
+    });
+
+    it('enters the request context with the route params', async () => {
+      const params: Parameters<typeof generateMetadata>[0]['params'] =
+        Promise.resolve({ tenant: 'tenant-1', locale: 'EN' });
+
+      await generateMetadata({ params });
+
+      expect(enterRequestContext).toHaveBeenCalledWith(params);
     });
   });
 

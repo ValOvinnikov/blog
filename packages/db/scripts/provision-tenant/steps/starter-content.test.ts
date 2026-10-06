@@ -10,7 +10,6 @@ describe(buildStarterDocuments, () => {
       'settings_navigation',
       'settings_footer',
       'settings_theme',
-      'settings_newsletter',
       'settings_site',
       'page_home',
     ]);
@@ -28,12 +27,12 @@ describe(buildStarterDocuments, () => {
     expect(site).not.toHaveProperty('defaultOgImage');
   });
 
-  it('newsletter starter document carries both trust cue strings', () => {
-    const newsletter = buildStarterDocuments(tenant).find(
-      (doc) => doc._type === 'settings_newsletter',
-    ) as unknown as { trustCues: string[] };
+  it('the site settings document seeds USD as the currency', () => {
+    const site = buildStarterDocuments(tenant).find(
+      (doc) => doc._type === 'settings_site',
+    );
 
-    expect(newsletter.trustCues).toEqual(['No spam', 'Unsubscribe anytime']);
+    expect(site).toHaveProperty('currency', 'USD');
   });
 
   it('settings_navigation seeds with an empty items array', () => {

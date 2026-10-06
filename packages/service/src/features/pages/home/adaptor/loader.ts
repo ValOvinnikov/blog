@@ -1,9 +1,11 @@
 import type { TMaybeUndefined } from '@blog/config';
+import { isr } from '@blog/service/sanity/query/isr';
 import {
-  isr,
   runQuery,
   type TTenantSanityContext,
-} from '@blog/service/sanity/query';
+} from '@blog/service/sanity/query/query';
+import { getPageFaqs } from '@blog/service/shared/adaptors/faq-questions/page-faqs';
+import { buildLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
 
 import { homePageQuery } from './query';
 import { toHomePage } from './transformer';
@@ -14,9 +16,13 @@ export async function getHomePage(
 ): Promise<TMaybeUndefined<THomePage>> {
   const raw = await runQuery(homePageQuery, {
     tenant,
-    ...isr(['homePage', 'modules:faq', 'block_faq'], tenant.projectId),
+    ...isr(['homePage', 'template_home'], tenant.projectId),
   });
   if (!raw) return undefined;
 
-  return toHomePage(raw);
+  return toHomePage(
+    raw,
+    buildLocaleParams(tenant).defaultLocale,
+    await getPageFaqs(raw.modules, tenant),
+  );
 }

@@ -1,8 +1,8 @@
 import type { ArticleText } from '@blog/config';
-import { q } from '@blog/service/sanity/query';
+import { q } from '@blog/service/sanity/query/query';
 import { bodyImageFragment } from '@blog/service/shared/fragments/image/image';
-import { paragraphTextBlockFragment } from '@blog/service/shared/fragments/portable-text/paragraph-text-block';
 import { portableTextMarkDefFragment } from '@blog/service/shared/fragments/portable-text/portable-text-mark-def';
+import { textBlockFragment } from '@blog/service/shared/fragments/portable-text/text-block';
 
 export const portableTextBodyItemFragment = q
   .fragment<ArticleText[number]>()
@@ -24,7 +24,7 @@ export const portableTextBodyItemFragment = q
         '...': true,
         body: asideSub
           .field('body[]')
-          .project(paragraphTextBlockFragment)
+          .project(textBlockFragment)
           .nullable(true),
       }),
     }),

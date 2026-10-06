@@ -7,8 +7,12 @@ export const mediaCardMediaVariants = tv({
   variants: {
     shape: {
       wide: ['w-full'],
+      wideFlat: ['w-full'],
       square: ['w-full aspect-square'],
-      circle: ['size-28 shrink-0 rounded-full mt-card-y'],
+      circle: [
+        'size-20 md:size-24 lg:size-28 shrink-0 rounded-full mt-card-y',
+        '[&>span]:text-2xl md:[&>span]:text-3xl lg:[&>span]:text-4xl',
+      ],
       icon: [
         'flex size-12 shrink-0 items-center justify-center rounded-md mt-card-y',
         'bg-brand-primary-muted text-brand-primary',
@@ -23,16 +27,34 @@ export const mediaCardMediaVariants = tv({
       left: [],
       center: [],
     },
+    iconPanel: {
+      true: [],
+      false: [],
+    },
   },
   compoundVariants: [
     { shape: 'wide', isLead: false, class: 'aspect-video' },
     { shape: 'wide', isLead: true, class: 'aspect-[4/3]' },
+    { shape: 'wideFlat', class: 'aspect-[2/1]' },
     { shape: 'circle', align: 'left', class: 'mx-card-x' },
     { shape: 'circle', align: 'center', class: 'mx-auto' },
     { shape: 'icon', align: 'left', class: 'mx-card-x' },
     { shape: 'icon', align: 'center', class: 'mx-auto' },
+    {
+      iconPanel: true,
+      class: [
+        'flex items-center justify-center',
+        'bg-brand-primary-muted text-brand-primary',
+        'group-hover:bg-surface group-focus-within:bg-surface',
+      ],
+    },
   ],
-  defaultVariants: { shape: 'wide', isLead: false, align: 'left' },
+  defaultVariants: {
+    shape: 'wide',
+    isLead: false,
+    align: 'left',
+    iconPanel: false,
+  },
 });
 
 export type TMediaCardMediaVariants = VariantProps<

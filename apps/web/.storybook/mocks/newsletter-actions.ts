@@ -1,4 +1,4 @@
-import type { TSubscribeResult } from '@web/server/newsletter/newsletter-actions';
+import type { TSubscribeResult } from '@web/server/newsletter/newsletter-actions/newsletter-actions';
 
 /**
  * Storybook-only stand-in for the real `'use server'` action, which pulls

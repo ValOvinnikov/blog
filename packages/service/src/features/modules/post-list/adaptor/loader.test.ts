@@ -1,4 +1,3 @@
-import { TAXONOMY_KIND } from '@blog/config';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawPostListModule } from '@blog/service/testing/modules/fixtures';
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
@@ -7,8 +6,10 @@ import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getPostList } from './loader';
 
-vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
+vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
+  ...(await importOriginal<
+    typeof import('@blog/service/sanity/query/query')
+  >()),
   runQuery: vi.fn(),
 }));
 
@@ -41,7 +42,7 @@ describe('getPostList', () => {
     await expect(getPostList('missing', 1, tenant)).rejects.toThrow();
   });
 
-  it('binds the scope slug as a posts-query parameter when scoped', async () => {
+  it('binds the scope term id as a posts-query parameter when scoped', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawPostListModule({ pageSize: 3 }))
       .mockResolvedValueOnce({
@@ -50,15 +51,14 @@ describe('getPostList', () => {
       });
 
     await getPostList('post-list-1', 1, tenant, {
-      kind: TAXONOMY_KIND.TAGS,
-      slug: 'engineering',
+      termId: 'tag-1',
     });
 
     expect(mockRun).toHaveBeenNthCalledWith(
       2,
       expect.anything(),
       expect.objectContaining({
-        parameters: { archivePageSlug: 'engineering' },
+        parameters: { termId: 'tag-1' },
       }),
     );
   });

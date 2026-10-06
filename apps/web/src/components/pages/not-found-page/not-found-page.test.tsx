@@ -32,8 +32,6 @@ describe(`<${NotFoundPage.name}/>`, () => {
 
   it('renders the decorative arrow icon inside the link', () => {
     const link = screen.getByRole('link', { name: 'Return home' });
-    expect(
-      within(link).getByTestId('not-found-arrow-icon'),
-    ).toBeInTheDocument();
+    expect(within(link).getByTestId('not-found-arrow-icon')).toBeVisible();
   });
 });

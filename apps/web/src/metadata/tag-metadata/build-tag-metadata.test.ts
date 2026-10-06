@@ -1,23 +1,25 @@
+import { LOCALE_ISO_CODES } from '@blog/config';
 import { urlForSanityImage } from '@blog/service';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
 import { makeTagDetailPage } from '@web/testing/shared/tag/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import {
+  DEFAULT_REQUEST_CONTEXT,
+  DEFAULT_TENANT_SANITY_CONTEXT,
+} from '@web/testing/shared/tenant/fixtures';
 
 import { buildTagMetadata } from './build-tag-metadata';
 
-const { getTagPageMock, getTenantSanityContextMock } = vi.hoisted(() => ({
+const { getTagPageMock } = vi.hoisted(() => ({
   getTagPageMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
 }));
 
-vi.mock('@web/server/tag/get-tag-page', () => ({
+vi.mock('@web/server/tag/get-tag-page/get-tag-page', () => ({
   getTagPage: getTagPageMock,
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
+vi.mock('@web/server/request-context/request-context');
 
 const ogImage = makeSanityImage();
 const EXPECTED_OG_IMAGE_URL = urlForSanityImage(
@@ -36,19 +38,17 @@ const seo = makeSeo({
 describe('buildTagMetadata', () => {
   beforeEach(() => {
     getTagPageMock.mockReset();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
-  it('forwards the slug and tenant to getTagPage — the same cached loader TagPage reads', async () => {
+  it('forwards the slug to getTagPage, the loader TagPage reads', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
       data: makeTagDetailPage({ seo }),
     });
 
-    await buildTagMetadata('typescript', 'tenant-1');
+    await buildTagMetadata('typescript');
 
-    expect(getTagPageMock).toHaveBeenCalledWith('typescript', 'tenant-1');
+    expect(getTagPageMock).toHaveBeenCalledWith('typescript');
   });
 
   it('builds page-1 metadata from the resolved seo, self-canonical to /tags/[slug]', async () => {
@@ -57,7 +57,7 @@ describe('buildTagMetadata', () => {
       data: makeTagDetailPage({ seo }),
     });
 
-    const metadata = await buildTagMetadata('typescript', 'tenant-1');
+    const metadata = await buildTagMetadata('typescript');
 
     expect(metadata.title).toBe('TypeScript');
     expect(metadata.description).toBe('Posts about TypeScript.');
@@ -78,18 +78,18 @@ describe('buildTagMetadata', () => {
       error: new Error('boom'),
     });
 
-    const metadata = await buildTagMetadata('typescript', 'tenant-1');
+    const metadata = await buildTagMetadata('typescript');
 
     expect(metadata).toEqual({});
   });
 
-  it('builds page-N metadata with a "– Page N" suffix, self-canonical to /tags/[slug]/page/N — never /tags/[slug]', async () => {
+  it('builds page-N metadata with a "– Page N" suffix, canonical to its own page URL', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
       data: makeTagDetailPage({ seo }),
     });
 
-    const metadata = await buildTagMetadata('typescript', 'tenant-1', 2);
+    const metadata = await buildTagMetadata('typescript', 2);
 
     expect(metadata.title).toBe('TypeScript – Page 2');
     expect(metadata.openGraph?.title).toBe('TypeScript – Page 2');
@@ -100,13 +100,13 @@ describe('buildTagMetadata', () => {
     });
   });
 
-  it('leaves ogTitle omitted on page 2+ when unauthored, rather than suffixing "undefined"', async () => {
+  it('leaves ogTitle omitted on page 2+ when unauthored, never suffixing "undefined"', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
       data: makeTagDetailPage({ seo: makeSeo({ ogTitle: undefined }) }),
     });
 
-    const metadata = await buildTagMetadata('typescript', 'tenant-1', 2);
+    const metadata = await buildTagMetadata('typescript', 2);
 
     expect(metadata.openGraph?.title).toBeUndefined();
     expect(metadata.twitter?.title).toBeUndefined();
@@ -118,7 +118,7 @@ describe('buildTagMetadata', () => {
       error: new Error('boom'),
     });
 
-    const metadata = await buildTagMetadata('missing', 'tenant-1', 2);
+    const metadata = await buildTagMetadata('missing', 2);
 
     expect(metadata).toEqual({});
   });
@@ -127,10 +127,58 @@ describe('buildTagMetadata', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getTagPageMock.mockResolvedValue({ ok: true, data: undefined });
 
-    const metadata = await buildTagMetadata('missing', 'tenant-1');
+    const metadata = await buildTagMetadata('missing');
 
     expect(metadata).toEqual({});
     expect(errorSpy).not.toHaveBeenCalled();
     errorSpy.mockRestore();
+  });
+});
+
+describe('buildTagMetadata per language', () => {
+  const { EN, NL, DE } = LOCALE_ISO_CODES;
+
+  beforeEach(() => {
+    getTagPageMock.mockReset();
+    vi.mocked(getRequestContext).mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      locale: NL,
+      liveLocales: [EN, NL],
+    });
+    getTagPageMock.mockResolvedValue({
+      ok: true,
+      data: makeTagDetailPage({
+        seo,
+        translations: [
+          { language: EN, slug: 'design' },
+          { language: NL, slug: 'ontwerp' },
+          { language: DE, slug: 'gestaltung' },
+        ],
+      }),
+    });
+  });
+
+  afterEach(() => {
+    vi.mocked(getRequestContext).mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
+  });
+
+  it('lists each live language under its own slug as hreflang, canonical to its own prefixed address', async () => {
+    const metadata = await buildTagMetadata('ontwerp');
+
+    expect(metadata.alternates).toMatchObject({
+      canonical: '/nl/tags/ontwerp',
+      languages: {
+        en: '/tags/design',
+        nl: '/nl/tags/ontwerp',
+        'x-default': '/tags/design',
+      },
+    });
+  });
+
+  it('lists no hreflang past page 1', async () => {
+    const metadata = await buildTagMetadata('ontwerp', 2);
+
+    expect(metadata.alternates?.canonical).toBe('/nl/tags/ontwerp/page/2');
+    expect(metadata.alternates?.languages).toBeUndefined();
   });
 });

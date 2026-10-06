@@ -327,6 +327,10 @@ file` are all denied alike) — an earlier version only handled the
   - `pre-bash-worktree-install-guard.sh` — `PreToolUse` hook that blocks
     dependency-mutating pnpm commands inside a shared-deps agent worktree
     (see below) before pnpm can write anything.
+  - `pre-bash-branch-name-guard.sh` — `PreToolUse` hook that refuses
+    `git push` of a session's generated `claude/<words>-<id>` branch and
+    prints the rename command. `claude/issue-<n>-…` passes. Without an
+    issue number in the name, `board-auto-sync.yml` cannot move the ticket.
   - `gate-bypass-guard.sh` — `PreToolUse` hook, wired **globally** in
     `.claude/settings.json` (every agent's `Bash` calls, not one agent's —
     bypass commands could come from any context, including the
@@ -689,7 +693,7 @@ file` are all denied alike) — an earlier version only handled the
   - `ui-library-practices` — building pure, prop-driven design-system components.
   - `web-component-practices` — building interactive `apps/web` components (compose `@blog/ui` via slots, client behaviour in ref-based hooks, merge Portable Text component maps rather than spreading them).
   - `ui-storybook` / `web-storybook` — Storybook conventions per workspace.
-  - `testing-practices` — Vitest + Testing Library conventions.
+  - `testing-practices` — Vitest + Testing Library conventions: fake only the edges (shared fakes in `__mocks__/`), never our own components, and behaviour titles of 80 characters or fewer.
   - `seo-and-metadata` — per-route metadata, JSON-LD, sitemap/robots/RSS.
   - `code-review-practices` — boundary/type/SEO/test checklist before a PR.
   - `refactor-sweep` — on-demand, layer-scoped cleanup audit (duplication,
@@ -714,6 +718,7 @@ file` are all denied alike) — an earlier version only handled the
     `superpowers:verification-before-completion`, `superpowers:writing-skills`,
     `superpowers:brainstorming` and `superpowers:using-git-worktrees` (invoked
     by `develop-feature`), `vercel:nextjs`, `vercel:next-cache-components`,
+    `vercel:react-best-practices` (scoped by `react-component-practices`),
     `vercel:deployments-cicd`, `frontend-design:frontend-design`.
 - **Settings** (`.claude/settings.json`) — permission allowlist for the standard
   pnpm/turbo/sanity/git/gh commands and hook wiring; deploys and hand-edits to
@@ -746,13 +751,14 @@ file` are all denied alike) — an earlier version only handled the
   (see [`docs/context/ci-automation.md`](./ci-automation.md)) — without it every `mcp__github__*` tool is
   silently absent from the run. That server also exposes write tools this
   repo's gates reserve for a human or for local git, so the deny list blocks
-  eight of them: `create_pull_request`, `merge_pull_request` and
-  `pull_request_review_write` (opening, merging and approving are the human's
-  calls); `create_or_update_file`, `push_files` and `delete_file` (committing
-  through the API skips commitlint, lint-staged and the push gate); and
-  `create_repository` / `delete_repository`. `create_pull_request` matters
-  most: a local session's `gh pr create` prompts for approval, so without the
-  denial the MCP call is an unprompted way around the same gate. The
+  seven of them: `merge_pull_request` and `pull_request_review_write`
+  (merging and approving are the human's calls); `create_or_update_file`,
+  `push_files` and `delete_file` (committing through the API skips
+  commitlint, lint-staged and the push gate); and `create_repository` /
+  `delete_repository`. `create_pull_request` sits in the `ask` list instead:
+  a cloud session has no `gh`, so it is the only way one can open its own PR,
+  and `ask` keeps it prompting for approval the way `gh pr create` does
+  locally. The
   issue tools `board-keeper` depends on — `issue_read`, `issue_write`,
   `sub_issue_write` — stay permitted, as does `pull_request_read`, which
   `ci-watcher` uses.

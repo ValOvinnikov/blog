@@ -1,41 +1,28 @@
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockPostDetail } from '@web/testing/pages/blog-post-page/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
 
 import { BlogPostingSchema } from './blog-posting-schema';
 
-const { getPostPageMock, getTenantBaseUrlMock, getTenantSanityContextMock } =
-  vi.hoisted(() => ({
-    getPostPageMock: vi.fn(),
-    getTenantBaseUrlMock: vi.fn(),
-    getTenantSanityContextMock: vi.fn(),
-  }));
+const { getPostPageMock } = vi.hoisted(() => ({
+  getPostPageMock: vi.fn(),
+}));
 
-vi.mock('@web/server/post/get-post-page', () => ({
+vi.mock('@web/server/post/get-post-page/get-post-page', () => ({
   getPostPage: getPostPageMock,
 }));
 
-vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
-  getTenantBaseUrl: getTenantBaseUrlMock,
-}));
-
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
+vi.mock('@web/server/request-context/request-context');
 
 const setup = customRenderAsync(BlogPostingSchema, {
   slug: 'hello-world',
-  tenant: 'tenant-1',
 });
 
 describe(`<${BlogPostingSchema.name}/>`, () => {
   beforeEach(() => {
     getPostPageMock.mockReset();
-    getTenantBaseUrlMock.mockReset();
-    getTenantBaseUrlMock.mockResolvedValue('https://example.com');
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
   });
 
   it('calls notFound() without logging when no page_post matches the slug', async () => {
@@ -69,20 +56,23 @@ describe(`<${BlogPostingSchema.name}/>`, () => {
     expect(script.textContent).toContain('"@type":"BlogPosting"');
   });
 
-  it('renders nothing when the tenant base URL fails to resolve', async () => {
+  it('renders nothing when the request has no base URL', async () => {
     getPostPageMock.mockResolvedValue({ ok: true, data: mockPostDetail });
-    getTenantBaseUrlMock.mockResolvedValue(undefined);
+    vi.mocked(getRequestContext).mockResolvedValueOnce({
+      ...DEFAULT_REQUEST_CONTEXT,
+      metadataBase: undefined,
+    });
 
     const { container } = await setup();
 
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('forwards the slug and tenant to getPostPage', async () => {
+  it('forwards the slug to getPostPage', async () => {
     getPostPageMock.mockResolvedValue({ ok: true, data: mockPostDetail });
 
     await setup();
 
-    expect(getPostPageMock).toHaveBeenCalledWith('hello-world', 'tenant-1');
+    expect(getPostPageMock).toHaveBeenCalledWith('hello-world');
   });
 });

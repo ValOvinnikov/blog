@@ -3,8 +3,9 @@
  * for one tenant: removes its domain from the shared web project, archives
  * (never deletes) its Sanity project, revokes the provisioned Sanity robot
  * tokens still live in that project, clears the provisioning-artifact
- * columns, archives (never hard-deletes) the `tenants` row, then
- * invalidates its cached pages so the archived site stops serving.
+ * columns, archives (never hard-deletes) the `tenants` row, purges its
+ * readers' personal data (`subscribers`, `bookmarks`, `membership_invites`),
+ * then invalidates its cached pages so the archived site stops serving.
  *
  * Invoked only by `.github/workflows/deprovision-tenant.yml` via
  * `pnpm --filter @blog/db db:deprovision-tenant -- --tenant-id=<uuid>
@@ -42,6 +43,7 @@ import { archiveTenantSanityProject } from './steps/archive-sanity-project';
 import { archiveTenantRow } from './steps/archive-tenant';
 import { clearTenantArtifacts } from './steps/clear-artifacts';
 import { invalidateTenantCache } from './steps/invalidate-tenant-cache';
+import { purgeTenantReaderData } from './steps/purge-reader-data';
 import { removeTenantDomain } from './steps/remove-domain';
 import { revokeTenantSanityTokens } from './steps/revoke-sanity-tokens';
 
@@ -112,6 +114,11 @@ const STEPS: TStep[] = [
     key: DEPROVISIONING_STEP.ARCHIVE_TENANT,
     name: 'archive-tenant',
     run: archiveTenantRow,
+  },
+  {
+    key: DEPROVISIONING_STEP.PURGE_READER_DATA,
+    name: 'purge-reader-data',
+    run: purgeTenantReaderData,
   },
   {
     key: DEPROVISIONING_STEP.INVALIDATE_TENANT_CACHE,

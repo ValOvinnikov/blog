@@ -1,8 +1,9 @@
 import { TAXONOMY_KIND } from '@blog/config';
+import { FaqPageSchema } from '@web/components/features/faq-page-schema';
 import { TopicBreadcrumbs } from '@web/components/features/topic/topic-breadcrumbs';
 import { TopicChips } from '@web/components/features/topic/topic-chips';
 import { PageShell } from '@web/components/page-templates/page-shell';
-import { getTopicPage } from '@web/server/topic/get-topic-page';
+import { getTopicPage } from '@web/server/topic/get-topic-page/get-topic-page';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 
 import { TopicModuleRenderer } from './topic-module-renderer';
@@ -10,41 +11,38 @@ import { TopicModuleRenderer } from './topic-module-renderer';
 type TTopicPageProps = {
   slug: string;
   page?: number;
-  locale: string;
-  tenant: string;
 };
 
-export const TopicPage = async ({
-  slug,
-  page,
-  locale,
-  tenant,
-}: TTopicPageProps) => {
-  const result = await getTopicPage(slug, tenant);
+export const TopicPage = async ({ slug, page }: TTopicPageProps) => {
+  const result = await getTopicPage(slug);
   const pageData = guardPageLoaderResult(result, 'topic_page.fetch_failed', {
     slug,
   });
-  const { topic, headingBlock, hero, modules } = pageData;
+  const { topic, headingBlock, hero, modules, faqs } = pageData;
 
   const currentPage = page ?? 1;
 
   return (
     <PageShell>
       <PageShell.Breadcrumbs>
-        <TopicBreadcrumbs slug={slug} tenant={tenant} />
+        <TopicBreadcrumbs slug={slug} />
       </PageShell.Breadcrumbs>
+      <FaqPageSchema faqs={faqs} />
       <TopicModuleRenderer
         hero={hero}
         headingBlock={headingBlock}
         modules={modules}
-        locale={locale}
-        tenant={tenant}
         context={{
           page: currentPage,
-          archive: { kind: TAXONOMY_KIND.TOPICS, slug, name: topic.title },
+          archive: {
+            id: topic.id,
+            kind: TAXONOMY_KIND.TOPICS,
+            slug,
+            name: topic.title,
+          },
         }}
       >
-        <TopicChips activeSlug={slug} tenant={tenant} />
+        <TopicChips activeSlug={slug} />
       </TopicModuleRenderer>
     </PageShell>
   );

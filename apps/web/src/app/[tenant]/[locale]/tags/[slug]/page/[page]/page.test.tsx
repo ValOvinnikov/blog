@@ -1,20 +1,20 @@
-import { CONTENT_ROUTE_REVALIDATE_SECONDS } from '@blog/config';
+import {
+  CONTENT_ROUTE_REVALIDATE_SECONDS,
+  LOCALE_ISO_CODES,
+} from '@blog/config';
+import { permanentRedirect } from '@web/i18n/navigation';
+import { enterRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync } from '@web/testing/custom-render';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
 
 import TagNumberedPage, { generateMetadata, revalidate } from './page';
 
-const { permanentRedirectMock } = vi.hoisted(() => ({
-  permanentRedirectMock: vi.fn(() => {
-    throw new Error('NEXT_REDIRECT');
-  }),
+const { getTagPageMock } = vi.hoisted(() => ({
+  getTagPageMock: vi.fn(),
 }));
 
-const { getTagPageMock, getTenantSanityContextMock } = vi.hoisted(() => ({
-  getTagPageMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
-}));
+vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -28,18 +28,14 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
+vi.mock('@web/i18n/navigation');
 
-vi.mock('@web/i18n/navigation', () => ({
-  permanentRedirect: permanentRedirectMock,
-}));
+const permanentRedirectMock = vi.mocked(permanentRedirect);
 
 const setup = customRenderAsync(TagNumberedPage, {
   params: Promise.resolve({
     tenant: 'tenant-1',
-    locale: 'EN',
+    locale: LOCALE_ISO_CODES.EN,
     slug: 'typescript',
     page: '1',
   }),
@@ -50,17 +46,14 @@ describe('TagNumberedPage', () => {
     expect(revalidate).toBe(CONTENT_ROUTE_REVALIDATE_SECONDS);
   });
 
-  beforeEach(() => {
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
-  });
+  beforeEach(() => {});
 
   describe('generateMetadata', () => {
     it('returns empty metadata for page 1', async () => {
       const metadata = await generateMetadata({
         params: Promise.resolve({
           tenant: 'tenant-1',
-          locale: 'EN',
+          locale: LOCALE_ISO_CODES.EN,
           slug: 'typescript',
           page: '1',
         }),
@@ -74,7 +67,7 @@ describe('TagNumberedPage', () => {
       const metadata = await generateMetadata({
         params: Promise.resolve({
           tenant: 'tenant-1',
-          locale: 'EN',
+          locale: LOCALE_ISO_CODES.EN,
           slug: 'typescript',
           page: 'abc',
         }),
@@ -107,7 +100,7 @@ describe('TagNumberedPage', () => {
       const metadata = await generateMetadata({
         params: Promise.resolve({
           tenant: 'tenant-1',
-          locale: 'EN',
+          locale: LOCALE_ISO_CODES.EN,
           slug: 'typescript',
           page: '2',
         }),
@@ -124,9 +117,11 @@ describe('TagNumberedPage', () => {
   it('redirects /tags/[slug]/page/1 to /tags/[slug] (canonical page 1 has one URL)', async () => {
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
 
+    expect(enterRequestContext).toHaveBeenCalled();
+
     expect(permanentRedirectMock).toHaveBeenCalledWith({
       href: '/tags/typescript',
-      locale: 'EN',
+      locale: LOCALE_ISO_CODES.EN,
     });
   });
 
@@ -137,7 +132,7 @@ describe('TagNumberedPage', () => {
         setup({
           params: Promise.resolve({
             tenant: 'tenant-1',
-            locale: 'EN',
+            locale: LOCALE_ISO_CODES.EN,
             slug: 'typescript',
             page: raw,
           }),

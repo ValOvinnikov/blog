@@ -1,85 +1,110 @@
 import type { ISanityImage } from '@blog/config';
-import { type TPortableTextBody, urlForSanityImage } from '@blog/service';
+import {
+  service,
+  type TPortableTextBody,
+  urlForSanityImage,
+} from '@blog/service';
 import userEvent from '@testing-library/user-event';
-import { customRenderAsync, screen, within } from '@web/testing/custom-render';
+import { ToastProvider } from '@web/context/toast-provider';
+import { getBookmarkStatus } from '@web/server/bookmarks/bookmark-actions/bookmark-actions';
+import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
+import {
+  customRenderServerAsync,
+  screen,
+  waitFor,
+  within,
+} from '@web/testing/custom-render';
 import {
   mockPostDetail,
   POST_DETAIL_AUTHOR_IMAGE,
 } from '@web/testing/pages/blog-post-page/fixtures';
 import { portableTextBlock } from '@web/testing/shared/portable-text/fixtures';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 import { PostArticle } from './post-article';
 
-const { getPostPageMock, getTenantBaseUrlMock, getTenantSanityContextMock } =
-  vi.hoisted(() => ({
-    getPostPageMock: vi.fn(),
-    getTenantBaseUrlMock: vi.fn(),
-    getTenantSanityContextMock: vi.fn(),
-  }));
+vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@web/server/post/get-post-page', () => ({
-  getPostPage: getPostPageMock,
-}));
+vi.mock('@web/i18n/navigation');
 
-vi.mock('@web/server/tenant/get-tenant-base-url', () => ({
-  getTenantBaseUrl: getTenantBaseUrlMock,
-}));
-
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
-
-vi.mock('@web/components/features/post/bookmark-button-gate', () => ({
-  BookmarkButtonGate: ({ postId }: { postId: string }) => (
-    <div data-testid="bookmark-button-gate">{postId}</div>
-  ),
-}));
-
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
-
-const setup = customRenderAsync(PostArticle, {
-  slug: 'hello-world',
-  tenant: 'tenant-1',
+vi.mock('@blog/service', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@blog/service')>();
+  return {
+    ...actual,
+    service: { pages: { post: { v1: { getPost: vi.fn() } } } },
+  };
 });
+
+vi.mock('@web/utils/logger/logger');
+
+vi.mock(
+  '@web/server/settings-features/is-capability-enabled/is-capability-enabled',
+  () => ({
+    isCapabilityEnabled: vi.fn(),
+  }),
+);
+
+vi.mock('@web/server/bookmarks/bookmark-actions/bookmark-actions', () => ({
+  getBookmarkStatus: vi.fn(),
+  setBookmarkStatus: vi.fn(),
+}));
+
+vi.mock('next-auth/react', () => ({ useSession: vi.fn() }));
+
+const getPostMock = vi.mocked(service.pages.post.v1.getPost);
+
+const setup = customRenderServerAsync(
+  PostArticle,
+  { slug: 'hello-world' },
+  { wrapper: ToastProvider },
+);
 
 describe(`<${PostArticle.name}/>`, () => {
   beforeEach(() => {
-    getPostPageMock.mockReset();
-    getTenantBaseUrlMock.mockReset();
-    getTenantBaseUrlMock.mockResolvedValue('https://example.com');
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
+    getPostMock.mockResolvedValue({ ok: true, data: mockPostDetail });
+    vi.mocked(isCapabilityEnabled).mockResolvedValue(false);
+    vi.mocked(useSession).mockReturnValue({
+      data: { user: { id: 'user-1' }, expires: '' },
+      status: 'authenticated',
+      update: vi.fn(),
+    });
+    vi.mocked(getBookmarkStatus).mockResolvedValue(false);
   });
 
   it('calls notFound() without logging when no page_post matches the slug', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getPostPageMock.mockResolvedValue({ ok: true, data: undefined });
+    getPostMock.mockResolvedValueOnce({ ok: true, data: undefined });
 
     await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    expect(errorSpy).not.toHaveBeenCalled();
-    errorSpy.mockRestore();
+    expect(logger.error).not.toHaveBeenCalled();
   });
 
-  it('calls notFound() when the fetch fails', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getPostPageMock.mockResolvedValue({ ok: false, error: new Error('boom') });
+  it('logs and calls notFound() when the fetch fails', async () => {
+    getPostMock.mockResolvedValueOnce({ ok: false, error: new Error('boom') });
 
     await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    errorSpy.mockRestore();
+    expect(logger.error).toHaveBeenCalledWith(
+      'post_article.fetch_failed',
+      expect.objectContaining({ slug: 'hello-world' }),
+    );
+  });
+
+  it('fetches the post for the given slug with the tenant context', async () => {
+    await setup();
+
+    expect(getPostMock).toHaveBeenCalledWith(
+      'hello-world',
+      DEFAULT_TENANT_SANITY_CONTEXT,
+    );
   });
 
   it('renders the post title, lead, author, and body', async () => {
-    getPostPageMock.mockResolvedValue({ ok: true, data: mockPostDetail });
-
     await setup();
 
     expect(
@@ -92,8 +117,9 @@ describe(`<${PostArticle.name}/>`, () => {
     expect(screen.getByText('Jane Doe')).toBeVisible();
   });
 
-  it('renders the bookmark button and share links in the header meta strip even for a post with no tags or hero image', async () => {
-    getPostPageMock.mockResolvedValue({
+  it('renders the bookmark toggle and share button in the header meta strip', async () => {
+    vi.mocked(isCapabilityEnabled).mockResolvedValueOnce(true);
+    getPostMock.mockResolvedValueOnce({
       ok: true,
       data: { ...mockPostDetail, tags: [], heroImage: undefined },
     });
@@ -101,14 +127,34 @@ describe(`<${PostArticle.name}/>`, () => {
     await setup();
 
     const header = screen.getByTestId('post-article-header');
-
-    expect(within(header).getByTestId('bookmark-button-gate')).toBeVisible();
+    await waitFor(() =>
+      expect(
+        within(header).getByRole('button', { name: 'Save post' }),
+      ).toBeEnabled(),
+    );
     expect(within(header).getByRole('button', { name: /Share/ })).toBeVisible();
   });
 
-  it('renders the published date formatted via next-intl (year/month/day) and the reading time', async () => {
-    getPostPageMock.mockResolvedValue({ ok: true, data: mockPostDetail });
+  it('checks the bookmark status of this post', async () => {
+    vi.mocked(isCapabilityEnabled).mockResolvedValueOnce(true);
 
+    await setup();
+
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Save post' })).toBeEnabled(),
+    );
+    expect(getBookmarkStatus).toHaveBeenCalledWith(mockPostDetail.id);
+  });
+
+  it('renders no bookmark toggle when bookmarks are not enabled', async () => {
+    await setup();
+
+    expect(
+      screen.queryByRole('button', { name: 'Save post' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders the published date (year/month/day) and the reading time', async () => {
     await setup();
 
     expect(screen.getByText('January 15, 2026')).toBeVisible();
@@ -116,8 +162,6 @@ describe(`<${PostArticle.name}/>`, () => {
   });
 
   it('links the topic eyebrow and the author name to their routes', async () => {
-    getPostPageMock.mockResolvedValue({ ok: true, data: mockPostDetail });
-
     await setup();
 
     const topicLinks = screen.getAllByRole('link', { name: 'Engineering' });
@@ -131,14 +175,31 @@ describe(`<${PostArticle.name}/>`, () => {
     );
   });
 
-  it('renders the author link with whatever href service resolved, even for a non-landing-page target', async () => {
-    getPostPageMock.mockResolvedValue({
+  it('renders the topic eyebrow as plain text when the topic has no topic page', async () => {
+    getPostMock.mockResolvedValueOnce({
+      ok: true,
+      data: {
+        ...mockPostDetail,
+        topic: { ...mockPostDetail.topic, slug: undefined },
+      },
+    });
+
+    await setup();
+
+    expect(screen.getByText('Engineering')).toBeVisible();
+    expect(
+      screen.queryByRole('link', { name: 'Engineering' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('links the author to whatever href the service resolved', async () => {
+    getPostMock.mockResolvedValueOnce({
       ok: true,
       data: {
         ...mockPostDetail,
         author: {
           ...mockPostDetail.author,
-          profilePageHref: '/blog/tag/writers',
+          profileUrl: '/blog/tag/writers',
         },
       },
     });
@@ -151,19 +212,7 @@ describe(`<${PostArticle.name}/>`, () => {
     );
   });
 
-  it('renders BookmarkButtonGate beside the share widget, forwarding the post id', async () => {
-    getPostPageMock.mockResolvedValue({ ok: true, data: mockPostDetail });
-
-    await setup();
-
-    expect(screen.getByTestId('bookmark-button-gate')).toHaveTextContent(
-      mockPostDetail.id,
-    );
-  });
-
   it('renders the share widget with an X and a LinkedIn link', async () => {
-    getPostPageMock.mockResolvedValue({ ok: true, data: mockPostDetail });
-
     await setup();
     await userEvent.click(screen.getByRole('button', { name: /Share/ }));
 
@@ -182,7 +231,7 @@ describe(`<${PostArticle.name}/>`, () => {
       lqip: undefined,
       dimensions: { width: 1600, height: 1200, aspectRatio: 1600 / 1200 },
     };
-    getPostPageMock.mockResolvedValue({
+    getPostMock.mockResolvedValueOnce({
       ok: true,
       data: { ...mockPostDetail, heroImage },
     });
@@ -192,9 +241,7 @@ describe(`<${PostArticle.name}/>`, () => {
     expect(screen.getByRole('img', { name: heroImage.alt })).toBeVisible();
   });
 
-  it('builds the author avatar at a fixed 64x64 crop (2x the 32px SIZE.SM avatar), never the source asset at full resolution', async () => {
-    getPostPageMock.mockResolvedValue({ ok: true, data: mockPostDetail });
-
+  it('builds the author avatar at a fixed 64x64 crop, not the full-size asset', async () => {
     await setup();
 
     const expectedAvatarUrl = urlForSanityImage(
@@ -209,9 +256,7 @@ describe(`<${PostArticle.name}/>`, () => {
     );
   });
 
-  it('renders no PostContentsRail (and stays single-column) when the body has fewer than 3 H2 headings', async () => {
-    getPostPageMock.mockResolvedValue({ ok: true, data: mockPostDetail });
-
+  it('renders no contents rail when the body has fewer than 3 H2 headings', async () => {
     await setup();
 
     expect(
@@ -219,14 +264,14 @@ describe(`<${PostArticle.name}/>`, () => {
     ).not.toBeInTheDocument();
   });
 
-  it('renders PostContentsRail once the body has 3+ H2 headings', async () => {
+  it('renders the contents rail once the body has 3+ H2 headings', async () => {
     const body: TPortableTextBody = [
       portableTextBlock('Getting started', { style: 'h2' }),
       portableTextBlock('Intro.'),
       portableTextBlock('Configuration', { style: 'h2', key: 'configuration' }),
       portableTextBlock('Deployment', { style: 'h2' }),
     ];
-    getPostPageMock.mockResolvedValue({
+    getPostMock.mockResolvedValueOnce({
       ok: true,
       data: { ...mockPostDetail, body },
     });
@@ -240,7 +285,7 @@ describe(`<${PostArticle.name}/>`, () => {
   });
 
   it('renders the post tags as links to routes.tag(slug)', async () => {
-    getPostPageMock.mockResolvedValue({
+    getPostMock.mockResolvedValueOnce({
       ok: true,
       data: {
         ...mockPostDetail,
@@ -263,12 +308,25 @@ describe(`<${PostArticle.name}/>`, () => {
     );
   });
 
-  it('renders no tag chips when the post has no tags', async () => {
-    getPostPageMock.mockResolvedValue({
+  it('omits a tag with no tag page from the footer', async () => {
+    getPostMock.mockResolvedValueOnce({
       ok: true,
-      data: { ...mockPostDetail, tags: [] },
+      data: {
+        ...mockPostDetail,
+        tags: [
+          { id: 'tag-1', title: 'TypeScript', slug: 'typescript' },
+          { id: 'tag-2', title: 'React', slug: undefined },
+        ],
+      },
     });
 
+    await setup();
+
+    expect(screen.getByRole('link', { name: 'TypeScript' })).toBeVisible();
+    expect(screen.queryByText('React')).not.toBeInTheDocument();
+  });
+
+  it('renders no tag chips when the post has no tags', async () => {
     await setup();
 
     expect(

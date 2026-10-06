@@ -48,6 +48,12 @@ const contentSecurityPolicy = [
 
 export default createNextConfig({
   contentSecurityPolicy,
+  experimental: {
+    // `app/global-not-found.tsx` serves unmatched URLs: there is no single
+    // root layout to compose a 404 from, since `<html lang>` is owned by
+    // `[tenant]/[locale]/layout.tsx`.
+    globalNotFound: true,
+  },
   transpilePackages: [
     '@blog/ui',
     '@blog/service',

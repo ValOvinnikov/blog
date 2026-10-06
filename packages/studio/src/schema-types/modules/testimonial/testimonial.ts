@@ -5,8 +5,8 @@ import { brandVariantField } from '@blog/studio/schema-types/fields/brand-varian
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { displayModeField } from '@blog/studio/schema-types/fields/display-mode-field/display-mode-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
-import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
+import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
+import { wideLayoutField } from '@blog/studio/schema-types/objects/wide-layout/wide-layout-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { MessageSquareQuote } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
@@ -21,7 +21,7 @@ export const testimonialSchema = defineType({
   fields: [
     titleField(),
     brandVariantField(),
-    headingBlockField(),
+    moduleHeadingBlockField(),
     defineField({
       name: 'testimonials',
       title: 'Testimonials',
@@ -61,7 +61,7 @@ export const testimonialSchema = defineType({
           'Horizontal alignment of the heading, supporting text and actions. Cards have their own alignment.',
       },
     ),
-    layoutField,
+    wideLayoutField,
   ],
   preview: {
     select: {

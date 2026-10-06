@@ -1,27 +1,33 @@
+import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { redirect } from 'next/navigation';
+import type { Session } from 'next-auth';
 
 import LookPage from './page';
 
-const { authMock, getAdminByUserIdMock, getTenantByIdMock, getSiteConfigMock } =
+const { getAdminByUserIdMock, getTenantByIdMock, getSiteConfigMock } =
   vi.hoisted(() => ({
-    authMock: vi.fn(),
     getAdminByUserIdMock: vi.fn(),
     getTenantByIdMock: vi.fn(),
     getSiteConfigMock: vi.fn(),
   }));
 
-vi.mock('@platform/server/auth/auth', () => ({ auth: authMock }));
+vi.mock('@platform/server/auth/auth');
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     admins: { getAdminByUserId: getAdminByUserIdMock },
-    tenants: { getTenantById: getTenantByIdMock },
+    tenants: {
+      getTenantById: getTenantByIdMock,
+      getTenantLiveLocales: vi.fn().mockResolvedValue(['EN']),
+    },
     siteConfig: { getSiteConfig: getSiteConfigMock },
   },
 }));
+
+const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 const setup = customRenderAsync(LookPage, {
   params: Promise.resolve({ tenantId: 'tenant-1' }),
@@ -54,7 +60,7 @@ describe(`<${LookPage.name}/>`, () => {
     expect(getSiteConfigMock).not.toHaveBeenCalled();
   });
 
-  it('renders Console defaults for a platform operator with no saved site_config row yet', async () => {
+  it('renders Console defaults for an operator with no saved site_config row', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });
     getTenantByIdMock.mockResolvedValue({ id: 'tenant-1' });

@@ -1,4 +1,4 @@
-import { q } from '@blog/service/sanity/query';
+import { q } from '@blog/service/sanity/query/query';
 import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document';
 
 export const navigationQuery = q.star
@@ -15,5 +15,6 @@ export const navigationQuery = q.star
           .notNull(),
       }))
       .nullable(true),
+    showLanguageSwitcher: sub.field('showLanguageSwitcher').nullable(true),
   }))
   .notNull();

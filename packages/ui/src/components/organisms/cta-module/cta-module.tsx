@@ -4,10 +4,12 @@ import {
   type IWithClassName,
   type IWithDataTestId,
   MEDIA_ORDER,
+  SPACING_SCALE,
   type TBrandVariant,
   type TContentAlignment,
   type TCtaVariant,
   type TMediaOrder,
+  type TSpacingScale,
 } from '@blog/config';
 import { Eyebrow } from '@blog/ui/components/atoms/eyebrow';
 import { Heading } from '@blog/ui/components/atoms/heading';
@@ -35,6 +37,8 @@ export type TCtaModuleProps = IWithClassName &
     contentAlignment?: TContentAlignment;
     mobileMediaOrder?: TMediaOrder;
     isWrapped?: TCtaModuleVariants['wrapped'];
+    spacingTop?: TSpacingScale;
+    spacingBottom?: TSpacingScale;
   };
 
 /** Page-builder organism rendering a call-to-action in one of three layouts. */
@@ -53,6 +57,8 @@ export const CtaModule = ({
   contentAlignment,
   mobileMediaOrder,
   isWrapped,
+  spacingTop,
+  spacingBottom,
   className,
   dataTestId,
 }: TCtaModuleProps) => {
@@ -76,22 +82,26 @@ export const CtaModule = ({
       ? (mobileMediaOrder ?? MEDIA_ORDER.LAST)
       : undefined,
     wrapped: isWrapped,
+    spacingTop: isBanner ? (spacingTop ?? SPACING_SCALE.MD) : undefined,
+    spacingBottom: isBanner ? (spacingBottom ?? SPACING_SCALE.MD) : undefined,
   });
 
   return (
     <div className={s.root({ class: className })} data-testid={dataTestId}>
       <div className={s.body()}>
         {eyebrow && <Eyebrow className={s.eyebrow()}>{eyebrow}</Eyebrow>}
-        <Heading
-          id={headingId}
-          level={2}
-          visual="section"
-          className={s.heading()}
-        >
-          {heading}
-        </Heading>
-        {supportingText && <p className={s.text()}>{supportingText}</p>}
-        {content && <Prose className={s.text()}>{content}</Prose>}
+        <div className={s.group()}>
+          <Heading
+            id={headingId}
+            level={2}
+            visual="section"
+            className={s.heading()}
+          >
+            {heading}
+          </Heading>
+          {supportingText && <p className={s.text()}>{supportingText}</p>}
+          {content && <Prose className={s.text()}>{content}</Prose>}
+        </div>
         {actions && <div className={s.actions()}>{actions}</div>}
         {footnote && <p className={s.footnote()}>{footnote}</p>}
       </div>

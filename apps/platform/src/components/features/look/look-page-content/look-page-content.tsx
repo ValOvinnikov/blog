@@ -16,7 +16,10 @@ export type TLookPageContentProps = {
  * routing (URL param vs. session membership) and hand it here.
  */
 export const LookPageContent = async ({ tenant }: TLookPageContentProps) => {
-  const siteConfig = await queries.siteConfig.getSiteConfig(tenant.id);
+  const [siteConfig, liveLocales] = await Promise.all([
+    queries.siteConfig.getSiteConfig(tenant.id),
+    queries.tenants.getTenantLiveLocales(tenant.id),
+  ]);
 
   const initialValues = siteConfig
     ? toLookFormValues(siteConfig)
@@ -28,6 +31,7 @@ export const LookPageContent = async ({ tenant }: TLookPageContentProps) => {
       tenantName={tenant.name}
       primaryDomain={tenant.primaryDomain}
       initialValues={initialValues}
+      hasMultipleLanguages={(liveLocales?.length ?? 0) > 1}
       archivedAt={tenant.deprovisionedAt ?? undefined}
     />
   );

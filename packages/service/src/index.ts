@@ -7,9 +7,9 @@ import { createTagsService } from './features/entities/tags';
 import { createTopicsService } from './features/entities/topics';
 import { createFooterService } from './features/global/footer';
 import { createNavigationService } from './features/global/navigation';
-import { createNewsletterSettingsService } from './features/global/newsletter-settings';
 import { createSiteSettingsService } from './features/global/site-settings';
 import { createThemeSettingsService } from './features/global/theme-settings';
+import { createTranslationMapService } from './features/global/translation-map';
 import { createContentModuleService } from './features/modules/content';
 import { createCtaModuleService } from './features/modules/cta';
 import { createFaqModuleService } from './features/modules/faq';
@@ -25,8 +25,10 @@ import { createPostFeaturedModuleService } from './features/modules/post-feature
 import { createPostLatestModuleService } from './features/modules/post-latest';
 import { createPostListModuleService } from './features/modules/post-list';
 import { createPostRelatedModuleService } from './features/modules/post-related';
+import { createPricingModuleService } from './features/modules/pricing';
 import { createStatsModuleService } from './features/modules/stats';
 import { createTaxonomyListModuleService } from './features/modules/taxonomy-list';
+import { createTeamModuleService } from './features/modules/team';
 import { createTestimonialModuleService } from './features/modules/testimonial';
 import { createTimelineModuleService } from './features/modules/timeline';
 import { createHomeService } from './features/pages/home';
@@ -70,7 +72,9 @@ export const service = {
     logoWall: createLogoWallModuleService(),
     testimonial: createTestimonialModuleService(),
     stats: createStatsModuleService(),
+    pricing: createPricingModuleService(),
     faq: createFaqModuleService(),
+    team: createTeamModuleService(),
     timeline: createTimelineModuleService(),
   },
   entities: {
@@ -83,8 +87,8 @@ export const service = {
     siteSettings: createSiteSettingsService(),
     navigation: createNavigationService(),
     footer: createFooterService(),
-    newsletterSettings: createNewsletterSettingsService(),
     themeSettings: createThemeSettingsService(),
+    translationMap: createTranslationMapService(),
   },
 };
 
@@ -97,9 +101,13 @@ export type {
 } from './features/entities/topics';
 export type { TFooter } from './features/global/footer';
 export type { TNavigation } from './features/global/navigation';
-export type { TNewsletterSettings } from './features/global/newsletter-settings';
 export type { TBrand, TSiteSettings } from './features/global/site-settings';
 export type { TThemeTokens } from './features/global/theme-settings';
+export type {
+  TTranslationEntry,
+  TTranslationGroup,
+  TTranslationMap,
+} from './features/global/translation-map';
 export type { TContentModule } from './features/modules/content';
 export type { TCtaModule } from './features/modules/cta';
 export type { TFaqModule, TFaqQuestion } from './features/modules/faq';
@@ -126,9 +134,15 @@ export type { TPostListModule } from './features/modules/post-list';
 export type { TPostRelatedModule } from './features/modules/post-related';
 export type { TStatItem, TStatsModule } from './features/modules/stats';
 export type {
+  TPricingModule,
+  TPricingPrice,
+  TPricingTier,
+} from './features/modules/pricing';
+export type {
   TTaxonomyEntry,
   TTaxonomyListModule,
 } from './features/modules/taxonomy-list';
+export type { TTeamMember, TTeamModule } from './features/modules/team';
 export type {
   TTestimonialItem,
   TTestimonialModule,
@@ -139,6 +153,7 @@ export type {
 } from './features/modules/timeline';
 export type { THomePage } from './features/pages/home';
 export type { TLandingPage } from './features/pages/landing';
+export type { TPageTranslation } from './shared/localization/page-translations/to-page-translations';
 export type {
   TPostDetail,
   TPostDetailAuthor,
@@ -149,16 +164,18 @@ export type { TTagDetailPage } from './features/pages/tag';
 export type { TTagIndexPage } from './features/pages/tag-index';
 export type { TTopicDetailPage } from './features/pages/topic';
 export type { TTopicIndexPage } from './features/pages/topic-index';
-export { urlForImage, urlForSanityImage } from './sanity/image';
-export type { TSanityProjectRef, TImageTransformOptions } from './sanity/image';
-export { getSanityImageBaseUrl } from './sanity/image-base-url';
-export type { TTenantSanityContext } from './sanity/query';
-export { getPlatformSanityContext } from './sanity/client';
-export { getPlatformSanityWriteContext } from './sanity/write-client';
+export { urlForImage, urlForSanityImage } from './sanity/image/image';
+export type { TImageTransformOptions } from './sanity/image/image';
+export type { TSanityProjectRef } from './sanity/project-cache/project-cache';
+export { getSanityImageBaseUrl } from './sanity/image/image-base-url';
+export type { TTenantSanityContext } from './sanity/client/client';
+export { getPlatformSanityContext } from './sanity/client/client';
+export { getPlatformSanityWriteContext } from './sanity/write-client/write-client';
 export type { TCtaButton } from './shared/transformers/cta/to-cta-button';
 export type { TFaqPageQuestion } from './shared/transformers/faq/resolve-faqs';
 export type { THeroPrimaryAction } from './shared/transformers/hero/to-hero-primary-action';
 export type { TModule } from './shared/transformers/module/to-module';
+export type { TPersonCard } from './shared/transformers/person/to-person-card';
 export type {
   TPostCard,
   TPostCardAuthor,

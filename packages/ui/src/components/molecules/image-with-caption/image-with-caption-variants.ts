@@ -12,19 +12,18 @@ export const imageWithCaptionVariants = tv({
         figure: ['w-full'],
       },
       [IMAGE_LAYOUT.FULL_BLEED]: {
-        // `left/right: 50%` plus a negative margin sized off the same `min(100vw, var(--container-page))` cap cancel out to a centered box at every width; a fixed `-mx-[50vw]` paired with an uncorrelated cap breaks that cancellation.
+        // Centred on its parent and sized to the viewport, so the parent column must itself be viewport-centred; the root clips horizontal overflow from the scrollbar gutter that `100vw` includes.
         figure: [
-          'relative left-1/2 right-1/2',
-          'w-[min(100vw,var(--container-page))]',
-          'mx-[calc(min(100vw,var(--container-page))*-0.5)]',
+          'relative left-1/2 w-screen -ml-[50vw]',
+          '[html:has(&)]:overflow-x-clip',
         ],
       },
       [IMAGE_LAYOUT.FLOAT_LEFT]: {
-        // No float below `md:` — a floated image with wrapped text needs more width than a phone viewport gives the remaining text.
-        figure: ['w-full', 'md:float-left md:clear-left md:mr-6 md:w-2/5'],
+        // Padding, not margin, carries the gap: a consumer's `mx-*` on prose children zeroes a float's margins. Floats start at `lg:` so the wrapped text column stays wide enough to read.
+        figure: ['w-full', 'lg:float-left lg:clear-left lg:w-48 lg:pr-6'],
       },
       [IMAGE_LAYOUT.FLOAT_RIGHT]: {
-        figure: ['w-full', 'md:float-right md:clear-right md:ml-6 md:w-2/5'],
+        figure: ['w-full', 'lg:float-right lg:clear-right lg:w-48 lg:pl-6'],
       },
     },
   },

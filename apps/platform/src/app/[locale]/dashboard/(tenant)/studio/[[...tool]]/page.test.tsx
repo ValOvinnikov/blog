@@ -1,19 +1,19 @@
+import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { makeTenant } from '@platform/testing/tenants/fixtures';
 import { redirect } from 'next/navigation';
+import type { Session } from 'next-auth';
 
 import DashboardStudioPage from './page';
 
 const {
-  authMock,
   listMembershipsForUserMock,
   listTenantsByIdsMock,
   getAdminByUserIdMock,
   getTenantSanityCredentialsMock,
   studioMountMock,
 } = vi.hoisted(() => ({
-  authMock: vi.fn(),
   listMembershipsForUserMock: vi.fn(),
   listTenantsByIdsMock: vi.fn(),
   getAdminByUserIdMock: vi.fn(),
@@ -21,7 +21,11 @@ const {
   studioMountMock: vi.fn(),
 }));
 
-vi.mock('@platform/server/auth/auth', () => ({ auth: authMock }));
+vi.mock('@platform/server/auth/auth');
+
+vi.mock('@platform/server/settings-features/get-enabled-capabilities', () => ({
+  getEnabledCapabilities: vi.fn().mockResolvedValue([]),
+}));
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
@@ -30,6 +34,7 @@ vi.mock('@blog/db', async () => ({
     tenants: {
       listTenantsByIds: listTenantsByIdsMock,
       getTenantSanityCredentials: getTenantSanityCredentialsMock,
+      getTenantLiveLocales: vi.fn().mockResolvedValue([]),
     },
     admins: { getAdminByUserId: getAdminByUserIdMock },
   },
@@ -41,6 +46,8 @@ vi.mock('@blog/studio', () => ({
     return <div data-testid="studio-mount" />;
   },
 }));
+
+const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 const setup = customRenderAsync(DashboardStudioPage, {});
 
@@ -67,7 +74,7 @@ describe(`<${DashboardStudioPage.name}/>`, () => {
     expect(getTenantSanityCredentialsMock).not.toHaveBeenCalled();
   });
 
-  it("mounts Studio with the session tenant's own coordinates and a locale-free basePath — never a tenant id from the URL, since this route carries none", async () => {
+  it("mounts Studio with the session tenant's coordinates and a locale-free basePath", async () => {
     listTenantsByIdsMock.mockResolvedValue([
       makeTenant({ id: 'tenant-1', name: 'Acme Inc.' }),
     ]);

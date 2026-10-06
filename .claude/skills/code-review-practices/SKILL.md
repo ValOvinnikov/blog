@@ -71,6 +71,18 @@ D | grep -nE '^\+.*(fields\.map\(\(f\) => f\.name\)|typeof [^)]*\)\.toBe\(.funct
 D | grep -nE '^\+.*(toHaveClass|\.className|\.classList|container\.querySelector|document\.querySelector|baseElement\.querySelector|\.(parentElement|parentNode|firstChild|lastChild|children|childNodes|nextSibling|previousSibling)\b)'
 D | grep -nE '^\+.*const \{[^}]*(getBy|queryBy|findBy|getAllBy|queryAllBy|findAllBy)[^}]*\} = render'
 
+# Faking our own components, or reading a fake's arguments (testing-practices
+# → "What to fake"). A `vi.mock` of an @web/@platform/@blog/ui component is
+# blocking unless the file is a `*-module-renderer.test.tsx` or a route
+# file's test under `src/app/`; `mock.calls` is blocking
+# when it pulls props out of a faked component outside those two cases.
+D | awk '/^\+\+\+ b\//{f=$0} /^\+vi\.mock\(.(@web\/(components|modules)|@platform\/components|@blog\/ui)/ && f !~ /(module-renderer|\/src\/app\/.*)\.test/{print FNR": "$0}'
+D | grep -nE '^\+.*mock\.calls'
+
+# Test titles over 80 characters (testing-practices → Conventions). Blocking
+# on added or edited titles only.
+D | grep -nE "^\+[[:space:]]*it(\.each\(.*\))?\([[:space:]]*['\"\`][^'\"\`]{81,}"
+
 # Comments that restate the code (CLAUDE.md → "Comments default to zero").
 # A doc block opening with the identifier (`Name — does X`) restates the
 # name; a doc block three or more lines long is narrating how, not what
@@ -86,9 +98,9 @@ D | grep -nE '^\+ {4,}// '
 D | awk '/^\+\+\+ b\//{t=($0 ~ /\.test\.tsx?$/)} t&&/^\+[[:space:]]*(\/\/|\/\*\*|\*[[:space:]])/{print FNR": "$0}'
 
 # Clones. Run over every workspace the diff touches, then read the hits that
-# involve a changed file. A whole helper/component/hook copied instead of
-# shared is blocking; a repeated test arrangement that wants `it.each` is
-# non-blocking and gets filed. ~5s for the whole repo.
+# involve a changed file. A clone the diff creates — a helper, component,
+# hook, test fake, fixture or repeated test arrangement — is blocking; a
+# clone whose copies were all on main before the diff is filed. ~5s for the whole repo.
 WS=$( (git diff "$BASE"...HEAD --name-only; git diff --name-only) | grep -E '\.(ts|tsx)$' | cut -d/ -f1-2 | sort -u )
 [ -n "$WS" ] && pnpm dlx jscpd@4 --min-tokens 60 --min-lines 8 \
   --ignore '**/node_modules/**,**/generated/**,**/.next/**' --reporters console $WS 2>/dev/null \
@@ -168,6 +180,12 @@ CI-enforced guard was deliberately not added.
 - ISR present (`next: { revalidate, tags }`); revalidate route verifies the
   secret. No accidental fully-dynamic rendering of static content.
 - Queries project only needed fields; no over-fetching.
+- No request waterfall: a Server Component that awaits two independent
+  fetches one after the other, or a route that blocks on a slow fetch it
+  could stream behind `Suspense`, is a finding. Same for a client component
+  handed a whole service result when it renders two fields of it. The rules
+  that apply, and the ones this repo overrides (never flag a missing memo),
+  are in `react-component-practices` → "Vercel's React rules".
 
 ## 4. SEO & accessibility
 
@@ -202,12 +220,11 @@ CI-enforced guard was deliberately not added.
   (field list, option list, default, fieldset, "exposes X as a function",
   constant value) is **blocking** — delete it, don't keep it (full rule:
   `testing-practices` → "What not to test"). Sibling cases that differ only
-  in an input and an expected value are one `it.each`; a copied block is
-  non-blocking and gets filed. A finding whose fix is a **new shared file**
-  is blocking only when the ticket's own scope is that extraction; otherwise
-  file it — two parallel sessions extracting the same helper meet as an
-  add/add conflict (CLAUDE.md → "Creating a shared file is not an inline
-  fix").
+  in an input and an expected value are one `it.each`. A test fake, fixture
+  or builder the diff copies from another file is **blocking**: it moves to
+  `testing/` or `__mocks__/` in this diff. Repetition that was already on
+  `main` and that the diff adds nothing to is filed, not fixed (CLAUDE.md →
+  "Duplication that already existed is filed, not fixed inline").
 - Bug fixes include a regression test that failed before the fix.
 - **Suite labels — a component takes ``describe(`<${Component.name}/>`, …)``,
   everything else takes the bare symbol `describe(theSymbol, …)`.** A string

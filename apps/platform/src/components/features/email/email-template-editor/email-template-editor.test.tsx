@@ -84,10 +84,8 @@ describe(`<${EmailTemplateEditor.name}/>`, () => {
       },
     });
 
-    expect(screen.getByDisplayValue('Sign in to Acme Co')).toBeInTheDocument();
-    expect(
-      screen.getByRole('heading', { name: 'Sign-in link' }),
-    ).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Sign in to Acme Co')).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Sign-in link' })).toBeVisible();
   });
 
   it('states that the locked action always renders and cannot be edited here', () => {
@@ -95,7 +93,7 @@ describe(`<${EmailTemplateEditor.name}/>`, () => {
 
     expect(
       screen.getByText(/always renders and can't be edited here/),
-    ).toBeInTheDocument();
+    ).toBeVisible();
   });
 
   it('saves an edited subject as-is', async () => {

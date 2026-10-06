@@ -1,0 +1,263 @@
+{
+  "pagination": {
+    "previous": "Vorige",
+    "next": "Volgende",
+    "pageSuffix": "– Pagina {page}"
+  },
+  "breadcrumbs": {
+    "home": "Home",
+    "ariaLabel": "Kruimelpad",
+    "topics": "Onderwerpen",
+    "tags": "Tags",
+    "blog": "Blog"
+  },
+  "notFound": {
+    "eyebrow": "404",
+    "heading": "Pagina niet gevonden",
+    "supportingText": "De pagina die u zoekt bestaat niet.",
+    "returnHome": "Terug naar home"
+  },
+  "localeErrorPage": {
+    "title": "Er is iets misgegaan",
+    "announcement": "Er is iets misgegaan. U kunt het opnieuw proberen of naar de homepage gaan.",
+    "description": "Er is een onverwachte fout opgetreden bij het weergeven van deze pagina. U kunt het opnieuw proberen of teruggaan naar de homepage.",
+    "retry": "Opnieuw proberen",
+    "goHome": "Naar home"
+  },
+  "postShare": {
+    "shareAriaLabel": "\"{title}\" delen",
+    "panelAriaLabel": "Deelopties",
+    "copyLink": "Link kopiëren",
+    "copied": "Gekopieerd",
+    "linkCopied": "Link gekopieerd"
+  },
+  "languageSwitcher": {
+    "ariaLabel": "Taal",
+    "menuAriaLabel": "Taal: {language}"
+  },
+  "siteNavigation": {
+    "toggleMenu": "Navigatiemenu openen of sluiten"
+  },
+  "brandLockupLink": {
+    "ariaLabel": "Home"
+  },
+  "socialLinks": {
+    "linkAriaLabel": "{platform}-profiel",
+    "listAriaLabel": "Profielen"
+  },
+  "topicChipList": {
+    "ariaLabel": "Onderwerpen",
+    "all": "Alle"
+  },
+  "blogListPage": {
+    "empty": "Nog geen berichten.",
+    "paginationAriaLabel": "Blogpagina's"
+  },
+  "blogPostPage": {
+    "depthToggle": {
+      "ariaLabel": "Leesdiepte",
+      "skim": "30s",
+      "read": "Lezen",
+      "deep": "Diepgaand"
+    },
+    "skimPanel": {
+      "label": "Samenvatting in 30 seconden",
+      "readFullArticle": "Lees het volledige artikel"
+    },
+    "asideKind": {
+      "WHY_NOT": "Waarom niet X",
+      "DIGRESSION": "Uitweiding",
+      "CONTEXT": "Context"
+    },
+    "backToTop": {
+      "ariaLabel": "Terug naar boven"
+    }
+  },
+  "postContentsRail": {
+    "label": "Onderwerpen"
+  },
+  "topicPage": {
+    "empty": "Nog geen berichten over {name}.",
+    "paginationAriaLabel": "Pagina's van {name}"
+  },
+  "tagPage": {
+    "empty": "Nog geen berichten met de tag {name}.",
+    "paginationAriaLabel": "Pagina's van {name}"
+  },
+  "taxonomyListModule": {
+    "topics": {
+      "postsCount": "{count, plural, one {1 bericht} other {{count} berichten}}",
+      "latestPostsLabel": "Nieuwste in {name}",
+      "empty": "Nog geen onderwerpen."
+    },
+    "tags": {
+      "postsCount": "{count, plural, one {1 bericht} other {{count} berichten}}",
+      "latestPostsLabel": "Nieuwste in {name}",
+      "empty": "Nog geen tags."
+    }
+  },
+  "rss": {
+    "fallbackTitle": "Blog",
+    "feedLinkLabel": "RSS-feed"
+  },
+  "authMenu": {
+    "signIn": "Inloggen",
+    "panelAriaLabel": "Inlogopties",
+    "signInHeading": "Inloggen",
+    "accountHeading": "Account",
+    "chooseProviderPrompt": "Kies een inlogmethode",
+    "continueWithGithub": "Doorgaan met GitHub",
+    "continueWithGoogle": "Doorgaan met Google",
+    "continueWithEmail": "Doorgaan met e-mail",
+    "redirectHint": "U keert terug naar dit artikel — u raakt uw plek nooit kwijt.",
+    "emailAriaLabel": "E-mailadres",
+    "emailPlaceholder": "naam@voorbeeld.nl",
+    "sendLink": "Link versturen",
+    "sending": "Versturen…",
+    "checkYourInbox": "Controleer uw inbox voor een inloglink.",
+    "emailError": "De link kon niet worden verstuurd. Probeer het opnieuw.",
+    "oauthError": "Inloggen mislukt. Probeer het opnieuw.",
+    "accountMenuAriaLabel": "Accountmenu",
+    "signOut": "Uitloggen",
+    "loadingAccountStatus": "Accountstatus laden",
+    "myBookmarks": "Mijn bladwijzers",
+    "accountSettings": "Accountinstellingen"
+  },
+  "toastProvider": {
+    "viewportAriaLabel": "Meldingen",
+    "dismissLabel": "Melding sluiten",
+    "mergeCountSuffix": " ×{count}"
+  },
+  "bookmarkButton": {
+    "save": "Bewaren",
+    "saved": "Bewaard",
+    "saveAriaLabel": "Bericht bewaren",
+    "removeAriaLabel": "Bladwijzer verwijderen",
+    "error": "Dat kon niet worden bewaard. Probeer het opnieuw.",
+    "errorUnavailable": "Bladwijzers opslaan is op deze site momenteel niet beschikbaar.",
+    "toastSavedMessage": "Bewaard in bladwijzers",
+    "toastRemovedMessage": "Verwijderd uit bladwijzers",
+    "toastRevertedMessage": "Teruggedraaid",
+    "toastUndoLabel": "Ongedaan maken",
+    "toastRetryLabel": "Opnieuw proberen"
+  },
+  "bookmarksPage": {
+    "title": "Mijn bladwijzers",
+    "listHeading": "Bewaarde berichten",
+    "metaDescription": "Berichten die u hebt bewaard om later te lezen.",
+    "empty": "Nog geen bladwijzers — bewaar een bericht om het hier terug te vinden.",
+    "hint": "{count, plural, one {1 bewaard} other {{count} bewaard}}"
+  },
+  "newsletterForm": {
+    "submitLabel": "Abonneren",
+    "emailAriaLabel": "E-mailadres",
+    "placeholder": "naam@voorbeeld.nl",
+    "successMessage": "Bijna klaar — controleer uw inbox om te bevestigen.",
+    "errorInvalid": "Voer een geldig e-mailadres in.",
+    "errorAlreadySubscribed": "Dit e-mailadres is al geabonneerd.",
+    "errorServer": "Er is iets misgegaan. Probeer het opnieuw.",
+    "errorUnavailable": "Deze site neemt op dit moment geen nieuwe inschrijvingen aan."
+  },
+  "newsletterConfirm": {
+    "confirmedTitle": "Abonnement bevestigd",
+    "confirmedMessage": "Uw abonnement is bevestigd. Bedankt voor uw aanmelding!",
+    "invalidTitle": "Ongeldige bevestigingslink",
+    "invalidMessage": "Deze bevestigingslink is ongeldig of verlopen.",
+    "errorTitle": "Er is iets misgegaan",
+    "errorMessage": "We konden uw abonnement niet bevestigen. Probeer het later opnieuw.",
+    "unavailableTitle": "Bevestigen kan nu niet",
+    "unavailableMessage": "Deze site accepteert op dit moment geen wijzigingen, dus we konden je bevestigingslink niet verwerken.",
+    "returnHome": "Terug naar home"
+  },
+  "newsletterUnsubscribe": {
+    "confirmTitle": "Afmelden voor onze nieuwsbrief",
+    "confirmMessage": "Klik op de knop hieronder om te bevestigen dat u geen nieuwsbrief meer van ons wilt ontvangen.",
+    "confirmButtonLabel": "Afmelding bevestigen",
+    "successTitle": "U bent afgemeld",
+    "successMessage": "U ontvangt geen nieuwsbrief meer van ons.",
+    "invalidTitle": "Link niet meer geldig",
+    "invalidMessage": "Deze afmeldlink is niet meer geldig — mogelijk bent u al afgemeld.",
+    "errorTitle": "Er ging iets mis",
+    "errorMessage": "We konden je niet uitschrijven. Probeer het later opnieuw.",
+    "returnHome": "Terug naar home"
+  },
+  "accountPage": {
+    "title": "Account",
+    "metaDescription": "Beheer uw privacy en gegevens — exporteer of verwijder uw account.",
+    "privacy": {
+      "heading": "Privacy",
+      "exportLabel": "Mijn gegevens exporteren",
+      "exportDescription": "Download uw profiel en bladwijzers als één JSON-archief.",
+      "exportButton": "Export aanvragen",
+      "deleteLabel": "Account verwijderen",
+      "deleteDescription": "Onomkeerbaar. Uw profiel en bladwijzers worden gewist en alle sessies worden afgemeld. Typ uw gebruikersnaam om de knop te activeren.",
+      "deleteConfirmAriaLabel": "Typ uw gebruikersnaam om het verwijderen te bevestigen",
+      "deleteConfirmPlaceholder": "Typ {handle} om te bevestigen",
+      "deleteButton": "Account verwijderen",
+      "deleteToastLoadingMessage": "Uw account wordt verwijderd…",
+      "deleteToastSuccessMessage": "Uw account is verwijderd.",
+      "deleteError": "Uw account kon niet worden verwijderd. Probeer het opnieuw."
+    },
+    "newsletter": {
+      "heading": "Nieuwsbrief",
+      "label": "Nieuwsbrief",
+      "activeBadge": "Geabonneerd",
+      "activeDescriptionPrefix": "Wekelijkse berichten bezorgd op",
+      "activeDescriptionSuffix": "(het e-mailadres van uw account — alleen-lezen in v1).",
+      "unsubscribeButton": "Afmelden",
+      "pendingBadge": "Wacht op bevestiging",
+      "pendingDescription": "Op de bevestigingslink is nog niet geklikt. Verstuur hem opnieuw als hij nooit is aangekomen.",
+      "resendButton": "Bevestiging opnieuw versturen",
+      "unsubscribeToastLoadingMessage": "Afmelden…",
+      "unsubscribeToastSuccessMessage": "U bent afgemeld.",
+      "unsubscribeError": "Afmelden is mislukt. Probeer het opnieuw.",
+      "resendToastLoadingMessage": "De bevestigingsmail wordt opnieuw verstuurd…",
+      "resendToastSuccessMessage": "Bevestigingsmail opnieuw verstuurd.",
+      "resendError": "De bevestigingsmail kon niet opnieuw worden verstuurd. Probeer het opnieuw.",
+      "resendUnavailable": "Opnieuw verzenden is op deze site momenteel niet beschikbaar."
+    },
+    "identity": {
+      "heading": "Gekoppelde accounts",
+      "githubLabel": "GitHub",
+      "googleLabel": "Google",
+      "emailLinkLabel": "E-maillink",
+      "linkedStatus": "Gekoppeld",
+      "linkButton": "Koppelen",
+      "unlinkButton": "Ontkoppelen",
+      "lastMethodNotice": "Laatste overgebleven methode — kan niet worden ontkoppeld",
+      "unlinkToastLoadingMessage": "Uw account wordt ontkoppeld…",
+      "unlinkToastSuccessMessage": "Account ontkoppeld.",
+      "unlinkError": "Ontkoppelen is mislukt. Probeer het opnieuw.",
+      "unlinkLastMethodError": "Dit is uw enige overgebleven inlogmethode — koppel eerst een andere voordat u deze ontkoppelt.",
+      "displayNameLabel": "Weergavenaam",
+      "displayNameDescription": "Vervangt uw gebruikersnaam van de provider overal waar uw reacties verschijnen.",
+      "displayNameAriaLabel": "Weergavenaam",
+      "saveButton": "Opslaan",
+      "saveToastLoadingMessage": "Uw weergavenaam wordt opgeslagen…",
+      "saveToastSuccessMessage": "Weergavenaam bijgewerkt.",
+      "saveError": "Uw weergavenaam kon niet worden bijgewerkt. Probeer het opnieuw."
+    }
+  },
+  "carousel": {
+    "previousAriaLabel": "Vorige dia",
+    "nextAriaLabel": "Volgende dia",
+    "regionLabel": "Carrousel {title}"
+  },
+  "pricingModule": {
+    "free": "Gratis",
+    "from": "Vanaf",
+    "compareAtLabel": "Normale prijs",
+    "period": {
+      "ONE_TIME": "eenmalig",
+      "HOUR": "per uur",
+      "SESSION": "per sessie",
+      "MONTH": "per maand",
+      "YEAR": "per jaar"
+    },
+    "tabs": {
+      "MONTH": "Maandelijks",
+      "YEAR": "Jaarlijks"
+    },
+    "periodSwitchLabel": "Factureringsperiode"
+  }
+}

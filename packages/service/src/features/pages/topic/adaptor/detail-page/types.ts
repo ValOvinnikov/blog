@@ -3,6 +3,8 @@ import type {
   TMaybeUndefined,
   TPageTopicType,
 } from '@blog/config';
+import type { TPageTranslation } from '@blog/service/shared/localization/page-translations/to-page-translations';
+import type { TFaqPageQuestion } from '@blog/service/shared/transformers/faq/resolve-faqs';
 import type { TModule } from '@blog/service/shared/transformers/module/to-module';
 import type { TSeoResolved } from '@blog/service/shared/transformers/seo/resolve-seo';
 import type { TTopic } from '@blog/service/shared/transformers/topic/to-topic';
@@ -12,5 +14,7 @@ export type TTopicDetailPage = {
   headingBlock: THeadingBlock;
   hero: TMaybeUndefined<TModule<TPageTopicType>>;
   modules: TModule<TPageTopicType>[];
+  faqs: TFaqPageQuestion[];
   seo: TSeoResolved;
+  translations: TPageTranslation[];
 };

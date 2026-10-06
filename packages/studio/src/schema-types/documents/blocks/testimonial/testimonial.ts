@@ -1,7 +1,10 @@
 import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
+import { localizedListedTextField } from '@blog/studio/schema-types/fields/localized-listed-text-field/localized-listed-text-field';
+import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
-import { listedTextSchema } from '@blog/studio/schema-types/portable-text/listed-text/listed-text';
+import { localizedImageWithAltSchema } from '@blog/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
+import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
+import { validateDefaultLanguageBlocksFilled } from '@blog/studio/schema-types/validation/validate-default-language-blocks-filled/validate-default-language-blocks-filled';
 import { Quote } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
@@ -26,25 +29,25 @@ export const blockTestimonialSchema = defineType({
       description: 'Who said it.',
       validation: (rule) => rule.required().error('Say who said it.'),
     }),
-    defineField({
+    localizedListedTextField({
       name: 'quote',
       title: 'Quote',
-      type: listedTextSchema.name,
       description: 'Their words, without quotation marks — the site adds them.',
       validation: (rule) =>
-        rule.required().error('A testimonial needs the quote.'),
+        rule.custom(
+          validateDefaultLanguageBlocksFilled('A testimonial needs the quote.'),
+        ),
     }),
-    defineField({
+    localizedOneLineTextField({
       name: 'role',
       title: 'Role',
-      type: 'string',
       description:
         'One line under the name — title, company, or both, punctuated as you want it shown.',
     }),
     defineField({
       name: 'image',
       title: 'Image',
-      type: imageWithAltSchema.name,
+      type: localizedImageWithAltSchema.name,
       description:
         'An image for this testimonial — not necessarily a portrait of the person. Without one, the site shows their initials.',
     }),
@@ -67,7 +70,7 @@ export const blockTestimonialSchema = defineType({
     prepare({ title, name, role, media }) {
       return {
         title: String(title ?? 'Unknown'),
-        subtitle: formatTestimonialByline(name, role),
+        subtitle: formatTestimonialByline(name, defaultLanguageValue(role)),
         media: media ?? undefined,
       };
     },

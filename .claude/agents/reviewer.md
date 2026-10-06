@@ -92,9 +92,9 @@ Review for what a contract check won't catch:
 - **Performance:** over-fetching, N+1, unbounded queries, work in hot paths.
 - **Maintainability:** naming, dead code, missing tests for changed
   behaviour, stale comments/docs contradicting the code. Duplication is
-  reported from the clone run in Pass 1 — a copied helper/component/hook is
-  blocking (share it); a repeated test arrangement is non-blocking (`it.each`,
-  filed). Name the sibling it should have extended.
+  reported from the clone run in Pass 1 — anything the diff copies (a helper,
+  component, hook, test fake, fixture or test arrangement) is blocking; a
+  duplication already on `main` that the diff adds nothing to is filed. Name the sibling it should have extended.
 
 ### Duplication is checked against the repo, not against the diff
 
@@ -103,8 +103,9 @@ copy it duplicates lives in a file the diff does not touch, so reading the
 diff alone will never reveal it. Checking for that is a deliberate step, not
 something the other passes produce as a by-product.
 
-**For every function, type, constant or fragment the diff adds, search the
-repo for an existing equivalent before approving.** Search by what it does,
+**For every function, type, constant, fragment, component, test fake or
+fixture the diff adds, search the repo for an existing equivalent before
+approving.** Search by what it does,
 not by its name — a duplicate that mattered would have been spotted already
 if it shared a name. Two useful handles: grep for the symbols it calls (a new
 wrapper around an existing helper will be near that helper's other call
@@ -121,6 +122,14 @@ silently later when someone fixes a bug in one of them.
 This applies even when the diff was written to follow an existing sibling
 feature. Copying a sibling's private helper is the most common way a
 duplicate enters, and it always looks locally consistent.
+
+**Duplication the diff did not create is filed, not blocking.** Two copies
+that were both on `main` before this diff, which it neither adds to nor
+touches, go into your report as a filed finding: extracting them means a new
+shared file that parallel sessions may also be writing (CLAUDE.md →
+"Duplication that already existed is filed, not fixed inline"). A match in
+the other app is never a finding — `apps/web` and `apps/platform` share no
+code.
 
 Judgement still applies: near-identical code that is genuinely coincidental,
 or where sharing would couple two things that should stay independent, is not

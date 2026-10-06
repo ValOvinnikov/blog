@@ -8,6 +8,7 @@ import {
   testTestimonialModule,
   testWarnsForUnknownModule,
 } from '@web/testing/shared/module-renderer-contract/module-renderer-contract';
+import { logger } from '@web/utils/logger/logger';
 
 import { HomeModuleRenderer } from './home-module-renderer';
 
@@ -23,7 +24,6 @@ const {
   heroBlogModuleMock,
   heroProfileModuleMock,
   heroStatementModuleMock,
-  loggerWarnMock,
 } = vi.hoisted(() => ({
   contentModuleMock: vi.fn(({ id }: { id: string }) => (
     <div data-testid="stub-content">{id}</div>
@@ -56,7 +56,6 @@ const {
   heroStatementModuleMock: vi.fn(async ({ id }: { id: string }) => (
     <h1 data-testid="stub-hero-statement">{id}</h1>
   )),
-  loggerWarnMock: vi.fn(),
 }));
 
 vi.mock('@web/modules/content/content-module', () => ({
@@ -91,27 +90,20 @@ vi.mock('@web/modules/hero-statement/hero-statement-module', () => ({
   HeroStatementModule: heroStatementModuleMock,
 }));
 
-vi.mock('@web/utils/logger/logger', () => ({
-  logger: {
-    error: vi.fn(),
-    warn: loggerWarnMock,
-    info: vi.fn(),
-    debug: vi.fn(),
-  },
-}));
+vi.mock('@web/utils/logger/logger');
+
+const loggerWarnMock = vi.mocked(logger.warn);
 
 const setup = customRenderAsync(HomeModuleRenderer, {
   hero: undefined,
   headingBlock: makeHeadingBlock({ heading: 'Welcome to the blog' }),
   modules: [],
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${HomeModuleRenderer.name}/>`, () => {
   testHeadingWithoutHero({ setup, headingText: 'Welcome to the blog' });
 
-  it('renders the resolved hero, with exactly one h1, when the hero resolves to content', async () => {
+  it('renders the resolved hero, with exactly one h1, when the hero has content', async () => {
     await setup({ hero: { id: 'hero-1', type: 'module_heroStatement' } });
 
     const headings = screen.getAllByRole('heading', { level: 1 });
@@ -138,7 +130,7 @@ describe(`<${HomeModuleRenderer.name}/>`, () => {
     ]);
   });
 
-  it('falls back to the page heading, still exactly one h1, when the hero resolves to nothing', async () => {
+  it('falls back to the page heading, still one h1, when the hero resolves to nothing', async () => {
     await setup({ hero: { id: 'hero-2', type: 'module_heroBlog' } });
 
     const headings = screen.getAllByRole('heading', { level: 1 });

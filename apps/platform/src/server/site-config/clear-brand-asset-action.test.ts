@@ -6,30 +6,28 @@ import {
   PRESET_ID,
   RADIUS_SCALE,
 } from '@blog/config';
+import { auth } from '@platform/server/auth/auth';
+import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { env } from '@platform/utils/env/env';
+import type { Session } from 'next-auth';
 
 import { clearBrandAssetAction } from './clear-brand-asset-action';
 
 const {
-  requireTenantMembershipMock,
-  authMock,
   getSiteConfigOrDefaultsMock,
   upsertSiteConfigMock,
   insertAuditEventMock,
   delMock,
 } = vi.hoisted(() => ({
-  requireTenantMembershipMock: vi.fn(),
-  authMock: vi.fn(),
   getSiteConfigOrDefaultsMock: vi.fn(),
   upsertSiteConfigMock: vi.fn(),
   insertAuditEventMock: vi.fn(),
   delMock: vi.fn(),
 }));
 
-vi.mock('@platform/server/auth/require-tenant-membership', () => ({
-  requireTenantMembership: requireTenantMembershipMock,
-}));
+vi.mock('@platform/server/auth/require-tenant-membership');
 
-vi.mock('@platform/server/auth/auth', () => ({ auth: authMock }));
+vi.mock('@platform/server/auth/auth');
 
 vi.mock('@platform/server/site-config/site-config-or-defaults', () => ({
   getSiteConfigOrDefaults: getSiteConfigOrDefaultsMock,
@@ -46,9 +44,14 @@ vi.mock('@vercel/blob', () => ({
   del: delMock,
 }));
 
-vi.mock('@platform/utils/env/env', () => ({
-  env: { BLOB_READ_WRITE_TOKEN: 'test-token' },
-}));
+vi.mock('@platform/utils/env/env');
+
+Object.assign(env, { BLOB_READ_WRITE_TOKEN: 'test-token' });
+
+const requireTenantMembershipMock = vi.mocked<
+  (tenantId: string) => Promise<unknown>
+>(requireTenantMembership);
+const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 const THEME_FIELDS = {
   preset: PRESET_ID.CONSOLE,
@@ -78,7 +81,7 @@ describe(clearBrandAssetAction, () => {
     insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
   });
 
-  it('re-resolves the tenant from the session against the routed tenant id before writing anything', async () => {
+  it('re-resolves the tenant from the session against the routed id before writing', async () => {
     getSiteConfigOrDefaultsMock.mockResolvedValue({
       ...THEME_FIELDS,
       logoAssetUrl: undefined,
@@ -111,7 +114,7 @@ describe(clearBrandAssetAction, () => {
     );
   });
 
-  it('records exactly one SETTINGS_UPDATED audit event identifying the asset and operation', async () => {
+  it('records one SETTINGS_UPDATED audit event naming the asset and operation', async () => {
     getSiteConfigOrDefaultsMock.mockResolvedValue({
       ...THEME_FIELDS,
       logoAssetUrl: undefined,
@@ -147,7 +150,7 @@ describe(clearBrandAssetAction, () => {
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
-  it('reports failure instead of throwing when the write itself fails, and records no audit event', async () => {
+  it('reports failure without throwing, and no audit event, when the write fails', async () => {
     getSiteConfigOrDefaultsMock.mockResolvedValue({
       ...THEME_FIELDS,
       logoAssetUrl: undefined,

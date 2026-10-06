@@ -6,22 +6,10 @@ import {
 } from '@platform/testing/custom-render';
 import userEvent from '@testing-library/user-event';
 import { useSelectedLayoutSegment } from 'next/navigation';
-import type { ComponentPropsWithoutRef } from 'react';
 
 import { AdminShell } from './admin-shell';
 
-vi.mock('@platform/i18n/navigation', () => ({
-  usePathname: () => '/',
-  Link: ({
-    href,
-    children,
-    ...rest
-  }: ComponentPropsWithoutRef<'a'> & { href: string }) => (
-    <a href={href} {...rest}>
-      {children}
-    </a>
-  ),
-}));
+vi.mock('@platform/i18n/navigation');
 
 const render = renderWithIntl;
 
@@ -55,7 +43,7 @@ describe(AdminShell, () => {
     expect(screen.getByText('Tenants page')).toBeVisible();
   });
 
-  it('also threads sections and switcher into the Topbar nav menu, not just the desktop Sidebar', async () => {
+  it('threads sections and switcher into the Topbar nav menu as well as the Sidebar', async () => {
     const user = userEvent.setup();
     render(
       <AdminShell
@@ -84,7 +72,7 @@ describe(AdminShell, () => {
     expect(within(menu).getByText('Tenant switcher')).toBeVisible();
   });
 
-  it('still renders the sidebar, topbar and page content on the studio route, in full-bleed mode', () => {
+  it('renders the sidebar, topbar and page content full-bleed on the studio route', () => {
     vi.mocked(useSelectedLayoutSegment).mockReturnValue('studio');
 
     render(
@@ -126,7 +114,6 @@ describe(AdminShell, () => {
     expect(
       screen.getByRole('button', { name: 'Expand sidebar' }),
     ).toHaveAttribute('aria-expanded', 'false');
-    // The nav link's accessible name survives the collapse.
     expect(screen.getByRole('link', { name: 'Tenants' })).toBeVisible();
   });
 });

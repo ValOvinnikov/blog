@@ -1,4 +1,7 @@
+import { BRAND_VARIANT } from '@blog/config';
+import type { TPostListModule } from '@blog/service';
 import type { IMediaCardData } from '@web/components/shared/media-card-item';
+import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 export const makePostListItem = (
   overrides: Partial<IMediaCardData> = {},
@@ -15,3 +18,17 @@ export const makePostListItem = (
     ...overrides,
   };
 };
+
+export const makePostListModuleData = (
+  overrides: Partial<TPostListModule> = {},
+): TPostListModule => ({
+  brandVariant: BRAND_VARIANT.PRIMARY,
+  headingBlock: makeHeadingBlock({ heading: 'Latest posts' }),
+  posts: [],
+  layout: undefined,
+  contentAlignment: undefined,
+  showImages: false,
+  currentPage: 1,
+  totalPages: 1,
+  ...overrides,
+});

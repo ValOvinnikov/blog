@@ -1,169 +1,148 @@
-import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { service } from '@blog/service';
+import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
+import {
+  customRenderServerAsync,
+  screen,
+  within,
+} from '@web/testing/custom-render';
 import { mockPostDetail } from '@web/testing/pages/blog-post-page/fixtures';
+import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 
 import { BlogPostPage } from './blog-post-page';
 
-const { getPostPageMock } = vi.hoisted(() => ({ getPostPageMock: vi.fn() }));
+vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@web/server/post/get-post-page', () => ({
-  getPostPage: getPostPageMock,
+vi.mock('@blog/service', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@blog/service')>();
+  return {
+    ...actual,
+    service: {
+      pages: { post: { v1: { getPost: vi.fn() } } },
+    },
+  };
+});
+
+vi.mock('@web/utils/logger/logger');
+
+vi.mock('@web/i18n/navigation');
+
+vi.mock(
+  '@web/server/settings-features/is-capability-enabled/is-capability-enabled',
+  () => ({
+    isCapabilityEnabled: vi.fn(),
+  }),
+);
+
+vi.mock('@web/server/bookmarks/bookmark-actions/bookmark-actions', () => ({
+  getBookmarkStatus: vi.fn(),
+  setBookmarkStatus: vi.fn(),
 }));
 
-vi.mock('@web/components/features/post/blog-posting-schema', () => ({
-  BlogPostingSchema: ({ slug, tenant }: { slug: string; tenant: string }) => (
-    <div data-testid="blog-posting-schema">
-      {slug}:{tenant}
-    </div>
-  ),
-}));
+const getPostMock = vi.mocked(service.pages.post.v1.getPost);
 
-vi.mock('@web/components/features/post/post-breadcrumbs', () => ({
-  PostBreadcrumbs: ({ slug, tenant }: { slug: string; tenant: string }) => (
-    <div data-testid="post-breadcrumbs">
-      {slug}:{tenant}
-    </div>
-  ),
-}));
-
-vi.mock('@web/components/features/post/post-article', () => ({
-  PostArticle: ({ slug, tenant }: { slug: string; tenant: string }) => (
-    <div data-testid="post-article">
-      <h1>{slug}</h1>:{tenant}
-    </div>
-  ),
-}));
-
-vi.mock('@web/components/shared/skim-panel', () => ({
-  SkimPanel: () => <div data-testid="skim-panel" />,
-}));
-
-vi.mock('./blog-post-module-renderer', () => ({
-  BlogPostModuleRenderer: ({
-    modules,
-    locale,
-    tenant,
-    context,
-  }: {
-    modules?: { id: string; type: string }[];
-    locale: string;
-    tenant: string;
-    context?: { post?: { id: string } };
-  }) => (
-    <div data-testid="module-renderer">
-      {modules?.length ?? 0}:{locale}:{tenant}:{context?.post?.id}
-    </div>
-  ),
-}));
-
-const setup = customRenderAsync(BlogPostPage, {
+const setup = customRenderServerAsync(BlogPostPage, {
   slug: 'hello-world',
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${BlogPostPage.name}/>`, () => {
   beforeEach(() => {
-    getPostPageMock.mockReset();
+    getPostMock.mockResolvedValue({
+      ok: true,
+      data: { ...mockPostDetail, modules: [] },
+    });
+    vi.mocked(isCapabilityEnabled).mockResolvedValue(false);
   });
 
   it('calls notFound() without logging when no page_post matches the slug', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getPostPageMock.mockResolvedValue({ ok: true, data: undefined });
+    getPostMock.mockResolvedValueOnce({ ok: true, data: undefined });
 
     await expect(setup({ slug: 'missing' })).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    expect(errorSpy).not.toHaveBeenCalled();
-    errorSpy.mockRestore();
+    expect(logger.error).not.toHaveBeenCalled();
   });
 
-  it('calls notFound() when the fetch fails', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getPostPageMock.mockResolvedValue({ ok: false, error: new Error('boom') });
+  it('logs and calls notFound() when the fetch fails', async () => {
+    getPostMock.mockResolvedValueOnce({ ok: false, error: new Error('boom') });
 
     await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    errorSpy.mockRestore();
+    expect(logger.error).toHaveBeenCalledWith(
+      'blog_post_page.fetch_failed',
+      expect.objectContaining({ slug: 'hello-world' }),
+    );
   });
 
-  it('renders the parts in order: schema, breadcrumbs, article, skim panel, modules', async () => {
-    getPostPageMock.mockResolvedValue({ ok: true, data: mockPostDetail });
-
+  it('fetches the post for the given slug with the tenant context', async () => {
     await setup();
 
-    const order = screen
-      .getAllByTestId(/.+/)
-      .map((el) => el.getAttribute('data-testid'));
-
-    expect(order).toEqual([
-      'blog-posting-schema',
-      'post-breadcrumbs',
-      'depth-root',
-      'post-article',
-      'skim-panel',
-      'module-renderer',
-    ]);
+    expect(getPostMock).toHaveBeenCalledWith(
+      'hello-world',
+      DEFAULT_TENANT_SANITY_CONTEXT,
+    );
   });
 
-  it('forwards the slug and tenant to every self-fetching part', async () => {
-    getPostPageMock.mockResolvedValue({ ok: true, data: mockPostDetail });
-
+  it('renders the breadcrumb trail outside main', async () => {
     await setup();
 
-    expect(screen.getByTestId('blog-posting-schema')).toHaveTextContent(
-      'hello-world:tenant-1',
-    );
-    expect(screen.getByTestId('post-breadcrumbs')).toHaveTextContent(
-      'hello-world:tenant-1',
-    );
-    expect(screen.getByTestId('post-article')).toHaveTextContent(
-      'hello-world:tenant-1',
-    );
+    const breadcrumbs = screen.getByRole('navigation', { name: 'Breadcrumb' });
+    expect(
+      within(breadcrumbs).getByRole('link', { name: 'Home' }),
+    ).toBeVisible();
+    expect(
+      within(breadcrumbs).getByRole('link', { name: 'Engineering' }),
+    ).toBeVisible();
+    expect(screen.getByRole('main')).not.toContainElement(breadcrumbs);
   });
 
-  it("passes the post's modules, locale, tenant, and post context to BlogPostModuleRenderer", async () => {
-    getPostPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        ...mockPostDetail,
-        id: 'post-1',
-        modules: [{ type: 'module_postRelated', id: 'related-1' }],
-      },
-    });
-
+  it('renders the post article inside main', async () => {
     await setup();
 
-    expect(screen.getByTestId('module-renderer')).toHaveTextContent(
-      '1:en:tenant-1:post-1',
-    );
+    const main = screen.getByRole('main');
+    expect(
+      within(main).getByRole('heading', { level: 1, name: 'Hello World' }),
+    ).toBeVisible();
+    expect(within(main).getByText('Body text.')).toBeVisible();
   });
 
-  it('renders no reading-depth control when the post has neither a skim nor asides', async () => {
-    getPostPageMock.mockResolvedValue({ ok: true, data: mockPostDetail });
+  it('renders exactly one h1, from the post', async () => {
+    await setup();
 
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Hello World' }),
+    ).toBeVisible();
+  });
+
+  it('renders no reading-depth control without a skim or asides', async () => {
     await setup();
 
     expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('region', { name: '30-second summary' }),
+    ).not.toBeInTheDocument();
   });
 
   it('renders the reading-depth control once the post has asides', async () => {
-    getPostPageMock.mockResolvedValue({
+    getPostMock.mockResolvedValueOnce({
       ok: true,
-      data: { ...mockPostDetail, hasAsides: true },
+      data: { ...mockPostDetail, modules: [], hasAsides: true },
     });
 
     await setup();
 
-    expect(screen.getByRole('radio', { name: 'Deep' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'Deep' })).toBeVisible();
   });
 
-  it('renders the reading-depth control with the 30s option once the post has an approved skim', async () => {
-    getPostPageMock.mockResolvedValue({
+  it('renders the 30s option and the skim panel once the post has a skim', async () => {
+    getPostMock.mockResolvedValueOnce({
       ok: true,
       data: {
         ...mockPostDetail,
+        modules: [],
         postTakeaways: {
           takeaways: ['First.', 'Second.', 'Third.'],
           generatedAt: '2026-01-01T00:00:00.000Z',
@@ -174,24 +153,10 @@ describe(`<${BlogPostPage.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByRole('radio', { name: '30s' })).toBeInTheDocument();
-  });
-
-  it('forwards the resolved slug/tenant to getPostPage', async () => {
-    getPostPageMock.mockResolvedValue({ ok: true, data: mockPostDetail });
-
-    await setup();
-
-    expect(getPostPageMock).toHaveBeenCalledWith('hello-world', 'tenant-1');
-  });
-
-  it('renders exactly one h1, from the post, with no heading fallback', async () => {
-    getPostPageMock.mockResolvedValue({ ok: true, data: mockPostDetail });
-
-    await setup();
-
-    const headings = screen.getAllByRole('heading', { level: 1 });
-    expect(headings).toHaveLength(1);
-    expect(headings[0]).toHaveTextContent('hello-world');
+    expect(screen.getByRole('radio', { name: '30s' })).toBeVisible();
+    const skim = within(screen.getByRole('main')).getByRole('region', {
+      name: '30-second summary',
+    });
+    expect(within(skim).getByText('First.')).toBeVisible();
   });
 });

@@ -6,11 +6,9 @@ import { LOCALE_ISO_CODES } from '@blog/config';
 import { GlobalErrorPage } from '@web/components/pages/global-error-page';
 
 /**
- * Replaces the entire document (including `<html>`/`<body>`) when the root
- * layout itself throws — the one place Next.js requires a route file to own
- * the document shell outside `app/layout.tsx`. Re-imports the global
- * stylesheet directly since it can't rely on the failed root layout having
- * already done so.
+ * Replaces the entire document when `[tenant]/[locale]/layout.tsx` (the root
+ * layout) throws, so it owns `<html>`/`<body>` and re-imports the global
+ * stylesheet that layout never got to load.
  */
 export default function GlobalError(props: {
   error: Error & { digest?: string };

@@ -1,4 +1,4 @@
-export {};
+import { logger } from '@web/utils/logger/logger';
 
 const { revalidateTagMock, revalidatePathMock, listTenantsMock } = vi.hoisted(
   () => ({
@@ -23,16 +23,9 @@ vi.mock('@web/utils/env/env', () => ({
   env: { SITE_CONFIG_REVALIDATE_SECRET: 'test-secret' },
 }));
 
-const { loggerWarnMock } = vi.hoisted(() => ({ loggerWarnMock: vi.fn() }));
+vi.mock('@web/utils/logger/logger');
 
-vi.mock('@web/utils/logger/logger', () => ({
-  logger: {
-    error: vi.fn(),
-    warn: loggerWarnMock,
-    info: vi.fn(),
-    debug: vi.fn(),
-  },
-}));
+let loggerWarnMock = vi.mocked(logger.warn);
 
 const makeRequest = (
   authorization?: string,
@@ -63,7 +56,9 @@ const makeRequestWithRawBody = (
 };
 
 describe('POST /api/revalidate-site-config', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
+    const fresh = await import('@web/utils/logger/logger');
+    loggerWarnMock = vi.mocked(fresh.logger.warn);
     revalidateTagMock.mockReset();
     revalidatePathMock.mockReset();
     listTenantsMock.mockReset();
@@ -114,7 +109,7 @@ describe('POST /api/revalidate-site-config', () => {
     });
   });
 
-  it('revalidates every known tenant’s scoped tags when no tenantId is provided (backward-compatible fallback)', async () => {
+  it("revalidates every tenant's scoped tags when no tenantId is provided", async () => {
     listTenantsMock.mockResolvedValue([{ id: 'tenant-1' }, { id: 'tenant-2' }]);
     const { POST } = await import('./route');
 
@@ -155,7 +150,7 @@ describe('POST /api/revalidate-site-config', () => {
     expect(revalidateTagMock).toHaveBeenCalledTimes(3);
   });
 
-  it('revalidates every known tenant’s scoped tags when the request body is malformed JSON', async () => {
+  it("revalidates every tenant's scoped tags when the request body is malformed JSON", async () => {
     listTenantsMock.mockResolvedValue([{ id: 'tenant-1' }]);
     const { POST } = await import('./route');
 

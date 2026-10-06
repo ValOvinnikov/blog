@@ -1,16 +1,20 @@
 import { BRAND_VARIANT } from '@blog/config';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import {
+  DEFAULT_REQUEST_CONTEXT,
+  DEFAULT_TENANT_SANITY_CONTEXT,
+} from '@web/testing/shared/tenant/fixtures';
 
 import { PostLatestModule } from './post-latest-module';
 
-const { getPostLatestMock, getTenantSanityContextMock } = vi.hoisted(() => ({
+const { getPostLatestMock } = vi.hoisted(() => ({
   getPostLatestMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
 }));
+
+vi.mock('@web/i18n/navigation');
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -20,25 +24,19 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
+vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
+const getRequestContextMock = vi.mocked(getRequestContext);
 
 const setup = customRenderAsync(PostLatestModule, {
   id: 'post-latest-1',
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${PostLatestModule.name}/>`, () => {
   beforeEach(() => {
     getPostLatestMock.mockReset();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
+    getRequestContextMock.mockReset();
+    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
   it('calls getPostLatest with the module id and resolved tenant Sanity context', async () => {
@@ -67,7 +65,10 @@ describe(`<${PostLatestModule.name}/>`, () => {
       dataset: 'production',
       token: 'tenant-token',
     };
-    getTenantSanityContextMock.mockResolvedValue(tenant);
+    getRequestContextMock.mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      sanityContext: tenant,
+    });
     getPostLatestMock.mockResolvedValue({
       ok: true,
       data: {
@@ -82,7 +83,6 @@ describe(`<${PostLatestModule.name}/>`, () => {
     await setup();
 
     expect(getPostLatestMock).toHaveBeenCalledWith('post-latest-1', tenant);
-    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
   });
 
   it('renders nothing when the fetch fails', async () => {
@@ -96,7 +96,7 @@ describe(`<${PostLatestModule.name}/>`, () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('renders nothing when no posts resolve, never an empty landmark with a dangling aria-labelledby', async () => {
+  it('renders nothing when no posts resolve, never an empty labelled landmark', async () => {
     getPostLatestMock.mockResolvedValue({
       ok: true,
       data: {
@@ -137,7 +137,7 @@ describe(`<${PostLatestModule.name}/>`, () => {
 
     await setup();
 
-    expect(screen.getByText('First post')).toBeInTheDocument();
+    expect(screen.getByText('First post')).toBeVisible();
     expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
   });
 
@@ -168,9 +168,7 @@ describe(`<${PostLatestModule.name}/>`, () => {
 
     await setup();
 
-    expect(
-      screen.getByRole('img', { name: sanityImage.alt }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: sanityImage.alt })).toBeVisible();
   });
 
   it('renders no post images when showImages is false', async () => {

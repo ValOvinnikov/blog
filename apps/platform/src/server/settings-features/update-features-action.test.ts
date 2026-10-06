@@ -1,5 +1,9 @@
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import { auth } from '@platform/server/auth/auth';
+import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { logger } from '@platform/utils/logger/logger';
+import type { Session } from 'next-auth';
 
 import {
   updateFeaturesAction,
@@ -7,36 +11,24 @@ import {
 } from './update-features-action';
 
 const {
-  requireTenantMembershipMock,
-  authMock,
   upsertSettingsFeaturesMock,
   revalidateSiteConfigMock,
   insertAuditEventMock,
-  loggerErrorMock,
-  loggerWarnMock,
 } = vi.hoisted(() => ({
-  requireTenantMembershipMock: vi.fn(),
-  authMock: vi.fn(),
   upsertSettingsFeaturesMock: vi.fn(),
   revalidateSiteConfigMock: vi.fn(),
   insertAuditEventMock: vi.fn(),
-  loggerErrorMock: vi.fn(),
-  loggerWarnMock: vi.fn(),
 }));
 
-vi.mock('@platform/server/auth/require-tenant-membership', () => ({
-  requireTenantMembership: requireTenantMembershipMock,
-}));
+vi.mock('@platform/server/auth/require-tenant-membership');
 
-vi.mock('@platform/server/auth/auth', () => ({ auth: authMock }));
+vi.mock('@platform/server/auth/auth');
 
 vi.mock('@platform/server/site-config/revalidate-site-config', () => ({
   revalidateSiteConfig: revalidateSiteConfigMock,
 }));
 
-vi.mock('@platform/utils/logger/logger', () => ({
-  logger: { error: loggerErrorMock, warn: loggerWarnMock },
-}));
+vi.mock('@platform/utils/logger/logger');
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
@@ -46,15 +38,23 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
+const requireTenantMembershipMock = vi.mocked<
+  (tenantId: string) => Promise<unknown>
+>(requireTenantMembership);
+const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
+const loggerErrorMock = vi.mocked(logger.error);
+const loggerWarnMock = vi.mocked(logger.warn);
+
 const FREE_TENANT = { id: 'tenant-1', plan: 'FREE' };
 const GROWTH_TENANT = { id: 'tenant-2', plan: 'GROWTH' };
 
 const VALID_INPUT: TUpdateFeaturesInput = {
-  commentsEnabled: true,
-  ratingsEnabled: true,
-  bookmarksEnabled: true,
+  commentsEnabled: false,
+  ratingsEnabled: false,
+  bookmarksEnabled: false,
   newsletterEnabled: false,
   analyticsEnabled: false,
+  consentBannerEnabled: true,
 };
 
 describe(updateFeaturesAction, () => {
@@ -73,7 +73,7 @@ describe(updateFeaturesAction, () => {
     loggerWarnMock.mockReset();
   });
 
-  it('re-resolves the tenant from the session against the routed tenant id before writing anything', async () => {
+  it('re-resolves the tenant from the session against the routed id before writing', async () => {
     requireTenantMembershipMock.mockResolvedValue({
       tenant: FREE_TENANT,
       membership: { role: 'OWNER' },
@@ -112,7 +112,7 @@ describe(updateFeaturesAction, () => {
     expect(requireTenantMembershipMock).not.toHaveBeenCalled();
   });
 
-  it("rejects an attempt to enable a GROWTH-only capability on a FREE tenant, bypassing the UI's disabled control, and writes nothing", async () => {
+  it('rejects enabling a GROWTH-only capability on a FREE tenant, and writes nothing', async () => {
     requireTenantMembershipMock.mockResolvedValue({
       tenant: FREE_TENANT,
       membership: { role: 'OWNER' },
@@ -120,7 +120,7 @@ describe(updateFeaturesAction, () => {
 
     const result = await updateFeaturesAction('tenant-1', {
       ...VALID_INPUT,
-      newsletterEnabled: true,
+      analyticsEnabled: true,
     });
 
     expect(result).toEqual({ ok: false });
@@ -129,7 +129,7 @@ describe(updateFeaturesAction, () => {
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
-  it('is not tripped by a stale-then-clamped out-of-plan field: a FREE tenant saving only an entitled-field change succeeds', async () => {
+  it('lets a FREE tenant save an entitled field despite a clamped out-of-plan one', async () => {
     requireTenantMembershipMock.mockResolvedValue({
       tenant: FREE_TENANT,
       membership: { role: 'OWNER' },
@@ -138,15 +138,15 @@ describe(updateFeaturesAction, () => {
 
     const result = await updateFeaturesAction('tenant-1', {
       ...VALID_INPUT,
-      commentsEnabled: false,
-      newsletterEnabled: false,
+      bookmarksEnabled: false,
+      analyticsEnabled: false,
     });
 
     expect(result).toEqual({ ok: true });
     expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith('tenant-1', {
       ...VALID_INPUT,
-      commentsEnabled: false,
-      newsletterEnabled: false,
+      bookmarksEnabled: false,
+      analyticsEnabled: false,
     });
   });
 
@@ -159,16 +159,54 @@ describe(updateFeaturesAction, () => {
 
     const result = await updateFeaturesAction('tenant-2', {
       ...VALID_INPUT,
-      newsletterEnabled: true,
       analyticsEnabled: true,
     });
 
     expect(result).toEqual({ ok: true });
     expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith('tenant-2', {
       ...VALID_INPUT,
-      newsletterEnabled: true,
       analyticsEnabled: true,
     });
+  });
+
+  it('writes Comments, Ratings and Newsletter off even when the payload switches them on', async () => {
+    requireTenantMembershipMock.mockResolvedValue({
+      tenant: GROWTH_TENANT,
+      membership: { role: 'OWNER' },
+    });
+    upsertSettingsFeaturesMock.mockResolvedValue({});
+
+    const result = await updateFeaturesAction('tenant-2', {
+      ...VALID_INPUT,
+      commentsEnabled: true,
+      ratingsEnabled: true,
+      newsletterEnabled: true,
+    });
+
+    expect(result).toEqual({ ok: true });
+    expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(
+      'tenant-2',
+      VALID_INPUT,
+    );
+  });
+
+  it('does not reject a FREE tenant for switching on a "Coming soon" capability outside its plan', async () => {
+    requireTenantMembershipMock.mockResolvedValue({
+      tenant: FREE_TENANT,
+      membership: { role: 'OWNER' },
+    });
+    upsertSettingsFeaturesMock.mockResolvedValue({});
+
+    const result = await updateFeaturesAction('tenant-1', {
+      ...VALID_INPUT,
+      newsletterEnabled: true,
+    });
+
+    expect(result).toEqual({ ok: true });
+    expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(
+      'tenant-1',
+      VALID_INPUT,
+    );
   });
 
   it('reports failure instead of throwing when the write itself fails', async () => {

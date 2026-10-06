@@ -5,8 +5,10 @@ import { makeTenant } from '@blog/service/testing/tenant';
 
 import { getNavigation } from './loader';
 
-vi.mock('@blog/service/sanity/query', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@blog/service/sanity/query')>()),
+vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
+  ...(await importOriginal<
+    typeof import('@blog/service/sanity/query/query')
+  >()),
   runQuery: vi.fn(),
 }));
 
@@ -52,6 +54,24 @@ describe('getNavigation', () => {
         ariaLabel: undefined,
       },
     ]);
+  });
+
+  it('leaves the language switcher toggle undefined when unset', async () => {
+    mockRun.mockResolvedValue(makeRawNavigation());
+
+    const result = await getNavigation(tenant);
+
+    expect(result.showLanguageSwitcher).toBeUndefined();
+  });
+
+  it('passes the language switcher toggle through when set', async () => {
+    mockRun.mockResolvedValue(
+      makeRawNavigation({ showLanguageSwitcher: true }),
+    );
+
+    const result = await getNavigation(tenant);
+
+    expect(result.showLanguageSwitcher).toBe(true);
   });
 
   it('threads tenant context into runQuery and scopes the tags to it', async () => {

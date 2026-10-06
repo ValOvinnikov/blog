@@ -1,3 +1,5 @@
+import { toPageTranslations } from '@blog/service/shared/localization/page-translations/to-page-translations';
+import type { TFaqPageQuestion } from '@blog/service/shared/transformers/faq/resolve-faqs';
 import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
 import {
   toHeroSlot,
@@ -16,12 +18,15 @@ function toTagDetailPageTag(rawTag: TRawTagDetailPageTag): TTagDetailPageTag {
   return {
     id: rawTag._id,
     title: rawTag.title,
-    slug: rawTag.slug,
+    slug: rawTag.slug ?? undefined,
     description: rawTag.description ?? undefined,
   };
 }
 
-export function toTagDetailPage(rawPage: TRawTagPage): TTagDetailPage {
+export function toTagDetailPage(
+  rawPage: TRawTagPage,
+  faqs: TFaqPageQuestion[],
+): TTagDetailPage {
   const tag = toTagDetailPageTag(rawPage.tag);
 
   return {
@@ -29,6 +34,8 @@ export function toTagDetailPage(rawPage: TRawTagPage): TTagDetailPage {
     headingBlock: toHeadingBlock(rawPage.headingBlock),
     hero: toHeroSlot(rawPage.hero),
     modules: (rawPage.modules ?? []).map(toModule),
+    faqs,
     seo: resolveSeo(rawPage.seo),
+    translations: toPageTranslations(rawPage.translations),
   };
 }

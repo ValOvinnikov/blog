@@ -3,12 +3,13 @@ import {
   customRenderAsync,
   screen,
 } from '@web/testing/custom-render';
+import { logger } from '@web/utils/logger/logger';
 
 import { renderHeroModule, renderModules } from './module-renderer';
 
-const { ctaModuleMock, postListModuleMock, heroModuleMock, loggerWarnMock } =
-  vi.hoisted(() => ({
-    ctaModuleMock: vi.fn(({ id }: { id: string; locale: string }) => (
+const { ctaModuleMock, postListModuleMock, heroModuleMock } = vi.hoisted(
+  () => ({
+    ctaModuleMock: vi.fn(({ id }: { id: string }) => (
       <div data-testid="stub-cta">{id}</div>
     )),
     postListModuleMock: vi.fn(({ id }: { id: string }) => (
@@ -17,17 +18,12 @@ const { ctaModuleMock, postListModuleMock, heroModuleMock, loggerWarnMock } =
     heroModuleMock: vi.fn(async ({ id }: { id: string }) => (
       <div data-testid="stub-hero">{id}</div>
     )),
-    loggerWarnMock: vi.fn(),
-  }));
+  }),
+);
 
-vi.mock('@web/utils/logger/logger', () => ({
-  logger: {
-    error: vi.fn(),
-    warn: loggerWarnMock,
-    info: vi.fn(),
-    debug: vi.fn(),
-  },
-}));
+vi.mock('@web/utils/logger/logger');
+
+const loggerWarnMock = vi.mocked(logger.warn);
 
 const moduleMap = {
   module_cta: ctaModuleMock,
@@ -42,8 +38,6 @@ describe(renderModules.name, () => {
   const setup = customRender(renderModules, {
     modules: [{ type: 'module_cta', id: 'cta-doc-id' }],
     map: moduleMap,
-    locale: 'en',
-    tenant: 'tenant-1',
   });
 
   it('renders the mapped component for a known module type with its id', () => {
@@ -52,14 +46,12 @@ describe(renderModules.name, () => {
     expect(screen.getByTestId('stub-cta')).toHaveTextContent('cta-doc-id');
   });
 
-  it('forwards id, locale, and tenant to every module component', () => {
+  it('forwards id to every module component', () => {
     setup();
 
     expect(ctaModuleMock).toHaveBeenCalledWith(
       {
         id: 'cta-doc-id',
-        locale: 'en',
-        tenant: 'tenant-1',
       },
       undefined,
     );
@@ -71,8 +63,6 @@ describe(renderModules.name, () => {
     expect(ctaModuleMock).toHaveBeenCalledWith(
       {
         id: 'cta-doc-id',
-        locale: 'en',
-        tenant: 'tenant-1',
         context: { page: 2 },
       },
       undefined,
@@ -122,8 +112,6 @@ describe(renderHeroModule.name, () => {
   const setup = customRenderAsync(renderHeroModule, {
     hero: { id: 'hero-doc-id', type: 'module_hero' },
     map: heroMap,
-    locale: 'en',
-    tenant: 'tenant-1',
   });
 
   it('dispatches to the registered hero component for a known type', async () => {
@@ -132,13 +120,11 @@ describe(renderHeroModule.name, () => {
     expect(screen.getByTestId('stub-hero')).toHaveTextContent('hero-doc-id');
   });
 
-  it('forwards id, locale, and tenant to the registered hero component', async () => {
+  it('forwards id to the registered hero component', async () => {
     await setup();
 
     expect(heroModuleMock).toHaveBeenCalledWith({
       id: 'hero-doc-id',
-      locale: 'en',
-      tenant: 'tenant-1',
     });
   });
 

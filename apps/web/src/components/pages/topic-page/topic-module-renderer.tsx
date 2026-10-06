@@ -5,7 +5,9 @@ import type {
 } from '@blog/config';
 import type { TModule } from '@blog/service';
 import { PageHeading } from '@web/components/shared/page-heading';
+import { ContentModule } from '@web/modules/content/content-module';
 import { CtaModule } from '@web/modules/cta/cta-module';
+import { FaqModule } from '@web/modules/faq/faq-module';
 import { HeroBlogModule } from '@web/modules/hero-blog/hero-blog-module';
 import {
   renderHeroModule,
@@ -26,14 +28,14 @@ const TOPIC_MAP: Partial<Record<TPageTopicType, TModuleComponent>> = {
   module_taxonomyList: TaxonomyListModule,
   module_cta: CtaModule,
   module_newsletter: NewsletterModule,
+  module_content: ContentModule,
+  module_faq: FaqModule,
 };
 
 export interface ITopicModuleRendererProps {
   hero: TMaybeUndefined<TModule<TPageTopicType>>;
   headingBlock: THeadingBlock;
   modules: TModule<TPageTopicType>[];
-  locale: string;
-  tenant: string;
   context?: TModuleComponentProps['context'];
   children?: ReactNode;
 }
@@ -42,20 +44,18 @@ export const TopicModuleRenderer = async ({
   hero,
   headingBlock,
   modules,
-  locale,
-  tenant,
   context,
   children,
 }: ITopicModuleRendererProps): Promise<ReactNode> => {
   const heroNode = hero
-    ? await renderHeroModule({ hero, map: TOPIC_MAP, locale, tenant })
+    ? await renderHeroModule({ hero, map: TOPIC_MAP })
     : null;
 
   return (
     <>
       {heroNode ?? <PageHeading headingBlock={headingBlock} />}
       {children}
-      {renderModules({ modules, map: TOPIC_MAP, locale, tenant, context })}
+      {renderModules({ modules, map: TOPIC_MAP, context })}
     </>
   );
 };

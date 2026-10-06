@@ -3,16 +3,15 @@ import type {
   TMaybeUndefined,
   TPageTagType,
 } from '@blog/config';
+import type { TPageTranslation } from '@blog/service/shared/localization/page-translations/to-page-translations';
+import type { TFaqPageQuestion } from '@blog/service/shared/transformers/faq/resolve-faqs';
 import type { TModule } from '@blog/service/shared/transformers/module/to-module';
 import type { TSeoResolved } from '@blog/service/shared/transformers/seo/resolve-seo';
 
-// The tag page's own richer tag shape — `description` on top of the minimal
-// `{id,title,slug}` chip shape `TTag` provides for the post-detail tags
-// projection.
 export type TTagDetailPageTag = {
   id: string;
   title: string;
-  slug: string;
+  slug: TMaybeUndefined<string>;
   description: TMaybeUndefined<string>;
 };
 
@@ -21,5 +20,7 @@ export type TTagDetailPage = {
   headingBlock: THeadingBlock;
   hero: TMaybeUndefined<TModule<TPageTagType>>;
   modules: TModule<TPageTagType>[];
+  faqs: TFaqPageQuestion[];
   seo: TSeoResolved;
+  translations: TPageTranslation[];
 };

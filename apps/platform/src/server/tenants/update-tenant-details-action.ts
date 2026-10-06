@@ -1,6 +1,11 @@
 'use server';
 
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE, DOMAIN_PATTERN } from '@blog/config';
+import {
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  DOMAIN_PATTERN,
+  isLocaleIsoCode,
+} from '@blog/config';
 import { queries, TENANT_PLAN, type TTenantPlan } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
@@ -17,7 +22,9 @@ const updateTenantDetailsInputSchema = z.object({
     .toLowerCase()
     .regex(DOMAIN_PATTERN, 'Enter a valid domain.'),
   plan: z.enum(Object.values(TENANT_PLAN) as [TTenantPlan, ...TTenantPlan[]]),
-  locale: z.string().trim().min(1, 'Enter a locale.'),
+  locale: z.string().refine(isLocaleIsoCode, {
+    message: 'Choose a supported language.',
+  }),
   ownerEmail: z
     .string()
     .trim()
@@ -82,6 +89,13 @@ export const updateTenantDetailsAction = async (
   if (tenant.deprovisionedAt) {
     const t = await getTranslations('tenantDetailsPanel');
     return { ok: false, error: t('archivedError') };
+  }
+  if (
+    parsed.data.locale !== tenant.locale &&
+    tenant.additionalLocales.includes(parsed.data.locale)
+  ) {
+    const t = await getTranslations('tenantDetailsPanel');
+    return { ok: false, error: t('localeIsAdditionalError') };
   }
 
   try {

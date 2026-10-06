@@ -1,15 +1,15 @@
 import { BRAND_VARIANT, HERO_VARIANT, SOCIAL_PLATFORMS } from '@blog/config';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { STATIC_SANITY_IMAGE_BASE_URL } from '@web/testing/providers';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { HeroProfileModule } from './hero-profile-module';
 
-const { getHeroProfileMock, getTenantSanityContextMock } = vi.hoisted(() => ({
+const { getHeroProfileMock } = vi.hoisted(() => ({
   getHeroProfileMock: vi.fn(),
-  getTenantSanityContextMock: vi.fn(),
 }));
 
 vi.mock('@blog/service', () => ({
@@ -20,9 +20,9 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/server/tenant/get-tenant-sanity-context', () => ({
-  getTenantSanityContext: getTenantSanityContextMock,
-}));
+vi.mock('@web/server/request-context/request-context');
+
+const getRequestContextMock = vi.mocked(getRequestContext);
 
 const makeHeroProfileData = (overrides: Record<string, unknown> = {}) => ({
   brandVariant: BRAND_VARIANT.PRIMARY,
@@ -42,15 +42,13 @@ const makeHeroProfileData = (overrides: Record<string, unknown> = {}) => ({
 
 const setup = customRenderAsync(HeroProfileModule, {
   id: 'hero-profile-1',
-  locale: 'en',
-  tenant: 'tenant-1',
 });
 
 describe(`<${HeroProfileModule.name}/>`, () => {
   beforeEach(() => {
     getHeroProfileMock.mockReset();
-    getTenantSanityContextMock.mockReset();
-    getTenantSanityContextMock.mockResolvedValue(DEFAULT_TENANT_SANITY_CONTEXT);
+    getRequestContextMock.mockReset();
+    getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
   it('forwards the resolved tenant Sanity context to getHeroProfile', async () => {
@@ -59,7 +57,10 @@ describe(`<${HeroProfileModule.name}/>`, () => {
       dataset: 'production',
       token: 'tenant-token',
     };
-    getTenantSanityContextMock.mockResolvedValue(tenant);
+    getRequestContextMock.mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      sanityContext: tenant,
+    });
     getHeroProfileMock.mockResolvedValue({
       ok: true,
       data: makeHeroProfileData(),
@@ -68,7 +69,6 @@ describe(`<${HeroProfileModule.name}/>`, () => {
     await setup();
 
     expect(getHeroProfileMock).toHaveBeenCalledWith('hero-profile-1', tenant);
-    expect(getTenantSanityContextMock).toHaveBeenCalledWith('tenant-1');
   });
 
   it('renders nothing when the fetch fails', async () => {
@@ -95,7 +95,7 @@ describe(`<${HeroProfileModule.name}/>`, () => {
     ).toBeVisible();
   });
 
-  it('renders the hero image src from the configured Sanity CDN base URL, not a hardcoded origin', async () => {
+  it('renders the hero image src from the configured Sanity CDN base URL', async () => {
     const sanityImage = makeSanityImage();
     getHeroProfileMock.mockResolvedValue({
       ok: true,
@@ -121,7 +121,7 @@ describe(`<${HeroProfileModule.name}/>`, () => {
     expect(screen.queryByRole('list')).not.toBeInTheDocument();
   });
 
-  it('renders a labelled list of the resolved social links, each honouring the authored target and rendering a platform icon with an accessible name', async () => {
+  it('renders a labelled list of social links with their targets and named icons', async () => {
     getHeroProfileMock.mockResolvedValue({
       ok: true,
       data: makeHeroProfileData({

@@ -1,9 +1,10 @@
 import type { TMaybeUndefined } from '@blog/config';
+import { isr } from '@blog/service/sanity/query/isr';
 import {
-  isr,
   runQuery,
   type TTenantSanityContext,
-} from '@blog/service/sanity/query';
+} from '@blog/service/sanity/query/query';
+import { getPageFaqs } from '@blog/service/shared/adaptors/faq-questions/page-faqs';
 
 import { topicPageQuery } from './query';
 import { toTopicDetailPage } from './transformer';
@@ -16,9 +17,9 @@ export async function getTopicPage(
   const rawPage = await runQuery(topicPageQuery, {
     parameters: { slug },
     tenant,
-    ...isr(['page_topic', 'topic'], tenant.projectId),
+    ...isr(['page_topic', 'template_topic', 'topic'], tenant.projectId),
   });
   if (!rawPage) return undefined;
 
-  return toTopicDetailPage(rawPage);
+  return toTopicDetailPage(rawPage, await getPageFaqs(rawPage.modules, tenant));
 }

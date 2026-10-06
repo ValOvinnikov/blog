@@ -11,5 +11,6 @@ export type TRawNavigation = NonNullable<
 export function toNavigation(raw: TRawNavigation): TNavigation {
   return {
     items: (raw.items ?? []).flatMap((item) => toLinkDocument(item.link) ?? []),
+    showLanguageSwitcher: raw.showLanguageSwitcher ?? undefined,
   };
 }

@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
@@ -32,7 +33,7 @@ const args = {
   primaryDomain: 'acme.example.com',
   sanityProjectId: 'proj-acme',
   sanityDataset: 'production',
-  locale: 'en',
+  locale: LOCALE_ISO_CODES.EN,
   ownerEmail: 'owner@example.com',
   plan: TENANT_PLAN.FREE,
   status: TENANT_STATUS.ACTIVE,
@@ -48,7 +49,7 @@ function tenant(overrides: Partial<TTenant> = {}): TTenant {
     sanityDataset: 'production',
     sanityReadTokenEncrypted: null,
     sanityWriteTokenEncrypted: null,
-    locale: 'en',
+    locale: LOCALE_ISO_CODES.EN,
     plan: TENANT_PLAN.FREE,
     status: TENANT_STATUS.ACTIVE,
     provisioningStatus: null,

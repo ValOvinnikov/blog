@@ -14,6 +14,9 @@ const { clearTenantArtifactsMock } = vi.hoisted(() => ({
 const { archiveTenantRowMock } = vi.hoisted(() => ({
   archiveTenantRowMock: vi.fn(),
 }));
+const { purgeTenantReaderDataMock } = vi.hoisted(() => ({
+  purgeTenantReaderDataMock: vi.fn(),
+}));
 const { invalidateTenantCacheMock } = vi.hoisted(() => ({
   invalidateTenantCacheMock: vi.fn(),
 }));
@@ -29,6 +32,9 @@ vi.mock('./steps/clear-artifacts', () => ({
 }));
 vi.mock('./steps/archive-tenant', () => ({
   archiveTenantRow: archiveTenantRowMock,
+}));
+vi.mock('./steps/purge-reader-data', () => ({
+  purgeTenantReaderData: purgeTenantReaderDataMock,
 }));
 vi.mock('./steps/invalidate-tenant-cache', () => ({
   invalidateTenantCache: invalidateTenantCacheMock,
@@ -77,6 +83,7 @@ beforeEach(() => {
   revokeTenantSanityTokensMock.mockReset().mockResolvedValue(undefined);
   clearTenantArtifactsMock.mockReset().mockResolvedValue(undefined);
   archiveTenantRowMock.mockReset().mockResolvedValue(undefined);
+  purgeTenantReaderDataMock.mockReset().mockResolvedValue(undefined);
   invalidateTenantCacheMock.mockReset().mockResolvedValue(undefined);
 });
 
@@ -99,6 +106,7 @@ describe(runSteps, () => {
     expect(patchInit.body).toBe(JSON.stringify({ isDisabledByUser: true }));
     expect(clearTenantArtifactsMock).toHaveBeenCalledTimes(1);
     expect(archiveTenantRowMock).toHaveBeenCalledTimes(1);
+    expect(purgeTenantReaderDataMock).toHaveBeenCalledTimes(1);
     expect(invalidateTenantCacheMock).toHaveBeenCalledTimes(1);
   });
 

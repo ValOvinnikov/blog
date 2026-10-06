@@ -1,6 +1,6 @@
 import { routes, TAXONOMY_KIND } from '@blog/config';
 import { service } from '@blog/service';
-import { getTenantSanityContext } from '@web/server/tenant/get-tenant-sanity-context';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
@@ -12,18 +12,13 @@ import {
 
 export interface ITaxonomyListModuleProps {
   id: string;
-  locale?: string;
-  tenant: string;
 }
 
-export const TaxonomyListModule = async ({
-  id,
-  tenant,
-}: ITaxonomyListModuleProps) => {
-  const tenantContext = await getTenantSanityContext(tenant);
+export const TaxonomyListModule = async ({ id }: ITaxonomyListModuleProps) => {
+  const { sanityContext } = await getRequestContext();
   const result = await service.modules.taxonomyList.v1.getTaxonomyList(
     id,
-    tenantContext,
+    sanityContext,
   );
 
   if (!result.ok) {
@@ -48,19 +43,26 @@ export const TaxonomyListModule = async ({
   const t = await getTranslations(`taxonomyListModule.${namespace}`);
   const buildHref = taxonomy === TAXONOMY_KIND.TAGS ? routes.tag : routes.topic;
 
-  const items: ITaxonomyListModuleItem[] = entries.map((entry) => ({
-    id: entry.id,
-    title: entry.title,
-    description: entry.description,
-    postCountLabel: t('postsCount', { count: entry.postCount }),
-    href: buildHref(entry.slug),
-    posts: entry.latestPosts.map((post) => ({
-      id: post.id,
-      title: post.title,
-      href: routes.post(post.slug),
-    })),
-    latestPostsLabel: t('latestPostsLabel', { name: entry.title }),
-  }));
+  const items: ITaxonomyListModuleItem[] = entries.flatMap(
+    ({ id: entryId, title, slug, description, postCount, latestPosts }) =>
+      slug
+        ? [
+            {
+              id: entryId,
+              title,
+              description,
+              postCountLabel: t('postsCount', { count: postCount }),
+              href: buildHref(slug),
+              posts: latestPosts.map((post) => ({
+                id: post.id,
+                title: post.title,
+                href: routes.post(post.slug),
+              })),
+              latestPostsLabel: t('latestPostsLabel', { name: title }),
+            },
+          ]
+        : [],
+  );
 
   return (
     <TaxonomyListModuleView

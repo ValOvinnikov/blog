@@ -3,6 +3,7 @@ import { getDb } from '@blog/db/client';
 import { type TTenantPlan, type TTenantStatus } from '@blog/db/constants';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
 import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
+import { normalizeLocaleCode } from '@blog/db/utils/normalize-locale-code/normalize-locale-code';
 import type { TResult } from '@blog/utils';
 
 export type TCreateTenantInput = {
@@ -24,7 +25,10 @@ export async function createTenant(
 
   const db = getDb();
 
-  const [inserted] = await db.insert(tenants).values(input).returning();
+  const [inserted] = await db
+    .insert(tenants)
+    .values({ ...input, locale: normalizeLocaleCode(input.locale) })
+    .returning();
 
   if (!inserted) {
     throw new Error('createTenant: insert returned no row.');

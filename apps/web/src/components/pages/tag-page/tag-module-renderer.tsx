@@ -5,7 +5,9 @@ import type {
 } from '@blog/config';
 import type { TModule } from '@blog/service';
 import { PageHeading } from '@web/components/shared/page-heading';
+import { ContentModule } from '@web/modules/content/content-module';
 import { CtaModule } from '@web/modules/cta/cta-module';
+import { FaqModule } from '@web/modules/faq/faq-module';
 import { HeroBlogModule } from '@web/modules/hero-blog/hero-blog-module';
 import {
   renderHeroModule,
@@ -26,6 +28,8 @@ const TAG_MAP: Partial<Record<TPageTagType, TModuleComponent>> = {
   module_taxonomyList: TaxonomyListModule,
   module_cta: CtaModule,
   module_newsletter: NewsletterModule,
+  module_content: ContentModule,
+  module_faq: FaqModule,
 };
 
 export interface ITagModuleRendererProps {
@@ -34,8 +38,6 @@ export interface ITagModuleRendererProps {
   hasTrailingSpace?: boolean;
   modules: TModule<TPageTagType>[];
   context?: TModuleComponentProps['context'];
-  locale: string;
-  tenant: string;
 }
 
 export const TagModuleRenderer = async ({
@@ -44,12 +46,8 @@ export const TagModuleRenderer = async ({
   hasTrailingSpace,
   modules,
   context,
-  locale,
-  tenant,
 }: ITagModuleRendererProps): Promise<ReactNode> => {
-  const heroNode = hero
-    ? await renderHeroModule({ hero, map: TAG_MAP, locale, tenant })
-    : null;
+  const heroNode = hero ? await renderHeroModule({ hero, map: TAG_MAP }) : null;
 
   return (
     <>
@@ -59,7 +57,7 @@ export const TagModuleRenderer = async ({
           hasTrailingSpace={hasTrailingSpace}
         />
       )}
-      {renderModules({ modules, map: TAG_MAP, locale, tenant, context })}
+      {renderModules({ modules, map: TAG_MAP, context })}
     </>
   );
 };
