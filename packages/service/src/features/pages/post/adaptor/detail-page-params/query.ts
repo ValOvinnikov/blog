@@ -1,10 +1,15 @@
 import { q } from '@blog/service/sanity/query/query';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/post/published-post';
+import type { TPageQueryPageParams } from '@blog/service/shared/types/page/page-query-page-params';
 
-export const postParamsQuery = q.star
-  .filterByType('page_post')
+export const postParamsQuery = q
+  .parameters<TPageQueryPageParams>()
+  .star.filterByType('page_post')
+  // groqd's typed filterBy has no `in` operator
+  .filterRaw('language in $locales')
   .filterRaw(PUBLISHED_POST_FILTER)
   .project((sub) => ({
     slug: sub.field('slug.current').notNull(),
+    language: sub.field('language').notNull(),
     publishedAt: sub.field('publishedAt').notNull(),
   }));

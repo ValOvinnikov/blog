@@ -28,6 +28,10 @@ const translationMap: TTranslationMap = {
       { documentType: 'page_tag', language: EN, slug: 'typescript' },
       { documentType: 'page_tag', language: NL, slug: 'typescript-nl' },
     ],
+    [
+      { documentType: 'page_post', language: EN, slug: 'my-article' },
+      { documentType: 'page_post', language: NL, slug: 'mijn-artikel' },
+    ],
   ],
 };
 
@@ -77,6 +81,19 @@ describe(findTranslatedPath, () => {
 
   it('finds the first page of the translation from a numbered archive page', () => {
     expect(find('/topics/design/page/3')).toBe('/nl/topics/ontwerp');
+  });
+
+  it("finds a post's translation under its own slug", () => {
+    expect(find('/blog/my-article')).toBe('/nl/blog/mijn-artikel');
+    expect(find('/blog/mijn-artikel', NL, EN)).toBe('/blog/my-article');
+  });
+
+  it('is undefined for a post with no translation in that language', () => {
+    expect(find('/blog/my-article', EN, FR)).toBeUndefined();
+  });
+
+  it('does not match a post slug against a landing page', () => {
+    expect(find('/my-article')).toBeUndefined();
   });
 
   it('is undefined for a Topic page with no translation in that language', () => {

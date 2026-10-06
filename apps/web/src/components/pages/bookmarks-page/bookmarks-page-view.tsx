@@ -4,7 +4,7 @@ import {
   BookmarksList,
   type IBookmarkRow,
 } from '@blog/ui/components/organisms/bookmarks-list';
-import { SmartLink } from '@web/components/shared/smart-link';
+import NextLink from 'next/link';
 
 import { bookmarksPageVariants } from './bookmarks-page-variants';
 
@@ -27,10 +27,6 @@ export interface IBookmarksPageViewProps {
   hint?: string;
 }
 
-/**
- * `posts` is the already auth/tenant/db-resolved, post-joined bookmark
- * list — this component has no knowledge of auth, tenant, or the db layer.
- */
 export const BookmarksPageView = ({
   heading,
   listHeading,
@@ -57,7 +53,7 @@ export const BookmarksPageView = ({
             rows={rows}
             emptyMessage={emptyMessage}
             hint={rows.length > 0 ? hint : undefined}
-            linkAs={SmartLink}
+            linkAs={NextLink}
           />
         </Panel.Body>
       </Panel>

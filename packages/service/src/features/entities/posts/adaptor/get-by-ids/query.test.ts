@@ -1,19 +1,34 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
+import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import {
+  toIds,
+  translatedPostDocuments,
+} from '@blog/service/testing/shared/translated-posts-dataset';
 
 import { postsByIdsQuery } from './query';
 
+const { EN, NL } = LOCALE_ISO_CODES;
+
 describe('postsByIdsQuery', () => {
-  it('parses a post card', () => {
-    const raw = [makeRawPostCard()];
+  it('parses a post card with its language', () => {
+    const raw = [{ ...makeRawPostCard(), language: EN }];
 
     expect(() => postsByIdsQuery.parse(raw)).not.toThrow();
   });
 
-  it('filters by the given id list', () => {
-    expect(postsByIdsQuery.query).toContain('_id in $ids');
-  });
+  it('resolves the given published posts whatever the request language', async () => {
+    const posts = await evaluateGroqExpression(
+      postsByIdsQuery.query,
+      translatedPostDocuments,
+      undefined,
+      {
+        ids: ['design-en', 'design-nl', 'scheduled-nl', 'missing'],
+        locale: NL,
+        defaultLocale: EN,
+      },
+    );
 
-  it('excludes posts whose publishedAt is in the future', () => {
-    expect(postsByIdsQuery.query).toContain('publishedAt <= now()');
+    expect(toIds(posts)).toEqual(['design-en', 'design-nl']);
   });
 });

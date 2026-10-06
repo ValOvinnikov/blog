@@ -58,4 +58,5 @@ export const mockPostDetail: TPostDetail = {
   },
   tags: [],
   readingTimeMinutes: 4,
+  translations: [],
 };

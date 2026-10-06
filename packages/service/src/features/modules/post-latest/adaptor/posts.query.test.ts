@@ -1,26 +1,28 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import {
+  toIds,
+  translatedPostDocuments,
+} from '@blog/service/testing/shared/translated-posts-dataset';
+
 import { postLatestModulePostsQuery } from './posts.query';
 
+const { EN, NL } = LOCALE_ISO_CODES;
+
+async function run(limit: number, locale: string): Promise<string[]> {
+  return toIds(
+    await evaluateGroqExpression(
+      postLatestModulePostsQuery(limit).query,
+      translatedPostDocuments,
+      undefined,
+      { locale, defaultLocale: EN },
+    ),
+  );
+}
+
 describe('postLatestModulePostsQuery', () => {
-  it('limits the posts to the given count in GROQ (end-exclusive slice)', () => {
-    expect(postLatestModulePostsQuery(3).query).toContain('[0...3]');
-    expect(postLatestModulePostsQuery(6).query).toContain('[0...6]');
-  });
-
-  it('orders by newest first', () => {
-    expect(postLatestModulePostsQuery(3).query).toContain(
-      'order(publishedAt desc)',
-    );
-  });
-
-  it('excludes posts whose publishedAt is in the future', () => {
-    expect(postLatestModulePostsQuery(3).query).toContain(
-      'publishedAt <= now()',
-    );
-  });
-
-  it('filters to page_post documents only', () => {
-    expect(postLatestModulePostsQuery(3).query).toContain(
-      '_type == "page_post"',
-    );
+  it('lists published posts in the request language, newest first, up to the limit', async () => {
+    expect(await run(2, EN)).toEqual(['only-en', 'design-en']);
+    expect(await run(3, NL)).toEqual(['design-nl']);
   });
 });

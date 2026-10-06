@@ -8,6 +8,10 @@ import {
   SHOW_IMAGES_EXPRESSION,
   showImagesParser,
 } from '@blog/service/shared/expressions/module/show-images';
+import {
+  buildPinnedPostInLocaleFilter,
+  POST_IN_LOCALE_FILTER,
+} from '@blog/service/shared/expressions/post/post-in-locale';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/post/published-post';
 import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
 import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
@@ -17,6 +21,7 @@ import { postCardFragment } from '@blog/service/shared/fragments/post/post';
 const newestFeaturedPostsQuery = q.star
   .filterByType('page_post')
   .filterRaw('featured == true')
+  .filterRaw(POST_IN_LOCALE_FILTER)
   .filterRaw(PUBLISHED_POST_FILTER)
   .order('publishedAt desc')
   .slice(0, 3)
@@ -39,9 +44,15 @@ export const postFeaturedModuleQuery = q
         {
           [`postSource == "${POST_SOURCE.PINNED}"`]: sub
             .field('posts[]')
-            .deref()
-            .filterRaw(PUBLISHED_POST_FILTER)
-            .project(postCardFragment)
+            .project((ref) => ({
+              post: ref.star
+                .filterByType('page_post')
+                .filterRaw(buildPinnedPostInLocaleFilter('_ref'))
+                .filterRaw(PUBLISHED_POST_FILTER)
+                .slice(0)
+                .project(postCardFragment)
+                .nullable(true),
+            }))
             .nullable(true),
         },
         newestFeaturedPostsQuery,

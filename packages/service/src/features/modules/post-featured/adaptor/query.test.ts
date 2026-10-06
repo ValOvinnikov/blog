@@ -2,6 +2,10 @@ import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { makeRawPostFeaturedModule } from '@blog/service/testing/modules/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import { localizedStrings } from '@blog/service/testing/shared/localized';
+import {
+  toIds,
+  translatedPostDocuments,
+} from '@blog/service/testing/shared/translated-posts-dataset';
 
 import { postFeaturedModuleQuery } from './query';
 
@@ -47,21 +51,6 @@ describe('postFeaturedModuleQuery', () => {
     expect(() => postFeaturedModuleQuery.parse(raw)).toThrow();
   });
 
-  it('derefs pinned posts and drops unpublished ones, preserving authored order', () => {
-    expect(postFeaturedModuleQuery.query).toContain('postSource == "PINNED"');
-    expect(postFeaturedModuleQuery.query).toContain('posts[]->');
-    expect(postFeaturedModuleQuery.query).toContain('publishedAt <= now()');
-  });
-
-  it('falls back to the newest featured, published posts capped at 3', () => {
-    expect(postFeaturedModuleQuery.query).toContain(
-      '_type == "page_post"][featured == true][publishedAt <= now()',
-    );
-    expect(postFeaturedModuleQuery.query).toContain(
-      'order(publishedAt desc)[0...3]',
-    );
-  });
-
   it('projects postSource and limit', () => {
     expect(postFeaturedModuleQuery.query).toContain('postSource');
     expect(postFeaturedModuleQuery.query).toContain('limit');
@@ -88,5 +77,62 @@ describe('postFeaturedModuleQuery', () => {
     const { headingBlock } = await runPostFeatured(FR);
 
     expect(headingBlock.heading).toBe('Latest posts');
+  });
+});
+
+describe('postFeaturedModuleQuery language scoping', () => {
+  async function runPosts(
+    module: Record<string, unknown>,
+    locale: string,
+  ): Promise<string[]> {
+    const raw = (await evaluateGroqExpression(
+      postFeaturedModuleQuery.query,
+      [{ ...moduleDocument, ...module }, ...translatedPostDocuments],
+      undefined,
+      { id: 'module-1', locale, defaultLocale: EN },
+    )) as { posts: unknown[] };
+
+    return toIds(
+      raw.posts.map((entry) =>
+        entry && typeof entry === 'object' && 'post' in entry
+          ? entry.post
+          : entry,
+      ),
+    );
+  }
+
+  const pinned = {
+    postSource: 'PINNED',
+    posts: [
+      { _key: 'a', _type: 'reference', _ref: 'only-en' },
+      { _key: 'b', _type: 'reference', _ref: 'design-en' },
+    ],
+  };
+
+  it('keeps pinned posts in authored order in their own language', async () => {
+    expect(await runPosts(pinned, EN)).toEqual(['only-en', 'design-en']);
+  });
+
+  it('swaps a pinned post for its translation and drops one with none', async () => {
+    expect(await runPosts(pinned, NL)).toEqual(['design-nl']);
+  });
+
+  it('drops a pinned scheduled post', async () => {
+    expect(
+      await runPosts(
+        {
+          postSource: 'PINNED',
+          posts: [{ _key: 'a', _type: 'reference', _ref: 'scheduled-nl' }],
+        },
+        NL,
+      ),
+    ).toEqual([]);
+  });
+
+  it('falls back to the newest featured posts in the request language', async () => {
+    const newest = { postSource: 'NEWEST_FEATURED' };
+
+    expect(await runPosts(newest, EN)).toEqual(['only-en', 'design-en']);
+    expect(await runPosts(newest, NL)).toEqual(['design-nl']);
   });
 });

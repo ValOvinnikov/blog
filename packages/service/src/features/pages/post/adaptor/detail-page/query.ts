@@ -1,15 +1,19 @@
-import { q, type TSlugParams } from '@blog/service/sanity/query/query';
+import { q } from '@blog/service/sanity/query/query';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/post/published-post';
 import { postDetailFragment } from '@blog/service/shared/fragments/post/post';
+import { translationsQuery } from '@blog/service/shared/localization/page-translations/translations';
+import type { TPageQueryParams } from '@blog/service/shared/types/page/page-query-params';
 
-// A post's content and its page are the same `page_post` document. Gating
-// on `PUBLISHED_POST_FILTER` makes `/blog/[slug]` hard-404 on direct access
-// to a scheduled post, not just excluded from listings/feeds/sitemap.
+// Gating on `PUBLISHED_POST_FILTER` makes `/blog/[slug]` hard-404 on direct access to a scheduled post, not just excluded from listings.
 export const postPageQuery = q
-  .parameters<TSlugParams>()
+  .parameters<TPageQueryParams>()
   .star.filterByType('page_post')
   .filterBy('slug.current == $slug')
+  .filterBy('language == $locale')
   .filterRaw(PUBLISHED_POST_FILTER)
   .slice(0)
-  .project(postDetailFragment)
+  .project(() => ({
+    ...postDetailFragment,
+    translations: translationsQuery,
+  }))
   .nullable(true);

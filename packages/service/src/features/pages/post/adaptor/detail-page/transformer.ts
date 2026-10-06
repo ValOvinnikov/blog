@@ -1,4 +1,5 @@
 import { PORTABLE_TEXT_BLOCK_TYPE, type TMaybeUndefined } from '@blog/config';
+import { toPageTranslations } from '@blog/service/shared/localization/page-translations/to-page-translations';
 import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
 import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image';
 import { toModule } from '@blog/service/shared/transformers/module/to-module';
@@ -53,5 +54,6 @@ export function toPostDetail(raw: TRawPostDetail): TPostDetail {
     tags: (raw.tags ?? []).map(toTag),
     modules: (raw.modules ?? []).map(toModule),
     readingTimeMinutes: toReadingTimeMinutes(raw.wordCount),
+    translations: toPageTranslations(raw.translations),
   };
 }

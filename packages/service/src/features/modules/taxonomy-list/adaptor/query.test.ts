@@ -2,6 +2,10 @@ import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { makeRawTaxonomyListModule } from '@blog/service/testing/modules/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import { localizedStrings } from '@blog/service/testing/shared/localized';
+import {
+  toIds,
+  translatedPostDocuments,
+} from '@blog/service/testing/shared/translated-posts-dataset';
 
 import { taxonomyListModuleQuery } from './query';
 
@@ -84,18 +88,6 @@ describe('taxonomyListModuleQuery', () => {
     );
   });
 
-  it('projects each entry post count via the shared published-post filter', () => {
-    expect(taxonomyListModuleQuery.query).toContain(
-      'count(*[_type == "page_post" && references(^._id) && publishedAt <= now()])',
-    );
-  });
-
-  it('orders latestPosts newest first, sliced to two, excluding scheduled posts', () => {
-    expect(taxonomyListModuleQuery.query).toContain(
-      '*[_type == "page_post"][references(^._id)][publishedAt <= now()] | order(publishedAt desc)[0...2]',
-    );
-  });
-
   it('projects only the id, heading and slug for each latest post', () => {
     expect(taxonomyListModuleQuery.query).toContain('"slug": slug.current');
     expect(taxonomyListModuleQuery.query).not.toContain('wordCount');
@@ -110,5 +102,31 @@ describe('taxonomyListModuleQuery', () => {
     const { headingBlock } = await runTaxonomyList(FR);
 
     expect(headingBlock.heading).toBe('Latest posts');
+  });
+});
+
+describe('taxonomyListModuleQuery language scoping', () => {
+  async function runEntry(locale: string) {
+    const raw = (await evaluateGroqExpression(
+      taxonomyListModuleQuery.query,
+      [moduleDocument, ...translatedPostDocuments],
+      undefined,
+      { id: 'module-1', locale, defaultLocale: EN },
+    )) as { entries: { postCount: number; latestPosts: unknown }[] };
+    const [entry] = raw.entries;
+    if (!entry) throw new Error('expected a topic entry');
+
+    return { postCount: entry.postCount, latest: toIds(entry.latestPosts) };
+  }
+
+  it('counts and lists only published posts in the request language, newest first', async () => {
+    expect(await runEntry(EN)).toEqual({
+      postCount: 3,
+      latest: ['only-en', 'design-en'],
+    });
+    expect(await runEntry(NL)).toEqual({
+      postCount: 1,
+      latest: ['design-nl'],
+    });
   });
 });

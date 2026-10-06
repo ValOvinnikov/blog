@@ -1,6 +1,7 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import { localizedStrings } from '@blog/service/testing/shared/localized';
+import { translatedPostDocuments } from '@blog/service/testing/shared/translated-posts-dataset';
 
 import { heroBlogModuleQuery } from './query';
 
@@ -39,24 +40,6 @@ async function runHero(document: Record<string, unknown>, locale: string) {
 }
 
 describe('heroBlogModuleQuery', () => {
-  it('resolves the post with select(), not coalesce(), branching on postSource', () => {
-    expect(heroBlogModuleQuery.query).toContain(
-      'select( postSource == "PINNED" =>',
-    );
-    expect(heroBlogModuleQuery.query).not.toContain('coalesce(post->');
-  });
-
-  it('falls back to the newest published featured post when postSource is not PINNED', () => {
-    expect(heroBlogModuleQuery.query).toContain(
-      '*[_type == "page_post"][featured == true][publishedAt <= now()] | order(publishedAt desc)[0]',
-    );
-  });
-
-  it('projects the post through the shared post-card fragment', () => {
-    expect(heroBlogModuleQuery.query).toContain('"slug": slug.current');
-    expect(heroBlogModuleQuery.query).toContain('"topic": topic->');
-  });
-
   it('picks the eyebrow, action label and image alt in the visitor language', async () => {
     const hero = await runHero(heroDocument, NL);
 
@@ -87,5 +70,42 @@ describe('heroBlogModuleQuery', () => {
     await expect(
       runHero({ ...heroDocument, primaryActionLabel: undefined }, NL),
     ).rejects.toThrow();
+  });
+});
+
+describe('heroBlogModuleQuery language scoping', () => {
+  async function runPost(
+    module: Record<string, unknown>,
+    locale: string,
+  ): Promise<unknown> {
+    const raw = (await evaluateGroqExpression(
+      heroBlogModuleQuery.query,
+      [{ ...heroDocument, ...module }, imageAsset, ...translatedPostDocuments],
+      undefined,
+      { id: 'hero-1', locale, defaultLocale: EN },
+    )) as { post: { _id: string } | null };
+
+    return raw.post?._id ?? null;
+  }
+
+  function pinned(id: string) {
+    return { postSource: 'PINNED', post: { _type: 'reference', _ref: id } };
+  }
+
+  it('shows the pinned post in its own language', async () => {
+    expect(await runPost(pinned('design-en'), EN)).toBe('design-en');
+  });
+
+  it('swaps the pinned post for its translation', async () => {
+    expect(await runPost(pinned('design-en'), NL)).toBe('design-nl');
+  });
+
+  it('shows no post when the pinned one has no translation', async () => {
+    expect(await runPost(pinned('only-en'), NL)).toBeNull();
+  });
+
+  it('falls back to the newest featured post in the request language', async () => {
+    expect(await runPost({}, EN)).toBe('only-en');
+    expect(await runPost({}, NL)).toBe('design-nl');
   });
 });

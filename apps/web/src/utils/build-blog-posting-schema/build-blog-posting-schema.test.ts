@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config';
 import {
   type TPostDetail,
   type TSanityProjectRef,
@@ -11,6 +12,9 @@ const project: TSanityProjectRef = {
   projectId: 'test-project',
   dataset: 'test-dataset',
 };
+
+const { EN, NL } = LOCALE_ISO_CODES;
+const DEFAULT_LANGUAGE = { locale: EN, defaultLocale: EN };
 
 const heroImage = makeSanityImage();
 
@@ -50,6 +54,7 @@ const post: TPostDetail = {
   },
   tags: [],
   readingTimeMinutes: 4,
+  translations: [],
 };
 
 describe(buildBlogPostingSchema, () => {
@@ -58,6 +63,7 @@ describe(buildBlogPostingSchema, () => {
       post,
       new URL('https://example.com'),
       project,
+      DEFAULT_LANGUAGE,
     );
 
     expect(schema).toEqual({
@@ -79,6 +85,7 @@ describe(buildBlogPostingSchema, () => {
       { ...post, heroImage: undefined },
       new URL('https://example.com'),
       project,
+      DEFAULT_LANGUAGE,
     );
 
     expect(schema?.image).toBeUndefined();
@@ -89,13 +96,30 @@ describe(buildBlogPostingSchema, () => {
       { ...post, slug: 'another-post' },
       new URL('https://blog.example.com'),
       project,
+      DEFAULT_LANGUAGE,
     );
 
     expect(schema?.url).toBe('https://blog.example.com/blog/another-post');
   });
 
+  it('prefixes the url with the post language when it is not the default', () => {
+    const schema = buildBlogPostingSchema(
+      { ...post, slug: 'mijn-artikel' },
+      new URL('https://blog.example.com'),
+      project,
+      { locale: NL, defaultLocale: EN },
+    );
+
+    expect(schema?.url).toBe('https://blog.example.com/nl/blog/mijn-artikel');
+  });
+
   it('returns undefined when there is no base URL, rather than emitting a relative (invalid) url', () => {
-    const schema = buildBlogPostingSchema(post, undefined, project);
+    const schema = buildBlogPostingSchema(
+      post,
+      undefined,
+      project,
+      DEFAULT_LANGUAGE,
+    );
 
     expect(schema).toBeUndefined();
   });
@@ -111,6 +135,7 @@ describe(buildBlogPostingSchema, () => {
       },
       new URL('https://example.com'),
       project,
+      DEFAULT_LANGUAGE,
     );
 
     expect(schema?.keywords).toBe('TypeScript, React');
@@ -121,6 +146,7 @@ describe(buildBlogPostingSchema, () => {
       post,
       new URL('https://example.com'),
       project,
+      DEFAULT_LANGUAGE,
     );
 
     expect(schema?.keywords).toBeUndefined();
@@ -131,6 +157,7 @@ describe(buildBlogPostingSchema, () => {
       { ...post, excerpt: undefined },
       new URL('https://example.com'),
       project,
+      DEFAULT_LANGUAGE,
     );
 
     expect(schema?.description).toBeUndefined();

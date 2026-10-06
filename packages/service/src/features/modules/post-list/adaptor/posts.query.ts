@@ -1,4 +1,5 @@
 import { q } from '@blog/service/sanity/query/query';
+import { POST_IN_LOCALE_FILTER } from '@blog/service/shared/expressions/post/post-in-locale';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/post/published-post';
 import { postCardFragment } from '@blog/service/shared/fragments/post/post';
 
@@ -14,12 +15,11 @@ export function postListModulePaginatedPostsQuery(
   const start = (page - 1) * pageSize;
   const end = start + pageSize;
 
-  const posts = scope
-    ? q.star
-        .filterByType('page_post')
-        .filterRaw(PUBLISHED_POST_FILTER)
-        .filterRaw('references($termId)')
-    : q.star.filterByType('page_post').filterRaw(PUBLISHED_POST_FILTER);
+  const published = q.star
+    .filterByType('page_post')
+    .filterRaw(POST_IN_LOCALE_FILTER)
+    .filterRaw(PUBLISHED_POST_FILTER);
+  const posts = scope ? published.filterRaw('references($termId)') : published;
 
   return q
     .parameters<{ termId?: string }>()

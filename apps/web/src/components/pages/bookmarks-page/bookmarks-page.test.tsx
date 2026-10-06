@@ -1,7 +1,7 @@
+import { LOCALE_ISO_CODES } from '@blog/config';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makePostCard } from '@web/testing/shared/post/fixtures';
-import { SmartLinkMock } from '@web/testing/shared/smart-link/smart-link-mock';
 import {
   DEFAULT_REQUEST_CONTEXT,
   DEFAULT_TENANT_SANITY_CONTEXT,
@@ -32,10 +32,7 @@ vi.mock('@blog/service', () => ({
   },
 }));
 
-vi.mock('@web/components/shared/smart-link', () => ({
-  SmartLink: SmartLinkMock,
-}));
-
+const { EN, NL } = LOCALE_ISO_CODES;
 const TENANT_ID = 'tenant-1';
 
 const setup = customRenderAsync(BookmarksPage, {});
@@ -113,8 +110,8 @@ describe(`<${BookmarksPage.name}/>`, () => {
     getPostsByIdsMock.mockResolvedValue({
       ok: true,
       data: [
-        makePostCard({ id: 'post-1', slug: 'first' }),
-        makePostCard({ id: 'post-2', slug: 'second' }),
+        { ...makePostCard({ id: 'post-1', slug: 'first' }), language: EN },
+        { ...makePostCard({ id: 'post-2', slug: 'second' }), language: EN },
       ],
     });
 
@@ -132,6 +129,38 @@ describe(`<${BookmarksPage.name}/>`, () => {
     ]);
     expect(links[0]).toHaveAttribute('href', '/blog/second');
     expect(links[1]).toHaveAttribute('href', '/blog/first');
+  });
+
+  it('links each bookmark to the language it was saved in, whatever the page language', async () => {
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    listBookmarksMock.mockResolvedValue([
+      { userId: 'user-1', postId: 'post-nl', createdAt: new Date() },
+      { userId: 'user-1', postId: 'post-en', createdAt: new Date() },
+    ]);
+    getPostsByIdsMock.mockResolvedValue({
+      ok: true,
+      data: [
+        {
+          ...makePostCard({ id: 'post-nl', slug: 'mijn-artikel' }),
+          language: NL,
+        },
+        {
+          ...makePostCard({ id: 'post-en', slug: 'my-article' }),
+          language: EN,
+        },
+      ],
+    });
+    vi.mocked(getRequestContext).mockResolvedValueOnce({
+      ...DEFAULT_REQUEST_CONTEXT,
+      locale: NL,
+      defaultLocale: EN,
+    });
+
+    await setup();
+
+    const links = screen.getAllByRole('link');
+    expect(links[0]).toHaveAttribute('href', '/nl/blog/mijn-artikel');
+    expect(links[1]).toHaveAttribute('href', '/blog/my-article');
   });
 
   it('renders nothing when resolving bookmarked posts fails', async () => {

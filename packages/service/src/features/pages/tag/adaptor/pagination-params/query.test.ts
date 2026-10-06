@@ -1,4 +1,10 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import { translatedPostDocuments } from '@blog/service/testing/shared/translated-posts-dataset';
+
 import { tagPaginationParamsQuery } from './query';
+
+const { EN, NL } = LOCALE_ISO_CODES;
 
 describe('tagPaginationParamsQuery', () => {
   it('parses a tag page slug with its module ids and a post count', () => {
@@ -15,11 +21,37 @@ describe('tagPaginationParamsQuery', () => {
     expect(() => tagPaginationParamsQuery.parse(raw)).not.toThrow();
   });
 
-  it('excludes future-dated posts from the post count', () => {
-    expect(tagPaginationParamsQuery.query).toContain('publishedAt <= now()');
-  });
+  it('counts the published posts on the tag in the tag page language', async () => {
+    const dataset = [
+      ...translatedPostDocuments,
+      {
+        _id: 'page-en',
+        _type: 'page_tag',
+        tag: { _type: 'reference', _ref: 'tag-1' },
+        slug: { current: 'design' },
+        language: EN,
+      },
+      {
+        _id: 'page-nl',
+        _type: 'page_tag',
+        tag: { _type: 'reference', _ref: 'tag-1' },
+        slug: { current: 'ontwerp' },
+        language: NL,
+      },
+    ];
 
-  it('correlates the post count to the enclosing tag page by reference', () => {
-    expect(tagPaginationParamsQuery.query).toContain('references(^.tag._ref)');
+    expect(
+      await evaluateGroqExpression(
+        tagPaginationParamsQuery.query,
+        dataset,
+        null,
+        {
+          locales: [EN, NL],
+        },
+      ),
+    ).toMatchObject([
+      { slug: 'design', language: EN, postCount: 3 },
+      { slug: 'ontwerp', language: NL, postCount: 1 },
+    ]);
   });
 });

@@ -20,6 +20,8 @@ type TTranslatablePage = {
   toHref: (slug: string) => string;
 };
 
+const POST_SEGMENT = 'blog';
+
 const ARCHIVE_PAGES = new Map<string, Omit<TTranslatablePage, 'slug'>>([
   ['topics', { documentType: 'page_topic', toHref: routes.topic }],
   ['tags', { documentType: 'page_tag', toHref: routes.tag }],
@@ -43,6 +45,13 @@ const toTranslatablePage = (
   const isArchivePath =
     second !== undefined &&
     (rest.length === 0 || (rest.length === 2 && rest[0] === 'page'));
+
+  if (first === POST_SEGMENT && second !== undefined && rest.length === 0) {
+    const slug = decodeSegment(second);
+    return slug
+      ? { documentType: 'page_post', slug, toHref: routes.post }
+      : undefined;
+  }
 
   if (archivePage && isArchivePath) {
     const slug = decodeSegment(second);

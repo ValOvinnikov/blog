@@ -1,27 +1,16 @@
 import { routes } from '@blog/config';
 import { queries } from '@blog/db';
 import { service } from '@blog/service';
+import { routing } from '@web/i18n/routing';
 import { auth } from '@web/server/auth/auth';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';
+import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
 import { redirect } from 'next/navigation';
 import { getFormatter, getTranslations } from 'next-intl/server';
 
 import { BookmarksPageView, type IBookmarkedPost } from './bookmarks-page-view';
 
-/**
- * `/bookmarks` composition: auth-gated (a signed-out reader is redirected
- * home; this app has no dedicated `/login` route), reached from
- * `AccountMenu`'s "My bookmarks" item.
- *
- * `@blog/db`'s `bookmarks` table only stores each saved post's Sanity `_id`,
- * so those ids are resolved into post data via
- * `service.entities.posts.v1.getPostsByIds`, which doesn't preserve input
- * order — the resolved posts are re-sorted back into bookmark-recency order
- * before rendering. The resolved, post-joined list is then handed to
- * `BookmarksPageView`, which has no knowledge of auth, tenant, or the db
- * layer.
- */
 export const BookmarksPage = async () => {
   const session = await auth();
   const userId = session?.user?.id;
@@ -30,7 +19,11 @@ export const BookmarksPage = async () => {
     redirect(routes.home());
   }
 
-  const { tenantId, sanityContext } = await getRequestContext();
+  const {
+    tenantId,
+    sanityContext,
+    defaultLocale = routing.defaultLocale,
+  } = await getRequestContext();
   if (!tenantId) {
     redirect(routes.home());
   }
@@ -64,7 +57,11 @@ export const BookmarksPage = async () => {
     id: post.id,
     title: post.title,
     slug: post.slug,
-    href: routes.post(post.slug),
+    href: toLocalizedPathname({
+      href: routes.post(post.slug),
+      locale: post.language,
+      defaultLocale,
+    }),
     filename: `${post.slug}.md`,
     formattedDate: format.dateTime(new Date(post.publishedAt), {
       year: 'numeric',

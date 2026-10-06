@@ -14,7 +14,10 @@ export type TRawPostFeaturedModule = InferResultType<
 export function toPostFeaturedModule(
   raw: TRawPostFeaturedModule,
 ): TPostFeaturedModule {
-  const posts = raw.posts ?? [];
+  const posts = (raw.posts ?? []).flatMap((entry) => {
+    const post = 'post' in entry ? entry.post : entry;
+    return post ? [post] : [];
+  });
   const limitedPosts =
     raw.postSource === POST_SOURCE.NEWEST_FEATURED && raw.limit != null
       ? posts.slice(0, raw.limit)
