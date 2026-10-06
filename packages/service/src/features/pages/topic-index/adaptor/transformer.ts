@@ -1,3 +1,5 @@
+import type { TLocaleIsoCode } from '@blog/config/constants';
+import { toPageLanguages } from '@blog/service/shared/localization/page-languages/to-page-languages';
 import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
 import {
   toHeroSlot,
@@ -13,11 +15,15 @@ export type TRawTopicIndexPage = NonNullable<
   InferResultType<typeof topicIndexPageQuery>
 >;
 
-export function toTopicIndexPage(rawPage: TRawTopicIndexPage): TTopicIndexPage {
+export function toTopicIndexPage(
+  rawPage: TRawTopicIndexPage,
+  defaultLocale: TLocaleIsoCode,
+): TTopicIndexPage {
   return {
     headingBlock: toHeadingBlock(rawPage.headingBlock),
     hero: toHeroSlot(rawPage.hero),
     modules: (rawPage.modules ?? []).map(toModule),
     seo: resolveSeo(rawPage.seo),
+    translations: toPageLanguages(rawPage.translations, defaultLocale),
   };
 }

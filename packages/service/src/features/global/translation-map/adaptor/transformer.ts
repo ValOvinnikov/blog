@@ -1,5 +1,5 @@
 import type { TLocaleIsoCode } from '@blog/config/constants';
-import { toHomeLanguages } from '@blog/service/shared/localization/home-languages/to-home-languages';
+import { toPageLanguages } from '@blog/service/shared/localization/page-languages/to-page-languages';
 import type { InferResultType } from 'groqd';
 
 import type { translationMapQuery } from './query';
@@ -21,7 +21,10 @@ export function toTranslationMap(
         language && slug ? [{ documentType, language, slug }] : [],
       ),
     ),
-    homeLanguages: toHomeLanguages(raw.homes, defaultLocale),
+    homeLanguages: toPageLanguages(raw.homes, defaultLocale),
+    postIndexLanguages: toPageLanguages(raw.postIndexes, defaultLocale),
+    topicIndexLanguages: toPageLanguages(raw.topicIndexes, defaultLocale),
+    tagIndexLanguages: toPageLanguages(raw.tagIndexes, defaultLocale),
   };
 }
 

@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config';
 import type { TTagIndexPage } from '@blog/service';
 import type { TResult } from '@blog/utils';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
@@ -11,6 +12,7 @@ const tagIndexPage: TTagIndexPage = {
   hero: undefined,
   modules: [],
   seo: makeSeo(),
+  translations: [LOCALE_ISO_CODES.EN],
 };
 
 /**

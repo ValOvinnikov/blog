@@ -117,6 +117,7 @@ export function makeRawBlogPage(
     hero: null,
     modules: [],
     seo: makeRawSeo(),
+    translations: [{ language: LOCALE_ISO_CODES.EN }],
     ...overrides,
   };
 }
@@ -129,6 +130,7 @@ export function makeRawTopicIndexPage(
     hero: null,
     modules: [{ _id: 'taxonomy-list-1', _type: 'module_taxonomyList' }],
     seo: makeRawSeo(),
+    translations: [{ language: LOCALE_ISO_CODES.EN }],
     ...overrides,
   };
 }
@@ -141,6 +143,7 @@ export function makeRawTagIndexPage(
     hero: null,
     modules: [{ _id: 'taxonomy-list-1', _type: 'module_taxonomyList' }],
     seo: makeRawSeo(),
+    translations: [{ language: LOCALE_ISO_CODES.EN }],
     ...overrides,
   };
 }

@@ -1,4 +1,6 @@
+import { LOCALE_ISO_CODES } from '@blog/config';
 import { service, type TBlogIndexPage } from '@blog/service';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import {
   customRenderServerAsync,
   screen,
@@ -8,10 +10,13 @@ import { makeCtaModuleData } from '@web/testing/modules/cta/fixtures';
 import { makeHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import {
+  DEFAULT_TENANT_SANITY_CONTEXT,
+  DEFAULT_REQUEST_CONTEXT,
+} from '@web/testing/shared/tenant/fixtures';
 import { makeTopicWithPostCount } from '@web/testing/shared/topic/fixtures';
 import { logger } from '@web/utils/logger/logger';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 
 import { PostIndexPage } from './post-index-page';
 
@@ -43,6 +48,7 @@ const indexPage: TBlogIndexPage = {
   hero: undefined,
   modules: [],
   seo: makeSeo(),
+  translations: [LOCALE_ISO_CODES.EN],
 };
 
 const setup = customRenderServerAsync(PostIndexPage, {
@@ -51,6 +57,7 @@ const setup = customRenderServerAsync(PostIndexPage, {
 
 describe(`<${PostIndexPage.name}/>`, () => {
   beforeEach(() => {
+    vi.mocked(getRequestContext).mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
     getIndexPageMock.mockResolvedValue({ ok: true, data: indexPage });
     vi.mocked(service.entities.topics.v1.getTopics).mockResolvedValue({
       ok: true,
@@ -82,6 +89,20 @@ describe(`<${PostIndexPage.name}/>`, () => {
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
     expect(logger.error).not.toHaveBeenCalled();
+  });
+
+  it('redirects to / when this language has no post index page of its own', async () => {
+    vi.mocked(getRequestContext).mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      locale: LOCALE_ISO_CODES.NL,
+      liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
+    });
+    getIndexPageMock.mockResolvedValueOnce({ ok: true, data: undefined });
+
+    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+
+    expect(vi.mocked(redirect)).toHaveBeenCalledWith('/');
+    expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 
   it('fetches the index page with the tenant context', async () => {

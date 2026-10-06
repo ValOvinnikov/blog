@@ -1,8 +1,13 @@
+import { LOCALE_ISO_CODES } from '@blog/config';
 import { urlForSanityImage } from '@blog/service';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import {
+  DEFAULT_REQUEST_CONTEXT,
+  DEFAULT_TENANT_SANITY_CONTEXT,
+} from '@web/testing/shared/tenant/fixtures';
 
 import { buildPostIndexMetadata } from './build-post-index-metadata';
 
@@ -36,6 +41,7 @@ const seo = makeSeo({
 describe('buildPostIndexMetadata', () => {
   beforeEach(() => {
     getPostIndexPageMock.mockReset();
+    vi.mocked(getRequestContext).mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
   it('reads the page through getPostIndexPage, the loader PostIndexPage reads', async () => {
@@ -46,6 +52,7 @@ describe('buildPostIndexMetadata', () => {
         headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         seo,
         modules: [],
+        translations: [LOCALE_ISO_CODES.EN],
       },
     });
 
@@ -62,6 +69,7 @@ describe('buildPostIndexMetadata', () => {
         headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         seo,
         modules: [],
+        translations: [LOCALE_ISO_CODES.EN],
       },
     });
 
@@ -88,6 +96,7 @@ describe('buildPostIndexMetadata', () => {
         headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         seo,
         modules: [],
+        translations: [LOCALE_ISO_CODES.EN],
       },
     });
 
@@ -111,6 +120,7 @@ describe('buildPostIndexMetadata', () => {
         headingBlock: makeHeadingBlock({ heading: 'Blog' }),
         seo: makeSeo({ title: 'The Blog', ogTitle: undefined }),
         modules: [],
+        translations: [LOCALE_ISO_CODES.EN],
       },
     });
 
@@ -145,5 +155,55 @@ describe('buildPostIndexMetadata', () => {
     expect(metadata).toEqual({});
     expect(errorSpy).not.toHaveBeenCalled();
     errorSpy.mockRestore();
+  });
+
+  it('lists every live language with its own page as hreflang, canonical to its own prefixed address', async () => {
+    const { EN, NL, DE } = LOCALE_ISO_CODES;
+    const translations = [EN, NL, DE];
+    vi.mocked(getRequestContext).mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      locale: NL,
+      liveLocales: [EN, NL],
+    });
+    getPostIndexPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
+        seo,
+        modules: [],
+        translations,
+      },
+    });
+
+    const metadata = await buildPostIndexMetadata(1);
+
+    expect(metadata.alternates).toMatchObject({
+      canonical: '/nl/blog',
+      languages: { en: '/blog', nl: '/nl/blog', 'x-default': '/blog' },
+    });
+  });
+
+  it('lists no hreflang past page 1', async () => {
+    const { EN, NL } = LOCALE_ISO_CODES;
+    const translations = [EN, NL];
+    vi.mocked(getRequestContext).mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      locale: NL,
+      liveLocales: [EN, NL],
+    });
+    getPostIndexPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
+        seo,
+        modules: [],
+        translations,
+      },
+    });
+
+    const metadata = await buildPostIndexMetadata(2);
+
+    expect(metadata.alternates?.canonical).toBe('/nl/blog/page/2');
+    expect(metadata.alternates?.languages).toBeUndefined();
   });
 });

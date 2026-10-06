@@ -1,18 +1,11 @@
 import { routes } from '@blog/config';
-import { toMetadata } from '@web/metadata/to-metadata';
+import { toLocalizedPageMetadata } from '@web/metadata/to-localized-page-metadata';
 import { getPostIndexPage } from '@web/server/post-index/get-post-index-page/get-post-index-page';
 import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 
-/**
- * Every page self-canonicalizes — page 2+ must NEVER canonical to /blog
- * (spec do-not-change rule). Every page also advertises the site-wide RSS
- * feed (`/rss.xml`) via `alternates.types['application/rss+xml']` — the
- * post index is the page whose content (every published post) matches the
- * feed's content, and it's the same feed regardless of which page of the
- * list is showing.
- */
+/** Page 2+ carries no hreflang: each language's list need not run to the same number of pages. */
 export const buildPostIndexMetadata = async (
   page: number,
 ): Promise<Metadata> => {
@@ -33,7 +26,7 @@ export const buildPostIndexMetadata = async (
     return {};
   }
 
-  const { seo } = result.data;
+  const { seo, translations } = result.data;
   const resolvedSeo =
     page === 1
       ? seo
@@ -45,8 +38,9 @@ export const buildPostIndexMetadata = async (
             : undefined,
         };
 
-  return toMetadata(resolvedSeo, {
-    canonical: routes.blogIndex(page),
+  return toLocalizedPageMetadata(resolvedSeo, {
+    href: routes.blogIndex(page),
+    translations: page === 1 ? translations : [],
     ogType: 'website',
     feedUrl: routes.rssFeed(),
   });

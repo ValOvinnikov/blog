@@ -36,6 +36,9 @@ const tenant = { id: 'tenant-1', locale: EN } as TTenant;
 
 const translationMap = {
   homeLanguages: [],
+  postIndexLanguages: [],
+  topicIndexLanguages: [],
+  tagIndexLanguages: [],
   groups: [
     [
       { documentType: 'page_landing', language: EN, slug: 'about' },
