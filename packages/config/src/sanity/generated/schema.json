@@ -11104,6 +11104,20 @@
         },
         "optional": true
       },
+      "sectionNavigation": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
+        },
+        "optional": true
+      },
+      "showSectionNavigation": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
+        },
+        "optional": true
+      },
       "headingBlock": {
         "type": "objectAttribute",
         "value": {
