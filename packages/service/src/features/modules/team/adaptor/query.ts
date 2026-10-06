@@ -4,7 +4,7 @@ import {
   displayModeParser,
 } from '@blog/service/shared/expressions/module/display-mode';
 import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
-import { localizedHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/localized-heading-block';
+import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
 import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { personDetailFragment } from '@blog/service/shared/fragments/person/person';
@@ -19,7 +19,7 @@ export const teamModuleQuery = q
     brandVariant: sub.field('brandVariant').notNull(),
     headingBlock: sub
       .field('headingBlock')
-      .project(localizedHeadingBlockFragment)
+      .project(moduleHeadingBlockFragment)
       .notNull(),
     members: sub
       .field('members[]')

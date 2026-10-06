@@ -7,7 +7,7 @@ import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fiel
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
-import { localizedHeadingBlockField } from '@blog/studio/schema-types/objects/localized-heading-block/localized-heading-block-field';
+import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
 import { newsletterTrustCueSchema } from '@blog/studio/schema-types/objects/newsletter-trust-cue/newsletter-trust-cue';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { toTitleCase } from '@blog/utils/primitives';
@@ -27,7 +27,7 @@ export const newsletterSchema = defineType({
       list: FULL_BRAND_VARIANT_LIST,
       initialValue: BRAND_VARIANT.PRIMARY,
     }),
-    localizedHeadingBlockField(),
+    moduleHeadingBlockField(),
     defineField({
       name: 'variant',
       title: 'Variant',

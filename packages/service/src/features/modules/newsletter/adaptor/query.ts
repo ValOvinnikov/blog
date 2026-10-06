@@ -1,6 +1,6 @@
 import { NEWSLETTER_VARIANT } from '@blog/config';
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
-import { localizedHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/localized-heading-block';
+import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
 import { moduleLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
@@ -21,7 +21,7 @@ export const newsletterModuleQuery = q
     brandVariant: sub.field('brandVariant').notNull(),
     headingBlock: sub
       .field('headingBlock')
-      .project(localizedHeadingBlockFragment)
+      .project(moduleHeadingBlockFragment)
       .notNull(),
     variant: sub.raw(NEWSLETTER_VARIANT_EXPRESSION, newsletterVariantParser),
     trustCues: sub

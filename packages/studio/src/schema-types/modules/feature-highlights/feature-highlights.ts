@@ -5,7 +5,7 @@ import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-fi
 import { mediaOrderField } from '@blog/studio/schema-types/fields/media-order-field/media-order-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { featureHighlightSchema } from '@blog/studio/schema-types/objects/feature-highlight/feature-highlight';
-import { localizedHeadingBlockField } from '@blog/studio/schema-types/objects/localized-heading-block/localized-heading-block-field';
+import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
 import { wideLayoutField } from '@blog/studio/schema-types/objects/wide-layout/wide-layout-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { Rows3 } from 'lucide-react';
@@ -20,7 +20,7 @@ export const featureHighlightsSchema = defineType({
   fields: [
     titleField(),
     brandVariantField(),
-    localizedHeadingBlockField(),
+    moduleHeadingBlockField(),
     defineField({
       name: 'highlights',
       title: 'Highlights',

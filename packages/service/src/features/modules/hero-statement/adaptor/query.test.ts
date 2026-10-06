@@ -16,7 +16,7 @@ const heroDocument = {
   brandVariant: 'PRIMARY',
   variant: HERO_VARIANT.SPLIT,
   headingBlock: {
-    _type: 'localizedHeadingBlock',
+    _type: 'moduleHeadingBlock',
     heading: localizedStrings({ [EN]: 'Build calmly', [NL]: 'Bouw rustig' }),
     supportingText: localizedValues('internationalizedArrayTextValue', {
       [EN]: 'Notes on making things.',
@@ -77,7 +77,7 @@ describe('heroStatementModuleQuery', () => {
         ...heroDocument,
         eyebrow: undefined,
         headingBlock: {
-          _type: 'localizedHeadingBlock',
+          _type: 'moduleHeadingBlock',
           heading: localizedStrings({ [EN]: 'Build calmly' }),
         },
       },
@@ -93,7 +93,7 @@ describe('heroStatementModuleQuery', () => {
   it('fails when the heading is missing in every language', async () => {
     await expect(
       runHero(
-        { ...heroDocument, headingBlock: { _type: 'localizedHeadingBlock' } },
+        { ...heroDocument, headingBlock: { _type: 'moduleHeadingBlock' } },
         NL,
       ),
     ).rejects.toThrow();

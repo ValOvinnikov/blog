@@ -9,8 +9,8 @@ import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/loca
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { heroFieldsets } from '@blog/studio/schema-types/modules/hero-fieldsets/hero-fieldsets';
 import { heroLayoutField } from '@blog/studio/schema-types/objects/hero-layout/hero-layout-field';
-import { localizedHeadingBlockField } from '@blog/studio/schema-types/objects/localized-heading-block/localized-heading-block-field';
 import { localizedImageWithAltSchema } from '@blog/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
+import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
 import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
 import { UserCircle } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
@@ -26,7 +26,7 @@ export const heroProfileSchema = defineType({
   fields: [
     titleField(),
     brandVariantField({ list: FULL_BRAND_VARIANT_LIST }),
-    localizedHeadingBlockField(),
+    moduleHeadingBlockField(),
     localizedOneLineTextField({
       name: 'eyebrow',
       title: 'Eyebrow',

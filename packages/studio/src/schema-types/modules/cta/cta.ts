@@ -16,8 +16,8 @@ import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/loca
 import { mediaOrderField } from '@blog/studio/schema-types/fields/media-order-field/media-order-field';
 import { spacingAndDividerFields } from '@blog/studio/schema-types/fields/spacing-and-divider-fields/spacing-and-divider-fields';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { localizedHeadingBlockField } from '@blog/studio/schema-types/objects/localized-heading-block/localized-heading-block-field';
 import { localizedImageWithAltSchema } from '@blog/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
+import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
 import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
 import { validateLocalizedMaxLength } from '@blog/studio/schema-types/validation/validate-localized-max-length/validate-localized-max-length';
 import { toTitleCase } from '@blog/utils/primitives';
@@ -76,7 +76,7 @@ export const ctaSchema = defineType({
       description: 'Fill color of the card itself.',
       initialValue: BRAND_VARIANT.SECONDARY,
     }),
-    localizedHeadingBlockField(),
+    moduleHeadingBlockField(),
     localizedOneLineTextField({
       name: 'eyebrow',
       title: 'Eyebrow',

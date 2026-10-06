@@ -18,7 +18,7 @@ const ctaDocument = {
   variant: CTA_VARIANT.SPLIT,
   brandVariant: 'PRIMARY',
   headingBlock: {
-    _type: 'localizedHeadingBlock',
+    _type: 'moduleHeadingBlock',
     heading: localizedStrings({ [EN]: 'Subscribe', [NL]: 'Abonneer' }),
     supportingText: localizedValues('internationalizedArrayTextValue', {
       [EN]: 'New posts weekly.',
@@ -99,7 +99,7 @@ describe('ctaModuleQuery', () => {
         content: undefined,
         footnote: undefined,
         headingBlock: {
-          _type: 'localizedHeadingBlock',
+          _type: 'moduleHeadingBlock',
           heading: localizedStrings({ [EN]: 'Subscribe' }),
         },
       },
@@ -131,7 +131,7 @@ describe('ctaModuleQuery', () => {
       runCta(
         {
           ...ctaDocument,
-          headingBlock: { _type: 'localizedHeadingBlock' },
+          headingBlock: { _type: 'moduleHeadingBlock' },
         },
         NL,
       ),

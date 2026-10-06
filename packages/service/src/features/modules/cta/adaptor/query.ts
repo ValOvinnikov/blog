@@ -1,6 +1,6 @@
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
 import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
-import { localizedHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/localized-heading-block';
+import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
 import { localizedImageWithAltFragment } from '@blog/service/shared/fragments/image/localized-image-with-alt';
 import { moduleLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
@@ -19,7 +19,7 @@ export const ctaModuleQuery = q
     eyebrow: getLocalizedField(sub, 'eyebrow'),
     headingBlock: sub
       .field('headingBlock')
-      .project(localizedHeadingBlockFragment)
+      .project(moduleHeadingBlockFragment)
       .notNull(),
     content: getLocalizedPortableTextBlock(sub, 'content'),
     image: sub

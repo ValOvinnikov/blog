@@ -15,7 +15,7 @@ const heroDocument = {
   brandVariant: 'PRIMARY',
   variant: HERO_VARIANT.SPLIT,
   headingBlock: {
-    _type: 'localizedHeadingBlock',
+    _type: 'moduleHeadingBlock',
     heading: localizedStrings({ [EN]: 'Meet Jane', [NL]: 'Maak kennis' }),
   },
   eyebrow: localizedStrings({ [EN]: 'Founder', [NL]: 'Oprichter' }),

@@ -62,7 +62,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "localizedHeadingBlock"
+          "name": "moduleHeadingBlock"
         },
         "optional": true
       },
@@ -172,7 +172,7 @@
     }
   },
   {
-    "name": "localizedHeadingBlock",
+    "name": "moduleHeadingBlock",
     "type": "type",
     "value": {
       "type": "object",
@@ -181,7 +181,7 @@
           "type": "objectAttribute",
           "value": {
             "type": "string",
-            "value": "localizedHeadingBlock"
+            "value": "moduleHeadingBlock"
           }
         },
         "heading": {
@@ -270,7 +270,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "localizedHeadingBlock"
+          "name": "moduleHeadingBlock"
         },
         "optional": true
       },
@@ -411,7 +411,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "localizedHeadingBlock"
+          "name": "moduleHeadingBlock"
         },
         "optional": true
       },
@@ -990,7 +990,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "localizedHeadingBlock"
+          "name": "moduleHeadingBlock"
         },
         "optional": true
       },
@@ -1128,7 +1128,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "localizedHeadingBlock"
+          "name": "moduleHeadingBlock"
         },
         "optional": true
       },
@@ -1321,7 +1321,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "localizedHeadingBlock"
+          "name": "moduleHeadingBlock"
         },
         "optional": true
       },
@@ -1501,7 +1501,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "localizedHeadingBlock"
+          "name": "moduleHeadingBlock"
         },
         "optional": true
       },
@@ -1734,7 +1734,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "localizedHeadingBlock"
+          "name": "moduleHeadingBlock"
         },
         "optional": true
       },
@@ -1910,7 +1910,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "localizedHeadingBlock"
+          "name": "moduleHeadingBlock"
         },
         "optional": true
       },
@@ -2174,7 +2174,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "localizedHeadingBlock"
+          "name": "moduleHeadingBlock"
         },
         "optional": true
       },
@@ -2363,7 +2363,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "localizedHeadingBlock"
+          "name": "moduleHeadingBlock"
         },
         "optional": true
       },
@@ -2556,7 +2556,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "localizedHeadingBlock"
+          "name": "moduleHeadingBlock"
         },
         "optional": true
       },
@@ -2698,7 +2698,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "localizedHeadingBlock"
+          "name": "moduleHeadingBlock"
         },
         "optional": true
       },
@@ -2862,7 +2862,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "localizedHeadingBlock"
+          "name": "moduleHeadingBlock"
         },
         "optional": true
       },
@@ -2991,7 +2991,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "localizedHeadingBlock"
+          "name": "moduleHeadingBlock"
         },
         "optional": true
       },
@@ -6719,7 +6719,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "localizedHeadingBlock"
+          "name": "moduleHeadingBlock"
         },
         "optional": true
       },
@@ -9977,7 +9977,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "localizedHeadingBlock"
+          "name": "moduleHeadingBlock"
         },
         "optional": true
       },
@@ -11364,7 +11364,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "localizedHeadingBlock"
+          "name": "moduleHeadingBlock"
         },
         "optional": true
       },
@@ -11597,7 +11597,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "localizedHeadingBlock"
+          "name": "moduleHeadingBlock"
         },
         "optional": true
       },

@@ -15,7 +15,7 @@ const statsDocument = {
   _type: 'module_stats',
   brandVariant: 'PRIMARY',
   headingBlock: {
-    _type: 'localizedHeadingBlock',
+    _type: 'moduleHeadingBlock',
     heading: localizedStrings({ [EN]: 'By the numbers', [NL]: 'In cijfers' }),
   },
   stats: [

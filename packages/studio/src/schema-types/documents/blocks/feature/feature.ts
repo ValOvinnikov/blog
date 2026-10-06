@@ -1,8 +1,8 @@
 import { FEATURE_ICONS } from '@blog/config/constants';
 import { linkSchema } from '@blog/studio/schema-types/documents/link/link';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { localizedHeadingBlockField } from '@blog/studio/schema-types/objects/localized-heading-block/localized-heading-block-field';
 import { localizedImageWithAltSchema } from '@blog/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
+import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
 import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
 import { toTitleCase } from '@blog/utils/primitives';
 import { IdCard } from 'lucide-react';
@@ -44,7 +44,7 @@ export const featureBlockSchema = defineType({
   icon: IdCard,
   fields: [
     titleField(),
-    localizedHeadingBlockField(),
+    moduleHeadingBlockField(),
     defineField({
       name: 'icon',
       title: 'Icon',
