@@ -76,6 +76,9 @@
   "postContentsRail": {
     "label": "Temas"
   },
+  "sectionNavigation": {
+    "label": "En esta sección"
+  },
   "topicPage": {
     "empty": "Todavía no hay artículos sobre {name}.",
     "paginationAriaLabel": "Páginas de {name}"

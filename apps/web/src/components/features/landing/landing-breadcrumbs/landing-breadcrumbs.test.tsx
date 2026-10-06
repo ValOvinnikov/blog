@@ -1,5 +1,8 @@
 import { customRenderAsync } from '@web/testing/custom-render';
-import { mockLandingPage } from '@web/testing/pages/landing-page/fixtures';
+import {
+  makeLandingSectionNavigation,
+  mockLandingPage,
+} from '@web/testing/pages/landing-page/fixtures';
 import {
   testBreadcrumbsJsonLdSchema,
   testBreadcrumbsTrail,
@@ -62,5 +65,21 @@ describe(`<${LandingBreadcrumbs.name}/>`, () => {
     successData: mockLandingPage,
     description: 'forwards the path to getLandingPage',
     expectedArgs: ['about-us'],
+  });
+
+  describe('inside a section', () => {
+    testBreadcrumbsTrail({
+      pageLoaderMock: getLandingPageMock,
+      setup,
+      successData: {
+        ...mockLandingPage,
+        sectionNavigation: makeLandingSectionNavigation(),
+      },
+      linkSteps: [
+        { label: 'Home', href: '/' },
+        { label: 'Modules', href: '/modules' },
+      ],
+      currentLabel: 'FAQ',
+    });
   });
 });

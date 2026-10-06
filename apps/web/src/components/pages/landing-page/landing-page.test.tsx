@@ -9,7 +9,10 @@ import {
 } from '@web/testing/custom-render';
 import { makeCtaModuleData } from '@web/testing/modules/cta/fixtures';
 import { makeHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
-import { mockLandingPage } from '@web/testing/pages/landing-page/fixtures';
+import {
+  makeLandingSectionNavigation,
+  mockLandingPage,
+} from '@web/testing/pages/landing-page/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
   DEFAULT_REQUEST_CONTEXT,
@@ -149,6 +152,34 @@ describe(`<${LandingPage.name}/>`, () => {
     ).toBeVisible();
     expect(within(breadcrumbs).getByText('About Us')).toBeVisible();
     expect(screen.getByRole('main')).not.toContainElement(breadcrumbs);
+  });
+
+  it('renders no section navigation when the page is outside a section', async () => {
+    await setup();
+
+    expect(
+      screen.queryByRole('navigation', { name: 'In this section' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders the section navigation inside main with the current page marked', async () => {
+    getPageMock.mockResolvedValueOnce({
+      ok: true,
+      data: {
+        ...mockLandingPage,
+        sectionNavigation: makeLandingSectionNavigation(),
+      },
+    });
+
+    await setup();
+
+    const sectionNav = within(screen.getByRole('main')).getByRole(
+      'navigation',
+      { name: 'In this section' },
+    );
+    expect(
+      within(sectionNav).getByRole('link', { name: 'FAQ' }),
+    ).toHaveAttribute('aria-current', 'page');
   });
 
   it('renders the authored modules inside main', async () => {

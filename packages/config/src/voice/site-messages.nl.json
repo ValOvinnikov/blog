@@ -76,6 +76,9 @@
   "postContentsRail": {
     "label": "Onderwerpen"
   },
+  "sectionNavigation": {
+    "label": "In deze sectie"
+  },
   "topicPage": {
     "empty": "Nog geen berichten over {name}.",
     "paginationAriaLabel": "Pagina's van {name}"

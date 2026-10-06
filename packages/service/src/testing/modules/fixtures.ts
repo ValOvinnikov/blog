@@ -18,6 +18,8 @@ import {
   TIMELINE_MARKER_STYLE,
   TIMELINE_ORIENTATION,
 } from '@blog/config';
+import type { TRawChildPagesModule } from '@blog/service/features/modules/child-pages/adaptor/module/transformer';
+import type { TRawChildPages } from '@blog/service/features/modules/child-pages/adaptor/pages/transformer';
 import type { TRawContentModule } from '@blog/service/features/modules/content/adaptor/transformer';
 import type { TRawCtaModule } from '@blog/service/features/modules/cta/adaptor/transformer';
 import type { TRawFaqModule } from '@blog/service/features/modules/faq/adaptor/transformer';
@@ -207,6 +209,32 @@ export function makeRawPostFeaturedModule(
     contentAlignment: null,
     showImages: true,
     displayMode: DISPLAY_MODE.GRID,
+    ...overrides,
+  };
+}
+
+export function makeRawChildPagesModule(
+  overrides: Partial<TRawChildPagesModule> = {},
+): TRawChildPagesModule {
+  return {
+    brandVariant: BRAND_VARIANT.PRIMARY,
+    headingBlock: makeRawHeadingBlock('In this section'),
+    contentAlignment: null,
+    layout: null,
+    ...overrides,
+  };
+}
+
+export function makeRawChildPage(
+  overrides: Partial<TRawChildPages[number]> = {},
+): TRawChildPages[number] {
+  return {
+    _id: 'page-faq',
+    slug: 'faq',
+    headingBlock: makeRawHeadingBlock('FAQ', {
+      supportingText: 'Answers to common questions.',
+    }),
+    image: makeRawSanityImage(),
     ...overrides,
   };
 }

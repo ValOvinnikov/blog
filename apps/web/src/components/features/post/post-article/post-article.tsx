@@ -3,11 +3,11 @@ import { type TImageTransformOptions, urlForSanityImage } from '@blog/service';
 import { Prose } from '@blog/ui/components/atoms/prose';
 import { Article } from '@blog/ui/components/organisms/article';
 import { BookmarkButtonGate } from '@web/components/features/post/bookmark-button-gate';
+import { PostTableOfContents } from '@web/components/features/post/post-table-of-contents';
 import {
   createAsideOverride,
   PortableText,
 } from '@web/components/shared/portable-text';
-import { PostContentsRail } from '@web/components/shared/post-contents-rail';
 import { PostShareLinks } from '@web/components/shared/post-share-links';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
@@ -146,7 +146,7 @@ export const PostArticle = async ({ slug }: TPostArticleProps) => {
       <Article.Body className={s.body({ withRail: hasContentsRail })}>
         {hasContentsRail ? (
           <>
-            <PostContentsRail className={s.rail()} headings={headings} />
+            <PostTableOfContents className={s.rail()} headings={headings} />
             <div className={s.content({ withRail: true })}>
               <Prose className={s.prose()}>
                 <PortableText value={body} components={components} />
