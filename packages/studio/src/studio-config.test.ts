@@ -85,6 +85,34 @@ describe(buildStudioConfig, () => {
     expect(actions(prev, context)).toEqual([]);
   });
 
+  it('wraps only the landing page publish action', () => {
+    const config = buildStudioConfig({
+      projectId: 'test-project',
+      dataset: 'test-dataset',
+      title: 'Test Studio',
+    });
+    const actions = config.document?.actions;
+    if (typeof actions !== 'function') {
+      throw new Error('expected config.document.actions to be a function');
+    }
+    const publish: DocumentActionComponent = () => null;
+    publish.action = 'publish';
+    const discard: DocumentActionComponent = () => null;
+    discard.action = 'discardChanges';
+
+    const [landingPublish, landingDiscard] = actions([publish, discard], {
+      schemaType: PAGE_LANDING_TYPE,
+    } as DocumentActionsContext);
+    const [topicPublish] = actions([publish], {
+      schemaType: PAGE_TOPIC_TYPE,
+    } as DocumentActionsContext);
+
+    expect(landingPublish).not.toBe(publish);
+    expect(landingPublish?.action).toBe('publish');
+    expect(landingDiscard).toBe(discard);
+    expect(topicPublish).toBe(publish);
+  });
+
   it.each([
     PAGE_HOME_TYPE,
     PAGE_LANDING_TYPE,
