@@ -73,6 +73,7 @@ export function toLandingPage(
   faqs: TFaqPageQuestion[],
 ): TLandingPage {
   return {
+    id: raw._id,
     path: raw.path,
     headingBlock: toHeadingBlock(raw.headingBlock),
     hero: toHeroSlot(raw.hero),

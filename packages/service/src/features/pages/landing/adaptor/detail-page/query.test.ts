@@ -213,6 +213,7 @@ describe('landingPageQuery nested paths', () => {
 
   it('resolves a nested page at its full path', async () => {
     expect(await run(['modules', 'faq'])).toMatchObject({
+      _id: 'faq',
       path: 'modules/faq',
       headingBlock: { heading: 'faq' },
     });
