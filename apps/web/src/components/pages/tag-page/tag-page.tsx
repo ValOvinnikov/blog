@@ -1,4 +1,5 @@
 import { TAXONOMY_KIND } from '@blog/config';
+import { FaqPageSchema } from '@web/components/features/faq-page-schema';
 import { TagBreadcrumbs } from '@web/components/features/tag/tag-breadcrumbs';
 import { PageShell } from '@web/components/page-templates/page-shell';
 import { getTagPage } from '@web/server/tag/get-tag-page/get-tag-page';
@@ -16,7 +17,7 @@ export const TagPage = async ({ slug, page }: TTagPageProps) => {
   const pageData = guardPageLoaderResult(result, 'tag_page.fetch_failed', {
     slug,
   });
-  const { tag, headingBlock, hero, modules } = pageData;
+  const { tag, headingBlock, hero, modules, faqs } = pageData;
 
   const currentPage = page ?? 1;
 
@@ -25,6 +26,7 @@ export const TagPage = async ({ slug, page }: TTagPageProps) => {
       <PageShell.Breadcrumbs>
         <TagBreadcrumbs slug={slug} />
       </PageShell.Breadcrumbs>
+      <FaqPageSchema faqs={faqs} />
       <TagModuleRenderer
         hero={hero}
         headingBlock={headingBlock}

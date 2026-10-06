@@ -34,6 +34,8 @@ vi.mock('@web/i18n/navigation');
 
 const getTagPageMock = vi.mocked(service.pages.tag.v1.getTagPage);
 
+const FAQ_PAGE_JSON_LD = '"@type":"FAQPage"';
+
 const setup = customRenderServerAsync(TagPage, {
   slug: 'typescript',
 });
@@ -193,5 +195,38 @@ describe(`<${TagPage.name}/>`, () => {
     await setup();
 
     expect(screen.getByText('No posts tagged TypeScript yet.')).toBeVisible();
+  });
+
+  it('renders no FAQPage JSON-LD when the page has no FAQ questions', async () => {
+    await setup();
+
+    expect(
+      screen
+        .queryAllByTestId('json-ld-script')
+        .some((script) => script.textContent?.includes(FAQ_PAGE_JSON_LD)),
+    ).toBe(false);
+  });
+
+  it('renders the FAQPage JSON-LD when the page has FAQ questions', async () => {
+    getTagPageMock.mockResolvedValueOnce({
+      ok: true,
+      data: makeTagDetailPage({
+        faqs: [
+          {
+            id: 'faq-1',
+            question: 'Do you offer a free trial?',
+            answer: 'Yes.',
+          },
+        ],
+      }),
+    });
+
+    await setup();
+
+    expect(
+      screen
+        .getAllByTestId('json-ld-script')
+        .some((script) => script.textContent?.includes(FAQ_PAGE_JSON_LD)),
+    ).toBe(true);
   });
 });
