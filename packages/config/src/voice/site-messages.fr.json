@@ -76,6 +76,9 @@
   "postContentsRail": {
     "label": "Thèmes"
   },
+  "sectionNavigation": {
+    "label": "Dans cette section"
+  },
   "topicPage": {
     "empty": "Aucun article sur {name} pour le moment.",
     "paginationAriaLabel": "Pages de {name}"

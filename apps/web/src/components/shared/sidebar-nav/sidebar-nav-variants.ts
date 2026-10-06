@@ -1,6 +1,6 @@
 import { tv } from 'tailwind-variants';
 
-export const postContentsRailVariants = tv({
+export const sidebarNavVariants = tv({
   slots: {
     // `sticky` lives on `root`, not `mobile` — `mobile`'s own parent box has no room to pin. `top-20` leaves a gap below the Header so the shadow reads as separation, not flush.
     root: [
@@ -13,11 +13,7 @@ export const postContentsRailVariants = tv({
       'lg:sticky lg:top-24',
       'lg:border-r lg:border-border lg:pr-6',
     ],
-    // `relative` gives this bar its own positioning context so `panel`
-    // overlays it directly rather than depending on `root`'s box.
-    // `shadow-md` — this bar shares `Header`'s exact `bg-primary`/`border-border`,
-    // so the hairline border alone doesn't read as a seam once it's sticky
-    // flush beneath it.
+    // `shadow-md`: this bar shares `Header`'s background and border, so the hairline alone doesn't read as a seam once it sticks beneath it.
     mobile: [
       'relative',
       'bg-primary border-b border-border shadow-md',
@@ -29,8 +25,6 @@ export const postContentsRailVariants = tv({
       'mb-3 block',
       'font-mono text-label tracking-label uppercase text-text',
     ],
-    // Stacked below `md:` (label above a full-width selector); inline-left
-    // at `md:`–`lg:` (label beside the selector in one row).
     selectorRow: [
       'flex flex-col gap-1.5',
       'md:flex-row md:items-center md:gap-3',
@@ -39,8 +33,6 @@ export const postContentsRailVariants = tv({
       'shrink-0',
       'font-mono text-label tracking-label uppercase text-subtle',
     ],
-    // A bordered form-field look, not a flush bar — the label + current
-    // topic text already convey it's expandable, so no leading icon.
     toggle: [
       'flex w-full min-w-0 items-center justify-between gap-2',
       'md:flex-1',
@@ -57,9 +49,7 @@ export const postContentsRailVariants = tv({
       'size-1.5 shrink-0 rotate-45 border-r-2 border-b-2 border-current',
       'transition-transform duration-base ease-smooth',
     ],
-    // Absolute against `mobile`'s `relative` box so it overlays the article
-    // body instead of pushing it down. `p-4` matches the nav-menu and
-    // share-post popover panels so all three read as one system.
+    // `p-4` matches the nav-menu and share-post popover panels so all three read as one system.
     panel: [
       'absolute inset-x-0 top-full',
       'bg-primary border-b border-border shadow-lg',
@@ -82,13 +72,9 @@ export const postContentsRailVariants = tv({
     isActive: {
       true: { link: ['text-brand-primary'] },
     },
-    isSubheading: {
+    isNested: {
       true: { item: ['pl-3'] },
     },
-    // Replicates `PopoverMenuItem`'s row chrome (rounded pill + hover fill)
-    // on the mobile panel's copy of `link` only — the desktop rail's
-    // `renderList()` call omits it, so the side column stays plain text.
-    // `list`'s `gap-1` already matches on both, so no override is needed here.
     inPanel: {
       true: {
         link: ['flex items-center rounded-md px-3 py-2', 'hover:bg-surface-2'],

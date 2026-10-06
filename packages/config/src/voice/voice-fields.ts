@@ -121,6 +121,14 @@ export const VOICE_FIELDS = [
     max: 40,
   },
   {
+    id: 'sectionNavigationLabel',
+    path: 'sectionNavigation.label',
+    kind: VOICE_FIELD_KIND.TEXT,
+    surface: VOICE_SURFACE.NAVIGATION,
+    placeholders: [],
+    max: 40,
+  },
+  {
     id: 'postShareCopyLink',
     path: 'postShare.copyLink',
     kind: VOICE_FIELD_KIND.TEXT,
