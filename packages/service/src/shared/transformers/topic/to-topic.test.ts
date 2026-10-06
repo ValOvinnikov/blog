@@ -19,4 +19,8 @@ describe('toTopic', () => {
     const raw = makeRawTopic({ description: null });
     expect(toTopic(raw).description).toBeUndefined();
   });
+
+  it('maps a topic with no topic page to an undefined slug', () => {
+    expect(toTopic(makeRawTopic({ slug: null })).slug).toBeUndefined();
+  });
 });

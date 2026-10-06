@@ -82,10 +82,9 @@ export const PostArticle = async ({ slug }: TPostArticleProps) => {
     [ASIDE_KIND.DIGRESSION]: blogPostT('asideKind.DIGRESSION'),
     [ASIDE_KIND.CONTEXT]: blogPostT('asideKind.CONTEXT'),
   };
-  const footerTags = tags.map((tag) => ({
-    label: tag.title,
-    href: routes.tag(tag.slug),
-  }));
+  const footerTags = tags.flatMap(({ title: label, slug: tagSlug }) =>
+    tagSlug ? [{ label, href: routes.tag(tagSlug) }] : [],
+  );
   const components = createAsideOverride(asideKindLabels);
 
   return (
@@ -96,7 +95,7 @@ export const PostArticle = async ({ slug }: TPostArticleProps) => {
         title={title}
         topic={{
           label: topic.title,
-          href: routes.topic(topic.slug),
+          href: topic.slug ? routes.topic(topic.slug) : undefined,
           linkAs: SmartLink,
         }}
         lead={excerpt}

@@ -7,7 +7,7 @@ export type TRawTopic = InferFragmentType<typeof topicFragment>;
 export type TTopic = {
   id: string;
   title: string;
-  slug: string;
+  slug: TMaybeUndefined<string>;
   description: TMaybeUndefined<string>;
 };
 
@@ -15,7 +15,7 @@ export function toTopic(raw: TRawTopic): TTopic {
   return {
     id: raw._id,
     title: raw.title,
-    slug: raw.slug,
+    slug: raw.slug ?? undefined,
     description: raw.description ?? undefined,
   };
 }

@@ -26,7 +26,9 @@ export const PostBreadcrumbs = async ({ slug }: TPostBreadcrumbsProps) => {
 
   const breadcrumbTrail: IBreadcrumbItem[] = [
     { label: t('home'), href: routes.home() },
-    { label: topic.title, href: routes.topic(topic.slug) },
+    ...(topic.slug
+      ? [{ label: topic.title, href: routes.topic(topic.slug) }]
+      : []),
     { label: title, href: routes.post(slug) },
   ];
   const breadcrumbListSchema = await buildBreadcrumbListSchema(breadcrumbTrail);

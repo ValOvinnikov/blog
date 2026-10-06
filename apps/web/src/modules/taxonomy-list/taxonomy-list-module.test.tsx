@@ -110,6 +110,20 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
       ).toBeVisible();
     });
 
+    it('omits an entry with no archive page', async () => {
+      getTaxonomyListMock.mockResolvedValue(
+        topicsResult([
+          entry,
+          { ...entry, id: 'topic-2', title: 'Design', slug: undefined },
+        ]),
+      );
+
+      await setup();
+
+      expect(screen.getByRole('link', { name: /Engineering/ })).toBeVisible();
+      expect(screen.queryByText('Design')).not.toBeInTheDocument();
+    });
+
     it('derives titleId and dataTestId from the module id', async () => {
       getTaxonomyListMock.mockResolvedValue(topicsResult([entry]));
 

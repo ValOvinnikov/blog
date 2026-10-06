@@ -1,4 +1,4 @@
-import { customRenderAsync } from '@web/testing/custom-render';
+import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { mockPostDetail } from '@web/testing/pages/blog-post-page/fixtures';
 import {
   testBreadcrumbsJsonLdSchema,
@@ -55,5 +55,23 @@ describe(`<${PostBreadcrumbs.name}/>`, () => {
     successData: mockPostDetail,
     description: 'forwards the slug to getPostPage',
     expectedArgs: ['hello-world'],
+  });
+
+  describe('when the topic has no topic page', () => {
+    it('omits the topic crumb', async () => {
+      getPostPageMock.mockResolvedValue({
+        ok: true,
+        data: {
+          ...mockPostDetail,
+          topic: { ...mockPostDetail.topic, slug: undefined },
+        },
+      });
+
+      await setup();
+
+      const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
+      expect(within(nav).getByRole('link', { name: 'Home' })).toBeVisible();
+      expect(within(nav).queryByText('Engineering')).not.toBeInTheDocument();
+    });
   });
 });

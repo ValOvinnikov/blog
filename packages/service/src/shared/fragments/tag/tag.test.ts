@@ -20,16 +20,15 @@ describe('tagFragment', () => {
     expect(() => tagDocQuery.parse(projected)).toThrow();
   });
 
-  it('throws when the resolved slug is missing', () => {
-    const projected = { _id: 'tag-3', title: 'No Slug', slug: null };
+  it('accepts a tag with no tag page as a null slug', () => {
+    const projected = { _id: 'tag-3', title: 'No Page', slug: null };
 
-    expect(() => tagDocQuery.parse(projected)).toThrow();
+    expect(tagDocQuery.parse(projected)).toEqual(projected);
   });
 
-  it('resolves the slug from the tag page referencing this tag, falling back to the tag own slug', () => {
+  it('resolves the slug only from the tag page referencing this tag', () => {
     expect(tagDocQuery.query).toContain(
       '_type == "page_tag" && tag._ref == ^._id',
     );
-    expect(tagDocQuery.query).toContain('coalesce(');
   });
 });

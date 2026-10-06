@@ -86,4 +86,26 @@ describe(`<${TopicChipList.name}/>`, () => {
       'aria-current',
     );
   });
+
+  it('renders a topic with no archive page as plain text, never current', () => {
+    setup({
+      topics: [
+        ...topics,
+        {
+          id: 'topic-3',
+          title: 'Culture',
+          slug: undefined,
+          description: undefined,
+          postCount: 2,
+        },
+      ],
+    });
+
+    const chip = screen.getByText('Culture');
+    expect(chip).toBeVisible();
+    expect(chip).not.toHaveAttribute('aria-current');
+    expect(
+      screen.queryByRole('link', { name: 'Culture' }),
+    ).not.toBeInTheDocument();
+  });
 });
