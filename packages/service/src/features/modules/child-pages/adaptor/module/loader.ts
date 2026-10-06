@@ -1,4 +1,3 @@
-import { getChildPages } from '@blog/service/features/modules/child-pages/adaptor/pages/loader';
 import { isr } from '@blog/service/sanity/query/isr';
 import {
   runQuery,
@@ -6,23 +5,18 @@ import {
 } from '@blog/service/sanity/query/query';
 
 import { childPagesModuleQuery } from './query';
-import { toChildPagesModule } from './transformer';
-import type { TChildPagesModule } from './types';
+import { toChildPagesModuleDocument } from './transformer';
+import type { TChildPagesModuleDocument } from './types';
 
-export async function getChildPagesModule(
+export async function getChildPagesModuleDocument(
   id: string,
-  parentId: string,
-  parentPath: string,
   tenant: TTenantSanityContext,
-): Promise<TChildPagesModule> {
-  const [raw, pages] = await Promise.all([
-    runQuery(childPagesModuleQuery, {
-      parameters: { id },
-      tenant,
-      ...isr(['modules:childPages', `module:${id}`], tenant.projectId),
-    }),
-    getChildPages(parentId, parentPath, tenant),
-  ]);
+): Promise<TChildPagesModuleDocument> {
+  const raw = await runQuery(childPagesModuleQuery, {
+    parameters: { id },
+    tenant,
+    ...isr(['modules:childPages', `module:${id}`], tenant.projectId),
+  });
 
-  return toChildPagesModule(raw, pages);
+  return toChildPagesModuleDocument(raw);
 }

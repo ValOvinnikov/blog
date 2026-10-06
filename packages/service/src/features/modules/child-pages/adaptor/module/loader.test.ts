@@ -1,11 +1,8 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import {
-  makeRawChildPage,
-  makeRawChildPagesModule,
-} from '@blog/service/testing/modules/fixtures';
+import { makeRawChildPagesModule } from '@blog/service/testing/modules/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
-import { getChildPagesModule } from './loader';
+import { getChildPagesModuleDocument } from './loader';
 
 vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
   ...(await importOriginal<
@@ -16,38 +13,24 @@ vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
 
 const tenant = makeTenant();
 
-describe(getChildPagesModule, () => {
-  it('resolves the module with the children of the hosting page', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawChildPagesModule())
-      .mockResolvedValueOnce([makeRawChildPage()]);
+describe(getChildPagesModuleDocument, () => {
+  it('resolves the module document fields', async () => {
+    mockRun.mockResolvedValueOnce(makeRawChildPagesModule());
 
-    const module = await getChildPagesModule(
-      'child-pages-1',
-      'page-modules',
-      'modules',
-      tenant,
-    );
+    const module = await getChildPagesModuleDocument('child-pages-1', tenant);
 
-    expect(module.pages.map((page) => page.path)).toEqual(['modules/faq']);
+    expect(module.headingBlock?.heading).toBe('In this section');
   });
 
   it('scopes the module cache tags to the tenant', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawChildPagesModule())
-      .mockResolvedValueOnce([]);
+    mockRun.mockResolvedValueOnce(makeRawChildPagesModule());
 
-    await getChildPagesModule(
-      'child-pages-1',
-      'page-modules',
-      'modules',
-      tenant,
-    );
+    await getChildPagesModuleDocument('child-pages-1', tenant);
 
-    expect(mockRun).toHaveBeenNthCalledWith(
-      1,
+    expect(mockRun).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({
+        parameters: { id: 'child-pages-1' },
         tenant,
         next: expect.objectContaining({
           tags: [
@@ -60,12 +43,10 @@ describe(getChildPagesModule, () => {
   });
 
   it('propagates when the module document is missing', async () => {
-    mockRun
-      .mockRejectedValueOnce(new Error('ValidationError'))
-      .mockResolvedValueOnce([]);
+    mockRun.mockRejectedValueOnce(new Error('ValidationError'));
 
     await expect(
-      getChildPagesModule('missing', 'page-modules', 'modules', tenant),
+      getChildPagesModuleDocument('missing', tenant),
     ).rejects.toThrow();
   });
 });

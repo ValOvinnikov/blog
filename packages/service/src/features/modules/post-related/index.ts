@@ -1,2 +1,2 @@
-export type { TPostRelatedModule } from './adaptor/types';
+export type { TPostRelatedModule } from './application/types';
 export { createPostRelatedModuleService } from './application/service';

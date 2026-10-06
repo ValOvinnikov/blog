@@ -1,22 +1,21 @@
 import { makeRawChildPagesModule } from '@blog/service/testing/modules/fixtures';
 
-import { toChildPagesModule } from './transformer';
+import { toChildPagesModuleDocument } from './transformer';
 
-describe(toChildPagesModule, () => {
+describe(toChildPagesModuleDocument, () => {
   it('maps an authored heading block', () => {
-    const module = toChildPagesModule(makeRawChildPagesModule(), []);
+    const module = toChildPagesModuleDocument(makeRawChildPagesModule());
 
     expect(module.headingBlock?.heading).toBe('In this section');
   });
 
   it('leaves the heading block, alignment and layout undefined when unset', () => {
-    const module = toChildPagesModule(
+    const module = toChildPagesModuleDocument(
       makeRawChildPagesModule({
         headingBlock: null,
         contentAlignment: null,
         layout: null,
       }),
-      [],
     );
 
     expect(module.headingBlock).toBeUndefined();

@@ -5,38 +5,10 @@ import { postCardFragment } from '@blog/service/shared/fragments/post/post';
 
 import { RELATED_POSTS_TAG_CANDIDATE_LIMIT } from './constants';
 
-export type TAnchorPostParams = {
-  postId: string;
-};
-
 export type TRelatedByTagsParams = {
   currentId: string;
   tagIds: string[];
 };
-
-export type TRelatedByTopicParams = {
-  currentId: string;
-  topicId: string;
-};
-
-export const relatedPostAnchorQuery = q
-  .parameters<TAnchorPostParams>()
-  .star.filterByType('page_post')
-  .filterBy('_id == $postId')
-  .slice(0)
-  .project((sub) => ({
-    tagIds: sub
-      .field('tags[]')
-      .deref()
-      .project(() => ({ _id: true }))
-      .nullable(true),
-    topicId: sub
-      .field('topic')
-      .deref()
-      .project(() => ({ _id: true }))
-      .nullable(true),
-  }))
-  .nullable(true);
 
 // groqd's typed `.order()` takes no raw `count(...)`, so the shared-tag ranking runs in JS (`toRelatedPosts`).
 export const relatedByTagsQuery = q
@@ -55,15 +27,3 @@ export const relatedByTagsQuery = q
       .project(() => ({ _id: true }))
       .nullable(true),
   }));
-
-export function relatedByTopicQuery(topicCandidateLimit: number) {
-  return q
-    .parameters<TRelatedByTopicParams>()
-    .star.filterByType('page_post')
-    .filterRaw('_id != $currentId && topic._ref == $topicId')
-    .filterRaw(POST_IN_LOCALE_FILTER)
-    .filterRaw(PUBLISHED_POST_FILTER)
-    .order('publishedAt desc')
-    .slice(0, topicCandidateLimit)
-    .project(postCardFragment);
-}

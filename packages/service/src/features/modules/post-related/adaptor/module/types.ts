@@ -5,12 +5,11 @@ import type {
   TMaybeUndefined,
   THeadingBlock,
 } from '@blog/config';
-import type { TPostCard } from '@blog/service/shared/transformers/post/to-post-card';
 
-export type TPostRelatedModule = {
+export type TPostRelatedModuleDocument = {
   brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
   headingBlock: THeadingBlock;
-  posts: TPostCard[];
+  limit: number;
   layout: TMaybeUndefined<TLayout>;
   contentAlignment: TMaybeUndefined<TContentAlignment>;
   showImages: boolean;
