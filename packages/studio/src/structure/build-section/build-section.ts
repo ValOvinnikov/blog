@@ -5,9 +5,14 @@ import {
 } from '@blog/config/constants';
 import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
 import { isSingleLanguage } from '@blog/studio/structure/locales/is-single-language';
+import { createPageTreeResolver } from '@blog/studio/structure/page-tree/page-tree';
 import type { ComponentType } from 'react';
 import { getPublishedId, type SchemaTypeDefinition } from 'sanity';
-import type { ListItemBuilder, StructureBuilder } from 'sanity/structure';
+import type {
+  ChildResolver,
+  ListItemBuilder,
+  StructureBuilder,
+} from 'sanity/structure';
 
 type TDividerBuilder = ReturnType<StructureBuilder['divider']>;
 
@@ -15,7 +20,7 @@ type TStructureSchema = Pick<SchemaTypeDefinition, 'name' | 'title' | 'icon'>;
 
 type TStructureGroupItem = {
   schema: TStructureSchema;
-  mode?: 'list' | 'singleton' | 'byLanguage' | 'onePerLanguage';
+  mode?: 'list' | 'singleton' | 'byLanguage' | 'onePerLanguage' | 'pageTree';
 };
 
 type TStructureGroup = {
@@ -57,10 +62,13 @@ type TPageItem = {
 const templateIdFor = (name: string, locale: TLocaleIsoCode) =>
   `${name}-${locale}`;
 
+const topLevelOnly = (filter: string) => `${filter} && !defined(parent)`;
+
 const buildByLanguageItem = (
   S: StructureBuilder,
   { name, title, icon }: TPageItem,
   locales: readonly TLocaleIsoCode[],
+  pageTree?: ChildResolver,
 ): ListItemBuilder => {
   const languageList = (
     id: string,
@@ -68,38 +76,44 @@ const buildByLanguageItem = (
     filter: string,
     params: Record<string, string>,
     templateIds: string[],
-  ) =>
-    S.listItem()
+    resolveChild?: ChildResolver,
+  ) => {
+    const list = S.documentTypeList(name)
+      .id(id)
+      .title(`${listTitle} ${title}`)
+      .filter(resolveChild ? topLevelOnly(filter) : filter)
+      .params({ type: name, ...params })
+      .initialValueTemplates(
+        templateIds.map((templateId) => S.initialValueTemplateItem(templateId)),
+      );
+
+    return S.listItem()
       .title(listTitle)
       .id(id)
       .icon(icon)
-      .child(
-        S.documentTypeList(name)
-          .id(id)
-          .title(`${listTitle} ${title}`)
-          .filter(filter)
-          .params({ type: name, ...params })
-          .initialValueTemplates(
-            templateIds.map((templateId) =>
-              S.initialValueTemplateItem(templateId),
-            ),
-          ),
-      );
+      .child(resolveChild ? list.child(resolveChild) : list);
+  };
 
   if (isSingleLanguage(locales)) {
     const [defaultLocale = LOCALE_ISO_CODES.EN] = locales;
+    const list = S.documentTypeList(name)
+      .id(name)
+      .title(title)
+      .initialValueTemplates([
+        S.initialValueTemplateItem(templateIdFor(name, defaultLocale)),
+      ]);
 
     return S.listItem()
       .title(title)
       .id(name)
       .icon(icon)
       .child(
-        S.documentTypeList(name)
-          .id(name)
-          .title(title)
-          .initialValueTemplates([
-            S.initialValueTemplateItem(templateIdFor(name, defaultLocale)),
-          ]),
+        pageTree
+          ? list
+              .filter(topLevelOnly('_type == $type'))
+              .params({ type: name })
+              .child(pageTree)
+          : list,
       );
   }
 
@@ -118,6 +132,7 @@ const buildByLanguageItem = (
               `_type == $type && ${LANGUAGE_FIELD} == $language`,
               { language: locale },
               [templateIdFor(name, locale)],
+              pageTree,
             ),
           ),
           S.divider(),
@@ -193,6 +208,15 @@ const buildGroupItem = (
 
   if (item.mode === 'byLanguage') {
     return buildByLanguageItem(S, { name, title, icon }, locales);
+  }
+
+  if (item.mode === 'pageTree') {
+    return buildByLanguageItem(
+      S,
+      { name, title, icon },
+      locales,
+      createPageTreeResolver(S, { name, icon }),
+    );
   }
 
   if (item.mode === 'onePerLanguage') {

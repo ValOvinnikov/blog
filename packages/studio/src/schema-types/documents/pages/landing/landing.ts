@@ -14,6 +14,10 @@ import { languagePreview } from '@blog/studio/schema-types/preview/language-prev
 import { validateLandingParent } from '@blog/studio/schema-types/validation/validate-landing-parent/validate-landing-parent';
 import { validateLandingSlug } from '@blog/studio/schema-types/validation/validate-landing-slug/validate-landing-slug';
 import { validateLandingSlugUniqueAmongSiblings } from '@blog/studio/schema-types/validation/validate-landing-slug-unique-among-siblings/validate-landing-slug-unique-among-siblings';
+import {
+  orderRankField,
+  orderRankOrdering,
+} from '@sanity/orderable-document-list';
 import { FileText } from 'lucide-react';
 import {
   defineField,
@@ -44,7 +48,9 @@ export const landingPageSchema = defineType({
     'A standalone page at its own URL, showing the hero and modules of its template — for marketing or informational content.',
   icon: FileText,
   preview: languagePreview,
+  orderings: [orderRankOrdering],
   fields: [
+    orderRankField({ type: PAGE_LANDING_TYPE }),
     languageField(),
     titleField(),
     defineField({

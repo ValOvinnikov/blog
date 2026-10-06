@@ -9,6 +9,10 @@ import type { StructureBuilder } from 'sanity/structure';
 
 import { buildSections, type TStructureSection } from './build-section';
 
+vi.mock('@sanity/orderable-document-list', () => ({
+  OrderableDocumentList: () => null,
+}));
+
 type TCall = { method: string; args: unknown[] };
 
 type TMockBuilder = {
@@ -648,6 +652,74 @@ describe(buildSections, () => {
       expect(lists.map((list) => listOf(list).documentType)).toEqual(
         lists.map(() => 'landingPage'),
       );
+    });
+  });
+
+  describe('pageTree items', () => {
+    const buildTreeItem = (locales?: readonly TLocaleIsoCode[]) => {
+      const S = makeMockStructureBuilder();
+      const [item] = getGroupItems(
+        S,
+        [
+          {
+            items: [
+              {
+                schema: {
+                  name: 'landingPage',
+                  title: 'Landing Pages',
+                  icon: List,
+                },
+                mode: 'pageTree',
+              },
+            ],
+          },
+        ],
+        locales,
+      );
+      return item!;
+    };
+
+    const documentListOf = (item: TMockBuilder) =>
+      callArgs(item, 'child')?.[0] as TMockBuilder;
+
+    it('lists only top-level pages per language and opens each through the tree', () => {
+      const list = documentListOf(buildTreeItem());
+      const [english] = callArgs(list, 'items')?.[0] as TMockBuilder[];
+      const englishList = documentListOf(english!);
+
+      expect(callArgs(englishList, 'filter')).toEqual([
+        '_type == $type && language == $language && !defined(parent)',
+      ]);
+      expect(callArgs(englishList, 'initialValueTemplates')).toEqual([
+        [{ templateId: 'landingPage-EN' }],
+      ]);
+      expect(callArgs(englishList, 'child')?.[0]).toBeTypeOf('function');
+    });
+
+    it('keeps all pages as one flat list of every page', () => {
+      const list = documentListOf(buildTreeItem());
+      const allPages = (callArgs(list, 'items')?.[0] as TMockBuilder[]).at(-1)!;
+      const allPagesList = documentListOf(allPages);
+
+      expect(callArgs(allPages, 'title')).toEqual(['All pages']);
+      expect(callArgs(allPagesList, 'filter')).toEqual(['_type == $type']);
+      expect(callArgs(allPagesList, 'child')).toBeUndefined();
+    });
+
+    it('lists only top-level pages with one live language', () => {
+      const documentList = documentListOf(buildTreeItem([LOCALE_ISO_CODES.NL]));
+
+      expect(documentList.kind).toBe('documentTypeList');
+      expect(callArgs(documentList, 'filter')).toEqual([
+        '_type == $type && !defined(parent)',
+      ]);
+      expect(callArgs(documentList, 'params')).toEqual([
+        { type: 'landingPage' },
+      ]);
+      expect(callArgs(documentList, 'initialValueTemplates')).toEqual([
+        [{ templateId: 'landingPage-NL' }],
+      ]);
+      expect(callArgs(documentList, 'child')?.[0]).toBeTypeOf('function');
     });
   });
 

@@ -1896,6 +1896,7 @@ export type Page_landing = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  orderRank?: string;
   language?: 'EN' | 'NL' | 'FR' | 'DE' | 'ES';
   title?: string;
   parent?: Page_landingReference;
