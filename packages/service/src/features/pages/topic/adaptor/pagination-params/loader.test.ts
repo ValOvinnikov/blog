@@ -14,10 +14,17 @@ const tenant = makeTenant();
 
 describe('getTopicPaginationParams', () => {
   it('delegates the raw query result to the pagination transformer', async () => {
-    mockRun.mockResolvedValueOnce([
-      { slug: 'engineering', pageSize: 9, postCount: 20 },
-      { slug: 'design', pageSize: 9, postCount: 9 },
-    ]);
+    mockRun
+      .mockResolvedValueOnce([
+        {
+          slug: 'engineering',
+          moduleRefs: [{ _ref: 'list-1' }],
+          postCount: 20,
+        },
+        { slug: 'design', moduleRefs: [{ _ref: 'list-1' }], postCount: 9 },
+        { slug: 'no-list', moduleRefs: [{ _ref: 'hero-1' }], postCount: 50 },
+      ])
+      .mockResolvedValueOnce([{ _id: 'list-1', pageSize: 9 }]);
 
     const params = await getTopicPaginationParams(tenant);
 
@@ -40,12 +47,32 @@ describe('getTopicPaginationParams', () => {
           tags: [
             't:tenant-a:page_topic',
             't:tenant-a:template_topic',
-            't:tenant-a:modules:postList',
             't:tenant-a:posts',
             't:tenant-a:topic',
           ],
         }),
       }),
+    );
+  });
+
+  it('fetches the page sizes of all pages in one request', async () => {
+    mockRun
+      .mockResolvedValueOnce([
+        {
+          slug: 'engineering',
+          moduleRefs: [{ _ref: 'list-1' }],
+          postCount: 20,
+        },
+        { slug: 'design', moduleRefs: [{ _ref: 'list-2' }], postCount: 20 },
+      ])
+      .mockResolvedValueOnce([]);
+
+    await getTopicPaginationParams(tenant);
+
+    expect(mockRun).toHaveBeenCalledTimes(2);
+    expect(mockRun).toHaveBeenLastCalledWith(
+      expect.anything(),
+      expect.objectContaining({ parameters: { ids: ['list-1', 'list-2'] } }),
     );
   });
 });

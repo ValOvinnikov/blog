@@ -1,8 +1,4 @@
 import { q } from '@blog/service/sanity/query/query';
-import {
-  FIRST_POST_LIST_PAGE_SIZE_EXPRESSION,
-  firstPostListPageSizeParser,
-} from '@blog/service/shared/expressions/module/first-post-list-page-size';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/post/published-post';
 
 export const indexPageParamsQuery = q.star
@@ -16,9 +12,11 @@ export const indexPageParamsQuery = q.star
         )
         .notNull(true),
     })),
-    pageSize: page.raw(
-      FIRST_POST_LIST_PAGE_SIZE_EXPRESSION,
-      firstPostListPageSizeParser,
-    ),
+    moduleRefs: page
+      .field('template')
+      .deref()
+      .field('modules[]')
+      .project(() => ({ _ref: true }))
+      .nullable(true),
   }))
   .notNull();
