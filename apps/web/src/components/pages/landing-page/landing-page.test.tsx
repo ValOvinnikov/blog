@@ -1,5 +1,6 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { service } from '@blog/service';
+import { permanentRedirect } from '@web/i18n/navigation';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {
   customRenderServerAsync,
@@ -23,7 +24,7 @@ vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@blog/service', () => ({
   service: {
-    pages: { landing: { v1: { getPage: vi.fn() } } },
+    pages: { landing: { v1: { getPage: vi.fn(), getRedirect: vi.fn() } } },
     modules: {
       cta: { v1: { getCta: vi.fn() } },
       heroBlog: { v1: { getHeroBlog: vi.fn() } },
@@ -36,6 +37,7 @@ vi.mock('@web/utils/logger/logger');
 vi.mock('@web/i18n/navigation');
 
 const getPageMock = vi.mocked(service.pages.landing.v1.getPage);
+const getRedirectMock = vi.mocked(service.pages.landing.v1.getRedirect);
 
 const FAQ_PAGE_JSON_LD = '"@type":"FAQPage"';
 
@@ -46,6 +48,26 @@ const setup = customRenderServerAsync(LandingPage, {
 describe(`<${LandingPage.name}/>`, () => {
   beforeEach(() => {
     getPageMock.mockResolvedValue({ ok: true, data: mockLandingPage });
+    getRedirectMock.mockResolvedValue({ ok: true, data: undefined });
+  });
+
+  it('redirects permanently when the missing path has moved', async () => {
+    getPageMock.mockResolvedValueOnce({ ok: true, data: undefined });
+    getRedirectMock.mockResolvedValueOnce({ ok: true, data: '/company/about' });
+
+    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+
+    expect(permanentRedirect).toHaveBeenCalledWith({
+      href: '/company/about',
+      locale: DEFAULT_REQUEST_CONTEXT.locale,
+    });
+    expect(vi.mocked(notFound)).not.toHaveBeenCalled();
+  });
+
+  it('renders the page without a redirect lookup when the page exists', async () => {
+    await setup();
+
+    expect(getRedirectMock).not.toHaveBeenCalled();
   });
 
   it('logs and calls notFound() when the fetch fails', async () => {

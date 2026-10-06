@@ -1,6 +1,7 @@
 import type { TLocaleIsoCode } from '@blog/config/constants';
 import { getPage } from '@blog/service/features/pages/landing/adaptor/detail-page/loader';
 import { getPageSlugs } from '@blog/service/features/pages/landing/adaptor/detail-page-params/loader';
+import { getRedirect } from '@blog/service/features/pages/landing/adaptor/redirect/loader';
 import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
 import { safeAsync } from '@blog/utils';
 
@@ -13,6 +14,10 @@ export function createLandingPageService() {
       getPageSlugs: safeAsync(
         (tenant: TTenantSanityContext, liveLocales: TLocaleIsoCode[]) =>
           getPageSlugs(tenant, liveLocales),
+      ),
+      getRedirect: safeAsync(
+        (segments: string[], tenant: TTenantSanityContext) =>
+          getRedirect(segments, tenant),
       ),
     },
   };
