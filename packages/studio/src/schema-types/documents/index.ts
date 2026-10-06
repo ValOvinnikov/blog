@@ -13,6 +13,7 @@ import { tagIndexPageSchema } from './pages/tag-index/tag-index';
 import { topicPageSchema } from './pages/topic/topic';
 import { topicIndexPageSchema } from './pages/topic-index/topic-index';
 import { personSchema } from './person/person';
+import { redirectSchema } from './redirect/redirect';
 import { footerSettingsSchema } from './settings/footer/footer';
 import { navigationSettingsSchema } from './settings/navigation/navigation';
 import { siteSettingsSchema } from './settings/site-settings/site-settings';
@@ -49,6 +50,7 @@ export const documents = [
   postPageSchema,
   tagIndexPageSchema,
   tagPageSchema,
+  redirectSchema,
   siteSettingsSchema,
   navigationSettingsSchema,
   footerSettingsSchema,

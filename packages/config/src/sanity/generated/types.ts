@@ -1066,6 +1066,18 @@ export type Settings_site = {
     | 'ZWL';
 };
 
+export type Redirect = {
+  _id: string;
+  _type: 'redirect';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  language?: 'EN' | 'NL' | 'FR' | 'DE' | 'ES';
+  source?: string;
+  destination?: string;
+  isPrefix?: boolean;
+};
+
 export type Block_faq = {
   _id: string;
   _type: 'block_faq';
@@ -2205,6 +2217,7 @@ export type AllSanitySchemaTypes =
   | Settings_footer
   | Settings_navigation
   | Settings_site
+  | Redirect
   | Block_faq
   | Block_testimonial
   | Block_feature

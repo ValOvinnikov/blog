@@ -3,6 +3,7 @@ import {
   type TCapability,
   type TLocaleIsoCode,
 } from '@blog/config/constants';
+import { withLandingRedirects } from '@blog/studio/document-actions/with-landing-redirects/with-landing-redirects';
 import { schemaTypes } from '@blog/studio/schema-types';
 import { PAGE_HOME_TYPE } from '@blog/studio/schema-types/documents/pages/home/home-type';
 import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
@@ -184,8 +185,14 @@ export const buildStudioConfig = ({
     },
 
     document: {
-      actions: (prev, { schemaType }) =>
-        schemaType === migrationStateSchema.name ? [] : prev,
+      actions: (prev, { schemaType }) => {
+        if (schemaType === migrationStateSchema.name) return [];
+        if (schemaType !== PAGE_LANDING_TYPE) return prev;
+
+        return prev.map((action) =>
+          action.action === 'publish' ? withLandingRedirects(action) : action,
+        );
+      },
       newDocumentOptions: (prev) =>
         prev.filter((item) => item.templateId !== migrationStateSchema.name),
     },
