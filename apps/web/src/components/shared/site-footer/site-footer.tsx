@@ -38,6 +38,7 @@ export const SiteFooter = async () => {
   const social = footerResult.ok ? footerResult.data.social : [];
   const hasLanguageSwitcher =
     footerResult.ok && footerResult.data.showLanguageSwitcher === true;
+  const hasRssFeed = !footerResult.ok || footerResult.data.showRssFeed;
 
   return (
     <Footer dataTestId="site-footer">
@@ -54,14 +55,18 @@ export const SiteFooter = async () => {
           />
         )}
         <CookieSettingsButton />
-        <NavLink
-          as={SmartLink}
-          href={routes.rssFeed()}
-          icon={<Icon name={ICONS.RSS} size={SIZE.SM} dataTestId="rss-icon" />}
-          hasLabel={false}
-        >
-          {t('feedLinkLabel')}
-        </NavLink>
+        {hasRssFeed && (
+          <NavLink
+            as={SmartLink}
+            href={routes.rssFeed()}
+            icon={
+              <Icon name={ICONS.RSS} size={SIZE.SM} dataTestId="rss-icon" />
+            }
+            hasLabel={false}
+          >
+            {t('feedLinkLabel')}
+          </NavLink>
+        )}
       </Footer.Nav>
     </Footer>
   );
