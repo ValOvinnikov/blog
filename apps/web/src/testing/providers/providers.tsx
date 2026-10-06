@@ -1,4 +1,5 @@
 import { LOCALE_ISO_CODES, SITE_MESSAGES } from '@blog/config';
+import { ConsentProvider } from '@web/context/consent-provider';
 import { SanityImageBaseUrlProvider } from '@web/context/sanity-image-base-url-provider';
 import { NextIntlClientProvider } from 'next-intl';
 import type { ReactNode } from 'react';
@@ -23,7 +24,7 @@ export interface IAppProvidersProps {
 export const AppProviders = ({ children }: IAppProvidersProps) => (
   <NextIntlClientProvider locale={LOCALE_ISO_CODES.EN} messages={SITE_MESSAGES}>
     <SanityImageBaseUrlProvider baseUrl={STATIC_SANITY_IMAGE_BASE_URL}>
-      {children}
+      <ConsentProvider>{children}</ConsentProvider>
     </SanityImageBaseUrlProvider>
   </NextIntlClientProvider>
 );

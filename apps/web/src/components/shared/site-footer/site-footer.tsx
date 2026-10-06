@@ -3,6 +3,7 @@ import { service } from '@blog/service';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { NavLink } from '@blog/ui/components/atoms/nav-link';
 import { Footer } from '@blog/ui/components/organisms/footer';
+import { CookieSettingsButton } from '@web/components/shared/cookie-settings-button';
 import { LanguageSwitcher } from '@web/components/shared/language-switcher';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { SocialLinks } from '@web/components/shared/social-links';
@@ -52,6 +53,7 @@ export const SiteFooter = async () => {
             isInFooter={true}
           />
         )}
+        <CookieSettingsButton />
         <NavLink
           as={SmartLink}
           href={routes.rssFeed()}
