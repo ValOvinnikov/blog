@@ -14,5 +14,4 @@ export const tagIndexPageSchema = taxonomyIndexPage({
   taxonomyKindMismatchError:
     'This page lists tags; the module is set to topics.',
   templateType: tagIndexTemplateSchema.name,
-  previewSubtitle: 'Tag index singleton',
 });

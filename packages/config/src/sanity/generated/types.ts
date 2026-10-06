@@ -1194,9 +1194,28 @@ export type Page_homeReference = {
   [internalGroqTypeReferenceTo]?: 'page_home';
 };
 
+export type Page_topicIndexReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_topicIndex';
+};
+
+export type Page_tagIndexReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_tagIndex';
+};
+
 export type InternationalizedArrayReferenceValue = {
   _type: 'internationalizedArrayReferenceValue';
-  value?: Page_homeReference | Page_landingReference;
+  value?:
+    | Page_homeReference
+    | Page_postIndexReference
+    | Page_topicIndexReference
+    | Page_tagIndexReference
+    | Page_landingReference;
   language?: string;
 };
 
@@ -1510,25 +1529,11 @@ export type Page_topicReference = {
   [internalGroqTypeReferenceTo]?: 'page_topic';
 };
 
-export type Page_topicIndexReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'page_topicIndex';
-};
-
 export type Page_tagReference = {
   _ref: string;
   _type: 'reference';
   _weak?: boolean;
   [internalGroqTypeReferenceTo]?: 'page_tag';
-};
-
-export type Page_tagIndexReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'page_tagIndex';
 };
 
 export type Link = {
@@ -1566,6 +1571,7 @@ export type Page_tagIndex = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  language?: 'EN' | 'NL' | 'FR' | 'DE' | 'ES';
   title?: string;
   headingBlock?: HeadingBlock;
   template?: Template_tagIndexReference;
@@ -1690,6 +1696,7 @@ export type Page_topicIndex = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  language?: 'EN' | 'NL' | 'FR' | 'DE' | 'ES';
   title?: string;
   headingBlock?: HeadingBlock;
   template?: Template_topicIndexReference;
@@ -1818,6 +1825,7 @@ export type Page_postIndex = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  language?: 'EN' | 'NL' | 'FR' | 'DE' | 'ES';
   title?: string;
   headingBlock?: HeadingBlock;
   template?: Template_postIndexReference;
@@ -2204,6 +2212,8 @@ export type AllSanitySchemaTypes =
   | TranslationMetadata
   | InternationalizedArrayReference
   | Page_homeReference
+  | Page_topicIndexReference
+  | Page_tagIndexReference
   | InternationalizedArrayReferenceValue
   | Template_homeReference
   | Page_home
@@ -2232,9 +2242,7 @@ export type AllSanitySchemaTypes =
   | Page_post
   | Person
   | Page_topicReference
-  | Page_topicIndexReference
   | Page_tagReference
-  | Page_tagIndexReference
   | Link
   | Template_tagIndexReference
   | Page_tagIndex

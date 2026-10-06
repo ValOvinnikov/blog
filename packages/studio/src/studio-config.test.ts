@@ -6,6 +6,9 @@ import {
 } from '@blog/config/constants';
 import { PAGE_HOME_TYPE } from '@blog/studio/schema-types/documents/pages/home/home-type';
 import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
+import { PAGE_POST_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/post-index/post-index-type';
+import { PAGE_TAG_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/tag-index/tag-index-type';
+import { PAGE_TOPIC_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/topic-index/topic-index-type';
 import { migrationStateSchema } from '@blog/studio/schema-types/documents/system/migration-state/migration-state';
 import { ThemeProvider } from '@sanity/ui';
 import { buildTheme } from '@sanity/ui/theme';
@@ -80,34 +83,37 @@ describe(buildStudioConfig, () => {
     expect(actions(prev, context)).toEqual([]);
   });
 
-  it.each([PAGE_HOME_TYPE, PAGE_LANDING_TYPE])(
-    'creates a %s only through a language template',
-    (type) => {
-      const config = buildStudioConfig({
-        projectId: 'test-project',
-        dataset: 'test-dataset',
-        title: 'Test Studio',
-      });
-      const templates = config.schema?.templates;
-      if (typeof templates !== 'function') {
-        throw new Error('expected config.schema.templates to be a function');
-      }
-      const template = (id: string, schemaType: string) => ({
-        id,
-        title: id,
-        schemaType,
-        value: {},
-      });
+  it.each([
+    PAGE_HOME_TYPE,
+    PAGE_LANDING_TYPE,
+    PAGE_POST_INDEX_TYPE,
+    PAGE_TOPIC_INDEX_TYPE,
+    PAGE_TAG_INDEX_TYPE,
+  ])('creates a %s only through a language template', (type) => {
+    const config = buildStudioConfig({
+      projectId: 'test-project',
+      dataset: 'test-dataset',
+      title: 'Test Studio',
+    });
+    const templates = config.schema?.templates;
+    if (typeof templates !== 'function') {
+      throw new Error('expected config.schema.templates to be a function');
+    }
+    const template = (id: string, schemaType: string) => ({
+      id,
+      title: id,
+      schemaType,
+      value: {},
+    });
 
-      const ids = templates([
-        template(type, type),
-        template(`${type}-EN`, type),
-        template('page_post', 'page_post'),
-      ]).map(({ id }) => id);
+    const ids = templates([
+      template(type, type),
+      template(`${type}-EN`, type),
+      template('page_post', 'page_post'),
+    ]).map(({ id }) => id);
 
-      expect(ids).toEqual([`${type}-EN`, 'page_post']);
-    },
-  );
+    expect(ids).toEqual([`${type}-EN`, 'page_post']);
+  });
 
   describe('translations menu', () => {
     const languageFilterFor = (liveLocales: TLocaleIsoCode[]) => {
