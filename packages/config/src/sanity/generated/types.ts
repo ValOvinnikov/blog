@@ -1242,6 +1242,7 @@ export type InternationalizedArrayReferenceValue = {
     | Page_topicIndexReference
     | Page_tagIndexReference
     | Page_landingReference
+    | Page_postReference
     | Page_topicReference
     | Page_tagReference;
   language?: string;
@@ -1497,6 +1498,7 @@ export type Page_post = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  language?: 'EN' | 'NL' | 'FR' | 'DE' | 'ES';
   title?: string;
   slug?: Slug;
   headingBlock?: HeadingBlock;

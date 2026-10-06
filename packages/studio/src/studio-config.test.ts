@@ -6,6 +6,7 @@ import {
 } from '@blog/config/constants';
 import { PAGE_HOME_TYPE } from '@blog/studio/schema-types/documents/pages/home/home-type';
 import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
+import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
 import { PAGE_POST_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/post-index/post-index-type';
 import { PAGE_TAG_TYPE } from '@blog/studio/schema-types/documents/pages/tag/tag-type';
 import { PAGE_TAG_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/tag-index/tag-index-type';
@@ -119,6 +120,7 @@ describe(buildStudioConfig, () => {
     PAGE_POST_INDEX_TYPE,
     PAGE_TOPIC_INDEX_TYPE,
     PAGE_TAG_INDEX_TYPE,
+    PAGE_POST_TYPE,
     PAGE_TOPIC_TYPE,
     PAGE_TAG_TYPE,
   ])('creates a %s only through a language template', (type) => {
@@ -141,10 +143,10 @@ describe(buildStudioConfig, () => {
     const ids = templates([
       template(type, type),
       template(`${type}-EN`, type),
-      template('page_post', 'page_post'),
+      template('blog_topic', 'blog_topic'),
     ]).map(({ id }) => id);
 
-    expect(ids).toEqual([`${type}-EN`, 'page_post']);
+    expect(ids).toEqual([`${type}-EN`, 'blog_topic']);
   });
 
   describe('translations menu', () => {

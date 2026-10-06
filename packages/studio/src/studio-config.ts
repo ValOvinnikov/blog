@@ -7,6 +7,7 @@ import { withLandingRedirects } from '@blog/studio/document-actions/with-landing
 import { schemaTypes } from '@blog/studio/schema-types';
 import { PAGE_HOME_TYPE } from '@blog/studio/schema-types/documents/pages/home/home-type';
 import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
+import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
 import { PAGE_POST_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/post-index/post-index-type';
 import { PAGE_TAG_TYPE } from '@blog/studio/schema-types/documents/pages/tag/tag-type';
 import { PAGE_TAG_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/tag-index/tag-index-type';
@@ -63,6 +64,7 @@ const ONE_PER_LANGUAGE_DOCUMENT_TYPES: string[] = [
 const TRANSLATED_DOCUMENT_TYPES: string[] = [
   ...ONE_PER_LANGUAGE_DOCUMENT_TYPES,
   PAGE_LANDING_TYPE,
+  PAGE_POST_TYPE,
   PAGE_TOPIC_TYPE,
   PAGE_TAG_TYPE,
 ];

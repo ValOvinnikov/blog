@@ -26,7 +26,7 @@ export const pagesSection: TStructureSection = {
       title: 'Blog',
       items: [
         { schema: postIndexPageSchema, mode: 'onePerLanguage' },
-        { schema: postPageSchema },
+        { schema: postPageSchema, mode: 'byLanguage' },
         { schema: topicIndexPageSchema, mode: 'onePerLanguage' },
         { schema: topicPageSchema, mode: 'byLanguage' },
         { schema: tagIndexPageSchema, mode: 'onePerLanguage' },
