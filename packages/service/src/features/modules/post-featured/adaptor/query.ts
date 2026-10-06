@@ -8,15 +8,13 @@ import {
   SHOW_IMAGES_EXPRESSION,
   showImagesParser,
 } from '@blog/service/shared/expressions/module/show-images';
-import {
-  buildPinnedPostInLocaleFilter,
-  POST_IN_LOCALE_FILTER,
-} from '@blog/service/shared/expressions/post/post-in-locale';
+import { POST_IN_LOCALE_FILTER } from '@blog/service/shared/expressions/post/post-in-locale';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/post/published-post';
 import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
 import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { postCardFragment } from '@blog/service/shared/fragments/post/post';
+import { pinnedPostInLocale } from '@blog/service/shared/localization/pinned-post-in-locale/pinned-post-in-locale';
 
 const newestFeaturedPostsQuery = q.star
   .filterByType('page_post')
@@ -45,13 +43,9 @@ export const postFeaturedModuleQuery = q
           [`postSource == "${POST_SOURCE.PINNED}"`]: sub
             .field('posts[]')
             .project((ref) => ({
-              post: ref.star
-                .filterByType('page_post')
-                .filterRaw(buildPinnedPostInLocaleFilter('_ref'))
-                .filterRaw(PUBLISHED_POST_FILTER)
-                .slice(0)
-                .project(postCardFragment)
-                .nullable(true),
+              post: pinnedPostInLocale(ref, ref.field('@'), {
+                publishedOnly: true,
+              }).nullable(true),
             }))
             .nullable(true),
         },

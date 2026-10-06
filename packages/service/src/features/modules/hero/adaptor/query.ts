@@ -1,9 +1,8 @@
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
-import { buildPinnedPostInLocaleFilter } from '@blog/service/shared/expressions/post/post-in-locale';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
 import { moduleHeroLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { inlineLinkFragment } from '@blog/service/shared/fragments/link/inline-link';
-import { postCardFragment } from '@blog/service/shared/fragments/post/post';
+import { pinnedPostInLocale } from '@blog/service/shared/localization/pinned-post-in-locale/pinned-post-in-locale';
 
 export const heroModuleQuery = q
   .parameters<TModuleQueryParams>()
@@ -12,12 +11,9 @@ export const heroModuleQuery = q
   .slice(0)
   .project((sub) => ({
     brandVariant: sub.field('brandVariant').notNull(),
-    featuredPost: sub.star
-      .filterByType('page_post')
-      .filterRaw(buildPinnedPostInLocaleFilter('featuredPost._ref'))
-      .slice(0)
-      .project(postCardFragment)
-      .nullable(true),
+    featuredPost: pinnedPostInLocale(sub, sub.field('featuredPost')).nullable(
+      true,
+    ),
     heroEyebrowMode: sub.field('heroEyebrowMode').notNull(),
     heroEyebrow: sub.field('heroEyebrow').nullable(true),
     heroTitleMode: sub.field('heroTitleMode').notNull(),

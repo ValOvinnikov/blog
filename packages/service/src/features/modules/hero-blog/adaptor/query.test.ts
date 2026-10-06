@@ -1,7 +1,7 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import { localizedStrings } from '@blog/service/testing/shared/localized';
-import { translatedPostDocuments } from '@blog/service/testing/shared/translated-posts-dataset';
+import { pinnedPostDocuments } from '@blog/service/testing/shared/translated-posts-dataset';
 
 import { heroBlogModuleQuery } from './query';
 
@@ -80,7 +80,7 @@ describe('heroBlogModuleQuery language scoping', () => {
   ): Promise<unknown> {
     const raw = (await evaluateGroqExpression(
       heroBlogModuleQuery.query,
-      [{ ...heroDocument, ...module }, imageAsset, ...translatedPostDocuments],
+      [{ ...heroDocument, ...module }, imageAsset, ...pinnedPostDocuments],
       undefined,
       { id: 'hero-1', locale, defaultLocale: EN },
     )) as { post: { _id: string } | null };
@@ -102,6 +102,14 @@ describe('heroBlogModuleQuery language scoping', () => {
 
   it('shows no post when the pinned one has no translation', async () => {
     expect(await runPost(pinned('only-en'), NL)).toBeNull();
+  });
+
+  it('shows a pinned post without a translation group in its own language', async () => {
+    expect(await runPost(pinned('solo-nl'), NL)).toBe('solo-nl');
+  });
+
+  it('shows no post for a group-less pinned post in another language', async () => {
+    expect(await runPost(pinned('solo-nl'), EN)).toBeNull();
   });
 
   it('falls back to the newest featured post in the request language', async () => {
