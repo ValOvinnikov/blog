@@ -206,9 +206,39 @@ and expression with groqd's typed API; a GROQ string literal or `sub.raw()` is
 allowed **only when the typed API cannot express it**, and then carries a
 one-line comment naming what is missing. In particular:
 
-- **Filters use `.filterBy('field == $param')`**, never a raw `[...]` filter
-  string. `filterBy` checks the field and the declared parameter, so a
-  `$locale` the query does not declare fails type-check instead of at runtime.
+- **Filters use `.filterBy(...)`; `.filterRaw(...)` is the exception, and a
+  `filterRaw` that `filterBy` could express is a blocking review finding.**
+  `filterBy` checks the field and the declared parameter, so a `$locale` the
+  query does not declare fails type-check instead of at runtime. It accepts:
+  - `field == value`, `field != value` and number comparisons
+    (`<`, `<=`, `>`, `>=`), where the value is a literal, a `$param` or a
+    `^.path` — `filterBy('language == $locale')`,
+    `filterBy('topic._ref == $topicId')`;
+  - a bare boolean field or its negation — `filterBy('featured')`,
+    `filterBy('!hidden')`;
+  - `references(path | $param)` — `filterBy('references($termId)')`.
+
+  Rewrite a compound expression before reaching for `filterRaw`: `&&` becomes
+  chained `filterBy` calls, `||` becomes several `filterBy` arguments
+  (`filterBy('references($documentId)', 'references($linkIds)')`). Split a
+  mixed expression so only the untypeable part stays raw —
+  `.filterBy('_id != $currentId').filterRaw('count(tags[_ref in $tagIds]) > 0')`,
+  never one `filterRaw` holding both.
+
+  `filterRaw` is allowed only for what `filterBy` rejects at type-check: `in`
+  (`_id in $ids`, `language in $locales`), function calls (`now()`, `count`,
+  `coalesce`, `defined`, `string::startsWith`), and comparisons whose sides
+  groqd cannot type. Try `filterBy` first and keep `filterRaw` only when
+  type-check fails; the one-line comment names what `filterBy` lacks
+  (`// groqd's typed filterBy has no \`in\` operator`). A raw filter reused
+  across queries is a shared constant whose definition carries that comment
+  once.
+
+- **No subquery and no dereference inside a filter.** A nested `*[...]` or a
+  `->` in a filter can run once per candidate document. Narrow with plain
+  fields and `references()`, then resolve related documents in the
+  projection, or split the lookup into a shared adaptor (`shared/adaptors/`)
+  that the loader calls with ids.
 - **`coalesce` uses `sub.coalesce(...)`**, never a `` `coalesce(${field}…)` ``
   template.
 - **A localized field is read with the shared helpers, by field name only** —
