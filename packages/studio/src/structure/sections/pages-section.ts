@@ -25,11 +25,11 @@ export const pagesSection: TStructureSection = {
     {
       title: 'Blog',
       items: [
-        { schema: postIndexPageSchema, mode: 'singleton' },
+        { schema: postIndexPageSchema, mode: 'onePerLanguage' },
         { schema: postPageSchema },
-        { schema: topicIndexPageSchema, mode: 'singleton' },
+        { schema: topicIndexPageSchema, mode: 'onePerLanguage' },
         { schema: topicPageSchema },
-        { schema: tagIndexPageSchema, mode: 'singleton' },
+        { schema: tagIndexPageSchema, mode: 'onePerLanguage' },
         { schema: tagPageSchema },
       ],
     },
