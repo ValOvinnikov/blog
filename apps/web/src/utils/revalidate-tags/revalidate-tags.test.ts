@@ -88,12 +88,6 @@ describe('getRevalidateTagsForType', () => {
     ).toEqual(['modules:newsletter', 'module:newsletter-1']);
   });
 
-  it('maps the newsletter settings singleton to its ISR tag', () => {
-    expect(
-      getRevalidateTagsForType('settings_newsletter', 'settings-newsletter'),
-    ).toEqual(['newsletter-settings']);
-  });
-
   it('maps the link document type to its ISR tag', () => {
     expect(getRevalidateTagsForType('link', 'link-1')).toEqual(['link']);
   });

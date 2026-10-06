@@ -1,7 +1,7 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { at, set } from 'sanity/migrate';
 
-import { copyNewsletterTrustCues } from './index';
+import { copyNewsletterTrustCues } from './copy-newsletter-trust-cues';
 
 const { EN } = LOCALE_ISO_CODES;
 

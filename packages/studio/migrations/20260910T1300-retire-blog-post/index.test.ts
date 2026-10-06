@@ -8,9 +8,10 @@ const baseDoc = {
   _rev: 'rev-1',
 };
 
-const createContext = (
-  result: { target: { content?: unknown } | null; refCount: number },
-): MigrationContext => {
+const createContext = (result: {
+  target: { content?: unknown } | null;
+  refCount: number;
+}): MigrationContext => {
   const fetch = async () => result;
 
   return { client: { fetch } } as unknown as MigrationContext;
@@ -54,9 +55,9 @@ describe('retire-blog-post migration — blog_post documents', () => {
     const doc = { ...baseDoc, _id: 'post-1', _type: 'blog_post' };
     const context = createContext({ target: null, refCount: 0 });
 
-    await expect(
-      migration.migrate.document(doc, context),
-    ).rejects.toThrow(/does not exist/);
+    await expect(migration.migrate.document(doc, context)).rejects.toThrow(
+      /does not exist/,
+    );
   });
 });
 

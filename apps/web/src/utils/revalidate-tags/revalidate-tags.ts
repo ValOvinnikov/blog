@@ -37,7 +37,6 @@ type TCachedDocumentType =
   | 'settings_site'
   | 'settings_navigation'
   | 'settings_footer'
-  | 'settings_newsletter'
   | 'settings_theme'
   | 'link'
   | 'translation.metadata'
@@ -68,7 +67,6 @@ const REVALIDATE_TAGS = {
   settings_site: ['site-settings'],
   settings_navigation: ['navigation'],
   settings_footer: ['footer'],
-  settings_newsletter: ['newsletter-settings'],
   settings_theme: ['theme-settings'],
   page_home: ['homePage'],
   page_postIndex: ['page_postIndex'],

@@ -7,7 +7,6 @@ import { createTagsService } from './features/entities/tags';
 import { createTopicsService } from './features/entities/topics';
 import { createFooterService } from './features/global/footer';
 import { createNavigationService } from './features/global/navigation';
-import { createNewsletterSettingsService } from './features/global/newsletter-settings';
 import { createSiteSettingsService } from './features/global/site-settings';
 import { createThemeSettingsService } from './features/global/theme-settings';
 import { createTranslationMapService } from './features/global/translation-map';
@@ -88,7 +87,6 @@ export const service = {
     siteSettings: createSiteSettingsService(),
     navigation: createNavigationService(),
     footer: createFooterService(),
-    newsletterSettings: createNewsletterSettingsService(),
     themeSettings: createThemeSettingsService(),
     translationMap: createTranslationMapService(),
   },
@@ -103,7 +101,6 @@ export type {
 } from './features/entities/topics';
 export type { TFooter } from './features/global/footer';
 export type { TNavigation } from './features/global/navigation';
-export type { TNewsletterSettings } from './features/global/newsletter-settings';
 export type { TBrand, TSiteSettings } from './features/global/site-settings';
 export type { TThemeTokens } from './features/global/theme-settings';
 export type {
