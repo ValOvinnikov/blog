@@ -1,4 +1,4 @@
-import type { TLocaleIsoCode } from '@blog/config';
+import { routes, type TLocaleIsoCode } from '@blog/config';
 import type { TTranslationMap } from '@blog/service';
 import { localeForPrefix } from '@web/i18n/routing';
 import { findTranslatedPath } from '@web/utils/find-translated-path';
@@ -10,6 +10,19 @@ type TSwitchLanguageTargetParams = {
   to: TLocaleIsoCode;
   defaultLocale: TLocaleIsoCode;
   liveLocales: readonly TLocaleIsoCode[];
+};
+
+const LIST_PAGE_BY_SEGMENT = new Map<string, string>([
+  ['blog', routes.blogIndex()],
+  ['topics', routes.topics()],
+  ['tags', routes.tags()],
+]);
+
+const toFallbackHref = (pathname: string): string => {
+  const [first = '', second] = pathname.split('/').filter(Boolean);
+  const listPage = LIST_PAGE_BY_SEGMENT.get(first);
+
+  return listPage && second !== undefined ? listPage : routes.home();
 };
 
 const splitLanguagePrefix = (
@@ -43,6 +56,11 @@ export const toSwitchLanguageTarget = ({
       fromLocale: current.locale,
       toLocale: to,
       defaultLocale,
-    }) ?? toLocalizedPathname({ href: '/', locale: to, defaultLocale })
+    }) ??
+    toLocalizedPathname({
+      href: toFallbackHref(current.pathname),
+      locale: to,
+      defaultLocale,
+    })
   );
 };
