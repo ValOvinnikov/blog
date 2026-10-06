@@ -17,7 +17,7 @@ export async function getTagPage(
   const rawPage = await runQuery(tagPageQuery, {
     parameters: { slug },
     tenant,
-    ...isr(['page_tag', 'tag'], tenant.projectId),
+    ...isr(['page_tag', 'template_tag', 'tag'], tenant.projectId),
   });
   if (!rawPage) return undefined;
 

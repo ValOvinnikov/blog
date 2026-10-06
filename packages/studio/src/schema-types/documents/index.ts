@@ -20,6 +20,11 @@ import { themeSettingsSchema } from './settings/theme/theme';
 import { migrationStateSchema } from './system/migration-state/migration-state';
 import { homeTemplateSchema } from './templates/home/home';
 import { landingTemplateSchema } from './templates/landing/landing';
+import { postIndexTemplateSchema } from './templates/post-index/post-index';
+import { tagTemplateSchema } from './templates/tag/tag';
+import { tagIndexTemplateSchema } from './templates/tag-index/tag-index';
+import { topicTemplateSchema } from './templates/topic/topic';
+import { topicIndexTemplateSchema } from './templates/topic-index/topic-index';
 
 export const documents = [
   personSchema,
@@ -31,6 +36,11 @@ export const documents = [
   linkSchema,
   homeTemplateSchema,
   landingTemplateSchema,
+  postIndexTemplateSchema,
+  topicIndexTemplateSchema,
+  topicTemplateSchema,
+  tagIndexTemplateSchema,
+  tagTemplateSchema,
   landingPageSchema,
   homePageSchema,
   postIndexPageSchema,

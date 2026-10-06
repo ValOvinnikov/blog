@@ -18,12 +18,16 @@ export const topicPageQuery = q
       .project(headingBlockFragment)
       .notNull(),
     hero: sub
+      .field('template')
+      .deref()
       .field('hero')
       .deref()
       .project(moduleFragment)
       .as<TRawModule<TPageTopicType>>()
       .nullable(),
     modules: sub
+      .field('template')
+      .deref()
       .field('modules[]')
       .deref()
       .project(moduleFragment)

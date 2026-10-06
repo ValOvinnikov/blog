@@ -66,7 +66,7 @@ describe('page module type unions', () => {
     >();
   });
 
-  it('resolves page_postIndex', () => {
+  it('resolves page_postIndex from template_postIndex', () => {
     expectTypeOf<TPagePostIndexType>().toEqualTypeOf<
       | 'module_heroBlog'
       | 'module_postList'
@@ -79,7 +79,7 @@ describe('page module type unions', () => {
     >();
   });
 
-  it('resolves page_tag', () => {
+  it('resolves page_tag from template_tag', () => {
     expectTypeOf<TPageTagType>().toEqualTypeOf<
       | 'module_heroBlog'
       | 'module_postList'
@@ -92,7 +92,7 @@ describe('page module type unions', () => {
     >();
   });
 
-  it('resolves page_tagIndex', () => {
+  it('resolves page_tagIndex from template_tagIndex', () => {
     expectTypeOf<TPageTagIndexType>().toEqualTypeOf<
       | 'module_heroBlog'
       | 'module_taxonomyList'
@@ -103,7 +103,7 @@ describe('page module type unions', () => {
     >();
   });
 
-  it('resolves page_topic', () => {
+  it('resolves page_topic from template_topic', () => {
     expectTypeOf<TPageTopicType>().toEqualTypeOf<
       | 'module_heroBlog'
       | 'module_postList'
@@ -116,7 +116,7 @@ describe('page module type unions', () => {
     >();
   });
 
-  it('resolves page_topicIndex', () => {
+  it('resolves page_topicIndex from template_topicIndex', () => {
     expectTypeOf<TPageTopicIndexType>().toEqualTypeOf<
       | 'module_heroBlog'
       | 'module_taxonomyList'

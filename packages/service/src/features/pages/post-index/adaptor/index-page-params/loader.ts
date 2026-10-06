@@ -12,7 +12,10 @@ export async function getIndexPageParams(
 ): Promise<{ page: string }[]> {
   const raw = await runQuery(indexPageParamsQuery, {
     tenant,
-    ...isr(['posts', 'page_postIndex', 'modules:postList'], tenant.projectId),
+    ...isr(
+      ['posts', 'page_postIndex', 'template_postIndex', 'modules:postList'],
+      tenant.projectId,
+    ),
   });
   return toIndexPageParams(raw);
 }

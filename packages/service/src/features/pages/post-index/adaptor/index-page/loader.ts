@@ -14,7 +14,7 @@ export async function getIndexPage(
 ): Promise<TMaybeUndefined<TBlogIndexPage>> {
   const rawPage = await runQuery(blogPageQuery, {
     tenant,
-    ...isr('page_postIndex', tenant.projectId),
+    ...isr(['page_postIndex', 'template_postIndex'], tenant.projectId),
   });
   if (!rawPage) return undefined;
 

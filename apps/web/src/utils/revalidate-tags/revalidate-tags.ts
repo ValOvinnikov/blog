@@ -31,6 +31,11 @@ type TCachedDocumentType =
   | 'page_home'
   | 'template_home'
   | 'template_landing'
+  | 'template_postIndex'
+  | 'template_topicIndex'
+  | 'template_tagIndex'
+  | 'template_topic'
+  | 'template_tag'
   | 'person'
   | 'blog_topic'
   | 'blog_tag'
@@ -73,6 +78,11 @@ const REVALIDATE_TAGS = {
   page_landing: ['page_landing'],
   template_home: ['homePage', 'template_home'],
   template_landing: ['page_landing', 'template_landing'],
+  template_postIndex: ['page_postIndex', 'template_postIndex'],
+  template_topicIndex: ['page_topicIndex', 'template_topicIndex'],
+  template_tagIndex: ['page_tagIndex', 'template_tagIndex'],
+  template_topic: ['page_topic', 'template_topic'],
+  template_tag: ['page_tag', 'template_tag'],
   page_post: ['page_post', 'posts', 'author', 'topic', 'tag'],
   page_tag: ['page_tag'],
   page_topic: ['page_topic'],

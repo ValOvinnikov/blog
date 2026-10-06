@@ -25,6 +25,11 @@ const HEADING_BLOCK_EXEMPTION: TExemptField[] = [
   },
 ];
 
+const PAGE_TEMPLATE_EXEMPTION: TExemptField = {
+  name: 'template',
+  reason: 'this migration creates page_tag with no template reference',
+};
+
 const baseDoc = {
   _createdAt: '2026-01-01T00:00:00Z',
   _updatedAt: '2026-01-01T00:00:00Z',
@@ -68,11 +73,10 @@ describe('seed-page-tag-for-existing-tags migration', () => {
       postListPayload,
       HEADING_BLOCK_EXEMPTION,
     );
-    assertSatisfiesRequiredFields(
-      tagPageSchema,
-      pageTagPayload,
-      HEADING_BLOCK_EXEMPTION,
-    );
+    assertSatisfiesRequiredFields(tagPageSchema, pageTagPayload, [
+      ...HEADING_BLOCK_EXEMPTION,
+      PAGE_TEMPLATE_EXEMPTION,
+    ]);
 
     expect(migration.migrate.document(tagDoc)).toEqual([
       createIfNotExists(postListPayload),
@@ -115,11 +119,10 @@ describe('seed-page-tag-for-existing-tags migration', () => {
       seo: { _type: 'seo', metaTitle: buildTagMetaTitle('TypeScript') },
     };
 
-    assertSatisfiesRequiredFields(
-      tagPageSchema,
-      pageTagPayload,
-      HEADING_BLOCK_EXEMPTION,
-    );
+    assertSatisfiesRequiredFields(tagPageSchema, pageTagPayload, [
+      ...HEADING_BLOCK_EXEMPTION,
+      PAGE_TEMPLATE_EXEMPTION,
+    ]);
 
     expect(pageTagMutation).toEqual(createIfNotExists(pageTagPayload));
   });
