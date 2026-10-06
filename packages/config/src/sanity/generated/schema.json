@@ -11045,6 +11045,13 @@
           "type": "string"
         }
       },
+      "orderRank": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
       "language": {
         "type": "objectAttribute",
         "value": {

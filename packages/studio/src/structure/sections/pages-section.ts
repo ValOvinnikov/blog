@@ -20,7 +20,7 @@ export const pagesSection: TStructureSection = {
     },
     {
       title: 'Landing',
-      items: [{ schema: landingPageSchema, mode: 'byLanguage' }],
+      items: [{ schema: landingPageSchema, mode: 'pageTree' }],
     },
     {
       title: 'Blog',
