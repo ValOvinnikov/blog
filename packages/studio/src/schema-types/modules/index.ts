@@ -1,3 +1,4 @@
+import { childPagesSchema } from './child-pages/child-pages';
 import { contentSchema } from './content/content';
 import { ctaSchema } from './cta/cta';
 import { faqSchema } from './faq/faq';
@@ -42,4 +43,5 @@ export const modules = [
   ctaSchema,
   newsletterSchema,
   pricingSchema,
+  childPagesSchema,
 ];
