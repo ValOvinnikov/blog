@@ -1,43 +1,36 @@
-import { routes } from '@blog/config';
-import { service, type TFeedPost } from '@blog/service';
-import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
-import { getHostTenantSanityContext } from '@web/server/tenant/tenant-sanity-context/tenant-sanity-context';
-import { buildRssFeed, type TRssItem } from '@web/utils/build-rss-feed';
+import type { ITenantLocalizedParams } from '@blog/config';
+import { service } from '@blog/service';
+import { getFeedContext } from '@web/server/feed/get-feed-context/get-feed-context';
+import { buildRssFeed } from '@web/utils/build-rss-feed';
 import { logger } from '@web/utils/logger/logger';
 import { NextResponse } from 'next/server';
 import { getTranslations } from 'next-intl/server';
 
-const toRssItem = (post: TFeedPost, siteUrl: string): TRssItem => {
-  return {
-    title: post.title,
-    link: `${siteUrl}${routes.post(post.slug)}`,
-    description: post.excerpt,
-    publishedAt: post.publishedAt,
-  };
+type TProps = {
+  params: Promise<Omit<ITenantLocalizedParams, 'locale'> & { locale: string }>;
 };
 
 /**
- * RSS 2.0 feed of every published post, newest posts first. Falls back to a
- * generic channel title when site settings fail to load — a broken feed
- * must never break because of an unrelated global-content fetch failure.
- * The channel description is the blog index page's own Meta Description,
- * omitted when unauthored or when that page fails to load.
+ * A site-settings failure falls back to a generic channel title: the feed
+ * must not break on an unrelated global-content fetch.
  */
-export async function GET(): Promise<Response> {
-  const siteUrl = (await getTenantBaseUrl()) ?? '';
-
-  const hostTenant = await getHostTenantSanityContext();
-  if (!hostTenant.isResolvable) {
+export async function GET(
+  _request: Request,
+  { params }: TProps,
+): Promise<Response> {
+  const { locale } = await params;
+  const feed = await getFeedContext(locale);
+  if (!feed) {
     return new NextResponse(null, { status: 404 });
   }
-  const { tenant } = hostTenant;
+  const { tenant, siteUrl, toRssItem } = feed;
 
   const [postsResult, siteSettingsResult, indexPageResult, t] =
     await Promise.all([
       service.entities.posts.v1.getAllPublishedPosts(tenant),
       service.global.siteSettings.v1.getSiteSettings(tenant),
       service.pages.blog.v1.getIndexPage(tenant),
-      getTranslations('rss'),
+      getTranslations({ locale, namespace: 'rss' }),
     ]);
 
   // A single unpaginated query: a failure yields the whole feed empty, not a
@@ -67,7 +60,7 @@ export async function GET(): Promise<Response> {
 
   const xml = buildRssFeed(
     { title, description, siteUrl },
-    posts.map((post) => toRssItem(post, siteUrl)),
+    posts.map(toRssItem),
   );
 
   return new Response(xml, {

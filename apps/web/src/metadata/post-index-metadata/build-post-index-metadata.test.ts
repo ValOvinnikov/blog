@@ -180,6 +180,7 @@ describe('buildPostIndexMetadata', () => {
     expect(metadata.alternates).toMatchObject({
       canonical: '/nl/blog',
       languages: { en: '/blog', nl: '/nl/blog', 'x-default': '/blog' },
+      types: { 'application/rss+xml': '/nl/rss.xml' },
     });
   });
 

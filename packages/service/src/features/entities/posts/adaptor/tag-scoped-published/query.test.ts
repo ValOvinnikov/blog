@@ -1,6 +1,22 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { makeRawFeedPost } from '@blog/service/testing/entities/fixtures';
+import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import { translatedPostDocuments } from '@blog/service/testing/shared/translated-posts-dataset';
 
 import { tagScopedPublishedPostsQuery } from './query';
+
+const { EN, NL } = LOCALE_ISO_CODES;
+
+async function slugsIn(locale: string): Promise<string[]> {
+  const posts = (await evaluateGroqExpression(
+    tagScopedPublishedPostsQuery.query,
+    translatedPostDocuments,
+    undefined,
+    { ...{ tagId: 'tag-1' }, locale, defaultLocale: EN },
+  )) as { slug: string }[];
+
+  return posts.map(({ slug }) => slug);
+}
 
 describe('tagScopedPublishedPostsQuery', () => {
   it('parses a feed post', () => {
@@ -36,5 +52,10 @@ describe('tagScopedPublishedPostsQuery', () => {
     expect(tagScopedPublishedPostsQuery.query).not.toContain('heroImage');
     expect(tagScopedPublishedPostsQuery.query).not.toContain('topic->');
     expect(tagScopedPublishedPostsQuery.query).not.toContain('wordCount');
+  });
+
+  it('lists only published posts in the request language, newest first', async () => {
+    expect(await slugsIn(EN)).toEqual(['only-en', 'design-en', 'notes-en']);
+    expect(await slugsIn(NL)).toEqual(['design-nl']);
   });
 });

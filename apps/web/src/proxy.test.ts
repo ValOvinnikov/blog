@@ -231,12 +231,7 @@ describe('proxy dotted-path pass-through', () => {
     loggerErrorMock.mockReset();
   });
 
-  it.each([
-    '/robots.txt',
-    '/sitemap.xml',
-    '/rss.xml',
-    '/tags/typescript/rss.xml',
-  ])(
+  it.each(['/robots.txt', '/sitemap.xml'])(
     'passes %s through unrewritten, without resolving a tenant or invoking next-intl',
     async (pathname) => {
       const response = await proxy(
@@ -269,6 +264,48 @@ describe('proxy dotted-path pass-through', () => {
     expect(overriddenHeaderNames?.split(',')).toContain('host');
     expect(response.headers.get('x-middleware-request-host')).toBe(
       'acme.example.com',
+    );
+  });
+});
+
+describe('proxy RSS feeds', () => {
+  beforeEach(() => {
+    resolveTenantRoutingMock.mockReset();
+    isProductionEnvironmentMock.mockReset();
+    isProductionEnvironmentMock.mockReturnValue(false);
+    intlMiddlewareMock.mockClear();
+  });
+
+  it.each(['/rss.xml', '/tags/typescript/rss.xml'])(
+    'routes %s into the tenant and language like a page',
+    async (pathname) => {
+      resolveTenantRoutingMock.mockResolvedValue(tenantRouting('tenant-1'));
+      intlMiddlewareMock.mockImplementationOnce((request) =>
+        NextResponse.rewrite(
+          new URL(`/EN${request.nextUrl.pathname}`, request.url),
+        ),
+      );
+
+      const response = await proxy(
+        buildRequest('acme.example.com', undefined, pathname),
+      );
+
+      expect(resolveTenantRoutingMock).toHaveBeenCalledWith('acme.example.com');
+      expect(response.headers.get('x-middleware-rewrite')).toBe(
+        `https://example.com/tenant-1/EN${pathname}`,
+      );
+    },
+  );
+
+  it('redirects the feed of a switched-off language to the default-language feed', async () => {
+    resolveTenantRoutingMock.mockResolvedValue(tenantRouting('tenant-1'));
+
+    const response = await proxy(
+      buildRequest('acme.example.com', undefined, '/nl/rss.xml'),
+    );
+
+    expect(new URL(response.headers.get('location') ?? '').pathname).toBe(
+      '/rss.xml',
     );
   });
 });

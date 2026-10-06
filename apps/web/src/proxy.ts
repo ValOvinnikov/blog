@@ -107,6 +107,7 @@ const redirectToPreferredTranslation = async (
 };
 
 const DOTTED_PATH_PATTERN = /\./;
+const FEED_PATH_PATTERN = /\/rss\.xml$/;
 
 /**
  * Decodes only the first path segment, after splitting on `/` — decoding
@@ -148,8 +149,8 @@ const prependTenantSegment = (
 
 /**
  * Refuses any request whose first path segment is already tenant-shaped,
- * then passes root-level dotted paths (sitemap.xml, robots.txt, rss.xml,
- * favicon.ico, per-tag rss feeds) through unrewritten. Only past both
+ * then passes root-level dotted paths (sitemap.xml, robots.txt, favicon.ico)
+ * through unrewritten; RSS feeds are routed per language like pages. Only past both
  * checks does it resolve the tenant from the request's `Host` header and
  * hand off to next-intl's own middleware, mutating `request.headers` in
  * place (rather than building a fresh `NextResponse.next({request:{headers}})`)
@@ -180,7 +181,7 @@ export default async function proxy(
     return new NextResponse(null, { status: 404 });
   }
 
-  if (DOTTED_PATH_PATTERN.test(pathname)) {
+  if (DOTTED_PATH_PATTERN.test(pathname) && !FEED_PATH_PATTERN.test(pathname)) {
     request.headers.delete(TENANT_ID_HEADER);
     return NextResponse.next({ request: { headers: request.headers } });
   }

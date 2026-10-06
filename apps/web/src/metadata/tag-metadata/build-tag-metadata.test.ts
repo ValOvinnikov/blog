@@ -162,6 +162,14 @@ describe('buildTagMetadata per language', () => {
     vi.mocked(getRequestContext).mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
+  it('advertises the feed in its own language', async () => {
+    const metadata = await buildTagMetadata('ontwerp');
+
+    expect(metadata.alternates?.types).toEqual({
+      'application/rss+xml': '/nl/tags/ontwerp/rss.xml',
+    });
+  });
+
   it('lists each live language under its own slug as hreflang, canonical to its own prefixed address', async () => {
     const metadata = await buildTagMetadata('ontwerp');
 

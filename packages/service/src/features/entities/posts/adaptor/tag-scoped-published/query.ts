@@ -1,18 +1,12 @@
 import { q } from '@blog/service/sanity/query/query';
+import { POST_IN_LOCALE_FILTER } from '@blog/service/shared/expressions/post/post-in-locale';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/post/published-post';
 import { postFeedFragment } from '@blog/service/shared/fragments/post/post-feed';
 
-/**
- * Every published post tagged with `$tagId`, newest first — the tag-scoped
- * counterpart to `allPublishedPostsQuery` for a tag's own RSS/Atom feed. The
- * caller already holds the tag's own `_id` (from
- * `service.pages.tag.v1.getTagPage`), so this matches directly by reference
- * identity rather than looking up an enclosing document, unlike
- * `postListModulePaginatedPostsQuery`'s tag-scope filter.
- */
 export const tagScopedPublishedPostsQuery = q
   .parameters<{ tagId: string }>()
   .star.filterByType('page_post')
+  .filterRaw(POST_IN_LOCALE_FILTER)
   .filterRaw(PUBLISHED_POST_FILTER)
   .filterRaw('references($tagId)')
   .order('publishedAt desc')

@@ -17,7 +17,7 @@ export const routes = {
   bookmarks: () => '/bookmarks',
   /** Auth-gated account hub — one static path per reader; additional sections mount here without a new route. */
   account: () => '/account',
-  /** The `/account` "export my data" download — a Route Handler, not a page, so it's outside `[locale]` like `rssFeed` below. */
+  /** A Route Handler, not a page, so it's outside `[locale]`. */
   accountExport: () => '/api/account/export',
   newsletterConfirm: (token: string) =>
     `/api/newsletter/confirm?token=${encodeURIComponent(token)}`,

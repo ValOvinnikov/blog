@@ -1,6 +1,7 @@
 /**
  * @vitest-environment jsdom
  */
+import { LOCALE_ISO_CODES } from '@blog/config';
 import type { TFeedPost } from '@blog/service';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 import { makeTagDetailPage } from '@web/testing/shared/tag/fixtures';
@@ -45,13 +46,25 @@ const post: TFeedPost = {
   publishedAt: '2026-01-15T00:00:00Z',
 };
 
-const params = Promise.resolve({ slug: 'typescript' });
+const { EN, NL } = LOCALE_ISO_CODES;
 
-describe('GET /tags/[slug]/rss.xml', () => {
+const tenant = {
+  projectId: 'tenant-project',
+  dataset: 'production',
+  token: 'tenant-token',
+  defaultLocale: EN,
+};
+
+const paramsFor = (locale: string = EN) =>
+  Promise.resolve({ tenant: 'tenant-1', locale, slug: 'typescript' });
+
+const params = paramsFor();
+
+describe('GET /[locale]/tags/[slug]/rss.xml', () => {
   beforeEach(() => {
     getHostTenantSanityContextMock.mockResolvedValue({
       isResolvable: true,
-      tenant: undefined,
+      tenant,
     });
     getTenantBaseUrlMock.mockResolvedValue('https://example.com');
   });
@@ -100,8 +113,10 @@ describe('GET /tags/[slug]/rss.xml', () => {
     expect(doc.querySelector('item > link')?.textContent).toBe(
       'https://example.com/blog/hello-welcome',
     );
-    expect(getTagPageMock).toHaveBeenCalledWith('typescript', undefined);
-    expect(getPublishedPostsByTagMock).toHaveBeenCalledWith('tag-1', undefined);
+    expect(getTagPageMock).toHaveBeenCalledWith('typescript', {
+      ...tenant,
+      locale: EN,
+    });
   });
 
   it('falls back to the tag title as the channel description when none is authored', async () => {
@@ -180,16 +195,7 @@ describe('GET /tags/[slug]/rss.xml', () => {
     errorSpy.mockRestore();
   });
 
-  it('forwards the resolved tenant Sanity context to every loader', async () => {
-    const tenant = {
-      projectId: 'tenant-project',
-      dataset: 'production',
-      token: 'tenant-token',
-    };
-    getHostTenantSanityContextMock.mockResolvedValue({
-      isResolvable: true,
-      tenant,
-    });
+  it('resolves the tag and its posts in the feed language and links posts in it', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
       data: makeTagDetailPage({
@@ -201,13 +207,37 @@ describe('GET /tags/[slug]/rss.xml', () => {
         },
       }),
     });
-    getPublishedPostsByTagMock.mockResolvedValue({ ok: true, data: [] });
+    getPublishedPostsByTagMock.mockResolvedValue({ ok: true, data: [post] });
     const { GET } = await import('./route');
 
-    await GET(new Request('https://example.com'), { params });
+    const response = await GET(new Request('https://example.com'), {
+      params: paramsFor(NL),
+    });
+    const doc = new DOMParser().parseFromString(
+      await response.text(),
+      'application/xml',
+    );
 
-    expect(getTagPageMock).toHaveBeenCalledWith('typescript', tenant);
-    expect(getPublishedPostsByTagMock).toHaveBeenCalledWith('tag-1', tenant);
+    const localizedTenant = { ...tenant, locale: NL };
+    expect(getTagPageMock).toHaveBeenCalledWith('typescript', localizedTenant);
+    expect(getPublishedPostsByTagMock).toHaveBeenCalledWith(
+      'tag-1',
+      localizedTenant,
+    );
+    expect(doc.querySelector('item > link')?.textContent).toBe(
+      'https://example.com/nl/blog/hello-welcome',
+    );
+  });
+
+  it('returns a 404 for a language the site does not support', async () => {
+    const { GET } = await import('./route');
+
+    const response = await GET(new Request('https://example.com'), {
+      params: paramsFor('xx'),
+    });
+
+    expect(response.status).toBe(404);
+    expect(getTagPageMock).not.toHaveBeenCalled();
   });
 
   it('returns a 404 without querying any content when the host is unresolvable', async () => {
