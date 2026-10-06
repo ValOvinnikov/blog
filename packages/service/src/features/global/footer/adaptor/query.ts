@@ -7,5 +7,6 @@ export const footerQuery = q.star
   .project((sub) => ({
     social: sub.field('social[]').project(socialProfileFragment).nullable(true),
     showLanguageSwitcher: sub.field('showLanguageSwitcher').nullable(true),
+    showRssFeed: sub.field('showRssFeed').nullable(true),
   }))
   .notNull();

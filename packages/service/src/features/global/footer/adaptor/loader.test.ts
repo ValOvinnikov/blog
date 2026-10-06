@@ -76,6 +76,22 @@ describe('getFooter', () => {
     expect(result.showLanguageSwitcher).toBe(true);
   });
 
+  it('shows the RSS feed when the switch was never set', async () => {
+    mockRun.mockResolvedValue(makeRawFooter());
+
+    const result = await getFooter(tenant);
+
+    expect(result.showRssFeed).toBe(true);
+  });
+
+  it('hides the RSS feed when the switch is off', async () => {
+    mockRun.mockResolvedValue(makeRawFooter({ showRssFeed: false }));
+
+    const result = await getFooter(tenant);
+
+    expect(result.showRssFeed).toBe(false);
+  });
+
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
     mockRun.mockResolvedValue(makeRawFooter());
 

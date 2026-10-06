@@ -32,6 +32,7 @@ export function makeRawFooter(overrides: Partial<TRawFooter> = {}): TRawFooter {
   return {
     social: null,
     showLanguageSwitcher: null,
+    showRssFeed: null,
     ...overrides,
   };
 }
