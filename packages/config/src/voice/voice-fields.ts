@@ -491,7 +491,7 @@ export const VOICE_FIELDS = [
   {
     id: 'consentBannerMessage',
     path: 'consent.banner.message',
-    kind: VOICE_FIELD_KIND.RICH,
+    kind: VOICE_FIELD_KIND.TEXT,
     surface: VOICE_SURFACE.CONSENT_BANNER,
     placeholders: [],
     max: 400,
@@ -547,7 +547,7 @@ export const VOICE_FIELDS = [
   {
     id: 'consentNecessaryDescription',
     path: 'consent.categories.necessary.description',
-    kind: VOICE_FIELD_KIND.RICH,
+    kind: VOICE_FIELD_KIND.TEXT,
     surface: VOICE_SURFACE.CONSENT_BANNER,
     placeholders: [],
     max: 300,
@@ -563,7 +563,7 @@ export const VOICE_FIELDS = [
   {
     id: 'consentExternalMediaDescription',
     path: 'consent.categories.externalMedia.description',
-    kind: VOICE_FIELD_KIND.RICH,
+    kind: VOICE_FIELD_KIND.TEXT,
     surface: VOICE_SURFACE.CONSENT_BANNER,
     placeholders: [],
     max: 300,
