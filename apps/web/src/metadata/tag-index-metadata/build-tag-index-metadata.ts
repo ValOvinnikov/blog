@@ -17,10 +17,11 @@ export const buildTagIndexMetadata = async (): Promise<Metadata> => {
   }
 
   const { seo, translations } = result.data;
+  const href = routes.tags();
 
   return toLocalizedPageMetadata(seo, {
-    href: routes.tags(),
-    translations,
+    href,
+    translations: translations.map((language) => ({ language, href })),
     ogType: 'website',
   });
 };

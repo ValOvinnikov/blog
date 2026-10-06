@@ -17,10 +17,11 @@ export const buildHomePageMetadata = async (): Promise<Metadata> => {
   }
 
   const { seo, translations } = result.data;
+  const href = routes.home();
 
   return toLocalizedPageMetadata(seo, {
-    href: routes.home(),
-    translations,
+    href,
+    translations: translations.map((language) => ({ language, href })),
     ogType: 'website',
     titleAbsolute: true,
   });

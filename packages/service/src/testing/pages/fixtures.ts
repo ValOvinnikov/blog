@@ -157,6 +157,7 @@ export function makeRawTopicPage(
     hero: null,
     modules: [{ _id: 'post-list-1', _type: 'module_postList' }],
     seo: makeRawSeo(),
+    translations: [{ language: 'EN', slug: 'engineering' }],
     ...overrides,
   };
 }
@@ -170,6 +171,7 @@ export function makeRawTagPage(
     hero: null,
     modules: [{ _id: 'post-list-1', _type: 'module_postList' }],
     seo: makeRawSeo(),
+    translations: [{ language: 'EN', slug: 'typescript' }],
     ...overrides,
   };
 }

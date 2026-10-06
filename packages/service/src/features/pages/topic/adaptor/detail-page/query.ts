@@ -1,15 +1,18 @@
 import type { TPageTopicType } from '@blog/config';
-import { q, type TSlugParams } from '@blog/service/sanity/query/query';
+import { q } from '@blog/service/sanity/query/query';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
 import { moduleFragment } from '@blog/service/shared/fragments/module/module';
 import { seoFragment } from '@blog/service/shared/fragments/seo/seo';
 import { topicFragment } from '@blog/service/shared/fragments/topic/topic';
+import { translationsQuery } from '@blog/service/shared/localization/page-translations/translations';
 import type { TRawModule } from '@blog/service/shared/transformers/module/to-module';
+import type { TLocalizedSlugParams } from '@blog/service/shared/types/page/localized-slug-params';
 
 export const topicPageQuery = q
-  .parameters<TSlugParams>()
+  .parameters<TLocalizedSlugParams>()
   .star.filterByType('page_topic')
   .filterBy('slug.current == $slug')
+  .filterBy('language == $locale')
   .slice(0)
   .project((sub) => ({
     topic: sub.field('topic').deref().project(topicFragment).notNull(),
@@ -34,5 +37,6 @@ export const topicPageQuery = q
       .as<TRawModule<TPageTopicType>[]>()
       .nullable(),
     seo: sub.field('seo').project(seoFragment).notNull(),
+    translations: translationsQuery,
   }))
   .nullable(true);
