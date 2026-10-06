@@ -3,7 +3,7 @@ import {
   runQuery,
   type TTenantSanityContext,
 } from '@blog/service/sanity/query/query';
-import { toPaginationParams } from '@blog/service/shared/transformers/pagination/to-pagination-params';
+import { getPaginationParamsWithPageSizes } from '@blog/service/shared/adaptors/post-list-page-size/pagination-params';
 
 import { tagPaginationParamsQuery } from './query';
 
@@ -12,10 +12,7 @@ export async function getTagPaginationParams(
 ): Promise<{ slug: string; page: string }[]> {
   const tagPages = await runQuery(tagPaginationParamsQuery, {
     tenant,
-    ...isr(
-      ['page_tag', 'template_tag', 'modules:postList', 'posts', 'tag'],
-      tenant.projectId,
-    ),
+    ...isr(['page_tag', 'template_tag', 'posts', 'tag'], tenant.projectId),
   });
-  return toPaginationParams(tagPages);
+  return getPaginationParamsWithPageSizes(tagPages, tenant);
 }

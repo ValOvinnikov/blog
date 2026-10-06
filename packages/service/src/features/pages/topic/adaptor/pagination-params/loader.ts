@@ -3,7 +3,7 @@ import {
   runQuery,
   type TTenantSanityContext,
 } from '@blog/service/sanity/query/query';
-import { toPaginationParams } from '@blog/service/shared/transformers/pagination/to-pagination-params';
+import { getPaginationParamsWithPageSizes } from '@blog/service/shared/adaptors/post-list-page-size/pagination-params';
 
 import { topicPaginationParamsQuery } from './query';
 
@@ -13,9 +13,9 @@ export async function getTopicPaginationParams(
   const topicPages = await runQuery(topicPaginationParamsQuery, {
     tenant,
     ...isr(
-      ['page_topic', 'template_topic', 'modules:postList', 'posts', 'topic'],
+      ['page_topic', 'template_topic', 'posts', 'topic'],
       tenant.projectId,
     ),
   });
-  return toPaginationParams(topicPages);
+  return getPaginationParamsWithPageSizes(topicPages, tenant);
 }

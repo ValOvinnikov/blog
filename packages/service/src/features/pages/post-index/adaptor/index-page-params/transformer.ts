@@ -1,11 +1,10 @@
 import { toTotalPages } from '@blog/utils';
-import type { InferResultType } from 'groqd';
 
-import type { indexPageParamsQuery } from './query';
+export type TRawIndexPageParams = {
+  blogPosts: { total: number };
+  pageSize: number | null;
+};
 
-export type TRawIndexPageParams = InferResultType<typeof indexPageParamsQuery>;
-
-/** Raw count + the first list module's pageSize → the generateStaticParams array for pages 2…N (page 1 is /blog); no list module means a single, unpaginated page. */
 export function toIndexPageParams(
   raw: TRawIndexPageParams,
 ): { page: string }[] {
