@@ -12,7 +12,7 @@ export const childPagesSchema = defineType({
   title: 'Child Pages',
   type: 'document',
   description:
-    "A grid of cards linking to the pages directly beneath the page it sits on, in the order editors drag them into. Each card shows the child page's title, with its summary and image taken from that page's Heading Block and SEO.",
+    'Shows a card for each page under the page using this template. Renders nothing on pages without children.',
   icon: FolderTree,
   fields: [
     titleField(),
