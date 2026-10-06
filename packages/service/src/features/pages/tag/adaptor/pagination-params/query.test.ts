@@ -1,14 +1,16 @@
 import { tagPaginationParamsQuery } from './query';
 
 describe('tagPaginationParamsQuery', () => {
-  it('parses a tag page slug with a list module page size and a post count', () => {
-    const raw = [{ slug: 'typescript', pageSize: 9, postCount: 5 }];
+  it('parses a tag page slug with its module ids and a post count', () => {
+    const raw = [
+      { slug: 'typescript', moduleRefs: [{ _ref: 'list-1' }], postCount: 5 },
+    ];
 
     expect(() => tagPaginationParamsQuery.parse(raw)).not.toThrow();
   });
 
-  it('parses a tag page with no list module in modules[] and zero posts', () => {
-    const raw = [{ slug: 'empty', pageSize: null, postCount: 0 }];
+  it('parses a tag page with no modules and zero posts', () => {
+    const raw = [{ slug: 'empty', moduleRefs: null, postCount: 0 }];
 
     expect(() => tagPaginationParamsQuery.parse(raw)).not.toThrow();
   });

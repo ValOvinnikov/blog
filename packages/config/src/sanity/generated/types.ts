@@ -1208,6 +1208,20 @@ export type Page_tagIndexReference = {
   [internalGroqTypeReferenceTo]?: 'page_tagIndex';
 };
 
+export type Page_topicReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_topic';
+};
+
+export type Page_tagReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_tag';
+};
+
 export type InternationalizedArrayReferenceValue = {
   _type: 'internationalizedArrayReferenceValue';
   value?:
@@ -1215,7 +1229,9 @@ export type InternationalizedArrayReferenceValue = {
     | Page_postIndexReference
     | Page_topicIndexReference
     | Page_tagIndexReference
-    | Page_landingReference;
+    | Page_landingReference
+    | Page_topicReference
+    | Page_tagReference;
   language?: string;
 };
 
@@ -1522,20 +1538,6 @@ export type Person = {
   profilePage?: LinkReference;
 };
 
-export type Page_topicReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'page_topic';
-};
-
-export type Page_tagReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'page_tag';
-};
-
 export type Link = {
   _id: string;
   _type: 'link';
@@ -1619,6 +1621,7 @@ export type Page_tag = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  language?: 'EN' | 'NL' | 'FR' | 'DE' | 'ES';
   title?: string;
   slug?: Slug;
   tag?: Blog_tagReference;
@@ -1761,6 +1764,7 @@ export type Page_topic = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  language?: 'EN' | 'NL' | 'FR' | 'DE' | 'ES';
   title?: string;
   slug?: Slug;
   topic?: Blog_topicReference;
@@ -2215,6 +2219,8 @@ export type AllSanitySchemaTypes =
   | Page_homeReference
   | Page_topicIndexReference
   | Page_tagIndexReference
+  | Page_topicReference
+  | Page_tagReference
   | InternationalizedArrayReferenceValue
   | Template_homeReference
   | Page_home
@@ -2242,8 +2248,6 @@ export type AllSanitySchemaTypes =
   | Module_postRelatedReference
   | Page_post
   | Person
-  | Page_topicReference
-  | Page_tagReference
   | Link
   | Template_tagIndexReference
   | Page_tagIndex

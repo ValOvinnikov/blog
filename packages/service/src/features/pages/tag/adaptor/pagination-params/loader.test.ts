@@ -14,10 +14,13 @@ const tenant = makeTenant();
 
 describe('getTagPaginationParams', () => {
   it('delegates the raw query result to the pagination transformer', async () => {
-    mockRun.mockResolvedValueOnce([
-      { slug: 'typescript', pageSize: 9, postCount: 20 },
-      { slug: 'react', pageSize: 9, postCount: 9 },
-    ]);
+    mockRun
+      .mockResolvedValueOnce([
+        { slug: 'typescript', moduleRefs: [{ _ref: 'list-1' }], postCount: 20 },
+        { slug: 'react', moduleRefs: [{ _ref: 'list-1' }], postCount: 9 },
+        { slug: 'no-list', moduleRefs: [{ _ref: 'hero-1' }], postCount: 50 },
+      ])
+      .mockResolvedValueOnce([{ _id: 'list-1', pageSize: 9 }]);
 
     const params = await getTagPaginationParams(tenant);
 
@@ -40,12 +43,28 @@ describe('getTagPaginationParams', () => {
           tags: [
             't:tenant-a:page_tag',
             't:tenant-a:template_tag',
-            't:tenant-a:modules:postList',
             't:tenant-a:posts',
             't:tenant-a:tag',
           ],
         }),
       }),
+    );
+  });
+
+  it('fetches the page sizes of all pages in one request', async () => {
+    mockRun
+      .mockResolvedValueOnce([
+        { slug: 'typescript', moduleRefs: [{ _ref: 'list-1' }], postCount: 20 },
+        { slug: 'react', moduleRefs: [{ _ref: 'list-2' }], postCount: 20 },
+      ])
+      .mockResolvedValueOnce([]);
+
+    await getTagPaginationParams(tenant);
+
+    expect(mockRun).toHaveBeenCalledTimes(2);
+    expect(mockRun).toHaveBeenLastCalledWith(
+      expect.anything(),
+      expect.objectContaining({ parameters: { ids: ['list-1', 'list-2'] } }),
     );
   });
 });
