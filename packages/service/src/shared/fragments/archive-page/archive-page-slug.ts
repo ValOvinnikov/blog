@@ -3,14 +3,14 @@ import { z } from 'zod';
 
 const slugParser = z.string().nullable();
 
-export const tagArchivePageSlug = q.star
+export const tagArchivePageSlugFragment = q.star
   .filterByType('page_tag')
   .filterRaw('tag._ref == ^._id')
   .slice(0)
   .field('slug.current')
   .validate(slugParser);
 
-export const topicArchivePageSlug = q.star
+export const topicArchivePageSlugFragment = q.star
   .filterByType('page_topic')
   .filterRaw('topic._ref == ^._id')
   .slice(0)
