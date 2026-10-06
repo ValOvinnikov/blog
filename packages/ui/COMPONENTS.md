@@ -2,7 +2,7 @@
 
 # @blog/ui component index
 
-_59 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
+_63 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
 
 ## Atoms
 
@@ -39,7 +39,7 @@ Variants: size: SIZE.SM|SIZE.MD|SIZE.LG
 ### Button — `components/atoms/button/button.tsx`
 
 The styled `<button>` for in-page actions (submit, toggle, dismiss).
-Props: type?: 'button' | 'submit' | 'reset' · title?: string · children?: ReactNode · onClick?: MouseEventHandler<HTMLButtonElement> · isDisabled?: boolean · 'aria-busy'?: AriaAttributes['aria-busy'] _(extends IWithClassName, IWithDataTestId, TButtonVariants)_
+Props: type?: 'button' | 'submit' | 'reset' · title?: string · children?: ReactNode · onClick?: MouseEventHandler<HTMLButtonElement> · isDisabled?: boolean · 'aria-busy'?: AriaAttributes['aria-busy'] · 'aria-describedby'?: AriaAttributes['aria-describedby'] _(extends IWithClassName, IWithDataTestId, TButtonVariants)_
 Variants: variant: primary|ghost|link|danger · size: SIZE.SM|SIZE.MD|SIZE.LG
 
 ### Caption — `components/atoms/caption/caption.tsx`
@@ -127,6 +127,11 @@ A small inline pill signalling a state such as "subscribed", "pending confirmati
 Props: tone: NonNullable<TStatusBadgeVariants['tone']> · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 Variants: tone: ok|warn|neutral
 
+### Switch — `components/atoms/switch/switch.tsx`
+
+A labelled on/off control for a single setting, backed by a native checkbox.
+Props: isChecked: boolean · isLocked?: boolean · onChange: (checked: boolean) => void · 'aria-labelledby'?: AriaAttributes['aria-labelledby'] · 'aria-describedby'?: AriaAttributes['aria-describedby'] _(extends IWithClassName, IWithDataTestId)_
+
 ### Tag — `components/atoms/tag/tag.tsx`
 
 Small pill-shaped label.
@@ -177,6 +182,21 @@ Variants: isCurrent: (boolean)
 
 Compact metadata row for cards.
 Props: dateValue: string · dateLabel: string · readingTime?: string _(extends IWithClassName, IWithDataTestId)_
+
+### ConsentBanner — `components/molecules/consent-banner/consent-banner.tsx`
+
+A persistent, non-modal card offering cookie-consent choices, fixed to the bottom of the viewport.
+Props: headingLevel: THeadingLevel · heading: string · message: string · acceptLabel: string · rejectLabel: string · settingsLabel: string · onAccept: () => void · onReject: () => void · onOpenSettings: () => void _(extends IWithClassName, IWithDataTestId)_
+
+### ConsentPlaceholder — `components/molecules/consent-placeholder/consent-placeholder.tsx`
+
+A themed stand-in, sized to the embed's aspect ratio, for a third-party embed a reader hasn't yet consented to load — allowing it grants the whole external-media category, so it also offers a route to the full preferences.
+Props: id: string · providerName: string · message: string · allowLabel: string · settingsLabel: string · scopeNote: string · ratio?: TMediaFrameRatio · onAllow: () => void · onOpenSettings: () => void _(extends IWithClassName, IWithDataTestId)_
+
+### ConsentPreferences — `components/molecules/consent-preferences/consent-preferences.tsx`
+
+The body of the cookie-consent preferences dialog — one switch row per category and a Save action — rendered without its own `<dialog>`, which the caller owns.
+Props: headingLevel: THeadingLevel · heading: string · categories: IConsentCategory[] · values: Record<string, boolean> · onCategoryChange: (id: string, checked: boolean) => void · saveLabel: string · onSave: () => void _(extends IWithClassName, IWithDataTestId)_
 
 ### ImageWithCaption — `components/molecules/image-with-caption/image-with-caption.tsx`
 
