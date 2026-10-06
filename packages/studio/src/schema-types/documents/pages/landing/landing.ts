@@ -113,6 +113,8 @@ export const landingPageSchema = defineType({
       isUnique: validateLandingSlugUniqueAmongSiblings,
       validateSlug: validateLandingSlug,
     }),
+    headingBlockField(),
+    templateField({ type: landingTemplateSchema.name }),
     sectionNavigationSetting({
       name: SECTION_NAVIGATION_FIELD,
       title: 'Section navigation',
@@ -129,8 +131,6 @@ export const landingPageSchema = defineType({
       initialValue: true,
       field: ShowSectionNavigationField,
     }),
-    headingBlockField(),
-    templateField({ type: landingTemplateSchema.name }),
     seoField(),
   ],
 });
