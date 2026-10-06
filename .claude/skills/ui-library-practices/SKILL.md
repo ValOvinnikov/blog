@@ -427,7 +427,7 @@ slot/media rules → **`compound-components.md`**.
   root: [
     // `< lg`, the `withRail: true` body used to jump straight to
     // `max-w-page` — the same width as the `lg:` two-column grid — but below
-    // `lg:` there's no grid columning it down: `PostContentsRail`'s mobile
+    // `lg:` there's no grid columning it down: `SidebarNav`'s mobile
     // disclosure (`w-full`) then spans the full `max-w-page` box while
     // `content` (the article text, capped to `max-w-measure` with no
     // `mx-auto` of its own) sits left-aligned inside it, so neither the rail

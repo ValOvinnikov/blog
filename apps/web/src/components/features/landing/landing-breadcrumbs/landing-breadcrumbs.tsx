@@ -24,13 +24,19 @@ export const LandingBreadcrumbs = async ({
     'landing_breadcrumbs.fetch_failed',
     { path },
   );
-  const { headingBlock } = page;
+  const { headingBlock, sectionNavigation } = page;
 
   const t = await getTranslations('breadcrumbs');
 
+  const pageTrail: IBreadcrumbItem[] = sectionNavigation
+    ? sectionNavigation.breadcrumbs.map((breadcrumb) => ({
+        label: breadcrumb.title,
+        href: routes.landingPage(breadcrumb.path),
+      }))
+    : [{ label: headingBlock.heading, href: routes.landingPage(path) }];
   const breadcrumbTrail: IBreadcrumbItem[] = [
     { label: t('home'), href: routes.home() },
-    { label: headingBlock.heading, href: routes.landingPage(path) },
+    ...pageTrail,
   ];
   const breadcrumbListSchema = await buildBreadcrumbListSchema(breadcrumbTrail);
 
