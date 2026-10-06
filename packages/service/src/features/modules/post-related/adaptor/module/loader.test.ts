@@ -1,9 +1,8 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawPostRelatedModule } from '@blog/service/testing/modules/fixtures';
-import { makeRawPostCard } from '@blog/service/testing/pages/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
-import { getPostRelated } from './loader';
+import { getPostRelatedModuleDocument } from './loader';
 
 vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
   ...(await importOriginal<
@@ -14,65 +13,29 @@ vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
 
 const tenant = makeTenant();
 
-describe(getPostRelated, () => {
-  it('resolves the module fields, ranked related posts capped at the module limit', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawPostRelatedModule({ limit: 3 }))
-      .mockResolvedValueOnce({
-        tagIds: [{ _id: 'tag-a' }],
-        topicId: { _id: 'topic-1' },
-      })
-      .mockResolvedValueOnce([
-        {
-          ...makeRawPostCard({ _id: 'tag-match' }),
-          tagIds: [{ _id: 'tag-a' }],
-        },
-      ])
-      .mockResolvedValueOnce([makeRawPostCard({ _id: 'topic-match' })]);
+describe(getPostRelatedModuleDocument, () => {
+  it('resolves the module document fields, including its limit', async () => {
+    mockRun.mockResolvedValueOnce(makeRawPostRelatedModule({ limit: 6 }));
 
-    const result = await getPostRelated('post-related-1', 'post-1', tenant);
+    const module = await getPostRelatedModuleDocument('post-related-1', tenant);
 
-    expect(result.posts.map((post) => post.id)).toEqual([
-      'tag-match',
-      'topic-match',
-    ]);
-  });
-
-  it('caps the result at a module-authored limit larger than 3', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawPostRelatedModule({ limit: 6 }))
-      .mockResolvedValueOnce({
-        tagIds: [{ _id: 'tag-a' }],
-        topicId: null,
-      })
-      .mockResolvedValueOnce(
-        Array.from({ length: 8 }, (_, i) => ({
-          ...makeRawPostCard({ _id: `post-${i}` }),
-          tagIds: [{ _id: 'tag-a' }],
-        })),
-      )
-      .mockResolvedValueOnce([]);
-
-    const result = await getPostRelated('post-related-1', 'post-1', tenant);
-
-    expect(result.posts).toHaveLength(6);
+    expect(module.limit).toBe(6);
   });
 
   it('propagates when the module document is missing', async () => {
     mockRun.mockRejectedValueOnce(new Error('ValidationError'));
 
-    await expect(getPostRelated('missing', 'post-1', tenant)).rejects.toThrow();
+    await expect(
+      getPostRelatedModuleDocument('missing', tenant),
+    ).rejects.toThrow();
   });
 
   it('threads tenant context into the module query and scopes its tags to it', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawPostRelatedModule({ limit: 3 }))
-      .mockResolvedValueOnce(null);
+    mockRun.mockResolvedValueOnce(makeRawPostRelatedModule({ limit: 3 }));
 
-    await getPostRelated('post-related-1', 'post-1', tenant);
+    await getPostRelatedModuleDocument('post-related-1', tenant);
 
-    expect(mockRun).toHaveBeenNthCalledWith(
-      1,
+    expect(mockRun).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({
         parameters: { id: 'post-related-1' },
