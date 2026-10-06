@@ -1667,8 +1667,8 @@ export type Blog_tag = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  title?: string;
-  description?: string;
+  title?: InternationalizedArrayString;
+  description?: InternationalizedArrayText;
 };
 
 export type Slug = {
@@ -1801,8 +1801,8 @@ export type Blog_topic = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  title?: string;
-  description?: string;
+  title?: InternationalizedArrayString;
+  description?: InternationalizedArrayText;
 };
 
 export type Template_postIndexReference = {

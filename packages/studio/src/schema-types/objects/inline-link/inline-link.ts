@@ -7,6 +7,7 @@ import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic/topi
 import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
 import { PAGE_POST_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/post-index/post-index-type';
+import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
 import { Link2 } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
@@ -138,7 +139,11 @@ export const inlineLinkSchema = defineType({
         title: title ?? 'Unknown',
         subtitle:
           linkType === LINK_TYPE.INTERNAL
-            ? `Internal: ${String(internalTitle ?? 'not selected')}`
+            ? `Internal: ${
+                typeof internalTitle === 'string'
+                  ? internalTitle
+                  : (defaultLanguageValue(internalTitle) ?? 'not selected')
+              }`
             : String(url ?? 'URL not set'),
       };
     },

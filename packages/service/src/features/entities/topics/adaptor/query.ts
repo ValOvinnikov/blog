@@ -3,5 +3,5 @@ import { topicWithPostCountFragment } from '@blog/service/shared/fragments/topic
 
 export const topicsQuery = q.star
   .filterByType('blog_topic')
-  .order('title asc')
-  .project(topicWithPostCountFragment);
+  .project(topicWithPostCountFragment)
+  .order('title asc');
