@@ -1880,6 +1880,7 @@ export type Page_landing = {
   _rev: string;
   language?: 'EN' | 'NL' | 'FR' | 'DE' | 'ES';
   title?: string;
+  parent?: Page_landingReference;
   slug?: Slug;
   headingBlock?: HeadingBlock;
   template?: Template_landingReference;
