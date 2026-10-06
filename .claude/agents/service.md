@@ -139,6 +139,14 @@ relative paths only within a single slice (`./query`, `./types`).
     a valid boolean access either way. That exact gap shipped a sitemap
     advertising a URL whose route 404s.
 
+  - **Adaptor slices never import each other or a shared adaptor.** A slice is
+    a self-contained data source: its loader runs its own queries and its own
+    transformer, and nothing else. When an action needs two sources — a
+    module and the posts it lists, a page and its FAQ questions — each source
+    is its own slice (or a `shared/adaptors/` read), and
+    `application/service.ts` loads both and combines them into the public
+    view-model. Shared fragments, transformers and expressions stay
+    importable from any slice; only loaders are composed upward.
   - **`application/service.ts`** — a `createXService()` **factory** returning the
     versioned facade `{ v1: { …actions } }`. Version is an object key, never in
     the import path. `src/index.ts` calls each factory (`createPostService()`, …)
@@ -159,12 +167,12 @@ relative paths only within a single slice (`./query`, `./types`).
   transformer per file** — including `build-image-url.ts` (raw image → URL) —
   each exporting its `TRaw*` input type (`InferFragmentType<typeof fragment>`)
   **and** the view-model `T*` type, both co-located and re-exported for web via
-  `src/index.ts`), and `adaptors/` (a read that other loaders reuse, laid out
+  `src/index.ts`), and `adaptors/` (a read that several features' application layers reuse, laid out
   as a feature slice — `query.ts` · `transformer.ts` · `types.ts` · thin
   `loader.ts` — in a domain folder, e.g. `adaptors/faq-questions/`).
 - **`shared/adaptors/` is never exposed to web.** It has no `application/`
-  service and nothing in it is exported from `src/index.ts`; only other
-  loaders import it. A read web needs directly is a feature under
+  service and nothing in it is exported from `src/index.ts`; only features'
+  `application/service.ts` files import it. A read web needs directly is a feature under
   `features/entities/`, which is public like `pages` and `modules`.
 - **Every file under a `shared/<kind>/` directory lives in a domain folder,
   never flat in the kind directory.** `shared/fragments/heading-block/heading-block.ts`
