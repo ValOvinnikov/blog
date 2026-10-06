@@ -8,4 +8,7 @@ export type TTranslationGroup = TTranslationEntry[];
 export type TTranslationMap = {
   groups: TTranslationGroup[];
   homeLanguages: TLocaleIsoCode[];
+  postIndexLanguages: TLocaleIsoCode[];
+  topicIndexLanguages: TLocaleIsoCode[];
+  tagIndexLanguages: TLocaleIsoCode[];
 };

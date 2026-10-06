@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { makeRawTopicIndexPage } from '@blog/service/testing/pages/fixtures';
 import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
@@ -98,6 +99,59 @@ describe('topicIndexPageQuery template layout', () => {
     expect(await run([page(), ...dataset])).toMatchObject({
       hero: null,
       modules: null,
+    });
+  });
+});
+
+describe('topicIndexPageQuery language scoping', () => {
+  const { EN, NL, FR } = LOCALE_ISO_CODES;
+
+  function page(id: string, heading: string, language?: string) {
+    return {
+      _id: id,
+      _type: 'page_topicIndex',
+      headingBlock: { heading },
+      ...(language ? { language } : {}),
+    };
+  }
+
+  function run(dataset: unknown[], locale: string): Promise<unknown> {
+    return evaluateGroqExpression(topicIndexPageQuery.query, dataset, null, {
+      locale,
+      defaultLocale: EN,
+    });
+  }
+
+  const dataset = [
+    page('page_topicIndex', 'Topics', EN),
+    page('page_topicIndex-nl', 'Onderwerpen', NL),
+  ];
+
+  it("resolves each language's own topic index page", async () => {
+    expect(await run(dataset, EN)).toMatchObject({
+      headingBlock: { heading: 'Topics' },
+    });
+    expect(await run(dataset, NL)).toMatchObject({
+      headingBlock: { heading: 'Onderwerpen' },
+    });
+  });
+
+  it('resolves nothing for a language without a topic index page, rather than another language', async () => {
+    expect(await run(dataset, FR)).toBeNull();
+  });
+
+  it('resolves a topic index page with no language for the default language only', async () => {
+    const legacy = [page('page_topicIndex', 'Topics')];
+
+    expect(await run(legacy, EN)).toMatchObject({
+      headingBlock: { heading: 'Topics' },
+    });
+    expect(await run(legacy, NL)).toBeNull();
+  });
+
+  it('lists the language of every topic index page as its translations', async () => {
+    expect(await run(dataset, NL)).toMatchObject({
+      translations: [{ language: EN }, { language: NL }],
     });
   });
 });

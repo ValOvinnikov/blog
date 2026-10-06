@@ -3,6 +3,7 @@ import type {
   TMaybeUndefined,
   TPagePostIndexType,
 } from '@blog/config';
+import type { TLocaleIsoCode } from '@blog/config/constants';
 import type { TModule } from '@blog/service/shared/transformers/module/to-module';
 import type { TSeoResolved } from '@blog/service/shared/transformers/seo/resolve-seo';
 
@@ -11,4 +12,5 @@ export type TBlogIndexPage = {
   hero: TMaybeUndefined<TModule<TPagePostIndexType>>;
   modules: TModule<TPagePostIndexType>[];
   seo: TSeoResolved;
+  translations: TLocaleIsoCode[];
 };

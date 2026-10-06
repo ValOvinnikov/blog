@@ -15,7 +15,14 @@ export async function getTranslationMap(
   const raw = await runQuery(translationMapQuery, {
     tenant,
     ...isr(
-      ['translation.metadata', 'page_landing', 'homePage'],
+      [
+        'translation.metadata',
+        'page_landing',
+        'homePage',
+        'page_postIndex',
+        'page_topicIndex',
+        'page_tagIndex',
+      ],
       tenant.projectId,
     ),
   });

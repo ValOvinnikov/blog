@@ -1,7 +1,12 @@
+import { LOCALE_ISO_CODES } from '@blog/config';
 import { urlForSanityImage } from '@blog/service';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import {
+  DEFAULT_REQUEST_CONTEXT,
+  DEFAULT_TENANT_SANITY_CONTEXT,
+} from '@web/testing/shared/tenant/fixtures';
 
 import { buildTopicIndexMetadata } from './build-topic-index-metadata';
 
@@ -35,12 +40,18 @@ const seo = makeSeo({
 describe('buildTopicIndexMetadata', () => {
   beforeEach(() => {
     getTopicIndexPageMock.mockReset();
+    vi.mocked(getRequestContext).mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
   it('reads the page through getTopicIndexPage, the loader TopicIndexPage reads', async () => {
     getTopicIndexPageMock.mockResolvedValue({
       ok: true,
-      data: { headingBlock: { heading: 'Topics' }, seo, modules: [] },
+      data: {
+        headingBlock: { heading: 'Topics' },
+        seo,
+        modules: [],
+        translations: [LOCALE_ISO_CODES.EN],
+      },
     });
 
     await buildTopicIndexMetadata();
@@ -55,6 +66,7 @@ describe('buildTopicIndexMetadata', () => {
         headingBlock: { heading: 'Topics' },
         seo,
         modules: [],
+        translations: [LOCALE_ISO_CODES.EN],
       },
     });
 
@@ -97,5 +109,31 @@ describe('buildTopicIndexMetadata', () => {
     expect(metadata).toEqual({});
     expect(errorSpy).not.toHaveBeenCalled();
     errorSpy.mockRestore();
+  });
+
+  it('lists every live language with its own page as hreflang, canonical to its own prefixed address', async () => {
+    const { EN, NL, DE } = LOCALE_ISO_CODES;
+    const translations = [EN, NL, DE];
+    vi.mocked(getRequestContext).mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      locale: NL,
+      liveLocales: [EN, NL],
+    });
+    getTopicIndexPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        headingBlock: { heading: 'Topics' },
+        seo,
+        modules: [],
+        translations,
+      },
+    });
+
+    const metadata = await buildTopicIndexMetadata();
+
+    expect(metadata.alternates).toMatchObject({
+      canonical: '/nl/topics',
+      languages: { en: '/topics', nl: '/nl/topics', 'x-default': '/topics' },
+    });
   });
 });

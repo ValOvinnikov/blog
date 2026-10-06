@@ -1,11 +1,7 @@
 import { routes } from '@blog/config';
-import { routing } from '@web/i18n/routing';
-import { toMetadata } from '@web/metadata/to-metadata';
+import { toLocalizedPageMetadata } from '@web/metadata/to-localized-page-metadata';
 import { getHomePage } from '@web/server/home/get-home-page/get-home-page';
-import { getRequestContext } from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';
-import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
-import { withLanguageAlternates } from '@web/utils/with-language-alternates';
 import type { Metadata } from 'next';
 
 export const buildHomePageMetadata = async (): Promise<Metadata> => {
@@ -21,25 +17,11 @@ export const buildHomePageMetadata = async (): Promise<Metadata> => {
   }
 
   const { seo, translations } = result.data;
-  const {
-    locale,
-    defaultLocale = routing.defaultLocale,
-    liveLocales = [locale],
-  } = await getRequestContext();
-  const metadata = await toMetadata(seo, {
-    canonical: toLocalizedPathname({
-      href: routes.home(),
-      locale,
-      defaultLocale,
-    }),
+
+  return toLocalizedPageMetadata(seo, {
+    href: routes.home(),
+    translations,
     ogType: 'website',
     titleAbsolute: true,
-  });
-
-  return withLanguageAlternates(metadata, {
-    pages: translations.map((language) => ({ language, href: routes.home() })),
-    locale,
-    liveLocales,
-    defaultLocale,
   });
 };

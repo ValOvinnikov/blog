@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { makeRawBlogPage } from '@blog/service/testing/pages/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 
@@ -78,6 +79,59 @@ describe('blogPageQuery template layout', () => {
     expect(await run([page(), ...dataset])).toMatchObject({
       hero: null,
       modules: null,
+    });
+  });
+});
+
+describe('blogPageQuery language scoping', () => {
+  const { EN, NL, FR } = LOCALE_ISO_CODES;
+
+  function page(id: string, heading: string, language?: string) {
+    return {
+      _id: id,
+      _type: 'page_postIndex',
+      headingBlock: { heading },
+      ...(language ? { language } : {}),
+    };
+  }
+
+  function run(dataset: unknown[], locale: string): Promise<unknown> {
+    return evaluateGroqExpression(blogPageQuery.query, dataset, null, {
+      locale,
+      defaultLocale: EN,
+    });
+  }
+
+  const dataset = [
+    page('page_postIndex', 'Blog', EN),
+    page('page_postIndex-nl', 'Blog NL', NL),
+  ];
+
+  it("resolves each language's own blog page", async () => {
+    expect(await run(dataset, EN)).toMatchObject({
+      headingBlock: { heading: 'Blog' },
+    });
+    expect(await run(dataset, NL)).toMatchObject({
+      headingBlock: { heading: 'Blog NL' },
+    });
+  });
+
+  it('resolves nothing for a language without a blog page, rather than another language', async () => {
+    expect(await run(dataset, FR)).toBeNull();
+  });
+
+  it('resolves a blog page with no language for the default language only', async () => {
+    const legacy = [page('page_postIndex', 'Blog')];
+
+    expect(await run(legacy, EN)).toMatchObject({
+      headingBlock: { heading: 'Blog' },
+    });
+    expect(await run(legacy, NL)).toBeNull();
+  });
+
+  it('lists the language of every blog page as its translations', async () => {
+    expect(await run(dataset, NL)).toMatchObject({
+      translations: [{ language: EN }, { language: NL }],
     });
   });
 });

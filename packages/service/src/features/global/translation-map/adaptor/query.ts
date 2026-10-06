@@ -1,5 +1,5 @@
 import { q } from '@blog/service/sanity/query/query';
-import { homeLanguagesQuery } from '@blog/service/shared/localization/home-languages/home-languages';
+import { pageLanguagesQuery } from '@blog/service/shared/localization/page-languages/page-languages';
 
 export const translationMapQuery = q.project((root) => ({
   groups: root.star.filterByType('translation.metadata').project((group) => ({
@@ -16,5 +16,8 @@ export const translationMapQuery = q.project((root) => ({
       }))
       .nullable(true),
   })),
-  homes: homeLanguagesQuery,
+  homes: pageLanguagesQuery('page_home'),
+  postIndexes: pageLanguagesQuery('page_postIndex'),
+  topicIndexes: pageLanguagesQuery('page_topicIndex'),
+  tagIndexes: pageLanguagesQuery('page_tagIndex'),
 }));

@@ -42,45 +42,50 @@ const toAbsoluteAlternates = (
     ]),
   );
 
-type THomePageEntriesParams = {
-  homeLanguages: readonly TLocaleIsoCode[];
+type TLanguagePageEntriesParams = {
+  href: string;
+  languages: readonly TLocaleIsoCode[];
   liveLocales: readonly TLocaleIsoCode[];
   defaultLocale: TLocaleIsoCode;
   siteUrl: string;
 };
 
-const toHomePageEntries = ({
-  homeLanguages,
+const toLanguagePageEntries = ({
+  href,
+  languages,
   liveLocales,
   defaultLocale,
   siteUrl,
-}: THomePageEntriesParams): MetadataRoute.Sitemap => {
-  const languages = [
-    defaultLocale,
-    ...homeLanguages.filter(
+}: TLanguagePageEntriesParams): MetadataRoute.Sitemap => {
+  const liveLanguages = [
+    ...(languages.includes(defaultLocale) ? [defaultLocale] : []),
+    ...languages.filter(
       (language) =>
         language !== defaultLocale && liveLocales.includes(language),
     ),
   ];
+  const toUrl = (language: TLocaleIsoCode) =>
+    `${siteUrl}${toLocalizedPathname({ href, locale: language, defaultLocale })}`;
 
-  if (languages.length < 2) {
-    return [toEntry(routes.home(), siteUrl)];
+  if (liveLanguages.length < 2) {
+    return liveLanguages.map((language) => ({
+      url: toUrl(language),
+      alternates: {
+        languages: { [LOCALE_BCP47_TAGS[language]]: toUrl(language) },
+      },
+    }));
   }
 
   const alternates = toAbsoluteAlternates(
     toLanguageAlternates({
-      pages: languages.map((language) => ({ language, href: routes.home() })),
+      pages: liveLanguages.map((language) => ({ language, href })),
       defaultLocale,
     }),
     siteUrl,
   );
 
-  return languages.map((language) => ({
-    url: `${siteUrl}${toLocalizedPathname({
-      href: routes.home(),
-      locale: language,
-      defaultLocale,
-    })}`,
+  return liveLanguages.map((language) => ({
+    url: toUrl(language),
     alternates: { languages: alternates },
   }));
 };
@@ -164,8 +169,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     tagPaginationParamsResult,
     blogParamsResult,
     landingPageSlugsResult,
-    topicIndexPageResult,
-    tagIndexPageResult,
     translationMapResult,
   ] = await Promise.all([
     service.pages.post.v1.getPostParams(tenant),
@@ -175,8 +178,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     service.pages.tag.v1.getTagPaginationParams(tenant),
     service.pages.blog.v1.getIndexPageParams(tenant),
     service.pages.landing.v1.getPageSlugs(tenant, liveLocales),
-    service.pages.topicIndex.v1.getIndexPage(tenant),
-    service.pages.tagIndex.v1.getIndexPage(tenant),
     service.global.translationMap.v1.getTranslationMap(tenant),
   ]);
 
@@ -237,18 +238,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ? landingPageSlugsResult.data
     : [];
 
-  if (!topicIndexPageResult.ok) {
-    logger.error('sitemap.topic_index_page_fetch_failed', {
-      error: topicIndexPageResult.error,
-    });
-  }
-
-  if (!tagIndexPageResult.ok) {
-    logger.error('sitemap.tag_index_page_fetch_failed', {
-      error: tagIndexPageResult.error,
-    });
-  }
-
   if (!translationMapResult.ok) {
     logger.error('sitemap.translation_map_fetch_failed', {
       error: translationMapResult.error,
@@ -256,22 +245,39 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
   const translationMap = translationMapResult.ok
     ? translationMapResult.data
-    : { groups: [], homeLanguages: [] };
-
-  return [
-    ...toHomePageEntries({
-      homeLanguages: translationMap.homeLanguages,
+    : {
+        groups: [],
+        homeLanguages: [],
+        postIndexLanguages: [],
+        topicIndexLanguages: [],
+        tagIndexLanguages: [],
+      };
+  const toTranslatedPageEntries = (
+    href: string,
+    languages: readonly TLocaleIsoCode[],
+  ) =>
+    toLanguagePageEntries({
+      href,
+      languages,
       liveLocales,
       defaultLocale,
       siteUrl,
-    }),
-    ...(blogParamsResult.ok ? [toEntry(routes.blogIndex(), siteUrl)] : []),
-    ...(topicIndexPageResult.ok && topicIndexPageResult.data
-      ? [toEntry(routes.topics(), siteUrl)]
-      : []),
-    ...(tagIndexPageResult.ok && tagIndexPageResult.data
-      ? [toEntry(routes.tags(), siteUrl)]
-      : []),
+    });
+
+  return [
+    ...toTranslatedPageEntries(routes.home(), [
+      defaultLocale,
+      ...translationMap.homeLanguages,
+    ]),
+    ...toTranslatedPageEntries(
+      routes.blogIndex(),
+      translationMap.postIndexLanguages,
+    ),
+    ...toTranslatedPageEntries(
+      routes.topics(),
+      translationMap.topicIndexLanguages,
+    ),
+    ...toTranslatedPageEntries(routes.tags(), translationMap.tagIndexLanguages),
     ...blogPageNumbers.map((page) => toEntry(routes.blogIndex(page), siteUrl)),
     ...posts.map(({ slug, publishedAt }) =>
       toEntry(routes.post(slug), siteUrl, publishedAt),
