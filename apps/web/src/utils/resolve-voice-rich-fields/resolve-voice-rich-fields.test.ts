@@ -64,7 +64,7 @@ describe(resolveVoiceRichFields, () => {
   it('resolves every RICH voice field, not only the ones present in overrides', () => {
     const result = resolveVoiceRichFields({}, BASE_MESSAGES);
 
-    expect(Object.keys(result)).toHaveLength(15);
+    expect(Object.keys(result)).toHaveLength(12);
     expect(result.accountIdentityDisplayNameDescription).toBeDefined();
   });
 });
