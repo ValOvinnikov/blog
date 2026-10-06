@@ -4,6 +4,10 @@ import {
   LANDING_PAGE_PATH_EXPRESSION,
   pagePathParser,
 } from '@blog/service/shared/expressions/landing-page/landing-page-path';
+import {
+  LANDING_PAGE_SECTION_CHAIN_EXPRESSION,
+  landingPageSectionChainParser,
+} from '@blog/service/shared/expressions/landing-page/landing-page-section';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
 import { moduleFragment } from '@blog/service/shared/fragments/module/module';
 import { seoFragment } from '@blog/service/shared/fragments/seo/seo';
@@ -41,6 +45,11 @@ export const landingPageQuery = q
       .as<TRawModule<TPageLandingType>[]>()
       .nullable(),
     seo: sub.field('seo').project(seoFragment).notNull(),
+    showSectionNavigation: sub.field('showSectionNavigation').nullable(true),
+    sectionChain: sub.raw(
+      LANDING_PAGE_SECTION_CHAIN_EXPRESSION,
+      landingPageSectionChainParser,
+    ),
     translations: translationsQuery,
   }))
   .nullable(true);
