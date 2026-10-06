@@ -1,6 +1,7 @@
 import { tagSchema } from '@blog/studio/schema-types/documents/blog/tag/tag';
 import { PAGE_TAG_TYPE } from '@blog/studio/schema-types/documents/pages/tag/tag-type';
 import { tagTemplateSchema } from '@blog/studio/schema-types/documents/templates/tag/tag';
+import { languageField } from '@blog/studio/schema-types/fields/language-field/language-field';
 import { slugField } from '@blog/studio/schema-types/fields/slug-field/slug-field';
 import { templateField } from '@blog/studio/schema-types/fields/template-field/template-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
@@ -8,6 +9,7 @@ import { createSlugUrlPreviewInput } from '@blog/studio/schema-types/inputs/slug
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
 import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
+import { validateSlugUniqueInLanguage } from '@blog/studio/schema-types/validation/validate-slug-unique-in-language/validate-slug-unique-in-language';
 import { validateUniqueTaxonomyReference } from '@blog/studio/schema-types/validation/validate-unique-taxonomy-reference/validate-unique-taxonomy-reference';
 import { Tag } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
@@ -15,7 +17,7 @@ import { defineField, defineType } from 'sanity';
 const tagSlugUrlPreviewInput = createSlugUrlPreviewInput('/tags/');
 
 const TAG_UNIQUENESS_ERROR =
-  'Another Tag Page already references this tag — each tag can only back one Tag Page.';
+  'Another Tag Page in this language already references this tag — each tag can only back one Tag Page per language.';
 
 export const tagPageSchema = defineType({
   name: PAGE_TAG_TYPE,
@@ -25,10 +27,12 @@ export const tagPageSchema = defineType({
     'The archive page for one tag, listing the posts labeled with it.',
   icon: Tag,
   fields: [
+    languageField(),
     titleField(),
     slugField({
       description: 'URL path segment — auto-generated from title.',
       previewInput: tagSlugUrlPreviewInput,
+      isUnique: validateSlugUniqueInLanguage,
     }),
     defineField({
       name: 'tag',
