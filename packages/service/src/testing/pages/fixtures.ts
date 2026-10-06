@@ -181,6 +181,7 @@ export function makeRawLandingPage(
   overrides: Partial<TRawLandingPage> = {},
 ): TRawLandingPage {
   return {
+    _id: 'about',
     path: 'about',
     headingBlock: makeRawHeadingBlock('About Us'),
     hero: null,

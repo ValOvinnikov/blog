@@ -23,6 +23,7 @@ export type TLandingSectionNavigation = {
 };
 
 export type TLandingPage = {
+  id: string;
   path: string;
   headingBlock: THeadingBlock;
   hero: TMaybeUndefined<TModule<TPageLandingType>>;

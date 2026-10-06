@@ -23,6 +23,7 @@ export const landingPageQuery = q
   .filterRaw(`${LANDING_PAGE_PATH_EXPRESSION} == $path`)
   .slice(0)
   .project((sub) => ({
+    _id: true,
     path: sub.raw(LANDING_PAGE_PATH_EXPRESSION, pagePathParser.unwrap()),
     headingBlock: sub
       .field('headingBlock')
