@@ -7,7 +7,9 @@ import { schemaTypes } from '@blog/studio/schema-types';
 import { PAGE_HOME_TYPE } from '@blog/studio/schema-types/documents/pages/home/home-type';
 import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
 import { PAGE_POST_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/post-index/post-index-type';
+import { PAGE_TAG_TYPE } from '@blog/studio/schema-types/documents/pages/tag/tag-type';
 import { PAGE_TAG_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/tag-index/tag-index-type';
+import { PAGE_TOPIC_TYPE } from '@blog/studio/schema-types/documents/pages/topic/topic-type';
 import { PAGE_TOPIC_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/topic-index/topic-index-type';
 import { migrationStateSchema } from '@blog/studio/schema-types/documents/system/migration-state/migration-state';
 import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
@@ -60,6 +62,8 @@ const ONE_PER_LANGUAGE_DOCUMENT_TYPES: string[] = [
 const TRANSLATED_DOCUMENT_TYPES: string[] = [
   ...ONE_PER_LANGUAGE_DOCUMENT_TYPES,
   PAGE_LANDING_TYPE,
+  PAGE_TOPIC_TYPE,
+  PAGE_TAG_TYPE,
 ];
 
 const translationLinks = definePlugin<TTranslationLinkOptions>((options) => ({

@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { PAGE_TAG_TYPE } from '@blog/studio/schema-types/documents/pages/tag/tag-type';
 import { PAGE_TOPIC_TYPE } from '@blog/studio/schema-types/documents/pages/topic/topic-type';
 import { validateUniqueTaxonomyReference } from '@blog/studio/schema-types/validation/validate-unique-taxonomy-reference/validate-unique-taxonomy-reference';
@@ -8,7 +9,11 @@ const REFERENCE_FIELD = 'tag';
 const UNIQUENESS_ERROR =
   'Another Tag Page already references this tag — each tag can only back one Tag Page.';
 
-const createMockContext = (fetchResult: unknown, documentId = 'page-tag-1') => {
+const createMockContext = (
+  fetchResult: unknown,
+  documentId = 'page-tag-1',
+  language?: string,
+) => {
   const fetchCalls: { query: string; params: unknown }[] = [];
   const withConfigCalls: unknown[] = [];
 
@@ -28,7 +33,7 @@ const createMockContext = (fetchResult: unknown, documentId = 'page-tag-1') => {
 
   const context = {
     getClient,
-    document: { _id: documentId },
+    document: { _id: documentId, language },
   } as unknown as ValidationContext;
 
   return { context, fetchCalls, withConfigCalls };
@@ -74,11 +79,34 @@ describe('validateUniqueTaxonomyReference', () => {
 
     await validate()({ _ref: 'tag-1' }, context);
 
-    expect(fetchCalls[0]?.params).toEqual({
-      type: PAGE_TYPE,
-      refId: 'tag-1',
+    expect(fetchCalls[0]?.params).toMatchObject({
       publishedId: 'page-tag-1',
     });
+  });
+
+  it('only counts pages in the same language as a conflict', async () => {
+    const { context, fetchCalls } = createMockContext(
+      0,
+      'page-tag-1',
+      LOCALE_ISO_CODES.NL,
+    );
+
+    await validate()({ _ref: 'tag-1' }, context);
+
+    expect(fetchCalls[0]?.query).toContain(
+      'coalesce(language, "") == $language',
+    );
+    expect(fetchCalls[0]?.params).toMatchObject({
+      language: LOCALE_ISO_CODES.NL,
+    });
+  });
+
+  it('matches only pages without a language when the page has none', async () => {
+    const { context, fetchCalls } = createMockContext(0);
+
+    await validate()({ _ref: 'tag-1' }, context);
+
+    expect(fetchCalls[0]?.params).toMatchObject({ language: '' });
   });
 
   it('requests the drafts perspective so an unpublished conflict still counts', async () => {
