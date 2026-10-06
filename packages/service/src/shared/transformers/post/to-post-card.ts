@@ -16,7 +16,7 @@ export type TPostCardAuthor = TPersonCard;
 export type TPostCardTopic = {
   id: string;
   title: string;
-  slug: string;
+  slug: TMaybeUndefined<string>;
 };
 
 export type TPostCard = {
@@ -36,7 +36,7 @@ function toPostCardTopic(raw: TRawPostCard['topic']): TPostCardTopic {
   return {
     id: raw._id,
     title: raw.title,
-    slug: raw.slug,
+    slug: raw.slug ?? undefined,
   };
 }
 

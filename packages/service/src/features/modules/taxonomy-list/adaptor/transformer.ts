@@ -27,7 +27,7 @@ function toTaxonomyEntry(raw: TRawTaxonomyEntry): TTaxonomyEntry {
   return {
     id: raw._id,
     title: raw.title,
-    slug: raw.slug,
+    slug: raw.slug ?? undefined,
     description: raw.description ?? undefined,
     postCount: raw.postCount,
     latestPosts: raw.latestPosts.map(toPostLink),

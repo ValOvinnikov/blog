@@ -4,7 +4,7 @@ export function buildArchivePageSlugExpression(
   archivePageType: string,
   referenceField: string,
 ): string {
-  return `coalesce(*[_type == "${archivePageType}" && ${referenceField}._ref == ^._id][0].slug.current, slug.current)`;
+  return `*[_type == "${archivePageType}" && ${referenceField}._ref == ^._id][0].slug.current`;
 }
 
 export const TAG_ARCHIVE_PAGE_SLUG_EXPRESSION = buildArchivePageSlugExpression(
@@ -15,4 +15,4 @@ export const TAG_ARCHIVE_PAGE_SLUG_EXPRESSION = buildArchivePageSlugExpression(
 export const TOPIC_ARCHIVE_PAGE_SLUG_EXPRESSION =
   buildArchivePageSlugExpression('page_topic', 'topic');
 
-export const archivePageSlugParser = z.string();
+export const archivePageSlugParser = z.string().nullable();

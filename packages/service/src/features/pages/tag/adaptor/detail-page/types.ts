@@ -7,13 +7,10 @@ import type { TFaqPageQuestion } from '@blog/service/shared/transformers/faq/res
 import type { TModule } from '@blog/service/shared/transformers/module/to-module';
 import type { TSeoResolved } from '@blog/service/shared/transformers/seo/resolve-seo';
 
-// The tag page's own richer tag shape — `description` on top of the minimal
-// `{id,title,slug}` chip shape `TTag` provides for the post-detail tags
-// projection.
 export type TTagDetailPageTag = {
   id: string;
   title: string;
-  slug: string;
+  slug: TMaybeUndefined<string>;
   description: TMaybeUndefined<string>;
 };
 

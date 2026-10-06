@@ -43,19 +43,26 @@ export const TaxonomyListModule = async ({ id }: ITaxonomyListModuleProps) => {
   const t = await getTranslations(`taxonomyListModule.${namespace}`);
   const buildHref = taxonomy === TAXONOMY_KIND.TAGS ? routes.tag : routes.topic;
 
-  const items: ITaxonomyListModuleItem[] = entries.map((entry) => ({
-    id: entry.id,
-    title: entry.title,
-    description: entry.description,
-    postCountLabel: t('postsCount', { count: entry.postCount }),
-    href: buildHref(entry.slug),
-    posts: entry.latestPosts.map((post) => ({
-      id: post.id,
-      title: post.title,
-      href: routes.post(post.slug),
-    })),
-    latestPostsLabel: t('latestPostsLabel', { name: entry.title }),
-  }));
+  const items: ITaxonomyListModuleItem[] = entries.flatMap(
+    ({ id: entryId, title, slug, description, postCount, latestPosts }) =>
+      slug
+        ? [
+            {
+              id: entryId,
+              title,
+              description,
+              postCountLabel: t('postsCount', { count: postCount }),
+              href: buildHref(slug),
+              posts: latestPosts.map((post) => ({
+                id: post.id,
+                title: post.title,
+                href: routes.post(post.slug),
+              })),
+              latestPostsLabel: t('latestPostsLabel', { name: title }),
+            },
+          ]
+        : [],
+  );
 
   return (
     <TaxonomyListModuleView

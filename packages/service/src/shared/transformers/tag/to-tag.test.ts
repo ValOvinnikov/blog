@@ -13,4 +13,8 @@ describe('toTag', () => {
       slug: 'typescript',
     });
   });
+
+  it('maps a tag with no tag page to an undefined slug', () => {
+    expect(toTag(makeRawTag({ slug: null })).slug).toBeUndefined();
+  });
 });

@@ -13,15 +13,10 @@ export type TPostLink = {
   slug: string;
 };
 
-/**
- * A resolved taxonomy term (topic or tag) as rendered by the module — the two
- * entities are structurally identical here (`{ id, title, slug, description,
- * postCount, latestPosts }`) by design, so one card renders either.
- */
 export type TTaxonomyEntry = {
   id: string;
   title: string;
-  slug: string;
+  slug: TMaybeUndefined<string>;
   description: TMaybeUndefined<string>;
   postCount: number;
   latestPosts: TPostLink[];

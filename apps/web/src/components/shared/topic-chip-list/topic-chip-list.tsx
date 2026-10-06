@@ -32,18 +32,20 @@ export const TopicChipList = ({ topics, activeSlug }: ITopicChipListProps) => {
       >
         {t('all')}
       </Tag>
-      {topics.map((topic) => {
-        const isActive = topic.slug === activeSlug;
+      {topics.map(({ id, title, slug }) => {
+        if (!slug) return <Tag key={id}>{title}</Tag>;
+
+        const isActive = slug === activeSlug;
 
         return (
           <Tag
-            key={topic.id}
+            key={id}
             as={SmartLink}
-            href={routes.topic(topic.slug)}
+            href={routes.topic(slug)}
             variant={isActive ? 'accent' : 'default'}
             aria-current={isActive ? 'page' : undefined}
           >
-            {topic.title}
+            {title}
           </Tag>
         );
       })}

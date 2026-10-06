@@ -175,6 +175,23 @@ describe(`<${PostArticle.name}/>`, () => {
     );
   });
 
+  it('renders the topic eyebrow as plain text when the topic has no topic page', async () => {
+    getPostMock.mockResolvedValueOnce({
+      ok: true,
+      data: {
+        ...mockPostDetail,
+        topic: { ...mockPostDetail.topic, slug: undefined },
+      },
+    });
+
+    await setup();
+
+    expect(screen.getByText('Engineering')).toBeVisible();
+    expect(
+      screen.queryByRole('link', { name: 'Engineering' }),
+    ).not.toBeInTheDocument();
+  });
+
   it('links the author to whatever href the service resolved', async () => {
     getPostMock.mockResolvedValueOnce({
       ok: true,
@@ -289,6 +306,24 @@ describe(`<${PostArticle.name}/>`, () => {
       'href',
       '/tags/react',
     );
+  });
+
+  it('omits a tag with no tag page from the footer', async () => {
+    getPostMock.mockResolvedValueOnce({
+      ok: true,
+      data: {
+        ...mockPostDetail,
+        tags: [
+          { id: 'tag-1', title: 'TypeScript', slug: 'typescript' },
+          { id: 'tag-2', title: 'React', slug: undefined },
+        ],
+      },
+    });
+
+    await setup();
+
+    expect(screen.getByRole('link', { name: 'TypeScript' })).toBeVisible();
+    expect(screen.queryByText('React')).not.toBeInTheDocument();
   });
 
   it('renders no tag chips when the post has no tags', async () => {

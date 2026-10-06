@@ -17,7 +17,7 @@ function toTagDetailPageTag(rawTag: TRawTagDetailPageTag): TTagDetailPageTag {
   return {
     id: rawTag._id,
     title: rawTag.title,
-    slug: rawTag.slug,
+    slug: rawTag.slug ?? undefined,
     description: rawTag.description ?? undefined,
   };
 }
