@@ -110,6 +110,7 @@ const REVALIDATE_TAGS = {
   module_team: ['modules:team'],
   module_timeline: ['modules:timeline'],
   module_pricing: ['modules:pricing'],
+  module_childPages: ['modules:childPages'],
   link: ['link'],
   redirect: ['redirect'],
   'translation.metadata': ['translation.metadata'],

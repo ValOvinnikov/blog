@@ -15,6 +15,25 @@
 export declare const internalGroqTypeReferenceTo: unique symbol;
 
 // Source: ../config/src/sanity/generated/schema.json
+export type Module_childPages = {
+  _id: string;
+  _type: 'module_childPages';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  headingBlock?: ModuleHeadingBlock;
+  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  layout?: WideLayout;
+};
+
+export type ModuleHeadingBlock = {
+  _type: 'moduleHeadingBlock';
+  heading?: InternationalizedArrayString;
+  supportingText?: InternationalizedArrayText;
+};
+
 export type Module_pricing = {
   _id: string;
   _type: 'module_pricing';
@@ -44,12 +63,6 @@ export type InternationalizedArrayString = Array<
     _key: string;
   } & InternationalizedArrayStringValue
 >;
-
-export type ModuleHeadingBlock = {
-  _type: 'moduleHeadingBlock';
-  heading?: InternationalizedArrayString;
-  supportingText?: InternationalizedArrayText;
-};
 
 export type Module_newsletter = {
   _id: string;
@@ -1906,6 +1919,13 @@ export type Page_landing = {
   seo?: Seo;
 };
 
+export type Module_childPagesReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_childPages';
+};
+
 export type Template_landing = {
   _id: string;
   _type: 'template_landing';
@@ -1918,6 +1938,9 @@ export type Template_landing = {
     | Module_heroProfileReference
     | Module_heroStatementReference;
   modules?: Array<
+    | ({
+        _key: string;
+      } & Module_childPagesReference)
     | ({
         _key: string;
       } & Module_contentReference)
@@ -2151,9 +2174,10 @@ export type Geopoint = {
 };
 
 export type AllSanitySchemaTypes =
+  | Module_childPages
+  | ModuleHeadingBlock
   | Module_pricing
   | InternationalizedArrayString
-  | ModuleHeadingBlock
   | Module_newsletter
   | Module_cta
   | InternationalizedArrayListedText
@@ -2287,6 +2311,7 @@ export type AllSanitySchemaTypes =
   | Template_postIndex
   | Template_landingReference
   | Page_landing
+  | Module_childPagesReference
   | Template_landing
   | Module_heroStatement
   | Module_heroProfile

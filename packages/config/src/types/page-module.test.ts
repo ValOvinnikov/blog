@@ -46,6 +46,7 @@ describe('page module type unions', () => {
   it('resolves page_landing from template_landing', () => {
     expectTypeOf<TPageLandingType>().toEqualTypeOf<
       | 'module_heroBlog'
+      | 'module_childPages'
       | 'module_heroStatement'
       | 'module_heroProfile'
       | 'module_content'

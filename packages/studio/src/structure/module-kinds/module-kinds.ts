@@ -1,4 +1,5 @@
 import { modules } from '@blog/studio/schema-types/modules';
+import { childPagesSchema } from '@blog/studio/schema-types/modules/child-pages/child-pages';
 import { contentSchema } from '@blog/studio/schema-types/modules/content/content';
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
 import { faqSchema } from '@blog/studio/schema-types/modules/faq/faq';
@@ -27,6 +28,7 @@ export const moduleKinds = [
       featureHighlightsSchema,
       timelineSchema,
       faqSchema,
+      childPagesSchema,
     ],
   },
   {
