@@ -7,6 +7,7 @@ export const VOICE_SURFACE = {
   ERROR: 'ERROR',
   BOOKMARKS: 'BOOKMARKS',
   ACCOUNT: 'ACCOUNT',
+  CONSENT_BANNER: 'CONSENT_BANNER',
 } as const;
 
 export type TVoiceSurface = (typeof VOICE_SURFACE)[keyof typeof VOICE_SURFACE];

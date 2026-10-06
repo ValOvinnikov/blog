@@ -262,5 +262,30 @@
       "YEAR": "Jaarlijks"
     },
     "periodSwitchLabel": "Factureringsperiode"
+  },
+  "consent": {
+    "banner": {
+      "heading": "Cookies op deze site",
+      "message": "We gebruiken alleen cookies die nodig zijn om deze site te laten werken, tenzij je externe media toestaat. Je kunt je keuze op elk moment wijzigen via Cookie-instellingen in de footer.",
+      "acceptLabel": "Alles accepteren",
+      "rejectLabel": "Alles weigeren",
+      "settingsLabel": "Instellingen"
+    },
+    "preferences": {
+      "heading": "Cookie-instellingen",
+      "saveLabel": "Opslaan",
+      "closeLabel": "Sluiten"
+    },
+    "categories": {
+      "necessary": {
+        "label": "Noodzakelijk",
+        "description": "Nodig om de site te laten werken. Altijd ingeschakeld."
+      },
+      "externalMedia": {
+        "label": "Externe media",
+        "description": "Inhoud van externe aanbieders, zoals video's en kaarten, die mogelijk hun eigen cookies plaatsen."
+      }
+    },
+    "footerSettingsLabel": "Cookie-instellingen"
   }
 }

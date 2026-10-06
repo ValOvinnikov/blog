@@ -1527,16 +1527,16 @@ was taken down while its site kept serving from cache. See
 and [`docs/context/rendering-caching-i18n.md`](./docs/context/rendering-caching-i18n.md).
 
 **Feature-toggle layer** (Phase 4 of the configurability epic, #1285/#1289):
-`@blog/db`'s `settings_features` table (one row per tenant, five `NOT NULL`
+`@blog/db`'s `settings_features` table (one row per tenant, six `NOT NULL`
 boolean columns — `commentsEnabled`/`ratingsEnabled`/`bookmarksEnabled`/
-`newsletterEnabled`/`analyticsEnabled`) holds the tenant's own on/off choice
-for each of `@blog/config`'s `CAPABILITY` keys. It is never eagerly seeded at
-tenant-provisioning time — like `site_config`, an absent row is resolved
-lazily at read time by falling back to the tenant's current preset's
-`PRESET_REGISTRY[preset].featureDefaults` (`comments`/`ratings`/`bookmarks`
-default on, `newsletter`/`analytics` default off — a deliberate opt-in
-posture for `newsletter` and `analytics`, not a "match legacy
-behavior" default). Two gating layers stack on top of the tenant toggle,
+`newsletterEnabled`/`analyticsEnabled`/`consentBannerEnabled`) holds the
+tenant's own on/off choice for each of `@blog/config`'s `CAPABILITY` keys. It
+is never eagerly seeded at tenant-provisioning time — like `site_config`, an
+absent row is resolved lazily at read time by falling back to the tenant's
+current preset's `PRESET_REGISTRY[preset].featureDefaults`
+(`comments`/`ratings`/`bookmarks` default on, `newsletter`/`analytics`/
+`consentBanner` default off — a deliberate opt-in posture for those three,
+not a "match legacy behavior" default). Two gating layers stack on top of the tenant toggle,
 most-restrictive-wins: env-locked secrets (unchanged, pre-existing —
 `AUTH_*`, `ANTHROPIC_API_KEY`, `SANITY_REVALIDATE_SECRET`, …) and
 `@blog/db`'s `PLAN_REGISTRY` (`Record<TTenantPlan, TCapability[]>` — `FREE`
@@ -1569,6 +1569,39 @@ toggle, rejecting the whole save if a submitted toggle exceeds the tenant's
 plan, since a disabled client control is never the real gate. Validation
 limits and layout thresholds (mentioned in the original phase scope) were
 cut with no concrete values ever specified; tracked separately (#1920).
+
+**Cookie consent.** Nothing outside the Necessary category ever loads before
+the visitor consents, whatever the tenant's settings — a forgotten toggle
+costs convenience, never compliance.
+
+- _Categories._ `@blog/config`'s `CONSENT_CATEGORY` is
+  `{ NECESSARY, EXTERNAL_MEDIA }`. Necessary is implicit, always granted and
+  never written to the cookie; External media covers third-party iframes
+  (embeds, maps). A new category is a code change to that const. Vercel
+  Analytics sets no cookies and stays outside consent; any future feature that
+  sets a non-essential cookie goes behind the gate before it ships.
+- _Cookie._ A first-party `consent` cookie written client-side — `Secure`,
+  `SameSite=Lax`, `path=/`, not `httpOnly`, 180 days. Its value is
+  `<version>.<CATEGORY>,…` (`1.EXTERNAL_MEDIA` granted, `1.` all declined). A
+  missing, unparseable or older-version value reads as unanswered, so bumping
+  the version re-asks everyone. There is no server-side consent log, and no
+  server code reads the cookie: pages stay static.
+- _Gate API (`apps/web`, client-side)._ `ConsentProvider` is mounted for every
+  tenant through the locale layout's client providers. It reads the cookie via
+  `useSyncExternalStore` and notifies every subscriber on each write, so
+  already-rendered content updates without a reload. `useConsent(category)`
+  returns `{ status, grant }`, where `status` is `unknown` (server render and
+  first paint), `granted`, `denied` or `unanswered`; the provider also exposes
+  `openPreferences()`. Features never read the cookie directly.
+- _Banner._ Shown only when the tenant's `CONSENT_BANNER` capability is
+  enabled and the status is `unanswered`: a non-modal card with equal-weight
+  Accept all / Reject all and a Settings action.
+- _Preferences._ A native `<dialog>` wrapping `@blog/ui`'s
+  `ConsentPreferences` — Necessary locked on, External media never pre-ticked.
+  The footer's "Cookie settings" button reopens it on every tenant, banner or
+  not, so withdrawing is as easy as granting.
+- _Copy._ The `consent.*` messages ship in every locale catalog and are
+  registered in `VOICE_FIELDS`, so a tenant can reword them in the Voice tab.
 
 **"Coming soon" capabilities.** A capability that is not finished end to end
 — today `comments` and `ratings` (no public-site implementation) and
@@ -1831,6 +1864,62 @@ each translation is its own document.
 **Not built:** a per-tenant strict mode turning translation warnings into
 errors; a domain per language; translated fixed path segments; machine
 translation; changing a tenant's default language after content exists.
+
+### Landing page tree
+
+Landing pages nest, so a tenant can build catalogue-style sections
+(`/modules/faq`) with navigation of their own while the header and footer stay
+the site's main navigation. Home is not part of the tree; top-level Landing
+pages sit directly under it.
+
+**Tree.** `page_landing.parent` is an optional reference to another Landing
+page in the same language. `slug` holds only the last segment (no `/`) and
+the URL is the parent chain joined with `/`. Studio rejects a cycle and a
+chain deeper than `LANDING_PAGE_MAX_DEPTH` (3, counting the page itself;
+`@blog/config`), the one constant both the schema and the service's path
+expression read. A slug is unique among pages with the same parent and
+language; only top-level slugs are checked against reserved paths, so
+`/help/blog` is allowed. The route is `[tenant]/[locale]/[...slug]`, and the
+service builds a Landing page's path in GROQ (`LANDING_PAGE_PATH_EXPRESSION`;
+`PAGE_PATH_EXPRESSION` wherever page types mix, such as the translation map
+and sitemap). A page whose parent chain is broken — a missing, unpublished or
+slugless ancestor, or one past the depth bound — has no path and is not
+routable.
+
+**Order.** Editors drag a parent's direct children into order in Studio's
+page tree (`@sanity/orderable-document-list`, an `orderRank` field on every
+Landing page). Everything that lists children follows that order; a new page
+lands last.
+
+**Section navigation** is a page setting, never a module. A page with
+children has a "Section navigation" switch (default off). When it is on, that
+page and every page beneath it show a sidebar (`SidebarNav`: a list from
+`lg` up, a collapsible selector below) of the section root and its direct
+children, with the current page — or the child whose branch contains it —
+marked, plus breadcrumbs from the parent chain. The section root is the
+nearest ancestor-or-self with the switch on, so a nested parent can run its
+own branch. Each page inside a section has "Show section navigation on this
+page" (default on) to opt out. Both settings live on the page rather than the
+template and warn when they differ from the default-language version. Labels
+use each page's public heading, never its internal `title`. The same
+`SidebarNav` renders a post's table of contents (`PostTableOfContents`).
+
+**Section Pages module** (`module_childPages`, allowed on `template_landing`)
+renders a card per direct child of the page using the template, in drag
+order: the child's public heading as the label, its heading's supporting text
+as the summary, its SEO sharing image, and a link to its path. On a page
+with no children it renders nothing.
+
+**Redirects.** A `redirect` document holds a language, a source path, a
+destination path and whether it is a prefix redirect; editors manage them in
+the Redirects sidebar section. Publishing a Landing page whose path changed
+(its slug or parent) creates one from the old path to the new — a prefix
+redirect when the page has descendants, so the whole subtree follows — while
+collapsing redirects that pointed at the old path and removing any whose
+source is now a live page. When a Landing path finds no page, the site checks
+redirects for that language (exact match, then the longest prefix, keeping
+the remaining path) and answers 301; otherwise it 404s. Redirects cover
+Landing paths only.
 
 Full mechanics:
 [`docs/context/rendering-caching-i18n.md`](./docs/context/rendering-caching-i18n.md).
