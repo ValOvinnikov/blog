@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config';
 import type { TTagDetailPage } from '@blog/service';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
@@ -31,6 +32,7 @@ export const makeTagDetailPage = (
       ogDescription: 'Posts about TypeScript.',
       ogImage: undefined,
     },
+    translations: [{ language: LOCALE_ISO_CODES.EN, slug: 'typescript' }],
     ...overrides,
   };
 };

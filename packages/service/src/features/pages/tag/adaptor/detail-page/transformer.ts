@@ -1,3 +1,4 @@
+import { toPageTranslations } from '@blog/service/shared/localization/page-translations/to-page-translations';
 import type { TFaqPageQuestion } from '@blog/service/shared/transformers/faq/resolve-faqs';
 import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
 import {
@@ -35,5 +36,6 @@ export function toTagDetailPage(
     modules: (rawPage.modules ?? []).map(toModule),
     faqs,
     seo: resolveSeo(rawPage.seo),
+    translations: toPageTranslations(rawPage.translations),
   };
 }

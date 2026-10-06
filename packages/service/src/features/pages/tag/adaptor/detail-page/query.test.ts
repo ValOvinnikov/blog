@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { makeRawTagPage } from '@blog/service/testing/pages/fixtures';
 import { makeRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
@@ -5,11 +6,6 @@ import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import { tagPageQuery } from './query';
 
 describe('tagPageQuery', () => {
-  it('filters to page_tag documents by their own slug', () => {
-    expect(tagPageQuery.query).toContain('_type == "page_tag"');
-    expect(tagPageQuery.query).toContain('slug.current == $slug');
-  });
-
   it('parses a tag page with no modules', () => {
     const raw = makeRawTagPage({ modules: null });
 
@@ -79,6 +75,7 @@ describe('tagPageQuery template layout', () => {
       _id: 'page-a',
       _type: 'page_tag',
       slug: { current: 'engineering' },
+      language: LOCALE_ISO_CODES.EN,
       ...(template ? { template } : {}),
     };
   }
@@ -86,6 +83,7 @@ describe('tagPageQuery template layout', () => {
   function run(data: unknown[]): Promise<unknown> {
     return evaluateGroqExpression(tagPageQuery.query, data, null, {
       slug: 'engineering',
+      locale: LOCALE_ISO_CODES.EN,
     });
   }
 
@@ -100,6 +98,68 @@ describe('tagPageQuery template layout', () => {
     expect(await run([page(), ...dataset])).toMatchObject({
       hero: null,
       modules: null,
+    });
+  });
+});
+
+describe('tagPageQuery language scoping', () => {
+  const { EN, NL, FR } = LOCALE_ISO_CODES;
+
+  function page(id: string, heading: string, language: string) {
+    return {
+      _id: id,
+      _type: 'page_tag',
+      slug: { current: 'design' },
+      headingBlock: { heading },
+      language,
+    };
+  }
+
+  function link(language: string, id: string) {
+    return {
+      _key: language,
+      language,
+      value: { _type: 'reference', _ref: id },
+    };
+  }
+
+  const dataset = [
+    page('design-en', 'Design', EN),
+    page('design-nl', 'Ontwerp', NL),
+    {
+      _id: 'meta-design',
+      _type: 'translation.metadata',
+      translations: [link(EN, 'design-en'), link(NL, 'design-nl')],
+    },
+  ];
+
+  function run(locale: string): Promise<unknown> {
+    return evaluateGroqExpression(tagPageQuery.query, dataset, null, {
+      slug: 'design',
+      locale,
+      defaultLocale: EN,
+    });
+  }
+
+  it('resolves the same slug to a different page per language', async () => {
+    expect(await run(EN)).toMatchObject({
+      headingBlock: { heading: 'Design' },
+    });
+    expect(await run(NL)).toMatchObject({
+      headingBlock: { heading: 'Ontwerp' },
+    });
+  });
+
+  it('resolves nothing for a language the page is not authored in', async () => {
+    expect(await run(FR)).toBeNull();
+  });
+
+  it('returns the linked translations with their languages and slugs', async () => {
+    expect(await run(NL)).toMatchObject({
+      translations: [
+        { language: EN, slug: 'design' },
+        { language: NL, slug: 'design' },
+      ],
     });
   });
 });

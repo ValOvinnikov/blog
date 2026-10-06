@@ -142,11 +142,11 @@ describe('sitemap', () => {
     });
     getTopicParamsMock.mockResolvedValue({
       ok: true,
-      data: [{ slug: 'news' }],
+      data: [{ slug: 'news', language: 'EN' }],
     });
     getTagParamsMock.mockResolvedValue({
       ok: true,
-      data: [{ slug: 'typescript' }],
+      data: [{ slug: 'typescript', language: 'EN' }],
     });
     getIndexPageParamsMock.mockResolvedValue({
       ok: true,
@@ -468,13 +468,13 @@ describe('sitemap', () => {
     mockAllEmpty();
     getTopicPaginationParamsMock.mockResolvedValue({
       ok: true,
-      data: [{ slug: 'news', page: '2' }],
+      data: [{ slug: 'news', language: 'EN', page: '2' }],
     });
     getTagPaginationParamsMock.mockResolvedValue({
       ok: true,
       data: [
-        { slug: 'typescript', page: '2' },
-        { slug: 'typescript', page: '3' },
+        { slug: 'typescript', language: 'EN', page: '2' },
+        { slug: 'typescript', language: 'EN', page: '3' },
       ],
     });
     const sitemap = (await import('./sitemap')).default;
@@ -487,6 +487,101 @@ describe('sitemap', () => {
     expect(urls).toContain('https://example.com/tags/typescript/page/3');
   });
 
+  it('lists each Topic and Tag page under its own language prefix, with its live translations as alternates', async () => {
+    mockAllEmpty();
+    resolveRequestTenantMock.mockResolvedValue({
+      id: 'tenant-1',
+      locale: 'EN',
+    });
+    selectLiveLocalesMock.mockReturnValue(['EN', 'NL']);
+    getTopicParamsMock.mockResolvedValue({
+      ok: true,
+      data: [
+        { slug: 'design', language: 'EN' },
+        { slug: 'ontwerp', language: 'NL' },
+      ],
+    });
+    getTagParamsMock.mockResolvedValue({
+      ok: true,
+      data: [{ slug: 'typescript-nl', language: 'NL' }],
+    });
+    getTranslationMapMock.mockResolvedValue({
+      ok: true,
+      data: makeTranslationMap({
+        groups: [
+          [
+            { documentType: 'page_topic', language: 'EN', slug: 'design' },
+            { documentType: 'page_topic', language: 'NL', slug: 'ontwerp' },
+          ],
+        ],
+      }),
+    });
+    const topicAlternates = {
+      en: 'https://example.com/topics/design',
+      nl: 'https://example.com/nl/topics/ontwerp',
+      'x-default': 'https://example.com/topics/design',
+    };
+    const sitemap = (await import('./sitemap')).default;
+
+    const entries = await sitemap();
+
+    expect(entries).toContainEqual({
+      url: 'https://example.com/nl/topics/ontwerp',
+      alternates: { languages: topicAlternates },
+    });
+    expect(entries).toContainEqual({
+      url: 'https://example.com/topics/design',
+      alternates: { languages: topicAlternates },
+    });
+    expect(entries).toContainEqual({
+      url: 'https://example.com/nl/tags/typescript-nl',
+      alternates: {
+        languages: { nl: 'https://example.com/nl/tags/typescript-nl' },
+      },
+    });
+  });
+
+  it('lists numbered Topic pages under their own language prefix', async () => {
+    mockAllEmpty();
+    resolveRequestTenantMock.mockResolvedValue({
+      id: 'tenant-1',
+      locale: 'EN',
+    });
+    selectLiveLocalesMock.mockReturnValue(['EN', 'NL']);
+    getTopicPaginationParamsMock.mockResolvedValue({
+      ok: true,
+      data: [{ slug: 'ontwerp', language: 'NL', page: '2' }],
+    });
+    const sitemap = (await import('./sitemap')).default;
+
+    const urls = (await sitemap()).map((entry) => entry.url);
+
+    expect(urls).toContain('https://example.com/nl/topics/ontwerp/page/2');
+  });
+
+  it("requests Topic and Tag pages with the tenant's live languages", async () => {
+    mockAllEmpty();
+    const tenantContext = { projectId: 'p' };
+    resolveRequestTenantMock.mockResolvedValue({ id: 'tenant-1' });
+    getHostTenantSanityContextMock.mockResolvedValue({
+      isResolvable: true,
+      tenant: tenantContext,
+    });
+    selectLiveLocalesMock.mockReturnValue(['EN', 'NL']);
+    const sitemap = (await import('./sitemap')).default;
+
+    await sitemap();
+
+    [
+      getTopicParamsMock,
+      getTagParamsMock,
+      getTopicPaginationParamsMock,
+      getTagPaginationParamsMock,
+    ].forEach((mock) => {
+      expect(mock).toHaveBeenCalledWith(tenantContext, ['EN', 'NL']);
+    });
+  });
+
   it('sets lastModified from publishedAt on posts, and not on entries without a date', async () => {
     mockAllEmpty();
     getPostParamsMock.mockResolvedValue({
@@ -495,7 +590,7 @@ describe('sitemap', () => {
     });
     getTopicParamsMock.mockResolvedValue({
       ok: true,
-      data: [{ slug: 'news' }],
+      data: [{ slug: 'news', language: 'EN' }],
     });
     const sitemap = (await import('./sitemap')).default;
 

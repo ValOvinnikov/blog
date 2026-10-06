@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config';
 import type {
   TTopic,
   TTopicDetailPage,
@@ -41,6 +42,7 @@ export const makeTopicDetailPage = (
       ogDescription: 'Posts about building things.',
       ogImage: undefined,
     },
+    translations: [{ language: LOCALE_ISO_CODES.EN, slug: 'engineering' }],
     ...overrides,
   };
 };

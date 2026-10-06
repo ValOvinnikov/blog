@@ -1,3 +1,4 @@
+import type { TLocaleIsoCode } from '@blog/config/constants';
 import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
 import {
   toPaginationParams,
@@ -8,6 +9,7 @@ import { getFirstPostListPageSizes } from './page-sizes';
 
 type TPaginatedPage = {
   slug: string;
+  language: TLocaleIsoCode;
   postCount: number;
   moduleRefs: { _ref: string }[] | null;
 };
@@ -22,8 +24,9 @@ export async function getPaginationParamsWithPageSizes(
   );
 
   return toPaginationParams(
-    pages.map(({ slug, postCount }, index) => ({
+    pages.map(({ slug, language, postCount }, index) => ({
       slug,
+      language,
       postCount,
       pageSize: pageSizes[index] ?? null,
     })),

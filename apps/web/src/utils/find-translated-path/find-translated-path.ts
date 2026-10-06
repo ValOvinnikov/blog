@@ -14,16 +14,47 @@ type TFindTranslatedPathParams = {
   defaultLocale: TLocaleIsoCode;
 };
 
-const toLandingSlug = (pathname: string): TMaybeUndefined<string> => {
-  const segments = pathname.split('/').filter(Boolean);
-  if (segments.length !== 1) {
-    return undefined;
-  }
+type TTranslatablePage = {
+  documentType: string;
+  slug: string;
+  toHref: (slug: string) => string;
+};
+
+const ARCHIVE_PAGES = new Map<string, Omit<TTranslatablePage, 'slug'>>([
+  ['topics', { documentType: 'page_topic', toHref: routes.topic }],
+  ['tags', { documentType: 'page_tag', toHref: routes.tag }],
+]);
+
+const decodeSegment = (segment: string): TMaybeUndefined<string> => {
   try {
-    return decodeURIComponent(segments[0]!);
+    return decodeURIComponent(segment);
   } catch {
     return undefined;
   }
+};
+
+/** A numbered archive page maps to the first page of its translation: each language's list need not run to the same number of pages. */
+const toTranslatablePage = (
+  pathname: string,
+): TMaybeUndefined<TTranslatablePage> => {
+  const [first = '', second, ...rest] = pathname.split('/').filter(Boolean);
+  const archivePage = ARCHIVE_PAGES.get(first);
+
+  if (second === undefined) {
+    const slug = decodeSegment(first);
+    return slug
+      ? { documentType: 'page_landing', slug, toHref: routes.landingPage }
+      : undefined;
+  }
+
+  const isArchivePath =
+    rest.length === 0 || (rest.length === 2 && rest[0] === 'page');
+  if (!archivePage || !isArchivePath) {
+    return undefined;
+  }
+
+  const slug = decodeSegment(second);
+  return slug ? { ...archivePage, slug } : undefined;
 };
 
 /** `pathname` carries no language prefix; the result does, for `toLocale`. */
@@ -52,23 +83,23 @@ export const findTranslatedPath = ({
       : undefined;
   }
 
-  const slug = toLandingSlug(pathname);
-  if (!slug) {
+  const page = toTranslatablePage(pathname);
+  if (!page) {
     return undefined;
   }
 
   const translation = service.global.translationMap.v1
     .findTranslationGroup(translationMap, {
-      documentType: 'page_landing',
+      documentType: page.documentType,
       language: fromLocale,
-      slug,
+      slug: page.slug,
     })
     ?.find(({ language }) => language === toLocale);
 
   return (
     translation &&
     toLocalizedPathname({
-      href: routes.landingPage(translation.slug),
+      href: page.toHref(translation.slug),
       locale: toLocale,
       defaultLocale,
     })

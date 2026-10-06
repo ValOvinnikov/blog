@@ -16,6 +16,14 @@ const translationMap: TTranslationMap = {
       { documentType: 'page_landing', language: NL, slug: 'over-ons' },
       { documentType: 'page_landing', language: DE, slug: 'über-uns' },
     ],
+    [
+      { documentType: 'page_topic', language: EN, slug: 'design' },
+      { documentType: 'page_topic', language: NL, slug: 'ontwerp' },
+    ],
+    [
+      { documentType: 'page_tag', language: EN, slug: 'typescript' },
+      { documentType: 'page_tag', language: NL, slug: 'typescript-nl' },
+    ],
   ],
 };
 
@@ -47,6 +55,32 @@ describe(findTranslatedPath, () => {
 
   it('is undefined when the page has no translation in that language', () => {
     expect(find('/about', EN, FR)).toBeUndefined();
+  });
+
+  it("finds a Topic page's translation under its own slug", () => {
+    expect(find('/topics/design')).toBe('/nl/topics/ontwerp');
+    expect(find('/topics/ontwerp', NL, EN)).toBe('/topics/design');
+  });
+
+  it("finds a Tag page's translation under its own slug", () => {
+    expect(find('/tags/typescript')).toBe('/nl/tags/typescript-nl');
+  });
+
+  it('finds the first page of the translation from a numbered archive page', () => {
+    expect(find('/topics/design/page/3')).toBe('/nl/topics/ontwerp');
+  });
+
+  it('is undefined for a Topic page with no translation in that language', () => {
+    expect(find('/topics/design', EN, FR)).toBeUndefined();
+  });
+
+  it('does not match a Topic slug against a landing page or Tag page', () => {
+    expect(find('/design')).toBeUndefined();
+    expect(find('/tags/design')).toBeUndefined();
+  });
+
+  it('is undefined for a path below an archive page that is not a page number', () => {
+    expect(find('/topics/design/extra')).toBeUndefined();
   });
 
   it('is undefined for a page outside the map', () => {

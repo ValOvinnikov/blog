@@ -17,10 +17,11 @@ export const buildTopicIndexMetadata = async (): Promise<Metadata> => {
   }
 
   const { seo, translations } = result.data;
+  const href = routes.topics();
 
   return toLocalizedPageMetadata(seo, {
-    href: routes.topics(),
-    translations,
+    href,
+    translations: translations.map((language) => ({ language, href })),
     ogType: 'website',
   });
 };

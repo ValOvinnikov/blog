@@ -40,7 +40,13 @@ export const buildPostIndexMetadata = async (
 
   return toLocalizedPageMetadata(resolvedSeo, {
     href: routes.blogIndex(page),
-    translations: page === 1 ? translations : [],
+    translations:
+      page === 1
+        ? translations.map((language) => ({
+            language,
+            href: routes.blogIndex(),
+          }))
+        : [],
     ogType: 'website',
     feedUrl: routes.rssFeed(),
   });
