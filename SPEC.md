@@ -1832,6 +1832,62 @@ each translation is its own document.
 errors; a domain per language; translated fixed path segments; machine
 translation; changing a tenant's default language after content exists.
 
+### Landing page tree
+
+Landing pages nest, so a tenant can build catalogue-style sections
+(`/modules/faq`) with navigation of their own while the header and footer stay
+the site's main navigation. Home is not part of the tree; top-level Landing
+pages sit directly under it.
+
+**Tree.** `page_landing.parent` is an optional reference to another Landing
+page in the same language. `slug` holds only the last segment (no `/`) and
+the URL is the parent chain joined with `/`. Studio rejects a cycle and a
+chain deeper than `LANDING_PAGE_MAX_DEPTH` (3, counting the page itself;
+`@blog/config`), the one constant both the schema and the service's path
+expression read. A slug is unique among pages with the same parent and
+language; only top-level slugs are checked against reserved paths, so
+`/help/blog` is allowed. The route is `[tenant]/[locale]/[...slug]`, and the
+service builds a Landing page's path in GROQ (`LANDING_PAGE_PATH_EXPRESSION`;
+`PAGE_PATH_EXPRESSION` wherever page types mix, such as the translation map
+and sitemap). A page whose parent chain is broken — a missing, unpublished or
+slugless ancestor, or one past the depth bound — has no path and is not
+routable.
+
+**Order.** Editors drag a parent's direct children into order in Studio's
+page tree (`@sanity/orderable-document-list`, an `orderRank` field on every
+Landing page). Everything that lists children follows that order; a new page
+lands last.
+
+**Section navigation** is a page setting, never a module. A page with
+children has a "Section navigation" switch (default off). When it is on, that
+page and every page beneath it show a sidebar (`SidebarNav`: a list from
+`lg` up, a collapsible selector below) of the section root and its direct
+children, with the current page — or the child whose branch contains it —
+marked, plus breadcrumbs from the parent chain. The section root is the
+nearest ancestor-or-self with the switch on, so a nested parent can run its
+own branch. Each page inside a section has "Show section navigation on this
+page" (default on) to opt out. Both settings live on the page rather than the
+template and warn when they differ from the default-language version. Labels
+use each page's public heading, never its internal `title`. The same
+`SidebarNav` renders a post's table of contents (`PostTableOfContents`).
+
+**Section Pages module** (`module_childPages`, allowed on `template_landing`)
+renders a card per direct child of the page using the template, in drag
+order: the child's public heading as the label, its heading's supporting text
+as the summary, its SEO sharing image, and a link to its path. On a page
+with no children it renders nothing.
+
+**Redirects.** A `redirect` document holds a language, a source path, a
+destination path and whether it is a prefix redirect; editors manage them in
+the Redirects sidebar section. Publishing a Landing page whose path changed
+(its slug or parent) creates one from the old path to the new — a prefix
+redirect when the page has descendants, so the whole subtree follows — while
+collapsing redirects that pointed at the old path and removing any whose
+source is now a live page. When a Landing path finds no page, the site checks
+redirects for that language (exact match, then the longest prefix, keeping
+the remaining path) and answers 301; otherwise it 404s. Redirects cover
+Landing paths only.
+
 Full mechanics:
 [`docs/context/rendering-caching-i18n.md`](./docs/context/rendering-caching-i18n.md).
 
