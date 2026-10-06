@@ -10961,6 +10961,14 @@
         },
         "optional": true
       },
+      "parent": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "page_landing.reference"
+        },
+        "optional": true
+      },
       "slug": {
         "type": "objectAttribute",
         "value": {
