@@ -9,8 +9,7 @@ const asDocument = (doc: Record<string, unknown>): SanityDocument =>
 
 const PAGE_TYPE = PAGE_TAG_TYPE;
 const REFERENCE_FIELD = 'tag';
-const MISSING_PAGE_ERROR =
-  'No Tag Page references this tag yet — /tags/{slug} will 404 until one is created.';
+const MISSING_PAGE_ERROR = 'No Tag Page references this tag yet.';
 
 describe('validateHasPage', () => {
   const validate = validateHasPage(
@@ -65,7 +64,7 @@ describe('validateHasPage', () => {
     const validateTopic = validateHasPage(
       PAGE_TOPIC_TYPE,
       'topic',
-      'No Topic Page references this topic yet — /topics/{slug} will 404 until one is created.',
+      'No Topic Page references this topic yet.',
     );
     const document = asDocument({ _id: 'topic-1', _type: 'blog_topic' });
 
