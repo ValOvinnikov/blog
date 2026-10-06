@@ -7,6 +7,7 @@ import { titleField } from '@blog/studio/schema-types/fields/title-field/title-f
 import { createSlugUrlPreviewInput } from '@blog/studio/schema-types/inputs/slug-url-preview/slug-url-preview-input';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
+import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
 import { validateUniqueTaxonomyReference } from '@blog/studio/schema-types/validation/validate-unique-taxonomy-reference/validate-unique-taxonomy-reference';
 import { Tag } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
@@ -56,9 +57,11 @@ export const tagPageSchema = defineType({
       tagTitle: 'tag.title',
     },
     prepare({ title, tagTitle }) {
+      const tagName = defaultLanguageValue(tagTitle);
+
       return {
         title: title ?? 'Unknown',
-        subtitle: tagTitle ? `Tag: ${String(tagTitle)}` : undefined,
+        subtitle: tagName ? `Tag: ${tagName}` : undefined,
       };
     },
   },

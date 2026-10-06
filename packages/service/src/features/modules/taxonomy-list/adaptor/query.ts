@@ -24,7 +24,6 @@ const showLatestPostsParser = z.boolean();
 
 const topicEntriesQuery = q.star
   .filterByType('blog_topic')
-  .order('title asc')
   .project((sub) => ({
     ...topicWithPostCountFragment,
     latestPosts: sub.star
@@ -34,11 +33,11 @@ const topicEntriesQuery = q.star
       .order('publishedAt desc')
       .slice(0, LATEST_POSTS_LIMIT)
       .project(postLinkFragment),
-  }));
+  }))
+  .order('title asc');
 
 const tagEntriesQuery = q.star
   .filterByType('blog_tag')
-  .order('title asc')
   .project((sub) => ({
     ...tagWithPostCountFragment,
     latestPosts: sub.star
@@ -48,7 +47,8 @@ const tagEntriesQuery = q.star
       .order('publishedAt desc')
       .slice(0, LATEST_POSTS_LIMIT)
       .project(postLinkFragment),
-  }));
+  }))
+  .order('title asc');
 
 export const taxonomyListModuleQuery = q
   .parameters<TModuleQueryParams>()

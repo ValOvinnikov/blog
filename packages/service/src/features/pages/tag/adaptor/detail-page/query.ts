@@ -4,6 +4,7 @@ import { headingBlockFragment } from '@blog/service/shared/fragments/heading-blo
 import { moduleFragment } from '@blog/service/shared/fragments/module/module';
 import { seoFragment } from '@blog/service/shared/fragments/seo/seo';
 import { tagFragment } from '@blog/service/shared/fragments/tag/tag';
+import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
 import type { TRawModule } from '@blog/service/shared/transformers/module/to-module';
 
 export const tagPageQuery = q
@@ -12,16 +13,12 @@ export const tagPageQuery = q
   .filterBy('slug.current == $slug')
   .slice(0)
   .project((sub) => ({
-    // The tag *page* needs more than the minimal `{_id,title,slug}` chip
-    // shape `tagFragment` provides (that stays minimal for the post-detail
-    // tags projection) — it also needs `description` to derive its own
-    // metadata, so it spreads `tagFragment` and adds the extra field.
     tag: sub
       .field('tag')
       .deref()
       .project((tagSub) => ({
         ...tagFragment,
-        description: tagSub.field('description').nullable(true),
+        description: getLocalizedField(tagSub, 'description'),
       }))
       .notNull(),
     headingBlock: sub

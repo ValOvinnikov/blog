@@ -1,9 +1,12 @@
 import { at, set, type NodePatch } from 'sanity/migrate';
 
-import { localizedString } from './in-default-locale';
+import { inDefaultLocale } from './in-default-locale';
 
 export const localizeStringField = (
   path: Parameters<typeof at>[0],
   value: unknown,
+  valueType = 'internationalizedArrayStringValue',
 ): NodePatch[] =>
-  typeof value === 'string' ? [at(path, set(localizedString(value)))] : [];
+  typeof value === 'string'
+    ? [at(path, set(inDefaultLocale(valueType, value)))]
+    : [];
