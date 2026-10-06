@@ -11361,21 +11361,6 @@
                 },
                 "rest": {
                   "type": "inline",
-                  "name": "module_childPages.reference"
-                }
-              },
-              {
-                "type": "object",
-                "attributes": {
-                  "_key": {
-                    "type": "objectAttribute",
-                    "value": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "rest": {
-                  "type": "inline",
                   "name": "module_content.reference"
                 }
               },
@@ -11422,6 +11407,21 @@
                 "rest": {
                   "type": "inline",
                   "name": "module_featureList.reference"
+                }
+              },
+              {
+                "type": "object",
+                "attributes": {
+                  "_key": {
+                    "type": "objectAttribute",
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "rest": {
+                  "type": "inline",
+                  "name": "module_childPages.reference"
                 }
               },
               {
