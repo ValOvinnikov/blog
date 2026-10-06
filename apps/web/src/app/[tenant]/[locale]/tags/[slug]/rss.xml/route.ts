@@ -1,18 +1,19 @@
-import { routes } from '@blog/config';
+import type { ITenantLocalizedParams } from '@blog/config';
 import {
   service,
   type TFeedPost,
   type TTenantSanityContext,
 } from '@blog/service';
-import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
-import { getHostTenantSanityContext } from '@web/server/tenant/tenant-sanity-context/tenant-sanity-context';
-import { buildRssFeed, type TRssItem } from '@web/utils/build-rss-feed';
+import { getFeedContext } from '@web/server/feed/get-feed-context/get-feed-context';
+import { buildRssFeed } from '@web/utils/build-rss-feed';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 import { NextResponse } from 'next/server';
 
 type TProps = {
-  params: Promise<{ slug: string }>;
+  params: Promise<
+    Omit<ITenantLocalizedParams, 'locale'> & { locale: string; slug: string }
+  >;
 };
 
 type TTagFeed = {
@@ -21,20 +22,6 @@ type TTagFeed = {
   posts: TFeedPost[];
 };
 
-const toRssItem = (post: TFeedPost, siteUrl: string): TRssItem => {
-  return {
-    title: post.title,
-    link: `${siteUrl}${routes.post(post.slug)}`,
-    description: post.excerpt,
-    publishedAt: post.publishedAt,
-  };
-};
-
-/**
- * Resolves the tag itself (for the channel title/description) and every
- * published post tagged with it, newest first. Returns `null` when the tag
- * lookup or the post fetch fails, which the `GET` handler 404s.
- */
 const getAllTagPosts = async (
   slug: string,
   tenant: TTenantSanityContext,
@@ -70,25 +57,19 @@ const getAllTagPosts = async (
   return { title: tag.title, description, posts: postsResult.data };
 };
 
-/**
- * RSS 2.0 feed of every published post, scoped by the `[slug]` tag's own
- * channel title/description. Mirrors the site-wide `rss.xml` route; a broken
- * tag or post fetch 404s instead of silently falling back to a generic
- * channel.
- */
+/** Unlike the site-wide feed, a broken tag or post fetch 404s rather than serving a generic channel. */
 export async function GET(
   _request: Request,
   { params }: TProps,
 ): Promise<Response> {
-  const { slug } = await params;
-  const siteUrl = (await getTenantBaseUrl()) ?? '';
-
-  const hostTenant = await getHostTenantSanityContext();
-  if (!hostTenant.isResolvable) {
+  const { slug, locale } = await params;
+  const feed = await getFeedContext(locale);
+  if (!feed) {
     return new NextResponse(null, { status: 404 });
   }
+  const { tenant, siteUrl, toRssItem } = feed;
 
-  const result = await getAllTagPosts(slug, hostTenant.tenant);
+  const result = await getAllTagPosts(slug, tenant);
 
   if (!result) {
     notFound();
@@ -96,7 +77,7 @@ export async function GET(
 
   const xml = buildRssFeed(
     { title: result.title, description: result.description, siteUrl },
-    result.posts.map((post) => toRssItem(post, siteUrl)),
+    result.posts.map(toRssItem),
   );
 
   return new Response(xml, {

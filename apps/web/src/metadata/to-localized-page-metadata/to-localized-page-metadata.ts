@@ -14,7 +14,7 @@ type TToLocalizedPageMetadataOptions = Omit<TToMetadataOptions, 'canonical'> & {
 
 export const toLocalizedPageMetadata = async (
   seo: TSeoResolved,
-  { href, translations, ...options }: TToLocalizedPageMetadataOptions,
+  { href, translations, feedUrl, ...options }: TToLocalizedPageMetadataOptions,
 ): Promise<Metadata> => {
   const {
     locale,
@@ -24,6 +24,8 @@ export const toLocalizedPageMetadata = async (
   const metadata = await toMetadata(seo, {
     ...options,
     canonical: toLocalizedPathname({ href, locale, defaultLocale }),
+    feedUrl:
+      feedUrl && toLocalizedPathname({ href: feedUrl, locale, defaultLocale }),
   });
 
   return withLanguageAlternates(metadata, {

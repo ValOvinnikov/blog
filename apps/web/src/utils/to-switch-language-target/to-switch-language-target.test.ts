@@ -36,6 +36,19 @@ describe(toSwitchLanguageTarget, () => {
   it("lands on the language's home page when the page has no translation", () => {
     expect(target('/about', FR)).toBe('/fr');
     expect(target('/nl/blog', EN)).toBe('/');
+    expect(target('/topics', NL)).toBe('/nl');
+  });
+
+  it("lands on the language's blog list when the post has no translation", () => {
+    expect(target('/blog/english-only', NL)).toBe('/nl/blog');
+    expect(target('/nl/blog/alleen-nederlands', EN)).toBe('/blog');
+  });
+
+  it("lands on the language's topics or tags list when the archive page has no translation", () => {
+    expect(target('/topics/design', NL)).toBe('/nl/topics');
+    expect(target('/topics/design/page/2', FR)).toBe('/fr/topics');
+    expect(target('/tags/react', NL)).toBe('/nl/tags');
+    expect(target('/nl/tags/react', EN)).toBe('/tags');
   });
 
   it('stays on the current page for its own language', () => {
