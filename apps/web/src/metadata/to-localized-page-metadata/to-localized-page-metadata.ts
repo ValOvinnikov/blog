@@ -1,15 +1,15 @@
-import type { TLocaleIsoCode } from '@blog/config';
 import type { TSeoResolved } from '@blog/service';
 import { routing } from '@web/i18n/routing';
 import { toMetadata, type TToMetadataOptions } from '@web/metadata/to-metadata';
 import { getRequestContext } from '@web/server/request-context/request-context';
+import type { TLanguagePage } from '@web/utils/to-language-alternates';
 import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
 import { withLanguageAlternates } from '@web/utils/with-language-alternates';
 import type { Metadata } from 'next';
 
 type TToLocalizedPageMetadataOptions = Omit<TToMetadataOptions, 'canonical'> & {
   href: string;
-  translations: readonly TLocaleIsoCode[];
+  translations: readonly TLanguagePage[];
 };
 
 export const toLocalizedPageMetadata = async (
@@ -27,7 +27,7 @@ export const toLocalizedPageMetadata = async (
   });
 
   return withLanguageAlternates(metadata, {
-    pages: translations.map((language) => ({ language, href })),
+    pages: translations,
     locale,
     liveLocales,
     defaultLocale,

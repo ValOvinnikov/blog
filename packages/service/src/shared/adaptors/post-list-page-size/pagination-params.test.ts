@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeTenant } from '@blog/service/testing/tenant';
 
@@ -10,6 +11,7 @@ vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
   runQuery: vi.fn(),
 }));
 
+const { EN, NL } = LOCALE_ISO_CODES;
 const tenant = makeTenant();
 
 describe(getPaginationParamsWithPageSizes, () => {
@@ -21,18 +23,33 @@ describe(getPaginationParamsWithPageSizes, () => {
 
     const params = await getPaginationParamsWithPageSizes(
       [
-        { slug: 'a', postCount: 20, moduleRefs: [{ _ref: 'list-a' }] },
-        { slug: 'b', postCount: 10, moduleRefs: [{ _ref: 'list-b' }] },
-        { slug: 'c', postCount: 50, moduleRefs: [{ _ref: 'hero' }] },
-        { slug: 'd', postCount: 50, moduleRefs: null },
+        {
+          slug: 'a',
+          language: EN,
+          postCount: 20,
+          moduleRefs: [{ _ref: 'list-a' }],
+        },
+        {
+          slug: 'b',
+          language: NL,
+          postCount: 10,
+          moduleRefs: [{ _ref: 'list-b' }],
+        },
+        {
+          slug: 'c',
+          language: EN,
+          postCount: 50,
+          moduleRefs: [{ _ref: 'hero' }],
+        },
+        { slug: 'd', language: EN, postCount: 50, moduleRefs: null },
       ],
       tenant,
     );
 
     expect(params).toEqual([
-      { slug: 'a', page: '2' },
-      { slug: 'a', page: '3' },
-      { slug: 'b', page: '2' },
+      { slug: 'a', language: EN, page: '2' },
+      { slug: 'a', language: EN, page: '3' },
+      { slug: 'b', language: NL, page: '2' },
     ]);
     expect(mockRun).toHaveBeenCalledTimes(1);
   });

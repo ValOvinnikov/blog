@@ -1,7 +1,12 @@
+import { LOCALE_ISO_CODES } from '@blog/config';
 import { urlForSanityImage } from '@blog/service';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import {
+  DEFAULT_REQUEST_CONTEXT,
+  DEFAULT_TENANT_SANITY_CONTEXT,
+} from '@web/testing/shared/tenant/fixtures';
 
 import { buildTopicMetadata } from './build-topic-metadata';
 
@@ -37,7 +42,7 @@ describe('buildTopicMetadata', () => {
   it('forwards the slug to getTopicPage, the loader TopicPage reads', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,
-      data: { topic: {}, modules: [], seo },
+      data: { topic: {}, modules: [], seo, translations: [] },
     });
 
     await buildTopicMetadata('engineering');
@@ -48,7 +53,7 @@ describe('buildTopicMetadata', () => {
   it('builds page-1 metadata from the resolved seo, self-canonical to /topics/[slug]', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,
-      data: { topic: {}, modules: [], seo },
+      data: { topic: {}, modules: [], seo, translations: [] },
     });
 
     const metadata = await buildTopicMetadata('engineering');
@@ -79,7 +84,7 @@ describe('buildTopicMetadata', () => {
   it('builds page-N metadata with a "– Page N" suffix, self-canonical to its own URL', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,
-      data: { topic: {}, modules: [], seo },
+      data: { topic: {}, modules: [], seo, translations: [] },
     });
 
     const metadata = await buildTopicMetadata('engineering', 2);
@@ -93,7 +98,12 @@ describe('buildTopicMetadata', () => {
   it('leaves ogTitle omitted on page 2+ when unauthored, never suffixing "undefined"', async () => {
     getTopicPageMock.mockResolvedValue({
       ok: true,
-      data: { topic: {}, modules: [], seo: makeSeo({ ogTitle: undefined }) },
+      data: {
+        topic: {},
+        modules: [],
+        seo: makeSeo({ ogTitle: undefined }),
+        translations: [],
+      },
     });
 
     const metadata = await buildTopicMetadata('engineering', 2);
@@ -122,5 +132,55 @@ describe('buildTopicMetadata', () => {
     expect(metadata).toEqual({});
     expect(errorSpy).not.toHaveBeenCalled();
     errorSpy.mockRestore();
+  });
+});
+
+describe('buildTopicMetadata per language', () => {
+  const { EN, NL, DE } = LOCALE_ISO_CODES;
+
+  beforeEach(() => {
+    getTopicPageMock.mockReset();
+    vi.mocked(getRequestContext).mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      locale: NL,
+      liveLocales: [EN, NL],
+    });
+    getTopicPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        topic: {},
+        modules: [],
+        seo,
+        translations: [
+          { language: EN, slug: 'design' },
+          { language: NL, slug: 'ontwerp' },
+          { language: DE, slug: 'gestaltung' },
+        ],
+      },
+    });
+  });
+
+  afterEach(() => {
+    vi.mocked(getRequestContext).mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
+  });
+
+  it('lists each live language under its own slug as hreflang, canonical to its own prefixed address', async () => {
+    const metadata = await buildTopicMetadata('ontwerp');
+
+    expect(metadata.alternates).toMatchObject({
+      canonical: '/nl/topics/ontwerp',
+      languages: {
+        en: '/topics/design',
+        nl: '/nl/topics/ontwerp',
+        'x-default': '/topics/design',
+      },
+    });
+  });
+
+  it('lists no hreflang past page 1', async () => {
+    const metadata = await buildTopicMetadata('ontwerp', 2);
+
+    expect(metadata.alternates?.canonical).toBe('/nl/topics/ontwerp/page/2');
+    expect(metadata.alternates?.languages).toBeUndefined();
   });
 });

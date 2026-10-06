@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
-export function buildArchivePageSlugExpression(
+function buildArchivePageSlugExpression(
   archivePageType: string,
   referenceField: string,
 ): string {
-  return `*[_type == "${archivePageType}" && ${referenceField}._ref == ^._id][0].slug.current`;
+  return `*[_type == "${archivePageType}" && ${referenceField}._ref == ^._id && language == $locale][0].slug.current`;
 }
 
 export const TAG_ARCHIVE_PAGE_SLUG_EXPRESSION = buildArchivePageSlugExpression(

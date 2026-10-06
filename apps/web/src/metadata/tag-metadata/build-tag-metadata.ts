@@ -1,18 +1,11 @@
 import { routes } from '@blog/config';
-import { toMetadata } from '@web/metadata/to-metadata';
+import { toLocalizedPageMetadata } from '@web/metadata/to-localized-page-metadata';
 import { getTagPage } from '@web/server/tag/get-tag-page/get-tag-page';
 import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 
-/**
- * Every page self-canonicalizes — page 2+ must never canonical to
- * `/tags/[slug]`.
- *
- * Every page also advertises the tag's own RSS feed
- * (`/tags/[slug]/rss.xml`) via `alternates.types['application/rss+xml']` —
- * the same feed regardless of which page of the tag's post list is showing.
- */
+/** Page 2+ self-canonicalizes and carries no hreflang: each language's list need not run to the same number of pages. */
 export const buildTagMetadata = async (
   slug: string,
   pageNumber?: number,
@@ -31,7 +24,7 @@ export const buildTagMetadata = async (
     return {};
   }
 
-  const { seo } = result.data;
+  const { seo, translations } = result.data;
   const resolvedSeo =
     pageNumber === undefined
       ? seo
@@ -43,8 +36,15 @@ export const buildTagMetadata = async (
             : undefined,
         };
 
-  return toMetadata(resolvedSeo, {
-    canonical: routes.tag(slug, pageNumber),
+  return toLocalizedPageMetadata(resolvedSeo, {
+    href: routes.tag(slug, pageNumber),
+    translations:
+      pageNumber === undefined
+        ? translations.map(({ language, slug: translatedSlug }) => ({
+            language,
+            href: routes.tag(translatedSlug),
+          }))
+        : [],
     ogType: 'website',
     feedUrl: routes.tagRssFeed(slug),
   });

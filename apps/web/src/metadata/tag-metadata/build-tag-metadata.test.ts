@@ -1,8 +1,13 @@
+import { LOCALE_ISO_CODES } from '@blog/config';
 import { urlForSanityImage } from '@blog/service';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
 import { makeTagDetailPage } from '@web/testing/shared/tag/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import {
+  DEFAULT_REQUEST_CONTEXT,
+  DEFAULT_TENANT_SANITY_CONTEXT,
+} from '@web/testing/shared/tenant/fixtures';
 
 import { buildTagMetadata } from './build-tag-metadata';
 
@@ -127,5 +132,53 @@ describe('buildTagMetadata', () => {
     expect(metadata).toEqual({});
     expect(errorSpy).not.toHaveBeenCalled();
     errorSpy.mockRestore();
+  });
+});
+
+describe('buildTagMetadata per language', () => {
+  const { EN, NL, DE } = LOCALE_ISO_CODES;
+
+  beforeEach(() => {
+    getTagPageMock.mockReset();
+    vi.mocked(getRequestContext).mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      locale: NL,
+      liveLocales: [EN, NL],
+    });
+    getTagPageMock.mockResolvedValue({
+      ok: true,
+      data: makeTagDetailPage({
+        seo,
+        translations: [
+          { language: EN, slug: 'design' },
+          { language: NL, slug: 'ontwerp' },
+          { language: DE, slug: 'gestaltung' },
+        ],
+      }),
+    });
+  });
+
+  afterEach(() => {
+    vi.mocked(getRequestContext).mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
+  });
+
+  it('lists each live language under its own slug as hreflang, canonical to its own prefixed address', async () => {
+    const metadata = await buildTagMetadata('ontwerp');
+
+    expect(metadata.alternates).toMatchObject({
+      canonical: '/nl/tags/ontwerp',
+      languages: {
+        en: '/tags/design',
+        nl: '/nl/tags/ontwerp',
+        'x-default': '/tags/design',
+      },
+    });
+  });
+
+  it('lists no hreflang past page 1', async () => {
+    const metadata = await buildTagMetadata('ontwerp', 2);
+
+    expect(metadata.alternates?.canonical).toBe('/nl/tags/ontwerp/page/2');
+    expect(metadata.alternates?.languages).toBeUndefined();
   });
 });

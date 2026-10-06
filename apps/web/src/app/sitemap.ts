@@ -6,7 +6,6 @@ import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 import { getHostTenantSanityContext } from '@web/server/tenant/tenant-sanity-context/tenant-sanity-context';
 import { logger } from '@web/utils/logger/logger';
-import { toLandingPageAlternates } from '@web/utils/to-landing-page-alternates';
 import { toLanguageAlternates } from '@web/utils/to-language-alternates';
 import { toLiveLanguagePages } from '@web/utils/to-live-language-pages';
 import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
@@ -90,32 +89,45 @@ const toLanguagePageEntries = ({
   }));
 };
 
-const LANDING_PAGE_DOCUMENT_TYPE = 'page_landing';
+type TTranslatedPage = { slug: string; language: TLocaleIsoCode };
 
-type TLandingPageEntryParams = {
-  page: { slug: string; language: TLocaleIsoCode };
+type TTranslatedPageEntryParams = {
+  page: TTranslatedPage;
+  documentType: string;
+  toHref: (slug: string) => string;
   translationMap: TTranslationMap;
   liveLocales: readonly TLocaleIsoCode[];
   defaultLocale: TLocaleIsoCode;
   siteUrl: string;
 };
 
-const toLandingPageEntry = ({
+const toLocalizedUrl = (
+  href: string,
+  language: TLocaleIsoCode,
+  defaultLocale: TLocaleIsoCode,
+  siteUrl: string,
+) =>
+  `${siteUrl}${toLocalizedPathname({ href, locale: language, defaultLocale })}`;
+
+const toTranslatedPageEntry = ({
   page,
+  documentType,
+  toHref,
   translationMap,
   liveLocales,
   defaultLocale,
   siteUrl,
-}: TLandingPageEntryParams): MetadataRoute.Sitemap[number] => {
-  const url = `${siteUrl}${toLocalizedPathname({
-    href: routes.landingPage(page.slug),
-    locale: page.language,
+}: TTranslatedPageEntryParams): MetadataRoute.Sitemap[number] => {
+  const url = toLocalizedUrl(
+    toHref(page.slug),
+    page.language,
     defaultLocale,
-  })}`;
+    siteUrl,
+  );
   const liveTranslations = toLiveLanguagePages({
     pages:
       service.global.translationMap.v1.findTranslationGroup(translationMap, {
-        documentType: LANDING_PAGE_DOCUMENT_TYPE,
+        documentType,
         ...page,
       }) ?? [],
     liveLocales,
@@ -132,13 +144,29 @@ const toLandingPageEntry = ({
     url,
     alternates: {
       languages: toAbsoluteAlternates(
-        toLandingPageAlternates({
-          translations: liveTranslations,
+        toLanguageAlternates({
+          pages: liveTranslations.map(({ language, slug }) => ({
+            language,
+            href: toHref(slug),
+          })),
           defaultLocale,
         }),
         siteUrl,
       ),
     },
+  };
+};
+
+const toPaginatedPageEntry = (
+  href: string,
+  language: TLocaleIsoCode,
+  defaultLocale: TLocaleIsoCode,
+  siteUrl: string,
+): MetadataRoute.Sitemap[number] => {
+  const url = toLocalizedUrl(href, language, defaultLocale, siteUrl);
+  return {
+    url,
+    alternates: { languages: { [LOCALE_BCP47_TAGS[language]]: url } },
   };
 };
 
@@ -172,10 +200,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     translationMapResult,
   ] = await Promise.all([
     service.pages.post.v1.getPostParams(tenant),
-    service.pages.topic.v1.getTopicParams(tenant),
-    service.pages.tag.v1.getTagParams(tenant),
-    service.pages.topic.v1.getTopicPaginationParams(tenant),
-    service.pages.tag.v1.getTagPaginationParams(tenant),
+    service.pages.topic.v1.getTopicParams(tenant, liveLocales),
+    service.pages.tag.v1.getTagParams(tenant, liveLocales),
+    service.pages.topic.v1.getTopicPaginationParams(tenant, liveLocales),
+    service.pages.tag.v1.getTagPaginationParams(tenant, liveLocales),
     service.pages.blog.v1.getIndexPageParams(tenant),
     service.pages.landing.v1.getPageSlugs(tenant, liveLocales),
     service.global.translationMap.v1.getTranslationMap(tenant),
@@ -252,6 +280,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         topicIndexLanguages: [],
         tagIndexLanguages: [],
       };
+  const translatedPageContext = {
+    translationMap,
+    liveLocales,
+    defaultLocale,
+    siteUrl,
+  };
   const toTranslatedPageEntries = (
     href: string,
     languages: readonly TLocaleIsoCode[],
@@ -282,21 +316,44 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...posts.map(({ slug, publishedAt }) =>
       toEntry(routes.post(slug), siteUrl, publishedAt),
     ),
-    ...topics.map(({ slug }) => toEntry(routes.topic(slug), siteUrl)),
-    ...topicPages.map(({ slug, page }) =>
-      toEntry(routes.topic(slug, Number(page)), siteUrl),
-    ),
-    ...tags.map(({ slug }) => toEntry(routes.tag(slug), siteUrl)),
-    ...tagPages.map(({ slug, page }) =>
-      toEntry(routes.tag(slug, Number(page)), siteUrl),
-    ),
-    ...landingPageSlugs.map((page) =>
-      toLandingPageEntry({
+    ...topics.map((page) =>
+      toTranslatedPageEntry({
         page,
-        translationMap,
-        liveLocales,
+        documentType: 'page_topic',
+        toHref: routes.topic,
+        ...translatedPageContext,
+      }),
+    ),
+    ...topicPages.map(({ slug, language, page }) =>
+      toPaginatedPageEntry(
+        routes.topic(slug, Number(page)),
+        language,
         defaultLocale,
         siteUrl,
+      ),
+    ),
+    ...tags.map((page) =>
+      toTranslatedPageEntry({
+        page,
+        documentType: 'page_tag',
+        toHref: routes.tag,
+        ...translatedPageContext,
+      }),
+    ),
+    ...tagPages.map(({ slug, language, page }) =>
+      toPaginatedPageEntry(
+        routes.tag(slug, Number(page)),
+        language,
+        defaultLocale,
+        siteUrl,
+      ),
+    ),
+    ...landingPageSlugs.map((page) =>
+      toTranslatedPageEntry({
+        page,
+        documentType: 'page_landing',
+        toHref: routes.landingPage,
+        ...translatedPageContext,
       }),
     ),
   ];

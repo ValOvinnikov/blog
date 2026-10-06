@@ -31,6 +31,9 @@ const deriveBlogPostPublishPaths = async ({
   tenantId,
   tenant,
 }: TDeriveRevalidatePathsInput): Promise<TDeriveRevalidatePathsResult> => {
+  const locales = (await queries.tenants.getTenantLiveLocales(tenantId)) ?? [
+    routing.defaultLocale,
+  ];
   const [
     postsResult,
     blogParamsResult,
@@ -41,10 +44,10 @@ const deriveBlogPostPublishPaths = async ({
   ] = await Promise.all([
     service.entities.posts.v1.getPostsByIds([id], tenant),
     service.pages.blog.v1.getIndexPageParams(tenant),
-    service.pages.tag.v1.getTagParams(tenant),
-    service.pages.tag.v1.getTagPaginationParams(tenant),
-    service.pages.topic.v1.getTopicParams(tenant),
-    service.pages.topic.v1.getTopicPaginationParams(tenant),
+    service.pages.tag.v1.getTagParams(tenant, locales),
+    service.pages.tag.v1.getTagPaginationParams(tenant, locales),
+    service.pages.topic.v1.getTopicParams(tenant, locales),
+    service.pages.topic.v1.getTopicPaginationParams(tenant, locales),
   ]);
 
   if (!postsResult.ok) {
@@ -97,9 +100,7 @@ const deriveBlogPostPublishPaths = async ({
 
   const paths = buildPostPublishPaths({
     tenantId,
-    locales: (await queries.tenants.getTenantLiveLocales(tenantId)) ?? [
-      routing.defaultLocale,
-    ],
+    locales,
     postSlug: post.slug,
     tagSlugs: tagSlugsResult.data.map(({ slug }) => slug),
     topicSlugs: topicSlugsResult.data.map(({ slug }) => slug),

@@ -18,6 +18,8 @@ export async function getTranslationMap(
       [
         'translation.metadata',
         'page_landing',
+        'page_topic',
+        'page_tag',
         'homePage',
         'page_postIndex',
         'page_topicIndex',
