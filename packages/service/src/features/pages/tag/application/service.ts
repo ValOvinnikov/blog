@@ -1,8 +1,8 @@
-import type { TLocaleIsoCode } from '@blog/config/constants';
 import { getTagPage } from '@blog/service/features/pages/tag/adaptor/detail-page/loader';
 import { getTagParams } from '@blog/service/features/pages/tag/adaptor/detail-page-params/loader';
 import { getTagPaginationParams } from '@blog/service/features/pages/tag/adaptor/pagination-params/loader';
 import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
+import type { TPageQueryPageParams } from '@blog/service/shared/types/page/page-query-page-params';
 import { safeAsync } from '@blog/utils';
 
 export function createTagService() {
@@ -12,12 +12,16 @@ export function createTagService() {
         getTagPage(slug, tenant),
       ),
       getTagParams: safeAsync(
-        (tenant: TTenantSanityContext, liveLocales: TLocaleIsoCode[]) =>
-          getTagParams(tenant, liveLocales),
+        (
+          tenant: TTenantSanityContext,
+          locales: TPageQueryPageParams['locales'],
+        ) => getTagParams(tenant, locales),
       ),
       getTagPaginationParams: safeAsync(
-        (tenant: TTenantSanityContext, liveLocales: TLocaleIsoCode[]) =>
-          getTagPaginationParams(tenant, liveLocales),
+        (
+          tenant: TTenantSanityContext,
+          locales: TPageQueryPageParams['locales'],
+        ) => getTagPaginationParams(tenant, locales),
       ),
     },
   };

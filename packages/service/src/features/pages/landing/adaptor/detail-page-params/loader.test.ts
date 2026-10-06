@@ -60,7 +60,7 @@ describe('getPageSlugs', () => {
 
     expect(mockRun).toHaveBeenCalledWith(
       expect.anything(),
-      expect.objectContaining({ parameters: { liveLocales: [EN, NL] } }),
+      expect.objectContaining({ parameters: { locales: [EN, NL] } }),
     );
   });
 });
@@ -88,9 +88,9 @@ describe('landingPageParamsQuery', () => {
     { _id: 'd', _type: 'page_landing', slug: { current: 'legacy' } },
   ];
 
-  function run(liveLocales: string[]): Promise<unknown> {
+  function run(locales: string[]): Promise<unknown> {
     return evaluateGroqExpression(landingPageParamsQuery.query, dataset, null, {
-      liveLocales,
+      locales,
       defaultLocale: EN,
     });
   }
@@ -128,7 +128,7 @@ describe('landingPageParamsQuery', () => {
 
     expect(
       await evaluateGroqExpression(landingPageParamsQuery.query, nested, null, {
-        liveLocales: [EN],
+        locales: [EN],
       }),
     ).toEqual([
       { slug: 'modules', language: EN },

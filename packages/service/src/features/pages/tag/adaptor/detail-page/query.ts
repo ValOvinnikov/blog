@@ -7,10 +7,10 @@ import { tagFragment } from '@blog/service/shared/fragments/tag/tag';
 import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
 import { translationsQuery } from '@blog/service/shared/localization/page-translations/translations';
 import type { TRawModule } from '@blog/service/shared/transformers/module/to-module';
-import type { TLocalizedSlugParams } from '@blog/service/shared/types/page/localized-slug-params';
+import type { TPageQueryParams } from '@blog/service/shared/types/page/page-query-params';
 
 export const tagPageQuery = q
-  .parameters<TLocalizedSlugParams>()
+  .parameters<TPageQueryParams>()
   .star.filterByType('page_tag')
   .filterBy('slug.current == $slug')
   .filterBy('language == $locale')
