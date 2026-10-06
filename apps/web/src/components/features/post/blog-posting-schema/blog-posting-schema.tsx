@@ -1,4 +1,5 @@
 import { JsonLd } from '@web/components/shared/json-ld';
+import { routing } from '@web/i18n/routing';
 import { getPostPage } from '@web/server/post/get-post-page/get-post-page';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { buildBlogPostingSchema } from '@web/utils/build-blog-posting-schema';
@@ -15,8 +16,16 @@ export const BlogPostingSchema = async ({ slug }: TBlogPostingSchemaProps) => {
     'blog_posting_schema.fetch_failed',
     { slug },
   );
-  const { metadataBase, sanityContext } = await getRequestContext();
-  const schema = buildBlogPostingSchema(post, metadataBase, sanityContext);
+  const {
+    metadataBase,
+    sanityContext,
+    locale,
+    defaultLocale = routing.defaultLocale,
+  } = await getRequestContext();
+  const schema = buildBlogPostingSchema(post, metadataBase, sanityContext, {
+    locale,
+    defaultLocale,
+  });
 
   return schema ? <JsonLd schema={schema} /> : null;
 };

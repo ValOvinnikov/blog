@@ -3,20 +3,16 @@ import {
   runQuery,
   type TTenantSanityContext,
 } from '@blog/service/sanity/query/query';
-import type { TPostCard } from '@blog/service/shared/transformers/post/to-post-card';
 
 import { postsByIdsQuery } from './query';
 import { toPostsByIds } from './transformer';
+import type { TPostById } from './types';
 
-/**
- * Post-card data for an explicit list of Sanity `_id`s, in whatever order
- * the query returns them — callers that need a specific order (e.g. a
- * reader's bookmarks sorted by save date) re-sort by id themselves.
- */
+/** Unordered: a caller that needs the input order re-sorts by id. */
 export async function getPostsByIds(
   ids: string[],
   tenant: TTenantSanityContext,
-): Promise<TPostCard[]> {
+): Promise<TPostById[]> {
   if (ids.length === 0) return [];
 
   const raw = await runQuery(postsByIdsQuery, {

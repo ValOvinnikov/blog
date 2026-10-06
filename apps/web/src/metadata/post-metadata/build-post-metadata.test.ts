@@ -1,7 +1,12 @@
+import { LOCALE_ISO_CODES } from '@blog/config';
 import { type TPostDetail, urlForSanityImage } from '@blog/service';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
-import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import {
+  DEFAULT_REQUEST_CONTEXT,
+  DEFAULT_TENANT_SANITY_CONTEXT,
+} from '@web/testing/shared/tenant/fixtures';
 
 import { buildPostMetadata } from './build-post-metadata';
 
@@ -57,6 +62,7 @@ const basePost: TPostDetail = {
   },
   tags: [],
   readingTimeMinutes: 4,
+  translations: [],
 };
 
 describe('buildPostMetadata', () => {
@@ -130,5 +136,47 @@ describe('buildPostMetadata', () => {
     expect((metadata.openGraph as { authors?: string[] })?.authors).toEqual([
       'Jane Doe',
     ]);
+  });
+});
+
+describe('buildPostMetadata per language', () => {
+  const { EN, NL, DE } = LOCALE_ISO_CODES;
+
+  beforeEach(() => {
+    getPostPageMock.mockReset();
+    vi.mocked(getRequestContext).mockResolvedValue({
+      ...DEFAULT_REQUEST_CONTEXT,
+      locale: NL,
+      liveLocales: [EN, NL],
+    });
+    getPostPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        ...basePost,
+        slug: 'mijn-artikel',
+        translations: [
+          { language: EN, slug: 'my-article' },
+          { language: NL, slug: 'mijn-artikel' },
+          { language: DE, slug: 'mein-artikel' },
+        ],
+      },
+    });
+  });
+
+  afterEach(() => {
+    vi.mocked(getRequestContext).mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
+  });
+
+  it('lists each live language under its own slug as hreflang, canonical to its own prefixed address', async () => {
+    const metadata = await buildPostMetadata('mijn-artikel');
+
+    expect(metadata.alternates).toMatchObject({
+      canonical: '/nl/blog/mijn-artikel',
+      languages: {
+        en: '/blog/my-article',
+        nl: '/nl/blog/mijn-artikel',
+        'x-default': '/blog/my-article',
+      },
+    });
   });
 });

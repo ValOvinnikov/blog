@@ -11,6 +11,7 @@ import { PostContentsRail } from '@web/components/shared/post-contents-rail';
 import { PostShareLinks } from '@web/components/shared/post-share-links';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
+import { routing } from '@web/i18n/routing';
 import { getPostPage } from '@web/server/post/get-post-page/get-post-page';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {
@@ -18,6 +19,7 @@ import {
   MIN_H2_HEADINGS_FOR_RAIL,
 } from '@web/utils/extract-post-headings/extract-post-headings';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
+import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
 import { getFormatter, getTranslations } from 'next-intl/server';
 
 import { postArticleVariants } from './post-article-variants';
@@ -57,12 +59,20 @@ export const PostArticle = async ({ slug }: TPostArticleProps) => {
     heroImage,
   } = post;
 
-  const [format, blogPostT, { metadataBase, sanityContext }] =
-    await Promise.all([
-      getFormatter(),
-      getTranslations('blogPostPage'),
-      getRequestContext(),
-    ]);
+  const [
+    format,
+    blogPostT,
+    {
+      metadataBase,
+      sanityContext,
+      locale,
+      defaultLocale = routing.defaultLocale,
+    },
+  ] = await Promise.all([
+    getFormatter(),
+    getTranslations('blogPostPage'),
+    getRequestContext(),
+  ]);
   const authorImageUrl = author.image
     ? urlForSanityImage(author.image, sanityContext, AUTHOR_AVATAR_TRANSFORM)
     : undefined;
@@ -74,9 +84,12 @@ export const PostArticle = async ({ slug }: TPostArticleProps) => {
   });
   const headings = extractPostHeadings(body);
   const hasContentsRail = headings.length >= MIN_H2_HEADINGS_FOR_RAIL;
-  const url = metadataBase
-    ? new URL(routes.post(slug), metadataBase).href
-    : routes.post(slug);
+  const path = toLocalizedPathname({
+    href: routes.post(slug),
+    locale,
+    defaultLocale,
+  });
+  const url = metadataBase ? new URL(path, metadataBase).href : path;
   const asideKindLabels: Record<TAsideKind, string> = {
     [ASIDE_KIND.WHY_NOT]: blogPostT('asideKind.WHY_NOT'),
     [ASIDE_KIND.DIGRESSION]: blogPostT('asideKind.DIGRESSION'),

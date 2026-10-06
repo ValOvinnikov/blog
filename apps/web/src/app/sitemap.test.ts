@@ -136,8 +136,16 @@ describe('sitemap', () => {
     getPostParamsMock.mockResolvedValue({
       ok: true,
       data: [
-        { slug: 'first-post', publishedAt: '2026-01-01T00:00:00.000Z' },
-        { slug: 'second-post', publishedAt: '2026-01-02T00:00:00.000Z' },
+        {
+          slug: 'first-post',
+          language: 'EN',
+          publishedAt: '2026-01-01T00:00:00.000Z',
+        },
+        {
+          slug: 'second-post',
+          language: 'EN',
+          publishedAt: '2026-01-02T00:00:00.000Z',
+        },
       ],
     });
     getTopicParamsMock.mockResolvedValue({
@@ -541,6 +549,60 @@ describe('sitemap', () => {
     });
   });
 
+  it('lists each post under its own language prefix, with its live translations as alternates', async () => {
+    mockAllEmpty();
+    resolveRequestTenantMock.mockResolvedValue({
+      id: 'tenant-1',
+      locale: 'EN',
+    });
+    selectLiveLocalesMock.mockReturnValue(['EN', 'NL']);
+    getPostParamsMock.mockResolvedValue({
+      ok: true,
+      data: [
+        {
+          slug: 'my-article',
+          language: 'EN',
+          publishedAt: '2026-01-01T00:00:00.000Z',
+        },
+        {
+          slug: 'mijn-artikel',
+          language: 'NL',
+          publishedAt: '2026-01-02T00:00:00.000Z',
+        },
+      ],
+    });
+    getTranslationMapMock.mockResolvedValue({
+      ok: true,
+      data: makeTranslationMap({
+        groups: [
+          [
+            { documentType: 'page_post', language: 'EN', slug: 'my-article' },
+            { documentType: 'page_post', language: 'NL', slug: 'mijn-artikel' },
+          ],
+        ],
+      }),
+    });
+    const postAlternates = {
+      en: 'https://example.com/blog/my-article',
+      nl: 'https://example.com/nl/blog/mijn-artikel',
+      'x-default': 'https://example.com/blog/my-article',
+    };
+    const sitemap = (await import('./sitemap')).default;
+
+    const entries = await sitemap();
+
+    expect(entries).toContainEqual({
+      url: 'https://example.com/blog/my-article',
+      lastModified: '2026-01-01T00:00:00.000Z',
+      alternates: { languages: postAlternates },
+    });
+    expect(entries).toContainEqual({
+      url: 'https://example.com/nl/blog/mijn-artikel',
+      lastModified: '2026-01-02T00:00:00.000Z',
+      alternates: { languages: postAlternates },
+    });
+  });
+
   it('lists numbered Topic pages under their own language prefix', async () => {
     mockAllEmpty();
     resolveRequestTenantMock.mockResolvedValue({
@@ -559,7 +621,7 @@ describe('sitemap', () => {
     expect(urls).toContain('https://example.com/nl/topics/ontwerp/page/2');
   });
 
-  it("requests Topic and Tag pages with the tenant's live languages", async () => {
+  it("requests posts, Topic and Tag pages with the tenant's live languages", async () => {
     mockAllEmpty();
     const tenantContext = { projectId: 'p' };
     resolveRequestTenantMock.mockResolvedValue({ id: 'tenant-1' });
@@ -573,6 +635,7 @@ describe('sitemap', () => {
     await sitemap();
 
     [
+      getPostParamsMock,
       getTopicParamsMock,
       getTagParamsMock,
       getTopicPaginationParamsMock,
@@ -586,7 +649,13 @@ describe('sitemap', () => {
     mockAllEmpty();
     getPostParamsMock.mockResolvedValue({
       ok: true,
-      data: [{ slug: 'first-post', publishedAt: '2026-01-01T00:00:00.000Z' }],
+      data: [
+        {
+          slug: 'first-post',
+          language: 'EN',
+          publishedAt: '2026-01-01T00:00:00.000Z',
+        },
+      ],
     });
     getTopicParamsMock.mockResolvedValue({
       ok: true,
@@ -702,7 +771,7 @@ describe('sitemap', () => {
 
     await sitemap();
 
-    expect(getPostParamsMock).toHaveBeenCalledWith(tenant);
+    expect(getPostParamsMock).toHaveBeenCalledWith(tenant, expect.any(Array));
   });
 
   it('returns an empty sitemap without querying content when the host is unresolvable', async () => {

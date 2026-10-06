@@ -1,4 +1,5 @@
 import type { TMaybeUndefined, TPagePostType } from '@blog/config';
+import type { TPageTranslation } from '@blog/service/shared/localization/page-translations/to-page-translations';
 import type { TModule } from '@blog/service/shared/transformers/module/to-module';
 import type { TPersonProfile } from '@blog/service/shared/transformers/person/to-person-profile';
 import type { TPortableTextBody } from '@blog/service/shared/transformers/portable-text/to-portable-text-body';
@@ -25,4 +26,5 @@ export type TPostDetail = Omit<TPostCard, 'author' | 'topic'> & {
   tags: TTag[];
   modules: TModule<TPagePostType>[];
   readingTimeMinutes: number;
+  translations: TPageTranslation[];
 };

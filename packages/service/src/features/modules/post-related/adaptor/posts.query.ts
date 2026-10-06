@@ -1,4 +1,5 @@
 import { q } from '@blog/service/sanity/query/query';
+import { POST_IN_LOCALE_FILTER } from '@blog/service/shared/expressions/post/post-in-locale';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/post/published-post';
 import { postCardFragment } from '@blog/service/shared/fragments/post/post';
 
@@ -18,7 +19,6 @@ export type TRelatedByTopicParams = {
   topicId: string;
 };
 
-/** The module's anchor post's own tag and topic ids, used to rank/backfill candidates. */
 export const relatedPostAnchorQuery = q
   .parameters<TAnchorPostParams>()
   .star.filterByType('page_post')
@@ -38,16 +38,12 @@ export const relatedPostAnchorQuery = q
   }))
   .nullable(true);
 
-/**
- * Candidate pool of published posts sharing at least one tag with the anchor
- * post. groqd's typed `.order()` only accepts a literal projected field, not
- * a raw `count(...)` expression, so the exact shared-tag-count ranking runs
- * in JS (`toRelatedPosts`) over this candidate set instead.
- */
+// groqd's typed `.order()` takes no raw `count(...)`, so the shared-tag ranking runs in JS (`toRelatedPosts`).
 export const relatedByTagsQuery = q
   .parameters<TRelatedByTagsParams>()
   .star.filterByType('page_post')
   .filterRaw('_id != $currentId && count(tags[_ref in $tagIds]) > 0')
+  .filterRaw(POST_IN_LOCALE_FILTER)
   .filterRaw(PUBLISHED_POST_FILTER)
   .order('publishedAt desc')
   .slice(0, RELATED_POSTS_TAG_CANDIDATE_LIMIT)
@@ -60,16 +56,12 @@ export const relatedByTagsQuery = q
       .nullable(true),
   }));
 
-/**
- * Recency-ordered backfill pool from the anchor post's primary topic,
- * bounded by `topicCandidateLimit` (the module's own `limit`, doubled, for
- * dedup headroom against the tag results).
- */
 export function relatedByTopicQuery(topicCandidateLimit: number) {
   return q
     .parameters<TRelatedByTopicParams>()
     .star.filterByType('page_post')
     .filterRaw('_id != $currentId && topic._ref == $topicId')
+    .filterRaw(POST_IN_LOCALE_FILTER)
     .filterRaw(PUBLISHED_POST_FILTER)
     .order('publishedAt desc')
     .slice(0, topicCandidateLimit)

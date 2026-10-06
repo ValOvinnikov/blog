@@ -1,5 +1,9 @@
 import { POST_SOURCE } from '@blog/config';
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
+import {
+  buildPinnedPostInLocaleFilter,
+  POST_IN_LOCALE_FILTER,
+} from '@blog/service/shared/expressions/post/post-in-locale';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/post/published-post';
 import { ctaSecondaryButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
 import { localizedImageWithAltFragment } from '@blog/service/shared/fragments/image/localized-image-with-alt';
@@ -11,6 +15,7 @@ import { getLocalizedField } from '@blog/service/shared/localization/get-localiz
 const newestFeaturedPostQuery = q.star
   .filterByType('page_post')
   .filterRaw('featured == true')
+  .filterRaw(POST_IN_LOCALE_FILTER)
   .filterRaw(PUBLISHED_POST_FILTER)
   .order('publishedAt desc')
   .slice(0)
@@ -26,9 +31,10 @@ export const heroBlogModuleQuery = q
     post: sub
       .select(
         {
-          [`postSource == "${POST_SOURCE.PINNED}"`]: sub
-            .field('post')
-            .deref()
+          [`postSource == "${POST_SOURCE.PINNED}"`]: sub.star
+            .filterByType('page_post')
+            .filterRaw(buildPinnedPostInLocaleFilter('post._ref'))
+            .slice(0)
             .project(postCardFragment)
             .nullable(true),
         },

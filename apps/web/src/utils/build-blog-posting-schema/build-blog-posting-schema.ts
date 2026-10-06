@@ -1,9 +1,10 @@
-import { routes } from '@blog/config';
+import { routes, type TLocaleIsoCode } from '@blog/config';
 import {
   type TPostDetail,
   type TSanityProjectRef,
   urlForSanityImage,
 } from '@blog/service';
+import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
 
 export type TBlogPostingSchema = {
   '@context': 'https://schema.org';
@@ -18,10 +19,16 @@ export type TBlogPostingSchema = {
   keywords: string | undefined;
 };
 
+type TBlogPostingLanguage = {
+  locale: TLocaleIsoCode;
+  defaultLocale: TLocaleIsoCode;
+};
+
 export const buildBlogPostingSchema = (
   post: TPostDetail,
   base: URL | undefined,
   project: TSanityProjectRef,
+  { locale, defaultLocale }: TBlogPostingLanguage,
 ): TBlogPostingSchema | undefined => {
   if (!base) return undefined;
 
@@ -36,7 +43,14 @@ export const buildBlogPostingSchema = (
     datePublished: post.publishedAt,
     dateModified: post.publishedAt,
     author: { '@type': 'Person', name: post.author.name },
-    url: new URL(routes.post(post.slug), base).href,
+    url: new URL(
+      toLocalizedPathname({
+        href: routes.post(post.slug),
+        locale,
+        defaultLocale,
+      }),
+      base,
+    ).href,
     keywords:
       post.tags.length > 0
         ? post.tags.map((tag) => tag.title).join(', ')

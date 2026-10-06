@@ -14,11 +14,9 @@ import type { MetadataRoute } from 'next';
 const toEntry = (
   path: string,
   siteUrl: string,
-  lastModified?: Date | string,
 ): MetadataRoute.Sitemap[number] => {
   return {
     url: `${siteUrl}${path}`,
-    ...(lastModified ? { lastModified } : {}),
     alternates: {
       languages: Object.fromEntries(
         [routing.defaultLocale].map((locale) => [
@@ -95,6 +93,7 @@ type TTranslatedPageEntryParams = {
   page: TTranslatedPage;
   documentType: string;
   toHref: (slug: string) => string;
+  lastModified?: string;
   translationMap: TTranslationMap;
   liveLocales: readonly TLocaleIsoCode[];
   defaultLocale: TLocaleIsoCode;
@@ -113,6 +112,7 @@ const toTranslatedPageEntry = ({
   page,
   documentType,
   toHref,
+  lastModified,
   translationMap,
   liveLocales,
   defaultLocale,
@@ -128,7 +128,8 @@ const toTranslatedPageEntry = ({
     pages:
       service.global.translationMap.v1.findTranslationGroup(translationMap, {
         documentType,
-        ...page,
+        slug: page.slug,
+        language: page.language,
       }) ?? [],
     liveLocales,
   });
@@ -136,12 +137,14 @@ const toTranslatedPageEntry = ({
   if (liveTranslations.length < 2) {
     return {
       url,
+      ...(lastModified ? { lastModified } : {}),
       alternates: { languages: { [LOCALE_BCP47_TAGS[page.language]]: url } },
     };
   }
 
   return {
     url,
+    ...(lastModified ? { lastModified } : {}),
     alternates: {
       languages: toAbsoluteAlternates(
         toLanguageAlternates({
@@ -199,7 +202,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     landingPageSlugsResult,
     translationMapResult,
   ] = await Promise.all([
-    service.pages.post.v1.getPostParams(tenant),
+    service.pages.post.v1.getPostParams(tenant, liveLocales),
     service.pages.topic.v1.getTopicParams(tenant, liveLocales),
     service.pages.tag.v1.getTagParams(tenant, liveLocales),
     service.pages.topic.v1.getTopicPaginationParams(tenant, liveLocales),
@@ -313,8 +316,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ),
     ...toTranslatedPageEntries(routes.tags(), translationMap.tagIndexLanguages),
     ...blogPageNumbers.map((page) => toEntry(routes.blogIndex(page), siteUrl)),
-    ...posts.map(({ slug, publishedAt }) =>
-      toEntry(routes.post(slug), siteUrl, publishedAt),
+    ...posts.map(({ publishedAt, ...page }) =>
+      toTranslatedPageEntry({
+        page,
+        documentType: 'page_post',
+        toHref: routes.post,
+        lastModified: publishedAt,
+        ...translatedPageContext,
+      }),
     ),
     ...topics.map((page) =>
       toTranslatedPageEntry({

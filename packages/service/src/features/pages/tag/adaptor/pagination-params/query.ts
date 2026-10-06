@@ -21,6 +21,7 @@ export const tagPaginationParamsQuery = q
         sub.star
           .filterByType('page_post')
           .filterRaw('references(^.tag._ref)')
+          .filterRaw('language == ^.language')
           .filterRaw(PUBLISHED_POST_FILTER),
       )
       .notNull(true),

@@ -1,5 +1,6 @@
 import { TAXONOMY_KIND, TAXONOMY_SORT } from '@blog/config';
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
+import { POST_IN_LOCALE_FILTER } from '@blog/service/shared/expressions/post/post-in-locale';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/post/published-post';
 import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
 import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
@@ -29,6 +30,7 @@ const topicEntriesQuery = q.star
     latestPosts: sub.star
       .filterByType('page_post')
       .filterRaw('references(^._id)')
+      .filterRaw(POST_IN_LOCALE_FILTER)
       .filterRaw(PUBLISHED_POST_FILTER)
       .order('publishedAt desc')
       .slice(0, LATEST_POSTS_LIMIT)
@@ -43,6 +45,7 @@ const tagEntriesQuery = q.star
     latestPosts: sub.star
       .filterByType('page_post')
       .filterRaw('references(^._id)')
+      .filterRaw(POST_IN_LOCALE_FILTER)
       .filterRaw(PUBLISHED_POST_FILTER)
       .order('publishedAt desc')
       .slice(0, LATEST_POSTS_LIMIT)

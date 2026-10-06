@@ -21,6 +21,7 @@ export const topicPaginationParamsQuery = q
         sub.star
           .filterByType('page_post')
           .filterRaw('references(^.topic._ref)')
+          .filterRaw('language == ^.language')
           .filterRaw(PUBLISHED_POST_FILTER),
       )
       .notNull(true),

@@ -6,16 +6,13 @@ export type TPostsByIdsParams = {
   ids: string[];
 };
 
-/**
- * Resolves an explicit `_id` allow-list (e.g. a reader's bookmarked post
- * ids) to post-card data. The `_type`/`PUBLISHED_POST_FILTER` filters do
- * double duty as the "no longer resolves" exclusion — an id that was
- * deleted, unpublished, or future-dated simply doesn't match, so it's
- * silently absent from the result rather than causing an error.
- */
+/** Unscoped by language, so a saved post resolves in the language it was saved in; an id that no longer resolves is simply absent. */
 export const postsByIdsQuery = q
   .parameters<TPostsByIdsParams>()
   .star.filterByType('page_post')
   .filterRaw('_id in $ids')
   .filterRaw(PUBLISHED_POST_FILTER)
-  .project(postCardFragment);
+  .project((sub) => ({
+    ...postCardFragment,
+    language: sub.field('language').notNull(),
+  }));

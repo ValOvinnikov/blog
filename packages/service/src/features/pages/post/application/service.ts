@@ -1,6 +1,7 @@
 import { getPost } from '@blog/service/features/pages/post/adaptor/detail-page/loader';
 import { getPostParams } from '@blog/service/features/pages/post/adaptor/detail-page-params/loader';
 import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
+import type { TPageQueryPageParams } from '@blog/service/shared/types/page/page-query-page-params';
 import { safeAsync } from '@blog/utils';
 
 export function createPostService() {
@@ -9,8 +10,11 @@ export function createPostService() {
       getPost: safeAsync((slug: string, tenant: TTenantSanityContext) =>
         getPost(slug, tenant),
       ),
-      getPostParams: safeAsync((tenant: TTenantSanityContext) =>
-        getPostParams(tenant),
+      getPostParams: safeAsync(
+        (
+          tenant: TTenantSanityContext,
+          locales: TPageQueryPageParams['locales'],
+        ) => getPostParams(tenant, locales),
       ),
     },
   };

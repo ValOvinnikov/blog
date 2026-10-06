@@ -93,7 +93,7 @@ export const service = {
 };
 
 export type { TPostBody, TSaveSkimDraftInput } from './features/editorial/skim';
-export type { TFeedPost } from './features/entities/posts';
+export type { TFeedPost, TPostById } from './features/entities/posts';
 export type { TTagsList, TTagWithPostCount } from './features/entities/tags';
 export type {
   TTopicsList,

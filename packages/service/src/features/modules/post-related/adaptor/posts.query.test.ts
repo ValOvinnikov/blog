@@ -1,4 +1,9 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import {
+  toIds,
+  translatedPostDocuments,
+} from '@blog/service/testing/shared/translated-posts-dataset';
 
 import {
   relatedByTagsQuery,
@@ -72,5 +77,36 @@ describe('relatedByTopicQuery', () => {
   it('bounds the candidate pool by the given limit', () => {
     expect(relatedByTopicQuery(6).query).toContain('[0...6]');
     expect(relatedByTopicQuery(12).query).toContain('[0...12]');
+  });
+});
+
+describe('related posts language scoping', () => {
+  const { EN, NL } = LOCALE_ISO_CODES;
+
+  function run(query: string, params: Record<string, unknown>) {
+    return evaluateGroqExpression(query, translatedPostDocuments, undefined, {
+      currentId: 'notes-en',
+      defaultLocale: EN,
+      ...params,
+    });
+  }
+
+  it('picks tag candidates only in the request language', async () => {
+    expect(
+      toIds(
+        await run(relatedByTagsQuery.query, { tagIds: ['tag-1'], locale: NL }),
+      ),
+    ).toEqual(['design-nl']);
+  });
+
+  it('picks topic candidates only in the request language', async () => {
+    expect(
+      toIds(
+        await run(relatedByTopicQuery(10).query, {
+          topicId: 'topic-1',
+          locale: EN,
+        }),
+      ),
+    ).toEqual(['only-en', 'design-en']);
   });
 });

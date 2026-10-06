@@ -1,5 +1,5 @@
 import { routes } from '@blog/config';
-import { toMetadata } from '@web/metadata/to-metadata';
+import { toLocalizedPageMetadata } from '@web/metadata/to-localized-page-metadata';
 import { getPostPage } from '@web/server/post/get-post-page/get-post-page';
 import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
@@ -16,10 +16,14 @@ export const buildPostMetadata = async (slug: string): Promise<Metadata> => {
     return {};
   }
 
-  const { seo, publishedAt, author } = result.data;
+  const { seo, publishedAt, author, translations } = result.data;
 
-  return toMetadata(seo, {
-    canonical: routes.post(slug),
+  return toLocalizedPageMetadata(seo, {
+    href: routes.post(slug),
+    translations: translations.map(({ language, slug: translatedSlug }) => ({
+      language,
+      href: routes.post(translatedSlug),
+    })),
     ogType: 'article',
     article: {
       publishedTime: publishedAt,

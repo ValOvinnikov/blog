@@ -1,4 +1,9 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import {
+  toIds,
+  translatedPostDocuments,
+} from '@blog/service/testing/shared/translated-posts-dataset';
 
 import { postListModulePaginatedPostsQuery } from './posts.query';
 
@@ -93,5 +98,33 @@ describe(postListModulePaginatedPostsQuery, () => {
       ]);
       expect(result.total).toBe(4);
     });
+  });
+});
+
+describe('postListModulePaginatedPostsQuery language scoping', () => {
+  const { EN, NL } = LOCALE_ISO_CODES;
+
+  async function run(locale: string, termId?: string) {
+    const result = (await evaluateGroqExpression(
+      postListModulePaginatedPostsQuery(1, 10, termId ? { termId } : undefined)
+        .query,
+      translatedPostDocuments,
+      undefined,
+      { locale, defaultLocale: EN, ...(termId ? { termId } : {}) },
+    )) as { posts: unknown; total: number };
+
+    return { ids: toIds(result.posts), total: result.total };
+  }
+
+  it('lists and counts only published posts in the request language', async () => {
+    expect(await run(NL)).toEqual({ ids: ['design-nl'], total: 1 });
+    expect(await run(EN)).toEqual({
+      ids: ['only-en', 'design-en', 'notes-en'],
+      total: 3,
+    });
+  });
+
+  it('keeps the language scope on a topic-scoped list', async () => {
+    expect(await run(NL, 'topic-1')).toEqual({ ids: ['design-nl'], total: 1 });
   });
 });

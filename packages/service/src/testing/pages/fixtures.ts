@@ -87,6 +87,7 @@ export function makeRawPostDetail(
     tags: [{ _id: 'tag-1', title: 'TypeScript', slug: 'typescript' }],
     modules: [],
     wordCount: 400,
+    translations: [{ language: 'EN', slug: 'hello-world' }],
     ...overrides,
   };
 }

@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import type { TRawPostDetail } from '@blog/service/features/pages/post/adaptor/detail-page/transformer';
 import { makeRawTopic } from '@blog/service/testing/entities/fixtures';
 import {
@@ -8,19 +9,11 @@ import {
   makeRawExternalLinkDocument,
   makeRawHeadingBlock,
 } from '@blog/service/testing/shared/fixtures';
+import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 
 import { postPageQuery } from './query';
 
 describe('postPageQuery', () => {
-  it('filters to page_post documents by their own slug', () => {
-    expect(postPageQuery.query).toContain('_type == "page_post"');
-    expect(postPageQuery.query).toContain('slug.current == $slug');
-  });
-
-  it('excludes page_post documents whose publishedAt is in the future, hard-404ing direct access', () => {
-    expect(postPageQuery.query).toContain('publishedAt <= now()');
-  });
-
   it('parses a post whose optional fields are all absent', () => {
     const raw = makeRawPostDetail({
       heroImage: null,
@@ -253,6 +246,71 @@ describe('postPageQuery', () => {
       _type: 'bodyImage',
       layout: 'FLOAT_LEFT',
       asset: { _id: 'image-abc123-800x600-jpg' },
+    });
+  });
+});
+
+describe('postPageQuery language scoping', () => {
+  const { EN, NL, FR } = LOCALE_ISO_CODES;
+
+  function post(
+    id: string,
+    slug: string,
+    language: string,
+    publishedAt = '2026-01-01T00:00:00Z',
+  ) {
+    return {
+      _id: id,
+      _type: 'page_post',
+      slug: { current: slug },
+      language,
+      publishedAt,
+    };
+  }
+
+  function link(language: string, id: string) {
+    return {
+      _key: language,
+      language,
+      value: { _type: 'reference', _ref: id },
+    };
+  }
+
+  const dataset = [
+    post('article-en', 'my-article', EN),
+    post('article-nl', 'mijn-artikel', NL),
+    post('scheduled-nl', 'later', NL, '2999-01-01T00:00:00Z'),
+    {
+      _id: 'meta-article',
+      _type: 'translation.metadata',
+      translations: [link(EN, 'article-en'), link(NL, 'article-nl')],
+    },
+  ];
+
+  function run(slug: string, locale: string): Promise<unknown> {
+    return evaluateGroqExpression(postPageQuery.query, dataset, null, {
+      slug,
+      locale,
+      defaultLocale: EN,
+    });
+  }
+
+  it('resolves a slug only in the language the post is authored in', async () => {
+    expect(await run('mijn-artikel', NL)).toMatchObject({ _id: 'article-nl' });
+    expect(await run('mijn-artikel', EN)).toBeNull();
+    expect(await run('my-article', FR)).toBeNull();
+  });
+
+  it('hard-404s a scheduled post', async () => {
+    expect(await run('later', NL)).toBeNull();
+  });
+
+  it('returns the linked translations with their languages and slugs', async () => {
+    expect(await run('mijn-artikel', NL)).toMatchObject({
+      translations: [
+        { language: EN, slug: 'my-article' },
+        { language: NL, slug: 'mijn-artikel' },
+      ],
     });
   });
 });
