@@ -17,6 +17,7 @@ export const VOICE_FIXED_KEYS = [
   'languageSwitcher.ariaLabel',
   'languageSwitcher.menuAriaLabel',
   'brandLockupLink.ariaLabel',
+  'consent.preferences.closeLabel',
   'socialLinks.linkAriaLabel',
   'socialLinks.listAriaLabel',
   'topicChipList.ariaLabel',
