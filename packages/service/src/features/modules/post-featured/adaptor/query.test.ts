@@ -4,7 +4,7 @@ import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import { localizedStrings } from '@blog/service/testing/shared/localized';
 import {
   toIds,
-  translatedPostDocuments,
+  pinnedPostDocuments,
 } from '@blog/service/testing/shared/translated-posts-dataset';
 
 import { postFeaturedModuleQuery } from './query';
@@ -87,7 +87,7 @@ describe('postFeaturedModuleQuery language scoping', () => {
   ): Promise<string[]> {
     const raw = (await evaluateGroqExpression(
       postFeaturedModuleQuery.query,
-      [{ ...moduleDocument, ...module }, ...translatedPostDocuments],
+      [{ ...moduleDocument, ...module }, ...pinnedPostDocuments],
       undefined,
       { id: 'module-1', locale, defaultLocale: EN },
     )) as { posts: unknown[] };
@@ -115,6 +115,42 @@ describe('postFeaturedModuleQuery language scoping', () => {
 
   it('swaps a pinned post for its translation and drops one with none', async () => {
     expect(await runPosts(pinned, NL)).toEqual(['design-nl']);
+  });
+
+  it('keeps a pinned post without a translation group in its own language', async () => {
+    expect(
+      await runPosts(
+        {
+          postSource: 'PINNED',
+          posts: [{ _key: 'a', _type: 'reference', _ref: 'solo-nl' }],
+        },
+        NL,
+      ),
+    ).toEqual(['solo-nl']);
+  });
+
+  it('drops a pinned post without a translation group in another language', async () => {
+    expect(
+      await runPosts(
+        {
+          postSource: 'PINNED',
+          posts: [{ _key: 'a', _type: 'reference', _ref: 'solo-nl' }],
+        },
+        EN,
+      ),
+    ).toEqual([]);
+  });
+
+  it('drops a pinned post whose translation is scheduled', async () => {
+    expect(
+      await runPosts(
+        {
+          postSource: 'PINNED',
+          posts: [{ _key: 'a', _type: 'reference', _ref: 'launch-en' }],
+        },
+        NL,
+      ),
+    ).toEqual([]);
   });
 
   it('drops a pinned scheduled post', async () => {

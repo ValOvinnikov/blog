@@ -1,14 +1,12 @@
 import { POST_SOURCE } from '@blog/config';
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
-import {
-  buildPinnedPostInLocaleFilter,
-  POST_IN_LOCALE_FILTER,
-} from '@blog/service/shared/expressions/post/post-in-locale';
+import { POST_IN_LOCALE_FILTER } from '@blog/service/shared/expressions/post/post-in-locale';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/post/published-post';
 import { ctaSecondaryButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
 import { localizedImageWithAltFragment } from '@blog/service/shared/fragments/image/localized-image-with-alt';
 import { moduleHeroLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
+import { pinnedPostInLocale } from '@blog/service/shared/fragments/post/pinned-post';
 import { postCardFragment } from '@blog/service/shared/fragments/post/post';
 import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
 
@@ -31,12 +29,10 @@ export const heroBlogModuleQuery = q
     post: sub
       .select(
         {
-          [`postSource == "${POST_SOURCE.PINNED}"`]: sub.star
-            .filterByType('page_post')
-            .filterRaw(buildPinnedPostInLocaleFilter('post._ref'))
-            .slice(0)
-            .project(postCardFragment)
-            .nullable(true),
+          [`postSource == "${POST_SOURCE.PINNED}"`]: pinnedPostInLocale(
+            sub,
+            sub.field('post'),
+          ).nullable(true),
         },
         newestFeaturedPostQuery,
       )

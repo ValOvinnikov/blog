@@ -14,7 +14,7 @@ import { createGroqBuilder, type IGroqBuilder, type QueryConfig } from 'groqd';
 
 export type { TTenantSanityContext };
 
-type TSchemaConfig = {
+export type TSchemaConfig = {
   schemaTypes: AllSanitySchemaTypes;
   referenceSymbol: typeof internalGroqTypeReferenceTo;
 };

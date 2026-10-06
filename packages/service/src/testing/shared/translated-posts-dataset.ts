@@ -44,6 +44,18 @@ export const translatedPostDocuments = [
   },
 ];
 
+export const pinnedPostDocuments = [
+  ...translatedPostDocuments,
+  post('solo-nl', NL),
+  post('launch-en', EN),
+  post('launch-nl', NL, { publishedAt: '2999-01-01T00:00:00Z' }),
+  {
+    _id: 'meta-launch',
+    _type: 'translation.metadata',
+    translations: [link(EN, 'launch-en'), link(NL, 'launch-nl')],
+  },
+];
+
 export function toIds(posts: unknown): string[] {
   return (posts as ({ _id: string } | null)[]).flatMap((post) =>
     post ? [post._id] : [],
