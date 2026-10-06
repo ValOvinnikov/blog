@@ -1,7 +1,9 @@
-import { COOKIE_SETTINGS_BUTTON_TEST_ID } from '@web/components/shared/cookie-settings-button';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type RefObject } from 'react';
 
-export const useModalDialog = (isOpen: boolean) => {
+export const useModalDialog = (
+  isOpen: boolean,
+  fallbackFocusRef: RefObject<HTMLElement | null>,
+) => {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const openerRef = useRef<Element | null>(null);
 
@@ -20,15 +22,11 @@ export const useModalDialog = (isOpen: boolean) => {
     if (!dialog) return;
     const restoreFocus = () => {
       if (openerRef.current?.isConnected) return;
-      document
-        .querySelector<HTMLElement>(
-          `[data-testid="${COOKIE_SETTINGS_BUTTON_TEST_ID}"]`,
-        )
-        ?.focus();
+      fallbackFocusRef.current?.querySelector('button')?.focus();
     };
     dialog.addEventListener('close', restoreFocus);
     return () => dialog.removeEventListener('close', restoreFocus);
-  }, []);
+  }, [fallbackFocusRef]);
 
   return dialogRef;
 };

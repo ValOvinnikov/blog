@@ -5,20 +5,19 @@ import { Button } from '@blog/ui/components/atoms/button';
 import { useConsentPreferences } from '@web/context/consent-provider';
 import { useTranslations } from 'next-intl';
 
-export const COOKIE_SETTINGS_BUTTON_TEST_ID = 'cookie-settings-button';
+import { cookieSettingsButtonVariants } from './cookie-settings-button-variants';
+
+const s = cookieSettingsButtonVariants();
 
 export const CookieSettingsButton = () => {
   const t = useTranslations('consent');
-  const { openPreferences } = useConsentPreferences();
+  const { openPreferences, settingsTriggerRef } = useConsentPreferences();
 
   return (
-    <Button
-      variant="link"
-      size={SIZE.SM}
-      onClick={openPreferences}
-      dataTestId={COOKIE_SETTINGS_BUTTON_TEST_ID}
-    >
-      {t('footerSettingsLabel')}
-    </Button>
+    <span ref={settingsTriggerRef} className={s.root()}>
+      <Button variant="link" size={SIZE.SM} onClick={openPreferences}>
+        {t('footerSettingsLabel')}
+      </Button>
+    </span>
   );
 };
