@@ -1943,9 +1943,6 @@ export type Template_landing = {
   modules?: Array<
     | ({
         _key: string;
-      } & Module_childPagesReference)
-    | ({
-        _key: string;
       } & Module_contentReference)
     | ({
         _key: string;
@@ -1956,6 +1953,9 @@ export type Template_landing = {
     | ({
         _key: string;
       } & Module_featureListReference)
+    | ({
+        _key: string;
+      } & Module_childPagesReference)
     | ({
         _key: string;
       } & Module_timelineReference)
