@@ -1,7 +1,7 @@
 import { q } from '@blog/service/sanity/query/query';
-import { POST_IN_LOCALE_FILTER } from '@blog/service/shared/expressions/post/post-in-locale';
-import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/post/published-post';
 import { postCardFragment } from '@blog/service/shared/fragments/post/post';
+import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
+import { publishedPostsInLocale } from '@blog/service/shared/localization/published-posts-in-locale/published-posts-in-locale';
 
 import { RELATED_POSTS_TAG_CANDIDATE_LIMIT } from './constants';
 
@@ -39,12 +39,12 @@ export const relatedPostAnchorQuery = q
   .nullable(true);
 
 // groqd's typed `.order()` takes no raw `count(...)`, so the shared-tag ranking runs in JS (`toRelatedPosts`).
-export const relatedByTagsQuery = q
-  .parameters<TRelatedByTagsParams>()
-  .star.filterByType('page_post')
-  .filterRaw('_id != $currentId && count(tags[_ref in $tagIds]) > 0')
-  .filterRaw(POST_IN_LOCALE_FILTER)
-  .filterRaw(PUBLISHED_POST_FILTER)
+export const relatedByTagsQuery = publishedPostsInLocale(
+  q.parameters<TLocaleParams & TRelatedByTagsParams>().star,
+)
+  .filterBy('_id != $currentId')
+  // groqd's typed filterBy has no `count` function call
+  .filterRaw('count(tags[_ref in $tagIds]) > 0')
   .order('publishedAt desc')
   .slice(0, RELATED_POSTS_TAG_CANDIDATE_LIMIT)
   .project((sub) => ({
@@ -57,13 +57,15 @@ export const relatedByTagsQuery = q
   }));
 
 export function relatedByTopicQuery(topicCandidateLimit: number) {
-  return q
-    .parameters<TRelatedByTopicParams>()
-    .star.filterByType('page_post')
-    .filterRaw('_id != $currentId && topic._ref == $topicId')
-    .filterRaw(POST_IN_LOCALE_FILTER)
-    .filterRaw(PUBLISHED_POST_FILTER)
-    .order('publishedAt desc')
-    .slice(0, topicCandidateLimit)
-    .project(postCardFragment);
+  return (
+    publishedPostsInLocale(
+      q.parameters<TLocaleParams & TRelatedByTopicParams>().star,
+    )
+      .filterBy('_id != $currentId')
+      // groqd's typed filterBy cannot reach a reference's `_ref`
+      .filterRaw('topic._ref == $topicId')
+      .order('publishedAt desc')
+      .slice(0, topicCandidateLimit)
+      .project(postCardFragment)
+  );
 }
