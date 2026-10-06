@@ -1820,8 +1820,11 @@ everything below it reads instead of receiving the tenant as a prop —
 that read the request (`getRequestTenantId`, `resolveRequestTenant`, in
 `apps/web/src/server/tenant/request-tenant/`) take the tenant as an argument and only touch
 `headers()` when not given one. That fallback serves Server Actions and the
-root-level `Host`-resolved routes (`robots.ts`/`sitemap.ts`/`rss.xml`) — none
-of which have route params to thread — and also the `account`/`bookmarks`
+root-level `Host`-resolved routes (`robots.ts`/`sitemap.ts`) — which have
+no route params to thread — the RSS feeds, which sit under
+`[tenant]/[locale]` so each language gets its own (`/rss.xml` for the default
+language, `/<lang>/rss.xml` for the others, same for
+`/tags/<slug>/rss.xml`) but take only the language from their params, and also the `account`/`bookmarks`
 compositions, which do sit under a route carrying `tenant` but deliberately
 leave it unthreaded: `force-dynamic` already excludes them from the cache,
 so resolving from the request costs them nothing. `app/global-not-found.tsx`
