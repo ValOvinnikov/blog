@@ -1,4 +1,4 @@
-import { customRenderAsync } from '@web/testing/custom-render';
+import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
   testFallsBackToHeadingWithoutHero,
@@ -28,6 +28,7 @@ const {
   heroBlogModuleMock,
   heroProfileModuleMock,
   heroStatementModuleMock,
+  childPagesModuleMock,
 } = vi.hoisted(() => ({
   contentModuleMock: vi.fn(({ id }: { id: string }) => (
     <div data-testid="stub-content">{id}</div>
@@ -64,6 +65,9 @@ const {
   heroStatementModuleMock: vi.fn(async ({ id }: { id: string }) => (
     <h1 data-testid="stub-hero-statement">{id}</h1>
   )),
+  childPagesModuleMock: vi.fn(({ id }: { id: string }) => (
+    <div data-testid="stub-child-pages">{id}</div>
+  )),
 }));
 
 vi.mock('@web/modules/content/content-module', () => ({
@@ -98,6 +102,10 @@ vi.mock('@web/modules/hero-statement/hero-statement-module', () => ({
   HeroStatementModule: heroStatementModuleMock,
 }));
 
+vi.mock('@web/modules/child-pages/child-pages-module', () => ({
+  ChildPagesModule: childPagesModuleMock,
+}));
+
 vi.mock('@web/utils/logger/logger');
 
 const loggerWarnMock = vi.mocked(logger.warn);
@@ -106,6 +114,7 @@ const setup = customRenderAsync(LandingModuleRenderer, {
   hero: undefined,
   headingBlock: makeHeadingBlock({ heading: 'About Us' }),
   modules: [],
+  landingPage: { id: 'modules', path: 'modules' },
 });
 
 describe(`<${LandingModuleRenderer.name}/>`, () => {
@@ -133,6 +142,23 @@ describe(`<${LandingModuleRenderer.name}/>`, () => {
       'renders nothing and warns once for a module absent from the landing page allow-list',
   });
   testFeatureListModule({ setup, loggerWarnMock });
+
+  it('renders the child pages module with the landing page as its context', async () => {
+    await setup({
+      modules: [{ id: 'child-pages-1', type: 'module_childPages' }],
+    });
+
+    expect(screen.getByTestId('stub-child-pages')).toHaveTextContent(
+      'child-pages-1',
+    );
+    expect(childPagesModuleMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 'child-pages-1',
+        context: { landingPage: { id: 'modules', path: 'modules' } },
+      }),
+      undefined,
+    );
+  });
   testTestimonialModule({ setup, loggerWarnMock });
   testRendersAllowedModulesInOrder({
     setup,

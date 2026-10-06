@@ -19,13 +19,14 @@ export const LandingPage = async ({ path }: TLandingPageProps) => {
   const page = guardPageLoaderResult(result, 'landing_page.fetch_failed', {
     path,
   });
-  const { headingBlock, hero, modules, faqs, sectionNavigation } = page;
+  const { id, headingBlock, hero, modules, faqs, sectionNavigation } = page;
 
   const content = (
     <LandingModuleRenderer
       hero={hero}
       headingBlock={headingBlock}
       modules={modules}
+      landingPage={{ id, path }}
     />
   );
 

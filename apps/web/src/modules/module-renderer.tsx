@@ -7,6 +7,7 @@ export type TModuleComponentProps = {
   id: string;
   context?: {
     post?: { id: string };
+    landingPage?: { id: string; path: string };
     page?: number;
     archive?: {
       id: string;
