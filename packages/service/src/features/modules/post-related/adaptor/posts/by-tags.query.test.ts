@@ -5,22 +5,7 @@ import {
   translatedPostDocuments,
 } from '@blog/service/testing/shared/translated-posts-dataset';
 
-import {
-  relatedByTagsQuery,
-  relatedByTopicQuery,
-  relatedPostAnchorQuery,
-} from './posts.query';
-
-describe('relatedPostAnchorQuery', () => {
-  it('filters to page_post documents by id', () => {
-    expect(relatedPostAnchorQuery.query).toContain('_type == "page_post"');
-    expect(relatedPostAnchorQuery.query).toContain('_id == $postId');
-  });
-
-  it('parses null as no matching anchor post, rather than throwing', () => {
-    expect(relatedPostAnchorQuery.parse(null)).toBeNull();
-  });
-});
+import { relatedByTagsQuery } from './by-tags.query';
 
 describe('relatedByTagsQuery', () => {
   it('filters to page_post documents', () => {
@@ -65,23 +50,8 @@ describe('relatedByTagsQuery', () => {
   });
 });
 
-describe('relatedByTopicQuery', () => {
-  it('filters to page_post documents', () => {
-    expect(relatedByTopicQuery(6).query).toContain('_type == "page_post"');
-  });
-
-  it('excludes posts whose publishedAt is in the future', () => {
-    expect(relatedByTopicQuery(6).query).toContain('publishedAt <= now()');
-  });
-
-  it('bounds the candidate pool by the given limit', () => {
-    expect(relatedByTopicQuery(6).query).toContain('[0...6]');
-    expect(relatedByTopicQuery(12).query).toContain('[0...12]');
-  });
-});
-
-describe('related posts language scoping', () => {
-  const { EN, NL } = LOCALE_ISO_CODES;
+describe('relatedByTagsQuery language scoping', () => {
+  const { NL, EN } = LOCALE_ISO_CODES;
 
   function run(query: string, params: Record<string, unknown>) {
     return evaluateGroqExpression(query, translatedPostDocuments, undefined, {
@@ -97,16 +67,5 @@ describe('related posts language scoping', () => {
         await run(relatedByTagsQuery.query, { tagIds: ['tag-1'], locale: NL }),
       ),
     ).toEqual(['design-nl']);
-  });
-
-  it('picks topic candidates only in the request language', async () => {
-    expect(
-      toIds(
-        await run(relatedByTopicQuery(10).query, {
-          topicId: 'topic-1',
-          locale: EN,
-        }),
-      ),
-    ).toEqual(['only-en', 'design-en']);
   });
 });

@@ -3,28 +3,19 @@ import {
   runQuery,
   type TTenantSanityContext,
 } from '@blog/service/sanity/query/query';
+import type { TPostCard } from '@blog/service/shared/transformers/post/to-post-card';
 
+import { relatedPostAnchorQuery } from './anchor.query';
+import { relatedByTagsQuery } from './by-tags.query';
+import { relatedByTopicQuery } from './by-topic.query';
 import { RELATED_POSTS_TOPIC_CANDIDATE_MULTIPLIER } from './constants';
-import {
-  relatedByTagsQuery,
-  relatedByTopicQuery,
-  relatedPostAnchorQuery,
-} from './posts.query';
-import { postRelatedModuleQuery } from './query';
-import { toPostRelatedModule, toRelatedPosts } from './transformer';
-import type { TPostRelatedModule } from './types';
+import { toRelatedPosts } from './transformer';
 
-export async function getPostRelated(
-  id: string,
+export async function getRelatedPosts(
   postId: string,
+  limit: number,
   tenant: TTenantSanityContext,
-): Promise<TPostRelatedModule> {
-  const raw = await runQuery(postRelatedModuleQuery, {
-    parameters: { id },
-    tenant,
-    ...isr(['modules:postRelated', `module:${id}`], tenant.projectId),
-  });
-
+): Promise<TPostCard[]> {
   const anchor = await runQuery(relatedPostAnchorQuery, {
     parameters: { postId },
     tenant,
@@ -44,9 +35,7 @@ export async function getPostRelated(
       : Promise.resolve([]),
     topicId
       ? runQuery(
-          relatedByTopicQuery(
-            raw.limit * RELATED_POSTS_TOPIC_CANDIDATE_MULTIPLIER,
-          ),
+          relatedByTopicQuery(limit * RELATED_POSTS_TOPIC_CANDIDATE_MULTIPLIER),
           {
             parameters: { currentId: postId, topicId },
             tenant,
@@ -56,7 +45,5 @@ export async function getPostRelated(
       : Promise.resolve([]),
   ]);
 
-  const posts = toRelatedPosts(byTags, byTopic, tagIds, raw.limit);
-
-  return toPostRelatedModule(raw, posts);
+  return toRelatedPosts(byTags, byTopic, tagIds, limit);
 }

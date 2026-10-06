@@ -1,29 +1,17 @@
-import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
-import { toLayout } from '@blog/service/shared/transformers/layout/to-layout';
 import {
   toPostCard,
   type TPostCard,
 } from '@blog/service/shared/transformers/post/to-post-card';
 import type { InferResultType } from 'groqd';
 
-import type { relatedByTagsQuery, relatedByTopicQuery } from './posts.query';
-import type { postRelatedModuleQuery } from './query';
-import type { TPostRelatedModule } from './types';
+import type { relatedByTagsQuery } from './by-tags.query';
+import type { relatedByTopicQuery } from './by-topic.query';
 
-export type TRawPostRelatedModule = InferResultType<
-  typeof postRelatedModuleQuery
->;
 export type TRawRelatedByTags = InferResultType<typeof relatedByTagsQuery>;
 export type TRawRelatedByTopic = InferResultType<
   ReturnType<typeof relatedByTopicQuery>
 >;
 
-/**
- * Ranks the shared-tag candidate pool by exact shared-tag count desc,
- * `publishedAt` desc tiebreak, then backfills any remaining slots (up to
- * `limit`) from the primary-topic candidate pool — excluding posts already
- * picked by the tag ranking.
- */
 export function toRelatedPosts(
   byTags: TRawRelatedByTags,
   byTopic: TRawRelatedByTopic,
@@ -55,18 +43,4 @@ export function toRelatedPosts(
     .map((raw) => toPostCard(raw));
 
   return [...ranked, ...backfill];
-}
-
-export function toPostRelatedModule(
-  raw: TRawPostRelatedModule,
-  posts: TPostCard[],
-): TPostRelatedModule {
-  return {
-    brandVariant: raw.brandVariant,
-    headingBlock: toHeadingBlock(raw.headingBlock),
-    posts,
-    layout: toLayout(raw.layout),
-    contentAlignment: raw.contentAlignment ?? undefined,
-    showImages: raw.showImages,
-  };
 }

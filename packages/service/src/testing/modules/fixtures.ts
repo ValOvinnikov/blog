@@ -34,7 +34,7 @@ import type { TRawNewsletterModule } from '@blog/service/features/modules/newsle
 import type { TRawPostFeaturedModule } from '@blog/service/features/modules/post-featured/adaptor/transformer';
 import type { TRawPostLatestModule } from '@blog/service/features/modules/post-latest/adaptor/transformer';
 import type { TRawPostListModule } from '@blog/service/features/modules/post-list/adaptor/transformer';
-import type { TRawPostRelatedModule } from '@blog/service/features/modules/post-related/adaptor/transformer';
+import type { TRawPostRelatedModule } from '@blog/service/features/modules/post-related/adaptor/module/transformer';
 import type { TRawPricingModule } from '@blog/service/features/modules/pricing/adaptor/transformer';
 import type { TRawStatsModule } from '@blog/service/features/modules/stats/adaptor/transformer';
 import type { TRawTaxonomyListModule } from '@blog/service/features/modules/taxonomy-list/adaptor/transformer';

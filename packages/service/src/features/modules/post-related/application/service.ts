@@ -1,4 +1,4 @@
-import { getPostRelated } from '@blog/service/features/modules/post-related/adaptor/loader';
+import { getPostRelated } from '@blog/service/features/modules/post-related/adaptor/module/loader';
 import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
 import { safeAsync } from '@blog/utils';
 
