@@ -96,6 +96,9 @@ describe('toTranslationMap', () => {
     expect(await buildMap([page('about-en', EN, 'about')])).toEqual({
       groups: [],
       homeLanguages: [],
+      postIndexLanguages: [],
+      topicIndexLanguages: [],
+      tagIndexLanguages: [],
     });
   });
 
@@ -116,6 +119,21 @@ describe('toTranslationMap', () => {
     ]);
 
     expect(homeLanguages).toEqual([EN, DE]);
+  });
+
+  it('lists every language that has each list page', async () => {
+    const map = await buildMap([
+      { _id: 'page_postIndex', _type: 'page_postIndex', language: EN },
+      { _id: 'post-index-nl', _type: 'page_postIndex', language: NL },
+      { _id: 'page_topicIndex', _type: 'page_topicIndex' },
+      { _id: 'tag-index-de', _type: 'page_tagIndex', language: DE },
+    ]);
+
+    expect(map).toMatchObject({
+      postIndexLanguages: [EN, NL],
+      topicIndexLanguages: [EN],
+      tagIndexLanguages: [DE],
+    });
   });
 });
 

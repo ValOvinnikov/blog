@@ -9,8 +9,6 @@ const {
   getTagPaginationParamsMock,
   getIndexPageParamsMock,
   getPageSlugsMock,
-  getTopicIndexPageMock,
-  getTagIndexPageMock,
   getHostTenantSanityContextMock,
   resolveRequestTenantMock,
   selectLiveLocalesMock,
@@ -23,8 +21,6 @@ const {
   getTagPaginationParamsMock: vi.fn(),
   getIndexPageParamsMock: vi.fn(),
   getPageSlugsMock: vi.fn(),
-  getTopicIndexPageMock: vi.fn(),
-  getTagIndexPageMock: vi.fn(),
   getHostTenantSanityContextMock: vi.fn(),
   resolveRequestTenantMock: vi.fn(),
   selectLiveLocalesMock: vi.fn(),
@@ -76,13 +72,20 @@ vi.mock('@blog/service', async (importOriginal) => ({
       },
       blog: { v1: { getIndexPageParams: getIndexPageParamsMock } },
       landing: { v1: { getPageSlugs: getPageSlugsMock } },
-      topicIndex: { v1: { getIndexPage: getTopicIndexPageMock } },
-      tagIndex: { v1: { getIndexPage: getTagIndexPageMock } },
     },
   },
 }));
 
 let getTenantBaseUrlMock = vi.mocked(getTenantBaseUrl);
+
+const makeTranslationMap = (overrides = {}) => ({
+  groups: [],
+  homeLanguages: [],
+  postIndexLanguages: [routing.defaultLocale],
+  topicIndexLanguages: [routing.defaultLocale],
+  tagIndexLanguages: [routing.defaultLocale],
+  ...overrides,
+});
 
 const mockAllEmpty = () => {
   getPostParamsMock.mockResolvedValue({ ok: true, data: [] });
@@ -92,11 +95,9 @@ const mockAllEmpty = () => {
   getTagPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
   getIndexPageParamsMock.mockResolvedValue({ ok: true, data: [] });
   getPageSlugsMock.mockResolvedValue({ ok: true, data: [] });
-  getTopicIndexPageMock.mockResolvedValue({ ok: true, data: {} });
-  getTagIndexPageMock.mockResolvedValue({ ok: true, data: {} });
   getTranslationMapMock.mockResolvedValue({
     ok: true,
-    data: { groups: [], homeLanguages: [] },
+    data: makeTranslationMap(),
   });
 };
 
@@ -123,8 +124,6 @@ describe('sitemap', () => {
     getTagPaginationParamsMock.mockReset();
     getIndexPageParamsMock.mockReset();
     getPageSlugsMock.mockReset();
-    getTopicIndexPageMock.mockReset();
-    getTagIndexPageMock.mockReset();
     getHostTenantSanityContextMock.mockReset();
     resolveRequestTenantMock.mockReset();
     selectLiveLocalesMock.mockReset();
@@ -261,7 +260,7 @@ describe('sitemap', () => {
     });
     getTranslationMapMock.mockResolvedValue({
       ok: true,
-      data: aboutTranslations,
+      data: makeTranslationMap(aboutTranslations),
     });
   };
 
@@ -296,7 +295,7 @@ describe('sitemap', () => {
     selectLiveLocalesMock.mockReturnValue(['EN', 'NL']);
     getTranslationMapMock.mockResolvedValue({
       ok: true,
-      data: { groups: [], homeLanguages },
+      data: makeTranslationMap({ homeLanguages }),
     });
   };
 
@@ -331,6 +330,61 @@ describe('sitemap', () => {
     expect(entries).toContainEqual(
       expect.objectContaining({ url: 'https://example.com/' }),
     );
+  });
+
+  const mockListPages = (
+    postIndexLanguages: string[],
+    topicIndexLanguages: string[] = [],
+    tagIndexLanguages: string[] = [],
+  ) => {
+    mockHomes(['EN']);
+    getTranslationMapMock.mockResolvedValue({
+      ok: true,
+      data: makeTranslationMap({
+        homeLanguages: ['EN'],
+        postIndexLanguages,
+        topicIndexLanguages,
+        tagIndexLanguages,
+      }),
+    });
+  };
+
+  it('lists each live Blog list page with every live Blog list page as an alternate', async () => {
+    mockListPages(['EN', 'NL', 'DE']);
+    const sitemap = (await import('./sitemap')).default;
+
+    const entries = await sitemap();
+    const blogAlternates = {
+      en: 'https://example.com/blog',
+      nl: 'https://example.com/nl/blog',
+      'x-default': 'https://example.com/blog',
+    };
+
+    expect(entries).toContainEqual({
+      url: 'https://example.com/blog',
+      alternates: { languages: blogAlternates },
+    });
+    expect(entries).toContainEqual({
+      url: 'https://example.com/nl/blog',
+      alternates: { languages: blogAlternates },
+    });
+    expect(entries).not.toContainEqual(
+      expect.objectContaining({ url: 'https://example.com/de/blog' }),
+    );
+  });
+
+  it('lists only the languages that have each list page', async () => {
+    mockListPages(['EN'], ['NL'], []);
+    const sitemap = (await import('./sitemap')).default;
+
+    const urls = (await sitemap()).map(({ url }) => url);
+
+    expect(urls).toContain('https://example.com/blog');
+    expect(urls).not.toContain('https://example.com/nl/blog');
+    expect(urls).toContain('https://example.com/nl/topics');
+    expect(urls).not.toContain('https://example.com/topics');
+    expect(urls).not.toContain('https://example.com/tags');
+    expect(urls).not.toContain('https://example.com/nl/tags');
   });
 
   it('keeps an untranslated landing page entry as its own language alternate', async () => {
@@ -469,7 +523,6 @@ describe('sitemap', () => {
   });
 
   const FAILURE_RESULT = { ok: false, error: new Error('boom') } as const;
-  const EMPTY_DOCUMENT_RESULT = { ok: true, data: undefined } as const;
 
   it.each([
     {
@@ -485,34 +538,17 @@ describe('sitemap', () => {
       missingUrls: ['/tags/typescript/page/2'],
     },
     {
-      name: 'omits the /blog entry and numbered blog pages when the params fetch fails',
+      name: 'omits numbered blog pages when the params fetch fails',
       getMock: () => getIndexPageParamsMock,
       result: FAILURE_RESULT,
-      missingUrls: ['/blog/page/2', '/blog'],
+      missingUrls: ['/blog/page/2'],
+      presentUrls: ['/blog'],
     },
     {
-      name: 'omits the /topics entry when the topic index page fetch resolves to a failure result',
-      getMock: () => getTopicIndexPageMock,
+      name: 'omits the list pages when the translation map fetch fails',
+      getMock: () => getTranslationMapMock,
       result: FAILURE_RESULT,
-      missingUrls: ['/topics'],
-    },
-    {
-      name: 'omits the /topics entry when the topic index page fetch resolves ok with no document',
-      getMock: () => getTopicIndexPageMock,
-      result: EMPTY_DOCUMENT_RESULT,
-      missingUrls: ['/topics'],
-    },
-    {
-      name: 'omits the /tags entry when the tag index page fetch resolves to a failure result',
-      getMock: () => getTagIndexPageMock,
-      result: FAILURE_RESULT,
-      missingUrls: ['/tags'],
-    },
-    {
-      name: 'omits the /tags entry when the tag index page fetch resolves ok with no document',
-      getMock: () => getTagIndexPageMock,
-      result: EMPTY_DOCUMENT_RESULT,
-      missingUrls: ['/tags'],
+      missingUrls: ['/blog', '/topics', '/tags'],
     },
     {
       name: 'omits landing pages when the slugs fetch fails',
@@ -572,8 +608,6 @@ describe('sitemap', () => {
     await sitemap();
 
     expect(getPostParamsMock).toHaveBeenCalledWith(tenant);
-    expect(getTopicIndexPageMock).toHaveBeenCalledWith(tenant);
-    expect(getTagIndexPageMock).toHaveBeenCalledWith(tenant);
   });
 
   it('returns an empty sitemap without querying content when the host is unresolvable', async () => {

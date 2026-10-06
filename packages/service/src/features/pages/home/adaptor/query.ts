@@ -3,8 +3,8 @@ import { q } from '@blog/service/sanity/query/query';
 import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
 import { moduleFragment } from '@blog/service/shared/fragments/module/module';
 import { seoFragment } from '@blog/service/shared/fragments/seo/seo';
-import { homeLanguagesQuery } from '@blog/service/shared/localization/home-languages/home-languages';
 import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
+import { pageLanguagesQuery } from '@blog/service/shared/localization/page-languages/page-languages';
 import type { TRawModule } from '@blog/service/shared/transformers/module/to-module';
 
 export const homePageQuery = q
@@ -35,6 +35,6 @@ export const homePageQuery = q
       .as<TRawModule<TPageHomeType>[]>()
       .nullable(),
     seo: sub.field('seo').project(seoFragment).notNull(),
-    translations: homeLanguagesQuery,
+    translations: pageLanguagesQuery('page_home'),
   }))
   .nullable(true);

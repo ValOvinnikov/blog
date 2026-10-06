@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeRawTopicIndexPage } from '@blog/service/testing/pages/fixtures';
 import {
@@ -104,6 +105,22 @@ describe('getIndexPage', () => {
     const result = await getIndexPage(tenant);
 
     expect(result).toBeUndefined();
+  });
+
+  it('lists the page translations, counting a page with no language as the default', async () => {
+    mockRun.mockResolvedValueOnce(
+      makeRawTopicIndexPage({
+        translations: [{ language: null }, { language: LOCALE_ISO_CODES.NL }],
+      }),
+    );
+
+    const result = await getIndexPage(tenant);
+    if (!result) throw new Error('expected a topic index page');
+
+    expect(result.translations).toEqual([
+      LOCALE_ISO_CODES.EN,
+      LOCALE_ISO_CODES.NL,
+    ]);
   });
 
   it('threads tenant context into the query and scopes its tags to it', async () => {

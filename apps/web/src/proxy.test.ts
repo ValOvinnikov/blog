@@ -548,6 +548,9 @@ describe('proxy language detection', () => {
 
   const translationMap = {
     homeLanguages: [],
+    postIndexLanguages: [],
+    topicIndexLanguages: [],
+    tagIndexLanguages: [],
     groups: [
       [
         { documentType: 'page_landing', language: EN, slug: 'about' },

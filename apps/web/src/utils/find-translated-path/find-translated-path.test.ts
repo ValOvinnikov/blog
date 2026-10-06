@@ -7,6 +7,9 @@ const { EN, NL, FR, DE } = LOCALE_ISO_CODES;
 
 const translationMap: TTranslationMap = {
   homeLanguages: [EN, NL],
+  postIndexLanguages: [],
+  topicIndexLanguages: [],
+  tagIndexLanguages: [],
   groups: [
     [
       { documentType: 'page_landing', language: EN, slug: 'about' },

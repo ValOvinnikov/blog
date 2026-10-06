@@ -2,7 +2,7 @@ import { type TSeoResolved, urlForSanityImage } from '@blog/service';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import type { Metadata } from 'next';
 
-type TToMetadataOptions = {
+export type TToMetadataOptions = {
   canonical: string;
   ogType: 'website' | 'article';
   titleAbsolute?: boolean;

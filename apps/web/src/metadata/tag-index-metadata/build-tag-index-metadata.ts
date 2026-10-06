@@ -1,5 +1,5 @@
 import { routes } from '@blog/config';
-import { toMetadata } from '@web/metadata/to-metadata';
+import { toLocalizedPageMetadata } from '@web/metadata/to-localized-page-metadata';
 import { getTagIndexPage } from '@web/server/tag-index/get-tag-index-page/get-tag-index-page';
 import { logger } from '@web/utils/logger/logger';
 import type { Metadata } from 'next';
@@ -16,10 +16,11 @@ export const buildTagIndexMetadata = async (): Promise<Metadata> => {
     return {};
   }
 
-  const { seo } = result.data;
+  const { seo, translations } = result.data;
 
-  return toMetadata(seo, {
-    canonical: routes.tags(),
+  return toLocalizedPageMetadata(seo, {
+    href: routes.tags(),
+    translations,
     ogType: 'website',
   });
 };
