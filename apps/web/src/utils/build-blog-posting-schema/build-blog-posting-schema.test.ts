@@ -77,6 +77,7 @@ describe(buildBlogPostingSchema, () => {
       author: { '@type': 'Person', name: 'Jane Doe' },
       url: 'https://example.com/blog/hello-world',
       keywords: undefined,
+      inLanguage: 'en',
     });
   });
 
@@ -111,6 +112,17 @@ describe(buildBlogPostingSchema, () => {
     );
 
     expect(schema?.url).toBe('https://blog.example.com/nl/blog/mijn-artikel');
+  });
+
+  it('sets inLanguage to the language of a non-default post', () => {
+    const schema = buildBlogPostingSchema(
+      { ...post, slug: 'mijn-artikel' },
+      new URL('https://blog.example.com'),
+      project,
+      { locale: NL, defaultLocale: EN },
+    );
+
+    expect(schema?.inLanguage).toBe('nl');
   });
 
   it('returns undefined when there is no base URL, rather than emitting a relative (invalid) url', () => {

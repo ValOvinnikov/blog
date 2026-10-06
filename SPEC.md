@@ -1821,8 +1821,9 @@ else to that language's Home.
 language, and `<html lang>`; sitemap entries carry the same alternates. Each
 language has its own RSS feed (`/rss.xml` for the default language,
 `/<lang>/rss.xml` otherwise, same for tag feeds) carrying only that
-language's posts. `og:locale` / `og:locale:alternate` are emitted on Landing
-pages only, and JSON-LD carries no `inLanguage` yet.
+language's posts. Every page also emits `og:locale` for its language and
+`og:locale:alternate` for each live translation, and a post's BlogPosting
+JSON-LD carries `inLanguage`.
 
 **Engagement.** Bookmarks belong to the language version the reader saved;
 each translation is its own document.

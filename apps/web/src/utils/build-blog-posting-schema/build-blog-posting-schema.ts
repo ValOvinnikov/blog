@@ -1,4 +1,9 @@
-import { routes, type TLocaleIsoCode } from '@blog/config';
+import {
+  LOCALE_BCP47_TAGS,
+  routes,
+  type TLocaleBcp47Tag,
+  type TLocaleIsoCode,
+} from '@blog/config';
 import {
   type TPostDetail,
   type TSanityProjectRef,
@@ -17,6 +22,7 @@ export type TBlogPostingSchema = {
   author: { '@type': 'Person'; name: string };
   url: string;
   keywords: string | undefined;
+  inLanguage: TLocaleBcp47Tag;
 };
 
 type TBlogPostingLanguage = {
@@ -55,5 +61,6 @@ export const buildBlogPostingSchema = (
       post.tags.length > 0
         ? post.tags.map((tag) => tag.title).join(', ')
         : undefined,
+    inLanguage: LOCALE_BCP47_TAGS[locale],
   };
 };
