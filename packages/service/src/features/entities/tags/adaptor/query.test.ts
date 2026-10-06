@@ -15,8 +15,17 @@ describe('tagsQuery', () => {
     expect(() => tagsQuery.parse(raw)).not.toThrow();
   });
 
-  it('projects the tag description', () => {
-    expect(tagsQuery.query).toContain('description,');
+  it('reads the title and description in the requested language, falling back to the default language', () => {
+    expect(tagsQuery.query).toContain(
+      'coalesce(title[][language == $locale][0].value, title[][language == $defaultLocale][0].value)',
+    );
+    expect(tagsQuery.query).toContain(
+      'coalesce(description[][language == $locale][0].value, description[][language == $defaultLocale][0].value)',
+    );
+  });
+
+  it('orders tags by their title in the requested language', () => {
+    expect(tagsQuery.query).toMatch(/\} \| order\(title asc\)$/);
   });
 
   it('correlates the post count to the enclosing tag document', () => {

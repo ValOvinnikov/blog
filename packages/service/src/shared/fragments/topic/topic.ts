@@ -7,17 +7,21 @@ import {
   POST_COUNT_EXPRESSION,
   postCountParser,
 } from '@blog/service/shared/expressions/post/post-count';
+import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
+import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
 
-export const topicFragment = q
+const localeQ = q.parameters<TLocaleParams>();
+
+export const topicFragment = localeQ
   .fragmentForType<'blog_topic'>()
   .project((sub) => ({
     _id: true,
-    title: sub.field('title').notNull(),
+    title: getLocalizedField(sub, 'title').notNull(),
     slug: sub.raw(TOPIC_ARCHIVE_PAGE_SLUG_EXPRESSION, archivePageSlugParser),
-    description: sub.field('description').nullable(true),
+    description: getLocalizedField(sub, 'description'),
   }));
 
-export const topicWithPostCountFragment = q
+export const topicWithPostCountFragment = localeQ
   .fragmentForType<'blog_topic'>()
   .project((sub) => ({
     ...topicFragment,

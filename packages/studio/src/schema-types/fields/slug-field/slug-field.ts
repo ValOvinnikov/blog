@@ -5,6 +5,7 @@ import {
   type SlugIsUniqueValidator,
   type SlugInputProps,
   type SlugRule,
+  type SlugSourceFn,
   type SlugValue,
 } from 'sanity';
 
@@ -13,6 +14,7 @@ type TSlugFieldOptions = {
   previewInput?: ComponentType<SlugInputProps>;
   validateSlug?: CustomValidator<SlugValue | undefined>;
   isUnique?: SlugIsUniqueValidator;
+  source?: string | SlugSourceFn;
 };
 
 export const slugField = ({
@@ -20,6 +22,7 @@ export const slugField = ({
   previewInput,
   validateSlug,
   isUnique,
+  source = 'title',
 }: TSlugFieldOptions) =>
   defineField({
     name: 'slug',
@@ -27,7 +30,7 @@ export const slugField = ({
     type: 'slug',
     description,
     options: {
-      source: 'title',
+      source,
       maxLength: 96,
       ...(isUnique ? { isUnique } : {}),
     },

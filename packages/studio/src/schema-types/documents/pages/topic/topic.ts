@@ -13,6 +13,7 @@ import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
+import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
 import { validateUniqueTaxonomyReference } from '@blog/studio/schema-types/validation/validate-unique-taxonomy-reference/validate-unique-taxonomy-reference';
 import { Tags } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
@@ -72,9 +73,11 @@ export const topicPageSchema = defineType({
       topicTitle: 'topic.title',
     },
     prepare({ title, topicTitle }) {
+      const topicName = defaultLanguageValue(topicTitle);
+
       return {
         title: title ?? 'Unknown',
-        subtitle: topicTitle ? `Topic: ${String(topicTitle)}` : undefined,
+        subtitle: topicName ? `Topic: ${topicName}` : undefined,
       };
     },
   },
