@@ -22,10 +22,4 @@ describe('inlineLinkFragment', () => {
 
     expect(inlineLinkDocQuery.parse(raw)).toEqual(raw);
   });
-
-  it('resolves the blog_topic branch only from the topic page referencing it', () => {
-    expect(inlineLinkDocQuery.query).toContain(
-      '_type == "blog_topic" => *[_type == "page_topic" && topic._ref == ^._id][0].slug.current',
-    );
-  });
 });

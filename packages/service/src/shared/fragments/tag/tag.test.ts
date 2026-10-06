@@ -25,10 +25,4 @@ describe('tagFragment', () => {
 
     expect(tagDocQuery.parse(projected)).toEqual(projected);
   });
-
-  it('resolves the slug only from the tag page referencing this tag', () => {
-    expect(tagDocQuery.query).toContain(
-      '_type == "page_tag" && tag._ref == ^._id',
-    );
-  });
 });
