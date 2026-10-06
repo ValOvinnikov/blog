@@ -22,6 +22,13 @@ const pages = [
   { _id: 'about-en', _type: 'page_landing', slug: { current: 'about' } },
   { _id: 'about-nl', _type: 'page_landing', slug: { current: 'over-ons' } },
   { _id: 'contact-en', _type: 'page_landing', slug: { current: 'contact' } },
+  { _id: 'modules-en', _type: 'page_landing', slug: { current: 'modules' } },
+  {
+    _id: 'faq-en',
+    _type: 'page_landing',
+    slug: { current: 'faq' },
+    parent: reference('modules-en'),
+  },
   {
     _id: 'meta-about',
     _type: 'translation.metadata',
@@ -95,6 +102,21 @@ describe('linkDocumentFragment', () => {
 
     expect(result).toMatchObject({
       internalReference: { _type: 'page_landing', slug: 'contact' },
+    });
+  });
+
+  it('resolves a nested landing page to its full path', async () => {
+    const result = await resolveLink(
+      {
+        linkType: LINK_TYPE.INTERNAL,
+        label: localizedStrings({ [EN]: 'FAQ' }),
+        internalReference: reference('faq-en'),
+      },
+      EN,
+    );
+
+    expect(result).toMatchObject({
+      internalReference: { _type: 'page_landing', slug: 'modules/faq' },
     });
   });
 

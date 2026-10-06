@@ -20,7 +20,7 @@ export function toLandingPage(
   faqs: TFaqPageQuestion[],
 ): TLandingPage {
   return {
-    slug: raw.slug,
+    path: raw.path,
     headingBlock: toHeadingBlock(raw.headingBlock),
     hero: toHeroSlot(raw.hero),
     modules: (raw.modules ?? []).map(toModule),

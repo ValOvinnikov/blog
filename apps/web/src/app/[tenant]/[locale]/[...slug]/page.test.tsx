@@ -13,8 +13,8 @@ vi.mock('@web/metadata/landing-page-metadata', () => ({
 }));
 
 vi.mock('@web/components/pages/landing-page', () => ({
-  LandingPage: ({ slug }: { slug: string }) => (
-    <div data-testid="landing-page">{slug}</div>
+  LandingPage: ({ path }: { path: string }) => (
+    <div data-testid="landing-page">{path}</div>
   ),
 }));
 
@@ -27,7 +27,7 @@ describe('LandingSlugPage', () => {
     const params = Promise.resolve({
       tenant: 'tenant-1',
       locale: LOCALE_ISO_CODES.EN,
-      slug: 'a-slug',
+      slug: ['a-slug'],
     });
 
     await LandingSlugPage({ params });
@@ -41,7 +41,7 @@ describe('LandingSlugPage', () => {
         params: Promise.resolve({
           tenant: 'tenant-1',
           locale: 'EN',
-          slug: 'about-us',
+          slug: ['about-us'],
         }),
       });
 
@@ -53,7 +53,7 @@ describe('LandingSlugPage', () => {
         Promise.resolve({
           tenant: 'tenant-1',
           locale: 'EN',
-          slug: 'about-us',
+          slug: ['about-us'],
         });
 
       await generateMetadata({ params });
@@ -62,15 +62,27 @@ describe('LandingSlugPage', () => {
     });
   });
 
+  it('renders LandingPage with the joined path of a nested page', async () => {
+    const ui = await LandingSlugPage({
+      params: Promise.resolve({
+        tenant: 'tenant-1',
+        locale: 'EN',
+        slug: ['modules', 'faq'],
+      }),
+    });
+
+    expect(ui.props).toEqual({ path: 'modules/faq' });
+  });
+
   it('renders LandingPage with the resolved slug', async () => {
     const ui = await LandingSlugPage({
       params: Promise.resolve({
         tenant: 'tenant-1',
         locale: 'EN',
-        slug: 'about-us',
+        slug: ['about-us'],
       }),
     });
 
-    expect(ui.props).toEqual({ slug: 'about-us' });
+    expect(ui.props).toEqual({ path: 'about-us' });
   });
 });

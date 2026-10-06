@@ -1,4 +1,8 @@
 import { q } from '@blog/service/sanity/query/query';
+import {
+  PAGE_PATH_EXPRESSION,
+  pagePathParser,
+} from '@blog/service/shared/expressions/landing-page/landing-page-path';
 import { pageLanguagesQuery } from '@blog/service/shared/localization/page-languages/page-languages';
 
 export const translationMapQuery = q.project((root) => ({
@@ -12,7 +16,7 @@ export const translationMapQuery = q.project((root) => ({
       .project((target) => ({
         documentType: target.field('_type'),
         language: target.field('language').nullable(true),
-        slug: target.field('slug.current').nullable(true),
+        slug: target.raw(PAGE_PATH_EXPRESSION, pagePathParser),
       }))
       .nullable(true),
   })),

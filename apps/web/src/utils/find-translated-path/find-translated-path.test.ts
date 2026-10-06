@@ -17,6 +17,10 @@ const translationMap: TTranslationMap = {
       { documentType: 'page_landing', language: DE, slug: 'über-uns' },
     ],
     [
+      { documentType: 'page_landing', language: EN, slug: 'modules/faq' },
+      { documentType: 'page_landing', language: NL, slug: 'modules/vragen' },
+    ],
+    [
       { documentType: 'page_topic', language: EN, slug: 'design' },
       { documentType: 'page_topic', language: NL, slug: 'ontwerp' },
     ],
@@ -51,6 +55,11 @@ describe(findTranslatedPath, () => {
 
   it('finds a translation through an encoded slug', () => {
     expect(find('/%C3%BCber-uns', DE, NL)).toBe('/nl/over-ons');
+  });
+
+  it("finds a nested page's translation under its full path", () => {
+    expect(find('/modules/faq')).toBe('/nl/modules/vragen');
+    expect(find('/modules/vragen', NL, EN)).toBe('/modules/faq');
   });
 
   it('is undefined when the page has no translation in that language', () => {

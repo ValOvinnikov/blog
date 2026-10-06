@@ -58,4 +58,29 @@ describe('inlineLinkFragment', () => {
       internalReference: { slug: null },
     });
   });
+
+  it('links a nested landing page to its full path', async () => {
+    const dataset = [
+      {
+        _id: 'link-1',
+        _type: 'inlineLink',
+        label: 'FAQ',
+        linkType: LINK_TYPE.INTERNAL,
+        internalReference: { _type: 'reference', _ref: 'faq' },
+      },
+      { _id: 'modules', _type: 'page_landing', slug: { current: 'modules' } },
+      {
+        _id: 'faq',
+        _type: 'page_landing',
+        slug: { current: 'faq' },
+        parent: { _type: 'reference', _ref: 'modules' },
+      },
+    ];
+
+    expect(
+      await evaluateGroqExpression(inlineLinkDocQuery.query, dataset, null, {
+        locale: EN,
+      }),
+    ).toMatchObject({ internalReference: { slug: 'modules/faq' } });
+  });
 });

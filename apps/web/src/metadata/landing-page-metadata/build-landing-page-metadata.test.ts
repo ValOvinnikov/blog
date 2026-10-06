@@ -52,6 +52,27 @@ describe('buildLandingPageMetadata', () => {
     expect(metadata.alternates).toEqual({ canonical: '/about-us' });
   });
 
+  it('uses the full path of a nested page for its canonical and hreflang', async () => {
+    getLandingPageMock.mockResolvedValue({
+      ok: true,
+      data: {
+        ...mockLandingPage,
+        path: 'modules/faq',
+        translations: [
+          { language: EN, slug: 'modules/faq' },
+          { language: NL, slug: 'modules/vragen' },
+        ],
+      },
+    });
+
+    const metadata = await buildLandingPageMetadata('modules/faq');
+
+    expect(metadata.alternates?.canonical).toBe('/modules/faq');
+    expect(metadata.alternates?.languages).toMatchObject({
+      nl: '/nl/modules/vragen',
+    });
+  });
+
   it('leaves a non-live translation out of the hreflang list', async () => {
     getLandingPageMock.mockResolvedValue({
       ok: true,
@@ -198,7 +219,7 @@ describe('buildLandingPageMetadata', () => {
     });
   });
 
-  it('forwards the slug to getLandingPage, the loader LandingPage reads', async () => {
+  it('forwards the path to getLandingPage, the loader LandingPage reads', async () => {
     getLandingPageMock.mockResolvedValue({ ok: true, data: mockLandingPage });
 
     await buildLandingPageMetadata('about-us');
@@ -206,7 +227,7 @@ describe('buildLandingPageMetadata', () => {
     expect(getLandingPageMock).toHaveBeenCalledWith('about-us');
   });
 
-  it('maps the resolved seo straight through toMetadata, self-canonical to /[slug]', async () => {
+  it('maps the resolved seo straight through toMetadata, self-canonical to its path', async () => {
     getLandingPageMock.mockResolvedValue({ ok: true, data: mockLandingPage });
 
     const metadata = await buildLandingPageMetadata('about-us');

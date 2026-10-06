@@ -6,19 +6,19 @@ import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 
 import { LandingModuleRenderer } from './landing-module-renderer';
 
-type TLandingPageProps = { slug: string };
+type TLandingPageProps = { path: string };
 
-export const LandingPage = async ({ slug }: TLandingPageProps) => {
-  const result = await getLandingPage(slug);
+export const LandingPage = async ({ path }: TLandingPageProps) => {
+  const result = await getLandingPage(path);
   const page = guardPageLoaderResult(result, 'landing_page.fetch_failed', {
-    slug,
+    path,
   });
   const { headingBlock, hero, modules, faqs } = page;
 
   return (
     <PageShell>
       <PageShell.Breadcrumbs>
-        <LandingBreadcrumbs slug={slug} />
+        <LandingBreadcrumbs path={path} />
       </PageShell.Breadcrumbs>
       <FaqPageSchema faqs={faqs} />
       <LandingModuleRenderer

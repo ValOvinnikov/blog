@@ -101,4 +101,38 @@ describe('landingPageParamsQuery', () => {
       { slug: 'over-ons', language: NL },
     ]);
   });
+
+  it('returns nested pages by their full path and drops a page whose parent is missing', async () => {
+    const nested = [
+      {
+        _id: 'modules',
+        _type: 'page_landing',
+        slug: { current: 'modules' },
+        language: EN,
+      },
+      {
+        _id: 'faq',
+        _type: 'page_landing',
+        slug: { current: 'faq' },
+        language: EN,
+        parent: { _type: 'reference', _ref: 'modules' },
+      },
+      {
+        _id: 'orphan',
+        _type: 'page_landing',
+        slug: { current: 'orphan' },
+        language: EN,
+        parent: { _type: 'reference', _ref: 'deleted' },
+      },
+    ];
+
+    expect(
+      await evaluateGroqExpression(landingPageParamsQuery.query, nested, null, {
+        liveLocales: [EN],
+      }),
+    ).toEqual([
+      { slug: 'modules', language: EN },
+      { slug: 'modules/faq', language: EN },
+    ]);
+  });
 });

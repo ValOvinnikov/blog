@@ -11,11 +11,14 @@ import { toLandingPage } from './transformer';
 import type { TLandingPage } from './types';
 
 export async function getPage(
-  slug: string,
+  segments: string[],
   tenant: TTenantSanityContext,
 ): Promise<TMaybeUndefined<TLandingPage>> {
+  const slug = segments.at(-1);
+  if (!slug) return undefined;
+
   const raw = await runQuery(landingPageQuery, {
-    parameters: { slug },
+    parameters: { slug, path: segments.join('/') },
     tenant,
     ...isr(['page_landing', 'template_landing'], tenant.projectId),
   });

@@ -10,13 +10,13 @@ import { withLanguageAlternates } from '@web/utils/with-language-alternates';
 import type { Metadata } from 'next';
 
 export const buildLandingPageMetadata = async (
-  slug: string,
+  path: string,
 ): Promise<Metadata> => {
-  const result = await getLandingPage(slug);
+  const result = await getLandingPage(path);
 
   if (!result.ok) {
     logger.error('landing_page_metadata.fetch_failed', {
-      slug,
+      path,
       error: result.error,
     });
     return {};
@@ -33,7 +33,7 @@ export const buildLandingPageMetadata = async (
     liveLocales = [locale],
   } = await getRequestContext();
   const canonical = toLocalizedPathname({
-    href: routes.landingPage(slug),
+    href: routes.landingPage(path),
     locale,
     defaultLocale,
   });
@@ -59,9 +59,9 @@ export const buildLandingPageMetadata = async (
       },
     },
     {
-      pages: translations.map(({ language, slug: translatedSlug }) => ({
+      pages: translations.map(({ language, slug: translatedPath }) => ({
         language,
-        href: routes.landingPage(translatedSlug),
+        href: routes.landingPage(translatedPath),
       })),
       locale,
       liveLocales,

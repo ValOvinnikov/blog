@@ -15,13 +15,13 @@ describe(getLandingPage, () => {
     getPageMock.mockReset();
   });
 
-  it('forwards the slug and the resolved tenant context to the landing page service', async () => {
+  it('forwards the path segments and the resolved tenant context to the landing page service', async () => {
     getPageMock.mockResolvedValue({ ok: true, data: undefined });
 
-    await getLandingPage('about-us');
+    await getLandingPage('modules/faq');
 
     expect(getPageMock).toHaveBeenCalledWith(
-      'about-us',
+      ['modules', 'faq'],
       DEFAULT_TENANT_SANITY_CONTEXT,
     );
   });

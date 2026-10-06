@@ -24,7 +24,7 @@ vi.mock('@web/server/landing/get-landing-page/get-landing-page', () => ({
 }));
 
 const setup = customRenderAsync(LandingBreadcrumbs, {
-  slug: 'about-us',
+  path: 'about-us',
 });
 
 describe(`<${LandingBreadcrumbs.name}/>`, () => {
@@ -60,7 +60,7 @@ describe(`<${LandingBreadcrumbs.name}/>`, () => {
     pageLoaderMock: getLandingPageMock,
     setup,
     successData: mockLandingPage,
-    description: 'forwards the slug to getLandingPage',
+    description: 'forwards the path to getLandingPage',
     expectedArgs: ['about-us'],
   });
 });
