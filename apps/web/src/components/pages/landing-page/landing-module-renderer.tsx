@@ -5,6 +5,7 @@ import type {
 } from '@blog/config';
 import type { TModule } from '@blog/service';
 import { PageHeading } from '@web/components/shared/page-heading';
+import { ChildPagesModule } from '@web/modules/child-pages/child-pages-module';
 import { ContentModule } from '@web/modules/content/content-module';
 import { CtaModule } from '@web/modules/cta/cta-module';
 import { FaqModule } from '@web/modules/faq/faq-module';
@@ -49,18 +50,21 @@ const LANDING_MAP: Partial<Record<TPageLandingType, TModuleComponent>> = {
   module_team: TeamModule,
   module_pricing: PricingModule,
   module_timeline: TimelineModule,
+  module_childPages: ChildPagesModule,
 };
 
 export interface ILandingModuleRendererProps {
   hero: TMaybeUndefined<TModule<TPageLandingType>>;
   headingBlock: THeadingBlock;
   modules: TModule<TPageLandingType>[];
+  landingPage: { id: string; path: string };
 }
 
 export const LandingModuleRenderer = async ({
   hero,
   headingBlock,
   modules,
+  landingPage,
 }: ILandingModuleRendererProps): Promise<ReactNode> => {
   const heroNode = hero
     ? await renderHeroModule({ hero, map: LANDING_MAP })
@@ -69,7 +73,7 @@ export const LandingModuleRenderer = async ({
   return (
     <>
       {heroNode ?? <PageHeading headingBlock={headingBlock} />}
-      {renderModules({ modules, map: LANDING_MAP })}
+      {renderModules({ modules, map: LANDING_MAP, context: { landingPage } })}
     </>
   );
 };

@@ -14,6 +14,7 @@ import { stretchedLinkVariants } from '@web/components/shared/stretched-link';
 import {
   CIRCLE_IMAGE_SIZE,
   SQUARE_IMAGE_SIZE,
+  WIDE_IMAGE_HEIGHT,
 } from '@web/utils/media-card-image-size';
 
 import { featureListCardVariants } from './feature-list-card-variants';
@@ -26,8 +27,6 @@ const CARD_IMAGE_SHAPE_TO_MEDIA_SHAPE: Record<
   [CARD_IMAGE_SHAPE.SQUARE]: 'square',
   [CARD_IMAGE_SHAPE.CIRCLE]: 'circle',
 };
-
-const WIDE_IMAGE_HEIGHT = 360;
 
 export interface IFeatureListCardProps extends IWithDataTestId {
   item: TFeatureListItem;
