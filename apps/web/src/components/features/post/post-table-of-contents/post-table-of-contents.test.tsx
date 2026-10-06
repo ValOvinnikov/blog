@@ -16,72 +16,70 @@ vi.mock('@web/hooks/use-active-heading-id', () => ({
 const setup = customRender(PostTableOfContents, { headings: mockPostHeadings });
 
 describe(`<${PostTableOfContents.name}/>`, () => {
-  beforeEach(() => {
-    useActiveHeadingIdMock.mockReturnValue(null);
-  });
+  describe('before any heading is active', () => {
+    beforeEach(() => {
+      useActiveHeadingIdMock.mockReturnValue(null);
+      setup();
+    });
 
-  it('renders a "Topics" nav landmark', () => {
-    setup();
+    it('renders a "Topics" nav landmark', () => {
+      expect(screen.getByRole('navigation', { name: 'Topics' })).toBeVisible();
+    });
 
-    expect(screen.getByRole('navigation', { name: 'Topics' })).toBeVisible();
-  });
+    it('renders every heading as a link to its anchor', () => {
+      mockPostHeadings.forEach((heading) => {
+        expect(
+          screen.getByRole('link', { name: heading.text }),
+        ).toHaveAttribute('href', `#${heading.key}`);
+      });
+    });
 
-  it('renders every heading as a link to its anchor', () => {
-    setup();
+    it('shows the mobile selector defaulting to the first heading', () => {
+      expect(
+        screen.getByRole('button', { name: 'Topics Getting started' }),
+      ).toBeVisible();
+    });
 
-    mockPostHeadings.forEach((heading) => {
-      expect(screen.getByRole('link', { name: heading.text })).toHaveAttribute(
-        'href',
-        `#${heading.key}`,
-      );
+    it('marks the first heading as the current location', () => {
+      expect(
+        screen.getByRole('link', { name: 'Getting started' }),
+      ).toHaveAttribute('aria-current', 'location');
+      mockPostHeadings.slice(1).forEach((heading) => {
+        expect(
+          screen.getByRole('link', { name: heading.text }),
+        ).not.toHaveAttribute('aria-current');
+      });
+    });
+
+    it('passes the heading ids to useActiveHeadingId in document order', () => {
+      expect(useActiveHeadingIdMock).toHaveBeenCalledWith([
+        'getting-started',
+        'prerequisites',
+        'configuration',
+        'deployment',
+      ]);
     });
   });
 
-  it('shows the mobile selector defaulting to the first heading before any scroll', () => {
-    setup();
+  describe('once useActiveHeadingId reports a heading', () => {
+    beforeEach(() => {
+      useActiveHeadingIdMock.mockReturnValue('configuration');
+      setup();
+    });
 
-    expect(
-      screen.getByRole('button', { name: 'Topics Getting started' }),
-    ).toBeVisible();
-  });
-
-  it('marks the first heading as the current location when no heading is active yet', () => {
-    setup();
-
-    expect(
-      screen.getByRole('link', { name: 'Getting started' }),
-    ).toHaveAttribute('aria-current', 'location');
-    mockPostHeadings.slice(1).forEach((heading) => {
+    it('marks that heading as the current location, and no other', () => {
       expect(
-        screen.getByRole('link', { name: heading.text }),
+        screen.getByRole('link', { name: 'Configuration' }),
+      ).toHaveAttribute('aria-current', 'location');
+      expect(
+        screen.getByRole('link', { name: 'Getting started' }),
       ).not.toHaveAttribute('aria-current');
     });
-  });
 
-  it('marks the heading reported by useActiveHeadingId as the current location', () => {
-    useActiveHeadingIdMock.mockReturnValue('configuration');
-    setup();
-
-    expect(screen.getByRole('link', { name: 'Configuration' })).toHaveAttribute(
-      'aria-current',
-      'location',
-    );
-    expect(
-      screen.getByRole('button', { name: 'Topics Configuration' }),
-    ).toBeVisible();
-    expect(
-      screen.getByRole('link', { name: 'Getting started' }),
-    ).not.toHaveAttribute('aria-current');
-  });
-
-  it('passes the heading ids to useActiveHeadingId in document order', () => {
-    setup();
-
-    expect(useActiveHeadingIdMock).toHaveBeenCalledWith([
-      'getting-started',
-      'prerequisites',
-      'configuration',
-      'deployment',
-    ]);
+    it('shows that heading in the mobile selector', () => {
+      expect(
+        screen.getByRole('button', { name: 'Topics Configuration' }),
+      ).toBeVisible();
+    });
   });
 });
