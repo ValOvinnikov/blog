@@ -16,6 +16,7 @@ import {
   type TLocalizationNoticeOptions,
 } from '@blog/studio/schema-types/inputs/localization-notice-input/localization-notice-input';
 import { LOCALE_LABEL } from '@blog/studio/schema-types/inputs/localization-notice-input/missing-locales';
+import { createSingleLanguageInput } from '@blog/studio/schema-types/inputs/single-language-input/single-language-input';
 import {
   createTranslationLinkInput,
   type TTranslationLinkOptions,
@@ -75,6 +76,18 @@ const languageSwitcherVisibility = definePlugin<{
   },
 }));
 
+const singleLanguageFields = definePlugin<{
+  liveLocales: readonly TLocaleIsoCode[];
+  defaultLocale: TLocaleIsoCode;
+}>(({ liveLocales, defaultLocale }) => ({
+  name: 'single-language-fields',
+  form: {
+    components: {
+      input: createSingleLanguageInput(liveLocales, defaultLocale),
+    },
+  },
+}));
+
 // Directive-free: both the Sanity CLI and the `'use client'` mount call it.
 export const buildStudioConfig = ({
   projectId,
@@ -130,6 +143,7 @@ export const buildStudioConfig = ({
         ? [
             localizationNotices({ liveLocales, defaultLocale }),
             languageSwitcherVisibility({ liveLocales }),
+            singleLanguageFields({ liveLocales, defaultLocale }),
           ]
         : []),
     ],
