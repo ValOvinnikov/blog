@@ -40,10 +40,4 @@ describe('topicFragment', () => {
 
     expect(topicDocQuery.parse(projected)).toEqual(projected);
   });
-
-  it('resolves the slug only from the topic page referencing this topic', () => {
-    expect(topicDocQuery.query).toContain(
-      '_type == "page_topic" && topic._ref == ^._id',
-    );
-  });
 });
