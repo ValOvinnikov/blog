@@ -24,24 +24,25 @@ describe(getChildPagesModule, () => {
 
     const module = await getChildPagesModule(
       'child-pages-1',
+      'page-modules',
       'modules',
       tenant,
     );
 
     expect(module.pages.map((page) => page.path)).toEqual(['modules/faq']);
-    expect(mockRun).toHaveBeenNthCalledWith(
-      2,
-      expect.anything(),
-      expect.objectContaining({ parameters: { parentPath: 'modules' } }),
-    );
   });
 
-  it('scopes cache tags to the tenant, purging on module and Landing page changes', async () => {
+  it('scopes the module cache tags to the tenant', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawChildPagesModule())
       .mockResolvedValueOnce([]);
 
-    await getChildPagesModule('child-pages-1', 'modules', tenant);
+    await getChildPagesModule(
+      'child-pages-1',
+      'page-modules',
+      'modules',
+      tenant,
+    );
 
     expect(mockRun).toHaveBeenNthCalledWith(
       1,
@@ -56,14 +57,6 @@ describe(getChildPagesModule, () => {
         }),
       }),
     );
-    expect(mockRun).toHaveBeenNthCalledWith(
-      2,
-      expect.anything(),
-      expect.objectContaining({
-        tenant,
-        next: expect.objectContaining({ tags: ['t:tenant-a:page_landing'] }),
-      }),
-    );
   });
 
   it('propagates when the module document is missing', async () => {
@@ -72,7 +65,7 @@ describe(getChildPagesModule, () => {
       .mockResolvedValueOnce([]);
 
     await expect(
-      getChildPagesModule('missing', 'modules', tenant),
+      getChildPagesModule('missing', 'page-modules', 'modules', tenant),
     ).rejects.toThrow();
   });
 });

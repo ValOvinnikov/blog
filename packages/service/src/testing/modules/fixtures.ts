@@ -18,10 +18,8 @@ import {
   TIMELINE_MARKER_STYLE,
   TIMELINE_ORIENTATION,
 } from '@blog/config';
-import type {
-  TRawChildPages,
-  TRawChildPagesModule,
-} from '@blog/service/features/modules/child-pages/adaptor/transformer';
+import type { TRawChildPagesModule } from '@blog/service/features/modules/child-pages/adaptor/module/transformer';
+import type { TRawChildPages } from '@blog/service/features/modules/child-pages/adaptor/pages/transformer';
 import type { TRawContentModule } from '@blog/service/features/modules/content/adaptor/transformer';
 import type { TRawCtaModule } from '@blog/service/features/modules/cta/adaptor/transformer';
 import type { TRawFaqModule } from '@blog/service/features/modules/faq/adaptor/transformer';
@@ -232,7 +230,7 @@ export function makeRawChildPage(
 ): TRawChildPages[number] {
   return {
     _id: 'page-faq',
-    path: 'modules/faq',
+    slug: 'faq',
     headingBlock: makeRawHeadingBlock('FAQ', {
       supportingText: 'Answers to common questions.',
     }),
