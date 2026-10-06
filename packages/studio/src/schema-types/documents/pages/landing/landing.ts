@@ -13,7 +13,7 @@ import { headingBlockField } from '@blog/studio/schema-types/objects/heading-blo
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
 import { languagePreview } from '@blog/studio/schema-types/preview/language-preview/language-preview';
 import { validateLandingParent } from '@blog/studio/schema-types/validation/validate-landing-parent/validate-landing-parent';
-import { validateSlugUniqueInLanguage } from '@blog/studio/schema-types/validation/validate-slug-unique-in-language/validate-slug-unique-in-language';
+import { validateLandingSlugUniqueAmongSiblings } from '@blog/studio/schema-types/validation/validate-landing-slug-unique-among-siblings/validate-landing-slug-unique-among-siblings';
 import { FileText } from 'lucide-react';
 import {
   defineField,
@@ -61,7 +61,7 @@ export const landingPageSchema = defineType({
       description:
         'The last part of the URL — auto-generated from title. To nest this page, choose a parent page instead.',
       previewInput: LandingSlugUrlPreviewInput,
-      isUnique: validateSlugUniqueInLanguage,
+      isUnique: validateLandingSlugUniqueAmongSiblings,
       validateSlug: (value) => {
         const current = value?.current;
 
