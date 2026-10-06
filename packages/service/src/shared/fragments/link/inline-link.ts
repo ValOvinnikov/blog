@@ -1,12 +1,9 @@
 import { q } from '@blog/service/sanity/query/query';
 import {
-  TOPIC_ARCHIVE_PAGE_SLUG_EXPRESSION,
-  archivePageSlugParser,
-} from '@blog/service/shared/expressions/archive-page/archive-page-slug';
-import {
   LANDING_PAGE_PATH_EXPRESSION,
   pagePathParser,
 } from '@blog/service/shared/expressions/landing-page/landing-page-path';
+import { topicArchivePageSlugFragment } from '@blog/service/shared/fragments/archive-page/archive-page-slug';
 
 export const inlineLinkFragment = q
   .fragmentForType<'inlineLink'>()
@@ -24,8 +21,7 @@ export const inlineLinkFragment = q
         // for it.
         slug: ref.selectByType({
           page_post: (s) => s.field('slug.current').notNull(),
-          blog_topic: (s) =>
-            s.raw(TOPIC_ARCHIVE_PAGE_SLUG_EXPRESSION, archivePageSlugParser),
+          blog_topic: () => topicArchivePageSlugFragment,
           page_landing: (s) =>
             s.raw(LANDING_PAGE_PATH_EXPRESSION, pagePathParser),
         }),
