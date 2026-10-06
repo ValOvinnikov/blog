@@ -230,3 +230,81 @@ describe('landingPageQuery nested paths', () => {
     expect(await run(['pricing'])).toMatchObject({ path: 'pricing' });
   });
 });
+
+describe('landingPageQuery section chain', () => {
+  const { EN, NL } = LOCALE_ISO_CODES;
+
+  function landing(
+    id: string,
+    {
+      parent,
+      orderRank,
+      sectionNavigation,
+      language = EN,
+    }: {
+      parent?: string;
+      orderRank?: string;
+      sectionNavigation?: boolean;
+      language?: string;
+    } = {},
+  ) {
+    return {
+      _id: id,
+      _type: 'page_landing',
+      slug: { current: id },
+      language,
+      headingBlock: { heading: `${id} heading` },
+      ...(orderRank ? { orderRank } : {}),
+      ...(sectionNavigation === undefined ? {} : { sectionNavigation }),
+      ...(parent ? { parent: { _type: 'reference', _ref: parent } } : {}),
+    };
+  }
+
+  const dataset = [
+    landing('modules', { sectionNavigation: true }),
+    landing('pricing', { parent: 'modules', orderRank: '0|b' }),
+    landing('faq', { parent: 'modules', orderRank: '0|a' }),
+    landing('prijzen', { parent: 'modules', orderRank: '0|0', language: NL }),
+    landing('answers', { parent: 'faq' }),
+  ];
+
+  function run(segments: string[]): Promise<unknown> {
+    return evaluateGroqExpression(landingPageQuery.query, dataset, null, {
+      slug: segments.at(-1),
+      path: segments.join('/'),
+      locale: EN,
+      defaultLocale: EN,
+    });
+  }
+
+  it('returns the page and its ancestors, nearest first', async () => {
+    expect(await run(['modules', 'faq', 'answers'])).toMatchObject({
+      sectionChain: [
+        { _id: 'answers', path: 'modules/faq/answers' },
+        { _id: 'faq', path: 'modules/faq' },
+        { _id: 'modules', path: 'modules' },
+      ],
+    });
+  });
+
+  it("returns a section root's children in drag order, in the page's language", async () => {
+    expect(await run(['modules', 'faq'])).toMatchObject({
+      sectionChain: [
+        { _id: 'faq', sectionNavigation: false, children: null },
+        {
+          _id: 'modules',
+          title: 'modules heading',
+          sectionNavigation: true,
+          children: [
+            { _id: 'faq', title: 'faq heading', path: 'modules/faq' },
+            {
+              _id: 'pricing',
+              title: 'pricing heading',
+              path: 'modules/pricing',
+            },
+          ],
+        },
+      ],
+    });
+  });
+});

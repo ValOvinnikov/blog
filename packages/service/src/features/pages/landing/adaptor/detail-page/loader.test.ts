@@ -162,4 +162,136 @@ describe('getPage', () => {
       }),
     );
   });
+  describe('section navigation', () => {
+    const faq = { _id: 'faq', title: 'FAQ', path: 'modules/faq' };
+    const pricing = {
+      _id: 'pricing',
+      title: 'Pricing',
+      path: 'modules/pricing',
+    };
+    const answers = {
+      _id: 'answers',
+      title: 'Answers',
+      path: 'modules/faq/answers',
+    };
+    const glossary = {
+      _id: 'glossary',
+      title: 'Glossary',
+      path: 'modules/faq/glossary',
+    };
+
+    type TSectionPage = {
+      _id: string;
+      title: string | null;
+      path: string | null;
+    };
+
+    function chainNode(
+      page: TSectionPage,
+      children: TSectionPage[] | null = null,
+    ) {
+      return { ...page, sectionNavigation: children !== null, children };
+    }
+
+    const modulesSection = chainNode(
+      { _id: 'modules', title: 'Modules', path: 'modules' },
+      [faq, pricing],
+    );
+
+    async function navigationFor(
+      overrides: Parameters<typeof makeRawLandingPage>[0],
+    ) {
+      mockRun.mockResolvedValueOnce(makeRawLandingPage(overrides));
+      const page = await getPage(['modules'], tenant);
+      if (!page) throw new Error('expected a landing page');
+
+      return page.sectionNavigation;
+    }
+
+    it("returns the section's children in drag order and the breadcrumb chain", async () => {
+      expect(
+        await navigationFor({
+          sectionChain: [chainNode(answers), chainNode(faq), modulesSection],
+        }),
+      ).toEqual({
+        root: { title: 'Modules', path: 'modules', isCurrent: false },
+        pages: [
+          { title: 'FAQ', path: 'modules/faq', isCurrent: true },
+          { title: 'Pricing', path: 'modules/pricing', isCurrent: false },
+        ],
+        breadcrumbs: [
+          { title: 'Modules', path: 'modules' },
+          { title: 'FAQ', path: 'modules/faq' },
+          { title: 'Answers', path: 'modules/faq/answers' },
+        ],
+      });
+    });
+
+    it('marks the root as current on the section root itself', async () => {
+      const navigation = await navigationFor({
+        sectionChain: [modulesSection],
+      });
+
+      expect(navigation?.root.isCurrent).toBe(true);
+      expect(navigation?.pages.map(({ isCurrent }) => isCurrent)).toEqual([
+        false,
+        false,
+      ]);
+    });
+
+    it('returns the nested branch when a nested parent has its own switch on', async () => {
+      const navigation = await navigationFor({
+        sectionChain: [
+          chainNode(answers),
+          chainNode(faq, [glossary, answers]),
+          modulesSection,
+        ],
+      });
+
+      expect(navigation?.root).toEqual({
+        title: 'FAQ',
+        path: 'modules/faq',
+        isCurrent: false,
+      });
+      expect(navigation?.pages).toEqual([
+        { title: 'Glossary', path: 'modules/faq/glossary', isCurrent: false },
+        { title: 'Answers', path: 'modules/faq/answers', isCurrent: true },
+      ]);
+    });
+
+    it('leaves out a child page that has no path', async () => {
+      const navigation = await navigationFor({
+        sectionChain: [
+          chainNode({ _id: 'modules', title: 'Modules', path: 'modules' }, [
+            faq,
+            { ...pricing, path: null },
+          ]),
+        ],
+      });
+
+      expect(navigation?.pages.map(({ path }) => path)).toEqual([
+        'modules/faq',
+      ]);
+    });
+
+    it('returns none when the page turns section navigation off', async () => {
+      expect(
+        await navigationFor({
+          showSectionNavigation: false,
+          sectionChain: [chainNode(faq), modulesSection],
+        }),
+      ).toBeUndefined();
+    });
+
+    it('returns none for a page outside any section', async () => {
+      expect(
+        await navigationFor({
+          sectionChain: [
+            chainNode(faq),
+            chainNode({ _id: 'modules', title: 'Modules', path: 'modules' }),
+          ],
+        }),
+      ).toBeUndefined();
+    });
+  });
 });

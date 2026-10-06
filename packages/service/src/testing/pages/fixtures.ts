@@ -190,6 +190,16 @@ export function makeRawLandingPage(
     ],
     seo: makeRawSeo(),
     translations: [{ language: 'EN', slug: 'about' }],
+    showSectionNavigation: null,
+    sectionChain: [
+      {
+        _id: 'about',
+        title: 'About Us',
+        path: 'about',
+        sectionNavigation: false,
+        children: null,
+      },
+    ],
     ...overrides,
   };
 }

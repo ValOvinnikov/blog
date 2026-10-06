@@ -152,7 +152,12 @@ export type {
   TTimelineModule,
 } from './features/modules/timeline';
 export type { THomePage } from './features/pages/home';
-export type { TLandingPage } from './features/pages/landing';
+export type {
+  TLandingBreadcrumb,
+  TLandingPage,
+  TLandingSectionNavigation,
+  TLandingSectionPage,
+} from './features/pages/landing';
 export type { TPageTranslation } from './shared/localization/page-translations/to-page-translations';
 export type {
   TPostDetail,
