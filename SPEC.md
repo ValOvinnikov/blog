@@ -84,7 +84,7 @@ reading, page canvas elevation) are documented in full in
 - **Next.js 16** (App Router, RSC, TypeScript strict) + **React 19** — `apps/web`
 - **Sanity Studio v6** (`sanity ^6`, `@sanity/cli ^7`) — `packages/studio`
 - **Tailwind CSS v4** (shared token preset) + `tailwind-variants`
-- **next-intl** for i18n (currently `en` only, `localePrefix: 'never'`)
+- **next-intl** for i18n (`localePrefix: 'as-needed'`; EN, NL, FR, DE, ES — §9 Localization)
 - **groqd** query builder in the service layer
 - **Neon Postgres + Drizzle ORM** (`packages/db`) — the non-Sanity relational
   store for the engagement layer (Auth.js, comments, ratings, bookmarks,
@@ -1719,8 +1719,10 @@ section (rollback strategy is an open decision, not yet settled).
 Static generation by default, revalidated on demand by the publish webhook
 with a time-based expiry as its backstop; the
 skim-generation pipeline (`/api/generate-skim`); the Sanity CDN is
-deliberately bypassed; i18n runs through `next-intl` with a locale-prefix-free
-URL scheme and a single `SmartLink` for all in-app navigation.
+deliberately bypassed; i18n runs through `next-intl` with an `as-needed`
+language prefix (none for the default language) and a single `SmartLink` for
+all in-app navigation. Content localization is described under Localization
+below.
 
 **Every CMS page but the post renders through one skeleton.** `PageShell`
 (`apps/web/src/components/page-templates/page-shell`) is a compound component
@@ -1741,6 +1743,93 @@ spacing between regions, and no knowledge of what a region contains — so the
 heading requirement stays a Studio field rule (§6) rather than
 something the shell silently papers over. The post page is the one page that
 does not use it.
+
+### Localization
+
+A tenant's site is published in one or more languages: the same pages, posts
+and modules, translated.
+
+**Languages per tenant.** The default language is `tenants.locale`; the
+additional ones are `tenants.additionalLocales`. Both come from the curated
+`LOCALE_ISO_CODES` in `@blog/config` (EN, NL, FR, DE, ES — UPPERCASE codes,
+mapped to BCP 47 tags by `LOCALE_BCP47_TAGS`) and are set in `apps/platform`'s
+Languages page. `PLAN_LOCALE_LIMIT` in `@blog/db` caps the total per plan
+(Free 1, Growth 3). The **live** languages are the stored ones the plan still
+allows: a downgrade switches extra languages off without deleting anything —
+their Sanity content stays published, the site stops serving them, Studio
+notices say so, and upgrading restores them. A language beyond this list
+(another script, CJK, right-to-left) is a project of its own, not a list
+entry.
+
+**URLs.** `localePrefix: 'as-needed'`: the default language has no prefix and
+the others do (`/nl/over`). `proxy.ts` resolves the language into the
+`[tenant]/[locale]` segment, redirects a switched-off prefix to the default
+language, and on an unprefixed URL only redirects by browser language (or the
+remembered `NEXT_LOCALE` cookie) when the page has a translation in that
+language. Fixed path segments from code (`/blog`, `/topics`, `/tags`) are not
+translated. Crawlers send no browser language and always get the default
+language.
+
+**Two content shapes.**
+
+- **Document-level — every page type.** Each language is its own document,
+  linked to the others through `translation.metadata`
+  (`document-internationalization`), with its own slug, SEO and publish state.
+  `TRANSLATED_DOCUMENT_TYPES` lists `page_home`, `page_landing`,
+  `page_postIndex`, `page_topicIndex`, `page_tagIndex`, `page_post`,
+  `page_topic` and `page_tag`. The first four are also
+  `ONE_PER_LANGUAGE_DOCUMENT_TYPES` (at most one per language; the Studio
+  sidebar shows them `onePerLanguage`, the rest `byLanguage`). A Topic or Tag
+  Page is unique per topic or tag **per language**. Pages take their hero and
+  modules from a `template_*` document shared by every language version; a
+  page whose template differs from its default-language version gets a
+  warning, not an error.
+- **Field-level — everything without its own URL.** One document with a value
+  per language for each text field (`internationalized-array`): modules and
+  blocks (`moduleHeadingBlock` and the `localized*Field` helpers), `link`
+  documents, settings, navigation, footer, persons, and `blog_topic` /
+  `blog_tag` (title and description). Topics and tags have no slug of their
+  own — their URL comes from their Topic or Tag Page in the reader's language.
+  Pages use the single-language `headingBlock`, since each language is its own
+  document.
+
+**Untranslated content.** A field-level value missing in a language falls
+back to the default-language value, field by field (`getLocalizedField`). A
+missing translation never blocks publishing: Studio shows a per-document and
+a per-field notice naming the missing languages. With fewer than two live
+languages, Studio hides the language machinery entirely (single-language
+mode).
+
+**Reading per language (`@blog/service`).** `runQuery` sends `$locale` and
+`$defaultLocale` with every query. Pages resolve by language and slug. An
+internal link reference follows the target page to its translation in the
+reader's language, else to the default-language page — never to a 404 —
+and Studio warns on a link whose target is untranslated. Every post list,
+count and post module returns only posts in the request language; a post
+pinned in a module shows its translation, and is dropped when it has none.
+
+**Missing pages.** A page with no document in the requested language is a
+404 — nothing the site generates links to one. `/<lang>` with no Home, and
+`/<lang>/blog`, `/<lang>/topics` or `/<lang>/tags` with no list page in that
+language, redirect instead. The language switch (`/api/switch-language`,
+driven by the cached per-tenant translation map) goes to the current page's
+translation, else to that language's list page for a post, Topic or Tag Page,
+else to that language's Home.
+
+**SEO.** Every page carries `hreflang` alternates for its translations plus
+`x-default` (the default language), a self-referencing canonical per
+language, and `<html lang>`; sitemap entries carry the same alternates. Each
+language has its own RSS feed (`/rss.xml` for the default language,
+`/<lang>/rss.xml` otherwise, same for tag feeds) carrying only that
+language's posts. `og:locale` / `og:locale:alternate` are emitted on Landing
+pages only, and JSON-LD carries no `inLanguage` yet.
+
+**Engagement.** Bookmarks belong to the language version the reader saved;
+each translation is its own document.
+
+**Not built:** a per-tenant strict mode turning translation warnings into
+errors; a domain per language; translated fixed path segments; machine
+translation; changing a tenant's default language after content exists.
 
 Full mechanics:
 [`docs/context/rendering-caching-i18n.md`](./docs/context/rendering-caching-i18n.md).
@@ -1811,8 +1900,7 @@ in the build and scales into a per-page `staticPageGenerationTimeout` cliff.
 
 **The tenant reaches a route through its `[tenant]` path segment, not a
 request header.** `proxy.ts` resolves it from `Host` and writes it into the
-path by rewrite (invisible in the URL, as `localePrefix: 'never'` already
-hides the locale), and every `[tenant]/[locale]` layout, page and
+path by rewrite (invisible in the URL), and every `[tenant]/[locale]` layout, page and
 `generateMetadata` enters the request context from those params
 (`enterRequestContext`, `apps/web/src/server/request-context/`), which
 everything below it reads instead of receiving the tenant as a prop —
