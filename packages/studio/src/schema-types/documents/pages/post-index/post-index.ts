@@ -3,7 +3,7 @@ import { postIndexTemplateSchema } from '@blog/studio/schema-types/documents/tem
 import { languageField } from '@blog/studio/schema-types/fields/language-field/language-field';
 import { templateField } from '@blog/studio/schema-types/fields/template-field/template-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
+import { pageHeadingBlockField } from '@blog/studio/schema-types/objects/page-heading-block/page-heading-block-field';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
 import { languagePreview } from '@blog/studio/schema-types/preview/language-preview/language-preview';
 import { validateOnePerLanguage } from '@blog/studio/schema-types/validation/validate-one-per-language/validate-one-per-language';
@@ -22,7 +22,7 @@ export const postIndexPageSchema = defineType({
   fields: [
     languageField(),
     titleField(),
-    headingBlockField(),
+    pageHeadingBlockField(),
     templateField({ type: postIndexTemplateSchema.name }),
     seoField(),
   ],

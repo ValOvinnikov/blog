@@ -8,7 +8,7 @@ import {
   LANDING_PAGE_SECTION_CHAIN_EXPRESSION,
   landingPageSectionChainParser,
 } from '@blog/service/shared/expressions/landing-page/landing-page-section';
-import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
+import { pageHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/page-heading-block';
 import { moduleFragment } from '@blog/service/shared/fragments/module/module';
 import { seoFragment } from '@blog/service/shared/fragments/seo/seo';
 import { translationsQuery } from '@blog/service/shared/localization/page-translations/translations';
@@ -27,7 +27,7 @@ export const landingPageQuery = q
     path: sub.raw(LANDING_PAGE_PATH_EXPRESSION, pagePathParser.unwrap()),
     headingBlock: sub
       .field('headingBlock')
-      .project(headingBlockFragment)
+      .project(pageHeadingBlockFragment)
       .notNull(),
     hero: sub
       .field('template')

@@ -6,7 +6,7 @@ import { slugField } from '@blog/studio/schema-types/fields/slug-field/slug-fiel
 import { templateField } from '@blog/studio/schema-types/fields/template-field/template-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { createSlugUrlPreviewInput } from '@blog/studio/schema-types/inputs/slug-url-preview/slug-url-preview-input';
-import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
+import { pageHeadingBlockField } from '@blog/studio/schema-types/objects/page-heading-block/page-heading-block-field';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
 import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
 import { validateSlugUniqueInLanguage } from '@blog/studio/schema-types/validation/validate-slug-unique-in-language/validate-slug-unique-in-language';
@@ -51,7 +51,7 @@ export const tagPageSchema = defineType({
             ),
           ),
     }),
-    headingBlockField(),
+    pageHeadingBlockField(),
     templateField({ type: tagTemplateSchema.name }),
     seoField(),
   ],

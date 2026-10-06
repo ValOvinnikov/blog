@@ -8,7 +8,6 @@ import {
   ctaSecondaryButtonSchema,
 } from './cta-button/cta-button';
 import { featureHighlightSchema } from './feature-highlight/feature-highlight';
-import { headingBlockSchema } from './heading-block/heading-block';
 import { heroLayoutSchema } from './hero-layout/hero-layout';
 import { imageWithAltSchema } from './image-with-alt/image-with-alt';
 import { inlineLinkSchema } from './inline-link/inline-link';
@@ -19,6 +18,7 @@ import { logoItemSchema } from './logo-item/logo-item';
 import { moduleHeadingBlockSchema } from './module-heading-block/module-heading-block';
 import { newsletterTrustCueSchema } from './newsletter-trust-cue/newsletter-trust-cue';
 import { openGraphSchema } from './open-graph/open-graph';
+import { pageHeadingBlockSchema } from './page-heading-block/page-heading-block';
 import { postTakeawaysSchema } from './post-takeaways/post-takeaways';
 import { pricingFeatureSchema } from './pricing-feature/pricing-feature';
 import { pricingPriceSchema } from './pricing-price/pricing-price';
@@ -33,7 +33,7 @@ export const objects = [
   layoutSchema,
   heroLayoutSchema,
   wideLayoutSchema,
-  headingBlockSchema,
+  pageHeadingBlockSchema,
   imageWithAltSchema,
   moduleHeadingBlockSchema,
   localizedImageWithAltSchema,

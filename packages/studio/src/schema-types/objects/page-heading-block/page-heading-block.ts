@@ -2,8 +2,8 @@ import { defineField, defineType } from 'sanity';
 
 export const HEADING_REQUIRED_MESSAGE = 'Add a heading.';
 
-export const headingBlockSchema = defineType({
-  name: 'headingBlock',
+export const pageHeadingBlockSchema = defineType({
+  name: 'pageHeadingBlock',
   title: 'Heading Block',
   type: 'object',
   description: "The page's main heading and its optional supporting line.",
