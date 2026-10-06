@@ -3,7 +3,9 @@ import { at, defineMigration, set } from 'sanity/migrate';
 const LEGACY_TYPE = 'localizedHeadingBlock';
 const TARGET_TYPE = 'moduleHeadingBlock';
 
-export const renameModuleHeadingBlockType = (node: { _type?: unknown }) =>
+type THeadingBlockNode = { _type?: unknown; [key: string]: unknown };
+
+export const renameModuleHeadingBlockType = (node: THeadingBlockNode) =>
   node._type === LEGACY_TYPE ? at('_type', set(TARGET_TYPE)) : undefined;
 
 export default defineMigration({
