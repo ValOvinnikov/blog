@@ -1,4 +1,3 @@
-import { RESERVED_SLUGS } from '@blog/config/constants';
 import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
 import { landingTemplateSchema } from '@blog/studio/schema-types/documents/templates/landing/landing';
 import {
@@ -13,6 +12,7 @@ import { headingBlockField } from '@blog/studio/schema-types/objects/heading-blo
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
 import { languagePreview } from '@blog/studio/schema-types/preview/language-preview/language-preview';
 import { validateLandingParent } from '@blog/studio/schema-types/validation/validate-landing-parent/validate-landing-parent';
+import { validateLandingSlug } from '@blog/studio/schema-types/validation/validate-landing-slug/validate-landing-slug';
 import { validateLandingSlugUniqueAmongSiblings } from '@blog/studio/schema-types/validation/validate-landing-slug-unique-among-siblings/validate-landing-slug-unique-among-siblings';
 import { FileText } from 'lucide-react';
 import {
@@ -62,22 +62,7 @@ export const landingPageSchema = defineType({
         'The last part of the URL — auto-generated from title. To nest this page, choose a parent page instead.',
       previewInput: LandingSlugUrlPreviewInput,
       isUnique: validateLandingSlugUniqueAmongSiblings,
-      validateSlug: (value) => {
-        const current = value?.current;
-
-        if (current?.includes('/')) {
-          return 'A slug is a single part of the URL and can\'t contain "/". To nest this page, choose a parent page.';
-        }
-
-        if (
-          current &&
-          (RESERVED_SLUGS as readonly string[]).includes(current)
-        ) {
-          return `"${current}" is a reserved path and can't be used as a page slug.`;
-        }
-
-        return true;
-      },
+      validateSlug: validateLandingSlug,
     }),
     headingBlockField(),
     templateField({ type: landingTemplateSchema.name }),
