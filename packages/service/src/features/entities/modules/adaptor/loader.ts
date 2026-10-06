@@ -3,16 +3,27 @@ import {
   type TTenantSanityContext,
 } from '@blog/service/sanity/query/query';
 
-import { referencingModuleIdsQuery } from './query';
+import {
+  linkIdsReferencingDocumentQuery,
+  referencingModuleIdsQuery,
+} from './query';
+
+// Never cached: this decides which caches to purge, so a stale answer would outlive the change that triggered it.
+const UNCACHED = { next: { revalidate: 0 } } as const;
 
 export async function getReferencingModuleIds(
   documentId: string,
   tenant: TTenantSanityContext,
 ): Promise<string[]> {
-  return runQuery(referencingModuleIdsQuery, {
+  const linkIds = await runQuery(linkIdsReferencingDocumentQuery, {
     parameters: { documentId },
     tenant,
-    // Never cached: this decides which caches to purge, so a stale answer would outlive the change that triggered it.
-    next: { revalidate: 0 },
+    ...UNCACHED,
+  });
+
+  return runQuery(referencingModuleIdsQuery, {
+    parameters: { documentId, linkIds },
+    tenant,
+    ...UNCACHED,
   });
 }
