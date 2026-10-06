@@ -262,5 +262,30 @@
       "YEAR": "Yearly"
     },
     "periodSwitchLabel": "Billing period"
+  },
+  "consent": {
+    "banner": {
+      "heading": "Cookies on this site",
+      "message": "We use cookies only for what is necessary to run this site, unless you allow external media. You can change your choice at any time via Cookie settings in the footer.",
+      "acceptLabel": "Accept all",
+      "rejectLabel": "Reject all",
+      "settingsLabel": "Settings"
+    },
+    "preferences": {
+      "heading": "Cookie settings",
+      "saveLabel": "Save",
+      "closeLabel": "Close"
+    },
+    "categories": {
+      "necessary": {
+        "label": "Necessary",
+        "description": "Needed for the site to work. Always on."
+      },
+      "externalMedia": {
+        "label": "External media",
+        "description": "Content from third-party providers, such as videos and maps, which may set their own cookies."
+      }
+    },
+    "footerSettingsLabel": "Cookie settings"
   }
 }

@@ -18,6 +18,11 @@ const { getMessagesMock, getNowMock, getTimeZoneMock } = vi.hoisted(() => ({
 
 vi.mock('@web/server/request-context/request-context');
 
+vi.mock(
+  '@web/server/settings-features/is-capability-enabled/is-capability-enabled',
+  () => ({ isCapabilityEnabled: vi.fn().mockResolvedValue(false) }),
+);
+
 vi.mock('@web/utils/resolve-tenant-messages', () => ({
   resolveTenantMessages: vi.fn(),
 }));

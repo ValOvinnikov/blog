@@ -5,6 +5,7 @@ export * from './brand-tagline';
 export * from './cache';
 export * from './capability';
 export * from './card-image-shape';
+export * from './consent-category';
 export * from './cta';
 export * from './depth';
 export * from './display-mode';

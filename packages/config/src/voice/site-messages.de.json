@@ -262,5 +262,30 @@
       "YEAR": "Jährlich"
     },
     "periodSwitchLabel": "Abrechnungszeitraum"
+  },
+  "consent": {
+    "banner": {
+      "heading": "Cookies auf dieser Website",
+      "message": "Wir verwenden nur Cookies, die für den Betrieb dieser Website notwendig sind, es sei denn, du erlaubst externe Medien. Du kannst deine Auswahl jederzeit über Cookie-Einstellungen im Footer ändern.",
+      "acceptLabel": "Alle akzeptieren",
+      "rejectLabel": "Alle ablehnen",
+      "settingsLabel": "Einstellungen"
+    },
+    "preferences": {
+      "heading": "Cookie-Einstellungen",
+      "saveLabel": "Speichern",
+      "closeLabel": "Schließen"
+    },
+    "categories": {
+      "necessary": {
+        "label": "Notwendig",
+        "description": "Erforderlich, damit die Website funktioniert. Immer aktiv."
+      },
+      "externalMedia": {
+        "label": "Externe Medien",
+        "description": "Inhalte von Drittanbietern, etwa Videos und Karten, die möglicherweise eigene Cookies setzen."
+      }
+    },
+    "footerSettingsLabel": "Cookie-Einstellungen"
   }
 }

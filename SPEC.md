@@ -1527,16 +1527,16 @@ was taken down while its site kept serving from cache. See
 and [`docs/context/rendering-caching-i18n.md`](./docs/context/rendering-caching-i18n.md).
 
 **Feature-toggle layer** (Phase 4 of the configurability epic, #1285/#1289):
-`@blog/db`'s `settings_features` table (one row per tenant, five `NOT NULL`
+`@blog/db`'s `settings_features` table (one row per tenant, six `NOT NULL`
 boolean columns — `commentsEnabled`/`ratingsEnabled`/`bookmarksEnabled`/
-`newsletterEnabled`/`analyticsEnabled`) holds the tenant's own on/off choice
-for each of `@blog/config`'s `CAPABILITY` keys. It is never eagerly seeded at
-tenant-provisioning time — like `site_config`, an absent row is resolved
-lazily at read time by falling back to the tenant's current preset's
-`PRESET_REGISTRY[preset].featureDefaults` (`comments`/`ratings`/`bookmarks`
-default on, `newsletter`/`analytics` default off — a deliberate opt-in
-posture for `newsletter` and `analytics`, not a "match legacy
-behavior" default). Two gating layers stack on top of the tenant toggle,
+`newsletterEnabled`/`analyticsEnabled`/`consentBannerEnabled`) holds the
+tenant's own on/off choice for each of `@blog/config`'s `CAPABILITY` keys. It
+is never eagerly seeded at tenant-provisioning time — like `site_config`, an
+absent row is resolved lazily at read time by falling back to the tenant's
+current preset's `PRESET_REGISTRY[preset].featureDefaults`
+(`comments`/`ratings`/`bookmarks` default on, `newsletter`/`analytics`/
+`consentBanner` default off — a deliberate opt-in posture for those three,
+not a "match legacy behavior" default). Two gating layers stack on top of the tenant toggle,
 most-restrictive-wins: env-locked secrets (unchanged, pre-existing —
 `AUTH_*`, `ANTHROPIC_API_KEY`, `SANITY_REVALIDATE_SECRET`, …) and
 `@blog/db`'s `PLAN_REGISTRY` (`Record<TTenantPlan, TCapability[]>` — `FREE`
@@ -1569,6 +1569,39 @@ toggle, rejecting the whole save if a submitted toggle exceeds the tenant's
 plan, since a disabled client control is never the real gate. Validation
 limits and layout thresholds (mentioned in the original phase scope) were
 cut with no concrete values ever specified; tracked separately (#1920).
+
+**Cookie consent.** Nothing outside the Necessary category ever loads before
+the visitor consents, whatever the tenant's settings — a forgotten toggle
+costs convenience, never compliance.
+
+- _Categories._ `@blog/config`'s `CONSENT_CATEGORY` is
+  `{ NECESSARY, EXTERNAL_MEDIA }`. Necessary is implicit, always granted and
+  never written to the cookie; External media covers third-party iframes
+  (embeds, maps). A new category is a code change to that const. Vercel
+  Analytics sets no cookies and stays outside consent; any future feature that
+  sets a non-essential cookie goes behind the gate before it ships.
+- _Cookie._ A first-party `consent` cookie written client-side — `Secure`,
+  `SameSite=Lax`, `path=/`, not `httpOnly`, 180 days. Its value is
+  `<version>.<CATEGORY>,…` (`1.EXTERNAL_MEDIA` granted, `1.` all declined). A
+  missing, unparseable or older-version value reads as unanswered, so bumping
+  the version re-asks everyone. There is no server-side consent log, and no
+  server code reads the cookie: pages stay static.
+- _Gate API (`apps/web`, client-side)._ `ConsentProvider` is mounted for every
+  tenant through the locale layout's client providers. It reads the cookie via
+  `useSyncExternalStore` and notifies every subscriber on each write, so
+  already-rendered content updates without a reload. `useConsent(category)`
+  returns `{ status, grant }`, where `status` is `unknown` (server render and
+  first paint), `granted`, `denied` or `unanswered`; the provider also exposes
+  `openPreferences()`. Features never read the cookie directly.
+- _Banner._ Shown only when the tenant's `CONSENT_BANNER` capability is
+  enabled and the status is `unanswered`: a non-modal card with equal-weight
+  Accept all / Reject all and a Settings action.
+- _Preferences._ A native `<dialog>` wrapping `@blog/ui`'s
+  `ConsentPreferences` — Necessary locked on, External media never pre-ticked.
+  The footer's "Cookie settings" button reopens it on every tenant, banner or
+  not, so withdrawing is as easy as granting.
+- _Copy._ The `consent.*` messages ship in every locale catalog and are
+  registered in `VOICE_FIELDS`, so a tenant can reword them in the Voice tab.
 
 **"Coming soon" capabilities.** A capability that is not finished end to end
 — today `comments` and `ratings` (no public-site implementation) and
