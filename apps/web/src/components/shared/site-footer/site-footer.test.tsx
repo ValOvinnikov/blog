@@ -71,7 +71,10 @@ describe(SiteFooter, () => {
       ok: true,
       data: { brand: { name: 'Blog', logo: undefined } },
     } as never);
-    getFooterMock.mockResolvedValue({ ok: true, data: { social: [] } });
+    getFooterMock.mockResolvedValue({
+      ok: true,
+      data: { social: [], showRssFeed: true },
+    });
     getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
     getTranslationsMock.mockResolvedValue(translate);
   });
@@ -101,6 +104,19 @@ describe(SiteFooter, () => {
     expect(link).toHaveAttribute('href', routes.rssFeed());
     expect(link).toHaveAttribute('title', 'RSS feed');
     expect(within(link).getByTestId('rss-icon')).toBeVisible();
+  });
+
+  it('leaves the RSS feed link out when the editor switched it off', async () => {
+    getFooterMock.mockResolvedValue({
+      ok: true,
+      data: { social: [], showRssFeed: false },
+    });
+
+    await setup();
+
+    expect(
+      screen.queryByRole('link', { name: 'RSS feed' }),
+    ).not.toBeInTheDocument();
   });
 
   it('renders a mapped social link icon-only, named after its platform', async () => {

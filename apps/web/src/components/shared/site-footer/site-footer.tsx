@@ -3,6 +3,7 @@ import { service } from '@blog/service';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { NavLink } from '@blog/ui/components/atoms/nav-link';
 import { Footer } from '@blog/ui/components/organisms/footer';
+import { CookieSettingsButton } from '@web/components/shared/cookie-settings-button';
 import { LanguageSwitcher } from '@web/components/shared/language-switcher';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { SocialLinks } from '@web/components/shared/social-links';
@@ -37,6 +38,7 @@ export const SiteFooter = async () => {
   const social = footerResult.ok ? footerResult.data.social : [];
   const hasLanguageSwitcher =
     footerResult.ok && footerResult.data.showLanguageSwitcher === true;
+  const hasRssFeed = !footerResult.ok || footerResult.data.showRssFeed;
 
   return (
     <Footer dataTestId="site-footer">
@@ -52,14 +54,19 @@ export const SiteFooter = async () => {
             isInFooter={true}
           />
         )}
-        <NavLink
-          as={SmartLink}
-          href={routes.rssFeed()}
-          icon={<Icon name={ICONS.RSS} size={SIZE.SM} dataTestId="rss-icon" />}
-          hasLabel={false}
-        >
-          {t('feedLinkLabel')}
-        </NavLink>
+        <CookieSettingsButton />
+        {hasRssFeed && (
+          <NavLink
+            as={SmartLink}
+            href={routes.rssFeed()}
+            icon={
+              <Icon name={ICONS.RSS} size={SIZE.SM} dataTestId="rss-icon" />
+            }
+            hasLabel={false}
+          >
+            {t('feedLinkLabel')}
+          </NavLink>
+        )}
       </Footer.Nav>
     </Footer>
   );
