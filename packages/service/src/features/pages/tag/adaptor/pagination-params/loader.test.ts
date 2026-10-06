@@ -2,7 +2,7 @@ import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeTenant } from '@blog/service/testing/tenant';
 
-import { getTagPaginationParams } from './loader';
+import { getTagPaginatedPages } from './loader';
 
 vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
   ...(await importOriginal<
@@ -14,43 +14,36 @@ vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
 const { EN, NL } = LOCALE_ISO_CODES;
 const tenant = makeTenant();
 
-describe('getTagPaginationParams', () => {
-  it('delegates the raw query result to the pagination transformer', async () => {
-    mockRun
-      .mockResolvedValueOnce([
-        {
-          slug: 'typescript',
-          language: EN,
-          moduleRefs: [{ _ref: 'list-1' }],
-          postCount: 20,
-        },
-        {
-          slug: 'react',
-          language: EN,
-          moduleRefs: [{ _ref: 'list-1' }],
-          postCount: 9,
-        },
-        {
-          slug: 'no-list',
-          language: EN,
-          moduleRefs: [{ _ref: 'hero-1' }],
-          postCount: 50,
-        },
-      ])
-      .mockResolvedValueOnce([{ _id: 'list-1', pageSize: 9 }]);
+describe('getTagPaginatedPages', () => {
+  it('returns the paginated pages as queried', async () => {
+    const pages = [
+      {
+        slug: 'typescript',
+        language: EN,
+        moduleRefs: [{ _ref: 'list-1' }],
+        postCount: 20,
+      },
+    ];
+    mockRun.mockResolvedValueOnce(pages);
 
-    const params = await getTagPaginationParams(tenant, [EN, NL]);
+    expect(await getTagPaginatedPages(tenant, [EN, NL])).toEqual(pages);
+  });
 
-    expect(params).toEqual([
-      { slug: 'typescript', language: EN, page: '2' },
-      { slug: 'typescript', language: EN, page: '3' },
-    ]);
+  it('passes the locales as a query parameter', async () => {
+    mockRun.mockResolvedValueOnce([]);
+
+    await getTagPaginatedPages(tenant, [EN, NL]);
+
+    expect(mockRun).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ parameters: { locales: [EN, NL] } }),
+    );
   });
 
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
     mockRun.mockResolvedValueOnce([]);
 
-    await getTagPaginationParams(tenant, [EN, NL]);
+    await getTagPaginatedPages(tenant, [EN, NL]);
 
     expect(mockRun).toHaveBeenCalledWith(
       expect.anything(),
@@ -65,33 +58,6 @@ describe('getTagPaginationParams', () => {
           ],
         }),
       }),
-    );
-  });
-
-  it('fetches the page sizes of all pages in one request', async () => {
-    mockRun
-      .mockResolvedValueOnce([
-        {
-          slug: 'typescript',
-          language: EN,
-          moduleRefs: [{ _ref: 'list-1' }],
-          postCount: 20,
-        },
-        {
-          slug: 'react',
-          language: EN,
-          moduleRefs: [{ _ref: 'list-2' }],
-          postCount: 20,
-        },
-      ])
-      .mockResolvedValueOnce([]);
-
-    await getTagPaginationParams(tenant, [EN, NL]);
-
-    expect(mockRun).toHaveBeenCalledTimes(2);
-    expect(mockRun).toHaveBeenLastCalledWith(
-      expect.anything(),
-      expect.objectContaining({ parameters: { ids: ['list-1', 'list-2'] } }),
     );
   });
 });

@@ -4,16 +4,15 @@ import {
   runQuery,
   type TTenantSanityContext,
 } from '@blog/service/sanity/query/query';
-import { getPageFaqs } from '@blog/service/shared/adaptors/faq-questions/page-faqs';
 
 import { topicPageQuery } from './query';
 import { toTopicDetailPage } from './transformer';
-import type { TTopicDetailPage } from './types';
+import type { TTopicDetailPageDocument } from './types';
 
-export async function getTopicPage(
+export async function getTopicPageDocument(
   slug: string,
   tenant: TTenantSanityContext,
-): Promise<TMaybeUndefined<TTopicDetailPage>> {
+): Promise<TMaybeUndefined<TTopicDetailPageDocument>> {
   const rawPage = await runQuery(topicPageQuery, {
     parameters: { slug },
     tenant,
@@ -21,5 +20,5 @@ export async function getTopicPage(
   });
   if (!rawPage) return undefined;
 
-  return toTopicDetailPage(rawPage, await getPageFaqs(rawPage.modules, tenant));
+  return toTopicDetailPage(rawPage);
 }

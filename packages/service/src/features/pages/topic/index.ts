@@ -1,2 +1,2 @@
-export type { TTopicDetailPage } from './adaptor/detail-page/types';
+export type { TTopicDetailPage } from './application/types';
 export { createTopicService } from './application/service';

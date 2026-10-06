@@ -2,7 +2,7 @@ import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeTenant } from '@blog/service/testing/tenant';
 
-import { getTopicPaginationParams } from './loader';
+import { getTopicPaginatedPages } from './loader';
 
 vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
   ...(await importOriginal<
@@ -14,43 +14,36 @@ vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
 const { EN, NL } = LOCALE_ISO_CODES;
 const tenant = makeTenant();
 
-describe('getTopicPaginationParams', () => {
-  it('delegates the raw query result to the pagination transformer', async () => {
-    mockRun
-      .mockResolvedValueOnce([
-        {
-          slug: 'engineering',
-          language: EN,
-          moduleRefs: [{ _ref: 'list-1' }],
-          postCount: 20,
-        },
-        {
-          slug: 'design',
-          language: EN,
-          moduleRefs: [{ _ref: 'list-1' }],
-          postCount: 9,
-        },
-        {
-          slug: 'no-list',
-          language: EN,
-          moduleRefs: [{ _ref: 'hero-1' }],
-          postCount: 50,
-        },
-      ])
-      .mockResolvedValueOnce([{ _id: 'list-1', pageSize: 9 }]);
+describe('getTopicPaginatedPages', () => {
+  it('returns the paginated pages as queried', async () => {
+    const pages = [
+      {
+        slug: 'engineering',
+        language: EN,
+        moduleRefs: [{ _ref: 'list-1' }],
+        postCount: 20,
+      },
+    ];
+    mockRun.mockResolvedValueOnce(pages);
 
-    const params = await getTopicPaginationParams(tenant, [EN, NL]);
+    expect(await getTopicPaginatedPages(tenant, [EN, NL])).toEqual(pages);
+  });
 
-    expect(params).toEqual([
-      { slug: 'engineering', language: EN, page: '2' },
-      { slug: 'engineering', language: EN, page: '3' },
-    ]);
+  it('passes the locales as a query parameter', async () => {
+    mockRun.mockResolvedValueOnce([]);
+
+    await getTopicPaginatedPages(tenant, [EN, NL]);
+
+    expect(mockRun).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ parameters: { locales: [EN, NL] } }),
+    );
   });
 
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
     mockRun.mockResolvedValueOnce([]);
 
-    await getTopicPaginationParams(tenant, [EN, NL]);
+    await getTopicPaginatedPages(tenant, [EN, NL]);
 
     expect(mockRun).toHaveBeenCalledWith(
       expect.anything(),
@@ -65,33 +58,6 @@ describe('getTopicPaginationParams', () => {
           ],
         }),
       }),
-    );
-  });
-
-  it('fetches the page sizes of all pages in one request', async () => {
-    mockRun
-      .mockResolvedValueOnce([
-        {
-          slug: 'engineering',
-          language: EN,
-          moduleRefs: [{ _ref: 'list-1' }],
-          postCount: 20,
-        },
-        {
-          slug: 'design',
-          language: EN,
-          moduleRefs: [{ _ref: 'list-2' }],
-          postCount: 20,
-        },
-      ])
-      .mockResolvedValueOnce([]);
-
-    await getTopicPaginationParams(tenant, [EN, NL]);
-
-    expect(mockRun).toHaveBeenCalledTimes(2);
-    expect(mockRun).toHaveBeenLastCalledWith(
-      expect.anything(),
-      expect.objectContaining({ parameters: { ids: ['list-1', 'list-2'] } }),
     );
   });
 });

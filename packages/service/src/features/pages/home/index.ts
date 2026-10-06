@@ -1,2 +1,2 @@
-export type { THomePage } from './adaptor/types';
+export type { THomePage } from './application/types';
 export { createHomeService } from './application/service';

@@ -1,5 +1,4 @@
 import { toPageTranslations } from '@blog/service/shared/localization/page-translations/to-page-translations';
-import type { TFaqPageQuestion } from '@blog/service/shared/transformers/faq/resolve-faqs';
 import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
 import {
   toHeroSlot,
@@ -10,14 +9,13 @@ import { toTopic } from '@blog/service/shared/transformers/topic/to-topic';
 import type { InferResultType } from 'groqd';
 
 import type { topicPageQuery } from './query';
-import type { TTopicDetailPage } from './types';
+import type { TTopicDetailPageDocument } from './types';
 
 export type TRawTopicPage = NonNullable<InferResultType<typeof topicPageQuery>>;
 
 export function toTopicDetailPage(
   rawPage: TRawTopicPage,
-  faqs: TFaqPageQuestion[],
-): TTopicDetailPage {
+): TTopicDetailPageDocument {
   const topic = toTopic(rawPage.topic);
 
   return {
@@ -25,7 +23,6 @@ export function toTopicDetailPage(
     headingBlock: toHeadingBlock(rawPage.headingBlock),
     hero: toHeroSlot(rawPage.hero),
     modules: (rawPage.modules ?? []).map(toModule),
-    faqs,
     seo: resolveSeo(rawPage.seo),
     translations: toPageTranslations(rawPage.translations),
   };

@@ -3,22 +3,15 @@ import {
   runQuery,
   type TTenantSanityContext,
 } from '@blog/service/sanity/query/query';
-import { getFirstPostListPageSizes } from '@blog/service/shared/adaptors/post-list-page-size/page-sizes';
 
 import { indexPageParamsQuery } from './query';
-import { toIndexPageParams } from './transformer';
+import type { TIndexPagePagination } from './types';
 
-export async function getIndexPageParams(
+export async function getIndexPagePagination(
   tenant: TTenantSanityContext,
-): Promise<{ page: string }[]> {
-  const raw = await runQuery(indexPageParamsQuery, {
+): Promise<TIndexPagePagination> {
+  return runQuery(indexPageParamsQuery, {
     tenant,
     ...isr(['posts', 'page_postIndex', 'template_postIndex'], tenant.projectId),
   });
-  const [pageSize = null] = await getFirstPostListPageSizes(
-    [raw.moduleRefs],
-    tenant,
-  );
-
-  return toIndexPageParams({ blogPosts: raw.blogPosts, pageSize });
 }

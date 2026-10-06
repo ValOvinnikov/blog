@@ -4,16 +4,15 @@ import {
   runQuery,
   type TTenantSanityContext,
 } from '@blog/service/sanity/query/query';
-import { getPageFaqs } from '@blog/service/shared/adaptors/faq-questions/page-faqs';
 
 import { landingPageQuery } from './query';
 import { toLandingPage } from './transformer';
-import type { TLandingPage } from './types';
+import type { TLandingPageDocument } from './types';
 
-export async function getPage(
+export async function getPageDocument(
   segments: string[],
   tenant: TTenantSanityContext,
-): Promise<TMaybeUndefined<TLandingPage>> {
+): Promise<TMaybeUndefined<TLandingPageDocument>> {
   const slug = segments.at(-1);
   if (!slug) return undefined;
 
@@ -24,5 +23,5 @@ export async function getPage(
   });
   if (!raw) return undefined;
 
-  return toLandingPage(raw, await getPageFaqs(raw.modules, tenant));
+  return toLandingPage(raw);
 }
