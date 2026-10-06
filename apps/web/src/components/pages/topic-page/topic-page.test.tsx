@@ -39,6 +39,8 @@ vi.mock('@web/i18n/navigation');
 
 const getTopicPageMock = vi.mocked(service.pages.topic.v1.getTopicPage);
 
+const FAQ_PAGE_JSON_LD = '"@type":"FAQPage"';
+
 const setup = customRenderServerAsync(TopicPage, {
   slug: 'news',
 });
@@ -230,5 +232,39 @@ describe(`<${TopicPage.name}/>`, () => {
     await setup();
 
     expect(screen.getByText('No posts in News yet.')).toBeVisible();
+  });
+
+  it('renders no FAQPage JSON-LD when the page has no FAQ questions', async () => {
+    await setup();
+
+    expect(
+      screen
+        .queryAllByTestId('json-ld-script')
+        .some((script) => script.textContent?.includes(FAQ_PAGE_JSON_LD)),
+    ).toBe(false);
+  });
+
+  it('renders the FAQPage JSON-LD when the page has FAQ questions', async () => {
+    getTopicPageMock.mockResolvedValueOnce({
+      ok: true,
+      data: makeTopicDetailPage({
+        topic: makeTopic({ title: 'News', slug: 'news' }),
+        faqs: [
+          {
+            id: 'faq-1',
+            question: 'Do you offer a free trial?',
+            answer: 'Yes.',
+          },
+        ],
+      }),
+    });
+
+    await setup();
+
+    expect(
+      screen
+        .getAllByTestId('json-ld-script')
+        .some((script) => script.textContent?.includes(FAQ_PAGE_JSON_LD)),
+    ).toBe(true);
   });
 });
