@@ -5,7 +5,7 @@ import {
 } from '@blog/studio/schema-types/inputs/slug-url-preview/slug-url-preview-path';
 import {
   flattenLandingParentChain,
-  LANDING_PARENT_CHAIN_PROJECTION,
+  LANDING_PARENT_CHAIN_QUERY,
   type TLandingParentChainNode,
 } from '@blog/studio/schema-types/queries/landing-parent-chain/landing-parent-chain';
 import { useEffect, useState } from 'react';
@@ -17,8 +17,6 @@ import {
 } from 'sanity';
 
 const PARENT_CHAIN_API_VERSION = '2025-02-19';
-
-const PARENT_CHAIN_QUERY = `*[_id == $parentId][0]${LANDING_PARENT_CHAIN_PROJECTION}`;
 
 const useAncestorSlugs = (parentId: string | undefined) => {
   const client = useClient({ apiVersion: PARENT_CHAIN_API_VERSION });
@@ -33,7 +31,9 @@ const useAncestorSlugs = (parentId: string | undefined) => {
     let isCurrent = true;
     client
       .withConfig({ perspective: 'drafts' })
-      .fetch<TLandingParentChainNode | null>(PARENT_CHAIN_QUERY, { parentId })
+      .fetch<TLandingParentChainNode | null>(LANDING_PARENT_CHAIN_QUERY, {
+        parentId,
+      })
       .then((chain) => {
         if (!isCurrent) return;
         setFetched({
