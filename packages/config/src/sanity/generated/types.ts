@@ -1914,6 +1914,8 @@ export type Page_landing = {
   title?: string;
   parent?: Page_landingReference;
   slug?: Slug;
+  sectionNavigation?: boolean;
+  showSectionNavigation?: boolean;
   headingBlock?: HeadingBlock;
   template?: Template_landingReference;
   seo?: Seo;
