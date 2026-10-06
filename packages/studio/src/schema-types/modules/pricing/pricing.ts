@@ -3,7 +3,7 @@ import { brandVariantField } from '@blog/studio/schema-types/fields/brand-varian
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { localizedHeadingBlockField } from '@blog/studio/schema-types/objects/localized-heading-block/localized-heading-block-field';
+import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
 import { pricingTierSchema } from '@blog/studio/schema-types/objects/pricing-tier/pricing-tier';
 import { wideLayoutField } from '@blog/studio/schema-types/objects/wide-layout/wide-layout-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
@@ -23,7 +23,7 @@ export const pricingSchema = defineType({
   fields: [
     titleField(),
     brandVariantField(),
-    localizedHeadingBlockField(),
+    moduleHeadingBlockField(),
     defineField({
       name: 'tiers',
       title: 'Tiers',

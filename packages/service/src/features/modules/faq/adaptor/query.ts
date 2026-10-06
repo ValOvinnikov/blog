@@ -1,7 +1,7 @@
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
 import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
 import { blockFaqFragment } from '@blog/service/shared/fragments/faq/block-faq';
-import { localizedHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/localized-heading-block';
+import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
 import { moduleLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 
@@ -14,7 +14,7 @@ export const faqModuleQuery = q
     brandVariant: sub.field('brandVariant').notNull(),
     headingBlock: sub
       .field('headingBlock')
-      .project(localizedHeadingBlockFragment)
+      .project(moduleHeadingBlockFragment)
       .notNull(),
     questions: sub
       .field('questions[]')

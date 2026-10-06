@@ -23,7 +23,7 @@ export type Module_pricing = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  headingBlock?: LocalizedHeadingBlock;
+  headingBlock?: ModuleHeadingBlock;
   tiers?: Array<
     {
       _key: string;
@@ -45,8 +45,8 @@ export type InternationalizedArrayString = Array<
   } & InternationalizedArrayStringValue
 >;
 
-export type LocalizedHeadingBlock = {
-  _type: 'localizedHeadingBlock';
+export type ModuleHeadingBlock = {
+  _type: 'moduleHeadingBlock';
   heading?: InternationalizedArrayString;
   supportingText?: InternationalizedArrayText;
 };
@@ -59,7 +59,7 @@ export type Module_newsletter = {
   _rev: string;
   title?: string;
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
-  headingBlock?: LocalizedHeadingBlock;
+  headingBlock?: ModuleHeadingBlock;
   variant?: 'FULL' | 'COMPACT';
   trustCues?: Array<
     {
@@ -78,7 +78,7 @@ export type Module_cta = {
   _rev: string;
   title?: string;
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
-  headingBlock?: LocalizedHeadingBlock;
+  headingBlock?: ModuleHeadingBlock;
   eyebrow?: InternationalizedArrayString;
   image?: LocalizedImageWithAlt;
   content?: InternationalizedArrayListedText;
@@ -158,7 +158,7 @@ export type Module_faq = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  headingBlock?: LocalizedHeadingBlock;
+  headingBlock?: ModuleHeadingBlock;
   questions?: Array<
     {
       _key: string;
@@ -181,7 +181,7 @@ export type Module_timeline = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  headingBlock?: LocalizedHeadingBlock;
+  headingBlock?: ModuleHeadingBlock;
   markerStyle?: 'NUMBERED' | 'LABELLED';
   items?: Array<
     {
@@ -207,7 +207,7 @@ export type Module_stats = {
   _rev: string;
   title?: string;
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
-  headingBlock?: LocalizedHeadingBlock;
+  headingBlock?: ModuleHeadingBlock;
   stats?: Array<
     {
       _key: string;
@@ -238,7 +238,7 @@ export type Module_team = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  headingBlock?: LocalizedHeadingBlock;
+  headingBlock?: ModuleHeadingBlock;
   members?: Array<
     {
       _key: string;
@@ -273,7 +273,7 @@ export type Module_testimonial = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  headingBlock?: LocalizedHeadingBlock;
+  headingBlock?: ModuleHeadingBlock;
   testimonials?: Array<
     {
       _key: string;
@@ -298,7 +298,7 @@ export type Module_logoWall = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  headingBlock?: LocalizedHeadingBlock;
+  headingBlock?: ModuleHeadingBlock;
   logos?: Array<
     {
       _key: string;
@@ -331,7 +331,7 @@ export type Module_featureHighlights = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  headingBlock?: LocalizedHeadingBlock;
+  headingBlock?: ModuleHeadingBlock;
   highlights?: Array<
     {
       _key: string;
@@ -362,7 +362,7 @@ export type Module_featureList = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  headingBlock?: LocalizedHeadingBlock;
+  headingBlock?: ModuleHeadingBlock;
   features?: Array<
     {
       _key: string;
@@ -388,7 +388,7 @@ export type Module_postRelated = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  headingBlock?: LocalizedHeadingBlock;
+  headingBlock?: ModuleHeadingBlock;
   limit?: number;
   showImages?: boolean;
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
@@ -410,7 +410,7 @@ export type Module_postFeatured = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  headingBlock?: LocalizedHeadingBlock;
+  headingBlock?: ModuleHeadingBlock;
   postSource?: 'PINNED' | 'NEWEST_FEATURED';
   posts?: Array<
     {
@@ -432,7 +432,7 @@ export type Module_postLatest = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  headingBlock?: LocalizedHeadingBlock;
+  headingBlock?: ModuleHeadingBlock;
   limit?: number;
   showImages?: boolean;
   displayMode?: 'GRID' | 'CAROUSEL';
@@ -448,7 +448,7 @@ export type Module_postList = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  headingBlock?: LocalizedHeadingBlock;
+  headingBlock?: ModuleHeadingBlock;
   pageSize?: number;
   showImages?: boolean;
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
@@ -1098,7 +1098,7 @@ export type Block_feature = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  headingBlock?: LocalizedHeadingBlock;
+  headingBlock?: ModuleHeadingBlock;
   icon?:
     | 'CODE'
     | 'LAYERS'
@@ -1715,7 +1715,7 @@ export type Module_taxonomyList = {
   _rev: string;
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY';
-  headingBlock?: LocalizedHeadingBlock;
+  headingBlock?: ModuleHeadingBlock;
   taxonomy?: 'TOPICS' | 'TAGS';
   sortOrder?: 'ALPHABETICAL' | 'MOST_POSTS';
   limit?: number;
@@ -1884,6 +1884,7 @@ export type Page_landing = {
   _rev: string;
   language?: 'EN' | 'NL' | 'FR' | 'DE' | 'ES';
   title?: string;
+  parent?: Page_landingReference;
   slug?: Slug;
   headingBlock?: HeadingBlock;
   template?: Template_landingReference;
@@ -1958,7 +1959,7 @@ export type Module_heroStatement = {
   _rev: string;
   title?: string;
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
-  headingBlock?: LocalizedHeadingBlock;
+  headingBlock?: ModuleHeadingBlock;
   eyebrow?: InternationalizedArrayString;
   image?: LocalizedImageWithAlt;
   ctaButtons?: Array<
@@ -1983,7 +1984,7 @@ export type Module_heroProfile = {
   _rev: string;
   title?: string;
   brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
-  headingBlock?: LocalizedHeadingBlock;
+  headingBlock?: ModuleHeadingBlock;
   eyebrow?: InternationalizedArrayString;
   author?: PersonReference;
   image?: LocalizedImageWithAlt;
@@ -2137,7 +2138,7 @@ export type Geopoint = {
 export type AllSanitySchemaTypes =
   | Module_pricing
   | InternationalizedArrayString
-  | LocalizedHeadingBlock
+  | ModuleHeadingBlock
   | Module_newsletter
   | Module_cta
   | InternationalizedArrayListedText

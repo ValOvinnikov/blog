@@ -4,8 +4,8 @@ import { HEADING_REQUIRED_MESSAGE } from '@blog/studio/schema-types/objects/head
 import { validateDefaultLanguageFilled } from '@blog/studio/schema-types/validation/validate-default-language-filled/validate-default-language-filled';
 import { defineType } from 'sanity';
 
-export const localizedHeadingBlockSchema = defineType({
-  name: 'localizedHeadingBlock',
+export const moduleHeadingBlockSchema = defineType({
+  name: 'moduleHeadingBlock',
   title: 'Heading Block',
   type: 'object',
   description: 'The main heading and its optional supporting line.',

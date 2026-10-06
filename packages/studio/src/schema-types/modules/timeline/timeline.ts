@@ -8,7 +8,7 @@ import { brandVariantField } from '@blog/studio/schema-types/fields/brand-varian
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
-import { localizedHeadingBlockField } from '@blog/studio/schema-types/objects/localized-heading-block/localized-heading-block-field';
+import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
 import { timelineItemSchema } from '@blog/studio/schema-types/objects/timeline-item/timeline-item';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { validateTimelineHorizontalItemCap } from '@blog/studio/schema-types/validation/validate-timeline-horizontal-item-cap/validate-timeline-horizontal-item-cap';
@@ -26,7 +26,7 @@ export const timelineSchema = defineType({
   fields: [
     titleField(),
     brandVariantField(),
-    localizedHeadingBlockField(),
+    moduleHeadingBlockField(),
     defineField({
       name: 'markerStyle',
       title: 'Marker Style',

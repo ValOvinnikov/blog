@@ -14,6 +14,7 @@ export * from './finding';
 export * from './html-tag';
 export * from './icon';
 export * from './image-layout';
+export * from './landing-page';
 export * from './language';
 export * from './layout';
 export * from './link';

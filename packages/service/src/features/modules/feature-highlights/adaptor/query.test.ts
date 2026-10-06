@@ -40,7 +40,7 @@ const featureHighlightsDocument = {
   brandVariant: 'PRIMARY',
   mediaOrder: 'FIRST',
   headingBlock: {
-    _type: 'localizedHeadingBlock',
+    _type: 'moduleHeadingBlock',
     heading: localizedStrings({
       [EN]: 'Why teams switch',
       [NL]: 'Waarom teams overstappen',

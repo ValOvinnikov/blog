@@ -1,7 +1,7 @@
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
 import { ctaSecondaryButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
 import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
-import { localizedHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/localized-heading-block';
+import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
 import { localizedImageWithAltFragment } from '@blog/service/shared/fragments/image/localized-image-with-alt';
 import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
@@ -17,7 +17,7 @@ export const featureHighlightsModuleQuery = q
     brandVariant: sub.field('brandVariant').notNull(),
     headingBlock: sub
       .field('headingBlock')
-      .project(localizedHeadingBlockFragment)
+      .project(moduleHeadingBlockFragment)
       .notNull(),
     highlights: sub
       .field('highlights[]')

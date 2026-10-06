@@ -6,15 +6,15 @@ import { featureListModuleQuery } from './query';
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-function localizedHeadingBlock(heading: Partial<Record<string, string>>) {
-  return { _type: 'localizedHeadingBlock', heading: localizedStrings(heading) };
+function moduleHeadingBlock(heading: Partial<Record<string, string>>) {
+  return { _type: 'moduleHeadingBlock', heading: localizedStrings(heading) };
 }
 
 const featureListDocument = {
   _id: 'feature-list-1',
   _type: 'module_featureList',
   brandVariant: 'PRIMARY',
-  headingBlock: localizedHeadingBlock({
+  headingBlock: moduleHeadingBlock({
     [EN]: 'What you get',
     [NL]: 'Wat je krijgt',
   }),
@@ -29,7 +29,7 @@ const featureListDocument = {
 const translatedFeature = {
   _id: 'feature-1',
   _type: 'block_feature',
-  headingBlock: localizedHeadingBlock({ [EN]: 'Fast', [NL]: 'Snel' }),
+  headingBlock: moduleHeadingBlock({ [EN]: 'Fast', [NL]: 'Snel' }),
   image: {
     _type: 'localizedImageWithAlt',
     asset: { _type: 'reference', _ref: 'image-1' },
@@ -40,7 +40,7 @@ const translatedFeature = {
 const englishOnlyFeature = {
   _id: 'feature-2',
   _type: 'block_feature',
-  headingBlock: localizedHeadingBlock({ [EN]: 'Calm' }),
+  headingBlock: moduleHeadingBlock({ [EN]: 'Calm' }),
   image: {
     _type: 'localizedImageWithAlt',
     asset: { _type: 'reference', _ref: 'image-1' },

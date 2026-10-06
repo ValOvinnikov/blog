@@ -1,6 +1,6 @@
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
 import { ctaButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
-import { localizedHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/localized-heading-block';
+import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
 import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
 
@@ -13,7 +13,7 @@ export const pricingModuleQuery = q
     brandVariant: sub.field('brandVariant').notNull(),
     headingBlock: sub
       .field('headingBlock')
-      .project(localizedHeadingBlockFragment)
+      .project(moduleHeadingBlockFragment)
       .notNull(),
     tiers: sub
       .field('tiers[]')

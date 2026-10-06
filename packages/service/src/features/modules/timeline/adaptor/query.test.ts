@@ -31,7 +31,7 @@ const timelineDocument = {
   _type: 'module_timeline',
   brandVariant: 'PRIMARY',
   headingBlock: {
-    _type: 'localizedHeadingBlock',
+    _type: 'moduleHeadingBlock',
     heading: localizedStrings({ [EN]: 'How it works', [NL]: 'Hoe het werkt' }),
   },
   markerStyle: 'LABELLED',

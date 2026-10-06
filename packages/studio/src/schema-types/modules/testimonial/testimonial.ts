@@ -5,7 +5,7 @@ import { brandVariantField } from '@blog/studio/schema-types/fields/brand-varian
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { displayModeField } from '@blog/studio/schema-types/fields/display-mode-field/display-mode-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { localizedHeadingBlockField } from '@blog/studio/schema-types/objects/localized-heading-block/localized-heading-block-field';
+import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
 import { wideLayoutField } from '@blog/studio/schema-types/objects/wide-layout/wide-layout-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { MessageSquareQuote } from 'lucide-react';
@@ -21,7 +21,7 @@ export const testimonialSchema = defineType({
   fields: [
     titleField(),
     brandVariantField(),
-    localizedHeadingBlockField(),
+    moduleHeadingBlockField(),
     defineField({
       name: 'testimonials',
       title: 'Testimonials',

@@ -28,7 +28,7 @@ const faqModuleDocument = {
   _type: 'module_faq',
   brandVariant: 'PRIMARY',
   headingBlock: {
-    _type: 'localizedHeadingBlock',
+    _type: 'moduleHeadingBlock',
     heading: localizedStrings({
       [EN]: 'Questions',
       [NL]: 'Vragen',
