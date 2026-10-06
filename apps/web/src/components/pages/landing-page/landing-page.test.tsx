@@ -40,7 +40,7 @@ const getPageMock = vi.mocked(service.pages.landing.v1.getPage);
 const FAQ_PAGE_JSON_LD = '"@type":"FAQPage"';
 
 const setup = customRenderServerAsync(LandingPage, {
-  slug: 'about-us',
+  path: 'about-us',
 });
 
 describe(`<${LandingPage.name}/>`, () => {
@@ -56,7 +56,7 @@ describe(`<${LandingPage.name}/>`, () => {
     expect(vi.mocked(notFound)).toHaveBeenCalled();
     expect(logger.error).toHaveBeenCalledWith(
       'landing_page.fetch_failed',
-      expect.objectContaining({ slug: 'about-us' }),
+      expect.objectContaining({ path: 'about-us' }),
     );
   });
 
@@ -78,7 +78,7 @@ describe(`<${LandingPage.name}/>`, () => {
         locale: LOCALE_ISO_CODES.NL,
       },
     });
-    getPageMock.mockImplementation(async (_slug, tenant) => ({
+    getPageMock.mockImplementation(async (_segments, tenant) => ({
       ok: true,
       data: tenant.locale === LOCALE_ISO_CODES.EN ? mockLandingPage : undefined,
     }));
@@ -88,11 +88,11 @@ describe(`<${LandingPage.name}/>`, () => {
     expect(vi.mocked(notFound)).toHaveBeenCalled();
   });
 
-  it('fetches the page for the given slug with the tenant context', async () => {
+  it('fetches the page for the given path with the tenant context', async () => {
     await setup();
 
     expect(getPageMock).toHaveBeenCalledWith(
-      'about-us',
+      ['about-us'],
       DEFAULT_TENANT_SANITY_CONTEXT,
     );
   });

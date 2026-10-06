@@ -5,7 +5,7 @@ import { enterRequestContext } from '@web/server/request-context/request-context
 import type { Metadata } from 'next';
 
 type TProps = {
-  params: Promise<ITenantLocalizedParams & { slug: string }>;
+  params: Promise<ITenantLocalizedParams & { slug: string[] }>;
 };
 
 export function generateStaticParams() {
@@ -18,12 +18,12 @@ export const revalidate = 21600;
 export async function generateMetadata({ params }: TProps): Promise<Metadata> {
   await enterRequestContext(params);
   const { slug } = await params;
-  return buildLandingPageMetadata(slug);
+  return buildLandingPageMetadata(slug.join('/'));
 }
 
 export default async function LandingSlugPage({ params }: TProps) {
   const { slug } = await params;
   await enterRequestContext(params);
 
-  return <LandingPage slug={slug} />;
+  return <LandingPage path={slug.join('/')} />;
 }

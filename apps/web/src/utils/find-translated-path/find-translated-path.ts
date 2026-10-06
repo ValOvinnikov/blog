@@ -37,24 +37,28 @@ const decodeSegment = (segment: string): TMaybeUndefined<string> => {
 const toTranslatablePage = (
   pathname: string,
 ): TMaybeUndefined<TTranslatablePage> => {
-  const [first = '', second, ...rest] = pathname.split('/').filter(Boolean);
+  const segments = pathname.split('/').filter(Boolean);
+  const [first = '', second, ...rest] = segments;
   const archivePage = ARCHIVE_PAGES.get(first);
+  const isArchivePath =
+    second !== undefined &&
+    (rest.length === 0 || (rest.length === 2 && rest[0] === 'page'));
 
-  if (second === undefined) {
-    const slug = decodeSegment(first);
-    return slug
-      ? { documentType: 'page_landing', slug, toHref: routes.landingPage }
-      : undefined;
+  if (archivePage && isArchivePath) {
+    const slug = decodeSegment(second);
+    return slug ? { ...archivePage, slug } : undefined;
   }
 
-  const isArchivePath =
-    rest.length === 0 || (rest.length === 2 && rest[0] === 'page');
-  if (!archivePage || !isArchivePath) {
+  const decoded = segments.map(decodeSegment);
+  if (decoded.length === 0 || !decoded.every(Boolean)) {
     return undefined;
   }
 
-  const slug = decodeSegment(second);
-  return slug ? { ...archivePage, slug } : undefined;
+  return {
+    documentType: 'page_landing',
+    slug: decoded.join('/'),
+    toHref: routes.landingPage,
+  };
 };
 
 /** `pathname` carries no language prefix; the result does, for `toLocale`. */

@@ -1,4 +1,5 @@
 import { q } from '@blog/service/sanity/query/query';
+import { PAGE_PATH_EXPRESSION } from '@blog/service/shared/expressions/landing-page/landing-page-path';
 import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
 import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
 import { translatedReference } from '@blog/service/shared/localization/translated-reference/translated-reference';
@@ -32,7 +33,7 @@ export const linkDocumentFragment = localeQ
               .asCombined()
               .project((target) => ({
                 _type: true,
-                slug: target.field('slug.current').nullable(true),
+                slug: target.raw<string | null>(PAGE_PATH_EXPRESSION),
               })),
           }))
           .field('translated'),
@@ -42,7 +43,7 @@ export const linkDocumentFragment = localeQ
         .asCombined()
         .project((ref) => ({
           _type: true,
-          slug: ref.field('slug.current').nullable(true),
+          slug: ref.raw<string | null>(PAGE_PATH_EXPRESSION),
         })),
     ),
     url: getLocalizedField(sub, 'url'),

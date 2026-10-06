@@ -7,8 +7,8 @@ import { safeAsync } from '@blog/utils';
 export function createLandingPageService() {
   return {
     v1: {
-      getPage: safeAsync((slug: string, tenant: TTenantSanityContext) =>
-        getPage(slug, tenant),
+      getPage: safeAsync((segments: string[], tenant: TTenantSanityContext) =>
+        getPage(segments, tenant),
       ),
       getPageSlugs: safeAsync(
         (tenant: TTenantSanityContext, liveLocales: TLocaleIsoCode[]) =>

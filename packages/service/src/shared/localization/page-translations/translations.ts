@@ -1,4 +1,8 @@
 import { q } from '@blog/service/sanity/query/query';
+import {
+  PAGE_PATH_EXPRESSION,
+  pagePathParser,
+} from '@blog/service/shared/expressions/landing-page/landing-page-path';
 
 export const translationsQuery = q.star
   .filterByType('translation.metadata')
@@ -12,5 +16,5 @@ export const translationsQuery = q.star
   .filterBy('slug.current != null')
   .project((t) => ({
     language: t.field('language').nullable(true),
-    slug: t.field('slug.current').nullable(true),
+    slug: t.raw(PAGE_PATH_EXPRESSION, pagePathParser),
   }));

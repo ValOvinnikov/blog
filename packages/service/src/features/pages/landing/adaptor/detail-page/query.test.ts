@@ -87,6 +87,7 @@ describe('landingPageQuery language scoping', () => {
   function run(slug: string, locale: string): Promise<unknown> {
     return evaluateGroqExpression(landingPageQuery.query, dataset, null, {
       slug,
+      path: slug,
       locale,
       defaultLocale: EN,
     });
@@ -154,6 +155,7 @@ describe('landingPageQuery template layout', () => {
   function run(data: unknown[], locale: string): Promise<unknown> {
     return evaluateGroqExpression(landingPageQuery.query, data, null, {
       slug: 'about',
+      path: 'about',
       locale,
       defaultLocale: EN,
     });
@@ -177,5 +179,54 @@ describe('landingPageQuery template layout', () => {
       hero: null,
       modules: null,
     });
+  });
+});
+
+describe('landingPageQuery nested paths', () => {
+  const { EN } = LOCALE_ISO_CODES;
+
+  function landing(id: string, slug: string, parent?: string) {
+    return {
+      _id: id,
+      _type: 'page_landing',
+      slug: { current: slug },
+      language: EN,
+      headingBlock: { heading: id },
+      ...(parent ? { parent: { _type: 'reference', _ref: parent } } : {}),
+    };
+  }
+
+  const dataset = [
+    landing('modules', 'modules'),
+    landing('faq', 'faq', 'modules'),
+    landing('pricing', 'pricing'),
+  ];
+
+  function run(segments: string[]): Promise<unknown> {
+    return evaluateGroqExpression(landingPageQuery.query, dataset, null, {
+      slug: segments.at(-1),
+      path: segments.join('/'),
+      locale: EN,
+      defaultLocale: EN,
+    });
+  }
+
+  it('resolves a nested page at its full path', async () => {
+    expect(await run(['modules', 'faq'])).toMatchObject({
+      path: 'modules/faq',
+      headingBlock: { heading: 'faq' },
+    });
+  });
+
+  it('resolves nothing for a nested page at its bare slug', async () => {
+    expect(await run(['faq'])).toBeNull();
+  });
+
+  it('resolves nothing for a top-level page under a parent it does not have', async () => {
+    expect(await run(['modules', 'pricing'])).toBeNull();
+  });
+
+  it('resolves a top-level page at its slug', async () => {
+    expect(await run(['pricing'])).toMatchObject({ path: 'pricing' });
   });
 });

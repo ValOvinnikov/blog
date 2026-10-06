@@ -29,6 +29,16 @@ const pricing = page('pricing-en', EN, 'pricing');
 const draftOnlyPricingNl = page('drafts.pricing-nl', NL, 'prijzen');
 const team = page('team-en', EN, 'team');
 const slugless = page('team-nl', NL);
+const modulesEn = page('modules-en', EN, 'modules');
+const modulesNl = page('modules-nl', NL, 'modules');
+const faqEn = {
+  ...page('faq-en', EN, 'faq'),
+  parent: { _type: 'reference', _ref: 'modules-en' },
+};
+const faqNl = {
+  ...page('faq-nl', NL, 'vragen'),
+  parent: { _type: 'reference', _ref: 'modules-nl' },
+};
 
 const dataset = [
   aboutEn,
@@ -38,6 +48,15 @@ const dataset = [
   draftOnlyPricingNl,
   team,
   slugless,
+  modulesEn,
+  modulesNl,
+  faqEn,
+  faqNl,
+  {
+    _id: 'meta-faq',
+    _type: 'translation.metadata',
+    translations: [translation('faq-en', EN), translation('faq-nl', NL)],
+  },
   {
     _id: 'meta-about',
     _type: 'translation.metadata',
@@ -92,5 +111,12 @@ describe('translationsQuery', () => {
 
   it('skips a published translation that has no slug', async () => {
     expect(await resolve(team)).toEqual([{ language: EN, slug: 'team' }]);
+  });
+
+  it('lists a nested page by its full path in each language', async () => {
+    expect(await resolve(faqEn)).toEqual([
+      { language: EN, slug: 'modules/faq' },
+      { language: NL, slug: 'modules/vragen' },
+    ]);
   });
 });

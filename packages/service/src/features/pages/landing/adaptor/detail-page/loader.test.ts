@@ -29,10 +29,10 @@ describe('getPage', () => {
   it('maps the thin page_landing document to module refs', async () => {
     mockRun.mockResolvedValueOnce(makeRawLandingPage());
 
-    const page = await getPage('about', tenant);
+    const page = await getPage(['about'], tenant);
     if (!page) throw new Error('expected a landing page');
 
-    expect(page.slug).toBe('about');
+    expect(page.path).toBe('about');
     expect(page.modules).toEqual([
       { id: 'content-1', type: 'module_content' },
       { id: 'cta-1', type: 'module_cta' },
@@ -48,7 +48,7 @@ describe('getPage', () => {
       }),
     );
 
-    const page = await getPage('about', tenant);
+    const page = await getPage(['about'], tenant);
     if (!page) throw new Error('expected a landing page');
 
     expect(page.headingBlock.heading).toBe('About Us');
@@ -58,7 +58,7 @@ describe('getPage', () => {
   it('leaves hero undefined when page_landing.hero is unset', async () => {
     mockRun.mockResolvedValueOnce(makeRawLandingPage({ hero: null }));
 
-    const page = await getPage('about', tenant);
+    const page = await getPage(['about'], tenant);
     if (!page) throw new Error('expected a landing page');
 
     expect(page.hero).toBeUndefined();
@@ -71,7 +71,7 @@ describe('getPage', () => {
       }),
     );
 
-    const page = await getPage('about', tenant);
+    const page = await getPage(['about'], tenant);
     if (!page) throw new Error('expected a landing page');
 
     expect(page.hero).toEqual({ id: 'hero-1', type: 'module_heroBlog' });
@@ -84,7 +84,7 @@ describe('getPage', () => {
       }),
     );
 
-    await expect(getPage('about', tenant)).rejects.toThrow();
+    await expect(getPage(['about'], tenant)).rejects.toThrow();
   });
 
   it('lets authored seo override the resolved defaults, with no fallback for an unauthored openGraph', async () => {
@@ -94,7 +94,7 @@ describe('getPage', () => {
       }),
     );
 
-    const page = await getPage('about', tenant);
+    const page = await getPage(['about'], tenant);
     if (!page) throw new Error('expected a landing page');
 
     expect(page.seo.title).toBe('About Us');
@@ -113,7 +113,7 @@ describe('getPage', () => {
     );
     mockFaqQuestions.mockResolvedValueOnce([makeRawFaqModuleQuestions()]);
 
-    const page = await getPage('about', tenant);
+    const page = await getPage(['about'], tenant);
     if (!page) throw new Error('expected a page');
 
     expect(mockFaqQuestions).toHaveBeenCalledExactlyOnceWith(
@@ -132,7 +132,7 @@ describe('getPage', () => {
   it('makes no FAQ-questions request when the page has no FAQ module', async () => {
     mockRun.mockResolvedValueOnce(makeRawLandingPage());
 
-    const page = await getPage('about', tenant);
+    const page = await getPage(['about'], tenant);
     if (!page) throw new Error('expected a page');
 
     expect(mockFaqQuestions).not.toHaveBeenCalled();
@@ -142,7 +142,7 @@ describe('getPage', () => {
   it('resolves undefined, rather than rejecting, when no page_landing matches the slug', async () => {
     mockRun.mockResolvedValueOnce(null);
 
-    const page = await getPage('missing', tenant);
+    const page = await getPage(['missing'], tenant);
 
     expect(page).toBeUndefined();
   });
@@ -150,7 +150,7 @@ describe('getPage', () => {
   it('threads tenant context into the query and scopes its tags to it', async () => {
     mockRun.mockResolvedValueOnce(makeRawLandingPage());
 
-    await getPage('about', tenant);
+    await getPage(['about'], tenant);
 
     expect(mockRun).toHaveBeenCalledWith(
       expect.anything(),

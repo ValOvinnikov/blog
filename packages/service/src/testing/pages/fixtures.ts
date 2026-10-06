@@ -180,7 +180,7 @@ export function makeRawLandingPage(
   overrides: Partial<TRawLandingPage> = {},
 ): TRawLandingPage {
   return {
-    slug: 'about',
+    path: 'about',
     headingBlock: makeRawHeadingBlock('About Us'),
     hero: null,
     modules: [

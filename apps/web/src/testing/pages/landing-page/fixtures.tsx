@@ -6,7 +6,7 @@ import { makeSeo } from '@web/testing/shared/seo/fixtures';
 export const LANDING_PAGE_OG_IMAGE = makeSanityImage();
 
 export const mockLandingPage: TLandingPage = {
-  slug: 'about-us',
+  path: 'about-us',
   translations: [{ language: LOCALE_ISO_CODES.EN, slug: 'about-us' }],
   headingBlock: { heading: 'About Us', supportingText: undefined },
   hero: undefined,

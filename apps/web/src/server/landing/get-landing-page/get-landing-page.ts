@@ -4,8 +4,8 @@ import { getRequestContext } from '@web/server/request-context/request-context';
 import { cache } from 'react';
 
 export const getLandingPage = cache(
-  async (slug: string): Promise<TResult<TLandingPage | undefined>> => {
+  async (path: string): Promise<TResult<TLandingPage | undefined>> => {
     const { sanityContext } = await getRequestContext();
-    return service.pages.landing.v1.getPage(slug, sanityContext);
+    return service.pages.landing.v1.getPage(path.split('/'), sanityContext);
   },
 );
