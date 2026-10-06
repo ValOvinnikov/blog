@@ -41,7 +41,7 @@ describe('heroModuleQuery featured post language', () => {
     expect(await runFeaturedPost('solo-nl', NL)).toBe('solo-nl');
   });
 
-  it('shows no post when a featured post without a translation group is in another language', async () => {
+  it('shows no post for a group-less featured post in another language', async () => {
     expect(await runFeaturedPost('solo-nl', EN)).toBeNull();
   });
 });

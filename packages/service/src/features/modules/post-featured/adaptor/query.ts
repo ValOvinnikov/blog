@@ -13,8 +13,8 @@ import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/post/pub
 import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
 import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
-import { pinnedPostInLocale } from '@blog/service/shared/fragments/post/pinned-post';
 import { postCardFragment } from '@blog/service/shared/fragments/post/post';
+import { pinnedPostInLocale } from '@blog/service/shared/localization/pinned-post-in-locale/pinned-post-in-locale';
 
 const newestFeaturedPostsQuery = q.star
   .filterByType('page_post')

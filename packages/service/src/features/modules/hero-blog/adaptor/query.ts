@@ -6,9 +6,9 @@ import { ctaSecondaryButtonFragment } from '@blog/service/shared/fragments/cta/c
 import { localizedImageWithAltFragment } from '@blog/service/shared/fragments/image/localized-image-with-alt';
 import { moduleHeroLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
-import { pinnedPostInLocale } from '@blog/service/shared/fragments/post/pinned-post';
 import { postCardFragment } from '@blog/service/shared/fragments/post/post';
 import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
+import { pinnedPostInLocale } from '@blog/service/shared/localization/pinned-post-in-locale/pinned-post-in-locale';
 
 const newestFeaturedPostQuery = q.star
   .filterByType('page_post')

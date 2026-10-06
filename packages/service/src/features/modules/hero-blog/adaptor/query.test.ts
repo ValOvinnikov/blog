@@ -108,7 +108,7 @@ describe('heroBlogModuleQuery language scoping', () => {
     expect(await runPost(pinned('solo-nl'), NL)).toBe('solo-nl');
   });
 
-  it('shows no post when a pinned post without a translation group is in another language', async () => {
+  it('shows no post for a group-less pinned post in another language', async () => {
     expect(await runPost(pinned('solo-nl'), EN)).toBeNull();
   });
 
