@@ -11,8 +11,9 @@ const s = consentPreferencesDialogVariants();
 
 export const ConsentPreferencesDialog = () => {
   const t = useTranslations('consent.preferences');
-  const { isPreferencesOpen, closePreferences } = useConsentPreferences();
-  const dialogRef = useModalDialog(isPreferencesOpen);
+  const { isPreferencesOpen, closePreferences, settingsTriggerRef } =
+    useConsentPreferences();
+  const dialogRef = useModalDialog(isPreferencesOpen, settingsTriggerRef);
 
   return (
     <dialog

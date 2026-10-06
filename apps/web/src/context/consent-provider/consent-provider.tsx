@@ -8,9 +8,11 @@ import {
 import {
   createContext,
   useContext,
+  useRef,
   useState,
   useSyncExternalStore,
   type ReactNode,
+  type RefObject,
 } from 'react';
 
 import {
@@ -32,6 +34,7 @@ interface IConsentContext {
   isPreferencesOpen: boolean;
   openPreferences: () => void;
   closePreferences: () => void;
+  settingsTriggerRef: RefObject<HTMLElement | null>;
 }
 
 const ConsentContext = createContext<IConsentContext | undefined>(undefined);
@@ -64,6 +67,7 @@ export const ConsentProvider = ({ children }: IConsentProviderProps) => {
     getServerConsentSnapshot,
   );
   const [isPreferencesOpen, setIsPreferencesOpen] = useState(false);
+  const settingsTriggerRef = useRef<HTMLElement>(null);
 
   return (
     <ConsentContext.Provider
@@ -72,6 +76,7 @@ export const ConsentProvider = ({ children }: IConsentProviderProps) => {
         isPreferencesOpen,
         openPreferences: () => setIsPreferencesOpen(true),
         closePreferences: () => setIsPreferencesOpen(false),
+        settingsTriggerRef,
       }}
     >
       {children}
@@ -110,7 +115,16 @@ export const useConsentChoices = () => {
 };
 
 export const useConsentPreferences = () => {
-  const { isPreferencesOpen, openPreferences, closePreferences } =
-    useConsentContext();
-  return { isPreferencesOpen, openPreferences, closePreferences };
+  const {
+    isPreferencesOpen,
+    openPreferences,
+    closePreferences,
+    settingsTriggerRef,
+  } = useConsentContext();
+  return {
+    isPreferencesOpen,
+    openPreferences,
+    closePreferences,
+    settingsTriggerRef,
+  };
 };

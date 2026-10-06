@@ -1,5 +1,9 @@
 import userEvent from '@testing-library/user-event';
-import { useConsentPreferences } from '@web/context/consent-provider';
+import { CookieSettingsButton } from '@web/components/shared/cookie-settings-button';
+import {
+  useConsentChoices,
+  useConsentPreferences,
+} from '@web/context/consent-provider';
 import { fireEvent, renderElement, screen } from '@web/testing/custom-render';
 
 import { ConsentPreferencesDialog } from './consent-preferences-dialog';
@@ -11,6 +15,14 @@ const clearConsentCookie = () => {
 const OpenPreferencesButton = () => {
   const { openPreferences } = useConsentPreferences();
   return <button onClick={openPreferences}>Open preferences</button>;
+};
+
+const BannerOpener = () => {
+  const { openPreferences } = useConsentPreferences();
+  const { status } = useConsentChoices();
+  return status === 'unanswered' ? (
+    <button onClick={openPreferences}>Banner settings</button>
+  ) : null;
 };
 
 const setup = async () => {
@@ -114,5 +126,23 @@ describe(`<${ConsentPreferencesDialog.name}/>`, () => {
     fireEvent(screen.getByRole('dialog'), new Event('close'));
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('moves focus to the footer cookie settings button when the opener is gone', async () => {
+    const user = userEvent.setup();
+    renderElement(
+      <>
+        <BannerOpener />
+        <CookieSettingsButton />
+        <ConsentPreferencesDialog />
+      </>,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Banner settings' }));
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+
+    expect(
+      screen.getByRole('button', { name: 'Cookie settings' }),
+    ).toHaveFocus();
   });
 });
