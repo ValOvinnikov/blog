@@ -6,10 +6,10 @@ import { seoFragment } from '@blog/service/shared/fragments/seo/seo';
 import { topicFragment } from '@blog/service/shared/fragments/topic/topic';
 import { translationsQuery } from '@blog/service/shared/localization/page-translations/translations';
 import type { TRawModule } from '@blog/service/shared/transformers/module/to-module';
-import type { TLocalizedSlugParams } from '@blog/service/shared/types/page/localized-slug-params';
+import type { TPageQueryParams } from '@blog/service/shared/types/page/page-query-params';
 
 export const topicPageQuery = q
-  .parameters<TLocalizedSlugParams>()
+  .parameters<TPageQueryParams>()
   .star.filterByType('page_topic')
   .filterBy('slug.current == $slug')
   .filterBy('language == $locale')

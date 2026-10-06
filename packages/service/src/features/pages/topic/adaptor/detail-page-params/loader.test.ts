@@ -60,7 +60,7 @@ describe('getTopicParams', () => {
 
     expect(mockRun).toHaveBeenCalledWith(
       expect.anything(),
-      expect.objectContaining({ parameters: { liveLocales: [EN, NL] } }),
+      expect.objectContaining({ parameters: { locales: [EN, NL] } }),
     );
   });
 });
@@ -85,7 +85,7 @@ describe('topicParamsQuery', () => {
 
     expect(
       await evaluateGroqExpression(topicParamsQuery.query, dataset, null, {
-        liveLocales: [EN, NL],
+        locales: [EN, NL],
       }),
     ).toEqual([
       { slug: 'engineering', language: EN },

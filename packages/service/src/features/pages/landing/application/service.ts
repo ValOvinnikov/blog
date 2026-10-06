@@ -1,7 +1,7 @@
-import type { TLocaleIsoCode } from '@blog/config/constants';
 import { getPage } from '@blog/service/features/pages/landing/adaptor/detail-page/loader';
 import { getPageSlugs } from '@blog/service/features/pages/landing/adaptor/detail-page-params/loader';
 import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
+import type { TPageQueryPageParams } from '@blog/service/shared/types/page/page-query-page-params';
 import { safeAsync } from '@blog/utils';
 
 export function createLandingPageService() {
@@ -11,8 +11,10 @@ export function createLandingPageService() {
         getPage(segments, tenant),
       ),
       getPageSlugs: safeAsync(
-        (tenant: TTenantSanityContext, liveLocales: TLocaleIsoCode[]) =>
-          getPageSlugs(tenant, liveLocales),
+        (
+          tenant: TTenantSanityContext,
+          locales: TPageQueryPageParams['locales'],
+        ) => getPageSlugs(tenant, locales),
       ),
     },
   };

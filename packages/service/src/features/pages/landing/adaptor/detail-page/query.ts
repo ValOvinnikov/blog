@@ -1,5 +1,4 @@
 import type { TPageLandingType } from '@blog/config';
-import type { TLocaleIsoCode } from '@blog/config/constants';
 import { q } from '@blog/service/sanity/query/query';
 import {
   LANDING_PAGE_PATH_EXPRESSION,
@@ -10,15 +9,10 @@ import { moduleFragment } from '@blog/service/shared/fragments/module/module';
 import { seoFragment } from '@blog/service/shared/fragments/seo/seo';
 import { translationsQuery } from '@blog/service/shared/localization/page-translations/translations';
 import type { TRawModule } from '@blog/service/shared/transformers/module/to-module';
-
-export type TLandingPageParams = {
-  slug: string;
-  path: string;
-  locale: TLocaleIsoCode;
-};
+import type { TPageQueryParams } from '@blog/service/shared/types/page/page-query-params';
 
 export const landingPageQuery = q
-  .parameters<TLandingPageParams>()
+  .parameters<TPageQueryParams & { path: string }>()
   .star.filterByType('page_landing')
   .filterBy('slug.current == $slug')
   .filterBy('language == $locale')
