@@ -9,10 +9,10 @@ import { defineType } from 'sanity';
 
 export const childPagesSchema = defineType({
   name: 'module_childPages',
-  title: 'Child Pages',
+  title: 'Section Pages',
   type: 'document',
   description:
-    'Shows a card for each page under the page using this template. Renders nothing on pages without children.',
+    'Shows a card for each page in this section. Renders nothing on pages without pages under them.',
   icon: FolderTree,
   fields: [
     titleField(),
