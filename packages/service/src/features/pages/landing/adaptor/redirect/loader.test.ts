@@ -68,6 +68,31 @@ describe('getRedirect', () => {
     await expect(getRedirect(['legacy', 'faq'], tenant)).resolves.toBe('/faq');
   });
 
+  it('rebases a nested path onto a prefix destination', async () => {
+    await expect(getRedirect(['old', 'a', 'b'], tenant)).resolves.toBe(
+      '/new/a/b',
+    );
+  });
+
+  it.each([
+    ['a decoded slash', ['legacy', '/evil.com']],
+    ['an empty segment', ['legacy', '', 'evil.com']],
+    ['a decoded backslash', ['legacy', '\\evil.com']],
+  ])(
+    'refuses a prefix redirect that would leave the site via %s',
+    async (_, segments) => {
+      await expect(getRedirect(segments, tenant)).resolves.toBe(undefined);
+    },
+  );
+
+  it('refuses an exact destination that would leave the site', async () => {
+    mockRun.mockResolvedValue([
+      { source: '/old', destination: '//evil.com', isPrefix: false },
+    ]);
+
+    await expect(getRedirect(['old'], tenant)).resolves.toBe(undefined);
+  });
+
   it('resolves undefined when no redirect matches', async () => {
     await expect(getRedirect(['unknown'], tenant)).resolves.toBe(undefined);
   });
