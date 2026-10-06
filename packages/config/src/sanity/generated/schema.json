@@ -5843,6 +5843,13 @@
           "type": "boolean"
         },
         "optional": true
+      },
+      "showRssFeed": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
+        },
+        "optional": true
       }
     }
   },

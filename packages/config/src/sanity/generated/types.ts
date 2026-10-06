@@ -889,6 +889,7 @@ export type Settings_footer = {
     } & SocialProfile
   >;
   showLanguageSwitcher?: boolean;
+  showRssFeed?: boolean;
 };
 
 export type Settings_navigation = {

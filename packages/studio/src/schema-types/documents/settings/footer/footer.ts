@@ -21,5 +21,12 @@ export const footerSettingsSchema = defineType({
       of: [defineArrayMember({ type: socialProfileSchema.name })],
     }),
     languageSwitcherField(),
+    defineField({
+      name: 'showRssFeed',
+      title: 'Show RSS feed',
+      type: 'boolean',
+      description: "Shows a link to your site's RSS feed.",
+      initialValue: true,
+    }),
   ],
 });
