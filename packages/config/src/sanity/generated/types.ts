@@ -1634,7 +1634,6 @@ export type Blog_tag = {
   _updatedAt: string;
   _rev: string;
   title?: InternationalizedArrayString;
-  slug?: Slug;
   description?: InternationalizedArrayText;
 };
 
@@ -1735,7 +1734,6 @@ export type Blog_topic = {
   _updatedAt: string;
   _rev: string;
   title?: InternationalizedArrayString;
-  slug?: Slug;
   description?: InternationalizedArrayText;
 };
 

@@ -1,7 +1,6 @@
 import { PAGE_TOPIC_TYPE } from '@blog/studio/schema-types/documents/pages/topic/topic-type';
 import { localizedMultilineTextField } from '@blog/studio/schema-types/fields/localized-multiline-text-field/localized-multiline-text-field';
 import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
-import { slugField } from '@blog/studio/schema-types/fields/slug-field/slug-field';
 import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
 import { validateDefaultLanguageFilled } from '@blog/studio/schema-types/validation/validate-default-language-filled/validate-default-language-filled';
 import { validateHasPage } from '@blog/studio/schema-types/validation/validate-has-page/validate-has-page';
@@ -12,8 +11,7 @@ import { defineType } from 'sanity';
 const TITLE_MAX_LENGTH = 60;
 const DESCRIPTION_MAX_LENGTH = 300;
 
-const MISSING_PAGE_ERROR =
-  'No Topic Page references this topic yet — /topics/{slug} will 404 until one is created.';
+const MISSING_PAGE_ERROR = 'No Topic Page references this topic yet.';
 
 export const topicSchema = defineType({
   name: 'blog_topic',
@@ -38,11 +36,6 @@ export const topicSchema = defineType({
               `Keep the title under ${TITLE_MAX_LENGTH} characters.`,
             ),
           ),
-    }),
-    slugField({
-      description:
-        'URL path segment for the topic page — auto-generated from the default-language title.',
-      source: (doc) => defaultLanguageValue(doc.title) ?? '',
     }),
     localizedMultilineTextField({
       name: 'description',

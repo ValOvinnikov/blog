@@ -1,4 +1,5 @@
 import { TAXONOMY_KIND } from '@blog/config';
+import { FaqPageSchema } from '@web/components/features/faq-page-schema';
 import { TopicBreadcrumbs } from '@web/components/features/topic/topic-breadcrumbs';
 import { TopicChips } from '@web/components/features/topic/topic-chips';
 import { PageShell } from '@web/components/page-templates/page-shell';
@@ -17,7 +18,7 @@ export const TopicPage = async ({ slug, page }: TTopicPageProps) => {
   const pageData = guardPageLoaderResult(result, 'topic_page.fetch_failed', {
     slug,
   });
-  const { topic, headingBlock, hero, modules } = pageData;
+  const { topic, headingBlock, hero, modules, faqs } = pageData;
 
   const currentPage = page ?? 1;
 
@@ -26,6 +27,7 @@ export const TopicPage = async ({ slug, page }: TTopicPageProps) => {
       <PageShell.Breadcrumbs>
         <TopicBreadcrumbs slug={slug} />
       </PageShell.Breadcrumbs>
+      <FaqPageSchema faqs={faqs} />
       <TopicModuleRenderer
         hero={hero}
         headingBlock={headingBlock}
