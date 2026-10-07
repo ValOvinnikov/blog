@@ -53,6 +53,10 @@
             {
               "type": "string",
               "value": "SECONDARY"
+            },
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
             }
           ]
         },
@@ -183,6 +187,10 @@
             {
               "type": "string",
               "value": "SECONDARY"
+            },
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
             }
           ]
         },
@@ -950,6 +958,10 @@
             {
               "type": "string",
               "value": "SECONDARY"
+            },
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
             }
           ]
         },
@@ -1079,6 +1091,10 @@
             {
               "type": "string",
               "value": "SECONDARY"
+            },
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
             }
           ]
         },
@@ -1217,6 +1233,10 @@
             {
               "type": "string",
               "value": "SECONDARY"
+            },
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
             }
           ]
         },
@@ -1590,6 +1610,10 @@
             {
               "type": "string",
               "value": "SECONDARY"
+            },
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
             }
           ]
         },
@@ -1823,6 +1847,10 @@
             {
               "type": "string",
               "value": "SECONDARY"
+            },
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
             }
           ]
         },
@@ -1999,6 +2027,10 @@
             {
               "type": "string",
               "value": "SECONDARY"
+            },
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
             }
           ]
         },
@@ -2263,6 +2295,10 @@
             {
               "type": "string",
               "value": "SECONDARY"
+            },
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
             }
           ]
         },
@@ -2452,6 +2488,10 @@
             {
               "type": "string",
               "value": "SECONDARY"
+            },
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
             }
           ]
         },
@@ -2645,6 +2685,10 @@
             {
               "type": "string",
               "value": "SECONDARY"
+            },
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
             }
           ]
         },
@@ -2787,6 +2831,10 @@
             {
               "type": "string",
               "value": "SECONDARY"
+            },
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
             }
           ]
         },
@@ -2951,6 +2999,10 @@
             {
               "type": "string",
               "value": "SECONDARY"
+            },
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
             }
           ]
         },
@@ -3080,6 +3132,10 @@
             {
               "type": "string",
               "value": "SECONDARY"
+            },
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
             }
           ]
         },
@@ -10278,6 +10334,10 @@
             {
               "type": "string",
               "value": "SECONDARY"
+            },
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
             }
           ]
         },

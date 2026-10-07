@@ -22,7 +22,7 @@ export type Module_sectionPages = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   headingBlock?: ModuleHeadingBlock;
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   layout?: WideLayout;
@@ -41,7 +41,7 @@ export type Module_pricing = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   headingBlock?: ModuleHeadingBlock;
   tiers?: Array<
     {
@@ -145,7 +145,7 @@ export type Module_content = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   body?: InternationalizedArrayArticleText;
   layout?: Layout;
 };
@@ -170,7 +170,7 @@ export type Module_faq = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   headingBlock?: ModuleHeadingBlock;
   questions?: Array<
     {
@@ -193,7 +193,7 @@ export type Module_timeline = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   headingBlock?: ModuleHeadingBlock;
   markerStyle?: 'NUMBERED' | 'LABELLED';
   items?: Array<
@@ -250,7 +250,7 @@ export type Module_team = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   headingBlock?: ModuleHeadingBlock;
   members?: Array<
     {
@@ -285,7 +285,7 @@ export type Module_testimonial = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   headingBlock?: ModuleHeadingBlock;
   testimonials?: Array<
     {
@@ -310,7 +310,7 @@ export type Module_logoWall = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   headingBlock?: ModuleHeadingBlock;
   logos?: Array<
     {
@@ -343,7 +343,7 @@ export type Module_featureHighlights = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   headingBlock?: ModuleHeadingBlock;
   highlights?: Array<
     {
@@ -374,7 +374,7 @@ export type Module_featureList = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   headingBlock?: ModuleHeadingBlock;
   features?: Array<
     {
@@ -400,7 +400,7 @@ export type Module_postRelated = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   headingBlock?: ModuleHeadingBlock;
   limit?: number;
   showImages?: boolean;
@@ -422,7 +422,7 @@ export type Module_postFeatured = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   headingBlock?: ModuleHeadingBlock;
   postSource?: 'PINNED' | 'NEWEST_FEATURED';
   posts?: Array<
@@ -444,7 +444,7 @@ export type Module_postLatest = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   headingBlock?: ModuleHeadingBlock;
   limit?: number;
   showImages?: boolean;
@@ -460,7 +460,7 @@ export type Module_postList = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   headingBlock?: ModuleHeadingBlock;
   pageSize?: number;
   showImages?: boolean;
@@ -1747,7 +1747,7 @@ export type Module_taxonomyList = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   headingBlock?: ModuleHeadingBlock;
   taxonomy?: 'TOPICS' | 'TAGS';
   sortOrder?: 'ALPHABETICAL' | 'MOST_POSTS';

@@ -1,10 +1,9 @@
-import { BRAND_VARIANT, type TBrandVariant } from '@blog/config/constants';
+import {
+  BRAND_VARIANT,
+  FULL_BRAND_VARIANT_LIST,
+  type TBrandVariant,
+} from '@blog/config/constants';
 import { defineField, type StringDefinition } from 'sanity';
-
-const DEFAULT_LIST: readonly TBrandVariant[] = [
-  BRAND_VARIANT.PRIMARY,
-  BRAND_VARIANT.SECONDARY,
-];
 
 const brandVariantOptions = [
   { title: 'Plain', value: BRAND_VARIANT.PRIMARY },
@@ -31,7 +30,7 @@ export const brandVariantField = ({
   title = 'Background',
   description = 'The background this section sits on.',
   descriptionSuffix = '',
-  list = DEFAULT_LIST,
+  list = FULL_BRAND_VARIANT_LIST,
   initialValue = BRAND_VARIANT.PRIMARY,
   hidden,
   validation = (rule) => rule.required(),
