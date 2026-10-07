@@ -58,7 +58,7 @@ describe(buildStarterDocuments, () => {
       headingBlock: { _type: string; heading: string; supportingText: string };
     };
 
-    expect(home.headingBlock._type).toBe('headingBlock');
+    expect(home.headingBlock._type).toBe('pageHeadingBlock');
     expect(home.headingBlock.heading).toBe('Welcome');
     expect(home.headingBlock.supportingText.length).toBeGreaterThan(0);
   });

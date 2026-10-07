@@ -65,7 +65,7 @@ export function buildStarterDocuments(
     _type: 'page_home',
     title: 'Home',
     headingBlock: {
-      _type: 'headingBlock',
+      _type: 'pageHeadingBlock',
       heading: 'Welcome',
       supportingText:
         'Your new site is ready — start adding pages, posts, and content whenever you like.',

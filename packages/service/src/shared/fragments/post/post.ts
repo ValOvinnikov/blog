@@ -4,7 +4,7 @@ import {
   WORD_COUNT_EXPRESSION,
   wordCountParser,
 } from '@blog/service/shared/expressions/post/word-count';
-import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
+import { pageHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/page-heading-block';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
 import { moduleFragment } from '@blog/service/shared/fragments/module/module';
 import {
@@ -31,7 +31,7 @@ export const postCardFragment = q
     _id: true,
     headingBlock: sub
       .field('headingBlock')
-      .project(headingBlockFragment)
+      .project(pageHeadingBlockFragment)
       .notNull(),
     slug: sub.field('slug.current').notNull(),
     publishedAt: sub.field('publishedAt').notNull(),

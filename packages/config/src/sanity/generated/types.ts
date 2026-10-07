@@ -820,8 +820,8 @@ export type BodyImage = {
   layout?: 'INLINE' | 'FULL_BLEED' | 'FLOAT_LEFT' | 'FLOAT_RIGHT';
 };
 
-export type HeadingBlock = {
-  _type: 'headingBlock';
+export type PageHeadingBlock = {
+  _type: 'pageHeadingBlock';
   heading?: string;
   supportingText?: string;
 };
@@ -1277,7 +1277,7 @@ export type Page_home = {
   _rev: string;
   language?: 'EN' | 'NL' | 'FR' | 'DE' | 'ES';
   title?: string;
-  headingBlock?: HeadingBlock;
+  headingBlock?: PageHeadingBlock;
   template?: Template_homeReference;
   seo?: Seo;
 };
@@ -1515,7 +1515,7 @@ export type Page_post = {
   language?: 'EN' | 'NL' | 'FR' | 'DE' | 'ES';
   title?: string;
   slug?: Slug;
-  headingBlock?: HeadingBlock;
+  headingBlock?: PageHeadingBlock;
   heroImage?: ImageWithAlt;
   content?: ArticleText;
   featured?: boolean;
@@ -1603,7 +1603,7 @@ export type Page_tagIndex = {
   _rev: string;
   language?: 'EN' | 'NL' | 'FR' | 'DE' | 'ES';
   title?: string;
-  headingBlock?: HeadingBlock;
+  headingBlock?: PageHeadingBlock;
   template?: Template_tagIndexReference;
   seo?: Seo;
   taxonomyList?: Module_taxonomyListReference;
@@ -1653,7 +1653,7 @@ export type Page_tag = {
   title?: string;
   slug?: Slug;
   tag?: Blog_tagReference;
-  headingBlock?: HeadingBlock;
+  headingBlock?: PageHeadingBlock;
   template?: Template_tagReference;
   seo?: Seo;
 };
@@ -1729,7 +1729,7 @@ export type Page_topicIndex = {
   _rev: string;
   language?: 'EN' | 'NL' | 'FR' | 'DE' | 'ES';
   title?: string;
-  headingBlock?: HeadingBlock;
+  headingBlock?: PageHeadingBlock;
   template?: Template_topicIndexReference;
   seo?: Seo;
   taxonomyList?: Module_taxonomyListReference;
@@ -1796,7 +1796,7 @@ export type Page_topic = {
   title?: string;
   slug?: Slug;
   topic?: Blog_topicReference;
-  headingBlock?: HeadingBlock;
+  headingBlock?: PageHeadingBlock;
   template?: Template_topicReference;
   seo?: Seo;
 };
@@ -1859,7 +1859,7 @@ export type Page_postIndex = {
   _rev: string;
   language?: 'EN' | 'NL' | 'FR' | 'DE' | 'ES';
   title?: string;
-  headingBlock?: HeadingBlock;
+  headingBlock?: PageHeadingBlock;
   template?: Template_postIndexReference;
   seo?: Seo;
 };
@@ -1915,7 +1915,7 @@ export type Page_landing = {
   title?: string;
   parent?: Page_landingReference;
   slug?: Slug;
-  headingBlock?: HeadingBlock;
+  headingBlock?: PageHeadingBlock;
   template?: Template_landingReference;
   sectionNavigation?: boolean;
   showSectionNavigation?: boolean;
@@ -2239,7 +2239,7 @@ export type AllSanitySchemaTypes =
   | LinkRef
   | Aside
   | BodyImage
-  | HeadingBlock
+  | PageHeadingBlock
   | WideLayout
   | HeroLayout
   | MigrationState

@@ -1,5 +1,5 @@
 import { q } from '@blog/service/sanity/query/query';
-import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
+import { pageHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/page-heading-block';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
 import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
 
@@ -17,7 +17,7 @@ export const childPagesQuery = q
     slug: sub.field('slug.current').notNull(),
     headingBlock: sub
       .field('headingBlock')
-      .project(headingBlockFragment)
+      .project(pageHeadingBlockFragment)
       .notNull(),
     image: sub
       .field('seo.openGraph.ogImage')

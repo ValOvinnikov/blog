@@ -1,13 +1,16 @@
 import { defineField } from 'sanity';
 
-import { HEADING_REQUIRED_MESSAGE, headingBlockSchema } from './heading-block';
+import {
+  HEADING_REQUIRED_MESSAGE,
+  pageHeadingBlockSchema,
+} from './page-heading-block';
 
 // Sanity never evaluates the nested heading rule for an absent object.
-export const headingBlockField = () =>
+export const pageHeadingBlockField = () =>
   defineField({
     name: 'headingBlock',
     title: 'Heading Block',
-    type: headingBlockSchema.name,
+    type: pageHeadingBlockSchema.name,
     description:
       'The heading shown at the top of this page or module, with its optional supporting line.',
     validation: (rule) =>
