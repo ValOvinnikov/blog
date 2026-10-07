@@ -81,6 +81,7 @@ export const TaxonomyListModuleView = ({
               href={item.href}
               headingLevel={3}
               linkAs={SmartLink}
+              isInteractive={Boolean(item.href)}
             >
               {showLatestPosts && item.posts.length > 0 && (
                 <TaxonomyCard.Posts

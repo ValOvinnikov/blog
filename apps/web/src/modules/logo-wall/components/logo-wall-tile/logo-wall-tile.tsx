@@ -36,13 +36,14 @@ export const LogoWallTile = ({ logo }: ILogoWallTileProps) => {
     );
 
     return link ? (
-      <SmartLink
+      <LogoTile.Link
         href={link.href}
         target={link.target}
-        aria-label={link.ariaLabel}
+        ariaLabel={link.ariaLabel}
+        linkAs={SmartLink}
       >
         {sanityImage}
-      </SmartLink>
+      </LogoTile.Link>
     ) : (
       sanityImage
     );

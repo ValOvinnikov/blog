@@ -26,11 +26,15 @@ export const TeamSpotlight = ({
 }: ITeamSpotlightProps) => {
   const { name, image, role, bio, socialLinks, profileUrl } = member;
   const isCircle = imageShape === CARD_IMAGE_SHAPE.CIRCLE;
-  const s = teamSpotlightVariants({ isCircle });
+  const s = teamSpotlightVariants();
 
   return (
     <article className={s.root()} data-testid={dataTestId}>
-      <MediaFrame ratio="square" className={s.media()}>
+      <MediaFrame
+        ratio="square"
+        shape={isCircle ? 'circle' : 'rect'}
+        className={s.media()}
+      >
         {image ? (
           <SanityImage
             image={image}

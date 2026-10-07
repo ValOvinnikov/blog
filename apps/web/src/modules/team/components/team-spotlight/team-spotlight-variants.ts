@@ -12,10 +12,4 @@ export const teamSpotlightVariants = tv({
     bio: ['mt-1'],
     social: ['mt-2'],
   },
-  variants: {
-    isCircle: {
-      true: { media: ['rounded-full'] },
-      false: { media: ['rounded-xl'] },
-    },
-  },
 });

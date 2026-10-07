@@ -6,7 +6,6 @@ import { PortableText } from '@web/components/shared/portable-text';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { SocialLinks } from '@web/components/shared/social-links';
-import { stretchedLinkVariants } from '@web/components/shared/stretched-link';
 import {
   CIRCLE_IMAGE_SIZE,
   SQUARE_IMAGE_SIZE,
@@ -64,12 +63,9 @@ export const TeamMemberCard = ({
       </MediaCard.Media>
       <MediaCard.Title level={3}>
         {member.profileUrl ? (
-          <SmartLink
-            href={member.profileUrl}
-            className={stretchedLinkVariants()}
-          >
+          <MediaCard.Link href={member.profileUrl} linkAs={SmartLink}>
             {member.name}
-          </SmartLink>
+          </MediaCard.Link>
         ) : (
           member.name
         )}
@@ -81,9 +77,9 @@ export const TeamMemberCard = ({
         </div>
       )}
       {member.socialLinks.length > 0 && (
-        <div className={s.social()}>
+        <MediaCard.Footer>
           <SocialLinks profiles={member.socialLinks} variant="outlined" />
-        </div>
+        </MediaCard.Footer>
       )}
     </MediaCard>
   );

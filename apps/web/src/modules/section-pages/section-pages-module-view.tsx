@@ -6,7 +6,6 @@ import { ModuleHeading } from '@web/components/shared/module-heading';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { Section } from '@web/components/shared/section';
 import { SmartLink } from '@web/components/shared/smart-link';
-import { stretchedLinkVariants } from '@web/components/shared/stretched-link';
 import {
   SQUARE_IMAGE_SIZE,
   WIDE_IMAGE_HEIGHT,
@@ -53,7 +52,7 @@ export const SectionPagesModuleView = ({
       )}
       <CardGrid columns={columns} className={s.grid()}>
         {pages.map(({ id, title, summary, image, path }) => (
-          <MediaCard key={id} excerpt={summary} isInteractive={true}>
+          <MediaCard key={id} excerpt={summary} isInteractive={Boolean(path)}>
             {image && (
               <MediaCard.Media dataTestId="section-page-card-media">
                 <SanityImage
@@ -67,12 +66,12 @@ export const SectionPagesModuleView = ({
               </MediaCard.Media>
             )}
             <MediaCard.Title level={headingBlock ? 3 : 2}>
-              <SmartLink
+              <MediaCard.Link
                 href={routes.landingPage(path)}
-                className={stretchedLinkVariants()}
+                linkAs={SmartLink}
               >
                 {title}
-              </SmartLink>
+              </MediaCard.Link>
             </MediaCard.Title>
           </MediaCard>
         ))}

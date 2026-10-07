@@ -3,7 +3,6 @@ import { Icon } from '@blog/ui/components/atoms/icon';
 import { MediaCard } from '@blog/ui/components/molecules/media-card';
 import type { THeadingLevel } from '@blog/ui/lib/react';
 import { SmartLink } from '@web/components/shared/smart-link';
-import { stretchedLinkVariants } from '@web/components/shared/stretched-link';
 import type { ReactNode } from 'react';
 
 interface IMediaCardTopicData {
@@ -42,6 +41,7 @@ export const MediaCardItem = ({
     excerpt={item.excerpt}
     isLead={isLead}
     isSplit={isSplit}
+    isInteractive={Boolean(item.href)}
     dataTestId={dataTestId}
   >
     {hasImage && (
@@ -55,9 +55,9 @@ export const MediaCardItem = ({
       readingTime={item.readingTime}
     />
     <MediaCard.Title level={headingLevel}>
-      <SmartLink href={item.href} className={stretchedLinkVariants()}>
+      <MediaCard.Link href={item.href} linkAs={SmartLink}>
         {item.title}
-      </SmartLink>
+      </MediaCard.Link>
     </MediaCard.Title>
     <MediaCard.Footer
       topic={item.topic.title}
