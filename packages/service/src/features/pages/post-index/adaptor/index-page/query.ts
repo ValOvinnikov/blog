@@ -2,6 +2,7 @@ import type { TPagePostIndexType } from '@blog/config';
 import { q } from '@blog/service/sanity/query/query';
 import { pageHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/page-heading-block';
 import { moduleFragment } from '@blog/service/shared/fragments/module/module';
+import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { seoFragment } from '@blog/service/shared/fragments/seo/seo';
 import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
 import { pageLanguagesQuery } from '@blog/service/shared/localization/page-languages/page-languages';
@@ -18,6 +19,7 @@ export const blogPageQuery = q
       .field('headingBlock')
       .project(pageHeadingBlockFragment)
       .notNull(),
+    ...moduleContentAlignmentLeftCenterFragment,
     hero: sub
       .field('template')
       .deref()

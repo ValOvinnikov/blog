@@ -1,4 +1,5 @@
 import { toPageTranslations } from '@blog/service/shared/localization/page-translations/to-page-translations';
+import { toHeadingAlignment } from '@blog/service/shared/transformers/heading-block/to-heading-alignment';
 import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
 import {
   toHeroSlot,
@@ -21,6 +22,7 @@ export function toTopicDetailPage(
   return {
     topic,
     headingBlock: toHeadingBlock(rawPage.headingBlock),
+    headingAlignment: toHeadingAlignment(rawPage.contentAlignment),
     hero: toHeroSlot(rawPage.hero),
     modules: (rawPage.modules ?? []).map(toModule),
     seo: resolveSeo(rawPage.seo),

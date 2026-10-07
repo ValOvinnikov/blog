@@ -10,6 +10,7 @@ import {
 } from '@blog/service/shared/expressions/landing-page/landing-page-section';
 import { pageHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/page-heading-block';
 import { moduleFragment } from '@blog/service/shared/fragments/module/module';
+import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { seoFragment } from '@blog/service/shared/fragments/seo/seo';
 import { translationsQuery } from '@blog/service/shared/localization/page-translations/translations';
 import type { TRawModule } from '@blog/service/shared/transformers/module/to-module';
@@ -30,6 +31,7 @@ export const landingPageQuery = q
       .field('headingBlock')
       .project(pageHeadingBlockFragment)
       .notNull(),
+    ...moduleContentAlignmentLeftCenterFragment,
     hero: sub
       .field('template')
       .deref()

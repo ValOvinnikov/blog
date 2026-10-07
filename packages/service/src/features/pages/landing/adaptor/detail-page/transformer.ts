@@ -1,5 +1,6 @@
 import type { TMaybeUndefined } from '@blog/config';
 import { toPageTranslations } from '@blog/service/shared/localization/page-translations/to-page-translations';
+import { toHeadingAlignment } from '@blog/service/shared/transformers/heading-block/to-heading-alignment';
 import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
 import {
   toHeroSlot,
@@ -72,6 +73,7 @@ export function toLandingPage(raw: TRawLandingPage): TLandingPageDocument {
     id: raw._id,
     path: raw.path,
     headingBlock: toHeadingBlock(raw.headingBlock),
+    headingAlignment: toHeadingAlignment(raw.contentAlignment),
     hero: toHeroSlot(raw.hero),
     modules: (raw.modules ?? []).map(toModule),
     seo: resolveSeo(raw.seo),
