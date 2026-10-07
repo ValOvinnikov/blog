@@ -1,19 +1,5 @@
-import {
-  BRAND_VARIANT,
-  CONTENT_ALIGNMENT,
-  HERO_VARIANT,
-  MEDIA_ORDER,
-  SPACING_SCALE,
-} from '@blog/config';
-import {
-  AZURE_SCRIM_CENTER,
-  AZURE_SCRIM_LEFT,
-  AZURE_SCRIM_RIGHT,
-  NEUTRAL_SCRIM_CENTER,
-  NEUTRAL_SCRIM_LEFT,
-  NEUTRAL_SCRIM_RIGHT,
-  tv,
-} from '@blog/ui/lib/styling';
+import { CONTENT_ALIGNMENT, HERO_VARIANT, MEDIA_ORDER } from '@blog/config';
+import { tv } from '@blog/ui/lib/styling';
 
 export const heroVariants = tv({
   slots: {
@@ -27,24 +13,13 @@ export const heroVariants = tv({
     excerpt: ['m-0 font-medium text-text'],
     body: ['font-medium text-text'],
     media: [],
-    overlay: [],
   },
   variants: {
     variant: {
       [HERO_VARIANT.SPLIT]: {},
       [HERO_VARIANT.STACKED]: {},
       [HERO_VARIANT.BANNER]: {
-        root: [
-          'relative isolate flex flex-col justify-center overflow-hidden',
-          'left-1/2 w-screen max-w-none -translate-x-1/2 rounded-none',
-          'min-h-[360px]',
-          'px-8 pt-8 pb-8 sm:px-10 sm:pt-10 sm:pb-10',
-        ],
         grid: ['items-center'],
-        eyebrow: ['text-white'],
-        heading: ['text-white'],
-        excerpt: ['text-white'],
-        body: ['text-white'],
       },
     },
     hasMedia: {
@@ -66,25 +41,6 @@ export const heroVariants = tv({
     mediaOrder: {
       [MEDIA_ORDER.FIRST]: {},
       [MEDIA_ORDER.LAST]: {},
-    },
-    tone: {
-      [BRAND_VARIANT.PRIMARY]: {},
-      [BRAND_VARIANT.SECONDARY]: {},
-      [BRAND_VARIANT.BRAND_PRIMARY]: {},
-    },
-    spacingTop: {
-      [SPACING_SCALE.NONE]: { root: ['pt-6 sm:pt-6'] },
-      [SPACING_SCALE.SM]: { root: ['pt-7 sm:pt-8'] },
-      [SPACING_SCALE.MD]: { root: ['pt-8 sm:pt-10'] },
-      [SPACING_SCALE.LG]: { root: ['pt-12 sm:pt-16'] },
-      [SPACING_SCALE.XL]: { root: ['pt-16 sm:pt-24'] },
-    },
-    spacingBottom: {
-      [SPACING_SCALE.NONE]: { root: ['pb-6 sm:pb-6'] },
-      [SPACING_SCALE.SM]: { root: ['pb-7 sm:pb-8'] },
-      [SPACING_SCALE.MD]: { root: ['pb-8 sm:pb-10'] },
-      [SPACING_SCALE.LG]: { root: ['pb-12 sm:pb-16'] },
-      [SPACING_SCALE.XL]: { root: ['pb-16 sm:pb-24'] },
     },
   },
   compoundVariants: [
@@ -122,69 +78,5 @@ export const heroVariants = tv({
       mediaOrder: MEDIA_ORDER.FIRST,
       class: { media: ['order-first'] },
     },
-    {
-      variant: HERO_VARIANT.BANNER,
-      class: {
-        media: [
-          'absolute inset-0 -z-20',
-          '[&>*]:block [&>*]:h-full [&>*]:w-full [&>*]:object-cover',
-        ],
-        overlay: ['pointer-events-none absolute inset-0 -z-10'],
-      },
-    },
-    {
-      variant: HERO_VARIANT.BANNER,
-      position: CONTENT_ALIGNMENT.LEFT,
-      class: { grid: ['justify-items-start'] },
-    },
-    {
-      variant: HERO_VARIANT.BANNER,
-      position: CONTENT_ALIGNMENT.CENTER,
-      class: { grid: ['justify-items-center'] },
-    },
-    {
-      variant: HERO_VARIANT.BANNER,
-      position: CONTENT_ALIGNMENT.RIGHT,
-      class: { grid: ['justify-items-end'] },
-    },
-    {
-      variant: HERO_VARIANT.BANNER,
-      tone: BRAND_VARIANT.BRAND_PRIMARY,
-      position: CONTENT_ALIGNMENT.LEFT,
-      class: { overlay: [AZURE_SCRIM_LEFT] },
-    },
-    {
-      variant: HERO_VARIANT.BANNER,
-      tone: BRAND_VARIANT.BRAND_PRIMARY,
-      position: CONTENT_ALIGNMENT.CENTER,
-      class: { overlay: [AZURE_SCRIM_CENTER] },
-    },
-    {
-      variant: HERO_VARIANT.BANNER,
-      tone: BRAND_VARIANT.BRAND_PRIMARY,
-      position: CONTENT_ALIGNMENT.RIGHT,
-      class: { overlay: [AZURE_SCRIM_RIGHT] },
-    },
-    {
-      variant: HERO_VARIANT.BANNER,
-      tone: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
-      position: CONTENT_ALIGNMENT.LEFT,
-      class: { overlay: [NEUTRAL_SCRIM_LEFT] },
-    },
-    {
-      variant: HERO_VARIANT.BANNER,
-      tone: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
-      position: CONTENT_ALIGNMENT.CENTER,
-      class: { overlay: [NEUTRAL_SCRIM_CENTER] },
-    },
-    {
-      variant: HERO_VARIANT.BANNER,
-      tone: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
-      position: CONTENT_ALIGNMENT.RIGHT,
-      class: { overlay: [NEUTRAL_SCRIM_RIGHT] },
-    },
   ],
-  defaultVariants: {
-    tone: BRAND_VARIANT.PRIMARY,
-  },
 });

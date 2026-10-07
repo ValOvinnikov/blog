@@ -4,7 +4,6 @@ import {
   type IWithClassName,
   type IWithDataTestId,
   MEDIA_ORDER,
-  SPACING_SCALE,
   type TBrandVariant,
   type TContentAlignment,
   type TCtaVariant,
@@ -15,6 +14,7 @@ import { Eyebrow } from '@blog/ui/components/atoms/eyebrow';
 import { Heading } from '@blog/ui/components/atoms/heading';
 import { MediaFrame } from '@blog/ui/components/atoms/media-frame';
 import { Prose } from '@blog/ui/components/atoms/prose';
+import { bannerVariants } from '@blog/ui/lib/styling';
 import type { ReactNode } from 'react';
 
 import {
@@ -71,8 +71,7 @@ export const CtaModule = ({
     : (contentPosition ?? CONTENT_ALIGNMENT.LEFT);
   const resolvedAlignment = isSplit
     ? contentAlignment
-    : (contentAlignment ??
-      (isBanner ? CONTENT_ALIGNMENT.LEFT : CONTENT_ALIGNMENT.CENTER));
+    : (contentAlignment ?? CONTENT_ALIGNMENT.LEFT);
 
   const s = ctaModuleVariants({
     variant,
@@ -83,38 +82,73 @@ export const CtaModule = ({
       ? (mobileMediaOrder ?? MEDIA_ORDER.LAST)
       : undefined,
     wrapped: isWrapped,
-    spacingTop: isBanner ? (spacingTop ?? SPACING_SCALE.MD) : undefined,
-    spacingBottom: isBanner ? (spacingBottom ?? SPACING_SCALE.MD) : undefined,
   });
+  const banner = isBanner
+    ? bannerVariants({
+        tone,
+        position: resolvedPosition,
+        spacingTop,
+        spacingBottom,
+      })
+    : undefined;
 
   return (
-    <div className={s.root({ class: className })} data-testid={dataTestId}>
+    <div
+      className={s.root({
+        class: [banner?.root(), banner?.copy(), className],
+      })}
+      data-testid={dataTestId}
+    >
       <div className={s.body()}>
-        {eyebrow && <Eyebrow className={s.eyebrow()}>{eyebrow}</Eyebrow>}
-        <div className={s.group()}>
+        {eyebrow && (
+          <Eyebrow className={s.eyebrow({ class: banner?.title() })}>
+            {eyebrow}
+          </Eyebrow>
+        )}
+        <div className={s.group({ class: banner?.block() })}>
           <Heading
             id={headingId}
             level={2}
             visual="section"
-            className={s.heading()}
+            className={s.heading({ class: banner?.title() })}
           >
             {heading}
           </Heading>
-          {supportingText && <p className={s.text()}>{supportingText}</p>}
-          {content && <Prose className={s.text()}>{content}</Prose>}
+          {supportingText && (
+            <p className={s.text({ class: banner?.text() })}>
+              {supportingText}
+            </p>
+          )}
+          {content && (
+            <Prose className={s.text({ class: banner?.text() })}>
+              {content}
+            </Prose>
+          )}
         </div>
-        {actions && <div className={s.actions()}>{actions}</div>}
-        {footnote && <p className={s.footnote()}>{footnote}</p>}
+        {actions && (
+          <div className={s.actions({ class: banner?.actions() })}>
+            {actions}
+          </div>
+        )}
+        {footnote && (
+          <p
+            className={s.footnote({
+              class: [banner?.block(), banner?.text()],
+            })}
+          >
+            {footnote}
+          </p>
+        )}
       </div>
       {image &&
-        (isBanner ? (
-          <div className={s.media()}>{image}</div>
+        (banner ? (
+          <div className={s.media({ class: banner.media() })}>{image}</div>
         ) : (
           <MediaFrame ratio="video" className={s.media()}>
             {image}
           </MediaFrame>
         ))}
-      {isBanner && <div className={s.overlay()} aria-hidden="true" />}
+      {banner && <div className={banner.overlay()} aria-hidden="true" />}
     </div>
   );
 };

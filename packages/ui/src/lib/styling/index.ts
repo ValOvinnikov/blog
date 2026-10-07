@@ -1,17 +1,7 @@
-export {
-  AZURE_SCRIM_CENTER,
-  AZURE_SCRIM_CENTER_BELOW_SM,
-  AZURE_SCRIM_LEFT,
-  AZURE_SCRIM_LEFT_FROM_SM,
-  AZURE_SCRIM_RIGHT,
-  AZURE_SCRIM_RIGHT_FROM_SM,
-  NEUTRAL_SCRIM_CENTER,
-  NEUTRAL_SCRIM_CENTER_BELOW_SM,
-  NEUTRAL_SCRIM_LEFT,
-  NEUTRAL_SCRIM_LEFT_FROM_SM,
-  NEUTRAL_SCRIM_RIGHT,
-  NEUTRAL_SCRIM_RIGHT_FROM_SM,
-} from './scrims';
+export { BAND_SPACING_BOTTOM, BAND_SPACING_TOP } from './band-spacing';
+export { bannerVariants } from './banner';
+export { CARD_GAP, CARD_GUTTER_OFFSET, CARD_GUTTER_START } from './card-gap';
+export { FULL_BLEED } from './full-bleed';
 export { INTERACTIVE_ITEM_CARD } from './item-card';
 export { BRAND_PILL } from './pill';
 export { tv } from './tv';

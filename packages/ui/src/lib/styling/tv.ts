@@ -9,6 +9,12 @@ const SPACING_TOKENS = [
   'site-y',
   'card-x',
   'card-y',
+  'card-gap',
+  'band',
+  'band-sm',
+  'band-md',
+  'band-lg',
+  'band-xl',
 ];
 
 const TRACKING_TOKENS = [
@@ -61,6 +67,8 @@ export const tv = createTV({
         pr: [{ pr: SPACING_TOKENS }],
         pb: [{ pb: SPACING_TOKENS }],
         pl: [{ pl: SPACING_TOKENS }],
+        ml: [{ ml: SPACING_TOKENS }],
+        gap: [{ gap: SPACING_TOKENS }],
       },
     },
   },

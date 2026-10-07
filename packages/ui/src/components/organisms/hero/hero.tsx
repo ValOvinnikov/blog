@@ -18,6 +18,7 @@ import {
   type TCompoundChildren,
   type TCompoundComponent,
 } from '@blog/ui/lib/react';
+import { bannerVariants } from '@blog/ui/lib/styling';
 import { cloneElement, Fragment, type ElementType } from 'react';
 
 import { HeroAvatar } from './components/avatar/hero-avatar';
@@ -77,8 +78,7 @@ const HeroRoot = ({
   const resolvedPosition = contentPosition ?? CONTENT_ALIGNMENT.LEFT;
   const resolvedAlignment = isSplit
     ? contentAlignment
-    : (contentAlignment ??
-      (isBanner ? CONTENT_ALIGNMENT.LEFT : CONTENT_ALIGNMENT.CENTER));
+    : (contentAlignment ?? CONTENT_ALIGNMENT.LEFT);
   const resolvedMediaOrder = isBanner
     ? undefined
     : (mediaOrder ?? MEDIA_ORDER.LAST);
@@ -89,62 +89,87 @@ const HeroRoot = ({
     position: resolvedPosition,
     alignment: resolvedAlignment,
     mediaOrder: resolvedMediaOrder,
-    tone,
-    spacingTop: isBanner ? spacingTop : undefined,
-    spacingBottom: isBanner ? spacingBottom : undefined,
   });
+  const banner = isBanner
+    ? bannerVariants({
+        tone,
+        position: resolvedPosition,
+        spacingTop,
+        spacingBottom,
+      })
+    : undefined;
 
   return (
-    <div className={s.root({ class: className })} data-testid={dataTestId}>
+    <div
+      className={s.root({ class: [banner?.root(), className] })}
+      data-testid={dataTestId}
+    >
       <div className={s.grid()}>
-        <div className={s.copy()} data-testid="hero-copy">
+        <div
+          className={s.copy({ class: banner?.copy() })}
+          data-testid="hero-copy"
+        >
           {slots.Avatar &&
             cloneElement(slots.Avatar, {
               contentAlignment: resolvedAlignment,
             })}
-          {eyebrow && <Eyebrow className={s.eyebrow()}>{eyebrow}</Eyebrow>}
-          <div className={s.group()}>
+          {eyebrow && (
+            <Eyebrow className={s.eyebrow({ class: banner?.title() })}>
+              {eyebrow}
+            </Eyebrow>
+          )}
+          <div className={s.group({ class: banner?.block() })}>
             <div className={s.title()}>
               <Heading
                 id={titleId}
                 level={1}
                 visual="hero"
-                className={s.heading()}
+                className={s.heading({ class: banner?.title() })}
               >
                 {title}
               </Heading>
             </div>
             {excerpt && (
-              <Text variant="hero" className={s.excerpt()}>
+              <Text
+                variant="hero"
+                className={s.excerpt({ class: banner?.text() })}
+              >
                 {excerpt}
               </Text>
             )}
             {slots.Body &&
               cloneElement(slots.Body, {
                 contentAlignment: resolvedAlignment,
-                className: s.body(),
+                className: s.body({
+                  class: [banner?.copy(), banner?.text()],
+                }),
               })}
           </div>
           {slots.Cta &&
             cloneElement(slots.Cta, {
               contentAlignment: resolvedAlignment,
+              ...(banner && { className: banner.actions() }),
             })}
           {slots.Social &&
             cloneElement(slots.Social, {
               contentAlignment: resolvedAlignment,
+              ...(banner && { className: banner.actions() }),
             })}
         </div>
         {slots.Media && (
-          <div className={s.media()} data-testid="hero-media">
+          <div
+            className={s.media({ class: banner?.media() })}
+            data-testid="hero-media"
+          >
             {cloneElement(
               slots.Media,
               isBanner ? { isFramed: false } : { variant: resolvedVariant },
             )}
           </div>
         )}
-        {isBanner && (
+        {banner && (
           <div
-            className={s.overlay()}
+            className={banner.overlay()}
             aria-hidden="true"
             data-testid="hero-overlay"
           />

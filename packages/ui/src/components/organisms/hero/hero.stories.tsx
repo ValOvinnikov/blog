@@ -109,15 +109,15 @@ const meta = {
     },
     tone: {
       control: 'select',
-      options: objectKeys(heroVariants.variants.tone),
+      options: objectKeys(BRAND_VARIANT),
     },
     spacingTop: {
       control: 'select',
-      options: objectKeys(heroVariants.variants.spacingTop),
+      options: objectKeys(SPACING_SCALE),
     },
     spacingBottom: {
       control: 'select',
-      options: objectKeys(heroVariants.variants.spacingBottom),
+      options: objectKeys(SPACING_SCALE),
     },
   },
   args: {
