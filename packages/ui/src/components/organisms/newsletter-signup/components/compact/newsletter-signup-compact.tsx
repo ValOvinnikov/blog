@@ -33,7 +33,7 @@ export type TNewsletterSignupCompactProps = IWithClassName &
     align?: TNewsletterSignupVariants['align'];
   };
 
-/** A slim single-row subscribe strip for the end of every article. */
+/** A single-row subscribe strip with an inline label in place of a heading. */
 export const NewsletterSignupCompact = ({
   email,
   onChange,

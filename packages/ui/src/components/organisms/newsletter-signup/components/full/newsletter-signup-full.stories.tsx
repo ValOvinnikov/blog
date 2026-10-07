@@ -2,6 +2,7 @@ import { FORM_STATUSES, CONTENT_ALIGNMENT, ICONS, SIZE } from '@blog/config';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { NewsletterSignup } from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup';
 import { newsletterSignupVariants } from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup-variants';
+import { HEADING_LEVELS } from '@blog/ui/lib/react';
 import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -30,6 +31,10 @@ const meta = {
       control: 'select',
       options: FORM_STATUSES,
     },
+    headingLevel: {
+      control: 'select',
+      options: HEADING_LEVELS,
+    },
   },
   args: {
     email: '',
@@ -50,11 +55,6 @@ const meta = {
 export default meta;
 type TStory = StoryObj<typeof meta>;
 
-/**
- * Access via `NewsletterSignup.Full` — the rich panel density used by
- * the site footer and CMS page-builder module, split into a pitch pane and a
- * form pane side by side on desktop.
- */
 export const Default: TStory = {};
 
 export const Submitting: TStory = {

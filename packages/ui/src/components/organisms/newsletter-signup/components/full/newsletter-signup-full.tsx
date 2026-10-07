@@ -7,6 +7,7 @@ import {
   type TFormStatus,
 } from '@blog/config';
 import { Alert } from '@blog/ui/components/atoms/alert';
+import { Heading } from '@blog/ui/components/atoms/heading';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { Panel } from '@blog/ui/components/molecules/panel';
 import { NewsletterSignupContent } from '@blog/ui/components/organisms/newsletter-signup/components/content/newsletter-signup-content';
@@ -14,6 +15,7 @@ import {
   newsletterSignupVariants,
   type TNewsletterSignupVariants,
 } from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup-variants';
+import type { THeadingLevel } from '@blog/ui/lib/react';
 import type { ReactNode } from 'react';
 
 export interface INewsletterSignupTrustCue {
@@ -29,6 +31,7 @@ export type TNewsletterSignupFullProps = IWithClassName &
     status: TFormStatus;
     heading: string;
     headingId?: string;
+    headingLevel?: THeadingLevel;
     supportingText?: string;
     errorMessage?: string;
     errorMessageId?: string;
@@ -40,7 +43,7 @@ export type TNewsletterSignupFullProps = IWithClassName &
     align?: TNewsletterSignupVariants['align'];
   };
 
-/** The rich, tinted panel signup form used by the site footer and the CMS page-builder module. */
+/** A panel that sets a heading, pitch and trust cues beside the subscribe form. */
 export const NewsletterSignupFull = ({
   email,
   onChange,
@@ -48,6 +51,7 @@ export const NewsletterSignupFull = ({
   status,
   heading,
   headingId,
+  headingLevel = 2,
   supportingText,
   errorMessage,
   errorMessageId,
@@ -67,9 +71,9 @@ export const NewsletterSignupFull = ({
     <Panel className={s.root({ class: className })} dataTestId={dataTestId}>
       <Panel.Body className={s.body()}>
         <div className={s.pitchPane()}>
-          <h3 id={headingId} className={s.heading()}>
+          <Heading level={headingLevel} visual="card" id={headingId}>
             {heading}
-          </h3>
+          </Heading>
           {supportingText && (
             <p className={s.supportingText()}>{supportingText}</p>
           )}
