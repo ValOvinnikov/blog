@@ -1,4 +1,4 @@
-import { DENSITY, FONT_CHOICE, RADIUS_SCALE } from '@blog/config';
+import { CARD_STYLE, DENSITY, FONT_CHOICE, RADIUS_SCALE } from '@blog/config';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import userEvent from '@testing-library/user-event';
 
@@ -15,6 +15,7 @@ const BASE_PROPS = {
   bodyFont: FONT_CHOICE.NEWSREADER,
   radiusScale: RADIUS_SCALE.MD,
   density: DENSITY.DEFAULT,
+  cardStyle: CARD_STYLE.ACCENT_BAR,
   logoSrc: undefined,
 };
 
@@ -46,6 +47,15 @@ describe(LookPreview, () => {
     expect(screen.getByTestId('preview-sample-tokens')).toHaveStyle({
       '--radius-md': '12px',
       '--spacing-card-x': '0.75rem',
+    });
+  });
+
+  it('carries the outlined card style onto the preview surface', () => {
+    render(<LookPreview {...BASE_PROPS} cardStyle={CARD_STYLE.OUTLINED} />);
+
+    expect(screen.getByTestId('preview-sample-tokens')).toHaveStyle({
+      '--item-border-width': '1px',
+      '--item-accent-color': 'var(--border)',
     });
   });
 

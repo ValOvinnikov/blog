@@ -51,7 +51,7 @@ const applyPresetDefaults = (
   preset: TPresetId,
   current: TLookFormValues,
 ): TLookFormValues => {
-  const tokens = PRESET_REGISTRY[preset].themeTokens;
+  const { themeTokens: tokens, cardStyle } = PRESET_REGISTRY[preset];
 
   return {
     preset,
@@ -61,6 +61,7 @@ const applyPresetDefaults = (
     bodyFont: tokens.bodyFont,
     radiusScale: tokens.radiusScale,
     density: tokens.density,
+    cardStyle,
     languageSwitcherStyle: current.languageSwitcherStyle,
     logoAssetUrl: current.logoAssetUrl,
     faviconAssetUrl: current.faviconAssetUrl,
@@ -76,6 +77,7 @@ const valuesEqual = (a: TLookFormValues, b: TLookFormValues): boolean => {
     a.bodyFont === b.bodyFont &&
     a.radiusScale === b.radiusScale &&
     a.density === b.density &&
+    a.cardStyle === b.cardStyle &&
     a.languageSwitcherStyle === b.languageSwitcherStyle &&
     a.logoAssetUrl === b.logoAssetUrl &&
     a.faviconAssetUrl === b.faviconAssetUrl
@@ -108,6 +110,7 @@ export const LookForm = ({
           bodyFont: vals.bodyFont,
           radiusScale: vals.radiusScale,
           density: vals.density,
+          cardStyle: vals.cardStyle,
           languageSwitcherStyle: vals.languageSwitcherStyle,
         }),
       onSuccess: (submittedValues) => {
@@ -227,6 +230,7 @@ export const LookForm = ({
               bodyFont={values.bodyFont}
               radiusScale={values.radiusScale}
               density={values.density}
+              cardStyle={values.cardStyle}
               onFieldChange={updateField}
               isArchived={isArchived}
               archivedNoticeId={archivedNoticeId}
@@ -246,6 +250,7 @@ export const LookForm = ({
             bodyFont={values.bodyFont}
             radiusScale={values.radiusScale}
             density={values.density}
+            cardStyle={values.cardStyle}
             logoSrc={values.logoAssetUrl}
           />
         </div>

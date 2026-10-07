@@ -64,8 +64,10 @@ export const PreviewSample = ({
         <span className={chip()}>{t('readTimeChip')}</span>
       </div>
       <div className={cards()}>
-        <MediaCard isInteractive={false} excerpt={t('firstCardExcerpt')}>
-          <MediaCard.Title level={4}>{t('firstCardTitle')}</MediaCard.Title>
+        <MediaCard isInteractive={true} excerpt={t('firstCardExcerpt')}>
+          <MediaCard.Title level={4}>
+            <MediaCard.Link href="#">{t('firstCardTitle')}</MediaCard.Link>
+          </MediaCard.Title>
         </MediaCard>
         <MediaCard isInteractive={false} excerpt={t('secondCardExcerpt')}>
           <MediaCard.Title level={4}>{t('secondCardTitle')}</MediaCard.Title>

@@ -304,7 +304,9 @@
     "radiusScaleDescription": "Rundung der Ecken auf allen Flächen.",
     "densityLabel": "Dichte",
     "densityDescription": "Abstände und Größe der Bedienelemente.",
-    "footerNote": "Eckenradius und Dichte werden mit dem restlichen Formular gespeichert, wirken sich aber noch nicht auf die Vorschau oben aus.",
+    "cardStyleLabel": "Kartenstil",
+    "cardStyleDescription": "Wie Beitrags-, Themen- und Zitatkarten auf der ganzen Website gerahmt sind.",
+    "footerNote": "Jede Einstellung hier, auch der Kartenstil, erscheint in der Vorschau, bevor Sie speichern.",
     "radiusScaleOptionLabel": {
       "SM": "Klein",
       "MD": "Mittel",
@@ -314,6 +316,10 @@
     "densityOptionLabel": {
       "DEFAULT": "Standard",
       "COMPACT": "Kompakt"
+    },
+    "cardStyleOptionLabel": {
+      "ACCENT_BAR": "Akzentleiste",
+      "OUTLINED": "Umrandet"
     },
     "languageSwitcherLabel": "Sprachauswahl",
     "languageSwitcherDescription": "Wie die Sprachauswahl auf dem Desktop in Kopf- und Fußzeile aussieht.",
@@ -336,9 +342,9 @@
     "readMoreButton": "Weiterlesen",
     "readTimeChip": "4 Min. Lesezeit",
     "firstCardTitle": "Notizen aus dem Hafen",
-    "firstCardExcerpt": "Eine Karte, wie Beitragslisten sie darstellen.",
+    "firstCardExcerpt": "Eine verlinkte Karte, wie Beitragslisten sie darstellen.",
     "secondCardTitle": "Kurs auf die nächste Saison",
-    "secondCardExcerpt": "Ecken und Abstände folgen Ihrer Rundung und Dichte.",
+    "secondCardExcerpt": "Eine statische Karte. Ihr Rahmen folgt Ihrem Kartenstil.",
     "outlinedCardHeading": "Newsletter",
     "outlinedCardBody": "Eine umrandete Karte, wie Panels und Preisstufen sie darstellen.",
     "previewNote": "Ungespeicherter Formularzustand → CSS Custom Properties, passend zur OKLCH-Abstufung in Produktion. Hier ist nichts live, bis Sie speichern.",

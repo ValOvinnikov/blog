@@ -201,9 +201,9 @@ at request time) is unaffected and still never imports `@blog/insight`.
 
 ³ `apps/platform`'s `@blog/ui` prohibition has one scoped exception:
 `apps/platform/src/components/features/look/look-preview/preview-sample/`
-renders the tenant's real site (`BrandMark`, `Heading`, `MediaCard`,
-`Panel`, `Text`, `Button`) so the live theme preview doesn't drift from what `apps/web`
-actually looks like. An ESLint `no-restricted-imports` override in
+renders the tenant's real site (`BrandMark`, `Heading`, `Text`, `Button`, a
+linked and a static `MediaCard`, and a `Panel`) so the live theme preview
+doesn't drift from what `apps/web` actually looks like. An ESLint `no-restricted-imports` override in
 `configs/eslint/platform.js` confines `@blog/ui` imports under `apps/platform` to
 that one directory; every other admin surface uses admin's own primitives.
 
@@ -1332,6 +1332,10 @@ density and card-style values live in `@blog/config`'s theme declaration tables;
 its preview surface, which also carries the `dark` class so the tenant's
 dark ramp wins over `theme.css`'s static `.dark` values. `apps/web`'s
 `buildThemeStyleBlock` reads the same tables. The
+Look page's Advanced section sets the card style (Accent bar or Outlined)
+beside radius and density; picking a preset re-seeds it from
+`PRESET_REGISTRY`'s `cardStyle`, and the preview's linked and static cards show
+it before saving. The
 Look form and `updateLookAction` both refuse an accent hue
 `isAccentHueAccessible` rejects, so a saved hue is never one the site
 silently replaces. It also selects the matching `next/font/local`
@@ -2482,3 +2486,26 @@ governs graphics required to identify a control, and these dividers are
 decorative — an accordion row is already a real `<button>` with its own focus
 ring, and a section's edge rule is a presentational boundary. `--border-emphasis`
 is the token for a border that genuinely is the sole indicator.
+
+### Card style
+
+Item cards — `MediaCard`, `TaxonomyCard` and `QuoteCard` — paint their frame
+through one `item-card` utility in `configs/tailwind/theme.css`, which reads
+five inherited `--item-*` properties rather than fixed classes, and each pairs
+it with `surface-card`, which retargets `--ambient` to `--surface`. The tenant picks
+the values site-wide on the Look page (`site_config.card_style`), and
+`buildThemeStyleBlock` declares them under `:root` from `@blog/config`'s
+`CARD_STYLE_DECLARATIONS`:
+
+| Property              | `ACCENT_BAR` (default) | `OUTLINED`         |
+| --------------------- | ---------------------- | ------------------ |
+| `--item-radius`       | `0`                    | `var(--radius-md)` |
+| `--item-border-width` | `0`                    | `1px`              |
+| `--item-accent-width` | `2px`                  | `1px`              |
+| `--item-accent-color` | `var(--brand-primary)` | `var(--border)`    |
+| `--item-shadow`       | `none`                 | `none`             |
+
+`--radius-item` exposes `--item-radius` as `rounded-item`. `theme.css`'s
+static values are `ACCENT_BAR`'s, so a site with no saved look renders the
+accent bar. An interactive card adds `INTERACTIVE_ITEM_CARD`'s brand-muted tint
+on hover and focus-within under either style; the style changes only the frame.

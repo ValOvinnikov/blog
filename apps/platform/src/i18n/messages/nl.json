@@ -304,7 +304,9 @@
     "radiusScaleDescription": "Rondheid van hoeken op elk oppervlak.",
     "densityLabel": "Dichtheid",
     "densityDescription": "Witruimte en grootte van bedieningselementen.",
-    "footerNote": "Afrondingsschaal en dichtheid worden met de rest van dit formulier opgeslagen, maar sturen de voorbeeldweergave hierboven nog niet aan.",
+    "cardStyleLabel": "Kaartstijl",
+    "cardStyleDescription": "Hoe bericht-, onderwerp- en citaatkaarten op de hele site worden omlijst.",
+    "footerNote": "Elke instelling hier, ook de kaartstijl, is zichtbaar in het voorbeeld voordat u opslaat.",
     "radiusScaleOptionLabel": {
       "SM": "Klein",
       "MD": "Middel",
@@ -314,6 +316,10 @@
     "densityOptionLabel": {
       "DEFAULT": "Standaard",
       "COMPACT": "Compact"
+    },
+    "cardStyleOptionLabel": {
+      "ACCENT_BAR": "Accentbalk",
+      "OUTLINED": "Omlijnd"
     },
     "languageSwitcherLabel": "Taalkeuze",
     "languageSwitcherDescription": "Hoe de taalkeuze er op desktop uitziet, in de header en footer.",
@@ -336,9 +342,9 @@
     "readMoreButton": "Lees meer",
     "readTimeChip": "4 min lezen",
     "firstCardTitle": "Notities uit de haven",
-    "firstCardExcerpt": "Een kaart zoals berichtenlijsten hem tonen.",
+    "firstCardExcerpt": "Een gelinkte kaart, zoals berichtenlijsten hem tonen.",
     "secondCardTitle": "Koers naar het volgende seizoen",
-    "secondCardExcerpt": "De hoeken en marges volgen uw afronding en dichtheid.",
+    "secondCardExcerpt": "Een statische kaart. De omlijsting volgt uw kaartstijl.",
     "outlinedCardHeading": "Nieuwsbrief",
     "outlinedCardBody": "Een omlijnde kaart, zoals panelen en prijsniveaus hem tonen.",
     "previewNote": "Niet-opgeslagen formulierstatus → CSS custom properties, volgens dezelfde OKLCH-schaal als in productie. Niets hier is live totdat u opslaat.",

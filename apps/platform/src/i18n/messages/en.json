@@ -304,7 +304,9 @@
     "radiusScaleDescription": "Corner roundness across every surface.",
     "densityLabel": "Density",
     "densityDescription": "Spacing and control size.",
-    "footerNote": "Radius scale and density are saved with the rest of this form but don't yet drive the inline preview above.",
+    "cardStyleLabel": "Card style",
+    "cardStyleDescription": "How post, topic and quote cards are framed across the site.",
+    "footerNote": "Every control here, card style included, shows in the preview before you save.",
     "radiusScaleOptionLabel": {
       "SM": "Small",
       "MD": "Medium",
@@ -314,6 +316,10 @@
     "densityOptionLabel": {
       "DEFAULT": "Default",
       "COMPACT": "Compact"
+    },
+    "cardStyleOptionLabel": {
+      "ACCENT_BAR": "Accent bar",
+      "OUTLINED": "Outlined"
     },
     "languageSwitcherLabel": "Language switcher",
     "languageSwitcherDescription": "How the language switcher looks on desktop, in the header and footer.",
@@ -336,9 +342,9 @@
     "readMoreButton": "Read more",
     "readTimeChip": "4 min read",
     "firstCardTitle": "Notes from the harbour",
-    "firstCardExcerpt": "A card the way post lists render it.",
+    "firstCardExcerpt": "A linked card, the way post lists render it.",
     "secondCardTitle": "Charting the next season",
-    "secondCardExcerpt": "Its corners and padding follow your radius and density.",
+    "secondCardExcerpt": "A static card. Its frame follows your card style.",
     "outlinedCardHeading": "Newsletter",
     "outlinedCardBody": "An outlined card, as panels and pricing tiers render it.",
     "previewNote": "Unsaved form state → CSS custom properties, matching production's OKLCH ramp. Nothing here is live until you save.",

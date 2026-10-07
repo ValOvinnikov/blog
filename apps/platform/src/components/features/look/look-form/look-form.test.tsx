@@ -1,4 +1,5 @@
 import {
+  CARD_STYLE,
   DENSITY,
   FONT_CHOICE,
   isAccentHueAccessible,
@@ -136,6 +137,7 @@ describe(`<${LookForm.name}/>`, () => {
         bodyFont: FONT_CHOICE.NEWSREADER,
         radiusScale: RADIUS_SCALE.MD,
         density: DENSITY.DEFAULT,
+        cardStyle: CARD_STYLE.ACCENT_BAR,
         languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
       });
     });
@@ -268,6 +270,36 @@ describe(`<${LookForm.name}/>`, () => {
     });
   });
 
+  it('previews and saves the outlined card style', async () => {
+    setup();
+
+    await user.click(screen.getByText('Advanced'));
+    await user.click(screen.getByRole('button', { name: 'Outlined' }));
+
+    expect(screen.getByTestId('preview-sample-tokens')).toHaveStyle({
+      '--item-border-width': '1px',
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    await waitFor(() => {
+      expect(updateLookActionMock).toHaveBeenCalledWith(
+        'tenant-1',
+        expect.objectContaining({ cardStyle: CARD_STYLE.OUTLINED }),
+      );
+    });
+  });
+
+  it("choosing a preset applies that preset's card style", async () => {
+    setup();
+
+    await user.click(screen.getByRole('radio', { name: 'Editorial' }));
+
+    expect(screen.getByTestId('preview-sample-tokens')).toHaveStyle({
+      '--item-border-width': '1px',
+    });
+  });
+
   it('resets a diverged control back to the current preset on "Reset to preset"', async () => {
     setup();
 
@@ -332,6 +364,7 @@ describe(`<${LookForm.name}/>`, () => {
         screen.getByRole('button', { name: 'Extra Large' }),
       ).toBeDisabled();
       expect(screen.getByRole('button', { name: 'Compact' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: 'Outlined' })).toBeDisabled();
     });
 
     it('describes the disabled Save and Reset buttons with the archived notice text, for a screen-reader user', () => {

@@ -1,8 +1,10 @@
 'use client';
 
 import {
+  CARD_STYLE,
   DENSITY,
   RADIUS_SCALE,
+  type TCardStyle,
   type TDensity,
   type TFontChoice,
   type TRadiusScale,
@@ -19,6 +21,7 @@ export type TLookFormAdvancedSectionProps = {
   bodyFont: TFontChoice;
   radiusScale: TRadiusScale;
   density: TDensity;
+  cardStyle: TCardStyle;
   onFieldChange: TLookFormFieldSetter;
   isArchived: boolean;
   archivedNoticeId: string;
@@ -29,6 +32,7 @@ export const LookFormAdvancedSection = ({
   bodyFont,
   radiusScale,
   density,
+  cardStyle,
   onFieldChange,
   isArchived,
   archivedNoticeId,
@@ -47,10 +51,16 @@ export const LookFormAdvancedSection = ({
     label: t(`densityOptionLabel.${option}`),
   }));
 
+  const cardStyleOptions = Object.values(CARD_STYLE).map((style) => ({
+    value: style,
+    label: t(`cardStyleOptionLabel.${style}`),
+  }));
+
   const headingFontLabel = t('headingFontLabel');
   const bodyFontLabel = t('bodyFontLabel');
   const radiusScaleLabel = t('radiusScaleLabel');
   const densityLabel = t('densityLabel');
+  const cardStyleLabel = t('cardStyleLabel');
 
   return (
     <>
@@ -98,6 +108,19 @@ export const LookFormAdvancedSection = ({
           options={densityOptions}
           value={density}
           onChange={(option) => onFieldChange('density', option)}
+          isDisabled={isArchived}
+          aria-describedby={archivedDescribedBy}
+        />
+      </div>
+
+      <div className={field()}>
+        <span className={fieldLabel()}>{cardStyleLabel}</span>
+        <p className={fieldHint()}>{t('cardStyleDescription')}</p>
+        <SegmentedControl<TCardStyle>
+          ariaLabel={cardStyleLabel}
+          options={cardStyleOptions}
+          value={cardStyle}
+          onChange={(style) => onFieldChange('cardStyle', style)}
           isDisabled={isArchived}
           aria-describedby={archivedDescribedBy}
         />

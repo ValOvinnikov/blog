@@ -3,12 +3,14 @@
 import {
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
+  CARD_STYLE,
   DENSITY,
   FONT_CHOICE,
   isAccentHueAccessible,
   LANGUAGE_SWITCHER_STYLE,
   PRESET_ID,
   RADIUS_SCALE,
+  type TCardStyle,
   type TDensity,
   type TFontChoice,
   type TLanguageSwitcherStyle,
@@ -46,6 +48,7 @@ const updateLookInputSchema = z.object({
       ...TLanguageSwitcherStyle[],
     ],
   ),
+  cardStyle: z.enum(Object.values(CARD_STYLE) as [TCardStyle, ...TCardStyle[]]),
 });
 
 export type TUpdateLookInput = z.input<typeof updateLookInputSchema>;

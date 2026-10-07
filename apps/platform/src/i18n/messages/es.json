@@ -304,7 +304,9 @@
     "radiusScaleDescription": "Redondeo de las esquinas en todas las superficies.",
     "densityLabel": "Densidad",
     "densityDescription": "Espaciado y tamaño de los controles.",
-    "footerNote": "La escala de radio y la densidad se guardan con el resto de este formulario, pero todavía no se reflejan en la vista previa de arriba.",
+    "cardStyleLabel": "Estilo de tarjeta",
+    "cardStyleDescription": "Cómo se enmarcan las tarjetas de entradas, temas y citas en todo el sitio.",
+    "footerNote": "Cada ajuste de aquí, incluido el estilo de tarjeta, se ve en la vista previa antes de guardar.",
     "radiusScaleOptionLabel": {
       "SM": "Pequeño",
       "MD": "Mediano",
@@ -314,6 +316,10 @@
     "densityOptionLabel": {
       "DEFAULT": "Predeterminada",
       "COMPACT": "Compacta"
+    },
+    "cardStyleOptionLabel": {
+      "ACCENT_BAR": "Barra de acento",
+      "OUTLINED": "Con contorno"
     },
     "languageSwitcherLabel": "Selector de idioma",
     "languageSwitcherDescription": "Cómo se ve el selector de idioma en escritorio, en el encabezado y el pie de página.",
@@ -336,9 +342,9 @@
     "readMoreButton": "Leer más",
     "readTimeChip": "4 min de lectura",
     "firstCardTitle": "Notas desde el puerto",
-    "firstCardExcerpt": "Una tarjeta tal como la muestran las listas de entradas.",
+    "firstCardExcerpt": "Una tarjeta enlazada, tal como la muestran las listas de entradas.",
     "secondCardTitle": "Rumbo a la próxima temporada",
-    "secondCardExcerpt": "Sus esquinas y márgenes siguen su redondeo y su densidad.",
+    "secondCardExcerpt": "Una tarjeta estática. Su marco sigue su estilo de tarjeta.",
     "outlinedCardHeading": "Boletín",
     "outlinedCardBody": "Una tarjeta con contorno, como la muestran los paneles y los planes de precios.",
     "previewNote": "Estado del formulario sin guardar → propiedades personalizadas de CSS, con la misma rampa OKLCH que producción. Nada de esto se publica hasta que guarde.",
