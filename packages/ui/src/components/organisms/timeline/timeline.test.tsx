@@ -45,27 +45,27 @@ const renderTimeline = (
   );
 
 describe(`<${Timeline.name}/>`, () => {
-  it('renders an ordered list with one item per entry', () => {
-    renderTimeline();
+  describe('with numbered markers', () => {
+    beforeEach(() => {
+      renderTimeline();
+    });
 
-    expect(screen.getByRole('list')).toBeVisible();
-    expect(screen.getAllByRole('listitem')).toHaveLength(items.length);
-  });
+    it('renders an ordered list with one item per entry', () => {
+      expect(screen.getByRole('list')).toBeVisible();
+      expect(screen.getAllByRole('listitem')).toHaveLength(items.length);
+    });
 
-  it('renders each item heading as a level-3 heading', () => {
-    renderTimeline();
+    it('renders each item heading as a level-3 heading', () => {
+      for (const item of items) {
+        expect(
+          screen.getByRole('heading', { level: 3, name: item.heading }),
+        ).toBeVisible();
+      }
+    });
 
-    for (const item of items) {
-      expect(
-        screen.getByRole('heading', { level: 3, name: item.heading }),
-      ).toBeVisible();
-    }
-  });
-
-  it('hides a numbered marker from assistive tech', () => {
-    renderTimeline();
-
-    expect(screen.getByText('1')).toHaveAttribute('aria-hidden', 'true');
+    it('hides a numbered marker from assistive tech', () => {
+      expect(screen.getByText('1')).toHaveAttribute('aria-hidden', 'true');
+    });
   });
 
   it('does not hide a labelled marker from assistive tech', () => {

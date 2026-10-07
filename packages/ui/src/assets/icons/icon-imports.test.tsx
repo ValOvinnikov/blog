@@ -4,18 +4,20 @@ import SunIcon from './sun.svg';
 import sunIconUrl from './sun.svg?url';
 
 describe('svg import tooling', () => {
-  it('resolves a bare .svg import to a renderable React component (SVGR)', () => {
-    render(<SunIcon data-testid="sun-icon" />);
+  describe('a bare .svg import', () => {
+    beforeEach(() => {
+      render(<SunIcon data-testid="sun-icon" />);
+    });
 
-    expect(screen.getByTestId('sun-icon')).toBeVisible();
-  });
+    it('resolves to a renderable React component (SVGR)', () => {
+      expect(screen.getByTestId('sun-icon')).toBeVisible();
+    });
 
-  it('keeps the source viewBox on the compiled SVG so CSS-driven resizing (Icon.tsx) rescales correctly', () => {
-    render(<SunIcon data-testid="sun-icon" />);
-
-    expect(screen.getByTestId('sun-icon').getAttribute('viewBox')).toBe(
-      '0 0 24 24',
-    );
+    it('keeps the source viewBox on the compiled SVG so CSS-driven resizing (Icon.tsx) rescales correctly', () => {
+      expect(screen.getByTestId('sun-icon').getAttribute('viewBox')).toBe(
+        '0 0 24 24',
+      );
+    });
   });
 
   it('resolves a `.svg?url` import to a non-empty asset URL string', () => {

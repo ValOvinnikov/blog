@@ -1,6 +1,7 @@
 import { DEPTH } from '@blog/config';
 import { customRender, screen } from '@blog/ui/testing/custom-render';
 import userEvent from '@testing-library/user-event';
+import type { Mock } from 'vitest';
 
 import { SegmentedControl } from './segmented-control';
 
@@ -18,50 +19,57 @@ const setup = customRender(SegmentedControl, {
 });
 
 describe(`<${SegmentedControl.name}/>`, () => {
-  it('renders a radiogroup with the given ariaLabel', () => {
-    setup();
-    expect(
-      screen.getByRole('radiogroup', { name: 'Reading depth' }),
-    ).toBeVisible();
+  let onChange: Mock<(value: string) => void>;
+
+  beforeEach(() => {
+    onChange = vi.fn();
   });
 
-  it('renders one radio per option with its label', () => {
-    setup();
-    for (const option of options) {
-      expect(screen.getByRole('radio', { name: option.label })).toBeVisible();
-    }
-  });
+  describe('with the default props', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-  it('marks the option matching value as checked, and the rest as unchecked', () => {
-    setup();
-    expect(screen.getByRole('radio', { name: 'Read' })).toHaveAttribute(
-      'aria-checked',
-      'true',
-    );
-    expect(screen.getByRole('radio', { name: '30s' })).toHaveAttribute(
-      'aria-checked',
-      'false',
-    );
-    expect(screen.getByRole('radio', { name: 'Deep' })).toHaveAttribute(
-      'aria-checked',
-      'false',
-    );
-  });
+    it('renders a radiogroup with the given ariaLabel', () => {
+      expect(
+        screen.getByRole('radiogroup', { name: 'Reading depth' }),
+      ).toBeVisible();
+    });
 
-  it('only the checked option is in the tab order', () => {
-    setup();
-    expect(screen.getByRole('radio', { name: 'Read' })).toHaveAttribute(
-      'tabIndex',
-      '0',
-    );
-    expect(screen.getByRole('radio', { name: '30s' })).toHaveAttribute(
-      'tabIndex',
-      '-1',
-    );
+    it('renders one radio per option with its label', () => {
+      for (const option of options) {
+        expect(screen.getByRole('radio', { name: option.label })).toBeVisible();
+      }
+    });
+
+    it('marks the option matching value as checked, and the rest as unchecked', () => {
+      expect(screen.getByRole('radio', { name: 'Read' })).toHaveAttribute(
+        'aria-checked',
+        'true',
+      );
+      expect(screen.getByRole('radio', { name: '30s' })).toHaveAttribute(
+        'aria-checked',
+        'false',
+      );
+      expect(screen.getByRole('radio', { name: 'Deep' })).toHaveAttribute(
+        'aria-checked',
+        'false',
+      );
+    });
+
+    it('only the checked option is in the tab order', () => {
+      expect(screen.getByRole('radio', { name: 'Read' })).toHaveAttribute(
+        'tabIndex',
+        '0',
+      );
+      expect(screen.getByRole('radio', { name: '30s' })).toHaveAttribute(
+        'tabIndex',
+        '-1',
+      );
+    });
   });
 
   it('calls onChange with the clicked option value', async () => {
-    const onChange = vi.fn();
     setup({ onChange });
     await userEvent.click(screen.getByRole('radio', { name: 'Deep' }));
     expect(onChange).toHaveBeenCalledTimes(1);
@@ -69,7 +77,6 @@ describe(`<${SegmentedControl.name}/>`, () => {
   });
 
   it('does not manage its own state — re-checks only after value is updated by the caller', async () => {
-    const onChange = vi.fn();
     const { rerender } = setup({ onChange });
     await userEvent.click(screen.getByRole('radio', { name: 'Deep' }));
     expect(screen.getByRole('radio', { name: 'Deep' })).toHaveAttribute(
@@ -92,7 +99,6 @@ describe(`<${SegmentedControl.name}/>`, () => {
   });
 
   it('moves focus and selection to the next option on ArrowRight, wrapping from the last option to the first', async () => {
-    const onChange = vi.fn();
     setup({ onChange, value: DEPTH.DEEP });
     screen.getByRole('radio', { name: 'Deep' }).focus();
 
@@ -103,7 +109,6 @@ describe(`<${SegmentedControl.name}/>`, () => {
   });
 
   it('moves focus and selection to the previous option on ArrowLeft, wrapping from the first option to the last', async () => {
-    const onChange = vi.fn();
     setup({ onChange, value: DEPTH.SKIM });
     screen.getByRole('radio', { name: '30s' }).focus();
 
@@ -114,7 +119,6 @@ describe(`<${SegmentedControl.name}/>`, () => {
   });
 
   it('treats ArrowDown the same as ArrowRight, and ArrowUp the same as ArrowLeft, re-rendering with the new value between presses since the controlled component re-derives currentIndex from value', async () => {
-    const onChange = vi.fn();
     const { rerender } = setup({ onChange, value: DEPTH.READ });
     screen.getByRole('radio', { name: 'Read' }).focus();
 
@@ -138,7 +142,6 @@ describe(`<${SegmentedControl.name}/>`, () => {
   });
 
   it('ignores non-navigation keys', async () => {
-    const onChange = vi.fn();
     setup({ onChange, value: DEPTH.READ });
     screen.getByRole('radio', { name: 'Read' }).focus();
 

@@ -43,26 +43,26 @@ const TestHarness = ({ children }: { children: ReactNode }) => {
 };
 
 describe(mapCompoundSlots, () => {
-  it('matches a single known slot', () => {
-    renderElement(
-      <TestHarness>
-        <Alpha>one</Alpha>
-      </TestHarness>,
-    );
-    expect(screen.getByTestId('alpha')).toBeVisible();
-    expect(screen.getByTestId('alpha')).toHaveTextContent('one');
-  });
+  describe('with a single Alpha slot', () => {
+    beforeEach(() => {
+      renderElement(
+        <TestHarness>
+          <Alpha>one</Alpha>
+        </TestHarness>,
+      );
+    });
 
-  it('types a matched slot with its own component props, needing no cast to clone it', () => {
-    renderElement(
-      <TestHarness>
-        <Alpha>one</Alpha>
-      </TestHarness>,
-    );
-    expect(screen.getByTestId('alpha')).toHaveAttribute(
-      'data-emphasis',
-      'true',
-    );
+    it('matches a single known slot', () => {
+      expect(screen.getByTestId('alpha')).toBeVisible();
+      expect(screen.getByTestId('alpha')).toHaveTextContent('one');
+    });
+
+    it('types a matched slot with its own component props, needing no cast to clone it', () => {
+      expect(screen.getByTestId('alpha')).toHaveAttribute(
+        'data-emphasis',
+        'true',
+      );
+    });
   });
 
   it('matches multiple different known slots', () => {

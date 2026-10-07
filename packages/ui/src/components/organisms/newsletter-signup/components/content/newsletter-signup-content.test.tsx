@@ -21,33 +21,42 @@ const baseArgs = {
   variant: 'full' as const,
 };
 
+const errorMessage = 'That email is already subscribed.';
+
 const setup = customRender(NewsletterSignupContent, baseArgs);
 
 describe(`<${NewsletterSignupContent.name}/>`, () => {
-  it('renders a labeled email field and submit button', () => {
-    setup();
+  describe('with the default props', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    expect(
-      screen.getByRole('textbox', { name: 'Email address' }),
-    ).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Subscribe' })).toBeVisible();
-  });
+    it('renders a labeled email field and submit button', () => {
+      expect(
+        screen.getByRole('textbox', { name: 'Email address' }),
+      ).toBeVisible();
+      expect(screen.getByRole('button', { name: 'Subscribe' })).toBeVisible();
+    });
 
-  it('associates the email field with its accessible label', () => {
-    setup();
+    it('associates the email field with its accessible label', () => {
+      expect(screen.getByLabelText('Email address')).toHaveAttribute(
+        'type',
+        'email',
+      );
+    });
 
-    expect(screen.getByLabelText('Email address')).toHaveAttribute(
-      'type',
-      'email',
-    );
-  });
+    it('renders inputPrompt as the field leading icon', () => {
+      expect(
+        screen.getByTestId('newsletter-signup-content-prompt'),
+      ).toBeVisible();
+    });
 
-  it('renders inputPrompt as the field leading icon', () => {
-    setup();
-
-    expect(
-      screen.getByTestId('newsletter-signup-content-prompt'),
-    ).toBeVisible();
+    it('submits through a real submit control, not an onClick shortcut', () => {
+      expect(screen.getByRole('button', { name: 'Subscribe' })).toHaveAttribute(
+        'type',
+        'submit',
+      );
+    });
   });
 
   it('forwards the typed character to onChange and does not manage its own state', async () => {
@@ -83,36 +92,28 @@ describe(`<${NewsletterSignupContent.name}/>`, () => {
     expect(onSubmit).toHaveBeenCalledTimes(1);
   });
 
-  it('submits through a real submit control, not an onClick shortcut', () => {
-    setup();
+  describe('while submitting', () => {
+    beforeEach(() => {
+      setup({ status: 'submitting' });
+    });
 
-    expect(screen.getByRole('button', { name: 'Subscribe' })).toHaveAttribute(
-      'type',
-      'submit',
-    );
-  });
+    it('disables the field and button and marks the button busy while submitting', () => {
+      expect(screen.getByRole('textbox')).toBeDisabled();
+      const button = screen.getByRole('button', { name: 'Subscribe' });
+      expect(button).toBeDisabled();
+      expect(button).toHaveAttribute('aria-busy', 'true');
+    });
 
-  it('disables the field and button and marks the button busy while submitting', () => {
-    setup({ status: 'submitting' });
-
-    expect(screen.getByRole('textbox')).toBeDisabled();
-    const button = screen.getByRole('button', { name: 'Subscribe' });
-    expect(button).toBeDisabled();
-    expect(button).toHaveAttribute('aria-busy', 'true');
-  });
-
-  it('shows the Spinner atom inside the button while submitting', () => {
-    setup({ status: 'submitting' });
-
-    const button = screen.getByRole('button', { name: 'Subscribe' });
-    expect(screen.getByTestId('newsletter-signup-spinner')).toBeVisible();
-    expect(button).toContainElement(
-      screen.getByTestId('newsletter-signup-spinner'),
-    );
+    it('shows the Spinner atom inside the button while submitting', () => {
+      const button = screen.getByRole('button', { name: 'Subscribe' });
+      expect(screen.getByTestId('newsletter-signup-spinner')).toBeVisible();
+      expect(button).toContainElement(
+        screen.getByTestId('newsletter-signup-spinner'),
+      );
+    });
   });
 
   it('surfaces the error message inline and marks the field invalid', () => {
-    const errorMessage = 'That email is already subscribed.';
     setup({ status: 'error', errorMessage });
 
     expect(screen.getByRole('alert')).toHaveTextContent(errorMessage);
@@ -136,7 +137,6 @@ describe(`<${NewsletterSignupContent.name}/>`, () => {
   });
 
   it('associates the email field with the error message via its accessible description', () => {
-    const errorMessage = 'That email is already subscribed.';
     setup({
       status: 'error',
       errorMessage,

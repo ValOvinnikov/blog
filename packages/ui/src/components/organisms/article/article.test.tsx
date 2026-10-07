@@ -16,35 +16,42 @@ const meta = {
 };
 
 describe(`<${Article.name}/>`, () => {
-  it('renders as an <article> landmark wrapping Header and Body', () => {
-    renderElement(
-      <Article>
-        <Article.Header title="Building a Design System" meta={meta} />
-        <Article.Body>
-          <p>Post body content.</p>
-        </Article.Body>
-      </Article>,
-    );
-    expect(screen.getByRole('article')).toBeVisible();
-    expect(
-      screen.getByRole('heading', {
-        level: 1,
-        name: 'Building a Design System',
-      }),
-    ).toBeVisible();
-    expect(screen.getByText('Post body content.')).toBeVisible();
-  });
+  describe('with a title, meta and body only', () => {
+    beforeEach(() => {
+      renderElement(
+        <Article>
+          <Article.Header title="Building a Design System" meta={meta} />
+          <Article.Body>
+            <p>Post body content.</p>
+          </Article.Body>
+        </Article>,
+      );
+    });
 
-  it('renders no topic eyebrow when topic is omitted', () => {
-    renderElement(
-      <Article>
-        <Article.Header title="Building a Design System" meta={meta} />
-        <Article.Body>
-          <p>Post body content.</p>
-        </Article.Body>
-      </Article>,
-    );
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    it('renders as an <article> landmark wrapping Header and Body', () => {
+      expect(screen.getByRole('article')).toBeVisible();
+      expect(
+        screen.getByRole('heading', {
+          level: 1,
+          name: 'Building a Design System',
+        }),
+      ).toBeVisible();
+      expect(screen.getByText('Post body content.')).toBeVisible();
+    });
+
+    it('renders no topic eyebrow when topic is omitted', () => {
+      expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    });
+
+    it('does not render a lead paragraph when omitted', () => {
+      expect(
+        screen.queryByText('A walkthrough of Atomic Design with Tailwind.'),
+      ).not.toBeInTheDocument();
+    });
+
+    it('does not render a coverMedia wrapper when omitted', () => {
+      expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    });
   });
 
   it('renders the topic eyebrow as non-heading text when no href is given', () => {
@@ -69,39 +76,32 @@ describe(`<${Article.name}/>`, () => {
     ).not.toBeInTheDocument();
   });
 
-  it('renders the topic eyebrow as a link when href is given', () => {
-    renderElement(
-      <Article>
-        <Article.Header
-          title="Building a Design System"
-          topic={{ label: 'Engineering', href: '/topics/engineering' }}
-          meta={meta}
-        />
-        <Article.Body>
-          <p>Post body content.</p>
-        </Article.Body>
-      </Article>,
-    );
-    expect(screen.getByRole('link', { name: 'Engineering' })).toHaveAttribute(
-      'href',
-      '/topics/engineering',
-    );
-  });
+  describe('with a linked topic eyebrow', () => {
+    beforeEach(() => {
+      renderElement(
+        <Article>
+          <Article.Header
+            title="Building a Design System"
+            topic={{ label: 'Engineering', href: '/topics/engineering' }}
+            meta={meta}
+          />
+          <Article.Body>
+            <p>Post body content.</p>
+          </Article.Body>
+        </Article>,
+      );
+    });
 
-  it('renders exactly one h1 — the post title — when a topic eyebrow is present', () => {
-    renderElement(
-      <Article>
-        <Article.Header
-          title="Building a Design System"
-          topic={{ label: 'Engineering', href: '/topics/engineering' }}
-          meta={meta}
-        />
-        <Article.Body>
-          <p>Post body content.</p>
-        </Article.Body>
-      </Article>,
-    );
-    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+    it('renders the topic eyebrow as a link when href is given', () => {
+      expect(screen.getByRole('link', { name: 'Engineering' })).toHaveAttribute(
+        'href',
+        '/topics/engineering',
+      );
+    });
+
+    it('renders exactly one h1 — the post title — when a topic eyebrow is present', () => {
+      expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+    });
   });
 
   it('renders the lead paragraph when provided', () => {
@@ -120,20 +120,6 @@ describe(`<${Article.name}/>`, () => {
     expect(
       screen.getByText('A walkthrough of Atomic Design with Tailwind.'),
     ).toBeVisible();
-  });
-
-  it('does not render a lead paragraph when omitted', () => {
-    renderElement(
-      <Article>
-        <Article.Header title="Building a Design System" meta={meta} />
-        <Article.Body>
-          <p>Post body content.</p>
-        </Article.Body>
-      </Article>,
-    );
-    expect(
-      screen.queryByText('A walkthrough of Atomic Design with Tailwind.'),
-    ).not.toBeInTheDocument();
   });
 
   it('does not render a PostMeta strip when meta is omitted', () => {
@@ -163,18 +149,6 @@ describe(`<${Article.name}/>`, () => {
       </Article>,
     );
     expect(screen.getByAltText('Post cover')).toBeVisible();
-  });
-
-  it('does not render a coverMedia wrapper when omitted', () => {
-    renderElement(
-      <Article>
-        <Article.Header title="Building a Design System" meta={meta} />
-        <Article.Body>
-          <p>Post body content.</p>
-        </Article.Body>
-      </Article>,
-    );
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
   it('renders Article.Body children', () => {

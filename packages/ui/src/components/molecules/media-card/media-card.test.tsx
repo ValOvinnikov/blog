@@ -9,19 +9,28 @@ vi.mock('react', async (importOriginal) => {
 });
 
 describe(`<${MediaCard.name}/>`, () => {
-  it('renders MediaCard.Title at the caller-specified heading level', () => {
-    renderElement(
-      <MediaCard>
-        <MediaCard.Title level={3}>
-          <a href="/posts/hello-world">Hello World</a>
-        </MediaCard.Title>
-      </MediaCard>,
-    );
-    expect(screen.getByRole('heading', { level: 3 })).toBeVisible();
-    expect(screen.getByRole('link')).toHaveAttribute(
-      'href',
-      '/posts/hello-world',
-    );
+  describe('with only a level-3 title', () => {
+    beforeEach(() => {
+      renderElement(
+        <MediaCard>
+          <MediaCard.Title level={3}>
+            <a href="/posts/hello-world">Hello World</a>
+          </MediaCard.Title>
+        </MediaCard>,
+      );
+    });
+
+    it('renders MediaCard.Title at the caller-specified heading level', () => {
+      expect(screen.getByRole('heading', { level: 3 })).toBeVisible();
+      expect(screen.getByRole('link')).toHaveAttribute(
+        'href',
+        '/posts/hello-world',
+      );
+    });
+
+    it('does not render media when MediaCard.Media is omitted', () => {
+      expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    });
   });
 
   it('renders MediaCard.Title at a different caller-specified heading level', () => {
@@ -47,25 +56,23 @@ describe(`<${MediaCard.name}/>`, () => {
     expect(screen.getByRole('img', { name: 'Cover photo' })).toBeVisible();
   });
 
-  it('does not render media when MediaCard.Media is omitted', () => {
-    renderElement(
-      <MediaCard>
-        <MediaCard.Title level={3}>
-          <a href="/posts/hello-world">Hello World</a>
-        </MediaCard.Title>
-      </MediaCard>,
-    );
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
-  });
-
   it('renders excerpt when provided', () => {
     renderElement(<MediaCard excerpt="A short summary." />);
     expect(screen.getByText('A short summary.')).toBeVisible();
   });
 
-  it('does not render excerpt element when omitted', () => {
-    renderElement(<MediaCard />);
-    expect(screen.queryByText(/summary/i)).not.toBeInTheDocument();
+  describe('with no props', () => {
+    beforeEach(() => {
+      renderElement(<MediaCard />);
+    });
+
+    it('does not render excerpt element when omitted', () => {
+      expect(screen.queryByText(/summary/i)).not.toBeInTheDocument();
+    });
+
+    it('does not render author section when authorName is omitted', () => {
+      expect(screen.queryByText('Jane Doe')).not.toBeInTheDocument();
+    });
   });
 
   it('renders all provided tags', () => {
@@ -81,11 +88,6 @@ describe(`<${MediaCard.name}/>`, () => {
       </MediaCard>,
     );
     expect(screen.getAllByText('Jane Doe')).toHaveLength(1);
-  });
-
-  it('does not render author section when authorName is omitted', () => {
-    renderElement(<MediaCard />);
-    expect(screen.queryByText('Jane Doe')).not.toBeInTheDocument();
   });
 
   it('renders a time element with the correct dateTime and display text', () => {

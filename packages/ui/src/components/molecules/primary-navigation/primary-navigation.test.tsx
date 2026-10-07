@@ -20,16 +20,30 @@ const setup = customRender(PrimaryNavigation, {
 });
 
 describe(`<${PrimaryNavigation.name}/>`, () => {
-  it('renders all nav links', () => {
-    setup();
-    for (const link of links) {
-      expect(screen.getByRole('link', { name: link.label })).toBeVisible();
-    }
-  });
+  describe('with the default props', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-  it('renders as a nav landmark', () => {
-    setup();
-    expect(screen.getByRole('navigation')).toBeVisible();
+    it('renders all nav links', () => {
+      for (const link of links) {
+        expect(screen.getByRole('link', { name: link.label })).toBeVisible();
+      }
+    });
+
+    it('renders as a nav landmark', () => {
+      expect(screen.getByRole('navigation')).toBeVisible();
+    });
+
+    it('renders without actions when omitted', () => {
+      expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    });
+
+    it('renders no mobile panel when mobileToggle is omitted', () => {
+      expect(
+        screen.queryByTestId('primary-navigation-mobile-panel'),
+      ).not.toBeInTheDocument();
+    });
   });
 
   it('renders the actions slot when provided', () => {
@@ -40,11 +54,6 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
   it('renders panelActions in the bar when there is no mobile toggle', () => {
     setup({ panelActions: <button type="button">Language</button> });
     expect(screen.getByRole('button', { name: 'Language' })).toBeVisible();
-  });
-
-  it('renders without actions when omitted', () => {
-    setup();
-    expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
   it('forwards target to the anchor when provided on a link', () => {
@@ -81,13 +90,6 @@ describe(`<${PrimaryNavigation.name}/>`, () => {
 
     setup({ linkAs: CustomLink });
     expect(screen.getAllByTestId('custom-link')).toHaveLength(links.length);
-  });
-
-  it('renders no mobile panel when mobileToggle is omitted', () => {
-    setup();
-    expect(
-      screen.queryByTestId('primary-navigation-mobile-panel'),
-    ).not.toBeInTheDocument();
   });
 
   describe('mobileToggle', () => {

@@ -9,16 +9,20 @@ const setup = customRender(ThemeToggle, {
 });
 
 describe(`<${ThemeToggle.name}/>`, () => {
-  it('renders a button', () => {
-    setup();
-    expect(screen.getByRole('button')).toBeVisible();
-  });
+  describe('with the default props', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-  it('shows "Switch to dark theme" label when isDark is false', () => {
-    setup();
-    expect(screen.getByRole('button')).toHaveAccessibleName(
-      'Switch to dark theme',
-    );
+    it('renders a button', () => {
+      expect(screen.getByRole('button')).toBeVisible();
+    });
+
+    it('shows "Switch to dark theme" label when isDark is false', () => {
+      expect(screen.getByRole('button')).toHaveAccessibleName(
+        'Switch to dark theme',
+      );
+    });
   });
 
   it('shows "Switch to light theme" label when isDark is true', () => {

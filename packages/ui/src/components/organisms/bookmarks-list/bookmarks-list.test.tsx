@@ -21,27 +21,33 @@ const setup = customRender(BookmarksList, {
 });
 
 describe(`<${BookmarksList.name}/>`, () => {
-  it('renders a row per bookmark with its date and filename link', () => {
-    setup();
+  describe('with the default props', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    for (const bookmark of rows) {
-      expect(screen.getByText(bookmark.formattedDate)).toBeVisible();
+    it('renders a row per bookmark with its date and filename link', () => {
+      for (const bookmark of rows) {
+        expect(screen.getByText(bookmark.formattedDate)).toBeVisible();
+        expect(
+          screen.getByRole('link', { name: bookmark.filename }),
+        ).toHaveAttribute('href', bookmark.href);
+      }
+    });
+
+    it('exposes the rows as an explicit list', () => {
+      expect(screen.getByRole('list')).toBeVisible();
+    });
+
+    it('does not render a prefix glyph when omitted', () => {
       expect(
-        screen.getByRole('link', { name: bookmark.filename }),
-      ).toHaveAttribute('href', bookmark.href);
-    }
-  });
+        screen.queryByTestId('bookmarks-list-row-prefix'),
+      ).not.toBeInTheDocument();
+    });
 
-  it('exposes the rows as an explicit list', () => {
-    setup();
-    expect(screen.getByRole('list')).toBeVisible();
-  });
-
-  it('does not render a prefix glyph when omitted', () => {
-    setup();
-    expect(
-      screen.queryByTestId('bookmarks-list-row-prefix'),
-    ).not.toBeInTheDocument();
+    it('does not render a hint when omitted', () => {
+      expect(screen.queryByText(/saved/)).not.toBeInTheDocument();
+    });
   });
 
   it('renders the supplied prefix node as-is, unmodified, once per row', () => {
@@ -76,11 +82,6 @@ describe(`<${BookmarksList.name}/>`, () => {
   it('renders the hint below the list when provided and rows are not empty', () => {
     setup({ hint: '3 saved' });
     expect(screen.getByText('3 saved')).toBeVisible();
-  });
-
-  it('does not render a hint when omitted', () => {
-    setup();
-    expect(screen.queryByText(/saved/)).not.toBeInTheDocument();
   });
 
   it('renders the empty message instead of the list when rows is empty', () => {

@@ -10,16 +10,20 @@ const setup = customRender(BackToTop, {
 });
 
 describe(`<${BackToTop.name}/>`, () => {
-  it('renders with the given accessible name', () => {
-    setup();
-    expect(screen.getByRole('button', { name: 'Back to top' })).toBeVisible();
-  });
+  describe('with the default props', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-  it('is visible and not inert when isVisible is true', () => {
-    setup();
-    const button = screen.getByRole('button', { name: 'Back to top' });
-    expect(button).toBeVisible();
-    expect(button).not.toHaveAttribute('inert');
+    it('renders with the given accessible name', () => {
+      expect(screen.getByRole('button', { name: 'Back to top' })).toBeVisible();
+    });
+
+    it('is visible and not inert when isVisible is true', () => {
+      const button = screen.getByRole('button', { name: 'Back to top' });
+      expect(button).toBeVisible();
+      expect(button).not.toHaveAttribute('inert');
+    });
   });
 
   it('is inert when isVisible is false', () => {

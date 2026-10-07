@@ -5,13 +5,24 @@ import { NavLink } from '../../atoms/nav-link';
 import { Footer } from './footer';
 
 describe(`<${Footer.name}/>`, () => {
-  it('renders Footer.Copyright with the given year and title', () => {
-    renderElement(
-      <Footer>
-        <Footer.Copyright title="My Blog" year={2027} />
-      </Footer>,
-    );
-    expect(screen.getByText('© 2027 My Blog')).toBeVisible();
+  describe('with only Footer.Copyright', () => {
+    beforeEach(() => {
+      renderElement(
+        <Footer>
+          <Footer.Copyright title="My Blog" year={2027} />
+        </Footer>,
+      );
+    });
+
+    it('renders Footer.Copyright with the given year and title', () => {
+      expect(screen.getByText('© 2027 My Blog')).toBeVisible();
+    });
+
+    it('does not render a nav element when Footer.Nav is omitted', () => {
+      expect(
+        screen.queryByRole('navigation', { name: 'Footer navigation' }),
+      ).not.toBeInTheDocument();
+    });
   });
 
   it('renders Footer.Nav content', () => {
@@ -39,17 +50,6 @@ describe(`<${Footer.name}/>`, () => {
       'href',
       '/about',
     );
-  });
-
-  it('does not render a nav element when Footer.Nav is omitted', () => {
-    renderElement(
-      <Footer>
-        <Footer.Copyright title="My Blog" year={2027} />
-      </Footer>,
-    );
-    expect(
-      screen.queryByRole('navigation', { name: 'Footer navigation' }),
-    ).not.toBeInTheDocument();
   });
 
   it('renders unmatched children without dropping them', () => {

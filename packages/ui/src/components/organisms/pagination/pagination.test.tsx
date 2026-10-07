@@ -16,43 +16,43 @@ const setup = customRender(Pagination, {
 });
 
 describe(`<${Pagination.name}/>`, () => {
-  it('renders a labeled nav with a link per page and correct hrefs', () => {
-    setup();
+  describe('with the default props', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    expect(
-      screen.getByRole('navigation', { name: 'Blog pages' }),
-    ).toBeVisible();
-    expect(screen.getByRole('link', { name: '1' })).toHaveAttribute(
-      'href',
-      '/blog',
-    );
-    expect(screen.getByRole('link', { name: '2' })).toHaveAttribute(
-      'href',
-      '/blog/page/2',
-    );
-    expect(screen.getByRole('link', { name: '3' })).toHaveAttribute(
-      'href',
-      '/blog/page/3',
-    );
-  });
+    it('renders a labeled nav with a link per page and correct hrefs', () => {
+      expect(
+        screen.getByRole('navigation', { name: 'Blog pages' }),
+      ).toBeVisible();
+      expect(screen.getByRole('link', { name: '1' })).toHaveAttribute(
+        'href',
+        '/blog',
+      );
+      expect(screen.getByRole('link', { name: '2' })).toHaveAttribute(
+        'href',
+        '/blog/page/2',
+      );
+      expect(screen.getByRole('link', { name: '3' })).toHaveAttribute(
+        'href',
+        '/blog/page/3',
+      );
+    });
 
-  it('exposes the page list with an explicit list role', () => {
-    setup();
+    it('exposes the page list with an explicit list role', () => {
+      const nav = screen.getByRole('navigation', { name: 'Blog pages' });
+      expect(within(nav).getByRole('list')).toBeVisible();
+    });
 
-    const nav = screen.getByRole('navigation', { name: 'Blog pages' });
-    expect(within(nav).getByRole('list')).toBeVisible();
-  });
-
-  it('marks the current page with aria-current', () => {
-    setup();
-
-    expect(screen.getByRole('link', { name: '2' })).toHaveAttribute(
-      'aria-current',
-      'page',
-    );
-    expect(screen.getByRole('link', { name: '1' })).not.toHaveAttribute(
-      'aria-current',
-    );
+    it('marks the current page with aria-current', () => {
+      expect(screen.getByRole('link', { name: '2' })).toHaveAttribute(
+        'aria-current',
+        'page',
+      );
+      expect(screen.getByRole('link', { name: '1' })).not.toHaveAttribute(
+        'aria-current',
+      );
+    });
   });
 
   it('hides previous on the first page and next on the last page', () => {
@@ -138,15 +138,19 @@ describe(`<${Pagination.name}/>`, () => {
       expect(screen.getAllByText('…')).toHaveLength(1);
     });
 
-    it('shows the first page, the last page, and the current page neighbours, with two ellipses, in the middle', () => {
-      setup({ currentPage: 6, totalPages: 12 });
-      expect(pageLinkNumbers()).toEqual([1, 5, 6, 7, 12]);
-      expect(screen.getAllByText('…')).toHaveLength(2);
-    });
+    describe('in the middle of a long run', () => {
+      beforeEach(() => {
+        setup({ currentPage: 6, totalPages: 12 });
+      });
 
-    it('hides the ellipsis from the accessibility tree', () => {
-      setup({ currentPage: 6, totalPages: 12 });
-      expect(screen.getAllByRole('listitem')).toHaveLength(5);
+      it('shows the first page, the last page, and the current page neighbours, with two ellipses, in the middle', () => {
+        expect(pageLinkNumbers()).toEqual([1, 5, 6, 7, 12]);
+        expect(screen.getAllByText('…')).toHaveLength(2);
+      });
+
+      it('hides the ellipsis from the accessibility tree', () => {
+        expect(screen.getAllByRole('listitem')).toHaveLength(5);
+      });
     });
   });
 });

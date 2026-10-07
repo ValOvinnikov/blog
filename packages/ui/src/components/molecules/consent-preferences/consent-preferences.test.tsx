@@ -1,6 +1,7 @@
 import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
 import userEvent from '@testing-library/user-event';
+import type { Mock } from 'vitest';
 
 import {
   ConsentPreferences,
@@ -116,42 +117,47 @@ describe(`<${ConsentPreferences.name}/>`, () => {
     expect(necessarySwitch).toBeDisabled();
   });
 
-  it('does not call onCategoryChange when the locked switch is clicked', async () => {
-    const onCategoryChange = vi.fn();
-    setup({ onCategoryChange });
-    await userEvent.click(screen.getByRole('switch', { name: necessaryLabel }));
-    expect(onCategoryChange).not.toHaveBeenCalled();
-  });
+  describe('interactions', () => {
+    let onCategoryChange: Mock<(id: string, checked: boolean) => void>;
+    let onSave: Mock<() => void>;
 
-  it('calls onCategoryChange with the category id and next value when an unlocked switch is clicked', async () => {
-    const onCategoryChange = vi.fn();
-    setup({ onCategoryChange });
-    await userEvent.click(screen.getByRole('switch', { name: analyticsLabel }));
-    expect(onCategoryChange).toHaveBeenCalledTimes(1);
-    expect(onCategoryChange).toHaveBeenCalledWith('analytics', true);
-  });
+    beforeEach(() => {
+      onCategoryChange = vi.fn();
+      onSave = vi.fn();
+      setup({ onCategoryChange, onSave });
+    });
 
-  it('calls onCategoryChange when an unlocked switch is activated by keyboard', async () => {
-    const onCategoryChange = vi.fn();
-    setup({ onCategoryChange });
-    screen.getByRole('switch', { name: analyticsLabel }).focus();
-    await userEvent.keyboard(' ');
-    expect(onCategoryChange).toHaveBeenCalledWith('analytics', true);
-  });
+    it('does not call onCategoryChange when the locked switch is clicked', async () => {
+      await userEvent.click(
+        screen.getByRole('switch', { name: necessaryLabel }),
+      );
+      expect(onCategoryChange).not.toHaveBeenCalled();
+    });
 
-  it('renders a Save action and calls onSave when clicked', async () => {
-    const onSave = vi.fn();
-    setup({ onSave });
-    await userEvent.click(screen.getByRole('button', { name: saveLabel }));
-    expect(onSave).toHaveBeenCalledTimes(1);
-  });
+    it('calls onCategoryChange with the category id and next value when an unlocked switch is clicked', async () => {
+      await userEvent.click(
+        screen.getByRole('switch', { name: analyticsLabel }),
+      );
+      expect(onCategoryChange).toHaveBeenCalledTimes(1);
+      expect(onCategoryChange).toHaveBeenCalledWith('analytics', true);
+    });
 
-  it('calls onSave when Save is activated by keyboard', async () => {
-    const onSave = vi.fn();
-    setup({ onSave });
-    screen.getByRole('button', { name: saveLabel }).focus();
-    await userEvent.keyboard('{Enter}');
-    expect(onSave).toHaveBeenCalledTimes(1);
+    it('calls onCategoryChange when an unlocked switch is activated by keyboard', async () => {
+      screen.getByRole('switch', { name: analyticsLabel }).focus();
+      await userEvent.keyboard(' ');
+      expect(onCategoryChange).toHaveBeenCalledWith('analytics', true);
+    });
+
+    it('renders a Save action and calls onSave when clicked', async () => {
+      await userEvent.click(screen.getByRole('button', { name: saveLabel }));
+      expect(onSave).toHaveBeenCalledTimes(1);
+    });
+
+    it('calls onSave when Save is activated by keyboard', async () => {
+      screen.getByRole('button', { name: saveLabel }).focus();
+      await userEvent.keyboard('{Enter}');
+      expect(onSave).toHaveBeenCalledTimes(1);
+    });
   });
 
   it('forwards dataTestId to the root element', () => {

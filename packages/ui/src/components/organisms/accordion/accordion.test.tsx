@@ -1,6 +1,6 @@
 import { renderElement, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { Accordion } from './accordion';
 
@@ -33,9 +33,14 @@ const renderAccordion = () =>
   );
 
 describe(`<${Accordion.name}/>`, () => {
-  it('renders each trigger as a button inside a level-3 heading', () => {
-    renderAccordion();
+  let user: UserEvent;
 
+  beforeEach(() => {
+    user = userEvent.setup();
+    renderAccordion();
+  });
+
+  it('renders each trigger as a button inside a level-3 heading', () => {
     const heading = screen.getByRole('heading', {
       level: 3,
       name: firstItem.label,
@@ -46,9 +51,6 @@ describe(`<${Accordion.name}/>`, () => {
   });
 
   it('opens the panel and flips aria-expanded when its trigger is activated', async () => {
-    const user = userEvent.setup();
-    renderAccordion();
-
     const trigger = screen.getByRole('button', { name: firstItem.label });
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
 
@@ -59,9 +61,6 @@ describe(`<${Accordion.name}/>`, () => {
   });
 
   it('leaves an already-open item open when a second item is opened', async () => {
-    const user = userEvent.setup();
-    renderAccordion();
-
     const firstTrigger = screen.getByRole('button', { name: firstItem.label });
     const secondTrigger = screen.getByRole('button', {
       name: secondItem.label,

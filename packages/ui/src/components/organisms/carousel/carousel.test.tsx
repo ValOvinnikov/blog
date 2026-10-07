@@ -1,7 +1,7 @@
 import { renderElement, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
 import { act } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { Carousel, type ICarouselProps } from './carousel';
 
@@ -86,6 +86,12 @@ const getNavButtons = () => ({
 });
 
 describe(`<${Carousel.name}/>`, () => {
+  let user: UserEvent;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
   it('renders a region carrying aria-roledescription and the given ariaLabel', () => {
     const customAriaLabel = faker.lorem.words(3);
     renderCarousel({ ariaLabel: customAriaLabel });
@@ -182,93 +188,89 @@ describe(`<${Carousel.name}/>`, () => {
     expect(next).not.toBeInTheDocument();
   });
 
-  it('renders no nav buttons once Embla reports nothing scrollable', () => {
-    emblaApi.canScrollPrev.mockReturnValue(false);
-    emblaApi.canScrollNext.mockReturnValue(false);
-    renderCarousel();
+  describe('with nothing scrollable', () => {
+    beforeEach(() => {
+      emblaApi.canScrollPrev.mockReturnValue(false);
+      emblaApi.canScrollNext.mockReturnValue(false);
+      renderCarousel();
+    });
 
-    const { previous, next } = queryNavButtons();
-    expect(previous).not.toBeInTheDocument();
-    expect(next).not.toBeInTheDocument();
+    it('renders no nav buttons once Embla reports nothing scrollable', () => {
+      const { previous, next } = queryNavButtons();
+      expect(previous).not.toBeInTheDocument();
+      expect(next).not.toBeInTheDocument();
+    });
+
+    it('brings the nav buttons back once a direction becomes scrollable again', () => {
+      emblaApi.canScrollNext.mockReturnValue(true);
+      emitEvent('select');
+
+      expect(getNavButtons().previous).toHaveAttribute('aria-disabled', 'true');
+      expect(getNavButtons().next).not.toHaveAttribute('aria-disabled');
+    });
   });
 
-  it('renders both nav buttons once a direction is scrollable, labelled and titled', () => {
-    renderCarousel();
+  describe('with both directions scrollable', () => {
+    beforeEach(() => {
+      renderCarousel();
+    });
 
-    const { previous, next } = getNavButtons();
-    expect(previous).toHaveAttribute('title', previousLabel);
-    expect(next).toHaveAttribute('title', nextLabel);
+    it('renders both nav buttons once a direction is scrollable, labelled and titled', () => {
+      const { previous, next } = getNavButtons();
+      expect(previous).toHaveAttribute('title', previousLabel);
+      expect(next).toHaveAttribute('title', nextLabel);
+    });
+
+    it('calls scrollPrev/scrollNext on the Embla api when the buttons are clicked', async () => {
+      const { previous, next } = getNavButtons();
+      await user.click(previous);
+      await user.click(next);
+
+      expect(emblaApi.scrollPrev).toHaveBeenCalledTimes(1);
+      expect(emblaApi.scrollNext).toHaveBeenCalledTimes(1);
+    });
+
+    it('re-reads the scrollable state on reInit', () => {
+      emblaApi.canScrollNext.mockReturnValue(false);
+      emitEvent('reInit');
+
+      expect(getNavButtons().next).toHaveAttribute('aria-disabled', 'true');
+    });
+
+    it('keeps focus on a nav button once it becomes aria-disabled', () => {
+      const previousButton = getNavButtons().previous;
+      previousButton.focus();
+      expect(previousButton).toHaveFocus();
+
+      emblaApi.canScrollPrev.mockReturnValue(false);
+      emitEvent('select');
+
+      expect(getNavButtons().previous).toHaveFocus();
+    });
   });
 
-  it('calls scrollPrev/scrollNext on the Embla api when the buttons are clicked', async () => {
-    const user = userEvent.setup();
-    renderCarousel();
+  describe('with only the previous direction blocked', () => {
+    beforeEach(() => {
+      emblaApi.canScrollPrev.mockReturnValue(false);
+      renderCarousel();
+    });
 
-    const { previous, next } = getNavButtons();
-    await user.click(previous);
-    await user.click(next);
+    it('marks the nav button at an end of the track aria-disabled, and follows select', () => {
+      expect(getNavButtons().previous).toHaveAttribute('aria-disabled', 'true');
+      expect(getNavButtons().next).not.toHaveAttribute('aria-disabled');
 
-    expect(emblaApi.scrollPrev).toHaveBeenCalledTimes(1);
-    expect(emblaApi.scrollNext).toHaveBeenCalledTimes(1);
-  });
+      emblaApi.canScrollPrev.mockReturnValue(true);
+      emblaApi.canScrollNext.mockReturnValue(false);
+      emitEvent('select');
 
-  it('marks the nav button at an end of the track aria-disabled, and follows select', () => {
-    emblaApi.canScrollPrev.mockReturnValue(false);
-    emblaApi.canScrollNext.mockReturnValue(true);
-    renderCarousel();
+      expect(getNavButtons().previous).not.toHaveAttribute('aria-disabled');
+      expect(getNavButtons().next).toHaveAttribute('aria-disabled', 'true');
+    });
 
-    expect(getNavButtons().previous).toHaveAttribute('aria-disabled', 'true');
-    expect(getNavButtons().next).not.toHaveAttribute('aria-disabled');
+    it('does nothing when clicking an aria-disabled nav button', async () => {
+      await user.click(getNavButtons().previous);
 
-    emblaApi.canScrollPrev.mockReturnValue(true);
-    emblaApi.canScrollNext.mockReturnValue(false);
-    emitEvent('select');
-
-    expect(getNavButtons().previous).not.toHaveAttribute('aria-disabled');
-    expect(getNavButtons().next).toHaveAttribute('aria-disabled', 'true');
-  });
-
-  it('re-reads the scrollable state on reInit', () => {
-    renderCarousel();
-
-    emblaApi.canScrollNext.mockReturnValue(false);
-    emitEvent('reInit');
-
-    expect(getNavButtons().next).toHaveAttribute('aria-disabled', 'true');
-  });
-
-  it('does nothing when clicking an aria-disabled nav button', async () => {
-    const user = userEvent.setup();
-    emblaApi.canScrollPrev.mockReturnValue(false);
-    renderCarousel();
-
-    await user.click(getNavButtons().previous);
-
-    expect(emblaApi.scrollPrev).not.toHaveBeenCalled();
-  });
-
-  it('keeps focus on a nav button once it becomes aria-disabled', () => {
-    renderCarousel();
-
-    const previousButton = getNavButtons().previous;
-    previousButton.focus();
-    expect(previousButton).toHaveFocus();
-
-    emblaApi.canScrollPrev.mockReturnValue(false);
-    emitEvent('select');
-
-    expect(getNavButtons().previous).toHaveFocus();
-  });
-
-  it('brings the nav buttons back once a direction becomes scrollable again', () => {
-    emblaApi.canScrollPrev.mockReturnValue(false);
-    emblaApi.canScrollNext.mockReturnValue(false);
-    renderCarousel();
-
-    emblaApi.canScrollNext.mockReturnValue(true);
-    emitEvent('select');
-
-    expect(getNavButtons().previous).toHaveAttribute('aria-disabled', 'true');
-    expect(getNavButtons().next).not.toHaveAttribute('aria-disabled');
+      expect(emblaApi.scrollPrev).not.toHaveBeenCalled();
+    });
   });
 });

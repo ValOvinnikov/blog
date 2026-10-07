@@ -8,32 +8,39 @@ faker.seed(123);
 const setup = customRender(BrandMark, {});
 
 describe(`<${BrandMark.name}/>`, () => {
+  let src: string;
+  let title: string;
+
+  beforeEach(() => {
+    src = faker.image.url();
+    title = faker.company.name();
+  });
+
   it('is decorative by default — no accessible role or name', () => {
     setup();
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
   it('exposes an accessible name when a title is provided', () => {
-    const title = faker.company.name();
     setup({ title });
     expect(screen.getByRole('img', { name: title })).toBeVisible();
   });
 
-  it('shows the uploaded image instead of the polygon mark when src is provided', () => {
-    const src = faker.image.url();
-    setup({ src });
-    expect(screen.getByRole('presentation')).toHaveAttribute('src', src);
-  });
+  describe('with an uploaded image and no title', () => {
+    beforeEach(() => {
+      setup({ src });
+    });
 
-  it('gives the image an empty alt when decorative (no title)', () => {
-    const src = faker.image.url();
-    setup({ src });
-    expect(screen.getByRole('presentation')).toHaveAttribute('alt', '');
+    it('shows the uploaded image instead of the polygon mark when src is provided', () => {
+      expect(screen.getByRole('presentation')).toHaveAttribute('src', src);
+    });
+
+    it('gives the image an empty alt when decorative (no title)', () => {
+      expect(screen.getByRole('presentation')).toHaveAttribute('alt', '');
+    });
   });
 
   it('gives the image an accessible name when a title is provided', () => {
-    const src = faker.image.url();
-    const title = faker.company.name();
     setup({ src, title });
     expect(screen.getByRole('img', { name: title })).toBeVisible();
   });

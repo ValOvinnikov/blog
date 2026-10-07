@@ -21,21 +21,35 @@ const setup = customRender(Toast, {
 });
 
 describe(`<${Toast.name}/>`, () => {
-  it('renders the title and message', () => {
-    setup();
-    expect(screen.getByText(title)).toBeVisible();
-    expect(screen.getByText(message)).toBeVisible();
+  describe('with the default props', () => {
+    beforeEach(() => {
+      setup();
+    });
+
+    it('renders the title and message', () => {
+      expect(screen.getByText(title)).toBeVisible();
+      expect(screen.getByText(message)).toBeVisible();
+    });
+
+    it('renders the type glyph using the Icon component, not a raw glyph span', () => {
+      expect(screen.getByTestId('toast-icon')).toBeVisible();
+      expect(screen.queryByText('✓')).not.toBeInTheDocument();
+    });
+
+    it('renders the dismiss button using the close icon, not a raw glyph', () => {
+      const dismissButton = screen.getByRole('button', { name: dismissLabel });
+      expect(screen.getByTestId('toast-dismiss-icon')).toBeVisible();
+      expect(dismissButton).not.toHaveTextContent('✕');
+    });
+
+    it('renders no action row when action is omitted', () => {
+      expect(screen.queryAllByRole('button')).toHaveLength(1);
+    });
   });
 
   it('renders the message alone when title is omitted', () => {
     setup({ title: undefined });
     expect(screen.getByText(message)).toBeVisible();
-  });
-
-  it('renders the type glyph using the Icon component, not a raw glyph span', () => {
-    setup();
-    expect(screen.getByTestId('toast-icon')).toBeVisible();
-    expect(screen.queryByText('✓')).not.toBeInTheDocument();
   });
 
   it('renders as a polite status region for success/info/warning', () => {
@@ -57,21 +71,9 @@ describe(`<${Toast.name}/>`, () => {
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });
 
-  it('renders the dismiss button using the close icon, not a raw glyph', () => {
-    setup();
-    const dismissButton = screen.getByRole('button', { name: dismissLabel });
-    expect(screen.getByTestId('toast-dismiss-icon')).toBeVisible();
-    expect(dismissButton).not.toHaveTextContent('✕');
-  });
-
   it('renders the relative time when provided', () => {
     setup({ time: 'just now' });
     expect(screen.getByText('just now')).toBeVisible();
-  });
-
-  it('renders no action row when action is omitted', () => {
-    setup();
-    expect(screen.queryAllByRole('button')).toHaveLength(1);
   });
 
   it('renders an action button and calls onAct when clicked', async () => {
@@ -102,17 +104,21 @@ describe(`<${Toast.name}/>`, () => {
     expect(screen.queryByTestId('toast-timer')).not.toBeInTheDocument();
   });
 
-  it('renders a decorative spinner instead of the icon when isLoading is true', () => {
-    setup({ isLoading: true });
-    const spinner = screen.getByTestId('toast-spinner');
-    expect(spinner).toBeVisible();
-    expect(spinner).toHaveAttribute('aria-hidden', 'true');
-    expect(screen.queryByTestId('toast-icon')).not.toBeInTheDocument();
-  });
+  describe('when isLoading is true', () => {
+    beforeEach(() => {
+      setup({ isLoading: true });
+    });
 
-  it('exposes a single status region when isLoading is true, not a nested one from the spinner', () => {
-    setup({ isLoading: true });
-    expect(screen.queryAllByRole('status')).toHaveLength(1);
+    it('renders a decorative spinner instead of the icon when isLoading is true', () => {
+      const spinner = screen.getByTestId('toast-spinner');
+      expect(spinner).toBeVisible();
+      expect(spinner).toHaveAttribute('aria-hidden', 'true');
+      expect(screen.queryByTestId('toast-icon')).not.toBeInTheDocument();
+    });
+
+    it('exposes a single status region when isLoading is true, not a nested one from the spinner', () => {
+      expect(screen.queryAllByRole('status')).toHaveLength(1);
+    });
   });
 
   it('forwards data-testid to the root element', () => {

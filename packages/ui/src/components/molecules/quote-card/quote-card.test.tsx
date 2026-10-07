@@ -54,9 +54,15 @@ const setup = customRender(QuoteCard, {
 });
 
 describe(`<${QuoteCard.name}/>`, () => {
+  let quote: string;
+  let name: string;
+
+  beforeEach(() => {
+    quote = faker.lorem.sentence();
+    name = faker.person.fullName();
+  });
+
   it('renders a figure containing the quote and the name', () => {
-    const quote = faker.lorem.sentence();
-    const name = faker.person.fullName();
     setup({ children: buildChildren({ quote, name }) });
 
     const figure = screen.getByRole('figure');
@@ -65,7 +71,6 @@ describe(`<${QuoteCard.name}/>`, () => {
   });
 
   it('renders the quote slot content inside the blockquote', () => {
-    const quote = faker.lorem.sentence();
     setup({ children: buildChildren({ quote }) });
 
     expect(screen.getByRole('blockquote')).toHaveTextContent(quote);
@@ -76,17 +81,38 @@ describe(`<${QuoteCard.name}/>`, () => {
     expect(screen.getByText('Head of Product')).toBeVisible();
   });
 
-  it('does not render a role element when omitted', () => {
-    setup();
-    expect(screen.queryByText(/head of/i)).not.toBeInTheDocument();
+  describe('with the default props', () => {
+    beforeEach(() => {
+      setup();
+    });
+
+    it('does not render a role element when omitted', () => {
+      expect(screen.queryByText(/head of/i)).not.toBeInTheDocument();
+    });
+
+    it('renders neither an image nor initials when QuoteCard.Avatar is omitted', () => {
+      expect(screen.queryByRole('img')).not.toBeInTheDocument();
+      expect(screen.queryByText('AL')).not.toBeInTheDocument();
+    });
   });
 
-  it('renders the caller-supplied Avatar with its initials fallback', () => {
-    setup({
-      children: buildChildrenWithAvatar(<Avatar name="Ada Lovelace" alt="" />),
+  describe('with a caller-supplied initials Avatar', () => {
+    beforeEach(() => {
+      setup({
+        children: buildChildrenWithAvatar(
+          <Avatar name="Ada Lovelace" alt="" />,
+        ),
+      });
     });
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
-    expect(screen.getByText('AL')).toBeVisible();
+
+    it('renders the caller-supplied Avatar with its initials fallback', () => {
+      expect(screen.queryByRole('img')).not.toBeInTheDocument();
+      expect(screen.getByText('AL')).toBeVisible();
+    });
+
+    it('announces the quoted person once when the caller-supplied Avatar sits beside QuoteCard.Name', () => {
+      expect(screen.getAllByText('Ada Lovelace')).toHaveLength(1);
+    });
   });
 
   it('renders the caller-supplied Avatar image when given a src', () => {
@@ -105,19 +131,6 @@ describe(`<${QuoteCard.name}/>`, () => {
     );
   });
 
-  it('announces the quoted person once when the caller-supplied Avatar sits beside QuoteCard.Name', () => {
-    setup({
-      children: buildChildrenWithAvatar(<Avatar name="Ada Lovelace" alt="" />),
-    });
-    expect(screen.getAllByText('Ada Lovelace')).toHaveLength(1);
-  });
-
-  it('renders neither an image nor initials when QuoteCard.Avatar is omitted', () => {
-    setup();
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
-    expect(screen.queryByText('AL')).not.toBeInTheDocument();
-  });
-
   it('renders the name as plain text, not a link, when the caller supplies a span', () => {
     setup({
       children: [
@@ -131,7 +144,6 @@ describe(`<${QuoteCard.name}/>`, () => {
   });
 
   it('renders the name as a link with whatever attributes the caller supplies', () => {
-    const name = faker.person.fullName();
     setup({
       children: [
         <QuoteCard.Quote key="quote">{faker.lorem.sentence()}</QuoteCard.Quote>,

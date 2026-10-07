@@ -25,28 +25,49 @@ const setup = customRender(PostMeta, {
 });
 
 describe(`<${PostMeta.name}/>`, () => {
-  it('renders the author name once, with the avatar image contributing no duplicate accessible name', () => {
-    setup();
-    expect(screen.getAllByText(author.name)).toHaveLength(1);
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+  let authorHref: string;
+
+  beforeEach(() => {
+    authorHref = `/authors/${faker.lorem.slug()}`;
   });
 
-  it('renders a time element with the correct dateTime attribute and label', () => {
-    setup();
-    const timeEl = screen.getByText(formattedDate);
-    expect(timeEl).toBeVisible();
-    expect(timeEl.tagName).toBe('TIME');
-    expect(timeEl).toHaveAttribute('dateTime', publishedAt);
+  describe('with the default props', () => {
+    beforeEach(() => {
+      setup();
+    });
+
+    it('renders the author name once, with the avatar image contributing no duplicate accessible name', () => {
+      expect(screen.getAllByText(author.name)).toHaveLength(1);
+      expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    });
+
+    it('renders a time element with the correct dateTime attribute and label', () => {
+      const timeEl = screen.getByText(formattedDate);
+      expect(timeEl).toBeVisible();
+      expect(timeEl.tagName).toBe('TIME');
+      expect(timeEl).toHaveAttribute('dateTime', publishedAt);
+    });
+
+    it('omits reading time segment when not provided', () => {
+      expect(screen.queryByText(/min read/)).not.toBeInTheDocument();
+    });
+
+    it('omits the share trigger when share is not provided', () => {
+      expect(
+        screen.queryByRole('button', { name: /share/i }),
+      ).not.toBeInTheDocument();
+    });
+
+    it('renders the author name as plain text when href is not provided', () => {
+      expect(
+        screen.queryByRole('link', { name: author.name }),
+      ).not.toBeInTheDocument();
+    });
   });
 
   it('renders reading time when provided', () => {
     setup({ readingTimeMinutes });
     expect(screen.getByText(`${readingTimeMinutes} min read`)).toBeVisible();
-  });
-
-  it('omits reading time segment when not provided', () => {
-    setup();
-    expect(screen.queryByText(/min read/)).not.toBeInTheDocument();
   });
 
   it('falls back to initials when imageUrl is not provided, announcing the name once', () => {
@@ -60,27 +81,12 @@ describe(`<${PostMeta.name}/>`, () => {
     expect(screen.getByTestId('post-meta')).toBeVisible();
   });
 
-  it('omits the share trigger when share is not provided', () => {
-    setup();
-    expect(
-      screen.queryByRole('button', { name: /share/i }),
-    ).not.toBeInTheDocument();
-  });
-
   it('renders the share slot when share is provided', () => {
     setup({ share: <button>share</button> });
     expect(screen.getByRole('button', { name: 'share' })).toBeVisible();
   });
 
-  it('renders the author name as plain text when href is not provided', () => {
-    setup();
-    expect(
-      screen.queryByRole('link', { name: author.name }),
-    ).not.toBeInTheDocument();
-  });
-
   it('renders the author name as a link to its href when provided', () => {
-    const authorHref = `/authors/${faker.lorem.slug()}`;
     setup({ author: { ...author, href: authorHref } });
     expect(screen.getByRole('link', { name: author.name })).toHaveAttribute(
       'href',
@@ -89,7 +95,6 @@ describe(`<${PostMeta.name}/>`, () => {
   });
 
   it('renders the author link as the linkAs component when provided', () => {
-    const authorHref = `/authors/${faker.lorem.slug()}`;
     const CustomLink = ({
       href,
       children,
