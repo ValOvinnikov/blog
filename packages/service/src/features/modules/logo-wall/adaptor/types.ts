@@ -1,7 +1,7 @@
 import type {
   ILink,
   ISanityImage,
-  TBrandVariantOf,
+  TBrandVariant,
   TContentAlignmentOf,
   TDisplayMode,
   TLayout,
@@ -19,7 +19,7 @@ export type TLogoItem = {
 };
 
 export type TLogoWallModule = {
-  brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
+  brandVariant: TBrandVariant;
   headingBlock: THeadingBlock;
   logos: TLogoItem[];
   ctaButtons: TCtaButton[];

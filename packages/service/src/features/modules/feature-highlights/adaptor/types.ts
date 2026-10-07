@@ -1,6 +1,6 @@
 import type {
   ISanityImage,
-  TBrandVariantOf,
+  TBrandVariant,
   TContentAlignment,
   TLayout,
   TMaybeUndefined,
@@ -19,7 +19,7 @@ export type TFeatureHighlightItem = {
 };
 
 export type TFeatureHighlightsModule = {
-  brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
+  brandVariant: TBrandVariant;
   headingBlock: THeadingBlock;
   highlights: TFeatureHighlightItem[];
   ctaButtons: TCtaButton[];

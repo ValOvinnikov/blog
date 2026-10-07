@@ -1,5 +1,5 @@
 import type {
-  TBrandVariantOf,
+  TBrandVariant,
   TContentAlignment,
   THeadingBlock,
   TLayout,
@@ -7,7 +7,7 @@ import type {
 } from '@blog/config';
 
 export type TSectionPagesModuleDocument = {
-  brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
+  brandVariant: TBrandVariant;
   headingBlock: TMaybeUndefined<THeadingBlock>;
   contentAlignment: TMaybeUndefined<TContentAlignment>;
   layout: TMaybeUndefined<TLayout>;
