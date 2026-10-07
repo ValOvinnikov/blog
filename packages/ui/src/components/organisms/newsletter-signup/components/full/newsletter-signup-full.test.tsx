@@ -20,8 +20,13 @@ const baseArgs = {
 const setup = customRender(NewsletterSignupFull, baseArgs);
 
 describe(`<${NewsletterSignupFull.name}/>`, () => {
+  let heading: string;
+
+  beforeEach(() => {
+    heading = faker.lorem.sentence(3);
+  });
+
   it('renders the heading and supportingText by default', () => {
-    const heading = faker.lorem.sentence(3);
     const supportingText = faker.lorem.sentence(8);
     setup({ heading, supportingText });
 
@@ -30,7 +35,6 @@ describe(`<${NewsletterSignupFull.name}/>`, () => {
   });
 
   it('assigns headingId to the heading element when provided', () => {
-    const heading = faker.lorem.sentence(3);
     setup({ heading, headingId: 'newsletter-full-heading' });
 
     expect(screen.getByRole('heading', { name: heading })).toHaveAttribute(
@@ -40,7 +44,6 @@ describe(`<${NewsletterSignupFull.name}/>`, () => {
   });
 
   it('renders the heading with no id when headingId is omitted', () => {
-    const heading = faker.lorem.sentence(3);
     setup({ heading });
 
     expect(screen.getByRole('heading', { name: heading })).not.toHaveAttribute(
@@ -48,9 +51,20 @@ describe(`<${NewsletterSignupFull.name}/>`, () => {
     );
   });
 
-  it('renders the chevron icon as the email field prompt', () => {
-    setup();
-    expect(screen.getByTestId('newsletter-signup-input-prompt')).toBeVisible();
+  describe('with the default props', () => {
+    beforeEach(() => {
+      setup();
+    });
+
+    it('renders the chevron icon as the email field prompt', () => {
+      expect(
+        screen.getByTestId('newsletter-signup-input-prompt'),
+      ).toBeVisible();
+    });
+
+    it('renders no trust-cue row when trustCues is omitted', () => {
+      expect(screen.queryByRole('list')).not.toBeInTheDocument();
+    });
   });
 
   it('renders trust cues when provided', () => {
@@ -68,12 +82,6 @@ describe(`<${NewsletterSignupFull.name}/>`, () => {
 
     expect(screen.getByText('No spam')).toBeVisible();
     expect(screen.getByText('Unsubscribe in one line')).toBeVisible();
-  });
-
-  it('renders no trust-cue row when trustCues is omitted', () => {
-    setup();
-
-    expect(screen.queryByRole('list')).not.toBeInTheDocument();
   });
 
   it('shows the success message and hides the field on success', () => {

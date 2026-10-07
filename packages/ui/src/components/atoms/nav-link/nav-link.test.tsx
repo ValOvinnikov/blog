@@ -51,28 +51,26 @@ describe(`<${NavLink.name}/>`, () => {
     expect(screen.getByRole('link', { name: 'RSS feed' })).toBeVisible();
   });
 
-  it('keeps the label as the accessible name when hasLabel is false', () => {
-    setup({
-      icon: <svg data-testid="nav-icon" />,
-      hasLabel: false,
-      children: 'RSS feed',
+  describe('when hasLabel is false', () => {
+    beforeEach(() => {
+      setup({
+        icon: <svg data-testid="nav-icon" />,
+        hasLabel: false,
+        children: 'RSS feed',
+      });
     });
 
-    expect(screen.getByTestId('nav-icon')).toBeVisible();
-    expect(screen.getByRole('link', { name: 'RSS feed' })).toBeVisible();
-  });
-
-  it('sets a title attribute on an icon-only link for sighted hover users', () => {
-    setup({
-      icon: <svg data-testid="nav-icon" />,
-      hasLabel: false,
-      children: 'RSS feed',
+    it('keeps the label as the accessible name', () => {
+      expect(screen.getByTestId('nav-icon')).toBeVisible();
+      expect(screen.getByRole('link', { name: 'RSS feed' })).toBeVisible();
     });
 
-    expect(screen.getByRole('link', { name: 'RSS feed' })).toHaveAttribute(
-      'title',
-      'RSS feed',
-    );
+    it('sets a title attribute on the icon-only link for sighted hover users', () => {
+      expect(screen.getByRole('link', { name: 'RSS feed' })).toHaveAttribute(
+        'title',
+        'RSS feed',
+      );
+    });
   });
 
   it('omits the title attribute when hasLabel is not set', () => {

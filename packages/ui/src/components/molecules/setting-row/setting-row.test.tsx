@@ -11,11 +11,24 @@ const description = faker.lorem.sentence();
 const setup = customRender(SettingRow, { label });
 
 describe(`<${SettingRow.name}/>`, () => {
-  it('renders the label as an h3 heading by default', () => {
-    setup();
-    expect(
-      screen.getByRole('heading', { level: 3, name: label }),
-    ).toBeVisible();
+  describe('with the default props', () => {
+    beforeEach(() => {
+      setup();
+    });
+
+    it('renders the label as an h3 heading by default', () => {
+      expect(
+        screen.getByRole('heading', { level: 3, name: label }),
+      ).toBeVisible();
+    });
+
+    it('does not render a description when omitted', () => {
+      expect(screen.queryByText(description)).not.toBeInTheDocument();
+    });
+
+    it('does not render a control wrapper when no children are given', () => {
+      expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    });
   });
 
   it('renders the label at a custom heading level', () => {
@@ -30,21 +43,11 @@ describe(`<${SettingRow.name}/>`, () => {
     expect(screen.getByText(description)).toBeVisible();
   });
 
-  it('does not render a description when omitted', () => {
-    setup();
-    expect(screen.queryByText(description)).not.toBeInTheDocument();
-  });
-
   it('renders control-slot children', () => {
     setup({ children: <button>request export</button> });
     expect(
       screen.getByRole('button', { name: 'request export' }),
     ).toBeVisible();
-  });
-
-  it('does not render a control wrapper when no children are given', () => {
-    setup();
-    expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
   it('forwards dataTestId to the root element', () => {

@@ -1,6 +1,7 @@
 import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
 import userEvent from '@testing-library/user-event';
+import type { Mock } from 'vitest';
 
 import { ConsentBanner } from './consent-banner';
 
@@ -25,64 +26,65 @@ const setup = customRender(ConsentBanner, {
 });
 
 describe(`<${ConsentBanner.name}/>`, () => {
-  it('renders the heading at the given level and the message', () => {
-    setup();
-    expect(
-      screen.getByRole('heading', { level: 2, name: heading }),
-    ).toBeVisible();
-    expect(screen.getByText(message)).toBeVisible();
-  });
+  describe('with the default props', () => {
+    let onAccept: Mock<() => void>;
+    let onReject: Mock<() => void>;
+    let onOpenSettings: Mock<() => void>;
 
-  it('renders Accept, Reject and Settings controls', () => {
-    setup();
-    expect(screen.getByRole('button', { name: acceptLabel })).toBeVisible();
-    expect(screen.getByRole('button', { name: rejectLabel })).toBeVisible();
-    expect(screen.getByRole('button', { name: settingsLabel })).toBeVisible();
-  });
+    beforeEach(() => {
+      onAccept = vi.fn();
+      onReject = vi.fn();
+      onOpenSettings = vi.fn();
+      setup({ onAccept, onReject, onOpenSettings });
+    });
 
-  it('calls onAccept when Accept is clicked', async () => {
-    const onAccept = vi.fn();
-    setup({ onAccept });
-    await userEvent.click(screen.getByRole('button', { name: acceptLabel }));
-    expect(onAccept).toHaveBeenCalledTimes(1);
-  });
+    it('renders the heading at the given level and the message', () => {
+      expect(
+        screen.getByRole('heading', { level: 2, name: heading }),
+      ).toBeVisible();
+      expect(screen.getByText(message)).toBeVisible();
+    });
 
-  it('calls onReject when Reject is clicked', async () => {
-    const onReject = vi.fn();
-    setup({ onReject });
-    await userEvent.click(screen.getByRole('button', { name: rejectLabel }));
-    expect(onReject).toHaveBeenCalledTimes(1);
-  });
+    it('renders Accept, Reject and Settings controls', () => {
+      expect(screen.getByRole('button', { name: acceptLabel })).toBeVisible();
+      expect(screen.getByRole('button', { name: rejectLabel })).toBeVisible();
+      expect(screen.getByRole('button', { name: settingsLabel })).toBeVisible();
+    });
 
-  it('calls onOpenSettings when Settings is clicked', async () => {
-    const onOpenSettings = vi.fn();
-    setup({ onOpenSettings });
-    await userEvent.click(screen.getByRole('button', { name: settingsLabel }));
-    expect(onOpenSettings).toHaveBeenCalledTimes(1);
-  });
+    it('calls onAccept when Accept is clicked', async () => {
+      await userEvent.click(screen.getByRole('button', { name: acceptLabel }));
+      expect(onAccept).toHaveBeenCalledTimes(1);
+    });
 
-  it('calls onAccept when Accept is activated by keyboard', async () => {
-    const onAccept = vi.fn();
-    setup({ onAccept });
-    screen.getByRole('button', { name: acceptLabel }).focus();
-    await userEvent.keyboard('{Enter}');
-    expect(onAccept).toHaveBeenCalledTimes(1);
-  });
+    it('calls onReject when Reject is clicked', async () => {
+      await userEvent.click(screen.getByRole('button', { name: rejectLabel }));
+      expect(onReject).toHaveBeenCalledTimes(1);
+    });
 
-  it('calls onReject when Reject is activated by keyboard', async () => {
-    const onReject = vi.fn();
-    setup({ onReject });
-    screen.getByRole('button', { name: rejectLabel }).focus();
-    await userEvent.keyboard('{Enter}');
-    expect(onReject).toHaveBeenCalledTimes(1);
-  });
+    it('calls onOpenSettings when Settings is clicked', async () => {
+      await userEvent.click(
+        screen.getByRole('button', { name: settingsLabel }),
+      );
+      expect(onOpenSettings).toHaveBeenCalledTimes(1);
+    });
 
-  it('calls onOpenSettings when Settings is activated by keyboard', async () => {
-    const onOpenSettings = vi.fn();
-    setup({ onOpenSettings });
-    screen.getByRole('button', { name: settingsLabel }).focus();
-    await userEvent.keyboard('{Enter}');
-    expect(onOpenSettings).toHaveBeenCalledTimes(1);
+    it('calls onAccept when Accept is activated by keyboard', async () => {
+      screen.getByRole('button', { name: acceptLabel }).focus();
+      await userEvent.keyboard('{Enter}');
+      expect(onAccept).toHaveBeenCalledTimes(1);
+    });
+
+    it('calls onReject when Reject is activated by keyboard', async () => {
+      screen.getByRole('button', { name: rejectLabel }).focus();
+      await userEvent.keyboard('{Enter}');
+      expect(onReject).toHaveBeenCalledTimes(1);
+    });
+
+    it('calls onOpenSettings when Settings is activated by keyboard', async () => {
+      screen.getByRole('button', { name: settingsLabel }).focus();
+      await userEvent.keyboard('{Enter}');
+      expect(onOpenSettings).toHaveBeenCalledTimes(1);
+    });
   });
 
   it('forwards dataTestId to the root element', () => {

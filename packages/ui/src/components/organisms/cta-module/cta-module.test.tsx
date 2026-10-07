@@ -13,15 +13,19 @@ const setup = customRender(CtaModule, {
 });
 
 describe(`<${CtaModule.name}/>`, () => {
+  let heading: string;
+
+  beforeEach(() => {
+    heading = faker.lorem.sentence(4);
+  });
+
   it('renders the heading', () => {
-    const heading = faker.lorem.sentence(4);
     setup({ heading });
 
     expect(screen.getByRole('heading', { name: heading })).toBeVisible();
   });
 
   it('assigns headingId to the heading element', () => {
-    const heading = faker.lorem.sentence(4);
     setup({ heading, headingId: 'cta-heading' });
 
     expect(screen.getByRole('heading', { name: heading })).toHaveAttribute(
@@ -37,10 +41,34 @@ describe(`<${CtaModule.name}/>`, () => {
     expect(screen.getByText(eyebrow)).toBeVisible();
   });
 
-  it('does not render an eyebrow when omitted', () => {
-    setup();
+  describe('with the default props', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    expect(screen.queryByText(faker.lorem.words(2))).not.toBeInTheDocument();
+    it('does not render an eyebrow when omitted', () => {
+      expect(screen.queryByText(faker.lorem.words(2))).not.toBeInTheDocument();
+    });
+
+    it('does not render supportingText when omitted', () => {
+      expect(
+        screen.queryByText(faker.lorem.sentence(8)),
+      ).not.toBeInTheDocument();
+    });
+
+    it('does not render content when omitted', () => {
+      expect(screen.queryByText('Rich CTA copy')).not.toBeInTheDocument();
+    });
+
+    it('does not render footnote when omitted', () => {
+      expect(
+        screen.queryByText(faker.lorem.sentence(6)),
+      ).not.toBeInTheDocument();
+    });
+
+    it('does not render an image when omitted', () => {
+      expect(screen.queryByTestId('cta-image')).not.toBeInTheDocument();
+    });
   });
 
   it('renders supportingText when provided', () => {
@@ -50,22 +78,10 @@ describe(`<${CtaModule.name}/>`, () => {
     expect(screen.getByText(supportingText)).toBeVisible();
   });
 
-  it('does not render supportingText when omitted', () => {
-    setup();
-
-    expect(screen.queryByText(faker.lorem.sentence(8))).not.toBeInTheDocument();
-  });
-
   it('renders content when provided', () => {
     setup({ content: <p>Rich CTA copy</p> });
 
     expect(screen.getByText('Rich CTA copy')).toBeVisible();
-  });
-
-  it('does not render content when omitted', () => {
-    setup();
-
-    expect(screen.queryByText('Rich CTA copy')).not.toBeInTheDocument();
   });
 
   it('renders the actions slot', () => {
@@ -90,22 +106,10 @@ describe(`<${CtaModule.name}/>`, () => {
     expect(screen.getByText(footnote)).toBeVisible();
   });
 
-  it('does not render footnote when omitted', () => {
-    setup();
-
-    expect(screen.queryByText(faker.lorem.sentence(6))).not.toBeInTheDocument();
-  });
-
   it('renders the image when provided', () => {
     setup({ image: <img src="/cta.jpg" alt="" data-testid="cta-image" /> });
 
     expect(screen.getByTestId('cta-image')).toBeVisible();
-  });
-
-  it('does not render an image when omitted', () => {
-    setup();
-
-    expect(screen.queryByTestId('cta-image')).not.toBeInTheDocument();
   });
 
   it('forwards data-testid', () => {

@@ -15,11 +15,35 @@ const setup = customRender(TextInput, {
 });
 
 describe(`<${TextInput.name}/>`, () => {
-  it('renders a textbox with the given ariaLabel', () => {
-    setup();
-    expect(
-      screen.getByRole('textbox', { name: 'Email address' }),
-    ).toBeVisible();
+  describe('with the default props', () => {
+    beforeEach(() => {
+      setup();
+    });
+
+    it('renders a textbox with the given ariaLabel', () => {
+      expect(
+        screen.getByRole('textbox', { name: 'Email address' }),
+      ).toBeVisible();
+    });
+
+    it('has no leading icon glyph by default', () => {
+      expect(screen.queryByText('$')).not.toBeInTheDocument();
+    });
+
+    it('has no trailing icon glyph by default', () => {
+      expect(screen.queryByText('$')).not.toBeInTheDocument();
+    });
+
+    it('is not marked invalid by default', () => {
+      expect(screen.getByRole('textbox')).toHaveAttribute(
+        'aria-invalid',
+        'false',
+      );
+    });
+
+    it('is not disabled by default', () => {
+      expect(screen.getByRole('textbox')).toBeEnabled();
+    });
   });
 
   it('renders the controlled value', () => {
@@ -34,11 +58,6 @@ describe(`<${TextInput.name}/>`, () => {
     await userEvent.type(screen.getByRole('textbox'), 'a');
     expect(onChange).toHaveBeenCalledWith('a');
     expect(screen.getByRole('textbox')).toHaveValue('');
-  });
-
-  it('has no leading icon glyph by default', () => {
-    setup();
-    expect(screen.queryByText('$')).not.toBeInTheDocument();
   });
 
   it('renders a decorative leading icon glyph when given, hidden from the accessibility tree', () => {
@@ -59,11 +78,6 @@ describe(`<${TextInput.name}/>`, () => {
       ),
     });
     expect(screen.getByTestId('leading-icon')).toBeVisible();
-  });
-
-  it('has no trailing icon glyph by default', () => {
-    setup();
-    expect(screen.queryByText('$')).not.toBeInTheDocument();
   });
 
   it('renders a decorative trailing icon glyph when given, hidden from the accessibility tree, positioned after the input', () => {
@@ -108,14 +122,6 @@ describe(`<${TextInput.name}/>`, () => {
     ).toBeTruthy();
   });
 
-  it('is not marked invalid by default', () => {
-    setup();
-    expect(screen.getByRole('textbox')).toHaveAttribute(
-      'aria-invalid',
-      'false',
-    );
-  });
-
   it('marks the field invalid via aria-invalid when isInvalid is true', () => {
     setup({ isInvalid: true });
     expect(screen.getByRole('textbox')).toHaveAttribute('aria-invalid', 'true');
@@ -124,11 +130,6 @@ describe(`<${TextInput.name}/>`, () => {
   it('forwards dataTestId to the root element', () => {
     setup({ dataTestId: 'text-input' });
     expect(screen.getByTestId('text-input')).toBeVisible();
-  });
-
-  it('is not disabled by default', () => {
-    setup();
-    expect(screen.getByRole('textbox')).toBeEnabled();
   });
 
   it('renders the native disabled attribute when isDisabled is true', () => {

@@ -19,16 +19,18 @@ describe(`<${Icon.name}/>`, () => {
     ).toHaveLength(0);
   });
 
-  it('renders a baked-in stroke-width per icon with no strokeWidth prop', () => {
-    setup({ dataTestId: 'icon' });
+  describe('with no aria-label or strokeWidth', () => {
+    beforeEach(() => {
+      setup({ dataTestId: 'icon' });
+    });
 
-    expect(screen.getByTestId('icon')).toHaveAttribute('stroke-width', '1.6');
-  });
+    it('renders a baked-in stroke-width per icon', () => {
+      expect(screen.getByTestId('icon')).toHaveAttribute('stroke-width', '1.6');
+    });
 
-  it('defaults to aria-hidden when no aria-label is given', () => {
-    setup({ dataTestId: 'icon' });
-
-    expect(screen.getByTestId('icon')).toHaveAttribute('aria-hidden', 'true');
+    it('defaults to aria-hidden', () => {
+      expect(screen.getByTestId('icon')).toHaveAttribute('aria-hidden', 'true');
+    });
   });
 
   it('does not default aria-hidden when an aria-label is given', () => {

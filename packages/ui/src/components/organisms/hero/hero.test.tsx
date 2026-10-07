@@ -60,11 +60,50 @@ const heroSocial = (
 );
 
 describe(`<${Hero.name}/>`, () => {
-  it('renders the title', () => {
-    setup();
-    expect(
-      screen.getByRole('heading', { name: 'Building a Design System' }),
-    ).toBeVisible();
+  describe('with the default props', () => {
+    beforeEach(() => {
+      setup();
+    });
+
+    it('renders the title', () => {
+      expect(
+        screen.getByRole('heading', { name: 'Building a Design System' }),
+      ).toBeVisible();
+    });
+
+    it('does not render an excerpt element when excerpt is omitted', () => {
+      expect(
+        screen.queryByText('A walkthrough of Atomic Design with Tailwind.'),
+      ).not.toBeInTheDocument();
+    });
+
+    it('does not render body content when Hero.Body is omitted', () => {
+      expect(screen.queryByText('Full bio goes here.')).not.toBeInTheDocument();
+    });
+
+    it('does not render a CTA when Hero.Cta is omitted', () => {
+      expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    });
+
+    it('does not render media when Hero.Media is omitted', () => {
+      expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    });
+
+    it('assigns titleId to the heading element', () => {
+      expect(
+        screen.getByRole('heading', { name: 'Building a Design System' }),
+      ).toHaveAttribute('id', 'hero-title');
+    });
+
+    it('does not render avatar content when Hero.Avatar is omitted', () => {
+      expect(
+        screen.queryByAltText('Portrait of Jane Doe'),
+      ).not.toBeInTheDocument();
+    });
+
+    it('does not render social content when Hero.Social is omitted', () => {
+      expect(screen.queryByRole('list')).not.toBeInTheDocument();
+    });
   });
 
   it('renders the excerpt when provided', () => {
@@ -72,13 +111,6 @@ describe(`<${Hero.name}/>`, () => {
     expect(
       screen.getByText('A walkthrough of Atomic Design with Tailwind.'),
     ).toBeVisible();
-  });
-
-  it('does not render an excerpt element when excerpt is omitted', () => {
-    setup();
-    expect(
-      screen.queryByText('A walkthrough of Atomic Design with Tailwind.'),
-    ).not.toBeInTheDocument();
   });
 
   it('renders Hero.Body between the excerpt and Hero.Cta in the DOM', () => {
@@ -102,32 +134,26 @@ describe(`<${Hero.name}/>`, () => {
     expectFollows(body, cta);
   });
 
-  it('does not render body content when Hero.Body is omitted', () => {
-    setup();
-    expect(screen.queryByText('Full bio goes here.')).not.toBeInTheDocument();
-  });
+  describe('with a Hero.Cta', () => {
+    beforeEach(() => {
+      renderHero(undefined, heroCta);
+    });
 
-  it('renders Hero.Cta children', () => {
-    renderHero(undefined, heroCta);
-    expect(screen.getByRole('link')).toHaveAttribute(
-      'href',
-      '/posts/design-system',
-    );
-    expect(screen.getByText('Read more')).toBeVisible();
-  });
+    it('renders Hero.Cta children', () => {
+      expect(screen.getByRole('link')).toHaveAttribute(
+        'href',
+        '/posts/design-system',
+      );
+      expect(screen.getByText('Read more')).toBeVisible();
+    });
 
-  it('nests the CTA inside the copy column, alongside the heading', () => {
-    renderHero(undefined, heroCta);
-    const copyColumn = screen.getByTestId('hero-copy');
-    expect(copyColumn).toContainElement(
-      screen.getByRole('heading', { name: 'Building a Design System' }),
-    );
-    expect(copyColumn).toContainElement(screen.getByRole('link'));
-  });
-
-  it('does not render a CTA when Hero.Cta is omitted', () => {
-    setup();
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    it('nests the CTA inside the copy column, alongside the heading', () => {
+      const copyColumn = screen.getByTestId('hero-copy');
+      expect(copyColumn).toContainElement(
+        screen.getByRole('heading', { name: 'Building a Design System' }),
+      );
+      expect(copyColumn).toContainElement(screen.getByRole('link'));
+    });
   });
 
   it('renders Hero.Media content', () => {
@@ -138,19 +164,6 @@ describe(`<${Hero.name}/>`, () => {
       </Hero.Media>,
     );
     expect(screen.getByAltText('Hero cover photo')).toBeVisible();
-  });
-
-  it('does not render media when Hero.Media is omitted', () => {
-    setup();
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
-  });
-
-  it('assigns titleId to the heading element', () => {
-    setup();
-
-    expect(
-      screen.getByRole('heading', { name: 'Building a Design System' }),
-    ).toHaveAttribute('id', 'hero-title');
   });
 
   it('forwards data-testid to the root element', () => {
@@ -307,13 +320,6 @@ describe(`<${Hero.name}/>`, () => {
     expectFollows(avatar, eyebrowText);
   });
 
-  it('does not render avatar content when Hero.Avatar is omitted', () => {
-    setup();
-    expect(
-      screen.queryByAltText('Portrait of Jane Doe'),
-    ).not.toBeInTheDocument();
-  });
-
   it('renders arbitrary children inside Hero.Avatar, not just an image', () => {
     renderHero(
       undefined,
@@ -349,11 +355,6 @@ describe(`<${Hero.name}/>`, () => {
     );
 
     expect(screen.getByRole('link', { name: 'GitHub' })).toBeVisible();
-  });
-
-  it('does not render social content when Hero.Social is omitted', () => {
-    setup();
-    expect(screen.queryByRole('list')).not.toBeInTheDocument();
   });
 
   it.each(Object.values(BRAND_VARIANT))(

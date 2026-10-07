@@ -14,9 +14,22 @@ const setup = customRender(Alert, {
 });
 
 describe(`<${Alert.name}/>`, () => {
-  it('renders the given message', () => {
-    setup();
-    expect(screen.getByText(message)).toBeVisible();
+  describe('with the default props', () => {
+    beforeEach(() => {
+      setup();
+    });
+
+    it('renders the given message', () => {
+      expect(screen.getByText(message)).toBeVisible();
+    });
+
+    it('has no id attribute on the root element when none is given', () => {
+      expect(screen.getByRole('status')).not.toHaveAttribute('id');
+    });
+
+    it('renders a type icon by default', () => {
+      expect(screen.getByTestId('alert-icon')).toBeInTheDocument();
+    });
   });
 
   it('renders an assertive alert for the ERROR type', () => {
@@ -47,16 +60,6 @@ describe(`<${Alert.name}/>`, () => {
   it('forwards id to the root element', () => {
     setup({ id: 'alert-id' });
     expect(screen.getByRole('status')).toHaveAttribute('id', 'alert-id');
-  });
-
-  it('has no id attribute on the root element when none is given', () => {
-    setup();
-    expect(screen.getByRole('status')).not.toHaveAttribute('id');
-  });
-
-  it('renders a type icon by default', () => {
-    setup();
-    expect(screen.getByTestId('alert-icon')).toBeInTheDocument();
   });
 
   it('renders no icon when hasIcon is false', () => {

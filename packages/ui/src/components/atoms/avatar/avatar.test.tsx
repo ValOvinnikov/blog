@@ -12,14 +12,23 @@ const setup = customRender(Avatar, {
 });
 
 describe(`<${Avatar.name}/>`, () => {
+  describe('with the default props', () => {
+    beforeEach(() => {
+      setup();
+    });
+
+    it('renders initials when no src', () => {
+      expect(screen.getByText('JD')).toBeVisible();
+    });
+
+    it('renders a text alternative for the initials fallback when alt is provided', () => {
+      expect(screen.getByText('Jane Doe')).toBeVisible();
+    });
+  });
+
   it('renders img when src is provided', () => {
     setup({ src: '/photo.jpg', alt: 'Profile photo' });
     expect(screen.getByRole('img', { name: 'Profile photo' })).toBeVisible();
-  });
-
-  it('renders initials when no src', () => {
-    setup();
-    expect(screen.getByText('JD')).toBeVisible();
   });
 
   it('caps initials at 2 chars', () => {
@@ -54,11 +63,6 @@ describe(`<${Avatar.name}/>`, () => {
     setup({ alt: '' });
     expect(screen.getByText('JD')).toBeVisible();
     expect(screen.queryByText('Jane Doe')).not.toBeInTheDocument();
-  });
-
-  it('renders a text alternative for the initials fallback when alt is provided', () => {
-    setup();
-    expect(screen.getByText('Jane Doe')).toBeVisible();
   });
 
   it('calls onImageError when the image fails to load', () => {
