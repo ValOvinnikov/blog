@@ -2,12 +2,20 @@ import type { ReactNode } from 'react';
 
 import { breadcrumbBarVariants } from './breadcrumb-bar-variants';
 
-type TBreadcrumbBarProps = { children: ReactNode };
+type TBreadcrumbBarProps = {
+  children: ReactNode;
+  isAbovePageHeading?: boolean;
+};
 
-const { root, inner } = breadcrumbBarVariants();
+export const BreadcrumbBar = ({
+  children,
+  isAbovePageHeading,
+}: TBreadcrumbBarProps) => {
+  const { root, inner } = breadcrumbBarVariants({ isAbovePageHeading });
 
-export const BreadcrumbBar = ({ children }: TBreadcrumbBarProps) => (
-  <div className={root()}>
-    <div className={inner()}>{children}</div>
-  </div>
-);
+  return (
+    <div className={root()}>
+      <div className={inner()}>{children}</div>
+    </div>
+  );
+};
