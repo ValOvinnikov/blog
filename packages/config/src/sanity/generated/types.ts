@@ -15,9 +15,9 @@
 export declare const internalGroqTypeReferenceTo: unique symbol;
 
 // Source: ../config/src/sanity/generated/schema.json
-export type Module_childPages = {
+export type Module_sectionPages = {
   _id: string;
-  _type: 'module_childPages';
+  _type: 'module_sectionPages';
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -1922,11 +1922,11 @@ export type Page_landing = {
   seo?: Seo;
 };
 
-export type Module_childPagesReference = {
+export type Module_sectionPagesReference = {
   _ref: string;
   _type: 'reference';
   _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'module_childPages';
+  [internalGroqTypeReferenceTo]?: 'module_sectionPages';
 };
 
 export type Template_landing = {
@@ -1955,7 +1955,7 @@ export type Template_landing = {
       } & Module_featureListReference)
     | ({
         _key: string;
-      } & Module_childPagesReference)
+      } & Module_sectionPagesReference)
     | ({
         _key: string;
       } & Module_timelineReference)
@@ -2177,7 +2177,7 @@ export type Geopoint = {
 };
 
 export type AllSanitySchemaTypes =
-  | Module_childPages
+  | Module_sectionPages
   | ModuleHeadingBlock
   | Module_pricing
   | InternationalizedArrayString
@@ -2314,7 +2314,7 @@ export type AllSanitySchemaTypes =
   | Template_postIndex
   | Template_landingReference
   | Page_landing
-  | Module_childPagesReference
+  | Module_sectionPagesReference
   | Template_landing
   | Module_heroStatement
   | Module_heroProfile

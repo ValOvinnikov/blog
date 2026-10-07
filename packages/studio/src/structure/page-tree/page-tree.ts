@@ -31,10 +31,10 @@ export const createPageTreeResolver = (
   const pageDocument = (id: string) =>
     S.document().schemaType(name).documentId(id);
 
-  const childPages = (id: string, title: string) =>
+  const sectionPages = (id: string, title: string) =>
     S.component(orderableList)
       .id(`${id}-children`)
-      .title(`${title} — child pages`)
+      .title(`${title} — section pages`)
       .options({
         type: name,
         filter: `parent._ref == $parentId`,
@@ -69,9 +69,9 @@ export const createPageTreeResolver = (
           .child(pageDocument(id)),
         S.listItem()
           .id('children')
-          .title('Child pages')
+          .title('Section pages')
           .icon(ListOrdered)
-          .child(childPages(id, title)),
+          .child(sectionPages(id, title)),
       ]);
   };
 

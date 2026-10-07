@@ -5,7 +5,6 @@ import type {
 } from '@blog/config';
 import type { TModule } from '@blog/service';
 import { PageHeading } from '@web/components/shared/page-heading';
-import { ChildPagesModule } from '@web/modules/child-pages/child-pages-module';
 import { ContentModule } from '@web/modules/content/content-module';
 import { CtaModule } from '@web/modules/cta/cta-module';
 import { FaqModule } from '@web/modules/faq/faq-module';
@@ -24,6 +23,7 @@ import { NewsletterModule } from '@web/modules/newsletter/newsletter-module';
 import { PostFeaturedModule } from '@web/modules/post-featured/post-featured-module';
 import { PostLatestModule } from '@web/modules/post-latest/post-latest-module';
 import { PricingModule } from '@web/modules/pricing/pricing-module';
+import { SectionPagesModule } from '@web/modules/section-pages/section-pages-module';
 import { StatsModule } from '@web/modules/stats/stats-module';
 import { TaxonomyListModule } from '@web/modules/taxonomy-list/taxonomy-list-module';
 import { TeamModule } from '@web/modules/team/team-module';
@@ -50,7 +50,7 @@ const LANDING_MAP: Partial<Record<TPageLandingType, TModuleComponent>> = {
   module_team: TeamModule,
   module_pricing: PricingModule,
   module_timeline: TimelineModule,
-  module_childPages: ChildPagesModule,
+  module_sectionPages: SectionPagesModule,
 };
 
 export interface ILandingModuleRendererProps {

@@ -10,7 +10,6 @@ import { createNavigationService } from './features/global/navigation';
 import { createSiteSettingsService } from './features/global/site-settings';
 import { createThemeSettingsService } from './features/global/theme-settings';
 import { createTranslationMapService } from './features/global/translation-map';
-import { createChildPagesModuleService } from './features/modules/child-pages';
 import { createContentModuleService } from './features/modules/content';
 import { createCtaModuleService } from './features/modules/cta';
 import { createFaqModuleService } from './features/modules/faq';
@@ -27,6 +26,7 @@ import { createPostLatestModuleService } from './features/modules/post-latest';
 import { createPostListModuleService } from './features/modules/post-list';
 import { createPostRelatedModuleService } from './features/modules/post-related';
 import { createPricingModuleService } from './features/modules/pricing';
+import { createSectionPagesModuleService } from './features/modules/section-pages';
 import { createStatsModuleService } from './features/modules/stats';
 import { createTaxonomyListModuleService } from './features/modules/taxonomy-list';
 import { createTeamModuleService } from './features/modules/team';
@@ -64,7 +64,7 @@ export const service = {
     postLatest: createPostLatestModuleService(),
     postFeatured: createPostFeaturedModuleService(),
     postRelated: createPostRelatedModuleService(),
-    childPages: createChildPagesModuleService(),
+    sectionPages: createSectionPagesModuleService(),
     content: createContentModuleService(),
     cta: createCtaModuleService(),
     newsletter: createNewsletterModuleService(),
@@ -111,9 +111,9 @@ export type {
   TTranslationMap,
 } from './features/global/translation-map';
 export type {
-  TChildPageCard,
-  TChildPagesModule,
-} from './features/modules/child-pages';
+  TSectionPageCard,
+  TSectionPagesModule,
+} from './features/modules/section-pages';
 export type { TContentModule } from './features/modules/content';
 export type { TCtaModule } from './features/modules/cta';
 export type { TFaqModule, TFaqQuestion } from './features/modules/faq';
