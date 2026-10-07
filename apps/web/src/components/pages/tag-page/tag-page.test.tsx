@@ -18,6 +18,7 @@ import { TagPage } from './tag-page';
 vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@web/server/site-settings/get-site-settings/get-site-settings');
+vi.mock('@web/server/site-config/get-voice-rich/get-voice-rich');
 
 vi.mock('@blog/service', () => ({
   service: {
