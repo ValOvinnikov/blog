@@ -7641,6 +7641,23 @@
         },
         "optional": true
       },
+      "contentAlignment": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "LEFT"
+            },
+            {
+              "type": "string",
+              "value": "CENTER"
+            }
+          ]
+        },
+        "optional": true
+      },
       "template": {
         "type": "objectAttribute",
         "value": {
@@ -8909,6 +8926,23 @@
         },
         "optional": true
       },
+      "contentAlignment": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "LEFT"
+            },
+            {
+              "type": "string",
+              "value": "CENTER"
+            }
+          ]
+        },
+        "optional": true
+      },
       "heroImage": {
         "type": "objectAttribute",
         "value": {
@@ -9414,6 +9448,23 @@
         },
         "optional": true
       },
+      "contentAlignment": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "LEFT"
+            },
+            {
+              "type": "string",
+              "value": "CENTER"
+            }
+          ]
+        },
+        "optional": true
+      },
       "template": {
         "type": "objectAttribute",
         "value": {
@@ -9701,6 +9752,23 @@
         "value": {
           "type": "inline",
           "name": "pageHeadingBlock"
+        },
+        "optional": true
+      },
+      "contentAlignment": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "LEFT"
+            },
+            {
+              "type": "string",
+              "value": "CENTER"
+            }
+          ]
         },
         "optional": true
       },
@@ -10110,6 +10178,23 @@
         "value": {
           "type": "inline",
           "name": "pageHeadingBlock"
+        },
+        "optional": true
+      },
+      "contentAlignment": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "LEFT"
+            },
+            {
+              "type": "string",
+              "value": "CENTER"
+            }
+          ]
         },
         "optional": true
       },
@@ -10549,6 +10634,23 @@
         },
         "optional": true
       },
+      "contentAlignment": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "LEFT"
+            },
+            {
+              "type": "string",
+              "value": "CENTER"
+            }
+          ]
+        },
+        "optional": true
+      },
       "template": {
         "type": "objectAttribute",
         "value": {
@@ -10898,6 +11000,23 @@
         },
         "optional": true
       },
+      "contentAlignment": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "LEFT"
+            },
+            {
+              "type": "string",
+              "value": "CENTER"
+            }
+          ]
+        },
+        "optional": true
+      },
       "template": {
         "type": "objectAttribute",
         "value": {
@@ -11214,6 +11333,23 @@
         "value": {
           "type": "inline",
           "name": "pageHeadingBlock"
+        },
+        "optional": true
+      },
+      "contentAlignment": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "LEFT"
+            },
+            {
+              "type": "string",
+              "value": "CENTER"
+            }
+          ]
         },
         "optional": true
       },

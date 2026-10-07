@@ -113,7 +113,7 @@ export const landingPageSchema = defineType({
       isUnique: validateLandingSlugUniqueAmongSiblings,
       validateSlug: validateLandingSlug,
     }),
-    pageHeadingBlockField(),
+    ...pageHeadingBlockField(),
     templateField({ type: landingTemplateSchema.name }),
     sectionNavigationSetting({
       name: SECTION_NAVIGATION_FIELD,

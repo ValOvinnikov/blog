@@ -22,7 +22,7 @@ export const homePageSchema = defineType({
   fields: [
     languageField(),
     titleField(),
-    pageHeadingBlockField(),
+    ...pageHeadingBlockField(),
     templateField({ type: homeTemplateSchema.name }),
     seoField(),
   ],

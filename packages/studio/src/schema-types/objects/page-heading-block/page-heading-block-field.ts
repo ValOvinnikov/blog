@@ -1,3 +1,5 @@
+import { CONTENT_ALIGNMENT } from '@blog/config/constants';
+import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { defineField } from 'sanity';
 
 import {
@@ -6,7 +8,7 @@ import {
 } from './page-heading-block';
 
 // Sanity never evaluates the nested heading rule for an absent object.
-export const pageHeadingBlockField = () =>
+export const pageHeadingBlockField = () => [
   defineField({
     name: 'headingBlock',
     title: 'Heading Block',
@@ -17,4 +19,10 @@ export const pageHeadingBlockField = () =>
       rule.custom((value) =>
         value === undefined ? HEADING_REQUIRED_MESSAGE : true,
       ),
-  });
+  }),
+  ...alignmentFields([], {
+    title: 'Heading Alignment',
+    description: 'Horizontal alignment of the heading and supporting text.',
+    allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
+  }),
+];

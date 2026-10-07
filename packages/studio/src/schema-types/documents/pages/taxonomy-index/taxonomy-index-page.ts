@@ -50,7 +50,7 @@ export const taxonomyIndexPage = ({
     fields: [
       languageField(),
       titleField(),
-      pageHeadingBlockField(),
+      ...pageHeadingBlockField(),
       templateField({ type: templateType }),
       seoField(),
       defineField({

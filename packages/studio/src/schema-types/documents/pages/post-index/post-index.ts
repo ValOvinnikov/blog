@@ -22,7 +22,7 @@ export const postIndexPageSchema = defineType({
   fields: [
     languageField(),
     titleField(),
-    pageHeadingBlockField(),
+    ...pageHeadingBlockField(),
     templateField({ type: postIndexTemplateSchema.name }),
     seoField(),
   ],

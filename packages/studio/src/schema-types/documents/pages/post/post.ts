@@ -36,7 +36,7 @@ export const postPageSchema = defineType({
       previewInput: postSlugUrlPreviewInput,
       isUnique: validateSlugUniqueInLanguage,
     }),
-    pageHeadingBlockField(),
+    ...pageHeadingBlockField(),
     defineField({
       name: 'heroImage',
       title: 'Hero Image',

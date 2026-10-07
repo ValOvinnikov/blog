@@ -51,7 +51,7 @@ export const tagPageSchema = defineType({
             ),
           ),
     }),
-    pageHeadingBlockField(),
+    ...pageHeadingBlockField(),
     templateField({ type: tagTemplateSchema.name }),
     seoField(),
   ],

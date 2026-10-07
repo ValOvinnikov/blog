@@ -51,7 +51,7 @@ export const topicPageSchema = defineType({
             ),
           ),
     }),
-    pageHeadingBlockField(),
+    ...pageHeadingBlockField(),
     templateField({ type: topicTemplateSchema.name }),
     seoField(),
   ],
