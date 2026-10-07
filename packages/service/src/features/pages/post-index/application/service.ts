@@ -1,7 +1,8 @@
 import { getIndexPage } from '@blog/service/features/pages/post-index/adaptor/index-page/loader';
-import { getIndexPageParams } from '@blog/service/features/pages/post-index/adaptor/index-page-params/loader';
 import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
 import { safeAsync } from '@blog/utils';
+
+import { getIndexPageParams } from './get-index-page-params';
 
 export function createBlogService() {
   return {
@@ -9,9 +10,7 @@ export function createBlogService() {
       getIndexPage: safeAsync((tenant: TTenantSanityContext) =>
         getIndexPage(tenant),
       ),
-      getIndexPageParams: safeAsync((tenant: TTenantSanityContext) =>
-        getIndexPageParams(tenant),
-      ),
+      getIndexPageParams: safeAsync(getIndexPageParams),
     },
   };
 }

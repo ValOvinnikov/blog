@@ -4,16 +4,15 @@ import {
   runQuery,
   type TTenantSanityContext,
 } from '@blog/service/sanity/query/query';
-import { getPageFaqs } from '@blog/service/shared/adaptors/faq-questions/page-faqs';
 
 import { tagPageQuery } from './query';
 import { toTagDetailPage } from './transformer';
-import type { TTagDetailPage } from './types';
+import type { TTagDetailPageDocument } from './types';
 
-export async function getTagPage(
+export async function getTagPageDocument(
   slug: string,
   tenant: TTenantSanityContext,
-): Promise<TMaybeUndefined<TTagDetailPage>> {
+): Promise<TMaybeUndefined<TTagDetailPageDocument>> {
   const rawPage = await runQuery(tagPageQuery, {
     parameters: { slug },
     tenant,
@@ -21,5 +20,5 @@ export async function getTagPage(
   });
   if (!rawPage) return undefined;
 
-  return toTagDetailPage(rawPage, await getPageFaqs(rawPage.modules, tenant));
+  return toTagDetailPage(rawPage);
 }

@@ -1,5 +1,4 @@
 import { toPageTranslations } from '@blog/service/shared/localization/page-translations/to-page-translations';
-import type { TFaqPageQuestion } from '@blog/service/shared/transformers/faq/resolve-faqs';
 import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
 import {
   toHeroSlot,
@@ -9,7 +8,7 @@ import { resolveSeo } from '@blog/service/shared/transformers/seo/resolve-seo';
 import type { InferResultType } from 'groqd';
 
 import type { tagPageQuery } from './query';
-import type { TTagDetailPage, TTagDetailPageTag } from './types';
+import type { TTagDetailPageDocument, TTagDetailPageTag } from './types';
 
 export type TRawTagPage = NonNullable<InferResultType<typeof tagPageQuery>>;
 type TRawTagDetailPageTag = TRawTagPage['tag'];
@@ -23,10 +22,7 @@ function toTagDetailPageTag(rawTag: TRawTagDetailPageTag): TTagDetailPageTag {
   };
 }
 
-export function toTagDetailPage(
-  rawPage: TRawTagPage,
-  faqs: TFaqPageQuestion[],
-): TTagDetailPage {
+export function toTagDetailPage(rawPage: TRawTagPage): TTagDetailPageDocument {
   const tag = toTagDetailPageTag(rawPage.tag);
 
   return {
@@ -34,7 +30,6 @@ export function toTagDetailPage(
     headingBlock: toHeadingBlock(rawPage.headingBlock),
     hero: toHeroSlot(rawPage.hero),
     modules: (rawPage.modules ?? []).map(toModule),
-    faqs,
     seo: resolveSeo(rawPage.seo),
     translations: toPageTranslations(rawPage.translations),
   };

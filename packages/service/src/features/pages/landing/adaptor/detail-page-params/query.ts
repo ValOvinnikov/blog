@@ -9,8 +9,8 @@ export const landingPageParamsQuery = q
   .parameters<TPageQueryPageParams>()
   .star.filterByType('page_landing')
   // groqd's typed filterBy has no `in` operator
-  .filterRaw(`language in $locales && defined(${LANDING_PAGE_PATH_EXPRESSION})`)
+  .filterRaw('language in $locales')
   .project((sub) => ({
-    slug: sub.raw(LANDING_PAGE_PATH_EXPRESSION, pagePathParser.unwrap()),
+    slug: sub.raw(LANDING_PAGE_PATH_EXPRESSION, pagePathParser),
     language: sub.field('language').notNull(),
   }));
