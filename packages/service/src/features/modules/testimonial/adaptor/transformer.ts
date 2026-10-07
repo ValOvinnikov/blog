@@ -35,7 +35,7 @@ export function toTestimonialModule(
     testimonials: raw.testimonials.map(toTestimonialItem),
     ctaButtons: toCtaButtons(raw.ctaButtons),
     displayMode: raw.displayMode,
-    cardAlignment: raw.cardAlignment ?? undefined,
+    cardAlignment: raw.cardAlignment,
     contentAlignment: raw.contentAlignment ?? undefined,
     layout: toLayout(raw.layout),
   };

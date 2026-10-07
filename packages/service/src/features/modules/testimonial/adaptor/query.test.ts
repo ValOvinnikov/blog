@@ -1,4 +1,4 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { CONTENT_ALIGNMENT, LOCALE_ISO_CODES } from '@blog/config/constants';
 import { makeRawTestimonialModule } from '@blog/service/testing/modules/fixtures';
 import { makeRawExternalLinkDocument } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
@@ -67,11 +67,14 @@ const untranslatedTestimonial = {
 
 const imageAsset = { _id: 'image-1', _type: 'sanity.imageAsset' };
 
-async function runTestimonial(locale: string) {
+async function runTestimonial(
+  locale: string,
+  moduleDocument: Record<string, unknown> = testimonialModuleDocument,
+) {
   const raw = await evaluateGroqExpression(
     testimonialModuleQuery.query,
     [
-      testimonialModuleDocument,
+      moduleDocument,
       translatedTestimonial,
       untranslatedTestimonial,
       imageAsset,
@@ -228,5 +231,20 @@ describe('testimonialModuleQuery', () => {
         alt: null,
       },
     ]);
+  });
+
+  it('reads an unset cardAlignment as Left', async () => {
+    const module = await runTestimonial(EN);
+
+    expect(module.cardAlignment).toBe(CONTENT_ALIGNMENT.LEFT);
+  });
+
+  it('keeps an authored Center cardAlignment', async () => {
+    const module = await runTestimonial(EN, {
+      ...testimonialModuleDocument,
+      cardAlignment: CONTENT_ALIGNMENT.CENTER,
+    });
+
+    expect(module.cardAlignment).toBe(CONTENT_ALIGNMENT.CENTER);
   });
 });

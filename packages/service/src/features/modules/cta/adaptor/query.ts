@@ -2,7 +2,7 @@ import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
 import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
 import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
 import { localizedImageWithAltFragment } from '@blog/service/shared/fragments/image/localized-image-with-alt';
-import { moduleLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { moduleCtaLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
 import { getLocalizedPortableTextBlock } from '@blog/service/shared/localization/get-localized-portable-text-block/get-localized-portable-text-block';
@@ -32,6 +32,6 @@ export const ctaModuleQuery = q
     mobileMediaOrder: sub.field('mobileMediaOrder').nullable(true),
     ...ctaButtonsFragment,
     footnote: getLocalizedField(sub, 'footnote'),
-    ...moduleLayoutFragment,
+    ...moduleCtaLayoutFragment,
   }))
   .notNull();

@@ -1,7 +1,7 @@
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
 import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
 import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
-import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
+import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 
 export const sectionPagesModuleQuery = q
   .parameters<TModuleQueryParams>()
@@ -14,7 +14,7 @@ export const sectionPagesModuleQuery = q
       .field('headingBlock')
       .project(moduleHeadingBlockFragment)
       .nullable(true),
-    ...moduleContentAlignmentFragment,
+    ...moduleContentAlignmentLeftCenterFragment,
     ...moduleWideLayoutFragment,
   }))
   .notNull();

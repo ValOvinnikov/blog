@@ -123,14 +123,6 @@ export const CenterAlignedWithFootnote: TStory = {
   },
 };
 
-export const RightAlignedWithFootnote: TStory = {
-  args: {
-    stats,
-    footnote: 'Figures reflect the trailing 12 months.',
-    contentAlignment: CONTENT_ALIGNMENT.RIGHT,
-  },
-};
-
 export const Secondary: TStory = {
   args: {
     stats,

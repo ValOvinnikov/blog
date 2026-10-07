@@ -2,7 +2,7 @@ import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
 import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
 import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
 import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
-import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
+import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
 
 export const statsModuleQuery = q
@@ -27,7 +27,7 @@ export const statsModuleQuery = q
       .notNull(),
     footnote: getLocalizedField(sub, 'footnote'),
     ...ctaButtonsFragment,
-    ...moduleContentAlignmentFragment,
+    ...moduleContentAlignmentLeftCenterFragment,
     ...moduleWideLayoutFragment,
   }))
   .notNull();

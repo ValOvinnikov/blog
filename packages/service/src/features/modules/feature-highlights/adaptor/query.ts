@@ -4,7 +4,7 @@ import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-butto
 import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
 import { localizedImageWithAltFragment } from '@blog/service/shared/fragments/image/localized-image-with-alt';
 import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
-import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
+import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
 import { getLocalizedPortableTextBlock } from '@blog/service/shared/localization/get-localized-portable-text-block/get-localized-portable-text-block';
 
@@ -37,7 +37,7 @@ export const featureHighlightsModuleQuery = q
       .notNull(),
     ...ctaButtonsFragment,
     mediaOrder: sub.field('mediaOrder').notNull(),
-    ...moduleContentAlignmentFragment,
+    ...moduleContentAlignmentLeftCenterFragment,
     ...moduleWideLayoutFragment,
   }))
   .notNull();

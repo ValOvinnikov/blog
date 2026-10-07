@@ -2,7 +2,7 @@ import { NEWSLETTER_VARIANT } from '@blog/config';
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
 import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
 import { moduleLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
-import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
+import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
 import { z } from 'zod';
 
@@ -31,6 +31,6 @@ export const newsletterModuleQuery = q
       }))
       .nullable(true),
     ...moduleLayoutFragment,
-    ...moduleContentAlignmentFragment,
+    ...moduleContentAlignmentLeftCenterFragment,
   }))
   .notNull();

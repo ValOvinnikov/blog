@@ -1,14 +1,14 @@
 import type {
   ISanityImage,
   TBrandVariant,
-  TContentAlignment,
-  TLayout,
+  TContentAlignmentOf,
   TMaybeUndefined,
   TMediaOrder,
   THeadingBlock,
   TPortableTextBlock,
 } from '@blog/config';
 import type { TCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button';
+import type { TWideLayout } from '@blog/service/shared/transformers/layout/to-layout';
 
 export type TFeatureHighlightItem = {
   id: string;
@@ -24,6 +24,6 @@ export type TFeatureHighlightsModule = {
   highlights: TFeatureHighlightItem[];
   ctaButtons: TCtaButton[];
   mediaOrder: TMediaOrder;
-  contentAlignment: TMaybeUndefined<TContentAlignment>;
-  layout: TMaybeUndefined<TLayout>;
+  contentAlignment: TMaybeUndefined<TContentAlignmentOf<'LEFT' | 'CENTER'>>;
+  layout: TMaybeUndefined<TWideLayout>;
 };

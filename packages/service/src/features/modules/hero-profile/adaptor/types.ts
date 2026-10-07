@@ -4,12 +4,12 @@ import type {
   TContentAlignment,
   THeadingBlock,
   THeroVariant,
-  TLayout,
   TMaybeUndefined,
   TMediaOrder,
   TPortableTextBlock,
 } from '@blog/config';
 import type { TCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button';
+import type { THeroLayout } from '@blog/service/shared/transformers/layout/to-layout';
 import type { TSocialProfile } from '@blog/service/shared/transformers/social-profile/to-social-profile';
 
 export type THeroProfileModule = {
@@ -25,5 +25,5 @@ export type THeroProfileModule = {
   contentPosition: TMaybeUndefined<TContentAlignment>;
   contentAlignment: TMaybeUndefined<TContentAlignment>;
   mediaOrder: TMaybeUndefined<TMediaOrder>;
-  layout: TMaybeUndefined<TLayout>;
+  layout: TMaybeUndefined<THeroLayout>;
 };

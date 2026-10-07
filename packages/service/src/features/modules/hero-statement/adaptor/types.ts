@@ -4,11 +4,11 @@ import type {
   TContentAlignment,
   THeadingBlock,
   THeroVariant,
-  TLayout,
   TMaybeUndefined,
   TMediaOrder,
 } from '@blog/config';
 import type { TCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button';
+import type { THeroLayout } from '@blog/service/shared/transformers/layout/to-layout';
 
 export type THeroStatementModule = {
   brandVariant: TBrandVariant;
@@ -20,5 +20,5 @@ export type THeroStatementModule = {
   contentPosition: TMaybeUndefined<TContentAlignment>;
   contentAlignment: TMaybeUndefined<TContentAlignment>;
   mediaOrder: TMaybeUndefined<TMediaOrder>;
-  layout: TMaybeUndefined<TLayout>;
+  layout: TMaybeUndefined<THeroLayout>;
 };

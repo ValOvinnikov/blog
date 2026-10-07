@@ -6,11 +6,11 @@ import type {
   TContentAlignmentOf,
   TDisplayMode,
   THeadingBlock,
-  TLayout,
   TMaybeUndefined,
   TPortableTextBlock,
 } from '@blog/config';
 import type { TCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button';
+import type { TWideLayout } from '@blog/service/shared/transformers/layout/to-layout';
 import type { TSocialProfile } from '@blog/service/shared/transformers/social-profile/to-social-profile';
 
 export type TTeamMember = {
@@ -34,5 +34,5 @@ export type TTeamModule = {
   cardAlignment: Extract<TContentAlignment, 'LEFT' | 'CENTER'>;
   ctaButtons: TCtaButton[];
   contentAlignment: TMaybeUndefined<TContentAlignmentOf<'LEFT' | 'CENTER'>>;
-  layout: TMaybeUndefined<TLayout>;
+  layout: TMaybeUndefined<TWideLayout>;
 };

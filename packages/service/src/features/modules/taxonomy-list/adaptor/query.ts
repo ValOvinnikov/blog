@@ -2,7 +2,7 @@ import { TAXONOMY_KIND, TAXONOMY_SORT } from '@blog/config';
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
 import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
 import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
-import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
+import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { postLinkFragment } from '@blog/service/shared/fragments/post/post-link';
 import { tagWithPostCountFragment } from '@blog/service/shared/fragments/tag/tag';
 import { topicWithPostCountFragment } from '@blog/service/shared/fragments/topic/topic';
@@ -61,7 +61,7 @@ export const taxonomyListModuleQuery = q
       .project(moduleHeadingBlockFragment)
       .notNull(),
     ...moduleWideLayoutFragment,
-    ...moduleContentAlignmentFragment,
+    ...moduleContentAlignmentLeftCenterFragment,
     taxonomy: sub.raw('taxonomy', taxonomyParser),
     sortOrder: sub.raw(
       `coalesce(sortOrder, "${TAXONOMY_SORT.ALPHABETICAL}")`,
