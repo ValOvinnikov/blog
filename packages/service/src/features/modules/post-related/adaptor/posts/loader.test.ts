@@ -14,6 +14,10 @@ vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
 const tenant = makeTenant();
 
 describe(getRelatedPosts, () => {
+  beforeEach(() => {
+    mockRun.mockResolvedValue(null);
+  });
+
   it('ranks tag matches ahead of the topic backfill', async () => {
     mockRun
       .mockResolvedValueOnce({
@@ -61,8 +65,6 @@ describe(getRelatedPosts, () => {
   });
 
   it('returns an empty list when the anchor post resolves to no candidates', async () => {
-    mockRun.mockResolvedValueOnce(null);
-
     const posts = await getRelatedPosts('post-1', 3, tenant);
 
     expect(posts).toEqual([]);
@@ -70,8 +72,6 @@ describe(getRelatedPosts, () => {
   });
 
   it('threads tenant context into the anchor-post lookup, scoped by the given post id', async () => {
-    mockRun.mockResolvedValueOnce(null);
-
     await getRelatedPosts('post-1', 3, tenant);
 
     expect(mockRun).toHaveBeenCalledWith(

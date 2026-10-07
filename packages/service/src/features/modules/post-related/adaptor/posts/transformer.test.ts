@@ -25,6 +25,16 @@ function byTopicPost(
 }
 
 describe(toRelatedPosts, () => {
+  let shared: TRawRelatedByTags[number];
+  let topicOnlyA: TRawRelatedByTopic[number];
+  let topicOnlyB: TRawRelatedByTopic[number];
+
+  beforeEach(() => {
+    shared = byTagsPost({ _id: 'shared', tagIds: [{ _id: 'tag-a' }] });
+    topicOnlyA = byTopicPost({ _id: 'topic-a' });
+    topicOnlyB = byTopicPost({ _id: 'topic-b' });
+  });
+
   it('ranks candidates by shared-tag count desc, then publishedAt desc', () => {
     const oneShared = byTagsPost({
       _id: 'one-shared',
@@ -85,10 +95,6 @@ describe(toRelatedPosts, () => {
   });
 
   it('backfills remaining slots from the primary-topic pool when fewer than the limit share a tag', () => {
-    const shared = byTagsPost({ _id: 'shared', tagIds: [{ _id: 'tag-a' }] });
-    const topicOnlyA = byTopicPost({ _id: 'topic-a' });
-    const topicOnlyB = byTopicPost({ _id: 'topic-b' });
-
     const result = toRelatedPosts(
       [shared],
       [topicOnlyA, topicOnlyB],
@@ -104,7 +110,6 @@ describe(toRelatedPosts, () => {
   });
 
   it('excludes posts from the topic backfill that were already tag-ranked', () => {
-    const shared = byTagsPost({ _id: 'shared', tagIds: [{ _id: 'tag-a' }] });
     const duplicate = byTopicPost({ _id: 'shared' });
     const topicOnly = byTopicPost({ _id: 'topic-only' });
 
@@ -119,9 +124,6 @@ describe(toRelatedPosts, () => {
   });
 
   it('fills entirely from the topic pool when the post has no tags', () => {
-    const topicOnlyA = byTopicPost({ _id: 'topic-a' });
-    const topicOnlyB = byTopicPost({ _id: 'topic-b' });
-
     const result = toRelatedPosts([], [topicOnlyA, topicOnlyB], [], 3);
 
     expect(result.map((post) => post.id)).toEqual(['topic-a', 'topic-b']);

@@ -6,6 +6,12 @@ import { makeRawSanityImage } from '@blog/service/testing/shared/fixtures';
 import { toHeroModule } from './transformer';
 
 describe('toHeroModule', () => {
+  let fallbackPost: ReturnType<typeof makeRawPostCard>;
+
+  beforeEach(() => {
+    fallbackPost = makeRawPostCard({ _id: 'fallback' });
+  });
+
   it('maps brandVariant straight through', () => {
     const raw = makeRawHeroModule({
       brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
@@ -14,23 +20,6 @@ describe('toHeroModule', () => {
     const hero = toHeroModule(raw, null);
 
     expect(hero.brandVariant).toBe(BRAND_VARIANT.BRAND_PRIMARY);
-  });
-
-  it('uses the configured featured post as the fallback source', () => {
-    const raw = makeRawHeroModule({
-      featuredPost: makeRawPostCard({ _id: 'featured-ref' }),
-    });
-
-    const hero = toHeroModule(raw, null);
-
-    expect(hero.title).toBe('Hello World');
-    expect(hero.primaryAction).toEqual({
-      label: 'Read more',
-      href: '/blog/hello-world',
-      target: undefined,
-      platform: undefined,
-      hiddenLabelSuffix: 'Hello World',
-    });
   });
 
   it('trusts an editor-authored primary action label and omits the hidden suffix', () => {
@@ -48,17 +37,6 @@ describe('toHeroModule', () => {
       platform: undefined,
       hiddenLabelSuffix: undefined,
     });
-  });
-
-  it('falls back to the newest featured post when none is configured', () => {
-    const raw = makeRawHeroModule({ featuredPost: null });
-    const fallbackPost = makeRawPostCard({ _id: 'fallback' });
-
-    const hero = toHeroModule(raw, fallbackPost);
-
-    expect(hero.title).toBe('Hello World');
-    expect(hero.primaryAction?.href).toBe('/blog/hello-world');
-    expect(hero.primaryAction?.hiddenLabelSuffix).toBe('Hello World');
   });
 
   it('uses custom copy and custom sanity image when configured', () => {
@@ -105,7 +83,6 @@ describe('toHeroModule', () => {
       featuredPost: null,
       heroImageMode: HERO_FIELD_MODE.NONE,
     });
-    const fallbackPost = makeRawPostCard({ _id: 'fallback' });
 
     const hero = toHeroModule(raw, fallbackPost);
 
@@ -125,23 +102,56 @@ describe('toHeroModule', () => {
     expect(hero.sanityImage).toBeUndefined();
   });
 
-  it('has no primary action and undefined title/subtitle when there is no post at all', () => {
-    const raw = makeRawHeroModule({ featuredPost: null });
+  describe('with a configured featured post', () => {
+    let raw: ReturnType<typeof makeRawHeroModule>;
 
-    const hero = toHeroModule(raw, null);
-
-    expect(hero.primaryAction).toBeUndefined();
-    expect(hero.title).toBeUndefined();
-    expect(hero.subtitle).toBeUndefined();
-  });
-
-  it('has no appearance on the primary action — module_hero has no appearance field', () => {
-    const raw = makeRawHeroModule({
-      featuredPost: makeRawPostCard({ _id: 'featured-ref' }),
+    beforeEach(() => {
+      raw = makeRawHeroModule({
+        featuredPost: makeRawPostCard({ _id: 'featured-ref' }),
+      });
     });
 
-    const hero = toHeroModule(raw, null);
+    it('uses the configured featured post as the fallback source', () => {
+      const hero = toHeroModule(raw, null);
 
-    expect(hero.primaryAction?.appearance).toBeUndefined();
+      expect(hero.title).toBe('Hello World');
+      expect(hero.primaryAction).toEqual({
+        label: 'Read more',
+        href: '/blog/hello-world',
+        target: undefined,
+        platform: undefined,
+        hiddenLabelSuffix: 'Hello World',
+      });
+    });
+
+    it('has no appearance on the primary action — module_hero has no appearance field', () => {
+      const hero = toHeroModule(raw, null);
+
+      expect(hero.primaryAction?.appearance).toBeUndefined();
+    });
+  });
+
+  describe('with no configured featured post', () => {
+    let raw: ReturnType<typeof makeRawHeroModule>;
+
+    beforeEach(() => {
+      raw = makeRawHeroModule({ featuredPost: null });
+    });
+
+    it('falls back to the newest featured post when none is configured', () => {
+      const hero = toHeroModule(raw, fallbackPost);
+
+      expect(hero.title).toBe('Hello World');
+      expect(hero.primaryAction?.href).toBe('/blog/hello-world');
+      expect(hero.primaryAction?.hiddenLabelSuffix).toBe('Hello World');
+    });
+
+    it('has no primary action and undefined title/subtitle when there is no post at all', () => {
+      const hero = toHeroModule(raw, null);
+
+      expect(hero.primaryAction).toBeUndefined();
+      expect(hero.title).toBeUndefined();
+      expect(hero.subtitle).toBeUndefined();
+    });
   });
 });

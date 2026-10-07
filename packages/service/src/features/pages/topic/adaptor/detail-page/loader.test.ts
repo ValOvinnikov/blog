@@ -18,6 +18,10 @@ vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
 const tenant = makeTenant();
 
 describe('getTopicPageDocument', () => {
+  beforeEach(() => {
+    mockRun.mockResolvedValue(makeRawTopicPage());
+  });
+
   it('loads a topic page with no list module in modules[]', async () => {
     mockRun.mockResolvedValueOnce(makeRawTopicPage({ modules: [] }));
 
@@ -134,8 +138,6 @@ describe('getTopicPageDocument', () => {
   });
 
   it('passes the slug as a query parameter', async () => {
-    mockRun.mockResolvedValueOnce(makeRawTopicPage());
-
     await getTopicPageDocument('engineering', tenant);
 
     expect(mockRun).toHaveBeenNthCalledWith(
@@ -154,8 +156,6 @@ describe('getTopicPageDocument', () => {
   });
 
   it('threads tenant context into the query and scopes its tags to it', async () => {
-    mockRun.mockResolvedValueOnce(makeRawTopicPage());
-
     await getTopicPageDocument('engineering', tenant);
 
     expect(mockRun).toHaveBeenCalledWith(

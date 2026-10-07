@@ -72,26 +72,24 @@ describe('runQuery injected locale parameters', () => {
 });
 
 describe('runQuery tenant threading', () => {
-  it('rejects a call site that omits tenant context at compile time', async () => {
-    const query = q.star.filterByType('page_post').slice(0);
+  const query = q.star.filterByType('page_post').slice(0);
 
+  beforeEach(() => {
+    mockFetch.mockResolvedValue(null);
+  });
+
+  it('rejects a call site that omits tenant context at compile time', async () => {
     // @ts-expect-error -- `tenant` is required on `runQuery`'s options; there is no form that silently reads the platform's project.
     await runQuery(query, {}).catch(() => {});
   });
 
   it('passes the tenant context through to getClient', async () => {
-    mockFetch.mockResolvedValue(null);
-
-    const query = q.star.filterByType('page_post').slice(0);
     await runQuery(query, { tenant: testTenant }).catch(() => {});
 
     expect(getClientMock).toHaveBeenCalledWith(testTenant);
   });
 
   it("sends the tenant's request and default language as query params", async () => {
-    mockFetch.mockResolvedValue(null);
-
-    const query = q.star.filterByType('page_post').slice(0);
     await runQuery(query, {
       tenant: { ...testTenant, locale: 'NL', defaultLocale: 'DE' },
     }).catch(() => {});
@@ -104,9 +102,6 @@ describe('runQuery tenant threading', () => {
   });
 
   it('defaults the request language to the default language', async () => {
-    mockFetch.mockResolvedValue(null);
-
-    const query = q.star.filterByType('page_post').slice(0);
     await runQuery(query, {
       tenant: { ...testTenant, defaultLocale: 'DE' },
     }).catch(() => {});

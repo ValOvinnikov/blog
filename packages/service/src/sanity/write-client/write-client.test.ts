@@ -27,123 +27,6 @@ describe('Sanity write client module loading', () => {
     ).toThrow();
   });
 
-  it('creates a per-tenant write client scoped to the tenant project/dataset/token', async () => {
-    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'test-project';
-    vi.resetModules();
-
-    const createClientMock = vi.fn().mockReturnValue({});
-    vi.doMock('next-sanity', () => ({ createClient: createClientMock }));
-
-    const { getWriteClient } = await import('./write-client');
-    getWriteClient({
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok-a',
-    });
-
-    expect(createClientMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        projectId: 'tenant-a',
-        dataset: 'production',
-        token: 'tok-a',
-        useCdn: false,
-      }),
-    );
-
-    vi.doUnmock('next-sanity');
-  });
-
-  it('reuses a cached write client for the same tenant instead of recreating it', async () => {
-    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'test-project';
-    vi.resetModules();
-
-    const createClientMock = vi.fn().mockReturnValue({});
-    vi.doMock('next-sanity', () => ({ createClient: createClientMock }));
-
-    const { getWriteClient } = await import('./write-client');
-    const tenant = {
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok-a',
-    };
-    const first = getWriteClient(tenant);
-    const second = getWriteClient(tenant);
-
-    expect(first).toBe(second);
-    expect(createClientMock).toHaveBeenCalledTimes(1);
-
-    vi.doUnmock('next-sanity');
-  });
-
-  it('rebuilds the cached write client when the token changes for the same project/dataset', async () => {
-    vi.resetModules();
-
-    const createClientMock = vi.fn().mockImplementation(() => ({}));
-    vi.doMock('next-sanity', () => ({ createClient: createClientMock }));
-
-    const { getWriteClient } = await import('./write-client');
-    const first = getWriteClient({
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok-old',
-    });
-    const second = getWriteClient({
-      projectId: 'tenant-a',
-      dataset: 'production',
-      token: 'tok-new',
-    });
-
-    expect(second).not.toBe(first);
-    expect(createClientMock).toHaveBeenLastCalledWith(
-      expect.objectContaining({ token: 'tok-new' }),
-    );
-    expect(
-      getWriteClient({
-        projectId: 'tenant-a',
-        dataset: 'production',
-        token: 'tok-new',
-      }),
-    ).toBe(second);
-    expect(createClientMock).toHaveBeenCalledTimes(2);
-
-    vi.doUnmock('next-sanity');
-  });
-
-  it.each([
-    { projectId: '', dataset: 'production', token: 'tok-a' },
-    { projectId: 'tenant-a', dataset: '', token: 'tok-a' },
-    { projectId: 'tenant-a', dataset: 'production', token: '' },
-    { projectId: '   ', dataset: 'production', token: 'tok-a' },
-    { projectId: 'tenant-a', dataset: '   ', token: 'tok-a' },
-    { projectId: 'tenant-a', dataset: 'production', token: '   ' },
-    { projectId: undefined, dataset: 'production', token: 'tok-a' },
-    { projectId: 'tenant-a', dataset: undefined, token: 'tok-a' },
-    { projectId: 'tenant-a', dataset: 'production', token: undefined },
-    { projectId: null, dataset: 'production', token: 'tok-a' },
-    { projectId: 'tenant-a', dataset: null, token: 'tok-a' },
-    { projectId: 'tenant-a', dataset: 'production', token: null },
-  ])(
-    'throws InvalidTenantSanityContextError for a partial tenant context %j instead of falling back to the platform client',
-    async (tenant) => {
-      process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'test-project';
-      vi.resetModules();
-
-      const createClientMock = vi.fn().mockReturnValue({});
-      vi.doMock('next-sanity', () => ({ createClient: createClientMock }));
-
-      const { getWriteClient } = await import('./write-client');
-      const { InvalidTenantSanityContextError } =
-        await import('./invalid-tenant-sanity-context-error');
-
-      expect(() =>
-        getWriteClient(tenant as unknown as TTenantSanityContext),
-      ).toThrow(InvalidTenantSanityContextError);
-      expect(createClientMock).not.toHaveBeenCalled();
-
-      vi.doUnmock('next-sanity');
-    },
-  );
-
   it('builds the platform write tenant context from env vars', async () => {
     process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'platform-project';
     process.env['SANITY_API_WRITE_TOKEN'] = 'write-secret';
@@ -166,6 +49,106 @@ describe('Sanity write client module loading', () => {
 
     expect(() => getPlatformSanityWriteContext()).toThrow(
       /SANITY_API_WRITE_TOKEN/,
+    );
+  });
+
+  describe('with a mocked next-sanity', () => {
+    let createClientMock: ReturnType<typeof vi.fn<() => object>>;
+    let getWriteClient: (typeof import('./write-client'))['getWriteClient'];
+
+    beforeEach(async () => {
+      process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'test-project';
+      vi.resetModules();
+      createClientMock = vi.fn(() => ({}));
+      vi.doMock('next-sanity', () => ({ createClient: createClientMock }));
+
+      ({ getWriteClient } = await import('./write-client'));
+    });
+
+    afterEach(() => {
+      vi.doUnmock('next-sanity');
+    });
+
+    it('creates a per-tenant write client scoped to the tenant project/dataset/token', () => {
+      getWriteClient({
+        projectId: 'tenant-a',
+        dataset: 'production',
+        token: 'tok-a',
+      });
+
+      expect(createClientMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          projectId: 'tenant-a',
+          dataset: 'production',
+          token: 'tok-a',
+          useCdn: false,
+        }),
+      );
+    });
+
+    it('reuses a cached write client for the same tenant instead of recreating it', () => {
+      const tenant = {
+        projectId: 'tenant-a',
+        dataset: 'production',
+        token: 'tok-a',
+      };
+      const first = getWriteClient(tenant);
+      const second = getWriteClient(tenant);
+
+      expect(first).toBe(second);
+      expect(createClientMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('rebuilds the cached write client when the token changes for the same project/dataset', () => {
+      const first = getWriteClient({
+        projectId: 'tenant-a',
+        dataset: 'production',
+        token: 'tok-old',
+      });
+      const second = getWriteClient({
+        projectId: 'tenant-a',
+        dataset: 'production',
+        token: 'tok-new',
+      });
+
+      expect(second).not.toBe(first);
+      expect(createClientMock).toHaveBeenLastCalledWith(
+        expect.objectContaining({ token: 'tok-new' }),
+      );
+      expect(
+        getWriteClient({
+          projectId: 'tenant-a',
+          dataset: 'production',
+          token: 'tok-new',
+        }),
+      ).toBe(second);
+      expect(createClientMock).toHaveBeenCalledTimes(2);
+    });
+
+    it.each([
+      { projectId: '', dataset: 'production', token: 'tok-a' },
+      { projectId: 'tenant-a', dataset: '', token: 'tok-a' },
+      { projectId: 'tenant-a', dataset: 'production', token: '' },
+      { projectId: '   ', dataset: 'production', token: 'tok-a' },
+      { projectId: 'tenant-a', dataset: '   ', token: 'tok-a' },
+      { projectId: 'tenant-a', dataset: 'production', token: '   ' },
+      { projectId: undefined, dataset: 'production', token: 'tok-a' },
+      { projectId: 'tenant-a', dataset: undefined, token: 'tok-a' },
+      { projectId: 'tenant-a', dataset: 'production', token: undefined },
+      { projectId: null, dataset: 'production', token: 'tok-a' },
+      { projectId: 'tenant-a', dataset: null, token: 'tok-a' },
+      { projectId: 'tenant-a', dataset: 'production', token: null },
+    ])(
+      'throws InvalidTenantSanityContextError for a partial tenant context %j instead of falling back to the platform client',
+      async (tenant) => {
+        const { InvalidTenantSanityContextError } =
+          await import('./invalid-tenant-sanity-context-error');
+
+        expect(() =>
+          getWriteClient(tenant as unknown as TTenantSanityContext),
+        ).toThrow(InvalidTenantSanityContextError);
+        expect(createClientMock).not.toHaveBeenCalled();
+      },
     );
   });
 });

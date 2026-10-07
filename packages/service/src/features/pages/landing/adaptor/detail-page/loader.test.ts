@@ -18,9 +18,11 @@ vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
 const tenant = makeTenant();
 
 describe('getPageDocument', () => {
-  it('maps the thin page_landing document to module refs', async () => {
-    mockRun.mockResolvedValueOnce(makeRawLandingPage());
+  beforeEach(() => {
+    mockRun.mockResolvedValue(makeRawLandingPage());
+  });
 
+  it('maps the thin page_landing document to module refs', async () => {
     const page = await getPageDocument(['about'], tenant);
     if (!page) throw new Error('expected a landing page');
 
@@ -103,8 +105,6 @@ describe('getPageDocument', () => {
   });
 
   it('threads tenant context into the query and scopes its tags to it', async () => {
-    mockRun.mockResolvedValueOnce(makeRawLandingPage());
-
     await getPageDocument(['about'], tenant);
 
     expect(mockRun).toHaveBeenCalledWith(

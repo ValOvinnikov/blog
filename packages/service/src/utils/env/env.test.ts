@@ -23,36 +23,39 @@ function restoreEnv(): void {
   }
 }
 
-// `env.ts` validates eagerly on import (createEnv runs at module evaluation),
-// so each case needs a fresh module instance via resetModules + dynamic import.
 async function importEnv(): Promise<typeof import('./env')> {
   vi.resetModules();
   return import('./env');
 }
 
 describe('env', () => {
+  beforeEach(() => {
+    delete process.env['SKIP_ENV_VALIDATION'];
+    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
+    process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'production';
+  });
+
   afterEach(() => {
     restoreEnv();
   });
 
-  it('parses a valid environment and exposes typed values', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
-    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
-    process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'staging';
-    process.env['SANITY_API_READ_TOKEN'] = 'secret-token';
-    process.env['SANITY_API_WRITE_TOKEN'] = 'secret-write-token';
+  it('leaves SANITY_API_READ_TOKEN undefined when absent', async () => {
+    delete process.env['SANITY_API_READ_TOKEN'];
 
     const { env } = await importEnv();
 
-    expect(env.NEXT_PUBLIC_SANITY_PROJECT_ID).toBe('abc123');
-    expect(env.NEXT_PUBLIC_SANITY_DATASET).toBe('staging');
-    expect(env.SANITY_API_READ_TOKEN).toBe('secret-token');
-    expect(env.SANITY_API_WRITE_TOKEN).toBe('secret-write-token');
+    expect(env.SANITY_API_READ_TOKEN).toBeUndefined();
+  });
+
+  it('leaves SANITY_API_WRITE_TOKEN undefined when absent', async () => {
+    delete process.env['SANITY_API_WRITE_TOKEN'];
+
+    const { env } = await importEnv();
+
+    expect(env.SANITY_API_WRITE_TOKEN).toBeUndefined();
   });
 
   describe('validation failures', () => {
-    // @t3-oss/env-nextjs logs `❌ Invalid environment variables: [...]` via
-    // console.error before throwing; suppress that expected noise here.
     beforeEach(() => {
       vi.spyOn(console, 'error').mockImplementation(() => {});
     });
@@ -62,77 +65,57 @@ describe('env', () => {
     });
 
     it('throws when NEXT_PUBLIC_SANITY_PROJECT_ID is missing', async () => {
-      delete process.env['SKIP_ENV_VALIDATION'];
       delete process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'];
-      process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'production';
 
       await expect(importEnv()).rejects.toThrow();
     });
 
     it('throws when NEXT_PUBLIC_SANITY_DATASET is empty (no default)', async () => {
-      delete process.env['SKIP_ENV_VALIDATION'];
-      process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
       process.env['NEXT_PUBLIC_SANITY_DATASET'] = '';
 
       await expect(importEnv()).rejects.toThrow();
     });
   });
 
-  it('leaves SANITY_API_READ_TOKEN undefined when absent', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
-    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
-    process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'production';
-    delete process.env['SANITY_API_READ_TOKEN'];
+  describe('with a staging dataset and both tokens', () => {
+    beforeEach(() => {
+      process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'staging';
+      process.env['SANITY_API_READ_TOKEN'] = 'secret-token';
+      process.env['SANITY_API_WRITE_TOKEN'] = 'secret-write-token';
+    });
 
-    const { env } = await importEnv();
-
-    expect(env.SANITY_API_READ_TOKEN).toBeUndefined();
-  });
-
-  it('leaves SANITY_API_WRITE_TOKEN undefined when absent', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
-    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
-    process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'production';
-    delete process.env['SANITY_API_WRITE_TOKEN'];
-
-    const { env } = await importEnv();
-
-    expect(env.SANITY_API_WRITE_TOKEN).toBeUndefined();
-  });
-
-  it('reads NEXT_PUBLIC_SANITY_PROJECT_ID/DATASET as if window is defined', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
-    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
-    process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'staging';
-    process.env['SANITY_API_READ_TOKEN'] = 'secret-token';
-    process.env['SANITY_API_WRITE_TOKEN'] = 'secret-write-token';
-
-    vi.stubGlobal('window', {});
-    try {
+    it('parses a valid environment and exposes typed values', async () => {
       const { env } = await importEnv();
 
       expect(env.NEXT_PUBLIC_SANITY_PROJECT_ID).toBe('abc123');
       expect(env.NEXT_PUBLIC_SANITY_DATASET).toBe('staging');
-    } finally {
-      vi.unstubAllGlobals();
-    }
-  });
+      expect(env.SANITY_API_READ_TOKEN).toBe('secret-token');
+      expect(env.SANITY_API_WRITE_TOKEN).toBe('secret-write-token');
+    });
 
-  it('throws when SANITY_API_READ_TOKEN is accessed as if window is defined', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
-    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
-    process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'staging';
-    process.env['SANITY_API_READ_TOKEN'] = 'secret-token';
+    describe('as if window is defined', () => {
+      beforeEach(() => {
+        vi.stubGlobal('window', {});
+      });
 
-    vi.stubGlobal('window', {});
-    try {
-      const { env } = await importEnv();
+      afterEach(() => {
+        vi.unstubAllGlobals();
+      });
 
-      expect(() => env.SANITY_API_READ_TOKEN).toThrow(
-        /server-side environment variable/,
-      );
-    } finally {
-      vi.unstubAllGlobals();
-    }
+      it('reads NEXT_PUBLIC_SANITY_PROJECT_ID/DATASET', async () => {
+        const { env } = await importEnv();
+
+        expect(env.NEXT_PUBLIC_SANITY_PROJECT_ID).toBe('abc123');
+        expect(env.NEXT_PUBLIC_SANITY_DATASET).toBe('staging');
+      });
+
+      it('throws when SANITY_API_READ_TOKEN is accessed', async () => {
+        const { env } = await importEnv();
+
+        expect(() => env.SANITY_API_READ_TOKEN).toThrow(
+          /server-side environment variable/,
+        );
+      });
+    });
   });
 });

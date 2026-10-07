@@ -17,6 +17,10 @@ const { EN, NL, FR } = LOCALE_ISO_CODES;
 const tenant = makeTenant();
 
 describe(getPageSlugs, () => {
+  beforeEach(() => {
+    mockRun.mockResolvedValue([]);
+  });
+
   it('returns the page_landing slug and language entries', async () => {
     mockRun.mockResolvedValue([
       { slug: 'about', language: EN },
@@ -43,16 +47,12 @@ describe(getPageSlugs, () => {
   });
 
   it('returns an empty array when no landing pages exist', async () => {
-    mockRun.mockResolvedValue([]);
-
     const params = await getPageSlugs(tenant, [EN, NL]);
 
     expect(params).toEqual([]);
   });
 
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
-    mockRun.mockResolvedValue([]);
-
     await getPageSlugs(tenant, [EN, NL]);
 
     expect(mockRun).toHaveBeenCalledWith(
@@ -65,8 +65,6 @@ describe(getPageSlugs, () => {
   });
 
   it('passes the live languages to the query', async () => {
-    mockRun.mockResolvedValue([]);
-
     await getPageSlugs(tenant, [EN, NL]);
 
     expect(mockRun).toHaveBeenCalledWith(

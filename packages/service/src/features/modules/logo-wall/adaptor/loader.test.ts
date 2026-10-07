@@ -15,6 +15,10 @@ vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
 const tenant = makeTenant();
 
 describe(getLogoWallModule, () => {
+  beforeEach(() => {
+    mockRun.mockResolvedValue(makeRawLogoWallModule());
+  });
+
   it('resolves the module in a single round trip — exactly one runQuery call', async () => {
     mockRun.mockResolvedValueOnce(
       makeRawLogoWallModule({
@@ -29,8 +33,6 @@ describe(getLogoWallModule, () => {
   });
 
   it('returns the referenced logos in authored order', async () => {
-    mockRun.mockResolvedValueOnce(makeRawLogoWallModule());
-
     const logoWall = await getLogoWallModule('logo-wall-1', tenant);
 
     expect(logoWall.logos.map((logo) => logo.id)).toEqual([
@@ -48,8 +50,6 @@ describe(getLogoWallModule, () => {
   });
 
   it('threads tenant context and scopes cache tags to it', async () => {
-    mockRun.mockResolvedValueOnce(makeRawLogoWallModule());
-
     await getLogoWallModule('logo-wall-1', tenant);
 
     expect(mockRun).toHaveBeenCalledTimes(1);

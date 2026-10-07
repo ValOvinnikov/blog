@@ -15,6 +15,10 @@ vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
 const tenant = makeTenant();
 
 describe(getAllPublishedPosts, () => {
+  beforeEach(() => {
+    mockRun.mockResolvedValue([]);
+  });
+
   it('fetches every published post with no pagination parameters', async () => {
     mockRun.mockResolvedValue([
       makeRawFeedPost({
@@ -50,16 +54,12 @@ describe(getAllPublishedPosts, () => {
   });
 
   it('returns an empty array when there are no published posts', async () => {
-    mockRun.mockResolvedValue([]);
-
     const result = await getAllPublishedPosts(tenant);
 
     expect(result).toEqual([]);
   });
 
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
-    mockRun.mockResolvedValue([]);
-
     await getAllPublishedPosts(tenant);
 
     expect(mockRun).toHaveBeenCalledWith(
