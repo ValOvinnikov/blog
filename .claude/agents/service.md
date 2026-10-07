@@ -221,10 +221,13 @@ one-line comment naming what is missing. In particular:
   - `field == value`, `field != value` and number comparisons
     (`<`, `<=`, `>`, `>=`), where the value is a literal, a `$param` or a
     `^.path` — `filterBy('language == $locale')`,
-    `filterBy('topic._ref == $topicId')`;
-  - a bare boolean field or its negation — `filterBy('featured')`,
-    `filterBy('!hidden')`;
+    `filterBy('_id != $currentId')`;
+  - a bare boolean field or its negation, when its generated type is a
+    non-optional `boolean`;
   - `references(path | $param)` — `filterBy('references($termId)')`.
+
+  It rejects a reference's `_ref` (`topic._ref == $topicId`) and a boolean
+  the generated types mark optional (`featured`); those stay `filterRaw`.
 
   Rewrite a compound expression before reaching for `filterRaw`: `&&` becomes
   chained `filterBy` calls, `||` becomes several `filterBy` arguments
@@ -235,8 +238,8 @@ one-line comment naming what is missing. In particular:
 
   `filterRaw` is allowed only for what `filterBy` rejects at type-check: `in`
   (`_id in $ids`, `language in $locales`), function calls (`now()`, `count`,
-  `coalesce`, `defined`, `string::startsWith`), and comparisons whose sides
-  groqd cannot type. Try `filterBy` first and keep `filterRaw` only when
+  `coalesce`, `defined`, `string::startsWith`), and the comparisons
+  above that groqd cannot type. Try `filterBy` first and keep `filterRaw` only when
   type-check fails; the one-line comment names what `filterBy` lacks
   (`// groqd's typed filterBy has no \`in\` operator`). A raw filter reused
   across queries is a shared constant whose definition carries that comment

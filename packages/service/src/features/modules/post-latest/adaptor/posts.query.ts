@@ -1,13 +1,10 @@
 import { q } from '@blog/service/sanity/query/query';
-import { POST_IN_LOCALE_FILTER } from '@blog/service/shared/expressions/post/post-in-locale';
-import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/post/published-post';
 import { postCardFragment } from '@blog/service/shared/fragments/post/post';
+import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
+import { publishedPostsInLocale } from '@blog/service/shared/localization/published-posts-in-locale/published-posts-in-locale';
 
 export function postLatestModulePostsQuery(limit: number) {
-  return q.star
-    .filterByType('page_post')
-    .filterRaw(POST_IN_LOCALE_FILTER)
-    .filterRaw(PUBLISHED_POST_FILTER)
+  return publishedPostsInLocale(q.parameters<TLocaleParams>().star)
     .order('publishedAt desc')
     .slice(0, limit)
     .project(postCardFragment);
