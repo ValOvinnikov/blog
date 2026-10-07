@@ -24,7 +24,7 @@ export type Module_sectionPages = {
   title?: string;
   brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   headingBlock?: ModuleHeadingBlock;
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  contentAlignment?: 'LEFT' | 'CENTER';
   layout?: WideLayout;
 };
 
@@ -54,7 +54,7 @@ export type Module_pricing = {
       _key: string;
     } & CtaButton
   >;
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  contentAlignment?: 'LEFT' | 'CENTER';
   layout?: WideLayout;
 };
 
@@ -79,7 +79,7 @@ export type Module_newsletter = {
       _key: string;
     } & NewsletterTrustCue
   >;
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  contentAlignment?: 'LEFT' | 'CENTER';
   layout?: Layout;
 };
 
@@ -107,13 +107,16 @@ export type Module_cta = {
   contentPositionSplit?: 'LEFT' | 'RIGHT';
   contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
   mobileMediaOrder?: 'LAST' | 'FIRST';
-  layout?: {
-    spacingTop?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
-    spacingBottom?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
-    containerWidth?: 'NARROW' | 'WIDE' | 'FULL';
-    dividerTop?: boolean;
-    dividerBottom?: boolean;
-  };
+  layout?: CtaLayout;
+};
+
+export type CtaLayout = {
+  _type: 'ctaLayout';
+  spacingTop?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  spacingBottom?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  containerWidth?: 'NARROW' | 'WIDE' | 'FULL';
+  dividerTop?: boolean;
+  dividerBottom?: boolean;
 };
 
 export type InternationalizedArrayListedText = Array<
@@ -232,7 +235,7 @@ export type Module_stats = {
       _key: string;
     } & CtaButton
   >;
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  contentAlignment?: 'LEFT' | 'CENTER';
   layout?: WideLayout;
 };
 
@@ -356,7 +359,7 @@ export type Module_featureHighlights = {
     } & CtaButton
   >;
   mediaOrder?: 'LAST' | 'FIRST';
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  contentAlignment?: 'LEFT' | 'CENTER';
   layout?: WideLayout;
 };
 
@@ -404,7 +407,7 @@ export type Module_postRelated = {
   headingBlock?: ModuleHeadingBlock;
   limit?: number;
   showImages?: boolean;
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  contentAlignment?: 'LEFT' | 'CENTER';
   layout?: WideLayout;
 };
 
@@ -449,7 +452,7 @@ export type Module_postLatest = {
   limit?: number;
   showImages?: boolean;
   displayMode?: 'GRID' | 'CAROUSEL';
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  contentAlignment?: 'LEFT' | 'CENTER';
   layout?: WideLayout;
 };
 
@@ -464,7 +467,7 @@ export type Module_postList = {
   headingBlock?: ModuleHeadingBlock;
   pageSize?: number;
   showImages?: boolean;
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  contentAlignment?: 'LEFT' | 'CENTER';
   layout?: WideLayout;
 };
 
@@ -1753,7 +1756,7 @@ export type Module_taxonomyList = {
   sortOrder?: 'ALPHABETICAL' | 'MOST_POSTS';
   limit?: number;
   showLatestPosts?: boolean;
-  contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
+  contentAlignment?: 'LEFT' | 'CENTER';
   layout?: WideLayout;
 };
 
@@ -2191,6 +2194,7 @@ export type AllSanitySchemaTypes =
   | InternationalizedArrayString
   | Module_newsletter
   | Module_cta
+  | CtaLayout
   | InternationalizedArrayListedText
   | SanityImageAssetReference
   | LocalizedImageWithAlt

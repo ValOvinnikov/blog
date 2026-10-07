@@ -82,10 +82,6 @@
             {
               "type": "string",
               "value": "CENTER"
-            },
-            {
-              "type": "string",
-              "value": "RIGHT"
             }
           ]
         },
@@ -268,10 +264,6 @@
             {
               "type": "string",
               "value": "CENTER"
-            },
-            {
-              "type": "string",
-              "value": "RIGHT"
             }
           ]
         },
@@ -431,10 +423,6 @@
             {
               "type": "string",
               "value": "CENTER"
-            },
-            {
-              "type": "string",
-              "value": "RIGHT"
             }
           ]
         },
@@ -696,104 +684,119 @@
       "layout": {
         "type": "objectAttribute",
         "value": {
-          "type": "object",
-          "attributes": {
-            "spacingTop": {
-              "type": "objectAttribute",
-              "value": {
-                "type": "union",
-                "of": [
-                  {
-                    "type": "string",
-                    "value": "NONE"
-                  },
-                  {
-                    "type": "string",
-                    "value": "SM"
-                  },
-                  {
-                    "type": "string",
-                    "value": "MD"
-                  },
-                  {
-                    "type": "string",
-                    "value": "LG"
-                  },
-                  {
-                    "type": "string",
-                    "value": "XL"
-                  }
-                ]
-              },
-              "optional": true
-            },
-            "spacingBottom": {
-              "type": "objectAttribute",
-              "value": {
-                "type": "union",
-                "of": [
-                  {
-                    "type": "string",
-                    "value": "NONE"
-                  },
-                  {
-                    "type": "string",
-                    "value": "SM"
-                  },
-                  {
-                    "type": "string",
-                    "value": "MD"
-                  },
-                  {
-                    "type": "string",
-                    "value": "LG"
-                  },
-                  {
-                    "type": "string",
-                    "value": "XL"
-                  }
-                ]
-              },
-              "optional": true
-            },
-            "containerWidth": {
-              "type": "objectAttribute",
-              "value": {
-                "type": "union",
-                "of": [
-                  {
-                    "type": "string",
-                    "value": "NARROW"
-                  },
-                  {
-                    "type": "string",
-                    "value": "WIDE"
-                  },
-                  {
-                    "type": "string",
-                    "value": "FULL"
-                  }
-                ]
-              },
-              "optional": true
-            },
-            "dividerTop": {
-              "type": "objectAttribute",
-              "value": {
-                "type": "boolean"
-              },
-              "optional": true
-            },
-            "dividerBottom": {
-              "type": "objectAttribute",
-              "value": {
-                "type": "boolean"
-              },
-              "optional": true
-            }
-          }
+          "type": "inline",
+          "name": "ctaLayout"
         },
         "optional": true
+      }
+    }
+  },
+  {
+    "name": "ctaLayout",
+    "type": "type",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "ctaLayout"
+          }
+        },
+        "spacingTop": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "NONE"
+              },
+              {
+                "type": "string",
+                "value": "SM"
+              },
+              {
+                "type": "string",
+                "value": "MD"
+              },
+              {
+                "type": "string",
+                "value": "LG"
+              },
+              {
+                "type": "string",
+                "value": "XL"
+              }
+            ]
+          },
+          "optional": true
+        },
+        "spacingBottom": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "NONE"
+              },
+              {
+                "type": "string",
+                "value": "SM"
+              },
+              {
+                "type": "string",
+                "value": "MD"
+              },
+              {
+                "type": "string",
+                "value": "LG"
+              },
+              {
+                "type": "string",
+                "value": "XL"
+              }
+            ]
+          },
+          "optional": true
+        },
+        "containerWidth": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "NARROW"
+              },
+              {
+                "type": "string",
+                "value": "WIDE"
+              },
+              {
+                "type": "string",
+                "value": "FULL"
+              }
+            ]
+          },
+          "optional": true
+        },
+        "dividerTop": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        },
+        "dividerBottom": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
       }
     }
   },
@@ -1507,10 +1510,6 @@
             {
               "type": "string",
               "value": "CENTER"
-            },
-            {
-              "type": "string",
-              "value": "RIGHT"
             }
           ]
         },
@@ -2385,10 +2384,6 @@
             {
               "type": "string",
               "value": "CENTER"
-            },
-            {
-              "type": "string",
-              "value": "RIGHT"
             }
           ]
         },
@@ -2728,10 +2723,6 @@
             {
               "type": "string",
               "value": "CENTER"
-            },
-            {
-              "type": "string",
-              "value": "RIGHT"
             }
           ]
         },
@@ -3059,10 +3050,6 @@
             {
               "type": "string",
               "value": "CENTER"
-            },
-            {
-              "type": "string",
-              "value": "RIGHT"
             }
           ]
         },
@@ -3175,10 +3162,6 @@
             {
               "type": "string",
               "value": "CENTER"
-            },
-            {
-              "type": "string",
-              "value": "RIGHT"
             }
           ]
         },
@@ -10411,10 +10394,6 @@
             {
               "type": "string",
               "value": "CENTER"
-            },
-            {
-              "type": "string",
-              "value": "RIGHT"
             }
           ]
         },

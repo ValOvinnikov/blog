@@ -6,7 +6,7 @@ import { defineType } from 'sanity';
 
 export const wideLayoutSchema = defineType({
   name: 'wideLayout',
-  title: 'Section Layout',
+  title: 'Spacing, Dividers and Wide Width',
   type: 'object',
   description:
     'Shared spacing, divider, and width controls for modules whose columns need the wider container widths.',

@@ -44,6 +44,11 @@ export const alignmentField = ({
     validation,
   });
 
+const LEFT_CENTER: readonly TContentAlignment[] = [
+  CONTENT_ALIGNMENT.LEFT,
+  CONTENT_ALIGNMENT.CENTER,
+];
+
 type TAlignmentFieldExtra = Omit<TAlignmentField, 'list'> & {
   allow: readonly TContentAlignment[];
 };
@@ -89,7 +94,7 @@ export const alignmentFields = (
     name: 'contentAlignment',
     title: 'Content Alignment',
     description: contentAlignmentDescription(options),
-    list: options.allow,
+    list: options.allow ?? LEFT_CENTER,
     initialValue: options.initialValue ?? CONTENT_ALIGNMENT.LEFT,
     fieldset: options.fieldset,
   }),
