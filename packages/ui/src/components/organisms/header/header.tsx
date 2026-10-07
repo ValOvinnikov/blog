@@ -25,19 +25,21 @@ export type THeaderProps = IWithClassName &
 /** The site header shell; composes a `Header.Brand` slot alongside grouped `Header.Nav` and `Header.Actions` slots into a `<header>`. */
 const HeaderRoot = ({ children, className, dataTestId }: THeaderProps) => {
   const { slots, unmatched } = mapCompoundSlots(children, HeaderParts);
-  const { root, navActionsGroup } = headerVariants();
+  const { root, inner, navActionsGroup } = headerVariants();
   return (
     <header className={root({ class: className })} data-testid={dataTestId}>
-      {slots.Brand}
-      {(slots.Nav || slots.Actions) && (
-        <div className={navActionsGroup()}>
-          {slots.Nav}
-          {slots.Actions}
-        </div>
-      )}
-      {unmatched.map((node, i) => (
-        <Fragment key={i}>{node}</Fragment>
-      ))}
+      <div className={inner()}>
+        {slots.Brand}
+        {(slots.Nav || slots.Actions) && (
+          <div className={navActionsGroup()}>
+            {slots.Nav}
+            {slots.Actions}
+          </div>
+        )}
+        {unmatched.map((node, i) => (
+          <Fragment key={i}>{node}</Fragment>
+        ))}
+      </div>
     </header>
   );
 };
