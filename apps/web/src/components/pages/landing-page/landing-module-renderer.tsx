@@ -4,7 +4,6 @@ import type {
   TPageLandingType,
 } from '@blog/config';
 import type { TLandingSectionNavigation, TModule } from '@blog/service';
-import { SectionNavigation } from '@web/components/features/landing/section-navigation';
 import { PageHeading } from '@web/components/shared/page-heading';
 import { ContentModule } from '@web/modules/content/content-module';
 import { CtaModule } from '@web/modules/cta/cta-module';
@@ -32,7 +31,7 @@ import { TestimonialModule } from '@web/modules/testimonial/testimonial-module';
 import { TimelineModule } from '@web/modules/timeline/timeline-module';
 import type { ReactNode } from 'react';
 
-import { landingPageVariants } from './landing-page-variants';
+import { LandingPageLayout } from './landing-page-layout';
 
 const LANDING_MAP: Partial<Record<TPageLandingType, TModuleComponent>> = {
   module_heroBlog: HeroBlogModule,
@@ -62,9 +61,8 @@ export interface ILandingModuleRendererProps {
   modules: TModule<TPageLandingType>[];
   landingPage: { id: string; path: string };
   sectionNavigation?: TLandingSectionNavigation;
+  breadcrumbs?: ReactNode;
 }
-
-const s = landingPageVariants();
 
 export const LandingModuleRenderer = async ({
   hero,
@@ -72,31 +70,19 @@ export const LandingModuleRenderer = async ({
   modules,
   landingPage,
   sectionNavigation,
+  breadcrumbs,
 }: ILandingModuleRendererProps): Promise<ReactNode> => {
   const heroNode = hero
     ? await renderHeroModule({ hero, map: LANDING_MAP })
     : null;
-  const content = (
-    <>
-      {heroNode}
-      {renderModules({ modules, map: LANDING_MAP, context: { landingPage } })}
-    </>
-  );
 
   return (
-    <>
-      {heroNode ? null : <PageHeading headingBlock={headingBlock} />}
-      {sectionNavigation ? (
-        <div className={s.layout()}>
-          <SectionNavigation
-            className={s.sidebar()}
-            sectionNavigation={sectionNavigation}
-          />
-          <div className={s.content()}>{content}</div>
-        </div>
-      ) : (
-        content
-      )}
-    </>
+    <LandingPageLayout
+      topBlock={heroNode ?? <PageHeading headingBlock={headingBlock} />}
+      breadcrumbs={breadcrumbs}
+      sectionNavigation={sectionNavigation}
+    >
+      {renderModules({ modules, map: LANDING_MAP, context: { landingPage } })}
+    </LandingPageLayout>
   );
 };

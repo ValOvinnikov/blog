@@ -11,14 +11,10 @@ import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-sche
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 import { getTranslations } from 'next-intl/server';
 
-export type TLandingBreadcrumbsProps = {
-  path: string;
-  isAbovePageHeading?: boolean;
-};
+export type TLandingBreadcrumbsProps = { path: string };
 
 export const LandingBreadcrumbs = async ({
   path,
-  isAbovePageHeading,
 }: TLandingBreadcrumbsProps) => {
   const result = await getLandingPage(path);
   const page = guardPageLoaderResult(
@@ -45,7 +41,7 @@ export const LandingBreadcrumbs = async ({
   return (
     <>
       {breadcrumbListSchema && <JsonLd schema={breadcrumbListSchema} />}
-      <BreadcrumbBar isAbovePageHeading={isAbovePageHeading}>
+      <BreadcrumbBar>
         <Breadcrumbs
           items={breadcrumbTrail}
           ariaLabel={t('ariaLabel')}
