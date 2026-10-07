@@ -1,5 +1,6 @@
 import { BRAND_VARIANT, TAXONOMY_KIND } from '@blog/config';
 import { getRequestContext } from '@web/server/request-context/request-context';
+import { getVoiceRich } from '@web/server/site-config/get-voice-rich/get-voice-rich';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
@@ -25,6 +26,7 @@ vi.mock('@blog/service', () => ({
 }));
 
 vi.mock('@web/server/request-context/request-context');
+vi.mock('@web/server/site-config/get-voice-rich/get-voice-rich');
 
 const getRequestContextMock = vi.mocked(getRequestContext);
 
@@ -172,6 +174,29 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
 
       const section = screen.getByRole('region', { name: 'Tags' });
       expect(within(section).getByText('No tags yet.')).toBeVisible();
+    });
+
+    it('renders an authored link in the tags empty message', async () => {
+      getTaxonomyListMock.mockResolvedValue(tagsResult());
+      vi.mocked(getVoiceRich).mockResolvedValueOnce([
+        {
+          _type: 'block',
+          _key: 'b1',
+          style: 'normal',
+          markDefs: [{ _type: 'link', _key: 'l1', href: '/blog' }],
+          children: [
+            { _type: 'span', _key: 's1', text: 'No tags — ' },
+            { _type: 'span', _key: 's2', text: 'read the blog', marks: ['l1'] },
+          ],
+        },
+      ]);
+
+      await setup();
+
+      expect(vi.mocked(getVoiceRich)).toHaveBeenCalledWith('tagsEmpty');
+      expect(
+        screen.getByRole('link', { name: 'read the blog' }),
+      ).toHaveAttribute('href', '/blog');
     });
 
     it('logs and calls notFound() when the fetch fails', async () => {

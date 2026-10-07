@@ -1,6 +1,8 @@
 import { routes, TAXONOMY_KIND } from '@blog/config';
 import { service } from '@blog/service';
+import { VoiceRichText } from '@web/components/shared/voice-rich-text';
 import { getRequestContext } from '@web/server/request-context/request-context';
+import { getVoiceRich } from '@web/server/site-config/get-voice-rich/get-voice-rich';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
@@ -39,9 +41,12 @@ export const TaxonomyListModule = async ({ id }: ITaxonomyListModuleProps) => {
     entries,
   } = result.data;
 
-  const namespace = taxonomy === TAXONOMY_KIND.TAGS ? 'tags' : 'topics';
-  const t = await getTranslations(`taxonomyListModule.${namespace}`);
-  const buildHref = taxonomy === TAXONOMY_KIND.TAGS ? routes.tag : routes.topic;
+  const isTags = taxonomy === TAXONOMY_KIND.TAGS;
+  const [t, emptyRich] = await Promise.all([
+    getTranslations(`taxonomyListModule.${isTags ? 'tags' : 'topics'}`),
+    getVoiceRich(isTags ? 'tagsEmpty' : 'topicsEmpty'),
+  ]);
+  const buildHref = isTags ? routes.tag : routes.topic;
 
   const items: ITaxonomyListModuleItem[] = entries.flatMap(
     ({ id: entryId, title, slug, description, postCount, latestPosts }) =>
@@ -75,7 +80,7 @@ export const TaxonomyListModule = async ({ id }: ITaxonomyListModuleProps) => {
       titleId={`taxonomy-list-${id}`}
       dataTestId={`taxonomy-list-module-${id}`}
       headingLevel={2}
-      emptyMessage={t('empty')}
+      emptyMessage={<VoiceRichText value={emptyRich} />}
     />
   );
 };

@@ -1,9 +1,13 @@
 import { routes, TAXONOMY_KIND, type TTaxonomyKind } from '@blog/config';
 import { service } from '@blog/service';
+import { VoiceRichText } from '@web/components/shared/voice-rich-text';
 import type { TModuleComponentProps } from '@web/modules/module-renderer';
 import { getRequestContext } from '@web/server/request-context/request-context';
+import { getVoiceRich } from '@web/server/site-config/get-voice-rich/get-voice-rich';
+import { fillVoicePlaceholders } from '@web/utils/fill-voice-placeholders';
 import { logger } from '@web/utils/logger/logger';
 import { renderPostCardImage } from '@web/utils/render-post-card-image';
+import type { TVoiceRichFieldId } from '@web/utils/resolve-voice-rich-fields';
 import { toPostListItems } from '@web/utils/to-post-list-items';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
@@ -28,6 +32,11 @@ const ARCHIVE_NAMESPACE: Record<TTaxonomyKind, string> = {
   [TAXONOMY_KIND.TAGS]: 'tagPage',
 };
 
+const ARCHIVE_EMPTY_FIELD: Record<TTaxonomyKind, TVoiceRichFieldId> = {
+  [TAXONOMY_KIND.TOPICS]: 'topicEmpty',
+  [TAXONOMY_KIND.TAGS]: 'tagEmpty',
+};
+
 const ARCHIVE_TITLE_ID: Record<TTaxonomyKind, string> = {
   [TAXONOMY_KIND.TOPICS]: 'topic-posts-title',
   [TAXONOMY_KIND.TAGS]: 'tag-posts-title',
@@ -38,7 +47,7 @@ export const PostListModule = async ({ id, context }: TPostListModuleProps) => {
   const archive = context?.archive;
 
   const { sanityContext } = await getRequestContext();
-  const [result, paginationT, scopedT] = await Promise.all([
+  const [result, paginationT, scopedT, emptyRich] = await Promise.all([
     service.modules.postList.v1.getPostList(
       id,
       sanityContext,
@@ -47,6 +56,7 @@ export const PostListModule = async ({ id, context }: TPostListModuleProps) => {
     ),
     getTranslations('pagination'),
     getTranslations(archive ? ARCHIVE_NAMESPACE[archive.kind] : 'blogListPage'),
+    getVoiceRich(archive ? ARCHIVE_EMPTY_FIELD[archive.kind] : 'blogListEmpty'),
   ]);
 
   if (!result.ok) {
@@ -104,7 +114,11 @@ export const PostListModule = async ({ id, context }: TPostListModuleProps) => {
       hasImages={showImages}
       titleId={titleId}
       dataTestId={`post-list-module-${id}`}
-      emptyMessage={scopedT('empty', scopedParams)}
+      emptyMessage={
+        <VoiceRichText
+          value={fillVoicePlaceholders(emptyRich, scopedParams ?? {})}
+        />
+      }
       pagination={pagination}
     />
   );

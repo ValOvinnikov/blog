@@ -5,6 +5,7 @@ import type { THeadingLevel } from '@blog/ui/lib/react';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';
 import { SmartLink } from '@web/components/shared/smart-link';
+import type { ReactNode } from 'react';
 
 import { taxonomyListModuleViewVariants } from './taxonomy-list-module-view-variants';
 
@@ -32,7 +33,7 @@ export interface ITaxonomyListModuleViewProps extends Omit<
   titleId: string;
   dataTestId: string;
   headingLevel: THeadingLevel;
-  emptyMessage: string;
+  emptyMessage: ReactNode;
 }
 
 /**
