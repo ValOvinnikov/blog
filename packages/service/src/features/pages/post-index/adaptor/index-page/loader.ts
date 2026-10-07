@@ -4,7 +4,7 @@ import {
   runQuery,
   type TTenantSanityContext,
 } from '@blog/service/sanity/query/query';
-import { buildLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
+import { buildLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
 
 import { blogPageQuery } from './query';
 import { toIndexPage } from './transformer';
@@ -19,5 +19,5 @@ export async function getIndexPage(
   });
   if (!rawPage) return undefined;
 
-  return toIndexPage(rawPage, buildLocaleParams(tenant).defaultLocale);
+  return toIndexPage(rawPage, buildLocaleQueryParams(tenant).defaultLocale);
 }

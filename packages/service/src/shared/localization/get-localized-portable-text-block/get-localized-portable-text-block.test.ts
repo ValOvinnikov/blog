@@ -6,7 +6,7 @@ import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { q } from '@blog/service/sanity/query/query';
 import type { textBlockFragment } from '@blog/service/shared/fragments/portable-text/text-block';
 import type { TLocalizedKey } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
-import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
+import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import { paragraphBlocks } from '@blog/service/testing/shared/localized';
 import type { InferFragmentType } from 'groqd';
@@ -16,7 +16,7 @@ import { getLocalizedPortableTextBlock } from './get-localized-portable-text-blo
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
 const query = q
-  .parameters<TLocaleParams>()
+  .parameters<TLocaleQueryParams>()
   .star.filterByType('module_cta')
   .slice(0)
   .project((sub) => ({

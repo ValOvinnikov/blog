@@ -1,6 +1,6 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { q } from '@blog/service/sanity/query/query';
-import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
+import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import {
   toIds,
@@ -12,7 +12,7 @@ import { publishedPostsInLocale } from './published-posts-in-locale';
 const { EN, NL } = LOCALE_ISO_CODES;
 
 async function idsIn(locale: string): Promise<string[]> {
-  const query = publishedPostsInLocale(q.parameters<TLocaleParams>().star);
+  const query = publishedPostsInLocale(q.parameters<TLocaleQueryParams>().star);
   const posts = await evaluateGroqExpression(
     query.query,
     translatedPostDocuments,

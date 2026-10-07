@@ -6,7 +6,7 @@ import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/m
 import { postLinkFragment } from '@blog/service/shared/fragments/post/post-link';
 import { tagWithPostCountFragment } from '@blog/service/shared/fragments/tag/tag';
 import { topicWithPostCountFragment } from '@blog/service/shared/fragments/topic/topic';
-import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
+import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
 import { publishedPostsInLocale } from '@blog/service/shared/localization/published-posts-in-locale/published-posts-in-locale';
 import { z } from 'zod';
 
@@ -24,7 +24,7 @@ const resolvedSortOrderParser = z.enum([
 const showLatestPostsParser = z.boolean();
 
 const topicEntriesQuery = q
-  .parameters<TLocaleParams>()
+  .parameters<TLocaleQueryParams>()
   .star.filterByType('blog_topic')
   .project((sub) => ({
     ...topicWithPostCountFragment,
@@ -37,7 +37,7 @@ const topicEntriesQuery = q
   .order('title asc');
 
 const tagEntriesQuery = q
-  .parameters<TLocaleParams>()
+  .parameters<TLocaleQueryParams>()
   .star.filterByType('blog_tag')
   .project((sub) => ({
     ...tagWithPostCountFragment,

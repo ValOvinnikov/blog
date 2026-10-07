@@ -1,9 +1,9 @@
 import { q } from '@blog/service/sanity/query/query';
 import { blockFaqFragment } from '@blog/service/shared/fragments/faq/block-faq';
-import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
+import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
 
 export const faqQuestionsQuery = q
-  .parameters<{ ids: string[] } & TLocaleParams>()
+  .parameters<{ ids: string[] } & TLocaleQueryParams>()
   .star.filterByType('module_faq')
   .filterRaw('_id in $ids')
   .project((sub) => ({

@@ -3,7 +3,7 @@ import type {
   InternationalizedArrayText,
 } from '@blog/config';
 import type { TLocaleIsoCode } from '@blog/config/constants';
-import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
+import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
 import type { GroqBuilder, GroqBuilderSubquery, QueryConfig } from 'groqd';
 
 export type TLanguageFilter =
@@ -12,7 +12,7 @@ export type TLanguageFilter =
 export type TLocaleQueryConfig = {
   schemaTypes: object;
   referenceSymbol: symbol;
-  parameters: TLocaleParams;
+  parameters: TLocaleQueryParams;
   scope: { $locale: TLocaleIsoCode; $defaultLocale: TLocaleIsoCode };
 };
 

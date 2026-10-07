@@ -1,12 +1,12 @@
 import type { Page_post } from '@blog/config';
 import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/post/published-post';
 import type { TLocaleQueryConfig } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
-import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
+import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
 import type { GroqBuilder, InferResultItem, QueryConfig } from 'groqd';
 
 export function publishedPostsInLocale<
   TResult,
-  TConfig extends QueryConfig & { parameters: TLocaleParams },
+  TConfig extends QueryConfig & { parameters: TLocaleQueryParams },
 >(
   documents: GroqBuilder<TResult, TConfig>,
 ): GroqBuilder<

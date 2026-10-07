@@ -258,7 +258,7 @@ one-line comment naming what is missing. In particular:
   text. Both pick the request's language, then the default, and accept only
   fields whose generated type is an internationalized array. Never
   hand-write the `coalesce` per field. `TModuleQueryParams` already carries
-  `TLocaleParams`, and `runQuery` injects them, so callers never pass them.
+  `TLocaleQueryParams`, and `runQuery` injects them, so callers never pass them.
 - **The one sanctioned escape hatch is a helper's loose implementation
   signature.** groqd cannot type a field name inside a generic function, so
   those two helpers expose a strict public overload over an implementation

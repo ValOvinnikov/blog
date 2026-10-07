@@ -3,12 +3,12 @@ import { q } from '@blog/service/sanity/query/query';
 import { pageHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/page-heading-block';
 import { moduleFragment } from '@blog/service/shared/fragments/module/module';
 import { seoFragment } from '@blog/service/shared/fragments/seo/seo';
-import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
+import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
 import { pageLanguagesQuery } from '@blog/service/shared/localization/page-languages/page-languages';
 import type { TRawModule } from '@blog/service/shared/transformers/module/to-module';
 
 export const homePageQuery = q
-  .parameters<TLocaleParams>()
+  .parameters<TLocaleQueryParams>()
   .star.filterByType('page_home')
   // groqd's typed filterBy has no coalesce, and a Home with no language is the default language's
   .filterRaw('coalesce(language, $defaultLocale) == $locale')

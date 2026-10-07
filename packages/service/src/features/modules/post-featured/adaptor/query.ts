@@ -13,12 +13,12 @@ import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/headi
 import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { postCardFragment } from '@blog/service/shared/fragments/post/post';
-import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
+import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
 import { pinnedPostInLocale } from '@blog/service/shared/localization/pinned-post-in-locale/pinned-post-in-locale';
 import { publishedPostsInLocale } from '@blog/service/shared/localization/published-posts-in-locale/published-posts-in-locale';
 
 const newestFeaturedPostsQuery = publishedPostsInLocale(
-  q.parameters<TLocaleParams>().star,
+  q.parameters<TLocaleQueryParams>().star,
 )
   .filterRaw(FEATURED_POST_FILTER)
   .order('publishedAt desc')

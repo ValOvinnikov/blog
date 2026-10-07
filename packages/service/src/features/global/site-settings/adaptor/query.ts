@@ -1,10 +1,10 @@
 import { q } from '@blog/service/sanity/query/query';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
 import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
-import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
+import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
 
 export const siteSettingsQuery = q
-  .parameters<TLocaleParams>()
+  .parameters<TLocaleQueryParams>()
   .star.filterByType('settings_site')
   .slice(0)
   .project((sub) => ({

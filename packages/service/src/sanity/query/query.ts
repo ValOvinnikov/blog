@@ -7,9 +7,9 @@ import {
   type TTenantSanityContext,
 } from '@blog/service/sanity/client/client';
 import {
-  buildLocaleParams,
-  type TLocaleParams,
-} from '@blog/service/shared/localization/locale-params/locale-params';
+  buildLocaleQueryParams,
+  type TLocaleQueryParams,
+} from '@blog/service/shared/localization/locale-query-params/locale-query-params';
 import { createGroqBuilder, type IGroqBuilder, type QueryConfig } from 'groqd';
 
 export type { TTenantSanityContext };
@@ -21,16 +21,19 @@ export type TSchemaConfig = {
 
 export const q = createGroqBuilder<TSchemaConfig>();
 
-export type TSlugParams = { slug: string };
+export type TSlugQueryParams = { slug: string };
 
-export type TModuleQueryParams = { id: string } & TLocaleParams;
+export type TModuleQueryParams = { id: string } & TLocaleQueryParams;
 
 type TNextFetchOptions = {
   next?: { revalidate?: number | false; tags?: string[] };
   tenant: TTenantSanityContext;
 };
 
-type TCallerParameters<TParameters> = Omit<TParameters, keyof TLocaleParams>;
+type TCallerParameters<TParameters> = Omit<
+  TParameters,
+  keyof TLocaleQueryParams
+>;
 
 type TParametersOption<TParameters> = unknown extends TParameters
   ? { parameters?: Record<string, never> }
@@ -45,7 +48,7 @@ export async function runQuery<TResult, TQueryConfig extends QueryConfig>(
   const { parameters, next, tenant } = options;
   const raw: unknown = await getClient(tenant).fetch(
     builder.query,
-    { ...buildLocaleParams(tenant), ...parameters },
+    { ...buildLocaleQueryParams(tenant), ...parameters },
     next ? { next } : undefined,
   );
   return builder.parse(raw);

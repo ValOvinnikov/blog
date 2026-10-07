@@ -1,13 +1,13 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { q } from '@blog/service/sanity/query/query';
-import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
+import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 
 import { translatedReference } from './translated-reference';
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
-const localeQ = q.parameters<TLocaleParams>();
+const localeQ = q.parameters<TLocaleQueryParams>();
 
 const query = localeQ.star
   .filterByType('link')

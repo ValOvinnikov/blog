@@ -7,12 +7,12 @@ import { moduleHeroLayoutFragment } from '@blog/service/shared/fragments/layout/
 import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { postCardFragment } from '@blog/service/shared/fragments/post/post';
 import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
-import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
+import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
 import { pinnedPostInLocale } from '@blog/service/shared/localization/pinned-post-in-locale/pinned-post-in-locale';
 import { publishedPostsInLocale } from '@blog/service/shared/localization/published-posts-in-locale/published-posts-in-locale';
 
 const newestFeaturedPostQuery = publishedPostsInLocale(
-  q.parameters<TLocaleParams>().star,
+  q.parameters<TLocaleQueryParams>().star,
 )
   .filterRaw(FEATURED_POST_FILTER)
   .order('publishedAt desc')
