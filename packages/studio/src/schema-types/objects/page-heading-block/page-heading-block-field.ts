@@ -21,8 +21,6 @@ export const pageHeadingBlockField = () => [
       ),
   }),
   ...alignmentFields([], {
-    title: 'Heading Alignment',
-    description: 'Horizontal alignment of the heading and supporting text.',
     allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
   }),
 ];

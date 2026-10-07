@@ -71,9 +71,9 @@ export type Module_newsletter = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
-  headingBlock?: ModuleHeadingBlock;
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   variant?: 'FULL' | 'COMPACT';
+  headingBlock?: ModuleHeadingBlock;
   trustCues?: Array<
     {
       _key: string;
@@ -90,7 +90,9 @@ export type Module_cta = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
+  bandTone?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
+  variant?: 'BANNER' | 'SPLIT' | 'CALLOUT';
   headingBlock?: ModuleHeadingBlock;
   eyebrow?: InternationalizedArrayString;
   image?: LocalizedImageWithAlt;
@@ -101,8 +103,6 @@ export type Module_cta = {
     } & CtaButton
   >;
   footnote?: InternationalizedArrayString;
-  variant?: 'BANNER' | 'SPLIT' | 'CALLOUT';
-  bandTone?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   contentPositionSplit?: 'LEFT' | 'RIGHT';
   contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
@@ -219,7 +219,7 @@ export type Module_stats = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   headingBlock?: ModuleHeadingBlock;
   stats?: Array<
     {
@@ -261,13 +261,13 @@ export type Module_team = {
   showSocialLinks?: boolean;
   imageShape?: 'CIRCLE' | 'SQUARE';
   displayMode?: 'GRID' | 'CAROUSEL';
-  cardAlignment?: 'LEFT' | 'CENTER';
   ctaButtons?: Array<
     {
       _key: string;
     } & CtaButton
   >;
   contentAlignment?: 'LEFT' | 'CENTER';
+  cardAlignment?: 'LEFT' | 'CENTER';
   layout?: WideLayout;
 };
 
@@ -475,7 +475,7 @@ export type Module_hero = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   featuredPost?: Page_postReference;
   heroEyebrowMode?: 'POST_TOPIC' | 'CUSTOM';
   heroEyebrow?: string;
@@ -1476,7 +1476,8 @@ export type Module_heroBlog = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
+  variant?: 'SPLIT' | 'STACKED' | 'BANNER';
   postSource?: 'PINNED' | 'NEWEST_FEATURED';
   post?: Page_postReference;
   image?: LocalizedImageWithAlt;
@@ -1484,7 +1485,6 @@ export type Module_heroBlog = {
   primaryActionLabel?: InternationalizedArrayString;
   primaryActionAppearance?: 'CONTAINED' | 'INLINE';
   secondaryAction?: CtaSecondaryButton;
-  variant?: 'SPLIT' | 'STACKED' | 'BANNER';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   contentPositionSplit?: 'LEFT' | 'RIGHT';
   contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
@@ -2007,7 +2007,8 @@ export type Module_heroStatement = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
+  variant?: 'SPLIT' | 'STACKED' | 'BANNER';
   headingBlock?: ModuleHeadingBlock;
   eyebrow?: InternationalizedArrayString;
   image?: LocalizedImageWithAlt;
@@ -2016,7 +2017,6 @@ export type Module_heroStatement = {
       _key: string;
     } & CtaButton
   >;
-  variant?: 'SPLIT' | 'STACKED' | 'BANNER';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   contentPositionSplit?: 'LEFT' | 'RIGHT';
   contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';
@@ -2032,10 +2032,12 @@ export type Module_heroProfile = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'BRAND_PRIMARY' | 'PRIMARY' | 'SECONDARY';
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
+  variant?: 'SPLIT' | 'STACKED' | 'BANNER';
   headingBlock?: ModuleHeadingBlock;
-  eyebrow?: InternationalizedArrayString;
   author?: PersonReference;
+  showRole?: boolean;
+  eyebrow?: InternationalizedArrayString;
   image?: LocalizedImageWithAlt;
   ctaButtons?: Array<
     {
@@ -2043,9 +2045,7 @@ export type Module_heroProfile = {
     } & CtaButton
   >;
   showSocialLinks?: boolean;
-  showRole?: boolean;
   showBio?: boolean;
-  variant?: 'SPLIT' | 'STACKED' | 'BANNER';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   contentPositionSplit?: 'LEFT' | 'RIGHT';
   contentPositionBanner?: 'LEFT' | 'CENTER' | 'RIGHT';

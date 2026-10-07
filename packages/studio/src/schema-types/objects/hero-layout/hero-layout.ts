@@ -1,5 +1,6 @@
-import { isBannerVariantDocument } from '@blog/studio/schema-types/fields/banner-variant-document-predicate/banner-variant-document-predicate';
+import { HERO_VARIANT } from '@blog/config/constants';
 import { spacingAndDividerFields } from '@blog/studio/schema-types/fields/spacing-and-divider-fields/spacing-and-divider-fields';
+import { isVariantDocument } from '@blog/studio/schema-types/fields/variant-field/variant-predicate';
 import { SlidersHorizontal } from 'lucide-react';
 import { defineType } from 'sanity';
 
@@ -20,6 +21,6 @@ export const heroLayoutSchema = defineType({
   options: { collapsible: true, collapsed: true },
   fields: spacingAndDividerFields({
     spacingDescriptionSuffix: ' On a Banner, this sets the Banner’s height.',
-    dividerHidden: isBannerVariantDocument,
+    dividerHidden: isVariantDocument(HERO_VARIANT.BANNER),
   }),
 });

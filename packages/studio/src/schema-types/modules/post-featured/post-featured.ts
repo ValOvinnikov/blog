@@ -113,13 +113,11 @@ export const postFeaturedSchema = defineType({
               : true;
           }),
     }),
-    showImagesField(),
+    showImagesField({ subject: 'post' }),
     displayModeField(),
     ...alignmentFields([], {
       allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
-      title: 'Heading Alignment',
-      description:
-        'Horizontal alignment of the heading, supporting text and, in a carousel that fits, the cards.',
+      alignsCarousel: true,
     }),
     wideLayoutField,
   ],

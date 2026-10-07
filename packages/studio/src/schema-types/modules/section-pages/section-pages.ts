@@ -18,10 +18,7 @@ export const sectionPagesSchema = defineType({
     titleField(),
     brandVariantField(),
     moduleHeadingBlockField({ isRequired: false }),
-    ...alignmentFields([], {
-      title: 'Heading Alignment',
-      description: 'Horizontal alignment of the heading and supporting text.',
-    }),
+    ...alignmentFields([]),
     wideLayoutField,
   ],
   preview: {

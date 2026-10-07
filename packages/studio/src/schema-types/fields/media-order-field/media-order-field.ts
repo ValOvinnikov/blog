@@ -1,29 +1,38 @@
 import { MEDIA_ORDER, type TMediaOrder } from '@blog/config/constants';
 import { toTitleCase } from '@blog/utils/primitives';
-import { type ConditionalProperty, defineField, type StringRule } from 'sanity';
+import { defineField, type StringDefinition } from 'sanity';
+
+const mediaOrderCopy = {
+  MOBILE: {
+    title: 'Mobile Media Order',
+    description:
+      'Whether the image comes before or after the text once the columns stack on small screens.',
+  },
+  STACKED: {
+    title: 'Media Order',
+    description: 'Whether the image comes before or after the text.',
+  },
+};
 
 type TMediaOrderFieldOptions = {
+  kind: keyof typeof mediaOrderCopy;
   name: string;
-  title: string;
-  description: string;
-  initialValue?: TMediaOrder;
-  hidden?: ConditionalProperty;
-  validation?: (rule: StringRule) => StringRule;
+  initialValue: TMediaOrder;
+  hidden?: StringDefinition['hidden'];
+  isRequired?: boolean;
 };
 
 export const mediaOrderField = ({
+  kind,
   name,
-  title,
-  description,
   initialValue,
   hidden,
-  validation,
+  isRequired = false,
 }: TMediaOrderFieldOptions) =>
   defineField({
     name,
-    title,
+    ...mediaOrderCopy[kind],
     type: 'string',
-    description,
     options: {
       layout: 'dropdown',
       list: Object.values(MEDIA_ORDER).map((value) => ({
@@ -33,5 +42,5 @@ export const mediaOrderField = ({
     },
     initialValue,
     hidden,
-    validation,
+    validation: isRequired ? (rule) => rule.required() : undefined,
   });

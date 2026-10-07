@@ -1,4 +1,5 @@
 import {
+  BRAND_VARIANT,
   FULL_BRAND_VARIANT_LIST,
   HERO_FIELD_MODE,
   type THeroFieldMode,
@@ -104,7 +105,10 @@ export const heroSchema = defineType({
   },
   fields: [
     titleField(),
-    brandVariantField({ list: FULL_BRAND_VARIANT_LIST }),
+    brandVariantField({
+      list: FULL_BRAND_VARIANT_LIST,
+      initialValue: BRAND_VARIANT.BRAND_PRIMARY,
+    }),
     defineField({
       name: 'featuredPost',
       title: 'Featured Post',

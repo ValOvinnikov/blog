@@ -27,11 +27,8 @@ export const postRelatedSchema = defineType({
       initialValue: 3,
       validation: (rule) => rule.required().integer().min(1).max(6),
     }),
-    showImagesField(),
-    ...alignmentFields([], {
-      title: 'Heading Alignment',
-      description: 'Horizontal alignment of the heading and supporting text.',
-    }),
+    showImagesField({ subject: 'post' }),
+    ...alignmentFields([]),
     wideLayoutField,
   ],
   preview: {

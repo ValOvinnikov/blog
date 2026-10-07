@@ -52,10 +52,7 @@ export const pricingSchema = defineType({
         ),
     }),
     ctaButtonsField(),
-    ...alignmentFields([], {
-      description:
-        'Horizontal alignment of the heading, period switch, footnote and actions. Card content is always left-aligned.',
-    }),
+    ...alignmentFields([], { hasActions: true }),
     wideLayoutField,
   ],
   preview: {

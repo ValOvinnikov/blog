@@ -3,7 +3,7 @@ import {
   type TContentAlignment,
 } from '@blog/config/constants';
 import { toTitleCase } from '@blog/utils/primitives';
-import { defineField, type StringDefinition, type StringRule } from 'sanity';
+import { defineField, type StringDefinition } from 'sanity';
 
 type TAlignmentField = {
   name: string;
@@ -13,7 +13,7 @@ type TAlignmentField = {
   initialValue?: TContentAlignment;
   hidden?: StringDefinition['hidden'];
   fieldset?: string;
-  validation?: (rule: StringRule) => StringRule;
+  validation?: StringDefinition['validation'];
 };
 
 export const alignmentField = ({
@@ -44,53 +44,56 @@ export const alignmentField = ({
     validation,
   });
 
-type TAlignmentFieldExtra = {
-  name: string;
-  title: string;
-  description: string;
+type TAlignmentFieldExtra = Omit<TAlignmentField, 'list'> & {
   allow: readonly TContentAlignment[];
-  initialValue?: TContentAlignment;
-  hidden?: StringDefinition['hidden'];
-  fieldset?: string;
-  validation?: (rule: StringRule) => StringRule;
 };
 
 type TAlignmentFieldsOptions = {
-  title?: string;
-  description?: string;
+  hasActions?: boolean;
+  alignsItems?: boolean;
+  alignsCarousel?: boolean;
   fieldset?: string;
   initialValue?: TContentAlignment;
   allow?: readonly TContentAlignment[];
 };
 
-/**
- * A variant-scoped extra exists because a single field's `options.list` is
- * static and can't vary its option set by another field's value — each
- * extra covers one variant's allowed subset.
- */
+const joinAsList = (parts: readonly string[]) =>
+  parts.length > 1
+    ? `${parts.slice(0, -1).join(', ')} and ${parts.at(-1) ?? ''}`
+    : (parts[0] ?? '');
+
+const contentAlignmentDescription = ({
+  hasActions = false,
+  alignsItems = false,
+  alignsCarousel = false,
+}: TAlignmentFieldsOptions) =>
+  [
+    `Horizontal alignment of ${joinAsList([
+      'the heading',
+      'supporting text',
+      ...(hasActions ? ['actions'] : []),
+    ])}.`,
+    ...(alignsItems ? ['Everything below the heading follows it too.'] : []),
+    ...(alignsCarousel
+      ? [
+          "When a carousel's cards don't fill the row, they line up the same way.",
+        ]
+      : []),
+  ].join(' ');
+
 export const alignmentFields = (
   extras: readonly TAlignmentFieldExtra[],
-  options?: TAlignmentFieldsOptions,
+  options: TAlignmentFieldsOptions = {},
 ) => [
   alignmentField({
     name: 'contentAlignment',
-    title: options?.title ?? 'Content Alignment',
-    description:
-      options?.description ?? "Horizontal alignment of this module's content.",
-    list: options?.allow,
-    initialValue: options?.initialValue ?? CONTENT_ALIGNMENT.LEFT,
-    fieldset: options?.fieldset,
+    title: 'Content Alignment',
+    description: contentAlignmentDescription(options),
+    list: options.allow,
+    initialValue: options.initialValue ?? CONTENT_ALIGNMENT.LEFT,
+    fieldset: options.fieldset,
   }),
-  ...extras.map((extra) =>
-    alignmentField({
-      name: extra.name,
-      title: extra.title,
-      description: extra.description,
-      list: extra.allow,
-      initialValue: extra.initialValue,
-      hidden: extra.hidden,
-      fieldset: extra.fieldset,
-      validation: extra.validation,
-    }),
+  ...extras.map(({ allow, ...extra }) =>
+    alignmentField({ ...extra, list: allow }),
   ),
 ];

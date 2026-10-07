@@ -2,6 +2,7 @@ import { CONTENT_ALIGNMENT } from '@blog/config/constants';
 import { blockTestimonialSchema } from '@blog/studio/schema-types/documents/blocks/testimonial/testimonial';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { cardAlignmentField } from '@blog/studio/schema-types/fields/card-alignment-field/card-alignment-field';
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { displayModeField } from '@blog/studio/schema-types/fields/display-mode-field/display-mode-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
@@ -46,21 +47,12 @@ export const testimonialSchema = defineType({
       description:
         'Grid lays the cards out in rows. Carousel puts them in a single row the reader can swipe or step through. Ignored for a single quote.',
     }),
-    ...alignmentFields(
-      [
-        {
-          name: 'cardAlignment',
-          title: 'Card Alignment',
-          description: 'Aligns the quote and the person inside each card.',
-          allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
-          initialValue: CONTENT_ALIGNMENT.LEFT,
-        },
-      ],
-      {
-        description:
-          'Horizontal alignment of the heading, supporting text and actions. Cards have their own alignment.',
-      },
-    ),
+    ...alignmentFields([], { hasActions: true }),
+    cardAlignmentField({
+      initialValue: CONTENT_ALIGNMENT.LEFT,
+      hasSpotlight: true,
+      isRequired: false,
+    }),
     wideLayoutField,
   ],
   preview: {

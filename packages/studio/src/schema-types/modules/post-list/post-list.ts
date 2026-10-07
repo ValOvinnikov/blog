@@ -26,11 +26,8 @@ export const postListSchema = defineType({
       description: 'Posts shown per page of the archive.',
       validation: (rule) => rule.required().integer().min(1).max(24),
     }),
-    showImagesField(),
-    ...alignmentFields([], {
-      title: 'Heading Alignment',
-      description: 'Horizontal alignment of the heading and supporting text.',
-    }),
+    showImagesField({ subject: 'post' }),
+    ...alignmentFields([]),
     wideLayoutField,
   ],
   preview: {

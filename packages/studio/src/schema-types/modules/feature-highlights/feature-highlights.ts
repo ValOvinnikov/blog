@@ -26,7 +26,7 @@ export const featureHighlightsSchema = defineType({
       title: 'Highlights',
       type: 'array',
       description:
-        'The rows in the order they should be read. Images alternate sides from the first row.',
+        'The rows in the order they should be read. Images alternate sides from the first row; on phones every image sits above its text.',
       of: [defineArrayMember({ type: featureHighlightSchema.name })],
       validation: (rule) => [
         rule.required().error('Add at least two rows.'),
@@ -36,14 +36,12 @@ export const featureHighlightsSchema = defineType({
     }),
     ctaButtonsField(),
     mediaOrderField({
+      kind: 'STACKED',
       name: 'mediaOrder',
-      title: 'First Image',
-      description:
-        "Which side the first row's image sits on. Later rows alternate; on phones every image sits above its text.",
       initialValue: MEDIA_ORDER.FIRST,
-      validation: (rule) => rule.required(),
+      isRequired: true,
     }),
-    ...alignmentFields([]),
+    ...alignmentFields([], { hasActions: true }),
     wideLayoutField,
   ],
   preview: {

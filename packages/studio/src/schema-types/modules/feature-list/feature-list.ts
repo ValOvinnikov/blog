@@ -1,12 +1,11 @@
 import { CARD_IMAGE_SHAPE, CONTENT_ALIGNMENT } from '@blog/config/constants';
 import { featureBlockSchema } from '@blog/studio/schema-types/documents/blocks/feature/feature';
-import {
-  alignmentField,
-  alignmentFields,
-} from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
+import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { cardAlignmentField } from '@blog/studio/schema-types/fields/card-alignment-field/card-alignment-field';
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { displayModeField } from '@blog/studio/schema-types/fields/display-mode-field/display-mode-field';
+import { imageShapeField } from '@blog/studio/schema-types/fields/image-shape-field/image-shape-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
 import { wideLayoutField } from '@blog/studio/schema-types/objects/wide-layout/wide-layout-field';
@@ -49,21 +48,10 @@ export const featureListSchema = defineType({
       ],
     }),
     ctaButtonsField(),
-    defineField({
-      name: 'imageShape',
-      title: 'Image Shape',
-      type: 'string',
-      description:
-        "How each card's image is cropped — wide, square, or circular. A card with no image shows its icon instead, regardless of this setting.",
-      options: {
-        layout: 'dropdown',
-        list: Object.values(CARD_IMAGE_SHAPE).map((value) => ({
-          title: toTitleCase(value),
-          value,
-        })),
-      },
+    imageShapeField({
+      values: Object.values(CARD_IMAGE_SHAPE),
       initialValue: CARD_IMAGE_SHAPE.WIDE,
-      validation: (rule) => rule.required(),
+      subject: 'card image',
     }),
     displayModeField({
       description:
@@ -71,18 +59,10 @@ export const featureListSchema = defineType({
     }),
     ...alignmentFields([], {
       allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
-      description:
-        'Horizontal alignment of the heading, supporting text and actions. Cards have their own alignment.',
+      hasActions: true,
+      alignsCarousel: true,
     }),
-    alignmentField({
-      name: 'cardAlignment',
-      title: 'Card Alignment',
-      description:
-        'Horizontal alignment of the heading and text within each feature card.',
-      list: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
-      initialValue: CONTENT_ALIGNMENT.LEFT,
-      validation: (rule) => rule.required(),
-    }),
+    cardAlignmentField({ initialValue: CONTENT_ALIGNMENT.LEFT }),
     wideLayoutField,
   ],
   preview: {

@@ -47,6 +47,8 @@ export const faqSchema = defineType({
     ctaButtonsField(),
     ...alignmentFields([], {
       allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
+      hasActions: true,
+      alignsItems: true,
     }),
     layoutField,
   ],
