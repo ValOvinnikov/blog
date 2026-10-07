@@ -9,7 +9,7 @@ describe('oklchToHex', () => {
     expect(oklchToHex(0.8, 0.14, 250)).toBe('#73c3ff');
   });
 
-  it('reproduces the Indigo light --logo-alt-2 hex from theme.css', () => {
+  it('converts a high-chroma indigo stop to its hex', () => {
     expect(oklchToHex(0.58, 0.21, 274)).toBe('#5966f3');
   });
 });
