@@ -1,7 +1,4 @@
-import {
-  FULL_BRAND_VARIANT_LIST,
-  NEWSLETTER_VARIANT,
-} from '@blog/config/constants';
+import { NEWSLETTER_VARIANT } from '@blog/config/constants';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
@@ -23,7 +20,7 @@ export const newsletterSchema = defineType({
   icon: Mail,
   fields: [
     titleField(),
-    brandVariantField({ list: FULL_BRAND_VARIANT_LIST }),
+    brandVariantField(),
     variantField({
       values: NEWSLETTER_VARIANT,
       initialValue: NEWSLETTER_VARIANT.FULL,
