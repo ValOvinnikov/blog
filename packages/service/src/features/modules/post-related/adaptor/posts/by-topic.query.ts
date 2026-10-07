@@ -1,7 +1,7 @@
 import { q } from '@blog/service/sanity/query/query';
-import { POST_IN_LOCALE_FILTER } from '@blog/service/shared/expressions/post/post-in-locale';
-import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/post/published-post';
 import { postCardFragment } from '@blog/service/shared/fragments/post/post';
+import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
+import { publishedPostsInLocale } from '@blog/service/shared/localization/published-posts-in-locale/published-posts-in-locale';
 
 export type TRelatedByTopicQueryParams = {
   currentId: string;
@@ -9,13 +9,15 @@ export type TRelatedByTopicQueryParams = {
 };
 
 export function relatedByTopicQuery(topicCandidateLimit: number) {
-  return q
-    .parameters<TRelatedByTopicQueryParams>()
-    .star.filterByType('page_post')
-    .filterRaw('_id != $currentId && topic._ref == $topicId')
-    .filterRaw(POST_IN_LOCALE_FILTER)
-    .filterRaw(PUBLISHED_POST_FILTER)
-    .order('publishedAt desc')
-    .slice(0, topicCandidateLimit)
-    .project(postCardFragment);
+  return (
+    publishedPostsInLocale(
+      q.parameters<TLocaleQueryParams & TRelatedByTopicQueryParams>().star,
+    )
+      .filterBy('_id != $currentId')
+      // groqd's typed filterBy cannot reach a reference's `_ref`
+      .filterRaw('topic._ref == $topicId')
+      .order('publishedAt desc')
+      .slice(0, topicCandidateLimit)
+      .project(postCardFragment)
+  );
 }

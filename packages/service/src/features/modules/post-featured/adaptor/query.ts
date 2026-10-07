@@ -8,19 +8,19 @@ import {
   SHOW_IMAGES_EXPRESSION,
   showImagesParser,
 } from '@blog/service/shared/expressions/module/show-images';
-import { POST_IN_LOCALE_FILTER } from '@blog/service/shared/expressions/post/post-in-locale';
-import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/post/published-post';
+import { FEATURED_POST_FILTER } from '@blog/service/shared/expressions/post/featured-post';
 import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
 import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { postCardFragment } from '@blog/service/shared/fragments/post/post';
+import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
 import { pinnedPostInLocale } from '@blog/service/shared/localization/pinned-post-in-locale/pinned-post-in-locale';
+import { publishedPostsInLocale } from '@blog/service/shared/localization/published-posts-in-locale/published-posts-in-locale';
 
-const newestFeaturedPostsQuery = q.star
-  .filterByType('page_post')
-  .filterRaw('featured == true')
-  .filterRaw(POST_IN_LOCALE_FILTER)
-  .filterRaw(PUBLISHED_POST_FILTER)
+const newestFeaturedPostsQuery = publishedPostsInLocale(
+  q.parameters<TLocaleQueryParams>().star,
+)
+  .filterRaw(FEATURED_POST_FILTER)
   .order('publishedAt desc')
   .slice(0, 3)
   .project(postCardFragment);

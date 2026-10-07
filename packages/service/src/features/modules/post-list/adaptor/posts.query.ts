@@ -1,7 +1,7 @@
 import { q } from '@blog/service/sanity/query/query';
-import { POST_IN_LOCALE_FILTER } from '@blog/service/shared/expressions/post/post-in-locale';
-import { PUBLISHED_POST_FILTER } from '@blog/service/shared/expressions/post/published-post';
 import { postCardFragment } from '@blog/service/shared/fragments/post/post';
+import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
+import { publishedPostsInLocale } from '@blog/service/shared/localization/published-posts-in-locale/published-posts-in-locale';
 
 export type TPostListScope = {
   termId: string;
@@ -15,11 +15,10 @@ export function postListModulePaginatedPostsQuery(
   const start = (page - 1) * pageSize;
   const end = start + pageSize;
 
-  const published = q.star
-    .filterByType('page_post')
-    .filterRaw(POST_IN_LOCALE_FILTER)
-    .filterRaw(PUBLISHED_POST_FILTER);
-  const posts = scope ? published.filterRaw('references($termId)') : published;
+  const published = publishedPostsInLocale(
+    q.parameters<TLocaleQueryParams & TPostListScope>().star,
+  );
+  const posts = scope ? published.filterBy('references($termId)') : published;
 
   return q
     .parameters<{ termId?: string }>()
