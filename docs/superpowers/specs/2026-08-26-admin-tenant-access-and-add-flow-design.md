@@ -307,7 +307,8 @@ UI plus its own theme, and stops importing `@blog/ui` for its own chrome.
 
 **With one deliberate exception, and it is not a compromise.** The Look tab's
 live preview renders _the tenant's site as it will actually look_ — including
-`WindowChrome`, the terminal frame `chromeOn` produces. That is the site's
+`WindowChrome`, the terminal frame `chromeOn` produces (both since deleted
+in #2846; the preview renders `Panel` today). That is the site's
 component by definition. Copying it into admin would create a second copy that
 silently drifts from the real thing, and a preview that lies is worse than no
 preview. So the preview's simulated-site content keeps importing `@blog/ui`.
@@ -324,7 +325,7 @@ exception can be enforced:
 - **Panel chrome** — the "Live preview" / "Full page preview" card headings,
   their descriptions, and the light/dark mode toggle. This is _admin's_ UI and
   gets admin's primitives like every other surface.
-- **Simulated site** — `WindowChrome` and the `sample` fragment inside it
+- **Simulated site** — `WindowChrome` (now `Panel`, #2846) and the `sample` fragment inside it
   (`BrandMark`, `Text`, `Button`) that portray the tenant's site. This is the
   exception.
 

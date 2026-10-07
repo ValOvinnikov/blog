@@ -201,8 +201,8 @@ at request time) is unaffected and still never imports `@blog/insight`.
 
 ³ `apps/platform`'s `@blog/ui` prohibition has one scoped exception:
 `apps/platform/src/components/features/look/look-preview/preview-sample/`
-renders the tenant's real site (`WindowChrome`, `BrandMark`, `Text`,
-`Button`) so the live theme preview doesn't drift from what `apps/web`
+renders the tenant's real site (`BrandMark`, `Heading`, `Panel`,
+`Text`, `Button`) so the live theme preview doesn't drift from what `apps/web`
 actually looks like. An ESLint `no-restricted-imports` override in
 `configs/eslint/platform.js` confines `@blog/ui` imports under `apps/platform` to
 that one directory; every other admin surface uses admin's own primitives.
@@ -303,9 +303,10 @@ text when it is unset.
 
 Every `module_*` document also carries a **required** `brandVariant` field
 (stored values from `@blog/config`'s `BRAND_VARIANT` const —
-`PRIMARY`/`SECONDARY` for `module_content`/`module_newsletter`/
-`module_postLatest`/`module_postFeatured`/`module_taxonomyList`; `module_hero`, `module_cta` and
-`module_postList` additionally allow `BRAND_PRIMARY` — on `module_cta` this
+`PRIMARY`/`SECONDARY` by default; `module_hero`, `module_heroBlog`,
+`module_heroProfile`, `module_heroStatement`, `module_cta`,
+`module_newsletter` and `module_stats` additionally allow `BRAND_PRIMARY`,
+and every other module keeps the two-value default — on `module_cta` this
 field means the card's own fill tone (Banner/Split/Callout below) rather
 than the full-bleed band tone every other module uses it for, which that
 module carries as a separate `bandTone` field), plus an optional, all-remaining-fields-optional `layout`
@@ -314,8 +315,10 @@ object (`spacingTop`/`spacingBottom`, `containerWidth` (not on
 `dividerBottom` — stored values from `SPACING_SCALE`/`CONTAINER_WIDTH`
 consts; there is no `align` field on `layout` — alignment is its own
 module-level field, below).
-`module_cta`/`module_postList`/`module_postLatest`/`module_postFeatured`/`module_postRelated`/`module_taxonomyList`/`module_newsletter`
-additionally carry a `headingBlock` field (`heading` and `supportingText`
+Every `module_*` except `module_content`, `module_hero` and `module_heroBlog`
+(`module_team` included), and every page document (home, landing, post,
+post index, topic, tag and the taxonomy index pages), additionally carries a
+`headingBlock` field (`heading` and `supportingText`
 only). Two registered types back that one field name: pages use
 `pageHeadingBlock` (plain strings), modules and feature blocks use
 `moduleHeadingBlock` (per-language values, where `heading` is required in
@@ -343,8 +346,8 @@ their heading as `.notNull()` was safe only once a migration had backfilled
 every stored document. With that done, one heading view model serves every
 call site and its `heading` is `string`, never optional.
 
-**Alignment is a module-level field, not part of `headingBlock`.** All seven
-of those modules carry their own `contentAlignment`, emitted by the
+**Alignment is a module-level field, not part of `headingBlock`.** The
+modules that align their heading carry their own `contentAlignment`, emitted by the
 `alignmentFields()` helper, which every caller gets whether or not it
 asks for variant-scoped extras. `headingBlock` deliberately does not bundle
 it: a Sanity named object type's field list is fixed at registration, so a
@@ -354,7 +357,10 @@ That is a **field-list** constraint, and it has no workaround — unlike the
 `requiredHeadingBlock` type to exist purely to vary one rule. Validation can
 move onto the field, and did; a field's presence cannot. Bundling it meant `module_cta`, which
 aligns its whole card rather than its heading, was forced to render an
-alignment control nothing read.
+alignment control nothing read. Pages have no module-level field list, so
+`pageHeadingBlockField()` returns the `headingBlock` field together with a
+sibling `contentAlignment` (titled Heading Alignment, Left/Center only), and
+the page loaders return it as `headingAlignment`, defaulting to Left.
 
 `module_content` has no `headingBlock` —
 its rich-text `body` supplies any in-content headings, so a separate
@@ -433,13 +439,10 @@ photo — the initials tile it used to render exposed that name to assistive
 technology as a side effect of `Avatar`'s fallback, and dropping the tile
 without replacing it would have left nothing saying whose hero it is. The
 photo is placed by variant — a round `Hero.Avatar` on Stacked, a
-`Hero.Media` square capped at 20rem on Split, the background on Banner —
+full-width square `Hero.Media` on Split, the background on Banner —
 its actions render in `Hero.Cta`, the bio in `Hero.Body`, and the author's
 profiles in `Hero.Social`. Those five slots are the `Hero` organism's whole
-surface. The cap and the shell's optional `ctaClassName` (which this view
-sets to clear `Hero.Cta`'s `mt-auto`) exist for the same reason: an
-uncapped square filled its column, stretched the copy column to match, and
-left the actions pinned to the foot of it under a band of empty space.
+surface.
 `Hero.Social` imposes no semantics of its own — it is a container,
 and the shared `SocialLinks` renders the labelled list inside it (its
 `outlined` variant there, plain in the footer).
@@ -535,7 +538,8 @@ shape, and the same registered type, the modules use. `@blog/service` maps
 consumer sees are unchanged and no `apps/web` component reads a document
 label.
 
-`page_post.modules[]` allows `module_postRelated`, `module_newsletter` and
+`page_post.modules[]` allows `module_postRelated` (at most once per post),
+`module_postLatest`, `module_taxonomyList`, `module_newsletter` and
 `module_cta`. It deliberately does **not** allow `module_content`: a post
 already carries its own `content` rich text, and offering a Content module
 beside it would give an editor two places to put the article's prose with no
@@ -666,7 +670,8 @@ had become only one of its five callers.
 `module_taxonomyList` renders through its page's own module map wherever it is
 placed — `page_home.modules[]`, `page_landing.modules[]`,
 `page_postIndex.modules[]`, `page_topic.modules[]`, `page_tag.modules[]`,
-`page_topicIndex.modules[]` and `page_tagIndex.modules[]`. It used to render a
+`page_topicIndex.modules[]`, `page_tagIndex.modules[]` and
+`page_post.modules[]`. It used to render a
 second way as well, through a dedicated `taxonomyList` reference on each
 taxonomy index page; neither page has one any more, and both fields are
 retained only as `readOnly`, `deprecated` pending removal. It carries a
@@ -1913,7 +1918,9 @@ use each page's public heading, never its internal `title`. The same
 renders a card per direct child of the page using the template, in drag
 order: the child's public heading as the label, its heading's supporting text
 as the summary, its SEO sharing image, and a link to its path. On a page
-with no children it renders nothing.
+with no children it renders nothing. Its authored fields are `title`,
+`brandVariant`, an optional `headingBlock` (the one module whose heading is
+not required), a Heading Alignment and a wide `layout`.
 
 **Redirects.** A `redirect` document holds a language, a source path, a
 destination path and whether it is a prefix redirect; editors manage them in

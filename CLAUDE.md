@@ -64,8 +64,8 @@ graph is acyclic
   interactive ones, all built on Base UI and styled in-app; nothing is added
   to `@blog/ui` for it. The one exception is
   `apps/platform/src/components/features/look/look-preview/preview-sample/`,
-  which renders the tenant's real site (WindowChrome, BrandMark, Text,
-  Button) so the live theme preview doesn't drift from what `apps/web`
+  which renders the tenant's real site (BrandMark, Heading, Panel,
+  Text, Button) so the live theme preview doesn't drift from what `apps/web`
   actually looks like — an ESLint `no-restricted-imports` guard confines
   `@blog/ui` imports under `apps/platform` to that one directory. See
   `.claude/agents/platform-app.md`.

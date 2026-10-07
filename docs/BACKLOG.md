@@ -722,6 +722,14 @@ consume those shapes, they don't design them.
 > lands in the existing **M9 — Portfolio** GitHub milestone alongside the
 > portfolio strand (#1919 / #1290 / #1291 / #1292), which slots in after
 > Phase 2 below; nothing here duplicates it.
+>
+> **Shipped modules are described in `SPEC.md` §6**, which wins over every
+> design answer recorded below. **Module surface and skin alignment** — one
+> skin vocabulary, item-surface families, the Banner recipe and the Look's
+> card style — has its own design of record,
+> `docs/superpowers/specs/2026-10-07-module-surface-and-look-alignment-design.md`,
+> delivered through epics #4402 (Studio), #4412 (UI/web surfaces), #4419
+> (Banner and band rhythm) and #4422 (Look platform).
 
 **The problem this milestone solves.** `page_home` is a blog home page and
 nothing else: its required `hero` slot accepts only `module_hero`, which is a
@@ -757,13 +765,17 @@ every sub-issue):**
   its own sub-issue too; where a layer has nothing to do, the epic says so
   rather than filing an empty ticket.
 - **Platform style is mandatory and identical for every module.** Studio:
-  `titleField`, `brandVariantField`, `headingBlockField` (where the module
-  has a heading), `defineAlignmentFields`, `layoutField`, a named
-  `{name}Schema` export, a desk-group entry, page allow-list entries.
+  `titleField`, `brandVariantField`, `moduleHeadingBlockField()` (where the
+  module has a heading; `pageHeadingBlockField()` is the page documents'
+  helper, not a module's), `alignmentFields`, `layoutField` or
+  `wideLayoutField`, a named `{name}Schema` export, a desk-group entry,
+  page allow-list entries. `module_content` carries no alignment field
+  today — an open decision, not a precedent.
   Service: `service.modules.<name>.v1`, explicit projections, `T | undefined`
   view models with no faked defaults, tenant-scoped ISR tags. UI: one pure
   organism, compound slots for anything the web layer builds, stories and
-  tests. Web: `MODULE_MAP`/`HERO_MAP` entry, `Section` wrapper,
+  tests. Web: an entry in each page's module map (`HOME_MAP`,
+  `LANDING_MAP`, …), `Section` wrapper,
   `REVALIDATE_TAGS` entry, a client leaf only for genuine interactivity.
   Copy: per-instance content on the module, feature copy on a `settings_*`
   singleton, nothing in Voice. Write paths get a `CAPABILITY` key and the
@@ -794,7 +806,7 @@ flowchart TD
   P1f["1.6 topic cards list latest posts"]
   P1g["1.7 page composition<br/>retire PostsSection · post page modules"]
   P2["Phase 2 · Hero family<br/>heroStatement · heroProfile"]
-  P3["Phase 3 · Marketing modules<br/>featureList · testimonial · logoWall · stats · faq · embed<br/>featureHighlights · team · location · contactForm"]
+  P3["Phase 3 · Marketing modules<br/>shipped: featureList · testimonial · logoWall · stats · faq<br/>featureHighlights · team · pricing · timeline · sectionPages<br/>outstanding: embed · location · contactForm"]
   P4["Phase 4 · Onboarding templates<br/>site-kind at tenant creation"]
   M9["Portfolio strand (#1919, same milestone)<br/>project entity · page_work · heroProject · projectList/Latest"]
   P0 --> P1a & P1b & P1e
@@ -821,7 +833,12 @@ generalisation` — output: a design section covering the derived hero type,
   is (brand variant, hero layout, image, actions, content position, content
   alignment, media order). **Answered 2026-09-07** in the portfolio
   design doc: home required, every other page optional and replacing its
-  default header; the shared tail ships with `module_heroBlog`.
+  default header; the shared tail ships with `module_heroBlog`. The
+  `defineHeroFields()` helper named here and below was later deleted
+  (#3275); the hero modules compose named field builders — `SPEC.md` §6.
+  Likewise `HERO_MAP` and `MODULE_MAP` no longer exist: each page renders
+  through its own `Partial` map (`HOME_MAP`, `LANDING_MAP`, …), so an
+  unregistered module is a runtime warning, not a compile error.
 - **Sub-issues (dependency order):**
   - **config** · `feat(config): derive THeroModuleType from the module_hero*
 naming convention` — `Extract<TModuleType, \`module_hero${string}\`>`, the
@@ -869,18 +886,10 @@ landing pages` — `Record<THeroModuleType, …>` so an unregistered hero kind
   newest-featured fallback becomes an explicit, visible choice with an error
   (not a warning) when neither a pinned post nor a featured post exists at
   author time.
-- **Answered 2026-09-07** (#2802, design section in the portfolio design
-  doc): overrides are `eyebrow`/`heading`/`supportingText` with the derived
-  value shown as the Studio placeholder; the image mode is a new
-  `HERO_IMAGE_SOURCE`, and `HERO_FIELD_MODE` shrinks **only** when
-  `module_hero` is deleted (#2813), since that type still reads all six
-  values; the primary action is a label plus appearance with a derived href,
-  the secondary a full `ctaAction`; the fallback is an explicit
-  `HERO_POST_SOURCE` choice; the one query uses `select()` on `postSource`
-  rather than `coalesce()`, which would fall back over a stale pinned
-  reference. `defineHeroFields()` ships here, and its media order is two
-  variant-scoped fields (`mediaOrderSplit` for Split's mobile collapse,
-  `mediaOrderStacked` for every width) collapsing to one `mediaOrder` prop.
+- **Answered 2026-09-07** (#2802); **what shipped differs** — a single
+  eyebrow override, a two-state optional image with a fallback, and named
+  field builders rather than `defineHeroFields()`. The shipped shape is
+  `SPEC.md` §6's `module_heroBlog` paragraph.
 - **Sub-issues:**
   - **studio** · `feat(studio): module_heroBlog schema` — new type beside
     `module_hero`; desk group "Heroes" lists both; `page_home`/`page_landing`
@@ -931,8 +940,9 @@ once module_heroBlog replaces it on production` — `prio:later`, blocked on
   the flag; `PostsSection` gains `hasImages` + a pre-rendered `image` node per
   card and renders the media frame on every card when on; one web
   `renderPostCardImage` helper (640×360, grid-breakpoint `sizes`, lazy, never
-  `priority`) passed to `toPostListItems` as an optional callback; the post
-  page's related reading always shows images since no module owns it.
+  `priority`) passed to `toPostListItems` as an optional callback. Related
+  reading later became `module_postRelated`, which carries its own
+  `showImages` (coalesced to true).
 - **Sub-issues:**
   - **studio** · `feat(studio): showImages on module_postLatest and
 module_postList`.
@@ -1008,8 +1018,9 @@ latest view models` — `postCardFragment` already carries `heroImageSanity`
   `apps/web` wrapper is per item type — `PostsCarousel` (the `SanityImage`
   shape) owns `renderItem`, the grid-column `slideClassName` (85 % below
   `sm`, ½ at `sm`, ⅓ from `md`) and the two labels — because a function
-  cannot cross the server→client boundary; the views pass plain data. Controls always render and are disabled exactly when
-  Embla cannot move; every slide stays in the tab order and the viewport
+  cannot cross the server→client boundary; the views pass plain data. As
+  shipped, `Carousel` renders the controls only when Embla can scroll, so
+  a carousel whose slides all fit shows none; every slide stays in the tab order and the viewport
   follows focus. `embla-carousel-react@8.6.0` in `packages/ui`, pinned to
   the v8 major (the 9.0 rc renames the methods). One Studio warning: a
   `module_postLatest` carousel with `limit` < 4.
@@ -1038,7 +1049,8 @@ displayMode branch in both teaser views` (#2840) — the wrapper owns `renderIte
 - **Acceptance:** grid remains the default for every existing document;
   carousel mode swipes without JavaScript and is Embla-driven with it, and
   keeps its position across hydration; no autoplay; both buttons keyboard
-  reachable, labelled, and disabled exactly when Embla cannot move; reduced
+  reachable and labelled, each disabled at its end and both hidden when
+  Embla cannot move either way; reduced
   motion makes every position change instant; a spotlight in carousel mode
   renders three equal slides.
 
@@ -1050,27 +1062,10 @@ displayMode branch in both teaser views` (#2840) — the wrapper owns `renderIte
   an authored `taxonomy` field (topics / tags) — decide whether that field is
   hidden when the module sits in a slot, or whether a sibling
   `module_taxonomyCards` is cleaner. Proposed: authored field, one type.
-  **Answered 2026-09-07** in the portfolio design doc: one type; `taxonomy`
-  optional on the document with no hidden rule (a module cannot see its
-  holder), required by an async rule on the home and landing pages and
-  checked for a mismatch by the index pages; `sortOrder` and `limit` added
-  so a teaser is usable, defaulting to today's index behaviour; one
-  `select()` query with the index page's kind as the fallback.
-- **Sub-issues (dependency order):**
-  - **config** · `feat(config): TAXONOMY_SORT and module_taxonomyList out of
-TSlotModuleType` — the union then names only slot-only modules, so the
-    missing `MODULE_MAP` entry is a compile error.
-  - **studio** · `feat(studio): authored taxonomy on module_taxonomyList and
-home/landing allow-lists` — `taxonomy`, `sortOrder`, `limit`; the two
-    page-level rules; `page_home`/`page_landing` allow the type.
-  - **service** · `feat(service): taxonomyList reads the authored taxonomy
-when present` — one query resolving module and terms, `fallbackTaxonomy`
-    parameter, sort and limit in the transformer.
-  - **ui** · none — the web view composes `PostGrid` + `TaxonomyCard` and
-    already takes `headingLevel`.
-  - **web** · `feat(web): taxonomyList MODULE_MAP entry` — the module
-    resolves hrefs and copy from the kind; index pages pass the fallback; an
-    empty `modules[]` placement omits itself.
+  **Answered 2026-09-07**; **what shipped differs** (the view composes
+  `CardGrid`, the loader takes only `(id, tenant)`, and the page-level
+  require rule gave way to an empty-state degrade). The shipped shape is
+  `SPEC.md` §6's `module_taxonomyList` paragraph.
 - **One PR:** the config const has no consumer until studio lands (knip), and
   the union change reds `MODULE_MAP` until web lands.
 - **Acceptance:** a blog home can show topic cards between latest posts and
@@ -1190,60 +1185,45 @@ Each is an epic with a design sub-issue and `studio → service → ui → web`
 implementation sub-issues. `service` returns a per-kind view model; the `ui`
 `Hero` organism grows compound slots rather than new organisms.
 
-- **2.1 `module_heroStatement`** (#2775, designed 2026-09-10 in #2806 —
-  section "`module_heroStatement` — the marketing hero" in the spec of
-  record) — eyebrow, a required plain-text heading (always the page `<h1>`),
-  supporting text, then `defineHeroFields()` with no options, so the tail's
-  own image and actions (0–2 through the shared `actionGroup`) are the
-  module's. The background-image hero is the tail's `BANNER`, not a new
-  variant — but the `Hero` organism's Banner has no scrim and no on-image
-  copy today, so this epic's **ui** sub-issue gives it `tone`, the
-  `CtaModule` scrim and on-image colours (fixing `heroBlog`'s Banner too).
-  Sub-issues: ui (own PR, first), then studio + service + web as one PR
-  (typegen reds `HERO_MAP` until the web entry lands); service adds a shared
-  `toHeroPresentation()` collapse that `heroBlog` moves onto.
-- **2.2 `module_heroProfile`** (#2776 — **the design of record**) — a
-  reference to `person` for the photo and social profiles the bylines
-  already use, with every word of copy the editor's (the shared required
-  `headingBlock` plus an optional eyebrow, nothing derived from the author);
-  up to two `ctaButtons`; one optional photo resolved by precedence — the
-  module's own image, else the author's, else initials — and placed by the
-  variant (round `Hero.Avatar` on Stacked, square `Hero.Media` on Split,
-  background on Banner); the author's profiles behind `showSocialLinks` in
-  `Hero.Social`, rendered through the shared `SocialLinks`. Shipped as six
-  per-layer PRs rather than one.
+- **2.1 `module_heroStatement`** (#2775, shipped; designed in #2806). Its
+  shipped shape, the `Hero` organism's Banner `tone` and scrims included,
+  is `SPEC.md` §6's `module_heroStatement` paragraph.
+- **2.2 `module_heroProfile`** (#2776, shipped) — a reference to `person`
+  for the photo and social profiles, with every word of copy the editor's.
+  The photo precedence is per variant: Stacked and Split take the module's
+  image, else the author's; Banner takes the module's image or nothing.
+  Without a photo Stacked shows initials, while Split and Banner render no
+  media. `SPEC.md` §6's `module_heroProfile` paragraph is the shape of
+  record.
 - **`module_heroProject`** stays with #1291 in M9 — it needs the `project`
-  entity.
+  entity, and makes a fourth hero kind, so the hero-family vocabulary is
+  settled before it is built.
 
 ### Phase 3 · Marketing modules — `prio:later`
 
 One epic per module, each: design sub-issue → `studio → service → ui → web`.
 Read-only modules are one issue per layer and nothing else; the contact form
-adds `config`, `db` and `email`. Order by archetypes unlocked:
+adds `config`, `db` and `email`.
 
-1. **`module_featureList`** (#3246, designed 2026-09-16 — section
-   "`module_featureList` — the features grid" in the spec of record; ui
-   #3247 first, then studio #3248 + service #3249 + web #3250 as one PR, a
-   visual icon picker after), **`module_testimonial`** (#3322, designed
-   2026-09-18 — section "`module_testimonial` — the quotes"; ui #3323 first,
-   then studio #3324 + service #3325 + web #3326 as one PR), **`module_logoWall`**,
-   **`module_stats`** — together they complete the agency and product pages.
-   Their reusable pieces are `block_*` documents in the Studio's new Blocks
-   section (Feature Cards and the moved Links first; testimonials and client
-   logos as they land). #3245 carries the post modules' matching image shape
-   and card alignment.
-2. **`module_contactForm`** — the first write path. Extra sub-issues:
-   **config** (`CAPABILITY` key), **db** (`leads` table + `settings_features`
-   column, two generated migrations), **email** (lead-notification template),
-   plus a **studio** `settings_contact` singleton for feature copy. Open
-   decisions to settle in its design: FREE vs. GROWTH entitlement; where a
-   tenant reads leads before any CRM UI.
-3. **`module_faq`** (disclosure in a web client leaf), **`module_embed`**
-   (video, booking, maps).
-4. **`module_featureHighlights`** (repeatable image + text rows),
-   **`module_team`** (reuse `person`),
-   **`module_location`** (address, hours, map embed; feeds `LocalBusiness`
-   JSON-LD), **`module_pricing`**, **`module_timeline`**.
+**Shipped** (shapes in `SPEC.md` §6): `module_featureList` (#3246),
+`module_testimonial` (#3322), `module_logoWall`, `module_stats`, `module_faq`
+(#2786), `module_featureHighlights`, `module_team` (#2790),
+`module_pricing` (#2793), `module_timeline` (#2795), and
+`module_sectionPages` (Section Pages — a page's child pages, shipped with
+the catalog-pages epic #4279). Their reusable pieces are `block_*`
+documents in the Studio's Blocks section. #3245 carries the post modules'
+image shape and card alignment.
+
+**Outstanding:**
+
+1. **`module_contactForm`** (#1292) — the first write path. Extra
+   sub-issues: **config** (`CAPABILITY` key), **db** (`leads` table +
+   `settings_features` column, two generated migrations), **email**
+   (lead-notification template), plus a **studio** `settings_contact`
+   singleton for feature copy.
+2. **`module_embed`** (#2788 — video, booking, maps).
+3. **`module_location`** (#2792 — address, hours, map embed; feeds
+   `LocalBusiness` JSON-LD).
 
 ### Phase 4 · Onboarding templates — `prio:later`
 

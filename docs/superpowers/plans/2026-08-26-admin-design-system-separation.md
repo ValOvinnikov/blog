@@ -78,8 +78,8 @@ afterwards would build each of them twice.
   `apps/platform/src/components/features/look/look-preview/preview-sample/`
   and must otherwise return nothing.
 - **`preview-sample/` is the single allowlisted directory.** It renders the
-  tenant's site as it will actually look — `WindowChrome`, `BrandMark`, `Text`,
-  `Button` from `@blog/ui`. Copying those into admin would produce a second copy
+  tenant's site as it will actually look — `Panel`, `BrandMark`, `Heading`,
+  `Text` and `Button` from `@blog/ui`. Copying those into admin would produce a second copy
   that drifts from the real site, so the preview would eventually lie. Nothing
   else under `apps/platform` may import `@blog/ui`, and a path-scoped guard enforces
   it — an unenforced exception is how the current 68 sites accumulated.

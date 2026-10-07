@@ -88,7 +88,8 @@ and closes the two structural gaps the 2026-08-10 audit found.
     (`window-chrome-bar-variants.ts`, `toast-variants.ts`,
     `terminal-chip-variants.ts`) with the themeable `--font-ui` token, so the
     `editorial` preset isn't stuck monospace. The chrome components themselves
-    (`WindowChrome`, `Toast`, `TerminalChip`, `TerminalTyping`) are already
+    (`WindowChrome`, `Toast`, `TerminalChip`, `TerminalTyping`; all but
+    `Toast` since deleted in #2846) are already
     discrete **opt-in** exports — a preset simply omits or includes them.
 - **`web`** — the theme injector: a server-rendered `<style>` block declaring
   the resolved CSS variables under **both** `:root { … }` and `.dark { … }`
