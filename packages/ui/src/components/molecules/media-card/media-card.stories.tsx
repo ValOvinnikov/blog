@@ -18,6 +18,7 @@ const meta = {
     },
   },
   args: {
+    isInteractive: true,
     excerpt:
       'A step-by-step guide to building a scalable, token-driven design system using Tailwind CSS, tailwind-variants, and Atomic Design principles.',
     tags: ['design-system', 'tailwind', 'react'],

@@ -45,7 +45,7 @@ export const mediaCardVariants = tv({
     },
   },
   defaultVariants: {
-    isInteractive: true,
+    isInteractive: false,
   },
 });
 
