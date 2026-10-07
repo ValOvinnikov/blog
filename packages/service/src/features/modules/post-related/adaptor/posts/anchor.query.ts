@@ -1,11 +1,11 @@
 import { q } from '@blog/service/sanity/query/query';
 
-export type TAnchorPostParams = {
+export type TAnchorPostQueryParams = {
   postId: string;
 };
 
 export const relatedPostAnchorQuery = q
-  .parameters<TAnchorPostParams>()
+  .parameters<TAnchorPostQueryParams>()
   .star.filterByType('page_post')
   .filterBy('_id == $postId')
   .slice(0)

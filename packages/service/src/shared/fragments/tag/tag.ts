@@ -5,9 +5,9 @@ import {
 } from '@blog/service/shared/expressions/post/post-count';
 import { tagArchivePageSlugFragment } from '@blog/service/shared/fragments/archive-page/archive-page-slug';
 import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
-import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
+import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
 
-const localeQ = q.parameters<TLocaleParams>();
+const localeQ = q.parameters<TLocaleQueryParams>();
 
 export const tagFragment = localeQ
   .fragmentForType<'blog_tag'>()

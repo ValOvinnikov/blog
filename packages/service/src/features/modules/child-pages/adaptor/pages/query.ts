@@ -1,9 +1,9 @@
 import { q } from '@blog/service/sanity/query/query';
 import { pageHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/page-heading-block';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
-import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
+import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
 
-export type TChildPagesQueryParams = { parentId: string } & TLocaleParams;
+export type TChildPagesQueryParams = { parentId: string } & TLocaleQueryParams;
 
 export const childPagesQuery = q
   .parameters<TChildPagesQueryParams>()

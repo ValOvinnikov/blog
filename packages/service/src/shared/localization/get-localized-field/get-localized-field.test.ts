@@ -5,7 +5,7 @@ import type {
 } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { q } from '@blog/service/sanity/query/query';
-import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
+import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 
 import { getLocalizedField, type TLocalizedKey } from './get-localized-field';
@@ -13,7 +13,7 @@ import { getLocalizedField, type TLocalizedKey } from './get-localized-field';
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 
 const query = q
-  .parameters<TLocaleParams>()
+  .parameters<TLocaleQueryParams>()
   .star.filterByType('link')
   .slice(0)
   .project((sub) => ({
@@ -59,7 +59,7 @@ describe(getLocalizedField, () => {
 });
 
 const typedQuery = q
-  .parameters<TLocaleParams>()
+  .parameters<TLocaleQueryParams>()
   .star.filterByType('module_cta')
   .slice(0)
   .project((sub) => ({

@@ -4,9 +4,9 @@ import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-d
 import { socialProfileFragment } from '@blog/service/shared/fragments/social-profile/social-profile';
 import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
 import { getLocalizedPortableTextBlock } from '@blog/service/shared/localization/get-localized-portable-text-block/get-localized-portable-text-block';
-import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
+import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
 
-const localeQ = q.parameters<TLocaleParams>();
+const localeQ = q.parameters<TLocaleQueryParams>();
 
 export const personCardFragment = localeQ
   .fragmentForType<'person'>()

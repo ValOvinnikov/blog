@@ -1,10 +1,10 @@
 import { q } from '@blog/service/sanity/query/query';
 import { PAGE_PATH_EXPRESSION } from '@blog/service/shared/expressions/landing-page/landing-page-path';
 import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
-import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
+import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
 import { translatedReference } from '@blog/service/shared/localization/translated-reference/translated-reference';
 
-const localeQ = q.parameters<TLocaleParams>();
+const localeQ = q.parameters<TLocaleQueryParams>();
 
 // Projected unconditionally — groqd's `sub.conditional()` union silently drops the matching branch's own field at parse time.
 export const linkDocumentFragment = localeQ

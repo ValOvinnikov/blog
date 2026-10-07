@@ -1,8 +1,8 @@
 import { q } from '@blog/service/sanity/query/query';
-import type { TLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
+import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
 
 export const redirectsQuery = q
-  .parameters<TLocaleParams>()
+  .parameters<TLocaleQueryParams>()
   .star.filterByType('redirect')
   .filterBy('language == $locale')
   .project((sub) => ({

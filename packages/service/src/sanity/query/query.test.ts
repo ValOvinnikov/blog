@@ -1,7 +1,7 @@
 import type { TLocaleIsoCode } from '@blog/config/constants';
 import type { IGroqBuilder } from 'groqd';
 
-import { q, runQuery, type TSlugParams } from './query';
+import { q, runQuery, type TSlugQueryParams } from './query';
 
 const { mockFetch, getClientMock } = vi.hoisted(() => {
   const mockFetch = vi.fn();
@@ -24,7 +24,7 @@ describe(runQuery, () => {
     mockFetch.mockResolvedValue(null);
 
     const query = q
-      .parameters<TSlugParams>()
+      .parameters<TSlugQueryParams>()
       .star.filterByType('page_post')
       .filterBy('slug.current == $slug')
       .slice(0)
@@ -41,7 +41,7 @@ describe(runQuery, () => {
 
 describe('runQuery injected locale parameters', () => {
   const localizedQuery = q
-    .parameters<TSlugParams & { locale: TLocaleIsoCode }>()
+    .parameters<TSlugQueryParams & { locale: TLocaleIsoCode }>()
     .star.filterByType('page_landing')
     .filterBy('slug.current == $slug')
     .filterBy('language == $locale')

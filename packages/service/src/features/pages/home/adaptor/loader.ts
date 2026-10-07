@@ -5,7 +5,7 @@ import {
   type TTenantSanityContext,
 } from '@blog/service/sanity/query/query';
 import { getPageFaqs } from '@blog/service/shared/adaptors/faq-questions/page-faqs';
-import { buildLocaleParams } from '@blog/service/shared/localization/locale-params/locale-params';
+import { buildLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
 
 import { homePageQuery } from './query';
 import { toHomePage } from './transformer';
@@ -22,7 +22,7 @@ export async function getHomePage(
 
   return toHomePage(
     raw,
-    buildLocaleParams(tenant).defaultLocale,
+    buildLocaleQueryParams(tenant).defaultLocale,
     await getPageFaqs(raw.modules, tenant),
   );
 }
