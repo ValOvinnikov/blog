@@ -5,10 +5,10 @@ import { defineType } from 'sanity';
 
 export const layoutSchema = defineType({
   name: 'layout',
-  title: 'Section Layout',
+  title: 'Spacing, Dividers and Width',
   type: 'object',
   description:
-    'Shared spacing, divider, and width controls available on most modules.',
+    'Spacing, divider and width controls for single-column modules, from the narrow reading measure to full width.',
   icon: SlidersHorizontal,
   options: { collapsible: true, collapsed: true },
   fields: [

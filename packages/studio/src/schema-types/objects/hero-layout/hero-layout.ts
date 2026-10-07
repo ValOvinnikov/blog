@@ -4,17 +4,10 @@ import { isVariantDocument } from '@blog/studio/schema-types/fields/variant-fiel
 import { SlidersHorizontal } from 'lucide-react';
 import { defineType } from 'sanity';
 
-/**
- * Hero's trimmed Layout — no `containerWidth`, since Hero's grid always
- * manages its own width. Shares its fields with `layoutSchema` via
- * `spacingAndDividerFields()` but is a distinct registered type (Sanity
- * validation/fields are fixed per named type, so two modules needing
- * different field sets need two types — same reasoning as
- * `imageWithAlt`/`bodyImage`).
- */
+// Sanity fixes a named object type's fields at registration, so each layout field set is its own registered type.
 export const heroLayoutSchema = defineType({
   name: 'heroLayout',
-  title: 'Hero Layout',
+  title: 'Spacing and Dividers',
   type: 'object',
   description: 'Spacing and divider controls for a hero module.',
   icon: SlidersHorizontal,

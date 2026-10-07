@@ -310,11 +310,15 @@ and every other module keeps the two-value default — on `module_cta` this
 field means the card's own fill tone (Banner/Split/Callout below) rather
 than the full-bleed band tone every other module uses it for, which that
 module carries as a separate `bandTone` field), plus an optional, all-remaining-fields-optional `layout`
-object (`spacingTop`/`spacingBottom`, `containerWidth` (not on
-`module_hero`, which uses the leaner `heroLayout` type), `dividerTop`,
+object (`spacingTop`/`spacingBottom`, `containerWidth`, `dividerTop`,
 `dividerBottom` — stored values from `SPACING_SCALE`/`CONTAINER_WIDTH`
 consts; there is no `align` field on `layout` — alignment is its own
-module-level field, below).
+module-level field, below). Sanity fixes a named object type's fields at
+registration, so each field set is its own registered type, titled by what it
+offers: `layout` (every width, Narrow to Full) for single-column modules,
+`wideLayout` (Wide and Full) for card grids, `heroLayout` (no width — a hero's
+grid manages its own) for heroes, and `ctaLayout` (every width, with width and
+dividers hidden on a Banner) for `module_cta`.
 Every `module_*` except `module_content`, `module_hero` and `module_heroBlog`
 (`module_team` included), and every page document (home, landing, post,
 post index, topic, tag and the taxonomy index pages), additionally carries a
@@ -361,6 +365,13 @@ alignment control nothing read. Pages have no module-level field list, so
 `pageHeadingBlockField()` returns the `headingBlock` field together with a
 sibling `contentAlignment` (titled Heading Alignment, Left/Center only), and
 the page loaders return it as `headingAlignment`, defaulting to Left.
+
+**`contentAlignment` offers Left and Center unless a copy block sits against
+media.** `alignmentFields()` defaults the option list to `LEFT`/`CENTER`, so
+every grid, list, column and carousel module gets two values without asking.
+Only the heroes, `module_cta` and `module_testimonial` pass the full list and
+keep `RIGHT`. A right-aligned heading over a grid of cards has no rendering
+that reads as deliberate, which is why a new module starts on two values.
 
 **Page headings align the same way.** `pageHeadingBlockField()` returns the
 `headingBlock` field together with a document-level `contentAlignment`
@@ -1112,9 +1123,8 @@ arrangement either hides answers behind a swipe or breaks the reading order that
 makes an FAQ scannable. The questions sit in a column capped at `max-w-post`
 (47.5rem), positioned left or centred by `contentAlignment` along with the heading
 and actions, while the answer text inside each panel stays start-aligned whatever
-the module's alignment. This is the one module that restricts that field's option
-list: a right-aligned block of questions is not a design this module has, so
-`contentAlignment` offers two values here where every other module offers three.
+the module's alignment. Like every module that is not a hero, CTA or
+testimonial, `contentAlignment` offers Left and Center only.
 
 **The disclosure is `Accordion` in `@blog/ui`, built on Base UI, and it carries
 no `'use client'`.** Every Base UI part ships its own directive and the organism

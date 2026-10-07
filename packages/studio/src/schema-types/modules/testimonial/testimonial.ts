@@ -47,7 +47,10 @@ export const testimonialSchema = defineType({
       description:
         'Grid lays the cards out in rows. Carousel puts them in a single row the reader can swipe or step through. Ignored for a single quote.',
     }),
-    ...alignmentFields([], { hasActions: true }),
+    ...alignmentFields([], {
+      hasActions: true,
+      allow: Object.values(CONTENT_ALIGNMENT),
+    }),
     cardAlignmentField({
       initialValue: CONTENT_ALIGNMENT.LEFT,
       hasSpotlight: true,

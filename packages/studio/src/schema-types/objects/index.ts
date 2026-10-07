@@ -7,6 +7,7 @@ import {
   ctaButtonSchema,
   ctaSecondaryButtonSchema,
 } from './cta-button/cta-button';
+import { ctaLayoutSchema } from './cta-layout/cta-layout';
 import { featureHighlightSchema } from './feature-highlight/feature-highlight';
 import { heroLayoutSchema } from './hero-layout/hero-layout';
 import { imageWithAltSchema } from './image-with-alt/image-with-alt';
@@ -33,6 +34,7 @@ export const objects = [
   layoutSchema,
   heroLayoutSchema,
   wideLayoutSchema,
+  ctaLayoutSchema,
   pageHeadingBlockSchema,
   imageWithAltSchema,
   moduleHeadingBlockSchema,

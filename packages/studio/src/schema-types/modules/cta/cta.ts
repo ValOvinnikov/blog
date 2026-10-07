@@ -1,58 +1,31 @@
 import {
   BRAND_VARIANT,
+  CONTENT_ALIGNMENT,
   CTA_VARIANT,
   FULL_BRAND_VARIANT_LIST,
   MEDIA_ORDER,
 } from '@blog/config/constants';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
-import { containerWidthField } from '@blog/studio/schema-types/fields/container-width-field/container-width-field';
 import { contentPositionFields } from '@blog/studio/schema-types/fields/content-position-fields/content-position-fields';
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { localizedListedTextField } from '@blog/studio/schema-types/fields/localized-listed-text-field/localized-listed-text-field';
 import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
 import { mediaOrderField } from '@blog/studio/schema-types/fields/media-order-field/media-order-field';
-import { spacingAndDividerFields } from '@blog/studio/schema-types/fields/spacing-and-divider-fields/spacing-and-divider-fields';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { variantField } from '@blog/studio/schema-types/fields/variant-field/variant-field';
-import {
-  isNotVariant,
-  isVariantDocument,
-} from '@blog/studio/schema-types/fields/variant-field/variant-predicate';
+import { isNotVariant } from '@blog/studio/schema-types/fields/variant-field/variant-predicate';
+import { ctaLayoutField } from '@blog/studio/schema-types/objects/cta-layout/cta-layout-field';
 import { localizedImageWithAltSchema } from '@blog/studio/schema-types/objects/localized-image-with-alt/localized-image-with-alt';
 import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
 import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
 import { validateLocalizedMaxLength } from '@blog/studio/schema-types/validation/validate-localized-max-length/validate-localized-max-length';
-import { Megaphone, SlidersHorizontal } from 'lucide-react';
+import { Megaphone } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
 const FOOTNOTE_MAX_LENGTH = 120;
 
 type TCtaParent = { variant?: string; brandVariant?: string };
-
-const isBannerDocument = isVariantDocument(CTA_VARIANT.BANNER);
-
-const ctaLayoutField = () => {
-  const layoutSpacingAndDividerFields = spacingAndDividerFields({
-    spacingDescriptionSuffix: ' On a Banner, this sets the Banner’s height.',
-    dividerHidden: isBannerDocument,
-  });
-
-  return defineField({
-    name: 'layout',
-    title: 'Layout',
-    type: 'object',
-    description:
-      'Optional visual overrides — spacing, container width, dividers.',
-    icon: SlidersHorizontal,
-    options: { collapsible: true, collapsed: true },
-    fields: [
-      ...layoutSpacingAndDividerFields.slice(0, 2),
-      containerWidthField({ hidden: isBannerDocument }),
-      ...layoutSpacingAndDividerFields.slice(2),
-    ],
-  });
-};
 
 export const ctaSchema = defineType({
   name: 'module_cta',
@@ -140,7 +113,10 @@ export const ctaSchema = defineType({
           ),
         ),
     }),
-    ...alignmentFields([], { hasActions: true }),
+    ...alignmentFields([], {
+      hasActions: true,
+      allow: Object.values(CONTENT_ALIGNMENT),
+    }),
     ...contentPositionFields({
       splitValue: CTA_VARIANT.SPLIT,
       bannerValue: CTA_VARIANT.BANNER,
@@ -151,7 +127,7 @@ export const ctaSchema = defineType({
       initialValue: MEDIA_ORDER.LAST,
       hidden: isNotVariant(CTA_VARIANT.SPLIT),
     }),
-    ctaLayoutField(),
+    ctaLayoutField,
   ],
   preview: {
     select: {
