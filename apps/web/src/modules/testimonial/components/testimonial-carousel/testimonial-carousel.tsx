@@ -6,6 +6,7 @@ import type {
   TBrandVariant,
 } from '@blog/config';
 import type { TTestimonialItem } from '@blog/service';
+import type { ICarouselProps } from '@blog/ui/components/organisms/carousel';
 import { LabelledCarousel } from '@web/components/shared/labelled-carousel';
 import { TestimonialCard } from '@web/modules/testimonial/components/testimonial-card/testimonial-card';
 
@@ -15,6 +16,7 @@ export interface ITestimonialCarouselProps
   align: 'left' | 'center';
   title: string;
   tone: TBrandVariant;
+  contentAlignment?: ICarouselProps<TTestimonialItem>['contentAlignment'];
 }
 
 export const TestimonialCarousel = ({
@@ -22,6 +24,7 @@ export const TestimonialCarousel = ({
   align,
   title,
   tone,
+  contentAlignment,
   className,
   dataTestId,
 }: ITestimonialCarouselProps) => (
@@ -33,6 +36,7 @@ export const TestimonialCarousel = ({
     getItemKey={({ item }) => item.id}
     title={title}
     tone={tone}
+    contentAlignment={contentAlignment}
     className={className}
     slideSize="stepped"
     dataTestId={dataTestId}

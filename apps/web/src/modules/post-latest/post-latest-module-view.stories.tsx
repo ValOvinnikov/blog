@@ -35,7 +35,7 @@ const meta = {
     },
     contentAlignment: {
       control: 'select',
-      options: Object.values(CONTENT_ALIGNMENT),
+      options: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
     },
     displayMode: {
       control: 'select',
@@ -96,5 +96,13 @@ export const Carousel: TStory = {
   args: {
     displayMode: DISPLAY_MODE.CAROUSEL,
     items: carouselItems,
+  },
+};
+
+export const CarouselFitsCenter: TStory = {
+  args: {
+    displayMode: DISPLAY_MODE.CAROUSEL,
+    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    items: carouselItems.slice(0, 2),
   },
 };

@@ -35,7 +35,7 @@ const meta = {
     },
     contentAlignment: {
       control: 'select',
-      options: Object.values(CONTENT_ALIGNMENT),
+      options: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
     },
   },
   args: {

@@ -52,6 +52,7 @@ export const PostLatestModuleView = ({
           hasImages={hasImages}
           title={heading}
           tone={brandVariant}
+          contentAlignment={contentAlignment}
         />
       ) : (
         <CardGrid>

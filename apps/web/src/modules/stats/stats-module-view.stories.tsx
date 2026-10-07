@@ -42,7 +42,7 @@ const meta = {
     },
     contentAlignment: {
       control: 'select',
-      options: Object.values(CONTENT_ALIGNMENT),
+      options: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
     },
   },
   args: {
@@ -137,17 +137,6 @@ export const BrandPrimary: TStory = {
   },
 };
 
-export const SevenFiguresLoneLastCentred: TStory = {
-  args: {
-    stats: [
-      ...stats,
-      makeStatItem({ id: 'stat-5', value: '3×', label: 'Faster indexing' }),
-      makeStatItem({ id: 'stat-6', value: 'Top 10', label: 'Industry rank' }),
-      makeStatItem({ id: 'stat-7', value: '99.9%', label: 'Uptime' }),
-    ],
-  },
-};
-
 export const PhoneOneFigurePerRow: TStory = {
   globals: { viewport: 'mobile' },
   args: { stats },
@@ -155,5 +144,5 @@ export const PhoneOneFigurePerRow: TStory = {
 
 export const TabletTwoFiguresPerRow: TStory = {
   globals: { viewport: 'tablet' },
-  args: SevenFiguresLoneLastCentred.args,
+  args: FiveFigures.args,
 };
