@@ -61,7 +61,6 @@ export interface ILandingModuleRendererProps {
   modules: TModule<TPageLandingType>[];
   landingPage: { id: string; path: string };
   sectionNavigation?: TLandingSectionNavigation;
-  breadcrumbs?: ReactNode;
 }
 
 export const LandingModuleRenderer = async ({
@@ -70,7 +69,6 @@ export const LandingModuleRenderer = async ({
   modules,
   landingPage,
   sectionNavigation,
-  breadcrumbs,
 }: ILandingModuleRendererProps): Promise<ReactNode> => {
   const heroNode = hero
     ? await renderHeroModule({ hero, map: LANDING_MAP })
@@ -79,7 +77,6 @@ export const LandingModuleRenderer = async ({
   return (
     <LandingPageLayout
       topBlock={heroNode ?? <PageHeading headingBlock={headingBlock} />}
-      breadcrumbs={breadcrumbs}
       sectionNavigation={sectionNavigation}
     >
       {renderModules({ modules, map: LANDING_MAP, context: { landingPage } })}
