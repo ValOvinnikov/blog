@@ -1,5 +1,5 @@
 import type {
-  TBrandVariantOf,
+  TBrandVariant,
   TContentAlignment,
   TLayout,
   TMaybeUndefined,
@@ -7,7 +7,7 @@ import type {
 } from '@blog/config';
 
 export type TPostRelatedModuleDocument = {
-  brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
+  brandVariant: TBrandVariant;
   headingBlock: THeadingBlock;
   limit: number;
   layout: TMaybeUndefined<TLayout>;

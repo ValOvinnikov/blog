@@ -1,5 +1,5 @@
 import type {
-  TBrandVariantOf,
+  TBrandVariant,
   TContentAlignment,
   THeadingBlock,
   TLayout,
@@ -28,7 +28,7 @@ export type TPricingTier = {
 };
 
 export type TPricingModule = {
-  brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
+  brandVariant: TBrandVariant;
   headingBlock: THeadingBlock;
   tiers: TPricingTier[];
   footnote: TMaybeUndefined<string>;

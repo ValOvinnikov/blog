@@ -1,8 +1,8 @@
-import type { TBrandVariantOf, TLayout, TMaybeUndefined } from '@blog/config';
+import type { TBrandVariant, TLayout, TMaybeUndefined } from '@blog/config';
 import type { TPortableTextBody } from '@blog/service/shared/transformers/portable-text/to-portable-text-body';
 
 export type TContentModule = {
-  brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
+  brandVariant: TBrandVariant;
   body: TPortableTextBody;
   layout: TMaybeUndefined<TLayout>;
 };

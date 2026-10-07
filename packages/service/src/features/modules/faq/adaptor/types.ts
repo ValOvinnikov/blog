@@ -1,5 +1,5 @@
 import type {
-  TBrandVariantOf,
+  TBrandVariant,
   TContentAlignmentOf,
   THeadingBlock,
   TLayout,
@@ -15,7 +15,7 @@ export type TFaqQuestion = {
 };
 
 export type TFaqModule = {
-  brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
+  brandVariant: TBrandVariant;
   headingBlock: THeadingBlock;
   questions: TFaqQuestion[];
   ctaButtons: TCtaButton[];

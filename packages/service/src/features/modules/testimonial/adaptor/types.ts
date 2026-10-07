@@ -1,7 +1,7 @@
 import type {
   ILink,
   ISanityImage,
-  TBrandVariantOf,
+  TBrandVariant,
   TContentAlignment,
   TDisplayMode,
   THeadingBlock,
@@ -21,7 +21,7 @@ export type TTestimonialItem = {
 };
 
 export type TTestimonialModule = {
-  brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
+  brandVariant: TBrandVariant;
   headingBlock: THeadingBlock;
   testimonials: TTestimonialItem[];
   ctaButtons: TCtaButton[];

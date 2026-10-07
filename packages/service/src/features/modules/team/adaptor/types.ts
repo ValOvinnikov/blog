@@ -1,6 +1,6 @@
 import type {
   ISanityImage,
-  TBrandVariantOf,
+  TBrandVariant,
   TCardImageShape,
   TContentAlignment,
   TContentAlignmentOf,
@@ -24,7 +24,7 @@ export type TTeamMember = {
 };
 
 export type TTeamModule = {
-  brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
+  brandVariant: TBrandVariant;
   headingBlock: THeadingBlock;
   members: TTeamMember[];
   showBios: boolean;

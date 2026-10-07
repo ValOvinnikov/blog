@@ -1,5 +1,5 @@
 import type {
-  TBrandVariantOf,
+  TBrandVariant,
   TContentAlignment,
   TContentAlignmentOf,
   TLayout,
@@ -19,7 +19,7 @@ export type TTimelineItem = {
 };
 
 export type TTimelineModule = {
-  brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
+  brandVariant: TBrandVariant;
   headingBlock: THeadingBlock;
   markerStyle: TTimelineMarkerStyle;
   items: TTimelineItem[];

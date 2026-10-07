@@ -1,7 +1,7 @@
 import type {
   ILink,
   ISanityImage,
-  TBrandVariantOf,
+  TBrandVariant,
   TCardImageShape,
   TContentAlignment,
   TContentAlignmentOf,
@@ -22,7 +22,7 @@ export type TFeatureListItem = {
 };
 
 export type TFeatureListModule = {
-  brandVariant: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
+  brandVariant: TBrandVariant;
   headingBlock: THeadingBlock;
   items: TFeatureListItem[];
   ctaButtons: TCtaButton[];
