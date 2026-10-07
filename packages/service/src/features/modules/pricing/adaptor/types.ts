@@ -1,12 +1,12 @@
 import type {
   TBrandVariant,
-  TContentAlignment,
+  TContentAlignmentOf,
   THeadingBlock,
-  TLayout,
   TMaybeUndefined,
   TPricePeriod,
 } from '@blog/config';
 import type { TCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button';
+import type { TWideLayout } from '@blog/service/shared/transformers/layout/to-layout';
 
 export type TPricingPrice = {
   period: TPricePeriod;
@@ -33,6 +33,6 @@ export type TPricingModule = {
   tiers: TPricingTier[];
   footnote: TMaybeUndefined<string>;
   ctaButtons: TCtaButton[];
-  contentAlignment: TMaybeUndefined<TContentAlignment>;
-  layout: TMaybeUndefined<TLayout>;
+  contentAlignment: TMaybeUndefined<TContentAlignmentOf<'LEFT' | 'CENTER'>>;
+  layout: TMaybeUndefined<TWideLayout>;
 };

@@ -1,7 +1,8 @@
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
 import { ctaButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
 import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
-import { layoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
 
 export const pricingModuleQuery = q
@@ -52,7 +53,7 @@ export const pricingModuleQuery = q
       .field('ctaButtons[]')
       .project(ctaButtonFragment)
       .nullable(true),
-    contentAlignment: sub.field('contentAlignment').nullable(true),
-    layout: sub.field('layout').project(layoutFragment).nullable(true),
+    ...moduleContentAlignmentLeftCenterFragment,
+    ...moduleWideLayoutFragment,
   }))
   .notNull();

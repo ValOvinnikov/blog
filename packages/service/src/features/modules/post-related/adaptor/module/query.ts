@@ -5,7 +5,7 @@ import {
 } from '@blog/service/shared/expressions/module/show-images';
 import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
 import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
-import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
+import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 
 export const postRelatedModuleQuery = q
   .parameters<TModuleQueryParams>()
@@ -21,6 +21,6 @@ export const postRelatedModuleQuery = q
     showImages: sub.raw(SHOW_IMAGES_EXPRESSION, showImagesParser),
     limit: sub.field('limit').notNull(),
     ...moduleWideLayoutFragment,
-    ...moduleContentAlignmentFragment,
+    ...moduleContentAlignmentLeftCenterFragment,
   }))
   .notNull();

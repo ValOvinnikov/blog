@@ -26,16 +26,14 @@ describe('toTestimonialModule', () => {
     expect(module.displayMode).toBe(DISPLAY_MODE.CAROUSEL);
   });
 
-  it('leaves cardAlignment, contentAlignment and layout undefined when unset (no faked default)', () => {
+  it('leaves contentAlignment and layout undefined when unset (no faked default)', () => {
     const raw = makeRawTestimonialModule({
-      cardAlignment: null,
       contentAlignment: null,
       layout: null,
     });
 
     const module = toTestimonialModule(raw);
 
-    expect(module.cardAlignment).toBeUndefined();
     expect(module.contentAlignment).toBeUndefined();
     expect(module.layout).toBeUndefined();
   });

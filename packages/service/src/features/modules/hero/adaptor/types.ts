@@ -2,10 +2,10 @@ import type {
   ILink,
   ISanityImage,
   TBrandVariant,
-  TLayout,
   TMaybeUndefined,
 } from '@blog/config';
 import type { THeroPrimaryAction } from '@blog/service/shared/transformers/hero/to-hero-primary-action';
+import type { THeroLayout } from '@blog/service/shared/transformers/layout/to-layout';
 
 export type THeroModule = {
   brandVariant: TBrandVariant;
@@ -15,5 +15,5 @@ export type THeroModule = {
   sanityImage: TMaybeUndefined<ISanityImage>;
   primaryAction: TMaybeUndefined<THeroPrimaryAction>;
   secondaryAction: TMaybeUndefined<ILink>;
-  layout: TMaybeUndefined<TLayout>;
+  layout: TMaybeUndefined<THeroLayout>;
 };

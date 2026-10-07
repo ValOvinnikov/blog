@@ -1,11 +1,11 @@
 import type {
   TBrandVariant,
-  TContentAlignment,
-  TLayout,
+  TContentAlignmentOf,
   TMaybeUndefined,
   THeadingBlock,
   TTaxonomyKind,
 } from '@blog/config';
+import type { TWideLayout } from '@blog/service/shared/transformers/layout/to-layout';
 
 export type TPostLink = {
   id: string;
@@ -25,8 +25,8 @@ export type TTaxonomyEntry = {
 export type TTaxonomyListModule = {
   brandVariant: TBrandVariant;
   headingBlock: THeadingBlock;
-  layout: TMaybeUndefined<TLayout>;
-  contentAlignment: TMaybeUndefined<TContentAlignment>;
+  layout: TMaybeUndefined<TWideLayout>;
+  contentAlignment: TMaybeUndefined<TContentAlignmentOf<'LEFT' | 'CENTER'>>;
   taxonomy: TMaybeUndefined<TTaxonomyKind>;
   showLatestPosts: boolean;
   entries: TTaxonomyEntry[];

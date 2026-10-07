@@ -5,11 +5,11 @@ import type {
   TContentAlignment,
   TDisplayMode,
   THeadingBlock,
-  TLayout,
   TMaybeUndefined,
   TPortableTextBlock,
 } from '@blog/config';
 import type { TCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button';
+import type { TWideLayout } from '@blog/service/shared/transformers/layout/to-layout';
 
 export type TTestimonialItem = {
   id: string;
@@ -26,7 +26,7 @@ export type TTestimonialModule = {
   testimonials: TTestimonialItem[];
   ctaButtons: TCtaButton[];
   displayMode: TDisplayMode;
-  cardAlignment: TMaybeUndefined<Extract<TContentAlignment, 'LEFT' | 'CENTER'>>;
+  cardAlignment: Extract<TContentAlignment, 'LEFT' | 'CENTER'>;
   contentAlignment: TMaybeUndefined<TContentAlignment>;
-  layout: TMaybeUndefined<TLayout>;
+  layout: TMaybeUndefined<TWideLayout>;
 };

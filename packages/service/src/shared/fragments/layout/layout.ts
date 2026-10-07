@@ -1,4 +1,4 @@
-import type { HeroLayout, Layout, WideLayout } from '@blog/config';
+import type { CtaLayout, HeroLayout, Layout, WideLayout } from '@blog/config';
 import { q } from '@blog/service/sanity/query/query';
 
 export const layoutFragment = q.fragmentForType<'layout'>().project((sub) => ({
@@ -28,6 +28,16 @@ export const heroLayoutFragment = q
     dividerBottom: sub.field('dividerBottom').nullable(true),
   }));
 
+export const ctaLayoutFragment = q
+  .fragmentForType<'ctaLayout'>()
+  .project((sub) => ({
+    spacingTop: sub.field('spacingTop').nullable(true),
+    spacingBottom: sub.field('spacingBottom').nullable(true),
+    containerWidth: sub.field('containerWidth').nullable(true),
+    dividerTop: sub.field('dividerTop').nullable(true),
+    dividerBottom: sub.field('dividerBottom').nullable(true),
+  }));
+
 export const moduleLayoutFragment = q
   .fragment<{ layout?: Layout }>()
   .project((sub) => ({
@@ -44,4 +54,10 @@ export const moduleHeroLayoutFragment = q
   .fragment<{ layout?: HeroLayout }>()
   .project((sub) => ({
     layout: sub.field('layout').project(heroLayoutFragment).nullable(true),
+  }));
+
+export const moduleCtaLayoutFragment = q
+  .fragment<{ layout?: CtaLayout }>()
+  .project((sub) => ({
+    layout: sub.field('layout').project(ctaLayoutFragment).nullable(true),
   }));

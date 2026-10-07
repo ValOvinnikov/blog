@@ -1,3 +1,4 @@
+import { CONTENT_ALIGNMENT } from '@blog/config';
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
 import {
   DISPLAY_MODE_EXPRESSION,
@@ -11,6 +12,13 @@ import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-d
 import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
 import { getLocalizedPortableTextBlock } from '@blog/service/shared/localization/get-localized-portable-text-block/get-localized-portable-text-block';
+import { z } from 'zod';
+
+const CARD_ALIGNMENT_EXPRESSION = `coalesce(cardAlignment, "${CONTENT_ALIGNMENT.LEFT}")`;
+const cardAlignmentParser = z.enum([
+  CONTENT_ALIGNMENT.LEFT,
+  CONTENT_ALIGNMENT.CENTER,
+]);
 
 export const testimonialModuleQuery = q
   .parameters<TModuleQueryParams>()
@@ -44,7 +52,7 @@ export const testimonialModuleQuery = q
       .notNull(),
     ...ctaButtonsFragment,
     displayMode: sub.raw(DISPLAY_MODE_EXPRESSION, displayModeParser),
-    cardAlignment: sub.field('cardAlignment').nullable(true),
+    cardAlignment: sub.raw(CARD_ALIGNMENT_EXPRESSION, cardAlignmentParser),
     ...moduleContentAlignmentFragment,
     ...moduleWideLayoutFragment,
   }))

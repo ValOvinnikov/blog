@@ -577,7 +577,7 @@ export function makeRawTestimonialModule(
     ],
     ctaButtons: null,
     displayMode: DISPLAY_MODE.GRID,
-    cardAlignment: null,
+    cardAlignment: CONTENT_ALIGNMENT.LEFT,
     contentAlignment: null,
     layout: null,
     ...overrides,

@@ -7,11 +7,11 @@ import type {
   TContentAlignmentOf,
   TDisplayMode,
   TFeatureIconName,
-  TLayout,
   TMaybeUndefined,
   THeadingBlock,
 } from '@blog/config';
 import type { TCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button';
+import type { TWideLayout } from '@blog/service/shared/transformers/layout/to-layout';
 
 export type TFeatureListItem = {
   id: string;
@@ -30,5 +30,5 @@ export type TFeatureListModule = {
   displayMode: TDisplayMode;
   contentAlignment: TMaybeUndefined<TContentAlignmentOf<'LEFT' | 'CENTER'>>;
   cardAlignment: Extract<TContentAlignment, 'LEFT' | 'CENTER'>;
-  layout: TMaybeUndefined<TLayout>;
+  layout: TMaybeUndefined<TWideLayout>;
 };

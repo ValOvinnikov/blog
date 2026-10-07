@@ -1,6 +1,6 @@
 import type {
   TBrandVariant,
-  TContentAlignment,
+  TContentAlignmentOf,
   THeadingBlock,
   TLayout,
   TMaybeUndefined,
@@ -13,5 +13,5 @@ export type TNewsletterModule = {
   variant: TNewsletterVariant;
   trustCues: TMaybeUndefined<string[]>;
   layout: TMaybeUndefined<TLayout>;
-  contentAlignment: TMaybeUndefined<TContentAlignment>;
+  contentAlignment: TMaybeUndefined<TContentAlignmentOf<'LEFT' | 'CENTER'>>;
 };

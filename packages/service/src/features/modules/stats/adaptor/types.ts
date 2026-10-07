@@ -1,11 +1,11 @@
 import type {
   TBrandVariant,
-  TContentAlignment,
-  TLayout,
+  TContentAlignmentOf,
   TMaybeUndefined,
   THeadingBlock,
 } from '@blog/config';
 import type { TCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button';
+import type { TWideLayout } from '@blog/service/shared/transformers/layout/to-layout';
 
 export type TStatItem = {
   id: string;
@@ -20,6 +20,6 @@ export type TStatsModule = {
   stats: TStatItem[];
   footnote: TMaybeUndefined<string>;
   ctaButtons: TCtaButton[];
-  contentAlignment: TMaybeUndefined<TContentAlignment>;
-  layout: TMaybeUndefined<TLayout>;
+  contentAlignment: TMaybeUndefined<TContentAlignmentOf<'LEFT' | 'CENTER'>>;
+  layout: TMaybeUndefined<TWideLayout>;
 };

@@ -1,14 +1,14 @@
 import type {
   TBrandVariant,
-  TContentAlignment,
+  TContentAlignmentOf,
   THeadingBlock,
-  TLayout,
   TMaybeUndefined,
 } from '@blog/config';
+import type { TWideLayout } from '@blog/service/shared/transformers/layout/to-layout';
 
 export type TSectionPagesModuleDocument = {
   brandVariant: TBrandVariant;
   headingBlock: TMaybeUndefined<THeadingBlock>;
-  contentAlignment: TMaybeUndefined<TContentAlignment>;
-  layout: TMaybeUndefined<TLayout>;
+  contentAlignment: TMaybeUndefined<TContentAlignmentOf<'LEFT' | 'CENTER'>>;
+  layout: TMaybeUndefined<TWideLayout>;
 };
