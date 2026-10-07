@@ -13,6 +13,10 @@ vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
 const tenant = makeTenant();
 
 describe(getReferencingModuleIds, () => {
+  beforeEach(() => {
+    mockRun.mockResolvedValue([]);
+  });
+
   it('returns every module id the lookup resolves', async () => {
     mockRun.mockResolvedValueOnce(['link-a']);
     mockRun.mockResolvedValueOnce(['module-a', 'module-b']);
@@ -23,9 +27,6 @@ describe(getReferencingModuleIds, () => {
   });
 
   it('returns an empty list when nothing references the document', async () => {
-    mockRun.mockResolvedValueOnce([]);
-    mockRun.mockResolvedValueOnce([]);
-
     const result = await getReferencingModuleIds('page_post-1', tenant);
 
     expect(result).toEqual([]);
@@ -33,7 +34,6 @@ describe(getReferencingModuleIds, () => {
 
   it('looks up the links first, then passes their ids to the module lookup', async () => {
     mockRun.mockResolvedValueOnce(['link-a', 'link-b']);
-    mockRun.mockResolvedValueOnce([]);
 
     await getReferencingModuleIds('page_post-1', tenant);
 
@@ -46,9 +46,6 @@ describe(getReferencingModuleIds, () => {
   });
 
   it('threads the tenant context into both lookups', async () => {
-    mockRun.mockResolvedValueOnce([]);
-    mockRun.mockResolvedValueOnce([]);
-
     await getReferencingModuleIds('page_post-1', tenant);
 
     expect(mockRun.mock.calls.map(([, options]) => options.tenant)).toEqual([
@@ -58,9 +55,6 @@ describe(getReferencingModuleIds, () => {
   });
 
   it('never caches either lookup, so a purge decision cannot outlive the change that triggered it', async () => {
-    mockRun.mockResolvedValueOnce([]);
-    mockRun.mockResolvedValueOnce([]);
-
     await getReferencingModuleIds('page_post-1', tenant);
 
     expect(mockRun.mock.calls.map(([, options]) => options.next)).toEqual([

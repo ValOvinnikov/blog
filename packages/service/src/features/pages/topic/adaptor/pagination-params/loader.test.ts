@@ -15,6 +15,10 @@ const { EN, NL } = LOCALE_ISO_CODES;
 const tenant = makeTenant();
 
 describe('getTopicPaginatedPages', () => {
+  beforeEach(() => {
+    mockRun.mockResolvedValue([]);
+  });
+
   it('returns the paginated pages as queried', async () => {
     const pages = [
       {
@@ -30,8 +34,6 @@ describe('getTopicPaginatedPages', () => {
   });
 
   it('passes the locales as a query parameter', async () => {
-    mockRun.mockResolvedValueOnce([]);
-
     await getTopicPaginatedPages(tenant, [EN, NL]);
 
     expect(mockRun).toHaveBeenCalledWith(
@@ -41,8 +43,6 @@ describe('getTopicPaginatedPages', () => {
   });
 
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
-    mockRun.mockResolvedValueOnce([]);
-
     await getTopicPaginatedPages(tenant, [EN, NL]);
 
     expect(mockRun).toHaveBeenCalledWith(

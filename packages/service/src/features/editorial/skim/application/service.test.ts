@@ -13,9 +13,11 @@ const tenant = makeTenant();
 
 describe('createSkimService', () => {
   describe('v1.getPublishedPostBody', () => {
-    it('resolves ok:true with the loader data on success', async () => {
+    beforeEach(() => {
       mockGetPublishedPostBody.mockResolvedValue([]);
+    });
 
+    it('resolves ok:true with the loader data on success', async () => {
       const result = await createSkimService().v1.getPublishedPostBody(
         'post-1',
         tenant,
@@ -37,8 +39,6 @@ describe('createSkimService', () => {
     });
 
     it('passes tenant context through to the loader', async () => {
-      mockGetPublishedPostBody.mockResolvedValue([]);
-
       await createSkimService().v1.getPublishedPostBody('post-1', tenant);
 
       expect(mockGetPublishedPostBody).toHaveBeenCalledWith('post-1', tenant);
@@ -46,9 +46,11 @@ describe('createSkimService', () => {
   });
 
   describe('v1.saveSkimDraft', () => {
-    it('resolves ok:true after a successful patch', async () => {
+    beforeEach(() => {
       mockSaveSkimDraft.mockResolvedValue(undefined);
+    });
 
+    it('resolves ok:true after a successful patch', async () => {
       const result = await createSkimService().v1.saveSkimDraft(
         {
           postId: 'post-1',
@@ -78,7 +80,6 @@ describe('createSkimService', () => {
     });
 
     it('passes tenant context through to the loader', async () => {
-      mockSaveSkimDraft.mockResolvedValue(undefined);
       const input = {
         postId: 'post-1',
         takeaways: ['a', 'b', 'c'],

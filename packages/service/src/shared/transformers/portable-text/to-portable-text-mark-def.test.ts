@@ -46,14 +46,6 @@ describe(toPortableText, () => {
     expect(result.markDefs?.[0]?._key).toBe('mark-42');
   });
 
-  it('leaves markDefs undefined when the block has none', () => {
-    const block = { _type: 'block' as const, _key: 'block-1', markDefs: null };
-
-    const result = toPortableText(block);
-
-    expect(result.markDefs).toBeUndefined();
-  });
-
   it('spreads every other block field unchanged', () => {
     const block = {
       _type: 'block' as const,
@@ -71,14 +63,6 @@ describe(toPortableText, () => {
     });
   });
 
-  it('normalises missing children to an empty array', () => {
-    const block = { _type: 'block' as const, _key: 'block-1', markDefs: null };
-
-    const result = toPortableText(block);
-
-    expect(result.children).toEqual([]);
-  });
-
   it('normalises a span with no text to an empty string', () => {
     const block = {
       _type: 'block' as const,
@@ -93,6 +77,26 @@ describe(toPortableText, () => {
       _type: 'span',
       _key: 'span-1',
       text: '',
+    });
+  });
+
+  describe('with a block that has no markDefs or children', () => {
+    let block: { _type: 'block'; _key: string; markDefs: null };
+
+    beforeEach(() => {
+      block = { _type: 'block', _key: 'block-1', markDefs: null };
+    });
+
+    it('leaves markDefs undefined when the block has none', () => {
+      const result = toPortableText(block);
+
+      expect(result.markDefs).toBeUndefined();
+    });
+
+    it('normalises missing children to an empty array', () => {
+      const result = toPortableText(block);
+
+      expect(result.children).toEqual([]);
     });
   });
 });

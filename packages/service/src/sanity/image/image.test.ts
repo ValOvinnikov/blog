@@ -66,6 +66,7 @@ describe(urlForImage, () => {
 
 describe(urlForSanityImage, () => {
   const project = { projectId: 'tenant-a', dataset: 'production' };
+  const crop = { top: 0.1, bottom: 0.1, left: 0.1, right: 0.1 };
 
   it('produces the same URL as urlForImage for the same asset', () => {
     expect(urlForSanityImage(sanityImage, project)).toBe(
@@ -83,7 +84,6 @@ describe(urlForSanityImage, () => {
 
   it('carries crop and hotspot through to the URL, matching urlForImage given the same source', () => {
     const hotspot = { x: 0.5, y: 0.5, height: 0.8, width: 0.8 };
-    const crop = { top: 0.1, bottom: 0.1, left: 0.1, right: 0.1 };
     const options = { width: 400, height: 300 };
 
     const fromSanityImage = urlForSanityImage(
@@ -102,8 +102,6 @@ describe(urlForSanityImage, () => {
   });
 
   it('still emits a rect for a crop with no transform options', () => {
-    const crop = { top: 0.1, bottom: 0.1, left: 0.1, right: 0.1 };
-
     const fromSanityImage = urlForSanityImage(
       { ...sanityImage, crop },
       project,
@@ -149,6 +147,21 @@ describe(urlForSanityImage, () => {
 });
 
 describe('project image builder cache', () => {
+  let createImageUrlBuilderMock: ReturnType<
+    typeof vi.fn<() => ReturnType<typeof makeFakeBuilder>>
+  >;
+  let freshUrlForImage: typeof urlForImage;
+
+  beforeEach(async () => {
+    vi.resetModules();
+    createImageUrlBuilderMock = vi.fn(() => makeFakeBuilder());
+    vi.doMock('@sanity/image-url', () => ({
+      createImageUrlBuilder: createImageUrlBuilderMock,
+    }));
+
+    ({ urlForImage: freshUrlForImage } = await import('./image'));
+  });
+
   afterEach(() => {
     vi.doUnmock('@sanity/image-url');
     vi.resetModules();
@@ -163,14 +176,7 @@ describe('project image builder cache', () => {
     return builder;
   }
 
-  it('reuses the cached builder for a repeated project instead of recreating it', async () => {
-    vi.resetModules();
-    const createImageUrlBuilderMock = vi.fn(() => makeFakeBuilder());
-    vi.doMock('@sanity/image-url', () => ({
-      createImageUrlBuilder: createImageUrlBuilderMock,
-    }));
-
-    const { urlForImage: freshUrlForImage } = await import('./image');
+  it('reuses the cached builder for a repeated project instead of recreating it', () => {
     const project = { projectId: 'tenant-a', dataset: 'production' };
 
     freshUrlForImage(image, project);
@@ -179,15 +185,7 @@ describe('project image builder cache', () => {
     expect(createImageUrlBuilderMock).toHaveBeenCalledTimes(1);
   });
 
-  it('creates a distinct builder per project', async () => {
-    vi.resetModules();
-    const createImageUrlBuilderMock = vi.fn(() => makeFakeBuilder());
-    vi.doMock('@sanity/image-url', () => ({
-      createImageUrlBuilder: createImageUrlBuilderMock,
-    }));
-
-    const { urlForImage: freshUrlForImage } = await import('./image');
-
+  it('creates a distinct builder per project', () => {
     freshUrlForImage(image, { projectId: 'tenant-a', dataset: 'production' });
     freshUrlForImage(image, { projectId: 'tenant-b', dataset: 'production' });
 

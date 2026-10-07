@@ -18,6 +18,10 @@ vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
 const tenant = makeTenant();
 
 describe('getTagPageDocument', () => {
+  beforeEach(() => {
+    mockRun.mockResolvedValue(makeRawTagPage());
+  });
+
   it('loads a tag page with no list module in modules[]', async () => {
     mockRun.mockResolvedValueOnce(makeRawTagPage({ modules: [] }));
 
@@ -132,8 +136,6 @@ describe('getTagPageDocument', () => {
   });
 
   it('passes the slug as a query parameter', async () => {
-    mockRun.mockResolvedValueOnce(makeRawTagPage());
-
     await getTagPageDocument('typescript', tenant);
 
     expect(mockRun).toHaveBeenNthCalledWith(
@@ -152,8 +154,6 @@ describe('getTagPageDocument', () => {
   });
 
   it('threads tenant context into the query and scopes its tags to it', async () => {
-    mockRun.mockResolvedValueOnce(makeRawTagPage());
-
     await getTagPageDocument('typescript', tenant);
 
     expect(mockRun).toHaveBeenCalledWith(

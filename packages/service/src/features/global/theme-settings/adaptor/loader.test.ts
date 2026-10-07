@@ -16,9 +16,6 @@ vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
   runQuery: vi.fn(),
 }));
 
-// The guard itself is covered by @blog/config's own accent-hue-guard.test.ts;
-// mocked here so one test below can force the AA-fallback branch without
-// depending on which hues happen to pass or fail the real contrast math.
 vi.mock('@blog/config', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@blog/config')>()),
   isAccentHueAccessible: vi.fn(),
@@ -26,6 +23,7 @@ vi.mock('@blog/config', async (importOriginal) => ({
 
 const mockedIsAccentHueAccessible = vi.mocked(isAccentHueAccessible);
 const tenant = makeTenant();
+const editorial = PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens;
 
 beforeEach(async () => {
   const actual =
@@ -53,7 +51,6 @@ describe('getTheme', () => {
 
     const result = await getTheme(tenant);
 
-    const editorial = PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens;
     expect(result).toEqual({ ...editorial, logoHue: editorial.accentHue });
   });
 
@@ -64,7 +61,6 @@ describe('getTheme', () => {
 
     const result = await getTheme(tenant);
 
-    const editorial = PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens;
     expect(result).toEqual({
       ...editorial,
       accentHue: 200,
@@ -95,7 +91,6 @@ describe('getTheme', () => {
 
     const result = await getTheme(tenant);
 
-    const editorial = PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens;
     expect(result.accentHue).toBe(editorial.accentHue);
     expect(result.logoHue).toBe(editorial.accentHue);
   });

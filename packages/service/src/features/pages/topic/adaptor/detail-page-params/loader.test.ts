@@ -17,6 +17,10 @@ const { EN, NL, FR } = LOCALE_ISO_CODES;
 const tenant = makeTenant();
 
 describe('getTopicParams', () => {
+  beforeEach(() => {
+    mockRun.mockResolvedValue([]);
+  });
+
   it('returns the slug and language entries', async () => {
     mockRun.mockResolvedValue([
       { slug: 'engineering', language: EN },
@@ -32,16 +36,12 @@ describe('getTopicParams', () => {
   });
 
   it('returns an empty array when there are no topic pages', async () => {
-    mockRun.mockResolvedValue([]);
-
     const params = await getTopicParams(tenant, [EN]);
 
     expect(params).toEqual([]);
   });
 
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
-    mockRun.mockResolvedValue([]);
-
     await getTopicParams(tenant, [EN]);
 
     expect(mockRun).toHaveBeenCalledWith(
@@ -54,8 +54,6 @@ describe('getTopicParams', () => {
   });
 
   it('passes the live languages to the query', async () => {
-    mockRun.mockResolvedValue([]);
-
     await getTopicParams(tenant, [EN, NL]);
 
     expect(mockRun).toHaveBeenCalledWith(

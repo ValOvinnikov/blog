@@ -15,6 +15,10 @@ vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
 const tenant = makeTenant();
 
 describe(getFaqModule, () => {
+  beforeEach(() => {
+    mockRun.mockResolvedValue(makeRawFaqModule());
+  });
+
   it('resolves the module in a single round trip — exactly one runQuery call', async () => {
     mockRun.mockResolvedValueOnce(
       makeRawFaqModule({
@@ -29,8 +33,6 @@ describe(getFaqModule, () => {
   });
 
   it('returns the referenced questions in authored order', async () => {
-    mockRun.mockResolvedValueOnce(makeRawFaqModule());
-
     const faq = await getFaqModule('faq-1', tenant);
 
     expect(faq.questions.map((question) => question.id)).toEqual([
@@ -47,8 +49,6 @@ describe(getFaqModule, () => {
   });
 
   it('threads tenant context and scopes cache tags to it', async () => {
-    mockRun.mockResolvedValueOnce(makeRawFaqModule());
-
     await getFaqModule('faq-1', tenant);
 
     expect(mockRun).toHaveBeenCalledTimes(1);

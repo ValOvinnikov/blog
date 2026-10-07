@@ -15,6 +15,10 @@ vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
 const tenant = makeTenant();
 
 describe('getFooter', () => {
+  beforeEach(() => {
+    mockRun.mockResolvedValue(makeRawFooter());
+  });
+
   it('throws when the footer document does not exist', async () => {
     mockRun.mockResolvedValue(null);
 
@@ -61,8 +65,6 @@ describe('getFooter', () => {
   });
 
   it('leaves the language switcher toggle undefined when unset', async () => {
-    mockRun.mockResolvedValue(makeRawFooter());
-
     const result = await getFooter(tenant);
 
     expect(result.showLanguageSwitcher).toBeUndefined();
@@ -77,8 +79,6 @@ describe('getFooter', () => {
   });
 
   it('shows the RSS feed when the switch was never set', async () => {
-    mockRun.mockResolvedValue(makeRawFooter());
-
     const result = await getFooter(tenant);
 
     expect(result.showRssFeed).toBe(true);
@@ -93,8 +93,6 @@ describe('getFooter', () => {
   });
 
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
-    mockRun.mockResolvedValue(makeRawFooter());
-
     await getFooter(tenant);
 
     expect(mockRun).toHaveBeenCalledWith(

@@ -15,6 +15,10 @@ vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
 const tenant = makeTenant();
 
 describe(getHeroStatement, () => {
+  beforeEach(() => {
+    mockRun.mockResolvedValue(makeRawHeroStatementModule());
+  });
+
   it('resolves the hero in a single round trip — exactly one runQuery call', async () => {
     mockRun.mockResolvedValueOnce(
       makeRawHeroStatementModule({
@@ -36,8 +40,6 @@ describe(getHeroStatement, () => {
   });
 
   it('threads tenant context and scopes cache tags to it', async () => {
-    mockRun.mockResolvedValueOnce(makeRawHeroStatementModule());
-
     await getHeroStatement('hero-statement-1', tenant);
 
     expect(mockRun).toHaveBeenCalledTimes(1);
@@ -58,8 +60,6 @@ describe(getHeroStatement, () => {
   });
 
   it('carries no page-type tag, since the webhook purges this module by id when a link target changes', async () => {
-    mockRun.mockResolvedValueOnce(makeRawHeroStatementModule());
-
     await getHeroStatement('hero-statement-1', tenant);
 
     expect(mockRun).toHaveBeenCalledWith(

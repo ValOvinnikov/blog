@@ -26,6 +26,18 @@ function taglineItems(...texts: (string | null)[]) {
 }
 
 describe('getSiteSettings', () => {
+  beforeEach(() => {
+    mockRun.mockResolvedValue(
+      makeRawSiteSettings({
+        brand: {
+          name: 'Awesome Blog',
+          tagline: null,
+          logo: makeRawSanityImage('Logo'),
+        },
+      }),
+    );
+  });
+
   it('throws when site settings document does not exist', async () => {
     mockRun.mockResolvedValue(null);
 
@@ -55,16 +67,6 @@ describe('getSiteSettings', () => {
   });
 
   it('maps a missing tagline to undefined', async () => {
-    mockRun.mockResolvedValue(
-      makeRawSiteSettings({
-        brand: {
-          name: 'Awesome Blog',
-          tagline: null,
-          logo: makeRawSanityImage('Logo'),
-        },
-      }),
-    );
-
     const result = await getSiteSettings(tenant);
 
     expect(result.brand.tagline).toBeUndefined();
@@ -206,16 +208,6 @@ describe('getSiteSettings', () => {
   });
 
   it('maps an uploaded logo to an image view-model', async () => {
-    mockRun.mockResolvedValue(
-      makeRawSiteSettings({
-        brand: {
-          name: 'Awesome Blog',
-          tagline: null,
-          logo: makeRawSanityImage('Logo'),
-        },
-      }),
-    );
-
     const result = await getSiteSettings(tenant);
 
     expect(result.brand.logo).toEqual(

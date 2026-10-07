@@ -14,17 +14,17 @@ vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
 const tenant = makeTenant();
 
 describe(getChildPagesModuleDocument, () => {
-  it('resolves the module document fields', async () => {
-    mockRun.mockResolvedValueOnce(makeRawChildPagesModule());
+  beforeEach(() => {
+    mockRun.mockResolvedValue(makeRawChildPagesModule());
+  });
 
+  it('resolves the module document fields', async () => {
     const module = await getChildPagesModuleDocument('child-pages-1', tenant);
 
     expect(module.headingBlock?.heading).toBe('In this section');
   });
 
   it('scopes the module cache tags to the tenant', async () => {
-    mockRun.mockResolvedValueOnce(makeRawChildPagesModule());
-
     await getChildPagesModuleDocument('child-pages-1', tenant);
 
     expect(mockRun).toHaveBeenCalledWith(
