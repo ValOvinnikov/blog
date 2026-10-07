@@ -1328,13 +1328,13 @@ and density values live in `@blog/config`'s theme declaration tables;
 `apps/platform`'s Look preview reads them to set the same tokens inline on
 its preview surface, which also carries the `dark` class so the tenant's
 dark ramp wins over `theme.css`'s static `.dark` values. `apps/web`'s
-`buildThemeStyleBlock` still declares its own copy of the same values. The
+`buildThemeStyleBlock` reads the same tables. The
 Look form and `updateLookAction` both refuse an accent hue
 `isAccentHueAccessible` rejects, so a saved hue is never one the site
 silently replaces. It also selects the matching `next/font/local`
-pair (`headingFont`/`bodyFont`) via a per-font dynamically imported loader
-module so only the two fonts actually resolved for that render are
-bundled/preloaded. Fonts are self-hosted in both apps: Latin-subset variable
+pair (`headingFont`/`bodyFont`): every `FONT_CHOICE` has a loader in each
+role, each binding that role's CSS variable, so any font the Look offers
+renders in either role. Only the Console pair and the mono font preload. Fonts are self-hosted in both apps: Latin-subset variable
 woff2 files (SIL OFL, `OFL.txt` alongside) are committed beside each app's
 loaders, so no build fetches Google Fonts. `apps/web/src/proxy.ts` resolves the request's tenant from
 its `Host` header against `@blog/db`'s `tenant_domains`

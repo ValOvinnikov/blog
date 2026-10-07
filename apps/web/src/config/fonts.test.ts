@@ -3,57 +3,42 @@ import { FONT_CHOICE } from '@blog/config';
 import { resolveFontVariableClassName } from './fonts';
 
 vi.mock('next/font/local', () => ({
-  default: ({ src }: { src: [{ path: string }, ...{ path: string }[]] }) => {
+  default: ({
+    src,
+    variable,
+  }: {
+    src: [{ path: string }, ...{ path: string }[]];
+    variable: string;
+  }) => {
     const fontName = src[0].path.replace(/^.*\//, '').replace('.woff2', '');
     return {
       className: `mock-${fontName}-className`,
-      variable: `mock-${fontName}-variable`,
+      variable: `${fontName}${variable}`,
     };
   },
 }));
 
+const FONT_FILE = {
+  [FONT_CHOICE.SPACE_GROTESK]: 'space-grotesk',
+  [FONT_CHOICE.NEWSREADER]: 'newsreader',
+  [FONT_CHOICE.JETBRAINS_MONO]: 'jetbrains-mono',
+  [FONT_CHOICE.FRAUNCES]: 'fraunces',
+  [FONT_CHOICE.INTER]: 'inter',
+};
+
 describe('resolveFontVariableClassName', () => {
-  it('resolves SPACE_GROTESK/NEWSREADER to their own variable classes', () => {
-    const result = resolveFontVariableClassName(
-      FONT_CHOICE.SPACE_GROTESK,
-      FONT_CHOICE.NEWSREADER,
-    );
-
-    expect(result).toBe(
-      'mock-space-grotesk-variable mock-newsreader-variable mock-jetbrains-mono-variable',
-    );
-  });
-
-  it('resolves FRAUNCES/INTER to their own variable classes', () => {
-    const result = resolveFontVariableClassName(
-      FONT_CHOICE.FRAUNCES,
-      FONT_CHOICE.INTER,
-    );
-
-    expect(result).toBe(
-      'mock-fraunces-variable mock-inter-variable mock-jetbrains-mono-variable',
-    );
-  });
-
-  it('falls back to the Console default heading font for an unmapped choice', () => {
-    const result = resolveFontVariableClassName(
-      FONT_CHOICE.JETBRAINS_MONO,
-      FONT_CHOICE.NEWSREADER,
-    );
-
-    expect(result).toBe(
-      'mock-space-grotesk-variable mock-newsreader-variable mock-jetbrains-mono-variable',
-    );
-  });
-
-  it('falls back to the Console default body font for an unmapped choice', () => {
-    const result = resolveFontVariableClassName(
-      FONT_CHOICE.SPACE_GROTESK,
-      FONT_CHOICE.JETBRAINS_MONO,
-    );
-
-    expect(result).toBe(
-      'mock-space-grotesk-variable mock-newsreader-variable mock-jetbrains-mono-variable',
-    );
-  });
+  it.each(Object.values(FONT_CHOICE))(
+    'sets the heading font to %s with every body font',
+    (headingFont) => {
+      Object.values(FONT_CHOICE).forEach((bodyFont) => {
+        expect(
+          resolveFontVariableClassName(headingFont, bodyFont).split(' '),
+        ).toEqual([
+          `${FONT_FILE[headingFont]}--font-display-family`,
+          `${FONT_FILE[bodyFont]}--font-body-family`,
+          'jetbrains-mono--font-mono-family',
+        ]);
+      });
+    },
+  );
 });

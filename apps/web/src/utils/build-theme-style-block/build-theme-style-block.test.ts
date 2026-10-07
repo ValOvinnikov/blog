@@ -48,7 +48,6 @@ describe('buildThemeStyleBlock', () => {
     expect(css).toContain('--logo-1: oklch(0.52 0.17 250);');
     expect(css).toContain('--logo-2: oklch(0.63 0.16 250);');
     expect(css).toContain('--logo-3: oklch(0.73 0.13 250);');
-    expect(css).toContain('--font-ui: var(--font-mono-family);');
 
     expect(css).toContain('--brand-primary: oklch(0.7 0.16 250);');
     expect(css).toContain('--brand-primary-hover: oklch(0.76 0.16 250);');
