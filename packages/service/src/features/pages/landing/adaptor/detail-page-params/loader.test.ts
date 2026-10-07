@@ -16,7 +16,7 @@ vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
 const { EN, NL, FR } = LOCALE_ISO_CODES;
 const tenant = makeTenant();
 
-describe('getPageSlugs', () => {
+describe(getPageSlugs, () => {
   it('returns the page_landing slug and language entries', async () => {
     mockRun.mockResolvedValue([
       { slug: 'about', language: EN },
@@ -29,6 +29,17 @@ describe('getPageSlugs', () => {
       { slug: 'about', language: EN },
       { slug: 'over-ons', language: NL },
     ]);
+  });
+
+  it('drops a page whose path did not resolve', async () => {
+    mockRun.mockResolvedValue([
+      { slug: 'about', language: EN },
+      { slug: null, language: EN },
+    ]);
+
+    const params = await getPageSlugs(tenant, [EN]);
+
+    expect(params).toEqual([{ slug: 'about', language: EN }]);
   });
 
   it('returns an empty array when no landing pages exist', async () => {
@@ -95,6 +106,12 @@ describe('landingPageParamsQuery', () => {
     });
   }
 
+  it('filters without following a parent reference', () => {
+    const [filter] = landingPageParamsQuery.query.split('{');
+
+    expect(filter).not.toContain('->');
+  });
+
   it('restricts to the live languages', async () => {
     expect(await run([NL, EN])).toEqual([
       { slug: 'about', language: EN },
@@ -102,7 +119,7 @@ describe('landingPageParamsQuery', () => {
     ]);
   });
 
-  it('returns nested pages by their full path and drops a page whose parent is missing', async () => {
+  it('resolves a nested page to its full path and an orphan to no path', async () => {
     const nested = [
       {
         _id: 'modules',
@@ -133,6 +150,7 @@ describe('landingPageParamsQuery', () => {
     ).toEqual([
       { slug: 'modules', language: EN },
       { slug: 'modules/faq', language: EN },
+      { slug: null, language: EN },
     ]);
   });
 });
