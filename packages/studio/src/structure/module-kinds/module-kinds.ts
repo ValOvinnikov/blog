@@ -1,5 +1,4 @@
 import { modules } from '@blog/studio/schema-types/modules';
-import { childPagesSchema } from '@blog/studio/schema-types/modules/child-pages/child-pages';
 import { contentSchema } from '@blog/studio/schema-types/modules/content/content';
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
 import { faqSchema } from '@blog/studio/schema-types/modules/faq/faq';
@@ -12,6 +11,7 @@ import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/
 import { postListSchema } from '@blog/studio/schema-types/modules/post-list/post-list';
 import { postRelatedSchema } from '@blog/studio/schema-types/modules/post-related/post-related';
 import { pricingSchema } from '@blog/studio/schema-types/modules/pricing/pricing';
+import { sectionPagesSchema } from '@blog/studio/schema-types/modules/section-pages/section-pages';
 import { statsSchema } from '@blog/studio/schema-types/modules/stats/stats';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import { teamSchema } from '@blog/studio/schema-types/modules/team/team';
@@ -28,7 +28,7 @@ export const moduleKinds = [
       featureHighlightsSchema,
       timelineSchema,
       faqSchema,
-      childPagesSchema,
+      sectionPagesSchema,
     ],
   },
   {

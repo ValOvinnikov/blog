@@ -1,4 +1,3 @@
-import { childPagesSchema } from './child-pages/child-pages';
 import { contentSchema } from './content/content';
 import { ctaSchema } from './cta/cta';
 import { faqSchema } from './faq/faq';
@@ -15,6 +14,7 @@ import { postLatestSchema } from './post-latest/post-latest';
 import { postListSchema } from './post-list/post-list';
 import { postRelatedSchema } from './post-related/post-related';
 import { pricingSchema } from './pricing/pricing';
+import { sectionPagesSchema } from './section-pages/section-pages';
 import { statsSchema } from './stats/stats';
 import { taxonomyListSchema } from './taxonomy-list/taxonomy-list';
 import { teamSchema } from './team/team';
@@ -43,5 +43,5 @@ export const modules = [
   ctaSchema,
   newsletterSchema,
   pricingSchema,
-  childPagesSchema,
+  sectionPagesSchema,
 ];

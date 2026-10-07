@@ -18,8 +18,6 @@ import {
   TIMELINE_MARKER_STYLE,
   TIMELINE_ORIENTATION,
 } from '@blog/config';
-import type { TRawChildPagesModule } from '@blog/service/features/modules/child-pages/adaptor/module/transformer';
-import type { TRawChildPages } from '@blog/service/features/modules/child-pages/adaptor/pages/transformer';
 import type { TRawContentModule } from '@blog/service/features/modules/content/adaptor/transformer';
 import type { TRawCtaModule } from '@blog/service/features/modules/cta/adaptor/transformer';
 import type { TRawFaqModule } from '@blog/service/features/modules/faq/adaptor/transformer';
@@ -36,6 +34,8 @@ import type { TRawPostLatestModule } from '@blog/service/features/modules/post-l
 import type { TRawPostListModule } from '@blog/service/features/modules/post-list/adaptor/transformer';
 import type { TRawPostRelatedModule } from '@blog/service/features/modules/post-related/adaptor/module/transformer';
 import type { TRawPricingModule } from '@blog/service/features/modules/pricing/adaptor/transformer';
+import type { TRawSectionPagesModule } from '@blog/service/features/modules/section-pages/adaptor/module/transformer';
+import type { TRawSectionPages } from '@blog/service/features/modules/section-pages/adaptor/pages/transformer';
 import type { TRawStatsModule } from '@blog/service/features/modules/stats/adaptor/transformer';
 import type { TRawTaxonomyListModule } from '@blog/service/features/modules/taxonomy-list/adaptor/transformer';
 import type { TRawTeamModule } from '@blog/service/features/modules/team/adaptor/transformer';
@@ -213,9 +213,9 @@ export function makeRawPostFeaturedModule(
   };
 }
 
-export function makeRawChildPagesModule(
-  overrides: Partial<TRawChildPagesModule> = {},
-): TRawChildPagesModule {
+export function makeRawSectionPagesModule(
+  overrides: Partial<TRawSectionPagesModule> = {},
+): TRawSectionPagesModule {
   return {
     brandVariant: BRAND_VARIANT.PRIMARY,
     headingBlock: makeRawHeadingBlock('In this section'),
@@ -225,9 +225,9 @@ export function makeRawChildPagesModule(
   };
 }
 
-export function makeRawChildPage(
-  overrides: Partial<TRawChildPages[number]> = {},
-): TRawChildPages[number] {
+export function makeRawSectionPage(
+  overrides: Partial<TRawSectionPages[number]> = {},
+): TRawSectionPages[number] {
   return {
     _id: 'page-faq',
     slug: 'faq',

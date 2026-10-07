@@ -328,7 +328,7 @@ would miss a case — the nested rule never fires on a document with no
 `headingBlock`, and the field rule alone would accept an empty heading
 inside one. `pageHeadingBlockField()` takes no options, so `heading` is
 **required on every page**; `moduleHeadingBlockField()` is required by
-default and only `module_childPages` opts out with `isRequired: false`.
+default and only `module_sectionPages` opts out with `isRequired: false`.
 Neither field carries a length cap; forced `max()` validation was removed as
 editor-hostile.
 
@@ -1907,7 +1907,7 @@ template and warn when they differ from the default-language version. Labels
 use each page's public heading, never its internal `title`. The same
 `SidebarNav` renders a post's table of contents (`PostTableOfContents`).
 
-**Section Pages module** (`module_childPages`, allowed on `template_landing`)
+**Section Pages module** (`module_sectionPages`, allowed on `template_landing`)
 renders a card per direct child of the page using the template, in drag
 order: the child's public heading as the label, its heading's supporting text
 as the summary, its SEO sharing image, and a link to its path. On a page

@@ -1,7 +1,6 @@
 import { heroField } from '@blog/studio/schema-types/fields/hero-field/hero-field';
 import { modulesField } from '@blog/studio/schema-types/fields/modules-field/modules-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { childPagesSchema } from '@blog/studio/schema-types/modules/child-pages/child-pages';
 import { contentSchema } from '@blog/studio/schema-types/modules/content/content';
 import { faqSchema } from '@blog/studio/schema-types/modules/faq/faq';
 import { featureHighlightsSchema } from '@blog/studio/schema-types/modules/feature-highlights/feature-highlights';
@@ -13,6 +12,7 @@ import { logoWallSchema } from '@blog/studio/schema-types/modules/logo-wall/logo
 import { postFeaturedSchema } from '@blog/studio/schema-types/modules/post-featured/post-featured';
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import { pricingSchema } from '@blog/studio/schema-types/modules/pricing/pricing';
+import { sectionPagesSchema } from '@blog/studio/schema-types/modules/section-pages/section-pages';
 import { statsSchema } from '@blog/studio/schema-types/modules/stats/stats';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import { teamSchema } from '@blog/studio/schema-types/modules/team/team';
@@ -54,7 +54,7 @@ export const landingTemplateSchema = defineType({
         timelineSchema.name,
         faqSchema.name,
         pricingSchema.name,
-        childPagesSchema.name,
+        sectionPagesSchema.name,
       ],
     }),
   ],

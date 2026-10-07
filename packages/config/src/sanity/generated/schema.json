@@ -1,6 +1,6 @@
 [
   {
-    "name": "module_childPages",
+    "name": "module_sectionPages",
     "type": "document",
     "attributes": {
       "_id": {
@@ -13,7 +13,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "string",
-          "value": "module_childPages"
+          "value": "module_sectionPages"
         }
       },
       "_createdAt": {
@@ -11251,7 +11251,7 @@
   },
   {
     "type": "type",
-    "name": "module_childPages.reference",
+    "name": "module_sectionPages.reference",
     "value": {
       "type": "object",
       "attributes": {
@@ -11276,7 +11276,7 @@
           "optional": true
         }
       },
-      "dereferencesTo": "module_childPages"
+      "dereferencesTo": "module_sectionPages"
     }
   },
   {
@@ -11421,7 +11421,7 @@
                 },
                 "rest": {
                   "type": "inline",
-                  "name": "module_childPages.reference"
+                  "name": "module_sectionPages.reference"
                 }
               },
               {

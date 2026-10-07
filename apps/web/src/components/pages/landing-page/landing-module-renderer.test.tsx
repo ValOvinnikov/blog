@@ -28,7 +28,7 @@ const {
   heroBlogModuleMock,
   heroProfileModuleMock,
   heroStatementModuleMock,
-  childPagesModuleMock,
+  sectionPagesModuleMock,
 } = vi.hoisted(() => ({
   contentModuleMock: vi.fn(({ id }: { id: string }) => (
     <div data-testid="stub-content">{id}</div>
@@ -65,8 +65,8 @@ const {
   heroStatementModuleMock: vi.fn(async ({ id }: { id: string }) => (
     <h1 data-testid="stub-hero-statement">{id}</h1>
   )),
-  childPagesModuleMock: vi.fn(({ id }: { id: string }) => (
-    <div data-testid="stub-child-pages">{id}</div>
+  sectionPagesModuleMock: vi.fn(({ id }: { id: string }) => (
+    <div data-testid="stub-section-pages">{id}</div>
   )),
 }));
 
@@ -102,8 +102,8 @@ vi.mock('@web/modules/hero-statement/hero-statement-module', () => ({
   HeroStatementModule: heroStatementModuleMock,
 }));
 
-vi.mock('@web/modules/child-pages/child-pages-module', () => ({
-  ChildPagesModule: childPagesModuleMock,
+vi.mock('@web/modules/section-pages/section-pages-module', () => ({
+  SectionPagesModule: sectionPagesModuleMock,
 }));
 
 vi.mock('@web/utils/logger/logger');
@@ -143,17 +143,17 @@ describe(`<${LandingModuleRenderer.name}/>`, () => {
   });
   testFeatureListModule({ setup, loggerWarnMock });
 
-  it('renders the child pages module with the landing page as its context', async () => {
+  it('renders the section pages module with the landing page as its context', async () => {
     await setup({
-      modules: [{ id: 'child-pages-1', type: 'module_childPages' }],
+      modules: [{ id: 'section-pages-1', type: 'module_sectionPages' }],
     });
 
-    expect(screen.getByTestId('stub-child-pages')).toHaveTextContent(
-      'child-pages-1',
+    expect(screen.getByTestId('stub-section-pages')).toHaveTextContent(
+      'section-pages-1',
     );
-    expect(childPagesModuleMock).toHaveBeenCalledWith(
+    expect(sectionPagesModuleMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        id: 'child-pages-1',
+        id: 'section-pages-1',
         context: { landingPage: { id: 'modules', path: 'modules' } },
       }),
       undefined,
