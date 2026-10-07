@@ -7,6 +7,7 @@ const meta = {
   title: 'Components/PageHeading',
   component: PageHeading,
   tags: ['autodocs'],
+  parameters: { layout: 'fullscreen' },
   argTypes: {
     align: {
       control: 'select',
@@ -19,7 +20,6 @@ const meta = {
       supportingText: undefined,
     },
     align: undefined,
-    hasTrailingSpace: undefined,
   },
 } satisfies Meta<typeof PageHeading>;
 
@@ -54,15 +54,5 @@ export const RightAligned: TStory = {
       heading: 'Notes on building things',
       supportingText: 'Essays and notes from the team, published as we ship.',
     },
-  },
-};
-
-export const NoTrailingSpace: TStory = {
-  args: {
-    headingBlock: {
-      heading: 'Notes on building things',
-      supportingText: 'Essays and notes from the team, published as we ship.',
-    },
-    hasTrailingSpace: false,
   },
 };

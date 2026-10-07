@@ -3,9 +3,13 @@ import { tv } from 'tailwind-variants';
 
 export const pageHeadingVariants = tv({
   slots: {
-    root: ['mx-auto w-full', 'max-w-page px-gutter pt-page-y'],
-    heading: ['mb-6'],
-    supportingText: ['text-muted', 'mb-6'],
+    root: [
+      'w-full bg-primary-subtle border-b border-divider',
+      'pt-8 pb-8 sm:pt-10 sm:pb-10 lg:pt-12 lg:pb-12',
+    ],
+    inner: ['mx-auto w-full max-w-page px-gutter'],
+    heading: [],
+    supportingText: ['text-muted'],
   },
   variants: {
     align: {
@@ -22,30 +26,13 @@ export const pageHeadingVariants = tv({
         supportingText: ['text-right'],
       },
     },
-    hasTrailingSpace: {
-      true: {},
-      false: {},
-    },
     hasSupportingText: {
-      true: {},
+      true: { heading: ['mb-6'] },
       false: {},
     },
   },
-  compoundVariants: [
-    {
-      hasTrailingSpace: false,
-      hasSupportingText: false,
-      class: { heading: ['mb-0'] },
-    },
-    {
-      hasTrailingSpace: false,
-      hasSupportingText: true,
-      class: { supportingText: ['mb-0'] },
-    },
-  ],
   defaultVariants: {
     align: CONTENT_ALIGNMENT.LEFT,
-    hasTrailingSpace: true,
     hasSupportingText: false,
   },
 });

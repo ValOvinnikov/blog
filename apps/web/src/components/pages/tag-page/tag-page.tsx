@@ -30,7 +30,6 @@ export const TagPage = async ({ slug, page }: TTagPageProps) => {
       <TagModuleRenderer
         hero={hero}
         headingBlock={headingBlock}
-        hasTrailingSpace={false}
         modules={modules}
         context={{
           page: currentPage,

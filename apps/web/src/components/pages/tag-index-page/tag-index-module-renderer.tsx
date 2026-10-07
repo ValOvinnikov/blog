@@ -44,9 +44,7 @@ export const TagIndexModuleRenderer = async ({
 
   return (
     <>
-      {heroNode ?? (
-        <PageHeading headingBlock={headingBlock} hasTrailingSpace={false} />
-      )}
+      {heroNode ?? <PageHeading headingBlock={headingBlock} />}
       {renderModules({ modules, map: TAG_INDEX_MAP })}
     </>
   );

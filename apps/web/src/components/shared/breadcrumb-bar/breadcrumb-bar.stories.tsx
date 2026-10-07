@@ -73,3 +73,19 @@ export const LongCurrentPage: TStory = {
     ),
   },
 };
+
+export const AbovePageHeading: TStory = {
+  args: {
+    isAbovePageHeading: true,
+    children: (
+      <Breadcrumbs
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Modules', href: '/modules' },
+        ]}
+        ariaLabel="Breadcrumb"
+        linkAs={SmartLink}
+      />
+    ),
+  },
+};

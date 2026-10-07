@@ -83,7 +83,6 @@ const loggerWarnMock = vi.mocked(logger.warn);
 const setup = customRenderAsync(TagModuleRenderer, {
   hero: undefined,
   headingBlock: makeHeadingBlock({ heading: 'TypeScript' }),
-  hasTrailingSpace: false,
   modules: [],
 });
 
