@@ -97,6 +97,7 @@ export function makeRawHomePage(
 ): TRawHomePage {
   return {
     headingBlock: makeRawHeadingBlock('Welcome'),
+    contentAlignment: null,
     hero: { _id: 'hero-1', _type: 'module_heroBlog' },
     modules: [
       { _id: 'post-latest-1', _type: 'module_postLatest' },
@@ -115,6 +116,7 @@ export function makeRawBlogPage(
     headingBlock: makeRawHeadingBlock('The Blog', {
       supportingText: 'Notes on building things.',
     }),
+    contentAlignment: null,
     hero: null,
     modules: [],
     seo: makeRawSeo(),
@@ -128,6 +130,7 @@ export function makeRawTopicIndexPage(
 ): TRawTopicIndexPage {
   return {
     headingBlock: makeRawHeadingBlock('Browse by topic'),
+    contentAlignment: null,
     hero: null,
     modules: [{ _id: 'taxonomy-list-1', _type: 'module_taxonomyList' }],
     seo: makeRawSeo(),
@@ -141,6 +144,7 @@ export function makeRawTagIndexPage(
 ): TRawTagIndexPage {
   return {
     headingBlock: makeRawHeadingBlock('Browse by tag'),
+    contentAlignment: null,
     hero: null,
     modules: [{ _id: 'taxonomy-list-1', _type: 'module_taxonomyList' }],
     seo: makeRawSeo(),
@@ -155,6 +159,7 @@ export function makeRawTopicPage(
   return {
     topic: makeRawTopic(),
     headingBlock: makeRawHeadingBlock('Engineering'),
+    contentAlignment: null,
     hero: null,
     modules: [{ _id: 'post-list-1', _type: 'module_postList' }],
     seo: makeRawSeo(),
@@ -169,6 +174,7 @@ export function makeRawTagPage(
   return {
     tag: { ...makeRawTag(), description: 'Posts about TypeScript.' },
     headingBlock: makeRawHeadingBlock('TypeScript'),
+    contentAlignment: null,
     hero: null,
     modules: [{ _id: 'post-list-1', _type: 'module_postList' }],
     seo: makeRawSeo(),
@@ -184,6 +190,7 @@ export function makeRawLandingPage(
     _id: 'about',
     path: 'about',
     headingBlock: makeRawHeadingBlock('About Us'),
+    contentAlignment: null,
     hero: null,
     modules: [
       { _id: 'content-1', _type: 'module_content' },

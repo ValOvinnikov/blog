@@ -1,4 +1,4 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
+import { LOCALE_ISO_CODES, CONTENT_ALIGNMENT } from '@blog/config';
 import { service, type TTagIndexPage } from '@blog/service';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {
@@ -38,6 +38,7 @@ vi.mock('@web/i18n/navigation');
 const getIndexPageMock = vi.mocked(service.pages.tagIndex.v1.getIndexPage);
 
 const tagIndexPage: TTagIndexPage = {
+  headingAlignment: CONTENT_ALIGNMENT.LEFT,
   headingBlock: makeHeadingBlock({
     heading: 'Tags',
     supportingText: 'Browse every post by tag.',

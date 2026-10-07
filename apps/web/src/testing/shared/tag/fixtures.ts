@@ -1,4 +1,4 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
+import { LOCALE_ISO_CODES, CONTENT_ALIGNMENT } from '@blog/config';
 import type { TTagDetailPage } from '@blog/service';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
@@ -21,6 +21,7 @@ export const makeTagDetailPage = (
 ): TTagDetailPage => {
   return {
     tag: makeTag(),
+    headingAlignment: CONTENT_ALIGNMENT.LEFT,
     headingBlock: makeHeadingBlock({ heading: 'TypeScript' }),
     hero: undefined,
     modules: [],

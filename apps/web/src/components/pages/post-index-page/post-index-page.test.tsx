@@ -1,4 +1,4 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
+import { LOCALE_ISO_CODES, CONTENT_ALIGNMENT } from '@blog/config';
 import { service, type TBlogIndexPage } from '@blog/service';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {
@@ -41,6 +41,7 @@ vi.mock('@web/i18n/navigation');
 const getIndexPageMock = vi.mocked(service.pages.blog.v1.getIndexPage);
 
 const indexPage: TBlogIndexPage = {
+  headingAlignment: CONTENT_ALIGNMENT.LEFT,
   headingBlock: makeHeadingBlock({
     heading: 'Blog',
     supportingText: 'Notes from the team.',

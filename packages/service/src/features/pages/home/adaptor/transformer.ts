@@ -1,5 +1,6 @@
 import type { TLocaleIsoCode } from '@blog/config/constants';
 import { toPageLanguages } from '@blog/service/shared/localization/page-languages/to-page-languages';
+import { toHeadingAlignment } from '@blog/service/shared/transformers/heading-block/to-heading-alignment';
 import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
 import {
   toHeroSlot,
@@ -19,6 +20,7 @@ export function toHomePage(
 ): THomePageDocument {
   return {
     headingBlock: toHeadingBlock(raw.headingBlock),
+    headingAlignment: toHeadingAlignment(raw.contentAlignment),
     hero: toHeroSlot(raw.hero),
     modules: (raw.modules ?? []).map(toModule),
     seo: resolveSeo(raw.seo),

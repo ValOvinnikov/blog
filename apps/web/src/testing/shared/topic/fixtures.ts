@@ -1,4 +1,4 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
+import { LOCALE_ISO_CODES, CONTENT_ALIGNMENT } from '@blog/config';
 import type {
   TTopic,
   TTopicDetailPage,
@@ -31,6 +31,7 @@ export const makeTopicDetailPage = (
 ): TTopicDetailPage => {
   return {
     topic: makeTopic(),
+    headingAlignment: CONTENT_ALIGNMENT.LEFT,
     headingBlock: makeHeadingBlock({ heading: 'Engineering' }),
     hero: undefined,
     modules: [],
