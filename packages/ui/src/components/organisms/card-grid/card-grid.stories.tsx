@@ -58,7 +58,7 @@ const renderMediaCards = (items: typeof posts) =>
       formattedDate,
       authorName,
     }) => (
-      <MediaCard key={href} excerpt={excerpt} tags={tags}>
+      <MediaCard key={href} excerpt={excerpt} tags={tags} isInteractive={true}>
         <MediaCard.Title level={3}>
           <a href={href}>{title}</a>
         </MediaCard.Title>

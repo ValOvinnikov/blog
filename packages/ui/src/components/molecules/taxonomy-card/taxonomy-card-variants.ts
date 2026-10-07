@@ -21,7 +21,7 @@ export const taxonomyCardVariants = tv({
     },
   },
   defaultVariants: {
-    isInteractive: true,
+    isInteractive: false,
   },
 });
 

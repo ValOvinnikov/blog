@@ -20,6 +20,7 @@ const meta = {
     href: '/topics/engineering',
     headingLevel: 2,
     postCountLabel: '12 posts',
+    isInteractive: true,
   },
 } satisfies Meta<typeof TaxonomyCard>;
 
