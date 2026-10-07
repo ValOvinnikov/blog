@@ -14,6 +14,8 @@ import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { logger } from '@web/utils/logger/logger';
 
+import { StickyHeaderFrame } from './components/sticky-header-frame/sticky-header-frame';
+
 export const SiteHeader = async () => {
   const { tenantId, sanityContext, locale, defaultLocale, liveLocales } =
     await getRequestContext();
@@ -43,34 +45,36 @@ export const SiteHeader = async () => {
     : undefined;
 
   return (
-    <Header>
-      <Header.Brand>
-        <BrandLockupLink logoUrl={brandLogoUrl} tagline={brand.tagline} />
-      </Header.Brand>
-      <SiteNavigation
-        links={navItems}
-        panelActions={
-          hasLanguageSwitcher && (
+    <StickyHeaderFrame>
+      <Header>
+        <Header.Brand>
+          <BrandLockupLink logoUrl={brandLogoUrl} tagline={brand.tagline} />
+        </Header.Brand>
+        <SiteNavigation
+          links={navItems}
+          panelActions={
+            hasLanguageSwitcher && (
+              <>
+                <LanguageSwitcher
+                  liveLocales={liveLocales ?? [locale]}
+                  currentLocale={locale}
+                  defaultLocale={defaultLocale ?? routing.defaultLocale}
+                  switcherStyle={switcherStyle}
+                />
+                <ThemeToggleButton />
+              </>
+            )
+          }
+          actions={
             <>
-              <LanguageSwitcher
-                liveLocales={liveLocales ?? [locale]}
-                currentLocale={locale}
-                defaultLocale={defaultLocale ?? routing.defaultLocale}
-                switcherStyle={switcherStyle}
-              />
-              <ThemeToggleButton />
+              {!hasLanguageSwitcher && <ThemeToggleButton />}
+              {hasReaderAccounts && (
+                <AuthMenu oauthProviderIds={getEnabledOAuthProviderIds()} />
+              )}
             </>
-          )
-        }
-        actions={
-          <>
-            {!hasLanguageSwitcher && <ThemeToggleButton />}
-            {hasReaderAccounts && (
-              <AuthMenu oauthProviderIds={getEnabledOAuthProviderIds()} />
-            )}
-          </>
-        }
-      />
-    </Header>
+          }
+        />
+      </Header>
+    </StickyHeaderFrame>
   );
 };
