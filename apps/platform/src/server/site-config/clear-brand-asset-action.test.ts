@@ -79,15 +79,15 @@ describe(clearBrandAssetAction, () => {
       user: { id: 'operator-1', email: 'operator@example.com' },
     });
     insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
-  });
-
-  it('re-resolves the tenant from the session against the routed id before writing', async () => {
     getSiteConfigOrDefaultsMock.mockResolvedValue({
       ...THEME_FIELDS,
       logoAssetUrl: undefined,
       faviconAssetUrl: undefined,
     });
+    upsertSiteConfigMock.mockResolvedValue({});
+  });
 
+  it('re-resolves the tenant from the session against the routed id before writing', async () => {
     await clearBrandAssetAction('tenant-1', 'favicon');
 
     expect(requireTenantMembershipMock).toHaveBeenCalledWith('tenant-1');
@@ -99,7 +99,6 @@ describe(clearBrandAssetAction, () => {
       logoAssetUrl: 'https://example.blob.vercel-storage.com/logo.png',
       faviconAssetUrl: undefined,
     });
-    upsertSiteConfigMock.mockResolvedValue({});
 
     const result = await clearBrandAssetAction('tenant-1', 'logo');
 
@@ -120,7 +119,6 @@ describe(clearBrandAssetAction, () => {
       logoAssetUrl: undefined,
       faviconAssetUrl: 'https://example.blob.vercel-storage.com/favicon.png',
     });
-    upsertSiteConfigMock.mockResolvedValue({});
 
     await clearBrandAssetAction('tenant-1', 'favicon');
 
@@ -136,12 +134,6 @@ describe(clearBrandAssetAction, () => {
   });
 
   it('is a no-op success when the field is already empty, and records no audit event', async () => {
-    getSiteConfigOrDefaultsMock.mockResolvedValue({
-      ...THEME_FIELDS,
-      logoAssetUrl: undefined,
-      faviconAssetUrl: undefined,
-    });
-
     const result = await clearBrandAssetAction('tenant-1', 'favicon');
 
     expect(result).toEqual({ ok: true });

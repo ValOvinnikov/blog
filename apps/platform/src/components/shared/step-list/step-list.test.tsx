@@ -32,43 +32,43 @@ const steps: ComponentProps<typeof StepList>['steps'] = [
 ];
 
 describe(StepList, () => {
-  it('maps each status to its indicator glyph, keeping every glyph decorative', () => {
-    render(<StepList steps={steps} />);
+  describe('with the full step set', () => {
+    beforeEach(() => {
+      render(<StepList steps={steps} />);
+    });
 
-    expect(
-      screen.getByText('✓', { selector: 'span[aria-hidden="true"]' }),
-    ).toBeVisible();
-    expect(
-      screen.getByText('2', { selector: 'span[aria-hidden="true"]' }),
-    ).toBeVisible();
-    expect(
-      screen.getByText('!', { selector: 'span[aria-hidden="true"]' }),
-    ).toBeVisible();
-    expect(
-      screen.getByText('4', { selector: 'span[aria-hidden="true"]' }),
-    ).toBeVisible();
-  });
+    it('maps each status to its indicator glyph, keeping every glyph decorative', () => {
+      expect(
+        screen.getByText('✓', { selector: 'span[aria-hidden="true"]' }),
+      ).toBeVisible();
+      expect(
+        screen.getByText('2', { selector: 'span[aria-hidden="true"]' }),
+      ).toBeVisible();
+      expect(
+        screen.getByText('!', { selector: 'span[aria-hidden="true"]' }),
+      ).toBeVisible();
+      expect(
+        screen.getByText('4', { selector: 'span[aria-hidden="true"]' }),
+      ).toBeVisible();
+    });
 
-  it('renders a connector after every step except the last', () => {
-    render(<StepList steps={steps} />);
+    it('renders a connector after every step except the last', () => {
+      expect(
+        screen.getAllByText((content) => content.length > 0, {
+          selector: 'span[aria-hidden="true"]',
+        }),
+      ).toHaveLength(steps.length);
+      expect(screen.getAllByTestId('step-connector')).toHaveLength(
+        steps.length - 1,
+      );
+    });
 
-    expect(
-      screen.getAllByText((content) => content.length > 0, {
-        selector: 'span[aria-hidden="true"]',
-      }),
-    ).toHaveLength(steps.length);
-    expect(screen.getAllByTestId('step-connector')).toHaveLength(
-      steps.length - 1,
-    );
-  });
-
-  it('carries each step status to assistive tech in a visually-hidden aria-live region', () => {
-    render(<StepList steps={steps} />);
-
-    for (const { statusLabel } of steps) {
-      const status = screen.getByText(statusLabel);
-      expect(status.closest('[aria-live="polite"]')).not.toBeNull();
-    }
+    it('carries each step status to assistive tech in a visually-hidden aria-live region', () => {
+      for (const { statusLabel } of steps) {
+        const status = screen.getByText(statusLabel);
+        expect(status.closest('[aria-live="polite"]')).not.toBeNull();
+      }
+    });
   });
 
   it('renders an optional trailing slot next to a step', () => {

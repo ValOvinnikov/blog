@@ -1,7 +1,7 @@
 import { EMAIL_TEMPLATE_TYPE } from '@blog/config';
 import type { TTenantEmailBrand } from '@blog/email/html';
 import { customRender, screen, waitFor } from '@platform/testing/custom-render';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { EmailTemplateEditor } from './email-template-editor';
 
@@ -61,7 +61,10 @@ const setup = customRender(EmailTemplateEditor, {
 });
 
 describe(`<${EmailTemplateEditor.name}/>`, () => {
+  let user: UserEvent;
+
   beforeEach(() => {
+    user = userEvent.setup();
     updateEmailTemplateActionMock.mockReset();
     updateEmailTemplateActionMock.mockResolvedValue({
       ok: true,
@@ -88,48 +91,6 @@ describe(`<${EmailTemplateEditor.name}/>`, () => {
     expect(screen.getByRole('heading', { name: 'Sign-in link' })).toBeVisible();
   });
 
-  it('states that the locked action always renders and cannot be edited here', () => {
-    setup();
-
-    expect(
-      screen.getByText(/always renders and can't be edited here/),
-    ).toBeVisible();
-  });
-
-  it('saves an edited subject as-is', async () => {
-    setup();
-
-    const user = userEvent.setup();
-    const subjectInput = screen.getByDisplayValue('Sign in');
-    await user.clear(subjectInput);
-    await user.type(subjectInput, 'Please sign in');
-    await user.click(screen.getByRole('button', { name: 'Save changes' }));
-
-    await waitFor(() => {
-      expect(updateEmailTemplateActionMock).toHaveBeenCalledWith(
-        'tenant-1',
-        EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-        expect.objectContaining({ subject: 'Please sign in' }),
-      );
-    });
-  });
-
-  it('sends null, not an empty string, when the subject is cleared', async () => {
-    setup();
-
-    const user = userEvent.setup();
-    await user.clear(screen.getByDisplayValue('Sign in'));
-    await user.click(screen.getByRole('button', { name: 'Save changes' }));
-
-    await waitFor(() => {
-      expect(updateEmailTemplateActionMock).toHaveBeenCalledWith(
-        'tenant-1',
-        EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-        expect.objectContaining({ subject: null }),
-      );
-    });
-  });
-
   it('sends null for a body that is blank (a single empty default paragraph)', async () => {
     setup({
       initialValues: {
@@ -139,7 +100,6 @@ describe(`<${EmailTemplateEditor.name}/>`, () => {
       },
     });
 
-    const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
     await waitFor(() => {
@@ -151,26 +111,63 @@ describe(`<${EmailTemplateEditor.name}/>`, () => {
     });
   });
 
-  it('shows a spinner, marks Save busy, and announces the pending state to assistive tech while the save is in flight', async () => {
-    let resolveAction: (value: { ok: boolean }) => void = () => {};
-    updateEmailTemplateActionMock.mockImplementation(
-      () =>
-        new Promise((resolve) => {
-          resolveAction = resolve;
-        }),
-    );
-    setup();
-
-    const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Save changes' }));
-
-    const saveButton = await screen.findByRole('button', {
-      name: 'Saving…',
+  describe('with the default sign-in template', () => {
+    beforeEach(() => {
+      setup();
     });
-    expect(saveButton).toBeDisabled();
-    expect(saveButton).toHaveAttribute('aria-busy', 'true');
-    expect(screen.getByRole('status')).toHaveTextContent('Saving…');
 
-    resolveAction({ ok: true });
+    it('states that the locked action always renders and cannot be edited here', () => {
+      expect(
+        screen.getByText(/always renders and can't be edited here/),
+      ).toBeVisible();
+    });
+
+    it('saves an edited subject as-is', async () => {
+      const subjectInput = screen.getByDisplayValue('Sign in');
+      await user.clear(subjectInput);
+      await user.type(subjectInput, 'Please sign in');
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      await waitFor(() => {
+        expect(updateEmailTemplateActionMock).toHaveBeenCalledWith(
+          'tenant-1',
+          EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+          expect.objectContaining({ subject: 'Please sign in' }),
+        );
+      });
+    });
+
+    it('sends null, not an empty string, when the subject is cleared', async () => {
+      await user.clear(screen.getByDisplayValue('Sign in'));
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      await waitFor(() => {
+        expect(updateEmailTemplateActionMock).toHaveBeenCalledWith(
+          'tenant-1',
+          EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+          expect.objectContaining({ subject: null }),
+        );
+      });
+    });
+
+    it('shows a spinner, marks Save busy, and announces the pending state to assistive tech while the save is in flight', async () => {
+      let resolveAction: (value: { ok: boolean }) => void = () => {};
+      updateEmailTemplateActionMock.mockImplementation(
+        () =>
+          new Promise((resolve) => {
+            resolveAction = resolve;
+          }),
+      );
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      const saveButton = await screen.findByRole('button', {
+        name: 'Saving…',
+      });
+      expect(saveButton).toBeDisabled();
+      expect(saveButton).toHaveAttribute('aria-busy', 'true');
+      expect(screen.getByRole('status')).toHaveTextContent('Saving…');
+
+      resolveAction({ ok: true });
+    });
   });
 });

@@ -23,10 +23,31 @@ vi.mock('@blog/db', async () => ({
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 describe(requireTenantById, () => {
+  let admin: {
+    id: string;
+    userId: string;
+    role: string;
+    grantedBy: null;
+    grantedVia: string;
+    grantedAt: Date;
+    createdAt: Date;
+  };
+
   beforeEach(() => {
     authMock.mockReset();
     getAdminByUserIdMock.mockReset();
     getTenantByIdMock.mockReset();
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    admin = {
+      id: 'admin-1',
+      userId: 'user-1',
+      role: 'ADMIN',
+      grantedBy: null,
+      grantedVia: 'MANUAL',
+      grantedAt: new Date(),
+      createdAt: new Date(),
+    };
+    getAdminByUserIdMock.mockResolvedValue(admin);
   });
 
   it('redirects to sign-in without querying admins or the tenant when signed out', async () => {
@@ -42,7 +63,6 @@ describe(requireTenantById, () => {
   });
 
   it('404s without querying the tenant when the signed-in user has no admins row', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue(undefined);
 
     await expect(requireTenantById('tenant-1')).rejects.toThrow(
@@ -55,7 +75,6 @@ describe(requireTenantById, () => {
   });
 
   it('404s for an unknown tenant id', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });
     getTenantByIdMock.mockResolvedValue(undefined);
 
@@ -67,17 +86,6 @@ describe(requireTenantById, () => {
   });
 
   it('returns the tenant and admin for an admins row without checking membership', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    const admin = {
-      id: 'admin-1',
-      userId: 'user-1',
-      role: 'ADMIN',
-      grantedBy: null,
-      grantedVia: 'MANUAL',
-      grantedAt: new Date(),
-      createdAt: new Date(),
-    };
-    getAdminByUserIdMock.mockResolvedValue(admin);
     const tenant = { id: 'tenant-1' };
     getTenantByIdMock.mockResolvedValue(tenant);
 
@@ -88,17 +96,6 @@ describe(requireTenantById, () => {
   });
 
   it('resolves an archived tenant by requesting it with includeArchived', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    const admin = {
-      id: 'admin-1',
-      userId: 'user-1',
-      role: 'ADMIN',
-      grantedBy: null,
-      grantedVia: 'MANUAL',
-      grantedAt: new Date(),
-      createdAt: new Date(),
-    };
-    getAdminByUserIdMock.mockResolvedValue(admin);
     const archivedTenant = {
       id: 'tenant-1',
       deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),

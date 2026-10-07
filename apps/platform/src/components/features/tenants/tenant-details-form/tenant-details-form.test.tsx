@@ -3,7 +3,7 @@ import {
   screen,
   waitFor,
 } from '@platform/testing/custom-render';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { TenantDetailsForm } from './tenant-details-form';
 
@@ -56,14 +56,16 @@ const mockOwnerInviteConfirmation = (overrides: {
 };
 
 describe(`<${TenantDetailsForm.name}/>`, () => {
+  let user: UserEvent;
+
   beforeEach(() => {
+    user = userEvent.setup();
     createTenantActionMock.mockReset();
     createTenantActionMock.mockResolvedValue({ ok: false });
+    render(<TenantDetailsForm />);
   });
 
   it('renders every Details-step field from the mock shape', () => {
-    render(<TenantDetailsForm />);
-
     expect(screen.getByRole('textbox', { name: 'Tenant name' })).toBeVisible();
     expect(screen.getByRole('textbox', { name: 'Domain' })).toBeVisible();
     expect(screen.getByRole('group', { name: 'Plan' })).toBeVisible();
@@ -71,8 +73,6 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
   });
 
   it('defaults the plan to Free', () => {
-    render(<TenantDetailsForm />);
-
     expect(screen.getByRole('button', { name: 'Free' })).toHaveAttribute(
       'aria-pressed',
       'true',
@@ -80,9 +80,6 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
   });
 
   it('submits the current field values to createTenantAction', async () => {
-    const user = userEvent.setup();
-    render(<TenantDetailsForm />);
-
     await fillValidForm(user);
     await user.click(screen.getByRole('button', { name: 'Growth' }));
     await clickBeginProvisioning(user);
@@ -100,8 +97,6 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
       ok: false,
       fieldErrors: { ownerEmail: 'No registered user matches this email.' },
     });
-    const user = userEvent.setup();
-    render(<TenantDetailsForm />);
 
     await fillValidForm(user);
     await clickBeginProvisioning(user);
@@ -119,8 +114,6 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
           resolveAction = resolve;
         }),
     );
-    const user = userEvent.setup();
-    render(<TenantDetailsForm />);
 
     await fillValidForm(user);
     await clickBeginProvisioning(user);
@@ -161,8 +154,6 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
           resolveAction = resolve;
         }),
     );
-    const user = userEvent.setup();
-    render(<TenantDetailsForm />);
 
     await fillValidForm(user);
     await clickBeginProvisioning(user);
@@ -192,8 +183,6 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
           "No account found for owner@example.com — they'll be sent an invite to sign in and manage this tenant as owner.",
       },
     });
-    const user = userEvent.setup();
-    render(<TenantDetailsForm />);
 
     await fillValidForm(user);
     await clickBeginProvisioning(user);
@@ -213,8 +202,6 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
       email: 'owner@example.com',
       message: 'No account found for owner@example.com.',
     });
-    const user = userEvent.setup();
-    render(<TenantDetailsForm />);
 
     await fillValidForm(user);
     await clickBeginProvisioning(user);
@@ -232,17 +219,17 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
       email: 'john.doe@example.com',
       message: 'No account found for john.doe@example.com.',
     });
-    const user = userEvent.setup();
-    render(<TenantDetailsForm />);
 
     await user.type(
       screen.getByRole('textbox', { name: 'Tenant name' }),
       'Acme',
     );
+
     await user.type(
       screen.getByRole('textbox', { name: 'Domain' }),
       'acme.example.com',
     );
+
     await user.type(
       screen.getByRole('textbox', { name: 'Owner email' }),
       'John.Doe@Example.com',
@@ -262,8 +249,6 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
       email: 'owner@example.com',
       message: 'No account found for owner@example.com.',
     });
-    const user = userEvent.setup();
-    render(<TenantDetailsForm />);
 
     await fillValidForm(user);
     await clickBeginProvisioning(user);
@@ -295,8 +280,6 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
       token: 'confirmation-token-for-owner-example-com',
       message: 'No account found for owner@example.com.',
     });
-    const user = userEvent.setup();
-    render(<TenantDetailsForm />);
 
     await fillValidForm(user);
     await clickBeginProvisioning(user);
@@ -316,8 +299,6 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
       token: 'confirmation-token-for-owner-example-com',
       message: 'No account found for owner@example.com.',
     });
-    const user = userEvent.setup();
-    render(<TenantDetailsForm />);
 
     await fillValidForm(user);
     await clickBeginProvisioning(user);
@@ -342,8 +323,6 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
       ok: false,
       error: "Couldn't create the tenant — try again.",
     });
-    const user = userEvent.setup();
-    render(<TenantDetailsForm />);
 
     await fillValidForm(user);
     await clickBeginProvisioning(user);

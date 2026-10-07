@@ -15,6 +15,11 @@ describe(dispatchDeprovisioningWorkflow, () => {
     envMock.TENANT_PROVISIONING_GITHUB_TOKEN = 'ghp_token';
     envMock.TENANT_PROVISIONING_GITHUB_REPO = 'acme-org/acme-repo';
     envMock.TENANT_PROVISIONING_DATASET = undefined;
+    fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   it('skips the dispatch call and returns false when no token is configured', async () => {
@@ -44,8 +49,6 @@ describe(dispatchDeprovisioningWorkflow, () => {
   });
 
   it('POSTs a workflow_dispatch with tenantId, confirm and dryRun, and returns true', async () => {
-    fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
-
     const result = await dispatchDeprovisioningWorkflow({
       tenantId: 'tenant-1',
       confirm: 'acme',
@@ -69,8 +72,6 @@ describe(dispatchDeprovisioningWorkflow, () => {
   });
 
   it('omits environment from the dispatch body when no dataset is configured', async () => {
-    fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
-
     await dispatchDeprovisioningWorkflow({
       tenantId: 'tenant-1',
       confirm: 'acme',
@@ -90,8 +91,6 @@ describe(dispatchDeprovisioningWorkflow, () => {
 
   it('sends environment from TENANT_PROVISIONING_DATASET when configured', async () => {
     envMock.TENANT_PROVISIONING_DATASET = 'development';
-    fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
-
     await dispatchDeprovisioningWorkflow({
       tenantId: 'tenant-1',
       confirm: 'acme',

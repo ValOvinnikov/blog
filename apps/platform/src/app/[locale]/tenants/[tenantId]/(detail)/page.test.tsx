@@ -87,8 +87,12 @@ const setup = customRenderAsync(TenantOverviewPage, {
 });
 
 describe(TenantOverviewPage, () => {
+  let tenant: ReturnType<typeof makeTenant>;
+
   beforeEach(() => {
     listTenantsByIdsMock.mockReset();
+    tenant = makeTenant();
+    listTenantsByIdsMock.mockResolvedValue([tenant]);
     getTenantOwnerEmailMock.mockReset();
     getTenantOwnerEmailMock.mockResolvedValue('owner@example.com');
     getTenantOwnerMembershipMock.mockReset();
@@ -105,9 +109,6 @@ describe(TenantOverviewPage, () => {
   });
 
   it('renders the overview for the resolved tenant', async () => {
-    const tenant = makeTenant();
-    listTenantsByIdsMock.mockResolvedValue([tenant]);
-
     await setup();
 
     expect(listTenantsByIdsMock).toHaveBeenCalledWith(['tenant-1']);
@@ -128,9 +129,6 @@ describe(TenantOverviewPage, () => {
   });
 
   it('formats and passes the owner membership join date to the Joined row', async () => {
-    const tenant = makeTenant();
-    listTenantsByIdsMock.mockResolvedValue([tenant]);
-
     await setup();
 
     expect(screen.getByText('Joined')).toBeVisible();
@@ -140,8 +138,6 @@ describe(TenantOverviewPage, () => {
   });
 
   it('omits the Joined row when the owner is still a pending invite', async () => {
-    const tenant = makeTenant();
-    listTenantsByIdsMock.mockResolvedValue([tenant]);
     getTenantOwnerEmailMock.mockResolvedValue(undefined);
     getTenantOwnerMembershipMock.mockResolvedValue(undefined);
 
@@ -158,8 +154,9 @@ describe(TenantOverviewPage, () => {
   });
 
   it('always shows "Open site", pointing at the tenant\'s live domain', async () => {
-    const tenant = makeTenant({ primaryDomain: 'acme.example.com' });
-    listTenantsByIdsMock.mockResolvedValue([tenant]);
+    listTenantsByIdsMock.mockResolvedValue([
+      makeTenant({ primaryDomain: 'acme.example.com' }),
+    ]);
 
     await setup();
 
@@ -169,9 +166,6 @@ describe(TenantOverviewPage, () => {
   });
 
   it('never shows an "Open Studio" action — the sidebar is the only entry point to Studio', async () => {
-    const tenant = makeTenant();
-    listTenantsByIdsMock.mockResolvedValue([tenant]);
-
     await setup();
 
     expect(
@@ -180,8 +174,6 @@ describe(TenantOverviewPage, () => {
   });
 
   it("renders the tenant's open findings from listFindingsForTenant", async () => {
-    const tenant = makeTenant();
-    listTenantsByIdsMock.mockResolvedValue([tenant]);
     listFindingsForTenantMock.mockResolvedValue([makeFinding()]);
 
     await setup();
@@ -190,8 +182,6 @@ describe(TenantOverviewPage, () => {
   });
 
   it('shows the healthy empty state when the tenant has no open findings', async () => {
-    const tenant = makeTenant();
-    listTenantsByIdsMock.mockResolvedValue([tenant]);
     listFindingsForTenantMock.mockResolvedValue([]);
 
     await setup();

@@ -7,6 +7,12 @@ import { PresetPicker } from './preset-picker';
 const render = renderWithIntl;
 
 describe(PresetPicker, () => {
+  let user: ReturnType<typeof userEvent.setup>;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
   it('renders both presets and marks the current value selected', () => {
     render(<PresetPicker value={PRESET_ID.EDITORIAL} onChange={vi.fn()} />);
 
@@ -21,7 +27,6 @@ describe(PresetPicker, () => {
   });
 
   it('reports the newly picked preset on click', async () => {
-    const user = userEvent.setup();
     const handleChange = vi.fn();
     render(<PresetPicker value={PRESET_ID.CONSOLE} onChange={handleChange} />);
 
@@ -31,7 +36,6 @@ describe(PresetPicker, () => {
   });
 
   it('disables every option and stops reporting clicks when isDisabled is true', async () => {
-    const user = userEvent.setup();
     const handleChange = vi.fn();
     render(
       <PresetPicker

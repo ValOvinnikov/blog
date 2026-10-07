@@ -39,6 +39,7 @@ describe(`<${LookPage.name}/>`, () => {
     getAdminByUserIdMock.mockReset();
     getTenantByIdMock.mockReset();
     getSiteConfigMock.mockReset();
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
   });
 
   it('redirects to sign-in without querying the tenant when there is no session', async () => {
@@ -51,7 +52,6 @@ describe(`<${LookPage.name}/>`, () => {
   });
 
   it('404s when the signed-in user has no admins row', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue(undefined);
 
     await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
@@ -61,7 +61,6 @@ describe(`<${LookPage.name}/>`, () => {
   });
 
   it('renders Console defaults for an operator with no saved site_config row', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });
     getTenantByIdMock.mockResolvedValue({ id: 'tenant-1' });
     getSiteConfigMock.mockResolvedValue(undefined);

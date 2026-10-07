@@ -24,6 +24,7 @@ describe(requireAdmin, () => {
   beforeEach(() => {
     authMock.mockReset();
     getAdminByUserIdMock.mockReset();
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
   });
 
   it('redirects to sign-in without querying admins when there is no session', async () => {
@@ -36,7 +37,6 @@ describe(requireAdmin, () => {
   });
 
   it('404s when the signed-in user has no admins row', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue(undefined);
 
     await expect(requireAdmin()).rejects.toThrow('NEXT_NOT_FOUND');
@@ -46,7 +46,6 @@ describe(requireAdmin, () => {
   });
 
   it('resolves to the admin row for a signed-in admins row', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     const admin = { id: 'admin-1', userId: 'user-1', role: 'ADMIN' };
     getAdminByUserIdMock.mockResolvedValue(admin);
 

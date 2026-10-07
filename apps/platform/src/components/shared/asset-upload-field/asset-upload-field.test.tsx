@@ -26,6 +26,12 @@ const baseProps: TAssetUploadFieldProps = {
 const pngFile = () => new File(['bytes'], 'logo.png', { type: 'image/png' });
 
 describe(`<${AssetUploadField.name}/>`, () => {
+  let user: ReturnType<typeof userEvent.setup>;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
   it('shows no thumbnail or Remove control before any value is set', () => {
     render(<AssetUploadField {...baseProps} />);
 
@@ -133,7 +139,6 @@ describe(`<${AssetUploadField.name}/>`, () => {
   it('clears the saved value through onClear when Remove is clicked', async () => {
     const onClear = vi.fn().mockResolvedValue({ ok: true });
     const onChange = vi.fn();
-    const user = userEvent.setup();
     render(
       <AssetUploadField
         {...baseProps}
@@ -156,7 +161,6 @@ describe(`<${AssetUploadField.name}/>`, () => {
       .fn()
       .mockResolvedValue({ ok: false, error: 'Could not remove the logo.' });
     const onChange = vi.fn();
-    const user = userEvent.setup();
     render(
       <AssetUploadField
         {...baseProps}

@@ -44,6 +44,18 @@ describe(`<${TenantDetailLayout.name}/>`, () => {
     getTenantByIdMock.mockReset();
     resolveIsSidebarCollapsedMock.mockReset();
     resolveIsSidebarCollapsedMock.mockResolvedValue(false);
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    getAdminByUserIdMock.mockResolvedValue({
+      id: 'admin-1',
+      userId: 'user-1',
+      role: 'ADMIN',
+      createdAt: new Date(),
+    });
+    getTenantByIdMock.mockResolvedValue({
+      id: 'tenant-1',
+      name: 'Acme Inc.',
+      primaryDomain: 'acme.example.com',
+    });
   });
 
   it('redirects to sign-in without querying the tenant when there is no session', async () => {
@@ -56,7 +68,6 @@ describe(`<${TenantDetailLayout.name}/>`, () => {
   });
 
   it('404s when the signed-in user has no admins row', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue(undefined);
 
     await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
@@ -66,19 +77,6 @@ describe(`<${TenantDetailLayout.name}/>`, () => {
   });
 
   it('renders the gated content for a platform operator', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getAdminByUserIdMock.mockResolvedValue({
-      id: 'admin-1',
-      userId: 'user-1',
-      role: 'ADMIN',
-      createdAt: new Date(),
-    });
-    getTenantByIdMock.mockResolvedValue({
-      id: 'tenant-1',
-      name: 'Acme Inc.',
-      primaryDomain: 'acme.example.com',
-    });
-
     await setup();
 
     expect(screen.getByText('tenant content')).toBeVisible();
@@ -86,19 +84,6 @@ describe(`<${TenantDetailLayout.name}/>`, () => {
   });
 
   it('renders both the Platform and Tenant sections in the sidebar', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getAdminByUserIdMock.mockResolvedValue({
-      id: 'admin-1',
-      userId: 'user-1',
-      role: 'ADMIN',
-      createdAt: new Date(),
-    });
-    getTenantByIdMock.mockResolvedValue({
-      id: 'tenant-1',
-      name: 'Acme Inc.',
-      primaryDomain: 'acme.example.com',
-    });
-
     await setup();
 
     expect(screen.getByText('Platform', { selector: 'p' })).toBeVisible();
@@ -106,13 +91,6 @@ describe(`<${TenantDetailLayout.name}/>`, () => {
   });
 
   it('renders no tenant switcher in the sidebar', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getAdminByUserIdMock.mockResolvedValue({
-      id: 'admin-1',
-      userId: 'user-1',
-      role: 'ADMIN',
-      createdAt: new Date(),
-    });
     getTenantByIdMock.mockResolvedValue({
       id: 'tenant-1',
       slug: 'acme',

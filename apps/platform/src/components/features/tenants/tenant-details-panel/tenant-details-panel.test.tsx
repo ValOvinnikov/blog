@@ -11,7 +11,7 @@ import { mockRouter } from '@platform/testing/mock-router';
 import { makeTenant } from '@platform/testing/tenants/fixtures';
 import type { TTenantFieldLocks } from '@platform/utils/tenant-field-locks/tenant-field-locks';
 import { render as rtlRender } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { NextIntlClientProvider } from 'next-intl';
 import type { ReactElement } from 'react';
 
@@ -61,8 +61,10 @@ vi.mock('@platform/server/tenants/update-tenant-details-action', () => ({
 
 describe(`<${TenantDetailsPanel.name}/>`, () => {
   const refreshMock = vi.fn();
+  let user: UserEvent;
 
   beforeEach(() => {
+    user = userEvent.setup();
     updateTenantDetailsActionMock.mockReset();
     refreshMock.mockReset();
     mockRouter({ refresh: refreshMock });
@@ -129,7 +131,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     });
 
     it('enables Save when only the owner email is edited', async () => {
-      const user = userEvent.setup();
       const tenant = makeTenant();
       render(
         <TenantDetailsPanel
@@ -159,7 +160,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         ok: true,
         tenant: makeTenant({ name: 'Acme Renamed' }),
       });
-      const user = userEvent.setup();
       const tenant = makeTenant({ id: 'tenant-1', name: 'Acme Inc.' });
       render(
         <TenantDetailsPanel
@@ -193,7 +193,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         ok: true,
         tenant: makeTenant(),
       });
-      const user = userEvent.setup();
       const tenant = makeTenant({ id: 'tenant-1' });
       render(
         <TenantDetailsPanel
@@ -223,7 +222,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         ok: false,
         fieldErrors: { primaryDomain: 'This domain is already in use.' },
       });
-      const user = userEvent.setup();
       const tenant = makeTenant();
       render(
         <TenantDetailsPanel
@@ -254,7 +252,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
           primaryDomain: 'Enter a valid domain.',
         },
       });
-      const user = userEvent.setup();
       const tenant = makeTenant();
       render(
         <TenantDetailsPanel
@@ -284,7 +281,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         ok: true,
         tenant: makeTenant({ id: 'tenant-1', name: 'Acme Renamed' }),
       });
-      const user = userEvent.setup();
       const tenant = makeTenant({ id: 'tenant-1', name: 'Acme Inc.' });
       render(
         <TenantDetailsPanel
@@ -312,7 +308,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         ok: false,
         fieldErrors: { primaryDomain: 'This domain is already in use.' },
       });
-      const user = userEvent.setup();
       const tenant = makeTenant();
       render(
         <TenantDetailsPanel
@@ -339,7 +334,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         error:
           "This tenant's provisioning has already started; its details can no longer be edited.",
       });
-      const user = userEvent.setup();
       const tenant = makeTenant();
       render(
         <TenantDetailsPanel
@@ -366,7 +360,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         error:
           "This tenant's owner has already signed in, so their email can no longer be corrected here — this would transfer ownership instead.",
       });
-      const user = userEvent.setup();
       const tenant = makeTenant({ id: 'tenant-1' });
       render(
         <TenantDetailsPanel
@@ -398,7 +391,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
           ownerEmail: 'This email already has a pending invite on this tenant.',
         },
       });
-      const user = userEvent.setup();
       const tenant = makeTenant();
       render(
         <TenantDetailsPanel
@@ -480,7 +472,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
           primaryDomain: 'new-domain.example.com',
         }),
       });
-      const user = userEvent.setup();
       const tenant = makeTenant({
         id: 'tenant-1',
         name: 'Acme Inc.',
@@ -542,7 +533,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         ok: true,
         tenant: makeTenant({ locale: LOCALE_ISO_CODES.NL }),
       });
-      const user = userEvent.setup();
       render(
         <TenantDetailsPanel
           tenant={makeTenant({ id: 'tenant-1', locale: LOCALE_ISO_CODES.EN })}
@@ -570,7 +560,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
             'Locked — the "Connect domain" step has already completed and used this value.',
         },
       });
-      const user = userEvent.setup();
       const tenant = makeTenant({ id: 'tenant-1' });
       render(
         <TenantDetailsPanel
@@ -648,7 +637,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
   describe('mid-edit lock transition', () => {
     it('discards an unsaved edit and reverts to the server value when the field being edited newly locks', async () => {
-      const user = userEvent.setup();
       const tenant = makeTenant({ primaryDomain: 'acme.example.com' });
       const { rerender } = rtlRender(
         withIntl(
@@ -688,7 +676,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     });
 
     it('leaves an unrelated field’s unsaved edit alone when a different field newly locks', async () => {
-      const user = userEvent.setup();
       const tenant = makeTenant({ name: 'Acme Inc.' });
       const { rerender } = rtlRender(
         withIntl(
@@ -737,7 +724,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     });
 
     it('enables once a field is edited, and disables again once edited back to the original value', async () => {
-      const user = userEvent.setup();
       const tenant = makeTenant({ name: 'Acme Inc.' });
       render(
         <TenantDetailsPanel
@@ -773,7 +759,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
             resolveAction = resolve;
           }),
       );
-      const user = userEvent.setup();
       const tenant = makeTenant({ id: 'tenant-1', name: 'Acme Inc.' });
       render(
         <TenantDetailsPanel
@@ -809,7 +794,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         ok: true,
         tenant: makeTenant({ id: 'tenant-1', name: 'Acme Renamed' }),
       });
-      const user = userEvent.setup();
       const tenant = makeTenant({ id: 'tenant-1', name: 'Acme Inc.' });
       const { rerender } = rtlRender(
         withIntl(
@@ -965,7 +949,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
   describe('archived tenant', () => {
     it('disables every field and the Save button, regardless of edits or field locks', async () => {
-      const user = userEvent.setup();
       const tenant = makeTenant({
         name: 'Acme Inc.',
         deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),

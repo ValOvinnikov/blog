@@ -3,7 +3,7 @@ import {
   screen,
   waitFor,
 } from '@platform/testing/custom-render';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { EmailSettingsForm } from './email-settings-form';
 
@@ -33,93 +33,83 @@ const INITIAL_VALUES = {
 };
 
 describe(EmailSettingsForm, () => {
+  let user: UserEvent;
+
   beforeEach(() => {
+    user = userEvent.setup();
     updateEmailConfigActionMock.mockReset();
     updateEmailConfigActionMock.mockResolvedValue({ ok: true });
   });
 
-  it('renders the given initial values', () => {
-    render(
-      <EmailSettingsForm tenantId="tenant-1" initialValues={INITIAL_VALUES} />,
-    );
-
-    expect(screen.getByDisplayValue('Acme Co')).toBeVisible();
-    expect(screen.getByDisplayValue('support@acme.example')).toBeVisible();
-    expect(screen.getByDisplayValue('123 Main St')).toBeVisible();
-  });
-
-  it('saves edited fields as-is', async () => {
-    render(
-      <EmailSettingsForm tenantId="tenant-1" initialValues={INITIAL_VALUES} />,
-    );
-
-    const user = userEvent.setup();
-    const senderNameInput = screen.getByDisplayValue('Acme Co');
-    await user.clear(senderNameInput);
-    await user.type(senderNameInput, 'New Name');
-    await user.click(screen.getByRole('button', { name: 'Save changes' }));
-
-    await waitFor(() => {
-      expect(updateEmailConfigActionMock).toHaveBeenCalledWith('tenant-1', {
-        senderName: 'New Name',
-        replyToAddress: 'support@acme.example',
-        footerPostalAddress: '123 Main St',
-      });
-    });
-  });
-
-  it('sends null, not an empty string, when a field is cleared', async () => {
-    render(
-      <EmailSettingsForm tenantId="tenant-1" initialValues={INITIAL_VALUES} />,
-    );
-
-    const user = userEvent.setup();
-    await user.clear(screen.getByDisplayValue('Acme Co'));
-    await user.click(screen.getByRole('button', { name: 'Save changes' }));
-
-    await waitFor(() => {
-      expect(updateEmailConfigActionMock).toHaveBeenCalledWith(
-        'tenant-1',
-        expect.objectContaining({ senderName: null }),
+  describe('with the saved initial values', () => {
+    beforeEach(() => {
+      render(
+        <EmailSettingsForm
+          tenantId="tenant-1"
+          initialValues={INITIAL_VALUES}
+        />,
       );
     });
-  });
 
-  it('shows a spinner, marks Save busy, and announces the pending state to assistive tech while the save is in flight', async () => {
-    let resolveAction: (value: { ok: boolean }) => void = () => {};
-    updateEmailConfigActionMock.mockImplementation(
-      () =>
-        new Promise((resolve) => {
-          resolveAction = resolve;
-        }),
-    );
-    render(
-      <EmailSettingsForm tenantId="tenant-1" initialValues={INITIAL_VALUES} />,
-    );
+    it('renders the given initial values', () => {
+      expect(screen.getByDisplayValue('Acme Co')).toBeVisible();
+      expect(screen.getByDisplayValue('support@acme.example')).toBeVisible();
+      expect(screen.getByDisplayValue('123 Main St')).toBeVisible();
+    });
 
-    const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+    it('saves edited fields as-is', async () => {
+      const senderNameInput = screen.getByDisplayValue('Acme Co');
+      await user.clear(senderNameInput);
+      await user.type(senderNameInput, 'New Name');
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
-    const saveButton = await screen.findByRole('button', { name: 'Saving…' });
-    expect(saveButton).toBeDisabled();
-    expect(saveButton).toHaveAttribute('aria-busy', 'true');
-    expect(screen.getByRole('status')).toHaveTextContent('Saving…');
+      await waitFor(() => {
+        expect(updateEmailConfigActionMock).toHaveBeenCalledWith('tenant-1', {
+          senderName: 'New Name',
+          replyToAddress: 'support@acme.example',
+          footerPostalAddress: '123 Main St',
+        });
+      });
+    });
 
-    resolveAction({ ok: true });
-  });
+    it('sends null, not an empty string, when a field is cleared', async () => {
+      await user.clear(screen.getByDisplayValue('Acme Co'));
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
-  it('shows an error alert when the save fails', async () => {
-    updateEmailConfigActionMock.mockResolvedValue({ ok: false });
-    render(
-      <EmailSettingsForm tenantId="tenant-1" initialValues={INITIAL_VALUES} />,
-    );
+      await waitFor(() => {
+        expect(updateEmailConfigActionMock).toHaveBeenCalledWith(
+          'tenant-1',
+          expect.objectContaining({ senderName: null }),
+        );
+      });
+    });
 
-    const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+    it('shows a spinner, marks Save busy, and announces the pending state to assistive tech while the save is in flight', async () => {
+      let resolveAction: (value: { ok: boolean }) => void = () => {};
+      updateEmailConfigActionMock.mockImplementation(
+        () =>
+          new Promise((resolve) => {
+            resolveAction = resolve;
+          }),
+      );
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      "Couldn't save email settings",
-    );
+      const saveButton = await screen.findByRole('button', { name: 'Saving…' });
+      expect(saveButton).toBeDisabled();
+      expect(saveButton).toHaveAttribute('aria-busy', 'true');
+      expect(screen.getByRole('status')).toHaveTextContent('Saving…');
+
+      resolveAction({ ok: true });
+    });
+
+    it('shows an error alert when the save fails', async () => {
+      updateEmailConfigActionMock.mockResolvedValue({ ok: false });
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        "Couldn't save email settings",
+      );
+    });
   });
 
   it('disables Save while the tenant is archived', () => {

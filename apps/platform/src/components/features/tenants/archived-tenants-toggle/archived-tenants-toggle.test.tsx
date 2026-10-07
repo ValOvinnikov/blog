@@ -1,6 +1,6 @@
 import { useRouter } from '@platform/i18n/navigation';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { ArchivedTenantsToggle } from './archived-tenants-toggle';
 
@@ -11,7 +11,10 @@ vi.mock('@platform/i18n/navigation');
 const pushMock = vi.fn();
 
 describe(ArchivedTenantsToggle, () => {
+  let user: UserEvent;
+
   beforeEach(() => {
+    user = userEvent.setup();
     vi.mocked(useRouter).mockReturnValue({ ...useRouter(), push: pushMock });
   });
 
@@ -34,7 +37,6 @@ describe(ArchivedTenantsToggle, () => {
   });
 
   it('navigates to the archived tenant list when All is selected', async () => {
-    const user = userEvent.setup();
     render(<ArchivedTenantsToggle shouldShowArchived={false} />);
 
     await user.click(screen.getByRole('button', { name: 'All' }));
@@ -43,7 +45,6 @@ describe(ArchivedTenantsToggle, () => {
   });
 
   it('navigates back to the active-only list when Active is selected', async () => {
-    const user = userEvent.setup();
     render(<ArchivedTenantsToggle shouldShowArchived={true} />);
 
     await user.click(screen.getByRole('button', { name: 'Active' }));

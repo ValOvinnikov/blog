@@ -11,9 +11,13 @@ const buildMatcherRegExp = () => {
 };
 
 describe('proxy matcher', () => {
-  it('rewrites real content routes through locale middleware', () => {
-    const matcher = buildMatcherRegExp();
+  let matcher: RegExp;
 
+  beforeEach(() => {
+    matcher = buildMatcherRegExp();
+  });
+
+  it('rewrites real content routes through locale middleware', () => {
     expect(matcher.test('/')).toBe(true);
     expect(matcher.test('/tenants')).toBe(true);
     expect(matcher.test('/tenants/tenant-1/look')).toBe(true);
@@ -24,8 +28,6 @@ describe('proxy matcher', () => {
   });
 
   it('rewrites Studio routes whose structure ids contain dots', () => {
-    const matcher = buildMatcherRegExp();
-
     expect(
       matcher.test(
         '/tenants/tenant-1/studio/structure/blog;page_post;page_post-provisioning.post.starter',
@@ -42,8 +44,6 @@ describe('proxy matcher', () => {
   });
 
   it('excludes api, _next, _vercel, and root-level dotted paths', () => {
-    const matcher = buildMatcherRegExp();
-
     expect(matcher.test('/api/auth/signin')).toBe(false);
     expect(matcher.test('/_next/static/chunk.js')).toBe(false);
     expect(matcher.test('/_vercel/insights')).toBe(false);

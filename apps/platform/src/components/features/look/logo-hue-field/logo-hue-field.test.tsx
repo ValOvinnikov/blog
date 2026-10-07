@@ -3,13 +3,19 @@ import {
   screen,
   waitFor,
 } from '@platform/testing/custom-render';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LogoHueField } from './logo-hue-field';
 
 const render = renderWithIntl;
 
 describe(LogoHueField, () => {
+  let user: UserEvent;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
   it('shows the follows-accent state, distinct from any explicit hue, when logoHue is unset', () => {
     render(
       <LogoHueField
@@ -44,7 +50,6 @@ describe(LogoHueField, () => {
   });
 
   it("switching follow off seeds the explicit hue from the accent's current value", async () => {
-    const user = userEvent.setup();
     const handleChange = vi.fn();
     render(
       <LogoHueField
@@ -61,7 +66,6 @@ describe(LogoHueField, () => {
   });
 
   it('switching follow back on reports undefined', async () => {
-    const user = userEvent.setup();
     const handleChange = vi.fn();
     render(
       <LogoHueField

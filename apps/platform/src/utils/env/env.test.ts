@@ -49,6 +49,7 @@ const importEnvOnServer = async (): Promise<typeof import('./env')> => {
 describe('env', () => {
   beforeEach(() => {
     process.env['AUTH_SECRET'] = 'test-auth-secret';
+    delete process.env['SKIP_ENV_VALIDATION'];
   });
 
   afterEach(() => {
@@ -56,7 +57,6 @@ describe('env', () => {
   });
 
   it('parses a valid RESEND_API_KEY and exposes it typed', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
     process.env['RESEND_API_KEY'] = 'resend-key';
 
     const { env } = await importEnvOnServer();
@@ -65,7 +65,6 @@ describe('env', () => {
   });
 
   it('leaves RESEND_API_KEY undefined when absent (magic-link sign-in stays unavailable)', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
     delete process.env['RESEND_API_KEY'];
 
     const { env } = await importEnvOnServer();
@@ -81,7 +80,6 @@ describe('env', () => {
   });
 
   it('parses a valid BLOB_READ_WRITE_TOKEN and exposes it typed', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
     process.env['BLOB_READ_WRITE_TOKEN'] = 'vercel_blob_rw_store_token';
 
     const { env } = await importEnvOnServer();
@@ -90,7 +88,6 @@ describe('env', () => {
   });
 
   it('leaves BLOB_READ_WRITE_TOKEN undefined when absent (uploads stay unavailable)', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
     delete process.env['BLOB_READ_WRITE_TOKEN'];
 
     const { env } = await importEnvOnServer();
@@ -99,7 +96,6 @@ describe('env', () => {
   });
 
   it('parses a valid WEB_APP_URL and exposes it typed', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
     process.env['WEB_APP_URL'] = 'https://example.com';
 
     const { env } = await importEnvOnServer();
@@ -108,7 +104,6 @@ describe('env', () => {
   });
 
   it('leaves WEB_APP_URL undefined when absent (revalidation calls are skipped)', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
     delete process.env['WEB_APP_URL'];
 
     const { env } = await importEnvOnServer();
@@ -117,7 +112,6 @@ describe('env', () => {
   });
 
   it('parses a valid SITE_CONFIG_REVALIDATE_SECRET and exposes it typed', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
     process.env['SITE_CONFIG_REVALIDATE_SECRET'] = 'shared-secret';
 
     const { env } = await importEnvOnServer();
@@ -126,7 +120,6 @@ describe('env', () => {
   });
 
   it('leaves SITE_CONFIG_REVALIDATE_SECRET undefined when absent (revalidation calls are skipped)', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
     delete process.env['SITE_CONFIG_REVALIDATE_SECRET'];
 
     const { env } = await importEnvOnServer();
@@ -135,7 +128,6 @@ describe('env', () => {
   });
 
   it('never throws at import time when WEB_APP_URL/SITE_CONFIG_REVALIDATE_SECRET are absent', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
     delete process.env['WEB_APP_URL'];
     delete process.env['SITE_CONFIG_REVALIDATE_SECRET'];
 
@@ -143,7 +135,6 @@ describe('env', () => {
   });
 
   it('parses a valid TENANT_PROVISIONING_GITHUB_TOKEN and exposes it typed', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
     process.env['TENANT_PROVISIONING_GITHUB_TOKEN'] = 'ghp_token';
 
     const { env } = await importEnvOnServer();
@@ -152,7 +143,6 @@ describe('env', () => {
   });
 
   it('leaves TENANT_PROVISIONING_GITHUB_TOKEN undefined when absent (dispatch is skipped)', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
     delete process.env['TENANT_PROVISIONING_GITHUB_TOKEN'];
 
     const { env } = await importEnvOnServer();
@@ -161,7 +151,6 @@ describe('env', () => {
   });
 
   it('parses a valid TENANT_PROVISIONING_GITHUB_REPO and exposes it typed', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
     process.env['TENANT_PROVISIONING_GITHUB_REPO'] = 'acme-org/acme-repo';
 
     const { env } = await importEnvOnServer();
@@ -170,7 +159,6 @@ describe('env', () => {
   });
 
   it('leaves TENANT_PROVISIONING_GITHUB_REPO undefined when absent (dispatch is skipped)', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
     delete process.env['TENANT_PROVISIONING_GITHUB_REPO'];
 
     const { env } = await importEnvOnServer();
@@ -179,14 +167,12 @@ describe('env', () => {
   });
 
   it('rejects a TENANT_PROVISIONING_GITHUB_REPO value with no slash', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
     process.env['TENANT_PROVISIONING_GITHUB_REPO'] = 'acme-repo';
 
     await expect(importEnvOnServer()).rejects.toThrow();
   });
 
   it('parses a valid TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE and exposes it typed', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
     process.env['TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE'] =
       'https://tenant-dev.tailnet.ts.net';
 
@@ -198,7 +184,6 @@ describe('env', () => {
   });
 
   it('leaves TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE undefined when absent (the workflow dispatch omits the override input)', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
     delete process.env['TENANT_PROVISIONING_ADMIN_BASE_URL_OVERRIDE'];
 
     const { env } = await importEnvOnServer();
@@ -207,7 +192,6 @@ describe('env', () => {
   });
 
   it('parses valid Vercel domain-check vars and exposes them typed', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
     process.env['VERCEL_API_TOKEN'] = 'vercel-token';
     process.env['VERCEL_PROJECT_ID_WEB'] = 'prj_123';
     process.env['VERCEL_TEAM_ID'] = 'team_123';
@@ -220,7 +204,6 @@ describe('env', () => {
   });
 
   it('leaves Vercel domain-check vars undefined when absent (the status page skips the live check)', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
     delete process.env['VERCEL_API_TOKEN'];
     delete process.env['VERCEL_PROJECT_ID_WEB'];
     delete process.env['VERCEL_TEAM_ID'];

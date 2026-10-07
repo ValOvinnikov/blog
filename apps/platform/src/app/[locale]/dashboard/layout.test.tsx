@@ -33,6 +33,7 @@ describe(`<${DashboardLayout.name}/>`, () => {
     authMock.mockReset();
     listMembershipsForUserMock.mockReset();
     listTenantsByIdsMock.mockReset();
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
   });
 
   it('redirects to sign-in without querying memberships when there is no session', async () => {
@@ -45,7 +46,6 @@ describe(`<${DashboardLayout.name}/>`, () => {
   });
 
   it('redirects to /workspace-pending when the signed-in user has zero memberships', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     listMembershipsForUserMock.mockResolvedValue([]);
 
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
@@ -54,7 +54,6 @@ describe(`<${DashboardLayout.name}/>`, () => {
   });
 
   it('renders the gated content for any membership without resolving a single tenant', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     listMembershipsForUserMock.mockResolvedValue([
       { id: 'm-1', userId: 'user-1', tenantId: 'tenant-1', role: 'OWNER' },
       { id: 'm-2', userId: 'user-1', tenantId: 'tenant-2', role: 'OWNER' },

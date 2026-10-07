@@ -10,9 +10,11 @@ vi.mock('@platform/server/tenants/create-tenant-action', () => ({
 }));
 
 describe(AddTenantWizard, () => {
-  it('renders the page H1 and demotes Tenant details to the step-1 card heading', () => {
+  beforeEach(() => {
     render(<AddTenantWizard />);
+  });
 
+  it('renders the page H1 and demotes Tenant details to the step-1 card heading', () => {
     expect(
       screen.getByRole('heading', { level: 1, name: 'Add tenant' }),
     ).toBeVisible();
@@ -22,8 +24,6 @@ describe(AddTenantWizard, () => {
   });
 
   it('renders a rail item for Details plus every core provisioning step, with Details active', () => {
-    render(<AddTenantWizard />);
-
     const rail = screen.getByRole('navigation', {
       name: 'Provisioning steps',
     });
@@ -41,8 +41,6 @@ describe(AddTenantWizard, () => {
   });
 
   it("renders the Details form's fields", () => {
-    render(<AddTenantWizard />);
-
     expect(screen.getByRole('textbox', { name: 'Tenant name' })).toBeVisible();
   });
 });

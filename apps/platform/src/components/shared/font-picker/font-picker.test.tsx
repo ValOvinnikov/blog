@@ -5,6 +5,12 @@ import userEvent from '@testing-library/user-event';
 import { FontPicker } from './font-picker';
 
 describe(FontPicker, () => {
+  let user: ReturnType<typeof userEvent.setup>;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
   it('renders every closed-set font option by its real name', () => {
     render(
       <FontPicker
@@ -36,7 +42,6 @@ describe(FontPicker, () => {
   });
 
   it('reports the newly picked font on click', async () => {
-    const user = userEvent.setup();
     const handleChange = vi.fn();
     render(
       <FontPicker
@@ -52,7 +57,6 @@ describe(FontPicker, () => {
   });
 
   it('disables every option and stops reporting clicks when isDisabled is true', async () => {
-    const user = userEvent.setup();
     const handleChange = vi.fn();
     render(
       <FontPicker

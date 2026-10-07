@@ -20,6 +20,12 @@ const setup = customRender(VoiceFieldGroup, {
 });
 
 describe(`<${VoiceFieldGroup.name}/>`, () => {
+  let user: ReturnType<typeof userEvent.setup>;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
   it('renders the group title, field count, and every field label', () => {
     setup();
 
@@ -61,7 +67,6 @@ describe(`<${VoiceFieldGroup.name}/>`, () => {
   });
 
   it('focuses a field input when its visible label is clicked', async () => {
-    const user = userEvent.setup();
     setup();
 
     const label = screen.getByText('Not Found Heading', {
@@ -92,7 +97,6 @@ describe(`<${VoiceFieldGroup.name}/>`, () => {
   });
 
   it('forwards a field change with its own key', async () => {
-    const user = userEvent.setup();
     const onFieldChange = vi.fn();
     setup({ onFieldChange });
 

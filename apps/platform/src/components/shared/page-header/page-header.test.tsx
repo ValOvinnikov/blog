@@ -3,11 +3,24 @@ import { render, screen } from '@platform/testing/custom-render';
 import { PageHeader } from './page-header';
 
 describe(PageHeader, () => {
-  it('renders the title through a level-1 heading', () => {
-    render(<PageHeader title="Tenants" />);
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Tenants' }),
-    ).toBeVisible();
+  describe('with only the title', () => {
+    beforeEach(() => {
+      render(<PageHeader title="Tenants" />);
+    });
+
+    it('renders the title through a level-1 heading', () => {
+      expect(
+        screen.getByRole('heading', { level: 1, name: 'Tenants' }),
+      ).toBeVisible();
+    });
+
+    it('omits the description when not provided', () => {
+      expect(screen.queryByText(/every site/i)).toBeNull();
+    });
+
+    it('omits the actions container when not provided', () => {
+      expect(screen.queryByRole('button')).toBeNull();
+    });
   });
 
   it('renders a description when provided', () => {
@@ -15,11 +28,6 @@ describe(PageHeader, () => {
       <PageHeader title="Tenants" description="Every site on the platform." />,
     );
     expect(screen.getByText('Every site on the platform.')).toBeVisible();
-  });
-
-  it('omits the description when not provided', () => {
-    render(<PageHeader title="Tenants" />);
-    expect(screen.queryByText(/every site/i)).toBeNull();
   });
 
   it('renders badges beside the title', () => {
@@ -40,11 +48,6 @@ describe(PageHeader, () => {
       />,
     );
     expect(screen.getByRole('button', { name: 'Add tenant' })).toBeVisible();
-  });
-
-  it('omits the actions container when not provided', () => {
-    render(<PageHeader title="Tenants" />);
-    expect(screen.queryByRole('button')).toBeNull();
   });
 
   it('renders with only the required title, without throwing', () => {

@@ -24,6 +24,7 @@ describe(requireSuperAdmin, () => {
   beforeEach(() => {
     authMock.mockReset();
     getAdminByUserIdMock.mockReset();
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
   });
 
   it('redirects to sign-in without querying the admins row when there is no session', async () => {
@@ -36,7 +37,6 @@ describe(requireSuperAdmin, () => {
   });
 
   it('404s when the signed-in user has no admins row', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue(undefined);
 
     await expect(requireSuperAdmin()).rejects.toThrow('NEXT_NOT_FOUND');
@@ -45,7 +45,6 @@ describe(requireSuperAdmin, () => {
   });
 
   it('404s when the admin row is below SUPERADMIN', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });
 
     await expect(requireSuperAdmin()).rejects.toThrow('NEXT_NOT_FOUND');
@@ -54,7 +53,6 @@ describe(requireSuperAdmin, () => {
   });
 
   it('resolves to the admin row when the role is SUPERADMIN', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     const admin = { id: 'admin-1', role: 'SUPERADMIN' };
     getAdminByUserIdMock.mockResolvedValue(admin);
 

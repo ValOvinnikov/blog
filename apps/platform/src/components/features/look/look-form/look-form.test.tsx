@@ -12,7 +12,7 @@ import {
   within,
 } from '@platform/testing/custom-render';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';
 
@@ -49,7 +49,10 @@ const setup = customRender(LookForm, {
 });
 
 describe(`<${LookForm.name}/>`, () => {
+  let user: UserEvent;
+
   beforeEach(() => {
+    user = userEvent.setup();
     updateLookActionMock.mockReset();
     updateLookActionMock.mockResolvedValue({ ok: true });
   });
@@ -87,7 +90,6 @@ describe(`<${LookForm.name}/>`, () => {
   });
 
   it("choosing a preset doesn't clear an already-saved brand image", async () => {
-    const user = userEvent.setup();
     setup({
       initialValues: {
         ...defaultLookFormValues(),
@@ -101,7 +103,6 @@ describe(`<${LookForm.name}/>`, () => {
   });
 
   it("choosing a preset resets every one of that preset's defaults", async () => {
-    const user = userEvent.setup();
     setup();
 
     await user.click(screen.getByRole('radio', { name: 'Editorial' }));
@@ -110,7 +111,6 @@ describe(`<${LookForm.name}/>`, () => {
   });
 
   it('saves the current form state through updateLookAction', async () => {
-    const user = userEvent.setup();
     setup();
 
     screen.getByRole('slider', { name: 'Accent hue' }).focus();
@@ -141,7 +141,6 @@ describe(`<${LookForm.name}/>`, () => {
   });
 
   it('saves the chosen language switcher style', async () => {
-    const user = userEvent.setup();
     setup();
 
     await user.click(screen.getByRole('button', { name: 'Compact codes' }));
@@ -171,7 +170,6 @@ describe(`<${LookForm.name}/>`, () => {
   });
 
   it('shows a save-confirmation toast once the save resolves', async () => {
-    const user = userEvent.setup();
     setup();
 
     screen.getByRole('slider', { name: 'Accent hue' }).focus();
@@ -189,7 +187,6 @@ describe(`<${LookForm.name}/>`, () => {
           resolveAction = resolve;
         }),
     );
-    const user = userEvent.setup();
     setup();
 
     screen.getByRole('slider', { name: 'Accent hue' }).focus();
@@ -206,7 +203,6 @@ describe(`<${LookForm.name}/>`, () => {
 
   it('shows an error alert when the save fails', async () => {
     updateLookActionMock.mockResolvedValue({ ok: false });
-    const user = userEvent.setup();
     setup();
 
     screen.getByRole('slider', { name: 'Accent hue' }).focus();
@@ -219,7 +215,6 @@ describe(`<${LookForm.name}/>`, () => {
   });
 
   it('disables Reset to preset and Save changes until the form is dirty', async () => {
-    const user = userEvent.setup();
     setup();
 
     expect(
@@ -237,7 +232,6 @@ describe(`<${LookForm.name}/>`, () => {
   });
 
   it('resets a diverged control back to the current preset on "Reset to preset"', async () => {
-    const user = userEvent.setup();
     setup();
 
     const slider = screen.getByRole('slider', { name: 'Accent hue' });
@@ -252,7 +246,6 @@ describe(`<${LookForm.name}/>`, () => {
 
   describe('archived tenant', () => {
     it('shows an archived notice and disables Save even once dirty', async () => {
-      const user = userEvent.setup();
       setup({ archivedAt: ARCHIVED_AT });
 
       expect(screen.getByText('This tenant is archived')).toBeVisible();
@@ -290,7 +283,6 @@ describe(`<${LookForm.name}/>`, () => {
     });
 
     it('disables the Advanced section controls', async () => {
-      const user = userEvent.setup();
       setup({ archivedAt: ARCHIVED_AT });
 
       await user.click(screen.getByText('Advanced'));
@@ -318,7 +310,6 @@ describe(`<${LookForm.name}/>`, () => {
   });
 
   it('leaves every Look control enabled for a non-archived tenant', async () => {
-    const user = userEvent.setup();
     setup();
 
     await user.click(screen.getByText('Advanced'));

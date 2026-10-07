@@ -38,6 +38,11 @@ describe(resolveDashboardTenant, () => {
   beforeEach(() => {
     listSessionTenantsMock.mockReset();
     cookiesMock.mockReset();
+    listSessionTenantsMock.mockResolvedValue({
+      userId: 'user-1',
+      memberships: [membership1, membership2],
+      tenants: [tenant1, tenant2],
+    });
   });
 
   it('404s when the single membership points at a tenant that no longer exists', async () => {
@@ -72,11 +77,6 @@ describe(resolveDashboardTenant, () => {
   });
 
   it('resolves the tenant named by a valid active-tenant cookie when there are multiple memberships', async () => {
-    listSessionTenantsMock.mockResolvedValue({
-      userId: 'user-1',
-      memberships: [membership1, membership2],
-      tenants: [tenant1, tenant2],
-    });
     mockCookie('tenant-2');
 
     const result = await resolveDashboardTenant();
@@ -90,11 +90,6 @@ describe(resolveDashboardTenant, () => {
   });
 
   it('redirects to the picker when there are multiple memberships and no active-tenant cookie', async () => {
-    listSessionTenantsMock.mockResolvedValue({
-      userId: 'user-1',
-      memberships: [membership1, membership2],
-      tenants: [tenant1, tenant2],
-    });
     mockCookie(undefined);
 
     await expect(resolveDashboardTenant()).rejects.toThrow('NEXT_REDIRECT');
@@ -103,11 +98,6 @@ describe(resolveDashboardTenant, () => {
   });
 
   it('redirects to the picker when the cookie names a tenant the session no longer has a membership for', async () => {
-    listSessionTenantsMock.mockResolvedValue({
-      userId: 'user-1',
-      memberships: [membership1, membership2],
-      tenants: [tenant1, tenant2],
-    });
     mockCookie('tenant-revoked');
 
     await expect(resolveDashboardTenant()).rejects.toThrow('NEXT_REDIRECT');

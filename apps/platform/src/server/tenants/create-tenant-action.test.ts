@@ -75,7 +75,9 @@ const validInput = {
 };
 
 describe('createTenantAction', () => {
-  beforeEach(() => {
+  let createTenantAction: typeof import('./create-tenant-action').createTenantAction;
+
+  beforeEach(async () => {
     requireAdminMock.mockReset();
     requireAdminMock.mockResolvedValue({ id: 'admin-1' });
     authMock.mockReset();
@@ -114,11 +116,10 @@ describe('createTenantAction', () => {
     insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
     loggerErrorMock.mockReset();
     loggerWarnMock.mockReset();
+    ({ createTenantAction } = await import('./create-tenant-action'));
   });
 
   it('returns field errors for an invalid domain without touching the database', async () => {
-    const { createTenantAction } = await import('./create-tenant-action');
-
     const result = await createTenantAction({
       ...validInput,
       domain: 'not a domain',
@@ -134,7 +135,6 @@ describe('createTenantAction', () => {
 
   it('returns a soft owner-invite confirmation when the owner email matches no user', async () => {
     getUserByEmailMock.mockResolvedValue(undefined);
-    const { createTenantAction } = await import('./create-tenant-action');
 
     const result = await createTenantAction(validInput);
 
@@ -153,7 +153,6 @@ describe('createTenantAction', () => {
 
   it('re-issues a confirmation when the confirming token was for a different email', async () => {
     getUserByEmailMock.mockResolvedValue(undefined);
-    const { createTenantAction } = await import('./create-tenant-action');
     const tokenForOtherEmail = createOwnerInviteToken('other@example.com');
 
     const result = await createTenantAction({
@@ -175,7 +174,6 @@ describe('createTenantAction', () => {
 
   it('re-issues a confirmation when the confirming token is invalid', async () => {
     getUserByEmailMock.mockResolvedValue(undefined);
-    const { createTenantAction } = await import('./create-tenant-action');
 
     const result = await createTenantAction({
       ...validInput,
@@ -196,7 +194,6 @@ describe('createTenantAction', () => {
 
   it('proceeds down the invite path once the token verifies for an unregistered email', async () => {
     getUserByEmailMock.mockResolvedValue(undefined);
-    const { createTenantAction } = await import('./create-tenant-action');
 
     await expect(
       createTenantAction({
@@ -223,7 +220,6 @@ describe('createTenantAction', () => {
   it('logs an error but still redirects when the owner-invite email fails to send', async () => {
     getUserByEmailMock.mockResolvedValue(undefined);
     signInMock.mockResolvedValue({ ok: false, error: 'EmailSignInError' });
-    const { createTenantAction } = await import('./create-tenant-action');
 
     await expect(
       createTenantAction({
@@ -246,7 +242,6 @@ describe('createTenantAction', () => {
   it('logs an error but still redirects when the owner-invite sign-in throws', async () => {
     getUserByEmailMock.mockResolvedValue(undefined);
     signInMock.mockRejectedValue(new Error('network error'));
-    const { createTenantAction } = await import('./create-tenant-action');
 
     await expect(
       createTenantAction({
@@ -268,8 +263,6 @@ describe('createTenantAction', () => {
   });
 
   it('never triggers the owner-invite sign-in email on the found-owner path', async () => {
-    const { createTenantAction } = await import('./create-tenant-action');
-
     await expect(createTenantAction(validInput)).rejects.toThrow(
       'NEXT_REDIRECT',
     );
@@ -279,7 +272,6 @@ describe('createTenantAction', () => {
 
   it('returns a field error when the domain is already taken', async () => {
     getTenantByDomainMock.mockResolvedValue({ id: 'existing-tenant' });
-    const { createTenantAction } = await import('./create-tenant-action');
 
     const result = await createTenantAction(validInput);
 
@@ -292,7 +284,6 @@ describe('createTenantAction', () => {
 
   it('returns a field error and blocks creation when another project uses the domain', async () => {
     checkDomainAvailabilityMock.mockResolvedValue('IN_USE');
-    const { createTenantAction } = await import('./create-tenant-action');
 
     const result = await createTenantAction(validInput);
 
@@ -305,7 +296,6 @@ describe('createTenantAction', () => {
 
   it('proceeds with creation when the domain is free', async () => {
     checkDomainAvailabilityMock.mockResolvedValue('AVAILABLE');
-    const { createTenantAction } = await import('./create-tenant-action');
 
     await expect(createTenantAction(validInput)).rejects.toThrow(
       'NEXT_REDIRECT',
@@ -316,7 +306,6 @@ describe('createTenantAction', () => {
 
   it('proceeds with creation unchecked when Vercel credentials are absent', async () => {
     checkDomainAvailabilityMock.mockResolvedValue('NOT_CONFIGURED');
-    const { createTenantAction } = await import('./create-tenant-action');
 
     await expect(createTenantAction(validInput)).rejects.toThrow(
       'NEXT_REDIRECT',
@@ -327,7 +316,6 @@ describe('createTenantAction', () => {
 
   it('proceeds with creation when the domain-availability check errors or times out', async () => {
     checkDomainAvailabilityMock.mockResolvedValue('ERROR');
-    const { createTenantAction } = await import('./create-tenant-action');
 
     await expect(createTenantAction(validInput)).rejects.toThrow(
       'NEXT_REDIRECT',
@@ -338,7 +326,6 @@ describe('createTenantAction', () => {
 
   it('returns a generic error and logs at error level when createTenantDraft throws', async () => {
     createTenantDraftMock.mockRejectedValue(new Error('unique violation'));
-    const { createTenantAction } = await import('./create-tenant-action');
 
     const result = await createTenantAction(validInput);
 
@@ -356,7 +343,6 @@ describe('createTenantAction', () => {
       ok: false,
       error: 'DB_NOT_FOUND',
     });
-    const { createTenantAction } = await import('./create-tenant-action');
 
     const result = await createTenantAction(validInput);
 
@@ -374,8 +360,6 @@ describe('createTenantAction', () => {
   });
 
   it('creates the draft with the resolved owner id and the platform default locale', async () => {
-    const { createTenantAction } = await import('./create-tenant-action');
-
     await expect(createTenantAction(validInput)).rejects.toThrow(
       'NEXT_REDIRECT',
     );
@@ -390,8 +374,6 @@ describe('createTenantAction', () => {
   });
 
   it('begins provisioning before dispatching, then redirects to the status page', async () => {
-    const { createTenantAction } = await import('./create-tenant-action');
-
     await expect(createTenantAction(validInput)).rejects.toThrow(
       'NEXT_REDIRECT',
     );
@@ -408,7 +390,6 @@ describe('createTenantAction', () => {
       data: { tenant: { id: 'tenant-1' }, previousProvisioningStatus: null },
     });
     dispatchProvisioningWorkflowMock.mockResolvedValue(false);
-    const { createTenantAction } = await import('./create-tenant-action');
 
     await expect(createTenantAction(validInput)).rejects.toThrow(
       'NEXT_REDIRECT',
@@ -426,7 +407,6 @@ describe('createTenantAction', () => {
       ok: false,
       error: 'DB_ALREADY_PROVISIONING',
     });
-    const { createTenantAction } = await import('./create-tenant-action');
 
     await expect(createTenantAction(validInput)).rejects.toThrow(
       'NEXT_REDIRECT',
@@ -442,8 +422,6 @@ describe('createTenantAction', () => {
   });
 
   it('records a CREATED audit event for the new tenant, with the operator as actor', async () => {
-    const { createTenantAction } = await import('./create-tenant-action');
-
     await expect(createTenantAction(validInput)).rejects.toThrow(
       'NEXT_REDIRECT',
     );
@@ -465,7 +443,6 @@ describe('createTenantAction', () => {
 
   it('still dispatches and redirects when the audit write fails, and logs it', async () => {
     insertAuditEventMock.mockRejectedValue(new Error('connection reset'));
-    const { createTenantAction } = await import('./create-tenant-action');
 
     await expect(createTenantAction(validInput)).rejects.toThrow(
       'NEXT_REDIRECT',
@@ -486,7 +463,6 @@ describe('createTenantAction', () => {
     requireAdminMock.mockImplementation(() => {
       throw new Error('NEXT_REDIRECT');
     });
-    const { createTenantAction } = await import('./create-tenant-action');
 
     await expect(createTenantAction(validInput)).rejects.toThrow(
       'NEXT_REDIRECT',

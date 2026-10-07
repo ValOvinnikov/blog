@@ -4,6 +4,12 @@ import userEvent from '@testing-library/user-event';
 import { Textarea } from './textarea';
 
 describe(Textarea, () => {
+  let user: ReturnType<typeof userEvent.setup>;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
   it('renders the given value', () => {
     render(<Textarea ariaLabel="Notes" value="Hello" onChange={vi.fn()} />);
 
@@ -11,7 +17,6 @@ describe(Textarea, () => {
   });
 
   it('calls onChange with the new string value on input', async () => {
-    const user = userEvent.setup();
     const handleChange = vi.fn();
 
     render(<Textarea ariaLabel="Notes" value="" onChange={handleChange} />);
@@ -53,7 +58,6 @@ describe(Textarea, () => {
   });
 
   it('makes the textarea read-only, not disabled, when isReadOnly is true', async () => {
-    const user = userEvent.setup();
     const handleChange = vi.fn();
     render(
       <Textarea

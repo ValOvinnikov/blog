@@ -74,6 +74,10 @@ describe(clearEmailLogoAction, () => {
       user: { id: 'operator-1', email: 'operator@example.com' },
     });
     insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
+    getEmailConfigMock.mockResolvedValue({
+      logoAssetUrl: 'https://example.blob.vercel-storage.com/email-logo.png',
+    });
+    upsertEmailConfigMock.mockResolvedValue({});
   });
 
   it('is a no-op success when the tenant email logo is already unset', async () => {
@@ -87,11 +91,6 @@ describe(clearEmailLogoAction, () => {
   });
 
   it('clears the tenant email logo and deletes the blob', async () => {
-    getEmailConfigMock.mockResolvedValue({
-      logoAssetUrl: 'https://example.blob.vercel-storage.com/email-logo.png',
-    });
-    upsertEmailConfigMock.mockResolvedValue({});
-
     const result = await clearEmailLogoAction('tenant-1', { type: 'tenant' });
 
     expect(result).toEqual({ ok: true });
@@ -126,11 +125,6 @@ describe(clearEmailLogoAction, () => {
   });
 
   it('records exactly one SETTINGS_UPDATED audit event', async () => {
-    getEmailConfigMock.mockResolvedValue({
-      logoAssetUrl: 'https://example.blob.vercel-storage.com/email-logo.png',
-    });
-    upsertEmailConfigMock.mockResolvedValue({});
-
     await clearEmailLogoAction('tenant-1', { type: 'tenant' });
 
     expect(insertAuditEventMock).toHaveBeenCalledTimes(1);
@@ -145,9 +139,6 @@ describe(clearEmailLogoAction, () => {
   });
 
   it('records no audit event when the write itself fails', async () => {
-    getEmailConfigMock.mockResolvedValue({
-      logoAssetUrl: 'https://example.blob.vercel-storage.com/email-logo.png',
-    });
     upsertEmailConfigMock.mockRejectedValue(new Error('db unavailable'));
 
     const result = await clearEmailLogoAction('tenant-1', { type: 'tenant' });

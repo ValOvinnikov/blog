@@ -84,11 +84,10 @@ describe(updateEmailTemplateAction, () => {
     insertAuditEventMock.mockReset();
     insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
     loggerErrorMock.mockReset();
+    mockMembershipAndUpsert();
   });
 
   it('re-resolves the tenant from the session against the routed id before writing', async () => {
-    mockMembershipAndUpsert();
-
     const result = await updateEmailTemplateAction(
       'tenant-1',
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
@@ -127,8 +126,6 @@ describe(updateEmailTemplateAction, () => {
   });
 
   it('accepts a body whose link markDef has a safe href', async () => {
-    mockMembershipAndUpsert();
-
     const input: TUpdateEmailTemplateInput = {
       subject: 'Sign in',
       body: [
@@ -289,8 +286,6 @@ describe(updateEmailTemplateAction, () => {
   });
 
   it('records a SETTINGS_UPDATED audit event, with the operator as actor', async () => {
-    mockMembershipAndUpsert();
-
     await updateEmailTemplateAction(
       'tenant-1',
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,

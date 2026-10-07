@@ -77,6 +77,7 @@ describe(TenantDangerPage, () => {
       role: 'SUPERADMIN',
     });
     listTenantsByIdsMock.mockReset();
+    listTenantsByIdsMock.mockResolvedValue([makeTenant()]);
     getLatestDeprovisionRequestedAtMock.mockReset();
     getLatestDeprovisionRequestedAtMock.mockResolvedValue(undefined);
     getTenantDeprovisioningStatusActionMock.mockReset();
@@ -96,9 +97,6 @@ describe(TenantDangerPage, () => {
   });
 
   it('renders the deprovisioning control for a permitted superadmin', async () => {
-    const tenant = makeTenant();
-    listTenantsByIdsMock.mockResolvedValue([tenant]);
-
     await setup();
 
     expect(requireSuperAdminMock).toHaveBeenCalled();
@@ -110,10 +108,6 @@ describe(TenantDangerPage, () => {
   });
 
   it('never offers reactivation for a live tenant', async () => {
-    listTenantsByIdsMock.mockResolvedValue([
-      makeTenant({ deprovisionedAt: null }),
-    ]);
-
     await setup();
 
     expect(
@@ -140,10 +134,6 @@ describe(TenantDangerPage, () => {
   });
 
   it('renders unchanged, with no deprovisioning progress card, for a tenant that has never been deprovisioned', async () => {
-    listTenantsByIdsMock.mockResolvedValue([
-      makeTenant({ deprovisioningSteps: null }),
-    ]);
-
     await setup();
 
     expect(getLatestDeprovisionRequestedAtMock).toHaveBeenCalledWith(
@@ -226,9 +216,6 @@ describe(TenantDangerPage, () => {
   });
 
   it('renders the deprovisioning progress card in a starting state when a request was dispatched but no run marker has appeared yet, with the Starting badge in the fallback Run card header', async () => {
-    listTenantsByIdsMock.mockResolvedValue([
-      makeTenant({ deprovisioningSteps: null }),
-    ]);
     getLatestDeprovisionRequestedAtMock.mockResolvedValue(
       new Date('2026-08-12T14:18:00.000Z'),
     );
@@ -249,9 +236,6 @@ describe(TenantDangerPage, () => {
   });
 
   it('stops polling the starting state once it exceeds the same stale-run cap a live run is bound by', async () => {
-    listTenantsByIdsMock.mockResolvedValue([
-      makeTenant({ deprovisioningSteps: null }),
-    ]);
     getLatestDeprovisionRequestedAtMock.mockResolvedValue(
       new Date('2026-08-12T14:18:00.000Z'),
     );
@@ -338,10 +322,6 @@ describe(TenantDangerPage, () => {
 
   describe('live-tenant reading order (scope guard: unaffected by the archived reorganisation)', () => {
     it('reads header, then the Deprovision card, with no archived notice or history heading', async () => {
-      listTenantsByIdsMock.mockResolvedValue([
-        makeTenant({ deprovisionedAt: null }),
-      ]);
-
       await setup();
 
       expect(
@@ -419,10 +399,6 @@ describe(TenantDangerPage, () => {
 
   describe('deprovision trigger disabled while a run is in progress', () => {
     it('leaves the trigger enabled for a tenant that has never been deprovisioned', async () => {
-      listTenantsByIdsMock.mockResolvedValue([
-        makeTenant({ deprovisioningSteps: null }),
-      ]);
-
       await setup();
 
       expect(screen.getByRole('button', { name: 'Deprovision' })).toBeEnabled();

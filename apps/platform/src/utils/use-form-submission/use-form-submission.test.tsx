@@ -39,6 +39,12 @@ const Harness = ({ initialValues, onSubmit, onSuccess }: THarnessProps) => {
 };
 
 describe(useFormSubmission, () => {
+  let user: ReturnType<typeof userEvent.setup>;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
   it('starts idle with the given initial values', () => {
     render(
       <Harness
@@ -64,7 +70,6 @@ describe(useFormSubmission, () => {
   });
 
   it('sets status to success and calls onSuccess with the submitted values on a successful submit', async () => {
-    const user = userEvent.setup();
     const onSubmit = vi.fn().mockResolvedValue({ ok: true });
     const onSuccess = vi.fn();
     render(
@@ -84,7 +89,6 @@ describe(useFormSubmission, () => {
   });
 
   it('sets status to error and does not call onSuccess when the submit fails', async () => {
-    const user = userEvent.setup();
     const onSubmit = vi.fn().mockResolvedValue({ ok: false });
     const onSuccess = vi.fn();
     render(
@@ -102,7 +106,6 @@ describe(useFormSubmission, () => {
   });
 
   it('clears a shown status back to idle as soon as the values change again', async () => {
-    const user = userEvent.setup();
     const onSubmit = vi.fn().mockResolvedValue({ ok: true });
     render(<Harness initialValues={{ name: 'initial' }} onSubmit={onSubmit} />);
 

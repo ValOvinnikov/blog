@@ -4,7 +4,7 @@ import {
   screen,
   within,
 } from '@platform/testing/custom-render';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { Topbar } from './topbar';
 
@@ -15,6 +15,12 @@ const render = renderWithIntl;
 const roleChip = { name: 'Jane Doe', role: 'ADMIN', scope: 'Platform' };
 
 describe(Topbar, () => {
+  let user: UserEvent;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
   it('renders the given crumb node and the role chip', () => {
     render(<Topbar crumb={<p>Platform</p>} roleChip={roleChip} />);
 
@@ -32,7 +38,6 @@ describe(Topbar, () => {
   });
 
   it('renders a nav menu trigger that opens the passed sections', async () => {
-    const user = userEvent.setup();
     render(
       <Topbar
         crumb={<p>Platform</p>}
@@ -57,7 +62,6 @@ describe(Topbar, () => {
   });
 
   it('renders the switcher slot above the section items inside the opened nav menu', async () => {
-    const user = userEvent.setup();
     render(
       <Topbar
         crumb={<p>Platform</p>}

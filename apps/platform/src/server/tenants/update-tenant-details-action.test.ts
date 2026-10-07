@@ -51,7 +51,9 @@ const validInput = {
 };
 
 describe('updateTenantDetailsAction', () => {
-  beforeEach(() => {
+  let updateTenantDetailsAction: typeof import('./update-tenant-details-action').updateTenantDetailsAction;
+
+  beforeEach(async () => {
     requireAdminMock.mockReset();
     requireAdminMock.mockResolvedValue({ id: 'admin-1' });
     authMock.mockReset();
@@ -64,14 +66,14 @@ describe('updateTenantDetailsAction', () => {
     insertAuditEventMock.mockReset();
     insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
     loggerErrorMock.mockReset();
+    ({ updateTenantDetailsAction } =
+      await import('./update-tenant-details-action'));
   });
 
   it('requires an admin session before validating or saving anything', async () => {
     requireAdminMock.mockImplementation(() => {
       throw new Error('NEXT_REDIRECT');
     });
-    const { updateTenantDetailsAction } =
-      await import('./update-tenant-details-action');
 
     await expect(
       updateTenantDetailsAction('tenant-1', validInput),
@@ -81,8 +83,6 @@ describe('updateTenantDetailsAction', () => {
 
   it('returns an error and never writes when the tenant no longer exists', async () => {
     getTenantByIdMock.mockResolvedValue(undefined);
-    const { updateTenantDetailsAction } =
-      await import('./update-tenant-details-action');
 
     const result = await updateTenantDetailsAction('tenant-1', validInput);
 
@@ -94,8 +94,6 @@ describe('updateTenantDetailsAction', () => {
     getTenantByIdMock.mockResolvedValue(
       makeTenant({ deprovisionedAt: new Date('2026-08-26T00:00:00.000Z') }),
     );
-    const { updateTenantDetailsAction } =
-      await import('./update-tenant-details-action');
 
     const result = await updateTenantDetailsAction('tenant-1', validInput);
 
@@ -108,9 +106,6 @@ describe('updateTenantDetailsAction', () => {
   });
 
   it('returns field errors for an invalid domain', async () => {
-    const { updateTenantDetailsAction } =
-      await import('./update-tenant-details-action');
-
     const result = await updateTenantDetailsAction('tenant-1', {
       ...validInput,
       primaryDomain: 'not a domain',
@@ -124,9 +119,6 @@ describe('updateTenantDetailsAction', () => {
   });
 
   it('returns a field error for an invalid owner email, without touching the database', async () => {
-    const { updateTenantDetailsAction } =
-      await import('./update-tenant-details-action');
-
     const result = await updateTenantDetailsAction('tenant-1', {
       ...validInput,
       ownerEmail: 'not-an-email',
@@ -142,8 +134,6 @@ describe('updateTenantDetailsAction', () => {
   it('passes a supplied ownerEmail to updateTenantDetails and returns the tenant', async () => {
     const tenant = makeTenant({ name: 'Acme' });
     updateTenantDetailsMock.mockResolvedValue({ outcome: 'updated', tenant });
-    const { updateTenantDetailsAction } =
-      await import('./update-tenant-details-action');
 
     const result = await updateTenantDetailsAction('tenant-1', {
       ...validInput,
@@ -160,8 +150,6 @@ describe('updateTenantDetailsAction', () => {
   it('does not forward an ownerEmail key when the input omits it', async () => {
     const tenant = makeTenant({ name: 'Acme' });
     updateTenantDetailsMock.mockResolvedValue({ outcome: 'updated', tenant });
-    const { updateTenantDetailsAction } =
-      await import('./update-tenant-details-action');
 
     await updateTenantDetailsAction('tenant-1', validInput);
 
@@ -173,8 +161,6 @@ describe('updateTenantDetailsAction', () => {
 
   it('maps a domain-taken outcome onto a primaryDomain field error', async () => {
     updateTenantDetailsMock.mockResolvedValue({ outcome: 'domain-taken' });
-    const { updateTenantDetailsAction } =
-      await import('./update-tenant-details-action');
 
     const result = await updateTenantDetailsAction('tenant-1', validInput);
 
@@ -186,8 +172,6 @@ describe('updateTenantDetailsAction', () => {
 
   it('maps a domain-invalid outcome onto a primaryDomain field error', async () => {
     updateTenantDetailsMock.mockResolvedValue({ outcome: 'domain-invalid' });
-    const { updateTenantDetailsAction } =
-      await import('./update-tenant-details-action');
 
     const result = await updateTenantDetailsAction('tenant-1', validInput);
 
@@ -202,8 +186,6 @@ describe('updateTenantDetailsAction', () => {
       outcome: 'domain-locked',
       blockingStep: 'MAP_DOMAIN',
     });
-    const { updateTenantDetailsAction } =
-      await import('./update-tenant-details-action');
 
     const result = await updateTenantDetailsAction('tenant-1', validInput);
 
@@ -221,8 +203,6 @@ describe('updateTenantDetailsAction', () => {
     updateTenantDetailsMock.mockResolvedValue({
       outcome: 'provisioning-started',
     });
-    const { updateTenantDetailsAction } =
-      await import('./update-tenant-details-action');
 
     const result = await updateTenantDetailsAction('tenant-1', validInput);
 
@@ -235,8 +215,6 @@ describe('updateTenantDetailsAction', () => {
 
   it('maps an owner-email-taken outcome onto an ownerEmail field error', async () => {
     updateTenantDetailsMock.mockResolvedValue({ outcome: 'owner-email-taken' });
-    const { updateTenantDetailsAction } =
-      await import('./update-tenant-details-action');
 
     const result = await updateTenantDetailsAction('tenant-1', {
       ...validInput,
@@ -252,8 +230,6 @@ describe('updateTenantDetailsAction', () => {
   it('succeeds on a rename that resends the current owner email after they joined', async () => {
     const tenant = makeTenant({ name: 'Acme Renamed' });
     updateTenantDetailsMock.mockResolvedValue({ outcome: 'updated', tenant });
-    const { updateTenantDetailsAction } =
-      await import('./update-tenant-details-action');
 
     const result = await updateTenantDetailsAction('tenant-1', {
       ...validInput,
@@ -273,8 +249,6 @@ describe('updateTenantDetailsAction', () => {
     updateTenantDetailsMock.mockResolvedValue({
       outcome: 'owner-already-joined',
     });
-    const { updateTenantDetailsAction } =
-      await import('./update-tenant-details-action');
 
     const result = await updateTenantDetailsAction('tenant-1', {
       ...validInput,
@@ -296,8 +270,6 @@ describe('updateTenantDetailsAction', () => {
 
   it('does not record an audit event for an owner-email-taken outcome', async () => {
     updateTenantDetailsMock.mockResolvedValue({ outcome: 'owner-email-taken' });
-    const { updateTenantDetailsAction } =
-      await import('./update-tenant-details-action');
 
     await updateTenantDetailsAction('tenant-1', {
       ...validInput,
@@ -311,8 +283,6 @@ describe('updateTenantDetailsAction', () => {
     updateTenantDetailsMock.mockResolvedValue({
       outcome: 'owner-already-joined',
     });
-    const { updateTenantDetailsAction } =
-      await import('./update-tenant-details-action');
 
     await updateTenantDetailsAction('tenant-1', {
       ...validInput,
@@ -328,8 +298,6 @@ describe('updateTenantDetailsAction', () => {
       outcome: 'updated',
       tenant,
     });
-    const { updateTenantDetailsAction } =
-      await import('./update-tenant-details-action');
 
     const result = await updateTenantDetailsAction('tenant-1', validInput);
 
@@ -343,8 +311,6 @@ describe('updateTenantDetailsAction', () => {
   it('records a SETTINGS_UPDATED audit event for the tenant with the operator as actor', async () => {
     const tenant = makeTenant({ name: 'Acme' });
     updateTenantDetailsMock.mockResolvedValue({ outcome: 'updated', tenant });
-    const { updateTenantDetailsAction } =
-      await import('./update-tenant-details-action');
 
     await updateTenantDetailsAction('tenant-1', validInput);
 
@@ -362,8 +328,6 @@ describe('updateTenantDetailsAction', () => {
     const tenant = makeTenant({ name: 'Acme' });
     updateTenantDetailsMock.mockResolvedValue({ outcome: 'updated', tenant });
     insertAuditEventMock.mockRejectedValue(new Error('connection reset'));
-    const { updateTenantDetailsAction } =
-      await import('./update-tenant-details-action');
 
     const result = await updateTenantDetailsAction('tenant-1', validInput);
 
@@ -379,8 +343,6 @@ describe('updateTenantDetailsAction', () => {
 
   it('does not record an audit event for a domain-taken outcome', async () => {
     updateTenantDetailsMock.mockResolvedValue({ outcome: 'domain-taken' });
-    const { updateTenantDetailsAction } =
-      await import('./update-tenant-details-action');
 
     await updateTenantDetailsAction('tenant-1', validInput);
 
@@ -389,8 +351,6 @@ describe('updateTenantDetailsAction', () => {
 
   it('does not record an audit event for a domain-invalid outcome', async () => {
     updateTenantDetailsMock.mockResolvedValue({ outcome: 'domain-invalid' });
-    const { updateTenantDetailsAction } =
-      await import('./update-tenant-details-action');
 
     await updateTenantDetailsAction('tenant-1', validInput);
 
@@ -399,8 +359,6 @@ describe('updateTenantDetailsAction', () => {
 
   it('returns a generic error when the mutation throws', async () => {
     updateTenantDetailsMock.mockRejectedValue(new Error('connection lost'));
-    const { updateTenantDetailsAction } =
-      await import('./update-tenant-details-action');
 
     const result = await updateTenantDetailsAction('tenant-1', validInput);
 
@@ -408,9 +366,6 @@ describe('updateTenantDetailsAction', () => {
   });
 
   it('rejects a language outside the supported list without saving', async () => {
-    const { updateTenantDetailsAction } =
-      await import('./update-tenant-details-action');
-
     const result = await updateTenantDetailsAction('tenant-1', {
       ...validInput,
       locale: 'en-US',
@@ -430,8 +385,6 @@ describe('updateTenantDetailsAction', () => {
         additionalLocales: [LOCALE_ISO_CODES.NL],
       }),
     );
-    const { updateTenantDetailsAction } =
-      await import('./update-tenant-details-action');
 
     const result = await updateTenantDetailsAction('tenant-1', {
       ...validInput,

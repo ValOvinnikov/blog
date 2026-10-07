@@ -44,7 +44,9 @@ const tenant = {
 };
 
 describe('deleteTenantAction', () => {
-  beforeEach(() => {
+  let deleteTenantAction: (typeof import('./delete-tenant-action'))['deleteTenantAction'];
+
+  beforeEach(async () => {
     requireSuperAdminMock.mockReset();
     requireSuperAdminMock.mockResolvedValue({
       id: 'admin-1',
@@ -61,14 +63,13 @@ describe('deleteTenantAction', () => {
     insertAuditEventMock.mockReset();
     insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
     loggerErrorMock.mockReset();
+    ({ deleteTenantAction } = await import('./delete-tenant-action'));
   });
 
   it('requires a super-admin session before deleting', async () => {
     requireSuperAdminMock.mockImplementation(() => {
       throw new Error('NEXT_REDIRECT');
     });
-    const { deleteTenantAction } = await import('./delete-tenant-action');
-
     await expect(
       deleteTenantAction('tenant-1', { confirm: 'Acme Inc.' }),
     ).rejects.toThrow('NEXT_REDIRECT');
@@ -79,8 +80,6 @@ describe('deleteTenantAction', () => {
     requireSuperAdminMock.mockImplementation(() => {
       notFound();
     });
-    const { deleteTenantAction } = await import('./delete-tenant-action');
-
     await expect(
       deleteTenantAction('tenant-1', { confirm: 'Acme Inc.' }),
     ).rejects.toThrow('NEXT_NOT_FOUND');
@@ -92,8 +91,6 @@ describe('deleteTenantAction', () => {
 
   it('returns an error when the tenant is not found', async () => {
     listTenantsByIdsMock.mockResolvedValue([]);
-    const { deleteTenantAction } = await import('./delete-tenant-action');
-
     const result = await deleteTenantAction('tenant-1', {
       confirm: 'Acme Inc.',
     });
@@ -103,8 +100,6 @@ describe('deleteTenantAction', () => {
   });
 
   it('returns an error when confirm does not match the tenant name', async () => {
-    const { deleteTenantAction } = await import('./delete-tenant-action');
-
     const result = await deleteTenantAction('tenant-1', {
       confirm: 'wrong-name',
     });
@@ -115,8 +110,6 @@ describe('deleteTenantAction', () => {
 
   it('returns an error and no audit event when the mutation refuses a live tenant', async () => {
     deleteTenantMock.mockResolvedValue({ outcome: 'not-archived' });
-    const { deleteTenantAction } = await import('./delete-tenant-action');
-
     const result = await deleteTenantAction('tenant-1', {
       confirm: 'Acme Inc.',
     });
@@ -127,8 +120,6 @@ describe('deleteTenantAction', () => {
 
   it('returns an error and no audit event when the mutation reports the tenant gone', async () => {
     deleteTenantMock.mockResolvedValue({ outcome: 'not-found' });
-    const { deleteTenantAction } = await import('./delete-tenant-action');
-
     const result = await deleteTenantAction('tenant-1', {
       confirm: 'Acme Inc.',
     });
@@ -138,8 +129,6 @@ describe('deleteTenantAction', () => {
   });
 
   it('deletes the tenant and records a DELETED audit event when confirm matches', async () => {
-    const { deleteTenantAction } = await import('./delete-tenant-action');
-
     const result = await deleteTenantAction('tenant-1', {
       confirm: 'Acme Inc.',
     });
@@ -158,8 +147,6 @@ describe('deleteTenantAction', () => {
 
   it('returns an error and records no audit event when the delete mutation throws', async () => {
     deleteTenantMock.mockRejectedValue(new Error('connection reset'));
-    const { deleteTenantAction } = await import('./delete-tenant-action');
-
     const result = await deleteTenantAction('tenant-1', {
       confirm: 'Acme Inc.',
     });
@@ -177,8 +164,6 @@ describe('deleteTenantAction', () => {
 
   it('still returns ok when the audit write fails, and logs the failure', async () => {
     insertAuditEventMock.mockRejectedValue(new Error('connection reset'));
-    const { deleteTenantAction } = await import('./delete-tenant-action');
-
     const result = await deleteTenantAction('tenant-1', {
       confirm: 'Acme Inc.',
     });

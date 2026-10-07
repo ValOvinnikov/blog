@@ -1,7 +1,7 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { customRender, screen, waitFor } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LanguagesSettings } from './languages-settings';
 
@@ -18,6 +18,12 @@ const setup = customRender(LanguagesSettings, {
 });
 
 describe(`<${LanguagesSettings.name}/>`, () => {
+  let user: UserEvent;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
   it('shows the default language apart from the helper sentence', () => {
     setup({ defaultLocale: NL });
 
@@ -39,7 +45,6 @@ describe(`<${LanguagesSettings.name}/>`, () => {
   });
 
   it('stops offering languages once the plan allowance is used', async () => {
-    const user = userEvent.setup();
     setup();
 
     await user.click(screen.getByRole('switch', { name: 'Dutch' }));
@@ -55,7 +60,6 @@ describe(`<${LanguagesSettings.name}/>`, () => {
   });
 
   it('saves the chosen additional languages', async () => {
-    const user = userEvent.setup();
     const saveAction = vi.fn().mockResolvedValue({ ok: true });
     setup({ saveAction });
 
@@ -96,7 +100,6 @@ describe(`<${LanguagesSettings.name}/>`, () => {
     });
 
     it('keeps every stored language when a different one is chosen to stay live', async () => {
-      const user = userEvent.setup();
       const saveAction = vi.fn().mockResolvedValue({ ok: true });
       setup({
         storedLocales: [NL, FR, DE],

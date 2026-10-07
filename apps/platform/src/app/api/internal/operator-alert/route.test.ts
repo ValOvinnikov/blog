@@ -51,17 +51,19 @@ const postRequest = (
   });
 
 describe('POST /api/internal/operator-alert', () => {
-  beforeEach(() => {
+  let POST: typeof import('./route').POST;
+
+  beforeEach(async () => {
     envMock.OPERATOR_ALERT_SECRET = VALID_SECRET;
     getTenantByIdMock.mockReset();
     listSuperadminEmailsMock.mockReset().mockResolvedValue([]);
     sendEmailMock.mockReset().mockResolvedValue(undefined);
     loggerErrorMock.mockReset();
+    getTenantByIdMock.mockResolvedValue(makeTenant({ id: 't1', name: 'Acme' }));
+    ({ POST } = await import('./route'));
   });
 
   it('rejects a request with no Authorization header', async () => {
-    const { POST } = await import('./route');
-
     const response = await POST(
       postRequest(
         { kind: 'OWNER_ELEVATION', tenantId: 't1', outcome: 'STALLED' },
@@ -74,8 +76,6 @@ describe('POST /api/internal/operator-alert', () => {
   });
 
   it('rejects a request with the wrong secret', async () => {
-    const { POST } = await import('./route');
-
     const response = await POST(
       postRequest(
         { kind: 'OWNER_ELEVATION', tenantId: 't1', outcome: 'STALLED' },
@@ -88,8 +88,6 @@ describe('POST /api/internal/operator-alert', () => {
   });
 
   it('rejects a secret of a different length', async () => {
-    const { POST } = await import('./route');
-
     const response = await POST(
       postRequest(
         { kind: 'OWNER_ELEVATION', tenantId: 't1', outcome: 'STALLED' },
@@ -103,7 +101,6 @@ describe('POST /api/internal/operator-alert', () => {
 
   it('returns 500 and never calls isSecretMatch when the secret is not configured', async () => {
     envMock.OPERATOR_ALERT_SECRET = undefined;
-    const { POST } = await import('./route');
 
     const response = await POST(
       postRequest({
@@ -118,8 +115,6 @@ describe('POST /api/internal/operator-alert', () => {
   });
 
   it('returns 400 for a malformed body even with a valid secret', async () => {
-    const { POST } = await import('./route');
-
     const response = await POST(postRequest({ kind: 'NOT_A_REAL_KIND' }));
 
     expect(response.status).toBe(400);
@@ -127,8 +122,6 @@ describe('POST /api/internal/operator-alert', () => {
   });
 
   it('returns 400 for a body that is not valid JSON, instead of throwing', async () => {
-    const { POST } = await import('./route');
-
     const request = new Request(ENDPOINT, {
       method: 'POST',
       headers: { authorization: `Bearer ${VALID_SECRET}` },
@@ -143,7 +136,6 @@ describe('POST /api/internal/operator-alert', () => {
 
   it('returns 404 and sends nothing for an unknown tenantId', async () => {
     getTenantByIdMock.mockResolvedValue(undefined);
-    const { POST } = await import('./route');
 
     const response = await POST(
       postRequest({
@@ -159,12 +151,10 @@ describe('POST /api/internal/operator-alert', () => {
   });
 
   it('sends one email per superadmin recipient for a valid OWNER_ELEVATION alert', async () => {
-    getTenantByIdMock.mockResolvedValue(makeTenant({ id: 't1', name: 'Acme' }));
     listSuperadminEmailsMock.mockResolvedValue([
       'super-one@example.com',
       'super-two@example.com',
     ]);
-    const { POST } = await import('./route');
 
     const response = await POST(
       postRequest({
@@ -188,9 +178,7 @@ describe('POST /api/internal/operator-alert', () => {
   });
 
   it('returns 200 and sends nothing when there are zero superadmins', async () => {
-    getTenantByIdMock.mockResolvedValue(makeTenant({ id: 't1', name: 'Acme' }));
     listSuperadminEmailsMock.mockResolvedValue([]);
-    const { POST } = await import('./route');
 
     const response = await POST(
       postRequest({
@@ -205,9 +193,7 @@ describe('POST /api/internal/operator-alert', () => {
   });
 
   it('sends the document-validation subject for a valid DOCUMENT_VALIDATION alert', async () => {
-    getTenantByIdMock.mockResolvedValue(makeTenant({ id: 't1', name: 'Acme' }));
     listSuperadminEmailsMock.mockResolvedValue(['super-one@example.com']);
-    const { POST } = await import('./route');
 
     const response = await POST(
       postRequest({
@@ -227,7 +213,6 @@ describe('POST /api/internal/operator-alert', () => {
   });
 
   it('logs a failed send and still sends to the other recipient', async () => {
-    getTenantByIdMock.mockResolvedValue(makeTenant({ id: 't1', name: 'Acme' }));
     listSuperadminEmailsMock.mockResolvedValue([
       'super-one@example.com',
       'super-two@example.com',
@@ -238,7 +223,6 @@ describe('POST /api/internal/operator-alert', () => {
         ? Promise.reject(sendError)
         : Promise.resolve(undefined),
     );
-    const { POST } = await import('./route');
 
     const response = await POST(
       postRequest({
@@ -263,11 +247,9 @@ describe('POST /api/internal/operator-alert', () => {
   });
 
   it('logs every failure and returns 502 when every send fails', async () => {
-    getTenantByIdMock.mockResolvedValue(makeTenant({ id: 't1', name: 'Acme' }));
     listSuperadminEmailsMock.mockResolvedValue(['super-one@example.com']);
     const sendError = new Error('Failed to send email via Resend: rejected');
     sendEmailMock.mockRejectedValue(sendError);
-    const { POST } = await import('./route');
 
     const response = await POST(
       postRequest({

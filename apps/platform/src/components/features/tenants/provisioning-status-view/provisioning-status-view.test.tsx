@@ -15,7 +15,7 @@ import {
   idleProvisioningSteps,
   makeTenant,
 } from '@platform/testing/tenants/fixtures';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { ProvisioningStatusView } from './provisioning-status-view';
 
@@ -52,8 +52,11 @@ vi.mock(
 );
 
 describe(ProvisioningStatusView, () => {
+  let user: UserEvent;
+
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
+    user = userEvent.setup();
     retryProvisioningStepActionMock.mockReset();
     retryProvisioningStepActionMock.mockResolvedValue({
       outcome: 'dispatched',
@@ -513,7 +516,6 @@ describe(ProvisioningStatusView, () => {
         },
       },
     });
-    const user = userEvent.setup();
     render(
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
@@ -558,7 +560,6 @@ describe(ProvisioningStatusView, () => {
 
   it('re-dispatches the workflow for this tenant when Start provisioning is clicked', async () => {
     const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
-    const user = userEvent.setup();
     render(
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
@@ -581,7 +582,6 @@ describe(ProvisioningStatusView, () => {
         resolveDispatch = resolve;
       }),
     );
-    const user = userEvent.setup();
     render(
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
@@ -610,7 +610,6 @@ describe(ProvisioningStatusView, () => {
         resolveDispatch = resolve;
       }),
     );
-    const user = userEvent.setup();
     render(
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
@@ -635,7 +634,6 @@ describe(ProvisioningStatusView, () => {
     retryProvisioningStepActionMock.mockResolvedValue({
       outcome: 'dispatch-error',
     });
-    const user = userEvent.setup();
     render(
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
@@ -657,7 +655,6 @@ describe(ProvisioningStatusView, () => {
     retryProvisioningStepActionMock.mockResolvedValue({
       outcome: 'not-found',
     });
-    const user = userEvent.setup();
     render(
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
@@ -678,7 +675,6 @@ describe(ProvisioningStatusView, () => {
     retryProvisioningStepActionMock.mockResolvedValue({
       outcome: 'already-in-progress',
     });
-    const user = userEvent.setup();
     render(
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
@@ -700,7 +696,6 @@ describe(ProvisioningStatusView, () => {
       provisioningSteps: idleProvisioningSteps(),
       deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
     });
-    const user = userEvent.setup();
     render(
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
@@ -726,7 +721,6 @@ describe(ProvisioningStatusView, () => {
         },
       },
     });
-    const user = userEvent.setup();
     render(
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
@@ -780,7 +774,6 @@ describe(ProvisioningStatusView, () => {
     retryProvisioningStepActionMock.mockResolvedValue({
       outcome: 'archived',
     });
-    const user = userEvent.setup();
     render(
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );

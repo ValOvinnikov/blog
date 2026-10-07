@@ -2,7 +2,7 @@ import { customRender, screen, within } from '@platform/testing/custom-render';
 import { mockRouter } from '@platform/testing/mock-router';
 import { makeTenant } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { DeprovisionTenantControl } from './deprovision-tenant-control';
 
@@ -26,10 +26,13 @@ const setup = customRender(DeprovisionTenantControl, {
 });
 
 describe(`<${DeprovisionTenantControl.name}/>`, () => {
+  let user: UserEvent;
+
   const refreshMock = vi.fn();
   const pushMock = vi.fn();
 
   beforeEach(() => {
+    user = userEvent.setup();
     deprovisionTenantActionMock.mockReset();
     deprovisionTenantActionMock.mockResolvedValue({ ok: true });
     deleteTenantActionMock.mockReset();
@@ -93,7 +96,6 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
   });
 
   it('opens a confirm dialog requiring the tenant name, disabled until it matches', async () => {
-    const user = userEvent.setup();
     setup();
 
     await user.click(screen.getByRole('button', { name: 'Deprovision' }));
@@ -108,7 +110,6 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
   });
 
   it('enables the confirm button only once the typed name matches, and calls the action on confirm', async () => {
-    const user = userEvent.setup();
     const tenant = makeTenant();
     setup({ tenant });
 
@@ -137,7 +138,6 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
       ok: false,
       error: "Doesn't match the tenant's name.",
     });
-    const user = userEvent.setup();
     setup();
 
     await user.click(screen.getByRole('button', { name: 'Deprovision' }));
@@ -158,7 +158,6 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
   });
 
   it('opens a delete-permanently confirm dialog requiring the tenant name, disabled until it matches', async () => {
-    const user = userEvent.setup();
     setup({
       tenant: makeTenant({
         deprovisionedAt: new Date('2026-04-10T00:00:00.000Z'),
@@ -176,7 +175,6 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
   });
 
   it('enables the delete confirm button only once the typed name matches, calls the action, and redirects to the tenant list', async () => {
-    const user = userEvent.setup();
     const tenant = makeTenant({
       deprovisionedAt: new Date('2026-04-10T00:00:00.000Z'),
     });
@@ -206,7 +204,6 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
       ok: false,
       error: "Doesn't match the tenant's name.",
     });
-    const user = userEvent.setup();
     setup({
       tenant: makeTenant({
         deprovisionedAt: new Date('2026-04-10T00:00:00.000Z'),

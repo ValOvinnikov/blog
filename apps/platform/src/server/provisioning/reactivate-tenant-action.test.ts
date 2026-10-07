@@ -46,7 +46,9 @@ const ARCHIVED_TENANT = {
 };
 
 describe('reactivateTenantAction', () => {
-  beforeEach(() => {
+  let reactivateTenantAction: typeof import('./reactivate-tenant-action').reactivateTenantAction;
+
+  beforeEach(async () => {
     requireSuperAdminMock.mockReset();
     requireSuperAdminMock.mockResolvedValue({
       id: 'admin-1',
@@ -71,14 +73,13 @@ describe('reactivateTenantAction', () => {
     });
     recordAuditEventMock.mockReset();
     recordAuditEventMock.mockResolvedValue(undefined);
+    ({ reactivateTenantAction } = await import('./reactivate-tenant-action'));
   });
 
   it('requires a super-admin session before reading the tenant', async () => {
     requireSuperAdminMock.mockImplementation(() => {
       notFound();
     });
-    const { reactivateTenantAction } =
-      await import('./reactivate-tenant-action');
 
     await expect(
       reactivateTenantAction('tenant-1', { confirm: 'Acme' }),
@@ -89,9 +90,6 @@ describe('reactivateTenantAction', () => {
   });
 
   it('dispatches the provisioning workflow and records a REACTIVATED audit event', async () => {
-    const { reactivateTenantAction } =
-      await import('./reactivate-tenant-action');
-
     const result = await reactivateTenantAction('tenant-1', {
       confirm: 'Acme',
     });
@@ -114,9 +112,6 @@ describe('reactivateTenantAction', () => {
   });
 
   it('rejects an empty confirmation without reading the tenant', async () => {
-    const { reactivateTenantAction } =
-      await import('./reactivate-tenant-action');
-
     const result = await reactivateTenantAction('tenant-1', { confirm: '  ' });
 
     expect(getTenantByIdMock).not.toHaveBeenCalled();
@@ -128,9 +123,6 @@ describe('reactivateTenantAction', () => {
   });
 
   it("rejects a confirmation that doesn't match the tenant's live name", async () => {
-    const { reactivateTenantAction } =
-      await import('./reactivate-tenant-action');
-
     const result = await reactivateTenantAction('tenant-1', {
       confirm: 'acme',
     });
@@ -149,8 +141,6 @@ describe('reactivateTenantAction', () => {
       ...ARCHIVED_TENANT,
       deprovisionedAt: null,
     });
-    const { reactivateTenantAction } =
-      await import('./reactivate-tenant-action');
 
     const result = await reactivateTenantAction('tenant-1', {
       confirm: 'Acme',
@@ -166,8 +156,6 @@ describe('reactivateTenantAction', () => {
 
   it('refuses an unknown tenant id', async () => {
     getTenantByIdMock.mockResolvedValue(undefined);
-    const { reactivateTenantAction } =
-      await import('./reactivate-tenant-action');
 
     const result = await reactivateTenantAction('ghost', { confirm: 'Acme' });
 
@@ -180,8 +168,6 @@ describe('reactivateTenantAction', () => {
       ok: false,
       error: 'DB_ALREADY_PROVISIONING',
     });
-    const { reactivateTenantAction } =
-      await import('./reactivate-tenant-action');
 
     const result = await reactivateTenantAction('tenant-1', {
       confirm: 'Acme',
@@ -197,8 +183,6 @@ describe('reactivateTenantAction', () => {
 
   it('reverts the PROVISIONING transition and records nothing when the dispatch fails', async () => {
     dispatchProvisioningWorkflowMock.mockResolvedValue(false);
-    const { reactivateTenantAction } =
-      await import('./reactivate-tenant-action');
 
     const result = await reactivateTenantAction('tenant-1', {
       confirm: 'Acme',

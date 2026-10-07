@@ -39,8 +39,13 @@ const ControlledConfirmDialog = (props: Partial<TConfirmDialogProps> = {}) => {
 };
 
 describe(ConfirmDialog, () => {
+  let user: ReturnType<typeof userEvent.setup>;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
   it('opens the dialog from the trigger and shows the title and description', async () => {
-    const user = userEvent.setup();
     render(<ControlledConfirmDialog />);
 
     await user.click(screen.getByRole('button', { name: 'Open dialog' }));
@@ -54,7 +59,6 @@ describe(ConfirmDialog, () => {
   });
 
   it('disables the confirm button until the typed value matches expectedValue', async () => {
-    const user = userEvent.setup();
     render(<ControlledConfirmDialog />);
     await user.click(screen.getByRole('button', { name: 'Open dialog' }));
 
@@ -69,7 +73,6 @@ describe(ConfirmDialog, () => {
   });
 
   it('names the confirm field from the FormField label, with no redundant aria-label', async () => {
-    const user = userEvent.setup();
     render(<ControlledConfirmDialog />);
     await user.click(screen.getByRole('button', { name: 'Open dialog' }));
 
@@ -81,7 +84,6 @@ describe(ConfirmDialog, () => {
 
   it('calls onConfirm when the confirm button is clicked', async () => {
     const onConfirm = vi.fn();
-    const user = userEvent.setup();
     render(<ControlledConfirmDialog onConfirm={onConfirm} />);
     await user.click(screen.getByRole('button', { name: 'Open dialog' }));
     await user.type(
@@ -95,7 +97,6 @@ describe(ConfirmDialog, () => {
   });
 
   it('closes the dialog when cancel is clicked', async () => {
-    const user = userEvent.setup();
     render(<ControlledConfirmDialog />);
     await user.click(screen.getByRole('button', { name: 'Open dialog' }));
     await screen.findByRole('alertdialog');
@@ -106,7 +107,6 @@ describe(ConfirmDialog, () => {
   });
 
   it('shows the error message when provided', async () => {
-    const user = userEvent.setup();
     render(<ControlledConfirmDialog error="Something went wrong." />);
     await user.click(screen.getByRole('button', { name: 'Open dialog' }));
 
@@ -114,7 +114,6 @@ describe(ConfirmDialog, () => {
   });
 
   it('disables the confirm button and shows the pending label while isPending', async () => {
-    const user = userEvent.setup();
     render(<ControlledConfirmDialog isPending={true} />);
     await user.click(screen.getByRole('button', { name: 'Open dialog' }));
     await user.type(
@@ -126,7 +125,6 @@ describe(ConfirmDialog, () => {
   });
 
   it('renders extra content passed as children between the field and the actions', async () => {
-    const user = userEvent.setup();
     render(
       <ControlledConfirmDialog>
         <span data-testid="extra">Extra content</span>
@@ -144,7 +142,6 @@ describe(ConfirmDialog, () => {
   });
 
   it('marks the trigger aria-disabled rather than natively disabled when isTriggerDisabled is set, so it stays reachable', async () => {
-    const user = userEvent.setup();
     render(<ControlledConfirmDialog isTriggerDisabled={true} />);
 
     const trigger = screen.getByRole('button', { name: 'Open dialog' });

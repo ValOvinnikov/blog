@@ -40,16 +40,17 @@ const setup = customRenderAsync(TenantProvisioningPage, {
 });
 
 describe(TenantProvisioningPage, () => {
+  let tenant: ReturnType<typeof makeTenant>;
+
   beforeEach(() => {
     listTenantsByIdsMock.mockReset();
+    tenant = makeTenant();
+    listTenantsByIdsMock.mockResolvedValue([tenant]);
     getTenantOwnerEmailMock.mockReset();
     getTenantOwnerEmailMock.mockResolvedValue('owner@example.com');
   });
 
   it('renders the provisioning status view for the resolved tenant, with no deprovisioning control', async () => {
-    const tenant = makeTenant();
-    listTenantsByIdsMock.mockResolvedValue([tenant]);
-
     await setup();
 
     expect(listTenantsByIdsMock).toHaveBeenCalledWith(['tenant-1']);
@@ -63,8 +64,6 @@ describe(TenantProvisioningPage, () => {
   });
 
   it("shows the invited-pending owner badge when the tenant's owner has not resolved to a real user yet", async () => {
-    const tenant = makeTenant();
-    listTenantsByIdsMock.mockResolvedValue([tenant]);
     getTenantOwnerEmailMock.mockResolvedValue(undefined);
 
     await setup();
