@@ -376,8 +376,8 @@
     0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 
   /* A scrim darkens the photo under it in either mode, so these stay out of .dark. */
-  --on-image: #fff;
-  --on-image-muted: rgb(255 255 255 / 0.85);
+  --on-image: oklch(1 0 0);
+  --on-image-muted: oklch(1 0 0 / 0.85);
   --scrim-brand-strong: oklch(0.2 0.06 250 / 0.92);
   --scrim-brand-mid: oklch(0.35 0.12 250 / 0.72);
   --scrim-brand-weak: oklch(0.45 0.14 250 / 0.4);
@@ -522,6 +522,10 @@
 
 @utility duration-slow {
   transition-duration: var(--duration-slow);
+}
+
+@utility max-w-wide {
+  max-width: var(--container-wide);
 }
 
 @utility max-w-page {

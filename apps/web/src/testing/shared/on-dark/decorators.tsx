@@ -4,8 +4,10 @@ import { Section } from '@web/components/shared/section';
 
 export const onDarkDecorators: Decorator[] = [
   (Story) => (
-    <Section brandVariant={BRAND_VARIANT.PRIMARY}>
-      <Story />
-    </Section>
+    <div className="dark">
+      <Section brandVariant={BRAND_VARIANT.PRIMARY}>
+        <Story />
+      </Section>
+    </div>
   ),
 ];

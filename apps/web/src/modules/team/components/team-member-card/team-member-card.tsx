@@ -1,4 +1,8 @@
-import { CARD_IMAGE_SHAPE, type IWithDataTestId } from '@blog/config';
+import {
+  CARD_IMAGE_SHAPE,
+  type IWithClassName,
+  type IWithDataTestId,
+} from '@blog/config';
 import type { TTeamMember, TTeamModule } from '@blog/service';
 import { Avatar } from '@blog/ui/components/atoms/avatar';
 import { MediaCard } from '@blog/ui/components/molecules/media-card';
@@ -16,7 +20,7 @@ import {
   teamMemberCardVariants,
 } from './team-member-card-variants';
 
-export interface ITeamMemberCardProps extends IWithDataTestId {
+export interface ITeamMemberCardProps extends IWithClassName, IWithDataTestId {
   member: TTeamMember;
   imageShape: TTeamModule['imageShape'];
   align: 'left' | 'center';
@@ -28,6 +32,7 @@ export const TeamMemberCard = ({
   imageShape,
   align,
   imageSizes,
+  className,
   dataTestId,
 }: ITeamMemberCardProps) => {
   const mediaShape =
@@ -40,6 +45,7 @@ export const TeamMemberCard = ({
     <MediaCard
       align={align}
       isInteractive={Boolean(member.profileUrl)}
+      className={className}
       dataTestId={dataTestId}
     >
       <MediaCard.Media shape={mediaShape} align={align}>

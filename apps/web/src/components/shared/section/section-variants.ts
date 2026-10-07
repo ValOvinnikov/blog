@@ -1,5 +1,9 @@
 import { BRAND_VARIANT, CONTAINER_WIDTH, SPACING_SCALE } from '@blog/config';
-import { tv } from 'tailwind-variants';
+import {
+  BAND_SPACING_BOTTOM,
+  BAND_SPACING_TOP,
+  tv,
+} from '@blog/ui/lib/styling';
 
 export const sectionVariants = tv({
   slots: {
@@ -15,22 +19,22 @@ export const sectionVariants = tv({
       },
     },
     spacingTop: {
-      [SPACING_SCALE.NONE]: { root: ['pt-0'] },
-      [SPACING_SCALE.SM]: { root: ['pt-4 sm:pt-6'] },
-      [SPACING_SCALE.MD]: { root: ['pt-8 sm:pt-10 lg:pt-12'] },
-      [SPACING_SCALE.LG]: { root: ['pt-10 sm:pt-13 lg:pt-16'] },
-      [SPACING_SCALE.XL]: { root: ['pt-14 sm:pt-18 lg:pt-24'] },
+      [SPACING_SCALE.NONE]: { root: [BAND_SPACING_TOP[SPACING_SCALE.NONE]] },
+      [SPACING_SCALE.SM]: { root: [BAND_SPACING_TOP[SPACING_SCALE.SM]] },
+      [SPACING_SCALE.MD]: { root: [BAND_SPACING_TOP[SPACING_SCALE.MD]] },
+      [SPACING_SCALE.LG]: { root: [BAND_SPACING_TOP[SPACING_SCALE.LG]] },
+      [SPACING_SCALE.XL]: { root: [BAND_SPACING_TOP[SPACING_SCALE.XL]] },
     },
     spacingBottom: {
-      [SPACING_SCALE.NONE]: { root: ['pb-0'] },
-      [SPACING_SCALE.SM]: { root: ['pb-4 sm:pb-6'] },
-      [SPACING_SCALE.MD]: { root: ['pb-8 sm:pb-10 lg:pb-12'] },
-      [SPACING_SCALE.LG]: { root: ['pb-10 sm:pb-13 lg:pb-16'] },
-      [SPACING_SCALE.XL]: { root: ['pb-14 sm:pb-18 lg:pb-24'] },
+      [SPACING_SCALE.NONE]: { root: [BAND_SPACING_BOTTOM[SPACING_SCALE.NONE]] },
+      [SPACING_SCALE.SM]: { root: [BAND_SPACING_BOTTOM[SPACING_SCALE.SM]] },
+      [SPACING_SCALE.MD]: { root: [BAND_SPACING_BOTTOM[SPACING_SCALE.MD]] },
+      [SPACING_SCALE.LG]: { root: [BAND_SPACING_BOTTOM[SPACING_SCALE.LG]] },
+      [SPACING_SCALE.XL]: { root: [BAND_SPACING_BOTTOM[SPACING_SCALE.XL]] },
     },
     containerWidth: {
-      [CONTAINER_WIDTH.NARROW]: { inner: ['max-w-prose'] },
-      [CONTAINER_WIDTH.WIDE]: { inner: ['max-w-5xl'] },
+      [CONTAINER_WIDTH.NARROW]: { inner: ['max-w-measure'] },
+      [CONTAINER_WIDTH.WIDE]: { inner: ['max-w-wide'] },
       [CONTAINER_WIDTH.FULL]: { inner: ['max-w-page'] },
     },
     dividerTop: { true: { root: ['border-t border-divider'] } },

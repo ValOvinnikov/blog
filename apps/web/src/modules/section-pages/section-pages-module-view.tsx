@@ -10,7 +10,6 @@ import {
   SQUARE_IMAGE_SIZE,
   WIDE_IMAGE_HEIGHT,
 } from '@web/utils/media-card-image-size';
-import { moduleGridActionsVariants } from '@web/utils/module-grid-actions-variants';
 import { GRID_IMAGE_SIZES } from '@web/utils/module-image-sizes';
 import { toModuleGridColumns } from '@web/utils/to-module-grid-columns';
 
@@ -31,7 +30,6 @@ export const SectionPagesModuleView = ({
   dataTestId,
 }: ISectionPagesModuleViewProps) => {
   const columns = toModuleGridColumns(pages.length);
-  const s = moduleGridActionsVariants({ align: contentAlignment });
   const { image: imageClassName } = sectionPagesModuleViewVariants();
 
   return (
@@ -50,7 +48,7 @@ export const SectionPagesModuleView = ({
           variant="section"
         />
       )}
-      <CardGrid columns={columns} className={s.grid()}>
+      <CardGrid columns={columns}>
         {pages.map(({ id, title, summary, image, path }) => (
           <MediaCard key={id} excerpt={summary} isInteractive={Boolean(path)}>
             {image && (

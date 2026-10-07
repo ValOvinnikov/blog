@@ -7,7 +7,7 @@ export const socialLinksVariants = tv({
 export const socialLinkOnDarkVariants = tv({
   variants: {
     isOnDark: {
-      true: ['text-white hover:bg-white/15 hover:text-white'],
+      true: ['text-on-image hover:bg-on-image/15 hover:text-on-image'],
     },
   },
 });

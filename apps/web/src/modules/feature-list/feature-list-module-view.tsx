@@ -63,11 +63,7 @@ export const FeatureListModuleView = ({
           hasAnyImage={hasAnyImage}
         />
       ) : (
-        <CardGrid
-          columns={columns}
-          className={s.grid()}
-          dataTestId={`${dataTestId}-grid`}
-        >
+        <CardGrid columns={columns} dataTestId={`${dataTestId}-grid`}>
           {items.map((item) => (
             <FeatureListCard
               key={item.id}

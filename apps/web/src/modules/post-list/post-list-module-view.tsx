@@ -8,7 +8,6 @@ import {
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';
 import { SmartLink } from '@web/components/shared/smart-link';
-import { moduleGridActionsVariants } from '@web/utils/module-grid-actions-variants';
 
 import { postListModuleViewVariants } from './post-list-module-view-variants';
 
@@ -47,7 +46,6 @@ export const PostListModuleView = ({
 }: IPostListModuleViewProps) => {
   const isEmpty = items.length === 0;
   const v = postListModuleViewVariants();
-  const s = moduleGridActionsVariants();
 
   return (
     <Section
@@ -66,7 +64,7 @@ export const PostListModuleView = ({
       {isEmpty ? (
         <p className={v.emptyMessage()}>{emptyMessage}</p>
       ) : (
-        <CardGrid className={s.grid()}>
+        <CardGrid>
           {items.map((item) => (
             <MediaCardItem key={item.id} item={item} hasImage={hasImages} />
           ))}
