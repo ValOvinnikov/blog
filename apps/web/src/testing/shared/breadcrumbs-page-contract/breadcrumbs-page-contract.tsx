@@ -160,3 +160,30 @@ export const testForwardsArgsToLoader = <TData,>({
     expect(pageLoaderMock).toHaveBeenCalledWith(...expectedArgs);
   });
 };
+
+export const testBreadcrumbsJsonLdTrail = <TData,>({
+  pageLoaderMock,
+  setup,
+  successData,
+  expectedTrail,
+}: IWithSuccessData<TData> & {
+  expectedTrail: { name: string; path: string }[];
+}) => {
+  it('emits a BreadcrumbList node for each crumb in the trail', async () => {
+    pageLoaderMock.mockResolvedValue({ ok: true, data: successData });
+
+    await setup();
+
+    const schema = JSON.parse(
+      screen.getByTestId('json-ld-script').textContent ?? '',
+    );
+    expect(schema.itemListElement).toEqual(
+      expectedTrail.map(({ name, path }, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name,
+        item: `https://example.com${path}`,
+      })),
+    );
+  });
+};

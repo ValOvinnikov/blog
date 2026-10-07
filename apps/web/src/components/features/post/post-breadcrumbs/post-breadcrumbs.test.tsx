@@ -2,6 +2,7 @@ import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { mockPostDetail } from '@web/testing/pages/blog-post-page/fixtures';
 import {
   testBreadcrumbsJsonLdSchema,
+  testBreadcrumbsJsonLdTrail,
   testBreadcrumbsTrail,
   testForwardsArgsToLoader,
   testNotFoundOnFetchFailure,
@@ -11,6 +12,8 @@ import {
 import { PostBreadcrumbs } from './post-breadcrumbs';
 
 vi.mock('@web/server/request-context/request-context');
+
+vi.mock('@web/server/site-settings/get-site-settings/get-site-settings');
 
 const { getPostPageMock } = vi.hoisted(() => ({
   getPostPageMock: vi.fn(),
@@ -38,7 +41,7 @@ describe(`<${PostBreadcrumbs.name}/>`, () => {
     setup,
     successData: mockPostDetail,
     linkSteps: [
-      { label: 'Home', href: '/' },
+      { label: 'Northwind Journal', href: '/' },
       { label: 'Engineering', href: '/topics/engineering' },
     ],
     currentLabel: 'Hello World',
@@ -48,6 +51,16 @@ describe(`<${PostBreadcrumbs.name}/>`, () => {
     setup,
     successData: mockPostDetail,
     itemPath: '/topics/engineering',
+  });
+  testBreadcrumbsJsonLdTrail({
+    pageLoaderMock: getPostPageMock,
+    setup,
+    successData: mockPostDetail,
+    expectedTrail: [
+      { name: 'Northwind Journal', path: '/' },
+      { name: 'Engineering', path: '/topics/engineering' },
+      { name: 'Hello World', path: '/blog/hello-world' },
+    ],
   });
   testForwardsArgsToLoader({
     pageLoaderMock: getPostPageMock,
@@ -70,7 +83,9 @@ describe(`<${PostBreadcrumbs.name}/>`, () => {
       await setup();
 
       const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
-      expect(within(nav).getByRole('link', { name: 'Home' })).toBeVisible();
+      expect(
+        within(nav).getByRole('link', { name: 'Northwind Journal' }),
+      ).toBeVisible();
       expect(within(nav).queryByText('Engineering')).not.toBeInTheDocument();
     });
   });

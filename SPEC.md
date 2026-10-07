@@ -547,7 +547,11 @@ heading field says so, and says why it is still required. The document
 Studio's internal list label. The breadcrumb trail rests on the same
 guarantee: `page_landing`'s trailing crumb comes from
 `headingBlock.heading`, which always exists, so it is always present in
-both the visible trail and the `BreadcrumbList` JSON-LD.
+both the visible trail and the `BreadcrumbList` JSON-LD. Every other crumb
+label comes from Studio as well — the root crumb is `settings_site`'s
+`brand.name`, and the blog, topics and tags index crumbs are their
+singleton's `headingBlock.heading` — so the message catalogue keeps only the
+trail's `aria-label`.
 
 Breadcrumbs, metadata and the Studio preview keep
 reading the document's own `title`/`heading` whether or not a hero is set.

@@ -5,11 +5,7 @@
     "pageSuffix": "– Page {page}"
   },
   "breadcrumbs": {
-    "home": "Accueil",
-    "ariaLabel": "Fil d'Ariane",
-    "topics": "Thèmes",
-    "tags": "Étiquettes",
-    "blog": "Blog"
+    "ariaLabel": "Fil d'Ariane"
   },
   "notFound": {
     "eyebrow": "404",

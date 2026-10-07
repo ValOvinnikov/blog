@@ -6,15 +6,26 @@ import {
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';
+import { getHomeBreadcrumb } from '@web/server/site-settings/get-home-breadcrumb/get-home-breadcrumb';
+import { getTagIndexPage } from '@web/server/tag-index/get-tag-index-page/get-tag-index-page';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
+import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 import { getTranslations } from 'next-intl/server';
 
 export const TagIndexBreadcrumbs = async () => {
-  const t = await getTranslations('breadcrumbs');
+  const [result, homeBreadcrumb, t] = await Promise.all([
+    getTagIndexPage(),
+    getHomeBreadcrumb(),
+    getTranslations('breadcrumbs'),
+  ]);
+  const { headingBlock } = guardPageLoaderResult(
+    result,
+    'tag_index_breadcrumbs.fetch_failed',
+  );
 
   const breadcrumbTrail: IBreadcrumbItem[] = [
-    { label: t('home'), href: routes.home() },
-    { label: t('tags'), href: routes.tags() },
+    homeBreadcrumb,
+    { label: headingBlock.heading, href: routes.tags() },
   ];
   const breadcrumbListSchema = await buildBreadcrumbListSchema(breadcrumbTrail);
 

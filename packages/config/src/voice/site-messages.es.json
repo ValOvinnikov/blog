@@ -5,11 +5,7 @@
     "pageSuffix": "– Página {page}"
   },
   "breadcrumbs": {
-    "home": "Inicio",
-    "ariaLabel": "Ruta de navegación",
-    "topics": "Temas",
-    "tags": "Etiquetas",
-    "blog": "Blog"
+    "ariaLabel": "Ruta de navegación"
   },
   "notFound": {
     "eyebrow": "404",

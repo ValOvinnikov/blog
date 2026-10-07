@@ -1,6 +1,7 @@
 import { customRenderAsync } from '@web/testing/custom-render';
 import {
   testBreadcrumbsJsonLdSchema,
+  testBreadcrumbsJsonLdTrail,
   testBreadcrumbsTrail,
   testForwardsArgsToLoader,
   testNoJsonLdWithoutBaseUrl,
@@ -12,6 +13,8 @@ import { makeTopic } from '@web/testing/shared/topic/fixtures';
 import { TopicBreadcrumbs } from './topic-breadcrumbs';
 
 vi.mock('@web/server/request-context/request-context');
+
+vi.mock('@web/server/site-settings/get-site-settings/get-site-settings');
 
 const { getTopicPageMock } = vi.hoisted(() => ({
   getTopicPageMock: vi.fn(),
@@ -45,7 +48,7 @@ describe(`<${TopicBreadcrumbs.name}/>`, () => {
     pageLoaderMock: getTopicPageMock,
     setup,
     successData,
-    linkSteps: [{ label: 'Home', href: '/' }],
+    linkSteps: [{ label: 'Northwind Journal', href: '/' }],
     currentLabel: 'News',
   });
   testBreadcrumbsJsonLdSchema({
@@ -53,6 +56,15 @@ describe(`<${TopicBreadcrumbs.name}/>`, () => {
     setup,
     successData,
     itemPath: '/topics/news',
+  });
+  testBreadcrumbsJsonLdTrail({
+    pageLoaderMock: getTopicPageMock,
+    setup,
+    successData,
+    expectedTrail: [
+      { name: 'Northwind Journal', path: '/' },
+      { name: 'News', path: '/topics/news' },
+    ],
   });
   testNoJsonLdWithoutBaseUrl({
     pageLoaderMock: getTopicPageMock,

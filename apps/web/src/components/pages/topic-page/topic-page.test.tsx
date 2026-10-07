@@ -21,6 +21,8 @@ import { TopicPage } from './topic-page';
 
 vi.mock('@web/server/request-context/request-context');
 
+vi.mock('@web/server/site-settings/get-site-settings/get-site-settings');
+
 vi.mock('@blog/service', () => ({
   service: {
     pages: { topic: { v1: { getTopicPage: vi.fn() } } },
@@ -95,7 +97,7 @@ describe(`<${TopicPage.name}/>`, () => {
         name: 'Breadcrumb',
       });
       expect(
-        within(breadcrumbs).getByRole('link', { name: 'Home' }),
+        within(breadcrumbs).getByRole('link', { name: 'Northwind Journal' }),
       ).toBeVisible();
       expect(within(breadcrumbs).getByText('News')).toBeVisible();
       expect(screen.getByRole('main')).not.toContainElement(breadcrumbs);

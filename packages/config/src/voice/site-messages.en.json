@@ -5,11 +5,7 @@
     "pageSuffix": "– Page {page}"
   },
   "breadcrumbs": {
-    "home": "Home",
-    "ariaLabel": "Breadcrumb",
-    "topics": "Topics",
-    "tags": "Tags",
-    "blog": "Blog"
+    "ariaLabel": "Breadcrumb"
   },
   "notFound": {
     "eyebrow": "404",

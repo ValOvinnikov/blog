@@ -6,6 +6,7 @@ import {
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';
+import { getHomeBreadcrumb } from '@web/server/site-settings/get-home-breadcrumb/get-home-breadcrumb';
 import { getTagPage } from '@web/server/tag/get-tag-page/get-tag-page';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
@@ -22,10 +23,13 @@ export const TagBreadcrumbs = async ({ slug }: TTagBreadcrumbsProps) => {
   });
   const { tag } = page;
 
-  const t = await getTranslations('breadcrumbs');
+  const [homeBreadcrumb, t] = await Promise.all([
+    getHomeBreadcrumb(),
+    getTranslations('breadcrumbs'),
+  ]);
 
   const breadcrumbTrail: IBreadcrumbItem[] = [
-    { label: t('home'), href: routes.home() },
+    homeBreadcrumb,
     { label: tag.title, href: routes.tag(slug) },
   ];
   const breadcrumbListSchema = await buildBreadcrumbListSchema(breadcrumbTrail);

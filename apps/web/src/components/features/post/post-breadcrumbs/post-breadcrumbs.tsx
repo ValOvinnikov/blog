@@ -7,6 +7,7 @@ import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { getPostPage } from '@web/server/post/get-post-page/get-post-page';
+import { getHomeBreadcrumb } from '@web/server/site-settings/get-home-breadcrumb/get-home-breadcrumb';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 import { getTranslations } from 'next-intl/server';
@@ -22,10 +23,13 @@ export const PostBreadcrumbs = async ({ slug }: TPostBreadcrumbsProps) => {
   });
   const { title, topic } = post;
 
-  const t = await getTranslations('breadcrumbs');
+  const [homeBreadcrumb, t] = await Promise.all([
+    getHomeBreadcrumb(),
+    getTranslations('breadcrumbs'),
+  ]);
 
   const breadcrumbTrail: IBreadcrumbItem[] = [
-    { label: t('home'), href: routes.home() },
+    homeBreadcrumb,
     ...(topic.slug
       ? [{ label: topic.title, href: routes.topic(topic.slug) }]
       : []),
