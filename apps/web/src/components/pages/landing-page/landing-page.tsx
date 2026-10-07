@@ -27,6 +27,9 @@ export const LandingPage = async ({ path }: TLandingPageProps) => {
 
   return (
     <PageShell>
+      <PageShell.Breadcrumbs>
+        <LandingBreadcrumbs path={path} isAbovePageHeading={!hero} />
+      </PageShell.Breadcrumbs>
       <FaqPageSchema faqs={faqs} />
       <LandingModuleRenderer
         hero={hero}
@@ -35,7 +38,6 @@ export const LandingPage = async ({ path }: TLandingPageProps) => {
         modules={modules}
         landingPage={{ id, path }}
         sectionNavigation={sectionNavigation}
-        breadcrumbs={<LandingBreadcrumbs path={path} />}
       />
     </PageShell>
   );

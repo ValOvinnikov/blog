@@ -6,7 +6,6 @@ import { landingPageLayoutVariants } from './landing-page-layout-variants';
 
 export interface ILandingPageLayoutProps {
   topBlock: ReactNode;
-  breadcrumbs?: ReactNode;
   sectionNavigation?: TLandingSectionNavigation;
   children?: ReactNode;
 }
@@ -15,13 +14,11 @@ const s = landingPageLayoutVariants();
 
 export const LandingPageLayout = ({
   topBlock,
-  breadcrumbs,
   sectionNavigation,
   children,
 }: ILandingPageLayoutProps) => (
   <div className={s.root()}>
     {topBlock}
-    {breadcrumbs}
     {sectionNavigation ? (
       <div className={s.row()}>
         <SectionNavigation
