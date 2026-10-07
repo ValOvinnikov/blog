@@ -18,7 +18,6 @@ vi.mock('@web/server/newsletter/newsletter-actions/newsletter-actions', () => ({
 
 const setup = customRender(NewsletterForm, {
   variant: 'full' as const,
-  heading: 'Get new posts by email',
 });
 
 const typeAndSubmit = async (
@@ -184,8 +183,8 @@ describe(`<${NewsletterForm.name}/>`, () => {
   it('gives each rendered instance its own errorMessageId, so two forms on one page never collide', async () => {
     renderElement(
       <>
-        <NewsletterForm variant="full" heading="First newsletter" />
-        <NewsletterForm variant="full" heading="Second newsletter" />
+        <NewsletterForm variant="full" />
+        <NewsletterForm variant="full" />
       </>,
     );
 
@@ -217,36 +216,10 @@ describe(`<${NewsletterForm.name}/>`, () => {
     );
   });
 
-  it('forwards headingId to the rendered heading (full variant)', () => {
-    setup({ headingId: 'newsletter-module-heading' });
+  it('renders no heading of its own', () => {
+    setup();
 
-    expect(
-      screen.getByRole('heading', { name: 'Get new posts by email' }),
-    ).toHaveAttribute('id', 'newsletter-module-heading');
-  });
-
-  it('forwards headingId to the rendered heading (compact variant)', () => {
-    setup({ variant: 'compact', headingId: 'newsletter-compact-heading' });
-
-    expect(screen.getByText('Get new posts by email')).toHaveAttribute(
-      'id',
-      'newsletter-compact-heading',
-    );
-  });
-
-  it('renders the compact variant without supporting text', () => {
-    setup({ variant: 'compact', supportingText: 'ignored in compact' });
-
-    expect(screen.queryByText('ignored in compact')).not.toBeInTheDocument();
-    expect(
-      screen.getByRole('textbox', { name: 'Email address' }),
-    ).toBeVisible();
-  });
-
-  it('renders the full variant with supporting text', () => {
-    setup({ supportingText: 'Subscribe for updates.' });
-
-    expect(screen.getByText('Subscribe for updates.')).toBeVisible();
+    expect(screen.queryByRole('heading')).not.toBeInTheDocument();
   });
 
   it('renders the CMS-authored trust cues for the full variant', () => {

@@ -24,9 +24,6 @@ const TRUST_CUE_ICONS = [ICONS.SHIELD_CHECK, ICONS.CLOSE];
 
 type TNewsletterFormProps = {
   variant: 'full' | 'compact';
-  heading: string;
-  headingId?: string;
-  supportingText?: string;
   trustCues?: string[];
   align?: TContentAlignment;
   className?: string;
@@ -34,9 +31,6 @@ type TNewsletterFormProps = {
 
 export const NewsletterForm = ({
   variant,
-  heading,
-  headingId,
-  supportingText,
   trustCues,
   align,
   className,
@@ -84,8 +78,6 @@ export const NewsletterForm = ({
     onChange: handleEmailChange,
     onSubmit: handleSubmit,
     status,
-    heading,
-    headingId,
     errorMessage,
     errorMessageId,
     successMessage: t('successMessage'),
@@ -110,11 +102,5 @@ export const NewsletterForm = ({
     label,
   }));
 
-  return (
-    <NewsletterSignup.Full
-      {...sharedProps}
-      supportingText={supportingText}
-      trustCues={trustCueItems}
-    />
-  );
+  return <NewsletterSignup.Full {...sharedProps} trustCues={trustCueItems} />;
 };
