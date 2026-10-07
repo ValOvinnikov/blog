@@ -70,7 +70,7 @@ describe(`<${LandingPage.name}/>`, () => {
       );
     });
 
-    it('renders the breadcrumb trail outside main', () => {
+    it('renders the breadcrumb trail inside main, after the page heading', () => {
       const breadcrumbs = screen.getByRole('navigation', {
         name: 'Breadcrumb',
       });
@@ -78,7 +78,12 @@ describe(`<${LandingPage.name}/>`, () => {
         within(breadcrumbs).getByRole('link', { name: 'Home' }),
       ).toBeVisible();
       expect(within(breadcrumbs).getByText('About Us')).toBeVisible();
-      expect(screen.getByRole('main')).not.toContainElement(breadcrumbs);
+      expect(screen.getByRole('main')).toContainElement(breadcrumbs);
+      expect(
+        screen
+          .getByRole('heading', { level: 1 })
+          .compareDocumentPosition(breadcrumbs),
+      ).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
     });
 
     it('renders no section navigation when the page is outside a section', () => {

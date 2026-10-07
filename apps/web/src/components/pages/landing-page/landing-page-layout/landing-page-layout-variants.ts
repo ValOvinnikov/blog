@@ -1,8 +1,9 @@
 import { tv } from 'tailwind-variants';
 
-export const landingPageVariants = tv({
+export const landingPageLayoutVariants = tv({
   slots: {
-    layout: [
+    root: ['w-full overflow-x-clip'],
+    row: [
       'mx-auto w-full max-w-page px-gutter',
       'lg:grid lg:grid-cols-[220px_1fr] lg:gap-x-10',
     ],
