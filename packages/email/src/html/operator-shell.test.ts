@@ -18,13 +18,6 @@ describe('buildOperatorShell', () => {
     expect(html).toContain('<a href="https://example.com">Confirm</a>');
   });
 
-  it('names the platform in the header and footer', () => {
-    const html = buildOperatorShell({ bodyHtml: '<p>Body</p>' });
-
-    expect(html).toContain('Tenant Alerts');
-    expect(html).toContain(`&copy; ${new Date().getFullYear()} Tenant Alerts`);
-  });
-
   it('includes a hidden preheader with the escaped preview text when given', () => {
     const html = buildOperatorShell({
       previewText: 'Needs <attention>',
@@ -35,18 +28,29 @@ describe('buildOperatorShell', () => {
     expect(html).toContain('Needs &lt;attention&gt;');
   });
 
-  it('omits the preheader block entirely when no preview text is given', () => {
-    const html = buildOperatorShell({ bodyHtml: '<p>Body</p>' });
+  describe('with only body HTML', () => {
+    let html: string;
 
-    expect(html).not.toContain('display:none');
-  });
+    beforeEach(() => {
+      html = buildOperatorShell({ bodyHtml: '<p>Body</p>' });
+    });
 
-  it('inlines the fixed platform hex tokens rather than referencing CSS custom properties', () => {
-    const html = buildOperatorShell({ bodyHtml: '<p>Body</p>' });
+    it('names the platform in the header and footer', () => {
+      expect(html).toContain('Tenant Alerts');
+      expect(html).toContain(
+        `&copy; ${new Date().getFullYear()} Tenant Alerts`,
+      );
+    });
 
-    expect(html).toContain(PLATFORM_EMAIL_BRAND.surface);
-    expect(html).toContain(PLATFORM_EMAIL_BRAND.border);
-    expect(html).not.toContain('var(--');
+    it('omits the preheader block entirely when no preview text is given', () => {
+      expect(html).not.toContain('display:none');
+    });
+
+    it('inlines the fixed platform hex tokens rather than referencing CSS custom properties', () => {
+      expect(html).toContain(PLATFORM_EMAIL_BRAND.surface);
+      expect(html).toContain(PLATFORM_EMAIL_BRAND.border);
+      expect(html).not.toContain('var(--');
+    });
   });
 
   it('cannot be passed a tenant brand at compile time', () => {

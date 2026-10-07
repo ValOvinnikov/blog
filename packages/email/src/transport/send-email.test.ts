@@ -18,16 +18,17 @@ async function importSendEmail(): Promise<typeof import('./send-email')> {
 }
 
 describe('sendEmail', () => {
-  beforeEach(() => {
+  let sendEmail: typeof import('./send-email').sendEmail;
+
+  beforeEach(async () => {
     sendMock.mockReset();
     resendCtorMock.mockReset();
     process.env['RESEND_API_KEY'] = 'test-resend-key';
+    sendMock.mockResolvedValue({ data: { id: 'email_1' }, error: null });
+    ({ sendEmail } = await importSendEmail());
   });
 
   it('sends the given email via the Resend client', async () => {
-    sendMock.mockResolvedValue({ data: { id: 'email_1' }, error: null });
-
-    const { sendEmail } = await importSendEmail();
     await sendEmail({
       to: 'reader@example.com',
       from: 'Sign in <onboarding@resend.dev>',
@@ -44,9 +45,6 @@ describe('sendEmail', () => {
   });
 
   it('forwards custom headers to the Resend client when supplied', async () => {
-    sendMock.mockResolvedValue({ data: { id: 'email_1' }, error: null });
-
-    const { sendEmail } = await importSendEmail();
     await sendEmail({
       to: 'reader@example.com',
       from: 'Newsletter <newsletter@resend.dev>',
@@ -71,9 +69,6 @@ describe('sendEmail', () => {
   });
 
   it('sends no headers when none are supplied', async () => {
-    sendMock.mockResolvedValue({ data: { id: 'email_1' }, error: null });
-
-    const { sendEmail } = await importSendEmail();
     await sendEmail({
       to: 'reader@example.com',
       from: 'Sign in <onboarding@resend.dev>',
@@ -85,9 +80,6 @@ describe('sendEmail', () => {
   });
 
   it('constructs the Resend client with the configured API key', async () => {
-    sendMock.mockResolvedValue({ data: { id: 'email_1' }, error: null });
-
-    const { sendEmail } = await importSendEmail();
     await sendEmail({
       to: 'a@example.com',
       from: 'from@example.com',
@@ -99,9 +91,6 @@ describe('sendEmail', () => {
   });
 
   it('reuses a single Resend client across calls', async () => {
-    sendMock.mockResolvedValue({ data: { id: 'email_1' }, error: null });
-
-    const { sendEmail } = await importSendEmail();
     await sendEmail({
       to: 'a@example.com',
       from: 'from@example.com',
@@ -119,9 +108,6 @@ describe('sendEmail', () => {
   });
 
   it('forwards a given replyTo address to the Resend client', async () => {
-    sendMock.mockResolvedValue({ data: { id: 'email_1' }, error: null });
-
-    const { sendEmail } = await importSendEmail();
     await sendEmail({
       to: 'reader@example.com',
       from: 'Newsletter <newsletter@resend.dev>',
@@ -140,9 +126,6 @@ describe('sendEmail', () => {
   });
 
   it('sends no replyTo when none is supplied', async () => {
-    sendMock.mockResolvedValue({ data: { id: 'email_1' }, error: null });
-
-    const { sendEmail } = await importSendEmail();
     await sendEmail({
       to: 'reader@example.com',
       from: 'Sign in <onboarding@resend.dev>',
@@ -154,8 +137,6 @@ describe('sendEmail', () => {
   });
 
   it('rejects a malformed replyTo address before calling the Resend client', async () => {
-    const { sendEmail } = await importSendEmail();
-
     await expect(
       sendEmail({
         to: 'reader@example.com',
@@ -169,9 +150,6 @@ describe('sendEmail', () => {
   });
 
   it('strips a newline from the subject so it cannot inject a header', async () => {
-    sendMock.mockResolvedValue({ data: { id: 'email_1' }, error: null });
-
-    const { sendEmail } = await importSendEmail();
     await sendEmail({
       to: 'reader@example.com',
       from: 'from@example.com',
@@ -185,9 +163,6 @@ describe('sendEmail', () => {
   });
 
   it('strips a bare carriage return or line feed from the subject', async () => {
-    sendMock.mockResolvedValue({ data: { id: 'email_1' }, error: null });
-
-    const { sendEmail } = await importSendEmail();
     await sendEmail({
       to: 'reader@example.com',
       from: 'from@example.com',
@@ -204,8 +179,6 @@ describe('sendEmail', () => {
       data: null,
       error: { name: 'validation_error', message: 'Invalid `to` field' },
     });
-
-    const { sendEmail } = await importSendEmail();
 
     await expect(
       sendEmail({

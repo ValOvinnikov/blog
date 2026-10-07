@@ -20,7 +20,7 @@ const BRAND: TTenantEmailBrand = {
 const ACTION = { label: 'Sign in', url: 'https://example.com/sign-in' };
 
 describe('buildTenantEmail', () => {
-  it('renders the authored body followed by the action element', () => {
+  describe('with a one-paragraph authored body', () => {
     const body: TPortableTextContent = [
       {
         _type: 'block',
@@ -28,29 +28,58 @@ describe('buildTenantEmail', () => {
         children: [{ _type: 'span', text: 'Welcome back.' }],
       },
     ];
+    let html: string;
 
-    const html = buildTenantEmail({
-      brand: BRAND,
-      brandName: 'Acme',
-      body,
-      action: ACTION,
+    beforeEach(() => {
+      html = buildTenantEmail({
+        brand: BRAND,
+        brandName: 'Acme',
+        body,
+        action: ACTION,
+      });
     });
 
-    expect(html.indexOf('Welcome back.')).toBeLessThan(
-      html.indexOf(ACTION.url),
-    );
+    it('renders the authored body followed by the action element', () => {
+      expect(html.indexOf('Welcome back.')).toBeLessThan(
+        html.indexOf(ACTION.url),
+      );
+    });
+
+    it('renders byte-identical output when logoImageUrl and footerPostalAddress are omitted vs explicitly undefined', () => {
+      const withUndefinedOptionals = buildTenantEmail({
+        brand: BRAND,
+        brandName: 'Acme',
+        body,
+        action: ACTION,
+        logoImageUrl: undefined,
+        footerPostalAddress: undefined,
+      });
+
+      expect(withUndefinedOptionals).toBe(html);
+    });
   });
 
-  it('renders the action element even when the authored body is empty', () => {
-    const html = buildTenantEmail({
-      brand: BRAND,
-      brandName: 'Acme',
-      body: [],
-      action: ACTION,
+  describe('with an empty authored body', () => {
+    let html: string;
+
+    beforeEach(() => {
+      html = buildTenantEmail({
+        brand: BRAND,
+        brandName: 'Acme',
+        body: [],
+        action: ACTION,
+      });
     });
 
-    expect(html).toContain(`href="${ACTION.url}"`);
-    expect(html).toContain('>Sign in</a>');
+    it('renders the action element even when the authored body is empty', () => {
+      expect(html).toContain(`href="${ACTION.url}"`);
+      expect(html).toContain('>Sign in</a>');
+    });
+
+    it('renders the action in the tenant brand colours', () => {
+      expect(html).toContain(BRAND.brandPrimarySolid);
+      expect(html).toContain(BRAND.brandPrimaryContrast);
+    });
   });
 
   it('renders the action element even when the authored body is null or undefined', () => {
@@ -102,18 +131,6 @@ describe('buildTenantEmail', () => {
     expect(html.match(new RegExp(`href="${ACTION.url}"`, 'g'))).toHaveLength(1);
   });
 
-  it('renders the action in the tenant brand colours', () => {
-    const html = buildTenantEmail({
-      brand: BRAND,
-      brandName: 'Acme',
-      body: [],
-      action: ACTION,
-    });
-
-    expect(html).toContain(BRAND.brandPrimarySolid);
-    expect(html).toContain(BRAND.brandPrimaryContrast);
-  });
-
   it('escapes an authored body that attempts to inject markup', () => {
     const html = buildTenantEmail({
       brand: BRAND,
@@ -129,33 +146,6 @@ describe('buildTenantEmail', () => {
     });
 
     expect(html).not.toContain('<img src=x onerror=steal()>');
-  });
-
-  it('renders byte-identical output when logoImageUrl and footerPostalAddress are omitted vs explicitly undefined', () => {
-    const body: TPortableTextContent = [
-      {
-        _type: 'block',
-        style: 'normal',
-        children: [{ _type: 'span', text: 'Welcome back.' }],
-      },
-    ];
-
-    const withoutOptionals = buildTenantEmail({
-      brand: BRAND,
-      brandName: 'Acme',
-      body,
-      action: ACTION,
-    });
-    const withUndefinedOptionals = buildTenantEmail({
-      brand: BRAND,
-      brandName: 'Acme',
-      body,
-      action: ACTION,
-      logoImageUrl: undefined,
-      footerPostalAddress: undefined,
-    });
-
-    expect(withUndefinedOptionals).toBe(withoutOptionals);
   });
 
   it('forwards a given logo URL and footer postal address to the shell', () => {

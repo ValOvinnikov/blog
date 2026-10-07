@@ -23,12 +23,15 @@ async function importEnv(): Promise<typeof import('./env')> {
 }
 
 describe('env', () => {
+  beforeEach(() => {
+    delete process.env['SKIP_ENV_VALIDATION'];
+  });
+
   afterEach(() => {
     restoreEnv();
   });
 
   it('exposes a valid RESEND_API_KEY', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
     process.env['RESEND_API_KEY'] = 'test-resend-key';
 
     const { env } = await importEnv();
@@ -37,7 +40,6 @@ describe('env', () => {
   });
 
   it('leaves RESEND_API_KEY undefined when absent', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
     delete process.env['RESEND_API_KEY'];
 
     const { env } = await importEnv();
@@ -46,7 +48,6 @@ describe('env', () => {
   });
 
   it('treats an empty RESEND_API_KEY as absent rather than throwing', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
     process.env['RESEND_API_KEY'] = '';
 
     const { env } = await importEnv();

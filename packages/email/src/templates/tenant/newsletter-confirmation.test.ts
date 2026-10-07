@@ -30,30 +30,75 @@ const BODY: TPortableTextContent = [
 ];
 
 describe('buildNewsletterConfirmationEmail', () => {
-  it('returns the given subject unchanged', () => {
-    const { subject } = buildNewsletterConfirmationEmail({
-      subject: SUBJECT,
-      body: BODY,
-      confirmationUrl: CONFIRMATION_URL,
-      unsubscribeUrl: UNSUBSCRIBE_URL,
-      brand: BRAND,
-      brandName: 'Acme Blog',
+  describe('with the default input', () => {
+    let email: ReturnType<typeof buildNewsletterConfirmationEmail>;
+
+    beforeEach(() => {
+      email = buildNewsletterConfirmationEmail({
+        subject: SUBJECT,
+        body: BODY,
+        confirmationUrl: CONFIRMATION_URL,
+        unsubscribeUrl: UNSUBSCRIBE_URL,
+        brand: BRAND,
+        brandName: 'Acme Blog',
+      });
     });
 
-    expect(subject).toBe(SUBJECT);
-  });
-
-  it('renders the authored body through the shared serializer', () => {
-    const { html } = buildNewsletterConfirmationEmail({
-      subject: SUBJECT,
-      body: BODY,
-      confirmationUrl: CONFIRMATION_URL,
-      unsubscribeUrl: UNSUBSCRIBE_URL,
-      brand: BRAND,
-      brandName: 'Acme Blog',
+    it('returns the given subject unchanged', () => {
+      expect(email.subject).toBe(SUBJECT);
     });
 
-    expect(html).toContain('Click the button below to confirm.');
+    it('renders the authored body through the shared serializer', () => {
+      expect(email.html).toContain('Click the button below to confirm.');
+    });
+
+    it('renders both the confirm and unsubscribe actions', () => {
+      expect(email.html).toContain('>Confirm subscription</a>');
+      expect(email.html).toContain('>Unsubscribe</a>');
+    });
+
+    it('sanitizes and escapes the unsubscribe url via the shared action helper', () => {
+      expect(email.html).not.toContain(`href="${UNSUBSCRIBE_URL}"`);
+      expect(email.html).toContain(
+        `href="${UNSUBSCRIBE_URL.replace(/&/g, '&amp;')}"`,
+      );
+    });
+
+    it('sets List-Unsubscribe and List-Unsubscribe-Post headers with raw, unescaped urls', () => {
+      expect(email.headers).toEqual({
+        'List-Unsubscribe': `<${UNSUBSCRIBE_URL}>`,
+        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+      });
+    });
+
+    it('does not put either link in the authored body html', () => {
+      const bodyEndMarker = 'Click the button below to confirm.</p>';
+      const bodyEnd = email.html.indexOf(bodyEndMarker) + bodyEndMarker.length;
+      const bodyOnlyHtml = email.html.slice(0, bodyEnd);
+
+      expect(bodyOnlyHtml).not.toContain('<a href=');
+    });
+
+    it('renders the tenant brand name', () => {
+      expect(email.html).toContain('Acme Blog');
+    });
+
+    it('renders byte-identical html when logoImageUrl and footerPostalAddress are omitted vs explicitly undefined', () => {
+      const { html: withUndefinedOptionals } = buildNewsletterConfirmationEmail(
+        {
+          subject: SUBJECT,
+          body: BODY,
+          confirmationUrl: CONFIRMATION_URL,
+          unsubscribeUrl: UNSUBSCRIBE_URL,
+          brand: BRAND,
+          brandName: 'Acme Blog',
+          logoImageUrl: undefined,
+          footerPostalAddress: undefined,
+        },
+      );
+
+      expect(withUndefinedOptionals).toBe(email.html);
+    });
   });
 
   it('escapes an authored body that attempts to inject markup', () => {
@@ -73,67 +118,6 @@ describe('buildNewsletterConfirmationEmail', () => {
     });
 
     expect(html).not.toContain('<img src=x onerror=steal()>');
-  });
-
-  it('renders both the confirm and unsubscribe actions', () => {
-    const { html } = buildNewsletterConfirmationEmail({
-      subject: SUBJECT,
-      body: BODY,
-      confirmationUrl: CONFIRMATION_URL,
-      unsubscribeUrl: UNSUBSCRIBE_URL,
-      brand: BRAND,
-      brandName: 'Acme Blog',
-    });
-
-    expect(html).toContain('>Confirm subscription</a>');
-    expect(html).toContain('>Unsubscribe</a>');
-  });
-
-  it('sanitizes and escapes the unsubscribe url via the shared action helper', () => {
-    const { html } = buildNewsletterConfirmationEmail({
-      subject: SUBJECT,
-      body: BODY,
-      confirmationUrl: CONFIRMATION_URL,
-      unsubscribeUrl: UNSUBSCRIBE_URL,
-      brand: BRAND,
-      brandName: 'Acme Blog',
-    });
-
-    expect(html).not.toContain(`href="${UNSUBSCRIBE_URL}"`);
-    expect(html).toContain(`href="${UNSUBSCRIBE_URL.replace(/&/g, '&amp;')}"`);
-  });
-
-  it('sets List-Unsubscribe and List-Unsubscribe-Post headers with raw, unescaped urls', () => {
-    const { headers } = buildNewsletterConfirmationEmail({
-      subject: SUBJECT,
-      body: BODY,
-      confirmationUrl: CONFIRMATION_URL,
-      unsubscribeUrl: UNSUBSCRIBE_URL,
-      brand: BRAND,
-      brandName: 'Acme Blog',
-    });
-
-    expect(headers).toEqual({
-      'List-Unsubscribe': `<${UNSUBSCRIBE_URL}>`,
-      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
-    });
-  });
-
-  it('does not put either link in the authored body html', () => {
-    const { html } = buildNewsletterConfirmationEmail({
-      subject: SUBJECT,
-      body: BODY,
-      confirmationUrl: CONFIRMATION_URL,
-      unsubscribeUrl: UNSUBSCRIBE_URL,
-      brand: BRAND,
-      brandName: 'Acme Blog',
-    });
-
-    const bodyEndMarker = 'Click the button below to confirm.</p>';
-    const bodyEnd = html.indexOf(bodyEndMarker) + bodyEndMarker.length;
-    const bodyOnlyHtml = html.slice(0, bodyEnd);
-
-    expect(bodyOnlyHtml).not.toContain('<a href=');
   });
 
   it('no authored body content can remove or duplicate the confirm/unsubscribe actions, even one that mimics them', () => {
@@ -201,42 +185,6 @@ describe('buildNewsletterConfirmationEmail', () => {
 
     expect(html).toContain(otherBrand.brandPrimarySolid);
     expect(html).toContain(otherBrand.brandPrimaryContrast);
-  });
-
-  it('renders the tenant brand name', () => {
-    const { html } = buildNewsletterConfirmationEmail({
-      subject: SUBJECT,
-      body: BODY,
-      confirmationUrl: CONFIRMATION_URL,
-      unsubscribeUrl: UNSUBSCRIBE_URL,
-      brand: BRAND,
-      brandName: 'Acme Blog',
-    });
-
-    expect(html).toContain('Acme Blog');
-  });
-
-  it('renders byte-identical html when logoImageUrl and footerPostalAddress are omitted vs explicitly undefined', () => {
-    const { html: withoutOptionals } = buildNewsletterConfirmationEmail({
-      subject: SUBJECT,
-      body: BODY,
-      confirmationUrl: CONFIRMATION_URL,
-      unsubscribeUrl: UNSUBSCRIBE_URL,
-      brand: BRAND,
-      brandName: 'Acme Blog',
-    });
-    const { html: withUndefinedOptionals } = buildNewsletterConfirmationEmail({
-      subject: SUBJECT,
-      body: BODY,
-      confirmationUrl: CONFIRMATION_URL,
-      unsubscribeUrl: UNSUBSCRIBE_URL,
-      brand: BRAND,
-      brandName: 'Acme Blog',
-      logoImageUrl: undefined,
-      footerPostalAddress: undefined,
-    });
-
-    expect(withUndefinedOptionals).toBe(withoutOptionals);
   });
 
   it('forwards a given logo URL and footer postal address to the shell', () => {

@@ -14,14 +14,6 @@ describe('oauth-providers', () => {
   });
 
   describe('getEnabledOAuthProviderIds', () => {
-    it('includes an id when its full credential pair is present', async () => {
-      process.env['AUTH_GITHUB_ID'] = 'github-id';
-      process.env['AUTH_GITHUB_SECRET'] = 'github-secret';
-      const { getEnabledOAuthProviderIds } = await importOAuthProviders();
-
-      expect(getEnabledOAuthProviderIds()).toContain('github');
-    });
-
     it('excludes an id when only the client id half of its pair is present', async () => {
       process.env['AUTH_GITHUB_ID'] = 'github-id';
       const { getEnabledOAuthProviderIds } = await importOAuthProviders();
@@ -44,14 +36,25 @@ describe('oauth-providers', () => {
       );
     });
 
-    it('orders enabled ids GitHub before Google, matching config.ts registration order', async () => {
-      process.env['AUTH_GITHUB_ID'] = 'github-id';
-      process.env['AUTH_GITHUB_SECRET'] = 'github-secret';
-      process.env['AUTH_GOOGLE_ID'] = 'google-id';
-      process.env['AUTH_GOOGLE_SECRET'] = 'google-secret';
-      const { getEnabledOAuthProviderIds } = await importOAuthProviders();
+    describe('with the GitHub credential pair set', () => {
+      beforeEach(() => {
+        process.env['AUTH_GITHUB_ID'] = 'github-id';
+        process.env['AUTH_GITHUB_SECRET'] = 'github-secret';
+      });
 
-      expect(getEnabledOAuthProviderIds()).toEqual(['github', 'google']);
+      it('includes an id when its full credential pair is present', async () => {
+        const { getEnabledOAuthProviderIds } = await importOAuthProviders();
+
+        expect(getEnabledOAuthProviderIds()).toContain('github');
+      });
+
+      it('orders enabled ids GitHub before Google, matching config.ts registration order', async () => {
+        process.env['AUTH_GOOGLE_ID'] = 'google-id';
+        process.env['AUTH_GOOGLE_SECRET'] = 'google-secret';
+        const { getEnabledOAuthProviderIds } = await importOAuthProviders();
+
+        expect(getEnabledOAuthProviderIds()).toEqual(['github', 'google']);
+      });
     });
   });
 
