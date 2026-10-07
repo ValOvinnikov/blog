@@ -1,6 +1,8 @@
 import {
   ACCENT_RAMP_DARK,
   ACCENT_RAMP_LIGHT,
+  CARD_STYLE,
+  CARD_STYLE_DECLARATIONS,
   DENSITY_DECLARATIONS,
   formatOklchRamp,
   LOGO_RAMP_DARK,
@@ -26,6 +28,7 @@ export const buildThemeStyleBlock = ({
   logoHue,
   radiusScale,
   density,
+  cardStyle = CARD_STYLE.ACCENT_BAR,
 }: TThemeTokens): string => {
   const resolvedLogoHue = logoHue ?? accentHue;
 
@@ -35,6 +38,7 @@ export const buildThemeStyleBlock = ({
       ...formatOklchRamp(LOGO_RAMP_LIGHT, resolvedLogoHue),
       ...RADIUS_DECLARATIONS[radiusScale],
       ...DENSITY_DECLARATIONS[density],
+      ...CARD_STYLE_DECLARATIONS[cardStyle],
     })}
 }
 .dark {

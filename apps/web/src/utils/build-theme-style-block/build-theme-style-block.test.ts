@@ -121,6 +121,40 @@ describe('buildThemeStyleBlock', () => {
     });
   });
 
+  it('reproduces theme.css item-card tokens for the accent-bar card style', () => {
+    const themeCss = readFileSync(
+      createRequire(import.meta.url).resolve('@blog/tailwind-config/theme.css'),
+      'utf8',
+    );
+    const itemDeclarations = themeCss.match(/--item-[\w-]+: [^;]+;/g);
+
+    expect(itemDeclarations?.length).toBeGreaterThan(0);
+
+    const accentBarCss = buildThemeStyleBlock({
+      ...CONSOLE_TOKENS,
+      cardStyle: 'ACCENT_BAR',
+    });
+    const unsetCss = buildThemeStyleBlock(CONSOLE_TOKENS);
+
+    itemDeclarations?.forEach((declaration) => {
+      expect(accentBarCss).toContain(declaration);
+      expect(unsetCss).toContain(declaration);
+    });
+  });
+
+  it('draws outlined item cards with a uniform border and rounded corners', () => {
+    const css = buildThemeStyleBlock({
+      ...CONSOLE_TOKENS,
+      cardStyle: 'OUTLINED',
+    });
+    const read = (token: string) =>
+      css.match(new RegExp(`${token}: ([^;]+);`))?.[1];
+
+    expect(read('--item-accent-width')).toBe(read('--item-border-width'));
+    expect(read('--item-accent-color')).toBe('var(--border)');
+    expect(read('--item-radius')).toMatch(/^var\(--radius-/);
+  });
+
   it.each(RADIUS_TOKENS)(
     'rounds %s more at each larger radius scale',
     (token) => {
@@ -150,11 +184,15 @@ describe('buildThemeStyleBlock', () => {
     );
   });
 
-  it('keeps radius and density out of the .dark block', () => {
-    const css = buildThemeStyleBlock(CONSOLE_TOKENS);
+  it('keeps radius, density and card style out of the .dark block', () => {
+    const css = buildThemeStyleBlock({
+      ...CONSOLE_TOKENS,
+      cardStyle: 'OUTLINED',
+    });
     const darkBlock = css.slice(css.indexOf('.dark'));
 
     expect(darkBlock).not.toContain('--radius');
     expect(darkBlock).not.toContain('--spacing-');
+    expect(darkBlock).not.toContain('--item-');
   });
 });

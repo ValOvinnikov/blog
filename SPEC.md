@@ -1308,7 +1308,7 @@ the copy slot is what reverses the visual order.
 storage cut over to Postgres by the config-to-Postgres transition's E5): a
 tenant's row in `@blog/db`'s `site_config` table (`preset` —
 `PRESET_ID.CONSOLE`/`EDITORIAL`, required, plus `accentHue`/`logoHue`/
-`headingFont`/`bodyFont`/`radiusScale`/`density`) is read via
+`headingFont`/`bodyFont`/`radiusScale`/`density`/`cardStyle`) is read via
 `apps/web/src/server/site-config/get-site-config/get-site-config.ts` and resolved by
 `apps/web/src/utils/to-theme-tokens.ts` against `@blog/config`'s
 `PRESET_REGISTRY` into a fully-populated `TThemeTokens` (never partial —
@@ -1320,11 +1320,14 @@ declaring CSS custom properties under both `:root` and `.dark`
 (carrying `precedence`/`href` so React hoists it into `<head>` from wherever
 it mounts). The accent and logo colours go in both; `radiusScale` sets the
 five `--radius*` tokens and `density` the seven layout `--spacing-*` tokens
-(`gutter`, `section`, `page-y`, `site-x/y`, `card-x/y`) under `:root` only.
-`MD` and `DEFAULT` reproduce `configs/tailwind/theme.css`'s static values, so
-a site with no saved look renders as the defaults; `density` does not touch
-Tailwind's base `--spacing`, so control sizes stay fixed. The ramp, radius
-and density values live in `@blog/config`'s theme declaration tables;
+(`gutter`, `section`, `page-y`, `site-x/y`, `card-x/y`) under `:root` only,
+and `cardStyle` sets the five `--item-*` tokens the `item-card` utility reads,
+also under `:root` only — `ACCENT_BAR` a square card with a 2px brand bar on
+the left, `OUTLINED` a hairline border all round at `--radius-md`.
+`MD`, `DEFAULT` and `ACCENT_BAR` reproduce `configs/tailwind/theme.css`'s
+static values, so a site with no saved look renders as the defaults; `density` does not touch
+Tailwind's base `--spacing`, so control sizes stay fixed. The ramp, radius,
+density and card-style values live in `@blog/config`'s theme declaration tables;
 `apps/platform`'s Look preview reads them to set the same tokens inline on
 its preview surface, which also carries the `dark` class so the tenant's
 dark ramp wins over `theme.css`'s static `.dark` values. `apps/web`'s
