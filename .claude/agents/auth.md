@@ -141,6 +141,8 @@ delete-don't-shorten rule. It is not restated here; follow it as written.
 - Vitest, co-located `*.test.ts`. See the `testing-practices` skill
   (`.claude/skills/testing-practices/SKILL.md`, read it with Read — you have no
   Skill tool).
+  Repeated per-`it` arrangement goes in `beforeEach` — mandatory
+  (`testing-practices` → "Repeated arrangement goes in `beforeEach`").
 - Test the shape of the exported configuration, not `next-auth`'s internals:
   that the expected providers are present, that the session strategy is what
   both apps require, that the adapter is bound to the right tables.

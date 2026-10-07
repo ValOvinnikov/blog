@@ -467,6 +467,8 @@ delete-don't-shorten rule. It is not restated here; follow it as written.
   `container.children[0]` is banned too though lint misses it); a roleless element gets a
   fixed `data-testid` on the component. See the `testing-practices`
   skill (`.claude/skills/testing-practices/SKILL.md`).
+  Repeated per-`it` arrangement goes in `beforeEach` — mandatory
+  (`testing-practices` → "Repeated arrangement goes in `beforeEach`").
 - Storybook is configured in `apps/web` (`.storybook/main.ts` scans
   `src/app/**` and `src/components/**`). When adding or changing a client
   component or page composition, follow the `web-storybook` skill

@@ -220,7 +220,10 @@ CI-enforced guard was deliberately not added.
   (field list, option list, default, fieldset, "exposes X as a function",
   constant value) is **blocking** — delete it, don't keep it (full rule:
   `testing-practices` → "What not to test"). Sibling cases that differ only
-  in an input and an expected value are one `it.each`. A test fake, fixture
+  in an input and an expected value are one `it.each`. An arrangement line
+  repeated across `it`s (a uniform render, `userEvent.setup()`, a fake's
+  default, a fixture build) is **blocking** — it moves into `beforeEach`;
+  an inline `setup({ overrides })` is not repetition. A test fake, fixture
   or builder the diff copies from another file is **blocking**: it moves to
   `testing/` or `__mocks__/` in this diff. Repetition that was already on
   `main` and that the diff adds nothing to is filed, not fixed (CLAUDE.md →
