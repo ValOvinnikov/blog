@@ -73,10 +73,26 @@ const baseDoc = {
 };
 
 describe('migrate-cta-actions-to-cta-buttons wiring', () => {
+  let context: MigrationContext;
+  let sharedLink: {
+    label: string;
+    linkType: 'EXTERNAL';
+    url: string;
+  };
+
+  beforeEach(() => {
+    context = createMockContext();
+    sharedLink = {
+      label: 'Contact sales',
+      linkType: 'EXTERNAL',
+      url: 'https://example.com/contact',
+    };
+  });
+
   it('returns nothing for a CTA with no actions at all', async () => {
     const doc = { ...baseDoc, _id: 'cta-1' };
 
-    const mutations = await runMigration(doc, createMockContext());
+    const mutations = await runMigration(doc, context);
 
     expect(mutations).toEqual([]);
   });
@@ -89,7 +105,7 @@ describe('migrate-cta-actions-to-cta-buttons wiring', () => {
       actions: { actions: [] },
     };
 
-    const mutations = await runMigration(doc, createMockContext());
+    const mutations = await runMigration(doc, context);
 
     expect(mutations).toEqual([]);
   });
@@ -115,7 +131,7 @@ describe('migrate-cta-actions-to-cta-buttons wiring', () => {
       },
     };
 
-    const mutations = await runMigration(doc, createMockContext());
+    const mutations = await runMigration(doc, context);
     const createMutations = mutations.filter(isCreateIfNotExists);
     const patchMutation = mutations.find(isPatch);
 
@@ -265,7 +281,7 @@ describe('migrate-cta-actions-to-cta-buttons wiring', () => {
       },
     };
 
-    const mutations = await runMigration(doc, createMockContext());
+    const mutations = await runMigration(doc, context);
     const createMutation = mutations.find(isCreateIfNotExists);
 
     expect(createMutation?.document.title).toBe(
@@ -274,12 +290,6 @@ describe('migrate-cta-actions-to-cta-buttons wiring', () => {
   });
 
   it('collapses two CTAs sharing one destination onto a single link document', async () => {
-    const sharedLink = {
-      label: 'Contact sales',
-      linkType: 'EXTERNAL' as const,
-      url: 'https://example.com/contact',
-    };
-
     const docA = {
       ...baseDoc,
       _id: 'cta-a',
@@ -296,8 +306,8 @@ describe('migrate-cta-actions-to-cta-buttons wiring', () => {
     };
 
     const [mutationsA, mutationsB] = await Promise.all([
-      runMigration(docA, createMockContext()),
-      runMigration(docB, createMockContext()),
+      runMigration(docA, context),
+      runMigration(docB, context),
     ]);
 
     const linkIdA = mutationsA.filter(isCreateIfNotExists)[0]?.document._id;
@@ -308,12 +318,6 @@ describe('migrate-cta-actions-to-cta-buttons wiring', () => {
   });
 
   it('dedupes a single CTA whose two buttons share one destination into one link document', async () => {
-    const sharedLink = {
-      label: 'Contact sales',
-      linkType: 'EXTERNAL' as const,
-      url: 'https://example.com/contact',
-    };
-
     const doc = {
       ...baseDoc,
       _id: 'cta-4',
@@ -325,7 +329,7 @@ describe('migrate-cta-actions-to-cta-buttons wiring', () => {
       },
     };
 
-    const mutations = await runMigration(doc, createMockContext());
+    const mutations = await runMigration(doc, context);
 
     expect(mutations.filter(isCreateIfNotExists)).toHaveLength(1);
   });

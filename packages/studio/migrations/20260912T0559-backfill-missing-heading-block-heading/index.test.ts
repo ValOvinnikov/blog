@@ -1,4 +1,5 @@
 import { at, set, setIfMissing, type MigrationContext } from 'sanity/migrate';
+import type { MockInstance } from 'vitest';
 
 import migration, {
   resolveHeroHeading,
@@ -189,7 +190,21 @@ describe(resolvePostListHeading, () => {
 });
 
 describe('backfill headingBlock.heading document() wiring', () => {
-  const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+  let warnSpy: MockInstance<typeof console.warn>;
+  let tagContext: MigrationContext;
+  let emptyContext: MigrationContext;
+
+  beforeEach(() => {
+    warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    tagContext = fakeContext({
+      entities: { 'blog_tag-1': { title: 'TypeScript' } },
+    });
+    emptyContext = fakeContext({});
+  });
+
+  afterEach(() => {
+    warnSpy.mockRestore();
+  });
 
   it('skips a document that already has a heading, without any lookups', async () => {
     const fetch = vi.fn(async () => null);
@@ -210,13 +225,9 @@ describe('backfill headingBlock.heading document() wiring', () => {
   });
 
   it('backfills page_tag from the referenced tag title', async () => {
-    const context = fakeContext({
-      entities: { 'blog_tag-1': { title: 'TypeScript' } },
-    });
-
     const result = await runDocument(
       { _id: 'page_tag-1', _type: 'page_tag', tag: { _ref: 'blog_tag-1' } },
-      context,
+      tagContext,
     );
 
     expect(result).toEqual(toHeadingMutations('TypeScript'));
@@ -308,11 +319,9 @@ describe('backfill headingBlock.heading document() wiring', () => {
   });
 
   it('reports rather than inventing copy when page_tag has no tag reference', async () => {
-    const context = fakeContext({});
-
     const result = await runDocument(
       { _id: 'page_tag-orphan', _type: 'page_tag' },
-      context,
+      emptyContext,
     );
 
     expect(result).toEqual([]);
@@ -322,11 +331,9 @@ describe('backfill headingBlock.heading document() wiring', () => {
   });
 
   it('reports rather than inventing copy when a module_postList has no owning page', async () => {
-    const context = fakeContext({});
-
     const result = await runDocument(
       { _id: 'postList-orphan', _type: 'module_postList' },
-      context,
+      emptyContext,
     );
 
     expect(result).toEqual([]);
@@ -336,22 +343,18 @@ describe('backfill headingBlock.heading document() wiring', () => {
   });
 
   it('is idempotent — running twice produces the same no-op once backfilled', async () => {
-    const context = fakeContext({
-      entities: { 'blog_tag-1': { title: 'TypeScript' } },
-    });
-
     const doc = {
       _id: 'page_tag-1',
       _type: 'page_tag',
       tag: { _ref: 'blog_tag-1' },
     };
 
-    const first = await runDocument(doc, context);
+    const first = await runDocument(doc, tagContext);
     expect(first).toEqual(toHeadingMutations('TypeScript'));
 
     const second = await runDocument(
       { ...doc, headingBlock: { heading: 'TypeScript' } },
-      context,
+      tagContext,
     );
     expect(second).toEqual([]);
   });

@@ -39,9 +39,15 @@ const runDocument = (doc: Record<string, unknown>, context: MigrationContext) =>
   );
 
 describe('seo.metaTitle backfill document() wiring', () => {
+  let context: MigrationContext;
+
+  beforeEach(() => {
+    context = fakeContext(settingsSite());
+  });
+
   it('skips a document that already has a metaTitle, without any lookups', async () => {
     const fetch = vi.fn(async () => null);
-    const context = {
+    const fetchOnlyContext = {
       client: { fetch },
     } as unknown as MigrationContext;
 
@@ -51,7 +57,7 @@ describe('seo.metaTitle backfill document() wiring', () => {
         _type: 'page_tag',
         seo: { metaTitle: 'Already authored, never touched here' },
       },
-      context,
+      fetchOnlyContext,
     );
 
     expect(result).toEqual([]);
@@ -65,7 +71,7 @@ describe('seo.metaTitle backfill document() wiring', () => {
         _type: 'page_blog',
         headingBlock: { heading: 'Blog' },
       },
-      fakeContext(settingsSite()),
+      context,
     );
 
     expect(result).toEqual(
@@ -95,7 +101,7 @@ describe('seo.metaTitle backfill document() wiring', () => {
         _type: 'page_tagIndex',
         headingBlock: { heading: 'Tags' },
       },
-      fakeContext(settingsSite()),
+      context,
     );
 
     expect(result).toEqual(
@@ -110,7 +116,7 @@ describe('seo.metaTitle backfill document() wiring', () => {
         _type: 'page_topicIndex',
         headingBlock: { heading: 'Topics' },
       },
-      fakeContext(settingsSite()),
+      context,
     );
 
     expect(result).toEqual(
@@ -172,7 +178,7 @@ describe('seo.metaTitle backfill document() wiring', () => {
         _type: 'page_post',
         headingBlock: { heading: 'SEO That Generates Itself' },
       },
-      fakeContext(settingsSite()),
+      context,
     );
 
     expect(result).toEqual(
@@ -189,7 +195,7 @@ describe('seo.metaTitle backfill document() wiring', () => {
         _type: 'page_post',
         headingBlock: { heading },
       },
-      fakeContext(settingsSite()),
+      context,
     );
 
     expect(result).toEqual(expectedMutations(heading));
@@ -198,7 +204,7 @@ describe('seo.metaTitle backfill document() wiring', () => {
   it('skips a page_tag with neither a heading nor a resolvable tag reference', async () => {
     const result = await runDocument(
       { _id: 'page_tag-orphan', _type: 'page_tag' },
-      fakeContext(settingsSite()),
+      context,
     );
 
     expect(result).toEqual([]);
@@ -211,7 +217,7 @@ describe('seo.metaTitle backfill document() wiring', () => {
         _type: 'page_home',
         headingBlock: { heading: 'Home' },
       },
-      fakeContext(settingsSite()),
+      context,
     );
 
     expect(result).toEqual(
@@ -222,7 +228,7 @@ describe('seo.metaTitle backfill document() wiring', () => {
   it('skips page_home when its hero reference cannot be resolved', async () => {
     const result = await runDocument(
       { _id: 'page_home', _type: 'page_home', hero: { _ref: 'module_hero-1' } },
-      fakeContext(settingsSite()),
+      context,
     );
 
     expect(result).toEqual([]);
@@ -327,7 +333,7 @@ describe('seo.metaTitle backfill document() wiring', () => {
         _type: 'page_landing',
         headingBlock: { heading: 'SEO That Generates Itself' },
       },
-      fakeContext(settingsSite()),
+      context,
     );
 
     expect(result).toEqual(
@@ -344,7 +350,7 @@ describe('seo.metaTitle backfill document() wiring', () => {
         _type: 'page_landing',
         headingBlock: { heading },
       },
-      fakeContext(settingsSite()),
+      context,
     );
 
     expect(result).toEqual(expectedMutations(heading));
@@ -389,7 +395,7 @@ describe('seo.metaTitle backfill document() wiring', () => {
         _type: 'page_blog',
         headingBlock: { heading: 'Blog' },
       },
-      fakeContext(settingsSite()),
+      context,
     );
 
     const second = await runDocument(
@@ -399,7 +405,7 @@ describe('seo.metaTitle backfill document() wiring', () => {
         headingBlock: { heading: 'Blog' },
         seo: { metaTitle: 'Blog — Field notes on building software' },
       },
-      fakeContext(settingsSite()),
+      context,
     );
 
     expect(first).not.toEqual([]);

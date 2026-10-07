@@ -23,16 +23,20 @@ const deletableContext = createContext({
 });
 
 describe('retire-blog-post migration — blog_post documents', () => {
-  it('deletes a blog_post once its page_post counterpart is verified deletable', async () => {
-    const doc = { ...baseDoc, _id: 'post-1', _type: 'blog_post' };
+  let doc: typeof baseDoc & { _id: string; _type: string };
 
+  beforeEach(() => {
+    doc = { ...baseDoc, _id: 'post-1', _type: 'blog_post' };
+  });
+
+  it('deletes a blog_post once its page_post counterpart is verified deletable', async () => {
     const mutations = await migration.migrate.document(doc, deletableContext);
 
     expect(mutations).toEqual([del('post-1')]);
   });
 
   it('deletes a draft blog_post, checking its counterpart drafts.page_post id', async () => {
-    const doc = { ...baseDoc, _id: 'drafts.post-1', _type: 'blog_post' };
+    const draftDoc = { ...baseDoc, _id: 'drafts.post-1', _type: 'blog_post' };
     const fetchCalls: unknown[] = [];
     const context = {
       client: {
@@ -43,7 +47,7 @@ describe('retire-blog-post migration — blog_post documents', () => {
       },
     } as unknown as MigrationContext;
 
-    const mutations = await migration.migrate.document(doc, context);
+    const mutations = await migration.migrate.document(draftDoc, context);
 
     expect(mutations).toEqual([del('drafts.post-1')]);
     expect(fetchCalls).toEqual([

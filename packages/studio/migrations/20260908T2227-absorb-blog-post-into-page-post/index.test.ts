@@ -97,9 +97,13 @@ const getCreateOrReplace = (mutations: unknown[]): TCreateOrReplaceMutation => {
 };
 
 describe('absorb-blog-post-into-page-post migration — blog_post documents', () => {
-  it('creates the two shared modules and the page_post when none exists yet (production shape)', async () => {
-    const { context } = createMockContext({ blogPostIds: ['post-1'] });
+  let context: MigrationContext;
 
+  beforeEach(() => {
+    ({ context } = createMockContext({ blogPostIds: ['post-1'] }));
+  });
+
+  it('creates the two shared modules and the page_post when none exists yet (production shape)', async () => {
     const mutations = (await migration.migrate.document(
       postDoc,
       context,
@@ -128,7 +132,7 @@ describe('absorb-blog-post-into-page-post migration — blog_post documents', ()
   });
 
   it('keeps the existing page_post’s own title/slug/publishedAt/seo (development shape)', async () => {
-    const { context } = createMockContext({
+    const { context: existingPageContext } = createMockContext({
       blogPostIds: ['post-1'],
       existingPagePosts: {
         'page_post-post-1': {
@@ -142,7 +146,7 @@ describe('absorb-blog-post-into-page-post migration — blog_post documents', ()
 
     const mutations = (await migration.migrate.document(
       postDoc,
-      context,
+      existingPageContext,
     )) as unknown[];
 
     expect(getCreateOrReplace(mutations).document).toMatchObject({
@@ -155,11 +159,13 @@ describe('absorb-blog-post-into-page-post migration — blog_post documents', ()
 
   it('maps a draft blog_post onto a draft page_post', async () => {
     const draftDoc = { ...postDoc, _id: 'drafts.post-1' };
-    const { context } = createMockContext({ blogPostIds: ['drafts.post-1'] });
+    const { context: draftContext } = createMockContext({
+      blogPostIds: ['drafts.post-1'],
+    });
 
     const mutations = (await migration.migrate.document(
       draftDoc,
-      context,
+      draftContext,
     )) as unknown[];
 
     expect(getCreateOrReplace(mutations).document._id).toBe(
@@ -168,8 +174,6 @@ describe('absorb-blog-post-into-page-post migration — blog_post documents', ()
   });
 
   it('omits the newsletter module when newsletterEnabled is false', async () => {
-    const { context } = createMockContext({ blogPostIds: ['post-1'] });
-
     const mutations = (await migration.migrate.document(
       { ...postDoc, newsletterEnabled: false },
       context,
@@ -208,8 +212,13 @@ describe('absorb-blog-post-into-page-post migration — blog_post documents', ()
 });
 
 describe('absorb-blog-post-into-page-post migration — reference rewriting', () => {
+  let context: MigrationContext;
+
+  beforeEach(() => {
+    ({ context } = createMockContext({ blogPostIds: ['post-1'] }));
+  });
+
   it('rewrites module_hero.featuredPost pointing at a migrated post', async () => {
-    const { context } = createMockContext({ blogPostIds: ['post-1'] });
     const heroDoc = {
       ...baseDoc,
       _id: 'hero-1',
@@ -225,7 +234,6 @@ describe('absorb-blog-post-into-page-post migration — reference rewriting', ()
   });
 
   it('produces no mutations for a document with no matching references', async () => {
-    const { context } = createMockContext({ blogPostIds: ['post-1'] });
     const otherDoc = {
       ...baseDoc,
       _id: 'author-1',

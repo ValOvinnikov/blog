@@ -18,14 +18,18 @@ const baseDoc = {
 };
 
 describe('migrateTagIndexPage', () => {
-  it('applies both the fold and the backfill for a fully legacy document', () => {
-    const doc = {
+  let doc: TTagIndexPageDoc;
+
+  beforeEach(() => {
+    doc = {
       ...baseDoc,
       taxonomyList: { _ref: 'list-1' },
       heading: 'Tags',
       supportingText: 'Browse every tag.',
-    };
+    } as TTagIndexPageDoc;
+  });
 
+  it('applies both the fold and the backfill for a fully legacy document', () => {
     expect(migrateTagIndexPage(doc)).toEqual([
       ...(foldTaxonomyListIntoModules(doc) ?? []),
       ...(backfillHeadingBlock(doc) ?? []),
@@ -34,13 +38,6 @@ describe('migrateTagIndexPage', () => {
   });
 
   it('is idempotent — running it twice produces no further patches the second time', () => {
-    const doc = {
-      ...baseDoc,
-      taxonomyList: { _ref: 'list-1' },
-      heading: 'Tags',
-      supportingText: 'Browse every tag.',
-    };
-
     const alreadyMigrated = {
       ...doc,
       modules: [
@@ -60,9 +57,9 @@ describe('migrateTagIndexPage', () => {
   });
 
   it('produces no patches for a document with neither legacy field populated', () => {
-    const doc = { ...baseDoc } as TTagIndexPageDoc;
+    const emptyDoc = { ...baseDoc } as TTagIndexPageDoc;
 
-    expect(migrateTagIndexPage(doc)).toBeUndefined();
+    expect(migrateTagIndexPage(emptyDoc)).toBeUndefined();
   });
 });
 
@@ -97,91 +94,84 @@ describe('fold-page-tag-index-into-modules migration', () => {
     );
   });
 
-  it('authors taxonomy on a referenced module_taxonomyList document', async () => {
-    const moduleDoc = {
-      _id: 'list-1',
-      _type: 'module_taxonomyList',
-      _createdAt: '2026-01-01T00:00:00Z',
-      _updatedAt: '2026-01-01T00:00:00Z',
-      _rev: 'rev-1',
+  describe('with a module_taxonomyList document a page references', () => {
+    let moduleDoc: {
+      _id: string;
+      _type: string;
+      _createdAt: string;
+      _updatedAt: string;
+      _rev: string;
     };
-    const context = createMockContext([
-      { taxonomyRef: 'list-1', moduleRefs: [] },
-    ]);
+    let context: MigrationContext;
 
-    await expect(
-      migration.migrate.document(moduleDoc, context),
-    ).resolves.toEqual([at('taxonomy', set(TAXONOMY_KIND.TAGS))]);
-  });
+    beforeEach(() => {
+      moduleDoc = {
+        _id: 'list-1',
+        _type: 'module_taxonomyList',
+        _createdAt: '2026-01-01T00:00:00Z',
+        _updatedAt: '2026-01-01T00:00:00Z',
+        _rev: 'rev-1',
+      };
+      context = createMockContext([{ taxonomyRef: 'list-1', moduleRefs: [] }]);
+    });
 
-  it('does not author taxonomy on a module_taxonomyList document no page references', async () => {
-    const moduleDoc = {
-      _id: 'list-2',
-      _type: 'module_taxonomyList',
-      _createdAt: '2026-01-01T00:00:00Z',
-      _updatedAt: '2026-01-01T00:00:00Z',
-      _rev: 'rev-1',
-    };
-    const context = createMockContext([
-      { taxonomyRef: 'list-1', moduleRefs: [] },
-    ]);
+    it('authors taxonomy on a referenced module_taxonomyList document', async () => {
+      await expect(
+        migration.migrate.document(moduleDoc, context),
+      ).resolves.toEqual([at('taxonomy', set(TAXONOMY_KIND.TAGS))]);
+    });
 
-    await expect(
-      migration.migrate.document(moduleDoc, context),
-    ).resolves.toEqual([]);
-  });
+    it('does not author taxonomy on a module_taxonomyList document no page references', async () => {
+      const unreferencedModuleDoc = { ...moduleDoc, _id: 'list-2' };
 
-  it('is idempotent across a whole run — the fold and the module patch both settle', async () => {
-    const pageDoc = {
-      ...baseDoc,
-      taxonomyList: { _ref: 'list-1' },
-      heading: 'Tags',
-      supportingText: 'Browse every tag.',
-    };
-    const moduleDoc = {
-      _id: 'list-1',
-      _type: 'module_taxonomyList',
-      _createdAt: '2026-01-01T00:00:00Z',
-      _updatedAt: '2026-01-01T00:00:00Z',
-      _rev: 'rev-1',
-    };
-    const context = createMockContext([
-      { taxonomyRef: 'list-1', moduleRefs: [] },
-    ]);
+      await expect(
+        migration.migrate.document(unreferencedModuleDoc, context),
+      ).resolves.toEqual([]);
+    });
 
-    const firstPagePatch = await migration.migrate.document(pageDoc, context);
-    const firstModulePatch = await migration.migrate.document(
-      moduleDoc,
-      context,
-    );
-
-    const migratedPageDoc = {
-      ...pageDoc,
-      modules: [
-        {
-          _key: toTaxonomyListModuleKey('list-1'),
-          _type: 'module_taxonomyList',
-          _ref: 'list-1',
-        },
-      ],
-      headingBlock: {
+    it('is idempotent across a whole run — the fold and the module patch both settle', async () => {
+      const pageDoc = {
+        ...baseDoc,
+        taxonomyList: { _ref: 'list-1' },
         heading: 'Tags',
         supportingText: 'Browse every tag.',
-      },
-    };
-    const migratedModuleDoc = { ...moduleDoc, taxonomy: TAXONOMY_KIND.TAGS };
-    const secondContext = createMockContext([
-      { taxonomyRef: 'list-1', moduleRefs: ['list-1'] },
-    ]);
+      };
+      const firstPagePatch = await migration.migrate.document(pageDoc, context);
+      const firstModulePatch = await migration.migrate.document(
+        moduleDoc,
+        context,
+      );
 
-    expect(firstPagePatch).toBeDefined();
-    expect(firstModulePatch).toEqual([at('taxonomy', set(TAXONOMY_KIND.TAGS))]);
+      const migratedPageDoc = {
+        ...pageDoc,
+        modules: [
+          {
+            _key: toTaxonomyListModuleKey('list-1'),
+            _type: 'module_taxonomyList',
+            _ref: 'list-1',
+          },
+        ],
+        headingBlock: {
+          heading: 'Tags',
+          supportingText: 'Browse every tag.',
+        },
+      };
+      const migratedModuleDoc = { ...moduleDoc, taxonomy: TAXONOMY_KIND.TAGS };
+      const secondContext = createMockContext([
+        { taxonomyRef: 'list-1', moduleRefs: ['list-1'] },
+      ]);
 
-    await expect(
-      migration.migrate.document(migratedPageDoc, secondContext),
-    ).resolves.toEqual([]);
-    await expect(
-      migration.migrate.document(migratedModuleDoc, secondContext),
-    ).resolves.toEqual([]);
+      expect(firstPagePatch).toBeDefined();
+      expect(firstModulePatch).toEqual([
+        at('taxonomy', set(TAXONOMY_KIND.TAGS)),
+      ]);
+
+      await expect(
+        migration.migrate.document(migratedPageDoc, secondContext),
+      ).resolves.toEqual([]);
+      await expect(
+        migration.migrate.document(migratedModuleDoc, secondContext),
+      ).resolves.toEqual([]);
+    });
   });
 });
