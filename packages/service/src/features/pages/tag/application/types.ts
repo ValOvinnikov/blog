@@ -1,4 +1,6 @@
 import type { TTagDetailPageDocument } from '@blog/service/features/pages/tag/adaptor/detail-page/types';
-import type { TWithPageFaqs } from '@blog/service/shared/adaptors/faq-questions/page-faqs';
+import type { TFaqPageQuestion } from '@blog/service/shared/transformers/faq/resolve-faqs';
 
-export type TTagDetailPage = TWithPageFaqs<TTagDetailPageDocument>;
+export type TTagDetailPage = TTagDetailPageDocument & {
+  faqs: TFaqPageQuestion[];
+};

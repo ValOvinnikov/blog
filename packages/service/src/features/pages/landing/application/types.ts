@@ -1,4 +1,4 @@
 import type { TLandingPageDocument } from '@blog/service/features/pages/landing/adaptor/detail-page/types';
-import type { TWithPageFaqs } from '@blog/service/shared/adaptors/faq-questions/page-faqs';
+import type { TFaqPageQuestion } from '@blog/service/shared/transformers/faq/resolve-faqs';
 
-export type TLandingPage = TWithPageFaqs<TLandingPageDocument>;
+export type TLandingPage = TLandingPageDocument & { faqs: TFaqPageQuestion[] };
