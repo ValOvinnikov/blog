@@ -29,7 +29,13 @@ function getAtPath(value: unknown, path: string): unknown {
 }
 
 describe('VOICE_FIELDS / site-messages.en.json coverage', () => {
-  const catalogKeys = flattenKeys(siteMessages);
+  let catalogKeys: string[];
+  let registeredPaths: Set<string>;
+
+  beforeEach(() => {
+    catalogKeys = flattenKeys(siteMessages);
+    registeredPaths = new Set<string>(VOICE_FIELDS.map((field) => field.path));
+  });
 
   it.each(VOICE_FIELDS.map((field) => field.path))(
     'registry path %s resolves to a real catalog string',
@@ -39,9 +45,6 @@ describe('VOICE_FIELDS / site-messages.en.json coverage', () => {
   );
 
   it('every catalog key is either registered or on VOICE_FIXED_KEYS', () => {
-    const registeredPaths = new Set<string>(
-      VOICE_FIELDS.map((field) => field.path),
-    );
     const fixedPaths = new Set<string>(VOICE_FIXED_KEYS);
 
     const unaccounted = catalogKeys.filter(
@@ -52,10 +55,6 @@ describe('VOICE_FIELDS / site-messages.en.json coverage', () => {
   });
 
   it('VOICE_FIXED_KEYS carries no key already registered in VOICE_FIELDS', () => {
-    const registeredPaths = new Set<string>(
-      VOICE_FIELDS.map((field) => field.path),
-    );
-
     const overlap = VOICE_FIXED_KEYS.filter((key) => registeredPaths.has(key));
 
     expect(overlap).toEqual([]);
