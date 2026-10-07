@@ -37,6 +37,28 @@ export const WithSupportingText: TStory = {
   },
 };
 
+const LONG_SUPPORTING_TEXT =
+  'Essays and notes from the team on design systems, content modelling and the small decisions that shape a product, published as we ship and revisited when we learn something new.';
+
+export const WithLongSupportingText: TStory = {
+  args: {
+    headingBlock: {
+      heading: 'Notes on building things',
+      supportingText: LONG_SUPPORTING_TEXT,
+    },
+  },
+};
+
+export const CenterAlignedWithLongSupportingText: TStory = {
+  args: {
+    align: CONTENT_ALIGNMENT.CENTER,
+    headingBlock: {
+      heading: 'Notes on building things',
+      supportingText: LONG_SUPPORTING_TEXT,
+    },
+  },
+};
+
 export const CenterAligned: TStory = {
   args: {
     align: CONTENT_ALIGNMENT.CENTER,
