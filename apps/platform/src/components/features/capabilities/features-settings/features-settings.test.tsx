@@ -6,7 +6,8 @@ import {
 import { customRender, screen, waitFor } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import type { TSettingsFeaturesValues } from '@platform/utils/settings-features-fields/settings-features-fields';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
+import type { Mock } from 'vitest';
 
 import { FeaturesSettings } from './features-settings';
 
@@ -36,6 +37,11 @@ const INITIAL_VALUES: TSettingsFeaturesValues = {
   consentBannerEnabled: false,
 };
 
+type TSaveAction = (
+  tenantId: string,
+  values: TSettingsFeaturesValues,
+) => Promise<{ ok: boolean }>;
+
 const ARCHIVED_AT = new Date('2026-08-26T00:00:00.000Z');
 
 const setup = customRender(FeaturesSettings, {
@@ -46,153 +52,157 @@ const setup = customRender(FeaturesSettings, {
 });
 
 describe(`<${FeaturesSettings.name}/>`, () => {
-  it('renders one toggle per built capability, reflecting the initial values', () => {
-    setup();
+  let user: UserEvent;
+  let refresh: ReturnType<typeof mockRouterRefresh>;
 
-    expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(
-      'data-checked',
-      '',
-    );
-    expect(screen.getByRole('switch', { name: 'Analytics' })).toHaveAttribute(
-      'data-unchecked',
-      '',
-    );
-    expect(screen.getAllByRole('switch')).toHaveLength(3);
+  beforeEach(() => {
+    user = userEvent.setup();
+    refresh = mockRouterRefresh();
   });
 
-  it.each(['Comments', 'Ratings', 'Newsletter'])(
-    'shows %s as "Coming soon" with no toggle, whatever the plan',
-    (label) => {
-      setup({ entitledCapabilities: FREE_ENTITLED });
+  describe('with every capability entitled and the initial values', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-      expect(screen.getByText(label)).toBeVisible();
+    it('renders one toggle per built capability, reflecting the initial values', () => {
+      expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(
+        'data-checked',
+        '',
+      );
+      expect(screen.getByRole('switch', { name: 'Analytics' })).toHaveAttribute(
+        'data-unchecked',
+        '',
+      );
+      expect(screen.getAllByRole('switch')).toHaveLength(3);
+    });
+
+    it('badges exactly the three unfinished capabilities "Coming soon"', () => {
+      expect(screen.getAllByText('Coming soon')).toHaveLength(3);
+    });
+
+    it('renders the page heading and a section heading without skipping a level; toggle rows are labelled rows, not further headings', () => {
       expect(
-        screen.queryByRole('switch', { name: label }),
-      ).not.toBeInTheDocument();
-    },
-  );
-
-  it('badges exactly the three unfinished capabilities "Coming soon"', () => {
-    setup();
-
-    expect(screen.getAllByText('Coming soon')).toHaveLength(3);
-  });
-
-  it('disables an out-of-plan toggle and shows a plan-locked badge, without hiding it', () => {
-    setup({ entitledCapabilities: FREE_ENTITLED });
-
-    expect(screen.getByRole('switch', { name: 'Analytics' })).toHaveAttribute(
-      'data-disabled',
-      '',
-    );
-    expect(
-      screen.getByRole('switch', { name: 'Cookie consent banner' }),
-    ).toHaveAttribute('data-disabled', '');
-    expect(
-      screen.getByRole('switch', { name: 'Bookmarks' }),
-    ).not.toHaveAttribute('data-disabled');
-    expect(screen.getAllByText('Growth plan')).toHaveLength(2);
-  });
-
-  it('makes a locked toggle inert (unreachable and unclickable) while leaving an entitled toggle interactive, same as a provisioning-locked field', () => {
-    setup({ entitledCapabilities: FREE_ENTITLED });
-
-    const lockedSwitch = screen.getByRole('switch', { name: 'Analytics' });
-    // eslint-disable-next-line testing-library/no-node-access
-    const lockedWrapper = lockedSwitch.closest('div');
-    expect(lockedWrapper?.getAttribute('inert')).toBe('');
-
-    const entitledSwitch = screen.getByRole('switch', { name: 'Bookmarks' });
-    // eslint-disable-next-line testing-library/no-node-access
-    const entitledWrapper = entitledSwitch.closest('div');
-    expect(entitledWrapper?.hasAttribute('inert')).toBe(false);
-  });
-
-  it('renders the page heading and a section heading without skipping a level; toggle rows are labelled rows, not further headings', () => {
-    setup();
-
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Features' }),
-    ).toBeVisible();
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'Capabilities' }),
-    ).toBeVisible();
-    expect(screen.getByText('Comments')).toBeVisible();
-  });
-
-  it('toggles an entitled capability on click', async () => {
-    const user = userEvent.setup();
-    setup();
-
-    await user.click(screen.getByRole('switch', { name: 'Bookmarks' }));
-
-    expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(
-      'data-unchecked',
-      '',
-    );
-  });
-
-  it('disables Save on initial render, with values unchanged', () => {
-    setup();
-
-    expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled();
-  });
-
-  it('enables Save after toggling an entitled capability, and disables it again once toggled back', async () => {
-    const user = userEvent.setup();
-    setup();
-
-    const saveButton = screen.getByRole('button', { name: 'Save changes' });
-    const analyticsSwitch = screen.getByRole('switch', {
-      name: 'Analytics',
+        screen.getByRole('heading', { level: 1, name: 'Features' }),
+      ).toBeVisible();
+      expect(
+        screen.getByRole('heading', { level: 2, name: 'Capabilities' }),
+      ).toBeVisible();
+      expect(screen.getByText('Comments')).toBeVisible();
     });
 
-    await user.click(analyticsSwitch);
-    expect(saveButton).toBeEnabled();
+    it('toggles an entitled capability on click', async () => {
+      await user.click(screen.getByRole('switch', { name: 'Bookmarks' }));
 
-    await user.click(analyticsSwitch);
-    expect(saveButton).toBeDisabled();
-  });
+      expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(
+        'data-unchecked',
+        '',
+      );
+    });
 
-  it('disables Save again after a successful save, without a remount', async () => {
-    const user = userEvent.setup();
-    const saveAction = vi.fn().mockResolvedValue({ ok: true });
-    setup({ saveAction });
+    it('disables Save on initial render, with values unchanged', () => {
+      expect(
+        screen.getByRole('button', { name: 'Save changes' }),
+      ).toBeDisabled();
+    });
 
-    const saveButton = screen.getByRole('button', { name: 'Save changes' });
-    await user.click(screen.getByRole('switch', { name: 'Analytics' }));
-    expect(saveButton).toBeEnabled();
+    it('enables Save after toggling an entitled capability, and disables it again once toggled back', async () => {
+      const saveButton = screen.getByRole('button', { name: 'Save changes' });
+      const analyticsSwitch = screen.getByRole('switch', {
+        name: 'Analytics',
+      });
 
-    await user.click(saveButton);
+      await user.click(analyticsSwitch);
+      expect(saveButton).toBeEnabled();
 
-    await waitFor(() => expect(saveButton).toBeDisabled());
-  });
+      await user.click(analyticsSwitch);
+      expect(saveButton).toBeDisabled();
+    });
 
-  it('saves the current toggle state through saveAction', async () => {
-    const user = userEvent.setup();
-    const saveAction = vi.fn().mockResolvedValue({ ok: true });
-    setup({ saveAction });
-
-    await user.click(screen.getByRole('switch', { name: 'Bookmarks' }));
-    await user.click(screen.getByRole('button', { name: 'Save changes' }));
-
-    expect(saveAction).toHaveBeenCalledWith('tenant-1', {
-      ...INITIAL_VALUES,
-      bookmarksEnabled: false,
+    it('leaves entitled capability toggles enabled for a non-archived tenant', () => {
+      expect(
+        screen.getByRole('switch', { name: 'Bookmarks' }),
+      ).not.toHaveAttribute('data-disabled');
     });
   });
 
-  it('shows a save-confirmation toast and refreshes after a successful save', async () => {
-    const user = userEvent.setup();
-    const refresh = mockRouterRefresh();
-    const saveAction = vi.fn().mockResolvedValue({ ok: true });
-    setup({ saveAction });
+  describe('on a plan that entitles only the free capabilities', () => {
+    beforeEach(() => {
+      setup({ entitledCapabilities: FREE_ENTITLED });
+    });
 
-    await user.click(screen.getByRole('switch', { name: 'Analytics' }));
-    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+    it.each(['Comments', 'Ratings', 'Newsletter'])(
+      'shows %s as "Coming soon" with no toggle, whatever the plan',
+      (label) => {
+        expect(screen.getByText(label)).toBeVisible();
+        expect(
+          screen.queryByRole('switch', { name: label }),
+        ).not.toBeInTheDocument();
+      },
+    );
 
-    expect(await screen.findByText('Features saved.')).toBeVisible();
-    expect(refresh).toHaveBeenCalled();
+    it('disables an out-of-plan toggle and shows a plan-locked badge, without hiding it', () => {
+      expect(screen.getByRole('switch', { name: 'Analytics' })).toHaveAttribute(
+        'data-disabled',
+        '',
+      );
+      expect(
+        screen.getByRole('switch', { name: 'Cookie consent banner' }),
+      ).toHaveAttribute('data-disabled', '');
+      expect(
+        screen.getByRole('switch', { name: 'Bookmarks' }),
+      ).not.toHaveAttribute('data-disabled');
+      expect(screen.getAllByText('Growth plan')).toHaveLength(2);
+    });
+
+    it('makes a locked toggle inert (unreachable and unclickable) while leaving an entitled toggle interactive, same as a provisioning-locked field', () => {
+      const lockedSwitch = screen.getByRole('switch', { name: 'Analytics' });
+      // eslint-disable-next-line testing-library/no-node-access
+      const lockedWrapper = lockedSwitch.closest('div');
+      expect(lockedWrapper?.getAttribute('inert')).toBe('');
+
+      const entitledSwitch = screen.getByRole('switch', { name: 'Bookmarks' });
+      // eslint-disable-next-line testing-library/no-node-access
+      const entitledWrapper = entitledSwitch.closest('div');
+      expect(entitledWrapper?.hasAttribute('inert')).toBe(false);
+    });
+  });
+
+  describe('with a saveAction that succeeds', () => {
+    let saveAction: Mock<TSaveAction>;
+
+    beforeEach(() => {
+      saveAction = vi.fn<TSaveAction>().mockResolvedValue({ ok: true });
+      setup({ saveAction });
+    });
+
+    it('disables Save again after a successful save, without a remount', async () => {
+      const saveButton = screen.getByRole('button', { name: 'Save changes' });
+      await user.click(screen.getByRole('switch', { name: 'Analytics' }));
+      expect(saveButton).toBeEnabled();
+
+      await user.click(saveButton);
+
+      await waitFor(() => expect(saveButton).toBeDisabled());
+    });
+
+    it('saves the current toggle state through saveAction', async () => {
+      await user.click(screen.getByRole('switch', { name: 'Bookmarks' }));
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      expect(saveAction).toHaveBeenCalledWith('tenant-1', {
+        ...INITIAL_VALUES,
+        bookmarksEnabled: false,
+      });
+    });
+
+    it('shows a save-confirmation toast and refreshes after a successful save', async () => {
+      await user.click(screen.getByRole('switch', { name: 'Analytics' }));
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      expect(await screen.findByText('Features saved.')).toBeVisible();
+      expect(refresh).toHaveBeenCalled();
+    });
   });
 
   it('shows the saving state while the save is in flight', async () => {
@@ -203,7 +213,6 @@ describe(`<${FeaturesSettings.name}/>`, () => {
           resolveAction = resolve;
         }),
     );
-    const user = userEvent.setup();
     setup({ saveAction });
 
     await user.click(screen.getByRole('switch', { name: 'Analytics' }));
@@ -217,8 +226,6 @@ describe(`<${FeaturesSettings.name}/>`, () => {
   });
 
   it('shows an error alert and does not refresh when the save fails', async () => {
-    const user = userEvent.setup();
-    const refresh = mockRouterRefresh();
     const saveAction = vi.fn().mockResolvedValue({ ok: false });
     setup({ saveAction });
 
@@ -230,24 +237,22 @@ describe(`<${FeaturesSettings.name}/>`, () => {
   });
 
   describe('archived tenant', () => {
-    it('shows an archived notice and disables Save', async () => {
-      const user = userEvent.setup();
-      const saveAction = vi.fn().mockResolvedValue({ ok: true });
-      setup({ saveAction, archivedAt: ARCHIVED_AT });
+    let saveAction: Mock<TSaveAction>;
 
+    beforeEach(() => {
+      saveAction = vi.fn<TSaveAction>().mockResolvedValue({ ok: true });
+      setup({ saveAction, archivedAt: ARCHIVED_AT });
+    });
+
+    it('shows an archived notice and disables Save', async () => {
       await expectArchivedDisablesSave(user, saveAction);
     });
 
     it('describes the disabled Save button with the archived notice text, for a screen-reader user', () => {
-      setup({ archivedAt: ARCHIVED_AT });
-
       expectArchivedSaveDescribedByNotice();
     });
 
     it('disables every capability toggle, including entitled ones', async () => {
-      const user = userEvent.setup();
-      setup({ archivedAt: ARCHIVED_AT });
-
       const bookmarksSwitch = screen.getByRole('switch', { name: 'Bookmarks' });
       expect(bookmarksSwitch).toHaveAttribute('data-disabled', '');
       expect(bookmarksSwitch).toHaveAccessibleDescription(
@@ -257,13 +262,5 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       await user.click(bookmarksSwitch);
       expect(bookmarksSwitch).toHaveAttribute('data-checked', '');
     });
-  });
-
-  it('leaves entitled capability toggles enabled for a non-archived tenant', () => {
-    setup();
-
-    expect(
-      screen.getByRole('switch', { name: 'Bookmarks' }),
-    ).not.toHaveAttribute('data-disabled');
   });
 });

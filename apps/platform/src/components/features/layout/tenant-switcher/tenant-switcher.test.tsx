@@ -3,7 +3,7 @@ import {
   makeReadyTenant,
   makeTenant,
 } from '@platform/testing/tenants/fixtures';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { TenantSwitcher } from './tenant-switcher';
 
@@ -17,6 +17,12 @@ const setup = customRender(TenantSwitcher, {
 });
 
 describe(`<${TenantSwitcher.name}/>`, () => {
+  let user: UserEvent;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
   it('shows the active tenant on the trigger', () => {
     setup();
 
@@ -26,7 +32,6 @@ describe(`<${TenantSwitcher.name}/>`, () => {
   });
 
   it('opens a menu named for the active tenant, linking every switchable tenant', async () => {
-    const user = userEvent.setup();
     setup();
 
     await user.click(screen.getByRole('button', { name: /acme inc\./i }));
@@ -37,7 +42,6 @@ describe(`<${TenantSwitcher.name}/>`, () => {
   });
 
   it('links each tenant through a caller-supplied hrefFor instead of /tenants/{id}', async () => {
-    const user = userEvent.setup();
     setup({
       hrefFor: (t) => `/dashboard/select-tenant?tenantId=${t.id}`,
     });
@@ -53,7 +57,6 @@ describe(`<${TenantSwitcher.name}/>`, () => {
   });
 
   it('marks an archived tenant in its accessible name and leaves others unmarked', async () => {
-    const user = userEvent.setup();
     const archivedTenant = makeTenant({
       id: 'tenant-2',
       name: 'Globex Corp',

@@ -96,6 +96,18 @@ describe(uploadBrandAssetAction, () => {
       user: { id: 'operator-1', email: 'operator@example.com' },
     });
     insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
+    validateBrandAssetUploadMock.mockResolvedValue({
+      ok: true,
+      asset: {
+        buffer: Buffer.from('bytes'),
+        contentType: 'image/png',
+        extension: 'png',
+      },
+    });
+    putMock.mockResolvedValue({
+      url: 'https://example.blob.vercel-storage.com/logo-abc.png',
+    });
+    upsertSiteConfigMock.mockResolvedValue({});
     getSiteConfigOrDefaultsMock.mockResolvedValue({
       ...THEME_FIELDS,
       logoAssetUrl: undefined,
@@ -152,19 +164,6 @@ describe(uploadBrandAssetAction, () => {
   });
 
   it('uploads, saves the theme fields plus the new logo URL, and returns it', async () => {
-    validateBrandAssetUploadMock.mockResolvedValue({
-      ok: true,
-      asset: {
-        buffer: Buffer.from('bytes'),
-        contentType: 'image/png',
-        extension: 'png',
-      },
-    });
-    putMock.mockResolvedValue({
-      url: 'https://example.blob.vercel-storage.com/logo-abc.png',
-    });
-    upsertSiteConfigMock.mockResolvedValue({});
-
     const result = await uploadBrandAssetAction(
       'tenant-1',
       'logo',
@@ -182,19 +181,6 @@ describe(uploadBrandAssetAction, () => {
   });
 
   it('records one SETTINGS_UPDATED audit event naming the asset and operation', async () => {
-    validateBrandAssetUploadMock.mockResolvedValue({
-      ok: true,
-      asset: {
-        buffer: Buffer.from('bytes'),
-        contentType: 'image/png',
-        extension: 'png',
-      },
-    });
-    putMock.mockResolvedValue({
-      url: 'https://example.blob.vercel-storage.com/logo-abc.png',
-    });
-    upsertSiteConfigMock.mockResolvedValue({});
-
     await uploadBrandAssetAction(
       'tenant-1',
       'logo',
@@ -222,18 +208,9 @@ describe(uploadBrandAssetAction, () => {
       logoAssetUrl: 'https://example.blob.vercel-storage.com/logo-old.png',
       faviconAssetUrl: undefined,
     });
-    validateBrandAssetUploadMock.mockResolvedValue({
-      ok: true,
-      asset: {
-        buffer: Buffer.from('bytes'),
-        contentType: 'image/png',
-        extension: 'png',
-      },
-    });
     putMock.mockResolvedValue({
       url: 'https://example.blob.vercel-storage.com/logo-new.png',
     });
-    upsertSiteConfigMock.mockResolvedValue({});
     delMock.mockRejectedValue(new Error('blob unavailable'));
 
     const result = await uploadBrandAssetAction(
@@ -250,14 +227,6 @@ describe(uploadBrandAssetAction, () => {
   });
 
   it('reports failure with no site_config write when the Blob upload throws', async () => {
-    validateBrandAssetUploadMock.mockResolvedValue({
-      ok: true,
-      asset: {
-        buffer: Buffer.from('bytes'),
-        contentType: 'image/png',
-        extension: 'png',
-      },
-    });
     putMock.mockRejectedValue(new Error('blob store unavailable'));
 
     const result = await uploadBrandAssetAction(
@@ -275,17 +244,6 @@ describe(uploadBrandAssetAction, () => {
   });
 
   it('records no audit event when the site_config write itself fails', async () => {
-    validateBrandAssetUploadMock.mockResolvedValue({
-      ok: true,
-      asset: {
-        buffer: Buffer.from('bytes'),
-        contentType: 'image/png',
-        extension: 'png',
-      },
-    });
-    putMock.mockResolvedValue({
-      url: 'https://example.blob.vercel-storage.com/logo-abc.png',
-    });
     upsertSiteConfigMock.mockRejectedValue(new Error('db unavailable'));
 
     const result = await uploadBrandAssetAction(

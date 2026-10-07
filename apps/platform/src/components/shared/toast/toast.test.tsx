@@ -5,6 +5,12 @@ import userEvent from '@testing-library/user-event';
 import { Toast } from './toast';
 
 describe(Toast, () => {
+  let user: ReturnType<typeof userEvent.setup>;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
   it('renders its message', () => {
     render(
       <Toast
@@ -76,7 +82,6 @@ describe(Toast, () => {
   );
 
   it('calls onDismiss when the dismiss button is clicked', async () => {
-    const user = userEvent.setup();
     const onDismiss = vi.fn();
     render(
       <Toast
@@ -95,7 +100,6 @@ describe(Toast, () => {
   });
 
   it('renders an action button and calls its handler', async () => {
-    const user = userEvent.setup();
     const onAct = vi.fn();
     render(
       <Toast

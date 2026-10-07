@@ -32,12 +32,11 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
   beforeEach(() => {
     getSettingsFeaturesMock.mockReset();
     getSiteConfigMock.mockReset();
+    getSettingsFeaturesMock.mockResolvedValue(undefined);
+    getSiteConfigMock.mockResolvedValue(undefined);
   });
 
   it('renders CONSOLE featureDefaults with no settings_features or site_config row', async () => {
-    getSettingsFeaturesMock.mockResolvedValue(undefined);
-    getSiteConfigMock.mockResolvedValue(undefined);
-
     await setup({ tenant: buildTenant('GROWTH') });
 
     expect(getSettingsFeaturesMock).toHaveBeenCalledWith('tenant-1');
@@ -78,7 +77,6 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
   });
 
   it('falls back to EDITORIAL featureDefaults when site_config has that preset saved', async () => {
-    getSettingsFeaturesMock.mockResolvedValue(undefined);
     getSiteConfigMock.mockResolvedValue({
       preset: PRESET_ID.EDITORIAL,
       accentHue: 28,
@@ -100,9 +98,6 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
   });
 
   it('disables the GROWTH-only toggles for a FREE-plan tenant', async () => {
-    getSettingsFeaturesMock.mockResolvedValue(undefined);
-    getSiteConfigMock.mockResolvedValue(undefined);
-
     await setup({ tenant: buildTenant('FREE') });
 
     expect(screen.getByRole('switch', { name: 'Analytics' })).toHaveAttribute(
@@ -132,9 +127,6 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
   });
 
   it('enables every toggle for a GROWTH-plan tenant', async () => {
-    getSettingsFeaturesMock.mockResolvedValue(undefined);
-    getSiteConfigMock.mockResolvedValue(undefined);
-
     await setup({ tenant: buildTenant('GROWTH') });
 
     expect(
@@ -146,9 +138,6 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
   });
 
   it('passes the archived date through for a deprovisioned tenant', async () => {
-    getSettingsFeaturesMock.mockResolvedValue(undefined);
-    getSiteConfigMock.mockResolvedValue(undefined);
-
     const tenant = buildTenant('FREE');
     await setup({
       tenant: {

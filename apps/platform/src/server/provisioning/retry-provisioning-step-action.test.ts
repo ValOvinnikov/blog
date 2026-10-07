@@ -33,7 +33,9 @@ vi.mock('@blog/db', () => ({
 }));
 
 describe('retryProvisioningStepAction', () => {
-  beforeEach(() => {
+  let retryProvisioningStepAction: typeof import('./retry-provisioning-step-action').retryProvisioningStepAction;
+
+  beforeEach(async () => {
     requireSuperAdminMock.mockReset();
     requireSuperAdminMock.mockResolvedValue({
       id: 'admin-1',
@@ -59,14 +61,14 @@ describe('retryProvisioningStepAction', () => {
       ok: true,
       data: { id: 'tenant-1' },
     });
+    ({ retryProvisioningStepAction } =
+      await import('./retry-provisioning-step-action'));
   });
 
   it('requires a super-admin session before dispatching', async () => {
     requireSuperAdminMock.mockImplementation(() => {
       throw new Error('NEXT_REDIRECT');
     });
-    const { retryProvisioningStepAction } =
-      await import('./retry-provisioning-step-action');
 
     await expect(retryProvisioningStepAction('tenant-1')).rejects.toThrow(
       'NEXT_REDIRECT',
@@ -79,8 +81,6 @@ describe('retryProvisioningStepAction', () => {
     requireSuperAdminMock.mockImplementation(() => {
       notFound();
     });
-    const { retryProvisioningStepAction } =
-      await import('./retry-provisioning-step-action');
 
     await expect(retryProvisioningStepAction('tenant-1')).rejects.toThrow(
       'NEXT_NOT_FOUND',
@@ -92,9 +92,6 @@ describe('retryProvisioningStepAction', () => {
   });
 
   it('begins provisioning then dispatches the workflow, returning "dispatched" on success', async () => {
-    const { retryProvisioningStepAction } =
-      await import('./retry-provisioning-step-action');
-
     const result = await retryProvisioningStepAction('tenant-1');
 
     expect(beginTenantProvisioningMock).toHaveBeenCalledWith('tenant-1');
@@ -108,8 +105,6 @@ describe('retryProvisioningStepAction', () => {
       ok: false,
       error: 'DB_ALREADY_PROVISIONING',
     });
-    const { retryProvisioningStepAction } =
-      await import('./retry-provisioning-step-action');
 
     const result = await retryProvisioningStepAction('tenant-1');
 
@@ -123,8 +118,6 @@ describe('retryProvisioningStepAction', () => {
       ok: false,
       error: 'DB_NOT_FOUND',
     });
-    const { retryProvisioningStepAction } =
-      await import('./retry-provisioning-step-action');
 
     const result = await retryProvisioningStepAction('tenant-1');
 
@@ -134,8 +127,6 @@ describe('retryProvisioningStepAction', () => {
 
   it('returns "not-found" without touching beginTenantProvisioning when the tenant does not exist', async () => {
     getTenantByIdMock.mockResolvedValue(undefined);
-    const { retryProvisioningStepAction } =
-      await import('./retry-provisioning-step-action');
 
     const result = await retryProvisioningStepAction('ghost');
 
@@ -152,8 +143,6 @@ describe('retryProvisioningStepAction', () => {
       id: 'tenant-1',
       deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
     });
-    const { retryProvisioningStepAction } =
-      await import('./retry-provisioning-step-action');
 
     const result = await retryProvisioningStepAction('tenant-1');
 
@@ -171,8 +160,6 @@ describe('retryProvisioningStepAction', () => {
       },
     });
     dispatchProvisioningWorkflowMock.mockResolvedValue(false);
-    const { retryProvisioningStepAction } =
-      await import('./retry-provisioning-step-action');
 
     const result = await retryProvisioningStepAction('tenant-1');
 

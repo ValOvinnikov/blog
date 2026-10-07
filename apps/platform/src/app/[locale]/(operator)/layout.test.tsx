@@ -36,6 +36,7 @@ describe(`<${OperatorLayout.name}/>`, () => {
     authMock.mockReset();
     getAdminByUserIdMock.mockReset();
     resolveIsSidebarCollapsedMock.mockReset();
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     resolveIsSidebarCollapsedMock.mockResolvedValue(false);
     vi.mocked(usePathname).mockReturnValue('/tenants');
     vi.mocked(useParams).mockReturnValue({});
@@ -51,7 +52,6 @@ describe(`<${OperatorLayout.name}/>`, () => {
   });
 
   it('404s when the signed-in user has no admins row', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue(undefined);
 
     await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
@@ -61,7 +61,6 @@ describe(`<${OperatorLayout.name}/>`, () => {
   });
 
   it('renders the gated content for a signed-in admin', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue({
       id: 'admin-1',
       userId: 'user-1',

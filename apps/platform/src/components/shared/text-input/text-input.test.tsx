@@ -4,6 +4,12 @@ import userEvent from '@testing-library/user-event';
 import { TextInput } from './text-input';
 
 describe(TextInput, () => {
+  let user: ReturnType<typeof userEvent.setup>;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
   it('renders the given value', () => {
     render(
       <TextInput ariaLabel="Tenant name" value="Acme" onChange={vi.fn()} />,
@@ -13,7 +19,6 @@ describe(TextInput, () => {
   });
 
   it('calls onChange with the new string value on input', async () => {
-    const user = userEvent.setup();
     const handleChange = vi.fn();
 
     render(
@@ -40,7 +45,6 @@ describe(TextInput, () => {
   });
 
   it('makes the input read-only, not disabled, when isReadOnly is true', async () => {
-    const user = userEvent.setup();
     const handleChange = vi.fn();
     render(
       <TextInput

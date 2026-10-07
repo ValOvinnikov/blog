@@ -346,15 +346,15 @@ describe(`<${TenantOverviewView.name}/>`, () => {
       deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
     });
 
-    it('shows the archived notice', () => {
+    beforeEach(() => {
       setup({ tenant: archivedTenant });
+    });
 
+    it('shows the archived notice', () => {
       expect(screen.getByText('This tenant is archived')).toBeVisible();
     });
 
     it("describes the details panel's disabled Save button with the archived notice, end to end", () => {
-      setup({ tenant: archivedTenant });
-
       expect(
         screen.getByRole('button', { name: 'Save changes' }),
       ).toHaveAccessibleDescription(/This tenant is archived/);

@@ -38,6 +38,7 @@ describe(`<${SelectTenantPage.name}/>`, () => {
     listTenantsByIdsMock.mockReset();
     getAdminByUserIdMock.mockReset();
     getAdminByUserIdMock.mockResolvedValue(undefined);
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
   });
 
   it('redirects to sign-in without a session', async () => {
@@ -49,7 +50,6 @@ describe(`<${SelectTenantPage.name}/>`, () => {
   });
 
   it('redirects to /workspace-pending with zero memberships', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     listMembershipsForUserMock.mockResolvedValue([]);
 
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
@@ -58,7 +58,6 @@ describe(`<${SelectTenantPage.name}/>`, () => {
   });
 
   it('redirects straight to /dashboard for exactly one membership — nothing to pick', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     listMembershipsForUserMock.mockResolvedValue([
       { id: 'm-1', userId: 'user-1', tenantId: 'tenant-1', role: 'OWNER' },
     ]);
@@ -70,7 +69,6 @@ describe(`<${SelectTenantPage.name}/>`, () => {
   });
 
   it('renders the picker for multiple memberships', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     listMembershipsForUserMock.mockResolvedValue([
       { id: 'm-1', userId: 'user-1', tenantId: 'tenant-1', role: 'OWNER' },
       { id: 'm-2', userId: 'user-1', tenantId: 'tenant-2', role: 'OWNER' },

@@ -5,6 +5,12 @@ import { useState } from 'react';
 import { Disclosure } from './disclosure';
 
 describe(Disclosure, () => {
+  let user: ReturnType<typeof userEvent.setup>;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
   it('renders the summary and content', () => {
     render(
       <Disclosure summary="Advanced">
@@ -37,7 +43,6 @@ describe(Disclosure, () => {
   });
 
   it('toggles open on click, keeping the state announced via the native open attribute', async () => {
-    const user = userEvent.setup();
     render(
       <Disclosure summary="Advanced">
         <p>Body</p>
@@ -107,7 +112,6 @@ describe(Disclosure, () => {
     });
 
     it('calls onOpenChange with the next value when toggled', async () => {
-      const user = userEvent.setup();
       const onOpenChange = vi.fn();
       render(
         <Disclosure
@@ -125,7 +129,6 @@ describe(Disclosure, () => {
     });
 
     it('round-trips through a caller that feeds onOpenChange back in as isOpen', async () => {
-      const user = userEvent.setup();
       const ControlledDisclosure = () => {
         const [isOpen, setIsOpen] = useState(false);
         return (

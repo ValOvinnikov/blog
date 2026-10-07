@@ -31,6 +31,9 @@ describe(requireTenantMembership, () => {
     getTenantByIdMock.mockReset();
     getMembershipMock.mockReset();
     getAdminByUserIdMock.mockReset();
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    getTenantByIdMock.mockResolvedValue({ id: 'tenant-1' });
+    getAdminByUserIdMock.mockResolvedValue(undefined);
   });
 
   it('redirects to sign-in without querying the tenant when there is no session', async () => {
@@ -45,7 +48,6 @@ describe(requireTenantMembership, () => {
   });
 
   it('404s for an unknown tenant id without checking membership or admin role', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getTenantByIdMock.mockResolvedValue(undefined);
 
     await expect(requireTenantMembership('ghost')).rejects.toThrow(
@@ -57,9 +59,6 @@ describe(requireTenantMembership, () => {
   });
 
   it('404s, as for an unknown id, with no admins row and no membership on the tenant', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getTenantByIdMock.mockResolvedValue({ id: 'tenant-1' });
-    getAdminByUserIdMock.mockResolvedValue(undefined);
     getMembershipMock.mockResolvedValue(undefined);
 
     await expect(requireTenantMembership('tenant-1')).rejects.toThrow(
@@ -73,8 +72,6 @@ describe(requireTenantMembership, () => {
   it.each(['ADMIN', 'MODERATOR', 'SUPERADMIN'])(
     'grants a %s admins row OWNER-level access with no membership on the tenant',
     async (role) => {
-      authMock.mockResolvedValue({ user: { id: 'user-1' } });
-      getTenantByIdMock.mockResolvedValue({ id: 'tenant-1' });
       getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role });
 
       const result = await requireTenantMembership('tenant-1');
@@ -89,9 +86,6 @@ describe(requireTenantMembership, () => {
   );
 
   it("does not gate one tenant's regular membership on a different tenant's membership", async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getTenantByIdMock.mockResolvedValue({ id: 'tenant-1' });
-    getAdminByUserIdMock.mockResolvedValue(undefined);
     const membership = {
       id: 'membership-1',
       userId: 'user-1',
@@ -113,7 +107,6 @@ describe(requireTenantMembership, () => {
   it("404s a member of tenant A supplying tenant B's id, never authorizing against A", async () => {
     authMock.mockResolvedValue({ user: { id: 'user-from-tenant-a' } });
     getTenantByIdMock.mockResolvedValue({ id: 'tenant-b' });
-    getAdminByUserIdMock.mockResolvedValue(undefined);
     getMembershipMock.mockResolvedValue(undefined);
 
     await expect(requireTenantMembership('tenant-b')).rejects.toThrow(

@@ -23,16 +23,21 @@ vi.mock('@blog/db', async () => ({
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
 describe('GET /api/dashboard/select-tenant', () => {
-  beforeEach(() => {
+  let GET: typeof import('./route').GET;
+
+  beforeEach(async () => {
     authMock.mockReset();
     getMembershipMock.mockReset();
     getAdminByUserIdMock.mockReset();
     listTenantsByIdsMock.mockReset();
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    getMembershipMock.mockResolvedValue(undefined);
+    getAdminByUserIdMock.mockResolvedValue(undefined);
+    ({ GET } = await import('./route'));
   });
 
   it('redirects to sign-in without checking membership when there is no session', async () => {
     authMock.mockResolvedValue(null);
-    const { GET } = await import('./route');
 
     const response = await GET(
       new Request(
@@ -48,9 +53,6 @@ describe('GET /api/dashboard/select-tenant', () => {
   });
 
   it('redirects to the picker when no tenantId is given', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    const { GET } = await import('./route');
-
     const response = await GET(
       new Request('https://admin.example.com/api/dashboard/select-tenant'),
     );
@@ -62,11 +64,6 @@ describe('GET /api/dashboard/select-tenant', () => {
   });
 
   it('returns 404 with no cookie for a non-SUPERADMIN with no membership on the tenant', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getMembershipMock.mockResolvedValue(undefined);
-    getAdminByUserIdMock.mockResolvedValue(undefined);
-    const { GET } = await import('./route');
-
     const response = await GET(
       new Request(
         'https://admin.example.com/api/dashboard/select-tenant?tenantId=someone-elses-tenant',
@@ -82,36 +79,13 @@ describe('GET /api/dashboard/select-tenant', () => {
     expect(response.cookies.get('admin-active-tenant')).toBeUndefined();
   });
 
-  it('returns 404 when a SUPERADMIN names a tenant that does not exist', async () => {
-    authMock.mockResolvedValue({ user: { id: 'super-1' } });
-    getMembershipMock.mockResolvedValue(undefined);
-    getAdminByUserIdMock.mockResolvedValue({
-      id: 'admin-1',
-      role: 'SUPERADMIN',
-    });
-    listTenantsByIdsMock.mockResolvedValue([]);
-    const { GET } = await import('./route');
-
-    const response = await GET(
-      new Request(
-        'https://admin.example.com/api/dashboard/select-tenant?tenantId=ghost-tenant',
-      ),
-    );
-
-    expect(response.status).toBe(404);
-    expect(response.headers.get('location')).toBeNull();
-    expect(response.cookies.get('admin-active-tenant')).toBeUndefined();
-  });
-
   it('sets the active-tenant cookie and redirects to /dashboard for a membership', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getMembershipMock.mockResolvedValue({
       id: 'm-1',
       userId: 'user-1',
       tenantId: 'tenant-1',
       role: 'OWNER',
     });
-    const { GET } = await import('./route');
 
     const response = await GET(
       new Request(
@@ -126,26 +100,45 @@ describe('GET /api/dashboard/select-tenant', () => {
     expect(getAdminByUserIdMock).not.toHaveBeenCalled();
   });
 
-  it('sets the cookie and redirects to /dashboard for a SUPERADMIN with no membership', async () => {
-    authMock.mockResolvedValue({ user: { id: 'super-1' } });
-    getMembershipMock.mockResolvedValue(undefined);
-    getAdminByUserIdMock.mockResolvedValue({
-      id: 'admin-1',
-      role: 'SUPERADMIN',
+  describe('for a SUPERADMIN with no membership', () => {
+    beforeEach(() => {
+      authMock.mockResolvedValue({ user: { id: 'super-1' } });
+      getAdminByUserIdMock.mockResolvedValue({
+        id: 'admin-1',
+        role: 'SUPERADMIN',
+      });
     });
-    listTenantsByIdsMock.mockResolvedValue([{ id: 'tenant-1' }]);
-    const { GET } = await import('./route');
 
-    const response = await GET(
-      new Request(
-        'https://admin.example.com/api/dashboard/select-tenant?tenantId=tenant-1',
-      ),
-    );
+    it('returns 404 when a SUPERADMIN names a tenant that does not exist', async () => {
+      listTenantsByIdsMock.mockResolvedValue([]);
 
-    expect(listTenantsByIdsMock).toHaveBeenCalledWith(['tenant-1']);
-    expect(response.headers.get('location')).toBe(
-      'https://admin.example.com/dashboard',
-    );
-    expect(response.cookies.get('admin-active-tenant')?.value).toBe('tenant-1');
+      const response = await GET(
+        new Request(
+          'https://admin.example.com/api/dashboard/select-tenant?tenantId=ghost-tenant',
+        ),
+      );
+
+      expect(response.status).toBe(404);
+      expect(response.headers.get('location')).toBeNull();
+      expect(response.cookies.get('admin-active-tenant')).toBeUndefined();
+    });
+
+    it('sets the cookie and redirects to /dashboard for a SUPERADMIN with no membership', async () => {
+      listTenantsByIdsMock.mockResolvedValue([{ id: 'tenant-1' }]);
+
+      const response = await GET(
+        new Request(
+          'https://admin.example.com/api/dashboard/select-tenant?tenantId=tenant-1',
+        ),
+      );
+
+      expect(listTenantsByIdsMock).toHaveBeenCalledWith(['tenant-1']);
+      expect(response.headers.get('location')).toBe(
+        'https://admin.example.com/dashboard',
+      );
+      expect(response.cookies.get('admin-active-tenant')?.value).toBe(
+        'tenant-1',
+      );
+    });
   });
 });

@@ -60,11 +60,16 @@ const VALID_INPUT: TUpdateFeaturesInput = {
 describe(updateFeaturesAction, () => {
   beforeEach(() => {
     requireTenantMembershipMock.mockReset();
+    requireTenantMembershipMock.mockResolvedValue({
+      tenant: FREE_TENANT,
+      membership: { role: 'OWNER' },
+    });
     authMock.mockReset();
     authMock.mockResolvedValue({
       user: { id: 'operator-1', email: 'operator@example.com' },
     });
     upsertSettingsFeaturesMock.mockReset();
+    upsertSettingsFeaturesMock.mockResolvedValue({});
     revalidateSiteConfigMock.mockReset();
     revalidateSiteConfigMock.mockResolvedValue(undefined);
     insertAuditEventMock.mockReset();
@@ -74,12 +79,6 @@ describe(updateFeaturesAction, () => {
   });
 
   it('re-resolves the tenant from the session against the routed id before writing', async () => {
-    requireTenantMembershipMock.mockResolvedValue({
-      tenant: FREE_TENANT,
-      membership: { role: 'OWNER' },
-    });
-    upsertSettingsFeaturesMock.mockResolvedValue({});
-
     const result = await updateFeaturesAction('tenant-1', VALID_INPUT);
 
     expect(requireTenantMembershipMock).toHaveBeenCalledWith('tenant-1');
@@ -91,12 +90,6 @@ describe(updateFeaturesAction, () => {
   });
 
   it('calls the site-config revalidation webhook after a successful save', async () => {
-    requireTenantMembershipMock.mockResolvedValue({
-      tenant: FREE_TENANT,
-      membership: { role: 'OWNER' },
-    });
-    upsertSettingsFeaturesMock.mockResolvedValue({});
-
     await updateFeaturesAction('tenant-1', VALID_INPUT);
 
     expect(revalidateSiteConfigMock).toHaveBeenCalledTimes(1);
@@ -113,11 +106,6 @@ describe(updateFeaturesAction, () => {
   });
 
   it('rejects enabling a GROWTH-only capability on a FREE tenant, and writes nothing', async () => {
-    requireTenantMembershipMock.mockResolvedValue({
-      tenant: FREE_TENANT,
-      membership: { role: 'OWNER' },
-    });
-
     const result = await updateFeaturesAction('tenant-1', {
       ...VALID_INPUT,
       analyticsEnabled: true,
@@ -130,12 +118,6 @@ describe(updateFeaturesAction, () => {
   });
 
   it('lets a FREE tenant save an entitled field despite a clamped out-of-plan one', async () => {
-    requireTenantMembershipMock.mockResolvedValue({
-      tenant: FREE_TENANT,
-      membership: { role: 'OWNER' },
-    });
-    upsertSettingsFeaturesMock.mockResolvedValue({});
-
     const result = await updateFeaturesAction('tenant-1', {
       ...VALID_INPUT,
       bookmarksEnabled: false,
@@ -155,7 +137,6 @@ describe(updateFeaturesAction, () => {
       tenant: GROWTH_TENANT,
       membership: { role: 'OWNER' },
     });
-    upsertSettingsFeaturesMock.mockResolvedValue({});
 
     const result = await updateFeaturesAction('tenant-2', {
       ...VALID_INPUT,
@@ -174,7 +155,6 @@ describe(updateFeaturesAction, () => {
       tenant: GROWTH_TENANT,
       membership: { role: 'OWNER' },
     });
-    upsertSettingsFeaturesMock.mockResolvedValue({});
 
     const result = await updateFeaturesAction('tenant-2', {
       ...VALID_INPUT,
@@ -191,12 +171,6 @@ describe(updateFeaturesAction, () => {
   });
 
   it('does not reject a FREE tenant for switching on a "Coming soon" capability outside its plan', async () => {
-    requireTenantMembershipMock.mockResolvedValue({
-      tenant: FREE_TENANT,
-      membership: { role: 'OWNER' },
-    });
-    upsertSettingsFeaturesMock.mockResolvedValue({});
-
     const result = await updateFeaturesAction('tenant-1', {
       ...VALID_INPUT,
       newsletterEnabled: true,
@@ -210,10 +184,6 @@ describe(updateFeaturesAction, () => {
   });
 
   it('reports failure instead of throwing when the write itself fails', async () => {
-    requireTenantMembershipMock.mockResolvedValue({
-      tenant: FREE_TENANT,
-      membership: { role: 'OWNER' },
-    });
     upsertSettingsFeaturesMock.mockRejectedValue(new Error('db unavailable'));
 
     const result = await updateFeaturesAction('tenant-1', VALID_INPUT);
@@ -224,12 +194,6 @@ describe(updateFeaturesAction, () => {
   });
 
   it('records a SETTINGS_UPDATED audit event with the operator as actor', async () => {
-    requireTenantMembershipMock.mockResolvedValue({
-      tenant: FREE_TENANT,
-      membership: { role: 'OWNER' },
-    });
-    upsertSettingsFeaturesMock.mockResolvedValue({});
-
     await updateFeaturesAction('tenant-1', VALID_INPUT);
 
     expect(insertAuditEventMock).toHaveBeenCalledWith({
@@ -243,11 +207,6 @@ describe(updateFeaturesAction, () => {
   });
 
   it('still returns ok when the audit write fails, and logs the failure', async () => {
-    requireTenantMembershipMock.mockResolvedValue({
-      tenant: FREE_TENANT,
-      membership: { role: 'OWNER' },
-    });
-    upsertSettingsFeaturesMock.mockResolvedValue({});
     insertAuditEventMock.mockRejectedValue(new Error('connection reset'));
 
     const result = await updateFeaturesAction('tenant-1', VALID_INPUT);

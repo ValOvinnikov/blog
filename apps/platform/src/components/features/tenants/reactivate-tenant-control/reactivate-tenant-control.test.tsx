@@ -1,7 +1,7 @@
 import { customRender, screen } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import { makeTenant } from '@platform/testing/tenants/fixtures';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { ReactivateTenantControl } from './reactivate-tenant-control';
 
@@ -23,8 +23,10 @@ const setup = customRender(ReactivateTenantControl, {
 
 describe(`<${ReactivateTenantControl.name}/>`, () => {
   const refreshMock = vi.fn();
+  let user: UserEvent;
 
   beforeEach(() => {
+    user = userEvent.setup();
     reactivateTenantActionMock.mockReset();
     reactivateTenantActionMock.mockResolvedValue({ ok: true });
     refreshMock.mockReset();
@@ -40,7 +42,6 @@ describe(`<${ReactivateTenantControl.name}/>`, () => {
   });
 
   it('opens a confirm dialog requiring the tenant name, disabled until it matches', async () => {
-    const user = userEvent.setup();
     setup();
 
     await user.click(screen.getByRole('button', { name: 'Reactivate tenant' }));
@@ -54,7 +55,6 @@ describe(`<${ReactivateTenantControl.name}/>`, () => {
   });
 
   it('calls the action with the typed name and refreshes on success', async () => {
-    const user = userEvent.setup();
     setup();
 
     await user.click(screen.getByRole('button', { name: 'Reactivate tenant' }));
@@ -80,7 +80,6 @@ describe(`<${ReactivateTenantControl.name}/>`, () => {
       ok: false,
       error: 'Provisioning is already running.',
     });
-    const user = userEvent.setup();
     setup();
 
     await user.click(screen.getByRole('button', { name: 'Reactivate tenant' }));

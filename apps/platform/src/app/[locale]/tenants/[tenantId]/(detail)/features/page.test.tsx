@@ -43,6 +43,10 @@ describe(`<${FeaturesPage.name}/>`, () => {
     getTenantByIdMock.mockReset();
     getSettingsFeaturesMock.mockReset();
     getSiteConfigMock.mockReset();
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });
+    getSettingsFeaturesMock.mockResolvedValue(undefined);
+    getSiteConfigMock.mockResolvedValue(undefined);
   });
 
   it('redirects to sign-in without querying the tenant when there is no session', async () => {
@@ -55,7 +59,6 @@ describe(`<${FeaturesPage.name}/>`, () => {
   });
 
   it('404s when the signed-in user has no admins row', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue(undefined);
 
     await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
@@ -65,14 +68,10 @@ describe(`<${FeaturesPage.name}/>`, () => {
   });
 
   it('renders preset featureDefaults for an operator with no settings_features row', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });
     getTenantByIdMock.mockResolvedValue({
       id: 'tenant-1',
       plan: 'GROWTH',
     });
-    getSettingsFeaturesMock.mockResolvedValue(undefined);
-    getSiteConfigMock.mockResolvedValue(undefined);
 
     await setup();
 
@@ -85,14 +84,10 @@ describe(`<${FeaturesPage.name}/>`, () => {
   });
 
   it('renders the GROWTH-only toggles as locked for a FREE-plan tenant', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });
     getTenantByIdMock.mockResolvedValue({
       id: 'tenant-1',
       plan: 'FREE',
     });
-    getSettingsFeaturesMock.mockResolvedValue(undefined);
-    getSiteConfigMock.mockResolvedValue(undefined);
 
     await setup();
 

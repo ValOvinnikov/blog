@@ -24,6 +24,12 @@ const setup = customRender(VoiceSettings, {
 });
 
 describe(`<${VoiceSettings.name}/>`, () => {
+  let user: ReturnType<typeof userEvent.setup>;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
   it('renders Basic empty, with a stated reason', () => {
     setup();
 
@@ -50,7 +56,6 @@ describe(`<${VoiceSettings.name}/>`, () => {
   });
 
   it('expands the Advanced section on click', async () => {
-    const user = userEvent.setup();
     setup();
 
     await openAdvanced(user);
@@ -60,7 +65,6 @@ describe(`<${VoiceSettings.name}/>`, () => {
   });
 
   it('renders all 8 fields across the 2 named groups, with none invented, once expanded', async () => {
-    const user = userEvent.setup();
     setup();
 
     await openAdvanced(user);
@@ -73,7 +77,6 @@ describe(`<${VoiceSettings.name}/>`, () => {
   });
 
   it('leaves an untouched field blank with no placeholder', async () => {
-    const user = userEvent.setup();
     setup();
     await openAdvanced(user);
 
@@ -83,7 +86,6 @@ describe(`<${VoiceSettings.name}/>`, () => {
   });
 
   it('shows an explicit stored override as the field value, not just the placeholder', async () => {
-    const user = userEvent.setup();
     setup({ initialOverrides: { notFoundHeading: 'Nothing here' } });
     await openAdvanced(user);
 
@@ -93,7 +95,6 @@ describe(`<${VoiceSettings.name}/>`, () => {
   });
 
   it('saves every current field value, including a just-cleared override as an empty string', async () => {
-    const user = userEvent.setup();
     const saveAction = vi.fn().mockResolvedValue({ ok: true });
     setup({
       initialOverrides: { notFoundHeading: 'Nothing here' },
@@ -121,7 +122,6 @@ describe(`<${VoiceSettings.name}/>`, () => {
   });
 
   it('shows a save-confirmation toast and refreshes after a successful save', async () => {
-    const user = userEvent.setup();
     const refresh = mockRouterRefresh();
     const saveAction = vi.fn().mockResolvedValue({ ok: true });
     setup({ saveAction });
@@ -133,7 +133,6 @@ describe(`<${VoiceSettings.name}/>`, () => {
   });
 
   it('shows an error alert and does not refresh when the save fails', async () => {
-    const user = userEvent.setup();
     const refresh = mockRouterRefresh();
     const saveAction = vi.fn().mockResolvedValue({ ok: false });
     setup({ saveAction });
@@ -152,7 +151,6 @@ describe(`<${VoiceSettings.name}/>`, () => {
           resolveAction = resolve;
         }),
     );
-    const user = userEvent.setup();
     setup({ saveAction });
 
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
@@ -166,7 +164,6 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
   describe('archived tenant', () => {
     it('shows an archived notice and disables Save', async () => {
-      const user = userEvent.setup();
       const saveAction = vi.fn().mockResolvedValue({ ok: true });
       setup({ saveAction, archivedAt: ARCHIVED_AT });
 
@@ -180,7 +177,6 @@ describe(`<${VoiceSettings.name}/>`, () => {
     });
 
     it('makes every curated voice field read-only, not disabled', async () => {
-      const user = userEvent.setup();
       setup({ archivedAt: ARCHIVED_AT });
 
       await openAdvanced(user);
@@ -195,7 +191,6 @@ describe(`<${VoiceSettings.name}/>`, () => {
   });
 
   it('leaves every curated voice field editable for a non-archived tenant', async () => {
-    const user = userEvent.setup();
     setup();
 
     await openAdvanced(user);

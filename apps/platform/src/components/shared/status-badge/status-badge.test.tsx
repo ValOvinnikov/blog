@@ -3,9 +3,18 @@ import { render, screen } from '@platform/testing/custom-render';
 import { StatusBadge } from './status-badge';
 
 describe(StatusBadge, () => {
-  it('renders its label', () => {
-    render(<StatusBadge tone="ok">Active</StatusBadge>);
-    expect(screen.getByText('Active')).toBeVisible();
+  describe('with the ok tone', () => {
+    beforeEach(() => {
+      render(<StatusBadge tone="ok">Active</StatusBadge>);
+    });
+
+    it('renders its label', () => {
+      expect(screen.getByText('Active')).toBeVisible();
+    });
+
+    it('renders the tone dot by default', () => {
+      expect(screen.getByTestId('status-badge-dot')).toBeVisible();
+    });
   });
 
   it('renders every tone without throwing', () => {
@@ -15,11 +24,6 @@ describe(StatusBadge, () => {
         render(<StatusBadge tone={tone}>Label</StatusBadge>),
       ).not.toThrow();
     }
-  });
-
-  it('renders the tone dot by default', () => {
-    render(<StatusBadge tone="ok">Active</StatusBadge>);
-    expect(screen.getByTestId('status-badge-dot')).toBeVisible();
   });
 
   it('omits the tone dot when hasDot is false', () => {

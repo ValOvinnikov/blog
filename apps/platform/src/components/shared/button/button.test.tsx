@@ -5,6 +5,12 @@ import userEvent from '@testing-library/user-event';
 import { Button } from './button';
 
 describe(Button, () => {
+  let user: ReturnType<typeof userEvent.setup>;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
   it('renders its children', () => {
     render(<Button>Save</Button>);
 
@@ -29,7 +35,6 @@ describe(Button, () => {
   });
 
   it('renders disabled and blocks the click handler', async () => {
-    const user = userEvent.setup();
     const handleClick = vi.fn();
 
     render(
@@ -46,7 +51,6 @@ describe(Button, () => {
   });
 
   it('calls onClick when enabled', async () => {
-    const user = userEvent.setup();
     const handleClick = vi.fn();
 
     render(<Button onClick={handleClick}>Save</Button>);
@@ -56,7 +60,6 @@ describe(Button, () => {
   });
 
   it('renders aria-disabled without native disabled, and blocks the click handler, when isAriaDisabled is set', async () => {
-    const user = userEvent.setup();
     const handleClick = vi.fn();
 
     render(
@@ -111,7 +114,6 @@ describe(Button, () => {
   });
 
   it('blocks the click handler while pending, even without isDisabled', async () => {
-    const user = userEvent.setup();
     const handleClick = vi.fn();
 
     render(

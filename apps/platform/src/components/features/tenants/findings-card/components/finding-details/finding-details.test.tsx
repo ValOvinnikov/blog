@@ -1,13 +1,18 @@
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { FindingDetails } from './finding-details';
 
 const render = renderWithIntl;
 
 describe(FindingDetails, () => {
+  let user: UserEvent;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
   it('renders the recognized DOCUMENT_VALIDATION shape as a table once opened', async () => {
-    const user = userEvent.setup();
     render(
       <FindingDetails
         details={{
@@ -31,7 +36,6 @@ describe(FindingDetails, () => {
   });
 
   it('falls back to a raw JSON dump for an unrecognized details shape', async () => {
-    const user = userEvent.setup();
     render(<FindingDetails details={{ step: 'MAP_DOMAIN' }} />);
 
     await user.click(screen.getByText('Details'));

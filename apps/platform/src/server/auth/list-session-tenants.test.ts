@@ -40,6 +40,8 @@ describe(listSessionTenants, () => {
     listTenantsByIdsMock.mockReset();
     listTenantsMock.mockReset();
     getAdminByUserIdMock.mockReset();
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    getAdminByUserIdMock.mockResolvedValue(undefined);
   });
 
   it('redirects to sign-in without querying memberships when there is no session', async () => {
@@ -52,8 +54,6 @@ describe(listSessionTenants, () => {
   });
 
   it('redirects to /workspace-pending for a non-SUPERADMIN with zero memberships', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getAdminByUserIdMock.mockResolvedValue(undefined);
     listMembershipsForUserMock.mockResolvedValue([]);
 
     await expect(listSessionTenants()).rejects.toThrow('NEXT_REDIRECT');
@@ -65,7 +65,6 @@ describe(listSessionTenants, () => {
   it.each(['ADMIN', 'MODERATOR'])(
     'redirects to /workspace-pending for a %s admins row with zero memberships',
     async (role) => {
-      authMock.mockResolvedValue({ user: { id: 'user-1' } });
       getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role });
       listMembershipsForUserMock.mockResolvedValue([]);
 
@@ -77,8 +76,6 @@ describe(listSessionTenants, () => {
   );
 
   it('resolves every tenant behind the memberships row set, not a client-supplied list', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getAdminByUserIdMock.mockResolvedValue(undefined);
     const memberships = [
       { id: 'm-1', userId: 'user-1', tenantId: 'tenant-1', role: 'OWNER' },
       { id: 'm-2', userId: 'user-1', tenantId: 'tenant-2', role: 'OWNER' },

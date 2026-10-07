@@ -27,12 +27,24 @@ const makeFinding = (overrides: Partial<TFinding> = {}): TFinding => ({
 });
 
 describe(FindingsCard, () => {
-  it("nests the card's title one level under the page's own h1", () => {
-    render(<FindingsCard findings={[]} />);
+  describe('with no findings', () => {
+    beforeEach(() => {
+      render(<FindingsCard findings={[]} />);
+    });
 
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'Open findings' }),
-    ).toBeVisible();
+    it("nests the card's title one level under the page's own h1", () => {
+      expect(
+        screen.getByRole('heading', { level: 2, name: 'Open findings' }),
+      ).toBeVisible();
+    });
+
+    it('shows a healthy empty state when there are no open findings', () => {
+      expect(
+        screen.getByText(
+          "No open findings for this tenant — everything's healthy.",
+        ),
+      ).toBeVisible();
+    });
   });
 
   it('renders a finding with its source, kind and severity', () => {
@@ -54,15 +66,5 @@ describe(FindingsCard, () => {
     );
 
     expect(screen.getAllByText('Details')).toHaveLength(1);
-  });
-
-  it('shows a healthy empty state when there are no open findings', () => {
-    render(<FindingsCard findings={[]} />);
-
-    expect(
-      screen.getByText(
-        "No open findings for this tenant — everything's healthy.",
-      ),
-    ).toBeVisible();
   });
 });

@@ -45,7 +45,9 @@ const tenant = {
 };
 
 describe('deprovisionTenantAction', () => {
-  beforeEach(() => {
+  let deprovisionTenantAction: (typeof import('./deprovision-tenant-action'))['deprovisionTenantAction'];
+
+  beforeEach(async () => {
     requireSuperAdminMock.mockReset();
     requireSuperAdminMock.mockResolvedValue({
       id: 'admin-1',
@@ -62,15 +64,13 @@ describe('deprovisionTenantAction', () => {
     insertAuditEventMock.mockReset();
     insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
     loggerErrorMock.mockReset();
+    ({ deprovisionTenantAction } = await import('./deprovision-tenant-action'));
   });
 
   it('requires a super-admin session before dispatching', async () => {
     requireSuperAdminMock.mockImplementation(() => {
       throw new Error('NEXT_REDIRECT');
     });
-    const { deprovisionTenantAction } =
-      await import('./deprovision-tenant-action');
-
     await expect(
       deprovisionTenantAction('tenant-1', {
         confirm: 'Acme Inc.',
@@ -84,9 +84,6 @@ describe('deprovisionTenantAction', () => {
     requireSuperAdminMock.mockImplementation(() => {
       notFound();
     });
-    const { deprovisionTenantAction } =
-      await import('./deprovision-tenant-action');
-
     await expect(
       deprovisionTenantAction('tenant-1', {
         confirm: 'Acme Inc.',
@@ -100,9 +97,6 @@ describe('deprovisionTenantAction', () => {
   });
 
   it('returns a field error when confirm does not match the tenant name', async () => {
-    const { deprovisionTenantAction } =
-      await import('./deprovision-tenant-action');
-
     const result = await deprovisionTenantAction('tenant-1', {
       confirm: 'wrong-name',
       dryRun: true,
@@ -114,9 +108,6 @@ describe('deprovisionTenantAction', () => {
 
   it('returns an error when the tenant is not found', async () => {
     listTenantsByIdsMock.mockResolvedValue([]);
-    const { deprovisionTenantAction } =
-      await import('./deprovision-tenant-action');
-
     const result = await deprovisionTenantAction('tenant-1', {
       confirm: 'Acme Inc.',
       dryRun: true,
@@ -130,9 +121,6 @@ describe('deprovisionTenantAction', () => {
     listTenantsByIdsMock.mockResolvedValue([
       { ...tenant, deprovisionedAt: new Date('2026-01-01T00:00:00.000Z') },
     ]);
-    const { deprovisionTenantAction } =
-      await import('./deprovision-tenant-action');
-
     const result = await deprovisionTenantAction('tenant-1', {
       confirm: 'Acme Inc.',
       dryRun: true,
@@ -143,9 +131,6 @@ describe('deprovisionTenantAction', () => {
   });
 
   it('dispatches the deprovisioning workflow when confirm matches the live name', async () => {
-    const { deprovisionTenantAction } =
-      await import('./deprovision-tenant-action');
-
     const result = await deprovisionTenantAction('tenant-1', {
       confirm: 'Acme Inc.',
       dryRun: false,
@@ -160,9 +145,6 @@ describe('deprovisionTenantAction', () => {
   });
 
   it('records a DEPROVISION_REQUESTED audit event for a real (non-dry-run) dispatch', async () => {
-    const { deprovisionTenantAction } =
-      await import('./deprovision-tenant-action');
-
     await deprovisionTenantAction('tenant-1', {
       confirm: 'Acme Inc.',
       dryRun: false,
@@ -180,9 +162,6 @@ describe('deprovisionTenantAction', () => {
 
   it('returns an error and writes no audit event when the dispatch fails', async () => {
     dispatchDeprovisioningWorkflowMock.mockResolvedValue(false);
-    const { deprovisionTenantAction } =
-      await import('./deprovision-tenant-action');
-
     const result = await deprovisionTenantAction('tenant-1', {
       confirm: 'Acme Inc.',
       dryRun: false,
@@ -193,9 +172,6 @@ describe('deprovisionTenantAction', () => {
   });
 
   it('records no audit event for a dry run', async () => {
-    const { deprovisionTenantAction } =
-      await import('./deprovision-tenant-action');
-
     const result = await deprovisionTenantAction('tenant-1', {
       confirm: 'Acme Inc.',
       dryRun: true,
@@ -207,9 +183,6 @@ describe('deprovisionTenantAction', () => {
 
   it('still returns ok when the audit write fails, and logs the failure', async () => {
     insertAuditEventMock.mockRejectedValue(new Error('connection reset'));
-    const { deprovisionTenantAction } =
-      await import('./deprovision-tenant-action');
-
     const result = await deprovisionTenantAction('tenant-1', {
       confirm: 'Acme Inc.',
       dryRun: false,

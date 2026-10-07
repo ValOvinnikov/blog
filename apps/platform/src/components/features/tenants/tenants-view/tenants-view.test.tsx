@@ -8,58 +8,44 @@ const render = renderWithIntl;
 const tenant = makeTenant();
 
 describe(TenantsView, () => {
-  it('renders the real tenant row', () => {
-    render(
-      <TenantsView
-        tenants={[tenant]}
-        shouldShowArchived={false}
-        isEmailAlertingConfigured={true}
-      />,
-    );
+  describe('with default props', () => {
+    beforeEach(() => {
+      render(
+        <TenantsView
+          tenants={[tenant]}
+          shouldShowArchived={false}
+          isEmailAlertingConfigured={true}
+        />,
+      );
+    });
 
-    expect(screen.getByRole('heading', { name: 'Tenants' })).toBeVisible();
-    expect(screen.getByText('Acme Inc.')).toBeVisible();
-  });
+    it('renders the real tenant row', () => {
+      expect(screen.getByRole('heading', { name: 'Tenants' })).toBeVisible();
+      expect(screen.getByText('Acme Inc.')).toBeVisible();
+    });
 
-  it("renders the description's code chunk as a real <code> element", () => {
-    render(
-      <TenantsView
-        tenants={[tenant]}
-        shouldShowArchived={false}
-        isEmailAlertingConfigured={true}
-      />,
-    );
+    it("renders the description's code chunk as a real <code> element", () => {
+      const code = screen.getByText('tenants', { selector: 'code' });
+      expect(code.tagName).toBe('CODE');
+    });
 
-    const code = screen.getByText('tenants', { selector: 'code' });
-    expect(code.tagName).toBe('CODE');
-  });
+    it('links add-tenant to the wizard', () => {
+      const addTenant = screen.getByRole('link', { name: /add tenant/i });
+      expect(addTenant).toHaveAttribute('href', '/tenants/new');
+    });
 
-  it('links add-tenant to the wizard', () => {
-    render(
-      <TenantsView
-        tenants={[tenant]}
-        shouldShowArchived={false}
-        isEmailAlertingConfigured={true}
-      />,
-    );
+    it('shows the archived-tenants toggle set to Active by default', () => {
+      expect(screen.getByRole('button', { name: 'Active' })).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      );
+    });
 
-    const addTenant = screen.getByRole('link', { name: /add tenant/i });
-    expect(addTenant).toHaveAttribute('href', '/tenants/new');
-  });
-
-  it('shows the archived-tenants toggle set to Active by default', () => {
-    render(
-      <TenantsView
-        tenants={[tenant]}
-        shouldShowArchived={false}
-        isEmailAlertingConfigured={true}
-      />,
-    );
-
-    expect(screen.getByRole('button', { name: 'Active' })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
+    it('renders no email-alerts banner when email alerting is configured', () => {
+      expect(
+        screen.queryByText('Email alerts not configured'),
+      ).not.toBeInTheDocument();
+    });
   });
 
   it('shows the archived-tenants toggle set to All when shouldShowArchived is true', () => {
@@ -75,20 +61,6 @@ describe(TenantsView, () => {
       'aria-pressed',
       'true',
     );
-  });
-
-  it('renders no email-alerts banner when email alerting is configured', () => {
-    render(
-      <TenantsView
-        tenants={[tenant]}
-        shouldShowArchived={false}
-        isEmailAlertingConfigured={true}
-      />,
-    );
-
-    expect(
-      screen.queryByText('Email alerts not configured'),
-    ).not.toBeInTheDocument();
   });
 
   it('renders the email-alerts banner when email alerting is not configured', () => {

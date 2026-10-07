@@ -5,7 +5,7 @@ import {
   screen,
   within,
 } from '@platform/testing/custom-render';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { TopbarNavMenu } from './topbar-nav-menu';
 
@@ -27,7 +27,10 @@ const PLATFORM_TENANTS_SECTION = [
 ];
 
 describe(`<${TopbarNavMenu.name}/>`, () => {
+  let user: UserEvent;
+
   beforeEach(() => {
+    user = userEvent.setup();
     setPathname('/');
   });
 
@@ -39,7 +42,6 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
   });
 
   it('opens the popup on click, showing sections, items, badges and notes', async () => {
-    const user = userEvent.setup();
     render(
       <TopbarNavMenu
         sections={[
@@ -76,7 +78,6 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
 
   it('marks only the item matching the current pathname active', async () => {
     setPathname('/tenants/tenant-1/look');
-    const user = userEvent.setup();
     render(
       <TopbarNavMenu
         sections={[
@@ -112,7 +113,6 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
 
   it('renders an item with no href as an inert row that is never marked active', async () => {
     setPathname('/tenants/tenant-1/domain');
-    const user = userEvent.setup();
     render(
       <TopbarNavMenu
         sections={[
@@ -144,7 +144,6 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
   });
 
   it('closes the popup after clicking a link item', async () => {
-    const user = userEvent.setup();
     render(<TopbarNavMenu sections={PLATFORM_TENANTS_SECTION} />);
 
     await user.click(screen.getByRole('button', { name: 'Menu' }));
@@ -155,7 +154,6 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
   });
 
   it('renders the switcher slot above the nav sections when provided', async () => {
-    const user = userEvent.setup();
     render(
       <TopbarNavMenu
         switcher={<div>Tenant switcher</div>}
@@ -174,7 +172,6 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
   });
 
   it('renders no switcher slot when none is provided', async () => {
-    const user = userEvent.setup();
     render(<TopbarNavMenu sections={PLATFORM_TENANTS_SECTION} />);
 
     await user.click(screen.getByRole('button', { name: 'Menu' }));

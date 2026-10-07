@@ -1,6 +1,6 @@
 import { SidebarCollapseProvider } from '@platform/components/features/layout/sidebar-collapse-provider';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { SidebarCollapseToggle } from './sidebar-collapse-toggle';
 
@@ -12,6 +12,12 @@ const renderToggle = (isInitiallyCollapsed: boolean) =>
   );
 
 describe(SidebarCollapseToggle, () => {
+  let user: UserEvent;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
   it('is named and marked expanded when the sidebar starts expanded', () => {
     renderToggle(false);
 
@@ -27,7 +33,6 @@ describe(SidebarCollapseToggle, () => {
   });
 
   it('toggles the shared collapse state on click', async () => {
-    const user = userEvent.setup();
     renderToggle(false);
 
     await user.click(screen.getByRole('button', { name: 'Collapse sidebar' }));
@@ -38,7 +43,6 @@ describe(SidebarCollapseToggle, () => {
   });
 
   it('is reachable by keyboard and toggles on Enter', async () => {
-    const user = userEvent.setup();
     renderToggle(false);
 
     await user.tab();

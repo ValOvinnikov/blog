@@ -98,9 +98,6 @@ describe(uploadEmailLogoAction, () => {
     insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
     getEmailConfigMock.mockResolvedValue(undefined);
     getEmailTemplateMock.mockResolvedValue({ logoAssetUrl: undefined });
-  });
-
-  it('uploads and persists the tenant email logo at a path distinct from the site logo', async () => {
     validateEmailLogoUploadMock.mockResolvedValue({
       ok: true,
       asset: VALID_ASSET,
@@ -109,7 +106,9 @@ describe(uploadEmailLogoAction, () => {
       url: 'https://example.blob.vercel-storage.com/email-logo-new.png',
     });
     upsertEmailConfigMock.mockResolvedValue({});
+  });
 
+  it('uploads and persists the tenant email logo at a path distinct from the site logo', async () => {
     const result = await uploadEmailLogoAction(
       'tenant-1',
       { type: 'tenant' },
@@ -132,10 +131,6 @@ describe(uploadEmailLogoAction, () => {
   });
 
   it('uploads and persists a per-template logo at a path naming the template', async () => {
-    validateEmailLogoUploadMock.mockResolvedValue({
-      ok: true,
-      asset: VALID_ASSET,
-    });
     putMock.mockResolvedValue({
       url: 'https://example.blob.vercel-storage.com/email-logo-magic-link.png',
     });
@@ -184,15 +179,6 @@ describe(uploadEmailLogoAction, () => {
   });
 
   it('records exactly one SETTINGS_UPDATED audit event identifying the target', async () => {
-    validateEmailLogoUploadMock.mockResolvedValue({
-      ok: true,
-      asset: VALID_ASSET,
-    });
-    putMock.mockResolvedValue({
-      url: 'https://example.blob.vercel-storage.com/email-logo-new.png',
-    });
-    upsertEmailConfigMock.mockResolvedValue({});
-
     await uploadEmailLogoAction(
       'tenant-1',
       { type: 'tenant' },
@@ -215,13 +201,6 @@ describe(uploadEmailLogoAction, () => {
   });
 
   it('records no audit event when the write itself fails', async () => {
-    validateEmailLogoUploadMock.mockResolvedValue({
-      ok: true,
-      asset: VALID_ASSET,
-    });
-    putMock.mockResolvedValue({
-      url: 'https://example.blob.vercel-storage.com/email-logo-new.png',
-    });
     upsertEmailConfigMock.mockRejectedValue(new Error('db unavailable'));
 
     const result = await uploadEmailLogoAction(

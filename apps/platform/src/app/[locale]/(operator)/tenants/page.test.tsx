@@ -29,6 +29,7 @@ describe(TenantsPage, () => {
   beforeEach(() => {
     listTenantsMock.mockReset();
     envMock.RESEND_API_KEY = 'resend-key';
+    listTenantsMock.mockResolvedValue([]);
   });
 
   it('renders the real tenant rows from listTenants, excluding archived by default', async () => {
@@ -55,16 +56,12 @@ describe(TenantsPage, () => {
   });
 
   it('includes archived tenants when ?archived=1 is set', async () => {
-    listTenantsMock.mockResolvedValue([]);
-
     await setup({ searchParams: Promise.resolve({ archived: '1' }) });
 
     expect(listTenantsMock).toHaveBeenCalledWith({ includeArchived: true });
   });
 
   it('does not show the email-alerts banner when RESEND_API_KEY is configured', async () => {
-    listTenantsMock.mockResolvedValue([]);
-
     await setup();
 
     expect(
@@ -74,7 +71,6 @@ describe(TenantsPage, () => {
 
   it('shows the email-alerts banner when RESEND_API_KEY is unset', async () => {
     envMock.RESEND_API_KEY = undefined;
-    listTenantsMock.mockResolvedValue([]);
 
     await setup();
 

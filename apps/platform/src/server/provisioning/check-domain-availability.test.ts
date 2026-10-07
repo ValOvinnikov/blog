@@ -21,6 +21,13 @@ describe(checkDomainAvailability, () => {
     envMock.VERCEL_API_TOKEN = 'vercel-token';
     envMock.VERCEL_PROJECT_ID_WEB = 'prj_web';
     envMock.VERCEL_TEAM_ID = undefined;
+    fetchMock.mockResolvedValue(
+      new Response(JSON.stringify({ projectDomains: [] }), { status: 200 }),
+    );
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   it('returns NOT_CONFIGURED with no request when the Vercel token or project is unset', async () => {
@@ -94,10 +101,6 @@ describe(checkDomainAvailability, () => {
   });
 
   it('requests the apex domain and matches the full domain in the response', async () => {
-    fetchMock.mockResolvedValue(
-      new Response(JSON.stringify({ projectDomains: [] }), { status: 200 }),
-    );
-
     await checkDomainAvailability('blog-dev.valstack.dev');
 
     const [calledUrl] = fetchMock.mock.calls[0] as [URL];
@@ -105,10 +108,6 @@ describe(checkDomainAvailability, () => {
   });
 
   it('requests the registrable domain under a multi-part public suffix', async () => {
-    fetchMock.mockResolvedValue(
-      new Response(JSON.stringify({ projectDomains: [] }), { status: 200 }),
-    );
-
     await checkDomainAvailability('blog.example.co.uk');
 
     const [calledUrl] = fetchMock.mock.calls[0] as [URL];

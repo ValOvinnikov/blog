@@ -11,6 +11,12 @@ const options: { value: TDensity; label: string }[] = [
 ];
 
 describe(SegmentedControl, () => {
+  let user: ReturnType<typeof userEvent.setup>;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
   it('renders a group with the given ariaLabel and one option per entry', () => {
     render(
       <SegmentedControl<TDensity>
@@ -66,7 +72,6 @@ describe(SegmentedControl, () => {
   });
 
   it('calls onChange with the clicked option value', async () => {
-    const user = userEvent.setup();
     const onChange = vi.fn();
     render(
       <SegmentedControl<TDensity>
@@ -83,7 +88,6 @@ describe(SegmentedControl, () => {
   });
 
   it('does not call onChange when clicking the already-selected option', async () => {
-    const user = userEvent.setup();
     const onChange = vi.fn();
     render(
       <SegmentedControl<TDensity>
@@ -100,7 +104,6 @@ describe(SegmentedControl, () => {
   });
 
   it('does not manage its own state — stays pressed only once value is updated by the caller', async () => {
-    const user = userEvent.setup();
     const onChange = vi.fn();
     const { rerender } = render(
       <SegmentedControl<TDensity>
@@ -151,7 +154,6 @@ describe(SegmentedControl, () => {
   });
 
   it('does not call onChange on click while disabled', async () => {
-    const user = userEvent.setup();
     const onChange = vi.fn();
     render(
       <SegmentedControl<TDensity>

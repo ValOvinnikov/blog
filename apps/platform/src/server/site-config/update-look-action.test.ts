@@ -58,11 +58,16 @@ const VALID_INPUT: TUpdateLookInput = {
 describe(updateLookAction, () => {
   beforeEach(() => {
     requireTenantMembershipMock.mockReset();
+    requireTenantMembershipMock.mockResolvedValue({
+      tenant: { id: 'tenant-1' },
+      membership: { role: 'OWNER' },
+    });
     authMock.mockReset();
     authMock.mockResolvedValue({
       user: { id: 'operator-1', email: 'operator@example.com' },
     });
     upsertSiteConfigMock.mockReset();
+    upsertSiteConfigMock.mockResolvedValue({});
     revalidateSiteConfigMock.mockReset();
     revalidateSiteConfigMock.mockResolvedValue(undefined);
     insertAuditEventMock.mockReset();
@@ -71,12 +76,6 @@ describe(updateLookAction, () => {
   });
 
   it('re-resolves the tenant from the session against the routed id before writing', async () => {
-    requireTenantMembershipMock.mockResolvedValue({
-      tenant: { id: 'tenant-1' },
-      membership: { role: 'OWNER' },
-    });
-    upsertSiteConfigMock.mockResolvedValue({});
-
     const result = await updateLookAction('tenant-1', VALID_INPUT);
 
     expect(requireTenantMembershipMock).toHaveBeenCalledWith('tenant-1');
@@ -85,12 +84,6 @@ describe(updateLookAction, () => {
   });
 
   it('calls the site-config revalidation webhook after a successful save', async () => {
-    requireTenantMembershipMock.mockResolvedValue({
-      tenant: { id: 'tenant-1' },
-      membership: { role: 'OWNER' },
-    });
-    upsertSiteConfigMock.mockResolvedValue({});
-
     await updateLookAction('tenant-1', VALID_INPUT);
 
     expect(revalidateSiteConfigMock).toHaveBeenCalledTimes(1);
@@ -107,10 +100,6 @@ describe(updateLookAction, () => {
   });
 
   it('reports failure instead of throwing when the write itself fails', async () => {
-    requireTenantMembershipMock.mockResolvedValue({
-      tenant: { id: 'tenant-1' },
-      membership: { role: 'OWNER' },
-    });
     upsertSiteConfigMock.mockRejectedValue(new Error('db unavailable'));
 
     const result = await updateLookAction('tenant-1', VALID_INPUT);
@@ -121,12 +110,6 @@ describe(updateLookAction, () => {
   });
 
   it('records a SETTINGS_UPDATED audit event on the site config by the operator', async () => {
-    requireTenantMembershipMock.mockResolvedValue({
-      tenant: { id: 'tenant-1' },
-      membership: { role: 'OWNER' },
-    });
-    upsertSiteConfigMock.mockResolvedValue({});
-
     await updateLookAction('tenant-1', VALID_INPUT);
 
     expect(insertAuditEventMock).toHaveBeenCalledWith({
@@ -140,11 +123,6 @@ describe(updateLookAction, () => {
   });
 
   it('still returns ok when the audit write fails, and logs the failure', async () => {
-    requireTenantMembershipMock.mockResolvedValue({
-      tenant: { id: 'tenant-1' },
-      membership: { role: 'OWNER' },
-    });
-    upsertSiteConfigMock.mockResolvedValue({});
     insertAuditEventMock.mockRejectedValue(new Error('connection reset'));
 
     const result = await updateLookAction('tenant-1', VALID_INPUT);

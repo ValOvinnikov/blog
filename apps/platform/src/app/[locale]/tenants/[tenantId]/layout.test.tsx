@@ -33,6 +33,13 @@ describe(`<${TenantByIdLayout.name}/>`, () => {
     authMock.mockReset();
     getAdminByUserIdMock.mockReset();
     getTenantByIdMock.mockReset();
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    getAdminByUserIdMock.mockResolvedValue({
+      id: 'admin-1',
+      userId: 'user-1',
+      role: 'ADMIN',
+      createdAt: new Date(),
+    });
   });
 
   it('redirects to sign-in without querying the tenant when there is no session', async () => {
@@ -45,7 +52,6 @@ describe(`<${TenantByIdLayout.name}/>`, () => {
   });
 
   it('404s when the signed-in user has no admins row', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue(undefined);
 
     await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
@@ -54,26 +60,12 @@ describe(`<${TenantByIdLayout.name}/>`, () => {
   });
 
   it('404s for an unknown tenant id', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getAdminByUserIdMock.mockResolvedValue({
-      id: 'admin-1',
-      userId: 'user-1',
-      role: 'ADMIN',
-      createdAt: new Date(),
-    });
     getTenantByIdMock.mockResolvedValue(undefined);
 
     await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
   });
 
   it('renders the gated content bare, with no AdminShell chrome, for an operator', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    getAdminByUserIdMock.mockResolvedValue({
-      id: 'admin-1',
-      userId: 'user-1',
-      role: 'ADMIN',
-      createdAt: new Date(),
-    });
     getTenantByIdMock.mockResolvedValue({
       id: 'tenant-1',
       name: 'Acme Inc.',
