@@ -33,6 +33,14 @@ export const WithDescription: TStory = {
   },
 };
 
+export const Static: TStory = {
+  args: {
+    isInteractive: false,
+    description:
+      'Posts about building things — architecture, tooling, and the craft of software.',
+  },
+};
+
 export const WithoutDescription: TStory = {
   args: {
     title: 'react',

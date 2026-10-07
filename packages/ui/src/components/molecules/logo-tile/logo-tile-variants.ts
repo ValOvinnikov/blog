@@ -1,4 +1,4 @@
-import { tv } from '@blog/ui/lib/styling';
+import { INTERACTIVE_ITEM_CARD, tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const logoTileVariants = tv({
@@ -10,12 +10,11 @@ export const logoTileVariants = tv({
   variants: {
     isInteractive: {
       true: [
-        'opacity-80 transition-opacity duration-base ease-smooth',
-        'hover:opacity-100 focus-within:opacity-100',
-        'motion-reduce:transition-none',
+        INTERACTIVE_ITEM_CARD,
         'hover:border-border-strong dark:hover:border-border-emphasis',
         'has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-brand-primary',
         'has-[a:focus-visible]:ring-offset-2 has-[a:focus-visible]:ring-offset-ambient',
+        // TODO(#4416): drop the bare-anchor selectors once every consumer passes LogoTile.Link.
         '[&_a]:flex [&_a]:size-full [&_a]:items-center [&_a]:justify-center',
         '[&_a]:outline-none',
         "[&_a]:after:absolute [&_a]:after:inset-0 [&_a]:after:rounded-media [&_a]:after:content-['']",

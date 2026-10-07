@@ -174,6 +174,38 @@ describe(`<${MediaCard.name}/>`, () => {
     expect(topicText.textContent).toBe('L design systems R');
   });
 
+  it('renders MediaCard.Link inside the title as the card link', () => {
+    renderElement(
+      <MediaCard>
+        <MediaCard.Title level={3}>
+          <MediaCard.Link href="/posts/hello-world">Hello World</MediaCard.Link>
+        </MediaCard.Title>
+      </MediaCard>,
+    );
+    expect(screen.getByRole('link', { name: 'Hello World' })).toHaveAttribute(
+      'href',
+      '/posts/hello-world',
+    );
+  });
+
+  it('renders controls passed to MediaCard.Footer alongside the card link', () => {
+    renderElement(
+      <MediaCard>
+        <MediaCard.Title level={3}>
+          <MediaCard.Link href="/team/ada">Ada Lovelace</MediaCard.Link>
+        </MediaCard.Title>
+        <MediaCard.Footer>
+          <a href="https://github.com/ada">GitHub</a>
+        </MediaCard.Footer>
+      </MediaCard>,
+    );
+    expect(screen.getByRole('link', { name: 'GitHub' })).toHaveAttribute(
+      'href',
+      'https://github.com/ada',
+    );
+    expect(screen.getByRole('link', { name: 'Ada Lovelace' })).toBeVisible();
+  });
+
   it('forwards data-testid to root element', () => {
     renderElement(<MediaCard dataTestId="media-card" />);
     expect(screen.getByTestId('media-card')).toBeVisible();

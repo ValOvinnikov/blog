@@ -1,4 +1,5 @@
 import { type IWithClassName, type IWithDataTestId } from '@blog/config';
+import { CardLink } from '@blog/ui/components/atoms/card-link';
 import { Tag } from '@blog/ui/components/atoms/tag';
 import { CardMeta } from '@blog/ui/components/molecules/card-meta';
 import {
@@ -16,11 +17,16 @@ import {
   type TMediaCardVariants,
 } from './media-card-variants';
 
-const MediaCardParts = {
+const MediaCardSlotParts = {
   Media: MediaCardMedia,
   Meta: CardMeta,
   Title: MediaCardTitle,
   Footer: MediaCardFooter,
+} satisfies Record<string, ElementType>;
+
+const MediaCardParts = {
+  ...MediaCardSlotParts,
+  Link: CardLink,
 } satisfies Record<string, ElementType>;
 
 export type TMediaCardProps = IWithClassName &
@@ -31,7 +37,7 @@ export type TMediaCardProps = IWithClassName &
     isLead?: TMediaCardVariants['isLead'];
     align?: TMediaCardVariants['align'];
     isInteractive?: TMediaCardVariants['isInteractive'];
-    children?: TCompoundChildren<typeof MediaCardParts>;
+    children?: TCompoundChildren<typeof MediaCardSlotParts>;
   };
 
 /** A media-led summary card for any linked item, rendered as an `<article>`. */
@@ -46,7 +52,7 @@ const MediaCardRoot = ({
   className,
   dataTestId,
 }: TMediaCardProps) => {
-  const { slots, unmatched } = mapCompoundSlots(children, MediaCardParts);
+  const { slots, unmatched } = mapCompoundSlots(children, MediaCardSlotParts);
   const hasMedia = Boolean(slots.Media);
   const isSplitLayout = Boolean(isSplit) && hasMedia;
   const s = mediaCardVariants({

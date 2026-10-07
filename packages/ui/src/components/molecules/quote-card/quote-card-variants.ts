@@ -1,4 +1,4 @@
-import { tv } from '@blog/ui/lib/styling';
+import { INTERACTIVE_ITEM_CARD, tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const quoteCardVariants = tv({
@@ -30,10 +30,22 @@ export const quoteCardVariants = tv({
         root: ['item-card surface-card px-card-x py-card-y'],
       },
     },
+    isInteractive: {
+      true: {},
+      false: {},
+    },
   },
+  compoundVariants: [
+    {
+      isSpotlight: false,
+      isInteractive: true,
+      class: { root: INTERACTIVE_ITEM_CARD },
+    },
+  ],
   defaultVariants: {
     align: 'left',
     isSpotlight: false,
+    isInteractive: false,
   },
 });
 

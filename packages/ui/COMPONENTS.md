@@ -2,7 +2,7 @@
 
 # @blog/ui component index
 
-_63 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
+_64 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
 
 ## Atoms
 
@@ -47,6 +47,11 @@ Variants: variant: primary|ghost|link|danger · size: SIZE.SM|SIZE.MD|SIZE.LG
 Accessible caption for a media element.
 Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
+### CardLink — `components/atoms/card-link/card-link.tsx`
+
+The one link that makes a whole item card its click target.
+Props: href: string · linkAs?: TAnchorElementType · target?: '_blank' · ariaLabel?: string · children: ReactNode _(extends IWithClassName, IWithDataTestId)_
+
 ### Eyebrow — `components/atoms/eyebrow/eyebrow.tsx`
 
 Small uppercase label displayed above a heading to provide contextual topic or section context.
@@ -80,7 +85,7 @@ Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 Positioning context for a Next.js `<Image fill />` child.
 Props: children?: ReactNode _(extends IWithClassName, TMediaFrameVariants, IWithDataTestId)_
-Variants: ratio: video|square|portrait|classic
+Variants: ratio: video|square|portrait|classic · shape: rect|circle
 
 ### MetaSeparator — `components/atoms/meta-separator/meta-separator.tsx`
 
@@ -215,10 +220,14 @@ A fixed-size card that frames a single logo, so transparent and opaque-backgroun
 Props: children: ReactNode · isInteractive?: TLogoTileVariants['isInteractive'] · aspectRatio?: number · darkLogo?: ReactNode · darkAspectRatio?: number _(extends IWithClassName, IWithDataTestId)_
 Variants: isInteractive: (boolean)
 
+Slots:
+
+- **LogoTile.Link** — The link that makes a whole `LogoTile` its click target, wrapping the logo it names. Props: _(extends TCardLinkProps)_
+
 ### MediaCard — `components/molecules/media-card/media-card.tsx`
 
 A media-led summary card for any linked item, rendered as an `<article>`.
-Props: excerpt?: string · tags?: string[] · isSplit?: TMediaCardVariants['isSplit'] · isLead?: TMediaCardVariants['isLead'] · align?: TMediaCardVariants['align'] · isInteractive?: TMediaCardVariants['isInteractive'] · children?: TCompoundChildren<typeof MediaCardParts> _(extends IWithClassName, IWithDataTestId)_
+Props: excerpt?: string · tags?: string[] · isSplit?: TMediaCardVariants['isSplit'] · isLead?: TMediaCardVariants['isLead'] · align?: TMediaCardVariants['align'] · isInteractive?: TMediaCardVariants['isInteractive'] · children?: TCompoundChildren<typeof MediaCardSlotParts> _(extends IWithClassName, IWithDataTestId)_
 Variants: isSplit: (boolean) · isLead: (boolean) · align: left|center · isInteractive: (boolean)
 
 Slots:
@@ -226,7 +235,8 @@ Slots:
 - **MediaCard.Media** — The media region of a `MediaCard`, reserving a consistent shape for its visual content regardless of what fills it. Props: isLead?: TMediaCardMediaVariants['isLead'] · shape?: TMediaCardMediaVariants['shape'] · align?: TMediaCardMediaVariants['align'] · iconPanel?: TMediaCardMediaVariants['iconPanel'] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: shape: wide|wideFlat|square|circle|icon · isLead: (boolean) · align: left|center · iconPanel: (boolean)
 - **MediaCard.Meta** — Compact metadata row for cards. Props: dateValue: string · dateLabel: string · readingTime?: string _(extends IWithClassName, IWithDataTestId)_
 - **MediaCard.Title** — The heading inside a `MediaCard`, rendered at the caller-specified heading depth with the card title's visual treatment. Props: level: THeadingLevel · isLead?: boolean · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **MediaCard.Footer** — The byline row at the bottom of a `MediaCard`. Props: authorName?: string · authorAvatarSrc?: string · publishedAt?: string · formattedDate?: string · topic?: string · leadingIcon?: ReactNode · trailingIcon?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **MediaCard.Footer** — The byline row at the bottom of a `MediaCard`. Props: authorName?: string · authorAvatarSrc?: string · publishedAt?: string · formattedDate?: string · topic?: string · leadingIcon?: ReactNode · trailingIcon?: ReactNode · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **MediaCard.Link** — The one link that makes a whole item card its click target. Props: href: string · linkAs?: TAnchorElementType · target?: '_blank' · ariaLabel?: string · children: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### Panel — `components/molecules/panel/panel.tsx`
 
@@ -281,8 +291,8 @@ Variants: collapsible: (boolean)
 ### QuoteCard — `components/molecules/quote-card/quote-card.tsx`
 
 A testimonial quote rendered as a figure; composes a caller-supplied `QuoteCard.Quote`, `QuoteCard.Avatar`, and `QuoteCard.Name` for the quoted person.
-Props: role?: string · align?: TQuoteCardVariants['align'] · isSpotlight?: boolean · tone: TBrandVariant · children?: TCompoundChildren<typeof QuoteCardParts> _(extends IWithClassName, IWithDataTestId)_
-Variants: align: left|center · isSpotlight: (boolean)
+Props: role?: string · align?: TQuoteCardVariants['align'] · isSpotlight?: boolean · isInteractive?: TQuoteCardVariants['isInteractive'] · tone: TBrandVariant · children?: TCompoundChildren<typeof QuoteCardParts> _(extends IWithClassName, IWithDataTestId)_
+Variants: align: left|center · isSpotlight: (boolean) · isInteractive: (boolean)
 
 Slots:
 
@@ -309,7 +319,8 @@ Props: tags: (string | ITagListItem)[] · linkAs?: TAnchorElementType _(extends 
 ### TaxonomyCard — `components/molecules/taxonomy-card/taxonomy-card.tsx`
 
 Summary card for a taxonomy entry (topic or tag) in a listing: title, optional description, and post count, linking to the entry's archive.
-Props: title: string · description?: string · postCountLabel: string · href: string · headingLevel: THeadingLevel · accessibleNameSeparator?: string · linkAs?: TAnchorElementType · children?: TCompoundChildren<typeof TaxonomyCardParts> _(extends IWithClassName, IWithDataTestId)_
+Props: title: string · description?: string · postCountLabel: string · href: string · headingLevel: THeadingLevel · accessibleNameSeparator?: string · linkAs?: TAnchorElementType · isInteractive?: TTaxonomyCardVariants['isInteractive'] · children?: TCompoundChildren<typeof TaxonomyCardParts> _(extends IWithClassName, IWithDataTestId)_
+Variants: isInteractive: (boolean)
 
 Slots:
 

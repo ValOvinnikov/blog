@@ -60,14 +60,10 @@ export const ctaModuleVariants = tv({
         root: [
           'grid grid-cols-1 gap-8 md:grid-cols-[1.05fr_0.95fr] md:items-center',
         ],
-        media: [
-          'aspect-video overflow-hidden rounded-media border border-border bg-surface-2 surface-nested sm:aspect-[4/3]',
-        ],
+        media: ['sm:aspect-[4/3]'],
       },
       [CTA_VARIANT.CALLOUT]: {
-        media: [
-          'order-first mx-auto mb-6 aspect-video w-full max-w-[420px] overflow-hidden rounded-media border border-border bg-surface-2 surface-nested',
-        ],
+        media: ['order-first mx-auto mb-6 w-full max-w-[420px]'],
       },
     },
     tone: {

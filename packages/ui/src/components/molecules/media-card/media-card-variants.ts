@@ -1,4 +1,4 @@
-import { tv } from '@blog/ui/lib/styling';
+import { INTERACTIVE_ITEM_CARD, tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const mediaCardVariants = tv({
@@ -6,8 +6,6 @@ export const mediaCardVariants = tv({
     root: [
       'relative flex h-full flex-col overflow-hidden',
       'item-card surface-card',
-      'transition-colors duration-base ease-smooth',
-      'motion-reduce:transition-none',
     ],
     media: [],
     content: ['flex flex-col flex-1', 'px-card-x py-card-y gap-2'],
@@ -41,9 +39,7 @@ export const mediaCardVariants = tv({
     },
     isInteractive: {
       true: {
-        root: [
-          'group hover:bg-brand-primary-muted focus-within:bg-brand-primary-muted',
-        ],
+        root: INTERACTIVE_ITEM_CARD,
       },
       false: {},
     },

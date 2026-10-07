@@ -31,6 +31,25 @@ describe(`<${LogoTile.name}/>`, () => {
     expect(screen.getAllByRole('link')).toHaveLength(1);
   });
 
+  it('renders LogoTile.Link as the one link, named by its label', () => {
+    const href = faker.internet.url();
+    const setup = customRender(LogoTile, {
+      isInteractive: true,
+      children: (
+        <LogoTile.Link href={href} ariaLabel="Visit Acme">
+          <img src={faker.image.url()} alt="" />
+        </LogoTile.Link>
+      ),
+    });
+
+    setup();
+
+    expect(screen.getByRole('link', { name: 'Visit Acme' })).toHaveAttribute(
+      'href',
+      href,
+    );
+  });
+
   it('adds no accessible name of its own', () => {
     const setup = customRender(LogoTile, {
       children: <img src={faker.image.url()} alt={faker.company.name()} />,

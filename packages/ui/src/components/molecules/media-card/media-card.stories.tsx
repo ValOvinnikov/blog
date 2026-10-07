@@ -36,9 +36,9 @@ const meta = {
           readingTime="9 min"
         />
         <MediaCard.Title level={3}>
-          <a href="/posts/building-a-design-system">
+          <MediaCard.Link href="/posts/building-a-design-system">
             Building a Design System from Scratch
-          </a>
+          </MediaCard.Link>
         </MediaCard.Title>
         <MediaCard.Footer
           topic="design-system"
@@ -311,6 +311,37 @@ export const IconPanelMedia: TStory = {
 export const Static: TStory = {
   args: {
     isInteractive: false,
+    excerpt: 'Ship features faster with a shared, token-driven component set.',
+    tags: undefined,
+    children: (
+      <>
+        <MediaCard.Media shape="icon">
+          <Icon name={ICONS.ROCKET} size={SIZE.MD} />
+        </MediaCard.Media>
+        <MediaCard.Title level={3}>Built for speed</MediaCard.Title>
+      </>
+    ),
+  },
+};
+
+export const WithFooterControls: TStory = {
+  args: {
+    excerpt: 'Leads the platform team and owns the design system.',
+    tags: undefined,
+    children: (
+      <>
+        <MediaCard.Title level={3}>
+          <MediaCard.Link href="/team/ada-lovelace">
+            Ada Lovelace
+          </MediaCard.Link>
+        </MediaCard.Title>
+        <MediaCard.Footer>
+          <a href="https://github.com" aria-label="GitHub">
+            <Icon name={ICONS.GITHUB} size={SIZE.SM} />
+          </a>
+        </MediaCard.Footer>
+      </>
+    ),
   },
 };
 
