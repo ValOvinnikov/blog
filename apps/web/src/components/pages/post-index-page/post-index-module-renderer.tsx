@@ -2,6 +2,7 @@ import type {
   THeadingBlock,
   TMaybeUndefined,
   TPagePostIndexType,
+  TContentAlignmentOf,
 } from '@blog/config';
 import type { TModule } from '@blog/service';
 import { PageHeading } from '@web/components/shared/page-heading';
@@ -35,6 +36,7 @@ const POST_INDEX_MAP: Partial<Record<TPagePostIndexType, TModuleComponent>> = {
 export interface IPostIndexModuleRendererProps {
   hero: TMaybeUndefined<TModule<TPagePostIndexType>>;
   headingBlock: THeadingBlock;
+  headingAlignment: TContentAlignmentOf<'LEFT' | 'CENTER'>;
   modules: TModule<TPagePostIndexType>[];
   context?: TModuleComponentProps['context'];
   children?: ReactNode;
@@ -43,6 +45,7 @@ export interface IPostIndexModuleRendererProps {
 export const PostIndexModuleRenderer = async ({
   hero,
   headingBlock,
+  headingAlignment,
   modules,
   context,
   children,
@@ -53,7 +56,9 @@ export const PostIndexModuleRenderer = async ({
 
   return (
     <>
-      {heroNode ?? <PageHeading headingBlock={headingBlock} />}
+      {heroNode ?? (
+        <PageHeading headingBlock={headingBlock} align={headingAlignment} />
+      )}
       {children}
       {renderModules({ modules, map: POST_INDEX_MAP, context })}
     </>

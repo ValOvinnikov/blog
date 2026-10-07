@@ -9,10 +9,8 @@ import { TagIndexModuleRenderer } from './tag-index-module-renderer';
 export const TagIndexPage = async () => {
   const result = await getTagIndexPage();
   await redirectMissingLanguagePage(result);
-  const { headingBlock, hero, modules } = guardPageLoaderResult(
-    result,
-    'tag_index_page.fetch_failed',
-  );
+  const { headingBlock, headingAlignment, hero, modules } =
+    guardPageLoaderResult(result, 'tag_index_page.fetch_failed');
 
   return (
     <PageShell>
@@ -22,6 +20,7 @@ export const TagIndexPage = async () => {
       <TagIndexModuleRenderer
         hero={hero}
         headingBlock={headingBlock}
+        headingAlignment={headingAlignment}
         modules={modules}
       />
     </PageShell>

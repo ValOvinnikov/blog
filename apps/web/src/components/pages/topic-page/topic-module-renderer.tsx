@@ -2,6 +2,7 @@ import type {
   THeadingBlock,
   TMaybeUndefined,
   TPageTopicType,
+  TContentAlignmentOf,
 } from '@blog/config';
 import type { TModule } from '@blog/service';
 import { PageHeading } from '@web/components/shared/page-heading';
@@ -35,6 +36,7 @@ const TOPIC_MAP: Partial<Record<TPageTopicType, TModuleComponent>> = {
 export interface ITopicModuleRendererProps {
   hero: TMaybeUndefined<TModule<TPageTopicType>>;
   headingBlock: THeadingBlock;
+  headingAlignment: TContentAlignmentOf<'LEFT' | 'CENTER'>;
   modules: TModule<TPageTopicType>[];
   context?: TModuleComponentProps['context'];
   children?: ReactNode;
@@ -43,6 +45,7 @@ export interface ITopicModuleRendererProps {
 export const TopicModuleRenderer = async ({
   hero,
   headingBlock,
+  headingAlignment,
   modules,
   context,
   children,
@@ -53,7 +56,9 @@ export const TopicModuleRenderer = async ({
 
   return (
     <>
-      {heroNode ?? <PageHeading headingBlock={headingBlock} />}
+      {heroNode ?? (
+        <PageHeading headingBlock={headingBlock} align={headingAlignment} />
+      )}
       {children}
       {renderModules({ modules, map: TOPIC_MAP, context })}
     </>

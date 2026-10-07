@@ -2,6 +2,7 @@ import type {
   THeadingBlock,
   TMaybeUndefined,
   TPageTopicIndexType,
+  TContentAlignmentOf,
 } from '@blog/config';
 import type { TModule } from '@blog/service';
 import { PageHeading } from '@web/components/shared/page-heading';
@@ -31,12 +32,14 @@ const TOPIC_INDEX_MAP: Partial<Record<TPageTopicIndexType, TModuleComponent>> =
 export interface ITopicIndexModuleRendererProps {
   hero: TMaybeUndefined<TModule<TPageTopicIndexType>>;
   headingBlock: THeadingBlock;
+  headingAlignment: TContentAlignmentOf<'LEFT' | 'CENTER'>;
   modules: TModule<TPageTopicIndexType>[];
 }
 
 export const TopicIndexModuleRenderer = async ({
   hero,
   headingBlock,
+  headingAlignment,
   modules,
 }: ITopicIndexModuleRendererProps): Promise<ReactNode> => {
   const heroNode = hero
@@ -45,7 +48,9 @@ export const TopicIndexModuleRenderer = async ({
 
   return (
     <>
-      {heroNode ?? <PageHeading headingBlock={headingBlock} />}
+      {heroNode ?? (
+        <PageHeading headingBlock={headingBlock} align={headingAlignment} />
+      )}
       {renderModules({ modules, map: TOPIC_INDEX_MAP })}
     </>
   );
