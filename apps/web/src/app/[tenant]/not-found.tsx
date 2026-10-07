@@ -6,7 +6,13 @@ import { getNotFoundContext } from '@web/server/request-context/request-context'
 import type { Metadata } from 'next';
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildNotFoundMetadata();
+  const { tenantId, locale, isDefaultLocale } = await getNotFoundContext();
+
+  return buildNotFoundMetadata({
+    tenant: tenantId,
+    locale,
+    hasVoiceOverrides: isDefaultLocale,
+  });
 }
 
 /**

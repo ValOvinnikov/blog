@@ -1,11 +1,25 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
+import {
+  resolveNotFoundMessages,
+  type TNotFoundMessagesContext,
+} from '@web/utils/resolve-not-found-messages';
 import type { Metadata } from 'next';
-import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { createTranslator } from 'next-intl';
 
-// Not-found boundaries receive no route params, so their locale is fixed.
-export const buildNotFoundMetadata = async (): Promise<Metadata> => {
-  setRequestLocale(LOCALE_ISO_CODES.EN);
-  const t = await getTranslations('notFound');
+const DEFAULT_CONTEXT: TNotFoundMessagesContext = {
+  locale: LOCALE_ISO_CODES.EN,
+  hasVoiceOverrides: false,
+};
+
+export const buildNotFoundMetadata = async (
+  context: TNotFoundMessagesContext = DEFAULT_CONTEXT,
+): Promise<Metadata> => {
+  const messages = await resolveNotFoundMessages(context);
+  const t = createTranslator({
+    locale: context.locale,
+    messages,
+    namespace: 'notFound',
+  });
 
   return {
     title: t('heading'),

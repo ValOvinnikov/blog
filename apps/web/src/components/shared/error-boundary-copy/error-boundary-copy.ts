@@ -1,7 +1,7 @@
 /**
- * Hardcoded English shared by `error-page.tsx` and `global-error-page.tsx` —
- * both render above `NextIntlClientProvider`, so neither can use
- * `useTranslations`. Plain data only; nothing here may throw.
+ * Fixed English for `GlobalErrorPage`: it renders when the root layout itself
+ * has failed, above `NextIntlClientProvider`, so it is the one error boundary
+ * the catalog cannot reach. Plain data only; nothing here may throw.
  */
 export const errorBoundaryCopy = {
   heading: 'Something went wrong',
