@@ -3,7 +3,7 @@
 import type {
   IWithClassName,
   IWithDataTestId,
-  TBrandVariantOf,
+  TBrandVariant,
 } from '@blog/config';
 import type { TTestimonialItem } from '@blog/service';
 import { LabelledCarousel } from '@web/components/shared/labelled-carousel';
@@ -14,7 +14,7 @@ export interface ITestimonialCarouselProps
   items: TTestimonialItem[];
   align: 'left' | 'center';
   title: string;
-  tone: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
+  tone: TBrandVariant;
 }
 
 export const TestimonialCarousel = ({

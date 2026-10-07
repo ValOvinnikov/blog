@@ -2,7 +2,7 @@ import {
   SIZE,
   type IWithClassName,
   type IWithDataTestId,
-  type TBrandVariantOf,
+  type TBrandVariant,
 } from '@blog/config';
 import type { TTestimonialItem } from '@blog/service';
 import { Avatar } from '@blog/ui/components/atoms/avatar';
@@ -18,7 +18,7 @@ const AVATAR_IMAGE_SIZE_PX = { default: 80, spotlight: 112 } as const;
 export interface ITestimonialCardProps extends IWithClassName, IWithDataTestId {
   item: TTestimonialItem;
   align: 'left' | 'center';
-  tone: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
+  tone: TBrandVariant;
   isSpotlight?: boolean;
 }
 
