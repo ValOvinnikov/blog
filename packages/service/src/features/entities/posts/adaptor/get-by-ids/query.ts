@@ -10,6 +10,7 @@ export type TPostsByIdsQueryParams = {
 export const postsByIdsQuery = q
   .parameters<TPostsByIdsQueryParams>()
   .star.filterByType('page_post')
+  // groqd's typed filterBy has no `in` operator
   .filterRaw('_id in $ids')
   .filterRaw(PUBLISHED_POST_FILTER)
   .project((sub) => ({

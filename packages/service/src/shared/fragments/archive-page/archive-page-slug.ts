@@ -7,6 +7,7 @@ const slugParser = z.string().nullable();
 export const tagArchivePageSlugFragment = q
   .parameters<TLocaleQueryParams>()
   .star.filterByType('page_tag')
+  // groqd's typed filterBy rejects a reference's `_ref` path
   .filterRaw('tag._ref == ^._id')
   .filterBy('language == $locale')
   .slice(0)
@@ -16,6 +17,7 @@ export const tagArchivePageSlugFragment = q
 export const topicArchivePageSlugFragment = q
   .parameters<TLocaleQueryParams>()
   .star.filterByType('page_topic')
+  // groqd's typed filterBy rejects a reference's `_ref` path
   .filterRaw('topic._ref == ^._id')
   .filterBy('language == $locale')
   .slice(0)

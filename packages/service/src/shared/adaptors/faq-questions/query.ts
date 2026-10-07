@@ -5,6 +5,7 @@ import type { TLocaleQueryParams } from '@blog/service/shared/localization/local
 export const faqQuestionsQuery = q
   .parameters<{ ids: string[] } & TLocaleQueryParams>()
   .star.filterByType('module_faq')
+  // groqd's typed filterBy has no `in` operator
   .filterRaw('_id in $ids')
   .project((sub) => ({
     _id: true,

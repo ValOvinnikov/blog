@@ -3,6 +3,7 @@ import { q } from '@blog/service/sanity/query/query';
 export const postListPageSizeQuery = q
   .parameters<{ ids: string[] }>()
   .star.filterByType('module_postList')
+  // groqd's typed filterBy has no `in` operator
   .filterRaw('_id in $ids')
   .project((sub) => ({
     _id: true,
