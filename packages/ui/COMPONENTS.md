@@ -422,12 +422,12 @@ Slots:
 
 ### NewsletterSignup — `components/organisms/newsletter-signup/newsletter-signup.tsx`
 
-A pure, controlled subscribe form built on the `TextInput` atom, exposed as two mutually-exclusive densities rather than a single component with a `variant` switch: `NewsletterSignup.Full` is the rich panel form used by the site footer and the CMS page-builder module; `NewsletterSignup.Compact` is the slim single-row strip for the end of every article.
+A controlled subscribe form in two densities: `Full`, a pitch pane beside the form, and `Compact`, a single-row strip.
 
 Compound component:
 
-- **NewsletterSignup.Full** — The rich, tinted panel signup form used by the site footer and the CMS page-builder module. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading: string · headingId?: string · supportingText?: string · errorMessage?: string · errorMessageId?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string · trustCues?: INewsletterSignupTrustCue[] · align?: TNewsletterSignupVariants['align'] _(extends IWithClassName, IWithDataTestId)_
-- **NewsletterSignup.Compact** — A slim single-row subscribe strip for the end of every article. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading: string · headingId?: string · prefix?: ReactNode · errorMessage?: string · errorMessageId?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string · align?: TNewsletterSignupVariants['align'] _(extends IWithClassName, IWithDataTestId)_
+- **NewsletterSignup.Full** — A panel that sets a heading, pitch and trust cues beside the subscribe form. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading: string · headingId?: string · headingLevel?: THeadingLevel · supportingText?: string · errorMessage?: string · errorMessageId?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string · trustCues?: INewsletterSignupTrustCue[] · align?: TNewsletterSignupVariants['align'] _(extends IWithClassName, IWithDataTestId)_
+- **NewsletterSignup.Compact** — A single-row subscribe strip with an inline label in place of a heading. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading: string · headingId?: string · prefix?: ReactNode · errorMessage?: string · errorMessageId?: string · successMessage?: string · submitLabel: string · emailAriaLabel: string · placeholder?: string · align?: TNewsletterSignupVariants['align'] _(extends IWithClassName, IWithDataTestId)_
 
 ### Pagination — `components/organisms/pagination/pagination.tsx`
 

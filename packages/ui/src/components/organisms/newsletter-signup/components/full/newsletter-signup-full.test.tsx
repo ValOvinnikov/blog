@@ -34,6 +34,25 @@ describe(`<${NewsletterSignupFull.name}/>`, () => {
     expect(screen.getByText(supportingText)).toBeVisible();
   });
 
+  it('renders the heading as an h2 when headingLevel is omitted', () => {
+    setup({ heading });
+
+    expect(
+      screen.getByRole('heading', { name: heading, level: 2 }),
+    ).toBeVisible();
+  });
+
+  it.each([1, 3, 4] as const)(
+    'renders the heading at level %i when headingLevel names it',
+    (headingLevel) => {
+      setup({ heading, headingLevel });
+
+      expect(
+        screen.getByRole('heading', { name: heading, level: headingLevel }),
+      ).toBeVisible();
+    },
+  );
+
   it('assigns headingId to the heading element when provided', () => {
     setup({ heading, headingId: 'newsletter-full-heading' });
 

@@ -37,10 +37,6 @@ const meta = {
 export default meta;
 type TStory = StoryObj<typeof meta>;
 
-/**
- * Access via `NewsletterSignup.Compact` — the slim single-row strip for the
- * end of every article.
- */
 export const Default: TStory = {};
 
 export const Submitting: TStory = {
