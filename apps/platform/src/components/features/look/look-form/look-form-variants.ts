@@ -20,6 +20,7 @@ export const lookFormVariants = tv({
     hueValue: [
       'min-w-[92px] shrink-0 text-right text-[12.5px] tabular-nums text-admin-muted',
     ],
+    fieldError: ['mt-2 text-[11.5px] text-admin-bad'],
     note: ['text-[12px] text-admin-muted'],
     uploads: ['grid grid-cols-1 gap-3 sm:grid-cols-2'],
   },

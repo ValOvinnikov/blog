@@ -1,4 +1,4 @@
-import { FONT_CHOICE } from '@blog/config';
+import { DENSITY, FONT_CHOICE, RADIUS_SCALE } from '@blog/config';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import userEvent from '@testing-library/user-event';
 
@@ -13,6 +13,9 @@ const BASE_PROPS = {
   logoHue: undefined,
   headingFont: FONT_CHOICE.SPACE_GROTESK,
   bodyFont: FONT_CHOICE.NEWSREADER,
+  radiusScale: RADIUS_SCALE.MD,
+  density: DENSITY.DEFAULT,
+  logoSrc: undefined,
 };
 
 describe(LookPreview, () => {
@@ -28,6 +31,21 @@ describe(LookPreview, () => {
 
     expect(screen.getByTestId('preview-sample-tokens')).toHaveStyle({
       '--brand-primary-solid': 'oklch(0.55 0.17 28)',
+    });
+  });
+
+  it('carries the radius scale and density onto the preview surface', () => {
+    render(
+      <LookPreview
+        {...BASE_PROPS}
+        radiusScale={RADIUS_SCALE.XL}
+        density={DENSITY.COMPACT}
+      />,
+    );
+
+    expect(screen.getByTestId('preview-sample-tokens')).toHaveStyle({
+      '--radius-md': '12px',
+      '--spacing-card-x': '0.75rem',
     });
   });
 

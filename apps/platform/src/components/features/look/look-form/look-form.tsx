@@ -1,6 +1,11 @@
 'use client';
 
-import { ALERT_TYPE, PRESET_REGISTRY, type TPresetId } from '@blog/config';
+import {
+  ALERT_TYPE,
+  isAccentHueAccessible,
+  PRESET_REGISTRY,
+  type TPresetId,
+} from '@blog/config';
 import { LookPreview } from '@platform/components/features/look/look-preview';
 import { Alert } from '@platform/components/shared/alert';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
@@ -114,6 +119,7 @@ export const LookForm = ({
     });
 
   const isDirty = !valuesEqual(values, savedValues);
+  const isAccentHueRejected = !isAccentHueAccessible(values.accentHue);
 
   const updateField: TLookFormFieldSetter = (key, value) => {
     setValues((prev) => ({ ...prev, [key]: value }));
@@ -152,7 +158,7 @@ export const LookForm = ({
               type="button"
               variant="primary"
               onClick={handleSubmit}
-              isDisabled={!isDirty || isArchived}
+              isDisabled={!isDirty || isArchived || isAccentHueRejected}
               isPending={isPending}
               pendingLabel={t('savingButton')}
               aria-describedby={isArchived ? archivedNoticeId : undefined}
@@ -184,6 +190,7 @@ export const LookForm = ({
                 preset={values.preset}
                 onPresetChange={handlePresetChange}
                 accentHue={values.accentHue}
+                isAccentHueRejected={isAccentHueRejected}
                 logoHue={values.logoHue}
                 onFieldChange={updateField}
                 isArchived={isArchived}
@@ -237,6 +244,9 @@ export const LookForm = ({
             logoHue={values.logoHue}
             headingFont={values.headingFont}
             bodyFont={values.bodyFont}
+            radiusScale={values.radiusScale}
+            density={values.density}
+            logoSrc={values.logoAssetUrl}
           />
         </div>
       </div>

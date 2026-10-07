@@ -1,6 +1,7 @@
 import {
   DENSITY,
   FONT_CHOICE,
+  isAccentHueAccessible,
   LANGUAGE_SWITCHER_STYLE,
   PRESET_ID,
   RADIUS_SCALE,
@@ -26,6 +27,11 @@ const {
   clearBrandAssetActionMock: vi.fn(),
 }));
 
+vi.mock('@blog/config', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@blog/config')>()),
+  isAccentHueAccessible: vi.fn(),
+}));
+
 vi.mock('@platform/server/site-config/update-look-action', () => ({
   updateLookAction: updateLookActionMock,
 }));
@@ -37,6 +43,8 @@ vi.mock('@platform/server/site-config/upload-brand-asset-action', () => ({
 vi.mock('@platform/server/site-config/clear-brand-asset-action', () => ({
   clearBrandAssetAction: clearBrandAssetActionMock,
 }));
+
+const isAccentHueAccessibleMock = vi.mocked(isAccentHueAccessible);
 
 const ARCHIVED_AT = new Date('2026-08-26T00:00:00.000Z');
 
@@ -55,6 +63,8 @@ describe(`<${LookForm.name}/>`, () => {
     user = userEvent.setup();
     updateLookActionMock.mockReset();
     updateLookActionMock.mockResolvedValue({ ok: true });
+    isAccentHueAccessibleMock.mockReset();
+    isAccentHueAccessibleMock.mockReturnValue(true);
   });
 
   it(
@@ -229,6 +239,33 @@ describe(`<${LookForm.name}/>`, () => {
       screen.getByRole('button', { name: 'Reset to preset' }),
     ).toBeEnabled();
     expect(screen.getByRole('button', { name: 'Save changes' })).toBeEnabled();
+  });
+
+  it('rejects an accent hue the site would replace, with a message, and blocks Save', async () => {
+    isAccentHueAccessibleMock.mockImplementation((hue) => hue !== 251);
+    setup();
+
+    const slider = screen.getByRole('slider', { name: 'Accent hue' });
+    slider.focus();
+    await user.keyboard('{ArrowRight}');
+
+    expect(slider).toHaveAccessibleDescription(
+      expect.stringContaining('the site would replace it'),
+    );
+    expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled();
+  });
+
+  it('previews a changed radius scale and density before saving', async () => {
+    setup();
+
+    await user.click(screen.getByText('Advanced'));
+    await user.click(screen.getByRole('button', { name: 'Extra Large' }));
+    await user.click(screen.getByRole('button', { name: 'Compact' }));
+
+    expect(screen.getByTestId('preview-sample-tokens')).toHaveStyle({
+      '--radius-md': '12px',
+      '--spacing-card-x': '0.75rem',
+    });
   });
 
   it('resets a diverged control back to the current preset on "Reset to preset"', async () => {

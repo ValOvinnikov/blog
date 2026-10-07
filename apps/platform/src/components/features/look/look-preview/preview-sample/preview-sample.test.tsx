@@ -7,8 +7,9 @@ const render = renderWithIntl;
 
 const BASE_PROPS = {
   tenantName: 'Acme Inc.',
+  logoSrc: undefined,
   tokenStyle: {
-    '--brand-primary': 'oklch(0.53 0.17 250)',
+    '--brand-primary': 'oklch(0.53 0.17 28)',
   } as CSSProperties,
   isDark: false,
   headingFontFamily: 'mock-space-grotesk-font-family',
@@ -16,6 +17,19 @@ const BASE_PROPS = {
 };
 
 describe(PreviewSample, () => {
+  let staticDarkRamp: HTMLStyleElement;
+
+  beforeEach(() => {
+    staticDarkRamp = document.createElement('style');
+    staticDarkRamp.textContent =
+      '.dark { --brand-primary: oklch(0.7 0.16 250); }';
+    document.head.append(staticDarkRamp);
+  });
+
+  afterEach(() => {
+    staticDarkRamp.remove();
+  });
+
   it('renders the tenant name and a @blog/ui Button primitive', () => {
     render(<PreviewSample {...BASE_PROPS} />);
 
@@ -23,10 +37,51 @@ describe(PreviewSample, () => {
     expect(screen.getByRole('button', { name: 'Subscribe' })).toBeVisible();
   });
 
-  it('applies the given token style to its root, ancestor of the sample content', () => {
-    render(<PreviewSample {...BASE_PROPS} />);
+  it('resolves the tenant accent rather than the static dark ramp in dark mode', () => {
+    render(
+      <PreviewSample
+        {...BASE_PROPS}
+        isDark={true}
+        tokenStyle={
+          { '--brand-primary': 'oklch(0.7 0.16 28)' } as CSSProperties
+        }
+      />,
+    );
 
     const button = screen.getByRole('button', { name: 'Subscribe' });
-    expect(button.closest('[style*="--brand-primary"]')).not.toBeNull();
+    expect(getComputedStyle(button).getPropertyValue('--brand-primary')).toBe(
+      'oklch(0.7 0.16 28)',
+    );
+  });
+
+  it('renders the uploaded logo in place of the generated mark', () => {
+    render(
+      <PreviewSample
+        {...BASE_PROPS}
+        logoSrc="https://cdn.example.com/logo.svg"
+      />,
+    );
+
+    expect(screen.getByRole('img', { name: 'Acme Inc.' })).toHaveAttribute(
+      'src',
+      'https://cdn.example.com/logo.svg',
+    );
+  });
+
+  it('renders two item cards and an outlined card', () => {
+    render(<PreviewSample {...BASE_PROPS} />);
+
+    expect(
+      screen.getByRole('heading', { level: 4, name: 'Notes from the harbour' }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole('heading', {
+        level: 4,
+        name: 'Charting the next season',
+      }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole('heading', { level: 4, name: 'Newsletter' }),
+    ).toBeVisible();
   });
 });
