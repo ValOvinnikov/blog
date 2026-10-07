@@ -19,14 +19,13 @@ describe(consumePendingInvitesOnSignIn, () => {
   beforeEach(() => {
     findPendingInviteByEmailMock.mockReset();
     consumeMembershipInviteMock.mockReset();
-  });
-
-  it("consumes every pending invite for the signed-in user's email", async () => {
     findPendingInviteByEmailMock.mockResolvedValue([
       { id: 'invite-1', tenantId: 'tenant-1' },
       { id: 'invite-2', tenantId: 'tenant-2' },
     ]);
+  });
 
+  it("consumes every pending invite for the signed-in user's email", async () => {
     await consumePendingInvitesOnSignIn({
       user: { id: 'user-1', email: 'owner@example.com' },
     });
@@ -45,10 +44,6 @@ describe(consumePendingInvitesOnSignIn, () => {
   });
 
   it('consumes every matched invite even when an earlier one was already consumed', async () => {
-    findPendingInviteByEmailMock.mockResolvedValue([
-      { id: 'invite-1', tenantId: 'tenant-1' },
-      { id: 'invite-2', tenantId: 'tenant-2' },
-    ]);
     consumeMembershipInviteMock.mockImplementation((inviteId: string) =>
       Promise.resolve(
         inviteId === 'invite-1'

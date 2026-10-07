@@ -15,6 +15,78 @@ const BRAND: TTenantEmailBrand = {
 };
 
 describe('buildTenantShell', () => {
+  describe('with only a brand, a brand name and body HTML', () => {
+    let html: string;
+
+    beforeEach(() => {
+      html = buildTenantShell({
+        brand: BRAND,
+        brandName: 'Acme',
+        bodyHtml: '<p>Body</p>',
+      });
+    });
+
+    it('omits the preheader block entirely when no preview text is given', () => {
+      expect(html).not.toContain('display:none');
+    });
+
+    it('inlines the given brand hex tokens rather than referencing CSS custom properties', () => {
+      expect(html).toContain(BRAND.surface);
+      expect(html).toContain(BRAND.border);
+      expect(html).not.toContain('var(--');
+    });
+
+    it('renders the current year in the footer copyright line', () => {
+      expect(html).toContain(`&copy; ${new Date().getFullYear()} Acme`);
+    });
+
+    it('renders no actionHtml given for an email with no action', () => {
+      const withUndefinedActionHtml = buildTenantShell({
+        brand: BRAND,
+        brandName: 'Acme',
+        bodyHtml: '<p>Body</p>',
+        actionHtml: undefined,
+      });
+
+      expect(withUndefinedActionHtml).toBe(html);
+    });
+
+    it('renders no structuralHtml given for an email with no locked structural content', () => {
+      const withUndefinedStructuralHtml = buildTenantShell({
+        brand: BRAND,
+        brandName: 'Acme',
+        bodyHtml: '<p>Body</p>',
+        structuralHtml: undefined,
+      });
+
+      expect(withUndefinedStructuralHtml).toBe(html);
+    });
+
+    it('renders no logo image given for an email with no uploaded logo', () => {
+      const withUndefinedLogo = buildTenantShell({
+        brand: BRAND,
+        brandName: 'Acme',
+        bodyHtml: '<p>Body</p>',
+        logoImageUrl: undefined,
+      });
+
+      expect(withUndefinedLogo).toBe(html);
+      expect(html).not.toContain('<img');
+      expect(html).toContain('<svg');
+    });
+
+    it('renders no footer postal address given for a send with no obligation to carry one', () => {
+      const withUndefinedAddress = buildTenantShell({
+        brand: BRAND,
+        brandName: 'Acme',
+        bodyHtml: '<p>Body</p>',
+        footerPostalAddress: undefined,
+      });
+
+      expect(withUndefinedAddress).toBe(html);
+    });
+  });
+
   it('wraps the given body HTML in a full HTML document', () => {
     const html = buildTenantShell({
       brand: BRAND,
@@ -60,28 +132,6 @@ describe('buildTenantShell', () => {
     expect(html).toContain('Confirm your &lt;email&gt;');
   });
 
-  it('omits the preheader block entirely when no preview text is given', () => {
-    const html = buildTenantShell({
-      brand: BRAND,
-      brandName: 'Acme',
-      bodyHtml: '<p>Body</p>',
-    });
-
-    expect(html).not.toContain('display:none');
-  });
-
-  it('inlines the given brand hex tokens rather than referencing CSS custom properties', () => {
-    const html = buildTenantShell({
-      brand: BRAND,
-      brandName: 'Acme',
-      bodyHtml: '<p>Body</p>',
-    });
-
-    expect(html).toContain(BRAND.surface);
-    expect(html).toContain(BRAND.border);
-    expect(html).not.toContain('var(--');
-  });
-
   it('renders a different tenant palette in the output for a different brand', () => {
     const otherBrand: TTenantEmailBrand = { ...BRAND, border: '#ff00ff' };
 
@@ -95,16 +145,6 @@ describe('buildTenantShell', () => {
     expect(html).not.toContain(BRAND.border);
   });
 
-  it('renders the current year in the footer copyright line', () => {
-    const html = buildTenantShell({
-      brand: BRAND,
-      brandName: 'Acme',
-      bodyHtml: '<p>Body</p>',
-    });
-
-    expect(html).toContain(`&copy; ${new Date().getFullYear()} Acme`);
-  });
-
   it('renders byte-identical output for an actionless email', () => {
     const html = buildTenantShell({
       brand: BRAND,
@@ -116,22 +156,6 @@ describe('buildTenantShell', () => {
     expect(html).toMatchInlineSnapshot(
       `"<!doctype html><html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>Acme</title></head><body style="margin:0;padding:0;background-color:#f8f8fb;font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;"><div style="display:none;max-height:0;overflow:hidden;opacity:0;">Preview text</div><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8f8fb;"><tr><td align="center" style="padding:32px 16px;"><table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:#ffffff;border:1px solid #e4e4ec;border-radius:8px;"><tr><td style="padding:24px 32px;border-bottom:1px solid #e4e4ec;"><table role="presentation" cellpadding="0" cellspacing="0"><tr><td style="padding-right:8px;"><svg width="24" height="24" viewBox="0 0 24 24" role="img" aria-hidden="true"><polygon points="12,3 22,7 12,11 2,7" fill="#3355dd" /><polygon points="12,8 22,12 12,16 2,12" fill="#5577ee" /><polygon points="12,13 22,17 12,21 2,17" fill="#88aaff" /></svg></td><td style="font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;font-size:18px;font-weight:700;color:#1f1f2b;">Acme</td></tr></table></td></tr><tr><td style="padding:32px;color:#1f1f2b;font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;font-size:16px;line-height:1.5;"><p>Body</p></td></tr><tr><td style="padding:24px 32px;border-top:1px solid #e4e4ec;color:#6b6b7a;font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;font-size:12px;line-height:1.5;">&copy; 2026 Acme</td></tr></table></td></tr></table></body></html>"`,
     );
-  });
-
-  it('renders no actionHtml given for an email with no action', () => {
-    const withoutActionHtml = buildTenantShell({
-      brand: BRAND,
-      brandName: 'Acme',
-      bodyHtml: '<p>Body</p>',
-    });
-    const withUndefinedActionHtml = buildTenantShell({
-      brand: BRAND,
-      brandName: 'Acme',
-      bodyHtml: '<p>Body</p>',
-      actionHtml: undefined,
-    });
-
-    expect(withUndefinedActionHtml).toBe(withoutActionHtml);
   });
 
   it('renders actionHtml between the body and the footer when given', () => {
@@ -150,22 +174,6 @@ describe('buildTenantShell', () => {
 
     expect(bodyIndex).toBeLessThan(actionIndex);
     expect(actionIndex).toBeLessThan(footerIndex);
-  });
-
-  it('renders no structuralHtml given for an email with no locked structural content', () => {
-    const withoutStructuralHtml = buildTenantShell({
-      brand: BRAND,
-      brandName: 'Acme',
-      bodyHtml: '<p>Body</p>',
-    });
-    const withUndefinedStructuralHtml = buildTenantShell({
-      brand: BRAND,
-      brandName: 'Acme',
-      bodyHtml: '<p>Body</p>',
-      structuralHtml: undefined,
-    });
-
-    expect(withUndefinedStructuralHtml).toBe(withoutStructuralHtml);
   });
 
   it('renders structuralHtml between the body and the action when both are given', () => {
@@ -209,24 +217,6 @@ describe('buildTenantShell', () => {
     expect(structuralIndex).toBeLessThan(footerIndex);
   });
 
-  it('renders no logo image given for an email with no uploaded logo', () => {
-    const withoutLogo = buildTenantShell({
-      brand: BRAND,
-      brandName: 'Acme',
-      bodyHtml: '<p>Body</p>',
-    });
-    const withUndefinedLogo = buildTenantShell({
-      brand: BRAND,
-      brandName: 'Acme',
-      bodyHtml: '<p>Body</p>',
-      logoImageUrl: undefined,
-    });
-
-    expect(withUndefinedLogo).toBe(withoutLogo);
-    expect(withoutLogo).not.toContain('<img');
-    expect(withoutLogo).toContain('<svg');
-  });
-
   it('renders an img tag with explicit dimensions and escaped alt text when a logo URL is given', () => {
     const html = buildTenantShell({
       brand: BRAND,
@@ -251,22 +241,6 @@ describe('buildTenantShell', () => {
 
     expect(html).not.toContain('<img');
     expect(html).toContain('<svg');
-  });
-
-  it('renders no footer postal address given for a send with no obligation to carry one', () => {
-    const withoutAddress = buildTenantShell({
-      brand: BRAND,
-      brandName: 'Acme',
-      bodyHtml: '<p>Body</p>',
-    });
-    const withUndefinedAddress = buildTenantShell({
-      brand: BRAND,
-      brandName: 'Acme',
-      bodyHtml: '<p>Body</p>',
-      footerPostalAddress: undefined,
-    });
-
-    expect(withUndefinedAddress).toBe(withoutAddress);
   });
 
   it('renders the escaped postal address beneath the copyright line in the footer', () => {
