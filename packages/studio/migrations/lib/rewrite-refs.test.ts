@@ -3,12 +3,24 @@ import { at, patch, set } from 'sanity/migrate';
 import { collectRefRewritePatches, rewriteRefsDeep } from './rewrite-refs';
 
 describe(rewriteRefsDeep, () => {
-  it('rewrites a top-level reference found in the id map', () => {
-    const idMap = new Map([['post-1', 'page_post-post-1']]);
+  describe('with a post-1 id map', () => {
+    let idMap: Map<string, string>;
 
-    expect(
-      rewriteRefsDeep({ _type: 'reference', _ref: 'post-1' }, idMap),
-    ).toEqual({ _type: 'reference', _ref: 'page_post-post-1' });
+    beforeEach(() => {
+      idMap = new Map([['post-1', 'page_post-post-1']]);
+    });
+
+    it('rewrites a top-level reference found in the id map', () => {
+      expect(
+        rewriteRefsDeep({ _type: 'reference', _ref: 'post-1' }, idMap),
+      ).toEqual({ _type: 'reference', _ref: 'page_post-post-1' });
+    });
+
+    it('leaves references absent from the id map unchanged', () => {
+      expect(
+        rewriteRefsDeep({ _type: 'reference', _ref: 'author-1' }, idMap),
+      ).toEqual({ _type: 'reference', _ref: 'author-1' });
+    });
   });
 
   it('rewrites a reference nested inside a Portable Text markDef', () => {
@@ -36,14 +48,6 @@ describe(rewriteRefsDeep, () => {
     ).toBe('page_post-post-2');
   });
 
-  it('leaves references absent from the id map unchanged', () => {
-    const idMap = new Map([['post-1', 'page_post-post-1']]);
-
-    expect(
-      rewriteRefsDeep({ _type: 'reference', _ref: 'author-1' }, idMap),
-    ).toEqual({ _type: 'reference', _ref: 'author-1' });
-  });
-
   it('leaves primitives unchanged', () => {
     const idMap = new Map<string, string>();
 
@@ -54,24 +58,79 @@ describe(rewriteRefsDeep, () => {
 });
 
 describe(collectRefRewritePatches, () => {
-  it('returns undefined when no ref in the document matches the id map', () => {
-    const idMap = new Map([['post-1', 'page_post-post-1']]);
-    const doc = { _id: 'doc-1', _type: 'module_hero', title: 'Hero' };
+  describe('with a post-1 id map', () => {
+    let idMap: Map<string, string>;
 
-    expect(collectRefRewritePatches(doc, idMap)).toBeUndefined();
-  });
+    beforeEach(() => {
+      idMap = new Map([['post-1', 'page_post-post-1']]);
+    });
 
-  it('rewrites a top-level reference field', () => {
-    const idMap = new Map([['post-1', 'page_post-post-1']]);
-    const doc = {
-      _id: 'hero-1',
-      _type: 'module_hero',
-      featuredPost: { _type: 'reference', _ref: 'post-1' },
-    };
+    it('returns undefined when no ref in the document matches the id map', () => {
+      const doc = { _id: 'doc-1', _type: 'module_hero', title: 'Hero' };
 
-    expect(collectRefRewritePatches(doc, idMap)).toEqual(
-      patch('hero-1', [at(['featuredPost', '_ref'], set('page_post-post-1'))]),
-    );
+      expect(collectRefRewritePatches(doc, idMap)).toBeUndefined();
+    });
+
+    it('rewrites a top-level reference field', () => {
+      const doc = {
+        _id: 'hero-1',
+        _type: 'module_hero',
+        featuredPost: { _type: 'reference', _ref: 'post-1' },
+      };
+
+      expect(collectRefRewritePatches(doc, idMap)).toEqual(
+        patch('hero-1', [
+          at(['featuredPost', '_ref'], set('page_post-post-1')),
+        ]),
+      );
+    });
+
+    it('rewrites a reference nested inside a Portable Text markDef', () => {
+      const doc = {
+        _id: 'cta-1',
+        _type: 'module_cta',
+        content: [
+          {
+            _type: 'block',
+            _key: 'block-1',
+            markDefs: [
+              {
+                _type: 'link',
+                _key: 'mark-1',
+                internalReference: { _type: 'reference', _ref: 'post-1' },
+              },
+            ],
+            children: [],
+          },
+        ],
+      };
+
+      expect(collectRefRewritePatches(doc, idMap)).toEqual(
+        patch('cta-1', [
+          at(
+            [
+              'content',
+              { _key: 'block-1' },
+              'markDefs',
+              { _key: 'mark-1' },
+              'internalReference',
+              '_ref',
+            ],
+            set('page_post-post-1'),
+          ),
+        ]),
+      );
+    });
+
+    it('returns undefined when a reference already points at its mapped id', () => {
+      const doc = {
+        _id: 'page_post-post-2',
+        _type: 'page_post',
+        author: { _type: 'reference', _ref: 'page_post-post-1' },
+      };
+
+      expect(collectRefRewritePatches(doc, idMap)).toBeUndefined();
+    });
   });
 
   it('rewrites every matching reference across distinct top-level fields', () => {
@@ -114,54 +173,5 @@ describe(collectRefRewritePatches, () => {
         at(['posts', { _key: 'b' }, '_ref'], set('page_post-post-2')),
       ]),
     );
-  });
-
-  it('rewrites a reference nested inside a Portable Text markDef', () => {
-    const idMap = new Map([['post-1', 'page_post-post-1']]);
-    const doc = {
-      _id: 'cta-1',
-      _type: 'module_cta',
-      content: [
-        {
-          _type: 'block',
-          _key: 'block-1',
-          markDefs: [
-            {
-              _type: 'link',
-              _key: 'mark-1',
-              internalReference: { _type: 'reference', _ref: 'post-1' },
-            },
-          ],
-          children: [],
-        },
-      ],
-    };
-
-    expect(collectRefRewritePatches(doc, idMap)).toEqual(
-      patch('cta-1', [
-        at(
-          [
-            'content',
-            { _key: 'block-1' },
-            'markDefs',
-            { _key: 'mark-1' },
-            'internalReference',
-            '_ref',
-          ],
-          set('page_post-post-1'),
-        ),
-      ]),
-    );
-  });
-
-  it('returns undefined when a reference already points at its mapped id', () => {
-    const idMap = new Map([['post-1', 'page_post-post-1']]);
-    const doc = {
-      _id: 'page_post-post-2',
-      _type: 'page_post',
-      author: { _type: 'reference', _ref: 'page_post-post-1' },
-    };
-
-    expect(collectRefRewritePatches(doc, idMap)).toBeUndefined();
   });
 });

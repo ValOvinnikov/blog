@@ -36,35 +36,37 @@ describe(toLinkIdentityKey, () => {
     expect(a).not.toBe(b);
   });
 
-  it('keys two links with the same destination but different labels differently', () => {
-    const a = toLinkIdentityKey({
-      linkType: 'INTERNAL',
-      label: 'Blog',
-      internalReference: { _ref: 'page-post-1' },
-    });
-    const b = toLinkIdentityKey({
-      linkType: 'INTERNAL',
-      label: 'Read Latest',
-      internalReference: { _ref: 'page-post-1' },
+  describe('with an internal Blog link to page-post-1', () => {
+    let a: ReturnType<typeof toLinkIdentityKey>;
+
+    beforeEach(() => {
+      a = toLinkIdentityKey({
+        linkType: 'INTERNAL',
+        label: 'Blog',
+        internalReference: { _ref: 'page-post-1' },
+      });
     });
 
-    expect(a).not.toBe(b);
-    expect(toLinkId(a as string)).not.toBe(toLinkId(b as string));
-  });
+    it('keys two links with the same destination but different labels differently', () => {
+      const b = toLinkIdentityKey({
+        linkType: 'INTERNAL',
+        label: 'Read Latest',
+        internalReference: { _ref: 'page-post-1' },
+      });
 
-  it('keys two links with the same destination and label the same, for dedup', () => {
-    const a = toLinkIdentityKey({
-      linkType: 'INTERNAL',
-      label: 'Blog',
-      internalReference: { _ref: 'page-post-1' },
-    });
-    const b = toLinkIdentityKey({
-      linkType: 'INTERNAL',
-      label: 'Blog',
-      internalReference: { _ref: 'page-post-1' },
+      expect(a).not.toBe(b);
+      expect(toLinkId(a as string)).not.toBe(toLinkId(b as string));
     });
 
-    expect(a).toBe(b);
+    it('keys two links with the same destination and label the same, for dedup', () => {
+      const b = toLinkIdentityKey({
+        linkType: 'INTERNAL',
+        label: 'Blog',
+        internalReference: { _ref: 'page-post-1' },
+      });
+
+      expect(a).toBe(b);
+    });
   });
 
   it('treats a missing label as the empty string, distinct from an explicit one', () => {

@@ -75,9 +75,13 @@ const pagePatch = (id: string, withHero: boolean) => ({
 });
 
 describe('move-page-layout-into-templates migration', () => {
-  it("points a translated page at the template built from its default-language page's layout", async () => {
-    const context = createContext([englishAbout, dutchAbout], aboutGroup);
+  let context: MigrationContext;
 
+  beforeEach(() => {
+    context = createContext([englishAbout, dutchAbout], aboutGroup);
+  });
+
+  it("points a translated page at the template built from its default-language page's layout", async () => {
     await expect(run(dutchAbout, context)).resolves.toEqual([
       templateCreate,
       pagePatch('about-nl', false),
@@ -85,8 +89,6 @@ describe('move-page-layout-into-templates migration', () => {
   });
 
   it('moves the default-language page onto the same template', async () => {
-    const context = createContext([englishAbout, dutchAbout], aboutGroup);
-
     await expect(run(englishAbout, context)).resolves.toEqual([
       templateCreate,
       pagePatch('about-en', true),

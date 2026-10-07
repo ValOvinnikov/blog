@@ -18,6 +18,12 @@ describe('validateHasPage', () => {
     MISSING_PAGE_ERROR,
   );
 
+  let document: SanityDocument;
+
+  beforeEach(() => {
+    document = asDocument({ _id: 'tag-1', _type: 'blog_tag' });
+  });
+
   it('passes without querying when the document has no id', async () => {
     const { context, fetchCalls } = createMockCountContext(0);
 
@@ -27,14 +33,12 @@ describe('validateHasPage', () => {
 
   it('passes when a page references the term', async () => {
     const { context } = createMockCountContext(1);
-    const document = asDocument({ _id: 'tag-1', _type: 'blog_tag' });
 
     await expect(validate(document, context)).resolves.toBe(true);
   });
 
   it('errors when no page references the term', async () => {
     const { context } = createMockCountContext(0);
-    const document = asDocument({ _id: 'tag-1', _type: 'blog_tag' });
 
     await expect(validate(document, context)).resolves.toBe(MISSING_PAGE_ERROR);
   });
@@ -54,7 +58,6 @@ describe('validateHasPage', () => {
 
   it('resolves to true, not the error, when the fetch rejects', async () => {
     const { context } = createMockCountContext(new Error('network down'));
-    const document = asDocument({ _id: 'tag-1', _type: 'blog_tag' });
 
     await expect(validate(document, context)).resolves.toBe(true);
   });
