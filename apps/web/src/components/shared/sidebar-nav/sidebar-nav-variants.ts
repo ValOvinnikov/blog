@@ -2,10 +2,10 @@ import { tv } from 'tailwind-variants';
 
 export const sidebarNavVariants = tv({
   slots: {
-    // `sticky` lives on `root`, not `mobile` — `mobile`'s own parent box has no room to pin. `top-20` leaves a gap below the Header so the shadow reads as separation, not flush.
+    // `sticky` lives on `root`, not `mobile` — `mobile`'s own parent box has no room to pin. `5rem` only covers the paint before `SiteHeader` publishes its height.
     root: [
       'w-full min-w-0',
-      'sticky top-20 z-10',
+      'sticky top-[var(--site-header-height,5rem)] z-10',
       'lg:static lg:top-auto lg:z-auto',
     ],
     desktop: [
