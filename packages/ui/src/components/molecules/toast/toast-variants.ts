@@ -6,14 +6,14 @@ export const toastVariants = tv({
   slots: {
     root: [
       'relative w-full overflow-hidden',
-      'rounded-md border border-border border-l-[3px] bg-surface shadow-sm',
+      'rounded-card border border-border border-l-2 bg-surface surface-card shadow-float',
       'pointer-events-auto',
       'transition-[transform_var(--duration-slow)_var(--ease-smooth),opacity_var(--duration-base)_var(--ease-smooth)]',
       'motion-reduce:transition-[opacity_var(--duration-base)_linear]',
     ],
     bar: [
       'flex items-center gap-1.5',
-      'border-b border-border bg-surface-2',
+      'border-b border-border bg-surface-2 surface-nested',
       'px-3 py-1.5',
       'font-ui text-label text-text',
     ],
@@ -39,7 +39,7 @@ export const toastVariants = tv({
       'focus-visible:ring-brand-primary focus-visible:ring-offset-ambient focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
     ],
     actionKey: [
-      'rounded-[3px] border border-border px-[0.4ch] text-label text-subtle',
+      'rounded-sm border border-border px-[0.4ch] text-label text-subtle',
     ],
     timer: [
       'absolute inset-x-0 bottom-0 h-0.5 origin-left opacity-70',

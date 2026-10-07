@@ -10,12 +10,12 @@ export const quoteCardNameVariants = tv({
     'has-[a]:transition-colors has-[a]:duration-base has-[a]:ease-smooth',
     'has-[a]:hover:text-brand-primary',
     'has-[:focus-visible]:outline-none has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand-primary',
-    'has-[:focus-visible]:ring-offset-2',
+    'has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-ambient',
   ],
   variants: {
     isSpotlight: {
-      true: ['has-[:focus-visible]:ring-offset-ambient'],
-      false: ['has-[:focus-visible]:ring-offset-surface'],
+      true: [],
+      false: [],
     },
     tone: {
       [BRAND_VARIANT.PRIMARY]: [],

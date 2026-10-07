@@ -5,7 +5,7 @@ export const mediaCardVariants = tv({
   slots: {
     root: [
       'relative flex h-full flex-col overflow-hidden',
-      'bg-surface border-l-2 border-brand-primary',
+      'item-card surface-card',
       'transition-colors duration-base ease-smooth',
       'motion-reduce:transition-none',
     ],

@@ -23,7 +23,7 @@ export const ctaModuleVariants = tv({
     root: [
       'relative isolate flex flex-col',
       'mx-auto w-full max-w-4xl overflow-hidden',
-      'rounded-xl border border-border shadow-card',
+      'rounded-card border border-border shadow-card',
       'px-6 pt-8 pb-8 sm:px-8 sm:pt-10 sm:pb-10',
     ],
     eyebrow: ['mb-3'],
@@ -61,12 +61,12 @@ export const ctaModuleVariants = tv({
           'grid grid-cols-1 gap-8 md:grid-cols-[1.05fr_0.95fr] md:items-center',
         ],
         media: [
-          'aspect-video overflow-hidden rounded-lg border border-border bg-surface-2 sm:aspect-[4/3]',
+          'aspect-video overflow-hidden rounded-media border border-border bg-surface-2 surface-nested sm:aspect-[4/3]',
         ],
       },
       [CTA_VARIANT.CALLOUT]: {
         media: [
-          'order-first mx-auto mb-6 aspect-video w-full max-w-[420px] overflow-hidden rounded-lg border border-border bg-surface-2',
+          'order-first mx-auto mb-6 aspect-video w-full max-w-[420px] overflow-hidden rounded-media border border-border bg-surface-2 surface-nested',
         ],
       },
     },

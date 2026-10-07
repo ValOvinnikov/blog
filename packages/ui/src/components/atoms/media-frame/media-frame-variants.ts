@@ -4,7 +4,7 @@ import type { VariantProps } from 'tailwind-variants';
 export const mediaFrameVariants = tv({
   base: [
     'relative isolate overflow-hidden',
-    'rounded-lg border border-border bg-surface-2',
+    'rounded-media border border-border bg-surface-2 surface-nested',
   ],
   variants: {
     ratio: {

@@ -3,11 +3,7 @@ import type { VariantProps } from 'tailwind-variants';
 
 export const quoteCardVariants = tv({
   slots: {
-    root: [
-      'flex h-full flex-col gap-4',
-      'bg-surface border-l-2 border-brand-primary',
-      'px-card-x py-card-y',
-    ],
+    root: ['flex h-full flex-col gap-4'],
     quoteMark: ['text-brand-primary'],
     caption: ['mt-auto flex items-center gap-3'],
     person: ['flex flex-col justify-center'],
@@ -27,10 +23,12 @@ export const quoteCardVariants = tv({
     },
     isSpotlight: {
       true: {
-        root: ['mx-auto max-w-[38ch] border-l-0 bg-transparent px-0 py-0'],
+        root: ['mx-auto max-w-[38ch]'],
         quoteMark: ['size-6'],
       },
-      false: {},
+      false: {
+        root: ['item-card surface-card px-card-x py-card-y'],
+      },
     },
   },
   defaultVariants: {

@@ -6,7 +6,7 @@ export const bookmarksListVariants = tv({
     list: ['m-0 list-none p-0'],
     row: [
       'flex items-center gap-[1.4ch]',
-      'border-b border-dashed border-border py-[0.28rem]',
+      'border-b border-dashed border-divider py-[0.28rem]',
     ],
     date: ['text-subtle'],
     filename: [

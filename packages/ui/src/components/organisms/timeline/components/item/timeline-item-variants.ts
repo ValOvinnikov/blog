@@ -6,7 +6,7 @@ export const timelineItemVariants = tv({
     root: [
       'relative grid grid-cols-[3rem_1fr] items-start gap-x-4',
       'pb-8 last:pb-0',
-      'before:absolute before:top-8 before:bottom-0 before:left-6 before:w-px before:bg-border before:content-[""]',
+      'before:absolute before:top-8 before:bottom-0 before:left-6 before:w-px before:bg-divider before:content-[""]',
       'last:before:hidden',
     ],
     marker: ['relative row-span-full self-start justify-self-center'],
@@ -18,7 +18,7 @@ export const timelineItemVariants = tv({
       [TIMELINE_ORIENTATION.HORIZONTAL]: {
         root: [
           'lg:grid-cols-1 lg:pb-0 lg:flex-1',
-          'lg:before:top-4 lg:before:bottom-auto lg:before:h-px lg:before:bg-border',
+          'lg:before:top-4 lg:before:bottom-auto lg:before:h-px lg:before:bg-divider',
         ],
         marker: ['lg:row-span-1'],
         content: ['lg:col-start-1 lg:gap-3'],

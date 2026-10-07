@@ -11,7 +11,7 @@ export const switchVariants = tv({
       'peer-checked:bg-brand-primary-solid',
       'peer-disabled:cursor-not-allowed peer-disabled:opacity-50',
       'peer-focus-visible:ring-2 peer-focus-visible:ring-brand-primary',
-      'peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-primary',
+      'peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-ambient',
     ],
     thumb: [
       'absolute left-0.5 h-5 w-5 rounded-full bg-surface shadow-sm transition-transform duration-base ease-smooth',
