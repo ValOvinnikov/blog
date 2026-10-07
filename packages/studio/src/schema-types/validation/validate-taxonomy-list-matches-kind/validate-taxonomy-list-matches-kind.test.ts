@@ -39,11 +39,76 @@ describe('validateTaxonomyListReferencesMatchKind', () => {
     );
   });
 
-  it('passes when neither the legacy field nor modules[] references anything, without querying', async () => {
-    const { context, fetchCalls } = createMockListContext([]);
+  describe('when no taxonomy list exists', () => {
+    let context: ReturnType<typeof createMockListContext>['context'];
+    let fetchCalls: ReturnType<typeof createMockListContext>['fetchCalls'];
 
-    await expect(validate(asDocument({}), context)).resolves.toBe(true);
-    expect(fetchCalls).toHaveLength(0);
+    beforeEach(() => {
+      ({ context, fetchCalls } = createMockListContext([]));
+    });
+
+    it('passes when neither the legacy field nor modules[] references anything, without querying', async () => {
+      await expect(validate(asDocument({}), context)).resolves.toBe(true);
+      expect(fetchCalls).toHaveLength(0);
+    });
+
+    it('ignores modules[] entries of a different type', async () => {
+      const document = asDocument({
+        modules: [{ _key: 'k1', _type: 'module_cta', _ref: 'cta-1' }],
+      });
+
+      await expect(validate(document, context)).resolves.toBe(true);
+      expect(fetchCalls).toHaveLength(0);
+    });
+  });
+
+  describe('when the list taxonomy-list-1 is of the tags kind', () => {
+    let context: ReturnType<typeof createMockListContext>['context'];
+    let fetchCalls: ReturnType<typeof createMockListContext>['fetchCalls'];
+
+    beforeEach(() => {
+      ({ context, fetchCalls } = createMockListContext([
+        { _id: 'taxonomy-list-1', taxonomy: TAXONOMY_KIND.TAGS },
+      ]));
+    });
+
+    it('fails when a modules[] entry lists the other kind, targeting that entry', async () => {
+      const document = asDocument({
+        modules: [
+          { _key: 'k1', _type: MODULE_TYPE_NAME, _ref: 'taxonomy-list-1' },
+        ],
+      });
+
+      await expect(validate(document, context)).resolves.toEqual([
+        { message: MISMATCH_ERROR, path: ['modules', { _key: 'k1' }] },
+      ]);
+    });
+
+    it('falls back to the array index when a mismatching modules[] entry has no _key', async () => {
+      const document = asDocument({
+        modules: [{ _type: MODULE_TYPE_NAME, _ref: 'taxonomy-list-1' }],
+      });
+
+      await expect(validate(document, context)).resolves.toEqual([
+        { message: MISMATCH_ERROR, path: ['modules', 0] },
+      ]);
+    });
+
+    it('deduplicates a ref shared by the legacy field and modules[] into one fetch, but reports both locations', async () => {
+      const document = asDocument({
+        taxonomyList: { _ref: 'taxonomy-list-1' },
+        modules: [
+          { _key: 'k1', _type: MODULE_TYPE_NAME, _ref: 'taxonomy-list-1' },
+        ],
+      });
+
+      await expect(validate(document, context)).resolves.toEqual([
+        { message: MISMATCH_ERROR, path: ['taxonomyList'] },
+        { message: MISMATCH_ERROR, path: ['modules', { _key: 'k1' }] },
+      ]);
+      expect(fetchCalls[0]?.params).toEqual({ ids: ['taxonomy-list-1'] });
+      expect(fetchCalls).toHaveLength(1);
+    });
   });
 
   it('passes when the legacy taxonomyList reference matches the page kind', async () => {
@@ -68,34 +133,6 @@ describe('validateTaxonomyListReferencesMatchKind', () => {
     await expect(validate(document, context)).resolves.toBe(true);
   });
 
-  it('fails when a modules[] entry lists the other kind, targeting that entry', async () => {
-    const { context } = createMockListContext([
-      { _id: 'taxonomy-list-1', taxonomy: TAXONOMY_KIND.TAGS },
-    ]);
-    const document = asDocument({
-      modules: [
-        { _key: 'k1', _type: MODULE_TYPE_NAME, _ref: 'taxonomy-list-1' },
-      ],
-    });
-
-    await expect(validate(document, context)).resolves.toEqual([
-      { message: MISMATCH_ERROR, path: ['modules', { _key: 'k1' }] },
-    ]);
-  });
-
-  it('falls back to the array index when a mismatching modules[] entry has no _key', async () => {
-    const { context } = createMockListContext([
-      { _id: 'taxonomy-list-1', taxonomy: TAXONOMY_KIND.TAGS },
-    ]);
-    const document = asDocument({
-      modules: [{ _type: MODULE_TYPE_NAME, _ref: 'taxonomy-list-1' }],
-    });
-
-    await expect(validate(document, context)).resolves.toEqual([
-      { message: MISMATCH_ERROR, path: ['modules', 0] },
-    ]);
-  });
-
   it('fails when the deprecated legacy field lists the other kind, targeting that field', async () => {
     const { context } = createMockListContext([
       { _id: 'taxonomy-list-legacy', taxonomy: TAXONOMY_KIND.TAGS },
@@ -118,34 +155,5 @@ describe('validateTaxonomyListReferencesMatchKind', () => {
     });
 
     await expect(validate(document, context)).resolves.toBe(true);
-  });
-
-  it('ignores modules[] entries of a different type', async () => {
-    const { context, fetchCalls } = createMockListContext([]);
-    const document = asDocument({
-      modules: [{ _key: 'k1', _type: 'module_cta', _ref: 'cta-1' }],
-    });
-
-    await expect(validate(document, context)).resolves.toBe(true);
-    expect(fetchCalls).toHaveLength(0);
-  });
-
-  it('deduplicates a ref shared by the legacy field and modules[] into one fetch, but reports both locations', async () => {
-    const { context, fetchCalls } = createMockListContext([
-      { _id: 'taxonomy-list-1', taxonomy: TAXONOMY_KIND.TAGS },
-    ]);
-    const document = asDocument({
-      taxonomyList: { _ref: 'taxonomy-list-1' },
-      modules: [
-        { _key: 'k1', _type: MODULE_TYPE_NAME, _ref: 'taxonomy-list-1' },
-      ],
-    });
-
-    await expect(validate(document, context)).resolves.toEqual([
-      { message: MISMATCH_ERROR, path: ['taxonomyList'] },
-      { message: MISMATCH_ERROR, path: ['modules', { _key: 'k1' }] },
-    ]);
-    expect(fetchCalls[0]?.params).toEqual({ ids: ['taxonomy-list-1'] });
-    expect(fetchCalls).toHaveLength(1);
   });
 });

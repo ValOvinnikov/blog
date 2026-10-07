@@ -19,6 +19,7 @@ import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import {
   type DocumentActionComponent,
+  type DocumentActionsResolver,
   type DocumentActionsContext,
   type InputProps,
   type ItemProps,
@@ -70,41 +71,44 @@ describe(buildStudioConfig, () => {
     expect(configWithBasePath.basePath).toBe('/dashboard/studio');
   });
 
-  it('hides the migrationState system ledger from document actions and the new-document menu', () => {
-    const actions = config.document?.actions;
-    if (typeof actions !== 'function') {
-      throw new Error('expected config.document.actions to be a function');
-    }
+  describe('document actions', () => {
+    let actions: DocumentActionsResolver;
 
-    const prev: DocumentActionComponent[] = [];
-    const context = {
-      schemaType: migrationStateSchema.name,
-    } as DocumentActionsContext;
+    beforeEach(() => {
+      const resolver = config.document?.actions;
+      if (typeof resolver !== 'function') {
+        throw new Error('expected config.document.actions to be a function');
+      }
+      actions = resolver;
+    });
 
-    expect(actions(prev, context)).toEqual([]);
-  });
+    it('hides the migrationState system ledger from document actions and the new-document menu', () => {
+      const prev: DocumentActionComponent[] = [];
+      const context = {
+        schemaType: migrationStateSchema.name,
+      } as DocumentActionsContext;
 
-  it('wraps only the landing page publish action', () => {
-    const actions = config.document?.actions;
-    if (typeof actions !== 'function') {
-      throw new Error('expected config.document.actions to be a function');
-    }
-    const publish: DocumentActionComponent = () => null;
-    publish.action = 'publish';
-    const discard: DocumentActionComponent = () => null;
-    discard.action = 'discardChanges';
+      expect(actions(prev, context)).toEqual([]);
+    });
 
-    const [landingPublish, landingDiscard] = actions([publish, discard], {
-      schemaType: PAGE_LANDING_TYPE,
-    } as DocumentActionsContext);
-    const [topicPublish] = actions([publish], {
-      schemaType: PAGE_TOPIC_TYPE,
-    } as DocumentActionsContext);
+    it('wraps only the landing page publish action', () => {
+      const publish: DocumentActionComponent = () => null;
+      publish.action = 'publish';
+      const discard: DocumentActionComponent = () => null;
+      discard.action = 'discardChanges';
 
-    expect(landingPublish).not.toBe(publish);
-    expect(landingPublish?.action).toBe('publish');
-    expect(landingDiscard).toBe(discard);
-    expect(topicPublish).toBe(publish);
+      const [landingPublish, landingDiscard] = actions([publish, discard], {
+        schemaType: PAGE_LANDING_TYPE,
+      } as DocumentActionsContext);
+      const [topicPublish] = actions([publish], {
+        schemaType: PAGE_TOPIC_TYPE,
+      } as DocumentActionsContext);
+
+      expect(landingPublish).not.toBe(publish);
+      expect(landingPublish?.action).toBe('publish');
+      expect(landingDiscard).toBe(discard);
+      expect(topicPublish).toBe(publish);
+    });
   });
 
   it.each([

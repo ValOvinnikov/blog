@@ -5,6 +5,7 @@ import {
   type CreateIfNotExistsMutation,
   type MigrationContext,
 } from 'sanity/migrate';
+import type { MockInstance } from 'vitest';
 
 import migration from './index';
 
@@ -236,7 +237,7 @@ describe('migrate-nav-footer-to-link-library wiring', () => {
     });
 
     describe('with unresolvable items', () => {
-      let warnSpy: ReturnType<typeof vi.spyOn>;
+      let warnSpy: MockInstance<typeof console.warn>;
 
       beforeEach(() => {
         warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});

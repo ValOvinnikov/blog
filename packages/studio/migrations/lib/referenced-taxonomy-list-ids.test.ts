@@ -60,21 +60,20 @@ describe(getReferencedTaxonomyListIds, () => {
     let context: ReturnType<typeof createMockContext>['context'];
     let fetchCalls: ReturnType<typeof createMockContext>['fetchCalls'];
 
-    beforeEach(() => {
+    beforeEach(async () => {
       ({ context, fetchCalls } = createMockContext([
         { taxonomyRef: 'list-1', moduleRefs: [] },
       ]));
+      await getReferencedTaxonomyListIds(context, 'page_topicIndex');
     });
 
     it('caches the result per context and pageType, fetching only once', async () => {
-      await getReferencedTaxonomyListIds(context, 'page_topicIndex');
       await getReferencedTaxonomyListIds(context, 'page_topicIndex');
 
       expect(fetchCalls).toHaveLength(1);
     });
 
     it('fetches separately per pageType against the same context', async () => {
-      await getReferencedTaxonomyListIds(context, 'page_topicIndex');
       await getReferencedTaxonomyListIds(context, 'page_tagIndex');
 
       expect(fetchCalls).toHaveLength(2);

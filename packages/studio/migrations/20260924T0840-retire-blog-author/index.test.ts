@@ -23,12 +23,26 @@ const deletableContext = createContext({
 });
 
 describe('retire-blog-author migration — blog_author documents', () => {
-  it('deletes a blog_author once its person counterpart is verified deletable', async () => {
-    const doc = { ...baseDoc, _id: 'author-1', _type: 'blog_author' };
+  describe('with a published blog_author', () => {
+    let doc: typeof baseDoc & { _id: string; _type: string };
 
-    const mutations = await migration.migrate.document(doc, deletableContext);
+    beforeEach(() => {
+      doc = { ...baseDoc, _id: 'author-1', _type: 'blog_author' };
+    });
 
-    expect(mutations).toEqual([del('author-1')]);
+    it('deletes a blog_author once its person counterpart is verified deletable', async () => {
+      const mutations = await migration.migrate.document(doc, deletableContext);
+
+      expect(mutations).toEqual([del('author-1')]);
+    });
+
+    it('rejects (aborting the run) when the precondition fails', async () => {
+      const context = createContext({ target: null, refCount: 0 });
+
+      await expect(migration.migrate.document(doc, context)).rejects.toThrow(
+        /does not exist/,
+      );
+    });
   });
 
   it('deletes a draft blog_author, checking its counterpart drafts.person id', async () => {
@@ -49,15 +63,6 @@ describe('retire-blog-author migration — blog_author documents', () => {
     expect(fetchCalls).toEqual([
       { personId: 'drafts.person-author-1', id: 'drafts.author-1' },
     ]);
-  });
-
-  it('rejects (aborting the run) when the precondition fails', async () => {
-    const doc = { ...baseDoc, _id: 'author-1', _type: 'blog_author' };
-    const context = createContext({ target: null, refCount: 0 });
-
-    await expect(migration.migrate.document(doc, context)).rejects.toThrow(
-      /does not exist/,
-    );
   });
 
   it('leaves unrelated document types untouched', async () => {

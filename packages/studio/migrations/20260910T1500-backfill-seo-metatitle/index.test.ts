@@ -39,6 +39,7 @@ const runDocument = (doc: Record<string, unknown>, context: MigrationContext) =>
   );
 
 describe('seo.metaTitle backfill document() wiring', () => {
+  const heading = 'Shipping Heroes Without a Designer';
   let context: MigrationContext;
 
   beforeEach(() => {
@@ -187,8 +188,6 @@ describe('seo.metaTitle backfill document() wiring', () => {
   });
 
   it('leaves an already-long page_post heading untouched', async () => {
-    const heading = 'Shipping Heroes Without a Designer';
-
     const result = await runDocument(
       {
         _id: 'page_post-2',
@@ -342,8 +341,6 @@ describe('seo.metaTitle backfill document() wiring', () => {
   });
 
   it('leaves an already-long page_landing heading untouched', async () => {
-    const heading = 'Shipping Heroes Without a Designer';
-
     const result = await runDocument(
       {
         _id: 'page_landing-2',

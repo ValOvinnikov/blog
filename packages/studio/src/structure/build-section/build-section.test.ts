@@ -676,8 +676,13 @@ describe(buildSections, () => {
     const documentListOf = (item: TMockBuilder) =>
       callArgs(item, 'child')?.[0] as TMockBuilder;
 
+    let list: TMockBuilder;
+
+    beforeEach(() => {
+      list = documentListOf(buildTreeItem());
+    });
+
     it('lists only top-level pages per language and opens each through the tree', () => {
-      const list = documentListOf(buildTreeItem());
       const [english] = callArgs(list, 'items')?.[0] as TMockBuilder[];
       const englishList = documentListOf(english!);
 
@@ -691,7 +696,6 @@ describe(buildSections, () => {
     });
 
     it('keeps all pages as one flat list of every page', () => {
-      const list = documentListOf(buildTreeItem());
       const allPages = (callArgs(list, 'items')?.[0] as TMockBuilder[]).at(-1)!;
       const allPagesList = documentListOf(allPages);
 
