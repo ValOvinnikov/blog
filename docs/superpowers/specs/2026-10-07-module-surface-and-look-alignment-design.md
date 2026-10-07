@@ -1049,6 +1049,7 @@ Inside an epic, the rows ship strictly in order, and each one merges before the 
    - What would change it: evidence that visitors click static pricing or testimonial cards expecting a link. Those items would then drop to FLAT.
 3. **One card style per site, or a per-module override?**
    - Recommendation: one per site, on the Look page, with no module field.
+   - **Decided 2026-10-07 by the product owner: one per site**, set on the Look page, with no module field.
    - What would change it: a planned module, such as the gallery or a project list, that must look different from post cards on the same page.
 4. **What should editors call "Brand Variant"?**
    - Recommendation: "Background", with the options Plain, Shaded and Brand tint. On the CTA, use "Card background" for the card fill and "Background" for the band behind it.

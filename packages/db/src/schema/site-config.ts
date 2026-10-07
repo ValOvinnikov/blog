@@ -1,10 +1,12 @@
 import type { TVoicePortableText } from '@blog/config';
 import {
+  CARD_STYLE,
   DENSITY,
   FONT_CHOICE,
   LANGUAGE_SWITCHER_STYLE,
   PRESET_ID,
   RADIUS_SCALE,
+  type TCardStyle,
   type TDensity,
   type TFontChoice,
   type TLanguageSwitcherStyle,
@@ -51,6 +53,11 @@ export const languageSwitcherStyleEnum = pgEnum(
   ],
 );
 
+export const cardStyleEnum = pgEnum(
+  'card_style',
+  Object.values(CARD_STYLE) as [TCardStyle, ...TCardStyle[]],
+);
+
 // `voiceOverrides` defaults to `{}` so "no overrides" has one representation, never also null.
 export const siteConfig = pgTable('site_config', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -68,6 +75,9 @@ export const siteConfig = pgTable('site_config', {
   languageSwitcherStyle: languageSwitcherStyleEnum('language_switcher_style')
     .notNull()
     .default(LANGUAGE_SWITCHER_STYLE.MENU_CODE),
+  cardStyle: cardStyleEnum('card_style')
+    .notNull()
+    .default(CARD_STYLE.ACCENT_BAR),
   logoAssetUrl: text('logo_asset_url'),
   faviconAssetUrl: text('favicon_asset_url'),
   voiceOverrides: jsonb('voice_overrides')

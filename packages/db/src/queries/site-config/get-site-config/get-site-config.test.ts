@@ -1,4 +1,4 @@
-import { PRESET_ID } from '@blog/config/constants';
+import { CARD_STYLE, PRESET_ID } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
@@ -47,6 +47,7 @@ describe(getSiteConfig, () => {
       preset: PRESET_ID.CONSOLE,
       accentHue: 250,
       logoHue: undefined,
+      cardStyle: CARD_STYLE.ACCENT_BAR,
       logoAssetUrl: undefined,
       faviconAssetUrl: undefined,
       voiceOverrides: {},

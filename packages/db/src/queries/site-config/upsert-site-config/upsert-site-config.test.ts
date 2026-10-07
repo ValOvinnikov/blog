@@ -1,4 +1,5 @@
 import {
+  CARD_STYLE,
   DENSITY,
   FONT_CHOICE,
   LANGUAGE_SWITCHER_STYLE,
@@ -188,6 +189,55 @@ describe(upsertSiteConfig, () => {
 
     await expect(
       upsertSiteConfig(tenantId, { ...baseInput, languageSwitcherStyle }),
+    ).rejects.toThrow();
+  });
+
+  it('gives a new Console config the accent-bar card style', async () => {
+    const result = expectOk(await upsertSiteConfig(tenantId, baseInput));
+
+    expect(result.cardStyle).toBe(CARD_STYLE.ACCENT_BAR);
+  });
+
+  it('gives a new Editorial config the outlined card style', async () => {
+    const result = expectOk(
+      await upsertSiteConfig(tenantId, {
+        ...baseInput,
+        preset: PRESET_ID.EDITORIAL,
+      }),
+    );
+
+    expect(result.cardStyle).toBe(CARD_STYLE.OUTLINED);
+  });
+
+  it('stores a chosen card style over the preset default', async () => {
+    const result = expectOk(
+      await upsertSiteConfig(tenantId, {
+        ...baseInput,
+        cardStyle: CARD_STYLE.OUTLINED,
+      }),
+    );
+
+    expect(result.cardStyle).toBe(CARD_STYLE.OUTLINED);
+  });
+
+  it('keeps the card style when a later save omits it, even across a preset change', async () => {
+    await upsertSiteConfig(tenantId, baseInput);
+
+    const result = expectOk(
+      await upsertSiteConfig(tenantId, {
+        ...baseInput,
+        preset: PRESET_ID.EDITORIAL,
+      }),
+    );
+
+    expect(result.cardStyle).toBe(CARD_STYLE.ACCENT_BAR);
+  });
+
+  it('rejects an unknown card style', async () => {
+    const cardStyle = 'SHADOWED' as TUpdateSiteConfigInput['cardStyle'];
+
+    await expect(
+      upsertSiteConfig(tenantId, { ...baseInput, cardStyle }),
     ).rejects.toThrow();
   });
 

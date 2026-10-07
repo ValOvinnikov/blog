@@ -1,4 +1,5 @@
 import {
+  CARD_STYLE,
   DENSITY,
   FONT_CHOICE,
   LANGUAGE_SWITCHER_STYLE,
@@ -39,6 +40,7 @@ describe(toLookFormValues, () => {
       radiusScale: RADIUS_SCALE.LG,
       density: DENSITY.COMPACT,
       languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
+      cardStyle: CARD_STYLE.OUTLINED,
       logoAssetUrl: 'https://example.blob.vercel-storage.com/logo.png',
       faviconAssetUrl: 'https://example.blob.vercel-storage.com/favicon.png',
       voiceOverrides: {},
