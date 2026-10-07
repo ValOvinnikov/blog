@@ -12,4 +12,5 @@ export {
   NEUTRAL_SCRIM_RIGHT,
   NEUTRAL_SCRIM_RIGHT_FROM_SM,
 } from './scrims';
+export { BRAND_PILL } from './pill';
 export { tv } from './tv';

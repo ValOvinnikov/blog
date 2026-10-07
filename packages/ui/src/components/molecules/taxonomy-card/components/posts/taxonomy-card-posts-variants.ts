@@ -9,7 +9,7 @@ export const taxonomyCardPostsVariants = tv({
       'transition-colors duration-base ease-smooth',
       'hover:text-brand-primary-hover hover:underline',
       'rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
-      'focus-visible:ring-offset-2 focus-visible:ring-offset-brand-primary-muted',
+      'focus-visible:ring-offset-2 focus-visible:ring-offset-ambient',
     ],
   },
 });

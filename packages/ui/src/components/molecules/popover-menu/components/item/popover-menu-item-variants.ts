@@ -9,7 +9,7 @@ export const popoverMenuItemVariants = tv({
     'transition-colors duration-base ease-smooth',
     'hover:bg-surface-2 hover:text-brand-primary',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
-    'focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
+    'focus-visible:ring-offset-2 focus-visible:ring-offset-ambient',
   ],
   variants: {
     variant: {

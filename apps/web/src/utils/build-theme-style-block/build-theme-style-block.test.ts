@@ -110,7 +110,7 @@ describe('buildThemeStyleBlock', () => {
       'utf8',
     );
     const staticDeclarations = themeCss.match(
-      /--(radius[\w-]*|spacing-(gutter|section|page-y|site-x|site-y|card-x|card-y)): [^;]+;/g,
+      /--(radius[\w-]*|spacing-(gutter|section|page-y|site-x|site-y|card-x|card-y)): (?!var\()[^;]+;/g,
     );
 
     expect(staticDeclarations).toHaveLength(12);

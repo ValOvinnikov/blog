@@ -1,6 +1,6 @@
 import { createTV } from 'tailwind-variants';
 
-/** Registers this project's custom Tailwind token names (font sizes, font families, spacing, tracking) with tailwind-merge's classGroups so it can tell them apart instead of silently dropping a conflicting class. */
+/** Registers this project's custom Tailwind token names with tailwind-merge's classGroups so conflicts between them and Tailwind's built-ins resolve correctly. */
 const SPACING_TOKENS = [
   'gutter',
   'section',
@@ -52,6 +52,8 @@ export const tv = createTV({
           },
         ],
         tracking: [{ tracking: TRACKING_TOKENS }],
+        rounded: [{ rounded: ['card', 'media', 'item'] }],
+        shadow: [{ shadow: ['card', 'float'] }],
         p: [{ p: SPACING_TOKENS }],
         px: [{ px: SPACING_TOKENS }],
         py: [{ py: SPACING_TOKENS }],
