@@ -1854,7 +1854,9 @@ else to that language's Home.
 
 **SEO.** Every page carries `hreflang` alternates for its translations plus
 `x-default` (the default language), a self-referencing canonical per
-language, and `<html lang>`; sitemap entries carry the same alternates. Each
+language, and `<html lang>`; sitemap entries carry the same alternates. A
+page with no live translation renders normally and carries no `hreflang`
+alternates, only its canonical. Each
 language has its own RSS feed (`/rss.xml` for the default language,
 `/<lang>/rss.xml` otherwise, same for tag feeds) carrying only that
 language's posts. Every page also emits `og:locale` for its language and
