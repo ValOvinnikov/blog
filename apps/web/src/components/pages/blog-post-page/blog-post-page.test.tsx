@@ -14,6 +14,8 @@ import { BlogPostPage } from './blog-post-page';
 
 vi.mock('@web/server/request-context/request-context');
 
+vi.mock('@web/server/site-settings/get-site-settings/get-site-settings');
+
 vi.mock('@blog/service', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@blog/service')>();
   return {
@@ -72,7 +74,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
         name: 'Breadcrumb',
       });
       expect(
-        within(breadcrumbs).getByRole('link', { name: 'Home' }),
+        within(breadcrumbs).getByRole('link', { name: 'Northwind Journal' }),
       ).toBeVisible();
       expect(
         within(breadcrumbs).getByRole('link', { name: 'Engineering' }),

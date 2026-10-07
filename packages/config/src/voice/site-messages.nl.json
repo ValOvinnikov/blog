@@ -5,11 +5,7 @@
     "pageSuffix": "– Pagina {page}"
   },
   "breadcrumbs": {
-    "home": "Home",
-    "ariaLabel": "Kruimelpad",
-    "topics": "Onderwerpen",
-    "tags": "Tags",
-    "blog": "Blog"
+    "ariaLabel": "Kruimelpad"
   },
   "notFound": {
     "eyebrow": "404",

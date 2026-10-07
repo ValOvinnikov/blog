@@ -5,11 +5,7 @@
     "pageSuffix": "– Seite {page}"
   },
   "breadcrumbs": {
-    "home": "Startseite",
-    "ariaLabel": "Brotkrumennavigation",
-    "topics": "Themen",
-    "tags": "Schlagwörter",
-    "blog": "Blog"
+    "ariaLabel": "Brotkrumennavigation"
   },
   "notFound": {
     "eyebrow": "404",

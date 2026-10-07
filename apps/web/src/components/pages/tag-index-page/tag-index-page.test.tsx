@@ -21,6 +21,8 @@ import { TagIndexPage } from './tag-index-page';
 
 vi.mock('@web/server/request-context/request-context');
 
+vi.mock('@web/server/site-settings/get-site-settings/get-site-settings');
+
 vi.mock('@blog/service', () => ({
   service: {
     pages: { tagIndex: { v1: { getIndexPage: vi.fn() } } },
@@ -128,7 +130,7 @@ describe(`<${TagIndexPage.name}/>`, () => {
         name: 'Breadcrumb',
       });
       expect(
-        within(breadcrumbs).getByRole('link', { name: 'Home' }),
+        within(breadcrumbs).getByRole('link', { name: 'Northwind Journal' }),
       ).toBeVisible();
       expect(within(breadcrumbs).getByText('Tags')).toBeVisible();
       expect(screen.getByRole('main')).not.toContainElement(breadcrumbs);

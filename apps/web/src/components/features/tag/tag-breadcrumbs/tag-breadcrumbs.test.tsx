@@ -1,6 +1,7 @@
 import { customRenderAsync } from '@web/testing/custom-render';
 import {
   testBreadcrumbsJsonLdSchema,
+  testBreadcrumbsJsonLdTrail,
   testBreadcrumbsTrail,
   testForwardsArgsToLoader,
   testNoJsonLdWithoutBaseUrl,
@@ -12,6 +13,8 @@ import { makeTag } from '@web/testing/shared/tag/fixtures';
 import { TagBreadcrumbs } from './tag-breadcrumbs';
 
 vi.mock('@web/server/request-context/request-context');
+
+vi.mock('@web/server/site-settings/get-site-settings/get-site-settings');
 
 const { getTagPageMock } = vi.hoisted(() => ({
   getTagPageMock: vi.fn(),
@@ -45,7 +48,7 @@ describe(`<${TagBreadcrumbs.name}/>`, () => {
     pageLoaderMock: getTagPageMock,
     setup,
     successData,
-    linkSteps: [{ label: 'Home', href: '/' }],
+    linkSteps: [{ label: 'Northwind Journal', href: '/' }],
     currentLabel: 'TypeScript',
   });
   testBreadcrumbsJsonLdSchema({
@@ -53,6 +56,15 @@ describe(`<${TagBreadcrumbs.name}/>`, () => {
     setup,
     successData,
     itemPath: '/tags/typescript',
+  });
+  testBreadcrumbsJsonLdTrail({
+    pageLoaderMock: getTagPageMock,
+    setup,
+    successData,
+    expectedTrail: [
+      { name: 'Northwind Journal', path: '/' },
+      { name: 'TypeScript', path: '/tags/typescript' },
+    ],
   });
   testNoJsonLdWithoutBaseUrl({
     pageLoaderMock: getTagPageMock,

@@ -4,6 +4,7 @@ import {
   testBreadcrumbsJsonLdSchema,
   testNoJsonLdWithoutBaseUrl,
 } from '@web/testing/shared/breadcrumbs-page-contract/breadcrumbs-page-contract';
+import { DEFAULT_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
 
 interface IStaticBreadcrumbsContractOptions {
   setup: TAsyncSetup;
@@ -16,12 +17,14 @@ export const testStaticBreadcrumbsContract = ({
   label,
   path,
 }: IStaticBreadcrumbsContractOptions) => {
-  it(`renders the Home › ${label} breadcrumbs trail`, async () => {
+  it(`renders the home › ${label} breadcrumbs trail`, async () => {
     await setup();
 
     const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
 
-    const homeLink = within(nav).getByRole('link', { name: 'Home' });
+    const homeLink = within(nav).getByRole('link', {
+      name: DEFAULT_SITE_SETTINGS.brand.name,
+    });
     expect(homeLink).toHaveAttribute('href', '/');
 
     const current = within(nav).getByText(label);

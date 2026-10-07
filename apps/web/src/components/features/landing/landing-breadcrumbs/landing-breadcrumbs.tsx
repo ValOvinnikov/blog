@@ -7,6 +7,7 @@ import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { getLandingPage } from '@web/server/landing/get-landing-page/get-landing-page';
+import { getHomeBreadcrumb } from '@web/server/site-settings/get-home-breadcrumb/get-home-breadcrumb';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 import { getTranslations } from 'next-intl/server';
@@ -28,7 +29,10 @@ export const LandingBreadcrumbs = async ({
   );
   const { headingBlock, sectionNavigation } = page;
 
-  const t = await getTranslations('breadcrumbs');
+  const [homeBreadcrumb, t] = await Promise.all([
+    getHomeBreadcrumb(),
+    getTranslations('breadcrumbs'),
+  ]);
 
   const pageTrail: IBreadcrumbItem[] = sectionNavigation
     ? sectionNavigation.breadcrumbs.map((breadcrumb) => ({
@@ -36,10 +40,7 @@ export const LandingBreadcrumbs = async ({
         href: routes.landingPage(breadcrumb.path),
       }))
     : [{ label: headingBlock.heading, href: routes.landingPage(path) }];
-  const breadcrumbTrail: IBreadcrumbItem[] = [
-    { label: t('home'), href: routes.home() },
-    ...pageTrail,
-  ];
+  const breadcrumbTrail: IBreadcrumbItem[] = [homeBreadcrumb, ...pageTrail];
   const breadcrumbListSchema = await buildBreadcrumbListSchema(breadcrumbTrail);
 
   return (

@@ -2,9 +2,8 @@
  * Every `site-messages.en.json` key deliberately left out of `VOICE_FIELDS`,
  * grouped by why: accessibility-only text, generic toast/operation feedback,
  * counters carrying ICU plural syntax, metadata with no visible counterpart,
- * archive/breadcrumb labels derived from Studio content, a taxonomy label
- * tied to a Sanity-modelled enum, fixed operational newsletter copy, and
- * fixed sign-in interface mechanics. The coverage test fails if a catalog
+ * a taxonomy label tied to a Sanity-modelled enum, fixed operational
+ * newsletter copy, and fixed sign-in interface mechanics. The coverage test fails if a catalog
  * key is on neither this list nor `VOICE_FIELDS`, so a new string can't be
  * added without deciding which.
  */
@@ -53,11 +52,6 @@ export const VOICE_FIXED_KEYS = [
   'pricingModule.tabs.MONTH',
   'pricingModule.tabs.YEAR',
   'pricingModule.periodSwitchLabel',
-
-  'breadcrumbs.home',
-  'breadcrumbs.topics',
-  'breadcrumbs.tags',
-  'breadcrumbs.blog',
 
   'blogPostPage.asideKind.WHY_NOT',
   'blogPostPage.asideKind.DIGRESSION',

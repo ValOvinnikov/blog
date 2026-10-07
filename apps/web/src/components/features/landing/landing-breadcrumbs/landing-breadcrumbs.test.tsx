@@ -16,6 +16,8 @@ import { LandingBreadcrumbs } from './landing-breadcrumbs';
 
 vi.mock('@web/server/request-context/request-context');
 
+vi.mock('@web/server/site-settings/get-site-settings/get-site-settings');
+
 const { getLandingPageMock } = vi.hoisted(() => ({
   getLandingPageMock: vi.fn(),
 }));
@@ -45,7 +47,7 @@ describe(`<${LandingBreadcrumbs.name}/>`, () => {
     pageLoaderMock: getLandingPageMock,
     setup,
     successData: mockLandingPage,
-    linkSteps: [{ label: 'Home', href: '/' }],
+    linkSteps: [{ label: 'Northwind Journal', href: '/' }],
     currentLabel: 'About Us',
   });
   testBreadcrumbsJsonLdSchema({
@@ -76,7 +78,7 @@ describe(`<${LandingBreadcrumbs.name}/>`, () => {
         sectionNavigation: makeLandingSectionNavigation(),
       },
       linkSteps: [
-        { label: 'Home', href: '/' },
+        { label: 'Northwind Journal', href: '/' },
         { label: 'Modules', href: '/modules' },
       ],
       currentLabel: 'FAQ',
