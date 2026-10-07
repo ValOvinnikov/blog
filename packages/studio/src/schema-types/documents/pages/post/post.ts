@@ -11,10 +11,7 @@ import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/
 import { postRelatedSchema } from '@blog/studio/schema-types/modules/post-related/post-related';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
-import {
-  pageHeadingAlignmentFields,
-  pageHeadingBlockField,
-} from '@blog/studio/schema-types/objects/page-heading-block/page-heading-block-field';
+import { pageHeadingBlockField } from '@blog/studio/schema-types/objects/page-heading-block/page-heading-block-field';
 import { postTakeawaysSchema } from '@blog/studio/schema-types/objects/post-takeaways/post-takeaways';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
 import { articleTextSchema } from '@blog/studio/schema-types/portable-text/article-text/article-text';
@@ -39,8 +36,7 @@ export const postPageSchema = defineType({
       previewInput: postSlugUrlPreviewInput,
       isUnique: validateSlugUniqueInLanguage,
     }),
-    pageHeadingBlockField(),
-    ...pageHeadingAlignmentFields(),
+    ...pageHeadingBlockField(),
     defineField({
       name: 'heroImage',
       title: 'Hero Image',
