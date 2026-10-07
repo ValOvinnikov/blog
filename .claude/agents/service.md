@@ -395,6 +395,8 @@ delete-don't-shorten rule. It is not restated here; follow it as written.
   network. See the `testing-practices` skill
   (`.claude/skills/testing-practices/SKILL.md` — read it with Read; you have
   no Skill tool) for patterns, fixture conventions, and the loader test setup.
+  Repeated per-`it` arrangement goes in `beforeEach` — mandatory
+  (`testing-practices` → "Repeated arrangement goes in `beforeEach`").
 - Run `pnpm --filter @blog/service type-check` after each major group of files
   — fast, catches structural errors early without verbose test output.
 - Run the full test suite **once, after all implementation is complete**:

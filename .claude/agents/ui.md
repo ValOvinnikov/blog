@@ -154,6 +154,8 @@ delete-don't-shorten rule. It is not restated here; follow it as written.
   `hero-media`. A variant whose only
   effect is styling gets a story and `no-tests-needed`, not a test. See the
   `testing-practices` skill (`.claude/skills/testing-practices/SKILL.md`).
+  Repeated per-`it` arrangement goes in `beforeEach` — mandatory
+  (`testing-practices` → "Repeated arrangement goes in `beforeEach`").
 - Use `@faker-js/faker` for realistic mock data in tests and stories — never
   hardcode `"Title"` or `"Lorem ipsum"` when a faker call gives better coverage.
   Seed tests for determinism: `faker.seed(123)` at the top of each test file.

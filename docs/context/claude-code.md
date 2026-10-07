@@ -693,7 +693,7 @@ file` are all denied alike) — an earlier version only handled the
   - `ui-library-practices` — building pure, prop-driven design-system components.
   - `web-component-practices` — building interactive `apps/web` components (compose `@blog/ui` via slots, client behaviour in ref-based hooks, merge Portable Text component maps rather than spreading them).
   - `ui-storybook` / `web-storybook` — Storybook conventions per workspace.
-  - `testing-practices` — Vitest + Testing Library conventions: fake only the edges (shared fakes in `__mocks__/`), never our own components, and behaviour titles of 80 characters or fewer.
+  - `testing-practices` — Vitest + Testing Library conventions: fake only the edges (shared fakes in `__mocks__/`), never our own components, repeated per-`it` arrangement in `beforeEach` (mandatory), and behaviour titles of 80 characters or fewer.
   - `seo-and-metadata` — per-route metadata, JSON-LD, sitemap/robots/RSS.
   - `code-review-practices` — boundary/type/SEO/test checklist before a PR.
   - `refactor-sweep` — on-demand, layer-scoped cleanup audit (duplication,

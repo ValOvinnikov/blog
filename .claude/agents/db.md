@@ -301,6 +301,8 @@ delete-don't-shorten rule. It is not restated here; follow it as written.
   general fixture conventions; adapt its "mock the client" service guidance
   to "prefer a real (test/dev) database connection" here, since Drizzle's
   value is largely in the SQL it generates, which a mock can't verify.
+  Repeated per-`it` arrangement goes in `beforeEach` — mandatory
+  (`testing-practices` → "Repeated arrangement goes in `beforeEach`").
 - Run `pnpm --filter @blog/db type-check` after each major group of files.
 - Run the full test suite **once, after all implementation is complete**:
   `pnpm --filter @blog/db test`.

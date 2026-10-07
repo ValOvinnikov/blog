@@ -520,6 +520,8 @@ delete-don't-shorten rule. It is not restated here; follow it as written.
 - **Tests follow `testing-practices` → "Writing a component test":** query
   ladder `getByRole` → `getByText` → `getByTestId`, `userEvent` for every
   interaction, `findBy*`/`waitFor` for async, a module-level `setup`.
+  Repeated per-`it` arrangement goes in `beforeEach` — mandatory
+  (`testing-practices` → "Repeated arrangement goes in `beforeEach`").
 - **Query through `screen`, never the DOM.** `container.querySelector`, a
   node walk (`.parentElement`, `.children`) and queries destructured from
   `render()` fail lint (`testing-library/no-container`, `no-node-access`,

@@ -272,15 +272,22 @@ export default mergeConfig(
   // ❌ never RTL's render directly: import { render } from '@testing-library/react';
   ```
 
-- **`beforeEach(setup)` for uniform suites; inline `setup({…})` when props vary.**
-  If every `it` in a suite renders the **same** props, call `setup()` in
-  `beforeEach` and query `screen`. If tests need **different** props, call
-  `setup({ overrides })` inline in each `it` — that is the factory's purpose, not
-  the repeated-`renderComponent()` smell. Don't pair a `beforeEach(setup)` default
-  with an inline override in the same `describe` (it double-renders); a genuinely
-  different render goes in its own `describe`. (Testing Library auto-cleans
-  between tests; drive small variations through the shared render where you can —
-  e.g. an outside click via `fireEvent.mouseDown(document.body)`.)
+- **Repeated arrangement goes in `beforeEach` — mandatory.** When two or more
+  `it`s in a `describe` open with the same line, that line moves into the
+  `describe`'s `beforeEach`: a uniform `setup()` render, `userEvent.setup()`,
+  a fake's default (`vi.mocked(fn).mockResolvedValue(…)`), a fixture build,
+  fake timers (`vi.useFakeTimers()` / `vi.setSystemTime(…)`). A value the
+  cases read (`user`, a fixture) is a `let` declared in the `describe` and
+  assigned in `beforeEach`. Each `it` keeps only what makes it different — an
+  inline `setup({ overrides })` stays in the `it`, because different props are
+  not repeated arrangement; that is the factory's purpose. Never pair a
+  `beforeEach` render with an inline one in the same `describe` (it
+  double-renders); a genuinely different render goes in its own `describe`.
+  Anything `beforeEach` changes globally (fake timers, a stubbed global) is
+  undone in `afterEach`. Arrangement duplicated across `it`s is a blocking
+  review finding. (Testing Library auto-cleans between tests; drive small
+  variations through the shared render where you can — e.g. an outside click
+  via `fireEvent.mouseDown(document.body)`.)
 
   ```tsx
   // ✅ uniform props → beforeEach
@@ -398,8 +405,9 @@ it never reads state, props, handlers or markup shape.
   `.not.toBeInTheDocument()`.** Never `.toBeInTheDocument()` for presence
   (hidden still passes) and never `getBy*` for absence (it throws before the
   matcher runs).
-- **Interaction is `userEvent`, set up once per test.** Create it with
-  `userEvent.setup()`, then `await user.click(…)`, `user.type(…)`,
+- **Interaction is `userEvent`, created in `beforeEach`.** Assign
+  `user = userEvent.setup()` there (see "Repeated arrangement goes in
+  `beforeEach`"), then `await user.click(…)`, `user.type(…)`,
   `user.keyboard('{Escape}')` — it dispatches the whole event sequence a
   real user produces. `fireEvent` is reserved for an event `userEvent` cannot
   produce, such as an outside `mousedown` on `document.body`; a `fireEvent.click`
@@ -427,9 +435,14 @@ const setup = customRender(SubscribeForm, {
 });
 
 describe(`<${SubscribeForm.name}/>`, () => {
+  let user: UserEvent;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
   it('subscribes the entered email', async () => {
     const onSubscribe = vi.fn();
-    const user = userEvent.setup();
     setup({ onSubscribe });
 
     await user.type(
@@ -442,7 +455,6 @@ describe(`<${SubscribeForm.name}/>`, () => {
   });
 
   it('replaces the form with the confirmation once the subscription resolves', async () => {
-    const user = userEvent.setup();
     setup({ onSubscribe: vi.fn().mockResolvedValue(undefined) });
 
     await user.click(screen.getByRole('button', { name: 'Subscribe' }));
@@ -545,4 +557,5 @@ rather than leaving them silent.
 - [ ] Only edges faked, shared fakes from `__mocks__/`; no network, no real time.
 - [ ] Queried by role/text; asserts behaviour, not implementation detail.
 - [ ] Every `it` title is behaviour, 80 characters or fewer.
+- [ ] No arrangement line repeated across `it`s — it lives in `beforeEach`.
 - [ ] `pnpm --filter <pkg> test` passes.

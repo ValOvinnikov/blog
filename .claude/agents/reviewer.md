@@ -93,7 +93,9 @@ Review for what a contract check won't catch:
 - **Maintainability:** naming, dead code, missing tests for changed
   behaviour, stale comments/docs contradicting the code. Duplication is
   reported from the clone run in Pass 1 — anything the diff copies (a helper,
-  component, hook, test fake, fixture or test arrangement) is blocking; a
+  component, hook, test fake, fixture or test arrangement) is blocking; an
+  arrangement line repeated across `it`s that is not in `beforeEach` is
+  blocking too (`testing-practices`); a
   duplication already on `main` that the diff adds nothing to is filed. Name the sibling it should have extended.
 
 ### Duplication is checked against the repo, not against the diff

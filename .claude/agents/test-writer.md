@@ -120,6 +120,9 @@ prune: note them as a finding.
   module-level `setup`. A component a test can only reach by test id is a
   markup finding (`react-component-practices` → "Accessible by
   construction"), reported, not worked around.
+- **Every test, every layer:** repeated per-`it` arrangement goes in
+  `beforeEach` — mandatory (`testing-practices` → "Repeated arrangement goes
+  in `beforeEach`").
 - **`@blog/ui`** components: Testing Library, query by role/text, assert
   behaviour/props/variants — never class names or snapshots, not even a
   class a prop toggles (the `no-class-assertions` lint rule fails it); a
