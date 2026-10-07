@@ -1,5 +1,5 @@
 import { IMAGE_LAYOUT } from '@blog/config';
-import { tv } from '@blog/ui/lib/styling';
+import { FULL_BLEED, tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const imageWithCaptionVariants = tv({
@@ -12,11 +12,8 @@ export const imageWithCaptionVariants = tv({
         figure: ['w-full'],
       },
       [IMAGE_LAYOUT.FULL_BLEED]: {
-        // Centred on its parent and sized to the viewport, so the parent column must itself be viewport-centred; the root clips horizontal overflow from the scrollbar gutter that `100vw` includes.
-        figure: [
-          'relative left-1/2 w-screen -ml-[50vw]',
-          '[html:has(&)]:overflow-x-clip',
-        ],
+        // Centred on its parent, so the parent column must itself be viewport-centred.
+        figure: FULL_BLEED,
       },
       [IMAGE_LAYOUT.FLOAT_LEFT]: {
         // Padding, not margin, carries the gap: a consumer's `mx-*` on prose children zeroes a float's margins. Floats start at `lg:` so the wrapped text column stays wide enough to read.

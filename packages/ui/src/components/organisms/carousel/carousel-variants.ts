@@ -1,5 +1,9 @@
 import { CONTENT_ALIGNMENT } from '@blog/config';
-import { tv } from '@blog/ui/lib/styling';
+import {
+  CARD_GUTTER_OFFSET,
+  CARD_GUTTER_START,
+  tv,
+} from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const carouselVariants = tv({
@@ -15,18 +19,12 @@ export const carouselVariants = tv({
   variants: {
     slideSize: {
       fraction: {
-        track: ['-ml-[0.875rem] md:-ml-[1.25rem] lg:-ml-[1.75rem]'],
-        slide: [
-          'basis-[85%] sm:basis-1/2 md:basis-1/3',
-          'pl-[0.875rem] md:pl-[1.25rem] lg:pl-[1.75rem]',
-        ],
+        track: [CARD_GUTTER_OFFSET],
+        slide: ['basis-[85%] sm:basis-1/2 md:basis-1/3', CARD_GUTTER_START],
       },
       stepped: {
-        track: ['-ml-[0.875rem] md:-ml-[1.25rem] lg:-ml-[1.75rem]'],
-        slide: [
-          'basis-[85%] sm:basis-1/2 lg:basis-1/3',
-          'pl-[0.875rem] md:pl-[1.25rem] lg:pl-[1.75rem]',
-        ],
+        track: [CARD_GUTTER_OFFSET],
+        slide: ['basis-[85%] sm:basis-1/2 lg:basis-1/3', CARD_GUTTER_START],
       },
       content: {
         track: ['-ml-6'],

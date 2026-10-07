@@ -1,8 +1,8 @@
-import { tv } from '@blog/ui/lib/styling';
+import { CARD_GAP, tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const cardGridVariants = tv({
-  base: ['grid', 'gap-4 sm:gap-6 lg:gap-8'],
+  base: ['grid', CARD_GAP],
   variants: {
     columns: {
       1: ['grid-cols-1'],

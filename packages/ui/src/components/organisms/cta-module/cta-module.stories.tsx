@@ -67,11 +67,11 @@ const meta = {
     },
     spacingTop: {
       control: 'select',
-      options: objectKeys(ctaModuleVariants.variants.spacingTop),
+      options: objectKeys(SPACING_SCALE),
     },
     spacingBottom: {
       control: 'select',
-      options: objectKeys(ctaModuleVariants.variants.spacingBottom),
+      options: objectKeys(SPACING_SCALE),
     },
   },
   args: {
@@ -91,6 +91,13 @@ type TStory = StoryObj<typeof meta>;
 
 export const CalloutDefault: TStory = {
   args: { image: image('callout-default') },
+};
+
+export const CalloutCentered: TStory = {
+  args: {
+    image: image('callout-centered'),
+    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+  },
 };
 
 export const CalloutNoImage: TStory = {
@@ -249,7 +256,7 @@ export const BannerPositionBySpacing: TStory = {
   render: (args) => (
     <div className="flex flex-col gap-10">
       {objectKeys(ctaModuleVariants.variants.position).map((position) =>
-        objectKeys(ctaModuleVariants.variants.spacingTop).map((spacing) => (
+        objectKeys(SPACING_SCALE).map((spacing) => (
           <CtaModule
             key={`${position}-${spacing}`}
             {...args}
