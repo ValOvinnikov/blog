@@ -1,6 +1,8 @@
 import {
+  CARD_STYLE,
   DENSITY,
   RADIUS_SCALE,
+  type TCardStyle,
   type TDensity,
   type TRadiusScale,
 } from '@blog/config/constants';
@@ -91,6 +93,23 @@ export const DENSITY_DECLARATIONS: Record<TDensity, TThemeDeclarations> = {
     '--spacing-site-y': '1rem',
     '--spacing-card-x': '0.75rem',
     '--spacing-card-y': '0.625rem',
+  },
+};
+
+export const CARD_STYLE_DECLARATIONS: Record<TCardStyle, TThemeDeclarations> = {
+  [CARD_STYLE.ACCENT_BAR]: {
+    '--item-radius': '0',
+    '--item-border-width': '0',
+    '--item-accent-width': '2px',
+    '--item-accent-color': 'var(--brand-primary)',
+    '--item-shadow': 'none',
+  },
+  [CARD_STYLE.OUTLINED]: {
+    '--item-radius': 'var(--radius-md)',
+    '--item-border-width': '1px',
+    '--item-accent-width': '1px',
+    '--item-accent-color': 'var(--border)',
+    '--item-shadow': 'none',
   },
 };
 

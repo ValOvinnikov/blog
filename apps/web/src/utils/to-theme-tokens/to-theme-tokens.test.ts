@@ -1,4 +1,5 @@
 import {
+  CARD_STYLE,
   isAccentHueAccessible,
   PRESET_ID,
   PRESET_REGISTRY,
@@ -27,6 +28,7 @@ describe(toThemeTokens, () => {
     expect(result).toEqual({
       ...consoleTokens,
       logoHue: consoleTokens.accentHue,
+      cardStyle: CARD_STYLE.ACCENT_BAR,
     });
   });
 
@@ -38,10 +40,29 @@ describe(toThemeTokens, () => {
       bodyFont: PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens.bodyFont,
       radiusScale: PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens.radiusScale,
       density: PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens.density,
+      cardStyle: PRESET_REGISTRY[PRESET_ID.EDITORIAL].cardStyle,
     });
 
-    const editorial = PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens;
-    expect(result).toEqual({ ...editorial, logoHue: editorial.accentHue });
+    const editorial = PRESET_REGISTRY[PRESET_ID.EDITORIAL];
+    expect(result).toEqual({
+      ...editorial.themeTokens,
+      logoHue: editorial.themeTokens.accentHue,
+      cardStyle: editorial.cardStyle,
+    });
+  });
+
+  it("keeps the row's card style over its preset's", () => {
+    const result = toThemeTokens({
+      preset: PRESET_ID.CONSOLE,
+      accentHue: 250,
+      headingFont: 'SPACE_GROTESK',
+      bodyFont: 'NEWSREADER',
+      radiusScale: 'MD',
+      density: 'DEFAULT',
+      cardStyle: CARD_STYLE.OUTLINED,
+    });
+
+    expect(result.cardStyle).toBe(CARD_STYLE.OUTLINED);
   });
 
   it('resolves accentHue and logoHue independently (Indigo reproduction)', () => {
@@ -53,6 +74,7 @@ describe(toThemeTokens, () => {
       bodyFont: 'NEWSREADER',
       radiusScale: 'MD',
       density: 'DEFAULT',
+      cardStyle: CARD_STYLE.ACCENT_BAR,
     });
 
     expect(result.accentHue).toBe(65);
@@ -69,6 +91,7 @@ describe(toThemeTokens, () => {
       bodyFont: 'INTER',
       radiusScale: 'SM',
       density: 'COMPACT',
+      cardStyle: CARD_STYLE.ACCENT_BAR,
     });
 
     const editorial = PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens;
