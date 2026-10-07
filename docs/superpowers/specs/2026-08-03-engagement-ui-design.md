@@ -428,7 +428,7 @@ export interface IRatingInputProps extends IWithDataTestId {
 > Neither was checked against
 > [`docs/design-reference/engagement-ui-mock.html`](../../design-reference/engagement-ui-mock.html)
 > before writing, the same mistake D14 already called out for Feature 1's
-> missing `WindowChrome` (the mock's "every implementing agent must open this
+> missing `WindowChrome` (since deleted in #2846; the mock's "every implementing agent must open this
 > file" rule existed by the time this was written but wasn't followed for
 > this feature specifically). Corrected below to match the mock exactly. The
 > mock's `⌘S` keyboard-shortcut hint pill is an intentionally-dropped
@@ -648,7 +648,7 @@ contextually, rather than four different logged-out treatments.
 
 | Component                        | Kind     | New?    | Purity / a11y notes                                                                                                                 |
 | -------------------------------- | -------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `WindowChrome`                   | molecule | **new** | title-bar (`user@host` prompt + tag pill) + body slots, D14; used by all five                                                       |
+| `WindowChrome`                   | molecule | **new** | title-bar (`user@host` prompt + tag pill) + body slots, D14; used by all five. Deleted in #2846, replaced by `Panel`                |
 | `TextInput`                      | atom     | **new** | controlled `value`/`onChange`, required `ariaLabel`, `invalid` variant                                                              |
 | `Textarea`                       | atom     | **new** | as above + `rows`/`maxLength`                                                                                                       |
 | `Spinner`                        | atom     | **new** | CSS-only braille cycle, `role="status"` + `label`, glyph `aria-hidden`, reduced-motion freeze; every async state                    |

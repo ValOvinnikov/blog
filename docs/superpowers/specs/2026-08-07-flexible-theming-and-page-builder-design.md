@@ -95,6 +95,8 @@ items 3–5 as historical context here, not a live spec.
 
 ## Feature 1 — Section appearance object
 
+> **Superseded** — it shipped as `brandVariantField()`, a `layout`/`wideLayout` object (spacing, `containerWidth`, dividers) and `alignmentFields`, rendered by `apps/web`'s `Section`, with no `appearance` object or `withAppearance()` helper. See docs/superpowers/specs/2026-10-07-module-surface-and-look-alignment-design.md.
+
 **Goal:** let editors vary the rhythm and color-blocking of a page without a
 developer, and give every current and future module the same knobs for free.
 
