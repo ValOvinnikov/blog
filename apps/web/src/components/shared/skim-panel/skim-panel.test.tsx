@@ -23,30 +23,32 @@ const setup = async (overrides?: Partial<ISkimPanelProps>) => {
 };
 
 describe(`<${SkimPanel.name}/>`, () => {
-  it('renders one <li> per takeaway', async () => {
-    await setup();
+  describe('with takeaways', () => {
+    beforeEach(async () => {
+      await setup();
+    });
 
-    expect(screen.getAllByRole('listitem')).toHaveLength(3);
-    expect(screen.getByText('First takeaway.')).toBeVisible();
-    expect(screen.getByText('Second takeaway.')).toBeVisible();
-    expect(screen.getByText('Third takeaway.')).toBeVisible();
+    it('renders one <li> per takeaway', () => {
+      expect(screen.getAllByRole('listitem')).toHaveLength(3);
+      expect(screen.getByText('First takeaway.')).toBeVisible();
+      expect(screen.getByText('Second takeaway.')).toBeVisible();
+      expect(screen.getByText('Third takeaway.')).toBeVisible();
+    });
+
+    it('renders the translated panel label and "read the full article" copy', () => {
+      expect(
+        screen.getByRole('region', { name: '30-second summary' }),
+      ).toBeVisible();
+      expect(
+        screen.getByRole('button', { name: 'Read the full article' }),
+      ).toBeVisible();
+    });
   });
 
   it('renders nothing when takeaways is undefined', async () => {
     await setup({ takeaways: undefined });
 
     expect(screen.queryByRole('region')).not.toBeInTheDocument();
-  });
-
-  it('renders the translated panel label and "read the full article" copy', async () => {
-    await setup();
-
-    expect(
-      screen.getByRole('region', { name: '30-second summary' }),
-    ).toBeVisible();
-    expect(
-      screen.getByRole('button', { name: 'Read the full article' }),
-    ).toBeVisible();
   });
 
   it('the "read the full article" button switches depth back to READ', async () => {

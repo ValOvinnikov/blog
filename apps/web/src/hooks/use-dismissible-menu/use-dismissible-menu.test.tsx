@@ -1,4 +1,4 @@
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, fireEvent, screen } from '@web/testing/custom-render';
 import {
   testArrowUpAndHomeBehavior,
@@ -138,16 +138,20 @@ const setup = customRender(Harness, {});
 const getTrigger = () => screen.getByRole('button', { name: 'trigger' });
 
 describe(useDismissibleMenu, () => {
+  let user: UserEvent;
+  let trigger: HTMLElement;
+
   beforeEach(() => {
+    user = userEvent.setup();
     setup();
+    trigger = getTrigger();
   });
 
   testCoreDismissibleMenuBehavior();
   testArrowUpAndHomeBehavior();
 
   it('reverse-traps Shift+Tab, wrapping focus from the first item to the last', async () => {
-    const user = userEvent.setup();
-    await user.click(getTrigger());
+    await user.click(trigger);
 
     const first = screen.getByRole('button', { name: 'first' });
     const last = screen.getByRole('button', { name: 'second' });
@@ -159,8 +163,6 @@ describe(useDismissibleMenu, () => {
   });
 
   it('closes on a pointer-down on a sibling element outside the trigger/panel when no `getContainer` is given (narrow scoping, e.g. `usePopover`)', async () => {
-    const user = userEvent.setup();
-    const trigger = getTrigger();
     await user.click(trigger);
 
     const sibling = document.createElement('button');
@@ -176,15 +178,19 @@ describe(useDismissibleMenu, () => {
 });
 
 describe(`${useDismissibleMenu.name} with trapFocus: false`, () => {
+  let user: UserEvent;
+  let trigger: HTMLElement;
+
   const setupNoTrap = customRender(HarnessNoTrap, {});
 
   beforeEach(() => {
+    user = userEvent.setup();
     setupNoTrap();
+    trigger = getTrigger();
   });
 
   it('does not trap Tab — tabbing from the last item moves focus out of the panel instead of wrapping to the first', async () => {
-    const user = userEvent.setup();
-    await user.click(getTrigger());
+    await user.click(trigger);
 
     const last = screen.getByRole('button', { name: 'second' });
     last.focus();
@@ -195,8 +201,6 @@ describe(`${useDismissibleMenu.name} with trapFocus: false`, () => {
   });
 
   it('does not reverse-trap Shift+Tab — tabbing back from the first item moves focus to the trigger instead of wrapping to the last', async () => {
-    const user = userEvent.setup();
-    const trigger = getTrigger();
     await user.click(trigger);
 
     const first = screen.getByRole('button', { name: 'first' });
@@ -208,8 +212,7 @@ describe(`${useDismissibleMenu.name} with trapFocus: false`, () => {
   });
 
   it('does not move focus on ArrowDown/ArrowUp/Home/End', async () => {
-    const user = userEvent.setup();
-    await user.click(getTrigger());
+    await user.click(trigger);
 
     const first = screen.getByRole('button', { name: 'first' });
     first.focus();
@@ -228,8 +231,6 @@ describe(`${useDismissibleMenu.name} with trapFocus: false`, () => {
   });
 
   it('still closes on Escape and returns focus to the trigger', async () => {
-    const user = userEvent.setup();
-    const trigger = getTrigger();
     await user.click(trigger);
 
     fireEvent.keyDown(document, { key: 'Escape' });
@@ -239,8 +240,6 @@ describe(`${useDismissibleMenu.name} with trapFocus: false`, () => {
   });
 
   it('still closes on an outside pointer-down and returns focus to the trigger', async () => {
-    const user = userEvent.setup();
-    const trigger = getTrigger();
     await user.click(trigger);
 
     fireEvent.mouseDown(document.body);
@@ -250,8 +249,6 @@ describe(`${useDismissibleMenu.name} with trapFocus: false`, () => {
   });
 
   it('with the default closeOnFocusOut (false), stays open when Tab carries focus past the last item and out of the panel', async () => {
-    const user = userEvent.setup();
-    const trigger = getTrigger();
     await user.click(trigger);
 
     const last = screen.getByRole('button', { name: 'second' });
@@ -265,15 +262,18 @@ describe(`${useDismissibleMenu.name} with trapFocus: false`, () => {
 });
 
 describe(`${useDismissibleMenu.name} with closeOnFocusOut: true`, () => {
+  let user: UserEvent;
+  let trigger: HTMLElement;
+
   const setupCloseOnFocusOut = customRender(HarnessCloseOnFocusOut, {});
 
   beforeEach(() => {
+    user = userEvent.setup();
     setupCloseOnFocusOut();
+    trigger = getTrigger();
   });
 
   it('closes when Tab carries focus past the last item, leaving focus on the element it landed on instead of forcing it back to the trigger', async () => {
-    const user = userEvent.setup();
-    const trigger = getTrigger();
     await user.click(trigger);
 
     const last = screen.getByRole('button', { name: 'second' });
@@ -287,7 +287,6 @@ describe(`${useDismissibleMenu.name} with closeOnFocusOut: true`, () => {
   });
 
   it('closes when focus moves to an arbitrary element outside the trigger/panel', () => {
-    const trigger = getTrigger();
     fireEvent.click(trigger);
 
     const first = screen.getByRole('button', { name: 'first' });
@@ -304,7 +303,6 @@ describe(`${useDismissibleMenu.name} with closeOnFocusOut: true`, () => {
   });
 
   it('stays open when focus moves within the panel', () => {
-    const trigger = getTrigger();
     fireEvent.click(trigger);
 
     const first = screen.getByRole('button', { name: 'first' });
@@ -317,7 +315,6 @@ describe(`${useDismissibleMenu.name} with closeOnFocusOut: true`, () => {
   });
 
   it('stays open when focus moves back to the trigger', () => {
-    const trigger = getTrigger();
     fireEvent.click(trigger);
 
     const first = screen.getByRole('button', { name: 'first' });
@@ -329,7 +326,6 @@ describe(`${useDismissibleMenu.name} with closeOnFocusOut: true`, () => {
   });
 
   it('stays open on the transient relatedTarget === null blur', () => {
-    const trigger = getTrigger();
     fireEvent.click(trigger);
 
     const first = screen.getByRole('button', { name: 'first' });
@@ -341,8 +337,6 @@ describe(`${useDismissibleMenu.name} with closeOnFocusOut: true`, () => {
   });
 
   it('still closes on Escape and returns focus to the trigger', async () => {
-    const user = userEvent.setup();
-    const trigger = getTrigger();
     await user.click(trigger);
 
     fireEvent.keyDown(document, { key: 'Escape' });
@@ -352,8 +346,6 @@ describe(`${useDismissibleMenu.name} with closeOnFocusOut: true`, () => {
   });
 
   it('still closes on an outside pointer-down and returns focus to the trigger', async () => {
-    const user = userEvent.setup();
-    const trigger = getTrigger();
     await user.click(trigger);
 
     fireEvent.mouseDown(document.body);
@@ -364,15 +356,18 @@ describe(`${useDismissibleMenu.name} with closeOnFocusOut: true`, () => {
 });
 
 describe(`${useDismissibleMenu.name} with getContainer`, () => {
+  let user: UserEvent;
+  let trigger: HTMLElement;
+
   const setupWithContainer = customRender(HarnessWithContainer, {});
 
   beforeEach(() => {
+    user = userEvent.setup();
     setupWithContainer();
+    trigger = getTrigger();
   });
 
   it('stays open on a pointer-down on a sibling element inside the container but outside the trigger/panel (e.g. the actions slot)', async () => {
-    const user = userEvent.setup();
-    const trigger = getTrigger();
     await user.click(trigger);
 
     fireEvent.mouseDown(screen.getByRole('button', { name: 'sibling action' }));
@@ -381,8 +376,6 @@ describe(`${useDismissibleMenu.name} with getContainer`, () => {
   });
 
   it('still closes on a pointer-down outside the container entirely', async () => {
-    const user = userEvent.setup();
-    const trigger = getTrigger();
     await user.click(trigger);
 
     fireEvent.mouseDown(document.body);

@@ -29,11 +29,10 @@ describe(`<${CtaModule.name}/>`, () => {
     getCtaMock.mockReset();
     getRequestContextMock.mockReset();
     getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
+    getCtaMock.mockResolvedValue({ ok: false, error: new Error('boom') });
   });
 
   it('renders nothing when the fetch fails', async () => {
-    getCtaMock.mockResolvedValue({ ok: false, error: new Error('boom') });
-
     const { container } = await setup();
 
     expect(container).toBeEmptyDOMElement();
@@ -49,7 +48,6 @@ describe(`<${CtaModule.name}/>`, () => {
       ...DEFAULT_REQUEST_CONTEXT,
       sanityContext: tenant,
     });
-    getCtaMock.mockResolvedValue({ ok: false, error: new Error('boom') });
 
     await setup();
 

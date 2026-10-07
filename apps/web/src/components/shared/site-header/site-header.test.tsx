@@ -79,58 +79,43 @@ describe(SiteHeader, () => {
     useSessionMock.mockReturnValue({ data: null, status: 'unauthenticated' });
   });
 
-  it('forwards the tenant Sanity context to the navigation loader', async () => {
-    await setup();
-
-    expect(getNavigationMock).toHaveBeenCalledWith(
-      DEFAULT_REQUEST_CONTEXT.sanityContext,
-    );
-  });
-
-  it('shows the language switcher when its toggle is on and several languages are live', async () => {
-    getRequestContextMock.mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
-      liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
-    });
-    getNavigationMock.mockResolvedValue({
-      ok: true,
-      data: { items: [], showLanguageSwitcher: true },
+  describe('with several live languages and the switcher on', () => {
+    beforeEach(async () => {
+      getRequestContextMock.mockResolvedValue({
+        ...DEFAULT_REQUEST_CONTEXT,
+        liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
+      });
+      getNavigationMock.mockResolvedValue({
+        ok: true,
+        data: { items: [], showLanguageSwitcher: true },
+      });
+      await setup();
     });
 
-    await setup();
-
-    expect(
-      within(screen.getByRole('banner')).getByRole('navigation', {
-        name: 'Language',
-      }),
-    ).toBeVisible();
-  });
-
-  it('puts the language pill and theme toggle in the open phone menu panel, leaving account in the bar', async () => {
-    getRequestContextMock.mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
-      liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
-    });
-    getNavigationMock.mockResolvedValue({
-      ok: true,
-      data: { items: [], showLanguageSwitcher: true },
+    it('shows the language switcher when its toggle is on and several languages are live', async () => {
+      expect(
+        within(screen.getByRole('banner')).getByRole('navigation', {
+          name: 'Language',
+        }),
+      ).toBeVisible();
     });
 
-    await setup();
-    await userEvent.click(
-      screen.getByRole('button', { name: 'Toggle navigation menu' }),
-    );
-    const panelRow = screen.getByTestId('primary-navigation-panel-actions');
+    it('puts the language pill and theme toggle in the open phone menu panel, leaving account in the bar', async () => {
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Toggle navigation menu' }),
+      );
+      const panelRow = screen.getByTestId('primary-navigation-panel-actions');
 
-    expect(
-      within(panelRow).getByRole('button', { name: 'Language: English' }),
-    ).toBeVisible();
-    expect(
-      within(panelRow).getByRole('button', { name: /Switch to/ }),
-    ).toBeVisible();
-    expect(
-      within(panelRow).queryByRole('button', { name: 'Sign in' }),
-    ).not.toBeInTheDocument();
+      expect(
+        within(panelRow).getByRole('button', { name: 'Language: English' }),
+      ).toBeVisible();
+      expect(
+        within(panelRow).getByRole('button', { name: /Switch to/ }),
+      ).toBeVisible();
+      expect(
+        within(panelRow).queryByRole('button', { name: 'Sign in' }),
+      ).not.toBeInTheDocument();
+    });
   });
 
   it('hides the language switcher when its toggle is off', async () => {
@@ -175,12 +160,6 @@ describe(SiteHeader, () => {
     ).not.toBeInTheDocument();
   });
 
-  it('shows the sign-in menu when the tenant has a reader-account capability enabled', async () => {
-    await setup();
-
-    expect(screen.getByRole('button', { name: 'Sign in' })).toBeVisible();
-  });
-
   it('hides the sign-in menu when the tenant has no reader-account capability enabled', async () => {
     isReaderAccountEnabledMock.mockResolvedValue(false);
 
@@ -189,6 +168,22 @@ describe(SiteHeader, () => {
     expect(
       screen.queryByRole('button', { name: 'Sign in' }),
     ).not.toBeInTheDocument();
+  });
+
+  describe('with the default tenant', () => {
+    beforeEach(async () => {
+      await setup();
+    });
+
+    it('forwards the tenant Sanity context to the navigation loader', async () => {
+      expect(getNavigationMock).toHaveBeenCalledWith(
+        DEFAULT_REQUEST_CONTEXT.sanityContext,
+      );
+    });
+
+    it('shows the sign-in menu when the tenant has a reader-account capability enabled', async () => {
+      expect(screen.getByRole('button', { name: 'Sign in' })).toBeVisible();
+    });
   });
 
   describe('when navigation fails to load', () => {

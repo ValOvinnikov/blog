@@ -11,15 +11,15 @@ const setup = customRender(ThemeScope, {
 });
 
 describe(`<${ThemeScope.name}/>`, () => {
-  it('renders children', () => {
+  beforeEach(() => {
     setup();
+  });
 
+  it('renders children', () => {
     expect(screen.getByText('content')).toBeVisible();
   });
 
   it('injects the resolved theme tokens as a <style> block', () => {
-    setup();
-
     const style = document.head.querySelector(
       'style[data-href="tenant-theme"]',
     );

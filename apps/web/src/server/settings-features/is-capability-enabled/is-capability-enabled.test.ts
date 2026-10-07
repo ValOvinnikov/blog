@@ -48,15 +48,14 @@ describe(isCapabilityEnabled, () => {
   beforeEach(() => {
     vi.mocked(getTenantPlan).mockReset();
     vi.mocked(getEffectiveSettingsFeatures).mockReset();
-  });
-
-  it('enables a capability when both the plan entitles it and the toggle is on', async () => {
     vi.mocked(getTenantPlan).mockResolvedValue({ ok: true, data: 'GROWTH' });
     vi.mocked(getEffectiveSettingsFeatures).mockResolvedValue({
       ok: true,
       data: ALL_ENABLED,
     });
+  });
 
+  it('enables a capability when both the plan entitles it and the toggle is on', async () => {
     await expect(isCapabilityEnabled(CAPABILITY.NEWSLETTER)).resolves.toBe(
       true,
     );
@@ -64,10 +63,6 @@ describe(isCapabilityEnabled, () => {
 
   it('disables a capability the plan does not entitle, even when the toggle is on', async () => {
     vi.mocked(getTenantPlan).mockResolvedValue({ ok: true, data: 'FREE' });
-    vi.mocked(getEffectiveSettingsFeatures).mockResolvedValue({
-      ok: true,
-      data: ALL_ENABLED,
-    });
 
     await expect(isCapabilityEnabled(CAPABILITY.NEWSLETTER)).resolves.toBe(
       false,
@@ -75,7 +70,6 @@ describe(isCapabilityEnabled, () => {
   });
 
   it('disables a capability the tenant has toggled off, even when the plan entitles it', async () => {
-    vi.mocked(getTenantPlan).mockResolvedValue({ ok: true, data: 'GROWTH' });
     vi.mocked(getEffectiveSettingsFeatures).mockResolvedValue({
       ok: true,
       data: { ...ALL_ENABLED, [CAPABILITY.NEWSLETTER]: false },
@@ -110,7 +104,6 @@ describe(isCapabilityEnabled, () => {
   });
 
   it('resolves false and logs when the effective features fetch fails', async () => {
-    vi.mocked(getTenantPlan).mockResolvedValue({ ok: true, data: 'GROWTH' });
     vi.mocked(getEffectiveSettingsFeatures).mockResolvedValue({
       ok: false,
       error: new Error('boom'),
@@ -120,12 +113,6 @@ describe(isCapabilityEnabled, () => {
   });
 
   it("reads both entitlements for the request context's tenant", async () => {
-    vi.mocked(getTenantPlan).mockResolvedValue({ ok: true, data: 'GROWTH' });
-    vi.mocked(getEffectiveSettingsFeatures).mockResolvedValue({
-      ok: true,
-      data: ALL_ENABLED,
-    });
-
     await isCapabilityEnabled(CAPABILITY.NEWSLETTER);
 
     expect(getTenantPlan).toHaveBeenCalledWith('tenant-1');
@@ -136,11 +123,6 @@ describe(isCapabilityEnabled, () => {
     vi.mocked(getRequestContext).mockResolvedValueOnce({
       ...DEFAULT_REQUEST_CONTEXT,
       tenantId: undefined,
-    });
-    vi.mocked(getTenantPlan).mockResolvedValue({ ok: true, data: 'GROWTH' });
-    vi.mocked(getEffectiveSettingsFeatures).mockResolvedValue({
-      ok: true,
-      data: ALL_ENABLED,
     });
 
     await isCapabilityEnabled(CAPABILITY.NEWSLETTER);

@@ -33,9 +33,11 @@ const setup = customRender(ActionGroup, {
 });
 
 describe(`<${ActionGroup.name}/>`, () => {
-  it('renders every action in authored order', () => {
+  beforeEach(() => {
     setup();
+  });
 
+  it('renders every action in authored order', () => {
     const links = screen.getAllByRole('link');
     expect(links).toHaveLength(2);
     expect(links[0]).toHaveTextContent('Subscribe now');
@@ -43,8 +45,6 @@ describe(`<${ActionGroup.name}/>`, () => {
   });
 
   it('forwards the authored ariaLabel to the rendered link accessible name', () => {
-    setup();
-
     expect(
       screen.getByRole('link', {
         name: 'Learn more about our subscription plans',
@@ -53,8 +53,6 @@ describe(`<${ActionGroup.name}/>`, () => {
   });
 
   it('falls back to the label as the accessible name when no ariaLabel is authored', () => {
-    setup();
-
     expect(screen.getByRole('link', { name: 'Subscribe now' })).toBeVisible();
   });
 });

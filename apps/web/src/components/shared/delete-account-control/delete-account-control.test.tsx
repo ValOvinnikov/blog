@@ -1,4 +1,4 @@
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, screen, waitFor } from '@web/testing/custom-render';
 
 import { DeleteAccountControl } from './delete-account-control';
@@ -41,16 +41,17 @@ const armAndClickDelete = async (user: ReturnType<typeof userEvent.setup>) => {
 };
 
 describe(`<${DeleteAccountControl.name}/>`, () => {
+  let user: UserEvent;
+
   beforeEach(() => {
     signOutMock.mockReset();
     deleteAccountActionMock.mockReset();
     toastPromiseMock.mockImplementation((promise: Promise<unknown>) => promise);
+    user = userEvent.setup();
+    setup();
   });
 
   it('renders the delete button disabled until the typed value matches the handle', async () => {
-    const user = userEvent.setup();
-    setup();
-
     const button = screen.getByRole('button', { name: 'Delete account' });
     const field = screen.getByRole('textbox', {
       name: 'Type your handle to confirm deletion',
@@ -66,9 +67,6 @@ describe(`<${DeleteAccountControl.name}/>`, () => {
   });
 
   it('arms the button case-insensitively', async () => {
-    const user = userEvent.setup();
-    setup();
-
     await user.type(
       screen.getByRole('textbox', {
         name: 'Type your handle to confirm deletion',
@@ -83,9 +81,6 @@ describe(`<${DeleteAccountControl.name}/>`, () => {
 
   it('runs the delete through toast.promise with loading/success/error messages, deletes, signs out, and redirects home', async () => {
     deleteAccountActionMock.mockResolvedValue({ ok: true });
-    const user = userEvent.setup();
-    setup();
-
     await armAndClickDelete(user);
 
     await waitFor(() => {
@@ -110,9 +105,6 @@ describe(`<${DeleteAccountControl.name}/>`, () => {
           resolveDelete = resolve;
         }),
     );
-    const user = userEvent.setup();
-    setup();
-
     const button = screen.getByRole('button', { name: 'Delete account' });
     await armAndClickDelete(user);
 
@@ -129,9 +121,6 @@ describe(`<${DeleteAccountControl.name}/>`, () => {
 
   it('does not sign out when the delete fails, and the rejection surfaces through toast.promise', async () => {
     deleteAccountActionMock.mockResolvedValue({ ok: false });
-    const user = userEvent.setup();
-    setup();
-
     await armAndClickDelete(user);
 
     await waitFor(() => {

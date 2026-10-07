@@ -8,24 +8,10 @@ const setup = customRender(CodeBlock, {
 });
 
 describe(`<${CodeBlock.name}/>`, () => {
-  it('renders the code content', () => {
-    setup();
-
-    expect(screen.getByTestId('code-content').textContent).toBe(
-      '1const x = 1;',
-    );
-  });
-
   it('renders the filename as a caption when provided', () => {
     setup({ filename: 'example.ts' });
 
     expect(screen.getByText('example.ts')).toBeVisible();
-  });
-
-  it('omits the filename caption when not provided', () => {
-    setup();
-
-    expect(screen.queryByTestId('filename-caption')).not.toBeInTheDocument();
   });
 
   it('renders without a language, falling back to plain text', () => {
@@ -34,20 +20,32 @@ describe(`<${CodeBlock.name}/>`, () => {
     expect(screen.getByText('plain text content')).toBeVisible();
   });
 
-  it('renders the code content with a transparent background so the theme-aware figure surface shows through', () => {
-    setup();
-
-    expect(screen.getByTestId('code-content')).toHaveStyle({
-      background: 'transparent',
-      color: 'var(--code-fg)',
+  describe('with default props', () => {
+    beforeEach(() => {
+      setup();
     });
-  });
 
-  it('colors syntax tokens with theme-aware CSS custom properties, not literal hex/hsl values', () => {
-    setup();
+    it('renders the code content', () => {
+      expect(screen.getByTestId('code-content').textContent).toBe(
+        '1const x = 1;',
+      );
+    });
 
-    expect(screen.getByText('const')).toHaveStyle({
-      color: 'var(--code-keyword)',
+    it('omits the filename caption when not provided', () => {
+      expect(screen.queryByTestId('filename-caption')).not.toBeInTheDocument();
+    });
+
+    it('renders the code content with a transparent background so the theme-aware figure surface shows through', () => {
+      expect(screen.getByTestId('code-content')).toHaveStyle({
+        background: 'transparent',
+        color: 'var(--code-fg)',
+      });
+    });
+
+    it('colors syntax tokens with theme-aware CSS custom properties, not literal hex/hsl values', () => {
+      expect(screen.getByText('const')).toHaveStyle({
+        color: 'var(--code-keyword)',
+      });
     });
   });
 });

@@ -21,38 +21,40 @@ const setup = (overrides?: Partial<IAccountPageViewProps>) =>
   );
 
 describe(`<${AccountPageView.name}/>`, () => {
-  it('renders the page heading', () => {
-    setup();
-
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Account' }),
-    ).toBeVisible();
-  });
-
-  it('renders all three sections, in identity/newsletter/privacy order', () => {
-    setup();
-
-    const identityHeading = screen.getByRole('heading', {
-      level: 2,
-      name: /Connected accounts/,
-    });
-    const newsletterHeading = screen.getByRole('heading', {
-      level: 2,
-      name: /Newsletter/,
-    });
-    const privacyHeading = screen.getByRole('heading', {
-      level: 2,
-      name: /Privacy/,
+  describe('with default props', () => {
+    beforeEach(() => {
+      setup();
     });
 
-    expect(
-      identityHeading.compareDocumentPosition(newsletterHeading) &
-        Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
-    expect(
-      newsletterHeading.compareDocumentPosition(privacyHeading) &
-        Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
+    it('renders the page heading', () => {
+      expect(
+        screen.getByRole('heading', { level: 1, name: 'Account' }),
+      ).toBeVisible();
+    });
+
+    it('renders all three sections, in identity/newsletter/privacy order', () => {
+      const identityHeading = screen.getByRole('heading', {
+        level: 2,
+        name: /Connected accounts/,
+      });
+      const newsletterHeading = screen.getByRole('heading', {
+        level: 2,
+        name: /Newsletter/,
+      });
+      const privacyHeading = screen.getByRole('heading', {
+        level: 2,
+        name: /Privacy/,
+      });
+
+      expect(
+        identityHeading.compareDocumentPosition(newsletterHeading) &
+          Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+      expect(
+        newsletterHeading.compareDocumentPosition(privacyHeading) &
+          Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+    });
   });
 
   it('renders no newsletter section when the slot is absent', () => {

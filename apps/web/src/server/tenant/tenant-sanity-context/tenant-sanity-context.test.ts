@@ -50,12 +50,12 @@ describe(getHostTenantSanityContext, () => {
     isProductionEnvironmentMock.mockReturnValue(false);
     getPlatformSanityContextMock.mockReset();
     getPlatformSanityContextMock.mockReturnValue(platformTenant);
-  });
-
-  it('resolves the tenant Sanity credentials for a resolved tenant', async () => {
     vi.mocked(resolveRequestTenant).mockResolvedValue({
       id: 'tenant-1',
     } as never);
+  });
+
+  it('resolves the tenant Sanity credentials for a resolved tenant', async () => {
     vi.mocked(queries.tenants.toTenantSanityCredentials).mockReturnValue({
       projectId: 'proj',
       dataset: 'production',
@@ -83,16 +83,6 @@ describe(getHostTenantSanityContext, () => {
     });
   });
 
-  it('resolves as unresolvable in production when no tenant resolves', async () => {
-    isProductionEnvironmentMock.mockReturnValue(true);
-    vi.mocked(resolveRequestTenant).mockResolvedValue(undefined);
-
-    await expect(getHostTenantSanityContext()).resolves.toEqual({
-      isResolvable: false,
-    });
-    expect(queries.tenants.toTenantSanityCredentials).not.toHaveBeenCalled();
-  });
-
   it('falls back to the platform Sanity context outside production when no tenant resolves', async () => {
     vi.mocked(resolveRequestTenant).mockResolvedValue(undefined);
 
@@ -103,9 +93,6 @@ describe(getHostTenantSanityContext, () => {
   });
 
   it('falls back to the platform Sanity context outside production when the matched tenant has no credentials set', async () => {
-    vi.mocked(resolveRequestTenant).mockResolvedValue({
-      id: 'tenant-1',
-    } as never);
     vi.mocked(queries.tenants.toTenantSanityCredentials).mockReturnValue(
       undefined,
     );
@@ -116,19 +103,30 @@ describe(getHostTenantSanityContext, () => {
     });
   });
 
-  it('resolves as unresolvable in production when the matched tenant has no credentials set, never falling back to the platform context', async () => {
-    isProductionEnvironmentMock.mockReturnValue(true);
-    vi.mocked(resolveRequestTenant).mockResolvedValue({
-      id: 'tenant-1',
-    } as never);
-    vi.mocked(queries.tenants.toTenantSanityCredentials).mockReturnValue(
-      undefined,
-    );
-
-    await expect(getHostTenantSanityContext()).resolves.toEqual({
-      isResolvable: false,
+  describe('in production', () => {
+    beforeEach(() => {
+      isProductionEnvironmentMock.mockReturnValue(true);
     });
-    expect(getPlatformSanityContextMock).not.toHaveBeenCalled();
+
+    it('resolves as unresolvable in production when no tenant resolves', async () => {
+      vi.mocked(resolveRequestTenant).mockResolvedValue(undefined);
+
+      await expect(getHostTenantSanityContext()).resolves.toEqual({
+        isResolvable: false,
+      });
+      expect(queries.tenants.toTenantSanityCredentials).not.toHaveBeenCalled();
+    });
+
+    it('resolves as unresolvable in production when the matched tenant has no credentials set, never falling back to the platform context', async () => {
+      vi.mocked(queries.tenants.toTenantSanityCredentials).mockReturnValue(
+        undefined,
+      );
+
+      await expect(getHostTenantSanityContext()).resolves.toEqual({
+        isResolvable: false,
+      });
+      expect(getPlatformSanityContextMock).not.toHaveBeenCalled();
+    });
   });
 });
 
@@ -196,10 +194,10 @@ describe(getHostTenantSanityWriteContext, () => {
     isProductionEnvironmentMock.mockReturnValue(false);
     vi.mocked(resolveRequestTenant).mockReset();
     vi.mocked(queries.tenants.toTenantSanityWriteCredentials).mockReset();
+    vi.mocked(resolveRequestTenant).mockResolvedValue(ACTIVE_ROW as never);
   });
 
   it('resolves the tenant Sanity write credentials for a resolved tenant', async () => {
-    vi.mocked(resolveRequestTenant).mockResolvedValue(ACTIVE_ROW as never);
     vi.mocked(queries.tenants.toTenantSanityWriteCredentials).mockReturnValue({
       projectId: 'proj',
       dataset: 'production',
@@ -264,7 +262,6 @@ describe(getHostTenantSanityWriteContext, () => {
   });
 
   it('resolves with a defined tenantId but an undefined tenant when the resolved tenant has no usable write credentials', async () => {
-    vi.mocked(resolveRequestTenant).mockResolvedValue(ACTIVE_ROW as never);
     vi.mocked(queries.tenants.toTenantSanityWriteCredentials).mockReturnValue(
       undefined,
     );

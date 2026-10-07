@@ -6,6 +6,7 @@ import type { TFeedPost } from '@blog/service';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 import { makeTagDetailPage } from '@web/testing/shared/tag/fixtures';
 import { notFound } from 'next/navigation';
+import type { MockInstance } from 'vitest';
 
 const {
   getTagPageMock,
@@ -61,15 +62,33 @@ const paramsFor = (locale: string = EN) =>
 const params = paramsFor();
 
 describe('GET /[locale]/tags/[slug]/rss.xml', () => {
-  beforeEach(() => {
+  let GET: typeof import('./route').GET;
+  let errorSpy: MockInstance<typeof console.error>;
+
+  beforeEach(async () => {
+    errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getHostTenantSanityContextMock.mockResolvedValue({
       isResolvable: true,
       tenant,
     });
     getTenantBaseUrlMock.mockResolvedValue('https://example.com');
+    getTagPageMock.mockResolvedValue({
+      ok: true,
+      data: makeTagDetailPage({
+        tag: {
+          id: 'tag-1',
+          title: 'TypeScript',
+          slug: 'typescript',
+          description: undefined,
+        },
+      }),
+    });
+    getPublishedPostsByTagMock.mockResolvedValue({ ok: true, data: [post] });
+    ({ GET } = await import('./route'));
   });
 
   afterEach(() => {
+    errorSpy.mockRestore();
     vi.resetModules();
     getTagPageMock.mockReset();
     getPublishedPostsByTagMock.mockReset();
@@ -89,9 +108,6 @@ describe('GET /[locale]/tags/[slug]/rss.xml', () => {
         },
       }),
     });
-    getPublishedPostsByTagMock.mockResolvedValue({ ok: true, data: [post] });
-    const { GET } = await import('./route');
-
     const response = await GET(new Request('https://example.com'), { params });
     const xml = await response.text();
 
@@ -120,20 +136,7 @@ describe('GET /[locale]/tags/[slug]/rss.xml', () => {
   });
 
   it('falls back to the tag title as the channel description when none is authored', async () => {
-    getTagPageMock.mockResolvedValue({
-      ok: true,
-      data: makeTagDetailPage({
-        tag: {
-          id: 'tag-1',
-          title: 'TypeScript',
-          slug: 'typescript',
-          description: undefined,
-        },
-      }),
-    });
     getPublishedPostsByTagMock.mockResolvedValue({ ok: true, data: [] });
-    const { GET } = await import('./route');
-
     const response = await GET(new Request('https://example.com'), { params });
     const xml = await response.text();
     const doc = new DOMParser().parseFromString(xml, 'application/xml');
@@ -144,25 +147,17 @@ describe('GET /[locale]/tags/[slug]/rss.xml', () => {
   });
 
   it('calls notFound() when the tag fetch fails', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getTagPageMock.mockResolvedValue({ ok: false, error: new Error('boom') });
-    const { GET } = await import('./route');
-
     await expect(
       GET(new Request('https://example.com'), { params }),
     ).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
     expect(getPublishedPostsByTagMock).not.toHaveBeenCalled();
-
-    errorSpy.mockRestore();
   });
 
   it('calls notFound() without logging when the tag simply does not exist', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getTagPageMock.mockResolvedValue({ ok: true, data: undefined });
-    const { GET } = await import('./route');
-
     await expect(
       GET(new Request('https://example.com'), { params }),
     ).rejects.toThrow('NEXT_NOT_FOUND');
@@ -170,12 +165,9 @@ describe('GET /[locale]/tags/[slug]/rss.xml', () => {
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
     expect(getPublishedPostsByTagMock).not.toHaveBeenCalled();
     expect(errorSpy).not.toHaveBeenCalled();
-
-    errorSpy.mockRestore();
   });
 
   it('calls notFound() when the posts fetch fails', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     getTagPageMock.mockResolvedValue({
       ok: true,
       data: makeTagDetailPage(),
@@ -184,32 +176,14 @@ describe('GET /[locale]/tags/[slug]/rss.xml', () => {
       ok: false,
       error: new Error('boom'),
     });
-    const { GET } = await import('./route');
-
     await expect(
       GET(new Request('https://example.com'), { params }),
     ).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-
-    errorSpy.mockRestore();
   });
 
   it('resolves the tag and its posts in the feed language and links posts in it', async () => {
-    getTagPageMock.mockResolvedValue({
-      ok: true,
-      data: makeTagDetailPage({
-        tag: {
-          id: 'tag-1',
-          title: 'TypeScript',
-          slug: 'typescript',
-          description: undefined,
-        },
-      }),
-    });
-    getPublishedPostsByTagMock.mockResolvedValue({ ok: true, data: [post] });
-    const { GET } = await import('./route');
-
     const response = await GET(new Request('https://example.com'), {
       params: paramsFor(NL),
     });
@@ -230,8 +204,6 @@ describe('GET /[locale]/tags/[slug]/rss.xml', () => {
   });
 
   it('returns a 404 for a language the site does not support', async () => {
-    const { GET } = await import('./route');
-
     const response = await GET(new Request('https://example.com'), {
       params: paramsFor('xx'),
     });
@@ -242,8 +214,6 @@ describe('GET /[locale]/tags/[slug]/rss.xml', () => {
 
   it('returns a 404 without querying any content when the host is unresolvable', async () => {
     getHostTenantSanityContextMock.mockResolvedValue({ isResolvable: false });
-    const { GET } = await import('./route');
-
     const response = await GET(new Request('https://example.com'), {
       params,
     });

@@ -7,6 +7,7 @@ import {
   DEFAULT_REQUEST_CONTEXT,
   DEFAULT_TENANT_SANITY_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
+import type { MockInstance } from 'vitest';
 
 import { buildPostMetadata } from './build-post-metadata';
 
@@ -70,72 +71,81 @@ describe('buildPostMetadata', () => {
     getPostPageMock.mockReset();
   });
 
-  it('forwards the slug to getPostPage, the loader BlogPostPage reads', async () => {
-    getPostPageMock.mockResolvedValue({ ok: true, data: basePost });
+  describe('when the post resolves', () => {
+    beforeEach(() => {
+      getPostPageMock.mockResolvedValue({ ok: true, data: basePost });
+    });
 
-    await buildPostMetadata('hello-world');
+    it('forwards the slug to getPostPage, the loader BlogPostPage reads', async () => {
+      await buildPostMetadata('hello-world');
 
-    expect(getPostPageMock).toHaveBeenCalledWith('hello-world');
+      expect(getPostPageMock).toHaveBeenCalledWith('hello-world');
+    });
+
+    it('passes the already-resolved seo through to toMetadata', async () => {
+      const metadata = await buildPostMetadata('hello-world');
+
+      expect(metadata.title).toBe('Hello World');
+      expect(metadata.description).toBe(
+        'A sufficiently long excerpt for the card.',
+      );
+      expect(metadata.alternates?.canonical).toBe('/blog/hello-world');
+      expect(metadata.openGraph?.title).toBe('Hello World OG');
+      expect(metadata.openGraph?.description).toBe(
+        'A sufficiently long excerpt for the card OG.',
+      );
+      expect(metadata.openGraph?.images).toEqual([
+        { url: EXPECTED_OG_IMAGE_URL },
+      ]);
+    });
+
+    it('sets openGraph.publishedTime from post.publishedAt', async () => {
+      const metadata = await buildPostMetadata('hello-world');
+
+      expect(
+        (metadata.openGraph as { publishedTime?: string })?.publishedTime,
+      ).toBe('2026-01-15T00:00:00Z');
+    });
+
+    it('sets openGraph.authors from post.author.name', async () => {
+      const metadata = await buildPostMetadata('hello-world');
+
+      expect((metadata.openGraph as { authors?: string[] })?.authors).toEqual([
+        'Jane Doe',
+      ]);
+    });
   });
 
-  it('returns empty metadata without logging when no page_post matches the slug', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getPostPageMock.mockResolvedValue({ ok: true, data: undefined });
+  describe('when no metadata can be built', () => {
+    let errorSpy: MockInstance<typeof console.error>;
 
-    const metadata = await buildPostMetadata('missing');
+    beforeEach(() => {
+      errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    });
 
-    expect(metadata).toEqual({});
-    expect(errorSpy).not.toHaveBeenCalled();
-    errorSpy.mockRestore();
-  });
+    afterEach(() => {
+      errorSpy.mockRestore();
+    });
 
-  it('returns empty metadata when the post fetch fails', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getPostPageMock.mockResolvedValue({ ok: false, error: new Error('boom') });
+    it('returns empty metadata without logging when no page_post matches the slug', async () => {
+      getPostPageMock.mockResolvedValue({ ok: true, data: undefined });
 
-    const metadata = await buildPostMetadata('hello-world');
+      const metadata = await buildPostMetadata('missing');
 
-    expect(metadata).toEqual({});
-    errorSpy.mockRestore();
-  });
+      expect(metadata).toEqual({});
+      expect(errorSpy).not.toHaveBeenCalled();
+    });
 
-  it('passes the already-resolved seo through to toMetadata', async () => {
-    getPostPageMock.mockResolvedValue({ ok: true, data: basePost });
+    it('returns empty metadata when the post fetch fails', async () => {
+      getPostPageMock.mockResolvedValue({
+        ok: false,
+        error: new Error('boom'),
+      });
 
-    const metadata = await buildPostMetadata('hello-world');
+      const metadata = await buildPostMetadata('hello-world');
 
-    expect(metadata.title).toBe('Hello World');
-    expect(metadata.description).toBe(
-      'A sufficiently long excerpt for the card.',
-    );
-    expect(metadata.alternates?.canonical).toBe('/blog/hello-world');
-    expect(metadata.openGraph?.title).toBe('Hello World OG');
-    expect(metadata.openGraph?.description).toBe(
-      'A sufficiently long excerpt for the card OG.',
-    );
-    expect(metadata.openGraph?.images).toEqual([
-      { url: EXPECTED_OG_IMAGE_URL },
-    ]);
-  });
-
-  it('sets openGraph.publishedTime from post.publishedAt', async () => {
-    getPostPageMock.mockResolvedValue({ ok: true, data: basePost });
-
-    const metadata = await buildPostMetadata('hello-world');
-
-    expect(
-      (metadata.openGraph as { publishedTime?: string })?.publishedTime,
-    ).toBe('2026-01-15T00:00:00Z');
-  });
-
-  it('sets openGraph.authors from post.author.name', async () => {
-    getPostPageMock.mockResolvedValue({ ok: true, data: basePost });
-
-    const metadata = await buildPostMetadata('hello-world');
-
-    expect((metadata.openGraph as { authors?: string[] })?.authors).toEqual([
-      'Jane Doe',
-    ]);
+      expect(metadata).toEqual({});
+    });
   });
 });
 

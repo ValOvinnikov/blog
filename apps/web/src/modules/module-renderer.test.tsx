@@ -40,21 +40,23 @@ describe(renderModules.name, () => {
     map: moduleMap,
   });
 
-  it('renders the mapped component for a known module type with its id', () => {
-    setup();
+  describe('with the default modules', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    expect(screen.getByTestId('stub-cta')).toHaveTextContent('cta-doc-id');
-  });
+    it('renders the mapped component for a known module type with its id', () => {
+      expect(screen.getByTestId('stub-cta')).toHaveTextContent('cta-doc-id');
+    });
 
-  it('forwards id to every module component', () => {
-    setup();
-
-    expect(ctaModuleMock).toHaveBeenCalledWith(
-      {
-        id: 'cta-doc-id',
-      },
-      undefined,
-    );
+    it('forwards id to every module component', () => {
+      expect(ctaModuleMock).toHaveBeenCalledWith(
+        {
+          id: 'cta-doc-id',
+        },
+        undefined,
+      );
+    });
   });
 
   it('forwards a caller-provided context, including page, to every module component', () => {
@@ -114,17 +116,19 @@ describe(renderHeroModule.name, () => {
     map: heroMap,
   });
 
-  it('dispatches to the registered hero component for a known type', async () => {
-    await setup();
+  describe('with the default hero', () => {
+    beforeEach(async () => {
+      await setup();
+    });
 
-    expect(screen.getByTestId('stub-hero')).toHaveTextContent('hero-doc-id');
-  });
+    it('dispatches to the registered hero component for a known type', async () => {
+      expect(screen.getByTestId('stub-hero')).toHaveTextContent('hero-doc-id');
+    });
 
-  it('forwards id to the registered hero component', async () => {
-    await setup();
-
-    expect(heroModuleMock).toHaveBeenCalledWith({
-      id: 'hero-doc-id',
+    it('forwards id to the registered hero component', async () => {
+      expect(heroModuleMock).toHaveBeenCalledWith({
+        id: 'hero-doc-id',
+      });
     });
   });
 

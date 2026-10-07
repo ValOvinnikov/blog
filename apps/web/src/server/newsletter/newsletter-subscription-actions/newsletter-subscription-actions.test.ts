@@ -5,6 +5,7 @@ import {
 } from '@blog/config';
 import { TENANT_STATUS } from '@blog/db';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
+import type { MockInstance } from 'vitest';
 
 const {
   authMock,
@@ -94,21 +95,31 @@ const session = {
 };
 
 describe('unsubscribeAction', () => {
-  beforeEach(() => {
+  let unsubscribeAction: typeof import('./newsletter-subscription-actions').unsubscribeAction;
+  let errorSpy: MockInstance<typeof console.error>;
+
+  beforeEach(async () => {
+    errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     authMock.mockReset();
+    authMock.mockResolvedValue(session);
     unsubscribeMock.mockReset();
+    unsubscribeMock.mockResolvedValue(undefined);
     clearNewsletterSubscribedCookieMock.mockReset();
+    clearNewsletterSubscribedCookieMock.mockResolvedValue(undefined);
     resolveRequestTenantMock.mockReset();
     resolveRequestTenantMock.mockResolvedValue({
       id: TENANT_ID,
       status: TENANT_STATUS.ACTIVE,
     });
+    ({ unsubscribeAction } = await import('./newsletter-subscription-actions'));
+  });
+
+  afterEach(() => {
+    errorSpy.mockRestore();
   });
 
   it('returns { ok: false } without unsubscribing when there is no session', async () => {
     authMock.mockResolvedValue(null);
-    const { unsubscribeAction } =
-      await import('./newsletter-subscription-actions');
 
     await expect(unsubscribeAction()).resolves.toEqual({
       ok: false,
@@ -119,10 +130,7 @@ describe('unsubscribeAction', () => {
   });
 
   it('returns { ok: false } without unsubscribing when no tenant resolves', async () => {
-    authMock.mockResolvedValue(session);
     resolveRequestTenantMock.mockResolvedValue(undefined);
-    const { unsubscribeAction } =
-      await import('./newsletter-subscription-actions');
 
     await expect(unsubscribeAction()).resolves.toEqual({
       ok: false,
@@ -135,12 +143,7 @@ describe('unsubscribeAction', () => {
   it.each([TENANT_STATUS.SUSPENDED, TENANT_STATUS.ARCHIVED])(
     'unsubscribes the session user when the tenant is %s',
     async (status) => {
-      authMock.mockResolvedValue(session);
       resolveRequestTenantMock.mockResolvedValue({ id: TENANT_ID, status });
-      unsubscribeMock.mockResolvedValue(undefined);
-      clearNewsletterSubscribedCookieMock.mockResolvedValue(undefined);
-      const { unsubscribeAction } =
-        await import('./newsletter-subscription-actions');
 
       await expect(unsubscribeAction()).resolves.toEqual({ ok: true });
       expect(unsubscribeMock).toHaveBeenCalledWith(TENANT_ID, 'user-1');
@@ -148,23 +151,13 @@ describe('unsubscribeAction', () => {
   );
 
   it('unsubscribes the session user, clears the cookie, and returns { ok: true }', async () => {
-    authMock.mockResolvedValue(session);
-    unsubscribeMock.mockResolvedValue(undefined);
-    clearNewsletterSubscribedCookieMock.mockResolvedValue(undefined);
-    const { unsubscribeAction } =
-      await import('./newsletter-subscription-actions');
-
     await expect(unsubscribeAction()).resolves.toEqual({ ok: true });
     expect(unsubscribeMock).toHaveBeenCalledWith(TENANT_ID, 'user-1');
     expect(clearNewsletterSubscribedCookieMock).toHaveBeenCalledTimes(1);
   });
 
   it('returns { ok: false }, logs and keeps the cookie when the db write throws', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    authMock.mockResolvedValue(session);
     unsubscribeMock.mockRejectedValue(new Error('boom'));
-    const { unsubscribeAction } =
-      await import('./newsletter-subscription-actions');
 
     await expect(unsubscribeAction()).resolves.toEqual({
       ok: false,
@@ -172,32 +165,34 @@ describe('unsubscribeAction', () => {
     });
     expect(errorSpy).toHaveBeenCalled();
     expect(clearNewsletterSubscribedCookieMock).not.toHaveBeenCalled();
-    errorSpy.mockRestore();
   });
 
   it('still returns { ok: true }, logging, when clearing the cookie throws', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    authMock.mockResolvedValue(session);
-    unsubscribeMock.mockResolvedValue(undefined);
     clearNewsletterSubscribedCookieMock.mockRejectedValue(
       new Error('cookie store down'),
     );
-    const { unsubscribeAction } =
-      await import('./newsletter-subscription-actions');
 
     await expect(unsubscribeAction()).resolves.toEqual({ ok: true });
     expect(errorSpy).toHaveBeenCalledWith(
       expect.stringContaining('newsletter.subscribed_cookie_clear_failed'),
     );
-    errorSpy.mockRestore();
   });
 });
 
 describe('resendConfirmationAction', () => {
-  beforeEach(() => {
+  let resendConfirmationAction: typeof import('./newsletter-subscription-actions').resendConfirmationAction;
+
+  beforeEach(async () => {
     authMock.mockReset();
+    authMock.mockResolvedValue(session);
     resendConfirmationMock.mockReset();
+    resendConfirmationMock.mockResolvedValue({
+      outcome: 'pending',
+      confirmationToken: 'token-abc',
+      unsubscribeToken: 'unsub-token-abc',
+    });
     sendEmailMock.mockReset();
+    sendEmailMock.mockResolvedValue(undefined);
     resolveTenantEmailIdentityMock.mockReset();
     resolveTenantEmailIdentityMock.mockResolvedValue({
       brand: resolveTenantEmailBrand({
@@ -223,12 +218,12 @@ describe('resendConfirmationAction', () => {
       body: [],
       logoAssetUrl: undefined,
     });
+    ({ resendConfirmationAction } =
+      await import('./newsletter-subscription-actions'));
   });
 
   it('returns { ok: false } without resending when there is no session', async () => {
     authMock.mockResolvedValue(null);
-    const { resendConfirmationAction } =
-      await import('./newsletter-subscription-actions');
 
     await expect(resendConfirmationAction()).resolves.toEqual({
       ok: false,
@@ -240,8 +235,6 @@ describe('resendConfirmationAction', () => {
 
   it('returns { ok: false } without resending when the session has no email', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    const { resendConfirmationAction } =
-      await import('./newsletter-subscription-actions');
 
     await expect(resendConfirmationAction()).resolves.toEqual({
       ok: false,
@@ -251,13 +244,10 @@ describe('resendConfirmationAction', () => {
   });
 
   it('returns { ok: false } without resending when no tenant resolves', async () => {
-    authMock.mockResolvedValue(session);
     resolveWritableTenantMock.mockResolvedValue({
       ok: false,
       reason: TENANT_WRITE_REFUSAL.UNRESOLVED,
     });
-    const { resendConfirmationAction } =
-      await import('./newsletter-subscription-actions');
 
     await expect(resendConfirmationAction()).resolves.toEqual({
       ok: false,
@@ -268,13 +258,10 @@ describe('resendConfirmationAction', () => {
   });
 
   it('returns { ok: false } without resending when the tenant is not ACTIVE, flagged unavailable', async () => {
-    authMock.mockResolvedValue(session);
     resolveWritableTenantMock.mockResolvedValue({
       ok: false,
       reason: TENANT_WRITE_REFUSAL.INACTIVE,
     });
-    const { resendConfirmationAction } =
-      await import('./newsletter-subscription-actions');
 
     await expect(resendConfirmationAction()).resolves.toEqual({
       ok: false,
@@ -285,16 +272,6 @@ describe('resendConfirmationAction', () => {
   });
 
   it('resends the confirmation email to the session email and returns { ok: true }', async () => {
-    authMock.mockResolvedValue(session);
-    resendConfirmationMock.mockResolvedValue({
-      outcome: 'pending',
-      confirmationToken: 'token-abc',
-      unsubscribeToken: 'unsub-token-abc',
-    });
-    sendEmailMock.mockResolvedValue(undefined);
-    const { resendConfirmationAction } =
-      await import('./newsletter-subscription-actions');
-
     await expect(resendConfirmationAction()).resolves.toEqual({ ok: true });
     expect(resendConfirmationMock).toHaveBeenCalledWith(TENANT_ID, 'user-1');
     expect(sendEmailMock).toHaveBeenCalledWith(
@@ -313,12 +290,6 @@ describe('resendConfirmationAction', () => {
   });
 
   it("renders the subscribing tenant's own brand in the resent confirmation email", async () => {
-    authMock.mockResolvedValue(session);
-    resendConfirmationMock.mockResolvedValue({
-      outcome: 'pending',
-      confirmationToken: 'token-abc',
-      unsubscribeToken: 'unsub-token-abc',
-    });
     const tenantBrand = resolveTenantEmailBrand({
       preset: PRESET_ID.CONSOLE,
       accentHue: 40,
@@ -327,9 +298,6 @@ describe('resendConfirmationAction', () => {
       brand: tenantBrand,
       brandName: 'Zeta Times',
     });
-    sendEmailMock.mockResolvedValue(undefined);
-    const { resendConfirmationAction } =
-      await import('./newsletter-subscription-actions');
 
     await resendConfirmationAction();
 
@@ -342,10 +310,7 @@ describe('resendConfirmationAction', () => {
   });
 
   it('returns { ok: false } without sending when the db reports not-pending', async () => {
-    authMock.mockResolvedValue(session);
     resendConfirmationMock.mockResolvedValue({ outcome: 'not-pending' });
-    const { resendConfirmationAction } =
-      await import('./newsletter-subscription-actions');
 
     await expect(resendConfirmationAction()).resolves.toEqual({
       ok: false,
@@ -356,15 +321,7 @@ describe('resendConfirmationAction', () => {
 
   it('returns { ok: false } and logs when sending the confirmation email throws', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    authMock.mockResolvedValue(session);
-    resendConfirmationMock.mockResolvedValue({
-      outcome: 'pending',
-      confirmationToken: 'token-abc',
-      unsubscribeToken: 'unsub-token-abc',
-    });
     sendEmailMock.mockRejectedValue(new Error('resend down'));
-    const { resendConfirmationAction } =
-      await import('./newsletter-subscription-actions');
 
     await expect(resendConfirmationAction()).resolves.toEqual({
       ok: false,
@@ -374,56 +331,7 @@ describe('resendConfirmationAction', () => {
     errorSpy.mockRestore();
   });
 
-  it('still sends the confirmation email when the email settings lookup rejects', async () => {
-    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    authMock.mockResolvedValue(session);
-    getEmailConfigMock.mockRejectedValue(new Error('db down'));
-    resendConfirmationMock.mockResolvedValue({
-      outcome: 'pending',
-      confirmationToken: 'token-abc',
-      unsubscribeToken: 'unsub-token-abc',
-    });
-    sendEmailMock.mockResolvedValue(undefined);
-    const { resendConfirmationAction } =
-      await import('./newsletter-subscription-actions');
-
-    await expect(resendConfirmationAction()).resolves.toEqual({ ok: true });
-    expect(sendEmailMock).toHaveBeenCalledWith(
-      expect.objectContaining({ to: 'val@icloud.com' }),
-    );
-    warnSpy.mockRestore();
-  });
-
-  it('falls back to default subject and body when the authored-copy lookup rejects', async () => {
-    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    authMock.mockResolvedValue(session);
-    getEmailTemplateMock.mockRejectedValue(new Error('db down'));
-    resendConfirmationMock.mockResolvedValue({
-      outcome: 'pending',
-      confirmationToken: 'token-abc',
-      unsubscribeToken: 'unsub-token-abc',
-    });
-    sendEmailMock.mockResolvedValue(undefined);
-    const { resendConfirmationAction } =
-      await import('./newsletter-subscription-actions');
-
-    await expect(resendConfirmationAction()).resolves.toEqual({ ok: true });
-    expect(sendEmailMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        to: 'val@icloud.com',
-        subject: 'Confirm your newsletter subscription',
-        headers: {
-          'List-Unsubscribe':
-            '<https://example.com/api/newsletter/unsubscribe?token=unsub-token-abc>',
-          'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
-        },
-      }),
-    );
-    warnSpy.mockRestore();
-  });
-
   it('sends with a validated reply-to while preserving the List-Unsubscribe headers', async () => {
-    authMock.mockResolvedValue(session);
     getEmailConfigMock.mockResolvedValue({
       tenantId: TENANT_ID,
       logoAssetUrl: undefined,
@@ -431,14 +339,6 @@ describe('resendConfirmationAction', () => {
       replyToAddress: 'support@example.com',
       footerPostalAddress: undefined,
     });
-    resendConfirmationMock.mockResolvedValue({
-      outcome: 'pending',
-      confirmationToken: 'token-abc',
-      unsubscribeToken: 'unsub-token-abc',
-    });
-    sendEmailMock.mockResolvedValue(undefined);
-    const { resendConfirmationAction } =
-      await import('./newsletter-subscription-actions');
 
     await resendConfirmationAction();
 
@@ -455,7 +355,6 @@ describe('resendConfirmationAction', () => {
   });
 
   it('drops a malformed stored reply-to address rather than blocking the resend', async () => {
-    authMock.mockResolvedValue(session);
     getEmailConfigMock.mockResolvedValue({
       tenantId: TENANT_ID,
       logoAssetUrl: undefined,
@@ -463,18 +362,48 @@ describe('resendConfirmationAction', () => {
       replyToAddress: 'not-an-address',
       footerPostalAddress: undefined,
     });
-    resendConfirmationMock.mockResolvedValue({
-      outcome: 'pending',
-      confirmationToken: 'token-abc',
-      unsubscribeToken: 'unsub-token-abc',
-    });
-    sendEmailMock.mockResolvedValue(undefined);
-    const { resendConfirmationAction } =
-      await import('./newsletter-subscription-actions');
 
     await expect(resendConfirmationAction()).resolves.toEqual({ ok: true });
     expect(sendEmailMock).toHaveBeenCalledWith(
       expect.objectContaining({ replyTo: undefined }),
     );
+  });
+
+  describe('when console warnings are expected', () => {
+    let warnSpy: MockInstance<typeof console.warn>;
+
+    beforeEach(() => {
+      warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      warnSpy.mockRestore();
+    });
+
+    it('still sends the confirmation email when the email settings lookup rejects', async () => {
+      getEmailConfigMock.mockRejectedValue(new Error('db down'));
+
+      await expect(resendConfirmationAction()).resolves.toEqual({ ok: true });
+      expect(sendEmailMock).toHaveBeenCalledWith(
+        expect.objectContaining({ to: 'val@icloud.com' }),
+      );
+    });
+
+    it('falls back to default subject and body when the authored-copy lookup rejects', async () => {
+      getEmailTemplateMock.mockRejectedValue(new Error('db down'));
+
+      await expect(resendConfirmationAction()).resolves.toEqual({ ok: true });
+      expect(sendEmailMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          to: 'val@icloud.com',
+          subject: 'Confirm your newsletter subscription',
+          headers: {
+            'List-Unsubscribe':
+              '<https://example.com/api/newsletter/unsubscribe?token=unsub-token-abc>',
+            'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+          },
+        }),
+      );
+    });
   });
 });

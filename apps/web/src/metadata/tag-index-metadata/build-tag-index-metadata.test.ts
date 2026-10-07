@@ -7,6 +7,7 @@ import {
   DEFAULT_REQUEST_CONTEXT,
   DEFAULT_TENANT_SANITY_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
+import type { MockInstance } from 'vitest';
 
 import { buildTagIndexMetadata } from './build-tag-index-metadata';
 
@@ -38,9 +39,6 @@ describe('buildTagIndexMetadata', () => {
   beforeEach(() => {
     getTagIndexPageMock.mockReset();
     vi.mocked(getRequestContext).mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
-  });
-
-  it('reads the page through getTagIndexPage', async () => {
     getTagIndexPageMock.mockResolvedValue({
       ok: true,
       data: {
@@ -50,23 +48,15 @@ describe('buildTagIndexMetadata', () => {
         translations: [LOCALE_ISO_CODES.EN],
       },
     });
+  });
 
+  it('reads the page through getTagIndexPage', async () => {
     await buildTagIndexMetadata();
 
     expect(getTagIndexPageMock).toHaveBeenCalledWith();
   });
 
   it('builds metadata from the resolved seo, self-canonical to /tags', async () => {
-    getTagIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        headingBlock: { heading: 'Tags' },
-        seo,
-        modules: [],
-        translations: [LOCALE_ISO_CODES.EN],
-      },
-    });
-
     const metadata = await buildTagIndexMetadata();
 
     expect(metadata.title).toBe('Tags');
@@ -81,31 +71,39 @@ describe('buildTagIndexMetadata', () => {
     ]);
   });
 
-  it('returns empty metadata and logs when the index page fetch fails', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getTagIndexPageMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
+  describe('when no metadata can be built', () => {
+    let errorSpy: MockInstance<typeof console.error>;
+
+    beforeEach(() => {
+      errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     });
 
-    const metadata = await buildTagIndexMetadata();
+    afterEach(() => {
+      errorSpy.mockRestore();
+    });
 
-    expect(metadata).toEqual({});
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('tag_index_metadata.fetch_failed'),
-    );
-    errorSpy.mockRestore();
-  });
+    it('returns empty metadata and logs when the index page fetch fails', async () => {
+      getTagIndexPageMock.mockResolvedValue({
+        ok: false,
+        error: new Error('boom'),
+      });
 
-  it('returns empty metadata without logging when the page does not exist', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getTagIndexPageMock.mockResolvedValue({ ok: true, data: undefined });
+      const metadata = await buildTagIndexMetadata();
 
-    const metadata = await buildTagIndexMetadata();
+      expect(metadata).toEqual({});
+      expect(errorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('tag_index_metadata.fetch_failed'),
+      );
+    });
 
-    expect(metadata).toEqual({});
-    expect(errorSpy).not.toHaveBeenCalled();
-    errorSpy.mockRestore();
+    it('returns empty metadata without logging when the page does not exist', async () => {
+      getTagIndexPageMock.mockResolvedValue({ ok: true, data: undefined });
+
+      const metadata = await buildTagIndexMetadata();
+
+      expect(metadata).toEqual({});
+      expect(errorSpy).not.toHaveBeenCalled();
+    });
   });
 
   it('lists every live language with its own page as hreflang, canonical to its own prefixed address', async () => {

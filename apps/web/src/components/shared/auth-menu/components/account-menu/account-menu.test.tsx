@@ -1,8 +1,9 @@
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { usePopover } from '@web/hooks/use-popover';
 import {
   customRender,
   fireEvent,
+  type RenderResult,
   screen,
   within,
 } from '@web/testing/custom-render';
@@ -43,9 +44,15 @@ const getTriggerImage = () => {
 };
 
 describe(`<${AccountMenu.name}/>`, () => {
-  it('falls back to initials in the trigger avatar once its image fails to load', () => {
-    setup();
+  let user: UserEvent;
+  let rerender: RenderResult['rerender'];
 
+  beforeEach(() => {
+    ({ rerender } = setup());
+    user = userEvent.setup();
+  });
+
+  it('falls back to initials in the trigger avatar once its image fails to load', () => {
     const image = getTriggerImage();
     expect(image).toBeVisible();
 
@@ -57,9 +64,6 @@ describe(`<${AccountMenu.name}/>`, () => {
   });
 
   it('also falls back to initials in the panel body avatar, since it shares the same failure state as the trigger', async () => {
-    setup();
-    const user = userEvent.setup();
-
     fireEvent.error(getTriggerImage()!);
 
     const trigger = screen.getByRole('button', { name: 'Account menu' });
@@ -71,8 +75,6 @@ describe(`<${AccountMenu.name}/>`, () => {
   });
 
   it('does not carry a stale failure forward once a different image URL is supplied', () => {
-    const { rerender } = setup();
-
     fireEvent.error(getTriggerImage()!);
     expect(getTriggerImage()).not.toBeInTheDocument();
 
@@ -88,9 +90,6 @@ describe(`<${AccountMenu.name}/>`, () => {
   });
 
   it('renders a plain "Account" label — not a heading — and the session name/email', async () => {
-    setup();
-    const user = userEvent.setup();
-
     await user.click(screen.getByRole('button', { name: 'Account menu' }));
     const panel = screen.getByRole('menu');
 

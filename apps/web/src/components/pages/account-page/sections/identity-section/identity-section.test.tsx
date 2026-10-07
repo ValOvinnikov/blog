@@ -82,21 +82,34 @@ describe(`<${IdentitySection.name}/>`, () => {
     expect(screen.getByRole('button', { name: 'Link' })).toBeVisible();
   });
 
-  it('shows the last-method notice instead of a control for the sole method', async () => {
-    getLinkedProvidersMock.mockResolvedValue({
-      github: true,
-      google: false,
-      emailLink: false,
+  describe('with GitHub as the only linked method', () => {
+    beforeEach(() => {
+      getLinkedProvidersMock.mockResolvedValue({
+        github: true,
+        google: false,
+        emailLink: false,
+      });
     });
 
-    await setup();
+    it('shows the last-method notice instead of a control for the sole method', async () => {
+      await setup();
 
-    expect(
-      screen.getByText("Last remaining method — can't unlink"),
-    ).toBeVisible();
-    expect(
-      screen.queryByRole('button', { name: 'Unlink' }),
-    ).not.toBeInTheDocument();
+      expect(
+        screen.getByText("Last remaining method — can't unlink"),
+      ).toBeVisible();
+      expect(
+        screen.queryByRole('button', { name: 'Unlink' }),
+      ).not.toBeInTheDocument();
+    });
+
+    it('prefills the display-name field with the session name', async () => {
+      await setup();
+
+      expect(screen.getByRole('textbox', { name: 'Display name' })).toHaveValue(
+        'Jane Doe',
+      );
+      expect(screen.getByRole('button', { name: 'Save' })).toBeVisible();
+    });
   });
 
   it('shows the last-method notice when email link is the only method', async () => {
@@ -111,20 +124,5 @@ describe(`<${IdentitySection.name}/>`, () => {
     expect(
       screen.getByText("Last remaining method — can't unlink"),
     ).toBeVisible();
-  });
-
-  it('prefills the display-name field with the session name', async () => {
-    getLinkedProvidersMock.mockResolvedValue({
-      github: true,
-      google: false,
-      emailLink: false,
-    });
-
-    await setup();
-
-    expect(screen.getByRole('textbox', { name: 'Display name' })).toHaveValue(
-      'Jane Doe',
-    );
-    expect(screen.getByRole('button', { name: 'Save' })).toBeVisible();
   });
 });

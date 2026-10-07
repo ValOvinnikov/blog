@@ -15,15 +15,15 @@ const setup = customRender(Section, {
 });
 
 describe(`<${Section.name}/>`, () => {
-  it('renders its children', () => {
+  beforeEach(() => {
     setup();
+  });
 
+  it('renders its children', () => {
     expect(screen.getByText('Content')).toBeVisible();
   });
 
   it('renders as a labelled region whose accessible name matches the heading referenced by titleId', () => {
-    setup();
-
     expect(screen.getByRole('region', { name: 'Test' })).toBeVisible();
   });
 });

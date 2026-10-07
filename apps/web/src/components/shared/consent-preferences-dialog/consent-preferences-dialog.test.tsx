@@ -1,4 +1,4 @@
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { CookieSettingsButton } from '@web/components/shared/cookie-settings-button';
 import {
   useConsentChoices,
@@ -26,7 +26,6 @@ const BannerOpener = () => {
 };
 
 const setup = async () => {
-  const user = userEvent.setup();
   renderElement(
     <>
       <OpenPreferencesButton />
@@ -34,8 +33,9 @@ const setup = async () => {
     </>,
   );
   await user.click(screen.getByRole('button', { name: 'Open preferences' }));
-  return user;
 };
+
+let user: UserEvent;
 
 describe(`<${ConsentPreferencesDialog.name}/>`, () => {
   beforeAll(() => {
@@ -47,7 +47,10 @@ describe(`<${ConsentPreferencesDialog.name}/>`, () => {
       this.dispatchEvent(new Event('close'));
     };
   });
-  beforeEach(clearConsentCookie);
+  beforeEach(() => {
+    clearConsentCookie();
+    user = userEvent.setup();
+  });
   afterEach(clearConsentCookie);
 
   it('stays closed until preferences are opened', () => {
@@ -56,80 +59,73 @@ describe(`<${ConsentPreferencesDialog.name}/>`, () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  it('opens as a modal dialog with the cookie settings', async () => {
-    await setup();
+  describe('when preferences are opened', () => {
+    beforeEach(async () => {
+      await setup();
+    });
 
-    expect(
-      screen.getByRole('dialog', { name: 'Cookie settings' }),
-    ).toBeVisible();
+    it('opens as a modal dialog with the cookie settings', async () => {
+      expect(
+        screen.getByRole('dialog', { name: 'Cookie settings' }),
+      ).toBeVisible();
+    });
+
+    it('shows necessary cookies as always on', async () => {
+      const necessary = screen.getByRole('switch', { name: 'Necessary' });
+      expect(necessary).toBeChecked();
+      expect(necessary).toBeDisabled();
+    });
+
+    it('shows external media off until it has been granted', async () => {
+      expect(
+        screen.getByRole('switch', { name: 'External media' }),
+      ).not.toBeChecked();
+    });
+
+    it('saves the chosen categories and closes', async () => {
+      await user.click(screen.getByRole('switch', { name: 'External media' }));
+      await user.click(screen.getByRole('button', { name: 'Save' }));
+
+      expect(document.cookie).toContain('consent=1.EXTERNAL_MEDIA');
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('closes without saving from the close button', async () => {
+      await user.click(screen.getByRole('switch', { name: 'External media' }));
+      await user.click(screen.getByRole('button', { name: 'Close' }));
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(document.cookie).not.toContain('consent=');
+    });
+
+    it('closes when the browser dismisses the dialog', async () => {
+      fireEvent(screen.getByRole('dialog'), new Event('close'));
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
   });
 
-  it('shows necessary cookies as always on', async () => {
-    await setup();
+  describe('when external media was already granted', () => {
+    beforeEach(async () => {
+      document.cookie = 'consent=1.EXTERNAL_MEDIA; Path=/';
+      await setup();
+    });
 
-    const necessary = screen.getByRole('switch', { name: 'Necessary' });
-    expect(necessary).toBeChecked();
-    expect(necessary).toBeDisabled();
-  });
+    it('shows external media on once it has been granted', async () => {
+      expect(
+        screen.getByRole('switch', { name: 'External media' }),
+      ).toBeChecked();
+    });
 
-  it('shows external media off until it has been granted', async () => {
-    await setup();
+    it('saves a withdrawn category as declined', async () => {
+      await user.click(screen.getByRole('switch', { name: 'External media' }));
+      await user.click(screen.getByRole('button', { name: 'Save' }));
 
-    expect(
-      screen.getByRole('switch', { name: 'External media' }),
-    ).not.toBeChecked();
-  });
-
-  it('shows external media on once it has been granted', async () => {
-    document.cookie = 'consent=1.EXTERNAL_MEDIA; Path=/';
-
-    await setup();
-
-    expect(
-      screen.getByRole('switch', { name: 'External media' }),
-    ).toBeChecked();
-  });
-
-  it('saves the chosen categories and closes', async () => {
-    const user = await setup();
-
-    await user.click(screen.getByRole('switch', { name: 'External media' }));
-    await user.click(screen.getByRole('button', { name: 'Save' }));
-
-    expect(document.cookie).toContain('consent=1.EXTERNAL_MEDIA');
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-  });
-
-  it('saves a withdrawn category as declined', async () => {
-    document.cookie = 'consent=1.EXTERNAL_MEDIA; Path=/';
-    const user = await setup();
-
-    await user.click(screen.getByRole('switch', { name: 'External media' }));
-    await user.click(screen.getByRole('button', { name: 'Save' }));
-
-    expect(document.cookie).not.toContain('EXTERNAL_MEDIA');
-  });
-
-  it('closes without saving from the close button', async () => {
-    const user = await setup();
-
-    await user.click(screen.getByRole('switch', { name: 'External media' }));
-    await user.click(screen.getByRole('button', { name: 'Close' }));
-
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    expect(document.cookie).not.toContain('consent=');
-  });
-
-  it('closes when the browser dismisses the dialog', async () => {
-    await setup();
-
-    fireEvent(screen.getByRole('dialog'), new Event('close'));
-
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(document.cookie).not.toContain('EXTERNAL_MEDIA');
+    });
   });
 
   it('moves focus to the footer cookie settings button when the opener is gone', async () => {
-    const user = userEvent.setup();
     renderElement(
       <>
         <BannerOpener />

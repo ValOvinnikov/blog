@@ -48,30 +48,34 @@ const setup = customRender(HeroModuleShell, {
 });
 
 describe(`<${HeroModuleShell.name}/>`, () => {
-  it('renders the title as the top-level heading, labelling the Section via titleId', () => {
-    setup();
-
-    const heading = screen.getByRole('heading', {
-      level: 1,
-      name: 'Shared hero shell',
+  describe('with the default props', () => {
+    beforeEach(() => {
+      setup();
     });
-    expect(heading).toBeVisible();
-    expect(heading).toHaveAttribute('id', 'shared-hero-shell');
 
-    const section = heading.closest('section');
-    expect(section).toHaveAttribute('aria-labelledby', 'shared-hero-shell');
-  });
+    it('renders the title as the top-level heading, labelling the Section via titleId', () => {
+      const heading = screen.getByRole('heading', {
+        level: 1,
+        name: 'Shared hero shell',
+      });
+      expect(heading).toBeVisible();
+      expect(heading).toHaveAttribute('id', 'shared-hero-shell');
 
-  it('renders its children inside the Hero', () => {
-    setup();
+      const section = heading.closest('section');
+      expect(section).toHaveAttribute('aria-labelledby', 'shared-hero-shell');
+    });
 
-    expect(screen.getByText('Slot content')).toBeVisible();
-  });
+    it('renders its children inside the Hero', () => {
+      expect(screen.getByText('Slot content')).toBeVisible();
+    });
 
-  it('renders no Hero.Cta slot when ctaButtons is empty', () => {
-    setup();
+    it('renders no Hero.Cta slot when ctaButtons is empty', () => {
+      expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    });
 
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    it('renders no Hero.Media slot when sanityImage is absent', () => {
+      expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    });
   });
 
   it('renders a link for each authored ctaButton', () => {
@@ -89,12 +93,6 @@ describe(`<${HeroModuleShell.name}/>`, () => {
     expect(links).toHaveLength(2);
     expect(links[0]).toHaveTextContent('Learn more');
     expect(links[1]).toHaveTextContent('See pricing');
-  });
-
-  it('renders no Hero.Media slot when sanityImage is absent', () => {
-    setup();
-
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
   it('renders the hero image cropped to a 16:9 (675) height, eagerly', () => {

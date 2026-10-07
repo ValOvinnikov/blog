@@ -16,36 +16,40 @@ const setup = customRender(TeamSpotlight, {
 });
 
 describe(`<${TeamSpotlight.name}/>`, () => {
-  it('renders initials, never an empty frame, when the member has no photo', () => {
-    const { unmount } = setup();
+  describe('with the default member', () => {
+    let unmount: () => void;
 
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
-    expect(screen.getByText('JR')).toBeVisible();
-    unmount();
+    beforeEach(() => {
+      ({ unmount } = setup());
+    });
 
-    setup({ member: makeTeamMember({ image: makeSanityImage() }) });
+    it('renders initials, never an empty frame, when the member has no photo', () => {
+      expect(screen.queryByRole('img')).not.toBeInTheDocument();
+      expect(screen.getByText('JR')).toBeVisible();
+      unmount();
 
-    expect(screen.getByRole('img')).toBeVisible();
-    expect(screen.queryByText('JR')).not.toBeInTheDocument();
-  });
+      setup({ member: makeTeamMember({ image: makeSanityImage() }) });
 
-  it("links the person's name only when a profile page is set", () => {
-    const { unmount } = setup();
+      expect(screen.getByRole('img')).toBeVisible();
+      expect(screen.queryByText('JR')).not.toBeInTheDocument();
+    });
 
-    expect(
-      screen.queryByRole('link', { name: member.name }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.getByRole('heading', { level: 3, name: member.name }),
-    ).toBeVisible();
-    unmount();
+    it("links the person's name only when a profile page is set", () => {
+      expect(
+        screen.queryByRole('link', { name: member.name }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.getByRole('heading', { level: 3, name: member.name }),
+      ).toBeVisible();
+      unmount();
 
-    setup({ member: makeTeamMember({ profileUrl: '/team/jordan-reyes' }) });
+      setup({ member: makeTeamMember({ profileUrl: '/team/jordan-reyes' }) });
 
-    expect(screen.getByRole('link', { name: member.name })).toHaveAttribute(
-      'href',
-      '/team/jordan-reyes',
-    );
+      expect(screen.getByRole('link', { name: member.name })).toHaveAttribute(
+        'href',
+        '/team/jordan-reyes',
+      );
+    });
   });
 
   it('renders the role and bio only when the loader supplied them', () => {

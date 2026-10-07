@@ -1,4 +1,4 @@
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import {
   customRender,
   renderElement,
@@ -33,45 +33,155 @@ const typeAndSubmit = async (
 };
 
 describe(`<${NewsletterForm.name}/>`, () => {
+  let user: UserEvent;
+
   beforeEach(() => {
     subscribeToNewsletterActionMock.mockReset();
+    user = userEvent.setup();
   });
 
-  it('renders idle with a labeled field and submit button', () => {
-    setup();
+  describe('with default props', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    expect(
-      screen.getByRole('textbox', { name: 'Email address' }),
-    ).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Subscribe' })).toBeVisible();
-  });
+    it('renders idle with a labeled field and submit button', () => {
+      expect(
+        screen.getByRole('textbox', { name: 'Email address' }),
+      ).toBeVisible();
+      expect(screen.getByRole('button', { name: 'Subscribe' })).toBeVisible();
+    });
 
-  it('shows an inline error without calling the server action for a malformed email', async () => {
-    const user = userEvent.setup();
-    setup();
+    it('shows an inline error without calling the server action for a malformed email', async () => {
+      await typeAndSubmit(user, 'not-an-email');
 
-    await typeAndSubmit(user, 'not-an-email');
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        'Enter a valid email address.',
+      );
+      expect(subscribeToNewsletterActionMock).not.toHaveBeenCalled();
+    });
 
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      'Enter a valid email address.',
-    );
-    expect(subscribeToNewsletterActionMock).not.toHaveBeenCalled();
-  });
+    it('associates the rendered error with the email field via its accessible description', async () => {
+      await typeAndSubmit(user, 'not-an-email');
 
-  it('associates the rendered error with the email field via its accessible description', async () => {
-    const user = userEvent.setup();
-    setup();
+      await screen.findByRole('alert');
+      expect(screen.getByRole('textbox')).toHaveAccessibleDescription(
+        'Enter a valid email address.',
+      );
+    });
 
-    await typeAndSubmit(user, 'not-an-email');
+    it('marks the button busy while the server action is in flight', async () => {
+      let resolveAction!: (result: { outcome: 'success' }) => void;
+      subscribeToNewsletterActionMock.mockImplementation(
+        () =>
+          new Promise((resolve) => {
+            resolveAction = resolve;
+          }),
+      );
+      await typeAndSubmit(user, 'reader@example.com');
 
-    await screen.findByRole('alert');
-    expect(screen.getByRole('textbox')).toHaveAccessibleDescription(
-      'Enter a valid email address.',
-    );
+      const button = screen.getByRole('button', { name: 'Subscribe' });
+      await waitFor(() => {
+        expect(button).toHaveAttribute('aria-busy', 'true');
+      });
+
+      resolveAction({ outcome: 'success' });
+
+      await waitFor(() => {
+        expect(screen.getByRole('status')).toBeVisible();
+      });
+    });
+
+    it('shows the success message once the server action resolves "success"', async () => {
+      subscribeToNewsletterActionMock.mockResolvedValue({ outcome: 'success' });
+      await typeAndSubmit(user, 'reader@example.com');
+
+      expect(await screen.findByRole('status')).toHaveTextContent(
+        'Almost there — check your inbox to confirm.',
+      );
+      expect(subscribeToNewsletterActionMock).toHaveBeenCalledWith(
+        'reader@example.com',
+      );
+    });
+
+    describe('when the email is already subscribed', () => {
+      beforeEach(() => {
+        subscribeToNewsletterActionMock.mockResolvedValue({
+          outcome: 'already-subscribed',
+        });
+      });
+
+      it('shows the "already subscribed" error when the server action resolves "already-subscribed"', async () => {
+        await typeAndSubmit(user, 'reader@example.com');
+
+        expect(await screen.findByRole('alert')).toHaveTextContent(
+          'That email is already subscribed.',
+        );
+      });
+
+      it('clears a server-returned error once the reader edits the email', async () => {
+        await typeAndSubmit(user, 'reader@example.com');
+        await screen.findByRole('alert');
+
+        await user.type(
+          screen.getByRole('textbox', { name: 'Email address' }),
+          'x',
+        );
+
+        expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+      });
+    });
+
+    it('shows a generic error when the server action resolves "server-error"', async () => {
+      subscribeToNewsletterActionMock.mockResolvedValue({
+        outcome: 'server-error',
+      });
+      await typeAndSubmit(user, 'reader@example.com');
+
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        'Something went wrong. Please try again.',
+      );
+    });
+
+    it('shows the unavailable message when the server action resolves "unavailable"', async () => {
+      subscribeToNewsletterActionMock.mockResolvedValue({
+        outcome: 'unavailable',
+      });
+      await typeAndSubmit(user, 'reader@example.com');
+
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        "This site isn't taking new subscriptions right now.",
+      );
+    });
+
+    it('clears the inline validation error once the reader edits the email', async () => {
+      await typeAndSubmit(user, 'not-an-email');
+      await screen.findByRole('alert');
+
+      await user.type(
+        screen.getByRole('textbox', { name: 'Email address' }),
+        'x',
+      );
+
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
+
+    it('shows the error again when an invalid email is submitted a second time', async () => {
+      await typeAndSubmit(user, 'not-an-email');
+      await screen.findByRole('alert');
+
+      const input = screen.getByRole('textbox', { name: 'Email address' });
+      await user.clear(input);
+      await user.type(input, 'still-not-an-email');
+      await user.click(screen.getByRole('button', { name: 'Subscribe' }));
+
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        'Enter a valid email address.',
+      );
+    });
   });
 
   it('gives each rendered instance its own errorMessageId, so two forms on one page never collide', async () => {
-    const user = userEvent.setup();
     renderElement(
       <>
         <NewsletterForm variant="full" heading="First newsletter" />
@@ -104,138 +214,6 @@ describe(`<${NewsletterForm.name}/>`, () => {
     );
     expect(firstInput.getAttribute('aria-describedby')).not.toBe(
       secondInput.getAttribute('aria-describedby'),
-    );
-  });
-
-  it('marks the button busy while the server action is in flight', async () => {
-    let resolveAction!: (result: { outcome: 'success' }) => void;
-    subscribeToNewsletterActionMock.mockImplementation(
-      () =>
-        new Promise((resolve) => {
-          resolveAction = resolve;
-        }),
-    );
-    const user = userEvent.setup();
-    setup();
-
-    await typeAndSubmit(user, 'reader@example.com');
-
-    const button = screen.getByRole('button', { name: 'Subscribe' });
-    await waitFor(() => {
-      expect(button).toHaveAttribute('aria-busy', 'true');
-    });
-
-    resolveAction({ outcome: 'success' });
-
-    await waitFor(() => {
-      expect(screen.getByRole('status')).toBeVisible();
-    });
-  });
-
-  it('shows the success message once the server action resolves "success"', async () => {
-    subscribeToNewsletterActionMock.mockResolvedValue({ outcome: 'success' });
-    const user = userEvent.setup();
-    setup();
-
-    await typeAndSubmit(user, 'reader@example.com');
-
-    expect(await screen.findByRole('status')).toHaveTextContent(
-      'Almost there — check your inbox to confirm.',
-    );
-    expect(subscribeToNewsletterActionMock).toHaveBeenCalledWith(
-      'reader@example.com',
-    );
-  });
-
-  it('shows the "already subscribed" error when the server action resolves "already-subscribed"', async () => {
-    subscribeToNewsletterActionMock.mockResolvedValue({
-      outcome: 'already-subscribed',
-    });
-    const user = userEvent.setup();
-    setup();
-
-    await typeAndSubmit(user, 'reader@example.com');
-
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      'That email is already subscribed.',
-    );
-  });
-
-  it('shows a generic error when the server action resolves "server-error"', async () => {
-    subscribeToNewsletterActionMock.mockResolvedValue({
-      outcome: 'server-error',
-    });
-    const user = userEvent.setup();
-    setup();
-
-    await typeAndSubmit(user, 'reader@example.com');
-
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      'Something went wrong. Please try again.',
-    );
-  });
-
-  it('shows the unavailable message when the server action resolves "unavailable"', async () => {
-    subscribeToNewsletterActionMock.mockResolvedValue({
-      outcome: 'unavailable',
-    });
-    const user = userEvent.setup();
-    setup();
-
-    await typeAndSubmit(user, 'reader@example.com');
-
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      "This site isn't taking new subscriptions right now.",
-    );
-  });
-
-  it('clears the inline validation error once the reader edits the email', async () => {
-    const user = userEvent.setup();
-    setup();
-
-    await typeAndSubmit(user, 'not-an-email');
-    await screen.findByRole('alert');
-
-    await user.type(
-      screen.getByRole('textbox', { name: 'Email address' }),
-      'x',
-    );
-
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-  });
-
-  it('clears a server-returned error once the reader edits the email', async () => {
-    subscribeToNewsletterActionMock.mockResolvedValue({
-      outcome: 'already-subscribed',
-    });
-    const user = userEvent.setup();
-    setup();
-
-    await typeAndSubmit(user, 'reader@example.com');
-    await screen.findByRole('alert');
-
-    await user.type(
-      screen.getByRole('textbox', { name: 'Email address' }),
-      'x',
-    );
-
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-  });
-
-  it('shows the error again when an invalid email is submitted a second time', async () => {
-    const user = userEvent.setup();
-    setup();
-
-    await typeAndSubmit(user, 'not-an-email');
-    await screen.findByRole('alert');
-
-    const input = screen.getByRole('textbox', { name: 'Email address' });
-    await user.clear(input);
-    await user.type(input, 'still-not-an-email');
-    await user.click(screen.getByRole('button', { name: 'Subscribe' }));
-
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      'Enter a valid email address.',
     );
   });
 

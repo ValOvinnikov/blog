@@ -23,19 +23,21 @@ vi.mock('next/headers', () => ({ headers: headersMock }));
 const TENANT_ID = 'tenant-1';
 
 describe('GET /api/account/export', () => {
-  beforeEach(() => {
+  let GET: typeof import('./route').GET;
+
+  beforeEach(async () => {
     authMock.mockReset();
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     exportAccountDataMock.mockReset();
     resolveTenantIdMock.mockReset();
     resolveTenantIdMock.mockResolvedValue(TENANT_ID);
     headersMock.mockReset();
     headersMock.mockResolvedValue(new Headers({ host: 'acme.example.com' }));
+    ({ GET } = await import('./route'));
   });
 
   it('returns 401 without querying the db when there is no session', async () => {
     authMock.mockResolvedValue(null);
-    const { GET } = await import('./route');
-
     const response = await GET();
 
     expect(response.status).toBe(401);
@@ -43,24 +45,18 @@ describe('GET /api/account/export', () => {
   });
 
   it('returns 404 when the session user has no matching account row', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     exportAccountDataMock.mockResolvedValue(undefined);
-    const { GET } = await import('./route');
-
     const response = await GET();
 
     expect(response.status).toBe(404);
   });
 
   it('streams the export as a downloadable JSON attachment', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     const exportData = {
       profile: { id: 'user-1', name: 'Jane Doe', email: 'jane@example.com' },
       bookmarks: [{ postId: 'post-1', createdAt: new Date('2026-01-01') }],
     };
     exportAccountDataMock.mockResolvedValue(exportData);
-    const { GET } = await import('./route');
-
     const response = await GET();
     const json = await response.json();
 
@@ -75,10 +71,7 @@ describe('GET /api/account/export', () => {
   });
 
   it('returns 404 without querying the db when no tenant resolves', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     resolveTenantIdMock.mockResolvedValue(undefined);
-    const { GET } = await import('./route');
-
     const response = await GET();
 
     expect(response.status).toBe(404);
@@ -86,13 +79,10 @@ describe('GET /api/account/export', () => {
   });
 
   it('resolves the tenant from the request Host header', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     exportAccountDataMock.mockResolvedValue({
       profile: { id: 'user-1', name: 'Jane Doe', email: 'jane@example.com' },
       bookmarks: [],
     });
-    const { GET } = await import('./route');
-
     await GET();
 
     expect(resolveTenantIdMock).toHaveBeenCalledWith('acme.example.com');
@@ -100,10 +90,7 @@ describe('GET /api/account/export', () => {
 
   it('returns 500 when the export query throws', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     exportAccountDataMock.mockRejectedValue(new Error('boom'));
-    const { GET } = await import('./route');
-
     const response = await GET();
 
     expect(response.status).toBe(500);

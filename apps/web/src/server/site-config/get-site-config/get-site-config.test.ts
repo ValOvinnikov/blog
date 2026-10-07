@@ -50,6 +50,7 @@ describe(getSiteConfig, () => {
   beforeEach(() => {
     getRequestTenantIdMock.mockReset();
     getSiteConfigMock.mockReset();
+    getRequestTenantIdMock.mockResolvedValue(TENANT_A_ID);
   });
 
   it("resolves each request's own tenant's site_config row rather than a shared one", async () => {
@@ -79,7 +80,6 @@ describe(getSiteConfig, () => {
   });
 
   it('forwards an explicitly supplied tenant to getRequestTenantId', async () => {
-    getRequestTenantIdMock.mockResolvedValue(TENANT_A_ID);
     getSiteConfigMock.mockResolvedValue(SITE_CONFIG_ROW_A);
 
     await getSiteConfig(TENANT_A_ID);
@@ -88,7 +88,6 @@ describe(getSiteConfig, () => {
   });
 
   it('returns ok:false when the query rejects', async () => {
-    getRequestTenantIdMock.mockResolvedValue(TENANT_A_ID);
     getSiteConfigMock.mockRejectedValue(new Error('boom'));
 
     const result = await getSiteConfig();

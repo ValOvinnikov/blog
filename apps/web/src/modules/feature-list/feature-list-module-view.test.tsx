@@ -51,29 +51,35 @@ const setup = customRender(FeatureListModuleView, {
 });
 
 describe(`<${FeatureListModuleView.name}/>`, () => {
-  it('labels the section with the given titleId', () => {
-    setup();
+  describe('with default props', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    const label = screen.getByText('Why choose us');
-    expect(label).toHaveAttribute('id', 'feature-list-title');
-    expect(label.tagName).toBe('H2');
+    it('labels the section with the given titleId', () => {
+      const label = screen.getByText('Why choose us');
+      expect(label).toHaveAttribute('id', 'feature-list-title');
+      expect(label.tagName).toBe('H2');
 
-    const section = label.closest('section');
-    expect(section).toHaveAttribute('aria-labelledby', 'feature-list-title');
-    expect(section).toHaveAttribute('data-testid', dataTestId);
-  });
+      const section = label.closest('section');
+      expect(section).toHaveAttribute('aria-labelledby', 'feature-list-title');
+      expect(section).toHaveAttribute('data-testid', dataTestId);
+    });
 
-  it('renders one article with an h3 title per item', () => {
-    setup();
+    it('renders one article with an h3 title per item', () => {
+      expect(screen.getAllByRole('article')).toHaveLength(2);
+      items.forEach((item) => {
+        expect(
+          screen.getByRole('heading', {
+            level: 3,
+            name: item.headingBlock.heading,
+          }),
+        ).toBeVisible();
+      });
+    });
 
-    expect(screen.getAllByRole('article')).toHaveLength(2);
-    items.forEach((item) => {
-      expect(
-        screen.getByRole('heading', {
-          level: 3,
-          name: item.headingBlock.heading,
-        }),
-      ).toBeVisible();
+    it('renders no action group when there are no cta buttons', () => {
+      expect(screen.queryAllByRole('link')).toHaveLength(0);
     });
   });
 
@@ -98,12 +104,6 @@ describe(`<${FeatureListModuleView.name}/>`, () => {
       }
     },
   );
-
-  it('renders no action group when there are no cta buttons', () => {
-    setup();
-
-    expect(screen.queryAllByRole('link')).toHaveLength(0);
-  });
 
   it('renders the resolved cta buttons when present', () => {
     setup({ ctaButtons: ctaActionsDemo });

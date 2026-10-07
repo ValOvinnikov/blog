@@ -1,4 +1,4 @@
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { usePathname } from '@web/i18n/navigation';
 import { fireEvent, renderElement, screen } from '@web/testing/custom-render';
 
@@ -34,8 +34,11 @@ const getToggle = () =>
   screen.getByRole('button', { name: 'Toggle navigation menu' });
 
 describe(`<${SiteNavigation.name}/>`, () => {
-  it('marks the Home item active only on the exact root path', () => {
+  beforeEach(() => {
     vi.mocked(usePathname).mockReturnValue('/');
+  });
+
+  it('marks the Home item active only on the exact root path', () => {
     renderElement(<SiteNavigation links={links} />);
 
     expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute(
@@ -82,7 +85,6 @@ describe(`<${SiteNavigation.name}/>`, () => {
   });
 
   it('renders the actions slot', () => {
-    vi.mocked(usePathname).mockReturnValue('/');
     renderElement(
       <SiteNavigation links={links} actions={<button>Toggle</button>} />,
     );
@@ -91,21 +93,21 @@ describe(`<${SiteNavigation.name}/>`, () => {
   });
 
   describe('mobile toggle', () => {
+    let user: UserEvent;
+    let view: ReturnType<typeof renderElement>;
+    let toggle: HTMLElement;
+
     beforeEach(() => {
-      vi.mocked(usePathname).mockReturnValue('/');
+      user = userEvent.setup();
+      view = renderElement(<SiteNavigation links={links} />);
+      toggle = getToggle();
     });
 
     it('passes a real, non-generic accessible name for the toggle', () => {
-      renderElement(<SiteNavigation links={links} />);
-
-      expect(getToggle()).toHaveAccessibleName('Toggle navigation menu');
+      expect(toggle).toHaveAccessibleName('Toggle navigation menu');
     });
 
     it('opens the panel on toggle click and reflects it via aria-expanded', async () => {
-      const user = userEvent.setup();
-      renderElement(<SiteNavigation links={links} />);
-      const toggle = getToggle();
-
       expect(toggle).toHaveAttribute('aria-expanded', 'false');
 
       await user.click(toggle);
@@ -114,9 +116,6 @@ describe(`<${SiteNavigation.name}/>`, () => {
     });
 
     it('closes on Escape and returns focus to the toggle', async () => {
-      const user = userEvent.setup();
-      renderElement(<SiteNavigation links={links} />);
-      const toggle = getToggle();
       await user.click(toggle);
 
       fireEvent.keyDown(document, { key: 'Escape' });
@@ -126,9 +125,6 @@ describe(`<${SiteNavigation.name}/>`, () => {
     });
 
     it('closes on an outside click', async () => {
-      const user = userEvent.setup();
-      renderElement(<SiteNavigation links={links} />);
-      const toggle = getToggle();
       await user.click(toggle);
 
       fireEvent.mouseDown(document.body);
@@ -137,14 +133,11 @@ describe(`<${SiteNavigation.name}/>`, () => {
     });
 
     it('closes automatically when the route changes', async () => {
-      const user = userEvent.setup();
-      const { rerender } = renderElement(<SiteNavigation links={links} />);
-      const toggle = getToggle();
       await user.click(toggle);
       expect(toggle).toHaveAttribute('aria-expanded', 'true');
 
       vi.mocked(usePathname).mockReturnValue('/blog');
-      rerender(<SiteNavigation links={links} />);
+      view.rerender(<SiteNavigation links={links} />);
 
       expect(getToggle()).toHaveAttribute('aria-expanded', 'false');
     });

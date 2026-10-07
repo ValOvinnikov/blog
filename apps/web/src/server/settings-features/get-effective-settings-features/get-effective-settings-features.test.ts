@@ -30,10 +30,12 @@ describe(getEffectiveSettingsFeatures, () => {
     getRequestTenantIdMock.mockReset();
     getSettingsFeaturesMock.mockReset();
     getSiteConfigMock.mockReset();
+    getRequestTenantIdMock.mockResolvedValue(TENANT_A_ID);
+    getSettingsFeaturesMock.mockResolvedValue(undefined);
+    getSiteConfigMock.mockResolvedValue(undefined);
   });
 
   it('maps the settings_features row to capabilities when one exists', async () => {
-    getRequestTenantIdMock.mockResolvedValue(TENANT_A_ID);
     getSettingsFeaturesMock.mockResolvedValue({
       commentsEnabled: false,
       ratingsEnabled: true,
@@ -59,8 +61,6 @@ describe(getEffectiveSettingsFeatures, () => {
   });
 
   it("falls back to the tenant's preset defaults when no settings_features row exists", async () => {
-    getRequestTenantIdMock.mockResolvedValue(TENANT_A_ID);
-    getSettingsFeaturesMock.mockResolvedValue(undefined);
     getSiteConfigMock.mockResolvedValue({ preset: 'EDITORIAL' });
 
     const result = await getEffectiveSettingsFeatures();
@@ -79,10 +79,6 @@ describe(getEffectiveSettingsFeatures, () => {
   });
 
   it('falls back to the console preset when there is no site_config row either', async () => {
-    getRequestTenantIdMock.mockResolvedValue(TENANT_A_ID);
-    getSettingsFeaturesMock.mockResolvedValue(undefined);
-    getSiteConfigMock.mockResolvedValue(undefined);
-
     const result = await getEffectiveSettingsFeatures();
 
     expect(result).toEqual({
@@ -108,17 +104,12 @@ describe(getEffectiveSettingsFeatures, () => {
   });
 
   it('forwards an explicitly supplied tenant to getRequestTenantId', async () => {
-    getRequestTenantIdMock.mockResolvedValue(TENANT_A_ID);
-    getSettingsFeaturesMock.mockResolvedValue(undefined);
-    getSiteConfigMock.mockResolvedValue(undefined);
-
     await getEffectiveSettingsFeatures(TENANT_A_ID);
 
     expect(getRequestTenantIdMock).toHaveBeenCalledWith(TENANT_A_ID);
   });
 
   it('returns ok:false when a query rejects', async () => {
-    getRequestTenantIdMock.mockResolvedValue(TENANT_A_ID);
     getSettingsFeaturesMock.mockRejectedValue(new Error('boom'));
 
     const result = await getEffectiveSettingsFeatures();

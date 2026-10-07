@@ -18,9 +18,13 @@ const setup = customRender(TeamMemberCard, {
 });
 
 describe(`<${TeamMemberCard.name}/>`, () => {
-  it('renders initials, never an empty avatar, when the member has no photo', () => {
-    const { unmount } = setup();
+  let unmount: () => void;
 
+  beforeEach(() => {
+    ({ unmount } = setup());
+  });
+
+  it('renders initials, never an empty avatar, when the member has no photo', () => {
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
     expect(screen.getByText('JR')).toBeVisible();
     unmount();
@@ -32,8 +36,6 @@ describe(`<${TeamMemberCard.name}/>`, () => {
   });
 
   it("links the person's name only when a profile page is set", () => {
-    const { unmount } = setup();
-
     expect(
       screen.queryByRole('link', { name: member.name }),
     ).not.toBeInTheDocument();
@@ -51,8 +53,6 @@ describe(`<${TeamMemberCard.name}/>`, () => {
   });
 
   it('renders the bio and social links only when the loader supplied them', () => {
-    const { unmount } = setup();
-
     expect(
       screen.queryByText('Builds resilient distributed systems.'),
     ).not.toBeInTheDocument();

@@ -119,64 +119,11 @@ describe('resolveRequestTenant memoization', () => {
     vi.mocked(resolveTenant).mockReset();
     vi.mocked(queries.tenants.toTenantSanityCredentials).mockReset();
     vi.mocked(queries.tenants.toTenantSanityWriteCredentials).mockReset();
-  });
-
-  afterEach(() => {
-    vi.doUnmock('react');
-    vi.resetModules();
-  });
-
-  it('dedupes the underlying lookup when called more than once in the same render pass', async () => {
     headersMock.mockResolvedValue(new Headers({ host: 'acme.example.com' }));
     vi.mocked(resolveTenant).mockResolvedValue({
       id: 'tenant-1',
       primaryDomain: 'acme.example.com',
     } as never);
-
-    vi.doMock('react', async (importOriginal) => {
-      const actual = await importOriginal<typeof import('react')>();
-      return {
-        ...actual,
-        cache: (fn: () => unknown) => {
-          let called = false;
-          let result: unknown;
-          return () => {
-            if (!called) {
-              result = fn();
-              called = true;
-            }
-            return result;
-          };
-        },
-      };
-    });
-    vi.resetModules();
-
-    const { resolveRequestTenant: freshResolveRequestTenant } =
-      await import('./request-tenant');
-
-    await freshResolveRequestTenant();
-    await freshResolveRequestTenant();
-
-    expect(resolveTenant).toHaveBeenCalledTimes(1);
-  });
-
-  it('resolves the tenant exactly once when getTenantBaseUrl and getHostTenantSanityContext both ask for it in the same render pass', async () => {
-    headersMock.mockResolvedValue(new Headers({ host: 'acme.example.com' }));
-    vi.mocked(resolveTenant).mockResolvedValue({
-      id: 'tenant-1',
-      primaryDomain: 'acme.example.com',
-    } as never);
-    vi.mocked(queries.tenants.toTenantSanityCredentials).mockReturnValue({
-      projectId: 'proj',
-      dataset: 'production',
-      token: 'tok',
-      defaultLocale: LOCALE_ISO_CODES.EN,
-      status: TENANT_STATUS.ACTIVE,
-      deprovisionedAt: null,
-      provisioningStatus: null,
-    });
-
     vi.doMock('react', async (importOriginal) => {
       const actual = await importOriginal<typeof import('react')>();
       return {
@@ -197,8 +144,34 @@ describe('resolveRequestTenant memoization', () => {
     vi.doMock('@web/utils/is-production-environment', () => ({
       isProductionEnvironment: () => false,
     }));
+    vi.mocked(queries.tenants.toTenantSanityCredentials).mockReturnValue({
+      projectId: 'proj',
+      dataset: 'production',
+      token: 'tok',
+      defaultLocale: LOCALE_ISO_CODES.EN,
+      status: TENANT_STATUS.ACTIVE,
+      deprovisionedAt: null,
+      provisioningStatus: null,
+    });
     vi.resetModules();
+  });
 
+  afterEach(() => {
+    vi.doUnmock('react');
+    vi.resetModules();
+  });
+
+  it('dedupes the underlying lookup when called more than once in the same render pass', async () => {
+    const { resolveRequestTenant: freshResolveRequestTenant } =
+      await import('./request-tenant');
+
+    await freshResolveRequestTenant();
+    await freshResolveRequestTenant();
+
+    expect(resolveTenant).toHaveBeenCalledTimes(1);
+  });
+
+  it('resolves the tenant exactly once when getTenantBaseUrl and getHostTenantSanityContext both ask for it in the same render pass', async () => {
     const { getTenantBaseUrl } =
       await import('@web/server/tenant/tenant-base-url/tenant-base-url');
     const { getHostTenantSanityContext } =
@@ -212,20 +185,6 @@ describe('resolveRequestTenant memoization', () => {
   });
 
   it('resolves the tenant exactly once when getHostTenantSanityContext and getHostTenantSanityWriteContext both ask for it in the same render pass', async () => {
-    headersMock.mockResolvedValue(new Headers({ host: 'acme.example.com' }));
-    vi.mocked(resolveTenant).mockResolvedValue({
-      id: 'tenant-1',
-      primaryDomain: 'acme.example.com',
-    } as never);
-    vi.mocked(queries.tenants.toTenantSanityCredentials).mockReturnValue({
-      projectId: 'proj',
-      dataset: 'production',
-      token: 'tok',
-      defaultLocale: LOCALE_ISO_CODES.EN,
-      status: TENANT_STATUS.ACTIVE,
-      deprovisionedAt: null,
-      provisioningStatus: null,
-    });
     vi.mocked(queries.tenants.toTenantSanityWriteCredentials).mockReturnValue({
       projectId: 'proj',
       dataset: 'production',
@@ -234,28 +193,6 @@ describe('resolveRequestTenant memoization', () => {
       deprovisionedAt: null,
       provisioningStatus: null,
     });
-
-    vi.doMock('react', async (importOriginal) => {
-      const actual = await importOriginal<typeof import('react')>();
-      return {
-        ...actual,
-        cache: (fn: () => unknown) => {
-          let called = false;
-          let result: unknown;
-          return () => {
-            if (!called) {
-              result = fn();
-              called = true;
-            }
-            return result;
-          };
-        },
-      };
-    });
-    vi.doMock('@web/utils/is-production-environment', () => ({
-      isProductionEnvironment: () => false,
-    }));
-    vi.resetModules();
 
     const { getHostTenantSanityContext } =
       await import('@web/server/tenant/tenant-sanity-context/tenant-sanity-context');
@@ -275,6 +212,7 @@ const VALID_TENANT_ID = 'a1b2c3d4-e5f6-4789-a012-3456789abcde';
 describe(getRequestTenantId, () => {
   beforeEach(() => {
     headersMock.mockReset();
+    headersMock.mockResolvedValue(new Headers());
   });
 
   it('returns the resolved tenant id from the x-tenant-id header', async () => {
@@ -284,8 +222,6 @@ describe(getRequestTenantId, () => {
   });
 
   it('returns undefined when the header is absent', async () => {
-    headersMock.mockResolvedValue(new Headers());
-
     await expect(getRequestTenantId()).resolves.toBeUndefined();
   });
 
@@ -298,8 +234,6 @@ describe(getRequestTenantId, () => {
   });
 
   it('returns undefined for the unresolved-tenant placeholder supplied as the tenant param, without forwarding it as a real id', async () => {
-    headersMock.mockResolvedValue(new Headers());
-
     await expect(
       getRequestTenantId(UNRESOLVED_TENANT_PLACEHOLDER),
     ).resolves.toBeUndefined();

@@ -15,6 +15,7 @@ describe('deleteAccountAction', () => {
   beforeEach(() => {
     authMock.mockReset();
     deleteAccountMock.mockReset();
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
   });
 
   it('returns { ok: false } without deleting when there is no session', async () => {
@@ -25,7 +26,6 @@ describe('deleteAccountAction', () => {
   });
 
   it('deletes the session user and returns { ok: true }', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     deleteAccountMock.mockResolvedValue(undefined);
 
     await expect(deleteAccountAction()).resolves.toEqual({ ok: true });
@@ -34,7 +34,6 @@ describe('deleteAccountAction', () => {
 
   it('returns { ok: false } when the delete throws', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     deleteAccountMock.mockRejectedValue(new Error('boom'));
 
     await expect(deleteAccountAction()).resolves.toEqual({ ok: false });

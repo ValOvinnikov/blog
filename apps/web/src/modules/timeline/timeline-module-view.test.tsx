@@ -34,34 +34,34 @@ const setup = customRender(TimelineModuleView, {
 });
 
 describe(`<${TimelineModuleView.name}/>`, () => {
-  it('renders the section heading as an h2 and each item heading as an h3', () => {
-    setup();
+  describe('with default props', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'How we work' }),
-    ).toBeVisible();
-    expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(3);
-  });
+    it('renders the section heading as an h2 and each item heading as an h3', () => {
+      expect(
+        screen.getByRole('heading', { level: 2, name: 'How we work' }),
+      ).toBeVisible();
+      expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(3);
+    });
 
-  it('renders the items in order as a list', () => {
-    setup();
+    it('renders the items in order as a list', () => {
+      const headings = screen.getAllByRole('heading', { level: 3 });
 
-    const headings = screen.getAllByRole('heading', { level: 3 });
+      expect(screen.getByRole('list')).toBeVisible();
+      expect(screen.getAllByRole('listitem')).toHaveLength(3);
+      expect(headings[0]).toHaveAccessibleName('Step heading 1');
+      expect(headings[1]).toHaveAccessibleName('Step heading 2');
+      expect(headings[2]).toHaveAccessibleName('Step heading 3');
+    });
 
-    expect(screen.getByRole('list')).toBeVisible();
-    expect(screen.getAllByRole('listitem')).toHaveLength(3);
-    expect(headings[0]).toHaveAccessibleName('Step heading 1');
-    expect(headings[1]).toHaveAccessibleName('Step heading 2');
-    expect(headings[2]).toHaveAccessibleName('Step heading 3');
-  });
-
-  it('numbers the markers by position when the marker style is numbered', () => {
-    setup();
-
-    expect(screen.getByText('1')).toBeVisible();
-    expect(screen.getByText('2')).toBeVisible();
-    expect(screen.getByText('3')).toBeVisible();
-    expect(screen.queryByText('Year 2020')).not.toBeInTheDocument();
+    it('numbers the markers by position when the marker style is numbered', () => {
+      expect(screen.getByText('1')).toBeVisible();
+      expect(screen.getByText('2')).toBeVisible();
+      expect(screen.getByText('3')).toBeVisible();
+      expect(screen.queryByText('Year 2020')).not.toBeInTheDocument();
+    });
   });
 
   it('shows the authored marker when the marker style is labelled', () => {

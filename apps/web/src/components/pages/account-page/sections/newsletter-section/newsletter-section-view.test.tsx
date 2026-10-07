@@ -6,20 +6,22 @@ import { NewsletterSectionView } from './newsletter-section-view';
 const setup = customRender(NewsletterSectionView, makeNewsletterSectionView());
 
 describe(`<${NewsletterSectionView.name}/>`, () => {
-  it('renders the panel heading as a level-2 heading', () => {
-    setup();
+  describe('with default props', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'Newsletter' }),
-    ).toBeVisible();
-  });
+    it('renders the panel heading as a level-2 heading', () => {
+      expect(
+        screen.getByRole('heading', { level: 2, name: 'Newsletter' }),
+      ).toBeVisible();
+    });
 
-  it('renders the active state with the subscribed badge, email, and given control', () => {
-    setup();
-
-    expect(screen.getByText('Subscribed')).toBeVisible();
-    expect(screen.getByText('jane@example.com')).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Unsubscribe' })).toBeVisible();
+    it('renders the active state with the subscribed badge, email, and given control', () => {
+      expect(screen.getByText('Subscribed')).toBeVisible();
+      expect(screen.getByText('jane@example.com')).toBeVisible();
+      expect(screen.getByRole('button', { name: 'Unsubscribe' })).toBeVisible();
+    });
   });
 
   it('renders the pending state with the pending badge, no email, and given control', () => {

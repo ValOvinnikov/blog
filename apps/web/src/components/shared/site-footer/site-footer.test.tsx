@@ -79,31 +79,31 @@ describe(SiteFooter, () => {
     getTranslationsMock.mockResolvedValue(translate);
   });
 
-  it('forwards the tenant Sanity context to the footer loader', async () => {
-    await setup();
+  describe('with the default footer', () => {
+    beforeEach(async () => {
+      await setup();
+    });
 
-    expect(getFooterMock).toHaveBeenCalledWith(
-      DEFAULT_REQUEST_CONTEXT.sanityContext,
-    );
-  });
+    it('forwards the tenant Sanity context to the footer loader', async () => {
+      expect(getFooterMock).toHaveBeenCalledWith(
+        DEFAULT_REQUEST_CONTEXT.sanityContext,
+      );
+    });
 
-  it('shows the brand name and the current year in the copyright', async () => {
-    await setup();
+    it('shows the brand name and the current year in the copyright', async () => {
+      const footer = screen.getByRole('contentinfo');
 
-    const footer = screen.getByRole('contentinfo');
+      expect(footer).toHaveTextContent('Blog');
+      expect(footer).toHaveTextContent(String(new Date().getFullYear()));
+    });
 
-    expect(footer).toHaveTextContent('Blog');
-    expect(footer).toHaveTextContent(String(new Date().getFullYear()));
-  });
+    it('adds a visible RSS feed link to the footer nav', async () => {
+      const link = screen.getByRole('link', { name: 'RSS feed' });
 
-  it('adds a visible RSS feed link to the footer nav', async () => {
-    await setup();
-
-    const link = screen.getByRole('link', { name: 'RSS feed' });
-
-    expect(link).toHaveAttribute('href', routes.rssFeed());
-    expect(link).toHaveAttribute('title', 'RSS feed');
-    expect(within(link).getByTestId('rss-icon')).toBeVisible();
+      expect(link).toHaveAttribute('href', routes.rssFeed());
+      expect(link).toHaveAttribute('title', 'RSS feed');
+      expect(within(link).getByTestId('rss-icon')).toBeVisible();
+    });
   });
 
   it('leaves the RSS feed link out when the editor switched it off', async () => {

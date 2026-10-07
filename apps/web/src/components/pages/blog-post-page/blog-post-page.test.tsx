@@ -55,6 +55,54 @@ describe(`<${BlogPostPage.name}/>`, () => {
     vi.mocked(isCapabilityEnabled).mockResolvedValue(false);
   });
 
+  describe('with the default post', () => {
+    beforeEach(async () => {
+      await setup();
+    });
+
+    it('fetches the post for the given slug with the tenant context', () => {
+      expect(getPostMock).toHaveBeenCalledWith(
+        'hello-world',
+        DEFAULT_TENANT_SANITY_CONTEXT,
+      );
+    });
+
+    it('renders the breadcrumb trail outside main', () => {
+      const breadcrumbs = screen.getByRole('navigation', {
+        name: 'Breadcrumb',
+      });
+      expect(
+        within(breadcrumbs).getByRole('link', { name: 'Home' }),
+      ).toBeVisible();
+      expect(
+        within(breadcrumbs).getByRole('link', { name: 'Engineering' }),
+      ).toBeVisible();
+      expect(screen.getByRole('main')).not.toContainElement(breadcrumbs);
+    });
+
+    it('renders the post article inside main', () => {
+      const main = screen.getByRole('main');
+      expect(
+        within(main).getByRole('heading', { level: 1, name: 'Hello World' }),
+      ).toBeVisible();
+      expect(within(main).getByText('Body text.')).toBeVisible();
+    });
+
+    it('renders exactly one h1, from the post', () => {
+      expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+      expect(
+        screen.getByRole('heading', { level: 1, name: 'Hello World' }),
+      ).toBeVisible();
+    });
+
+    it('renders no reading-depth control without a skim or asides', () => {
+      expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('region', { name: '30-second summary' }),
+      ).not.toBeInTheDocument();
+    });
+  });
+
   it('calls notFound() without logging when no page_post matches the slug', async () => {
     getPostMock.mockResolvedValueOnce({ ok: true, data: undefined });
 
@@ -74,56 +122,6 @@ describe(`<${BlogPostPage.name}/>`, () => {
       'blog_post_page.fetch_failed',
       expect.objectContaining({ slug: 'hello-world' }),
     );
-  });
-
-  it('fetches the post for the given slug with the tenant context', async () => {
-    await setup();
-
-    expect(getPostMock).toHaveBeenCalledWith(
-      'hello-world',
-      DEFAULT_TENANT_SANITY_CONTEXT,
-    );
-  });
-
-  it('renders the breadcrumb trail outside main', async () => {
-    await setup();
-
-    const breadcrumbs = screen.getByRole('navigation', { name: 'Breadcrumb' });
-    expect(
-      within(breadcrumbs).getByRole('link', { name: 'Home' }),
-    ).toBeVisible();
-    expect(
-      within(breadcrumbs).getByRole('link', { name: 'Engineering' }),
-    ).toBeVisible();
-    expect(screen.getByRole('main')).not.toContainElement(breadcrumbs);
-  });
-
-  it('renders the post article inside main', async () => {
-    await setup();
-
-    const main = screen.getByRole('main');
-    expect(
-      within(main).getByRole('heading', { level: 1, name: 'Hello World' }),
-    ).toBeVisible();
-    expect(within(main).getByText('Body text.')).toBeVisible();
-  });
-
-  it('renders exactly one h1, from the post', async () => {
-    await setup();
-
-    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Hello World' }),
-    ).toBeVisible();
-  });
-
-  it('renders no reading-depth control without a skim or asides', async () => {
-    await setup();
-
-    expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole('region', { name: '30-second summary' }),
-    ).not.toBeInTheDocument();
   });
 
   it('renders the reading-depth control once the post has asides', async () => {

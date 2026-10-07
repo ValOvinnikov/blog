@@ -41,28 +41,53 @@ const setup = customRender(TaxonomyListModuleView, {
 });
 
 describe(`<${TaxonomyListModuleView.name}/>`, () => {
-  it('labels the section with the given titleId', () => {
-    setup();
+  describe('with the default props', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    const label = screen.getByText('Browse by topic');
-    expect(label).toHaveAttribute('id', 'topic-list-title');
+    it('labels the section with the given titleId', () => {
+      const label = screen.getByText('Browse by topic');
+      expect(label).toHaveAttribute('id', 'topic-list-title');
 
-    const section = label.closest('section');
-    expect(section).toHaveAttribute('aria-labelledby', 'topic-list-title');
-    expect(section).toHaveAttribute(
-      'data-testid',
-      'taxonomy-list-module-topic-list-1',
-    );
-    expect(
-      screen.getByRole('region', { name: 'Browse by topic' }),
-    ).toBeVisible();
-  });
+      const section = label.closest('section');
+      expect(section).toHaveAttribute('aria-labelledby', 'topic-list-title');
+      expect(section).toHaveAttribute(
+        'data-testid',
+        'taxonomy-list-module-topic-list-1',
+      );
+      expect(
+        screen.getByRole('region', { name: 'Browse by topic' }),
+      ).toBeVisible();
+    });
 
-  it('renders the section heading as an h2 by default', () => {
-    setup();
+    it('renders the section heading as an h2 by default', () => {
+      const label = screen.getByText('Browse by topic');
+      expect(label.tagName).toBe('H2');
+    });
 
-    const label = screen.getByText('Browse by topic');
-    expect(label.tagName).toBe('H2');
+    it('renders a linked card per entry with the post count as a level-3 heading', () => {
+      const link = screen.getByRole('link', { name: /Engineering/ });
+      expect(link).toHaveAttribute('href', '/topics/engineering');
+      expect(
+        screen.getByRole('heading', { level: 3, name: /Engineering/ }),
+      ).toBeVisible();
+      expect(screen.getByText('Posts about building things.')).toBeVisible();
+      expect(screen.getByText('5 posts')).toBeVisible();
+    });
+
+    it('lists an entry’s latest posts, newest first, when showLatestPosts is on', () => {
+      const list = screen.getByRole('list', { name: 'Latest in Engineering' });
+      const postLinks = within(list).getAllByRole('link');
+      expect(postLinks.map((link) => link.textContent)).toEqual([
+        'Shipping the new build pipeline',
+        'Why we rewrote our test runner',
+      ]);
+      expect(postLinks[0]).toHaveAttribute(
+        'href',
+        '/blog/shipping-the-new-build-pipeline',
+      );
+    });
   });
 
   it('renders the section heading at the given headingLevel', () => {
@@ -72,38 +97,11 @@ describe(`<${TaxonomyListModuleView.name}/>`, () => {
     expect(label.tagName).toBe('H3');
   });
 
-  it('renders a linked card per entry with the post count as a level-3 heading', () => {
-    setup();
-
-    const link = screen.getByRole('link', { name: /Engineering/ });
-    expect(link).toHaveAttribute('href', '/topics/engineering');
-    expect(
-      screen.getByRole('heading', { level: 3, name: /Engineering/ }),
-    ).toBeVisible();
-    expect(screen.getByText('Posts about building things.')).toBeVisible();
-    expect(screen.getByText('5 posts')).toBeVisible();
-  });
-
   it('renders the empty message instead of the grid when items is empty', () => {
     setup({ items: [] });
 
     expect(screen.getByText('No topics yet.')).toBeVisible();
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
-  });
-
-  it('lists an entry’s latest posts, newest first, when showLatestPosts is on', () => {
-    setup();
-
-    const list = screen.getByRole('list', { name: 'Latest in Engineering' });
-    const postLinks = within(list).getAllByRole('link');
-    expect(postLinks.map((link) => link.textContent)).toEqual([
-      'Shipping the new build pipeline',
-      'Why we rewrote our test runner',
-    ]);
-    expect(postLinks[0]).toHaveAttribute(
-      'href',
-      '/blog/shipping-the-new-build-pipeline',
-    );
   });
 
   it('omits the latest-posts list when showLatestPosts is off, even though posts exist', () => {

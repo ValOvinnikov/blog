@@ -16,16 +16,24 @@ const setup = customRender(CtaModuleView, {
 });
 
 describe(`<${CtaModuleView.name}/>`, () => {
-  it('labels the section by a heading whose id derives from the module id', () => {
-    setup();
-
-    const heading = screen.getByRole('heading', {
-      level: 2,
-      name: 'Get started',
+  describe('with the default module data', () => {
+    beforeEach(() => {
+      setup();
     });
-    expect(heading).toHaveAttribute('id', 'cta-cta-1');
 
-    expect(screen.getByRole('region', { name: 'Get started' })).toBeVisible();
+    it('labels the section by a heading whose id derives from the module id', () => {
+      const heading = screen.getByRole('heading', {
+        level: 2,
+        name: 'Get started',
+      });
+      expect(heading).toHaveAttribute('id', 'cta-cta-1');
+
+      expect(screen.getByRole('region', { name: 'Get started' })).toBeVisible();
+    });
+
+    it('renders no image when none is authored', () => {
+      expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    });
   });
 
   it('derives a distinct heading id from a distinct module id', () => {
@@ -60,11 +68,5 @@ describe(`<${CtaModuleView.name}/>`, () => {
 
     expect(screen.getByText('14-day trial')).toBeVisible();
     expect(screen.getAllByRole('listitem')).toHaveLength(2);
-  });
-
-  it('renders no image when none is authored', () => {
-    setup();
-
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 });

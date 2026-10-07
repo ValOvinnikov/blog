@@ -19,17 +19,17 @@ const setup = () =>
   );
 
 describe(`<${PrivacySection.name}/>`, () => {
-  it('renders the panel heading as a level-2 heading', () => {
+  beforeEach(() => {
     setup();
+  });
 
+  it('renders the panel heading as a level-2 heading', () => {
     expect(
       screen.getByRole('heading', { level: 2, name: 'Privacy' }),
     ).toBeVisible();
   });
 
   it('renders the export row as a download link to the export route', () => {
-    setup();
-
     const exportLink = screen.getByRole('link', { name: 'Request export' });
     expect(exportLink).toHaveAttribute('href', '/api/account/export');
     expect(exportLink).toHaveAttribute('download');
@@ -37,8 +37,6 @@ describe(`<${PrivacySection.name}/>`, () => {
 
   it('arms the delete button once the handle is typed', async () => {
     const user = userEvent.setup();
-    setup();
-
     const deleteButton = screen.getByRole('button', { name: 'Delete account' });
     expect(deleteButton).toBeDisabled();
 

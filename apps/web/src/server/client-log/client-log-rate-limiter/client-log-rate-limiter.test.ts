@@ -24,9 +24,12 @@ const floodUntilLimited = (
 };
 
 describe('isClientLogRateLimited', () => {
-  beforeEach(() => {
+  let isClientLogRateLimited: (clientKey: string) => boolean;
+
+  beforeEach(async () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2026-01-01T00:00:00.000Z'));
+    ({ isClientLogRateLimited } = await freshModule());
   });
 
   afterEach(() => {
@@ -34,8 +37,6 @@ describe('isClientLogRateLimited', () => {
   });
 
   it('rejects a request once the per-window limit is exceeded, allowing every one before it', async () => {
-    const { isClientLogRateLimited } = await freshModule();
-
     const results = floodUntilLimited(isClientLogRateLimited, 'client-a');
 
     expect(results.at(-1)).toBe(true);
@@ -43,14 +44,12 @@ describe('isClientLogRateLimited', () => {
   });
 
   it('tracks each client key independently', async () => {
-    const { isClientLogRateLimited } = await freshModule();
     floodUntilLimited(isClientLogRateLimited, 'client-a');
 
     expect(isClientLogRateLimited('client-b')).toBe(false);
   });
 
   it('resets the count once the window elapses', async () => {
-    const { isClientLogRateLimited } = await freshModule();
     const results = floodUntilLimited(isClientLogRateLimited, 'client-a');
     expect(results.at(-1)).toBe(true);
 
@@ -60,7 +59,6 @@ describe('isClientLogRateLimited', () => {
   });
 
   it('evicts the oldest tracked client once the tracked-client cap is reached, forgetting its rate-limit history', async () => {
-    const { isClientLogRateLimited } = await freshModule();
     const floodResults = floodUntilLimited(isClientLogRateLimited, 'client-0');
     expect(floodResults.at(-1)).toBe(true);
 

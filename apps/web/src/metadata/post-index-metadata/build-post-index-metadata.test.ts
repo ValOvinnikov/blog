@@ -8,6 +8,7 @@ import {
   DEFAULT_REQUEST_CONTEXT,
   DEFAULT_TENANT_SANITY_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
+import type { MockInstance } from 'vitest';
 
 import { buildPostIndexMetadata } from './build-post-index-metadata';
 
@@ -44,71 +45,139 @@ describe('buildPostIndexMetadata', () => {
     vi.mocked(getRequestContext).mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
-  it('reads the page through getPostIndexPage, the loader PostIndexPage reads', async () => {
-    getPostIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        title: 'Blog',
-        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
-        seo,
-        modules: [],
-        translations: [LOCALE_ISO_CODES.EN],
-      },
+  describe('when the index page resolves', () => {
+    beforeEach(() => {
+      getPostIndexPageMock.mockResolvedValue({
+        ok: true,
+        data: {
+          title: 'Blog',
+          headingBlock: makeHeadingBlock({ heading: 'Blog' }),
+          seo,
+          modules: [],
+          translations: [LOCALE_ISO_CODES.EN],
+        },
+      });
     });
 
-    await buildPostIndexMetadata(1);
+    it('reads the page through getPostIndexPage, the loader PostIndexPage reads', async () => {
+      await buildPostIndexMetadata(1);
 
-    expect(getPostIndexPageMock).toHaveBeenCalledWith();
+      expect(getPostIndexPageMock).toHaveBeenCalledWith();
+    });
+
+    it('builds page-1 metadata from the resolved seo, self-canonical to /blog', async () => {
+      const metadata = await buildPostIndexMetadata(1);
+
+      expect(metadata.title).toBe('The Blog');
+      expect(metadata.description).toBe('All the posts.');
+      expect(metadata.alternates?.canonical).toBe('/blog');
+      expect(metadata.openGraph?.title).toBe('The Blog OG');
+      expect(metadata.openGraph?.description).toBe('All the posts OG.');
+      expect(metadata.openGraph?.images).toEqual([
+        { url: EXPECTED_OG_IMAGE_URL },
+      ]);
+      expect(metadata.alternates?.types).toEqual({
+        'application/rss+xml': '/rss.xml',
+      });
+    });
+
+    it('builds page-N metadata with a "– Page N" suffix, canonical to /blog/page/N', async () => {
+      const metadata = await buildPostIndexMetadata(2);
+
+      expect(metadata.title).toBe('The Blog – Page 2');
+      expect(metadata.openGraph?.title).toBe('The Blog OG – Page 2');
+      expect(metadata.twitter?.title).toBe('The Blog OG – Page 2');
+      expect(metadata.alternates?.canonical).toBe('/blog/page/2');
+      expect(metadata.alternates?.canonical).not.toBe('/blog');
+      expect(metadata.alternates?.types).toEqual({
+        'application/rss+xml': '/rss.xml',
+      });
+    });
   });
 
-  it('builds page-1 metadata from the resolved seo, self-canonical to /blog', async () => {
-    getPostIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        title: 'Blog',
-        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
-        seo,
-        modules: [],
-        translations: [LOCALE_ISO_CODES.EN],
-      },
+  describe('when no metadata can be built', () => {
+    let errorSpy: MockInstance<typeof console.error>;
+
+    beforeEach(() => {
+      errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     });
 
-    const metadata = await buildPostIndexMetadata(1);
+    afterEach(() => {
+      errorSpy.mockRestore();
+    });
 
-    expect(metadata.title).toBe('The Blog');
-    expect(metadata.description).toBe('All the posts.');
-    expect(metadata.alternates?.canonical).toBe('/blog');
-    expect(metadata.openGraph?.title).toBe('The Blog OG');
-    expect(metadata.openGraph?.description).toBe('All the posts OG.');
-    expect(metadata.openGraph?.images).toEqual([
-      { url: EXPECTED_OG_IMAGE_URL },
-    ]);
-    expect(metadata.alternates?.types).toEqual({
-      'application/rss+xml': '/rss.xml',
+    it('returns empty metadata and logs when the index page fetch fails', async () => {
+      getPostIndexPageMock.mockResolvedValue({
+        ok: false,
+        error: new Error('boom'),
+      });
+
+      const metadata = await buildPostIndexMetadata(1);
+
+      expect(metadata).toEqual({});
+      expect(errorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('post_index_metadata.fetch_failed'),
+      );
+    });
+
+    it('returns empty metadata without logging when the index page simply does not exist', async () => {
+      getPostIndexPageMock.mockResolvedValue({ ok: true, data: undefined });
+
+      const metadata = await buildPostIndexMetadata(1);
+
+      expect(metadata).toEqual({});
+      expect(errorSpy).not.toHaveBeenCalled();
     });
   });
 
-  it('builds page-N metadata with a "– Page N" suffix, canonical to /blog/page/N', async () => {
-    getPostIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        title: 'Blog',
-        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
-        seo,
-        modules: [],
-        translations: [LOCALE_ISO_CODES.EN],
-      },
+  describe('for a Dutch-language request', () => {
+    const { EN, NL, DE } = LOCALE_ISO_CODES;
+
+    beforeEach(() => {
+      vi.mocked(getRequestContext).mockResolvedValue({
+        ...DEFAULT_REQUEST_CONTEXT,
+        locale: NL,
+        liveLocales: [EN, NL],
+      });
     });
 
-    const metadata = await buildPostIndexMetadata(2);
+    it('lists every live language with its own page as hreflang, canonical to its own prefixed address', async () => {
+      const translations = [EN, NL, DE];
+      getPostIndexPageMock.mockResolvedValue({
+        ok: true,
+        data: {
+          headingBlock: makeHeadingBlock({ heading: 'Blog' }),
+          seo,
+          modules: [],
+          translations,
+        },
+      });
 
-    expect(metadata.title).toBe('The Blog – Page 2');
-    expect(metadata.openGraph?.title).toBe('The Blog OG – Page 2');
-    expect(metadata.twitter?.title).toBe('The Blog OG – Page 2');
-    expect(metadata.alternates?.canonical).toBe('/blog/page/2');
-    expect(metadata.alternates?.canonical).not.toBe('/blog');
-    expect(metadata.alternates?.types).toEqual({
-      'application/rss+xml': '/rss.xml',
+      const metadata = await buildPostIndexMetadata(1);
+
+      expect(metadata.alternates).toMatchObject({
+        canonical: '/nl/blog',
+        languages: { en: '/blog', nl: '/nl/blog', 'x-default': '/blog' },
+        types: { 'application/rss+xml': '/nl/rss.xml' },
+      });
+    });
+
+    it('lists no hreflang past page 1', async () => {
+      const translations = [EN, NL];
+      getPostIndexPageMock.mockResolvedValue({
+        ok: true,
+        data: {
+          headingBlock: makeHeadingBlock({ heading: 'Blog' }),
+          seo,
+          modules: [],
+          translations,
+        },
+      });
+
+      const metadata = await buildPostIndexMetadata(2);
+
+      expect(metadata.alternates?.canonical).toBe('/nl/blog/page/2');
+      expect(metadata.alternates?.languages).toBeUndefined();
     });
   });
 
@@ -128,83 +197,5 @@ describe('buildPostIndexMetadata', () => {
 
     expect(metadata.openGraph?.title).toBeUndefined();
     expect(metadata.twitter?.title).toBeUndefined();
-  });
-
-  it('returns empty metadata and logs when the index page fetch fails', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getPostIndexPageMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
-
-    const metadata = await buildPostIndexMetadata(1);
-
-    expect(metadata).toEqual({});
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('post_index_metadata.fetch_failed'),
-    );
-    errorSpy.mockRestore();
-  });
-
-  it('returns empty metadata without logging when the index page simply does not exist', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getPostIndexPageMock.mockResolvedValue({ ok: true, data: undefined });
-
-    const metadata = await buildPostIndexMetadata(1);
-
-    expect(metadata).toEqual({});
-    expect(errorSpy).not.toHaveBeenCalled();
-    errorSpy.mockRestore();
-  });
-
-  it('lists every live language with its own page as hreflang, canonical to its own prefixed address', async () => {
-    const { EN, NL, DE } = LOCALE_ISO_CODES;
-    const translations = [EN, NL, DE];
-    vi.mocked(getRequestContext).mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
-      locale: NL,
-      liveLocales: [EN, NL],
-    });
-    getPostIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
-        seo,
-        modules: [],
-        translations,
-      },
-    });
-
-    const metadata = await buildPostIndexMetadata(1);
-
-    expect(metadata.alternates).toMatchObject({
-      canonical: '/nl/blog',
-      languages: { en: '/blog', nl: '/nl/blog', 'x-default': '/blog' },
-      types: { 'application/rss+xml': '/nl/rss.xml' },
-    });
-  });
-
-  it('lists no hreflang past page 1', async () => {
-    const { EN, NL } = LOCALE_ISO_CODES;
-    const translations = [EN, NL];
-    vi.mocked(getRequestContext).mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
-      locale: NL,
-      liveLocales: [EN, NL],
-    });
-    getPostIndexPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
-        seo,
-        modules: [],
-        translations,
-      },
-    });
-
-    const metadata = await buildPostIndexMetadata(2);
-
-    expect(metadata.alternates?.canonical).toBe('/nl/blog/page/2');
-    expect(metadata.alternates?.languages).toBeUndefined();
   });
 });

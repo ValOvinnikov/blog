@@ -86,28 +86,52 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
       id: 'taxonomy-list-1',
     });
 
-    it('forwards the tenant Sanity context to getTaxonomyList', async () => {
-      getTaxonomyListMock.mockResolvedValue(topicsResult());
+    describe('with no topic entries', () => {
+      beforeEach(async () => {
+        getTaxonomyListMock.mockResolvedValue(topicsResult());
 
-      await setup();
+        await setup();
+      });
 
-      expect(getTaxonomyListMock).toHaveBeenCalledWith(
-        'taxonomy-list-1',
-        DEFAULT_TENANT_SANITY_CONTEXT,
-      );
+      it('forwards the tenant Sanity context to getTaxonomyList', async () => {
+        expect(getTaxonomyListMock).toHaveBeenCalledWith(
+          'taxonomy-list-1',
+          DEFAULT_TENANT_SANITY_CONTEXT,
+        );
+      });
+
+      it('renders a labeled section with the topics empty message when entries is empty', async () => {
+        const section = screen.getByRole('region', { name: 'Topics' });
+        expect(within(section).getByText('No topics yet.')).toBeVisible();
+      });
     });
 
-    it('renders topic entries with /topics hrefs and the topics postsCount copy', async () => {
-      getTaxonomyListMock.mockResolvedValue(topicsResult([entry]));
+    describe('with one topic entry', () => {
+      beforeEach(async () => {
+        getTaxonomyListMock.mockResolvedValue(topicsResult([entry]));
 
-      await setup();
+        await setup();
+      });
 
-      const link = screen.getByRole('link', { name: /Engineering/ });
-      expect(link).toHaveAttribute('href', '/topics/engineering');
-      expect(screen.getByText('5 posts')).toBeVisible();
-      expect(
-        screen.getByRole('heading', { level: 2, name: 'Topics' }),
-      ).toBeVisible();
+      it('renders topic entries with /topics hrefs and the topics postsCount copy', async () => {
+        const link = screen.getByRole('link', { name: /Engineering/ });
+        expect(link).toHaveAttribute('href', '/topics/engineering');
+        expect(screen.getByText('5 posts')).toBeVisible();
+        expect(
+          screen.getByRole('heading', { level: 2, name: 'Topics' }),
+        ).toBeVisible();
+      });
+
+      it('derives titleId and dataTestId from the module id', async () => {
+        const heading = screen.getByRole('heading', {
+          level: 2,
+          name: 'Topics',
+        });
+        expect(heading).toHaveAttribute('id', 'taxonomy-list-taxonomy-list-1');
+        expect(screen.getByTestId('taxonomy-list-module-taxonomy-list-1')).toBe(
+          heading.closest('section'),
+        );
+      });
     });
 
     it('omits an entry with no archive page', async () => {
@@ -122,21 +146,6 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
 
       expect(screen.getByRole('link', { name: /Engineering/ })).toBeVisible();
       expect(screen.queryByText('Design')).not.toBeInTheDocument();
-    });
-
-    it('derives titleId and dataTestId from the module id', async () => {
-      getTaxonomyListMock.mockResolvedValue(topicsResult([entry]));
-
-      await setup();
-
-      const heading = screen.getByRole('heading', {
-        level: 2,
-        name: 'Topics',
-      });
-      expect(heading).toHaveAttribute('id', 'taxonomy-list-taxonomy-list-1');
-      expect(screen.getByTestId('taxonomy-list-module-taxonomy-list-1')).toBe(
-        heading.closest('section'),
-      );
     });
 
     it('renders tag entries with /tags hrefs and the tags postsCount copy', async () => {
@@ -154,15 +163,6 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
       expect(
         screen.getByRole('heading', { level: 2, name: 'Tags' }),
       ).toBeVisible();
-    });
-
-    it('renders a labeled section with the topics empty message when entries is empty', async () => {
-      getTaxonomyListMock.mockResolvedValue(topicsResult());
-
-      await setup();
-
-      const section = screen.getByRole('region', { name: 'Topics' });
-      expect(within(section).getByText('No topics yet.')).toBeVisible();
     });
 
     it('renders a labeled section with the tags empty message when entries is empty', async () => {

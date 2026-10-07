@@ -46,34 +46,18 @@ const importEnvOnServer = async (): Promise<typeof import('./env')> => {
 };
 
 describe('env', () => {
+  beforeEach(() => {
+    delete process.env['SKIP_ENV_VALIDATION'];
+    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
+    process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'production';
+  });
+
   afterEach(() => {
     restoreEnv();
   });
 
-  it('parses a valid environment and exposes typed values', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
-    process.env['SANITY_REVALIDATE_SECRET'] = 'revalidate-secret';
-    process.env['ANTHROPIC_API_KEY'] = 'anthropic-key';
-    process.env['SANITY_GENERATE_SECRET'] = 'generate-secret';
-    process.env['NEXT_PUBLIC_SITE_URL'] = 'https://example.com';
-    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
-    process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'staging';
-
-    const { env } = await importEnvOnServer();
-
-    expect(env.SANITY_REVALIDATE_SECRET).toBe('revalidate-secret');
-    expect(env.ANTHROPIC_API_KEY).toBe('anthropic-key');
-    expect(env.SANITY_GENERATE_SECRET).toBe('generate-secret');
-    expect(env.NEXT_PUBLIC_SITE_URL).toBe('https://example.com');
-    expect(env.NEXT_PUBLIC_SANITY_PROJECT_ID).toBe('abc123');
-    expect(env.NEXT_PUBLIC_SANITY_DATASET).toBe('staging');
-  });
-
   it('leaves SANITY_REVALIDATE_SECRET undefined when absent', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
     delete process.env['SANITY_REVALIDATE_SECRET'];
-    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
-    process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'production';
 
     const { env } = await importEnvOnServer();
 
@@ -81,11 +65,8 @@ describe('env', () => {
   });
 
   it('leaves ANTHROPIC_API_KEY and SANITY_GENERATE_SECRET undefined when absent (the skim pipeline stays disabled)', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
     delete process.env['ANTHROPIC_API_KEY'];
     delete process.env['SANITY_GENERATE_SECRET'];
-    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
-    process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'production';
 
     const { env } = await importEnvOnServer();
 
@@ -94,10 +75,7 @@ describe('env', () => {
   });
 
   it('leaves WEB_ANALYTICS_ENABLED undefined when absent (Analytics/SpeedInsights stay omitted)', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
     delete process.env['WEB_ANALYTICS_ENABLED'];
-    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
-    process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'production';
 
     const { env } = await importEnvOnServer();
 
@@ -105,36 +83,48 @@ describe('env', () => {
   });
 
   it('parses WEB_ANALYTICS_ENABLED when set to "true"', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
     process.env['WEB_ANALYTICS_ENABLED'] = 'true';
-    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
-    process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'production';
 
     const { env } = await importEnvOnServer();
 
     expect(env.WEB_ANALYTICS_ENABLED).toBe('true');
   });
 
-  it('throws when SANITY_REVALIDATE_SECRET is read on the client', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
-    process.env['SANITY_REVALIDATE_SECRET'] = 'revalidate-secret';
-    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
-    process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'production';
-
-    const { env } = await importEnv();
-
-    expect(() => env.SANITY_REVALIDATE_SECRET).toThrow();
-  });
-
   it('leaves NEXT_PUBLIC_SITE_URL undefined when absent', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
     delete process.env['NEXT_PUBLIC_SITE_URL'];
-    process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
-    process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'production';
 
     const { env } = await importEnv();
 
     expect(env.NEXT_PUBLIC_SITE_URL).toBeUndefined();
+  });
+
+  describe('with SANITY_REVALIDATE_SECRET set', () => {
+    beforeEach(() => {
+      process.env['SANITY_REVALIDATE_SECRET'] = 'revalidate-secret';
+    });
+
+    it('parses a valid environment and exposes typed values', async () => {
+      process.env['ANTHROPIC_API_KEY'] = 'anthropic-key';
+      process.env['SANITY_GENERATE_SECRET'] = 'generate-secret';
+      process.env['NEXT_PUBLIC_SITE_URL'] = 'https://example.com';
+      process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'staging';
+      process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'staging';
+
+      const { env } = await importEnvOnServer();
+
+      expect(env.SANITY_REVALIDATE_SECRET).toBe('revalidate-secret');
+      expect(env.ANTHROPIC_API_KEY).toBe('anthropic-key');
+      expect(env.SANITY_GENERATE_SECRET).toBe('generate-secret');
+      expect(env.NEXT_PUBLIC_SITE_URL).toBe('https://example.com');
+      expect(env.NEXT_PUBLIC_SANITY_PROJECT_ID).toBe('abc123');
+      expect(env.NEXT_PUBLIC_SANITY_DATASET).toBe('staging');
+    });
+
+    it('throws when SANITY_REVALIDATE_SECRET is read on the client', async () => {
+      const { env } = await importEnv();
+
+      expect(() => env.SANITY_REVALIDATE_SECRET).toThrow();
+    });
   });
 
   describe('validation failure', () => {
@@ -147,34 +137,24 @@ describe('env', () => {
     });
 
     it('throws when WEB_ANALYTICS_ENABLED is set to an unrecognized value', async () => {
-      delete process.env['SKIP_ENV_VALIDATION'];
       process.env['WEB_ANALYTICS_ENABLED'] = 'yes';
-      process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
-      process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'production';
 
       await expect(importEnvOnServer()).rejects.toThrow();
     });
 
     it('throws when NEXT_PUBLIC_SITE_URL is not a valid URL', async () => {
-      delete process.env['SKIP_ENV_VALIDATION'];
       process.env['NEXT_PUBLIC_SITE_URL'] = 'not-a-url';
-      process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
-      process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'production';
 
       await expect(importEnv()).rejects.toThrow();
     });
 
     it('throws when NEXT_PUBLIC_SANITY_PROJECT_ID is missing', async () => {
-      delete process.env['SKIP_ENV_VALIDATION'];
       delete process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'];
-      process.env['NEXT_PUBLIC_SANITY_DATASET'] = 'production';
 
       await expect(importEnv()).rejects.toThrow();
     });
 
     it('throws when NEXT_PUBLIC_SANITY_DATASET is empty (no default)', async () => {
-      delete process.env['SKIP_ENV_VALIDATION'];
-      process.env['NEXT_PUBLIC_SANITY_PROJECT_ID'] = 'abc123';
       process.env['NEXT_PUBLIC_SANITY_DATASET'] = '';
 
       await expect(importEnv()).rejects.toThrow();

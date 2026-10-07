@@ -58,26 +58,38 @@ const setup = customRender(TeamModuleView, {
 });
 
 describe(`<${TeamModuleView.name}/>`, () => {
-  it('labels the section with the given titleId', () => {
-    setup();
+  describe('with default props', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    const label = screen.getByText('Meet the team');
-    expect(label).toHaveAttribute('id', 'team-title');
-    expect(label.tagName).toBe('H2');
+    it('labels the section with the given titleId', () => {
+      const label = screen.getByText('Meet the team');
+      expect(label).toHaveAttribute('id', 'team-title');
+      expect(label.tagName).toBe('H2');
 
-    const section = label.closest('section');
-    expect(section).toHaveAttribute('aria-labelledby', 'team-title');
-    expect(section).toHaveAttribute('data-testid', dataTestId);
-  });
+      const section = label.closest('section');
+      expect(section).toHaveAttribute('aria-labelledby', 'team-title');
+      expect(section).toHaveAttribute('data-testid', dataTestId);
+    });
 
-  it('renders one article with an h3 name per member', () => {
-    setup();
+    it('renders one article with an h3 name per member', () => {
+      expect(screen.getAllByRole('article')).toHaveLength(2);
+      members.forEach((member) => {
+        expect(
+          screen.getByRole('heading', { level: 3, name: member.name }),
+        ).toBeVisible();
+      });
+    });
 
-    expect(screen.getAllByRole('article')).toHaveLength(2);
-    members.forEach((member) => {
+    it('renders two or more members without a spotlight', () => {
       expect(
-        screen.getByRole('heading', { level: 3, name: member.name }),
-      ).toBeVisible();
+        screen.queryByTestId(`${dataTestId}-spotlight`),
+      ).not.toBeInTheDocument();
+    });
+
+    it('renders no action group when there are no cta buttons', () => {
+      expect(screen.queryAllByRole('link')).toHaveLength(0);
     });
   });
 
@@ -114,20 +126,6 @@ describe(`<${TeamModuleView.name}/>`, () => {
       expect(CardGrid).not.toHaveBeenCalled();
     },
   );
-
-  it('renders two or more members without a spotlight', () => {
-    setup();
-
-    expect(
-      screen.queryByTestId(`${dataTestId}-spotlight`),
-    ).not.toBeInTheDocument();
-  });
-
-  it('renders no action group when there are no cta buttons', () => {
-    setup();
-
-    expect(screen.queryAllByRole('link')).toHaveLength(0);
-  });
 
   it('renders the resolved cta buttons when present', () => {
     setup({ ctaButtons: ctaActionsDemo });

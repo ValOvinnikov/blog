@@ -60,11 +60,10 @@ describe('resolveTenantMessages', () => {
     getRequestTenantIdMock.mockReset();
     getSiteConfigMock.mockReset();
     getRequestTenantIdMock.mockResolvedValue(TENANT.id);
+    getSiteConfigMock.mockResolvedValue(siteConfigRow());
   });
 
   it('returns the base messages unchanged when there are no voice overrides', async () => {
-    getSiteConfigMock.mockResolvedValue(siteConfigRow());
-
     const { messages } = await resolveTenantMessages(SITE_MESSAGES);
 
     expect(messages).toEqual(SITE_MESSAGES);
@@ -128,8 +127,6 @@ describe('resolveTenantMessages', () => {
   });
 
   it('forwards an explicit tenant to getSiteConfig, through to getRequestTenantId', async () => {
-    getSiteConfigMock.mockResolvedValue(siteConfigRow());
-
     await resolveTenantMessages(SITE_MESSAGES, 'tenant-2');
 
     expect(getRequestTenantIdMock).toHaveBeenCalledWith('tenant-2');
@@ -181,8 +178,6 @@ describe('resolveTenantMessages', () => {
   });
 
   it('falls back to the catalog default paragraph for a RICH field with no override', async () => {
-    getSiteConfigMock.mockResolvedValue(siteConfigRow());
-
     const { rich } = await resolveTenantMessages(SITE_MESSAGES);
 
     expect(rich.blogListEmpty).toEqual([

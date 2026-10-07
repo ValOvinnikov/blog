@@ -26,30 +26,40 @@ describe(`<${NewsletterModuleView.name}/>`, () => {
     document.cookie =
       'newsletter_subscribed=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
   });
+  describe('with the default props', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-  it('renders the full signup with the authored heading and supporting text', () => {
-    setup();
+    it('renders the full signup with the authored heading and supporting text', () => {
+      expect(
+        screen.getByRole('heading', { name: 'Get new posts' }),
+      ).toBeVisible();
+      expect(screen.getByText('Straight to inbox.')).toBeVisible();
+      expect(
+        screen.getByRole('textbox', { name: 'Email address' }),
+      ).toBeVisible();
+    });
 
-    expect(
-      screen.getByRole('heading', { name: 'Get new posts' }),
-    ).toBeVisible();
-    expect(screen.getByText('Straight to inbox.')).toBeVisible();
-    expect(
-      screen.getByRole('textbox', { name: 'Email address' }),
-    ).toBeVisible();
-  });
+    it('labels the section landmark by the rendered heading', () => {
+      expect(
+        screen.getByRole('region', { name: 'Get new posts' }),
+      ).toBeVisible();
+    });
 
-  it('labels the section landmark by the rendered heading', () => {
-    setup();
+    it('renders the authored trust cues for a FULL module', () => {
+      expect(screen.getByText('No spam')).toBeVisible();
+      expect(screen.getByText('Unsubscribe anytime')).toBeVisible();
+    });
 
-    expect(screen.getByRole('region', { name: 'Get new posts' })).toBeVisible();
-  });
-
-  it('renders the authored trust cues for a FULL module', () => {
-    setup();
-
-    expect(screen.getByText('No spam')).toBeVisible();
-    expect(screen.getByText('Unsubscribe anytime')).toBeVisible();
+    it('renders the band and the form together on first render without the cookie', () => {
+      expect(
+        screen.getByTestId('newsletter-module-newsletter-1'),
+      ).toBeVisible();
+      expect(
+        screen.getByRole('textbox', { name: 'Email address' }),
+      ).toBeVisible();
+    });
   });
 
   it('renders a COMPACT module without supporting text or trust cues', () => {
@@ -77,14 +87,5 @@ describe(`<${NewsletterModuleView.name}/>`, () => {
     expect(
       screen.queryByRole('textbox', { name: 'Email address' }),
     ).not.toBeInTheDocument();
-  });
-
-  it('renders the band and the form together on first render without the cookie', () => {
-    setup();
-
-    expect(screen.getByTestId('newsletter-module-newsletter-1')).toBeVisible();
-    expect(
-      screen.getByRole('textbox', { name: 'Email address' }),
-    ).toBeVisible();
   });
 });

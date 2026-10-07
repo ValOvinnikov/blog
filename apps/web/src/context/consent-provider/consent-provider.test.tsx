@@ -18,13 +18,28 @@ describe(useConsent, () => {
   beforeEach(clearConsentCookie);
   afterEach(clearConsentCookie);
 
-  it('reads a missing cookie as unanswered', () => {
-    const { result } = renderHook(
-      () => useConsent(CONSENT_CATEGORY.EXTERNAL_MEDIA),
-      { wrapper: AppProviders },
-    );
+  describe('with no stored answer', () => {
+    let result: ReturnType<
+      typeof renderHook<ReturnType<typeof useConsent>, unknown>
+    >['result'];
 
-    expect(result.current.status).toBe('unanswered');
+    beforeEach(() => {
+      ({ result } = renderHook(
+        () => useConsent(CONSENT_CATEGORY.EXTERNAL_MEDIA),
+        { wrapper: AppProviders },
+      ));
+    });
+
+    it('reads a missing cookie as unanswered', () => {
+      expect(result.current.status).toBe('unanswered');
+    });
+
+    it('updates the status without a reload once the category is granted', () => {
+      act(() => result.current.grant());
+
+      expect(result.current.status).toBe('granted');
+      expect(document.cookie).toContain('consent=1.EXTERNAL_MEDIA');
+    });
   });
 
   it('reads a cookie of another version as unanswered', () => {
@@ -38,38 +53,28 @@ describe(useConsent, () => {
     expect(result.current.status).toBe('unanswered');
   });
 
-  it('reads a declined cookie as denied', () => {
-    document.cookie = 'consent=1.; Path=/';
+  describe('with a declined answer stored', () => {
+    beforeEach(() => {
+      document.cookie = 'consent=1.; Path=/';
+    });
 
-    const { result } = renderHook(
-      () => useConsent(CONSENT_CATEGORY.EXTERNAL_MEDIA),
-      { wrapper: AppProviders },
-    );
+    it('reads a declined cookie as denied', () => {
+      const { result } = renderHook(
+        () => useConsent(CONSENT_CATEGORY.EXTERNAL_MEDIA),
+        { wrapper: AppProviders },
+      );
 
-    expect(result.current.status).toBe('denied');
-  });
+      expect(result.current.status).toBe('denied');
+    });
 
-  it('updates the status without a reload once the category is granted', () => {
-    const { result } = renderHook(
-      () => useConsent(CONSENT_CATEGORY.EXTERNAL_MEDIA),
-      { wrapper: AppProviders },
-    );
+    it('always reports the necessary category as granted once answered', () => {
+      const { result } = renderHook(
+        () => useConsent(CONSENT_CATEGORY.NECESSARY),
+        { wrapper: AppProviders },
+      );
 
-    act(() => result.current.grant());
-
-    expect(result.current.status).toBe('granted');
-    expect(document.cookie).toContain('consent=1.EXTERNAL_MEDIA');
-  });
-
-  it('always reports the necessary category as granted once answered', () => {
-    document.cookie = 'consent=1.; Path=/';
-
-    const { result } = renderHook(
-      () => useConsent(CONSENT_CATEGORY.NECESSARY),
-      { wrapper: AppProviders },
-    );
-
-    expect(result.current.status).toBe('granted');
+      expect(result.current.status).toBe('granted');
+    });
   });
 });
 
@@ -111,17 +116,6 @@ describe(useConsentChoices, () => {
   beforeEach(clearConsentCookie);
   afterEach(clearConsentCookie);
 
-  it('grants every optional category on accept all', () => {
-    const { result } = renderHook(() => useConsentChoices(), {
-      wrapper: AppProviders,
-    });
-
-    act(() => result.current.acceptAll());
-
-    expect(result.current.status).toBe('answered');
-    expect(result.current.granted).toEqual([CONSENT_CATEGORY.EXTERNAL_MEDIA]);
-  });
-
   it('grants nothing on reject all but still counts as answered', () => {
     document.cookie = 'consent=1.EXTERNAL_MEDIA; Path=/';
     const { result } = renderHook(() => useConsentChoices(), {
@@ -134,15 +128,30 @@ describe(useConsentChoices, () => {
     expect(result.current.granted).toEqual([]);
   });
 
-  it('persists exactly the categories passed to save', () => {
-    const { result } = renderHook(() => useConsentChoices(), {
-      wrapper: AppProviders,
+  describe('with no stored answer', () => {
+    let result: ReturnType<
+      typeof renderHook<ReturnType<typeof useConsentChoices>, unknown>
+    >['result'];
+
+    beforeEach(() => {
+      ({ result } = renderHook(() => useConsentChoices(), {
+        wrapper: AppProviders,
+      }));
     });
 
-    act(() => result.current.save([CONSENT_CATEGORY.EXTERNAL_MEDIA]));
+    it('grants every optional category on accept all', () => {
+      act(() => result.current.acceptAll());
 
-    expect(result.current.granted).toEqual([CONSENT_CATEGORY.EXTERNAL_MEDIA]);
-    expect(document.cookie).toContain('consent=1.EXTERNAL_MEDIA');
+      expect(result.current.status).toBe('answered');
+      expect(result.current.granted).toEqual([CONSENT_CATEGORY.EXTERNAL_MEDIA]);
+    });
+
+    it('persists exactly the categories passed to save', () => {
+      act(() => result.current.save([CONSENT_CATEGORY.EXTERNAL_MEDIA]));
+
+      expect(result.current.granted).toEqual([CONSENT_CATEGORY.EXTERNAL_MEDIA]);
+      expect(document.cookie).toContain('consent=1.EXTERNAL_MEDIA');
+    });
   });
 });
 

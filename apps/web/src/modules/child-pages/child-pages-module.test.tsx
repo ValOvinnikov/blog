@@ -49,24 +49,26 @@ describe(`<${ChildPagesModule.name}/>`, () => {
     loggerErrorMock.mockReset();
   });
 
-  it('fetches the module for the landing page it sits on', async () => {
-    await setup();
+  describe('with the landing page context', () => {
+    beforeEach(async () => {
+      await setup();
+    });
 
-    expect(getChildPagesModuleMock).toHaveBeenCalledWith(
-      'child-pages-1',
-      'modules',
-      'modules',
-      DEFAULT_TENANT_SANITY_CONTEXT,
-    );
-  });
+    it('fetches the module for the landing page it sits on', async () => {
+      expect(getChildPagesModuleMock).toHaveBeenCalledWith(
+        'child-pages-1',
+        'modules',
+        'modules',
+        DEFAULT_TENANT_SANITY_CONTEXT,
+      );
+    });
 
-  it('renders a card per child page linking to its full path', async () => {
-    await setup();
-
-    expect(screen.getByRole('link', { name: 'FAQ' })).toHaveAttribute(
-      'href',
-      '/modules/faq',
-    );
+    it('renders a card per child page linking to its full path', async () => {
+      expect(screen.getByRole('link', { name: 'FAQ' })).toHaveAttribute(
+        'href',
+        '/modules/faq',
+      );
+    });
   });
 
   it('renders nothing when the page has no children', async () => {

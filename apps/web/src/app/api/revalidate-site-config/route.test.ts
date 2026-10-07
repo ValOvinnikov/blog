@@ -69,130 +69,126 @@ describe('POST /api/revalidate-site-config', () => {
     vi.resetModules();
   });
 
-  it('revalidates only the given tenant’s scoped tags when a tenantId is provided', async () => {
-    const { POST } = await import('./route');
+  describe('with the site config secret configured', () => {
+    let POST: typeof import('./route').POST;
 
-    const request = makeRequest('Bearer test-secret', {
-      tenantId: 'tenant-1',
+    beforeEach(async () => {
+      listTenantsMock.mockResolvedValue([{ id: 'tenant-1' }]);
+      ({ POST } = await import('./route'));
     });
-    const response = await POST(request);
-    const json = await response.json();
 
-    expect(response.status).toBe(200);
-    expect(revalidateTagMock).toHaveBeenCalledWith('site-config:tenant-1', {
-      expire: 0,
-    });
-    expect(revalidateTagMock).toHaveBeenCalledWith(
-      'settings-features:tenant-1',
-      { expire: 0 },
-    );
-    expect(revalidateTagMock).toHaveBeenCalledWith('tenant-plan:tenant-1', {
-      expire: 0,
-    });
-    expect(revalidateTagMock).toHaveBeenCalledTimes(3);
-    expect(listTenantsMock).not.toHaveBeenCalled();
-    expect(revalidatePathMock).toHaveBeenCalledWith('/', 'layout');
-    expect(loggerWarnMock).toHaveBeenCalledWith(
-      'revalidate_site_config.whole_site_purge',
-      expect.objectContaining({
-        tenantIds: ['tenant-1'],
-        requestedTenantId: 'tenant-1',
-      }),
-    );
-    expect(json).toEqual({
-      revalidated: [
-        'site-config:tenant-1',
+    it('revalidates only the given tenant’s scoped tags when a tenantId is provided', async () => {
+      const request = makeRequest('Bearer test-secret', {
+        tenantId: 'tenant-1',
+      });
+      const response = await POST(request);
+      const json = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(revalidateTagMock).toHaveBeenCalledWith('site-config:tenant-1', {
+        expire: 0,
+      });
+      expect(revalidateTagMock).toHaveBeenCalledWith(
         'settings-features:tenant-1',
-        'tenant-plan:tenant-1',
-      ],
-      pathPurged: true,
+        { expire: 0 },
+      );
+      expect(revalidateTagMock).toHaveBeenCalledWith('tenant-plan:tenant-1', {
+        expire: 0,
+      });
+      expect(revalidateTagMock).toHaveBeenCalledTimes(3);
+      expect(listTenantsMock).not.toHaveBeenCalled();
+      expect(revalidatePathMock).toHaveBeenCalledWith('/', 'layout');
+      expect(loggerWarnMock).toHaveBeenCalledWith(
+        'revalidate_site_config.whole_site_purge',
+        expect.objectContaining({
+          tenantIds: ['tenant-1'],
+          requestedTenantId: 'tenant-1',
+        }),
+      );
+      expect(json).toEqual({
+        revalidated: [
+          'site-config:tenant-1',
+          'settings-features:tenant-1',
+          'tenant-plan:tenant-1',
+        ],
+        pathPurged: true,
+      });
     });
-  });
 
-  it("revalidates every tenant's scoped tags when no tenantId is provided", async () => {
-    listTenantsMock.mockResolvedValue([{ id: 'tenant-1' }, { id: 'tenant-2' }]);
-    const { POST } = await import('./route');
+    it("revalidates every tenant's scoped tags when no tenantId is provided", async () => {
+      listTenantsMock.mockResolvedValue([
+        { id: 'tenant-1' },
+        { id: 'tenant-2' },
+      ]);
+      const request = makeRequest('Bearer test-secret');
+      const response = await POST(request);
+      const json = await response.json();
 
-    const request = makeRequest('Bearer test-secret');
-    const response = await POST(request);
-    const json = await response.json();
-
-    expect(response.status).toBe(200);
-    expect(revalidateTagMock).toHaveBeenCalledWith('site-config:tenant-1', {
-      expire: 0,
+      expect(response.status).toBe(200);
+      expect(revalidateTagMock).toHaveBeenCalledWith('site-config:tenant-1', {
+        expire: 0,
+      });
+      expect(revalidateTagMock).toHaveBeenCalledWith('site-config:tenant-2', {
+        expire: 0,
+      });
+      expect(revalidateTagMock).toHaveBeenCalledTimes(6);
+      expect(revalidatePathMock).toHaveBeenCalledWith('/', 'layout');
+      expect(loggerWarnMock).toHaveBeenCalledWith(
+        'revalidate_site_config.whole_site_purge',
+        expect.objectContaining({
+          tenantIds: ['tenant-1', 'tenant-2'],
+          requestedTenantId: undefined,
+        }),
+      );
+      expect(json.revalidated).toHaveLength(6);
     });
-    expect(revalidateTagMock).toHaveBeenCalledWith('site-config:tenant-2', {
-      expire: 0,
+
+    it('revalidates every known tenant’s scoped tags when tenantId is an empty string', async () => {
+      const request = makeRequest('Bearer test-secret', { tenantId: '' });
+      const response = await POST(request);
+
+      expect(response.status).toBe(200);
+      expect(revalidateTagMock).toHaveBeenCalledWith('site-config:tenant-1', {
+        expire: 0,
+      });
+      expect(revalidateTagMock).toHaveBeenCalledTimes(3);
     });
-    expect(revalidateTagMock).toHaveBeenCalledTimes(6);
-    expect(revalidatePathMock).toHaveBeenCalledWith('/', 'layout');
-    expect(loggerWarnMock).toHaveBeenCalledWith(
-      'revalidate_site_config.whole_site_purge',
-      expect.objectContaining({
-        tenantIds: ['tenant-1', 'tenant-2'],
-        requestedTenantId: undefined,
-      }),
-    );
-    expect(json.revalidated).toHaveLength(6);
-  });
 
-  it('revalidates every known tenant’s scoped tags when tenantId is an empty string', async () => {
-    listTenantsMock.mockResolvedValue([{ id: 'tenant-1' }]);
-    const { POST } = await import('./route');
+    it("revalidates every tenant's scoped tags when the request body is malformed JSON", async () => {
+      const request = makeRequestWithRawBody('Bearer test-secret', '{not json');
+      const response = await POST(request);
 
-    const request = makeRequest('Bearer test-secret', { tenantId: '' });
-    const response = await POST(request);
-
-    expect(response.status).toBe(200);
-    expect(revalidateTagMock).toHaveBeenCalledWith('site-config:tenant-1', {
-      expire: 0,
+      expect(response.status).toBe(200);
+      expect(revalidateTagMock).toHaveBeenCalledWith('site-config:tenant-1', {
+        expire: 0,
+      });
+      expect(revalidateTagMock).toHaveBeenCalledTimes(3);
     });
-    expect(revalidateTagMock).toHaveBeenCalledTimes(3);
-  });
 
-  it("revalidates every tenant's scoped tags when the request body is malformed JSON", async () => {
-    listTenantsMock.mockResolvedValue([{ id: 'tenant-1' }]);
-    const { POST } = await import('./route');
+    it('returns 401 and revalidates nothing for an invalid secret', async () => {
+      const request = makeRequest('Bearer wrong-secret');
+      const response = await POST(request);
 
-    const request = makeRequestWithRawBody('Bearer test-secret', '{not json');
-    const response = await POST(request);
-
-    expect(response.status).toBe(200);
-    expect(revalidateTagMock).toHaveBeenCalledWith('site-config:tenant-1', {
-      expire: 0,
+      expect(response.status).toBe(401);
+      expect(revalidateTagMock).not.toHaveBeenCalled();
+      expect(revalidatePathMock).not.toHaveBeenCalled();
     });
-    expect(revalidateTagMock).toHaveBeenCalledTimes(3);
-  });
 
-  it('returns 401 and revalidates nothing for an invalid secret', async () => {
-    const { POST } = await import('./route');
+    it('returns 401 and revalidates nothing when the authorization header is missing', async () => {
+      const request = makeRequest();
+      const response = await POST(request);
 
-    const request = makeRequest('Bearer wrong-secret');
-    const response = await POST(request);
+      expect(response.status).toBe(401);
+      expect(revalidateTagMock).not.toHaveBeenCalled();
+    });
 
-    expect(response.status).toBe(401);
-    expect(revalidateTagMock).not.toHaveBeenCalled();
-    expect(revalidatePathMock).not.toHaveBeenCalled();
-  });
+    it('returns 401 when the authorization header is not a bearer token', async () => {
+      const request = makeRequest('test-secret');
+      const response = await POST(request);
 
-  it('returns 401 and revalidates nothing when the authorization header is missing', async () => {
-    const { POST } = await import('./route');
-
-    const request = makeRequest();
-    const response = await POST(request);
-
-    expect(response.status).toBe(401);
-    expect(revalidateTagMock).not.toHaveBeenCalled();
-  });
-
-  it('returns 401 when the authorization header is not a bearer token', async () => {
-    const { POST } = await import('./route');
-
-    const request = makeRequest('test-secret');
-    const response = await POST(request);
-
-    expect(response.status).toBe(401);
-    expect(revalidateTagMock).not.toHaveBeenCalled();
+      expect(response.status).toBe(401);
+      expect(revalidateTagMock).not.toHaveBeenCalled();
+    });
   });
 
   it('returns 500 when SITE_CONFIG_REVALIDATE_SECRET is not configured', async () => {

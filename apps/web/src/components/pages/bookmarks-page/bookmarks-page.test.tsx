@@ -42,6 +42,9 @@ describe(`<${BookmarksPage.name}/>`, () => {
     authMock.mockReset();
     listBookmarksMock.mockReset();
     getPostsByIdsMock.mockReset();
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    listBookmarksMock.mockResolvedValue([]);
+    getPostsByIdsMock.mockResolvedValue({ ok: true, data: [] });
   });
 
   it('redirects home without querying bookmarks when there is no session', async () => {
@@ -55,7 +58,6 @@ describe(`<${BookmarksPage.name}/>`, () => {
   });
 
   it('redirects home without querying bookmarks when no tenant resolves', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     vi.mocked(getRequestContext).mockResolvedValueOnce({
       ...DEFAULT_REQUEST_CONTEXT,
       tenantId: undefined,
@@ -69,10 +71,6 @@ describe(`<${BookmarksPage.name}/>`, () => {
   });
 
   it('queries bookmarks for the signed-in user and tenant, then resolves ids via getPostsByIds', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    listBookmarksMock.mockResolvedValue([]);
-    getPostsByIdsMock.mockResolvedValue({ ok: true, data: [] });
-
     await setup();
 
     expect(listBookmarksMock).toHaveBeenCalledWith(TENANT_ID, 'user-1');
@@ -83,9 +81,6 @@ describe(`<${BookmarksPage.name}/>`, () => {
   });
 
   it('forwards the request context Sanity context to getPostsByIds', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    listBookmarksMock.mockResolvedValue([]);
-    getPostsByIdsMock.mockResolvedValue({ ok: true, data: [] });
     const tenant = {
       projectId: 'tenant-project',
       dataset: 'production',
@@ -102,7 +97,6 @@ describe(`<${BookmarksPage.name}/>`, () => {
   });
 
   it('re-sorts resolved posts back into bookmark-recency order before rendering', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     listBookmarksMock.mockResolvedValue([
       { userId: 'user-1', postId: 'post-2', createdAt: new Date() },
       { userId: 'user-1', postId: 'post-1', createdAt: new Date() },
@@ -132,7 +126,6 @@ describe(`<${BookmarksPage.name}/>`, () => {
   });
 
   it('links each bookmark to the language it was saved in, whatever the page language', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     listBookmarksMock.mockResolvedValue([
       { userId: 'user-1', postId: 'post-nl', createdAt: new Date() },
       { userId: 'user-1', postId: 'post-en', createdAt: new Date() },
@@ -164,7 +157,6 @@ describe(`<${BookmarksPage.name}/>`, () => {
   });
 
   it('renders nothing when resolving bookmarked posts fails', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     listBookmarksMock.mockResolvedValue([
       { userId: 'user-1', postId: 'post-1', createdAt: new Date() },
     ]);

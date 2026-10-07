@@ -10,11 +10,13 @@ const setup = customRender(PostShareLinks, {
 });
 
 describe(`<${PostShareLinks.name}/>`, () => {
-  it('renders an X share link and a LinkedIn share link, each with its own platform icon', async () => {
+  beforeEach(async () => {
     setup();
 
     await userEvent.click(screen.getByRole('button', { name: /Share/ }));
+  });
 
+  it('renders an X share link and a LinkedIn share link, each with its own platform icon', async () => {
     const xShareLink = screen.getByRole('menuitem', { name: /Share on X/ });
     expect(xShareLink).toBeVisible();
     expect(
@@ -33,10 +35,6 @@ describe(`<${PostShareLinks.name}/>`, () => {
   });
 
   it('builds each share link href from the given url and title', async () => {
-    setup();
-
-    await userEvent.click(screen.getByRole('button', { name: /Share/ }));
-
     expect(
       screen.getByRole('menuitem', { name: /Share on X/ }),
     ).toHaveAttribute(

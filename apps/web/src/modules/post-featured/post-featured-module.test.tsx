@@ -50,49 +50,41 @@ describe(`<${PostFeaturedModule.name}/>`, () => {
     getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
-  it('calls getPostFeatured with the module id and resolved tenant Sanity context', async () => {
-    getPostFeaturedMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: 'Featured' }),
-        posts: [],
-        layout: undefined,
-        contentAlignment: undefined,
-        showImages: false,
-      },
+  describe('when the module has no posts', () => {
+    beforeEach(() => {
+      getPostFeaturedMock.mockResolvedValue({
+        ok: true,
+        data: {
+          brandVariant: BRAND_VARIANT.PRIMARY,
+          headingBlock: makeHeadingBlock({ heading: 'Featured' }),
+          posts: [],
+          layout: undefined,
+          contentAlignment: undefined,
+          showImages: false,
+        },
+      });
     });
 
-    await setup();
+    it('calls getPostFeatured with the module id and resolved tenant Sanity context', async () => {
+      await setup();
 
-    expect(getPostFeaturedMock).toHaveBeenCalledWith(
-      'post-featured-1',
-      DEFAULT_TENANT_SANITY_CONTEXT,
-    );
+      expect(getPostFeaturedMock).toHaveBeenCalledWith(
+        'post-featured-1',
+        DEFAULT_TENANT_SANITY_CONTEXT,
+      );
+    });
+
+    it('renders nothing when no posts resolve, never an empty labelled landmark', async () => {
+      const { container } = await setup();
+
+      expect(container).toBeEmptyDOMElement();
+    });
   });
 
   it('renders nothing when the fetch fails', async () => {
     getPostFeaturedMock.mockResolvedValue({
       ok: false,
       error: new Error('boom'),
-    });
-
-    const { container } = await setup();
-
-    expect(container).toBeEmptyDOMElement();
-  });
-
-  it('renders nothing when no posts resolve, never an empty labelled landmark', async () => {
-    getPostFeaturedMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: 'Featured' }),
-        posts: [],
-        layout: undefined,
-        contentAlignment: undefined,
-        showImages: false,
-      },
     });
 
     const { container } = await setup();

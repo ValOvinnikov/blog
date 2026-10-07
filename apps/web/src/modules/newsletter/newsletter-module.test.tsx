@@ -46,17 +46,6 @@ describe(`<${NewsletterModule.name}/>`, () => {
     getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
-  it('renders nothing when the fetch fails', async () => {
-    getNewsletterMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
-
-    const { container } = await setup();
-
-    expect(container).toBeEmptyDOMElement();
-  });
-
   it("renders the module's own trust cues in the form", async () => {
     getNewsletterMock.mockResolvedValue({
       ok: true,
@@ -100,26 +89,6 @@ describe(`<${NewsletterModule.name}/>`, () => {
     ).not.toBeInTheDocument();
   });
 
-  it('forwards the resolved tenant Sanity context to getNewsletter', async () => {
-    const tenant = {
-      projectId: 'tenant-project',
-      dataset: 'production',
-      token: 'tenant-token',
-    };
-    getRequestContextMock.mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
-      sanityContext: tenant,
-    });
-    getNewsletterMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
-
-    await setup();
-
-    expect(getNewsletterMock).toHaveBeenCalledWith('newsletter-1', tenant);
-  });
-
   it('renders nothing, without fetching, when the NEWSLETTER capability is off', async () => {
     vi.mocked(isCapabilityEnabled).mockResolvedValue(false);
 
@@ -129,14 +98,40 @@ describe(`<${NewsletterModule.name}/>`, () => {
     expect(getNewsletterMock).not.toHaveBeenCalled();
   });
 
-  it('checks the NEWSLETTER capability', async () => {
-    getNewsletterMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
+  describe('when the newsletter fetch fails', () => {
+    beforeEach(() => {
+      getNewsletterMock.mockResolvedValue({
+        ok: false,
+        error: new Error('boom'),
+      });
     });
 
-    await setup();
+    it('renders nothing when the fetch fails', async () => {
+      const { container } = await setup();
 
-    expect(isCapabilityEnabled).toHaveBeenCalledWith('NEWSLETTER');
+      expect(container).toBeEmptyDOMElement();
+    });
+
+    it('forwards the resolved tenant Sanity context to getNewsletter', async () => {
+      const tenant = {
+        projectId: 'tenant-project',
+        dataset: 'production',
+        token: 'tenant-token',
+      };
+      getRequestContextMock.mockResolvedValue({
+        ...DEFAULT_REQUEST_CONTEXT,
+        sanityContext: tenant,
+      });
+
+      await setup();
+
+      expect(getNewsletterMock).toHaveBeenCalledWith('newsletter-1', tenant);
+    });
+
+    it('checks the NEWSLETTER capability', async () => {
+      await setup();
+
+      expect(isCapabilityEnabled).toHaveBeenCalledWith('NEWSLETTER');
+    });
   });
 });

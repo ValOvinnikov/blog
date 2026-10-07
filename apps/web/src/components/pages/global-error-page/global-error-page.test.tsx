@@ -20,70 +20,71 @@ const reset = vi.fn();
 const setup = customRender(GlobalErrorPage, { error, reset });
 
 describe(`<${GlobalErrorPage.name}/>`, () => {
-  it('renders a heading and a try-again action', () => {
-    setup();
+  describe('with the default error', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    expect(
-      screen.getByRole('heading', { name: 'Something went wrong' }),
-    ).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Try again' })).toBeVisible();
-  });
+    it('renders a heading and a try-again action', () => {
+      expect(
+        screen.getByRole('heading', { name: 'Something went wrong' }),
+      ).toBeVisible();
+      expect(screen.getByRole('button', { name: 'Try again' })).toBeVisible();
+    });
 
-  it('reports the error on mount, with its digest', () => {
-    setup();
+    it('reports the error on mount, with its digest', () => {
+      expect(reportClientErrorMock).toHaveBeenCalledWith(
+        'global_error_boundary.render_failed',
+        error,
+        { digest: 'digest-456' },
+      );
+    });
 
-    expect(reportClientErrorMock).toHaveBeenCalledWith(
-      'global_error_boundary.render_failed',
-      error,
-      { digest: 'digest-456' },
-    );
-  });
+    it('calls reset when "Try again" is clicked', async () => {
+      const user = userEvent.setup();
 
-  it('calls reset when "Try again" is clicked', async () => {
-    const user = userEvent.setup();
-    setup();
+      await user.click(screen.getByRole('button', { name: 'Try again' }));
 
-    await user.click(screen.getByRole('button', { name: 'Try again' }));
+      expect(reset).toHaveBeenCalledTimes(1);
+    });
 
-    expect(reset).toHaveBeenCalledTimes(1);
-  });
+    it('renders "Go home" as a real link, not a button', () => {
+      const goHomeLink = screen.getByRole('link', { name: 'Go home' });
+      expect(goHomeLink).toBeVisible();
+      expect(goHomeLink).toHaveAttribute('href', '/');
+    });
 
-  it('renders "Go home" as a real link, not a button', () => {
-    setup();
+    it('announces the error to assistive technology after mount', () => {
+      expect(
+        screen.getByText(
+          'Something went wrong. You can try again, or go home.',
+        ),
+      ).toBeVisible();
+    });
 
-    const goHomeLink = screen.getByRole('link', { name: 'Go home' });
-    expect(goHomeLink).toBeVisible();
-    expect(goHomeLink).toHaveAttribute('href', '/');
-  });
+    it('names both available actions in the announcement, matching the rendered controls', () => {
+      const announcement =
+        'Something went wrong. You can try again, or go home.'.toLowerCase();
+      const tryAgainLabel =
+        screen.getByRole('button', { name: 'Try again' }).textContent ?? '';
+      const goHomeLabel =
+        screen.getByRole('link', { name: 'Go home' }).textContent ?? '';
 
-  it('announces the error to assistive technology after mount', () => {
-    setup();
+      expect(announcement).toContain(tryAgainLabel.toLowerCase());
+      expect(announcement).toContain(goHomeLabel.toLowerCase());
+    });
 
-    expect(
-      screen.getByText('Something went wrong. You can try again, or go home.'),
-    ).toBeVisible();
-  });
+    it('sets aria-atomic on the live region', () => {
+      expect(
+        screen.getByText(
+          'Something went wrong. You can try again, or go home.',
+        ),
+      ).toHaveAttribute('aria-atomic', 'true');
+    });
 
-  it('names both available actions in the announcement, matching the rendered controls', () => {
-    setup();
-
-    const announcement =
-      'Something went wrong. You can try again, or go home.'.toLowerCase();
-    const tryAgainLabel =
-      screen.getByRole('button', { name: 'Try again' }).textContent ?? '';
-    const goHomeLabel =
-      screen.getByRole('link', { name: 'Go home' }).textContent ?? '';
-
-    expect(announcement).toContain(tryAgainLabel.toLowerCase());
-    expect(announcement).toContain(goHomeLabel.toLowerCase());
-  });
-
-  it('sets aria-atomic on the live region', () => {
-    setup();
-
-    expect(
-      screen.getByText('Something went wrong. You can try again, or go home.'),
-    ).toHaveAttribute('aria-atomic', 'true');
+    it('moves focus to the page container on mount', () => {
+      expect(screen.getByRole('main')).toHaveFocus();
+    });
   });
 
   it('does not re-report or re-announce on a re-render with the same error', () => {
@@ -92,12 +93,6 @@ describe(`<${GlobalErrorPage.name}/>`, () => {
     rerender(<GlobalErrorPage error={error} reset={reset} />);
 
     expect(reportClientErrorMock).toHaveBeenCalledTimes(1);
-  });
-
-  it('moves focus to the page container on mount', () => {
-    setup();
-
-    expect(screen.getByRole('main')).toHaveFocus();
   });
 
   it('renders without the i18n provider, since it sits above it in the tree', () => {

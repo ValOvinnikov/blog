@@ -11,10 +11,18 @@ const item = makeLogoItem();
 const setup = customRender(LogoWallTile, { logo: item });
 
 describe(`<${LogoWallTile.name}/>`, () => {
-  it('renders the logo image with the company name as its alt', () => {
-    setup();
+  describe('with the default logo', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    expect(screen.getByRole('img', { name: item.name })).toBeVisible();
+    it('renders the logo image with the company name as its alt', () => {
+      expect(screen.getByRole('img', { name: item.name })).toBeVisible();
+    });
+
+    it('renders no link when the item has none', () => {
+      expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    });
   });
 
   it('wraps the logo in a link named by the company when the item has one', () => {
@@ -50,12 +58,6 @@ describe(`<${LogoWallTile.name}/>`, () => {
     expect(
       screen.getByRole('link', { name: 'Visit the Acme Corp website' }),
     ).toHaveAttribute('href', 'https://acme.example.com');
-  });
-
-  it('renders no link when the item has none', () => {
-    setup();
-
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
   it('pins the tile to the logo asset aspect ratio', () => {

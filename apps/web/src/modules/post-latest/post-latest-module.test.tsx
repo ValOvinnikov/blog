@@ -37,9 +37,6 @@ describe(`<${PostLatestModule.name}/>`, () => {
     getPostLatestMock.mockReset();
     getRequestContextMock.mockReset();
     getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
-  });
-
-  it('calls getPostLatest with the module id and resolved tenant Sanity context', async () => {
     getPostLatestMock.mockResolvedValue({
       ok: true,
       data: {
@@ -50,7 +47,9 @@ describe(`<${PostLatestModule.name}/>`, () => {
         contentAlignment: undefined,
       },
     });
+  });
 
+  it('calls getPostLatest with the module id and resolved tenant Sanity context', async () => {
     await setup();
 
     expect(getPostLatestMock).toHaveBeenCalledWith(
@@ -69,17 +68,6 @@ describe(`<${PostLatestModule.name}/>`, () => {
       ...DEFAULT_REQUEST_CONTEXT,
       sanityContext: tenant,
     });
-    getPostLatestMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock(),
-        posts: [],
-        layout: undefined,
-        contentAlignment: undefined,
-      },
-    });
-
     await setup();
 
     expect(getPostLatestMock).toHaveBeenCalledWith('post-latest-1', tenant);
@@ -97,17 +85,6 @@ describe(`<${PostLatestModule.name}/>`, () => {
   });
 
   it('renders nothing when no posts resolve, never an empty labelled landmark', async () => {
-    getPostLatestMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock(),
-        posts: [],
-        layout: undefined,
-        contentAlignment: undefined,
-      },
-    });
-
     const { container } = await setup();
 
     expect(container).toBeEmptyDOMElement();

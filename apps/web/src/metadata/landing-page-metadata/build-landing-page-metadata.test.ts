@@ -9,6 +9,7 @@ import {
   DEFAULT_REQUEST_CONTEXT,
   DEFAULT_TENANT_SANITY_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
+import type { MockInstance } from 'vitest';
 
 import { buildLandingPageMetadata } from './build-landing-page-metadata';
 
@@ -112,89 +113,6 @@ describe('buildLandingPageMetadata', () => {
     expect(metadata.alternates).toEqual({ canonical: '/about-us' });
   });
 
-  it('treats only the current language as live when the tenant has no live list', async () => {
-    vi.mocked(getRequestContext).mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
-      liveLocales: undefined,
-    });
-    getLandingPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        ...mockLandingPage,
-        translations: [
-          { language: EN, slug: 'about-us' },
-          { language: NL, slug: 'over-ons' },
-        ],
-      },
-    });
-
-    const metadata = await buildLandingPageMetadata('about-us');
-
-    expect(metadata.alternates).toEqual({ canonical: '/about-us' });
-  });
-
-  it('leaves the alternates without languages for a page with no translations', async () => {
-    getLandingPageMock.mockResolvedValue({
-      ok: true,
-      data: { ...mockLandingPage, translations: [] },
-    });
-
-    const metadata = await buildLandingPageMetadata('about-us');
-
-    expect(metadata.alternates).toEqual({ canonical: '/about-us' });
-  });
-
-  it('lists every translation as hreflang with x-default on the default language', async () => {
-    getLandingPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        ...mockLandingPage,
-        translations: [
-          { language: EN, slug: 'about-us' },
-          { language: NL, slug: 'over-ons' },
-        ],
-      },
-    });
-
-    const metadata = await buildLandingPageMetadata('about-us');
-
-    expect(metadata.alternates).toEqual({
-      canonical: '/about-us',
-      languages: {
-        en: '/about-us',
-        nl: '/nl/over-ons',
-        'x-default': '/about-us',
-      },
-    });
-  });
-
-  it('points a non-default translation canonical at its own prefixed address', async () => {
-    vi.mocked(getRequestContext).mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
-      locale: NL,
-      liveLocales: [EN, NL],
-    });
-    getLandingPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        ...mockLandingPage,
-        slug: 'over-ons',
-        translations: [
-          { language: EN, slug: 'about-us' },
-          { language: NL, slug: 'over-ons' },
-        ],
-      },
-    });
-
-    const metadata = await buildLandingPageMetadata('over-ons');
-
-    expect(metadata.alternates?.canonical).toBe('/nl/over-ons');
-    expect(metadata.alternates?.languages).toMatchObject({
-      nl: '/nl/over-ons',
-      en: '/about-us',
-    });
-  });
-
   it('omits x-default when no translation exists in the default language', async () => {
     vi.mocked(getRequestContext).mockResolvedValue({
       ...DEFAULT_REQUEST_CONTEXT,
@@ -219,110 +137,172 @@ describe('buildLandingPageMetadata', () => {
     });
   });
 
-  it('forwards the path to getLandingPage, the loader LandingPage reads', async () => {
-    getLandingPageMock.mockResolvedValue({ ok: true, data: mockLandingPage });
-
-    await buildLandingPageMetadata('about-us');
-
-    expect(getLandingPageMock).toHaveBeenCalledWith('about-us');
-  });
-
-  it('maps the resolved seo straight through toMetadata, self-canonical to its path', async () => {
-    getLandingPageMock.mockResolvedValue({ ok: true, data: mockLandingPage });
-
-    const metadata = await buildLandingPageMetadata('about-us');
-
-    expect(metadata.title).toBe('About Us');
-    expect(metadata.description).toBe('Who we are.');
-    expect(metadata.alternates?.canonical).toBe('/about-us');
-    expect(metadata.openGraph?.title).toBe('About Us OG');
-    expect(metadata.openGraph?.description).toBe('Who we are OG.');
-    expect(metadata.openGraph?.images).toEqual([
-      { url: EXPECTED_OG_IMAGE_URL },
-    ]);
-  });
-
-  it('emits locale, alternate locale and url for an EN page with a live NL translation', async () => {
-    getLandingPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        ...mockLandingPage,
-        translations: [
-          { language: EN, slug: 'about-us' },
-          { language: NL, slug: 'over-ons' },
-        ],
-      },
+  describe('for a page with an EN and a live NL translation', () => {
+    beforeEach(() => {
+      getLandingPageMock.mockResolvedValue({
+        ok: true,
+        data: {
+          ...mockLandingPage,
+          translations: [
+            { language: EN, slug: 'about-us' },
+            { language: NL, slug: 'over-ons' },
+          ],
+        },
+      });
     });
 
-    const metadata = await buildLandingPageMetadata('about-us');
+    it('treats only the current language as live when the tenant has no live list', async () => {
+      vi.mocked(getRequestContext).mockResolvedValue({
+        ...DEFAULT_REQUEST_CONTEXT,
+        liveLocales: undefined,
+      });
 
-    expect(metadata.openGraph?.locale).toBe('en');
-    expect(metadata.openGraph?.alternateLocale).toEqual(['nl']);
-    expect(metadata.openGraph?.url).toBe(metadata.alternates?.canonical);
-  });
+      const metadata = await buildLandingPageMetadata('about-us');
 
-  it('emits locale, alternate locale and url for the NL translation of the same page', async () => {
-    vi.mocked(getRequestContext).mockResolvedValue({
-      ...DEFAULT_REQUEST_CONTEXT,
-      locale: NL,
-      liveLocales: [EN, NL],
-    });
-    getLandingPageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        ...mockLandingPage,
-        slug: 'over-ons',
-        translations: [
-          { language: EN, slug: 'about-us' },
-          { language: NL, slug: 'over-ons' },
-        ],
-      },
+      expect(metadata.alternates).toEqual({ canonical: '/about-us' });
     });
 
-    const metadata = await buildLandingPageMetadata('over-ons');
+    it('lists every translation as hreflang with x-default on the default language', async () => {
+      const metadata = await buildLandingPageMetadata('about-us');
 
-    expect(metadata.openGraph?.locale).toBe('nl');
-    expect(metadata.openGraph?.alternateLocale).toEqual(['en']);
-    expect(metadata.openGraph?.url).toBe(metadata.alternates?.canonical);
-  });
-
-  it('emits only locale and url, with no alternate locale, for a page with no translation', async () => {
-    getLandingPageMock.mockResolvedValue({
-      ok: true,
-      data: { ...mockLandingPage, translations: [] },
+      expect(metadata.alternates).toEqual({
+        canonical: '/about-us',
+        languages: {
+          en: '/about-us',
+          nl: '/nl/over-ons',
+          'x-default': '/about-us',
+        },
+      });
     });
 
-    const metadata = await buildLandingPageMetadata('about-us');
+    it('emits locale, alternate locale and url for an EN page with a live NL translation', async () => {
+      const metadata = await buildLandingPageMetadata('about-us');
 
-    expect(metadata.openGraph?.locale).toBe('en');
-    expect(metadata.openGraph?.alternateLocale).toBeUndefined();
-    expect(metadata.openGraph?.url).toBe('/about-us');
+      expect(metadata.openGraph?.locale).toBe('en');
+      expect(metadata.openGraph?.alternateLocale).toEqual(['nl']);
+      expect(metadata.openGraph?.url).toBe(metadata.alternates?.canonical);
+    });
   });
 
-  it('returns empty metadata and logs when the page fetch fails', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getLandingPageMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
+  describe('for a page with no translations', () => {
+    beforeEach(() => {
+      getLandingPageMock.mockResolvedValue({
+        ok: true,
+        data: { ...mockLandingPage, translations: [] },
+      });
     });
 
-    const metadata = await buildLandingPageMetadata('missing');
+    it('leaves the alternates without languages for a page with no translations', async () => {
+      const metadata = await buildLandingPageMetadata('about-us');
 
-    expect(metadata).toEqual({});
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('landing_page_metadata.fetch_failed'),
-    );
-    errorSpy.mockRestore();
+      expect(metadata.alternates).toEqual({ canonical: '/about-us' });
+    });
+
+    it('emits only locale and url, with no alternate locale, for a page with no translation', async () => {
+      const metadata = await buildLandingPageMetadata('about-us');
+
+      expect(metadata.openGraph?.locale).toBe('en');
+      expect(metadata.openGraph?.alternateLocale).toBeUndefined();
+      expect(metadata.openGraph?.url).toBe('/about-us');
+    });
   });
 
-  it('returns empty metadata without logging when the page simply does not exist', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getLandingPageMock.mockResolvedValue({ ok: true, data: undefined });
+  describe('for a page with the default fixture', () => {
+    beforeEach(() => {
+      getLandingPageMock.mockResolvedValue({ ok: true, data: mockLandingPage });
+    });
 
-    const metadata = await buildLandingPageMetadata('missing');
+    it('forwards the path to getLandingPage, the loader LandingPage reads', async () => {
+      await buildLandingPageMetadata('about-us');
 
-    expect(metadata).toEqual({});
-    expect(errorSpy).not.toHaveBeenCalled();
-    errorSpy.mockRestore();
+      expect(getLandingPageMock).toHaveBeenCalledWith('about-us');
+    });
+
+    it('maps the resolved seo straight through toMetadata, self-canonical to its path', async () => {
+      const metadata = await buildLandingPageMetadata('about-us');
+
+      expect(metadata.title).toBe('About Us');
+      expect(metadata.description).toBe('Who we are.');
+      expect(metadata.alternates?.canonical).toBe('/about-us');
+      expect(metadata.openGraph?.title).toBe('About Us OG');
+      expect(metadata.openGraph?.description).toBe('Who we are OG.');
+      expect(metadata.openGraph?.images).toEqual([
+        { url: EXPECTED_OG_IMAGE_URL },
+      ]);
+    });
+  });
+
+  describe('for the Dutch translation of a page', () => {
+    beforeEach(() => {
+      vi.mocked(getRequestContext).mockResolvedValue({
+        ...DEFAULT_REQUEST_CONTEXT,
+        locale: NL,
+        liveLocales: [EN, NL],
+      });
+      getLandingPageMock.mockResolvedValue({
+        ok: true,
+        data: {
+          ...mockLandingPage,
+          slug: 'over-ons',
+          translations: [
+            { language: EN, slug: 'about-us' },
+            { language: NL, slug: 'over-ons' },
+          ],
+        },
+      });
+    });
+
+    it('points a non-default translation canonical at its own prefixed address', async () => {
+      const metadata = await buildLandingPageMetadata('over-ons');
+
+      expect(metadata.alternates?.canonical).toBe('/nl/over-ons');
+      expect(metadata.alternates?.languages).toMatchObject({
+        nl: '/nl/over-ons',
+        en: '/about-us',
+      });
+    });
+
+    it('emits locale, alternate locale and url for the NL translation of the same page', async () => {
+      const metadata = await buildLandingPageMetadata('over-ons');
+
+      expect(metadata.openGraph?.locale).toBe('nl');
+      expect(metadata.openGraph?.alternateLocale).toEqual(['en']);
+      expect(metadata.openGraph?.url).toBe(metadata.alternates?.canonical);
+    });
+  });
+
+  describe('when no metadata can be built', () => {
+    let errorSpy: MockInstance<typeof console.error>;
+
+    beforeEach(() => {
+      errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      errorSpy.mockRestore();
+    });
+
+    it('returns empty metadata and logs when the page fetch fails', async () => {
+      getLandingPageMock.mockResolvedValue({
+        ok: false,
+        error: new Error('boom'),
+      });
+
+      const metadata = await buildLandingPageMetadata('missing');
+
+      expect(metadata).toEqual({});
+      expect(errorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('landing_page_metadata.fetch_failed'),
+      );
+    });
+
+    it('returns empty metadata without logging when the page simply does not exist', async () => {
+      getLandingPageMock.mockResolvedValue({ ok: true, data: undefined });
+
+      const metadata = await buildLandingPageMetadata('missing');
+
+      expect(metadata).toEqual({});
+      expect(errorSpy).not.toHaveBeenCalled();
+    });
   });
 });

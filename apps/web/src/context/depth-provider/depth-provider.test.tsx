@@ -48,38 +48,34 @@ describe(`<${DepthProvider.name}/>`, () => {
     expect(screen.getByText('Article body')).toBeVisible();
   });
 
-  it('defaults to DEPTH.READ and stamps it as data-depth on the wrapper', async () => {
-    renderElement(
-      <DepthProvider hasSkim={true} hasDeep={true}>
-        <ReadDepth />
-      </DepthProvider>,
-    );
+  describe('with nothing stored and a full-depth post', () => {
+    beforeEach(() => {
+      renderElement(
+        <DepthProvider hasSkim={true} hasDeep={true}>
+          <ReadDepth />
+        </DepthProvider>,
+      );
+    });
 
-    await waitFor(() =>
-      expect(screen.getByTestId('depth')).toHaveTextContent(DEPTH.READ),
-    );
-    expect(screen.getByTestId('depth-root')).toHaveAttribute(
-      'data-depth',
-      DEPTH.READ,
-    );
-  });
+    it('defaults to DEPTH.READ and stamps it as data-depth on the wrapper', async () => {
+      await waitFor(() =>
+        expect(screen.getByTestId('depth')).toHaveTextContent(DEPTH.READ),
+      );
+      expect(screen.getByTestId('depth-root')).toHaveAttribute(
+        'data-depth',
+        DEPTH.READ,
+      );
+    });
 
-  it('restores a stored DEEP depth on mount when the post has asides', async () => {
-    localStorage.setItem(DEPTH_STORAGE_KEY, DEPTH.DEEP);
+    it('never renders the bootstrap script on a plain client-side mount with no server-rendered markup to hydrate against — e.g. an App Router client-side navigation into this route segment for the first time in the tab. React never executes a client-rendered <script> tag anyway, so this is a pure no-op mount that used to render — and get console-warned about — for nothing', async () => {
+      await waitFor(() =>
+        expect(screen.getByTestId('depth')).toHaveTextContent(DEPTH.READ),
+      );
 
-    renderElement(
-      <DepthProvider hasSkim={false} hasDeep={true}>
-        <ReadDepth />
-      </DepthProvider>,
-    );
-
-    await waitFor(() =>
-      expect(screen.getByTestId('depth')).toHaveTextContent(DEPTH.DEEP),
-    );
-    expect(screen.getByTestId('depth-root')).toHaveAttribute(
-      'data-depth',
-      DEPTH.DEEP,
-    );
+      expect(
+        screen.queryByTestId('depth-bootstrap-script'),
+      ).not.toBeInTheDocument();
+    });
   });
 
   it('ignores a garbage stored value and falls back to READ', async () => {
@@ -110,42 +106,60 @@ describe(`<${DepthProvider.name}/>`, () => {
     );
   });
 
-  it('clamps a stored DEEP depth to READ when this post has no asides', async () => {
-    localStorage.setItem(DEPTH_STORAGE_KEY, DEPTH.DEEP);
+  describe('with a stored DEEP depth', () => {
+    beforeEach(() => {
+      localStorage.setItem(DEPTH_STORAGE_KEY, DEPTH.DEEP);
+    });
 
-    renderElement(
-      <DepthProvider hasSkim={true} hasDeep={false}>
-        <ReadDepth />
-      </DepthProvider>,
-    );
+    it('restores a stored DEEP depth on mount when the post has asides', async () => {
+      renderElement(
+        <DepthProvider hasSkim={false} hasDeep={true}>
+          <ReadDepth />
+        </DepthProvider>,
+      );
 
-    await waitFor(() =>
-      expect(screen.getByTestId('depth')).toHaveTextContent(DEPTH.READ),
-    );
-  });
+      await waitFor(() =>
+        expect(screen.getByTestId('depth')).toHaveTextContent(DEPTH.DEEP),
+      );
+      expect(screen.getByTestId('depth-root')).toHaveAttribute(
+        'data-depth',
+        DEPTH.DEEP,
+      );
+    });
 
-  it('re-clamps when hasSkim/hasDeep change without an unmount — the client-side-navigation-to-a-different-post case', async () => {
-    localStorage.setItem(DEPTH_STORAGE_KEY, DEPTH.DEEP);
+    it('clamps a stored DEEP depth to READ when this post has no asides', async () => {
+      renderElement(
+        <DepthProvider hasSkim={true} hasDeep={false}>
+          <ReadDepth />
+        </DepthProvider>,
+      );
 
-    const { rerender } = renderElement(
-      <DepthProvider hasSkim={false} hasDeep={true}>
-        <ReadDepth />
-      </DepthProvider>,
-    );
+      await waitFor(() =>
+        expect(screen.getByTestId('depth')).toHaveTextContent(DEPTH.READ),
+      );
+    });
 
-    await waitFor(() =>
-      expect(screen.getByTestId('depth')).toHaveTextContent(DEPTH.DEEP),
-    );
+    it('re-clamps when hasSkim/hasDeep change without an unmount — the client-side-navigation-to-a-different-post case', async () => {
+      const { rerender } = renderElement(
+        <DepthProvider hasSkim={false} hasDeep={true}>
+          <ReadDepth />
+        </DepthProvider>,
+      );
 
-    rerender(
-      <DepthProvider hasSkim={false} hasDeep={false}>
-        <ReadDepth />
-      </DepthProvider>,
-    );
+      await waitFor(() =>
+        expect(screen.getByTestId('depth')).toHaveTextContent(DEPTH.DEEP),
+      );
 
-    await waitFor(() =>
-      expect(screen.getByTestId('depth')).toHaveTextContent(DEPTH.READ),
-    );
+      rerender(
+        <DepthProvider hasSkim={false} hasDeep={false}>
+          <ReadDepth />
+        </DepthProvider>,
+      );
+
+      await waitFor(() =>
+        expect(screen.getByTestId('depth')).toHaveTextContent(DEPTH.READ),
+      );
+    });
   });
 
   it('includes the bootstrap script in server-rendered markup — the browser executes it during the initial HTML parse, before React hydrates', () => {
@@ -158,22 +172,6 @@ describe(`<${DepthProvider.name}/>`, () => {
     );
 
     expect(html).toContain('<script');
-  });
-
-  it('never renders the bootstrap script on a plain client-side mount with no server-rendered markup to hydrate against — e.g. an App Router client-side navigation into this route segment for the first time in the tab. React never executes a client-rendered <script> tag anyway, so this is a pure no-op mount that used to render — and get console-warned about — for nothing', async () => {
-    renderElement(
-      <DepthProvider hasSkim={true} hasDeep={true}>
-        <ReadDepth />
-      </DepthProvider>,
-    );
-
-    await waitFor(() =>
-      expect(screen.getByTestId('depth')).toHaveTextContent(DEPTH.READ),
-    );
-
-    expect(
-      screen.queryByTestId('depth-bootstrap-script'),
-    ).not.toBeInTheDocument();
   });
 
   it('omits the bootstrap script on a client-side re-render of the same instance — it must never re-render on navigation, since React never executes a script tag it renders client-side (only a console warning would result)', async () => {

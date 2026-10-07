@@ -46,13 +46,14 @@ const freshRoute = async () => {
 };
 
 describe('POST /api/client-log', () => {
-  beforeEach(() => {
+  let POST: Awaited<ReturnType<typeof freshRoute>>['POST'];
+
+  beforeEach(async () => {
     loggerErrorMock.mockReset();
+    ({ POST } = await freshRoute());
   });
 
   it('accepts a valid payload and logs through the shared logger with source: client', async () => {
-    const { POST } = await freshRoute();
-
     const response = await POST(postRequest(validPayload));
 
     expect(response.status).toBe(204);
@@ -64,8 +65,6 @@ describe('POST /api/client-log', () => {
   });
 
   it('rejects a payload with an unknown key', async () => {
-    const { POST } = await freshRoute();
-
     const response = await POST(
       postRequest({ ...validPayload, extra: 'nope' }),
     );
@@ -75,8 +74,6 @@ describe('POST /api/client-log', () => {
   });
 
   it('rejects malformed JSON', async () => {
-    const { POST } = await freshRoute();
-
     const response = await POST(postRequest(undefined, { raw: '{not json' }));
 
     expect(response.status).toBe(400);
@@ -84,8 +81,6 @@ describe('POST /api/client-log', () => {
   });
 
   it('rejects an oversized payload declared via Content-Length', async () => {
-    const { POST } = await freshRoute();
-
     const response = await POST(
       postRequest(validPayload, {
         headers: { 'Content-Length': String(9 * 1024) },
@@ -97,8 +92,6 @@ describe('POST /api/client-log', () => {
   });
 
   it('rejects an oversized payload even without a Content-Length header', async () => {
-    const { POST } = await freshRoute();
-
     const response = await POST(
       postRequest({ ...validPayload, message: 'a'.repeat(9000) }),
     );
@@ -108,7 +101,6 @@ describe('POST /api/client-log', () => {
   });
 
   it('rejects an oversized streamed body with no Content-Length, without buffering it', async () => {
-    const { POST } = await freshRoute();
     const request = postStreamRequest(9 * 1024);
     expect(request.headers.get('content-length')).toBeNull();
 
@@ -119,7 +111,6 @@ describe('POST /api/client-log', () => {
   });
 
   it('accepts a streamed body with no Content-Length that is within the payload cap', async () => {
-    const { POST } = await freshRoute();
     const body = JSON.stringify(validPayload);
     const stream = new ReadableStream<Uint8Array>({
       start(controller) {
@@ -141,7 +132,6 @@ describe('POST /api/client-log', () => {
   });
 
   it('strips control characters from the message so a payload cannot forge a log line', async () => {
-    const { POST } = await freshRoute();
     const forgedSuffix = JSON.stringify({
       level: 'error',
       event: 'fake.forged_entry',
@@ -162,8 +152,6 @@ describe('POST /api/client-log', () => {
   });
 
   it('strips the query string from a reported url before logging', async () => {
-    const { POST } = await freshRoute();
-
     await POST(
       postRequest({
         ...validPayload,
@@ -178,7 +166,6 @@ describe('POST /api/client-log', () => {
   });
 
   it('rate-limits a client that floods the endpoint', async () => {
-    const { POST } = await freshRoute();
     const headers = { 'x-forwarded-for': '203.0.113.5' };
 
     let lastResponse;
@@ -190,8 +177,6 @@ describe('POST /api/client-log', () => {
   });
 
   it('tracks rate limiting per client key, not globally', async () => {
-    const { POST } = await freshRoute();
-
     for (let i = 0; i < 21; i += 1) {
       await POST(
         postRequest(validPayload, {

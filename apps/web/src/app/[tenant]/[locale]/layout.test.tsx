@@ -16,6 +16,7 @@ import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound } from 'next/navigation';
 import type { ReactElement } from 'react';
+import type { MockInstance } from 'vitest';
 
 import LocaleLayout, { generateMetadata, generateStaticParams } from './layout';
 
@@ -104,16 +105,6 @@ describe('LocaleLayout', () => {
       expect(metadata).not.toHaveProperty('description');
     });
 
-    it('falls back to metadataBase only when site settings fail', async () => {
-      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      settingsFailure();
-
-      const metadata = await generateMetadata({ params: makeParams() });
-
-      expect(metadata).not.toHaveProperty('title');
-      errorSpy.mockRestore();
-    });
-
     it('omits robots restrictions in production (indexable)', async () => {
       isProductionEnvironmentMock.mockReturnValue(true);
 
@@ -130,17 +121,6 @@ describe('LocaleLayout', () => {
       expect(metadata.robots).toEqual({ index: false, follow: false });
     });
 
-    it('still applies noindex, nofollow outside production when site settings fail', async () => {
-      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      isProductionEnvironmentMock.mockReturnValue(false);
-      settingsFailure();
-
-      const metadata = await generateMetadata({ params: makeParams() });
-
-      expect(metadata.robots).toEqual({ index: false, follow: false });
-      errorSpy.mockRestore();
-    });
-
     it('enters the request context from its route params', async () => {
       const params = makeParams();
 
@@ -153,6 +133,33 @@ describe('LocaleLayout', () => {
       const metadata = await generateMetadata({ params: makeParams() });
 
       expect(metadata.metadataBase).toBe(DEFAULT_REQUEST_CONTEXT.metadataBase);
+    });
+
+    describe('when site settings fail to load', () => {
+      let errorSpy: MockInstance<typeof console.error>;
+
+      beforeEach(() => {
+        errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        settingsFailure();
+      });
+
+      afterEach(() => {
+        errorSpy.mockRestore();
+      });
+
+      it('falls back to metadataBase only when site settings fail', async () => {
+        const metadata = await generateMetadata({ params: makeParams() });
+
+        expect(metadata).not.toHaveProperty('title');
+      });
+
+      it('still applies noindex, nofollow outside production when site settings fail', async () => {
+        isProductionEnvironmentMock.mockReturnValue(false);
+
+        const metadata = await generateMetadata({ params: makeParams() });
+
+        expect(metadata.robots).toEqual({ index: false, follow: false });
+      });
     });
   });
 
@@ -193,20 +200,24 @@ describe('LocaleLayout', () => {
   });
 
   describe('when site settings fail to load', () => {
-    it('calls the real Next.js notFound() instead of rendering a broken shell', async () => {
-      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    let errorSpy: MockInstance<typeof console.error>;
+
+    beforeEach(() => {
+      errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       settingsFailure();
+    });
 
-      await expect(renderLayout()).rejects.toThrow('NEXT_NOT_FOUND');
-
-      expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+    afterEach(() => {
       errorSpy.mockRestore();
     });
 
-    it('preserves the site_settings.layout_fetch_failed log call', async () => {
-      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      settingsFailure();
+    it('calls the real Next.js notFound() instead of rendering a broken shell', async () => {
+      await expect(renderLayout()).rejects.toThrow('NEXT_NOT_FOUND');
 
+      expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+    });
+
+    it('preserves the site_settings.layout_fetch_failed log call', async () => {
       await expect(renderLayout()).rejects.toThrow();
 
       expect(
@@ -218,19 +229,14 @@ describe('LocaleLayout', () => {
           ),
         ),
       ).toBe(true);
-      errorSpy.mockRestore();
     });
 
     it('enters the request context ahead of the notFound() it throws', async () => {
-      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      settingsFailure();
-
       await expect(renderLayout()).rejects.toThrow('NEXT_NOT_FOUND');
 
       expect(enterRequestContextMock.mock.invocationCallOrder[0]).toBeLessThan(
         vi.mocked(notFound).mock.invocationCallOrder[0]!,
       );
-      errorSpy.mockRestore();
     });
   });
 });

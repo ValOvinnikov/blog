@@ -11,21 +11,25 @@ const setup = customRender(PageHeading, {
 });
 
 describe(`<${PageHeading.name}/>`, () => {
-  it('renders the heading as an h1', () => {
-    setup();
+  describe('with default props', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    expect(
-      screen.getByRole('heading', {
-        level: 1,
-        name: 'Notes on building things',
-      }),
-    ).toBeVisible();
-  });
+    it('renders the heading as an h1', () => {
+      expect(
+        screen.getByRole('heading', {
+          level: 1,
+          name: 'Notes on building things',
+        }),
+      ).toBeVisible();
+    });
 
-  it('renders no supporting paragraph when supportingText is absent', () => {
-    setup();
-
-    expect(screen.queryByText(/./, { selector: 'p' })).not.toBeInTheDocument();
+    it('renders no supporting paragraph when supportingText is absent', () => {
+      expect(
+        screen.queryByText(/./, { selector: 'p' }),
+      ).not.toBeInTheDocument();
+    });
   });
 
   it('renders the supporting text when given', () => {

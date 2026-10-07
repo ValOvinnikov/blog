@@ -51,19 +51,18 @@ describe(`<${BookmarkButtonGate.name}/>`, () => {
     expect(getBookmarkStatus).toHaveBeenCalledWith('post-1');
   });
 
-  it('renders no toggle when bookmarks are not enabled', async () => {
-    vi.mocked(isCapabilityEnabled).mockResolvedValueOnce(false);
+  describe('when bookmarks are not enabled', () => {
+    beforeEach(async () => {
+      vi.mocked(isCapabilityEnabled).mockResolvedValueOnce(false);
+      await setup();
+    });
 
-    await setup();
+    it('renders no toggle when bookmarks are not enabled', async () => {
+      expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    });
 
-    expect(screen.queryByRole('button')).not.toBeInTheDocument();
-  });
-
-  it('checks the bookmarks capability ', async () => {
-    vi.mocked(isCapabilityEnabled).mockResolvedValueOnce(false);
-
-    await setup();
-
-    expect(isCapabilityEnabled).toHaveBeenCalledWith('BOOKMARKS');
+    it('checks the bookmarks capability ', async () => {
+      expect(isCapabilityEnabled).toHaveBeenCalledWith('BOOKMARKS');
+    });
   });
 });
