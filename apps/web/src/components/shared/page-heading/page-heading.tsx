@@ -18,12 +18,14 @@ export const PageHeading = ({ headingBlock, align }: IPageHeadingProps) => {
   return (
     <div className={s.root()}>
       <div className={s.inner()}>
-        <Heading level={1} visual="page" className={s.heading()}>
-          {heading}
-        </Heading>
-        {supportingText ? (
-          <p className={s.supportingText()}>{supportingText}</p>
-        ) : null}
+        <div className={s.text()}>
+          <Heading level={1} visual="page" className={s.heading()}>
+            {heading}
+          </Heading>
+          {supportingText ? (
+            <p className={s.supportingText()}>{supportingText}</p>
+          ) : null}
+        </div>
       </div>
     </div>
   );
