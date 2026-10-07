@@ -88,3 +88,7 @@ export const MobilePhone: TStory = {
     ),
   ],
 };
+
+export const WithoutHeading: TStory = {
+  args: { heading: undefined, prefix: undefined },
+};

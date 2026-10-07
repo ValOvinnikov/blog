@@ -70,6 +70,27 @@ describe(`<${NewsletterSignupFull.name}/>`, () => {
     );
   });
 
+  it('renders no heading when heading is omitted', () => {
+    setup({ heading: undefined });
+
+    expect(screen.queryByRole('heading')).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('textbox', { name: 'Email address' }),
+    ).toBeVisible();
+  });
+
+  it('renders the trust cues without a heading when heading is omitted', () => {
+    setup({
+      heading: undefined,
+      trustCues: [
+        { icon: <Icon name={ICONS.SHIELD_CHECK} />, label: 'No spam' },
+      ],
+    });
+
+    expect(screen.queryByRole('heading')).not.toBeInTheDocument();
+    expect(screen.getByText('No spam')).toBeVisible();
+  });
+
   describe('with the default props', () => {
     beforeEach(() => {
       setup();

@@ -78,6 +78,14 @@ export const WithTrustCues: TStory = {
   args: { trustCues },
 };
 
+export const WithoutHeading: TStory = {
+  args: { heading: undefined, supportingText: undefined, trustCues },
+};
+
+export const FormOnly: TStory = {
+  args: { heading: undefined, supportingText: undefined },
+};
+
 export const Centered: TStory = {
   args: { align: CONTENT_ALIGNMENT.CENTER, trustCues },
 };

@@ -77,6 +77,18 @@ describe(`<${NewsletterSignupCompact.name}/>`, () => {
     );
   });
 
+  it('renders neither label nor prefix when both are omitted', () => {
+    setup({ heading: undefined, prefix: undefined });
+
+    expect(screen.queryByText('subscribe --email')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('newsletter-signup-compact-prefix'),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('textbox', { name: 'Email address' }),
+    ).toBeVisible();
+  });
+
   it('renders no prefix element when prefix is omitted', () => {
     setup({ prefix: undefined });
 
