@@ -1,7 +1,7 @@
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { makeTenant } from '@blog/service/testing/tenant';
 
-import { getIndexPageParams } from './loader';
+import { getIndexPagePagination } from './loader';
 
 vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
   ...(await importOriginal<
@@ -12,18 +12,15 @@ vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
 
 const tenant = makeTenant();
 
-describe('getIndexPageParams', () => {
-  it('delegates the raw query result to the pagination transformer', async () => {
-    mockRun
-      .mockResolvedValueOnce({
-        blogPosts: { total: 20 },
-        moduleRefs: [{ _ref: 'hero-1' }, { _ref: 'list-1' }],
-      })
-      .mockResolvedValueOnce([{ _id: 'list-1', pageSize: 9 }]);
+describe('getIndexPagePagination', () => {
+  it('returns the post count and module refs as queried', async () => {
+    const pagination = {
+      blogPosts: { total: 20 },
+      moduleRefs: [{ _ref: 'list-1' }],
+    };
+    mockRun.mockResolvedValueOnce(pagination);
 
-    const params = await getIndexPageParams(tenant);
-
-    expect(params).toEqual([{ page: '2' }, { page: '3' }]);
+    expect(await getIndexPagePagination(tenant)).toEqual(pagination);
   });
 
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
@@ -32,7 +29,7 @@ describe('getIndexPageParams', () => {
       moduleRefs: null,
     });
 
-    await getIndexPageParams(tenant);
+    await getIndexPagePagination(tenant);
 
     expect(mockRun).toHaveBeenCalledWith(
       expect.anything(),
@@ -47,16 +44,5 @@ describe('getIndexPageParams', () => {
         }),
       }),
     );
-  });
-
-  it('returns no extra pages when the page has no post list module', async () => {
-    mockRun
-      .mockResolvedValueOnce({
-        blogPosts: { total: 200 },
-        moduleRefs: [{ _ref: 'hero-1' }],
-      })
-      .mockResolvedValueOnce([]);
-
-    expect(await getIndexPageParams(tenant)).toEqual([]);
   });
 });

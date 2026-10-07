@@ -1,6 +1,4 @@
-import { getFaqQuestions } from '@blog/service/shared/adaptors/faq-questions/loader';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawFaqModuleQuestions } from '@blog/service/testing/modules/fixtures';
 import { makeRawTopicPage } from '@blog/service/testing/pages/fixtures';
 import {
   makeRawHeadingBlock,
@@ -8,13 +6,7 @@ import {
 } from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
-import { getTopicPage } from './loader';
-
-vi.mock('@blog/service/shared/adaptors/faq-questions/loader', () => ({
-  getFaqQuestions: vi.fn(),
-}));
-
-const mockFaqQuestions = vi.mocked(getFaqQuestions);
+import { getTopicPageDocument } from './loader';
 
 vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
   ...(await importOriginal<
@@ -25,11 +17,11 @@ vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
 
 const tenant = makeTenant();
 
-describe('getTopicPage', () => {
+describe('getTopicPageDocument', () => {
   it('loads a topic page with no list module in modules[]', async () => {
     mockRun.mockResolvedValueOnce(makeRawTopicPage({ modules: [] }));
 
-    const result = await getTopicPage('engineering', tenant);
+    const result = await getTopicPageDocument('engineering', tenant);
 
     expect(result).toBeDefined();
   });
@@ -46,7 +38,7 @@ describe('getTopicPage', () => {
       }),
     );
 
-    const result = await getTopicPage('engineering', tenant);
+    const result = await getTopicPageDocument('engineering', tenant);
     if (!result) throw new Error('expected a topic page');
 
     expect(result.topic).toEqual({
@@ -64,7 +56,7 @@ describe('getTopicPage', () => {
       }),
     );
 
-    const result = await getTopicPage('engineering', tenant);
+    const result = await getTopicPageDocument('engineering', tenant);
     if (!result) throw new Error('expected a topic page');
 
     expect(result.seo.title).toBe('Engineering');
@@ -80,7 +72,7 @@ describe('getTopicPage', () => {
       }),
     );
 
-    const result = await getTopicPage('engineering', tenant);
+    const result = await getTopicPageDocument('engineering', tenant);
     if (!result) throw new Error('expected a topic page');
 
     expect(result.headingBlock).toEqual({
@@ -102,7 +94,7 @@ describe('getTopicPage', () => {
       }),
     );
 
-    const result = await getTopicPage('engineering', tenant);
+    const result = await getTopicPageDocument('engineering', tenant);
     if (!result) throw new Error('expected a topic page');
 
     expect(result.headingBlock).toEqual({
@@ -114,7 +106,7 @@ describe('getTopicPage', () => {
   it('leaves hero undefined when page_topic.hero is unset', async () => {
     mockRun.mockResolvedValueOnce(makeRawTopicPage({ hero: null }));
 
-    const result = await getTopicPage('engineering', tenant);
+    const result = await getTopicPageDocument('engineering', tenant);
     if (!result) throw new Error('expected a topic page');
 
     expect(result.hero).toBeUndefined();
@@ -125,7 +117,7 @@ describe('getTopicPage', () => {
       makeRawTopicPage({ hero: { _id: 'hero-1', _type: 'module_heroBlog' } }),
     );
 
-    const result = await getTopicPage('engineering', tenant);
+    const result = await getTopicPageDocument('engineering', tenant);
     if (!result) throw new Error('expected a topic page');
 
     expect(result.hero).toEqual({ id: 'hero-1', type: 'module_heroBlog' });
@@ -138,51 +130,13 @@ describe('getTopicPage', () => {
       }),
     );
 
-    await expect(getTopicPage('engineering', tenant)).rejects.toThrow();
-  });
-
-  it('builds the faqs from the FAQ modules, in page order, with one request', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawTopicPage({
-        modules: [
-          { _id: 'faq-b', _type: 'module_faq' },
-          { _id: 'cta-1', _type: 'module_cta' },
-          { _id: 'faq-a', _type: 'module_faq' },
-        ],
-      }),
-    );
-    mockFaqQuestions.mockResolvedValueOnce([makeRawFaqModuleQuestions()]);
-
-    const result = await getTopicPage('engineering', tenant);
-    if (!result) throw new Error('expected a topic page');
-
-    expect(mockFaqQuestions).toHaveBeenCalledExactlyOnceWith(
-      ['faq-b', 'faq-a'],
-      tenant,
-    );
-    expect(result.faqs).toEqual([
-      {
-        id: 'block-faq-1',
-        question: 'How long does onboarding take?',
-        answer: 'Most teams are live within a week.',
-      },
-    ]);
-  });
-
-  it('makes no FAQ-questions request when the page has no FAQ module', async () => {
-    mockRun.mockResolvedValueOnce(makeRawTopicPage({ modules: [] }));
-
-    const result = await getTopicPage('engineering', tenant);
-    if (!result) throw new Error('expected a topic page');
-
-    expect(mockFaqQuestions).not.toHaveBeenCalled();
-    expect(result.faqs).toEqual([]);
+    await expect(getTopicPageDocument('engineering', tenant)).rejects.toThrow();
   });
 
   it('passes the slug as a query parameter', async () => {
     mockRun.mockResolvedValueOnce(makeRawTopicPage());
 
-    await getTopicPage('engineering', tenant);
+    await getTopicPageDocument('engineering', tenant);
 
     expect(mockRun).toHaveBeenNthCalledWith(
       1,
@@ -194,7 +148,7 @@ describe('getTopicPage', () => {
   it('resolves undefined, rather than rejecting, when no page_topic matches the slug', async () => {
     mockRun.mockResolvedValueOnce(null);
 
-    const result = await getTopicPage('nonexistent', tenant);
+    const result = await getTopicPageDocument('nonexistent', tenant);
 
     expect(result).toBeUndefined();
   });
@@ -202,7 +156,7 @@ describe('getTopicPage', () => {
   it('threads tenant context into the query and scopes its tags to it', async () => {
     mockRun.mockResolvedValueOnce(makeRawTopicPage());
 
-    await getTopicPage('engineering', tenant);
+    await getTopicPageDocument('engineering', tenant);
 
     expect(mockRun).toHaveBeenCalledWith(
       expect.anything(),

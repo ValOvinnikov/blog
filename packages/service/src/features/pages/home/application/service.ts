@@ -1,13 +1,11 @@
-import { getHomePage } from '@blog/service/features/pages/home/adaptor/loader';
-import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
 import { safeAsync } from '@blog/utils';
+
+import { getHomePage } from './get-home-page';
 
 export function createHomeService() {
   return {
     v1: {
-      getHomePage: safeAsync((tenant: TTenantSanityContext) =>
-        getHomePage(tenant),
-      ),
+      getHomePage: safeAsync(getHomePage),
     },
   };
 }

@@ -1,6 +1,4 @@
-import { getFaqQuestions } from '@blog/service/shared/adaptors/faq-questions/loader';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { makeRawFaqModuleQuestions } from '@blog/service/testing/modules/fixtures';
 import { makeRawTagPage } from '@blog/service/testing/pages/fixtures';
 import {
   makeRawHeadingBlock,
@@ -8,13 +6,7 @@ import {
 } from '@blog/service/testing/shared/fixtures';
 import { makeTenant } from '@blog/service/testing/tenant';
 
-import { getTagPage } from './loader';
-
-vi.mock('@blog/service/shared/adaptors/faq-questions/loader', () => ({
-  getFaqQuestions: vi.fn(),
-}));
-
-const mockFaqQuestions = vi.mocked(getFaqQuestions);
+import { getTagPageDocument } from './loader';
 
 vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
   ...(await importOriginal<
@@ -25,11 +17,11 @@ vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
 
 const tenant = makeTenant();
 
-describe('getTagPage', () => {
+describe('getTagPageDocument', () => {
   it('loads a tag page with no list module in modules[]', async () => {
     mockRun.mockResolvedValueOnce(makeRawTagPage({ modules: [] }));
 
-    const result = await getTagPage('typescript', tenant);
+    const result = await getTagPageDocument('typescript', tenant);
 
     expect(result).toBeDefined();
   });
@@ -46,7 +38,7 @@ describe('getTagPage', () => {
       }),
     );
 
-    const result = await getTagPage('typescript', tenant);
+    const result = await getTagPageDocument('typescript', tenant);
     if (!result) throw new Error('expected a tag page');
 
     expect(result.tag).toEqual({
@@ -64,7 +56,7 @@ describe('getTagPage', () => {
       }),
     );
 
-    const result = await getTagPage('typescript', tenant);
+    const result = await getTagPageDocument('typescript', tenant);
     if (!result) throw new Error('expected a tag page');
 
     expect(result.seo.title).toBe('TypeScript');
@@ -80,7 +72,7 @@ describe('getTagPage', () => {
       }),
     );
 
-    const result = await getTagPage('typescript', tenant);
+    const result = await getTagPageDocument('typescript', tenant);
     if (!result) throw new Error('expected a tag page');
 
     expect(result.headingBlock).toEqual({
@@ -102,7 +94,7 @@ describe('getTagPage', () => {
       }),
     );
 
-    const result = await getTagPage('typescript', tenant);
+    const result = await getTagPageDocument('typescript', tenant);
     if (!result) throw new Error('expected a tag page');
 
     expect(result.headingBlock).toEqual({
@@ -114,7 +106,7 @@ describe('getTagPage', () => {
   it('leaves hero undefined when page_tag.hero is unset', async () => {
     mockRun.mockResolvedValueOnce(makeRawTagPage({ hero: null }));
 
-    const result = await getTagPage('typescript', tenant);
+    const result = await getTagPageDocument('typescript', tenant);
     if (!result) throw new Error('expected a tag page');
 
     expect(result.hero).toBeUndefined();
@@ -125,7 +117,7 @@ describe('getTagPage', () => {
       makeRawTagPage({ hero: { _id: 'hero-1', _type: 'module_heroBlog' } }),
     );
 
-    const result = await getTagPage('typescript', tenant);
+    const result = await getTagPageDocument('typescript', tenant);
     if (!result) throw new Error('expected a tag page');
 
     expect(result.hero).toEqual({ id: 'hero-1', type: 'module_heroBlog' });
@@ -136,51 +128,13 @@ describe('getTagPage', () => {
       makeRawTagPage({ hero: { _id: 'cta-1', _type: 'module_cta' as never } }),
     );
 
-    await expect(getTagPage('typescript', tenant)).rejects.toThrow();
-  });
-
-  it('builds the faqs from the FAQ modules, in page order, with one request', async () => {
-    mockRun.mockResolvedValueOnce(
-      makeRawTagPage({
-        modules: [
-          { _id: 'faq-b', _type: 'module_faq' },
-          { _id: 'cta-1', _type: 'module_cta' },
-          { _id: 'faq-a', _type: 'module_faq' },
-        ],
-      }),
-    );
-    mockFaqQuestions.mockResolvedValueOnce([makeRawFaqModuleQuestions()]);
-
-    const result = await getTagPage('typescript', tenant);
-    if (!result) throw new Error('expected a tag page');
-
-    expect(mockFaqQuestions).toHaveBeenCalledExactlyOnceWith(
-      ['faq-b', 'faq-a'],
-      tenant,
-    );
-    expect(result.faqs).toEqual([
-      {
-        id: 'block-faq-1',
-        question: 'How long does onboarding take?',
-        answer: 'Most teams are live within a week.',
-      },
-    ]);
-  });
-
-  it('makes no FAQ-questions request when the page has no FAQ module', async () => {
-    mockRun.mockResolvedValueOnce(makeRawTagPage({ modules: [] }));
-
-    const result = await getTagPage('typescript', tenant);
-    if (!result) throw new Error('expected a tag page');
-
-    expect(mockFaqQuestions).not.toHaveBeenCalled();
-    expect(result.faqs).toEqual([]);
+    await expect(getTagPageDocument('typescript', tenant)).rejects.toThrow();
   });
 
   it('passes the slug as a query parameter', async () => {
     mockRun.mockResolvedValueOnce(makeRawTagPage());
 
-    await getTagPage('typescript', tenant);
+    await getTagPageDocument('typescript', tenant);
 
     expect(mockRun).toHaveBeenNthCalledWith(
       1,
@@ -192,7 +146,7 @@ describe('getTagPage', () => {
   it('resolves undefined, rather than rejecting, when no page_tag matches the slug', async () => {
     mockRun.mockResolvedValueOnce(null);
 
-    const result = await getTagPage('nonexistent', tenant);
+    const result = await getTagPageDocument('nonexistent', tenant);
 
     expect(result).toBeUndefined();
   });
@@ -200,7 +154,7 @@ describe('getTagPage', () => {
   it('threads tenant context into the query and scopes its tags to it', async () => {
     mockRun.mockResolvedValueOnce(makeRawTagPage());
 
-    await getTagPage('typescript', tenant);
+    await getTagPageDocument('typescript', tenant);
 
     expect(mockRun).toHaveBeenCalledWith(
       expect.anything(),
