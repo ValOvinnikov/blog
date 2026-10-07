@@ -20,6 +20,7 @@ export const landingPageQuery = q
   .star.filterByType('page_landing')
   .filterBy('slug.current == $slug')
   .filterBy('language == $locale')
+  // groqd's typed filterBy cannot type the computed path expression
   .filterRaw(`${LANDING_PAGE_PATH_EXPRESSION} == $path`)
   .slice(0)
   .project((sub) => ({

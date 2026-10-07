@@ -20,8 +20,9 @@ export const tagPaginationParamsQuery = q
       .count(
         sub.star
           .filterByType('page_post')
+          // groqd's typed filterBy rejects a reference's `_ref` path
           .filterRaw('references(^.tag._ref)')
-          .filterRaw('language == ^.language')
+          .filterBy('language == ^.language')
           .filterRaw(PUBLISHED_POST_FILTER),
       )
       .notNull(true),
