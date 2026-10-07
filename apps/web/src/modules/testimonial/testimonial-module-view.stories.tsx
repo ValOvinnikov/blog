@@ -87,8 +87,24 @@ export const Spotlight: TStory = {
   args: { testimonials: [testimonials[0]!] },
 };
 
+export const SpotlightCenterAligned: TStory = {
+  args: {
+    testimonials: [testimonials[0]!],
+    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    ctaButtons: ctaActionsDemo,
+  },
+};
+
 export const Carousel: TStory = {
   args: { displayMode: DISPLAY_MODE.CAROUSEL },
+};
+
+export const CarouselFitsCenter: TStory = {
+  args: {
+    displayMode: DISPLAY_MODE.CAROUSEL,
+    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    testimonials: testimonials.slice(0, 2),
+  },
 };
 
 export const WithActions: TStory = {

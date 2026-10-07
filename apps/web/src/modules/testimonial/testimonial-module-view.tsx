@@ -31,13 +31,14 @@ export const TestimonialModuleView = ({
 }: ITestimonialModuleViewProps) => {
   const [spotlightItem] = testimonials;
   const isSpotlight = testimonials.length === 1;
-  const headingAlign = isSpotlight
-    ? CONTENT_ALIGNMENT.CENTER
-    : contentAlignment;
+  const carouselAlign =
+    contentAlignment === CONTENT_ALIGNMENT.CENTER
+      ? CONTENT_ALIGNMENT.CENTER
+      : CONTENT_ALIGNMENT.LEFT;
   const cardAlign =
     cardAlignment === CONTENT_ALIGNMENT.CENTER ? 'center' : 'left';
   const columns = toTestimonialGridColumns(testimonials.length);
-  const s = moduleGridActionsVariants({ align: headingAlign });
+  const s = moduleGridActionsVariants({ align: contentAlignment });
   const v = testimonialModuleViewVariants({ columns });
   const lastIndex = testimonials.length - 1;
   const isLoneBelowLg = isLoneLastInRow(testimonials.length, 2);
@@ -54,7 +55,7 @@ export const TestimonialModuleView = ({
         headingBlock={headingBlock}
         id={titleId}
         level={2}
-        align={headingAlign}
+        align={contentAlignment}
         variant="section"
       />
       {isSpotlight && spotlightItem ? (
@@ -70,6 +71,7 @@ export const TestimonialModuleView = ({
           items={testimonials}
           align={cardAlign}
           tone={brandVariant}
+          contentAlignment={carouselAlign}
           title={headingBlock.heading}
         />
       ) : (

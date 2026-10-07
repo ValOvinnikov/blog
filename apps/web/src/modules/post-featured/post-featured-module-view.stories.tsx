@@ -30,6 +30,16 @@ const thirdItem = makePostListItem({
   topic: { title: 'Accessibility' },
 });
 
+const placeholderImage = (alt: string) => (
+  // eslint-disable-next-line @next/next/no-img-element -- Storybook placeholder image, not a production asset; next/image would be wrong here
+  <img src="https://placehold.co/640x360" alt={alt} />
+);
+
+const withImage = <T extends { title: string }>(item: T) => ({
+  ...item,
+  image: placeholderImage(item.title),
+});
+
 const meta = {
   title: 'Modules/PostFeaturedModule',
   component: PostFeaturedModuleView,
@@ -42,7 +52,7 @@ const meta = {
     },
     contentAlignment: {
       control: 'select',
-      options: Object.values(CONTENT_ALIGNMENT),
+      options: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
     },
     displayMode: {
       control: 'select',
@@ -64,17 +74,14 @@ const meta = {
 export default meta;
 type TStory = StoryObj<typeof meta>;
 
-/** One lead card plus a two-column grid of the remaining posts. */
 export const Default: TStory = {};
 
-/** One lead card plus exactly one full-width split tail card. */
 export const LeadWithSingleTail: TStory = {
-  args: { items: [leadItem, secondItem] },
+  args: { hasImages: true, items: [leadItem, secondItem].map(withImage) },
 };
 
-/** Only the lead card, no tail posts at all. */
 export const LeadOnly: TStory = {
-  args: { items: [leadItem] },
+  args: { hasImages: true, items: [leadItem].map(withImage) },
 };
 
 export const Secondary: TStory = {
@@ -84,12 +91,6 @@ export const Secondary: TStory = {
 export const CenterAligned: TStory = {
   args: { contentAlignment: CONTENT_ALIGNMENT.CENTER },
 };
-
-const manyItems = Array.from({ length: 8 }, (_, index) => ({
-  ...leadItem,
-  id: `post-many-${index}`,
-  title: `${leadItem.title} ${index + 1}`,
-}));
 
 export const CarouselFitsLeft: TStory = {
   args: {
@@ -107,25 +108,17 @@ export const CarouselFitsCenter: TStory = {
   },
 };
 
-export const CarouselOverflowsCenter: TStory = {
+export const PhoneCarouselOverflowsCenter: TStory = {
+  globals: { viewport: 'mobile' },
   args: {
     displayMode: DISPLAY_MODE.CAROUSEL,
     contentAlignment: CONTENT_ALIGNMENT.CENTER,
-    items: manyItems,
   },
 };
-
-const placeholderImage = (alt: string) => (
-  // eslint-disable-next-line @next/next/no-img-element -- Storybook placeholder image, not a production asset; next/image would be wrong here
-  <img src="https://placehold.co/640x360" alt={alt} />
-);
 
 export const WithImages: TStory = {
   args: {
     hasImages: true,
-    items: [leadItem, secondItem, thirdItem].map((item) => ({
-      ...item,
-      image: placeholderImage(item.title),
-    })),
+    items: [leadItem, secondItem, thirdItem].map(withImage),
   },
 };

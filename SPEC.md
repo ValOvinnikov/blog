@@ -301,15 +301,16 @@ point at. Because the destination is no longer knowably a landing page,
 name, and links a card's name to it when set, leaving the name as plain
 text when it is unset.
 
-Every `module_*` document also carries a **required** `brandVariant` field
-(stored values from `@blog/config`'s `BRAND_VARIANT` const —
-`PRIMARY`/`SECONDARY` by default; `module_hero`, `module_heroBlog`,
-`module_heroProfile`, `module_heroStatement`, `module_cta`,
-`module_newsletter` and `module_stats` additionally allow `BRAND_PRIMARY`,
-and every other module keeps the two-value default — on `module_cta` this
-field means the card's own fill tone (Banner/Split/Callout below) rather
-than the full-bleed band tone every other module uses it for, which that
-module carries as a separate `bandTone` field), plus an optional, all-remaining-fields-optional `layout`
+Every `module_*` document also carries a **required** `brandVariant` field,
+titled Background, from `brandVariantField()`. **Every module offers all three
+`BRAND_VARIANT` values** — Plain (`PRIMARY`), Shaded (`SECONDARY`) and Brand
+tint (`BRAND_PRIMARY`) — and starts on Plain; the heroes are the one family
+that starts on Brand tint, and on a Banner hero the value also tints the
+image. A module that must not sit on the brand band states why rather than
+trimming its list. On `module_cta` this field means the card's own fill
+(titled Card background, starting on Shaded) rather than the full-bleed band
+every other module uses it for, which that module carries as a separate
+`bandTone` field. Every module also carries an optional, all-remaining-fields-optional `layout`
 object (`spacingTop`/`spacingBottom`, `containerWidth`, `dividerTop`,
 `dividerBottom` — stored values from `SPACING_SCALE`/`CONTAINER_WIDTH`
 consts; there is no `align` field on `layout` — alignment is its own
@@ -367,11 +368,36 @@ sibling `contentAlignment` (titled Heading Alignment, Left/Center only), and
 the page loaders return it as `headingAlignment`, defaulting to Left.
 
 **`contentAlignment` offers Left and Center unless a copy block sits against
-media.** `alignmentFields()` defaults the option list to `LEFT`/`CENTER`, so
-every grid, list, column and carousel module gets two values without asking.
-Only the heroes, `module_cta` and `module_testimonial` pass the full list and
-keep `RIGHT`. A right-aligned heading over a grid of cards has no rendering
-that reads as deliberate, which is why a new module starts on two values.
+media.** Every module except `module_content` and `module_hero` carries it,
+titled Content Alignment and starting on Left. `alignmentFields()` defaults
+the option list to `LEFT`/`CENTER`, so every grid, list, column and carousel
+module gets two values without asking. Only the heroes, `module_cta` and
+`module_testimonial` pass the full list and keep `RIGHT`. A right-aligned
+heading over a grid of cards has no rendering that reads as deliberate, which
+is why a new module starts on two values. The field aligns the module heading
+and actions; a module whose items have no alignment of their own (FAQ,
+newsletter, stats, logo wall) aligns them with it too.
+
+**A carousel follows `contentAlignment` too.** Every module with a carousel
+display mode hands the value to `Carousel`, which centres a track that does
+not overflow on Center and lines it up left otherwise — once the track
+scrolls it always starts at the left edge. `Carousel` has no right-aligned
+track, so `module_testimonial`'s `RIGHT` lines its carousel up left.
+
+**A single item renders as a spotlight, and the spotlight keeps its own
+layout.** `module_testimonial` and `module_team` both swap a one-item grid for
+a spotlight. The module heading and actions follow `contentAlignment` as they
+do above a grid; the spotlight figure itself ignores both `contentAlignment`
+and `cardAlignment` — the testimonial quote stays centred, the team member
+keeps its photo beside start-aligned text.
+
+**Items align on their own axis, `cardAlignment`.** Card Alignment
+(`cardAlignmentField()`) offers Left and Center and aligns the content inside
+each card. `module_featureList` and `module_testimonial` start it on Left,
+`module_team` on Center, because a centred photo reads as a portrait.
+`module_timeline` carries the same shape as `itemAlignment` (Item Alignment),
+since its items are rows rather than cards. Every other module either has no
+items or aligns them with `contentAlignment`.
 
 **Page headings align the same way.** `pageHeadingBlockField()` returns the
 `headingBlock` field together with a document-level `contentAlignment`
@@ -490,12 +516,16 @@ one optional secondary is a `secondaryAction` of type `ctaSecondaryButton`
 `SECONDARY` and `link` optional, since Sanity seeds the nested object on
 document creation and an empty link means "no secondary action".
 
-Every module's fields open `title → brandVariant → headingBlock → …`, and
-the heroes group theirs into fieldsets (`post`, `image`, `primaryAction`,
+**Every module's fields follow one spine:** `title`, then Background, then
+Shape (`variant`) where the module has one, then the heading block, then the
+module's content, its actions and its own options (show toggles, image shape,
+display mode, media order), then the alignment and position axes, and the
+layout object last.
+The heroes group theirs into fieldsets (`post`, `image`, `primaryAction`,
 `contentPosition`) so the Studio form reads as sections rather than a flat
-list. Shared field helpers seed sensible defaults: `brandVariantField`
-starts on the first entry of its list and `alignmentFields`'
-`contentAlignment` starts on `LEFT`. `heading` is required without qualification because nothing
+list. Shared field helpers seed the defaults: `brandVariantField` starts on
+`PRIMARY` whatever its list order, and `alignmentFields`' `contentAlignment`
+starts on `LEFT`. `heading` is required without qualification because nothing
 can derive it; that is safe here precisely because the type shipped with no
 existing documents to strand, which is the standing exception to the rule
 against adding a `required()` field to a type already in use.
@@ -763,8 +793,7 @@ array, validated with `required()`, `unique()`, `min(2)` and `max(8)` as
 separate rule chains. Two is the floor because a
 lone card is a statement rather than a grid; eight is the ceiling because the
 column rule below stops producing balanced rows past it. It carries the usual
-module furniture — `title`, `brandVariant` (the default
-`PRIMARY`/`SECONDARY` list, defaulting to `PRIMARY`), `headingBlock`,
+module furniture — `title`, `brandVariant`, `headingBlock`,
 `layout`, `ctaButtons` — plus
 `displayMode` (grid or carousel), `contentAlignment` from `alignmentFields([])`
 with no position axis, and two fields of its own: `imageShape` and
@@ -788,9 +817,9 @@ same reason: the card's own content already answers it.
 and seven takes four rather than three, so the last row is never left with a
 single orphaned card. `toModuleGridColumns` in `apps/web` is the whole rule;
 the carousel ignores it. It is named for the job rather than for this module
-because `module_stats` derives its columns from the same table — the mapping is
-identical across the 2–6 range a stats band can hold, so a second copy would
-have been a near-duplicate that never fails loudly.
+because `module_stats`, `module_team`, `module_sectionPages` and
+`module_postRelated` derive their columns from the same table, so a second
+copy would have been a near-duplicate that never fails loudly.
 
 `cardAlignment` is a casing seam worth naming: it stores UPPERCASE
 `CONTENT_ALIGNMENT` values and offers only `LEFT`/`CENTER`, while `@blog/ui`'s
@@ -1978,7 +2007,7 @@ order: the child's public heading as the label, its heading's supporting text
 as the summary, its SEO sharing image, and a link to its path. On a page
 with no children it renders nothing. Its authored fields are `title`,
 `brandVariant`, an optional `headingBlock` (the one module whose heading is
-not required), a Heading Alignment and a wide `layout`.
+not required), `contentAlignment` and a wide `layout`.
 
 **Redirects.** A `redirect` document holds a language, a source path, a
 destination path and whether it is a prefix redirect; editors manage them in

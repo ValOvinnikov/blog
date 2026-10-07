@@ -72,6 +72,7 @@ export const WithRichAnswer: TStory = {
         question: 'What does the free trial include?',
         answer: faqAnswerWithListAndLinkDemo,
       }),
+      ...questions.slice(1),
     ],
   },
 };

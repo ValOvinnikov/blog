@@ -87,6 +87,23 @@ describe(`<${TestimonialModuleView.name}/>`, () => {
     expect(screen.queryByRole('blockquote')).not.toBeInTheDocument();
   });
 
+  it.each([
+    [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.LEFT],
+    [CONTENT_ALIGNMENT.CENTER, CONTENT_ALIGNMENT.CENTER],
+    [CONTENT_ALIGNMENT.RIGHT, CONTENT_ALIGNMENT.LEFT],
+    [undefined, CONTENT_ALIGNMENT.LEFT],
+  ])(
+    'lines the carousel track up %s as %s',
+    (contentAlignment, expectedAlignment) => {
+      setup({ displayMode: DISPLAY_MODE.CAROUSEL, contentAlignment });
+
+      expect(TestimonialCarousel).toHaveBeenCalledWith(
+        expect.objectContaining({ contentAlignment: expectedAlignment }),
+        undefined,
+      );
+    },
+  );
+
   it('renders the resolved cta buttons when present', () => {
     setup({ ctaButtons: ctaActionsDemo });
 
