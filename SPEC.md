@@ -356,6 +356,15 @@ move onto the field, and did; a field's presence cannot. Bundling it meant `modu
 aligns its whole card rather than its heading, was forced to render an
 alignment control nothing read.
 
+**Page headings align the same way.** `pageHeadingBlockField()` returns the
+`headingBlock` field together with a document-level `contentAlignment`
+("Heading Alignment", Left or Centre, initial value Left), so every page type
+with a page heading gets both from one spread. The page loaders return it as
+a required `headingAlignment`, falling back to Left for pages stored before
+the field existed, and `PageHeading` aligns the heading and its supporting
+text to it whenever the page renders no hero. Posts carry the field but
+ignore it: their article header is not a `PageHeading`.
+
 `module_content` has no `headingBlock` —
 its rich-text `body` supplies any in-content headings, so a separate
 structured heading field would just be a second way to do the same thing.

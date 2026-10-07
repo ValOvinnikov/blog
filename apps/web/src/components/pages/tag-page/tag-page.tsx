@@ -17,7 +17,7 @@ export const TagPage = async ({ slug, page }: TTagPageProps) => {
   const pageData = guardPageLoaderResult(result, 'tag_page.fetch_failed', {
     slug,
   });
-  const { tag, headingBlock, hero, modules, faqs } = pageData;
+  const { tag, headingBlock, headingAlignment, hero, modules, faqs } = pageData;
 
   const currentPage = page ?? 1;
 
@@ -30,6 +30,7 @@ export const TagPage = async ({ slug, page }: TTagPageProps) => {
       <TagModuleRenderer
         hero={hero}
         headingBlock={headingBlock}
+        headingAlignment={headingAlignment}
         modules={modules}
         context={{
           page: currentPage,

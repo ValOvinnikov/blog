@@ -16,7 +16,7 @@ export const PostIndexPage = async ({ page }: TPostIndexPageProps) => {
     result,
     'post_index_page.fetch_failed',
   );
-  const { headingBlock, hero, modules } = pageData;
+  const { headingBlock, headingAlignment, hero, modules } = pageData;
 
   return (
     <PageShell>
@@ -26,6 +26,7 @@ export const PostIndexPage = async ({ page }: TPostIndexPageProps) => {
       <PostIndexModuleRenderer
         hero={hero}
         headingBlock={headingBlock}
+        headingAlignment={headingAlignment}
         modules={modules}
         context={{ page }}
       >

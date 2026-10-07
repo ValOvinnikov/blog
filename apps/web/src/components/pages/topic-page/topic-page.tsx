@@ -18,7 +18,8 @@ export const TopicPage = async ({ slug, page }: TTopicPageProps) => {
   const pageData = guardPageLoaderResult(result, 'topic_page.fetch_failed', {
     slug,
   });
-  const { topic, headingBlock, hero, modules, faqs } = pageData;
+  const { topic, headingBlock, headingAlignment, hero, modules, faqs } =
+    pageData;
 
   const currentPage = page ?? 1;
 
@@ -31,6 +32,7 @@ export const TopicPage = async ({ slug, page }: TTopicPageProps) => {
       <TopicModuleRenderer
         hero={hero}
         headingBlock={headingBlock}
+        headingAlignment={headingAlignment}
         modules={modules}
         context={{
           page: currentPage,

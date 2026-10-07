@@ -9,10 +9,8 @@ import { TopicIndexModuleRenderer } from './topic-index-module-renderer';
 export const TopicIndexPage = async () => {
   const result = await getTopicIndexPage();
   await redirectMissingLanguagePage(result);
-  const { headingBlock, hero, modules } = guardPageLoaderResult(
-    result,
-    'topic_index_page.fetch_failed',
-  );
+  const { headingBlock, headingAlignment, hero, modules } =
+    guardPageLoaderResult(result, 'topic_index_page.fetch_failed');
 
   return (
     <PageShell>
@@ -22,6 +20,7 @@ export const TopicIndexPage = async () => {
       <TopicIndexModuleRenderer
         hero={hero}
         headingBlock={headingBlock}
+        headingAlignment={headingAlignment}
         modules={modules}
       />
     </PageShell>

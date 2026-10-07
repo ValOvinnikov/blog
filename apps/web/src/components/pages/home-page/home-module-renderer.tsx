@@ -2,6 +2,7 @@ import type {
   THeadingBlock,
   TMaybeUndefined,
   TPageHomeType,
+  TContentAlignmentOf,
 } from '@blog/config';
 import type { TModule } from '@blog/service';
 import { PageHeading } from '@web/components/shared/page-heading';
@@ -54,12 +55,14 @@ const HOME_MAP: Partial<Record<TPageHomeType, TModuleComponent>> = {
 export interface IHomeModuleRendererProps {
   hero: TMaybeUndefined<TModule<TPageHomeType>>;
   headingBlock: THeadingBlock;
+  headingAlignment: TContentAlignmentOf<'LEFT' | 'CENTER'>;
   modules: TModule[];
 }
 
 export const HomeModuleRenderer = async ({
   hero,
   headingBlock,
+  headingAlignment,
   modules,
 }: IHomeModuleRendererProps): Promise<ReactNode> => {
   const heroNode = hero
@@ -68,7 +71,9 @@ export const HomeModuleRenderer = async ({
 
   return (
     <>
-      {heroNode ?? <PageHeading headingBlock={headingBlock} />}
+      {heroNode ?? (
+        <PageHeading headingBlock={headingBlock} align={headingAlignment} />
+      )}
       {renderModules({ modules, map: HOME_MAP })}
     </>
   );

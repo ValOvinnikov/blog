@@ -2,6 +2,7 @@ import type {
   THeadingBlock,
   TMaybeUndefined,
   TPageLandingType,
+  TContentAlignmentOf,
 } from '@blog/config';
 import type { TLandingSectionNavigation, TModule } from '@blog/service';
 import { PageHeading } from '@web/components/shared/page-heading';
@@ -58,6 +59,7 @@ const LANDING_MAP: Partial<Record<TPageLandingType, TModuleComponent>> = {
 export interface ILandingModuleRendererProps {
   hero: TMaybeUndefined<TModule<TPageLandingType>>;
   headingBlock: THeadingBlock;
+  headingAlignment: TContentAlignmentOf<'LEFT' | 'CENTER'>;
   modules: TModule<TPageLandingType>[];
   landingPage: { id: string; path: string };
   sectionNavigation?: TLandingSectionNavigation;
@@ -66,6 +68,7 @@ export interface ILandingModuleRendererProps {
 export const LandingModuleRenderer = async ({
   hero,
   headingBlock,
+  headingAlignment,
   modules,
   landingPage,
   sectionNavigation,
@@ -76,7 +79,11 @@ export const LandingModuleRenderer = async ({
 
   return (
     <LandingPageLayout
-      topBlock={heroNode ?? <PageHeading headingBlock={headingBlock} />}
+      topBlock={
+        heroNode ?? (
+          <PageHeading headingBlock={headingBlock} align={headingAlignment} />
+        )
+      }
       sectionNavigation={sectionNavigation}
     >
       {renderModules({ modules, map: LANDING_MAP, context: { landingPage } })}

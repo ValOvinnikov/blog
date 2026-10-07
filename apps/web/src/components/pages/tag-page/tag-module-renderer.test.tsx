@@ -1,3 +1,4 @@
+import { CONTENT_ALIGNMENT } from '@blog/config';
 import { customRenderAsync } from '@web/testing/custom-render';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
@@ -83,6 +84,7 @@ const loggerWarnMock = vi.mocked(logger.warn);
 const setup = customRenderAsync(TagModuleRenderer, {
   hero: undefined,
   headingBlock: makeHeadingBlock({ heading: 'TypeScript' }),
+  headingAlignment: CONTENT_ALIGNMENT.LEFT,
   modules: [],
 });
 

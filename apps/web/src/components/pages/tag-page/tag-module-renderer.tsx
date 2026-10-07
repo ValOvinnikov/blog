@@ -2,6 +2,7 @@ import type {
   THeadingBlock,
   TMaybeUndefined,
   TPageTagType,
+  TContentAlignmentOf,
 } from '@blog/config';
 import type { TModule } from '@blog/service';
 import { PageHeading } from '@web/components/shared/page-heading';
@@ -35,6 +36,7 @@ const TAG_MAP: Partial<Record<TPageTagType, TModuleComponent>> = {
 export interface ITagModuleRendererProps {
   hero: TMaybeUndefined<TModule<TPageTagType>>;
   headingBlock: THeadingBlock;
+  headingAlignment: TContentAlignmentOf<'LEFT' | 'CENTER'>;
   modules: TModule<TPageTagType>[];
   context?: TModuleComponentProps['context'];
 }
@@ -42,6 +44,7 @@ export interface ITagModuleRendererProps {
 export const TagModuleRenderer = async ({
   hero,
   headingBlock,
+  headingAlignment,
   modules,
   context,
 }: ITagModuleRendererProps): Promise<ReactNode> => {
@@ -49,7 +52,9 @@ export const TagModuleRenderer = async ({
 
   return (
     <>
-      {heroNode ?? <PageHeading headingBlock={headingBlock} />}
+      {heroNode ?? (
+        <PageHeading headingBlock={headingBlock} align={headingAlignment} />
+      )}
       {renderModules({ modules, map: TAG_MAP, context })}
     </>
   );
