@@ -1,4 +1,4 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { LOCALE_ISO_CODES, CONTENT_ALIGNMENT } from '@blog/config/constants';
 import type { TLandingPage, TLandingSectionNavigation } from '@blog/service';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
@@ -9,6 +9,7 @@ export const mockLandingPage: TLandingPage = {
   id: 'about-us',
   path: 'about-us',
   translations: [{ language: LOCALE_ISO_CODES.EN, slug: 'about-us' }],
+  headingAlignment: CONTENT_ALIGNMENT.LEFT,
   headingBlock: { heading: 'About Us', supportingText: undefined },
   hero: undefined,
   modules: [],
