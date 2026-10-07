@@ -7,6 +7,7 @@ import { Section } from '@web/components/shared/section';
 import { TeamCarousel } from '@web/modules/team/components/team-carousel/team-carousel';
 import { TeamMemberCard } from '@web/modules/team/components/team-member-card/team-member-card';
 import { TeamSpotlight } from '@web/modules/team/components/team-spotlight/team-spotlight';
+import { isLoneLastInRow } from '@web/utils/is-lone-last-in-row';
 import { moduleGridActionsVariants } from '@web/utils/module-grid-actions-variants';
 import {
   CAROUSEL_IMAGE_SIZES,
@@ -41,6 +42,8 @@ export const TeamModuleView = ({
     cardAlignment === CONTENT_ALIGNMENT.CENTER ? 'center' : 'left';
   const baseColumns = toModuleGridColumns(members.length);
   const columns = showBios && baseColumns === 4 ? 3 : baseColumns;
+  const lastIndex = members.length - 1;
+  const isLoneFromLg = isLoneLastInRow(members.length, columns);
   const s = moduleGridActionsVariants({ align: contentAlignment });
   const v = teamModuleViewVariants({ columns });
 
@@ -77,13 +80,16 @@ export const TeamModuleView = ({
       ) : (
         <CardGrid
           columns={columns}
-          className={v.grid({ class: s.grid() })}
+          className={v.grid()}
           dataTestId={`${dataTestId}-grid`}
         >
-          {members.map((member) => (
+          {members.map((member, index) => (
             <TeamMemberCard
               key={member.id}
               member={member}
+              className={v.item({
+                isLoneFromLg: index === lastIndex && isLoneFromLg,
+              })}
               imageShape={imageShape}
               align={cardAlign}
               imageSizes={GRID_IMAGE_SIZES[columns]}

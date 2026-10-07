@@ -5,6 +5,7 @@ import {
   CARD_STYLE_DECLARATIONS,
   DENSITY_DECLARATIONS,
   formatOklchRamp,
+  IMAGE_SCRIM_RAMP,
   LOGO_RAMP_DARK,
   LOGO_RAMP_LIGHT,
   RADIUS_DECLARATIONS,
@@ -36,6 +37,7 @@ export const buildThemeStyleBlock = ({
     ${formatDeclarations({
       ...formatOklchRamp(ACCENT_RAMP_LIGHT, accentHue),
       ...formatOklchRamp(LOGO_RAMP_LIGHT, resolvedLogoHue),
+      ...formatOklchRamp(IMAGE_SCRIM_RAMP, accentHue),
       ...RADIUS_DECLARATIONS[radiusScale],
       ...DENSITY_DECLARATIONS[density],
       ...CARD_STYLE_DECLARATIONS[cardStyle],

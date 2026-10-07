@@ -75,7 +75,7 @@ export const TestimonialModuleView = ({
       ) : (
         <CardGrid
           columns={columns}
-          className={v.grid({ class: s.grid() })}
+          className={v.grid()}
           dataTestId={`${dataTestId}-grid`}
         >
           {testimonials.map((item, index) => (

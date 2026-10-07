@@ -8,7 +8,6 @@ import {
 } from '@web/components/shared/media-card-item';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';
-import { moduleGridActionsVariants } from '@web/utils/module-grid-actions-variants';
 
 export interface IPostLatestModuleViewProps extends Omit<
   TPostLatestModule,
@@ -32,7 +31,6 @@ export const PostLatestModuleView = ({
   displayMode,
 }: IPostLatestModuleViewProps) => {
   const { heading } = headingBlock;
-  const s = moduleGridActionsVariants();
 
   return (
     <Section
@@ -56,7 +54,7 @@ export const PostLatestModuleView = ({
           tone={brandVariant}
         />
       ) : (
-        <CardGrid className={s.grid()}>
+        <CardGrid>
           {items.map((item) => (
             <MediaCardItem key={item.id} item={item} hasImage={hasImages} />
           ))}

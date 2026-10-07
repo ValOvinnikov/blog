@@ -3,7 +3,6 @@ import { tv } from 'tailwind-variants';
 
 export const moduleGridActionsVariants = tv({
   slots: {
-    grid: ['gap-3.5 md:gap-5 lg:gap-7'],
     actions: ['flex flex-wrap gap-3 mt-7'],
   },
   variants: {

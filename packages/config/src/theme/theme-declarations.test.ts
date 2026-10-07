@@ -15,4 +15,10 @@ describe(formatOklchRamp, () => {
       '--contrast': 'oklch(0.16 0.006 250)',
     });
   });
+
+  it('appends an alpha channel to a stop that carries one', () => {
+    expect(
+      formatOklchRamp({ '--scrim': { l: 0.2, c: 0.06, alpha: 0.92 } }, 28),
+    ).toEqual({ '--scrim': 'oklch(0.2 0.06 28 / 0.92)' });
+  });
 });

@@ -8,7 +8,6 @@ import {
 } from '@web/components/shared/media-card-item';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';
-import { moduleGridActionsVariants } from '@web/utils/module-grid-actions-variants';
 
 import { postFeaturedModuleViewVariants } from './post-featured-module-view-variants';
 
@@ -34,7 +33,6 @@ export const PostFeaturedModuleView = ({
   displayMode,
 }: IPostFeaturedModuleViewProps) => {
   const v = postFeaturedModuleViewVariants();
-  const s = moduleGridActionsVariants();
 
   const { heading } = headingBlock;
 
@@ -82,11 +80,7 @@ export const PostFeaturedModuleView = ({
             />
           )}
           {tailPosts.length > 1 && (
-            <CardGrid
-              columns={2}
-              className={s.grid()}
-              dataTestId={`${dataTestId}-tail-grid`}
-            >
+            <CardGrid columns={2} dataTestId={`${dataTestId}-tail-grid`}>
               {tailPosts.map((post) => (
                 <MediaCardItem key={post.id} item={post} hasImage={hasImages} />
               ))}

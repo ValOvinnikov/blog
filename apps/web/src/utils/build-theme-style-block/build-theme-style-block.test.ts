@@ -30,6 +30,8 @@ const SPACING_TOKENS = [
   '--spacing-site-y',
   '--spacing-card-x',
   '--spacing-card-y',
+  '--spacing-card-gap',
+  '--spacing-band',
 ];
 
 const readPixels = (css: string, token: string): number =>
@@ -109,10 +111,10 @@ describe('buildThemeStyleBlock', () => {
       'utf8',
     );
     const staticDeclarations = themeCss.match(
-      /--(radius[\w-]*|spacing-(gutter|section|page-y|site-x|site-y|card-x|card-y)): (?!var\()[^;]+;/g,
+      /--(radius[\w-]*|spacing-(gutter|section|page-y|site-x|site-y|card-x|card-y|card-gap|band)): (?!var\()[^;]+;/g,
     );
 
-    expect(staticDeclarations).toHaveLength(12);
+    expect(staticDeclarations).toHaveLength(14);
 
     const css = buildThemeStyleBlock(CONSOLE_TOKENS);
 
@@ -155,6 +157,34 @@ describe('buildThemeStyleBlock', () => {
     expect(read('--item-radius')).toMatch(/^var\(--radius-/);
   });
 
+  it('reproduces theme.css on-image and brand scrim tokens at the Console accent hue', () => {
+    const themeCss = readFileSync(
+      createRequire(import.meta.url).resolve('@blog/tailwind-config/theme.css'),
+      'utf8',
+    );
+    const imageDeclarations = themeCss.match(
+      /--(on-image[\w-]*|scrim-brand-[\w-]+): [^;]+;/g,
+    );
+
+    expect(imageDeclarations).toHaveLength(5);
+
+    const css = buildThemeStyleBlock(CONSOLE_TOKENS);
+
+    imageDeclarations?.forEach((declaration) => {
+      expect(css).toContain(declaration);
+    });
+  });
+
+  it('tints the brand scrim with the accent hue and keeps on-image copy and the neutral scrim hue-free', () => {
+    const css = buildThemeStyleBlock({ ...CONSOLE_TOKENS, accentHue: 28 });
+
+    expect(css).toContain('--scrim-brand-strong: oklch(0.2 0.06 28 / 0.92);');
+    expect(css).toContain('--scrim-brand-mid: oklch(0.35 0.12 28 / 0.72);');
+    expect(css).toContain('--scrim-brand-weak: oklch(0.45 0.14 28 / 0.4);');
+    expect(css).toContain('--on-image: oklch(1 0 0);');
+    expect(css).not.toContain('--scrim-neutral');
+  });
+
   it.each(RADIUS_TOKENS)(
     'rounds %s more at each larger radius scale',
     (token) => {
@@ -194,5 +224,7 @@ describe('buildThemeStyleBlock', () => {
     expect(darkBlock).not.toContain('--radius');
     expect(darkBlock).not.toContain('--spacing-');
     expect(darkBlock).not.toContain('--item-');
+    expect(darkBlock).not.toContain('--scrim-');
+    expect(darkBlock).not.toContain('--on-image');
   });
 });

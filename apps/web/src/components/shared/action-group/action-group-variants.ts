@@ -4,7 +4,7 @@ export const actionGroupVariants = tv({
   base: ['sm:min-w-32'],
   variants: {
     isOnDark: {
-      true: ['text-white'],
+      true: ['text-on-image'],
     },
     isInline: {
       true: ['sm:min-w-0'],
@@ -21,13 +21,13 @@ export const actionGroupVariants = tv({
       isOnDark: true,
       isInline: false,
       class: [
-        'border-white/55 hover:border-white hover:bg-white/15 hover:text-white',
+        'border-on-image/55 hover:border-on-image hover:bg-on-image/15 hover:text-on-image',
       ],
     },
     {
       isOnDark: true,
       isInline: true,
-      class: ['hover:text-white'],
+      class: ['hover:text-on-image'],
     },
   ],
 });

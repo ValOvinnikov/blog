@@ -1,7 +1,7 @@
-import { tv } from 'tailwind-variants';
+import { CARD_GAP, tv } from '@blog/ui/lib/styling';
 
 export const postFeaturedModuleViewVariants = tv({
   slots: {
-    leadGroup: ['flex flex-col', 'gap-3.5 md:gap-5 lg:gap-7'],
+    leadGroup: ['flex flex-col', CARD_GAP],
   },
 });

@@ -205,6 +205,33 @@ export const SixMembers: TStory = {
   },
 };
 
+export const SevenMembersWithBios: TStory = {
+  args: {
+    showBios: true,
+    members: [
+      ...members,
+      makeTeamMember({ id: 'team-member-4', name: 'Sana Ito' }),
+      makeTeamMember({ id: 'team-member-5', name: 'Wale Adebayo' }),
+      makeTeamMember({ id: 'team-member-6', name: 'Elin Kask' }),
+      makeTeamMember({ id: 'team-member-7', name: 'Noor Haddad' }),
+    ].map((member) => ({ ...member, bio })),
+  },
+};
+
+export const NineMembers: TStory = {
+  args: {
+    members: [
+      ...members,
+      makeTeamMember({ id: 'team-member-4', name: 'Sana Ito' }),
+      makeTeamMember({ id: 'team-member-5', name: 'Wale Adebayo' }),
+      makeTeamMember({ id: 'team-member-6', name: 'Elin Kask' }),
+      makeTeamMember({ id: 'team-member-7', name: 'Noor Haddad' }),
+      makeTeamMember({ id: 'team-member-8', name: 'Tomás Rivera' }),
+      makeTeamMember({ id: 'team-member-9', name: 'Ines Duarte' }),
+    ],
+  },
+};
+
 export const Spotlight: TStory = {
   args: {
     showBios: true,
