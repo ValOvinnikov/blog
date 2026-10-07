@@ -44,9 +44,13 @@ afterEach(async () => {
 });
 
 describe(setTenantSanityToken, () => {
-  it('stores the token encrypted, not as plaintext', async () => {
-    const tenant = await insertTenant();
+  let tenant: TTenant;
 
+  beforeEach(async () => {
+    tenant = await insertTenant();
+  });
+
+  it('stores the token encrypted, not as plaintext', async () => {
     await setTenantSanityToken(tenant.id, 'sk-real-token-value');
 
     const [row] = await db()
@@ -60,7 +64,6 @@ describe(setTenantSanityToken, () => {
 
   it('throws when the encryption key is not configured', async () => {
     delete process.env['TENANT_TOKEN_ENCRYPTION_KEY'];
-    const tenant = await insertTenant();
 
     await expect(
       setTenantSanityToken(tenant.id, 'sk-real-token-value'),

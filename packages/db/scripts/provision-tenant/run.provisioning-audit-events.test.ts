@@ -178,21 +178,6 @@ describe(runSteps, () => {
     );
   });
 
-  it('records PROVISIONING_FAILED with the failing step key when a step throws', async () => {
-    seedTenantContentMock.mockRejectedValue(new Error('seed failed'));
-
-    const result = await runSteps('tenant-1', env);
-
-    expect(result).toEqual({ ok: false });
-    expect(recordProvisioningAuditEventMock).toHaveBeenCalledTimes(1);
-    expect(recordProvisioningAuditEventMock).toHaveBeenCalledWith(
-      'tenant-1',
-      env,
-      AUDIT_ACTION.PROVISIONING_FAILED,
-      TENANT_PROVISIONING_STEP.SEED_CONTENT,
-    );
-  });
-
   it('records PROVISIONING_FAILED with VERIFY_CONTENT when the final verification step throws', async () => {
     verifyTenantSeededContentMock.mockRejectedValue(
       new Error('missing required starter document(s): settings_site'),
@@ -267,15 +252,32 @@ describe(runSteps, () => {
     expect(auditCallOrder).toBeLessThan(elevateCallOrder as number);
   });
 
-  it('never records a PROVISIONED event when an earlier step fails', async () => {
-    seedTenantContentMock.mockRejectedValue(new Error('seed failed'));
+  describe('when seed-content fails', () => {
+    beforeEach(() => {
+      seedTenantContentMock.mockRejectedValue(new Error('seed failed'));
+    });
 
-    await runSteps('tenant-1', env);
+    it('records PROVISIONING_FAILED with the failing step key when a step throws', async () => {
+      const result = await runSteps('tenant-1', env);
 
-    expect(recordProvisioningAuditEventMock).not.toHaveBeenCalledWith(
-      'tenant-1',
-      env,
-      AUDIT_ACTION.PROVISIONED,
-    );
+      expect(result).toEqual({ ok: false });
+      expect(recordProvisioningAuditEventMock).toHaveBeenCalledTimes(1);
+      expect(recordProvisioningAuditEventMock).toHaveBeenCalledWith(
+        'tenant-1',
+        env,
+        AUDIT_ACTION.PROVISIONING_FAILED,
+        TENANT_PROVISIONING_STEP.SEED_CONTENT,
+      );
+    });
+
+    it('never records a PROVISIONED event when an earlier step fails', async () => {
+      await runSteps('tenant-1', env);
+
+      expect(recordProvisioningAuditEventMock).not.toHaveBeenCalledWith(
+        'tenant-1',
+        env,
+        AUDIT_ACTION.PROVISIONED,
+      );
+    });
   });
 });

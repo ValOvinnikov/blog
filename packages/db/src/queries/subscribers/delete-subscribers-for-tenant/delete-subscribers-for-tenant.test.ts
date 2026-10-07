@@ -17,8 +17,13 @@ afterEach(async () => {
 });
 
 describe(deleteSubscribersForTenant, () => {
+  let tenantId: string;
+
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
   it('deletes every subscriber row for the tenant and returns the count', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     await db()
       .insert(schema.subscribers)
       .values([
@@ -36,7 +41,6 @@ describe(deleteSubscribersForTenant, () => {
   });
 
   it("leaves another tenant's subscribers untouched", async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     const { id: otherTenantId } = await insertTestTenant(db());
     await db()
       .insert(schema.subscribers)
@@ -52,8 +56,6 @@ describe(deleteSubscribersForTenant, () => {
   });
 
   it('is idempotent — returns 0 when nothing matches', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
-
     await expect(deleteSubscribersForTenant(tenantId)).resolves.toBe(0);
   });
 });

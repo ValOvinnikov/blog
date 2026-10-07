@@ -64,9 +64,13 @@ afterEach(async () => {
 });
 
 describe(reportStepStatus, () => {
-  it('writes the step status directly to Postgres, with no HTTP call involved', async () => {
-    const tenantId = await insertDraftTenant();
+  let tenantId: string;
 
+  beforeEach(async () => {
+    tenantId = await insertDraftTenant();
+  });
+
+  it('writes the step status directly to Postgres, with no HTTP call involved', async () => {
     await reportStepStatus({
       tenantId,
       step: 'SANITY_PROJECT',
@@ -80,8 +84,6 @@ describe(reportStepStatus, () => {
   });
 
   it('stores the error message only when supplied', async () => {
-    const tenantId = await insertDraftTenant();
-
     await reportStepStatus({
       tenantId,
       step: 'SEED_CONTENT',
@@ -99,8 +101,6 @@ describe(reportStepStatus, () => {
   });
 
   it('sets the overall provisioningStatus to READY when the last step finishes', async () => {
-    const tenantId = await insertDraftTenant();
-
     await reportStepStatus({
       tenantId,
       step: 'VERIFY_CONTENT',
@@ -112,8 +112,6 @@ describe(reportStepStatus, () => {
   });
 
   it('leaves the overall provisioningStatus untouched when CREATE_WEBHOOK (not the last step) finishes', async () => {
-    const tenantId = await insertDraftTenant();
-
     await reportStepStatus({
       tenantId,
       step: 'CREATE_WEBHOOK',
@@ -125,8 +123,6 @@ describe(reportStepStatus, () => {
   });
 
   it('sets the overall provisioningStatus to FAILED when the last step fails', async () => {
-    const tenantId = await insertDraftTenant();
-
     await reportStepStatus({
       tenantId,
       step: 'VERIFY_CONTENT',
@@ -139,8 +135,6 @@ describe(reportStepStatus, () => {
   });
 
   it('sets the overall provisioningStatus to FAILED when an earlier step fails', async () => {
-    const tenantId = await insertDraftTenant();
-
     await reportStepStatus({
       tenantId,
       step: 'PERSIST_TOKEN',
@@ -152,7 +146,6 @@ describe(reportStepStatus, () => {
   });
 
   it('leaves a mid-sequence failure retryable via beginTenantProvisioning', async () => {
-    const tenantId = await insertDraftTenant();
     await db
       .update(schema.tenants)
       .set({ provisioningStatus: 'PROVISIONING' })
@@ -172,8 +165,6 @@ describe(reportStepStatus, () => {
   });
 
   it('leaves the overall provisioningStatus untouched for an earlier step only RUNNING', async () => {
-    const tenantId = await insertDraftTenant();
-
     await reportStepStatus({
       tenantId,
       step: 'PERSIST_TOKEN',
@@ -185,8 +176,6 @@ describe(reportStepStatus, () => {
   });
 
   it('writes lastNotifiedOwnerElevationOutcome only when supplied', async () => {
-    const tenantId = await insertDraftTenant();
-
     await reportStepStatus({
       tenantId,
       step: 'OWNER_ELEVATION',

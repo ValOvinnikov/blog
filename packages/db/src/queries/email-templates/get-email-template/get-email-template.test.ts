@@ -18,9 +18,13 @@ afterEach(async () => {
 });
 
 describe(getEmailTemplate, () => {
-  it('returns full product defaults when no row exists for the template type', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
+  let tenantId: string;
 
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
+  it('returns full product defaults when no row exists for the template type', async () => {
     const result = await getEmailTemplate(
       tenantId,
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
@@ -36,7 +40,6 @@ describe(getEmailTemplate, () => {
   });
 
   it('renders the default body when only the subject has been authored', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     await db().insert(schema.emailTemplates).values({
       tenantId,
       templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
@@ -53,7 +56,6 @@ describe(getEmailTemplate, () => {
   });
 
   it('renders the default subject when only the body has been authored', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     const customBody = [
       {
         _type: 'block',
@@ -86,7 +88,6 @@ describe(getEmailTemplate, () => {
   });
 
   it('returns the authored logoAssetUrl when set, and undefined when not', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     await db().insert(schema.emailTemplates).values({
       tenantId,
       templateType: EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION,

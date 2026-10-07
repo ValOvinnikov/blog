@@ -48,91 +48,95 @@ describe(postOperatorAlert, () => {
     ).resolves.toBeUndefined();
   });
 
-  it('sends the secret as a Bearer token', async () => {
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValue(new Response(null, { status: 200 }));
-    vi.stubGlobal('fetch', fetchMock);
+  describe('when the platform accepts the alert', () => {
+    let fetchMock: ReturnType<typeof vi.fn>;
 
-    await postOperatorAlert({
-      kind: 'OWNER_ELEVATION',
-      tenantId: 't1',
-      outcome: 'STALLED',
+    beforeEach(() => {
+      fetchMock = vi
+        .fn()
+        .mockResolvedValue(new Response(null, { status: 200 }));
+      vi.stubGlobal('fetch', fetchMock);
     });
 
-    const [, init] = fetchMock.mock.calls[0] as [
-      URL,
-      { headers: Record<string, string>; body: string },
-    ];
-    expect(init.headers['Authorization']).toBe('Bearer shared-secret');
-    expect(JSON.parse(init.body)).toEqual({
-      kind: 'OWNER_ELEVATION',
-      tenantId: 't1',
-      outcome: 'STALLED',
-    });
-  });
-
-  it('POSTs to /api/internal/operator-alert on the platform origin', async () => {
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValue(new Response(null, { status: 200 }));
-    vi.stubGlobal('fetch', fetchMock);
-
-    await postOperatorAlert({
-      kind: 'DOCUMENT_VALIDATION',
-      tenantId: 't1',
-      invalidDocumentCount: 2,
-      isCritical: true,
-    });
-
-    const [url] = fetchMock.mock.calls[0] as [URL];
-    expect(url.toString()).toBe(
-      'https://platform.example.com/api/internal/operator-alert',
-    );
-  });
-
-  it('does not call fetch and resolves when ADMIN_APP_BASE_URL is unset', async () => {
-    delete process.env['ADMIN_APP_BASE_URL'];
-    const fetchMock = vi.fn();
-    vi.stubGlobal('fetch', fetchMock);
-
-    await expect(
-      postOperatorAlert({
+    it('sends the secret as a Bearer token', async () => {
+      await postOperatorAlert({
         kind: 'OWNER_ELEVATION',
         tenantId: 't1',
         outcome: 'STALLED',
-      }),
-    ).resolves.toBeUndefined();
-    expect(fetchMock).not.toHaveBeenCalled();
-  });
+      });
 
-  it('does not call fetch and resolves when OPERATOR_ALERT_SECRET is unset', async () => {
-    delete process.env['OPERATOR_ALERT_SECRET'];
-    const fetchMock = vi.fn();
-    vi.stubGlobal('fetch', fetchMock);
-
-    await expect(
-      postOperatorAlert({
+      const [, init] = fetchMock.mock.calls[0] as [
+        URL,
+        { headers: Record<string, string>; body: string },
+      ];
+      expect(init.headers['Authorization']).toBe('Bearer shared-secret');
+      expect(JSON.parse(init.body)).toEqual({
         kind: 'OWNER_ELEVATION',
         tenantId: 't1',
         outcome: 'STALLED',
-      }),
-    ).resolves.toBeUndefined();
-    expect(fetchMock).not.toHaveBeenCalled();
+      });
+    });
+
+    it('POSTs to /api/internal/operator-alert on the platform origin', async () => {
+      await postOperatorAlert({
+        kind: 'DOCUMENT_VALIDATION',
+        tenantId: 't1',
+        invalidDocumentCount: 2,
+        isCritical: true,
+      });
+
+      const [url] = fetchMock.mock.calls[0] as [URL];
+      expect(url.toString()).toBe(
+        'https://platform.example.com/api/internal/operator-alert',
+      );
+    });
   });
 
-  it('does not throw when ADMIN_APP_BASE_URL is not a valid URL', async () => {
-    process.env['ADMIN_APP_BASE_URL'] = 'not a url';
-    const fetchMock = vi.fn();
-    vi.stubGlobal('fetch', fetchMock);
+  describe('when the alert cannot be addressed', () => {
+    let fetchMock: ReturnType<typeof vi.fn>;
 
-    await expect(
-      postOperatorAlert({
-        kind: 'OWNER_ELEVATION',
-        tenantId: 't1',
-        outcome: 'STALLED',
-      }),
-    ).resolves.toBeUndefined();
-    expect(fetchMock).not.toHaveBeenCalled();
+    beforeEach(() => {
+      fetchMock = vi.fn();
+      vi.stubGlobal('fetch', fetchMock);
+    });
+
+    it('does not call fetch and resolves when ADMIN_APP_BASE_URL is unset', async () => {
+      delete process.env['ADMIN_APP_BASE_URL'];
+
+      await expect(
+        postOperatorAlert({
+          kind: 'OWNER_ELEVATION',
+          tenantId: 't1',
+          outcome: 'STALLED',
+        }),
+      ).resolves.toBeUndefined();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('does not call fetch and resolves when OPERATOR_ALERT_SECRET is unset', async () => {
+      delete process.env['OPERATOR_ALERT_SECRET'];
+
+      await expect(
+        postOperatorAlert({
+          kind: 'OWNER_ELEVATION',
+          tenantId: 't1',
+          outcome: 'STALLED',
+        }),
+      ).resolves.toBeUndefined();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('does not throw when ADMIN_APP_BASE_URL is not a valid URL', async () => {
+      process.env['ADMIN_APP_BASE_URL'] = 'not a url';
+
+      await expect(
+        postOperatorAlert({
+          kind: 'OWNER_ELEVATION',
+          tenantId: 't1',
+          outcome: 'STALLED',
+        }),
+      ).resolves.toBeUndefined();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
   });
 });

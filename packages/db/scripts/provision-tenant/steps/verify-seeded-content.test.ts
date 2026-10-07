@@ -1,6 +1,7 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { ClientError } from '@sanity/client';
+import type { Mock } from 'vitest';
 
 import type { TProvisionEnv } from '../lib/env';
 
@@ -141,8 +142,15 @@ beforeEach(() => {
 });
 
 describe(verifyTenantSeededContent, () => {
+  let tenant: TTenant;
+  let sleep: Mock<(ms: number) => Promise<void>>;
+
+  beforeEach(() => {
+    tenant = baseTenant();
+    sleep = vi.fn().mockResolvedValue(undefined);
+  });
+
   it('passes when content, webhook, and domain are all verified', async () => {
-    const tenant = baseTenant();
     const { createClient, fetch } = createClientStubResolving([
       'settings_site',
       'settings_navigation',
@@ -154,7 +162,6 @@ describe(verifyTenantSeededContent, () => {
     const listDomains = vi
       .fn()
       .mockResolvedValue([{ name: 'acme.example.com' }]);
-    const sleep = vi.fn().mockResolvedValue(undefined);
 
     await verifyTenantSeededContent(
       tenant,
@@ -192,7 +199,6 @@ describe(verifyTenantSeededContent, () => {
   });
 
   it('fails the run when a required singleton is absent', async () => {
-    const tenant = baseTenant();
     const { createClient } = createClientStubResolving([
       'settings_navigation',
       'settings_footer',
@@ -204,7 +210,6 @@ describe(verifyTenantSeededContent, () => {
   });
 
   it('fails the run when the dataset has none of the required singletons', async () => {
-    const tenant = baseTenant();
     const { createClient } = createClientStubResolving([]);
 
     await expect(
@@ -215,7 +220,6 @@ describe(verifyTenantSeededContent, () => {
   });
 
   it('fails the run when a seeded navigation item has no resolvable link reference', async () => {
-    const tenant = baseTenant();
     const { createClient } = createClientStubResolving(
       ['settings_site', 'settings_navigation', 'settings_footer'],
       VALID_HOME_PAGE,
@@ -230,7 +234,6 @@ describe(verifyTenantSeededContent, () => {
   });
 
   it('fails the run and counts every unresolved item when navigation mixes resolved and unresolved items', async () => {
-    const tenant = baseTenant();
     const { createClient } = createClientStubResolving(
       ['settings_site', 'settings_navigation', 'settings_footer'],
       VALID_HOME_PAGE,
@@ -245,7 +248,6 @@ describe(verifyTenantSeededContent, () => {
   });
 
   it('does not throw when settings_navigation has no items field (GROQ evaluates items[] to null, not [])', async () => {
-    const tenant = baseTenant();
     const { createClient } = createClientStubResolving(
       ['settings_site', 'settings_navigation', 'settings_footer'],
       VALID_HOME_PAGE,
@@ -258,7 +260,6 @@ describe(verifyTenantSeededContent, () => {
   });
 
   it('fails the run when the dataset has no page_home document', async () => {
-    const tenant = baseTenant();
     const { createClient } = createClientStubResolving(
       ['settings_site', 'settings_navigation', 'settings_footer'],
       null,
@@ -270,7 +271,6 @@ describe(verifyTenantSeededContent, () => {
   });
 
   it('fails the run when the seeded page_home has no headingBlock.heading', async () => {
-    const tenant = baseTenant();
     const { createClient } = createClientStubResolving(
       ['settings_site', 'settings_navigation', 'settings_footer'],
       { headingBlock: null, seo: VALID_HOME_PAGE.seo },
@@ -282,7 +282,6 @@ describe(verifyTenantSeededContent, () => {
   });
 
   it('fails the run when the seeded page_home has no seo.metaTitle', async () => {
-    const tenant = baseTenant();
     const { createClient } = createClientStubResolving(
       ['settings_site', 'settings_navigation', 'settings_footer'],
       { headingBlock: VALID_HOME_PAGE.headingBlock, seo: null },
@@ -294,7 +293,6 @@ describe(verifyTenantSeededContent, () => {
   });
 
   it('fails the run when the seeded page_home has a seo.metaTitle shorter than the 30 character schema minimum', async () => {
-    const tenant = baseTenant();
     const { createClient } = createClientStubResolving(
       ['settings_site', 'settings_navigation', 'settings_footer'],
       { headingBlock: VALID_HOME_PAGE.headingBlock, seo: { metaTitle: 'x' } },
@@ -308,7 +306,6 @@ describe(verifyTenantSeededContent, () => {
   });
 
   it('fails the run when the seeded page_home has a seo.metaTitle longer than the 60 character schema maximum', async () => {
-    const tenant = baseTenant();
     const { createClient } = createClientStubResolving(
       ['settings_site', 'settings_navigation', 'settings_footer'],
       {
@@ -325,7 +322,6 @@ describe(verifyTenantSeededContent, () => {
   });
 
   it('throws when the tenant has no persisted Sanity read token yet', async () => {
-    const tenant = baseTenant();
     getTenantSanityCredentialsMock.mockResolvedValue(undefined);
     const createClient = vi.fn();
 
@@ -336,7 +332,6 @@ describe(verifyTenantSeededContent, () => {
   });
 
   it('retries a transient permission-denied content read once and passes once it succeeds', async () => {
-    const tenant = baseTenant();
     const fetch = vi
       .fn()
       .mockRejectedValueOnce(grantError())
@@ -348,7 +343,6 @@ describe(verifyTenantSeededContent, () => {
       .mockResolvedValueOnce(VALID_NAVIGATION_ITEMS)
       .mockResolvedValueOnce(VALID_HOME_PAGE);
     const { createClient } = createClientStub(fetch);
-    const sleep = vi.fn().mockResolvedValue(undefined);
 
     await verifyTenantSeededContent(
       tenant,
@@ -361,10 +355,8 @@ describe(verifyTenantSeededContent, () => {
   });
 
   it('exhausts retries on a persistent permission-denied content read and fails with a token-specific message, not a missing-content one', async () => {
-    const tenant = baseTenant();
     const fetch = vi.fn().mockRejectedValue(grantError());
     const { createClient } = createClientStub(fetch);
-    const sleep = vi.fn().mockResolvedValue(undefined);
 
     await expect(
       verifyTenantSeededContent(tenant, env, baseDeps({ createClient, sleep })),
@@ -374,7 +366,6 @@ describe(verifyTenantSeededContent, () => {
   });
 
   it('fails the run when no webhook targets the revalidate URL on the tenant project', async () => {
-    const tenant = baseTenant();
     const listWebhooks = vi
       .fn()
       .mockResolvedValue([
@@ -389,12 +380,10 @@ describe(verifyTenantSeededContent, () => {
   });
 
   it('retries a transient permission-denied webhook read once and passes once it succeeds', async () => {
-    const tenant = baseTenant();
     const listWebhooks = vi
       .fn()
       .mockRejectedValueOnce(grantError())
       .mockResolvedValueOnce([{ id: 'hook1', url: REVALIDATE_WEBHOOK_URL }]);
-    const sleep = vi.fn().mockResolvedValue(undefined);
 
     await verifyTenantSeededContent(
       tenant,
@@ -407,9 +396,7 @@ describe(verifyTenantSeededContent, () => {
   });
 
   it('exhausts retries on a persistent permission-denied webhook read and fails with a webhook-specific message', async () => {
-    const tenant = baseTenant();
     const listWebhooks = vi.fn().mockRejectedValue(grantError());
-    const sleep = vi.fn().mockResolvedValue(undefined);
 
     await expect(
       verifyTenantSeededContent(tenant, env, baseDeps({ listWebhooks, sleep })),
@@ -421,7 +408,6 @@ describe(verifyTenantSeededContent, () => {
   });
 
   it('fails the run when the tenant domain is not mapped on the shared Vercel project', async () => {
-    const tenant = baseTenant();
     const listDomains = vi
       .fn()
       .mockResolvedValue([{ name: 'someone-else.example.com' }]);
@@ -434,12 +420,10 @@ describe(verifyTenantSeededContent, () => {
   });
 
   it('retries a transient permission-denied domain read once and passes once it succeeds', async () => {
-    const tenant = baseTenant();
     const listDomains = vi
       .fn()
       .mockRejectedValueOnce(grantError())
       .mockResolvedValueOnce([{ name: 'acme.example.com' }]);
-    const sleep = vi.fn().mockResolvedValue(undefined);
 
     await verifyTenantSeededContent(
       tenant,
@@ -452,9 +436,7 @@ describe(verifyTenantSeededContent, () => {
   });
 
   it('exhausts retries on a persistent permission-denied domain read and fails with a domain-specific message', async () => {
-    const tenant = baseTenant();
     const listDomains = vi.fn().mockRejectedValue(grantError());
-    const sleep = vi.fn().mockResolvedValue(undefined);
 
     await expect(
       verifyTenantSeededContent(tenant, env, baseDeps({ listDomains, sleep })),

@@ -14,24 +14,24 @@ afterEach(async () => {
 });
 
 describe(getUserByEmail, () => {
-  it('returns the row for an existing email', async () => {
-    await db()
-      .insert(schema.users)
-      .values({ id: 'user-1', email: 'jane@example.com' });
+  describe('with a stored user jane@example.com', () => {
+    beforeEach(async () => {
+      await db()
+        .insert(schema.users)
+        .values({ id: 'user-1', email: 'jane@example.com' });
+    });
 
-    const result = await getUserByEmail('jane@example.com');
+    it('returns the row for an existing email', async () => {
+      const result = await getUserByEmail('jane@example.com');
 
-    expect(result).toMatchObject({ id: 'user-1', email: 'jane@example.com' });
-  });
+      expect(result).toMatchObject({ id: 'user-1', email: 'jane@example.com' });
+    });
 
-  it('matches case-insensitively', async () => {
-    await db()
-      .insert(schema.users)
-      .values({ id: 'user-1', email: 'jane@example.com' });
+    it('matches case-insensitively', async () => {
+      const result = await getUserByEmail('Jane@Example.com');
 
-    const result = await getUserByEmail('Jane@Example.com');
-
-    expect(result).toMatchObject({ id: 'user-1' });
+      expect(result).toMatchObject({ id: 'user-1' });
+    });
   });
 
   it('matches a differently-cased lookup against a mixed-case stored email', async () => {

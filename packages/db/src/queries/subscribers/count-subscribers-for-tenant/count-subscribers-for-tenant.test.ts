@@ -16,8 +16,13 @@ afterEach(async () => {
 });
 
 describe(countSubscribersForTenant, () => {
+  let tenantId: string;
+
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
   it('counts every subscriber row for the tenant', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     await db()
       .insert(schema.subscribers)
       .values([
@@ -29,7 +34,6 @@ describe(countSubscribersForTenant, () => {
   });
 
   it("does not count another tenant's subscribers", async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     const { id: otherTenantId } = await insertTestTenant(db());
     await db()
       .insert(schema.subscribers)

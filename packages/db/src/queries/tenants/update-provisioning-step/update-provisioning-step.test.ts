@@ -51,9 +51,13 @@ afterEach(async () => {
 });
 
 describe(updateProvisioningStep, () => {
-  it('updates only the given step, leaving every other step untouched', async () => {
-    const tenantId = await insertDraftTenant();
+  let tenantId: string;
 
+  beforeEach(async () => {
+    tenantId = await insertDraftTenant();
+  });
+
+  it('updates only the given step, leaving every other step untouched', async () => {
     const result = await updateProvisioningStep({
       tenantId,
       step: 'SANITY_PROJECT',
@@ -73,8 +77,6 @@ describe(updateProvisioningStep, () => {
   });
 
   it('does not clobber a previously-updated step when a later step is updated', async () => {
-    const tenantId = await insertDraftTenant();
-
     await updateProvisioningStep({
       tenantId,
       step: 'SANITY_PROJECT',
@@ -99,8 +101,6 @@ describe(updateProvisioningStep, () => {
   });
 
   it('stores the error message only when one is supplied', async () => {
-    const tenantId = await insertDraftTenant();
-
     const result = await updateProvisioningStep({
       tenantId,
       step: 'SANITY_PROJECT',
@@ -117,8 +117,6 @@ describe(updateProvisioningStep, () => {
   });
 
   it('stores the detail only when one is supplied', async () => {
-    const tenantId = await insertDraftTenant();
-
     const result = await updateProvisioningStep({
       tenantId,
       step: 'OWNER_ELEVATION',
@@ -135,8 +133,6 @@ describe(updateProvisioningStep, () => {
   });
 
   it('omits detail entirely when not supplied, leaving prior step state unaffected', async () => {
-    const tenantId = await insertDraftTenant();
-
     const result = await updateProvisioningStep({
       tenantId,
       step: 'SANITY_PROJECT',
@@ -151,8 +147,6 @@ describe(updateProvisioningStep, () => {
   });
 
   it('leaves the overall provisioningStatus untouched when not supplied', async () => {
-    const tenantId = await insertDraftTenant();
-
     const result = await updateProvisioningStep({
       tenantId,
       step: 'SANITY_PROJECT',
@@ -164,8 +158,6 @@ describe(updateProvisioningStep, () => {
   });
 
   it('updates the overall provisioningStatus when supplied on the last step', async () => {
-    const tenantId = await insertDraftTenant();
-
     const result = await updateProvisioningStep({
       tenantId,
       step: 'MAP_DOMAIN',
@@ -182,8 +174,6 @@ describe(updateProvisioningStep, () => {
   });
 
   it('leaves lastNotifiedOwnerElevationOutcome untouched when not supplied', async () => {
-    const tenantId = await insertDraftTenant();
-
     const result = await updateProvisioningStep({
       tenantId,
       step: 'OWNER_ELEVATION',
@@ -196,8 +186,6 @@ describe(updateProvisioningStep, () => {
   });
 
   it('writes lastNotifiedOwnerElevationOutcome alongside the step detail when supplied', async () => {
-    const tenantId = await insertDraftTenant();
-
     const result = await updateProvisioningStep({
       tenantId,
       step: 'OWNER_ELEVATION',

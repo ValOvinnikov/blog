@@ -50,9 +50,13 @@ afterEach(async () => {
 });
 
 describe(updateDeprovisioningStep, () => {
-  it('updates only the given step, leaving every other step untouched', async () => {
-    const tenantId = await insertDeprovisioningTenant();
+  let tenantId: string;
 
+  beforeEach(async () => {
+    tenantId = await insertDeprovisioningTenant();
+  });
+
+  it('updates only the given step, leaving every other step untouched', async () => {
     const result = await updateDeprovisioningStep({
       tenantId,
       step: 'REMOVE_DOMAIN',
@@ -72,8 +76,6 @@ describe(updateDeprovisioningStep, () => {
   });
 
   it('does not clobber a previously-updated step when a later step is updated', async () => {
-    const tenantId = await insertDeprovisioningTenant();
-
     await updateDeprovisioningStep({
       tenantId,
       step: 'REMOVE_DOMAIN',
@@ -98,8 +100,6 @@ describe(updateDeprovisioningStep, () => {
   });
 
   it('stores the error message only when one is supplied', async () => {
-    const tenantId = await insertDeprovisioningTenant();
-
     const result = await updateDeprovisioningStep({
       tenantId,
       step: 'ARCHIVE_SANITY_PROJECT',
@@ -118,8 +118,6 @@ describe(updateDeprovisioningStep, () => {
   });
 
   it('omits error entirely when not supplied', async () => {
-    const tenantId = await insertDeprovisioningTenant();
-
     const result = await updateDeprovisioningStep({
       tenantId,
       step: 'REMOVE_DOMAIN',

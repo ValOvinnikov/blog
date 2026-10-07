@@ -31,8 +31,13 @@ async function insertSubscriber(
 }
 
 describe(unsubscribeByToken, () => {
+  let tenantId: string;
+
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
   it('deletes the subscriber row matching the unsubscribe token', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     const subscriber = await insertSubscriber(tenantId);
 
     const result = await unsubscribeByToken(
@@ -50,15 +55,12 @@ describe(unsubscribeByToken, () => {
   });
 
   it('returns not-found for an unrecognized token', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
-
     const result = await unsubscribeByToken(tenantId, 'does-not-exist');
 
     expect(result).toEqual({ outcome: 'not-found' });
   });
 
   it('returns not-found on a second use of the same token', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     const subscriber = await insertSubscriber(tenantId);
 
     const first = await unsubscribeByToken(
@@ -94,7 +96,6 @@ describe(unsubscribeByToken, () => {
   });
 
   it("does not remove another subscriber's row", async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     const subscriber = await insertSubscriber(tenantId, {
       email: 'reader@example.com',
     });

@@ -62,9 +62,13 @@ afterEach(async () => {
 });
 
 describe(reportDeprovisioningStepStatus, () => {
-  it('writes the step status directly to Postgres', async () => {
-    const tenantId = await insertTenant();
+  let tenantId: string;
 
+  beforeEach(async () => {
+    tenantId = await insertTenant();
+  });
+
+  it('writes the step status directly to Postgres', async () => {
     await reportDeprovisioningStepStatus({
       tenantId,
       step: 'REMOVE_DOMAIN',
@@ -78,8 +82,6 @@ describe(reportDeprovisioningStepStatus, () => {
   });
 
   it('stores the error message only when supplied', async () => {
-    const tenantId = await insertTenant();
-
     await reportDeprovisioningStepStatus({
       tenantId,
       step: 'ARCHIVE_SANITY_PROJECT',

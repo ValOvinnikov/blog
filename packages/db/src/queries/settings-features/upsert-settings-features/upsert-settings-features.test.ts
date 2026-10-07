@@ -16,9 +16,13 @@ afterEach(async () => {
 });
 
 describe(upsertSettingsFeatures, () => {
-  it('inserts a new row falling back to column defaults for omitted toggles', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
+  let tenantId: string;
 
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
+  it('inserts a new row falling back to column defaults for omitted toggles', async () => {
     const result = await upsertSettingsFeatures(tenantId, {
       newsletterEnabled: true,
     });
@@ -34,7 +38,6 @@ describe(upsertSettingsFeatures, () => {
   });
 
   it('updates the existing row in place rather than inserting a second one', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     await upsertSettingsFeatures(tenantId, {});
 
     const result = await upsertSettingsFeatures(tenantId, {
@@ -47,7 +50,6 @@ describe(upsertSettingsFeatures, () => {
   });
 
   it('leaves an omitted toggle untouched on a later update', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     await upsertSettingsFeatures(tenantId, { newsletterEnabled: true });
 
     const result = await upsertSettingsFeatures(tenantId, {

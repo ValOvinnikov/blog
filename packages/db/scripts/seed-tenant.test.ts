@@ -65,16 +65,14 @@ function tenant(overrides: Partial<TTenant> = {}): TTenant {
 }
 
 beforeEach(() => {
-  getTenantByDomainMock.mockReset();
+  getTenantByDomainMock.mockReset().mockResolvedValue(undefined);
   createTenantMock.mockReset();
-  getTenantIdBySanityProjectIdMock.mockReset();
+  getTenantIdBySanityProjectIdMock.mockReset().mockResolvedValue(undefined);
   getTenantByIdMock.mockReset();
 });
 
 describe(resolveOrCreateTenant, () => {
   it('creates a new tenant when no row exists for the domain', async () => {
-    getTenantByDomainMock.mockResolvedValue(undefined);
-    getTenantIdBySanityProjectIdMock.mockResolvedValue(undefined);
     createTenantMock.mockResolvedValue({ ok: true, data: tenant() });
 
     const result = await resolveOrCreateTenant(args);
@@ -93,8 +91,6 @@ describe(resolveOrCreateTenant, () => {
   });
 
   it('throws when createTenant fails', async () => {
-    getTenantByDomainMock.mockResolvedValue(undefined);
-    getTenantIdBySanityProjectIdMock.mockResolvedValue(undefined);
     createTenantMock.mockResolvedValue({
       ok: false,
       error: 'DB_INVALID_DOMAIN',
@@ -106,7 +102,6 @@ describe(resolveOrCreateTenant, () => {
   });
 
   it('resumes a tenant that was created but never got its domain row', async () => {
-    getTenantByDomainMock.mockResolvedValue(undefined);
     getTenantIdBySanityProjectIdMock.mockResolvedValue('tenant-1');
     getTenantByIdMock.mockResolvedValue(tenant());
 
@@ -120,7 +115,6 @@ describe(resolveOrCreateTenant, () => {
   });
 
   it('rejects when the Sanity project id belongs to an archived tenant', async () => {
-    getTenantByDomainMock.mockResolvedValue(undefined);
     getTenantIdBySanityProjectIdMock.mockResolvedValue('tenant-1');
     getTenantByIdMock.mockResolvedValue(
       tenant({ deprovisionedAt: new Date('2026-02-01T00:00:00.000Z') }),
@@ -133,7 +127,6 @@ describe(resolveOrCreateTenant, () => {
   });
 
   it('rejects when the Sanity project id resolves to an id with no tenant row', async () => {
-    getTenantByDomainMock.mockResolvedValue(undefined);
     getTenantIdBySanityProjectIdMock.mockResolvedValue('tenant-1');
     getTenantByIdMock.mockResolvedValue(undefined);
 

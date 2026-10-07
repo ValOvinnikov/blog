@@ -151,21 +151,6 @@ describe(runSteps, () => {
     ]);
   });
 
-  it('stops at the first failing step and never runs later steps', async () => {
-    archiveTenantSanityProjectMock.mockRejectedValue(new Error('boom'));
-
-    const result = await runSteps(baseTenant, env);
-
-    expect(result).toEqual({ ok: false });
-    expect(removeTenantDomainMock).toHaveBeenCalledTimes(1);
-    expect(archiveTenantSanityProjectMock).toHaveBeenCalledTimes(1);
-    expect(revokeTenantSanityTokensMock).not.toHaveBeenCalled();
-    expect(clearTenantArtifactsMock).not.toHaveBeenCalled();
-    expect(archiveTenantRowMock).not.toHaveBeenCalled();
-    expect(purgeTenantReaderDataMock).not.toHaveBeenCalled();
-    expect(invalidateTenantCacheMock).not.toHaveBeenCalled();
-  });
-
   it('reports failure but leaves the already-committed archive and purge untouched when invalidate-tenant-cache fails', async () => {
     invalidateTenantCacheMock.mockRejectedValue(new Error('missing config'));
 
@@ -226,39 +211,11 @@ describe(runSteps, () => {
     expect(reportDeprovisioningRunFinishMock).toHaveBeenCalledWith('tenant-1');
   });
 
-  it('records FAILED with the error and the run finish when a step throws, and never reports later steps', async () => {
-    archiveTenantSanityProjectMock.mockRejectedValue(new Error('boom'));
-
-    const result = await runSteps(baseTenant, env);
-
-    expect(result).toEqual({ ok: false });
-    expect(reportDeprovisioningStepStatusMock).toHaveBeenCalledWith({
-      tenantId: 'tenant-1',
-      step: 'ARCHIVE_SANITY_PROJECT',
-      status: 'FAILED',
-      error: 'boom',
-    });
-    expect(reportDeprovisioningStepStatusMock).not.toHaveBeenCalledWith(
-      expect.objectContaining({ step: 'REVOKE_SANITY_TOKENS' }),
-    );
-    expect(reportDeprovisioningRunFinishMock).toHaveBeenCalledTimes(1);
-  });
-
   it('writes nothing to deprovisioning step state during a dry run', async () => {
     const result = await runSteps(baseTenant, { ...env, dryRun: true });
 
     expect(result).toEqual({ ok: true });
     expect(reportDeprovisioningRunStartMock).not.toHaveBeenCalled();
-    expect(reportDeprovisioningStepStatusMock).not.toHaveBeenCalled();
-    expect(reportDeprovisioningRunFinishMock).not.toHaveBeenCalled();
-  });
-
-  it('never reports a step during a dry run even when the step itself throws', async () => {
-    archiveTenantSanityProjectMock.mockRejectedValue(new Error('boom'));
-
-    const result = await runSteps(baseTenant, { ...env, dryRun: true });
-
-    expect(result).toEqual({ ok: false });
     expect(reportDeprovisioningStepStatusMock).not.toHaveBeenCalled();
     expect(reportDeprovisioningRunFinishMock).not.toHaveBeenCalled();
   });
@@ -285,6 +242,49 @@ describe(runSteps, () => {
 
     expect(result).toEqual({ ok: true });
     expect(archiveTenantRowMock).toHaveBeenCalledTimes(1);
+  });
+
+  describe('when archive-sanity-project throws', () => {
+    beforeEach(() => {
+      archiveTenantSanityProjectMock.mockRejectedValue(new Error('boom'));
+    });
+
+    it('stops at the first failing step and never runs later steps', async () => {
+      const result = await runSteps(baseTenant, env);
+
+      expect(result).toEqual({ ok: false });
+      expect(removeTenantDomainMock).toHaveBeenCalledTimes(1);
+      expect(archiveTenantSanityProjectMock).toHaveBeenCalledTimes(1);
+      expect(revokeTenantSanityTokensMock).not.toHaveBeenCalled();
+      expect(clearTenantArtifactsMock).not.toHaveBeenCalled();
+      expect(archiveTenantRowMock).not.toHaveBeenCalled();
+      expect(purgeTenantReaderDataMock).not.toHaveBeenCalled();
+      expect(invalidateTenantCacheMock).not.toHaveBeenCalled();
+    });
+
+    it('records FAILED with the error and the run finish when a step throws, and never reports later steps', async () => {
+      const result = await runSteps(baseTenant, env);
+
+      expect(result).toEqual({ ok: false });
+      expect(reportDeprovisioningStepStatusMock).toHaveBeenCalledWith({
+        tenantId: 'tenant-1',
+        step: 'ARCHIVE_SANITY_PROJECT',
+        status: 'FAILED',
+        error: 'boom',
+      });
+      expect(reportDeprovisioningStepStatusMock).not.toHaveBeenCalledWith(
+        expect.objectContaining({ step: 'REVOKE_SANITY_TOKENS' }),
+      );
+      expect(reportDeprovisioningRunFinishMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('never reports a step during a dry run even when the step itself throws', async () => {
+      const result = await runSteps(baseTenant, { ...env, dryRun: true });
+
+      expect(result).toEqual({ ok: false });
+      expect(reportDeprovisioningStepStatusMock).not.toHaveBeenCalled();
+      expect(reportDeprovisioningRunFinishMock).not.toHaveBeenCalled();
+    });
   });
 });
 

@@ -31,8 +31,13 @@ async function insertPendingSubscriber(
 }
 
 describe(confirmSubscriber, () => {
+  let tenantId: string;
+
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
   it('flips a pending subscriber to active and stamps confirmedAt', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     const pending = await insertPendingSubscriber(tenantId);
 
     const result = await confirmSubscriber(tenantId, pending.confirmationToken);
@@ -50,7 +55,6 @@ describe(confirmSubscriber, () => {
   });
 
   it('is idempotent-safe: confirming an already-active row again does not error or restamp confirmedAt', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     const pending = await insertPendingSubscriber(tenantId);
     const first = await confirmSubscriber(tenantId, pending.confirmationToken);
     if (first.outcome !== 'confirmed') throw new Error('expected confirmed');
@@ -64,8 +68,6 @@ describe(confirmSubscriber, () => {
   });
 
   it('returns not-found for an unrecognized token', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
-
     const result = await confirmSubscriber(tenantId, 'does-not-exist');
 
     expect(result).toEqual({ outcome: 'not-found' });
@@ -85,7 +87,6 @@ describe(confirmSubscriber, () => {
   });
 
   it('resolves two concurrent confirms of the same token into exactly one confirmed outcome', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     const pending = await insertPendingSubscriber(tenantId);
 
     const [first, second] = await Promise.all([

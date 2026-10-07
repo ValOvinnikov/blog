@@ -23,12 +23,15 @@ async function importEnv(): Promise<typeof import('./env')> {
 }
 
 describe('env', () => {
+  beforeEach(() => {
+    delete process.env['SKIP_ENV_VALIDATION'];
+  });
+
   afterEach(() => {
     restoreEnv();
   });
 
   it('parses a valid environment and exposes the typed pooled connection string', async () => {
-    delete process.env['SKIP_ENV_VALIDATION'];
     process.env['DATABASE_URL'] = 'postgresql://user:pass@host/db';
 
     const { env } = await importEnv();
@@ -46,14 +49,12 @@ describe('env', () => {
     });
 
     it('throws when DATABASE_URL is missing', async () => {
-      delete process.env['SKIP_ENV_VALIDATION'];
       delete process.env['DATABASE_URL'];
 
       await expect(importEnv()).rejects.toThrow();
     });
 
     it('throws when DATABASE_URL is empty (no default)', async () => {
-      delete process.env['SKIP_ENV_VALIDATION'];
       process.env['DATABASE_URL'] = '';
 
       await expect(importEnv()).rejects.toThrow();

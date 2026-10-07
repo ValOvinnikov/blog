@@ -24,47 +24,49 @@ afterEach(async () => {
 });
 
 describe(startProvisioningRun, () => {
-  it('writes startedAt, registry, and workflowRunUrl when all are supplied', async () => {
-    const tenant = await insertTestTenant(db());
+  describe('a tenant with default steps', () => {
+    let tenant: Awaited<ReturnType<typeof insertTestTenant>>;
 
-    const result = await startProvisioningRun({
-      tenantId: tenant.id,
-      registry: 'production',
-      workflowRunUrl: 'https://github.com/acme/blog/actions/runs/123',
+    beforeEach(async () => {
+      tenant = await insertTestTenant(db());
     });
 
-    if (!result.ok) throw new Error('expected ok:true');
-    expect(result.data.provisioningSteps?.run).toEqual({
-      startedAt: NOW,
-      registry: 'production',
-      workflowRunUrl: 'https://github.com/acme/blog/actions/runs/123',
-    });
-  });
+    it('writes startedAt, registry, and workflowRunUrl when all are supplied', async () => {
+      const result = await startProvisioningRun({
+        tenantId: tenant.id,
+        registry: 'production',
+        workflowRunUrl: 'https://github.com/acme/blog/actions/runs/123',
+      });
 
-  it('omits registry and workflowRunUrl entirely when not supplied', async () => {
-    const tenant = await insertTestTenant(db());
-
-    const result = await startProvisioningRun({ tenantId: tenant.id });
-
-    if (!result.ok) throw new Error('expected ok:true');
-    expect(result.data.provisioningSteps?.run).toEqual({ startedAt: NOW });
-  });
-
-  it('replaces a previous run wholesale rather than merging', async () => {
-    const tenant = await insertTestTenant(db());
-
-    await startProvisioningRun({
-      tenantId: tenant.id,
-      registry: 'development',
-      workflowRunUrl: 'https://github.com/acme/blog/actions/runs/1',
+      if (!result.ok) throw new Error('expected ok:true');
+      expect(result.data.provisioningSteps?.run).toEqual({
+        startedAt: NOW,
+        registry: 'production',
+        workflowRunUrl: 'https://github.com/acme/blog/actions/runs/123',
+      });
     });
 
-    vi.setSystemTime(new Date('2026-09-02T13:00:00.000Z'));
-    const result = await startProvisioningRun({ tenantId: tenant.id });
+    it('omits registry and workflowRunUrl entirely when not supplied', async () => {
+      const result = await startProvisioningRun({ tenantId: tenant.id });
 
-    if (!result.ok) throw new Error('expected ok:true');
-    expect(result.data.provisioningSteps?.run).toEqual({
-      startedAt: '2026-09-02T13:00:00.000Z',
+      if (!result.ok) throw new Error('expected ok:true');
+      expect(result.data.provisioningSteps?.run).toEqual({ startedAt: NOW });
+    });
+
+    it('replaces a previous run wholesale rather than merging', async () => {
+      await startProvisioningRun({
+        tenantId: tenant.id,
+        registry: 'development',
+        workflowRunUrl: 'https://github.com/acme/blog/actions/runs/1',
+      });
+
+      vi.setSystemTime(new Date('2026-09-02T13:00:00.000Z'));
+      const result = await startProvisioningRun({ tenantId: tenant.id });
+
+      if (!result.ok) throw new Error('expected ok:true');
+      expect(result.data.provisioningSteps?.run).toEqual({
+        startedAt: '2026-09-02T13:00:00.000Z',
+      });
     });
   });
 

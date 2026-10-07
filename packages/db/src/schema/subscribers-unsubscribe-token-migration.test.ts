@@ -8,17 +8,20 @@ import {
 } from '@blog/db/testing/migration-files';
 import { PGlite } from '@electric-sql/pglite';
 import { sql } from 'drizzle-orm';
-import { drizzle } from 'drizzle-orm/pglite';
+import { drizzle, type PgliteDatabase } from 'drizzle-orm/pglite';
 
 const BACKFILL_MIGRATION = '0024_faithful_kree.sql';
 
 describe('0024_faithful_kree (subscribers unsubscribe_token backfill)', () => {
+  let db: PgliteDatabase<typeof schema>;
+
+  beforeEach(() => {
+    db = drizzle(new PGlite(), { schema });
+  });
+
   it(
     'backfills every pre-existing subscriber row with a distinct, non-null unsubscribe_token',
     async () => {
-      const client = new PGlite();
-      const db = drizzle(client, { schema });
-
       const migrationFiles = listMigrationFiles();
       const priorMigrations = migrationFiles.filter(
         (file) => file < BACKFILL_MIGRATION,
@@ -66,9 +69,6 @@ describe('0024_faithful_kree (subscribers unsubscribe_token backfill)', () => {
   it(
     'enforces NOT NULL and UNIQUE on unsubscribe_token once fully migrated',
     async () => {
-      const client = new PGlite();
-      const db = drizzle(client, { schema });
-
       for (const file of listMigrationFiles()) {
         await applyMigrationFile(db, file);
       }
@@ -102,9 +102,6 @@ describe('0024_faithful_kree (subscribers unsubscribe_token backfill)', () => {
   it(
     'still applies cleanly against an empty subscribers table',
     async () => {
-      const client = new PGlite();
-      const db = drizzle(client, { schema });
-
       for (const file of listMigrationFiles()) {
         await applyMigrationFile(db, file);
       }

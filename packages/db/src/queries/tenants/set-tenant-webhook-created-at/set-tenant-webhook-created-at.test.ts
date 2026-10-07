@@ -37,8 +37,13 @@ afterEach(async () => {
 });
 
 describe(setTenantWebhookCreatedAt, () => {
+  let tenantId: string;
+
+  beforeEach(async () => {
+    tenantId = await insertDraftTenant();
+  });
+
   it('sets the webhook-created-at timestamp', async () => {
-    const tenantId = await insertDraftTenant();
     const webhookCreatedAt = new Date('2026-08-15T12:00:00.000Z');
 
     await setTenantWebhookCreatedAt(tenantId, webhookCreatedAt);
@@ -52,8 +57,6 @@ describe(setTenantWebhookCreatedAt, () => {
   });
 
   it('leaves every other column untouched', async () => {
-    const tenantId = await insertDraftTenant();
-
     await setTenantWebhookCreatedAt(
       tenantId,
       new Date('2026-08-15T12:00:00.000Z'),

@@ -18,9 +18,14 @@ afterEach(async () => {
 });
 
 describe(getMembership, () => {
-  it('returns the row for an existing (userId, tenantId) pair', async () => {
+  let tenantId: string;
+
+  beforeEach(async () => {
     await insertTestUser(db(), { id: 'user-1' });
-    const { id: tenantId } = await insertTestTenant(db());
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
+  it('returns the row for an existing (userId, tenantId) pair', async () => {
     await db()
       .insert(schema.memberships)
       .values({ userId: 'user-1', tenantId, role: MEMBERSHIP_ROLE.OWNER });
@@ -35,9 +40,6 @@ describe(getMembership, () => {
   });
 
   it('returns undefined when the user has no membership on that tenant', async () => {
-    await insertTestUser(db(), { id: 'user-1' });
-    const { id: tenantId } = await insertTestTenant(db());
-
     const result = await getMembership('user-1', tenantId);
 
     expect(result).toBeUndefined();

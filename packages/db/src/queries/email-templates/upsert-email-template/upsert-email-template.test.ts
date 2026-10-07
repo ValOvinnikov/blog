@@ -18,9 +18,13 @@ afterEach(async () => {
 });
 
 describe(upsertEmailTemplate, () => {
-  it('inserts a new row with only the provided fields set', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
+  let tenantId: string;
 
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
+  it('inserts a new row with only the provided fields set', async () => {
     const result = await upsertEmailTemplate(
       tenantId,
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
@@ -32,7 +36,6 @@ describe(upsertEmailTemplate, () => {
   });
 
   it('updates the existing row in place rather than inserting a second one', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     await upsertEmailTemplate(tenantId, EMAIL_TEMPLATE_TYPE.MAGIC_LINK, {
       subject: 'First subject',
     });
@@ -49,8 +52,6 @@ describe(upsertEmailTemplate, () => {
   });
 
   it('rejects a subject longer than its cap', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
-
     await expect(
       upsertEmailTemplate(tenantId, EMAIL_TEMPLATE_TYPE.MAGIC_LINK, {
         subject: 'x'.repeat(201),
@@ -59,8 +60,6 @@ describe(upsertEmailTemplate, () => {
   });
 
   it('rejects a body block missing _type or _key', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
-
     await expect(
       upsertEmailTemplate(tenantId, EMAIL_TEMPLATE_TYPE.MAGIC_LINK, {
         body: [{ text: 'no _type or _key' } as never],
@@ -80,8 +79,13 @@ describe(upsertEmailTemplate, () => {
 });
 
 describe('partial updates — omission leaves a field untouched, explicit null clears it', () => {
+  let tenantId: string;
+
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
   it('preserves subject when a later update omits the field', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     await upsertEmailTemplate(tenantId, EMAIL_TEMPLATE_TYPE.MAGIC_LINK, {
       subject: 'Custom sign-in subject',
     });
@@ -96,7 +100,6 @@ describe('partial updates — omission leaves a field untouched, explicit null c
   });
 
   it('clears an authored subject back to the default when explicitly set to null', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     await upsertEmailTemplate(tenantId, EMAIL_TEMPLATE_TYPE.MAGIC_LINK, {
       subject: 'Custom sign-in subject',
     });

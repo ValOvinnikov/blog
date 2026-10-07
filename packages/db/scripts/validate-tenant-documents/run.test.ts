@@ -156,63 +156,6 @@ describe(runValidation, () => {
     });
   });
 
-  it('tallies a tenant with no Sanity credentials yet as skipped', async () => {
-    listActiveTenantsMock.mockResolvedValue([tenant('t1', 'acme')]);
-    getTenantSanityCredentialsMock.mockResolvedValue(undefined);
-
-    const summary = await runValidation();
-
-    expect(summary).toEqual({
-      checked: 1,
-      clean: 0,
-      warning: 0,
-      critical: 0,
-      skipped: 1,
-      errors: 0,
-    });
-    expect(validateTenantDocumentsMock).not.toHaveBeenCalled();
-  });
-
-  it('skips a tenant whose credentials resolve to a non-ACTIVE status', async () => {
-    listActiveTenantsMock.mockResolvedValue([tenant('t1', 'acme')]);
-    getTenantSanityCredentialsMock.mockResolvedValue({
-      ...credentials('t1'),
-      status: TENANT_STATUS.SUSPENDED,
-    });
-
-    const summary = await runValidation();
-
-    expect(summary).toEqual({
-      checked: 1,
-      clean: 0,
-      warning: 0,
-      critical: 0,
-      skipped: 1,
-      errors: 0,
-    });
-    expect(validateTenantDocumentsMock).not.toHaveBeenCalled();
-  });
-
-  it('skips a tenant whose credentials resolve to a deprovisioned timestamp', async () => {
-    listActiveTenantsMock.mockResolvedValue([tenant('t1', 'acme')]);
-    getTenantSanityCredentialsMock.mockResolvedValue({
-      ...credentials('t1'),
-      deprovisionedAt: new Date('2026-01-02T00:00:00.000Z'),
-    });
-
-    const summary = await runValidation();
-
-    expect(summary).toEqual({
-      checked: 1,
-      clean: 0,
-      warning: 0,
-      critical: 0,
-      skipped: 1,
-      errors: 0,
-    });
-    expect(validateTenantDocumentsMock).not.toHaveBeenCalled();
-  });
-
   it("one tenant's failure does not abort the sweep for the rest", async () => {
     const tenants = [
       tenant('t1', 'acme'),
@@ -239,27 +182,6 @@ describe(runValidation, () => {
     });
     expect(validateTenantDocumentsMock).toHaveBeenCalledTimes(3);
     expect(hasSystemicFailures(summary)).toBe(true);
-  });
-
-  it('opens a finding for a tenant with invalid documents', async () => {
-    listActiveTenantsMock.mockResolvedValue([tenant('t1', 'acme')]);
-    validateTenantDocumentsMock.mockReturnValue([
-      {
-        documentId: 'doc-1',
-        documentType: 'page_post',
-        level: 'error',
-        markers: [],
-      },
-    ]);
-
-    await runValidation();
-
-    expect(openFindingMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        tenantId: 't1',
-        severity: FINDING_SEVERITY.CRITICAL,
-      }),
-    );
   });
 
   it('notifies operators only when the finding is newly opened, not on a repeat open', async () => {
@@ -290,40 +212,122 @@ describe(runValidation, () => {
     expect(notifyMock).toHaveBeenCalledTimes(1);
   });
 
-  it('resolves a previously open finding once the tenant validates clean again', async () => {
-    listActiveTenantsMock.mockResolvedValue([tenant('t1', 'acme')]);
-    validateTenantDocumentsMock.mockReturnValue([]);
-    listFindingsForTenantMock.mockResolvedValue([
-      {
-        id: 'finding-1',
-        tenantId: 't1',
-        source: 'DOCUMENT_VALIDATION',
-        kind: 'SCHEMA_VALIDATION_ERROR',
-        status: 'OPEN',
-      },
-    ]);
+  describe('with one active tenant', () => {
+    beforeEach(() => {
+      listActiveTenantsMock.mockResolvedValue([tenant('t1', 'acme')]);
+    });
 
-    await runValidation();
+    it('tallies a tenant with no Sanity credentials yet as skipped', async () => {
+      getTenantSanityCredentialsMock.mockResolvedValue(undefined);
 
-    expect(resolveFindingMock).toHaveBeenCalledWith('finding-1');
-  });
+      const summary = await runValidation();
 
-  it('does not resolve an open finding from a different source/kind', async () => {
-    listActiveTenantsMock.mockResolvedValue([tenant('t1', 'acme')]);
-    validateTenantDocumentsMock.mockReturnValue([]);
-    listFindingsForTenantMock.mockResolvedValue([
-      {
-        id: 'finding-1',
-        tenantId: 't1',
-        source: 'RECHECK_TENANT_OWNERS',
-        kind: 'OWNER_CHECK_STALLED',
-        status: 'OPEN',
-      },
-    ]);
+      expect(summary).toEqual({
+        checked: 1,
+        clean: 0,
+        warning: 0,
+        critical: 0,
+        skipped: 1,
+        errors: 0,
+      });
+      expect(validateTenantDocumentsMock).not.toHaveBeenCalled();
+    });
 
-    await runValidation();
+    it('skips a tenant whose credentials resolve to a non-ACTIVE status', async () => {
+      getTenantSanityCredentialsMock.mockResolvedValue({
+        ...credentials('t1'),
+        status: TENANT_STATUS.SUSPENDED,
+      });
 
-    expect(resolveFindingMock).not.toHaveBeenCalled();
+      const summary = await runValidation();
+
+      expect(summary).toEqual({
+        checked: 1,
+        clean: 0,
+        warning: 0,
+        critical: 0,
+        skipped: 1,
+        errors: 0,
+      });
+      expect(validateTenantDocumentsMock).not.toHaveBeenCalled();
+    });
+
+    it('skips a tenant whose credentials resolve to a deprovisioned timestamp', async () => {
+      getTenantSanityCredentialsMock.mockResolvedValue({
+        ...credentials('t1'),
+        deprovisionedAt: new Date('2026-01-02T00:00:00.000Z'),
+      });
+
+      const summary = await runValidation();
+
+      expect(summary).toEqual({
+        checked: 1,
+        clean: 0,
+        warning: 0,
+        critical: 0,
+        skipped: 1,
+        errors: 0,
+      });
+      expect(validateTenantDocumentsMock).not.toHaveBeenCalled();
+    });
+
+    it('opens a finding for a tenant with invalid documents', async () => {
+      validateTenantDocumentsMock.mockReturnValue([
+        {
+          documentId: 'doc-1',
+          documentType: 'page_post',
+          level: 'error',
+          markers: [],
+        },
+      ]);
+
+      await runValidation();
+
+      expect(openFindingMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          tenantId: 't1',
+          severity: FINDING_SEVERITY.CRITICAL,
+        }),
+      );
+    });
+
+    describe('when the tenant validates clean', () => {
+      beforeEach(() => {
+        validateTenantDocumentsMock.mockReturnValue([]);
+      });
+
+      it('resolves a previously open finding once the tenant validates clean again', async () => {
+        listFindingsForTenantMock.mockResolvedValue([
+          {
+            id: 'finding-1',
+            tenantId: 't1',
+            source: 'DOCUMENT_VALIDATION',
+            kind: 'SCHEMA_VALIDATION_ERROR',
+            status: 'OPEN',
+          },
+        ]);
+
+        await runValidation();
+
+        expect(resolveFindingMock).toHaveBeenCalledWith('finding-1');
+      });
+
+      it('does not resolve an open finding from a different source/kind', async () => {
+        listFindingsForTenantMock.mockResolvedValue([
+          {
+            id: 'finding-1',
+            tenantId: 't1',
+            source: 'RECHECK_TENANT_OWNERS',
+            kind: 'OWNER_CHECK_STALLED',
+            status: 'OPEN',
+          },
+        ]);
+
+        await runValidation();
+
+        expect(resolveFindingMock).not.toHaveBeenCalled();
+      });
+    });
   });
 });
 

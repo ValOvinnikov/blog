@@ -51,43 +51,6 @@ afterEach(() => {
 });
 
 describe(notifyOperatorsOfDocumentValidationFailure, () => {
-  it('posts a DOCUMENT_VALIDATION alert with isCritical true for CRITICAL severity', async () => {
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValue(new Response(null, { status: 200 }));
-    vi.stubGlobal('fetch', fetchMock);
-
-    await notifyOperatorsOfDocumentValidationFailure({
-      tenant: tenant(),
-      invalidDocumentCount: 3,
-      severity: FINDING_SEVERITY.CRITICAL,
-    });
-
-    const [, init] = fetchMock.mock.calls[0] as [URL, { body: string }];
-    expect(JSON.parse(init.body)).toEqual({
-      kind: 'DOCUMENT_VALIDATION',
-      tenantId: 't1',
-      invalidDocumentCount: 3,
-      isCritical: true,
-    });
-  });
-
-  it('posts isCritical false for WARNING severity', async () => {
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValue(new Response(null, { status: 200 }));
-    vi.stubGlobal('fetch', fetchMock);
-
-    await notifyOperatorsOfDocumentValidationFailure({
-      tenant: tenant(),
-      invalidDocumentCount: 1,
-      severity: FINDING_SEVERITY.WARNING,
-    });
-
-    const [, init] = fetchMock.mock.calls[0] as [URL, { body: string }];
-    expect(JSON.parse(init.body)).toMatchObject({ isCritical: false });
-  });
-
   it('resolves without throwing when the platform responds with a failure status', async () => {
     vi.stubGlobal(
       'fetch',
@@ -113,5 +76,43 @@ describe(notifyOperatorsOfDocumentValidationFailure, () => {
         severity: FINDING_SEVERITY.CRITICAL,
       }),
     ).resolves.toBeUndefined();
+  });
+
+  describe('when the platform accepts the alert', () => {
+    let fetchMock: ReturnType<typeof vi.fn>;
+
+    beforeEach(() => {
+      fetchMock = vi
+        .fn()
+        .mockResolvedValue(new Response(null, { status: 200 }));
+      vi.stubGlobal('fetch', fetchMock);
+    });
+
+    it('posts a DOCUMENT_VALIDATION alert with isCritical true for CRITICAL severity', async () => {
+      await notifyOperatorsOfDocumentValidationFailure({
+        tenant: tenant(),
+        invalidDocumentCount: 3,
+        severity: FINDING_SEVERITY.CRITICAL,
+      });
+
+      const [, init] = fetchMock.mock.calls[0] as [URL, { body: string }];
+      expect(JSON.parse(init.body)).toEqual({
+        kind: 'DOCUMENT_VALIDATION',
+        tenantId: 't1',
+        invalidDocumentCount: 3,
+        isCritical: true,
+      });
+    });
+
+    it('posts isCritical false for WARNING severity', async () => {
+      await notifyOperatorsOfDocumentValidationFailure({
+        tenant: tenant(),
+        invalidDocumentCount: 1,
+        severity: FINDING_SEVERITY.WARNING,
+      });
+
+      const [, init] = fetchMock.mock.calls[0] as [URL, { body: string }];
+      expect(JSON.parse(init.body)).toMatchObject({ isCritical: false });
+    });
   });
 });

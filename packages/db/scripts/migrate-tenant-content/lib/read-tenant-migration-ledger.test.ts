@@ -11,13 +11,11 @@ const params = {
 };
 
 beforeEach(() => {
-  execFileSyncMock.mockReset();
+  execFileSyncMock.mockReset().mockReturnValue('[]');
 });
 
 describe(isTenantMigrationLedgerEmpty, () => {
   it('is empty when no migrationState document exists yet', () => {
-    execFileSyncMock.mockReturnValue('[]');
-
     expect(isTenantMigrationLedgerEmpty(params)).toBe(true);
   });
 
@@ -51,8 +49,6 @@ describe(isTenantMigrationLedgerEmpty, () => {
   });
 
   it('overrides the per-tenant Sanity env vars for the CLI invocation', () => {
-    execFileSyncMock.mockReturnValue('[]');
-
     isTenantMigrationLedgerEmpty(params);
 
     expect(execFileSyncMock).toHaveBeenCalledWith(

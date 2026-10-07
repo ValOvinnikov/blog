@@ -20,10 +20,15 @@ afterEach(async () => {
 });
 
 describe(deleteBookmarksForTenant, () => {
+  let tenantId: string;
+
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
   it('deletes every bookmark row for the tenant, across users, and returns the count', async () => {
     const user1 = await insertTestUser(db());
     const user2 = await insertTestUser(db());
-    const { id: tenantId } = await insertTestTenant(db());
     await addBookmark(tenantId, user1.id, 'post-1');
     await addBookmark(tenantId, user2.id, 'post-2');
 
@@ -38,7 +43,6 @@ describe(deleteBookmarksForTenant, () => {
 
   it("leaves another tenant's bookmarks untouched", async () => {
     const user = await insertTestUser(db());
-    const { id: tenantId } = await insertTestTenant(db());
     const { id: otherTenantId } = await insertTestTenant(db());
     await addBookmark(otherTenantId, user.id, 'post-1');
 
@@ -52,8 +56,6 @@ describe(deleteBookmarksForTenant, () => {
   });
 
   it('is idempotent — returns 0 when nothing matches', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
-
     await expect(deleteBookmarksForTenant(tenantId)).resolves.toBe(0);
   });
 });

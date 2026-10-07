@@ -25,6 +25,12 @@ afterEach(async () => {
 });
 
 describe(listFindingsForTenant, () => {
+  let tenantId: string;
+
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
   it('returns only the given tenant’s findings, most recently seen first', async () => {
     const { id: tenantOneId } = await insertTestTenant(db());
     const { id: tenantTwoId } = await insertTestTenant(db());
@@ -53,7 +59,6 @@ describe(listFindingsForTenant, () => {
   });
 
   it('filters by status when given', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     const opened = await openFinding({
       tenantId,
       source: FINDING_SOURCE.DOMAIN_VERIFICATION,
@@ -84,8 +89,6 @@ describe(listFindingsForTenant, () => {
   });
 
   it('returns an empty array for a tenant with no findings', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
-
     const result = await listFindingsForTenant(tenantId);
 
     expect(result).toEqual([]);

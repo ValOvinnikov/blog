@@ -1,6 +1,7 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { ClientError } from '@sanity/client';
+import type { Mock } from 'vitest';
 
 import type { TProvisionEnv } from '../lib/env';
 
@@ -82,30 +83,47 @@ beforeEach(() => {
 });
 
 describe(seedTenantContent, () => {
-  it('seeds when the dataset lacks settings_site even though seededAt is already set', async () => {
-    const tenant = baseTenant({ seededAt: new Date() });
-    const commit = vi.fn().mockResolvedValue(undefined);
-    const createOrReplace = vi.fn();
-    const { createClient, fetch } = createClientStub({
-      createOrReplace,
-      commit,
-    });
-    const mintWriteToken = vi
+  let tenant: TTenant;
+  let commit: ReturnType<typeof vi.fn>;
+  let createOrReplace: ReturnType<typeof vi.fn>;
+  let assetsUpload: ReturnType<typeof vi.fn>;
+  let clientFetch: ReturnType<typeof vi.fn>;
+  let createClient: TSeedContentDeps['createClient'];
+  let mintWriteToken: Mock<TSeedContentDeps['mintWriteToken']>;
+  let revokeWriteToken: Mock<TSeedContentDeps['revokeWriteToken']>;
+  let sleep: Mock<TSeedContentDeps['sleep']>;
+
+  beforeEach(() => {
+    tenant = baseTenant();
+    commit = vi.fn().mockResolvedValue(undefined);
+    createOrReplace = vi.fn();
+    ({
+      assetsUpload,
+      fetch: clientFetch,
+      createClient,
+    } = createClientStub({ createOrReplace, commit }));
+    mintWriteToken = vi
       .fn()
       .mockResolvedValue({ id: 'robot-1', token: 'sk-write' });
-    const revokeWriteToken = vi.fn().mockResolvedValue(undefined);
-    const sleep = vi.fn().mockResolvedValue(undefined);
+    revokeWriteToken = vi.fn().mockResolvedValue(undefined);
+    sleep = vi.fn().mockResolvedValue(undefined);
+  });
 
-    await seedTenantContent(tenant, env, {
+  it('seeds when the dataset lacks settings_site even though seededAt is already set', async () => {
+    const seededTenant = baseTenant({ seededAt: new Date() });
+
+    await seedTenantContent(seededTenant, env, {
       createClient,
       mintWriteToken,
       revokeWriteToken,
       sleep,
     });
 
-    expect(fetch).toHaveBeenCalledWith('*[_type == "settings_site"][0]._id');
+    expect(clientFetch).toHaveBeenCalledWith(
+      '*[_type == "settings_site"][0]._id',
+    );
     expect(createOrReplace).toHaveBeenCalledTimes(
-      buildStarterDocuments(tenant).length,
+      buildStarterDocuments(seededTenant).length,
     );
     expect(commit).toHaveBeenCalledTimes(1);
     expect(setTenantSanityWriteTokenAndSeededAtMock).toHaveBeenCalledWith(
@@ -117,27 +135,21 @@ describe(seedTenantContent, () => {
   });
 
   it('skips seeding when the dataset already has settings_site', async () => {
-    const tenant = baseTenant();
-    const commit = vi.fn();
-    const createOrReplace = vi.fn();
-    const { createClient, fetch } = createClientStub(
+    const existingSiteClient = createClientStub(
       { createOrReplace, commit },
       { fetchResult: 'existing-settings-site-id' },
     );
-    const mintWriteToken = vi
-      .fn()
-      .mockResolvedValue({ id: 'robot-1', token: 'sk-write' });
-    const revokeWriteToken = vi.fn().mockResolvedValue(undefined);
-    const sleep = vi.fn().mockResolvedValue(undefined);
 
     await seedTenantContent(tenant, env, {
-      createClient,
+      createClient: existingSiteClient.createClient,
       mintWriteToken,
       revokeWriteToken,
       sleep,
     });
 
-    expect(fetch).toHaveBeenCalledWith('*[_type == "settings_site"][0]._id');
+    expect(existingSiteClient.fetch).toHaveBeenCalledWith(
+      '*[_type == "settings_site"][0]._id',
+    );
     expect(createOrReplace).not.toHaveBeenCalled();
     expect(commit).not.toHaveBeenCalled();
     expect(setTenantSanityWriteTokenAndSeededAtMock).not.toHaveBeenCalled();
@@ -149,7 +161,10 @@ describe(seedTenantContent, () => {
   });
 
   it('throws when the Sanity project has not been created yet', async () => {
-    const tenant = baseTenant({ sanityProjectId: null, sanityDataset: null });
+    const unprovisionedTenant = baseTenant({
+      sanityProjectId: null,
+      sanityDataset: null,
+    });
     const deps: TSeedContentDeps = {
       createClient: vi.fn(),
       mintWriteToken: vi.fn(),
@@ -157,25 +172,12 @@ describe(seedTenantContent, () => {
       sleep: vi.fn().mockResolvedValue(undefined),
     };
 
-    await expect(seedTenantContent(tenant, env, deps)).rejects.toThrow(
-      /has no Sanity project yet/,
-    );
+    await expect(
+      seedTenantContent(unprovisionedTenant, env, deps),
+    ).rejects.toThrow(/has no Sanity project yet/);
   });
 
   it('mints an editor token, uploads no assets, commits a transaction, and persists the token and seededAt together instead of revoking', async () => {
-    const tenant = baseTenant();
-    const commit = vi.fn().mockResolvedValue(undefined);
-    const createOrReplace = vi.fn();
-    const { assetsUpload, createClient } = createClientStub({
-      createOrReplace,
-      commit,
-    });
-    const mintWriteToken = vi
-      .fn()
-      .mockResolvedValue({ id: 'robot-1', token: 'sk-write' });
-    const revokeWriteToken = vi.fn().mockResolvedValue(undefined);
-    const sleep = vi.fn().mockResolvedValue(undefined);
-
     await seedTenantContent(tenant, env, {
       createClient,
       mintWriteToken,
@@ -212,14 +214,6 @@ describe(seedTenantContent, () => {
   });
 
   it('the committed starter documents contain no defaultOgImage on the site settings', async () => {
-    const tenant = baseTenant();
-    const commit = vi.fn().mockResolvedValue(undefined);
-    const createOrReplace = vi.fn();
-    const { createClient } = createClientStub({ createOrReplace, commit });
-    const mintWriteToken = vi
-      .fn()
-      .mockResolvedValue({ id: 'robot-1', token: 'sk-write' });
-
     await seedTenantContent(tenant, env, {
       createClient,
       mintWriteToken,
@@ -238,17 +232,7 @@ describe(seedTenantContent, () => {
   });
 
   it('still revokes the transient token when seeding fails', async () => {
-    const tenant = baseTenant();
-    const commit = vi.fn().mockRejectedValue(new Error('commit failed'));
-    const { createClient } = createClientStub({
-      createOrReplace: vi.fn(),
-      commit,
-    });
-    const mintWriteToken = vi
-      .fn()
-      .mockResolvedValue({ id: 'robot-1', token: 'sk-write' });
-    const revokeWriteToken = vi.fn().mockResolvedValue(undefined);
-    const sleep = vi.fn().mockResolvedValue(undefined);
+    commit.mockRejectedValue(new Error('commit failed'));
 
     await expect(
       seedTenantContent(tenant, env, {
@@ -268,15 +252,6 @@ describe(seedTenantContent, () => {
   });
 
   it('regression: revokes the token when persisting the token+seededAt fails, so a crash/retry window never orphans a live Editor-scoped token or mints a second one on retry', async () => {
-    const tenant = baseTenant();
-    const commit = vi.fn().mockResolvedValue(undefined);
-    const createOrReplace = vi.fn();
-    const { createClient } = createClientStub({ createOrReplace, commit });
-    const mintWriteToken = vi
-      .fn()
-      .mockResolvedValue({ id: 'robot-1', token: 'sk-write' });
-    const revokeWriteToken = vi.fn().mockResolvedValue(undefined);
-    const sleep = vi.fn().mockResolvedValue(undefined);
     setTenantSanityWriteTokenAndSeededAtMock.mockRejectedValue(
       new Error('persist failed'),
     );
@@ -298,21 +273,10 @@ describe(seedTenantContent, () => {
   });
 
   it('retries a grant-propagation failure once and succeeds', async () => {
-    const tenant = baseTenant();
     const grantError = new Error(
       'transaction failed: Insufficient permissions; permission "create" required',
     );
-    const commit = vi
-      .fn()
-      .mockRejectedValueOnce(grantError)
-      .mockResolvedValueOnce(undefined);
-    const createOrReplace = vi.fn();
-    const { createClient } = createClientStub({ createOrReplace, commit });
-    const mintWriteToken = vi
-      .fn()
-      .mockResolvedValue({ id: 'robot-1', token: 'sk-write' });
-    const revokeWriteToken = vi.fn().mockResolvedValue(undefined);
-    const sleep = vi.fn().mockResolvedValue(undefined);
+    commit.mockRejectedValueOnce(grantError).mockResolvedValueOnce(undefined);
 
     await seedTenantContent(tenant, env, {
       createClient,
@@ -332,7 +296,6 @@ describe(seedTenantContent, () => {
   });
 
   it('retries a structured ClientError carrying the permission-denied status code, even when its message text does not mention "insufficient permissions"', async () => {
-    const tenant = baseTenant();
     const grantError = new ClientError({
       statusCode: 403,
       headers: {},
@@ -340,17 +303,7 @@ describe(seedTenantContent, () => {
       url: 'https://api.sanity.io/v2024-01-01/data/mutate/test-dataset',
       method: 'POST',
     });
-    const commit = vi
-      .fn()
-      .mockRejectedValueOnce(grantError)
-      .mockResolvedValueOnce(undefined);
-    const createOrReplace = vi.fn();
-    const { createClient } = createClientStub({ createOrReplace, commit });
-    const mintWriteToken = vi
-      .fn()
-      .mockResolvedValue({ id: 'robot-1', token: 'sk-write' });
-    const revokeWriteToken = vi.fn().mockResolvedValue(undefined);
-    const sleep = vi.fn().mockResolvedValue(undefined);
+    commit.mockRejectedValueOnce(grantError).mockResolvedValueOnce(undefined);
 
     await seedTenantContent(tenant, env, {
       createClient,
@@ -370,7 +323,6 @@ describe(seedTenantContent, () => {
   });
 
   it('does not retry a structured ClientError with an unrelated status code and message', async () => {
-    const tenant = baseTenant();
     const otherError = new ClientError({
       statusCode: 400,
       headers: {},
@@ -378,14 +330,7 @@ describe(seedTenantContent, () => {
       url: 'https://api.sanity.io/v2024-01-01/data/mutate/test-dataset',
       method: 'POST',
     });
-    const commit = vi.fn().mockRejectedValue(otherError);
-    const createOrReplace = vi.fn();
-    const { createClient } = createClientStub({ createOrReplace, commit });
-    const mintWriteToken = vi
-      .fn()
-      .mockResolvedValue({ id: 'robot-1', token: 'sk-write' });
-    const revokeWriteToken = vi.fn().mockResolvedValue(undefined);
-    const sleep = vi.fn().mockResolvedValue(undefined);
+    commit.mockRejectedValue(otherError);
 
     await expect(
       seedTenantContent(tenant, env, {
@@ -407,18 +352,10 @@ describe(seedTenantContent, () => {
   });
 
   it('exhausts retries on a persistent grant-propagation failure, still revokes the token, and never persists it or seededAt', async () => {
-    const tenant = baseTenant();
     const grantError = new Error(
       'transaction failed: Insufficient permissions; permission "create" required',
     );
-    const commit = vi.fn().mockRejectedValue(grantError);
-    const createOrReplace = vi.fn();
-    const { createClient } = createClientStub({ createOrReplace, commit });
-    const mintWriteToken = vi
-      .fn()
-      .mockResolvedValue({ id: 'robot-1', token: 'sk-write' });
-    const revokeWriteToken = vi.fn().mockResolvedValue(undefined);
-    const sleep = vi.fn().mockResolvedValue(undefined);
+    commit.mockRejectedValue(grantError);
 
     await expect(
       seedTenantContent(tenant, env, {
@@ -439,16 +376,8 @@ describe(seedTenantContent, () => {
   });
 
   it('does not retry a non-grant-propagation commit failure', async () => {
-    const tenant = baseTenant();
     const otherError = new Error('malformed document');
-    const commit = vi.fn().mockRejectedValue(otherError);
-    const createOrReplace = vi.fn();
-    const { createClient } = createClientStub({ createOrReplace, commit });
-    const mintWriteToken = vi
-      .fn()
-      .mockResolvedValue({ id: 'robot-1', token: 'sk-write' });
-    const revokeWriteToken = vi.fn().mockResolvedValue(undefined);
-    const sleep = vi.fn().mockResolvedValue(undefined);
+    commit.mockRejectedValue(otherError);
 
     await expect(
       seedTenantContent(tenant, env, {

@@ -40,27 +40,32 @@ afterEach(async () => {
 });
 
 describe(getTenantLiveLocales, () => {
-  it('returns the default locale first, then the additional ones', async () => {
-    const tenantId = await insertGrowthTenantWith([NL, FR]);
+  describe('a growth tenant with NL and FR as additional locales', () => {
+    let tenantId: string;
 
-    expect(await getTenantLiveLocales(tenantId)).toEqual([EN, NL, FR]);
-  });
+    beforeEach(async () => {
+      tenantId = await insertGrowthTenantWith([NL, FR]);
+    });
 
-  it('serves only what the plan allows after a downgrade, keeping the stored locales', async () => {
-    const tenantId = await insertGrowthTenantWith([NL, FR]);
-    await db()
-      .update(tenants)
-      .set({ plan: TENANT_PLAN.FREE })
-      .where(eq(tenants.id, tenantId));
+    it('returns the default locale first, then the additional ones', async () => {
+      expect(await getTenantLiveLocales(tenantId)).toEqual([EN, NL, FR]);
+    });
 
-    const live = await getTenantLiveLocales(tenantId);
-    const [stored] = await db()
-      .select({ additionalLocales: tenants.additionalLocales })
-      .from(tenants)
-      .where(eq(tenants.id, tenantId));
+    it('serves only what the plan allows after a downgrade, keeping the stored locales', async () => {
+      await db()
+        .update(tenants)
+        .set({ plan: TENANT_PLAN.FREE })
+        .where(eq(tenants.id, tenantId));
 
-    expect(live).toEqual([EN]);
-    expect(stored?.additionalLocales).toEqual([NL, FR]);
+      const live = await getTenantLiveLocales(tenantId);
+      const [stored] = await db()
+        .select({ additionalLocales: tenants.additionalLocales })
+        .from(tenants)
+        .where(eq(tenants.id, tenantId));
+
+      expect(live).toEqual([EN]);
+      expect(stored?.additionalLocales).toEqual([NL, FR]);
+    });
   });
 
   it('returns undefined for a missing tenant', async () => {

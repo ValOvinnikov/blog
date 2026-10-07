@@ -20,8 +20,13 @@ afterEach(async () => {
 });
 
 describe(deleteMembershipInvitesForTenant, () => {
+  let tenantId: string;
+
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
   it('deletes every invite row for the tenant and returns the count', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     await createMembershipInvite(
       tenantId,
       'one@example.com',
@@ -43,7 +48,6 @@ describe(deleteMembershipInvitesForTenant, () => {
   });
 
   it("leaves another tenant's invites untouched", async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     const { id: otherTenantId } = await insertTestTenant(db());
     await createMembershipInvite(
       otherTenantId,
@@ -61,8 +65,6 @@ describe(deleteMembershipInvitesForTenant, () => {
   });
 
   it('is idempotent — returns 0 when nothing matches', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
-
     await expect(deleteMembershipInvitesForTenant(tenantId)).resolves.toBe(0);
   });
 });

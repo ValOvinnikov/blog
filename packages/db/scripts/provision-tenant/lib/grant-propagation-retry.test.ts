@@ -1,4 +1,5 @@
 import { ClientError } from '@sanity/client';
+import type { Mock } from 'vitest';
 
 import { grantPropagationRetryOptions } from './grant-propagation-retry';
 import { retryWithBackoff } from './retry-with-backoff';
@@ -14,8 +15,13 @@ function forbiddenClientError(): ClientError {
 }
 
 describe(grantPropagationRetryOptions, () => {
+  let sleep: Mock<(ms: number) => Promise<void>>;
+
+  beforeEach(() => {
+    sleep = vi.fn().mockResolvedValue(undefined);
+  });
+
   it('retries an "insufficient permissions" message failure until it gives up, a bounded and stable number of times', async () => {
-    const sleep = vi.fn().mockResolvedValue(undefined);
     const failure = new Error(
       'transaction failed: Insufficient permissions; permission "create" required',
     );
@@ -38,7 +44,6 @@ describe(grantPropagationRetryOptions, () => {
   });
 
   it('retries a structured ClientError carrying the 403 status code until it succeeds', async () => {
-    const sleep = vi.fn().mockResolvedValue(undefined);
     const fn = vi
       .fn()
       .mockRejectedValueOnce(forbiddenClientError())
@@ -70,7 +75,6 @@ describe(grantPropagationRetryOptions, () => {
       new Error('malformed document'),
     ],
   ])('does not retry %s', async (_label, otherError) => {
-    const sleep = vi.fn().mockResolvedValue(undefined);
     const fn = vi.fn().mockRejectedValue(otherError);
 
     await expect(

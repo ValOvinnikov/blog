@@ -3,6 +3,10 @@ export {};
 describe('db client module loading', () => {
   const originalDatabaseUrl = process.env['DATABASE_URL'];
 
+  beforeEach(() => {
+    vi.resetModules();
+  });
+
   afterEach(() => {
     if (originalDatabaseUrl === undefined) {
       delete process.env['DATABASE_URL'];
@@ -14,7 +18,6 @@ describe('db client module loading', () => {
 
   it('does not connect to Neon while merely importing the module', async () => {
     delete process.env['DATABASE_URL'];
-    vi.resetModules();
 
     await expect(import('./client')).resolves.toHaveProperty(
       'getDb',
@@ -24,7 +27,6 @@ describe('db client module loading', () => {
 
   it('creates and caches a single drizzle instance across calls', async () => {
     process.env['DATABASE_URL'] = 'postgresql://user:pass@host/db';
-    vi.resetModules();
 
     const { getDb } = await import('./client');
 

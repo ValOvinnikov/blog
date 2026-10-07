@@ -97,97 +97,6 @@ describe(runMigration, () => {
     });
   });
 
-  it('runs a normal deploy for a tenant with a non-empty ledger', async () => {
-    listActiveTenantsMock.mockResolvedValue([tenant('t1', 'acme')]);
-    isTenantMigrationLedgerEmptyMock.mockReturnValue(false);
-
-    const summary = await runMigration();
-
-    expect(summary).toEqual({
-      checked: 1,
-      migrated: 1,
-      backfilled: 0,
-      skipped: 0,
-      errors: 0,
-    });
-    expect(runTenantMigrationDeployMock).toHaveBeenCalledWith(
-      expect.objectContaining({ backfill: false }),
-    );
-  });
-
-  it('backfills instead of replaying for a tenant with an empty ledger', async () => {
-    listActiveTenantsMock.mockResolvedValue([tenant('t1', 'acme')]);
-    isTenantMigrationLedgerEmptyMock.mockReturnValue(true);
-
-    const summary = await runMigration();
-
-    expect(summary).toEqual({
-      checked: 1,
-      migrated: 0,
-      backfilled: 1,
-      skipped: 0,
-      errors: 0,
-    });
-    expect(runTenantMigrationDeployMock).toHaveBeenCalledWith(
-      expect.objectContaining({ backfill: true }),
-    );
-  });
-
-  it('tallies a tenant with no Sanity write credentials yet as skipped', async () => {
-    listActiveTenantsMock.mockResolvedValue([tenant('t1', 'acme')]);
-    getTenantSanityWriteCredentialsMock.mockResolvedValue(undefined);
-
-    const summary = await runMigration();
-
-    expect(summary).toEqual({
-      checked: 1,
-      migrated: 0,
-      backfilled: 0,
-      skipped: 1,
-      errors: 0,
-    });
-    expect(isTenantMigrationLedgerEmptyMock).not.toHaveBeenCalled();
-    expect(runTenantMigrationDeployMock).not.toHaveBeenCalled();
-  });
-
-  it('skips a tenant whose credentials resolve to a non-ACTIVE status', async () => {
-    listActiveTenantsMock.mockResolvedValue([tenant('t1', 'acme')]);
-    getTenantSanityWriteCredentialsMock.mockResolvedValue({
-      ...credentials('t1'),
-      status: TENANT_STATUS.SUSPENDED,
-    });
-
-    const summary = await runMigration();
-
-    expect(summary).toEqual({
-      checked: 1,
-      migrated: 0,
-      backfilled: 0,
-      skipped: 1,
-      errors: 0,
-    });
-    expect(runTenantMigrationDeployMock).not.toHaveBeenCalled();
-  });
-
-  it('skips a tenant whose credentials resolve to a deprovisioned timestamp', async () => {
-    listActiveTenantsMock.mockResolvedValue([tenant('t1', 'acme')]);
-    getTenantSanityWriteCredentialsMock.mockResolvedValue({
-      ...credentials('t1'),
-      deprovisionedAt: new Date('2026-01-02T00:00:00.000Z'),
-    });
-
-    const summary = await runMigration();
-
-    expect(summary).toEqual({
-      checked: 1,
-      migrated: 0,
-      backfilled: 0,
-      skipped: 1,
-      errors: 0,
-    });
-    expect(runTenantMigrationDeployMock).not.toHaveBeenCalled();
-  });
-
   it("one tenant's failure does not abort the sweep for the rest", async () => {
     const tenants = [
       tenant('t1', 'acme'),
@@ -236,6 +145,97 @@ describe(runMigration, () => {
       errors: 1,
     });
     expect(runTenantMigrationDeployMock).toHaveBeenCalledTimes(1);
+  });
+  describe('with one active tenant', () => {
+    beforeEach(() => {
+      listActiveTenantsMock.mockResolvedValue([tenant('t1', 'acme')]);
+    });
+
+    it('runs a normal deploy for a tenant with a non-empty ledger', async () => {
+      isTenantMigrationLedgerEmptyMock.mockReturnValue(false);
+
+      const summary = await runMigration();
+
+      expect(summary).toEqual({
+        checked: 1,
+        migrated: 1,
+        backfilled: 0,
+        skipped: 0,
+        errors: 0,
+      });
+      expect(runTenantMigrationDeployMock).toHaveBeenCalledWith(
+        expect.objectContaining({ backfill: false }),
+      );
+    });
+
+    it('backfills instead of replaying for a tenant with an empty ledger', async () => {
+      isTenantMigrationLedgerEmptyMock.mockReturnValue(true);
+
+      const summary = await runMigration();
+
+      expect(summary).toEqual({
+        checked: 1,
+        migrated: 0,
+        backfilled: 1,
+        skipped: 0,
+        errors: 0,
+      });
+      expect(runTenantMigrationDeployMock).toHaveBeenCalledWith(
+        expect.objectContaining({ backfill: true }),
+      );
+    });
+
+    it('tallies a tenant with no Sanity write credentials yet as skipped', async () => {
+      getTenantSanityWriteCredentialsMock.mockResolvedValue(undefined);
+
+      const summary = await runMigration();
+
+      expect(summary).toEqual({
+        checked: 1,
+        migrated: 0,
+        backfilled: 0,
+        skipped: 1,
+        errors: 0,
+      });
+      expect(isTenantMigrationLedgerEmptyMock).not.toHaveBeenCalled();
+      expect(runTenantMigrationDeployMock).not.toHaveBeenCalled();
+    });
+
+    it('skips a tenant whose credentials resolve to a non-ACTIVE status', async () => {
+      getTenantSanityWriteCredentialsMock.mockResolvedValue({
+        ...credentials('t1'),
+        status: TENANT_STATUS.SUSPENDED,
+      });
+
+      const summary = await runMigration();
+
+      expect(summary).toEqual({
+        checked: 1,
+        migrated: 0,
+        backfilled: 0,
+        skipped: 1,
+        errors: 0,
+      });
+      expect(runTenantMigrationDeployMock).not.toHaveBeenCalled();
+    });
+
+    it('skips a tenant whose credentials resolve to a deprovisioned timestamp', async () => {
+      getTenantSanityWriteCredentialsMock.mockResolvedValue({
+        ...credentials('t1'),
+        deprovisionedAt: new Date('2026-01-02T00:00:00.000Z'),
+      });
+
+      const summary = await runMigration();
+
+      expect(summary).toEqual({
+        checked: 1,
+        migrated: 0,
+        backfilled: 0,
+        skipped: 1,
+        errors: 0,
+      });
+      expect(runTenantMigrationDeployMock).not.toHaveBeenCalled();
+    });
   });
 });
 

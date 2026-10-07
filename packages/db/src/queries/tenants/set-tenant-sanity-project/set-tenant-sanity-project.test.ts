@@ -35,9 +35,13 @@ afterEach(async () => {
 });
 
 describe(setTenantSanityProject, () => {
-  it('sets the Sanity project id and dataset', async () => {
-    const tenantId = await insertDraftTenant();
+  let tenantId: string;
 
+  beforeEach(async () => {
+    tenantId = await insertDraftTenant();
+  });
+
+  it('sets the Sanity project id and dataset', async () => {
     await setTenantSanityProject(tenantId, {
       sanityProjectId: 'abc123',
       sanityDataset: 'production',
@@ -55,8 +59,6 @@ describe(setTenantSanityProject, () => {
   });
 
   it('leaves every other column untouched', async () => {
-    const tenantId = await insertDraftTenant();
-
     await setTenantSanityProject(tenantId, {
       sanityProjectId: 'abc123',
       sanityDataset: 'production',

@@ -5,6 +5,7 @@ const fetchMock = vi.fn();
 beforeEach(() => {
   vi.stubGlobal('fetch', fetchMock);
   fetchMock.mockReset();
+  fetchMock.mockResolvedValue(new Response(null, { status: 200 }));
 });
 
 afterEach(() => {
@@ -13,8 +14,6 @@ afterEach(() => {
 
 describe(deleteVercelProjectDomain, () => {
   it('DELETEs the project domain', async () => {
-    fetchMock.mockResolvedValue(new Response(null, { status: 200 }));
-
     const result = await deleteVercelProjectDomain({
       token: 'tok',
       teamId: undefined,
@@ -31,8 +30,6 @@ describe(deleteVercelProjectDomain, () => {
   });
 
   it('appends teamId as a query param when supplied', async () => {
-    fetchMock.mockResolvedValue(new Response(null, { status: 200 }));
-
     await deleteVercelProjectDomain({
       token: 'tok',
       teamId: 'team_1',

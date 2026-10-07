@@ -16,10 +16,15 @@ afterEach(async () => {
 });
 
 describe(listTenantDomains, () => {
-  it('returns every domain for the given tenant', async () => {
-    const { id: tenantId } = await insertTestTenant(db(), {
+  let tenantId: string;
+
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db(), {
       primaryDomain: 'acme.example.com',
-    });
+    }));
+  });
+
+  it('returns every domain for the given tenant', async () => {
     const { id: otherTenantId } = await insertTestTenant(db(), {
       primaryDomain: 'other.example.com',
     });
@@ -40,10 +45,6 @@ describe(listTenantDomains, () => {
   });
 
   it('returns an empty array for a tenant with no domains', async () => {
-    const { id: tenantId } = await insertTestTenant(db(), {
-      primaryDomain: 'acme.example.com',
-    });
-
     const result = await listTenantDomains(tenantId);
 
     expect(result).toEqual([]);

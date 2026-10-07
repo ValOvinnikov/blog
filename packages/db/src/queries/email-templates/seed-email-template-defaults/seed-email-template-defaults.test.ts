@@ -19,9 +19,13 @@ afterEach(async () => {
 });
 
 describe(seedEmailTemplateDefaults, () => {
-  it('inserts one row per template type with the product default copy', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
+  let tenantId: string;
 
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
+  it('inserts one row per template type with the product default copy', async () => {
     await seedEmailTemplateDefaults(tenantId);
 
     const rows = await db()
@@ -43,7 +47,6 @@ describe(seedEmailTemplateDefaults, () => {
   });
 
   it('never overwrites a row that already has authored copy', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     await db().insert(schema.emailTemplates).values({
       tenantId,
       templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
@@ -69,7 +72,6 @@ describe(seedEmailTemplateDefaults, () => {
   });
 
   it('is idempotent — a second call is a no-op', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     await seedEmailTemplateDefaults(tenantId);
 
     await seedEmailTemplateDefaults(tenantId);

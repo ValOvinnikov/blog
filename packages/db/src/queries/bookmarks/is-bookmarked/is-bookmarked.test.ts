@@ -19,23 +19,24 @@ afterEach(async () => {
 });
 
 describe(isBookmarked, () => {
-  it('returns true when the tuple exists', async () => {
+  let tenantId: string;
+
+  beforeEach(async () => {
     await insertTestUser(db(), { id: 'user-1' });
-    const { id: tenantId } = await insertTestTenant(db());
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
+  it('returns true when the tuple exists', async () => {
     await addBookmark(tenantId, 'user-1', 'post-1');
 
     expect(await isBookmarked(tenantId, 'user-1', 'post-1')).toBe(true);
   });
 
   it('returns false when the tuple does not exist', async () => {
-    await insertTestUser(db(), { id: 'user-1' });
-    const { id: tenantId } = await insertTestTenant(db());
-
     expect(await isBookmarked(tenantId, 'user-1', 'post-1')).toBe(false);
   });
 
   it("returns false for another tenant's bookmark on the same user and post", async () => {
-    await insertTestUser(db(), { id: 'user-1' });
     const { id: tenantOneId } = await insertTestTenant(db());
     const { id: tenantTwoId } = await insertTestTenant(db());
     await addBookmark(tenantOneId, 'user-1', 'post-1');

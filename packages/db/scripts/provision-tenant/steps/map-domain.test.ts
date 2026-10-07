@@ -60,12 +60,16 @@ beforeEach(() => {
 });
 
 describe(mapTenantDomain, () => {
+  let tenant: TTenant;
+
+  beforeEach(() => {
+    tenant = baseTenant();
+  });
+
   it('adds the domain to the shared web project when not already registered', async () => {
     listVercelProjectDomainsMock.mockResolvedValue([
       { name: 'other-tenant.example.com' },
     ]);
-    const tenant = baseTenant();
-
     await mapTenantDomain(tenant, env);
 
     expect(listVercelProjectDomainsMock).toHaveBeenCalledWith({
@@ -85,8 +89,6 @@ describe(mapTenantDomain, () => {
     listVercelProjectDomainsMock.mockResolvedValue([
       { name: 'acme.example.com' },
     ]);
-    const tenant = baseTenant();
-
     await mapTenantDomain(tenant, env);
 
     expect(addVercelProjectDomainMock).not.toHaveBeenCalled();

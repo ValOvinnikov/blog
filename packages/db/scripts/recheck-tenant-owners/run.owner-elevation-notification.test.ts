@@ -166,10 +166,14 @@ afterEach(async () => {
 });
 
 describe('owner-elevation notification across provision-tenant and recheck-tenant-owners', () => {
-  it('notifies operators exactly once for an outcome notifiable at provisioning time, and the next sweep stays silent', async () => {
-    const tenantId = await insertActiveTenant();
-    elevateTenantOwnerMock.mockResolvedValue('STALLED');
+  let tenantId: string;
 
+  beforeEach(async () => {
+    tenantId = await insertActiveTenant();
+    elevateTenantOwnerMock.mockResolvedValue('STALLED');
+  });
+
+  it('notifies operators exactly once for an outcome notifiable at provisioning time, and the next sweep stays silent', async () => {
     const provisionResult = await runSteps(tenantId, provisionEnv);
     expect(provisionResult).toEqual({ ok: true });
 
@@ -190,9 +194,6 @@ describe('owner-elevation notification across provision-tenant and recheck-tenan
   });
 
   it('notifies again on the next sweep once the outcome actually changes', async () => {
-    const tenantId = await insertActiveTenant();
-    elevateTenantOwnerMock.mockResolvedValue('STALLED');
-
     await runSteps(tenantId, provisionEnv);
     expect(notifyOperatorsOfOwnerElevationOutcomeMock).toHaveBeenCalledTimes(1);
 

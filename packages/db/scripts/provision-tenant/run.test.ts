@@ -129,7 +129,7 @@ beforeEach(() => {
   reportStepStatusMock.mockReset().mockResolvedValue(undefined);
   reportProvisioningRunStartMock.mockReset().mockResolvedValue(undefined);
   reportProvisioningRunFinishMock.mockReset().mockResolvedValue(undefined);
-  createTenantSanityProjectMock.mockReset();
+  createTenantSanityProjectMock.mockReset().mockResolvedValue({});
   seedTenantContentMock.mockReset().mockResolvedValue(undefined);
   persistTenantSanityTokenMock.mockReset().mockResolvedValue(undefined);
   mapTenantDomainMock.mockReset().mockResolvedValue(undefined);
@@ -142,8 +142,6 @@ beforeEach(() => {
 
 describe(runSteps, () => {
   it('reports RUNNING then DONE for every step, in order, on a clean run', async () => {
-    createTenantSanityProjectMock.mockResolvedValue({});
-
     const result = await runSteps('tenant-1', env);
 
     expect(result).toEqual({ ok: true });
@@ -231,30 +229,7 @@ describe(runSteps, () => {
     });
   });
 
-  it('stops at the first failing step, reports FAILED, and never runs later steps', async () => {
-    createTenantSanityProjectMock.mockResolvedValue({});
-    seedTenantContentMock.mockRejectedValue(new Error('seed failed'));
-
-    const result = await runSteps('tenant-1', env);
-
-    expect(result).toEqual({ ok: false });
-    expect(persistTenantSanityTokenMock).not.toHaveBeenCalled();
-    expect(mapTenantDomainMock).not.toHaveBeenCalled();
-    expect(createTenantRevalidateWebhookMock).not.toHaveBeenCalled();
-    expect(verifyTenantSeededContentMock).not.toHaveBeenCalled();
-
-    const lastCall = reportStepStatusMock.mock.calls.at(-1) as [
-      { step: string; status: string; error: string },
-    ];
-    expect(lastCall[0]).toMatchObject({
-      step: TENANT_PROVISIONING_STEP.SEED_CONTENT,
-      status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-      error: 'seed failed',
-    });
-  });
-
   it('fails the run when the final verification step finds the dataset missing required content, and never runs owner elevation', async () => {
-    createTenantSanityProjectMock.mockResolvedValue({});
     verifyTenantSeededContentMock.mockRejectedValue(
       new Error('missing required starter document(s): settings_site'),
     );
@@ -289,8 +264,6 @@ describe(runSteps, () => {
         deprovisionedAt: null,
       },
     });
-    createTenantSanityProjectMock.mockResolvedValue({});
-
     const result = await runSteps('tenant-1', env);
 
     expect(result).toEqual({ ok: true });
@@ -302,84 +275,20 @@ describe(runSteps, () => {
     expect(tenantSeenBySanityProject.deprovisionedAt).toBeNull();
   });
 
-  it("un-archives a re-provisioned tenant's existing Sanity project before any step runs", async () => {
-    reactivateTenantMock.mockResolvedValue({
-      ok: true,
-      data: { ...baseTenant, sanityProjectId: 'proj-abc' },
-    });
-    createTenantSanityProjectMock.mockResolvedValue({});
-
-    const result = await runSteps('tenant-1', env);
-
-    expect(result).toEqual({ ok: true });
-    expect(unarchiveSanityProjectMock).toHaveBeenCalledWith({
-      token: 'sanity-token',
-      projectId: 'proj-abc',
-    });
-    const [unarchiveCallOrder] =
-      unarchiveSanityProjectMock.mock.invocationCallOrder;
-    const [firstReportCallOrder] =
-      reportStepStatusMock.mock.invocationCallOrder;
-    expect(unarchiveCallOrder).toBeDefined();
-    expect(firstReportCallOrder).toBeDefined();
-    expect(unarchiveCallOrder).toBeLessThan(firstReportCallOrder as number);
-  });
-
   it('does not attempt to un-archive a first-time provision with no existing Sanity project', async () => {
-    createTenantSanityProjectMock.mockResolvedValue({});
-
     await runSteps('tenant-1', env);
 
     expect(unarchiveSanityProjectMock).not.toHaveBeenCalled();
   });
 
-  it('stops before any step when un-archiving the Sanity project fails', async () => {
-    reactivateTenantMock.mockResolvedValue({
-      ok: true,
-      data: { ...baseTenant, sanityProjectId: 'proj-abc' },
-    });
-    unarchiveSanityProjectMock.mockRejectedValue(new Error('network error'));
-
-    const result = await runSteps('tenant-1', env);
-
-    expect(result).toEqual({ ok: false });
-    expect(createTenantSanityProjectMock).not.toHaveBeenCalled();
-    expect(reportStepStatusMock).not.toHaveBeenCalled();
-  });
-
-  it('stops before any step when reactivateTenant fails', async () => {
-    reactivateTenantMock.mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_NOT_FOUND,
-    });
-
-    const result = await runSteps('tenant-1', env);
-
-    expect(result).toEqual({ ok: false });
-    expect(createTenantSanityProjectMock).not.toHaveBeenCalled();
-    expect(reportStepStatusMock).not.toHaveBeenCalled();
-  });
-
   it('seeds default email-template copy once every core step succeeds', async () => {
-    createTenantSanityProjectMock.mockResolvedValue({});
-
     const result = await runSteps('tenant-1', env);
 
     expect(result).toEqual({ ok: true });
     expect(seedEmailTemplateDefaultsMock).toHaveBeenCalledWith('tenant-1');
   });
 
-  it('never seeds email-template copy when an earlier step fails', async () => {
-    createTenantSanityProjectMock.mockResolvedValue({});
-    seedTenantContentMock.mockRejectedValue(new Error('seed failed'));
-
-    await runSteps('tenant-1', env);
-
-    expect(seedEmailTemplateDefaultsMock).not.toHaveBeenCalled();
-  });
-
   it('still reports ok:true when seeding email-template defaults throws', async () => {
-    createTenantSanityProjectMock.mockResolvedValue({});
     seedEmailTemplateDefaultsMock.mockRejectedValue(
       new Error('seed defaults failed'),
     );
@@ -390,7 +299,6 @@ describe(runSteps, () => {
   });
 
   it('elevates the tenant owner once every core step succeeds', async () => {
-    createTenantSanityProjectMock.mockResolvedValue({});
     elevateTenantOwnerMock.mockResolvedValue('ELEVATED');
 
     const result = await runSteps('tenant-1', env);
@@ -401,17 +309,7 @@ describe(runSteps, () => {
     expect(tenantSeen.id).toBe('tenant-1');
   });
 
-  it('still reports ok:true when the owner has not yet accepted (PENDING_ACCEPTANCE/STALLED)', async () => {
-    createTenantSanityProjectMock.mockResolvedValue({});
-    elevateTenantOwnerMock.mockResolvedValue('STALLED');
-
-    const result = await runSteps('tenant-1', env);
-
-    expect(result).toEqual({ ok: true });
-  });
-
   it('still reports ok:true when membership is ambiguous (more than one human member)', async () => {
-    createTenantSanityProjectMock.mockResolvedValue({});
     elevateTenantOwnerMock.mockResolvedValue('AMBIGUOUS_MEMBERSHIP');
 
     const result = await runSteps('tenant-1', env);
@@ -419,55 +317,9 @@ describe(runSteps, () => {
     expect(result).toEqual({ ok: true });
   });
 
-  it('still reports ok:true when elevating the owner throws unexpectedly', async () => {
-    createTenantSanityProjectMock.mockResolvedValue({});
-    elevateTenantOwnerMock.mockRejectedValue(new Error('acl fetch failed'));
-
-    const result = await runSteps('tenant-1', env);
-
-    expect(result).toEqual({ ok: true });
-  });
-
-  it('notifies operators of a notifiable owner-elevation outcome once core provisioning finishes', async () => {
-    createTenantSanityProjectMock.mockResolvedValue({});
-    elevateTenantOwnerMock.mockResolvedValue('STALLED');
-
-    await runSteps('tenant-1', env);
-
-    expect(notifyOwnerElevationOutcomeMock).toHaveBeenCalledTimes(1);
-    expect(notifyOwnerElevationOutcomeMock).toHaveBeenCalledWith({
-      tenant: expect.objectContaining({ id: 'tenant-1' }),
-      outcome: 'STALLED',
-    });
-  });
-
-  it('never notifies when an earlier step fails', async () => {
-    createTenantSanityProjectMock.mockResolvedValue({});
-    seedTenantContentMock.mockRejectedValue(new Error('seed failed'));
-
-    await runSteps('tenant-1', env);
-
-    expect(notifyOwnerElevationOutcomeMock).not.toHaveBeenCalled();
-  });
-
-  it('never elevates the owner when an earlier step fails', async () => {
-    createTenantSanityProjectMock.mockResolvedValue({});
-    seedTenantContentMock.mockRejectedValue(new Error('seed failed'));
-
-    await runSteps('tenant-1', env);
-
-    expect(elevateTenantOwnerMock).not.toHaveBeenCalled();
-    expect(reportStepStatusMock).not.toHaveBeenCalledWith(
-      expect.objectContaining({
-        step: TENANT_PROVISIONING_STEP.OWNER_ELEVATION,
-      }),
-    );
-  });
-
   it.each(Object.values(ELEVATE_TENANT_OWNER_OUTCOME))(
     'persists %s as the OWNER_ELEVATION step detail, always alongside DONE',
     async (outcome: TElevateTenantOwnerOutcome) => {
-      createTenantSanityProjectMock.mockResolvedValue({});
       elevateTenantOwnerMock.mockResolvedValue(outcome);
 
       await runSteps('tenant-1', env);
@@ -481,22 +333,7 @@ describe(runSteps, () => {
     },
   );
 
-  it('never reports the OWNER_ELEVATION step when elevating the owner throws', async () => {
-    createTenantSanityProjectMock.mockResolvedValue({});
-    elevateTenantOwnerMock.mockRejectedValue(new Error('acl fetch failed'));
-
-    await runSteps('tenant-1', env);
-
-    expect(reportStepStatusMock).not.toHaveBeenCalledWith(
-      expect.objectContaining({
-        step: TENANT_PROVISIONING_STEP.OWNER_ELEVATION,
-      }),
-    );
-  });
-
   it('starts the run with the registry and workflow run URL before the first step', async () => {
-    createTenantSanityProjectMock.mockResolvedValue({});
-
     await runSteps('tenant-1', {
       ...env,
       tenantRegistryEnvironment: 'production',
@@ -518,8 +355,6 @@ describe(runSteps, () => {
   });
 
   it('omits registry and workflowRunUrl entirely when the underlying env vars are unset', async () => {
-    createTenantSanityProjectMock.mockResolvedValue({});
-
     await runSteps('tenant-1', env);
 
     expect(reportProvisioningRunStartMock).toHaveBeenCalledWith({
@@ -528,44 +363,179 @@ describe(runSteps, () => {
   });
 
   it('finishes the run once every step succeeds', async () => {
-    createTenantSanityProjectMock.mockResolvedValue({});
-
     await runSteps('tenant-1', env);
 
     expect(reportProvisioningRunFinishMock).toHaveBeenCalledWith('tenant-1');
   });
 
-  it('finishes the run when a step fails', async () => {
-    createTenantSanityProjectMock.mockResolvedValue({});
-    seedTenantContentMock.mockRejectedValue(new Error('seed failed'));
-
-    await runSteps('tenant-1', env);
-
-    expect(reportProvisioningRunFinishMock).toHaveBeenCalledWith('tenant-1');
-  });
-
-  it('never starts or finishes a run when reactivateTenant fails', async () => {
-    reactivateTenantMock.mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_NOT_FOUND,
+  describe('when seed-content fails', () => {
+    beforeEach(() => {
+      seedTenantContentMock.mockRejectedValue(new Error('seed failed'));
     });
 
-    await runSteps('tenant-1', env);
+    it('stops at the first failing step, reports FAILED, and never runs later steps', async () => {
+      const result = await runSteps('tenant-1', env);
 
-    expect(reportProvisioningRunStartMock).not.toHaveBeenCalled();
-    expect(reportProvisioningRunFinishMock).not.toHaveBeenCalled();
+      expect(result).toEqual({ ok: false });
+      expect(persistTenantSanityTokenMock).not.toHaveBeenCalled();
+      expect(mapTenantDomainMock).not.toHaveBeenCalled();
+      expect(createTenantRevalidateWebhookMock).not.toHaveBeenCalled();
+      expect(verifyTenantSeededContentMock).not.toHaveBeenCalled();
+
+      const lastCall = reportStepStatusMock.mock.calls.at(-1) as [
+        { step: string; status: string; error: string },
+      ];
+      expect(lastCall[0]).toMatchObject({
+        step: TENANT_PROVISIONING_STEP.SEED_CONTENT,
+        status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
+        error: 'seed failed',
+      });
+    });
+
+    it('never seeds email-template copy when an earlier step fails', async () => {
+      await runSteps('tenant-1', env);
+
+      expect(seedEmailTemplateDefaultsMock).not.toHaveBeenCalled();
+    });
+
+    it('never notifies when an earlier step fails', async () => {
+      await runSteps('tenant-1', env);
+
+      expect(notifyOwnerElevationOutcomeMock).not.toHaveBeenCalled();
+    });
+
+    it('never elevates the owner when an earlier step fails', async () => {
+      await runSteps('tenant-1', env);
+
+      expect(elevateTenantOwnerMock).not.toHaveBeenCalled();
+      expect(reportStepStatusMock).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          step: TENANT_PROVISIONING_STEP.OWNER_ELEVATION,
+        }),
+      );
+    });
+
+    it('finishes the run when a step fails', async () => {
+      await runSteps('tenant-1', env);
+
+      expect(reportProvisioningRunFinishMock).toHaveBeenCalledWith('tenant-1');
+    });
   });
 
-  it('never starts or finishes a run when un-archiving the Sanity project fails', async () => {
-    reactivateTenantMock.mockResolvedValue({
-      ok: true,
-      data: { ...baseTenant, sanityProjectId: 'proj-abc' },
+  describe('when owner elevation throws', () => {
+    beforeEach(() => {
+      elevateTenantOwnerMock.mockRejectedValue(new Error('acl fetch failed'));
     });
-    unarchiveSanityProjectMock.mockRejectedValue(new Error('network error'));
 
-    await runSteps('tenant-1', env);
+    it('still reports ok:true when elevating the owner throws unexpectedly', async () => {
+      const result = await runSteps('tenant-1', env);
 
-    expect(reportProvisioningRunStartMock).not.toHaveBeenCalled();
-    expect(reportProvisioningRunFinishMock).not.toHaveBeenCalled();
+      expect(result).toEqual({ ok: true });
+    });
+
+    it('never reports the OWNER_ELEVATION step when elevating the owner throws', async () => {
+      await runSteps('tenant-1', env);
+
+      expect(reportStepStatusMock).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          step: TENANT_PROVISIONING_STEP.OWNER_ELEVATION,
+        }),
+      );
+    });
+  });
+
+  describe('when owner elevation stalls', () => {
+    beforeEach(() => {
+      elevateTenantOwnerMock.mockResolvedValue('STALLED');
+    });
+
+    it('still reports ok:true when the owner has not yet accepted (PENDING_ACCEPTANCE/STALLED)', async () => {
+      const result = await runSteps('tenant-1', env);
+
+      expect(result).toEqual({ ok: true });
+    });
+
+    it('notifies operators of a notifiable owner-elevation outcome once core provisioning finishes', async () => {
+      await runSteps('tenant-1', env);
+
+      expect(notifyOwnerElevationOutcomeMock).toHaveBeenCalledTimes(1);
+      expect(notifyOwnerElevationOutcomeMock).toHaveBeenCalledWith({
+        tenant: expect.objectContaining({ id: 'tenant-1' }),
+        outcome: 'STALLED',
+      });
+    });
+  });
+
+  describe('when reactivateTenant fails', () => {
+    beforeEach(() => {
+      reactivateTenantMock.mockResolvedValue({
+        ok: false,
+        error: ERROR_CODE.DB_NOT_FOUND,
+      });
+    });
+
+    it('stops before any step when reactivateTenant fails', async () => {
+      const result = await runSteps('tenant-1', env);
+
+      expect(result).toEqual({ ok: false });
+      expect(createTenantSanityProjectMock).not.toHaveBeenCalled();
+      expect(reportStepStatusMock).not.toHaveBeenCalled();
+    });
+
+    it('never starts or finishes a run when reactivateTenant fails', async () => {
+      await runSteps('tenant-1', env);
+
+      expect(reportProvisioningRunStartMock).not.toHaveBeenCalled();
+      expect(reportProvisioningRunFinishMock).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('when the tenant has an existing Sanity project', () => {
+    beforeEach(() => {
+      reactivateTenantMock.mockResolvedValue({
+        ok: true,
+        data: { ...baseTenant, sanityProjectId: 'proj-abc' },
+      });
+    });
+
+    it("un-archives a re-provisioned tenant's existing Sanity project before any step runs", async () => {
+      const result = await runSteps('tenant-1', env);
+
+      expect(result).toEqual({ ok: true });
+      expect(unarchiveSanityProjectMock).toHaveBeenCalledWith({
+        token: 'sanity-token',
+        projectId: 'proj-abc',
+      });
+      const [unarchiveCallOrder] =
+        unarchiveSanityProjectMock.mock.invocationCallOrder;
+      const [firstReportCallOrder] =
+        reportStepStatusMock.mock.invocationCallOrder;
+      expect(unarchiveCallOrder).toBeDefined();
+      expect(firstReportCallOrder).toBeDefined();
+      expect(unarchiveCallOrder).toBeLessThan(firstReportCallOrder as number);
+    });
+
+    describe('when un-archiving fails', () => {
+      beforeEach(() => {
+        unarchiveSanityProjectMock.mockRejectedValue(
+          new Error('network error'),
+        );
+      });
+
+      it('stops before any step when un-archiving the Sanity project fails', async () => {
+        const result = await runSteps('tenant-1', env);
+
+        expect(result).toEqual({ ok: false });
+        expect(createTenantSanityProjectMock).not.toHaveBeenCalled();
+        expect(reportStepStatusMock).not.toHaveBeenCalled();
+      });
+
+      it('never starts or finishes a run when un-archiving the Sanity project fails', async () => {
+        await runSteps('tenant-1', env);
+
+        expect(reportProvisioningRunStartMock).not.toHaveBeenCalled();
+        expect(reportProvisioningRunFinishMock).not.toHaveBeenCalled();
+      });
+    });
   });
 });

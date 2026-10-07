@@ -77,24 +77,6 @@ async function readVoiceOverrides(
 
 describe(`${RENAME_MIGRATION} (voiceOverrides categoryEmpty -> topicEmpty rename)`, () => {
   it(
-    'renames categoryEmpty to topicEmpty and preserves its value alongside other keys',
-    async () => {
-      const { db } = await setUpDbWithSiteConfigRow({
-        categoryEmpty: 'No posts in this topic yet.',
-        tagEmpty: 'No posts with this tag yet.',
-      });
-
-      await applyRenameMigration(db);
-
-      expect(await readVoiceOverrides(db)).toEqual({
-        topicEmpty: 'No posts in this topic yet.',
-        tagEmpty: 'No posts with this tag yet.',
-      });
-    },
-    MIGRATION_REPLAY_TEST_TIMEOUT_MS,
-  );
-
-  it(
     'leaves a row with no categoryEmpty key untouched',
     async () => {
       const { db } = await setUpDbWithSiteConfigRow({
@@ -139,29 +121,6 @@ describe(`${RENAME_MIGRATION} (voiceOverrides categoryEmpty -> topicEmpty rename
   );
 
   it(
-    'is idempotent: applying it a second time changes nothing',
-    async () => {
-      const { db } = await setUpDbWithSiteConfigRow({
-        categoryEmpty: 'No posts in this topic yet.',
-        tagEmpty: 'No posts with this tag yet.',
-      });
-
-      await applyRenameMigration(db);
-      const afterFirstRun = await readVoiceOverrides(db);
-
-      await applyMigrationFile(db, RENAME_MIGRATION);
-      const afterSecondRun = await readVoiceOverrides(db);
-
-      expect(afterSecondRun).toEqual(afterFirstRun);
-      expect(afterSecondRun).toEqual({
-        topicEmpty: 'No posts in this topic yet.',
-        tagEmpty: 'No posts with this tag yet.',
-      });
-    },
-    MIGRATION_REPLAY_TEST_TIMEOUT_MS,
-  );
-
-  it(
     'when both categoryEmpty and topicEmpty are present, topicEmpty ends up holding the old categoryEmpty value (jsonb || favours its right operand — accepted, not a bug)',
     async () => {
       const { db } = await setUpDbWithSiteConfigRow({
@@ -194,4 +153,46 @@ describe(`${RENAME_MIGRATION} (voiceOverrides categoryEmpty -> topicEmpty rename
     },
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,
   );
+
+  describe('with categoryEmpty and tagEmpty set', () => {
+    let db: Awaited<ReturnType<typeof setUpDbWithSiteConfigRow>>['db'];
+
+    beforeEach(async () => {
+      ({ db } = await setUpDbWithSiteConfigRow({
+        categoryEmpty: 'No posts in this topic yet.',
+        tagEmpty: 'No posts with this tag yet.',
+      }));
+    });
+
+    it(
+      'renames categoryEmpty to topicEmpty and preserves its value alongside other keys',
+      async () => {
+        await applyRenameMigration(db);
+
+        expect(await readVoiceOverrides(db)).toEqual({
+          topicEmpty: 'No posts in this topic yet.',
+          tagEmpty: 'No posts with this tag yet.',
+        });
+      },
+      MIGRATION_REPLAY_TEST_TIMEOUT_MS,
+    );
+
+    it(
+      'is idempotent: applying it a second time changes nothing',
+      async () => {
+        await applyRenameMigration(db);
+        const afterFirstRun = await readVoiceOverrides(db);
+
+        await applyMigrationFile(db, RENAME_MIGRATION);
+        const afterSecondRun = await readVoiceOverrides(db);
+
+        expect(afterSecondRun).toEqual(afterFirstRun);
+        expect(afterSecondRun).toEqual({
+          topicEmpty: 'No posts in this topic yet.',
+          tagEmpty: 'No posts with this tag yet.',
+        });
+      },
+      MIGRATION_REPLAY_TEST_TIMEOUT_MS,
+    );
+  });
 });

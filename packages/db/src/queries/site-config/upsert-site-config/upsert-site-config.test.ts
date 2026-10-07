@@ -107,9 +107,13 @@ afterEach(async () => {
 });
 
 describe(upsertSiteConfig, () => {
-  it('inserts a new row when the tenant has no config yet', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
+  let tenantId: string;
 
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
+  it('inserts a new row when the tenant has no config yet', async () => {
     const result = expectOk(await upsertSiteConfig(tenantId, baseInput));
 
     expect(result).toMatchObject({
@@ -122,7 +126,6 @@ describe(upsertSiteConfig, () => {
   });
 
   it('updates the existing row in place rather than inserting a second one', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     await upsertSiteConfig(tenantId, baseInput);
 
     const result = expectOk(
@@ -140,16 +143,12 @@ describe(upsertSiteConfig, () => {
   });
 
   it('rejects an accentHue outside the 0–360 range', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
-
     await expect(
       upsertSiteConfig(tenantId, { ...baseInput, accentHue: 400 }),
     ).rejects.toThrow();
   });
 
   it('gives a new config the menu-with-code language switcher style', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
-
     const result = expectOk(await upsertSiteConfig(tenantId, baseInput));
 
     expect(result.languageSwitcherStyle).toBe(
@@ -158,8 +157,6 @@ describe(upsertSiteConfig, () => {
   });
 
   it('stores a chosen language switcher style', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
-
     const result = expectOk(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
@@ -171,7 +168,6 @@ describe(upsertSiteConfig, () => {
   });
 
   it('keeps the language switcher style when a save omits it', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     await upsertSiteConfig(tenantId, {
       ...baseInput,
       languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_GLOBE,
@@ -187,7 +183,6 @@ describe(upsertSiteConfig, () => {
   });
 
   it('rejects an unknown language switcher style', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     const languageSwitcherStyle =
       'DROPDOWN' as TUpdateSiteConfigInput['languageSwitcherStyle'];
 
@@ -203,7 +198,6 @@ describe(upsertSiteConfig, () => {
   });
 
   it('rejects an unknown voice override key', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     const voiceOverrides = {
       thisIsNotARegisteredField: 'x',
     } as TUpdateSiteConfigInput['voiceOverrides'];
@@ -215,9 +209,13 @@ describe(upsertSiteConfig, () => {
 });
 
 describe('voice overrides — TEXT fields', () => {
-  it('stores a trimmed TEXT override', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
+  let tenantId: string;
 
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
+  it('stores a trimmed TEXT override', async () => {
     const result = expectOk(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
@@ -231,8 +229,6 @@ describe('voice overrides — TEXT fields', () => {
   });
 
   it('rejects a TEXT override longer than its field-specific cap', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
-
     const result = expectFieldErrors(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
@@ -244,8 +240,6 @@ describe('voice overrides — TEXT fields', () => {
   });
 
   it('rejects a TEXT override containing a line break', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
-
     const result = expectFieldErrors(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
@@ -257,7 +251,6 @@ describe('voice overrides — TEXT fields', () => {
   });
 
   it('clears a previously-set TEXT override when resubmitted blank', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     await upsertSiteConfig(tenantId, {
       ...baseInput,
       voiceOverrides: { notFoundHeading: 'Custom heading' },
@@ -281,9 +274,13 @@ describe('voice overrides — TEXT fields', () => {
 });
 
 describe('voice overrides — MULTILINE fields', () => {
-  it('stores a trimmed MULTILINE override without rejecting line breaks', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
+  let tenantId: string;
 
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
+  it('stores a trimmed MULTILINE override without rejecting line breaks', async () => {
     const overrides = {
       [SYNTHETIC_MULTILINE_FIELD_ID]: '  Line one\nLine two  ',
     } as TVoiceOverridesInput;
@@ -301,8 +298,6 @@ describe('voice overrides — MULTILINE fields', () => {
   });
 
   it('rejects a MULTILINE override longer than its field-specific cap', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
-
     const overrides = {
       [SYNTHETIC_MULTILINE_FIELD_ID]: 'x'.repeat(
         SYNTHETIC_MULTILINE_FIELD_MAX + 1,
@@ -325,9 +320,13 @@ describe('voice overrides — MULTILINE fields', () => {
 });
 
 describe('voice overrides — RICH fields', () => {
-  it('stores a valid rich-text override with allowed marks and a link', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
+  let tenantId: string;
 
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
+  it('stores a valid rich-text override with allowed marks and a link', async () => {
     const result = expectOk(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
@@ -344,8 +343,6 @@ describe('voice overrides — RICH fields', () => {
   });
 
   it('rejects rich text carrying a disallowed mark', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
-
     const result = expectFieldErrors(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
@@ -361,8 +358,6 @@ describe('voice overrides — RICH fields', () => {
   });
 
   it('rejects rich text carrying a disallowed style', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
-
     const result = expectFieldErrors(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
@@ -376,8 +371,6 @@ describe('voice overrides — RICH fields', () => {
   });
 
   it('rejects rich text whose link href does not pass sanitizeHref', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
-
     const result = expectFieldErrors(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
@@ -394,7 +387,6 @@ describe('voice overrides — RICH fields', () => {
   });
 
   it('clears a previously-set rich override when resubmitted empty', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     await upsertSiteConfig(tenantId, {
       ...baseInput,
       voiceOverrides: {
@@ -414,9 +406,13 @@ describe('voice overrides — RICH fields', () => {
 });
 
 describe('voice overrides — RICH fields accept a plain string', () => {
-  it('normalizes a plain string into a single normal block', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
+  let tenantId: string;
 
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
+  it('normalizes a plain string into a single normal block', async () => {
     const result = expectOk(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
@@ -439,8 +435,6 @@ describe('voice overrides — RICH fields accept a plain string', () => {
   });
 
   it('drops the key for a blank/whitespace-only string', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
-
     const result = expectOk(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
@@ -452,7 +446,6 @@ describe('voice overrides — RICH fields accept a plain string', () => {
   });
 
   it('rejects a string exceeding the field cap, same message as authored rich text', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     const overlong = 'x'.repeat(301);
 
     const coerced = expectFieldErrors(
@@ -474,8 +467,6 @@ describe('voice overrides — RICH fields accept a plain string', () => {
   });
 
   it('catches a placeholder violation in a coerced string', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
-
     const result = expectFieldErrors(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
@@ -490,8 +481,6 @@ describe('voice overrides — RICH fields accept a plain string', () => {
   });
 
   it('still rejects a non-string, non-array value', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
-
     const result = expectFieldErrors(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
@@ -507,8 +496,6 @@ describe('voice overrides — RICH fields accept a plain string', () => {
   });
 
   it('trims a whitespace-padded string before storing it', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
-
     const result = expectOk(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
@@ -528,7 +515,6 @@ describe('voice overrides — RICH fields accept a plain string', () => {
   });
 
   it('accepts a string that only exceeds the cap because of its padding', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     const atCap = 'x'.repeat(300);
 
     const result = expectOk(
@@ -546,7 +532,6 @@ describe('voice overrides — RICH fields accept a plain string', () => {
   });
 
   it('still rejects a string exceeding the cap after trimming', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     const overCap = 'x'.repeat(301);
 
     const result = expectFieldErrors(
@@ -563,9 +548,13 @@ describe('voice overrides — RICH fields accept a plain string', () => {
 });
 
 describe('voice overrides — placeholders', () => {
-  it('rejects a value missing a placeholder the registry declares', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
+  let tenantId: string;
 
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
+  it('rejects a value missing a placeholder the registry declares', async () => {
     const result = expectFieldErrors(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
@@ -580,8 +569,6 @@ describe('voice overrides — placeholders', () => {
   });
 
   it('rejects a value carrying a placeholder token the registry does not declare', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
-
     const result = expectFieldErrors(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
@@ -594,8 +581,6 @@ describe('voice overrides — placeholders', () => {
   });
 
   it('accepts a value that includes every placeholder the registry declares', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
-
     const result = expectOk(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
@@ -610,8 +595,13 @@ describe('voice overrides — placeholders', () => {
 });
 
 describe('partial updates — omission leaves a field untouched, explicit null clears it', () => {
+  let tenantId: string;
+
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
   it('preserves voice overrides when a later update omits the field entirely', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     await upsertSiteConfig(tenantId, {
       ...baseInput,
       voiceOverrides: { notFoundHeading: 'Custom heading' },
@@ -627,7 +617,6 @@ describe('partial updates — omission leaves a field untouched, explicit null c
   });
 
   it('clears every voice override when explicitly updated with {}', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     await upsertSiteConfig(tenantId, {
       ...baseInput,
       voiceOverrides: { notFoundHeading: 'Custom heading' },
@@ -641,7 +630,6 @@ describe('partial updates — omission leaves a field untouched, explicit null c
   });
 
   it('preserves logoHue when a later update omits the field', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     await upsertSiteConfig(tenantId, { ...baseInput, logoHue: 200 });
 
     const result = expectOk(
@@ -652,7 +640,6 @@ describe('partial updates — omission leaves a field untouched, explicit null c
   });
 
   it('clears logoHue back to "follow accentHue" when explicitly set to null', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     await upsertSiteConfig(tenantId, { ...baseInput, logoHue: 200 });
 
     const result = expectOk(
@@ -663,7 +650,6 @@ describe('partial updates — omission leaves a field untouched, explicit null c
   });
 
   it('preserves logoAssetUrl on omission and clears it on explicit null', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     await upsertSiteConfig(tenantId, {
       ...baseInput,
       logoAssetUrl: 'https://blob.example.com/logo.png',

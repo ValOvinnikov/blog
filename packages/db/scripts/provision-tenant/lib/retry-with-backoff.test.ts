@@ -1,10 +1,16 @@
+import type { Mock } from 'vitest';
+
 import { retryWithBackoff } from './retry-with-backoff';
 
 describe(retryWithBackoff, () => {
+  let sleep: Mock<(ms: number) => Promise<void>>;
+
+  beforeEach(() => {
+    sleep = vi.fn().mockResolvedValue(undefined);
+  });
+
   it('returns the result on the first successful attempt without sleeping', async () => {
     const fn = vi.fn().mockResolvedValue('ok');
-    const sleep = vi.fn().mockResolvedValue(undefined);
-
     const result = await retryWithBackoff(fn, {
       maxAttempts: 3,
       baseDelayMs: 10,
@@ -23,8 +29,6 @@ describe(retryWithBackoff, () => {
       .mockRejectedValueOnce(new Error('nope'))
       .mockRejectedValueOnce(new Error('nope'))
       .mockResolvedValueOnce('ok');
-    const sleep = vi.fn().mockResolvedValue(undefined);
-
     const result = await retryWithBackoff(fn, {
       maxAttempts: 5,
       baseDelayMs: 10,
@@ -41,8 +45,6 @@ describe(retryWithBackoff, () => {
   it('rethrows once maxAttempts is exhausted', async () => {
     const failure = new Error('always fails');
     const fn = vi.fn().mockRejectedValue(failure);
-    const sleep = vi.fn().mockResolvedValue(undefined);
-
     await expect(
       retryWithBackoff(fn, {
         maxAttempts: 3,
@@ -59,7 +61,6 @@ describe(retryWithBackoff, () => {
   it('rethrows immediately when the error is not retryable', async () => {
     const failure = new Error('not our error');
     const fn = vi.fn().mockRejectedValue(failure);
-    const sleep = vi.fn().mockResolvedValue(undefined);
     const isRetryable = vi.fn().mockReturnValue(false);
 
     await expect(

@@ -18,11 +18,15 @@ afterEach(async () => {
 });
 
 describe(addTenantDomain, () => {
-  it('inserts a new domain row for the given tenant', async () => {
-    const { id: tenantId } = await insertTestTenant(db(), {
-      primaryDomain: 'acme.example.com',
-    });
+  let tenantId: string;
 
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db(), {
+      primaryDomain: 'acme.example.com',
+    }));
+  });
+
+  it('inserts a new domain row for the given tenant', async () => {
     const result = await addTenantDomain(tenantId, 'acme.example.com');
 
     expect(result).toEqual({
@@ -35,9 +39,6 @@ describe(addTenantDomain, () => {
   });
 
   it('is idempotent when the same (tenantId, domain) pair is added again', async () => {
-    const { id: tenantId } = await insertTestTenant(db(), {
-      primaryDomain: 'acme.example.com',
-    });
     const first = await addTenantDomain(tenantId, 'acme.example.com');
 
     const second = await addTenantDomain(tenantId, 'acme.example.com');
@@ -48,9 +49,6 @@ describe(addTenantDomain, () => {
   });
 
   it('returns DB_DUPLICATE_DOMAIN for a domain already assigned to a different tenant', async () => {
-    const { id: tenantId } = await insertTestTenant(db(), {
-      primaryDomain: 'acme.example.com',
-    });
     const { id: otherTenantId } = await insertTestTenant(db(), {
       primaryDomain: 'other.example.com',
     });
@@ -65,9 +63,6 @@ describe(addTenantDomain, () => {
   });
 
   it('returns DB_NOT_FOUND when the conflicting row vanishes before the follow-up read', async () => {
-    const { id: tenantId } = await insertTestTenant(db(), {
-      primaryDomain: 'acme.example.com',
-    });
     await addTenantDomain(tenantId, 'shared.example.com');
 
     const selectSpy = vi.spyOn(db(), 'select').mockReturnValueOnce({
@@ -87,10 +82,6 @@ describe(addTenantDomain, () => {
   ])(
     'rejects %s for domain without writing a row',
     async (_description, domain) => {
-      const { id: tenantId } = await insertTestTenant(db(), {
-        primaryDomain: 'acme.example.com',
-      });
-
       const result = await addTenantDomain(tenantId, domain);
 
       expect(result).toEqual({

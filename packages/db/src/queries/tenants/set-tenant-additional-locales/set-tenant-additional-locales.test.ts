@@ -58,25 +58,53 @@ afterEach(async () => {
 });
 
 describe(setTenantAdditionalLocales, () => {
-  it('saves additional locales within the plan limit', async () => {
-    const tenantId = await insertTenant(TENANT_PLAN.GROWTH);
+  describe('a GROWTH tenant', () => {
+    let tenantId: string;
 
-    const result = await setTenantAdditionalLocales(tenantId, [NL, FR]);
-
-    expect(result).toEqual({ ok: true, data: [NL, FR] });
-    expect(await storedAdditionalLocales(tenantId)).toEqual([NL, FR]);
-  });
-
-  it('rejects more locales than the plan allows, counting the default', async () => {
-    const tenantId = await insertTenant(TENANT_PLAN.GROWTH);
-
-    const result = await setTenantAdditionalLocales(tenantId, [NL, FR, DE]);
-
-    expect(result).toEqual({
-      ok: false,
-      error: ERROR_CODE.DB_LOCALE_LIMIT_EXCEEDED,
+    beforeEach(async () => {
+      tenantId = await insertTenant(TENANT_PLAN.GROWTH);
     });
-    expect(await storedAdditionalLocales(tenantId)).toEqual([]);
+
+    it('saves additional locales within the plan limit', async () => {
+      const result = await setTenantAdditionalLocales(tenantId, [NL, FR]);
+
+      expect(result).toEqual({ ok: true, data: [NL, FR] });
+      expect(await storedAdditionalLocales(tenantId)).toEqual([NL, FR]);
+    });
+
+    it('rejects more locales than the plan allows, counting the default', async () => {
+      const result = await setTenantAdditionalLocales(tenantId, [NL, FR, DE]);
+
+      expect(result).toEqual({
+        ok: false,
+        error: ERROR_CODE.DB_LOCALE_LIMIT_EXCEEDED,
+      });
+      expect(await storedAdditionalLocales(tenantId)).toEqual([]);
+    });
+
+    it('rejects the default locale among the additional ones', async () => {
+      const result = await setTenantAdditionalLocales(tenantId, [EN]);
+
+      expect(result).toEqual({
+        ok: false,
+        error: ERROR_CODE.DB_DEFAULT_LOCALE_REPEATED,
+      });
+    });
+
+    it('counts a repeated locale once', async () => {
+      const result = await setTenantAdditionalLocales(tenantId, [NL, NL, FR]);
+
+      expect(result).toEqual({ ok: true, data: [NL, FR] });
+    });
+
+    it('clears the additional locales when given none', async () => {
+      await setTenantAdditionalLocales(tenantId, [NL]);
+
+      const result = await setTenantAdditionalLocales(tenantId, []);
+
+      expect(result).toEqual({ ok: true, data: [] });
+      expect(await storedAdditionalLocales(tenantId)).toEqual([]);
+    });
   });
 
   it('rejects any additional locale on a plan that allows only the default', async () => {
@@ -88,35 +116,6 @@ describe(setTenantAdditionalLocales, () => {
       ok: false,
       error: ERROR_CODE.DB_LOCALE_LIMIT_EXCEEDED,
     });
-  });
-
-  it('rejects the default locale among the additional ones', async () => {
-    const tenantId = await insertTenant(TENANT_PLAN.GROWTH);
-
-    const result = await setTenantAdditionalLocales(tenantId, [EN]);
-
-    expect(result).toEqual({
-      ok: false,
-      error: ERROR_CODE.DB_DEFAULT_LOCALE_REPEATED,
-    });
-  });
-
-  it('counts a repeated locale once', async () => {
-    const tenantId = await insertTenant(TENANT_PLAN.GROWTH);
-
-    const result = await setTenantAdditionalLocales(tenantId, [NL, NL, FR]);
-
-    expect(result).toEqual({ ok: true, data: [NL, FR] });
-  });
-
-  it('clears the additional locales when given none', async () => {
-    const tenantId = await insertTenant(TENANT_PLAN.GROWTH);
-    await setTenantAdditionalLocales(tenantId, [NL]);
-
-    const result = await setTenantAdditionalLocales(tenantId, []);
-
-    expect(result).toEqual({ ok: true, data: [] });
-    expect(await storedAdditionalLocales(tenantId)).toEqual([]);
   });
 
   it('keeps stored locales past the limit in the order given after a downgrade', async () => {

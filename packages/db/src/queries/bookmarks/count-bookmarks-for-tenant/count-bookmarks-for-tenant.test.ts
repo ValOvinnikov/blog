@@ -19,10 +19,15 @@ afterEach(async () => {
 });
 
 describe(countBookmarksForTenant, () => {
+  let tenantId: string;
+
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
   it('counts every bookmark row for the tenant, across users', async () => {
     const user1 = await insertTestUser(db());
     const user2 = await insertTestUser(db());
-    const { id: tenantId } = await insertTestTenant(db());
     await addBookmark(tenantId, user1.id, 'post-1');
     await addBookmark(tenantId, user2.id, 'post-2');
 
@@ -31,7 +36,6 @@ describe(countBookmarksForTenant, () => {
 
   it("does not count another tenant's bookmarks", async () => {
     const user = await insertTestUser(db());
-    const { id: tenantId } = await insertTestTenant(db());
     const { id: otherTenantId } = await insertTestTenant(db());
     await addBookmark(otherTenantId, user.id, 'post-1');
 

@@ -1,5 +1,6 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import type { Mock } from 'vitest';
 
 import type { TProvisionEnv } from '../lib/env';
 
@@ -58,23 +59,29 @@ beforeEach(() => {
 });
 
 describe(persistTenantSanityToken, () => {
-  it('skips minting when a token is already persisted', async () => {
-    const tenant = baseTenant({ sanityReadTokenEncrypted: 'already-set' });
-    const mintReadToken = vi.fn();
+  describe('when no token can be minted', () => {
+    let mintReadToken: Mock<TPersistSanityTokenDeps['mintReadToken']>;
 
-    await persistTenantSanityToken(tenant, env, { mintReadToken });
+    beforeEach(() => {
+      mintReadToken = vi.fn();
+    });
 
-    expect(mintReadToken).not.toHaveBeenCalled();
-    expect(setTenantSanityTokenMock).not.toHaveBeenCalled();
-  });
+    it('skips minting when a token is already persisted', async () => {
+      const tenant = baseTenant({ sanityReadTokenEncrypted: 'already-set' });
 
-  it('throws when the Sanity project has not been created yet', async () => {
-    const tenant = baseTenant({ sanityProjectId: null });
-    const mintReadToken = vi.fn();
+      await persistTenantSanityToken(tenant, env, { mintReadToken });
 
-    await expect(
-      persistTenantSanityToken(tenant, env, { mintReadToken }),
-    ).rejects.toThrow(/has no Sanity project yet/);
+      expect(mintReadToken).not.toHaveBeenCalled();
+      expect(setTenantSanityTokenMock).not.toHaveBeenCalled();
+    });
+
+    it('throws when the Sanity project has not been created yet', async () => {
+      const tenant = baseTenant({ sanityProjectId: null });
+
+      await expect(
+        persistTenantSanityToken(tenant, env, { mintReadToken }),
+      ).rejects.toThrow(/has no Sanity project yet/);
+    });
   });
 
   it('mints a viewer-scoped token and persists it', async () => {

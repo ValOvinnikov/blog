@@ -19,8 +19,14 @@ afterEach(async () => {
 });
 
 describe(listBookmarks, () => {
-  it("returns only the given tenant and user's bookmarks", async () => {
+  let tenantId: string;
+
+  beforeEach(async () => {
     await insertTestUser(db(), { id: 'user-1' });
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
+  it("returns only the given tenant and user's bookmarks", async () => {
     await insertTestUser(db(), { id: 'user-2' });
     const { id: tenantOneId } = await insertTestTenant(db());
     const { id: tenantTwoId } = await insertTestTenant(db());
@@ -38,8 +44,6 @@ describe(listBookmarks, () => {
   });
 
   it('orders results by most recently bookmarked first', async () => {
-    await insertTestUser(db(), { id: 'user-1' });
-    const { id: tenantId } = await insertTestTenant(db());
     await db()
       .insert(schema.bookmarks)
       .values([
@@ -66,9 +70,6 @@ describe(listBookmarks, () => {
   });
 
   it('returns an empty array when the user has no bookmarks', async () => {
-    await insertTestUser(db(), { id: 'user-1' });
-    const { id: tenantId } = await insertTestTenant(db());
-
     expect(await listBookmarks(tenantId, 'user-1')).toEqual([]);
   });
 });
