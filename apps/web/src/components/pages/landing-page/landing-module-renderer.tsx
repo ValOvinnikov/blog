@@ -3,7 +3,8 @@ import type {
   TMaybeUndefined,
   TPageLandingType,
 } from '@blog/config';
-import type { TModule } from '@blog/service';
+import type { TLandingSectionNavigation, TModule } from '@blog/service';
+import { SectionNavigation } from '@web/components/features/landing/section-navigation';
 import { PageHeading } from '@web/components/shared/page-heading';
 import { ContentModule } from '@web/modules/content/content-module';
 import { CtaModule } from '@web/modules/cta/cta-module';
@@ -30,6 +31,8 @@ import { TeamModule } from '@web/modules/team/team-module';
 import { TestimonialModule } from '@web/modules/testimonial/testimonial-module';
 import { TimelineModule } from '@web/modules/timeline/timeline-module';
 import type { ReactNode } from 'react';
+
+import { landingPageVariants } from './landing-page-variants';
 
 const LANDING_MAP: Partial<Record<TPageLandingType, TModuleComponent>> = {
   module_heroBlog: HeroBlogModule,
@@ -58,22 +61,42 @@ export interface ILandingModuleRendererProps {
   headingBlock: THeadingBlock;
   modules: TModule<TPageLandingType>[];
   landingPage: { id: string; path: string };
+  sectionNavigation?: TLandingSectionNavigation;
 }
+
+const s = landingPageVariants();
 
 export const LandingModuleRenderer = async ({
   hero,
   headingBlock,
   modules,
   landingPage,
+  sectionNavigation,
 }: ILandingModuleRendererProps): Promise<ReactNode> => {
   const heroNode = hero
     ? await renderHeroModule({ hero, map: LANDING_MAP })
     : null;
+  const content = (
+    <>
+      {heroNode}
+      {renderModules({ modules, map: LANDING_MAP, context: { landingPage } })}
+    </>
+  );
 
   return (
     <>
-      {heroNode ?? <PageHeading headingBlock={headingBlock} />}
-      {renderModules({ modules, map: LANDING_MAP, context: { landingPage } })}
+      {heroNode ? null : <PageHeading headingBlock={headingBlock} />}
+      {sectionNavigation ? (
+        <div className={s.layout()}>
+          <SectionNavigation
+            className={s.sidebar()}
+            sectionNavigation={sectionNavigation}
+          />
+          <div className={s.content()}>{content}</div>
+        </div>
+      ) : (
+        content
+      )}
     </>
   );
 };

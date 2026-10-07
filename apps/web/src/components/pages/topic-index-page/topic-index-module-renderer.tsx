@@ -45,9 +45,7 @@ export const TopicIndexModuleRenderer = async ({
 
   return (
     <>
-      {heroNode ?? (
-        <PageHeading headingBlock={headingBlock} hasTrailingSpace={false} />
-      )}
+      {heroNode ?? <PageHeading headingBlock={headingBlock} />}
       {renderModules({ modules, map: TOPIC_INDEX_MAP })}
     </>
   );
