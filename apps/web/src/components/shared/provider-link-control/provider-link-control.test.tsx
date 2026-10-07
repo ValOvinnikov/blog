@@ -1,4 +1,4 @@
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, screen, waitFor } from '@web/testing/custom-render';
 import { useRouter } from 'next/navigation';
 
@@ -52,135 +52,136 @@ const setup = customRender(ProviderLinkControl, {
   action: 'link' as const,
 });
 
+let user: UserEvent;
+
 describe(`<${ProviderLinkControl.name}/>`, () => {
   beforeEach(() => {
     routerRefreshMock.mockReset();
     signInMock.mockReset();
     unlinkProviderActionMock.mockReset();
     toastPromiseMock.mockImplementation((promise: Promise<unknown>) => promise);
+    user = userEvent.setup();
   });
 
-  it('renders the link button copy for the "link" action', () => {
-    setup();
+  describe('link action', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    expect(screen.getByRole('button', { name: 'Link' })).toBeVisible();
-  });
+    it('renders the link button copy for the "link" action', () => {
+      expect(screen.getByRole('button', { name: 'Link' })).toBeVisible();
+    });
 
-  it('renders the unlink button copy for the "unlink" action', () => {
-    setup({ action: 'unlink' });
+    it('calls signIn with the provider and the /account redirect on "link"', async () => {
+      signInMock.mockResolvedValue(undefined);
 
-    expect(screen.getByRole('button', { name: 'Unlink' })).toBeVisible();
-  });
+      await user.click(screen.getByRole('button', { name: 'Link' }));
 
-  it('calls signIn with the provider and the /account redirect on "link"', async () => {
-    signInMock.mockResolvedValue(undefined);
-    const user = userEvent.setup();
-    setup();
+      await waitFor(() => {
+        expect(signInMock).toHaveBeenCalledWith('github', {
+          redirectTo: '/account',
+        });
+      });
+    });
 
-    await user.click(screen.getByRole('button', { name: 'Link' }));
+    it('marks the button aria-busy while the "link" action is pending', async () => {
+      let resolveSignIn!: () => void;
+      signInMock.mockImplementation(
+        () =>
+          new Promise<void>((resolve) => {
+            resolveSignIn = resolve;
+          }),
+      );
 
-    await waitFor(() => {
-      expect(signInMock).toHaveBeenCalledWith('github', {
-        redirectTo: '/account',
+      const button = screen.getByRole('button', { name: 'Link' });
+      await user.click(button);
+
+      await waitFor(() => {
+        expect(button).toHaveAttribute('aria-busy', 'true');
+      });
+
+      resolveSignIn();
+
+      await waitFor(() => {
+        expect(button).toHaveAttribute('aria-busy', 'false');
       });
     });
   });
 
-  it('runs unlinkProviderAction through toast.promise and refreshes the router on success', async () => {
-    unlinkProviderActionMock.mockResolvedValue({ ok: true });
-    const user = userEvent.setup();
-    setup({ action: 'unlink' });
-
-    await user.click(screen.getByRole('button', { name: 'Unlink' }));
-
-    await waitFor(() => {
-      expect(unlinkProviderActionMock).toHaveBeenCalledWith('github');
-    });
-    await waitFor(() => {
-      expect(routerRefreshMock).toHaveBeenCalledTimes(1);
+  describe('unlink action', () => {
+    beforeEach(() => {
+      setup({ action: 'unlink' });
     });
 
-    expect(toastPromiseMock).toHaveBeenCalledWith(
-      expect.any(Promise),
-      expect.objectContaining({
-        loading: { message: 'Unlinking your account…' },
-        success: { message: 'Account unlinked.' },
-      }),
-    );
-  });
-
-  it('does not refresh the router when unlinking fails generically', async () => {
-    unlinkProviderActionMock.mockResolvedValue({
-      ok: false,
-      reason: 'unknown',
+    it('renders the unlink button copy for the "unlink" action', () => {
+      expect(screen.getByRole('button', { name: 'Unlink' })).toBeVisible();
     });
-    const user = userEvent.setup();
-    setup({ action: 'unlink' });
 
-    await user.click(screen.getByRole('button', { name: 'Unlink' }));
+    it('runs unlinkProviderAction through toast.promise and refreshes the router on success', async () => {
+      unlinkProviderActionMock.mockResolvedValue({ ok: true });
 
-    await waitFor(() => {
-      expect(toastPromiseMock).toHaveBeenCalled();
-    });
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Unlink' })).toHaveAttribute(
-        'aria-busy',
-        'false',
+      await user.click(screen.getByRole('button', { name: 'Unlink' }));
+
+      await waitFor(() => {
+        expect(unlinkProviderActionMock).toHaveBeenCalledWith('github');
+      });
+      await waitFor(() => {
+        expect(routerRefreshMock).toHaveBeenCalledTimes(1);
+      });
+
+      expect(toastPromiseMock).toHaveBeenCalledWith(
+        expect.any(Promise),
+        expect.objectContaining({
+          loading: { message: 'Unlinking your account…' },
+          success: { message: 'Account unlinked.' },
+        }),
       );
     });
-    expect(routerRefreshMock).not.toHaveBeenCalled();
 
-    const [, messages] = toastPromiseMock.mock
-      .calls[0] as unknown as TToastPromiseCallArgs;
-    expect(messages.error(new Error('unknown')).message).toBe(
-      "Couldn't unlink. Try again.",
-    );
-  });
+    it('does not refresh the router when unlinking fails generically', async () => {
+      unlinkProviderActionMock.mockResolvedValue({
+        ok: false,
+        reason: 'unknown',
+      });
 
-  it('surfaces a distinct message when the server rejects the last remaining method', async () => {
-    unlinkProviderActionMock.mockResolvedValue({
-      ok: false,
-      reason: 'last-method',
-    });
-    const user = userEvent.setup();
-    setup({ action: 'unlink' });
+      await user.click(screen.getByRole('button', { name: 'Unlink' }));
 
-    await user.click(screen.getByRole('button', { name: 'Unlink' }));
+      await waitFor(() => {
+        expect(toastPromiseMock).toHaveBeenCalled();
+      });
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: 'Unlink' })).toHaveAttribute(
+          'aria-busy',
+          'false',
+        );
+      });
+      expect(routerRefreshMock).not.toHaveBeenCalled();
 
-    await waitFor(() => {
-      expect(toastPromiseMock).toHaveBeenCalled();
-    });
-
-    const [, messages] = toastPromiseMock.mock
-      .calls[0] as unknown as TToastPromiseCallArgs;
-    expect(messages.error(new Error('last-method')).message).toBe(
-      "That's your only remaining sign-in method — link another before unlinking this one.",
-    );
-    expect(routerRefreshMock).not.toHaveBeenCalled();
-  });
-
-  it('marks the button aria-busy while the "link" action is pending', async () => {
-    let resolveSignIn!: () => void;
-    signInMock.mockImplementation(
-      () =>
-        new Promise<void>((resolve) => {
-          resolveSignIn = resolve;
-        }),
-    );
-    const user = userEvent.setup();
-    setup();
-
-    const button = screen.getByRole('button', { name: 'Link' });
-    await user.click(button);
-
-    await waitFor(() => {
-      expect(button).toHaveAttribute('aria-busy', 'true');
+      const [, messages] = toastPromiseMock.mock
+        .calls[0] as unknown as TToastPromiseCallArgs;
+      expect(messages.error(new Error('unknown')).message).toBe(
+        "Couldn't unlink. Try again.",
+      );
     });
 
-    resolveSignIn();
+    it('surfaces a distinct message when the server rejects the last remaining method', async () => {
+      unlinkProviderActionMock.mockResolvedValue({
+        ok: false,
+        reason: 'last-method',
+      });
 
-    await waitFor(() => {
-      expect(button).toHaveAttribute('aria-busy', 'false');
+      await user.click(screen.getByRole('button', { name: 'Unlink' }));
+
+      await waitFor(() => {
+        expect(toastPromiseMock).toHaveBeenCalled();
+      });
+
+      const [, messages] = toastPromiseMock.mock
+        .calls[0] as unknown as TToastPromiseCallArgs;
+      expect(messages.error(new Error('last-method')).message).toBe(
+        "That's your only remaining sign-in method — link another before unlinking this one.",
+      );
+      expect(routerRefreshMock).not.toHaveBeenCalled();
     });
   });
 });

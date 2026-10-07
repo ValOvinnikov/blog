@@ -4,6 +4,7 @@ import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { notFound, redirect } from 'next/navigation';
+import type { MockInstance } from 'vitest';
 
 import { HomePage } from './home-page';
 
@@ -48,30 +49,39 @@ describe(`<${HomePage.name}/>`, () => {
     vi.mocked(getRequestContext).mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
   });
 
-  it('calls notFound() and logs when the fetch fails', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getHomePageMock.mockResolvedValue({ ok: false, error: new Error('boom') });
+  describe('when the page cannot be rendered', () => {
+    let errorSpy: MockInstance<typeof console.error>;
 
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+    beforeEach(() => {
+      errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    });
 
-    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('home_page.fetch_failed'),
-    );
+    afterEach(() => {
+      errorSpy.mockRestore();
+    });
 
-    errorSpy.mockRestore();
-  });
+    it('calls notFound() and logs when the fetch fails', async () => {
+      getHomePageMock.mockResolvedValue({
+        ok: false,
+        error: new Error('boom'),
+      });
 
-  it('calls notFound() without logging when the home page simply does not exist', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getHomePageMock.mockResolvedValue({ ok: true, data: undefined });
+      await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
 
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+      expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+      expect(errorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('home_page.fetch_failed'),
+      );
+    });
 
-    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    expect(errorSpy).not.toHaveBeenCalled();
+    it('calls notFound() without logging when the home page simply does not exist', async () => {
+      getHomePageMock.mockResolvedValue({ ok: true, data: undefined });
 
-    errorSpy.mockRestore();
+      await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+
+      expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+      expect(errorSpy).not.toHaveBeenCalled();
+    });
   });
 
   it('redirects to / when this language has no Home of its own', async () => {
@@ -88,47 +98,39 @@ describe(`<${HomePage.name}/>`, () => {
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 
-  it('renders through PageShell: the module renderer inside a single main landmark', async () => {
-    getHomePageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        headingBlock: makeHeadingBlock({ heading: 'Welcome to the blog' }),
-        hero: { id: 'hero-1', type: 'module_hero' },
-        modules: [{ id: 'module-1', type: 'module_content' }],
-        faqs: [],
-      },
+  describe('with a hero and modules', () => {
+    beforeEach(async () => {
+      getHomePageMock.mockResolvedValue({
+        ok: true,
+        data: {
+          headingBlock: makeHeadingBlock({ heading: 'Welcome to the blog' }),
+          hero: { id: 'hero-1', type: 'module_hero' },
+          modules: [{ id: 'module-1', type: 'module_content' }],
+          faqs: [],
+        },
+      });
+
+      await setup();
     });
 
-    await setup();
-
-    const main = screen.getByRole('main');
-    expect(main).toContainElement(screen.getByTestId('home-module-renderer'));
-  });
-
-  it('dispatches HomeModuleRenderer with the fetched hero, heading, and modules', async () => {
-    getHomePageMock.mockResolvedValue({
-      ok: true,
-      data: {
-        headingBlock: makeHeadingBlock({ heading: 'Welcome to the blog' }),
-        hero: { id: 'hero-1', type: 'module_hero' },
-        modules: [{ id: 'module-1', type: 'module_content' }],
-        faqs: [],
-      },
+    it('renders through PageShell: the module renderer inside a single main landmark', () => {
+      const main = screen.getByRole('main');
+      expect(main).toContainElement(screen.getByTestId('home-module-renderer'));
     });
 
-    await setup();
-
-    expect(homeModuleRendererMock).toHaveBeenCalledWith(
-      {
-        hero: { id: 'hero-1', type: 'module_hero' },
-        headingBlock: makeHeadingBlock({ heading: 'Welcome to the blog' }),
-        modules: [{ id: 'module-1', type: 'module_content' }],
-      },
-      undefined,
-    );
-    expect(screen.getByTestId('home-module-renderer')).toHaveTextContent(
-      'hero-1 — 1 modules',
-    );
+    it('dispatches HomeModuleRenderer with the fetched hero, heading, and modules', () => {
+      expect(homeModuleRendererMock).toHaveBeenCalledWith(
+        {
+          hero: { id: 'hero-1', type: 'module_hero' },
+          headingBlock: makeHeadingBlock({ heading: 'Welcome to the blog' }),
+          modules: [{ id: 'module-1', type: 'module_content' }],
+        },
+        undefined,
+      );
+      expect(screen.getByTestId('home-module-renderer')).toHaveTextContent(
+        'hero-1 — 1 modules',
+      );
+    });
   });
 
   it('dispatches HomeModuleRenderer with no hero when the page has none', async () => {

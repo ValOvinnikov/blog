@@ -83,9 +83,13 @@ describe(createToastStore, () => {
   });
 
   describe('show', () => {
-    it('enqueues a new toast in the entering phase with a numeric life', () => {
-      const store = createToastStore();
+    let store: ReturnType<typeof createToastStore>;
 
+    beforeEach(() => {
+      store = createToastStore();
+    });
+
+    it('enqueues a new toast in the entering phase with a numeric life', () => {
       const id = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
 
       expect(store.getState().visible).toHaveLength(1);
@@ -105,7 +109,6 @@ describe(createToastStore, () => {
     it('gives warning a longer life than success and leaves error sticky', () => {
       const warningLifeMs = measureDefaultLifeMs(TOAST_TYPE.WARNING);
       const successLifeMs = measureDefaultLifeMs(TOAST_TYPE.SUCCESS);
-      const store = createToastStore();
 
       store.actions.show(TOAST_TYPE.ERROR, buildPayload());
 
@@ -114,8 +117,6 @@ describe(createToastStore, () => {
     });
 
     it('honors an explicit durationMs override', () => {
-      const store = createToastStore();
-
       store.actions.show(
         TOAST_TYPE.SUCCESS,
         buildPayload({ durationMs: 1000 }),
@@ -125,7 +126,6 @@ describe(createToastStore, () => {
     });
 
     it('auto-dismisses after its life elapses, entering leaving then removed', () => {
-      const store = createToastStore();
       const id = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
 
       vi.advanceTimersToNextTimer();
@@ -138,7 +138,6 @@ describe(createToastStore, () => {
     });
 
     it('never auto-dismisses an error toast', () => {
-      const store = createToastStore();
       const id = store.actions.show(TOAST_TYPE.ERROR, buildPayload());
 
       vi.runAllTimers();
@@ -150,8 +149,13 @@ describe(createToastStore, () => {
   });
 
   describe('cap and eviction', () => {
+    let store: ReturnType<typeof createToastStore>;
+
+    beforeEach(() => {
+      store = createToastStore();
+    });
+
     it('evicts the oldest non-error toast once one more than the cap is shown', () => {
-      const store = createToastStore();
       const cap = discoverQueueCap();
       const ids = fillVisibleToCap(store, TOAST_TYPE.INFO, cap);
 
@@ -167,7 +171,6 @@ describe(createToastStore, () => {
     });
 
     it('queues a new toast instead of evicting when every visible slot is an error', () => {
-      const store = createToastStore();
       const cap = discoverQueueCap();
       fillVisibleToCap(store, TOAST_TYPE.ERROR, cap);
 
@@ -181,7 +184,6 @@ describe(createToastStore, () => {
     });
 
     it('promotes the oldest pending toast once a visible slot frees up', () => {
-      const store = createToastStore();
       const cap = discoverQueueCap();
       const errorIds = fillVisibleToCap(store, TOAST_TYPE.ERROR, cap);
       const queuedId = store.actions.show(TOAST_TYPE.INFO, buildPayload());
@@ -196,8 +198,13 @@ describe(createToastStore, () => {
   });
 
   describe('coalescing', () => {
+    let store: ReturnType<typeof createToastStore>;
+
+    beforeEach(() => {
+      store = createToastStore();
+    });
+
     it('toggle-collapse: a second call with the same coalesceKey replaces the toast in place', () => {
-      const store = createToastStore();
       const key = 'bookmark:post-1';
 
       const firstId = store.actions.show(
@@ -219,7 +226,6 @@ describe(createToastStore, () => {
 
     it('toggle-collapse resets the timer to the fresh full duration', () => {
       const lifeMs = measureDefaultLifeMs(TOAST_TYPE.SUCCESS);
-      const store = createToastStore();
       const key = 'bookmark:post-1';
 
       const id = store.actions.show(
@@ -245,8 +251,6 @@ describe(createToastStore, () => {
     });
 
     it('counter-merge: identical success toasts within the merge window collapse with an incrementing count', () => {
-      const store = createToastStore();
-
       const firstId = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
       vi.advanceTimersByTime(100);
       const secondId = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
@@ -259,7 +263,6 @@ describe(createToastStore, () => {
     });
 
     it('counter-merge while paused un-pauses and re-arms a fresh full-duration timer', () => {
-      const store = createToastStore();
       const id = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
       store.actions.pause(id);
       expect(store.getState().visible[0]!.paused).toBe(true);
@@ -278,8 +281,6 @@ describe(createToastStore, () => {
     });
 
     it('does not merge once a long delay has elapsed', () => {
-      const store = createToastStore();
-
       store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
       vi.setSystemTime(Date.now() + 60 * 60 * 1000);
       store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
@@ -288,8 +289,6 @@ describe(createToastStore, () => {
     });
 
     it('never merges error toasts, even when identical within the window', () => {
-      const store = createToastStore();
-
       store.actions.show(TOAST_TYPE.ERROR, buildPayload());
       store.actions.show(TOAST_TYPE.ERROR, buildPayload());
 
@@ -301,9 +300,14 @@ describe(createToastStore, () => {
   });
 
   describe('pause / resume', () => {
+    let store: ReturnType<typeof createToastStore>;
+
+    beforeEach(() => {
+      store = createToastStore();
+    });
+
     it('pauses the auto-dismiss timer and resumes from the exact remaining time', () => {
       const lifeMs = measureDefaultLifeMs(TOAST_TYPE.SUCCESS);
-      const store = createToastStore();
       const id = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
 
       vi.advanceTimersByTime(1000);
@@ -330,7 +334,6 @@ describe(createToastStore, () => {
     });
 
     it('is a no-op to pause an already-paused toast or resume a running one', () => {
-      const store = createToastStore();
       const id = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
 
       store.actions.resume(id);
@@ -347,8 +350,13 @@ describe(createToastStore, () => {
   });
 
   describe('dismiss', () => {
+    let store: ReturnType<typeof createToastStore>;
+
+    beforeEach(() => {
+      store = createToastStore();
+    });
+
     it('dismisses the given id', () => {
-      const store = createToastStore();
       const id = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
 
       store.actions.dismiss(id);
@@ -358,7 +366,6 @@ describe(createToastStore, () => {
     });
 
     it('dismisses the newest toast when no id is given', () => {
-      const store = createToastStore();
       store.actions.show(
         TOAST_TYPE.SUCCESS,
         buildPayload({ message: 'first' }),
@@ -377,7 +384,6 @@ describe(createToastStore, () => {
     });
 
     it('removes a pending (not-yet-visible) toast without a leave animation', () => {
-      const store = createToastStore();
       const cap = discoverQueueCap();
       fillVisibleToCap(store, TOAST_TYPE.ERROR, cap);
       const queuedId = store.actions.show(TOAST_TYPE.INFO, buildPayload());
@@ -388,15 +394,18 @@ describe(createToastStore, () => {
     });
 
     it('is a no-op when the queue is empty', () => {
-      const store = createToastStore();
-
       expect(() => store.actions.dismiss()).not.toThrow();
     });
   });
 
   describe('markEntered', () => {
+    let store: ReturnType<typeof createToastStore>;
+
+    beforeEach(() => {
+      store = createToastStore();
+    });
+
     it('flips an entering toast to visible', () => {
-      const store = createToastStore();
       const id = store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
 
       store.actions.markEntered(id);
@@ -408,97 +417,114 @@ describe(createToastStore, () => {
   });
 
   describe('promise', () => {
-    it('shows the resolved toast directly, skipping loading, when the promise settles before the grace period', async () => {
-      const store = createToastStore();
-      const deferred = Promise.resolve('~/bookmarks');
+    describe('with a fresh store', () => {
+      let store: ReturnType<typeof createToastStore>;
 
-      const returned = store.actions.promise(deferred, {
-        loading: { title: 'Saving', message: 'saving…' },
-        success: (value) => ({
+      beforeEach(() => {
+        store = createToastStore();
+      });
+
+      it('shows the resolved toast directly, skipping loading, when the promise settles before the grace period', async () => {
+        const deferred = Promise.resolve('~/bookmarks');
+
+        const returned = store.actions.promise(deferred, {
+          loading: { title: 'Saving', message: 'saving…' },
+          success: (value) => ({
+            title: 'Saved',
+            message: `stashed to ${value}`,
+          }),
+          error: { title: 'Failed', message: '! failed' },
+        });
+
+        expect(returned).toBe(deferred);
+        await deferred;
+        await vi.advanceTimersByTimeAsync(0);
+
+        expect(store.getState().visible).toHaveLength(1);
+        expect(store.getState().visible[0]).toMatchObject({
+          type: TOAST_TYPE.SUCCESS,
+          message: 'stashed to ~/bookmarks',
+        });
+      });
+
+      it('swaps the loading toast to error on reject', async () => {
+        let rejectPromise!: (reason: unknown) => void;
+        const pending = new Promise<string>((_resolve, reject) => {
+          rejectPromise = reject;
+        });
+
+        const returned = store.actions.promise(pending, {
+          loading: { title: 'Saving', message: 'saving…' },
+          success: { title: 'Saved', message: 'saved' },
+          error: { title: 'Failed', message: '! failed' },
+        });
+        returned.catch(() => {});
+
+        await vi.advanceTimersToNextTimerAsync();
+        rejectPromise(new Error('network error'));
+        await vi.advanceTimersByTimeAsync(0);
+
+        expect(store.getState().visible[0]).toMatchObject({
+          type: TOAST_TYPE.ERROR,
+          isLoading: false,
+          title: 'Failed',
+          durationMs: undefined,
+        });
+      });
+    });
+
+    describe('with a loading toast on screen', () => {
+      let store: ReturnType<typeof createToastStore>;
+      let resolvePromise: (value: string) => void;
+      let loadingId: string;
+
+      beforeEach(async () => {
+        ({ store, resolvePromise, loadingId } = await createLoadingToast());
+      });
+
+      it('shows a loading toast after the grace period, then swaps it in place on resolve', async () => {
+        expect(store.getState().visible).toHaveLength(1);
+        expect(store.getState().visible[0]).toMatchObject({
+          type: TOAST_TYPE.INFO,
+          isLoading: true,
+          durationMs: undefined,
+        });
+
+        resolvePromise('done');
+        await vi.advanceTimersByTimeAsync(0);
+
+        expect(store.getState().visible).toHaveLength(1);
+        expect(store.getState().visible[0]).toMatchObject({
+          id: loadingId,
+          type: TOAST_TYPE.SUCCESS,
+          isLoading: false,
           title: 'Saved',
-          message: `stashed to ${value}`,
-        }),
-        error: { title: 'Failed', message: '! failed' },
+        });
+        expect(store.getState().visible[0]!.durationMs).toEqual(
+          expect.any(Number),
+        );
       });
 
-      expect(returned).toBe(deferred);
-      await deferred;
-      await vi.advanceTimersByTimeAsync(0);
+      it('does not resurrect a loading toast the reader already dismissed before it settled', async () => {
+        store.actions.dismiss(loadingId);
+        await vi.advanceTimersToNextTimerAsync();
+        expect(store.getState().visible).toHaveLength(0);
 
-      expect(store.getState().visible).toHaveLength(1);
-      expect(store.getState().visible[0]).toMatchObject({
-        type: TOAST_TYPE.SUCCESS,
-        message: 'stashed to ~/bookmarks',
+        resolvePromise('done');
+        await vi.advanceTimersByTimeAsync(0);
+
+        expect(store.getState().visible).toHaveLength(0);
       });
-    });
-
-    it('shows a loading toast after the grace period, then swaps it in place on resolve', async () => {
-      const { store, resolvePromise, loadingId } = await createLoadingToast();
-      expect(store.getState().visible).toHaveLength(1);
-      expect(store.getState().visible[0]).toMatchObject({
-        type: TOAST_TYPE.INFO,
-        isLoading: true,
-        durationMs: undefined,
-      });
-
-      resolvePromise('done');
-      await vi.advanceTimersByTimeAsync(0);
-
-      expect(store.getState().visible).toHaveLength(1);
-      expect(store.getState().visible[0]).toMatchObject({
-        id: loadingId,
-        type: TOAST_TYPE.SUCCESS,
-        isLoading: false,
-        title: 'Saved',
-      });
-      expect(store.getState().visible[0]!.durationMs).toEqual(
-        expect.any(Number),
-      );
-    });
-
-    it('swaps the loading toast to error on reject', async () => {
-      const store = createToastStore();
-      let rejectPromise!: (reason: unknown) => void;
-      const pending = new Promise<string>((_resolve, reject) => {
-        rejectPromise = reject;
-      });
-
-      const returned = store.actions.promise(pending, {
-        loading: { title: 'Saving', message: 'saving…' },
-        success: { title: 'Saved', message: 'saved' },
-        error: { title: 'Failed', message: '! failed' },
-      });
-      returned.catch(() => {});
-
-      await vi.advanceTimersToNextTimerAsync();
-      rejectPromise(new Error('network error'));
-      await vi.advanceTimersByTimeAsync(0);
-
-      expect(store.getState().visible[0]).toMatchObject({
-        type: TOAST_TYPE.ERROR,
-        isLoading: false,
-        title: 'Failed',
-        durationMs: undefined,
-      });
-    });
-
-    it('does not resurrect a loading toast the reader already dismissed before it settled', async () => {
-      const { store, resolvePromise, loadingId } = await createLoadingToast();
-
-      store.actions.dismiss(loadingId);
-      await vi.advanceTimersToNextTimerAsync();
-      expect(store.getState().visible).toHaveLength(0);
-
-      resolvePromise('done');
-      await vi.advanceTimersByTimeAsync(0);
-
-      expect(store.getState().visible).toHaveLength(0);
     });
   });
-
   describe('destroy', () => {
+    let store: ReturnType<typeof createToastStore>;
+
+    beforeEach(() => {
+      store = createToastStore();
+    });
+
     it('clears pending timers so they never fire after teardown', () => {
-      const store = createToastStore();
       store.actions.show(TOAST_TYPE.SUCCESS, buildPayload());
       const listener = vi.fn();
       store.subscribe(listener);

@@ -72,91 +72,91 @@ describe(`<${BackToTopButton.name}/>`, () => {
     vi.unstubAllGlobals();
   });
 
-  it('is hidden while scrolled less than one viewport height', () => {
-    setup();
+  describe('once rendered', () => {
+    let unmount: () => void;
 
-    const button = screen.getByRole('button', {
-      hidden: true,
-      name: 'Back to top',
+    beforeEach(() => {
+      ({ unmount } = setup());
     });
 
-    expect(button).toHaveAttribute('inert');
-  });
+    it('is hidden while scrolled less than one viewport height', () => {
+      const button = screen.getByRole('button', {
+        hidden: true,
+        name: 'Back to top',
+      });
 
-  it('becomes visible once scrolled past one viewport height', () => {
-    setup();
-
-    setScrollY(window.innerHeight + 1);
-    fireScroll();
-
-    expect(screen.getByRole('button', { name: 'Back to top' })).toBeVisible();
-  });
-
-  it('smooth-scrolls to the top on click', async () => {
-    const scrollTo = vi.fn();
-    window.scrollTo = scrollTo;
-    setup();
-
-    setScrollY(window.innerHeight + 1);
-    fireScroll();
-
-    await userEvent
-      .setup()
-      .click(screen.getByRole('button', { name: 'Back to top' }));
-
-    expect(scrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'smooth' });
-  });
-
-  it('removes the scroll listener on unmount', () => {
-    const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
-
-    const { unmount } = setup();
-    unmount();
-
-    expect(removeEventListenerSpy).toHaveBeenCalledWith(
-      'scroll',
-      expect.any(Function),
-    );
-  });
-
-  it('hides once the footer scrolls into view, even past one viewport height', () => {
-    setup();
-
-    setScrollY(window.innerHeight + 1);
-    fireScroll();
-    expect(screen.getByRole('button', { name: 'Back to top' })).toBeVisible();
-
-    act(() => {
-      getObserver().trigger(true);
+      expect(button).toHaveAttribute('inert');
     });
 
-    expect(
-      screen.getByRole('button', { hidden: true, name: 'Back to top' }),
-    ).toHaveAttribute('inert');
-  });
+    it('removes the scroll listener on unmount', () => {
+      const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
 
-  it('reappears once the footer scrolls back out of view', () => {
-    setup();
+      unmount();
 
-    setScrollY(window.innerHeight + 1);
-    fireScroll();
-    act(() => {
-      getObserver().trigger(true);
-    });
-    act(() => {
-      getObserver().trigger(false);
+      expect(removeEventListenerSpy).toHaveBeenCalledWith(
+        'scroll',
+        expect.any(Function),
+      );
     });
 
-    expect(screen.getByRole('button', { name: 'Back to top' })).toBeVisible();
-  });
+    it('disconnects the footer observer on unmount', () => {
+      const disconnectSpy = vi.spyOn(getObserver(), 'disconnect');
 
-  it('disconnects the footer observer on unmount', () => {
-    const { unmount } = setup();
-    const disconnectSpy = vi.spyOn(getObserver(), 'disconnect');
+      unmount();
 
-    unmount();
+      expect(disconnectSpy).toHaveBeenCalled();
+    });
 
-    expect(disconnectSpy).toHaveBeenCalled();
+    describe('scrolled past one viewport height', () => {
+      beforeEach(() => {
+        setScrollY(window.innerHeight + 1);
+        fireScroll();
+      });
+
+      it('becomes visible once scrolled past one viewport height', () => {
+        expect(
+          screen.getByRole('button', { name: 'Back to top' }),
+        ).toBeVisible();
+      });
+
+      it('smooth-scrolls to the top on click', async () => {
+        const scrollTo = vi.fn();
+        window.scrollTo = scrollTo;
+
+        await userEvent
+          .setup()
+          .click(screen.getByRole('button', { name: 'Back to top' }));
+
+        expect(scrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'smooth' });
+      });
+
+      it('hides once the footer scrolls into view, even past one viewport height', () => {
+        expect(
+          screen.getByRole('button', { name: 'Back to top' }),
+        ).toBeVisible();
+
+        act(() => {
+          getObserver().trigger(true);
+        });
+
+        expect(
+          screen.getByRole('button', { hidden: true, name: 'Back to top' }),
+        ).toHaveAttribute('inert');
+      });
+
+      it('reappears once the footer scrolls back out of view', () => {
+        act(() => {
+          getObserver().trigger(true);
+        });
+        act(() => {
+          getObserver().trigger(false);
+        });
+
+        expect(
+          screen.getByRole('button', { name: 'Back to top' }),
+        ).toBeVisible();
+      });
+    });
   });
 
   it('observes the site footer by test id, not an earlier in-DOM article footer', () => {

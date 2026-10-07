@@ -33,6 +33,10 @@ describe(getVoiceRich, () => {
     getSiteConfigMock.mockReset();
     getMessagesMock.mockReset();
     getMessagesMock.mockResolvedValue(BASE_MESSAGES);
+    getSiteConfigMock.mockResolvedValue({
+      ok: true,
+      data: { voiceOverrides: {} },
+    });
   });
 
   it('returns the stored override for the given field id', async () => {
@@ -48,11 +52,6 @@ describe(getVoiceRich, () => {
   });
 
   it('falls back to the catalog default wrapped as one paragraph when there is no override', async () => {
-    getSiteConfigMock.mockResolvedValue({
-      ok: true,
-      data: { voiceOverrides: {} },
-    });
-
     const result = await getVoiceRich('blogListEmpty');
 
     expect(result[0]?.children[0]?.text).toBe('No posts yet.');
@@ -70,11 +69,6 @@ describe(getVoiceRich, () => {
   });
 
   it('forwards an explicitly supplied tenant to getSiteConfig', async () => {
-    getSiteConfigMock.mockResolvedValue({
-      ok: true,
-      data: { voiceOverrides: {} },
-    });
-
     await getVoiceRich('blogListEmpty', 'tenant-2');
 
     expect(getSiteConfigMock).toHaveBeenCalledWith('tenant-2');

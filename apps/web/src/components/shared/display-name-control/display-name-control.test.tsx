@@ -1,4 +1,4 @@
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, screen, waitFor } from '@web/testing/custom-render';
 import { useRouter } from 'next/navigation';
 
@@ -41,16 +41,18 @@ const setup = customRender(DisplayNameControl, {
   image: null,
 });
 
+let user: UserEvent;
+
 describe(`<${DisplayNameControl.name}/>`, () => {
   beforeEach(() => {
     routerRefreshMock.mockReset();
     updateDisplayNameActionMock.mockReset();
     toastPromiseMock.mockImplementation((promise: Promise<unknown>) => promise);
+    user = userEvent.setup();
+    setup();
   });
 
   it('renders the current display name in the field and avatar initials', () => {
-    setup();
-
     expect(screen.getByRole('textbox', { name: 'Display name' })).toHaveValue(
       'Jane Doe',
     );
@@ -60,9 +62,6 @@ describe(`<${DisplayNameControl.name}/>`, () => {
 
   it('saves the edited name through toast.promise and refreshes the router on success', async () => {
     updateDisplayNameActionMock.mockResolvedValue({ ok: true });
-    const user = userEvent.setup();
-    setup();
-
     const input = screen.getByRole('textbox', { name: 'Display name' });
     await user.clear(input);
     await user.type(input, 'New Name');
@@ -83,9 +82,6 @@ describe(`<${DisplayNameControl.name}/>`, () => {
   });
 
   it('disables the save button when the name is cleared to empty', async () => {
-    const user = userEvent.setup();
-    setup();
-
     const input = screen.getByRole('textbox', { name: 'Display name' });
     await user.clear(input);
 
@@ -95,9 +91,6 @@ describe(`<${DisplayNameControl.name}/>`, () => {
 
   it('does not refresh the router when the save fails', async () => {
     updateDisplayNameActionMock.mockResolvedValue({ ok: false });
-    const user = userEvent.setup();
-    setup();
-
     await user.click(screen.getByRole('button', { name: 'Save' }));
 
     await waitFor(() => {

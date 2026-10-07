@@ -54,9 +54,6 @@ describe(`<${PostRelatedModule.name}/>`, () => {
     getRequestContextMock.mockReset();
     getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
     loggerWarnMock.mockReset();
-  });
-
-  it('calls getPostRelated with the module id, anchor post id and tenant context', async () => {
     getPostRelatedMock.mockResolvedValue({
       ok: true,
       data: {
@@ -68,7 +65,9 @@ describe(`<${PostRelatedModule.name}/>`, () => {
         showImages: false,
       },
     });
+  });
 
+  it('calls getPostRelated with the module id, anchor post id and tenant context', async () => {
     await setup();
 
     expect(getPostRelatedMock).toHaveBeenCalledWith(
@@ -102,18 +101,6 @@ describe(`<${PostRelatedModule.name}/>`, () => {
   });
 
   it('renders nothing when no posts resolve, never an empty labelled landmark', async () => {
-    getPostRelatedMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: 'Related reading' }),
-        posts: [],
-        layout: undefined,
-        contentAlignment: undefined,
-        showImages: false,
-      },
-    });
-
     const { container } = await setup();
 
     expect(container).toBeEmptyDOMElement();

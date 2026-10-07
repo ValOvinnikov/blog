@@ -34,14 +34,19 @@ const subscriber = {
 };
 
 describe('GET /api/newsletter/unsubscribe', () => {
-  beforeEach(() => {
+  let GET: typeof import('./route').GET;
+  let request: Request;
+
+  beforeEach(async () => {
+    request = new Request(
+      'https://example.com/api/newsletter/unsubscribe?token=unsub-token-abc',
+    );
     unsubscribeByTokenMock.mockReset();
     resolveRequestTenantMock.mockReset();
+    ({ GET } = await import('./route'));
   });
 
   it('returns 400 without touching the db when no token is given', async () => {
-    const { GET } = await import('./route');
-
     const response = await GET(
       new Request('https://example.com/api/newsletter/unsubscribe'),
     );
@@ -54,13 +59,7 @@ describe('GET /api/newsletter/unsubscribe', () => {
   });
 
   it('renders a confirmation form without touching the db for a present token', async () => {
-    const { GET } = await import('./route');
-
-    const response = await GET(
-      new Request(
-        'https://example.com/api/newsletter/unsubscribe?token=unsub-token-abc',
-      ),
-    );
+    const response = await GET(request);
     const html = await response.text();
 
     expect(response.status).toBe(200);
@@ -77,13 +76,7 @@ describe('GET /api/newsletter/unsubscribe', () => {
 
   it('declares <html lang> as the resolved request locale, not a hardcoded value', async () => {
     vi.mocked(getLocale).mockResolvedValueOnce('fr');
-    const { GET } = await import('./route');
-
-    const response = await GET(
-      new Request(
-        'https://example.com/api/newsletter/unsubscribe?token=unsub-token-abc',
-      ),
-    );
+    const response = await GET(request);
     const html = await response.text();
 
     expect(html).toContain('<html lang="fr">');
@@ -91,18 +84,28 @@ describe('GET /api/newsletter/unsubscribe', () => {
 });
 
 describe('POST /api/newsletter/unsubscribe', () => {
-  beforeEach(() => {
+  let POST: typeof import('./route').POST;
+  let request: Request;
+
+  beforeEach(async () => {
+    request = new Request(
+      'https://example.com/api/newsletter/unsubscribe?token=unsub-token-abc',
+      { method: 'POST' },
+    );
     unsubscribeByTokenMock.mockReset();
+    unsubscribeByTokenMock.mockResolvedValue({
+      outcome: 'unsubscribed',
+      subscriber,
+    });
     resolveRequestTenantMock.mockReset();
     resolveRequestTenantMock.mockResolvedValue({
       id: TENANT_ID,
       status: TENANT_STATUS.ACTIVE,
     });
+    ({ POST } = await import('./route'));
   });
 
   it('returns 400 without querying the db when no token is given', async () => {
-    const { POST } = await import('./route');
-
     const response = await POST(
       new Request('https://example.com/api/newsletter/unsubscribe', {
         method: 'POST',
@@ -116,18 +119,7 @@ describe('POST /api/newsletter/unsubscribe', () => {
   });
 
   it('unsubscribes and returns 200 for a valid token', async () => {
-    unsubscribeByTokenMock.mockResolvedValue({
-      outcome: 'unsubscribed',
-      subscriber,
-    });
-    const { POST } = await import('./route');
-
-    const response = await POST(
-      new Request(
-        'https://example.com/api/newsletter/unsubscribe?token=unsub-token-abc',
-        { method: 'POST' },
-      ),
-    );
+    const response = await POST(request);
     const html = await response.text();
 
     expect(response.status).toBe(200);
@@ -139,19 +131,8 @@ describe('POST /api/newsletter/unsubscribe', () => {
   });
 
   it('declares <html lang> as the resolved request locale, not a hardcoded value', async () => {
-    unsubscribeByTokenMock.mockResolvedValue({
-      outcome: 'unsubscribed',
-      subscriber,
-    });
     vi.mocked(getLocale).mockResolvedValueOnce('fr');
-    const { POST } = await import('./route');
-
-    const response = await POST(
-      new Request(
-        'https://example.com/api/newsletter/unsubscribe?token=unsub-token-abc',
-        { method: 'POST' },
-      ),
-    );
+    const response = await POST(request);
     const html = await response.text();
 
     expect(html).toContain('<html lang="fr">');
@@ -159,8 +140,6 @@ describe('POST /api/newsletter/unsubscribe', () => {
 
   it('renders the calm "no longer valid" page for an unknown or already-used token', async () => {
     unsubscribeByTokenMock.mockResolvedValue({ outcome: 'not-found' });
-    const { POST } = await import('./route');
-
     const response = await POST(
       new Request(
         'https://example.com/api/newsletter/unsubscribe?token=bogus',
@@ -177,18 +156,7 @@ describe('POST /api/newsletter/unsubscribe', () => {
     'unsubscribes and returns 200 when the tenant is %s',
     async (status) => {
       resolveRequestTenantMock.mockResolvedValue({ id: TENANT_ID, status });
-      unsubscribeByTokenMock.mockResolvedValue({
-        outcome: 'unsubscribed',
-        subscriber,
-      });
-      const { POST } = await import('./route');
-
-      const response = await POST(
-        new Request(
-          'https://example.com/api/newsletter/unsubscribe?token=unsub-token-abc',
-          { method: 'POST' },
-        ),
-      );
+      const response = await POST(request);
       const html = await response.text();
 
       expect(response.status).toBe(200);
@@ -202,14 +170,7 @@ describe('POST /api/newsletter/unsubscribe', () => {
 
   it('returns 404 with the error copy without unsubscribing when no tenant resolves', async () => {
     resolveRequestTenantMock.mockResolvedValue(undefined);
-    const { POST } = await import('./route');
-
-    const response = await POST(
-      new Request(
-        'https://example.com/api/newsletter/unsubscribe?token=unsub-token-abc',
-        { method: 'POST' },
-      ),
-    );
+    const response = await POST(request);
     const html = await response.text();
 
     expect(response.status).toBe(404);
@@ -221,14 +182,7 @@ describe('POST /api/newsletter/unsubscribe', () => {
   it('returns 500 with the error copy and logs when the db query throws', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     unsubscribeByTokenMock.mockRejectedValue(new Error('db down'));
-    const { POST } = await import('./route');
-
-    const response = await POST(
-      new Request(
-        'https://example.com/api/newsletter/unsubscribe?token=unsub-token-abc',
-        { method: 'POST' },
-      ),
-    );
+    const response = await POST(request);
     const html = await response.text();
 
     expect(response.status).toBe(500);

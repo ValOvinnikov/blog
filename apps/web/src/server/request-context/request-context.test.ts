@@ -138,52 +138,52 @@ describe('request-context', () => {
     );
   });
 
-  it('reads the tenants row once however often it is entered and read', async () => {
-    const { enterRequestContext, getRequestContext } =
-      await loadRequestContext();
+  describe('with a freshly loaded module', () => {
+    let enterRequestContext: (typeof TModule)['enterRequestContext'];
+    let getRequestContext: (typeof TModule)['getRequestContext'];
 
-    await enterRequestContext(params(TENANT_ID, LOCALE_ISO_CODES.EN));
-    await enterRequestContext(params(TENANT_ID, LOCALE_ISO_CODES.EN));
-    await Promise.all([getRequestContext(), getRequestContext()]);
-
-    expect(getTenantByIdMock).toHaveBeenCalledTimes(1);
-    expect(getTenantByIdMock).toHaveBeenCalledWith(TENANT_ID, {
-      includeArchived: true,
+    beforeEach(async () => {
+      ({ enterRequestContext, getRequestContext } = await loadRequestContext());
     });
-  });
 
-  it('refuses a second entry with a different tenant', async () => {
-    const { enterRequestContext } = await loadRequestContext();
+    it('reads the tenants row once however often it is entered and read', async () => {
+      await enterRequestContext(params(TENANT_ID, LOCALE_ISO_CODES.EN));
+      await enterRequestContext(params(TENANT_ID, LOCALE_ISO_CODES.EN));
+      await Promise.all([getRequestContext(), getRequestContext()]);
 
-    await enterRequestContext(
-      params(UNRESOLVED_TENANT_PLACEHOLDER, LOCALE_ISO_CODES.EN),
-    );
+      expect(getTenantByIdMock).toHaveBeenCalledTimes(1);
+      expect(getTenantByIdMock).toHaveBeenCalledWith(TENANT_ID, {
+        includeArchived: true,
+      });
+    });
 
-    await expect(
-      enterRequestContext(params(TENANT_ID, LOCALE_ISO_CODES.EN)),
-    ).rejects.toThrow(/different route params/);
-  });
+    it('refuses a second entry with a different tenant', async () => {
+      await enterRequestContext(
+        params(UNRESOLVED_TENANT_PLACEHOLDER, LOCALE_ISO_CODES.EN),
+      );
 
-  it('refuses a second entry with a different locale', async () => {
-    const { enterRequestContext } = await loadRequestContext();
+      await expect(
+        enterRequestContext(params(TENANT_ID, LOCALE_ISO_CODES.EN)),
+      ).rejects.toThrow(/different route params/);
+    });
 
-    await enterRequestContext(params(TENANT_ID, LOCALE_ISO_CODES.EN));
+    it('refuses a second entry with a different locale', async () => {
+      await enterRequestContext(params(TENANT_ID, LOCALE_ISO_CODES.EN));
 
-    await expect(
-      enterRequestContext(params(TENANT_ID, LOCALE_ISO_CODES.NL)),
-    ).rejects.toThrow(/different route params/);
+      await expect(
+        enterRequestContext(params(TENANT_ID, LOCALE_ISO_CODES.NL)),
+      ).rejects.toThrow(/different route params/);
+    });
+
+    it('throws naming enterRequestContext when read before entry', async () => {
+      expect(() => getRequestContext()).toThrow(/enterRequestContext\(\)/);
+    });
   });
 
   it('throws a 404 for a locale the site does not serve', async () => {
     await expect(enterAndRead(TENANT_ID, 'xx')).rejects.toThrow(
       'NEXT_NOT_FOUND',
     );
-  });
-
-  it('throws naming enterRequestContext when read before entry', async () => {
-    const { getRequestContext } = await loadRequestContext();
-
-    expect(() => getRequestContext()).toThrow(/enterRequestContext\(\)/);
   });
 
   describe('with no tenant entered', () => {

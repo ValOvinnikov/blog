@@ -24,10 +24,42 @@ const topics = [
 const setup = customRender(TopicChipList, { topics });
 
 describe(`<${TopicChipList.name}/>`, () => {
-  it('renders a Topics nav landmark', () => {
-    setup();
+  describe('with default props', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    expect(screen.getByRole('navigation', { name: 'Topics' })).toBeVisible();
+    it('renders a Topics nav landmark', () => {
+      expect(screen.getByRole('navigation', { name: 'Topics' })).toBeVisible();
+    });
+
+    it('renders an "All" chip linking to the blog index', () => {
+      expect(screen.getByRole('link', { name: 'All' })).toHaveAttribute(
+        'href',
+        '/blog',
+      );
+    });
+
+    it('renders one chip per topic linking to its archive', () => {
+      expect(screen.getByRole('link', { name: 'Engineering' })).toHaveAttribute(
+        'href',
+        '/topics/engineering',
+      );
+      expect(screen.getByRole('link', { name: 'Design' })).toHaveAttribute(
+        'href',
+        '/topics/design',
+      );
+    });
+
+    it('marks "All" as the current page when no activeSlug is given', () => {
+      expect(screen.getByRole('link', { name: 'All' })).toHaveAttribute(
+        'aria-current',
+        'page',
+      );
+      expect(
+        screen.getByRole('link', { name: 'Engineering' }),
+      ).not.toHaveAttribute('aria-current');
+    });
   });
 
   it('renders nothing when there are no topics', () => {
@@ -36,40 +68,6 @@ describe(`<${TopicChipList.name}/>`, () => {
     expect(
       screen.queryByRole('navigation', { name: 'Topics' }),
     ).not.toBeInTheDocument();
-  });
-
-  it('renders an "All" chip linking to the blog index', () => {
-    setup();
-
-    expect(screen.getByRole('link', { name: 'All' })).toHaveAttribute(
-      'href',
-      '/blog',
-    );
-  });
-
-  it('renders one chip per topic linking to its archive', () => {
-    setup();
-
-    expect(screen.getByRole('link', { name: 'Engineering' })).toHaveAttribute(
-      'href',
-      '/topics/engineering',
-    );
-    expect(screen.getByRole('link', { name: 'Design' })).toHaveAttribute(
-      'href',
-      '/topics/design',
-    );
-  });
-
-  it('marks "All" as the current page when no activeSlug is given', () => {
-    setup();
-
-    expect(screen.getByRole('link', { name: 'All' })).toHaveAttribute(
-      'aria-current',
-      'page',
-    );
-    expect(
-      screen.getByRole('link', { name: 'Engineering' }),
-    ).not.toHaveAttribute('aria-current');
   });
 
   it('marks the matching topic chip as the current page when activeSlug is given', () => {

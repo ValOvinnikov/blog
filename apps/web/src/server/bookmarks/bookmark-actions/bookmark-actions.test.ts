@@ -1,5 +1,6 @@
 import { TENANT_WRITE_REFUSAL } from '@blog/config';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
+import type { MockInstance } from 'vitest';
 
 import { getBookmarkStatus, setBookmarkStatus } from './bookmark-actions';
 
@@ -46,6 +47,7 @@ describe('getBookmarkStatus', () => {
     getRequestTenantIdMock.mockReset();
     getRequestTenantIdMock.mockResolvedValue(TENANT_ID);
     isBookmarkedMock.mockReset();
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
   });
 
   it('resolves false without querying the db when there is no session', async () => {
@@ -56,7 +58,6 @@ describe('getBookmarkStatus', () => {
   });
 
   it('resolves false without querying the db when no tenant resolves', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getRequestTenantIdMock.mockResolvedValue(undefined);
 
     await expect(getBookmarkStatus('post-1')).resolves.toBe(false);
@@ -64,7 +65,6 @@ describe('getBookmarkStatus', () => {
   });
 
   it('resolves the db result for a signed-in user', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     isBookmarkedMock.mockResolvedValue(true);
 
     await expect(getBookmarkStatus('post-1')).resolves.toBe(true);
@@ -77,8 +77,12 @@ describe('getBookmarkStatus', () => {
 });
 
 describe('setBookmarkStatus', () => {
+  let errorSpy: MockInstance<typeof console.error>;
+
   beforeEach(() => {
     authMock.mockReset();
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     resolveWritableTenantMock.mockReset();
     resolveWritableTenantMock.mockResolvedValue({
       ok: true,
@@ -86,6 +90,10 @@ describe('setBookmarkStatus', () => {
     });
     addBookmarkMock.mockReset();
     removeBookmarkMock.mockReset();
+  });
+
+  afterEach(() => {
+    errorSpy.mockRestore();
   });
 
   it('returns a refusal without writing when there is no session', async () => {
@@ -100,7 +108,6 @@ describe('setBookmarkStatus', () => {
   });
 
   it('returns a refusal without writing when no tenant resolves', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     resolveWritableTenantMock.mockResolvedValue({
       ok: false,
       reason: TENANT_WRITE_REFUSAL.UNRESOLVED,
@@ -115,7 +122,6 @@ describe('setBookmarkStatus', () => {
   });
 
   it('flags the refusal unavailable without writing when the tenant is not ACTIVE', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     resolveWritableTenantMock.mockResolvedValue({
       ok: false,
       reason: TENANT_WRITE_REFUSAL.INACTIVE,
@@ -130,7 +136,6 @@ describe('setBookmarkStatus', () => {
   });
 
   it('adds a bookmark for the signed-in user when isBookmarked is true', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     addBookmarkMock.mockResolvedValue({ ok: true, data: {} });
 
     await expect(setBookmarkStatus('post-1', true)).resolves.toEqual({
@@ -141,20 +146,15 @@ describe('setBookmarkStatus', () => {
   });
 
   it('returns a refusal when addBookmark resolves a typed failure', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     addBookmarkMock.mockResolvedValue({ ok: false, error: 'DB_NOT_FOUND' });
 
     await expect(setBookmarkStatus('post-1', true)).resolves.toEqual({
       ok: false,
       isUnavailable: false,
     });
-
-    errorSpy.mockRestore();
   });
 
   it('removes a bookmark for the signed-in user when isBookmarked is false', async () => {
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     removeBookmarkMock.mockResolvedValue(undefined);
 
     await expect(setBookmarkStatus('post-1', false)).resolves.toEqual({
@@ -169,15 +169,11 @@ describe('setBookmarkStatus', () => {
   });
 
   it('returns a refusal when the write throws', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    authMock.mockResolvedValue({ user: { id: 'user-1' } });
     addBookmarkMock.mockRejectedValue(new Error('boom'));
 
     await expect(setBookmarkStatus('post-1', true)).resolves.toEqual({
       ok: false,
       isUnavailable: false,
     });
-
-    errorSpy.mockRestore();
   });
 });

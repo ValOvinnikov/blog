@@ -29,12 +29,11 @@ describe(getTenantPlan, () => {
   beforeEach(() => {
     getRequestTenantIdMock.mockReset();
     getTenantByIdMock.mockReset();
+    getRequestTenantIdMock.mockResolvedValue(TENANT_A_ID);
+    getTenantByIdMock.mockResolvedValue({ id: TENANT_A_ID, plan: 'GROWTH' });
   });
 
   it('resolves the plan of the supplied tenant id', async () => {
-    getRequestTenantIdMock.mockResolvedValue(TENANT_A_ID);
-    getTenantByIdMock.mockResolvedValue({ id: TENANT_A_ID, plan: 'GROWTH' });
-
     const result = await getTenantPlan(TENANT_A_ID);
 
     expect(result).toEqual({ ok: true, data: 'GROWTH' });
@@ -53,16 +52,12 @@ describe(getTenantPlan, () => {
   });
 
   it('forwards an explicitly supplied tenant to getRequestTenantId', async () => {
-    getRequestTenantIdMock.mockResolvedValue(TENANT_A_ID);
-    getTenantByIdMock.mockResolvedValue({ id: TENANT_A_ID, plan: 'GROWTH' });
-
     await getTenantPlan(TENANT_A_ID);
 
     expect(getRequestTenantIdMock).toHaveBeenCalledWith(TENANT_A_ID);
   });
 
   it('returns ok:false when a query rejects', async () => {
-    getRequestTenantIdMock.mockResolvedValue(TENANT_A_ID);
     getTenantByIdMock.mockRejectedValue(new Error('boom'));
 
     const result = await getTenantPlan(TENANT_A_ID);

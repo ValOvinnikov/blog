@@ -40,23 +40,22 @@ describe(`<${PostIndexTopicChips.name}/>`, () => {
     ).toHaveAttribute('href', '/topics/engineering');
   });
 
-  it('renders nothing when there are no topics', async () => {
-    getTopicsSafelyMock.mockResolvedValue([]);
+  describe('with no topics', () => {
+    beforeEach(async () => {
+      getTopicsSafelyMock.mockResolvedValue([]);
+      await setup();
+    });
 
-    await setup();
+    it('renders nothing when there are no topics', async () => {
+      expect(
+        screen.queryByRole('navigation', { name: 'Topics' }),
+      ).not.toBeInTheDocument();
+    });
 
-    expect(
-      screen.queryByRole('navigation', { name: 'Topics' }),
-    ).not.toBeInTheDocument();
-  });
-
-  it('forwards the request context Sanity context to getTopicsSafely', async () => {
-    getTopicsSafelyMock.mockResolvedValue([]);
-
-    await setup();
-
-    expect(getTopicsSafelyMock).toHaveBeenCalledWith(
-      DEFAULT_TENANT_SANITY_CONTEXT,
-    );
+    it('forwards the request context Sanity context to getTopicsSafely', async () => {
+      expect(getTopicsSafelyMock).toHaveBeenCalledWith(
+        DEFAULT_TENANT_SANITY_CONTEXT,
+      );
+    });
   });
 });

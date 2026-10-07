@@ -35,6 +35,7 @@ describe(resolveReferencingModuleTags, () => {
   beforeEach(() => {
     getReferencingModuleIdsMock.mockReset();
     loggerErrorMock.mockReset();
+    getReferencingModuleIdsMock.mockResolvedValue({ ok: true, data: [] });
   });
 
   it('maps every resolved module id onto its per-document purge tag', async () => {
@@ -49,16 +50,12 @@ describe(resolveReferencingModuleTags, () => {
   });
 
   it('returns no tags when nothing references the document', async () => {
-    getReferencingModuleIdsMock.mockResolvedValue({ ok: true, data: [] });
-
     const result = await resolveReferencingModuleTags(input);
 
     expect(result).toEqual([]);
   });
 
   it('looks the document up by its own id in the tenant context', async () => {
-    getReferencingModuleIdsMock.mockResolvedValue({ ok: true, data: [] });
-
     await resolveReferencingModuleTags(input);
 
     expect(getReferencingModuleIdsMock).toHaveBeenCalledWith('topic-1', tenant);

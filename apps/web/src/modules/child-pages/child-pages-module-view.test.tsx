@@ -16,15 +16,38 @@ const setup = customRender(ChildPagesModuleView, {
 });
 
 describe(`<${ChildPagesModuleView.name}/>`, () => {
-  it('labels the section with its heading', () => {
-    setup();
+  describe('with default props', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    expect(
-      screen.getByRole('region', { name: 'In this section' }),
-    ).toBeVisible();
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'In this section' }),
-    ).toBeVisible();
+    it('labels the section with its heading', () => {
+      expect(
+        screen.getByRole('region', { name: 'In this section' }),
+      ).toBeVisible();
+      expect(
+        screen.getByRole('heading', { level: 2, name: 'In this section' }),
+      ).toBeVisible();
+    });
+
+    it('renders each card title one level below the module heading', () => {
+      expect(
+        screen.getByRole('heading', { level: 3, name: 'FAQ' }),
+      ).toBeVisible();
+    });
+
+    it('renders the child page summary', () => {
+      const card = screen.getByRole('article');
+      expect(
+        within(card).getByText('Answers to the questions we hear most.'),
+      ).toBeVisible();
+    });
+
+    it('renders no media region when the child page has no image', () => {
+      expect(
+        screen.queryByTestId('child-page-card-media'),
+      ).not.toBeInTheDocument();
+    });
   });
 
   it('renders a card per child page in the given order, each linking to its full path', () => {
@@ -45,23 +68,6 @@ describe(`<${ChildPagesModuleView.name}/>`, () => {
     expect(links[1]).toHaveAttribute('href', '/modules/faq');
   });
 
-  it('renders each card title one level below the module heading', () => {
-    setup();
-
-    expect(
-      screen.getByRole('heading', { level: 3, name: 'FAQ' }),
-    ).toBeVisible();
-  });
-
-  it('renders the child page summary', () => {
-    setup();
-
-    const card = screen.getByRole('article');
-    expect(
-      within(card).getByText('Answers to the questions we hear most.'),
-    ).toBeVisible();
-  });
-
   it('renders card titles as the top-level heading when the module has no heading', () => {
     setup({ headingBlock: undefined });
 
@@ -76,13 +82,5 @@ describe(`<${ChildPagesModuleView.name}/>`, () => {
     setup({ pages: [makeChildPageCard({ image })] });
 
     expect(screen.getByRole('img', { name: image.alt })).toBeVisible();
-  });
-
-  it('renders no media region when the child page has no image', () => {
-    setup();
-
-    expect(
-      screen.queryByTestId('child-page-card-media'),
-    ).not.toBeInTheDocument();
   });
 });

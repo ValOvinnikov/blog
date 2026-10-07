@@ -18,23 +18,29 @@ const setup = customRender(FeatureListCard, {
 });
 
 describe(`<${FeatureListCard.name}/>`, () => {
-  it('renders the heading and excerpt from the item headingBlock', () => {
-    setup();
+  describe('with the default item', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    expect(
-      screen.getByRole('heading', {
-        level: 3,
-        name: item.headingBlock.heading,
-      }),
-    ).toBeVisible();
-    expect(screen.getByText(item.headingBlock.supportingText!)).toBeVisible();
-  });
+    it('renders the heading and excerpt from the item headingBlock', () => {
+      expect(
+        screen.getByRole('heading', {
+          level: 3,
+          name: item.headingBlock.heading,
+        }),
+      ).toBeVisible();
+      expect(screen.getByText(item.headingBlock.supportingText!)).toBeVisible();
+    });
 
-  it('renders the chosen icon when the item has no image', () => {
-    setup();
+    it('renders the chosen icon when the item has no image', () => {
+      expect(screen.getByTestId('feature-card-icon')).toBeVisible();
+      expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    });
 
-    expect(screen.getByTestId('feature-card-icon')).toBeVisible();
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    it('renders no link when the item has none', () => {
+      expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    });
   });
 
   it('renders the image over the icon when the item has both', () => {
@@ -98,11 +104,5 @@ describe(`<${FeatureListCard.name}/>`, () => {
     expect(
       screen.queryByRole('link', { name: item.headingBlock.heading }),
     ).not.toBeInTheDocument();
-  });
-
-  it('renders no link when the item has none', () => {
-    setup();
-
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 });

@@ -70,6 +70,59 @@ describe(`<${TopicPage.name}/>`, () => {
     });
   });
 
+  describe('with the default topic', () => {
+    beforeEach(async () => {
+      await setup();
+    });
+
+    it('fetches the topic for the given slug with the tenant context', () => {
+      expect(getTopicPageMock).toHaveBeenCalledWith(
+        'news',
+        DEFAULT_TENANT_SANITY_CONTEXT,
+      );
+    });
+
+    it('renders the topic heading and supporting text inside main', () => {
+      const main = screen.getByRole('main');
+      expect(
+        within(main).getByRole('heading', { level: 1, name: 'News' }),
+      ).toBeVisible();
+      expect(within(main).getByText('The latest updates.')).toBeVisible();
+    });
+
+    it('renders the breadcrumb trail outside main', () => {
+      const breadcrumbs = screen.getByRole('navigation', {
+        name: 'Breadcrumb',
+      });
+      expect(
+        within(breadcrumbs).getByRole('link', { name: 'Home' }),
+      ).toBeVisible();
+      expect(within(breadcrumbs).getByText('News')).toBeVisible();
+      expect(screen.getByRole('main')).not.toContainElement(breadcrumbs);
+    });
+
+    it('renders the topic chips inside main with the current topic active', () => {
+      const chips = within(screen.getByRole('main')).getByRole('navigation', {
+        name: 'Topics',
+      });
+      expect(within(chips).getByRole('link', { name: 'News' })).toHaveAttribute(
+        'aria-current',
+        'page',
+      );
+      expect(
+        within(chips).getByRole('link', { name: 'Design' }),
+      ).not.toHaveAttribute('aria-current');
+    });
+
+    it('renders no FAQPage JSON-LD when the page has no FAQ questions', () => {
+      expect(
+        screen
+          .queryAllByTestId('json-ld-script')
+          .some((script) => script.textContent?.includes(FAQ_PAGE_JSON_LD)),
+      ).toBe(false);
+    });
+  });
+
   it('logs and calls notFound() when the fetch fails', async () => {
     getTopicPageMock.mockResolvedValueOnce({
       ok: false,
@@ -92,51 +145,6 @@ describe(`<${TopicPage.name}/>`, () => {
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
     expect(logger.error).not.toHaveBeenCalled();
-  });
-
-  it('fetches the topic for the given slug with the tenant context', async () => {
-    await setup();
-
-    expect(getTopicPageMock).toHaveBeenCalledWith(
-      'news',
-      DEFAULT_TENANT_SANITY_CONTEXT,
-    );
-  });
-
-  it('renders the topic heading and supporting text inside main', async () => {
-    await setup();
-
-    const main = screen.getByRole('main');
-    expect(
-      within(main).getByRole('heading', { level: 1, name: 'News' }),
-    ).toBeVisible();
-    expect(within(main).getByText('The latest updates.')).toBeVisible();
-  });
-
-  it('renders the breadcrumb trail outside main', async () => {
-    await setup();
-
-    const breadcrumbs = screen.getByRole('navigation', { name: 'Breadcrumb' });
-    expect(
-      within(breadcrumbs).getByRole('link', { name: 'Home' }),
-    ).toBeVisible();
-    expect(within(breadcrumbs).getByText('News')).toBeVisible();
-    expect(screen.getByRole('main')).not.toContainElement(breadcrumbs);
-  });
-
-  it('renders the topic chips inside main with the current topic active', async () => {
-    await setup();
-
-    const chips = within(screen.getByRole('main')).getByRole('navigation', {
-      name: 'Topics',
-    });
-    expect(within(chips).getByRole('link', { name: 'News' })).toHaveAttribute(
-      'aria-current',
-      'page',
-    );
-    expect(
-      within(chips).getByRole('link', { name: 'Design' }),
-    ).not.toHaveAttribute('aria-current');
   });
 
   it('renders the authored modules inside main', async () => {
@@ -232,16 +240,6 @@ describe(`<${TopicPage.name}/>`, () => {
     await setup();
 
     expect(screen.getByText('No posts in News yet.')).toBeVisible();
-  });
-
-  it('renders no FAQPage JSON-LD when the page has no FAQ questions', async () => {
-    await setup();
-
-    expect(
-      screen
-        .queryAllByTestId('json-ld-script')
-        .some((script) => script.textContent?.includes(FAQ_PAGE_JSON_LD)),
-    ).toBe(false);
   });
 
   it('renders the FAQPage JSON-LD when the page has FAQ questions', async () => {

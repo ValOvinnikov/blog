@@ -1,4 +1,4 @@
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { useConsentPreferences } from '@web/context/consent-provider';
 import {
   customRender,
@@ -19,17 +19,14 @@ const PreferencesState = () => {
   return <p>{isPreferencesOpen ? 'Preferences open' : 'Preferences closed'}</p>;
 };
 
+let user: UserEvent;
+
 describe(`<${ConsentBannerSlot.name}/>`, () => {
-  beforeEach(clearConsentCookie);
-  afterEach(clearConsentCookie);
-
-  it('offers the choice while consent is unanswered', () => {
-    setup();
-
-    expect(
-      screen.getByRole('heading', { name: 'Cookies on this site' }),
-    ).toBeVisible();
+  beforeEach(() => {
+    clearConsentCookie();
+    user = userEvent.setup();
   });
+  afterEach(clearConsentCookie);
 
   it('renders nothing when the banner is disabled', () => {
     setup({ isEnabled: false });
@@ -49,33 +46,38 @@ describe(`<${ConsentBannerSlot.name}/>`, () => {
     ).not.toBeInTheDocument();
   });
 
-  it('hides and remembers the choice on accept all', async () => {
-    const user = userEvent.setup();
-    setup();
+  describe('while consent is unanswered', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    await user.click(screen.getByRole('button', { name: 'Accept all' }));
+    it('offers the choice while consent is unanswered', () => {
+      expect(
+        screen.getByRole('heading', { name: 'Cookies on this site' }),
+      ).toBeVisible();
+    });
 
-    expect(
-      screen.queryByRole('heading', { name: 'Cookies on this site' }),
-    ).not.toBeInTheDocument();
-    expect(document.cookie).toContain('consent=1.EXTERNAL_MEDIA');
-  });
+    it('hides and remembers the choice on accept all', async () => {
+      await user.click(screen.getByRole('button', { name: 'Accept all' }));
 
-  it('hides and remembers the choice on reject all', async () => {
-    const user = userEvent.setup();
-    setup();
+      expect(
+        screen.queryByRole('heading', { name: 'Cookies on this site' }),
+      ).not.toBeInTheDocument();
+      expect(document.cookie).toContain('consent=1.EXTERNAL_MEDIA');
+    });
 
-    await user.click(screen.getByRole('button', { name: 'Reject all' }));
+    it('hides and remembers the choice on reject all', async () => {
+      await user.click(screen.getByRole('button', { name: 'Reject all' }));
 
-    expect(
-      screen.queryByRole('heading', { name: 'Cookies on this site' }),
-    ).not.toBeInTheDocument();
-    expect(document.cookie).not.toContain('EXTERNAL_MEDIA');
-    expect(document.cookie).toContain('consent=1.');
+      expect(
+        screen.queryByRole('heading', { name: 'Cookies on this site' }),
+      ).not.toBeInTheDocument();
+      expect(document.cookie).not.toContain('EXTERNAL_MEDIA');
+      expect(document.cookie).toContain('consent=1.');
+    });
   });
 
   it('opens the preferences from settings and keeps the banner', async () => {
-    const user = userEvent.setup();
     renderElement(
       <>
         <ConsentBannerSlot isEnabled={true} />

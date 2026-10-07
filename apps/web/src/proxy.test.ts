@@ -72,31 +72,29 @@ const buildMatcherRegExp = () => {
 };
 
 describe('proxy matcher', () => {
-  it('excludes root-level Next.js metadata-file routes from locale rewriting', () => {
-    const matcher = buildMatcherRegExp();
+  let matcher: RegExp;
 
+  beforeEach(() => {
+    matcher = buildMatcherRegExp();
+  });
+
+  it('excludes root-level Next.js metadata-file routes from locale rewriting', () => {
     expect(matcher.test('/icon')).toBe(false);
   });
 
   it('still rewrites real content routes through locale middleware', () => {
-    const matcher = buildMatcherRegExp();
-
     expect(matcher.test('/')).toBe(true);
     expect(matcher.test('/blog')).toBe(true);
     expect(matcher.test('/blog/some-post-slug')).toBe(true);
   });
 
   it('still excludes the pre-existing api/_next/_vercel paths', () => {
-    const matcher = buildMatcherRegExp();
-
     expect(matcher.test('/api/whatever')).toBe(false);
     expect(matcher.test('/_next/static/chunk.js')).toBe(false);
     expect(matcher.test('/_vercel/insights')).toBe(false);
   });
 
   it('matches dotted-extension paths, so the proxy itself can guard them', () => {
-    const matcher = buildMatcherRegExp();
-
     expect(matcher.test('/robots.txt')).toBe(true);
     expect(matcher.test('/favicon.ico')).toBe(true);
     expect(matcher.test('/sitemap.xml')).toBe(true);
@@ -105,15 +103,11 @@ describe('proxy matcher', () => {
   });
 
   it('bypasses locale middleware for sibling paths sharing an excluded prefix', () => {
-    const matcher = buildMatcherRegExp();
-
     expect(matcher.test('/icons')).toBe(false);
     expect(matcher.test('/icon-something')).toBe(false);
   });
 
   it('excludes .well-known paths, which should never reach app routing', () => {
-    const matcher = buildMatcherRegExp();
-
     expect(
       matcher.test('/.well-known/appspecific/com.chrome.devtools.json'),
     ).toBe(false);
@@ -121,8 +115,6 @@ describe('proxy matcher', () => {
   });
 
   it('still matches other dotted multi-segment paths, so per-tag RSS keeps working', () => {
-    const matcher = buildMatcherRegExp();
-
     expect(matcher.test('/tags/typescript/rss.xml')).toBe(true);
   });
 });
@@ -271,6 +263,7 @@ describe('proxy dotted-path pass-through', () => {
 describe('proxy RSS feeds', () => {
   beforeEach(() => {
     resolveTenantRoutingMock.mockReset();
+    resolveTenantRoutingMock.mockResolvedValue(tenantRouting('tenant-1'));
     isProductionEnvironmentMock.mockReset();
     isProductionEnvironmentMock.mockReturnValue(false);
     intlMiddlewareMock.mockClear();
@@ -279,7 +272,6 @@ describe('proxy RSS feeds', () => {
   it.each(['/rss.xml', '/tags/typescript/rss.xml'])(
     'routes %s into the tenant and language like a page',
     async (pathname) => {
-      resolveTenantRoutingMock.mockResolvedValue(tenantRouting('tenant-1'));
       intlMiddlewareMock.mockImplementationOnce((request) =>
         NextResponse.rewrite(
           new URL(`/EN${request.nextUrl.pathname}`, request.url),
@@ -298,8 +290,6 @@ describe('proxy RSS feeds', () => {
   );
 
   it('redirects the feed of a switched-off language to the default-language feed', async () => {
-    resolveTenantRoutingMock.mockResolvedValue(tenantRouting('tenant-1'));
-
     const response = await proxy(
       buildRequest('acme.example.com', undefined, '/nl/rss.xml'),
     );
@@ -313,14 +303,13 @@ describe('proxy RSS feeds', () => {
 describe('proxy tenant resolution', () => {
   beforeEach(() => {
     resolveTenantRoutingMock.mockReset();
+    resolveTenantRoutingMock.mockResolvedValue(tenantRouting('tenant-1'));
     isProductionEnvironmentMock.mockReset();
     isProductionEnvironmentMock.mockReturnValue(false);
     loggerErrorMock.mockReset();
   });
 
   it('sets x-tenant-id on the request handed to next-intl when a tenant resolves', async () => {
-    resolveTenantRoutingMock.mockResolvedValue(tenantRouting('tenant-1'));
-
     await proxy(buildRequest('acme.example.com'));
 
     expect(resolveTenantRoutingMock).toHaveBeenCalledWith('acme.example.com');
@@ -329,47 +318,12 @@ describe('proxy tenant resolution', () => {
   });
 
   it('calls resolveTenantId with null when the request has no Host header', async () => {
-    resolveTenantRoutingMock.mockResolvedValue(tenantRouting('tenant-1'));
-
     await proxy(buildRequest(null));
 
     expect(resolveTenantRoutingMock).toHaveBeenCalledWith(null);
   });
 
-  it('falls through to next-intl with no header outside production and no tenant', async () => {
-    resolveTenantRoutingMock.mockResolvedValue(undefined);
-
-    const response = await proxy(buildRequest('unknown.example.com'));
-
-    expect(intlMiddlewareMock).toHaveBeenCalledTimes(1);
-    const [forwardedRequest] = intlMiddlewareMock.mock.calls[0]!;
-    expect(forwardedRequest.headers.has('x-tenant-id')).toBe(false);
-    expect(response.status).not.toBe(404);
-  });
-
-  it('404s without calling next-intl when no tenant resolves in production', async () => {
-    isProductionEnvironmentMock.mockReturnValue(true);
-    resolveTenantRoutingMock.mockResolvedValue(undefined);
-
-    const response = await proxy(buildRequest('unknown.example.com'));
-
-    expect(response.status).toBe(404);
-    expect(intlMiddlewareMock).not.toHaveBeenCalled();
-  });
-
-  it('404s an archived or unprovisioned tenant domain in production', async () => {
-    isProductionEnvironmentMock.mockReturnValue(true);
-    resolveTenantRoutingMock.mockResolvedValue(undefined);
-
-    const response = await proxy(buildRequest('archived-tenant.example.com'));
-
-    expect(response.status).toBe(404);
-    expect(intlMiddlewareMock).not.toHaveBeenCalled();
-  });
-
   it('strips a client-supplied x-tenant-id header before forwarding a resolved tenant', async () => {
-    resolveTenantRoutingMock.mockResolvedValue(tenantRouting('tenant-1'));
-
     await proxy(
       buildRequest('acme.example.com', { 'x-tenant-id': 'spoofed-tenant' }),
     );
@@ -378,30 +332,65 @@ describe('proxy tenant resolution', () => {
     expect(forwardedRequest.headers.get('x-tenant-id')).toBe('tenant-1');
   });
 
-  it('strips a client-supplied x-tenant-id header when resolution fails outside prod', async () => {
-    resolveTenantRoutingMock.mockResolvedValue(undefined);
+  describe('when no tenant resolves', () => {
+    beforeEach(() => {
+      resolveTenantRoutingMock.mockResolvedValue(undefined);
+    });
 
-    await proxy(
-      buildRequest('unknown.example.com', {
-        'x-tenant-id': 'spoofed-tenant',
-      }),
-    );
+    it('falls through to next-intl with no header outside production and no tenant', async () => {
+      const response = await proxy(buildRequest('unknown.example.com'));
 
-    const [forwardedRequest] = intlMiddlewareMock.mock.calls[0]!;
-    expect(forwardedRequest.headers.has('x-tenant-id')).toBe(false);
+      expect(intlMiddlewareMock).toHaveBeenCalledTimes(1);
+      const [forwardedRequest] = intlMiddlewareMock.mock.calls[0]!;
+      expect(forwardedRequest.headers.has('x-tenant-id')).toBe(false);
+      expect(response.status).not.toBe(404);
+    });
+
+    it('strips a client-supplied x-tenant-id header when resolution fails outside prod', async () => {
+      await proxy(
+        buildRequest('unknown.example.com', {
+          'x-tenant-id': 'spoofed-tenant',
+        }),
+      );
+
+      const [forwardedRequest] = intlMiddlewareMock.mock.calls[0]!;
+      expect(forwardedRequest.headers.has('x-tenant-id')).toBe(false);
+    });
+
+    describe('in production', () => {
+      beforeEach(() => {
+        isProductionEnvironmentMock.mockReturnValue(true);
+      });
+
+      it('404s without calling next-intl when no tenant resolves in production', async () => {
+        const response = await proxy(buildRequest('unknown.example.com'));
+
+        expect(response.status).toBe(404);
+        expect(intlMiddlewareMock).not.toHaveBeenCalled();
+      });
+
+      it('404s an archived or unprovisioned tenant domain in production', async () => {
+        const response = await proxy(
+          buildRequest('archived-tenant.example.com'),
+        );
+
+        expect(response.status).toBe(404);
+        expect(intlMiddlewareMock).not.toHaveBeenCalled();
+      });
+    });
   });
 });
 
 describe('proxy tenant segment rewrite', () => {
   beforeEach(() => {
     resolveTenantRoutingMock.mockReset();
+    resolveTenantRoutingMock.mockResolvedValue(tenantRouting('tenant-1'));
     isProductionEnvironmentMock.mockReset();
     isProductionEnvironmentMock.mockReturnValue(false);
     loggerErrorMock.mockReset();
   });
 
   it("prepends the resolved tenant id to next-intl's locale-rewritten pathname", async () => {
-    resolveTenantRoutingMock.mockResolvedValue(tenantRouting('tenant-1'));
     intlMiddlewareMock.mockImplementationOnce((request) =>
       NextResponse.rewrite(
         new URL(`/EN${request.nextUrl.pathname}`, request.url),
@@ -418,7 +407,6 @@ describe('proxy tenant segment rewrite', () => {
   });
 
   it('falls back to the original request URL when next-intl did not need to rewrite', async () => {
-    resolveTenantRoutingMock.mockResolvedValue(tenantRouting('tenant-1'));
     intlMiddlewareMock.mockImplementationOnce(() => NextResponse.next());
 
     const response = await proxy(
@@ -448,7 +436,6 @@ describe('proxy tenant segment rewrite', () => {
   });
 
   it('never rewrites the tenant-shaped segment onto a redirect response', async () => {
-    resolveTenantRoutingMock.mockResolvedValue(tenantRouting('tenant-1'));
     intlMiddlewareMock.mockImplementationOnce(() =>
       NextResponse.redirect(new URL('https://example.com/blog')),
     );
@@ -465,22 +452,19 @@ describe('proxy tenant segment rewrite', () => {
 describe('proxy tenant lookup failure', () => {
   beforeEach(() => {
     resolveTenantRoutingMock.mockReset();
+    resolveTenantRoutingMock.mockRejectedValue(new Error('connection refused'));
     isProductionEnvironmentMock.mockReset();
     isProductionEnvironmentMock.mockReturnValue(false);
     loggerErrorMock.mockReset();
   });
 
   it('returns a controlled 503 instead of throwing when resolveTenantId rejects', async () => {
-    resolveTenantRoutingMock.mockRejectedValue(new Error('connection refused'));
-
     const response = await proxy(buildRequest('acme.example.com'));
 
     expect(response.status).toBe(503);
   });
 
   it('never calls next-intl when the tenant lookup fails', async () => {
-    resolveTenantRoutingMock.mockRejectedValue(new Error('connection refused'));
-
     await proxy(buildRequest('acme.example.com'));
 
     expect(intlMiddlewareMock).not.toHaveBeenCalled();
@@ -501,8 +485,6 @@ describe('proxy tenant lookup failure', () => {
 
   it('fails closed in production when the tenant lookup fails', async () => {
     isProductionEnvironmentMock.mockReturnValue(true);
-    resolveTenantRoutingMock.mockRejectedValue(new Error('connection refused'));
-
     const response = await proxy(buildRequest('acme.example.com'));
 
     expect(response.status).toBe(503);
@@ -510,8 +492,6 @@ describe('proxy tenant lookup failure', () => {
   });
 
   it('sets no x-tenant-id and uses no fallback tenant when the lookup fails', async () => {
-    resolveTenantRoutingMock.mockRejectedValue(new Error('connection refused'));
-
     await proxy(
       buildRequest('acme.example.com', { 'x-tenant-id': 'spoofed-tenant' }),
     );

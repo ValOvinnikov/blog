@@ -42,17 +42,19 @@ const setup = customRender(PricingModuleView, {
 });
 
 describe(`<${PricingModuleView.name}/>`, () => {
-  it('renders a tier name and its formatted price', () => {
-    setup();
+  describe('with the default panel', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    expect(screen.getByRole('heading', { name: 'Starter' })).toBeVisible();
-    expect(screen.getByText('£49')).toBeVisible();
-  });
+    it('renders a tier name and its formatted price', () => {
+      expect(screen.getByRole('heading', { name: 'Starter' })).toBeVisible();
+      expect(screen.getByText('£49')).toBeVisible();
+    });
 
-  it('renders no period switch for a single panel', () => {
-    setup();
-
-    expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument();
+    it('renders no period switch for a single panel', () => {
+      expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument();
+    });
   });
 
   it('renders a period switch and shows only the monthly price', () => {

@@ -24,7 +24,6 @@ describe(buildBreadcrumbListSchema, () => {
   });
 
   it('builds a BreadcrumbList schema from the trail', async () => {
-    mockContext({ metadataBase: new URL('https://example.com') });
     const schema = await buildBreadcrumbListSchema(trail);
 
     expect(schema).toEqual({
@@ -54,7 +53,6 @@ describe(buildBreadcrumbListSchema, () => {
   });
 
   it('assigns 1-based positions in trail order', async () => {
-    mockContext({ metadataBase: new URL('https://example.com') });
     const schema = await buildBreadcrumbListSchema(trail);
 
     expect(schema?.itemListElement.map((item) => item.position)).toEqual([

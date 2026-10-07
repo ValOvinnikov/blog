@@ -1,6 +1,7 @@
 import type { ISanityImage } from '@blog/config';
 import { type TSeoResolved, urlForSanityImage } from '@blog/service';
 import { DEFAULT_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import type { Metadata } from 'next';
 import {
   resolveOpenGraph,
   resolveTwitter,
@@ -36,28 +37,6 @@ const seo: TSeoResolved = {
 };
 
 describe('toMetadata', () => {
-  it('maps canonical, description, and ogType', async () => {
-    const metadata = await toMetadata(seo, {
-      canonical: '/blog',
-      ogType: 'website',
-    });
-
-    expect(metadata.alternates?.canonical).toBe('/blog');
-    expect(metadata.description).toBe('All the posts.');
-    expect((metadata.openGraph as TOpenGraphWithType | null)?.type).toBe(
-      'website',
-    );
-  });
-
-  it('maps title as a plain string when titleAbsolute is not set', async () => {
-    const metadata = await toMetadata(seo, {
-      canonical: '/blog',
-      ogType: 'website',
-    });
-
-    expect(metadata.title).toBe('The Blog');
-  });
-
   it('maps title as an absolute title object when titleAbsolute is true', async () => {
     const metadata = await toMetadata(seo, {
       canonical: '/',
@@ -77,19 +56,6 @@ describe('toMetadata', () => {
     expect((metadata.openGraph as TOpenGraphWithType | null)?.type).toBe(
       'article',
     );
-  });
-
-  it('maps openGraph title/description/images from ogTitle/ogDescription/ogImage', async () => {
-    const metadata = await toMetadata(seo, {
-      canonical: '/blog',
-      ogType: 'website',
-    });
-
-    expect(metadata.openGraph?.title).toBe('The Blog OG');
-    expect(metadata.openGraph?.description).toBe('All the posts OG.');
-    expect(metadata.openGraph?.images).toEqual([
-      { url: EXPECTED_OG_IMAGE_URL },
-    ]);
   });
 
   it('omits openGraph and twitter images when ogImage is absent', async () => {
@@ -126,20 +92,6 @@ describe('toMetadata', () => {
     expect(metadata.twitter?.description).toBeUndefined();
   });
 
-  it('maps twitter card, title, description, and images', async () => {
-    const metadata = await toMetadata(seo, {
-      canonical: '/blog',
-      ogType: 'website',
-    });
-
-    expect((metadata.twitter as TTwitterWithCard | null)?.card).toBe(
-      'summary_large_image',
-    );
-    expect(metadata.twitter?.title).toBe('The Blog OG');
-    expect(metadata.twitter?.description).toBe('All the posts OG.');
-    expect(metadata.twitter?.images).toEqual([EXPECTED_OG_IMAGE_URL]);
-  });
-
   it('adds openGraph.publishedTime and authors for article type when provided', async () => {
     const metadata = await toMetadata(seo, {
       canonical: '/blog/my-post',
@@ -158,20 +110,6 @@ describe('toMetadata', () => {
     ]);
   });
 
-  it('omits openGraph.publishedTime and authors when article option is not passed', async () => {
-    const metadata = await toMetadata(seo, {
-      canonical: '/blog',
-      ogType: 'website',
-    });
-
-    expect(
-      (metadata.openGraph as { publishedTime?: string })?.publishedTime,
-    ).toBeUndefined();
-    expect(
-      (metadata.openGraph as { authors?: string[] })?.authors,
-    ).toBeUndefined();
-  });
-
   it('adds alternates.types["application/rss+xml"] when feedUrl is provided', async () => {
     const metadata = await toMetadata(seo, {
       canonical: '/blog',
@@ -185,13 +123,57 @@ describe('toMetadata', () => {
     expect(metadata.alternates?.canonical).toBe('/blog');
   });
 
-  it('omits alternates.types when feedUrl is not provided', async () => {
-    const metadata = await toMetadata(seo, {
-      canonical: '/blog',
-      ogType: 'website',
+  describe('for a website page at /blog', () => {
+    let metadata: Metadata;
+
+    beforeEach(async () => {
+      metadata = await toMetadata(seo, {
+        canonical: '/blog',
+        ogType: 'website',
+      });
     });
 
-    expect(metadata.alternates?.types).toBeUndefined();
+    it('maps canonical, description, and ogType', async () => {
+      expect(metadata.alternates?.canonical).toBe('/blog');
+      expect(metadata.description).toBe('All the posts.');
+      expect((metadata.openGraph as TOpenGraphWithType | null)?.type).toBe(
+        'website',
+      );
+    });
+
+    it('maps title as a plain string when titleAbsolute is not set', async () => {
+      expect(metadata.title).toBe('The Blog');
+    });
+
+    it('maps openGraph title/description/images from ogTitle/ogDescription/ogImage', async () => {
+      expect(metadata.openGraph?.title).toBe('The Blog OG');
+      expect(metadata.openGraph?.description).toBe('All the posts OG.');
+      expect(metadata.openGraph?.images).toEqual([
+        { url: EXPECTED_OG_IMAGE_URL },
+      ]);
+    });
+
+    it('maps twitter card, title, description, and images', async () => {
+      expect((metadata.twitter as TTwitterWithCard | null)?.card).toBe(
+        'summary_large_image',
+      );
+      expect(metadata.twitter?.title).toBe('The Blog OG');
+      expect(metadata.twitter?.description).toBe('All the posts OG.');
+      expect(metadata.twitter?.images).toEqual([EXPECTED_OG_IMAGE_URL]);
+    });
+
+    it('omits openGraph.publishedTime and authors when article option is not passed', async () => {
+      expect(
+        (metadata.openGraph as { publishedTime?: string })?.publishedTime,
+      ).toBeUndefined();
+      expect(
+        (metadata.openGraph as { authors?: string[] })?.authors,
+      ).toBeUndefined();
+    });
+
+    it('omits alternates.types when feedUrl is not provided', async () => {
+      expect(metadata.alternates?.types).toBeUndefined();
+    });
   });
 });
 
@@ -202,43 +184,41 @@ describe('toMetadata output resolved by Next itself', () => {
     isStaticMetadataRouteFile: false,
   };
 
-  it('resolves openGraph.images to undefined, never an injected default, when ogImage is absent', async () => {
-    const metadata = await toMetadata(
-      { ...seo, ogImage: undefined },
-      {
-        canonical: '/',
-        ogType: 'website',
-      },
-    );
+  describe('without an ogImage', () => {
+    let metadata: Metadata;
 
-    const resolved = await resolveOpenGraph(
-      metadata.openGraph,
-      metadataBase,
-      Promise.resolve('/'),
-      metadataContext,
-      null,
-    );
+    beforeEach(async () => {
+      metadata = await toMetadata(
+        { ...seo, ogImage: undefined },
+        {
+          canonical: '/',
+          ogType: 'website',
+        },
+      );
+    });
 
-    expect(resolved?.images).toBeUndefined();
-  });
+    it('resolves openGraph.images to undefined, never an injected default, when ogImage is absent', async () => {
+      const resolved = await resolveOpenGraph(
+        metadata.openGraph,
+        metadataBase,
+        Promise.resolve('/'),
+        metadataContext,
+        null,
+      );
 
-  it('resolves twitter.images to undefined, never an injected default, when ogImage is absent', async () => {
-    const metadata = await toMetadata(
-      { ...seo, ogImage: undefined },
-      {
-        canonical: '/',
-        ogType: 'website',
-      },
-    );
+      expect(resolved?.images).toBeUndefined();
+    });
 
-    const resolved = resolveTwitter(
-      metadata.twitter,
-      metadataBase,
-      metadataContext,
-      null,
-    );
+    it('resolves twitter.images to undefined, never an injected default, when ogImage is absent', async () => {
+      const resolved = resolveTwitter(
+        metadata.twitter,
+        metadataBase,
+        metadataContext,
+        null,
+      );
 
-    expect(resolved?.images).toBeUndefined();
+      expect(resolved?.images).toBeUndefined();
+    });
   });
 
   it('still resolves an explicit ogImage unchanged (no fallback applied)', async () => {

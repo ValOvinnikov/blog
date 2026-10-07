@@ -1,4 +1,4 @@
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import {
   customRender,
   fireEvent,
@@ -29,14 +29,17 @@ const setup = customRender(PostShare, {
 const getTrigger = () =>
   screen.getByRole('button', { name: 'Share "Hello World"' });
 
+let user: UserEvent;
+let trigger: HTMLElement;
+
 describe(`<${PostShare.name}/>`, () => {
   beforeEach(() => {
+    user = userEvent.setup();
     setup();
+    trigger = getTrigger();
   });
 
   it('labels the trigger with the post title and renders it closed', () => {
-    const trigger = getTrigger();
-
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
     expect(
       within(trigger).getByTestId('post-share-trigger-icon'),
@@ -44,9 +47,6 @@ describe(`<${PostShare.name}/>`, () => {
   });
 
   it('opens the panel on trigger click and closes it again on a second click', async () => {
-    const user = userEvent.setup();
-    const trigger = getTrigger();
-
     await user.click(trigger);
     expect(trigger).toHaveAttribute('aria-expanded', 'true');
     expect(screen.getByRole('menuitem', { name: 'Share on X' })).toBeVisible();
@@ -60,7 +60,7 @@ describe(`<${PostShare.name}/>`, () => {
       .spyOn(navigator.clipboard, 'writeText')
       .mockResolvedValue(undefined);
 
-    await userEvent.setup().click(getTrigger());
+    await user.click(trigger);
     fireEvent.click(screen.getByRole('menuitem', { name: 'Copy link' }));
 
     expect(writeText).toHaveBeenCalledWith('https://example.com/blog/hello');
@@ -85,14 +85,14 @@ describe(`<${PostShare.name}/>`, () => {
 
     expect(screen.getByRole('status')).toHaveTextContent('');
 
-    await userEvent.setup().click(getTrigger());
+    await user.click(trigger);
     fireEvent.click(screen.getByRole('menuitem', { name: 'Copy link' }));
 
     expect(await screen.findByRole('status')).toHaveTextContent('Link copied');
   });
 
   it('renders one share link per entry in `links`, opening in a new tab', async () => {
-    await userEvent.setup().click(getTrigger());
+    await user.click(trigger);
 
     const xLink = screen.getByRole('menuitem', { name: 'Share on X' });
     expect(xLink).toHaveAttribute('href', links[0]?.href);

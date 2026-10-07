@@ -6,32 +6,41 @@ import { IdentitySectionView } from './identity-section-view';
 const setup = customRender(IdentitySectionView, makeIdentitySectionView());
 
 describe(`<${IdentitySectionView.name}/>`, () => {
-  it('renders the panel heading as a level-2 heading', () => {
-    setup();
+  describe('with default props', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    expect(
-      screen.getByRole('heading', { level: 2, name: /Connected accounts/ }),
-    ).toBeVisible();
-  });
+    it('renders the panel heading as a level-2 heading', () => {
+      expect(
+        screen.getByRole('heading', { level: 2, name: /Connected accounts/ }),
+      ).toBeVisible();
+    });
 
-  it('renders each provider name as a level-3 heading', () => {
-    setup();
+    it('renders each provider name as a level-3 heading', () => {
+      expect(
+        screen.getByRole('heading', { level: 3, name: 'GitHub' }),
+      ).toBeVisible();
+      expect(
+        screen.getByRole('heading', { level: 3, name: 'Google' }),
+      ).toBeVisible();
+      expect(
+        screen.getByRole('heading', { level: 3, name: 'Email link' }),
+      ).toBeVisible();
+    });
 
-    expect(
-      screen.getByRole('heading', { level: 3, name: 'GitHub' }),
-    ).toBeVisible();
-    expect(
-      screen.getByRole('heading', { level: 3, name: 'Google' }),
-    ).toBeVisible();
-    expect(
-      screen.getByRole('heading', { level: 3, name: 'Email link' }),
-    ).toBeVisible();
-  });
+    it('shows the linked-status label for a linked row', () => {
+      expect(screen.getAllByText('Linked').length).toBeGreaterThan(0);
+    });
 
-  it('shows the linked-status label for a linked row', () => {
-    setup();
+    it('renders the given control for a row that is not the last remaining method', () => {
+      expect(screen.getByRole('button', { name: 'Unlink' })).toBeVisible();
+    });
 
-    expect(screen.getAllByText('Linked').length).toBeGreaterThan(0);
+    it('renders the given display-name control inside the display-name row', () => {
+      expect(screen.getByText('Display name')).toBeVisible();
+      expect(screen.getByRole('button', { name: 'Save' })).toBeVisible();
+    });
   });
 
   it('shows no linked-status label for a row that is not linked', () => {
@@ -43,12 +52,6 @@ describe(`<${IdentitySectionView.name}/>`, () => {
 
     const googleHeading = screen.getByRole('heading', { name: 'Google' });
     expect(googleHeading.parentElement).not.toHaveTextContent('Linked');
-  });
-
-  it('renders the given control for a row that is not the last remaining method', () => {
-    setup();
-
-    expect(screen.getByRole('button', { name: 'Unlink' })).toBeVisible();
   });
 
   it('renders the last-method notice instead of the control when isLastMethod is true', () => {
@@ -64,12 +67,5 @@ describe(`<${IdentitySectionView.name}/>`, () => {
     expect(
       screen.queryByRole('button', { name: 'Unlink' }),
     ).not.toBeInTheDocument();
-  });
-
-  it('renders the given display-name control inside the display-name row', () => {
-    setup();
-
-    expect(screen.getByText('Display name')).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Save' })).toBeVisible();
   });
 });

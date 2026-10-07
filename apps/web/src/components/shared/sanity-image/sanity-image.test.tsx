@@ -40,15 +40,34 @@ const setupWide = customRender(SanityImage, {
 });
 
 describe(`<${SanityImage.name}/>`, () => {
-  it('renders an img pointing at the Sanity CDN with a srcset', () => {
-    setup();
+  describe('with default props', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    const img = screen.getByRole('img', { name: image.alt });
-    expect(img).toHaveAttribute(
-      'src',
-      expect.stringContaining('https://cdn.sanity.io'),
-    );
-    expect(img.getAttribute('srcset')).toContain('cdn.sanity.io');
+    it('renders an img pointing at the Sanity CDN with a srcset', () => {
+      const img = screen.getByRole('img', { name: image.alt });
+      expect(img).toHaveAttribute(
+        'src',
+        expect.stringContaining('https://cdn.sanity.io'),
+      );
+      expect(img.getAttribute('srcset')).toContain('cdn.sanity.io');
+    });
+
+    it('renders against the default test baseUrl when no override provider is nested', () => {
+      const img = screen.getByRole('img', { name: image.alt });
+      expect(img.getAttribute('src')).toContain(STATIC_SANITY_IMAGE_BASE_URL);
+    });
+
+    it('falls back to the image alt text when no override is provided', () => {
+      expect(screen.getByAltText(image.alt)).toBeVisible();
+    });
+
+    it('renders no fetchpriority attribute when priority is omitted (default false)', () => {
+      expect(screen.getByRole('img', { name: image.alt })).not.toHaveAttribute(
+        'fetchpriority',
+      );
+    });
   });
 
   it('renders against the tenant baseUrl supplied by the surrounding SanityImageBaseUrlProvider, not a hardcoded origin', () => {
@@ -64,19 +83,6 @@ describe(`<${SanityImage.name}/>`, () => {
     const img = screen.getByRole('img', { name: image.alt });
     expect(img.getAttribute('src')).toContain('other-project/other-dataset');
     expect(img.getAttribute('srcset')).toContain('other-project/other-dataset');
-  });
-
-  it('renders against the default test baseUrl when no override provider is nested', () => {
-    setup();
-
-    const img = screen.getByRole('img', { name: image.alt });
-    expect(img.getAttribute('src')).toContain(STATIC_SANITY_IMAGE_BASE_URL);
-  });
-
-  it('falls back to the image alt text when no override is provided', () => {
-    setup();
-
-    expect(screen.getByAltText(image.alt)).toBeVisible();
   });
 
   it('uses the provided alt override instead of the image alt', () => {
@@ -103,14 +109,6 @@ describe(`<${SanityImage.name}/>`, () => {
     expect(screen.getByRole('img', { name: image.alt })).toHaveAttribute(
       'fetchpriority',
       'high',
-    );
-  });
-
-  it('renders no fetchpriority attribute when priority is omitted (default false)', () => {
-    setup();
-
-    expect(screen.getByRole('img', { name: image.alt })).not.toHaveAttribute(
-      'fetchpriority',
     );
   });
 

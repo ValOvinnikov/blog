@@ -41,6 +41,46 @@ const setup = customRenderServerAsync(TagPage, {
 });
 
 describe(`<${TagPage.name}/>`, () => {
+  describe('with the default tag', () => {
+    beforeEach(async () => {
+      await setup();
+    });
+
+    it('fetches the tag for the given slug with the tenant context', () => {
+      expect(getTagPageMock).toHaveBeenCalledWith(
+        'typescript',
+        DEFAULT_TENANT_SANITY_CONTEXT,
+      );
+    });
+
+    it('renders the tag heading and supporting text inside main', () => {
+      const main = screen.getByRole('main');
+      expect(
+        within(main).getByRole('heading', { level: 1, name: 'TypeScript' }),
+      ).toBeVisible();
+      expect(within(main).getByText('Posts about TypeScript.')).toBeVisible();
+    });
+
+    it('renders the breadcrumb trail outside main', () => {
+      const breadcrumbs = screen.getByRole('navigation', {
+        name: 'Breadcrumb',
+      });
+      expect(
+        within(breadcrumbs).getByRole('link', { name: 'Home' }),
+      ).toBeVisible();
+      expect(within(breadcrumbs).getByText('TypeScript')).toBeVisible();
+      expect(screen.getByRole('main')).not.toContainElement(breadcrumbs);
+    });
+
+    it('renders no FAQPage JSON-LD when the page has no FAQ questions', () => {
+      expect(
+        screen
+          .queryAllByTestId('json-ld-script')
+          .some((script) => script.textContent?.includes(FAQ_PAGE_JSON_LD)),
+      ).toBe(false);
+    });
+  });
+
   beforeEach(() => {
     getTagPageMock.mockResolvedValue({
       ok: true,
@@ -75,36 +115,6 @@ describe(`<${TagPage.name}/>`, () => {
 
     expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
     expect(logger.error).not.toHaveBeenCalled();
-  });
-
-  it('fetches the tag for the given slug with the tenant context', async () => {
-    await setup();
-
-    expect(getTagPageMock).toHaveBeenCalledWith(
-      'typescript',
-      DEFAULT_TENANT_SANITY_CONTEXT,
-    );
-  });
-
-  it('renders the tag heading and supporting text inside main', async () => {
-    await setup();
-
-    const main = screen.getByRole('main');
-    expect(
-      within(main).getByRole('heading', { level: 1, name: 'TypeScript' }),
-    ).toBeVisible();
-    expect(within(main).getByText('Posts about TypeScript.')).toBeVisible();
-  });
-
-  it('renders the breadcrumb trail outside main', async () => {
-    await setup();
-
-    const breadcrumbs = screen.getByRole('navigation', { name: 'Breadcrumb' });
-    expect(
-      within(breadcrumbs).getByRole('link', { name: 'Home' }),
-    ).toBeVisible();
-    expect(within(breadcrumbs).getByText('TypeScript')).toBeVisible();
-    expect(screen.getByRole('main')).not.toContainElement(breadcrumbs);
   });
 
   it('renders the authored modules inside main', async () => {
@@ -195,16 +205,6 @@ describe(`<${TagPage.name}/>`, () => {
     await setup();
 
     expect(screen.getByText('No posts tagged TypeScript yet.')).toBeVisible();
-  });
-
-  it('renders no FAQPage JSON-LD when the page has no FAQ questions', async () => {
-    await setup();
-
-    expect(
-      screen
-        .queryAllByTestId('json-ld-script')
-        .some((script) => script.textContent?.includes(FAQ_PAGE_JSON_LD)),
-    ).toBe(false);
   });
 
   it('renders the FAQPage JSON-LD when the page has FAQ questions', async () => {

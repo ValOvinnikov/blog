@@ -37,30 +37,45 @@ const setup = customRender(PostFeaturedModuleView, {
 });
 
 describe(`<${PostFeaturedModuleView.name}/>`, () => {
-  it('labels the section with the given titleId', () => {
-    setup();
+  describe('with the default props', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    const label = screen.getByText('Featured');
-    expect(label).toHaveAttribute('id', 'featured-posts-title');
-    expect(label.tagName).toBe('H2');
+    it('labels the section with the given titleId', () => {
+      const label = screen.getByText('Featured');
+      expect(label).toHaveAttribute('id', 'featured-posts-title');
+      expect(label.tagName).toBe('H2');
 
-    const section = label.closest('section');
-    expect(section).toHaveAttribute('aria-labelledby', 'featured-posts-title');
-    expect(section).toHaveAttribute(
-      'data-testid',
-      'post-featured-module-featured-1',
-    );
-    expect(screen.getByRole('region', { name: 'Featured' })).toBeVisible();
-  });
+      const section = label.closest('section');
+      expect(section).toHaveAttribute(
+        'aria-labelledby',
+        'featured-posts-title',
+      );
+      expect(section).toHaveAttribute(
+        'data-testid',
+        'post-featured-module-featured-1',
+      );
+      expect(screen.getByRole('region', { name: 'Featured' })).toBeVisible();
+    });
 
-  it('renders the first item as a lead card with a level-3 heading link', () => {
-    setup();
+    it('renders the first item as a lead card with a level-3 heading link', () => {
+      const link = screen.getByRole('link', { name: 'Lead post' });
+      expect(link).toHaveAttribute('href', leadPost.href);
+      expect(
+        screen.getByRole('heading', { level: 3, name: 'Lead post' }),
+      ).toBeVisible();
+    });
 
-    const link = screen.getByRole('link', { name: 'Lead post' });
-    expect(link).toHaveAttribute('href', leadPost.href);
-    expect(
-      screen.getByRole('heading', { level: 3, name: 'Lead post' }),
-    ).toBeVisible();
+    it('renders no media region when hasImages is not given', () => {
+      expect(screen.queryByTestId('media-card-media')).not.toBeInTheDocument();
+    });
+
+    it('renders no carousel when displayMode is GRID', () => {
+      expect(
+        screen.queryByRole('region', { name: 'Featured carousel' }),
+      ).not.toBeInTheDocument();
+    });
   });
 
   it('renders nothing (no lead group, no cards) when items is empty', () => {
@@ -114,12 +129,6 @@ describe(`<${PostFeaturedModuleView.name}/>`, () => {
     expect(screen.getAllByRole('article')).toHaveLength(3);
   });
 
-  it('renders no media region when hasImages is not given', () => {
-    setup();
-
-    expect(screen.queryByTestId('media-card-media')).not.toBeInTheDocument();
-  });
-
   it('renders a media region for the lead card when hasImages is true', () => {
     setup({ hasImages: true });
 
@@ -142,13 +151,5 @@ describe(`<${PostFeaturedModuleView.name}/>`, () => {
       await screen.findByRole('button', { name: 'Previous slide' }),
     ).toBeVisible();
     expect(screen.getByRole('button', { name: 'Next slide' })).toBeVisible();
-  });
-
-  it('renders no carousel when displayMode is GRID', () => {
-    setup();
-
-    expect(
-      screen.queryByRole('region', { name: 'Featured carousel' }),
-    ).not.toBeInTheDocument();
   });
 });

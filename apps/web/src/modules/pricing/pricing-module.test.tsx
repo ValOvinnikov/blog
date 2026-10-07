@@ -46,20 +46,6 @@ describe(`<${PricingModule.name}/>`, () => {
     });
   });
 
-  it('calls getPricingModule with the module id and the tenant Sanity context', async () => {
-    getPricingModuleMock.mockResolvedValue({
-      ok: true,
-      data: makePricingModule(),
-    });
-
-    await setup();
-
-    expect(getPricingModuleMock).toHaveBeenCalledWith(
-      'pricing-1',
-      DEFAULT_TENANT_SANITY_CONTEXT,
-    );
-  });
-
   it('renders nothing when the module fetch fails', async () => {
     getPricingModuleMock.mockResolvedValue({
       ok: false,
@@ -71,19 +57,33 @@ describe(`<${PricingModule.name}/>`, () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('renders nothing when the site settings fetch fails', async () => {
-    getPricingModuleMock.mockResolvedValue({
-      ok: true,
-      data: makePricingModule(),
-    });
-    getSiteSettingsMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
+  describe('with a default pricing module', () => {
+    beforeEach(() => {
+      getPricingModuleMock.mockResolvedValue({
+        ok: true,
+        data: makePricingModule(),
+      });
     });
 
-    const { container } = await setup();
+    it('calls getPricingModule with the module id and the tenant Sanity context', async () => {
+      await setup();
 
-    expect(container).toBeEmptyDOMElement();
+      expect(getPricingModuleMock).toHaveBeenCalledWith(
+        'pricing-1',
+        DEFAULT_TENANT_SANITY_CONTEXT,
+      );
+    });
+
+    it('renders nothing when the site settings fetch fails', async () => {
+      getSiteSettingsMock.mockResolvedValue({
+        ok: false,
+        error: new Error('boom'),
+      });
+
+      const { container } = await setup();
+
+      expect(container).toBeEmptyDOMElement();
+    });
   });
 
   it('formats prices in the site currency without trailing zeros', async () => {

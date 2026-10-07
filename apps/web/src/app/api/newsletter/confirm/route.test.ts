@@ -28,18 +28,27 @@ const subscriber = {
 };
 
 describe('GET /api/newsletter/confirm', () => {
-  beforeEach(() => {
+  let GET: typeof import('./route').GET;
+  let request: Request;
+
+  beforeEach(async () => {
+    request = new Request(
+      'https://example.com/api/newsletter/confirm?token=token-abc',
+    );
     confirmSubscriberMock.mockReset();
+    confirmSubscriberMock.mockResolvedValue({
+      outcome: 'confirmed',
+      subscriber,
+    });
     resolveWritableTenantMock.mockReset();
     resolveWritableTenantMock.mockResolvedValue({
       ok: true,
       tenantId: TENANT_ID,
     });
+    ({ GET } = await import('./route'));
   });
 
   it('returns 400 without querying the db when no token is given', async () => {
-    const { GET } = await import('./route');
-
     const response = await GET(
       new Request('https://example.com/api/newsletter/confirm'),
     );
@@ -49,15 +58,7 @@ describe('GET /api/newsletter/confirm', () => {
   });
 
   it('confirms the subscriber and returns 200 for a valid token', async () => {
-    confirmSubscriberMock.mockResolvedValue({
-      outcome: 'confirmed',
-      subscriber,
-    });
-    const { GET } = await import('./route');
-
-    const response = await GET(
-      new Request('https://example.com/api/newsletter/confirm?token=token-abc'),
-    );
+    const response = await GET(request);
     const html = await response.text();
 
     expect(response.status).toBe(200);
@@ -69,16 +70,8 @@ describe('GET /api/newsletter/confirm', () => {
   });
 
   it('declares <html lang> as the resolved request locale, not a hardcoded value', async () => {
-    confirmSubscriberMock.mockResolvedValue({
-      outcome: 'confirmed',
-      subscriber,
-    });
     vi.mocked(getLocale).mockResolvedValueOnce('fr');
-    const { GET } = await import('./route');
-
-    const response = await GET(
-      new Request('https://example.com/api/newsletter/confirm?token=token-abc'),
-    );
+    const response = await GET(request);
     const html = await response.text();
 
     expect(html).toContain('<html lang="fr">');
@@ -89,19 +82,13 @@ describe('GET /api/newsletter/confirm', () => {
       outcome: 'already-confirmed',
       subscriber,
     });
-    const { GET } = await import('./route');
-
-    const response = await GET(
-      new Request('https://example.com/api/newsletter/confirm?token=token-abc'),
-    );
+    const response = await GET(request);
 
     expect(response.status).toBe(200);
   });
 
   it('returns 404 for an unrecognized token', async () => {
     confirmSubscriberMock.mockResolvedValue({ outcome: 'not-found' });
-    const { GET } = await import('./route');
-
     const response = await GET(
       new Request('https://example.com/api/newsletter/confirm?token=bogus'),
     );
@@ -116,11 +103,7 @@ describe('GET /api/newsletter/confirm', () => {
       ok: false,
       reason: TENANT_WRITE_REFUSAL.INACTIVE,
     });
-    const { GET } = await import('./route');
-
-    const response = await GET(
-      new Request('https://example.com/api/newsletter/confirm?token=token-abc'),
-    );
+    const response = await GET(request);
     const html = await response.text();
 
     expect(response.status).toBe(403);
@@ -133,11 +116,7 @@ describe('GET /api/newsletter/confirm', () => {
       ok: false,
       reason: TENANT_WRITE_REFUSAL.UNRESOLVED,
     });
-    const { GET } = await import('./route');
-
-    const response = await GET(
-      new Request('https://example.com/api/newsletter/confirm?token=token-abc'),
-    );
+    const response = await GET(request);
     const html = await response.text();
 
     expect(response.status).toBe(404);
@@ -148,11 +127,7 @@ describe('GET /api/newsletter/confirm', () => {
   it('returns 500 and logs when the db query throws', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     confirmSubscriberMock.mockRejectedValue(new Error('db down'));
-    const { GET } = await import('./route');
-
-    const response = await GET(
-      new Request('https://example.com/api/newsletter/confirm?token=token-abc'),
-    );
+    const response = await GET(request);
 
     expect(response.status).toBe(500);
     expect(errorSpy).toHaveBeenCalled();

@@ -26,17 +26,23 @@ const setup = customRender(StatsModuleView, {
 });
 
 describe(`<${StatsModuleView.name}/>`, () => {
-  it('renders the given labels and values', () => {
-    setup();
+  describe('with default props', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    expect(screen.getByText('Monthly readers')).toBeVisible();
-    expect(screen.getByText('Median TTFB')).toBeVisible();
-  });
+    it('renders the given labels and values', () => {
+      expect(screen.getByText('Monthly readers')).toBeVisible();
+      expect(screen.getByText('Median TTFB')).toBeVisible();
+    });
 
-  it('renders no footnote when unset', () => {
-    setup();
+    it('renders no footnote when unset', () => {
+      expect(screen.queryByText(/figures reflect/i)).not.toBeInTheDocument();
+    });
 
-    expect(screen.queryByText(/figures reflect/i)).not.toBeInTheDocument();
+    it('renders no action group when there are no cta buttons', () => {
+      expect(screen.queryAllByRole('link')).toHaveLength(0);
+    });
   });
 
   it('renders the footnote when set', () => {
@@ -45,12 +51,6 @@ describe(`<${StatsModuleView.name}/>`, () => {
     expect(
       screen.getByText('Figures reflect the trailing 12 months.'),
     ).toBeVisible();
-  });
-
-  it('renders no action group when there are no cta buttons', () => {
-    setup();
-
-    expect(screen.queryAllByRole('link')).toHaveLength(0);
   });
 
   it('renders the resolved cta buttons when present', () => {

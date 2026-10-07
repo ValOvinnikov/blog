@@ -27,14 +27,13 @@ describe(resolveWritableTenant, () => {
     vi.mocked(resolveRequestTenant).mockReset();
     vi.mocked(logger.error).mockReset();
     vi.mocked(logger.warn).mockReset();
-  });
-
-  it('returns the tenant id for an ACTIVE tenant', async () => {
     vi.mocked(resolveRequestTenant).mockResolvedValue({
       id: 'tenant-1',
       status: TENANT_STATUS.ACTIVE,
     } as never);
+  });
 
+  it('returns the tenant id for an ACTIVE tenant', async () => {
     await expect(resolveWritableTenant(SITE)).resolves.toEqual({
       ok: true,
       tenantId: 'tenant-1',
@@ -71,11 +70,6 @@ describe(resolveWritableTenant, () => {
   });
 
   it('resolves the tenant row exactly once', async () => {
-    vi.mocked(resolveRequestTenant).mockResolvedValue({
-      id: 'tenant-1',
-      status: TENANT_STATUS.ACTIVE,
-    } as never);
-
     await resolveWritableTenant(SITE);
 
     expect(resolveRequestTenant).toHaveBeenCalledTimes(1);

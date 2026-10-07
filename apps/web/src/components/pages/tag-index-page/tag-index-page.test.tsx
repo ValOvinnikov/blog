@@ -102,34 +102,36 @@ describe(`<${TagIndexPage.name}/>`, () => {
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
   });
 
-  it('fetches the index page with the request context Sanity context', async () => {
-    await setup();
+  describe('when the index page exists', () => {
+    beforeEach(async () => {
+      await setup();
+    });
 
-    expect(getIndexPageMock).toHaveBeenCalledWith(
-      DEFAULT_TENANT_SANITY_CONTEXT,
-    );
-  });
+    it('fetches the index page with the request context Sanity context', () => {
+      expect(getIndexPageMock).toHaveBeenCalledWith(
+        DEFAULT_TENANT_SANITY_CONTEXT,
+      );
+    });
 
-  it('renders the heading and supporting text inside main', async () => {
-    await setup();
+    it('renders the heading and supporting text inside main', () => {
+      const main = screen.getByRole('main');
+      expect(
+        within(main).getByRole('heading', { level: 1, name: 'Tags' }),
+      ).toBeVisible();
+      expect(within(main).getByText('Browse every post by tag.')).toBeVisible();
+      expect(vi.mocked(notFound)).not.toHaveBeenCalled();
+    });
 
-    const main = screen.getByRole('main');
-    expect(
-      within(main).getByRole('heading', { level: 1, name: 'Tags' }),
-    ).toBeVisible();
-    expect(within(main).getByText('Browse every post by tag.')).toBeVisible();
-    expect(vi.mocked(notFound)).not.toHaveBeenCalled();
-  });
-
-  it('renders the breadcrumb trail outside main', async () => {
-    await setup();
-
-    const breadcrumbs = screen.getByRole('navigation', { name: 'Breadcrumb' });
-    expect(
-      within(breadcrumbs).getByRole('link', { name: 'Home' }),
-    ).toBeVisible();
-    expect(within(breadcrumbs).getByText('Tags')).toBeVisible();
-    expect(screen.getByRole('main')).not.toContainElement(breadcrumbs);
+    it('renders the breadcrumb trail outside main', () => {
+      const breadcrumbs = screen.getByRole('navigation', {
+        name: 'Breadcrumb',
+      });
+      expect(
+        within(breadcrumbs).getByRole('link', { name: 'Home' }),
+      ).toBeVisible();
+      expect(within(breadcrumbs).getByText('Tags')).toBeVisible();
+      expect(screen.getByRole('main')).not.toContainElement(breadcrumbs);
+    });
   });
 
   it('renders the authored modules inside main in order', async () => {

@@ -95,84 +95,38 @@ describe(`<${PostArticle.name}/>`, () => {
     );
   });
 
-  it('fetches the post for the given slug with the tenant context', async () => {
-    await setup();
-
-    expect(getPostMock).toHaveBeenCalledWith(
-      'hello-world',
-      DEFAULT_TENANT_SANITY_CONTEXT,
-    );
-  });
-
-  it('renders the post title, lead, author, and body', async () => {
-    await setup();
-
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Hello World' }),
-    ).toBeVisible();
-    expect(
-      screen.getByText('A sufficiently long excerpt for the card.'),
-    ).toBeVisible();
-    expect(screen.getByText('Body text.')).toBeVisible();
-    expect(screen.getByText('Jane Doe')).toBeVisible();
-  });
-
-  it('renders the bookmark toggle and share button in the header meta strip', async () => {
-    vi.mocked(isCapabilityEnabled).mockResolvedValueOnce(true);
-    getPostMock.mockResolvedValueOnce({
-      ok: true,
-      data: { ...mockPostDetail, tags: [], heroImage: undefined },
+  describe('with bookmarks enabled', () => {
+    beforeEach(() => {
+      vi.mocked(isCapabilityEnabled).mockResolvedValueOnce(true);
     });
 
-    await setup();
+    it('renders the bookmark toggle and share button in the header meta strip', async () => {
+      getPostMock.mockResolvedValueOnce({
+        ok: true,
+        data: { ...mockPostDetail, tags: [], heroImage: undefined },
+      });
 
-    const header = screen.getByTestId('post-article-header');
-    await waitFor(() =>
+      await setup();
+
+      const header = screen.getByTestId('post-article-header');
+      await waitFor(() =>
+        expect(
+          within(header).getByRole('button', { name: 'Save post' }),
+        ).toBeEnabled(),
+      );
       expect(
-        within(header).getByRole('button', { name: 'Save post' }),
-      ).toBeEnabled(),
-    );
-    expect(within(header).getByRole('button', { name: /Share/ })).toBeVisible();
-  });
-
-  it('checks the bookmark status of this post', async () => {
-    vi.mocked(isCapabilityEnabled).mockResolvedValueOnce(true);
-
-    await setup();
-
-    await waitFor(() =>
-      expect(screen.getByRole('button', { name: 'Save post' })).toBeEnabled(),
-    );
-    expect(getBookmarkStatus).toHaveBeenCalledWith(mockPostDetail.id);
-  });
-
-  it('renders no bookmark toggle when bookmarks are not enabled', async () => {
-    await setup();
-
-    expect(
-      screen.queryByRole('button', { name: 'Save post' }),
-    ).not.toBeInTheDocument();
-  });
-
-  it('renders the published date (year/month/day) and the reading time', async () => {
-    await setup();
-
-    expect(screen.getByText('January 15, 2026')).toBeVisible();
-    expect(screen.getByText('4 min read')).toBeVisible();
-  });
-
-  it('links the topic eyebrow and the author name to their routes', async () => {
-    await setup();
-
-    const topicLinks = screen.getAllByRole('link', { name: 'Engineering' });
-    expect(topicLinks.length).toBeGreaterThan(0);
-    topicLinks.forEach((link) => {
-      expect(link).toHaveAttribute('href', '/topics/engineering');
+        within(header).getByRole('button', { name: /Share/ }),
+      ).toBeVisible();
     });
-    expect(screen.getByRole('link', { name: 'Jane Doe' })).toHaveAttribute(
-      'href',
-      '/jane-doe',
-    );
+
+    it('checks the bookmark status of this post', async () => {
+      await setup();
+
+      await waitFor(() =>
+        expect(screen.getByRole('button', { name: 'Save post' })).toBeEnabled(),
+      );
+      expect(getBookmarkStatus).toHaveBeenCalledWith(mockPostDetail.id);
+    });
   });
 
   it('renders the topic eyebrow as plain text when the topic has no topic page', async () => {
@@ -212,16 +166,6 @@ describe(`<${PostArticle.name}/>`, () => {
     );
   });
 
-  it('renders the share widget with an X and a LinkedIn link', async () => {
-    await setup();
-    await userEvent.click(screen.getByRole('button', { name: /Share/ }));
-
-    expect(screen.getByRole('menuitem', { name: /Share on X/ })).toBeVisible();
-    expect(
-      screen.getByRole('menuitem', { name: /Share on LinkedIn/ }),
-    ).toBeVisible();
-  });
-
   it('renders the hero image with its own alt text', async () => {
     const heroImage: ISanityImage = {
       assetId: 'image-abc123-1600x1200-jpg',
@@ -239,29 +183,6 @@ describe(`<${PostArticle.name}/>`, () => {
     await setup();
 
     expect(screen.getByRole('img', { name: heroImage.alt })).toBeVisible();
-  });
-
-  it('builds the author avatar at a fixed 64x64 crop, not the full-size asset', async () => {
-    await setup();
-
-    const expectedAvatarUrl = urlForSanityImage(
-      POST_DETAIL_AUTHOR_IMAGE,
-      DEFAULT_TENANT_SANITY_CONTEXT,
-      { width: 64, height: 64, fit: 'crop', quality: 75 },
-    );
-
-    expect(screen.getByRole('presentation')).toHaveAttribute(
-      'src',
-      expectedAvatarUrl,
-    );
-  });
-
-  it('renders no contents rail when the body has fewer than 3 H2 headings', async () => {
-    await setup();
-
-    expect(
-      screen.queryByRole('navigation', { name: 'Topics' }),
-    ).not.toBeInTheDocument();
   });
 
   it('renders the contents rail once the body has 3+ H2 headings', async () => {
@@ -326,11 +247,86 @@ describe(`<${PostArticle.name}/>`, () => {
     expect(screen.queryByText('React')).not.toBeInTheDocument();
   });
 
-  it('renders no tag chips when the post has no tags', async () => {
-    await setup();
+  describe('with the default post', () => {
+    beforeEach(async () => {
+      await setup();
+    });
 
-    expect(
-      screen.queryByRole('link', { name: 'TypeScript' }),
-    ).not.toBeInTheDocument();
+    it('fetches the post for the given slug with the tenant context', async () => {
+      expect(getPostMock).toHaveBeenCalledWith(
+        'hello-world',
+        DEFAULT_TENANT_SANITY_CONTEXT,
+      );
+    });
+
+    it('renders the post title, lead, author, and body', async () => {
+      expect(
+        screen.getByRole('heading', { level: 1, name: 'Hello World' }),
+      ).toBeVisible();
+      expect(
+        screen.getByText('A sufficiently long excerpt for the card.'),
+      ).toBeVisible();
+      expect(screen.getByText('Body text.')).toBeVisible();
+      expect(screen.getByText('Jane Doe')).toBeVisible();
+    });
+
+    it('renders no bookmark toggle when bookmarks are not enabled', async () => {
+      expect(
+        screen.queryByRole('button', { name: 'Save post' }),
+      ).not.toBeInTheDocument();
+    });
+
+    it('renders the published date (year/month/day) and the reading time', async () => {
+      expect(screen.getByText('January 15, 2026')).toBeVisible();
+      expect(screen.getByText('4 min read')).toBeVisible();
+    });
+
+    it('links the topic eyebrow and the author name to their routes', async () => {
+      const topicLinks = screen.getAllByRole('link', { name: 'Engineering' });
+      expect(topicLinks.length).toBeGreaterThan(0);
+      topicLinks.forEach((link) => {
+        expect(link).toHaveAttribute('href', '/topics/engineering');
+      });
+      expect(screen.getByRole('link', { name: 'Jane Doe' })).toHaveAttribute(
+        'href',
+        '/jane-doe',
+      );
+    });
+
+    it('renders the share widget with an X and a LinkedIn link', async () => {
+      await userEvent.click(screen.getByRole('button', { name: /Share/ }));
+
+      expect(
+        screen.getByRole('menuitem', { name: /Share on X/ }),
+      ).toBeVisible();
+      expect(
+        screen.getByRole('menuitem', { name: /Share on LinkedIn/ }),
+      ).toBeVisible();
+    });
+
+    it('builds the author avatar at a fixed 64x64 crop, not the full-size asset', async () => {
+      const expectedAvatarUrl = urlForSanityImage(
+        POST_DETAIL_AUTHOR_IMAGE,
+        DEFAULT_TENANT_SANITY_CONTEXT,
+        { width: 64, height: 64, fit: 'crop', quality: 75 },
+      );
+
+      expect(screen.getByRole('presentation')).toHaveAttribute(
+        'src',
+        expectedAvatarUrl,
+      );
+    });
+
+    it('renders no contents rail when the body has fewer than 3 H2 headings', async () => {
+      expect(
+        screen.queryByRole('navigation', { name: 'Topics' }),
+      ).not.toBeInTheDocument();
+    });
+
+    it('renders no tag chips when the post has no tags', async () => {
+      expect(
+        screen.queryByRole('link', { name: 'TypeScript' }),
+      ).not.toBeInTheDocument();
+    });
   });
 });

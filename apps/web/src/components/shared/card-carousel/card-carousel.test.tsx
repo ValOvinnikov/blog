@@ -16,21 +16,29 @@ const setup = customRender(CardCarousel, {
 });
 
 describe(`<${CardCarousel.name}/>`, () => {
-  it('renders a labelled carousel with one card per item', async () => {
-    setup();
+  describe('with default props', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    const region = screen.getByRole('region', {
-      name: 'Latest posts carousel',
+    it('renders a labelled carousel with one card per item', async () => {
+      const region = screen.getByRole('region', {
+        name: 'Latest posts carousel',
+      });
+      const cards = within(region).getAllByRole('article');
+      expect(cards).toHaveLength(items.length);
+      items.forEach((item, index) => {
+        expect(cards[index]).toHaveTextContent(item.title);
+      });
+      expect(
+        await screen.findByRole('button', { name: 'Previous slide' }),
+      ).toBeVisible();
+      expect(screen.getByRole('button', { name: 'Next slide' })).toBeVisible();
     });
-    const cards = within(region).getAllByRole('article');
-    expect(cards).toHaveLength(items.length);
-    items.forEach((item, index) => {
-      expect(cards[index]).toHaveTextContent(item.title);
+
+    it('renders no media region when hasImages is omitted', () => {
+      expect(screen.queryByTestId('media-card-media')).not.toBeInTheDocument();
     });
-    expect(
-      await screen.findByRole('button', { name: 'Previous slide' }),
-    ).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Next slide' })).toBeVisible();
   });
 
   it('renders a media region with the image node when hasImages is set', () => {
@@ -47,11 +55,5 @@ describe(`<${CardCarousel.name}/>`, () => {
     setup({ items: [makePostListItem()], hasImages: true });
 
     expect(screen.getByTestId('media-card-media')).toBeEmptyDOMElement();
-  });
-
-  it('renders no media region when hasImages is omitted', () => {
-    setup();
-
-    expect(screen.queryByTestId('media-card-media')).not.toBeInTheDocument();
   });
 });

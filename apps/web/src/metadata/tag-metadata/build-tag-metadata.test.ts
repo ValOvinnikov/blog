@@ -38,25 +38,19 @@ const seo = makeSeo({
 describe('buildTagMetadata', () => {
   beforeEach(() => {
     getTagPageMock.mockReset();
-  });
-
-  it('forwards the slug to getTagPage, the loader TagPage reads', async () => {
     getTagPageMock.mockResolvedValue({
       ok: true,
       data: makeTagDetailPage({ seo }),
     });
+  });
 
+  it('forwards the slug to getTagPage, the loader TagPage reads', async () => {
     await buildTagMetadata('typescript');
 
     expect(getTagPageMock).toHaveBeenCalledWith('typescript');
   });
 
   it('builds page-1 metadata from the resolved seo, self-canonical to /tags/[slug]', async () => {
-    getTagPageMock.mockResolvedValue({
-      ok: true,
-      data: makeTagDetailPage({ seo }),
-    });
-
     const metadata = await buildTagMetadata('typescript');
 
     expect(metadata.title).toBe('TypeScript');
@@ -72,23 +66,7 @@ describe('buildTagMetadata', () => {
     ]);
   });
 
-  it('returns empty metadata when the tag fetch fails', async () => {
-    getTagPageMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
-
-    const metadata = await buildTagMetadata('typescript');
-
-    expect(metadata).toEqual({});
-  });
-
   it('builds page-N metadata with a "– Page N" suffix, canonical to its own page URL', async () => {
-    getTagPageMock.mockResolvedValue({
-      ok: true,
-      data: makeTagDetailPage({ seo }),
-    });
-
     const metadata = await buildTagMetadata('typescript', 2);
 
     expect(metadata.title).toBe('TypeScript – Page 2');
@@ -112,15 +90,25 @@ describe('buildTagMetadata', () => {
     expect(metadata.twitter?.title).toBeUndefined();
   });
 
-  it('returns empty metadata for page N when the tag fetch fails', async () => {
-    getTagPageMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
+  describe('when the tag fetch fails', () => {
+    beforeEach(() => {
+      getTagPageMock.mockResolvedValue({
+        ok: false,
+        error: new Error('boom'),
+      });
     });
 
-    const metadata = await buildTagMetadata('missing', 2);
+    it('returns empty metadata when the tag fetch fails', async () => {
+      const metadata = await buildTagMetadata('typescript');
 
-    expect(metadata).toEqual({});
+      expect(metadata).toEqual({});
+    });
+
+    it('returns empty metadata for page N when the tag fetch fails', async () => {
+      const metadata = await buildTagMetadata('missing', 2);
+
+      expect(metadata).toEqual({});
+    });
   });
 
   it('returns empty metadata without logging when the tag simply does not exist', async () => {

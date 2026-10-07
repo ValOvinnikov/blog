@@ -19,9 +19,11 @@ const inLanguage = (locale: typeof EN | typeof NL) => {
 };
 
 describe(redirectMissingLanguagePage, () => {
-  it('redirects to / when a non-default language has no page of its own', async () => {
+  beforeEach(() => {
     inLanguage(NL);
+  });
 
+  it('redirects to / when a non-default language has no page of its own', async () => {
     await expect(
       redirectMissingLanguagePage({ ok: true, data: undefined }),
     ).rejects.toThrow('NEXT_REDIRECT');
@@ -38,16 +40,12 @@ describe(redirectMissingLanguagePage, () => {
   });
 
   it('does not redirect when the language has its page', async () => {
-    inLanguage(NL);
-
     await redirectMissingLanguagePage({ ok: true, data: { title: 'Blog' } });
 
     expect(redirect).not.toHaveBeenCalled();
   });
 
   it('does not redirect when the fetch failed', async () => {
-    inLanguage(NL);
-
     await redirectMissingLanguagePage({ ok: false, error: new Error('boom') });
 
     expect(redirect).not.toHaveBeenCalled();

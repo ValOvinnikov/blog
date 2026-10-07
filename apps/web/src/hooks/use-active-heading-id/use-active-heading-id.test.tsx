@@ -85,10 +85,46 @@ describe(useActiveHeadingId, () => {
     vi.unstubAllGlobals();
   });
 
-  it('returns null before any heading has intersected', () => {
-    setup({ ids: ['one', 'two', 'three'] });
+  describe('with three headings', () => {
+    let observer: FakeIntersectionObserver;
 
-    expect(screen.getByTestId('active-id')).toHaveTextContent('none');
+    beforeEach(() => {
+      setup({ ids: ['one', 'two', 'three'] });
+      observer = getObserver();
+    });
+
+    it('returns null before any heading has intersected', () => {
+      expect(screen.getByTestId('active-id')).toHaveTextContent('none');
+    });
+
+    it('sets the active id to the intersecting heading', () => {
+      observer.trigger([
+        {
+          target: document.getElementById('one')!,
+          isIntersecting: true,
+          top: 10,
+        },
+      ]);
+
+      expect(screen.getByTestId('active-id')).toHaveTextContent('one');
+    });
+
+    it('picks the topmost heading when multiple are intersecting at once', () => {
+      observer.trigger([
+        {
+          target: document.getElementById('two')!,
+          isIntersecting: true,
+          top: 50,
+        },
+        {
+          target: document.getElementById('one')!,
+          isIntersecting: true,
+          top: 5,
+        },
+      ]);
+
+      expect(screen.getByTestId('active-id')).toHaveTextContent('one');
+    });
   });
 
   it('returns nothing to observe for an empty id list', () => {
@@ -96,37 +132,6 @@ describe(useActiveHeadingId, () => {
 
     expect(FakeIntersectionObserver.instances).toHaveLength(0);
     expect(screen.getByTestId('active-id')).toHaveTextContent('none');
-  });
-
-  it('sets the active id to the intersecting heading', () => {
-    setup({ ids: ['one', 'two', 'three'] });
-    const observer = getObserver();
-
-    observer.trigger([
-      {
-        target: document.getElementById('one')!,
-        isIntersecting: true,
-        top: 10,
-      },
-    ]);
-
-    expect(screen.getByTestId('active-id')).toHaveTextContent('one');
-  });
-
-  it('picks the topmost heading when multiple are intersecting at once', () => {
-    setup({ ids: ['one', 'two', 'three'] });
-    const observer = getObserver();
-
-    observer.trigger([
-      {
-        target: document.getElementById('two')!,
-        isIntersecting: true,
-        top: 50,
-      },
-      { target: document.getElementById('one')!, isIntersecting: true, top: 5 },
-    ]);
-
-    expect(screen.getByTestId('active-id')).toHaveTextContent('one');
   });
 
   it('ignores non-intersecting entries', () => {

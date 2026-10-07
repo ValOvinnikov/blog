@@ -39,60 +39,64 @@ describe('buildTopicMetadata', () => {
     getTopicPageMock.mockReset();
   });
 
-  it('forwards the slug to getTopicPage, the loader TopicPage reads', async () => {
-    getTopicPageMock.mockResolvedValue({
-      ok: true,
-      data: { topic: {}, modules: [], seo, translations: [] },
+  describe('when the topic resolves', () => {
+    beforeEach(() => {
+      getTopicPageMock.mockResolvedValue({
+        ok: true,
+        data: { topic: {}, modules: [], seo, translations: [] },
+      });
     });
 
-    await buildTopicMetadata('engineering');
+    it('forwards the slug to getTopicPage, the loader TopicPage reads', async () => {
+      await buildTopicMetadata('engineering');
 
-    expect(getTopicPageMock).toHaveBeenCalledWith('engineering');
+      expect(getTopicPageMock).toHaveBeenCalledWith('engineering');
+    });
+
+    it('builds page-1 metadata from the resolved seo, self-canonical to /topics/[slug]', async () => {
+      const metadata = await buildTopicMetadata('engineering');
+
+      expect(metadata.title).toBe('Engineering');
+      expect(metadata.description).toBe('Posts about building things.');
+      expect(metadata.alternates?.canonical).toBe('/topics/engineering');
+      expect(metadata.openGraph?.title).toBe('Engineering OG');
+      expect(metadata.openGraph?.description).toBe(
+        'Posts about building things OG.',
+      );
+      expect(metadata.openGraph?.images).toEqual([
+        { url: EXPECTED_OG_IMAGE_URL },
+      ]);
+    });
+
+    it('builds page-N metadata with a "– Page N" suffix, self-canonical to its own URL', async () => {
+      const metadata = await buildTopicMetadata('engineering', 2);
+
+      expect(metadata.title).toBe('Engineering – Page 2');
+      expect(metadata.openGraph?.title).toBe('Engineering OG – Page 2');
+      expect(metadata.alternates?.canonical).toBe('/topics/engineering/page/2');
+      expect(metadata.alternates?.canonical).not.toBe('/topics/engineering');
+    });
   });
 
-  it('builds page-1 metadata from the resolved seo, self-canonical to /topics/[slug]', async () => {
-    getTopicPageMock.mockResolvedValue({
-      ok: true,
-      data: { topic: {}, modules: [], seo, translations: [] },
+  describe('when the topic fetch fails', () => {
+    beforeEach(() => {
+      getTopicPageMock.mockResolvedValue({
+        ok: false,
+        error: new Error('boom'),
+      });
     });
 
-    const metadata = await buildTopicMetadata('engineering');
+    it('returns empty metadata when the topic fetch fails', async () => {
+      const metadata = await buildTopicMetadata('engineering');
 
-    expect(metadata.title).toBe('Engineering');
-    expect(metadata.description).toBe('Posts about building things.');
-    expect(metadata.alternates?.canonical).toBe('/topics/engineering');
-    expect(metadata.openGraph?.title).toBe('Engineering OG');
-    expect(metadata.openGraph?.description).toBe(
-      'Posts about building things OG.',
-    );
-    expect(metadata.openGraph?.images).toEqual([
-      { url: EXPECTED_OG_IMAGE_URL },
-    ]);
-  });
-
-  it('returns empty metadata when the topic fetch fails', async () => {
-    getTopicPageMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
+      expect(metadata).toEqual({});
     });
 
-    const metadata = await buildTopicMetadata('engineering');
+    it('returns empty metadata for page N when the topic fetch fails', async () => {
+      const metadata = await buildTopicMetadata('missing', 2);
 
-    expect(metadata).toEqual({});
-  });
-
-  it('builds page-N metadata with a "– Page N" suffix, self-canonical to its own URL', async () => {
-    getTopicPageMock.mockResolvedValue({
-      ok: true,
-      data: { topic: {}, modules: [], seo, translations: [] },
+      expect(metadata).toEqual({});
     });
-
-    const metadata = await buildTopicMetadata('engineering', 2);
-
-    expect(metadata.title).toBe('Engineering – Page 2');
-    expect(metadata.openGraph?.title).toBe('Engineering OG – Page 2');
-    expect(metadata.alternates?.canonical).toBe('/topics/engineering/page/2');
-    expect(metadata.alternates?.canonical).not.toBe('/topics/engineering');
   });
 
   it('leaves ogTitle omitted on page 2+ when unauthored, never suffixing "undefined"', async () => {
@@ -110,17 +114,6 @@ describe('buildTopicMetadata', () => {
 
     expect(metadata.openGraph?.title).toBeUndefined();
     expect(metadata.twitter?.title).toBeUndefined();
-  });
-
-  it('returns empty metadata for page N when the topic fetch fails', async () => {
-    getTopicPageMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
-
-    const metadata = await buildTopicMetadata('missing', 2);
-
-    expect(metadata).toEqual({});
   });
 
   it('returns empty metadata without logging when the topic simply does not exist', async () => {

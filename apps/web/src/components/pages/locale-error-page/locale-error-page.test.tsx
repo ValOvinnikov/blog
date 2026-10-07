@@ -21,78 +21,84 @@ const reset = vi.fn();
 const setup = customRender(LocaleErrorPage, { error, reset });
 
 describe(`<${LocaleErrorPage.name}/>`, () => {
-  it('renders the translated heading, copy, and actions', () => {
-    setup();
+  describe('when rendered', () => {
+    let rerender: ReturnType<typeof setup>['rerender'];
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Something went wrong' }),
-    ).toBeVisible();
-    expect(
-      screen.getByText(
-        'An unexpected error occurred while rendering this page. You can try again, or head back to the homepage.',
-      ),
-    ).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Try again' })).toBeVisible();
-  });
+    beforeEach(() => {
+      ({ rerender } = setup());
+    });
 
-  it('renders "Go home" as a real link, not a button', () => {
-    setup();
+    it('renders the translated heading, copy, and actions', () => {
+      expect(
+        screen.getByRole('heading', { level: 1, name: 'Something went wrong' }),
+      ).toBeVisible();
+      expect(
+        screen.getByText(
+          'An unexpected error occurred while rendering this page. You can try again, or head back to the homepage.',
+        ),
+      ).toBeVisible();
+      expect(screen.getByRole('button', { name: 'Try again' })).toBeVisible();
+    });
 
-    const goHomeLink = screen.getByRole('link', { name: 'Go home' });
-    expect(goHomeLink).toBeVisible();
-    expect(goHomeLink).toHaveAttribute('href', '/');
-  });
+    it('renders "Go home" as a real link, not a button', () => {
+      const goHomeLink = screen.getByRole('link', { name: 'Go home' });
+      expect(goHomeLink).toBeVisible();
+      expect(goHomeLink).toHaveAttribute('href', '/');
+    });
 
-  it('announces the error to assistive technology after mount', () => {
-    setup();
+    it('announces the error to assistive technology after mount', () => {
+      expect(
+        screen.getByText(SITE_MESSAGES.localeErrorPage.announcement),
+      ).toBeVisible();
+      expect(SITE_MESSAGES.localeErrorPage.announcement).not.toBe(
+        SITE_MESSAGES.localeErrorPage.title,
+      );
+    });
 
-    expect(
-      screen.getByText(SITE_MESSAGES.localeErrorPage.announcement),
-    ).toBeVisible();
-    expect(SITE_MESSAGES.localeErrorPage.announcement).not.toBe(
-      SITE_MESSAGES.localeErrorPage.title,
-    );
-  });
+    it('names both available actions in the announcement, matching the rendered controls', () => {
+      const announcement =
+        SITE_MESSAGES.localeErrorPage.announcement.toLowerCase();
+      const tryAgainLabel =
+        screen.getByRole('button', { name: 'Try again' }).textContent ?? '';
+      const goHomeLabel =
+        screen.getByRole('link', { name: 'Go home' }).textContent ?? '';
 
-  it('names both available actions in the announcement, matching the rendered controls', () => {
-    setup();
+      expect(announcement).toContain(tryAgainLabel.toLowerCase());
+      expect(announcement).toContain(goHomeLabel.toLowerCase());
+    });
 
-    const announcement =
-      SITE_MESSAGES.localeErrorPage.announcement.toLowerCase();
-    const tryAgainLabel =
-      screen.getByRole('button', { name: 'Try again' }).textContent ?? '';
-    const goHomeLabel =
-      screen.getByRole('link', { name: 'Go home' }).textContent ?? '';
+    it('sets aria-atomic on the live region', () => {
+      expect(
+        screen.getByText(SITE_MESSAGES.localeErrorPage.announcement),
+      ).toHaveAttribute('aria-atomic', 'true');
+    });
 
-    expect(announcement).toContain(tryAgainLabel.toLowerCase());
-    expect(announcement).toContain(goHomeLabel.toLowerCase());
-  });
+    it('reports the error exactly once on mount, with its digest', () => {
+      expect(reportClientErrorMock).toHaveBeenCalledTimes(1);
+      expect(reportClientErrorMock).toHaveBeenCalledWith(
+        'locale_error_boundary.render_failed',
+        error,
+        { digest: 'digest-123' },
+      );
+    });
 
-  it('sets aria-atomic on the live region', () => {
-    setup();
+    it('does not re-report when re-rendered with the same error', () => {
+      rerender(<LocaleErrorPage error={error} reset={reset} />);
 
-    expect(
-      screen.getByText(SITE_MESSAGES.localeErrorPage.announcement),
-    ).toHaveAttribute('aria-atomic', 'true');
-  });
+      expect(reportClientErrorMock).toHaveBeenCalledTimes(1);
+    });
 
-  it('reports the error exactly once on mount, with its digest', () => {
-    setup();
+    it('calls reset when "Try again" is clicked', async () => {
+      const user = userEvent.setup();
 
-    expect(reportClientErrorMock).toHaveBeenCalledTimes(1);
-    expect(reportClientErrorMock).toHaveBeenCalledWith(
-      'locale_error_boundary.render_failed',
-      error,
-      { digest: 'digest-123' },
-    );
-  });
+      await user.click(screen.getByRole('button', { name: 'Try again' }));
 
-  it('does not re-report when re-rendered with the same error', () => {
-    const { rerender } = setup();
+      expect(reset).toHaveBeenCalledTimes(1);
+    });
 
-    rerender(<LocaleErrorPage error={error} reset={reset} />);
-
-    expect(reportClientErrorMock).toHaveBeenCalledTimes(1);
+    it('moves focus to the page container on mount', () => {
+      expect(screen.getByRole('main')).toHaveFocus();
+    });
   });
 
   it("does not re-report when `t`'s identity changes but the error does not", () => {
@@ -115,20 +121,5 @@ describe(`<${LocaleErrorPage.name}/>`, () => {
     );
 
     expect(reportClientErrorMock).toHaveBeenCalledTimes(1);
-  });
-
-  it('calls reset when "Try again" is clicked', async () => {
-    const user = userEvent.setup();
-    setup();
-
-    await user.click(screen.getByRole('button', { name: 'Try again' }));
-
-    expect(reset).toHaveBeenCalledTimes(1);
-  });
-
-  it('moves focus to the page container on mount', () => {
-    setup();
-
-    expect(screen.getByRole('main')).toHaveFocus();
   });
 });

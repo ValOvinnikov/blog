@@ -25,6 +25,10 @@ const getRedirectMock = vi.mocked(service.pages.landing.v1.getRedirect);
 const MISSING = { ok: true, data: undefined } as const;
 
 describe(redirectMovedLandingPage, () => {
+  beforeEach(() => {
+    getRedirectMock.mockResolvedValue(MISSING);
+  });
+
   it('redirects permanently to the destination in the request language', async () => {
     vi.mocked(getRequestContext).mockResolvedValue({
       ...DEFAULT_REQUEST_CONTEXT,
@@ -43,8 +47,6 @@ describe(redirectMovedLandingPage, () => {
   });
 
   it('looks the redirect up by path segments with the tenant context', async () => {
-    getRedirectMock.mockResolvedValueOnce({ ok: true, data: undefined });
-
     await redirectMovedLandingPage(MISSING, 'old/faq');
 
     expect(getRedirectMock).toHaveBeenCalledWith(
@@ -54,8 +56,6 @@ describe(redirectMovedLandingPage, () => {
   });
 
   it('does nothing when no redirect matches', async () => {
-    getRedirectMock.mockResolvedValueOnce({ ok: true, data: undefined });
-
     await redirectMovedLandingPage(MISSING, 'unknown');
 
     expect(permanentRedirect).not.toHaveBeenCalled();

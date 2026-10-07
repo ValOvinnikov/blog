@@ -67,6 +67,50 @@ describe(`<${PostIndexPage.name}/>`, () => {
     });
   });
 
+  describe('with the default index page', () => {
+    beforeEach(async () => {
+      await setup();
+    });
+
+    it('fetches the index page with the tenant context', () => {
+      expect(getIndexPageMock).toHaveBeenCalledWith(
+        DEFAULT_TENANT_SANITY_CONTEXT,
+      );
+    });
+
+    it('renders the page heading and supporting text inside main', () => {
+      const main = screen.getByRole('main');
+      expect(
+        within(main).getByRole('heading', { level: 1, name: 'Blog' }),
+      ).toBeVisible();
+      expect(within(main).getByText('Notes from the team.')).toBeVisible();
+      expect(vi.mocked(notFound)).not.toHaveBeenCalled();
+    });
+
+    it('renders the breadcrumb trail outside main', () => {
+      const breadcrumbs = screen.getByRole('navigation', {
+        name: 'Breadcrumb',
+      });
+      expect(
+        within(breadcrumbs).getByRole('link', { name: 'Home' }),
+      ).toBeVisible();
+      expect(within(breadcrumbs).getByText('Blog')).toBeVisible();
+      expect(screen.getByRole('main')).not.toContainElement(breadcrumbs);
+    });
+
+    it('renders the tenant topic chips inside main', () => {
+      const topics = within(screen.getByRole('main')).getByRole('navigation', {
+        name: 'Topics',
+      });
+      expect(
+        within(topics).getByRole('link', { name: 'Engineering' }),
+      ).toHaveAttribute('href', '/topics/engineering');
+      expect(service.entities.topics.v1.getTopics).toHaveBeenCalledWith(
+        DEFAULT_TENANT_SANITY_CONTEXT,
+      );
+    });
+  });
+
   it('logs and calls notFound() when the fetch fails', async () => {
     getIndexPageMock.mockResolvedValueOnce({
       ok: false,
@@ -103,50 +147,6 @@ describe(`<${PostIndexPage.name}/>`, () => {
 
     expect(vi.mocked(redirect)).toHaveBeenCalledWith('/');
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();
-  });
-
-  it('fetches the index page with the tenant context', async () => {
-    await setup();
-
-    expect(getIndexPageMock).toHaveBeenCalledWith(
-      DEFAULT_TENANT_SANITY_CONTEXT,
-    );
-  });
-
-  it('renders the page heading and supporting text inside main', async () => {
-    await setup();
-
-    const main = screen.getByRole('main');
-    expect(
-      within(main).getByRole('heading', { level: 1, name: 'Blog' }),
-    ).toBeVisible();
-    expect(within(main).getByText('Notes from the team.')).toBeVisible();
-    expect(vi.mocked(notFound)).not.toHaveBeenCalled();
-  });
-
-  it('renders the breadcrumb trail outside main', async () => {
-    await setup();
-
-    const breadcrumbs = screen.getByRole('navigation', { name: 'Breadcrumb' });
-    expect(
-      within(breadcrumbs).getByRole('link', { name: 'Home' }),
-    ).toBeVisible();
-    expect(within(breadcrumbs).getByText('Blog')).toBeVisible();
-    expect(screen.getByRole('main')).not.toContainElement(breadcrumbs);
-  });
-
-  it('renders the tenant topic chips inside main', async () => {
-    await setup();
-
-    const topics = within(screen.getByRole('main')).getByRole('navigation', {
-      name: 'Topics',
-    });
-    expect(
-      within(topics).getByRole('link', { name: 'Engineering' }),
-    ).toHaveAttribute('href', '/topics/engineering');
-    expect(service.entities.topics.v1.getTopics).toHaveBeenCalledWith(
-      DEFAULT_TENANT_SANITY_CONTEXT,
-    );
   });
 
   it('renders the authored modules inside main', async () => {

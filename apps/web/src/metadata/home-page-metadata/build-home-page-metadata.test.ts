@@ -2,6 +2,7 @@ import { LOCALE_ISO_CODES } from '@blog/config';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { makeSeo } from '@web/testing/shared/seo/fixtures';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import type { MockInstance } from 'vitest';
 
 import { buildHomePageMetadata } from './build-home-page-metadata';
 
@@ -37,42 +38,53 @@ describe('buildHomePageMetadata', () => {
     });
   });
 
-  it('returns empty metadata and logs when the fetch fails', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getHomePageMock.mockResolvedValue({ ok: false, error: new Error('boom') });
+  describe('when no metadata can be built', () => {
+    let errorSpy: MockInstance<typeof console.error>;
 
-    expect(await buildHomePageMetadata()).toEqual({});
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('home_page.metadata_fetch_failed'),
-    );
+    beforeEach(() => {
+      errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    });
 
-    errorSpy.mockRestore();
+    afterEach(() => {
+      errorSpy.mockRestore();
+    });
+
+    it('returns empty metadata and logs when the fetch fails', async () => {
+      getHomePageMock.mockResolvedValue({
+        ok: false,
+        error: new Error('boom'),
+      });
+
+      expect(await buildHomePageMetadata()).toEqual({});
+      expect(errorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('home_page.metadata_fetch_failed'),
+      );
+    });
+
+    it('returns empty metadata without logging when this language has no Home', async () => {
+      getHomePageMock.mockResolvedValue({ ok: true, data: undefined });
+
+      expect(await buildHomePageMetadata()).toEqual({});
+      expect(errorSpy).not.toHaveBeenCalled();
+    });
   });
 
-  it('returns empty metadata without logging when this language has no Home', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    getHomePageMock.mockResolvedValue({ ok: true, data: undefined });
+  describe('when only this Home exists', () => {
+    beforeEach(() => {
+      getHomePageMock.mockResolvedValue(homePage([EN]));
+    });
 
-    expect(await buildHomePageMetadata()).toEqual({});
-    expect(errorSpy).not.toHaveBeenCalled();
+    it('uses the seo title as the absolute title', async () => {
+      const metadata = await buildHomePageMetadata();
 
-    errorSpy.mockRestore();
-  });
+      expect(metadata.title).toEqual({ absolute: 'Home' });
+    });
 
-  it('uses the seo title as the absolute title', async () => {
-    getHomePageMock.mockResolvedValue(homePage([EN]));
+    it('is self-canonical to / with no languages when only this Home exists', async () => {
+      const metadata = await buildHomePageMetadata();
 
-    const metadata = await buildHomePageMetadata();
-
-    expect(metadata.title).toEqual({ absolute: 'Home' });
-  });
-
-  it('is self-canonical to / with no languages when only this Home exists', async () => {
-    getHomePageMock.mockResolvedValue(homePage([EN]));
-
-    const metadata = await buildHomePageMetadata();
-
-    expect(metadata.alternates).toEqual({ canonical: '/' });
+      expect(metadata.alternates).toEqual({ canonical: '/' });
+    });
   });
 
   it('lists every live Home as hreflang with x-default on the default language', async () => {

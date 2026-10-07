@@ -17,19 +17,21 @@ const props = {
 const setup = customRender(DeepAside, props);
 
 describe(`<${DeepAside.name}/>`, () => {
-  it('renders the Aside molecule with its label and content', () => {
-    setup();
+  describe('outside a DepthProvider', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    expect(screen.getByRole('note')).toBeVisible();
-    expect(screen.getByText('Why not X')).toBeVisible();
-    expect(screen.getByText('Because Y.')).toBeVisible();
-  });
+    it('renders the Aside molecule with its label and content', () => {
+      expect(screen.getByRole('note')).toBeVisible();
+      expect(screen.getByText('Why not X')).toBeVisible();
+      expect(screen.getByText('Because Y.')).toBeVisible();
+    });
 
-  it('is not gated by depth outside a DepthProvider', () => {
-    setup();
-
-    expect(screen.getByRole('note')).toBeVisible();
-    expect(screen.queryByTestId('deep-aside-gate')).not.toBeInTheDocument();
+    it('is not gated by depth outside a DepthProvider', () => {
+      expect(screen.getByRole('note')).toBeVisible();
+      expect(screen.queryByTestId('deep-aside-gate')).not.toBeInTheDocument();
+    });
   });
 
   it('is gated by depth inside a DepthProvider', () => {

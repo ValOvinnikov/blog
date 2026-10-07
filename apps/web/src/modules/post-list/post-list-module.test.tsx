@@ -38,6 +38,18 @@ describe(`<${PostListModule.name}/>`, () => {
     getPostListMock.mockReset();
     getRequestContextMock.mockReset();
     getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
+    getPostListMock.mockResolvedValue({
+      ok: true,
+      data: {
+        brandVariant: BRAND_VARIANT.PRIMARY,
+        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
+        posts: [],
+        layout: undefined,
+        contentAlignment: undefined,
+        currentPage: 1,
+        totalPages: 1,
+      },
+    });
   });
 
   it('logs and calls notFound() when the fetch fails', async () => {
@@ -82,19 +94,6 @@ describe(`<${PostListModule.name}/>`, () => {
   });
 
   it('defaults the resolved page to 1 when context is absent', async () => {
-    getPostListMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
-        posts: [],
-        layout: undefined,
-        contentAlignment: undefined,
-        currentPage: 1,
-        totalPages: 1,
-      },
-    });
-
     await setup({ context: undefined });
 
     expect(getPostListMock).toHaveBeenCalledWith(
@@ -115,19 +114,6 @@ describe(`<${PostListModule.name}/>`, () => {
       ...DEFAULT_REQUEST_CONTEXT,
       sanityContext: tenant,
     });
-    getPostListMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
-        posts: [],
-        layout: undefined,
-        contentAlignment: undefined,
-        currentPage: 1,
-        totalPages: 1,
-      },
-    });
-
     await setup();
 
     expect(getPostListMock).toHaveBeenCalledWith(
@@ -139,19 +125,6 @@ describe(`<${PostListModule.name}/>`, () => {
   });
 
   it('renders the i18n default empty message when zero posts resolve, unconditionally', async () => {
-    getPostListMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
-        posts: [],
-        layout: undefined,
-        contentAlignment: undefined,
-        currentPage: 1,
-        totalPages: 1,
-      },
-    });
-
     await setup();
 
     expect(screen.getByText('No posts yet.')).toBeVisible();
@@ -215,19 +188,6 @@ describe(`<${PostListModule.name}/>`, () => {
   });
 
   it('does not 404 page 1 of an empty archive, and renders the derived empty message', async () => {
-    getPostListMock.mockResolvedValue({
-      ok: true,
-      data: {
-        brandVariant: BRAND_VARIANT.PRIMARY,
-        headingBlock: makeHeadingBlock({ heading: 'Blog' }),
-        posts: [],
-        layout: undefined,
-        contentAlignment: undefined,
-        currentPage: 1,
-        totalPages: 1,
-      },
-    });
-
     await setup({ context: { page: 1 } });
 
     expect(vi.mocked(notFound)).not.toHaveBeenCalled();

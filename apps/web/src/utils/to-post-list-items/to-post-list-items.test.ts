@@ -1,3 +1,4 @@
+import type { TPostCard } from '@blog/service';
 import {
   makePostCard,
   makePostCardTopic,
@@ -34,32 +35,37 @@ describe('toPostListItems', () => {
     });
   });
 
-  it('formats the date via next-intl getFormatter, using the request-scoped locale', async () => {
-    const post = makePostCard({ publishedAt: '2026-01-15T00:00:00.000Z' });
+  describe('date formatting', () => {
+    let post: TPostCard;
 
-    vi.mocked(getFormatter).mockResolvedValueOnce({
-      dateTime: () => '15 janvier 2026',
-    } as unknown as Awaited<ReturnType<typeof getFormatter>>);
+    beforeEach(() => {
+      post = makePostCard({ publishedAt: '2026-01-15T00:00:00.000Z' });
+    });
 
-    const [item] = await toPostListItems([post]);
+    it('formats the date via next-intl getFormatter, using the request-scoped locale', async () => {
+      vi.mocked(getFormatter).mockResolvedValueOnce({
+        dateTime: () => '15 janvier 2026',
+      } as unknown as Awaited<ReturnType<typeof getFormatter>>);
 
-    expect(item?.formattedDate).toBe('15 janvier 2026');
-  });
+      const [item] = await toPostListItems([post]);
 
-  it('calls dateTime with the published date and the year/month/day format', async () => {
-    const post = makePostCard({ publishedAt: '2026-01-15T00:00:00.000Z' });
-    const dateTimeMock = vi.fn().mockReturnValue('January 15, 2026');
+      expect(item?.formattedDate).toBe('15 janvier 2026');
+    });
 
-    vi.mocked(getFormatter).mockResolvedValueOnce({
-      dateTime: dateTimeMock,
-    } as unknown as Awaited<ReturnType<typeof getFormatter>>);
+    it('calls dateTime with the published date and the year/month/day format', async () => {
+      const dateTimeMock = vi.fn().mockReturnValue('January 15, 2026');
 
-    await toPostListItems([post]);
+      vi.mocked(getFormatter).mockResolvedValueOnce({
+        dateTime: dateTimeMock,
+      } as unknown as Awaited<ReturnType<typeof getFormatter>>);
 
-    expect(dateTimeMock).toHaveBeenCalledWith(new Date(post.publishedAt), {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
+      await toPostListItems([post]);
+
+      expect(dateTimeMock).toHaveBeenCalledWith(new Date(post.publishedAt), {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
     });
   });
 
@@ -83,22 +89,27 @@ describe('toPostListItems', () => {
     expect(item?.excerpt).toBeUndefined();
   });
 
-  it('sets image from renderImage when given', async () => {
-    const post = makePostCard({ id: 'post-1' });
-    const image = 'rendered-image' as unknown as ReactNode;
-    const renderImage = vi.fn().mockReturnValue(image);
+  describe('image', () => {
+    let post: TPostCard;
 
-    const [item] = await toPostListItems([post], renderImage);
+    beforeEach(() => {
+      post = makePostCard({ id: 'post-1' });
+    });
 
-    expect(renderImage).toHaveBeenCalledWith(post);
-    expect(item?.image).toBe(image);
-  });
+    it('sets image from renderImage when given', async () => {
+      const image = 'rendered-image' as unknown as ReactNode;
+      const renderImage = vi.fn().mockReturnValue(image);
 
-  it('leaves image undefined when no renderImage is given', async () => {
-    const post = makePostCard({ id: 'post-1' });
+      const [item] = await toPostListItems([post], renderImage);
 
-    const [item] = await toPostListItems([post]);
+      expect(renderImage).toHaveBeenCalledWith(post);
+      expect(item?.image).toBe(image);
+    });
 
-    expect(item?.image).toBeUndefined();
+    it('leaves image undefined when no renderImage is given', async () => {
+      const [item] = await toPostListItems([post]);
+
+      expect(item?.image).toBeUndefined();
+    });
   });
 });

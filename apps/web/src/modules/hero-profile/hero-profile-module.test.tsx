@@ -49,6 +49,10 @@ describe(`<${HeroProfileModule.name}/>`, () => {
     getHeroProfileMock.mockReset();
     getRequestContextMock.mockReset();
     getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
+    getHeroProfileMock.mockResolvedValue({
+      ok: true,
+      data: makeHeroProfileData(),
+    });
   });
 
   it('forwards the resolved tenant Sanity context to getHeroProfile', async () => {
@@ -61,11 +65,6 @@ describe(`<${HeroProfileModule.name}/>`, () => {
       ...DEFAULT_REQUEST_CONTEXT,
       sanityContext: tenant,
     });
-    getHeroProfileMock.mockResolvedValue({
-      ok: true,
-      data: makeHeroProfileData(),
-    });
-
     await setup();
 
     expect(getHeroProfileMock).toHaveBeenCalledWith('hero-profile-1', tenant);
@@ -83,11 +82,6 @@ describe(`<${HeroProfileModule.name}/>`, () => {
   });
 
   it('renders the resolved heading', async () => {
-    getHeroProfileMock.mockResolvedValue({
-      ok: true,
-      data: makeHeroProfileData(),
-    });
-
     await setup();
 
     expect(

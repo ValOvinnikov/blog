@@ -102,6 +102,8 @@ const mockAllEmpty = () => {
 };
 
 describe('sitemap', () => {
+  let sitemap: typeof import('./sitemap').default;
+
   beforeEach(async () => {
     const fresh =
       await import('@web/server/tenant/tenant-base-url/tenant-base-url');
@@ -111,8 +113,13 @@ describe('sitemap', () => {
       tenant: undefined,
     });
     getTenantBaseUrlMock.mockResolvedValue('https://example.com');
-    resolveRequestTenantMock.mockResolvedValue({ id: 'tenant-1' });
+    resolveRequestTenantMock.mockResolvedValue({
+      id: 'tenant-1',
+      locale: 'EN',
+    });
     selectLiveLocalesMock.mockReturnValue(['en']);
+    mockAllEmpty();
+    sitemap = (await import('./sitemap')).default;
   });
 
   afterEach(() => {
@@ -132,7 +139,6 @@ describe('sitemap', () => {
   });
 
   it('includes every static, post, topic, tag, blog page and landing page entry', async () => {
-    mockAllEmpty();
     getPostParamsMock.mockResolvedValue({
       ok: true,
       data: [
@@ -164,7 +170,6 @@ describe('sitemap', () => {
       ok: true,
       data: [{ slug: 'about', language: 'EN' }],
     });
-    const sitemap = (await import('./sitemap')).default;
 
     const entries = await sitemap();
     const urls = entries.map((entry) => entry.url);
@@ -183,17 +188,11 @@ describe('sitemap', () => {
   });
 
   it('keeps a single-language tenant landing entry as its own url and language alternate', async () => {
-    mockAllEmpty();
-    resolveRequestTenantMock.mockResolvedValue({
-      id: 'tenant-1',
-      locale: 'EN',
-    });
     selectLiveLocalesMock.mockReturnValue(['EN']);
     getPageSlugsMock.mockResolvedValue({
       ok: true,
       data: [{ slug: 'about', language: 'EN' }],
     });
-    const sitemap = (await import('./sitemap')).default;
 
     const entries = await sitemap();
 
@@ -204,11 +203,6 @@ describe('sitemap', () => {
   });
 
   it('lists each landing page under its own language prefix with that language as its alternate', async () => {
-    mockAllEmpty();
-    resolveRequestTenantMock.mockResolvedValue({
-      id: 'tenant-1',
-      locale: 'EN',
-    });
     selectLiveLocalesMock.mockReturnValue(['EN', 'NL']);
     getPageSlugsMock.mockResolvedValue({
       ok: true,
@@ -217,7 +211,6 @@ describe('sitemap', () => {
         { slug: 'over-ons', language: 'NL' },
       ],
     });
-    const sitemap = (await import('./sitemap')).default;
 
     const entries = await sitemap();
 
@@ -252,11 +245,6 @@ describe('sitemap', () => {
   };
 
   const mockTranslatedAbout = () => {
-    mockAllEmpty();
-    resolveRequestTenantMock.mockResolvedValue({
-      id: 'tenant-1',
-      locale: 'EN',
-    });
     selectLiveLocalesMock.mockReturnValue(['EN', 'NL']);
     getPageSlugsMock.mockResolvedValue({
       ok: true,
@@ -272,19 +260,60 @@ describe('sitemap', () => {
     });
   };
 
-  it("lists every live translation and the default-language x-default on each translation's entry", async () => {
-    mockTranslatedAbout();
-    const sitemap = (await import('./sitemap')).default;
-
-    const entries = await sitemap();
-
-    expect(entries).toContainEqual({
-      url: 'https://example.com/about',
-      alternates: { languages: aboutAlternates },
+  describe('with a translated landing page', () => {
+    beforeEach(() => {
+      mockTranslatedAbout();
     });
-    expect(entries).toContainEqual({
-      url: 'https://example.com/nl/over-ons',
-      alternates: { languages: aboutAlternates },
+
+    it("lists every live translation and the default-language x-default on each translation's entry", async () => {
+      const entries = await sitemap();
+
+      expect(entries).toContainEqual({
+        url: 'https://example.com/about',
+        alternates: { languages: aboutAlternates },
+      });
+      expect(entries).toContainEqual({
+        url: 'https://example.com/nl/over-ons',
+        alternates: { languages: aboutAlternates },
+      });
+    });
+
+    it('keeps an untranslated landing page entry as its own language alternate', async () => {
+      const entries = await sitemap();
+
+      expect(entries).toContainEqual({
+        url: 'https://example.com/pricing',
+        alternates: { languages: { en: 'https://example.com/pricing' } },
+      });
+    });
+
+    it('keeps a single-language tenant landing entry unchanged when its page has translations', async () => {
+      selectLiveLocalesMock.mockReturnValue(['EN']);
+      getPageSlugsMock.mockResolvedValue({
+        ok: true,
+        data: [{ slug: 'about', language: 'EN' }],
+      });
+
+      const entries = await sitemap();
+
+      expect(entries).toContainEqual({
+        url: 'https://example.com/about',
+        alternates: { languages: { en: 'https://example.com/about' } },
+      });
+    });
+
+    it('keeps each landing page as its own language alternate when the translation map fetch fails', async () => {
+      getTranslationMapMock.mockResolvedValue({
+        ok: false,
+        error: new Error('boom'),
+      });
+
+      const entries = await sitemap();
+
+      expect(entries).toContainEqual({
+        url: 'https://example.com/nl/over-ons',
+        alternates: { languages: { nl: 'https://example.com/nl/over-ons' } },
+      });
     });
   });
 
@@ -295,11 +324,6 @@ describe('sitemap', () => {
   };
 
   const mockHomes = (homeLanguages: string[]) => {
-    mockAllEmpty();
-    resolveRequestTenantMock.mockResolvedValue({
-      id: 'tenant-1',
-      locale: 'EN',
-    });
     selectLiveLocalesMock.mockReturnValue(['EN', 'NL']);
     getTranslationMapMock.mockResolvedValue({
       ok: true,
@@ -309,7 +333,6 @@ describe('sitemap', () => {
 
   it('lists each live Home with every live Home as an alternate', async () => {
     mockHomes(['EN', 'NL', 'DE']);
-    const sitemap = (await import('./sitemap')).default;
 
     const entries = await sitemap();
 
@@ -328,7 +351,6 @@ describe('sitemap', () => {
 
   it('keeps the default-language Home as its own entry when no other language has one', async () => {
     mockHomes(['EN']);
-    const sitemap = (await import('./sitemap')).default;
 
     const entries = await sitemap();
 
@@ -359,7 +381,6 @@ describe('sitemap', () => {
 
   it('lists each live Blog list page with every live Blog list page as an alternate', async () => {
     mockListPages(['EN', 'NL', 'DE']);
-    const sitemap = (await import('./sitemap')).default;
 
     const entries = await sitemap();
     const blogAlternates = {
@@ -383,7 +404,6 @@ describe('sitemap', () => {
 
   it('lists only the languages that have each list page', async () => {
     mockListPages(['EN'], ['NL'], []);
-    const sitemap = (await import('./sitemap')).default;
 
     const urls = (await sitemap()).map(({ url }) => url);
 
@@ -395,53 +415,7 @@ describe('sitemap', () => {
     expect(urls).not.toContain('https://example.com/nl/tags');
   });
 
-  it('keeps an untranslated landing page entry as its own language alternate', async () => {
-    mockTranslatedAbout();
-    const sitemap = (await import('./sitemap')).default;
-
-    const entries = await sitemap();
-
-    expect(entries).toContainEqual({
-      url: 'https://example.com/pricing',
-      alternates: { languages: { en: 'https://example.com/pricing' } },
-    });
-  });
-
-  it('keeps a single-language tenant landing entry unchanged when its page has translations', async () => {
-    mockTranslatedAbout();
-    selectLiveLocalesMock.mockReturnValue(['EN']);
-    getPageSlugsMock.mockResolvedValue({
-      ok: true,
-      data: [{ slug: 'about', language: 'EN' }],
-    });
-    const sitemap = (await import('./sitemap')).default;
-
-    const entries = await sitemap();
-
-    expect(entries).toContainEqual({
-      url: 'https://example.com/about',
-      alternates: { languages: { en: 'https://example.com/about' } },
-    });
-  });
-
-  it('keeps each landing page as its own language alternate when the translation map fetch fails', async () => {
-    mockTranslatedAbout();
-    getTranslationMapMock.mockResolvedValue({
-      ok: false,
-      error: new Error('boom'),
-    });
-    const sitemap = (await import('./sitemap')).default;
-
-    const entries = await sitemap();
-
-    expect(entries).toContainEqual({
-      url: 'https://example.com/nl/over-ons',
-      alternates: { languages: { nl: 'https://example.com/nl/over-ons' } },
-    });
-  });
-
   it("requests landing page slugs with the tenant's live languages", async () => {
-    mockAllEmpty();
     const tenantRow = { id: 'tenant-1' };
     const tenantContext = { projectId: 'p' };
     resolveRequestTenantMock.mockResolvedValue(tenantRow);
@@ -450,7 +424,6 @@ describe('sitemap', () => {
       tenant: tenantContext,
     });
     selectLiveLocalesMock.mockReturnValue(['en', 'de']);
-    const sitemap = (await import('./sitemap')).default;
 
     await sitemap();
 
@@ -459,9 +432,7 @@ describe('sitemap', () => {
   });
 
   it('falls back to the default language when the host has no tenant row', async () => {
-    mockAllEmpty();
     resolveRequestTenantMock.mockResolvedValue(undefined);
-    const sitemap = (await import('./sitemap')).default;
 
     const entries = await sitemap();
 
@@ -473,7 +444,6 @@ describe('sitemap', () => {
   });
 
   it('includes numbered topic and tag pagination pages', async () => {
-    mockAllEmpty();
     getTopicPaginationParamsMock.mockResolvedValue({
       ok: true,
       data: [{ slug: 'news', language: 'EN', page: '2' }],
@@ -485,7 +455,6 @@ describe('sitemap', () => {
         { slug: 'typescript', language: 'EN', page: '3' },
       ],
     });
-    const sitemap = (await import('./sitemap')).default;
 
     const entries = await sitemap();
     const urls = entries.map((entry) => entry.url);
@@ -496,11 +465,6 @@ describe('sitemap', () => {
   });
 
   it('lists each Topic and Tag page under its own language prefix, with its live translations as alternates', async () => {
-    mockAllEmpty();
-    resolveRequestTenantMock.mockResolvedValue({
-      id: 'tenant-1',
-      locale: 'EN',
-    });
     selectLiveLocalesMock.mockReturnValue(['EN', 'NL']);
     getTopicParamsMock.mockResolvedValue({
       ok: true,
@@ -529,7 +493,6 @@ describe('sitemap', () => {
       nl: 'https://example.com/nl/topics/ontwerp',
       'x-default': 'https://example.com/topics/design',
     };
-    const sitemap = (await import('./sitemap')).default;
 
     const entries = await sitemap();
 
@@ -550,11 +513,6 @@ describe('sitemap', () => {
   });
 
   it('lists each post under its own language prefix, with its live translations as alternates', async () => {
-    mockAllEmpty();
-    resolveRequestTenantMock.mockResolvedValue({
-      id: 'tenant-1',
-      locale: 'EN',
-    });
     selectLiveLocalesMock.mockReturnValue(['EN', 'NL']);
     getPostParamsMock.mockResolvedValue({
       ok: true,
@@ -587,7 +545,6 @@ describe('sitemap', () => {
       nl: 'https://example.com/nl/blog/mijn-artikel',
       'x-default': 'https://example.com/blog/my-article',
     };
-    const sitemap = (await import('./sitemap')).default;
 
     const entries = await sitemap();
 
@@ -604,17 +561,11 @@ describe('sitemap', () => {
   });
 
   it('lists numbered Topic pages under their own language prefix', async () => {
-    mockAllEmpty();
-    resolveRequestTenantMock.mockResolvedValue({
-      id: 'tenant-1',
-      locale: 'EN',
-    });
     selectLiveLocalesMock.mockReturnValue(['EN', 'NL']);
     getTopicPaginationParamsMock.mockResolvedValue({
       ok: true,
       data: [{ slug: 'ontwerp', language: 'NL', page: '2' }],
     });
-    const sitemap = (await import('./sitemap')).default;
 
     const urls = (await sitemap()).map((entry) => entry.url);
 
@@ -622,7 +573,6 @@ describe('sitemap', () => {
   });
 
   it("requests posts, Topic and Tag pages with the tenant's live languages", async () => {
-    mockAllEmpty();
     const tenantContext = { projectId: 'p' };
     resolveRequestTenantMock.mockResolvedValue({ id: 'tenant-1' });
     getHostTenantSanityContextMock.mockResolvedValue({
@@ -630,7 +580,6 @@ describe('sitemap', () => {
       tenant: tenantContext,
     });
     selectLiveLocalesMock.mockReturnValue(['EN', 'NL']);
-    const sitemap = (await import('./sitemap')).default;
 
     await sitemap();
 
@@ -646,7 +595,6 @@ describe('sitemap', () => {
   });
 
   it('sets lastModified from publishedAt on posts, and not on entries without a date', async () => {
-    mockAllEmpty();
     getPostParamsMock.mockResolvedValue({
       ok: true,
       data: [
@@ -661,7 +609,6 @@ describe('sitemap', () => {
       ok: true,
       data: [{ slug: 'news', language: 'EN' }],
     });
-    const sitemap = (await import('./sitemap')).default;
 
     const entries = await sitemap();
     const postEntry = entries.find(
@@ -676,9 +623,6 @@ describe('sitemap', () => {
   });
 
   it('carries a languages alternate for each configured locale', async () => {
-    mockAllEmpty();
-    const sitemap = (await import('./sitemap')).default;
-
     const [homeEntry] = await sitemap();
 
     expect(homeEntry?.alternates?.languages).toEqual({
@@ -740,9 +684,7 @@ describe('sitemap', () => {
       missingUrls: ['/tags/typescript'],
     },
   ])('$name', async ({ getMock, result, missingUrls, presentUrls = [] }) => {
-    mockAllEmpty();
     getMock().mockResolvedValue(result);
-    const sitemap = (await import('./sitemap')).default;
 
     const entries = await sitemap();
     const urls = entries.map((entry) => entry.url);
@@ -757,7 +699,6 @@ describe('sitemap', () => {
   });
 
   it('forwards the resolved tenant Sanity context to every loader', async () => {
-    mockAllEmpty();
     const tenant = {
       projectId: 'tenant-project',
       dataset: 'production',
@@ -767,7 +708,6 @@ describe('sitemap', () => {
       isResolvable: true,
       tenant,
     });
-    const sitemap = (await import('./sitemap')).default;
 
     await sitemap();
 
@@ -776,7 +716,6 @@ describe('sitemap', () => {
 
   it('returns an empty sitemap without querying content when the host is unresolvable', async () => {
     getHostTenantSanityContextMock.mockResolvedValue({ isResolvable: false });
-    const sitemap = (await import('./sitemap')).default;
 
     const entries = await sitemap();
 
@@ -786,7 +725,6 @@ describe('sitemap', () => {
 
   it('returns an empty sitemap when no tenant base URL resolves', async () => {
     getTenantBaseUrlMock.mockResolvedValue(undefined);
-    const sitemap = (await import('./sitemap')).default;
 
     const entries = await sitemap();
 

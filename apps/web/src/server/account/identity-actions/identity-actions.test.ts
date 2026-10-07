@@ -1,4 +1,6 @@
-export {};
+import type { MockInstance } from 'vitest';
+
+import type * as TIdentityActions from './identity-actions';
 
 const { authMock, unlinkProviderMock, updateDisplayNameMock } = vi.hoisted(
   () => ({
@@ -24,14 +26,23 @@ const session = {
 };
 
 describe('unlinkProviderAction', () => {
-  beforeEach(() => {
+  let unlinkProviderAction: (typeof TIdentityActions)['unlinkProviderAction'];
+  let errorSpy: MockInstance<typeof console.error>;
+
+  beforeEach(async () => {
     authMock.mockReset();
     unlinkProviderMock.mockReset();
+    authMock.mockResolvedValue(session);
+    errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    ({ unlinkProviderAction } = await import('./identity-actions'));
+  });
+
+  afterEach(() => {
+    errorSpy.mockRestore();
   });
 
   it('returns { ok: false, reason: "unknown" } without unlinking when there is no session', async () => {
     authMock.mockResolvedValue(null);
-    const { unlinkProviderAction } = await import('./identity-actions');
 
     await expect(unlinkProviderAction('github')).resolves.toEqual({
       ok: false,
@@ -41,10 +52,6 @@ describe('unlinkProviderAction', () => {
   });
 
   it('rejects a provider that is not literally "github" or "google" at runtime, without logging or querying it', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    authMock.mockResolvedValue(session);
-    const { unlinkProviderAction } = await import('./identity-actions');
-
     await expect(
       unlinkProviderAction('DROP TABLE accounts;--' as 'github'),
     ).resolves.toEqual({ ok: false, reason: 'unknown' });
@@ -52,13 +59,10 @@ describe('unlinkProviderAction', () => {
     expect(authMock).not.toHaveBeenCalled();
     expect(unlinkProviderMock).not.toHaveBeenCalled();
     expect(errorSpy).not.toHaveBeenCalled();
-    errorSpy.mockRestore();
   });
 
   it("unlinks the session user's provider and returns { ok: true }", async () => {
-    authMock.mockResolvedValue(session);
     unlinkProviderMock.mockResolvedValue({ outcome: 'unlinked' });
-    const { unlinkProviderAction } = await import('./identity-actions');
 
     await expect(unlinkProviderAction('github')).resolves.toEqual({
       ok: true,
@@ -67,9 +71,7 @@ describe('unlinkProviderAction', () => {
   });
 
   it('returns { ok: false, reason: "last-method" } when the db rejects the unlink', async () => {
-    authMock.mockResolvedValue(session);
     unlinkProviderMock.mockResolvedValue({ outcome: 'last-method' });
-    const { unlinkProviderAction } = await import('./identity-actions');
 
     await expect(unlinkProviderAction('google')).resolves.toEqual({
       ok: false,
@@ -78,29 +80,28 @@ describe('unlinkProviderAction', () => {
   });
 
   it('returns { ok: false, reason: "unknown" } and logs when the db write throws', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    authMock.mockResolvedValue(session);
     unlinkProviderMock.mockRejectedValue(new Error('boom'));
-    const { unlinkProviderAction } = await import('./identity-actions');
 
     await expect(unlinkProviderAction('github')).resolves.toEqual({
       ok: false,
       reason: 'unknown',
     });
     expect(errorSpy).toHaveBeenCalled();
-    errorSpy.mockRestore();
   });
 });
 
 describe('updateDisplayNameAction', () => {
-  beforeEach(() => {
+  let updateDisplayNameAction: (typeof TIdentityActions)['updateDisplayNameAction'];
+
+  beforeEach(async () => {
     authMock.mockReset();
     updateDisplayNameMock.mockReset();
+    authMock.mockResolvedValue(session);
+    ({ updateDisplayNameAction } = await import('./identity-actions'));
   });
 
   it('returns { ok: false } without updating when there is no session', async () => {
     authMock.mockResolvedValue(null);
-    const { updateDisplayNameAction } = await import('./identity-actions');
 
     await expect(updateDisplayNameAction('Jane')).resolves.toEqual({
       ok: false,
@@ -109,9 +110,6 @@ describe('updateDisplayNameAction', () => {
   });
 
   it('returns { ok: false } without updating when the trimmed name is empty', async () => {
-    authMock.mockResolvedValue(session);
-    const { updateDisplayNameAction } = await import('./identity-actions');
-
     await expect(updateDisplayNameAction('   ')).resolves.toEqual({
       ok: false,
     });
@@ -119,9 +117,7 @@ describe('updateDisplayNameAction', () => {
   });
 
   it('trims the name, updates it, and returns { ok: true }', async () => {
-    authMock.mockResolvedValue(session);
     updateDisplayNameMock.mockResolvedValue(undefined);
-    const { updateDisplayNameAction } = await import('./identity-actions');
 
     await expect(updateDisplayNameAction('  Jane Doe  ')).resolves.toEqual({
       ok: true,
@@ -131,9 +127,7 @@ describe('updateDisplayNameAction', () => {
 
   it('returns { ok: false } and logs when the db write throws', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    authMock.mockResolvedValue(session);
     updateDisplayNameMock.mockRejectedValue(new Error('boom'));
-    const { updateDisplayNameAction } = await import('./identity-actions');
 
     await expect(updateDisplayNameAction('Jane')).resolves.toEqual({
       ok: false,

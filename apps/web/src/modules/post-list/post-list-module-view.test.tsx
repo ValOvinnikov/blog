@@ -21,20 +21,42 @@ const setup = customRender(PostListModuleView, {
 });
 
 describe(`<${PostListModuleView.name}/>`, () => {
-  it('labels the section with the given titleId', () => {
-    setup();
+  describe('with default props', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    const label = screen.getByText('Latest posts');
-    expect(label).toHaveAttribute('id', 'posts-title');
-    expect(label.tagName).toBe('H2');
+    it('labels the section with the given titleId', () => {
+      const label = screen.getByText('Latest posts');
+      expect(label).toHaveAttribute('id', 'posts-title');
+      expect(label.tagName).toBe('H2');
 
-    const section = label.closest('section');
-    expect(section).toHaveAttribute('aria-labelledby', 'posts-title');
-    expect(section).toHaveAttribute(
-      'data-testid',
-      'post-list-module-post-list-1',
-    );
-    expect(screen.getByRole('region', { name: 'Latest posts' })).toBeVisible();
+      const section = label.closest('section');
+      expect(section).toHaveAttribute('aria-labelledby', 'posts-title');
+      expect(section).toHaveAttribute(
+        'data-testid',
+        'post-list-module-post-list-1',
+      );
+      expect(
+        screen.getByRole('region', { name: 'Latest posts' }),
+      ).toBeVisible();
+    });
+
+    it('renders a card per item, linked to its href', () => {
+      const link = screen.getByRole('link', { name: post.title });
+      expect(link).toHaveAttribute('href', post.href);
+      expect(
+        screen.getByRole('heading', { level: 3, name: post.title }),
+      ).toBeVisible();
+    });
+
+    it('renders no pagination nav when the pagination prop is absent', () => {
+      expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    });
+
+    it('renders no media region when hasImages is not given', () => {
+      expect(screen.queryByTestId('media-card-media')).not.toBeInTheDocument();
+    });
   });
 
   it('derives a different section id from a different titleId, avoiding duplicate ids', () => {
@@ -47,22 +69,6 @@ describe(`<${PostListModuleView.name}/>`, () => {
       'id',
       'other-posts-title',
     );
-  });
-
-  it('renders a card per item, linked to its href', () => {
-    setup();
-
-    const link = screen.getByRole('link', { name: post.title });
-    expect(link).toHaveAttribute('href', post.href);
-    expect(
-      screen.getByRole('heading', { level: 3, name: post.title }),
-    ).toBeVisible();
-  });
-
-  it('renders no pagination nav when the pagination prop is absent', () => {
-    setup();
-
-    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
   });
 
   it('renders Pagination as a sibling of the grid, inside the same Section', () => {
@@ -94,12 +100,6 @@ describe(`<${PostListModuleView.name}/>`, () => {
 
     expect(screen.getByText('No posts yet.')).toBeVisible();
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
-  });
-
-  it('renders no media region when hasImages is not given', () => {
-    setup();
-
-    expect(screen.queryByTestId('media-card-media')).not.toBeInTheDocument();
   });
 
   it('renders a media region for each item when hasImages is true', () => {

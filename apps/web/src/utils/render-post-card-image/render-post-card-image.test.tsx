@@ -24,17 +24,19 @@ const setup = customRender(RenderPostCardImageHarness, {
 });
 
 describe('renderPostCardImage', () => {
-  it('renders a SanityImage for a post with a hero image', () => {
-    setup();
+  describe('for a post with a hero image', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    const img = screen.getByRole('img', { name: sanityImage.alt });
-    expect(img).toHaveAttribute('loading', 'lazy');
-  });
+    it('renders a SanityImage for a post with a hero image', () => {
+      const img = screen.getByRole('img', { name: sanityImage.alt });
+      expect(img).toHaveAttribute('loading', 'lazy');
+    });
 
-  it('never sets priority/fetchpriority on a grid image', () => {
-    setup();
-
-    expect(screen.getByRole('img')).not.toHaveAttribute('fetchpriority');
+    it('never sets priority/fetchpriority on a grid image', () => {
+      expect(screen.getByRole('img')).not.toHaveAttribute('fetchpriority');
+    });
   });
 
   it('renders nothing for a post with no hero image', () => {

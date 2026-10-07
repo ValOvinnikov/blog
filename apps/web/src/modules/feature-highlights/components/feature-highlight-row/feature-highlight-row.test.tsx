@@ -15,18 +15,24 @@ const setup = customRender(FeatureHighlightRow, {
 });
 
 describe(`<${FeatureHighlightRow.name}/>`, () => {
-  it('renders the row heading as an h3', () => {
-    setup();
+  describe('with the default item', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    expect(
-      screen.getByRole('heading', { level: 3, name: item.heading }),
-    ).toBeVisible();
-  });
+    it('renders the row heading as an h3', () => {
+      expect(
+        screen.getByRole('heading', { level: 3, name: item.heading }),
+      ).toBeVisible();
+    });
 
-  it('renders the row image', () => {
-    setup();
+    it('renders the row image', () => {
+      expect(screen.getByRole('img')).toBeVisible();
+    });
 
-    expect(screen.getByRole('img')).toBeVisible();
+    it('renders no action when the item has none', () => {
+      expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    });
   });
 
   it('renders the row action when the item has one', () => {
@@ -35,11 +41,5 @@ describe(`<${FeatureHighlightRow.name}/>`, () => {
     expect(
       screen.getByRole('link', { name: ctaActionsDemo[0]!.link.label }),
     ).toBeVisible();
-  });
-
-  it('renders no action when the item has none', () => {
-    setup();
-
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 });

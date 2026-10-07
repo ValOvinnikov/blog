@@ -19,10 +19,12 @@ const getMobileTrigger = () =>
 describe(`<${SidebarNav.name}/>`, () => {
   describe('with an active item', () => {
     let user: UserEvent;
+    let trigger: HTMLElement;
 
     beforeEach(() => {
       user = userEvent.setup();
       setup();
+      trigger = getMobileTrigger();
     });
 
     it('renders a single nav landmark named by its label', () => {
@@ -109,8 +111,6 @@ describe(`<${SidebarNav.name}/>`, () => {
     });
 
     it('closes the mobile disclosure on Escape', async () => {
-      const trigger = getMobileTrigger();
-
       await user.click(trigger);
       fireEvent.keyDown(document, { key: 'Escape' });
 
@@ -121,8 +121,6 @@ describe(`<${SidebarNav.name}/>`, () => {
     });
 
     it('closes the mobile disclosure on an outside click', async () => {
-      const trigger = getMobileTrigger();
-
       await user.click(trigger);
       fireEvent.mouseDown(document.body);
 
@@ -133,8 +131,6 @@ describe(`<${SidebarNav.name}/>`, () => {
     });
 
     it('closes the mobile disclosure when one of its links is clicked', async () => {
-      const trigger = getMobileTrigger();
-
       await user.click(trigger);
       const panelLink = screen
         .getAllByRole('link', { name: mockSidebarNavItems.at(0)?.label })

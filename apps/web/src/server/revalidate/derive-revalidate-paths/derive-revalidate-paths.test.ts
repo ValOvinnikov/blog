@@ -88,6 +88,12 @@ describe(deriveRevalidatePaths, () => {
     getTopicParamsMock.mockReset();
     getTopicPaginationParamsMock.mockReset();
     loggerErrorMock.mockReset();
+    getPostsByIdsMock.mockResolvedValue({ ok: true, data: [okPost] });
+    getIndexPageParamsMock.mockResolvedValue({ ok: true, data: [] });
+    getTagParamsMock.mockResolvedValue({ ok: true, data: [] });
+    getTagPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
+    getTopicParamsMock.mockResolvedValue({ ok: true, data: [] });
+    getTopicPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
   });
 
   it('falls back with unsupported_type for an unknown type, skipping the service', async () => {
@@ -103,18 +109,14 @@ describe(deriveRevalidatePaths, () => {
   });
 
   it('resolves every path for a published post, including its tag and topic pages', async () => {
-    getPostsByIdsMock.mockResolvedValue({ ok: true, data: [okPost] });
-    getIndexPageParamsMock.mockResolvedValue({ ok: true, data: [] });
     getTagParamsMock.mockResolvedValue({
       ok: true,
       data: [{ slug: 'typescript' }, { slug: 'unrelated-tag' }],
     });
-    getTagPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
     getTopicParamsMock.mockResolvedValue({
       ok: true,
       data: [{ slug: 'engineering' }],
     });
-    getTopicPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
 
     const result = await deriveRevalidatePaths({
       type: 'page_post',
@@ -138,11 +140,7 @@ describe(deriveRevalidatePaths, () => {
 
   it('falls back with document_not_found when the id matches no post (e.g. a delete)', async () => {
     getPostsByIdsMock.mockResolvedValue({ ok: true, data: [] });
-    getIndexPageParamsMock.mockResolvedValue({ ok: true, data: [] });
-    getTagParamsMock.mockResolvedValue({ ok: true, data: [] });
-    getTagPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
-    getTopicParamsMock.mockResolvedValue({ ok: true, data: [] });
-    getTopicPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
+    getPostsByIdsMock.mockResolvedValue({ ok: true, data: [] });
 
     const result = await deriveRevalidatePaths({
       type: 'page_post',
@@ -160,11 +158,6 @@ describe(deriveRevalidatePaths, () => {
       ok: false,
       error: new Error('boom'),
     });
-    getIndexPageParamsMock.mockResolvedValue({ ok: true, data: [] });
-    getTagParamsMock.mockResolvedValue({ ok: true, data: [] });
-    getTagPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
-    getTopicParamsMock.mockResolvedValue({ ok: true, data: [] });
-    getTopicPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
 
     const result = await deriveRevalidatePaths({
       type: 'page_post',
@@ -181,15 +174,10 @@ describe(deriveRevalidatePaths, () => {
   });
 
   it('falls back with fetch_failed and logs when the blog pagination lookup fails', async () => {
-    getPostsByIdsMock.mockResolvedValue({ ok: true, data: [okPost] });
     getIndexPageParamsMock.mockResolvedValue({
       ok: false,
       error: new Error('boom'),
     });
-    getTagParamsMock.mockResolvedValue({ ok: true, data: [] });
-    getTagPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
-    getTopicParamsMock.mockResolvedValue({ ok: true, data: [] });
-    getTopicPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
 
     const result = await deriveRevalidatePaths({
       type: 'page_post',
@@ -206,15 +194,10 @@ describe(deriveRevalidatePaths, () => {
   });
 
   it('falls back with fetch_failed and logs when the tag params lookup fails', async () => {
-    getPostsByIdsMock.mockResolvedValue({ ok: true, data: [okPost] });
-    getIndexPageParamsMock.mockResolvedValue({ ok: true, data: [] });
     getTagParamsMock.mockResolvedValue({
       ok: false,
       error: new Error('boom'),
     });
-    getTagPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
-    getTopicParamsMock.mockResolvedValue({ ok: true, data: [] });
-    getTopicPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
 
     const result = await deriveRevalidatePaths({
       type: 'page_post',
@@ -231,15 +214,10 @@ describe(deriveRevalidatePaths, () => {
   });
 
   it('falls back with fetch_failed and logs when the tag pagination lookup fails', async () => {
-    getPostsByIdsMock.mockResolvedValue({ ok: true, data: [okPost] });
-    getIndexPageParamsMock.mockResolvedValue({ ok: true, data: [] });
-    getTagParamsMock.mockResolvedValue({ ok: true, data: [] });
     getTagPaginationParamsMock.mockResolvedValue({
       ok: false,
       error: new Error('boom'),
     });
-    getTopicParamsMock.mockResolvedValue({ ok: true, data: [] });
-    getTopicPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
 
     const result = await deriveRevalidatePaths({
       type: 'page_post',
@@ -256,15 +234,10 @@ describe(deriveRevalidatePaths, () => {
   });
 
   it('falls back with fetch_failed and logs when the topic params lookup fails', async () => {
-    getPostsByIdsMock.mockResolvedValue({ ok: true, data: [okPost] });
-    getIndexPageParamsMock.mockResolvedValue({ ok: true, data: [] });
-    getTagParamsMock.mockResolvedValue({ ok: true, data: [] });
-    getTagPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
     getTopicParamsMock.mockResolvedValue({
       ok: false,
       error: new Error('boom'),
     });
-    getTopicPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
 
     const result = await deriveRevalidatePaths({
       type: 'page_post',
@@ -281,11 +254,6 @@ describe(deriveRevalidatePaths, () => {
   });
 
   it('falls back with fetch_failed and logs when the topic pagination lookup fails', async () => {
-    getPostsByIdsMock.mockResolvedValue({ ok: true, data: [okPost] });
-    getIndexPageParamsMock.mockResolvedValue({ ok: true, data: [] });
-    getTagParamsMock.mockResolvedValue({ ok: true, data: [] });
-    getTagPaginationParamsMock.mockResolvedValue({ ok: true, data: [] });
-    getTopicParamsMock.mockResolvedValue({ ok: true, data: [] });
     getTopicPaginationParamsMock.mockResolvedValue({
       ok: false,
       error: new Error('boom'),

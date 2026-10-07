@@ -16,19 +16,38 @@ const item: IMediaCardData = {
 };
 
 describe(`<${MediaCardItem.name}/>`, () => {
-  it('renders the title linked via SmartLink to item.href', () => {
-    renderElement(<MediaCardItem item={item} />);
+  describe('with the base item', () => {
+    beforeEach(() => {
+      renderElement(<MediaCardItem item={item} />);
+    });
 
-    const link = screen.getByRole('link', { name: 'Hello World' });
-    expect(link).toHaveAttribute('href', '/blog/hello-world');
-  });
+    it('renders the title linked via SmartLink to item.href', () => {
+      const link = screen.getByRole('link', { name: 'Hello World' });
+      expect(link).toHaveAttribute('href', '/blog/hello-world');
+    });
 
-  it('defaults to heading level 3', () => {
-    renderElement(<MediaCardItem item={item} />);
+    it('defaults to heading level 3', () => {
+      expect(
+        screen.getByRole('heading', { level: 3, name: 'Hello World' }),
+      ).toBeVisible();
+    });
 
-    expect(
-      screen.getByRole('heading', { level: 3, name: 'Hello World' }),
-    ).toBeVisible();
+    it('renders no media region when hasImage is omitted', () => {
+      expect(screen.queryByTestId('media-card-media')).not.toBeInTheDocument();
+    });
+
+    it('renders the formatted date and reading time', () => {
+      expect(screen.getByText('January 15, 2026')).toBeVisible();
+      expect(screen.getByText(/4 min/)).toBeVisible();
+    });
+
+    it('renders the topic in the footer', () => {
+      expect(screen.getByText(/engineering/)).toBeVisible();
+    });
+
+    it('renders no dataTestId on the underlying MediaCard when omitted', () => {
+      expect(screen.getByRole('article')).not.toHaveAttribute('data-testid');
+    });
   });
 
   it('renders the title at the given headingLevel', () => {
@@ -37,12 +56,6 @@ describe(`<${MediaCardItem.name}/>`, () => {
     expect(
       screen.getByRole('heading', { level: 2, name: 'Hello World' }),
     ).toBeVisible();
-  });
-
-  it('renders no media region when hasImage is omitted', () => {
-    renderElement(<MediaCardItem item={item} />);
-
-    expect(screen.queryByTestId('media-card-media')).not.toBeInTheDocument();
   });
 
   it('renders the pre-rendered image node inside MediaCard.Media when hasImage is true', () => {
@@ -57,28 +70,9 @@ describe(`<${MediaCardItem.name}/>`, () => {
     expect(screen.getByTestId('post-image')).toBeVisible();
   });
 
-  it('renders the formatted date and reading time', () => {
-    renderElement(<MediaCardItem item={item} />);
-
-    expect(screen.getByText('January 15, 2026')).toBeVisible();
-    expect(screen.getByText(/4 min/)).toBeVisible();
-  });
-
-  it('renders the topic in the footer', () => {
-    renderElement(<MediaCardItem item={item} />);
-
-    expect(screen.getByText(/engineering/)).toBeVisible();
-  });
-
   it('forwards dataTestId to the underlying MediaCard', () => {
     renderElement(<MediaCardItem item={item} dataTestId="lead-card" />);
 
     expect(screen.getByTestId('lead-card')).toBeVisible();
-  });
-
-  it('renders no dataTestId on the underlying MediaCard when omitted', () => {
-    renderElement(<MediaCardItem item={item} />);
-
-    expect(screen.getByRole('article')).not.toHaveAttribute('data-testid');
   });
 });

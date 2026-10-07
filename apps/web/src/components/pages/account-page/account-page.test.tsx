@@ -56,15 +56,34 @@ describe(`<${AccountPage.name}/>`, () => {
     expect(vi.mocked(redirect)).toHaveBeenCalledWith('/');
   });
 
-  it('renders the three sections under the page heading, in order', async () => {
-    await setup();
+  describe('with an active subscription', () => {
+    beforeEach(async () => {
+      await setup();
+    });
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Account' }),
-    ).toBeVisible();
-    expect(
-      screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent),
-    ).toEqual(['Connected accounts', 'Newsletter', 'Privacy']);
+    it('renders the three sections under the page heading, in order', () => {
+      expect(
+        screen.getByRole('heading', { level: 1, name: 'Account' }),
+      ).toBeVisible();
+      expect(
+        screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent),
+      ).toEqual(['Connected accounts', 'Newsletter', 'Privacy']);
+    });
+
+    it('arms account deletion with the handle derived from the session', async () => {
+      const user = userEvent.setup();
+
+      await user.type(
+        screen.getByRole('textbox', {
+          name: 'Type your handle to confirm deletion',
+        }),
+        'jane',
+      );
+
+      expect(
+        screen.getByRole('button', { name: 'Delete account' }),
+      ).toBeEnabled();
+    });
   });
 
   it('omits the newsletter section when the account is not subscribed', async () => {
@@ -77,21 +96,5 @@ describe(`<${AccountPage.name}/>`, () => {
     expect(
       screen.queryByRole('heading', { level: 2, name: 'Newsletter' }),
     ).not.toBeInTheDocument();
-  });
-
-  it('arms account deletion with the handle derived from the session', async () => {
-    const user = userEvent.setup();
-    await setup();
-
-    await user.type(
-      screen.getByRole('textbox', {
-        name: 'Type your handle to confirm deletion',
-      }),
-      'jane',
-    );
-
-    expect(
-      screen.getByRole('button', { name: 'Delete account' }),
-    ).toBeEnabled();
   });
 });

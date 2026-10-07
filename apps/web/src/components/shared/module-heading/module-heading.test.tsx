@@ -11,14 +11,24 @@ const setup = customRender(ModuleHeading, {
 });
 
 describe(`<${ModuleHeading.name}/>`, () => {
-  it('renders the authored heading text at the given level and id', () => {
-    setup();
-
-    const heading = screen.getByRole('heading', {
-      level: 2,
-      name: 'Latest posts',
+  describe('with default props', () => {
+    beforeEach(() => {
+      setup();
     });
-    expect(heading).toHaveAttribute('id', 'section-title');
+
+    it('renders the authored heading text at the given level and id', () => {
+      const heading = screen.getByRole('heading', {
+        level: 2,
+        name: 'Latest posts',
+      });
+      expect(heading).toHaveAttribute('id', 'section-title');
+    });
+
+    it('renders no supporting text paragraph when supportingText is absent', () => {
+      expect(
+        screen.queryByText(/./, { selector: 'p' }),
+      ).not.toBeInTheDocument();
+    });
   });
 
   it('renders the heading tag at the given level', () => {
@@ -27,12 +37,6 @@ describe(`<${ModuleHeading.name}/>`, () => {
     expect(
       screen.getByRole('heading', { level: 3, name: 'Latest posts' }),
     ).toBeVisible();
-  });
-
-  it('renders no supporting text paragraph when supportingText is absent', () => {
-    setup();
-
-    expect(screen.queryByText(/./, { selector: 'p' })).not.toBeInTheDocument();
   });
 
   it('renders the supporting text when given', () => {

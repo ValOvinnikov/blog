@@ -1,4 +1,4 @@
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, screen, waitFor } from '@web/testing/custom-render';
 import { useState } from 'react';
 
@@ -60,22 +60,21 @@ const Harness = () => {
 const setup = customRender(Harness, {});
 
 describe(useEmailSignIn, () => {
+  let user: UserEvent;
+
   beforeEach(() => {
     signInMock.mockReset();
+    setup();
+    user = userEvent.setup();
   });
 
   it('starts collapsed', () => {
-    setup();
-
     expect(
       screen.getByRole('button', { name: 'continue with email' }),
     ).toBeVisible();
   });
 
   it('moves focus into the field once it expands', async () => {
-    setup();
-    const user = userEvent.setup();
-
     await user.click(
       screen.getByRole('button', { name: 'continue with email' }),
     );
@@ -95,9 +94,6 @@ describe(useEmailSignIn, () => {
       status: 200,
       url: null,
     });
-    setup();
-    const user = userEvent.setup();
-
     await user.click(
       screen.getByRole('button', { name: 'continue with email' }),
     );
@@ -122,9 +118,6 @@ describe(useEmailSignIn, () => {
       status: 401,
       url: null,
     });
-    setup();
-    const user = userEvent.setup();
-
     await user.click(
       screen.getByRole('button', { name: 'continue with email' }),
     );
@@ -141,9 +134,6 @@ describe(useEmailSignIn, () => {
   });
 
   it('resets to collapsed once the popover itself closes', async () => {
-    setup();
-    const user = userEvent.setup();
-
     await user.click(
       screen.getByRole('button', { name: 'continue with email' }),
     );

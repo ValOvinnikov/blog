@@ -54,23 +54,75 @@ describe(`<${LandingPage.name}/>`, () => {
     getRedirectMock.mockResolvedValue({ ok: true, data: undefined });
   });
 
-  it('redirects permanently when the missing path has moved', async () => {
-    getPageMock.mockResolvedValueOnce({ ok: true, data: undefined });
-    getRedirectMock.mockResolvedValueOnce({ ok: true, data: '/company/about' });
-
-    await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
-
-    expect(permanentRedirect).toHaveBeenCalledWith({
-      href: '/company/about',
-      locale: DEFAULT_REQUEST_CONTEXT.locale,
+  describe('with an existing page', () => {
+    beforeEach(async () => {
+      await setup();
     });
-    expect(vi.mocked(notFound)).not.toHaveBeenCalled();
+
+    it('renders the page without a redirect lookup when the page exists', () => {
+      expect(getRedirectMock).not.toHaveBeenCalled();
+    });
+
+    it('fetches the page for the given path with the tenant context', () => {
+      expect(getPageMock).toHaveBeenCalledWith(
+        ['about-us'],
+        DEFAULT_TENANT_SANITY_CONTEXT,
+      );
+    });
+
+    it('renders the breadcrumb trail outside main', () => {
+      const breadcrumbs = screen.getByRole('navigation', {
+        name: 'Breadcrumb',
+      });
+      expect(
+        within(breadcrumbs).getByRole('link', { name: 'Home' }),
+      ).toBeVisible();
+      expect(within(breadcrumbs).getByText('About Us')).toBeVisible();
+      expect(screen.getByRole('main')).not.toContainElement(breadcrumbs);
+    });
+
+    it('renders no section navigation when the page is outside a section', () => {
+      expect(
+        screen.queryByRole('navigation', { name: 'In this section' }),
+      ).not.toBeInTheDocument();
+    });
+
+    it('renders no FAQPage JSON-LD when the page has no FAQ questions', () => {
+      const scripts = screen.getAllByTestId('json-ld-script');
+      expect(
+        scripts.some((script) =>
+          script.textContent?.includes(FAQ_PAGE_JSON_LD),
+        ),
+      ).toBe(false);
+    });
   });
 
-  it('renders the page without a redirect lookup when the page exists', async () => {
-    await setup();
+  describe('when no page matches the path', () => {
+    beforeEach(() => {
+      getPageMock.mockResolvedValueOnce({ ok: true, data: undefined });
+    });
 
-    expect(getRedirectMock).not.toHaveBeenCalled();
+    it('redirects permanently when the missing path has moved', async () => {
+      getRedirectMock.mockResolvedValueOnce({
+        ok: true,
+        data: '/company/about',
+      });
+
+      await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
+
+      expect(permanentRedirect).toHaveBeenCalledWith({
+        href: '/company/about',
+        locale: DEFAULT_REQUEST_CONTEXT.locale,
+      });
+      expect(vi.mocked(notFound)).not.toHaveBeenCalled();
+    });
+
+    it('calls notFound() without logging when the page does not exist', async () => {
+      await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
+
+      expect(vi.mocked(notFound)).toHaveBeenCalled();
+      expect(logger.error).not.toHaveBeenCalled();
+    });
   });
 
   it('logs and calls notFound() when the fetch fails', async () => {
@@ -83,15 +135,6 @@ describe(`<${LandingPage.name}/>`, () => {
       'landing_page.fetch_failed',
       expect.objectContaining({ path: 'about-us' }),
     );
-  });
-
-  it('calls notFound() without logging when the page does not exist', async () => {
-    getPageMock.mockResolvedValueOnce({ ok: true, data: undefined });
-
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
-
-    expect(vi.mocked(notFound)).toHaveBeenCalled();
-    expect(logger.error).not.toHaveBeenCalled();
   });
 
   it('calls notFound() when the slug exists only in another language', async () => {
@@ -113,15 +156,6 @@ describe(`<${LandingPage.name}/>`, () => {
     expect(vi.mocked(notFound)).toHaveBeenCalled();
   });
 
-  it('fetches the page for the given path with the tenant context', async () => {
-    await setup();
-
-    expect(getPageMock).toHaveBeenCalledWith(
-      ['about-us'],
-      DEFAULT_TENANT_SANITY_CONTEXT,
-    );
-  });
-
   it('renders the page heading and supporting text inside main', async () => {
     getPageMock.mockResolvedValueOnce({
       ok: true,
@@ -141,25 +175,6 @@ describe(`<${LandingPage.name}/>`, () => {
       within(main).getByRole('heading', { level: 1, name: 'About Us' }),
     ).toBeVisible();
     expect(within(main).getByText('Who we are.')).toBeVisible();
-  });
-
-  it('renders the breadcrumb trail outside main', async () => {
-    await setup();
-
-    const breadcrumbs = screen.getByRole('navigation', { name: 'Breadcrumb' });
-    expect(
-      within(breadcrumbs).getByRole('link', { name: 'Home' }),
-    ).toBeVisible();
-    expect(within(breadcrumbs).getByText('About Us')).toBeVisible();
-    expect(screen.getByRole('main')).not.toContainElement(breadcrumbs);
-  });
-
-  it('renders no section navigation when the page is outside a section', async () => {
-    await setup();
-
-    expect(
-      screen.queryByRole('navigation', { name: 'In this section' }),
-    ).not.toBeInTheDocument();
   });
 
   it('renders the section navigation inside main with the current page marked', async () => {
@@ -227,15 +242,6 @@ describe(`<${LandingPage.name}/>`, () => {
     expect(
       screen.queryByRole('heading', { level: 1, name: 'About Us' }),
     ).not.toBeInTheDocument();
-  });
-
-  it('renders no FAQPage JSON-LD when the page has no FAQ questions', async () => {
-    await setup();
-
-    const scripts = screen.getAllByTestId('json-ld-script');
-    expect(
-      scripts.some((script) => script.textContent?.includes(FAQ_PAGE_JSON_LD)),
-    ).toBe(false);
   });
 
   it('renders the FAQPage JSON-LD when the page has FAQ questions', async () => {

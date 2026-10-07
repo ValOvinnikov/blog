@@ -1,4 +1,4 @@
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import {
   customRender,
   screen,
@@ -29,31 +29,33 @@ const setLocationSearch = (search: string) => {
 };
 
 describe(`<${AuthMenu.name}/>`, () => {
+  let user: UserEvent;
+
   beforeEach(() => {
+    user = userEvent.setup();
     useSessionMock.mockReset();
     signInMock.mockReset();
     signOutMock.mockReset();
     setLocationSearch('');
   });
 
-  it('renders no accessible button while the session is resolving', () => {
-    useSessionMock.mockReturnValue({ data: null, status: 'loading' });
-
-    setup();
-
-    expect(screen.queryByRole('button')).not.toBeInTheDocument();
-  });
-
-  it('shows a neutral loading status region while the session is resolving — not shaped like either the sign-in or account trigger', () => {
-    useSessionMock.mockReturnValue({ data: null, status: 'loading' });
-
-    setup();
-
-    const status = screen.getByRole('status', {
-      name: 'Loading account status',
+  describe('while the session is resolving', () => {
+    beforeEach(() => {
+      useSessionMock.mockReturnValue({ data: null, status: 'loading' });
+      setup();
     });
-    expect(status.tagName).toBe('SPAN');
-    expect(status).not.toHaveTextContent('Sign in');
+
+    it('renders no accessible button while the session is resolving', () => {
+      expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    });
+
+    it('shows a neutral loading status region while the session is resolving — not shaped like either the sign-in or account trigger', () => {
+      const status = screen.getByRole('status', {
+        name: 'Loading account status',
+      });
+      expect(status.tagName).toBe('SPAN');
+      expect(status).not.toHaveTextContent('Sign in');
+    });
   });
 
   describe('logged out', () => {
@@ -64,67 +66,168 @@ describe(`<${AuthMenu.name}/>`, () => {
       });
     });
 
-    it('opens a popover with the GitHub, Google, and email items', async () => {
-      setup();
-      const user = userEvent.setup();
+    describe('with every provider enabled', () => {
+      beforeEach(() => {
+        setup();
+      });
 
-      await user.click(screen.getByRole('button', { name: 'Sign in' }));
+      it('opens a popover with the GitHub, Google, and email items', async () => {
+        await user.click(screen.getByRole('button', { name: 'Sign in' }));
 
-      expect(
-        screen.getByRole('menuitem', { name: 'Continue with GitHub' }),
-      ).toBeVisible();
-      expect(
-        screen.getByRole('menuitem', { name: 'Continue with Google' }),
-      ).toBeVisible();
-      expect(
-        screen.getByRole('menuitem', { name: 'Continue with email' }),
-      ).toBeVisible();
-    });
+        expect(
+          screen.getByRole('menuitem', { name: 'Continue with GitHub' }),
+        ).toBeVisible();
+        expect(
+          screen.getByRole('menuitem', { name: 'Continue with Google' }),
+        ).toBeVisible();
+        expect(
+          screen.getByRole('menuitem', { name: 'Continue with email' }),
+        ).toBeVisible();
+      });
 
-    it('renders a plain "Sign in" label — not a heading — plus the provider prompt', async () => {
-      setup();
-      const user = userEvent.setup();
+      it('renders a plain "Sign in" label — not a heading — plus the provider prompt', async () => {
+        await user.click(screen.getByRole('button', { name: 'Sign in' }));
+        const panel = screen.getByRole('menu');
 
-      await user.click(screen.getByRole('button', { name: 'Sign in' }));
-      const panel = screen.getByRole('menu');
+        expect(within(panel).queryByRole('heading')).not.toBeInTheDocument();
+        expect(within(panel).getByText('Sign in')).toBeVisible();
+        expect(
+          within(panel).getByText(/Choose a sign-in method/),
+        ).toBeVisible();
+        expect(
+          within(panel).getByText(
+            'Redirects back to this article — you never lose your place.',
+          ),
+        ).toBeVisible();
+      });
 
-      expect(within(panel).queryByRole('heading')).not.toBeInTheDocument();
-      expect(within(panel).getByText('Sign in')).toBeVisible();
-      expect(within(panel).getByText(/Choose a sign-in method/)).toBeVisible();
-      expect(
-        within(panel).getByText(
-          'Redirects back to this article — you never lose your place.',
-        ),
-      ).toBeVisible();
-    });
+      it('calls signIn("github") when the GitHub item is clicked', async () => {
+        await user.click(screen.getByRole('button', { name: 'Sign in' }));
+        await user.click(
+          screen.getByRole('menuitem', { name: 'Continue with GitHub' }),
+        );
 
-    it('calls signIn("github") when the GitHub item is clicked', async () => {
-      setup();
-      const user = userEvent.setup();
+        expect(signInMock).toHaveBeenCalledWith('github');
+      });
 
-      await user.click(screen.getByRole('button', { name: 'Sign in' }));
-      await user.click(
-        screen.getByRole('menuitem', { name: 'Continue with GitHub' }),
-      );
+      it('calls signIn("google") when the Google item is clicked', async () => {
+        await user.click(screen.getByRole('button', { name: 'Sign in' }));
+        await user.click(
+          screen.getByRole('menuitem', { name: 'Continue with Google' }),
+        );
 
-      expect(signInMock).toHaveBeenCalledWith('github');
-    });
+        expect(signInMock).toHaveBeenCalledWith('google');
+      });
 
-    it('calls signIn("google") when the Google item is clicked', async () => {
-      setup();
-      const user = userEvent.setup();
+      it('expands the email item in place into a field and submit button', async () => {
+        await user.click(screen.getByRole('button', { name: 'Sign in' }));
+        await user.click(
+          screen.getByRole('menuitem', { name: 'Continue with email' }),
+        );
 
-      await user.click(screen.getByRole('button', { name: 'Sign in' }));
-      await user.click(
-        screen.getByRole('menuitem', { name: 'Continue with Google' }),
-      );
+        expect(
+          screen.getByRole('textbox', { name: 'Email address' }),
+        ).toBeVisible();
+        expect(screen.getByRole('button', { name: 'Send link' })).toBeVisible();
+        expect(
+          screen.queryByRole('menuitem', { name: 'Continue with email' }),
+        ).not.toBeInTheDocument();
+        expect(screen.getByTestId('sign-in-prompt-icon')).toBeVisible();
+      });
 
-      expect(signInMock).toHaveBeenCalledWith('google');
+      it('moves focus into the email field once it expands (collapsed → expanded)', async () => {
+        await user.click(screen.getByRole('button', { name: 'Sign in' }));
+        await user.click(
+          screen.getByRole('menuitem', { name: 'Continue with email' }),
+        );
+
+        await waitFor(() => {
+          expect(
+            screen.getByRole('textbox', { name: 'Email address' }),
+          ).toHaveFocus();
+        });
+      });
+
+      describe('when the email sign-in succeeds', () => {
+        beforeEach(() => {
+          signInMock.mockResolvedValue({
+            ok: true,
+            error: undefined,
+            code: undefined,
+            status: 200,
+            url: null,
+          });
+        });
+
+        it('submits the email and shows a check-your-inbox confirmation on success', async () => {
+          await user.click(screen.getByRole('button', { name: 'Sign in' }));
+          await user.click(
+            screen.getByRole('menuitem', { name: 'Continue with email' }),
+          );
+          await user.type(
+            screen.getByRole('textbox', { name: 'Email address' }),
+            'reader@example.com',
+          );
+          await user.click(screen.getByRole('button', { name: 'Send link' }));
+
+          expect(signInMock).toHaveBeenCalledWith('email', {
+            email: 'reader@example.com',
+            redirect: false,
+          });
+          expect(await screen.findByRole('status')).toHaveTextContent(
+            'Check your inbox for a sign-in link.',
+          );
+        });
+
+        it('also submits on Enter in the email field (the send button is never a native submit control)', async () => {
+          await user.click(screen.getByRole('button', { name: 'Sign in' }));
+          await user.click(
+            screen.getByRole('menuitem', { name: 'Continue with email' }),
+          );
+          await user.type(
+            screen.getByRole('textbox', { name: 'Email address' }),
+            'reader@example.com{Enter}',
+          );
+
+          expect(signInMock).toHaveBeenCalledWith('email', {
+            email: 'reader@example.com',
+            redirect: false,
+          });
+          expect(
+            await screen.findByText('Check your inbox for a sign-in link.'),
+          ).toBeVisible();
+        });
+      });
+
+      it('shows an inline error and keeps the field open when the email sign-in fails', async () => {
+        signInMock.mockResolvedValue({
+          ok: false,
+          error: 'EmailSignin',
+          code: undefined,
+          status: 401,
+          url: null,
+        });
+        await user.click(screen.getByRole('button', { name: 'Sign in' }));
+        await user.click(
+          screen.getByRole('menuitem', { name: 'Continue with email' }),
+        );
+        await user.type(
+          screen.getByRole('textbox', { name: 'Email address' }),
+          'reader@example.com',
+        );
+        await user.click(screen.getByRole('button', { name: 'Send link' }));
+
+        expect(await screen.findByRole('status')).toHaveTextContent(
+          "Couldn't send the link. Try again.",
+        );
+        expect(
+          screen.getByRole('textbox', { name: 'Email address' }),
+        ).toBeVisible();
+      });
     });
 
     it('renders only the GitHub button when only GitHub is enabled', async () => {
       setup({ oauthProviderIds: ['github'] });
-      const user = userEvent.setup();
 
       await user.click(screen.getByRole('button', { name: 'Sign in' }));
 
@@ -141,7 +244,6 @@ describe(`<${AuthMenu.name}/>`, () => {
 
     it('renders only the Google button when only Google is enabled', async () => {
       setup({ oauthProviderIds: ['google'] });
-      const user = userEvent.setup();
 
       await user.click(screen.getByRole('button', { name: 'Sign in' }));
 
@@ -158,7 +260,6 @@ describe(`<${AuthMenu.name}/>`, () => {
 
     it('renders no OAuth buttons when neither provider is enabled, but email sign-in still works', async () => {
       setup({ oauthProviderIds: [] });
-      const user = userEvent.setup();
 
       await user.click(screen.getByRole('button', { name: 'Sign in' }));
 
@@ -172,129 +273,6 @@ describe(`<${AuthMenu.name}/>`, () => {
         screen.getByRole('menuitem', { name: 'Continue with email' }),
       );
 
-      expect(
-        screen.getByRole('textbox', { name: 'Email address' }),
-      ).toBeVisible();
-    });
-
-    it('expands the email item in place into a field and submit button', async () => {
-      setup();
-      const user = userEvent.setup();
-
-      await user.click(screen.getByRole('button', { name: 'Sign in' }));
-      await user.click(
-        screen.getByRole('menuitem', { name: 'Continue with email' }),
-      );
-
-      expect(
-        screen.getByRole('textbox', { name: 'Email address' }),
-      ).toBeVisible();
-      expect(screen.getByRole('button', { name: 'Send link' })).toBeVisible();
-      expect(
-        screen.queryByRole('menuitem', { name: 'Continue with email' }),
-      ).not.toBeInTheDocument();
-      expect(screen.getByTestId('sign-in-prompt-icon')).toBeVisible();
-    });
-
-    it('moves focus into the email field once it expands (collapsed → expanded)', async () => {
-      setup();
-      const user = userEvent.setup();
-
-      await user.click(screen.getByRole('button', { name: 'Sign in' }));
-      await user.click(
-        screen.getByRole('menuitem', { name: 'Continue with email' }),
-      );
-
-      await waitFor(() => {
-        expect(
-          screen.getByRole('textbox', { name: 'Email address' }),
-        ).toHaveFocus();
-      });
-    });
-
-    it('submits the email and shows a check-your-inbox confirmation on success', async () => {
-      signInMock.mockResolvedValue({
-        ok: true,
-        error: undefined,
-        code: undefined,
-        status: 200,
-        url: null,
-      });
-      setup();
-      const user = userEvent.setup();
-
-      await user.click(screen.getByRole('button', { name: 'Sign in' }));
-      await user.click(
-        screen.getByRole('menuitem', { name: 'Continue with email' }),
-      );
-      await user.type(
-        screen.getByRole('textbox', { name: 'Email address' }),
-        'reader@example.com',
-      );
-      await user.click(screen.getByRole('button', { name: 'Send link' }));
-
-      expect(signInMock).toHaveBeenCalledWith('email', {
-        email: 'reader@example.com',
-        redirect: false,
-      });
-      expect(await screen.findByRole('status')).toHaveTextContent(
-        'Check your inbox for a sign-in link.',
-      );
-    });
-
-    it('also submits on Enter in the email field (the send button is never a native submit control)', async () => {
-      signInMock.mockResolvedValue({
-        ok: true,
-        error: undefined,
-        code: undefined,
-        status: 200,
-        url: null,
-      });
-      setup();
-      const user = userEvent.setup();
-
-      await user.click(screen.getByRole('button', { name: 'Sign in' }));
-      await user.click(
-        screen.getByRole('menuitem', { name: 'Continue with email' }),
-      );
-      await user.type(
-        screen.getByRole('textbox', { name: 'Email address' }),
-        'reader@example.com{Enter}',
-      );
-
-      expect(signInMock).toHaveBeenCalledWith('email', {
-        email: 'reader@example.com',
-        redirect: false,
-      });
-      expect(
-        await screen.findByText('Check your inbox for a sign-in link.'),
-      ).toBeVisible();
-    });
-
-    it('shows an inline error and keeps the field open when the email sign-in fails', async () => {
-      signInMock.mockResolvedValue({
-        ok: false,
-        error: 'EmailSignin',
-        code: undefined,
-        status: 401,
-        url: null,
-      });
-      setup();
-      const user = userEvent.setup();
-
-      await user.click(screen.getByRole('button', { name: 'Sign in' }));
-      await user.click(
-        screen.getByRole('menuitem', { name: 'Continue with email' }),
-      );
-      await user.type(
-        screen.getByRole('textbox', { name: 'Email address' }),
-        'reader@example.com',
-      );
-      await user.click(screen.getByRole('button', { name: 'Send link' }));
-
-      expect(await screen.findByRole('status')).toHaveTextContent(
-        "Couldn't send the link. Try again.",
-      );
       expect(
         screen.getByRole('textbox', { name: 'Email address' }),
       ).toBeVisible();
@@ -327,12 +305,10 @@ describe(`<${AuthMenu.name}/>`, () => {
         },
         status: 'authenticated',
       });
+      setup();
     });
 
     it('shows the account menu with name, email, My bookmarks, Account settings, and Sign out', async () => {
-      setup();
-      const user = userEvent.setup();
-
       await user.click(screen.getByRole('button', { name: 'Account menu' }));
       const panel = screen.getByRole('menu');
 
@@ -348,9 +324,6 @@ describe(`<${AuthMenu.name}/>`, () => {
     });
 
     it('renders a plain "Account" label — not a heading', async () => {
-      setup();
-      const user = userEvent.setup();
-
       await user.click(screen.getByRole('button', { name: 'Account menu' }));
       const panel = screen.getByRole('menu');
 
@@ -359,9 +332,6 @@ describe(`<${AuthMenu.name}/>`, () => {
     });
 
     it('calls signOut when Sign out is clicked', async () => {
-      setup();
-      const user = userEvent.setup();
-
       await user.click(screen.getByRole('button', { name: 'Account menu' }));
       await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
 
