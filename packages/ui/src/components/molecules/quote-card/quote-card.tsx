@@ -3,7 +3,7 @@ import {
   SIZE,
   type IWithClassName,
   type IWithDataTestId,
-  type TBrandVariantOf,
+  type TBrandVariant,
 } from '@blog/config';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import {
@@ -32,7 +32,7 @@ export type TQuoteCardProps = IWithClassName &
     role?: string;
     align?: TQuoteCardVariants['align'];
     isSpotlight?: boolean;
-    tone: TBrandVariantOf<'PRIMARY' | 'SECONDARY'>;
+    tone: TBrandVariant;
     children?: TCompoundChildren<typeof QuoteCardParts>;
   };
 

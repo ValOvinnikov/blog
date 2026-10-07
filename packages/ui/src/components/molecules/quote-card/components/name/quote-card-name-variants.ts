@@ -20,6 +20,7 @@ export const quoteCardNameVariants = tv({
     tone: {
       [BRAND_VARIANT.PRIMARY]: [],
       [BRAND_VARIANT.SECONDARY]: [],
+      [BRAND_VARIANT.BRAND_PRIMARY]: [],
     },
   },
   defaultVariants: {

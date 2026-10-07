@@ -281,14 +281,14 @@ Variants: collapsible: (boolean)
 ### QuoteCard — `components/molecules/quote-card/quote-card.tsx`
 
 A testimonial quote rendered as a figure; composes a caller-supplied `QuoteCard.Quote`, `QuoteCard.Avatar`, and `QuoteCard.Name` for the quoted person.
-Props: role?: string · align?: TQuoteCardVariants['align'] · isSpotlight?: boolean · tone: TBrandVariantOf<'PRIMARY' | 'SECONDARY'> · children?: TCompoundChildren<typeof QuoteCardParts> _(extends IWithClassName, IWithDataTestId)_
+Props: role?: string · align?: TQuoteCardVariants['align'] · isSpotlight?: boolean · tone: TBrandVariant · children?: TCompoundChildren<typeof QuoteCardParts> _(extends IWithClassName, IWithDataTestId)_
 Variants: align: left|center · isSpotlight: (boolean)
 
 Slots:
 
 - **QuoteCard.Quote** — The quote slot of a `QuoteCard`; owns the figure's `<blockquote>`, so the caller passes the quote's inner content and never a `<blockquote>` of its own. Props: isSpotlight?: TQuoteCardQuoteVariants['isSpotlight'] · children: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: isSpotlight: (boolean)
 - **QuoteCard.Avatar** — The avatar slot of a `QuoteCard`; positions the caller's own `Avatar` element beside the quoted person's name. Props: children: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **QuoteCard.Name** — The name slot of a `QuoteCard`; wraps the quoted person's link or text in the link/focus treatment, on an element the component itself owns rather than the caller's link or text. Props: isSpotlight?: TQuoteCardNameVariants['isSpotlight'] · tone?: TQuoteCardNameVariants['tone'] · children: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: isSpotlight: (boolean) · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY
+- **QuoteCard.Name** — The name slot of a `QuoteCard`; wraps the quoted person's link or text in the link/focus treatment, on an element the component itself owns rather than the caller's link or text. Props: isSpotlight?: TQuoteCardNameVariants['isSpotlight'] · tone?: TQuoteCardNameVariants['tone'] · children: ReactNode _(extends IWithClassName, IWithDataTestId)_ · Variants: isSpotlight: (boolean) · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY|BRAND_VARIANT.BRAND_PRIMARY
 
 ### SettingRow — `components/molecules/setting-row/setting-row.tsx`
 
