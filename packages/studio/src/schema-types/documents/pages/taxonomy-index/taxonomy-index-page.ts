@@ -3,7 +3,7 @@ import { languageField } from '@blog/studio/schema-types/fields/language-field/l
 import { templateField } from '@blog/studio/schema-types/fields/template-field/template-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
-import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
+import { pageHeadingBlockField } from '@blog/studio/schema-types/objects/page-heading-block/page-heading-block-field';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
 import { languagePreview } from '@blog/studio/schema-types/preview/language-preview/language-preview';
 import { validateOnePerLanguage } from '@blog/studio/schema-types/validation/validate-one-per-language/validate-one-per-language';
@@ -50,7 +50,7 @@ export const taxonomyIndexPage = ({
     fields: [
       languageField(),
       titleField(),
-      headingBlockField(),
+      pageHeadingBlockField(),
       templateField({ type: templateType }),
       seoField(),
       defineField({

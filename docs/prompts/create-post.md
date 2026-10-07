@@ -342,7 +342,7 @@ Rules — these must be exact or the import fails or orphans data:
   documents must exist in the file or the dataset (use `"_weak": true` only if
   intentionally dangling — normally never).
 - `headingBlock` is an object with its own `_type`:
-  `{"_type": "headingBlock", "heading": "…", "supportingText": "…"}`.
+  `{"_type": "pageHeadingBlock", "heading": "…", "supportingText": "…"}`.
 - `seo` is **not** optional on a post — `metaTitle` is required, so always
   emit it: `"seo": {"_type": "seo", "metaTitle": "…", "metaDescription": "…"}`.
   Add `"openGraph": {"_type": "openGraph", "ogTitle": "…"}` when authored;

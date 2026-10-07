@@ -10,8 +10,8 @@ import { createSlugUrlPreviewInput } from '@blog/studio/schema-types/inputs/slug
 import { postLatestSchema } from '@blog/studio/schema-types/modules/post-latest/post-latest';
 import { postRelatedSchema } from '@blog/studio/schema-types/modules/post-related/post-related';
 import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-list/taxonomy-list';
-import { headingBlockField } from '@blog/studio/schema-types/objects/heading-block/heading-block-field';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
+import { pageHeadingBlockField } from '@blog/studio/schema-types/objects/page-heading-block/page-heading-block-field';
 import { postTakeawaysSchema } from '@blog/studio/schema-types/objects/post-takeaways/post-takeaways';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
 import { articleTextSchema } from '@blog/studio/schema-types/portable-text/article-text/article-text';
@@ -36,7 +36,7 @@ export const postPageSchema = defineType({
       previewInput: postSlugUrlPreviewInput,
       isUnique: validateSlugUniqueInLanguage,
     }),
-    headingBlockField(),
+    pageHeadingBlockField(),
     defineField({
       name: 'heroImage',
       title: 'Hero Image',

@@ -5288,7 +5288,7 @@
     }
   },
   {
-    "name": "headingBlock",
+    "name": "pageHeadingBlock",
     "type": "type",
     "value": {
       "type": "object",
@@ -5297,7 +5297,7 @@
           "type": "objectAttribute",
           "value": {
             "type": "string",
-            "value": "headingBlock"
+            "value": "pageHeadingBlock"
           }
         },
         "heading": {
@@ -7637,7 +7637,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "headingBlock"
+          "name": "pageHeadingBlock"
         },
         "optional": true
       },
@@ -8905,7 +8905,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "headingBlock"
+          "name": "pageHeadingBlock"
         },
         "optional": true
       },
@@ -9410,7 +9410,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "headingBlock"
+          "name": "pageHeadingBlock"
         },
         "optional": true
       },
@@ -9700,7 +9700,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "headingBlock"
+          "name": "pageHeadingBlock"
         },
         "optional": true
       },
@@ -10109,7 +10109,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "headingBlock"
+          "name": "pageHeadingBlock"
         },
         "optional": true
       },
@@ -10545,7 +10545,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "headingBlock"
+          "name": "pageHeadingBlock"
         },
         "optional": true
       },
@@ -10894,7 +10894,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "headingBlock"
+          "name": "pageHeadingBlock"
         },
         "optional": true
       },
@@ -11213,7 +11213,7 @@
         "type": "objectAttribute",
         "value": {
           "type": "inline",
-          "name": "headingBlock"
+          "name": "pageHeadingBlock"
         },
         "optional": true
       },

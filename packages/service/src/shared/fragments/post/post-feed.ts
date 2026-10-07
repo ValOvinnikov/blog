@@ -1,5 +1,5 @@
 import { q } from '@blog/service/sanity/query/query';
-import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
+import { pageHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/page-heading-block';
 
 /**
  * Deliberately leaner than `postCardFragment` — an RSS entry only ever
@@ -11,7 +11,7 @@ export const postFeedFragment = q
   .project((sub) => ({
     headingBlock: sub
       .field('headingBlock')
-      .project(headingBlockFragment)
+      .project(pageHeadingBlockFragment)
       .notNull(),
     slug: sub.field('slug.current').notNull(),
     publishedAt: sub.field('publishedAt').notNull(),

@@ -1,6 +1,6 @@
 import type { TPageTopicType } from '@blog/config';
 import { q } from '@blog/service/sanity/query/query';
-import { headingBlockFragment } from '@blog/service/shared/fragments/heading-block/heading-block';
+import { pageHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/page-heading-block';
 import { moduleFragment } from '@blog/service/shared/fragments/module/module';
 import { seoFragment } from '@blog/service/shared/fragments/seo/seo';
 import { topicFragment } from '@blog/service/shared/fragments/topic/topic';
@@ -18,7 +18,7 @@ export const topicPageQuery = q
     topic: sub.field('topic').deref().project(topicFragment).notNull(),
     headingBlock: sub
       .field('headingBlock')
-      .project(headingBlockFragment)
+      .project(pageHeadingBlockFragment)
       .notNull(),
     hero: sub
       .field('template')

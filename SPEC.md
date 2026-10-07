@@ -315,18 +315,21 @@ object (`spacingTop`/`spacingBottom`, `containerWidth` (not on
 consts; there is no `align` field on `layout` — alignment is its own
 module-level field, below).
 `module_cta`/`module_postList`/`module_postLatest`/`module_postFeatured`/`module_postRelated`/`module_taxonomyList`/`module_newsletter`
-additionally carry a `headingBlock` object (`heading` and `supportingText`
-only). There is **one registered `headingBlock` type**, and requiredness is
-enforced at **two levels**, because Sanity never descends into an absent
-object: the registered type marks its own nested `heading` `required()`,
-and `headingBlockField()` marks the containing field `required()` so the
+additionally carry a `headingBlock` field (`heading` and `supportingText`
+only). Two registered types back that one field name: pages use
+`pageHeadingBlock` (plain strings), modules and feature blocks use
+`moduleHeadingBlock` (per-language values, where `heading` is required in
+the default language). Requiredness is enforced at **two levels**, because
+Sanity never descends into an absent object: each type marks its own nested
+`heading` required, and its field factory (`pageHeadingBlockField()`,
+`moduleHeadingBlockField()`) marks the containing field required so the
 object is always there for that nested rule to run against. Either alone
 would miss a case — the nested rule never fires on a document with no
 `headingBlock`, and the field rule alone would accept an empty heading
-inside one. `headingBlockField()` takes no options, so `heading` is
-**required on every call site**, every module and every page: no layer has
-to reason about which case it is holding, and no caller can opt out. Neither
-field carries a length cap; forced `max()` validation was removed as
+inside one. `pageHeadingBlockField()` takes no options, so `heading` is
+**required on every page**; `moduleHeadingBlockField()` is required by
+default and only `module_childPages` opts out with `isRequired: false`.
+Neither field carries a length cap; forced `max()` validation was removed as
 editor-hostile.
 
 **Schema-required is not the same as present in stored data**, and the
@@ -1662,8 +1665,8 @@ poorly") rather than a number. The rule is held by authoring and review, not
 by a test: a mechanical check can only confirm a description exists, which is
 the easy half, while whether it tells an editor something true and useful
 needs a reader. Where a shared field factory would otherwise have every caller
-repeat the same text, the copy lives on the factory — `headingBlockField`
-carries one generic description covering both pages and modules, and no
+repeat the same text, the copy lives on the factory — `pageHeadingBlockField`
+and `moduleHeadingBlockField` each own their description copy, and no
 caller can override it. Two per-surface overrides existed and were dropped
 deliberately: one text everywhere is worth more than a sentence tuned per
 call site.
