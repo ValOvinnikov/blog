@@ -1,12 +1,13 @@
 'use client';
 
-import type { TFontChoice } from '@blog/config';
+import type { TDensity, TFontChoice, TRadiusScale } from '@blog/config';
 import { Card } from '@platform/components/shared/card';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { FONT_OPTIONS } from '@platform/config/fonts';
 import {
   buildAccentPreviewTokens,
   buildLogoPreviewTokens,
+  buildShapePreviewTokens,
 } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import { useTranslations } from 'next-intl';
 import { type CSSProperties, useState } from 'react';
@@ -23,19 +24,14 @@ export type TLookPreviewProps = {
   logoHue: number | undefined;
   headingFont: TFontChoice;
   bodyFont: TFontChoice;
+  radiusScale: TRadiusScale;
+  density: TDensity;
+  logoSrc: string | undefined;
 };
 
 /**
- * Tier 1 (inline, this component) and tier 2 (the reserved full-page panel
- * below it) of the Look tab's live preview. The panel chrome here (the
- * cards, headers, mode toggle, and reserved full-page panel) is admin's own
- * design system — but `PreviewSample` inside it renders the *tenant's* site
- * theme through real site primitives and site tokens, since it must
- * show what the site will actually look like, not an admin-styled
- * approximation. Light/dark is this preview's own toggle, not tenant
- * config — a reader's `prefers-color-scheme` choice, independent of
- * whichever preset is selected, so both ramps must be previewable
- * regardless of preset.
+ * Light/dark is the preview's own toggle rather than tenant config, since a
+ * reader's `prefers-color-scheme` picks the ramp on the live site.
  */
 export const LookPreview = ({
   tenantName,
@@ -44,6 +40,9 @@ export const LookPreview = ({
   logoHue,
   headingFont,
   bodyFont,
+  radiusScale,
+  density,
+  logoSrc,
 }: TLookPreviewProps) => {
   const t = useTranslations('lookPreview');
   const [mode, setMode] = useState<TPreviewMode>('light');
@@ -58,6 +57,7 @@ export const LookPreview = ({
   const tokenStyle = {
     ...buildAccentPreviewTokens(accentHue, isDark),
     ...buildLogoPreviewTokens(resolvedLogoHue, isDark),
+    ...buildShapePreviewTokens(radiusScale, density),
   } as CSSProperties;
 
   const heading = FONT_OPTIONS[headingFont];
@@ -93,6 +93,7 @@ export const LookPreview = ({
         <Card.Body>
           <PreviewSample
             tenantName={tenantName}
+            logoSrc={logoSrc}
             tokenStyle={tokenStyle}
             isDark={isDark}
             headingFontFamily={heading.fontFamily}

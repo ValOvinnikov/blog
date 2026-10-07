@@ -9,6 +9,7 @@ import {
   buildAccentPreviewTokens,
 } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import { useTranslations } from 'next-intl';
+import { useId } from 'react';
 
 import type { TLookFormFieldSetter } from './look-form';
 import { lookFormVariants } from './look-form-variants';
@@ -17,6 +18,7 @@ export type TLookFormBasicSectionProps = {
   preset: TPresetId;
   onPresetChange: (preset: TPresetId) => void;
   accentHue: number;
+  isAccentHueRejected: boolean;
   logoHue: number | undefined;
   onFieldChange: TLookFormFieldSetter;
   isArchived: boolean;
@@ -27,12 +29,17 @@ export const LookFormBasicSection = ({
   preset,
   onPresetChange,
   accentHue,
+  isAccentHueRejected,
   logoHue,
   onFieldChange,
   isArchived,
   archivedNoticeId,
 }: TLookFormBasicSectionProps) => {
   const archivedDescribedBy = isArchived ? archivedNoticeId : undefined;
+  const accentHueErrorId = useId();
+  const accentHueDescribedBy = isAccentHueRejected
+    ? accentHueErrorId
+    : archivedDescribedBy;
   const t = useTranslations('lookForm');
   const {
     field,
@@ -42,6 +49,7 @@ export const LookFormBasicSection = ({
     hueField,
     swatch,
     hueValue,
+    fieldError,
   } = lookFormVariants();
 
   const accentHueLabel = t('accentHueLabel');
@@ -76,11 +84,16 @@ export const LookFormBasicSection = ({
             value={accentHue}
             onChange={(value) => onFieldChange('accentHue', value)}
             isDisabled={isArchived}
-            aria-describedby={archivedDescribedBy}
+            aria-describedby={accentHueDescribedBy}
             trackStyle={{ background: accentHueGradient() }}
           />
           <span className={hueValue()}>{accentHue}°</span>
         </div>
+        {isAccentHueRejected && (
+          <p id={accentHueErrorId} className={fieldError()} role="alert">
+            {t('accentHueInaccessible')}
+          </p>
+        )}
       </div>
 
       <div className={field()}>

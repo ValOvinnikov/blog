@@ -1,30 +1,29 @@
 import { tv } from '@platform/utils/tv/tv';
 
 /**
- * Every class here reads a SITE token (`--surface`, `--text`, `--border`,
- * …), not an `--admin-*` one — this box renders the tenant's own theme via
- * `tokenStyle`, so it must speak the site's vocabulary to actually preview
- * it. See `look-preview.tsx`'s doc comment for the admin/site token split.
+ * Every class here reads a site token rather than an `--admin-*` one, since
+ * this box renders the tenant's theme through `tokenStyle`.
  */
 export const previewSampleVariants = tv({
   slots: {
-    // No base classes — `Panel` (an external component whose own
-    // surface/border/text classes already read `--surface`/`--border`/
-    // `--text`) supplies the visible surface; this slot carries only the
-    // conditional `dark` class below, needed because those tokens are
-    // scoped to a `.dark` ancestor rather than `prefers-color-scheme`.
-    surface: [],
+    root: [
+      'flex flex-col gap-3 rounded-md border border-border bg-primary px-card-x py-card-y text-text',
+    ],
     brandRow: ['flex items-center gap-2'],
     brandName: ['text-base font-semibold text-text'],
     actionsRow: ['flex flex-wrap items-center gap-2 pt-1'],
     chip: [
       'inline-flex items-center rounded-full border border-border px-2.5 py-1 text-xs text-text-muted',
     ],
+    cards: ['grid grid-cols-1 gap-3 pt-1 sm:grid-cols-2'],
+    outlinedCard: ['sm:col-span-2'],
   },
   variants: {
     isDark: {
+      // theme.css scopes its dark ramp to `.dark`, so the class must sit on the
+      // element carrying the inline tenant tokens or its static values win.
       true: {
-        surface: ['dark'],
+        root: ['dark'],
       },
       false: {},
     },

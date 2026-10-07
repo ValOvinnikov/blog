@@ -3,6 +3,7 @@ import {
   AUDIT_TARGET_TYPE,
   DENSITY,
   FONT_CHOICE,
+  isAccentHueAccessible,
   LANGUAGE_SWITCHER_STYLE,
   PRESET_ID,
   RADIUS_SCALE,
@@ -20,6 +21,11 @@ const { upsertSiteConfigMock, revalidateSiteConfigMock, insertAuditEventMock } =
     revalidateSiteConfigMock: vi.fn(),
     insertAuditEventMock: vi.fn(),
   }));
+
+vi.mock('@blog/config', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@blog/config')>()),
+  isAccentHueAccessible: vi.fn(),
+}));
 
 vi.mock('@platform/server/auth/require-tenant-membership');
 
@@ -43,6 +49,7 @@ const requireTenantMembershipMock = vi.mocked<
 >(requireTenantMembership);
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 const loggerErrorMock = vi.mocked(logger.error);
+const isAccentHueAccessibleMock = vi.mocked(isAccentHueAccessible);
 
 const VALID_INPUT: TUpdateLookInput = {
   preset: PRESET_ID.EDITORIAL,
@@ -73,6 +80,8 @@ describe(updateLookAction, () => {
     insertAuditEventMock.mockReset();
     insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
     loggerErrorMock.mockReset();
+    isAccentHueAccessibleMock.mockReset();
+    isAccentHueAccessibleMock.mockReturnValue(true);
   });
 
   it('re-resolves the tenant from the session against the routed id before writing', async () => {
@@ -97,6 +106,15 @@ describe(updateLookAction, () => {
 
     expect(result).toEqual({ ok: false });
     expect(requireTenantMembershipMock).not.toHaveBeenCalled();
+  });
+
+  it('rejects an accent hue the site would replace without writing it', async () => {
+    isAccentHueAccessibleMock.mockReturnValue(false);
+
+    const result = await updateLookAction('tenant-1', VALID_INPUT);
+
+    expect(result).toEqual({ ok: false });
+    expect(upsertSiteConfigMock).not.toHaveBeenCalled();
   });
 
   it('reports failure instead of throwing when the write itself fails', async () => {

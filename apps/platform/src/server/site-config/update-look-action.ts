@@ -5,6 +5,7 @@ import {
   AUDIT_TARGET_TYPE,
   DENSITY,
   FONT_CHOICE,
+  isAccentHueAccessible,
   LANGUAGE_SWITCHER_STYLE,
   PRESET_ID,
   RADIUS_SCALE,
@@ -27,7 +28,7 @@ const hueSchema = z.number().int().min(HUE_MIN).max(HUE_MAX);
 
 const updateLookInputSchema = z.object({
   preset: z.enum(Object.values(PRESET_ID) as [TPresetId, ...TPresetId[]]),
-  accentHue: hueSchema,
+  accentHue: hueSchema.refine(isAccentHueAccessible),
   logoHue: hueSchema.nullable(),
   headingFont: z.enum(
     Object.values(FONT_CHOICE) as [TFontChoice, ...TFontChoice[]],

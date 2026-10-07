@@ -1,6 +1,6 @@
 /* Retained for `look-preview/preview-sample/` only — it renders the
-   tenant's own site (BrandMark, Button, Heading, Text, Panel from
-   `@blog/ui`) fed unsaved form state, so it needs the site's real token
+   tenant's own site (BrandMark, Button, Heading, Text, MediaCard, Panel
+   from `@blog/ui`) fed unsaved form state, so it needs the site's real token
    vocabulary. It is the one directory under apps/platform allowed to
    import `@blog/ui`; do not drop this import to "clean up" the dependency. */
 
