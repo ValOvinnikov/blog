@@ -14,6 +14,10 @@ vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
 const tenant = makeTenant();
 
 describe('getTopics', () => {
+  beforeEach(() => {
+    mockRun.mockResolvedValue([]);
+  });
+
   it('maps every raw topic into a domain topic with its post count', async () => {
     mockRun.mockResolvedValue([
       makeRawTopicWithPostCount({
@@ -39,16 +43,12 @@ describe('getTopics', () => {
   });
 
   it('returns an empty list when there are no topics', async () => {
-    mockRun.mockResolvedValue([]);
-
     const result = await getTopics(tenant);
 
     expect(result).toEqual([]);
   });
 
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
-    mockRun.mockResolvedValue([]);
-
     await getTopics(tenant);
 
     expect(mockRun).toHaveBeenCalledWith(

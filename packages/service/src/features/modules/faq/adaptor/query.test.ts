@@ -79,6 +79,14 @@ function questionText(module: Awaited<ReturnType<typeof runFaq>>) {
 }
 
 describe('faqModuleQuery', () => {
+  let firstQuestion: ReturnType<typeof makeRawFaqModule>['questions'][number];
+
+  beforeEach(() => {
+    const [question] = makeRawFaqModule().questions;
+    if (!question) throw new Error('expected a fixture faq question');
+    firstQuestion = question;
+  });
+
   it('filters to module_faq documents by id', () => {
     expect(faqModuleQuery.query).toContain('_type == "module_faq"');
     expect(faqModuleQuery.query).toContain('_id == $id');
@@ -103,8 +111,6 @@ describe('faqModuleQuery', () => {
   });
 
   it('rejects a question with no question text', () => {
-    const [firstQuestion] = makeRawFaqModule().questions;
-
     const raw = {
       ...makeRawFaqModule(),
       questions: [{ ...firstQuestion, question: null }],
@@ -114,8 +120,6 @@ describe('faqModuleQuery', () => {
   });
 
   it('rejects a question with no answer', () => {
-    const [firstQuestion] = makeRawFaqModule().questions;
-
     const raw = {
       ...makeRawFaqModule(),
       questions: [{ ...firstQuestion, answer: null }],

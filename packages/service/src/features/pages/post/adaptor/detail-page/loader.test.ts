@@ -22,6 +22,10 @@ vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
 const tenant = makeTenant();
 
 describe('getPost', () => {
+  beforeEach(() => {
+    mockRun.mockResolvedValue(makeRawPostDetail());
+  });
+
   it('resolves undefined, rather than rejecting, when no page_post matches the slug', async () => {
     mockRun.mockResolvedValueOnce(null);
 
@@ -233,18 +237,7 @@ describe('getPost', () => {
     });
   });
 
-  it('maps a post with no heroImage to an undefined heroImage', async () => {
-    mockRun.mockResolvedValueOnce(makeRawPostDetail({ heroImage: null }));
-
-    const result = await getPost('hello-world', tenant);
-    if (!result) throw new Error('expected a post detail');
-
-    expect(result.heroImage).toBeUndefined();
-  });
-
   it('passes the slug as a query parameter', async () => {
-    mockRun.mockResolvedValueOnce(makeRawPostDetail());
-
     await getPost('my-slug', tenant);
 
     expect(mockRun).toHaveBeenCalledWith(
@@ -269,15 +262,6 @@ describe('getPost', () => {
     expect(result.seo.title).toBe('Authored Title');
     expect(result.seo.description).toBe('Authored description');
     expect(result.seo.ogTitle).toBeUndefined();
-  });
-
-  it('leaves seo.ogImage undefined when no ogImage is authored, without falling back to the hero image', async () => {
-    mockRun.mockResolvedValueOnce(makeRawPostDetail({ heroImage: null }));
-
-    const result = await getPost('hello-world', tenant);
-    if (!result) throw new Error('expected a post detail');
-
-    expect(result.seo.ogImage).toBeUndefined();
   });
 
   it('maps tags from raw input', async () => {
@@ -496,8 +480,6 @@ describe('getPost', () => {
   });
 
   it('threads tenant context into the query and scopes its tags to it', async () => {
-    mockRun.mockResolvedValueOnce(makeRawPostDetail());
-
     await getPost('my-slug', tenant);
 
     expect(mockRun).toHaveBeenCalledWith(
@@ -522,5 +504,25 @@ describe('getPost', () => {
         }),
       }),
     );
+  });
+
+  describe('with no heroImage', () => {
+    beforeEach(() => {
+      mockRun.mockResolvedValue(makeRawPostDetail({ heroImage: null }));
+    });
+
+    it('maps a post with no heroImage to an undefined heroImage', async () => {
+      const result = await getPost('hello-world', tenant);
+      if (!result) throw new Error('expected a post detail');
+
+      expect(result.heroImage).toBeUndefined();
+    });
+
+    it('leaves seo.ogImage undefined when no ogImage is authored, without falling back to the hero image', async () => {
+      const result = await getPost('hello-world', tenant);
+      if (!result) throw new Error('expected a post detail');
+
+      expect(result.seo.ogImage).toBeUndefined();
+    });
   });
 });

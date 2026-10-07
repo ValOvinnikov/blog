@@ -15,9 +15,13 @@ import {
 const rawPosts: TRawPostLatestModulePosts = [];
 
 describe('toPostLatestModule', () => {
-  it('maps headingBlock straight through', () => {
-    const raw = makeRawPostLatestModule();
+  let raw: ReturnType<typeof makeRawPostLatestModule>;
 
+  beforeEach(() => {
+    raw = makeRawPostLatestModule();
+  });
+
+  it('maps headingBlock straight through', () => {
     const module = toPostLatestModule(raw, rawPosts);
 
     expect(module.headingBlock).toEqual({
@@ -27,7 +31,7 @@ describe('toPostLatestModule', () => {
   });
 
   it('maps brandVariant straight through', () => {
-    const raw = makeRawPostLatestModule({
+    raw = makeRawPostLatestModule({
       brandVariant: BRAND_VARIANT.SECONDARY,
     });
 
@@ -37,7 +41,7 @@ describe('toPostLatestModule', () => {
   });
 
   it('leaves contentAlignment undefined when unset (no faked default)', () => {
-    const raw = makeRawPostLatestModule({ contentAlignment: null });
+    raw = makeRawPostLatestModule({ contentAlignment: null });
 
     const module = toPostLatestModule(raw, rawPosts);
 
@@ -45,7 +49,7 @@ describe('toPostLatestModule', () => {
   });
 
   it('maps contentAlignment when authored', () => {
-    const raw = makeRawPostLatestModule({
+    raw = makeRawPostLatestModule({
       contentAlignment: CONTENT_ALIGNMENT.RIGHT,
     });
 
@@ -55,7 +59,7 @@ describe('toPostLatestModule', () => {
   });
 
   it('maps a fully-authored layout object 1:1', () => {
-    const raw = makeRawPostLatestModule({
+    raw = makeRawPostLatestModule({
       layout: {
         spacingTop: 'MD',
         spacingBottom: 'MD',
@@ -77,7 +81,7 @@ describe('toPostLatestModule', () => {
   });
 
   it('leaves layout undefined when the field is unset (no faked default)', () => {
-    const raw = makeRawPostLatestModule({ layout: null });
+    raw = makeRawPostLatestModule({ layout: null });
 
     const module = toPostLatestModule(raw, rawPosts);
 
@@ -85,23 +89,19 @@ describe('toPostLatestModule', () => {
   });
 
   it('maps posts through toPostCard', () => {
-    const raw = makeRawPostLatestModule();
-
     const module = toPostLatestModule(raw, [makeRawPostCard({ _id: 'a' })]);
 
     expect(module.posts.map((p) => p.id)).toEqual(['a']);
   });
 
   it('returns an empty posts array when nothing resolves', () => {
-    const raw = makeRawPostLatestModule();
-
     const module = toPostLatestModule(raw, rawPosts);
 
     expect(module.posts).toEqual([]);
   });
 
   it('passes showImages through when true', () => {
-    const raw = makeRawPostLatestModule({ showImages: true });
+    raw = makeRawPostLatestModule({ showImages: true });
 
     const module = toPostLatestModule(raw, rawPosts);
 
@@ -109,7 +109,7 @@ describe('toPostLatestModule', () => {
   });
 
   it('passes showImages through when false', () => {
-    const raw = makeRawPostLatestModule({ showImages: false });
+    raw = makeRawPostLatestModule({ showImages: false });
 
     const module = toPostLatestModule(raw, rawPosts);
 
@@ -117,7 +117,7 @@ describe('toPostLatestModule', () => {
   });
 
   it('passes an authored CAROUSEL displayMode through', () => {
-    const raw = makeRawPostLatestModule({
+    raw = makeRawPostLatestModule({
       displayMode: DISPLAY_MODE.CAROUSEL,
     });
 
@@ -127,7 +127,7 @@ describe('toPostLatestModule', () => {
   });
 
   it('passes the read-time GRID default through when the field is absent from the document', () => {
-    const raw = makeRawPostLatestModule({ displayMode: DISPLAY_MODE.GRID });
+    raw = makeRawPostLatestModule({ displayMode: DISPLAY_MODE.GRID });
 
     const module = toPostLatestModule(raw, rawPosts);
 

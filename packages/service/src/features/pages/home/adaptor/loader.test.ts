@@ -19,9 +19,11 @@ vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
 const tenant = makeTenant();
 
 describe('getHomePageDocument', () => {
-  it('maps the thin page_home document to module refs', async () => {
-    mockRun.mockResolvedValueOnce(makeRawHomePage());
+  beforeEach(() => {
+    mockRun.mockResolvedValue(makeRawHomePage());
+  });
 
+  it('maps the thin page_home document to module refs', async () => {
     const page = await getHomePageDocument(tenant);
     if (!page) throw new Error('expected a home page');
 
@@ -118,8 +120,6 @@ describe('getHomePageDocument', () => {
   });
 
   it('threads tenant context into the query and scopes its tags to it', async () => {
-    mockRun.mockResolvedValueOnce(makeRawHomePage());
-
     await getHomePageDocument(tenant);
 
     expect(mockRun).toHaveBeenCalledWith(

@@ -15,6 +15,10 @@ vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
 const tenant = makeTenant();
 
 describe('getNavigation', () => {
+  beforeEach(() => {
+    mockRun.mockResolvedValue(makeRawNavigation());
+  });
+
   it('throws when the navigation document does not exist', async () => {
     mockRun.mockResolvedValue(null);
 
@@ -57,8 +61,6 @@ describe('getNavigation', () => {
   });
 
   it('leaves the language switcher toggle undefined when unset', async () => {
-    mockRun.mockResolvedValue(makeRawNavigation());
-
     const result = await getNavigation(tenant);
 
     expect(result.showLanguageSwitcher).toBeUndefined();
@@ -75,8 +77,6 @@ describe('getNavigation', () => {
   });
 
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
-    mockRun.mockResolvedValue(makeRawNavigation());
-
     await getNavigation(tenant);
 
     expect(mockRun).toHaveBeenCalledWith(

@@ -13,6 +13,10 @@ vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
 const tenant = makeTenant();
 
 describe(getPublishedPostBody, () => {
+  beforeEach(() => {
+    mockRun.mockResolvedValue({ body: [] });
+  });
+
   it('returns the post body from the raw query result', async () => {
     const body = [{ _type: 'block', _key: 'b1', children: [] }];
     mockRun.mockResolvedValueOnce({ body });
@@ -23,8 +27,6 @@ describe(getPublishedPostBody, () => {
   });
 
   it('queries by the given post id', async () => {
-    mockRun.mockResolvedValueOnce({ body: [] });
-
     await getPublishedPostBody('post-abc', tenant);
 
     expect(mockRun).toHaveBeenCalledWith(
@@ -34,8 +36,6 @@ describe(getPublishedPostBody, () => {
   });
 
   it('does not tag the fetch for Next ISR caching (always reads fresh)', async () => {
-    mockRun.mockResolvedValueOnce({ body: [] });
-
     await getPublishedPostBody('post-abc', tenant);
 
     const [, options] = mockRun.mock.calls[0] as [
@@ -52,8 +52,6 @@ describe(getPublishedPostBody, () => {
   });
 
   it('threads tenant context into runQuery', async () => {
-    mockRun.mockResolvedValueOnce({ body: [] });
-
     await getPublishedPostBody('post-abc', tenant);
 
     expect(mockRun).toHaveBeenCalledWith(

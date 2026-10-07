@@ -5,10 +5,15 @@ function project(projectId: string) {
 }
 
 describe(createProjectCache, () => {
-  it('returns the cached entry for a repeated project', () => {
-    const getOrCreate = createProjectCache<object>();
-    const create = vi.fn(() => ({}));
+  let getOrCreate: ReturnType<typeof createProjectCache<object>>;
+  let create: ReturnType<typeof vi.fn<() => object>>;
 
+  beforeEach(() => {
+    getOrCreate = createProjectCache<object>();
+    create = vi.fn(() => ({}));
+  });
+
+  it('returns the cached entry for a repeated project', () => {
     const first = getOrCreate(project('tenant-a'), create);
     const second = getOrCreate(project('tenant-a'), create);
 
@@ -17,9 +22,6 @@ describe(createProjectCache, () => {
   });
 
   it('keeps projects with the same id but different datasets apart', () => {
-    const getOrCreate = createProjectCache<object>();
-    const create = vi.fn(() => ({}));
-
     getOrCreate({ projectId: 'tenant-a', dataset: 'production' }, create);
     getOrCreate({ projectId: 'tenant-a', dataset: 'staging' }, create);
 
@@ -27,15 +29,15 @@ describe(createProjectCache, () => {
   });
 
   it('replaces an entry that is no longer reusable', () => {
-    const getOrCreate = createProjectCache<{ token: string }>();
+    const getOrCreateToken = createProjectCache<{ token: string }>();
 
-    getOrCreate(project('tenant-a'), () => ({ token: 'old' }));
-    const replaced = getOrCreate(
+    getOrCreateToken(project('tenant-a'), () => ({ token: 'old' }));
+    const replaced = getOrCreateToken(
       project('tenant-a'),
       () => ({ token: 'new' }),
       (entry) => entry.token === 'new',
     );
-    const reused = getOrCreate(
+    const reused = getOrCreateToken(
       project('tenant-a'),
       () => ({ token: 'newer' }),
       (entry) => entry.token === 'new',
@@ -46,9 +48,6 @@ describe(createProjectCache, () => {
   });
 
   it('evicts the least recently used project once 20 are cached', () => {
-    const getOrCreate = createProjectCache<object>();
-    const create = vi.fn(() => ({}));
-
     for (let i = 0; i < 20; i++) getOrCreate(project(`tenant-${i}`), create);
     getOrCreate(project('tenant-0'), create);
     getOrCreate(project('tenant-overflow'), create);

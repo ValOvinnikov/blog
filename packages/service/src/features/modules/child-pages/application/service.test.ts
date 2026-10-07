@@ -20,9 +20,12 @@ const pages = [{ id: 'page-faq' }] as unknown as TChildPageCard[];
 
 describe('createChildPagesModuleService', () => {
   describe('v1.getChildPagesModule', () => {
+    beforeEach(() => {
+      mockGetPages.mockResolvedValue(pages);
+    });
+
     it('combines the module document with the children of the hosting page', async () => {
       mockGetModule.mockResolvedValue(moduleDocument);
-      mockGetPages.mockResolvedValue(pages);
 
       const result =
         await createChildPagesModuleService().v1.getChildPagesModule(
@@ -44,7 +47,6 @@ describe('createChildPagesModuleService', () => {
     it('resolves ok:false with the error when the module document fails to load', async () => {
       const error = new Error('ValidationError');
       mockGetModule.mockRejectedValue(error);
-      mockGetPages.mockResolvedValue(pages);
 
       const result =
         await createChildPagesModuleService().v1.getChildPagesModule(

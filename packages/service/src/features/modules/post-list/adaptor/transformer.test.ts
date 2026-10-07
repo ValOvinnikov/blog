@@ -11,9 +11,13 @@ const rawPosts: TRawPostListModulePosts = [];
 const pagination = { currentPage: 1, totalPages: 1 };
 
 describe('toPostListModule', () => {
-  it('maps headingBlock straight through', () => {
-    const raw = makeRawPostListModule();
+  let raw: ReturnType<typeof makeRawPostListModule>;
 
+  beforeEach(() => {
+    raw = makeRawPostListModule();
+  });
+
+  it('maps headingBlock straight through', () => {
     const module = toPostListModule(raw, rawPosts, pagination);
 
     expect(module.headingBlock).toEqual({
@@ -23,7 +27,7 @@ describe('toPostListModule', () => {
   });
 
   it('maps brandVariant straight through', () => {
-    const raw = makeRawPostListModule({
+    raw = makeRawPostListModule({
       brandVariant: BRAND_VARIANT.SECONDARY,
     });
 
@@ -33,7 +37,7 @@ describe('toPostListModule', () => {
   });
 
   it('leaves contentAlignment undefined when unset (no faked default)', () => {
-    const raw = makeRawPostListModule({ contentAlignment: null });
+    raw = makeRawPostListModule({ contentAlignment: null });
 
     const module = toPostListModule(raw, rawPosts, pagination);
 
@@ -41,7 +45,7 @@ describe('toPostListModule', () => {
   });
 
   it('maps contentAlignment when authored', () => {
-    const raw = makeRawPostListModule({
+    raw = makeRawPostListModule({
       contentAlignment: CONTENT_ALIGNMENT.RIGHT,
     });
 
@@ -51,7 +55,7 @@ describe('toPostListModule', () => {
   });
 
   it('maps a fully-authored layout object 1:1', () => {
-    const raw = makeRawPostListModule({
+    raw = makeRawPostListModule({
       layout: {
         spacingTop: 'MD',
         spacingBottom: 'MD',
@@ -73,7 +77,7 @@ describe('toPostListModule', () => {
   });
 
   it('leaves layout undefined when the field is unset (no faked default)', () => {
-    const raw = makeRawPostListModule({ layout: null });
+    raw = makeRawPostListModule({ layout: null });
 
     const module = toPostListModule(raw, rawPosts, pagination);
 
@@ -81,16 +85,12 @@ describe('toPostListModule', () => {
   });
 
   it('maps posts through toPostCard', () => {
-    const raw = makeRawPostListModule();
-
     const module = toPostListModule(raw, rawPosts, pagination);
 
     expect(module.posts).toEqual([]);
   });
 
   it('maps currentPage/totalPages straight through', () => {
-    const raw = makeRawPostListModule();
-
     const module = toPostListModule(raw, rawPosts, {
       currentPage: 2,
       totalPages: 5,
@@ -101,7 +101,7 @@ describe('toPostListModule', () => {
   });
 
   it('passes showImages through when true', () => {
-    const raw = makeRawPostListModule({ showImages: true });
+    raw = makeRawPostListModule({ showImages: true });
 
     const module = toPostListModule(raw, rawPosts, pagination);
 
@@ -109,7 +109,7 @@ describe('toPostListModule', () => {
   });
 
   it('passes showImages through when false', () => {
-    const raw = makeRawPostListModule({ showImages: false });
+    raw = makeRawPostListModule({ showImages: false });
 
     const module = toPostListModule(raw, rawPosts, pagination);
 

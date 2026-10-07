@@ -17,6 +17,10 @@ const { EN, NL, FR } = LOCALE_ISO_CODES;
 const tenant = makeTenant();
 
 describe('getTagParams', () => {
+  beforeEach(() => {
+    mockRun.mockResolvedValue([]);
+  });
+
   it('returns the slug and language entries', async () => {
     mockRun.mockResolvedValue([
       { slug: 'typescript', language: EN },
@@ -32,16 +36,12 @@ describe('getTagParams', () => {
   });
 
   it('returns an empty array when there are no tag pages', async () => {
-    mockRun.mockResolvedValue([]);
-
     const params = await getTagParams(tenant, [EN]);
 
     expect(params).toEqual([]);
   });
 
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
-    mockRun.mockResolvedValue([]);
-
     await getTagParams(tenant, [EN]);
 
     expect(mockRun).toHaveBeenCalledWith(
@@ -54,8 +54,6 @@ describe('getTagParams', () => {
   });
 
   it('passes the live languages to the query', async () => {
-    mockRun.mockResolvedValue([]);
-
     await getTagParams(tenant, [EN, NL]);
 
     expect(mockRun).toHaveBeenCalledWith(

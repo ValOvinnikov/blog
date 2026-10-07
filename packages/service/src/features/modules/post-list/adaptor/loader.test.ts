@@ -42,46 +42,6 @@ describe('getPostList', () => {
     await expect(getPostList('missing', 1, tenant)).rejects.toThrow();
   });
 
-  it('binds the scope term id as a posts-query parameter when scoped', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawPostListModule({ pageSize: 3 }))
-      .mockResolvedValueOnce({
-        posts: [makeRawPostCard({ _id: 'a' })],
-        total: 1,
-      });
-
-    await getPostList('post-list-1', 1, tenant, {
-      termId: 'tag-1',
-    });
-
-    expect(mockRun).toHaveBeenNthCalledWith(
-      2,
-      expect.anything(),
-      expect.objectContaining({
-        parameters: { termId: 'tag-1' },
-      }),
-    );
-  });
-
-  it('binds no parameters to the posts query when unscoped', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawPostListModule({ pageSize: 3 }))
-      .mockResolvedValueOnce({
-        posts: [makeRawPostCard({ _id: 'a' })],
-        total: 1,
-      });
-
-    await getPostList('post-list-1', 1, tenant);
-
-    expect(mockRun).toHaveBeenNthCalledWith(
-      2,
-      expect.anything(),
-      expect.objectContaining({
-        parameters: {},
-      }),
-    );
-  });
-
   it('defaults to page 1', async () => {
     mockRun
       .mockResolvedValueOnce(makeRawPostListModule({ pageSize: 9 }))
@@ -113,43 +73,73 @@ describe('getPostList', () => {
     expect(postList.totalPages).toBe(3); // ceil(25 / 9)
   });
 
-  it('threads tenant context into both queries and scopes their tags to it', async () => {
-    mockRun
-      .mockResolvedValueOnce(makeRawPostListModule({ pageSize: 3 }))
-      .mockResolvedValueOnce({
-        posts: [makeRawPostCard({ _id: 'a' })],
-        total: 1,
+  describe('with a one-match first page of three', () => {
+    beforeEach(() => {
+      mockRun
+        .mockResolvedValueOnce(makeRawPostListModule({ pageSize: 3 }))
+        .mockResolvedValueOnce({
+          posts: [makeRawPostCard({ _id: 'a' })],
+          total: 1,
+        });
+    });
+
+    it('binds the scope term id as a posts-query parameter when scoped', async () => {
+      await getPostList('post-list-1', 1, tenant, {
+        termId: 'tag-1',
       });
 
-    await getPostList('post-list-1', 1, tenant);
+      expect(mockRun).toHaveBeenNthCalledWith(
+        2,
+        expect.anything(),
+        expect.objectContaining({
+          parameters: { termId: 'tag-1' },
+        }),
+      );
+    });
 
-    expect(mockRun).toHaveBeenNthCalledWith(
-      1,
-      expect.anything(),
-      expect.objectContaining({
-        tenant,
-        next: expect.objectContaining({
-          tags: [
-            't:tenant-a:modules:postList',
-            't:tenant-a:module:post-list-1',
-          ],
+    it('binds no parameters to the posts query when unscoped', async () => {
+      await getPostList('post-list-1', 1, tenant);
+
+      expect(mockRun).toHaveBeenNthCalledWith(
+        2,
+        expect.anything(),
+        expect.objectContaining({
+          parameters: {},
         }),
-      }),
-    );
-    expect(mockRun).toHaveBeenNthCalledWith(
-      2,
-      expect.anything(),
-      expect.objectContaining({
-        tenant,
-        next: expect.objectContaining({
-          tags: [
-            't:tenant-a:posts',
-            't:tenant-a:author',
-            't:tenant-a:topic',
-            't:tenant-a:tag',
-          ],
+      );
+    });
+
+    it('threads tenant context into both queries and scopes their tags to it', async () => {
+      await getPostList('post-list-1', 1, tenant);
+
+      expect(mockRun).toHaveBeenNthCalledWith(
+        1,
+        expect.anything(),
+        expect.objectContaining({
+          tenant,
+          next: expect.objectContaining({
+            tags: [
+              't:tenant-a:modules:postList',
+              't:tenant-a:module:post-list-1',
+            ],
+          }),
         }),
-      }),
-    );
+      );
+      expect(mockRun).toHaveBeenNthCalledWith(
+        2,
+        expect.anything(),
+        expect.objectContaining({
+          tenant,
+          next: expect.objectContaining({
+            tags: [
+              't:tenant-a:posts',
+              't:tenant-a:author',
+              't:tenant-a:topic',
+              't:tenant-a:tag',
+            ],
+          }),
+        }),
+      );
+    });
   });
 });

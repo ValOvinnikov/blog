@@ -15,6 +15,10 @@ vi.mock('@blog/service/sanity/query/query', async (importOriginal) => ({
 const tenant = makeTenant();
 
 describe(getPublishedPostsByTag, () => {
+  beforeEach(() => {
+    mockRun.mockResolvedValue([]);
+  });
+
   it('fetches every published post tagged with the given tag id', async () => {
     mockRun.mockResolvedValue([
       makeRawFeedPost({
@@ -50,8 +54,6 @@ describe(getPublishedPostsByTag, () => {
   });
 
   it('passes the tag id as a query parameter', async () => {
-    mockRun.mockResolvedValue([]);
-
     await getPublishedPostsByTag('tag-1', tenant);
 
     expect(mockRun).toHaveBeenCalledWith(
@@ -61,16 +63,12 @@ describe(getPublishedPostsByTag, () => {
   });
 
   it('returns an empty array when no posts are tagged', async () => {
-    mockRun.mockResolvedValue([]);
-
     const result = await getPublishedPostsByTag('tag-1', tenant);
 
     expect(result).toEqual([]);
   });
 
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
-    mockRun.mockResolvedValue([]);
-
     await getPublishedPostsByTag('tag-1', tenant);
 
     expect(mockRun).toHaveBeenCalledWith(

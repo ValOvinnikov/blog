@@ -15,6 +15,10 @@ const { EN, NL } = LOCALE_ISO_CODES;
 const tenant = makeTenant();
 
 describe('getPostParams', () => {
+  beforeEach(() => {
+    mockRun.mockResolvedValue([]);
+  });
+
   it('returns the slug, language and publishedAt entries', async () => {
     mockRun.mockResolvedValue([
       { slug: 'post-a', language: EN, publishedAt: '2026-01-01T00:00:00Z' },
@@ -30,16 +34,12 @@ describe('getPostParams', () => {
   });
 
   it('returns an empty array when there are no posts', async () => {
-    mockRun.mockResolvedValue([]);
-
     const params = await getPostParams(tenant, [EN]);
 
     expect(params).toEqual([]);
   });
 
   it('threads tenant context into runQuery and scopes the tags to it', async () => {
-    mockRun.mockResolvedValue([]);
-
     await getPostParams(tenant, [EN]);
 
     expect(mockRun).toHaveBeenCalledWith(
@@ -52,8 +52,6 @@ describe('getPostParams', () => {
   });
 
   it('passes the live languages to the query', async () => {
-    mockRun.mockResolvedValue([]);
-
     await getPostParams(tenant, [EN, NL]);
 
     expect(mockRun).toHaveBeenCalledWith(

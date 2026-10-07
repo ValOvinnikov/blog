@@ -10,26 +10,28 @@ vi.mock('@blog/service/sanity/write-client/write-client', () => ({
 const mockGetWriteClient = vi.mocked(getWriteClient);
 const tenant = makeTenant();
 
-function makeMockClient(
-  overrides: { getDocument?: ReturnType<typeof vi.fn> } = {},
-) {
+function makeMockClient() {
   const commit = vi.fn().mockResolvedValue(undefined);
   const patch = vi.fn().mockReturnValue({ commit });
   const createIfNotExists = vi.fn().mockReturnValue({ patch });
   const transaction = vi.fn().mockReturnValue({ createIfNotExists });
-  const getDocument =
-    overrides.getDocument ??
-    vi.fn().mockResolvedValue({ _id: 'post-1', _type: 'page_post' });
+  const getDocument = vi
+    .fn()
+    .mockResolvedValue({ _id: 'post-1', _type: 'page_post' });
 
   return { getDocument, transaction, createIfNotExists, patch, commit };
 }
 
 describe(saveSkimDraft, () => {
-  it('throws when there is no published post for the id', async () => {
-    const client = makeMockClient({
-      getDocument: vi.fn().mockResolvedValue(undefined),
-    });
+  let client: ReturnType<typeof makeMockClient>;
+
+  beforeEach(() => {
+    client = makeMockClient();
     mockGetWriteClient.mockReturnValue(client as never);
+  });
+
+  it('throws when there is no published post for the id', async () => {
+    client.getDocument.mockResolvedValue(undefined);
 
     await expect(
       saveSkimDraft(
@@ -53,14 +55,11 @@ describe(saveSkimDraft, () => {
   });
 
   it('creates the draft from the published doc if none exists, and patches only the draft id', async () => {
-    const client = makeMockClient({
-      getDocument: vi.fn().mockResolvedValue({
-        _id: 'post-1',
-        _type: 'page_post',
-        title: 'Hello',
-      }),
+    client.getDocument.mockResolvedValue({
+      _id: 'post-1',
+      _type: 'page_post',
+      title: 'Hello',
     });
-    mockGetWriteClient.mockReturnValue(client as never);
 
     await saveSkimDraft(
       {
@@ -91,9 +90,6 @@ describe(saveSkimDraft, () => {
   });
 
   it('never patches the published document id', async () => {
-    const client = makeMockClient();
-    mockGetWriteClient.mockReturnValue(client as never);
-
     await saveSkimDraft(
       { postId: 'post-1', takeaways: ['a', 'b', 'c'], model: 'x' },
       tenant,
@@ -103,9 +99,6 @@ describe(saveSkimDraft, () => {
   });
 
   it('normalizes an already-draft postId (idempotent re-run) to the same draft id', async () => {
-    const client = makeMockClient();
-    mockGetWriteClient.mockReturnValue(client as never);
-
     await saveSkimDraft(
       { postId: 'drafts.post-1', takeaways: ['a', 'b', 'c'], model: 'x' },
       tenant,
@@ -122,9 +115,6 @@ describe(saveSkimDraft, () => {
   });
 
   it('passes the tenant context through to getWriteClient', async () => {
-    const client = makeMockClient();
-    mockGetWriteClient.mockReturnValue(client as never);
-
     await saveSkimDraft(
       { postId: 'post-1', takeaways: ['a', 'b', 'c'], model: 'x' },
       tenant,

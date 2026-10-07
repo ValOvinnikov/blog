@@ -93,6 +93,16 @@ function testimonialText(module: Awaited<ReturnType<typeof runTestimonial>>) {
 }
 
 describe('testimonialModuleQuery', () => {
+  let firstItem: NonNullable<
+    ReturnType<typeof makeRawTestimonialModule>['testimonials']
+  >[number];
+
+  beforeEach(() => {
+    const [item] = makeRawTestimonialModule().testimonials ?? [];
+    if (!item) throw new Error('expected a fixture testimonial item');
+    firstItem = item;
+  });
+
   it('filters to module_testimonial documents by id', () => {
     expect(testimonialModuleQuery.query).toContain(
       '_type == "module_testimonial"',
@@ -119,9 +129,6 @@ describe('testimonialModuleQuery', () => {
   });
 
   it('rejects a testimonial item with no name', () => {
-    const [firstItem] = makeRawTestimonialModule().testimonials ?? [];
-    if (!firstItem) throw new Error('expected a fixture testimonial item');
-
     const raw = {
       ...makeRawTestimonialModule(),
       testimonials: [{ ...firstItem, name: null }],
@@ -131,9 +138,6 @@ describe('testimonialModuleQuery', () => {
   });
 
   it('rejects a testimonial item with no quote', () => {
-    const [firstItem] = makeRawTestimonialModule().testimonials ?? [];
-    if (!firstItem) throw new Error('expected a fixture testimonial item');
-
     const raw = {
       ...makeRawTestimonialModule(),
       testimonials: [{ ...firstItem, quote: null }],
@@ -149,9 +153,6 @@ describe('testimonialModuleQuery', () => {
   });
 
   it('keeps a resolved inline link mark inside the quote', () => {
-    const [firstItem] = makeRawTestimonialModule().testimonials ?? [];
-    if (!firstItem) throw new Error('expected a fixture testimonial item');
-
     const raw = {
       ...makeRawTestimonialModule(),
       testimonials: [
