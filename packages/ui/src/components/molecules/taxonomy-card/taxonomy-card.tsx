@@ -4,6 +4,7 @@ import {
   type IWithDataTestId,
 } from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
+import { CardLink } from '@blog/ui/components/atoms/card-link';
 import { Heading } from '@blog/ui/components/atoms/heading';
 import {
   mapCompoundSlots,
@@ -14,7 +15,10 @@ import {
 import { cloneElement, Fragment, type ElementType } from 'react';
 
 import { TaxonomyCardPosts } from './components/posts/taxonomy-card-posts';
-import { taxonomyCardVariants } from './taxonomy-card-variants';
+import {
+  taxonomyCardVariants,
+  type TTaxonomyCardVariants,
+} from './taxonomy-card-variants';
 
 const TaxonomyCardParts = {
   Posts: TaxonomyCardPosts,
@@ -29,10 +33,9 @@ export type TTaxonomyCardProps = IWithClassName &
     headingLevel: THeadingLevel;
     accessibleNameSeparator?: string;
     linkAs?: TAnchorElementType;
+    isInteractive?: TTaxonomyCardVariants['isInteractive'];
     children?: TCompoundChildren<typeof TaxonomyCardParts>;
   };
-
-const s = taxonomyCardVariants();
 
 /** Summary card for a taxonomy entry (topic or tag) in a listing: title, optional description, and post count, linking to the entry's archive. */
 const TaxonomyCardRoot = ({
@@ -43,10 +46,12 @@ const TaxonomyCardRoot = ({
   headingLevel,
   accessibleNameSeparator = ', ',
   linkAs,
+  isInteractive,
   children,
   className,
   dataTestId,
 }: TTaxonomyCardProps) => {
+  const s = taxonomyCardVariants({ isInteractive });
   const LinkComponent = linkAs ?? A_AS_CONST;
   const { slots, unmatched } = mapCompoundSlots(children, TaxonomyCardParts);
   const posts = slots.Posts
@@ -58,14 +63,14 @@ const TaxonomyCardRoot = ({
   return (
     <article className={s.root({ class: className })} data-testid={dataTestId}>
       <Heading level={headingLevel} visual="card">
-        <LinkComponent href={href} className={s.link()}>
+        <CardLink href={href} linkAs={LinkComponent}>
           <span aria-hidden="true">{title}</span>
           <span className={s.accessibleName()}>
             {title}
             {accessibleNameSeparator}
             {postCountLabel}
           </span>
-        </LinkComponent>
+        </CardLink>
       </Heading>
       {description && <p className={s.description()}>{description}</p>}
       {posts}

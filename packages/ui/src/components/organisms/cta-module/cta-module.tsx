@@ -13,6 +13,7 @@ import {
 } from '@blog/config';
 import { Eyebrow } from '@blog/ui/components/atoms/eyebrow';
 import { Heading } from '@blog/ui/components/atoms/heading';
+import { MediaFrame } from '@blog/ui/components/atoms/media-frame';
 import { Prose } from '@blog/ui/components/atoms/prose';
 import type { ReactNode } from 'react';
 
@@ -105,7 +106,14 @@ export const CtaModule = ({
         {actions && <div className={s.actions()}>{actions}</div>}
         {footnote && <p className={s.footnote()}>{footnote}</p>}
       </div>
-      {image && <div className={s.media()}>{image}</div>}
+      {image &&
+        (isBanner ? (
+          <div className={s.media()}>{image}</div>
+        ) : (
+          <MediaFrame ratio="video" className={s.media()}>
+            {image}
+          </MediaFrame>
+        ))}
       {isBanner && <div className={s.overlay()} aria-hidden="true" />}
     </div>
   );

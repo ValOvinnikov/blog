@@ -32,6 +32,10 @@ const meta = {
       control: 'select',
       options: objectKeys(mediaFrameVariants.variants.ratio),
     },
+    shape: {
+      control: 'select',
+      options: objectKeys(mediaFrameVariants.variants.shape),
+    },
   },
 } satisfies Meta<typeof MediaFrame>;
 
@@ -50,6 +54,10 @@ export const Portrait: TStory = {
 
 export const Classic: TStory = {
   args: { ratio: 'classic', className: 'w-96' },
+};
+
+export const Circle: TStory = {
+  args: { ratio: 'square', shape: 'circle', className: 'w-48' },
 };
 
 export const CustomRatio: TStory = {

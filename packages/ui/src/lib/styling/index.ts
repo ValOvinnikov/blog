@@ -12,5 +12,6 @@ export {
   NEUTRAL_SCRIM_RIGHT,
   NEUTRAL_SCRIM_RIGHT_FROM_SM,
 } from './scrims';
+export { INTERACTIVE_ITEM_CARD } from './item-card';
 export { BRAND_PILL } from './pill';
 export { tv } from './tv';

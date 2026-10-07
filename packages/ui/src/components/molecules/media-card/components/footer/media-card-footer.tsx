@@ -13,6 +13,7 @@ export type TMediaCardFooterProps = IWithClassName &
     topic?: string;
     leadingIcon?: ReactNode;
     trailingIcon?: ReactNode;
+    children?: ReactNode;
   };
 
 const s = mediaCardFooterVariants();
@@ -26,6 +27,7 @@ export const MediaCardFooter = ({
   topic,
   leadingIcon,
   trailingIcon,
+  children,
   className,
   dataTestId,
 }: TMediaCardFooterProps) => (
@@ -42,5 +44,6 @@ export const MediaCardFooter = ({
         {leadingIcon} {topic.toLowerCase()} {trailingIcon}
       </span>
     )}
+    {children}
   </div>
 );

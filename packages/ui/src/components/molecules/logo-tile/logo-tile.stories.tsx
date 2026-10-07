@@ -35,9 +35,9 @@ export const Interactive: TStory = {
   args: {
     isInteractive: true,
     children: (
-      <a href={faker.internet.url()}>
+      <LogoTile.Link href={faker.internet.url()}>
         <img src={LOGO_SRC} alt={LOGO_ALT} />
-      </a>
+      </LogoTile.Link>
     ),
   },
 };

@@ -1,8 +1,14 @@
 import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import type { CSSProperties, ReactNode } from 'react';
+import type { TCompoundComponent } from '@blog/ui/lib/react';
+import type { CSSProperties, ElementType, ReactNode } from 'react';
 
+import { LogoTileLink } from './components/link/logo-tile-link';
 import { LogoTileLogo } from './components/logo/logo-tile-logo';
 import { logoTileVariants, type TLogoTileVariants } from './logo-tile-variants';
+
+const LogoTileParts = {
+  Link: LogoTileLink,
+} satisfies Record<string, ElementType>;
 
 export type TLogoTileProps = IWithClassName &
   IWithDataTestId & {
@@ -14,7 +20,7 @@ export type TLogoTileProps = IWithClassName &
   };
 
 /** A fixed-size card that frames a single logo, so transparent and opaque-background assets sit inside identical bounds. */
-export const LogoTile = ({
+const LogoTileRoot = ({
   children,
   isInteractive,
   aspectRatio,
@@ -53,3 +59,8 @@ export const LogoTile = ({
     </div>
   );
 };
+
+export const LogoTile: TCompoundComponent<
+  typeof LogoTileRoot,
+  typeof LogoTileParts
+> = Object.assign(LogoTileRoot, LogoTileParts);

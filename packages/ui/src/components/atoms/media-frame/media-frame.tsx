@@ -15,13 +15,14 @@ export type TMediaFrameProps = IWithClassName &
 /** Positioning context for a Next.js `<Image fill />` child. */
 export const MediaFrame = ({
   ratio,
+  shape,
   className,
   children,
   dataTestId,
 }: TMediaFrameProps) => {
   return (
     <div
-      className={mediaFrameVariants({ ratio, class: className })}
+      className={mediaFrameVariants({ ratio, shape, class: className })}
       data-testid={dataTestId}
     >
       {children}

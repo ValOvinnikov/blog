@@ -1,5 +1,6 @@
 import { BRAND_VARIANT } from '@blog/config';
 import { Avatar } from '@blog/ui/components/atoms/avatar';
+import { CardLink } from '@blog/ui/components/atoms/card-link';
 import { CardGrid } from '@blog/ui/components/organisms/card-grid';
 import { Carousel } from '@blog/ui/components/organisms/carousel';
 import { objectKeys } from '@blog/utils/primitives';
@@ -51,6 +52,23 @@ export default meta;
 type TStory = StoryObj<typeof meta>;
 
 export const Default: TStory = {};
+
+export const Interactive: TStory = {
+  args: {
+    isInteractive: true,
+    children: (
+      <>
+        <QuoteCard.Quote>{faker.lorem.sentences(2)}</QuoteCard.Quote>
+        <QuoteCard.Avatar>
+          <Avatar src={AVATAR_SRC} alt="" name={NAME} />
+        </QuoteCard.Avatar>
+        <QuoteCard.Name>
+          <CardLink href="#">{NAME}</CardLink>
+        </QuoteCard.Name>
+      </>
+    ),
+  },
+};
 
 export const Centered: TStory = {
   args: { align: 'center' },

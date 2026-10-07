@@ -4,7 +4,7 @@ import type { VariantProps } from 'tailwind-variants';
 export const mediaFrameVariants = tv({
   base: [
     'relative isolate overflow-hidden',
-    'rounded-media border border-border bg-surface-2 surface-nested',
+    'border border-border bg-surface-2 surface-nested',
   ],
   variants: {
     ratio: {
@@ -13,6 +13,13 @@ export const mediaFrameVariants = tv({
       portrait: ['aspect-[3/4]'],
       classic: ['aspect-[4/3]'],
     },
+    shape: {
+      rect: ['rounded-media'],
+      circle: ['rounded-full'],
+    },
+  },
+  defaultVariants: {
+    shape: 'rect',
   },
 });
 

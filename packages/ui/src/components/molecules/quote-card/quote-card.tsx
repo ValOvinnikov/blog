@@ -32,6 +32,7 @@ export type TQuoteCardProps = IWithClassName &
     role?: string;
     align?: TQuoteCardVariants['align'];
     isSpotlight?: boolean;
+    isInteractive?: TQuoteCardVariants['isInteractive'];
     tone: TBrandVariant;
     children?: TCompoundChildren<typeof QuoteCardParts>;
   };
@@ -41,6 +42,7 @@ const QuoteCardRoot = ({
   role,
   align,
   isSpotlight = false,
+  isInteractive,
   tone,
   children,
   className,
@@ -50,6 +52,7 @@ const QuoteCardRoot = ({
   const s = quoteCardVariants({
     align: isSpotlight ? 'center' : align,
     isSpotlight,
+    isInteractive,
   });
 
   return (
