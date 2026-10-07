@@ -21,7 +21,7 @@ export type TNewsletterSignupCompactProps = IWithClassName &
     onChange: (value: string) => void;
     onSubmit: () => void;
     status: TFormStatus;
-    heading: string;
+    heading?: string;
     headingId?: string;
     prefix?: ReactNode;
     errorMessage?: string;
@@ -57,12 +57,16 @@ export const NewsletterSignupCompact = ({
 
   return (
     <div className={s.root({ class: className })} data-testid={dataTestId}>
-      <span className={s.promptGroup()}>
-        {prefix}
-        <span id={headingId} className={s.label()}>
-          {heading}
+      {(prefix || heading) && (
+        <span className={s.promptGroup()}>
+          {prefix}
+          {heading && (
+            <span id={headingId} className={s.label()}>
+              {heading}
+            </span>
+          )}
         </span>
-      </span>
+      )}
       {isSuccess ? (
         <Alert
           type={ALERT_TYPE.SUCCESS}

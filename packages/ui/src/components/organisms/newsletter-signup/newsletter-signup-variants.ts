@@ -15,11 +15,7 @@ export const newsletterSignupVariants = tv({
     ],
     trustCue: ['inline-flex items-center gap-1.5'],
     trustCueIcon: ['shrink-0 text-muted'],
-    formPane: [
-      'flex flex-col justify-center gap-3',
-      'p-8',
-      'border-t border-border @3xl:border-t-0 @3xl:border-l',
-    ],
+    formPane: ['flex flex-col justify-center gap-3', 'p-8'],
     form: ['flex flex-col gap-3'],
     field: [],
     submit: ['inline-flex items-center justify-center gap-2'],
@@ -49,6 +45,14 @@ export const newsletterSignupVariants = tv({
         errorAlert: ['sm:basis-full'],
       },
     },
+    hasPitch: {
+      true: {
+        formPane: ['border-t border-border @3xl:border-t-0 @3xl:border-l'],
+      },
+      false: {
+        body: ['@3xl:grid-cols-1'],
+      },
+    },
     align: {
       [CONTENT_ALIGNMENT.LEFT]: {
         pitchPane: ['items-start text-left'],
@@ -70,7 +74,11 @@ export const newsletterSignupVariants = tv({
       },
     },
   },
-  defaultVariants: { variant: 'full', align: CONTENT_ALIGNMENT.LEFT },
+  defaultVariants: {
+    variant: 'full',
+    align: CONTENT_ALIGNMENT.LEFT,
+    hasPitch: true,
+  },
 });
 
 export type TNewsletterSignupVariants = VariantProps<

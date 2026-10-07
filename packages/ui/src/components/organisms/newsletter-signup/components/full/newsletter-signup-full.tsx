@@ -29,7 +29,7 @@ export type TNewsletterSignupFullProps = IWithClassName &
     onChange: (value: string) => void;
     onSubmit: () => void;
     status: TFormStatus;
-    heading: string;
+    heading?: string;
     headingId?: string;
     headingLevel?: THeadingLevel;
     supportingText?: string;
@@ -65,31 +65,37 @@ export const NewsletterSignupFull = ({
   dataTestId,
 }: TNewsletterSignupFullProps) => {
   const isSuccess = status === 'success';
-  const s = newsletterSignupVariants({ variant: 'full', align });
+  const hasTrustCues = trustCues !== undefined && trustCues.length > 0;
+  const hasPitch = Boolean(heading || supportingText || hasTrustCues);
+  const s = newsletterSignupVariants({ variant: 'full', align, hasPitch });
 
   return (
     <Panel className={s.root({ class: className })} dataTestId={dataTestId}>
       <Panel.Body className={s.body()}>
-        <div className={s.pitchPane()}>
-          <Heading level={headingLevel} visual="card" id={headingId}>
-            {heading}
-          </Heading>
-          {supportingText && (
-            <p className={s.supportingText()}>{supportingText}</p>
-          )}
-          {trustCues && trustCues.length > 0 && (
-            <ul className={s.trustCues()}>
-              {trustCues.map((cue) => (
-                <li key={cue.label} className={s.trustCue()}>
-                  <span aria-hidden="true" className={s.trustCueIcon()}>
-                    {cue.icon}
-                  </span>
-                  {cue.label}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+        {hasPitch && (
+          <div className={s.pitchPane()}>
+            {heading && (
+              <Heading level={headingLevel} visual="card" id={headingId}>
+                {heading}
+              </Heading>
+            )}
+            {supportingText && (
+              <p className={s.supportingText()}>{supportingText}</p>
+            )}
+            {hasTrustCues && (
+              <ul className={s.trustCues()}>
+                {trustCues.map((cue) => (
+                  <li key={cue.label} className={s.trustCue()}>
+                    <span aria-hidden="true" className={s.trustCueIcon()}>
+                      {cue.icon}
+                    </span>
+                    {cue.label}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
         <div className={s.formPane()}>
           {isSuccess ? (
             <Alert type={ALERT_TYPE.SUCCESS} message={successMessage ?? ''} />
