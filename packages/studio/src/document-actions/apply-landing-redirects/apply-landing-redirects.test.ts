@@ -59,23 +59,36 @@ const createClient = (dataset: unknown[]) => {
 };
 
 describe(applyLandingRedirects, () => {
-  it('redirects a renamed page from its old path', async () => {
-    const { client, operations } = createClient([page('faq', 'faq')]);
+  describe('with a single faq page', () => {
+    let client: ReturnType<typeof createClient>['client'];
+    let operations: ReturnType<typeof createClient>['operations'];
 
-    await applyLandingRedirects(client, page('drafts.faq', 'questions'));
+    beforeEach(() => {
+      ({ client, operations } = createClient([page('faq', 'faq')]));
+    });
 
-    expect(operations).toEqual([
-      {
-        create: {
-          _type: REDIRECT_TYPE,
-          language: EN,
-          source: '/faq',
-          destination: '/questions',
-          isPrefix: false,
+    it('redirects a renamed page from its old path', async () => {
+      await applyLandingRedirects(client, page('drafts.faq', 'questions'));
+
+      expect(operations).toEqual([
+        {
+          create: {
+            _type: REDIRECT_TYPE,
+            language: EN,
+            source: '/faq',
+            destination: '/questions',
+            isPrefix: false,
+          },
         },
-      },
-      'commit',
-    ]);
+        'commit',
+      ]);
+    });
+
+    it('writes nothing when the path is unchanged', async () => {
+      await applyLandingRedirects(client, page('drafts.faq', 'faq'));
+
+      expect(operations).toEqual([]);
+    });
   });
 
   it('redirects a re-parented page to its path under the new parent', async () => {
@@ -142,14 +155,6 @@ describe(applyLandingRedirects, () => {
 
   it('writes nothing on a first publish', async () => {
     const { client, operations } = createClient([]);
-
-    await applyLandingRedirects(client, page('drafts.faq', 'faq'));
-
-    expect(operations).toEqual([]);
-  });
-
-  it('writes nothing when the path is unchanged', async () => {
-    const { client, operations } = createClient([page('faq', 'faq')]);
 
     await applyLandingRedirects(client, page('drafts.faq', 'faq'));
 

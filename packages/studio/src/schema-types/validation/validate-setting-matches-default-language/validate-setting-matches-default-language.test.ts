@@ -49,9 +49,13 @@ const createContext = (document: SanityDocument, dataset: unknown[]) =>
   }) as unknown as ValidationContext;
 
 describe(validateSettingMatchesDefaultLanguage, () => {
-  it('passes a translation with the same value as its default-language page', async () => {
-    const dutchPage = page('drafts.about-nl', NL, false);
+  let dutchPage: SanityDocument;
 
+  beforeEach(() => {
+    dutchPage = page('drafts.about-nl', NL, false);
+  });
+
+  it('passes a translation with the same value as its default-language page', async () => {
     await expect(
       validate(
         false,
@@ -65,8 +69,6 @@ describe(validateSettingMatchesDefaultLanguage, () => {
   });
 
   it('warns about a translation with a different value from its default-language page', async () => {
-    const dutchPage = page('drafts.about-nl', NL, false);
-
     await expect(
       validate(
         false,
@@ -80,14 +82,14 @@ describe(validateSettingMatchesDefaultLanguage, () => {
   });
 
   it('treats an unset value as the initial value on either page', async () => {
-    const dutchPage = page('drafts.about-nl', NL);
+    const unsetDutchPage = page('drafts.about-nl', NL);
 
     await expect(
       validate(
         undefined,
-        createContext(dutchPage, [
+        createContext(unsetDutchPage, [
           page('about-en', EN, true),
-          dutchPage,
+          unsetDutchPage,
           linked,
         ]),
       ),
@@ -95,8 +97,6 @@ describe(validateSettingMatchesDefaultLanguage, () => {
   });
 
   it('warns when an unset default-language value differs from the translation', async () => {
-    const dutchPage = page('drafts.about-nl', NL, false);
-
     await expect(
       validate(
         false,
@@ -114,12 +114,15 @@ describe(validateSettingMatchesDefaultLanguage, () => {
   });
 
   it('passes a page that is not linked to any translation', async () => {
-    const dutchPage = page('about-nl', NL, false);
+    const unlinkedDutchPage = page('about-nl', NL, false);
 
     await expect(
       validate(
         false,
-        createContext(dutchPage, [page('about-en', EN, true), dutchPage]),
+        createContext(unlinkedDutchPage, [
+          page('about-en', EN, true),
+          unlinkedDutchPage,
+        ]),
       ),
     ).resolves.toBe(true);
   });

@@ -23,16 +23,24 @@ const deletableContext = createContext({
 });
 
 describe('retire-page-blog migration', () => {
-  it('deletes the published page_blog once its page_postIndex counterpart is verified deletable', async () => {
-    const doc = { ...baseDoc, _id: 'page_blog', _type: 'page_blog' };
+  let doc: typeof baseDoc & { _id: string; _type: string };
 
+  beforeEach(() => {
+    doc = { ...baseDoc, _id: 'page_blog', _type: 'page_blog' };
+  });
+
+  it('deletes the published page_blog once its page_postIndex counterpart is verified deletable', async () => {
     const mutations = await migration.migrate.document(doc, deletableContext);
 
     expect(mutations).toEqual([del('page_blog')]);
   });
 
   it('deletes the draft page_blog, checking its counterpart drafts.page_postIndex id', async () => {
-    const doc = { ...baseDoc, _id: 'drafts.page_blog', _type: 'page_blog' };
+    const draftDoc = {
+      ...baseDoc,
+      _id: 'drafts.page_blog',
+      _type: 'page_blog',
+    };
     const fetchCalls: unknown[] = [];
     const context = {
       client: {
@@ -46,7 +54,7 @@ describe('retire-page-blog migration', () => {
       },
     } as unknown as MigrationContext;
 
-    const mutations = await migration.migrate.document(doc, context);
+    const mutations = await migration.migrate.document(draftDoc, context);
 
     expect(mutations).toEqual([del('drafts.page_blog')]);
     expect(fetchCalls).toEqual([
@@ -67,16 +75,14 @@ describe('retire-page-blog migration', () => {
   });
 
   it('throws for a page_blog id that is not one of the known singleton ids', async () => {
-    const doc = { ...baseDoc, _id: 'some-other-id', _type: 'page_blog' };
+    const unknownDoc = { ...baseDoc, _id: 'some-other-id', _type: 'page_blog' };
 
     await expect(
-      migration.migrate.document(doc, deletableContext),
+      migration.migrate.document(unknownDoc, deletableContext),
     ).rejects.toThrow(/some-other-id/);
   });
 
   it('is idempotent: the same document produces the same deletion mutation on every invocation', async () => {
-    const doc = { ...baseDoc, _id: 'page_blog', _type: 'page_blog' };
-
     const firstRun = await migration.migrate.document(doc, deletableContext);
     const secondRun = await migration.migrate.document(doc, deletableContext);
 

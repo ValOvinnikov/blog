@@ -19,6 +19,7 @@ import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import {
   type DocumentActionComponent,
+  type DocumentActionsResolver,
   type DocumentActionsContext,
   type InputProps,
   type ItemProps,
@@ -41,13 +42,17 @@ vi.mock('@sanity/code-input', () => ({
 }));
 
 describe(buildStudioConfig, () => {
-  it('builds a config from the given projectId/dataset/title', () => {
-    const config = buildStudioConfig({
+  let config: ReturnType<typeof buildStudioConfig>;
+
+  beforeEach(() => {
+    config = buildStudioConfig({
       projectId: 'test-project',
       dataset: 'test-dataset',
       title: 'Test Studio',
     });
+  });
 
+  it('builds a config from the given projectId/dataset/title', () => {
     expect(config.name).toBe('default');
     expect(config.title).toBe('Test Studio');
     expect(config.projectId).toBe('test-project');
@@ -56,62 +61,54 @@ describe(buildStudioConfig, () => {
   });
 
   it('sets basePath when provided', () => {
-    const config = buildStudioConfig({
+    const configWithBasePath = buildStudioConfig({
       projectId: 'test-project',
       dataset: 'test-dataset',
       basePath: '/dashboard/studio',
       title: 'Test Studio',
     });
 
-    expect(config.basePath).toBe('/dashboard/studio');
+    expect(configWithBasePath.basePath).toBe('/dashboard/studio');
   });
 
-  it('hides the migrationState system ledger from document actions and the new-document menu', () => {
-    const config = buildStudioConfig({
-      projectId: 'test-project',
-      dataset: 'test-dataset',
-      title: 'Test Studio',
+  describe('document actions', () => {
+    let actions: DocumentActionsResolver;
+
+    beforeEach(() => {
+      const resolver = config.document?.actions;
+      if (typeof resolver !== 'function') {
+        throw new Error('expected config.document.actions to be a function');
+      }
+      actions = resolver;
     });
 
-    const actions = config.document?.actions;
-    if (typeof actions !== 'function') {
-      throw new Error('expected config.document.actions to be a function');
-    }
+    it('hides the migrationState system ledger from document actions and the new-document menu', () => {
+      const prev: DocumentActionComponent[] = [];
+      const context = {
+        schemaType: migrationStateSchema.name,
+      } as DocumentActionsContext;
 
-    const prev: DocumentActionComponent[] = [];
-    const context = {
-      schemaType: migrationStateSchema.name,
-    } as DocumentActionsContext;
-
-    expect(actions(prev, context)).toEqual([]);
-  });
-
-  it('wraps only the landing page publish action', () => {
-    const config = buildStudioConfig({
-      projectId: 'test-project',
-      dataset: 'test-dataset',
-      title: 'Test Studio',
+      expect(actions(prev, context)).toEqual([]);
     });
-    const actions = config.document?.actions;
-    if (typeof actions !== 'function') {
-      throw new Error('expected config.document.actions to be a function');
-    }
-    const publish: DocumentActionComponent = () => null;
-    publish.action = 'publish';
-    const discard: DocumentActionComponent = () => null;
-    discard.action = 'discardChanges';
 
-    const [landingPublish, landingDiscard] = actions([publish, discard], {
-      schemaType: PAGE_LANDING_TYPE,
-    } as DocumentActionsContext);
-    const [topicPublish] = actions([publish], {
-      schemaType: PAGE_TOPIC_TYPE,
-    } as DocumentActionsContext);
+    it('wraps only the landing page publish action', () => {
+      const publish: DocumentActionComponent = () => null;
+      publish.action = 'publish';
+      const discard: DocumentActionComponent = () => null;
+      discard.action = 'discardChanges';
 
-    expect(landingPublish).not.toBe(publish);
-    expect(landingPublish?.action).toBe('publish');
-    expect(landingDiscard).toBe(discard);
-    expect(topicPublish).toBe(publish);
+      const [landingPublish, landingDiscard] = actions([publish, discard], {
+        schemaType: PAGE_LANDING_TYPE,
+      } as DocumentActionsContext);
+      const [topicPublish] = actions([publish], {
+        schemaType: PAGE_TOPIC_TYPE,
+      } as DocumentActionsContext);
+
+      expect(landingPublish).not.toBe(publish);
+      expect(landingPublish?.action).toBe('publish');
+      expect(landingDiscard).toBe(discard);
+      expect(topicPublish).toBe(publish);
+    });
   });
 
   it.each([
@@ -124,11 +121,6 @@ describe(buildStudioConfig, () => {
     PAGE_TOPIC_TYPE,
     PAGE_TAG_TYPE,
   ])('creates a %s only through a language template', (type) => {
-    const config = buildStudioConfig({
-      projectId: 'test-project',
-      dataset: 'test-dataset',
-      title: 'Test Studio',
-    });
     const templates = config.schema?.templates;
     if (typeof templates !== 'function') {
       throw new Error('expected config.schema.templates to be a function');

@@ -15,20 +15,25 @@ const fieldProps = (name: string) => {
 };
 
 describe(createLanguageSwitcherField, () => {
-  it('hides the language switcher toggle with one live language', () => {
-    const { props, renderDefault } = fieldProps('showLanguageSwitcher');
+  describe('showLanguageSwitcher field', () => {
+    let props: FieldProps;
+    let renderDefault: ReturnType<typeof fieldProps>['renderDefault'];
 
-    createLanguageSwitcherField([EN])(props);
+    beforeEach(() => {
+      ({ props, renderDefault } = fieldProps('showLanguageSwitcher'));
+    });
 
-    expect(renderDefault).not.toHaveBeenCalled();
-  });
+    it('hides the language switcher toggle with one live language', () => {
+      createLanguageSwitcherField([EN])(props);
 
-  it('shows the language switcher toggle with two live languages', () => {
-    const { props, renderDefault } = fieldProps('showLanguageSwitcher');
+      expect(renderDefault).not.toHaveBeenCalled();
+    });
 
-    createLanguageSwitcherField([EN, NL])(props);
+    it('shows the language switcher toggle with two live languages', () => {
+      createLanguageSwitcherField([EN, NL])(props);
 
-    expect(renderDefault).toHaveBeenCalledWith(props);
+      expect(renderDefault).toHaveBeenCalledWith(props);
+    });
   });
 
   it('leaves other fields alone with one live language', () => {

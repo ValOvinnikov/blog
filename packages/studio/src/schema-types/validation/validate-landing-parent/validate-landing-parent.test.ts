@@ -43,6 +43,11 @@ const createContext = (
 describe(validateLandingParent, () => {
   const modules = page('modules');
   const faq = page('faq', 'modules');
+  let draft: SanityDocument;
+
+  beforeEach(() => {
+    draft = page('drafts.modules');
+  });
 
   it('passes a page with no parent', async () => {
     await expect(
@@ -59,16 +64,12 @@ describe(validateLandingParent, () => {
   });
 
   it('rejects the page as its own parent', async () => {
-    const draft = page('drafts.modules');
-
     await expect(
       validateLandingParent(ref('modules'), createContext(draft, [modules])),
     ).resolves.toBe(LANDING_PARENT_CYCLE_ERROR);
   });
 
   it('rejects a parent that sits beneath the page', async () => {
-    const draft = page('drafts.modules');
-
     await expect(
       validateLandingParent(ref('faq'), createContext(draft, [modules, faq])),
     ).resolves.toBe(LANDING_PARENT_CYCLE_ERROR);

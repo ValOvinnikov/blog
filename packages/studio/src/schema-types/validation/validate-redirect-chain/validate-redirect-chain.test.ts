@@ -48,17 +48,19 @@ const createContext = (
   }) as unknown as ValidationContext;
 
 describe(validateRedirectSource, () => {
-  it('passes a source no other redirect uses', async () => {
-    const draft = redirect('drafts.r1', '/faq', '/help');
+  let draft: SanityDocument;
 
+  beforeEach(() => {
+    draft = redirect('drafts.r1', '/faq', '/help');
+  });
+
+  it('passes a source no other redirect uses', async () => {
     await expect(
       validateRedirectSource('/faq', createContext(draft, [draft])),
     ).resolves.toBe(true);
   });
 
   it('rejects a source another redirect already starts from', async () => {
-    const draft = redirect('drafts.r1', '/faq', '/help');
-
     await expect(
       validateRedirectSource(
         '/faq',
@@ -68,8 +70,6 @@ describe(validateRedirectSource, () => {
   });
 
   it('rejects a source another redirect sends visitors to', async () => {
-    const draft = redirect('drafts.r1', '/faq', '/help');
-
     await expect(
       validateRedirectSource(
         '/faq',
@@ -79,21 +79,19 @@ describe(validateRedirectSource, () => {
   });
 
   it('rejects a prefix source another redirect sends visitors beneath', async () => {
-    const draft = redirect('drafts.r1', '/modules', '/catalog', {
+    const prefixDraft = redirect('drafts.r1', '/modules', '/catalog', {
       isPrefix: true,
     });
 
     await expect(
       validateRedirectSource(
         '/modules',
-        createContext(draft, [redirect('r2', '/old', '/modules/faq')]),
+        createContext(prefixDraft, [redirect('r2', '/old', '/modules/faq')]),
       ),
     ).resolves.toBe(REDIRECT_INCOMING_CHAIN_ERROR);
   });
 
   it('ignores redirects in another language', async () => {
-    const draft = redirect('drafts.r1', '/faq', '/help');
-
     await expect(
       validateRedirectSource(
         '/faq',
@@ -103,8 +101,6 @@ describe(validateRedirectSource, () => {
   });
 
   it('passes when the lookup fails', async () => {
-    const draft = redirect('drafts.r1', '/faq', '/help');
-
     await expect(
       validateRedirectSource('/faq', createContext(draft, [], new Error('x'))),
     ).resolves.toBe(true);
@@ -112,17 +108,19 @@ describe(validateRedirectSource, () => {
 });
 
 describe(validateRedirectDestination, () => {
-  it('passes a destination that is not redirected', async () => {
-    const draft = redirect('drafts.r1', '/faq', '/help');
+  let draft: SanityDocument;
 
+  beforeEach(() => {
+    draft = redirect('drafts.r1', '/faq', '/help');
+  });
+
+  it('passes a destination that is not redirected', async () => {
     await expect(
       validateRedirectDestination('/help', createContext(draft, [])),
     ).resolves.toBe(true);
   });
 
   it('rejects a destination that is itself redirected', async () => {
-    const draft = redirect('drafts.r1', '/faq', '/help');
-
     await expect(
       validateRedirectDestination(
         '/help',
@@ -132,12 +130,12 @@ describe(validateRedirectDestination, () => {
   });
 
   it('rejects a destination beneath a prefix redirect', async () => {
-    const draft = redirect('drafts.r1', '/faq', '/modules/faq');
+    const nestedDraft = redirect('drafts.r1', '/faq', '/modules/faq');
 
     await expect(
       validateRedirectDestination(
         '/modules/faq',
-        createContext(draft, [
+        createContext(nestedDraft, [
           redirect('r2', '/modules', '/catalog', { isPrefix: true }),
         ]),
       ),

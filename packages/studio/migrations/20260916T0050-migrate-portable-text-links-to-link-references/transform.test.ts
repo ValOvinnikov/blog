@@ -53,13 +53,19 @@ describe(deriveExternalLabel, () => {
 });
 
 describe(resolveRawHrefDestination, () => {
+  let context: MigrationContext;
+
+  beforeEach(() => {
+    context = createMockContext();
+  });
+
   it('resolves a /blog/<slug> href to the matching page_post', async () => {
-    const context = createMockContext({
+    const postContext = createMockContext({
       'understanding-groq': { _id: 'page-post-1', title: 'Understanding GROQ' },
     });
 
     const destination = await resolveRawHrefDestination(
-      context,
+      postContext,
       '/blog/understanding-groq',
     );
 
@@ -72,8 +78,6 @@ describe(resolveRawHrefDestination, () => {
   });
 
   it('is undefined for a /blog/<slug> href matching no page_post', async () => {
-    const context = createMockContext();
-
     const destination = await resolveRawHrefDestination(
       context,
       '/blog/nothing-merges-on-vibes',
@@ -83,8 +87,6 @@ describe(resolveRawHrefDestination, () => {
   });
 
   it('resolves a full https:// URL to an external destination', async () => {
-    const context = createMockContext();
-
     const destination = await resolveRawHrefDestination(
       context,
       'https://github.com/FormidableLabs/groqd',
@@ -99,15 +101,19 @@ describe(resolveRawHrefDestination, () => {
   });
 
   it('is undefined for an empty href', async () => {
-    expect(
-      await resolveRawHrefDestination(createMockContext(), undefined),
-    ).toBeUndefined();
+    expect(await resolveRawHrefDestination(context, undefined)).toBeUndefined();
   });
 });
 
 describe(resolveInlineLinkDestination, () => {
+  let context: MigrationContext;
+
+  beforeEach(() => {
+    context = createMockContext();
+  });
+
   it('resolves an internal inlineLink, preferring its own label', async () => {
-    const context = createMockContext(
+    const titledContext = createMockContext(
       {},
       { 'page-post-1': 'Understanding GROQ' },
     );
@@ -119,7 +125,10 @@ describe(resolveInlineLinkDestination, () => {
       internalReference: { _ref: 'page-post-1' },
     };
 
-    const destination = await resolveInlineLinkDestination(context, markDef);
+    const destination = await resolveInlineLinkDestination(
+      titledContext,
+      markDef,
+    );
 
     expect(destination).toEqual({
       linkType: 'INTERNAL',
@@ -130,7 +139,6 @@ describe(resolveInlineLinkDestination, () => {
   });
 
   it('resolves an external inlineLink, deriving a label when none is set', async () => {
-    const context = createMockContext();
     const markDef: TInlineLinkMarkDef = {
       _key: 'mark-1',
       _type: 'inlineLink',
@@ -156,7 +164,7 @@ describe(resolveInlineLinkDestination, () => {
     };
 
     expect(
-      await resolveInlineLinkDestination(createMockContext(), markDef),
+      await resolveInlineLinkDestination(context, markDef),
     ).toBeUndefined();
   });
 });

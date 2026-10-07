@@ -113,8 +113,13 @@ describe('create-person-from-blog-author migration — blog_author documents', (
 });
 
 describe('create-person-from-blog-author migration — reference rewriting', () => {
+  let context: ReturnType<typeof createMockContext>['context'];
+
+  beforeEach(() => {
+    ({ context } = createMockContext({ blogAuthorIds: ['author-1'] }));
+  });
+
   it('rewrites page_post.author pointing at a migrated author (development referrer shape)', async () => {
-    const { context } = createMockContext({ blogAuthorIds: ['author-1'] });
     const postDoc = {
       ...baseDoc,
       _id: 'page_post-post-1',
@@ -132,7 +137,6 @@ describe('create-person-from-blog-author migration — reference rewriting', () 
   });
 
   it('rewrites blog_post.author pointing at a migrated author (production referrer shape)', async () => {
-    const { context } = createMockContext({ blogAuthorIds: ['author-1'] });
     const postDoc = {
       ...baseDoc,
       _id: 'post-1',
@@ -148,7 +152,6 @@ describe('create-person-from-blog-author migration — reference rewriting', () 
   });
 
   it('rewrites module_heroProfile.author pointing at a migrated author', async () => {
-    const { context } = createMockContext({ blogAuthorIds: ['author-1'] });
     const heroDoc = {
       ...baseDoc,
       _id: 'hero-profile-1',
@@ -164,7 +167,6 @@ describe('create-person-from-blog-author migration — reference rewriting', () 
   });
 
   it('produces no mutations for a document with no matching references', async () => {
-    const { context } = createMockContext({ blogAuthorIds: ['author-1'] });
     const otherDoc = {
       ...baseDoc,
       _id: 'topic-1',
@@ -178,7 +180,6 @@ describe('create-person-from-blog-author migration — reference rewriting', () 
   });
 
   it('is idempotent — a reference already pointing at its person id produces no mutations', async () => {
-    const { context } = createMockContext({ blogAuthorIds: ['author-1'] });
     const rewrittenPostDoc = {
       ...baseDoc,
       _id: 'page_post-post-1',

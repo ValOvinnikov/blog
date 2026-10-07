@@ -5,12 +5,25 @@ import { toPostListModuleKey } from '../lib/post-list-module-key';
 import { refoldPostListIntoModules, type TFoldableDoc } from './index';
 
 describe(refoldPostListIntoModules, () => {
-  it('folds a document whose modules field is entirely absent, and unsets postList', () => {
-    const doc: TFoldableDoc = {
-      postList: { _ref: 'postList-1' },
-    };
+  let unfoldedDoc: TFoldableDoc;
+  let foldedDoc: TFoldableDoc;
 
-    const result = refoldPostListIntoModules(doc);
+  beforeEach(() => {
+    unfoldedDoc = { postList: { _ref: 'postList-1' } };
+    foldedDoc = {
+      postList: { _ref: 'postList-1' },
+      modules: [
+        {
+          _key: toPostListModuleKey('postList-1'),
+          _type: 'module_postList',
+          _ref: 'postList-1',
+        },
+      ],
+    };
+  });
+
+  it('folds a document whose modules field is entirely absent, and unsets postList', () => {
+    const result = refoldPostListIntoModules(unfoldedDoc);
 
     expect(result).toEqual([
       at('modules', setIfMissing([])),
@@ -53,33 +66,11 @@ describe(refoldPostListIntoModules, () => {
   });
 
   it('is idempotent — a doc already referencing the post list in modules[] produces no patch', () => {
-    const doc: TFoldableDoc = {
-      postList: { _ref: 'postList-1' },
-      modules: [
-        {
-          _key: toPostListModuleKey('postList-1'),
-          _type: 'module_postList',
-          _ref: 'postList-1',
-        },
-      ],
-    };
-
-    expect(refoldPostListIntoModules(doc)).toBeUndefined();
+    expect(refoldPostListIntoModules(foldedDoc)).toBeUndefined();
   });
 
   it('never unsets postList for a document it skips (already folded)', () => {
-    const doc: TFoldableDoc = {
-      postList: { _ref: 'postList-1' },
-      modules: [
-        {
-          _key: toPostListModuleKey('postList-1'),
-          _type: 'module_postList',
-          _ref: 'postList-1',
-        },
-      ],
-    };
-
-    expect(refoldPostListIntoModules(doc)).toBeUndefined();
+    expect(refoldPostListIntoModules(foldedDoc)).toBeUndefined();
   });
 
   it('is a no-op, not an error, for a doc with no postList reference', () => {
@@ -88,10 +79,8 @@ describe(refoldPostListIntoModules, () => {
   });
 
   it('running it twice produces the same result — the derived _key is stable', () => {
-    const doc: TFoldableDoc = { postList: { _ref: 'postList-1' } };
-
-    expect(refoldPostListIntoModules(doc)).toEqual(
-      refoldPostListIntoModules(doc),
+    expect(refoldPostListIntoModules(unfoldedDoc)).toEqual(
+      refoldPostListIntoModules(unfoldedDoc),
     );
   });
 });

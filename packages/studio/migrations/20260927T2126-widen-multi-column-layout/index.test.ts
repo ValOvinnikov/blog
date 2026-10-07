@@ -9,17 +9,19 @@ if (!objectHandler) {
 }
 
 describe('widen-multi-column-layout migration wiring', () => {
-  it('returns a set() operation for a legacy layout field', () => {
-    const node = { _type: 'layout', spacingTop: 'MD' };
+  let node: { _type: string; spacingTop: string };
 
+  beforeEach(() => {
+    node = { _type: 'layout', spacingTop: 'MD' };
+  });
+
+  it('returns a set() operation for a legacy layout field', () => {
     const result = objectHandler(node, ['layout']);
 
     expect(result).toEqual(set({ ...node, _type: 'wideLayout' }));
   });
 
   it('returns undefined for a node outside the layout field path', () => {
-    const node = { _type: 'layout', spacingTop: 'MD' };
-
     const result = objectHandler(node, ['heroImage']);
 
     expect(result).toBeUndefined();

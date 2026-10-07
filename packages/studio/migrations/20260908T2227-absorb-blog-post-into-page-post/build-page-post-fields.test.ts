@@ -44,9 +44,13 @@ const basePost: TBlogPostDoc = {
 };
 
 describe('buildPagePostFields — no existing page_post (production shape)', () => {
-  it('sets every content field from the post', () => {
-    const fields = buildPagePostFields(basePost, undefined, new Map());
+  let fields: ReturnType<typeof buildPagePostFields>;
 
+  beforeEach(() => {
+    fields = buildPagePostFields(basePost, undefined, new Map());
+  });
+
+  it('sets every content field from the post', () => {
     expect(fields.heroImage).toEqual(basePost.heroImage);
     expect(fields.author).toEqual(basePost.author);
     expect(fields.topic).toEqual(basePost.topic);
@@ -57,14 +61,10 @@ describe('buildPagePostFields — no existing page_post (production shape)', () 
   });
 
   it('sets the internal title from the post title so the desk list is readable', () => {
-    const fields = buildPagePostFields(basePost, undefined, new Map());
-
     expect(fields.title).toBe(basePost.title);
   });
 
   it('moves the post title and excerpt into sectionHeader', () => {
-    const fields = buildPagePostFields(basePost, undefined, new Map());
-
     expect(fields.sectionHeader).toEqual({
       _type: 'requiredHeadingSectionHeader',
       heading: basePost.title,
@@ -73,22 +73,16 @@ describe('buildPagePostFields — no existing page_post (production shape)', () 
   });
 
   it('falls back to the post slug, publishedAt and seo when no page exists', () => {
-    const fields = buildPagePostFields(basePost, undefined, new Map());
-
     expect(fields.slug).toEqual(basePost.slug);
     expect(fields.publishedAt).toBe(basePost.publishedAt);
     expect(fields.seo).toEqual(basePost.seo);
   });
 
   it('has no post reference field — the page absorbed the post directly', () => {
-    const fields = buildPagePostFields(basePost, undefined, new Map());
-
     expect(fields.post).toBeUndefined();
   });
 
   it('includes both shared modules when newsletterEnabled is true', () => {
-    const fields = buildPagePostFields(basePost, undefined, new Map());
-
     expect(fields.modules).toEqual([
       {
         _type: 'reference',
@@ -132,8 +126,6 @@ describe('buildPagePostFields — no existing page_post (production shape)', () 
   });
 
   it('produces a payload satisfying every field page_post requires', () => {
-    const fields = buildPagePostFields(basePost, undefined, new Map());
-
     assertSatisfiesRequiredFields(
       postPageSchema,
       {
@@ -154,23 +146,23 @@ describe('buildPagePostFields — an existing page_post already carries its own 
     seo: { metaTitle: 'Custom SEO title' },
   };
 
-  it('keeps the page’s own slug, publishedAt and seo', () => {
-    const fields = buildPagePostFields(basePost, existingPagePost, new Map());
+  let fields: ReturnType<typeof buildPagePostFields>;
 
+  beforeEach(() => {
+    fields = buildPagePostFields(basePost, existingPagePost, new Map());
+  });
+
+  it('keeps the page’s own slug, publishedAt and seo', () => {
     expect(fields.slug).toEqual(existingPagePost.slug);
     expect(fields.publishedAt).toBe(existingPagePost.publishedAt);
     expect(fields.seo).toEqual(existingPagePost.seo);
   });
 
   it('preserves the page’s own title rather than overwriting it with the post’s title', () => {
-    const fields = buildPagePostFields(basePost, existingPagePost, new Map());
-
     expect(fields.title).toBe(existingPagePost.title);
   });
 
   it('still derives sectionHeader from the post, independent of the existing title', () => {
-    const fields = buildPagePostFields(basePost, existingPagePost, new Map());
-
     expect(fields.sectionHeader).toEqual({
       _type: 'requiredHeadingSectionHeader',
       heading: basePost.title,
@@ -221,26 +213,30 @@ describe('buildPagePostFields — internal links inside content get rewritten', 
 });
 
 describe('buildPagePostFields — idempotency', () => {
+  let firstRun: ReturnType<typeof buildPagePostFields>;
+
+  beforeEach(() => {
+    firstRun = buildPagePostFields(basePost, undefined, new Map());
+  });
+
   it('produces the same fields on a second call given the same inputs', () => {
-    const first = buildPagePostFields(basePost, undefined, new Map());
     const second = buildPagePostFields(basePost, undefined, new Map());
 
-    expect(second).toEqual(first);
+    expect(second).toEqual(firstRun);
   });
 
   it('produces the same result whether or not a prior run already migrated the page', () => {
-    const firstRunResult = buildPagePostFields(basePost, undefined, new Map());
     const secondRunResult = buildPagePostFields(
       basePost,
       {
-        title: firstRunResult.title as string,
-        slug: firstRunResult.slug as { _type: 'slug'; current?: string },
-        publishedAt: firstRunResult.publishedAt as string,
-        seo: firstRunResult.seo as Record<string, unknown>,
+        title: firstRun.title as string,
+        slug: firstRun.slug as { _type: 'slug'; current?: string },
+        publishedAt: firstRun.publishedAt as string,
+        seo: firstRun.seo as Record<string, unknown>,
       },
       new Map(),
     );
 
-    expect(secondRunResult).toEqual(firstRunResult);
+    expect(secondRunResult).toEqual(firstRun);
   });
 });
