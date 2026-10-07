@@ -726,9 +726,7 @@ consume those shapes, they don't design them.
 > **Shipped modules are described in `SPEC.md` §6**, which wins over every
 > design answer recorded below. **Module surface and skin alignment** — one
 > skin vocabulary, item-surface families, the Banner recipe and the Look's
-> card style — has its own design of record,
-> `docs/superpowers/specs/2026-10-07-module-surface-and-look-alignment-design.md`,
-> delivered through epics #4402 (Studio), #4412 (UI/web surfaces), #4419
+> card style — shipped through epics #4402 (Studio), #4412 (UI/web surfaces), #4419
 > (Banner and band rhythm) and #4422 (Look platform).
 
 **The problem this milestone solves.** `page_home` is a blog home page and

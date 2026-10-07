@@ -24,7 +24,7 @@ and additive to the flexibility spine (module styling + theme-as-content)
 that #1285 already shipped.
 **Related / dependencies:**
 
-> **Superseded** — `MODULE_MAP` and `HERO_MAP` are gone: each page renders through its own `Partial` map (`HOME_MAP`, `LANDING_MAP`, …) and the pages declare `modulesField`. See docs/superpowers/specs/2026-10-07-module-surface-and-look-alignment-design.md.
+> **Superseded** — `MODULE_MAP` and `HERO_MAP` are gone: each page renders through its own `Partial` map (`HOME_MAP`, `LANDING_MAP`, …) and the pages declare `modulesField`. See `SPEC.md` §6.
 
 - **Module type flow** (`packages/config/src/constants/module.ts`) — there is
   **no** hand-maintained `MODULE_TYPE` const. `TModuleType` is **derived**
@@ -44,7 +44,7 @@ that #1285 already shipped.
   absorbs every `module_hero*` type through `THeroModuleType`, and a hero's
   own component is registered in `HERO_MAP` instead.
 
-> **Superseded** — modules use `moduleHeadingBlockField()`, `alignmentFields` and `layoutField`/`wideLayoutField`, and `headingBlockField()`, `defineAlignmentFields()` and the `requireHeading` override no longer exist. See docs/superpowers/specs/2026-10-07-module-surface-and-look-alignment-design.md.
+> **Superseded** — modules use `moduleHeadingBlockField()`, `alignmentFields` and `layoutField`/`wideLayoutField`, and `headingBlockField()`, `defineAlignmentFields()` and the `requireHeading` override no longer exist. See `SPEC.md` §6.
 
 - **Module styling (shipped)** — the "section appearance object" the
   original design proposed shipped under different names, and every module
@@ -66,7 +66,7 @@ that #1285 already shipped.
   `CONSOLE` preset's separate rendering path, so a new organism renders
   **one** structure — never a `chromeOn`/`isPlain` branch.
 
-> **Superseded** — `settings_newsletter` was retired by #4253 (trust cues live on `module_newsletter`), so there is no per-feature copy singleton to mirror. See docs/superpowers/specs/2026-10-07-module-surface-and-look-alignment-design.md.
+> **Superseded** — `settings_newsletter` was retired by #4253 (trust cues live on `module_newsletter`), so there is no per-feature copy singleton to mirror. See `SPEC.md` §6.
 
 - **Copy placement** — per `SPEC.md`'s "Curated UI copy lives in Voice, not
   on modules" and the 2026-09-06 design's D4: a module never carries an
@@ -154,7 +154,7 @@ end rather than renumbering):
 - `module_contactForm` — see below (has a write path; specced separately).
 - Second wave: `module_pricing`, `module_timeline`.
 
-> **Superseded** — the Studio helpers are `moduleHeadingBlockField()`, `alignmentFields` and `layoutField`/`wideLayoutField`, `modules[]` lives on `template_*` documents via `modulesField`, and web registers per-page `Partial` maps rather than `MODULE_MAP`. See docs/superpowers/specs/2026-10-07-module-surface-and-look-alignment-design.md.
+> **Superseded** — the Studio helpers are `moduleHeadingBlockField()`, `alignmentFields` and `layoutField`/`wideLayoutField`, `modules[]` lives on `template_*` documents via `modulesField`, and web registers per-page `Partial` maps rather than `MODULE_MAP`. See `SPEC.md` §6.
 
 **Per module, the same steps** (dependency order `studio → service → ui →
 web` — **no config-const step**, since a module's `_type` is derived from its
@@ -247,7 +247,7 @@ than silently being un-pickable.
 
 ### Which pages get a hero slot
 
-> **Superseded** — `modules[]` lives on `template_home`/`template_landing` (and the other `template_*` documents), and `page_blog` is now `page_postIndex`. See docs/superpowers/specs/2026-10-07-module-surface-and-look-alignment-design.md.
+> **Superseded** — `modules[]` lives on `template_home`/`template_landing` (and the other `template_*` documents), and `page_blog` is now `page_postIndex`. See `SPEC.md` §6.
 
 One rule, no exceptions: **home has a required hero; every other page has an
 optional one; a hero always replaces that page's default header and owns the
@@ -277,7 +277,7 @@ set, exactly as `page_home.title` does today.
 
 ### The shared field tail — `defineHeroFields()`
 
-> **Superseded** — `defineHeroFields()` was deleted in #3275; each hero kind composes named field builders, and `SPEC.md` §6 holds the shipped tail. See docs/superpowers/specs/2026-10-07-module-surface-and-look-alignment-design.md.
+> **Superseded** — `defineHeroFields()` was deleted in #3275; each hero kind composes named field builders, and `SPEC.md` §6 holds the shipped tail. See `SPEC.md` §6.
 
 Every hero kind is _content fields first, shared tail last_. The tail is
 emitted by one studio helper so an editor who has configured one hero already
@@ -909,7 +909,7 @@ the link's label or "No link", the image as media.
 
 ### Fields
 
-> **Superseded** — `module_featureList` shipped with no `showImages`, a three-value `CARD_IMAGE_SHAPE` (`WIDE`/`SQUARE`/`CIRCLE`, no `ICON`), the default `brandVariantField()` list, `moduleHeadingBlockField()` and `wideLayoutField`; `SPEC.md` §6 is the shape of record. See docs/superpowers/specs/2026-10-07-module-surface-and-look-alignment-design.md.
+> **Superseded** — `module_featureList` shipped with no `showImages`, a three-value `CARD_IMAGE_SHAPE` (`WIDE`/`SQUARE`/`CIRCLE`, no `ICON`), the default `brandVariantField()` list, `moduleHeadingBlockField()` and `wideLayoutField`; `SPEC.md` §6 is the shape of record. See `SPEC.md` §6.
 
 The form opens `title → brandVariant → headingBlock → …` as every module
 does:
@@ -931,7 +931,7 @@ does:
 Dropdowns throughout, no radios; every field carries an editor-facing
 description.
 
-> **Superseded** — `CARD_IMAGE_SHAPE` shipped as `WIDE`/`SQUARE`/`CIRCLE` only; `SPEC.md` §6 describes icon-only cards. See docs/superpowers/specs/2026-10-07-module-surface-and-look-alignment-design.md.
+> **Superseded** — `CARD_IMAGE_SHAPE` shipped as `WIDE`/`SQUARE`/`CIRCLE` only; `SPEC.md` §6 describes icon-only cards. See `SPEC.md` §6.
 
 **Image shape is one field on the module, not per card,** so the grid stays
 even. `CARD_IMAGE_SHAPE = { WIDE, SQUARE, CIRCLE, ICON }` lands in
@@ -1133,7 +1133,7 @@ decisions: <https://claude.ai/artifact/MNyKjaCPuX66qFTuXZVfNm>.
 
 ### Quotes are documents, in the Blocks section
 
-> **Superseded** — `block_testimonial` stores the portrait as `image`, not `photo`; `SPEC.md` §6 is the shape of record. See docs/superpowers/specs/2026-10-07-module-surface-and-look-alignment-design.md.
+> **Superseded** — `block_testimonial` stores the portrait as `image`, not `photo`; `SPEC.md` §6 is the shape of record. See `SPEC.md` §6.
 
 Testimonials are **`block_testimonial` documents** ("Testimonial") under
 Blocks → Testimonials, beside Feature Cards and Links, referenced by the
@@ -1158,7 +1158,7 @@ logo wall. Preview: the quote, subtitle `name — role`, the photo as media.
 
 ### Fields
 
-> **Superseded** — `module_testimonial` shipped with no `showImages`, `moduleHeadingBlockField()`, the default `brandVariantField()` list and `wideLayoutField`; `SPEC.md` §6 is the shape of record. See docs/superpowers/specs/2026-10-07-module-surface-and-look-alignment-design.md.
+> **Superseded** — `module_testimonial` shipped with no `showImages`, `moduleHeadingBlockField()`, the default `brandVariantField()` list and `wideLayoutField`; `SPEC.md` §6 is the shape of record. See `SPEC.md` §6.
 
 | Field              | Type                                                            | Notes                                                                                |
 | ------------------ | --------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
@@ -1256,7 +1256,7 @@ them. `REVALIDATE_TAGS.module_testimonial = ['modules:testimonial']`.
 
 ### `@blog/ui`
 
-> **Superseded** — the spotlight `QuoteCard` caps at `38ch`, not ~52ch. See docs/superpowers/specs/2026-10-07-module-surface-and-look-alignment-design.md.
+> **Superseded** — the spotlight `QuoteCard` caps at `38ch`, not ~52ch. See `SPEC.md` §6.
 
 One new molecule, **`QuoteCard`** — a `<figure>` with a decorative opening
 quote mark, a `<blockquote>` and a `<figcaption>` holding `Avatar`
@@ -2069,7 +2069,7 @@ the gallery's wrapper passes `basis-full` for one image per view. The
 organism ships no width of its own, so no consumer's shape is ever baked
 into it.
 
-> **Superseded** — `Carousel` renders the controls only when Embla can scroll at all, so a carousel whose slides all fit shows none. See docs/superpowers/specs/2026-10-07-module-surface-and-look-alignment-design.md.
+> **Superseded** — `Carousel` renders the controls only when Embla can scroll at all, so a carousel whose slides all fit shows none. See `SPEC.md` §6.
 
 **The controls always render.** They sit centred under the track rather than
 in the heading row, so a centred or right-aligned section header keeps
@@ -2430,7 +2430,7 @@ with a write path. Deliberately assembles pieces the M5 engagement phase
 already built, and mirrors `module_newsletter` — the shipped write-path
 module — wherever the two overlap.
 
-> **Superseded** — there is no `Textarea` atom yet (#3670), modules register in per-page `Partial` maps rather than `MODULE_MAP`, and `settings_contact` has no newsletter precedent to mirror since #4253. See docs/superpowers/specs/2026-10-07-module-surface-and-look-alignment-design.md.
+> **Superseded** — there is no `Textarea` atom yet (#3670), modules register in per-page `Partial` maps rather than `MODULE_MAP`, and `settings_contact` has no newsletter precedent to mirror since #4253. See `SPEC.md` §6.
 
 **Composition (mostly reuse):**
 
@@ -2523,7 +2523,7 @@ Content
 └─ Settings
 ```
 
-> **Superseded** — `PostsSection` and `PostCard` are gone; listings compose `MediaCard`/`MediaCardItem` in `CardGrid`. See docs/superpowers/specs/2026-10-07-module-surface-and-look-alignment-design.md.
+> **Superseded** — `PostsSection` and `PostCard` are gone; listings compose `MediaCard`/`MediaCardItem` in `CardGrid`. See `SPEC.md` §6.
 
 **Service / UI / Web.** A `service.pages.work.*` slice plus
 `service.modules.projectList` / `projectLatest`; reuse `PostsSection` /
@@ -2822,9 +2822,7 @@ catalogue has enough shipped history to matter).
 - **2026-10-07** — superseded banners added to the sections that no
   longer match what shipped (helper names, page maps, the hero tail,
   featureList, testimonial, carousel controls, contact form, portfolio
-  cards), pointing at
-  `2026-10-07-module-surface-and-look-alignment-design.md` and `SPEC.md`
-  §6. The sections themselves are not rewritten.
+  cards), pointing at `SPEC.md` §6. The sections themselves are not rewritten.
 - **2026-09-11** — "`module_heroProfile` — the person hero" added (#2808),
   the third hero kind, designed against `person` as it stands (name,
   image, Portable Text bio, role, `socialLinks[]`) and the footer's
