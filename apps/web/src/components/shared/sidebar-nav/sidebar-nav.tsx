@@ -47,15 +47,13 @@ export const SidebarNav = ({
     <ol className={s.list({ inPanel })}>
       {items.map((item) => {
         const isActive = item === activeItem;
+        const isNested = item.level === 2;
 
         return (
-          <li
-            key={item.href}
-            className={s.item({ isNested: item.level === 2 })}
-          >
+          <li key={item.href} className={s.item({ isNested })}>
             <SmartLink
               href={item.href}
-              className={s.link({ isActive, inPanel })}
+              className={s.link({ isActive, isNested, inPanel })}
               aria-current={isActive ? ariaCurrent : undefined}
               onClick={onNavigate}
             >

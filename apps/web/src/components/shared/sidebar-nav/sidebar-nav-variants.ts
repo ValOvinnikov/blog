@@ -69,11 +69,13 @@ export const sidebarNavVariants = tv({
     open: {
       true: { chevron: ['-rotate-135'] },
     },
-    isActive: {
-      true: { link: ['text-brand-primary'] },
-    },
+    // Declared before `isActive` so the active colour wins over a root item's `text-text`.
     isNested: {
       true: { item: ['pl-3'] },
+      false: { link: ['font-semibold text-text'] },
+    },
+    isActive: {
+      true: { link: ['text-brand-primary'] },
     },
     inPanel: {
       true: {

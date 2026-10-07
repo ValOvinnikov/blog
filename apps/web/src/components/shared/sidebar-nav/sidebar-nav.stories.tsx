@@ -22,6 +22,10 @@ type TStory = StoryObj<typeof meta>;
 
 export const Desktop: TStory = {};
 
+export const DesktopRootActive: TStory = {
+  args: { activeKey: '/modules' },
+};
+
 export const MobileClosed: TStory = {
   globals: { viewport: 'mobile' },
 };
