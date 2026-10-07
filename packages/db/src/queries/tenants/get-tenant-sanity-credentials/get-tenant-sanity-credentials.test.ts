@@ -50,51 +50,63 @@ afterEach(async () => {
 });
 
 describe(getTenantSanityCredentials, () => {
-  it('resolves the decrypted token alongside project/dataset and servable state for an active tenant', async () => {
-    const tenant = await insertTenant();
-    await setTenantSanityToken(tenant.id, 'sk-real-token-value');
+  let tenant: TTenant;
 
-    const credentials = await getTenantSanityCredentials(tenant.id);
-
-    expect(credentials).toEqual({
-      projectId: 'abc123',
-      dataset: 'production',
-      token: 'sk-real-token-value',
-      defaultLocale: LOCALE_ISO_CODES.EN,
-      status: TENANT_STATUS.ACTIVE,
-      deprovisionedAt: null,
-      provisioningStatus: null,
-    });
+  beforeEach(async () => {
+    tenant = await insertTenant();
   });
 
-  it('still resolves working credentials for an archived tenant, tagged with its ARCHIVED status', async () => {
-    const tenant = await insertTenant();
-    await setTenantSanityToken(tenant.id, 'sk-real-token-value');
-    const archived = await archiveTenant(tenant.id);
-    if (!archived.ok) throw new Error('setup: archiveTenant failed.');
-
-    const credentials = await getTenantSanityCredentials(tenant.id);
-
-    expect(credentials).toMatchObject({
-      projectId: 'abc123',
-      dataset: 'production',
-      token: 'sk-real-token-value',
-      status: TENANT_STATUS.ARCHIVED,
+  describe('with a token set', () => {
+    beforeEach(async () => {
+      await setTenantSanityToken(tenant.id, 'sk-real-token-value');
     });
-  });
 
-  it('surfaces deprovisionedAt for a deprovisioned tenant instead of collapsing to undefined', async () => {
-    const tenant = await insertTenant();
-    await setTenantSanityToken(tenant.id, 'sk-real-token-value');
-    await archiveTenant(tenant.id);
+    it('resolves the decrypted token alongside project/dataset and servable state for an active tenant', async () => {
+      const credentials = await getTenantSanityCredentials(tenant.id);
 
-    const credentials = await getTenantSanityCredentials(tenant.id);
+      expect(credentials).toEqual({
+        projectId: 'abc123',
+        dataset: 'production',
+        token: 'sk-real-token-value',
+        defaultLocale: LOCALE_ISO_CODES.EN,
+        status: TENANT_STATUS.ACTIVE,
+        deprovisionedAt: null,
+        provisioningStatus: null,
+      });
+    });
 
-    expect(credentials?.deprovisionedAt).toBeInstanceOf(Date);
+    it('still resolves working credentials for an archived tenant, tagged with its ARCHIVED status', async () => {
+      const archived = await archiveTenant(tenant.id);
+      if (!archived.ok) throw new Error('setup: archiveTenant failed.');
+
+      const credentials = await getTenantSanityCredentials(tenant.id);
+
+      expect(credentials).toMatchObject({
+        projectId: 'abc123',
+        dataset: 'production',
+        token: 'sk-real-token-value',
+        status: TENANT_STATUS.ARCHIVED,
+      });
+    });
+
+    it('surfaces deprovisionedAt for a deprovisioned tenant instead of collapsing to undefined', async () => {
+      await archiveTenant(tenant.id);
+
+      const credentials = await getTenantSanityCredentials(tenant.id);
+
+      expect(credentials?.deprovisionedAt).toBeInstanceOf(Date);
+    });
+
+    it('throws when the encryption key is not configured', async () => {
+      delete process.env['TENANT_TOKEN_ENCRYPTION_KEY'];
+
+      await expect(getTenantSanityCredentials(tenant.id)).rejects.toThrow(
+        'TENANT_TOKEN_ENCRYPTION_KEY is not configured.',
+      );
+    });
   });
 
   it('resolves undefined for a mid-provisioning tenant with no token set yet', async () => {
-    const tenant = await insertTenant();
     await setTenantProvisioningStatus(
       tenant.id,
       TENANT_PROVISIONING_STATUS.PROVISIONING,
@@ -106,7 +118,6 @@ describe(getTenantSanityCredentials, () => {
   });
 
   it('resolves undefined for a tenant whose provisioning failed and never set a token', async () => {
-    const tenant = await insertTenant();
     await setTenantProvisioningStatus(
       tenant.id,
       TENANT_PROVISIONING_STATUS.FAILED,
@@ -118,8 +129,6 @@ describe(getTenantSanityCredentials, () => {
   });
 
   it('resolves undefined when the tenant has no token set yet', async () => {
-    const tenant = await insertTenant();
-
     await expect(
       getTenantSanityCredentials(tenant.id),
     ).resolves.toBeUndefined();
@@ -129,15 +138,5 @@ describe(getTenantSanityCredentials, () => {
     await expect(
       getTenantSanityCredentials('00000000-0000-0000-0000-000000000000'),
     ).resolves.toBeUndefined();
-  });
-
-  it('throws when the encryption key is not configured', async () => {
-    const tenant = await insertTenant();
-    await setTenantSanityToken(tenant.id, 'sk-real-token-value');
-    delete process.env['TENANT_TOKEN_ENCRYPTION_KEY'];
-
-    await expect(getTenantSanityCredentials(tenant.id)).rejects.toThrow(
-      'TENANT_TOKEN_ENCRYPTION_KEY is not configured.',
-    );
   });
 });

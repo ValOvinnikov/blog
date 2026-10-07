@@ -44,8 +44,13 @@ afterEach(async () => {
 });
 
 describe(setTenantSanityWriteTokenAndSeededAt, () => {
+  let tenant: TTenant;
+
+  beforeEach(async () => {
+    tenant = await insertTenant();
+  });
+
   it('stores the token encrypted and the seeded-at timestamp in one call', async () => {
-    const tenant = await insertTenant();
     const seededAt = new Date('2026-08-15T12:00:00.000Z');
 
     await setTenantSanityWriteTokenAndSeededAt(
@@ -68,7 +73,6 @@ describe(setTenantSanityWriteTokenAndSeededAt, () => {
 
   it('throws when the encryption key is not configured, leaving both columns untouched', async () => {
     delete process.env['TENANT_TOKEN_ENCRYPTION_KEY'];
-    const tenant = await insertTenant();
 
     await expect(
       setTenantSanityWriteTokenAndSeededAt(

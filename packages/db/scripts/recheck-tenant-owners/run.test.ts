@@ -178,31 +178,36 @@ describe(runRecheck, () => {
     );
   });
 
-  it('delegates every candidate outcome to the shared notify-and-mark-notified helper', async () => {
-    const tenants = [tenant('t1', 'acme')];
-    listTenantsPendingOwnerElevationMock.mockResolvedValue(tenants);
-    elevateTenantOwnerMock.mockResolvedValueOnce('STALLED');
+  describe('with a single candidate', () => {
+    let tenants: TTenant[];
 
-    await runRecheck(env);
-
-    expect(notifyOwnerElevationOutcomeMock).toHaveBeenCalledTimes(1);
-    expect(notifyOwnerElevationOutcomeMock).toHaveBeenCalledWith({
-      tenant: tenants[0],
-      outcome: 'STALLED',
+    beforeEach(() => {
+      tenants = [tenant('t1', 'acme')];
+      listTenantsPendingOwnerElevationMock.mockResolvedValue(tenants);
     });
-  });
 
-  it('still delegates a non-notifiable outcome — the helper itself decides whether to notify', async () => {
-    const tenants = [tenant('t1', 'acme')];
-    listTenantsPendingOwnerElevationMock.mockResolvedValue(tenants);
-    elevateTenantOwnerMock.mockResolvedValueOnce('ELEVATED');
+    it('delegates every candidate outcome to the shared notify-and-mark-notified helper', async () => {
+      elevateTenantOwnerMock.mockResolvedValueOnce('STALLED');
 
-    await runRecheck(env);
+      await runRecheck(env);
 
-    expect(notifyOwnerElevationOutcomeMock).toHaveBeenCalledTimes(1);
-    expect(notifyOwnerElevationOutcomeMock).toHaveBeenCalledWith({
-      tenant: tenants[0],
-      outcome: 'ELEVATED',
+      expect(notifyOwnerElevationOutcomeMock).toHaveBeenCalledTimes(1);
+      expect(notifyOwnerElevationOutcomeMock).toHaveBeenCalledWith({
+        tenant: tenants[0],
+        outcome: 'STALLED',
+      });
+    });
+
+    it('still delegates a non-notifiable outcome — the helper itself decides whether to notify', async () => {
+      elevateTenantOwnerMock.mockResolvedValueOnce('ELEVATED');
+
+      await runRecheck(env);
+
+      expect(notifyOwnerElevationOutcomeMock).toHaveBeenCalledTimes(1);
+      expect(notifyOwnerElevationOutcomeMock).toHaveBeenCalledWith({
+        tenant: tenants[0],
+        outcome: 'ELEVATED',
+      });
     });
   });
 });

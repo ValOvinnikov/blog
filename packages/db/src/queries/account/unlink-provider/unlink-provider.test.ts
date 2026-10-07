@@ -29,17 +29,6 @@ async function findAccount(userId: string, provider: string) {
 }
 
 describe(unlinkProvider, () => {
-  it('deletes the accounts row when a second method remains linked', async () => {
-    const user = await insertTestUser(db());
-    await insertTestAccount(db(), user.id, 'github');
-    await insertTestAccount(db(), user.id, 'google');
-
-    const result = await unlinkProvider(user.id, 'github');
-
-    expect(result).toEqual({ outcome: 'unlinked' });
-    expect(await findAccount(user.id, 'github')).toEqual([]);
-  });
-
   it('deletes github when email-link is also linked', async () => {
     const user = await insertTestUser(db(), {
       emailVerified: new Date(2026, 0, 1),
@@ -52,55 +41,68 @@ describe(unlinkProvider, () => {
     expect(await findAccount(user.id, 'github')).toEqual([]);
   });
 
-  it('rejects removing the last remaining linked method', async () => {
-    const user = await insertTestUser(db());
-    await insertTestAccount(db(), user.id, 'github');
+  describe('with a user', () => {
+    let user: Awaited<ReturnType<typeof insertTestUser>>;
 
-    const result = await unlinkProvider(user.id, 'github');
+    beforeEach(async () => {
+      user = await insertTestUser(db());
+    });
 
-    expect(result).toEqual({ outcome: 'last-method' });
-    expect(await findAccount(user.id, 'github')).toHaveLength(1);
-  });
+    it('rejects removing the last remaining linked method', async () => {
+      await insertTestAccount(db(), user.id, 'github');
 
-  it('is a no-op (not a rejection) when the target provider is not linked', async () => {
-    const user = await insertTestUser(db());
-    await insertTestAccount(db(), user.id, 'google');
+      const result = await unlinkProvider(user.id, 'github');
 
-    const result = await unlinkProvider(user.id, 'github');
+      expect(result).toEqual({ outcome: 'last-method' });
+      expect(await findAccount(user.id, 'github')).toHaveLength(1);
+    });
 
-    expect(result).toEqual({ outcome: 'unlinked' });
-    expect(await findAccount(user.id, 'google')).toHaveLength(1);
-  });
+    it('is a no-op (not a rejection) when the target provider is not linked', async () => {
+      await insertTestAccount(db(), user.id, 'google');
 
-  it("does not remove another user's accounts row", async () => {
-    const user = await insertTestUser(db());
-    const otherUser = await insertTestUser(db());
-    await insertTestAccount(db(), user.id, 'github');
-    await insertTestAccount(db(), user.id, 'google');
-    await insertTestAccount(db(), otherUser.id, 'github');
+      const result = await unlinkProvider(user.id, 'github');
 
-    await unlinkProvider(user.id, 'github');
+      expect(result).toEqual({ outcome: 'unlinked' });
+      expect(await findAccount(user.id, 'google')).toHaveLength(1);
+    });
 
-    expect(await findAccount(otherUser.id, 'github')).toHaveLength(1);
-  });
+    describe('with github and google linked', () => {
+      beforeEach(async () => {
+        await insertTestAccount(db(), user.id, 'github');
+        await insertTestAccount(db(), user.id, 'google');
+      });
 
-  it('never lets two concurrent calls both remove the last two linked methods', async () => {
-    const user = await insertTestUser(db());
-    await insertTestAccount(db(), user.id, 'github');
-    await insertTestAccount(db(), user.id, 'google');
+      it('deletes the accounts row when a second method remains linked', async () => {
+        const result = await unlinkProvider(user.id, 'github');
 
-    const [githubResult, googleResult] = await Promise.all([
-      unlinkProvider(user.id, 'github'),
-      unlinkProvider(user.id, 'google'),
-    ]);
+        expect(result).toEqual({ outcome: 'unlinked' });
+        expect(await findAccount(user.id, 'github')).toEqual([]);
+      });
 
-    const outcomes = [githubResult.outcome, googleResult.outcome].sort();
-    expect(outcomes).toEqual(['last-method', 'unlinked']);
+      it("does not remove another user's accounts row", async () => {
+        const otherUser = await insertTestUser(db());
+        await insertTestAccount(db(), otherUser.id, 'github');
 
-    const remainingAccounts = await db()
-      .select()
-      .from(schema.accounts)
-      .where(eq(schema.accounts.userId, user.id));
-    expect(remainingAccounts).toHaveLength(1);
+        await unlinkProvider(user.id, 'github');
+
+        expect(await findAccount(otherUser.id, 'github')).toHaveLength(1);
+      });
+
+      it('never lets two concurrent calls both remove the last two linked methods', async () => {
+        const [githubResult, googleResult] = await Promise.all([
+          unlinkProvider(user.id, 'github'),
+          unlinkProvider(user.id, 'google'),
+        ]);
+
+        const outcomes = [githubResult.outcome, googleResult.outcome].sort();
+        expect(outcomes).toEqual(['last-method', 'unlinked']);
+
+        const remainingAccounts = await db()
+          .select()
+          .from(schema.accounts)
+          .where(eq(schema.accounts.userId, user.id));
+        expect(remainingAccounts).toHaveLength(1);
+      });
+    });
   });
 });

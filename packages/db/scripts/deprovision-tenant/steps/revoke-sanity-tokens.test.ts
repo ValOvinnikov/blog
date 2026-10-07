@@ -58,29 +58,33 @@ function deps(
 }
 
 describe(revokeTenantSanityTokens, () => {
-  it('skips when no Sanity project id is set', async () => {
-    const testDeps = deps();
+  describe('with default deps', () => {
+    let testDeps: TRevokeSanityTokensDeps;
 
-    await revokeTenantSanityTokens(
-      baseTenant({ sanityProjectId: null }),
-      env,
-      testDeps,
-    );
+    beforeEach(() => {
+      testDeps = deps();
+    });
 
-    expect(testDeps.listRobotTokens).not.toHaveBeenCalled();
-  });
+    it('skips when no Sanity project id is set', async () => {
+      await revokeTenantSanityTokens(
+        baseTenant({ sanityProjectId: null }),
+        env,
+        testDeps,
+      );
 
-  it('does not call the API in dry-run mode', async () => {
-    const testDeps = deps();
+      expect(testDeps.listRobotTokens).not.toHaveBeenCalled();
+    });
 
-    await revokeTenantSanityTokens(
-      baseTenant(),
-      { ...env, dryRun: true },
-      testDeps,
-    );
+    it('does not call the API in dry-run mode', async () => {
+      await revokeTenantSanityTokens(
+        baseTenant(),
+        { ...env, dryRun: true },
+        testDeps,
+      );
 
-    expect(testDeps.listRobotTokens).not.toHaveBeenCalled();
-    expect(testDeps.revokeToken).not.toHaveBeenCalled();
+      expect(testDeps.listRobotTokens).not.toHaveBeenCalled();
+      expect(testDeps.revokeToken).not.toHaveBeenCalled();
+    });
   });
 
   it('lists the project robots and deletes only the provisioned read/write tokens by label', async () => {

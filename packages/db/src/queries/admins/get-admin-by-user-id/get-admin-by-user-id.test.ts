@@ -17,8 +17,11 @@ afterEach(async () => {
 });
 
 describe(getAdminByUserId, () => {
-  it('returns the row for an existing admin user', async () => {
+  beforeEach(async () => {
     await insertTestUser(db(), { id: 'user-1' });
+  });
+
+  it('returns the row for an existing admin user', async () => {
     await db().insert(schema.admins).values({
       userId: 'user-1',
       role: ADMIN_ROLE.SUPERADMIN,
@@ -34,8 +37,6 @@ describe(getAdminByUserId, () => {
   });
 
   it('returns undefined when the user is not an admin', async () => {
-    await insertTestUser(db(), { id: 'user-1' });
-
     const result = await getAdminByUserId('user-1');
 
     expect(result).toBeUndefined();

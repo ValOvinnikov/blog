@@ -30,49 +30,47 @@ afterEach(async () => {
 });
 
 describe(setTenantProvisioningStatus, () => {
-  it('reverts a PROVISIONING tenant back to its prior status', async () => {
-    const tenantId = await insertTenant({
-      provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+  describe('a PROVISIONING tenant', () => {
+    let tenantId: string;
+
+    beforeEach(async () => {
+      tenantId = await insertTenant({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+      });
     });
 
-    const result = await setTenantProvisioningStatus(
-      tenantId,
-      TENANT_PROVISIONING_STATUS.PENDING,
-    );
+    it('reverts a PROVISIONING tenant back to its prior status', async () => {
+      const result = await setTenantProvisioningStatus(
+        tenantId,
+        TENANT_PROVISIONING_STATUS.PENDING,
+      );
 
-    if (!result.ok) throw new Error('expected ok:true');
-    expect(result.data.provisioningStatus).toBe(
-      TENANT_PROVISIONING_STATUS.PENDING,
-    );
-  });
-
-  it('reverts a PROVISIONING tenant back to NULL when there was no prior status', async () => {
-    const tenantId = await insertTenant({
-      provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+      if (!result.ok) throw new Error('expected ok:true');
+      expect(result.data.provisioningStatus).toBe(
+        TENANT_PROVISIONING_STATUS.PENDING,
+      );
     });
 
-    const result = await setTenantProvisioningStatus(tenantId, null);
+    it('reverts a PROVISIONING tenant back to NULL when there was no prior status', async () => {
+      const result = await setTenantProvisioningStatus(tenantId, null);
 
-    if (!result.ok) throw new Error('expected ok:true');
-    expect(result.data.provisioningStatus).toBeNull();
-  });
-
-  it('leaves every other column untouched', async () => {
-    const tenantId = await insertTenant({
-      provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+      if (!result.ok) throw new Error('expected ok:true');
+      expect(result.data.provisioningStatus).toBeNull();
     });
 
-    await setTenantProvisioningStatus(
-      tenantId,
-      TENANT_PROVISIONING_STATUS.FAILED,
-    );
+    it('leaves every other column untouched', async () => {
+      await setTenantProvisioningStatus(
+        tenantId,
+        TENANT_PROVISIONING_STATUS.FAILED,
+      );
 
-    const [row] = await db()
-      .select()
-      .from(tenants)
-      .where(eq(tenants.id, tenantId));
+      const [row] = await db()
+        .select()
+        .from(tenants)
+        .where(eq(tenants.id, tenantId));
 
-    expect(row).toMatchObject({ name: 'Acme' });
+      expect(row).toMatchObject({ name: 'Acme' });
+    });
   });
 
   it('returns DB_NOT_FOUND for a tenant id that does not exist', async () => {

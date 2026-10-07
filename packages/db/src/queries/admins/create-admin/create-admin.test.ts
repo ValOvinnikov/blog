@@ -18,9 +18,11 @@ afterEach(async () => {
 });
 
 describe(createAdmin, () => {
-  it('inserts a new admin row', async () => {
+  beforeEach(async () => {
     await insertTestUser(db(), { id: 'user-1' });
+  });
 
+  it('inserts a new admin row', async () => {
     const admin = await createAdmin(
       'user-1',
       ADMIN_ROLE.SUPERADMIN,
@@ -34,7 +36,6 @@ describe(createAdmin, () => {
   });
 
   it('is idempotent when the user already has an admin row', async () => {
-    await insertTestUser(db(), { id: 'user-1' });
     const first = await createAdmin(
       'user-1',
       ADMIN_ROLE.SUPERADMIN,
@@ -53,7 +54,6 @@ describe(createAdmin, () => {
   });
 
   it('does not change the stored role when re-run with a different role', async () => {
-    await insertTestUser(db(), { id: 'user-1' });
     const first = await createAdmin(
       'user-1',
       ADMIN_ROLE.SUPERADMIN,
@@ -81,8 +81,6 @@ describe(createAdmin, () => {
   });
 
   it('leaves grantedBy NULL and still sets grantedAt for a break-glass grant', async () => {
-    await insertTestUser(db(), { id: 'user-1' });
-
     const admin = await createAdmin(
       'user-1',
       ADMIN_ROLE.SUPERADMIN,
@@ -94,41 +92,42 @@ describe(createAdmin, () => {
     expect(admin.grantedAt).toBeInstanceOf(Date);
   });
 
-  it('records the granting user id, grantedVia, and grantedAt for an in-app promotion', async () => {
-    await insertTestUser(db(), { id: 'user-1' });
-    await insertTestUser(db(), { id: 'granter-1' });
+  describe('with a granting user', () => {
+    beforeEach(async () => {
+      await insertTestUser(db(), { id: 'granter-1' });
+    });
 
-    const admin = await createAdmin(
-      'user-1',
-      ADMIN_ROLE.SUPERADMIN,
-      GRANTED_VIA.PROMOTION,
-      'granter-1',
-    );
+    it('records the granting user id, grantedVia, and grantedAt for an in-app promotion', async () => {
+      const admin = await createAdmin(
+        'user-1',
+        ADMIN_ROLE.SUPERADMIN,
+        GRANTED_VIA.PROMOTION,
+        'granter-1',
+      );
 
-    expect(admin.grantedVia).toBe(GRANTED_VIA.PROMOTION);
-    expect(admin.grantedBy).toBe('granter-1');
-    expect(admin.grantedAt).toBeInstanceOf(Date);
-  });
+      expect(admin.grantedVia).toBe(GRANTED_VIA.PROMOTION);
+      expect(admin.grantedBy).toBe('granter-1');
+      expect(admin.grantedAt).toBeInstanceOf(Date);
+    });
 
-  it('keeps grantedVia as PROMOTION even after the granting user is deleted', async () => {
-    await insertTestUser(db(), { id: 'user-1' });
-    await insertTestUser(db(), { id: 'granter-1' });
-    const admin = await createAdmin(
-      'user-1',
-      ADMIN_ROLE.SUPERADMIN,
-      GRANTED_VIA.PROMOTION,
-      'granter-1',
-    );
+    it('keeps grantedVia as PROMOTION even after the granting user is deleted', async () => {
+      const admin = await createAdmin(
+        'user-1',
+        ADMIN_ROLE.SUPERADMIN,
+        GRANTED_VIA.PROMOTION,
+        'granter-1',
+      );
 
-    await db().delete(schema.users).where(eq(schema.users.id, 'granter-1'));
+      await db().delete(schema.users).where(eq(schema.users.id, 'granter-1'));
 
-    const [row] = await db()
-      .select()
-      .from(schema.admins)
-      .where(eq(schema.admins.id, admin.id));
+      const [row] = await db()
+        .select()
+        .from(schema.admins)
+        .where(eq(schema.admins.id, admin.id));
 
-    expect(row?.grantedBy).toBeNull();
-    expect(row?.grantedVia).toBe(GRANTED_VIA.PROMOTION);
+      expect(row?.grantedBy).toBeNull();
+      expect(row?.grantedVia).toBe(GRANTED_VIA.PROMOTION);
+    });
   });
 });
 

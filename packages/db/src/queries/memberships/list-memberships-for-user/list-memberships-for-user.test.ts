@@ -18,8 +18,11 @@ afterEach(async () => {
 });
 
 describe(listMembershipsForUser, () => {
-  it('returns every membership for the given user', async () => {
+  beforeEach(async () => {
     await insertTestUser(db(), { id: 'user-1' });
+  });
+
+  it('returns every membership for the given user', async () => {
     await insertTestUser(db(), { id: 'user-2' });
     const { id: tenantOneId } = await insertTestTenant(db());
     const { id: tenantTwoId } = await insertTestTenant(db());
@@ -52,8 +55,6 @@ describe(listMembershipsForUser, () => {
   });
 
   it('returns an empty array for a user with no memberships', async () => {
-    await insertTestUser(db(), { id: 'user-1' });
-
     const result = await listMembershipsForUser('user-1');
 
     expect(result).toEqual([]);

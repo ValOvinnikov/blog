@@ -32,8 +32,13 @@ afterEach(async () => {
 });
 
 describe(findPendingInviteByEmail, () => {
+  let tenantId: string;
+
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
   it('returns a pending invite matching the normalized email', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     await insertInvite(tenantId, 'owner@example.com');
 
     const results = await findPendingInviteByEmail('Owner@Example.com');
@@ -43,7 +48,6 @@ describe(findPendingInviteByEmail, () => {
   });
 
   it('matches an email padded with leading/trailing whitespace', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     await insertInvite(tenantId, 'owner@example.com');
 
     const results = await findPendingInviteByEmail('  owner@example.com  ');
@@ -53,7 +57,6 @@ describe(findPendingInviteByEmail, () => {
   });
 
   it('excludes already-consumed invites', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     await insertInvite(tenantId, 'owner@example.com', true);
 
     const results = await findPendingInviteByEmail('owner@example.com');

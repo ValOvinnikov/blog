@@ -96,61 +96,66 @@ describe(createTenantRevalidateWebhook, () => {
     );
   });
 
-  it('creates the webhook and persists the marker when none exists yet', async () => {
-    const tenant = baseTenant();
-    listSanityWebhooksMock.mockResolvedValue([]);
-    createSanityWebhookMock.mockResolvedValue({
-      id: 'hook1',
-      url: 'https://example.com/api/revalidate',
+  describe('for a tenant with a Sanity project', () => {
+    let tenant: TTenant;
+
+    beforeEach(() => {
+      tenant = baseTenant();
     });
 
-    await createTenantRevalidateWebhook(tenant, env);
+    it('creates the webhook and persists the marker when none exists yet', async () => {
+      listSanityWebhooksMock.mockResolvedValue([]);
+      createSanityWebhookMock.mockResolvedValue({
+        id: 'hook1',
+        url: 'https://example.com/api/revalidate',
+      });
 
-    expect(listSanityWebhooksMock).toHaveBeenCalledWith({
-      token: 'mgmt-token',
-      projectId: 'proj123',
-    });
-    expect(createSanityWebhookMock).toHaveBeenCalledWith({
-      token: 'mgmt-token',
-      projectId: 'proj123',
-      dataset: 'production',
-      name: expect.any(String),
-      url: 'https://example.com/api/revalidate',
-      secret: 'revalidate-shh',
-    });
-    expect(setTenantWebhookCreatedAtMock).toHaveBeenCalledWith(
-      'tenant-1',
-      expect.any(Date),
-    );
-  });
+      await createTenantRevalidateWebhook(tenant, env);
 
-  it('skips creation but still persists the marker when a matching webhook already exists', async () => {
-    const tenant = baseTenant();
-    listSanityWebhooksMock.mockResolvedValue([
-      { id: 'hook1', url: 'https://example.com/api/revalidate' },
-    ]);
-
-    await createTenantRevalidateWebhook(tenant, env);
-
-    expect(createSanityWebhookMock).not.toHaveBeenCalled();
-    expect(setTenantWebhookCreatedAtMock).toHaveBeenCalledWith(
-      'tenant-1',
-      expect.any(Date),
-    );
-  });
-
-  it('creates the webhook when existing webhooks point at different URLs', async () => {
-    const tenant = baseTenant();
-    listSanityWebhooksMock.mockResolvedValue([
-      { id: 'hook0', url: 'https://other.example.com/api/revalidate' },
-    ]);
-    createSanityWebhookMock.mockResolvedValue({
-      id: 'hook1',
-      url: 'https://example.com/api/revalidate',
+      expect(listSanityWebhooksMock).toHaveBeenCalledWith({
+        token: 'mgmt-token',
+        projectId: 'proj123',
+      });
+      expect(createSanityWebhookMock).toHaveBeenCalledWith({
+        token: 'mgmt-token',
+        projectId: 'proj123',
+        dataset: 'production',
+        name: expect.any(String),
+        url: 'https://example.com/api/revalidate',
+        secret: 'revalidate-shh',
+      });
+      expect(setTenantWebhookCreatedAtMock).toHaveBeenCalledWith(
+        'tenant-1',
+        expect.any(Date),
+      );
     });
 
-    await createTenantRevalidateWebhook(tenant, env);
+    it('skips creation but still persists the marker when a matching webhook already exists', async () => {
+      listSanityWebhooksMock.mockResolvedValue([
+        { id: 'hook1', url: 'https://example.com/api/revalidate' },
+      ]);
 
-    expect(createSanityWebhookMock).toHaveBeenCalledTimes(1);
+      await createTenantRevalidateWebhook(tenant, env);
+
+      expect(createSanityWebhookMock).not.toHaveBeenCalled();
+      expect(setTenantWebhookCreatedAtMock).toHaveBeenCalledWith(
+        'tenant-1',
+        expect.any(Date),
+      );
+    });
+
+    it('creates the webhook when existing webhooks point at different URLs', async () => {
+      listSanityWebhooksMock.mockResolvedValue([
+        { id: 'hook0', url: 'https://other.example.com/api/revalidate' },
+      ]);
+      createSanityWebhookMock.mockResolvedValue({
+        id: 'hook1',
+        url: 'https://example.com/api/revalidate',
+      });
+
+      await createTenantRevalidateWebhook(tenant, env);
+
+      expect(createSanityWebhookMock).toHaveBeenCalledTimes(1);
+    });
   });
 });

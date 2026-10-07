@@ -17,9 +17,13 @@ afterEach(async () => {
 });
 
 describe(listEmailTemplates, () => {
-  it('returns one entry per template type, even with no rows at all', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
+  let tenantId: string;
 
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
+  it('returns one entry per template type, even with no rows at all', async () => {
     const result = await listEmailTemplates(tenantId);
 
     expect(result.map((entry) => entry.templateType).sort()).toEqual(
@@ -28,7 +32,6 @@ describe(listEmailTemplates, () => {
   });
 
   it('mixes authored and default entries across template types', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     await db().insert(schema.emailTemplates).values({
       tenantId,
       templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,

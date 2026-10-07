@@ -70,9 +70,13 @@ afterEach(async () => {
 });
 
 describe(clearTenantProvisioningArtifacts, () => {
-  it('nulls every provisioning column except sanityProjectId/sanityDataset — the archived project still exists', async () => {
-    const tenantId = await insertProvisionedTenant();
+  let tenantId: string;
 
+  beforeEach(async () => {
+    tenantId = await insertProvisionedTenant();
+  });
+
+  it('nulls every provisioning column except sanityProjectId/sanityDataset — the archived project still exists', async () => {
     await clearTenantProvisioningArtifacts(tenantId);
 
     const [row] = await db()
@@ -92,8 +96,6 @@ describe(clearTenantProvisioningArtifacts, () => {
   });
 
   it('leaves identity columns untouched', async () => {
-    const tenantId = await insertProvisionedTenant();
-
     await clearTenantProvisioningArtifacts(tenantId);
 
     const [row] = await db()
@@ -108,8 +110,6 @@ describe(clearTenantProvisioningArtifacts, () => {
   });
 
   it('is safe to call again once already cleared', async () => {
-    const tenantId = await insertProvisionedTenant();
-
     await clearTenantProvisioningArtifacts(tenantId);
     await expect(
       clearTenantProvisioningArtifacts(tenantId),

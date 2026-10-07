@@ -7,19 +7,22 @@ import {
 } from '@blog/db/testing/migration-files';
 import { PGlite } from '@electric-sql/pglite';
 import { sql } from 'drizzle-orm';
-import { drizzle } from 'drizzle-orm/pglite';
+import { drizzle, type PgliteDatabase } from 'drizzle-orm/pglite';
 
 import { admins } from './admins';
 
 const BACKFILL_MIGRATION = '0007_wide_silver_samurai.sql';
 
 describe('0007_wide_silver_samurai (granted_via backfill)', () => {
+  let db: PgliteDatabase<typeof schema>;
+
+  beforeEach(() => {
+    db = drizzle(new PGlite(), { schema });
+  });
+
   it(
     'backfills a pre-existing admin row to BREAK_GLASS instead of failing NOT NULL',
     async () => {
-      const client = new PGlite();
-      const db = drizzle(client, { schema });
-
       const migrationFiles = listMigrationFiles();
       const priorMigrations = migrationFiles.filter(
         (file) => file < BACKFILL_MIGRATION,
@@ -48,9 +51,6 @@ describe('0007_wide_silver_samurai (granted_via backfill)', () => {
   it(
     'still applies cleanly against an empty admins table',
     async () => {
-      const client = new PGlite();
-      const db = drizzle(client, { schema });
-
       for (const file of listMigrationFiles()) {
         await applyMigrationFile(db, file);
       }

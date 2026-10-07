@@ -26,31 +26,36 @@ afterEach(async () => {
 });
 
 describe(finishDeprovisioningRun, () => {
-  it('merges finishedAt without clobbering startedAt/workflowRunUrl', async () => {
-    const tenant = await insertTestTenant(db());
-    await startDeprovisioningRun({
-      tenantId: tenant.id,
-      workflowRunUrl: 'https://github.com/acme/blog/actions/runs/123',
+  describe('a tenant with no run recorded', () => {
+    let tenant: Awaited<ReturnType<typeof insertTestTenant>>;
+
+    beforeEach(async () => {
+      tenant = await insertTestTenant(db());
     });
 
-    vi.setSystemTime(new Date('2026-09-02T12:05:00.000Z'));
-    const result = await finishDeprovisioningRun({ tenantId: tenant.id });
+    it('merges finishedAt without clobbering startedAt/workflowRunUrl', async () => {
+      await startDeprovisioningRun({
+        tenantId: tenant.id,
+        workflowRunUrl: 'https://github.com/acme/blog/actions/runs/123',
+      });
 
-    if (!result.ok) throw new Error('expected ok:true');
-    expect(result.data.deprovisioningSteps?.run).toEqual({
-      startedAt: NOW,
-      workflowRunUrl: 'https://github.com/acme/blog/actions/runs/123',
-      finishedAt: '2026-09-02T12:05:00.000Z',
+      vi.setSystemTime(new Date('2026-09-02T12:05:00.000Z'));
+      const result = await finishDeprovisioningRun({ tenantId: tenant.id });
+
+      if (!result.ok) throw new Error('expected ok:true');
+      expect(result.data.deprovisioningSteps?.run).toEqual({
+        startedAt: NOW,
+        workflowRunUrl: 'https://github.com/acme/blog/actions/runs/123',
+        finishedAt: '2026-09-02T12:05:00.000Z',
+      });
     });
-  });
 
-  it('sets finishedAt on an absent run rather than throwing', async () => {
-    const tenant = await insertTestTenant(db());
+    it('sets finishedAt on an absent run rather than throwing', async () => {
+      const result = await finishDeprovisioningRun({ tenantId: tenant.id });
 
-    const result = await finishDeprovisioningRun({ tenantId: tenant.id });
-
-    if (!result.ok) throw new Error('expected ok:true');
-    expect(result.data.deprovisioningSteps?.run).toEqual({ finishedAt: NOW });
+      if (!result.ok) throw new Error('expected ok:true');
+      expect(result.data.deprovisioningSteps?.run).toEqual({ finishedAt: NOW });
+    });
   });
 
   it('leaves every step entry untouched', async () => {

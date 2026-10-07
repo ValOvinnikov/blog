@@ -24,44 +24,46 @@ afterEach(async () => {
 });
 
 describe(startDeprovisioningRun, () => {
-  it('writes startedAt and workflowRunUrl when supplied', async () => {
-    const tenant = await insertTestTenant(db());
+  describe('a tenant with default steps', () => {
+    let tenant: Awaited<ReturnType<typeof insertTestTenant>>;
 
-    const result = await startDeprovisioningRun({
-      tenantId: tenant.id,
-      workflowRunUrl: 'https://github.com/acme/blog/actions/runs/123',
+    beforeEach(async () => {
+      tenant = await insertTestTenant(db());
     });
 
-    if (!result.ok) throw new Error('expected ok:true');
-    expect(result.data.deprovisioningSteps?.run).toEqual({
-      startedAt: NOW,
-      workflowRunUrl: 'https://github.com/acme/blog/actions/runs/123',
-    });
-  });
+    it('writes startedAt and workflowRunUrl when supplied', async () => {
+      const result = await startDeprovisioningRun({
+        tenantId: tenant.id,
+        workflowRunUrl: 'https://github.com/acme/blog/actions/runs/123',
+      });
 
-  it('omits workflowRunUrl entirely when not supplied', async () => {
-    const tenant = await insertTestTenant(db());
-
-    const result = await startDeprovisioningRun({ tenantId: tenant.id });
-
-    if (!result.ok) throw new Error('expected ok:true');
-    expect(result.data.deprovisioningSteps?.run).toEqual({ startedAt: NOW });
-  });
-
-  it('replaces a previous run wholesale rather than merging', async () => {
-    const tenant = await insertTestTenant(db());
-
-    await startDeprovisioningRun({
-      tenantId: tenant.id,
-      workflowRunUrl: 'https://github.com/acme/blog/actions/runs/1',
+      if (!result.ok) throw new Error('expected ok:true');
+      expect(result.data.deprovisioningSteps?.run).toEqual({
+        startedAt: NOW,
+        workflowRunUrl: 'https://github.com/acme/blog/actions/runs/123',
+      });
     });
 
-    vi.setSystemTime(new Date('2026-09-02T13:00:00.000Z'));
-    const result = await startDeprovisioningRun({ tenantId: tenant.id });
+    it('omits workflowRunUrl entirely when not supplied', async () => {
+      const result = await startDeprovisioningRun({ tenantId: tenant.id });
 
-    if (!result.ok) throw new Error('expected ok:true');
-    expect(result.data.deprovisioningSteps?.run).toEqual({
-      startedAt: '2026-09-02T13:00:00.000Z',
+      if (!result.ok) throw new Error('expected ok:true');
+      expect(result.data.deprovisioningSteps?.run).toEqual({ startedAt: NOW });
+    });
+
+    it('replaces a previous run wholesale rather than merging', async () => {
+      await startDeprovisioningRun({
+        tenantId: tenant.id,
+        workflowRunUrl: 'https://github.com/acme/blog/actions/runs/1',
+      });
+
+      vi.setSystemTime(new Date('2026-09-02T13:00:00.000Z'));
+      const result = await startDeprovisioningRun({ tenantId: tenant.id });
+
+      if (!result.ok) throw new Error('expected ok:true');
+      expect(result.data.deprovisioningSteps?.run).toEqual({
+        startedAt: '2026-09-02T13:00:00.000Z',
+      });
     });
   });
 

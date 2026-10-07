@@ -25,8 +25,13 @@ afterEach(async () => {
 });
 
 describe(resolveFinding, () => {
+  let tenantId: string;
+
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
   it('marks an open finding resolved and stamps resolvedAt', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     const opened = await openFinding({
       tenantId,
       source: FINDING_SOURCE.DOMAIN_VERIFICATION,
@@ -50,7 +55,6 @@ describe(resolveFinding, () => {
   });
 
   it('allows the same condition to reopen after being resolved', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     const input = {
       tenantId,
       source: FINDING_SOURCE.DOMAIN_VERIFICATION,
@@ -78,7 +82,6 @@ describe(resolveFinding, () => {
   });
 
   it('returns DB_NOT_FOUND when the finding is already resolved', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     const opened = await openFinding({
       tenantId,
       source: FINDING_SOURCE.DOMAIN_VERIFICATION,

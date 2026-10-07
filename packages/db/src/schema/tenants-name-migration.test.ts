@@ -6,19 +6,22 @@ import {
 } from '@blog/db/testing/migration-files';
 import { PGlite } from '@electric-sql/pglite';
 import { sql } from 'drizzle-orm';
-import { drizzle } from 'drizzle-orm/pglite';
+import { drizzle, type PgliteDatabase } from 'drizzle-orm/pglite';
 
 import { tenants } from './tenants';
 
 const BACKFILL_MIGRATION = '0009_quick_jazinda.sql';
 
 describe('0009_quick_jazinda (tenants name backfill)', () => {
+  let db: PgliteDatabase<typeof schema>;
+
+  beforeEach(() => {
+    db = drizzle(new PGlite(), { schema });
+  });
+
   it(
     'backfills pre-existing tenant rows to a title-cased version of their slug',
     async () => {
-      const client = new PGlite();
-      const db = drizzle(client, { schema });
-
       const migrationFiles = listMigrationFiles();
       const priorMigrations = migrationFiles.filter(
         (file) => file < BACKFILL_MIGRATION,
@@ -68,9 +71,6 @@ describe('0009_quick_jazinda (tenants name backfill)', () => {
   it(
     'still applies cleanly against an empty tenants table',
     async () => {
-      const client = new PGlite();
-      const db = drizzle(client, { schema });
-
       for (const file of listMigrationFiles()) {
         await applyMigrationFile(db, file);
       }

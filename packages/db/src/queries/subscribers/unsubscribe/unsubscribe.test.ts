@@ -24,9 +24,15 @@ async function insertUser(
 }
 
 describe(unsubscribe, () => {
+  let user: Awaited<ReturnType<typeof insertUser>>;
+  let tenantId: string;
+
+  beforeEach(async () => {
+    user = await insertUser();
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
   it('deletes the subscriber row matching the account email', async () => {
-    const user = await insertUser();
-    const { id: tenantId } = await insertTestTenant(db());
     await db()
       .insert(schema.subscribers)
       .values({ tenantId, email: 'reader@example.com' });
@@ -46,14 +52,10 @@ describe(unsubscribe, () => {
   });
 
   it('is a no-op when no subscriber row matches the account email', async () => {
-    const user = await insertUser();
-    const { id: tenantId } = await insertTestTenant(db());
-
     await expect(unsubscribe(tenantId, user.id)).resolves.toBeUndefined();
   });
 
   it('is a no-op for an unrecognized userId', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     await db()
       .insert(schema.subscribers)
       .values({ tenantId, email: 'reader@example.com' });
@@ -69,7 +71,6 @@ describe(unsubscribe, () => {
 
   it('is a no-op when the user has no email on file', async () => {
     const user = await insertUser({ email: null });
-    const { id: tenantId } = await insertTestTenant(db());
     await db()
       .insert(schema.subscribers)
       .values({ tenantId, email: 'reader@example.com' });
@@ -84,8 +85,6 @@ describe(unsubscribe, () => {
   });
 
   it("does not remove another user's subscriber row", async () => {
-    const { id: tenantId } = await insertTestTenant(db());
-    const user = await insertUser({ email: 'reader@example.com' });
     await db()
       .insert(schema.subscribers)
       .values({ tenantId, email: 'reader@example.com' });
@@ -103,7 +102,6 @@ describe(unsubscribe, () => {
   });
 
   it("does not remove another tenant's subscriber row for the same email", async () => {
-    const user = await insertUser();
     const { id: tenantOneId } = await insertTestTenant(db());
     const { id: tenantTwoId } = await insertTestTenant(db());
     await db()

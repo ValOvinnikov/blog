@@ -16,16 +16,19 @@ afterEach(async () => {
 });
 
 describe(getEmailConfig, () => {
-  it('returns undefined when the tenant has no email config row', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
+  let tenantId: string;
 
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
+  it('returns undefined when the tenant has no email config row', async () => {
     const result = await getEmailConfig(tenantId);
 
     expect(result).toBeUndefined();
   });
 
   it('maps null columns to undefined', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     await db().insert(schema.emailConfig).values({ tenantId });
 
     const result = await getEmailConfig(tenantId);
@@ -40,7 +43,6 @@ describe(getEmailConfig, () => {
   });
 
   it('returns every set field', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     await db().insert(schema.emailConfig).values({
       tenantId,
       logoAssetUrl: 'https://blob.example.com/email-logo.png',

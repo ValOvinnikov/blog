@@ -23,9 +23,15 @@ async function insertUser(
 }
 
 describe(resendConfirmation, () => {
+  let user: Awaited<ReturnType<typeof insertUser>>;
+  let tenantId: string;
+
+  beforeEach(async () => {
+    user = await insertUser();
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
   it('returns the existing confirmation token for a pending subscriber', async () => {
-    const user = await insertUser();
-    const { id: tenantId } = await insertTestTenant(db());
     const [subscriber] = await db()
       .insert(schema.subscribers)
       .values({ tenantId, email: 'reader@example.com' })
@@ -42,8 +48,6 @@ describe(resendConfirmation, () => {
   });
 
   it('does not rotate the token across repeated calls', async () => {
-    const user = await insertUser();
-    const { id: tenantId } = await insertTestTenant(db());
     await db()
       .insert(schema.subscribers)
       .values({ tenantId, email: 'reader@example.com' });
@@ -55,8 +59,6 @@ describe(resendConfirmation, () => {
   });
 
   it('returns not-pending for an already-active subscriber', async () => {
-    const user = await insertUser();
-    const { id: tenantId } = await insertTestTenant(db());
     await db()
       .insert(schema.subscribers)
       .values({ tenantId, email: 'reader@example.com', status: 'active' });
@@ -67,17 +69,12 @@ describe(resendConfirmation, () => {
   });
 
   it('returns not-pending when no subscriber row matches the account email', async () => {
-    const user = await insertUser();
-    const { id: tenantId } = await insertTestTenant(db());
-
     const result = await resendConfirmation(tenantId, user.id);
 
     expect(result).toEqual({ outcome: 'not-pending' });
   });
 
   it('returns not-pending for an unrecognized userId', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
-
     const result = await resendConfirmation(tenantId, 'does-not-exist');
 
     expect(result).toEqual({ outcome: 'not-pending' });
@@ -85,7 +82,6 @@ describe(resendConfirmation, () => {
 
   it('returns not-pending when the user has no email on file', async () => {
     const user = await insertUser({ email: null });
-    const { id: tenantId } = await insertTestTenant(db());
 
     const result = await resendConfirmation(tenantId, user.id);
 
@@ -93,7 +89,6 @@ describe(resendConfirmation, () => {
   });
 
   it('returns not-pending when the subscriber row belongs to a different tenant', async () => {
-    const user = await insertUser();
     const { id: tenantOneId } = await insertTestTenant(db());
     const { id: tenantTwoId } = await insertTestTenant(db());
     await db()

@@ -46,16 +46,48 @@ afterEach(async () => {
 });
 
 describe(beginTenantProvisioning, () => {
-  it('moves a tenant with no provisioningStatus (NULL) to PROVISIONING', async () => {
-    const tenantId = await insertTenant();
+  describe('a tenant with no provisioningStatus', () => {
+    let tenantId: string;
 
-    const result = await beginTenantProvisioning(tenantId);
+    beforeEach(async () => {
+      tenantId = await insertTenant();
+    });
 
-    if (!result.ok) throw new Error('expected ok:true');
-    expect(result.data.tenant.provisioningStatus).toBe(
-      TENANT_PROVISIONING_STATUS.PROVISIONING,
-    );
-    expect(result.data.previousProvisioningStatus).toBeNull();
+    it('moves a tenant with no provisioningStatus (NULL) to PROVISIONING', async () => {
+      const result = await beginTenantProvisioning(tenantId);
+
+      if (!result.ok) throw new Error('expected ok:true');
+      expect(result.data.tenant.provisioningStatus).toBe(
+        TENANT_PROVISIONING_STATUS.PROVISIONING,
+      );
+      expect(result.data.previousProvisioningStatus).toBeNull();
+    });
+
+    it('resolves exactly one of two concurrent calls with ok:true', async () => {
+      const [first, second] = await Promise.all([
+        beginTenantProvisioning(tenantId),
+        beginTenantProvisioning(tenantId),
+      ]);
+
+      const outcomes = [first, second];
+      const succeeded = outcomes.filter((result) => result.ok);
+      const refused = outcomes.filter((result) => !result.ok);
+
+      expect(succeeded).toHaveLength(1);
+      expect(refused).toHaveLength(1);
+      expect(refused[0]).toEqual({
+        ok: false,
+        error: ERROR_CODE.DB_ALREADY_PROVISIONING,
+      });
+
+      const [row] = await db()
+        .select()
+        .from(tenants)
+        .where(eq(tenants.id, tenantId));
+      expect(row?.provisioningStatus).toBe(
+        TENANT_PROVISIONING_STATUS.PROVISIONING,
+      );
+    });
   });
 
   it('moves a PENDING tenant to PROVISIONING and reports the prior status', async () => {
@@ -108,73 +140,6 @@ describe(beginTenantProvisioning, () => {
       .where(eq(tenants.id, tenantId));
     expect(row?.provisioningStatus).toBe(
       TENANT_PROVISIONING_STATUS.PROVISIONING,
-    );
-  });
-
-  it('resolves exactly one of two concurrent calls with ok:true', async () => {
-    const tenantId = await insertTenant();
-
-    const [first, second] = await Promise.all([
-      beginTenantProvisioning(tenantId),
-      beginTenantProvisioning(tenantId),
-    ]);
-
-    const outcomes = [first, second];
-    const succeeded = outcomes.filter((result) => result.ok);
-    const refused = outcomes.filter((result) => !result.ok);
-
-    expect(succeeded).toHaveLength(1);
-    expect(refused).toHaveLength(1);
-    expect(refused[0]).toEqual({
-      ok: false,
-      error: ERROR_CODE.DB_ALREADY_PROVISIONING,
-    });
-
-    const [row] = await db()
-      .select()
-      .from(tenants)
-      .where(eq(tenants.id, tenantId));
-    expect(row?.provisioningStatus).toBe(
-      TENANT_PROVISIONING_STATUS.PROVISIONING,
-    );
-  });
-
-  it('admits a PROVISIONING tenant wedged with a FAILED step whose updatedAt matches run.startedAt, preserving the step error text', async () => {
-    const provisioningSteps: TTenantProvisioningState = {
-      SANITY_PROJECT: { status: 'DONE' },
-      SEED_CONTENT: {
-        status: 'FAILED',
-        error: 'boom',
-        updatedAt: WEDGED_STARTED_AT,
-      },
-      PERSIST_TOKEN: { status: 'IDLE' },
-      MAP_DOMAIN: { status: 'IDLE' },
-      CREATE_WEBHOOK: { status: 'IDLE' },
-      VERIFY_CONTENT: { status: 'IDLE' },
-      OWNER_ELEVATION: { status: 'IDLE' },
-      run: { startedAt: WEDGED_STARTED_AT },
-    };
-    const tenant = await insertTestTenant(db(), {
-      provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-      provisioningSteps,
-    });
-
-    const result = await beginTenantProvisioning(tenant.id);
-
-    if (!result.ok) throw new Error('expected ok:true');
-    expect(result.data.tenant.provisioningStatus).toBe(
-      TENANT_PROVISIONING_STATUS.PROVISIONING,
-    );
-    expect(result.data.previousProvisioningStatus).toBe(
-      TENANT_PROVISIONING_STATUS.PROVISIONING,
-    );
-    expect(result.data.tenant.provisioningSteps?.SEED_CONTENT).toEqual({
-      status: 'FAILED',
-      error: 'boom',
-      updatedAt: WEDGED_STARTED_AT,
-    });
-    expect(result.data.tenant.provisioningSteps?.run?.startedAt).toBe(
-      WEDGED_STARTED_AT,
     );
   });
 
@@ -303,114 +268,121 @@ describe(beginTenantProvisioning, () => {
     );
   });
 
-  it('refuses immediately after a reverted dispatch failure, then admits again once the debounce has elapsed, preserving the FAILED step', async () => {
-    const provisioningSteps: TTenantProvisioningState = {
-      SANITY_PROJECT: { status: 'DONE' },
-      SEED_CONTENT: {
+  describe('a PROVISIONING tenant wedged with a FAILED step', () => {
+    let tenant: Awaited<ReturnType<typeof insertTestTenant>>;
+
+    beforeEach(async () => {
+      const provisioningSteps: TTenantProvisioningState = {
+        SANITY_PROJECT: { status: 'DONE' },
+        SEED_CONTENT: {
+          status: 'FAILED',
+          error: 'boom',
+          updatedAt: WEDGED_STARTED_AT,
+        },
+        PERSIST_TOKEN: { status: 'IDLE' },
+        MAP_DOMAIN: { status: 'IDLE' },
+        CREATE_WEBHOOK: { status: 'IDLE' },
+        VERIFY_CONTENT: { status: 'IDLE' },
+        OWNER_ELEVATION: { status: 'IDLE' },
+        run: { startedAt: WEDGED_STARTED_AT },
+      };
+      tenant = await insertTestTenant(db(), {
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+        provisioningSteps,
+      });
+    });
+
+    it('admits a PROVISIONING tenant wedged with a FAILED step whose updatedAt matches run.startedAt, preserving the step error text', async () => {
+      const result = await beginTenantProvisioning(tenant.id);
+
+      if (!result.ok) throw new Error('expected ok:true');
+      expect(result.data.tenant.provisioningStatus).toBe(
+        TENANT_PROVISIONING_STATUS.PROVISIONING,
+      );
+      expect(result.data.previousProvisioningStatus).toBe(
+        TENANT_PROVISIONING_STATUS.PROVISIONING,
+      );
+      expect(result.data.tenant.provisioningSteps?.SEED_CONTENT).toEqual({
         status: 'FAILED',
         error: 'boom',
         updatedAt: WEDGED_STARTED_AT,
-      },
-      PERSIST_TOKEN: { status: 'IDLE' },
-      MAP_DOMAIN: { status: 'IDLE' },
-      CREATE_WEBHOOK: { status: 'IDLE' },
-      VERIFY_CONTENT: { status: 'IDLE' },
-      OWNER_ELEVATION: { status: 'IDLE' },
-      run: { startedAt: WEDGED_STARTED_AT },
-    };
-    const tenant = await insertTestTenant(db(), {
-      provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-      provisioningSteps,
+      });
+      expect(result.data.tenant.provisioningSteps?.run?.startedAt).toBe(
+        WEDGED_STARTED_AT,
+      );
     });
 
-    const firstAttempt = await beginTenantProvisioning(tenant.id);
-    if (!firstAttempt.ok) throw new Error('expected ok:true');
+    it('refuses immediately after a reverted dispatch failure, then admits again once the debounce has elapsed, preserving the FAILED step', async () => {
+      const firstAttempt = await beginTenantProvisioning(tenant.id);
+      if (!firstAttempt.ok) throw new Error('expected ok:true');
 
-    const reverted = await setTenantProvisioningStatus(
-      tenant.id,
-      firstAttempt.data.previousProvisioningStatus,
-    );
-    if (!reverted.ok) throw new Error('expected revert ok:true');
+      const reverted = await setTenantProvisioningStatus(
+        tenant.id,
+        firstAttempt.data.previousProvisioningStatus,
+      );
+      if (!reverted.ok) throw new Error('expected revert ok:true');
 
-    const immediateRetry = await beginTenantProvisioning(tenant.id);
-    expect(immediateRetry).toEqual({
-      ok: false,
-      error: ERROR_CODE.DB_ALREADY_PROVISIONING,
-    });
+      const immediateRetry = await beginTenantProvisioning(tenant.id);
+      expect(immediateRetry).toEqual({
+        ok: false,
+        error: ERROR_CODE.DB_ALREADY_PROVISIONING,
+      });
 
-    const debouncedAdmittedAt = minutesAgo(
-      TENANT_PROVISIONING_RETRY_DEBOUNCE_MINUTES + 1,
-    );
-    await db()
-      .update(tenants)
-      .set({
-        provisioningSteps: sql`jsonb_set(
-          ${tenants.provisioningSteps},
-          array['run','admittedAt']::text[],
-          ${JSON.stringify(debouncedAdmittedAt)}::jsonb
-        )`,
-      })
-      .where(eq(tenants.id, tenant.id));
+      const debouncedAdmittedAt = minutesAgo(
+        TENANT_PROVISIONING_RETRY_DEBOUNCE_MINUTES + 1,
+      );
+      await db()
+        .update(tenants)
+        .set({
+          provisioningSteps: sql`jsonb_set(
+            ${tenants.provisioningSteps},
+            array['run','admittedAt']::text[],
+            ${JSON.stringify(debouncedAdmittedAt)}::jsonb
+          )`,
+        })
+        .where(eq(tenants.id, tenant.id));
 
-    const delayedRetry = await beginTenantProvisioning(tenant.id);
+      const delayedRetry = await beginTenantProvisioning(tenant.id);
 
-    if (!delayedRetry.ok) throw new Error('expected ok:true');
-    expect(delayedRetry.data.tenant.provisioningStatus).toBe(
-      TENANT_PROVISIONING_STATUS.PROVISIONING,
-    );
-    expect(delayedRetry.data.tenant.provisioningSteps?.SEED_CONTENT).toEqual({
-      status: 'FAILED',
-      error: 'boom',
-      updatedAt: WEDGED_STARTED_AT,
-    });
-    expect(delayedRetry.data.tenant.provisioningSteps?.run?.startedAt).toBe(
-      WEDGED_STARTED_AT,
-    );
-  });
-
-  it('resolves exactly one of two near-simultaneous calls on a wedged tenant', async () => {
-    const provisioningSteps: TTenantProvisioningState = {
-      SANITY_PROJECT: { status: 'DONE' },
-      SEED_CONTENT: {
+      if (!delayedRetry.ok) throw new Error('expected ok:true');
+      expect(delayedRetry.data.tenant.provisioningStatus).toBe(
+        TENANT_PROVISIONING_STATUS.PROVISIONING,
+      );
+      expect(delayedRetry.data.tenant.provisioningSteps?.SEED_CONTENT).toEqual({
         status: 'FAILED',
         error: 'boom',
         updatedAt: WEDGED_STARTED_AT,
-      },
-      PERSIST_TOKEN: { status: 'IDLE' },
-      MAP_DOMAIN: { status: 'IDLE' },
-      CREATE_WEBHOOK: { status: 'IDLE' },
-      VERIFY_CONTENT: { status: 'IDLE' },
-      OWNER_ELEVATION: { status: 'IDLE' },
-      run: { startedAt: WEDGED_STARTED_AT },
-    };
-    const tenant = await insertTestTenant(db(), {
-      provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-      provisioningSteps,
+      });
+      expect(delayedRetry.data.tenant.provisioningSteps?.run?.startedAt).toBe(
+        WEDGED_STARTED_AT,
+      );
     });
 
-    const [first, second] = await Promise.all([
-      beginTenantProvisioning(tenant.id),
-      beginTenantProvisioning(tenant.id),
-    ]);
+    it('resolves exactly one of two near-simultaneous calls on a wedged tenant', async () => {
+      const [first, second] = await Promise.all([
+        beginTenantProvisioning(tenant.id),
+        beginTenantProvisioning(tenant.id),
+      ]);
 
-    const outcomes = [first, second];
-    const succeeded = outcomes.filter((result) => result.ok);
-    const refused = outcomes.filter((result) => !result.ok);
+      const outcomes = [first, second];
+      const succeeded = outcomes.filter((result) => result.ok);
+      const refused = outcomes.filter((result) => !result.ok);
 
-    expect(succeeded).toHaveLength(1);
-    expect(refused).toHaveLength(1);
-    expect(refused[0]).toEqual({
-      ok: false,
-      error: ERROR_CODE.DB_ALREADY_PROVISIONING,
+      expect(succeeded).toHaveLength(1);
+      expect(refused).toHaveLength(1);
+      expect(refused[0]).toEqual({
+        ok: false,
+        error: ERROR_CODE.DB_ALREADY_PROVISIONING,
+      });
+
+      const [row] = await db()
+        .select()
+        .from(tenants)
+        .where(eq(tenants.id, tenant.id));
+      expect(row?.provisioningStatus).toBe(
+        TENANT_PROVISIONING_STATUS.PROVISIONING,
+      );
     });
-
-    const [row] = await db()
-      .select()
-      .from(tenants)
-      .where(eq(tenants.id, tenant.id));
-    expect(row?.provisioningStatus).toBe(
-      TENANT_PROVISIONING_STATUS.PROVISIONING,
-    );
   });
 
   it('returns DB_NOT_FOUND for a tenant id that does not exist', async () => {

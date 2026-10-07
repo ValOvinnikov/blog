@@ -16,10 +16,15 @@ afterEach(async () => {
 });
 
 describe(getTenantByDomain, () => {
-  it('resolves the owning tenant via a tenant_domains row', async () => {
-    const { id: tenantId } = await insertTestTenant(db(), {
+  let tenantId: string;
+
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db(), {
       primaryDomain: 'acme.example.com',
-    });
+    }));
+  });
+
+  it('resolves the owning tenant via a tenant_domains row', async () => {
     await db()
       .insert(schema.tenantDomains)
       .values({ tenantId, domain: 'acme.example.com' });
@@ -36,9 +41,6 @@ describe(getTenantByDomain, () => {
   });
 
   it('does not cross-match a domain belonging to a different tenant', async () => {
-    const { id: tenantId } = await insertTestTenant(db(), {
-      primaryDomain: 'acme.example.com',
-    });
     const { id: otherTenantId } = await insertTestTenant(db(), {
       primaryDomain: 'other.example.com',
     });

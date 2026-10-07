@@ -36,51 +36,45 @@ describe(getTenantById, () => {
     expect(result).toMatchObject({ id: inserted.id, name: 'Acme' });
   });
 
+  describe('a deprovisioned tenant', () => {
+    let inserted: typeof schema.tenants.$inferSelect;
+
+    beforeEach(async () => {
+      const [row] = await db()
+        .insert(schema.tenants)
+        .values({
+          name: 'Acme',
+          primaryDomain: 'acme.example.com',
+          sanityProjectId: 'abc123',
+          sanityDataset: 'production',
+          locale: LOCALE_ISO_CODES.EN,
+          plan: TENANT_PLAN.FREE,
+          status: TENANT_STATUS.ARCHIVED,
+          deprovisionedAt: new Date(),
+        })
+        .returning();
+      if (!row) throw new Error('setup: tenant insert returned no row.');
+      inserted = row;
+    });
+
+    it('excludes a deprovisioned tenant by default', async () => {
+      const result = await getTenantById(inserted.id);
+
+      expect(result).toBeUndefined();
+    });
+
+    it('returns a deprovisioned tenant when includeArchived is true', async () => {
+      const result = await getTenantById(inserted.id, {
+        includeArchived: true,
+      });
+
+      expect(result).toMatchObject({ id: inserted.id, name: 'Acme' });
+    });
+  });
+
   it('returns undefined for an id with no row', async () => {
     const result = await getTenantById('00000000-0000-0000-0000-000000000000');
 
     expect(result).toBeUndefined();
-  });
-
-  it('excludes a deprovisioned tenant by default', async () => {
-    const [inserted] = await db()
-      .insert(schema.tenants)
-      .values({
-        name: 'Acme',
-        primaryDomain: 'acme.example.com',
-        sanityProjectId: 'abc123',
-        sanityDataset: 'production',
-        locale: LOCALE_ISO_CODES.EN,
-        plan: TENANT_PLAN.FREE,
-        status: TENANT_STATUS.ARCHIVED,
-        deprovisionedAt: new Date(),
-      })
-      .returning();
-    if (!inserted) throw new Error('setup: tenant insert returned no row.');
-
-    const result = await getTenantById(inserted.id);
-
-    expect(result).toBeUndefined();
-  });
-
-  it('returns a deprovisioned tenant when includeArchived is true', async () => {
-    const [inserted] = await db()
-      .insert(schema.tenants)
-      .values({
-        name: 'Acme',
-        primaryDomain: 'acme.example.com',
-        sanityProjectId: 'abc123',
-        sanityDataset: 'production',
-        locale: LOCALE_ISO_CODES.EN,
-        plan: TENANT_PLAN.FREE,
-        status: TENANT_STATUS.ARCHIVED,
-        deprovisionedAt: new Date(),
-      })
-      .returning();
-    if (!inserted) throw new Error('setup: tenant insert returned no row.');
-
-    const result = await getTenantById(inserted.id, { includeArchived: true });
-
-    expect(result).toMatchObject({ id: inserted.id, name: 'Acme' });
   });
 });

@@ -32,9 +32,14 @@ afterEach(async () => {
 });
 
 describe(consumeMembershipInvite, () => {
-  it('inserts the real membership row and stamps consumedAt', async () => {
+  let tenantId: string;
+
+  beforeEach(async () => {
     await insertTestUser(db(), { id: 'user-1' });
-    const { id: tenantId } = await insertTestTenant(db());
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
+  it('inserts the real membership row and stamps consumedAt', async () => {
     const inviteId = await insertInvite(
       tenantId,
       'owner@example.com',
@@ -57,8 +62,6 @@ describe(consumeMembershipInvite, () => {
   });
 
   it('is idempotent for an already-consumed invite: no-op, returns undefined', async () => {
-    await insertTestUser(db(), { id: 'user-1' });
-    const { id: tenantId } = await insertTestTenant(db());
     const inviteId = await insertInvite(tenantId, 'owner@example.com');
     await consumeMembershipInvite(inviteId, 'user-1');
 
@@ -70,8 +73,6 @@ describe(consumeMembershipInvite, () => {
   });
 
   it('returns undefined for an invite id that does not exist', async () => {
-    await insertTestUser(db(), { id: 'user-1' });
-
     const result = await consumeMembershipInvite(
       '00000000-0000-0000-0000-000000000000',
       'user-1',
@@ -81,7 +82,6 @@ describe(consumeMembershipInvite, () => {
   });
 
   it('rolls back the claim when the dependent membership insert fails, leaving the invite pending and retryable', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     const inviteId = await insertInvite(tenantId, 'owner@example.com');
 
     await expect(
@@ -100,8 +100,6 @@ describe(consumeMembershipInvite, () => {
   });
 
   it('returns the existing membership without erroring when one already exists for the (userId, tenantId) pair', async () => {
-    await insertTestUser(db(), { id: 'user-1' });
-    const { id: tenantId } = await insertTestTenant(db());
     const [existingMembership] = await db()
       .insert(schema.memberships)
       .values({ userId: 'user-1', tenantId, role: MEMBERSHIP_ROLE.READER })

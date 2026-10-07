@@ -69,18 +69,6 @@ async function readBookmarkPostIds(
 
 describe(`${REWRITE_MIGRATION} (bookmarks.post_id page_post prefix rewrite)`, () => {
   it(
-    'prefixes a bare post id with page_post-',
-    async () => {
-      const { db } = await setUpDbWithBookmark('welcome');
-
-      await applyRewriteMigration(db);
-
-      expect(await readBookmarkPostIds(db)).toEqual(['page_post-welcome']);
-    },
-    MIGRATION_REPLAY_TEST_TIMEOUT_MS,
-  );
-
-  it(
     'leaves an already-prefixed post id untouched',
     async () => {
       const { db } = await setUpDbWithBookmark('page_post-welcome');
@@ -88,23 +76,6 @@ describe(`${REWRITE_MIGRATION} (bookmarks.post_id page_post prefix rewrite)`, ()
       await applyRewriteMigration(db);
 
       expect(await readBookmarkPostIds(db)).toEqual(['page_post-welcome']);
-    },
-    MIGRATION_REPLAY_TEST_TIMEOUT_MS,
-  );
-
-  it(
-    'is idempotent: applying it a second time changes nothing',
-    async () => {
-      const { db } = await setUpDbWithBookmark('welcome');
-
-      await applyRewriteMigration(db);
-      const afterFirstRun = await readBookmarkPostIds(db);
-
-      await applyMigrationFile(db, REWRITE_MIGRATION);
-      const afterSecondRun = await readBookmarkPostIds(db);
-
-      expect(afterSecondRun).toEqual(afterFirstRun);
-      expect(afterSecondRun).toEqual(['page_post-welcome']);
     },
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,
   );
@@ -125,4 +96,37 @@ describe(`${REWRITE_MIGRATION} (bookmarks.post_id page_post prefix rewrite)`, ()
     },
     MIGRATION_REPLAY_TEST_TIMEOUT_MS,
   );
+
+  describe('with a bare post id bookmark', () => {
+    let db: Awaited<ReturnType<typeof setUpDbWithBookmark>>['db'];
+
+    beforeEach(async () => {
+      ({ db } = await setUpDbWithBookmark('welcome'));
+    });
+
+    it(
+      'prefixes a bare post id with page_post-',
+      async () => {
+        await applyRewriteMigration(db);
+
+        expect(await readBookmarkPostIds(db)).toEqual(['page_post-welcome']);
+      },
+      MIGRATION_REPLAY_TEST_TIMEOUT_MS,
+    );
+
+    it(
+      'is idempotent: applying it a second time changes nothing',
+      async () => {
+        await applyRewriteMigration(db);
+        const afterFirstRun = await readBookmarkPostIds(db);
+
+        await applyMigrationFile(db, REWRITE_MIGRATION);
+        const afterSecondRun = await readBookmarkPostIds(db);
+
+        expect(afterSecondRun).toEqual(afterFirstRun);
+        expect(afterSecondRun).toEqual(['page_post-welcome']);
+      },
+      MIGRATION_REPLAY_TEST_TIMEOUT_MS,
+    );
+  });
 });

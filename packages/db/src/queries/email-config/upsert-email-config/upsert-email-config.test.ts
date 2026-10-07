@@ -16,9 +16,13 @@ afterEach(async () => {
 });
 
 describe(upsertEmailConfig, () => {
-  it('inserts a new row when the tenant has no email config yet', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
+  let tenantId: string;
 
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
+  it('inserts a new row when the tenant has no email config yet', async () => {
     const result = await upsertEmailConfig(tenantId, {
       senderName: 'Acme Weekly',
       replyToAddress: 'support@example.com',
@@ -34,7 +38,6 @@ describe(upsertEmailConfig, () => {
   });
 
   it('updates the existing row in place rather than inserting a second one', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     await upsertEmailConfig(tenantId, { senderName: 'Acme Weekly' });
 
     const result = await upsertEmailConfig(tenantId, {
@@ -47,8 +50,6 @@ describe(upsertEmailConfig, () => {
   });
 
   it('rejects a malformed reply-to address', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
-
     await expect(
       upsertEmailConfig(tenantId, { replyToAddress: 'not-an-email' }),
     ).rejects.toThrow();
@@ -64,8 +65,13 @@ describe(upsertEmailConfig, () => {
 });
 
 describe('partial updates — omission leaves a field untouched, explicit null clears it', () => {
+  let tenantId: string;
+
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
   it('preserves footerPostalAddress when a later update omits the field', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     await upsertEmailConfig(tenantId, {
       footerPostalAddress: '123 Main St, Springfield',
     });
@@ -78,7 +84,6 @@ describe('partial updates — omission leaves a field untouched, explicit null c
   });
 
   it('clears footerPostalAddress when explicitly set to null', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     await upsertEmailConfig(tenantId, {
       footerPostalAddress: '123 Main St, Springfield',
     });

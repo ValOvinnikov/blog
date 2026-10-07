@@ -20,9 +20,14 @@ afterEach(async () => {
 });
 
 describe(removeBookmark, () => {
-  it('deletes an existing bookmark', async () => {
+  let tenantId: string;
+
+  beforeEach(async () => {
     await insertTestUser(db(), { id: 'user-1' });
-    const { id: tenantId } = await insertTestTenant(db());
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
+  it('deletes an existing bookmark', async () => {
     await addBookmark(tenantId, 'user-1', 'post-1');
 
     await removeBookmark(tenantId, 'user-1', 'post-1');
@@ -31,18 +36,13 @@ describe(removeBookmark, () => {
   });
 
   it('is a no-op when the bookmark does not exist', async () => {
-    await insertTestUser(db(), { id: 'user-1' });
-    const { id: tenantId } = await insertTestTenant(db());
-
     await expect(
       removeBookmark(tenantId, 'user-1', 'post-1'),
     ).resolves.toBeUndefined();
   });
 
   it("does not remove another user's bookmark for the same post", async () => {
-    await insertTestUser(db(), { id: 'user-1' });
     await insertTestUser(db(), { id: 'user-2' });
-    const { id: tenantId } = await insertTestTenant(db());
     await addBookmark(tenantId, 'user-1', 'post-1');
     await addBookmark(tenantId, 'user-2', 'post-1');
 
@@ -52,7 +52,6 @@ describe(removeBookmark, () => {
   });
 
   it("does not remove another tenant's bookmark for the same user and post", async () => {
-    await insertTestUser(db(), { id: 'user-1' });
     const { id: tenantOneId } = await insertTestTenant(db());
     const { id: tenantTwoId } = await insertTestTenant(db());
     await addBookmark(tenantOneId, 'user-1', 'post-1');

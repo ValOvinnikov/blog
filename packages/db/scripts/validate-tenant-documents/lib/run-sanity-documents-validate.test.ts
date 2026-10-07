@@ -11,19 +11,15 @@ const params = {
 };
 
 beforeEach(() => {
-  execFileSyncMock.mockReset();
+  execFileSyncMock.mockReset().mockReturnValue('[]');
 });
 
 describe(validateTenantDocuments, () => {
   it('parses the JSON array printed on a clean exit', () => {
-    execFileSyncMock.mockReturnValue('[]');
-
     expect(validateTenantDocuments(params)).toEqual([]);
   });
 
   it('overrides the per-tenant Sanity env vars for the CLI invocation', () => {
-    execFileSyncMock.mockReturnValue('[]');
-
     validateTenantDocuments(params);
 
     expect(execFileSyncMock).toHaveBeenCalledWith(

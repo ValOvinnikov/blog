@@ -43,18 +43,105 @@ afterEach(async () => {
 });
 
 describe(deleteTenant, () => {
-  it('deletes an archived tenant row', async () => {
-    const tenantId = await insertTenant({ archived: true });
+  describe('an archived tenant', () => {
+    let tenantId: string;
 
-    const result = await deleteTenant(tenantId);
+    beforeEach(async () => {
+      tenantId = await insertTenant({ archived: true });
+    });
 
-    expect(result).toEqual({ outcome: 'deleted', sanityProject: 'no-project' });
+    it('deletes an archived tenant row', async () => {
+      const result = await deleteTenant(tenantId);
 
-    const remaining = await db()
-      .select()
-      .from(tenants)
-      .where(eq(tenants.id, tenantId));
-    expect(remaining).toEqual([]);
+      expect(result).toEqual({
+        outcome: 'deleted',
+        sanityProject: 'no-project',
+      });
+
+      const remaining = await db()
+        .select()
+        .from(tenants)
+        .where(eq(tenants.id, tenantId));
+      expect(remaining).toEqual([]);
+    });
+
+    describe('with a user', () => {
+      beforeEach(async () => {
+        await db().insert(schema.users).values({ id: 'user-1' });
+      });
+
+      it('cascades to dependent membership and tenant_domains rows for that tenant', async () => {
+        await db().insert(schema.memberships).values({
+          userId: 'user-1',
+          tenantId,
+          role: MEMBERSHIP_ROLE.OWNER,
+        });
+        await db().insert(schema.tenantDomains).values({
+          tenantId,
+          domain: 'acme.example.com',
+        });
+
+        await deleteTenant(tenantId);
+
+        const remainingMemberships = await db()
+          .select()
+          .from(schema.memberships)
+          .where(eq(schema.memberships.tenantId, tenantId));
+        expect(remainingMemberships).toEqual([]);
+
+        const remainingDomains = await db()
+          .select()
+          .from(schema.tenantDomains)
+          .where(eq(schema.tenantDomains.tenantId, tenantId));
+        expect(remainingDomains).toEqual([]);
+      });
+
+      it('cascades to dependent subscriber and bookmark rows for that tenant', async () => {
+        await db().insert(schema.subscribers).values({
+          tenantId,
+          email: 'reader@example.com',
+        });
+        await db().insert(schema.bookmarks).values({
+          tenantId,
+          userId: 'user-1',
+          postId: 'post-1',
+        });
+
+        await deleteTenant(tenantId);
+
+        const remainingSubscribers = await db()
+          .select()
+          .from(schema.subscribers)
+          .where(eq(schema.subscribers.tenantId, tenantId));
+        expect(remainingSubscribers).toEqual([]);
+
+        const remainingBookmarks = await db()
+          .select()
+          .from(schema.bookmarks)
+          .where(eq(schema.bookmarks.tenantId, tenantId));
+        expect(remainingBookmarks).toEqual([]);
+      });
+    });
+
+    it('cascades to a dependent site_config row for that tenant', async () => {
+      await db().insert(schema.siteConfig).values({
+        tenantId,
+        preset: PRESET_ID.CONSOLE,
+        accentHue: 250,
+        headingFont: 'SPACE_GROTESK',
+        bodyFont: 'NEWSREADER',
+        radiusScale: 'MD',
+        density: 'DEFAULT',
+      });
+
+      await deleteTenant(tenantId);
+
+      const remainingSiteConfig = await db()
+        .select()
+        .from(schema.siteConfig)
+        .where(eq(schema.siteConfig.tenantId, tenantId));
+      expect(remainingSiteConfig).toEqual([]);
+    });
   });
 
   it('refuses to delete a tenant that is not archived, and the row survives', async () => {
@@ -78,83 +165,6 @@ describe(deleteTenant, () => {
 
     expect(result).toEqual({ outcome: 'not-found' });
   });
-
-  it('cascades to dependent membership and tenant_domains rows for that tenant', async () => {
-    const tenantId = await insertTenant({ archived: true });
-    await db().insert(schema.users).values({ id: 'user-1' });
-    await db().insert(schema.memberships).values({
-      userId: 'user-1',
-      tenantId,
-      role: MEMBERSHIP_ROLE.OWNER,
-    });
-    await db().insert(schema.tenantDomains).values({
-      tenantId,
-      domain: 'acme.example.com',
-    });
-
-    await deleteTenant(tenantId);
-
-    const remainingMemberships = await db()
-      .select()
-      .from(schema.memberships)
-      .where(eq(schema.memberships.tenantId, tenantId));
-    expect(remainingMemberships).toEqual([]);
-
-    const remainingDomains = await db()
-      .select()
-      .from(schema.tenantDomains)
-      .where(eq(schema.tenantDomains.tenantId, tenantId));
-    expect(remainingDomains).toEqual([]);
-  });
-
-  it('cascades to a dependent site_config row for that tenant', async () => {
-    const tenantId = await insertTenant({ archived: true });
-    await db().insert(schema.siteConfig).values({
-      tenantId,
-      preset: PRESET_ID.CONSOLE,
-      accentHue: 250,
-      headingFont: 'SPACE_GROTESK',
-      bodyFont: 'NEWSREADER',
-      radiusScale: 'MD',
-      density: 'DEFAULT',
-    });
-
-    await deleteTenant(tenantId);
-
-    const remainingSiteConfig = await db()
-      .select()
-      .from(schema.siteConfig)
-      .where(eq(schema.siteConfig.tenantId, tenantId));
-    expect(remainingSiteConfig).toEqual([]);
-  });
-
-  it('cascades to dependent subscriber and bookmark rows for that tenant', async () => {
-    const tenantId = await insertTenant({ archived: true });
-    await db().insert(schema.users).values({ id: 'user-1' });
-    await db().insert(schema.subscribers).values({
-      tenantId,
-      email: 'reader@example.com',
-    });
-    await db().insert(schema.bookmarks).values({
-      tenantId,
-      userId: 'user-1',
-      postId: 'post-1',
-    });
-
-    await deleteTenant(tenantId);
-
-    const remainingSubscribers = await db()
-      .select()
-      .from(schema.subscribers)
-      .where(eq(schema.subscribers.tenantId, tenantId));
-    expect(remainingSubscribers).toEqual([]);
-
-    const remainingBookmarks = await db()
-      .select()
-      .from(schema.bookmarks)
-      .where(eq(schema.bookmarks.tenantId, tenantId));
-    expect(remainingBookmarks).toEqual([]);
-  });
 });
 
 describe('deleteTenant — Sanity project deletion', () => {
@@ -169,18 +179,92 @@ describe('deleteTenant — Sanity project deletion', () => {
     vi.unstubAllGlobals();
   });
 
-  it('does not attempt Sanity deletion when no token is supplied', async () => {
-    const tenantId = await insertTenant({
-      archived: true,
-      sanityProjectId: 'proj123',
+  describe('a tenant with a Sanity project', () => {
+    let tenantId: string;
+
+    beforeEach(async () => {
+      tenantId = await insertTenant({
+        archived: true,
+        sanityProjectId: 'proj123',
+      });
     });
 
-    const result = await deleteTenant(tenantId);
+    it('does not attempt Sanity deletion when no token is supplied', async () => {
+      const result = await deleteTenant(tenantId);
 
-    expect(fetchMock).not.toHaveBeenCalled();
-    expect(result).toEqual({
-      outcome: 'deleted',
-      sanityProject: 'skipped-no-token',
+      expect(fetchMock).not.toHaveBeenCalled();
+      expect(result).toEqual({
+        outcome: 'deleted',
+        sanityProject: 'skipped-no-token',
+      });
+    });
+
+    it('deletes the Sanity project when a token is supplied and the API succeeds', async () => {
+      fetchMock.mockResolvedValue(new Response(null, { status: 200 }));
+
+      const result = await deleteTenant(tenantId, 'mgmt-token');
+
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+      expect(url).toBe('https://api.sanity.io/v2021-06-07/projects/proj123');
+      expect(init.method).toBe('DELETE');
+      expect(result).toEqual({ outcome: 'deleted', sanityProject: 'deleted' });
+    });
+
+    it('reports already-gone (not deleted) and still hard-deletes the row on a 404', async () => {
+      fetchMock.mockResolvedValue(new Response('not found', { status: 404 }));
+
+      const result = await deleteTenant(tenantId, 'mgmt-token');
+
+      expect(result).toEqual({
+        outcome: 'deleted',
+        sanityProject: 'already-gone',
+      });
+
+      const remaining = await db()
+        .select()
+        .from(tenants)
+        .where(eq(tenants.id, tenantId));
+      expect(remaining).toEqual([]);
+    });
+
+    it('still hard-deletes the row and reports left-archived on the org-billing 401', async () => {
+      fetchMock.mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            code: 401,
+            status: 'Unauthorized',
+            message:
+              'Cancellation of project "proj123" requires billing permission on organization "org1"',
+          }),
+          { status: 401 },
+        ),
+      );
+
+      const result = await deleteTenant(tenantId, 'mgmt-token');
+
+      expect(result).toEqual({
+        outcome: 'deleted',
+        sanityProject: 'left-archived',
+      });
+
+      const remaining = await db()
+        .select()
+        .from(tenants)
+        .where(eq(tenants.id, tenantId));
+      expect(remaining).toEqual([]);
+    });
+
+    it('still throws on a Sanity failure unrelated to billing permission, and leaves the row untouched', async () => {
+      fetchMock.mockResolvedValue(new Response('forbidden', { status: 403 }));
+
+      await expect(deleteTenant(tenantId, 'mgmt-token')).rejects.toThrow(/403/);
+
+      const remaining = await db()
+        .select()
+        .from(tenants)
+        .where(eq(tenants.id, tenantId));
+      expect(remaining).toHaveLength(1);
     });
   });
 
@@ -191,89 +275,5 @@ describe('deleteTenant — Sanity project deletion', () => {
 
     expect(fetchMock).not.toHaveBeenCalled();
     expect(result).toEqual({ outcome: 'deleted', sanityProject: 'no-project' });
-  });
-
-  it('deletes the Sanity project when a token is supplied and the API succeeds', async () => {
-    fetchMock.mockResolvedValue(new Response(null, { status: 200 }));
-    const tenantId = await insertTenant({
-      archived: true,
-      sanityProjectId: 'proj123',
-    });
-
-    const result = await deleteTenant(tenantId, 'mgmt-token');
-
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
-    expect(url).toBe('https://api.sanity.io/v2021-06-07/projects/proj123');
-    expect(init.method).toBe('DELETE');
-    expect(result).toEqual({ outcome: 'deleted', sanityProject: 'deleted' });
-  });
-
-  it('reports already-gone (not deleted) and still hard-deletes the row on a 404', async () => {
-    fetchMock.mockResolvedValue(new Response('not found', { status: 404 }));
-    const tenantId = await insertTenant({
-      archived: true,
-      sanityProjectId: 'proj123',
-    });
-
-    const result = await deleteTenant(tenantId, 'mgmt-token');
-
-    expect(result).toEqual({
-      outcome: 'deleted',
-      sanityProject: 'already-gone',
-    });
-
-    const remaining = await db()
-      .select()
-      .from(tenants)
-      .where(eq(tenants.id, tenantId));
-    expect(remaining).toEqual([]);
-  });
-
-  it('still hard-deletes the row and reports left-archived on the org-billing 401', async () => {
-    fetchMock.mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          code: 401,
-          status: 'Unauthorized',
-          message:
-            'Cancellation of project "proj123" requires billing permission on organization "org1"',
-        }),
-        { status: 401 },
-      ),
-    );
-    const tenantId = await insertTenant({
-      archived: true,
-      sanityProjectId: 'proj123',
-    });
-
-    const result = await deleteTenant(tenantId, 'mgmt-token');
-
-    expect(result).toEqual({
-      outcome: 'deleted',
-      sanityProject: 'left-archived',
-    });
-
-    const remaining = await db()
-      .select()
-      .from(tenants)
-      .where(eq(tenants.id, tenantId));
-    expect(remaining).toEqual([]);
-  });
-
-  it('still throws on a Sanity failure unrelated to billing permission, and leaves the row untouched', async () => {
-    fetchMock.mockResolvedValue(new Response('forbidden', { status: 403 }));
-    const tenantId = await insertTenant({
-      archived: true,
-      sanityProjectId: 'proj123',
-    });
-
-    await expect(deleteTenant(tenantId, 'mgmt-token')).rejects.toThrow(/403/);
-
-    const remaining = await db()
-      .select()
-      .from(tenants)
-      .where(eq(tenants.id, tenantId));
-    expect(remaining).toHaveLength(1);
   });
 });

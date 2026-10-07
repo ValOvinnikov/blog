@@ -61,9 +61,11 @@ async function seedUserWithRelatedRows(userId: string): Promise<void> {
 }
 
 describe(deleteAccount, () => {
-  it('deletes the users row', async () => {
+  beforeEach(async () => {
     await seedUserWithRelatedRows('user-1');
+  });
 
+  it('deletes the users row', async () => {
     await deleteAccount('user-1');
 
     const remainingUsers = await db()
@@ -74,8 +76,6 @@ describe(deleteAccount, () => {
   });
 
   it('cascades to accounts, sessions, and bookmarks rows for that user', async () => {
-    await seedUserWithRelatedRows('user-1');
-
     await deleteAccount('user-1');
 
     const remainingAccounts = await db()
@@ -97,7 +97,6 @@ describe(deleteAccount, () => {
   });
 
   it("does not delete another user's rows", async () => {
-    await seedUserWithRelatedRows('user-1');
     await seedUserWithRelatedRows('user-2');
 
     await deleteAccount('user-1');

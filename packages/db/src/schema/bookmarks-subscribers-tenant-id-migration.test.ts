@@ -6,7 +6,7 @@ import {
 } from '@blog/db/testing/migration-files';
 import { PGlite } from '@electric-sql/pglite';
 import { sql } from 'drizzle-orm';
-import { drizzle } from 'drizzle-orm/pglite';
+import { drizzle, type PgliteDatabase } from 'drizzle-orm/pglite';
 
 import { bookmarks } from './bookmarks';
 import { subscribers } from './subscribers';
@@ -14,12 +14,15 @@ import { subscribers } from './subscribers';
 const BACKFILL_MIGRATION = '0008_silly_xorn.sql';
 
 describe('0008_silly_xorn (bookmarks/subscribers tenant_id backfill)', () => {
+  let db: PgliteDatabase<typeof schema>;
+
+  beforeEach(() => {
+    db = drizzle(new PGlite(), { schema });
+  });
+
   it(
     'backfills pre-existing bookmark and subscriber rows to the sole existing tenant',
     async () => {
-      const client = new PGlite();
-      const db = drizzle(client, { schema });
-
       const migrationFiles = listMigrationFiles();
       const priorMigrations = migrationFiles.filter(
         (file) => file < BACKFILL_MIGRATION,
@@ -67,9 +70,6 @@ describe('0008_silly_xorn (bookmarks/subscribers tenant_id backfill)', () => {
   it(
     'still applies cleanly against empty bookmarks and subscribers tables',
     async () => {
-      const client = new PGlite();
-      const db = drizzle(client, { schema });
-
       for (const file of listMigrationFiles()) {
         await applyMigrationFile(db, file);
       }

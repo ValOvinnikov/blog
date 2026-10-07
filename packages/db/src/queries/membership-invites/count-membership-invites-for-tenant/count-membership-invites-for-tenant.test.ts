@@ -19,8 +19,13 @@ afterEach(async () => {
 });
 
 describe(countMembershipInvitesForTenant, () => {
+  let tenantId: string;
+
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
   it('counts every invite row for the tenant', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     await createMembershipInvite(
       tenantId,
       'one@example.com',
@@ -36,7 +41,6 @@ describe(countMembershipInvitesForTenant, () => {
   });
 
   it("does not count another tenant's invites", async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     const { id: otherTenantId } = await insertTestTenant(db());
     await createMembershipInvite(
       otherTenantId,

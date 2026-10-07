@@ -24,9 +24,13 @@ afterEach(async () => {
 });
 
 describe(openFinding, () => {
-  it('inserts a fresh OPEN finding when none exists for the condition', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
+  let tenantId: string;
 
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
+  it('inserts a fresh OPEN finding when none exists for the condition', async () => {
     const result = await openFinding({
       tenantId,
       source: FINDING_SOURCE.DOMAIN_VERIFICATION,
@@ -51,7 +55,6 @@ describe(openFinding, () => {
   });
 
   it('detecting the same condition twice yields one open row, not two', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     const input = {
       tenantId,
       source: FINDING_SOURCE.RECHECK_TENANT_OWNERS,
@@ -88,7 +91,6 @@ describe(openFinding, () => {
   });
 
   it('bumps lastSeenAt without changing firstSeenAt on a repeat sighting', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     const input = {
       tenantId,
       source: FINDING_SOURCE.DOCUMENT_VALIDATION,
@@ -113,7 +115,6 @@ describe(openFinding, () => {
   });
 
   it('reopens as a new row once the prior finding for the same condition was resolved', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     const input = {
       tenantId,
       source: FINDING_SOURCE.SITE_CONFIG_REVALIDATION,
@@ -161,7 +162,6 @@ describe(openFinding, () => {
   });
 
   it('returns DB_NOT_FOUND when the open row vanishes before the follow-up update', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     const input = {
       tenantId,
       source: FINDING_SOURCE.DOMAIN_VERIFICATION,
