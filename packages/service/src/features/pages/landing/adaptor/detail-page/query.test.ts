@@ -42,6 +42,12 @@ describe('landingPageQuery', () => {
     expect(() => landingPageQuery.parse(raw)).not.toThrow();
   });
 
+  it('parses a landing page that has no translation group', () => {
+    const raw = { ...makeRawLandingPage(), translations: null };
+
+    expect(landingPageQuery.parse(raw)?.translations).toBeNull();
+  });
+
   it('parses null as no matching page_landing document, rather than throwing', () => {
     expect(landingPageQuery.parse(null)).toBeNull();
   });

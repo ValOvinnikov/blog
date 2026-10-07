@@ -17,4 +17,5 @@ export const translationsQuery = q.star
   .project((t) => ({
     language: t.field('language').nullable(true),
     slug: t.raw(PAGE_PATH_EXPRESSION, pagePathParser),
-  }));
+  }))
+  .nullable(true);
