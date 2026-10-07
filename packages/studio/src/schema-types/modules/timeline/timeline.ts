@@ -76,13 +76,17 @@ export const timelineSchema = defineType({
         {
           name: 'itemAlignment',
           title: 'Item Alignment',
-          description: 'Aligns the marker and text within each timeline item.',
+          description:
+            'Horizontal alignment of each item. On Horizontal, the marker centres over its text; on Vertical, the list centres as a block.',
           allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
           initialValue: CONTENT_ALIGNMENT.LEFT,
           validation: (rule) => rule.required(),
         },
       ],
-      { allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER] },
+      {
+        allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
+        hasActions: true,
+      },
     ),
     layoutField,
   ],

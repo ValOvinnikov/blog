@@ -2,16 +2,14 @@ import {
   CTA_ACTION_APPEARANCE,
   POST_SOURCE,
   type TPostSource,
-  FULL_BRAND_VARIANT_LIST,
 } from '@blog/config/constants';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
-import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { heroBackgroundAndShapeFields } from '@blog/studio/schema-types/fields/hero-background-and-shape-fields/hero-background-and-shape-fields';
 import { heroContentPositionFields } from '@blog/studio/schema-types/fields/hero-content-position-fields/hero-content-position-fields';
 import {
   heroMediaOrderSplitField,
   heroMediaOrderStackedField,
 } from '@blog/studio/schema-types/fields/hero-media-order-fields/hero-media-order-fields';
-import { heroVariantField } from '@blog/studio/schema-types/fields/hero-variant-field/hero-variant-field';
 import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { publishedPostFilter } from '@blog/studio/schema-types/filters/published-post';
@@ -58,7 +56,7 @@ export const heroBlogSchema = defineType({
   ],
   fields: [
     titleField(),
-    brandVariantField({ list: FULL_BRAND_VARIANT_LIST }),
+    ...heroBackgroundAndShapeFields(),
     defineField({
       name: 'postSource',
       title: 'Source',
@@ -149,7 +147,6 @@ export const heroBlogSchema = defineType({
         'An optional supporting action. Leave the link empty to show none.',
       options: { collapsible: true, collapsed: true },
     }),
-    heroVariantField(),
     ...heroContentPositionFields(),
     heroMediaOrderSplitField(),
     heroMediaOrderStackedField(),

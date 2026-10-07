@@ -1,17 +1,16 @@
 import { CARD_IMAGE_SHAPE, CONTENT_ALIGNMENT } from '@blog/config/constants';
 import { personSchema } from '@blog/studio/schema-types/documents/person/person';
-import {
-  alignmentField,
-  alignmentFields,
-} from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
+import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { cardAlignmentField } from '@blog/studio/schema-types/fields/card-alignment-field/card-alignment-field';
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { displayModeField } from '@blog/studio/schema-types/fields/display-mode-field/display-mode-field';
+import { imageShapeField } from '@blog/studio/schema-types/fields/image-shape-field/image-shape-field';
+import { showToggleField } from '@blog/studio/schema-types/fields/show-toggle-field/show-toggle-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
 import { wideLayoutField } from '@blog/studio/schema-types/objects/wide-layout/wide-layout-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
-import { toTitleCase } from '@blog/utils/primitives';
 import { Users } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
@@ -45,50 +44,35 @@ export const teamSchema = defineType({
         rule.unique(),
       ],
     }),
-    defineField({
+    showToggleField({
       name: 'showBios',
       title: 'Show Bios',
-      type: 'boolean',
       description:
         "Show each person's full bio under their role. Off keeps the cards to photo, name and role.",
       initialValue: false,
     }),
-    defineField({
+    showToggleField({
       name: 'showSocialLinks',
       title: 'Show Social Links',
-      type: 'boolean',
       description:
         "Show each person's social links as icons. Turn off on pages where visitors should stay, such as a landing page.",
       initialValue: true,
     }),
-    defineField({
-      name: 'imageShape',
-      title: 'Image Shape',
-      type: 'string',
-      description:
-        'How each photo is cropped. A person without a photo shows their initials.',
-      options: {
-        layout: 'dropdown',
-        list: [CARD_IMAGE_SHAPE.CIRCLE, CARD_IMAGE_SHAPE.SQUARE].map(
-          (value) => ({ title: toTitleCase(value), value }),
-        ),
-      },
+    imageShapeField({
+      values: [CARD_IMAGE_SHAPE.CIRCLE, CARD_IMAGE_SHAPE.SQUARE],
       initialValue: CARD_IMAGE_SHAPE.CIRCLE,
-      validation: (rule) => rule.required(),
+      subject: 'photo',
     }),
     displayModeField(),
-    alignmentField({
-      name: 'cardAlignment',
-      title: 'Card Alignment',
-      description:
-        "Aligns each person's photo, name and role inside their card.",
-      list: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
-      initialValue: CONTENT_ALIGNMENT.CENTER,
-      validation: (rule) => rule.required(),
-    }),
     ctaButtonsField(),
     ...alignmentFields([], {
       allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
+      hasActions: true,
+      alignsCarousel: true,
+    }),
+    cardAlignmentField({
+      initialValue: CONTENT_ALIGNMENT.CENTER,
+      hasSpotlight: true,
     }),
     wideLayoutField,
   ],

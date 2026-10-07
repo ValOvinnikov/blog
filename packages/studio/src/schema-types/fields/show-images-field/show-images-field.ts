@@ -1,10 +1,9 @@
-import { defineField } from 'sanity';
+import { showToggleField } from '@blog/studio/schema-types/fields/show-toggle-field/show-toggle-field';
 
-export const showImagesField = () =>
-  defineField({
+export const showImagesField = ({ subject }: { subject: string }) =>
+  showToggleField({
     name: 'showImages',
     title: 'Show Images',
-    type: 'boolean',
-    description: "Show each post's image on its card.",
+    description: `Show each ${subject}'s image on its card.`,
     initialValue: true,
   });

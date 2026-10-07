@@ -46,12 +46,9 @@ export const postLatestSchema = defineType({
       description: 'Maximum number of posts to show.',
       validation: (rule) => rule.required().integer().min(1).max(12),
     }),
-    showImagesField(),
+    showImagesField({ subject: 'post' }),
     displayModeField(),
-    ...alignmentFields([], {
-      title: 'Heading Alignment',
-      description: 'Horizontal alignment of the heading and supporting text.',
-    }),
+    ...alignmentFields([]),
     wideLayoutField,
   ],
   preview: {

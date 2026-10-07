@@ -350,25 +350,17 @@
           "of": [
             {
               "type": "string",
-              "value": "BRAND_PRIMARY"
-            },
-            {
-              "type": "string",
               "value": "PRIMARY"
             },
             {
               "type": "string",
               "value": "SECONDARY"
+            },
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
             }
           ]
-        },
-        "optional": true
-      },
-      "headingBlock": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "inline",
-          "name": "moduleHeadingBlock"
         },
         "optional": true
       },
@@ -386,6 +378,14 @@
               "value": "COMPACT"
             }
           ]
+        },
+        "optional": true
+      },
+      "headingBlock": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "moduleHeadingBlock"
         },
         "optional": true
       },
@@ -491,8 +491,25 @@
           "of": [
             {
               "type": "string",
-              "value": "BRAND_PRIMARY"
+              "value": "PRIMARY"
             },
+            {
+              "type": "string",
+              "value": "SECONDARY"
+            },
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "bandTone": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
             {
               "type": "string",
               "value": "PRIMARY"
@@ -500,6 +517,31 @@
             {
               "type": "string",
               "value": "SECONDARY"
+            },
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "variant": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "BANNER"
+            },
+            {
+              "type": "string",
+              "value": "SPLIT"
+            },
+            {
+              "type": "string",
+              "value": "CALLOUT"
             }
           ]
         },
@@ -564,48 +606,6 @@
         "value": {
           "type": "inline",
           "name": "internationalizedArrayString"
-        },
-        "optional": true
-      },
-      "variant": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "BANNER"
-            },
-            {
-              "type": "string",
-              "value": "SPLIT"
-            },
-            {
-              "type": "string",
-              "value": "CALLOUT"
-            }
-          ]
-        },
-        "optional": true
-      },
-      "bandTone": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "BRAND_PRIMARY"
-            },
-            {
-              "type": "string",
-              "value": "PRIMARY"
-            },
-            {
-              "type": "string",
-              "value": "SECONDARY"
-            }
-          ]
         },
         "optional": true
       },
@@ -1401,15 +1401,15 @@
           "of": [
             {
               "type": "string",
-              "value": "BRAND_PRIMARY"
-            },
-            {
-              "type": "string",
               "value": "PRIMARY"
             },
             {
               "type": "string",
               "value": "SECONDARY"
+            },
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
             }
           ]
         },
@@ -1673,23 +1673,6 @@
         },
         "optional": true
       },
-      "cardAlignment": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "LEFT"
-            },
-            {
-              "type": "string",
-              "value": "CENTER"
-            }
-          ]
-        },
-        "optional": true
-      },
       "ctaButtons": {
         "type": "objectAttribute",
         "value": {
@@ -1713,6 +1696,23 @@
         "optional": true
       },
       "contentAlignment": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "LEFT"
+            },
+            {
+              "type": "string",
+              "value": "CENTER"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "cardAlignment": {
         "type": "objectAttribute",
         "value": {
           "type": "union",
@@ -3187,15 +3187,15 @@
           "of": [
             {
               "type": "string",
-              "value": "BRAND_PRIMARY"
-            },
-            {
-              "type": "string",
               "value": "PRIMARY"
             },
             {
               "type": "string",
               "value": "SECONDARY"
+            },
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
             }
           ]
         },
@@ -8567,15 +8567,36 @@
           "of": [
             {
               "type": "string",
-              "value": "BRAND_PRIMARY"
-            },
-            {
-              "type": "string",
               "value": "PRIMARY"
             },
             {
               "type": "string",
               "value": "SECONDARY"
+            },
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "variant": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "SPLIT"
+            },
+            {
+              "type": "string",
+              "value": "STACKED"
+            },
+            {
+              "type": "string",
+              "value": "BANNER"
             }
           ]
         },
@@ -8652,27 +8673,6 @@
         "value": {
           "type": "inline",
           "name": "ctaSecondaryButton"
-        },
-        "optional": true
-      },
-      "variant": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "SPLIT"
-            },
-            {
-              "type": "string",
-              "value": "STACKED"
-            },
-            {
-              "type": "string",
-              "value": "BANNER"
-            }
-          ]
         },
         "optional": true
       },
@@ -11781,15 +11781,36 @@
           "of": [
             {
               "type": "string",
-              "value": "BRAND_PRIMARY"
-            },
-            {
-              "type": "string",
               "value": "PRIMARY"
             },
             {
               "type": "string",
               "value": "SECONDARY"
+            },
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "variant": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "SPLIT"
+            },
+            {
+              "type": "string",
+              "value": "STACKED"
+            },
+            {
+              "type": "string",
+              "value": "BANNER"
             }
           ]
         },
@@ -11838,27 +11859,6 @@
               "name": "ctaButton"
             }
           }
-        },
-        "optional": true
-      },
-      "variant": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "SPLIT"
-            },
-            {
-              "type": "string",
-              "value": "STACKED"
-            },
-            {
-              "type": "string",
-              "value": "BANNER"
-            }
-          ]
         },
         "optional": true
       },
@@ -12014,15 +12014,36 @@
           "of": [
             {
               "type": "string",
-              "value": "BRAND_PRIMARY"
-            },
-            {
-              "type": "string",
               "value": "PRIMARY"
             },
             {
               "type": "string",
               "value": "SECONDARY"
+            },
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "variant": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "SPLIT"
+            },
+            {
+              "type": "string",
+              "value": "STACKED"
+            },
+            {
+              "type": "string",
+              "value": "BANNER"
             }
           ]
         },
@@ -12036,19 +12057,26 @@
         },
         "optional": true
       },
-      "eyebrow": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "inline",
-          "name": "internationalizedArrayString"
-        },
-        "optional": true
-      },
       "author": {
         "type": "objectAttribute",
         "value": {
           "type": "inline",
           "name": "person.reference"
+        },
+        "optional": true
+      },
+      "showRole": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
+        },
+        "optional": true
+      },
+      "eyebrow": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "internationalizedArrayString"
         },
         "optional": true
       },
@@ -12089,38 +12117,10 @@
         },
         "optional": true
       },
-      "showRole": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "boolean"
-        },
-        "optional": true
-      },
       "showBio": {
         "type": "objectAttribute",
         "value": {
           "type": "boolean"
-        },
-        "optional": true
-      },
-      "variant": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "SPLIT"
-            },
-            {
-              "type": "string",
-              "value": "STACKED"
-            },
-            {
-              "type": "string",
-              "value": "BANNER"
-            }
-          ]
         },
         "optional": true
       },

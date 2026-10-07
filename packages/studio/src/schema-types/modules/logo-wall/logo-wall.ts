@@ -38,6 +38,9 @@ export const logoWallSchema = defineType({
     displayModeField(),
     ...alignmentFields([], {
       allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
+      hasActions: true,
+      alignsItems: true,
+      alignsCarousel: true,
     }),
     layoutField,
   ],

@@ -1,30 +1,51 @@
 import { BRAND_VARIANT, type TBrandVariant } from '@blog/config/constants';
-import { toTitleCase } from '@blog/utils/primitives';
-import { defineField } from 'sanity';
+import { defineField, type StringDefinition } from 'sanity';
 
 const DEFAULT_LIST: readonly TBrandVariant[] = [
   BRAND_VARIANT.PRIMARY,
   BRAND_VARIANT.SECONDARY,
 ];
 
-export const brandVariantField = (options?: {
-  list?: readonly TBrandVariant[];
-  description?: string;
-  initialValue?: TBrandVariant;
-}) => {
-  const list = options?.list ?? DEFAULT_LIST;
+const brandVariantOptions = [
+  { title: 'Plain', value: BRAND_VARIANT.PRIMARY },
+  { title: 'Shaded', value: BRAND_VARIANT.SECONDARY },
+  { title: 'Brand tint', value: BRAND_VARIANT.BRAND_PRIMARY },
+];
 
-  return defineField({
-    name: 'brandVariant',
-    title: 'Brand Variant',
-    type: 'string',
-    description:
-      options?.description ??
-      "Which brand color this section's background uses.",
-    options: {
-      list: list.map((value) => ({ title: toTitleCase(value), value })),
-    },
-    initialValue: options?.initialValue ?? list[0],
-    validation: (rule) => rule.required(),
-  });
+export const brandVariantTitle = (value: unknown): string | undefined =>
+  brandVariantOptions.find((option) => option.value === value)?.title;
+
+type TBrandVariantFieldOptions = {
+  name?: string;
+  title?: string;
+  description?: string;
+  descriptionSuffix?: string;
+  list?: readonly TBrandVariant[];
+  initialValue?: TBrandVariant;
+  hidden?: StringDefinition['hidden'];
+  validation?: StringDefinition['validation'];
 };
+
+export const brandVariantField = ({
+  name = 'brandVariant',
+  title = 'Background',
+  description = 'The background this section sits on.',
+  descriptionSuffix = '',
+  list = DEFAULT_LIST,
+  initialValue = BRAND_VARIANT.PRIMARY,
+  hidden,
+  validation = (rule) => rule.required(),
+}: TBrandVariantFieldOptions = {}) =>
+  defineField({
+    name,
+    title,
+    type: 'string',
+    description: `${description}${descriptionSuffix}`,
+    options: {
+      layout: 'dropdown',
+      list: brandVariantOptions.filter((option) => list.includes(option.value)),
+    },
+    initialValue,
+    hidden,
+    validation,
+  });
