@@ -1042,12 +1042,14 @@ Inside an epic, the rows ship strictly in order, and each one merges before the 
 
 1. **Should the Accent bar card round its corners with the Look's corner roundness?**
    - Recommendation: no. Accent bar stays square, and the Outlined card style carries the roundness. A 2px left border on a rounded corner bends into a hook at Large and Extra large.
+   - **Decided 2026-10-07 by the product owner: no.** Accent bar stays square; only Outlined follows the Look's corner roundness.
    - What would change it: if most tenants are expected to keep the default Accent bar style, the roundness control stays inert on the most common item surface (**F10**). The bar should then round with `--radius-md`.
 2. **Are static framed cards legitimate: PricingCard, the newsletter Panel, unlinked logo tiles and testimonial cards?**
    - Recommendation: yes. Restate `SPEC.md:980-985` as "a surface marks a bounded item; only the hover tint and the link overlay mark a click", and list the static consumers.
    - What would change it: evidence that visitors click static pricing or testimonial cards expecting a link. Those items would then drop to FLAT.
 3. **One card style per site, or a per-module override?**
    - Recommendation: one per site, on the Look page, with no module field.
+   - **Decided 2026-10-07 by the product owner: one per site**, set on the Look page, with no module field.
    - What would change it: a planned module, such as the gallery or a project list, that must look different from post cards on the same page.
 4. **What should editors call "Brand Variant"?**
    - Recommendation: "Background", with the options Plain, Shaded and Brand tint. On the CTA, use "Card background" for the card fill and "Background" for the band behind it.

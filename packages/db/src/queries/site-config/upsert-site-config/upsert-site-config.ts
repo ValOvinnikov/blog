@@ -10,11 +10,14 @@ import {
   type TVoicePortableTextSpan,
 } from '@blog/config';
 import {
+  CARD_STYLE,
   DENSITY,
   LANGUAGE_SWITCHER_STYLE,
   FONT_CHOICE,
   PRESET_ID,
+  PRESET_REGISTRY,
   RADIUS_SCALE,
+  type TCardStyle,
   type TDensity,
   type TLanguageSwitcherStyle,
   type TFontChoice,
@@ -355,6 +358,9 @@ export const updateSiteConfigInputSchema = z.object({
       ],
     )
     .optional(),
+  cardStyle: z
+    .enum(Object.values(CARD_STYLE) as [TCardStyle, ...TCardStyle[]])
+    .optional(),
   logoAssetUrl: z.string().trim().url().nullable().optional(),
   faviconAssetUrl: z.string().trim().url().nullable().optional(),
 });
@@ -381,6 +387,7 @@ function presentOptionalFields(
   if (parsed.languageSwitcherStyle !== undefined) {
     fields.languageSwitcherStyle = parsed.languageSwitcherStyle;
   }
+  if (parsed.cardStyle !== undefined) fields.cardStyle = parsed.cardStyle;
   if (parsed.logoAssetUrl !== undefined) {
     fields.logoAssetUrl = parsed.logoAssetUrl;
   }
@@ -419,7 +426,12 @@ export async function upsertSiteConfig(
 
   const [row] = await db
     .insert(siteConfig)
-    .values({ tenantId, ...required, ...optional })
+    .values({
+      tenantId,
+      cardStyle: PRESET_REGISTRY[parsed.preset].cardStyle,
+      ...required,
+      ...optional,
+    })
     .onConflictDoUpdate({
       target: siteConfig.tenantId,
       set: { ...required, ...optional, updatedAt: new Date() },
