@@ -1278,6 +1278,7 @@ export type Page_home = {
   language?: 'EN' | 'NL' | 'FR' | 'DE' | 'ES';
   title?: string;
   headingBlock?: PageHeadingBlock;
+  contentAlignment?: 'LEFT' | 'CENTER';
   template?: Template_homeReference;
   seo?: Seo;
 };
@@ -1516,6 +1517,7 @@ export type Page_post = {
   title?: string;
   slug?: Slug;
   headingBlock?: PageHeadingBlock;
+  contentAlignment?: 'LEFT' | 'CENTER';
   heroImage?: ImageWithAlt;
   content?: ArticleText;
   featured?: boolean;
@@ -1604,6 +1606,7 @@ export type Page_tagIndex = {
   language?: 'EN' | 'NL' | 'FR' | 'DE' | 'ES';
   title?: string;
   headingBlock?: PageHeadingBlock;
+  contentAlignment?: 'LEFT' | 'CENTER';
   template?: Template_tagIndexReference;
   seo?: Seo;
   taxonomyList?: Module_taxonomyListReference;
@@ -1654,6 +1657,7 @@ export type Page_tag = {
   slug?: Slug;
   tag?: Blog_tagReference;
   headingBlock?: PageHeadingBlock;
+  contentAlignment?: 'LEFT' | 'CENTER';
   template?: Template_tagReference;
   seo?: Seo;
 };
@@ -1730,6 +1734,7 @@ export type Page_topicIndex = {
   language?: 'EN' | 'NL' | 'FR' | 'DE' | 'ES';
   title?: string;
   headingBlock?: PageHeadingBlock;
+  contentAlignment?: 'LEFT' | 'CENTER';
   template?: Template_topicIndexReference;
   seo?: Seo;
   taxonomyList?: Module_taxonomyListReference;
@@ -1797,6 +1802,7 @@ export type Page_topic = {
   slug?: Slug;
   topic?: Blog_topicReference;
   headingBlock?: PageHeadingBlock;
+  contentAlignment?: 'LEFT' | 'CENTER';
   template?: Template_topicReference;
   seo?: Seo;
 };
@@ -1860,6 +1866,7 @@ export type Page_postIndex = {
   language?: 'EN' | 'NL' | 'FR' | 'DE' | 'ES';
   title?: string;
   headingBlock?: PageHeadingBlock;
+  contentAlignment?: 'LEFT' | 'CENTER';
   template?: Template_postIndexReference;
   seo?: Seo;
 };
@@ -1916,6 +1923,7 @@ export type Page_landing = {
   parent?: Page_landingReference;
   slug?: Slug;
   headingBlock?: PageHeadingBlock;
+  contentAlignment?: 'LEFT' | 'CENTER';
   template?: Template_landingReference;
   sectionNavigation?: boolean;
   showSectionNavigation?: boolean;

@@ -16,7 +16,10 @@ import {
   ShowSectionNavigationField,
 } from '@blog/studio/schema-types/inputs/landing-section-navigation-field/landing-section-navigation-field';
 import { LandingSlugUrlPreviewInput } from '@blog/studio/schema-types/inputs/landing-slug-url-preview/landing-slug-url-preview-input';
-import { pageHeadingBlockField } from '@blog/studio/schema-types/objects/page-heading-block/page-heading-block-field';
+import {
+  pageHeadingAlignmentFields,
+  pageHeadingBlockField,
+} from '@blog/studio/schema-types/objects/page-heading-block/page-heading-block-field';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
 import { languagePreview } from '@blog/studio/schema-types/preview/language-preview/language-preview';
 import { validateLandingParent } from '@blog/studio/schema-types/validation/validate-landing-parent/validate-landing-parent';
@@ -114,6 +117,7 @@ export const landingPageSchema = defineType({
       validateSlug: validateLandingSlug,
     }),
     pageHeadingBlockField(),
+    ...pageHeadingAlignmentFields(),
     templateField({ type: landingTemplateSchema.name }),
     sectionNavigationSetting({
       name: SECTION_NAVIGATION_FIELD,
