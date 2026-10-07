@@ -1,6 +1,11 @@
 'use client';
 
-import type { TDensity, TFontChoice, TRadiusScale } from '@blog/config';
+import type {
+  TCardStyle,
+  TDensity,
+  TFontChoice,
+  TRadiusScale,
+} from '@blog/config';
 import { Card } from '@platform/components/shared/card';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { FONT_OPTIONS } from '@platform/config/fonts';
@@ -26,6 +31,7 @@ export type TLookPreviewProps = {
   bodyFont: TFontChoice;
   radiusScale: TRadiusScale;
   density: TDensity;
+  cardStyle: TCardStyle;
   logoSrc: string | undefined;
 };
 
@@ -42,6 +48,7 @@ export const LookPreview = ({
   bodyFont,
   radiusScale,
   density,
+  cardStyle,
   logoSrc,
 }: TLookPreviewProps) => {
   const t = useTranslations('lookPreview');
@@ -57,7 +64,7 @@ export const LookPreview = ({
   const tokenStyle = {
     ...buildAccentPreviewTokens(accentHue, isDark),
     ...buildLogoPreviewTokens(resolvedLogoHue, isDark),
-    ...buildShapePreviewTokens(radiusScale, density),
+    ...buildShapePreviewTokens(radiusScale, density, cardStyle),
   } as CSSProperties;
 
   const heading = FONT_OPTIONS[headingFont];

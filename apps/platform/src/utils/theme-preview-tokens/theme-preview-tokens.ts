@@ -1,11 +1,13 @@
 import {
   ACCENT_RAMP_DARK,
   ACCENT_RAMP_LIGHT,
+  CARD_STYLE_DECLARATIONS,
   DENSITY_DECLARATIONS,
   formatOklchRamp,
   LOGO_RAMP_DARK,
   LOGO_RAMP_LIGHT,
   RADIUS_DECLARATIONS,
+  type TCardStyle,
   type TDensity,
   type TRadiusScale,
   type TThemeDeclarations,
@@ -26,10 +28,12 @@ export const buildLogoPreviewTokens = (hue: number, isDark: boolean) => {
 export const buildShapePreviewTokens = (
   radiusScale: TRadiusScale,
   density: TDensity,
+  cardStyle: TCardStyle,
 ): TThemeDeclarations => {
   return {
     ...RADIUS_DECLARATIONS[radiusScale],
     ...DENSITY_DECLARATIONS[density],
+    ...CARD_STYLE_DECLARATIONS[cardStyle],
   };
 };
 

@@ -1,6 +1,7 @@
 import {
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
+  CARD_STYLE,
   DENSITY,
   FONT_CHOICE,
   isAccentHueAccessible,
@@ -60,6 +61,7 @@ const VALID_INPUT: TUpdateLookInput = {
   radiusScale: RADIUS_SCALE.SM,
   density: DENSITY.COMPACT,
   languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_GLOBE,
+  cardStyle: CARD_STYLE.OUTLINED,
 };
 
 describe(updateLookAction, () => {
@@ -106,6 +108,16 @@ describe(updateLookAction, () => {
 
     expect(result).toEqual({ ok: false });
     expect(requireTenantMembershipMock).not.toHaveBeenCalled();
+  });
+
+  it('rejects a card style the site has no tokens for without writing it', async () => {
+    const result = await updateLookAction('tenant-1', {
+      ...VALID_INPUT,
+      cardStyle: 'SHADOWED' as TUpdateLookInput['cardStyle'],
+    });
+
+    expect(result).toEqual({ ok: false });
+    expect(upsertSiteConfigMock).not.toHaveBeenCalled();
   });
 
   it('rejects an accent hue the site would replace without writing it', async () => {

@@ -68,11 +68,11 @@ describe(PreviewSample, () => {
     );
   });
 
-  it('renders two item cards and an outlined card', () => {
+  it('renders one linked and one static item card beside an outlined card', () => {
     render(<PreviewSample {...BASE_PROPS} />);
 
     expect(
-      screen.getByRole('heading', { level: 4, name: 'Notes from the harbour' }),
+      screen.getByRole('link', { name: 'Notes from the harbour' }),
     ).toBeVisible();
     expect(
       screen.getByRole('heading', {
@@ -80,6 +80,9 @@ describe(PreviewSample, () => {
         name: 'Charting the next season',
       }),
     ).toBeVisible();
+    expect(
+      screen.queryByRole('link', { name: 'Charting the next season' }),
+    ).not.toBeInTheDocument();
     expect(
       screen.getByRole('heading', { level: 4, name: 'Newsletter' }),
     ).toBeVisible();
