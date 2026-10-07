@@ -41,6 +41,13 @@ describe(`<${NewsletterModuleView.name}/>`, () => {
       ).toBeVisible();
     });
 
+    it('renders the authored heading exactly once, as an h2', () => {
+      expect(screen.getAllByRole('heading')).toHaveLength(1);
+      expect(
+        screen.getByRole('heading', { level: 2, name: 'Get new posts' }),
+      ).toBeVisible();
+    });
+
     it('labels the section landmark by the rendered heading', () => {
       expect(
         screen.getByRole('region', { name: 'Get new posts' }),
@@ -65,7 +72,9 @@ describe(`<${NewsletterModuleView.name}/>`, () => {
   it('renders a COMPACT module without supporting text or trust cues', () => {
     setup({ variant: NEWSLETTER_VARIANT.COMPACT });
 
-    expect(screen.getByText('Get new posts')).toBeVisible();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Get new posts' }),
+    ).toBeVisible();
     expect(screen.queryByText('Straight to inbox.')).not.toBeInTheDocument();
     expect(screen.queryByText('No spam')).not.toBeInTheDocument();
   });

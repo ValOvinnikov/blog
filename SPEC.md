@@ -937,9 +937,17 @@ a left-aligned heading rather than floating centred. `LogoTile` paints a card �
 `bg-surface`, a hairline border and a token radius — because logos arrive as
 whatever the company supplies: a transparent SVG beside a raster mark with an
 opaque background baked in reads as an odd filled square floating next to a bare
-wordmark unless a uniform frame reconciles them. This reverses the earlier
-no-surface decision, whose reasoning was that a card promises a click most logos
-do not have; real assets made consistency the stronger concern.
+wordmark unless a uniform frame reconciles them. A linked tile takes the
+interactive tint; an unlinked one stays static.
+
+**A surface marks a bounded item; only the hover tint and the link overlay mark
+a click.** An item may react to hover only when its whole surface is one link:
+`MediaCard`, `TaxonomyCard`, `QuoteCard` and `LogoTile` take `isInteractive`
+(default `false`), and only `true` adds `INTERACTIVE_ITEM_CARD`'s brand-muted
+tint on hover and focus-within. Every other surface — outlined, accent-bar or
+flat — is static. Static framed cards are legitimate: `PricingCard`, the
+newsletter's `Panel`, unlinked logo tiles and testimonial cards each paint a
+frame and promise no click.
 
 **The logo's box is computed from the asset's aspect ratio, never from the
 decoded file.** `SanityImage` paints an LQIP blur-up placeholder whose dimensions
@@ -1002,11 +1010,8 @@ one or two rows, so a carousel would hide them behind a swipe, and the figures
 follow `contentAlignment` along with the heading and actions rather than taking
 a `cardAlignment` of their own.
 
-**The figures are not cards, and that is a deliberate affordance decision.** In
-this design system a card surface means the item does something — `MediaCard`
-takes `isInteractive`, a feature card is a link, a post card opens a post. A
-figure is read, not clicked, so a surface would promise a click that never
-arrives; the items sit directly on the band with a hairline between columns and
+**The figures are not cards.** A figure is one value in a run, not a bounded
+item, so the items sit directly on the band with a hairline between columns and
 no surface, border or radius, and `CardGrid` is skipped with them. The band is a
 `<dl>` whose source order is label-first, so a screen reader hears “median
 organic lift, plus 38 percent”, while CSS `order` puts the value on top
@@ -1031,9 +1036,9 @@ alternation by setting each row independently — the pattern is the point, and 
 rows of individually-chosen sides is a mistake worth designing out rather than
 validating against. Below `md` every image sits above its text whatever
 `mediaOrder` says. Each row is two equal columns with the text vertically
-centred, its heading an `<h3>`, and **no card surface** — by the affordance rule
-the figures follow, a row is read rather than clicked, so the image takes a thin
-frame and the row itself takes none. Every image is 4:3 (`MediaFrame
+centred, its heading an `<h3>`, and **no card surface** — like the figures, a
+row is part of one narrative rather than a bounded item, so the image takes a
+thin frame and the row itself takes none. Every image is 4:3 (`MediaFrame
 ratio="classic"`) with no ratio field and no `displayMode`: one rhythm, authored
 once.
 
@@ -1358,6 +1363,10 @@ under `:root` only, the accent hue also sets the on-image and
 and `cardStyle` sets the five `--item-*` tokens the `item-card` utility reads,
 also under `:root` only — `ACCENT_BAR` a square card with a 2px brand bar on
 the left, `OUTLINED` a hairline border all round at `--radius-md`.
+`ACCENT_BAR` stays square whatever `radiusScale` says: a 2px left border on a
+rounded corner bends into a hook at the larger steps, so only `OUTLINED` follows
+the Look's corner roundness, and under the default card style `radiusScale`
+reaches bounded cards and media frames but not item cards.
 `MD`, `DEFAULT` and `ACCENT_BAR` reproduce `configs/tailwind/theme.css`'s
 static values, so a site with no saved look renders as the defaults; `density` does not touch
 Tailwind's base `--spacing`, so control sizes stay fixed. The ramp, radius,
@@ -2464,6 +2473,21 @@ component's own variants. A consumer restyling internals through `className`,
 or through a `[&>child]:` selector, means a variant is missing; add the
 variant.
 
+**Radius is chosen by role, never by step.** A component rounds through the
+token for what it is, so the Look's `radiusScale` and card style reach it
+without the component knowing either:
+
+| Role            | Utility         | Token                             | Used by                                                                         |
+| --------------- | --------------- | --------------------------------- | ------------------------------------------------------------------------------- |
+| bounded card    | `rounded-card`  | `--radius-card` → `--radius-md`   | `Panel`, `PricingCard`, `Toast`, `PopoverMenu`, `CtaModule`, `NewsletterSignup` |
+| media frame     | `rounded-media` | `--radius-media` → `--radius-lg`  | `MediaFrame`, `LogoTile`                                                        |
+| house item card | `rounded-item`  | `--radius-item` → `--item-radius` | `item-card` (`MediaCard`, `TaxonomyCard`, `QuoteCard`)                          |
+
+Controls and pills keep the plain steps (`rounded-sm`, `rounded-full`).
+`MediaFrame` takes a `shape` of `rect` (default, `rounded-media`) or `circle`
+(`rounded-full`), so an avatar-style portrait is a variant rather than a radius
+class a consumer passes through `className`.
+
 Both conventions are lint-enforced rather than left to review — see the
 repo-specific ESLint rules in
 [`docs/context/claude-code.md`](./docs/context/claude-code.md). The
@@ -2497,9 +2521,28 @@ applied by whatever element paints the background:
 - `@blog/ui` organisms that paint their own flat background behind focusable
   children — `CtaModule` (SPLIT and CALLOUT) and `Footer`.
 
+Two more utilities cover the item-level fills inside a band:
+
+- `surface-card` retargets `--ambient` to `--surface` (divider stays
+  `--border`). Every `bg-surface` card root applies it — `Panel`,
+  `PricingCard`, `Toast`, the `PopoverMenu` panel and the `item-card` roots.
+- `surface-nested` retargets `--ambient` to `--surface-2` and `--divider` to
+  `--border-strong`, because `--border` against `--surface-2` reads weaker than
+  the page's own divider. Every `bg-surface-2` root that can hold focusable
+  content applies it — `MediaFrame`, `Aside`, `Panel.Header` and the
+  `NewsletterSignup` COMPACT strip.
+
 A surface painted with an image or a scrim rather than a flat token colour
 (`Hero` BANNER, `CtaModule` BANNER) sets neither: there is no single colour a
 ring offset could match.
+
+**Elevation is two tokens** (`shadow-card` also carries a heavier `.dark`
+value; `shadow-float` has one value for both modes). `shadow-card` marks a
+raised card — `Panel`, the highlighted `PricingCard` and the `CtaModule` card —
+and `shadow-float` marks chrome floating above the page, the `Toast` and the
+`PopoverMenu` panel. A static item card carries no shadow (`--item-shadow` is
+`none` under both card styles); a surface's frame, not its depth, is what bounds
+it.
 
 **No props and no context.** Everything stays server-renderable, dark mode
 follows automatically because the defaults are references rather than literals

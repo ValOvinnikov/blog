@@ -1,5 +1,6 @@
 import { NEWSLETTER_VARIANT } from '@blog/config';
 import type { TNewsletterModule } from '@blog/service';
+import { ModuleHeading } from '@web/components/shared/module-heading';
 import { NewsletterForm } from '@web/components/shared/newsletter-form';
 import { NewsletterSubscribedGate } from '@web/components/shared/newsletter-subscribed-gate';
 import { Section } from '@web/components/shared/section';
@@ -18,9 +19,7 @@ export const NewsletterModuleView = ({
   trustCues,
 }: INewsletterModuleViewProps) => {
   const titleId = `newsletter-${id}`;
-  const { heading, supportingText } = headingBlock;
-  const formVariant =
-    variant === NEWSLETTER_VARIANT.COMPACT ? 'compact' : 'full';
+  const isCompact = variant === NEWSLETTER_VARIANT.COMPACT;
 
   return (
     <NewsletterSubscribedGate>
@@ -30,11 +29,19 @@ export const NewsletterModuleView = ({
         titleId={titleId}
         dataTestId={`newsletter-module-${id}`}
       >
+        <ModuleHeading
+          headingBlock={
+            isCompact
+              ? { ...headingBlock, supportingText: undefined }
+              : headingBlock
+          }
+          id={titleId}
+          level={2}
+          align={contentAlignment}
+          variant="section"
+        />
         <NewsletterForm
-          variant={formVariant}
-          heading={heading}
-          headingId={titleId}
-          supportingText={supportingText}
+          variant={isCompact ? 'compact' : 'full'}
           trustCues={trustCues}
           align={contentAlignment}
         />

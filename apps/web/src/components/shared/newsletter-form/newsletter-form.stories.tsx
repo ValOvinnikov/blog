@@ -17,8 +17,6 @@ const meta = {
   },
   args: {
     variant: 'full',
-    heading: 'Get new posts in your inbox',
-    supportingText: 'One email a week, no spam, unsubscribe anytime.',
     trustCues: ['No spam', 'Unsubscribe anytime'],
   },
 } satisfies Meta<typeof NewsletterForm>;
@@ -29,7 +27,7 @@ type TStory = StoryObj<typeof meta>;
 export const Full: TStory = {};
 
 export const Compact: TStory = {
-  args: { variant: 'compact', supportingText: undefined },
+  args: { variant: 'compact' },
 };
 
 /**
