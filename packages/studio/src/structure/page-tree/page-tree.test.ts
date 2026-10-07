@@ -77,9 +77,14 @@ const childPagesOf = (pane: TMockBuilder) => {
 };
 
 describe('createPageTreeResolver', () => {
-  it('opens a page without children straight in the editor', async () => {
-    const { resolve } = makeResolver([modules, faq]);
+  let resolve: ReturnType<typeof makeResolver>['resolve'];
+  let client: ReturnType<typeof makeResolver>['client'];
 
+  beforeEach(() => {
+    ({ resolve, client } = makeResolver([modules, faq]));
+  });
+
+  it('opens a page without children straight in the editor', async () => {
     const pane = await resolve('faq');
 
     expect(pane.kind).toBe('document');
@@ -88,8 +93,6 @@ describe('createPageTreeResolver', () => {
   });
 
   it('offers a page with children as the page plus its child pages', async () => {
-    const { resolve } = makeResolver([modules, faq]);
-
     const pane = await resolve('modules');
     const items = callArgs(pane, 'items')?.[0] as TMockBuilder[];
 
@@ -105,26 +108,27 @@ describe('createPageTreeResolver', () => {
   });
 
   it('counts a child that exists only as a draft', async () => {
-    const { resolve } = makeResolver([modules, { ...faq, _id: 'drafts.faq' }]);
+    const { resolve: resolveWithDraftChild } = makeResolver([
+      modules,
+      { ...faq, _id: 'drafts.faq' },
+    ]);
 
-    expect((await resolve('modules')).kind).toBe('list');
+    expect((await resolveWithDraftChild('modules')).kind).toBe('list');
   });
 
   it('titles the pane from the draft when the page has unpublished edits', async () => {
-    const { resolve } = makeResolver([
+    const { resolve: resolveWithDraft } = makeResolver([
       modules,
       { ...modules, _id: 'drafts.modules', title: 'All modules' },
       faq,
     ]);
 
-    expect(callArgs(await resolve('modules'), 'title')).toEqual([
+    expect(callArgs(await resolveWithDraft('modules'), 'title')).toEqual([
       'All modules',
     ]);
   });
 
   it('lists only the direct children, in the current perspective', async () => {
-    const { resolve, client } = makeResolver([modules, faq]);
-
     const options = callArgs(
       childPagesOf(await resolve('modules')),
       'options',
@@ -140,8 +144,6 @@ describe('createPageTreeResolver', () => {
   });
 
   it('opens each child page through the same tree', async () => {
-    const { resolve } = makeResolver([modules, faq]);
-
     const resolveChild = callArgs(
       childPagesOf(await resolve('modules')),
       'child',
@@ -152,8 +154,6 @@ describe('createPageTreeResolver', () => {
   });
 
   it('wires the reset and increments actions the orderable list handles', async () => {
-    const { resolve } = makeResolver([modules, faq]);
-
     const menuItems = callArgs(
       childPagesOf(await resolve('modules')),
       'menuItems',

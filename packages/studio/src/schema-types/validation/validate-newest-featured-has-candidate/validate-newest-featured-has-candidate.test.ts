@@ -18,8 +18,13 @@ const createMockContext = (
 };
 
 describe('validateNewestFeaturedHasCandidate', () => {
+  let validate: ReturnType<typeof validateNewestFeaturedHasCandidate>;
+
+  beforeEach(() => {
+    validate = validateNewestFeaturedHasCandidate('hero');
+  });
+
   it('passes without querying when Post Source is not Newest Featured', async () => {
-    const validate = validateNewestFeaturedHasCandidate('hero');
     let called = false;
     const context = createMockContext(() => {
       called = true;
@@ -31,7 +36,6 @@ describe('validateNewestFeaturedHasCandidate', () => {
   });
 
   it('errors with the given render target when no candidate exists', async () => {
-    const validate = validateNewestFeaturedHasCandidate('hero');
     const context = createMockContext(() => 0);
 
     await expect(validate(POST_SOURCE.NEWEST_FEATURED, context)).resolves.toBe(
@@ -40,16 +44,17 @@ describe('validateNewestFeaturedHasCandidate', () => {
   });
 
   it('substitutes a different render target for a different caller', async () => {
-    const validate = validateNewestFeaturedHasCandidate('spotlight');
+    const validateSpotlight = validateNewestFeaturedHasCandidate('spotlight');
     const context = createMockContext(() => 0);
 
-    await expect(validate(POST_SOURCE.NEWEST_FEATURED, context)).resolves.toBe(
+    await expect(
+      validateSpotlight(POST_SOURCE.NEWEST_FEATURED, context),
+    ).resolves.toBe(
       'No published post is marked Featured, so this spotlight would render empty.',
     );
   });
 
   it('passes when a candidate exists', async () => {
-    const validate = validateNewestFeaturedHasCandidate('hero');
     const context = createMockContext(() => 1);
 
     await expect(validate(POST_SOURCE.NEWEST_FEATURED, context)).resolves.toBe(
@@ -58,7 +63,6 @@ describe('validateNewestFeaturedHasCandidate', () => {
   });
 
   it('resolves to true, not an error, when the fetch rejects', async () => {
-    const validate = validateNewestFeaturedHasCandidate('hero');
     const context = createMockContext(() => {
       throw new Error('network down');
     });
@@ -69,7 +73,6 @@ describe('validateNewestFeaturedHasCandidate', () => {
   });
 
   it('queries the featured, published post count', async () => {
-    const validate = validateNewestFeaturedHasCandidate('hero');
     let receivedQuery = '';
     const context = createMockContext((query) => {
       receivedQuery = query;

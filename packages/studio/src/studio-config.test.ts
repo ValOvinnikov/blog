@@ -41,13 +41,17 @@ vi.mock('@sanity/code-input', () => ({
 }));
 
 describe(buildStudioConfig, () => {
-  it('builds a config from the given projectId/dataset/title', () => {
-    const config = buildStudioConfig({
+  let config: ReturnType<typeof buildStudioConfig>;
+
+  beforeEach(() => {
+    config = buildStudioConfig({
       projectId: 'test-project',
       dataset: 'test-dataset',
       title: 'Test Studio',
     });
+  });
 
+  it('builds a config from the given projectId/dataset/title', () => {
     expect(config.name).toBe('default');
     expect(config.title).toBe('Test Studio');
     expect(config.projectId).toBe('test-project');
@@ -56,23 +60,17 @@ describe(buildStudioConfig, () => {
   });
 
   it('sets basePath when provided', () => {
-    const config = buildStudioConfig({
+    const configWithBasePath = buildStudioConfig({
       projectId: 'test-project',
       dataset: 'test-dataset',
       basePath: '/dashboard/studio',
       title: 'Test Studio',
     });
 
-    expect(config.basePath).toBe('/dashboard/studio');
+    expect(configWithBasePath.basePath).toBe('/dashboard/studio');
   });
 
   it('hides the migrationState system ledger from document actions and the new-document menu', () => {
-    const config = buildStudioConfig({
-      projectId: 'test-project',
-      dataset: 'test-dataset',
-      title: 'Test Studio',
-    });
-
     const actions = config.document?.actions;
     if (typeof actions !== 'function') {
       throw new Error('expected config.document.actions to be a function');
@@ -87,11 +85,6 @@ describe(buildStudioConfig, () => {
   });
 
   it('wraps only the landing page publish action', () => {
-    const config = buildStudioConfig({
-      projectId: 'test-project',
-      dataset: 'test-dataset',
-      title: 'Test Studio',
-    });
     const actions = config.document?.actions;
     if (typeof actions !== 'function') {
       throw new Error('expected config.document.actions to be a function');
@@ -124,11 +117,6 @@ describe(buildStudioConfig, () => {
     PAGE_TOPIC_TYPE,
     PAGE_TAG_TYPE,
   ])('creates a %s only through a language template', (type) => {
-    const config = buildStudioConfig({
-      projectId: 'test-project',
-      dataset: 'test-dataset',
-      title: 'Test Studio',
-    });
     const templates = config.schema?.templates;
     if (typeof templates !== 'function') {
       throw new Error('expected config.schema.templates to be a function');

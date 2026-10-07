@@ -107,8 +107,13 @@ const getGroupItems = (
 };
 
 describe(buildSections, () => {
+  let S: ReturnType<typeof makeMockStructureBuilder>;
+
+  beforeEach(() => {
+    S = makeMockStructureBuilder();
+  });
+
   it('flattens 3 groups into divider + items, preserving declared order with no leading/trailing extra divider', () => {
-    const S = makeMockStructureBuilder();
     const items = getGroupItems(S, [
       {
         title: 'Group A',
@@ -165,7 +170,6 @@ describe(buildSections, () => {
   });
 
   it('drops an empty group entirely, including its divider, without crashing', () => {
-    const S = makeMockStructureBuilder();
     const items = getGroupItems(S, [
       {
         title: 'Group A',
@@ -193,7 +197,6 @@ describe(buildSections, () => {
   });
 
   it('builds a list item via S.documentTypeListItem() and a singleton item via S.listItem()/S.document()', () => {
-    const S = makeMockStructureBuilder();
     const items = getGroupItems(S, [
       {
         title: 'Group',
@@ -234,7 +237,6 @@ describe(buildSections, () => {
   });
 
   it('treats an omitted mode the same as an explicit "list" mode', () => {
-    const S = makeMockStructureBuilder();
     const items = getGroupItems(S, [
       {
         title: 'Group',
@@ -260,7 +262,6 @@ describe(buildSections, () => {
   });
 
   it('emits an untitled group with no divider while a titled group still gets one', () => {
-    const S = makeMockStructureBuilder();
     const items = getGroupItems(S, [
       {
         items: [
@@ -300,7 +301,6 @@ describe(buildSections, () => {
   });
 
   it('emits a bare divider before an untitled group carrying dividerBefore', () => {
-    const S = makeMockStructureBuilder();
     const items = getGroupItems(S, [
       {
         items: [
@@ -330,7 +330,6 @@ describe(buildSections, () => {
   });
 
   it('builds a listItem with the section title/id/icon and a matching child list', () => {
-    const S = makeMockStructureBuilder();
     const result = buildOneSection(S, {
       title: 'Pages',
       id: 'pages',
@@ -360,7 +359,6 @@ describe(buildSections, () => {
   });
 
   it('skips the middle list and children straight into the document list when flattenSingleItem is set on a single non-singleton item, keeping the section title rather than the item schema title', () => {
-    const S = makeMockStructureBuilder();
     const result = buildOneSection(S, {
       title: 'Links',
       id: 'links',
@@ -388,7 +386,6 @@ describe(buildSections, () => {
   });
 
   it('throws when flattenSingleItem is set but the section has more than one item', () => {
-    const S = makeMockStructureBuilder();
     const section: TStructureSection = {
       title: 'Modules',
       id: 'modules',
@@ -410,7 +407,6 @@ describe(buildSections, () => {
   });
 
   it('throws when flattenSingleItem is set but the single item is a singleton', () => {
-    const S = makeMockStructureBuilder();
     const section: TStructureSection = {
       title: 'Settings',
       id: 'settings',
@@ -465,7 +461,6 @@ describe(buildSections, () => {
       },
     ];
 
-    const S = makeMockStructureBuilder();
     const result = buildSections(
       asStructureBuilder(S),
       sections,
@@ -509,7 +504,6 @@ describe(buildSections, () => {
       },
     ];
 
-    const S = makeMockStructureBuilder();
     const result = buildSections(
       asStructureBuilder(S),
       sections,

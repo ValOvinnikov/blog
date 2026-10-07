@@ -40,30 +40,33 @@ const createMockContext = (
 };
 
 describe('validateUniqueTaxonomyReference', () => {
-  const validate = () =>
-    validateUniqueTaxonomyReference(
+  let validate: ReturnType<typeof validateUniqueTaxonomyReference>;
+
+  beforeEach(() => {
+    validate = validateUniqueTaxonomyReference(
       PAGE_TYPE,
       REFERENCE_FIELD,
       UNIQUENESS_ERROR,
     );
+  });
 
   it('passes without querying when no reference is set', async () => {
     const { context, fetchCalls } = createMockContext(0);
 
-    await expect(validate()(undefined, context)).resolves.toBe(true);
+    await expect(validate(undefined, context)).resolves.toBe(true);
     expect(fetchCalls).toHaveLength(0);
   });
 
   it('passes when no other page references the same term', async () => {
     const { context } = createMockContext(0);
 
-    await expect(validate()({ _ref: 'tag-1' }, context)).resolves.toBe(true);
+    await expect(validate({ _ref: 'tag-1' }, context)).resolves.toBe(true);
   });
 
   it('flags a conflicting page referencing the same term', async () => {
     const { context } = createMockContext(1);
 
-    await expect(validate()({ _ref: 'tag-1' }, context)).resolves.toBe(
+    await expect(validate({ _ref: 'tag-1' }, context)).resolves.toBe(
       UNIQUENESS_ERROR,
     );
   });
@@ -71,13 +74,13 @@ describe('validateUniqueTaxonomyReference', () => {
   it('resolves to true, not the uniqueness error, when the fetch rejects', async () => {
     const { context } = createMockContext(new Error('network down'));
 
-    await expect(validate()({ _ref: 'tag-1' }, context)).resolves.toBe(true);
+    await expect(validate({ _ref: 'tag-1' }, context)).resolves.toBe(true);
   });
 
   it('excludes both the draft and published id of the current document', async () => {
     const { context, fetchCalls } = createMockContext(0, 'drafts.page-tag-1');
 
-    await validate()({ _ref: 'tag-1' }, context);
+    await validate({ _ref: 'tag-1' }, context);
 
     expect(fetchCalls[0]?.params).toMatchObject({
       publishedId: 'page-tag-1',
@@ -91,7 +94,7 @@ describe('validateUniqueTaxonomyReference', () => {
       LOCALE_ISO_CODES.NL,
     );
 
-    await validate()({ _ref: 'tag-1' }, context);
+    await validate({ _ref: 'tag-1' }, context);
 
     expect(fetchCalls[0]?.query).toContain(
       'coalesce(language, "") == $language',
@@ -104,7 +107,7 @@ describe('validateUniqueTaxonomyReference', () => {
   it('matches only pages without a language when the page has none', async () => {
     const { context, fetchCalls } = createMockContext(0);
 
-    await validate()({ _ref: 'tag-1' }, context);
+    await validate({ _ref: 'tag-1' }, context);
 
     expect(fetchCalls[0]?.params).toMatchObject({ language: '' });
   });
@@ -112,7 +115,7 @@ describe('validateUniqueTaxonomyReference', () => {
   it('requests the drafts perspective so an unpublished conflict still counts', async () => {
     const { context, withConfigCalls } = createMockContext(0);
 
-    await validate()({ _ref: 'tag-1' }, context);
+    await validate({ _ref: 'tag-1' }, context);
 
     expect(withConfigCalls).toEqual([{ perspective: 'drafts' }]);
   });

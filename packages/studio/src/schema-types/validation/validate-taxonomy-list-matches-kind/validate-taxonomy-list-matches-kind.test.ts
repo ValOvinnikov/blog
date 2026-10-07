@@ -29,12 +29,17 @@ const createMockListContext = (
 };
 
 describe('validateTaxonomyListReferencesMatchKind', () => {
-  it('passes when neither the legacy field nor modules[] references anything, without querying', async () => {
-    const validate = validateTaxonomyListReferencesMatchKind(
+  let validate: ReturnType<typeof validateTaxonomyListReferencesMatchKind>;
+
+  beforeEach(() => {
+    validate = validateTaxonomyListReferencesMatchKind(
       TAXONOMY_KIND.TOPICS,
       MODULE_TYPE_NAME,
       MISMATCH_ERROR,
     );
+  });
+
+  it('passes when neither the legacy field nor modules[] references anything, without querying', async () => {
     const { context, fetchCalls } = createMockListContext([]);
 
     await expect(validate(asDocument({}), context)).resolves.toBe(true);
@@ -42,11 +47,6 @@ describe('validateTaxonomyListReferencesMatchKind', () => {
   });
 
   it('passes when the legacy taxonomyList reference matches the page kind', async () => {
-    const validate = validateTaxonomyListReferencesMatchKind(
-      TAXONOMY_KIND.TOPICS,
-      MODULE_TYPE_NAME,
-      MISMATCH_ERROR,
-    );
     const { context } = createMockListContext([
       { _id: 'taxonomy-list-1', taxonomy: TAXONOMY_KIND.TOPICS },
     ]);
@@ -56,11 +56,6 @@ describe('validateTaxonomyListReferencesMatchKind', () => {
   });
 
   it('passes when the modules[] entry has no taxonomy set', async () => {
-    const validate = validateTaxonomyListReferencesMatchKind(
-      TAXONOMY_KIND.TOPICS,
-      MODULE_TYPE_NAME,
-      MISMATCH_ERROR,
-    );
     const { context } = createMockListContext([
       { _id: 'taxonomy-list-1', taxonomy: undefined },
     ]);
@@ -74,11 +69,6 @@ describe('validateTaxonomyListReferencesMatchKind', () => {
   });
 
   it('fails when a modules[] entry lists the other kind, targeting that entry', async () => {
-    const validate = validateTaxonomyListReferencesMatchKind(
-      TAXONOMY_KIND.TOPICS,
-      MODULE_TYPE_NAME,
-      MISMATCH_ERROR,
-    );
     const { context } = createMockListContext([
       { _id: 'taxonomy-list-1', taxonomy: TAXONOMY_KIND.TAGS },
     ]);
@@ -94,11 +84,6 @@ describe('validateTaxonomyListReferencesMatchKind', () => {
   });
 
   it('falls back to the array index when a mismatching modules[] entry has no _key', async () => {
-    const validate = validateTaxonomyListReferencesMatchKind(
-      TAXONOMY_KIND.TOPICS,
-      MODULE_TYPE_NAME,
-      MISMATCH_ERROR,
-    );
     const { context } = createMockListContext([
       { _id: 'taxonomy-list-1', taxonomy: TAXONOMY_KIND.TAGS },
     ]);
@@ -112,11 +97,6 @@ describe('validateTaxonomyListReferencesMatchKind', () => {
   });
 
   it('fails when the deprecated legacy field lists the other kind, targeting that field', async () => {
-    const validate = validateTaxonomyListReferencesMatchKind(
-      TAXONOMY_KIND.TOPICS,
-      MODULE_TYPE_NAME,
-      MISMATCH_ERROR,
-    );
     const { context } = createMockListContext([
       { _id: 'taxonomy-list-legacy', taxonomy: TAXONOMY_KIND.TAGS },
     ]);
@@ -130,11 +110,6 @@ describe('validateTaxonomyListReferencesMatchKind', () => {
   });
 
   it('resolves to true, not an error, when the fetch rejects', async () => {
-    const validate = validateTaxonomyListReferencesMatchKind(
-      TAXONOMY_KIND.TOPICS,
-      MODULE_TYPE_NAME,
-      MISMATCH_ERROR,
-    );
     const { context } = createMockListContext(new Error('network down'));
     const document = asDocument({
       modules: [
@@ -146,11 +121,6 @@ describe('validateTaxonomyListReferencesMatchKind', () => {
   });
 
   it('ignores modules[] entries of a different type', async () => {
-    const validate = validateTaxonomyListReferencesMatchKind(
-      TAXONOMY_KIND.TOPICS,
-      MODULE_TYPE_NAME,
-      MISMATCH_ERROR,
-    );
     const { context, fetchCalls } = createMockListContext([]);
     const document = asDocument({
       modules: [{ _key: 'k1', _type: 'module_cta', _ref: 'cta-1' }],
@@ -161,11 +131,6 @@ describe('validateTaxonomyListReferencesMatchKind', () => {
   });
 
   it('deduplicates a ref shared by the legacy field and modules[] into one fetch, but reports both locations', async () => {
-    const validate = validateTaxonomyListReferencesMatchKind(
-      TAXONOMY_KIND.TOPICS,
-      MODULE_TYPE_NAME,
-      MISMATCH_ERROR,
-    );
     const { context, fetchCalls } = createMockListContext([
       { _id: 'taxonomy-list-1', taxonomy: TAXONOMY_KIND.TAGS },
     ]);
