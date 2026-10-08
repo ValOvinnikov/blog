@@ -1,7 +1,13 @@
 'use client';
 
-import { portableTextToPlainText, type TLocaleIsoCode } from '@blog/config';
+import {
+  EMAIL_TEMPLATE_TYPE,
+  portableTextToPlainText,
+  type TEmailTemplateType,
+  type TLocaleIsoCode,
+} from '@blog/config';
 import type { TTenantEmailBrand } from '@blog/email/html';
+import { EmailPreview } from '@platform/components/features/email/email-preview';
 import { EmailSenderEditor } from '@platform/components/features/email/email-sender-editor';
 import { ItemList } from '@platform/components/features/email/email-settings/components/item-list';
 import { ItemSelect } from '@platform/components/features/email/email-settings/components/item-select';
@@ -22,12 +28,16 @@ import {
   type TEmailPageItem,
   type TEmailSenderDraft,
 } from '@platform/utils/email-draft/email-draft';
+import { buildEmailTemplatePreviewHtml } from '@platform/utils/email-template-preview-builder/email-template-preview-builder';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
 
 import { emailSettingsVariants } from './email-settings-variants';
 import { useEmailDraft } from './use-email-draft';
+import { useSendTestEmail } from './use-send-test-email';
+
+type TPhoneView = 'edit' | 'preview';
 
 const SENDER_FIELD_LABEL_KEYS = {
   senderName: 'senderNameLabel',
@@ -69,6 +79,11 @@ export const EmailSettings = ({
     useState<TEmailPageItem>(EMAIL_SENDER_ITEM);
   const [selectedLocale, setSelectedLocale] = useState(defaultLocale);
   const [discardCount, setDiscardCount] = useState(0);
+  const [previewTemplate, setPreviewTemplate] = useState<TEmailTemplateType>(
+    EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+  );
+  const [phoneView, setPhoneView] = useState<TPhoneView>('edit');
+  const { sendTest, isSending } = useSendTestEmail(tenantId);
 
   const {
     values: draft,
@@ -89,7 +104,34 @@ export const EmailSettings = ({
     },
   });
 
-  const { layout, main } = emailSettingsVariants();
+  const { layout, main, phoneTabs, editPane, previewPane } =
+    emailSettingsVariants({ phoneView });
+
+  const selectItem = (item: TEmailPageItem) => {
+    setSelectedItem(item);
+    if (item !== EMAIL_SENDER_ITEM) setPreviewTemplate(item);
+  };
+
+  const previewCopy = draft.copies[previewTemplate][selectedLocale];
+  const previewFallback = resolveFallbackCopy(
+    draft,
+    previewTemplate,
+    selectedLocale,
+    defaultLocale,
+  );
+  const previewSubject = previewCopy.subject.trim() || previewFallback.subject;
+  const previewBody = previewCopy.body ?? previewFallback.body;
+  const previewLogo = draft.templateLogos[previewTemplate].url
+    ? draft.templateLogos[previewTemplate]
+    : draft.senderLogo;
+  const previewHtml = buildEmailTemplatePreviewHtml(previewTemplate, {
+    subject: previewSubject,
+    body: previewBody,
+    brand,
+    brandName,
+    logoImageUrl: previewLogo.url,
+    footerPostalAddress: draft.sender.footerPostalAddress.trim() || undefined,
+  });
   const isDisabled = isPending || isArchived;
   const archivedDescribedBy = isArchived ? archivedNoticeId : undefined;
 
@@ -188,76 +230,104 @@ export const EmailSettings = ({
         <ItemList
           items={items}
           selected={selectedItem}
-          onSelect={setSelectedItem}
+          onSelect={selectItem}
           ariaLabel={t('itemsAriaLabel')}
         />
         <div className={main()}>
           <ItemSelect
             items={items}
             selected={selectedItem}
-            onSelect={setSelectedItem}
+            onSelect={selectItem}
             label={t('editingLabel')}
           />
-          {selectedItem === EMAIL_SENDER_ITEM ? (
-            <EmailSenderEditor
-              sender={draft.sender}
-              logo={draft.senderLogo}
-              onSenderChange={(sender) => {
-                setSenderNameError(undefined);
-                setDraft((prev) => ({ ...prev, sender }));
-              }}
-              onLogoStage={(logo) =>
-                setDraft((prev) => withLogo(prev, EMAIL_SENDER_ITEM, logo))
-              }
-              senderNameError={senderNameError}
-              isDisabled={isDisabled}
-              archivedNoticeId={archivedDescribedBy}
-            />
-          ) : (
-            <>
-              {liveLocales.length > 1 && (
-                <SegmentedControl
-                  options={liveLocales.map((locale) => ({
-                    value: locale,
-                    label: tLanguage(locale),
-                  }))}
-                  value={selectedLocale}
-                  onChange={setSelectedLocale}
-                  ariaLabel={t('languageAriaLabel')}
-                />
-              )}
-              <EmailTemplateEditor
-                key={`${selectedItem}-${selectedLocale}-${discardCount}`}
-                templateType={selectedItem}
-                languageName={tLanguage(selectedLocale)}
-                copy={draft.copies[selectedItem][selectedLocale]}
-                fallback={resolveFallbackCopy(
-                  draft,
-                  selectedItem,
-                  selectedLocale,
-                  defaultLocale,
-                )}
-                logo={draft.templateLogos[selectedItem]}
-                senderLogoUrl={draft.senderLogo.url}
-                onCopyChange={(copy) =>
-                  setDraft((prev) =>
-                    withCopy(
-                      prev,
-                      { templateType: selectedItem, locale: selectedLocale },
-                      copy,
-                    ),
-                  )
-                }
+          <SegmentedControl
+            className={phoneTabs()}
+            options={[
+              { value: 'edit', label: t('editTab') },
+              { value: 'preview', label: t('previewTab') },
+            ]}
+            value={phoneView}
+            onChange={setPhoneView}
+            ariaLabel={t('viewAriaLabel')}
+          />
+          <div className={editPane()}>
+            {selectedItem === EMAIL_SENDER_ITEM ? (
+              <EmailSenderEditor
+                sender={draft.sender}
+                logo={draft.senderLogo}
+                onSenderChange={(sender) => {
+                  setSenderNameError(undefined);
+                  setDraft((prev) => ({ ...prev, sender }));
+                }}
                 onLogoStage={(logo) =>
-                  setDraft((prev) => withLogo(prev, selectedItem, logo))
+                  setDraft((prev) => withLogo(prev, EMAIL_SENDER_ITEM, logo))
                 }
-                brand={brand}
-                brandName={brandName}
+                senderNameError={senderNameError}
                 isDisabled={isDisabled}
                 archivedNoticeId={archivedDescribedBy}
               />
-            </>
-          )}
+            ) : (
+              <>
+                {liveLocales.length > 1 && (
+                  <SegmentedControl
+                    options={liveLocales.map((locale) => ({
+                      value: locale,
+                      label: tLanguage(locale),
+                    }))}
+                    value={selectedLocale}
+                    onChange={setSelectedLocale}
+                    ariaLabel={t('languageAriaLabel')}
+                  />
+                )}
+                <EmailTemplateEditor
+                  key={`${selectedItem}-${selectedLocale}-${discardCount}`}
+                  templateType={selectedItem}
+                  languageName={tLanguage(selectedLocale)}
+                  copy={draft.copies[selectedItem][selectedLocale]}
+                  fallback={resolveFallbackCopy(
+                    draft,
+                    selectedItem,
+                    selectedLocale,
+                    defaultLocale,
+                  )}
+                  logo={draft.templateLogos[selectedItem]}
+                  onCopyChange={(copy) =>
+                    setDraft((prev) =>
+                      withCopy(
+                        prev,
+                        { templateType: selectedItem, locale: selectedLocale },
+                        copy,
+                      ),
+                    )
+                  }
+                  onLogoStage={(logo) =>
+                    setDraft((prev) => withLogo(prev, selectedItem, logo))
+                  }
+                  isDisabled={isDisabled}
+                  archivedNoticeId={archivedDescribedBy}
+                />
+              </>
+            )}
+          </div>
+          <div className={previewPane()}>
+            <EmailPreview
+              html={previewHtml}
+              from={draft.sender.senderName.trim() || undefined}
+              replyTo={draft.sender.replyToAddress.trim() || undefined}
+              subject={previewSubject}
+              onSendTest={() =>
+                sendTest({
+                  templateType: previewTemplate,
+                  subject: previewSubject,
+                  body: previewBody,
+                  sender: draft.sender,
+                })
+              }
+              isSendingTest={isSending}
+              isSendTestDisabled={isArchived}
+              hasUnsavedLogo={previewLogo.file !== undefined}
+            />
+          </div>
         </div>
       </div>
     </SettingsFormShell>

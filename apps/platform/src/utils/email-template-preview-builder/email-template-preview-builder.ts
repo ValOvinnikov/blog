@@ -13,6 +13,7 @@ export type TEmailTemplatePreviewInput = {
   brand: TTenantEmailBrand;
   brandName: string;
   logoImageUrl?: string;
+  footerPostalAddress?: string;
 };
 
 const PREVIEW_ACTION_URL = 'https://example.com';

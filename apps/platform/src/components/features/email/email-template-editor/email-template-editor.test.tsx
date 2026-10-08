@@ -1,6 +1,5 @@
 import { EMAIL_TEMPLATE_TYPE } from '@blog/config';
 import { customRender, screen } from '@platform/testing/custom-render';
-import { TENANT_EMAIL_BRAND as BRAND } from '@platform/testing/tenant-email-brand';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { EmailTemplateEditor } from './email-template-editor';
@@ -21,11 +20,8 @@ const setup = customRender(EmailTemplateEditor, {
   copy: { subject: '', body: null },
   fallback: { subject: 'Connectez-vous', body: FALLBACK_BODY },
   logo: { url: undefined },
-  senderLogoUrl: undefined,
   onCopyChange: vi.fn(),
   onLogoStage: vi.fn(),
-  brand: BRAND,
-  brandName: 'Acme Co',
   isDisabled: false,
 });
 

@@ -1749,6 +1749,31 @@ page, so a downgraded tenant's data stays reachable. Roadmap entries with no
 page yet (Subscribers, Comments, Team) render as non-interactive "Coming soon"
 items in both views; no entry carries a progress badge.
 
+**Email templates per language.** Each template's subject and body are
+stored per language (`email_templates`, keyed by tenant, template type and
+language); a template's logo override is the same in every language
+(`email_template_logos`). Every send resolves each field from the
+recipient's language, then the tenant's default language, then the product
+default in the recipient's language. Senders pick the language as follows:
+the magic-link provider as described in §3, `apps/web`'s newsletter
+confirmation from the language of the page the reader subscribed on (a value
+outside the site's languages falls back to the tenant's default), and a
+platform admin signing into the platform itself always in English.
+
+`apps/platform`'s Email page edits one language at a time, as one draft saved
+through the settings save bar: Sender & footer (sender name, reply-to,
+postal address and the email logo, the same in every language) and the three
+templates, each marked Default, Customised or Unsaved for the selected
+language. A blank field shows, and sends, its fallback. Logos are staged in
+the draft and uploaded on save. Beside the editor, a preview renders the
+selected template in the selected language through the same `@blog/email`
+builder the sender uses, with From, Reply-to and Subject above it, a
+Desktop/Mobile width toggle, and **Send test to me**: it mails the current
+draft (saved logos only) to the signed-in user from the platform's own
+sender address, limited to five sends per user per ten minutes on each
+server instance. On a phone, an "Editing" select replaces the list and
+Edit/Preview tabs switch between the editor and the preview.
+
 **Studio capability warning.** `@blog/studio`'s `StudioMount` takes an optional
 `enabledCapabilities?: readonly TCapability[]`. When it is supplied, a
 type→capability map in the package (`module_newsletter` → `NEWSLETTER`)
