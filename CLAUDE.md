@@ -216,6 +216,12 @@ state plainly:
   the next starts ("One layer at a time" above). Parallel here means
   independent tickets, not the layers of one ticket.
 - **Constraints** — migrations, human gates, anything that cannot be split.
+- **Copy** — every visible string on the public site the work adds or
+  rewords, including the copy a new `@blog/ui` text prop will carry once
+  `web` wires it. Give each string a recommended classification, Voice or
+  fixed, per "Check for Voice candidates" below, or write "none". The user's
+  approval of the split settles them, and they go into the ticket body
+  before dispatch.
 - **Doubts** — including scope you suspect but have not yet confirmed.
 
 **If anything blocks, ask and wait for an answer.** Never proceed on an
@@ -816,6 +822,31 @@ totalPages } = result.data;`) — but the same rule applies anywhere a shape
   gate as Sanity's. Full mechanism in `.claude/agents/db.md`'s "Migrations"
   section. Never hand-edit a migration file once it has been applied
   anywhere shared (dev or prod) — write a new corrective migration instead.
+- **Check for Voice candidates.** Every visible string in the public site's
+  catalog (`packages/config/src/voice/site-messages.*.json`) sits on one of
+  two lists. `VOICE_FIELDS` strings are tenant-editable, per language, in
+  the platform's Voice page. `VOICE_FIXED_KEYS` strings are fixed and
+  translated by us. Which list a new or reworded string joins is the
+  **user's** decision, put to them in the plan's **Copy** line ("Say what it
+  touches before starting"). Neither the orchestrator nor a layer agent
+  settles it.
+  - Recommend Voice for page-level prose an editor writes in the site's own
+    voice: an empty state, or the heading or supporting text of a page like
+    the 404 or error page.
+  - Recommend fixed for everything else: buttons, links, toggles, badges,
+    statuses, form and section labels, page names that a fixed menu link
+    repeats, copy that states what the code enforces, third-party names,
+    accessibility-only strings, toasts and ICU counters.
+  - The editable set has no cap. A new string that meets the rule is a
+    candidate however many fields already exist.
+  - The cost of wiring a field (db, the platform page, its preview specimen)
+    belongs in the recommendation, never in the decision.
+  - A feature that starts in `@blog/ui` lists its copy at the `ui` step. The
+    component's props already decide whether the copy can be a Voice field,
+    such as one rich message versus a title, body and action.
+  - A string a layer agent first reports mid-task under **Voice candidates**
+    goes to the user before commit.
+  - `apps/platform`'s own UI copy is never Voice.
 - Verify with `pnpm verify` from root — one `&&` chain over `type-check`,
   `lint`, `test`, `knip` and the five gating scripts (`check:client-graph`,
   `check:revalidate-tags-sync`, `check:turbo-env-sync`,

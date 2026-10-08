@@ -260,6 +260,17 @@ CI-enforced guard was deliberately not added.
   before this review is dispatched — reviewer trusts that result rather than
   re-running the suite. `build` is CI-only (`ci.yml`'s `build` job gates every
   PR); it is not part of the local/review loop.
+- **Voice candidates (listed, not blocking).** Under a "Voice candidates"
+  heading, list:
+  - every catalog key the diff adds or rewords in
+    `packages/config/src/voice/site-messages.*.json`, with the list it landed
+    on (`VOICE_FIELDS` or `VOICE_FIXED_KEYS`);
+  - every new `@blog/ui` prop that renders visible text.
+
+  The orchestrator checks each one against the classification recorded in
+  the ticket. If the ticket does not record one, it goes to the user before
+  commit (CLAUDE.md "Check for Voice candidates").
+
 - **Inline comments (blocking).** Read every comment the diff adds or
   touches, not just grep for keywords. Any comment sitting inside a
   function/component body — narrating what a line, branch, or step does —

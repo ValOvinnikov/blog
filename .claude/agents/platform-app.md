@@ -477,20 +477,16 @@ them to fix these.
   needs no permission.
 - **No SEO surface.** No `generateMetadata` beyond a plain title, no sitemap,
   no robots, no feeds. This app should not be indexed.
-- **Voice settings edit a subset of the site's copy catalogue.**
-  `src/utils/voice-fields/voice-fields.ts` (`TVoiceOverrideKey`,
-  `VOICE_FIELD_GROUPS`) is one of three hand-duplicated lists the runtime
-  reads; the others are `apps/web`'s
-  `src/utils/apply-voice-overrides/apply-voice-overrides.ts` mapping and the
-  Zod `voiceOverridesSchema` in `packages/db`'s `upsert-site-config.ts`. An
-  override missing from any of the three is accepted, stored, and never
-  applied, with nothing failing — so a new key goes into all three. Which
-  strings are editable at all is declared by `@blog/config`'s `VOICE_FIELDS`
-  registry, whose coverage test refuses a catalog string that is neither
-  registered nor explicitly marked fixed. There is no Studio schema for voice
-  copy. No `packages/db` migration is needed to add a key — `voiceOverrides`
-  is an open-ended JSONB column — but removing or renaming one does need
-  one, since existing rows still carry the old key.
+- **Voice settings edit the site copy registered in `@blog/config`'s
+  `VOICE_FIELDS`.**
+  - The page submits its own field list today
+    (`src/utils/voice-fields/voice-fields.ts`).
+  - `upsertSiteConfig` (`@blog/db`) validates the submission against the
+    registry and throws on an unregistered key. So a field that leaves the
+    registry leaves that list in the same PR.
+  - Which strings are editable is the user's decision (CLAUDE.md "Check for
+    Voice candidates").
+  - The platform's own UI copy is never Voice.
 - Per-role page access beyond the coarse split above is not fully settled — the
   design doc states the default assumption and flags it as open. Follow the
   ticket; if the ticket is silent, report the ambiguity rather than choosing.
