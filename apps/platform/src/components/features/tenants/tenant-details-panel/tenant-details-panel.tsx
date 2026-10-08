@@ -45,18 +45,9 @@ type TFormValues = {
 
 type TTextFieldKey = 'name' | 'primaryDomain' | 'ownerEmail';
 
-const TEXT_FIELD_ID: Record<TTextFieldKey, string> = {
-  name: 'tenant-detail-name',
-  primaryDomain: 'tenant-detail-domain',
-  ownerEmail: 'tenant-detail-owner-email',
-};
-
 const TEXT_FIELD_TYPE: Partial<Record<TTextFieldKey, string>> = {
   ownerEmail: 'email',
 };
-
-const PLAN_FIELD_ID = 'tenant-detail-plan';
-const LOCALE_FIELD_ID = 'tenant-detail-locale';
 
 const valuesFromProps = (
   tenant: TTenant,
@@ -100,6 +91,8 @@ export const TenantDetailsPanel = ({
   const toast = useToast();
   const router = useRouter();
   const panelId = useId();
+  const localeLockReasonId = useId();
+  const planLockReasonId = useId();
   const [renderedTenant, setRenderedTenant] = useState(tenant);
   const [renderedOwnerEmail, setRenderedOwnerEmail] = useState(ownerEmail);
   const [values, setValues] = useState<TFormValues>(() =>
@@ -270,24 +263,16 @@ export const TenantDetailsPanel = ({
               aria-label={t('fieldsGroupLabel')}
             >
               {textFields.map(({ key, label: labelText }) => {
-                const id = TEXT_FIELD_ID[key];
-                const errorId = `${id}-error`;
-                const reasonId = `${id}-lock-reason`;
                 const errorMessage = fieldErrors[key];
                 const lock = effectiveFieldLocks[key];
-                const describedBy =
-                  [lock ? reasonId : null, errorMessage ? errorId : null]
-                    .filter(Boolean)
-                    .join(' ') || undefined;
 
                 return (
                   <FormTextInput
                     key={key}
                     label={labelText}
-                    htmlFor={id}
                     hint={
                       lock && (
-                        <span id={reasonId} className={fieldLockReason()}>
+                        <span className={fieldLockReason()}>
                           {lockReasonText(lock)}
                         </span>
                       )
@@ -298,19 +283,16 @@ export const TenantDetailsPanel = ({
                     onChange={(nextValue) => updateField(key, nextValue)}
                     isInvalid={Boolean(errorMessage)}
                     isDisabled={Boolean(lock)}
-                    aria-describedby={describedBy}
                   />
                 );
               })}
 
               <FormField
                 label={t('localeLabel')}
+                hasOwnAccessibleName={true}
                 hint={
                   localeLock && (
-                    <span
-                      id={`${LOCALE_FIELD_ID}-lock-reason`}
-                      className={fieldLockReason()}
-                    >
+                    <span id={localeLockReasonId} className={fieldLockReason()}>
                       {lockReasonText(localeLock)}
                     </span>
                   )
@@ -323,20 +305,16 @@ export const TenantDetailsPanel = ({
                   onChange={(locale) => updateField('locale', locale)}
                   className={planControl()}
                   isDisabled={Boolean(localeLock)}
-                  aria-describedby={
-                    localeLock ? `${LOCALE_FIELD_ID}-lock-reason` : undefined
-                  }
+                  aria-describedby={localeLock ? localeLockReasonId : undefined}
                 />
               </FormField>
 
               <FormField
                 label={t('planLabel')}
+                hasOwnAccessibleName={true}
                 hint={
                   planLock && (
-                    <span
-                      id={`${PLAN_FIELD_ID}-lock-reason`}
-                      className={fieldLockReason()}
-                    >
+                    <span id={planLockReasonId} className={fieldLockReason()}>
                       {lockReasonText(planLock)}
                     </span>
                   )
@@ -349,9 +327,7 @@ export const TenantDetailsPanel = ({
                   onChange={(plan) => updateField('plan', plan)}
                   className={planControl()}
                   isDisabled={Boolean(planLock)}
-                  aria-describedby={
-                    planLock ? `${PLAN_FIELD_ID}-lock-reason` : undefined
-                  }
+                  aria-describedby={planLock ? planLockReasonId : undefined}
                 />
               </FormField>
             </div>

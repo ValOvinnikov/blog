@@ -4,7 +4,6 @@ import type { AriaAttributes, ReactNode } from 'react';
 
 export type TFormTextInputProps = {
   label: string;
-  htmlFor: string;
   hint?: ReactNode;
   error?: string;
   footer?: ReactNode;
@@ -19,7 +18,6 @@ export type TFormTextInputProps = {
 
 export const FormTextInput = ({
   label,
-  htmlFor,
   hint,
   error,
   footer,
@@ -32,15 +30,8 @@ export const FormTextInput = ({
   'aria-describedby': ariaDescribedBy,
 }: TFormTextInputProps) => {
   return (
-    <FormField
-      label={label}
-      htmlFor={htmlFor}
-      hint={hint}
-      error={error}
-      footer={footer}
-    >
+    <FormField label={label} hint={hint} error={error} footer={footer}>
       <TextInput
-        id={htmlFor}
         type={type}
         placeholder={placeholder}
         value={value}

@@ -1,5 +1,6 @@
 'use client';
 
+import { Field } from '@base-ui/react/field';
 import {
   VOICE_FIELD_KIND,
   VOICE_PORTABLE_TEXT_SCHEMA,
@@ -16,7 +17,6 @@ import { isBlankPortableTextValue } from '@platform/utils/portable-text-schema/p
 import {
   isSameVoiceValue,
   isVoiceValueCustomised,
-  voiceFieldInputId,
   type TVoiceDraftValue,
   type TVoiceField,
 } from '@platform/utils/voice-draft/voice-draft';
@@ -26,6 +26,7 @@ import { useState } from 'react';
 import { voiceFieldVariants } from './voice-field-variants';
 
 export type TVoiceFieldProps = {
+  inputId: string;
   field: Pick<TVoiceField, 'id' | 'placeholders'> & { kind: TVoiceFieldKind };
   value: TVoiceDraftValue;
   savedValue: TVoiceDraftValue;
@@ -36,6 +37,7 @@ export type TVoiceFieldProps = {
 };
 
 export const VoiceField = ({
+  inputId,
   field,
   value,
   savedValue,
@@ -62,8 +64,6 @@ export const VoiceField = ({
     error: errorSlot,
   } = voiceFieldVariants();
 
-  const inputId = voiceFieldInputId(field.id);
-  const labelId = `${inputId}-label`;
   const hintId = `${inputId}-hint`;
   const noteId = `${inputId}-note`;
   const errorId = `${inputId}-error`;
@@ -72,7 +72,7 @@ export const VoiceField = ({
   const textValue = typeof value === 'string' ? value : '';
   const isCustomised = isVoiceValueCustomised(value);
   const [placeholderToken] = field.placeholders;
-  const describedBy = [
+  const richDescribedBy = [
     hintId,
     placeholderToken !== undefined && noteId,
     error && errorId,
@@ -86,21 +86,21 @@ export const VoiceField = ({
   };
 
   return (
-    <div className={root()}>
+    <Field.Root className={root()} invalid={Boolean(error)}>
       <div className={header()}>
         <div className={labelGroup()}>
           {isRich ? (
-            <span id={labelId} className={labelSlot()}>
-              {label}
-            </span>
+            <span className={labelSlot()}>{label}</span>
           ) : (
-            <label id={labelId} htmlFor={inputId} className={labelSlot()}>
-              {label}
-            </label>
+            <Field.Label className={labelSlot()}>{label}</Field.Label>
           )}
-          <span id={hintId} className={hintSlot()}>
+          <Field.Description
+            id={hintId}
+            render={<span />}
+            className={hintSlot()}
+          >
             {tHints(field.id)}
-          </span>
+          </Field.Description>
         </div>
         <div className={actions()}>
           <VoiceFieldStatus
@@ -132,7 +132,7 @@ export const VoiceField = ({
           placeholder={placeholder}
           isInvalid={Boolean(error)}
           isDisabled={isReadOnly}
-          aria-describedby={describedBy}
+          aria-describedby={richDescribedBy}
         />
       ) : field.kind === VOICE_FIELD_KIND.MULTILINE ? (
         <Textarea
@@ -141,8 +141,6 @@ export const VoiceField = ({
           onChange={onChange}
           placeholder={placeholder}
           isReadOnly={isReadOnly}
-          hasExternalLabel={true}
-          aria-describedby={describedBy}
           rows={3}
           className={input()}
         />
@@ -154,24 +152,27 @@ export const VoiceField = ({
           placeholder={placeholder}
           isInvalid={Boolean(error)}
           isReadOnly={isReadOnly}
-          hasExternalLabel={true}
-          aria-describedby={describedBy}
           className={input()}
         />
       )}
       {placeholderToken !== undefined && (
-        <span id={noteId} className={note()}>
+        <Field.Description id={noteId} render={<span />} className={note()}>
           {t.rich('keepPlaceholder', {
             token: `{${placeholderToken}}`,
             code: (chunks) => <code className={token()}>{chunks}</code>,
           })}
-        </span>
+        </Field.Description>
       )}
       {error && (
-        <span id={errorId} className={errorSlot()}>
+        <Field.Error
+          id={errorId}
+          match={true}
+          render={<span />}
+          className={errorSlot()}
+        >
           {error}
-        </span>
+        </Field.Error>
       )}
-    </div>
+    </Field.Root>
   );
 };

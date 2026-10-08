@@ -1,4 +1,7 @@
-import type { AriaAttributes, ChangeEvent } from 'react';
+'use client';
+
+import { Input } from '@base-ui/react/input';
+import type { AriaAttributes } from 'react';
 
 import {
   textInputVariants,
@@ -9,7 +12,6 @@ export type TTextInputProps = {
   value: string;
   onChange: (value: string) => void;
   ariaLabel?: string;
-  hasExternalLabel?: boolean;
   id?: string;
   type?: string;
   placeholder?: string;
@@ -35,12 +37,8 @@ export const TextInput = ({
   'aria-describedby': ariaDescribedBy,
   className,
 }: TTextInputProps) => {
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    onChange(event.target.value);
-  };
-
   return (
-    <input
+    <Input
       id={id}
       type={type}
       placeholder={placeholder}
@@ -48,9 +46,9 @@ export const TextInput = ({
       disabled={Boolean(isDisabled)}
       readOnly={Boolean(isReadOnly)}
       value={value}
-      onChange={handleChange}
+      onValueChange={(nextValue) => onChange(nextValue)}
       aria-label={ariaLabel}
-      aria-invalid={Boolean(isInvalid)}
+      aria-invalid={isInvalid || undefined}
       aria-describedby={ariaDescribedBy}
       className={textInputVariants({
         isInvalid,

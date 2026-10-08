@@ -4,26 +4,18 @@ import userEvent from '@testing-library/user-event';
 import { FormTextInput } from './form-text-input';
 
 describe(FormTextInput, () => {
-  it('associates the label with the input via htmlFor/id', () => {
-    render(
-      <FormTextInput
-        label="Tenant name"
-        htmlFor="tenant-name"
-        value=""
-        onChange={vi.fn()}
-      />,
-    );
+  it('names the input by its label', () => {
+    render(<FormTextInput label="Tenant name" value="" onChange={vi.fn()} />);
 
     const input = screen.getByRole('textbox', { name: 'Tenant name' });
     expect(input).toBeVisible();
     expect(input).not.toHaveAttribute('aria-label');
   });
 
-  it('renders the hint node and the error message', () => {
+  it('describes the input with its hint and error', () => {
     render(
       <FormTextInput
         label="Slug"
-        htmlFor="tenant-slug"
         hint={<span data-testid="hint">Used in the URL</span>}
         error="Already in use"
         value=""
@@ -31,15 +23,15 @@ describe(FormTextInput, () => {
       />,
     );
 
-    expect(screen.getByTestId('hint')).toBeVisible();
-    expect(screen.getByText('Already in use')).toBeVisible();
+    const input = screen.getByRole('textbox', { name: 'Slug' });
+    expect(input).toHaveAccessibleDescription('Used in the URL Already in use');
+    expect(input).toHaveAttribute('aria-invalid', 'true');
   });
 
   it('renders footer content after the error message', () => {
     render(
       <FormTextInput
         label="Owner email"
-        htmlFor="owner-email"
         error="Invalid email"
         footer={<span data-testid="footer">Confirmation sent</span>}
         value=""
@@ -55,12 +47,7 @@ describe(FormTextInput, () => {
     const handleChange = vi.fn();
 
     render(
-      <FormTextInput
-        label="Tenant name"
-        htmlFor="tenant-name"
-        value=""
-        onChange={handleChange}
-      />,
+      <FormTextInput label="Tenant name" value="" onChange={handleChange} />,
     );
 
     await user.type(screen.getByLabelText('Tenant name'), 'a');
@@ -72,7 +59,6 @@ describe(FormTextInput, () => {
     render(
       <FormTextInput
         label="Slug"
-        htmlFor="tenant-slug"
         value=""
         onChange={vi.fn()}
         isInvalid={true}

@@ -11,7 +11,6 @@ const baseProps: Omit<
   triggerLabel: 'Open dialog',
   title: 'Confirm this action',
   description: 'This cannot be undone.',
-  confirmFieldId: 'confirm-field',
   confirmLabel: 'Type "acme" to confirm',
   confirmHint: 'This action is irreversible.',
   expectedValue: 'acme',

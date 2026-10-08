@@ -19,19 +19,23 @@ ruleTester.run(
     valid: [
       'const el = <TextInput value={v} onChange={onChange} ariaLabel="Name" />;',
       'const el = <Textarea value={v} onChange={onChange} ariaLabel="Bio" />;',
-      // Explicit opt-out for a sibling-labelled control (e.g. VoiceField).
-      'const el = <TextInput value={v} onChange={onChange} hasExternalLabel />;',
-      'const el = <Textarea value={v} onChange={onChange} hasExternalLabel />;',
-      // A FormField ancestor with htmlFor renders the associated <label>.
       `const el = (
-        <FormField label="Name" htmlFor="name">
-          <TextInput id="name" value={v} onChange={onChange} />
+        <FormField label="Name">
+          <TextInput value={v} onChange={onChange} />
         </FormField>
       );`,
       `const el = (
-        <FormField label="Bio" htmlFor="bio">
-          <Textarea id="bio" value={v} onChange={onChange} />
+        <FormField label="Bio">
+          <Textarea value={v} onChange={onChange} />
         </FormField>
+      );`,
+      `const el = (
+        <Field.Root>
+          <Field.Label>Name</Field.Label>
+          <div>
+            <TextInput value={v} onChange={onChange} />
+          </div>
+        </Field.Root>
       );`,
       // Unrelated components are untouched.
       'const el = <Button onClick={onClick}>Save</Button>;',
@@ -46,10 +50,8 @@ ruleTester.run(
         errors: [{ messageId: 'missingAccessibleName' }],
       },
       {
-        // A FormField ancestor with no htmlFor renders a plain span label,
-        // not an associated <label htmlFor> — still unlabelled.
         code: `const el = (
-          <FormField label="Name">
+          <FormField label="Name" hasOwnAccessibleName={true}>
             <TextInput value={v} onChange={onChange} />
           </FormField>
         );`,

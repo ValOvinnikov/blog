@@ -1,6 +1,6 @@
+import { Field } from '@base-ui/react/field';
 import type { TEmailPageItemOption } from '@platform/components/features/email/email-settings/components/item-list';
 import type { TEmailPageItem } from '@platform/utils/email-draft/email-draft';
-import { useId } from 'react';
 
 import { itemSelectVariants } from './item-select-variants';
 
@@ -17,22 +17,17 @@ export const ItemSelect = ({
   onSelect,
   label,
 }: TItemSelectProps) => {
-  const selectId = useId();
   const { root, label: labelSlot, select } = itemSelectVariants();
 
   return (
-    <div className={root()}>
-      <label htmlFor={selectId} className={labelSlot()}>
-        {label}
-      </label>
-      <select
-        id={selectId}
+    <Field.Root className={root()}>
+      <Field.Label className={labelSlot()}>{label}</Field.Label>
+      <Field.Control
+        render={<select />}
         className={select()}
         value={selected}
-        onChange={(event) => {
-          const next = items.find(
-            (option) => option.value === event.target.value,
-          );
+        onValueChange={(value) => {
+          const next = items.find((option) => option.value === value);
           if (next) onSelect(next.value);
         }}
       >
@@ -41,7 +36,7 @@ export const ItemSelect = ({
             {`${option.label} — ${option.statusLabel}`}
           </option>
         ))}
-      </select>
-    </div>
+      </Field.Control>
+    </Field.Root>
   );
 };

@@ -361,9 +361,12 @@ describe(`<${VoiceSettings.name}/>`, () => {
         /Must be 100 characters or fewer\./,
       );
       expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-      expect(
-        screen.getByRole('region', { name: 'Unsaved changes' }),
-      ).toHaveTextContent('1 field needs attention');
+      const saveBar = screen.getByRole('region', { name: 'Unsaved changes' });
+      expect(saveBar).toHaveTextContent('1 field needs attention');
+      expect(within(saveBar).getByRole('link')).toHaveAttribute(
+        'href',
+        `#${notFoundHeading().id}`,
+      );
 
       await user.type(notFoundHeading(), '!');
 

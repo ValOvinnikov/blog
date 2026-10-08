@@ -1,4 +1,7 @@
-import type { AriaAttributes, ChangeEvent } from 'react';
+'use client';
+
+import { Field } from '@base-ui/react/field';
+import type { AriaAttributes } from 'react';
 
 import { textareaVariants, type TTextareaVariants } from './textarea-variants';
 
@@ -6,7 +9,6 @@ export type TTextareaProps = {
   value: string;
   onChange: (value: string) => void;
   ariaLabel?: string;
-  hasExternalLabel?: boolean;
   id?: string;
   placeholder?: string;
   rows?: number;
@@ -32,21 +34,17 @@ export const Textarea = ({
   'aria-describedby': ariaDescribedBy,
   className,
 }: TTextareaProps) => {
-  const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-    onChange(event.target.value);
-  };
-
   return (
-    <textarea
+    <Field.Control
+      render={<textarea rows={rows} />}
       id={id}
       placeholder={placeholder}
-      rows={rows}
       maxLength={maxLength}
       required={isRequired}
       disabled={Boolean(isDisabled)}
       readOnly={Boolean(isReadOnly)}
       value={value}
-      onChange={handleChange}
+      onValueChange={(nextValue) => onChange(nextValue)}
       aria-label={ariaLabel}
       aria-describedby={ariaDescribedBy}
       className={textareaVariants({ isDisabled, isReadOnly, class: className })}
