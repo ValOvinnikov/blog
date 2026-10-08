@@ -29,7 +29,7 @@ export default meta;
 type TStory = StoryObj<typeof meta>;
 
 export const WithReadingTime: TStory = {
-  args: { readingTimeMinutes: faker.number.int({ min: 3, max: 15 }) },
+  args: { readingTime: `${faker.number.int({ min: 3, max: 15 })} min read` },
 };
 
 export const WithoutReadingTime: TStory = {};

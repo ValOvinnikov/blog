@@ -77,6 +77,7 @@ export const PostArticle = async ({ slug }: TPostArticleProps) => {
     ? urlForSanityImage(author.image, sanityContext, AUTHOR_AVATAR_TRANSFORM)
     : undefined;
 
+  const readingTime = blogPostT('readingTime', { count: readingTimeMinutes });
   const formattedDate = format.dateTime(new Date(publishedAt), {
     year: 'numeric',
     month: 'long',
@@ -120,7 +121,7 @@ export const PostArticle = async ({ slug }: TPostArticleProps) => {
           },
           publishedAt,
           formattedDate,
-          readingTimeMinutes,
+          readingTime,
           linkAs: SmartLink,
           share: (
             <div className={s.metaActions()}>
