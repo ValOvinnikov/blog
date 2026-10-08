@@ -158,12 +158,12 @@ describe('resolveTenantMessages', () => {
 
   it('flattens a TEXT-kind override stored as Portable Text to plain text', async () => {
     getSiteConfigMock.mockResolvedValue(
-      siteConfigRow({ paginationPrevious: richTextOf('Prev') }),
+      siteConfigRow({ localeErrorTitle: richTextOf('Oops') }),
     );
 
     const { messages } = await resolveTenantMessages(SITE_MESSAGES);
 
-    expect(getAtPath(messages, ['pagination', 'previous'])).toBe('Prev');
+    expect(getAtPath(messages, ['localeErrorPage', 'title'])).toBe('Oops');
   });
 
   it('returns a RICH override unflattened in the rich map, keyed by voice field id', async () => {

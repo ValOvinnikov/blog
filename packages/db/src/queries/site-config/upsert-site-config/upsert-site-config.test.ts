@@ -37,7 +37,7 @@ vi.mock('@blog/config', async (importOriginal) => {
         id: SYNTHETIC_MULTILINE_FIELD_ID,
         path: 'test.multilineField',
         kind: actual.VOICE_FIELD_KIND.MULTILINE,
-        surface: actual.VOICE_SURFACE.ACCOUNT,
+        surface: actual.VOICE_SURFACE.ERROR,
         placeholders: [],
         max: SYNTHETIC_MULTILINE_FIELD_MAX,
       },

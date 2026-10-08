@@ -22,8 +22,8 @@ describe(`<${PostTableOfContents.name}/>`, () => {
       setup();
     });
 
-    it('renders a "Topics" nav landmark', () => {
-      expect(screen.getByRole('navigation', { name: 'Topics' })).toBeVisible();
+    it('renders a "Contents" nav landmark', () => {
+      expect(screen.getByRole('navigation', { name: 'Contents' })).toBeVisible();
     });
 
     it('renders every heading as a link to its anchor', () => {
@@ -36,7 +36,7 @@ describe(`<${PostTableOfContents.name}/>`, () => {
 
     it('shows the mobile selector defaulting to the first heading', () => {
       expect(
-        screen.getByRole('button', { name: 'Topics Getting started' }),
+        screen.getByRole('button', { name: 'Contents Getting started' }),
       ).toBeVisible();
     });
 
@@ -78,7 +78,7 @@ describe(`<${PostTableOfContents.name}/>`, () => {
 
     it('shows that heading in the mobile selector', () => {
       expect(
-        screen.getByRole('button', { name: 'Topics Configuration' }),
+        screen.getByRole('button', { name: 'Contents Configuration' }),
       ).toBeVisible();
     });
   });

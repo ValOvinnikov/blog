@@ -199,7 +199,7 @@ describe(`<${PostArticle.name}/>`, () => {
 
     await setup();
 
-    const rail = screen.getByRole('navigation', { name: 'Topics' });
+    const rail = screen.getByRole('navigation', { name: 'Contents' });
     expect(
       within(rail).getByRole('link', { name: 'Configuration' }),
     ).toHaveAttribute('href', '#configuration');
@@ -319,7 +319,7 @@ describe(`<${PostArticle.name}/>`, () => {
 
     it('renders no contents rail when the body has fewer than 3 H2 headings', async () => {
       expect(
-        screen.queryByRole('navigation', { name: 'Topics' }),
+        screen.queryByRole('navigation', { name: 'Contents' }),
       ).not.toBeInTheDocument();
     });
 
