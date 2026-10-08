@@ -197,6 +197,8 @@ export const LookForm = ({
     });
 
   const changeCount = countChanges(values, savedValues);
+  const isDivergedFromPreset =
+    countChanges(values, applyPresetDefaults(values.preset, values)) > 0;
   const isAccentHueRejected = !isAccentHueAccessible(values.accentHue);
   const hasCardChanges = (card: keyof typeof CARD_FIELDS) =>
     CARD_FIELDS[card].some((key) => isFieldChanged(key, values, savedValues));
@@ -349,7 +351,7 @@ export const LookForm = ({
             preset={values.preset}
             onPresetChange={handlePresetChange}
             onReset={handleReset}
-            isResetDisabled={changeCount === 0}
+            isResetVisible={isDivergedFromPreset}
             hasUnsavedChanges={hasCardChanges('preset')}
             isArchived={isArchived}
             archivedNoticeId={archivedNoticeId}

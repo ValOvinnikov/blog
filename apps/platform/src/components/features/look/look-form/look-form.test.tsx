@@ -274,12 +274,9 @@ describe(`<${LookForm.name}/>`, () => {
     );
   });
 
-  it('offers Save changes and enables Reset to preset only once the form is dirty', async () => {
+  it('offers Save changes only once the form is dirty', async () => {
     setup();
 
-    expect(
-      screen.getByRole('button', { name: 'Reset to preset' }),
-    ).toBeDisabled();
     expect(
       screen.queryByRole('button', { name: 'Save changes' }),
     ).not.toBeInTheDocument();
@@ -288,10 +285,28 @@ describe(`<${LookForm.name}/>`, () => {
     screen.getByRole('slider', { name: 'Accent hue' }).focus();
     await user.keyboard('{ArrowRight}');
 
-    expect(
-      screen.getByRole('button', { name: 'Reset to preset' }),
-    ).toBeEnabled();
     expect(screen.getByRole('button', { name: 'Save changes' })).toBeEnabled();
+  });
+
+  it('hides Reset to preset while every preset-controlled value matches the preset', () => {
+    setup();
+
+    expect(
+      screen.queryByRole('button', { name: 'Reset to preset' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('offers Reset to preset for saved values that differ from the preset, with no unsaved edits', async () => {
+    setup({ initialValues: { ...defaultLookFormValues(), accentHue: 260 } });
+
+    expect(screen.getByText('All changes saved')).toBeVisible();
+
+    await user.click(screen.getByRole('button', { name: 'Reset to preset' }));
+
+    expect(screen.getByText('250°')).toBeVisible();
+    expect(
+      screen.queryByRole('button', { name: 'Reset to preset' }),
+    ).not.toBeInTheDocument();
   });
 
   it('discards unsaved changes back to the saved values', async () => {
@@ -450,12 +465,15 @@ describe(`<${LookForm.name}/>`, () => {
       expect(screen.getByRole('button', { name: 'Outlined' })).toBeDisabled();
     });
 
-    it('describes the disabled Reset button with the archived notice text, for a screen-reader user', () => {
-      setup({ archivedAt: ARCHIVED_AT });
+    it('disables Reset to preset and describes it with the archived notice text, for a screen-reader user', () => {
+      setup({
+        archivedAt: ARCHIVED_AT,
+        initialValues: { ...defaultLookFormValues(), accentHue: 260 },
+      });
 
-      expect(
-        screen.getByRole('button', { name: 'Reset to preset' }),
-      ).toHaveAccessibleDescription(/This tenant is archived/);
+      const reset = screen.getByRole('button', { name: 'Reset to preset' });
+      expect(reset).toBeDisabled();
+      expect(reset).toHaveAccessibleDescription(/This tenant is archived/);
     });
   });
 
