@@ -87,36 +87,38 @@ const isString = (...candidates: unknown[]) =>
 const subscribeToNothing = () => () => {};
 
 export const useSettingsDraft = <TValues>(
-  draft: TSettingsFormDraft<TValues>,
+  draft: TSettingsFormDraft<TValues> | undefined,
   isDirty: boolean,
 ) => {
-  const { values, savedValues, fields, onRestore } = draft;
-  const storageKey = settingsDraftStorageKey(draft);
+  const storageKey = draft ? settingsDraftStorageKey(draft) : null;
   const isHydrated = useSyncExternalStore(
     subscribeToNothing,
     () => true,
     () => false,
   );
   const [storedOnArrival] = useState(() =>
-    typeof window === 'undefined' ? null : readSettingsDraft(storageKey),
+    typeof window === 'undefined' || !storageKey
+      ? null
+      : readSettingsDraft(storageKey),
   );
   const [isOfferSettled, setIsOfferSettled] = useState(false);
   const offer =
-    isHydrated && !isOfferSettled && storedOnArrival
-      ? toOffer(storedOnArrival, savedValues, fields)
+    draft && isHydrated && !isOfferSettled && storedOnArrival
+      ? toOffer(storedOnArrival, draft.savedValues, draft.fields)
       : null;
   const isOfferPending = offer !== null;
-  const valuesSnapshot = JSON.stringify(values);
-  const savedSnapshot = JSON.stringify(savedValues);
+  const valuesSnapshot = JSON.stringify(draft?.values);
+  const savedSnapshot = JSON.stringify(draft?.savedValues);
 
   const syncStoredDraft = useEffectEvent(() => {
+    if (!draft || !storageKey) return;
     if (!isDirty) {
       clearSettingsDraft(storageKey);
       return;
     }
     writeSettingsDraft(storageKey, {
-      values,
-      baseline: savedValues,
+      values: draft.values,
+      baseline: draft.savedValues,
       takenAt: new Date().toISOString(),
     });
   });
@@ -134,13 +136,13 @@ export const useSettingsDraft = <TValues>(
   ]);
 
   const restore = () => {
-    if (!offer) return;
-    onRestore(offer.values);
+    if (!offer || !draft) return;
+    draft.onRestore(offer.values);
     setIsOfferSettled(true);
   };
 
   const forget = () => {
-    clearSettingsDraft(storageKey);
+    if (storageKey) clearSettingsDraft(storageKey);
     setIsOfferSettled(true);
   };
 

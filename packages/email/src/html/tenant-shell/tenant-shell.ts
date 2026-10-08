@@ -1,4 +1,4 @@
-import { renderEmailShell } from './email-layout';
+import { renderEmailShell } from '@blog/email/html/email-layout/email-layout';
 
 export type TTenantEmailBrand = {
   surface: string;

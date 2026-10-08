@@ -1,4 +1,4 @@
-import { escapeHtml } from '@blog/email/html/escape-html';
+import { escapeHtml } from '@blog/email/html/escape-html/escape-html';
 import { sanitizeHref } from '@blog/utils';
 
 import type {

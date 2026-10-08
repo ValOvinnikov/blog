@@ -35,7 +35,8 @@ export type TSettingsFormShellProps<TValues> = {
   archivedNoticeId: string;
   hasError: boolean;
   errorTitle: string;
-  draft: TSettingsFormDraft<TValues>;
+  draft?: TSettingsFormDraft<TValues>;
+  className?: string;
   children: ReactNode;
 };
 
@@ -58,6 +59,7 @@ export const SettingsFormShell = <TValues,>({
   hasError,
   errorTitle,
   draft,
+  className,
   children,
 }: TSettingsFormShellProps<TValues>) => {
   const t = useTranslations('saveBar');
@@ -116,7 +118,7 @@ export const SettingsFormShell = <TValues,>({
   }, [isDirty]);
 
   return (
-    <div className={root()}>
+    <div className={root({ class: className })}>
       <PageHeader
         title={title}
         description={description}
@@ -136,7 +138,7 @@ export const SettingsFormShell = <TValues,>({
       {offer && (
         <DraftRecoveryBanner
           takenAt={offer.takenAt}
-          savedAt={draft.savedAt}
+          savedAt={draft?.savedAt}
           changeCount={offer.changeCount}
           differences={offer.differences}
           onRestore={restore}

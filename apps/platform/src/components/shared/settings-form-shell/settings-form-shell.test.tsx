@@ -20,7 +20,7 @@ const draftFor = (
   values: TValues,
   savedValues: TValues = SAVED,
   onRestore: (values: TValues) => void = vi.fn(),
-): TSettingsFormShellProps<TValues>['draft'] => ({
+): NonNullable<TSettingsFormShellProps<TValues>['draft']> => ({
   tenantId: 'tenant-1',
   page: 'voice',
   values,
