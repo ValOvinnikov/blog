@@ -1,4 +1,6 @@
-import type { TVoicePortableText } from '@blog/config';
+import { LOCALE_ISO_CODES, type TVoicePortableText } from '@blog/config';
+import { getRequestContext } from '@web/server/request-context/request-context';
+import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { getVoiceRich } from './get-voice-rich';
 
@@ -10,6 +12,8 @@ const { getSiteConfigMock, getMessagesMock } = vi.hoisted(() => ({
 vi.mock('@web/server/site-config/get-site-config/get-site-config', () => ({
   getSiteConfig: getSiteConfigMock,
 }));
+
+vi.mock('@web/server/request-context/request-context');
 
 vi.mock('next-intl/server', () => ({
   getMessages: getMessagesMock,
@@ -66,6 +70,24 @@ describe(getVoiceRich, () => {
     expect(result[0]?.children[0]?.text).toBe('No posts yet.');
     expect(errorSpy).toHaveBeenCalled();
     errorSpy.mockRestore();
+  });
+
+  it('returns the catalog default for a non-default locale even when an override is stored', async () => {
+    vi.mocked(getRequestContext).mockResolvedValueOnce({
+      ...DEFAULT_REQUEST_CONTEXT,
+      locale: LOCALE_ISO_CODES.DE,
+    });
+    getSiteConfigMock.mockResolvedValue({
+      ok: true,
+      data: {
+        voiceOverrides: { blogListEmpty: richTextOf('Nothing published yet.') },
+      },
+    });
+
+    const result = await getVoiceRich('blogListEmpty');
+
+    expect(result[0]?.children[0]?.text).toBe('No posts yet.');
+    expect(getSiteConfigMock).not.toHaveBeenCalled();
   });
 
   it('forwards an explicitly supplied tenant to getSiteConfig', async () => {

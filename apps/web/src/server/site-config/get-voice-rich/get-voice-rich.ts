@@ -1,4 +1,5 @@
 import type { TVoicePortableText } from '@blog/config';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
 import { logger } from '@web/utils/logger/logger';
 import {
@@ -7,19 +8,21 @@ import {
 } from '@web/utils/resolve-voice-rich-fields';
 import { getMessages } from 'next-intl/server';
 
-/**
- * Resolves a single RICH voice field for a Server Component — the tenant's
- * stored override where one exists, otherwise the catalog default wrapped
- * as a single paragraph.
- */
+/** Voice overrides are authored in the tenant's default locale, so every other locale gets the catalog default. */
 export const getVoiceRich = async (
   id: TVoiceRichFieldId,
   tenant?: string,
 ): Promise<TVoicePortableText> => {
-  const [result, baseMessages] = await Promise.all([
-    getSiteConfig(tenant),
+  const [{ locale, defaultLocale }, baseMessages] = await Promise.all([
+    getRequestContext(),
     getMessages(),
   ]);
+
+  if (locale !== defaultLocale) {
+    return resolveVoiceRichFields({}, baseMessages)[id];
+  }
+
+  const result = await getSiteConfig(tenant);
 
   if (!result.ok) {
     logger.error('voice_rich.fetch_failed', { id, error: result.error });
