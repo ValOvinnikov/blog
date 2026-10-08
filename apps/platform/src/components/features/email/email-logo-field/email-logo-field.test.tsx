@@ -1,43 +1,29 @@
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { customRender, screen } from '@platform/testing/custom-render';
 import { selectFile } from '@platform/testing/select-file';
 import userEvent from '@testing-library/user-event';
 
 import { EmailLogoField } from './email-logo-field';
 
-const render = renderWithIntl;
+const STORED_URL = 'https://example.blob.vercel-storage.com/email-logo.png';
 
-const { uploadEmailLogoActionMock, clearEmailLogoActionMock } = vi.hoisted(
-  () => ({
-    uploadEmailLogoActionMock: vi.fn(),
-    clearEmailLogoActionMock: vi.fn(),
-  }),
-);
-
-vi.mock('@platform/server/email/upload-email-logo-action', () => ({
-  uploadEmailLogoAction: uploadEmailLogoActionMock,
-}));
-
-vi.mock('@platform/server/email/clear-email-logo-action', () => ({
-  clearEmailLogoAction: clearEmailLogoActionMock,
-}));
+const setup = customRender(EmailLogoField, {
+  label: 'Email logo',
+  hint: 'PNG, JPEG, or GIF.',
+  logo: { url: undefined },
+  onStage: vi.fn(),
+});
 
 describe(`<${EmailLogoField.name}/>`, () => {
   beforeEach(() => {
-    uploadEmailLogoActionMock.mockReset();
-    clearEmailLogoActionMock.mockReset();
+    vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:staged-logo');
   });
 
-  it('shows the hint and the upload label before any value is set', () => {
-    render(
-      <EmailLogoField
-        tenantId="tenant-1"
-        target={{ type: 'tenant' }}
-        label="Email logo"
-        hint="PNG, JPEG, or GIF."
-        currentUrl={undefined}
-        onChange={vi.fn()}
-      />,
-    );
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('shows the hint and the upload label before any logo is set', () => {
+    setup();
 
     expect(screen.getByText('PNG, JPEG, or GIF.')).toBeVisible();
     expect(
@@ -45,17 +31,8 @@ describe(`<${EmailLogoField.name}/>`, () => {
     ).toBeVisible();
   });
 
-  it('shows the current alt text and the replace label once a value is set', () => {
-    render(
-      <EmailLogoField
-        tenantId="tenant-1"
-        target={{ type: 'tenant' }}
-        label="Email logo"
-        hint="PNG, JPEG, or GIF."
-        currentUrl="https://example.blob.vercel-storage.com/email-logo.png"
-        onChange={vi.fn()}
-      />,
-    );
+  it('shows the current logo and the replace label once a logo is set', () => {
+    setup({ logo: { url: STORED_URL } });
 
     expect(screen.getByAltText('Current email logo')).toBeVisible();
     expect(
@@ -63,73 +40,36 @@ describe(`<${EmailLogoField.name}/>`, () => {
     ).toBeVisible();
   });
 
-  it('translates an unsupported-type rejection before ever calling the upload action', async () => {
-    const onChange = vi.fn();
-    render(
-      <EmailLogoField
-        tenantId="tenant-1"
-        target={{ type: 'tenant' }}
-        label="Email logo"
-        hint="PNG, JPEG, or GIF."
-        currentUrl={undefined}
-        onChange={onChange}
-      />,
-    );
+  it('stages a picked file with a local preview URL', async () => {
+    const onStage = vi.fn();
+    const file = new File(['x'], 'logo.png', { type: 'image/png' });
+    setup({ onStage });
+
+    await selectFile(file);
+
+    expect(onStage).toHaveBeenCalledWith({ url: 'blob:staged-logo', file });
+  });
+
+  it('rejects an unsupported type without staging it', async () => {
+    const onStage = vi.fn();
+    setup({ onStage });
 
     await selectFile(
       new File(['<svg></svg>'], 'logo.svg', { type: 'image/svg+xml' }),
     );
 
-    expect(uploadEmailLogoActionMock).not.toHaveBeenCalled();
-    expect(onChange).not.toHaveBeenCalled();
+    expect(onStage).not.toHaveBeenCalled();
     expect(screen.getByText(/SVG and WebP are not supported/)).toBeVisible();
   });
 
-  it('forwards the tenantId and target to the upload action when a file is selected', async () => {
-    uploadEmailLogoActionMock.mockResolvedValue({
-      ok: true,
-      url: 'https://example.blob.vercel-storage.com/email-logo-new.png',
-    });
-    render(
-      <EmailLogoField
-        tenantId="tenant-1"
-        target={{ type: 'tenant' }}
-        label="Email logo"
-        hint="PNG, JPEG, or GIF."
-        currentUrl={undefined}
-        onChange={vi.fn()}
-      />,
-    );
-
-    await selectFile(new File(['x'], 'logo.png', { type: 'image/png' }));
-
-    expect(uploadEmailLogoActionMock).toHaveBeenCalledWith(
-      'tenant-1',
-      { type: 'tenant' },
-      expect.any(FormData),
-    );
-  });
-
-  it('forwards the tenantId and target to the clear action when Remove is clicked', async () => {
-    clearEmailLogoActionMock.mockResolvedValue({ ok: true });
-    render(
-      <EmailLogoField
-        tenantId="tenant-1"
-        target={{ type: 'template', templateType: 'MAGIC_LINK' }}
-        label="Template logo"
-        hint="PNG, JPEG, or GIF."
-        currentUrl="https://example.blob.vercel-storage.com/email-logo-magic-link.png"
-        onChange={vi.fn()}
-      />,
-    );
+  it('stages a removal', async () => {
+    const onStage = vi.fn();
+    setup({ logo: { url: STORED_URL }, onStage });
 
     await userEvent
       .setup()
       .click(screen.getByRole('button', { name: 'Remove' }));
 
-    expect(clearEmailLogoActionMock).toHaveBeenCalledWith('tenant-1', {
-      type: 'template',
-      templateType: 'MAGIC_LINK',
-    });
+    expect(onStage).toHaveBeenCalledWith({ url: undefined });
   });
 });

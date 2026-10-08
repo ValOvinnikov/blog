@@ -4,7 +4,9 @@ import {
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
   EMAIL_TEMPLATE_TYPE,
+  LOCALE_ISO_CODES,
   type TEmailTemplateType,
+  type TLocaleIsoCode,
 } from '@blog/config';
 import { queries } from '@blog/db';
 import type { TEmailTemplateResult } from '@blog/db/queries/email-templates';
@@ -19,6 +21,11 @@ const SUBJECT_MAX = 200;
 const EMAIL_TEMPLATE_TYPE_VALUES = Object.values(EMAIL_TEMPLATE_TYPE) as [
   TEmailTemplateType,
   ...TEmailTemplateType[],
+];
+
+const LOCALE_ISO_CODE_VALUES = Object.values(LOCALE_ISO_CODES) as [
+  TLocaleIsoCode,
+  ...TLocaleIsoCode[],
 ];
 
 const portableTextBlockSchema = z
@@ -71,46 +78,53 @@ export type TUpdateEmailTemplateInput = z.input<
 export type TUpdateEmailTemplateResult =
   { ok: true; result: TEmailTemplateResult } | { ok: false };
 
-/**
- * The per-template copy editor's save action — subject and body only. The
- * template's logo persists immediately through its own
- * `uploadEmailLogoAction`/`clearEmailLogoAction`, the same immediate-persist
- * pattern the Look tab's brand-asset fields use, so it never goes through
- * this action.
- */
 export const updateEmailTemplateAction = async (
   tenantId: string,
   templateType: TEmailTemplateType,
+  locale: TLocaleIsoCode,
   input: TUpdateEmailTemplateInput,
 ): Promise<TUpdateEmailTemplateResult> => {
   const parsedTemplateType = z
     .enum(EMAIL_TEMPLATE_TYPE_VALUES)
     .safeParse(templateType);
+  const parsedLocale = z.enum(LOCALE_ISO_CODE_VALUES).safeParse(locale);
   const parsedInput = updateEmailTemplateInputSchema.safeParse(input);
-  if (!parsedTemplateType.success || !parsedInput.success) {
+  if (
+    !parsedTemplateType.success ||
+    !parsedLocale.success ||
+    !parsedInput.success
+  ) {
     return { ok: false };
   }
 
   const { tenant } = await requireTenantMembership(tenantId);
+  if (!queries.tenants.selectLiveLocales(tenant).includes(parsedLocale.data)) {
+    return { ok: false };
+  }
 
   try {
     const result = await queries.emailTemplates.upsertEmailTemplate(
       tenant.id,
       parsedTemplateType.data,
       parsedInput.data,
+      parsedLocale.data,
     );
     await recordAuditEvent({
       logEvent: 'email_templates.update_audit_failed',
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
       targetId: tenant.id,
-      details: { templateType: parsedTemplateType.data },
+      details: {
+        templateType: parsedTemplateType.data,
+        locale: parsedLocale.data,
+      },
     });
     return { ok: true, result };
   } catch (error) {
     logger.error('email_templates.update_failed', {
       tenantId: tenant.id,
       templateType: parsedTemplateType.data,
+      locale: parsedLocale.data,
       error,
     });
     return { ok: false };

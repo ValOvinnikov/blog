@@ -363,7 +363,21 @@
   },
   "emailForm": {
     "pageHeading": "Correo electrónico",
-    "pageSubtitle": "Identidad del remitente y textos por plantilla para cada correo que envía este cliente."
+    "pageSubtitle": "Identidad del remitente y textos por plantilla para cada correo que envía este cliente.",
+    "saveButton": "Guardar cambios",
+    "savingButton": "Guardando…",
+    "alertSuccess": "Configuración del correo guardada.",
+    "alertError": "No se guardaron todos los cambios: los que siguen marcados como «Sin guardar» no se guardaron. Vuelva a intentarlo.",
+    "senderItemLabel": "Remitente y pie",
+    "senderItemDescription": "Nombre, dirección de respuesta, dirección postal y logotipo, iguales en todos los idiomas.",
+    "itemsAriaLabel": "Correos para editar",
+    "editingLabel": "Editando",
+    "languageAriaLabel": "Idioma para editar"
+  },
+  "emailItemStatus": {
+    "default": "Predeterminado",
+    "customised": "Personalizado",
+    "unsaved": "Sin guardar"
   },
   "emailSettingsForm": {
     "heading": "Configuración del correo electrónico",
@@ -376,11 +390,7 @@
     "footerAddressLabel": "Dirección postal del pie",
     "footerAddressHint": "Un requisito legal para los envíos masivos: se muestra en el pie de todos los correos del cliente.",
     "logoLabel": "Logotipo del correo",
-    "logoHint": "Si no se define, se usa el predeterminado del producto. Cada plantilla puede sustituirlo por su propio logotipo más abajo.",
-    "saveButton": "Guardar cambios",
-    "savingButton": "Guardando…",
-    "alertSuccess": "Configuración del correo guardada.",
-    "alertError": "No se pudo guardar la configuración del correo. Vuelva a intentarlo."
+    "logoHint": "Se usa en todos los correos y en todos los idiomas. Una plantilla puede sustituirlo por su propio logotipo."
   },
   "emailLogoField": {
     "unexpectedError": "Algo ha salido mal. Vuelva a intentarlo.",
@@ -392,22 +402,13 @@
     "unsupportedType": "Elija una imagen PNG, JPEG o GIF: los principales clientes de correo no admiten SVG ni WebP.",
     "tooLarge": "El archivo es demasiado grande: el límite es {limit}."
   },
-  "emailTemplatesSection": {
-    "heading": "Plantillas",
-    "description": "Asunto, cuerpo y logotipo de cada tipo de plantilla. Si se elimina todo el texto personalizado, se muestra el predeterminado del producto.",
-    "segmentedControlAriaLabel": "Elija una plantilla de correo para editar"
-  },
   "emailTemplateEditor": {
-    "subjectLabel": "Asunto",
-    "subjectHint": "Si se deja en blanco, se usa el asunto predeterminado del producto.",
-    "bodyLabel": "Cuerpo",
+    "subjectLabel": "Asunto ({language})",
+    "subjectHint": "Déjelo en blanco para enviar el asunto que se muestra en el campo.",
+    "bodyLabel": "Mensaje ({language})",
     "bodyHint": "El botón de inicio de sesión, el enlace de invitación o el enlace para darse de baja siempre se muestran debajo; no se pueden quitar desde aquí.",
     "logoLabel": "Logotipo de la plantilla",
-    "logoHint": "Sustituye el logotipo de correo del cliente solo en esta plantilla.",
-    "saveButton": "Guardar cambios",
-    "savingButton": "Guardando…",
-    "alertSuccess": "Plantilla guardada.",
-    "alertError": "No se pudo guardar esta plantilla. Vuelva a intentarlo.",
+    "logoHint": "Sustituye el logotipo de correo en esta plantilla, en todos los idiomas.",
     "previewHeading": "Vista previa",
     "previewIframeTitle": "Vista previa del correo",
     "actionLockedNote": "Los botones y enlaces de la vista previa se envían siempre y no se pueden editar aquí.",
@@ -420,7 +421,8 @@
       "MAGIC_LINK": "Se envía cuando alguien inicia sesión en el sitio de este cliente.",
       "TENANT_INVITE": "Se envía cuando se invita a alguien a unirse al equipo de este cliente.",
       "NEWSLETTER_CONFIRMATION": "Se envía para confirmar una suscripción al boletín."
-    }
+    },
+    "useDefault": "Usar el predeterminado"
   },
   "portableTextEditorToolbar": {
     "bold": "Negrita",

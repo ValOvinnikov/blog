@@ -363,7 +363,21 @@
   },
   "emailForm": {
     "pageHeading": "E-mail",
-    "pageSubtitle": "Afzenderidentiteit en tekst per sjabloon voor elke e-mail die deze tenant verstuurt."
+    "pageSubtitle": "Afzenderidentiteit en tekst per sjabloon voor elke e-mail die deze tenant verstuurt.",
+    "saveButton": "Wijzigingen opslaan",
+    "savingButton": "Opslaan…",
+    "alertSuccess": "E-mailinstellingen opgeslagen.",
+    "alertError": "Niet alle wijzigingen zijn opgeslagen — wat nog als ‘Niet opgeslagen’ is gemarkeerd, is niet opgeslagen. Probeer het opnieuw.",
+    "senderItemLabel": "Afzender en voettekst",
+    "senderItemDescription": "Naam, antwoordadres, postadres en logo, in elke taal hetzelfde.",
+    "itemsAriaLabel": "E-mails om te bewerken",
+    "editingLabel": "Bewerken",
+    "languageAriaLabel": "Taal om te bewerken"
+  },
+  "emailItemStatus": {
+    "default": "Standaard",
+    "customised": "Aangepast",
+    "unsaved": "Niet opgeslagen"
   },
   "emailSettingsForm": {
     "heading": "E-mailinstellingen",
@@ -376,11 +390,7 @@
     "footerAddressLabel": "Postadres in voettekst",
     "footerAddressHint": "Wettelijk verplicht voor bulkmail — wordt getoond in de voettekst van elke e-mail van de tenant.",
     "logoLabel": "E-maillogo",
-    "logoHint": "Valt terug op de productstandaard. Een sjabloon kan dit hieronder met een eigen logo overschrijven.",
-    "saveButton": "Wijzigingen opslaan",
-    "savingButton": "Opslaan…",
-    "alertSuccess": "E-mailinstellingen opgeslagen.",
-    "alertError": "E-mailinstellingen konden niet worden opgeslagen. Probeer het opnieuw."
+    "logoHint": "Gebruikt in elke e-mail, in elke taal. Een sjabloon kan het vervangen door een eigen logo."
   },
   "emailLogoField": {
     "unexpectedError": "Er is iets misgegaan. Probeer het opnieuw.",
@@ -392,22 +402,13 @@
     "unsupportedType": "Kies een PNG-, JPEG- of GIF-afbeelding — SVG en WebP worden niet ondersteund door grote e-mailprogramma's.",
     "tooLarge": "Dat bestand is te groot — de limiet is {limit}."
   },
-  "emailTemplatesSection": {
-    "heading": "Sjablonen",
-    "description": "Onderwerp, tekst en logo per sjabloontype. Als alle eigen tekst wordt verwijderd, wordt de productstandaard getoond.",
-    "segmentedControlAriaLabel": "Kies een e-mailsjabloon om te bewerken"
-  },
   "emailTemplateEditor": {
-    "subjectLabel": "Onderwerp",
-    "subjectHint": "Leeg laten herstelt het standaardonderwerp van het product.",
-    "bodyLabel": "Tekst",
+    "subjectLabel": "Onderwerp ({language})",
+    "subjectHint": "Laat leeg om het onderwerp in het veld te versturen.",
+    "bodyLabel": "Bericht ({language})",
     "bodyHint": "De inlogknop, uitnodigingslink of afmeldlink wordt altijd hieronder getoond — die kan hier niet worden verwijderd.",
     "logoLabel": "Sjabloonlogo",
-    "logoHint": "Overschrijft het e-maillogo van de tenant voor alleen dit sjabloon.",
-    "saveButton": "Wijzigingen opslaan",
-    "savingButton": "Opslaan…",
-    "alertSuccess": "Sjabloon opgeslagen.",
-    "alertError": "Dit sjabloon kon niet worden opgeslagen. Probeer het opnieuw.",
+    "logoHint": "Overschrijft het e-maillogo voor dit sjabloon, in elke taal.",
     "previewHeading": "Voorbeeld",
     "previewIframeTitle": "E-mailvoorbeeld",
     "actionLockedNote": "De knoppen en links in het voorbeeld worden altijd meegestuurd en kunnen hier niet worden bewerkt.",
@@ -420,7 +421,8 @@
       "MAGIC_LINK": "Verstuurd wanneer iemand inlogt op de site van deze tenant.",
       "TENANT_INVITE": "Verstuurd wanneer iemand wordt uitgenodigd voor het team van deze tenant.",
       "NEWSLETTER_CONFIRMATION": "Verstuurd om een nieuwsbriefabonnement te bevestigen."
-    }
+    },
+    "useDefault": "Standaard gebruiken"
   },
   "portableTextEditorToolbar": {
     "bold": "Vet",

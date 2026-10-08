@@ -2,6 +2,7 @@ import {
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
   EMAIL_TEMPLATE_TYPE,
+  LOCALE_ISO_CODES,
 } from '@blog/config';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
@@ -13,10 +14,12 @@ import {
   type TUpdateEmailTemplateInput,
 } from './update-email-template-action';
 
-const { upsertEmailTemplateMock, insertAuditEventMock } = vi.hoisted(() => ({
-  upsertEmailTemplateMock: vi.fn(),
-  insertAuditEventMock: vi.fn(),
-}));
+const { upsertEmailTemplateMock, insertAuditEventMock, selectLiveLocalesMock } =
+  vi.hoisted(() => ({
+    upsertEmailTemplateMock: vi.fn(),
+    insertAuditEventMock: vi.fn(),
+    selectLiveLocalesMock: vi.fn(),
+  }));
 
 vi.mock('@platform/server/auth/require-tenant-membership');
 
@@ -28,6 +31,7 @@ vi.mock('@blog/db', () => ({
   queries: {
     emailTemplates: { upsertEmailTemplate: upsertEmailTemplateMock },
     auditEvents: { insertAuditEvent: insertAuditEventMock },
+    tenants: { selectLiveLocales: selectLiveLocalesMock },
   },
 }));
 
@@ -84,13 +88,59 @@ describe(updateEmailTemplateAction, () => {
     insertAuditEventMock.mockReset();
     insertAuditEventMock.mockResolvedValue({ id: 'event-1' });
     loggerErrorMock.mockReset();
+    selectLiveLocalesMock.mockReset();
+    selectLiveLocalesMock.mockReturnValue([
+      LOCALE_ISO_CODES.EN,
+      LOCALE_ISO_CODES.FR,
+    ]);
     mockMembershipAndUpsert();
+  });
+
+  it('writes the copy to the requested language', async () => {
+    await updateEmailTemplateAction(
+      'tenant-1',
+      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      LOCALE_ISO_CODES.FR,
+      VALID_INPUT,
+    );
+
+    expect(upsertEmailTemplateMock).toHaveBeenCalledWith(
+      'tenant-1',
+      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      VALID_INPUT,
+      LOCALE_ISO_CODES.FR,
+    );
+  });
+
+  it('rejects a language the tenant does not offer without writing', async () => {
+    const result = await updateEmailTemplateAction(
+      'tenant-1',
+      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      LOCALE_ISO_CODES.DE,
+      VALID_INPUT,
+    );
+
+    expect(result).toEqual({ ok: false });
+    expect(upsertEmailTemplateMock).not.toHaveBeenCalled();
+  });
+
+  it('rejects an unrecognized language without ever calling the tenant gate', async () => {
+    const result = await updateEmailTemplateAction(
+      'tenant-1',
+      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      'XX' as never,
+      VALID_INPUT,
+    );
+
+    expect(result).toEqual({ ok: false });
+    expect(requireTenantMembershipMock).not.toHaveBeenCalled();
   });
 
   it('re-resolves the tenant from the session against the routed id before writing', async () => {
     const result = await updateEmailTemplateAction(
       'tenant-1',
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      LOCALE_ISO_CODES.EN,
       VALID_INPUT,
     );
 
@@ -99,6 +149,7 @@ describe(updateEmailTemplateAction, () => {
       'tenant-1',
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
       VALID_INPUT,
+      LOCALE_ISO_CODES.EN,
     );
     expect(result.ok).toBe(true);
   });
@@ -107,6 +158,7 @@ describe(updateEmailTemplateAction, () => {
     const result = await updateEmailTemplateAction(
       'tenant-1',
       'NOT_A_TEMPLATE' as never,
+      LOCALE_ISO_CODES.EN,
       VALID_INPUT,
     );
 
@@ -118,6 +170,7 @@ describe(updateEmailTemplateAction, () => {
     const result = await updateEmailTemplateAction(
       'tenant-1',
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      LOCALE_ISO_CODES.EN,
       { ...VALID_INPUT, subject: '' },
     );
 
@@ -146,6 +199,7 @@ describe(updateEmailTemplateAction, () => {
     const result = await updateEmailTemplateAction(
       'tenant-1',
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      LOCALE_ISO_CODES.EN,
       input,
     );
 
@@ -154,6 +208,7 @@ describe(updateEmailTemplateAction, () => {
       'tenant-1',
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
       input,
+      LOCALE_ISO_CODES.EN,
     );
   });
 
@@ -190,6 +245,7 @@ describe(updateEmailTemplateAction, () => {
       const result = await updateEmailTemplateAction(
         'tenant-1',
         EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+        LOCALE_ISO_CODES.EN,
         input,
       );
 
@@ -243,6 +299,7 @@ describe(updateEmailTemplateAction, () => {
     const result = await updateEmailTemplateAction(
       'tenant-1',
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      LOCALE_ISO_CODES.EN,
       input,
     );
 
@@ -257,6 +314,7 @@ describe(updateEmailTemplateAction, () => {
     const result = await updateEmailTemplateAction(
       'tenant-1',
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      LOCALE_ISO_CODES.EN,
       { subject: null, body: null },
     );
 
@@ -265,6 +323,7 @@ describe(updateEmailTemplateAction, () => {
       'tenant-1',
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
       { subject: null, body: null },
+      LOCALE_ISO_CODES.EN,
     );
   });
 
@@ -278,6 +337,7 @@ describe(updateEmailTemplateAction, () => {
     const result = await updateEmailTemplateAction(
       'tenant-1',
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      LOCALE_ISO_CODES.EN,
       VALID_INPUT,
     );
 
@@ -289,6 +349,7 @@ describe(updateEmailTemplateAction, () => {
     await updateEmailTemplateAction(
       'tenant-1',
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      LOCALE_ISO_CODES.EN,
       VALID_INPUT,
     );
 
@@ -298,7 +359,10 @@ describe(updateEmailTemplateAction, () => {
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
       targetId: 'tenant-1',
-      details: { templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK },
+      details: {
+        templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+        locale: LOCALE_ISO_CODES.EN,
+      },
     });
   });
 
@@ -316,6 +380,7 @@ describe(updateEmailTemplateAction, () => {
         updateEmailTemplateAction(
           'tenant-1',
           EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+          LOCALE_ISO_CODES.EN,
           VALID_INPUT,
         ),
       ).rejects.toThrow(digest);

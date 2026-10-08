@@ -11,16 +11,12 @@ export type TFormTextInputProps = {
   value: string;
   onChange: (value: string) => void;
   type?: string;
+  placeholder?: string;
   isInvalid?: boolean;
   isDisabled?: boolean;
   'aria-describedby'?: AriaAttributes['aria-describedby'];
 };
 
-/**
- * Fuses `FormField` and `TextInput` for the common single-text-field case.
- * `FormField` stays the general primitive for non-text-input controls (e.g.
- * `SegmentedControl`, which has no `htmlFor`).
- */
 export const FormTextInput = ({
   label,
   htmlFor,
@@ -30,6 +26,7 @@ export const FormTextInput = ({
   value,
   onChange,
   type,
+  placeholder,
   isInvalid,
   isDisabled,
   'aria-describedby': ariaDescribedBy,
@@ -45,6 +42,7 @@ export const FormTextInput = ({
       <TextInput
         id={htmlFor}
         type={type}
+        placeholder={placeholder}
         value={value}
         onChange={onChange}
         isInvalid={isInvalid}
