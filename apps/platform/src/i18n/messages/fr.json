@@ -495,6 +495,37 @@
     "ARCHIVE": "Affichées quand une liste est encore vide. Choisissez-en une pour la modifier.",
     "BOOKMARKS": "Les articles enregistrés d'un lecteur, avant qu'il en enregistre"
   },
+  "voiceSpecimen": {
+    "showPreview": "Afficher l'aperçu",
+    "hidePreview": "Masquer l'aperçu",
+    "lists": {
+      "blogList": {
+        "eyebrow": "Blog",
+        "heading": "Tous les articles",
+        "count": "0 article"
+      },
+      "topic": {
+        "eyebrow": "Thème",
+        "heading": "Design",
+        "count": "0 article"
+      },
+      "tag": {
+        "eyebrow": "Étiquette",
+        "heading": "Typographie",
+        "count": "0 article"
+      },
+      "topics": {
+        "eyebrow": "Explorer",
+        "heading": "Thèmes",
+        "count": "0 thème"
+      },
+      "tags": {
+        "eyebrow": "Explorer",
+        "heading": "Étiquettes",
+        "count": "0 étiquette"
+      }
+    }
+  },
   "voiceFieldLabels": {
     "blogListEmpty": "Index du blog",
     "topicEmpty": "Page de thème",

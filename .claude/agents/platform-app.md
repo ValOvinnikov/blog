@@ -481,11 +481,18 @@ them to fix these.
   no robots, no feeds. This app should not be indexed.
 - **Voice settings edit the site copy registered in `@blog/config`'s
   `VOICE_FIELDS`.**
-  - The page submits its own field list today
-    (`src/utils/voice-fields/voice-fields.ts`).
-  - `upsertSiteConfig` (`@blog/db`) validates the submission against the
-    registry and throws on an unregistered key. So a field that leaves the
-    registry leaves that list in the same PR.
+  - The page renders straight from the registry
+    (`src/utils/voice-draft/voice-draft.ts`); it keeps no field list of its
+    own. A new field needs a label and hint in all five platform catalogs
+    (`voiceFieldLabels`, `voiceFieldHints`), which a test enforces.
+  - Each surface's specimen lives in `site-preview/voice-specimen/` and places
+    every field through a `Record<TVoiceFieldId, …>` map, so a registered
+    field with no place fails type-check. Wrap a field's specimen text in
+    `VoiceKeyFrame` (`data-voice-key`) for the focus outline; never widen a
+    `@blog/ui` prop for it.
+  - Rich values render through `site-preview/voice-rich-text/`, which handles
+    exactly `VOICE_PORTABLE_TEXT_SCHEMA`'s marks; the platform may not
+    import `apps/web`'s Portable Text renderer.
   - Which strings are editable is the user's decision (CLAUDE.md "Check for
     Voice candidates").
   - The platform's own UI copy is never Voice.

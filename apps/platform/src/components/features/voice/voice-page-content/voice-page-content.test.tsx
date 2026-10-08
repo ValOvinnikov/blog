@@ -6,6 +6,7 @@ import {
 } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
+import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 
 import { VoicePageContent } from './voice-page-content';
 
@@ -54,6 +55,7 @@ describe(`<${VoicePageContent.name}/>`, () => {
 
   it("renders the default language's saved override as the field value", async () => {
     getSiteConfigMock.mockResolvedValue({
+      ...defaultLookFormValues(),
       voiceOverridesByLocale: {
         [EN]: { notFoundHeading: 'Nothing here' },
         [DE]: { notFoundHeading: 'Nichts hier' },

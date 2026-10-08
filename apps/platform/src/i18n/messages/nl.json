@@ -495,6 +495,37 @@
     "ARCHIVE": "Verschijnen zolang een lijst nog leeg is. Kies er een om te bewerken.",
     "BOOKMARKS": "De bewaarde berichten van een lezer, voordat die iets bewaart"
   },
+  "voiceSpecimen": {
+    "showPreview": "Voorbeeld tonen",
+    "hidePreview": "Voorbeeld verbergen",
+    "lists": {
+      "blogList": {
+        "eyebrow": "Blog",
+        "heading": "Alle berichten",
+        "count": "0 berichten"
+      },
+      "topic": {
+        "eyebrow": "Onderwerp",
+        "heading": "Ontwerp",
+        "count": "0 berichten"
+      },
+      "tag": {
+        "eyebrow": "Tag",
+        "heading": "Typografie",
+        "count": "0 berichten"
+      },
+      "topics": {
+        "eyebrow": "Ontdekken",
+        "heading": "Onderwerpen",
+        "count": "0 onderwerpen"
+      },
+      "tags": {
+        "eyebrow": "Ontdekken",
+        "heading": "Tags",
+        "count": "0 tags"
+      }
+    }
+  },
   "voiceFieldLabels": {
     "blogListEmpty": "Blogoverzicht",
     "topicEmpty": "Onderwerppagina",

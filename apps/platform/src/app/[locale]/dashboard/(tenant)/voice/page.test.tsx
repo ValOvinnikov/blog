@@ -1,6 +1,7 @@
 import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -50,7 +51,9 @@ describe(`<${DashboardVoicePage.name}/>`, () => {
     listMembershipsForUserMock.mockResolvedValue([
       { id: 'm-1', userId: 'user-1', tenantId: 'tenant-1', role: 'OWNER' },
     ]);
-    listTenantsByIdsMock.mockResolvedValue([{ id: 'tenant-1' }]);
+    listTenantsByIdsMock.mockResolvedValue([
+      makeReadyTenant({ id: 'tenant-1' }),
+    ]);
   });
 
   it('redirects to sign-in without a session', async () => {

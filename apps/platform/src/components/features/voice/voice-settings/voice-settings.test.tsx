@@ -3,6 +3,7 @@ import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
+import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import { buildVoiceDraft } from '@platform/utils/voice-draft/voice-draft';
 import userEvent from '@testing-library/user-event';
 
@@ -40,6 +41,7 @@ const setup = customRender(VoiceSettings, {
   initialDraft: buildVoiceDraft({}, [EN]),
   defaultLocale: EN,
   liveLocales: [EN],
+  previewTheme: defaultLookFormValues(),
   saveAction: vi.fn(),
 });
 
@@ -118,6 +120,76 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
     expect(notFoundHeading()).toHaveValue('');
     expect(within(section).getByText('All default')).toBeVisible();
+  });
+
+  describe('specimens', () => {
+    it('re-renders the specimen beside a field as the editor types', async () => {
+      setup();
+
+      await user.type(notFoundHeading(), 'Lost at sea');
+
+      expect(
+        within(screen.getByTestId('voice-specimen-NOT_FOUND')).getByText(
+          'Lost at sea',
+        ),
+      ).toBeVisible();
+    });
+
+    it("outlines the focused field's text in its specimen", async () => {
+      setup();
+
+      await user.click(notFoundHeading());
+
+      expect(screen.getByTestId('voice-key-notFoundHeading')).toHaveAttribute(
+        'data-focused',
+        'true',
+      );
+
+      await user.tab();
+
+      expect(screen.getByTestId('voice-key-notFoundHeading')).toHaveAttribute(
+        'data-focused',
+        'false',
+      );
+    });
+
+    it('shows the open list in the empty-lists specimen', async () => {
+      setup();
+      const section = card('Empty lists');
+
+      await user.click(
+        within(section).getByRole('button', { name: /Topic page/ }),
+      );
+
+      expect(
+        within(screen.getByTestId('voice-specimen-ARCHIVE')).getByText(
+          'No posts in Design yet.',
+        ),
+      ).toBeVisible();
+    });
+
+    it('toggles each preview behind its own Show preview button', async () => {
+      setup();
+      const toggle = within(card('Bookmarks')).getByRole('button', {
+        name: 'Show preview',
+        expanded: false,
+      });
+
+      await user.click(toggle);
+
+      expect(
+        within(card('Bookmarks')).getByRole('button', {
+          name: 'Hide preview',
+          expanded: true,
+        }),
+      ).toBeVisible();
+      expect(
+        within(card('Error page')).getByRole('button', {
+          name: 'Show preview',
+          expanded: false,
+        }),
+      ).toBeVisible();
+    });
   });
 
   describe('empty lists', () => {

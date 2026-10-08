@@ -1,6 +1,6 @@
 # Engagement Layer — Visual & Token Spec
 
-> **Superseded** — the terminal idiom, the `--accent`, `--bg` and `--ease-console` tokens, the blink animation and `WindowChrome` (deleted in #2846) are gone; one rendering path replaced them. See docs/superpowers/specs/2026-09-06-generic-theme-and-full-voice-design.md.
+> **Superseded** — the terminal idiom, the `--accent`, `--bg` and `--ease-console` tokens, the blink animation and `WindowChrome` (deleted in #2846) are gone; one rendering path replaced them. See `SPEC.md` "Voice-as-content".
 
 **Status:** Visual design spec (companion to the UX design doc; no code).
 **Date:** 2026-08-03

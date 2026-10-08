@@ -174,3 +174,12 @@ export const toVoiceOverridesInput = (
       return [locale, Object.fromEntries(customised)];
     }),
   );
+
+export const resolveVoiceValue = (
+  locale: TLocaleIsoCode,
+  field: TVoiceField,
+  value: TVoiceDraftValue,
+): string | TVoicePortableText =>
+  value !== null && isVoiceValueCustomised(value)
+    ? value
+    : voiceDefaultText(locale, field);
