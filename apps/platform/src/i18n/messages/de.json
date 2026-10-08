@@ -419,11 +419,6 @@
       "MAGIC_LINK": "Wird gesendet, wenn sich jemand auf der Website dieses Mandanten anmeldet.",
       "TENANT_INVITE": "Wird gesendet, wenn jemand in das Team dieses Mandanten eingeladen wird.",
       "NEWSLETTER_CONFIRMATION": "Wird gesendet, um ein Newsletter-Abonnement zu bestätigen."
-    },
-    "previewActionLabel": {
-      "MAGIC_LINK": "Anmelden",
-      "TENANT_INVITE": "Einladung annehmen",
-      "NEWSLETTER_CONFIRMATION": "Abonnement bestätigen"
     }
   },
   "portableTextEditorToolbar": {

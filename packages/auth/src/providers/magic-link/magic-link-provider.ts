@@ -1,13 +1,15 @@
 import { env } from '@blog/auth/utils/env/env';
 import { EMAIL_TEMPLATE_TYPE } from '@blog/config/constants';
 import { EMAIL_TEMPLATE_DEFAULT_COPY } from '@blog/db/constants';
-import { sendEmail } from '@blog/email';
+import {
+  buildInviteMagicLinkEmail,
+  buildMagicLinkEmail,
+  sendEmail,
+} from '@blog/email';
 import type { EmailConfig } from 'next-auth/providers/email';
 
 import { applyTenantSenderName } from './apply-tenant-sender-name';
 import { findPendingInviteTenantNames } from './find-pending-invite-tenant-names';
-import { buildMagicLinkEmail } from './magic-link-email';
-import { buildInviteMagicLinkEmail } from './magic-link-invite-email';
 import { resolveMagicLinkEmailSettings } from './resolve-magic-link-email-settings';
 import { resolveMagicLinkFromAddress } from './resolve-magic-link-from-address';
 import { resolveTenantEmailIdentity } from './resolve-tenant-email-identity';

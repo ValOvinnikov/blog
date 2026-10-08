@@ -419,11 +419,6 @@
       "MAGIC_LINK": "Sent when someone signs in to this tenant's site.",
       "TENANT_INVITE": "Sent when someone is invited to join this tenant's team.",
       "NEWSLETTER_CONFIRMATION": "Sent to confirm a newsletter subscription."
-    },
-    "previewActionLabel": {
-      "MAGIC_LINK": "Sign in",
-      "TENANT_INVITE": "Accept invite",
-      "NEWSLETTER_CONFIRMATION": "Confirm subscription"
     }
   },
   "portableTextEditorToolbar": {

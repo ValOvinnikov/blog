@@ -419,11 +419,6 @@
       "MAGIC_LINK": "Envoyé lorsqu'une personne se connecte au site de ce locataire.",
       "TENANT_INVITE": "Envoyé lorsqu'une personne est invitée à rejoindre l'équipe de ce locataire.",
       "NEWSLETTER_CONFIRMATION": "Envoyé pour confirmer un abonnement à la newsletter."
-    },
-    "previewActionLabel": {
-      "MAGIC_LINK": "Se connecter",
-      "TENANT_INVITE": "Accepter l'invitation",
-      "NEWSLETTER_CONFIRMATION": "Confirmer l'abonnement"
     }
   },
   "portableTextEditorToolbar": {
