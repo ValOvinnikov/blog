@@ -2,7 +2,6 @@ import { LOCALE_ISO_CODES, SITE_MESSAGES_BY_LOCALE } from '@blog/config';
 import { NotFoundPage } from '@web/components/pages/not-found-page';
 import { ThemeScope } from '@web/components/shared/theme-scope';
 import { makeFormattedVoiceRich } from '@web/testing/shared/voice/fixtures';
-import { resolveVoiceRichFields } from '@web/utils/resolve-voice-rich-fields';
 import { NextIntlClientProvider } from 'next-intl';
 
 import { StandaloneNotFoundPage } from './standalone-not-found-page';
@@ -88,6 +87,7 @@ describe(`<${StandaloneNotFoundPage.name}/>`, () => {
       expect(getThemeTokensMock).toHaveBeenCalledWith('tenant-1');
       expect(resolveTenantMessagesMock).toHaveBeenCalledWith(
         messages,
+        LOCALE_ISO_CODES.EN,
         'tenant-1',
       );
       expect(toThemeTokensMock).not.toHaveBeenCalled();
@@ -100,19 +100,16 @@ describe(`<${StandaloneNotFoundPage.name}/>`, () => {
       expect(ui.props.themeTokens).toBe(THEME_TOKENS);
     });
 
-    it('keeps the base messages but the tenant theme without voice overrides', async () => {
-      const ui = await StandaloneNotFoundPage({
+    it('resolves the tenant’s messages in the given language', async () => {
+      await StandaloneNotFoundPage({
         tenant: 'tenant-1',
         locale: LOCALE_ISO_CODES.NL,
-        hasVoiceOverrides: false,
       });
 
-      expect(resolveTenantMessagesMock).not.toHaveBeenCalled();
-      expect(ui.props.themeTokens).toBe(THEME_TOKENS);
-      expect(ui.props.children.props.messages).toBe(SITE_MESSAGES_BY_LOCALE.NL);
-      expect(ui.props.children.props.children.props.supportingText).toEqual(
-        resolveVoiceRichFields({}, SITE_MESSAGES_BY_LOCALE.NL)
-          .notFoundSupportingText,
+      expect(resolveTenantMessagesMock).toHaveBeenCalledWith(
+        SITE_MESSAGES_BY_LOCALE.NL,
+        LOCALE_ISO_CODES.NL,
+        'tenant-1',
       );
     });
 

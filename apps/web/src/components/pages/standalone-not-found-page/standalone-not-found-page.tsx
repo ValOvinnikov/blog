@@ -10,19 +10,17 @@ import { setRequestLocale } from 'next-intl/server';
 type TStandaloneNotFoundPageProps = {
   tenant?: string;
   locale?: TLocaleIsoCode;
-  hasVoiceOverrides?: boolean;
 };
 
 /** The body of every `not-found.tsx` boundary that renders outside `[tenant]/[locale]/layout.tsx`'s providers. */
 export const StandaloneNotFoundPage = async ({
   tenant,
   locale = LOCALE_ISO_CODES.EN,
-  hasVoiceOverrides = true,
 }: TStandaloneNotFoundPageProps = {}) => {
   setRequestLocale(locale);
 
   const [{ messages, rich }, themeTokens] = await Promise.all([
-    resolveNotFoundMessages({ tenant, locale, hasVoiceOverrides }),
+    resolveNotFoundMessages({ tenant, locale }),
     tenant ? getThemeTokens(tenant) : toThemeTokens(undefined),
   ]);
 

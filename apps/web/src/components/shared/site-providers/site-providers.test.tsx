@@ -83,7 +83,7 @@ describe(SiteProviders, () => {
     expect(intl.props.timeZone).toBe('UTC');
   });
 
-  it('applies the tenant voice pack to the base messages for the default language', async () => {
+  it('applies the tenant voice pack to the base messages', async () => {
     const tenantMessages = { ...realMessages };
     resolveTenantMessagesMock.mockResolvedValue({
       messages: tenantMessages,
@@ -94,12 +94,13 @@ describe(SiteProviders, () => {
 
     expect(resolveTenantMessagesMock).toHaveBeenCalledWith(
       realMessages,
+      LOCALE_ISO_CODES.EN,
       DEFAULT_REQUEST_CONTEXT.tenantId,
     );
     expect(intl.props.messages).toBe(tenantMessages);
   });
 
-  it("serves another language's messages without the tenant's default-language voice pack", async () => {
+  it("applies the tenant voice pack in another language to that language's messages", async () => {
     getRequestContextMock.mockResolvedValue({
       ...DEFAULT_REQUEST_CONTEXT,
       locale: LOCALE_ISO_CODES.NL,
@@ -107,7 +108,11 @@ describe(SiteProviders, () => {
 
     const { intl } = await render();
 
-    expect(resolveTenantMessagesMock).not.toHaveBeenCalled();
+    expect(resolveTenantMessagesMock).toHaveBeenCalledWith(
+      SITE_MESSAGES_BY_LOCALE.NL,
+      LOCALE_ISO_CODES.NL,
+      DEFAULT_REQUEST_CONTEXT.tenantId,
+    );
     expect(intl.props.messages).toBe(SITE_MESSAGES_BY_LOCALE.NL);
   });
 

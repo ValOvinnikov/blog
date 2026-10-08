@@ -1,5 +1,6 @@
 import {
   portableTextToPlainText,
+  type TLocaleIsoCode,
   VOICE_FIELDS,
   type TVoicePortableText,
 } from '@blog/config';
@@ -38,16 +39,7 @@ const setAtPath = (
   return { ...target, [key]: setAtPath(childObject, rest, value) };
 };
 
-/**
- * Applies `site_config.voiceOverrides` onto the merged message tree at each
- * override's own `VOICE_FIELDS` registry path, cloning only the objects
- * along that path so untouched namespaces keep referencing the cached
- * messages module instead of being mutated in place. A message tree leaf
- * must be a string, so a RICH override is projected to plain text rather
- * than dropped — unformatted still beats falling back to the untouched
- * default copy. An override whose key is absent from the registry is
- * ignored.
- */
+// A message leaf must be a string, so a RICH override is projected to plain text rather than dropped.
 const applyVoiceOverrides = (
   messages: Record<string, unknown>,
   overrides: Record<string, string | TVoicePortableText>,
@@ -72,6 +64,7 @@ export interface ITenantMessages {
 
 export const resolveTenantMessages = async (
   base: Record<string, unknown>,
+  locale: TLocaleIsoCode,
   tenant?: string,
 ): Promise<ITenantMessages> => {
   const result = await getSiteConfig(tenant);
@@ -81,7 +74,7 @@ export const resolveTenantMessages = async (
     return { messages: base, rich: resolveVoiceRichFields({}, base) };
   }
 
-  const voiceOverrides = result.data?.voiceOverrides ?? {};
+  const voiceOverrides = result.data?.voiceOverridesByLocale[locale] ?? {};
 
   return {
     messages: applyVoiceOverrides(base, voiceOverrides),

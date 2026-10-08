@@ -1580,15 +1580,18 @@ every `module_*` document's `brandVariant` field uses, is a different axis and
 is unaffected.)
 
 **Voice-as-content**: `apps/web/src/utils/resolve-tenant-messages/` resolves
-each request's `next-intl` messages as a two-layer merge — the neutral base
-(`i18n/messages/en.json`) ← the tenant's `site_config.voiceOverrides`. There
+each request's `next-intl` messages as a two-layer merge — the request
+language's catalog ← the tenant's overrides for that same language, on every
+page and for every language the tenant serves; a language with no override
+for a field keeps that language's catalog default. There
 is no preset layer: a preset is a _look_, and carries no copy. The `preset`
 and `voiceOverrides` still come from the same `site_config` row and the same
 cached read as theme (`get-site-config.ts`, tenant-scoped tag) — one row
 backs both. The `voice_overrides` column holds one map per language,
 `{ [locale]: { [fieldId]: value } }` (`voiceOverridesByLocale` in
 `@blog/db`); a save may carry several languages, replaces the map of each
-one it carries, and leaves the others as stored. Until web and platform read per language, `getSiteConfig` also
+one it carries, and leaves the others as stored. `apps/web` reads
+`voiceOverridesByLocale` directly. Until platform reads per language, `getSiteConfig` also
 returns the tenant's default-language map as a flat `voiceOverrides`, and
 `upsertSiteConfig` still accepts that flat shape, saving it under the default
 language. Each map keys fields as flat camelCase ids (e.g.

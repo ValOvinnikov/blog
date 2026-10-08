@@ -18,5 +18,4 @@ export const getRequestContext = async (): Promise<TRequestContext> =>
 export const getNotFoundContext = async (): Promise<TNotFoundContext> => ({
   tenantId: DEFAULT_REQUEST_CONTEXT.tenantId,
   locale: DEFAULT_REQUEST_CONTEXT.locale,
-  isDefaultLocale: true,
 });

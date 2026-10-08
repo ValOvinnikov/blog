@@ -31,7 +31,6 @@ export type TRequestContext = {
 export type TNotFoundContext = {
   tenantId: TMaybeUndefined<string>;
   locale: TLocaleIsoCode;
-  isDefaultLocale: boolean;
 };
 
 type TRouteParams = { tenant: string; locale: string };
@@ -174,11 +173,7 @@ const buildNotFoundContext = async (
     : routing.locales;
   const servedLocale = hasLocale(liveLocales, locale) ? locale : defaultLocale;
 
-  return {
-    tenantId,
-    locale: servedLocale,
-    isDefaultLocale: servedLocale === defaultLocale,
-  };
+  return { tenantId, locale: servedLocale };
 };
 
 /**
@@ -192,28 +187,17 @@ export const getNotFoundContext = (): Promise<TNotFoundContext> => {
 };
 
 /**
- * The tenant whose Voice overrides apply to `locale` in this request, or
- * `undefined` without waiting when no `[tenant]` route has entered — so
+ * The tenant whose Voice overrides apply in this request, or `undefined`
+ * without waiting when no `[tenant]` route has entered — so
  * `global-not-found` and `global-error` never block on it.
  */
-export const peekVoiceTenant = async (
-  locale: TLocaleIsoCode,
-): Promise<TMaybeUndefined<string>> => {
+export const peekVoiceTenant = async (): Promise<TMaybeUndefined<string>> => {
   const { context, notFoundContext } = getStore();
   const entered = await context?.then(
     (resolved) => resolved,
     () => undefined,
   );
 
-  if (entered) {
-    return locale === entered.defaultLocale ? entered.tenantId : undefined;
-  }
-  if (!notFoundContext) return undefined;
-
-  const {
-    tenantId,
-    locale: servedLocale,
-    isDefaultLocale,
-  } = await notFoundContext;
-  return isDefaultLocale && servedLocale === locale ? tenantId : undefined;
+  if (entered) return entered.tenantId;
+  return (await notFoundContext)?.tenantId;
 };
