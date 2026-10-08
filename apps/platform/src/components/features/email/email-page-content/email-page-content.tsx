@@ -1,11 +1,8 @@
-import { resolveTenantEmailBrand, type TEmailTemplateType } from '@blog/config';
+import type { TEmailTemplateType } from '@blog/config';
 import { queries } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { EmailSettings } from '@platform/components/features/email/email-settings';
-import {
-  defaultLookFormValues,
-  toLookFormValues,
-} from '@platform/utils/default-look-values/default-look-values';
+import { loadTenantEmailBrand } from '@platform/server/email/load-tenant-email-brand';
 import { buildEmailDraft } from '@platform/utils/email-draft/email-draft';
 
 export type TEmailPageContentProps = {
@@ -13,22 +10,12 @@ export type TEmailPageContentProps = {
 };
 
 export const EmailPageContent = async ({ tenant }: TEmailPageContentProps) => {
-  const [siteConfig, emailConfig, templates, authored] = await Promise.all([
-    queries.siteConfig.getSiteConfig(tenant.id),
+  const [brand, emailConfig, templates, authored] = await Promise.all([
+    loadTenantEmailBrand(tenant.id),
     queries.emailConfig.getEmailConfig(tenant.id),
     queries.emailTemplates.listEmailTemplates(tenant.id),
     queries.emailTemplates.listAuthoredEmailTemplates(tenant.id),
   ]);
-
-  const lookValues = siteConfig
-    ? toLookFormValues(siteConfig)
-    : defaultLookFormValues();
-
-  const brand = resolveTenantEmailBrand({
-    preset: lookValues.preset,
-    accentHue: lookValues.accentHue,
-    logoHue: lookValues.logoHue,
-  });
 
   const liveLocales = queries.tenants.selectLiveLocales(tenant);
 

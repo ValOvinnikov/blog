@@ -14,7 +14,9 @@ const {
   updateEmailConfigActionMock,
   uploadEmailLogoActionMock,
   clearEmailLogoActionMock,
+  sendTestEmailActionMock,
 } = vi.hoisted(() => ({
+  sendTestEmailActionMock: vi.fn(),
   updateEmailTemplateActionMock: vi.fn(),
   updateEmailConfigActionMock: vi.fn(),
   uploadEmailLogoActionMock: vi.fn(),
@@ -36,6 +38,10 @@ vi.mock('@platform/server/email/upload-email-logo-action', () => ({
 
 vi.mock('@platform/server/email/clear-email-logo-action', () => ({
   clearEmailLogoAction: clearEmailLogoActionMock,
+}));
+
+vi.mock('@platform/server/email/send-test-email-action', () => ({
+  sendTestEmailAction: sendTestEmailActionMock,
 }));
 
 const { EN, FR } = LOCALE_ISO_CODES;
@@ -86,6 +92,11 @@ describe(`<${EmailSettings.name}/>`, () => {
     updateEmailConfigActionMock.mockResolvedValue({ ok: true });
     uploadEmailLogoActionMock.mockReset();
     clearEmailLogoActionMock.mockReset();
+    sendTestEmailActionMock.mockReset();
+    sendTestEmailActionMock.mockResolvedValue({
+      ok: true,
+      to: 'admin@example.com',
+    });
     vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:staged-logo');
   });
 
@@ -170,6 +181,42 @@ describe(`<${EmailSettings.name}/>`, () => {
         'Connexion',
       );
       expect(refresh).not.toHaveBeenCalled();
+    });
+    it('previews the edited subject and sends it as a test', async () => {
+      expect(screen.getByRole('region', { name: 'Preview' })).toHaveTextContent(
+        'Connexion',
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Send test to me' }));
+
+      expect(
+        await screen.findByText('Test sent to admin@example.com.'),
+      ).toBeVisible();
+      expect(sendTestEmailActionMock).toHaveBeenCalledWith('tenant-1', {
+        templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+        copy: {
+          subject: 'Connexion',
+          body: expect.any(Array),
+        },
+        sender: {
+          senderName: null,
+          replyToAddress: null,
+          footerPostalAddress: null,
+        },
+      });
+    });
+
+    it('says when the test limit is reached', async () => {
+      sendTestEmailActionMock.mockResolvedValue({
+        ok: false,
+        reason: 'rate-limited',
+      });
+
+      await user.click(screen.getByRole('button', { name: 'Send test to me' }));
+
+      expect(
+        await screen.findByText(/You've sent several tests recently/),
+      ).toBeVisible();
     });
   });
 

@@ -1,25 +1,30 @@
 import { emailTemplatePreviewVariants } from './email-template-preview-variants';
 
+export type TEmailPreviewWidth = 'desktop' | 'mobile';
+
 export type TEmailTemplatePreviewProps = {
   html: string;
   title: string;
+  width?: TEmailPreviewWidth;
 };
 
-/**
- * Shows the HTML body only: sending headers (`List-Unsubscribe`), the
- * tenant-level logo and footer address, and the unbranded fallback used when
- * no tenant resolves for a host are not represented. Sandboxed, because the
- * HTML is a full document with its own inline styles.
- */
+// Sandboxed: the HTML is a full document with its own inline styles.
 export const EmailTemplatePreview = ({
   html,
   title,
+  width = 'desktop',
 }: TEmailTemplatePreviewProps) => {
-  const { root, frame } = emailTemplatePreviewVariants();
+  const { root, frame } = emailTemplatePreviewVariants({ width });
 
   return (
     <div className={root()}>
-      <iframe title={title} srcDoc={html} sandbox="" className={frame()} />
+      <iframe
+        title={title}
+        srcDoc={html}
+        sandbox=""
+        className={frame()}
+        data-width={width}
+      />
     </div>
   );
 };

@@ -5,6 +5,13 @@ export const emailTemplatePreviewVariants = tv({
     root: [
       'overflow-hidden rounded-admin border border-admin-line bg-admin-surface-2',
     ],
-    frame: ['h-[480px] w-full bg-white'],
+    frame: ['mx-auto block h-[560px] w-full bg-white'],
   },
+  variants: {
+    width: {
+      desktop: {},
+      mobile: { frame: ['max-w-[375px]'] },
+    },
+  },
+  defaultVariants: { width: 'desktop' },
 });

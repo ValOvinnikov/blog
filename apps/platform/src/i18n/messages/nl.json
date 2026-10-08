@@ -372,12 +372,36 @@
     "senderItemDescription": "Naam, antwoordadres, postadres en logo, in elke taal hetzelfde.",
     "itemsAriaLabel": "E-mails om te bewerken",
     "editingLabel": "Bewerken",
-    "languageAriaLabel": "Taal om te bewerken"
+    "languageAriaLabel": "Taal om te bewerken",
+    "viewAriaLabel": "Bewerken of voorbeeld",
+    "editTab": "Bewerken",
+    "previewTab": "Voorbeeld"
   },
   "emailItemStatus": {
     "default": "Standaard",
     "customised": "Aangepast",
     "unsaved": "Niet opgeslagen"
+  },
+  "emailPreview": {
+    "heading": "Voorbeeld",
+    "fromLabel": "Van",
+    "replyToLabel": "Antwoord aan",
+    "subjectLabel": "Onderwerp",
+    "defaultSender": "Standaardafzender",
+    "noReplyTo": "Geen antwoordadres",
+    "widthAriaLabel": "Breedte van het voorbeeld",
+    "desktop": "Desktop",
+    "mobile": "Mobiel",
+    "iframeTitle": "E-mailvoorbeeld",
+    "actionLockedNote": "Zo wordt de e-mail verstuurd: knoppen en voettekst worden automatisch toegevoegd en kunnen hier niet worden bewerkt.",
+    "sendTest": "Test naar mij sturen",
+    "sendingTest": "Versturen…",
+    "testSent": "Test verstuurd naar {email}.",
+    "testRateLimited": "Je hebt net meerdere tests verstuurd — probeer het over een paar minuten opnieuw.",
+    "testInvalid": "Vul het onderwerp en bericht in voordat je een test verstuurt.",
+    "testFailed": "De test kon niet worden verstuurd — probeer het opnieuw.",
+    "testSubject": "[Test] {subject}",
+    "unsavedLogoNote": "Een logo dat je nog niet hebt opgeslagen, zit niet in de test."
   },
   "emailSettingsForm": {
     "heading": "E-mailinstellingen",
@@ -409,9 +433,6 @@
     "bodyHint": "De inlogknop, uitnodigingslink of afmeldlink wordt altijd hieronder getoond — die kan hier niet worden verwijderd.",
     "logoLabel": "Sjabloonlogo",
     "logoHint": "Overschrijft het e-maillogo voor dit sjabloon, in elke taal.",
-    "previewHeading": "Voorbeeld",
-    "previewIframeTitle": "E-mailvoorbeeld",
-    "actionLockedNote": "De knoppen en links in het voorbeeld worden altijd meegestuurd en kunnen hier niet worden bewerkt.",
     "templateTypeLabel": {
       "MAGIC_LINK": "Inloglink",
       "TENANT_INVITE": "Teamuitnodiging",
