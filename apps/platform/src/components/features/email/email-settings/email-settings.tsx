@@ -1,6 +1,6 @@
 'use client';
 
-import type { TLocaleIsoCode } from '@blog/config';
+import { portableTextToPlainText, type TLocaleIsoCode } from '@blog/config';
 import type { TTenantEmailBrand } from '@blog/email/html';
 import { EmailSenderEditor } from '@platform/components/features/email/email-sender-editor';
 import { ItemList } from '@platform/components/features/email/email-settings/components/item-list';
@@ -20,6 +20,7 @@ import {
   withLogo,
   type TEmailDraft,
   type TEmailPageItem,
+  type TEmailSenderDraft,
 } from '@platform/utils/email-draft/email-draft';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -28,6 +29,12 @@ import { useId, useState } from 'react';
 import { emailSettingsVariants } from './email-settings-variants';
 import { useEmailDraft } from './use-email-draft';
 
+const SENDER_FIELD_LABEL_KEYS = {
+  senderName: 'senderNameLabel',
+  replyToAddress: 'replyToLabel',
+  footerPostalAddress: 'footerAddressLabel',
+} as const satisfies Record<keyof TEmailSenderDraft, string>;
+
 export type TEmailSettingsProps = {
   tenantId: string;
   initialDraft: TEmailDraft;
@@ -35,6 +42,7 @@ export type TEmailSettingsProps = {
   liveLocales: TLocaleIsoCode[];
   brand: TTenantEmailBrand;
   brandName: string;
+  savedAt?: Date;
   archivedAt?: Date;
 };
 
@@ -45,12 +53,14 @@ export const EmailSettings = ({
   liveLocales,
   brand,
   brandName,
+  savedAt,
   archivedAt,
 }: TEmailSettingsProps) => {
   const t = useTranslations('emailForm');
   const tStatus = useTranslations('emailItemStatus');
   const tTemplate = useTranslations('emailTemplateEditor');
   const tLanguage = useTranslations('languageNames');
+  const tSender = useTranslations('emailSettingsForm');
   const toast = useToast();
   const router = useRouter();
   const archivedNoticeId = useId();
@@ -100,6 +110,46 @@ export const EmailSettings = ({
     };
   });
 
+  const senderDraftFields = (
+    Object.keys(SENDER_FIELD_LABEL_KEYS) as (keyof TEmailSenderDraft)[]
+  ).map((field) => ({
+    id: field,
+    label: tSender(SENDER_FIELD_LABEL_KEYS[field]),
+    display: (values: TEmailDraft) => values.sender[field],
+  }));
+
+  const copyDraftFields = EMAIL_TEMPLATE_TYPES.flatMap((templateType) =>
+    liveLocales.flatMap((locale) => {
+      const template = tTemplate(`templateTypeLabel.${templateType}`);
+      const language = tLanguage(locale);
+      return [
+        {
+          id: `${templateType}.${locale}.subject`,
+          label: `${template} — ${tTemplate('subjectLabel', { language })}`,
+          display: (values: TEmailDraft) =>
+            values.copies[templateType][locale].subject,
+        },
+        {
+          id: `${templateType}.${locale}.body`,
+          label: `${template} — ${tTemplate('bodyLabel', { language })}`,
+          display: (values: TEmailDraft) =>
+            portableTextToPlainText(
+              values.copies[templateType][locale].body as Parameters<
+                typeof portableTextToPlainText
+              >[0],
+            ),
+        },
+      ];
+    }),
+  );
+
+  const restoreDraft = (restored: TEmailDraft) =>
+    setDraft((prev) => ({
+      ...restored,
+      senderLogo: prev.senderLogo,
+      templateLogos: prev.templateLogos,
+    }));
+
   const discard = () => {
     setSenderNameError(undefined);
     setDraft(saved);
@@ -124,6 +174,15 @@ export const EmailSettings = ({
       archivedNoticeId={archivedNoticeId}
       hasError={status === 'error' && !senderNameError}
       errorTitle={t('alertError')}
+      draft={{
+        tenantId,
+        page: 'email',
+        values: draft,
+        savedValues: saved,
+        savedAt,
+        fields: [...senderDraftFields, ...copyDraftFields],
+        onRestore: restoreDraft,
+      }}
     >
       <div className={layout()}>
         <ItemList

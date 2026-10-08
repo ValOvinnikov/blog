@@ -57,6 +57,7 @@ export const EmailPageContent = async ({ tenant }: TEmailPageContentProps) => {
       liveLocales={liveLocales}
       brand={brand}
       brandName={tenant.name}
+      savedAt={emailConfig?.updatedAt}
       archivedAt={tenant.deprovisionedAt ?? undefined}
     />
   );

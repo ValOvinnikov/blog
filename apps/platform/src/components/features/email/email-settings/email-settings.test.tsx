@@ -91,6 +91,7 @@ describe(`<${EmailSettings.name}/>`, () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    window.localStorage.clear();
   });
 
   it('opens on Sender & footer, with each template marked for the default language', () => {
@@ -218,6 +219,27 @@ describe(`<${EmailSettings.name}/>`, () => {
 
     expect(
       await screen.findByText('Enter a name, not an address.'),
+    ).toBeVisible();
+  });
+
+  it('restores an unsaved translation after leaving the page, but not a staged logo', async () => {
+    const { unmount } = setup();
+    await selectFile(new File(['x'], 'logo.png', { type: 'image/png' }));
+    await openSignInTemplate(user);
+    await chooseLanguage(user, 'French');
+    await user.type(screen.getByLabelText('Subject (French)'), 'Connexion');
+    unmount();
+
+    setup();
+    await user.click(
+      screen.getByRole('button', { name: /^Restore \d+ changes?$/ }),
+    );
+    await openSignInTemplate(user);
+    await chooseLanguage(user, 'French');
+
+    expect(screen.getByLabelText('Subject (French)')).toHaveValue('Connexion');
+    expect(
+      screen.getByRole('button', { name: /^Sender & footer.*Default$/ }),
     ).toBeVisible();
   });
 
