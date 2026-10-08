@@ -1,6 +1,8 @@
 import { LOCALE_ISO_CODES, SITE_MESSAGES_BY_LOCALE } from '@blog/config';
 import { NotFoundPage } from '@web/components/pages/not-found-page';
 import { ThemeScope } from '@web/components/shared/theme-scope';
+import { makeFormattedVoiceRich } from '@web/testing/shared/voice/fixtures';
+import { resolveVoiceRichFields } from '@web/utils/resolve-voice-rich-fields';
 import { NextIntlClientProvider } from 'next-intl';
 
 import { StandaloneNotFoundPage } from './standalone-not-found-page';
@@ -35,6 +37,7 @@ vi.mock('@web/utils/to-theme-tokens', () => ({
 
 const messages = SITE_MESSAGES_BY_LOCALE.EN;
 const voicedMessages = { notFound: { commandNotFound: 'command not found' } };
+const voicedSupportingText = makeFormattedVoiceRich();
 
 const THEME_TOKENS = {
   accentHue: 250,
@@ -57,7 +60,7 @@ describe(`<${StandaloneNotFoundPage.name}/>`, () => {
     getThemeTokensMock.mockResolvedValue(THEME_TOKENS);
     resolveTenantMessagesMock.mockResolvedValue({
       messages: voicedMessages,
-      rich: {},
+      rich: { notFoundSupportingText: voicedSupportingText },
     });
     toThemeTokensMock.mockReturnValue(DEFAULT_THEME_TOKENS);
   });
@@ -107,6 +110,10 @@ describe(`<${StandaloneNotFoundPage.name}/>`, () => {
       expect(resolveTenantMessagesMock).not.toHaveBeenCalled();
       expect(ui.props.themeTokens).toBe(THEME_TOKENS);
       expect(ui.props.children.props.messages).toBe(SITE_MESSAGES_BY_LOCALE.NL);
+      expect(ui.props.children.props.children.props.supportingText).toEqual(
+        resolveVoiceRichFields({}, SITE_MESSAGES_BY_LOCALE.NL)
+          .notFoundSupportingText,
+      );
     });
 
     it('wraps NotFoundPage in its own NextIntlClientProvider, independent of any ancestor provider', async () => {
@@ -117,6 +124,9 @@ describe(`<${StandaloneNotFoundPage.name}/>`, () => {
       expect(provider.props.locale).toBe(LOCALE_ISO_CODES.EN);
       expect(provider.props.messages).toBe(voicedMessages);
       expect(provider.props.children.type).toBe(NotFoundPage);
+      expect(provider.props.children.props.supportingText).toBe(
+        voicedSupportingText,
+      );
     });
   });
 

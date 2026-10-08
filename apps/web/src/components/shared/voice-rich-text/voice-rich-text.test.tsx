@@ -1,26 +1,15 @@
 import type { TVoicePortableText } from '@blog/config';
 import { renderElement, screen } from '@web/testing/custom-render';
+import { makeFormattedVoiceRich } from '@web/testing/shared/voice/fixtures';
 
 import { VoiceRichText } from './voice-rich-text';
 
 vi.mock('@web/i18n/navigation');
 
-const LINKED_VALUE: TVoicePortableText = [
-  {
-    _type: 'block',
-    _key: 'b1',
-    style: 'normal',
-    markDefs: [{ _type: 'link', _key: 'l1', href: 'https://example.com' }],
-    children: [
-      { _type: 'span', _key: 's1', text: 'Read ' },
-      { _type: 'span', _key: 's2', text: 'the guide', marks: ['l1'] },
-      { _type: 'span', _key: 's3', text: ' — ' },
-      { _type: 'span', _key: 's4', text: 'bold', marks: ['strong'] },
-      { _type: 'span', _key: 's5', text: ' and ' },
-      { _type: 'span', _key: 's6', text: 'italic', marks: ['em'] },
-    ],
-  },
-];
+const LINKED_VALUE = makeFormattedVoiceRich({
+  linkText: 'the guide',
+  href: 'https://example.com',
+});
 
 const TWO_BLOCK_VALUE: TVoicePortableText = [
   {

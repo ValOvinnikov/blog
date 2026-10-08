@@ -1,16 +1,19 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { getRequestContext } from '@web/server/request-context/request-context';
+import { getVoiceRich } from '@web/server/site-config/get-voice-rich/get-voice-rich';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makePostCard } from '@web/testing/shared/post/fixtures';
 import {
   DEFAULT_REQUEST_CONTEXT,
   DEFAULT_TENANT_SANITY_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
+import { makeFormattedVoiceRich } from '@web/testing/shared/voice/fixtures';
 import { redirect } from 'next/navigation';
 
 import { BookmarksPage } from './bookmarks-page';
 
 vi.mock('@web/server/request-context/request-context');
+vi.mock('@web/server/site-config/get-voice-rich/get-voice-rich');
 
 const { authMock, listBookmarksMock, getPostsByIdsMock } = vi.hoisted(() => ({
   authMock: vi.fn(),
@@ -154,6 +157,29 @@ describe(`<${BookmarksPage.name}/>`, () => {
     const links = screen.getAllByRole('link');
     expect(links[0]).toHaveAttribute('href', '/nl/blog/mijn-artikel');
     expect(links[1]).toHaveAttribute('href', '/blog/my-article');
+  });
+
+  it('renders the catalog empty message when there are no bookmarks', async () => {
+    await setup();
+
+    expect(vi.mocked(getVoiceRich)).toHaveBeenCalledWith('bookmarksEmpty');
+    expect(
+      screen.getByText('No bookmarks yet — save a post to find it here.'),
+    ).toBeVisible();
+  });
+
+  it('renders the tenant-authored empty message with its formatting and link', async () => {
+    vi.mocked(getVoiceRich).mockResolvedValueOnce(
+      makeFormattedVoiceRich({ linkText: 'browse the blog', href: '/blog' }),
+    );
+
+    await setup();
+
+    expect(
+      screen.getByRole('link', { name: 'browse the blog' }),
+    ).toHaveAttribute('href', '/blog');
+    expect(screen.getByText('bold', { selector: 'strong' })).toBeVisible();
+    expect(screen.getByText('italic', { selector: 'em' })).toBeVisible();
   });
 
   it('renders nothing when resolving bookmarked posts fails', async () => {

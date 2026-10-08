@@ -7,6 +7,8 @@ import { Text } from '@blog/ui/components/atoms/text';
 import { LinkButton } from '@blog/ui/components/molecules/link-button';
 import { errorPageLayoutVariants } from '@web/components/shared/error-page-layout';
 import { SmartLink } from '@web/components/shared/smart-link';
+import { VoiceRichText } from '@web/components/shared/voice-rich-text';
+import { useVoiceRich } from '@web/context/voice-rich-provider';
 import { reportClientError } from '@web/utils/report-client-error';
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef } from 'react';
@@ -25,6 +27,7 @@ const s = errorPageLayoutVariants();
  */
 export const LocaleErrorPage = ({ error, reset }: TLocaleErrorPageProps) => {
   const t = useTranslations('localeErrorPage');
+  const description = useVoiceRich('localeErrorDescription');
   const announcementRef = useRef<HTMLSpanElement>(null);
   const mainRef = useRef<HTMLElement>(null);
   const reportedErrorRef = useRef<Error | null>(null);
@@ -58,7 +61,9 @@ export const LocaleErrorPage = ({ error, reset }: TLocaleErrorPageProps) => {
       <Heading level={1} visual="hero">
         {t('title')}
       </Heading>
-      <Text className={s.copy()}>{t('description')}</Text>
+      <Text className={s.copy()}>
+        <VoiceRichText value={description} />
+      </Text>
       <div className={s.actions()}>
         <Button onClick={reset}>{t('retry')}</Button>
         <LinkButton as={SmartLink} href={routes.home()} variant="ghost">

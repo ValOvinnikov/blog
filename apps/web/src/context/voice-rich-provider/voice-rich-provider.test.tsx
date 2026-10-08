@@ -1,5 +1,5 @@
 import type { TVoicePortableText } from '@blog/config';
-import { renderElement, screen } from '@web/testing/custom-render';
+import { render, renderElement, screen } from '@web/testing/custom-render';
 import type { TVoiceRichFieldId } from '@web/utils/resolve-voice-rich-fields';
 
 import { useVoiceRich, VoiceRichProvider } from './voice-rich-provider';
@@ -52,7 +52,7 @@ describe(`<${VoiceRichProvider.name}/>`, () => {
       .spyOn(console, 'error')
       .mockImplementation(() => {});
 
-    expect(() => renderElement(<ReadVoiceRich id="blogListEmpty" />)).toThrow(
+    expect(() => render(<ReadVoiceRich id="blogListEmpty" />)).toThrow(
       'useVoiceRich must be used within a VoiceRichProvider',
     );
 

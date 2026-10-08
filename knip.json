@@ -89,13 +89,7 @@
       // Next.js plugin still contributes the app-router entries.
       // (packages/ui needs no such entry: its `./*` package.json export makes
       // the wrapper reachable as public API, so knip already sees it as used.)
-      //
-      // src/context/voice-rich-provider/index.ts: the `useVoiceRich` hook is
-      // built ahead of the client-component consumers that will call it.
-      "entry": [
-        "src/testing/custom-render.tsx",
-        "src/context/voice-rich-provider/index.ts"
-      ],
+      "entry": ["src/testing/custom-render.tsx"],
       "project": [
         "**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx,mdx,css}!",
         "!src/testing/**!",

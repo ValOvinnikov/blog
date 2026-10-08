@@ -1,16 +1,21 @@
-import { ICONS } from '@blog/config';
+import { ICONS, type TVoicePortableText } from '@blog/config';
 import { Eyebrow } from '@blog/ui/components/atoms/eyebrow';
 import { Heading } from '@blog/ui/components/atoms/heading';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { Text } from '@blog/ui/components/atoms/text';
 import { SmartLink } from '@web/components/shared/smart-link';
+import { VoiceRichText } from '@web/components/shared/voice-rich-text';
 import { useTranslations } from 'next-intl';
 
 import { notFoundPageVariants } from './not-found-page-variants';
 
 const s = notFoundPageVariants();
 
-export const NotFoundPage = () => {
+export interface INotFoundPageProps {
+  supportingText: TVoicePortableText;
+}
+
+export const NotFoundPage = ({ supportingText }: INotFoundPageProps) => {
   const t = useTranslations('notFound');
   const eyebrow = t('eyebrow');
 
@@ -20,7 +25,9 @@ export const NotFoundPage = () => {
       <Heading level={1} visual="hero">
         {t('heading')}
       </Heading>
-      <Text className={s.copy()}>{t('supportingText')}</Text>
+      <Text className={s.copy()}>
+        <VoiceRichText value={supportingText} />
+      </Text>
       <SmartLink href="/" className={s.link()}>
         {t('returnHome')}
         <Icon

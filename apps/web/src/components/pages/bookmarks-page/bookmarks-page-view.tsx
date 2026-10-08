@@ -5,6 +5,7 @@ import {
   type IBookmarkRow,
 } from '@blog/ui/components/organisms/bookmarks-list';
 import NextLink from 'next/link';
+import type { ReactNode } from 'react';
 
 import { bookmarksPageVariants } from './bookmarks-page-variants';
 
@@ -23,7 +24,7 @@ export interface IBookmarksPageViewProps {
   heading: string;
   listHeading: string;
   posts: IBookmarkedPost[];
-  emptyMessage: string;
+  emptyMessage: ReactNode;
   hint?: string;
 }
 

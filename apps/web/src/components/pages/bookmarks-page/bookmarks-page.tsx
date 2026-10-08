@@ -1,9 +1,11 @@
 import { routes } from '@blog/config';
 import { queries } from '@blog/db';
 import { service } from '@blog/service';
+import { VoiceRichText } from '@web/components/shared/voice-rich-text';
 import { routing } from '@web/i18n/routing';
 import { auth } from '@web/server/auth/auth';
 import { getRequestContext } from '@web/server/request-context/request-context';
+import { getVoiceRich } from '@web/server/site-config/get-voice-rich/get-voice-rich';
 import { logger } from '@web/utils/logger/logger';
 import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
 import { redirect } from 'next/navigation';
@@ -28,10 +30,11 @@ export const BookmarksPage = async () => {
     redirect(routes.home());
   }
 
-  const [bookmarks, t, format] = await Promise.all([
+  const [bookmarks, t, format, emptyRich] = await Promise.all([
     queries.bookmarks.listBookmarks(tenantId, userId),
     getTranslations('bookmarksPage'),
     getFormatter(),
+    getVoiceRich('bookmarksEmpty'),
   ]);
 
   const bookmarkOrder = bookmarks.map((bookmark) => bookmark.postId);
@@ -75,7 +78,7 @@ export const BookmarksPage = async () => {
       heading={t('title')}
       listHeading={t('listHeading')}
       posts={posts}
-      emptyMessage={t('empty')}
+      emptyMessage={<VoiceRichText value={emptyRich} />}
       hint={posts.length > 0 ? t('hint', { count: posts.length }) : undefined}
     />
   );

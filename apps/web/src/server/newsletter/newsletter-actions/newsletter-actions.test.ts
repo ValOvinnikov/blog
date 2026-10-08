@@ -32,10 +32,12 @@ vi.mock('@blog/db', () => ({
     emailConfig: { getEmailConfig: getEmailConfigMock },
     emailTemplates: { getEmailTemplate: getEmailTemplateMock },
   },
-  EMAIL_TEMPLATE_DEFAULT_COPY: {
-    NEWSLETTER_CONFIRMATION: {
-      subject: 'Confirm your newsletter subscription',
-      body: [{ _type: 'block', _key: 'newsletter-confirmation-default-1' }],
+  EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE: {
+    EN: {
+      NEWSLETTER_CONFIRMATION: {
+        subject: 'Confirm your newsletter subscription',
+        body: [{ _type: 'block', _key: 'newsletter-confirmation-default-1' }],
+      },
     },
   },
 }));
