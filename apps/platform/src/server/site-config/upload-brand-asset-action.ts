@@ -17,15 +17,7 @@ import { del, put } from '@vercel/blob';
 export type TUploadBrandAssetResult =
   { ok: true; url: string } | { ok: false; error: string };
 
-/**
- * Called directly from `BrandAssetField` on file selection — persists to
- * `site_config` immediately, not gated behind the Look tab's "Save changes"
- * (the same way any native file-upload control takes effect right away).
- * `requireTenantMembership` re-checks the session against `tenantId` here
- * too, same as every other Look-tab action; `kind` is re-validated even
- * though the client only ever sends one of two literals, since a Server
- * Action is a public HTTP endpoint regardless of what its caller's types say.
- */
+// `kind` is re-validated although the client only sends one of two literals: a Server Action is a public endpoint.
 export const uploadBrandAssetAction = async (
   tenantId: string,
   kind: TBrandAssetKind,

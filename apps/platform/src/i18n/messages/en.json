@@ -331,6 +331,8 @@
     "shapeHeading": "Shape",
     "shapeDescription": "Corners, spacing and how cards are framed.",
     "brandHeading": "Brand",
+    "brandImagePicked": "New image, not uploaded yet",
+    "brandImageUnchanged": "No new image",
     "editTab": "Edit",
     "previewTab": "Preview",
     "viewTabsAriaLabel": "View"
@@ -363,7 +365,8 @@
     "uploading": "Uploading…",
     "replace": "Replace {label}",
     "upload": "Upload {label}",
-    "remove": "Remove"
+    "remove": "Remove",
+    "pickAgain": "Your recovered draft had a new {label} that couldn't be kept — pick it again."
   },
   "emailForm": {
     "pageHeading": "Email",
