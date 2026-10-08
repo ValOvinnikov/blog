@@ -26,6 +26,24 @@ export const DesktopRootActive: TStory = {
   args: { activeKey: '/modules' },
 };
 
+export const DesktopItemHover: TStory = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const links = canvas.getAllByRole('link', {
+      name: mockSidebarNavItems.at(0)?.label,
+    });
+    await userEvent.hover(links.at(0)!);
+  },
+};
+
+export const DesktopCurrentItemHover: TStory = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const links = canvas.getAllByRole('link', { name: 'Pricing' });
+    await userEvent.hover(links.at(0)!);
+  },
+};
+
 export const MobileClosed: TStory = {
   globals: { viewport: 'mobile' },
 };
