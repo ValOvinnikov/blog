@@ -20,6 +20,7 @@ import { localizedImageWithAltSchema } from '@blog/studio/schema-types/objects/l
 import { validateDefaultLanguageFilled } from '@blog/studio/schema-types/validation/validate-default-language-filled/validate-default-language-filled';
 import { validateLocalizedMaxLength } from '@blog/studio/schema-types/validation/validate-localized-max-length/validate-localized-max-length';
 import { validateNewestFeaturedHasCandidate } from '@blog/studio/schema-types/validation/validate-newest-featured-has-candidate/validate-newest-featured-has-candidate';
+import { validatePinnedPostTranslated } from '@blog/studio/schema-types/validation/validate-pinned-post-translated/validate-pinned-post-translated';
 import { toTitleCase } from '@blog/utils/primitives';
 import { Star } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
@@ -86,7 +87,7 @@ export const heroBlogSchema = defineType({
       hidden: ({ parent }) =>
         (parent as THeroBlogDocument | undefined)?.postSource !==
         POST_SOURCE.PINNED,
-      validation: (rule) =>
+      validation: (rule) => [
         rule.custom((value, context) => {
           const parent = context.parent as THeroBlogDocument | undefined;
 
@@ -94,6 +95,8 @@ export const heroBlogSchema = defineType({
             ? 'Choose a post, or switch the source to Newest featured.'
             : true;
         }),
+        rule.custom(validatePinnedPostTranslated).warning(),
+      ],
     }),
     defineField({
       name: 'image',
