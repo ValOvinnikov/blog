@@ -8,6 +8,7 @@ import {
   DEFAULT_REQUEST_CONTEXT,
   DEFAULT_TENANT_SANITY_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
+import { makeFormattedVoiceRich } from '@web/testing/shared/voice/fixtures';
 import { notFound } from 'next/navigation';
 
 import { PostListModule } from './post-list-module';
@@ -133,18 +134,9 @@ describe(`<${PostListModule.name}/>`, () => {
   });
 
   it('renders an authored link in the empty message', async () => {
-    vi.mocked(getVoiceRich).mockResolvedValueOnce([
-      {
-        _type: 'block',
-        _key: 'b1',
-        style: 'normal',
-        markDefs: [{ _type: 'link', _key: 'l1', href: '/topics' }],
-        children: [
-          { _type: 'span', _key: 's1', text: 'Nothing yet — ' },
-          { _type: 'span', _key: 's2', text: 'browse topics', marks: ['l1'] },
-        ],
-      },
-    ]);
+    vi.mocked(getVoiceRich).mockResolvedValueOnce(
+      makeFormattedVoiceRich({ linkText: 'browse topics', href: '/topics' }),
+    );
 
     await setup();
 

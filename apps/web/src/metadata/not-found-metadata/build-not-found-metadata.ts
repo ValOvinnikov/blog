@@ -14,7 +14,7 @@ const DEFAULT_CONTEXT: TNotFoundMessagesContext = {
 export const buildNotFoundMetadata = async (
   context: TNotFoundMessagesContext = DEFAULT_CONTEXT,
 ): Promise<Metadata> => {
-  const messages = await resolveNotFoundMessages(context);
+  const { messages } = await resolveNotFoundMessages(context);
   const t = createTranslator({
     locale: context.locale,
     messages,

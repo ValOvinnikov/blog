@@ -7,6 +7,7 @@ import {
   DEFAULT_REQUEST_CONTEXT,
   DEFAULT_TENANT_SANITY_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
+import { makeFormattedVoiceRich } from '@web/testing/shared/voice/fixtures';
 import { notFound } from 'next/navigation';
 
 import { TaxonomyListModule } from './taxonomy-list-module';
@@ -178,18 +179,9 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
 
     it('renders an authored link in the tags empty message', async () => {
       getTaxonomyListMock.mockResolvedValue(tagsResult());
-      vi.mocked(getVoiceRich).mockResolvedValueOnce([
-        {
-          _type: 'block',
-          _key: 'b1',
-          style: 'normal',
-          markDefs: [{ _type: 'link', _key: 'l1', href: '/blog' }],
-          children: [
-            { _type: 'span', _key: 's1', text: 'No tags — ' },
-            { _type: 'span', _key: 's2', text: 'read the blog', marks: ['l1'] },
-          ],
-        },
-      ]);
+      vi.mocked(getVoiceRich).mockResolvedValueOnce(
+        makeFormattedVoiceRich({ linkText: 'read the blog', href: '/blog' }),
+      );
 
       await setup();
 
