@@ -15,7 +15,7 @@ import {
   useSyncExternalStore,
 } from 'react';
 
-export type TSettingsDraftField<TValues> = {
+type TSettingsDraftField<TValues> = {
   id: string;
   label: string;
   display: (values: TValues) => string;
