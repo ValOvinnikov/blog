@@ -20,17 +20,30 @@ const setup = customRender(HeroBlogModuleView, {
 });
 
 describe(`<${HeroBlogModuleView.name}/>`, () => {
-  it('renders the resolved heading as the top-level heading, labelling the Section via a unique id derived from the module id', () => {
+  it('names the section by its top-level heading', () => {
     setup();
 
-    const heading = screen.getByRole('heading', {
-      level: 1,
-      name: 'Welcome to the blog',
-    });
-    expect(heading).toBeVisible();
-    expect(heading).toHaveAttribute('id', 'hero-blog-hero-blog-1');
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Welcome to the blog' }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole('region', { name: 'Welcome to the blog' }),
+    ).toBeVisible();
+  });
 
-    const section = heading.closest('section');
-    expect(section).toHaveAttribute('aria-labelledby', 'hero-blog-hero-blog-1');
+  it('gives two instances of the same module distinct heading ids', () => {
+    setup();
+    setup();
+
+    const headingIds = screen
+      .getAllByRole('heading', {
+        level: 1,
+        name: 'Welcome to the blog',
+      })
+      .map(({ id }) => id);
+    expect(new Set(headingIds).size).toBe(2);
+    expect(
+      screen.getAllByRole('region', { name: 'Welcome to the blog' }),
+    ).toHaveLength(2);
   });
 });

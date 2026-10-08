@@ -6,6 +6,7 @@ import { PortableText } from '@web/components/shared/portable-text';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { Section } from '@web/components/shared/section';
 import { BANNER_SECTION_LAYOUT } from '@web/utils/banner-section-layout';
+import { useId } from 'react';
 
 export interface ICtaModuleViewProps extends TCtaModule {
   id: string;
@@ -27,7 +28,7 @@ export const CtaModuleView = ({
   footnote,
   layout,
 }: ICtaModuleViewProps) => {
-  const titleId = `cta-${id}`;
+  const titleId = useId();
   const { heading, supportingText } = headingBlock;
   const isBanner = variant === CTA_VARIANT.BANNER;
 

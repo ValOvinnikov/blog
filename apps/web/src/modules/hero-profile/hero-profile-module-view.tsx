@@ -6,6 +6,7 @@ import { PortableText } from '@web/components/shared/portable-text';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SocialLinks } from '@web/components/shared/social-links';
 import { HeroModuleShell } from '@web/modules/hero-shared';
+import { useId } from 'react';
 
 import {
   heroProfileAvatarFallbackVariants,
@@ -34,7 +35,7 @@ export const HeroProfileModuleView = ({
   mediaOrder,
   layout,
 }: IHeroProfileModuleViewProps) => {
-  const titleId = `hero-profile-${id}`;
+  const titleId = useId();
   const { heading, supportingText } = headingBlock;
   const isBanner = variant === HERO_VARIANT.BANNER;
 

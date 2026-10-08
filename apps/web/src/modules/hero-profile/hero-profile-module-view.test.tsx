@@ -45,24 +45,27 @@ const setup = customRender(HeroProfileModuleView, {
 });
 
 describe(`<${HeroProfileModuleView.name}/>`, () => {
-  it('renders the heading as the top-level heading, labelling the Section via a unique id derived from the module id', () => {
+  it('names the section by its top-level heading', () => {
     setup();
 
-    const renderedHeading = screen.getByRole('heading', {
-      level: 1,
-      name: heading,
-    });
-    expect(renderedHeading).toBeVisible();
-    expect(renderedHeading).toHaveAttribute(
-      'id',
-      'hero-profile-hero-profile-1',
-    );
+    expect(
+      screen.getByRole('heading', { level: 1, name: heading }),
+    ).toBeVisible();
+    expect(screen.getByRole('region', { name: heading })).toBeVisible();
+  });
 
-    const section = renderedHeading.closest('section');
-    expect(section).toHaveAttribute(
-      'aria-labelledby',
-      'hero-profile-hero-profile-1',
-    );
+  it('gives two instances of the same module distinct heading ids', () => {
+    setup();
+    setup();
+
+    const headingIds = screen
+      .getAllByRole('heading', {
+        level: 1,
+        name: heading,
+      })
+      .map(({ id }) => id);
+    expect(new Set(headingIds).size).toBe(2);
+    expect(screen.getAllByRole('region', { name: heading })).toHaveLength(2);
   });
 
   it('renders the photo sized for an avatar on Stacked', () => {

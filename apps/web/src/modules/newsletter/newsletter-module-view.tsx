@@ -4,6 +4,7 @@ import { ModuleHeading } from '@web/components/shared/module-heading';
 import { NewsletterForm } from '@web/components/shared/newsletter-form';
 import { NewsletterSubscribedGate } from '@web/components/shared/newsletter-subscribed-gate';
 import { Section } from '@web/components/shared/section';
+import { useId } from 'react';
 
 export interface INewsletterModuleViewProps extends TNewsletterModule {
   id: string;
@@ -18,7 +19,7 @@ export const NewsletterModuleView = ({
   contentAlignment,
   trustCues,
 }: INewsletterModuleViewProps) => {
-  const titleId = `newsletter-${id}`;
+  const titleId = useId();
   const isCompact = variant === NEWSLETTER_VARIANT.COMPACT;
 
   return (
