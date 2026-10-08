@@ -79,7 +79,7 @@ When invoked, before writing any code:
    `Disclosure`, `BrandMark`, `PageHeader`, `Icon`, `Text`, and `Heading`
    already exist. Do not rebuild them, and do not reach for `@blog/ui`'s
    equivalents — this app's dependency on `@blog/ui` is confined by an
-   ESLint guard to `look-preview/preview-sample/` (which renders the
+   ESLint guard to `site-preview/` (which renders the
    tenant's real site for live-preview fidelity, not a component to reuse
    elsewhere); an import anywhere else fails lint.
 5. If a `db` or `config` change your work depends on (a new query, a constant,
@@ -150,7 +150,7 @@ When invoked, before writing any code:
 - Depend on `@blog/db`, `@blog/auth`, `@blog/config`, `@blog/insight`, and
   `@blog/email`
   only — `@blog/ui` is **not** an ordinary dependency here; it's confined by
-  an ESLint guard to `look-preview/preview-sample/` (the one directory that
+  an ESLint guard to `site-preview/` (the one directory that
   renders the tenant's real site for live-preview fidelity). Reach for this
   app's own primitives under `apps/platform/src/components/shared/` everywhere
   else.
@@ -214,7 +214,7 @@ deliberately separate. Style Base UI parts from admin's own tokens
 (`admin-*` custom properties), and where one of admin's own primitives
 already fits (the list above), compose it directly rather than restyling a
 Base UI part to match it. `@blog/ui` itself is off-limits outside
-`look-preview/preview-sample/` — see the dependency rule above.
+`site-preview/` — see the dependency rule above.
 
 ## Auth and access
 

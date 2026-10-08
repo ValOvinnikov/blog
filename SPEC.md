@@ -205,7 +205,7 @@ of `@blog/db` (its `src/` library code, consumed by `apps/web`/`apps/platform`
 at request time) is unaffected and still never imports `@blog/insight`.
 
 ³ `apps/platform`'s `@blog/ui` prohibition has one scoped exception:
-`apps/platform/src/components/features/look/look-preview/preview-sample/`
+`apps/platform/src/components/features/site-preview/`
 renders the tenant's real site (`BrandMark`, `Heading`, `Text`, `Button`, a
 linked and a static `MediaCard`, and a `Panel`) so the live theme preview
 doesn't drift from what `apps/web` actually looks like. An ESLint `no-restricted-imports` override in

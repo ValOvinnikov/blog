@@ -8,9 +8,9 @@ import { Panel } from '@blog/ui/components/molecules/panel';
 import { useTranslations } from 'next-intl';
 import type { CSSProperties } from 'react';
 
-import { previewSampleVariants } from './preview-sample-variants';
+import { lookSampleVariants } from './look-sample-variants';
 
-export type TPreviewSampleProps = {
+export type TLookSampleProps = {
   tenantName: string;
   logoSrc: string | undefined;
   tokenStyle: CSSProperties;
@@ -19,25 +19,21 @@ export type TPreviewSampleProps = {
   bodyFontFamily: string;
 };
 
-export const PreviewSample = ({
+export const LookSample = ({
   tenantName,
   logoSrc,
   tokenStyle,
   isDark,
   headingFontFamily,
   bodyFontFamily,
-}: TPreviewSampleProps) => {
+}: TLookSampleProps) => {
   const t = useTranslations('lookPreview');
 
   const { root, brandRow, brandName, actionsRow, chip, cards, outlinedCard } =
-    previewSampleVariants({ isDark });
+    lookSampleVariants({ isDark });
 
   return (
-    <div
-      className={root()}
-      style={tokenStyle}
-      data-testid="preview-sample-tokens"
-    >
+    <div className={root()} style={tokenStyle} data-testid="look-sample-tokens">
       <div className={brandRow()}>
         <BrandMark size={SIZE.SM} title={tenantName} src={logoSrc} />
         <span className={brandName()} style={{ fontFamily: headingFontFamily }}>

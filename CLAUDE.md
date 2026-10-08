@@ -63,7 +63,7 @@ graph is acyclic
   presentational primitives (Text, Card, Icon, Button, …) as well as its
   interactive ones, all built on Base UI and styled in-app; nothing is added
   to `@blog/ui` for it. The one exception is
-  `apps/platform/src/components/features/look/look-preview/preview-sample/`,
+  `apps/platform/src/components/features/site-preview/`,
   which renders the tenant's real site (BrandMark, Heading, Panel,
   Text, Button) so the live theme preview doesn't drift from what `apps/web`
   actually looks like — an ESLint `no-restricted-imports` guard confines
@@ -358,7 +358,7 @@ dispatch order is `config → db → auth → platform-app`; it never waits on
 `studio`/`service`, which it does not consume. Base UI is installed and styled inside that app,
 and it owns its own presentational primitives too — do not route its
 components through the `ui` agent. The one exception is
-`look-preview/preview-sample/`, an ESLint-guarded directory allowed to
+`site-preview/`, an ESLint-guarded directory allowed to
 import `@blog/ui` directly so the live theme preview renders the site's
 real components. See `.claude/agents/platform-app.md`.
 

@@ -1,7 +1,7 @@
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import type { CSSProperties } from 'react';
 
-import { PreviewSample } from './preview-sample';
+import { LookSample } from './look-sample';
 
 const render = renderWithIntl;
 
@@ -16,7 +16,7 @@ const BASE_PROPS = {
   bodyFontFamily: 'mock-newsreader-font-family',
 };
 
-describe(PreviewSample, () => {
+describe(LookSample, () => {
   let staticDarkRamp: HTMLStyleElement;
 
   beforeEach(() => {
@@ -31,7 +31,7 @@ describe(PreviewSample, () => {
   });
 
   it('renders the tenant name and a @blog/ui Button primitive', () => {
-    render(<PreviewSample {...BASE_PROPS} />);
+    render(<LookSample {...BASE_PROPS} />);
 
     expect(screen.getAllByText('Acme Inc.').length).toBeGreaterThan(0);
     expect(screen.getByRole('button', { name: 'Subscribe' })).toBeVisible();
@@ -39,7 +39,7 @@ describe(PreviewSample, () => {
 
   it('resolves the tenant accent rather than the static dark ramp in dark mode', () => {
     render(
-      <PreviewSample
+      <LookSample
         {...BASE_PROPS}
         isDark={true}
         tokenStyle={
@@ -56,10 +56,7 @@ describe(PreviewSample, () => {
 
   it('renders the uploaded logo in place of the generated mark', () => {
     render(
-      <PreviewSample
-        {...BASE_PROPS}
-        logoSrc="https://cdn.example.com/logo.svg"
-      />,
+      <LookSample {...BASE_PROPS} logoSrc="https://cdn.example.com/logo.svg" />,
     );
 
     expect(screen.getByRole('img', { name: 'Acme Inc.' })).toHaveAttribute(
@@ -69,7 +66,7 @@ describe(PreviewSample, () => {
   });
 
   it('renders one linked and one static item card beside an outlined card', () => {
-    render(<PreviewSample {...BASE_PROPS} />);
+    render(<LookSample {...BASE_PROPS} />);
 
     expect(
       screen.getByRole('link', { name: 'Notes from the harbour' }),

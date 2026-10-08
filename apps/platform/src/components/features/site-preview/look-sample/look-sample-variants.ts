@@ -4,7 +4,7 @@ import { tv } from '@platform/utils/tv/tv';
  * Every class here reads a site token rather than an `--admin-*` one, since
  * this box renders the tenant's theme through `tokenStyle`.
  */
-export const previewSampleVariants = tv({
+export const lookSampleVariants = tv({
   slots: {
     root: [
       'flex flex-col gap-3 rounded-md border border-border bg-primary px-card-x py-card-y text-text',

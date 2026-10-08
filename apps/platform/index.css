@@ -1,4 +1,4 @@
-/* Retained for `look-preview/preview-sample/` only — it renders the
+/* Retained for `site-preview/` only — it renders the
    tenant's own site (BrandMark, Button, Heading, Text, MediaCard, Panel
    from `@blog/ui`) fed unsaved form state, so it needs the site's real token
    vocabulary. It is the one directory under apps/platform allowed to
@@ -11,5 +11,5 @@
 @import '@blog/tailwind-config/theme.css';
 @import './src/styles/admin-theme.css';
 
-/* Scans @blog/ui source so Tailwind emits the classes preview-sample/ uses */
+/* Scans @blog/ui source so Tailwind emits the classes site-preview/ uses */
 @source '../../packages/ui/src/**/*.{ts,tsx}';
