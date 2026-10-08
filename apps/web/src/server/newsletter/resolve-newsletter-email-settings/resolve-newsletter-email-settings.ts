@@ -1,3 +1,4 @@
+import type { TMaybeUndefined } from '@blog/config';
 import {
   EMAIL_TEMPLATE_TYPE,
   LOCALE_ISO_CODES,
@@ -11,10 +12,10 @@ import { logger } from '@web/utils/logger/logger';
 export type TNewsletterEmailSettings = {
   subject: string;
   body: TPortableTextContent;
-  logoImageUrl: string | undefined;
-  footerPostalAddress: string | undefined;
+  logoImageUrl: TMaybeUndefined<string>;
+  footerPostalAddress: TMaybeUndefined<string>;
   fromAddress: string;
-  replyTo: string | undefined;
+  replyTo: TMaybeUndefined<string>;
 };
 
 // A `from` display name flows straight into a mail header.
@@ -25,7 +26,7 @@ const FROM_ADDRESS_WITH_DISPLAY_NAME = /<([^<>]+)>\s*$/;
 
 const applySenderNameOverride = (
   fromAddress: string,
-  senderName: string | undefined,
+  senderName: TMaybeUndefined<string>,
 ): string => {
   if (!senderName) return fromAddress;
 
@@ -52,7 +53,7 @@ const getEmailConfigSafely = async (tenantId: string) => {
 
 const getEmailTemplateSafely = async (
   tenantId: string,
-  locale: TLocaleIsoCode | undefined,
+  locale: TMaybeUndefined<TLocaleIsoCode>,
 ) => {
   try {
     return await queries.emailTemplates.getEmailTemplate(
@@ -71,8 +72,8 @@ const getEmailTemplateSafely = async (
 
 export const resolveNewsletterEmailSettings = async (
   tenantId: string,
-  configuredFromAddress: string | undefined,
-  locale: TLocaleIsoCode | undefined,
+  configuredFromAddress: TMaybeUndefined<string>,
+  locale: TMaybeUndefined<TLocaleIsoCode>,
 ): Promise<TNewsletterEmailSettings> => {
   const [emailConfig, template] = await Promise.all([
     getEmailConfigSafely(tenantId),
