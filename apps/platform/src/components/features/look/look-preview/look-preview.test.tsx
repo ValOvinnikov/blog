@@ -8,7 +8,6 @@ const render = renderWithIntl;
 
 const BASE_PROPS = {
   tenantName: 'Acme Inc.',
-  primaryDomain: 'acme.example.com',
   accentHue: 250,
   logoHue: undefined,
   headingFont: FONT_CHOICE.SPACE_GROTESK,
@@ -59,11 +58,21 @@ describe(LookPreview, () => {
     });
   });
 
-  it('reserves a full-page preview panel naming the deferred iframe mechanism', () => {
+  it('switches the preview between desktop and mobile widths', async () => {
+    const user = userEvent.setup();
     render(<LookPreview {...BASE_PROPS} />);
 
-    expect(screen.getByText('Full-page preview')).toBeVisible();
-    expect(screen.getByText('acme.example.com')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Desktop' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Mobile' }));
+
+    expect(screen.getByRole('button', { name: 'Mobile' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
   });
 
   it('re-derives the swatch color when the preview mode toggles to dark, independent of preset', async () => {

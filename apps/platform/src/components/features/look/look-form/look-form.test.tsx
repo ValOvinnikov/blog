@@ -8,12 +8,7 @@ import {
   RADIUS_SCALE,
 } from '@blog/config';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
-import {
-  customRender,
-  screen,
-  waitFor,
-  within,
-} from '@platform/testing/custom-render';
+import { customRender, screen, waitFor } from '@platform/testing/custom-render';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -53,7 +48,6 @@ const ARCHIVED_AT = new Date('2026-08-26T00:00:00.000Z');
 const setup = customRender(LookForm, {
   tenantId: 'tenant-1',
   tenantName: 'Acme Inc.',
-  primaryDomain: 'acme.example.com',
   initialValues: defaultLookFormValues(),
   hasMultipleLanguages: true,
 });
@@ -83,12 +77,47 @@ describe(`<${LookForm.name}/>`, () => {
     },
   );
 
-  it('renders Basic and Advanced as visually distinct sections, Advanced collapsed by default', () => {
+  it('groups the settings into Preset, Colour, Type, Shape, Brand and Language switcher cards', () => {
     setup();
 
-    expect(screen.getByRole('heading', { name: 'Basic' })).toBeVisible();
-    expect(screen.getByText('Advanced')).toBeVisible();
-    expect(screen.getByTestId('disclosure')).not.toHaveAttribute('open');
+    for (const name of [
+      'Preset',
+      'Colour',
+      'Type',
+      'Shape',
+      'Brand',
+      'Language switcher',
+    ]) {
+      expect(screen.getByRole('heading', { level: 2, name })).toBeVisible();
+    }
+  });
+
+  it('marks only the card holding an unsaved change', async () => {
+    setup();
+
+    screen.getByRole('slider', { name: 'Accent hue' }).focus();
+    await user.keyboard('{ArrowRight}');
+
+    expect(
+      screen.getByRole('heading', { name: 'Colour Unsaved changes' }),
+    ).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Type' })).toBeVisible();
+  });
+
+  it('switches between the Edit and Preview tabs', async () => {
+    setup();
+
+    const editTab = screen.getByRole('tab', { name: 'Edit' });
+    const previewTab = screen.getByRole('tab', { name: 'Preview' });
+    expect(editTab).toHaveAttribute('aria-selected', 'true');
+
+    await user.click(previewTab);
+
+    expect(previewTab).toHaveAttribute('aria-selected', 'true');
+    expect(editTab).toHaveAttribute('aria-selected', 'false');
+    expect(screen.getByRole('tabpanel', { name: 'Preview' })).toContainElement(
+      screen.getByTestId('preview-sample-tokens'),
+    );
   });
 
   it('shows the favicon square requirement before any file is chosen', () => {
@@ -142,15 +171,6 @@ describe(`<${LookForm.name}/>`, () => {
         languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
       });
     });
-  });
-
-  it('shows the language switcher style outside the collapsed Advanced section', () => {
-    setup();
-
-    expect(screen.getByRole('button', { name: 'Compact codes' })).toBeVisible();
-    expect(
-      within(screen.getByTestId('disclosure')).queryByText('Language switcher'),
-    ).not.toBeInTheDocument();
   });
 
   it('saves the chosen language switcher style', async () => {
@@ -293,7 +313,6 @@ describe(`<${LookForm.name}/>`, () => {
   it('previews a changed radius scale and density before saving', async () => {
     setup();
 
-    await user.click(screen.getByText('Advanced'));
     await user.click(screen.getByRole('button', { name: 'Extra Large' }));
     await user.click(screen.getByRole('button', { name: 'Compact' }));
 
@@ -306,7 +325,6 @@ describe(`<${LookForm.name}/>`, () => {
   it('previews and saves the outlined card style', async () => {
     setup();
 
-    await user.click(screen.getByText('Advanced'));
     await user.click(screen.getByRole('button', { name: 'Outlined' }));
 
     expect(screen.getByTestId('preview-sample-tokens')).toHaveStyle({
@@ -346,6 +364,20 @@ describe(`<${LookForm.name}/>`, () => {
     expect(screen.getByText('250°')).toBeVisible();
   });
 
+  it('resets to the preset in the draft only, so Discard brings the saved values back', async () => {
+    setup({ initialValues: { ...defaultLookFormValues(), accentHue: 260 } });
+
+    await user.click(screen.getByRole('button', { name: 'Compact' }));
+    await user.click(screen.getByRole('button', { name: 'Reset to preset' }));
+
+    expect(screen.getByText('250°')).toBeVisible();
+    expect(updateLookActionMock).not.toHaveBeenCalled();
+
+    await user.click(screen.getByRole('button', { name: 'Discard' }));
+
+    expect(screen.getByText('260°')).toBeVisible();
+  });
+
   describe('archived tenant', () => {
     it('shows an archived notice and offers no Save', () => {
       setup({ archivedAt: ARCHIVED_AT });
@@ -376,10 +408,8 @@ describe(`<${LookForm.name}/>`, () => {
       ).toBeDisabled();
     });
 
-    it('disables the Advanced section controls', async () => {
+    it('disables the Type and Shape controls', () => {
       setup({ archivedAt: ARCHIVED_AT });
-
-      await user.click(screen.getByText('Advanced'));
 
       expect(
         screen.getAllByRole('radio', { name: 'Space Grotesk' })[0],
@@ -401,10 +431,8 @@ describe(`<${LookForm.name}/>`, () => {
     });
   });
 
-  it('leaves every Look control enabled for a non-archived tenant', async () => {
+  it('leaves every Look control enabled for a non-archived tenant', () => {
     setup();
-
-    await user.click(screen.getByText('Advanced'));
 
     expect(screen.getByRole('radio', { name: 'Console' })).not.toHaveAttribute(
       'aria-disabled',

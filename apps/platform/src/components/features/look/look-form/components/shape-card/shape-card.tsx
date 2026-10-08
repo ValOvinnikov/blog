@@ -1,45 +1,38 @@
-'use client';
-
 import {
   CARD_STYLE,
   DENSITY,
   RADIUS_SCALE,
   type TCardStyle,
   type TDensity,
-  type TFontChoice,
   type TRadiusScale,
 } from '@blog/config';
-import { FontPicker } from '@platform/components/shared/font-picker';
+import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
+import { LookField } from '@platform/components/features/look/look-form/components/look-field';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
+import type { TLookFormFieldSetter } from '@platform/utils/default-look-values/default-look-values';
 import { useTranslations } from 'next-intl';
 
-import type { TLookFormFieldSetter } from './look-form';
-import { lookFormVariants } from './look-form-variants';
-
-export type TLookFormAdvancedSectionProps = {
-  headingFont: TFontChoice;
-  bodyFont: TFontChoice;
+export type TShapeCardProps = {
   radiusScale: TRadiusScale;
   density: TDensity;
   cardStyle: TCardStyle;
   onFieldChange: TLookFormFieldSetter;
+  hasUnsavedChanges: boolean;
   isArchived: boolean;
   archivedNoticeId: string;
 };
 
-export const LookFormAdvancedSection = ({
-  headingFont,
-  bodyFont,
+export const ShapeCard = ({
   radiusScale,
   density,
   cardStyle,
   onFieldChange,
+  hasUnsavedChanges,
   isArchived,
   archivedNoticeId,
-}: TLookFormAdvancedSectionProps) => {
-  const archivedDescribedBy = isArchived ? archivedNoticeId : undefined;
+}: TShapeCardProps) => {
   const t = useTranslations('lookForm');
-  const { field, fieldLabel, fieldHint } = lookFormVariants();
+  const archivedDescribedBy = isArchived ? archivedNoticeId : undefined;
 
   const radiusOptions = Object.values(RADIUS_SCALE).map((scale) => ({
     value: scale,
@@ -56,40 +49,17 @@ export const LookFormAdvancedSection = ({
     label: t(`cardStyleOptionLabel.${style}`),
   }));
 
-  const headingFontLabel = t('headingFontLabel');
-  const bodyFontLabel = t('bodyFontLabel');
   const radiusScaleLabel = t('radiusScaleLabel');
   const densityLabel = t('densityLabel');
   const cardStyleLabel = t('cardStyleLabel');
 
   return (
-    <>
-      <div className={field()}>
-        <span className={fieldLabel()}>{headingFontLabel}</span>
-        <p className={fieldHint()}>{t('headingFontDescription')}</p>
-        <FontPicker
-          ariaLabel={headingFontLabel}
-          value={headingFont}
-          onChange={(font) => onFieldChange('headingFont', font)}
-          isDisabled={isArchived}
-          aria-describedby={archivedDescribedBy}
-        />
-      </div>
-
-      <div className={field()}>
-        <span className={fieldLabel()}>{bodyFontLabel}</span>
-        <FontPicker
-          ariaLabel={bodyFontLabel}
-          value={bodyFont}
-          onChange={(font) => onFieldChange('bodyFont', font)}
-          isDisabled={isArchived}
-          aria-describedby={archivedDescribedBy}
-        />
-      </div>
-
-      <div className={field()}>
-        <span className={fieldLabel()}>{radiusScaleLabel}</span>
-        <p className={fieldHint()}>{t('radiusScaleDescription')}</p>
+    <LookCard
+      title={t('shapeHeading')}
+      description={t('shapeDescription')}
+      hasUnsavedChanges={hasUnsavedChanges}
+    >
+      <LookField label={radiusScaleLabel} hint={t('radiusScaleDescription')}>
         <SegmentedControl<TRadiusScale>
           ariaLabel={radiusScaleLabel}
           options={radiusOptions}
@@ -98,11 +68,9 @@ export const LookFormAdvancedSection = ({
           isDisabled={isArchived}
           aria-describedby={archivedDescribedBy}
         />
-      </div>
+      </LookField>
 
-      <div className={field()}>
-        <span className={fieldLabel()}>{densityLabel}</span>
-        <p className={fieldHint()}>{t('densityDescription')}</p>
+      <LookField label={densityLabel} hint={t('densityDescription')}>
         <SegmentedControl<TDensity>
           ariaLabel={densityLabel}
           options={densityOptions}
@@ -111,11 +79,9 @@ export const LookFormAdvancedSection = ({
           isDisabled={isArchived}
           aria-describedby={archivedDescribedBy}
         />
-      </div>
+      </LookField>
 
-      <div className={field()}>
-        <span className={fieldLabel()}>{cardStyleLabel}</span>
-        <p className={fieldHint()}>{t('cardStyleDescription')}</p>
+      <LookField label={cardStyleLabel} hint={t('cardStyleDescription')}>
         <SegmentedControl<TCardStyle>
           ariaLabel={cardStyleLabel}
           options={cardStyleOptions}
@@ -124,7 +90,7 @@ export const LookFormAdvancedSection = ({
           isDisabled={isArchived}
           aria-describedby={archivedDescribedBy}
         />
-      </div>
-    </>
+      </LookField>
+    </LookCard>
   );
 };

@@ -24,7 +24,6 @@ export const LookPageContent = async ({ tenant }: TLookPageContentProps) => {
     <LookForm
       tenantId={tenant.id}
       tenantName={tenant.name}
-      primaryDomain={tenant.primaryDomain}
       initialValues={initialValues}
       hasMultipleLanguages={(liveLocales?.length ?? 0) > 1}
       savedAt={siteConfig?.updatedAt}

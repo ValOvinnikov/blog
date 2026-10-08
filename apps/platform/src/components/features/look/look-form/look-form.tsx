@@ -6,38 +6,39 @@ import {
   PRESET_REGISTRY,
   type TPresetId,
 } from '@blog/config';
+import { BrandCard } from '@platform/components/features/look/look-form/components/brand-card';
+import { ColourCard } from '@platform/components/features/look/look-form/components/colour-card';
+import { LanguageSwitcherCard } from '@platform/components/features/look/look-form/components/language-switcher-card';
+import { PresetCard } from '@platform/components/features/look/look-form/components/preset-card';
+import { ShapeCard } from '@platform/components/features/look/look-form/components/shape-card';
+import { TypeCard } from '@platform/components/features/look/look-form/components/type-card';
+import {
+  ViewTabs,
+  type TLookView,
+} from '@platform/components/features/look/look-form/components/view-tabs';
 import { LookPreview } from '@platform/components/features/look/look-preview';
-import { Card } from '@platform/components/shared/card';
-import { Disclosure } from '@platform/components/shared/disclosure';
 import { SettingsFormShell } from '@platform/components/shared/settings-form-shell';
 import { FONT_OPTIONS } from '@platform/config/fonts';
 import { useToast } from '@platform/context/toast-provider';
 import { updateLookAction } from '@platform/server/site-config/update-look-action';
-import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+import type {
+  TLookFormFieldSetter,
+  TLookFormValues,
+} from '@platform/utils/default-look-values/default-look-values';
 import { useFormSubmission } from '@platform/utils/use-form-submission/use-form-submission';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
 
-import { LookFormAdvancedSection } from './look-form-advanced-section';
-import { LookFormBasicSection } from './look-form-basic-section';
-import { LookFormImagesSection } from './look-form-images-section';
-import { LookFormLanguageSwitcherSection } from './look-form-language-switcher-section';
 import { lookFormVariants } from './look-form-variants';
 
 export type TLookFormProps = {
   tenantId: string;
   tenantName: string;
-  primaryDomain: string;
   initialValues: TLookFormValues;
   hasMultipleLanguages: boolean;
   savedAt?: Date;
   archivedAt?: Date;
 };
-
-export type TLookFormFieldSetter = <K extends keyof TLookFormValues>(
-  key: K,
-  value: TLookFormValues[K],
-) => void;
 
 const applyPresetDefaults = (
   preset: TPresetId,
@@ -65,6 +66,15 @@ const PRESET_LABEL_KEY = {
   [PRESET_ID.EDITORIAL]: 'editorial',
 } as const satisfies Record<TPresetId, string>;
 
+const CARD_FIELDS = {
+  preset: ['preset'],
+  colour: ['accentHue', 'logoHue'],
+  type: ['headingFont', 'bodyFont'],
+  shape: ['radiusScale', 'density', 'cardStyle'],
+  brand: ['logoAssetUrl', 'faviconAssetUrl'],
+  languageSwitcher: ['languageSwitcherStyle'],
+} as const satisfies Record<string, readonly (keyof TLookFormValues)[]>;
+
 const countChanges = (a: TLookFormValues, b: TLookFormValues): number =>
   (Object.keys(a) as (keyof TLookFormValues)[]).filter(
     (key) => a[key] !== b[key],
@@ -73,7 +83,6 @@ const countChanges = (a: TLookFormValues, b: TLookFormValues): number =>
 export const LookForm = ({
   tenantId,
   tenantName,
-  primaryDomain,
   initialValues,
   hasMultipleLanguages,
   savedAt,
@@ -82,6 +91,11 @@ export const LookForm = ({
   const isArchived = Boolean(archivedAt);
   const archivedNoticeId = useId();
   const accentHueFieldId = useId();
+  const viewIds = {
+    edit: { tab: useId(), panel: useId() },
+    preview: { tab: useId(), panel: useId() },
+  };
+  const [view, setView] = useState<TLookView>('edit');
   const toast = useToast();
   const t = useTranslations('lookForm');
   const tPreset = useTranslations('presetPicker');
@@ -113,6 +127,8 @@ export const LookForm = ({
 
   const changeCount = countChanges(values, savedValues);
   const isAccentHueRejected = !isAccentHueAccessible(values.accentHue);
+  const hasCardChanges = (card: keyof typeof CARD_FIELDS) =>
+    CARD_FIELDS[card].some((key) => values[key] !== savedValues[key]);
 
   const handleSave = () =>
     isAccentHueRejected ? Promise.resolve(false) : handleSubmit();
@@ -198,7 +214,7 @@ export const LookForm = ({
     },
   ];
 
-  const { root, grid, stack, tagSecondary, note } = lookFormVariants();
+  const { root, columns, editPanel, previewPanel } = lookFormVariants();
 
   return (
     <SettingsFormShell
@@ -226,73 +242,82 @@ export const LookForm = ({
         onRestore: handleRestore,
       }}
     >
-      <div className={grid()}>
-        <div className={stack()}>
-          <Card>
-            <Card.Header
-              title={t('basicHeading')}
-              supportingText={t('basicDescription')}
-              headingLevel={2}
-            />
-            <Card.Body>
-              <LookFormBasicSection
-                preset={values.preset}
-                onPresetChange={handlePresetChange}
-                onReset={handleReset}
-                isResetDisabled={changeCount === 0}
-                accentHue={values.accentHue}
-                accentHueFieldId={accentHueFieldId}
-                isAccentHueRejected={isAccentHueRejected}
-                logoHue={values.logoHue}
-                onFieldChange={updateField}
-                isArchived={isArchived}
-                archivedNoticeId={archivedNoticeId}
-              />
-              <LookFormImagesSection
-                tenantId={tenantId}
-                logoAssetUrl={values.logoAssetUrl}
-                faviconAssetUrl={values.faviconAssetUrl}
-                onFieldChange={updateField}
-                isArchived={isArchived}
-                archivedNoticeId={archivedNoticeId}
-              />
-              <LookFormLanguageSwitcherSection
-                languageSwitcherStyle={values.languageSwitcherStyle}
-                hasMultipleLanguages={hasMultipleLanguages}
-                onFieldChange={updateField}
-                isArchived={isArchived}
-                archivedNoticeId={archivedNoticeId}
-              />
-            </Card.Body>
-          </Card>
-
-          <Disclosure
-            summary={
-              <>
-                {t('advancedSummary')}
-                <span className={tagSecondary()}>{t('optionalTag')}</span>
-              </>
-            }
-          >
-            <LookFormAdvancedSection
-              headingFont={values.headingFont}
-              bodyFont={values.bodyFont}
-              radiusScale={values.radiusScale}
-              density={values.density}
-              cardStyle={values.cardStyle}
-              onFieldChange={updateField}
-              isArchived={isArchived}
-              archivedNoticeId={archivedNoticeId}
-            />
-          </Disclosure>
-
-          <p className={note()}>{t('footerNote')}</p>
+      <ViewTabs
+        value={view}
+        onChange={setView}
+        ids={viewIds}
+        ariaLabel={t('viewTabsAriaLabel')}
+      />
+      <div className={columns()}>
+        <div
+          id={viewIds.edit.panel}
+          role="tabpanel"
+          aria-labelledby={viewIds.edit.tab}
+          className={editPanel({ isActive: view === 'edit' })}
+        >
+          <PresetCard
+            preset={values.preset}
+            onPresetChange={handlePresetChange}
+            onReset={handleReset}
+            isResetDisabled={changeCount === 0}
+            hasUnsavedChanges={hasCardChanges('preset')}
+            isArchived={isArchived}
+            archivedNoticeId={archivedNoticeId}
+          />
+          <ColourCard
+            accentHue={values.accentHue}
+            accentHueFieldId={accentHueFieldId}
+            isAccentHueRejected={isAccentHueRejected}
+            logoHue={values.logoHue}
+            onFieldChange={updateField}
+            hasUnsavedChanges={hasCardChanges('colour')}
+            isArchived={isArchived}
+            archivedNoticeId={archivedNoticeId}
+          />
+          <TypeCard
+            headingFont={values.headingFont}
+            bodyFont={values.bodyFont}
+            onFieldChange={updateField}
+            hasUnsavedChanges={hasCardChanges('type')}
+            isArchived={isArchived}
+            archivedNoticeId={archivedNoticeId}
+          />
+          <ShapeCard
+            radiusScale={values.radiusScale}
+            density={values.density}
+            cardStyle={values.cardStyle}
+            onFieldChange={updateField}
+            hasUnsavedChanges={hasCardChanges('shape')}
+            isArchived={isArchived}
+            archivedNoticeId={archivedNoticeId}
+          />
+          <BrandCard
+            tenantId={tenantId}
+            logoAssetUrl={values.logoAssetUrl}
+            faviconAssetUrl={values.faviconAssetUrl}
+            onFieldChange={updateField}
+            hasUnsavedChanges={hasCardChanges('brand')}
+            isArchived={isArchived}
+            archivedNoticeId={archivedNoticeId}
+          />
+          <LanguageSwitcherCard
+            languageSwitcherStyle={values.languageSwitcherStyle}
+            hasMultipleLanguages={hasMultipleLanguages}
+            onFieldChange={updateField}
+            hasUnsavedChanges={hasCardChanges('languageSwitcher')}
+            isArchived={isArchived}
+            archivedNoticeId={archivedNoticeId}
+          />
         </div>
 
-        <div className={stack()}>
+        <div
+          id={viewIds.preview.panel}
+          role="tabpanel"
+          aria-labelledby={viewIds.preview.tab}
+          className={previewPanel({ isActive: view === 'preview' })}
+        >
           <LookPreview
             tenantName={tenantName}
-            primaryDomain={primaryDomain}
             accentHue={values.accentHue}
             logoHue={values.logoHue}
             headingFont={values.headingFont}

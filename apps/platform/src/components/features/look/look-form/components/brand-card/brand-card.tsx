@@ -1,37 +1,40 @@
-'use client';
-
 import { BrandAssetField } from '@platform/components/features/look/brand-asset-field';
+import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
+import type { TLookFormFieldSetter } from '@platform/utils/default-look-values/default-look-values';
 import { useTranslations } from 'next-intl';
 
-import type { TLookFormFieldSetter } from './look-form';
-import { lookFormVariants } from './look-form-variants';
+import { brandCardVariants } from './brand-card-variants';
 
-export type TLookFormImagesSectionProps = {
+export type TBrandCardProps = {
   tenantId: string;
   logoAssetUrl: string | undefined;
   faviconAssetUrl: string | undefined;
   onFieldChange: TLookFormFieldSetter;
+  hasUnsavedChanges: boolean;
   isArchived: boolean;
   archivedNoticeId: string;
 };
 
-/** The logo and favicon upload fields — independent of preset, so they persist immediately through their own actions rather than staging behind Save. */
-export const LookFormImagesSection = ({
+/** The logo and favicon persist through their own upload actions rather than staging behind Save. */
+export const BrandCard = ({
   tenantId,
   logoAssetUrl,
   faviconAssetUrl,
   onFieldChange,
+  hasUnsavedChanges,
   isArchived,
   archivedNoticeId,
-}: TLookFormImagesSectionProps) => {
-  const archivedDescribedBy = isArchived ? archivedNoticeId : undefined;
+}: TBrandCardProps) => {
   const t = useTranslations('lookForm');
-  const { field, fieldLabel, fieldHint, uploads } = lookFormVariants();
+  const archivedDescribedBy = isArchived ? archivedNoticeId : undefined;
+  const { uploads } = brandCardVariants();
 
   return (
-    <div className={field()}>
-      <span className={fieldLabel()}>{t('brandImagesLabel')}</span>
-      <p className={fieldHint()}>{t('brandImagesDescription')}</p>
+    <LookCard
+      title={t('brandHeading')}
+      description={t('brandImagesDescription')}
+      hasUnsavedChanges={hasUnsavedChanges}
+    >
       <div className={uploads()}>
         <BrandAssetField
           tenantId={tenantId}
@@ -54,6 +57,6 @@ export const LookFormImagesSection = ({
           aria-describedby={archivedDescribedBy}
         />
       </div>
-    </div>
+    </LookCard>
   );
 };

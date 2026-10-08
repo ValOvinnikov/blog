@@ -25,6 +25,11 @@ export type TLookFormValues = {
   faviconAssetUrl: string | undefined;
 };
 
+export type TLookFormFieldSetter = <K extends keyof TLookFormValues>(
+  key: K,
+  value: TLookFormValues[K],
+) => void;
+
 /**
  * The starting values for a tenant with no `site_config` row yet — the same
  * Console defaults `build-theme-style-block.ts` falls back to when no theme
