@@ -68,3 +68,18 @@ export const MobileOpenItemFocus: TStory = {
     links.at(-1)!.focus();
   },
 };
+
+export const MobileOpenLongList: TStory = {
+  globals: { viewport: 'mobile' },
+  args: {
+    items: [
+      ...mockSidebarNavItems,
+      ...Array.from({ length: 30 }, (_, index) => ({
+        label: `Module ${index + 1}`,
+        href: `/modules/module-${index + 1}`,
+        level: 2 as const,
+      })),
+    ],
+  },
+  play: MobileOpen.play,
+};

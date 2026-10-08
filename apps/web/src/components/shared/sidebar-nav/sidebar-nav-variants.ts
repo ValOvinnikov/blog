@@ -53,7 +53,7 @@ export const sidebarNavVariants = tv({
     panel: [
       'absolute inset-x-0 top-full',
       'bg-primary border-b border-border shadow-lg',
-      'max-h-[70vh] overflow-y-auto p-4',
+      'overflow-y-auto overscroll-contain p-4',
     ],
     list: ['flex flex-col gap-1', 'font-mono text-copy', 'm-0 list-none p-0'],
     item: [],

@@ -2,6 +2,7 @@
 
 import type { TMaybeUndefined } from '@blog/config';
 import { SmartLink } from '@web/components/shared/smart-link';
+import { usePanelScrollLock } from '@web/hooks/use-panel-scroll-lock';
 import { usePopover } from '@web/hooks/use-popover';
 import { useId } from 'react';
 
@@ -40,6 +41,7 @@ export const SidebarNav = ({
     trapFocus: false,
     closeOnFocusOut: true,
   });
+  usePanelScrollLock(panelRef, open);
   const activeItem = items.find(({ href }) => href === activeKey);
 
   // A click leaves focus on the link, so `closeOnFocusOut` never fires and `onNavigate` closes the panel instead.
