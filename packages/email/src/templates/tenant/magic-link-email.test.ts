@@ -1,17 +1,18 @@
-import { resolveTenantEmailBrand } from '@blog/config';
-import { PRESET_ID } from '@blog/config/constants';
-import type { TPortableTextContent } from '@blog/email';
+import type { TPortableTextContent } from '@blog/email/portable-text';
+import { TENANT_EMAIL_BRAND as brand } from '@blog/email/testing/tenant-email-brand';
 
 import { buildMagicLinkEmail } from './magic-link-email';
 
-const bodyOf = (text: string): TPortableTextContent => [
-  {
-    _type: 'block',
-    _key: 'body-1',
-    style: 'normal',
-    children: [{ _type: 'span', _key: 'body-1-span', text, marks: [] }],
-  },
-];
+function bodyOf(text: string): TPortableTextContent {
+  return [
+    {
+      _type: 'block',
+      _key: 'body-1',
+      style: 'normal',
+      children: [{ _type: 'span', _key: 'body-1-span', text, marks: [] }],
+    },
+  ];
+}
 
 describe(buildMagicLinkEmail, () => {
   it('escapes an unsafe url in the unbranded fallback link', () => {
@@ -57,21 +58,12 @@ describe(buildMagicLinkEmail, () => {
   });
 
   describe('with a tenant identity', () => {
-    let brand: ReturnType<typeof resolveTenantEmailBrand>;
-
-    beforeEach(() => {
-      brand = resolveTenantEmailBrand({
-        preset: PRESET_ID.CONSOLE,
-        accentHue: 140,
-      });
-    });
-
     it("threads the resolved tenant's hue into the rendered html", () => {
       const { html } = buildMagicLinkEmail({
         url: 'https://example.com/api/auth/callback/email?token=abc',
         subject: 'Sign in to your account',
         body: bodyOf('We received a request to sign in.'),
-        tenantIdentity: { brand, brandName: 'Acme Blog', tenantId: 'tenant-1' },
+        tenantIdentity: { brand, brandName: 'Acme Blog' },
       });
 
       expect(html).toContain('<!doctype html>');
@@ -83,7 +75,7 @@ describe(buildMagicLinkEmail, () => {
         url: 'https://example.com/api/auth/callback/email?token=abc',
         subject: 'Sign in to your account',
         body: bodyOf('We received a request to sign in.'),
-        tenantIdentity: { brand, brandName: 'Acme Blog', tenantId: 'tenant-1' },
+        tenantIdentity: { brand, brandName: 'Acme Blog' },
         logoImageUrl: 'https://cdn.example.com/logo.png',
         footerPostalAddress: '123 Main St, Springfield',
       });
@@ -116,7 +108,7 @@ describe(buildMagicLinkEmail, () => {
             ],
           },
         ],
-        tenantIdentity: { brand, brandName: 'Acme Blog', tenantId: 'tenant-1' },
+        tenantIdentity: { brand, brandName: 'Acme Blog' },
       });
 
       expect(html).toContain(

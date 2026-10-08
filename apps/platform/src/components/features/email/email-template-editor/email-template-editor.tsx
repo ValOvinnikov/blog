@@ -3,7 +3,6 @@
 import { ALERT_TYPE, type TEmailTemplateType } from '@blog/config';
 import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
 import type { TTenantEmailBrand } from '@blog/email/html';
-import { buildTenantEmail } from '@blog/email/templates/tenant';
 import { EmailLogoField } from '@platform/components/features/email/email-logo-field';
 import { EmailTemplatePreview } from '@platform/components/features/email/email-template-preview';
 import { Alert } from '@platform/components/shared/alert';
@@ -15,7 +14,7 @@ import { Heading } from '@platform/components/shared/heading';
 import { PortableTextEditor } from '@platform/components/shared/portable-text-editor';
 import { useToast } from '@platform/context/toast-provider';
 import { updateEmailTemplateAction } from '@platform/server/email-templates/update-email-template-action';
-import { buildEmailTemplatePreviewAction } from '@platform/utils/email-template-preview-action-builder/email-template-preview-action-builder';
+import { buildEmailTemplatePreviewHtml } from '@platform/utils/email-template-preview-builder/email-template-preview-builder';
 import { isBlankPortableTextValue } from '@platform/utils/portable-text-schema/portable-text-schema';
 import { useFormSubmission } from '@platform/utils/use-form-submission/use-form-submission';
 import { useTranslations } from 'next-intl';
@@ -40,11 +39,8 @@ export type TEmailTemplateEditorProps = {
 };
 
 /**
- * One template type's subject, body and logo, plus a live preview of the
- * authored copy — the surrounding structure (actions, headers, brand
- * fallback) doesn't reproduce what any one template type actually sends.
- * Remounted (via a `key={templateType}` from its caller) rather than kept
- * in sync across template switches — each template type is its own editing
+ * Remounted (via a `key={templateType}` from its caller) rather than kept in
+ * sync across template switches — each template type is its own editing
  * session.
  */
 export const EmailTemplateEditor = ({
@@ -83,15 +79,17 @@ export const EmailTemplateEditor = ({
       },
     });
 
-  const previewHtml = useMemo(() => {
-    return buildTenantEmail({
-      brand,
-      brandName,
-      previewText: values.subject,
-      body: values.body,
-      action: buildEmailTemplatePreviewAction(templateType, t),
-    });
-  }, [brand, brandName, values.subject, values.body, templateType, t]);
+  const previewHtml = useMemo(
+    () =>
+      buildEmailTemplatePreviewHtml(templateType, {
+        subject: values.subject,
+        body: values.body,
+        brand,
+        brandName,
+        logoImageUrl: logoAssetUrl,
+      }),
+    [templateType, values.subject, values.body, brand, brandName, logoAssetUrl],
+  );
 
   const { grid, stack, footer, previewHeading } = emailTemplateEditorVariants();
 
