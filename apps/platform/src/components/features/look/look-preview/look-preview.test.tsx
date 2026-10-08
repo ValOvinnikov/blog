@@ -29,7 +29,7 @@ describe(LookPreview, () => {
   it('applies the accent hue as a live CSS custom property on the preview surface', () => {
     render(<LookPreview {...BASE_PROPS} accentHue={28} />);
 
-    expect(screen.getByTestId('preview-sample-tokens')).toHaveStyle({
+    expect(screen.getByTestId('look-sample-tokens')).toHaveStyle({
       '--brand-primary-solid': 'oklch(0.55 0.17 28)',
     });
   });
@@ -43,7 +43,7 @@ describe(LookPreview, () => {
       />,
     );
 
-    expect(screen.getByTestId('preview-sample-tokens')).toHaveStyle({
+    expect(screen.getByTestId('look-sample-tokens')).toHaveStyle({
       '--radius-md': '12px',
       '--spacing-card-x': '0.75rem',
     });
@@ -52,7 +52,7 @@ describe(LookPreview, () => {
   it('carries the outlined card style onto the preview surface', () => {
     render(<LookPreview {...BASE_PROPS} cardStyle={CARD_STYLE.OUTLINED} />);
 
-    expect(screen.getByTestId('preview-sample-tokens')).toHaveStyle({
+    expect(screen.getByTestId('look-sample-tokens')).toHaveStyle({
       '--item-border-width': '1px',
       '--item-accent-color': 'var(--border)',
     });
@@ -81,7 +81,7 @@ describe(LookPreview, () => {
 
     await user.click(screen.getByRole('button', { name: 'Dark' }));
 
-    expect(screen.getByTestId('preview-sample-tokens')).toHaveStyle({
+    expect(screen.getByTestId('look-sample-tokens')).toHaveStyle({
       '--brand-primary-solid': 'oklch(0.7 0.16 28)',
     });
   });

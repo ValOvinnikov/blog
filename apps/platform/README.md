@@ -61,7 +61,7 @@ supplies authentication only — it has no opinion on either.
 
 This app owns its own presentational primitives under `src/components/shared/`
 (`Text`, `Card`, `Button`, `SegmentedControl`, …) rather than drawing them from
-`@blog/ui` — the one exception is `look-preview/preview-sample/`, which
+`@blog/ui` — the one exception is `site-preview/`, which
 renders the tenant's real site and is allowed to import `@blog/ui` directly
 for that reason.
 

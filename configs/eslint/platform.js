@@ -25,7 +25,7 @@ const contentLayerRestrictedGroup = {
 const uiRestrictedGroup = {
   group: ['@blog/ui', '@blog/ui/*'],
   message:
-    'apps/platform has dropped @blog/ui everywhere except look-preview/preview-sample (the sample renders real blog UI for the tenant preview) — build admin UI from in-app Base UI-based primitives instead.',
+    'apps/platform has dropped @blog/ui everywhere except site-preview/ (its samples render real blog UI for the tenant preview) — build admin UI from in-app Base UI-based primitives instead.',
 };
 
 const platformTestingRestrictedGroup = {
@@ -41,8 +41,7 @@ const TESTING_IMPORT_ALLOWED_FILES = [
   '**/*.stories.{ts,tsx}',
 ];
 
-const PREVIEW_SAMPLE_DIR =
-  'src/components/features/look/look-preview/preview-sample';
+const SITE_PREVIEW_DIR = 'src/components/features/site-preview';
 
 /** @type {import("eslint").Linter.Config[]} */
 export default [
@@ -91,10 +90,9 @@ export default [
     },
   },
   {
-    // The preview sample renders real @blog/ui components so tenant admins can
-    // preview their look-and-feel settings against actual blog UI — the one
-    // deliberate exception to the ban above.
-    files: [`${PREVIEW_SAMPLE_DIR}/**/*.{ts,tsx}`],
+    // The one deliberate exception to the ban above: site-preview/ renders real
+    // @blog/ui so tenant previews match the public site.
+    files: [`${SITE_PREVIEW_DIR}/**/*.{ts,tsx}`],
     rules: {
       'no-restricted-imports': [
         'error',
@@ -121,12 +119,12 @@ export default [
     },
   },
   {
-    // preview-sample's own *.test.{ts,tsx}/*.stories.{ts,tsx} are both the
+    // site-preview's own *.test.{ts,tsx}/*.stories.{ts,tsx} are both the
     // @blog/ui exception above and test-only — most specific, so it must
     // come last to win over both overrides for that intersection.
     files: [
-      `${PREVIEW_SAMPLE_DIR}/**/*.test.{ts,tsx}`,
-      `${PREVIEW_SAMPLE_DIR}/**/*.stories.{ts,tsx}`,
+      `${SITE_PREVIEW_DIR}/**/*.test.{ts,tsx}`,
+      `${SITE_PREVIEW_DIR}/**/*.stories.{ts,tsx}`,
     ],
     rules: {
       'no-restricted-imports': [

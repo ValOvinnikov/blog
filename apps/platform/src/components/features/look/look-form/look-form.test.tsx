@@ -144,7 +144,7 @@ describe(`<${LookForm.name}/>`, () => {
     expect(previewTab).toHaveAttribute('aria-selected', 'true');
     expect(editTab).toHaveAttribute('aria-selected', 'false');
     expect(screen.getByRole('tabpanel', { name: 'Preview' })).toContainElement(
-      screen.getByTestId('preview-sample-tokens'),
+      screen.getByTestId('look-sample-tokens'),
     );
   });
 
@@ -361,7 +361,7 @@ describe(`<${LookForm.name}/>`, () => {
     await user.click(screen.getByRole('button', { name: 'Extra Large' }));
     await user.click(screen.getByRole('button', { name: 'Compact' }));
 
-    expect(screen.getByTestId('preview-sample-tokens')).toHaveStyle({
+    expect(screen.getByTestId('look-sample-tokens')).toHaveStyle({
       '--radius-md': '12px',
       '--spacing-card-x': '0.75rem',
     });
@@ -372,7 +372,7 @@ describe(`<${LookForm.name}/>`, () => {
 
     await user.click(screen.getByRole('button', { name: 'Outlined' }));
 
-    expect(screen.getByTestId('preview-sample-tokens')).toHaveStyle({
+    expect(screen.getByTestId('look-sample-tokens')).toHaveStyle({
       '--item-border-width': '1px',
     });
 
@@ -391,7 +391,7 @@ describe(`<${LookForm.name}/>`, () => {
 
     await user.click(screen.getByRole('radio', { name: 'Editorial' }));
 
-    expect(screen.getByTestId('preview-sample-tokens')).toHaveStyle({
+    expect(screen.getByTestId('look-sample-tokens')).toHaveStyle({
       '--item-border-width': '1px',
     });
   });

@@ -8,7 +8,7 @@
 
 ```
 web → ui, service, db, auth, config, utils
-platform → db, auth, config, utils, studio   (+ @blog/ui, scoped to look-preview/preview-sample/)
+platform → db, auth, config, utils, studio   (+ @blog/ui, scoped to site-preview/)
 service → config, utils   (no React, ever)
 db → config, utils        (no React, no Sanity SDK — sibling to service, not a dependent)
 ui → config               (no Sanity, no data fetching — stays publishable)
@@ -26,7 +26,7 @@ TypeScript (Just-in-Time pattern) and are transpiled by the web app via
 `platform` (`apps/platform`) never consumes `service` or Sanity — it owns its own
 presentational and interactive primitives, styled from its own token layer
 rather than `@blog/ui`. The one exception is
-`apps/platform/src/components/features/look/look-preview/preview-sample/`,
+`apps/platform/src/components/features/site-preview/`,
 which renders the tenant's real site so the live theme preview doesn't
 drift from `apps/web`; an ESLint `no-restricted-imports` guard in
 `configs/eslint/platform.js` confines `@blog/ui` imports to that directory.

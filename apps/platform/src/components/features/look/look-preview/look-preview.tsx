@@ -6,6 +6,7 @@ import type {
   TFontChoice,
   TRadiusScale,
 } from '@blog/config';
+import { LookSample } from '@platform/components/features/site-preview/look-sample';
 import { Card } from '@platform/components/shared/card';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { FONT_OPTIONS } from '@platform/config/fonts';
@@ -18,7 +19,6 @@ import { useTranslations } from 'next-intl';
 import { type CSSProperties, useState } from 'react';
 
 import { lookPreviewVariants } from './look-preview-variants';
-import { PreviewSample } from './preview-sample';
 
 type TPreviewMode = 'light' | 'dark';
 
@@ -105,7 +105,7 @@ export const LookPreview = ({
       />
       <Card.Body>
         <div className={frame()}>
-          <PreviewSample
+          <LookSample
             tenantName={tenantName}
             logoSrc={logoSrc}
             tokenStyle={tokenStyle}
