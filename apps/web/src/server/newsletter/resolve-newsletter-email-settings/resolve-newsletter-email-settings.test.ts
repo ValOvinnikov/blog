@@ -1,3 +1,4 @@
+import { getLocale } from 'next-intl/server';
 import type { MockInstance } from 'vitest';
 
 const { getEmailConfigMock, getEmailTemplateMock } = vi.hoisted(() => ({
@@ -6,6 +7,7 @@ const { getEmailConfigMock, getEmailTemplateMock } = vi.hoisted(() => ({
 }));
 
 const DEFAULT_COPY_SUBJECT = 'Confirm your newsletter subscription';
+const FRENCH_DEFAULT_COPY_SUBJECT = 'Confirmez votre abonnement';
 const DEFAULT_COPY_BODY = [
   { _type: 'block', _key: 'newsletter-confirmation-default-1' },
 ];
@@ -15,13 +17,23 @@ vi.mock('@blog/db', () => ({
     emailConfig: { getEmailConfig: getEmailConfigMock },
     emailTemplates: { getEmailTemplate: getEmailTemplateMock },
   },
-  EMAIL_TEMPLATE_DEFAULT_COPY: {
-    NEWSLETTER_CONFIRMATION: {
-      subject: DEFAULT_COPY_SUBJECT,
-      body: DEFAULT_COPY_BODY,
+  EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE: {
+    EN: {
+      NEWSLETTER_CONFIRMATION: {
+        subject: DEFAULT_COPY_SUBJECT,
+        body: DEFAULT_COPY_BODY,
+      },
+    },
+    FR: {
+      NEWSLETTER_CONFIRMATION: {
+        subject: FRENCH_DEFAULT_COPY_SUBJECT,
+        body: DEFAULT_COPY_BODY,
+      },
     },
   },
 }));
+
+const getLocaleMock = vi.mocked(getLocale);
 
 const TENANT_ID = 'tenant-1';
 const DEFAULT_FROM_ADDRESS = 'Newsletter <onboarding@resend.dev>';
@@ -32,6 +44,7 @@ describe('resolveNewsletterEmailSettings', () => {
   let resolveNewsletterEmailSettings: typeof import('./resolve-newsletter-email-settings').resolveNewsletterEmailSettings;
 
   beforeEach(async () => {
+    getLocaleMock.mockResolvedValue('EN');
     getEmailConfigMock.mockReset();
     getEmailTemplateMock.mockReset();
     getEmailConfigMock.mockResolvedValue(undefined);
@@ -57,6 +70,30 @@ describe('resolveNewsletterEmailSettings', () => {
       fromAddress: DEFAULT_FROM_ADDRESS,
       replyTo: undefined,
     });
+  });
+
+  it('reads the template in the language of the page the reader subscribed on', async () => {
+    getLocaleMock.mockResolvedValue('FR');
+
+    await resolveNewsletterEmailSettings(TENANT_ID, undefined);
+
+    expect(getEmailTemplateMock).toHaveBeenCalledWith(
+      TENANT_ID,
+      'NEWSLETTER_CONFIRMATION',
+      'FR',
+    );
+  });
+
+  it("leaves the language to the tenant's default when the page language is not a site language", async () => {
+    getLocaleMock.mockResolvedValue('xx');
+
+    await resolveNewsletterEmailSettings(TENANT_ID, undefined);
+
+    expect(getEmailTemplateMock).toHaveBeenCalledWith(
+      TENANT_ID,
+      'NEWSLETTER_CONFIRMATION',
+      undefined,
+    );
   });
 
   describe('with a tenant-level logo configured', () => {
@@ -265,6 +302,17 @@ describe('resolveNewsletterEmailSettings', () => {
           'newsletter_email_settings.email_template_fetch_failed',
         ),
       );
+    });
+
+    it("falls back to the product default in the reader's language when getEmailTemplate rejects", async () => {
+      getLocaleMock.mockResolvedValue('FR');
+      getEmailTemplateMock.mockRejectedValue(new Error('db down'));
+      const settings = await resolveNewsletterEmailSettings(
+        TENANT_ID,
+        undefined,
+      );
+
+      expect(settings.subject).toBe(FRENCH_DEFAULT_COPY_SUBJECT);
     });
 
     it('still uses the successfully-resolved per-template logo when getEmailConfig rejects', async () => {
