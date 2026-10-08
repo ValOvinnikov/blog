@@ -5,7 +5,9 @@ review before `writing-plans`.
 **Date:** 2026-09-06
 **Amended:** 2026-10-08 — Voice scope cut to page-level prose, per-language
 overrides, section sidebar title in Studio, contents rail relabelled
-(D15–D18).
+(D15–D18). Voice page redesigned around one card per surface with its own
+preview, and the shared save bar, leave-page guard and draft recovery
+(D8 revised, D19).
 **Supersedes:** decisions D4 and D5 of
 [`2026-08-10-configurability-and-de-console-design.md`](./2026-08-10-configurability-and-de-console-design.md)
 (code voice-packs, "preserve the console voice") and the `chromeOn` field of
@@ -18,8 +20,11 @@ and is already reflected in `SPEC.md`.
 copy lives in Voice, not on modules"; #1899 (module copy vs. Voice); #1420
 (catalog neutralisation); #1415/#1416/#1417 (the `chromeOn` branches this
 removes).
-**Mock:** the approved Voice page layout (variant A, "split workbench") is at
-<https://claude.ai/code/artifact/1a48581b-2835-4c04-8060-2f27dace8770>.
+**Mock:** the approved Voice and Email redesign, desktop and phone, with the
+save, leave and recovery states, is at
+<https://claude.ai/artifact/2VkuUEbjfD5QEMXaZSZHJH>. It supersedes the
+earlier three-variant mock
+(<https://claude.ai/code/artifact/1a48581b-2835-4c04-8060-2f27dace8770>).
 
 ## Goal
 
@@ -129,9 +134,23 @@ Two tasks, delivered in order:
   request, an `X-Frame-Options`/`frame-ancestors` carve-out in the shared
   preset, HMAC tokens and a new env var.
 
-- **D8 — Voice page layout is variant A of the mock** (fields by surface on
-  the left, sticky live preview on the right that follows focus), plus
-  per-surface change counts borrowed from variant C.
+- **D8 (revised 2026-10-08) — One card per surface, each with its own
+  preview.** The Voice page is one scrolling column of four cards (page not
+  found, error page, empty lists, bookmarks). Each card has its fields on
+  the left and its specimen (D7) on the right. Editing a field re-renders
+  the specimen beside it, and focusing one outlines its text there.
+  - Empty lists render as five compact rows: label, the current text,
+    Default or Customised, and a chevron. One row is open at a time with
+    the full editor, and the specimen shows only the open list inside its
+    page.
+  - On a phone each card stacks its fields over a "Show preview"
+    disclosure.
+
+  **Superseded:** variant A of the earlier mock (fields on the left, one
+  sticky preview on the right that follows focus, a surface picker, a
+  search box and a bottom sheet below 960 px). It was sized for the
+  72-field catalog. At 11 fields it costs more than it gives.
+
 - **D9 — The neutral catalog moves to `@blog/config`.** It is the only layer
   both apps can read: the site loads it as base messages, the platform reads
   it for placeholders and "reset to default". `apps/web/src/i18n/messages/`
@@ -263,6 +282,24 @@ Two tasks, delivered in order:
   `postContentsRail.label` stays fixed. Its default changes from "Topics",
   which collided with the site's topic taxonomy, to "Contents" in all five
   catalogs: de "Inhalt", es "Contenido", fr "Sommaire", nl "Inhoud".
+- **D19 (2026-10-08) — Settings pages save through one save bar, guard
+  against leaving, and recover drafts.** These live in `SettingsFormShell`,
+  so Voice, Email and every other settings page get the same behaviour. Built in #4480 (save bar, guard) and #4481 (recovery); the Look page joins in #4482.
+  - _Save bar:_ it replaces the header Save button and is pinned to the
+    bottom of the content area, shown only while there are unsaved changes.
+    It holds the change count, with a per-language breakdown on Voice and
+    Email, plus Discard, Save and ⌘S / Ctrl+S. When clean, the header says
+    "All changes saved". Field errors stay inline, and the bar adds "N
+    fields need attention" with a link to the first one.
+  - _Leave-page guard:_ an in-app link asks "Leave without saving?" with
+    Stay, Discard and leave, or Save and leave, through Next's `Link`
+    `onNavigate`. Reload, closing the tab and typed URLs fall back to
+    `beforeunload`.
+  - _Draft recovery:_ the draft is kept on the device per tenant, page and
+    language, and offered back on return. When someone saved since, the
+    banner offers the differences for review before any restore.
+  - One draft covers the whole page. Switching a section, template or
+    language never discards it.
 
 ---
 
@@ -441,14 +478,16 @@ string>> }` so the page can show them inline.
 
 ### Preview (`apps/platform`, D7)
 
-- **Two specimens.**
-  - _Page hero_ for `NOT_FOUND` and `ERROR`: `Eyebrow` (left out when
-    blank), `Heading` at hero size, `Text`, and the page's fixed actions as
+- **One specimen per surface, inside its card (D8).**
+  - _Page not found_ and _Error page_: `Eyebrow` (left out when blank),
+    `Heading` at hero size, `Text`, and the page's fixed actions as
     `LinkButton`/`Button`. Those are "Return home" for the 404, and "Try
     again" / "Go home" for the error page.
-  - _Empty states_ for `ARCHIVE` and `BOOKMARKS`: the six messages as muted
-    `Text`, stacked with dividers, with `{name}` filled from a sample topic
-    or tag.
+  - _Empty lists_: the open list only, inside its page. That is the list's
+    eyebrow and heading (fixed, from Studio in the real site), its count
+    line, then the message, with `{name}` filled from a sample topic or tag.
+  - _Bookmarks_: the fixed page title and "Saved posts" panel heading
+    around the empty message.
 - **Where it lives.** The platform's single `@blog/ui` exception widens from
   `look/look-preview/preview-sample/` to one shared
   `apps/platform/src/components/features/site-preview/` directory. It holds
@@ -467,46 +506,49 @@ string>> }` so the page can show them inline.
   `VOICE_PORTABLE_TEXT_SCHEMA` marks (bold, italic, link). `@blog/ui` has no
   Portable Text renderer, and the platform may not import `apps/web`'s.
 - **Focus.** Each field's element sits in a platform-owned wrapper carrying
-  `data-voice-key`. Focusing a field shows its specimen and outlines the
-  wrapper, and no `@blog/ui` prop widens for it.
+  `data-voice-key`. Focusing a field outlines that wrapper in the specimen
+  beside it, and no `@blog/ui` prop widens for it.
 - **Completeness.** The specimens' field map is typed
   `Record<TVoiceFieldId, …>`, so registering a field without placing it
   fails type-check.
 
 ### Voice page (`apps/platform`)
 
-Layout per D8 and the mock:
+Layout per D8, D19 and the mock:
 
-- **Header:** "Voice", one-line description, actions **Discard** (disabled
-  when clean), **Save**, and an "N unsaved" count. The "Basic" card and the
-  "Advanced" disclosure are removed.
+- **Header:** "Voice", a one-line description, and the D19 save status. The
+  "Basic" card and the "Advanced" disclosure are removed. A one-line note
+  says buttons, menus and labels are translated for you and so aren't
+  listed.
 - **Language:** a switcher over the tenant's live languages, shown when it
-  serves more than one (D16). Fields, placeholders, change counts and the
-  preview all follow the selected language.
-- **Left column:** a search box filtering fields by label or default text;
-  then one `Card` per surface in site order, header showing the surface name,
-  its route and its change count. Each field row: label, a hint saying where
-  it appears, the control for its kind (`TextInput`, `Textarea`, or
-  `PortableTextEditor` with a bold/italic/link toolbar), placeholder = neutral
-  default, a change marker and **Reset** when overridden, placeholder chips
-  ("Keep these: `{count}`") when the field has them, and inline field errors
-  from the save action.
-- **Right column, sticky:** a specimen `<select>`, the light/dark toggle
-  (as Look) and the specimen (D7). Focusing a field switches to its specimen
-  and outlines it, and typing re-renders it from the draft. Below 960 px the
-  preview collapses into a toggleable bottom sheet.
+  serves more than one (D16). Each language shows its customised count.
+  Fields, placeholders, badges and specimens all follow the selected
+  language.
+- **Cards:** one per surface in site order. The header shows the surface
+  name, where it appears and its customised count.
+  - Each field row has a label, a hint saying where it appears, and the
+    control for its kind (`TextInput`, `Textarea`, or `PortableTextEditor`
+    with a bold/italic/link toolbar). The neutral default is the
+    placeholder.
+  - A Default or Customised badge, an unsaved marker and **Reset** once
+    overridden.
+  - A "Keep `{name}`" note when the field has a placeholder token.
+  - Inline field errors from the save action.
+  - The specimen sits beside the fields (D7, D8).
+- **Phone:** cards stack their fields over a "Show preview" disclosure. Tap
+  targets are at least 44 px, and inputs use 16 px text so iOS doesn't zoom
+  in.
 - **Editor:** `PortableTextEditor` gains a `schema` prop (default: the email
   schema) so Voice passes `VOICE_PORTABLE_TEXT_SCHEMA`; the toolbar renders
   only the buttons the schema allows.
 - **Labels and hints** live in the platform catalog under `voiceFieldLabels.
 <id>` / `voiceFieldHints.<id>` / `voiceSurfaces.<surface>`; a test asserts
   every registry id has both.
-- **Save:** the existing `saveVoiceOverridesAction` sends the full draft;
-  the Save button shows the spinner and is disabled while the action is
-  pending (D14), and the field controls are `inert` for the duration;
-  `upsertSiteConfig` validates; success toasts, refreshes and revalidates the
-  site as today; `fieldErrors` render inline and the first errored field
-  receives focus.
+- **Save** through the D19 save bar. `saveVoiceOverridesAction` sends the
+  full draft. The bar's Save shows the pending state (D14), and the field
+  controls are `inert` meanwhile. `upsertSiteConfig` validates; success
+  toasts, refreshes and revalidates the site as today. `fieldErrors` render
+  inline, the bar counts them and links to the first.
 - `apps/platform/src/utils/voice-fields/voice-fields.ts` is deleted in favour
   of the registry.
 
@@ -582,7 +624,9 @@ the next starts:
    states: `notFoundSupportingText`, `localeErrorDescription` and
    `bookmarksEmpty`.
 6. `platform-app`, #2758 rescoped: the `site-preview/` move, then the
-   editor, then the specimens.
+   editor, then the specimens. The settings save bar and leave-page guard
+   (#4480) land first; draft recovery (#4481) and the Look page's move
+   onto the shell (#4482) follow independently.
 7. D17 runs as its own `studio → service → web` chain, parallel to all of
    the above.
 
