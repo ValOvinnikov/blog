@@ -495,6 +495,37 @@
     "ARCHIVE": "Erscheint, solange eine Liste noch leer ist. Wählen Sie eine aus, um sie zu bearbeiten.",
     "BOOKMARKS": "Die gemerkten Beiträge eines Lesers, bevor er welche merkt"
   },
+  "voiceSpecimen": {
+    "showPreview": "Vorschau anzeigen",
+    "hidePreview": "Vorschau ausblenden",
+    "lists": {
+      "blogList": {
+        "eyebrow": "Blog",
+        "heading": "Alle Beiträge",
+        "count": "0 Beiträge"
+      },
+      "topic": {
+        "eyebrow": "Thema",
+        "heading": "Design",
+        "count": "0 Beiträge"
+      },
+      "tag": {
+        "eyebrow": "Schlagwort",
+        "heading": "Typografie",
+        "count": "0 Beiträge"
+      },
+      "topics": {
+        "eyebrow": "Entdecken",
+        "heading": "Themen",
+        "count": "0 Themen"
+      },
+      "tags": {
+        "eyebrow": "Entdecken",
+        "heading": "Schlagwörter",
+        "count": "0 Schlagwörter"
+      }
+    }
+  },
   "voiceFieldLabels": {
     "blogListEmpty": "Blog-Übersicht",
     "topicEmpty": "Themenseite",

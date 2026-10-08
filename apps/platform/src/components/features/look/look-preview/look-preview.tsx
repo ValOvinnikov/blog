@@ -10,13 +10,9 @@ import { LookSample } from '@platform/components/features/site-preview/look-samp
 import { Card } from '@platform/components/shared/card';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { FONT_OPTIONS } from '@platform/config/fonts';
-import {
-  buildAccentPreviewTokens,
-  buildLogoPreviewTokens,
-  buildShapePreviewTokens,
-} from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
+import { buildThemePreviewStyle } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import { useTranslations } from 'next-intl';
-import { type CSSProperties, useState } from 'react';
+import { useState } from 'react';
 
 import { lookPreviewVariants } from './look-preview-variants';
 
@@ -55,7 +51,6 @@ export const LookPreview = ({
   const [mode, setMode] = useState<TPreviewMode>('light');
   const [width, setWidth] = useState<TPreviewWidth>('desktop');
   const isDark = mode === 'dark';
-  const resolvedLogoHue = logoHue ?? accentHue;
 
   const modeOptions: { value: TPreviewMode; label: string }[] = [
     { value: 'light', label: t('modeLight') },
@@ -67,11 +62,10 @@ export const LookPreview = ({
     { value: 'mobile', label: t('widthMobile') },
   ];
 
-  const tokenStyle = {
-    ...buildAccentPreviewTokens(accentHue, isDark),
-    ...buildLogoPreviewTokens(resolvedLogoHue, isDark),
-    ...buildShapePreviewTokens(radiusScale, density, cardStyle),
-  } as CSSProperties;
+  const tokenStyle = buildThemePreviewStyle(
+    { accentHue, logoHue, radiusScale, density, cardStyle },
+    isDark,
+  );
 
   const heading = FONT_OPTIONS[headingFont];
   const body = FONT_OPTIONS[bodyFont];

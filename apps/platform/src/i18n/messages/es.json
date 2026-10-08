@@ -495,6 +495,37 @@
     "ARCHIVE": "Se muestran cuando una lista aún está vacía. Elija una para editarla.",
     "BOOKMARKS": "Las entradas guardadas de un lector, antes de que guarde alguna"
   },
+  "voiceSpecimen": {
+    "showPreview": "Mostrar vista previa",
+    "hidePreview": "Ocultar vista previa",
+    "lists": {
+      "blogList": {
+        "eyebrow": "Blog",
+        "heading": "Todas las entradas",
+        "count": "0 entradas"
+      },
+      "topic": {
+        "eyebrow": "Tema",
+        "heading": "Diseño",
+        "count": "0 entradas"
+      },
+      "tag": {
+        "eyebrow": "Etiqueta",
+        "heading": "Tipografía",
+        "count": "0 entradas"
+      },
+      "topics": {
+        "eyebrow": "Explorar",
+        "heading": "Temas",
+        "count": "0 temas"
+      },
+      "tags": {
+        "eyebrow": "Explorar",
+        "heading": "Etiquetas",
+        "count": "0 etiquetas"
+      }
+    }
+  },
   "voiceFieldLabels": {
     "blogListEmpty": "Índice del blog",
     "topicEmpty": "Página de tema",
