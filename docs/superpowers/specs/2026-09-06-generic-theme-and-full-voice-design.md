@@ -288,8 +288,9 @@ Two tasks, delivered in order:
   - _Save bar:_ it replaces the header Save button and is pinned to the
     bottom of the content area, shown only while there are unsaved changes.
     It holds the change count, with a per-language breakdown on Voice and
-    Email, plus Discard, Save and ⌘S / Ctrl+S. When clean, the header says
-    "All changes saved". Field errors stay inline, and the bar adds "N
+    Email, plus Discard, Save and ⌘S / Ctrl+S. After a save, the header says
+    "All changes saved" until the next edit; an untouched page shows no save
+    status (amended 2026-10-08). Field errors stay inline, and the bar adds "N
     fields need attention" with a link to the first one.
   - _Leave-page guard:_ an in-app link asks "Leave without saving?" with
     Stay, Discard and leave, or Save and leave, through Next's `Link`
