@@ -23,9 +23,12 @@ export const env = createEnv({
     // disabled and the rest of the site is unaffected.
     // @env-optional
     SANITY_API_WRITE_TOKEN: z.string().min(1).optional(),
+    // Local-dev only: bypasses the Sanity fetch cache so Studio edits show on reload.
+    // @env-optional
+    SANITY_LIVE_CONTENT: z.literal('1').optional(),
   },
   // NODE_ENV is intentionally not validated here: it's a runtime-guaranteed
-  // system var (Node/Next/Vitest always set it). client.ts reads it directly.
+  // system var (Node/Next/Vitest always set it). isr.ts reads it directly.
   runtimeEnv: process.env,
   emptyStringAsUndefined: true,
   skipValidation: !!process.env['SKIP_ENV_VALIDATION'],

@@ -38,6 +38,7 @@ export const makeLandingSectionNavigation = (
       { title: 'Modules', path: 'modules' },
       { title: 'FAQ', path: 'modules/faq' },
     ],
+    parentSection: undefined,
     ...overrides,
   };
 };

@@ -21,6 +21,7 @@ export type TLandingSectionNavigation = {
   root: TLandingSectionPage;
   pages: TLandingSectionPage[];
   breadcrumbs: TLandingBreadcrumb[];
+  parentSection: TMaybeUndefined<TLandingBreadcrumb>;
 };
 
 export type TLandingPageDocument = {

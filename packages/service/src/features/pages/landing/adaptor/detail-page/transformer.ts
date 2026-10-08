@@ -53,6 +53,9 @@ function toSectionNavigation({
   const root = sectionRoot && toSectionPage(sectionRoot, rootIndex === 0);
   if (!sectionRoot || !root) return undefined;
 
+  const parentSection = sectionChain
+    .slice(rootIndex + 1)
+    .find((page) => page.sectionNavigation);
   const currentBranchIds = new Set(
     sectionChain.slice(0, rootIndex).map(({ _id }) => _id),
   );
@@ -66,6 +69,7 @@ function toSectionNavigation({
     breadcrumbs: [...sectionChain]
       .reverse()
       .flatMap((page) => toBreadcrumb(page) ?? []),
+    parentSection: parentSection && toBreadcrumb(parentSection),
   };
 }
 

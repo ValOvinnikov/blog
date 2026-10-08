@@ -1,8 +1,8 @@
 import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
+import { env } from '@blog/service/utils/env/env';
 
-type TIsrOptions = {
-  next: { revalidate: number; tags: string[] };
-};
+type TIsrOptions =
+  { next: { revalidate: number; tags: string[] } } | { cache: 'no-store' };
 
 /**
  * Tag-scope contract: a loader's `isr(...)` call must cover every document
@@ -30,6 +30,13 @@ export function isr(
   tag: string | string[],
   scopeProjectId: string,
 ): TIsrOptions {
+  if (
+    process.env.NODE_ENV === 'development' &&
+    env.SANITY_LIVE_CONTENT === '1'
+  ) {
+    return { cache: 'no-store' };
+  }
+
   const tags = Array.isArray(tag) ? tag : [tag];
 
   return {

@@ -32,6 +32,7 @@ import { articleTextSchema } from '@blog/studio/schema-types/portable-text/artic
 import { listedTextSchema } from '@blog/studio/schema-types/portable-text/listed-text/listed-text';
 import { paragraphTextSchema } from '@blog/studio/schema-types/portable-text/paragraph-text/paragraph-text';
 import { setDefaultLanguage } from '@blog/studio/schema-types/validation/default-language/default-language';
+import { setLiveLanguages } from '@blog/studio/schema-types/validation/live-languages/live-languages';
 import { isSingleLanguage } from '@blog/studio/structure/locales/is-single-language';
 import { orderLocales } from '@blog/studio/structure/locales/order-locales';
 import { codeInput } from '@sanity/code-input';
@@ -117,6 +118,7 @@ export const buildStudioConfig = ({
   liveLocales,
 }: TBuildStudioConfigParams) => {
   setDefaultLanguage(defaultLocale);
+  setLiveLanguages(liveLocales ?? []);
 
   const offeredLocales = orderLocales(defaultLocale, liveLocales);
   const languages = offeredLocales.map((locale) => ({

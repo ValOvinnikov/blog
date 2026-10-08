@@ -84,5 +84,5 @@ export function toHeroBlogModule(raw: TRawHeroBlogModule): THeroBlogModule {
 
   return post
     ? { ...base, hasPost: true, heading: post.title }
-    : { ...base, hasPost: false };
+    : { ...base, hasPost: false, isPostUntranslated: raw.hasPinnedPost };
 }

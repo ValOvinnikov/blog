@@ -113,3 +113,23 @@ describe('runQuery tenant threading', () => {
     );
   });
 });
+
+describe('runQuery fetch cache options', () => {
+  const query = q.star.filterByType('page_post').slice(0);
+
+  beforeEach(() => {
+    mockFetch.mockResolvedValue(null);
+  });
+
+  it('forwards no-store to the client fetch instead of the tagged cache', async () => {
+    await runQuery(query, { cache: 'no-store', tenant: testTenant }).catch(
+      () => {},
+    );
+
+    expect(mockFetch).toHaveBeenLastCalledWith(
+      expect.any(String),
+      expect.any(Object),
+      { cache: 'no-store' },
+    );
+  });
+});

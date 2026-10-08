@@ -74,16 +74,20 @@ describe('heroBlogModuleQuery', () => {
 });
 
 describe('heroBlogModuleQuery language scoping', () => {
-  async function runPost(
-    module: Record<string, unknown>,
-    locale: string,
-  ): Promise<unknown> {
-    const raw = (await evaluateGroqExpression(
+  async function runRaw(module: Record<string, unknown>, locale: string) {
+    return (await evaluateGroqExpression(
       heroBlogModuleQuery.query,
       [{ ...heroDocument, ...module }, imageAsset, ...pinnedPostDocuments],
       undefined,
       { id: 'hero-1', locale, defaultLocale: EN },
-    )) as { post: { _id: string } | null };
+    )) as { post: { _id: string } | null; hasPinnedPost: boolean };
+  }
+
+  async function runPost(
+    module: Record<string, unknown>,
+    locale: string,
+  ): Promise<unknown> {
+    const raw = await runRaw(module, locale);
 
     return raw.post?._id ?? null;
   }
@@ -115,5 +119,19 @@ describe('heroBlogModuleQuery language scoping', () => {
   it('falls back to the newest featured post in the request language', async () => {
     expect(await runPost({}, EN)).toBe('only-en');
     expect(await runPost({}, NL)).toBe('design-nl');
+  });
+
+  it('reports the pinned post as existing when it has no version in the request language', async () => {
+    expect((await runRaw(pinned('only-en'), NL)).hasPinnedPost).toBe(true);
+  });
+
+  it('reports no pinned post when the reference points at a missing document', async () => {
+    expect((await runRaw(pinned('deleted-post'), NL)).hasPinnedPost).toBe(
+      false,
+    );
+  });
+
+  it('reports no pinned post in newest-featured mode', async () => {
+    expect((await runRaw({}, NL)).hasPinnedPost).toBe(false);
   });
 });
