@@ -8,7 +8,7 @@ export type TPresetCardProps = {
   preset: TPresetId;
   onPresetChange: (preset: TPresetId) => void;
   onReset: () => void;
-  isResetDisabled: boolean;
+  isResetVisible: boolean;
   hasUnsavedChanges: boolean;
   isArchived: boolean;
   archivedNoticeId: string;
@@ -18,7 +18,7 @@ export const PresetCard = ({
   preset,
   onPresetChange,
   onReset,
-  isResetDisabled,
+  isResetVisible,
   hasUnsavedChanges,
   isArchived,
   archivedNoticeId,
@@ -32,16 +32,18 @@ export const PresetCard = ({
       description={t('presetDescription')}
       hasUnsavedChanges={hasUnsavedChanges}
       actions={
-        <Button
-          type="button"
-          variant="ghost"
-          size={SIZE.SM}
-          onClick={onReset}
-          isDisabled={isResetDisabled || isArchived}
-          aria-describedby={archivedDescribedBy}
-        >
-          {t('resetButton')}
-        </Button>
+        isResetVisible && (
+          <Button
+            type="button"
+            variant="ghost"
+            size={SIZE.SM}
+            onClick={onReset}
+            isDisabled={isArchived}
+            aria-describedby={archivedDescribedBy}
+          >
+            {t('resetButton')}
+          </Button>
+        )
       }
     >
       <PresetPicker
