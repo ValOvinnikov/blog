@@ -751,5 +751,23 @@
     "downgradeNotice": "Su plan publica {allowed, plural, one {# idioma adicional} other {# idiomas adicionales}}, pero hay {stored} guardados. Elija cuáles siguen publicados: los demás se conservan y no se elimina nada.",
     "keptBadge": "Conservado, no publicado en su plan",
     "planLockedBadge": "No incluido en su plan"
+  },
+  "saveBar": {
+    "regionLabel": "Cambios sin guardar",
+    "allSaved": "Todos los cambios guardados",
+    "unsavedChanges": "{count, plural, one {# cambio sin guardar} other {# cambios sin guardar}}",
+    "fieldsNeedAttention": "{count, plural, one {# campo requiere atención} other {# campos requieren atención}}",
+    "goToFirstField": "Ir al primero",
+    "shortcut": "⌘S / Ctrl+S",
+    "discard": "Descartar"
+  },
+  "leavePageDialog": {
+    "title": "¿Salir sin guardar?",
+    "description": "Tienes {count, plural, one {# cambio sin guardar} other {# cambios sin guardar}} en {page}.",
+    "descriptionByLanguage": "Tienes {count, plural, one {# cambio sin guardar} other {# cambios sin guardar}} en {page} — {languages}.",
+    "stay": "Quedarse",
+    "discardAndLeave": "Descartar y salir",
+    "saveAndLeave": "Guardar y salir",
+    "saving": "Guardando…"
   }
 }

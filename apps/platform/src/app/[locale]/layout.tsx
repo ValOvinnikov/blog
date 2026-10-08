@@ -2,6 +2,7 @@ import '../../../index.css';
 
 import { LOCALE_BCP47_TAGS } from '@blog/config';
 import { ToastProvider } from '@platform/context/toast-provider';
+import { UnsavedChangesProvider } from '@platform/context/unsaved-changes-provider';
 import { routing } from '@platform/i18n/routing';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -41,7 +42,9 @@ export default async function LocaleLayout({ children, params }: TProps) {
     <html lang={LOCALE_BCP47_TAGS[locale]}>
       <body>
         <NextIntlClientProvider locale={locale} messages={messages}>
-          <ToastProvider>{children}</ToastProvider>
+          <ToastProvider>
+            <UnsavedChangesProvider>{children}</UnsavedChangesProvider>
+          </ToastProvider>
         </NextIntlClientProvider>
       </body>
     </html>

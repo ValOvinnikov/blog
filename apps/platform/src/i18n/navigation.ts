@@ -1,5 +1,2 @@
-import { createNavigation } from 'next-intl/navigation';
-
-import { routing } from './routing';
-
-export const { Link, usePathname, useRouter } = createNavigation(routing);
+export { GuardedLink as Link } from '@platform/components/shared/guarded-link';
+export { usePathname, useRouter } from './base-navigation';

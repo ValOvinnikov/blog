@@ -16,10 +16,11 @@ import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
 
-const valuesEqual = (
+const countChanges = (
   a: TSettingsFeaturesValues,
   b: TSettingsFeaturesValues,
-): boolean => CAPABILITY_TOGGLES.every(({ field }) => a[field] === b[field]);
+): number =>
+  CAPABILITY_TOGGLES.filter(({ field }) => a[field] !== b[field]).length;
 
 export type TFeaturesSettingsProps = {
   tenantId: string;
@@ -66,7 +67,7 @@ export const FeaturesSettings = ({
       },
     });
 
-  const isDirty = !valuesEqual(values, savedValues);
+  const changeCount = countChanges(values, savedValues);
 
   const handleToggle = (
     field: keyof TSettingsFeaturesValues,
@@ -82,7 +83,8 @@ export const FeaturesSettings = ({
       saveButtonLabel={t('saveButton')}
       savingButtonLabel={t('savingButton')}
       onSave={handleSubmit}
-      isSaveDisabled={!isDirty || isArchived}
+      onDiscard={() => setValues(savedValues)}
+      changeCount={changeCount}
       isPending={isPending}
       archivedAt={archivedAt}
       archivedNoticeId={archivedNoticeId}

@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { useFormSubmission } from './use-form-submission';
@@ -7,12 +7,18 @@ type TValues = { name: string };
 type TResult = { ok: boolean };
 
 type THarnessProps = {
+  onOutcome?: (isSaved: boolean) => void;
   initialValues: TValues | (() => TValues);
   onSubmit: (values: TValues) => Promise<TResult>;
   onSuccess?: (values: TValues, result: TResult) => void;
 };
 
-const Harness = ({ initialValues, onSubmit, onSuccess }: THarnessProps) => {
+const Harness = ({
+  initialValues,
+  onSubmit,
+  onSuccess,
+  onOutcome,
+}: THarnessProps) => {
   const { values, setValues, status, isPending, handleSubmit } =
     useFormSubmission<TValues, TResult>({
       initialValues,
@@ -31,7 +37,12 @@ const Harness = ({ initialValues, onSubmit, onSuccess }: THarnessProps) => {
       >
         edit
       </button>
-      <button type="button" onClick={handleSubmit}>
+      <button
+        type="button"
+        onClick={() =>
+          void handleSubmit().then((isSaved) => onOutcome?.(isSaved))
+        }
+      >
         submit
       </button>
     </div>
@@ -116,4 +127,25 @@ describe(useFormSubmission, () => {
 
     expect(screen.getByTestId('status')).toHaveTextContent('idle');
   });
+
+  it.each([
+    [true, { ok: true }],
+    [false, { ok: false }],
+  ])(
+    'resolves the submit with %s once the save settles',
+    async (isSaved, result) => {
+      const onOutcome = vi.fn();
+      render(
+        <Harness
+          initialValues={{ name: 'initial' }}
+          onSubmit={vi.fn().mockResolvedValue(result)}
+          onOutcome={onOutcome}
+        />,
+      );
+
+      await user.click(screen.getByRole('button', { name: 'submit' }));
+
+      await waitFor(() => expect(onOutcome).toHaveBeenCalledWith(isSaved));
+    },
+  );
 });

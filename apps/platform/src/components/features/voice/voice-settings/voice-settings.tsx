@@ -16,7 +16,7 @@ import {
 } from '@platform/utils/voice-fields/voice-fields';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useId } from 'react';
+import { useId, useState } from 'react';
 
 import { voiceSettingsVariants } from './voice-settings-variants';
 
@@ -60,11 +60,15 @@ export const VoiceSettings = ({
   const tLabels = useTranslations('voiceFieldLabels');
   const toast = useToast();
   const router = useRouter();
+  const [savedValues, setSavedValues] = useState(() =>
+    buildInitialValues(initialOverrides),
+  );
   const { values, setValues, status, isPending, handleSubmit } =
     useFormSubmission<TVoiceOverrides, { ok: boolean }>({
-      initialValues: () => buildInitialValues(initialOverrides),
+      initialValues: savedValues,
       onSubmit: (vals) => saveAction(tenantId, vals),
-      onSuccess: () => {
+      onSuccess: (submittedValues) => {
+        setSavedValues(submittedValues);
         toast.success({
           message: t('alertSuccess'),
         });
@@ -73,6 +77,9 @@ export const VoiceSettings = ({
     });
 
   const { advancedBody } = voiceSettingsVariants();
+  const changeCount = VOICE_OVERRIDE_KEYS.filter(
+    (key) => values[key] !== savedValues[key],
+  ).length;
 
   const handleFieldChange = (key: TVoiceOverrideKey, value: string) => {
     setValues((prev) => ({ ...prev, [key]: value }));
@@ -85,7 +92,8 @@ export const VoiceSettings = ({
       saveButtonLabel={t('saveButton')}
       savingButtonLabel={t('savingButton')}
       onSave={handleSubmit}
-      isSaveDisabled={isArchived}
+      onDiscard={() => setValues(savedValues)}
+      changeCount={changeCount}
       isPending={isPending}
       archivedAt={archivedAt}
       archivedNoticeId={archivedNoticeId}

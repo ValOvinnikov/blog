@@ -20,7 +20,7 @@ export type TUseFormSubmissionResult<TValues> = {
   setValues: Dispatch<SetStateAction<TValues>>;
   status: TFormSubmissionStatus;
   isPending: boolean;
-  handleSubmit: () => void;
+  handleSubmit: () => Promise<boolean>;
 };
 
 /**
@@ -46,15 +46,17 @@ export const useFormSubmission = <TValues, TResult extends { ok: boolean }>({
     setValuesState(update);
   };
 
-  const handleSubmit = () => {
-    startTransition(async () => {
-      const result = await onSubmit(values);
-      setStatus(result.ok ? 'success' : 'error');
-      if (result.ok) {
-        onSuccess?.(values, result);
-      }
+  const handleSubmit = () =>
+    new Promise<boolean>((resolve) => {
+      startTransition(async () => {
+        const result = await onSubmit(values);
+        setStatus(result.ok ? 'success' : 'error');
+        if (result.ok) {
+          onSuccess?.(values, result);
+        }
+        resolve(result.ok);
+      });
     });
-  };
 
   return { values, setValues, status, isPending, handleSubmit };
 };

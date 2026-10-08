@@ -1,8 +1,5 @@
 import { CAPABILITY } from '@blog/config';
-import {
-  expectArchivedDisablesSave,
-  expectArchivedSaveDescribedByNotice,
-} from '@platform/testing/assert-archived-save';
+import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { customRender, screen, waitFor } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import type { TSettingsFeaturesValues } from '@platform/utils/settings-features-fields/settings-features-fields';
@@ -100,23 +97,41 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       );
     });
 
-    it('disables Save on initial render, with values unchanged', () => {
+    it('offers no Save on initial render, with values unchanged', () => {
       expect(
-        screen.getByRole('button', { name: 'Save changes' }),
-      ).toBeDisabled();
+        screen.queryByRole('button', { name: 'Save changes' }),
+      ).not.toBeInTheDocument();
+      expect(screen.getByText('All changes saved')).toBeVisible();
     });
 
-    it('enables Save after toggling an entitled capability, and disables it again once toggled back', async () => {
-      const saveButton = screen.getByRole('button', { name: 'Save changes' });
+    it('offers Save with the change count after toggling an entitled capability, and withdraws it once toggled back', async () => {
       const analyticsSwitch = screen.getByRole('switch', {
         name: 'Analytics',
       });
 
       await user.click(analyticsSwitch);
-      expect(saveButton).toBeEnabled();
+      expect(
+        screen.getByRole('button', { name: 'Save changes' }),
+      ).toBeVisible();
+      expect(
+        screen.getByRole('region', { name: 'Unsaved changes' }),
+      ).toHaveTextContent('1 unsaved change');
 
       await user.click(analyticsSwitch);
-      expect(saveButton).toBeDisabled();
+      expect(
+        screen.queryByRole('button', { name: 'Save changes' }),
+      ).not.toBeInTheDocument();
+    });
+
+    it('restores the saved toggles on Discard', async () => {
+      await user.click(screen.getByRole('switch', { name: 'Analytics' }));
+      await user.click(screen.getByRole('button', { name: 'Discard' }));
+
+      expect(screen.getByRole('switch', { name: 'Analytics' })).toHaveAttribute(
+        'data-unchecked',
+        '',
+      );
+      expect(screen.getByText('All changes saved')).toBeVisible();
     });
 
     it('leaves entitled capability toggles enabled for a non-archived tenant', () => {
@@ -176,14 +191,15 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       setup({ saveAction });
     });
 
-    it('disables Save again after a successful save, without a remount', async () => {
-      const saveButton = screen.getByRole('button', { name: 'Save changes' });
+    it('withdraws Save after a successful save, without a remount', async () => {
       await user.click(screen.getByRole('switch', { name: 'Analytics' }));
-      expect(saveButton).toBeEnabled();
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
-      await user.click(saveButton);
-
-      await waitFor(() => expect(saveButton).toBeDisabled());
+      await waitFor(() =>
+        expect(
+          screen.queryByRole('button', { name: 'Save changes' }),
+        ).not.toBeInTheDocument(),
+      );
     });
 
     it('saves the current toggle state through saveAction', async () => {
@@ -244,12 +260,8 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       setup({ saveAction, archivedAt: ARCHIVED_AT });
     });
 
-    it('shows an archived notice and disables Save', async () => {
-      await expectArchivedDisablesSave(user, saveAction);
-    });
-
-    it('describes the disabled Save button with the archived notice text, for a screen-reader user', () => {
-      expectArchivedSaveDescribedByNotice();
+    it('shows an archived notice and offers no Save', () => {
+      expectArchivedOffersNoSave();
     });
 
     it('disables every capability toggle, including entitled ones', async () => {

@@ -1,7 +1,4 @@
-import {
-  expectArchivedDisablesSave,
-  expectArchivedSaveDescribedByNotice,
-} from '@platform/testing/assert-archived-save';
+import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import userEvent from '@testing-library/user-event';
@@ -15,6 +12,14 @@ const ARCHIVED_AT = new Date('2026-08-26T00:00:00.000Z');
 
 const openAdvanced = async (user: ReturnType<typeof userEvent.setup>) => {
   await user.click(screen.getByText(ADVANCED_SUMMARY));
+};
+
+const editOneField = async (user: ReturnType<typeof userEvent.setup>) => {
+  await openAdvanced(user);
+  await user.type(
+    screen.getByRole('textbox', { name: 'Blog List Empty' }),
+    'edited',
+  );
 };
 
 const setup = customRender(VoiceSettings, {
@@ -126,6 +131,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
     const saveAction = vi.fn().mockResolvedValue({ ok: true });
     setup({ saveAction });
 
+    await editOneField(user);
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
     expect(await screen.findByText('Saved voiceOverrides.')).toBeVisible();
@@ -137,6 +143,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
     const saveAction = vi.fn().mockResolvedValue({ ok: false });
     setup({ saveAction });
 
+    await editOneField(user);
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
     expect(await screen.findByRole('alert')).toHaveTextContent("Couldn't save");
@@ -153,6 +160,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
     );
     setup({ saveAction });
 
+    await editOneField(user);
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
     expect(
@@ -163,17 +171,10 @@ describe(`<${VoiceSettings.name}/>`, () => {
   });
 
   describe('archived tenant', () => {
-    it('shows an archived notice and disables Save', async () => {
-      const saveAction = vi.fn().mockResolvedValue({ ok: true });
-      setup({ saveAction, archivedAt: ARCHIVED_AT });
-
-      await expectArchivedDisablesSave(user, saveAction);
-    });
-
-    it('describes the disabled Save button with the archived notice text, for a screen-reader user', () => {
+    it('shows an archived notice and offers no Save', () => {
       setup({ archivedAt: ARCHIVED_AT });
 
-      expectArchivedSaveDescribedByNotice();
+      expectArchivedOffersNoSave();
     });
 
     it('makes every curated voice field read-only, not disabled', async () => {
@@ -188,6 +189,27 @@ describe(`<${VoiceSettings.name}/>`, () => {
         expect(field).toBeEnabled();
       }
     });
+  });
+
+  it('counts the edited fields and restores them on Discard', async () => {
+    setup({ initialOverrides: { notFoundHeading: 'Nothing here' } });
+    await editOneField(user);
+    await user.clear(
+      screen.getByRole('textbox', { name: 'Not Found Heading' }),
+    );
+
+    expect(
+      screen.getByRole('region', { name: 'Unsaved changes' }),
+    ).toHaveTextContent('2 unsaved changes');
+
+    await user.click(screen.getByRole('button', { name: 'Discard' }));
+
+    expect(
+      screen.getByRole('textbox', { name: 'Not Found Heading' }),
+    ).toHaveValue('Nothing here');
+    expect(
+      screen.getByRole('textbox', { name: 'Blog List Empty' }),
+    ).toHaveValue('');
   });
 
   it('leaves every curated voice field editable for a non-archived tenant', async () => {

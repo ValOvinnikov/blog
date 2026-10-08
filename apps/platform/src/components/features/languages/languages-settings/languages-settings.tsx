@@ -70,10 +70,13 @@ export const LanguagesSettings = ({
   const toast = useToast();
   const router = useRouter();
   const [savedLocales, setSavedLocales] = useState(storedLocales);
+  const [savedLiveLocales, setSavedLiveLocales] = useState(() =>
+    storedLocales.slice(0, additionalLocaleLimit),
+  );
   const isOverLimit = savedLocales.length > additionalLocaleLimit;
   const { values, setValues, status, isPending, handleSubmit } =
     useFormSubmission<TLocaleIsoCode[], { ok: boolean }>({
-      initialValues: savedLocales.slice(0, additionalLocaleLimit),
+      initialValues: savedLiveLocales,
       onSubmit: (liveLocales) =>
         saveAction(
           tenantId,
@@ -83,15 +86,15 @@ export const LanguagesSettings = ({
         setSavedLocales(
           additionalLocalesToSave(liveLocales, savedLocales, isOverLimit),
         );
+        setSavedLiveLocales(liveLocales);
         toast.success({ message: t('alertSuccess') });
         router.refresh();
       },
     });
 
-  const toSave = additionalLocalesToSave(values, savedLocales, isOverLimit);
-  const isDirty =
-    toSave.length !== savedLocales.length ||
-    toSave.some((locale, index) => locale !== savedLocales[index]);
+  const changeCount = SUPPORTED_LOCALES.filter(
+    (locale) => values.includes(locale) !== savedLiveLocales.includes(locale),
+  ).length;
   const isAtLimit = values.length >= additionalLocaleLimit;
 
   const handleToggle = (locale: TLocaleIsoCode, checked: boolean) => {
@@ -120,7 +123,8 @@ export const LanguagesSettings = ({
       saveButtonLabel={t('saveButton')}
       savingButtonLabel={t('savingButton')}
       onSave={handleSubmit}
-      isSaveDisabled={!isDirty || isArchived}
+      onDiscard={() => setValues(savedLiveLocales)}
+      changeCount={changeCount}
       isPending={isPending}
       archivedAt={archivedAt}
       archivedNoticeId={archivedNoticeId}

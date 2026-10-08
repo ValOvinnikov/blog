@@ -129,6 +129,7 @@ describe(EmailSettingsForm, () => {
       );
       expect(screen.queryByRole('alert')).not.toBeInTheDocument();
 
+      await waitFor(() => expect(senderNameInput).toBeEnabled());
       await user.type(senderNameInput, 'x');
 
       expect(
