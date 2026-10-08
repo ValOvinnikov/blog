@@ -1,4 +1,8 @@
-import { PRESET_ID, PRESET_REGISTRY } from '@blog/config/constants';
+import {
+  LOCALE_ISO_CODES,
+  PRESET_ID,
+  PRESET_REGISTRY,
+} from '@blog/config/constants';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 
 import { saveVoiceOverridesAction } from './save-voice-overrides-action';
@@ -41,6 +45,11 @@ const overrides = {
   bookmarksEmpty: '',
 };
 
+const overridesByLocale = {
+  [LOCALE_ISO_CODES.EN]: overrides,
+  [LOCALE_ISO_CODES.DE]: { ...overrides, notFoundHeading: 'Nicht gefunden' },
+};
+
 describe(saveVoiceOverridesAction, () => {
   beforeEach(() => {
     requireTenantMembershipMock.mockReset();
@@ -57,18 +66,18 @@ describe(saveVoiceOverridesAction, () => {
   });
 
   it('resolves the tenant from the checked membership, never a bare client-supplied id', async () => {
-    await saveVoiceOverridesAction('tenant-1', overrides);
+    await saveVoiceOverridesAction('tenant-1', overridesByLocale);
 
     expect(requireTenantMembershipMock).toHaveBeenCalledWith('tenant-1');
     expect(getSiteConfigMock).toHaveBeenCalledWith('tenant-1');
     expect(upsertSiteConfigMock).toHaveBeenCalledWith(
       'tenant-1',
-      expect.objectContaining({ voiceOverrides: overrides }),
+      expect.objectContaining({ voiceOverridesByLocale: overridesByLocale }),
     );
   });
 
   it('falls back to CONSOLE preset defaults when the tenant has no site_config row', async () => {
-    await saveVoiceOverridesAction('tenant-1', overrides);
+    await saveVoiceOverridesAction('tenant-1', overridesByLocale);
 
     const consoleTokens = PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens;
     expect(upsertSiteConfigMock).toHaveBeenCalledWith('tenant-1', {
@@ -81,7 +90,7 @@ describe(saveVoiceOverridesAction, () => {
       density: consoleTokens.density,
       logoAssetUrl: undefined,
       faviconAssetUrl: undefined,
-      voiceOverrides: overrides,
+      voiceOverridesByLocale: overridesByLocale,
     });
   });
 
@@ -100,7 +109,7 @@ describe(saveVoiceOverridesAction, () => {
     });
     upsertSiteConfigMock.mockResolvedValue({ ok: true });
 
-    await saveVoiceOverridesAction('tenant-1', overrides);
+    await saveVoiceOverridesAction('tenant-1', overridesByLocale);
 
     expect(upsertSiteConfigMock).toHaveBeenCalledWith('tenant-1', {
       preset: PRESET_ID.EDITORIAL,
@@ -112,14 +121,17 @@ describe(saveVoiceOverridesAction, () => {
       density: 'COMPACT',
       logoAssetUrl: 'https://blob.example.com/logo.png',
       faviconAssetUrl: 'https://blob.example.com/favicon.png',
-      voiceOverrides: overrides,
+      voiceOverridesByLocale: overridesByLocale,
     });
   });
 
   it('returns ok:false without throwing when the upsert fails', async () => {
     upsertSiteConfigMock.mockRejectedValue(new Error('db down'));
 
-    const result = await saveVoiceOverridesAction('tenant-1', overrides);
+    const result = await saveVoiceOverridesAction(
+      'tenant-1',
+      overridesByLocale,
+    );
 
     expect(result).toEqual({ ok: false });
     expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
@@ -128,23 +140,33 @@ describe(saveVoiceOverridesAction, () => {
   it('does not report success or revalidate when upsertSiteConfig rejects a field', async () => {
     upsertSiteConfigMock.mockResolvedValue({
       ok: false,
-      fieldErrors: { notFoundHeading: 'Must be 80 characters or fewer.' },
+      fieldErrorsByLocale: {
+        [LOCALE_ISO_CODES.DE]: {
+          notFoundHeading: 'Must be 80 characters or fewer.',
+        },
+      },
     });
 
-    const result = await saveVoiceOverridesAction('tenant-1', overrides);
+    const result = await saveVoiceOverridesAction(
+      'tenant-1',
+      overridesByLocale,
+    );
 
     expect(result).toEqual({ ok: false });
     expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
   });
 
   it('returns ok:true on a successful save', async () => {
-    const result = await saveVoiceOverridesAction('tenant-1', overrides);
+    const result = await saveVoiceOverridesAction(
+      'tenant-1',
+      overridesByLocale,
+    );
 
     expect(result).toEqual({ ok: true });
   });
 
   it('calls the site-config revalidation webhook after a successful save', async () => {
-    await saveVoiceOverridesAction('tenant-1', overrides);
+    await saveVoiceOverridesAction('tenant-1', overridesByLocale);
 
     expect(revalidateSiteConfigMock).toHaveBeenCalledTimes(1);
   });

@@ -80,8 +80,6 @@ export type TUpsertSiteConfigResult =
   | {
       ok: false;
       fieldErrorsByLocale: Partial<Record<TLocaleIsoCode, TVoiceFieldErrors>>;
-      /** @deprecated The default locale's slice of `fieldErrorsByLocale`, kept until the platform saves per language. */
-      fieldErrors: TVoiceFieldErrors;
     };
 
 function findPlaceholderError(
@@ -385,8 +383,6 @@ export const updateSiteConfigInputSchema = z.object({
 export type TUpdateSiteConfigInput = z.input<
   typeof updateSiteConfigInputSchema
 > & {
-  /** @deprecated Saves under the tenant's default locale; use `voiceOverridesByLocale`. */
-  voiceOverrides?: TVoiceOverridesInput;
   voiceOverridesByLocale?: TVoiceOverridesByLocaleInput;
 };
 
@@ -429,25 +425,9 @@ async function getTenantLocale(tenantId: string): Promise<TLocaleIsoCode> {
   return tenant.locale;
 }
 
-function resolveVoiceOverridesInput(
-  input: Pick<
-    TUpdateSiteConfigInput,
-    'voiceOverrides' | 'voiceOverridesByLocale'
-  >,
-  defaultLocale: TLocaleIsoCode,
-): TVoiceOverridesByLocaleInput | undefined {
-  const { voiceOverrides, voiceOverridesByLocale } = input;
-
-  if (voiceOverrides !== undefined && voiceOverridesByLocale !== undefined) {
-    throw new Error(
-      'upsertSiteConfig: pass voiceOverrides or voiceOverridesByLocale, not both.',
-    );
-  }
-  if (voiceOverrides !== undefined) {
-    return { [defaultLocale]: voiceOverrides };
-  }
-  if (voiceOverridesByLocale === undefined) return undefined;
-
+function assertKnownLocales(
+  voiceOverridesByLocale: TVoiceOverridesByLocaleInput,
+): void {
   const unknownLocales = Object.keys(voiceOverridesByLocale).filter(
     (locale) => !isLocaleIsoCode(locale),
   );
@@ -456,8 +436,6 @@ function resolveVoiceOverridesInput(
       `upsertSiteConfig: unknown voice override locale(s): ${unknownLocales.join(', ')}.`,
     );
   }
-
-  return voiceOverridesByLocale;
 }
 
 type TVoiceOverridesByLocaleParseResult =
@@ -496,24 +474,16 @@ export async function upsertSiteConfig(
   input: TUpdateSiteConfigInput,
 ): Promise<TUpsertSiteConfigResult> {
   const db = getDb();
-  const { voiceOverrides, voiceOverridesByLocale, ...rest } = input;
+  const { voiceOverridesByLocale, ...rest } = input;
   const parsed = updateSiteConfigInputSchema.parse(rest);
   const defaultLocale = await getTenantLocale(tenantId);
-  const voiceInput = resolveVoiceOverridesInput(
-    { voiceOverrides, voiceOverridesByLocale },
-    defaultLocale,
-  );
 
   let voicePatch: TVoiceOverridesByLocale | undefined;
-  if (voiceInput !== undefined) {
-    const result = parseVoiceOverridesByLocale(voiceInput);
+  if (voiceOverridesByLocale !== undefined) {
+    assertKnownLocales(voiceOverridesByLocale);
+    const result = parseVoiceOverridesByLocale(voiceOverridesByLocale);
     if (!result.ok) {
-      const { fieldErrorsByLocale } = result;
-      return {
-        ok: false,
-        fieldErrorsByLocale,
-        fieldErrors: fieldErrorsByLocale[defaultLocale] ?? {},
-      };
+      return { ok: false, fieldErrorsByLocale: result.fieldErrorsByLocale };
     }
     voicePatch = result.value;
   }

@@ -1,3 +1,5 @@
+import type { TLocaleIsoCode } from '@blog/config/constants';
+
 export type TVoiceOverrideKey =
   | 'notFoundHeading'
   | 'notFoundSupportingText'
@@ -8,6 +10,10 @@ export type TVoiceOverrideKey =
   | 'bookmarksEmpty';
 
 export type TVoiceOverrides = Record<TVoiceOverrideKey, string>;
+
+export type TVoiceOverridesByLocale = Partial<
+  Record<TLocaleIsoCode, TVoiceOverrides>
+>;
 
 export type TVoiceField = {
   key: TVoiceOverrideKey;

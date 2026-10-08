@@ -1,3 +1,4 @@
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
@@ -24,6 +25,7 @@ const editOneField = async (user: ReturnType<typeof userEvent.setup>) => {
 
 const setup = customRender(VoiceSettings, {
   tenantId: 'tenant-1',
+  locale: LOCALE_ISO_CODES.EN,
   initialOverrides: {},
   saveAction: vi.fn(),
 });
@@ -99,7 +101,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
     ).toHaveValue('Nothing here');
   });
 
-  it('saves every current field value, including a just-cleared override as an empty string', async () => {
+  it('saves every current field value under the edited language, including a just-cleared override as an empty string', async () => {
     const saveAction = vi.fn().mockResolvedValue({ ok: true });
     setup({
       initialOverrides: { notFoundHeading: 'Nothing here' },
@@ -116,14 +118,13 @@ describe(`<${VoiceSettings.name}/>`, () => {
     );
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
-    expect(saveAction).toHaveBeenCalledWith(
-      'tenant-1',
-      expect.objectContaining({
+    expect(saveAction).toHaveBeenCalledWith('tenant-1', {
+      [LOCALE_ISO_CODES.EN]: expect.objectContaining({
         notFoundHeading: '',
         blogListEmpty: 'saved!',
         notFoundSupportingText: '',
       }),
-    );
+    });
   });
 
   it('shows a save-confirmation toast and refreshes after a successful save', async () => {

@@ -62,7 +62,7 @@ function expectOk(
 ): Extract<TUpsertSiteConfigResult, { ok: true }> {
   if (!result.ok) {
     throw new Error(
-      `Expected an ok result, got fieldErrors: ${JSON.stringify(result.fieldErrors)}`,
+      `Expected an ok result, got field errors: ${JSON.stringify(result.fieldErrorsByLocale)}`,
     );
   }
   return result;
@@ -251,10 +251,13 @@ describe(upsertSiteConfig, () => {
   it('rejects an unknown voice override key', async () => {
     const voiceOverrides = {
       thisIsNotARegisteredField: 'x',
-    } as TUpdateSiteConfigInput['voiceOverrides'];
+    } as TVoiceOverridesInput;
 
     await expect(
-      upsertSiteConfig(tenantId, { ...baseInput, voiceOverrides }),
+      upsertSiteConfig(tenantId, {
+        ...baseInput,
+        voiceOverridesByLocale: { [LOCALE_ISO_CODES.EN]: voiceOverrides },
+      }),
     ).rejects.toThrow();
   });
 });
@@ -270,7 +273,9 @@ describe('voice overrides — TEXT fields', () => {
     const result = expectOk(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
-        voiceOverrides: { notFoundHeading: '  Lost the plot?  ' },
+        voiceOverridesByLocale: {
+          [LOCALE_ISO_CODES.EN]: { notFoundHeading: '  Lost the plot?  ' },
+        },
       }),
     );
 
@@ -283,34 +288,46 @@ describe('voice overrides — TEXT fields', () => {
     const result = expectFieldErrors(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
-        voiceOverrides: { notFoundHeading: 'x'.repeat(101) },
+        voiceOverridesByLocale: {
+          [LOCALE_ISO_CODES.EN]: { notFoundHeading: 'x'.repeat(101) },
+        },
       }),
     );
 
-    expect(result.fieldErrors.notFoundHeading).toBeDefined();
+    expect(
+      result.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.notFoundHeading,
+    ).toBeDefined();
   });
 
   it('rejects a TEXT override containing a line break', async () => {
     const result = expectFieldErrors(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
-        voiceOverrides: { notFoundHeading: 'Lost\nthe plot?' },
+        voiceOverridesByLocale: {
+          [LOCALE_ISO_CODES.EN]: { notFoundHeading: 'Lost\nthe plot?' },
+        },
       }),
     );
 
-    expect(result.fieldErrors.notFoundHeading).toMatch(/line break/i);
+    expect(
+      result.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.notFoundHeading,
+    ).toMatch(/line break/i);
   });
 
   it('clears a previously-set TEXT override when resubmitted blank', async () => {
     await upsertSiteConfig(tenantId, {
       ...baseInput,
-      voiceOverrides: { notFoundHeading: 'Custom heading' },
+      voiceOverridesByLocale: {
+        [LOCALE_ISO_CODES.EN]: { notFoundHeading: 'Custom heading' },
+      },
     });
 
     const result = expectOk(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
-        voiceOverrides: { notFoundHeading: '   ' },
+        voiceOverridesByLocale: {
+          [LOCALE_ISO_CODES.EN]: { notFoundHeading: '   ' },
+        },
       }),
     );
 
@@ -339,7 +356,7 @@ describe('voice overrides — MULTILINE fields', () => {
     const result = expectOk(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
-        voiceOverrides: overrides,
+        voiceOverridesByLocale: { [LOCALE_ISO_CODES.EN]: overrides },
       }),
     );
 
@@ -358,15 +375,13 @@ describe('voice overrides — MULTILINE fields', () => {
     const result = expectFieldErrors(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
-        voiceOverrides: overrides,
+        voiceOverridesByLocale: { [LOCALE_ISO_CODES.EN]: overrides },
       }),
     );
 
-    expect(
-      result.fieldErrors[
-        SYNTHETIC_MULTILINE_FIELD_ID as keyof typeof result.fieldErrors
-      ],
-    ).toBeDefined();
+    expect(result.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]).toHaveProperty(
+      SYNTHETIC_MULTILINE_FIELD_ID,
+    );
   });
 });
 
@@ -381,11 +396,13 @@ describe('voice overrides — RICH fields', () => {
     const result = expectOk(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
-        voiceOverrides: {
-          notFoundSupportingText: richTextOf('Bold and a link', {
-            marks: ['strong'],
-            href: 'https://example.com/help',
-          }),
+        voiceOverridesByLocale: {
+          [LOCALE_ISO_CODES.EN]: {
+            notFoundSupportingText: richTextOf('Bold and a link', {
+              marks: ['strong'],
+              href: 'https://example.com/help',
+            }),
+          },
         },
       }),
     );
@@ -397,58 +414,74 @@ describe('voice overrides — RICH fields', () => {
     const result = expectFieldErrors(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
-        voiceOverrides: {
-          notFoundSupportingText: richTextOf('Underlined text', {
-            marks: ['underline'],
-          }),
+        voiceOverridesByLocale: {
+          [LOCALE_ISO_CODES.EN]: {
+            notFoundSupportingText: richTextOf('Underlined text', {
+              marks: ['underline'],
+            }),
+          },
         },
       }),
     );
 
-    expect(result.fieldErrors.notFoundSupportingText).toMatch(/mark/i);
+    expect(
+      result.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.notFoundSupportingText,
+    ).toMatch(/mark/i);
   });
 
   it('rejects rich text carrying a disallowed style', async () => {
     const result = expectFieldErrors(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
-        voiceOverrides: {
-          notFoundSupportingText: richTextOf('A heading', { style: 'h2' }),
+        voiceOverridesByLocale: {
+          [LOCALE_ISO_CODES.EN]: {
+            notFoundSupportingText: richTextOf('A heading', { style: 'h2' }),
+          },
         },
       }),
     );
 
-    expect(result.fieldErrors.notFoundSupportingText).toMatch(/style/i);
+    expect(
+      result.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.notFoundSupportingText,
+    ).toMatch(/style/i);
   });
 
   it('rejects rich text whose link href does not pass sanitizeHref', async () => {
     const result = expectFieldErrors(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
-        voiceOverrides: {
-          notFoundSupportingText: richTextOf('Click here', {
-            marks: ['link-1'],
-            href: 'javascript:alert(1)',
-          }),
+        voiceOverridesByLocale: {
+          [LOCALE_ISO_CODES.EN]: {
+            notFoundSupportingText: richTextOf('Click here', {
+              marks: ['link-1'],
+              href: 'javascript:alert(1)',
+            }),
+          },
         },
       }),
     );
 
-    expect(result.fieldErrors.notFoundSupportingText).toMatch(/link/i);
+    expect(
+      result.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.notFoundSupportingText,
+    ).toMatch(/link/i);
   });
 
   it('clears a previously-set rich override when resubmitted empty', async () => {
     await upsertSiteConfig(tenantId, {
       ...baseInput,
-      voiceOverrides: {
-        notFoundSupportingText: richTextOf('Custom description.'),
+      voiceOverridesByLocale: {
+        [LOCALE_ISO_CODES.EN]: {
+          notFoundSupportingText: richTextOf('Custom description.'),
+        },
       },
     });
 
     const result = expectOk(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
-        voiceOverrides: { notFoundSupportingText: [] },
+        voiceOverridesByLocale: {
+          [LOCALE_ISO_CODES.EN]: { notFoundSupportingText: [] },
+        },
       }),
     );
 
@@ -467,7 +500,11 @@ describe('voice overrides — RICH fields accept a plain string', () => {
     const result = expectOk(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
-        voiceOverrides: { notFoundSupportingText: 'Try the homepage instead.' },
+        voiceOverridesByLocale: {
+          [LOCALE_ISO_CODES.EN]: {
+            notFoundSupportingText: 'Try the homepage instead.',
+          },
+        },
       }),
     );
 
@@ -489,7 +526,9 @@ describe('voice overrides — RICH fields accept a plain string', () => {
     const result = expectOk(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
-        voiceOverrides: { notFoundSupportingText: '   ' },
+        voiceOverridesByLocale: {
+          [LOCALE_ISO_CODES.EN]: { notFoundSupportingText: '   ' },
+        },
       }),
     );
 
@@ -502,18 +541,26 @@ describe('voice overrides — RICH fields accept a plain string', () => {
     const coerced = expectFieldErrors(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
-        voiceOverrides: { notFoundSupportingText: overlong },
+        voiceOverridesByLocale: {
+          [LOCALE_ISO_CODES.EN]: { notFoundSupportingText: overlong },
+        },
       }),
     );
     const authored = expectFieldErrors(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
-        voiceOverrides: { notFoundSupportingText: richTextOf(overlong) },
+        voiceOverridesByLocale: {
+          [LOCALE_ISO_CODES.EN]: {
+            notFoundSupportingText: richTextOf(overlong),
+          },
+        },
       }),
     );
 
-    expect(coerced.fieldErrors.notFoundSupportingText).toBe(
-      authored.fieldErrors.notFoundSupportingText,
+    expect(
+      coerced.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.notFoundSupportingText,
+    ).toBe(
+      authored.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.notFoundSupportingText,
     );
   });
 
@@ -521,37 +568,47 @@ describe('voice overrides — RICH fields accept a plain string', () => {
     const result = expectFieldErrors(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
-        voiceOverrides: {
-          topicEmpty: 'Nothing published under this topic yet.',
+        voiceOverridesByLocale: {
+          [LOCALE_ISO_CODES.EN]: {
+            topicEmpty: 'Nothing published under this topic yet.',
+          },
         },
       }),
     );
 
-    expect(result.fieldErrors.topicEmpty).toMatch(/missing/i);
-    expect(result.fieldErrors.topicEmpty).toContain('{name}');
+    expect(result.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.topicEmpty).toMatch(
+      /missing/i,
+    );
+    expect(
+      result.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.topicEmpty,
+    ).toContain('{name}');
   });
 
   it('still rejects a non-string, non-array value', async () => {
     const result = expectFieldErrors(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
-        voiceOverrides: {
-          notFoundSupportingText: 42 as unknown as string,
+        voiceOverridesByLocale: {
+          [LOCALE_ISO_CODES.EN]: {
+            notFoundSupportingText: 42 as unknown as string,
+          },
         },
       }),
     );
 
-    expect(result.fieldErrors.notFoundSupportingText).toBe(
-      'Must be rich text.',
-    );
+    expect(
+      result.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.notFoundSupportingText,
+    ).toBe('Must be rich text.');
   });
 
   it('trims a whitespace-padded string before storing it', async () => {
     const result = expectOk(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
-        voiceOverrides: {
-          notFoundSupportingText: '  Try the homepage instead.  \n',
+        voiceOverridesByLocale: {
+          [LOCALE_ISO_CODES.EN]: {
+            notFoundSupportingText: '  Try the homepage instead.  \n',
+          },
         },
       }),
     );
@@ -571,7 +628,9 @@ describe('voice overrides — RICH fields accept a plain string', () => {
     const result = expectOk(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
-        voiceOverrides: { notFoundSupportingText: `  ${atCap}  ` },
+        voiceOverridesByLocale: {
+          [LOCALE_ISO_CODES.EN]: { notFoundSupportingText: `  ${atCap}  ` },
+        },
       }),
     );
 
@@ -588,13 +647,15 @@ describe('voice overrides — RICH fields accept a plain string', () => {
     const result = expectFieldErrors(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
-        voiceOverrides: { notFoundSupportingText: `  ${overCap}  ` },
+        voiceOverridesByLocale: {
+          [LOCALE_ISO_CODES.EN]: { notFoundSupportingText: `  ${overCap}  ` },
+        },
       }),
     );
 
-    expect(result.fieldErrors.notFoundSupportingText).toBe(
-      'Must be 300 characters or fewer.',
-    );
+    expect(
+      result.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.notFoundSupportingText,
+    ).toBe('Must be 300 characters or fewer.');
   });
 });
 
@@ -609,34 +670,48 @@ describe('voice overrides — placeholders', () => {
     const result = expectFieldErrors(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
-        voiceOverrides: {
-          topicEmpty: richTextOf('Nothing published under this topic yet.'),
+        voiceOverridesByLocale: {
+          [LOCALE_ISO_CODES.EN]: {
+            topicEmpty: richTextOf('Nothing published under this topic yet.'),
+          },
         },
       }),
     );
 
-    expect(result.fieldErrors.topicEmpty).toMatch(/missing/i);
-    expect(result.fieldErrors.topicEmpty).toContain('{name}');
+    expect(result.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.topicEmpty).toMatch(
+      /missing/i,
+    );
+    expect(
+      result.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.topicEmpty,
+    ).toContain('{name}');
   });
 
   it('rejects a value carrying a placeholder token the registry does not declare', async () => {
     const result = expectFieldErrors(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
-        voiceOverrides: { notFoundHeading: 'Lost, {name}?' },
+        voiceOverridesByLocale: {
+          [LOCALE_ISO_CODES.EN]: { notFoundHeading: 'Lost, {name}?' },
+        },
       }),
     );
 
-    expect(result.fieldErrors.notFoundHeading).toMatch(/unknown/i);
-    expect(result.fieldErrors.notFoundHeading).toContain('{name}');
+    expect(
+      result.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.notFoundHeading,
+    ).toMatch(/unknown/i);
+    expect(
+      result.fieldErrorsByLocale[LOCALE_ISO_CODES.EN]?.notFoundHeading,
+    ).toContain('{name}');
   });
 
   it('accepts a value that includes every placeholder the registry declares', async () => {
     const result = expectOk(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
-        voiceOverrides: {
-          topicEmpty: richTextOf('Nothing published under {name} yet.'),
+        voiceOverridesByLocale: {
+          [LOCALE_ISO_CODES.EN]: {
+            topicEmpty: richTextOf('Nothing published under {name} yet.'),
+          },
         },
       }),
     );
@@ -672,56 +747,6 @@ describe('per-language voice overrides', () => {
     expect(result.voiceOverrides).toEqual({});
   });
 
-  it('leaves every language the save does not carry exactly as stored', async () => {
-    await upsertSiteConfig(tenantId, {
-      ...baseInput,
-      voiceOverridesByLocale: {
-        [LOCALE_ISO_CODES.DE]: { notFoundHeading: 'Nicht gefunden' },
-        [LOCALE_ISO_CODES.FR]: { notFoundHeading: 'Introuvable' },
-      },
-    });
-
-    const result = expectOk(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
-        voiceOverridesByLocale: {
-          [LOCALE_ISO_CODES.FR]: {},
-          [LOCALE_ISO_CODES.ES]: { notFoundHeading: 'No encontrado' },
-        },
-      }),
-    );
-
-    expect(result.voiceOverridesByLocale).toEqual({
-      [LOCALE_ISO_CODES.DE]: { notFoundHeading: 'Nicht gefunden' },
-      [LOCALE_ISO_CODES.FR]: {},
-      [LOCALE_ISO_CODES.ES]: { notFoundHeading: 'No encontrado' },
-    });
-  });
-
-  it("saves the flat shape under the tenant's default language", async () => {
-    await upsertSiteConfig(tenantId, {
-      ...baseInput,
-      voiceOverridesByLocale: {
-        [LOCALE_ISO_CODES.DE]: { notFoundHeading: 'Nicht gefunden' },
-      },
-    });
-
-    const result = expectOk(
-      await upsertSiteConfig(tenantId, {
-        ...baseInput,
-        voiceOverrides: { notFoundHeading: 'Lost the plot?' },
-      }),
-    );
-
-    expect(result.voiceOverridesByLocale).toEqual({
-      [LOCALE_ISO_CODES.DE]: { notFoundHeading: 'Nicht gefunden' },
-      [LOCALE_ISO_CODES.EN]: { notFoundHeading: 'Lost the plot?' },
-    });
-    expect(result.voiceOverrides).toEqual({
-      notFoundHeading: 'Lost the plot?',
-    });
-  });
-
   it('returns field errors per language and writes nothing', async () => {
     const result = expectFieldErrors(
       await upsertSiteConfig(tenantId, {
@@ -738,29 +763,7 @@ describe('per-language voice overrides', () => {
       [LOCALE_ISO_CODES.EN]: { notFoundHeading: expect.any(String) },
       [LOCALE_ISO_CODES.DE]: { topicEmpty: expect.any(String) },
     });
-    expect(result.fieldErrors).toEqual({
-      notFoundHeading: expect.any(String),
-    });
     expect(await db().select().from(schema.siteConfig)).toEqual([]);
-  });
-
-  it('rejects an unknown language', async () => {
-    await expect(
-      upsertSiteConfig(tenantId, {
-        ...baseInput,
-        voiceOverridesByLocale: { XX: {} } as never,
-      }),
-    ).rejects.toThrow();
-  });
-
-  it('rejects the flat and per-language shapes together', async () => {
-    await expect(
-      upsertSiteConfig(tenantId, {
-        ...baseInput,
-        voiceOverrides: {},
-        voiceOverridesByLocale: { [LOCALE_ISO_CODES.DE]: {} },
-      }),
-    ).rejects.toThrow();
   });
 });
 
@@ -774,7 +777,9 @@ describe('partial updates — omission leaves a field untouched, explicit null c
   it('preserves voice overrides when a later update omits the field entirely', async () => {
     await upsertSiteConfig(tenantId, {
       ...baseInput,
-      voiceOverrides: { notFoundHeading: 'Custom heading' },
+      voiceOverridesByLocale: {
+        [LOCALE_ISO_CODES.EN]: { notFoundHeading: 'Custom heading' },
+      },
     });
 
     const result = expectOk(
@@ -789,11 +794,16 @@ describe('partial updates — omission leaves a field untouched, explicit null c
   it('clears every voice override when explicitly updated with {}', async () => {
     await upsertSiteConfig(tenantId, {
       ...baseInput,
-      voiceOverrides: { notFoundHeading: 'Custom heading' },
+      voiceOverridesByLocale: {
+        [LOCALE_ISO_CODES.EN]: { notFoundHeading: 'Custom heading' },
+      },
     });
 
     const result = expectOk(
-      await upsertSiteConfig(tenantId, { ...baseInput, voiceOverrides: {} }),
+      await upsertSiteConfig(tenantId, {
+        ...baseInput,
+        voiceOverridesByLocale: { [LOCALE_ISO_CODES.EN]: {} },
+      }),
     );
 
     expect(result.voiceOverrides).toEqual({});

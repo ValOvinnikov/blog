@@ -1589,9 +1589,10 @@ backs both. The `voice_overrides` column holds one map per language,
 `{ [locale]: { [fieldId]: value } }` (`voiceOverridesByLocale` in
 `@blog/db`); a save may carry several languages, replaces the map of each
 one it carries, and leaves the others as stored. Until web and platform read per language, `getSiteConfig` also
-returns the tenant's default-language map as a flat `voiceOverrides`, and
-`upsertSiteConfig` still accepts that flat shape, saving it under the default
-language. Each map keys fields as flat camelCase ids (e.g.
+returns the tenant's default-language map as a flat `voiceOverrides`.
+`upsertSiteConfig` accepts only `voiceOverridesByLocale`, and the platform's
+Voice save sends every language with unsaved edits in that one call, so a
+save stores all of them or none. Each map keys fields as flat camelCase ids (e.g.
 `notFoundHeading`), matching `apps/platform`'s Voice tab
 (`apps/platform/src/utils/voice-fields/voice-fields.ts`);
 `apps/web/src/utils/apply-voice-overrides/apply-voice-overrides.ts` maps each
