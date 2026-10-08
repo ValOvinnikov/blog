@@ -1594,7 +1594,11 @@ added to all three to take effect.
 `@blog/config`'s `VOICE_FIELDS` registry (`packages/config/src/voice/`) is the
 declaration those three converge on: it names every editable string with its
 storage id, catalog path, kind and preview surface, alongside a copy of the
-neutral catalog. Its co-located test asserts every registry path resolves in
+neutral catalog. The editable set is bounded to page-level prose an editor
+writes in the site's own voice — the archive and bookmarks empty states and
+the 404 and error pages (surfaces `ARCHIVE`, `BOOKMARKS`, `NOT_FOUND`,
+`ERROR`); buttons, labels, statuses, enforced-behaviour copy, third-party
+names and accessibility-only text stay fixed in the catalog. Its co-located test asserts every registry path resolves in
 the catalog and every catalog key is either registered or explicitly listed as
 fixed, so a new string cannot enter the catalog without being classified.
 
@@ -1709,7 +1713,9 @@ costs convenience, never compliance.
   The footer's "Cookie settings" button reopens it on every tenant, banner or
   not, so withdrawing is as easy as granting.
 - _Copy._ The `consent.*` messages ship in every locale catalog and are
-  registered in `VOICE_FIELDS`, so a tenant can reword them in the Voice tab.
+  fixed (`VOICE_FIXED_KEYS`): they state what the code enforces, and
+  rewording the message would never re-ask visitors who consented under the
+  old wording.
 
 **"Coming soon" capabilities.** A capability that is not finished end to end
 — today `comments` and `ratings` (no public-site implementation) and
