@@ -410,7 +410,7 @@
     "alertError": "Couldn't save this template — try again.",
     "previewHeading": "Preview",
     "previewIframeTitle": "Email preview",
-    "actionLockedNote": "The button below always renders and can't be edited here.",
+    "actionLockedNote": "The buttons and links in the preview are always sent and can't be edited here.",
     "templateTypeLabel": {
       "MAGIC_LINK": "Sign-in link",
       "TENANT_INVITE": "Team invite",

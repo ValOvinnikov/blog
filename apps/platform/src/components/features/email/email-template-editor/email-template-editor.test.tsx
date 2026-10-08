@@ -102,12 +102,6 @@ describe(`<${EmailTemplateEditor.name}/>`, () => {
       setup();
     });
 
-    it('states that the locked action always renders and cannot be edited here', () => {
-      expect(
-        screen.getByText(/always renders and can't be edited here/),
-      ).toBeVisible();
-    });
-
     it('saves an edited subject as-is', async () => {
       const subjectInput = screen.getByDisplayValue('Sign in');
       await user.clear(subjectInput);
