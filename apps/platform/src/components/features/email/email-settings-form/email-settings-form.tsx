@@ -7,10 +7,13 @@ import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
 import { FormTextInput } from '@platform/components/shared/form-text-input';
 import { useToast } from '@platform/context/toast-provider';
-import { updateEmailConfigAction } from '@platform/server/email-config/update-email-config-action';
+import {
+  updateEmailConfigAction,
+  type TUpdateEmailConfigResult,
+} from '@platform/server/email-config/update-email-config-action';
 import { useFormSubmission } from '@platform/utils/use-form-submission/use-form-submission';
 import { useTranslations } from 'next-intl';
-import { useId } from 'react';
+import { useId, useState } from 'react';
 
 import { emailSettingsFormVariants } from './email-settings-form-variants';
 
@@ -34,11 +37,6 @@ const blankToNull = (value: string): string | null => {
   return trimmed === '' ? null : trimmed;
 };
 
-/**
- * Sender name, reply-to address and footer postal address — the fields
- * `site_config` has no home for. A blank field reverts to the product
- * default on save, same convention as the Voice tab's overrides.
- */
 export const EmailSettingsForm = ({
   tenantId,
   initialValues,
@@ -51,16 +49,22 @@ export const EmailSettingsForm = ({
   const senderNameId = useId();
   const replyToId = useId();
   const footerAddressId = useId();
+  const [senderNameError, setSenderNameError] = useState<string>();
 
   const { values, setValues, status, isPending, handleSubmit } =
-    useFormSubmission<TEmailSettingsFormValues, { ok: boolean }>({
+    useFormSubmission<TEmailSettingsFormValues, TUpdateEmailConfigResult>({
       initialValues,
-      onSubmit: (vals) =>
-        updateEmailConfigAction(tenantId, {
+      onSubmit: async (vals) => {
+        const result = await updateEmailConfigAction(tenantId, {
           senderName: blankToNull(vals.senderName),
           replyToAddress: blankToNull(vals.replyToAddress),
           footerPostalAddress: blankToNull(vals.footerPostalAddress),
-        }),
+        });
+        setSenderNameError(
+          result.ok ? undefined : result.fieldErrors?.senderName,
+        );
+        return result;
+      },
       onSuccess: () => {
         toast.success({
           message: t('alertSuccess'),
@@ -70,6 +74,10 @@ export const EmailSettingsForm = ({
 
   const { stack, footer } = emailSettingsFormVariants();
   const archivedDescribedBy = isArchived ? archivedNoticeId : undefined;
+  const senderNameDescribedBy =
+    [archivedDescribedBy, senderNameError ? `${senderNameId}-error` : null]
+      .filter(Boolean)
+      .join(' ') || undefined;
 
   return (
     <Card>
@@ -80,19 +88,22 @@ export const EmailSettingsForm = ({
       />
       <Card.Body>
         <div className={stack()}>
-          {status === 'error' && (
+          {status === 'error' && !senderNameError && (
             <Alert type={ALERT_TYPE.ERROR} title={t('alertError')} />
           )}
           <FormTextInput
             label={t('senderNameLabel')}
             htmlFor={senderNameId}
             hint={t('senderNameHint')}
+            error={senderNameError}
+            isInvalid={senderNameError !== undefined}
             value={values.senderName}
-            onChange={(value) =>
-              setValues((prev) => ({ ...prev, senderName: value }))
-            }
+            onChange={(value) => {
+              setSenderNameError(undefined);
+              setValues((prev) => ({ ...prev, senderName: value }));
+            }}
             isDisabled={isPending || isArchived}
-            aria-describedby={archivedDescribedBy}
+            aria-describedby={senderNameDescribedBy}
           />
           <FormTextInput
             label={t('replyToLabel')}

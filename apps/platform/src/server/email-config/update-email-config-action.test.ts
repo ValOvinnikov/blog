@@ -57,6 +57,44 @@ describe(updateEmailConfigAction, () => {
     expect(requireTenantMembership).not.toHaveBeenCalled();
   });
 
+  it.each([
+    'Acme <evil@attacker.example>',
+    'support@acme.example',
+    'Acme\r\nBcc: victim@example.com',
+    'Acme "Support"',
+    'Acme, Inc',
+    'Acme; Support',
+  ])(
+    'rejects %j as a sender name with a field error explaining it is a display name, and writes nothing',
+    async (senderName) => {
+      const result = await updateEmailConfigAction('tenant-1', {
+        ...VALID_INPUT,
+        senderName,
+      });
+
+      expect(result).toEqual({
+        ok: false,
+        fieldErrors: {
+          senderName: expect.stringContaining('not an email address'),
+        },
+      });
+      expect(requireTenantMembership).not.toHaveBeenCalled();
+      expect(upsertEmailConfigMock).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each(["Acme & Co's Newsletter", 'Café Müller', 'Acme (Support)'])(
+    'accepts %j as a sender name',
+    async (senderName) => {
+      const result = await updateEmailConfigAction('tenant-1', {
+        ...VALID_INPUT,
+        senderName,
+      });
+
+      expect(result).toEqual({ ok: true });
+    },
+  );
+
   it('accepts explicit nulls as "revert to product default"', async () => {
     const result = await updateEmailConfigAction('tenant-1', {
       senderName: null,

@@ -370,6 +370,7 @@
     "description": "Se aplica a todos los correos que envía este cliente. Los campos en blanco usan el valor predeterminado del producto.",
     "senderNameLabel": "Nombre del remitente",
     "senderNameHint": "El nombre visible en la dirección del remitente; no tiene relación con el título del sitio.",
+    "senderNameInvalidError": "Es el nombre que ven los destinatarios, no una dirección de correo. Introduzca un nombre como Acme Co, sin < > \" , ; ni @.",
     "replyToLabel": "Dirección de respuesta",
     "replyToHint": "Adónde se dirigen las respuestas a cualquier correo del cliente.",
     "footerAddressLabel": "Dirección postal del pie",

@@ -370,6 +370,7 @@
     "description": "Applies to every email this tenant sends. Blank fields fall back to the product default.",
     "senderNameLabel": "Sender name",
     "senderNameHint": "The display name on the From address — unrelated to the site title.",
+    "senderNameInvalidError": "This is the name recipients see, not an email address. Enter a name such as Acme Co, without < > \" , ; or @.",
     "replyToLabel": "Reply-to address",
     "replyToHint": "Where a reply to any tenant email is routed.",
     "footerAddressLabel": "Footer postal address",

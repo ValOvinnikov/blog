@@ -370,6 +370,7 @@
     "description": "Geldt voor elke e-mail die deze tenant verstuurt. Lege velden vallen terug op de productstandaard.",
     "senderNameLabel": "Naam afzender",
     "senderNameHint": "De weergavenaam bij het Van-adres — staat los van de sitetitel.",
+    "senderNameInvalidError": "Dit is de naam die ontvangers zien, geen e-mailadres. Vul een naam in zoals Acme Co, zonder < > \" , ; of @.",
     "replyToLabel": "Antwoordadres",
     "replyToHint": "Waar een antwoord op een e-mail van de tenant naartoe gaat.",
     "footerAddressLabel": "Postadres in voettekst",
