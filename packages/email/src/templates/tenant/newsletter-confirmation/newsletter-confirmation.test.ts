@@ -1,4 +1,4 @@
-import type { TTenantEmailBrand } from '@blog/email/html/tenant-shell';
+import type { TTenantEmailBrand } from '@blog/email/html/tenant-shell/tenant-shell';
 import type { TPortableTextContent } from '@blog/email/portable-text';
 import { TENANT_EMAIL_BRAND as BRAND } from '@blog/email/testing/tenant-email-brand';
 

@@ -1,7 +1,6 @@
+import { FONT_STACK } from '@blog/email/html/email-layout/email-layout';
+import { escapeHtml } from '@blog/email/html/escape-html/escape-html';
 import { sanitizeHref } from '@blog/utils';
-
-import { FONT_STACK } from './email-layout';
-import { escapeHtml } from './escape-html';
 
 export type TEmailAction = {
   label: string;

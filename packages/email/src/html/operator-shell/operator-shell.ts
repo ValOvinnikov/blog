@@ -1,5 +1,5 @@
-import { renderEmailShell } from './email-layout';
-import { PLATFORM_EMAIL_BRAND } from './platform-email-brand';
+import { renderEmailShell } from '@blog/email/html/email-layout/email-layout';
+import { PLATFORM_EMAIL_BRAND } from '@blog/email/html/platform-email-brand/platform-email-brand';
 
 const OPERATOR_BRAND_NAME = 'Tenant Alerts';
 

@@ -1,5 +1,6 @@
+import { PLATFORM_EMAIL_BRAND } from '@blog/email/html/platform-email-brand/platform-email-brand';
+
 import { buildOperatorShell } from './operator-shell';
-import { PLATFORM_EMAIL_BRAND } from './platform-email-brand';
 
 describe('buildOperatorShell', () => {
   it('wraps the given body HTML in a full HTML document', () => {
