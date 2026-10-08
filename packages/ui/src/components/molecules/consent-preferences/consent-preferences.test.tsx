@@ -1,4 +1,8 @@
-import { customRender, screen } from '@blog/ui/testing/custom-render';
+import {
+  customRender,
+  renderElement,
+  screen,
+} from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
 import userEvent from '@testing-library/user-event';
 import type { Mock } from 'vitest';
@@ -18,6 +22,12 @@ const necessaryDescription = faker.lorem.sentence();
 const analyticsLabel = faker.word.noun();
 const analyticsDescription = faker.lorem.sentence();
 
+const analyticsCategory: IConsentCategory = {
+  id: 'analytics',
+  label: analyticsLabel,
+  description: analyticsDescription,
+};
+
 const categories: IConsentCategory[] = [
   {
     id: 'necessary',
@@ -25,11 +35,7 @@ const categories: IConsentCategory[] = [
     description: necessaryDescription,
     isLocked: true,
   },
-  {
-    id: 'analytics',
-    label: analyticsLabel,
-    description: analyticsDescription,
-  },
+  analyticsCategory,
 ];
 
 const values: Record<string, boolean> = {
@@ -163,5 +169,51 @@ describe(`<${ConsentPreferences.name}/>`, () => {
   it('forwards dataTestId to the root element', () => {
     setup({ dataTestId: 'consent-preferences' });
     expect(screen.getByTestId('consent-preferences')).toBeVisible();
+  });
+
+  it('names and describes each switch by its own row when two preference panels share category ids', () => {
+    const otherLabel = faker.lorem.words(2);
+    const otherDescription = faker.lorem.sentence();
+    renderElement(
+      <>
+        <ConsentPreferences
+          headingLevel={2}
+          heading={heading}
+          categories={[analyticsCategory]}
+          values={values}
+          onCategoryChange={vi.fn()}
+          saveLabel={saveLabel}
+          onSave={vi.fn()}
+        />
+        <ConsentPreferences
+          headingLevel={2}
+          heading={heading}
+          categories={[
+            {
+              id: 'analytics',
+              label: otherLabel,
+              description: otherDescription,
+            },
+          ]}
+          values={values}
+          onCategoryChange={vi.fn()}
+          saveLabel={saveLabel}
+          onSave={vi.fn()}
+        />
+      </>,
+    );
+
+    expect(
+      screen.getByRole('switch', {
+        name: analyticsLabel,
+        description: analyticsDescription,
+      }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole('switch', {
+        name: otherLabel,
+        description: otherDescription,
+      }),
+    ).toBeVisible();
   });
 });

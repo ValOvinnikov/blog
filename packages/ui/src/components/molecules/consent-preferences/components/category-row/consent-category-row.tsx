@@ -1,11 +1,11 @@
 import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import { Switch } from '@blog/ui/components/atoms/switch';
+import { useId } from 'react';
 
 import { consentCategoryRowVariants } from './consent-category-row-variants';
 
 export type TConsentCategoryRowProps = IWithClassName &
   IWithDataTestId & {
-    id: string;
     label: string;
     description: string;
     isChecked: boolean;
@@ -15,9 +15,7 @@ export type TConsentCategoryRowProps = IWithClassName &
 
 const s = consentCategoryRowVariants();
 
-/** One row of a `ConsentPreferences` dialog: a category's label, description and switch. */
 export const ConsentCategoryRow = ({
-  id,
   label,
   description,
   isChecked,
@@ -26,6 +24,7 @@ export const ConsentCategoryRow = ({
   className,
   dataTestId,
 }: TConsentCategoryRowProps) => {
+  const id = useId();
   const labelId = `${id}-label`;
   const descriptionId = `${id}-description`;
 
