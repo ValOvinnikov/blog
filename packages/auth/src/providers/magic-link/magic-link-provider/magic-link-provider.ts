@@ -1,3 +1,15 @@
+import { applyTenantSenderName } from '@blog/auth/providers/magic-link/apply-tenant-sender-name/apply-tenant-sender-name';
+import {
+  findPendingInviteTenants,
+  type TPendingInviteTenant,
+} from '@blog/auth/providers/magic-link/find-pending-invite-tenants/find-pending-invite-tenants';
+import { readRecipientLocale } from '@blog/auth/providers/magic-link/read-recipient-locale/read-recipient-locale';
+import { resolveMagicLinkEmailSettings } from '@blog/auth/providers/magic-link/resolve-magic-link-email-settings/resolve-magic-link-email-settings';
+import { resolveMagicLinkFromAddress } from '@blog/auth/providers/magic-link/resolve-magic-link-from-address/resolve-magic-link-from-address';
+import {
+  resolveTenantEmailIdentity,
+  type TResolvedTenantEmailIdentity,
+} from '@blog/auth/providers/magic-link/resolve-tenant-email-identity/resolve-tenant-email-identity';
 import { env } from '@blog/auth/utils/env/env';
 import {
   EMAIL_TEMPLATE_TYPE,
@@ -11,19 +23,6 @@ import {
   sendEmail,
 } from '@blog/email';
 import type { EmailConfig } from 'next-auth/providers/email';
-
-import { applyTenantSenderName } from './apply-tenant-sender-name';
-import {
-  findPendingInviteTenants,
-  type TPendingInviteTenant,
-} from './find-pending-invite-tenants';
-import { readRecipientLocale } from './read-recipient-locale';
-import { resolveMagicLinkEmailSettings } from './resolve-magic-link-email-settings';
-import { resolveMagicLinkFromAddress } from './resolve-magic-link-from-address';
-import {
-  resolveTenantEmailIdentity,
-  type TResolvedTenantEmailIdentity,
-} from './resolve-tenant-email-identity';
 
 export function buildMagicLinkProvider(): EmailConfig {
   const from = resolveMagicLinkFromAddress(env.MAGIC_LINK_FROM_ADDRESS);

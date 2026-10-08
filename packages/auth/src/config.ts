@@ -2,7 +2,7 @@ import 'server-only';
 
 import { DrizzleAdapter } from '@auth/drizzle-adapter';
 import { consumePendingInvitesOnSignIn } from '@blog/auth/events/consume-pending-invites-on-sign-in';
-import { buildMagicLinkProvider } from '@blog/auth/providers/magic-link/magic-link-provider';
+import { buildMagicLinkProvider } from '@blog/auth/providers/magic-link/magic-link-provider/magic-link-provider';
 import { env } from '@blog/auth/utils/env/env';
 import { getOAuthProviderCredentials } from '@blog/auth/utils/oauth-providers/oauth-providers';
 import { getDb, schema } from '@blog/db';
