@@ -110,11 +110,25 @@ Two tasks, delivered in order:
   restricted to bold, italic, link and plain paragraphs. Labels, buttons,
   titles and placeholders stay single-line strings. No new dependency:
   `@portabletext/editor` (MIT) is already installed for email templates.
-- **D7 — The preview is an iframe of the real site.** `apps/platform` may not
-  import `apps/web`, and most Voice copy lives in web-owned compositions, so
-  re-composing a preview in the platform would approximate and drift. The
-  web app exposes a token-gated preview route that renders one surface with
-  fixture data and draft overrides pushed by `postMessage`.
+- **D7 (revised 2026-10-08) — The preview renders `@blog/ui` specimens
+  inside the platform.** The Voice page previews each surface with the same
+  `@blog/ui` atoms the site passes that copy into (`Eyebrow`, `Heading`,
+  `Text`, `Button`, `LinkButton`). They are themed through the token path the
+  Look preview already uses and fed straight from the form's draft state.
+  - `apps/web` carries no preview code: no route, no proxy branch, no
+    framing carve-out in the security headers both apps share, no token, no
+    env var and no `postMessage` channel.
+  - The layout around the atoms is a platform copy with nothing to catch
+    drift. Fidelity is best-effort, the trade already accepted for the
+    archive empty states.
+
+  **Superseded:** "the preview is an iframe of the real site", a token-gated
+  `apps/web` route rendering every surface from fixtures (#2757). D15 leaves
+  11 fields on four simple surfaces. For those, the route's machinery bought
+  little fidelity that a specimen does not: a proxy carve-out on every
+  request, an `X-Frame-Options`/`frame-ancestors` carve-out in the shared
+  preset, HMAC tokens and a new env var.
+
 - **D8 — Voice page layout is variant A of the mock** (fields by surface on
   the left, sticky live preview on the right that follows focus), plus
   per-surface change counts borrowed from variant C.
@@ -425,29 +439,39 @@ string>> }` so the page can show them inline.
   `notFound.supportingText` (a `portableTextToPlainText` helper in
   `@blog/config`).
 
-### Preview route (`apps/web`)
+### Preview (`apps/platform`, D7)
 
-`apps/web/src/app/[tenant]/preview/voice/[surface]/page.tsx`, a sibling of
-`[locale]` so it inherits `ThemeScope` and fonts without the site header and
-footer. Locale is the tenant default.
-
-- **Fixtures, not data.** Each of the four D15 surfaces renders from
-  fixture props: `NotFoundPage`, the error page, and the archive and
-  bookmarks empty states as stacked styled text.
-- **Draft channel.** A client island wraps the surface in
-  `NextIntlClientProvider` + `VoiceRichProvider`, listens for
-  `{ type: 'voice-draft', overrides }` messages from the platform origin, and
-  re-renders with the merged messages. Elements bound to a field carry
-  `data-voice-key`; a `{ type: 'voice-focus', id }` message outlines them.
-- **Security.** The URL carries `?token=` — an HMAC over
-  `voice-preview:<tenantId>:<expiresAt>` using `SITE_CONFIG_REVALIDATE_SECRET`
-  (already shared by both apps), ten-minute expiry, compared with
-  `isSecretMatch`; the route checks the token's tenant against the
-  host-resolved tenant and 404s on mismatch or expiry. It sets
-  `robots: noindex`, `Content-Security-Policy: frame-ancestors
-<PLATFORM_APP_URL>`, and ignores `postMessage` from any other origin.
-  `PLATFORM_APP_URL` is a new optional web env var (`turbo.json`,
-  `docs/context/environment-variables.md`); absent, the route 404s.
+- **Two specimens.**
+  - _Page hero_ for `NOT_FOUND` and `ERROR`: `Eyebrow` (left out when
+    blank), `Heading` at hero size, `Text`, and the page's fixed actions as
+    `LinkButton`/`Button`. Those are "Return home" for the 404, and "Try
+    again" / "Go home" for the error page.
+  - _Empty states_ for `ARCHIVE` and `BOOKMARKS`: the six messages as muted
+    `Text`, stacked with dividers, with `{name}` filled from a sample topic
+    or tag.
+- **Where it lives.** The platform's single `@blog/ui` exception widens from
+  `look/look-preview/preview-sample/` to one shared
+  `apps/platform/src/components/features/site-preview/` directory. It holds
+  both the Look sample and the Voice specimens and is still one
+  ESLint-guarded directory. `configs/eslint/platform.js`, `CLAUDE.md`,
+  `SPEC.md`, `.claude/agents/platform-app.md` and
+  `docs/context/frontend-conventions.md` name the new path in the same PR
+  that moves it.
+- **Theme.** The `theme-preview-tokens` builders
+  (`apps/platform/src/utils/theme-preview-tokens/`) plus the tenant's font
+  variables, with the light/dark toggle the Look preview has.
+- **Drafts.** Each field shows the draft value for the selected language
+  (D16), else that language's catalog default from `SITE_MESSAGES_BY_LOCALE`
+  (`@blog/config`). The fixed action labels come from the same catalog.
+- **Rich values.** A small platform renderer handles exactly the
+  `VOICE_PORTABLE_TEXT_SCHEMA` marks (bold, italic, link). `@blog/ui` has no
+  Portable Text renderer, and the platform may not import `apps/web`'s.
+- **Focus.** Each field's element sits in a platform-owned wrapper carrying
+  `data-voice-key`. Focusing a field shows its specimen and outlines the
+  wrapper, and no `@blog/ui` prop widens for it.
+- **Completeness.** The specimens' field map is typed
+  `Record<TVoiceFieldId, …>`, so registering a field without placing it
+  fails type-check.
 
 ### Voice page (`apps/platform`)
 
@@ -467,12 +491,10 @@ Layout per D8 and the mock:
   default, a change marker and **Reset** when overridden, placeholder chips
   ("Keep these: `{count}`") when the field has them, and inline field errors
   from the save action.
-- **Right column, sticky:** surface `<select>`, light/dark toggle (as Look),
-  the iframe, and a status line. Focusing a field switches the iframe to that
-  field's surface (250 ms debounce) and posts `voice-focus`; typing posts
-  `voice-draft` (150 ms debounce). If `WEB_APP_URL` is unset or the iframe
-  fails to load, an `Alert` says the preview is unavailable and editing still
-  works. Below 960 px the preview collapses into a toggleable bottom sheet.
+- **Right column, sticky:** a specimen `<select>`, the light/dark toggle
+  (as Look) and the specimen (D7). Focusing a field switches to its specimen
+  and outlines it, and typing re-renders it from the draft. Below 960 px the
+  preview collapses into a toggleable bottom sheet.
 - **Editor:** `PortableTextEditor` gains a `schema` prop (default: the email
   schema) so Voice passes `VOICE_PORTABLE_TEXT_SCHEMA`; the toolbar renders
   only the buttons the schema allows.
@@ -544,21 +566,36 @@ renamed keys.
 `config → db → web → platform-app` for the registry, storage, rendering,
 preview route and page; `studio → service → web` for the newsletter copy.
 
-**Env and docs in the same PRs:** `PLATFORM_APP_URL` in `apps/web` env, turbo
-and `docs/context/environment-variables.md`; `SPEC.md` "Theme-as-content",
-"Voice-as-content" and "Curated UI copy" sections rewritten to this doc's
-final shape; `.claude/agents/web.md` and `platform-app.md` gain the preview
-route and Voice page conventions; this spec is deleted in the PR that syncs
-`SPEC.md`.
+**Amendment (2026-10-08) — remaining delivery.** The preview route (#2757)
+is not built (D7). The rest lands one layer at a time, each merged before
+the next starts:
 
-**Verification** per PR: `pnpm type-check && pnpm lint && pnpm test && pnpm
-knip`, `pnpm gen:ui-index:check` for `packages/ui` PRs,
-`pnpm check:turbo-env-sync` for the env PR, `pnpm check:voice-sync` wherever
-voice keys change until Phase 2 retires it, `pnpm typegen` diff-minimal for the Studio PRs. The
-preview route gets an e2e smoke test: load with a valid token, post a draft,
-assert the outlined element's text changed.
+1. `web`, `prio:now`: a confirmed fix so overrides reach server-rendered
+   strings (see Rendering). It ships first and stands alone.
+2. `config`: the D15 scope cut and D18's "Contents". This one PR also edits
+   the `web` and `db` tests that name a moved id, so it merges green alone.
+3. `config` + `platform-app`: retire `notFoundReturnHome` in one PR, because
+   the platform's field list has to drop it in the same change (D15).
+4. D16 per-language overrides, through `config → db → web → platform-app`,
+   expand/contract so each PR merges green alone.
+5. #2911 is rescoped to the three surviving `RICH` sinks outside the empty
+   states: `notFoundSupportingText`, `localeErrorDescription` and
+   `bookmarksEmpty`.
+6. `platform-app`, #2758 rescoped: the `site-preview/` move, then the
+   editor, then the specimens.
+7. D17 runs as its own `studio → service → web` chain, parallel to all of
+   the above.
+
+**Env and docs in the same PRs:** `SPEC.md` "Theme-as-content",
+"Voice-as-content", "Curated UI copy" and the cookie-consent "Copy" bullet
+are rewritten to this doc's final shape. `.claude/agents/platform-app.md`
+gains the Voice page and specimen conventions. This spec is deleted in the
+PR that syncs `SPEC.md`.
+
+**Verification** per PR: `pnpm verify`, plus `pnpm typegen` diff-minimal for
+the Studio PRs.
 
 ## Later (recorded, not scoped)
 
-- Click-to-edit from the preview (variant B): the `data-voice-key` attributes
-  and the `postMessage` channel already carry what it needs.
+- Click-to-edit from the preview (variant B): the specimens' `data-voice-key`
+  wrappers already carry what it needs.
