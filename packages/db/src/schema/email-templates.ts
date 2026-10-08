@@ -22,6 +22,7 @@ export type TEmailTemplateBlock = {
 // One row per (tenant, template type, language). `subject`/`body` are
 // nullable: an absent field falls back through the tenant's default language
 // to the product default in the requested language (see `getEmailTemplate`).
+// The logo override is not per language, so it lives in `emailTemplateLogos`.
 export const emailTemplates = pgTable(
   'email_templates',
   {
@@ -32,7 +33,6 @@ export const emailTemplates = pgTable(
     locale: localeCodeEnum('locale').notNull(),
     subject: text('subject'),
     body: jsonb('body').$type<TEmailTemplateBlock[]>(),
-    logoAssetUrl: text('logo_asset_url'),
     createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { mode: 'date' })
       .notNull()
@@ -51,3 +51,24 @@ export const emailTemplates = pgTable(
 );
 
 export type TEmailTemplateRow = typeof emailTemplates.$inferSelect;
+
+export const emailTemplateLogos = pgTable(
+  'email_template_logos',
+  {
+    tenantId: uuid('tenant_id')
+      .notNull()
+      .references(() => tenants.id, { onDelete: 'cascade' }),
+    templateType: text('template_type').notNull().$type<TEmailTemplateType>(),
+    logoAssetUrl: text('logo_asset_url').notNull(),
+    createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { mode: 'date' })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  (emailTemplateLogo) => [
+    primaryKey({
+      columns: [emailTemplateLogo.tenantId, emailTemplateLogo.templateType],
+    }),
+  ],
+);

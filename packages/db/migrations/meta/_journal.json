@@ -253,6 +253,13 @@
       "when": 1791448682640,
       "tag": "0035_massive_lucky_pierre",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1791452697623,
+      "tag": "0036_gifted_kang",
+      "breakpoints": true
     }
   ]
 }
