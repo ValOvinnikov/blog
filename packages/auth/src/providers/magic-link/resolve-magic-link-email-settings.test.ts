@@ -1,5 +1,8 @@
-import { EMAIL_TEMPLATE_TYPE } from '@blog/config/constants';
-import { EMAIL_TEMPLATE_DEFAULT_COPY } from '@blog/db/constants';
+import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@blog/config/constants';
+import {
+  EMAIL_TEMPLATE_DEFAULT_COPY,
+  EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE,
+} from '@blog/db/constants';
 
 import { resolveMagicLinkEmailSettings } from './resolve-magic-link-email-settings';
 
@@ -41,6 +44,7 @@ describe(resolveMagicLinkEmailSettings, () => {
     const result = await resolveMagicLinkEmailSettings(
       'tenant-1',
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      LOCALE_ISO_CODES.EN,
     );
 
     expect(result).toEqual({
@@ -63,6 +67,7 @@ describe(resolveMagicLinkEmailSettings, () => {
     const result = await resolveMagicLinkEmailSettings(
       'tenant-1',
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      LOCALE_ISO_CODES.EN,
     );
 
     expect(result.subject).toBe('Welcome back to Acme');
@@ -73,6 +78,7 @@ describe(resolveMagicLinkEmailSettings, () => {
     const result = await resolveMagicLinkEmailSettings(
       'tenant-1',
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      LOCALE_ISO_CODES.EN,
     );
 
     expect(result).toEqual({
@@ -101,6 +107,7 @@ describe(resolveMagicLinkEmailSettings, () => {
     const result = await resolveMagicLinkEmailSettings(
       'tenant-1',
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      LOCALE_ISO_CODES.EN,
     );
 
     expect(result.logoImageUrl).toBe(
@@ -119,6 +126,7 @@ describe(resolveMagicLinkEmailSettings, () => {
     const result = await resolveMagicLinkEmailSettings(
       'tenant-1',
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      LOCALE_ISO_CODES.EN,
     );
 
     expect(result.logoImageUrl).toBe('https://cdn.example.com/tenant-logo.png');
@@ -135,6 +143,7 @@ describe(resolveMagicLinkEmailSettings, () => {
     const result = await resolveMagicLinkEmailSettings(
       'tenant-1',
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      LOCALE_ISO_CODES.EN,
     );
 
     expect(result.replyTo).toBeUndefined();
@@ -152,6 +161,7 @@ describe(resolveMagicLinkEmailSettings, () => {
     const result = await resolveMagicLinkEmailSettings(
       'tenant-1',
       EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      LOCALE_ISO_CODES.EN,
     );
 
     expect(result).toEqual({
@@ -170,12 +180,44 @@ describe(resolveMagicLinkEmailSettings, () => {
     const result = await resolveMagicLinkEmailSettings(
       'tenant-1',
       EMAIL_TEMPLATE_TYPE.TENANT_INVITE,
+      LOCALE_ISO_CODES.EN,
     );
 
     const inviteDefaults =
       EMAIL_TEMPLATE_DEFAULT_COPY[EMAIL_TEMPLATE_TYPE.TENANT_INVITE];
     expect(result.subject).toBe(inviteDefaults.subject);
     expect(result.body).toEqual(inviteDefaults.body);
+  });
+
+  it("looks the template up in the recipient's language", async () => {
+    await resolveMagicLinkEmailSettings(
+      'tenant-1',
+      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      LOCALE_ISO_CODES.FR,
+    );
+
+    expect(getEmailTemplateMock).toHaveBeenCalledWith(
+      'tenant-1',
+      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      LOCALE_ISO_CODES.FR,
+    );
+  });
+
+  it("falls back to the product default in the recipient's language when the template lookup fails", async () => {
+    getEmailTemplateMock.mockRejectedValue(new Error('db error'));
+
+    const result = await resolveMagicLinkEmailSettings(
+      'tenant-1',
+      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      LOCALE_ISO_CODES.DE,
+    );
+
+    const germanDefaults =
+      EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE[LOCALE_ISO_CODES.DE][
+        EMAIL_TEMPLATE_TYPE.MAGIC_LINK
+      ];
+    expect(result.subject).toBe(germanDefaults.subject);
+    expect(result.body).toEqual(germanDefaults.body);
   });
 
   describe('when getEmailConfig fails', () => {
@@ -193,6 +235,7 @@ describe(resolveMagicLinkEmailSettings, () => {
       const result = await resolveMagicLinkEmailSettings(
         'tenant-1',
         EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+        LOCALE_ISO_CODES.EN,
       );
 
       expect(result).toEqual({
@@ -211,6 +254,7 @@ describe(resolveMagicLinkEmailSettings, () => {
       const result = await resolveMagicLinkEmailSettings(
         'tenant-1',
         EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+        LOCALE_ISO_CODES.EN,
       );
 
       expect(result).toEqual({

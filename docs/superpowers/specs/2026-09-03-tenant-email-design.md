@@ -282,7 +282,7 @@ to `db` owning email.
 The magic-link senders were believed to have no tenant context. They do.
 `packages/auth/src/providers/magic-link/magic-link-provider.ts:29-36` already
 extracts `const { host } = new URL(url)` and already performs a database lookup
-inside `sendVerificationRequest` — `findPendingInviteTenantNames(identifier)` —
+inside `sendVerificationRequest` — `findPendingInviteTenants(identifier)` —
 because `packages/auth/package.json:21` depends on `@blog/db`.
 
 So tenant resolution is `getTenantByDomain(host)`, the same lookup
