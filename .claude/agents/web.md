@@ -382,22 +382,36 @@ variants.ts` using `tailwind-variants` (`tv`), classes grouped by concern in
 
 ## Locale (next-intl)
 
-All routes live under `src/app/[locale]/`. The middleware (`src/middleware.ts`)
-uses `localePrefix: 'never'` so the browser URL never shows the locale segment.
-Supported locales and the default are declared in `src/i18n/routing.ts`.
+Every site route lives under `src/app/[tenant]/[locale]/`. Neither segment
+ever appears in the browser URL as written: `src/proxy.ts` resolves the
+tenant from the `Host` header (`resolveTenantRouting`), runs next-intl's
+middleware with that tenant's routing, then rewrites to
+`/<tenantId>/<locale>/…`.
 
-- **Never hardcode a locale string.** In Server Components, read locale from
-  `params`: `const { locale } = await params`. Call `setRequestLocale(locale)`
-  at the top of every layout and page that receives params — required for static
-  rendering.
-- **`generateStaticParams`** must be exported from `[locale]/layout.tsx`:
-  `return routing.locales.map((locale) => ({ locale }))`.
-- Date/number formatting uses next-intl's `useFormatter`/`getFormatter`
-  (`format.dateTime(...)`), which reads locale automatically from the
-  per-request config set up in `i18n/request.ts` — no `locale` argument needs
-  threading down to formatting call sites.
+- **Routing is per tenant.** `buildTenantRouting(defaultLocale, liveLocales)`
+  in `src/i18n/routing.ts` builds it from the tenant row: its default
+  language plus the additional ones it serves. `localePrefix` is `as-needed`
+  — the default language has no prefix, every other one carries its
+  `LOCALE_BCP47_TAGS` prefix (`/nl/…`). The static `routing` export there
+  lists all five locales and is only the superset `hasLocale` checks against;
+  never read a tenant's languages from it.
+- **The proxy owns language redirects.** A prefix for a language the tenant
+  has switched off redirects to the default language; a multi-language
+  tenant redirects a prefix-less request to the visitor's remembered or
+  `Accept-Language` language when that page has a translation. Don't
+  re-implement either in a route.
+- **Never hardcode a locale string, and never call `setRequestLocale`
+  yourself.** Every `[tenant]/[locale]` layout, page and `generateMetadata`
+  calls `enterRequestContext(params)` first; it validates the locale, calls
+  `setRequestLocale`, and loads the tenant. Read `locale`, `defaultLocale`
+  and `liveLocales` from `getRequestContext()`.
+- **`generateStaticParams`** in `[tenant]/[locale]/layout.tsx` returns only
+  `routing.defaultLocale`; content pages return `[]` and render on demand.
+- Date/number formatting uses next-intl's `useFormatter`/`getFormatter`,
+  which reads the locale from the per-request config in `src/i18n/request.ts`
+  — no `locale` argument needs threading down to formatting call sites.
 - **ESLint exception**: `src/app/` is excluded from the `check-file`
-  folder-naming rule (see `apps/web/eslint.config.js`) because Next.js uses
+  folder-naming rule in `configs/eslint/web.js`, because Next.js uses
   `[dynamic]` and `(group)` folder conventions there.
 
 ## Site copy and the Voice editor
