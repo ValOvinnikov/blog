@@ -27,6 +27,7 @@ export type TModuleQueryParams = { id: string } & TLocaleQueryParams;
 
 type TNextFetchOptions = {
   next?: { revalidate?: number | false; tags?: string[] };
+  cache?: 'no-store';
   tenant: TTenantSanityContext;
 };
 
@@ -45,11 +46,11 @@ export async function runQuery<TResult, TQueryConfig extends QueryConfig>(
   builder: IGroqBuilder<TResult, TQueryConfig>,
   options: TNextFetchOptions & TParametersOption<TQueryConfig['parameters']>,
 ): Promise<TResult> {
-  const { parameters, next, tenant } = options;
+  const { parameters, next, cache, tenant } = options;
   const raw: unknown = await getClient(tenant).fetch(
     builder.query,
     { ...buildLocaleQueryParams(tenant), ...parameters },
-    next ? { next } : undefined,
+    cache ? { cache } : next ? { next } : undefined,
   );
   return builder.parse(raw);
 }
