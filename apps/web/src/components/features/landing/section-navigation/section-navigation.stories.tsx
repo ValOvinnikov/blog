@@ -19,3 +19,9 @@ export const Desktop: TStory = {};
 export const Mobile: TStory = {
   globals: { viewport: 'mobile' },
 };
+
+export const CustomTitle: TStory = {
+  args: {
+    sectionNavigation: makeLandingSectionNavigation({ title: 'Guides' }),
+  },
+};
