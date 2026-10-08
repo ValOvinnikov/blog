@@ -410,7 +410,7 @@
     "alertError": "Impossible d'enregistrer ce modèle — veuillez réessayer.",
     "previewHeading": "Aperçu",
     "previewIframeTitle": "Aperçu de l'e-mail",
-    "actionLockedNote": "Le bouton ci-dessous s'affiche toujours et ne peut pas être modifié ici.",
+    "actionLockedNote": "Les boutons et liens de l'aperçu sont toujours envoyés et ne peuvent pas être modifiés ici.",
     "templateTypeLabel": {
       "MAGIC_LINK": "Lien de connexion",
       "TENANT_INVITE": "Invitation à l'équipe",

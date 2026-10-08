@@ -410,7 +410,7 @@
     "alertError": "Dit sjabloon kon niet worden opgeslagen. Probeer het opnieuw.",
     "previewHeading": "Voorbeeld",
     "previewIframeTitle": "E-mailvoorbeeld",
-    "actionLockedNote": "De knop hieronder wordt altijd getoond en kan hier niet worden bewerkt.",
+    "actionLockedNote": "De knoppen en links in het voorbeeld worden altijd meegestuurd en kunnen hier niet worden bewerkt.",
     "templateTypeLabel": {
       "MAGIC_LINK": "Inloglink",
       "TENANT_INVITE": "Teamuitnodiging",

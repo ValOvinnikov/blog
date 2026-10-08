@@ -410,7 +410,7 @@
     "alertError": "No se pudo guardar esta plantilla. Vuelva a intentarlo.",
     "previewHeading": "Vista previa",
     "previewIframeTitle": "Vista previa del correo",
-    "actionLockedNote": "El botón de abajo siempre se muestra y no se puede editar aquí.",
+    "actionLockedNote": "Los botones y enlaces de la vista previa se envían siempre y no se pueden editar aquí.",
     "templateTypeLabel": {
       "MAGIC_LINK": "Enlace de inicio de sesión",
       "TENANT_INVITE": "Invitación al equipo",

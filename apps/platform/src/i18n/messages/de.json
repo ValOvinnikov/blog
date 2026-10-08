@@ -410,7 +410,7 @@
     "alertError": "Diese Vorlage konnte nicht gespeichert werden — bitte erneut versuchen.",
     "previewHeading": "Vorschau",
     "previewIframeTitle": "E-Mail-Vorschau",
-    "actionLockedNote": "Die Schaltfläche unten wird immer angezeigt und kann hier nicht bearbeitet werden.",
+    "actionLockedNote": "Die Schaltflächen und Links in der Vorschau werden immer mitgesendet und können hier nicht bearbeitet werden.",
     "templateTypeLabel": {
       "MAGIC_LINK": "Anmeldelink",
       "TENANT_INVITE": "Teameinladung",
