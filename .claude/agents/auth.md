@@ -37,6 +37,12 @@ All source files live under `packages/auth/src/`. Import across the package
 with the workspace's own-name alias (`@blog/auth/*` → `./src/*`); same-directory
 `./` stays relative, parent-traversal `../` never.
 
+A folder holding more than two modules gives each its own folder:
+`providers/magic-link/magic-link-provider/magic-link-provider.ts` +
+`magic-link-provider.test.ts`, no per-module `index.ts` — the importer reads
+the file directly. A folder with two or fewer modules stays flat; the third
+module to land splits all of them.
+
 ## Start here
 
 When invoked, before writing any code:
