@@ -48,15 +48,9 @@ const { elevateTenantOwnerMock } = vi.hoisted(() => ({
 const { notifyOwnerElevationOutcomeMock } = vi.hoisted(() => ({
   notifyOwnerElevationOutcomeMock: vi.fn(),
 }));
-const { seedEmailTemplateDefaultsMock } = vi.hoisted(() => ({
-  seedEmailTemplateDefaultsMock: vi.fn(),
-}));
 
 vi.mock('@blog/db/queries/tenants', () => ({
   reactivateTenant: reactivateTenantMock,
-}));
-vi.mock('@blog/db/queries/email-templates', () => ({
-  seedEmailTemplateDefaults: seedEmailTemplateDefaultsMock,
 }));
 vi.mock(
   '@blog/db/utils/sanity-management-client/sanity-management-client',
@@ -137,7 +131,6 @@ beforeEach(() => {
   verifyTenantSeededContentMock.mockReset().mockResolvedValue(undefined);
   elevateTenantOwnerMock.mockReset().mockResolvedValue('PENDING_ACCEPTANCE');
   notifyOwnerElevationOutcomeMock.mockReset().mockResolvedValue(undefined);
-  seedEmailTemplateDefaultsMock.mockReset().mockResolvedValue(undefined);
 });
 
 describe(runSteps, () => {
@@ -238,7 +231,6 @@ describe(runSteps, () => {
 
     expect(result).toEqual({ ok: false });
     expect(elevateTenantOwnerMock).not.toHaveBeenCalled();
-    expect(seedEmailTemplateDefaultsMock).not.toHaveBeenCalled();
 
     const lastCall = reportStepStatusMock.mock.calls.at(-1) as [
       { step: string; status: string; error: string },
@@ -279,23 +271,6 @@ describe(runSteps, () => {
     await runSteps('tenant-1', env);
 
     expect(unarchiveSanityProjectMock).not.toHaveBeenCalled();
-  });
-
-  it('seeds default email-template copy once every core step succeeds', async () => {
-    const result = await runSteps('tenant-1', env);
-
-    expect(result).toEqual({ ok: true });
-    expect(seedEmailTemplateDefaultsMock).toHaveBeenCalledWith('tenant-1');
-  });
-
-  it('still reports ok:true when seeding email-template defaults throws', async () => {
-    seedEmailTemplateDefaultsMock.mockRejectedValue(
-      new Error('seed defaults failed'),
-    );
-
-    const result = await runSteps('tenant-1', env);
-
-    expect(result).toEqual({ ok: true });
   });
 
   it('elevates the tenant owner once every core step succeeds', async () => {
@@ -390,12 +365,6 @@ describe(runSteps, () => {
         status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
         error: 'seed failed',
       });
-    });
-
-    it('never seeds email-template copy when an earlier step fails', async () => {
-      await runSteps('tenant-1', env);
-
-      expect(seedEmailTemplateDefaultsMock).not.toHaveBeenCalled();
     });
 
     it('never notifies when an earlier step fails', async () => {

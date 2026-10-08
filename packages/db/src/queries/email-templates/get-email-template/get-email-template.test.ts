@@ -1,5 +1,8 @@
-import { EMAIL_TEMPLATE_TYPE } from '@blog/config/constants';
-import { EMAIL_TEMPLATE_DEFAULT_COPY } from '@blog/db/constants';
+import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@blog/config/constants';
+import {
+  EMAIL_TEMPLATE_DEFAULT_COPY,
+  EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE,
+} from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
@@ -43,6 +46,7 @@ describe(getEmailTemplate, () => {
     await db().insert(schema.emailTemplates).values({
       tenantId,
       templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      locale: LOCALE_ISO_CODES.EN,
       subject: 'Custom sign-in subject',
     });
 
@@ -75,6 +79,7 @@ describe(getEmailTemplate, () => {
     await db().insert(schema.emailTemplates).values({
       tenantId,
       templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      locale: LOCALE_ISO_CODES.EN,
       body: customBody,
     });
 
@@ -91,6 +96,7 @@ describe(getEmailTemplate, () => {
     await db().insert(schema.emailTemplates).values({
       tenantId,
       templateType: EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION,
+      locale: LOCALE_ISO_CODES.EN,
       logoAssetUrl: 'https://blob.example.com/newsletter-logo.png',
     });
 
@@ -108,5 +114,77 @@ describe(getEmailTemplate, () => {
       EMAIL_TEMPLATE_TYPE.TENANT_INVITE,
     );
     expect(other.logoAssetUrl).toBeUndefined();
+  });
+});
+
+describe('per-language fallback', () => {
+  let tenantId: string;
+
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db(), {
+      locale: LOCALE_ISO_CODES.DE,
+      additionalLocales: [LOCALE_ISO_CODES.FR, LOCALE_ISO_CODES.ES],
+    }));
+    await db()
+      .insert(schema.emailTemplates)
+      .values([
+        {
+          tenantId,
+          templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+          locale: LOCALE_ISO_CODES.DE,
+          subject: 'Deutscher Betreff',
+          logoAssetUrl: 'https://blob.example.com/de-logo.png',
+        },
+        {
+          tenantId,
+          templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+          locale: LOCALE_ISO_CODES.FR,
+          subject: 'Sujet français',
+        },
+      ]);
+  });
+
+  it('uses the requested language when it has authored copy', async () => {
+    const result = await getEmailTemplate(
+      tenantId,
+      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      LOCALE_ISO_CODES.FR,
+    );
+
+    expect(result.subject).toBe('Sujet français');
+  });
+
+  it("falls back to the tenant's default language when the requested one has none", async () => {
+    const result = await getEmailTemplate(
+      tenantId,
+      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      LOCALE_ISO_CODES.ES,
+    );
+
+    expect(result.subject).toBe('Deutscher Betreff');
+    expect(result.logoAssetUrl).toBe('https://blob.example.com/de-logo.png');
+  });
+
+  it('falls back to the product default in the requested language when neither has the field', async () => {
+    const result = await getEmailTemplate(
+      tenantId,
+      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      LOCALE_ISO_CODES.ES,
+    );
+
+    expect(result.body).toEqual(
+      EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE.ES.MAGIC_LINK.body,
+    );
+  });
+
+  it("reads the tenant's default language when no language is requested", async () => {
+    const result = await getEmailTemplate(
+      tenantId,
+      EMAIL_TEMPLATE_TYPE.TENANT_INVITE,
+    );
+
+    expect(result.subject).toBe(
+      EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE.DE.TENANT_INVITE.subject,
+    );
   });
 });

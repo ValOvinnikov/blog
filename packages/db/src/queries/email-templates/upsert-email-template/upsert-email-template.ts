@@ -1,13 +1,18 @@
-import type { TEmailTemplateType } from '@blog/config/constants';
+import type {
+  TEmailTemplateType,
+  TLocaleIsoCode,
+} from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import {
   emailTemplates,
   type TEmailTemplateBlock,
 } from '@blog/db/schema/email-templates';
+import { tenants } from '@blog/db/schema/tenants';
+import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 
 import {
-  mergeEmailTemplateCopy,
+  getEmailTemplate,
   type TEmailTemplateResult,
 } from '../get-email-template';
 
@@ -17,11 +22,8 @@ const portableTextBlockSchema = z
   .object({ _type: z.string(), _key: z.string() })
   .passthrough();
 
-// A field absent from the input is left untouched on `UPDATE` (and falls
-// back to the merge-with-defaults read path on the first `INSERT` for a
-// tenant/template pair) — subject, body and logo save independently. An
-// explicit `null` clears a previously-authored value back to the product
-// default, distinct from omission.
+// An omitted field is left untouched, so subject, body and logo save
+// independently; an explicit `null` clears the field back to its fallback.
 export const updateEmailTemplateInputSchema = z.object({
   subject: z.string().trim().min(1).max(SUBJECT_MAX).nullable().optional(),
   body: z.array(portableTextBlockSchema).nullable().optional(),
@@ -50,20 +52,41 @@ function presentFields(
   return fields;
 }
 
+async function resolveTenantLocale(tenantId: string): Promise<TLocaleIsoCode> {
+  const [tenant] = await getDb()
+    .select({ locale: tenants.locale })
+    .from(tenants)
+    .where(eq(tenants.id, tenantId));
+
+  if (!tenant) {
+    throw new Error(
+      `upsertEmailTemplate: tenant "${tenantId}" does not exist.`,
+    );
+  }
+
+  return tenant.locale;
+}
+
 export async function upsertEmailTemplate(
   tenantId: string,
   templateType: TEmailTemplateType,
   input: TUpdateEmailTemplateInput,
+  locale?: TLocaleIsoCode,
 ): Promise<TEmailTemplateResult> {
   const db = getDb();
   const parsed = updateEmailTemplateInputSchema.parse(input);
   const fields = presentFields(parsed);
+  const targetLocale = locale ?? (await resolveTenantLocale(tenantId));
 
   const [row] = await db
     .insert(emailTemplates)
-    .values({ tenantId, templateType, ...fields })
+    .values({ tenantId, templateType, locale: targetLocale, ...fields })
     .onConflictDoUpdate({
-      target: [emailTemplates.tenantId, emailTemplates.templateType],
+      target: [
+        emailTemplates.tenantId,
+        emailTemplates.templateType,
+        emailTemplates.locale,
+      ],
       set: { ...fields, updatedAt: new Date() },
     })
     .returning();
@@ -74,5 +97,5 @@ export async function upsertEmailTemplate(
     );
   }
 
-  return mergeEmailTemplateCopy(tenantId, templateType, row);
+  return getEmailTemplate(tenantId, templateType, targetLocale);
 }

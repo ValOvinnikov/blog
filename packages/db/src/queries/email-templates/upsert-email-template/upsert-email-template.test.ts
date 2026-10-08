@@ -1,4 +1,4 @@
-import { EMAIL_TEMPLATE_TYPE } from '@blog/config/constants';
+import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@blog/config/constants';
 import { EMAIL_TEMPLATE_DEFAULT_COPY } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
@@ -49,6 +49,48 @@ describe(upsertEmailTemplate, () => {
     expect(result.subject).toBe('Second subject');
     const rows = await db().select().from(schema.emailTemplates);
     expect(rows).toHaveLength(1);
+  });
+
+  it('writes only the requested language', async () => {
+    await upsertEmailTemplate(
+      tenantId,
+      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      { subject: 'Sujet français' },
+      LOCALE_ISO_CODES.FR,
+    );
+
+    const english = await upsertEmailTemplate(
+      tenantId,
+      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      { subject: 'English subject' },
+      LOCALE_ISO_CODES.EN,
+    );
+
+    expect(english.subject).toBe('English subject');
+    const rows = await db()
+      .select({
+        locale: schema.emailTemplates.locale,
+        subject: schema.emailTemplates.subject,
+      })
+      .from(schema.emailTemplates)
+      .orderBy(schema.emailTemplates.locale);
+    expect(rows).toEqual([
+      { locale: LOCALE_ISO_CODES.EN, subject: 'English subject' },
+      { locale: LOCALE_ISO_CODES.FR, subject: 'Sujet français' },
+    ]);
+  });
+
+  it("writes the tenant's default language when no language is given", async () => {
+    const { id: germanTenantId } = await insertTestTenant(db(), {
+      locale: LOCALE_ISO_CODES.DE,
+    });
+
+    await upsertEmailTemplate(germanTenantId, EMAIL_TEMPLATE_TYPE.MAGIC_LINK, {
+      subject: 'Deutscher Betreff',
+    });
+
+    const [row] = await db().select().from(schema.emailTemplates);
+    expect(row?.locale).toBe(LOCALE_ISO_CODES.DE);
   });
 
   it('rejects a subject longer than its cap', async () => {

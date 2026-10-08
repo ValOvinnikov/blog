@@ -8,7 +8,7 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core';
 
-import { tenants } from './tenants';
+import { localeCodeEnum, tenants } from './tenants';
 
 // A Portable Text block, typed loosely on purpose — this package never
 // interprets its contents (the email-HTML serializer that does lives in
@@ -19,15 +19,9 @@ export type TEmailTemplateBlock = {
   [key: string]: unknown;
 };
 
-// A tenant's authored copy for one template type, one row per (tenant,
-// template type) pair. `subject`/`body` are nullable rather than required:
-// a row can be fully seeded with product defaults, hold only a subset of
-// fields a tenant has actually edited, or not exist at all for a template
-// type introduced after the tenant was provisioned — the read path merges
-// whatever is present here over product defaults, per field (see
-// `getEmailTemplate`). `logoAssetUrl` has no such fallback in this table;
-// its own resolution ladder (per-template logo, then the tenant's email
-// logo, then a product default) is resolved by the caller, not stored here.
+// One row per (tenant, template type, language). `subject`/`body` are
+// nullable: an absent field falls back through the tenant's default language
+// to the product default in the requested language (see `getEmailTemplate`).
 export const emailTemplates = pgTable(
   'email_templates',
   {
@@ -35,6 +29,7 @@ export const emailTemplates = pgTable(
       .notNull()
       .references(() => tenants.id, { onDelete: 'cascade' }),
     templateType: text('template_type').notNull().$type<TEmailTemplateType>(),
+    locale: localeCodeEnum('locale').notNull(),
     subject: text('subject'),
     body: jsonb('body').$type<TEmailTemplateBlock[]>(),
     logoAssetUrl: text('logo_asset_url'),
@@ -46,7 +41,11 @@ export const emailTemplates = pgTable(
   },
   (emailTemplate) => [
     primaryKey({
-      columns: [emailTemplate.tenantId, emailTemplate.templateType],
+      columns: [
+        emailTemplate.tenantId,
+        emailTemplate.templateType,
+        emailTemplate.locale,
+      ],
     }),
   ],
 );
