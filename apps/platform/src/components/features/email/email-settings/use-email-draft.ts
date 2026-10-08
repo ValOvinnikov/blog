@@ -6,11 +6,13 @@ import { uploadEmailLogoAction } from '@platform/server/email/upload-email-logo-
 import { updateEmailConfigAction } from '@platform/server/email-config/update-email-config-action';
 import { updateEmailTemplateAction } from '@platform/server/email-templates/update-email-template-action';
 import {
+  blankToNull,
   EMAIL_SENDER_ITEM,
   isSenderChanged,
   listCopyChanges,
   listLogoChanges,
   withCopy,
+  toSenderInput,
   withLogo,
   type TEmailDraft,
 } from '@platform/utils/email-draft/email-draft';
@@ -23,11 +25,6 @@ type TUseEmailDraftArgs = {
   initialDraft: TEmailDraft;
   liveLocales: TLocaleIsoCode[];
   onSaved: () => void;
-};
-
-const blankToNull = (value: string): string | null => {
-  const trimmed = value.trim();
-  return trimmed === '' ? null : trimmed;
 };
 
 const toLogoTarget = (
@@ -88,11 +85,10 @@ export const useEmailDraft = ({
       }
 
       if (isSenderChanged(saved, draft)) {
-        const result = await updateEmailConfigAction(tenantId, {
-          senderName: blankToNull(draft.sender.senderName),
-          replyToAddress: blankToNull(draft.sender.replyToAddress),
-          footerPostalAddress: blankToNull(draft.sender.footerPostalAddress),
-        });
+        const result = await updateEmailConfigAction(
+          tenantId,
+          toSenderInput(draft.sender),
+        );
         setSenderNameError(
           result.ok ? undefined : result.fieldErrors?.senderName,
         );

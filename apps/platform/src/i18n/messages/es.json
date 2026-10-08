@@ -372,12 +372,36 @@
     "senderItemDescription": "Nombre, dirección de respuesta, dirección postal y logotipo, iguales en todos los idiomas.",
     "itemsAriaLabel": "Correos para editar",
     "editingLabel": "Editando",
-    "languageAriaLabel": "Idioma para editar"
+    "languageAriaLabel": "Idioma para editar",
+    "viewAriaLabel": "Editar o previsualizar",
+    "editTab": "Editar",
+    "previewTab": "Vista previa"
   },
   "emailItemStatus": {
     "default": "Predeterminado",
     "customised": "Personalizado",
     "unsaved": "Sin guardar"
+  },
+  "emailPreview": {
+    "heading": "Vista previa",
+    "fromLabel": "De",
+    "replyToLabel": "Responder a",
+    "subjectLabel": "Asunto",
+    "defaultSender": "Remitente predeterminado",
+    "noReplyTo": "Sin dirección de respuesta",
+    "widthAriaLabel": "Ancho de la vista previa",
+    "desktop": "Escritorio",
+    "mobile": "Móvil",
+    "iframeTitle": "Vista previa del correo",
+    "actionLockedNote": "Así se envía el correo: los botones y el pie se añaden automáticamente y no se pueden editar aquí.",
+    "sendTest": "Enviarme una prueba",
+    "sendingTest": "Enviando…",
+    "testSent": "Prueba enviada a {email}.",
+    "testRateLimited": "Ha enviado varias pruebas recientemente. Vuelva a intentarlo en unos minutos.",
+    "testInvalid": "Complete el asunto y el mensaje antes de enviar una prueba.",
+    "testFailed": "No se pudo enviar la prueba. Vuelva a intentarlo.",
+    "testSubject": "[Prueba] {subject}",
+    "unsavedLogoNote": "Un logotipo que aún no ha guardado no se incluye en la prueba."
   },
   "emailSettingsForm": {
     "heading": "Configuración del correo electrónico",
@@ -409,9 +433,6 @@
     "bodyHint": "El botón de inicio de sesión, el enlace de invitación o el enlace para darse de baja siempre se muestran debajo; no se pueden quitar desde aquí.",
     "logoLabel": "Logotipo de la plantilla",
     "logoHint": "Sustituye el logotipo de correo en esta plantilla, en todos los idiomas.",
-    "previewHeading": "Vista previa",
-    "previewIframeTitle": "Vista previa del correo",
-    "actionLockedNote": "Los botones y enlaces de la vista previa se envían siempre y no se pueden editar aquí.",
     "templateTypeLabel": {
       "MAGIC_LINK": "Enlace de inicio de sesión",
       "TENANT_INVITE": "Invitación al equipo",

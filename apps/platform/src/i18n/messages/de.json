@@ -372,12 +372,36 @@
     "senderItemDescription": "Name, Antwortadresse, Anschrift und Logo, in jeder Sprache gleich.",
     "itemsAriaLabel": "Zu bearbeitende E-Mails",
     "editingLabel": "Bearbeiten",
-    "languageAriaLabel": "Zu bearbeitende Sprache"
+    "languageAriaLabel": "Zu bearbeitende Sprache",
+    "viewAriaLabel": "Bearbeiten oder Vorschau",
+    "editTab": "Bearbeiten",
+    "previewTab": "Vorschau"
   },
   "emailItemStatus": {
     "default": "Standard",
     "customised": "Angepasst",
     "unsaved": "Nicht gespeichert"
+  },
+  "emailPreview": {
+    "heading": "Vorschau",
+    "fromLabel": "Von",
+    "replyToLabel": "Antwort an",
+    "subjectLabel": "Betreff",
+    "defaultSender": "Standardabsender",
+    "noReplyTo": "Keine Antwortadresse",
+    "widthAriaLabel": "Vorschaubreite",
+    "desktop": "Desktop",
+    "mobile": "Mobil",
+    "iframeTitle": "E-Mail-Vorschau",
+    "actionLockedNote": "So wird die E-Mail versendet: Schaltflächen und Fußzeile werden automatisch ergänzt und lassen sich hier nicht bearbeiten.",
+    "sendTest": "Test an mich senden",
+    "sendingTest": "Wird gesendet…",
+    "testSent": "Test an {email} gesendet.",
+    "testRateLimited": "Sie haben gerade mehrere Tests gesendet — bitte in ein paar Minuten erneut versuchen.",
+    "testInvalid": "Füllen Sie Betreff und Nachricht aus, bevor Sie einen Test senden.",
+    "testFailed": "Der Test konnte nicht gesendet werden — bitte erneut versuchen.",
+    "testSubject": "[Test] {subject}",
+    "unsavedLogoNote": "Ein noch nicht gespeichertes Logo ist im Test nicht enthalten."
   },
   "emailSettingsForm": {
     "heading": "E-Mail-Einstellungen",
@@ -409,9 +433,6 @@
     "bodyHint": "Die Anmeldeschaltfläche, der Einladungslink oder der Abmeldelink wird immer darunter angezeigt — er lässt sich hier nicht entfernen.",
     "logoLabel": "Vorlagen-Logo",
     "logoHint": "Überschreibt das E-Mail-Logo für diese Vorlage, in jeder Sprache.",
-    "previewHeading": "Vorschau",
-    "previewIframeTitle": "E-Mail-Vorschau",
-    "actionLockedNote": "Die Schaltflächen und Links in der Vorschau werden immer mitgesendet und können hier nicht bearbeitet werden.",
     "templateTypeLabel": {
       "MAGIC_LINK": "Anmeldelink",
       "TENANT_INVITE": "Teameinladung",

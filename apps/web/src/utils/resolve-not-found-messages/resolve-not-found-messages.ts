@@ -13,7 +13,6 @@ import {
 export type TNotFoundMessagesContext = {
   tenant?: string;
   locale: TLocaleIsoCode;
-  hasVoiceOverrides: boolean;
 };
 
 interface INotFoundMessages {
@@ -25,17 +24,20 @@ interface INotFoundMessages {
 export const resolveNotFoundMessages = async ({
   tenant,
   locale,
-  hasVoiceOverrides,
 }: TNotFoundMessagesContext): Promise<INotFoundMessages> => {
   const baseMessages = SITE_MESSAGES_BY_LOCALE[locale];
-  if (!tenant || !hasVoiceOverrides) {
+  if (!tenant) {
     return {
       messages: baseMessages,
       rich: resolveVoiceRichFields({}, baseMessages),
     };
   }
 
-  const { messages, rich } = await resolveTenantMessages(baseMessages, tenant);
+  const { messages, rich } = await resolveTenantMessages(
+    baseMessages,
+    locale,
+    tenant,
+  );
   // Voice overrides only replace string leaves, so the catalog's shape holds.
   return { messages: messages as TSiteMessages, rich };
 };

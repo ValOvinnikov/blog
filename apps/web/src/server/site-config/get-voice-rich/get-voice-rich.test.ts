@@ -39,7 +39,7 @@ describe(getVoiceRich, () => {
     getMessagesMock.mockResolvedValue(BASE_MESSAGES);
     getSiteConfigMock.mockResolvedValue({
       ok: true,
-      data: { voiceOverrides: {} },
+      data: { voiceOverridesByLocale: {} },
     });
   });
 
@@ -47,7 +47,11 @@ describe(getVoiceRich, () => {
     const override = richTextOf('Nothing published yet.');
     getSiteConfigMock.mockResolvedValue({
       ok: true,
-      data: { voiceOverrides: { blogListEmpty: override } },
+      data: {
+        voiceOverridesByLocale: {
+          [DEFAULT_REQUEST_CONTEXT.locale]: { blogListEmpty: override },
+        },
+      },
     });
 
     const result = await getVoiceRich('blogListEmpty');
@@ -72,7 +76,8 @@ describe(getVoiceRich, () => {
     errorSpy.mockRestore();
   });
 
-  it('returns the catalog default for a non-default locale even when an override is stored', async () => {
+  it("returns the request language's override in a non-default language", async () => {
+    const override = richTextOf('Noch keine Beiträge.');
     vi.mocked(getRequestContext).mockResolvedValueOnce({
       ...DEFAULT_REQUEST_CONTEXT,
       locale: LOCALE_ISO_CODES.DE,
@@ -80,14 +85,39 @@ describe(getVoiceRich, () => {
     getSiteConfigMock.mockResolvedValue({
       ok: true,
       data: {
-        voiceOverrides: { blogListEmpty: richTextOf('Nothing published yet.') },
+        voiceOverridesByLocale: {
+          [LOCALE_ISO_CODES.EN]: {
+            blogListEmpty: richTextOf('Nothing published yet.'),
+          },
+          [LOCALE_ISO_CODES.DE]: { blogListEmpty: override },
+        },
+      },
+    });
+
+    const result = await getVoiceRich('blogListEmpty');
+
+    expect(result).toBe(override);
+  });
+
+  it('returns the catalog default in a language with no override of its own', async () => {
+    vi.mocked(getRequestContext).mockResolvedValueOnce({
+      ...DEFAULT_REQUEST_CONTEXT,
+      locale: LOCALE_ISO_CODES.DE,
+    });
+    getSiteConfigMock.mockResolvedValue({
+      ok: true,
+      data: {
+        voiceOverridesByLocale: {
+          [LOCALE_ISO_CODES.EN]: {
+            blogListEmpty: richTextOf('Nothing published yet.'),
+          },
+        },
       },
     });
 
     const result = await getVoiceRich('blogListEmpty');
 
     expect(result[0]?.children[0]?.text).toBe('No posts yet.');
-    expect(getSiteConfigMock).not.toHaveBeenCalled();
   });
 
   it('forwards an explicitly supplied tenant to getSiteConfig', async () => {

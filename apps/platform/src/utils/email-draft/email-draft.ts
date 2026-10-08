@@ -238,3 +238,14 @@ export const withCopy = (
     [templateType]: { ...draft.copies[templateType], [locale]: copy },
   },
 });
+
+export const blankToNull = (value: string): string | null => {
+  const trimmed = value.trim();
+  return trimmed === '' ? null : trimmed;
+};
+
+export const toSenderInput = (sender: TEmailSenderDraft) => ({
+  senderName: blankToNull(sender.senderName),
+  replyToAddress: blankToNull(sender.replyToAddress),
+  footerPostalAddress: blankToNull(sender.footerPostalAddress),
+});

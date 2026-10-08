@@ -8,20 +8,14 @@ import {
 } from '@web/utils/resolve-voice-rich-fields';
 import { getMessages } from 'next-intl/server';
 
-/** Voice overrides are authored in the tenant's default locale, so every other locale gets the catalog default. */
 export const getVoiceRich = async (
   id: TVoiceRichFieldId,
   tenant?: string,
 ): Promise<TVoicePortableText> => {
-  const [{ locale, defaultLocale }, baseMessages] = await Promise.all([
+  const [{ locale }, baseMessages] = await Promise.all([
     getRequestContext(),
     getMessages(),
   ]);
-
-  if (locale !== defaultLocale) {
-    return resolveVoiceRichFields({}, baseMessages)[id];
-  }
-
   const result = await getSiteConfig(tenant);
 
   if (!result.ok) {
@@ -29,7 +23,7 @@ export const getVoiceRich = async (
     return resolveVoiceRichFields({}, baseMessages)[id];
   }
 
-  const voiceOverrides = result.data?.voiceOverrides ?? {};
+  const voiceOverrides = result.data?.voiceOverridesByLocale[locale] ?? {};
 
   return resolveVoiceRichFields(voiceOverrides, baseMessages)[id];
 };

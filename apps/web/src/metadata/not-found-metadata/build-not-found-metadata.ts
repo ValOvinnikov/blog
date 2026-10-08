@@ -8,7 +8,6 @@ import { createTranslator } from 'next-intl';
 
 const DEFAULT_CONTEXT: TNotFoundMessagesContext = {
   locale: LOCALE_ISO_CODES.EN,
-  hasVoiceOverrides: false,
 };
 
 export const buildNotFoundMetadata = async (

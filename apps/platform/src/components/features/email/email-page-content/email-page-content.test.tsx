@@ -54,6 +54,10 @@ vi.mock('@platform/server/email/clear-email-logo-action', () => ({
   clearEmailLogoAction: vi.fn(),
 }));
 
+vi.mock('@platform/server/email/send-test-email-action', () => ({
+  sendTestEmailAction: vi.fn(),
+}));
+
 const tenant = makeReadyTenant();
 
 const TEMPLATE_RESULTS = [

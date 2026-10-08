@@ -372,12 +372,36 @@
     "senderItemDescription": "Nom, adresse de réponse, adresse postale et logo, identiques dans toutes les langues.",
     "itemsAriaLabel": "E-mails à modifier",
     "editingLabel": "Modification",
-    "languageAriaLabel": "Langue à modifier"
+    "languageAriaLabel": "Langue à modifier",
+    "viewAriaLabel": "Modifier ou prévisualiser",
+    "editTab": "Modifier",
+    "previewTab": "Aperçu"
   },
   "emailItemStatus": {
     "default": "Par défaut",
     "customised": "Personnalisé",
     "unsaved": "Non enregistré"
+  },
+  "emailPreview": {
+    "heading": "Aperçu",
+    "fromLabel": "De",
+    "replyToLabel": "Répondre à",
+    "subjectLabel": "Objet",
+    "defaultSender": "Expéditeur par défaut",
+    "noReplyTo": "Aucune adresse de réponse",
+    "widthAriaLabel": "Largeur de l'aperçu",
+    "desktop": "Ordinateur",
+    "mobile": "Mobile",
+    "iframeTitle": "Aperçu de l'e-mail",
+    "actionLockedNote": "Voici l'e-mail tel qu'il est envoyé : les boutons et le pied de page sont ajoutés automatiquement et ne peuvent pas être modifiés ici.",
+    "sendTest": "M'envoyer un test",
+    "sendingTest": "Envoi…",
+    "testSent": "Test envoyé à {email}.",
+    "testRateLimited": "Vous avez envoyé plusieurs tests récemment — réessayez dans quelques minutes.",
+    "testInvalid": "Renseignez l'objet et le message avant d'envoyer un test.",
+    "testFailed": "Impossible d'envoyer le test — veuillez réessayer.",
+    "testSubject": "[Test] {subject}",
+    "unsavedLogoNote": "Un logo non encore enregistré n'est pas inclus dans le test."
   },
   "emailSettingsForm": {
     "heading": "Paramètres d'e-mail",
@@ -409,9 +433,6 @@
     "bodyHint": "Le bouton de connexion, le lien d'invitation ou le lien de désabonnement s'affiche toujours sous ce texte — il ne peut pas être supprimé ici.",
     "logoLabel": "Logo du modèle",
     "logoHint": "Remplace le logo des e-mails pour ce modèle, dans toutes les langues.",
-    "previewHeading": "Aperçu",
-    "previewIframeTitle": "Aperçu de l'e-mail",
-    "actionLockedNote": "Les boutons et liens de l'aperçu sont toujours envoyés et ne peuvent pas être modifiés ici.",
     "templateTypeLabel": {
       "MAGIC_LINK": "Lien de connexion",
       "TENANT_INVITE": "Invitation à l'équipe",

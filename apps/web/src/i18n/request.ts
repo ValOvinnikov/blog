@@ -12,10 +12,14 @@ export default getRequestConfig(async ({ requestLocale }) => {
     ? requested
     : routing.defaultLocale;
   const baseMessages = SITE_MESSAGES_BY_LOCALE[locale];
-  const voiceTenant = await peekVoiceTenant(locale);
+  const voiceTenant = await peekVoiceTenant();
 
   if (!voiceTenant) return { locale, messages: baseMessages };
 
-  const { messages } = await resolveTenantMessages(baseMessages, voiceTenant);
+  const { messages } = await resolveTenantMessages(
+    baseMessages,
+    locale,
+    voiceTenant,
+  );
   return { locale, messages };
 });

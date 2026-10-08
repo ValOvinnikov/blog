@@ -372,12 +372,36 @@
     "senderItemDescription": "Name, reply-to, address and logo, the same in every language.",
     "itemsAriaLabel": "Emails to edit",
     "editingLabel": "Editing",
-    "languageAriaLabel": "Language to edit"
+    "languageAriaLabel": "Language to edit",
+    "viewAriaLabel": "Edit or preview",
+    "editTab": "Edit",
+    "previewTab": "Preview"
   },
   "emailItemStatus": {
     "default": "Default",
     "customised": "Customised",
     "unsaved": "Unsaved"
+  },
+  "emailPreview": {
+    "heading": "Preview",
+    "fromLabel": "From",
+    "replyToLabel": "Reply-to",
+    "subjectLabel": "Subject",
+    "defaultSender": "Default sender",
+    "noReplyTo": "No reply-to address",
+    "widthAriaLabel": "Preview width",
+    "desktop": "Desktop",
+    "mobile": "Mobile",
+    "iframeTitle": "Email preview",
+    "actionLockedNote": "This is the email as sent: the buttons and footer are added for you and can't be edited here.",
+    "sendTest": "Send test to me",
+    "sendingTest": "Sending…",
+    "testSent": "Test sent to {email}.",
+    "testRateLimited": "You've sent several tests recently — try again in a few minutes.",
+    "testInvalid": "Fill in the subject and message before sending a test.",
+    "testFailed": "Couldn't send the test — try again.",
+    "testSubject": "[Test] {subject}",
+    "unsavedLogoNote": "A logo you haven't saved yet isn't included in the test."
   },
   "emailSettingsForm": {
     "heading": "Email settings",
@@ -409,9 +433,6 @@
     "bodyHint": "The sign-in button, invite link or unsubscribe link always renders below this — it can't be removed from here.",
     "logoLabel": "Template logo",
     "logoHint": "Overrides the email logo for this template, in every language.",
-    "previewHeading": "Preview",
-    "previewIframeTitle": "Email preview",
-    "actionLockedNote": "The buttons and links in the preview are always sent and can't be edited here.",
     "templateTypeLabel": {
       "MAGIC_LINK": "Sign-in link",
       "TENANT_INVITE": "Team invite",

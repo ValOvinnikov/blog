@@ -13,7 +13,6 @@ export const getNotFoundContext = vi.fn<typeof TModule.getNotFoundContext>(
   async () => ({
     tenantId: DEFAULT_REQUEST_CONTEXT.tenantId,
     locale: DEFAULT_REQUEST_CONTEXT.locale,
-    isDefaultLocale: true,
   }),
 );
 

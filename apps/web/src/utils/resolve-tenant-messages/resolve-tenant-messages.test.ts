@@ -1,4 +1,10 @@
-import { SITE_MESSAGES, type TVoicePortableText } from '@blog/config';
+import {
+  LOCALE_ISO_CODES,
+  SITE_MESSAGES,
+  SITE_MESSAGES_BY_LOCALE,
+  type TLocaleIsoCode,
+  type TVoicePortableText,
+} from '@blog/config';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
 
 import { resolveTenantMessages } from './resolve-tenant-messages';
@@ -25,6 +31,7 @@ const TENANT = { id: 'tenant-1' };
 
 const siteConfigRow = (
   voiceOverrides: Record<string, string | TVoicePortableText> = {},
+  locale: TLocaleIsoCode = LOCALE_ISO_CODES.EN,
 ) => {
   return {
     preset: 'CONSOLE',
@@ -33,7 +40,7 @@ const siteConfigRow = (
     bodyFont: 'NEWSREADER',
     radiusScale: 'MD',
     density: 'DEFAULT',
-    voiceOverrides,
+    voiceOverridesByLocale: { [locale]: voiceOverrides },
   };
 };
 
@@ -64,7 +71,10 @@ describe('resolveTenantMessages', () => {
   });
 
   it('returns the base messages unchanged when there are no voice overrides', async () => {
-    const { messages } = await resolveTenantMessages(SITE_MESSAGES);
+    const { messages } = await resolveTenantMessages(
+      SITE_MESSAGES,
+      LOCALE_ISO_CODES.EN,
+    );
 
     expect(messages).toEqual(SITE_MESSAGES);
   });
@@ -72,7 +82,10 @@ describe('resolveTenantMessages', () => {
   it('returns the base messages unchanged when the tenant has no site config row', async () => {
     getSiteConfigMock.mockResolvedValue(undefined);
 
-    const { messages } = await resolveTenantMessages(SITE_MESSAGES);
+    const { messages } = await resolveTenantMessages(
+      SITE_MESSAGES,
+      LOCALE_ISO_CODES.EN,
+    );
 
     expect(messages).toEqual(SITE_MESSAGES);
   });
@@ -82,7 +95,10 @@ describe('resolveTenantMessages', () => {
       siteConfigRow({ notFoundHeading: 'nope, try again' }),
     );
 
-    const { messages } = await resolveTenantMessages(SITE_MESSAGES);
+    const { messages } = await resolveTenantMessages(
+      SITE_MESSAGES,
+      LOCALE_ISO_CODES.EN,
+    );
 
     expect(getAtPath(messages, ['notFound', 'heading'])).toBe(
       'nope, try again',
@@ -92,12 +108,41 @@ describe('resolveTenantMessages', () => {
     );
   });
 
+  it('applies an override saved for the requested language', async () => {
+    getSiteConfigMock.mockResolvedValue(
+      siteConfigRow({ notFoundHeading: 'Verirrt' }, LOCALE_ISO_CODES.DE),
+    );
+
+    const { messages } = await resolveTenantMessages(
+      SITE_MESSAGES_BY_LOCALE.DE,
+      LOCALE_ISO_CODES.DE,
+    );
+
+    expect(getAtPath(messages, ['notFound', 'heading'])).toBe('Verirrt');
+  });
+
+  it('ignores an override saved for another language', async () => {
+    getSiteConfigMock.mockResolvedValue(
+      siteConfigRow({ notFoundHeading: 'Verirrt' }, LOCALE_ISO_CODES.DE),
+    );
+
+    const { messages } = await resolveTenantMessages(
+      SITE_MESSAGES_BY_LOCALE.EN,
+      LOCALE_ISO_CODES.EN,
+    );
+
+    expect(messages).toEqual(SITE_MESSAGES_BY_LOCALE.EN);
+  });
+
   it('a tenant blogListEmpty voice override reaches blogListPage.empty', async () => {
     getSiteConfigMock.mockResolvedValue(
       siteConfigRow({ blogListEmpty: richTextOf('Nothing published yet.') }),
     );
 
-    const { messages } = await resolveTenantMessages(SITE_MESSAGES);
+    const { messages } = await resolveTenantMessages(
+      SITE_MESSAGES,
+      LOCALE_ISO_CODES.EN,
+    );
 
     expect(getAtPath(messages, ['blogListPage', 'empty'])).toBe(
       'Nothing published yet.',
@@ -109,7 +154,10 @@ describe('resolveTenantMessages', () => {
       siteConfigRow({ topicEmpty: richTextOf('Nothing here yet.') }),
     );
 
-    const { messages } = await resolveTenantMessages(SITE_MESSAGES);
+    const { messages } = await resolveTenantMessages(
+      SITE_MESSAGES,
+      LOCALE_ISO_CODES.EN,
+    );
 
     expect(getAtPath(messages, ['topicPage', 'empty'])).toBe(
       'Nothing here yet.',
@@ -121,13 +169,16 @@ describe('resolveTenantMessages', () => {
       siteConfigRow({ notARealVoiceField: 'ignored' }),
     );
 
-    const { messages } = await resolveTenantMessages(SITE_MESSAGES);
+    const { messages } = await resolveTenantMessages(
+      SITE_MESSAGES,
+      LOCALE_ISO_CODES.EN,
+    );
 
     expect(messages).toEqual(SITE_MESSAGES);
   });
 
   it('forwards an explicit tenant to getSiteConfig, through to getRequestTenantId', async () => {
-    await resolveTenantMessages(SITE_MESSAGES, 'tenant-2');
+    await resolveTenantMessages(SITE_MESSAGES, LOCALE_ISO_CODES.EN, 'tenant-2');
 
     expect(getRequestTenantIdMock).toHaveBeenCalledWith('tenant-2');
   });
@@ -138,7 +189,10 @@ describe('resolveTenantMessages', () => {
       .spyOn(console, 'error')
       .mockImplementation(() => {});
 
-    const { messages } = await resolveTenantMessages(SITE_MESSAGES);
+    const { messages } = await resolveTenantMessages(
+      SITE_MESSAGES,
+      LOCALE_ISO_CODES.EN,
+    );
 
     expect(messages).toEqual(SITE_MESSAGES);
     expect(consoleErrorSpy).toHaveBeenCalled();
@@ -151,7 +205,7 @@ describe('resolveTenantMessages', () => {
       siteConfigRow({ notFoundHeading: 'Overridden heading' }),
     );
 
-    await resolveTenantMessages(base);
+    await resolveTenantMessages(base, LOCALE_ISO_CODES.EN);
 
     expect(base.notFound.heading).toBe('Original heading');
   });
@@ -161,7 +215,10 @@ describe('resolveTenantMessages', () => {
       siteConfigRow({ localeErrorTitle: richTextOf('Oops') }),
     );
 
-    const { messages } = await resolveTenantMessages(SITE_MESSAGES);
+    const { messages } = await resolveTenantMessages(
+      SITE_MESSAGES,
+      LOCALE_ISO_CODES.EN,
+    );
 
     expect(getAtPath(messages, ['localeErrorPage', 'title'])).toBe('Oops');
   });
@@ -172,13 +229,19 @@ describe('resolveTenantMessages', () => {
       siteConfigRow({ blogListEmpty: override }),
     );
 
-    const { rich } = await resolveTenantMessages(SITE_MESSAGES);
+    const { rich } = await resolveTenantMessages(
+      SITE_MESSAGES,
+      LOCALE_ISO_CODES.EN,
+    );
 
     expect(rich.blogListEmpty).toBe(override);
   });
 
   it('falls back to the catalog default paragraph for a RICH field with no override', async () => {
-    const { rich } = await resolveTenantMessages(SITE_MESSAGES);
+    const { rich } = await resolveTenantMessages(
+      SITE_MESSAGES,
+      LOCALE_ISO_CODES.EN,
+    );
 
     expect(rich.blogListEmpty).toEqual([
       {

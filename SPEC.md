@@ -1580,15 +1580,18 @@ every `module_*` document's `brandVariant` field uses, is a different axis and
 is unaffected.)
 
 **Voice-as-content**: `apps/web/src/utils/resolve-tenant-messages/` resolves
-each request's `next-intl` messages as a two-layer merge — the neutral base
-(`i18n/messages/en.json`) ← the tenant's `site_config.voiceOverrides`. There
+each request's `next-intl` messages as a two-layer merge — the request
+language's catalog ← the tenant's overrides for that same language, on every
+page and for every language the tenant serves; a language with no override
+for a field keeps that language's catalog default. There
 is no preset layer: a preset is a _look_, and carries no copy. The `preset`
 and `voiceOverrides` still come from the same `site_config` row and the same
 cached read as theme (`get-site-config.ts`, tenant-scoped tag) — one row
 backs both. The `voice_overrides` column holds one map per language,
 `{ [locale]: { [fieldId]: value } }` (`voiceOverridesByLocale` in
 `@blog/db`); a save may carry several languages, replaces the map of each
-one it carries, and leaves the others as stored. Until web and platform read per language, `getSiteConfig` also
+one it carries, and leaves the others as stored. `apps/web` reads
+`voiceOverridesByLocale` directly. Until platform reads per language, `getSiteConfig` also
 returns the tenant's default-language map as a flat `voiceOverrides`.
 `upsertSiteConfig` accepts only `voiceOverridesByLocale`, and the platform's
 Voice save sends every language with unsaved edits in that one call, so a
@@ -1749,6 +1752,33 @@ operator's `/tenants/{id}` view ignores the plan and shows every entry and
 page, so a downgraded tenant's data stays reachable. Roadmap entries with no
 page yet (Subscribers, Comments, Team) render as non-interactive "Coming soon"
 items in both views; no entry carries a progress badge.
+
+**Email templates per language.** Each template's subject and body are
+stored per language (`email_templates`, keyed by tenant, template type and
+language); a template's logo override is the same in every language
+(`email_template_logos`). Every send resolves each field from the
+recipient's language, then the tenant's default language, then the product
+default in the recipient's language. Senders pick the language as follows:
+the magic-link provider as described in §3, `apps/web`'s newsletter
+confirmation from the language of the page the reader subscribed on (a value
+outside the site's languages falls back to the tenant's default), with its
+confirm and unsubscribe links carrying that language so the page they open
+matches the email, and a
+platform admin signing into the platform itself always in English.
+
+`apps/platform`'s Email page edits one language at a time, as one draft saved
+through the settings save bar: Sender & footer (sender name, reply-to,
+postal address and the email logo, the same in every language) and the three
+templates, each marked Default, Customised or Unsaved for the selected
+language. A blank field shows, and sends, its fallback. Logos are staged in
+the draft and uploaded on save. Beside the editor, a preview renders the
+selected template in the selected language through the same `@blog/email`
+builder the sender uses, with From, Reply-to and Subject above it, a
+Desktop/Mobile width toggle, and **Send test to me**: it mails the current
+draft (saved logos only) to the signed-in user from the platform's own
+sender address, limited to five sends per user per ten minutes on each
+server instance. On a phone, an "Editing" select replaces the list and
+Edit/Preview tabs switch between the editor and the preview.
 
 **Studio capability warning.** `@blog/studio`'s `StudioMount` takes an optional
 `enabledCapabilities?: readonly TCapability[]`. When it is supplied, a
