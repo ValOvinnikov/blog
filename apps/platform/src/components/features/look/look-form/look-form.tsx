@@ -6,7 +6,6 @@ import {
   type TPresetId,
 } from '@blog/config';
 import { LookPreview } from '@platform/components/features/look/look-preview';
-import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
 import { Disclosure } from '@platform/components/shared/disclosure';
 import { SettingsFormShell } from '@platform/components/shared/settings-form-shell';
@@ -148,22 +147,13 @@ export const LookForm = ({
               title={t('basicHeading')}
               supportingText={t('basicDescription')}
               headingLevel={2}
-              actions={
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={handleReset}
-                  isDisabled={changeCount === 0 || isArchived}
-                  aria-describedby={isArchived ? archivedNoticeId : undefined}
-                >
-                  {t('resetButton')}
-                </Button>
-              }
             />
             <Card.Body>
               <LookFormBasicSection
                 preset={values.preset}
                 onPresetChange={handlePresetChange}
+                onReset={handleReset}
+                isResetDisabled={changeCount === 0}
                 accentHue={values.accentHue}
                 accentHueFieldId={accentHueFieldId}
                 isAccentHueRejected={isAccentHueRejected}

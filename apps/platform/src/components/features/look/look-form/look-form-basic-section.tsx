@@ -2,6 +2,7 @@
 
 import type { TPresetId } from '@blog/config';
 import { LogoHueField } from '@platform/components/features/look/logo-hue-field';
+import { Button } from '@platform/components/shared/button';
 import { HueSlider } from '@platform/components/shared/hue-slider';
 import { PresetPicker } from '@platform/components/shared/preset-picker';
 import {
@@ -17,6 +18,8 @@ import { lookFormVariants } from './look-form-variants';
 export type TLookFormBasicSectionProps = {
   preset: TPresetId;
   onPresetChange: (preset: TPresetId) => void;
+  onReset: () => void;
+  isResetDisabled: boolean;
   accentHue: number;
   accentHueFieldId: string;
   isAccentHueRejected: boolean;
@@ -29,6 +32,8 @@ export type TLookFormBasicSectionProps = {
 export const LookFormBasicSection = ({
   preset,
   onPresetChange,
+  onReset,
+  isResetDisabled,
   accentHue,
   accentHueFieldId,
   isAccentHueRejected,
@@ -45,6 +50,7 @@ export const LookFormBasicSection = ({
   const t = useTranslations('lookForm');
   const {
     field,
+    fieldHeader,
     fieldLabel,
     fieldHint,
     tagSecondary,
@@ -62,7 +68,20 @@ export const LookFormBasicSection = ({
   return (
     <>
       <div className={field()}>
-        <span className={fieldLabel()}>{t('presetLabel')}</span>
+        <div className={fieldHeader()}>
+          <span className={fieldLabel({ class: 'mb-0' })}>
+            {t('presetLabel')}
+          </span>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={onReset}
+            isDisabled={isResetDisabled || isArchived}
+            aria-describedby={archivedDescribedBy}
+          >
+            {t('resetButton')}
+          </Button>
+        </div>
         <p className={fieldHint()}>{t('presetDescription')}</p>
         <PresetPicker
           value={preset}
