@@ -8,7 +8,7 @@ const PAGE_FIELDS = `_id, "title": headingBlock.heading, "path": ${LANDING_PAGE_
 const CHILDREN_EXPRESSION = `*[_type == "page_landing" && parent._ref == ^._id && language == $locale] | order(orderRank) { ${PAGE_FIELDS} }`;
 
 function node(scope: string): string {
-  return `${scope}{ ${PAGE_FIELDS}, "sectionNavigation": coalesce(sectionNavigation, false), "children": select(sectionNavigation == true => ${CHILDREN_EXPRESSION}) }`;
+  return `${scope}{ ${PAGE_FIELDS}, "sectionNavigation": coalesce(sectionNavigation, false), sectionNavigationTitle, "children": select(sectionNavigation == true => ${CHILDREN_EXPRESSION}) }`;
 }
 
 const scopes = Array.from({ length: LANDING_PAGE_MAX_DEPTH }, (_, hops) =>
@@ -27,6 +27,7 @@ const sectionPageParser = z.object({
 export const landingPageSectionChainParser = z.array(
   sectionPageParser.extend({
     sectionNavigation: z.boolean(),
+    sectionNavigationTitle: z.string().nullable(),
     children: z.array(sectionPageParser).nullable(),
   }),
 );

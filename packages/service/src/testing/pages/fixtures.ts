@@ -205,6 +205,7 @@ export function makeRawLandingPage(
         title: 'About Us',
         path: 'about',
         sectionNavigation: false,
+        sectionNavigationTitle: null,
         children: null,
       },
     ],

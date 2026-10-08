@@ -145,7 +145,12 @@ describe('getPageDocument', () => {
       page: TSectionPage,
       children: TSectionPage[] | null = null,
     ) {
-      return { ...page, sectionNavigation: children !== null, children };
+      return {
+        ...page,
+        sectionNavigation: children !== null,
+        sectionNavigationTitle: null,
+        children,
+      };
     }
 
     const modulesSection = chainNode(
@@ -169,6 +174,7 @@ describe('getPageDocument', () => {
           sectionChain: [chainNode(answers), chainNode(faq), modulesSection],
         }),
       ).toEqual({
+        title: null,
         root: { title: 'Modules', path: 'modules', isCurrent: false },
         pages: [
           { title: 'FAQ', path: 'modules/faq', isCurrent: true },
@@ -212,6 +218,35 @@ describe('getPageDocument', () => {
         { title: 'Glossary', path: 'modules/faq/glossary', isCurrent: false },
         { title: 'Answers', path: 'modules/faq/answers', isCurrent: true },
       ]);
+    });
+
+    it.each([
+      ['Guides', 'Guides'],
+      ['   ', null],
+    ])(
+      "maps the section root's sidebar title %j to %j",
+      async (sectionNavigationTitle, title) => {
+        const navigation = await navigationFor({
+          sectionChain: [
+            chainNode(faq),
+            { ...modulesSection, sectionNavigationTitle },
+          ],
+        });
+
+        expect(navigation?.title).toBe(title);
+      },
+    );
+
+    it("takes the title from the nested section root, not an outer section's", async () => {
+      const navigation = await navigationFor({
+        sectionChain: [
+          chainNode(answers),
+          chainNode(faq, [glossary, answers]),
+          { ...modulesSection, sectionNavigationTitle: 'Guides' },
+        ],
+      });
+
+      expect(navigation?.title).toBeNull();
     });
 
     it('leaves out a child page that has no path', async () => {

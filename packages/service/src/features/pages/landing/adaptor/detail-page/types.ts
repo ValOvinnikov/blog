@@ -17,6 +17,7 @@ export type TLandingSectionPage = {
 export type TLandingBreadcrumb = Omit<TLandingSectionPage, 'isCurrent'>;
 
 export type TLandingSectionNavigation = {
+  title: string | null;
   root: TLandingSectionPage;
   pages: TLandingSectionPage[];
   breadcrumbs: TLandingBreadcrumb[];
