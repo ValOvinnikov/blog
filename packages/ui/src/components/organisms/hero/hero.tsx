@@ -163,7 +163,12 @@ const HeroRoot = ({
           >
             {cloneElement(
               slots.Media,
-              isBanner ? { isFramed: false } : { variant: resolvedVariant },
+              isBanner
+                ? { isFramed: false }
+                : {
+                    variant: resolvedVariant,
+                    contentAlignment: resolvedAlignment,
+                  },
             )}
           </div>
         )}
