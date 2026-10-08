@@ -101,7 +101,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       expect(
         screen.queryByRole('button', { name: 'Save changes' }),
       ).not.toBeInTheDocument();
-      expect(screen.getByText('All changes saved')).toBeVisible();
+      expect(screen.queryByText('All changes saved')).not.toBeInTheDocument();
     });
 
     it('offers Save with the change count after toggling an entitled capability, and withdraws it once toggled back', async () => {
@@ -131,7 +131,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
         'data-unchecked',
         '',
       );
-      expect(screen.getByText('All changes saved')).toBeVisible();
+      expect(screen.queryByText('All changes saved')).not.toBeInTheDocument();
     });
 
     it('leaves entitled capability toggles enabled for a non-archived tenant', () => {

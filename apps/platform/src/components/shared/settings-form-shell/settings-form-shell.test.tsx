@@ -6,6 +6,7 @@ import {
   within,
 } from '@platform/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
+import { useState } from 'react';
 
 import {
   SettingsFormShell,
@@ -86,8 +87,8 @@ describe(`<${SettingsFormShell.name}/>`, () => {
       renderShell({ onSave });
     });
 
-    it('says all changes are saved and offers no save bar', () => {
-      expect(screen.getByText('All changes saved')).toBeVisible();
+    it('shows no save status and offers no save bar', () => {
+      expect(screen.queryByText('All changes saved')).not.toBeInTheDocument();
       expect(
         screen.queryByRole('region', { name: 'Unsaved changes' }),
       ).not.toBeInTheDocument();
@@ -155,6 +156,74 @@ describe(`<${SettingsFormShell.name}/>`, () => {
 
     it('never moves focus into the save bar', () => {
       expect(document.body).toHaveFocus();
+    });
+  });
+
+  describe('saved status', () => {
+    const TaglineSettings = () => {
+      const [saved, setSaved] = useState(SAVED);
+      const [values, setValues] = useState(SAVED);
+
+      return (
+        <SettingsFormShell
+          {...baseProps}
+          changeCount={values.tagline === saved.tagline ? 0 : 1}
+          onSave={async () => {
+            setSaved(values);
+            return true;
+          }}
+          onDiscard={() => setValues(saved)}
+          draft={draftFor(values, saved)}
+        >
+          <label>
+            Tagline
+            <input
+              value={values.tagline}
+              onChange={(event) =>
+                setValues({ ...values, tagline: event.target.value })
+              }
+            />
+          </label>
+        </SettingsFormShell>
+      );
+    };
+
+    const editTagline = () =>
+      user.type(screen.getByRole('textbox', { name: 'Tagline' }), '!');
+
+    it('shows after a successful save', async () => {
+      renderWithIntl(<TaglineSettings />);
+
+      await editTagline();
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      expect(await screen.findByText('All changes saved')).toBeVisible();
+    });
+
+    it('disappears on the next edit after a save', async () => {
+      renderWithIntl(<TaglineSettings />);
+      await editTagline();
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+      await screen.findByText('All changes saved');
+
+      await editTagline();
+
+      expect(screen.queryByText('All changes saved')).not.toBeInTheDocument();
+    });
+
+    it('stays hidden after discarding back to clean', async () => {
+      renderWithIntl(<TaglineSettings />);
+      await editTagline();
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+      await screen.findByText('All changes saved');
+      await editTagline();
+
+      await user.click(screen.getByRole('button', { name: 'Discard' }));
+
+      expect(
+        screen.queryByRole('region', { name: 'Unsaved changes' }),
+      ).not.toBeInTheDocument();
+      expect(screen.queryByText('All changes saved')).not.toBeInTheDocument();
     });
   });
 
