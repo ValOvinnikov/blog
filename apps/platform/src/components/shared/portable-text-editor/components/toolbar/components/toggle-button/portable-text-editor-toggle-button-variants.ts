@@ -3,6 +3,7 @@ import { tv } from '@platform/utils/tv/tv';
 export const portableTextEditorToggleButtonVariants = tv({
   base: [
     'rounded-[7px] border border-transparent px-2 py-1',
+    'min-h-11 min-w-11 md:min-h-0 md:min-w-0',
     'text-[12.5px] text-admin-text',
     'hover:bg-admin-line-2',
     'focus-visible:outline-2 focus-visible:outline-admin-brand-weak',

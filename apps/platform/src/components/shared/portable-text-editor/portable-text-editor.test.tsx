@@ -1,3 +1,4 @@
+import { VOICE_PORTABLE_TEXT_SCHEMA } from '@blog/config';
 import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
 import {
   renderWithIntl,
@@ -145,6 +146,64 @@ describe(PortableTextEditor, () => {
     );
 
     expect(screen.getByRole('button', { name: 'Bold' })).toBeVisible();
+  });
+
+  it('offers only the controls the schema allows', () => {
+    render(
+      <PortableTextEditor
+        initialValue={[]}
+        onChange={() => {}}
+        ariaLabel="Body"
+        schema={VOICE_PORTABLE_TEXT_SCHEMA}
+      />,
+    );
+
+    expect(screen.getAllByRole('button')).toHaveLength(3);
+    expect(screen.getByRole('button', { name: 'Bold' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Italic' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Link' })).toBeVisible();
+  });
+
+  it('offers headings and lists under the default schema', () => {
+    render(
+      <PortableTextEditor
+        initialValue={[]}
+        onChange={() => {}}
+        ariaLabel="Body"
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Heading' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Bullet list' })).toBeVisible();
+  });
+
+  it('shows the placeholder while empty', () => {
+    render(
+      <PortableTextEditor
+        initialValue={[]}
+        onChange={() => {}}
+        ariaLabel="Body"
+        placeholder="No posts yet."
+      />,
+    );
+
+    expect(screen.getByText('No posts yet.')).toBeVisible();
+  });
+
+  it('marks the field invalid and points it at its description', () => {
+    render(
+      <PortableTextEditor
+        initialValue={[]}
+        onChange={() => {}}
+        ariaLabel="Body"
+        isInvalid={true}
+        aria-describedby="body-error"
+      />,
+    );
+
+    const field = screen.getByRole('textbox', { name: 'Body' });
+    expect(field).toHaveAttribute('aria-invalid', 'true');
+    expect(field).toHaveAttribute('aria-describedby', 'body-error');
   });
 
   it('hides the formatting toolbar when disabled', () => {

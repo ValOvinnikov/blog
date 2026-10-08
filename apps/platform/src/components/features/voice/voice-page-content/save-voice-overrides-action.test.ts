@@ -35,15 +35,7 @@ const requireTenantMembershipMock = vi.mocked<
 
 const tenant = { id: 'tenant-1' };
 
-const overrides = {
-  notFoundHeading: '',
-  notFoundSupportingText: 'Custom 404 copy.',
-  blogListEmpty: '',
-  topicEmpty: '',
-  tagEmpty: '',
-  topicsEmpty: '',
-  bookmarksEmpty: '',
-};
+const overrides = { notFoundSupportingText: 'Custom 404 copy.' };
 
 const overridesByLocale = {
   [LOCALE_ISO_CODES.EN]: overrides,
@@ -137,22 +129,20 @@ describe(saveVoiceOverridesAction, () => {
     expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
   });
 
-  it('does not report success or revalidate when upsertSiteConfig rejects a field', async () => {
-    upsertSiteConfigMock.mockResolvedValue({
-      ok: false,
-      fieldErrorsByLocale: {
-        [LOCALE_ISO_CODES.DE]: {
-          notFoundHeading: 'Must be 80 characters or fewer.',
-        },
+  it('returns the rejected fields per language without revalidating', async () => {
+    const fieldErrorsByLocale = {
+      [LOCALE_ISO_CODES.DE]: {
+        notFoundHeading: 'Must be 100 characters or fewer.',
       },
-    });
+    };
+    upsertSiteConfigMock.mockResolvedValue({ ok: false, fieldErrorsByLocale });
 
     const result = await saveVoiceOverridesAction(
       'tenant-1',
       overridesByLocale,
     );
 
-    expect(result).toEqual({ ok: false });
+    expect(result).toEqual({ ok: false, fieldErrorsByLocale });
     expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
   });
 

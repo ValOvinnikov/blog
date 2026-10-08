@@ -466,31 +466,60 @@
   },
   "voiceSettings": {
     "heading": "Tonalität",
-    "description": "Die Worte, die die Website selbst verwendet. Jedes Feld hat bereits einen sinnvollen Standardwert.",
+    "description": "Formulieren Sie die seitenweiten Hinweise der Website um. Jedes Feld hat einen Standardtext – ändern Sie nur, was nach Ihnen klingen soll.",
+    "fixedCopyNote": "Schaltflächen, Menüs und Beschriftungen werden für Sie übersetzt und sind auf jeder Website gleich, deshalb sind sie hier nicht aufgeführt.",
+    "editingLanguageNote": "Sie bearbeiten {language} — andere Sprachen behalten ihren eigenen Text.",
+    "languageAriaLabel": "Sprache",
+    "languageOption": "{language} · {count, plural, =0 {alles Standard} other {# angepasst}}",
+    "surfaceCustomisedCount": "{count, plural, =0 {Alles Standard} other {# angepasst}}",
     "saveButton": "Änderungen speichern",
     "savingButton": "Wird gespeichert…",
-    "alertSuccess": "voiceOverrides gespeichert.",
+    "alertSuccess": "Tonalität gespeichert.",
     "alertError": "Speichern fehlgeschlagen — bitte erneut versuchen.",
-    "basicHeading": "Grundlagen",
-    "basicAlert": "Hier ist nichts erforderlich. Die Website hat bereits sinnvolle Standardtexte. Die meisten Mandanten öffnen die erweiterten Felder unten nie.",
-    "advancedSummary": "Erweitert — 7 ausgewählte Texte, 2 Gruppen",
-    "advancedOverrideInfo": "Jedes Feld ist eine Überschreibung. Lassen Sie ein Feld leer, um den Standardtext der Website zu verwenden — ein geleertes Feld kehrt zu diesem Standard zurück und setzt den Text nicht auf leer."
+    "badgeDefault": "Standard",
+    "badgeCustomised": "Angepasst",
+    "unsaved": "Nicht gespeichert",
+    "reset": "Zurücksetzen",
+    "keepPlaceholder": "<code>{token}</code> beibehalten — die Website setzt den Wert ein.",
+    "draftFieldLabel": "{surface} — {field} ({language})"
   },
-  "voiceFieldGroup": {
-    "fieldCount": "{count, plural, one {# Feld} other {# Felder}}"
+  "voiceSurfaces": {
+    "NOT_FOUND": "Seite nicht gefunden",
+    "ERROR": "Fehlerseite",
+    "ARCHIVE": "Leere Listen",
+    "BOOKMARKS": "Lesezeichen"
   },
-  "voiceFieldGroups": {
-    "notFoundPage": "404-Seite",
-    "emptyStates": "Leere Zustände"
+  "voiceSurfaceDescriptions": {
+    "NOT_FOUND": "Erscheint unter jeder Adresse, die es nicht gibt",
+    "ERROR": "Erscheint, wenn eine Seite nicht geladen werden kann",
+    "ARCHIVE": "Erscheint, solange eine Liste noch leer ist. Wählen Sie eine aus, um sie zu bearbeiten.",
+    "BOOKMARKS": "Die gemerkten Beiträge eines Lesers, bevor er welche merkt"
   },
   "voiceFieldLabels": {
-    "notFoundHeading": "404 – Überschrift",
-    "notFoundSupportingText": "404 – Begleittext",
-    "blogListEmpty": "Blogliste leer",
-    "topicEmpty": "Thema leer",
-    "tagEmpty": "Schlagwort leer",
-    "topicsEmpty": "Themen leer",
-    "bookmarksEmpty": "Lesezeichen leer"
+    "blogListEmpty": "Blog-Übersicht",
+    "topicEmpty": "Themenseite",
+    "tagEmpty": "Schlagwortseite",
+    "topicsEmpty": "Themenübersicht",
+    "tagsEmpty": "Schlagwortübersicht",
+    "notFoundEyebrow": "Kennzeile",
+    "notFoundHeading": "Überschrift",
+    "notFoundSupportingText": "Begleittext",
+    "localeErrorTitle": "Überschrift",
+    "localeErrorDescription": "Beschreibung",
+    "bookmarksEmpty": "Leere Lesezeichen"
+  },
+  "voiceFieldHints": {
+    "blogListEmpty": "Die Blog-Übersicht, bevor etwas veröffentlicht ist",
+    "topicEmpty": "Ein Thema ohne Beiträge",
+    "tagEmpty": "Ein Schlagwort ohne Beiträge",
+    "topicsEmpty": "Die Themenübersicht, bevor es Themen gibt",
+    "tagsEmpty": "Die Schlagwortübersicht, bevor es Schlagwörter gibt",
+    "notFoundEyebrow": "Kleine Zeile über der Überschrift",
+    "notFoundHeading": "Auch der Titel im Browser-Tab",
+    "notFoundSupportingText": "Unter der Überschrift",
+    "localeErrorTitle": "Die Hauptüberschrift der Seite",
+    "localeErrorDescription": "Unter der Überschrift",
+    "bookmarksEmpty": "Die Lesezeichenseite, bevor etwas gemerkt ist"
   },
   "addTenantWizard": {
     "heading": "Mandant hinzufügen",
