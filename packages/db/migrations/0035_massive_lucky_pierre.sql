@@ -1,0 +1,14 @@
+ALTER TABLE "email_templates" ADD COLUMN "locale" "locale_code";--> statement-breakpoint
+UPDATE "email_templates" SET "locale" = "tenants"."locale" FROM "tenants" WHERE "tenants"."id" = "email_templates"."tenant_id";--> statement-breakpoint
+ALTER TABLE "email_templates" ALTER COLUMN "locale" SET NOT NULL;--> statement-breakpoint
+UPDATE "email_templates" SET
+  "subject" = CASE WHEN "email_templates"."subject" = "seeded"."subject" THEN NULL ELSE "email_templates"."subject" END,
+  "body" = CASE WHEN "email_templates"."body" = "seeded"."body" THEN NULL ELSE "email_templates"."body" END
+FROM (VALUES
+  ('MAGIC_LINK', 'Sign in to your account', '[{"_type":"block","_key":"magic-link-default-1","style":"normal","markDefs":[],"children":[{"_type":"span","_key":"magic-link-default-1-span","text":"We received a request to sign in to your account. Use the button below to continue.","marks":[]}]},{"_type":"block","_key":"magic-link-default-2","style":"normal","markDefs":[],"children":[{"_type":"span","_key":"magic-link-default-2-span","text":"If you did not request this email, you can safely ignore it.","marks":[]}]}]'::jsonb),
+  ('TENANT_INVITE', 'You''ve been invited to join the team', '[{"_type":"block","_key":"tenant-invite-default-1","style":"normal","markDefs":[],"children":[{"_type":"span","_key":"tenant-invite-default-1-span","text":"You''ve been invited to join as a team member. Use the button below to accept your invitation.","marks":[]}]},{"_type":"block","_key":"tenant-invite-default-2","style":"normal","markDefs":[],"children":[{"_type":"span","_key":"tenant-invite-default-2-span","text":"If you weren''t expecting this invitation, you can safely ignore this email.","marks":[]}]}]'::jsonb),
+  ('NEWSLETTER_CONFIRMATION', 'Confirm your newsletter subscription', '[{"_type":"block","_key":"newsletter-confirmation-default-1","style":"normal","markDefs":[],"children":[{"_type":"span","_key":"newsletter-confirmation-default-1-span","text":"Thanks for subscribing! Please confirm your email address to start receiving updates.","marks":[]}]},{"_type":"block","_key":"newsletter-confirmation-default-2","style":"normal","markDefs":[],"children":[{"_type":"span","_key":"newsletter-confirmation-default-2-span","text":"If you did not request this, you can safely ignore this email.","marks":[]}]}]'::jsonb)
+) AS "seeded"("template_type", "subject", "body")
+WHERE "email_templates"."template_type" = "seeded"."template_type";--> statement-breakpoint
+ALTER TABLE "email_templates" DROP CONSTRAINT "email_templates_tenant_id_template_type_pk";--> statement-breakpoint
+ALTER TABLE "email_templates" ADD CONSTRAINT "email_templates_tenant_id_template_type_locale_pk" PRIMARY KEY("tenant_id","template_type","locale");
