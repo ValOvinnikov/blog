@@ -469,3 +469,21 @@ export const SplitSquarePortrait: TStory = {
     ),
   },
 };
+
+export const SplitSquarePortraitPhone: TStory = {
+  ...SplitSquarePortrait,
+  globals: { viewport: 'phone' },
+};
+
+export const SplitSquarePortraitTablet: TStory = {
+  ...SplitSquarePortrait,
+  globals: { viewport: 'tablet' },
+};
+
+export const SplitSquarePortraitCenterTablet: TStory = {
+  args: {
+    ...SplitSquarePortrait.args,
+    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+  },
+  globals: { viewport: 'tablet' },
+};
