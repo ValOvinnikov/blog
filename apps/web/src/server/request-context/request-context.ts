@@ -44,6 +44,7 @@ type TRequestContextStore = {
   tenantRow?: Promise<TMaybeUndefined<TTenant>>;
   entry?: { tenantId: TMaybeUndefined<string>; locale: TLocaleIsoCode };
   context?: Promise<TRequestContext>;
+  notFoundContext?: Promise<TNotFoundContext>;
 };
 
 const getStore = cache((): TRequestContextStore => {
@@ -162,13 +163,9 @@ const loadTenantRowForNotFound = async (
   }
 };
 
-/**
- * Next renders `[tenant]/not-found.tsx` alongside the `[tenant]/[locale]`
- * layout on every request, so this waits for that layout to enter the route
- * rather than reading the store before it has.
- */
-export const getNotFoundContext = async (): Promise<TNotFoundContext> => {
-  const store = getStore();
+const buildNotFoundContext = async (
+  store: TRequestContextStore,
+): Promise<TNotFoundContext> => {
   const { tenantId, locale } = await store.requestedRoute;
   const row = await loadTenantRowForNotFound(store, tenantId);
   const defaultLocale = row?.locale ?? routing.defaultLocale;
@@ -182,4 +179,41 @@ export const getNotFoundContext = async (): Promise<TNotFoundContext> => {
     locale: servedLocale,
     isDefaultLocale: servedLocale === defaultLocale,
   };
+};
+
+/**
+ * Next renders `[tenant]/not-found.tsx` alongside the `[tenant]/[locale]`
+ * layout on every request, so this waits for that layout to enter the route
+ * rather than reading the store before it has.
+ */
+export const getNotFoundContext = (): Promise<TNotFoundContext> => {
+  const store = getStore();
+  return (store.notFoundContext ??= buildNotFoundContext(store));
+};
+
+/**
+ * The tenant whose Voice overrides apply to `locale` in this request, or
+ * `undefined` without waiting when no `[tenant]` route has entered — so
+ * `global-not-found` and `global-error` never block on it.
+ */
+export const peekVoiceTenant = async (
+  locale: TLocaleIsoCode,
+): Promise<TMaybeUndefined<string>> => {
+  const { context, notFoundContext } = getStore();
+  const entered = await context?.then(
+    (resolved) => resolved,
+    () => undefined,
+  );
+
+  if (entered) {
+    return locale === entered.defaultLocale ? entered.tenantId : undefined;
+  }
+  if (!notFoundContext) return undefined;
+
+  const {
+    tenantId,
+    locale: servedLocale,
+    isDefaultLocale,
+  } = await notFoundContext;
+  return isDefaultLocale && servedLocale === locale ? tenantId : undefined;
 };

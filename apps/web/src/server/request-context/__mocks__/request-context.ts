@@ -16,3 +16,7 @@ export const getNotFoundContext = vi.fn<typeof TModule.getNotFoundContext>(
     isDefaultLocale: true,
   }),
 );
+
+export const peekVoiceTenant = vi.fn<typeof TModule.peekVoiceTenant>(
+  async () => undefined,
+);
