@@ -22,9 +22,10 @@ import { PreviewSample } from './preview-sample';
 
 type TPreviewMode = 'light' | 'dark';
 
+type TPreviewWidth = 'desktop' | 'mobile';
+
 export type TLookPreviewProps = {
   tenantName: string;
-  primaryDomain: string;
   accentHue: number;
   logoHue: number | undefined;
   headingFont: TFontChoice;
@@ -41,7 +42,6 @@ export type TLookPreviewProps = {
  */
 export const LookPreview = ({
   tenantName,
-  primaryDomain,
   accentHue,
   logoHue,
   headingFont,
@@ -53,12 +53,18 @@ export const LookPreview = ({
 }: TLookPreviewProps) => {
   const t = useTranslations('lookPreview');
   const [mode, setMode] = useState<TPreviewMode>('light');
+  const [width, setWidth] = useState<TPreviewWidth>('desktop');
   const isDark = mode === 'dark';
   const resolvedLogoHue = logoHue ?? accentHue;
 
   const modeOptions: { value: TPreviewMode; label: string }[] = [
     { value: 'light', label: t('modeLight') },
     { value: 'dark', label: t('modeDark') },
+  ];
+
+  const widthOptions: { value: TPreviewWidth; label: string }[] = [
+    { value: 'desktop', label: t('widthDesktop') },
+    { value: 'mobile', label: t('widthMobile') },
   ];
 
   const tokenStyle = {
@@ -70,34 +76,35 @@ export const LookPreview = ({
   const heading = FONT_OPTIONS[headingFont];
   const body = FONT_OPTIONS[bodyFont];
 
-  const {
-    root,
-    note,
-    deviceBar,
-    deviceDots,
-    deviceDot,
-    deviceUrl,
-    frame,
-    framePlaceholder,
-  } = lookPreviewVariants();
+  const { actions, frame, note } = lookPreviewVariants({
+    isMobile: width === 'mobile',
+  });
 
   return (
-    <div className={root()}>
-      <Card>
-        <Card.Header
-          title={t('livePreviewHeading')}
-          supportingText={t('livePreviewDescription')}
-          headingLevel={2}
-          actions={
+    <Card>
+      <Card.Header
+        title={t('livePreviewHeading')}
+        supportingText={t('livePreviewDescription')}
+        headingLevel={2}
+        actions={
+          <div className={actions()}>
+            <SegmentedControl
+              ariaLabel={t('previewWidthAriaLabel')}
+              options={widthOptions}
+              value={width}
+              onChange={setWidth}
+            />
             <SegmentedControl
               ariaLabel={t('previewColorSchemeAriaLabel')}
               options={modeOptions}
               value={mode}
               onChange={setMode}
             />
-          }
-        />
-        <Card.Body>
+          </div>
+        }
+      />
+      <Card.Body>
+        <div className={frame()}>
           <PreviewSample
             tenantName={tenantName}
             logoSrc={logoSrc}
@@ -106,32 +113,9 @@ export const LookPreview = ({
             headingFontFamily={heading.fontFamily}
             bodyFontFamily={body.fontFamily}
           />
-          <p className={note()}>{t('previewNote')}</p>
-        </Card.Body>
-      </Card>
-
-      <Card>
-        <Card.Header
-          title={t('fullPagePreviewHeading')}
-          supportingText={t('fullPagePreviewDescription')}
-          headingLevel={2}
-        />
-        <Card.Body>
-          <div className={deviceBar()}>
-            <span className={deviceDots()} aria-hidden="true">
-              <span className={deviceDot()} />
-              <span className={deviceDot()} />
-              <span className={deviceDot()} />
-            </span>
-            <span className={deviceUrl()}>
-              {t('deviceUrl', { primaryDomain })}
-            </span>
-          </div>
-          <div className={frame()}>
-            <p className={framePlaceholder()}>{t('framePlaceholder')}</p>
-          </div>
-        </Card.Body>
-      </Card>
-    </div>
+        </div>
+        <p className={note()}>{t('previewNote')}</p>
+      </Card.Body>
+    </Card>
   );
 };

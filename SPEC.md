@@ -1413,7 +1413,7 @@ density and card-style values live in `@blog/config`'s theme declaration tables;
 its preview surface, which also carries the `dark` class so the tenant's
 dark ramp wins over `theme.css`'s static `.dark` values. `apps/web`'s
 `buildThemeStyleBlock` reads the same tables. The
-Look page's Advanced section sets the card style (Accent bar or Outlined)
+Look page's Shape card sets the card style (Accent bar or Outlined)
 beside radius and density; picking a preset re-seeds it from
 `PRESET_REGISTRY`'s `cardStyle`, and the preview's linked and static cards show
 it before saving. The
