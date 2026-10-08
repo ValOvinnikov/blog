@@ -214,7 +214,7 @@ export const LookForm = ({
     },
   ];
 
-  const { root, columns, editPanel, previewPanel } = lookFormVariants();
+  const { columns, editPanel, previewPanel } = lookFormVariants();
 
   return (
     <SettingsFormShell
@@ -231,7 +231,7 @@ export const LookForm = ({
       archivedNoticeId={archivedNoticeId}
       hasError={status === 'error'}
       errorTitle={t('alertError')}
-      className={root()}
+      isWide={true}
       draft={{
         tenantId,
         page: 'look',
