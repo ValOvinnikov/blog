@@ -370,6 +370,7 @@
     "description": "Gilt für jede E-Mail, die dieser Mandant versendet. Leere Felder verwenden den Produktstandard.",
     "senderNameLabel": "Absendername",
     "senderNameHint": "Der Anzeigename der Absenderadresse — unabhängig vom Website-Titel.",
+    "senderNameInvalidError": "Das ist der Name, den Empfänger sehen, keine E-Mail-Adresse. Geben Sie einen Namen wie Acme Co ein, ohne < > \" , ; oder @.",
     "replyToLabel": "Antwortadresse",
     "replyToHint": "Wohin Antworten auf E-Mails dieses Mandanten geleitet werden.",
     "footerAddressLabel": "Postanschrift in der Fußzeile",

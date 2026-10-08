@@ -110,6 +110,31 @@ describe(EmailSettingsForm, () => {
         "Couldn't save email settings",
       );
     });
+
+    it('shows the sender-name error on the field itself, and clears it once the field is edited', async () => {
+      updateEmailConfigActionMock.mockResolvedValue({
+        ok: false,
+        fieldErrors: { senderName: 'Enter a name, not an address.' },
+      });
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      const senderNameInput = screen.getByRole('textbox', {
+        name: 'Sender name',
+      });
+      expect(
+        await screen.findByText('Enter a name, not an address.'),
+      ).toBeVisible();
+      expect(senderNameInput).toHaveAccessibleDescription(
+        expect.stringContaining('Enter a name, not an address.'),
+      );
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+
+      await user.type(senderNameInput, 'x');
+
+      expect(
+        screen.queryByText('Enter a name, not an address.'),
+      ).not.toBeInTheDocument();
+    });
   });
 
   it('disables Save while the tenant is archived', () => {
