@@ -70,4 +70,22 @@ describe(`<${SectionNavigation.name}/>`, () => {
       ).toBeVisible();
     });
   });
+
+  describe('with an authored section title', () => {
+    beforeEach(() => {
+      setup({
+        sectionNavigation: makeLandingSectionNavigation({ title: 'Guides' }),
+      });
+    });
+
+    it('names the nav landmark with the authored title', () => {
+      expect(screen.getByRole('navigation', { name: 'Guides' })).toBeVisible();
+    });
+
+    it('does not fall back to "In this section"', () => {
+      expect(
+        screen.queryByRole('navigation', { name: 'In this section' }),
+      ).not.toBeInTheDocument();
+    });
+  });
 });
