@@ -1,3 +1,4 @@
+import { Card } from '@platform/components/shared/card';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import type {
   TEmailItemStatus,
@@ -33,25 +34,27 @@ export const ItemList = ({
   onSelect,
   ariaLabel,
 }: TItemListProps) => {
-  const { root, item, label, description } = itemListVariants();
+  const { root, list, item, label, description } = itemListVariants();
 
   return (
-    <nav aria-label={ariaLabel} className={root()}>
-      {items.map((option) => (
-        <button
-          key={option.value}
-          type="button"
-          className={item()}
-          aria-current={option.value === selected}
-          onClick={() => onSelect(option.value)}
-        >
-          <span className={label()}>{option.label}</span>
-          <span className={description()}>{option.description}</span>
-          <StatusBadge tone={STATUS_TONE[option.status]}>
-            {option.statusLabel}
-          </StatusBadge>
-        </button>
-      ))}
-    </nav>
+    <Card className={root()}>
+      <nav aria-label={ariaLabel} className={list()}>
+        {items.map((option) => (
+          <button
+            key={option.value}
+            type="button"
+            className={item()}
+            aria-current={option.value === selected}
+            onClick={() => onSelect(option.value)}
+          >
+            <span className={label()}>{option.label}</span>
+            <span className={description()}>{option.description}</span>
+            <StatusBadge tone={STATUS_TONE[option.status]}>
+              {option.statusLabel}
+            </StatusBadge>
+          </button>
+        ))}
+      </nav>
+    </Card>
   );
 };
