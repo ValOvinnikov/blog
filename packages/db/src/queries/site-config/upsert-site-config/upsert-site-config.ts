@@ -15,6 +15,7 @@ import {
   LANGUAGE_SWITCHER_STYLE,
   FONT_CHOICE,
   isLocaleIsoCode,
+  LOCALE_ISO_CODES,
   PRESET_ID,
   PRESET_REGISTRY,
   RADIUS_SCALE,
@@ -453,10 +454,10 @@ function parseVoiceOverridesByLocale(
     Record<TLocaleIsoCode, TVoiceFieldErrors>
   > = {};
 
-  for (const [locale, overrides] of Object.entries(raw) as [
-    TLocaleIsoCode,
-    TVoiceOverridesInput,
-  ][]) {
+  for (const locale of Object.values(LOCALE_ISO_CODES)) {
+    const overrides = raw[locale];
+    if (overrides === undefined) continue;
+
     const result = parseVoiceOverrides(overrides);
     if (result.ok) value[locale] = result.value;
     else fieldErrorsByLocale[locale] = result.fieldErrors;
