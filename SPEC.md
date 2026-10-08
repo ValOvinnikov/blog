@@ -1757,7 +1757,9 @@ recipient's language, then the tenant's default language, then the product
 default in the recipient's language. Senders pick the language as follows:
 the magic-link provider as described in §3, `apps/web`'s newsletter
 confirmation from the language of the page the reader subscribed on (a value
-outside the site's languages falls back to the tenant's default), and a
+outside the site's languages falls back to the tenant's default), with its
+confirm and unsubscribe links carrying that language so the page they open
+matches the email, and a
 platform admin signing into the platform itself always in English.
 
 `apps/platform`'s Email page edits one language at a time, as one draft saved
