@@ -21,7 +21,7 @@ export const StandaloneNotFoundPage = async ({
 }: TStandaloneNotFoundPageProps = {}) => {
   setRequestLocale(locale);
 
-  const [messages, themeTokens] = await Promise.all([
+  const [{ messages, rich }, themeTokens] = await Promise.all([
     resolveNotFoundMessages({ tenant, locale, hasVoiceOverrides }),
     tenant ? getThemeTokens(tenant) : toThemeTokens(undefined),
   ]);
@@ -29,7 +29,7 @@ export const StandaloneNotFoundPage = async ({
   return (
     <ThemeScope themeTokens={themeTokens}>
       <NextIntlClientProvider locale={locale} messages={messages}>
-        <NotFoundPage />
+        <NotFoundPage supportingText={rich.notFoundSupportingText} />
       </NextIntlClientProvider>
     </ThemeScope>
   );

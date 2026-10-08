@@ -1,6 +1,10 @@
 import { LOCALE_ISO_CODES, SITE_MESSAGES } from '@blog/config';
 import userEvent from '@testing-library/user-event';
+import { VoiceRichProvider } from '@web/context/voice-rich-provider';
 import { customRender, render, screen } from '@web/testing/custom-render';
+import { AppProviders } from '@web/testing/providers';
+import { makeFormattedVoiceRich } from '@web/testing/shared/voice/fixtures';
+import { resolveVoiceRichFields } from '@web/utils/resolve-voice-rich-fields';
 import { NextIntlClientProvider } from 'next-intl';
 
 import { LocaleErrorPage } from './locale-error-page';
@@ -109,6 +113,7 @@ describe(`<${LocaleErrorPage.name}/>`, () => {
       >
         <LocaleErrorPage error={error} reset={reset} />
       </NextIntlClientProvider>,
+      { wrapper: AppProviders },
     );
 
     rerender(
@@ -121,5 +126,29 @@ describe(`<${LocaleErrorPage.name}/>`, () => {
     );
 
     expect(reportClientErrorMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders the tenant-authored description with its formatting and link', () => {
+    render(
+      <VoiceRichProvider
+        values={{
+          ...resolveVoiceRichFields({}, SITE_MESSAGES),
+          localeErrorDescription: makeFormattedVoiceRich({
+            linkText: 'status page',
+            href: 'https://status.example.com',
+          }),
+        }}
+      >
+        <LocaleErrorPage error={error} reset={reset} />
+      </VoiceRichProvider>,
+      { wrapper: AppProviders },
+    );
+
+    expect(screen.getByRole('link', { name: 'status page' })).toHaveAttribute(
+      'href',
+      'https://status.example.com',
+    );
+    expect(screen.getByText('bold', { selector: 'strong' })).toBeVisible();
+    expect(screen.getByText('italic', { selector: 'em' })).toBeVisible();
   });
 });
