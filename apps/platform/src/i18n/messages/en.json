@@ -771,5 +771,22 @@
     "discardAndLeave": "Discard and leave",
     "saveAndLeave": "Save and leave",
     "saving": "Saving…"
+  },
+  "draftRecovery": {
+    "title": "You have unsaved changes from {takenAt}.",
+    "description": "They were kept on this device when you left the page.",
+    "todayAt": "{time} today",
+    "restore": "{count, plural, one {Restore # change} other {Restore # changes}}",
+    "discard": "Discard them",
+    "differencesTitle": "You have unsaved changes from {takenAt}, but this page was saved at {savedAt}.",
+    "differencesTitleSavedSince": "You have unsaved changes from {takenAt}, but this page has been saved since.",
+    "differencesDescription": "Restoring replaces {count, plural, one {# of the newer values} other {# of the newer values}}: {fields}.",
+    "reviewDifferences": "{count, plural, one {Review the difference} other {Review the # differences}}",
+    "restoreAnyway": "Restore anyway",
+    "discardDraft": "Discard my draft",
+    "fieldColumn": "Field",
+    "savedColumn": "Saved",
+    "draftColumn": "Your draft",
+    "emptyValue": "Empty"
   }
 }

@@ -58,6 +58,12 @@ vi.mock('next/navigation', () => ({
   })),
 }));
 
+// Unsaved settings drafts persist in localStorage, so one test's draft would
+// otherwise be offered for restore in the next.
+beforeEach(() => {
+  if (typeof window !== 'undefined') window.localStorage.clear();
+});
+
 // Base UI's floating components call these, and jsdom implements none of them.
 if (typeof Element !== 'undefined') {
   if (!Element.prototype.hasPointerCapture) {

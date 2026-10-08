@@ -12,10 +12,15 @@ import {
 import { useTranslations } from 'next-intl';
 import { useEffect, useEffectEvent, type ReactNode } from 'react';
 
+import { DraftRecoveryBanner } from './components/draft-recovery-banner/draft-recovery-banner';
 import { SaveBar } from './components/save-bar/save-bar';
 import { settingsFormShellVariants } from './settings-form-shell-variants';
+import {
+  useSettingsDraft,
+  type TSettingsFormDraft,
+} from './use-settings-draft';
 
-export type TSettingsFormShellProps = {
+export type TSettingsFormShellProps<TValues> = {
   title: string;
   description: string;
   saveButtonLabel: string;
@@ -30,6 +35,7 @@ export type TSettingsFormShellProps = {
   archivedNoticeId: string;
   hasError: boolean;
   errorTitle: string;
+  draft: TSettingsFormDraft<TValues>;
   className?: string;
   children: ReactNode;
 };
@@ -37,7 +43,7 @@ export type TSettingsFormShellProps = {
 const isSaveShortcut = (event: KeyboardEvent) =>
   (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's';
 
-export const SettingsFormShell = ({
+export const SettingsFormShell = <TValues,>({
   title,
   description,
   saveButtonLabel,
@@ -52,13 +58,30 @@ export const SettingsFormShell = ({
   archivedNoticeId,
   hasError,
   errorTitle,
+  draft,
   className,
   children,
-}: TSettingsFormShellProps) => {
+}: TSettingsFormShellProps<TValues>) => {
   const t = useTranslations('saveBar');
   const { root, alert, savedStatus, liveStatus } = settingsFormShellVariants();
   const isDirty = changeCount > 0;
   const breakdown = formatLanguageChanges(changesByLanguage);
+  const {
+    offer,
+    restore,
+    forget: forgetDraft,
+  } = useSettingsDraft(draft, isDirty);
+
+  const handleSave = async () => {
+    const isSaved = await onSave();
+    if (isSaved) forgetDraft();
+    return isSaved;
+  };
+
+  const handleDiscard = () => {
+    onDiscard();
+    forgetDraft();
+  };
 
   useUnsavedChangesGuard(
     isDirty
@@ -66,8 +89,8 @@ export const SettingsFormShell = ({
           pageTitle: title,
           changeCount,
           changesByLanguage,
-          save: onSave,
-          discard: onDiscard,
+          save: handleSave,
+          discard: handleDiscard,
         }
       : null,
   );
@@ -75,7 +98,7 @@ export const SettingsFormShell = ({
   const handleShortcut = useEffectEvent((event: KeyboardEvent) => {
     if (!isSaveShortcut(event)) return;
     event.preventDefault();
-    if (!isPending) void onSave();
+    if (!isPending) void handleSave();
   });
 
   useEffect(() => {
@@ -112,6 +135,17 @@ export const SettingsFormShell = ({
         <Alert type={ALERT_TYPE.ERROR} title={errorTitle} className={alert()} />
       )}
 
+      {offer && (
+        <DraftRecoveryBanner
+          takenAt={offer.takenAt}
+          savedAt={draft.savedAt}
+          changeCount={offer.changeCount}
+          differences={offer.differences}
+          onRestore={restore}
+          onDiscard={forgetDraft}
+        />
+      )}
+
       {children}
 
       <span
@@ -130,8 +164,8 @@ export const SettingsFormShell = ({
           saveButtonLabel={saveButtonLabel}
           savingButtonLabel={savingButtonLabel}
           isPending={isPending}
-          onSave={() => void onSave()}
-          onDiscard={onDiscard}
+          onSave={() => void handleSave()}
+          onDiscard={handleDiscard}
         />
       )}
     </div>

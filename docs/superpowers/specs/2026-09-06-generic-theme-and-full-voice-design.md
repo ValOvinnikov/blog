@@ -7,7 +7,7 @@ review before `writing-plans`.
 overrides, section sidebar title in Studio, contents rail relabelled
 (D15–D18). Voice page redesigned around one card per surface with its own
 preview, and the shared save bar, leave-page guard and draft recovery
-(D8 revised, D19).
+(D8 revised, D19). The Look page follows the same pattern (D20).
 **Supersedes:** decisions D4 and D5 of
 [`2026-08-10-configurability-and-de-console-design.md`](./2026-08-10-configurability-and-de-console-design.md)
 (code voice-packs, "preserve the console voice") and the `chromeOn` field of
@@ -20,8 +20,8 @@ and is already reflected in `SPEC.md`.
 copy lives in Voice, not on modules"; #1899 (module copy vs. Voice); #1420
 (catalog neutralisation); #1415/#1416/#1417 (the `chromeOn` branches this
 removes).
-**Mock:** the approved Voice and Email redesign, desktop and phone, with the
-save, leave and recovery states, is at
+**Mock:** the approved Voice, Email and Look redesign, desktop and phone,
+with the save, leave and recovery states, is at
 <https://claude.ai/artifact/2VkuUEbjfD5QEMXaZSZHJH>. It supersedes the
 earlier three-variant mock
 (<https://claude.ai/code/artifact/1a48581b-2835-4c04-8060-2f27dace8770>).
@@ -300,6 +300,28 @@ Two tasks, delivered in order:
     banner offers the differences for review before any restore.
   - One draft covers the whole page. Switching a section, template or
     language never discards it.
+- **D20 (2026-10-08) — The Look page follows the Voice and Email pattern.**
+  Setting cards on the left, a preview on the right that stays in view while
+  the cards scroll, and the D19 save bar. Every field, and how it is stored,
+  is unchanged; nothing on the page is per-language.
+  - _Cards,_ replacing the "Basic" card and the "Advanced" fold: Preset (the
+    picker, with "Reset to preset" in the card header beside it), Colour
+    (accent and logo hues), Type (heading and body fonts), Shape (corners,
+    density, card style), Brand (logo and favicon), Language switcher. Each
+    card header carries an unsaved dot.
+  - _Reset to preset_ changes the draft only, so Discard undoes it.
+  - _Accent contrast:_ an inaccessible hue stays an inline error on the
+    field, and becomes a D19 "needs attention" field that blocks Save.
+  - _Preview:_ the existing `@blog/ui` sample with its Light/Dark toggle,
+    plus a Desktop/Mobile width toggle. The dashed "Full page preview"
+    placeholder is removed.
+  - _Brand images are staged:_ picking a logo or favicon no longer uploads
+    it. The file uploads when the page is saved, so Discard drops it. A
+    recovered draft (D19) cannot hold a file, so it restores every other
+    field and says the image has to be picked again.
+  - _On a phone:_ Edit/Preview tabs replace the two columns; the save bar
+    spans the width.
+  - Copy is platform UI only, so nothing joins Voice.
 
 ---
 
@@ -629,6 +651,8 @@ the next starts:
    onto the shell (#4482) follow independently.
 7. D17 runs as its own `studio → service → web` chain, parallel to all of
    the above.
+8. D20, two `platform-app` tickets in order: the Look layout, then staged
+   brand images (both edit the Look form). Independent of the Voice chain.
 
 **Env and docs in the same PRs:** `SPEC.md` "Theme-as-content",
 "Voice-as-content", "Curated UI copy" and the cookie-consent "Copy" bullet

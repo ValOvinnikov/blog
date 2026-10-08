@@ -417,4 +417,24 @@ describe(`<${LookForm.name}/>`, () => {
     expect(screen.getByRole('button', { name: 'Upload logo' })).toBeEnabled();
     expect(screen.getByRole('button', { name: 'Small' })).toBeEnabled();
   });
+
+  it('restores unsaved Look changes after leaving the page, keeping the current brand images', async () => {
+    const { unmount } = setup();
+    await user.click(screen.getByRole('radio', { name: 'Editorial' }));
+    unmount();
+
+    setup({
+      initialValues: {
+        ...defaultLookFormValues(),
+        logoAssetUrl: 'https://example.blob.vercel-storage.com/logo.png',
+      },
+    });
+    await user.click(
+      screen.getByRole('button', { name: /^Restore \d+ changes$/ }),
+    );
+
+    expect(screen.getByRole('radio', { name: 'Editorial' })).toBeChecked();
+    expect(screen.getByText('28°')).toBeVisible();
+    expect(screen.getByAltText('Current logo')).toBeVisible();
+  });
 });

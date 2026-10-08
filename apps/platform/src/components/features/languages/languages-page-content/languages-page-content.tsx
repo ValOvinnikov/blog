@@ -10,7 +10,8 @@ export type TLanguagesPageContentProps = {
 export const LanguagesPageContent = async ({
   tenant,
 }: TLanguagesPageContentProps) => {
-  const { id, locale, additionalLocales, plan, deprovisionedAt } = tenant;
+  const { id, locale, additionalLocales, plan, updatedAt, deprovisionedAt } =
+    tenant;
 
   return (
     <LanguagesSettings
@@ -19,6 +20,7 @@ export const LanguagesPageContent = async ({
       storedLocales={additionalLocales}
       additionalLocaleLimit={PLAN_LOCALE_LIMIT[plan] - 1}
       saveAction={updateTenantLanguagesAction}
+      savedAt={updatedAt}
       archivedAt={deprovisionedAt ?? undefined}
     />
   );
