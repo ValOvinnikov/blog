@@ -4,7 +4,10 @@ import {
   type TLocaleIsoCode,
 } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
-import { emailTemplates } from '@blog/db/schema/email-templates';
+import {
+  emailTemplateLogos,
+  emailTemplates,
+} from '@blog/db/schema/email-templates';
 import { tenants } from '@blog/db/schema/tenants';
 import { eq } from 'drizzle-orm';
 
@@ -21,11 +24,17 @@ export async function listEmailTemplates(
 ): Promise<TEmailTemplateResult[]> {
   const db = getDb();
 
-  const rows = await db
-    .select({ defaultLocale: tenants.locale, template: emailTemplates })
-    .from(tenants)
-    .leftJoin(emailTemplates, eq(emailTemplates.tenantId, tenants.id))
-    .where(eq(tenants.id, tenantId));
+  const [rows, logos] = await Promise.all([
+    db
+      .select({ defaultLocale: tenants.locale, template: emailTemplates })
+      .from(tenants)
+      .leftJoin(emailTemplates, eq(emailTemplates.tenantId, tenants.id))
+      .where(eq(tenants.id, tenantId)),
+    db
+      .select()
+      .from(emailTemplateLogos)
+      .where(eq(emailTemplateLogos.tenantId, tenantId)),
+  ]);
 
   const defaultLocale = rows[0]?.defaultLocale ?? LOCALE_ISO_CODES.EN;
   const templates = rows.flatMap(({ template }) =>
@@ -39,6 +48,7 @@ export async function listEmailTemplates(
       locale ?? defaultLocale,
       defaultLocale,
       templates.filter((template) => template.templateType === templateType),
+      logos.find((logo) => logo.templateType === templateType)?.logoAssetUrl,
     ),
   );
 }

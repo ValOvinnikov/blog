@@ -10,7 +10,7 @@ import { PGlite } from '@electric-sql/pglite';
 import { sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/pglite';
 
-import { emailTemplates } from './email-templates';
+import { emailTemplateLogos, emailTemplates } from './email-templates';
 
 const LOCALE_MIGRATION = '0035_massive_lucky_pierre.sql';
 
@@ -32,7 +32,12 @@ const customBody = [
 ];
 
 async function migrateGermanTenantTemplates(
-  templates: { templateType: string; subject: string; body: unknown }[],
+  legacyRows: {
+    templateType: string;
+    subject: string;
+    body: unknown;
+    logoAssetUrl?: string;
+  }[],
 ) {
   const client = new PGlite();
   const db = drizzle(client, { schema });
@@ -48,9 +53,9 @@ async function migrateGermanTenantTemplates(
     )
     .then((result) => result.rows);
 
-  for (const { templateType, subject, body } of templates) {
+  for (const { templateType, subject, body, logoAssetUrl } of legacyRows) {
     await db.execute(
-      sql`insert into "email_templates" ("tenant_id", "template_type", "subject", "body", "logo_asset_url") values (${tenant?.id}, ${templateType}, ${subject}, ${JSON.stringify(body)}::jsonb, 'https://blob.example.com/logo.png')`,
+      sql`insert into "email_templates" ("tenant_id", "template_type", "subject", "body", "logo_asset_url") values (${tenant?.id}, ${templateType}, ${subject}, ${JSON.stringify(body)}::jsonb, ${logoAssetUrl ?? null})`,
     );
   }
 
@@ -58,23 +63,31 @@ async function migrateGermanTenantTemplates(
     await applyMigrationFile(db, file);
   }
 
-  return db
+  const templates = await db
     .select({
       templateType: emailTemplates.templateType,
       locale: emailTemplates.locale,
       subject: emailTemplates.subject,
       body: emailTemplates.body,
-      logoAssetUrl: emailTemplates.logoAssetUrl,
     })
     .from(emailTemplates)
     .orderBy(emailTemplates.templateType);
+  const logos = await db
+    .select({
+      templateType: emailTemplateLogos.templateType,
+      logoAssetUrl: emailTemplateLogos.logoAssetUrl,
+    })
+    .from(emailTemplateLogos)
+    .orderBy(emailTemplateLogos.templateType);
+
+  return { templates, logos };
 }
 
-describe('0035_massive_lucky_pierre (email templates per language)', () => {
+describe('0035_massive_lucky_pierre + 0036_gifted_kang (email templates per language)', () => {
   it(
     "clears seeded defaults and keeps edited copy under the tenant's default language",
     async () => {
-      const rows = await migrateGermanTenantTemplates([
+      const { templates } = await migrateGermanTenantTemplates([
         {
           templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
           subject: 'Eigener Betreff',
@@ -92,27 +105,51 @@ describe('0035_massive_lucky_pierre (email templates per language)', () => {
         },
       ]);
 
-      expect(rows).toEqual([
+      expect(templates).toEqual([
         {
           templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
           locale: LOCALE_ISO_CODES.DE,
           subject: 'Eigener Betreff',
           body: null,
-          logoAssetUrl: 'https://blob.example.com/logo.png',
         },
         {
           templateType: EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION,
           locale: LOCALE_ISO_CODES.DE,
           subject: null,
           body: customBody,
-          logoAssetUrl: 'https://blob.example.com/logo.png',
         },
         {
           templateType: EMAIL_TEMPLATE_TYPE.TENANT_INVITE,
           locale: LOCALE_ISO_CODES.DE,
           subject: null,
           body: null,
-          logoAssetUrl: 'https://blob.example.com/logo.png',
+        },
+      ]);
+    },
+    MIGRATION_REPLAY_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    "moves each template's logo override out of the per-language rows",
+    async () => {
+      const { logos } = await migrateGermanTenantTemplates([
+        {
+          templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+          subject: 'Eigener Betreff',
+          body: customBody,
+          logoAssetUrl: 'https://blob.example.com/magic-link.png',
+        },
+        {
+          templateType: EMAIL_TEMPLATE_TYPE.TENANT_INVITE,
+          subject: 'Einladung',
+          body: customBody,
+        },
+      ]);
+
+      expect(logos).toEqual([
+        {
+          templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+          logoAssetUrl: 'https://blob.example.com/magic-link.png',
         },
       ]);
     },

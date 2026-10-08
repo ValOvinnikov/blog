@@ -4,11 +4,12 @@ import type {
 } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import {
+  emailTemplateLogos,
   emailTemplates,
   type TEmailTemplateBlock,
 } from '@blog/db/schema/email-templates';
 import { tenants } from '@blog/db/schema/tenants';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { z } from 'zod';
 
 import {
@@ -34,19 +35,18 @@ export type TUpdateEmailTemplateInput = z.input<
   typeof updateEmailTemplateInputSchema
 >;
 
-type TEmailTemplateWritable = Partial<typeof emailTemplates.$inferInsert>;
+type TEmailTemplateCopyWritable = Partial<
+  Pick<typeof emailTemplates.$inferInsert, 'subject' | 'body'>
+>;
 
-function presentFields(
+function presentCopyFields(
   parsed: z.output<typeof updateEmailTemplateInputSchema>,
-): TEmailTemplateWritable {
-  const fields: TEmailTemplateWritable = {};
+): TEmailTemplateCopyWritable {
+  const fields: TEmailTemplateCopyWritable = {};
 
   if (parsed.subject !== undefined) fields.subject = parsed.subject;
   if (parsed.body !== undefined) {
     fields.body = parsed.body as TEmailTemplateBlock[] | null;
-  }
-  if (parsed.logoAssetUrl !== undefined) {
-    fields.logoAssetUrl = parsed.logoAssetUrl;
   }
 
   return fields;
@@ -67,20 +67,15 @@ async function resolveTenantLocale(tenantId: string): Promise<TLocaleIsoCode> {
   return tenant.locale;
 }
 
-export async function upsertEmailTemplate(
+async function writeCopy(
   tenantId: string,
   templateType: TEmailTemplateType,
-  input: TUpdateEmailTemplateInput,
-  locale?: TLocaleIsoCode,
-): Promise<TEmailTemplateResult> {
-  const db = getDb();
-  const parsed = updateEmailTemplateInputSchema.parse(input);
-  const fields = presentFields(parsed);
-  const targetLocale = locale ?? (await resolveTenantLocale(tenantId));
-
-  const [row] = await db
+  locale: TLocaleIsoCode,
+  fields: TEmailTemplateCopyWritable,
+): Promise<void> {
+  const [row] = await getDb()
     .insert(emailTemplates)
-    .values({ tenantId, templateType, locale: targetLocale, ...fields })
+    .values({ tenantId, templateType, locale, ...fields })
     .onConflictDoUpdate({
       target: [
         emailTemplates.tenantId,
@@ -95,6 +90,54 @@ export async function upsertEmailTemplate(
     throw new Error(
       `upsertEmailTemplate: upsert for tenant "${tenantId}" template "${templateType}" returned no row.`,
     );
+  }
+}
+
+async function writeLogo(
+  tenantId: string,
+  templateType: TEmailTemplateType,
+  logoAssetUrl: string | null,
+): Promise<void> {
+  const db = getDb();
+
+  if (logoAssetUrl === null) {
+    await db
+      .delete(emailTemplateLogos)
+      .where(
+        and(
+          eq(emailTemplateLogos.tenantId, tenantId),
+          eq(emailTemplateLogos.templateType, templateType),
+        ),
+      );
+    return;
+  }
+
+  await db
+    .insert(emailTemplateLogos)
+    .values({ tenantId, templateType, logoAssetUrl })
+    .onConflictDoUpdate({
+      target: [emailTemplateLogos.tenantId, emailTemplateLogos.templateType],
+      set: { logoAssetUrl, updatedAt: new Date() },
+    });
+}
+
+// The logo is the same in every language, so `locale` scopes only the
+// subject and body.
+export async function upsertEmailTemplate(
+  tenantId: string,
+  templateType: TEmailTemplateType,
+  input: TUpdateEmailTemplateInput,
+  locale?: TLocaleIsoCode,
+): Promise<TEmailTemplateResult> {
+  const parsed = updateEmailTemplateInputSchema.parse(input);
+  const copyFields = presentCopyFields(parsed);
+  const targetLocale = locale ?? (await resolveTenantLocale(tenantId));
+
+  if (Object.keys(copyFields).length > 0) {
+    await writeCopy(tenantId, templateType, targetLocale, copyFields);
+  }
+  if (parsed.logoAssetUrl !== undefined) {
+    await writeLogo(tenantId, templateType, parsed.logoAssetUrl);
   }
 
   return getEmailTemplate(tenantId, templateType, targetLocale);

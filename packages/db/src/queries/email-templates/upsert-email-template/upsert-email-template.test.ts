@@ -155,3 +155,52 @@ describe('partial updates — omission leaves a field untouched, explicit null c
     expect(result.subject).toBe(EMAIL_TEMPLATE_DEFAULT_COPY.MAGIC_LINK.subject);
   });
 });
+
+describe('logo override', () => {
+  let tenantId: string;
+
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
+  it('applies a logo written in one language to every language', async () => {
+    await upsertEmailTemplate(
+      tenantId,
+      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      { logoAssetUrl: 'https://blob.example.com/logo.png' },
+      LOCALE_ISO_CODES.FR,
+    );
+
+    const result = await upsertEmailTemplate(
+      tenantId,
+      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      { subject: 'English subject' },
+      LOCALE_ISO_CODES.EN,
+    );
+
+    expect(result.logoAssetUrl).toBe('https://blob.example.com/logo.png');
+  });
+
+  it('removes the override when the logo is set to null', async () => {
+    await upsertEmailTemplate(tenantId, EMAIL_TEMPLATE_TYPE.MAGIC_LINK, {
+      logoAssetUrl: 'https://blob.example.com/logo.png',
+    });
+
+    const result = await upsertEmailTemplate(
+      tenantId,
+      EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      { logoAssetUrl: null },
+    );
+
+    expect(result.logoAssetUrl).toBeUndefined();
+    expect(await db().select().from(schema.emailTemplateLogos)).toEqual([]);
+  });
+
+  it('creates no per-language row when only the logo changes', async () => {
+    await upsertEmailTemplate(tenantId, EMAIL_TEMPLATE_TYPE.MAGIC_LINK, {
+      logoAssetUrl: 'https://blob.example.com/logo.png',
+    });
+
+    expect(await db().select().from(schema.emailTemplates)).toEqual([]);
+  });
+});

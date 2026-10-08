@@ -93,10 +93,9 @@ describe(getEmailTemplate, () => {
   });
 
   it('returns the authored logoAssetUrl when set, and undefined when not', async () => {
-    await db().insert(schema.emailTemplates).values({
+    await db().insert(schema.emailTemplateLogos).values({
       tenantId,
       templateType: EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION,
-      locale: LOCALE_ISO_CODES.EN,
       logoAssetUrl: 'https://blob.example.com/newsletter-logo.png',
     });
 
@@ -133,7 +132,6 @@ describe('per-language fallback', () => {
           templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
           locale: LOCALE_ISO_CODES.DE,
           subject: 'Deutscher Betreff',
-          logoAssetUrl: 'https://blob.example.com/de-logo.png',
         },
         {
           tenantId,
@@ -162,7 +160,6 @@ describe('per-language fallback', () => {
     );
 
     expect(result.subject).toBe('Deutscher Betreff');
-    expect(result.logoAssetUrl).toBe('https://blob.example.com/de-logo.png');
   });
 
   it('falls back to the product default in the requested language when neither has the field', async () => {
@@ -185,6 +182,29 @@ describe('per-language fallback', () => {
 
     expect(result.subject).toBe(
       EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE.DE.TENANT_INVITE.subject,
+    );
+  });
+
+  it('returns the same logo override in every language', async () => {
+    await db().insert(schema.emailTemplateLogos).values({
+      tenantId,
+      templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      logoAssetUrl: 'https://blob.example.com/logo.png',
+    });
+
+    const logos = await Promise.all(
+      Object.values(LOCALE_ISO_CODES).map(async (locale) => {
+        const { logoAssetUrl } = await getEmailTemplate(
+          tenantId,
+          EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+          locale,
+        );
+        return logoAssetUrl;
+      }),
+    );
+
+    expect(new Set(logos)).toEqual(
+      new Set(['https://blob.example.com/logo.png']),
     );
   });
 });
