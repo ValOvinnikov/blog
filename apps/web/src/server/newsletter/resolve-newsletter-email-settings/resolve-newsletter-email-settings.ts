@@ -1,8 +1,14 @@
-import { EMAIL_TEMPLATE_TYPE } from '@blog/config/constants';
-import { EMAIL_TEMPLATE_DEFAULT_COPY, queries } from '@blog/db';
+import {
+  EMAIL_TEMPLATE_TYPE,
+  isLocaleIsoCode,
+  LOCALE_ISO_CODES,
+  type TLocaleIsoCode,
+} from '@blog/config/constants';
+import { EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE, queries } from '@blog/db';
 import { isValidEmailAddress, type TPortableTextContent } from '@blog/email';
 import { resolveNewsletterFromAddress } from '@web/server/newsletter/newsletter-from-address/newsletter-from-address';
 import { logger } from '@web/utils/logger/logger';
+import { getLocale } from 'next-intl/server';
 
 export type TNewsletterEmailSettings = {
   subject: string;
@@ -13,10 +19,7 @@ export type TNewsletterEmailSettings = {
   replyTo: string | undefined;
 };
 
-// Header-injection guard: a `from` display name flows straight into a mail
-// header, so stray CR/LF and angle brackets in a tenant-supplied sender name
-// must never reach it verbatim — matches
-// packages/auth/src/providers/magic-link/apply-tenant-sender-name.ts.
+// A `from` display name flows straight into a mail header.
 const sanitizeSenderName = (senderName: string): string =>
   senderName.replace(/[\r\n<>]/g, '').trim();
 
@@ -49,11 +52,15 @@ const getEmailConfigSafely = async (tenantId: string) => {
   }
 };
 
-const getEmailTemplateSafely = async (tenantId: string) => {
+const getEmailTemplateSafely = async (
+  tenantId: string,
+  locale: TLocaleIsoCode | undefined,
+) => {
   try {
     return await queries.emailTemplates.getEmailTemplate(
       tenantId,
       EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION,
+      locale,
     );
   } catch (error) {
     logger.warn('newsletter_email_settings.email_template_fetch_failed', {
@@ -64,24 +71,27 @@ const getEmailTemplateSafely = async (tenantId: string) => {
   }
 };
 
-/**
- * Resolves the tenant-configurable parts of a newsletter confirmation send —
- * authored subject/body, logo, sender display name, reply-to and footer
- * postal address — layering `email_config` under the per-template row and
- * falling back to product defaults on any settings-load failure so a broken
- * query never blocks delivery.
- */
+const getSubscribedPageLocale = async (): Promise<
+  TLocaleIsoCode | undefined
+> => {
+  const locale = await getLocale();
+  return isLocaleIsoCode(locale) ? locale : undefined;
+};
+
 export const resolveNewsletterEmailSettings = async (
   tenantId: string,
   configuredFromAddress: string | undefined,
 ): Promise<TNewsletterEmailSettings> => {
+  const locale = await getSubscribedPageLocale();
   const [emailConfig, template] = await Promise.all([
     getEmailConfigSafely(tenantId),
-    getEmailTemplateSafely(tenantId),
+    getEmailTemplateSafely(tenantId, locale),
   ]);
 
   const defaultCopy =
-    EMAIL_TEMPLATE_DEFAULT_COPY[EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION];
+    EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE[locale ?? LOCALE_ISO_CODES.EN][
+      EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION
+    ];
 
   const replyToAddress = emailConfig?.replyToAddress;
   const replyTo =
