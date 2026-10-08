@@ -377,4 +377,73 @@ describe('request-context', () => {
       });
     });
   });
+
+  describe('peekVoiceTenant', () => {
+    it('resolves no tenant without waiting when no route has entered', async () => {
+      const { peekVoiceTenant } = await loadRequestContext();
+
+      await expect(peekVoiceTenant(LOCALE_ISO_CODES.EN)).resolves.toBe(
+        undefined,
+      );
+    });
+
+    it('resolves the entered tenant in its default language', async () => {
+      const { enterRequestContext, peekVoiceTenant } =
+        await loadRequestContext();
+      await enterRequestContext(params(TENANT_ID, LOCALE_ISO_CODES.EN));
+
+      await expect(peekVoiceTenant(LOCALE_ISO_CODES.EN)).resolves.toBe(
+        TENANT_ID,
+      );
+    });
+
+    it('resolves no tenant in a language other than the default', async () => {
+      const { enterRequestContext, peekVoiceTenant } =
+        await loadRequestContext();
+      await enterRequestContext(params(TENANT_ID, LOCALE_ISO_CODES.NL));
+
+      await expect(peekVoiceTenant(LOCALE_ISO_CODES.NL)).resolves.toBe(
+        undefined,
+      );
+    });
+
+    it('resolves no tenant when none was entered', async () => {
+      const { enterRequestContext, peekVoiceTenant } =
+        await loadRequestContext();
+      await enterRequestContext(
+        params(UNRESOLVED_TENANT_PLACEHOLDER, LOCALE_ISO_CODES.EN),
+      );
+
+      await expect(peekVoiceTenant(LOCALE_ISO_CODES.EN)).resolves.toBe(
+        undefined,
+      );
+    });
+
+    it("resolves the not-found tenant in its served default language when the layout 404'd on the language", async () => {
+      const { enterRequestContext, getNotFoundContext, peekVoiceTenant } =
+        await loadRequestContext();
+      const notFoundContext = getNotFoundContext();
+      await enterRequestContext(params(TENANT_ID, 'xx')).catch(() => {});
+      await notFoundContext;
+
+      await expect(peekVoiceTenant(LOCALE_ISO_CODES.EN)).resolves.toBe(
+        TENANT_ID,
+      );
+    });
+
+    it('resolves the not-found tenant when its Sanity credentials 404 the layout', async () => {
+      toTenantSanityCredentialsMock.mockReturnValue(undefined);
+      const { enterRequestContext, getNotFoundContext, peekVoiceTenant } =
+        await loadRequestContext();
+      const notFoundContext = getNotFoundContext();
+      await enterRequestContext(params(TENANT_ID, LOCALE_ISO_CODES.EN)).catch(
+        () => {},
+      );
+      await notFoundContext;
+
+      await expect(peekVoiceTenant(LOCALE_ISO_CODES.EN)).resolves.toBe(
+        TENANT_ID,
+      );
+    });
+  });
 });

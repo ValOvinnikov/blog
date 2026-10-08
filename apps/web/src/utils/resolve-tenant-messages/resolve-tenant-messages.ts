@@ -70,16 +70,6 @@ export interface ITenantMessages {
   rich: Record<TVoiceRichFieldId, TVoicePortableText>;
 }
 
-/**
- * Applies the tenant's per-key voice overrides on top of the base locale
- * messages returned by `getMessages()`, and resolves the same overrides'
- * RICH fields unflattened for `VoiceRichProvider`. Called from every route
- * that builds its own `NextIntlClientProvider` tree
- * (`[tenant]/[locale]/layout.tsx`, and `StandaloneNotFoundPage` for the
- * `not-found.tsx` boundaries that render outside it) — `i18n/request.ts`'s
- * `getRequestConfig` only resolves the base, un-voiced messages since it has
- * no tenant to read.
- */
 export const resolveTenantMessages = async (
   base: Record<string, unknown>,
   tenant?: string,

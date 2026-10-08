@@ -1,4 +1,4 @@
-import { CAPABILITY } from '@blog/config';
+import { CAPABILITY, SITE_MESSAGES_BY_LOCALE } from '@blog/config';
 import { getSanityImageBaseUrl } from '@blog/service';
 import { ConsentBannerSlot } from '@web/components/shared/consent-banner-slot';
 import { ConsentPreferencesDialog } from '@web/components/shared/consent-preferences-dialog';
@@ -13,7 +13,7 @@ import { resolveTenantMessages } from '@web/utils/resolve-tenant-messages';
 import { resolveVoiceRichFields } from '@web/utils/resolve-voice-rich-fields';
 import { SessionProvider } from 'next-auth/react';
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages, getNow, getTimeZone } from 'next-intl/server';
+import { getNow, getTimeZone } from 'next-intl/server';
 import type { ReactNode } from 'react';
 
 export interface ISiteProvidersProps {
@@ -24,13 +24,12 @@ export const SiteProviders = async ({ children }: ISiteProvidersProps) => {
   const { tenantId, locale, sanityContext, defaultLocale } =
     await getRequestContext();
   const tenant = tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER;
-  const [baseMessages, now, timeZone, isConsentBannerEnabled] =
-    await Promise.all([
-      getMessages(),
-      getNow(),
-      getTimeZone(),
-      isCapabilityEnabled(CAPABILITY.CONSENT_BANNER),
-    ]);
+  const baseMessages = SITE_MESSAGES_BY_LOCALE[locale];
+  const [now, timeZone, isConsentBannerEnabled] = await Promise.all([
+    getNow(),
+    getTimeZone(),
+    isCapabilityEnabled(CAPABILITY.CONSENT_BANNER),
+  ]);
   const { messages, rich } =
     locale === defaultLocale
       ? await resolveTenantMessages(baseMessages, tenant)

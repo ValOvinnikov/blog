@@ -1,4 +1,8 @@
-import { LOCALE_ISO_CODES, SITE_MESSAGES as realMessages } from '@blog/config';
+import {
+  LOCALE_ISO_CODES,
+  SITE_MESSAGES as realMessages,
+  SITE_MESSAGES_BY_LOCALE,
+} from '@blog/config';
 import { VoiceRichProvider } from '@web/context/voice-rich-provider';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
@@ -10,8 +14,7 @@ import { SiteProviders } from './site-providers';
 
 type TAnyElement = ReactElement<Record<string, unknown>>;
 
-const { getMessagesMock, getNowMock, getTimeZoneMock } = vi.hoisted(() => ({
-  getMessagesMock: vi.fn(),
+const { getNowMock, getTimeZoneMock } = vi.hoisted(() => ({
   getNowMock: vi.fn(),
   getTimeZoneMock: vi.fn(),
 }));
@@ -32,7 +35,6 @@ vi.mock('@blog/service', () => ({
 }));
 
 vi.mock('next-intl/server', () => ({
-  getMessages: getMessagesMock,
   getNow: getNowMock,
   getTimeZone: getTimeZoneMock,
 }));
@@ -64,7 +66,6 @@ const render = async (): Promise<{
 describe(SiteProviders, () => {
   beforeEach(() => {
     getRequestContextMock.mockResolvedValue(DEFAULT_REQUEST_CONTEXT);
-    getMessagesMock.mockResolvedValue(realMessages);
     getNowMock.mockResolvedValue(now);
     getTimeZoneMock.mockResolvedValue('UTC');
     resolveTenantMessagesMock.mockImplementation((messages) =>
@@ -107,7 +108,7 @@ describe(SiteProviders, () => {
     const { intl } = await render();
 
     expect(resolveTenantMessagesMock).not.toHaveBeenCalled();
-    expect(intl.props.messages).toBe(realMessages);
+    expect(intl.props.messages).toBe(SITE_MESSAGES_BY_LOCALE.NL);
   });
 
   it('mounts VoiceRichProvider with the rich voice values from resolveTenantMessages', async () => {
