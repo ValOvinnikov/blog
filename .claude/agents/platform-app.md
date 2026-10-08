@@ -168,10 +168,12 @@ When invoked, before writing any code:
   `ariaLabel`s and `title`s are copy too — they go through the same
   catalogue, never a literal (see Accessibility).
 - **Link with `@platform/i18n/navigation`, not `next/link`.** That module
-  re-exports the locale-aware `Link`, `permanentRedirect`, `usePathname` and
-  `useRouter` from `createNavigation(routing)`. No lint rule enforces this yet,
-  so it holds by discipline — every navigation in the app currently uses it,
-  and a stray `next/link` import would pass CI.
+  re-exports `usePathname` and `useRouter` from `createNavigation(routing)`
+  (in `base-navigation.ts`), and its `Link` is `GuardedLink`: the locale-aware
+  link that asks before leaving a settings page with unsaved changes. Never
+  import `BaseLink` from `base-navigation.ts` directly — that skips the guard.
+  No lint rule enforces this yet, so it holds by discipline — every navigation
+  in the app currently uses it, and a stray `next/link` import would pass CI.
 
 ## Base UI is this app's behavior layer
 

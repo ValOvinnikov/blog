@@ -756,5 +756,23 @@
     "downgradeNotice": "Ihr Tarif veröffentlicht {allowed, plural, one {# zusätzliche Sprache} other {# zusätzliche Sprachen}}, gespeichert sind jedoch {stored}. Wählen Sie, welche live bleiben — die anderen bleiben erhalten, und nichts wird gelöscht.",
     "keptBadge": "Erhalten, in Ihrem Tarif nicht live",
     "planLockedBadge": "Nicht in Ihrem Tarif"
+  },
+  "saveBar": {
+    "regionLabel": "Ungespeicherte Änderungen",
+    "allSaved": "Alle Änderungen gespeichert",
+    "unsavedChanges": "{count, plural, one {# ungespeicherte Änderung} other {# ungespeicherte Änderungen}}",
+    "fieldsNeedAttention": "{count, plural, one {# Feld braucht Aufmerksamkeit} other {# Felder brauchen Aufmerksamkeit}}",
+    "goToFirstField": "Zum ersten Feld",
+    "shortcut": "⌘S / Strg+S",
+    "discard": "Verwerfen"
+  },
+  "leavePageDialog": {
+    "title": "Ohne Speichern verlassen?",
+    "description": "Du hast {count, plural, one {# ungespeicherte Änderung} other {# ungespeicherte Änderungen}} auf {page}.",
+    "descriptionByLanguage": "Du hast {count, plural, one {# ungespeicherte Änderung} other {# ungespeicherte Änderungen}} auf {page} — {languages}.",
+    "stay": "Bleiben",
+    "discardAndLeave": "Verwerfen und verlassen",
+    "saveAndLeave": "Speichern und verlassen",
+    "saving": "Wird gespeichert…"
   }
 }

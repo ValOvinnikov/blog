@@ -756,5 +756,23 @@
     "downgradeNotice": "Uw abonnement publiceert {allowed, plural, one {# extra taal} other {# extra talen}}, maar er zijn er {stored} opgeslagen. Kies welke live blijven — de andere worden bewaard en er wordt niets verwijderd.",
     "keptBadge": "Bewaard, niet live binnen uw abonnement",
     "planLockedBadge": "Niet in uw abonnement"
+  },
+  "saveBar": {
+    "regionLabel": "Niet-opgeslagen wijzigingen",
+    "allSaved": "Alle wijzigingen opgeslagen",
+    "unsavedChanges": "{count, plural, one {# niet-opgeslagen wijziging} other {# niet-opgeslagen wijzigingen}}",
+    "fieldsNeedAttention": "{count, plural, one {# veld vraagt aandacht} other {# velden vragen aandacht}}",
+    "goToFirstField": "Naar het eerste veld",
+    "shortcut": "⌘S / Ctrl+S",
+    "discard": "Verwerpen"
+  },
+  "leavePageDialog": {
+    "title": "Weggaan zonder op te slaan?",
+    "description": "Je hebt {count, plural, one {# niet-opgeslagen wijziging} other {# niet-opgeslagen wijzigingen}} op {page}.",
+    "descriptionByLanguage": "Je hebt {count, plural, one {# niet-opgeslagen wijziging} other {# niet-opgeslagen wijzigingen}} op {page} — {languages}.",
+    "stay": "Blijven",
+    "discardAndLeave": "Verwerpen en weggaan",
+    "saveAndLeave": "Opslaan en weggaan",
+    "saving": "Opslaan…"
   }
 }

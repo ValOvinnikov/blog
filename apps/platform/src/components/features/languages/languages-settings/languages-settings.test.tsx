@@ -126,9 +126,34 @@ describe(`<${LanguagesSettings.name}/>`, () => {
     });
   });
 
-  it('keeps Save disabled until something changes', () => {
+  it('offers no Save until something changes', () => {
     setup({ storedLocales: [ES] });
 
-    expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled();
+    expect(
+      screen.queryByRole('button', { name: 'Save changes' }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText('All changes saved')).toBeVisible();
+  });
+
+  it('counts each toggled language and restores the saved ones on Discard', async () => {
+    setup({ storedLocales: [ES] });
+
+    await user.click(screen.getByRole('switch', { name: 'Spanish' }));
+    await user.click(screen.getByRole('switch', { name: 'Dutch' }));
+
+    expect(
+      screen.getByRole('region', { name: 'Unsaved changes' }),
+    ).toHaveTextContent('2 unsaved changes');
+
+    await user.click(screen.getByRole('button', { name: 'Discard' }));
+
+    expect(screen.getByRole('switch', { name: 'Spanish' })).toHaveAttribute(
+      'data-checked',
+      '',
+    );
+    expect(screen.getByRole('switch', { name: 'Dutch' })).toHaveAttribute(
+      'data-unchecked',
+      '',
+    );
   });
 });

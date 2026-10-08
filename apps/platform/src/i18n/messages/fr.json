@@ -756,5 +756,23 @@
     "downgradeNotice": "Votre formule publie {allowed, plural, one {# langue supplémentaire} other {# langues supplémentaires}}, mais {stored} sont enregistrées. Choisissez celles qui restent en ligne — les autres sont conservées et rien n'est supprimé.",
     "keptBadge": "Conservée, non publiée avec votre formule",
     "planLockedBadge": "Non incluse dans votre formule"
+  },
+  "saveBar": {
+    "regionLabel": "Modifications non enregistrées",
+    "allSaved": "Toutes les modifications sont enregistrées",
+    "unsavedChanges": "{count, plural, one {# modification non enregistrée} other {# modifications non enregistrées}}",
+    "fieldsNeedAttention": "{count, plural, one {# champ à vérifier} other {# champs à vérifier}}",
+    "goToFirstField": "Aller au premier",
+    "shortcut": "⌘S / Ctrl+S",
+    "discard": "Annuler les modifications"
+  },
+  "leavePageDialog": {
+    "title": "Quitter sans enregistrer ?",
+    "description": "Vous avez {count, plural, one {# modification non enregistrée} other {# modifications non enregistrées}} sur {page}.",
+    "descriptionByLanguage": "Vous avez {count, plural, one {# modification non enregistrée} other {# modifications non enregistrées}} sur {page} — {languages}.",
+    "stay": "Rester",
+    "discardAndLeave": "Quitter sans enregistrer",
+    "saveAndLeave": "Enregistrer et quitter",
+    "saving": "Enregistrement…"
   }
 }
