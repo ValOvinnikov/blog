@@ -260,6 +260,13 @@
       "when": 1791452697623,
       "tag": "0036_gifted_kang",
       "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1791462861397,
+      "tag": "0037_nest_voice_overrides_by_locale",
+      "breakpoints": true
     }
   ]
 }

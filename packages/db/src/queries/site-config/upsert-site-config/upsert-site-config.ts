@@ -14,6 +14,7 @@ import {
   DENSITY,
   LANGUAGE_SWITCHER_STYLE,
   FONT_CHOICE,
+  isLocaleIsoCode,
   PRESET_ID,
   PRESET_REGISTRY,
   RADIUS_SCALE,
@@ -21,12 +22,20 @@ import {
   type TDensity,
   type TLanguageSwitcherStyle,
   type TFontChoice,
+  type TLocaleIsoCode,
   type TPresetId,
   type TRadiusScale,
 } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
-import { siteConfig } from '@blog/db/schema/site-config';
+import {
+  siteConfig,
+  type TVoiceOverrides,
+  type TVoiceOverridesByLocale,
+  type TVoiceOverrideValue,
+} from '@blog/db/schema/site-config';
+import { tenants } from '@blog/db/schema/tenants';
 import { sanitizeHref } from '@blog/utils';
+import { eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
 
 import { toSiteConfigResult, type TSiteConfigResult } from '../get-site-config';
@@ -52,18 +61,28 @@ const VOICE_FIELDS_BY_ID = new Map(
 );
 
 type TVoiceField = (typeof VOICE_FIELDS)[number];
-type TVoiceFieldValue = string | TVoicePortableText;
 
 type TVoiceFieldValidation =
-  | { ok: true; value: TVoiceFieldValue | undefined }
+  | { ok: true; value: TVoiceOverrideValue | undefined }
   | { ok: false; error: string };
 
 /** Every field id the platform can send, mapped to the raw value it authored — not yet trimmed, size-checked or sanitized. */
 export type TVoiceOverridesInput = Partial<Record<TVoiceFieldId, unknown>>;
 
+export type TVoiceOverridesByLocaleInput = Partial<
+  Record<TLocaleIsoCode, TVoiceOverridesInput>
+>;
+
+type TVoiceFieldErrors = Partial<Record<TVoiceFieldId, string>>;
+
 export type TUpsertSiteConfigResult =
   | ({ ok: true } & TSiteConfigResult)
-  | { ok: false; fieldErrors: Partial<Record<TVoiceFieldId, string>> };
+  | {
+      ok: false;
+      fieldErrorsByLocale: Partial<Record<TLocaleIsoCode, TVoiceFieldErrors>>;
+      /** @deprecated The default locale's slice of `fieldErrorsByLocale`, kept until the platform saves per language. */
+      fieldErrors: TVoiceFieldErrors;
+    };
 
 function findPlaceholderError(
   text: string,
@@ -285,8 +304,8 @@ function validateVoiceFieldValue(
 }
 
 type TVoiceOverridesParseResult =
-  | { ok: true; value: Record<string, TVoiceFieldValue> }
-  | { ok: false; fieldErrors: Partial<Record<TVoiceFieldId, string>> };
+  | { ok: true; value: TVoiceOverrides }
+  | { ok: false; fieldErrors: TVoiceFieldErrors };
 
 /**
  * Validates a tenant's raw Voice-tab submission against the `VOICE_FIELDS`
@@ -307,8 +326,8 @@ function parseVoiceOverrides(
     );
   }
 
-  const value: Record<string, TVoiceFieldValue> = {};
-  const fieldErrors: Partial<Record<TVoiceFieldId, string>> = {};
+  const value: TVoiceOverrides = {};
+  const fieldErrors: TVoiceFieldErrors = {};
 
   for (const [key, rawValue] of Object.entries(raw)) {
     const field = VOICE_FIELDS_BY_ID.get(key as TVoiceFieldId)!;
@@ -329,13 +348,9 @@ function parseVoiceOverrides(
 // A field absent from the input is left untouched on `UPDATE` — Look and
 // Voice are saved from separate admin-panel tabs, so a Look save must never
 // wipe Voice data (or vice versa). `logoHue`/`logoAssetUrl`/`faviconAssetUrl`
-// additionally accept an explicit `null` to actually clear them (distinct
-// from omission) since `undefined` alone can't express "unset this" once a
-// value has been set. `voiceOverrides` follows the same omit-vs-present rule
-// one level up: omitted leaves the whole JSONB column untouched, present
-// (even `{}`) replaces it — the per-field blank-clears-that-key behaviour
-// inside it is handled separately by `parseVoiceOverrides`, since it needs
-// registry lookups a Zod object schema can't express.
+// additionally accept an explicit `null` to clear them, since `undefined`
+// alone can't express "unset this". A Voice save replaces the map of each
+// locale it carries (even with `{}`) and leaves every other locale's map untouched.
 export const updateSiteConfigInputSchema = z.object({
   preset: z.enum(Object.values(PRESET_ID) as [TPresetId, ...TPresetId[]]),
   accentHue: hueSchema,
@@ -369,7 +384,11 @@ export const updateSiteConfigInputSchema = z.object({
 // blank strings/empty rich text for a cleared voice override.
 export type TUpdateSiteConfigInput = z.input<
   typeof updateSiteConfigInputSchema
-> & { voiceOverrides?: TVoiceOverridesInput };
+> & {
+  /** @deprecated Saves under the tenant's default locale; use `voiceOverridesByLocale`. */
+  voiceOverrides?: TVoiceOverridesInput;
+  voiceOverridesByLocale?: TVoiceOverridesByLocaleInput;
+};
 
 type TSiteConfigWritable = Partial<typeof siteConfig.$inferInsert>;
 
@@ -379,7 +398,6 @@ type TSiteConfigWritable = Partial<typeof siteConfig.$inferInsert>;
 // both the `INSERT` values and the `UPDATE ... SET` clause.
 function presentOptionalFields(
   parsed: z.output<typeof updateSiteConfigInputSchema>,
-  voiceOverrides: Record<string, TVoiceFieldValue> | undefined,
 ): TSiteConfigWritable {
   const fields: TSiteConfigWritable = {};
 
@@ -394,9 +412,83 @@ function presentOptionalFields(
   if (parsed.faviconAssetUrl !== undefined) {
     fields.faviconAssetUrl = parsed.faviconAssetUrl;
   }
-  if (voiceOverrides !== undefined) fields.voiceOverrides = voiceOverrides;
 
   return fields;
+}
+
+async function getTenantLocale(tenantId: string): Promise<TLocaleIsoCode> {
+  const [tenant] = await getDb()
+    .select({ locale: tenants.locale })
+    .from(tenants)
+    .where(eq(tenants.id, tenantId));
+
+  if (!tenant) {
+    throw new Error(`upsertSiteConfig: no tenant "${tenantId}".`);
+  }
+
+  return tenant.locale;
+}
+
+function resolveVoiceOverridesInput(
+  input: Pick<
+    TUpdateSiteConfigInput,
+    'voiceOverrides' | 'voiceOverridesByLocale'
+  >,
+  defaultLocale: TLocaleIsoCode,
+): TVoiceOverridesByLocaleInput | undefined {
+  const { voiceOverrides, voiceOverridesByLocale } = input;
+
+  if (voiceOverrides !== undefined && voiceOverridesByLocale !== undefined) {
+    throw new Error(
+      'upsertSiteConfig: pass voiceOverrides or voiceOverridesByLocale, not both.',
+    );
+  }
+  if (voiceOverrides !== undefined) {
+    return { [defaultLocale]: voiceOverrides };
+  }
+  if (voiceOverridesByLocale === undefined) return undefined;
+
+  const unknownLocales = Object.keys(voiceOverridesByLocale).filter(
+    (locale) => !isLocaleIsoCode(locale),
+  );
+  if (unknownLocales.length > 0) {
+    throw new Error(
+      `upsertSiteConfig: unknown voice override locale(s): ${unknownLocales.join(', ')}.`,
+    );
+  }
+
+  return voiceOverridesByLocale;
+}
+
+type TVoiceOverridesByLocaleParseResult =
+  | { ok: true; value: TVoiceOverridesByLocale }
+  | {
+      ok: false;
+      fieldErrorsByLocale: Partial<Record<TLocaleIsoCode, TVoiceFieldErrors>>;
+    };
+
+function parseVoiceOverridesByLocale(
+  raw: TVoiceOverridesByLocaleInput,
+): TVoiceOverridesByLocaleParseResult {
+  const value: TVoiceOverridesByLocale = {};
+  const fieldErrorsByLocale: Partial<
+    Record<TLocaleIsoCode, TVoiceFieldErrors>
+  > = {};
+
+  for (const [locale, overrides] of Object.entries(raw) as [
+    TLocaleIsoCode,
+    TVoiceOverridesInput,
+  ][]) {
+    const result = parseVoiceOverrides(overrides);
+    if (result.ok) value[locale] = result.value;
+    else fieldErrorsByLocale[locale] = result.fieldErrors;
+  }
+
+  if (Object.keys(fieldErrorsByLocale).length > 0) {
+    return { ok: false, fieldErrorsByLocale };
+  }
+
+  return { ok: true, value };
 }
 
 export async function upsertSiteConfig(
@@ -404,14 +496,26 @@ export async function upsertSiteConfig(
   input: TUpdateSiteConfigInput,
 ): Promise<TUpsertSiteConfigResult> {
   const db = getDb();
-  const { voiceOverrides: rawVoiceOverrides, ...rest } = input;
+  const { voiceOverrides, voiceOverridesByLocale, ...rest } = input;
   const parsed = updateSiteConfigInputSchema.parse(rest);
+  const defaultLocale = await getTenantLocale(tenantId);
+  const voiceInput = resolveVoiceOverridesInput(
+    { voiceOverrides, voiceOverridesByLocale },
+    defaultLocale,
+  );
 
-  let voiceOverrides: Record<string, TVoiceFieldValue> | undefined;
-  if (rawVoiceOverrides !== undefined) {
-    const result = parseVoiceOverrides(rawVoiceOverrides);
-    if (!result.ok) return result;
-    voiceOverrides = result.value;
+  let voicePatch: TVoiceOverridesByLocale | undefined;
+  if (voiceInput !== undefined) {
+    const result = parseVoiceOverridesByLocale(voiceInput);
+    if (!result.ok) {
+      const { fieldErrorsByLocale } = result;
+      return {
+        ok: false,
+        fieldErrorsByLocale,
+        fieldErrors: fieldErrorsByLocale[defaultLocale] ?? {},
+      };
+    }
+    voicePatch = result.value;
   }
 
   const required = {
@@ -422,7 +526,7 @@ export async function upsertSiteConfig(
     radiusScale: parsed.radiusScale,
     density: parsed.density,
   };
-  const optional = presentOptionalFields(parsed, voiceOverrides);
+  const optional = presentOptionalFields(parsed);
 
   const [row] = await db
     .insert(siteConfig)
@@ -431,10 +535,18 @@ export async function upsertSiteConfig(
       cardStyle: PRESET_REGISTRY[parsed.preset].cardStyle,
       ...required,
       ...optional,
+      ...(voicePatch && { voiceOverridesByLocale: voicePatch }),
     })
     .onConflictDoUpdate({
       target: siteConfig.tenantId,
-      set: { ...required, ...optional, updatedAt: new Date() },
+      set: {
+        ...required,
+        ...optional,
+        ...(voicePatch && {
+          voiceOverridesByLocale: sql`${siteConfig.voiceOverridesByLocale} || ${JSON.stringify(voicePatch)}::jsonb`,
+        }),
+        updatedAt: new Date(),
+      },
     })
     .returning();
 
@@ -444,5 +556,5 @@ export async function upsertSiteConfig(
     );
   }
 
-  return { ok: true, ...toSiteConfigResult(row) };
+  return { ok: true, ...toSiteConfigResult(row, defaultLocale) };
 }

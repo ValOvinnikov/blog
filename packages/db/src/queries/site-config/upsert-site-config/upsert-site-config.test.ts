@@ -3,6 +3,7 @@ import {
   DENSITY,
   FONT_CHOICE,
   LANGUAGE_SWITCHER_STYLE,
+  LOCALE_ISO_CODES,
   PRESET_ID,
   RADIUS_SCALE,
 } from '@blog/config/constants';
@@ -641,6 +642,125 @@ describe('voice overrides — placeholders', () => {
     );
 
     expect(result.voiceOverrides.topicEmpty).toBeDefined();
+  });
+});
+
+describe('per-language voice overrides', () => {
+  let tenantId: string;
+
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db(), {
+      locale: LOCALE_ISO_CODES.EN,
+    }));
+  });
+
+  it('stores each language a save carries under that language', async () => {
+    const result = expectOk(
+      await upsertSiteConfig(tenantId, {
+        ...baseInput,
+        voiceOverridesByLocale: {
+          [LOCALE_ISO_CODES.DE]: { notFoundHeading: '  Nicht gefunden  ' },
+          [LOCALE_ISO_CODES.FR]: { notFoundHeading: 'Introuvable' },
+        },
+      }),
+    );
+
+    expect(result.voiceOverridesByLocale).toEqual({
+      [LOCALE_ISO_CODES.DE]: { notFoundHeading: 'Nicht gefunden' },
+      [LOCALE_ISO_CODES.FR]: { notFoundHeading: 'Introuvable' },
+    });
+    expect(result.voiceOverrides).toEqual({});
+  });
+
+  it('leaves every language the save does not carry exactly as stored', async () => {
+    await upsertSiteConfig(tenantId, {
+      ...baseInput,
+      voiceOverridesByLocale: {
+        [LOCALE_ISO_CODES.DE]: { notFoundHeading: 'Nicht gefunden' },
+        [LOCALE_ISO_CODES.FR]: { notFoundHeading: 'Introuvable' },
+      },
+    });
+
+    const result = expectOk(
+      await upsertSiteConfig(tenantId, {
+        ...baseInput,
+        voiceOverridesByLocale: {
+          [LOCALE_ISO_CODES.FR]: {},
+          [LOCALE_ISO_CODES.ES]: { notFoundHeading: 'No encontrado' },
+        },
+      }),
+    );
+
+    expect(result.voiceOverridesByLocale).toEqual({
+      [LOCALE_ISO_CODES.DE]: { notFoundHeading: 'Nicht gefunden' },
+      [LOCALE_ISO_CODES.FR]: {},
+      [LOCALE_ISO_CODES.ES]: { notFoundHeading: 'No encontrado' },
+    });
+  });
+
+  it("saves the flat shape under the tenant's default language", async () => {
+    await upsertSiteConfig(tenantId, {
+      ...baseInput,
+      voiceOverridesByLocale: {
+        [LOCALE_ISO_CODES.DE]: { notFoundHeading: 'Nicht gefunden' },
+      },
+    });
+
+    const result = expectOk(
+      await upsertSiteConfig(tenantId, {
+        ...baseInput,
+        voiceOverrides: { notFoundHeading: 'Lost the plot?' },
+      }),
+    );
+
+    expect(result.voiceOverridesByLocale).toEqual({
+      [LOCALE_ISO_CODES.DE]: { notFoundHeading: 'Nicht gefunden' },
+      [LOCALE_ISO_CODES.EN]: { notFoundHeading: 'Lost the plot?' },
+    });
+    expect(result.voiceOverrides).toEqual({
+      notFoundHeading: 'Lost the plot?',
+    });
+  });
+
+  it('returns field errors per language and writes nothing', async () => {
+    const result = expectFieldErrors(
+      await upsertSiteConfig(tenantId, {
+        ...baseInput,
+        voiceOverridesByLocale: {
+          [LOCALE_ISO_CODES.EN]: { notFoundHeading: 'x'.repeat(101) },
+          [LOCALE_ISO_CODES.DE]: { topicEmpty: 'Keine Beiträge in {topic}' },
+          [LOCALE_ISO_CODES.FR]: { notFoundHeading: 'Introuvable' },
+        },
+      }),
+    );
+
+    expect(result.fieldErrorsByLocale).toEqual({
+      [LOCALE_ISO_CODES.EN]: { notFoundHeading: expect.any(String) },
+      [LOCALE_ISO_CODES.DE]: { topicEmpty: expect.any(String) },
+    });
+    expect(result.fieldErrors).toEqual({
+      notFoundHeading: expect.any(String),
+    });
+    expect(await db().select().from(schema.siteConfig)).toEqual([]);
+  });
+
+  it('rejects an unknown language', async () => {
+    await expect(
+      upsertSiteConfig(tenantId, {
+        ...baseInput,
+        voiceOverridesByLocale: { XX: {} } as never,
+      }),
+    ).rejects.toThrow();
+  });
+
+  it('rejects the flat and per-language shapes together', async () => {
+    await expect(
+      upsertSiteConfig(tenantId, {
+        ...baseInput,
+        voiceOverrides: {},
+        voiceOverridesByLocale: { [LOCALE_ISO_CODES.DE]: {} },
+      }),
+    ).rejects.toThrow();
   });
 });
 
