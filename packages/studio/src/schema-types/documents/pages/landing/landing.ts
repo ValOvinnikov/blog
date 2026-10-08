@@ -1,6 +1,7 @@
 import {
   PAGE_LANDING_TYPE,
   SECTION_NAVIGATION_FIELD,
+  SECTION_NAVIGATION_TITLE_FIELD,
   SHOW_SECTION_NAVIGATION_FIELD,
 } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
 import { landingTemplateSchema } from '@blog/studio/schema-types/documents/templates/landing/landing';
@@ -122,6 +123,14 @@ export const landingPageSchema = defineType({
         'Shows a sidebar of this page and the pages beneath it, with breadcrumbs, on this page and every page under it.',
       initialValue: false,
       field: SectionNavigationField,
+    }),
+    defineField({
+      name: SECTION_NAVIGATION_TITLE_FIELD,
+      title: 'Section sidebar title',
+      type: 'string',
+      description:
+        'The heading above the section sidebar, e.g. Guides. Leave empty to use the site default.',
+      hidden: ({ document }) => document?.[SECTION_NAVIGATION_FIELD] !== true,
     }),
     sectionNavigationSetting({
       name: SHOW_SECTION_NAVIGATION_FIELD,
