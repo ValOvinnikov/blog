@@ -58,9 +58,9 @@ export const sidebarNavVariants = tv({
     list: ['flex flex-col gap-1', 'font-mono text-copy', 'm-0 list-none p-0'],
     item: [],
     link: [
-      'block text-subtle no-underline',
+      'block rounded-md px-2 py-1 text-subtle no-underline',
       'transition-colors duration-base ease-smooth',
-      'hover:text-brand-primary',
+      'hover:bg-surface-2 hover:text-text',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
       'focus-visible:ring-offset-2 focus-visible:ring-offset-ambient',
     ],
@@ -69,18 +69,25 @@ export const sidebarNavVariants = tv({
     open: {
       true: { chevron: ['-rotate-135'] },
     },
+    inPanel: {
+      true: { link: ['flex items-center px-3 py-2'] },
+    },
     // Declared before `isActive` so the active colour wins over a root item's `text-text`.
     isNested: {
       true: { item: ['pl-3'] },
       false: { link: ['font-semibold text-text'] },
     },
+    // Last, so its hover classes win: hovering the current item leaves it unchanged.
     isActive: {
-      true: { link: ['text-brand-primary'] },
-    },
-    inPanel: {
       true: {
-        link: ['flex items-center rounded-md px-3 py-2', 'hover:bg-surface-2'],
+        link: [
+          'bg-brand-primary-muted text-brand-primary',
+          'hover:bg-brand-primary-muted hover:text-brand-primary',
+        ],
       },
     },
   },
+  compoundVariants: [
+    { isActive: true, isNested: true, class: { link: ['font-medium'] } },
+  ],
 });
