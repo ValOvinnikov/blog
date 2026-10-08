@@ -1,6 +1,10 @@
 'use client';
 
-import { useEditor, useEditorSelector } from '@portabletext/editor';
+import {
+  useEditor,
+  useEditorSelector,
+  type SchemaDefinition,
+} from '@portabletext/editor';
 import * as selectors from '@portabletext/editor/selectors';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
@@ -16,13 +20,19 @@ const findActiveLinkHref = (
   return typeof link?.href === 'string' ? link.href : '';
 };
 
-/**
- * The editor's formatting controls — deliberately limited to exactly what
- * `@blog/email`'s serializer renders (bold, italic, one heading level, two
- * list types, link), so nothing offered here can produce copy that silently
- * disappears from the sent email.
- */
-export const PortableTextEditorToolbar = () => {
+export type TPortableTextEditorToolbarProps = {
+  schema: SchemaDefinition;
+};
+
+const hasName = (
+  entries: readonly { name: string }[] | undefined,
+  name: string,
+): boolean => entries?.some((entry) => entry.name === name) ?? false;
+
+/** Offers only what `schema` allows, so no control can author a mark the value's renderer would drop. */
+export const PortableTextEditorToolbar = ({
+  schema,
+}: TPortableTextEditorToolbarProps) => {
   const t = useTranslations('portableTextEditorToolbar');
   const editor = useEditor();
   const linkControlId = useId();
@@ -58,6 +68,13 @@ export const PortableTextEditorToolbar = () => {
   );
 
   const { root, divider } = portableTextEditorToolbarVariants();
+  const hasBold = hasName(schema.decorators, 'strong');
+  const hasItalic = hasName(schema.decorators, 'em');
+  const hasHeading = hasName(schema.styles, 'h2');
+  const hasBulletList = hasName(schema.lists, 'bullet');
+  const hasNumberedList = hasName(schema.lists, 'number');
+  const hasLink = hasName(schema.annotations, 'link');
+  const hasLists = hasBulletList || hasNumberedList;
 
   const focusEditor = () => editor.send({ type: 'focus' });
 
@@ -82,61 +99,77 @@ export const PortableTextEditorToolbar = () => {
   return (
     <div>
       <div className={root()}>
-        <PortableTextEditorToggleButton
-          label={t('bold')}
-          isActive={isBoldActive}
-          isBold={true}
-          onToggle={() => {
-            editor.send({ type: 'decorator.toggle', decorator: 'strong' });
-            focusEditor();
-          }}
-        />
-        <PortableTextEditorToggleButton
-          label={t('italic')}
-          isActive={isItalicActive}
-          isItalic={true}
-          onToggle={() => {
-            editor.send({ type: 'decorator.toggle', decorator: 'em' });
-            focusEditor();
-          }}
-        />
-        <span aria-hidden="true" className={divider()} />
-        <PortableTextEditorToggleButton
-          label={t('heading')}
-          isActive={isHeadingActive}
-          onToggle={() => {
-            editor.send({
-              type: 'style.toggle',
-              style: isHeadingActive ? 'normal' : 'h2',
-            });
-            focusEditor();
-          }}
-        />
-        <span aria-hidden="true" className={divider()} />
-        <PortableTextEditorToggleButton
-          label={t('bulletList')}
-          isActive={isBulletListActive}
-          onToggle={() => {
-            editor.send({ type: 'list item.toggle', listItem: 'bullet' });
-            focusEditor();
-          }}
-        />
-        <PortableTextEditorToggleButton
-          label={t('numberedList')}
-          isActive={isNumberedListActive}
-          onToggle={() => {
-            editor.send({ type: 'list item.toggle', listItem: 'number' });
-            focusEditor();
-          }}
-        />
-        <span aria-hidden="true" className={divider()} />
-        <PortableTextEditorToggleButton
-          label={t('link')}
-          isActive={isLinkActive}
-          isExpanded={isLinkControlOpen}
-          ariaControls={linkControlId}
-          onToggle={() => setIsLinkControlOpen((open) => !open)}
-        />
+        {hasBold && (
+          <PortableTextEditorToggleButton
+            label={t('bold')}
+            isActive={isBoldActive}
+            isBold={true}
+            onToggle={() => {
+              editor.send({ type: 'decorator.toggle', decorator: 'strong' });
+              focusEditor();
+            }}
+          />
+        )}
+        {hasItalic && (
+          <PortableTextEditorToggleButton
+            label={t('italic')}
+            isActive={isItalicActive}
+            isItalic={true}
+            onToggle={() => {
+              editor.send({ type: 'decorator.toggle', decorator: 'em' });
+              focusEditor();
+            }}
+          />
+        )}
+        {hasHeading && (
+          <>
+            <span aria-hidden="true" className={divider()} />
+            <PortableTextEditorToggleButton
+              label={t('heading')}
+              isActive={isHeadingActive}
+              onToggle={() => {
+                editor.send({
+                  type: 'style.toggle',
+                  style: isHeadingActive ? 'normal' : 'h2',
+                });
+                focusEditor();
+              }}
+            />
+          </>
+        )}
+        {hasLists && <span aria-hidden="true" className={divider()} />}
+        {hasBulletList && (
+          <PortableTextEditorToggleButton
+            label={t('bulletList')}
+            isActive={isBulletListActive}
+            onToggle={() => {
+              editor.send({ type: 'list item.toggle', listItem: 'bullet' });
+              focusEditor();
+            }}
+          />
+        )}
+        {hasNumberedList && (
+          <PortableTextEditorToggleButton
+            label={t('numberedList')}
+            isActive={isNumberedListActive}
+            onToggle={() => {
+              editor.send({ type: 'list item.toggle', listItem: 'number' });
+              focusEditor();
+            }}
+          />
+        )}
+        {hasLink && (
+          <>
+            <span aria-hidden="true" className={divider()} />
+            <PortableTextEditorToggleButton
+              label={t('link')}
+              isActive={isLinkActive}
+              isExpanded={isLinkControlOpen}
+              ariaControls={linkControlId}
+              onToggle={() => setIsLinkControlOpen((open) => !open)}
+            />
+          </>
+        )}
       </div>
       {isLinkControlOpen && (
         <PortableTextEditorLinkControl

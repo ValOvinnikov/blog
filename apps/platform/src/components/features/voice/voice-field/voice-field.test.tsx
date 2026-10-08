@@ -1,73 +1,80 @@
-import { voiceFieldInputId } from '@platform/utils/voice-fields/voice-fields';
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { VOICE_FIELD_KIND, VOICE_FIELDS } from '@blog/config';
+import { customRender, screen } from '@platform/testing/custom-render';
 
 import { VoiceField } from './voice-field';
 
-describe(VoiceField, () => {
-  it('shows the inherited value as a placeholder, not as the field value, and exposes the shared input id', () => {
-    render(
-      <VoiceField
-        fieldKey="notFoundHeading"
-        value=""
-        onChange={vi.fn()}
-        placeholder="Page not found"
-      />,
-    );
+const fieldById = (id: string) =>
+  VOICE_FIELDS.find((field) => field.id === id)!;
 
-    const input = screen.getByRole('textbox');
-    expect(input).toHaveAttribute('id', voiceFieldInputId('notFoundHeading'));
+const setup = customRender(VoiceField, {
+  field: fieldById('notFoundHeading'),
+  value: '',
+  savedValue: '',
+  placeholder: 'Page not found',
+  onChange: vi.fn(),
+  isReadOnly: false,
+});
+
+describe(`<${VoiceField.name}/>`, () => {
+  it('labels a text field and describes it with its hint', () => {
+    setup();
+
+    const input = screen.getByRole('textbox', { name: 'Heading' });
     expect(input).toHaveAttribute('placeholder', 'Page not found');
-    expect(input).toHaveValue('');
+    expect(input).toHaveAccessibleDescription('Also the browser tab title');
   });
 
-  it('renders a Textarea for multiline fields and a single-line input otherwise', () => {
-    const { rerender } = render(
-      <VoiceField
-        fieldKey="notFoundSupportingText"
-        value=""
-        onChange={vi.fn()}
-        isMultiline={true}
-      />,
-    );
-    expect(screen.getByRole('textbox').tagName).toBe('TEXTAREA');
+  it('edits a rich field in the rich text editor with only bold, italic and link', () => {
+    setup({ field: fieldById('notFoundSupportingText'), value: null });
 
-    rerender(
-      <VoiceField fieldKey="notFoundHeading" value="" onChange={vi.fn()} />,
-    );
-    expect(screen.getByRole('textbox').tagName).toBe('INPUT');
+    expect(
+      screen.getByRole('textbox', { name: 'Supporting text' }),
+    ).toBeVisible();
+    expect(screen.getAllByRole('button')).toHaveLength(3);
   });
 
-  it('makes the field read-only, not disabled, when isReadOnly is true', () => {
-    render(
-      <VoiceField
-        fieldKey="notFoundHeading"
-        value="custom"
-        onChange={vi.fn()}
-        isReadOnly={true}
-      />,
-    );
+  it('edits a multiline field in a plain text area', () => {
+    setup({
+      field: {
+        id: 'blogListEmpty',
+        kind: VOICE_FIELD_KIND.MULTILINE,
+        placeholders: [],
+      },
+    });
 
-    const input = screen.getByRole('textbox');
-    expect(input).toHaveAttribute('readonly');
-    expect(input).toBeEnabled();
+    expect(screen.getByRole('textbox', { name: 'Blog index' })).toHaveAttribute(
+      'rows',
+      '3',
+    );
   });
 
-  it('reports every keystroke, including clearing back to empty, via onChange', async () => {
-    const user = userEvent.setup();
-    const onChange = vi.fn();
-    render(
-      <VoiceField
-        fieldKey="notFoundHeading"
-        value="custom"
-        onChange={onChange}
-        placeholder="Page not found"
-      />,
+  it('describes the field with its error and marks it invalid', () => {
+    setup({ error: 'Must be 100 characters or fewer.' });
+
+    const input = screen.getByRole('textbox', { name: 'Heading' });
+    expect(input).toHaveAttribute('aria-invalid', 'true');
+    expect(input).toHaveAccessibleDescription(
+      'Also the browser tab title Must be 100 characters or fewer.',
     );
+  });
 
-    const input = screen.getByRole('textbox');
-    await user.clear(input);
+  it('notes the placeholder a field must keep', () => {
+    setup({ field: fieldById('topicEmpty'), value: null });
 
-    expect(onChange).toHaveBeenLastCalledWith('');
+    expect(
+      screen.getByRole('textbox', { name: 'Topic page' }),
+    ).toHaveAccessibleDescription(
+      'A topic with no posts yet Keep {name} — the site fills it in.',
+    );
+  });
+
+  it('offers no editing controls on a read-only rich field', () => {
+    setup({
+      field: fieldById('notFoundSupportingText'),
+      value: null,
+      isReadOnly: true,
+    });
+
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 });

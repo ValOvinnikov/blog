@@ -24,7 +24,10 @@ vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     memberships: { listMembershipsForUser: listMembershipsForUserMock },
-    tenants: { listTenantsByIds: listTenantsByIdsMock },
+    tenants: {
+      listTenantsByIds: listTenantsByIdsMock,
+      selectLiveLocales: () => ['EN'],
+    },
     admins: { getAdminByUserId: getAdminByUserIdMock },
     siteConfig: { getSiteConfig: getSiteConfigMock },
   },

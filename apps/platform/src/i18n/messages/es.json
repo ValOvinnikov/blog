@@ -466,31 +466,60 @@
   },
   "voiceSettings": {
     "heading": "Voz",
-    "description": "Las palabras que el sitio usa para expresarse. Cada campo ya tiene un valor predeterminado adecuado.",
+    "description": "Reformule los mensajes de página del sitio. Cada campo tiene un texto predeterminado: cambie solo lo que deba sonar como usted.",
+    "fixedCopyNote": "Los botones, menús y etiquetas se traducen por usted y son iguales en todos los sitios, por eso no aparecen aquí.",
+    "editingLanguageNote": "Editando {language}: los demás idiomas conservan su propio texto.",
+    "languageAriaLabel": "Idioma",
+    "languageOption": "{language} · {count, plural, =0 {todo predeterminado} one {# personalizado} other {# personalizados}}",
+    "surfaceCustomisedCount": "{count, plural, =0 {Todo predeterminado} one {# personalizado} other {# personalizados}}",
     "saveButton": "Guardar cambios",
     "savingButton": "Guardando…",
-    "alertSuccess": "voiceOverrides guardado.",
+    "alertSuccess": "Voz guardada.",
     "alertError": "No se pudo guardar. Vuelva a intentarlo.",
-    "basicHeading": "Básico",
-    "basicAlert": "Aquí no hay nada obligatorio. El sitio ya tiene unos textos predeterminados adecuados. La mayoría de los clientes nunca abre los campos avanzados de abajo.",
-    "advancedSummary": "Avanzado: 7 textos seleccionados, 2 grupos",
-    "advancedOverrideInfo": "Cada campo es una sustitución. Deje uno en blanco para usar el texto predeterminado del sitio: vaciar un campo restablece ese valor predeterminado, no deja el texto vacío."
+    "badgeDefault": "Predeterminado",
+    "badgeCustomised": "Personalizado",
+    "unsaved": "Sin guardar",
+    "reset": "Restablecer",
+    "keepPlaceholder": "Conserve <code>{token}</code>: el sitio lo rellena.",
+    "draftFieldLabel": "{surface} — {field} ({language})"
   },
-  "voiceFieldGroup": {
-    "fieldCount": "{count, plural, one {# campo} other {# campos}}"
+  "voiceSurfaces": {
+    "NOT_FOUND": "Página no encontrada",
+    "ERROR": "Página de error",
+    "ARCHIVE": "Listas vacías",
+    "BOOKMARKS": "Marcadores"
   },
-  "voiceFieldGroups": {
-    "notFoundPage": "Página 404",
-    "emptyStates": "Estados vacíos"
+  "voiceSurfaceDescriptions": {
+    "NOT_FOUND": "Se muestra en cualquier dirección que no existe",
+    "ERROR": "Se muestra cuando una página no se carga",
+    "ARCHIVE": "Se muestran cuando una lista aún está vacía. Elija una para editarla.",
+    "BOOKMARKS": "Las entradas guardadas de un lector, antes de que guarde alguna"
   },
   "voiceFieldLabels": {
-    "notFoundHeading": "Título de página no encontrada",
-    "notFoundSupportingText": "Texto de apoyo de página no encontrada",
-    "blogListEmpty": "Lista del blog vacía",
-    "topicEmpty": "Tema vacío",
-    "tagEmpty": "Etiqueta vacía",
-    "topicsEmpty": "Temas vacíos",
-    "bookmarksEmpty": "Guardados vacíos"
+    "blogListEmpty": "Índice del blog",
+    "topicEmpty": "Página de tema",
+    "tagEmpty": "Página de etiqueta",
+    "topicsEmpty": "Índice de temas",
+    "tagsEmpty": "Índice de etiquetas",
+    "notFoundEyebrow": "Antetítulo",
+    "notFoundHeading": "Título",
+    "notFoundSupportingText": "Texto de apoyo",
+    "localeErrorTitle": "Título",
+    "localeErrorDescription": "Descripción",
+    "bookmarksEmpty": "Marcadores vacíos"
+  },
+  "voiceFieldHints": {
+    "blogListEmpty": "El índice del blog, antes de publicar nada",
+    "topicEmpty": "Un tema que aún no tiene entradas",
+    "tagEmpty": "Una etiqueta que aún no tiene entradas",
+    "topicsEmpty": "El índice de temas, antes de que exista ninguno",
+    "tagsEmpty": "El índice de etiquetas, antes de que exista ninguna",
+    "notFoundEyebrow": "Etiqueta pequeña sobre el título",
+    "notFoundHeading": "También el título de la pestaña del navegador",
+    "notFoundSupportingText": "Debajo del título",
+    "localeErrorTitle": "El título principal de la página",
+    "localeErrorDescription": "Debajo del título",
+    "bookmarksEmpty": "La página de marcadores, antes de guardar nada"
   },
   "addTenantWizard": {
     "heading": "Añadir cliente",

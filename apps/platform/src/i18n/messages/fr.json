@@ -466,31 +466,60 @@
   },
   "voiceSettings": {
     "heading": "Voix",
-    "description": "Les mots que le site emploie pour s'exprimer. Chaque champ a déjà une valeur par défaut adaptée.",
+    "description": "Reformulez les messages de page du site. Chaque champ a un texte par défaut : ne modifiez que ce qui doit vous ressembler.",
+    "fixedCopyNote": "Les boutons, menus et libellés sont traduits pour vous et restent identiques sur tous les sites ; ils ne figurent donc pas ici.",
+    "editingLanguageNote": "Vous modifiez : {language} — les autres langues gardent leur propre texte.",
+    "languageAriaLabel": "Langue",
+    "languageOption": "{language} · {count, plural, =0 {tout par défaut} one {# personnalisé} other {# personnalisés}}",
+    "surfaceCustomisedCount": "{count, plural, =0 {Tout par défaut} one {# personnalisé} other {# personnalisés}}",
     "saveButton": "Enregistrer les modifications",
     "savingButton": "Enregistrement…",
-    "alertSuccess": "voiceOverrides enregistré.",
+    "alertSuccess": "Voix enregistrée.",
     "alertError": "Impossible d'enregistrer — veuillez réessayer.",
-    "basicHeading": "Essentiel",
-    "basicAlert": "Rien d'obligatoire ici. Le site dispose déjà de textes par défaut adaptés. La plupart des locataires n'ouvrent jamais les champs avancés ci-dessous.",
-    "advancedSummary": "Avancé — 7 textes sélectionnés, 2 groupes",
-    "advancedOverrideInfo": "Chaque champ est un remplacement. Laissez-en un vide pour utiliser le texte par défaut du site — vider un champ rétablit ce texte par défaut, il ne le remplace pas par une chaîne vide."
+    "badgeDefault": "Par défaut",
+    "badgeCustomised": "Personnalisé",
+    "unsaved": "Non enregistré",
+    "reset": "Réinitialiser",
+    "keepPlaceholder": "Conservez <code>{token}</code> — le site le remplit.",
+    "draftFieldLabel": "{surface} — {field} ({language})"
   },
-  "voiceFieldGroup": {
-    "fieldCount": "{count, plural, one {# champ} other {# champs}}"
+  "voiceSurfaces": {
+    "NOT_FOUND": "Page introuvable",
+    "ERROR": "Page d'erreur",
+    "ARCHIVE": "Listes vides",
+    "BOOKMARKS": "Favoris"
   },
-  "voiceFieldGroups": {
-    "notFoundPage": "Page 404",
-    "emptyStates": "États vides"
+  "voiceSurfaceDescriptions": {
+    "NOT_FOUND": "Affichée à toute adresse qui n'existe pas",
+    "ERROR": "Affichée quand une page ne se charge pas",
+    "ARCHIVE": "Affichées quand une liste est encore vide. Choisissez-en une pour la modifier.",
+    "BOOKMARKS": "Les articles enregistrés d'un lecteur, avant qu'il en enregistre"
   },
   "voiceFieldLabels": {
-    "notFoundHeading": "Titre de la page introuvable",
-    "notFoundSupportingText": "Texte de la page introuvable",
-    "blogListEmpty": "Liste du blog vide",
-    "topicEmpty": "Thème vide",
-    "tagEmpty": "Étiquette vide",
-    "topicsEmpty": "Thèmes vides",
+    "blogListEmpty": "Index du blog",
+    "topicEmpty": "Page de thème",
+    "tagEmpty": "Page d'étiquette",
+    "topicsEmpty": "Index des thèmes",
+    "tagsEmpty": "Index des étiquettes",
+    "notFoundEyebrow": "Surtitre",
+    "notFoundHeading": "Titre",
+    "notFoundSupportingText": "Texte d'accompagnement",
+    "localeErrorTitle": "Titre",
+    "localeErrorDescription": "Description",
     "bookmarksEmpty": "Favoris vides"
+  },
+  "voiceFieldHints": {
+    "blogListEmpty": "L'index du blog, avant toute publication",
+    "topicEmpty": "Un thème sans article pour l'instant",
+    "tagEmpty": "Une étiquette sans article pour l'instant",
+    "topicsEmpty": "L'index des thèmes, avant qu'un thème existe",
+    "tagsEmpty": "L'index des étiquettes, avant qu'une étiquette existe",
+    "notFoundEyebrow": "Petit libellé au-dessus du titre",
+    "notFoundHeading": "Aussi le titre de l'onglet du navigateur",
+    "notFoundSupportingText": "Sous le titre",
+    "localeErrorTitle": "Le titre principal de la page",
+    "localeErrorDescription": "Sous le titre",
+    "bookmarksEmpty": "La page des favoris, avant tout enregistrement"
   },
   "addTenantWizard": {
     "heading": "Ajouter un locataire",
