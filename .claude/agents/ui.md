@@ -187,6 +187,12 @@ Run these checks **once, after all work is complete**:
   (e.g. `PostCard.Media`, `PostCard.Title`)
 - Any improvements flagged during the existing-component review that were
   not addressed in this task (so the orchestrator can track them)
+- **Voice candidates:** every prop that renders visible text, what copy it
+  will carry on the site, and whether that copy reads as page-level prose or
+  interface copy. Write "none" when there is none. `@blog/ui` owns no copy,
+  but its props decide whether the copy can become a tenant-editable Voice
+  field. The orchestrator settles that with the user before `web` wires it
+  (CLAUDE.md "Check for Voice candidates").
 
 **Commit your work before you report.** Stage the specific files you changed
 — component, test, story, barrel (`git add <path> …` — never `git add -A`;

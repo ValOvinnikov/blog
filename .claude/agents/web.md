@@ -400,38 +400,34 @@ Supported locales and the default are declared in `src/i18n/routing.ts`.
   folder-naming rule (see `apps/web/eslint.config.js`) because Next.js uses
   `[dynamic]` and `(group)` folder conventions there.
 
-## New i18n keys that are tenant-customizable "voice" copy also need a Voice override
+## Site copy and the Voice editor
 
-Visible copy is tenant-overridable through `apps/platform`'s Voice tab, backed
-by `packages/db`'s `voiceOverrides` JSONB column.
+Every visible string in the site catalog
+(`packages/config/src/voice/site-messages.*.json`, all five locales) is on
+exactly one list in `packages/config/src/voice/`:
 
-**Two separate obligations, and doing only one ships a silent no-op.**
+- `VOICE_FIELDS` strings are tenant-editable per language in the platform's
+  Voice page.
+- `VOICE_FIXED_KEYS` strings are fixed and translated by us.
 
-_Classify it._ `@blog/config`'s `VOICE_FIELDS` registry
-(`packages/config/src/voice/`) names every editable string — its flat storage
-`id`, its dotted `path` into the catalog, its kind (`TEXT`/`MULTILINE`/`RICH`)
-and its preview surface — and `VOICE_FIXED_KEYS` names every string that is
-deliberately not editable. Their co-located test asserts both directions: every
-registry `path` resolves to a real catalog key, and every catalog key sits on
-one list or the other. A string added to the catalog and neither list fails
-that test, which is what stops "is this editable?" being decided by omission.
+Their co-located test fails when a catalog key is on neither, so every new key
+forces the choice. Catalog keys and both lists live in `packages/config`, which
+the `config` agent writes.
 
-_Wire it._ The registry is a declaration; it is not yet what the runtime reads.
-Three hand-duplicated lists are: `src/utils/apply-voice-overrides/apply-voice-overrides.ts`
-(yours — maps each storage key to its catalog path),
-`apps/platform/src/utils/voice-fields/voice-fields.ts` (`platform-app` owns it)
-and the Zod `voiceOverridesSchema` in `packages/db`'s `upsert-site-config.ts`
-(`db` owns it). An override that is missing from any of the three is accepted,
-stored, and never applied — with nothing failing. Coordinate all three.
+**The choice is the user's, settled in the plan. It is never yours.**
 
-Fixed, never tenant-editable: accessibility-only strings, toast copy, anything
-carrying ICU plural syntax, metadata with no visible counterpart, archive titles
-and breadcrumb labels (Studio-derived), and newsletter copy (which lives on its
-Studio settings singleton). Everything else visible is a Voice field.
+- Your dispatch names each key and the list it belongs on.
+- Never hardcode a string the dispatch did not cover. List it in your report
+  under **Voice candidates** with a proposed key, its default text and the
+  list you recommend, so the orchestrator can put it to the user before
+  commit.
+- Your recommendation follows CLAUDE.md's "Check for Voice candidates".
 
-Adding a field needs no `packages/db` migration — the column is open-ended
-JSONB — but **removing or renaming one does**, since existing rows still carry
-the old key.
+Registering a key is the whole site-side wiring, because `resolveTenantMessages`
+and `upsertSiteConfig` both read `VOICE_FIELDS`. The platform's Voice page
+needs a label and hint for a new field, which `platform-app` owns. A live
+field leaving `VOICE_FIELDS` must also leave the platform's submitted fields
+in the same PR, because `upsertSiteConfig` throws on an unregistered key.
 
 ## SEO / feeds / a11y
 
@@ -497,6 +493,9 @@ Run these checks **once, after all work is complete**:
 - Metadata wired (title, description, OG, canonical)
 - Any ISR tags consumed from the service layer
 - Any framework-coupled components added to `src/components/`
+- **Voice candidates:** each catalog string the work needs that the dispatch
+  did not classify, with the proposed key, its default text and the list you
+  recommend. Write "none" when there are none.
 
 **Commit your work before you report.** Stage the specific files you changed
 (`git add <path> …` — never `git add -A`) and commit with a conventional

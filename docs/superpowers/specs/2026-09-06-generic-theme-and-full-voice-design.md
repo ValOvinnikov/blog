@@ -3,6 +3,9 @@
 **Status:** Design — approved in conversation 2026-09-06; awaiting written
 review before `writing-plans`.
 **Date:** 2026-09-06
+**Amended:** 2026-10-08 — Voice scope cut to page-level prose, per-language
+overrides, section sidebar title in Studio, contents rail relabelled
+(D15–D18).
 **Supersedes:** decisions D4 and D5 of
 [`2026-08-10-configurability-and-de-console-design.md`](./2026-08-10-configurability-and-de-console-design.md)
 (code voice-packs, "preserve the console voice") and the `chromeOn` field of
@@ -27,10 +30,16 @@ Two tasks, delivered in order:
    `chromeOn` / `isPlain` branches that render two structures. `CONSOLE`
    survives only as a look (fonts, hue, radius, density); every component
    renders one generic structure whose styling is token-driven.
-2. **Voice owns every visible string on the site.** The tenant-editable set
-   grows from 19 curated keys to the whole visible catalog, edited in the
-   platform's Voice page against a live preview of the real component, with a
-   rich-text editor for long-form copy.
+2. **Voice owns the copy an editor writes** (revised 2026-10-08, D15). The
+   tenant-editable set is the page-level prose that carries a site's voice:
+   the empty states and the 404 and error pages, 11 fields. Each is edited
+   per language (D16) in the platform's Voice page against a live preview,
+   with a rich-text editor for long-form copy. Every other visible string
+   stays fixed in the catalog, which we translate.
+
+   **Superseded:** this goal first read "Voice owns every visible string on
+   the site", growing the editable set to the whole visible catalog (72
+   fields by the time the registry landed). D15 records why it was cut back.
 
 ## Non-goals
 
@@ -40,8 +49,6 @@ Two tasks, delivered in order:
   authored "build-tag" line under the logo rendered by `BrandLockup`; it
   reads as terminal idiom only when a tenant chooses to write one, so it is
   content, not a hardcoded symbol.
-- Per-locale voice. The catalog is `en` only today; the registry is shaped so
-  a locale can be added later, nothing more.
 - Making accessibility-only strings editable (see D3).
 - Click-to-edit in the preview (variant B of the mock). Noted under "Later".
 
@@ -52,8 +59,8 @@ Two tasks, delivered in order:
   Drizzle migration. The framed panel becomes the single structure for
   engagement sections; the "plain" card variant is deleted, not kept as a
   toggle.
-- **D2 — Drop preset voice packs.** With Voice covering the full catalog a
-  preset has no reason to carry copy. `TPresetBundle` loses `voicePack`,
+- **D2 — Drop preset voice packs.** A preset is a look, and has no reason to
+  carry copy. `TPresetBundle` loses `voicePack`,
   `TVoicePack` is deleted, and the message merge drops from three layers to
   two: neutral catalog ← tenant overrides.
 - **D3 — Visible copy only. Accessibility-only strings are never
@@ -103,11 +110,25 @@ Two tasks, delivered in order:
   restricted to bold, italic, link and plain paragraphs. Labels, buttons,
   titles and placeholders stay single-line strings. No new dependency:
   `@portabletext/editor` (MIT) is already installed for email templates.
-- **D7 — The preview is an iframe of the real site.** `apps/platform` may not
-  import `apps/web`, and most Voice copy lives in web-owned compositions, so
-  re-composing a preview in the platform would approximate and drift. The
-  web app exposes a token-gated preview route that renders one surface with
-  fixture data and draft overrides pushed by `postMessage`.
+- **D7 (revised 2026-10-08) — The preview renders `@blog/ui` specimens
+  inside the platform.** The Voice page previews each surface with the same
+  `@blog/ui` atoms the site passes that copy into (`Eyebrow`, `Heading`,
+  `Text`, `Button`, `LinkButton`). They are themed through the token path the
+  Look preview already uses and fed straight from the form's draft state.
+  - `apps/web` carries no preview code: no route, no proxy branch, no
+    framing carve-out in the security headers both apps share, no token, no
+    env var and no `postMessage` channel.
+  - The layout around the atoms is a platform copy with nothing to catch
+    drift. Fidelity is best-effort, the trade already accepted for the
+    archive empty states.
+
+  **Superseded:** "the preview is an iframe of the real site", a token-gated
+  `apps/web` route rendering every surface from fixtures (#2757). D15 leaves
+  11 fields on four simple surfaces. For those, the route's machinery bought
+  little fidelity that a specimen does not: a proxy carve-out on every
+  request, an `X-Frame-Options`/`frame-ancestors` carve-out in the shared
+  preset, HMAC tokens and a new env var.
+
 - **D8 — Voice page layout is variant A of the mock** (fields by surface on
   the left, sticky live preview on the right that follows focus), plus
   per-surface change counts borrowed from variant C.
@@ -160,6 +181,88 @@ Two tasks, delivered in order:
   passes `useFormSubmission`'s `isPending` to it — Voice, Look, Features,
   Email templates and tenant details alike — so "did it take?" is answered
   on the button rather than only by the toast that follows.
+- **D15 (2026-10-08) — Voice is bounded to page-level prose.** A string is
+  tenant-editable only if it is page-level prose an editor writes in the
+  site's own voice. Everything else stays fixed in the catalog, which we
+  translate into every locale:
+  - copy that operates the interface: buttons, links, toggles, badges,
+    statuses, form and section labels, and page names that a fixed menu link
+    or aria label repeats;
+  - copy that states what the code enforces: data export and deletion,
+    consent categories and choices;
+  - third-party names (GitHub, Google);
+  - copy read only by assistive technology (D3).
+
+  This is D4's rule, which #2921 already applied to sign-in, applied to every
+  surface. The editable set is 11 fields, eight of them `RICH`:
+
+  | Surface     | Editable fields                                                       |
+  | ----------- | --------------------------------------------------------------------- |
+  | `ARCHIVE`   | `blogListEmpty`, `topicEmpty`, `tagEmpty`, `topicsEmpty`, `tagsEmpty` |
+  | `BOOKMARKS` | `bookmarksEmpty`                                                      |
+  | `NOT_FOUND` | `notFoundEyebrow`, `notFoundHeading`, `notFoundSupportingText`        |
+  | `ERROR`     | `localeErrorTitle`, `localeErrorDescription`                          |
+
+  The other 61 registered ids move to `VOICE_FIXED_KEYS`. They include
+  every field of `NAVIGATION`, `POST`, `SHARING`, `ACCOUNT` and
+  `CONSENT_BANNER`, which leave `VOICE_SURFACE`; the pagination labels; the
+  bookmark button and the bookmarks page's title and list heading; the 404's
+  "Return home"; and the error page's "Try again" and "Go home". No catalog
+  key is added or removed, and the registry coverage test proves the move is
+  complete.
+
+  The consent banner's message goes fixed with the rest of its surface. This
+  reverses `SPEC.md`'s cookie-consent "Copy" bullet. Rewording the message
+  never re-asks visitors who consented under the old wording, and it cannot
+  link a privacy policy until #3726.
+
+  Of the 61, the 60 that the full-catalog expansion added need no data
+  migration, because the platform could only ever save the original eight
+  keys.
+  `notFoundReturnHome` is the exception: it is saveable today. The platform's
+  field list must drop it in the same PR that unregisters it, because
+  `upsertSiteConfig` rejects an unregistered key and every Voice save would
+  fail. Any custom wording a tenant gave it reverts to the catalog default.
+
+  **Superseded:** Goal 2's original "every visible string". It reversed the
+  "deliberately bounded" curated set of
+  [`2026-08-10-configurability-and-de-console-design.md`](./2026-08-10-configurability-and-de-console-design.md),
+  and this returns to it. Making buttons, statuses and settings copy
+  editable gained no voice. It created label-in-name breaks against fixed
+  aria labels, page names that stopped matching the menu links leading to
+  them, and copy that could drift from what the code actually does.
+
+- **D16 (2026-10-08) — Voice overrides are per language.** A tenant serves
+  its default `locale` plus `additionalLocales`. Each editable field takes an
+  optional value per live language, and falls back to that language's
+  catalog default when empty.
+  - `site_config.voice_overrides` gains a locale level:
+    `{ [locale]: { [fieldId]: value } }`. Each value is validated as before
+    (kind, `max`, placeholders).
+  - A Drizzle data migration moves existing values under the tenant's
+    default `locale`, with the usual human-gated apply. This keeps today's
+    behaviour, where overrides apply only on default-language pages.
+  - Rendering applies the request language's overrides on every page and to
+    every string, whether a server or a client component renders it.
+  - The Voice page edits one language at a time, through a switcher over
+    the tenant's live languages. Placeholders, "reset to default" and the
+    preview follow the selected language.
+- **D17 (2026-10-08) — The section sidebar's title is Studio content.** The
+  sidebar heading on nested landing pages (`sectionNavigation.label`, "In
+  this section") becomes an optional `sectionNavigationTitle` string on the
+  section's root landing page. It sits beside the `sectionNavigation` toggle
+  and is shown only while that toggle is on.
+  - An empty title falls back to the catalog default, which is fixed. So no
+    Voice override competes with it, which is the failure mode "Curated UI
+    copy lives in Voice, not on modules" warns about.
+  - Landing pages are per-language documents, so the title is localised
+    with no extra machinery.
+  - Additive and optional, so no content migration. It ships through
+    `studio → service → web`.
+- **D18 (2026-10-08) — The post contents rail is labelled "Contents".**
+  `postContentsRail.label` stays fixed. Its default changes from "Topics",
+  which collided with the site's topic taxonomy, to "Contents" in all five
+  catalogs: de "Inhalt", es "Contenido", fr "Sommaire", nl "Inhoud".
 
 ---
 
@@ -243,7 +346,7 @@ WindowChrome terminal bar" assertion is deleted with its branch;
 
 ---
 
-## Task 2 — Voice as the full catalog
+## Task 2 — Voice for the editor's copy
 
 ### The registry (`@blog/config`)
 
@@ -271,27 +374,29 @@ WindowChrome terminal bar" assertion is deleted with its branch;
   label catalog is keyed by id, and the ten surviving overrides keep their
   ids without migration.
 
-- **Surfaces**, in site order: navigation (the topic chip "All"), archive
-  empty states, post page, sharing, not found, error page,
-  sign-in menu, bookmarks, account (privacy / newsletter / connected
-  accounts). Newsletter (D4), toasts (D5), metadata (D10) and archive titles
-  (D13) are not surfaces.
+- **Surfaces**, in site order: archive empty states, bookmarks, not found,
+  error page (D15). Navigation, the post page, sharing, account, the consent
+  banner, sign-in (#2921), newsletter (D4), toasts (D5), metadata (D10) and
+  archive titles (D13) are not surfaces.
 - **Exclusions are mechanical:** a key is in the registry only if it is
   listed; the a11y keys, toast keys and newsletter keys are simply absent. A
   co-located test asserts every registry `path` exists in the catalog and
   every catalog key is either registered or on the explicit fixed list, so a
   new string cannot be added without deciding which it is.
 
-Roughly 60 fields after Task 1's removals and D10.
+Eleven fields (D15).
 
 ### Storage and validation (`@blog/db`)
 
 `site_config.voice_overrides` stays JSONB; its type widens to
-`Record<string, string | TVoicePortableText>` where `TVoicePortableText` is a
+`Partial<Record<TLocaleIsoCode, Record<string, string | TVoicePortableText>>>`
+(one map per language, D16) where `TVoicePortableText` is a
 minimal block/span/link type owned by `@blog/config`. `TPortableTextBlock` in
 `packages/db/src/schema/email-templates.ts` becomes a re-export of it so the
 two JSONB columns share one shape; `@blog/email`'s serializer types and
-`apps/platform`'s `EMAIL_PORTABLE_TEXT_SCHEMA` are untouched. No schema change, so no schema migration.
+`apps/platform`'s `EMAIL_PORTABLE_TEXT_SCHEMA` are untouched. No column
+change; the D16 data migration nests the existing values under each tenant's
+default `locale`.
 
 `upsertSiteConfig`'s Zod schema is generated from `VOICE_FIELDS`:
 
@@ -312,16 +417,17 @@ string>> }` so the page can show them inline.
 
 ### Rendering (`apps/web`)
 
-- `resolveTenantMessages` becomes: base catalog ← overrides, where each
-  `TEXT`/`MULTILINE` override is set at its registry `path`. next-intl usage
-  in components is unchanged.
+- `resolveTenantMessages` becomes: base catalog ← the request language's
+  overrides (D16), where each `TEXT`/`MULTILINE` override is set at its
+  registry `path`. The merged messages must reach server-rendered strings as
+  well as client ones. Every editable field renders on the server, so
+  overrides that reach only `NextIntlClientProvider` never show.
 - `RICH` keys cannot be next-intl messages. The tenant layout also mounts a
   `VoiceRichProvider` holding the resolved rich map (override, else the
   catalog string wrapped as one paragraph). A server accessor
   (`getVoiceRich(id)`) and a client hook (`useVoiceRich(id)`) return Portable
   Text, rendered by the existing `PortableText`. Consumers: empty
-  states, the not-found and error pages' supporting text, account section
-  descriptions.
+  states, and the not-found and error pages' supporting text.
 - `error-boundary-copy.ts`, `error-page.tsx` strings move into the catalog
   under `errorPage.*` and render through the provider. The error page takes the same shape as the not-found page (D11): `errorPage.eyebrow` (optional, empty by default), `heading`, `supportingText`, `retry`, `goHome`. `global-error.tsx`
   keeps fixed copy — it renders when the root layout itself fails and has no
@@ -333,32 +439,39 @@ string>> }` so the page can show them inline.
   `notFound.supportingText` (a `portableTextToPlainText` helper in
   `@blog/config`).
 
-### Preview route (`apps/web`)
+### Preview (`apps/platform`, D7)
 
-`apps/web/src/app/[tenant]/preview/voice/[surface]/page.tsx`, a sibling of
-`[locale]` so it inherits `ThemeScope` and fonts without the site header and
-footer. Locale is the tenant default.
-
-- **Fixtures, not data.** Each surface renders its existing pure view
-  (`IdentitySectionView`, `PrivacySection`, `NewsletterSectionView`,
-  `BookmarksPageView`, `NotFoundPage`, the sign-in and account menus, the
-  archive list) with fixture props from `apps/web/src/preview/voice/`. The
-  account fixtures in `src/testing/` move there and the tests import them
-  from the new home.
-- **Draft channel.** A client island wraps the surface in
-  `NextIntlClientProvider` + `VoiceRichProvider`, listens for
-  `{ type: 'voice-draft', overrides }` messages from the platform origin, and
-  re-renders with the merged messages. Elements bound to a field carry
-  `data-voice-key`; a `{ type: 'voice-focus', id }` message outlines them.
-- **Security.** The URL carries `?token=` — an HMAC over
-  `voice-preview:<tenantId>:<expiresAt>` using `SITE_CONFIG_REVALIDATE_SECRET`
-  (already shared by both apps), ten-minute expiry, compared with
-  `isSecretMatch`; the route checks the token's tenant against the
-  host-resolved tenant and 404s on mismatch or expiry. It sets
-  `robots: noindex`, `Content-Security-Policy: frame-ancestors
-<PLATFORM_APP_URL>`, and ignores `postMessage` from any other origin.
-  `PLATFORM_APP_URL` is a new optional web env var (`turbo.json`,
-  `docs/context/environment-variables.md`); absent, the route 404s.
+- **Two specimens.**
+  - _Page hero_ for `NOT_FOUND` and `ERROR`: `Eyebrow` (left out when
+    blank), `Heading` at hero size, `Text`, and the page's fixed actions as
+    `LinkButton`/`Button`. Those are "Return home" for the 404, and "Try
+    again" / "Go home" for the error page.
+  - _Empty states_ for `ARCHIVE` and `BOOKMARKS`: the six messages as muted
+    `Text`, stacked with dividers, with `{name}` filled from a sample topic
+    or tag.
+- **Where it lives.** The platform's single `@blog/ui` exception widens from
+  `look/look-preview/preview-sample/` to one shared
+  `apps/platform/src/components/features/site-preview/` directory. It holds
+  both the Look sample and the Voice specimens and is still one
+  ESLint-guarded directory. `configs/eslint/platform.js`, `CLAUDE.md`,
+  `SPEC.md`, `.claude/agents/platform-app.md` and
+  `docs/context/frontend-conventions.md` name the new path in the same PR
+  that moves it.
+- **Theme.** The `theme-preview-tokens` builders
+  (`apps/platform/src/utils/theme-preview-tokens/`) plus the tenant's font
+  variables, with the light/dark toggle the Look preview has.
+- **Drafts.** Each field shows the draft value for the selected language
+  (D16), else that language's catalog default from `SITE_MESSAGES_BY_LOCALE`
+  (`@blog/config`). The fixed action labels come from the same catalog.
+- **Rich values.** A small platform renderer handles exactly the
+  `VOICE_PORTABLE_TEXT_SCHEMA` marks (bold, italic, link). `@blog/ui` has no
+  Portable Text renderer, and the platform may not import `apps/web`'s.
+- **Focus.** Each field's element sits in a platform-owned wrapper carrying
+  `data-voice-key`. Focusing a field shows its specimen and outlines the
+  wrapper, and no `@blog/ui` prop widens for it.
+- **Completeness.** The specimens' field map is typed
+  `Record<TVoiceFieldId, …>`, so registering a field without placing it
+  fails type-check.
 
 ### Voice page (`apps/platform`)
 
@@ -367,6 +480,9 @@ Layout per D8 and the mock:
 - **Header:** "Voice", one-line description, actions **Discard** (disabled
   when clean), **Save**, and an "N unsaved" count. The "Basic" card and the
   "Advanced" disclosure are removed.
+- **Language:** a switcher over the tenant's live languages, shown when it
+  serves more than one (D16). Fields, placeholders, change counts and the
+  preview all follow the selected language.
 - **Left column:** a search box filtering fields by label or default text;
   then one `Card` per surface in site order, header showing the surface name,
   its route and its change count. Each field row: label, a hint saying where
@@ -375,12 +491,10 @@ Layout per D8 and the mock:
   default, a change marker and **Reset** when overridden, placeholder chips
   ("Keep these: `{count}`") when the field has them, and inline field errors
   from the save action.
-- **Right column, sticky:** surface `<select>`, light/dark toggle (as Look),
-  the iframe, and a status line. Focusing a field switches the iframe to that
-  field's surface (250 ms debounce) and posts `voice-focus`; typing posts
-  `voice-draft` (150 ms debounce). If `WEB_APP_URL` is unset or the iframe
-  fails to load, an `Alert` says the preview is unavailable and editing still
-  works. Below 960 px the preview collapses into a toggleable bottom sheet.
+- **Right column, sticky:** a specimen `<select>`, the light/dark toggle
+  (as Look) and the specimen (D7). Focusing a field switches to its specimen
+  and outlines it, and typing re-renders it from the draft. Below 960 px the
+  preview collapses into a toggleable bottom sheet.
 - **Editor:** `PortableTextEditor` gains a `schema` prop (default: the email
   schema) so Voice passes `VOICE_PORTABLE_TEXT_SCHEMA`; the toolbar renders
   only the buttons the schema allows.
@@ -452,24 +566,36 @@ renamed keys.
 `config → db → web → platform-app` for the registry, storage, rendering,
 preview route and page; `studio → service → web` for the newsletter copy.
 
-**Env and docs in the same PRs:** `PLATFORM_APP_URL` in `apps/web` env, turbo
-and `docs/context/environment-variables.md`; `SPEC.md` "Theme-as-content",
-"Voice-as-content" and "Curated UI copy" sections rewritten to this doc's
-final shape; `.claude/agents/web.md` and `platform-app.md` gain the preview
-route and Voice page conventions; this spec is deleted in the PR that syncs
-`SPEC.md`.
+**Amendment (2026-10-08) — remaining delivery.** The preview route (#2757)
+is not built (D7). The rest lands one layer at a time, each merged before
+the next starts:
 
-**Verification** per PR: `pnpm type-check && pnpm lint && pnpm test && pnpm
-knip`, `pnpm gen:ui-index:check` for `packages/ui` PRs,
-`pnpm check:turbo-env-sync` for the env PR, `pnpm check:voice-sync` wherever
-voice keys change until Phase 2 retires it, `pnpm typegen` diff-minimal for the Studio PRs. The
-preview route gets an e2e smoke test: load with a valid token, post a draft,
-assert the outlined element's text changed.
+1. `web`, `prio:now`: a confirmed fix so overrides reach server-rendered
+   strings (see Rendering). It ships first and stands alone.
+2. `config`: the D15 scope cut and D18's "Contents". This one PR also edits
+   the `web` and `db` tests that name a moved id, so it merges green alone.
+3. `config` + `platform-app`: retire `notFoundReturnHome` in one PR, because
+   the platform's field list has to drop it in the same change (D15).
+4. D16 per-language overrides, through `config → db → web → platform-app`,
+   expand/contract so each PR merges green alone.
+5. #2911 is rescoped to the three surviving `RICH` sinks outside the empty
+   states: `notFoundSupportingText`, `localeErrorDescription` and
+   `bookmarksEmpty`.
+6. `platform-app`, #2758 rescoped: the `site-preview/` move, then the
+   editor, then the specimens.
+7. D17 runs as its own `studio → service → web` chain, parallel to all of
+   the above.
+
+**Env and docs in the same PRs:** `SPEC.md` "Theme-as-content",
+"Voice-as-content", "Curated UI copy" and the cookie-consent "Copy" bullet
+are rewritten to this doc's final shape. `.claude/agents/platform-app.md`
+gains the Voice page and specimen conventions. This spec is deleted in the
+PR that syncs `SPEC.md`.
+
+**Verification** per PR: `pnpm verify`, plus `pnpm typegen` diff-minimal for
+the Studio PRs.
 
 ## Later (recorded, not scoped)
 
-- Click-to-edit from the preview (variant B): the `data-voice-key` attributes
-  and the `postMessage` channel already carry what it needs.
-- Per-locale catalogs: the registry `path` is locale-independent; a second
-  `site-messages.<locale>.json` plus a locale column on the override map is
-  the shape.
+- Click-to-edit from the preview (variant B): the specimens' `data-voice-key`
+  wrappers already carry what it needs.

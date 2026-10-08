@@ -686,7 +686,7 @@ file` are all denied alike) — an earlier version only handled the
     files, so it only fills the gaps).
 
 - **Skills** (`.claude/skills/`):
-  - `develop-feature` — the lifecycle playbook (investigate → delegate per layer → test → review → commit → remove the subagent worktrees); start here for non-trivial work.
+  - `develop-feature` — the lifecycle playbook (investigate → delegate per layer → test → review → commit → remove the subagent worktrees); start here for non-trivial work. Its Voice check lists every new or reworded public-site string, including the copy a new `@blog/ui` text prop will carry, as the plan's **Copy** line. The user settles whether each one is tenant-editable. The `web` and `ui` agents report unclassified strings under **Voice candidates**, and the reviewer lists them (CLAUDE.md "Check for Voice candidates").
   - `add-content-type` — end-to-end recipe spanning all layers (schema → types → service → ui → web).
   - `studio-schema-practices` — Sanity schema quality bar + content-migration workflow.
   - `react-component-practices` — the React rules shared by `ui`, `web` and `platform-app` (server-first, closed props, derived state, composition, no unmeasured memo, accessible by construction).

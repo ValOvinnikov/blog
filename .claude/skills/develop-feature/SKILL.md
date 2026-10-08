@@ -91,6 +91,14 @@ ui → web`; dependency order) so each review stays small — **and each
   Decide now whether a data migration is required. If yes, it is part of the plan
   (see step 2); if the change is purely additive/optional, note explicitly that
   no migration is needed. Purely new types/fields need none.
+- **Voice check (site copy).** List every visible string on the public site
+  that the work adds or rewords. That covers new or changed catalog keys,
+  and the copy any new `@blog/ui` text prop (label, title, message,
+  placeholder) will carry once `web` wires it. Give each a recommended
+  classification under CLAUDE.md's "Check for Voice candidates". This list is
+  the plan's **Copy** line in step 2. A feature that starts in `@blog/ui`
+  lists its copy now, not in the later `web` ticket, because the component's
+  props decide whether the copy can be a Voice field.
 - Surface unknowns early; ask the user only if a decision is genuinely theirs.
 - **Follow Gate 0 in `open-pull-request`** — pull the issue from the board,
   set status → In Progress, checkout a new branch from `main`. For multi-layer
@@ -108,6 +116,14 @@ ui → web`; dependency order) so each review stays small — **and each
 - Explicitly mark which layers are **unaffected** — those agents are skipped
   entirely. Do not invoke an agent whose layer has no changes.
 - Note which step each subagent owns.
+- **State the Copy line** from step 1's Voice check in the split you put to
+  the user. List each string with its recommended classification, or write
+  "none". The user's approval settles it.
+  - Write the settled classifications into the ticket body before dispatch.
+  - Name each key's list (`VOICE_FIELDS` or `VOICE_FIXED_KEYS`) in the
+    dispatch prompt.
+  - A string an agent reports under **Voice candidates** that the plan did
+    not list goes to the user before commit.
 - **If the investigation flagged a migration**, the plan must include it as an
   explicit step — which documents/fields change, the `sanity/migrate` transform,
   and the dry-run → backup → human-gated run sequence — and **prompt the user
