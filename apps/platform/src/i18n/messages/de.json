@@ -769,5 +769,22 @@
     "discardAndLeave": "Verwerfen und verlassen",
     "saveAndLeave": "Speichern und verlassen",
     "saving": "Wird gespeichert…"
+  },
+  "draftRecovery": {
+    "title": "Du hast ungespeicherte Änderungen von {takenAt}.",
+    "description": "Sie wurden auf diesem Gerät aufbewahrt, als du die Seite verlassen hast.",
+    "todayAt": "heute {time}",
+    "restore": "{count, plural, one {# Änderung wiederherstellen} other {# Änderungen wiederherstellen}}",
+    "discard": "Verwerfen",
+    "differencesTitle": "Du hast ungespeicherte Änderungen von {takenAt}, aber diese Seite wurde um {savedAt} gespeichert.",
+    "differencesTitleSavedSince": "Du hast ungespeicherte Änderungen von {takenAt}, aber diese Seite wurde seitdem gespeichert.",
+    "differencesDescription": "Wiederherstellen ersetzt {count, plural, one {# der neueren Werte} other {# der neueren Werte}}: {fields}.",
+    "reviewDifferences": "{count, plural, one {Unterschied ansehen} other {Die # Unterschiede ansehen}}",
+    "restoreAnyway": "Trotzdem wiederherstellen",
+    "discardDraft": "Meinen Entwurf verwerfen",
+    "fieldColumn": "Feld",
+    "savedColumn": "Gespeichert",
+    "draftColumn": "Dein Entwurf",
+    "emptyValue": "Leer"
   }
 }

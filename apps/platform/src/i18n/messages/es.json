@@ -769,5 +769,22 @@
     "discardAndLeave": "Descartar y salir",
     "saveAndLeave": "Guardar y salir",
     "saving": "Guardando…"
+  },
+  "draftRecovery": {
+    "title": "Tienes cambios sin guardar de {takenAt}.",
+    "description": "Se guardaron en este dispositivo al salir de la página.",
+    "todayAt": "hoy a las {time}",
+    "restore": "{count, plural, one {Restaurar # cambio} other {Restaurar # cambios}}",
+    "discard": "Descartarlos",
+    "differencesTitle": "Tienes cambios sin guardar de {takenAt}, pero esta página se guardó a las {savedAt}.",
+    "differencesTitleSavedSince": "Tienes cambios sin guardar de {takenAt}, pero esta página se ha guardado desde entonces.",
+    "differencesDescription": "Al restaurar se {count, plural, one {reemplaza # de los valores más recientes} other {reemplazan # de los valores más recientes}}: {fields}.",
+    "reviewDifferences": "{count, plural, one {Revisar la diferencia} other {Revisar las # diferencias}}",
+    "restoreAnyway": "Restaurar de todos modos",
+    "discardDraft": "Descartar mi borrador",
+    "fieldColumn": "Campo",
+    "savedColumn": "Guardado",
+    "draftColumn": "Tu borrador",
+    "emptyValue": "Vacío"
   }
 }

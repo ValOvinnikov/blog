@@ -51,6 +51,7 @@ export type TLanguagesSettingsProps = {
     tenantId: string,
     additionalLocales: TLocaleIsoCode[],
   ) => Promise<{ ok: boolean }>;
+  savedAt?: Date;
   archivedAt?: Date;
 };
 
@@ -60,6 +61,7 @@ export const LanguagesSettings = ({
   storedLocales,
   additionalLocaleLimit,
   saveAction,
+  savedAt,
   archivedAt,
 }: TLanguagesSettingsProps) => {
   const isArchived = Boolean(archivedAt);
@@ -130,6 +132,22 @@ export const LanguagesSettings = ({
       archivedNoticeId={archivedNoticeId}
       hasError={status === 'error'}
       errorTitle={t('alertError')}
+      draft={{
+        tenantId,
+        page: 'languages',
+        values,
+        savedValues: savedLiveLocales,
+        savedAt,
+        fields: SUPPORTED_LOCALES.filter(
+          (locale) => locale !== defaultLocale,
+        ).map((locale) => ({
+          id: locale,
+          label: tLanguage(locale),
+          display: (liveLocales: TLocaleIsoCode[]) =>
+            liveLocales.includes(locale) ? t('switchOn') : t('switchOff'),
+        })),
+        onRestore: setValues,
+      }}
     >
       <Card>
         <Card.Header title={t('defaultHeading')} headingLevel={2} />

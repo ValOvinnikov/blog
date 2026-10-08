@@ -9,11 +9,6 @@ export type TVoicePageContentProps = {
   tenant: TTenant;
 };
 
-/**
- * The Voice tab's data-fetch + render, shared by `/tenants/[tenantId]/voice`
- * and `/dashboard/voice` — both resolve a `TTenant` however fits their own
- * routing (URL param vs. session membership) and hand it here.
- */
 export const VoicePageContent = async ({ tenant }: TVoicePageContentProps) => {
   const config = await queries.siteConfig.getSiteConfig(tenant.id);
 
@@ -22,6 +17,7 @@ export const VoicePageContent = async ({ tenant }: TVoicePageContentProps) => {
       tenantId={tenant.id}
       initialOverrides={plainTextVoiceOverrides(config?.voiceOverrides ?? {})}
       saveAction={saveVoiceOverridesAction}
+      savedAt={config?.updatedAt}
       archivedAt={tenant.deprovisionedAt ?? undefined}
     />
   );

@@ -275,4 +275,21 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       expect(bookmarksSwitch).toHaveAttribute('data-checked', '');
     });
   });
+
+  it('offers to restore unsaved toggles after leaving the page', async () => {
+    const { unmount } = setup();
+    await user.click(screen.getByRole('switch', { name: 'Analytics' }));
+    unmount();
+
+    setup();
+    await user.click(screen.getByRole('button', { name: 'Restore 1 change' }));
+
+    expect(screen.getByRole('switch', { name: 'Analytics' })).toHaveAttribute(
+      'data-checked',
+      '',
+    );
+    expect(
+      screen.getByRole('region', { name: 'Unsaved changes' }),
+    ).toHaveTextContent('1 unsaved change');
+  });
 });

@@ -769,5 +769,22 @@
     "discardAndLeave": "Verwerpen en weggaan",
     "saveAndLeave": "Opslaan en weggaan",
     "saving": "Opslaan…"
+  },
+  "draftRecovery": {
+    "title": "Je hebt niet-opgeslagen wijzigingen van {takenAt}.",
+    "description": "Ze zijn op dit apparaat bewaard toen je de pagina verliet.",
+    "todayAt": "vandaag {time}",
+    "restore": "{count, plural, one {# wijziging herstellen} other {# wijzigingen herstellen}}",
+    "discard": "Weggooien",
+    "differencesTitle": "Je hebt niet-opgeslagen wijzigingen van {takenAt}, maar deze pagina is om {savedAt} opgeslagen.",
+    "differencesTitleSavedSince": "Je hebt niet-opgeslagen wijzigingen van {takenAt}, maar deze pagina is sindsdien opgeslagen.",
+    "differencesDescription": "Herstellen vervangt {count, plural, one {# van de nieuwere waarden} other {# van de nieuwere waarden}}: {fields}.",
+    "reviewDifferences": "{count, plural, one {Het verschil bekijken} other {De # verschillen bekijken}}",
+    "restoreAnyway": "Toch herstellen",
+    "discardDraft": "Mijn concept weggooien",
+    "fieldColumn": "Veld",
+    "savedColumn": "Opgeslagen",
+    "draftColumn": "Jouw concept",
+    "emptyValue": "Leeg"
   }
 }

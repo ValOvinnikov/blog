@@ -769,5 +769,22 @@
     "discardAndLeave": "Quitter sans enregistrer",
     "saveAndLeave": "Enregistrer et quitter",
     "saving": "Enregistrement…"
+  },
+  "draftRecovery": {
+    "title": "Vous avez des modifications non enregistrées de {takenAt}.",
+    "description": "Elles ont été conservées sur cet appareil quand vous avez quitté la page.",
+    "todayAt": "aujourd’hui à {time}",
+    "restore": "{count, plural, one {Restaurer # modification} other {Restaurer # modifications}}",
+    "discard": "Les ignorer",
+    "differencesTitle": "Vous avez des modifications non enregistrées de {takenAt}, mais cette page a été enregistrée à {savedAt}.",
+    "differencesTitleSavedSince": "Vous avez des modifications non enregistrées de {takenAt}, mais cette page a été enregistrée depuis.",
+    "differencesDescription": "Restaurer remplace {count, plural, one {# des valeurs plus récentes} other {# des valeurs plus récentes}} : {fields}.",
+    "reviewDifferences": "{count, plural, one {Voir la différence} other {Voir les # différences}}",
+    "restoreAnyway": "Restaurer quand même",
+    "discardDraft": "Ignorer mon brouillon",
+    "fieldColumn": "Champ",
+    "savedColumn": "Enregistré",
+    "draftColumn": "Votre brouillon",
+    "emptyValue": "Vide"
   }
 }
