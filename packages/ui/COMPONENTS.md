@@ -263,7 +263,7 @@ Slots:
 ### PostMeta — `components/molecules/post-meta/post-meta.tsx`
 
 Post detail metadata strip: author avatar + name, publish date, and estimated reading time.
-Props: author: { name: string; imageUrl?: string; href?: string; } · publishedAt: string · formattedDate: string · readingTimeMinutes?: number · linkAs?: TAnchorElementType · share?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+Props: author: { name: string; imageUrl?: string; href?: string; } · publishedAt: string · formattedDate: string · readingTime?: string · linkAs?: TAnchorElementType · share?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### PricingCard — `components/molecules/pricing-card/pricing-card.tsx`
 

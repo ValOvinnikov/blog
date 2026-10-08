@@ -5,7 +5,7 @@ import userEvent from '@testing-library/user-event';
 
 import { VoicePageContent } from './voice-page-content';
 
-const ADVANCED_SUMMARY = 'Advanced — 8 curated strings, 2 groups';
+const ADVANCED_SUMMARY = 'Advanced — 7 curated strings, 2 groups';
 
 const openAdvanced = async () => {
   await userEvent.setup().click(screen.getByText(ADVANCED_SUMMARY));

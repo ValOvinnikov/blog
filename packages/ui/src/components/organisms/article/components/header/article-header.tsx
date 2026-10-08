@@ -65,7 +65,7 @@ export const ArticleHeader = ({
               author={meta.author}
               publishedAt={meta.publishedAt}
               formattedDate={meta.formattedDate}
-              readingTimeMinutes={meta.readingTimeMinutes}
+              readingTime={meta.readingTime}
               linkAs={meta.linkAs}
               share={meta.share}
             />

@@ -34,7 +34,6 @@ const tenant = { id: 'tenant-1' };
 const overrides = {
   notFoundHeading: '',
   notFoundSupportingText: 'Custom 404 copy.',
-  notFoundReturnHome: '',
   blogListEmpty: '',
   topicEmpty: '',
   tagEmpty: '',

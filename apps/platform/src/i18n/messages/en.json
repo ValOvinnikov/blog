@@ -370,6 +370,7 @@
     "description": "Applies to every email this tenant sends. Blank fields fall back to the product default.",
     "senderNameLabel": "Sender name",
     "senderNameHint": "The display name on the From address — unrelated to the site title.",
+    "senderNameInvalidError": "This is the name recipients see, not an email address. Enter a name such as Acme Co, without < > \" , ; or @.",
     "replyToLabel": "Reply-to address",
     "replyToHint": "Where a reply to any tenant email is routed.",
     "footerAddressLabel": "Footer postal address",
@@ -419,11 +420,6 @@
       "MAGIC_LINK": "Sent when someone signs in to this tenant's site.",
       "TENANT_INVITE": "Sent when someone is invited to join this tenant's team.",
       "NEWSLETTER_CONFIRMATION": "Sent to confirm a newsletter subscription."
-    },
-    "previewActionLabel": {
-      "MAGIC_LINK": "Sign in",
-      "TENANT_INVITE": "Accept invite",
-      "NEWSLETTER_CONFIRMATION": "Confirm subscription"
     }
   },
   "portableTextEditorToolbar": {
@@ -447,7 +443,7 @@
     "alertError": "Couldn't save — try again.",
     "basicHeading": "Basic",
     "basicAlert": "Nothing required here. The site already has sensible default wording. Most tenants never open the Advanced fields below.",
-    "advancedSummary": "Advanced — 8 curated strings, 2 groups",
+    "advancedSummary": "Advanced — 7 curated strings, 2 groups",
     "advancedOverrideInfo": "Every field is an override. Leave one blank to use the site's own default wording — clearing a field reverts to that default, it does not set the string to empty."
   },
   "voiceFieldGroup": {
@@ -460,7 +456,6 @@
   "voiceFieldLabels": {
     "notFoundHeading": "Not Found Heading",
     "notFoundSupportingText": "Not Found Supporting Text",
-    "notFoundReturnHome": "Not Found Return Home",
     "blogListEmpty": "Blog List Empty",
     "topicEmpty": "Topic Empty",
     "tagEmpty": "Tag Empty",

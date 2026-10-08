@@ -7,7 +7,7 @@ import type { Session } from 'next-auth';
 
 import VoicePage from './page';
 
-const ADVANCED_SUMMARY = 'Advanced — 8 curated strings, 2 groups';
+const ADVANCED_SUMMARY = 'Advanced — 7 curated strings, 2 groups';
 
 const openAdvanced = async () => {
   await userEvent.setup().click(screen.getByText(ADVANCED_SUMMARY));

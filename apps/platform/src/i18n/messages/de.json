@@ -370,6 +370,7 @@
     "description": "Gilt für jede E-Mail, die dieser Mandant versendet. Leere Felder verwenden den Produktstandard.",
     "senderNameLabel": "Absendername",
     "senderNameHint": "Der Anzeigename der Absenderadresse — unabhängig vom Website-Titel.",
+    "senderNameInvalidError": "Das ist der Name, den Empfänger sehen, keine E-Mail-Adresse. Geben Sie einen Namen wie Acme Co ein, ohne < > \" , ; oder @.",
     "replyToLabel": "Antwortadresse",
     "replyToHint": "Wohin Antworten auf E-Mails dieses Mandanten geleitet werden.",
     "footerAddressLabel": "Postanschrift in der Fußzeile",
@@ -419,11 +420,6 @@
       "MAGIC_LINK": "Wird gesendet, wenn sich jemand auf der Website dieses Mandanten anmeldet.",
       "TENANT_INVITE": "Wird gesendet, wenn jemand in das Team dieses Mandanten eingeladen wird.",
       "NEWSLETTER_CONFIRMATION": "Wird gesendet, um ein Newsletter-Abonnement zu bestätigen."
-    },
-    "previewActionLabel": {
-      "MAGIC_LINK": "Anmelden",
-      "TENANT_INVITE": "Einladung annehmen",
-      "NEWSLETTER_CONFIRMATION": "Abonnement bestätigen"
     }
   },
   "portableTextEditorToolbar": {
@@ -447,7 +443,7 @@
     "alertError": "Speichern fehlgeschlagen — bitte erneut versuchen.",
     "basicHeading": "Grundlagen",
     "basicAlert": "Hier ist nichts erforderlich. Die Website hat bereits sinnvolle Standardtexte. Die meisten Mandanten öffnen die erweiterten Felder unten nie.",
-    "advancedSummary": "Erweitert — 8 ausgewählte Texte, 2 Gruppen",
+    "advancedSummary": "Erweitert — 7 ausgewählte Texte, 2 Gruppen",
     "advancedOverrideInfo": "Jedes Feld ist eine Überschreibung. Lassen Sie ein Feld leer, um den Standardtext der Website zu verwenden — ein geleertes Feld kehrt zu diesem Standard zurück und setzt den Text nicht auf leer."
   },
   "voiceFieldGroup": {
@@ -460,7 +456,6 @@
   "voiceFieldLabels": {
     "notFoundHeading": "404 – Überschrift",
     "notFoundSupportingText": "404 – Begleittext",
-    "notFoundReturnHome": "404 – Link zur Startseite",
     "blogListEmpty": "Blogliste leer",
     "topicEmpty": "Thema leer",
     "tagEmpty": "Schlagwort leer",

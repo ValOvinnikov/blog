@@ -1,17 +1,17 @@
+import { renderEmailAction } from '@blog/email/html/email-action';
+import { escapeHtml } from '@blog/email/html/escape-html';
+import { buildTenantShell } from '@blog/email/html/tenant-shell';
 import {
-  buildTenantShell,
-  renderEmailAction,
   serializePortableText,
   type TPortableTextContent,
-} from '@blog/email';
+} from '@blog/email/portable-text';
 
-import { escapeHtml } from './escape-html';
 import type { TMagicLinkEmailContent } from './magic-link-email';
-import type { TResolvedTenantEmailIdentity } from './resolve-tenant-email-identity';
+import type { TTenantEmailIdentity } from './tenant-email-identity';
 
 export type TMagicLinkInviteEmailInput = {
   url: string;
-  tenantIdentity?: TResolvedTenantEmailIdentity;
+  tenantIdentity?: TTenantEmailIdentity;
   tenantNames?: string[];
   subject: string;
   body: TPortableTextContent;
