@@ -185,6 +185,7 @@ describe('getPageDocument', () => {
           { title: 'FAQ', path: 'modules/faq' },
           { title: 'Answers', path: 'modules/faq/answers' },
         ],
+        parentSection: undefined,
       });
     });
 
@@ -218,6 +219,34 @@ describe('getPageDocument', () => {
         { title: 'Glossary', path: 'modules/faq/glossary', isCurrent: false },
         { title: 'Answers', path: 'modules/faq/answers', isCurrent: true },
       ]);
+    });
+
+    it('returns the nearest outer section root as the parent section of a nested section', async () => {
+      const navigation = await navigationFor({
+        sectionChain: [
+          chainNode(answers),
+          chainNode(faq, [glossary, answers]),
+          chainNode({ _id: 'catalog', title: 'Catalog', path: 'catalog' }),
+          modulesSection,
+        ],
+      });
+
+      expect(navigation?.parentSection).toEqual({
+        title: 'Modules',
+        path: 'modules',
+      });
+    });
+
+    it('returns no parent section for a top-level section', async () => {
+      const navigation = await navigationFor({
+        sectionChain: [
+          chainNode(faq),
+          modulesSection,
+          chainNode({ _id: 'catalog', title: 'Catalog', path: 'catalog' }),
+        ],
+      });
+
+      expect(navigation?.parentSection).toBeUndefined();
     });
 
     it.each([
