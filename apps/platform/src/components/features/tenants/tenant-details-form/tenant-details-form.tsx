@@ -54,7 +54,7 @@ export const TenantDetailsForm = () => {
     useState<TOwnerInviteConfirmation | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const { root, cardWrap, cardInert, overlay, fields, hint, planControl } =
+  const { root, cardWrap, cardInert, overlay, fields, planControl } =
     tenantDetailsFormVariants({ pending: isPending });
 
   const updateField = <K extends keyof TFormValues>(
@@ -133,7 +133,7 @@ export const TenantDetailsForm = () => {
                 <FormTextInput
                   label={t('domainLabel')}
                   htmlFor="tenant-domain"
-                  hint={<span className={hint()}>{t('domainHint')}</span>}
+                  hint={t('domainHint')}
                   error={fieldErrors.domain}
                   value={values.domain}
                   onChange={(value) => updateField('domain', value)}
@@ -152,7 +152,7 @@ export const TenantDetailsForm = () => {
                 <FormTextInput
                   label={t('ownerEmailLabel')}
                   htmlFor="tenant-owner-email"
-                  hint={<span className={hint()}>{t('ownerEmailHint')}</span>}
+                  hint={t('ownerEmailHint')}
                   error={fieldErrors.ownerEmail}
                   footer={
                     ownerInviteConfirmation && (
