@@ -99,6 +99,7 @@ export function makeRawHeroBlogModule(
 ): TRawHeroBlogModule {
   return {
     post: null,
+    hasPinnedPost: false,
     eyebrow: null,
     image: null,
     primaryActionLabel: 'Read the post',

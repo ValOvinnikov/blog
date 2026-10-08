@@ -26,7 +26,9 @@ export const HeroBlogModule = async ({ id }: IHeroBlogModuleProps) => {
   const { data } = result;
 
   if (!data.hasPost) {
-    logger.error('hero_blog_module.post_unresolved', { id });
+    if (!data.isPostUntranslated) {
+      logger.error('hero_blog_module.post_unresolved', { id });
+    }
     return null;
   }
 
