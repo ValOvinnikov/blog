@@ -1,14 +1,6 @@
-/**
- * The 8 curated voice-override fields, grouped for the admin form —
- * the Postgres-backed field set matching
- * `packages/db`'s `voiceOverridesSchema` (`upsert-site-config.ts`) exactly.
- * Display text for `groupKey`/`key` lives in `i18n/messages/en.json` under
- * `voiceFieldGroups`/`voiceFieldLabels`, not here.
- */
 export type TVoiceOverrideKey =
   | 'notFoundHeading'
   | 'notFoundSupportingText'
-  | 'notFoundReturnHome'
   | 'blogListEmpty'
   | 'topicEmpty'
   | 'tagEmpty'
@@ -35,7 +27,6 @@ export const VOICE_FIELD_GROUPS: TVoiceFieldGroup[] = [
     fields: [
       { key: 'notFoundHeading' },
       { key: 'notFoundSupportingText', multiline: true },
-      { key: 'notFoundReturnHome' },
     ],
   },
   {

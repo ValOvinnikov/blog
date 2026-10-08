@@ -10,7 +10,7 @@ import { VoiceSettings } from './voice-settings';
 
 mockRouterRefresh();
 
-const ADVANCED_SUMMARY = 'Advanced — 8 curated strings, 2 groups';
+const ADVANCED_SUMMARY = 'Advanced — 7 curated strings, 2 groups';
 const ARCHIVED_AT = new Date('2026-08-26T00:00:00.000Z');
 
 const openAdvanced = async (user: ReturnType<typeof userEvent.setup>) => {
@@ -64,12 +64,12 @@ describe(`<${VoiceSettings.name}/>`, () => {
     expect(screen.getByText('404 page')).toBeVisible();
   });
 
-  it('renders all 8 fields across the 2 named groups, with none invented, once expanded', async () => {
+  it('renders all 7 fields across the 2 named groups, with none invented, once expanded', async () => {
     setup();
 
     await openAdvanced(user);
 
-    expect(screen.getAllByRole('textbox')).toHaveLength(8);
+    expect(screen.getAllByRole('textbox')).toHaveLength(7);
     expect(screen.getByText('404 page')).toBeVisible();
     expect(screen.getByText('Empty states')).toBeVisible();
     expect(screen.queryByText(/Publish confirmation/i)).not.toBeInTheDocument();
@@ -182,7 +182,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
       await openAdvanced(user);
 
       const fields = screen.getAllByRole('textbox');
-      expect(fields).toHaveLength(8);
+      expect(fields).toHaveLength(7);
       for (const field of fields) {
         expect(field).toHaveAttribute('readonly');
         expect(field).toBeEnabled();
