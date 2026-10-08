@@ -1,12 +1,11 @@
-import { renderEmailAction } from '@blog/email/html/email-action';
-import { escapeHtml } from '@blog/email/html/escape-html';
-import { buildTenantShell } from '@blog/email/html/tenant-shell';
+import { renderEmailAction } from '@blog/email/html/email-action/email-action';
+import { escapeHtml } from '@blog/email/html/escape-html/escape-html';
+import { buildTenantShell } from '@blog/email/html/tenant-shell/tenant-shell';
 import {
   serializePortableText,
   type TPortableTextContent,
 } from '@blog/email/portable-text';
-
-import type { TTenantEmailIdentity } from './tenant-email-identity';
+import type { TTenantEmailIdentity } from '@blog/email/templates/tenant/tenant-email-identity/tenant-email-identity';
 
 export type TMagicLinkEmailInput = {
   url: string;

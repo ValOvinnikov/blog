@@ -1,8 +1,8 @@
-import { renderEmailAction } from '@blog/email/html/email-action';
+import { renderEmailAction } from '@blog/email/html/email-action/email-action';
 import {
   buildTenantShell,
   type TTenantEmailBrand,
-} from '@blog/email/html/tenant-shell';
+} from '@blog/email/html/tenant-shell/tenant-shell';
 import {
   serializePortableText,
   type TPortableTextContent,

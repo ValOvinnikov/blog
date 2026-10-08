@@ -1,16 +1,16 @@
-export { escapeHtml } from './escape-html';
+export { escapeHtml } from './escape-html/escape-html';
 export {
   renderEmailAction,
   type TEmailAction,
   type TEmailActionBrand,
-} from './email-action';
+} from './email-action/email-action';
 export {
   buildOperatorShell,
   type TBuildOperatorShellInput,
-} from './operator-shell';
+} from './operator-shell/operator-shell';
 export { sanitizeHref } from '@blog/utils';
 export {
   buildTenantShell,
   type TBuildTenantShellInput,
   type TTenantEmailBrand,
-} from './tenant-shell';
+} from './tenant-shell/tenant-shell';
