@@ -93,6 +93,22 @@ describe(`<${BookmarksList.name}/>`, () => {
     expect(screen.queryByRole('list')).not.toBeInTheDocument();
   });
 
+  it('renders a rich empty message with its working link', () => {
+    setup({
+      rows: [],
+      emptyMessage: (
+        <>
+          Browse <a href="/blog">the blog</a> to save a post.
+        </>
+      ),
+    });
+
+    expect(screen.getByRole('link', { name: 'the blog' })).toHaveAttribute(
+      'href',
+      '/blog',
+    );
+  });
+
   it('does not render the hint in the empty state', () => {
     setup({ rows: [], hint: '3 saved' });
     expect(screen.queryByText('3 saved')).not.toBeInTheDocument();
