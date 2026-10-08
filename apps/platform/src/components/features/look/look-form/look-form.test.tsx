@@ -299,7 +299,9 @@ describe(`<${LookForm.name}/>`, () => {
   it('offers Reset to preset for saved values that differ from the preset, with no unsaved edits', async () => {
     setup({ initialValues: { ...defaultLookFormValues(), accentHue: 260 } });
 
-    expect(screen.getByText('All changes saved')).toBeVisible();
+    expect(
+      screen.queryByRole('region', { name: 'Unsaved changes' }),
+    ).not.toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'Reset to preset' }));
 
@@ -584,7 +586,7 @@ describe(`<${LookForm.name}/>`, () => {
         'src',
         expect.stringContaining(encodeURIComponent(SAVED_LOGO_URL)),
       );
-      expect(screen.getByText('All changes saved')).toBeVisible();
+      expect(screen.queryByText('All changes saved')).not.toBeInTheDocument();
       expect(uploadBrandAssetActionMock).not.toHaveBeenCalled();
     });
 
