@@ -2,7 +2,7 @@ import { tv } from '@platform/utils/tv/tv';
 
 export const lookFormVariants = tv({
   slots: {
-    root: ['flex flex-col gap-6'],
+    root: ['max-w-none'],
     grid: ['grid grid-cols-1 items-start gap-6 lg:grid-cols-2'],
     stack: ['flex flex-col gap-6'],
     field: ['mb-[18px] last:mb-0'],

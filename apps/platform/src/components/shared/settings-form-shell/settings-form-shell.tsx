@@ -30,6 +30,7 @@ export type TSettingsFormShellProps = {
   archivedNoticeId: string;
   hasError: boolean;
   errorTitle: string;
+  className?: string;
   children: ReactNode;
 };
 
@@ -51,6 +52,7 @@ export const SettingsFormShell = ({
   archivedNoticeId,
   hasError,
   errorTitle,
+  className,
   children,
 }: TSettingsFormShellProps) => {
   const t = useTranslations('saveBar');
@@ -93,7 +95,7 @@ export const SettingsFormShell = ({
   }, [isDirty]);
 
   return (
-    <div className={root()}>
+    <div className={root({ class: className })}>
       <PageHeader
         title={title}
         description={description}

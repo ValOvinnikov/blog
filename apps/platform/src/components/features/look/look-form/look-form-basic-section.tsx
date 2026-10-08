@@ -18,6 +18,7 @@ export type TLookFormBasicSectionProps = {
   preset: TPresetId;
   onPresetChange: (preset: TPresetId) => void;
   accentHue: number;
+  accentHueFieldId: string;
   isAccentHueRejected: boolean;
   logoHue: number | undefined;
   onFieldChange: TLookFormFieldSetter;
@@ -29,6 +30,7 @@ export const LookFormBasicSection = ({
   preset,
   onPresetChange,
   accentHue,
+  accentHueFieldId,
   isAccentHueRejected,
   logoHue,
   onFieldChange,
@@ -70,7 +72,7 @@ export const LookFormBasicSection = ({
         />
       </div>
 
-      <div className={field()}>
+      <div id={accentHueFieldId} className={field()}>
         <span className={fieldLabel()}>{accentHueLabel}</span>
         <p className={fieldHint()}>{t('accentHueDescription')}</p>
         <div className={hueField()}>

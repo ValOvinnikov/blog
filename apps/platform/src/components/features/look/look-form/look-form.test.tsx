@@ -7,6 +7,7 @@ import {
   PRESET_ID,
   RADIUS_SCALE,
 } from '@blog/config';
+import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import {
   customRender,
   screen,
@@ -191,7 +192,7 @@ describe(`<${LookForm.name}/>`, () => {
     expect(await screen.findByText('Saved to site_config.')).toBeVisible();
   });
 
-  it('shows a spinner, marks Save busy, and announces the pending state to assistive tech while the save is in flight', async () => {
+  it('marks Save busy while the save is in flight', async () => {
     let resolveAction: (value: { ok: boolean }) => void = () => {};
     updateLookActionMock.mockImplementation(
       () =>
@@ -208,7 +209,6 @@ describe(`<${LookForm.name}/>`, () => {
     const saveButton = await screen.findByRole('button', { name: 'Saving…' });
     expect(saveButton).toHaveAttribute('aria-busy', 'true');
     expect(saveButton).toBeDisabled();
-    expect(screen.getByRole('status')).toHaveTextContent('Saving…');
 
     resolveAction({ ok: true });
   });
@@ -226,13 +226,16 @@ describe(`<${LookForm.name}/>`, () => {
     );
   });
 
-  it('disables Reset to preset and Save changes until the form is dirty', async () => {
+  it('offers Save changes and enables Reset to preset only once the form is dirty', async () => {
     setup();
 
     expect(
       screen.getByRole('button', { name: 'Reset to preset' }),
     ).toBeDisabled();
-    expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled();
+    expect(
+      screen.queryByRole('button', { name: 'Save changes' }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText('All changes saved')).toBeVisible();
 
     screen.getByRole('slider', { name: 'Accent hue' }).focus();
     await user.keyboard('{ArrowRight}');
@@ -241,6 +244,32 @@ describe(`<${LookForm.name}/>`, () => {
       screen.getByRole('button', { name: 'Reset to preset' }),
     ).toBeEnabled();
     expect(screen.getByRole('button', { name: 'Save changes' })).toBeEnabled();
+  });
+
+  it('discards unsaved changes back to the saved values', async () => {
+    setup();
+
+    screen.getByRole('slider', { name: 'Accent hue' }).focus();
+    await user.keyboard('{ArrowRight}');
+    await user.click(screen.getByRole('button', { name: 'Discard' }));
+
+    expect(screen.getByText('250°')).toBeVisible();
+    expect(
+      screen.queryByRole('button', { name: 'Save changes' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('hides the save bar once the save resolves', async () => {
+    setup();
+
+    screen.getByRole('slider', { name: 'Accent hue' }).focus();
+    await user.keyboard('{ArrowRight}');
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    expect(await screen.findByText('All changes saved')).toBeVisible();
+    expect(
+      screen.queryByRole('button', { name: 'Save changes' }),
+    ).not.toBeInTheDocument();
   });
 
   it('rejects an accent hue the site would replace, with a message, and blocks Save', async () => {
@@ -254,7 +283,11 @@ describe(`<${LookForm.name}/>`, () => {
     expect(slider).toHaveAccessibleDescription(
       expect.stringContaining('the site would replace it'),
     );
-    expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled();
+    expect(screen.getByText('1 field needs attention')).toBeVisible();
+
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    expect(updateLookActionMock).not.toHaveBeenCalled();
   });
 
   it('previews a changed radius scale and density before saving', async () => {
@@ -314,18 +347,10 @@ describe(`<${LookForm.name}/>`, () => {
   });
 
   describe('archived tenant', () => {
-    it('shows an archived notice and disables Save even once dirty', async () => {
+    it('shows an archived notice and offers no Save', () => {
       setup({ archivedAt: ARCHIVED_AT });
 
-      expect(screen.getByText('This tenant is archived')).toBeVisible();
-
-      screen.getByRole('slider', { name: 'Accent hue' }).focus();
-      await user.keyboard('{ArrowRight}');
-
-      expect(
-        screen.getByRole('button', { name: 'Save changes' }),
-      ).toBeDisabled();
-      expect(updateLookActionMock).not.toHaveBeenCalled();
+      expectArchivedOffersNoSave();
     });
 
     it('disables every Look control', () => {
@@ -367,12 +392,9 @@ describe(`<${LookForm.name}/>`, () => {
       expect(screen.getByRole('button', { name: 'Outlined' })).toBeDisabled();
     });
 
-    it('describes the disabled Save and Reset buttons with the archived notice text, for a screen-reader user', () => {
+    it('describes the disabled Reset button with the archived notice text, for a screen-reader user', () => {
       setup({ archivedAt: ARCHIVED_AT });
 
-      expect(
-        screen.getByRole('button', { name: 'Save changes' }),
-      ).toHaveAccessibleDescription(/This tenant is archived/);
       expect(
         screen.getByRole('button', { name: 'Reset to preset' }),
       ).toHaveAccessibleDescription(/This tenant is archived/);
