@@ -30,7 +30,6 @@ export const SectionPagesModuleView = ({
   dataTestId,
 }: ISectionPagesModuleViewProps) => {
   const columns = toModuleGridColumns(pages.length);
-  const { image: imageClassName } = sectionPagesModuleViewVariants();
 
   return (
     <Section
@@ -49,30 +48,40 @@ export const SectionPagesModuleView = ({
         />
       )}
       <CardGrid columns={columns}>
-        {pages.map(({ id, title, summary, image, path }) => (
-          <MediaCard key={id} excerpt={summary} isInteractive={Boolean(path)}>
-            {image && (
-              <MediaCard.Media dataTestId="section-page-card-media">
-                <SanityImage
-                  image={image}
-                  width={SQUARE_IMAGE_SIZE}
-                  height={WIDE_IMAGE_HEIGHT}
-                  sizes={GRID_IMAGE_SIZES[columns]}
-                  loading="lazy"
-                  className={imageClassName()}
-                />
-              </MediaCard.Media>
-            )}
-            <MediaCard.Title level={headingBlock ? 3 : 2}>
-              <MediaCard.Link
-                href={routes.landingPage(path)}
-                linkAs={SmartLink}
-              >
-                {title}
-              </MediaCard.Link>
-            </MediaCard.Title>
-          </MediaCard>
-        ))}
+        {pages.map(({ id, title, summary, image, path }) => {
+          const { card, image: imageClassName } =
+            sectionPagesModuleViewVariants({ hasImage: Boolean(image) });
+
+          return (
+            <MediaCard
+              key={id}
+              excerpt={summary}
+              isInteractive={Boolean(path)}
+              className={card()}
+            >
+              {image && (
+                <MediaCard.Media dataTestId="section-page-card-media">
+                  <SanityImage
+                    image={image}
+                    width={SQUARE_IMAGE_SIZE}
+                    height={WIDE_IMAGE_HEIGHT}
+                    sizes={GRID_IMAGE_SIZES[columns]}
+                    loading="lazy"
+                    className={imageClassName()}
+                  />
+                </MediaCard.Media>
+              )}
+              <MediaCard.Title level={headingBlock ? 3 : 2}>
+                <MediaCard.Link
+                  href={routes.landingPage(path)}
+                  linkAs={SmartLink}
+                >
+                  {title}
+                </MediaCard.Link>
+              </MediaCard.Title>
+            </MediaCard>
+          );
+        })}
       </CardGrid>
     </Section>
   );
