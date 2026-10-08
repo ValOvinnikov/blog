@@ -5,7 +5,7 @@ import {
   wordCountParser,
 } from '@blog/service/shared/expressions/post/word-count';
 import { pageHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/page-heading-block';
-import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
+import { sanityImageOptionalFragment } from '@blog/service/shared/fragments/image/image';
 import { moduleFragment } from '@blog/service/shared/fragments/module/module';
 import {
   personCardFragment,
@@ -37,7 +37,7 @@ export const postCardFragment = q
     publishedAt: sub.field('publishedAt').notNull(),
     heroImage: sub
       .field('heroImage')
-      .project(sanityImageFragment)
+      .project(sanityImageOptionalFragment)
       .nullable(true),
     featured: sub.field('featured').nullable(true),
     author: sub.field('author').deref().project(personCardFragment).notNull(),

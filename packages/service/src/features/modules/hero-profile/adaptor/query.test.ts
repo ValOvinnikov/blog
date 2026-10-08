@@ -62,6 +62,21 @@ describe('heroProfileModuleQuery', () => {
     });
   });
 
+  it('loads the hero without an image when Studio left an image with no asset', async () => {
+    const hero = await runHero(
+      {
+        ...heroDocument,
+        image: { _type: 'localizedImageWithAlt', alt: [{ language: EN }] },
+      },
+      EN,
+    );
+
+    expect(hero).toMatchObject({
+      image: { asset: null, alt: null },
+      eyebrow: 'Founder',
+    });
+  });
+
   it('resolves the author reference', async () => {
     const hero = await runHero(heroDocument, EN);
 

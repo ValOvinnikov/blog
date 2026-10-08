@@ -1,5 +1,5 @@
 import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
-import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
+import { sanityImageOptionalFragment } from '@blog/service/shared/fragments/image/image';
 import { moduleHeroLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { inlineLinkFragment } from '@blog/service/shared/fragments/link/inline-link';
 import { pinnedPostInLocale } from '@blog/service/shared/localization/pinned-post-in-locale/pinned-post-in-locale';
@@ -23,7 +23,7 @@ export const heroModuleQuery = q
     heroImageMode: sub.field('heroImageMode').notNull(),
     heroImageAsset: sub
       .field('heroImage')
-      .project(sanityImageFragment)
+      .project(sanityImageOptionalFragment)
       .nullable(true),
     primaryActionLabel: sub.field('primaryActionLabel').nullable(true),
     secondaryAction: sub

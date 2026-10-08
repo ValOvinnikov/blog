@@ -114,16 +114,16 @@ describe('ctaModuleQuery', () => {
     });
   });
 
-  it('fails when the image has no alt in either language', async () => {
-    await expect(
-      runCta(
-        {
-          ...ctaDocument,
-          image: { ...ctaDocument.image, alt: undefined },
-        },
-        NL,
-      ),
-    ).rejects.toThrow();
+  it('loads the image with a null alt when it has no alt in either language', async () => {
+    const cta = await runCta(
+      {
+        ...ctaDocument,
+        image: { ...ctaDocument.image, alt: undefined },
+      },
+      NL,
+    );
+
+    expect(cta).toMatchObject({ image: { alt: null } });
   });
 
   it('fails when the heading is missing in both languages', async () => {
