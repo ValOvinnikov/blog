@@ -56,3 +56,15 @@ export const WithoutHint: TStory = {
 export const Empty: TStory = {
   args: { rows: [] },
 };
+
+export const EmptyWithRichMessage: TStory = {
+  args: {
+    rows: [],
+    emptyMessage: (
+      <>
+        <strong>No bookmarks yet.</strong> Browse <a href="/blog">the blog</a>{' '}
+        and save a post to find it here.
+      </>
+    ),
+  },
+};

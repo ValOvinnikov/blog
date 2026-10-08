@@ -18,13 +18,13 @@ export interface IBookmarkRow {
 export type TBookmarksListProps = IWithClassName &
   IWithDataTestId & {
     rows: IBookmarkRow[];
-    emptyMessage: string;
+    emptyMessage: ReactNode;
     hint?: string;
     prefix?: ReactNode;
     linkAs?: TAnchorElementType;
   };
 
-/** Renders a reader's saved posts as one row per bookmark, each with a date and a link to the post, or `emptyMessage` when there are none. */
+/** Lists a reader's saved posts, one row per bookmark with its date and a link to the post, or an empty state when there are none. */
 export const BookmarksList = ({
   rows,
   emptyMessage,
