@@ -64,3 +64,35 @@ export const WithoutHeading: TStory = {
 export const Secondary: TStory = {
   args: { brandVariant: BRAND_VARIANT.SECONDARY },
 };
+
+export const TitleOnly: TStory = {
+  args: {
+    pages: pages.map((page) => ({ ...page, summary: undefined })),
+  },
+};
+
+export const MixedTitleOnlyAndSummary: TStory = {
+  args: {
+    pages: [
+      ...pages,
+      makeSectionPageCard({
+        id: 'contact',
+        title: 'Contact',
+        summary: undefined,
+        path: 'modules/contact',
+      }),
+      makeSectionPageCard({
+        id: 'careers',
+        title: 'Careers',
+        summary: undefined,
+        path: 'modules/careers',
+      }),
+      makeSectionPageCard({
+        id: 'press',
+        title: 'Press',
+        summary: undefined,
+        path: 'modules/press',
+      }),
+    ],
+  },
+};
