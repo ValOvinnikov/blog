@@ -1587,8 +1587,8 @@ and `voiceOverrides` still come from the same `site_config` row and the same
 cached read as theme (`get-site-config.ts`, tenant-scoped tag) — one row
 backs both. The `voice_overrides` column holds one map per language,
 `{ [locale]: { [fieldId]: value } }` (`voiceOverridesByLocale` in
-`@blog/db`); a save replaces one language's map and leaves the others as
-stored. Until web and platform read per language, `getSiteConfig` also
+`@blog/db`); a save may carry several languages, replaces the map of each
+one it carries, and leaves the others as stored. Until web and platform read per language, `getSiteConfig` also
 returns the tenant's default-language map as a flat `voiceOverrides`, and
 `upsertSiteConfig` still accepts that flat shape, saving it under the default
 language. Each map keys fields as flat camelCase ids (e.g.

@@ -654,58 +654,55 @@ describe('per-language voice overrides', () => {
     }));
   });
 
-  it('stores a save under the language it was made for', async () => {
+  it('stores each language a save carries under that language', async () => {
     const result = expectOk(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
-        voiceOverridesForLocale: {
-          locale: LOCALE_ISO_CODES.DE,
-          overrides: { notFoundHeading: '  Nicht gefunden  ' },
+        voiceOverridesByLocale: {
+          [LOCALE_ISO_CODES.DE]: { notFoundHeading: '  Nicht gefunden  ' },
+          [LOCALE_ISO_CODES.FR]: { notFoundHeading: 'Introuvable' },
         },
       }),
     );
 
     expect(result.voiceOverridesByLocale).toEqual({
       [LOCALE_ISO_CODES.DE]: { notFoundHeading: 'Nicht gefunden' },
+      [LOCALE_ISO_CODES.FR]: { notFoundHeading: 'Introuvable' },
     });
     expect(result.voiceOverrides).toEqual({});
   });
 
-  it("leaves every other language's overrides exactly as stored", async () => {
+  it('leaves every language the save does not carry exactly as stored', async () => {
     await upsertSiteConfig(tenantId, {
       ...baseInput,
-      voiceOverridesForLocale: {
-        locale: LOCALE_ISO_CODES.DE,
-        overrides: { notFoundHeading: 'Nicht gefunden' },
-      },
-    });
-    await upsertSiteConfig(tenantId, {
-      ...baseInput,
-      voiceOverridesForLocale: {
-        locale: LOCALE_ISO_CODES.FR,
-        overrides: { notFoundHeading: 'Introuvable' },
+      voiceOverridesByLocale: {
+        [LOCALE_ISO_CODES.DE]: { notFoundHeading: 'Nicht gefunden' },
+        [LOCALE_ISO_CODES.FR]: { notFoundHeading: 'Introuvable' },
       },
     });
 
     const result = expectOk(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
-        voiceOverridesForLocale: { locale: LOCALE_ISO_CODES.FR, overrides: {} },
+        voiceOverridesByLocale: {
+          [LOCALE_ISO_CODES.FR]: {},
+          [LOCALE_ISO_CODES.ES]: { notFoundHeading: 'No encontrado' },
+        },
       }),
     );
 
     expect(result.voiceOverridesByLocale).toEqual({
       [LOCALE_ISO_CODES.DE]: { notFoundHeading: 'Nicht gefunden' },
       [LOCALE_ISO_CODES.FR]: {},
+      [LOCALE_ISO_CODES.ES]: { notFoundHeading: 'No encontrado' },
     });
   });
 
   it("saves the flat shape under the tenant's default language", async () => {
     await upsertSiteConfig(tenantId, {
       ...baseInput,
-      voiceOverridesForLocale: {
-        locale: LOCALE_ISO_CODES.DE,
-        overrides: { notFoundHeading: 'Nicht gefunden' },
+      voiceOverridesByLocale: {
+        [LOCALE_ISO_CODES.DE]: { notFoundHeading: 'Nicht gefunden' },
       },
     });
 
@@ -725,23 +722,24 @@ describe('per-language voice overrides', () => {
     });
   });
 
-  it('returns per-field errors for a per-language save without writing it', async () => {
+  it('returns field errors per language and writes nothing', async () => {
     const result = expectFieldErrors(
       await upsertSiteConfig(tenantId, {
         ...baseInput,
-        voiceOverridesForLocale: {
-          locale: LOCALE_ISO_CODES.DE,
-          overrides: {
-            notFoundHeading: 'x'.repeat(101),
-            topicEmpty: 'Keine Beiträge in {topic}',
-          },
+        voiceOverridesByLocale: {
+          [LOCALE_ISO_CODES.EN]: { notFoundHeading: 'x'.repeat(101) },
+          [LOCALE_ISO_CODES.DE]: { topicEmpty: 'Keine Beiträge in {topic}' },
+          [LOCALE_ISO_CODES.FR]: { notFoundHeading: 'Introuvable' },
         },
       }),
     );
 
+    expect(result.fieldErrorsByLocale).toEqual({
+      [LOCALE_ISO_CODES.EN]: { notFoundHeading: expect.any(String) },
+      [LOCALE_ISO_CODES.DE]: { topicEmpty: expect.any(String) },
+    });
     expect(result.fieldErrors).toEqual({
       notFoundHeading: expect.any(String),
-      topicEmpty: expect.any(String),
     });
     expect(await db().select().from(schema.siteConfig)).toEqual([]);
   });
@@ -750,10 +748,7 @@ describe('per-language voice overrides', () => {
     await expect(
       upsertSiteConfig(tenantId, {
         ...baseInput,
-        voiceOverridesForLocale: {
-          locale: 'XX' as typeof LOCALE_ISO_CODES.EN,
-          overrides: {},
-        },
+        voiceOverridesByLocale: { XX: {} } as never,
       }),
     ).rejects.toThrow();
   });
@@ -763,7 +758,7 @@ describe('per-language voice overrides', () => {
       upsertSiteConfig(tenantId, {
         ...baseInput,
         voiceOverrides: {},
-        voiceOverridesForLocale: { locale: LOCALE_ISO_CODES.DE, overrides: {} },
+        voiceOverridesByLocale: { [LOCALE_ISO_CODES.DE]: {} },
       }),
     ).rejects.toThrow();
   });

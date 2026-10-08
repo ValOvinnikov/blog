@@ -69,14 +69,20 @@ type TVoiceFieldValidation =
 /** Every field id the platform can send, mapped to the raw value it authored — not yet trimmed, size-checked or sanitized. */
 export type TVoiceOverridesInput = Partial<Record<TVoiceFieldId, unknown>>;
 
-export interface IVoiceOverridesForLocaleInput {
-  locale: TLocaleIsoCode;
-  overrides: TVoiceOverridesInput;
-}
+export type TVoiceOverridesByLocaleInput = Partial<
+  Record<TLocaleIsoCode, TVoiceOverridesInput>
+>;
+
+type TVoiceFieldErrors = Partial<Record<TVoiceFieldId, string>>;
 
 export type TUpsertSiteConfigResult =
   | ({ ok: true } & TSiteConfigResult)
-  | { ok: false; fieldErrors: Partial<Record<TVoiceFieldId, string>> };
+  | {
+      ok: false;
+      fieldErrorsByLocale: Partial<Record<TLocaleIsoCode, TVoiceFieldErrors>>;
+      /** @deprecated The default locale's slice of `fieldErrorsByLocale`, kept until the platform saves per language. */
+      fieldErrors: TVoiceFieldErrors;
+    };
 
 function findPlaceholderError(
   text: string,
@@ -299,7 +305,7 @@ function validateVoiceFieldValue(
 
 type TVoiceOverridesParseResult =
   | { ok: true; value: TVoiceOverrides }
-  | { ok: false; fieldErrors: Partial<Record<TVoiceFieldId, string>> };
+  | { ok: false; fieldErrors: TVoiceFieldErrors };
 
 /**
  * Validates a tenant's raw Voice-tab submission against the `VOICE_FIELDS`
@@ -321,7 +327,7 @@ function parseVoiceOverrides(
   }
 
   const value: TVoiceOverrides = {};
-  const fieldErrors: Partial<Record<TVoiceFieldId, string>> = {};
+  const fieldErrors: TVoiceFieldErrors = {};
 
   for (const [key, rawValue] of Object.entries(raw)) {
     const field = VOICE_FIELDS_BY_ID.get(key as TVoiceFieldId)!;
@@ -343,8 +349,8 @@ function parseVoiceOverrides(
 // Voice are saved from separate admin-panel tabs, so a Look save must never
 // wipe Voice data (or vice versa). `logoHue`/`logoAssetUrl`/`faviconAssetUrl`
 // additionally accept an explicit `null` to clear them, since `undefined`
-// alone can't express "unset this". A Voice save replaces one locale's map
-// (even with `{}`) and leaves every other locale's map untouched.
+// alone can't express "unset this". A Voice save replaces the map of each
+// locale it carries (even with `{}`) and leaves every other locale's map untouched.
 export const updateSiteConfigInputSchema = z.object({
   preset: z.enum(Object.values(PRESET_ID) as [TPresetId, ...TPresetId[]]),
   accentHue: hueSchema,
@@ -379,9 +385,9 @@ export const updateSiteConfigInputSchema = z.object({
 export type TUpdateSiteConfigInput = z.input<
   typeof updateSiteConfigInputSchema
 > & {
-  /** @deprecated Saves under the tenant's default locale; use `voiceOverridesForLocale`. */
+  /** @deprecated Saves under the tenant's default locale; use `voiceOverridesByLocale`. */
   voiceOverrides?: TVoiceOverridesInput;
-  voiceOverridesForLocale?: IVoiceOverridesForLocaleInput;
+  voiceOverridesByLocale?: TVoiceOverridesByLocaleInput;
 };
 
 type TSiteConfigWritable = Partial<typeof siteConfig.$inferInsert>;
@@ -426,30 +432,63 @@ async function getTenantLocale(tenantId: string): Promise<TLocaleIsoCode> {
 function resolveVoiceOverridesInput(
   input: Pick<
     TUpdateSiteConfigInput,
-    'voiceOverrides' | 'voiceOverridesForLocale'
+    'voiceOverrides' | 'voiceOverridesByLocale'
   >,
   defaultLocale: TLocaleIsoCode,
-): IVoiceOverridesForLocaleInput | undefined {
-  const { voiceOverrides, voiceOverridesForLocale } = input;
+): TVoiceOverridesByLocaleInput | undefined {
+  const { voiceOverrides, voiceOverridesByLocale } = input;
 
-  if (voiceOverrides !== undefined && voiceOverridesForLocale !== undefined) {
+  if (voiceOverrides !== undefined && voiceOverridesByLocale !== undefined) {
     throw new Error(
-      'upsertSiteConfig: pass voiceOverrides or voiceOverridesForLocale, not both.',
+      'upsertSiteConfig: pass voiceOverrides or voiceOverridesByLocale, not both.',
     );
   }
   if (voiceOverrides !== undefined) {
-    return { locale: defaultLocale, overrides: voiceOverrides };
+    return { [defaultLocale]: voiceOverrides };
   }
-  if (
-    voiceOverridesForLocale !== undefined &&
-    !isLocaleIsoCode(voiceOverridesForLocale.locale)
-  ) {
+  if (voiceOverridesByLocale === undefined) return undefined;
+
+  const unknownLocales = Object.keys(voiceOverridesByLocale).filter(
+    (locale) => !isLocaleIsoCode(locale),
+  );
+  if (unknownLocales.length > 0) {
     throw new Error(
-      `upsertSiteConfig: unknown voice override locale "${String(voiceOverridesForLocale.locale)}".`,
+      `upsertSiteConfig: unknown voice override locale(s): ${unknownLocales.join(', ')}.`,
     );
   }
 
-  return voiceOverridesForLocale;
+  return voiceOverridesByLocale;
+}
+
+type TVoiceOverridesByLocaleParseResult =
+  | { ok: true; value: TVoiceOverridesByLocale }
+  | {
+      ok: false;
+      fieldErrorsByLocale: Partial<Record<TLocaleIsoCode, TVoiceFieldErrors>>;
+    };
+
+function parseVoiceOverridesByLocale(
+  raw: TVoiceOverridesByLocaleInput,
+): TVoiceOverridesByLocaleParseResult {
+  const value: TVoiceOverridesByLocale = {};
+  const fieldErrorsByLocale: Partial<
+    Record<TLocaleIsoCode, TVoiceFieldErrors>
+  > = {};
+
+  for (const [locale, overrides] of Object.entries(raw) as [
+    TLocaleIsoCode,
+    TVoiceOverridesInput,
+  ][]) {
+    const result = parseVoiceOverrides(overrides);
+    if (result.ok) value[locale] = result.value;
+    else fieldErrorsByLocale[locale] = result.fieldErrors;
+  }
+
+  if (Object.keys(fieldErrorsByLocale).length > 0) {
+    return { ok: false, fieldErrorsByLocale };
+  }
+
+  return { ok: true, value };
 }
 
 export async function upsertSiteConfig(
@@ -457,19 +496,26 @@ export async function upsertSiteConfig(
   input: TUpdateSiteConfigInput,
 ): Promise<TUpsertSiteConfigResult> {
   const db = getDb();
-  const { voiceOverrides, voiceOverridesForLocale, ...rest } = input;
+  const { voiceOverrides, voiceOverridesByLocale, ...rest } = input;
   const parsed = updateSiteConfigInputSchema.parse(rest);
   const defaultLocale = await getTenantLocale(tenantId);
   const voiceInput = resolveVoiceOverridesInput(
-    { voiceOverrides, voiceOverridesForLocale },
+    { voiceOverrides, voiceOverridesByLocale },
     defaultLocale,
   );
 
   let voicePatch: TVoiceOverridesByLocale | undefined;
   if (voiceInput !== undefined) {
-    const result = parseVoiceOverrides(voiceInput.overrides);
-    if (!result.ok) return result;
-    voicePatch = { [voiceInput.locale]: result.value };
+    const result = parseVoiceOverridesByLocale(voiceInput);
+    if (!result.ok) {
+      const { fieldErrorsByLocale } = result;
+      return {
+        ok: false,
+        fieldErrorsByLocale,
+        fieldErrors: fieldErrorsByLocale[defaultLocale] ?? {},
+      };
+    }
+    voicePatch = result.value;
   }
 
   const required = {
