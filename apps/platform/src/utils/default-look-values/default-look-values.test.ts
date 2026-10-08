@@ -44,6 +44,7 @@ describe(toLookFormValues, () => {
       cardStyle: CARD_STYLE.OUTLINED,
       logoAssetUrl: 'https://example.blob.vercel-storage.com/logo.png',
       faviconAssetUrl: 'https://example.blob.vercel-storage.com/favicon.png',
+      voiceOverridesByLocale: {},
       voiceOverrides: {},
       createdAt: new Date(),
       updatedAt: new Date(),

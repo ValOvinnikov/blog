@@ -13,6 +13,7 @@ import {
   MIGRATION_REPLAY_TEST_TIMEOUT_MS,
 } from '@blog/db/testing/migration-files';
 import { PGlite } from '@electric-sql/pglite';
+import { sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/pglite';
 
 import { siteConfig } from './site-config';
@@ -54,7 +55,7 @@ async function setUpDbWithSiteConfigRow(
     bodyFont: FONT_CHOICE.INTER,
     radiusScale: RADIUS_SCALE.SM,
     density: DENSITY.COMPACT,
-    voiceOverrides,
+    voiceOverridesByLocale: sql`${JSON.stringify(voiceOverrides)}::jsonb`,
   });
 
   return { db };
@@ -71,7 +72,7 @@ async function readVoiceOverrides(
 ) {
   const [row] = await db.select().from(siteConfig);
   if (!row) throw new Error('expected a site_config row');
-  return row.voiceOverrides;
+  return row.voiceOverridesByLocale;
 }
 
 describe(`${RETIRE_MIGRATION} (voiceOverrides key retirement + 404 key renames)`, () => {

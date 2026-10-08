@@ -10,6 +10,7 @@ import {
   type TDensity,
   type TFontChoice,
   type TLanguageSwitcherStyle,
+  type TLocaleIsoCode,
   type TPresetId,
   type TRadiusScale,
 } from '@blog/config/constants';
@@ -58,7 +59,15 @@ export const cardStyleEnum = pgEnum(
   Object.values(CARD_STYLE) as [TCardStyle, ...TCardStyle[]],
 );
 
-// `voiceOverrides` defaults to `{}` so "no overrides" has one representation, never also null.
+export type TVoiceOverrideValue = string | TVoicePortableText;
+
+export type TVoiceOverrides = Record<string, TVoiceOverrideValue>;
+
+export type TVoiceOverridesByLocale = Partial<
+  Record<TLocaleIsoCode, TVoiceOverrides>
+>;
+
+// `voiceOverridesByLocale` defaults to `{}` so "no overrides" has one representation, never also null.
 export const siteConfig = pgTable('site_config', {
   id: uuid('id').primaryKey().defaultRandom(),
   tenantId: uuid('tenant_id')
@@ -80,8 +89,8 @@ export const siteConfig = pgTable('site_config', {
     .default(CARD_STYLE.ACCENT_BAR),
   logoAssetUrl: text('logo_asset_url'),
   faviconAssetUrl: text('favicon_asset_url'),
-  voiceOverrides: jsonb('voice_overrides')
-    .$type<Record<string, string | TVoicePortableText>>()
+  voiceOverridesByLocale: jsonb('voice_overrides')
+    .$type<TVoiceOverridesByLocale>()
     .notNull()
     .default({}),
   createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),

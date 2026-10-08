@@ -1,4 +1,8 @@
-import { CARD_STYLE, PRESET_ID } from '@blog/config/constants';
+import {
+  CARD_STYLE,
+  LOCALE_ISO_CODES,
+  PRESET_ID,
+} from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
@@ -51,6 +55,33 @@ describe(getSiteConfig, () => {
       logoAssetUrl: undefined,
       faviconAssetUrl: undefined,
       voiceOverrides: {},
+    });
+  });
+
+  it("returns every language's overrides and the default language's slice", async () => {
+    const { id: germanTenantId } = await insertTestTenant(db(), {
+      locale: LOCALE_ISO_CODES.DE,
+    });
+    const voiceOverridesByLocale = {
+      [LOCALE_ISO_CODES.DE]: { notFoundHeading: 'Nicht gefunden' },
+      [LOCALE_ISO_CODES.EN]: { notFoundHeading: 'Lost the plot?' },
+    };
+    await db().insert(schema.siteConfig).values({
+      tenantId: germanTenantId,
+      preset: PRESET_ID.CONSOLE,
+      accentHue: 250,
+      headingFont: 'SPACE_GROTESK',
+      bodyFont: 'NEWSREADER',
+      radiusScale: 'MD',
+      density: 'DEFAULT',
+      voiceOverridesByLocale,
+    });
+
+    const result = await getSiteConfig(germanTenantId);
+
+    expect(result).toMatchObject({
+      voiceOverridesByLocale,
+      voiceOverrides: { notFoundHeading: 'Nicht gefunden' },
     });
   });
 });

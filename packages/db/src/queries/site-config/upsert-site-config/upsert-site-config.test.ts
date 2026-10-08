@@ -3,6 +3,7 @@ import {
   DENSITY,
   FONT_CHOICE,
   LANGUAGE_SWITCHER_STYLE,
+  LOCALE_ISO_CODES,
   PRESET_ID,
   RADIUS_SCALE,
 } from '@blog/config/constants';
@@ -641,6 +642,130 @@ describe('voice overrides — placeholders', () => {
     );
 
     expect(result.voiceOverrides.topicEmpty).toBeDefined();
+  });
+});
+
+describe('per-language voice overrides', () => {
+  let tenantId: string;
+
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db(), {
+      locale: LOCALE_ISO_CODES.EN,
+    }));
+  });
+
+  it('stores a save under the language it was made for', async () => {
+    const result = expectOk(
+      await upsertSiteConfig(tenantId, {
+        ...baseInput,
+        voiceOverridesForLocale: {
+          locale: LOCALE_ISO_CODES.DE,
+          overrides: { notFoundHeading: '  Nicht gefunden  ' },
+        },
+      }),
+    );
+
+    expect(result.voiceOverridesByLocale).toEqual({
+      [LOCALE_ISO_CODES.DE]: { notFoundHeading: 'Nicht gefunden' },
+    });
+    expect(result.voiceOverrides).toEqual({});
+  });
+
+  it("leaves every other language's overrides exactly as stored", async () => {
+    await upsertSiteConfig(tenantId, {
+      ...baseInput,
+      voiceOverridesForLocale: {
+        locale: LOCALE_ISO_CODES.DE,
+        overrides: { notFoundHeading: 'Nicht gefunden' },
+      },
+    });
+    await upsertSiteConfig(tenantId, {
+      ...baseInput,
+      voiceOverridesForLocale: {
+        locale: LOCALE_ISO_CODES.FR,
+        overrides: { notFoundHeading: 'Introuvable' },
+      },
+    });
+
+    const result = expectOk(
+      await upsertSiteConfig(tenantId, {
+        ...baseInput,
+        voiceOverridesForLocale: { locale: LOCALE_ISO_CODES.FR, overrides: {} },
+      }),
+    );
+
+    expect(result.voiceOverridesByLocale).toEqual({
+      [LOCALE_ISO_CODES.DE]: { notFoundHeading: 'Nicht gefunden' },
+      [LOCALE_ISO_CODES.FR]: {},
+    });
+  });
+
+  it("saves the flat shape under the tenant's default language", async () => {
+    await upsertSiteConfig(tenantId, {
+      ...baseInput,
+      voiceOverridesForLocale: {
+        locale: LOCALE_ISO_CODES.DE,
+        overrides: { notFoundHeading: 'Nicht gefunden' },
+      },
+    });
+
+    const result = expectOk(
+      await upsertSiteConfig(tenantId, {
+        ...baseInput,
+        voiceOverrides: { notFoundHeading: 'Lost the plot?' },
+      }),
+    );
+
+    expect(result.voiceOverridesByLocale).toEqual({
+      [LOCALE_ISO_CODES.DE]: { notFoundHeading: 'Nicht gefunden' },
+      [LOCALE_ISO_CODES.EN]: { notFoundHeading: 'Lost the plot?' },
+    });
+    expect(result.voiceOverrides).toEqual({
+      notFoundHeading: 'Lost the plot?',
+    });
+  });
+
+  it('returns per-field errors for a per-language save without writing it', async () => {
+    const result = expectFieldErrors(
+      await upsertSiteConfig(tenantId, {
+        ...baseInput,
+        voiceOverridesForLocale: {
+          locale: LOCALE_ISO_CODES.DE,
+          overrides: {
+            notFoundHeading: 'x'.repeat(101),
+            topicEmpty: 'Keine Beiträge in {topic}',
+          },
+        },
+      }),
+    );
+
+    expect(result.fieldErrors).toEqual({
+      notFoundHeading: expect.any(String),
+      topicEmpty: expect.any(String),
+    });
+    expect(await db().select().from(schema.siteConfig)).toEqual([]);
+  });
+
+  it('rejects an unknown language', async () => {
+    await expect(
+      upsertSiteConfig(tenantId, {
+        ...baseInput,
+        voiceOverridesForLocale: {
+          locale: 'XX' as typeof LOCALE_ISO_CODES.EN,
+          overrides: {},
+        },
+      }),
+    ).rejects.toThrow();
+  });
+
+  it('rejects the flat and per-language shapes together', async () => {
+    await expect(
+      upsertSiteConfig(tenantId, {
+        ...baseInput,
+        voiceOverrides: {},
+        voiceOverridesForLocale: { locale: LOCALE_ISO_CODES.DE, overrides: {} },
+      }),
+    ).rejects.toThrow();
   });
 });
 
