@@ -8,7 +8,7 @@ export const emailSettingsVariants = tv({
     ],
     main: [
       'grid grid-cols-1 items-start gap-6',
-      'xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]',
+      'xl:grid-cols-[minmax(0,1fr)_minmax(420px,1fr)]',
     ],
     phoneTabs: ['lg:hidden', 'xl:col-span-2'],
     editPane: ['flex', 'min-w-0', 'flex-col', 'gap-4'],

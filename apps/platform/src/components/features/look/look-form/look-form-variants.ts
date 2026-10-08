@@ -2,7 +2,6 @@ import { tv } from '@platform/utils/tv/tv';
 
 export const lookFormVariants = tv({
   slots: {
-    root: ['max-w-none'],
     columns: ['grid grid-cols-1 items-start gap-6 lg:grid-cols-2'],
     editPanel: ['flex flex-col gap-6'],
     // Clears the sticky topbar.

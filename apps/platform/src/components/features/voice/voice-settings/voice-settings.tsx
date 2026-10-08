@@ -1,6 +1,7 @@
 'use client';
 
 import { ALERT_TYPE } from '@blog/config';
+import type { TLocaleIsoCode } from '@blog/config/constants';
 import { VoiceFieldGroup } from '@platform/components/features/voice/voice-field-group';
 import { Alert } from '@platform/components/shared/alert';
 import { Card } from '@platform/components/shared/card';
@@ -13,6 +14,7 @@ import {
   VOICE_OVERRIDE_KEYS,
   type TVoiceOverrideKey,
   type TVoiceOverrides,
+  type TVoiceOverridesByLocale,
 } from '@platform/utils/voice-fields/voice-fields';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -22,10 +24,11 @@ import { voiceSettingsVariants } from './voice-settings-variants';
 
 export type TVoiceSettingsProps = {
   tenantId: string;
+  locale: TLocaleIsoCode;
   initialOverrides: Record<string, string>;
   saveAction: (
     tenantId: string,
-    overrides: TVoiceOverrides,
+    overridesByLocale: TVoiceOverridesByLocale,
   ) => Promise<{ ok: boolean }>;
   savedAt?: Date;
   archivedAt?: Date;
@@ -45,6 +48,7 @@ const buildInitialValues = (
 // drops them rather than storing an empty string.
 export const VoiceSettings = ({
   tenantId,
+  locale,
   initialOverrides,
   saveAction,
   savedAt,
@@ -63,7 +67,7 @@ export const VoiceSettings = ({
   const { values, setValues, status, isPending, handleSubmit } =
     useFormSubmission<TVoiceOverrides, { ok: boolean }>({
       initialValues: savedValues,
-      onSubmit: (vals) => saveAction(tenantId, vals),
+      onSubmit: (vals) => saveAction(tenantId, { [locale]: vals }),
       onSuccess: (submittedValues) => {
         setSavedValues(submittedValues);
         toast.success({

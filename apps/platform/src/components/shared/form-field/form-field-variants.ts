@@ -7,6 +7,7 @@ export const formFieldVariants = tv({
       'flex items-center gap-[7px]',
       'text-[13px] font-semibold text-admin-text',
     ],
+    hint: ['text-[11.5px] text-admin-muted'],
     error: ['text-[11.5px] text-admin-bad'],
   },
 });

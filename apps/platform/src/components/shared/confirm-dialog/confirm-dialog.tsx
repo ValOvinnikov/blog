@@ -62,7 +62,6 @@ export const ConfirmDialog = ({
     popup,
     title: titleSlot,
     description: descriptionSlot,
-    hint,
     actions,
   } = confirmDialogVariants();
 
@@ -93,7 +92,7 @@ export const ConfirmDialog = ({
           <FormField
             label={confirmLabel}
             htmlFor={confirmFieldId}
-            hint={<span className={hint()}>{confirmHint}</span>}
+            hint={confirmHint}
           >
             <TextInput
               id={confirmFieldId}

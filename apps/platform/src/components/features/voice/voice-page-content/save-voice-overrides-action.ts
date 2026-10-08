@@ -5,30 +5,14 @@ import { queries } from '@blog/db';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { logger } from '@platform/utils/logger/logger';
-import type { TVoiceOverrides } from '@platform/utils/voice-fields/voice-fields';
+import type { TVoiceOverridesByLocale } from '@platform/utils/voice-fields/voice-fields';
 
 export type TSaveVoiceOverridesResult = { ok: true } | { ok: false };
 
-/**
- * Persists the Voice tab's curated overrides for the routed tenant.
- * Re-derives the tenant and re-checks membership from the session itself
- * via `requireTenantMembership` — the id only selects which tenant is in
- * scope, never an authorization decision on its own. Shared by both
- * `/tenants/[tenantId]/voice` and the membership-scoped `/dashboard/voice`
- * (via `VoicePageContent`): both resolve the same tenant id and hand it to
- * this action, so re-checking membership here is a no-op re-verification
- * rather than a second code path.
- *
- * `upsertSiteConfig` writes its typed theme columns on every call (they're
- * required, not optional), so a Voice-only save must round-trip the
- * tenant's existing theme values unchanged rather than omit them, or it
- * would silently reset whatever the Look tab last saved. A tenant with no
- * `site_config` row yet (Look never saved) falls back to the CONSOLE
- * preset's own registry defaults.
- */
+// A Voice-only save round-trips the theme columns, which upsertSiteConfig writes on every call.
 export const saveVoiceOverridesAction = async (
   tenantId: string,
-  overrides: TVoiceOverrides,
+  overridesByLocale: TVoiceOverridesByLocale,
 ): Promise<TSaveVoiceOverridesResult> => {
   const { tenant } = await requireTenantMembership(tenantId);
 
@@ -46,13 +30,13 @@ export const saveVoiceOverridesAction = async (
       density: theme.density,
       logoAssetUrl: existing?.logoAssetUrl,
       faviconAssetUrl: existing?.faviconAssetUrl,
-      voiceOverrides: overrides,
+      voiceOverridesByLocale: overridesByLocale,
     });
 
     if (!result.ok) {
       logger.warn('site_config.voice_save_rejected', {
         tenantId: tenant.id,
-        fieldErrors: result.fieldErrors,
+        fieldErrorsByLocale: result.fieldErrorsByLocale,
       });
       return { ok: false };
     }

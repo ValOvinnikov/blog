@@ -36,7 +36,7 @@ export type TSettingsFormShellProps<TValues> = {
   hasError: boolean;
   errorTitle: string;
   draft: TSettingsFormDraft<TValues>;
-  className?: string;
+  isWide?: boolean;
   children: ReactNode;
 };
 
@@ -59,11 +59,13 @@ export const SettingsFormShell = <TValues,>({
   hasError,
   errorTitle,
   draft,
-  className,
+  isWide = false,
   children,
 }: TSettingsFormShellProps<TValues>) => {
   const t = useTranslations('saveBar');
-  const { root, alert, savedStatus, liveStatus } = settingsFormShellVariants();
+  const { root, alert, savedStatus, liveStatus } = settingsFormShellVariants({
+    isWide,
+  });
   const isDirty = changeCount > 0;
   const breakdown = formatLanguageChanges(changesByLanguage);
   const {
@@ -118,7 +120,7 @@ export const SettingsFormShell = <TValues,>({
   }, [isDirty]);
 
   return (
-    <div className={root({ class: className })}>
+    <div className={root()}>
       <PageHeader
         title={title}
         description={description}
