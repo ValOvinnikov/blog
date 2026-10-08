@@ -3,10 +3,8 @@
 import { EmailLogoField } from '@platform/components/features/email/email-logo-field';
 import { Card } from '@platform/components/shared/card';
 import { FormTextInput } from '@platform/components/shared/form-text-input';
-import type {
-  TEmailSenderDraft,
-  TStagedLogo,
-} from '@platform/utils/email-draft/email-draft';
+import type { TEmailSenderDraft } from '@platform/utils/email-draft/email-draft';
+import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 
@@ -14,9 +12,9 @@ import { emailSenderEditorVariants } from './email-sender-editor-variants';
 
 export type TEmailSenderEditorProps = {
   sender: TEmailSenderDraft;
-  logo: TStagedLogo;
+  logo: TStagedImage;
   onSenderChange: (sender: TEmailSenderDraft) => void;
-  onLogoStage: (logo: TStagedLogo) => void;
+  onLogoStage: (logo: TStagedImage) => void;
   senderNameError?: string;
   isDisabled: boolean;
   archivedNoticeId?: string;

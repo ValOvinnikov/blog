@@ -331,6 +331,8 @@
     "shapeHeading": "Forme",
     "shapeDescription": "Coins, espacement et encadrement des cartes.",
     "brandHeading": "Marque",
+    "brandImagePicked": "Nouvelle image, pas encore importée",
+    "brandImageUnchanged": "Aucune nouvelle image",
     "editTab": "Modifier",
     "previewTab": "Aperçu",
     "viewTabsAriaLabel": "Affichage"
@@ -363,7 +365,8 @@
     "uploading": "Envoi…",
     "replace": "Remplacer : {label}",
     "upload": "Importer : {label}",
-    "remove": "Supprimer"
+    "remove": "Supprimer",
+    "pickAgain": "Votre brouillon restauré contenait une nouvelle image ({label}) qui n'a pas pu être conservée — choisissez-la à nouveau."
   },
   "emailForm": {
     "pageHeading": "E-mail",

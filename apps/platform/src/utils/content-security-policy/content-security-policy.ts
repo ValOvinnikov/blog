@@ -27,8 +27,9 @@ export const buildContentSecurityPolicy = ({
     // asset previews load from regardless of which tenant project is
     // mounted (one fixed CDN host for every project), and the two OAuth
     // providers' own avatar hosts, which the Studio's user menu renders the
-    // signed-in user's profile picture from.
-    "img-src 'self' https://*.blob.vercel-storage.com https://authjs.dev https://cdn.sanity.io https://avatars.githubusercontent.com https://lh3.googleusercontent.com",
+    // signed-in user's profile picture from. `blob:` is a staged upload's
+    // local preview before Save sends it to Blob.
+    "img-src 'self' blob: https://*.blob.vercel-storage.com https://authjs.dev https://cdn.sanity.io https://avatars.githubusercontent.com https://lh3.googleusercontent.com",
     scriptSrc,
     // 'unsafe-inline' is required because Next.js and Tailwind inject inline
     // <style> tags at runtime; there is no static, hashable set of style

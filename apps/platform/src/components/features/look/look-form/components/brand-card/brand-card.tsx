@@ -1,25 +1,26 @@
 import { BrandAssetField } from '@platform/components/features/look/brand-asset-field';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
+import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import type { TLookFormFieldSetter } from '@platform/utils/default-look-values/default-look-values';
+import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 import { useTranslations } from 'next-intl';
 
 import { brandCardVariants } from './brand-card-variants';
 
 export type TBrandCardProps = {
-  tenantId: string;
-  logoAssetUrl: string | undefined;
-  faviconAssetUrl: string | undefined;
+  logo: TStagedImage;
+  favicon: TStagedImage;
+  repickKinds: readonly TBrandAssetKind[];
   onFieldChange: TLookFormFieldSetter;
   hasUnsavedChanges: boolean;
   isArchived: boolean;
   archivedNoticeId: string;
 };
 
-/** The logo and favicon persist through their own upload actions rather than staging behind Save. */
 export const BrandCard = ({
-  tenantId,
-  logoAssetUrl,
-  faviconAssetUrl,
+  logo,
+  favicon,
+  repickKinds,
   onFieldChange,
   hasUnsavedChanges,
   isArchived,
@@ -37,22 +38,22 @@ export const BrandCard = ({
     >
       <div className={uploads()}>
         <BrandAssetField
-          tenantId={tenantId}
           kind="logo"
           label={t('logoFieldLabel')}
           hint={t('logoFieldHint')}
-          currentUrl={logoAssetUrl}
-          onChange={(url) => onFieldChange('logoAssetUrl', url)}
+          image={logo}
+          onStage={(image) => onFieldChange('logo', image)}
+          isRepickNeeded={repickKinds.includes('logo')}
           isDisabled={isArchived}
           aria-describedby={archivedDescribedBy}
         />
         <BrandAssetField
-          tenantId={tenantId}
           kind="favicon"
           label={t('faviconFieldLabel')}
           hint={t('faviconFieldHint')}
-          currentUrl={faviconAssetUrl}
-          onChange={(url) => onFieldChange('faviconAssetUrl', url)}
+          image={favicon}
+          onStage={(image) => onFieldChange('favicon', image)}
+          isRepickNeeded={repickKinds.includes('favicon')}
           isDisabled={isArchived}
           aria-describedby={archivedDescribedBy}
         />

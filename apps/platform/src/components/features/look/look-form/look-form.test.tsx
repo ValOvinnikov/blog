@@ -44,6 +44,22 @@ vi.mock('@platform/server/site-config/clear-brand-asset-action', () => ({
 const isAccentHueAccessibleMock = vi.mocked(isAccentHueAccessible);
 
 const ARCHIVED_AT = new Date('2026-08-26T00:00:00.000Z');
+const SAVED_LOGO_URL = 'https://example.blob.vercel-storage.com/logo.png';
+const UPLOADED_LOGO_URL =
+  'https://example.blob.vercel-storage.com/logo-new.png';
+const LOGO_FILE = new File(['bytes'], 'logo.png', { type: 'image/png' });
+
+const pickLogo = async (user: UserEvent) => {
+  const [logoInput] = screen.getAllByTestId('asset-upload-field-input');
+  if (!logoInput) throw new Error('logo input not found');
+  await user.upload(logoInput, LOGO_FILE);
+  await waitFor(() => {
+    expect(screen.getByAltText('Current logo')).toHaveAttribute(
+      'src',
+      'blob:staged-logo',
+    );
+  });
+};
 
 const setup = customRender(LookForm, {
   tenantId: 'tenant-1',
@@ -61,6 +77,18 @@ describe(`<${LookForm.name}/>`, () => {
     updateLookActionMock.mockResolvedValue({ ok: true });
     isAccentHueAccessibleMock.mockReset();
     isAccentHueAccessibleMock.mockReturnValue(true);
+    uploadBrandAssetActionMock.mockReset();
+    uploadBrandAssetActionMock.mockResolvedValue({
+      ok: true,
+      url: UPLOADED_LOGO_URL,
+    });
+    clearBrandAssetActionMock.mockReset();
+    clearBrandAssetActionMock.mockResolvedValue({ ok: true });
+    vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:staged-logo');
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it(
@@ -134,7 +162,7 @@ describe(`<${LookForm.name}/>`, () => {
     setup({
       initialValues: {
         ...defaultLookFormValues(),
-        logoAssetUrl: 'https://example.blob.vercel-storage.com/logo.png',
+        logo: { url: SAVED_LOGO_URL },
       },
     });
 
@@ -454,7 +482,7 @@ describe(`<${LookForm.name}/>`, () => {
     setup({
       initialValues: {
         ...defaultLookFormValues(),
-        logoAssetUrl: 'https://example.blob.vercel-storage.com/logo.png',
+        logo: { url: SAVED_LOGO_URL },
       },
     });
     await user.click(
@@ -464,5 +492,124 @@ describe(`<${LookForm.name}/>`, () => {
     expect(screen.getByRole('radio', { name: 'Editorial' })).toBeChecked();
     expect(screen.getByText('28°')).toBeVisible();
     expect(screen.getByAltText('Current logo')).toBeVisible();
+  });
+  describe('brand images', () => {
+    it('stages a picked logo as an unsaved change without uploading it', async () => {
+      setup();
+
+      await pickLogo(user);
+
+      expect(
+        screen.getByRole('heading', { name: 'Brand Unsaved changes' }),
+      ).toBeVisible();
+      expect(screen.getByAltText('Current logo')).toHaveAttribute(
+        'src',
+        'blob:staged-logo',
+      );
+      expect(uploadBrandAssetActionMock).not.toHaveBeenCalled();
+    });
+
+    it('uploads a staged logo on Save, then saves the rest of the look', async () => {
+      setup();
+
+      await pickLogo(user);
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      expect(await screen.findByText('All changes saved')).toBeVisible();
+      expect(uploadBrandAssetActionMock).toHaveBeenCalledWith(
+        'tenant-1',
+        'logo',
+        expect.any(FormData),
+      );
+      expect(updateLookActionMock).toHaveBeenCalled();
+      expect(screen.getByAltText('Current logo')).toHaveAttribute(
+        'src',
+        expect.stringContaining(encodeURIComponent(UPLOADED_LOGO_URL)),
+      );
+    });
+
+    it('clears a staged removal on Save', async () => {
+      setup({
+        initialValues: {
+          ...defaultLookFormValues(),
+          logo: { url: SAVED_LOGO_URL },
+        },
+      });
+
+      await user.click(screen.getByRole('button', { name: 'Remove' }));
+      const saveButton = await screen.findByRole('button', {
+        name: 'Save changes',
+      });
+      expect(clearBrandAssetActionMock).not.toHaveBeenCalled();
+      await user.click(saveButton);
+
+      await waitFor(() => {
+        expect(clearBrandAssetActionMock).toHaveBeenCalledWith(
+          'tenant-1',
+          'logo',
+        );
+      });
+    });
+
+    it('drops a staged logo on Discard, keeping the saved one', async () => {
+      setup({
+        initialValues: {
+          ...defaultLookFormValues(),
+          logo: { url: SAVED_LOGO_URL },
+        },
+      });
+
+      await pickLogo(user);
+      await user.click(screen.getByRole('button', { name: 'Discard' }));
+
+      expect(screen.getByAltText('Current logo')).toHaveAttribute(
+        'src',
+        expect.stringContaining(encodeURIComponent(SAVED_LOGO_URL)),
+      );
+      expect(screen.getByText('All changes saved')).toBeVisible();
+      expect(uploadBrandAssetActionMock).not.toHaveBeenCalled();
+    });
+
+    it('fails the save with the upload error and keeps the draft when the upload fails', async () => {
+      uploadBrandAssetActionMock.mockResolvedValue({
+        ok: false,
+        error: "Couldn't upload the logo — try again.",
+      });
+      setup();
+
+      screen.getByRole('slider', { name: 'Accent hue' }).focus();
+      await user.keyboard('{ArrowRight}');
+      await pickLogo(user);
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        "Couldn't upload the logo — try again.",
+      );
+      expect(updateLookActionMock).not.toHaveBeenCalled();
+      expect(
+        await screen.findByRole('button', { name: 'Save changes' }),
+      ).toBeEnabled();
+      expect(screen.getByText('251°')).toBeVisible();
+    });
+
+    it('restores a draft without its staged logo and asks for it to be picked again', async () => {
+      const { unmount } = setup();
+      await user.click(screen.getByRole('radio', { name: 'Editorial' }));
+      await pickLogo(user);
+      unmount();
+
+      setup();
+      await user.click(
+        screen.getByRole('button', { name: /^Restore \d+ changes$/ }),
+      );
+
+      expect(screen.getByRole('radio', { name: 'Editorial' })).toBeChecked();
+      expect(screen.getByRole('button', { name: 'Upload logo' })).toBeVisible();
+      expect(
+        screen.getByText(
+          "Your recovered draft had a new logo that couldn't be kept — pick it again.",
+        ),
+      ).toBeVisible();
+    });
   });
 });

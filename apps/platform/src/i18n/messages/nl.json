@@ -331,6 +331,8 @@
     "shapeHeading": "Vorm",
     "shapeDescription": "Hoeken, ruimte en hoe kaarten zijn omlijst.",
     "brandHeading": "Merk",
+    "brandImagePicked": "Nieuwe afbeelding, nog niet geüpload",
+    "brandImageUnchanged": "Geen nieuwe afbeelding",
     "editTab": "Bewerken",
     "previewTab": "Voorbeeld",
     "viewTabsAriaLabel": "Weergave"
@@ -363,7 +365,8 @@
     "uploading": "Uploaden…",
     "replace": "{label} vervangen",
     "upload": "{label} uploaden",
-    "remove": "Verwijderen"
+    "remove": "Verwijderen",
+    "pickAgain": "Uw herstelde concept bevatte een nieuwe afbeelding ({label}) die niet bewaard kon worden — kies deze opnieuw."
   },
   "emailForm": {
     "pageHeading": "E-mail",

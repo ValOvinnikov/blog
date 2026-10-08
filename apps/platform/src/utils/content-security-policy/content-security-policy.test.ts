@@ -17,7 +17,7 @@ describe(buildContentSecurityPolicy, () => {
     expect(directives).toEqual({
       'default-src': "'self'",
       'img-src':
-        "'self' https://*.blob.vercel-storage.com https://authjs.dev https://cdn.sanity.io https://avatars.githubusercontent.com https://lh3.googleusercontent.com",
+        "'self' blob: https://*.blob.vercel-storage.com https://authjs.dev https://cdn.sanity.io https://avatars.githubusercontent.com https://lh3.googleusercontent.com",
       'script-src': "'self' 'unsafe-inline'",
       'style-src': "'self' 'unsafe-inline'",
       'font-src': "'self' https://design-system-static.sanity.io",
@@ -38,7 +38,7 @@ describe(buildContentSecurityPolicy, () => {
       "'self' 'unsafe-inline' 'unsafe-eval'",
     );
     expect(directives['img-src']).toBe(
-      "'self' https://*.blob.vercel-storage.com https://authjs.dev https://cdn.sanity.io https://avatars.githubusercontent.com https://lh3.googleusercontent.com",
+      "'self' blob: https://*.blob.vercel-storage.com https://authjs.dev https://cdn.sanity.io https://avatars.githubusercontent.com https://lh3.googleusercontent.com",
     );
   });
 

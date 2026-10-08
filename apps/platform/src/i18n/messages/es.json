@@ -331,6 +331,8 @@
     "shapeHeading": "Forma",
     "shapeDescription": "Esquinas, espaciado y el marco de las tarjetas.",
     "brandHeading": "Marca",
+    "brandImagePicked": "Imagen nueva, aún sin subir",
+    "brandImageUnchanged": "Ninguna imagen nueva",
     "editTab": "Editar",
     "previewTab": "Vista previa",
     "viewTabsAriaLabel": "Vista"
@@ -363,7 +365,8 @@
     "uploading": "Subiendo…",
     "replace": "Sustituir {label}",
     "upload": "Subir {label}",
-    "remove": "Quitar"
+    "remove": "Quitar",
+    "pickAgain": "El borrador recuperado tenía una imagen nueva ({label}) que no se pudo conservar: vuelva a elegirla."
   },
   "emailForm": {
     "pageHeading": "Correo electrónico",

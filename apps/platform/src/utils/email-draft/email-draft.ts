@@ -6,6 +6,10 @@ import {
 import { EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE } from '@blog/db/constants/email-template-defaults';
 import type { TAuthoredEmailTemplateCopy } from '@blog/db/queries/email-templates';
 import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
+import {
+  isSameStagedImage,
+  type TStagedImage,
+} from '@platform/utils/staged-image/staged-image';
 
 export const EMAIL_SENDER_ITEM = 'SENDER' as const;
 
@@ -14,8 +18,6 @@ export const EMAIL_TEMPLATE_TYPES = Object.values(EMAIL_TEMPLATE_TYPE);
 export type TEmailPageItem = typeof EMAIL_SENDER_ITEM | TEmailTemplateType;
 
 export type TEmailItemStatus = 'default' | 'customised' | 'unsaved';
-
-export type TStagedLogo = { url: string | undefined; file?: File };
 
 export type TEmailSenderDraft = {
   senderName: string;
@@ -30,9 +32,9 @@ export type TEmailCopyDraft = {
 
 export type TEmailDraft = {
   sender: TEmailSenderDraft;
-  senderLogo: TStagedLogo;
+  senderLogo: TStagedImage;
   copies: Record<TEmailTemplateType, Record<TLocaleIsoCode, TEmailCopyDraft>>;
-  templateLogos: Record<TEmailTemplateType, TStagedLogo>;
+  templateLogos: Record<TEmailTemplateType, TStagedImage>;
 };
 
 export type TEmailCopyChange = {
@@ -63,9 +65,6 @@ const isSameBody = (
   a: TEmailTemplateBlock[] | null,
   b: TEmailTemplateBlock[] | null,
 ): boolean => JSON.stringify(a) === JSON.stringify(b);
-
-const isSameLogo = (a: TStagedLogo, b: TStagedLogo): boolean =>
-  a.url === b.url && a.file === b.file;
 
 export const buildEmailDraft = ({
   sender,
@@ -149,11 +148,12 @@ export const listLogoChanges = (
   saved: TEmailDraft,
   draft: TEmailDraft,
 ): (typeof EMAIL_SENDER_ITEM | TEmailTemplateType)[] => [
-  ...(isSameLogo(saved.senderLogo, draft.senderLogo)
+  ...(isSameStagedImage(saved.senderLogo, draft.senderLogo)
     ? []
     : [EMAIL_SENDER_ITEM]),
   ...EMAIL_TEMPLATE_TYPES.filter(
-    (type) => !isSameLogo(saved.templateLogos[type], draft.templateLogos[type]),
+    (type) =>
+      !isSameStagedImage(saved.templateLogos[type], draft.templateLogos[type]),
   ),
 ];
 
@@ -194,7 +194,7 @@ export const resolveItemStatus = (
   if (item === EMAIL_SENDER_ITEM) {
     if (
       isSenderChanged(saved, draft) ||
-      !isSameLogo(saved.senderLogo, draft.senderLogo)
+      !isSameStagedImage(saved.senderLogo, draft.senderLogo)
     ) {
       return 'unsaved';
     }
@@ -207,7 +207,7 @@ export const resolveItemStatus = (
   const copy = draft.copies[item][locale];
   if (
     countCopyFieldChanges(saved.copies[item][locale], copy) > 0 ||
-    !isSameLogo(saved.templateLogos[item], draft.templateLogos[item])
+    !isSameStagedImage(saved.templateLogos[item], draft.templateLogos[item])
   ) {
     return 'unsaved';
   }
@@ -221,7 +221,7 @@ export const resolveItemStatus = (
 export const withLogo = (
   draft: TEmailDraft,
   target: typeof EMAIL_SENDER_ITEM | TEmailTemplateType,
-  logo: TStagedLogo,
+  logo: TStagedImage,
 ): TEmailDraft =>
   target === EMAIL_SENDER_ITEM
     ? { ...draft, senderLogo: logo }
