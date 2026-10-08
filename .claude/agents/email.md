@@ -104,6 +104,10 @@ asking nicely.
 - Folder-per-concern under `src/`, each with its own `index.ts` barrel
   re-exported from the top-level `src/index.ts` — same shape as
   `packages/insight`/`packages/utils`.
+- **A folder holding more than two modules gives each its own folder**:
+  `html/escape-html/escape-html.ts` + `escape-html.test.ts`, no per-module
+  `index.ts` — the concern's barrel imports the file directly. A folder with
+  two or fewer modules stays flat; the third module to land splits all of them.
 - Co-locate `*.test.ts`. A test must fail without the implementation; never one
   that passes against a stub.
 - **A bugfix's regression test is TDD, written by you, first:** per
