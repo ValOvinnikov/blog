@@ -126,3 +126,32 @@ export const GapOnDesktop: TStory = {
   args: { columns: 3 },
   globals: { viewport: 'desktop' },
 };
+
+const [designSystem, ...otherPosts] = posts;
+
+export const MixedTitleLengths: TStory = {
+  args: {
+    columns: 3,
+    children: renderMediaCards([
+      ...(designSystem
+        ? [
+            {
+              ...designSystem,
+              title:
+                'Building a Design System from Scratch: Tokens, Themes and the Long Road to a Shared Vocabulary',
+            },
+          ]
+        : []),
+      ...otherPosts,
+      {
+        href: '/posts/short',
+        title: 'Short',
+        excerpt: 'Brief.',
+        tags: [],
+        publishedAt: '2024-02-01T00:00:00Z',
+        formattedDate: 'February 1, 2024',
+        authorName: 'Jane Doe',
+      },
+    ]),
+  },
+};
