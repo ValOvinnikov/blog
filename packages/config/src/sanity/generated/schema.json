@@ -11407,6 +11407,13 @@
         },
         "optional": true
       },
+      "sectionNavigationTitle": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
       "showSectionNavigation": {
         "type": "objectAttribute",
         "value": {

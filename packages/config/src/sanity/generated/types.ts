@@ -1929,6 +1929,7 @@ export type Page_landing = {
   contentAlignment?: 'LEFT' | 'CENTER';
   template?: Template_landingReference;
   sectionNavigation?: boolean;
+  sectionNavigationTitle?: string;
   showSectionNavigation?: boolean;
   seo?: Seo;
 };
