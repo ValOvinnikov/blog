@@ -6,6 +6,7 @@ export const lookFormVariants = tv({
     grid: ['grid grid-cols-1 items-start gap-6 lg:grid-cols-2'],
     stack: ['flex flex-col gap-6'],
     field: ['mb-[18px] last:mb-0'],
+    fieldHeader: ['mb-[5px] flex items-center justify-between gap-2'],
     fieldLabel: [
       'mb-[5px] flex items-center gap-2 text-[13px] font-semibold text-admin-text',
     ],
