@@ -19,7 +19,12 @@ export const FormField = ({
   children,
   footer,
 }: TFormFieldProps) => {
-  const { root, label: labelSlot, error: errorSlot } = formFieldVariants();
+  const {
+    root,
+    label: labelSlot,
+    hint: hintSlot,
+    error: errorSlot,
+  } = formFieldVariants();
   const errorId = htmlFor ? `${htmlFor}-error` : undefined;
 
   return (
@@ -32,7 +37,7 @@ export const FormField = ({
         <span className={labelSlot()}>{label}</span>
       )}
       {children}
-      {hint}
+      {hint && <span className={hintSlot()}>{hint}</span>}
       {error && (
         <span id={errorId} className={errorSlot()}>
           {error}

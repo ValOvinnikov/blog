@@ -10,7 +10,6 @@ export const tenantDetailsFormVariants = tv({
       'rounded-admin bg-admin-surface/80 backdrop-blur-sm',
     ],
     fields: ['flex flex-col gap-5'],
-    hint: ['text-[11.5px] text-admin-muted'],
     planControl: ['self-start'],
   },
   variants: {

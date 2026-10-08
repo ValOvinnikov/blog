@@ -15,7 +15,6 @@ export const confirmDialogVariants = tv({
     ],
     title: ['text-[15px] font-semibold text-admin-text'],
     description: ['text-[13px] text-admin-muted'],
-    hint: ['text-[11.5px] text-admin-muted'],
     actions: ['flex justify-end gap-2'],
   },
 });
