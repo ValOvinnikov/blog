@@ -90,13 +90,10 @@
       // (packages/ui needs no such entry: its `./*` package.json export makes
       // the wrapper reachable as public API, so knip already sees it as used.)
       //
-      // src/utils/voice-portable-text-to-inline-text/index.ts and
-      // src/context/voice-rich-provider/index.ts: the href→url voice link
-      // adapter and the `useVoiceRich` hook are built ahead of the
-      // page-template consumers that will call them.
+      // src/context/voice-rich-provider/index.ts: the `useVoiceRich` hook is
+      // built ahead of the client-component consumers that will call it.
       "entry": [
         "src/testing/custom-render.tsx",
-        "src/utils/voice-portable-text-to-inline-text/index.ts",
         "src/context/voice-rich-provider/index.ts"
       ],
       "project": [

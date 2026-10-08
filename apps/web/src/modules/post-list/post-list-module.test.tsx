@@ -1,5 +1,6 @@
 import { BRAND_VARIANT, TAXONOMY_KIND } from '@blog/config';
 import { getRequestContext } from '@web/server/request-context/request-context';
+import { getVoiceRich } from '@web/server/site-config/get-voice-rich/get-voice-rich';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { makeSanityImage } from '@web/testing/modules/hero/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
@@ -26,6 +27,7 @@ vi.mock('@blog/service', () => ({
 }));
 
 vi.mock('@web/server/request-context/request-context');
+vi.mock('@web/server/site-config/get-voice-rich/get-voice-rich');
 
 const getRequestContextMock = vi.mocked(getRequestContext);
 
@@ -128,6 +130,29 @@ describe(`<${PostListModule.name}/>`, () => {
     await setup();
 
     expect(screen.getByText('No posts yet.')).toBeVisible();
+  });
+
+  it('renders an authored link in the empty message', async () => {
+    vi.mocked(getVoiceRich).mockResolvedValueOnce([
+      {
+        _type: 'block',
+        _key: 'b1',
+        style: 'normal',
+        markDefs: [{ _type: 'link', _key: 'l1', href: '/topics' }],
+        children: [
+          { _type: 'span', _key: 's1', text: 'Nothing yet — ' },
+          { _type: 'span', _key: 's2', text: 'browse topics', marks: ['l1'] },
+        ],
+      },
+    ]);
+
+    await setup();
+
+    expect(vi.mocked(getVoiceRich)).toHaveBeenCalledWith('blogListEmpty');
+    expect(screen.getByRole('link', { name: 'browse topics' })).toHaveAttribute(
+      'href',
+      '/topics',
+    );
   });
 
   it('renders a pager with a fully translated aria-label and correct hrefs', async () => {

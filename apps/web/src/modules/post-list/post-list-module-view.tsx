@@ -8,6 +8,7 @@ import {
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section } from '@web/components/shared/section';
 import { SmartLink } from '@web/components/shared/smart-link';
+import type { ReactNode } from 'react';
 
 import { postListModuleViewVariants } from './post-list-module-view-variants';
 
@@ -27,7 +28,7 @@ export interface IPostListModuleViewProps extends Omit<
   items: IMediaCardData[];
   titleId: string;
   dataTestId: string;
-  emptyMessage?: string;
+  emptyMessage?: ReactNode;
   pagination?: IPostListModulePagination;
   hasImages?: boolean;
 }
