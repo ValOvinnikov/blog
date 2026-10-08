@@ -58,6 +58,7 @@ function toSectionNavigation({
   );
 
   return {
+    title: sectionRoot.sectionNavigationTitle?.trim() || null,
     root,
     pages: (sectionRoot.children ?? []).flatMap(
       (child) => toSectionPage(child, currentBranchIds.has(child._id)) ?? [],

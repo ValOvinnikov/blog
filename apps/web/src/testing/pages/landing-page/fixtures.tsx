@@ -28,6 +28,7 @@ export const makeLandingSectionNavigation = (
   overrides: Partial<TLandingSectionNavigation> = {},
 ): TLandingSectionNavigation => {
   return {
+    title: null,
     root: { title: 'Modules', path: 'modules', isCurrent: false },
     pages: [
       { title: 'FAQ', path: 'modules/faq', isCurrent: true },

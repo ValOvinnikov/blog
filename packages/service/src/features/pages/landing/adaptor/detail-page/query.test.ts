@@ -247,11 +247,13 @@ describe('landingPageQuery section chain', () => {
       parent,
       orderRank,
       sectionNavigation,
+      sectionNavigationTitle,
       language = EN,
     }: {
       parent?: string;
       orderRank?: string;
       sectionNavigation?: boolean;
+      sectionNavigationTitle?: string;
       language?: string;
     } = {},
   ) {
@@ -263,12 +265,16 @@ describe('landingPageQuery section chain', () => {
       headingBlock: { heading: `${id} heading` },
       ...(orderRank ? { orderRank } : {}),
       ...(sectionNavigation === undefined ? {} : { sectionNavigation }),
+      ...(sectionNavigationTitle ? { sectionNavigationTitle } : {}),
       ...(parent ? { parent: { _type: 'reference', _ref: parent } } : {}),
     };
   }
 
   const dataset = [
-    landing('modules', { sectionNavigation: true }),
+    landing('modules', {
+      sectionNavigation: true,
+      sectionNavigationTitle: 'Guides',
+    }),
     landing('pricing', { parent: 'modules', orderRank: '0|b' }),
     landing('faq', { parent: 'modules', orderRank: '0|a' }),
     landing('prijzen', { parent: 'modules', orderRank: '0|0', language: NL }),
@@ -311,6 +317,15 @@ describe('landingPageQuery section chain', () => {
             },
           ],
         },
+      ],
+    });
+  });
+
+  it("returns each page's sidebar title, or null where none is set", async () => {
+    expect(await run(['modules', 'faq'])).toMatchObject({
+      sectionChain: [
+        { _id: 'faq', sectionNavigationTitle: null },
+        { _id: 'modules', sectionNavigationTitle: 'Guides' },
       ],
     });
   });
