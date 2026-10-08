@@ -216,6 +216,7 @@ export const EmailSettings = ({
       archivedNoticeId={archivedNoticeId}
       hasError={status === 'error' && !senderNameError}
       errorTitle={t('alertError')}
+      isWide={true}
       draft={{
         tenantId,
         page: 'email',
