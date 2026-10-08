@@ -1,6 +1,5 @@
 import { q } from '@blog/service/sanity/query/query';
-import { localizedImageWithAltFragment } from '@blog/service/shared/fragments/image/localized-image-with-alt';
-import { optionalImage } from '@blog/service/shared/fragments/image/optional-image';
+import { localizedImageWithAltOptionalFragment } from '@blog/service/shared/fragments/image/localized-image-with-alt';
 import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document';
 import { socialProfileFragment } from '@blog/service/shared/fragments/social-profile/social-profile';
 import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
@@ -14,7 +13,10 @@ export const personCardFragment = localeQ
   .project((sub) => ({
     _id: true,
     name: sub.field('name').notNull(),
-    image: optionalImage(sub, 'image', localizedImageWithAltFragment),
+    image: sub
+      .field('image')
+      .project(localizedImageWithAltOptionalFragment)
+      .nullable(true),
     profilePage: sub
       .field('profilePage')
       .deref()

@@ -71,7 +71,10 @@ describe('heroProfileModuleQuery', () => {
       EN,
     );
 
-    expect(hero).toMatchObject({ image: null, eyebrow: 'Founder' });
+    expect(hero).toMatchObject({
+      image: { asset: null, alt: null },
+      eyebrow: 'Founder',
+    });
   });
 
   it('resolves the author reference', async () => {

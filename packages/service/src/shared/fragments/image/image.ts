@@ -34,6 +34,19 @@ export const sanityImageFragment = q
       .notNull(),
   }));
 
+export const sanityImageOptionalFragment = q
+  .fragmentForType<'imageWithAlt'>()
+  .project((sub) => ({
+    alt: sub.field('alt').nullable(true),
+    hotspot: true,
+    crop: true,
+    asset: sub
+      .field('asset')
+      .deref()
+      .project(sanityImageAssetFragment)
+      .nullable(true),
+  }));
+
 // Same asset resolution as `sanityImageFragment`, but both `asset` and
 // `alt` stay nullable so a malformed body-image block degrades gracefully
 // instead of failing the whole document.

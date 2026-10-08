@@ -5,8 +5,7 @@ import {
 } from '@blog/service/shared/expressions/module/display-mode';
 import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
 import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
-import { localizedImageWithAltFragment } from '@blog/service/shared/fragments/image/localized-image-with-alt';
-import { optionalImage } from '@blog/service/shared/fragments/image/optional-image';
+import { localizedImageWithAltOptionalFragment } from '@blog/service/shared/fragments/image/localized-image-with-alt';
 import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document';
 import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
@@ -32,11 +31,10 @@ export const featureListModuleQuery = q
           .project(moduleHeadingBlockFragment)
           .notNull(),
         icon: featureSub.field('icon').nullable(true),
-        image: optionalImage(
-          featureSub,
-          'image',
-          localizedImageWithAltFragment,
-        ),
+        image: featureSub
+          .field('image')
+          .project(localizedImageWithAltOptionalFragment)
+          .nullable(true),
         link: featureSub
           .field('link')
           .deref()

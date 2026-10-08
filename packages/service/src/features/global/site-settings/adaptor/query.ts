@@ -1,6 +1,5 @@
 import { q } from '@blog/service/sanity/query/query';
-import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
-import { optionalImage } from '@blog/service/shared/fragments/image/optional-image';
+import { sanityImageOptionalFragment } from '@blog/service/shared/fragments/image/image';
 import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
 import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
 
@@ -26,7 +25,10 @@ export const siteSettingsQuery = q
             separator: t.field('separator').notNull(),
           }))
           .nullable(true),
-        logo: optionalImage(b, 'logo', sanityImageFragment),
+        logo: b
+          .field('logo')
+          .project(sanityImageOptionalFragment)
+          .nullable(true),
       }))
       .notNull(),
     currency: sub.field('currency').notNull(),

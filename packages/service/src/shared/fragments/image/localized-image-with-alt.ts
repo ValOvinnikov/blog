@@ -16,3 +16,17 @@ export const localizedImageWithAltFragment = q
       .project(sanityImageAssetFragment)
       .notNull(),
   }));
+
+export const localizedImageWithAltOptionalFragment = q
+  .parameters<TLocaleQueryParams>()
+  .fragmentForType<'localizedImageWithAlt'>()
+  .project((sub) => ({
+    alt: getLocalizedField(sub, 'alt'),
+    hotspot: true,
+    crop: true,
+    asset: sub
+      .field('asset')
+      .deref()
+      .project(sanityImageAssetFragment)
+      .nullable(true),
+  }));
