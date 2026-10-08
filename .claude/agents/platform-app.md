@@ -196,6 +196,15 @@ because this app is almost entirely forms.
   is the same call this repo already made in #1157. If a control genuinely
   repeats across admin pages later, extracting it then is mechanical; predicting
   it now is not.
+- **A control uses its Base UI part when one exists,** directly or through
+  the shared primitive built on it (`FormField`, `Disclosure`, `Button`). A
+  labelled input is a `Field` (Label, Description, Error) around `Input` or
+  `Field.Control`, which also generates and wires its ids; an expandable
+  section is a `Collapsible`; a choice list is a `Select`; a formatting bar is
+  a `Toolbar` with `Toggle`s; a form is a `Form`. A raw `<label>`, `<select>`,
+  `<details>` or a `<button>` outside the shared `Button` gets none of Base
+  UI's keyboard and ARIA handling. The file `<input>` and `<table>` have no
+  Base UI part and stay native.
 - Base UI parts are already marked `'use client'` upstream, so importing one
   makes the importing component a client component. Keep that boundary at the
   leaf — a form control, not a whole page.
