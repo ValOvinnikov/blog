@@ -35,7 +35,7 @@ export type TSettingsFormShellProps<TValues> = {
   archivedNoticeId: string;
   hasError: boolean;
   errorTitle: string;
-  draft?: TSettingsFormDraft<TValues>;
+  draft: TSettingsFormDraft<TValues>;
   className?: string;
   children: ReactNode;
 };
@@ -138,7 +138,7 @@ export const SettingsFormShell = <TValues,>({
       {offer && (
         <DraftRecoveryBanner
           takenAt={offer.takenAt}
-          savedAt={draft?.savedAt}
+          savedAt={draft.savedAt}
           changeCount={offer.changeCount}
           differences={offer.differences}
           onRestore={restore}

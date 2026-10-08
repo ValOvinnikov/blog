@@ -10,11 +10,6 @@ export type TLookPageContentProps = {
   tenant: TTenant;
 };
 
-/**
- * The Look tab's data-fetch + render, shared by `/tenants/[tenantId]/look`
- * and `/dashboard/look` — both resolve a `TTenant` however fits their own
- * routing (URL param vs. session membership) and hand it here.
- */
 export const LookPageContent = async ({ tenant }: TLookPageContentProps) => {
   const [siteConfig, liveLocales] = await Promise.all([
     queries.siteConfig.getSiteConfig(tenant.id),
@@ -32,6 +27,7 @@ export const LookPageContent = async ({ tenant }: TLookPageContentProps) => {
       primaryDomain={tenant.primaryDomain}
       initialValues={initialValues}
       hasMultipleLanguages={(liveLocales?.length ?? 0) > 1}
+      savedAt={siteConfig?.updatedAt}
       archivedAt={tenant.deprovisionedAt ?? undefined}
     />
   );

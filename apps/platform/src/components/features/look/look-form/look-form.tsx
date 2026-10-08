@@ -2,6 +2,7 @@
 
 import {
   isAccentHueAccessible,
+  PRESET_ID,
   PRESET_REGISTRY,
   type TPresetId,
 } from '@blog/config';
@@ -10,6 +11,7 @@ import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
 import { Disclosure } from '@platform/components/shared/disclosure';
 import { SettingsFormShell } from '@platform/components/shared/settings-form-shell';
+import { FONT_OPTIONS } from '@platform/config/fonts';
 import { useToast } from '@platform/context/toast-provider';
 import { updateLookAction } from '@platform/server/site-config/update-look-action';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
@@ -29,6 +31,7 @@ export type TLookFormProps = {
   primaryDomain: string;
   initialValues: TLookFormValues;
   hasMultipleLanguages: boolean;
+  savedAt?: Date;
   archivedAt?: Date;
 };
 
@@ -58,6 +61,11 @@ const applyPresetDefaults = (
   };
 };
 
+const PRESET_LABEL_KEY = {
+  [PRESET_ID.CONSOLE]: 'console',
+  [PRESET_ID.EDITORIAL]: 'editorial',
+} as const satisfies Record<TPresetId, string>;
+
 const countChanges = (a: TLookFormValues, b: TLookFormValues): number =>
   (Object.keys(a) as (keyof TLookFormValues)[]).filter(
     (key) => a[key] !== b[key],
@@ -69,6 +77,7 @@ export const LookForm = ({
   primaryDomain,
   initialValues,
   hasMultipleLanguages,
+  savedAt,
   archivedAt,
 }: TLookFormProps) => {
   const isArchived = Boolean(archivedAt);
@@ -76,6 +85,8 @@ export const LookForm = ({
   const accentHueFieldId = useId();
   const toast = useToast();
   const t = useTranslations('lookForm');
+  const tPreset = useTranslations('presetPicker');
+  const tHue = useTranslations('logoHueField');
   const [savedValues, setSavedValues] =
     useState<TLookFormValues>(initialValues);
   const { values, setValues, status, isPending, handleSubmit } =
@@ -122,6 +133,72 @@ export const LookForm = ({
     setValues((prev) => applyPresetDefaults(prev.preset, prev));
   };
 
+  const handleRestore = (draftValues: TLookFormValues) => {
+    setValues((prev) => ({
+      ...draftValues,
+      logoAssetUrl: prev.logoAssetUrl,
+      faviconAssetUrl: prev.faviconAssetUrl,
+    }));
+  };
+
+  const draftFields = [
+    {
+      id: 'preset',
+      label: t('presetLabel'),
+      display: ({ preset }: TLookFormValues) =>
+        tPreset(PRESET_LABEL_KEY[preset]),
+    },
+    {
+      id: 'accentHue',
+      label: t('accentHueLabel'),
+      display: ({ accentHue }: TLookFormValues) =>
+        tHue('hueValue', { hue: accentHue }),
+    },
+    {
+      id: 'logoHue',
+      label: t('logoHueLabel'),
+      display: ({ logoHue }: TLookFormValues) =>
+        logoHue === undefined
+          ? tHue('followsAccent')
+          : tHue('hueValue', { hue: logoHue }),
+    },
+    {
+      id: 'headingFont',
+      label: t('headingFontLabel'),
+      display: ({ headingFont }: TLookFormValues) =>
+        FONT_OPTIONS[headingFont].label,
+    },
+    {
+      id: 'bodyFont',
+      label: t('bodyFontLabel'),
+      display: ({ bodyFont }: TLookFormValues) => FONT_OPTIONS[bodyFont].label,
+    },
+    {
+      id: 'radiusScale',
+      label: t('radiusScaleLabel'),
+      display: ({ radiusScale }: TLookFormValues) =>
+        t(`radiusScaleOptionLabel.${radiusScale}`),
+    },
+    {
+      id: 'density',
+      label: t('densityLabel'),
+      display: ({ density }: TLookFormValues) =>
+        t(`densityOptionLabel.${density}`),
+    },
+    {
+      id: 'cardStyle',
+      label: t('cardStyleLabel'),
+      display: ({ cardStyle }: TLookFormValues) =>
+        t(`cardStyleOptionLabel.${cardStyle}`),
+    },
+    {
+      id: 'languageSwitcherStyle',
+      label: t('languageSwitcherLabel'),
+      display: ({ languageSwitcherStyle }: TLookFormValues) =>
+        t(`languageSwitcherOptionLabel.${languageSwitcherStyle}`),
+    },
+  ];
+
   const { root, grid, stack, tagSecondary, note } = lookFormVariants();
 
   return (
@@ -140,6 +217,15 @@ export const LookForm = ({
       hasError={status === 'error'}
       errorTitle={t('alertError')}
       className={root()}
+      draft={{
+        tenantId,
+        page: 'look',
+        values,
+        savedValues,
+        savedAt,
+        fields: draftFields,
+        onRestore: handleRestore,
+      }}
     >
       <div className={grid()}>
         <div className={stack()}>
