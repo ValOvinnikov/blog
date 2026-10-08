@@ -15,6 +15,7 @@ export const VoicePageContent = async ({ tenant }: TVoicePageContentProps) => {
   return (
     <VoiceSettings
       tenantId={tenant.id}
+      locale={tenant.locale}
       initialOverrides={plainTextVoiceOverrides(config?.voiceOverrides ?? {})}
       saveAction={saveVoiceOverridesAction}
       savedAt={config?.updatedAt}
