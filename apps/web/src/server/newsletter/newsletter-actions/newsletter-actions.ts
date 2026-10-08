@@ -5,6 +5,7 @@ import { queries } from '@blog/db';
 import { buildNewsletterConfirmationEmail, sendEmail } from '@blog/email';
 import { markNewsletterSubscribed } from '@web/server/newsletter/newsletter-subscribed-cookie/newsletter-subscribed-cookie';
 import { resolveNewsletterEmailSettings } from '@web/server/newsletter/resolve-newsletter-email-settings/resolve-newsletter-email-settings';
+import { getSubscribedPageLocale } from '@web/server/newsletter/subscribed-page-locale/subscribed-page-locale';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 import { resolveWritableTenant } from '@web/server/tenant/write-gate/write-gate';
@@ -61,8 +62,9 @@ export const subscribeToNewsletterAction = async (
     }
 
     const siteUrl = (await getTenantBaseUrl()) ?? '';
-    const confirmationUrl = `${siteUrl}${routes.newsletterConfirm(subscriber.confirmationToken)}`;
-    const unsubscribeUrl = `${siteUrl}${routes.newsletterUnsubscribe(subscriber.unsubscribeToken)}`;
+    const locale = await getSubscribedPageLocale();
+    const confirmationUrl = `${siteUrl}${routes.newsletterConfirm(subscriber.confirmationToken, locale)}`;
+    const unsubscribeUrl = `${siteUrl}${routes.newsletterUnsubscribe(subscriber.unsubscribeToken, locale)}`;
     const { brand, brandName } = await resolveTenantEmailIdentity(tenantId);
 
     const {
@@ -75,6 +77,7 @@ export const subscribeToNewsletterAction = async (
     } = await resolveNewsletterEmailSettings(
       tenantId,
       env.NEWSLETTER_FROM_ADDRESS,
+      locale,
     );
 
     const { html, headers } = buildNewsletterConfirmationEmail({

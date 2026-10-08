@@ -1,9 +1,10 @@
 import { routes } from '@blog/config';
 import { queries } from '@blog/db';
+import { resolveNewsletterLinkLocale } from '@web/server/newsletter/newsletter-link-locale/newsletter-link-locale';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { logger } from '@web/utils/logger/logger';
 import type { NextResponse } from 'next/server';
-import { getLocale, getTranslations } from 'next-intl/server';
+import { getTranslations } from 'next-intl/server';
 
 import {
   renderResultResponse,
@@ -13,11 +14,13 @@ import {
 import { renderConfirmResponse } from './unsubscribe-page';
 
 export async function GET(request: Request): Promise<NextResponse> {
-  const token = new URL(request.url).searchParams.get('token');
-  const [lang, t] = await Promise.all([
-    getLocale(),
-    getTranslations('newsletterUnsubscribe'),
-  ]);
+  const { searchParams } = new URL(request.url);
+  const token = searchParams.get('token');
+  const lang = await resolveNewsletterLinkLocale(searchParams.get('lang'));
+  const t = await getTranslations({
+    locale: lang,
+    namespace: 'newsletterUnsubscribe',
+  });
   const returnHomeLabel = t('returnHome');
 
   if (!token) {
@@ -38,16 +41,18 @@ export async function GET(request: Request): Promise<NextResponse> {
     message: t('confirmMessage'),
     confirmButtonLabel: t('confirmButtonLabel'),
     returnHomeLabel,
-    actionUrl: routes.newsletterUnsubscribe(token),
+    actionUrl: routes.newsletterUnsubscribe(token, lang),
   });
 }
 
 export async function POST(request: Request): Promise<NextResponse> {
-  const token = new URL(request.url).searchParams.get('token');
-  const [lang, t] = await Promise.all([
-    getLocale(),
-    getTranslations('newsletterUnsubscribe'),
-  ]);
+  const { searchParams } = new URL(request.url);
+  const token = searchParams.get('token');
+  const lang = await resolveNewsletterLinkLocale(searchParams.get('lang'));
+  const t = await getTranslations({
+    locale: lang,
+    namespace: 'newsletterUnsubscribe',
+  });
   const returnHomeLabel = t('returnHome');
   const errorCopy: TResultPageCopy = {
     lang,

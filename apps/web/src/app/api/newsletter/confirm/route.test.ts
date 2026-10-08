@@ -1,5 +1,5 @@
 import { TENANT_WRITE_REFUSAL } from '@blog/config';
-import { getLocale } from 'next-intl/server';
+import { getTranslations } from 'next-intl/server';
 
 export {};
 
@@ -15,6 +15,15 @@ vi.mock('@blog/db', () => ({
 vi.mock('@web/server/tenant/write-gate/write-gate', () => ({
   resolveWritableTenant: resolveWritableTenantMock,
 }));
+
+const { resolveNewsletterLinkLocaleMock } = vi.hoisted(() => ({
+  resolveNewsletterLinkLocaleMock: vi.fn(),
+}));
+
+vi.mock(
+  '@web/server/newsletter/newsletter-link-locale/newsletter-link-locale',
+  () => ({ resolveNewsletterLinkLocale: resolveNewsletterLinkLocaleMock }),
+);
 
 const TENANT_ID = 'tenant-1';
 
@@ -45,6 +54,7 @@ describe('GET /api/newsletter/confirm', () => {
       ok: true,
       tenantId: TENANT_ID,
     });
+    resolveNewsletterLinkLocaleMock.mockResolvedValue('EN');
     ({ GET } = await import('./route'));
   });
 
@@ -69,12 +79,27 @@ describe('GET /api/newsletter/confirm', () => {
     expect(confirmSubscriberMock).toHaveBeenCalledWith(TENANT_ID, 'token-abc');
   });
 
-  it('declares <html lang> as the resolved request locale, not a hardcoded value', async () => {
-    vi.mocked(getLocale).mockResolvedValueOnce('fr');
-    const response = await GET(request);
+  it('renders in the language the link carries', async () => {
+    resolveNewsletterLinkLocaleMock.mockResolvedValue('FR');
+    const response = await GET(
+      new Request(
+        'https://example.com/api/newsletter/confirm?token=token-abc&lang=FR',
+      ),
+    );
     const html = await response.text();
 
-    expect(html).toContain('<html lang="fr">');
+    expect(resolveNewsletterLinkLocaleMock).toHaveBeenCalledWith('FR');
+    expect(getTranslations).toHaveBeenCalledWith({
+      locale: 'FR',
+      namespace: 'newsletterConfirm',
+    });
+    expect(html).toContain('<html lang="FR">');
+  });
+
+  it('resolves the language of a link sent without one', async () => {
+    await GET(request);
+
+    expect(resolveNewsletterLinkLocaleMock).toHaveBeenCalledWith(null);
   });
 
   it('treats an already-confirmed token as success (idempotent)', async () => {

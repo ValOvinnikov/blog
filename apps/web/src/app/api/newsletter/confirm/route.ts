@@ -1,18 +1,21 @@
 import { TENANT_WRITE_REFUSAL } from '@blog/config';
 import { queries } from '@blog/db';
+import { resolveNewsletterLinkLocale } from '@web/server/newsletter/newsletter-link-locale/newsletter-link-locale';
 import { resolveWritableTenant } from '@web/server/tenant/write-gate/write-gate';
 import { logger } from '@web/utils/logger/logger';
 import type { NextResponse } from 'next/server';
-import { getLocale, getTranslations } from 'next-intl/server';
+import { getTranslations } from 'next-intl/server';
 
 import { renderResultResponse } from '../newsletter-result-page';
 
 export async function GET(request: Request): Promise<NextResponse> {
-  const token = new URL(request.url).searchParams.get('token');
-  const [lang, t] = await Promise.all([
-    getLocale(),
-    getTranslations('newsletterConfirm'),
-  ]);
+  const { searchParams } = new URL(request.url);
+  const token = searchParams.get('token');
+  const lang = await resolveNewsletterLinkLocale(searchParams.get('lang'));
+  const t = await getTranslations({
+    locale: lang,
+    namespace: 'newsletterConfirm',
+  });
   const returnHomeLabel = t('returnHome');
 
   if (!token) {

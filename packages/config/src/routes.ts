@@ -1,3 +1,10 @@
+import type { TLocaleIsoCode } from '@blog/config/constants';
+
+const toNewsletterLinkQuery = (token: string, locale?: TLocaleIsoCode) => {
+  const tokenQuery = `token=${encodeURIComponent(token)}`;
+  return locale ? `${tokenQuery}&lang=${locale}` : tokenQuery;
+};
+
 /**
  * Single source of truth for app URL construction. Consumed by `service`
  * (href-emitting transformers) and `web` (routes, pagination `createHref`,
@@ -19,10 +26,10 @@ export const routes = {
   account: () => '/account',
   /** A Route Handler, not a page, so it's outside `[locale]`. */
   accountExport: () => '/api/account/export',
-  newsletterConfirm: (token: string) =>
-    `/api/newsletter/confirm?token=${encodeURIComponent(token)}`,
-  newsletterUnsubscribe: (token: string) =>
-    `/api/newsletter/unsubscribe?token=${encodeURIComponent(token)}`,
+  newsletterConfirm: (token: string, locale?: TLocaleIsoCode) =>
+    `/api/newsletter/confirm?${toNewsletterLinkQuery(token, locale)}`,
+  newsletterUnsubscribe: (token: string, locale?: TLocaleIsoCode) =>
+    `/api/newsletter/unsubscribe?${toNewsletterLinkQuery(token, locale)}`,
   landingPage: (slug: string) => `/${slug}`,
   switchLanguage: (to: string, from: string) =>
     `/api/switch-language?${new URLSearchParams({ to, from }).toString()}`,
