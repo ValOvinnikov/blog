@@ -10,7 +10,7 @@ import {
   type TLanguageChangeCount,
 } from '@platform/utils/format-language-changes/format-language-changes';
 import { useTranslations } from 'next-intl';
-import { useEffect, useEffectEvent, type ReactNode } from 'react';
+import { useEffect, useEffectEvent, useState, type ReactNode } from 'react';
 
 import { DraftRecoveryBanner } from './components/draft-recovery-banner/draft-recovery-banner';
 import { SaveBar } from './components/save-bar/save-bar';
@@ -67,6 +67,14 @@ export const SettingsFormShell = <TValues,>({
     isWide,
   });
   const isDirty = changeCount > 0;
+  const [hasSavedSinceEdit, setHasSavedSinceEdit] = useState(false);
+  const [wasDirty, setWasDirty] = useState(isDirty);
+  // Reset on the clean-to-dirty edge: a page can still be dirty for a render
+  // after onSave resolves.
+  if (isDirty !== wasDirty) {
+    setWasDirty(isDirty);
+    if (isDirty) setHasSavedSinceEdit(false);
+  }
   const breakdown = formatLanguageChanges(changesByLanguage);
   const {
     offer,
@@ -76,7 +84,10 @@ export const SettingsFormShell = <TValues,>({
 
   const handleSave = async () => {
     const isSaved = await onSave();
-    if (isSaved) forgetDraft();
+    if (isSaved) {
+      forgetDraft();
+      setHasSavedSinceEdit(true);
+    }
     return isSaved;
   };
 
@@ -125,7 +136,10 @@ export const SettingsFormShell = <TValues,>({
         title={title}
         description={description}
         actions={
-          !isDirty && <span className={savedStatus()}>{t('allSaved')}</span>
+          !isDirty &&
+          hasSavedSinceEdit && (
+            <span className={savedStatus()}>{t('allSaved')}</span>
+          )
         }
       />
 

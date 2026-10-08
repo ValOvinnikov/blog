@@ -132,7 +132,7 @@ describe(`<${LanguagesSettings.name}/>`, () => {
     expect(
       screen.queryByRole('button', { name: 'Save changes' }),
     ).not.toBeInTheDocument();
-    expect(screen.getByText('All changes saved')).toBeVisible();
+    expect(screen.queryByText('All changes saved')).not.toBeInTheDocument();
   });
 
   it('counts each toggled language and restores the saved ones on Discard', async () => {

@@ -255,7 +255,7 @@ describe(`<${LookForm.name}/>`, () => {
     expect(
       screen.queryByRole('button', { name: 'Save changes' }),
     ).not.toBeInTheDocument();
-    expect(screen.getByText('All changes saved')).toBeVisible();
+    expect(screen.queryByText('All changes saved')).not.toBeInTheDocument();
 
     screen.getByRole('slider', { name: 'Accent hue' }).focus();
     await user.keyboard('{ArrowRight}');
