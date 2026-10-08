@@ -466,31 +466,91 @@
   },
   "voiceSettings": {
     "heading": "Toon",
-    "description": "De woorden die de site zelf gebruikt. Elk veld heeft al een verstandige standaardwaarde.",
+    "description": "Herformuleer de paginaberichten van de site. Elk veld heeft een standaardtekst, dus pas alleen aan wat naar jou moet klinken.",
+    "fixedCopyNote": "Knoppen, menu’s en labels worden voor je vertaald en zijn op elke site hetzelfde, dus ze staan hier niet.",
+    "editingLanguageNote": "Je bewerkt {language} — andere talen houden hun eigen tekst.",
+    "languageAriaLabel": "Taal",
+    "languageOption": "{language} · {count, plural, =0 {alles standaard} other {# aangepast}}",
+    "surfaceCustomisedCount": "{count, plural, =0 {Alles standaard} other {# aangepast}}",
     "saveButton": "Wijzigingen opslaan",
     "savingButton": "Opslaan…",
-    "alertSuccess": "voiceOverrides opgeslagen.",
+    "alertSuccess": "Toon opgeslagen.",
     "alertError": "Opslaan mislukt. Probeer het opnieuw.",
-    "basicHeading": "Basis",
-    "basicAlert": "Hier is niets verplicht. De site heeft al verstandige standaardteksten. De meeste tenants openen de geavanceerde velden hieronder nooit.",
-    "advancedSummary": "Geavanceerd — 7 geselecteerde teksten, 2 groepen",
-    "advancedOverrideInfo": "Elk veld is een overschrijving. Laat een veld leeg om de eigen standaardtekst van de site te gebruiken — een veld leegmaken zet het terug naar die standaard, het maakt de tekst niet leeg."
+    "badgeDefault": "Standaard",
+    "badgeCustomised": "Aangepast",
+    "unsaved": "Niet opgeslagen",
+    "reset": "Herstellen",
+    "keepPlaceholder": "Laat <code>{token}</code> staan — de site vult het in.",
+    "draftFieldLabel": "{surface} — {field} ({language})"
   },
-  "voiceFieldGroup": {
-    "fieldCount": "{count, plural, one {# veld} other {# velden}}"
+  "voiceSurfaces": {
+    "NOT_FOUND": "Pagina niet gevonden",
+    "ERROR": "Foutpagina",
+    "ARCHIVE": "Lege lijsten",
+    "BOOKMARKS": "Bladwijzers"
   },
-  "voiceFieldGroups": {
-    "notFoundPage": "404-pagina",
-    "emptyStates": "Lege staten"
+  "voiceSurfaceDescriptions": {
+    "NOT_FOUND": "Verschijnt op elk adres dat niet bestaat",
+    "ERROR": "Verschijnt als een pagina niet laadt",
+    "ARCHIVE": "Verschijnen zolang een lijst nog leeg is. Kies er een om te bewerken.",
+    "BOOKMARKS": "De bewaarde berichten van een lezer, voordat die iets bewaart"
+  },
+  "voiceSpecimen": {
+    "showPreview": "Voorbeeld tonen",
+    "hidePreview": "Voorbeeld verbergen",
+    "lists": {
+      "blogList": {
+        "eyebrow": "Blog",
+        "heading": "Alle berichten",
+        "count": "0 berichten"
+      },
+      "topic": {
+        "eyebrow": "Onderwerp",
+        "heading": "Ontwerp",
+        "count": "0 berichten"
+      },
+      "tag": {
+        "eyebrow": "Tag",
+        "heading": "Typografie",
+        "count": "0 berichten"
+      },
+      "topics": {
+        "eyebrow": "Ontdekken",
+        "heading": "Onderwerpen",
+        "count": "0 onderwerpen"
+      },
+      "tags": {
+        "eyebrow": "Ontdekken",
+        "heading": "Tags",
+        "count": "0 tags"
+      }
+    }
   },
   "voiceFieldLabels": {
-    "notFoundHeading": "Kop niet gevonden",
-    "notFoundSupportingText": "Ondersteunende tekst niet gevonden",
-    "blogListEmpty": "Bloglijst leeg",
-    "topicEmpty": "Onderwerp leeg",
-    "tagEmpty": "Tag leeg",
-    "topicsEmpty": "Onderwerpen leeg",
-    "bookmarksEmpty": "Bladwijzers leeg"
+    "blogListEmpty": "Blogoverzicht",
+    "topicEmpty": "Onderwerppagina",
+    "tagEmpty": "Tagpagina",
+    "topicsEmpty": "Onderwerpenoverzicht",
+    "tagsEmpty": "Tagoverzicht",
+    "notFoundEyebrow": "Bovenregel",
+    "notFoundHeading": "Kop",
+    "notFoundSupportingText": "Begeleidende tekst",
+    "localeErrorTitle": "Kop",
+    "localeErrorDescription": "Beschrijving",
+    "bookmarksEmpty": "Lege bladwijzers"
+  },
+  "voiceFieldHints": {
+    "blogListEmpty": "Het blogoverzicht, voordat er iets is gepubliceerd",
+    "topicEmpty": "Een onderwerp zonder berichten",
+    "tagEmpty": "Een tag zonder berichten",
+    "topicsEmpty": "Het onderwerpenoverzicht, voordat er onderwerpen zijn",
+    "tagsEmpty": "Het tagoverzicht, voordat er tags zijn",
+    "notFoundEyebrow": "Klein label boven de kop",
+    "notFoundHeading": "Ook de titel van het browsertabblad",
+    "notFoundSupportingText": "Onder de kop",
+    "localeErrorTitle": "De hoofdkop van de pagina",
+    "localeErrorDescription": "Onder de kop",
+    "bookmarksEmpty": "De bladwijzerpagina, voordat er iets is bewaard"
   },
   "addTenantWizard": {
     "heading": "Tenant toevoegen",

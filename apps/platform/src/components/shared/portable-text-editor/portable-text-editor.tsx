@@ -13,20 +13,26 @@ import {
   useEditorSelector,
   type PortableTextBlock,
   type PortableTextTextBlock,
+  type SchemaDefinition,
   type TextBlockRenderProps,
 } from '@portabletext/editor';
 import { EventListenerPlugin, NodePlugin } from '@portabletext/editor/plugins';
 import * as selectors from '@portabletext/editor/selectors';
-import { useMemo } from 'react';
+import { useMemo, type AriaAttributes } from 'react';
 
 import { PortableTextEditorToolbar } from './components/toolbar/portable-text-editor-toolbar';
 import { portableTextEditorVariants } from './portable-text-editor-variants';
 
-export type TPortableTextEditorProps = {
-  initialValue: TEmailTemplateBlock[];
-  onChange: (value: TEmailTemplateBlock[]) => void;
+export type TPortableTextEditorProps<TBlock = TEmailTemplateBlock> = {
+  initialValue: TBlock[];
+  onChange: (value: TBlock[]) => void;
   ariaLabel: string;
+  schema?: SchemaDefinition;
+  id?: string;
+  placeholder?: string;
+  isInvalid?: boolean;
   isDisabled?: boolean;
+  'aria-describedby'?: AriaAttributes['aria-describedby'];
 };
 
 const strongDecorator = defineDecorator({
@@ -125,18 +131,22 @@ const textBlock = defineTextBlock({
   render: (props) => <TextBlock {...props} />,
 });
 
-/**
- * The editor's authoring surface — Base UI's primitives don't cover rich
- * text, so this composes `@portabletext/editor`'s own headless building
- * blocks directly, restricted to `EMAIL_PORTABLE_TEXT_SCHEMA`'s vocabulary.
- */
-export const PortableTextEditor = ({
+export const PortableTextEditor = <TBlock = TEmailTemplateBlock,>({
   initialValue,
   onChange,
   ariaLabel,
+  schema = EMAIL_PORTABLE_TEXT_SCHEMA,
+  id,
+  placeholder,
+  isInvalid = false,
   isDisabled = false,
-}: TPortableTextEditorProps) => {
-  const { root, editable } = portableTextEditorVariants({ isDisabled });
+  'aria-describedby': ariaDescribedBy,
+}: TPortableTextEditorProps<TBlock>) => {
+  const {
+    root,
+    editable,
+    placeholder: placeholderSlot,
+  } = portableTextEditorVariants({ isDisabled, isInvalid });
 
   // @portabletext/editor drops role and aria-multiline entirely when readOnly; restore both so a disabled editor still announces as a (dimmed) text field instead of a nameless generic node.
   const disabledFieldProps = isDisabled
@@ -173,8 +183,11 @@ export const PortableTextEditor = ({
     <div className={root()}>
       <EditorProvider
         initialConfig={{
-          schemaDefinition: EMAIL_PORTABLE_TEXT_SCHEMA,
-          initialValue: initialValue.length > 0 ? initialValue : undefined,
+          schemaDefinition: schema,
+          initialValue:
+            initialValue.length > 0
+              ? (initialValue as PortableTextBlock[])
+              : undefined,
           readOnly: isDisabled,
         }}
       >
@@ -182,14 +195,22 @@ export const PortableTextEditor = ({
         <EventListenerPlugin
           on={(event) => {
             if (event.type === 'mutation') {
-              onChange((event.value ?? []) as TEmailTemplateBlock[]);
+              onChange((event.value ?? []) as TBlock[]);
             }
           }}
         />
-        {!isDisabled && <PortableTextEditorToolbar />}
+        {!isDisabled && <PortableTextEditorToolbar schema={schema} />}
         <PortableTextEditable
+          id={id}
           aria-label={ariaLabel}
+          aria-describedby={ariaDescribedBy}
+          aria-invalid={isInvalid || undefined}
           aria-disabled={isDisabled || undefined}
+          renderPlaceholder={
+            placeholder
+              ? () => <span className={placeholderSlot()}>{placeholder}</span>
+              : undefined
+          }
           {...disabledFieldProps}
           className={editable()}
         />

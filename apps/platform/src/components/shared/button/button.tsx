@@ -16,6 +16,8 @@ export type TButtonProps = {
   children?: ReactNode;
   className?: string;
   'aria-describedby'?: AriaAttributes['aria-describedby'];
+  'aria-expanded'?: AriaAttributes['aria-expanded'];
+  'aria-controls'?: AriaAttributes['aria-controls'];
   hasArrow?: boolean;
 };
 
@@ -31,6 +33,8 @@ export const Button = ({
   children,
   className,
   'aria-describedby': ariaDescribedBy,
+  'aria-expanded': ariaExpanded,
+  'aria-controls': ariaControls,
   hasArrow,
 }: TButtonProps) => {
   const { root, srOnlyStatus } = buttonVariants({ variant, size });
@@ -56,6 +60,8 @@ export const Button = ({
         onClick={handleClick}
         className={root({ class: className })}
         aria-describedby={ariaDescribedBy}
+        aria-expanded={ariaExpanded}
+        aria-controls={ariaControls}
       >
         {isPending && (
           <span aria-hidden="true">

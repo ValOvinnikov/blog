@@ -1,17 +1,11 @@
 import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
-import userEvent from '@testing-library/user-event';
+import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
 import VoicePage from './page';
-
-const ADVANCED_SUMMARY = 'Advanced — 7 curated strings, 2 groups';
-
-const openAdvanced = async () => {
-  await userEvent.setup().click(screen.getByText(ADVANCED_SUMMARY));
-};
 
 const { getAdminByUserIdMock, getTenantByIdMock, getSiteConfigMock } =
   vi.hoisted(() => ({
@@ -26,7 +20,10 @@ vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     admins: { getAdminByUserId: getAdminByUserIdMock },
-    tenants: { getTenantById: getTenantByIdMock },
+    tenants: {
+      getTenantById: getTenantByIdMock,
+      selectLiveLocales: () => ['EN'],
+    },
     siteConfig: { getSiteConfig: getSiteConfigMock },
   },
 }));
@@ -46,7 +43,7 @@ describe(`<${VoicePage.name}/>`, () => {
 
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });
-    getTenantByIdMock.mockResolvedValue({ id: 'tenant-1' });
+    getTenantByIdMock.mockResolvedValue(makeReadyTenant({ id: 'tenant-1' }));
   });
 
   it('404s when the signed-in user has no admins row', async () => {
@@ -58,17 +55,12 @@ describe(`<${VoicePage.name}/>`, () => {
     expect(getSiteConfigMock).not.toHaveBeenCalled();
   });
 
-  it('shows every field blank, with no placeholder, when there is no site_config row', async () => {
+  it("renders the tenant's Voice settings", async () => {
     getSiteConfigMock.mockResolvedValue(undefined);
 
     await setup();
-    await openAdvanced();
 
-    expect(
-      screen.getByRole('textbox', { name: 'Not Found Heading' }),
-    ).toHaveValue('');
-    expect(
-      screen.getByRole('textbox', { name: 'Not Found Heading' }),
-    ).not.toHaveAttribute('placeholder');
+    expect(getSiteConfigMock).toHaveBeenCalledWith('tenant-1');
+    expect(screen.getByRole('heading', { name: 'Voice' })).toBeVisible();
   });
 });

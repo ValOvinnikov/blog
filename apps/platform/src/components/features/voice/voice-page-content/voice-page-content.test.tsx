@@ -1,23 +1,28 @@
-import { customRenderAsync, screen } from '@platform/testing/custom-render';
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import {
+  customRenderAsync,
+  screen,
+  within,
+} from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
-import userEvent from '@testing-library/user-event';
+import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 
 import { VoicePageContent } from './voice-page-content';
 
-const ADVANCED_SUMMARY = 'Advanced — 7 curated strings, 2 groups';
+const { EN, DE } = LOCALE_ISO_CODES;
 
-const openAdvanced = async () => {
-  await userEvent.setup().click(screen.getByText(ADVANCED_SUMMARY));
-};
-
-const { getSiteConfigMock } = vi.hoisted(() => ({
+const { getSiteConfigMock, selectLiveLocalesMock } = vi.hoisted(() => ({
   getSiteConfigMock: vi.fn(),
+  selectLiveLocalesMock: vi.fn(),
 }));
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
-  queries: { siteConfig: { getSiteConfig: getSiteConfigMock } },
+  queries: {
+    siteConfig: { getSiteConfig: getSiteConfigMock },
+    tenants: { selectLiveLocales: selectLiveLocalesMock },
+  },
 }));
 
 vi.mock('@platform/server/auth/auth');
@@ -26,60 +31,49 @@ const tenant = makeReadyTenant();
 
 const setup = customRenderAsync(VoicePageContent, { tenant });
 
+const notFoundHeading = () =>
+  within(screen.getByRole('region', { name: 'Page not found' })).getByRole(
+    'textbox',
+    { name: 'Heading' },
+  );
+
 describe(`<${VoicePageContent.name}/>`, () => {
   beforeEach(() => {
     getSiteConfigMock.mockReset();
+    selectLiveLocalesMock.mockReset();
+    selectLiveLocalesMock.mockReturnValue([EN]);
   });
 
-  it('shows every field blank, with no placeholder, when there is no site_config row', async () => {
+  it('shows every field at its default when there is no site_config row', async () => {
     getSiteConfigMock.mockResolvedValue(undefined);
 
     await setup();
-    await openAdvanced();
 
-    expect(
-      screen.getByRole('textbox', { name: 'Not Found Heading' }),
-    ).toHaveValue('');
-    expect(
-      screen.getByRole('textbox', { name: 'Not Found Heading' }),
-    ).not.toHaveAttribute('placeholder');
+    expect(notFoundHeading()).toHaveValue('');
+    expect(screen.getAllByText('Default')).toHaveLength(11);
   });
 
-  it('renders a previously-saved override as the field value', async () => {
+  it("renders the default language's saved override as the field value", async () => {
     getSiteConfigMock.mockResolvedValue({
-      voiceOverrides: { notFoundHeading: 'Nothing here' },
-    });
-
-    await setup();
-    await openAdvanced();
-
-    expect(
-      screen.getByRole('textbox', { name: 'Not Found Heading' }),
-    ).toHaveValue('Nothing here');
-  });
-
-  it('renders a stored rich (Portable Text) override as its plain text, not blank', async () => {
-    getSiteConfigMock.mockResolvedValue({
-      voiceOverrides: {
-        blogListEmpty: [
-          {
-            _type: 'block',
-            _key: 'k1',
-            style: 'normal',
-            children: [
-              { _type: 'span', _key: 's1', text: 'Nothing published yet.' },
-            ],
-          },
-        ],
+      ...defaultLookFormValues(),
+      voiceOverridesByLocale: {
+        [EN]: { notFoundHeading: 'Nothing here' },
+        [DE]: { notFoundHeading: 'Nichts hier' },
       },
     });
 
     await setup();
-    await openAdvanced();
 
-    expect(
-      screen.getByRole('textbox', { name: 'Blog List Empty' }),
-    ).toHaveValue('Nothing published yet.');
+    expect(notFoundHeading()).toHaveValue('Nothing here');
+  });
+
+  it('offers a language switcher over the live languages', async () => {
+    getSiteConfigMock.mockResolvedValue(undefined);
+    selectLiveLocalesMock.mockReturnValue([EN, DE]);
+
+    await setup();
+
+    expect(screen.getByRole('group', { name: 'Language' })).toBeVisible();
   });
 
   it('passes the archived date through for a deprovisioned tenant', async () => {

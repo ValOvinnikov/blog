@@ -134,6 +134,12 @@ Overridden here:
   can only find by `data-testid` is one whose markup is wrong, not one that
   needs a test id — the fixed `data-testid` is reserved for a genuinely
   roleless element (a media slot, a decorative wrapper).
+- **A DOM id comes from `useId()`** (or from the Base UI part that generates
+  it), never a hand-written string (`id="tenant-name"`) or a template built
+  from content (`` `cta-${key}` ``) — both collide when the component renders
+  twice. A suffix on a `useId` base (`` `${id}-hint` ``) is fine. When another
+  component needs the id, such as an in-page `#id` link, generate it in their
+  common owner and pass it down.
 - Layer-specific rules: `ui-library-practices` → "Accessibility rules",
   `platform-app.md` → forms and Base UI.
 
@@ -150,3 +156,4 @@ Overridden here:
 | `open?: boolean`, `image?: false`                    | `isOpen?: boolean`, `hasOwnImage?: boolean`  |
 | `'use client'` at the top of a page                  | Move it to the leaf that needs the hook      |
 | `data-testid` on a button so the test can find it    | Give the button its accessible name          |
+| `id="field-name"` or ``id={`cta-${key}`}``           | `const id = useId()`                         |

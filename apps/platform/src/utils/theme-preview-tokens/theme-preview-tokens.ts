@@ -12,6 +12,7 @@ import {
   type TRadiusScale,
   type TThemeDeclarations,
 } from '@blog/config';
+import type { CSSProperties } from 'react';
 
 const HUE_MIN = 0;
 const HUE_MAX = 360;
@@ -25,7 +26,7 @@ export const buildLogoPreviewTokens = (hue: number, isDark: boolean) => {
   return formatOklchRamp(isDark ? LOGO_RAMP_DARK : LOGO_RAMP_LIGHT, hue);
 };
 
-export const buildShapePreviewTokens = (
+const buildShapePreviewTokens = (
   radiusScale: TRadiusScale,
   density: TDensity,
   cardStyle: TCardStyle,
@@ -36,6 +37,24 @@ export const buildShapePreviewTokens = (
     ...CARD_STYLE_DECLARATIONS[cardStyle],
   };
 };
+
+export type TThemePreviewValues = {
+  accentHue: number;
+  logoHue: number | undefined;
+  radiusScale: TRadiusScale;
+  density: TDensity;
+  cardStyle: TCardStyle;
+};
+
+export const buildThemePreviewStyle = (
+  { accentHue, logoHue, radiusScale, density, cardStyle }: TThemePreviewValues,
+  isDark: boolean,
+): CSSProperties =>
+  ({
+    ...buildAccentPreviewTokens(accentHue, isDark),
+    ...buildLogoPreviewTokens(logoHue ?? accentHue, isDark),
+    ...buildShapePreviewTokens(radiusScale, density, cardStyle),
+  }) as CSSProperties;
 
 /**
  * The accent-hue slider's track gradient, sampled from the light-mode swatch

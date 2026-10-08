@@ -2,6 +2,7 @@ import {
   accentHueGradient,
   buildAccentPreviewTokens,
   buildLogoPreviewTokens,
+  buildThemePreviewStyle,
 } from './theme-preview-tokens';
 
 describe('buildAccentPreviewTokens', () => {
@@ -54,5 +55,40 @@ describe(accentHueGradient, () => {
     expect(gradient).toContain('oklch(0.53 0.17 0)');
     expect(gradient).toContain('oklch(0.53 0.17 180)');
     expect(gradient).toContain('oklch(0.53 0.17 360)');
+  });
+});
+
+describe('buildThemePreviewStyle', () => {
+  it('colours the logo ramp from the accent hue when no logo hue is set', () => {
+    const style = buildThemePreviewStyle(
+      {
+        accentHue: 28,
+        logoHue: undefined,
+        radiusScale: 'SM',
+        density: 'COMPACT',
+        cardStyle: 'OUTLINED',
+      },
+      false,
+    );
+
+    expect(style).toMatchObject(buildLogoPreviewTokens(28, false));
+  });
+
+  it('switches every ramp to its dark values in dark mode', () => {
+    const style = buildThemePreviewStyle(
+      {
+        accentHue: 250,
+        logoHue: 120,
+        radiusScale: 'SM',
+        density: 'COMPACT',
+        cardStyle: 'OUTLINED',
+      },
+      true,
+    );
+
+    expect(style).toMatchObject({
+      ...buildAccentPreviewTokens(250, true),
+      ...buildLogoPreviewTokens(120, true),
+    });
   });
 });

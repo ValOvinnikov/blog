@@ -466,31 +466,91 @@
   },
   "voiceSettings": {
     "heading": "Voice",
-    "description": "The words the site puts in its own mouth. Every field already has a sensible default.",
+    "description": "Reword the site's page-level messages. Every field has a default, so change only what you want to sound like you.",
+    "fixedCopyNote": "Buttons, menus and labels are translated for you and stay the same on every site, so they aren't listed here.",
+    "editingLanguageNote": "Editing {language} — other languages keep their own text.",
+    "languageAriaLabel": "Language",
+    "languageOption": "{language} · {count, plural, =0 {all default} other {# customised}}",
+    "surfaceCustomisedCount": "{count, plural, =0 {All default} other {# customised}}",
     "saveButton": "Save changes",
     "savingButton": "Saving…",
-    "alertSuccess": "Saved voiceOverrides.",
+    "alertSuccess": "Voice saved.",
     "alertError": "Couldn't save — try again.",
-    "basicHeading": "Basic",
-    "basicAlert": "Nothing required here. The site already has sensible default wording. Most tenants never open the Advanced fields below.",
-    "advancedSummary": "Advanced — 7 curated strings, 2 groups",
-    "advancedOverrideInfo": "Every field is an override. Leave one blank to use the site's own default wording — clearing a field reverts to that default, it does not set the string to empty."
+    "badgeDefault": "Default",
+    "badgeCustomised": "Customised",
+    "unsaved": "Unsaved",
+    "reset": "Reset",
+    "keepPlaceholder": "Keep <code>{token}</code> — the site fills it in.",
+    "draftFieldLabel": "{surface} — {field} ({language})"
   },
-  "voiceFieldGroup": {
-    "fieldCount": "{count, plural, one {# field} other {# fields}}"
+  "voiceSurfaces": {
+    "NOT_FOUND": "Page not found",
+    "ERROR": "Error page",
+    "ARCHIVE": "Empty lists",
+    "BOOKMARKS": "Bookmarks"
   },
-  "voiceFieldGroups": {
-    "notFoundPage": "404 page",
-    "emptyStates": "Empty states"
+  "voiceSurfaceDescriptions": {
+    "NOT_FOUND": "Shown at any address that doesn't exist",
+    "ERROR": "Shown when a page fails to load",
+    "ARCHIVE": "Shown when a list has nothing in it yet. Pick one to edit it.",
+    "BOOKMARKS": "A reader's saved posts, before they save any"
+  },
+  "voiceSpecimen": {
+    "showPreview": "Show preview",
+    "hidePreview": "Hide preview",
+    "lists": {
+      "blogList": {
+        "eyebrow": "Blog",
+        "heading": "All posts",
+        "count": "0 posts"
+      },
+      "topic": {
+        "eyebrow": "Topic",
+        "heading": "Design",
+        "count": "0 posts"
+      },
+      "tag": {
+        "eyebrow": "Tag",
+        "heading": "Typography",
+        "count": "0 posts"
+      },
+      "topics": {
+        "eyebrow": "Browse",
+        "heading": "Topics",
+        "count": "0 topics"
+      },
+      "tags": {
+        "eyebrow": "Browse",
+        "heading": "Tags",
+        "count": "0 tags"
+      }
+    }
   },
   "voiceFieldLabels": {
-    "notFoundHeading": "Not Found Heading",
-    "notFoundSupportingText": "Not Found Supporting Text",
-    "blogListEmpty": "Blog List Empty",
-    "topicEmpty": "Topic Empty",
-    "tagEmpty": "Tag Empty",
-    "topicsEmpty": "Topics Empty",
-    "bookmarksEmpty": "Bookmarks Empty"
+    "blogListEmpty": "Blog index",
+    "topicEmpty": "Topic page",
+    "tagEmpty": "Tag page",
+    "topicsEmpty": "Topics index",
+    "tagsEmpty": "Tags index",
+    "notFoundEyebrow": "Eyebrow",
+    "notFoundHeading": "Heading",
+    "notFoundSupportingText": "Supporting text",
+    "localeErrorTitle": "Heading",
+    "localeErrorDescription": "Description",
+    "bookmarksEmpty": "Empty bookmarks"
+  },
+  "voiceFieldHints": {
+    "blogListEmpty": "The blog index, before anything is published",
+    "topicEmpty": "A topic with no posts yet",
+    "tagEmpty": "A tag with no posts yet",
+    "topicsEmpty": "The topics index, before any topic exists",
+    "tagsEmpty": "The tags index, before any tag exists",
+    "notFoundEyebrow": "Small label above the heading",
+    "notFoundHeading": "Also the browser tab title",
+    "notFoundSupportingText": "Below the heading",
+    "localeErrorTitle": "The page's main heading",
+    "localeErrorDescription": "Below the heading",
+    "bookmarksEmpty": "The bookmarks page, before anything is saved"
   },
   "addTenantWizard": {
     "heading": "Add tenant",

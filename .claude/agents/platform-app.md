@@ -196,6 +196,15 @@ because this app is almost entirely forms.
   is the same call this repo already made in #1157. If a control genuinely
   repeats across admin pages later, extracting it then is mechanical; predicting
   it now is not.
+- **A control uses its Base UI part when one exists,** directly or through
+  the shared primitive built on it (`FormField`, `Disclosure`, `Button`). A
+  labelled input is a `Field` (Label, Description, Error) around `Input` or
+  `Field.Control`, which also generates and wires its ids; an expandable
+  section is a `Collapsible`; a choice list is a `Select`; a formatting bar is
+  a `Toolbar` with `Toggle`s; a form is a `Form`. A raw `<label>`, `<select>`,
+  `<details>` or a `<button>` outside the shared `Button` gets none of Base
+  UI's keyboard and ARIA handling. The file `<input>` and `<table>` have no
+  Base UI part and stay native.
 - Base UI parts are already marked `'use client'` upstream, so importing one
   makes the importing component a client component. Keep that boundary at the
   leaf — a form control, not a whole page.
@@ -481,11 +490,18 @@ them to fix these.
   no robots, no feeds. This app should not be indexed.
 - **Voice settings edit the site copy registered in `@blog/config`'s
   `VOICE_FIELDS`.**
-  - The page submits its own field list today
-    (`src/utils/voice-fields/voice-fields.ts`).
-  - `upsertSiteConfig` (`@blog/db`) validates the submission against the
-    registry and throws on an unregistered key. So a field that leaves the
-    registry leaves that list in the same PR.
+  - The page renders straight from the registry
+    (`src/utils/voice-draft/voice-draft.ts`); it keeps no field list of its
+    own. A new field needs a label and hint in all five platform catalogs
+    (`voiceFieldLabels`, `voiceFieldHints`), which a test enforces.
+  - Each surface's specimen lives in `site-preview/voice-specimen/` and places
+    every field through a `Record<TVoiceFieldId, …>` map, so a registered
+    field with no place fails type-check. Wrap a field's specimen text in
+    `VoiceKeyFrame` (`data-voice-key`) for the focus outline; never widen a
+    `@blog/ui` prop for it.
+  - Rich values render through `site-preview/voice-rich-text/`, which handles
+    exactly `VOICE_PORTABLE_TEXT_SCHEMA`'s marks; the platform may not
+    import `apps/web`'s Portable Text renderer.
   - Which strings are editable is the user's decision (CLAUDE.md "Check for
     Voice candidates").
   - The platform's own UI copy is never Voice.

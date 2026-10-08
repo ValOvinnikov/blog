@@ -1409,9 +1409,10 @@ reaches bounded cards and media frames but not item cards.
 static values, so a site with no saved look renders as the defaults; `density` does not touch
 Tailwind's base `--spacing`, so control sizes stay fixed. The ramp, radius,
 density and card-style values live in `@blog/config`'s theme declaration tables;
-`apps/platform`'s Look preview reads them to set the same tokens inline on
-its preview surface, which also carries the `dark` class so the tenant's
-dark ramp wins over `theme.css`'s static `.dark` values. `apps/web`'s
+`apps/platform`'s Look preview and Voice specimens read them (through
+`theme-preview-tokens`) to set the same tokens inline on their preview
+surface, which also carries the `dark` class so the tenant's dark ramp wins
+over `theme.css`'s static `.dark` values. `apps/web`'s
 `buildThemeStyleBlock` reads the same tables. The
 Look page's Shape card sets the card style (Accent bar or Outlined)
 beside radius and density; picking a preset re-seeds it from
@@ -1585,37 +1586,66 @@ language's catalog ← the tenant's overrides for that same language, on every
 page and for every language the tenant serves; a language with no override
 for a field keeps that language's catalog default. There
 is no preset layer: a preset is a _look_, and carries no copy. The `preset`
-and `voiceOverrides` still come from the same `site_config` row and the same
+and the Voice overrides come from the same `site_config` row and the same
 cached read as theme (`get-site-config.ts`, tenant-scoped tag) — one row
 backs both. The `voice_overrides` column holds one map per language,
 `{ [locale]: { [fieldId]: value } }` (`voiceOverridesByLocale` in
 `@blog/db`); a save may carry several languages, replaces the map of each
 one it carries, and leaves the others as stored. `apps/web` reads
-`voiceOverridesByLocale` directly. Until platform reads per language, `getSiteConfig` also
-returns the tenant's default-language map as a flat `voiceOverrides`.
+`voiceOverridesByLocale` directly, and so does the platform's Voice page;
+`getSiteConfig` still returns a deprecated flat `voiceOverrides` (the default
+language's map) that nothing reads.
 `upsertSiteConfig` accepts only `voiceOverridesByLocale`, and the platform's
-Voice save sends every language with unsaved edits in that one call, so a
-save stores all of them or none. Each map keys fields as flat camelCase ids (e.g.
-`notFoundHeading`), matching `apps/platform`'s Voice tab
-(`apps/platform/src/utils/voice-fields/voice-fields.ts`);
-`apps/web/src/utils/apply-voice-overrides/apply-voice-overrides.ts` maps each
-flat key back to its nested message path and applies it last, cloning only
-the objects along that path so untouched namespaces keep referencing the
-cached messages module instead of being mutated in place. Those three lists —
-the Voice tab's fields, the apply map, and `@blog/db`'s `voiceOverridesSchema`
-— are what the runtime reads, and they are hand-duplicated, so a key has to be
-added to all three to take effect.
+Voice save sends every language in one call, so a save stores all of them or
+none.
 
 `@blog/config`'s `VOICE_FIELDS` registry (`packages/config/src/voice/`) is the
-declaration those three converge on: it names every editable string with its
-storage id, catalog path, kind and preview surface, alongside a copy of the
-neutral catalog. The editable set is bounded to page-level prose an editor
-writes in the site's own voice — the archive and bookmarks empty states and
-the 404 and error pages (surfaces `ARCHIVE`, `BOOKMARKS`, `NOT_FOUND`,
-`ERROR`); buttons, labels, statuses, enforced-behaviour copy, third-party
-names and accessibility-only text stay fixed in the catalog. Its co-located test asserts every registry path resolves in
-the catalog and every catalog key is either registered or explicitly listed as
-fixed, so a new string cannot enter the catalog without being classified.
+one declaration of what a tenant may reword: every editable string with its
+storage id (flat camelCase, e.g. `notFoundHeading`), catalog path, kind
+(`TEXT`, `MULTILINE` or `RICH`), `VOICE_SURFACE`, required `{name}`
+placeholders and length cap, alongside the neutral catalog
+(`SITE_MESSAGES_BY_LOCALE`). Everything else reads it rather than keeping a
+list of its own: `@blog/db` generates the override validation from it (a
+`RICH` value is checked against `VOICE_PORTABLE_TEXT_SCHEMA` — bold, italic
+and links only — and a failure returns per-language `fieldErrorsByLocale`),
+`apps/web`'s `resolveTenantMessages` sets each `TEXT`/`MULTILINE` override at
+its registry path, and the platform's Voice page renders one control per
+field. The editable set is bounded to page-level prose an editor writes in
+the site's own voice: 11 fields on the archive and bookmarks empty states
+and the 404 and error pages (surfaces `ARCHIVE`, `BOOKMARKS`, `NOT_FOUND`,
+`ERROR`), eight of them `RICH`; buttons, labels, statuses, enforced-behaviour
+copy, third-party names and accessibility-only text stay fixed in the catalog
+(`VOICE_FIXED_KEYS`). Its co-located test asserts every registry path
+resolves in the catalog and every catalog key is either registered or
+explicitly listed as fixed, so a new string cannot enter the catalog without
+being classified.
+
+`RICH` values cannot be `next-intl` messages. The tenant layout mounts a
+`VoiceRichProvider` holding each rich field's resolved Portable Text (the
+override, else the catalog string as one paragraph), read on the server with
+`getVoiceRich(id)` and on the client with `useVoiceRich(id)` and rendered by
+the site's `PortableText`. Page metadata derives from the visible copy, so
+the 404's `<title>` and description follow its Voice heading and supporting
+text; there are no metadata-only Voice fields.
+
+**The Voice page** (`apps/platform`) edits one language at a time through a
+switcher over the tenant's live languages, each showing its customised count.
+It is one column of four cards, one per surface. Each card holds its fields
+(the control for the field's kind, the catalog default as placeholder, a
+Default/Customised badge, Reset, and a "Keep `{name}`" note) beside a
+specimen of that surface. The empty lists show as compact rows with one
+open at a time. Saving goes through the settings save bar, which shows
+`fieldErrorsByLocale` inline. The specimens live in
+`apps/platform/src/components/features/site-preview/`, the one directory the
+platform may import `@blog/ui` from. They render the same atoms the site
+passes that copy into, themed through `theme-preview-tokens` and the tenant's
+fonts with the Look preview's light/dark toggle, and fed from the form's
+draft. Each field's text sits in a `data-voice-key` wrapper that outlines
+while the field has focus. A `Record<TVoiceFieldId, …>` placement map means
+registering a field without placing it fails type-check. Fidelity is
+best-effort: the layout around the atoms is a platform copy with nothing to
+catch drift, the same trade the Look sample accepts. On a phone each card
+stacks its fields over a "Show preview" toggle.
 
 A fetch failure, or a tenant with no `site_config` row, yields the
 neutral base messages with no overrides applied — never a thrown error or an
@@ -1794,8 +1824,8 @@ than showing a false warning. Because it is read on each Studio load,
 turning a feature on clears the warning on the next load.
 
 **Curated UI copy lives in Voice, not on modules.** Empty-state and other
-curated UI strings have exactly one authorable home: the tenant's
-`site_config.voiceOverrides` in Postgres (`blogListEmpty`, `topicEmpty`,
+curated UI strings have exactly one authorable home: the tenant's per-language
+`site_config.voice_overrides` in Postgres (`blogListEmpty`, `topicEmpty`,
 `tagEmpty`, …), edited in the platform's Voice page and applied via the merge
 above. The `settings_voice` Studio singleton that previously held them is
 deleted — it had no read path after the Postgres cutover.

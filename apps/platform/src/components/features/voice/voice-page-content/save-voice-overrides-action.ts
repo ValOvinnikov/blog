@@ -2,17 +2,19 @@
 
 import { PRESET_ID, PRESET_REGISTRY } from '@blog/config/constants';
 import { queries } from '@blog/db';
+import type { TVoiceOverridesByLocaleInput } from '@blog/db/queries/site-config';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { logger } from '@platform/utils/logger/logger';
-import type { TVoiceOverridesByLocale } from '@platform/utils/voice-fields/voice-fields';
+import type { TVoiceFieldErrorsByLocale } from '@platform/utils/voice-draft/voice-draft';
 
-export type TSaveVoiceOverridesResult = { ok: true } | { ok: false };
+export type TSaveVoiceOverridesResult =
+  { ok: true } | { ok: false; fieldErrorsByLocale?: TVoiceFieldErrorsByLocale };
 
 // A Voice-only save round-trips the theme columns, which upsertSiteConfig writes on every call.
 export const saveVoiceOverridesAction = async (
   tenantId: string,
-  overridesByLocale: TVoiceOverridesByLocale,
+  overridesByLocale: TVoiceOverridesByLocaleInput,
 ): Promise<TSaveVoiceOverridesResult> => {
   const { tenant } = await requireTenantMembership(tenantId);
 
@@ -34,11 +36,7 @@ export const saveVoiceOverridesAction = async (
     });
 
     if (!result.ok) {
-      logger.warn('site_config.voice_save_rejected', {
-        tenantId: tenant.id,
-        fieldErrorsByLocale: result.fieldErrorsByLocale,
-      });
-      return { ok: false };
+      return { ok: false, fieldErrorsByLocale: result.fieldErrorsByLocale };
     }
 
     await revalidateSiteConfig(tenant.id);
