@@ -24,11 +24,15 @@ export {
   type TDocumentValidationAlertInput,
 } from './templates/operator';
 export {
-  buildTenantEmail,
-  type TBuildTenantEmailInput,
+  buildMagicLinkEmail,
+  type TMagicLinkEmailInput,
+  type TMagicLinkEmailContent,
+  buildInviteMagicLinkEmail,
+  type TMagicLinkInviteEmailInput,
   buildNewsletterConfirmationEmail,
   type TNewsletterConfirmationEmailInput,
   type TNewsletterConfirmationEmailContent,
+  type TTenantEmailIdentity,
 } from './templates/tenant';
 export { sendEmail, type TSendEmailInput } from './transport/send-email';
 export { isValidEmailAddress } from './validation';

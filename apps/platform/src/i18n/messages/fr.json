@@ -370,6 +370,7 @@
     "description": "S'applique à tous les e-mails envoyés par ce locataire. Les champs vides reprennent la valeur par défaut du produit.",
     "senderNameLabel": "Nom de l'expéditeur",
     "senderNameHint": "Le nom affiché dans l'adresse d'expédition — indépendant du titre du site.",
+    "senderNameInvalidError": "C'est le nom que voient les destinataires, pas une adresse e-mail. Saisissez un nom comme Acme Co, sans < > \" , ; ni @.",
     "replyToLabel": "Adresse de réponse",
     "replyToHint": "L'adresse vers laquelle sont dirigées les réponses aux e-mails du locataire.",
     "footerAddressLabel": "Adresse postale du pied de page",
@@ -419,11 +420,6 @@
       "MAGIC_LINK": "Envoyé lorsqu'une personne se connecte au site de ce locataire.",
       "TENANT_INVITE": "Envoyé lorsqu'une personne est invitée à rejoindre l'équipe de ce locataire.",
       "NEWSLETTER_CONFIRMATION": "Envoyé pour confirmer un abonnement à la newsletter."
-    },
-    "previewActionLabel": {
-      "MAGIC_LINK": "Se connecter",
-      "TENANT_INVITE": "Accepter l'invitation",
-      "NEWSLETTER_CONFIRMATION": "Confirmer l'abonnement"
     }
   },
   "portableTextEditorToolbar": {

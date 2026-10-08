@@ -5,7 +5,11 @@ import {
   type TLocaleIsoCode,
 } from '@blog/config/constants';
 import { EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE } from '@blog/db/constants';
-import { sendEmail } from '@blog/email';
+import {
+  buildInviteMagicLinkEmail,
+  buildMagicLinkEmail,
+  sendEmail,
+} from '@blog/email';
 import type { EmailConfig } from 'next-auth/providers/email';
 
 import { applyTenantSenderName } from './apply-tenant-sender-name';
@@ -13,8 +17,6 @@ import {
   findPendingInviteTenants,
   type TPendingInviteTenant,
 } from './find-pending-invite-tenants';
-import { buildMagicLinkEmail } from './magic-link-email';
-import { buildInviteMagicLinkEmail } from './magic-link-invite-email';
 import { readRecipientLocale } from './read-recipient-locale';
 import { resolveMagicLinkEmailSettings } from './resolve-magic-link-email-settings';
 import { resolveMagicLinkFromAddress } from './resolve-magic-link-from-address';

@@ -6,12 +6,10 @@ export type TEmailTemplatePreviewProps = {
 };
 
 /**
- * Renders the authored subject and body through the same read and
- * serializer the real send path uses, so that copy matches what goes out —
- * but the surrounding structure (actions, headers, brand fallback) is
- * generic and doesn't reproduce what any one template type actually sends.
- * Sandboxed: the HTML is a full document with its own inline styles, not
- * something to compose with the admin panel's own CSS.
+ * Shows the HTML body only: sending headers (`List-Unsubscribe`), the
+ * tenant-level logo and footer address, and the unbranded fallback used when
+ * no tenant resolves for a host are not represented. Sandboxed, because the
+ * HTML is a full document with its own inline styles.
  */
 export const EmailTemplatePreview = ({
   html,

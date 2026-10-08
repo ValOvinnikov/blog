@@ -16,7 +16,7 @@ export const SectionNavigation = ({
   className,
 }: TSectionNavigationProps) => {
   const t = useTranslations('sectionNavigation');
-  const { root, pages } = sectionNavigation;
+  const { title: sectionTitle, root, pages } = sectionNavigation;
   const sectionPages = [
     { ...root, level: 1 as const },
     ...pages.map((page) => ({ ...page, level: 2 as const })),
@@ -35,7 +35,7 @@ export const SectionNavigation = ({
       className={className}
       items={items}
       activeKey={currentPage && routes.landingPage(currentPage.path)}
-      label={t('label')}
+      label={sectionTitle ?? t('label')}
       ariaCurrent="page"
     />
   );

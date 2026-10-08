@@ -1,6 +1,6 @@
 import { EMAIL_TEMPLATE_TYPE } from '@blog/config';
-import type { TTenantEmailBrand } from '@blog/email/html';
 import { customRender, screen, waitFor } from '@platform/testing/custom-render';
+import { TENANT_EMAIL_BRAND as BRAND } from '@platform/testing/tenant-email-brand';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { EmailTemplateEditor } from './email-template-editor';
@@ -23,20 +23,6 @@ vi.mock('@platform/server/email/upload-email-logo-action', () => ({
 vi.mock('@platform/server/email/clear-email-logo-action', () => ({
   clearEmailLogoAction: vi.fn(),
 }));
-
-const BRAND: TTenantEmailBrand = {
-  surface: '#ffffff',
-  surface2: '#fbfbfd',
-  border: '#e5e7eb',
-  text: '#111827',
-  textMuted: '#6b7280',
-  brandPrimary: '#4f46e5',
-  brandPrimarySolid: '#4338ca',
-  brandPrimaryContrast: '#ffffff',
-  logo1: '#4f46e5',
-  logo2: '#818cf8',
-  logo3: '#c7d2fe',
-};
 
 const BODY_WITH_TEXT = [
   {
