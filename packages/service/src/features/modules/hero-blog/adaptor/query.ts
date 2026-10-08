@@ -3,6 +3,7 @@ import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
 import { FEATURED_POST_FILTER } from '@blog/service/shared/expressions/post/featured-post';
 import { ctaSecondaryButtonFragment } from '@blog/service/shared/fragments/cta/cta-button';
 import { localizedImageWithAltFragment } from '@blog/service/shared/fragments/image/localized-image-with-alt';
+import { optionalImage } from '@blog/service/shared/fragments/image/optional-image';
 import { moduleHeroLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { postCardFragment } from '@blog/service/shared/fragments/post/post';
@@ -38,10 +39,7 @@ export const heroBlogModuleQuery = q
       )
       .nullable(true),
     eyebrow: getLocalizedField(sub, 'eyebrow'),
-    image: sub
-      .field('image')
-      .project(localizedImageWithAltFragment)
-      .nullable(true),
+    image: optionalImage(sub, 'image', localizedImageWithAltFragment),
     primaryActionLabel: getLocalizedField(sub, 'primaryActionLabel').notNull(),
     primaryActionAppearance: sub.field('primaryActionAppearance').notNull(),
     secondaryAction: sub

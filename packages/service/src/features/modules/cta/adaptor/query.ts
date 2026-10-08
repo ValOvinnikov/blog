@@ -2,6 +2,7 @@ import { q, type TModuleQueryParams } from '@blog/service/sanity/query/query';
 import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
 import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
 import { localizedImageWithAltFragment } from '@blog/service/shared/fragments/image/localized-image-with-alt';
+import { optionalImage } from '@blog/service/shared/fragments/image/optional-image';
 import { moduleCtaLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
@@ -22,10 +23,7 @@ export const ctaModuleQuery = q
       .project(moduleHeadingBlockFragment)
       .notNull(),
     content: getLocalizedPortableTextBlock(sub, 'content'),
-    image: sub
-      .field('image')
-      .project(localizedImageWithAltFragment)
-      .nullable(true),
+    image: optionalImage(sub, 'image', localizedImageWithAltFragment),
     contentPositionSplit: sub.field('contentPositionSplit').nullable(true),
     contentPositionBanner: sub.field('contentPositionBanner').nullable(true),
     ...moduleContentAlignmentFragment,

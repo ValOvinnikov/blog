@@ -1,6 +1,7 @@
 import { q } from '@blog/service/sanity/query/query';
 import { pageHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/page-heading-block';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
+import { optionalImage } from '@blog/service/shared/fragments/image/optional-image';
 import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
 
 export type TSectionPagesQueryParams = {
@@ -21,8 +22,5 @@ export const sectionPagesQuery = q
       .field('headingBlock')
       .project(pageHeadingBlockFragment)
       .notNull(),
-    image: sub
-      .field('seo.openGraph.ogImage')
-      .project(sanityImageFragment)
-      .nullable(true),
+    image: optionalImage(sub, 'seo.openGraph.ogImage', sanityImageFragment),
   }));

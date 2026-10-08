@@ -7,6 +7,7 @@ import {
 import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-buttons';
 import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
 import { localizedImageWithAltFragment } from '@blog/service/shared/fragments/image/localized-image-with-alt';
+import { optionalImage } from '@blog/service/shared/fragments/image/optional-image';
 import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document';
 import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
@@ -39,10 +40,7 @@ export const testimonialModuleQuery = q
         name: itemSub.field('name').notNull(),
         quote: getLocalizedPortableTextBlock(itemSub, 'quote').notNull(),
         role: getLocalizedField(itemSub, 'role'),
-        image: itemSub
-          .field('image')
-          .project(localizedImageWithAltFragment)
-          .nullable(true),
+        image: optionalImage(itemSub, 'image', localizedImageWithAltFragment),
         link: itemSub
           .field('link')
           .deref()

@@ -6,6 +6,7 @@ import {
 } from '@blog/service/shared/expressions/post/word-count';
 import { pageHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/page-heading-block';
 import { sanityImageFragment } from '@blog/service/shared/fragments/image/image';
+import { optionalImage } from '@blog/service/shared/fragments/image/optional-image';
 import { moduleFragment } from '@blog/service/shared/fragments/module/module';
 import {
   personCardFragment,
@@ -35,10 +36,7 @@ export const postCardFragment = q
       .notNull(),
     slug: sub.field('slug.current').notNull(),
     publishedAt: sub.field('publishedAt').notNull(),
-    heroImage: sub
-      .field('heroImage')
-      .project(sanityImageFragment)
-      .nullable(true),
+    heroImage: optionalImage(sub, 'heroImage', sanityImageFragment),
     featured: sub.field('featured').nullable(true),
     author: sub.field('author').deref().project(personCardFragment).notNull(),
     topic: sub.field('topic').deref().project(topicFragment).notNull(),
