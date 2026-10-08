@@ -23,12 +23,7 @@ export type TUseFormSubmissionResult<TValues> = {
   handleSubmit: () => Promise<boolean>;
 };
 
-/**
- * Any `setValues` call clears a previous save's status — a field edit made
- * after an alert is showing invalidates that alert, whether the edit came
- * from a form control or an independently-persisted side effect (e.g. a
- * brand-asset upload updating a URL field outside the save flow).
- */
+// Any `setValues` call clears a previous save's status, so an edit made after an alert shows dismisses it.
 export const useFormSubmission = <TValues, TResult extends { ok: boolean }>({
   initialValues,
   onSubmit,

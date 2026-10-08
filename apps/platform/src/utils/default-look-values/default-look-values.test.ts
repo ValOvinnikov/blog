@@ -22,8 +22,8 @@ describe(defaultLookFormValues, () => {
       density: DENSITY.DEFAULT,
       cardStyle: CARD_STYLE.ACCENT_BAR,
       languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
-      logoAssetUrl: undefined,
-      faviconAssetUrl: undefined,
+      logo: { url: undefined },
+      favicon: { url: undefined },
     });
   });
 });
@@ -60,8 +60,8 @@ describe(toLookFormValues, () => {
       density: DENSITY.COMPACT,
       languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
       cardStyle: CARD_STYLE.OUTLINED,
-      logoAssetUrl: 'https://example.blob.vercel-storage.com/logo.png',
-      faviconAssetUrl: 'https://example.blob.vercel-storage.com/favicon.png',
+      logo: { url: 'https://example.blob.vercel-storage.com/logo.png' },
+      favicon: { url: 'https://example.blob.vercel-storage.com/favicon.png' },
     });
   });
 });

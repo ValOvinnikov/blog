@@ -10,6 +10,7 @@ import {
   type TRadiusScale,
 } from '@blog/config';
 import type { TSiteConfigResult } from '@blog/db/queries/site-config';
+import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 
 export type TLookFormValues = {
   preset: TPresetId;
@@ -21,8 +22,8 @@ export type TLookFormValues = {
   density: TDensity;
   cardStyle: TCardStyle;
   languageSwitcherStyle: TLanguageSwitcherStyle;
-  logoAssetUrl: string | undefined;
-  faviconAssetUrl: string | undefined;
+  logo: TStagedImage;
+  favicon: TStagedImage;
 };
 
 export type TLookFormFieldSetter = <K extends keyof TLookFormValues>(
@@ -49,8 +50,8 @@ export const defaultLookFormValues = (): TLookFormValues => {
     density: consoleTokens.density,
     cardStyle,
     languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
-    logoAssetUrl: undefined,
-    faviconAssetUrl: undefined,
+    logo: { url: undefined },
+    favicon: { url: undefined },
   };
 };
 
@@ -67,7 +68,7 @@ export const toLookFormValues = (
     density: siteConfig.density,
     cardStyle: siteConfig.cardStyle,
     languageSwitcherStyle: siteConfig.languageSwitcherStyle,
-    logoAssetUrl: siteConfig.logoAssetUrl,
-    faviconAssetUrl: siteConfig.faviconAssetUrl,
+    logo: { url: siteConfig.logoAssetUrl },
+    favicon: { url: siteConfig.faviconAssetUrl },
   };
 };

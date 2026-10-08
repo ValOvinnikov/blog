@@ -1,19 +1,22 @@
 'use client';
 
 import { AssetUploadField } from '@platform/components/shared/asset-upload-field';
-import type { TStagedLogo } from '@platform/utils/email-draft/email-draft';
 import {
   ACCEPTED_EMAIL_LOGO_MIME_TYPES,
   quickClientEmailLogoCheck,
 } from '@platform/utils/email-logo-limits/email-logo-limits';
+import {
+  createStagingHandlers,
+  type TStagedImage,
+} from '@platform/utils/staged-image/staged-image';
 import { useTranslations } from 'next-intl';
 import type { AriaAttributes } from 'react';
 
 export type TEmailLogoFieldProps = {
   label: string;
   hint: string;
-  logo: TStagedLogo;
-  onStage: (logo: TStagedLogo) => void;
+  logo: TStagedImage;
+  onStage: (logo: TStagedImage) => void;
   isDisabled?: boolean;
   'aria-describedby'?: AriaAttributes['aria-describedby'];
 };
@@ -38,20 +41,10 @@ export const EmailLogoField = ({
       : t('tooLarge', { limit: quickError.limit });
   };
 
-  const stageFile = async (formData: FormData) => {
-    const file = formData.get('file');
-    if (!(file instanceof File)) {
-      return { ok: false as const, error: t('unexpectedError') };
-    }
-    const url = URL.createObjectURL(file);
-    onStage({ url, file });
-    return { ok: true as const, url };
-  };
-
-  const stageClear = async () => {
-    onStage({ url: undefined });
-    return { ok: true as const };
-  };
+  const { onUpload, onClear } = createStagingHandlers(
+    onStage,
+    t('unexpectedError'),
+  );
 
   return (
     <AssetUploadField
@@ -69,8 +62,8 @@ export const EmailLogoField = ({
       removeLabel={t('remove')}
       unexpectedErrorLabel={t('unexpectedError')}
       onValidateFile={validateFile}
-      onUpload={stageFile}
-      onClear={stageClear}
+      onUpload={onUpload}
+      onClear={onClear}
       onChange={() => undefined}
       isDisabled={isDisabled}
       aria-describedby={ariaDescribedBy}

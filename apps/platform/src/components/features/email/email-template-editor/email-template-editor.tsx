@@ -9,11 +9,9 @@ import { FormField } from '@platform/components/shared/form-field';
 import { FormTextInput } from '@platform/components/shared/form-text-input';
 import { PortableTextEditor } from '@platform/components/shared/portable-text-editor';
 import { StatusBadge } from '@platform/components/shared/status-badge';
-import type {
-  TEmailCopyDraft,
-  TStagedLogo,
-} from '@platform/utils/email-draft/email-draft';
+import type { TEmailCopyDraft } from '@platform/utils/email-draft/email-draft';
 import { isBlankPortableTextValue } from '@platform/utils/portable-text-schema/portable-text-schema';
+import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
 
@@ -24,9 +22,9 @@ export type TEmailTemplateEditorProps = {
   languageName: string;
   copy: TEmailCopyDraft;
   fallback: { subject: string; body: TEmailTemplateBlock[] };
-  logo: TStagedLogo;
+  logo: TStagedImage;
   onCopyChange: (copy: TEmailCopyDraft) => void;
-  onLogoStage: (logo: TStagedLogo) => void;
+  onLogoStage: (logo: TStagedImage) => void;
   isDisabled: boolean;
   archivedNoticeId?: string;
 };

@@ -331,6 +331,8 @@
     "shapeHeading": "Form",
     "shapeDescription": "Ecken, Abstände und wie Karten gerahmt sind.",
     "brandHeading": "Marke",
+    "brandImagePicked": "Neues Bild, noch nicht hochgeladen",
+    "brandImageUnchanged": "Kein neues Bild",
     "editTab": "Bearbeiten",
     "previewTab": "Vorschau",
     "viewTabsAriaLabel": "Ansicht"
@@ -363,7 +365,8 @@
     "uploading": "Wird hochgeladen…",
     "replace": "{label} ersetzen",
     "upload": "{label} hochladen",
-    "remove": "Entfernen"
+    "remove": "Entfernen",
+    "pickAgain": "Ihr wiederhergestellter Entwurf enthielt ein neues Bild ({label}), das nicht erhalten blieb — bitte wählen Sie es erneut aus."
   },
   "emailForm": {
     "pageHeading": "E-Mail",
