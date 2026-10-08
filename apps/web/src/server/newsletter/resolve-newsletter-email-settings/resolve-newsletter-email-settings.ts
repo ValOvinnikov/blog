@@ -1,6 +1,5 @@
 import {
   EMAIL_TEMPLATE_TYPE,
-  isLocaleIsoCode,
   LOCALE_ISO_CODES,
   type TLocaleIsoCode,
 } from '@blog/config/constants';
@@ -8,7 +7,6 @@ import { EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE, queries } from '@blog/db';
 import { isValidEmailAddress, type TPortableTextContent } from '@blog/email';
 import { resolveNewsletterFromAddress } from '@web/server/newsletter/newsletter-from-address/newsletter-from-address';
 import { logger } from '@web/utils/logger/logger';
-import { getLocale } from 'next-intl/server';
 
 export type TNewsletterEmailSettings = {
   subject: string;
@@ -71,18 +69,11 @@ const getEmailTemplateSafely = async (
   }
 };
 
-const getSubscribedPageLocale = async (): Promise<
-  TLocaleIsoCode | undefined
-> => {
-  const locale = await getLocale();
-  return isLocaleIsoCode(locale) ? locale : undefined;
-};
-
 export const resolveNewsletterEmailSettings = async (
   tenantId: string,
   configuredFromAddress: string | undefined,
+  locale: TLocaleIsoCode | undefined,
 ): Promise<TNewsletterEmailSettings> => {
-  const locale = await getSubscribedPageLocale();
   const [emailConfig, template] = await Promise.all([
     getEmailConfigSafely(tenantId),
     getEmailTemplateSafely(tenantId, locale),

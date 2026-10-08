@@ -1,5 +1,5 @@
 import { TENANT_STATUS } from '@blog/db';
-import { getLocale } from 'next-intl/server';
+import { getTranslations } from 'next-intl/server';
 
 export {};
 
@@ -20,6 +20,15 @@ vi.mock('@blog/db', () => ({
 vi.mock('@web/server/tenant/request-tenant/request-tenant', () => ({
   resolveRequestTenant: resolveRequestTenantMock,
 }));
+
+const { resolveNewsletterLinkLocaleMock } = vi.hoisted(() => ({
+  resolveNewsletterLinkLocaleMock: vi.fn(),
+}));
+
+vi.mock(
+  '@web/server/newsletter/newsletter-link-locale/newsletter-link-locale',
+  () => ({ resolveNewsletterLinkLocale: resolveNewsletterLinkLocaleMock }),
+);
 
 const TENANT_ID = 'tenant-1';
 
@@ -43,6 +52,7 @@ describe('GET /api/newsletter/unsubscribe', () => {
     );
     unsubscribeByTokenMock.mockReset();
     resolveRequestTenantMock.mockReset();
+    resolveNewsletterLinkLocaleMock.mockResolvedValue('EN');
     ({ GET } = await import('./route'));
   });
 
@@ -74,12 +84,22 @@ describe('GET /api/newsletter/unsubscribe', () => {
     expect(resolveRequestTenantMock).not.toHaveBeenCalled();
   });
 
-  it('declares <html lang> as the resolved request locale, not a hardcoded value', async () => {
-    vi.mocked(getLocale).mockResolvedValueOnce('fr');
-    const response = await GET(request);
+  it('renders in the language the link carries and keeps it on the form', async () => {
+    resolveNewsletterLinkLocaleMock.mockResolvedValue('FR');
+    const response = await GET(
+      new Request(
+        'https://example.com/api/newsletter/unsubscribe?token=unsub-token-abc&lang=FR',
+      ),
+    );
     const html = await response.text();
 
-    expect(html).toContain('<html lang="fr">');
+    expect(resolveNewsletterLinkLocaleMock).toHaveBeenCalledWith('FR');
+    expect(getTranslations).toHaveBeenCalledWith({
+      locale: 'FR',
+      namespace: 'newsletterUnsubscribe',
+    });
+    expect(html).toContain('<html lang="FR">');
+    expect(html).toContain('token=unsub-token-abc&amp;lang=FR');
   });
 });
 
@@ -102,6 +122,7 @@ describe('POST /api/newsletter/unsubscribe', () => {
       id: TENANT_ID,
       status: TENANT_STATUS.ACTIVE,
     });
+    resolveNewsletterLinkLocaleMock.mockResolvedValue('EN');
     ({ POST } = await import('./route'));
   });
 
@@ -130,12 +151,18 @@ describe('POST /api/newsletter/unsubscribe', () => {
     );
   });
 
-  it('declares <html lang> as the resolved request locale, not a hardcoded value', async () => {
-    vi.mocked(getLocale).mockResolvedValueOnce('fr');
-    const response = await POST(request);
+  it('renders in the language the link carries', async () => {
+    resolveNewsletterLinkLocaleMock.mockResolvedValue('FR');
+    const response = await POST(
+      new Request(
+        'https://example.com/api/newsletter/unsubscribe?token=unsub-token-abc&lang=FR',
+        { method: 'POST' },
+      ),
+    );
     const html = await response.text();
 
-    expect(html).toContain('<html lang="fr">');
+    expect(resolveNewsletterLinkLocaleMock).toHaveBeenCalledWith('FR');
+    expect(html).toContain('<html lang="FR">');
   });
 
   it('renders the calm "no longer valid" page for an unknown or already-used token', async () => {

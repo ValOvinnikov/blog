@@ -1,4 +1,3 @@
-import { getLocale } from 'next-intl/server';
 import type { MockInstance } from 'vitest';
 
 const { getEmailConfigMock, getEmailTemplateMock } = vi.hoisted(() => ({
@@ -33,8 +32,6 @@ vi.mock('@blog/db', () => ({
   },
 }));
 
-const getLocaleMock = vi.mocked(getLocale);
-
 const TENANT_ID = 'tenant-1';
 const DEFAULT_FROM_ADDRESS = 'Newsletter <onboarding@resend.dev>';
 const AUTHORED_SUBJECT = 'Confirm your subscription';
@@ -44,7 +41,6 @@ describe('resolveNewsletterEmailSettings', () => {
   let resolveNewsletterEmailSettings: typeof import('./resolve-newsletter-email-settings').resolveNewsletterEmailSettings;
 
   beforeEach(async () => {
-    getLocaleMock.mockResolvedValue('EN');
     getEmailConfigMock.mockReset();
     getEmailTemplateMock.mockReset();
     getEmailConfigMock.mockResolvedValue(undefined);
@@ -60,7 +56,11 @@ describe('resolveNewsletterEmailSettings', () => {
   });
 
   it('returns product defaults when the tenant has no email_config row', async () => {
-    const settings = await resolveNewsletterEmailSettings(TENANT_ID, undefined);
+    const settings = await resolveNewsletterEmailSettings(
+      TENANT_ID,
+      undefined,
+      'EN',
+    );
 
     expect(settings).toEqual({
       subject: AUTHORED_SUBJECT,
@@ -72,10 +72,8 @@ describe('resolveNewsletterEmailSettings', () => {
     });
   });
 
-  it('reads the template in the language of the page the reader subscribed on', async () => {
-    getLocaleMock.mockResolvedValue('FR');
-
-    await resolveNewsletterEmailSettings(TENANT_ID, undefined);
+  it('reads the template in the given language', async () => {
+    await resolveNewsletterEmailSettings(TENANT_ID, undefined, 'FR');
 
     expect(getEmailTemplateMock).toHaveBeenCalledWith(
       TENANT_ID,
@@ -84,10 +82,8 @@ describe('resolveNewsletterEmailSettings', () => {
     );
   });
 
-  it("leaves the language to the tenant's default when the page language is not a site language", async () => {
-    getLocaleMock.mockResolvedValue('xx');
-
-    await resolveNewsletterEmailSettings(TENANT_ID, undefined);
+  it("leaves the language to the tenant's default when no language is given", async () => {
+    await resolveNewsletterEmailSettings(TENANT_ID, undefined, undefined);
 
     expect(getEmailTemplateMock).toHaveBeenCalledWith(
       TENANT_ID,
@@ -118,6 +114,7 @@ describe('resolveNewsletterEmailSettings', () => {
       const settings = await resolveNewsletterEmailSettings(
         TENANT_ID,
         undefined,
+        'EN',
       );
 
       expect(settings.logoImageUrl).toBe(
@@ -129,6 +126,7 @@ describe('resolveNewsletterEmailSettings', () => {
       const settings = await resolveNewsletterEmailSettings(
         TENANT_ID,
         undefined,
+        'EN',
       );
 
       expect(settings.logoImageUrl).toBe(
@@ -148,6 +146,7 @@ describe('resolveNewsletterEmailSettings', () => {
     const defaultAddress = await resolveNewsletterEmailSettings(
       TENANT_ID,
       undefined,
+      'EN',
     );
     expect(defaultAddress.fromAddress).toBe(
       'Zeta Times <onboarding@resend.dev>',
@@ -156,6 +155,7 @@ describe('resolveNewsletterEmailSettings', () => {
     const configuredAddress = await resolveNewsletterEmailSettings(
       TENANT_ID,
       'Newsletter <news@mail.example.com>',
+      'EN',
     );
     expect(configuredAddress.fromAddress).toBe(
       'Zeta Times <news@mail.example.com>',
@@ -170,7 +170,11 @@ describe('resolveNewsletterEmailSettings', () => {
       replyToAddress: undefined,
       footerPostalAddress: undefined,
     });
-    const settings = await resolveNewsletterEmailSettings(TENANT_ID, undefined);
+    const settings = await resolveNewsletterEmailSettings(
+      TENANT_ID,
+      undefined,
+      'EN',
+    );
 
     expect(settings.fromAddress).toBe(
       'ZetaBcc: attacker@example.com <onboarding@resend.dev>',
@@ -185,7 +189,11 @@ describe('resolveNewsletterEmailSettings', () => {
       replyToAddress: undefined,
       footerPostalAddress: undefined,
     });
-    const settings = await resolveNewsletterEmailSettings(TENANT_ID, undefined);
+    const settings = await resolveNewsletterEmailSettings(
+      TENANT_ID,
+      undefined,
+      'EN',
+    );
 
     expect(settings.fromAddress.match(/</g)).toHaveLength(1);
     expect(settings.fromAddress).toContain('<onboarding@resend.dev>');
@@ -199,7 +207,11 @@ describe('resolveNewsletterEmailSettings', () => {
       replyToAddress: undefined,
       footerPostalAddress: undefined,
     });
-    const settings = await resolveNewsletterEmailSettings(TENANT_ID, undefined);
+    const settings = await resolveNewsletterEmailSettings(
+      TENANT_ID,
+      undefined,
+      'EN',
+    );
 
     expect(settings.fromAddress).toBe(DEFAULT_FROM_ADDRESS);
   });
@@ -212,7 +224,11 @@ describe('resolveNewsletterEmailSettings', () => {
       replyToAddress: 'support@example.com',
       footerPostalAddress: undefined,
     });
-    const settings = await resolveNewsletterEmailSettings(TENANT_ID, undefined);
+    const settings = await resolveNewsletterEmailSettings(
+      TENANT_ID,
+      undefined,
+      'EN',
+    );
 
     expect(settings.replyTo).toBe('support@example.com');
   });
@@ -225,7 +241,11 @@ describe('resolveNewsletterEmailSettings', () => {
       replyToAddress: undefined,
       footerPostalAddress: '123 Main St, Springfield',
     });
-    const settings = await resolveNewsletterEmailSettings(TENANT_ID, undefined);
+    const settings = await resolveNewsletterEmailSettings(
+      TENANT_ID,
+      undefined,
+      'EN',
+    );
 
     expect(settings.footerPostalAddress).toBe('123 Main St, Springfield');
   });
@@ -252,6 +272,7 @@ describe('resolveNewsletterEmailSettings', () => {
       const settings = await resolveNewsletterEmailSettings(
         TENANT_ID,
         undefined,
+        'EN',
       );
 
       expect(settings.replyTo).toBeUndefined();
@@ -265,6 +286,7 @@ describe('resolveNewsletterEmailSettings', () => {
       const settings = await resolveNewsletterEmailSettings(
         TENANT_ID,
         undefined,
+        'EN',
       );
 
       expect(settings).toEqual({
@@ -287,6 +309,7 @@ describe('resolveNewsletterEmailSettings', () => {
       const settings = await resolveNewsletterEmailSettings(
         TENANT_ID,
         undefined,
+        'EN',
       );
 
       expect(settings).toEqual({
@@ -305,11 +328,11 @@ describe('resolveNewsletterEmailSettings', () => {
     });
 
     it("falls back to the product default in the reader's language when getEmailTemplate rejects", async () => {
-      getLocaleMock.mockResolvedValue('FR');
       getEmailTemplateMock.mockRejectedValue(new Error('db down'));
       const settings = await resolveNewsletterEmailSettings(
         TENANT_ID,
         undefined,
+        'FR',
       );
 
       expect(settings.subject).toBe(FRENCH_DEFAULT_COPY_SUBJECT);
@@ -327,6 +350,7 @@ describe('resolveNewsletterEmailSettings', () => {
       const settings = await resolveNewsletterEmailSettings(
         TENANT_ID,
         undefined,
+        'EN',
       );
 
       expect(settings.logoImageUrl).toBe(
@@ -346,6 +370,7 @@ describe('resolveNewsletterEmailSettings', () => {
       const settings = await resolveNewsletterEmailSettings(
         TENANT_ID,
         undefined,
+        'EN',
       );
 
       expect(settings).toEqual({

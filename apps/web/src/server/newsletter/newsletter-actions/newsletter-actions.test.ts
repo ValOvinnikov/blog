@@ -5,6 +5,7 @@ import {
 } from '@blog/config';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
+import { getLocale } from 'next-intl/server';
 import type { MockInstance } from 'vitest';
 
 const {
@@ -36,6 +37,12 @@ vi.mock('@blog/db', () => ({
     EN: {
       NEWSLETTER_CONFIRMATION: {
         subject: 'Confirm your newsletter subscription',
+        body: [{ _type: 'block', _key: 'newsletter-confirmation-default-1' }],
+      },
+    },
+    FR: {
+      NEWSLETTER_CONFIRMATION: {
+        subject: 'Confirmez votre abonnement',
         body: [{ _type: 'block', _key: 'newsletter-confirmation-default-1' }],
       },
     },
@@ -166,6 +173,24 @@ describe('subscribeToNewsletterAction', () => {
       }),
     );
     expect(markNewsletterSubscribedMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('sends confirm and unsubscribe links carrying the language the reader subscribed in', async () => {
+    vi.mocked(getLocale).mockResolvedValueOnce('FR');
+
+    await subscribeToNewsletterAction('reader@example.com');
+
+    expect(sendEmailMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        html: expect.stringContaining(
+          'https://example.com/api/newsletter/confirm?token=token-abc&amp;lang=FR',
+        ),
+        headers: expect.objectContaining({
+          'List-Unsubscribe':
+            '<https://example.com/api/newsletter/unsubscribe?token=unsub-token-abc&lang=FR>',
+        }),
+      }),
+    );
   });
 
   it('re-sends the confirmation email and returns "success" for a pending subscriber', async () => {
