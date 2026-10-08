@@ -8,9 +8,9 @@ describe('VOICE_FIELD_GROUPS', () => {
     ]);
   });
 
-  it('groups fields per the surviving field counts (3/5)', () => {
+  it('groups fields per the surviving field counts (2/5)', () => {
     expect(VOICE_FIELD_GROUPS.map((group) => group.fields.length)).toEqual([
-      3, 5,
+      2, 5,
     ]);
   });
 
@@ -18,7 +18,6 @@ describe('VOICE_FIELD_GROUPS', () => {
     expect(VOICE_OVERRIDE_KEYS).toEqual([
       'notFoundHeading',
       'notFoundSupportingText',
-      'notFoundReturnHome',
       'blogListEmpty',
       'topicEmpty',
       'tagEmpty',

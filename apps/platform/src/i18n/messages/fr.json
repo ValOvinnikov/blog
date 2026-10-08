@@ -443,7 +443,7 @@
     "alertError": "Impossible d'enregistrer — veuillez réessayer.",
     "basicHeading": "Essentiel",
     "basicAlert": "Rien d'obligatoire ici. Le site dispose déjà de textes par défaut adaptés. La plupart des locataires n'ouvrent jamais les champs avancés ci-dessous.",
-    "advancedSummary": "Avancé — 8 textes sélectionnés, 2 groupes",
+    "advancedSummary": "Avancé — 7 textes sélectionnés, 2 groupes",
     "advancedOverrideInfo": "Chaque champ est un remplacement. Laissez-en un vide pour utiliser le texte par défaut du site — vider un champ rétablit ce texte par défaut, il ne le remplace pas par une chaîne vide."
   },
   "voiceFieldGroup": {
@@ -456,7 +456,6 @@
   "voiceFieldLabels": {
     "notFoundHeading": "Titre de la page introuvable",
     "notFoundSupportingText": "Texte de la page introuvable",
-    "notFoundReturnHome": "Lien de retour de la page introuvable",
     "blogListEmpty": "Liste du blog vide",
     "topicEmpty": "Thème vide",
     "tagEmpty": "Étiquette vide",

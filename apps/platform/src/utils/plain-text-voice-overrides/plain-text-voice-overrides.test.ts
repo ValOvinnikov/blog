@@ -7,11 +7,11 @@ describe(plainTextVoiceOverrides, () => {
     expect(
       plainTextVoiceOverrides({
         notFoundHeading: 'Page not found',
-        notFoundReturnHome: 'Return home',
+        blogListEmpty: 'No posts yet.',
       }),
     ).toEqual({
       notFoundHeading: 'Page not found',
-      notFoundReturnHome: 'Return home',
+      blogListEmpty: 'No posts yet.',
     });
   });
 

@@ -71,14 +71,6 @@ export const VOICE_FIELDS = [
     max: 300,
   },
   {
-    id: 'notFoundReturnHome',
-    path: 'notFound.returnHome',
-    kind: VOICE_FIELD_KIND.TEXT,
-    surface: VOICE_SURFACE.NOT_FOUND,
-    placeholders: [],
-    max: 100,
-  },
-  {
     id: 'localeErrorTitle',
     path: 'localeErrorPage.title',
     kind: VOICE_FIELD_KIND.TEXT,

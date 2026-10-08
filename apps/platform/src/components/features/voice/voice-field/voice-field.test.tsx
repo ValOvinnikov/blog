@@ -8,19 +8,16 @@ describe(VoiceField, () => {
   it('shows the inherited value as a placeholder, not as the field value, and exposes the shared input id', () => {
     render(
       <VoiceField
-        fieldKey="notFoundReturnHome"
+        fieldKey="notFoundHeading"
         value=""
         onChange={vi.fn()}
-        placeholder="Return home"
+        placeholder="Page not found"
       />,
     );
 
     const input = screen.getByRole('textbox');
-    expect(input).toHaveAttribute(
-      'id',
-      voiceFieldInputId('notFoundReturnHome'),
-    );
-    expect(input).toHaveAttribute('placeholder', 'Return home');
+    expect(input).toHaveAttribute('id', voiceFieldInputId('notFoundHeading'));
+    expect(input).toHaveAttribute('placeholder', 'Page not found');
     expect(input).toHaveValue('');
   });
 
@@ -36,7 +33,7 @@ describe(VoiceField, () => {
     expect(screen.getByRole('textbox').tagName).toBe('TEXTAREA');
 
     rerender(
-      <VoiceField fieldKey="notFoundReturnHome" value="" onChange={vi.fn()} />,
+      <VoiceField fieldKey="notFoundHeading" value="" onChange={vi.fn()} />,
     );
     expect(screen.getByRole('textbox').tagName).toBe('INPUT');
   });
@@ -44,7 +41,7 @@ describe(VoiceField, () => {
   it('makes the field read-only, not disabled, when isReadOnly is true', () => {
     render(
       <VoiceField
-        fieldKey="notFoundReturnHome"
+        fieldKey="notFoundHeading"
         value="custom"
         onChange={vi.fn()}
         isReadOnly={true}
@@ -61,10 +58,10 @@ describe(VoiceField, () => {
     const onChange = vi.fn();
     render(
       <VoiceField
-        fieldKey="notFoundReturnHome"
+        fieldKey="notFoundHeading"
         value="custom"
         onChange={onChange}
-        placeholder="Return home"
+        placeholder="Page not found"
       />,
     );
 

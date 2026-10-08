@@ -443,7 +443,7 @@
     "alertError": "Speichern fehlgeschlagen — bitte erneut versuchen.",
     "basicHeading": "Grundlagen",
     "basicAlert": "Hier ist nichts erforderlich. Die Website hat bereits sinnvolle Standardtexte. Die meisten Mandanten öffnen die erweiterten Felder unten nie.",
-    "advancedSummary": "Erweitert — 8 ausgewählte Texte, 2 Gruppen",
+    "advancedSummary": "Erweitert — 7 ausgewählte Texte, 2 Gruppen",
     "advancedOverrideInfo": "Jedes Feld ist eine Überschreibung. Lassen Sie ein Feld leer, um den Standardtext der Website zu verwenden — ein geleertes Feld kehrt zu diesem Standard zurück und setzt den Text nicht auf leer."
   },
   "voiceFieldGroup": {
@@ -456,7 +456,6 @@
   "voiceFieldLabels": {
     "notFoundHeading": "404 – Überschrift",
     "notFoundSupportingText": "404 – Begleittext",
-    "notFoundReturnHome": "404 – Link zur Startseite",
     "blogListEmpty": "Blogliste leer",
     "topicEmpty": "Thema leer",
     "tagEmpty": "Schlagwort leer",

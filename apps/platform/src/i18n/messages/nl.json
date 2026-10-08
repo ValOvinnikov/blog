@@ -443,7 +443,7 @@
     "alertError": "Opslaan mislukt. Probeer het opnieuw.",
     "basicHeading": "Basis",
     "basicAlert": "Hier is niets verplicht. De site heeft al verstandige standaardteksten. De meeste tenants openen de geavanceerde velden hieronder nooit.",
-    "advancedSummary": "Geavanceerd — 8 geselecteerde teksten, 2 groepen",
+    "advancedSummary": "Geavanceerd — 7 geselecteerde teksten, 2 groepen",
     "advancedOverrideInfo": "Elk veld is een overschrijving. Laat een veld leeg om de eigen standaardtekst van de site te gebruiken — een veld leegmaken zet het terug naar die standaard, het maakt de tekst niet leeg."
   },
   "voiceFieldGroup": {
@@ -456,7 +456,6 @@
   "voiceFieldLabels": {
     "notFoundHeading": "Kop niet gevonden",
     "notFoundSupportingText": "Ondersteunende tekst niet gevonden",
-    "notFoundReturnHome": "Terug naar home (niet gevonden)",
     "blogListEmpty": "Bloglijst leeg",
     "topicEmpty": "Onderwerp leeg",
     "tagEmpty": "Tag leeg",

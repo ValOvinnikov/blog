@@ -443,7 +443,7 @@
     "alertError": "No se pudo guardar. Vuelva a intentarlo.",
     "basicHeading": "Básico",
     "basicAlert": "Aquí no hay nada obligatorio. El sitio ya tiene unos textos predeterminados adecuados. La mayoría de los clientes nunca abre los campos avanzados de abajo.",
-    "advancedSummary": "Avanzado: 8 textos seleccionados, 2 grupos",
+    "advancedSummary": "Avanzado: 7 textos seleccionados, 2 grupos",
     "advancedOverrideInfo": "Cada campo es una sustitución. Deje uno en blanco para usar el texto predeterminado del sitio: vaciar un campo restablece ese valor predeterminado, no deja el texto vacío."
   },
   "voiceFieldGroup": {
@@ -456,7 +456,6 @@
   "voiceFieldLabels": {
     "notFoundHeading": "Título de página no encontrada",
     "notFoundSupportingText": "Texto de apoyo de página no encontrada",
-    "notFoundReturnHome": "Volver al inicio en página no encontrada",
     "blogListEmpty": "Lista del blog vacía",
     "topicEmpty": "Tema vacío",
     "tagEmpty": "Etiqueta vacía",

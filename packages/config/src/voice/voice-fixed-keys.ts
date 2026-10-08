@@ -151,6 +151,7 @@ export const VOICE_FIXED_KEYS = [
   'postShare.linkCopied',
   'localeErrorPage.retry',
   'localeErrorPage.goHome',
+  'notFound.returnHome',
   'bookmarkButton.save',
   'bookmarkButton.saved',
   'bookmarksPage.title',
