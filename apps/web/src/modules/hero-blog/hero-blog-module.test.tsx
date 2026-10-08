@@ -97,6 +97,18 @@ describe(`<${HeroBlogModule.name}/>`, () => {
     );
   });
 
+  it('renders nothing without an error log when the post has no version in the request language', async () => {
+    getHeroBlogMock.mockResolvedValue({
+      ok: true,
+      data: makeUnresolvedHeroBlogData({ isPostUntranslated: true }),
+    });
+
+    const { container } = await setup();
+
+    expect(container).toBeEmptyDOMElement();
+    expect(loggerErrorMock).not.toHaveBeenCalled();
+  });
+
   it('logs and renders nothing for a stale hasPost: false result carrying a heading', async () => {
     getHeroBlogMock.mockResolvedValue({
       ok: true,

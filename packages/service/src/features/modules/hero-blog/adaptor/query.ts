@@ -37,6 +37,9 @@ export const heroBlogModuleQuery = q
         newestFeaturedPostQuery,
       )
       .nullable(true),
+    hasPinnedPost: sub.raw<boolean>(
+      `postSource == "${POST_SOURCE.PINNED}" && defined(post->)`,
+    ),
     eyebrow: getLocalizedField(sub, 'eyebrow'),
     image: sub
       .field('image')

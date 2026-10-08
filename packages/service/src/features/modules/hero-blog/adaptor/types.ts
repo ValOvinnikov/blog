@@ -26,4 +26,4 @@ export type THeroBlogModuleBase = {
 
 export type THeroBlogModule =
   | (THeroBlogModuleBase & { hasPost: true; heading: string })
-  | (THeroBlogModuleBase & { hasPost: false });
+  | (THeroBlogModuleBase & { hasPost: false; isPostUntranslated: boolean });

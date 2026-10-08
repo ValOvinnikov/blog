@@ -75,6 +75,24 @@ describe(toHeroBlogModule, () => {
     expect(hero.ctaButtons).toEqual([]);
   });
 
+  it('marks an unresolved pinned post that still exists as untranslated', () => {
+    const raw = makeRawHeroBlogModule({ post: null, hasPinnedPost: true });
+
+    const hero = toHeroBlogModule(raw);
+
+    if (hero.hasPost) throw new Error('expected no resolved post');
+    expect(hero.isPostUntranslated).toBe(true);
+  });
+
+  it('does not mark a missing post as untranslated', () => {
+    const raw = makeRawHeroBlogModule({ post: null, hasPinnedPost: false });
+
+    const hero = toHeroBlogModule(raw);
+
+    if (hero.hasPost) throw new Error('expected no resolved post');
+    expect(hero.isPostUntranslated).toBe(false);
+  });
+
   it('reports hasPost true and derives heading/supportingText from the resolved post', () => {
     const raw = makeRawHeroBlogModule({
       post: makeRawPostCard(),

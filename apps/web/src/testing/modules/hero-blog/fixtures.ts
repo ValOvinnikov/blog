@@ -37,6 +37,7 @@ export const makeUnresolvedHeroBlogData = (
 ): THeroBlogModule => ({
   ...heroBlogDataBase,
   hasPost: false,
+  isPostUntranslated: false,
   ...overrides,
 });
 
@@ -51,5 +52,6 @@ export const makeStaleUnresolvedHeroBlogData = (
   ({
     ...heroBlogDataBase,
     hasPost: false,
+    isPostUntranslated: false,
     heading,
   }) as THeroBlogModule;
