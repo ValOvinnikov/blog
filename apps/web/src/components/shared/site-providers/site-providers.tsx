@@ -10,7 +10,6 @@ import { getRequestContext } from '@web/server/request-context/request-context';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { resolveTenantMessages } from '@web/utils/resolve-tenant-messages';
-import { resolveVoiceRichFields } from '@web/utils/resolve-voice-rich-fields';
 import { SessionProvider } from 'next-auth/react';
 import { NextIntlClientProvider } from 'next-intl';
 import { getNow, getTimeZone } from 'next-intl/server';
@@ -21,8 +20,7 @@ export interface ISiteProvidersProps {
 }
 
 export const SiteProviders = async ({ children }: ISiteProvidersProps) => {
-  const { tenantId, locale, sanityContext, defaultLocale } =
-    await getRequestContext();
+  const { tenantId, locale, sanityContext } = await getRequestContext();
   const tenant = tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER;
   const baseMessages = SITE_MESSAGES_BY_LOCALE[locale];
   const [now, timeZone, isConsentBannerEnabled] = await Promise.all([
@@ -30,13 +28,11 @@ export const SiteProviders = async ({ children }: ISiteProvidersProps) => {
     getTimeZone(),
     isCapabilityEnabled(CAPABILITY.CONSENT_BANNER),
   ]);
-  const { messages, rich } =
-    locale === defaultLocale
-      ? await resolveTenantMessages(baseMessages, tenant)
-      : {
-          messages: baseMessages,
-          rich: resolveVoiceRichFields({}, baseMessages),
-        };
+  const { messages, rich } = await resolveTenantMessages(
+    baseMessages,
+    locale,
+    tenant,
+  );
 
   return (
     <SanityImageBaseUrlProvider baseUrl={getSanityImageBaseUrl(sanityContext)}>

@@ -42,7 +42,6 @@ describe(buildNotFoundMetadata, () => {
     const metadata = await buildNotFoundMetadata({
       tenant: TENANT_ID,
       locale: LOCALE_ISO_CODES.EN,
-      hasVoiceOverrides: true,
     });
 
     expect(metadata).toEqual({
@@ -51,21 +50,29 @@ describe(buildNotFoundMetadata, () => {
     });
     expect(resolveTenantMessages).toHaveBeenCalledWith(
       SITE_MESSAGES_BY_LOCALE.EN,
+      LOCALE_ISO_CODES.EN,
       TENANT_ID,
     );
   });
 
-  it('reads the served language’s copy and ignores overrides outside the default language', async () => {
+  it('resolves the tenant’s overrides in the served language', async () => {
+    vi.mocked(resolveTenantMessages).mockResolvedValue(
+      withNotFoundOverrides('Verdwaald', 'Hier woont niets.'),
+    );
+
     const metadata = await buildNotFoundMetadata({
       tenant: TENANT_ID,
       locale: LOCALE_ISO_CODES.NL,
-      hasVoiceOverrides: false,
     });
 
     expect(metadata).toEqual({
-      title: SITE_MESSAGES_BY_LOCALE.NL.notFound.heading,
-      description: SITE_MESSAGES_BY_LOCALE.NL.notFound.supportingText,
+      title: 'Verdwaald',
+      description: 'Hier woont niets.',
     });
-    expect(resolveTenantMessages).not.toHaveBeenCalled();
+    expect(resolveTenantMessages).toHaveBeenCalledWith(
+      SITE_MESSAGES_BY_LOCALE.NL,
+      LOCALE_ISO_CODES.NL,
+      TENANT_ID,
+    );
   });
 });

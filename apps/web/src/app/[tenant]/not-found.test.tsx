@@ -32,14 +32,12 @@ describe('TenantNotFound ([tenant] not-found route)', () => {
       vi.mocked(getNotFoundContext).mockResolvedValue({
         tenantId: TENANT_ID,
         locale: LOCALE_ISO_CODES.DE,
-        isDefaultLocale: true,
       });
 
       await expect(generateMetadata()).resolves.toBe(metadata);
       expect(buildNotFoundMetadataMock).toHaveBeenCalledWith({
         tenant: TENANT_ID,
         locale: LOCALE_ISO_CODES.DE,
-        hasVoiceOverrides: true,
       });
       expect(headersMock).not.toHaveBeenCalled();
     });
@@ -51,7 +49,6 @@ describe('TenantNotFound ([tenant] not-found route)', () => {
     vi.mocked(getNotFoundContext).mockResolvedValue({
       tenantId: TENANT_ID,
       locale: LOCALE_ISO_CODES.NL,
-      isDefaultLocale: false,
     });
 
     const document = await TenantNotFound();
@@ -61,23 +58,7 @@ describe('TenantNotFound ([tenant] not-found route)', () => {
     expect(standaloneNotFoundPageMock).toHaveBeenCalledWith({
       tenant: TENANT_ID,
       locale: LOCALE_ISO_CODES.NL,
-      hasVoiceOverrides: false,
     });
     expect(headersMock).not.toHaveBeenCalled();
-  });
-
-  it('applies voice overrides in the default language', async () => {
-    vi.mocked(getNotFoundContext).mockResolvedValue({
-      tenantId: TENANT_ID,
-      locale: LOCALE_ISO_CODES.DE,
-      isDefaultLocale: true,
-    });
-
-    const document = await TenantNotFound();
-
-    expect(document.props.lang).toBe('de');
-    expect(standaloneNotFoundPageMock).toHaveBeenCalledWith(
-      expect.objectContaining({ hasVoiceOverrides: true }),
-    );
   });
 });

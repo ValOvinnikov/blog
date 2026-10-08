@@ -6,13 +6,9 @@ import { getNotFoundContext } from '@web/server/request-context/request-context'
 import type { Metadata } from 'next';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { tenantId, locale, isDefaultLocale } = await getNotFoundContext();
+  const { tenantId, locale } = await getNotFoundContext();
 
-  return buildNotFoundMetadata({
-    tenant: tenantId,
-    locale,
-    hasVoiceOverrides: isDefaultLocale,
-  });
+  return buildNotFoundMetadata({ tenant: tenantId, locale });
 }
 
 /**
@@ -21,15 +17,11 @@ export async function generateMetadata(): Promise<Metadata> {
  * the document. Must never call `headers()`.
  */
 export default async function TenantNotFound() {
-  const { tenantId, locale, isDefaultLocale } = await getNotFoundContext();
+  const { tenantId, locale } = await getNotFoundContext();
 
   return (
     <DocumentShell lang={LOCALE_BCP47_TAGS[locale]}>
-      {await StandaloneNotFoundPage({
-        tenant: tenantId,
-        locale,
-        hasVoiceOverrides: isDefaultLocale,
-      })}
+      {await StandaloneNotFoundPage({ tenant: tenantId, locale })}
     </DocumentShell>
   );
 }

@@ -44,7 +44,7 @@ describe('i18n request config', () => {
   beforeEach(() => {
     vi.mocked(getSiteConfig).mockResolvedValue({
       ok: true,
-      data: { voiceOverrides: OVERRIDES },
+      data: { voiceOverridesByLocale: { [LOCALE_ISO_CODES.EN]: OVERRIDES } },
     } as never);
   });
 
@@ -67,7 +67,7 @@ describe('i18n request config', () => {
     expect(getSiteConfig).not.toHaveBeenCalled();
   });
 
-  describe("with the tenant's default language", () => {
+  describe('with a tenant voice', () => {
     beforeEach(() => {
       vi.mocked(peekVoiceTenant).mockResolvedValue(TENANT_ID);
     });
@@ -84,7 +84,7 @@ describe('i18n request config', () => {
     it('serves the catalog default for a key with no override', async () => {
       vi.mocked(getSiteConfig).mockResolvedValue({
         ok: true,
-        data: { voiceOverrides: {} },
+        data: { voiceOverridesByLocale: {} },
       } as never);
 
       const { messages } = await resolveConfig('EN');
@@ -92,10 +92,28 @@ describe('i18n request config', () => {
       expect(translateAt(messages, 'notFound.heading')).toBe('Page not found');
     });
 
-    it('reads the voice tenant for the resolved language', async () => {
-      await resolveConfig(LOCALE_ISO_CODES.DE);
+    it("serves another language's own overrides and not the default language's", async () => {
+      vi.mocked(getSiteConfig).mockResolvedValue({
+        ok: true,
+        data: {
+          voiceOverridesByLocale: {
+            [LOCALE_ISO_CODES.EN]: { notFoundHeading: 'Lost' },
+            [LOCALE_ISO_CODES.DE]: { notFoundHeading: 'Verirrt' },
+          },
+        },
+      } as never);
 
-      expect(peekVoiceTenant).toHaveBeenCalledWith(LOCALE_ISO_CODES.DE);
+      const { messages } = await resolveConfig(LOCALE_ISO_CODES.DE);
+
+      expect(translateAt(messages, 'notFound.heading')).toBe('Verirrt');
+    });
+
+    it("serves a language's catalog default when only another language has an override", async () => {
+      const { messages } = await resolveConfig(LOCALE_ISO_CODES.DE);
+
+      expect(translateAt(messages, 'notFound.heading')).toBe(
+        SITE_MESSAGES_BY_LOCALE.DE.notFound.heading,
+      );
     });
   });
 });
