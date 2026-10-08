@@ -1,7 +1,7 @@
 import { routes } from '@blog/config';
 import type { TPostCardTopic } from '@blog/service';
 import type { IMediaCardData } from '@web/components/shared/media-card-item';
-import { getFormatter } from 'next-intl/server';
+import { getFormatter, getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
 
 type TPostListItemSource = {
@@ -14,21 +14,14 @@ type TPostListItemSource = {
   readingTimeMinutes: number;
 };
 
-/**
- * Maps service post-card view-models to the `IMediaCardData` shape
- * `MediaCardItem` renders, resolving the two presentation concerns the
- * (React-free, locale-agnostic) service layer deliberately doesn't own: the
- * post detail route (`routes.post`) and the formatted date, via next-intl's
- * `getFormatter` (async — this is a plain helper, not a component, so the
- * `useFormatter` hook isn't an option). `getFormatter` reads locale/timeZone
- * from the current request's config (`i18n/request.ts`) automatically, so no
- * `locale` argument is threaded through here or by callers.
- */
 export const toPostListItems = async <T extends TPostListItemSource>(
   posts: readonly T[],
   renderImage?: (post: T) => ReactNode | undefined,
 ): Promise<IMediaCardData[]> => {
-  const format = await getFormatter();
+  const [format, postCardT] = await Promise.all([
+    getFormatter(),
+    getTranslations('postCard'),
+  ]);
 
   return posts.map((post) => ({
     id: post.id,
@@ -41,7 +34,7 @@ export const toPostListItems = async <T extends TPostListItemSource>(
       month: 'long',
       day: 'numeric',
     }),
-    readingTime: `${post.readingTimeMinutes} min`,
+    readingTime: postCardT('readingTime', { count: post.readingTimeMinutes }),
     topic: post.topic,
     image: renderImage?.(post),
   }));

@@ -83,6 +83,8 @@ export const VOICE_FIXED_KEYS = [
   'taxonomyListModule.tags.postsCount',
   'toastProvider.mergeCountSuffix',
   'bookmarksPage.hint',
+  'blogPostPage.readingTime',
+  'postCard.readingTime',
 
   'accountPage.metaDescription',
   'bookmarksPage.metaDescription',

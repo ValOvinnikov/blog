@@ -20,7 +20,7 @@ export type TPostMetaProps = IWithClassName &
     };
     publishedAt: string;
     formattedDate: string;
-    readingTimeMinutes?: number;
+    readingTime?: string;
     linkAs?: TAnchorElementType;
     share?: ReactNode;
   };
@@ -32,7 +32,7 @@ export const PostMeta = ({
   author,
   publishedAt,
   formattedDate,
-  readingTimeMinutes,
+  readingTime,
   linkAs,
   share,
   className,
@@ -59,10 +59,10 @@ export const PostMeta = ({
       </span>
       <MetaSeparator />
       <time dateTime={publishedAt}>{formattedDate}</time>
-      {readingTimeMinutes !== undefined && (
+      {readingTime && (
         <>
           <MetaSeparator />
-          <span>{readingTimeMinutes} min read</span>
+          <span>{readingTime}</span>
         </>
       )}
       {share && <div className={s.share()}>{share}</div>}

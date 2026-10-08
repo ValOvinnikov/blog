@@ -67,7 +67,11 @@
     },
     "backToTop": {
       "ariaLabel": "Terug naar boven"
-    }
+    },
+    "readingTime": "{count, plural, one {1 min leestijd} other {{count} min leestijd}}"
+  },
+  "postCard": {
+    "readingTime": "{count, plural, one {1 min} other {{count} min}}"
   },
   "postContentsRail": {
     "label": "Inhoud"

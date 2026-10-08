@@ -16,7 +16,7 @@ const formattedDate = faker.date.past().toLocaleDateString('en-GB', {
   month: 'long',
   day: 'numeric',
 });
-const readingTimeMinutes = faker.number.int({ min: 3, max: 15 });
+const readingTime = `${faker.number.int({ min: 3, max: 15 })} min read`;
 
 const setup = customRender(PostMeta, {
   author,
@@ -49,7 +49,7 @@ describe(`<${PostMeta.name}/>`, () => {
     });
 
     it('omits reading time segment when not provided', () => {
-      expect(screen.queryByText(/min read/)).not.toBeInTheDocument();
+      expect(screen.queryByText(readingTime)).not.toBeInTheDocument();
     });
 
     it('omits the share trigger when share is not provided', () => {
@@ -66,8 +66,8 @@ describe(`<${PostMeta.name}/>`, () => {
   });
 
   it('renders reading time when provided', () => {
-    setup({ readingTimeMinutes });
-    expect(screen.getByText(`${readingTimeMinutes} min read`)).toBeVisible();
+    setup({ readingTime });
+    expect(screen.getByText(readingTime)).toBeVisible();
   });
 
   it('falls back to initials when imageUrl is not provided, announcing the name once', () => {

@@ -34,7 +34,7 @@ const meta = {
             },
             publishedAt,
             formattedDate,
-            readingTimeMinutes: faker.number.int({ min: 3, max: 15 }),
+            readingTime: `${faker.number.int({ min: 3, max: 15 })} min read`,
           }}
         />
         <Article.Body>{bodyParagraphs}</Article.Body>
@@ -63,7 +63,7 @@ export const WithCoverMedia: TStory = {
             },
             publishedAt,
             formattedDate,
-            readingTimeMinutes: faker.number.int({ min: 3, max: 15 }),
+            readingTime: `${faker.number.int({ min: 3, max: 15 })} min read`,
           }}
           coverMedia={
             <img
@@ -207,7 +207,7 @@ const OnSecondaryBackground = () => (
           },
           publishedAt,
           formattedDate,
-          readingTimeMinutes: faker.number.int({ min: 3, max: 15 }),
+          readingTime: `${faker.number.int({ min: 3, max: 15 })} min read`,
         }}
       />
       <Article.Body>{bodyParagraphs}</Article.Body>
