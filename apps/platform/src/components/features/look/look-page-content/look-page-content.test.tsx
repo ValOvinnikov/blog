@@ -1,4 +1,5 @@
 import { PRESET_ID } from '@blog/config';
+import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
@@ -81,7 +82,6 @@ describe(`<${LookPageContent.name}/>`, () => {
       },
     });
 
-    expect(screen.getByText('This tenant is archived')).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled();
+    expectArchivedOffersNoSave();
   });
 });

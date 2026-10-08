@@ -1,18 +1,15 @@
 'use client';
 
 import {
-  ALERT_TYPE,
   isAccentHueAccessible,
   PRESET_REGISTRY,
   type TPresetId,
 } from '@blog/config';
 import { LookPreview } from '@platform/components/features/look/look-preview';
-import { Alert } from '@platform/components/shared/alert';
-import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
 import { Disclosure } from '@platform/components/shared/disclosure';
-import { PageHeader } from '@platform/components/shared/page-header';
+import { SettingsFormShell } from '@platform/components/shared/settings-form-shell';
 import { useToast } from '@platform/context/toast-provider';
 import { updateLookAction } from '@platform/server/site-config/update-look-action';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
@@ -40,13 +37,6 @@ export type TLookFormFieldSetter = <K extends keyof TLookFormValues>(
   value: TLookFormValues[K],
 ) => void;
 
-/**
- * Applying a preset (via the picker or "Reset to preset") re-seeds every
- * `PRESET_REGISTRY` default — that's what "preset" means: a starting point,
- * not a locked-in choice. Individual controls remain freely adjustable
- * afterward. Brand images and the language switcher style are independent
- * of preset, so `current`'s values for them carry through unchanged.
- */
 const applyPresetDefaults = (
   preset: TPresetId,
   current: TLookFormValues,
@@ -68,21 +58,10 @@ const applyPresetDefaults = (
   };
 };
 
-const valuesEqual = (a: TLookFormValues, b: TLookFormValues): boolean => {
-  return (
-    a.preset === b.preset &&
-    a.accentHue === b.accentHue &&
-    a.logoHue === b.logoHue &&
-    a.headingFont === b.headingFont &&
-    a.bodyFont === b.bodyFont &&
-    a.radiusScale === b.radiusScale &&
-    a.density === b.density &&
-    a.cardStyle === b.cardStyle &&
-    a.languageSwitcherStyle === b.languageSwitcherStyle &&
-    a.logoAssetUrl === b.logoAssetUrl &&
-    a.faviconAssetUrl === b.faviconAssetUrl
-  );
-};
+const countChanges = (a: TLookFormValues, b: TLookFormValues): number =>
+  (Object.keys(a) as (keyof TLookFormValues)[]).filter(
+    (key) => a[key] !== b[key],
+  ).length;
 
 export const LookForm = ({
   tenantId,
@@ -94,6 +73,7 @@ export const LookForm = ({
 }: TLookFormProps) => {
   const isArchived = Boolean(archivedAt);
   const archivedNoticeId = useId();
+  const accentHueFieldId = useId();
   const toast = useToast();
   const t = useTranslations('lookForm');
   const [savedValues, setSavedValues] =
@@ -121,8 +101,11 @@ export const LookForm = ({
       },
     });
 
-  const isDirty = !valuesEqual(values, savedValues);
+  const changeCount = countChanges(values, savedValues);
   const isAccentHueRejected = !isAccentHueAccessible(values.accentHue);
+
+  const handleSave = () =>
+    isAccentHueRejected ? Promise.resolve(false) : handleSubmit();
 
   const updateField: TLookFormFieldSetter = (key, value) => {
     setValues((prev) => ({ ...prev, [key]: value }));
@@ -142,44 +125,22 @@ export const LookForm = ({
   const { root, grid, stack, tagSecondary, note } = lookFormVariants();
 
   return (
-    <div className={root()}>
-      <PageHeader
-        title={t('heading')}
-        description={t('subtitle')}
-        actions={
-          <>
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={handleReset}
-              isDisabled={!isDirty || isArchived}
-              aria-describedby={isArchived ? archivedNoticeId : undefined}
-            >
-              {t('resetButton')}
-            </Button>
-            <Button
-              type="button"
-              variant="primary"
-              onClick={handleSubmit}
-              isDisabled={!isDirty || isArchived || isAccentHueRejected}
-              isPending={isPending}
-              pendingLabel={t('savingButton')}
-              aria-describedby={isArchived ? archivedNoticeId : undefined}
-            >
-              {t('saveButton')}
-            </Button>
-          </>
-        }
-      />
-
-      {archivedAt && (
-        <ArchivedTenantNotice id={archivedNoticeId} archivedAt={archivedAt} />
-      )}
-
-      {status === 'error' && (
-        <Alert type={ALERT_TYPE.ERROR} title={t('alertError')} />
-      )}
-
+    <SettingsFormShell
+      title={t('heading')}
+      description={t('subtitle')}
+      saveButtonLabel={t('saveButton')}
+      savingButtonLabel={t('savingButton')}
+      onSave={handleSave}
+      onDiscard={() => setValues(savedValues)}
+      changeCount={changeCount}
+      invalidFieldIds={isAccentHueRejected ? [accentHueFieldId] : []}
+      isPending={isPending}
+      archivedAt={archivedAt}
+      archivedNoticeId={archivedNoticeId}
+      hasError={status === 'error'}
+      errorTitle={t('alertError')}
+      className={root()}
+    >
       <div className={grid()}>
         <div className={stack()}>
           <Card>
@@ -187,12 +148,24 @@ export const LookForm = ({
               title={t('basicHeading')}
               supportingText={t('basicDescription')}
               headingLevel={2}
+              actions={
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={handleReset}
+                  isDisabled={changeCount === 0 || isArchived}
+                  aria-describedby={isArchived ? archivedNoticeId : undefined}
+                >
+                  {t('resetButton')}
+                </Button>
+              }
             />
             <Card.Body>
               <LookFormBasicSection
                 preset={values.preset}
                 onPresetChange={handlePresetChange}
                 accentHue={values.accentHue}
+                accentHueFieldId={accentHueFieldId}
                 isAccentHueRejected={isAccentHueRejected}
                 logoHue={values.logoHue}
                 onFieldChange={updateField}
@@ -255,6 +228,6 @@ export const LookForm = ({
           />
         </div>
       </div>
-    </div>
+    </SettingsFormShell>
   );
 };
