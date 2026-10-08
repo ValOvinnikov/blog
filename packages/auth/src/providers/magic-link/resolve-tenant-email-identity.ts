@@ -1,10 +1,13 @@
 import { resolveTenantEmailBrand, type TTenantEmailBrand } from '@blog/config';
+import type { TLocaleIsoCode } from '@blog/config/constants';
 import { queries } from '@blog/db';
 
 export type TResolvedTenantEmailIdentity = {
   brand: TTenantEmailBrand;
   brandName: string;
   tenantId: string;
+  defaultLocale: TLocaleIsoCode;
+  liveLocales: TLocaleIsoCode[];
 };
 
 /**
@@ -31,6 +34,8 @@ export async function resolveTenantEmailIdentity(
       }),
       brandName: tenant.name,
       tenantId: tenant.id,
+      defaultLocale: tenant.locale,
+      liveLocales: queries.tenants.selectLiveLocales(tenant),
     };
   } catch {
     return undefined;

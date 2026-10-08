@@ -95,7 +95,12 @@ reading, page canvas elevation) are documented in full in
   session strategy). The magic-link provider (`sendVerificationRequest` and
   its email-copy builders) lives in `@blog/auth`, which sends through
   `@blog/email`'s transport directly — `buildAuthConfig()` takes no arguments,
-  and neither app carries a send transport of its own
+  and neither app carries a send transport of its own. It writes each email
+  in the recipient's language: on a tenant's host, the first segment of the
+  link's return-to path when it is one of the tenant's live languages, else
+  the tenant's default language; on a tenant-less host (the platform), an
+  invite uses the invited tenant's default language and any other sign-in
+  stays in English
 - **Vitest + Testing Library**; **Storybook** in `packages/ui` and `apps/web`
 - **Turborepo + pnpm** workspaces; Node ≥ 20.19 (CI runs 22), pnpm 11.21
 

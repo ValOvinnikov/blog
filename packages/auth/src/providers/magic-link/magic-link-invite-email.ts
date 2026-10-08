@@ -11,7 +11,7 @@ import type { TResolvedTenantEmailIdentity } from './resolve-tenant-email-identi
 
 export type TMagicLinkInviteEmailInput = {
   url: string;
-  tenantIdentity?: TResolvedTenantEmailIdentity;
+  tenantIdentity?: Pick<TResolvedTenantEmailIdentity, 'brand' | 'brandName'>;
   tenantNames?: string[];
   subject: string;
   body: TPortableTextContent;

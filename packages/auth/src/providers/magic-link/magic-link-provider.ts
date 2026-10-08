@@ -1,16 +1,27 @@
 import { env } from '@blog/auth/utils/env/env';
-import { EMAIL_TEMPLATE_TYPE } from '@blog/config/constants';
-import { EMAIL_TEMPLATE_DEFAULT_COPY } from '@blog/db/constants';
+import {
+  EMAIL_TEMPLATE_TYPE,
+  LOCALE_ISO_CODES,
+  type TLocaleIsoCode,
+} from '@blog/config/constants';
+import { EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE } from '@blog/db/constants';
 import { sendEmail } from '@blog/email';
 import type { EmailConfig } from 'next-auth/providers/email';
 
 import { applyTenantSenderName } from './apply-tenant-sender-name';
-import { findPendingInviteTenantNames } from './find-pending-invite-tenant-names';
+import {
+  findPendingInviteTenants,
+  type TPendingInviteTenant,
+} from './find-pending-invite-tenants';
 import { buildMagicLinkEmail } from './magic-link-email';
 import { buildInviteMagicLinkEmail } from './magic-link-invite-email';
+import { readRecipientLocale } from './read-recipient-locale';
 import { resolveMagicLinkEmailSettings } from './resolve-magic-link-email-settings';
 import { resolveMagicLinkFromAddress } from './resolve-magic-link-from-address';
-import { resolveTenantEmailIdentity } from './resolve-tenant-email-identity';
+import {
+  resolveTenantEmailIdentity,
+  type TResolvedTenantEmailIdentity,
+} from './resolve-tenant-email-identity';
 
 export function buildMagicLinkProvider(): EmailConfig {
   const from = resolveMagicLinkFromAddress(env.MAGIC_LINK_FROM_ADDRESS);
@@ -22,30 +33,32 @@ export function buildMagicLinkProvider(): EmailConfig {
     from,
     async sendVerificationRequest({ identifier, url }) {
       const { host } = new URL(url);
-      let tenantNames: string[] = [];
+      let inviteTenants: TPendingInviteTenant[] = [];
       try {
-        tenantNames = await findPendingInviteTenantNames(identifier);
+        inviteTenants = await findPendingInviteTenants(identifier);
       } catch {
-        // Best-effort: a failed lookup falls back to the generic copy below,
-        // same as finding no pending invite — never blocks delivery of the
-        // magic-link email itself. Never console.*, this package never logs
-        // (see CLAUDE.md).
+        // A failed lookup must not block delivery: it degrades to the
+        // generic copy, the same as finding no pending invite.
       }
+      const tenantNames = inviteTenants.map(({ name }) => name);
       const tenantIdentity = await resolveTenantEmailIdentity(host);
       const isInvite = tenantNames.length > 0;
       const templateType = isInvite
         ? EMAIL_TEMPLATE_TYPE.TENANT_INVITE
         : EMAIL_TEMPLATE_TYPE.MAGIC_LINK;
+      const locale = resolveRecipientLocale(url, tenantIdentity, inviteTenants);
 
       const emailSettings = tenantIdentity
         ? await resolveMagicLinkEmailSettings(
             tenantIdentity.tenantId,
             templateType,
+            locale,
           )
         : undefined;
 
       const { subject: resolvedSubject, body: resolvedBody } =
-        emailSettings ?? EMAIL_TEMPLATE_DEFAULT_COPY[templateType];
+        emailSettings ??
+        EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE[locale][templateType];
 
       const { subject, html } = isInvite
         ? buildInviteMagicLinkEmail({
@@ -75,4 +88,23 @@ export function buildMagicLinkProvider(): EmailConfig {
       });
     },
   };
+}
+
+// With no tenant behind the host, an invite is written in the invited
+// tenant's default language, and a platform admin's own sign-in stays in
+// English.
+function resolveRecipientLocale(
+  url: string,
+  tenantIdentity: TResolvedTenantEmailIdentity | undefined,
+  inviteTenants: TPendingInviteTenant[],
+): TLocaleIsoCode {
+  if (tenantIdentity) {
+    return readRecipientLocale(
+      url,
+      tenantIdentity.liveLocales,
+      tenantIdentity.defaultLocale,
+    );
+  }
+
+  return inviteTenants[0]?.locale ?? LOCALE_ISO_CODES.EN;
 }

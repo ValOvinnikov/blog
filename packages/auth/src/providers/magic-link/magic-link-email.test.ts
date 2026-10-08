@@ -71,7 +71,7 @@ describe(buildMagicLinkEmail, () => {
         url: 'https://example.com/api/auth/callback/email?token=abc',
         subject: 'Sign in to your account',
         body: bodyOf('We received a request to sign in.'),
-        tenantIdentity: { brand, brandName: 'Acme Blog', tenantId: 'tenant-1' },
+        tenantIdentity: { brand, brandName: 'Acme Blog' },
       });
 
       expect(html).toContain('<!doctype html>');
@@ -83,7 +83,7 @@ describe(buildMagicLinkEmail, () => {
         url: 'https://example.com/api/auth/callback/email?token=abc',
         subject: 'Sign in to your account',
         body: bodyOf('We received a request to sign in.'),
-        tenantIdentity: { brand, brandName: 'Acme Blog', tenantId: 'tenant-1' },
+        tenantIdentity: { brand, brandName: 'Acme Blog' },
         logoImageUrl: 'https://cdn.example.com/logo.png',
         footerPostalAddress: '123 Main St, Springfield',
       });
@@ -116,7 +116,7 @@ describe(buildMagicLinkEmail, () => {
             ],
           },
         ],
-        tenantIdentity: { brand, brandName: 'Acme Blog', tenantId: 'tenant-1' },
+        tenantIdentity: { brand, brandName: 'Acme Blog' },
       });
 
       expect(html).toContain(

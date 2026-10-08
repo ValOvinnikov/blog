@@ -10,7 +10,7 @@ import type { TResolvedTenantEmailIdentity } from './resolve-tenant-email-identi
 
 export type TMagicLinkEmailInput = {
   url: string;
-  tenantIdentity?: TResolvedTenantEmailIdentity;
+  tenantIdentity?: Pick<TResolvedTenantEmailIdentity, 'brand' | 'brandName'>;
   subject: string;
   body: TPortableTextContent;
   logoImageUrl?: string;

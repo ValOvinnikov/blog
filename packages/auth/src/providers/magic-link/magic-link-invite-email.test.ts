@@ -131,7 +131,7 @@ describe(buildInviteMagicLinkEmail, () => {
         subject: "You've been invited to join the team",
         body: bodyOf('You have been invited to join as a team member.'),
         tenantNames: ['Acme Blog'],
-        tenantIdentity: { brand, brandName: 'Acme Blog', tenantId: 'tenant-1' },
+        tenantIdentity: { brand, brandName: 'Acme Blog' },
       });
 
       expect(html).toContain('<!doctype html>');
@@ -144,7 +144,7 @@ describe(buildInviteMagicLinkEmail, () => {
         subject: "You've been invited to join the team",
         body: bodyOf('You have been invited to join as a team member.'),
         tenantNames: ['Acme Blog'],
-        tenantIdentity: { brand, brandName: 'Acme Blog', tenantId: 'tenant-1' },
+        tenantIdentity: { brand, brandName: 'Acme Blog' },
         logoImageUrl: 'https://cdn.example.com/logo.png',
         footerPostalAddress: '123 Main St, Springfield',
       });
@@ -178,7 +178,7 @@ describe(buildInviteMagicLinkEmail, () => {
           },
         ],
         tenantNames: ['Acme Blog'],
-        tenantIdentity: { brand, brandName: 'Acme Blog', tenantId: 'tenant-1' },
+        tenantIdentity: { brand, brandName: 'Acme Blog' },
       });
 
       expect(html).toContain(
@@ -193,7 +193,7 @@ describe(buildInviteMagicLinkEmail, () => {
         subject: "You've been invited to join the team",
         body: bodyOf("You've been invited to manage EvilCorp."),
         tenantNames: ['Acme Blog'],
-        tenantIdentity: { brand, brandName: 'Acme Blog', tenantId: 'tenant-1' },
+        tenantIdentity: { brand, brandName: 'Acme Blog' },
       });
 
       expect(html).toContain('<strong>Acme Blog</strong>');

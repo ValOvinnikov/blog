@@ -1,6 +1,9 @@
-import type { TEmailTemplateType } from '@blog/config/constants';
+import type {
+  TEmailTemplateType,
+  TLocaleIsoCode,
+} from '@blog/config/constants';
 import { queries } from '@blog/db';
-import { EMAIL_TEMPLATE_DEFAULT_COPY } from '@blog/db/constants';
+import { EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE } from '@blog/db/constants';
 import type { TEmailTemplateResult } from '@blog/db/queries/email-templates';
 import { isValidEmailAddress } from '@blog/email/validation';
 
@@ -24,13 +27,15 @@ export type TResolvedMagicLinkEmailSettings = {
 export async function resolveMagicLinkEmailSettings(
   tenantId: string,
   templateType: TEmailTemplateType,
+  locale: TLocaleIsoCode,
 ): Promise<TResolvedMagicLinkEmailSettings> {
   const [config, template] = await Promise.all([
     getEmailConfigSafely(tenantId),
-    getEmailTemplateSafely(tenantId, templateType),
+    getEmailTemplateSafely(tenantId, templateType, locale),
   ]);
 
-  const defaultCopy = EMAIL_TEMPLATE_DEFAULT_COPY[templateType];
+  const defaultCopy =
+    EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE[locale][templateType];
   const replyTo = config?.replyToAddress;
 
   return {
@@ -54,11 +59,13 @@ async function getEmailConfigSafely(tenantId: string) {
 async function getEmailTemplateSafely(
   tenantId: string,
   templateType: TEmailTemplateType,
+  locale: TLocaleIsoCode,
 ): Promise<TEmailTemplateResult | undefined> {
   try {
     return await queries.emailTemplates.getEmailTemplate(
       tenantId,
       templateType,
+      locale,
     );
   } catch {
     return undefined;

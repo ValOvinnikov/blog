@@ -1,6 +1,14 @@
 import { resolveTenantEmailBrand } from '@blog/config';
-import { EMAIL_TEMPLATE_TYPE, PRESET_ID } from '@blog/config/constants';
-import { EMAIL_TEMPLATE_DEFAULT_COPY } from '@blog/db/constants';
+import {
+  EMAIL_TEMPLATE_TYPE,
+  LOCALE_ISO_CODES,
+  PRESET_ID,
+} from '@blog/config/constants';
+import {
+  EMAIL_TEMPLATE_DEFAULT_COPY,
+  EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE,
+  TENANT_PLAN,
+} from '@blog/db/constants';
 
 import { buildMagicLinkProvider } from './magic-link-provider';
 
@@ -27,12 +35,17 @@ const {
   sendEmailMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', () => ({
+vi.mock('@blog/db', async () => ({
   queries: {
     membershipInvites: {
       findPendingInviteByEmail: findPendingInviteByEmailMock,
     },
-    tenants: { listTenantsByIds: listTenantsByIdsMock },
+    tenants: {
+      ...(await vi.importActual(
+        '@blog/db/queries/tenants/get-tenant-live-locales',
+      )),
+      listTenantsByIds: listTenantsByIdsMock,
+    },
     tenantDomains: { getTenantByDomain: getTenantByDomainMock },
     siteConfig: { getSiteConfig: getSiteConfigMock },
     emailConfig: { getEmailConfig: getEmailConfigMock },
@@ -98,7 +111,7 @@ describe(buildMagicLinkProvider, () => {
       { id: 'invite-1', tenantId: 'tenant-1' },
     ]);
     listTenantsByIdsMock.mockResolvedValue([
-      { id: 'tenant-1', name: 'Acme Blog' },
+      { id: 'tenant-1', name: 'Acme Blog', locale: LOCALE_ISO_CODES.EN },
     ]);
 
     await provider.sendVerificationRequest({
@@ -194,11 +207,65 @@ describe(buildMagicLinkProvider, () => {
     });
   });
 
+  it("writes an invite sent from a tenant-less host in the invited tenant's default language", async () => {
+    findPendingInviteByEmailMock.mockResolvedValue([
+      { id: 'invite-1', tenantId: 'tenant-1' },
+    ]);
+    listTenantsByIdsMock.mockResolvedValue([
+      { id: 'tenant-1', name: 'Acme Blog', locale: LOCALE_ISO_CODES.ES },
+    ]);
+
+    await provider.sendVerificationRequest({
+      identifier: 'owner@example.com',
+      url: 'https://platform.example.com/api/auth/callback/email?token=abc',
+      expires: new Date('2026-01-01T00:00:00.000Z'),
+      provider,
+      token: 'abc',
+      theme: {},
+      request: new Request('https://platform.example.com'),
+    });
+
+    expect(sendEmailMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        subject:
+          EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE[LOCALE_ISO_CODES.ES][
+            EMAIL_TEMPLATE_TYPE.TENANT_INVITE
+          ].subject,
+      }),
+    );
+  });
+
+  it('writes a sign-in from a tenant-less host in English whatever the return-to path', async () => {
+    await provider.sendVerificationRequest({
+      identifier: 'admin@example.com',
+      url: `https://platform.example.com/api/auth/callback/email?${new URLSearchParams(
+        { callbackUrl: 'https://platform.example.com/fr', token: 'abc' },
+      )}`,
+      expires: new Date('2026-01-01T00:00:00.000Z'),
+      provider,
+      token: 'abc',
+      theme: {},
+      request: new Request('https://platform.example.com'),
+    });
+
+    expect(sendEmailMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        subject:
+          EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE[LOCALE_ISO_CODES.EN][
+            EMAIL_TEMPLATE_TYPE.MAGIC_LINK
+          ].subject,
+      }),
+    );
+  });
+
   describe('when the host resolves to a tenant', () => {
     beforeEach(() => {
       getTenantByDomainMock.mockResolvedValue({
         id: 'tenant-1',
         name: 'Acme Blog',
+        locale: LOCALE_ISO_CODES.EN,
+        additionalLocales: [LOCALE_ISO_CODES.FR],
+        plan: TENANT_PLAN.GROWTH,
       });
       getSiteConfigMock.mockResolvedValue({
         preset: PRESET_ID.CONSOLE,
@@ -447,5 +514,32 @@ describe(buildMagicLinkProvider, () => {
         }),
       );
     });
+
+    it.each([
+      ['a language the tenant offers', '/fr/blog', LOCALE_ISO_CODES.FR],
+      ['a language the tenant does not offer', '/de/blog', LOCALE_ISO_CODES.EN],
+      ['no language prefix', '/blog', LOCALE_ISO_CODES.EN],
+    ])(
+      'looks the template up in the right language for a return-to path with %s',
+      async (_, callbackPath, expectedLocale) => {
+        await provider.sendVerificationRequest({
+          identifier: 'jane@example.com',
+          url: `https://example.com/api/auth/callback/email?${new URLSearchParams(
+            { callbackUrl: `https://example.com${callbackPath}`, token: 'abc' },
+          )}`,
+          expires: new Date('2026-01-01T00:00:00.000Z'),
+          provider,
+          token: 'abc',
+          theme: {},
+          request: new Request('https://example.com'),
+        });
+
+        expect(getEmailTemplateMock).toHaveBeenCalledWith(
+          'tenant-1',
+          EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+          expectedLocale,
+        );
+      },
+    );
   });
 });
