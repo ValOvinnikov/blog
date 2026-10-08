@@ -1,4 +1,1 @@
-export {
-  EmailTemplateEditor,
-  type TEmailTemplateEditorValues,
-} from './email-template-editor';
+export { EmailTemplateEditor } from './email-template-editor';

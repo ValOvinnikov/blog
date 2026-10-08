@@ -1,97 +1,114 @@
 'use client';
 
-import { ALERT_TYPE, type TEmailTemplateType } from '@blog/config';
+import { SIZE, type TEmailTemplateType } from '@blog/config';
 import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
 import type { TTenantEmailBrand } from '@blog/email/html';
 import { EmailLogoField } from '@platform/components/features/email/email-logo-field';
 import { EmailTemplatePreview } from '@platform/components/features/email/email-template-preview';
-import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
 import { FormField } from '@platform/components/shared/form-field';
 import { FormTextInput } from '@platform/components/shared/form-text-input';
 import { Heading } from '@platform/components/shared/heading';
 import { PortableTextEditor } from '@platform/components/shared/portable-text-editor';
-import { useToast } from '@platform/context/toast-provider';
-import { updateEmailTemplateAction } from '@platform/server/email-templates/update-email-template-action';
+import { StatusBadge } from '@platform/components/shared/status-badge';
+import type {
+  TEmailCopyDraft,
+  TStagedLogo,
+} from '@platform/utils/email-draft/email-draft';
 import { buildEmailTemplatePreviewHtml } from '@platform/utils/email-template-preview-builder/email-template-preview-builder';
 import { isBlankPortableTextValue } from '@platform/utils/portable-text-schema/portable-text-schema';
-import { useFormSubmission } from '@platform/utils/use-form-submission/use-form-submission';
 import { useTranslations } from 'next-intl';
 import { useId, useMemo, useState } from 'react';
 
 import { emailTemplateEditorVariants } from './email-template-editor-variants';
 
-export type TEmailTemplateEditorValues = {
-  subject: string;
-  body: TEmailTemplateBlock[];
-  logoAssetUrl: string | undefined;
-};
-
 export type TEmailTemplateEditorProps = {
-  tenantId: string;
   templateType: TEmailTemplateType;
-  initialValues: TEmailTemplateEditorValues;
+  languageName: string;
+  copy: TEmailCopyDraft;
+  fallback: { subject: string; body: TEmailTemplateBlock[] };
+  logo: TStagedLogo;
+  senderLogoUrl: string | undefined;
+  onCopyChange: (copy: TEmailCopyDraft) => void;
+  onLogoStage: (logo: TStagedLogo) => void;
   brand: TTenantEmailBrand;
   brandName: string;
-  isArchived?: boolean;
+  isDisabled: boolean;
   archivedNoticeId?: string;
 };
 
-/**
- * Remounted (via a `key={templateType}` from its caller) rather than kept in
- * sync across template switches — each template type is its own editing
- * session.
- */
+const isSameBody = (a: TEmailTemplateBlock[], b: TEmailTemplateBlock[]) =>
+  JSON.stringify(a) === JSON.stringify(b);
+
 export const EmailTemplateEditor = ({
-  tenantId,
   templateType,
-  initialValues,
+  languageName,
+  copy,
+  fallback,
+  logo,
+  senderLogoUrl,
+  onCopyChange,
+  onLogoStage,
   brand,
   brandName,
-  isArchived = false,
+  isDisabled,
   archivedNoticeId,
 }: TEmailTemplateEditorProps) => {
   const t = useTranslations('emailTemplateEditor');
-  const toast = useToast();
+  const tStatus = useTranslations('emailItemStatus');
   const subjectId = useId();
-  const archivedDescribedBy = isArchived ? archivedNoticeId : undefined;
-  const [logoAssetUrl, setLogoAssetUrl] = useState(initialValues.logoAssetUrl);
+  const [bodyRevision, setBodyRevision] = useState(0);
+  const { grid, stack, fieldStatus, note, previewHeading } =
+    emailTemplateEditorVariants();
 
-  const { values, setValues, status, isPending, handleSubmit } =
-    useFormSubmission<
-      Pick<TEmailTemplateEditorValues, 'subject' | 'body'>,
-      { ok: boolean }
-    >({
-      initialValues: {
-        subject: initialValues.subject,
-        body: initialValues.body,
-      },
-      onSubmit: (vals) =>
-        updateEmailTemplateAction(tenantId, templateType, {
-          subject: vals.subject.trim() === '' ? null : vals.subject.trim(),
-          body: isBlankPortableTextValue(vals.body) ? null : vals.body,
-        }),
-      onSuccess: () => {
-        toast.success({
-          message: t('alertSuccess'),
-        });
-      },
+  const isSubjectCustomised = copy.subject !== '';
+  const isBodyCustomised = copy.body !== null;
+
+  const handleBodyChange = (body: TEmailTemplateBlock[]) =>
+    onCopyChange({
+      ...copy,
+      body:
+        isBlankPortableTextValue(body) || isSameBody(body, fallback.body)
+          ? null
+          : body,
     });
+
+  const resetBody = () => {
+    onCopyChange({ ...copy, body: null });
+    setBodyRevision((revision) => revision + 1);
+  };
+
+  const renderFieldStatus = (isCustomised: boolean, onReset: () => void) => (
+    <div className={fieldStatus()}>
+      <StatusBadge tone={isCustomised ? 'plan' : 'neutral'} hasDot={false}>
+        {isCustomised ? tStatus('customised') : tStatus('default')}
+      </StatusBadge>
+      {isCustomised && (
+        <Button
+          type="button"
+          size={SIZE.SM}
+          variant="secondary"
+          onClick={onReset}
+          isDisabled={isDisabled}
+        >
+          {t('useDefault')}
+        </Button>
+      )}
+    </div>
+  );
 
   const previewHtml = useMemo(
     () =>
       buildEmailTemplatePreviewHtml(templateType, {
-        subject: values.subject,
-        body: values.body,
+        subject: copy.subject || fallback.subject,
+        body: copy.body ?? fallback.body,
         brand,
         brandName,
-        logoImageUrl: logoAssetUrl,
+        logoImageUrl: logo.url ?? senderLogoUrl,
       }),
-    [templateType, values.subject, values.body, brand, brandName, logoAssetUrl],
+    [templateType, copy, fallback, brand, brandName, logo.url, senderLogoUrl],
   );
-
-  const { grid, stack, footer, previewHeading } = emailTemplateEditorVariants();
 
   return (
     <Card>
@@ -103,38 +120,39 @@ export const EmailTemplateEditor = ({
       <Card.Body>
         <div className={grid()}>
           <div className={stack()}>
-            {status === 'error' && (
-              <Alert type={ALERT_TYPE.ERROR} title={t('alertError')} />
-            )}
             <FormTextInput
-              label={t('subjectLabel')}
+              label={t('subjectLabel', { language: languageName })}
               htmlFor={subjectId}
               hint={t('subjectHint')}
-              value={values.subject}
-              onChange={(value) =>
-                setValues((prev) => ({ ...prev, subject: value }))
-              }
-              isDisabled={isPending || isArchived}
-              aria-describedby={archivedDescribedBy}
+              placeholder={fallback.subject}
+              value={copy.subject}
+              onChange={(subject) => onCopyChange({ ...copy, subject })}
+              isDisabled={isDisabled}
+              aria-describedby={archivedNoticeId}
+              footer={renderFieldStatus(isSubjectCustomised, () =>
+                onCopyChange({ ...copy, subject: '' }),
+              )}
             />
-            <FormField label={t('bodyLabel')} hint={t('bodyHint')}>
+            <FormField
+              label={t('bodyLabel', { language: languageName })}
+              hint={t('bodyHint')}
+              footer={renderFieldStatus(isBodyCustomised, resetBody)}
+            >
               <PortableTextEditor
-                key={templateType}
-                initialValue={initialValues.body}
-                onChange={(body) => setValues((prev) => ({ ...prev, body }))}
-                ariaLabel={t('bodyLabel')}
-                isDisabled={isPending || isArchived}
+                key={bodyRevision}
+                initialValue={copy.body ?? fallback.body}
+                onChange={handleBodyChange}
+                ariaLabel={t('bodyLabel', { language: languageName })}
+                isDisabled={isDisabled}
               />
             </FormField>
             <EmailLogoField
-              tenantId={tenantId}
-              target={{ type: 'template', templateType }}
               label={t('logoLabel')}
               hint={t('logoHint')}
-              currentUrl={logoAssetUrl}
-              onChange={setLogoAssetUrl}
-              isDisabled={isArchived}
-              aria-describedby={archivedDescribedBy}
+              logo={logo}
+              onStage={onLogoStage}
+              isDisabled={isDisabled}
+              aria-describedby={archivedNoticeId}
             />
           </div>
           <div className={stack()}>
@@ -145,25 +163,10 @@ export const EmailTemplateEditor = ({
               html={previewHtml}
               title={t('previewIframeTitle')}
             />
+            <p className={note()}>{t('actionLockedNote')}</p>
           </div>
         </div>
       </Card.Body>
-      <Card.Footer>
-        <div className={footer()}>
-          <p>{t('actionLockedNote')}</p>
-          <Button
-            type="button"
-            variant="primary"
-            onClick={handleSubmit}
-            isDisabled={isArchived}
-            isPending={isPending}
-            pendingLabel={t('savingButton')}
-            aria-describedby={archivedDescribedBy}
-          >
-            {t('saveButton')}
-          </Button>
-        </div>
-      </Card.Footer>
     </Card>
   );
 };

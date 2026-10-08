@@ -1,4 +1,4 @@
-import { EMAIL_TEMPLATE_TYPE } from '@blog/config';
+import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@blog/config';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
@@ -6,19 +6,30 @@ import userEvent from '@testing-library/user-event';
 
 import { EmailPageContent } from './email-page-content';
 
-const { getSiteConfigMock, getEmailConfigMock, listEmailTemplatesMock } =
-  vi.hoisted(() => ({
-    getSiteConfigMock: vi.fn(),
-    getEmailConfigMock: vi.fn(),
-    listEmailTemplatesMock: vi.fn(),
-  }));
+const {
+  getSiteConfigMock,
+  getEmailConfigMock,
+  listEmailTemplatesMock,
+  listAuthoredEmailTemplatesMock,
+  selectLiveLocalesMock,
+} = vi.hoisted(() => ({
+  getSiteConfigMock: vi.fn(),
+  getEmailConfigMock: vi.fn(),
+  listEmailTemplatesMock: vi.fn(),
+  listAuthoredEmailTemplatesMock: vi.fn(),
+  selectLiveLocalesMock: vi.fn(),
+}));
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     siteConfig: { getSiteConfig: getSiteConfigMock },
     emailConfig: { getEmailConfig: getEmailConfigMock },
-    emailTemplates: { listEmailTemplates: listEmailTemplatesMock },
+    emailTemplates: {
+      listEmailTemplates: listEmailTemplatesMock,
+      listAuthoredEmailTemplates: listAuthoredEmailTemplatesMock,
+    },
+    tenants: { selectLiveLocales: selectLiveLocalesMock },
   },
 }));
 
@@ -79,6 +90,17 @@ describe(`<${EmailPageContent.name}/>`, () => {
     getSiteConfigMock.mockResolvedValue(undefined);
     getEmailConfigMock.mockResolvedValue(undefined);
     listEmailTemplatesMock.mockResolvedValue(TEMPLATE_RESULTS);
+    listAuthoredEmailTemplatesMock.mockReset();
+    listAuthoredEmailTemplatesMock.mockResolvedValue([
+      {
+        templateType: EMAIL_TEMPLATE_TYPE.TENANT_INVITE,
+        locale: LOCALE_ISO_CODES.EN,
+        subject: "You're invited to Acme Co",
+        body: null,
+      },
+    ]);
+    selectLiveLocalesMock.mockReset();
+    selectLiveLocalesMock.mockReturnValue([LOCALE_ISO_CODES.EN]);
   });
 
   it('renders the Email page heading', async () => {
@@ -112,13 +134,13 @@ describe(`<${EmailPageContent.name}/>`, () => {
     expect(screen.getByDisplayValue('support@acme.example')).toBeVisible();
   });
 
-  it('renders every template type, always fully populated, never blank', async () => {
+  it("shows each template's authored copy in the tenant's default language", async () => {
     await setup();
 
-    expect(screen.getByDisplayValue('Sign in to Acme Co')).toBeVisible();
+    await userEvent
+      .setup()
+      .click(screen.getByRole('button', { name: /^Team invite/ }));
 
-    const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Team invite' }));
     expect(screen.getByDisplayValue("You're invited to Acme Co")).toBeVisible();
   });
 

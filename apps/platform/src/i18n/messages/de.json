@@ -363,7 +363,21 @@
   },
   "emailForm": {
     "pageHeading": "E-Mail",
-    "pageSubtitle": "Absenderidentität und Texte je Vorlage für jede E-Mail, die dieser Mandant versendet."
+    "pageSubtitle": "Absenderidentität und Texte je Vorlage für jede E-Mail, die dieser Mandant versendet.",
+    "saveButton": "Änderungen speichern",
+    "savingButton": "Wird gespeichert…",
+    "alertSuccess": "E-Mail-Einstellungen gespeichert.",
+    "alertError": "Nicht alle Änderungen konnten gespeichert werden — was noch als „Nicht gespeichert“ markiert ist, wurde nicht gespeichert. Bitte erneut versuchen.",
+    "senderItemLabel": "Absender & Fußzeile",
+    "senderItemDescription": "Name, Antwortadresse, Anschrift und Logo, in jeder Sprache gleich.",
+    "itemsAriaLabel": "Zu bearbeitende E-Mails",
+    "editingLabel": "Bearbeiten",
+    "languageAriaLabel": "Zu bearbeitende Sprache"
+  },
+  "emailItemStatus": {
+    "default": "Standard",
+    "customised": "Angepasst",
+    "unsaved": "Nicht gespeichert"
   },
   "emailSettingsForm": {
     "heading": "E-Mail-Einstellungen",
@@ -376,11 +390,7 @@
     "footerAddressLabel": "Postanschrift in der Fußzeile",
     "footerAddressHint": "Für Massen-E-Mails gesetzlich vorgeschrieben — wird in der Fußzeile jeder E-Mail dieses Mandanten angezeigt.",
     "logoLabel": "E-Mail-Logo",
-    "logoHint": "Ohne Angabe wird der Produktstandard verwendet. Eine Vorlage kann dies unten mit einem eigenen Logo überschreiben.",
-    "saveButton": "Änderungen speichern",
-    "savingButton": "Wird gespeichert…",
-    "alertSuccess": "E-Mail-Einstellungen gespeichert.",
-    "alertError": "Die E-Mail-Einstellungen konnten nicht gespeichert werden — bitte erneut versuchen."
+    "logoHint": "Wird in jeder E-Mail und jeder Sprache verwendet. Eine Vorlage kann es mit einem eigenen Logo überschreiben."
   },
   "emailLogoField": {
     "unexpectedError": "Etwas ist schiefgelaufen — bitte erneut versuchen.",
@@ -392,22 +402,13 @@
     "unsupportedType": "Wählen Sie ein PNG-, JPEG- oder GIF-Bild — SVG und WebP werden von gängigen E-Mail-Programmen nicht unterstützt.",
     "tooLarge": "Diese Datei ist zu groß — die Grenze liegt bei {limit}."
   },
-  "emailTemplatesSection": {
-    "heading": "Vorlagen",
-    "description": "Betreff, Text und Logo für jeden Vorlagentyp. Werden alle eigenen Texte entfernt, wird der Produktstandard verwendet.",
-    "segmentedControlAriaLabel": "E-Mail-Vorlage zum Bearbeiten wählen"
-  },
   "emailTemplateEditor": {
-    "subjectLabel": "Betreff",
-    "subjectHint": "Leer bedeutet: Standardbetreff des Produkts.",
-    "bodyLabel": "Text",
+    "subjectLabel": "Betreff ({language})",
+    "subjectHint": "Leer lassen, um den im Feld angezeigten Betreff zu senden.",
+    "bodyLabel": "Nachricht ({language})",
     "bodyHint": "Die Anmeldeschaltfläche, der Einladungslink oder der Abmeldelink wird immer darunter angezeigt — er lässt sich hier nicht entfernen.",
     "logoLabel": "Vorlagen-Logo",
-    "logoHint": "Überschreibt das E-Mail-Logo des Mandanten nur für diese Vorlage.",
-    "saveButton": "Änderungen speichern",
-    "savingButton": "Wird gespeichert…",
-    "alertSuccess": "Vorlage gespeichert.",
-    "alertError": "Diese Vorlage konnte nicht gespeichert werden — bitte erneut versuchen.",
+    "logoHint": "Überschreibt das E-Mail-Logo für diese Vorlage, in jeder Sprache.",
     "previewHeading": "Vorschau",
     "previewIframeTitle": "E-Mail-Vorschau",
     "actionLockedNote": "Die Schaltflächen und Links in der Vorschau werden immer mitgesendet und können hier nicht bearbeitet werden.",
@@ -420,7 +421,8 @@
       "MAGIC_LINK": "Wird gesendet, wenn sich jemand auf der Website dieses Mandanten anmeldet.",
       "TENANT_INVITE": "Wird gesendet, wenn jemand in das Team dieses Mandanten eingeladen wird.",
       "NEWSLETTER_CONFIRMATION": "Wird gesendet, um ein Newsletter-Abonnement zu bestätigen."
-    }
+    },
+    "useDefault": "Standard verwenden"
   },
   "portableTextEditorToolbar": {
     "bold": "Fett",

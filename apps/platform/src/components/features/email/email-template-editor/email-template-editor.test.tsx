@@ -1,49 +1,32 @@
 import { EMAIL_TEMPLATE_TYPE } from '@blog/config';
-import { customRender, screen, waitFor } from '@platform/testing/custom-render';
+import { customRender, screen } from '@platform/testing/custom-render';
 import { TENANT_EMAIL_BRAND as BRAND } from '@platform/testing/tenant-email-brand';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { EmailTemplateEditor } from './email-template-editor';
 
-const { updateEmailTemplateActionMock } = vi.hoisted(() => ({
-  updateEmailTemplateActionMock: vi.fn(),
-}));
-
-vi.mock(
-  '@platform/server/email-templates/update-email-template-action',
-  () => ({
-    updateEmailTemplateAction: updateEmailTemplateActionMock,
-  }),
-);
-
-vi.mock('@platform/server/email/upload-email-logo-action', () => ({
-  uploadEmailLogoAction: vi.fn(),
-}));
-
-vi.mock('@platform/server/email/clear-email-logo-action', () => ({
-  clearEmailLogoAction: vi.fn(),
-}));
-
-const BODY_WITH_TEXT = [
+const FALLBACK_BODY = [
   {
-    _type: 'block' as const,
+    _type: 'block',
     _key: 'k1',
     style: 'normal',
-    children: [{ _type: 'span', _key: 's1', text: 'Hello there', marks: [] }],
     markDefs: [],
+    children: [{ _type: 'span', _key: 's1', text: 'Hello there', marks: [] }],
   },
 ];
 
 const setup = customRender(EmailTemplateEditor, {
-  tenantId: 'tenant-1',
   templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-  initialValues: {
-    subject: 'Sign in',
-    body: BODY_WITH_TEXT,
-    logoAssetUrl: undefined,
-  },
+  languageName: 'French',
+  copy: { subject: '', body: null },
+  fallback: { subject: 'Connectez-vous', body: FALLBACK_BODY },
+  logo: { url: undefined },
+  senderLogoUrl: undefined,
+  onCopyChange: vi.fn(),
+  onLogoStage: vi.fn(),
   brand: BRAND,
   brandName: 'Acme Co',
+  isDisabled: false,
 });
 
 describe(`<${EmailTemplateEditor.name}/>`, () => {
@@ -51,103 +34,50 @@ describe(`<${EmailTemplateEditor.name}/>`, () => {
 
   beforeEach(() => {
     user = userEvent.setup();
-    updateEmailTemplateActionMock.mockReset();
-    updateEmailTemplateActionMock.mockResolvedValue({
-      ok: true,
-      result: {
-        tenantId: 'tenant-1',
-        templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-        subject: 'Sign in',
-        body: BODY_WITH_TEXT,
-        logoAssetUrl: undefined,
-      },
-    });
   });
 
-  it('renders the given subject and template label', () => {
-    setup({
-      initialValues: {
-        subject: 'Sign in to Acme Co',
-        body: BODY_WITH_TEXT,
-        logoAssetUrl: undefined,
-      },
-    });
+  it('labels the fields with the language being edited', () => {
+    setup();
 
-    expect(screen.getByDisplayValue('Sign in to Acme Co')).toBeVisible();
     expect(screen.getByRole('heading', { name: 'Sign-in link' })).toBeVisible();
+    expect(screen.getByLabelText('Subject (French)')).toBeVisible();
   });
 
-  it('sends null for a body that is blank (a single empty default paragraph)', async () => {
-    setup({
-      initialValues: {
-        subject: 'Sign in',
-        body: [],
-        logoAssetUrl: undefined,
-      },
-    });
+  it('shows the copy that would be sent in place of a blank subject', () => {
+    setup();
 
-    await user.click(screen.getByRole('button', { name: 'Save changes' }));
-
-    await waitFor(() => {
-      expect(updateEmailTemplateActionMock).toHaveBeenCalledWith(
-        'tenant-1',
-        EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-        expect.objectContaining({ body: null }),
-      );
-    });
+    expect(screen.getByLabelText('Subject (French)')).toHaveAttribute(
+      'placeholder',
+      'Connectez-vous',
+    );
+    expect(screen.getAllByText('Default')).toHaveLength(2);
   });
 
-  describe('with the default sign-in template', () => {
-    beforeEach(() => {
-      setup();
-    });
+  it('reports a typed subject as the new copy', async () => {
+    const onCopyChange = vi.fn();
+    setup({ onCopyChange });
 
-    it('saves an edited subject as-is', async () => {
-      const subjectInput = screen.getByDisplayValue('Sign in');
-      await user.clear(subjectInput);
-      await user.type(subjectInput, 'Please sign in');
-      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+    await user.type(screen.getByLabelText('Subject (French)'), 'S');
 
-      await waitFor(() => {
-        expect(updateEmailTemplateActionMock).toHaveBeenCalledWith(
-          'tenant-1',
-          EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-          expect.objectContaining({ subject: 'Please sign in' }),
-        );
-      });
-    });
+    expect(onCopyChange).toHaveBeenLastCalledWith({ subject: 'S', body: null });
+  });
 
-    it('sends null, not an empty string, when the subject is cleared', async () => {
-      await user.clear(screen.getByDisplayValue('Sign in'));
-      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+  it('clears a customised subject back to the default', async () => {
+    const onCopyChange = vi.fn();
+    setup({ copy: { subject: 'Bonjour', body: null }, onCopyChange });
 
-      await waitFor(() => {
-        expect(updateEmailTemplateActionMock).toHaveBeenCalledWith(
-          'tenant-1',
-          EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-          expect.objectContaining({ subject: null }),
-        );
-      });
-    });
+    expect(screen.getByText('Customised')).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Use default' }));
 
-    it('shows a spinner, marks Save busy, and announces the pending state to assistive tech while the save is in flight', async () => {
-      let resolveAction: (value: { ok: boolean }) => void = () => {};
-      updateEmailTemplateActionMock.mockImplementation(
-        () =>
-          new Promise((resolve) => {
-            resolveAction = resolve;
-          }),
-      );
-      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+    expect(onCopyChange).toHaveBeenCalledWith({ subject: '', body: null });
+  });
 
-      const saveButton = await screen.findByRole('button', {
-        name: 'Saving…',
-      });
-      expect(saveButton).toBeDisabled();
-      expect(saveButton).toHaveAttribute('aria-busy', 'true');
-      expect(screen.getByRole('status')).toHaveTextContent('Saving…');
+  it('locks every field while disabled', () => {
+    setup({ isDisabled: true });
 
-      resolveAction({ ok: true });
-    });
+    expect(screen.getByLabelText('Subject (French)')).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: 'Upload template logo' }),
+    ).toBeDisabled();
   });
 });

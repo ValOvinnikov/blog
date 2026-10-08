@@ -363,7 +363,21 @@
   },
   "emailForm": {
     "pageHeading": "Email",
-    "pageSubtitle": "Sender identity and per-template copy for every email this tenant sends."
+    "pageSubtitle": "Sender identity and per-template copy for every email this tenant sends.",
+    "saveButton": "Save changes",
+    "savingButton": "Saving…",
+    "alertSuccess": "Saved email settings.",
+    "alertError": "Couldn't save every change — the ones still marked Unsaved weren't saved. Try again.",
+    "senderItemLabel": "Sender & footer",
+    "senderItemDescription": "Name, reply-to, address and logo, the same in every language.",
+    "itemsAriaLabel": "Emails to edit",
+    "editingLabel": "Editing",
+    "languageAriaLabel": "Language to edit"
+  },
+  "emailItemStatus": {
+    "default": "Default",
+    "customised": "Customised",
+    "unsaved": "Unsaved"
   },
   "emailSettingsForm": {
     "heading": "Email settings",
@@ -376,11 +390,7 @@
     "footerAddressLabel": "Footer postal address",
     "footerAddressHint": "A legal requirement for bulk mail — shown in the footer of every tenant email.",
     "logoLabel": "Email logo",
-    "logoHint": "Falls back to the product default. A template can override this with its own logo below.",
-    "saveButton": "Save changes",
-    "savingButton": "Saving…",
-    "alertSuccess": "Saved email settings.",
-    "alertError": "Couldn't save email settings — try again."
+    "logoHint": "Used in every email, in every language. A template can override it with its own logo."
   },
   "emailLogoField": {
     "unexpectedError": "Something went wrong — try again.",
@@ -392,22 +402,13 @@
     "unsupportedType": "Choose a PNG, JPEG, or GIF image — SVG and WebP are not supported by major email clients.",
     "tooLarge": "That file is too large — the limit is {limit}."
   },
-  "emailTemplatesSection": {
-    "heading": "Templates",
-    "description": "Subject, body and logo for each template type. Removing all authored copy renders the product default.",
-    "segmentedControlAriaLabel": "Choose an email template to edit"
-  },
   "emailTemplateEditor": {
-    "subjectLabel": "Subject",
-    "subjectHint": "Blank reverts to the product default subject.",
-    "bodyLabel": "Body",
+    "subjectLabel": "Subject ({language})",
+    "subjectHint": "Leave blank to send the subject shown in the field.",
+    "bodyLabel": "Message ({language})",
     "bodyHint": "The sign-in button, invite link or unsubscribe link always renders below this — it can't be removed from here.",
     "logoLabel": "Template logo",
-    "logoHint": "Overrides the tenant email logo for this template only.",
-    "saveButton": "Save changes",
-    "savingButton": "Saving…",
-    "alertSuccess": "Saved template.",
-    "alertError": "Couldn't save this template — try again.",
+    "logoHint": "Overrides the email logo for this template, in every language.",
     "previewHeading": "Preview",
     "previewIframeTitle": "Email preview",
     "actionLockedNote": "The buttons and links in the preview are always sent and can't be edited here.",
@@ -420,7 +421,8 @@
       "MAGIC_LINK": "Sent when someone signs in to this tenant's site.",
       "TENANT_INVITE": "Sent when someone is invited to join this tenant's team.",
       "NEWSLETTER_CONFIRMATION": "Sent to confirm a newsletter subscription."
-    }
+    },
+    "useDefault": "Use default"
   },
   "portableTextEditorToolbar": {
     "bold": "Bold",

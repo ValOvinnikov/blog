@@ -363,7 +363,21 @@
   },
   "emailForm": {
     "pageHeading": "E-mail",
-    "pageSubtitle": "Identité de l'expéditeur et textes de chaque modèle pour tous les e-mails envoyés par ce locataire."
+    "pageSubtitle": "Identité de l'expéditeur et textes de chaque modèle pour tous les e-mails envoyés par ce locataire.",
+    "saveButton": "Enregistrer les modifications",
+    "savingButton": "Enregistrement…",
+    "alertSuccess": "Paramètres d'e-mail enregistrés.",
+    "alertError": "Certaines modifications n'ont pas été enregistrées — celles encore marquées « Non enregistré ». Veuillez réessayer.",
+    "senderItemLabel": "Expéditeur et pied de page",
+    "senderItemDescription": "Nom, adresse de réponse, adresse postale et logo, identiques dans toutes les langues.",
+    "itemsAriaLabel": "E-mails à modifier",
+    "editingLabel": "Modification",
+    "languageAriaLabel": "Langue à modifier"
+  },
+  "emailItemStatus": {
+    "default": "Par défaut",
+    "customised": "Personnalisé",
+    "unsaved": "Non enregistré"
   },
   "emailSettingsForm": {
     "heading": "Paramètres d'e-mail",
@@ -376,11 +390,7 @@
     "footerAddressLabel": "Adresse postale du pied de page",
     "footerAddressHint": "Une obligation légale pour les envois en masse — affichée dans le pied de page de chaque e-mail du locataire.",
     "logoLabel": "Logo des e-mails",
-    "logoHint": "À défaut, le logo par défaut du produit est utilisé. Un modèle peut le remplacer par son propre logo ci-dessous.",
-    "saveButton": "Enregistrer les modifications",
-    "savingButton": "Enregistrement…",
-    "alertSuccess": "Paramètres d'e-mail enregistrés.",
-    "alertError": "Impossible d'enregistrer les paramètres d'e-mail — veuillez réessayer."
+    "logoHint": "Utilisé dans chaque e-mail, dans toutes les langues. Un modèle peut le remplacer par son propre logo."
   },
   "emailLogoField": {
     "unexpectedError": "Une erreur s'est produite — veuillez réessayer.",
@@ -392,22 +402,13 @@
     "unsupportedType": "Choisissez une image PNG, JPEG ou GIF — les formats SVG et WebP ne sont pas pris en charge par les principaux clients de messagerie.",
     "tooLarge": "Ce fichier est trop volumineux — la limite est de {limit}."
   },
-  "emailTemplatesSection": {
-    "heading": "Modèles",
-    "description": "Objet, corps et logo de chaque type de modèle. Si vous supprimez tout le texte rédigé, le modèle par défaut du produit est utilisé.",
-    "segmentedControlAriaLabel": "Choisissez un modèle d'e-mail à modifier"
-  },
   "emailTemplateEditor": {
-    "subjectLabel": "Objet",
-    "subjectHint": "Laissez vide pour revenir à l'objet par défaut du produit.",
-    "bodyLabel": "Corps",
+    "subjectLabel": "Objet ({language})",
+    "subjectHint": "Laissez vide pour envoyer l'objet affiché dans le champ.",
+    "bodyLabel": "Message ({language})",
     "bodyHint": "Le bouton de connexion, le lien d'invitation ou le lien de désabonnement s'affiche toujours sous ce texte — il ne peut pas être supprimé ici.",
     "logoLabel": "Logo du modèle",
-    "logoHint": "Remplace le logo des e-mails du locataire pour ce modèle uniquement.",
-    "saveButton": "Enregistrer les modifications",
-    "savingButton": "Enregistrement…",
-    "alertSuccess": "Modèle enregistré.",
-    "alertError": "Impossible d'enregistrer ce modèle — veuillez réessayer.",
+    "logoHint": "Remplace le logo des e-mails pour ce modèle, dans toutes les langues.",
     "previewHeading": "Aperçu",
     "previewIframeTitle": "Aperçu de l'e-mail",
     "actionLockedNote": "Les boutons et liens de l'aperçu sont toujours envoyés et ne peuvent pas être modifiés ici.",
@@ -420,7 +421,8 @@
       "MAGIC_LINK": "Envoyé lorsqu'une personne se connecte au site de ce locataire.",
       "TENANT_INVITE": "Envoyé lorsqu'une personne est invitée à rejoindre l'équipe de ce locataire.",
       "NEWSLETTER_CONFIRMATION": "Envoyé pour confirmer un abonnement à la newsletter."
-    }
+    },
+    "useDefault": "Utiliser la valeur par défaut"
   },
   "portableTextEditorToolbar": {
     "bold": "Gras",

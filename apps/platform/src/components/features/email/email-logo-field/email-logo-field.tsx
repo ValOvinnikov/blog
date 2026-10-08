@@ -1,42 +1,29 @@
 'use client';
 
 import { AssetUploadField } from '@platform/components/shared/asset-upload-field';
-import { clearEmailLogoAction } from '@platform/server/email/clear-email-logo-action';
-import { uploadEmailLogoAction } from '@platform/server/email/upload-email-logo-action';
+import type { TStagedLogo } from '@platform/utils/email-draft/email-draft';
 import {
   ACCEPTED_EMAIL_LOGO_MIME_TYPES,
   quickClientEmailLogoCheck,
 } from '@platform/utils/email-logo-limits/email-logo-limits';
-import type { TEmailLogoTarget } from '@platform/utils/email-logo-target/email-logo-target';
 import { useTranslations } from 'next-intl';
 import type { AriaAttributes } from 'react';
 
 export type TEmailLogoFieldProps = {
-  tenantId: string;
-  target: TEmailLogoTarget;
   label: string;
   hint: string;
-  currentUrl: string | undefined;
-  onChange: (url: string | undefined) => void;
+  logo: TStagedLogo;
+  onStage: (logo: TStagedLogo) => void;
   isDisabled?: boolean;
   'aria-describedby'?: AriaAttributes['aria-describedby'];
 };
 
-/**
- * Uploads/clears persist immediately through their own server actions,
- * same as the Look tab's `BrandAssetField` — a file selection isn't staged
- * behind a "Save changes" button. Deliberately not the same component:
- * this one enforces email-specific limits (`validateEmailLogoUpload`) and
- * writes to either the tenant's `email_config` row or one template's
- * `email_templates` row, resolved by `target`.
- */
+// Picking or removing a file only stages it; the page's Save uploads it.
 export const EmailLogoField = ({
-  tenantId,
-  target,
   label,
   hint,
-  currentUrl,
-  onChange,
+  logo,
+  onStage,
   isDisabled = false,
   'aria-describedby': ariaDescribedBy,
 }: TEmailLogoFieldProps) => {
@@ -51,15 +38,30 @@ export const EmailLogoField = ({
       : t('tooLarge', { limit: quickError.limit });
   };
 
+  const stageFile = async (formData: FormData) => {
+    const file = formData.get('file');
+    if (!(file instanceof File)) {
+      return { ok: false as const, error: t('unexpectedError') };
+    }
+    const url = URL.createObjectURL(file);
+    onStage({ url, file });
+    return { ok: true as const, url };
+  };
+
+  const stageClear = async () => {
+    onStage({ url: undefined });
+    return { ok: true as const };
+  };
+
   return (
     <AssetUploadField
       label={label}
       hint={hint}
-      currentUrl={currentUrl}
+      currentUrl={logo.url}
       currentAlt={t('currentAlt', { label: lowerLabel })}
       acceptedMimeTypes={ACCEPTED_EMAIL_LOGO_MIME_TYPES}
       uploadLabel={
-        currentUrl
+        logo.url
           ? t('replace', { label: lowerLabel })
           : t('upload', { label: lowerLabel })
       }
@@ -67,9 +69,9 @@ export const EmailLogoField = ({
       removeLabel={t('remove')}
       unexpectedErrorLabel={t('unexpectedError')}
       onValidateFile={validateFile}
-      onUpload={(formData) => uploadEmailLogoAction(tenantId, target, formData)}
-      onClear={() => clearEmailLogoAction(tenantId, target)}
-      onChange={onChange}
+      onUpload={stageFile}
+      onClear={stageClear}
+      onChange={() => undefined}
       isDisabled={isDisabled}
       aria-describedby={ariaDescribedBy}
     />
