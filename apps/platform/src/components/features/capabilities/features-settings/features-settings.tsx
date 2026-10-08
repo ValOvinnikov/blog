@@ -30,21 +30,18 @@ export type TFeaturesSettingsProps = {
     tenantId: string,
     values: TSettingsFeaturesValues,
   ) => Promise<{ ok: boolean }>;
+  savedAt?: Date;
   archivedAt?: Date;
 };
 
-/**
- * The Features tab: one toggle per `settings_features` column. A capability
- * outside `entitledCapabilities` renders through `SettingRow`'s locked
- * treatment rather than hidden, so the tenant knows it exists — the
- * client-side `disabled` is a courtesy, the Server Action re-checks
- * entitlement itself.
- */
+// A capability outside the plan is shown locked rather than hidden; the Server
+// Action re-checks entitlement, so the disabled switch is only a courtesy.
 export const FeaturesSettings = ({
   tenantId,
   entitledCapabilities,
   initialValues,
   saveAction,
+  savedAt,
   archivedAt,
 }: TFeaturesSettingsProps) => {
   const isArchived = Boolean(archivedAt);
@@ -90,6 +87,22 @@ export const FeaturesSettings = ({
       archivedNoticeId={archivedNoticeId}
       hasError={status === 'error'}
       errorTitle={t('alertError')}
+      draft={{
+        tenantId,
+        page: 'features',
+        values,
+        savedValues,
+        savedAt,
+        fields: CAPABILITY_TOGGLES.filter(
+          ({ isComingSoon }) => !isComingSoon,
+        ).map(({ capability, field }) => ({
+          id: field,
+          label: t(`toggleLabel.${capability}`),
+          display: (draftValues: TSettingsFeaturesValues) =>
+            draftValues[field] ? t('switchOn') : t('switchOff'),
+        })),
+        onRestore: setValues,
+      }}
     >
       <Card>
         <Card.Header title={t('capabilitiesHeading')} headingLevel={2} />

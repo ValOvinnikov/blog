@@ -2,6 +2,8 @@ import {
   fireEvent,
   renderWithIntl,
   screen,
+  waitFor,
+  within,
 } from '@platform/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -10,7 +12,28 @@ import {
   type TSettingsFormShellProps,
 } from './settings-form-shell';
 
-const baseProps: TSettingsFormShellProps = {
+type TValues = { tagline: string; footer: string };
+
+const SAVED: TValues = { tagline: 'Old tagline', footer: 'Old footer' };
+
+const draftFor = (
+  values: TValues,
+  savedValues: TValues = SAVED,
+  onRestore: (values: TValues) => void = vi.fn(),
+): TSettingsFormShellProps<TValues>['draft'] => ({
+  tenantId: 'tenant-1',
+  page: 'voice',
+  values,
+  savedValues,
+  savedAt: new Date('2026-10-08T11:05:00.000Z'),
+  fields: [
+    { id: 'tagline', label: 'Tagline', display: (v) => v.tagline },
+    { id: 'footer', label: 'Footer note', display: (v) => v.footer },
+  ],
+  onRestore,
+});
+
+const baseProps: TSettingsFormShellProps<TValues> = {
   title: 'Features',
   description: 'Toggle capabilities for this tenant.',
   saveButtonLabel: 'Save changes',
@@ -22,11 +45,13 @@ const baseProps: TSettingsFormShellProps = {
   archivedNoticeId: 'archived-notice',
   hasError: false,
   errorTitle: 'Something went wrong — try again.',
+  draft: draftFor(SAVED),
   children: <p>tab body</p>,
 };
 
-const renderShell = (overrides: Partial<TSettingsFormShellProps> = {}) =>
-  renderWithIntl(<SettingsFormShell {...baseProps} {...overrides} />);
+const renderShell = (
+  overrides: Partial<TSettingsFormShellProps<TValues>> = {},
+) => renderWithIntl(<SettingsFormShell {...baseProps} {...overrides} />);
 
 const dispatchBeforeUnload = () => {
   const event = new Event('beforeunload', { cancelable: true });
@@ -54,7 +79,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
   });
 
   describe('with no unsaved changes', () => {
-    let onSave: TSettingsFormShellProps['onSave'];
+    let onSave: TSettingsFormShellProps<TValues>['onSave'];
 
     beforeEach(() => {
       onSave = vi.fn().mockResolvedValue(true);
@@ -80,8 +105,8 @@ describe(`<${SettingsFormShell.name}/>`, () => {
   });
 
   describe('with unsaved changes', () => {
-    let onSave: TSettingsFormShellProps['onSave'];
-    let onDiscard: TSettingsFormShellProps['onDiscard'];
+    let onSave: TSettingsFormShellProps<TValues>['onSave'];
+    let onDiscard: TSettingsFormShellProps<TValues>['onDiscard'];
 
     beforeEach(() => {
       onSave = vi.fn().mockResolvedValue(true);
@@ -168,5 +193,191 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     renderShell({ hasError: true });
 
     expect(screen.getByText('Something went wrong — try again.')).toBeVisible();
+  });
+
+  describe('draft recovery', () => {
+    const EDITED: TValues = { ...SAVED, tagline: 'My tagline' };
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    const leaveWithUnsavedChanges = (values: TValues = EDITED) => {
+      const { unmount } = renderShell({
+        changeCount: 1,
+        draft: draftFor(values),
+      });
+      unmount();
+    };
+
+    const queryBanner = () =>
+      screen.queryByText(/You have unsaved changes from/);
+
+    it('offers no draft on a first visit', () => {
+      renderShell();
+
+      expect(queryBanner()).not.toBeInTheDocument();
+    });
+
+    it('offers to restore exactly the unsaved changes on return', async () => {
+      const onRestore = vi.fn();
+      leaveWithUnsavedChanges();
+
+      renderShell({ draft: draftFor(SAVED, SAVED, onRestore) });
+
+      expect(queryBanner()).toBeVisible();
+      expect(
+        screen.getByText(
+          'They were kept on this device when you left the page.',
+        ),
+      ).toBeVisible();
+      await user.click(
+        screen.getByRole('button', { name: 'Restore 1 change' }),
+      );
+
+      expect(onRestore).toHaveBeenCalledWith(EDITED);
+      expect(queryBanner()).not.toBeInTheDocument();
+    });
+
+    it('forgets the draft when it is discarded from the banner', async () => {
+      leaveWithUnsavedChanges();
+      const { unmount } = renderShell();
+
+      await user.click(screen.getByRole('button', { name: 'Discard them' }));
+      expect(queryBanner()).not.toBeInTheDocument();
+      unmount();
+      renderShell();
+
+      expect(queryBanner()).not.toBeInTheDocument();
+    });
+
+    it('forgets the draft once the changes are saved', async () => {
+      const { unmount } = renderShell({
+        changeCount: 1,
+        draft: draftFor(EDITED),
+      });
+
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+      await waitFor(() => expect(baseProps.onSave).toHaveBeenCalled());
+      unmount();
+      renderShell();
+
+      expect(queryBanner()).not.toBeInTheDocument();
+    });
+
+    it('forgets the draft once the changes are discarded', async () => {
+      const { unmount } = renderShell({
+        changeCount: 1,
+        draft: draftFor(EDITED),
+      });
+
+      await user.click(screen.getByRole('button', { name: 'Discard' }));
+      unmount();
+      renderShell();
+
+      expect(queryBanner()).not.toBeInTheDocument();
+    });
+
+    it('offers nothing when the draft matches what is saved now', () => {
+      leaveWithUnsavedChanges();
+
+      renderShell({ draft: draftFor(EDITED, EDITED) });
+
+      expect(queryBanner()).not.toBeInTheDocument();
+    });
+
+    it('keeps drafts apart per tenant', () => {
+      leaveWithUnsavedChanges();
+
+      renderShell({ draft: { ...draftFor(SAVED), tenantId: 'tenant-2' } });
+
+      expect(queryBanner()).not.toBeInTheDocument();
+    });
+
+    it('keeps drafts apart per language', () => {
+      leaveWithUnsavedChanges();
+
+      renderShell({ draft: { ...draftFor(SAVED), language: 'DE' } });
+
+      expect(queryBanner()).not.toBeInTheDocument();
+    });
+
+    it('still works as a form when storage is blocked', async () => {
+      vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+        throw new Error('blocked');
+      });
+      vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+        throw new Error('blocked');
+      });
+      const onSave = vi.fn().mockResolvedValue(true);
+      const { unmount } = renderShell({
+        onSave,
+        changeCount: 1,
+        draft: draftFor(EDITED),
+      });
+
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+      expect(onSave).toHaveBeenCalledTimes(1);
+      unmount();
+      renderShell();
+
+      expect(queryBanner()).not.toBeInTheDocument();
+    });
+
+    describe('when someone else saved since', () => {
+      const THEIRS: TValues = { ...SAVED, tagline: 'Their tagline' };
+      let onRestore: (values: TValues) => void;
+
+      beforeEach(() => {
+        onRestore = vi.fn();
+        leaveWithUnsavedChanges();
+        renderShell({ draft: draftFor(THEIRS, THEIRS, onRestore) });
+      });
+
+      it('says the page was saved after the draft was taken', () => {
+        expect(screen.getByText(/but this page was saved at/)).toBeVisible();
+      });
+
+      it('names the fields a restore would overwrite before any restore', () => {
+        expect(
+          screen.getByText(
+            'Restoring replaces 1 of the newer values: Tagline.',
+          ),
+        ).toBeVisible();
+        expect(
+          screen.queryByRole('button', { name: 'Restore 1 change' }),
+        ).not.toBeInTheDocument();
+        expect(onRestore).not.toHaveBeenCalled();
+      });
+
+      it('shows the saved value beside the draft for each differing field', async () => {
+        await user.click(screen.getByText('Review the difference'));
+
+        const row = screen.getByRole('row', { name: /Tagline/ });
+        expect(
+          within(row).getByRole('cell', { name: 'Their tagline' }),
+        ).toBeVisible();
+        expect(
+          within(row).getByRole('cell', { name: 'My tagline' }),
+        ).toBeVisible();
+      });
+
+      it('restores the draft on Restore anyway', async () => {
+        await user.click(
+          screen.getByRole('button', { name: 'Restore anyway' }),
+        );
+
+        expect(onRestore).toHaveBeenCalledWith(EDITED);
+      });
+
+      it('forgets the draft on Discard my draft', async () => {
+        await user.click(
+          screen.getByRole('button', { name: 'Discard my draft' }),
+        );
+
+        expect(queryBanner()).not.toBeInTheDocument();
+        expect(onRestore).not.toHaveBeenCalled();
+      });
+    });
   });
 });

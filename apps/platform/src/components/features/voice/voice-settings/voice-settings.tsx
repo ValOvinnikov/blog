@@ -27,6 +27,7 @@ export type TVoiceSettingsProps = {
     tenantId: string,
     overrides: TVoiceOverrides,
   ) => Promise<{ ok: boolean }>;
+  savedAt?: Date;
   archivedAt?: Date;
 };
 
@@ -40,17 +41,13 @@ const buildInitialValues = (
   return values;
 };
 
-/**
- * The Voice tab: Basic is deliberately empty (the preset already decides the
- * default voice), Advanced holds every curated override. Every field is
- * blank-means-inherit, and saving sends the raw (possibly blank) strings
- * straight through; `upsertSiteConfig`'s own Zod schema is what turns a
- * blank entry into an absent JSONB key rather than a stored empty string.
- */
+// Blank means inherit: blank strings are sent as-is and `upsertSiteConfig`
+// drops them rather than storing an empty string.
 export const VoiceSettings = ({
   tenantId,
   initialOverrides,
   saveAction,
+  savedAt,
   archivedAt,
 }: TVoiceSettingsProps) => {
   const isArchived = Boolean(archivedAt);
@@ -99,6 +96,19 @@ export const VoiceSettings = ({
       archivedNoticeId={archivedNoticeId}
       hasError={status === 'error'}
       errorTitle={t('alertError')}
+      draft={{
+        tenantId,
+        page: 'voice',
+        values,
+        savedValues,
+        savedAt,
+        fields: VOICE_OVERRIDE_KEYS.map((key) => ({
+          id: key,
+          label: tLabels(key),
+          display: (overrides: TVoiceOverrides) => overrides[key],
+        })),
+        onRestore: setValues,
+      }}
     >
       <div data-testid="voice-basic-card">
         <Card>
