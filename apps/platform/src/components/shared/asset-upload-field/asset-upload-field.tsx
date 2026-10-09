@@ -7,6 +7,7 @@ import { unstable_rethrow } from 'next/navigation';
 import {
   type AriaAttributes,
   type ChangeEvent,
+  type ReactNode,
   useId,
   useRef,
   useState,
@@ -22,10 +23,15 @@ type TAssetClearResult = { ok: true } | { ok: false; error: string };
 
 type TAssetUploadFieldSize = 'sm' | 'md';
 
+type TAssetUploadFieldLayout = 'box' | 'row';
+
 export type TAssetUploadFieldProps = {
   size?: TAssetUploadFieldSize;
+  layout?: TAssetUploadFieldLayout;
   label: string;
-  hint: string;
+  hint?: string;
+  fileName?: string;
+  badge?: ReactNode;
   currentUrl: string | undefined;
   currentAlt: string;
   acceptedMimeTypes: readonly string[];
@@ -43,8 +49,11 @@ export type TAssetUploadFieldProps = {
 
 export const AssetUploadField = ({
   size = 'md',
+  layout = 'box',
   label,
   hint,
+  fileName,
+  badge,
   currentUrl,
   currentAlt,
   acceptedMimeTypes,
@@ -64,7 +73,7 @@ export const AssetUploadField = ({
   const [isPending, startTransition] = useTransition();
   const hintId = useId();
   const errorId = useId();
-  const describedBy = [hintId, ariaDescribedBy, error && errorId]
+  const describedBy = [hint && hintId, ariaDescribedBy, error && errorId]
     .filter(Boolean)
     .join(' ');
 
@@ -75,12 +84,14 @@ export const AssetUploadField = ({
     thumb,
     thumbImage,
     text,
+    titleRow,
     title,
+    fileName: fileNameSlot,
     hint: hintSlot,
     actions,
     input,
     error: errorSlot,
-  } = assetUploadFieldVariants({ size });
+  } = assetUploadFieldVariants({ size, layout });
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -149,10 +160,16 @@ export const AssetUploadField = ({
             )}
           </span>
           <div className={text()}>
-            <p className={title()}>{label}</p>
-            <p id={hintId} className={hintSlot()}>
-              {hint}
-            </p>
+            <div className={titleRow()}>
+              <p className={title()}>{label}</p>
+              {badge}
+            </div>
+            {fileName && <p className={fileNameSlot()}>{fileName}</p>}
+            {hint && (
+              <p id={hintId} className={hintSlot()}>
+                {hint}
+              </p>
+            )}
           </div>
         </div>
 

@@ -290,9 +290,8 @@
     "logoHueDescription": "Tints the wordmark's tonal steps (--logo-1/2/3). Follows the accent hue unless you set it.",
     "brandImagesDescription": "Stored in Vercel Blob — no on-the-fly transforms, so what you upload is what ships.",
     "logoFieldLabel": "Logo",
-    "logoFieldHint": "PNG, JPEG, WebP, or SVG · falls back to the polygon wordmark",
     "faviconFieldLabel": "Favicon",
-    "faviconFieldHint": "Pre-cropped square, please — Blob can't crop it for you (an SVG's viewBox counts as its shape). Non-square uploads are rejected.",
+    "brandFieldsHint": "Logo: PNG, JPEG, WebP or SVG. Favicon: a square image.",
     "optionalTag": "optional",
     "headingFontLabel": "Heading font",
     "bodyFontLabel": "Body font",
@@ -361,6 +360,7 @@
     "previewWidthAriaLabel": "Preview width"
   },
   "brandAssetField": {
+    "savesWithChanges": "Saves with changes",
     "unexpectedError": "Something went wrong — try again.",
     "currentAlt": "Current {label}",
     "uploading": "Uploading…",
