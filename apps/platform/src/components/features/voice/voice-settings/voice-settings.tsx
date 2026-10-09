@@ -12,6 +12,7 @@ import type { TVoiceOverridesByLocaleInput } from '@blog/db/queries/site-config'
 import type { TSaveVoiceOverridesResult } from '@platform/components/features/voice/voice-page-content/save-voice-overrides-action';
 import { VoiceSurfaceCard } from '@platform/components/features/voice/voice-surface-card';
 import { Alert } from '@platform/components/shared/alert';
+import { LanguagePicker } from '@platform/components/shared/language-picker';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { SettingsFormShell } from '@platform/components/shared/settings-form-shell';
 import { FONT_OPTIONS } from '@platform/config/fonts';
@@ -221,6 +222,19 @@ export const VoiceSettings = ({
       archivedNoticeId={archivedNoticeId}
       hasError={status === 'error' && !hasFieldErrors}
       errorTitle={t('alertError')}
+      headerActions={
+        liveLocales.length > 1 && (
+          <LanguagePicker
+            locales={liveLocales}
+            defaultLocale={defaultLocale}
+            value={selectedLocale}
+            onChange={setSelectedLocale}
+            countCustomised={(locale) =>
+              countCustomisedVoiceFields(localeDraftOf(values, locale))
+            }
+          />
+        )
+      }
       draft={{
         tenantId,
         page: 'voice',
@@ -234,22 +248,6 @@ export const VoiceSettings = ({
     >
       <div className={intro()}>
         <div className={controls()}>
-          {liveLocales.length > 1 && (
-            <SegmentedControl
-              options={liveLocales.map((locale) => ({
-                value: locale,
-                label: t('languageOption', {
-                  language: tLanguage(locale),
-                  count: countCustomisedVoiceFields(
-                    localeDraftOf(values, locale),
-                  ),
-                }),
-              }))}
-              value={selectedLocale}
-              onChange={setSelectedLocale}
-              ariaLabel={t('languageAriaLabel')}
-            />
-          )}
           <SegmentedControl
             options={[
               { value: 'light', label: tPreview('modeLight') },

@@ -382,7 +382,6 @@
     "senderItemDescription": "Naam, antwoordadres, postadres en logo, in elke taal hetzelfde.",
     "itemsAriaLabel": "E-mails om te bewerken",
     "editingLabel": "Bewerken",
-    "languageAriaLabel": "Taal om te bewerken",
     "viewAriaLabel": "Bewerken of voorbeeld",
     "editTab": "Bewerken",
     "previewTab": "Voorbeeld"
@@ -472,8 +471,6 @@
     "description": "Herformuleer de paginaberichten van de site. Elk veld heeft een standaardtekst, dus pas alleen aan wat naar jou moet klinken.",
     "fixedCopyNote": "Knoppen, menu’s en labels worden voor je vertaald en zijn op elke site hetzelfde, dus ze staan hier niet.",
     "editingLanguageNote": "Je bewerkt <strong>{language}</strong> — andere talen houden hun eigen tekst.",
-    "languageAriaLabel": "Taal",
-    "languageOption": "{language} · {count, plural, =0 {alles standaard} other {# aangepast}}",
     "surfaceSummary": "{unit, select, lists {{total, plural, one {# lijst} other {# lijsten}}} other {{total, plural, one {# veld} other {# velden}}}} · {customised, plural, =0 {alles standaard} other {# aangepast}}",
     "saveButton": "Wijzigingen opslaan",
     "savingButton": "Opslaan…",
@@ -825,6 +822,10 @@
       "ANALYTICS": "Schakel analysetracking op de site in.",
       "CONSENT_BANNER": "Toon bezoekers een cookiemelding voordat niet-essentiële cookies of scripts worden geladen."
     }
+  },
+  "languagePicker": {
+    "ariaLabel": "Taal",
+    "optionDescription": "{isDefault, select, true {Standaardtaal · } other {}}{count, plural, =0 {Alles standaard} other {# aangepast}}"
   },
   "languageNames": {
     "EN": "Engels",

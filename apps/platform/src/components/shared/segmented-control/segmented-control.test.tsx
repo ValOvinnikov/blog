@@ -32,6 +32,27 @@ describe(SegmentedControl, () => {
     expect(screen.getByRole('button', { name: 'Comfortable' })).toBeVisible();
   });
 
+  it('names an option by its label and describes it by its second line', () => {
+    render(
+      <SegmentedControl<TDensity>
+        ariaLabel="Density"
+        options={[
+          { value: 'compact', label: 'Compact', description: 'Tighter rows' },
+          { value: 'comfortable', label: 'Comfortable' },
+        ]}
+        value="compact"
+        onChange={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Compact' }),
+    ).toHaveAccessibleDescription('Tighter rows');
+    expect(
+      screen.getByRole('button', { name: 'Comfortable' }),
+    ).not.toHaveAccessibleDescription();
+  });
+
   it('forwards aria-describedby to the group', () => {
     render(
       <div>

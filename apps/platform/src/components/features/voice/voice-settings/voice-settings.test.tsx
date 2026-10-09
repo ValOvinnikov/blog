@@ -311,18 +311,16 @@ describe(`<${VoiceSettings.name}/>`, () => {
       ).not.toBeInTheDocument();
     });
 
-    it('lists each live language with its customised count', () => {
+    it('describes each live language with its customised count, marking the default', () => {
       setupBilingual();
 
       const switcher = screen.getByRole('group', { name: 'Language' });
       expect(
-        within(switcher).getByRole('button', {
-          name: 'English · 3 customised',
-        }),
-      ).toBeVisible();
+        within(switcher).getByRole('button', { name: 'English' }),
+      ).toHaveAccessibleDescription('Default language · 3 customised');
       expect(
-        within(switcher).getByRole('button', { name: 'German · 1 customised' }),
-      ).toBeVisible();
+        within(switcher).getByRole('button', { name: 'German' }),
+      ).toHaveAccessibleDescription('1 customised');
     });
 
     it("edits the selected language's values against that language's defaults", async () => {
@@ -330,9 +328,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
       expect(notFoundHeading()).toHaveValue('Nothing here');
 
-      await user.click(
-        screen.getByRole('button', { name: 'German · 1 customised' }),
-      );
+      await user.click(screen.getByRole('button', { name: 'German' }));
 
       expect(notFoundHeading()).toHaveValue('');
       expect(notFoundHeading()).toHaveAttribute(
@@ -346,9 +342,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
       setupBilingual();
 
       await user.type(notFoundHeading(), '!');
-      await user.click(
-        screen.getByRole('button', { name: 'German · 1 customised' }),
-      );
+      await user.click(screen.getByRole('button', { name: 'German' }));
       await user.type(notFoundHeading(), 'Weg');
 
       expect(

@@ -382,7 +382,6 @@
     "senderItemDescription": "Name, reply-to, address and logo, the same in every language.",
     "itemsAriaLabel": "Emails to edit",
     "editingLabel": "Editing",
-    "languageAriaLabel": "Language to edit",
     "viewAriaLabel": "Edit or preview",
     "editTab": "Edit",
     "previewTab": "Preview"
@@ -472,8 +471,6 @@
     "description": "Reword the site's page-level messages. Every field has a default, so change only what you want to sound like you.",
     "fixedCopyNote": "Buttons, menus and labels are translated for you and stay the same on every site, so they aren't listed here.",
     "editingLanguageNote": "Editing <strong>{language}</strong> — other languages keep their own text.",
-    "languageAriaLabel": "Language",
-    "languageOption": "{language} · {count, plural, =0 {all default} other {# customised}}",
     "surfaceSummary": "{unit, select, lists {{total, plural, one {# list} other {# lists}}} other {{total, plural, one {# field} other {# fields}}}} · {customised, plural, =0 {all default} other {# customised}}",
     "saveButton": "Save changes",
     "savingButton": "Saving…",
@@ -825,6 +822,10 @@
       "ANALYTICS": "Enable on-site analytics tracking.",
       "CONSENT_BANNER": "Show visitors a cookie-consent banner before non-essential cookies or scripts load."
     }
+  },
+  "languagePicker": {
+    "ariaLabel": "Language",
+    "optionDescription": "{isDefault, select, true {Default language · } other {}}{count, plural, =0 {All default} other {# customised}}"
   },
   "languageNames": {
     "EN": "English",

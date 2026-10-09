@@ -382,7 +382,6 @@
     "senderItemDescription": "Name, Antwortadresse, Anschrift und Logo, in jeder Sprache gleich.",
     "itemsAriaLabel": "Zu bearbeitende E-Mails",
     "editingLabel": "Bearbeiten",
-    "languageAriaLabel": "Zu bearbeitende Sprache",
     "viewAriaLabel": "Bearbeiten oder Vorschau",
     "editTab": "Bearbeiten",
     "previewTab": "Vorschau"
@@ -472,8 +471,6 @@
     "description": "Formulieren Sie die seitenweiten Hinweise der Website um. Jedes Feld hat einen Standardtext – ändern Sie nur, was nach Ihnen klingen soll.",
     "fixedCopyNote": "Schaltflächen, Menüs und Beschriftungen werden für Sie übersetzt und sind auf jeder Website gleich, deshalb sind sie hier nicht aufgeführt.",
     "editingLanguageNote": "Sie bearbeiten <strong>{language}</strong> — andere Sprachen behalten ihren eigenen Text.",
-    "languageAriaLabel": "Sprache",
-    "languageOption": "{language} · {count, plural, =0 {alles Standard} other {# angepasst}}",
     "surfaceSummary": "{unit, select, lists {{total, plural, one {# Liste} other {# Listen}}} other {{total, plural, one {# Feld} other {# Felder}}}} · {customised, plural, =0 {alles Standard} other {# angepasst}}",
     "saveButton": "Änderungen speichern",
     "savingButton": "Wird gespeichert…",
@@ -825,6 +822,10 @@
       "ANALYTICS": "Analyse-Tracking auf der Website aktivieren.",
       "CONSENT_BANNER": "Besuchern ein Cookie-Einwilligungsbanner anzeigen, bevor nicht notwendige Cookies oder Skripte geladen werden."
     }
+  },
+  "languagePicker": {
+    "ariaLabel": "Sprache",
+    "optionDescription": "{isDefault, select, true {Standardsprache · } other {}}{count, plural, =0 {Alles Standard} other {# angepasst}}"
   },
   "languageNames": {
     "EN": "Englisch",

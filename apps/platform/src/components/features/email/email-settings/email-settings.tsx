@@ -12,10 +12,12 @@ import { EmailSenderEditor } from '@platform/components/features/email/email-sen
 import { ItemList } from '@platform/components/features/email/email-settings/components/item-list';
 import { ItemSelect } from '@platform/components/features/email/email-settings/components/item-select';
 import { EmailTemplateEditor } from '@platform/components/features/email/email-template-editor';
+import { LanguagePicker } from '@platform/components/shared/language-picker';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { SettingsFormShell } from '@platform/components/shared/settings-form-shell';
 import { useToast } from '@platform/context/toast-provider';
 import {
+  countCustomisedTemplates,
   countEmailDraftChanges,
   countLanguageChanges,
   EMAIL_SENDER_ITEM,
@@ -217,6 +219,19 @@ export const EmailSettings = ({
       hasError={status === 'error' && !senderNameError}
       errorTitle={t('alertError')}
       isWide={true}
+      headerActions={
+        liveLocales.length > 1 && (
+          <LanguagePicker
+            locales={liveLocales}
+            defaultLocale={defaultLocale}
+            value={selectedLocale}
+            onChange={setSelectedLocale}
+            countCustomised={(locale) =>
+              countCustomisedTemplates(draft, locale)
+            }
+          />
+        )
+      }
       draft={{
         tenantId,
         page: 'email',
@@ -268,46 +283,33 @@ export const EmailSettings = ({
                 archivedNoticeId={archivedDescribedBy}
               />
             ) : (
-              <>
-                {liveLocales.length > 1 && (
-                  <SegmentedControl
-                    options={liveLocales.map((locale) => ({
-                      value: locale,
-                      label: tLanguage(locale),
-                    }))}
-                    value={selectedLocale}
-                    onChange={setSelectedLocale}
-                    ariaLabel={t('languageAriaLabel')}
-                  />
+              <EmailTemplateEditor
+                key={`${selectedItem}-${selectedLocale}-${discardCount}`}
+                templateType={selectedItem}
+                languageName={tLanguage(selectedLocale)}
+                copy={draft.copies[selectedItem][selectedLocale]}
+                fallback={resolveFallbackCopy(
+                  draft,
+                  selectedItem,
+                  selectedLocale,
+                  defaultLocale,
                 )}
-                <EmailTemplateEditor
-                  key={`${selectedItem}-${selectedLocale}-${discardCount}`}
-                  templateType={selectedItem}
-                  languageName={tLanguage(selectedLocale)}
-                  copy={draft.copies[selectedItem][selectedLocale]}
-                  fallback={resolveFallbackCopy(
-                    draft,
-                    selectedItem,
-                    selectedLocale,
-                    defaultLocale,
-                  )}
-                  logo={draft.templateLogos[selectedItem]}
-                  onCopyChange={(copy) =>
-                    setDraft((prev) =>
-                      withCopy(
-                        prev,
-                        { templateType: selectedItem, locale: selectedLocale },
-                        copy,
-                      ),
-                    )
-                  }
-                  onLogoStage={(logo) =>
-                    setDraft((prev) => withLogo(prev, selectedItem, logo))
-                  }
-                  isDisabled={isDisabled}
-                  archivedNoticeId={archivedDescribedBy}
-                />
-              </>
+                logo={draft.templateLogos[selectedItem]}
+                onCopyChange={(copy) =>
+                  setDraft((prev) =>
+                    withCopy(
+                      prev,
+                      { templateType: selectedItem, locale: selectedLocale },
+                      copy,
+                    ),
+                  )
+                }
+                onLogoStage={(logo) =>
+                  setDraft((prev) => withLogo(prev, selectedItem, logo))
+                }
+                isDisabled={isDisabled}
+                archivedNoticeId={archivedDescribedBy}
+              />
             )}
           </div>
           <div className={previewPane()}>
