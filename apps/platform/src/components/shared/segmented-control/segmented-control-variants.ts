@@ -8,7 +8,7 @@ export const segmentedControlVariants = tv({
       'data-[disabled]:opacity-[.55]',
     ],
     option: [
-      'rounded-[8px] border-0 bg-transparent px-[14px] py-[7px]',
+      'min-h-11 rounded-[8px] border-0 bg-transparent px-[14px] py-[7px] md:min-h-0',
       'text-[13px] font-medium text-admin-muted',
       'cursor-pointer disabled:cursor-not-allowed',
       'data-[pressed]:bg-admin-surface data-[pressed]:text-admin-text data-[pressed]:shadow-admin',

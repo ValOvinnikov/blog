@@ -35,8 +35,12 @@ export const buttonVariants = tv({
       },
     },
     size: {
-      [SIZE.SM]: { root: ['px-[9px] py-[5px] text-[12px]'] },
-      [SIZE.MD]: { root: ['px-[13px] py-[8px] text-[13px]'] },
+      [SIZE.SM]: {
+        root: ['min-h-11 px-[9px] py-[5px] text-[12px] md:min-h-0'],
+      },
+      [SIZE.MD]: {
+        root: ['min-h-11 px-[13px] py-[8px] text-[13px] md:min-h-0'],
+      },
     },
   },
   defaultVariants: {
