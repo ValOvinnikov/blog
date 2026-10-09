@@ -39,7 +39,10 @@ const Wrapper = ({
   deprovisionRequestedAt?: string;
   headingLevel?: 3;
 }) => {
-  const poll = useDeprovisioningPoll(tenant, deprovisionRequestedAt);
+  const poll = useDeprovisioningPoll(tenant, {
+    isEnabled: true,
+    deprovisionRequestedAt,
+  });
   return <DeprovisioningStatusView poll={poll} headingLevel={headingLevel} />;
 };
 

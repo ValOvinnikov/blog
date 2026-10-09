@@ -19,23 +19,17 @@ export type TTenantDangerPageContentProps = {
   deprovisionRequestedAt?: string;
 };
 
-/**
- * The danger page's client shell: it owns the single `useDeprovisioningPoll`
- * call for this tenant, so the deprovision trigger and the teardown-progress
- * view always agree on whether a run is in progress.
- */
 export const TenantDangerPageContent = ({
   tenant,
   deprovisionRequestedAt,
 }: TTenantDangerPageContentProps) => {
   const t = useTranslations('tenantDangerPage');
-  const poll = useDeprovisioningPoll(tenant, deprovisionRequestedAt);
-  const hasDeprovisioningRun = Boolean(tenant.deprovisioningSteps?.run);
   const showDeprovisioningStatus =
-    hasDeprovisioningRun || Boolean(deprovisionRequestedAt);
-  // `poll.isRunning` alone reads the same for "genuinely in flight" and
-  // "never deprovisioned" — gate it on a run actually existing or requested.
-  const isDeprovisioningInProgress = showDeprovisioningStatus && poll.isRunning;
+    Boolean(tenant.deprovisioningSteps?.run) || Boolean(deprovisionRequestedAt);
+  const poll = useDeprovisioningPoll(tenant, {
+    isEnabled: showDeprovisioningStatus,
+    deprovisionRequestedAt,
+  });
 
   const { root, actionsRow, historySection } =
     tenantDangerPageContentVariants();
@@ -64,7 +58,7 @@ export const TenantDangerPageContent = ({
         <>
           <DeprovisionTenantControl
             tenant={tenant}
-            isDeprovisioningInProgress={isDeprovisioningInProgress}
+            isDeprovisioningInProgress={poll.isInProgress}
           />
           {showDeprovisioningStatus && <DeprovisioningStatusView poll={poll} />}
         </>
