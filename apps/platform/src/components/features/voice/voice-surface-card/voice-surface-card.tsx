@@ -1,6 +1,10 @@
 'use client';
 
-import type { TVoiceFieldId, TVoiceSurface } from '@blog/config';
+import {
+  VOICE_SURFACE,
+  type TVoiceFieldId,
+  type TVoiceSurface,
+} from '@blog/config';
 import type { TLocaleIsoCode } from '@blog/config/constants';
 import {
   VoiceSpecimen,
@@ -90,7 +94,7 @@ export const VoiceSurfaceCard = ({
     previewColumn,
     previewToggle,
     preview,
-    customisedCount,
+    summary,
   } = voiceSurfaceCardVariants({ isPreviewOpen });
   const fields = voiceFieldsOf(surface);
   const trackFocusOf = (id: TVoiceFieldId) => ({
@@ -106,9 +110,11 @@ export const VoiceSurfaceCard = ({
           supportingText={tDescriptions(surface)}
           headingLevel={2}
           actions={
-            <span className={customisedCount()}>
-              {t('surfaceCustomisedCount', {
-                count: countCustomisedVoiceFields(values, fields),
+            <span className={summary()}>
+              {t('surfaceSummary', {
+                unit: surface === VOICE_SURFACE.ARCHIVE ? 'lists' : 'fields',
+                total: fields.length,
+                customised: countCustomisedVoiceFields(values, fields),
               })}
             </span>
           }

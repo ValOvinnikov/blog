@@ -11,7 +11,7 @@ export const voiceSurfaceCardVariants = tv({
     previewColumn: ['flex flex-col gap-3 lg:sticky lg:top-[68px]'],
     previewToggle: ['w-full lg:hidden'],
     preview: [],
-    customisedCount: ['text-[12px] font-medium text-admin-muted'],
+    summary: ['text-[12px] font-medium text-admin-muted'],
   },
   variants: {
     isPreviewOpen: {

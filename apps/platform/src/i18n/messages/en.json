@@ -472,7 +472,7 @@
     "editingLanguageNote": "Editing {language} — other languages keep their own text.",
     "languageAriaLabel": "Language",
     "languageOption": "{language} · {count, plural, =0 {all default} other {# customised}}",
-    "surfaceCustomisedCount": "{count, plural, =0 {All default} other {# customised}}",
+    "surfaceSummary": "{unit, select, lists {{total, plural, one {# list} other {# lists}}} other {{total, plural, one {# field} other {# fields}}}} · {customised, plural, =0 {all default} other {# customised}}",
     "saveButton": "Save changes",
     "savingButton": "Saving…",
     "alertSuccess": "Voice saved.",
