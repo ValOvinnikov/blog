@@ -5,7 +5,7 @@ export const topbarNavMenuVariants = tv({
     trigger: [
       'md:hidden',
       'inline-flex size-11 shrink-0 items-center justify-center rounded-admin-sm',
-      'border border-admin-line bg-admin-surface text-admin-muted',
+      'border border-admin-control-line bg-admin-surface text-admin-muted',
       'transition-colors duration-base ease-smooth',
       'hover:border-admin-brand hover:text-admin-text',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-brand',

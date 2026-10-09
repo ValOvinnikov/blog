@@ -12,7 +12,7 @@ export const presetPickerVariants = tv({
     ],
     checkmark: [
       'absolute right-[11px] top-[11px] flex size-[18px] items-center justify-center',
-      'rounded-full border-[1.5px] border-admin-line text-[11px] text-transparent',
+      'rounded-full border-[1.5px] border-admin-control-line text-[11px] text-transparent',
     ],
     name: ['flex items-center gap-2 text-[14px] font-semibold text-admin-text'],
     description: ['mt-[3px] block text-[12px] text-admin-muted'],

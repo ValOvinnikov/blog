@@ -4,7 +4,7 @@ export const segmentedControlVariants = tv({
   slots: {
     root: [
       'inline-flex flex-wrap items-center gap-[3px]',
-      'rounded-[10px] bg-admin-line-2 p-[3px]',
+      'rounded-[10px] border border-admin-control-line bg-admin-line-2 p-[3px]',
       'data-[disabled]:opacity-[.55]',
     ],
     option: [
