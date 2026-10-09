@@ -7,7 +7,7 @@ export const tenantSwitcherVariants = tv({
       'bg-admin-side-raised px-2.5 py-2 text-left',
       'transition-colors duration-base ease-smooth',
       'hover:border-admin-side-accent/40',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-brand',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-side-accent',
       'focus-visible:ring-offset-2 focus-visible:ring-offset-admin-side',
       'data-[popup-open]:border-admin-brand',
     ],
