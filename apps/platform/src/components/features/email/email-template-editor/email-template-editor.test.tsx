@@ -21,8 +21,11 @@ const FALLBACK_BODY = [
 const setup = customRender(EmailTemplateEditor, {
   templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
   languageName: 'French',
-  copy: { subject: '', body: null },
-  fallback: { subject: 'Connectez-vous', body: FALLBACK_BODY },
+  copy: {
+    draft: { subject: '', body: null },
+    saved: { subject: '', body: null },
+    fallback: { subject: 'Connectez-vous', body: FALLBACK_BODY },
+  },
   logo: { url: undefined },
   onCopyChange: vi.fn(),
   onLogoStage: vi.fn(),
@@ -64,12 +67,47 @@ describe(`<${EmailTemplateEditor.name}/>`, () => {
 
   it('clears a customised subject back to the default', async () => {
     const onCopyChange = vi.fn();
-    setup({ copy: { subject: 'Bonjour', body: null }, onCopyChange });
+    setup({
+      copy: {
+        draft: { subject: 'Bonjour', body: null },
+        saved: { subject: 'Bonjour', body: null },
+        fallback: { subject: 'Connectez-vous', body: FALLBACK_BODY },
+      },
+      onCopyChange,
+    });
 
     expect(screen.getByText('Customised')).toBeVisible();
-    await user.click(screen.getByRole('button', { name: 'Use default' }));
+    await user.click(screen.getByRole('button', { name: 'Reset' }));
 
     expect(onCopyChange).toHaveBeenCalledWith({ subject: '', body: null });
+  });
+
+  it('marks an edited subject unsaved', () => {
+    setup({
+      copy: {
+        draft: { subject: 'Bonjour', body: null },
+        saved: { subject: '', body: null },
+        fallback: { subject: 'Connectez-vous', body: FALLBACK_BODY },
+      },
+    });
+
+    expect(screen.getByText('Unsaved')).toBeInTheDocument();
+  });
+
+  it('offers no reset while disabled', () => {
+    setup({
+      copy: {
+        draft: { subject: 'Bonjour', body: null },
+        saved: { subject: 'Bonjour', body: null },
+        fallback: { subject: 'Connectez-vous', body: FALLBACK_BODY },
+      },
+      isDisabled: true,
+    });
+
+    expect(screen.getByText('Customised')).toBeVisible();
+    expect(
+      screen.queryByRole('button', { name: 'Reset' }),
+    ).not.toBeInTheDocument();
   });
 
   it('locks every field while disabled', () => {
@@ -98,8 +136,11 @@ describe(`<${EmailTemplateEditor.name}/>`, () => {
         <EmailTemplateEditor
           templateType={EMAIL_TEMPLATE_TYPE.MAGIC_LINK}
           languageName="French"
-          copy={{ subject: '', body: null }}
-          fallback={{ subject: 'Connectez-vous', body: FALLBACK_BODY }}
+          copy={{
+            draft: { subject: '', body: null },
+            saved: { subject: '', body: null },
+            fallback: { subject: 'Connectez-vous', body: FALLBACK_BODY },
+          }}
           logo={{ url: undefined }}
           onCopyChange={vi.fn()}
           onLogoStage={vi.fn()}

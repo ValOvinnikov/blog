@@ -30,6 +30,17 @@ export type TEmailCopyDraft = {
   body: TEmailTemplateBlock[] | null;
 };
 
+export type TEmailFallbackCopy = {
+  subject: string;
+  body: TEmailTemplateBlock[];
+};
+
+export type TEmailCopyEdit = {
+  draft: TEmailCopyDraft;
+  saved: TEmailCopyDraft;
+  fallback: TEmailFallbackCopy;
+};
+
 export type TEmailDraft = {
   sender: TEmailSenderDraft;
   senderLogo: TStagedImage;
@@ -61,7 +72,7 @@ const mapTemplateTypes = <T>(build: (type: TEmailTemplateType) => T) =>
     EMAIL_TEMPLATE_TYPES.map((type) => [type, build(type)]),
   ) as Record<TEmailTemplateType, T>;
 
-const isSameBody = (
+export const isSameBody = (
   a: TEmailTemplateBlock[] | null,
   b: TEmailTemplateBlock[] | null,
 ): boolean => JSON.stringify(a) === JSON.stringify(b);
@@ -100,7 +111,7 @@ export const resolveFallbackCopy = (
   templateType: TEmailTemplateType,
   locale: TLocaleIsoCode,
   defaultLocale: TLocaleIsoCode,
-): { subject: string; body: TEmailTemplateBlock[] } => {
+): TEmailFallbackCopy => {
   const productDefault =
     EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE[locale][templateType];
   const tenantDefault =

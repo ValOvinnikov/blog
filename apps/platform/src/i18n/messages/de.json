@@ -336,7 +336,6 @@
       "MENU_GLOBE": "Menü mit Globus",
       "CODES": "Kompakte Codes"
     },
-    "unsavedCard": "Nicht gespeicherte Änderungen",
     "colourHeading": "Farbe",
     "colourDescription": "Nur der Farbton ändert sich, damit Text lesbar bleibt.",
     "typeHeading": "Schrift",
@@ -393,10 +392,11 @@
     "itemsAriaLabel": "Zu bearbeitende E-Mails",
     "editingLabel": "Bearbeiten"
   },
-  "emailItemStatus": {
+  "fieldStatus": {
     "default": "Standard",
     "customised": "Angepasst",
-    "unsaved": "Nicht gespeichert"
+    "unsaved": "Nicht gespeichert",
+    "reset": "Zurücksetzen"
   },
   "emailPreview": {
     "heading": "Vorschau",
@@ -458,8 +458,7 @@
       "MAGIC_LINK": "Wird gesendet, wenn sich jemand auf Ihrer Website anmeldet.",
       "TENANT_INVITE": "Wird gesendet, wenn jemand in Ihr Team eingeladen wird.",
       "NEWSLETTER_CONFIRMATION": "Wird gesendet, um ein Newsletter-Abonnement zu bestätigen."
-    },
-    "useDefault": "Standard verwenden"
+    }
   },
   "portableTextEditorToolbar": {
     "bold": "Fett",
@@ -483,10 +482,6 @@
     "savingButton": "Wird gespeichert…",
     "alertSuccess": "Tonalität gespeichert.",
     "alertError": "Speichern fehlgeschlagen — bitte erneut versuchen.",
-    "badgeDefault": "Standard",
-    "badgeCustomised": "Angepasst",
-    "unsaved": "Nicht gespeichert",
-    "reset": "Zurücksetzen",
     "keepPlaceholder": "<code>{token}</code> beibehalten — die Website setzt den Wert ein.",
     "draftFieldLabel": "{surface} — {field} ({language})"
   },

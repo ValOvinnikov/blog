@@ -336,7 +336,6 @@
       "MENU_GLOBE": "Menú con globo",
       "CODES": "Códigos compactos"
     },
-    "unsavedCard": "Cambios sin guardar",
     "colourHeading": "Color",
     "colourDescription": "Solo cambia el tono, para que el texto siga siendo legible.",
     "typeHeading": "Tipografía",
@@ -393,10 +392,11 @@
     "itemsAriaLabel": "Correos para editar",
     "editingLabel": "Editando"
   },
-  "emailItemStatus": {
+  "fieldStatus": {
     "default": "Predeterminado",
     "customised": "Personalizado",
-    "unsaved": "Sin guardar"
+    "unsaved": "Sin guardar",
+    "reset": "Restablecer"
   },
   "emailPreview": {
     "heading": "Vista previa",
@@ -458,8 +458,7 @@
       "MAGIC_LINK": "Se envía cuando alguien inicia sesión en su sitio.",
       "TENANT_INVITE": "Se envía cuando se invita a alguien a unirse a su equipo.",
       "NEWSLETTER_CONFIRMATION": "Se envía para confirmar una suscripción al boletín."
-    },
-    "useDefault": "Usar el predeterminado"
+    }
   },
   "portableTextEditorToolbar": {
     "bold": "Negrita",
@@ -483,10 +482,6 @@
     "savingButton": "Guardando…",
     "alertSuccess": "Voz guardada.",
     "alertError": "No se pudo guardar. Vuelva a intentarlo.",
-    "badgeDefault": "Predeterminado",
-    "badgeCustomised": "Personalizado",
-    "unsaved": "Sin guardar",
-    "reset": "Restablecer",
     "keepPlaceholder": "Conserve <code>{token}</code>: el sitio lo rellena.",
     "draftFieldLabel": "{surface} — {field} ({language})"
   },

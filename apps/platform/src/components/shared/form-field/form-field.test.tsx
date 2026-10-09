@@ -65,6 +65,17 @@ describe(FormField, () => {
     expect(second).toHaveAccessibleDescription('');
   });
 
+  it('renders actions in the label row', () => {
+    render(
+      <FormField label="Subject" actions={<button type="button">Reset</button>}>
+        <TextInput value="" onChange={vi.fn()} />
+      </FormField>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Reset' })).toBeVisible();
+    expect(screen.getByRole('textbox', { name: 'Subject' })).toBeVisible();
+  });
+
   it('renders footer content after the error message', () => {
     render(
       <FormField

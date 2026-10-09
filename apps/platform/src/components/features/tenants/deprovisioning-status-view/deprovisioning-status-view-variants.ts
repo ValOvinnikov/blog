@@ -16,7 +16,7 @@ export const deprovisioningStatusViewVariants = tv({
     errorIcon: ['flex-none text-admin-bad'],
     errorDetails: ['mt-1'],
     errorDetailsText: [
-      'mt-2 rounded-admin-sm bg-admin-surface-2 p-3',
+      'mt-2 rounded-admin-control bg-admin-surface-2 p-3',
       'font-mono text-xs text-admin-muted whitespace-pre-wrap break-words',
     ],
   },

@@ -13,12 +13,12 @@ export const saveBarVariants = tv({
     breakdown: ['text-admin-muted'],
     errorLink: [
       'text-admin-bad underline underline-offset-2',
-      'rounded-admin-sm outline-hidden focus-visible:ring-2 focus-visible:ring-admin-brand',
+      'rounded-admin-control outline-hidden focus-visible:ring-2 focus-visible:ring-admin-brand',
     ],
     actions: ['grid grid-cols-2 gap-2 md:flex md:items-center'],
     shortcut: [
       'hidden md:inline',
-      'rounded-admin-sm border border-admin-line px-1.5 py-0.5 font-mono text-[11px] text-admin-muted',
+      'rounded-admin-control border border-admin-line px-1.5 py-0.5 font-mono text-[11px] text-admin-muted',
     ],
     button: ['justify-center'],
   },

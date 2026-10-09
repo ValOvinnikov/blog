@@ -336,7 +336,6 @@
       "MENU_GLOBE": "Menu with globe",
       "CODES": "Compact codes"
     },
-    "unsavedCard": "Unsaved changes",
     "colourHeading": "Colour",
     "colourDescription": "Only the hue changes, so text stays readable.",
     "typeHeading": "Type",
@@ -393,10 +392,11 @@
     "itemsAriaLabel": "Emails to edit",
     "editingLabel": "Editing"
   },
-  "emailItemStatus": {
+  "fieldStatus": {
     "default": "Default",
     "customised": "Customised",
-    "unsaved": "Unsaved"
+    "unsaved": "Unsaved",
+    "reset": "Reset"
   },
   "emailPreview": {
     "heading": "Preview",
@@ -458,8 +458,7 @@
       "MAGIC_LINK": "Sent when someone signs in to your site.",
       "TENANT_INVITE": "Sent when someone is invited to join your team.",
       "NEWSLETTER_CONFIRMATION": "Sent to confirm a newsletter subscription."
-    },
-    "useDefault": "Use default"
+    }
   },
   "portableTextEditorToolbar": {
     "bold": "Bold",
@@ -483,10 +482,6 @@
     "savingButton": "Saving…",
     "alertSuccess": "Voice saved.",
     "alertError": "Couldn't save — try again.",
-    "badgeDefault": "Default",
-    "badgeCustomised": "Customised",
-    "unsaved": "Unsaved",
-    "reset": "Reset",
     "keepPlaceholder": "Keep <code>{token}</code> — the site fills it in.",
     "draftFieldLabel": "{surface} — {field} ({language})"
   },

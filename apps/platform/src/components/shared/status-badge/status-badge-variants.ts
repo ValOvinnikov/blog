@@ -16,6 +16,7 @@ export const statusBadgeVariants = tv({
       warn: { root: ['text-admin-warn bg-admin-warn-weak'] },
       bad: { root: ['text-admin-bad bg-admin-bad-weak'] },
       neutral: { root: ['text-admin-muted bg-admin-line-2'] },
+      brand: { root: ['text-admin-brand bg-admin-brand-weak'] },
       plan: { root: ['text-admin-brand-strong bg-admin-brand-weak'] },
     },
   },

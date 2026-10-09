@@ -64,8 +64,7 @@
   --color-admin-side-raised: var(--admin-side-raised);
   --color-admin-side-accent: var(--admin-side-accent);
 
-  --radius-admin: 12px;
-  --radius-admin-sm: 8px;
+  --radius-admin: 6px;
   --radius-admin-control: 4px;
 
   --shadow-admin:

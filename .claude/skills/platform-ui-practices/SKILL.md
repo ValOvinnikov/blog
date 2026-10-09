@@ -308,12 +308,12 @@ values (`DetailList.Row isMono`).
 No other value between those things: no `gap-5`, `gap-[18px]`, `mb-[18px]`, or
 `mb-3.5` between sections.
 
-- Radius: `rounded-admin` (12px) for containers (cards, notices, the save bar,
-  dialogs); `rounded-admin-sm` (8px) for small items (chips, rows inside a card,
-  code blocks); 9px for controls through `--radius-admin-control`. **Not yet:**
-  that token doesn't exist. Get 9px by composing the primitive; a control that
-  genuinely can't writes `rounded-[9px]`. Never a site radius (`rounded-md`,
-  `-lg`, `-xl`) or 5, 7 or 10px.
+- Radius: two tokens. `rounded-admin` (6px) for surfaces: cards, dialogs,
+  popovers, menus, toasts, notices, the save bar. `rounded-admin-control` (4px)
+  for everything interactive or small: buttons, inputs, selects, pickers,
+  segmented tracks and thumbs, list rows, chips, thumbs, code blocks.
+  `rounded-full` only for pills and circles. Never a site radius
+  (`rounded-md`, `-lg`, `-xl`) or an arbitrary `rounded-[Npx]`.
 - Elevation: `shadow-admin` on resting surfaces and controls, `shadow-admin-lg`
   on floating layers only (save bar, dialog, toast, popup). A notice nested in a
   card has no shadow.
@@ -350,10 +350,9 @@ No other value between those things: no `gap-5`, `gap-[18px]`, `mb-[18px]`, or
   `aria-describedby` includes the notice's id, joined with its hint and error
   ids, never replaced by them.
 - Per-field status on Look, Voice and Email (unsaved dot, Default/Customised
-  badge, Reset) sits in the field header; Reset is hidden when read-only. **Not
-  yet:** there is no shared field-status component; follow
-  `components/features/voice/voice-field-status/` (dot, badge) and `voice-field/`
-  (Reset), except its `tone="plan"` Customised badge, which `plan` is not for.
+  badge, Reset) sits in the field header, through `FieldStatus`
+  (`FormField`'s `actions` slot) or, for a card title, `UnsavedDot`; Reset is
+  hidden when read-only.
 - Buttons: one primary per surface; `md` by default; `sm` in `Card.Header`
   actions, a field's Reset and toolbars. A pending button uses `isPending` +
   `pendingLabel`. A destructive action goes through `ConfirmDialog`.
@@ -639,7 +638,7 @@ panes.
 | `text-indigo-800`, a hex, any raw palette colour                                                                 | An `admin-*` token                                                                                                                                                   |
 | `outline-admin-brand-weak` as the only focus cue                                                                 | `Button`'s `focus-visible:ring-2` ring with offset                                                                                                                   |
 | `gap-[18px]` or `gap-5` between cards, `gap-5` or `mb-[18px]` between fields                                     | `gap-6` between cards, `gap-4` on the fields' parent                                                                                                                 |
-| `rounded-[10px]`, `rounded-[5px]`, `rounded-lg`, `rounded-xl`                                                    | `rounded-admin`, `rounded-admin-sm`, or the control primitive                                                                                                        |
+| `rounded-[10px]`, `rounded-[5px]`, `rounded-lg`, `rounded-xl`                                                    | `rounded-admin` or `rounded-admin-control`                                                                                                                           |
 | `font-sans`, `font-ui` or an inline `fontFamily` on admin chrome                                                 | Nothing; the font belongs on `<body>` (**Not yet:** unset, see Type)                                                                                                 |
 | `sm:grid-cols-2` inside a half-width column                                                                      | `@container` on the body, `@sm:grid-cols-2` on the grid                                                                                                              |
 | `@base-ui/react/switch` imported outside `shared/switch/`                                                        | The shared `Switch`; raise a missing mode                                                                                                                            |

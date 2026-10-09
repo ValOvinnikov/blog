@@ -7,7 +7,6 @@ export const voiceFieldVariants = tv({
     labelGroup: ['flex min-w-0 flex-col gap-0.5'],
     label: ['text-[13px] font-semibold text-admin-text'],
     hint: ['text-[11.5px] text-admin-muted'],
-    actions: ['flex items-center gap-2'],
     note: ['text-[11.5px] text-admin-muted'],
     token: ['font-mono text-[11px] text-admin-text'],
     error: ['text-[11.5px] text-admin-bad'],
