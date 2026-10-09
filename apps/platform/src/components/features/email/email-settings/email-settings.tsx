@@ -77,7 +77,7 @@ export const EmailSettings = ({
   const [selectedItem, setSelectedItem] =
     useState<TEmailPageItem>(EMAIL_SENDER_ITEM);
   const [selectedLocale, setSelectedLocale] = useState(defaultLocale);
-  const [discardCount, setDiscardCount] = useState(0);
+  const [revision, setRevision] = useState(0);
   const [previewTemplate, setPreviewTemplate] = useState<TEmailTemplateType>(
     EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
   );
@@ -186,18 +186,18 @@ export const EmailSettings = ({
     }),
   );
 
+  const replaceDraft = (replace: (prev: TEmailDraft) => TEmailDraft) => {
+    setSenderNameError(undefined);
+    setDraft(replace);
+    setRevision((current) => current + 1);
+  };
+
   const restoreDraft = (restored: TEmailDraft) =>
-    setDraft((prev) => ({
+    replaceDraft((prev) => ({
       ...restored,
       senderLogo: prev.senderLogo,
       templateLogos: prev.templateLogos,
     }));
-
-  const discard = () => {
-    setSenderNameError(undefined);
-    setDraft(saved);
-    setDiscardCount((count) => count + 1);
-  };
 
   return (
     <SettingsFormShell
@@ -206,7 +206,7 @@ export const EmailSettings = ({
       saveButtonLabel={t('saveButton')}
       savingButtonLabel={t('savingButton')}
       onSave={handleSubmit}
-      onDiscard={discard}
+      onDiscard={() => replaceDraft(() => saved)}
       changeCount={countEmailDraftChanges(saved, draft, liveLocales)}
       changesByLanguage={liveLocales.map((locale) => ({
         language: tLanguage(locale),
@@ -269,7 +269,7 @@ export const EmailSettings = ({
             />
           ) : (
             <EmailTemplateEditor
-              key={`${selectedItem}-${selectedLocale}-${discardCount}`}
+              key={`${selectedItem}-${selectedLocale}-${revision}`}
               templateType={selectedItem}
               languageName={tLanguage(selectedLocale)}
               copy={{

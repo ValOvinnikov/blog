@@ -9,7 +9,14 @@ import {
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import { selectFile } from '@platform/testing/select-file';
 import { TENANT_EMAIL_BRAND as BRAND } from '@platform/testing/tenant-email-brand';
-import { buildEmailDraft } from '@platform/utils/email-draft/email-draft';
+import {
+  buildEmailDraft,
+  withCopy,
+} from '@platform/utils/email-draft/email-draft';
+import {
+  settingsDraftStorageKey,
+  writeSettingsDraft,
+} from '@platform/utils/settings-draft-storage/settings-draft-storage';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { EmailSettings } from './email-settings';
@@ -52,26 +59,28 @@ vi.mock('@platform/server/email/send-test-email-action', () => ({
 const { EN, FR } = LOCALE_ISO_CODES;
 const LIVE_LOCALES = [EN, FR];
 
+const INITIAL_DRAFT = buildEmailDraft({
+  sender: { senderName: '', replyToAddress: '', footerPostalAddress: '' },
+  senderLogoUrl: undefined,
+  authored: [
+    {
+      templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
+      locale: EN,
+      subject: 'Sign in to Acme',
+      body: null,
+    },
+  ],
+  templateLogoUrls: {
+    MAGIC_LINK: undefined,
+    TENANT_INVITE: undefined,
+    NEWSLETTER_CONFIRMATION: undefined,
+  },
+  liveLocales: LIVE_LOCALES,
+});
+
 const setup = customRender(EmailSettings, {
   tenantId: 'tenant-1',
-  initialDraft: buildEmailDraft({
-    sender: { senderName: '', replyToAddress: '', footerPostalAddress: '' },
-    senderLogoUrl: undefined,
-    authored: [
-      {
-        templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-        locale: EN,
-        subject: 'Sign in to Acme',
-        body: null,
-      },
-    ],
-    templateLogoUrls: {
-      MAGIC_LINK: undefined,
-      TENANT_INVITE: undefined,
-      NEWSLETTER_CONFIRMATION: undefined,
-    },
-    liveLocales: LIVE_LOCALES,
-  }),
+  initialDraft: INITIAL_DRAFT,
   defaultLocale: EN,
   liveLocales: LIVE_LOCALES,
   brand: BRAND,
@@ -356,6 +365,49 @@ describe(`<${EmailSettings.name}/>`, () => {
         name: /^Sender & footer.*Default$/,
       }),
     ).toBeVisible();
+  });
+
+  it('shows a restored message in the template already open', async () => {
+    writeSettingsDraft(
+      settingsDraftStorageKey({ tenantId: 'tenant-1', page: 'email' }),
+      {
+        values: withCopy(
+          INITIAL_DRAFT,
+          { templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK, locale: EN },
+          {
+            subject: 'Sign in to Acme',
+            body: [
+              {
+                _type: 'block',
+                _key: 'b1',
+                style: 'normal',
+                children: [
+                  {
+                    _type: 'span',
+                    _key: 's1',
+                    text: 'Welcome back',
+                    marks: [],
+                  },
+                ],
+                markDefs: [],
+              },
+            ],
+          },
+        ),
+        baseline: INITIAL_DRAFT,
+        takenAt: new Date().toISOString(),
+      },
+    );
+    setup();
+    await openSignInTemplate(user);
+
+    await user.click(
+      screen.getByRole('button', { name: /^Restore \d+ changes?$/ }),
+    );
+
+    expect(
+      await screen.findByRole('textbox', { name: 'Message (English)' }),
+    ).toHaveTextContent('Welcome back');
   });
 
   it('is read-only for an archived tenant', () => {
