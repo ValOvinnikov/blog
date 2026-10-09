@@ -10,6 +10,7 @@ import { FormField } from '@platform/components/shared/form-field';
 import { FormTextInput } from '@platform/components/shared/form-text-input';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { useToast } from '@platform/context/toast-provider';
+import { useUnsavedChangesGuard } from '@platform/context/unsaved-changes-provider';
 import {
   updateTenantDetailsAction,
   type TUpdateTenantDetailsActionInput,
@@ -104,19 +105,12 @@ export const TenantDetailsPanel = ({
   const [isPending, startTransition] = useTransition();
   const isArchived = Boolean(tenant.deprovisionedAt);
 
-  // A fresh `tenant`/`ownerEmail` prop (a successful save's own
-  // `router.refresh()`) should replace whatever the form last held —
-  // adjusted during render, per React's guidance for state derived from
-  // props.
   if (tenant !== renderedTenant || ownerEmail !== renderedOwnerEmail) {
     setRenderedTenant(tenant);
     setRenderedOwnerEmail(ownerEmail);
     setValues(valuesFromProps(tenant, ownerEmail));
   }
 
-  // An archived tenant overrides every provisioning-derived lock with a
-  // single, stronger reason — reusing the same lock machinery (hint,
-  // `aria-describedby`, lock/unlock announcement) rather than a parallel one.
   const effectiveFieldLocks: TTenantFieldLocks = isArchived
     ? Object.fromEntries(
         ALL_FIELD_KEYS.map((key) => [key, { kind: 'archived' } as const]),
@@ -128,11 +122,6 @@ export const TenantDetailsPanel = ({
     fieldLocks: effectiveFieldLocks,
     lockedAnnouncement: t('lockedAnnouncement'),
     unlockedAnnouncement: t('unlockedAnnouncement'),
-    // A field that just locked (e.g. a background poll catching up to a
-    // step another operator retried) may still hold an unsaved edit —
-    // discard it back to the server value rather than leave a disabled
-    // control displaying input that was never saved and can no longer be
-    // submitted.
     onFieldsLocked: (newlyLockedKeys) => {
       const baseline = valuesFromProps(tenant, ownerEmail);
       setValues((prev) => {
@@ -146,6 +135,7 @@ export const TenantDetailsPanel = ({
   });
 
   const {
+    root,
     bodyStack,
     fields,
     lockAnnouncementLive,
@@ -153,17 +143,11 @@ export const TenantDetailsPanel = ({
     footerActions,
   } = tenantDetailsPanelVariants();
 
-  // `tenant`/`ownerEmail` are the baseline: whenever a fresh pair of props
-  // lands, the render-phase adjustment above resets `values` to match in the
-  // same pass, so the two stay in lockstep without any extra state to track
-  // a "saved" copy.
   const baselineValues = valuesFromProps(tenant, ownerEmail);
-  const isDirty =
-    values.name !== baselineValues.name ||
-    values.primaryDomain !== baselineValues.primaryDomain ||
-    values.plan !== baselineValues.plan ||
-    values.locale !== baselineValues.locale ||
-    values.ownerEmail !== baselineValues.ownerEmail;
+  const changeCount = ALL_FIELD_KEYS.filter(
+    (key) => values[key] !== baselineValues[key],
+  ).length;
+  const isDirty = changeCount > 0;
 
   const updateField = <K extends keyof TFormValues>(
     key: K,
@@ -172,7 +156,7 @@ export const TenantDetailsPanel = ({
     setValues((prev) => ({ ...prev, [key]: nextValue }));
   };
 
-  const handleSave = () => {
+  const save = async (): Promise<boolean> => {
     setFormError(undefined);
     setFieldErrors({});
 
@@ -184,19 +168,34 @@ export const TenantDetailsPanel = ({
       ownerEmail: values.ownerEmail,
     };
 
+    const result = await updateTenantDetailsAction(tenant.id, payload);
+    if (!result.ok) {
+      setFieldErrors(result.fieldErrors ?? {});
+      setFormError(result.error);
+      return false;
+    }
+    toast.success({
+      message: t('alertSuccess'),
+    });
+    router.refresh();
+    return true;
+  };
+
+  const handleSave = () => {
     startTransition(async () => {
-      const result = await updateTenantDetailsAction(tenant.id, payload);
-      if (!result.ok) {
-        setFieldErrors(result.fieldErrors ?? {});
-        setFormError(result.error);
-        return;
-      }
-      toast.success({
-        message: t('alertSuccess'),
-      });
-      router.refresh();
+      await save();
     });
   };
+
+  const discard = () => {
+    setValues(baselineValues);
+    setFieldErrors({});
+    setFormError(undefined);
+  };
+
+  useUnsavedChangesGuard(
+    isDirty ? { pageTitle: t('heading'), changeCount, save, discard } : null,
+  );
 
   const lockReasonText = (reason: TTenantFieldLockReason): string => {
     switch (reason.kind) {
@@ -239,7 +238,9 @@ export const TenantDetailsPanel = ({
   const localeLock = effectiveFieldLocks.locale;
 
   return (
-    <div data-tenant-details-panel={panelId}>
+    <div className={root()} data-tenant-details-panel={panelId}>
+      {formError && <Alert type={ALERT_TYPE.ERROR} title={formError} />}
+
       <Card>
         <Card.Header title={t('heading')} headingLevel={2} />
         <Card.Body>
@@ -251,8 +252,6 @@ export const TenantDetailsPanel = ({
             >
               {lockAnnouncement}
             </span>
-
-            {formError && <Alert type={ALERT_TYPE.ERROR} title={formError} />}
 
             <div
               className={fields()}
