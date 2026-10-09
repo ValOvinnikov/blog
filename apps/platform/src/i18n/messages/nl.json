@@ -345,10 +345,7 @@
     "shapeDescription": "Hoeken, ruimte en hoe kaarten zijn omlijst.",
     "brandHeading": "Merk",
     "brandImagePicked": "Nieuwe afbeelding, nog niet geüpload",
-    "brandImageUnchanged": "Geen nieuwe afbeelding",
-    "editTab": "Bewerken",
-    "previewTab": "Voorbeeld",
-    "viewTabsAriaLabel": "Weergave"
+    "brandImageUnchanged": "Geen nieuwe afbeelding"
   },
   "lookPreview": {
     "modeLight": "Licht",
@@ -394,10 +391,7 @@
     "senderItemLabel": "Afzender en voettekst",
     "senderItemDescription": "Naam, antwoordadres, postadres en logo, in elke taal hetzelfde.",
     "itemsAriaLabel": "E-mails om te bewerken",
-    "editingLabel": "Bewerken",
-    "viewAriaLabel": "Bewerken of voorbeeld",
-    "editTab": "Bewerken",
-    "previewTab": "Voorbeeld"
+    "editingLabel": "Bewerken"
   },
   "emailItemStatus": {
     "default": "Standaard",
@@ -840,6 +834,11 @@
   "languagePicker": {
     "ariaLabel": "Taal",
     "optionDescription": "{isDefault, select, true {Standaardtaal · } other {}}{count, plural, =0 {Alles standaard} other {# aangepast}}"
+  },
+  "viewTabs": {
+    "ariaLabel": "Bewerken of voorbeeld",
+    "editTab": "Bewerken",
+    "previewTab": "Voorbeeld"
   },
   "languageNames": {
     "EN": "Engels",

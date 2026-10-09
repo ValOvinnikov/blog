@@ -345,10 +345,7 @@
     "shapeDescription": "Esquinas, espaciado y el marco de las tarjetas.",
     "brandHeading": "Marca",
     "brandImagePicked": "Imagen nueva, aún sin subir",
-    "brandImageUnchanged": "Ninguna imagen nueva",
-    "editTab": "Editar",
-    "previewTab": "Vista previa",
-    "viewTabsAriaLabel": "Vista"
+    "brandImageUnchanged": "Ninguna imagen nueva"
   },
   "lookPreview": {
     "modeLight": "Claro",
@@ -394,10 +391,7 @@
     "senderItemLabel": "Remitente y pie",
     "senderItemDescription": "Nombre, dirección de respuesta, dirección postal y logotipo, iguales en todos los idiomas.",
     "itemsAriaLabel": "Correos para editar",
-    "editingLabel": "Editando",
-    "viewAriaLabel": "Editar o previsualizar",
-    "editTab": "Editar",
-    "previewTab": "Vista previa"
+    "editingLabel": "Editando"
   },
   "emailItemStatus": {
     "default": "Predeterminado",
@@ -840,6 +834,11 @@
   "languagePicker": {
     "ariaLabel": "Idioma",
     "optionDescription": "{isDefault, select, true {Idioma predeterminado · } other {}}{count, plural, =0 {Todo predeterminado} one {# personalizado} other {# personalizados}}"
+  },
+  "viewTabs": {
+    "ariaLabel": "Editar o previsualizar",
+    "editTab": "Editar",
+    "previewTab": "Vista previa"
   },
   "languageNames": {
     "EN": "Inglés",
