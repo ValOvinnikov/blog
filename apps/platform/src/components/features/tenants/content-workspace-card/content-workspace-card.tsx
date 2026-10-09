@@ -17,7 +17,6 @@ export const ContentWorkspaceCard = ({
     <Card>
       <Card.Header
         title={t('contentWorkspaceCardTitle')}
-        headingLevel={2}
         actions={
           <StatusBadge tone="neutral" hasDot={false}>
             {t('platformBadge')}

@@ -30,7 +30,6 @@ export const YourSiteCard = ({ tenant }: TYourSiteCardProps) => {
     <Card>
       <Card.Header
         title={t('yourSiteCardTitle')}
-        headingLevel={2}
         actions={
           <StatusBadge tone="neutral" hasDot={false}>
             {t('readOnlyBadge')}

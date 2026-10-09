@@ -54,7 +54,7 @@ export const ReactivateTenantControl = ({
 
   return (
     <Card>
-      <Card.Header title={t('cardTitle')} headingLevel={2} />
+      <Card.Header title={t('cardTitle')} />
       <Card.Body>
         <div className={content()}>
           <Text variant="supporting">{t('description')}</Text>

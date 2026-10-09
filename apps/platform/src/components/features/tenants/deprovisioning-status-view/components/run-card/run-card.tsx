@@ -3,6 +3,7 @@ import type { TDeprovisioningRun } from '@blog/db/schema/tenants';
 import { Card } from '@platform/components/shared/card';
 import { DetailList } from '@platform/components/shared/detail-list';
 import { ExternalLinkButton } from '@platform/components/shared/external-link-button';
+import type { THeadingLevel } from '@platform/components/shared/heading';
 import { formatDateTime } from '@platform/utils/format-date-time/format-date-time';
 import { formatRelativeTime } from '@platform/utils/format-relative-time/format-relative-time';
 import { useLocale, useTranslations } from 'next-intl';
@@ -13,9 +14,10 @@ import { runCardVariants } from './run-card-variants';
 type TRunCardProps = {
   run: TDeprovisioningRun;
   actions?: ReactNode;
+  headingLevel?: THeadingLevel;
 };
 
-export const RunCard = ({ run, actions }: TRunCardProps) => {
+export const RunCard = ({ run, actions, headingLevel }: TRunCardProps) => {
   const t = useTranslations('deprovisioningStatusView');
   const locale = useLocale();
   const { workflowLogLink } = runCardVariants();
@@ -24,7 +26,7 @@ export const RunCard = ({ run, actions }: TRunCardProps) => {
     <Card>
       <Card.Header
         title={t('runCardTitle')}
-        headingLevel={2}
+        headingLevel={headingLevel}
         actions={actions}
       />
       <Card.Body>

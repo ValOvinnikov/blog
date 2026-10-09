@@ -23,7 +23,7 @@ export const FindingsCard = ({ findings }: TFindingsCardProps) => {
 
   return (
     <Card>
-      <Card.Header title={t('title')} headingLevel={2} />
+      <Card.Header title={t('title')} />
       <Card.Body>
         {findings.length === 0 ? (
           <p className={empty()}>{t('empty')}</p>

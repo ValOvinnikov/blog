@@ -118,7 +118,6 @@ export const TenantDetailsForm = () => {
             <Card.Header
               title={t('heading')}
               supportingText={t('description')}
-              headingLevel={2}
             />
             <Card.Body>
               <div className={fields()}>

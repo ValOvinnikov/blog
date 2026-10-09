@@ -163,13 +163,13 @@ describe(ProvisioningStatusView, () => {
     expect(screen.queryByText('Invited, pending')).not.toBeInTheDocument();
   });
 
-  it('renders the steps column as a semantic aside landmark', () => {
+  it('renders no complementary landmark around the main content', () => {
     const tenant = makeTenant();
     render(
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    expect(screen.getByRole('complementary')).toBeVisible();
+    expect(screen.queryByRole('complementary')).not.toBeInTheDocument();
   });
 
   it('titles the steps card "Steps" and shows a 0-of-6-done badge when every step is idle', () => {
@@ -178,7 +178,7 @@ describe(ProvisioningStatusView, () => {
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
 
-    const sidebar = screen.getByRole('complementary');
+    const sidebar = screen.getByTestId('provisioning-steps');
     expect(
       within(sidebar).getByRole('heading', { level: 2, name: /^Steps/ }),
     ).toBeVisible();
@@ -202,7 +202,7 @@ describe(ProvisioningStatusView, () => {
     );
 
     expect(
-      within(screen.getByRole('complementary')).getByText('2 of 6 done'),
+      within(screen.getByTestId('provisioning-steps')).getByText('2 of 6 done'),
     ).toBeVisible();
   });
 
@@ -333,7 +333,7 @@ describe(ProvisioningStatusView, () => {
       screen.getAllByRole('button', { name: 'Retry provisioning' }),
     ).toHaveLength(1);
     expect(
-      within(screen.getByRole('complementary')).queryByRole('button', {
+      within(screen.getByTestId('provisioning-steps')).queryByRole('button', {
         name: 'Retry provisioning',
       }),
     ).not.toBeInTheDocument();
@@ -356,7 +356,7 @@ describe(ProvisioningStatusView, () => {
     );
 
     expect(
-      within(screen.getByRole('complementary')).queryByText(
+      within(screen.getByTestId('provisioning-steps')).queryByText(
         'Vercel API POST /v9/projects/prj_web/domains failed: 500 internal_server_error',
       ),
     ).not.toBeInTheDocument();
@@ -825,7 +825,7 @@ describe(ProvisioningStatusView, () => {
         />,
       );
 
-      const sidebar = screen.getByRole('complementary');
+      const sidebar = screen.getByTestId('provisioning-steps');
       expect(within(sidebar).getByText('Running…')).toBeVisible();
 
       await act(async () => {
@@ -1047,7 +1047,7 @@ describe(ProvisioningStatusView, () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
       });
       expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledTimes(2);
-      const sidebar = screen.getByRole('complementary');
+      const sidebar = screen.getByTestId('provisioning-steps');
       expect(within(sidebar).getByText('Running…')).toBeVisible();
     });
 
@@ -1172,7 +1172,7 @@ describe(ProvisioningStatusView, () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
       });
 
-      const sidebar = screen.getByRole('complementary');
+      const sidebar = screen.getByTestId('provisioning-steps');
       expect(within(sidebar).getByText('Running…')).toBeVisible();
 
       await act(async () => {
@@ -1225,7 +1225,7 @@ describe(ProvisioningStatusView, () => {
         />,
       );
 
-      const sidebar = screen.getByRole('complementary');
+      const sidebar = screen.getByTestId('provisioning-steps');
       expect(within(sidebar).getByText('Running…')).toBeVisible();
 
       await act(async () => {
@@ -1266,7 +1266,7 @@ describe(ProvisioningStatusView, () => {
 
   describe('steps disclosure collapse', () => {
     const stepsToggle = () =>
-      within(screen.getByRole('complementary')).getByRole('button', {
+      within(screen.getByTestId('provisioning-steps')).getByRole('button', {
         name: /Steps/,
       });
 

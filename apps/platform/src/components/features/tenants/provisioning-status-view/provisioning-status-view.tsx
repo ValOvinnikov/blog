@@ -200,7 +200,7 @@ export const ProvisioningStatusView = ({
       )}
 
       <div className={cardsRow()}>
-        <aside>
+        <div data-testid="provisioning-steps">
           <Disclosure
             className={stepsCard()}
             isOpen={isStepsOpen}
@@ -222,17 +222,13 @@ export const ProvisioningStatusView = ({
           >
             <StepList steps={stepListSteps} />
           </Disclosure>
-        </aside>
+        </div>
 
         {provisioningRun ? (
           <RunCard run={provisioningRun} actions={runCardActions} />
         ) : (
           <Card>
-            <Card.Header
-              title={t('runCardTitle')}
-              headingLevel={2}
-              actions={runCardActions}
-            />
+            <Card.Header title={t('runCardTitle')} actions={runCardActions} />
           </Card>
         )}
       </div>

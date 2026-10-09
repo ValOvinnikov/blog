@@ -37,11 +37,7 @@ export const EmailSenderEditor = ({
 
   return (
     <Card>
-      <Card.Header
-        title={t('heading')}
-        supportingText={t('description')}
-        headingLevel={2}
-      />
+      <Card.Header title={t('heading')} supportingText={t('description')} />
       <Card.Body>
         <div className={stack()}>
           <FormTextInput

@@ -241,7 +241,7 @@ export const TenantDetailsPanel = ({
   return (
     <div data-tenant-details-panel={panelId}>
       <Card>
-        <Card.Header title={t('heading')} headingLevel={2} />
+        <Card.Header title={t('heading')} />
         <Card.Body>
           <div className={bodyStack()}>
             <span
