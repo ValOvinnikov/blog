@@ -46,7 +46,6 @@ export const ConsentPreferences = ({
       {categories.map((category) => (
         <ConsentCategoryRow
           key={category.id}
-          id={category.id}
           label={category.label}
           description={category.description}
           isChecked={category.isLocked ? true : (values[category.id] ?? false)}

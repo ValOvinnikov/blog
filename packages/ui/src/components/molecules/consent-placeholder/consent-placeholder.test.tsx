@@ -1,4 +1,8 @@
-import { customRender, screen } from '@blog/ui/testing/custom-render';
+import {
+  customRender,
+  renderElement,
+  screen,
+} from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
 import userEvent from '@testing-library/user-event';
 import type { Mock } from 'vitest';
@@ -7,7 +11,6 @@ import { ConsentPlaceholder } from './consent-placeholder';
 
 faker.seed(123);
 
-const id = faker.lorem.slug();
 const providerName = faker.company.name();
 const message = faker.lorem.sentence();
 const allowLabel = faker.word.verb();
@@ -15,7 +18,6 @@ const settingsLabel = faker.word.noun();
 const scopeNote = faker.lorem.sentence();
 
 const setup = customRender(ConsentPlaceholder, {
-  id,
   providerName,
   message,
   allowLabel,
@@ -93,5 +95,43 @@ describe(`<${ConsentPlaceholder.name}/>`, () => {
   it('forwards dataTestId to the root element', () => {
     setup({ dataTestId: 'consent-placeholder' });
     expect(screen.getByTestId('consent-placeholder')).toBeVisible();
+  });
+
+  it("describes each placeholder's controls by its own scope note when two render on one page", () => {
+    const otherAllowLabel = faker.lorem.words(2);
+    const otherSettingsLabel = faker.lorem.words(2);
+    const otherScopeNote = faker.lorem.sentence();
+    renderElement(
+      <>
+        <ConsentPlaceholder
+          providerName={providerName}
+          message={message}
+          allowLabel={allowLabel}
+          settingsLabel={settingsLabel}
+          scopeNote={scopeNote}
+          onAllow={vi.fn()}
+          onOpenSettings={vi.fn()}
+        />
+        <ConsentPlaceholder
+          providerName={providerName}
+          message={message}
+          allowLabel={otherAllowLabel}
+          settingsLabel={otherSettingsLabel}
+          scopeNote={otherScopeNote}
+          onAllow={vi.fn()}
+          onOpenSettings={vi.fn()}
+        />
+      </>,
+    );
+
+    expect(
+      screen.getByRole('button', { name: allowLabel, description: scopeNote }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole('button', {
+        name: otherSettingsLabel,
+        description: otherScopeNote,
+      }),
+    ).toBeVisible();
   });
 });
