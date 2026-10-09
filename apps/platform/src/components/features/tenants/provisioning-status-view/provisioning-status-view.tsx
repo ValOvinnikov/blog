@@ -9,6 +9,7 @@ import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
 import { Disclosure } from '@platform/components/shared/disclosure';
 import { Heading } from '@platform/components/shared/heading';
+import { headingVariants } from '@platform/components/shared/heading/heading-variants';
 import { Icon } from '@platform/components/shared/icon';
 import { PageHeader } from '@platform/components/shared/page-header';
 import { StatusBadge } from '@platform/components/shared/status-badge';
@@ -27,10 +28,6 @@ import { STEP_ORDER, useProvisioningPoll } from './use-provisioning-poll';
 
 type TProvisioningStatusViewProps = {
   tenant: TTenant;
-  // `undefined` means the tenant's OWNER row is still a pending
-  // `membershipInvites` entry rather than a real `memberships` row (see
-  // `queries.memberships.getTenantOwnerEmail`) — every tenant has exactly
-  // one of the two from the moment it's created.
   ownerEmail: string | undefined;
 };
 
@@ -208,11 +205,12 @@ export const ProvisioningStatusView = ({
             className={stepsCard()}
             isOpen={isStepsOpen}
             onOpenChange={setIsStepsOpen}
+            headingLevel={2}
             summary={
               <span className={stepsSummary()}>
-                <Heading level={2} size="cardTitle">
+                <span className={headingVariants({ size: 'cardTitle' })}>
                   {t('stepsCardTitle')}
-                </Heading>
+                </span>
                 <StatusBadge tone="neutral">
                   {t('stepsCompletionBadge', {
                     done: doneStepCount,

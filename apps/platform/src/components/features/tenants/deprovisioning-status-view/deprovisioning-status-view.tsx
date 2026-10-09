@@ -5,6 +5,7 @@ import { TENANT_PROVISIONING_STEP_STATUS } from '@blog/db/constants';
 import { Card } from '@platform/components/shared/card';
 import { Disclosure } from '@platform/components/shared/disclosure';
 import { Heading } from '@platform/components/shared/heading';
+import { headingVariants } from '@platform/components/shared/heading/heading-variants';
 import { Icon } from '@platform/components/shared/icon';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { StepList } from '@platform/components/shared/step-list';
@@ -114,11 +115,12 @@ export const DeprovisioningStatusView = ({
           className={stepsCard()}
           isOpen={isStepsOpen}
           onOpenChange={setIsStepsOpen}
+          headingLevel={2}
           summary={
             <span className={stepsSummary()}>
-              <Heading level={2} size="cardTitle">
+              <span className={headingVariants({ size: 'cardTitle' })}>
                 {t('cardTitle')}
-              </Heading>
+              </span>
               <StatusBadge tone="neutral">
                 {t('stepsCompletionBadge', {
                   done: doneStepCount,
