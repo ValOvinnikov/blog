@@ -292,16 +292,16 @@
     "resetButton": "Reset to preset",
     "saveButton": "Save changes",
     "savingButton": "Saving…",
-    "alertSuccess": "Saved to site_config.",
+    "alertSuccess": "Look saved.",
     "alertError": "Couldn't save Look settings — try again.",
     "presetLabel": "Preset",
     "presetDescription": "The starting point nearly every site picks. Sets accent hue, heading and body fonts, radius, and density.",
     "accentHueLabel": "Accent hue",
-    "accentHueDescription": "Only the hue changes — lightness & chroma are fixed (OKLCH), so contrast stays WCAG-verified.",
+    "accentHueDescription": "Colours links, buttons and highlights across your site.",
     "accentHueInaccessible": "This hue doesn't keep body text readable on its tinted surfaces, so the site would replace it. Choose another hue.",
     "logoHueLabel": "Logo hue",
-    "logoHueDescription": "Tints the wordmark's tonal steps (--logo-1/2/3). Follows the accent hue unless you set it.",
-    "brandImagesDescription": "Stored in Vercel Blob — no on-the-fly transforms, so what you upload is what ships.",
+    "logoHueDescription": "Tints your wordmark. Follows the accent hue unless you choose another.",
+    "brandImagesDescription": "Images are used exactly as uploaded — nothing is resized or cropped.",
     "logoFieldLabel": "Logo",
     "faviconFieldLabel": "Favicon",
     "brandFieldsHint": "Logo: PNG, JPEG, WebP or SVG. Favicon: a square image.",
@@ -318,7 +318,7 @@
       "SM": "Small",
       "MD": "Medium",
       "LG": "Large",
-      "XL": "Extra Large"
+      "XL": "Extra large"
     },
     "densityOptionLabel": {
       "DEFAULT": "Default",
@@ -344,15 +344,12 @@
     "shapeDescription": "Corners, spacing and how cards are framed.",
     "brandHeading": "Brand",
     "brandImagePicked": "New image, not uploaded yet",
-    "brandImageUnchanged": "No new image",
-    "editTab": "Edit",
-    "previewTab": "Preview",
-    "viewTabsAriaLabel": "View"
+    "brandImageUnchanged": "No new image"
   },
   "lookPreview": {
     "modeLight": "Light",
     "modeDark": "Dark",
-    "previewColorSchemeAriaLabel": "Preview color scheme",
+    "previewColorSchemeAriaLabel": "Preview colour scheme",
     "livePreviewHeading": "Live preview",
     "sampleHeading": "Reading the tide charts",
     "samplePara": "A short dispatch to show heading and body type, accent, logo tones, and radius together.",
@@ -393,10 +390,7 @@
     "senderItemLabel": "Sender & footer",
     "senderItemDescription": "Name, reply-to, address and logo, the same in every language.",
     "itemsAriaLabel": "Emails to edit",
-    "editingLabel": "Editing",
-    "viewAriaLabel": "Edit or preview",
-    "editTab": "Edit",
-    "previewTab": "Preview"
+    "editingLabel": "Editing"
   },
   "fieldStatus": {
     "default": "Default",
@@ -835,6 +829,11 @@
   "languagePicker": {
     "ariaLabel": "Language",
     "optionDescription": "{isDefault, select, true {Default language · } other {}}{count, plural, =0 {All default} other {# customised}}"
+  },
+  "viewTabs": {
+    "ariaLabel": "Edit or preview",
+    "editTab": "Edit",
+    "previewTab": "Preview"
   },
   "languageNames": {
     "EN": "English",

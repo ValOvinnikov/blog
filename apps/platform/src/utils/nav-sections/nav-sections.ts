@@ -7,7 +7,7 @@ import type {
   TPlanPage,
   TPlanPageAccess,
 } from '@platform/utils/plan-page-access/plan-page-access';
-import { adminRoutes } from '@platform/utils/routes/routes';
+import { adminRoutes, STUDIO_SEGMENT } from '@platform/utils/routes/routes';
 
 /** Structurally compatible with both `useTranslations`'s and `getTranslations`'s return type, without fighting next-intl's per-namespace literal-key generic. */
 export type TNavTranslator = (
@@ -92,7 +92,7 @@ const configurationNavItems = (
   ];
 };
 
-const EVERY_PAGE: TPlanPageAccess = {
+export const EVERY_PLAN_PAGE: TPlanPageAccess = {
   languages: true,
   email: true,
   subscribers: true,
@@ -143,7 +143,7 @@ export const tenantNavSections = (
     },
     {
       label: t('configurationSectionLabel'),
-      items: configurationNavItems(t, hrefs, EVERY_PAGE),
+      items: configurationNavItems(t, hrefs, EVERY_PLAN_PAGE),
     },
     {
       label: t('platformSectionLabel'),
@@ -190,3 +190,17 @@ export const dashboardNavSections = (
     },
   ];
 };
+
+const isNavItemFor = (href: string, pathname: string) =>
+  pathname === href ||
+  (href.endsWith(`/${STUDIO_SEGMENT}`) && pathname.startsWith(`${href}/`));
+
+export const navLabelForPathname = (
+  sections: TSidebarNavSection[],
+  pathname: string,
+): string | undefined =>
+  sections
+    .flatMap((section) => section.items)
+    .find(
+      (item) => item.href !== undefined && isNavItemFor(item.href, pathname),
+    )?.label;

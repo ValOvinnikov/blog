@@ -5,31 +5,27 @@ import {
   type TBreadcrumbItem,
 } from '@platform/components/shared/breadcrumbs';
 import { usePathname } from '@platform/i18n/navigation';
+import {
+  navLabelForPathname,
+  operatorNavSections,
+} from '@platform/utils/nav-sections/nav-sections';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { useTranslations } from 'next-intl';
 
-/**
- * `(operator)/layout.tsx`'s breadcrumb — every route under that segment is
- * tenant-agnostic (`/tenants`, `/tenants/new`); a specific tenant's pages live
- * under `tenants/[tenantId]/layout.tsx`'s own `TenantBreadcrumb` instead.
- */
 export const OperatorBreadcrumb = () => {
   const pathname = usePathname();
   const t = useTranslations('navSections');
   const tTopbar = useTranslations('topbar');
 
-  const platform: TBreadcrumbItem = { label: t('platformLabel') };
-  const tenants: TBreadcrumbItem = {
-    label: t('tenants'),
-    href: adminRoutes.tenants(),
-  };
+  const leafLabel = navLabelForPathname(operatorNavSections(t), pathname);
 
-  const items: TBreadcrumbItem[] =
-    pathname === adminRoutes.newTenant()
-      ? [platform, tenants, { label: t('addTenant') }]
-      : pathname === adminRoutes.findings()
-        ? [platform, { label: t('findings') }]
-        : [platform, { label: t('tenants') }];
+  const items: TBreadcrumbItem[] = [
+    { label: t('platformLabel') },
+    ...(pathname === adminRoutes.newTenant()
+      ? [{ label: t('tenants'), href: adminRoutes.tenants() }]
+      : []),
+    ...(leafLabel ? [{ label: leafLabel }] : []),
+  ];
 
   return (
     <Breadcrumbs items={items} ariaLabel={tTopbar('breadcrumbAriaLabel')} />

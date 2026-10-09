@@ -292,16 +292,16 @@
     "resetButton": "Auf Vorlage zurücksetzen",
     "saveButton": "Änderungen speichern",
     "savingButton": "Wird gespeichert…",
-    "alertSuccess": "In site_config gespeichert.",
+    "alertSuccess": "Erscheinungsbild gespeichert.",
     "alertError": "Die Einstellungen zum Erscheinungsbild konnten nicht gespeichert werden — bitte erneut versuchen.",
     "presetLabel": "Vorlage",
     "presetDescription": "Der Ausgangspunkt, den fast jede Website wählt. Legt Akzentfarbton, Überschriften- und Fließtextschrift, Eckenradius und Dichte fest.",
     "accentHueLabel": "Akzentfarbton",
-    "accentHueDescription": "Nur der Farbton ändert sich — Helligkeit und Chroma sind fest (OKLCH), sodass der Kontrast WCAG-geprüft bleibt.",
+    "accentHueDescription": "Färbt Links, Schaltflächen und Hervorhebungen auf der ganzen Website.",
     "accentHueInaccessible": "Mit diesem Farbton bleibt Fließtext auf seinen getönten Flächen nicht lesbar, daher würde die Website ihn ersetzen. Wählen Sie einen anderen Farbton.",
     "logoHueLabel": "Logo-Farbton",
-    "logoHueDescription": "Färbt die Tonstufen der Wortmarke (--logo-1/2/3). Folgt dem Akzentfarbton, sofern Sie ihn nicht festlegen.",
-    "brandImagesDescription": "Gespeichert in Vercel Blob — ohne Transformationen zur Laufzeit, also wird genau das ausgeliefert, was Sie hochladen.",
+    "logoHueDescription": "Färbt die Wortmarke. Folgt dem Akzentfarbton, solange kein anderer gewählt ist.",
+    "brandImagesDescription": "Bilder werden genau so verwendet, wie sie hochgeladen werden — nichts wird verkleinert oder zugeschnitten.",
     "logoFieldLabel": "Logo",
     "faviconFieldLabel": "Favicon",
     "brandFieldsHint": "Logo: PNG, JPEG, WebP oder SVG. Favicon: ein quadratisches Bild.",
@@ -344,10 +344,7 @@
     "shapeDescription": "Ecken, Abstände und wie Karten gerahmt sind.",
     "brandHeading": "Marke",
     "brandImagePicked": "Neues Bild, noch nicht hochgeladen",
-    "brandImageUnchanged": "Kein neues Bild",
-    "editTab": "Bearbeiten",
-    "previewTab": "Vorschau",
-    "viewTabsAriaLabel": "Ansicht"
+    "brandImageUnchanged": "Kein neues Bild"
   },
   "lookPreview": {
     "modeLight": "Hell",
@@ -393,10 +390,7 @@
     "senderItemLabel": "Absender & Fußzeile",
     "senderItemDescription": "Name, Antwortadresse, Anschrift und Logo, in jeder Sprache gleich.",
     "itemsAriaLabel": "Zu bearbeitende E-Mails",
-    "editingLabel": "Bearbeiten",
-    "viewAriaLabel": "Bearbeiten oder Vorschau",
-    "editTab": "Bearbeiten",
-    "previewTab": "Vorschau"
+    "editingLabel": "Bearbeiten"
   },
   "fieldStatus": {
     "default": "Standard",
@@ -835,6 +829,11 @@
   "languagePicker": {
     "ariaLabel": "Sprache",
     "optionDescription": "{isDefault, select, true {Standardsprache · } other {}}{count, plural, =0 {Alles Standard} other {# angepasst}}"
+  },
+  "viewTabs": {
+    "ariaLabel": "Bearbeiten oder Vorschau",
+    "editTab": "Bearbeiten",
+    "previewTab": "Vorschau"
   },
   "languageNames": {
     "EN": "Englisch",

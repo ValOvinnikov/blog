@@ -292,16 +292,16 @@
     "resetButton": "Terugzetten naar voorinstelling",
     "saveButton": "Wijzigingen opslaan",
     "savingButton": "Opslaan…",
-    "alertSuccess": "Opgeslagen in site_config.",
+    "alertSuccess": "Uiterlijk opgeslagen.",
     "alertError": "Uiterlijk-instellingen konden niet worden opgeslagen. Probeer het opnieuw.",
     "presetLabel": "Voorinstelling",
     "presetDescription": "Het startpunt dat bijna elke site kiest. Stelt accenttint, kop- en tekstlettertype, afronding en dichtheid in.",
     "accentHueLabel": "Accenttint",
-    "accentHueDescription": "Alleen de tint verandert — lichtheid en chroma liggen vast (OKLCH), zodat het contrast WCAG-geverifieerd blijft.",
+    "accentHueDescription": "Kleurt links, knoppen en accenten op de hele site.",
     "accentHueInaccessible": "Met deze tint blijft lopende tekst op de getinte vlakken niet leesbaar, dus de site zou hem vervangen. Kies een andere tint.",
     "logoHueLabel": "Logotint",
-    "logoHueDescription": "Kleurt de toonstappen van het woordmerk (--logo-1/2/3). Volgt de accenttint, tenzij u deze instelt.",
-    "brandImagesDescription": "Opgeslagen in Vercel Blob — geen transformaties achteraf, dus wat u uploadt is wat er live gaat.",
+    "logoHueDescription": "Kleurt het woordmerk. Volgt de accenttint, tenzij er een andere is gekozen.",
+    "brandImagesDescription": "Afbeeldingen worden gebruikt zoals ze zijn geüpload — er wordt niets verkleind of bijgesneden.",
     "logoFieldLabel": "Logo",
     "faviconFieldLabel": "Favicon",
     "brandFieldsHint": "Logo: PNG, JPEG, WebP of SVG. Favicon: een vierkante afbeelding.",
@@ -344,10 +344,7 @@
     "shapeDescription": "Hoeken, ruimte en hoe kaarten zijn omlijst.",
     "brandHeading": "Merk",
     "brandImagePicked": "Nieuwe afbeelding, nog niet geüpload",
-    "brandImageUnchanged": "Geen nieuwe afbeelding",
-    "editTab": "Bewerken",
-    "previewTab": "Voorbeeld",
-    "viewTabsAriaLabel": "Weergave"
+    "brandImageUnchanged": "Geen nieuwe afbeelding"
   },
   "lookPreview": {
     "modeLight": "Licht",
@@ -393,10 +390,7 @@
     "senderItemLabel": "Afzender en voettekst",
     "senderItemDescription": "Naam, antwoordadres, postadres en logo, in elke taal hetzelfde.",
     "itemsAriaLabel": "E-mails om te bewerken",
-    "editingLabel": "Bewerken",
-    "viewAriaLabel": "Bewerken of voorbeeld",
-    "editTab": "Bewerken",
-    "previewTab": "Voorbeeld"
+    "editingLabel": "Bewerken"
   },
   "fieldStatus": {
     "default": "Standaard",
@@ -835,6 +829,11 @@
   "languagePicker": {
     "ariaLabel": "Taal",
     "optionDescription": "{isDefault, select, true {Standaardtaal · } other {}}{count, plural, =0 {Alles standaard} other {# aangepast}}"
+  },
+  "viewTabs": {
+    "ariaLabel": "Bewerken of voorbeeld",
+    "editTab": "Bewerken",
+    "previewTab": "Voorbeeld"
   },
   "languageNames": {
     "EN": "Engels",

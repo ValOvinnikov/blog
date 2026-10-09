@@ -5,36 +5,30 @@ import { useTranslations } from 'next-intl';
 
 import { viewTabsVariants } from './view-tabs-variants';
 
-const LOOK_VIEWS = ['edit', 'preview'] as const;
+const VIEWS = ['edit', 'preview'] as const;
 
-export type TLookView = (typeof LOOK_VIEWS)[number];
+export type TView = (typeof VIEWS)[number];
 
 export type TViewTabsProps = {
-  value: TLookView;
-  onChange: (view: TLookView) => void;
-  ids: Record<TLookView, { tab: string; panel: string }>;
-  ariaLabel: string;
+  value: TView;
+  onChange: (view: TView) => void;
+  ids: Record<TView, { tab: string; panel: string }>;
 };
 
 // The panels are the page's two columns, rendered by the caller rather than
 // `Tabs.Panel`, whose `hidden` attribute would also hide them on desktop.
-export const ViewTabs = ({
-  value,
-  onChange,
-  ids,
-  ariaLabel,
-}: TViewTabsProps) => {
-  const t = useTranslations('lookForm');
+export const ViewTabs = ({ value, onChange, ids }: TViewTabsProps) => {
+  const t = useTranslations('viewTabs');
   const { root, list, tab } = viewTabsVariants();
 
   return (
     <Tabs.Root
       value={value}
-      onValueChange={(next: TLookView) => onChange(next)}
+      onValueChange={(next: TView) => onChange(next)}
       className={root()}
     >
-      <Tabs.List aria-label={ariaLabel} className={list()}>
-        {LOOK_VIEWS.map((view) => (
+      <Tabs.List aria-label={t('ariaLabel')} className={list()}>
+        {VIEWS.map((view) => (
           <Tabs.Tab
             key={view}
             value={view}

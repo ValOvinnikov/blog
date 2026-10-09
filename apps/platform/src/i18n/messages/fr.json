@@ -292,16 +292,16 @@
     "resetButton": "Rétablir le préréglage",
     "saveButton": "Enregistrer les modifications",
     "savingButton": "Enregistrement…",
-    "alertSuccess": "Enregistré dans site_config.",
+    "alertSuccess": "Apparence enregistrée.",
     "alertError": "Impossible d'enregistrer les paramètres d'apparence — veuillez réessayer.",
     "presetLabel": "Préréglage",
     "presetDescription": "Le point de départ choisi par presque tous les sites. Définit la teinte d'accent, les polices des titres et du texte, l'arrondi et la densité.",
     "accentHueLabel": "Teinte d'accent",
-    "accentHueDescription": "Seule la teinte change — la luminosité et la chroma sont fixes (OKLCH), le contraste reste donc conforme aux WCAG.",
+    "accentHueDescription": "Colore les liens, les boutons et les mises en avant de tout le site.",
     "accentHueInaccessible": "Cette teinte ne garde pas le texte lisible sur ses surfaces teintées ; le site la remplacerait. Choisissez une autre teinte.",
     "logoHueLabel": "Teinte du logo",
-    "logoHueDescription": "Colore les nuances du logotype (--logo-1/2/3). Suit la teinte d'accent sauf si vous la définissez.",
-    "brandImagesDescription": "Stockées dans Vercel Blob — aucune transformation à la volée : le fichier envoyé est celui qui est publié.",
+    "logoHueDescription": "Colore le logotype. Suit la teinte d'accent si aucune autre n'est choisie.",
+    "brandImagesDescription": "Les images sont utilisées telles quelles — rien n'est redimensionné ni recadré.",
     "logoFieldLabel": "Logo",
     "faviconFieldLabel": "Favicon",
     "brandFieldsHint": "Logo : PNG, JPEG, WebP ou SVG. Favicon : une image carrée.",
@@ -344,10 +344,7 @@
     "shapeDescription": "Coins, espacement et encadrement des cartes.",
     "brandHeading": "Marque",
     "brandImagePicked": "Nouvelle image, pas encore importée",
-    "brandImageUnchanged": "Aucune nouvelle image",
-    "editTab": "Modifier",
-    "previewTab": "Aperçu",
-    "viewTabsAriaLabel": "Affichage"
+    "brandImageUnchanged": "Aucune nouvelle image"
   },
   "lookPreview": {
     "modeLight": "Clair",
@@ -393,10 +390,7 @@
     "senderItemLabel": "Expéditeur et pied de page",
     "senderItemDescription": "Nom, adresse de réponse, adresse postale et logo, identiques dans toutes les langues.",
     "itemsAriaLabel": "E-mails à modifier",
-    "editingLabel": "Modification",
-    "viewAriaLabel": "Modifier ou prévisualiser",
-    "editTab": "Modifier",
-    "previewTab": "Aperçu"
+    "editingLabel": "Modification"
   },
   "fieldStatus": {
     "default": "Par défaut",
@@ -835,6 +829,11 @@
   "languagePicker": {
     "ariaLabel": "Langue",
     "optionDescription": "{isDefault, select, true {Langue par défaut · } other {}}{count, plural, =0 {Tout par défaut} one {# personnalisé} other {# personnalisés}}"
+  },
+  "viewTabs": {
+    "ariaLabel": "Modifier ou prévisualiser",
+    "editTab": "Modifier",
+    "previewTab": "Aperçu"
   },
   "languageNames": {
     "EN": "Anglais",

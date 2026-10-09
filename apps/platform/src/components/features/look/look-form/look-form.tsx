@@ -13,12 +13,9 @@ import { LanguageSwitcherCard } from '@platform/components/features/look/look-fo
 import { PresetCard } from '@platform/components/features/look/look-form/components/preset-card';
 import { ShapeCard } from '@platform/components/features/look/look-form/components/shape-card';
 import { TypeCard } from '@platform/components/features/look/look-form/components/type-card';
-import {
-  ViewTabs,
-  type TLookView,
-} from '@platform/components/features/look/look-form/components/view-tabs';
 import { LookPreview } from '@platform/components/features/look/look-preview';
 import { SettingsFormShell } from '@platform/components/shared/settings-form-shell';
+import { useViewTabs, ViewTabs } from '@platform/components/shared/view-tabs';
 import { FONT_OPTIONS } from '@platform/config/fonts';
 import { useToast } from '@platform/context/toast-provider';
 import { clearBrandAssetAction } from '@platform/server/site-config/clear-brand-asset-action';
@@ -37,7 +34,6 @@ import {
   type TStagedImage,
 } from '@platform/utils/staged-image/staged-image';
 import { useFormSubmission } from '@platform/utils/use-form-submission/use-form-submission';
-import { useMediaQuery } from '@platform/utils/use-media-query/use-media-query';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
 
@@ -139,13 +135,7 @@ export const LookForm = ({
   const hasMultipleLanguages = liveLocales.length > 1;
   const archivedNoticeId = useId();
   const accentHueFieldId = useId();
-  const viewIds = {
-    edit: { tab: useId(), panel: useId() },
-    preview: { tab: useId(), panel: useId() },
-  };
-  const [view, setView] = useState<TLookView>('edit');
-  // Tailwind's `lg`, where the view tabs hide and both columns show.
-  const isTabbed = !useMediaQuery('(width >= 64rem)');
+  const { view, tabsProps, panelProps } = useViewTabs();
   const toast = useToast();
   const t = useTranslations('lookForm');
   const tPreset = useTranslations('presetPicker');
@@ -339,17 +329,10 @@ export const LookForm = ({
         onRestore: handleRestore,
       }}
     >
-      <ViewTabs
-        value={view}
-        onChange={setView}
-        ids={viewIds}
-        ariaLabel={t('viewTabsAriaLabel')}
-      />
+      <ViewTabs {...tabsProps} />
       <div className={columns()}>
         <div
-          id={viewIds.edit.panel}
-          role={isTabbed ? 'tabpanel' : undefined}
-          aria-labelledby={isTabbed ? viewIds.edit.tab : undefined}
+          {...panelProps('edit')}
           className={editPanel({ isActive: view === 'edit' })}
         >
           <PresetCard
@@ -408,9 +391,7 @@ export const LookForm = ({
         </div>
 
         <div
-          id={viewIds.preview.panel}
-          role={isTabbed ? 'tabpanel' : undefined}
-          aria-labelledby={isTabbed ? viewIds.preview.tab : undefined}
+          {...panelProps('preview')}
           className={previewPanel({ isActive: view === 'preview' })}
         >
           <LookPreview
