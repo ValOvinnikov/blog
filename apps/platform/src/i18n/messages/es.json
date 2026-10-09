@@ -504,7 +504,7 @@
     "BOOKMARKS": "Las entradas guardadas de un lector, antes de que guarde alguna"
   },
   "voiceSurfaceNotes": {
-    "NOT_FOUND": "El texto gris es fijo y se traduce por usted.",
+    "NOT_FOUND": "El botón de regreso es fijo y se traduce por usted.",
     "ERROR": "Los botones son fijos y se traducen por usted.",
     "ARCHIVE": "El encabezado viene de Studio; aquí solo el mensaje es suyo.",
     "BOOKMARKS": "El título de la página y el encabezado del panel son fijos."

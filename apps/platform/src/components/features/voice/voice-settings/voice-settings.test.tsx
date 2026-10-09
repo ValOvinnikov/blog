@@ -203,7 +203,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
     });
 
     it.each([
-      ['Page not found', 'Grey text is fixed and translated for you.'],
+      ['Page not found', 'The return button is fixed and translated for you.'],
       ['Error page', 'The buttons are fixed and translated for you.'],
       [
         'Empty lists',
