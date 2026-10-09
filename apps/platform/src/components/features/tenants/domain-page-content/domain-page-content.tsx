@@ -46,7 +46,6 @@ export const DomainPageContent = ({
       <Card>
         <Card.Header
           title={t('cardTitle', { domain: tenant.primaryDomain })}
-          headingLevel={2}
           actions={
             <Text variant="hint" as="span">
               {t('checkedHint')}

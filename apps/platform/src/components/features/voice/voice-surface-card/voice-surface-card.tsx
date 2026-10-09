@@ -101,7 +101,6 @@ export const VoiceSurfaceCard = ({
         <Card.Header
           title={tSurfaces(surface)}
           supportingText={tDescriptions(surface)}
-          headingLevel={2}
           actions={
             <span className={summary()}>
               {t('surfaceSummary', {

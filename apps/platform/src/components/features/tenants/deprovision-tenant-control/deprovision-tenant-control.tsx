@@ -65,7 +65,6 @@ export const DeprovisionTenantControl = ({
       <Card className={cardBorder()}>
         <Card.Header
           title={<span className={cardTitle()}>{t('archivedCardTitle')}</span>}
-          headingLevel={2}
           className={cardHeader()}
         />
         <Card.Body>
@@ -82,7 +81,6 @@ export const DeprovisionTenantControl = ({
     <Card className={cardBorder()}>
       <Card.Header
         title={<span className={cardTitle()}>{t('cardTitle')}</span>}
-        headingLevel={2}
         className={cardHeader()}
       />
       <Card.Body>

@@ -56,7 +56,7 @@ export const TenantDangerPageContent = ({
               <Heading level={2} size="cardTitle">
                 {t('historyHeading')}
               </Heading>
-              <DeprovisioningStatusView poll={poll} />
+              <DeprovisioningStatusView poll={poll} headingLevel={3} />
             </div>
           )}
         </>

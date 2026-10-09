@@ -41,7 +41,6 @@ export const RecentActivityCard = ({ events }: TRecentActivityCardProps) => {
     <Card>
       <Card.Header
         title={t('recentActivityCardTitle')}
-        headingLevel={2}
         actions={
           <Text variant="hint" as="span">
             {t('recentActivitySourceLabel')}
