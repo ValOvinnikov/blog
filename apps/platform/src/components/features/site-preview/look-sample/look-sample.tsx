@@ -45,26 +45,25 @@ export const LookSample = ({
     <div
       inert={true}
       className={root()}
-      style={tokenStyle}
+      style={
+        {
+          ...tokenStyle,
+          '--font-display-family': headingFontFamily,
+          '--font-body-family': bodyFontFamily,
+        } as CSSProperties
+      }
       data-testid="look-sample-tokens"
     >
       <SampleSiteHeader
         tenantName={tenantName}
         logoSrc={logoSrc}
-        headingFontFamily={headingFontFamily}
         liveLocales={liveLocales}
         languageSwitcherStyle={languageSwitcherStyle}
       />
-      <Heading
-        level={3}
-        visual="preview"
-        style={{ fontFamily: headingFontFamily }}
-      >
+      <Heading level={3} visual="preview">
         {t('sampleHeading')}
       </Heading>
-      <Text variant="supporting" style={{ fontFamily: bodyFontFamily }}>
-        {t('samplePara')}
-      </Text>
+      <Text variant="supporting">{t('samplePara')}</Text>
       <div className={actionsRow()}>
         <Button type="button" size={SIZE.SM}>
           {t('subscribeButton')}
@@ -88,9 +87,7 @@ export const LookSample = ({
             {t('outlinedCardHeading')}
           </Panel.Header>
           <Panel.Body>
-            <Text variant="supporting" style={{ fontFamily: bodyFontFamily }}>
-              {t('outlinedCardBody')}
-            </Text>
+            <Text variant="supporting">{t('outlinedCardBody')}</Text>
           </Panel.Body>
         </Panel>
       </div>
