@@ -165,10 +165,10 @@ describe(`<${LookForm.name}/>`, () => {
 
     expect(
       screen.getByRole('slider', { name: 'Accent hue' }),
-    ).toHaveAccessibleDescription(/Only the hue changes/);
+    ).toHaveAccessibleDescription(/Colours links/);
     expect(
       screen.getByRole('switch', { name: 'Follow accent hue' }),
-    ).toHaveAccessibleDescription(/Tints the wordmark/);
+    ).toHaveAccessibleDescription(/Tints your wordmark/);
     expect(
       screen.getByRole('group', { name: 'Radius scale' }),
     ).toHaveAccessibleDescription('Corner roundness across every surface.');
@@ -273,7 +273,7 @@ describe(`<${LookForm.name}/>`, () => {
     await user.keyboard('{ArrowRight}');
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
-    expect(await screen.findByText('Saved to site_config.')).toBeVisible();
+    expect(await screen.findByText('Look saved.')).toBeVisible();
   });
 
   it('marks Save busy while the save is in flight', async () => {
@@ -394,7 +394,7 @@ describe(`<${LookForm.name}/>`, () => {
   it('previews a changed radius scale and density before saving', async () => {
     setup();
 
-    await user.click(screen.getByRole('button', { name: 'Extra Large' }));
+    await user.click(screen.getByRole('button', { name: 'Extra large' }));
     await user.click(screen.getByRole('button', { name: 'Compact' }));
 
     expect(screen.getByTestId('look-sample-tokens')).toHaveStyle({
@@ -497,7 +497,7 @@ describe(`<${LookForm.name}/>`, () => {
       ).toHaveAttribute('aria-disabled', 'true');
       expect(screen.getByRole('button', { name: 'Small' })).toBeDisabled();
       expect(
-        screen.getByRole('button', { name: 'Extra Large' }),
+        screen.getByRole('button', { name: 'Extra large' }),
       ).toBeDisabled();
       expect(screen.getByRole('button', { name: 'Compact' })).toBeDisabled();
       expect(screen.getByRole('button', { name: 'Outlined' })).toBeDisabled();
