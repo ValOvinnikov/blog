@@ -1,12 +1,11 @@
 import { DOMAIN_PATTERN } from '@blog/config';
-import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 import { getDomain } from 'tldts';
 
+import { fetchVercel, readVercelCredentials } from './vercel-domains-api';
+
 export type TDomainAvailability =
   'NOT_CONFIGURED' | 'AVAILABLE' | 'IN_USE' | 'ERROR';
-
-const VERCEL_TIMEOUT_MS = 5000;
 
 // Every tenant domain on this platform lives under the same shared apex
 // (map-domain.ts attaches all of them to the one shared apps/web Vercel
@@ -41,19 +40,6 @@ const deriveApexDomain = (domain: string): string | null => getDomain(domain);
 const normalizeDomainName = (name: string): string =>
   name.toLowerCase().replace(/\.$/, '');
 
-const buildProjectDomainsUrl = (
-  apexDomain: string,
-  teamId: string | undefined,
-  until: number | undefined,
-): URL => {
-  const url = new URL(
-    `https://api.vercel.com/v1/domains/${encodeURIComponent(apexDomain)}/project-domains`,
-  );
-  if (teamId) url.searchParams.set('teamId', teamId);
-  if (until !== undefined) url.searchParams.set('until', String(until));
-  return url;
-};
-
 /**
  * Advisory pre-check run at tenant-creation time, before provisioning ever
  * starts. Mirrors the rule `mapTenantDomain` (`packages/db`) enforces at
@@ -67,13 +53,9 @@ const buildProjectDomainsUrl = (
 export const checkDomainAvailability = async (
   domain: string,
 ): Promise<TDomainAvailability> => {
-  const {
-    VERCEL_API_TOKEN: token,
-    VERCEL_PROJECT_ID_WEB: webProjectId,
-    VERCEL_TEAM_ID: teamId,
-  } = env;
+  const credentials = readVercelCredentials();
 
-  if (!token || !webProjectId) return 'NOT_CONFIGURED';
+  if (!credentials) return 'NOT_CONFIGURED';
 
   if (!DOMAIN_PATTERN.test(domain)) {
     logger.error('tenants.domain_availability_invalid_domain', { domain });
@@ -93,12 +75,11 @@ export const checkDomainAvailability = async (
 
   try {
     for (let page = 0; page < MAX_PROJECT_DOMAINS_PAGES; page++) {
-      const url = buildProjectDomainsUrl(apexDomain, teamId, until);
-
-      const response = await fetch(url, {
-        headers: { Authorization: `Bearer ${token}` },
-        signal: AbortSignal.timeout(VERCEL_TIMEOUT_MS),
-      });
+      const response = await fetchVercel(
+        credentials,
+        `/v1/domains/${encodeURIComponent(apexDomain)}/project-domains`,
+        until === undefined ? {} : { until: String(until) },
+      );
 
       // A 404 means the apex itself is unknown to the team's Vercel
       // account — no project can have a domain registered under an apex
@@ -118,7 +99,7 @@ export const checkDomainAvailability = async (
       const attachedElsewhere = data.projectDomains?.some(
         (projectDomain) =>
           normalizeDomainName(projectDomain.name) === normalizedDomain &&
-          projectDomain.projectId !== webProjectId,
+          projectDomain.projectId !== credentials.projectId,
       );
 
       if (attachedElsewhere) return 'IN_USE';
