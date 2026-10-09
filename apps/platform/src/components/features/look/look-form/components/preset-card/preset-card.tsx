@@ -35,7 +35,7 @@ export const PresetCard = ({
         isResetVisible && (
           <Button
             type="button"
-            variant="ghost"
+            variant="secondary"
             size={SIZE.SM}
             onClick={onReset}
             isDisabled={isArchived}

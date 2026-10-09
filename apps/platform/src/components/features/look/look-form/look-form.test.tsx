@@ -148,6 +148,39 @@ describe(`<${LookForm.name}/>`, () => {
     );
   });
 
+  it('drops the tab panels on desktop, where the view tabs are hidden', () => {
+    const stubMatchMedia = window.matchMedia;
+    vi.spyOn(window, 'matchMedia').mockImplementation((query) => ({
+      ...stubMatchMedia(query),
+      matches: true,
+    }));
+    setup();
+
+    expect(screen.queryByRole('tabpanel')).not.toBeInTheDocument();
+  });
+
+  it("describes each Look control with its field's hint", () => {
+    setup();
+
+    expect(
+      screen.getByRole('slider', { name: 'Accent hue' }),
+    ).toHaveAccessibleDescription(/Only the hue changes/);
+    expect(
+      screen.getByRole('switch', { name: 'Follow accent hue' }),
+    ).toHaveAccessibleDescription(/Tints the wordmark/);
+    expect(
+      screen.getByRole('group', { name: 'Radius scale' }),
+    ).toHaveAccessibleDescription('Corner roundness across every surface.');
+  });
+
+  it('names the logo hue group with its optional tag', () => {
+    setup();
+
+    expect(
+      screen.getByRole('group', { name: 'Logo hue optional' }),
+    ).toBeVisible();
+  });
+
   it('shows the favicon square requirement before any file is chosen', () => {
     setup();
 
@@ -465,6 +498,15 @@ describe(`<${LookForm.name}/>`, () => {
       ).toBeDisabled();
       expect(screen.getByRole('button', { name: 'Compact' })).toBeDisabled();
       expect(screen.getByRole('button', { name: 'Outlined' })).toBeDisabled();
+    });
+
+    it('describes a rejected accent hue with both the archived notice and the error', () => {
+      isAccentHueAccessibleMock.mockReturnValue(false);
+      setup({ archivedAt: ARCHIVED_AT });
+
+      const slider = screen.getByRole('slider', { name: 'Accent hue' });
+      expect(slider).toHaveAccessibleDescription(/This tenant is archived/);
+      expect(slider).toHaveAccessibleDescription(/the site would replace it/);
     });
 
     it('disables Reset to preset and describes it with the archived notice text, for a screen-reader user', () => {

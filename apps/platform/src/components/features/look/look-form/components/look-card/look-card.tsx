@@ -20,7 +20,7 @@ export const LookCard = ({
   children,
 }: TLookCardProps) => {
   const t = useTranslations('lookForm');
-  const { title: titleSlot, dot, body } = lookCardVariants();
+  const { title: titleSlot, dot, srOnly, body } = lookCardVariants();
 
   return (
     <Card>
@@ -32,7 +32,7 @@ export const LookCard = ({
               <>
                 {' '}
                 <span className={dot()}>
-                  <span className="sr-only">{t('unsavedCard')}</span>
+                  <span className={srOnly()}>{t('unsavedCard')}</span>
                 </span>
               </>
             )}

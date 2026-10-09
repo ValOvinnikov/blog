@@ -9,6 +9,5 @@ export const colourCardVariants = tv({
     hueValue: [
       'min-w-[92px] shrink-0 text-right text-[12.5px] tabular-nums text-admin-muted',
     ],
-    fieldError: ['mt-2 text-[11.5px] text-admin-bad'],
   },
 });

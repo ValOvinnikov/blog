@@ -37,6 +37,12 @@ describe(LookSample, () => {
     expect(screen.getByRole('button', { name: 'Subscribe' })).toBeVisible();
   });
 
+  it('keeps the sample out of the tab order and the page outline', () => {
+    render(<LookSample {...BASE_PROPS} />);
+
+    expect(screen.getByTestId('look-sample-tokens')).toHaveAttribute('inert');
+  });
+
   it('resolves the tenant accent rather than the static dark ramp in dark mode', () => {
     render(
       <LookSample

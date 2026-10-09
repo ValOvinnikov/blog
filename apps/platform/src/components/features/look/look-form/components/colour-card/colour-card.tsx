@@ -8,7 +8,6 @@ import {
   buildAccentPreviewTokens,
 } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import { useTranslations } from 'next-intl';
-import { useId } from 'react';
 
 import { colourCardVariants } from './colour-card-variants';
 
@@ -34,12 +33,8 @@ export const ColourCard = ({
   archivedNoticeId,
 }: TColourCardProps) => {
   const t = useTranslations('lookForm');
-  const accentHueErrorId = useId();
   const archivedDescribedBy = isArchived ? archivedNoticeId : undefined;
-  const accentHueDescribedBy = isAccentHueRejected
-    ? accentHueErrorId
-    : archivedDescribedBy;
-  const { hueField, swatch, hueValue, fieldError } = colourCardVariants();
+  const { hueField, swatch, hueValue } = colourCardVariants();
 
   const accentHueLabel = t('accentHueLabel');
   const swatchColor = buildAccentPreviewTokens(accentHue, false)[
@@ -56,6 +51,7 @@ export const ColourCard = ({
         id={accentHueFieldId}
         label={accentHueLabel}
         hint={t('accentHueDescription')}
+        error={isAccentHueRejected ? t('accentHueInaccessible') : undefined}
       >
         <div className={hueField()}>
           <span
@@ -68,22 +64,18 @@ export const ColourCard = ({
             value={accentHue}
             onChange={(value) => onFieldChange('accentHue', value)}
             isDisabled={isArchived}
-            aria-describedby={accentHueDescribedBy}
+            aria-describedby={archivedDescribedBy}
             trackStyle={{ background: accentHueGradient() }}
           />
           <span className={hueValue()}>{accentHue}°</span>
         </div>
-        {isAccentHueRejected && (
-          <p id={accentHueErrorId} className={fieldError()} role="alert">
-            {t('accentHueInaccessible')}
-          </p>
-        )}
       </LookField>
 
       <LookField
         label={t('logoHueLabel')}
         hint={t('logoHueDescription')}
         isOptional={true}
+        isGroup={true}
       >
         <LogoHueField
           accentHue={accentHue}

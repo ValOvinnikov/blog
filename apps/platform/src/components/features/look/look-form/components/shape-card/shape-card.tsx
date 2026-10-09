@@ -59,9 +59,12 @@ export const ShapeCard = ({
       description={t('shapeDescription')}
       hasUnsavedChanges={hasUnsavedChanges}
     >
-      <LookField label={radiusScaleLabel} hint={t('radiusScaleDescription')}>
+      <LookField
+        label={radiusScaleLabel}
+        hint={t('radiusScaleDescription')}
+        isGroup={true}
+      >
         <SegmentedControl<TRadiusScale>
-          ariaLabel={radiusScaleLabel}
           options={radiusOptions}
           value={radiusScale}
           onChange={(scale) => onFieldChange('radiusScale', scale)}
@@ -70,9 +73,12 @@ export const ShapeCard = ({
         />
       </LookField>
 
-      <LookField label={densityLabel} hint={t('densityDescription')}>
+      <LookField
+        label={densityLabel}
+        hint={t('densityDescription')}
+        isGroup={true}
+      >
         <SegmentedControl<TDensity>
-          ariaLabel={densityLabel}
           options={densityOptions}
           value={density}
           onChange={(option) => onFieldChange('density', option)}
@@ -81,9 +87,12 @@ export const ShapeCard = ({
         />
       </LookField>
 
-      <LookField label={cardStyleLabel} hint={t('cardStyleDescription')}>
+      <LookField
+        label={cardStyleLabel}
+        hint={t('cardStyleDescription')}
+        isGroup={true}
+      >
         <SegmentedControl<TCardStyle>
-          ariaLabel={cardStyleLabel}
           options={cardStyleOptions}
           value={cardStyle}
           onChange={(style) => onFieldChange('cardStyle', style)}

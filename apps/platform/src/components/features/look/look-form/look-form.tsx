@@ -36,6 +36,7 @@ import {
   type TStagedImage,
 } from '@platform/utils/staged-image/staged-image';
 import { useFormSubmission } from '@platform/utils/use-form-submission/use-form-submission';
+import { useMediaQuery } from '@platform/utils/use-media-query/use-media-query';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
 
@@ -141,6 +142,8 @@ export const LookForm = ({
     preview: { tab: useId(), panel: useId() },
   };
   const [view, setView] = useState<TLookView>('edit');
+  // Tailwind's `lg`, where the view tabs hide and both columns show.
+  const isTabbed = !useMediaQuery('(width >= 64rem)');
   const toast = useToast();
   const t = useTranslations('lookForm');
   const tPreset = useTranslations('presetPicker');
@@ -343,8 +346,8 @@ export const LookForm = ({
       <div className={columns()}>
         <div
           id={viewIds.edit.panel}
-          role="tabpanel"
-          aria-labelledby={viewIds.edit.tab}
+          role={isTabbed ? 'tabpanel' : undefined}
+          aria-labelledby={isTabbed ? viewIds.edit.tab : undefined}
           className={editPanel({ isActive: view === 'edit' })}
         >
           <PresetCard
@@ -404,8 +407,8 @@ export const LookForm = ({
 
         <div
           id={viewIds.preview.panel}
-          role="tabpanel"
-          aria-labelledby={viewIds.preview.tab}
+          role={isTabbed ? 'tabpanel' : undefined}
+          aria-labelledby={isTabbed ? viewIds.preview.tab : undefined}
           className={previewPanel({ isActive: view === 'preview' })}
         >
           <LookPreview

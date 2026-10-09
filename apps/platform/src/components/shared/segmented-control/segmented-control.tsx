@@ -15,7 +15,7 @@ export type TSegmentedControlProps<TValue extends string> = {
   options: TSegmentedControlOption<TValue>[];
   value: TValue;
   onChange: (value: TValue) => void;
-  ariaLabel: string;
+  ariaLabel?: string;
   isDisabled?: boolean;
   className?: string;
   'aria-describedby'?: AriaAttributes['aria-describedby'];

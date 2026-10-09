@@ -9,7 +9,7 @@ import type { AriaAttributes } from 'react';
 import { fontPickerVariants } from './font-picker-variants';
 
 export type TFontPickerProps = {
-  ariaLabel: string;
+  ariaLabel?: string;
   value: TFontChoice;
   onChange: (value: TFontChoice) => void;
   isDisabled?: boolean;

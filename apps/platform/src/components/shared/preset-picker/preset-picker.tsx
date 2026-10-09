@@ -5,7 +5,7 @@ import { RadioGroup } from '@base-ui/react/radio-group';
 import { FONT_CHOICE, PRESET_ID, type TPresetId } from '@blog/config';
 import { FONT_OPTIONS } from '@platform/config/fonts';
 import { useTranslations } from 'next-intl';
-import type { AriaAttributes } from 'react';
+import { useId, type AriaAttributes } from 'react';
 
 import { presetPickerVariants } from './preset-picker-variants';
 
@@ -38,6 +38,7 @@ export const PresetPicker = ({
   'aria-describedby': ariaDescribedBy,
 }: TPresetPickerProps) => {
   const t = useTranslations('presetPicker');
+  const idBase = useId();
 
   const presetOptions: TPresetOption[] = [
     {
@@ -79,19 +80,26 @@ export const PresetPicker = ({
           miniPrimary,
           miniSecondary,
         } = presetPickerVariants({ selected, preset: preset.value });
+        const nameId = `${idBase}-${preset.value}-name`;
+        const descriptionId = `${idBase}-${preset.value}-description`;
 
         return (
           <Radio.Root
             key={preset.value}
             value={preset.value}
-            aria-label={preset.label}
+            aria-labelledby={nameId}
+            aria-describedby={descriptionId}
             className={card()}
           >
             <span className={checkmark()} aria-hidden="true">
               ✓
             </span>
-            <span className={name()}>{preset.label}</span>
-            <span className={description()}>{preset.description}</span>
+            <span id={nameId} className={name()}>
+              {preset.label}
+            </span>
+            <span id={descriptionId} className={description()}>
+              {preset.description}
+            </span>
             <span className={mini()} aria-hidden="true">
               <span
                 className={miniPrimary()}

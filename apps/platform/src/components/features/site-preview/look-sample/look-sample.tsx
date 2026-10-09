@@ -33,7 +33,12 @@ export const LookSample = ({
     lookSampleVariants({ isDark });
 
   return (
-    <div className={root()} style={tokenStyle} data-testid="look-sample-tokens">
+    <div
+      inert={true}
+      className={root()}
+      style={tokenStyle}
+      data-testid="look-sample-tokens"
+    >
       <div className={brandRow()}>
         <BrandMark size={SIZE.SM} title={tenantName} src={logoSrc} />
         <span className={brandName()} style={{ fontFamily: headingFontFamily }}>
