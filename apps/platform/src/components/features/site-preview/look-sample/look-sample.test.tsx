@@ -1,3 +1,4 @@
+import { LANGUAGE_SWITCHER_STYLE, LOCALE_ISO_CODES } from '@blog/config';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import type { CSSProperties } from 'react';
 
@@ -14,6 +15,8 @@ const BASE_PROPS = {
   isDark: false,
   headingFontFamily: 'mock-space-grotesk-font-family',
   bodyFontFamily: 'mock-newsreader-font-family',
+  liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR],
+  languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
 };
 
 describe(LookSample, () => {
@@ -89,5 +92,93 @@ describe(LookSample, () => {
     expect(
       screen.getByRole('heading', { level: 4, name: 'Newsletter' }),
     ).toBeVisible();
+  });
+
+  it('opens with a header carrying the brand and two nav links', () => {
+    render(<LookSample {...BASE_PROPS} />);
+
+    expect(screen.getByRole('banner')).toHaveTextContent('Acme Inc.');
+    expect(screen.getByRole('link', { name: 'Posts' })).toBeVisible();
+    expect(screen.getByRole('link', { name: 'About' })).toBeVisible();
+  });
+
+  it('shows every live language as a code with compact codes', () => {
+    render(<LookSample {...BASE_PROPS} />);
+
+    expect(screen.getByRole('link', { name: 'English' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    expect(screen.getByRole('link', { name: 'Français' })).toHaveTextContent(
+      'FR',
+    );
+    expect(
+      screen.queryByRole('button', { name: 'Language: English' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows a menu pill with the current code for menu with code', () => {
+    render(
+      <LookSample
+        {...BASE_PROPS}
+        languageSwitcherStyle={LANGUAGE_SWITCHER_STYLE.MENU_CODE}
+      />,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Language: English' }),
+    ).toHaveTextContent('EN');
+    expect(
+      screen.queryByRole('link', { name: 'Français' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows a globe menu without a code for menu with globe', () => {
+    render(
+      <LookSample
+        {...BASE_PROPS}
+        languageSwitcherStyle={LANGUAGE_SWITCHER_STYLE.MENU_GLOBE}
+      />,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Language: English' }),
+    ).not.toHaveTextContent('EN');
+  });
+
+  it('falls back to the code menu when compact codes would show more than four languages', () => {
+    render(
+      <LookSample
+        {...BASE_PROPS}
+        liveLocales={[
+          LOCALE_ISO_CODES.EN,
+          LOCALE_ISO_CODES.FR,
+          LOCALE_ISO_CODES.DE,
+          LOCALE_ISO_CODES.ES,
+          LOCALE_ISO_CODES.NL,
+        ]}
+      />,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Language: English' }),
+    ).toHaveTextContent('EN');
+  });
+
+  it('shows no switcher with one live language', () => {
+    render(
+      <LookSample
+        {...BASE_PROPS}
+        liveLocales={[LOCALE_ISO_CODES.EN]}
+        languageSwitcherStyle={LANGUAGE_SWITCHER_STYLE.MENU_GLOBE}
+      />,
+    );
+
+    expect(
+      screen.queryByRole('button', { name: /^Language/ }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: 'English' }),
+    ).not.toBeInTheDocument();
   });
 });

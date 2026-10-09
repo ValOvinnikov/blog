@@ -290,9 +290,8 @@
     "logoHueDescription": "Tiñe los pasos tonales del logotipo (--logo-1/2/3). Sigue el tono de acento salvo que lo defina usted.",
     "brandImagesDescription": "Se almacenan en Vercel Blob, sin transformaciones al vuelo: lo que suba es lo que se publica.",
     "logoFieldLabel": "Logotipo",
-    "logoFieldHint": "PNG, JPEG, WebP o SVG · si no hay, se usa el logotipo poligonal",
     "faviconFieldLabel": "Favicon",
-    "faviconFieldHint": "Súbalo ya recortado en cuadrado: Blob no puede recortarlo por usted (en un SVG, su viewBox determina la forma). Las imágenes que no sean cuadradas se rechazan.",
+    "brandFieldsHint": "Logotipo: PNG, JPEG, WebP o SVG. Favicon: una imagen cuadrada.",
     "optionalTag": "opcional",
     "headingFontLabel": "Fuente de títulos",
     "bodyFontLabel": "Fuente del texto",
@@ -343,7 +342,6 @@
     "modeDark": "Oscuro",
     "previewColorSchemeAriaLabel": "Esquema de color de la vista previa",
     "livePreviewHeading": "Vista previa en directo",
-    "livePreviewDescription": "Primitivas reales de @blog/ui",
     "sampleHeading": "Leyendo las tablas de mareas",
     "samplePara": "Una breve crónica para mostrar juntos la tipografía de títulos y de texto, el acento, los tonos del logotipo y el radio.",
     "subscribeButton": "Suscribirse",
@@ -355,12 +353,16 @@
     "secondCardExcerpt": "Una tarjeta estática. Su marco sigue su estilo de tarjeta.",
     "outlinedCardHeading": "Boletín",
     "outlinedCardBody": "Una tarjeta con contorno, como la muestran los paneles y los planes de precios.",
-    "previewNote": "Estado del formulario sin guardar → propiedades personalizadas de CSS, con la misma rampa OKLCH que producción. Nada de esto se publica hasta que guarde.",
+    "previewNote": "Creada con los propios componentes del sitio. Nada se publica hasta que guarde.",
     "widthDesktop": "Escritorio",
     "widthMobile": "Móvil",
-    "previewWidthAriaLabel": "Ancho de la vista previa"
+    "previewWidthAriaLabel": "Ancho de la vista previa",
+    "navPosts": "Entradas",
+    "navAbout": "Acerca de",
+    "switcherMenuAriaLabel": "Idioma: {language}"
   },
   "brandAssetField": {
+    "savesWithChanges": "Se guarda con los cambios",
     "unexpectedError": "Algo ha salido mal. Vuelva a intentarlo.",
     "currentAlt": "{label} actual",
     "uploading": "Subiendo…",
@@ -371,7 +373,7 @@
   },
   "emailForm": {
     "pageHeading": "Correo electrónico",
-    "pageSubtitle": "Identidad del remitente y textos por plantilla para cada correo que envía este cliente.",
+    "pageSubtitle": "Los correos que reciben sus lectores y su equipo. Deje un campo en blanco para usar el valor predeterminado.",
     "saveButton": "Guardar cambios",
     "savingButton": "Guardando…",
     "alertSuccess": "Configuración del correo guardada.",
@@ -413,14 +415,14 @@
   },
   "emailSettingsForm": {
     "heading": "Configuración del correo electrónico",
-    "description": "Se aplica a todos los correos que envía este cliente. Los campos en blanco usan el valor predeterminado del producto.",
+    "description": "Se aplica a todos los correos que envía su sitio. Deje un campo en blanco para usar el texto que se muestra.",
     "senderNameLabel": "Nombre del remitente",
     "senderNameHint": "El nombre visible en la dirección del remitente; no tiene relación con el título del sitio.",
     "senderNameInvalidError": "Es el nombre que ven los destinatarios, no una dirección de correo. Introduzca un nombre como Acme Co, sin < > \" , ; ni @.",
     "replyToLabel": "Dirección de respuesta",
-    "replyToHint": "Adónde se dirigen las respuestas a cualquier correo del cliente.",
+    "replyToHint": "Adónde van las respuestas a los correos de su sitio.",
     "footerAddressLabel": "Dirección postal del pie",
-    "footerAddressHint": "Un requisito legal para los envíos masivos: se muestra en el pie de todos los correos del cliente.",
+    "footerAddressHint": "Un requisito legal para los envíos masivos: se muestra en el pie de todos los correos que envía su sitio.",
     "logoLabel": "Logotipo del correo",
     "logoHint": "Se usa en todos los correos y en todos los idiomas. Una plantilla puede sustituirlo por su propio logotipo."
   },
@@ -469,7 +471,7 @@
     "heading": "Voz",
     "description": "Reformule los mensajes de página del sitio. Cada campo tiene un texto predeterminado: cambie solo lo que deba sonar como usted.",
     "fixedCopyNote": "Los botones, menús y etiquetas se traducen por usted y son iguales en todos los sitios, por eso no aparecen aquí.",
-    "editingLanguageNote": "Editando {language}: los demás idiomas conservan su propio texto.",
+    "editingLanguageNote": "Editando <strong>{language}</strong>: los demás idiomas conservan su propio texto.",
     "languageAriaLabel": "Idioma",
     "languageOption": "{language} · {count, plural, =0 {todo predeterminado} one {# personalizado} other {# personalizados}}",
     "surfaceSummary": "{unit, select, lists {{total, plural, one {# lista} other {# listas}}} other {{total, plural, one {# campo} other {# campos}}}} · {customised, plural, =0 {todo predeterminado} one {# personalizado} other {# personalizados}}",
@@ -495,6 +497,12 @@
     "ERROR": "Se muestra cuando una página no se carga",
     "ARCHIVE": "Se muestran cuando una lista aún está vacía. Elija una para editarla.",
     "BOOKMARKS": "Las entradas guardadas de un lector, antes de que guarde alguna"
+  },
+  "voiceSurfaceNotes": {
+    "NOT_FOUND": "El texto gris es fijo y se traduce por usted.",
+    "ERROR": "Los botones son fijos y se traducen por usted.",
+    "ARCHIVE": "El encabezado viene de Studio; aquí solo el mensaje es suyo.",
+    "BOOKMARKS": "El título de la página y el encabezado del panel son fijos."
   },
   "voiceSpecimen": {
     "showPreview": "Mostrar vista previa",

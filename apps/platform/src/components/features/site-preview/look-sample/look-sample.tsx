@@ -1,10 +1,14 @@
-import { SIZE } from '@blog/config';
-import { BrandMark } from '@blog/ui/components/atoms/brand-mark';
+import {
+  SIZE,
+  type TLanguageSwitcherStyle,
+  type TLocaleIsoCode,
+} from '@blog/config';
 import { Button } from '@blog/ui/components/atoms/button';
 import { Heading } from '@blog/ui/components/atoms/heading';
 import { Text } from '@blog/ui/components/atoms/text';
 import { MediaCard } from '@blog/ui/components/molecules/media-card';
 import { Panel } from '@blog/ui/components/molecules/panel';
+import { SampleSiteHeader } from '@platform/components/features/site-preview/look-sample/components/sample-site-header';
 import { useTranslations } from 'next-intl';
 import type { CSSProperties } from 'react';
 
@@ -17,6 +21,8 @@ export type TLookSampleProps = {
   isDark: boolean;
   headingFontFamily: string;
   bodyFontFamily: string;
+  liveLocales: readonly TLocaleIsoCode[];
+  languageSwitcherStyle: TLanguageSwitcherStyle;
 };
 
 export const LookSample = ({
@@ -26,11 +32,14 @@ export const LookSample = ({
   isDark,
   headingFontFamily,
   bodyFontFamily,
+  liveLocales,
+  languageSwitcherStyle,
 }: TLookSampleProps) => {
   const t = useTranslations('lookPreview');
 
-  const { root, brandRow, brandName, actionsRow, chip, cards, outlinedCard } =
-    lookSampleVariants({ isDark });
+  const { root, actionsRow, chip, cards, outlinedCard } = lookSampleVariants({
+    isDark,
+  });
 
   return (
     <div
@@ -39,12 +48,13 @@ export const LookSample = ({
       style={tokenStyle}
       data-testid="look-sample-tokens"
     >
-      <div className={brandRow()}>
-        <BrandMark size={SIZE.SM} title={tenantName} src={logoSrc} />
-        <span className={brandName()} style={{ fontFamily: headingFontFamily }}>
-          {tenantName}
-        </span>
-      </div>
+      <SampleSiteHeader
+        tenantName={tenantName}
+        logoSrc={logoSrc}
+        headingFontFamily={headingFontFamily}
+        liveLocales={liveLocales}
+        languageSwitcherStyle={languageSwitcherStyle}
+      />
       <Heading
         level={3}
         visual="preview"

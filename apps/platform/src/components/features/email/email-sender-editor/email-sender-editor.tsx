@@ -29,6 +29,7 @@ export const EmailSenderEditor = ({
   archivedNoticeId,
 }: TEmailSenderEditorProps) => {
   const t = useTranslations('emailSettingsForm');
+  const tPreview = useTranslations('emailPreview');
   const { stack } = emailSenderEditorVariants();
 
   const updateField = (field: keyof TEmailSenderDraft, value: string) =>
@@ -47,6 +48,7 @@ export const EmailSenderEditor = ({
             label={t('senderNameLabel')}
             hint={t('senderNameHint')}
             error={senderNameError}
+            placeholder={tPreview('defaultSender')}
             value={sender.senderName}
             onChange={(value) => updateField('senderName', value)}
             isDisabled={isDisabled}
@@ -56,6 +58,7 @@ export const EmailSenderEditor = ({
             label={t('replyToLabel')}
             hint={t('replyToHint')}
             type="email"
+            placeholder={tPreview('noReplyTo')}
             value={sender.replyToAddress}
             onChange={(value) => updateField('replyToAddress', value)}
             isDisabled={isDisabled}

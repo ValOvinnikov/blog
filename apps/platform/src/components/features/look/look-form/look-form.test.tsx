@@ -4,6 +4,7 @@ import {
   FONT_CHOICE,
   isAccentHueAccessible,
   LANGUAGE_SWITCHER_STYLE,
+  LOCALE_ISO_CODES,
   PRESET_ID,
   RADIUS_SCALE,
 } from '@blog/config';
@@ -65,7 +66,7 @@ const setup = customRender(LookForm, {
   tenantId: 'tenant-1',
   tenantName: 'Acme Inc.',
   initialValues: defaultLookFormValues(),
-  hasMultipleLanguages: true,
+  liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR],
 });
 
 describe(`<${LookForm.name}/>`, () => {
@@ -181,14 +182,16 @@ describe(`<${LookForm.name}/>`, () => {
     ).toBeVisible();
   });
 
-  it('shows the favicon square requirement before any file is chosen', () => {
+  it('describes both brand uploads with one shared hint', () => {
     setup();
 
-    expect(screen.getByRole('button', { name: 'Upload logo' })).toBeVisible();
+    const hint = 'Logo: PNG, JPEG, WebP or SVG. Favicon: a square image.';
+    expect(
+      screen.getByRole('button', { name: 'Upload logo' }),
+    ).toHaveAccessibleDescription(hint);
     expect(
       screen.getByRole('button', { name: 'Upload favicon' }),
-    ).toBeVisible();
-    expect(screen.getByText(/Pre-cropped square, please/)).toBeVisible();
+    ).toHaveAccessibleDescription(hint);
   });
 
   it("choosing a preset doesn't clear an already-saved brand image", async () => {
@@ -251,7 +254,7 @@ describe(`<${LookForm.name}/>`, () => {
   });
 
   it('shows a note instead of the language switcher choice with one live language', () => {
-    setup({ hasMultipleLanguages: false });
+    setup({ liveLocales: [LOCALE_ISO_CODES.EN] });
 
     expect(
       screen.getByText(

@@ -32,6 +32,19 @@ describe(`<${EmailSenderEditor.name}/>`, () => {
     });
   });
 
+  it('shows what a blank sender name and reply-to address send', () => {
+    setup({ sender: { ...SENDER, senderName: '' } });
+
+    expect(screen.getByLabelText('Sender name')).toHaveAttribute(
+      'placeholder',
+      'Default sender',
+    );
+    expect(screen.getByLabelText('Reply-to address')).toHaveAttribute(
+      'placeholder',
+      'No reply-to address',
+    );
+  });
+
   it('shows a sender-name error against the field', () => {
     setup({ senderNameError: 'Enter a name.' });
 

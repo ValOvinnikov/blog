@@ -290,9 +290,8 @@
     "logoHueDescription": "Färbt die Tonstufen der Wortmarke (--logo-1/2/3). Folgt dem Akzentfarbton, sofern Sie ihn nicht festlegen.",
     "brandImagesDescription": "Gespeichert in Vercel Blob — ohne Transformationen zur Laufzeit, also wird genau das ausgeliefert, was Sie hochladen.",
     "logoFieldLabel": "Logo",
-    "logoFieldHint": "PNG, JPEG, WebP oder SVG · ersatzweise wird die Polygon-Wortmarke verwendet",
     "faviconFieldLabel": "Favicon",
-    "faviconFieldHint": "Bitte bereits quadratisch zuschneiden — Blob kann das nicht für Sie übernehmen (bei einem SVG zählt die viewBox als Form). Nicht quadratische Uploads werden abgelehnt.",
+    "brandFieldsHint": "Logo: PNG, JPEG, WebP oder SVG. Favicon: ein quadratisches Bild.",
     "optionalTag": "optional",
     "headingFontLabel": "Überschriftenschrift",
     "bodyFontLabel": "Fließtextschrift",
@@ -343,7 +342,6 @@
     "modeDark": "Dunkel",
     "previewColorSchemeAriaLabel": "Farbschema der Vorschau",
     "livePreviewHeading": "Live-Vorschau",
-    "livePreviewDescription": "Echte @blog/ui-Primitive",
     "sampleHeading": "Gezeitentabellen lesen",
     "samplePara": "Ein kurzer Bericht, der Überschriften- und Fließtextschrift, Akzent, Logo-Töne und Eckenradius zusammen zeigt.",
     "subscribeButton": "Abonnieren",
@@ -355,12 +353,16 @@
     "secondCardExcerpt": "Eine statische Karte. Ihr Rahmen folgt Ihrem Kartenstil.",
     "outlinedCardHeading": "Newsletter",
     "outlinedCardBody": "Eine umrandete Karte, wie Panels und Preisstufen sie darstellen.",
-    "previewNote": "Ungespeicherter Formularzustand → CSS Custom Properties, passend zur OKLCH-Abstufung in Produktion. Hier ist nichts live, bis Sie speichern.",
+    "previewNote": "Aus den eigenen Komponenten der Website gebaut. Nichts ist live, bis Sie speichern.",
     "widthDesktop": "Desktop",
     "widthMobile": "Mobil",
-    "previewWidthAriaLabel": "Vorschaubreite"
+    "previewWidthAriaLabel": "Vorschaubreite",
+    "navPosts": "Beiträge",
+    "navAbout": "Über uns",
+    "switcherMenuAriaLabel": "Sprache: {language}"
   },
   "brandAssetField": {
+    "savesWithChanges": "Wird mit den Änderungen gespeichert",
     "unexpectedError": "Etwas ist schiefgelaufen — bitte erneut versuchen.",
     "currentAlt": "Aktuelles {label}",
     "uploading": "Wird hochgeladen…",
@@ -371,7 +373,7 @@
   },
   "emailForm": {
     "pageHeading": "E-Mail",
-    "pageSubtitle": "Absenderidentität und Texte je Vorlage für jede E-Mail, die dieser Mandant versendet.",
+    "pageSubtitle": "Die E-Mails, die Ihre Leser und Ihr Team erhalten. Lassen Sie ein Feld leer, um den Standard zu verwenden.",
     "saveButton": "Änderungen speichern",
     "savingButton": "Wird gespeichert…",
     "alertSuccess": "E-Mail-Einstellungen gespeichert.",
@@ -413,14 +415,14 @@
   },
   "emailSettingsForm": {
     "heading": "E-Mail-Einstellungen",
-    "description": "Gilt für jede E-Mail, die dieser Mandant versendet. Leere Felder verwenden den Produktstandard.",
+    "description": "Gilt für jede E-Mail, die Ihre Website versendet. Lassen Sie ein Feld leer, um den angezeigten Text zu verwenden.",
     "senderNameLabel": "Absendername",
     "senderNameHint": "Der Anzeigename der Absenderadresse — unabhängig vom Website-Titel.",
     "senderNameInvalidError": "Das ist der Name, den Empfänger sehen, keine E-Mail-Adresse. Geben Sie einen Namen wie Acme Co ein, ohne < > \" , ; oder @.",
     "replyToLabel": "Antwortadresse",
-    "replyToHint": "Wohin Antworten auf E-Mails dieses Mandanten geleitet werden.",
+    "replyToHint": "Wohin Antworten auf die E-Mails Ihrer Website gehen.",
     "footerAddressLabel": "Postanschrift in der Fußzeile",
-    "footerAddressHint": "Für Massen-E-Mails gesetzlich vorgeschrieben — wird in der Fußzeile jeder E-Mail dieses Mandanten angezeigt.",
+    "footerAddressHint": "Für Massen-E-Mails gesetzlich vorgeschrieben — wird in der Fußzeile jeder E-Mail Ihrer Website angezeigt.",
     "logoLabel": "E-Mail-Logo",
     "logoHint": "Wird in jeder E-Mail und jeder Sprache verwendet. Eine Vorlage kann es mit einem eigenen Logo überschreiben."
   },
@@ -469,7 +471,7 @@
     "heading": "Tonalität",
     "description": "Formulieren Sie die seitenweiten Hinweise der Website um. Jedes Feld hat einen Standardtext – ändern Sie nur, was nach Ihnen klingen soll.",
     "fixedCopyNote": "Schaltflächen, Menüs und Beschriftungen werden für Sie übersetzt und sind auf jeder Website gleich, deshalb sind sie hier nicht aufgeführt.",
-    "editingLanguageNote": "Sie bearbeiten {language} — andere Sprachen behalten ihren eigenen Text.",
+    "editingLanguageNote": "Sie bearbeiten <strong>{language}</strong> — andere Sprachen behalten ihren eigenen Text.",
     "languageAriaLabel": "Sprache",
     "languageOption": "{language} · {count, plural, =0 {alles Standard} other {# angepasst}}",
     "surfaceSummary": "{unit, select, lists {{total, plural, one {# Liste} other {# Listen}}} other {{total, plural, one {# Feld} other {# Felder}}}} · {customised, plural, =0 {alles Standard} other {# angepasst}}",
@@ -495,6 +497,12 @@
     "ERROR": "Erscheint, wenn eine Seite nicht geladen werden kann",
     "ARCHIVE": "Erscheint, solange eine Liste noch leer ist. Wählen Sie eine aus, um sie zu bearbeiten.",
     "BOOKMARKS": "Die gemerkten Beiträge eines Lesers, bevor er welche merkt"
+  },
+  "voiceSurfaceNotes": {
+    "NOT_FOUND": "Grauer Text ist fest und wird für Sie übersetzt.",
+    "ERROR": "Die Schaltflächen sind fest und werden für Sie übersetzt.",
+    "ARCHIVE": "Die Überschrift kommt aus Studio; nur die Nachricht gehört hier Ihnen.",
+    "BOOKMARKS": "Seitentitel und Bereichsüberschrift sind fest."
   },
   "voiceSpecimen": {
     "showPreview": "Vorschau anzeigen",
