@@ -1,5 +1,6 @@
 import { ICONS } from '@blog/config';
 import { VoiceFieldStatus } from '@platform/components/features/voice/voice-field-status';
+import { Button } from '@platform/components/shared/button';
 import { Icon } from '@platform/components/shared/icon';
 
 import { voiceListRowVariants } from './voice-list-row-variants';
@@ -29,8 +30,8 @@ export const VoiceListRow = ({
   } = voiceListRowVariants({ hasError });
 
   return (
-    <button
-      type="button"
+    <Button
+      variant="unstyled"
       aria-expanded={false}
       onClick={onOpen}
       className={root()}
@@ -39,6 +40,6 @@ export const VoiceListRow = ({
       <span className={textSlot()}>{text}</span>
       <VoiceFieldStatus isCustomised={isCustomised} isUnsaved={isUnsaved} />
       <Icon name={ICONS.CHEVRON_DOWN} className={chevron()} />
-    </button>
+    </Button>
   );
 };

@@ -6,6 +6,7 @@ import {
   waitFor,
   within,
 } from '@platform/testing/custom-render';
+import userEvent from '@testing-library/user-event';
 
 import { PortableTextEditor } from './portable-text-editor';
 
@@ -162,6 +163,49 @@ describe(PortableTextEditor, () => {
     expect(screen.getByRole('button', { name: 'Bold' })).toBeVisible();
     expect(screen.getByRole('button', { name: 'Italic' })).toBeVisible();
     expect(screen.getByRole('button', { name: 'Link' })).toBeVisible();
+  });
+
+  it('moves focus between toolbar controls with the arrow keys', async () => {
+    const user = userEvent.setup();
+    render(
+      <PortableTextEditor
+        initialValue={[]}
+        onChange={() => {}}
+        ariaLabel="Body"
+        schema={VOICE_PORTABLE_TEXT_SCHEMA}
+      />,
+    );
+
+    within(screen.getByRole('toolbar'))
+      .getByRole('button', { name: 'Bold' })
+      .focus();
+    await user.keyboard('{ArrowRight}');
+
+    expect(screen.getByRole('button', { name: 'Italic' })).toHaveFocus();
+
+    await user.keyboard('{ArrowLeft}');
+
+    expect(screen.getByRole('button', { name: 'Bold' })).toHaveFocus();
+  });
+
+  it('announces each toggle as not pressed while its format is inactive', () => {
+    render(
+      <PortableTextEditor
+        initialValue={[]}
+        onChange={() => {}}
+        ariaLabel="Body"
+        schema={VOICE_PORTABLE_TEXT_SCHEMA}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Bold' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+    expect(screen.getByRole('button', { name: 'Italic' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
   });
 
   it('offers headings and lists under the default schema', () => {

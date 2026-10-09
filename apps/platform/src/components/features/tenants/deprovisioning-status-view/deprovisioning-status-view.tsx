@@ -64,7 +64,6 @@ export const DeprovisioningStatusView = ({
     errorHeadline,
     errorIcon,
     errorDetails,
-    errorDetailsSummary,
     errorDetailsText,
   } = deprovisioningStatusViewVariants();
 
@@ -159,12 +158,13 @@ export const DeprovisioningStatusView = ({
           </Text>
           <Text variant="hint">{t(`errorKind.${errorKind}.nextStep`)}</Text>
           {failedStepError && (
-            <details className={errorDetails()}>
-              <summary className={errorDetailsSummary()}>
-                {t('technicalDetailsToggle')}
-              </summary>
+            <Disclosure
+              variant="inline"
+              className={errorDetails()}
+              summary={t('technicalDetailsToggle')}
+            >
               <pre className={errorDetailsText()}>{failedStepError}</pre>
-            </details>
+            </Disclosure>
           )}
         </div>
       )}

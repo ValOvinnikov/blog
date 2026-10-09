@@ -1,5 +1,6 @@
 'use client';
 
+import { Toolbar } from '@base-ui/react/toolbar';
 import {
   useEditor,
   useEditorSelector,
@@ -98,7 +99,7 @@ export const PortableTextEditorToolbar = ({
 
   return (
     <div>
-      <div className={root()}>
+      <Toolbar.Root className={root()}>
         {hasBold && (
           <PortableTextEditorToggleButton
             label={t('bold')}
@@ -123,7 +124,7 @@ export const PortableTextEditorToolbar = ({
         )}
         {hasHeading && (
           <>
-            <span aria-hidden="true" className={divider()} />
+            <Toolbar.Separator className={divider()} />
             <PortableTextEditorToggleButton
               label={t('heading')}
               isActive={isHeadingActive}
@@ -137,7 +138,7 @@ export const PortableTextEditorToolbar = ({
             />
           </>
         )}
-        {hasLists && <span aria-hidden="true" className={divider()} />}
+        {hasLists && <Toolbar.Separator className={divider()} />}
         {hasBulletList && (
           <PortableTextEditorToggleButton
             label={t('bulletList')}
@@ -160,7 +161,7 @@ export const PortableTextEditorToolbar = ({
         )}
         {hasLink && (
           <>
-            <span aria-hidden="true" className={divider()} />
+            <Toolbar.Separator className={divider()} />
             <PortableTextEditorToggleButton
               label={t('link')}
               isActive={isLinkActive}
@@ -170,7 +171,7 @@ export const PortableTextEditorToolbar = ({
             />
           </>
         )}
-      </div>
+      </Toolbar.Root>
       {isLinkControlOpen && (
         <PortableTextEditorLinkControl
           id={linkControlId}

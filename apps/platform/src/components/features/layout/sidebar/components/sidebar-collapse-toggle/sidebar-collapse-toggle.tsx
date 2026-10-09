@@ -2,6 +2,7 @@
 
 import { ICONS } from '@blog/config';
 import { useSidebarCollapse } from '@platform/components/features/layout/sidebar-collapse-provider';
+import { Button } from '@platform/components/shared/button';
 import { Icon } from '@platform/components/shared/icon';
 import { useTranslations } from 'next-intl';
 
@@ -11,12 +12,7 @@ export type TSidebarCollapseToggleProps = {
   className?: string;
 };
 
-/**
- * The sidebar's own collapse control, at the top-right of its brand row.
- * Reads and flips `SidebarCollapseProvider`'s state directly rather than
- * taking it as props, since `Sidebar` (its parent's render tree) stays a
- * Server Component.
- */
+/** Reads the collapse state from context rather than props because `Sidebar` stays a Server Component. */
 export const SidebarCollapseToggle = ({
   className,
 }: TSidebarCollapseToggleProps) => {
@@ -26,8 +22,8 @@ export const SidebarCollapseToggle = ({
   const { root, icon } = sidebarCollapseToggleVariants({ isCollapsed });
 
   return (
-    <button
-      type="button"
+    <Button
+      variant="unstyled"
       onClick={toggle}
       aria-expanded={!isCollapsed}
       aria-label={label}
@@ -35,6 +31,6 @@ export const SidebarCollapseToggle = ({
       className={root({ class: className })}
     >
       <Icon name={ICONS.CHEVRON_RIGHT} className={icon()} />
-    </button>
+    </Button>
   );
 };

@@ -1,4 +1,5 @@
 import { TOAST_TYPE, type TToastType } from '@blog/config';
+import { Button } from '@platform/components/shared/button';
 import type { ReactNode } from 'react';
 
 import { toastVariants, type TToastVariants } from './toast-variants';
@@ -37,10 +38,6 @@ const TOAST_ROLE: Record<TToastType, 'status' | 'alert'> = {
   [TOAST_TYPE.ERROR]: 'alert',
 };
 
-/**
- * A single controlled, presentational toast notification — `ToastProvider`
- * owns the queue, timers, and phase transitions.
- */
 export const Toast = ({
   type,
   isLoading = false,
@@ -75,22 +72,26 @@ export const Toast = ({
       </span>
       {time && <span className={s.time()}>{time}</span>}
       {action && (
-        <button type="button" onClick={action.onAct} className={s.action()}>
+        <Button
+          variant="unstyled"
+          onClick={action.onAct}
+          className={s.action()}
+        >
           {action.label}
           {action.keyHint && (
             <span className={s.actionKey()}>{action.keyHint}</span>
           )}
-        </button>
+        </Button>
       )}
-      <button
-        type="button"
+      <Button
+        variant="unstyled"
         onClick={onDismiss}
         aria-label={dismissLabel}
         title={dismissLabel}
         className={s.dismiss()}
       >
         ×
-      </button>
+      </Button>
     </div>
   );
 };

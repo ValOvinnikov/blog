@@ -1,17 +1,39 @@
 import { tv } from '@platform/utils/tv/tv';
+import type { VariantProps } from 'tailwind-variants';
 
 export const disclosureVariants = tv({
   slots: {
-    root: [
-      'group overflow-hidden rounded-admin border border-admin-line shadow-admin',
-    ],
-    summary: [
-      'flex cursor-pointer list-none items-center gap-2.5 bg-admin-surface px-[18px] py-[14px] text-sm font-semibold text-admin-text',
-      'marker:hidden [&::-webkit-details-marker]:hidden',
-    ],
+    root: [],
+    trigger: ['group/trigger flex cursor-pointer items-center text-left'],
     chevron: [
-      'ml-auto shrink-0 text-admin-faint transition-transform group-open:rotate-90',
+      'shrink-0 transition-transform group-data-[panel-open]/trigger:rotate-90',
     ],
-    inner: ['border-t border-admin-line-2 p-[18px]'],
+    inner: [],
+  },
+  variants: {
+    variant: {
+      card: {
+        root: [
+          'overflow-hidden rounded-admin border border-admin-line shadow-admin',
+        ],
+        trigger: [
+          'w-full gap-2.5 bg-admin-surface px-[18px] py-[14px] text-sm font-semibold text-admin-text',
+        ],
+        chevron: ['ml-auto text-admin-faint'],
+        inner: ['border-t border-admin-line-2 p-[18px]'],
+      },
+      inline: {
+        trigger: [
+          'gap-1 text-[13px] font-medium text-admin-text',
+          'underline-offset-2 hover:underline',
+        ],
+        chevron: ['order-first text-admin-text'],
+      },
+    },
+  },
+  defaultVariants: {
+    variant: 'card',
   },
 });
+
+export type TDisclosureVariants = VariantProps<typeof disclosureVariants>;

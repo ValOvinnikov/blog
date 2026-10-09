@@ -81,6 +81,7 @@ describe(ProvisioningStatusView, () => {
     expect(vi.getTimerCount()).toBeGreaterThan(0);
 
     unmount();
+    vi.runOnlyPendingTimers();
     expect(vi.getTimerCount()).toBe(0);
   });
 
@@ -1264,6 +1265,11 @@ describe(ProvisioningStatusView, () => {
   });
 
   describe('steps disclosure collapse', () => {
+    const stepsToggle = () =>
+      within(screen.getByRole('complementary')).getByRole('button', {
+        name: /Steps/,
+      });
+
     it('is expanded while the run is not done', () => {
       const tenant = makeTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
@@ -1281,9 +1287,7 @@ describe(ProvisioningStatusView, () => {
         />,
       );
 
-      expect(
-        within(screen.getByRole('complementary')).getByRole('group'),
-      ).toHaveAttribute('open');
+      expect(stepsToggle()).toHaveAttribute('aria-expanded', 'true');
     });
 
     it('is collapsed by default once every step is already done on mount', () => {
@@ -1307,9 +1311,7 @@ describe(ProvisioningStatusView, () => {
         />,
       );
 
-      expect(
-        within(screen.getByRole('complementary')).getByRole('group'),
-      ).not.toHaveAttribute('open');
+      expect(stepsToggle()).toHaveAttribute('aria-expanded', 'false');
     });
 
     it('auto-collapses once the run completes, and a later re-render does not undo a user-initiated reopen', async () => {
@@ -1342,24 +1344,23 @@ describe(ProvisioningStatusView, () => {
         />,
       );
 
-      const sidebar = screen.getByRole('complementary');
-      const disclosure = within(sidebar).getByRole('group');
-      expect(disclosure).toHaveAttribute('open');
+      const disclosure = stepsToggle();
+      expect(disclosure).toHaveAttribute('aria-expanded', 'true');
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
       });
 
-      expect(disclosure).not.toHaveAttribute('open');
+      expect(disclosure).toHaveAttribute('aria-expanded', 'false');
 
-      fireEvent.click(within(sidebar).getByText('Steps'));
-      expect(disclosure).toHaveAttribute('open');
+      fireEvent.click(disclosure);
+      expect(disclosure).toHaveAttribute('aria-expanded', 'true');
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(60_000);
       });
 
-      expect(disclosure).toHaveAttribute('open');
+      expect(disclosure).toHaveAttribute('aria-expanded', 'true');
     });
   });
 

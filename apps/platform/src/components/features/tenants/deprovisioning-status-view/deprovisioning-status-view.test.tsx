@@ -240,6 +240,9 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
   });
 
   describe('steps disclosure collapse', () => {
+    const stepsToggle = () =>
+      screen.getByRole('button', { name: /Deprovisioning progress/ });
+
     it('is expanded while the run is not done', () => {
       const tenant = makeTenant({
         deprovisioningSteps: {
@@ -252,7 +255,7 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
       });
       render(<Wrapper tenant={tenant} />);
 
-      expect(screen.getByRole('group')).toHaveAttribute('open');
+      expect(stepsToggle()).toHaveAttribute('aria-expanded', 'true');
     });
 
     it('is collapsed by default once every step is already done on mount', () => {
@@ -267,7 +270,7 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
       });
       render(<Wrapper tenant={tenant} />);
 
-      expect(screen.getByRole('group')).not.toHaveAttribute('open');
+      expect(stepsToggle()).toHaveAttribute('aria-expanded', 'false');
     });
 
     it('auto-collapses once the run completes, and a later re-render does not undo a user-initiated reopen', async () => {
@@ -292,22 +295,22 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
       const user = userEvent.setup();
       render(<Wrapper tenant={tenant} />);
 
-      expect(screen.getByRole('group')).toHaveAttribute('open');
+      expect(stepsToggle()).toHaveAttribute('aria-expanded', 'true');
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
       });
 
-      expect(screen.getByRole('group')).not.toHaveAttribute('open');
+      expect(stepsToggle()).toHaveAttribute('aria-expanded', 'false');
 
-      await user.click(screen.getByText('Deprovisioning progress'));
-      expect(screen.getByRole('group')).toHaveAttribute('open');
+      await user.click(stepsToggle());
+      expect(stepsToggle()).toHaveAttribute('aria-expanded', 'true');
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(60_000);
       });
 
-      expect(screen.getByRole('group')).toHaveAttribute('open');
+      expect(stepsToggle()).toHaveAttribute('aria-expanded', 'true');
     });
   });
 });
