@@ -34,9 +34,9 @@ contracts:
     already issues. A sibling to `web`, not a step after it — its upstreams are
     `config`, `db`, and `ui` only, so it never waits on `studio`/`service`, which
     it must not import. Interactive primitives come from Base UI installed in
-    that app and styled with the shared Tailwind tokens; nothing is added to
-    `@blog/ui` for it (a component with one consumer isn't shared — the same
-    call #1157 made for `apps/web` page sections). Its "Start here" names the
+    that app and styled from its own `admin-*` tokens; reusable blocks are built
+    on them in `components/shared/` per `platform-ui-practices`, and nothing
+    is added to `@blog/ui` for it. Its "Start here" names the
     three admin design documents — the product-design spec (intent), the
     interactive mock (approved information architecture and layout), and the
     corrections brief (real token values, and the defects the mock still
@@ -691,6 +691,7 @@ file` are all denied alike) — an earlier version only handled the
   - `studio-schema-practices` — Sanity schema quality bar + content-migration workflow.
   - `react-component-practices` — the React rules shared by `ui`, `web` and `platform-app` (server-first, closed props, derived state, composition, no unmeasured memo, accessible by construction).
   - `ui-library-practices` — building pure, prop-driven design-system components.
+  - `platform-ui-practices` — the `apps/platform` admin design standard with its decided values (type scale, cards, fields, spacing, colour, states, phones, copy), reusable blocks built on Base UI, the size rule, and a red-flags table; the reviewer checks platform diffs against it.
   - `web-component-practices` — building interactive `apps/web` components (compose `@blog/ui` via slots, client behaviour in ref-based hooks, merge Portable Text component maps rather than spreading them).
   - `ui-storybook` / `web-storybook` — Storybook conventions per workspace.
   - `testing-practices` — Vitest + Testing Library conventions: fake only the edges (shared fakes in `__mocks__/`), never our own components, repeated per-`it` arrangement in `beforeEach` (mandatory), and behaviour titles of 80 characters or fewer.

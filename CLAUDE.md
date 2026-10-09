@@ -520,6 +520,9 @@ silently unindexed). Never hand-edit it; fix the source and regenerate. A future
 - `web-component-practices` when building or editing an interactive component in
   `apps/web` (popover/menu/disclosure/clipboard/focus) or composing `@blog/ui`
   with client state.
+- `platform-ui-practices` when building or changing any UI in `apps/platform`
+  — the admin design standard (type scale, cards, fields, spacing, states,
+  phones, copy), reusable blocks on Base UI, and the red flags to stop on.
 - `ui-storybook` when adding or editing stories in `packages/ui`.
 - `web-storybook` when adding or editing stories in `apps/web`.
 - `testing-practices` when adding/updating tests.
