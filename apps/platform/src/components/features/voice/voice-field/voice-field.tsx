@@ -33,6 +33,7 @@ export type TVoiceFieldProps = {
   error?: string;
   onChange: (value: TVoiceDraftValue) => void;
   isReadOnly: boolean;
+  hasVisibleLabel?: boolean;
 };
 
 export const VoiceField = ({
@@ -44,6 +45,7 @@ export const VoiceField = ({
   error,
   onChange,
   isReadOnly,
+  hasVisibleLabel = true,
 }: TVoiceFieldProps) => {
   const t = useTranslations('voiceSettings');
   const tLabels = useTranslations('voiceFieldLabels');
@@ -84,11 +86,12 @@ export const VoiceField = ({
     <Field.Root className={root()} invalid={Boolean(error)}>
       <div className={header()}>
         <div className={labelGroup()}>
-          {isRich ? (
-            <span className={labelSlot()}>{label}</span>
-          ) : (
-            <Field.Label className={labelSlot()}>{label}</Field.Label>
-          )}
+          {hasVisibleLabel &&
+            (isRich ? (
+              <span className={labelSlot()}>{label}</span>
+            ) : (
+              <Field.Label className={labelSlot()}>{label}</Field.Label>
+            ))}
           <Field.Description
             id={hintId}
             render={<span />}
@@ -123,6 +126,7 @@ export const VoiceField = ({
           onChange={onChange}
           placeholder={placeholder}
           isReadOnly={isReadOnly}
+          ariaLabel={hasVisibleLabel ? undefined : label}
           rows={3}
         />
       ) : (
@@ -132,6 +136,7 @@ export const VoiceField = ({
           onChange={onChange}
           placeholder={placeholder}
           isReadOnly={isReadOnly}
+          ariaLabel={hasVisibleLabel ? undefined : label}
         />
       )}
       {placeholderToken !== undefined && (

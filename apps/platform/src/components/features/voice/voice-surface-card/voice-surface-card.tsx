@@ -95,6 +95,7 @@ export const VoiceSurfaceCard = ({
       error={errors[field.id]}
       onChange={(next) => onFieldChange(field.id, next)}
       isReadOnly={isReadOnly}
+      hasVisibleLabel={surface !== VOICE_SURFACE.ARCHIVE}
     />
   );
 

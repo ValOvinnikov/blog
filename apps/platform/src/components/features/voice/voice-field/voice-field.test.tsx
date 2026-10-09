@@ -25,6 +25,26 @@ describe(`<${VoiceField.name}/>`, () => {
     expect(input).toHaveAccessibleDescription('Also the browser tab title');
   });
 
+  it('names a field without a visible label for screen readers', () => {
+    setup({ hasVisibleLabel: false });
+
+    expect(screen.getByRole('textbox', { name: 'Heading' })).toBeVisible();
+    expect(screen.queryByText('Heading')).not.toBeInTheDocument();
+  });
+
+  it('names a rich field without a visible label for screen readers', () => {
+    setup({
+      field: fieldById('notFoundSupportingText'),
+      value: null,
+      hasVisibleLabel: false,
+    });
+
+    expect(
+      screen.getByRole('textbox', { name: 'Supporting text' }),
+    ).toBeVisible();
+    expect(screen.queryByText('Supporting text')).not.toBeInTheDocument();
+  });
+
   it('edits a rich field in the rich text editor with only bold, italic and link', () => {
     setup({ field: fieldById('notFoundSupportingText'), value: null });
 
@@ -43,10 +63,9 @@ describe(`<${VoiceField.name}/>`, () => {
       },
     });
 
-    expect(screen.getByRole('textbox', { name: 'Blog index' })).toHaveAttribute(
-      'rows',
-      '3',
-    );
+    expect(
+      screen.getByRole('textbox', { name: 'Blog index page' }),
+    ).toHaveAttribute('rows', '3');
   });
 
   it('describes the field with its error and marks it invalid', () => {

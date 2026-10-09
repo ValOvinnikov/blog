@@ -493,7 +493,8 @@
     "alertSuccess": "Voice saved.",
     "alertError": "Couldn't save — try again.",
     "keepPlaceholder": "Keep <code>{token}</code> — the site fills it in.",
-    "draftFieldLabel": "{surface} — {field} ({language})"
+    "draftFieldLabel": "{surface} — {field} ({language})",
+    "listRoute": "Shown at {path}"
   },
   "voiceSurfaces": {
     "NOT_FOUND": "Page not found",
@@ -545,11 +546,11 @@
     }
   },
   "voiceFieldLabels": {
-    "blogListEmpty": "Blog index",
+    "blogListEmpty": "Blog index page",
     "topicEmpty": "Topic page",
     "tagEmpty": "Tag page",
-    "topicsEmpty": "Topics index",
-    "tagsEmpty": "Tags index",
+    "topicsEmpty": "Topics index page",
+    "tagsEmpty": "Tags index page",
     "notFoundEyebrow": "Eyebrow",
     "notFoundHeading": "Heading",
     "notFoundSupportingText": "Supporting text",
@@ -558,11 +559,11 @@
     "bookmarksEmpty": "Empty bookmarks"
   },
   "voiceFieldHints": {
-    "blogListEmpty": "The blog index, before anything is published",
+    "blogListEmpty": "Before anything is published",
     "topicEmpty": "A topic with no posts yet",
     "tagEmpty": "A tag with no posts yet",
-    "topicsEmpty": "The topics index, before any topic exists",
-    "tagsEmpty": "The tags index, before any tag exists",
+    "topicsEmpty": "Before any topic exists",
+    "tagsEmpty": "Before any tag exists",
     "notFoundEyebrow": "Small label above the heading",
     "notFoundHeading": "Also the browser tab title",
     "notFoundSupportingText": "Below the heading",

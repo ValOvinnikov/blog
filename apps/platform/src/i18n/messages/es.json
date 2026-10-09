@@ -493,7 +493,8 @@
     "alertSuccess": "Voz guardada.",
     "alertError": "No se pudo guardar. Vuelva a intentarlo.",
     "keepPlaceholder": "Conserve <code>{token}</code>: el sitio lo rellena.",
-    "draftFieldLabel": "{surface} — {field} ({language})"
+    "draftFieldLabel": "{surface} — {field} ({language})",
+    "listRoute": "Se muestra en {path}"
   },
   "voiceSurfaces": {
     "NOT_FOUND": "Página no encontrada",
@@ -545,11 +546,11 @@
     }
   },
   "voiceFieldLabels": {
-    "blogListEmpty": "Índice del blog",
+    "blogListEmpty": "Página índice del blog",
     "topicEmpty": "Página de tema",
     "tagEmpty": "Página de etiqueta",
-    "topicsEmpty": "Índice de temas",
-    "tagsEmpty": "Índice de etiquetas",
+    "topicsEmpty": "Página índice de temas",
+    "tagsEmpty": "Página índice de etiquetas",
     "notFoundEyebrow": "Antetítulo",
     "notFoundHeading": "Título",
     "notFoundSupportingText": "Texto de apoyo",
@@ -558,11 +559,11 @@
     "bookmarksEmpty": "Marcadores vacíos"
   },
   "voiceFieldHints": {
-    "blogListEmpty": "El índice del blog, antes de publicar nada",
+    "blogListEmpty": "Antes de publicar nada",
     "topicEmpty": "Un tema que aún no tiene entradas",
     "tagEmpty": "Una etiqueta que aún no tiene entradas",
-    "topicsEmpty": "El índice de temas, antes de que exista ninguno",
-    "tagsEmpty": "El índice de etiquetas, antes de que exista ninguna",
+    "topicsEmpty": "Antes de que exista ningún tema",
+    "tagsEmpty": "Antes de que exista ninguna etiqueta",
     "notFoundEyebrow": "Etiqueta pequeña sobre el título",
     "notFoundHeading": "También el título de la pestaña del navegador",
     "notFoundSupportingText": "Debajo del título",
