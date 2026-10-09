@@ -15,6 +15,7 @@ describe(DashboardBreadcrumb, () => {
 
     expect(screen.getByText('Your site')).toBeVisible();
     expect(screen.queryByRole('link', { name: 'Your site' })).toBeNull();
+    expect(screen.queryByText('Overview')).not.toBeInTheDocument();
   });
 
   it('links "Your site" back to /dashboard and shows Look as current on the look route', () => {

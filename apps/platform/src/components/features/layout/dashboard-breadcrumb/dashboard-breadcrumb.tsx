@@ -17,11 +17,10 @@ import { useTranslations } from 'next-intl';
 export const DashboardBreadcrumb = () => {
   const pathname = usePathname();
   const t = useTranslations('navSections');
-  const tDashboard = useTranslations('dashboardLayout');
   const tTopbar = useTranslations('topbar');
 
   const homeHref = adminRoutes.dashboard();
-  const yourSite: TBreadcrumbItem = { label: tDashboard('yourSiteLabel') };
+  const yourSite: TBreadcrumbItem = { label: t('yourSiteLabel') };
 
   if (pathname === homeHref) {
     return (
