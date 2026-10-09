@@ -144,8 +144,7 @@ export const auditLogTableVariants = tv({
 ```
 
 - This is `tenants-table-variants.ts` without the drift it and
-  `findings-table-variants.ts` still carry (`text-label`, `text-meta`,
-  `text-admin-faint`, `text-sm`): copy this, not them. Cells pad 14px, not the card's 18px.
+  `findings-table-variants.ts` still carry (`text-sm`): copy this, not them. Cells pad 14px, not the card's 18px.
 - Render through `DataTableShell`: `classNames` from `card`, `table`, `head`
   and `empty`; `row()` and `cell()` in `renderRow`; a translated label on every
   column (`sr-only` for actions); `<time dateTime>` for dates; `emptyMessage`
@@ -239,7 +238,7 @@ values (`DetailList.Row isMono`).
 | Small title inside a card (step, notice, list item, summary) | the primitive's title slot                              | 13.5px, 600                                                                                                             |
 | Field label                                                  | `FormField` `label`                                     | 13px, 600, field labels only                                                                                            |
 | Field hint                                                   | `FormField` `hint`, a plain string                      | 12px muted, under the label, above the control. **Not yet:** 11.5px below the control                                   |
-| Lock reason                                                  | `SettingRow` `lockedReason`                             | 12px muted, the hint style. **Not yet:** 11.5px `admin-faint`                                                           |
+| Lock reason                                                  | `SettingRow` `lockedReason`                             | 12px muted, the hint style                                                                                              |
 | Field error                                                  | `FormField` `error`                                     | 11.5px `admin-bad`, inline under the field                                                                              |
 | Body: primary content and values                             | `Text` plus a `text-[13.5px] text-admin-text` slot      | 13.5px `admin-text`. **Not yet:** `Text` alone is unsized, so 16px                                                      |
 | Read-only facts                                              | `DetailList` (`isMono` for domains, ids)                | 13.5px values, 12.5px muted terms, mono 12.5px                                                                          |
@@ -292,10 +291,9 @@ values (`DetailList.Row isMono`).
   `ring-offset-admin-side`. A text field turns its border `admin-brand`.
   `outline-admin-brand-weak` (1.12:1) is not a focus indicator. **Not yet:** it
   is still `Switch`'s only cue.
-- **Not yet:** the `warn` badge tone (4.28:1), the `plan` tone's raw
-  `text-indigo-800` and the sidebar section labels (3.16:1) fail. Their fix is a
-  token change; don't override them per call site. `plan` is for plan tiers
-  only.
+- **Not yet:** the sidebar section labels (3.16:1) fail. Their fix is a token
+  change; don't override them per call site.
+- `plan` is for plan tiers only.
 
 ## Spacing, radius, elevation
 

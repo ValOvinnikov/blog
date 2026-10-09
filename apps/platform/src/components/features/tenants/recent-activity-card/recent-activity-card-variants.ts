@@ -13,7 +13,7 @@ export const recentActivityCardVariants = tv({
     ],
     activityBody: ['min-w-0 flex-1'],
     activityMessage: ['block text-[13px] text-admin-text'],
-    activitySub: ['block text-[12px] text-admin-faint'],
+    activitySub: ['block text-[12px] text-admin-muted'],
     activityTime: ['flex-none text-[12px] text-admin-muted'],
     activityEmpty: ['text-[13px] text-admin-muted'],
   },

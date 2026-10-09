@@ -6,7 +6,7 @@ export const tenantsTableVariants = tv({
     table: ['w-full border-collapse text-left'],
     head: [
       'border-b border-admin-line-2 px-[14px] py-2.5',
-      'text-left text-label font-bold text-admin-faint uppercase tracking-[.06em]',
+      'text-left text-[11px] font-bold text-admin-muted uppercase tracking-[.06em]',
     ],
     row: [
       'border-b border-admin-line-2 last:border-b-0 hover:bg-admin-surface-2',
@@ -14,7 +14,7 @@ export const tenantsTableVariants = tv({
     cell: ['px-[14px] py-3 align-middle text-[13.5px] text-admin-text'],
     tname: ['flex items-center gap-2.5'],
     name: ['text-admin-text'],
-    domain: ['text-meta text-admin-faint'],
+    domain: ['text-[12px] text-admin-muted'],
     empty: ['p-8 text-center text-sm text-admin-muted'],
   },
 });
