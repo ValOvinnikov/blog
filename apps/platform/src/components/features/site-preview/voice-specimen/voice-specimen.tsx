@@ -209,8 +209,8 @@ export const VoiceSpecimen = ({
       style={
         {
           ...tokenStyle,
-          '--font-display': headingFontFamily,
-          '--font-read': bodyFontFamily,
+          '--font-display-family': headingFontFamily,
+          '--font-body-family': bodyFontFamily,
         } as CSSProperties
       }
       data-testid={`voice-specimen-${surface}`}

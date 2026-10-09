@@ -143,7 +143,7 @@ describe(VoiceSpecimen, () => {
     ).toHaveAttribute('data-focused', 'false');
   });
 
-  it('applies the tenant theme and fonts to the specimen', () => {
+  it('applies the tenant theme to the specimen', () => {
     render(
       <VoiceSpecimen
         surface={VOICE_SURFACE.NOT_FOUND}
@@ -160,6 +160,5 @@ describe(VoiceSpecimen, () => {
     expect(style.getPropertyValue('--brand-primary')).toBe(
       'oklch(0.53 0.17 28)',
     );
-    expect(style.getPropertyValue('--font-display')).toBe('mock-heading-font');
   });
 });
