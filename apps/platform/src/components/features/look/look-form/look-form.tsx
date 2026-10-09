@@ -148,12 +148,13 @@ export const LookForm = ({
     useFormSubmission<TLookFormValues, { ok: boolean }>({
       initialValues,
       onSubmit: async (vals) => {
-        let nextSaved = savedValues;
-        let nextValues = vals;
+        const savedImages: Partial<Record<TBrandAssetKind, TStagedImage>> = {};
 
         const finish = (ok: boolean) => {
-          setSavedValues(nextSaved);
-          setValues(nextValues);
+          setSavedValues((prev) =>
+            ok ? { ...vals, ...savedImages } : { ...prev, ...savedImages },
+          );
+          setValues((prev) => ({ ...prev, ...savedImages }));
           return { ok };
         };
 
@@ -165,8 +166,7 @@ export const LookForm = ({
             setBrandImageError(result.error);
             return finish(false);
           }
-          nextSaved = { ...nextSaved, [kind]: result.image };
-          nextValues = { ...nextValues, [kind]: result.image };
+          savedImages[kind] = result.image;
         }
 
         const result = await updateLookAction(tenantId, {
@@ -180,7 +180,6 @@ export const LookForm = ({
           cardStyle: vals.cardStyle,
           languageSwitcherStyle: vals.languageSwitcherStyle,
         });
-        if (result.ok) nextSaved = nextValues;
         return finish(result.ok);
       },
       onSuccess: () => {
@@ -333,6 +332,8 @@ export const LookForm = ({
       <div className={columns()}>
         <div
           {...panelProps('edit')}
+          inert={isPending}
+          data-testid="look-form-edit-panel"
           className={editPanel({ isActive: view === 'edit' })}
         >
           <PresetCard
