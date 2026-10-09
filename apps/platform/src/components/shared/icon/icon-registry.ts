@@ -3,6 +3,7 @@ import Bold from '@platform/assets/icons/bold.svg';
 import Book from '@platform/assets/icons/book.svg';
 import CheckCircle from '@platform/assets/icons/check-circle.svg';
 import CheckSheet from '@platform/assets/icons/check-sheet.svg';
+import ChevronDown from '@platform/assets/icons/chevron-down.svg';
 import ChevronRight from '@platform/assets/icons/chevron-right.svg';
 import Comment from '@platform/assets/icons/comment.svg';
 import ErrorCircle from '@platform/assets/icons/error.svg';
@@ -27,11 +28,12 @@ import type { FC, SVGProps } from 'react';
 
 type TGlyph = FC<SVGProps<SVGSVGElement>>;
 
-export const ICON_REGISTRY: Partial<Record<TIconName, TGlyph>> = {
+export const ICON_REGISTRY = {
   [ICONS.BOLD]: Bold,
   [ICONS.BOOK]: Book,
   [ICONS.CHECK]: CheckCircle,
   [ICONS.CHECK_SHEET]: CheckSheet,
+  [ICONS.CHEVRON_DOWN]: ChevronDown,
   [ICONS.CHEVRON_RIGHT]: ChevronRight,
   // The error notice's circled cross, the same key @blog/ui's Alert uses for ERROR.
   [ICONS.CLOSE]: ErrorCircle,
@@ -53,4 +55,6 @@ export const ICON_REGISTRY: Partial<Record<TIconName, TGlyph>> = {
   [ICONS.STUDIO]: Studio,
   [ICONS.USERS]: Users,
   [ICONS.WARNING]: Warning,
-};
+} as const satisfies Partial<Record<TIconName, TGlyph>>;
+
+export type TRegisteredIconName = keyof typeof ICON_REGISTRY;

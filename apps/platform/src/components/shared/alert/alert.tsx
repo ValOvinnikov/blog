@@ -1,5 +1,8 @@
-import { ALERT_TYPE, ICONS, SIZE, type TIconName } from '@blog/config';
-import { Icon } from '@platform/components/shared/icon';
+import { ALERT_TYPE, ICONS, SIZE } from '@blog/config';
+import {
+  Icon,
+  type TRegisteredIconName,
+} from '@platform/components/shared/icon';
 import type { ReactNode } from 'react';
 
 import { alertVariants, type TAlertVariants } from './alert-variants';
@@ -11,7 +14,7 @@ const ALERT_ICON = {
   [ALERT_TYPE.WARNING]: ICONS.WARNING,
   [ALERT_TYPE.ERROR]: ICONS.CLOSE,
   [ALERT_TYPE.INFO]: ICONS.INFO,
-} as const satisfies Record<TAlertType, TIconName>;
+} as const satisfies Record<TAlertType, TRegisteredIconName>;
 
 export type TAlertProps = {
   type: TAlertType;

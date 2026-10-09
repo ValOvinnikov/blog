@@ -1,6 +1,6 @@
-import type { TIconName } from '@blog/config';
 import { NavItemContent } from '@platform/components/features/layout/nav-item-content';
 import { BrandMark } from '@platform/components/shared/brand-mark';
+import type { TRegisteredIconName } from '@platform/components/shared/icon';
 import type { TStatusBadgeProps } from '@platform/components/shared/status-badge';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
@@ -17,7 +17,7 @@ type TSidebarNavBadge = {
 
 type TSidebarNavItemBase = {
   label: string;
-  icon: TIconName;
+  icon: TRegisteredIconName;
   badge?: TSidebarNavBadge;
 };
 

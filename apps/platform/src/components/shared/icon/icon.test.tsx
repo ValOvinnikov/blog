@@ -19,6 +19,7 @@ describe(Icon, () => {
       ICONS.BOOK,
       ICONS.CHECK,
       ICONS.CHECK_SHEET,
+      ICONS.CHEVRON_DOWN,
       ICONS.CHEVRON_RIGHT,
       ICONS.CLOSE,
       ICONS.COMMENT,

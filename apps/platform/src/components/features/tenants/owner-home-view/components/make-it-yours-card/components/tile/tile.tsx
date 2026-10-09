@@ -1,12 +1,15 @@
-import { SIZE, type TIconName } from '@blog/config';
-import { Icon } from '@platform/components/shared/icon';
+import { SIZE } from '@blog/config';
+import {
+  Icon,
+  type TRegisteredIconName,
+} from '@platform/components/shared/icon';
 import { Link } from '@platform/i18n/navigation';
 
 import { tileVariants } from './tile-variants';
 
 export type TTileProps = {
   href: string;
-  icon: TIconName;
+  icon: TRegisteredIconName;
   title: string;
   description: string;
 };
