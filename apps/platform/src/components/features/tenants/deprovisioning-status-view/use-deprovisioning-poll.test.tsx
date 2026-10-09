@@ -12,7 +12,8 @@ import { act, renderHook } from '@testing-library/react';
 import { STEP_ORDER, useDeprovisioningPoll } from './use-deprovisioning-poll';
 
 const STEP_POLL_INTERVAL_MS = 4000;
-const STALE_RUN_MAX_TICKS = 75;
+const MAX_POLL_TICKS = 75;
+const ENABLED = { isEnabled: true };
 
 const { getTenantDeprovisioningStatusActionMock } = vi.hoisted(() => ({
   getTenantDeprovisioningStatusActionMock: vi.fn(),
@@ -26,7 +27,6 @@ vi.mock(
   }),
 );
 
-/** A tenant whose REVOKE_SANITY_TOKENS step failed on a run that already finished — the shared arrangement every "stale FAILED run" test below starts from. */
 const makeFailedRevokeTenant = () =>
   makeTenant({
     deprovisioningSteps: {
@@ -63,19 +63,22 @@ describe(useDeprovisioningPoll, () => {
   });
 
   describe('status derivation', () => {
-    it('reports IDLE and isRunning when every step is idle', () => {
+    it('reports IDLE, in progress but not running, when every step is idle', () => {
       const tenant = makeTenant({
         deprovisioningSteps: {
           ...idleDeprovisioningSteps(),
           run: { startedAt: '2026-08-12T14:18:00.000Z' },
         },
       });
-      const { result } = renderHook(() => useDeprovisioningPoll(tenant));
+      const { result } = renderHook(() =>
+        useDeprovisioningPoll(tenant, ENABLED),
+      );
 
       expect(result.current.overallStatus).toBe(
         TENANT_PROVISIONING_STEP_STATUS.IDLE,
       );
-      expect(result.current.isRunning).toBe(true);
+      expect(result.current.isRunning).toBe(false);
+      expect(result.current.isInProgress).toBe(true);
       expect(result.current.isFailed).toBe(false);
       expect(result.current.isDone).toBe(false);
     });
@@ -94,7 +97,9 @@ describe(useDeprovisioningPoll, () => {
           run: { startedAt: '2026-08-12T14:18:00.000Z' },
         },
       });
-      const { result } = renderHook(() => useDeprovisioningPoll(tenant));
+      const { result } = renderHook(() =>
+        useDeprovisioningPoll(tenant, ENABLED),
+      );
 
       expect(result.current.overallStatus).toBe(
         TENANT_PROVISIONING_STEP_STATUS.RUNNING,
@@ -105,13 +110,13 @@ describe(useDeprovisioningPoll, () => {
 
     it('reports FAILED with the failing step and its error when a step fails and nothing else is running', () => {
       const { result } = renderHook(() =>
-        useDeprovisioningPoll(makeFailedRevokeTenant()),
+        useDeprovisioningPoll(makeFailedRevokeTenant(), ENABLED),
       );
 
       expect(result.current.overallStatus).toBe(
         TENANT_PROVISIONING_STEP_STATUS.FAILED,
       );
-      expect(result.current.isRunning).toBe(false);
+      expect(result.current.isInProgress).toBe(false);
       expect(result.current.isFailed).toBe(true);
       expect(result.current.failedStep).toBe(
         DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS,
@@ -124,27 +129,27 @@ describe(useDeprovisioningPoll, () => {
 
     it('treats a deprovision request newer than a stale FAILED run as a fresh start, not the old failure', () => {
       const { result } = renderHook(() =>
-        useDeprovisioningPoll(
-          makeFailedRevokeTenant(),
-          '2026-08-12T14:25:00.000Z',
-        ),
+        useDeprovisioningPoll(makeFailedRevokeTenant(), {
+          isEnabled: true,
+          deprovisionRequestedAt: '2026-08-12T14:25:00.000Z',
+        }),
       );
 
       expect(result.current.deprovisioningSteps).toBeNull();
       expect(result.current.overallStatus).toBe(
         TENANT_PROVISIONING_STEP_STATUS.IDLE,
       );
-      expect(result.current.isRunning).toBe(true);
+      expect(result.current.isInProgress).toBe(true);
       expect(result.current.isFailed).toBe(false);
       expect(result.current.run).toBeUndefined();
     });
 
     it('keeps showing a stale FAILED run when the deprovision request is not newer than it', () => {
       const { result } = renderHook(() =>
-        useDeprovisioningPoll(
-          makeFailedRevokeTenant(),
-          '2026-08-12T14:15:00.000Z',
-        ),
+        useDeprovisioningPoll(makeFailedRevokeTenant(), {
+          isEnabled: true,
+          deprovisionRequestedAt: '2026-08-12T14:15:00.000Z',
+        }),
       );
 
       expect(result.current.overallStatus).toBe(
@@ -167,7 +172,9 @@ describe(useDeprovisioningPoll, () => {
           },
         },
       });
-      const { result } = renderHook(() => useDeprovisioningPoll(tenant));
+      const { result } = renderHook(() =>
+        useDeprovisioningPoll(tenant, ENABLED),
+      );
 
       expect(result.current.overallStatus).toBe(
         TENANT_PROVISIONING_STEP_STATUS.DONE,
@@ -188,7 +195,9 @@ describe(useDeprovisioningPoll, () => {
           run: { startedAt: '2026-08-12T14:18:00.000Z' },
         },
       });
-      const { result } = renderHook(() => useDeprovisioningPoll(tenant));
+      const { result } = renderHook(() =>
+        useDeprovisioningPoll(tenant, ENABLED),
+      );
 
       expect(result.current.run).toEqual({
         startedAt: '2026-08-12T14:18:00.000Z',
@@ -227,7 +236,9 @@ describe(useDeprovisioningPoll, () => {
         },
         deprovisionedAt: null,
       });
-      const { result } = renderHook(() => useDeprovisioningPoll(tenant));
+      const { result } = renderHook(() =>
+        useDeprovisioningPoll(tenant, ENABLED),
+      );
 
       expect(result.current.stepStatuses[0]).toBe(
         TENANT_PROVISIONING_STEP_STATUS.RUNNING,
@@ -265,7 +276,9 @@ describe(useDeprovisioningPoll, () => {
         deprovisioningSteps: doneSteps,
         deprovisionedAt: new Date('2026-08-12T14:20:00.000Z'),
       });
-      const { result } = renderHook(() => useDeprovisioningPoll(tenant));
+      const { result } = renderHook(() =>
+        useDeprovisioningPoll(tenant, ENABLED),
+      );
 
       expect(result.current.isRunning).toBe(true);
 
@@ -296,7 +309,7 @@ describe(useDeprovisioningPoll, () => {
           },
         },
       });
-      renderHook(() => useDeprovisioningPoll(tenant));
+      renderHook(() => useDeprovisioningPoll(tenant, ENABLED));
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS * 2);
@@ -330,10 +343,13 @@ describe(useDeprovisioningPoll, () => {
         deprovisionedAt: null,
       });
       const { result } = renderHook(() =>
-        useDeprovisioningPoll(tenant, '2026-08-12T14:25:00.000Z'),
+        useDeprovisioningPoll(tenant, {
+          isEnabled: true,
+          deprovisionRequestedAt: '2026-08-12T14:25:00.000Z',
+        }),
       );
 
-      expect(result.current.isRunning).toBe(true);
+      expect(result.current.isInProgress).toBe(true);
       expect(result.current.deprovisioningSteps).toBeNull();
 
       await act(async () => {
@@ -376,7 +392,7 @@ describe(useDeprovisioningPoll, () => {
         },
         deprovisionedAt: null,
       });
-      renderHook(() => useDeprovisioningPoll(tenant));
+      renderHook(() => useDeprovisioningPoll(tenant, ENABLED));
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
@@ -409,16 +425,16 @@ describe(useDeprovisioningPoll, () => {
         },
         deprovisionedAt: null,
       });
-      renderHook(() => useDeprovisioningPoll(tenant));
+      renderHook(() => useDeprovisioningPoll(tenant, ENABLED));
 
-      for (let tick = 0; tick < STALE_RUN_MAX_TICKS + 5; tick += 1) {
+      for (let tick = 0; tick < MAX_POLL_TICKS + 5; tick += 1) {
         await act(async () => {
           await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
         });
       }
 
       expect(getTenantDeprovisioningStatusActionMock).toHaveBeenCalledTimes(
-        STALE_RUN_MAX_TICKS,
+        MAX_POLL_TICKS,
       );
     });
 
@@ -438,18 +454,57 @@ describe(useDeprovisioningPoll, () => {
       });
       getTenantDeprovisioningStatusActionMock.mockResolvedValue(undefined);
       renderHook(() =>
-        useDeprovisioningPoll(tenant, '2026-08-12T14:25:00.000Z'),
+        useDeprovisioningPoll(tenant, {
+          isEnabled: true,
+          deprovisionRequestedAt: '2026-08-12T14:25:00.000Z',
+        }),
       );
 
-      for (let tick = 0; tick < STALE_RUN_MAX_TICKS + 5; tick += 1) {
+      for (let tick = 0; tick < MAX_POLL_TICKS + 5; tick += 1) {
         await act(async () => {
           await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
         });
       }
 
       expect(getTenantDeprovisioningStatusActionMock).toHaveBeenCalledTimes(
-        STALE_RUN_MAX_TICKS,
+        MAX_POLL_TICKS,
       );
+    });
+
+    it('reports nothing in progress and never polls while disabled', async () => {
+      const { result } = renderHook(() =>
+        useDeprovisioningPoll(makeTenant({ deprovisioningSteps: null }), {
+          isEnabled: false,
+        }),
+      );
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS * 3);
+      });
+
+      expect(result.current.isInProgress).toBe(false);
+      expect(getTenantDeprovisioningStatusActionMock).not.toHaveBeenCalled();
+    });
+
+    it('pauses polling while the tab is hidden and resumes once it is visible again', async () => {
+      const tenant = makeTenant({ deprovisioningSteps: null });
+      const visibility = vi.spyOn(document, 'visibilityState', 'get');
+      visibility.mockReturnValue('hidden');
+      renderHook(() => useDeprovisioningPoll(tenant, ENABLED));
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS * 3);
+      });
+      expect(getTenantDeprovisioningStatusActionMock).not.toHaveBeenCalled();
+
+      visibility.mockReturnValue('visible');
+      await act(async () => {
+        document.dispatchEvent(new Event('visibilitychange'));
+        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
+      });
+      expect(getTenantDeprovisioningStatusActionMock).toHaveBeenCalledTimes(1);
+
+      visibility.mockRestore();
     });
 
     it('stops polling once the hook unmounts', async () => {
@@ -462,7 +517,9 @@ describe(useDeprovisioningPoll, () => {
           run: { startedAt: '2026-08-12T14:18:00.000Z' },
         },
       });
-      const { unmount } = renderHook(() => useDeprovisioningPoll(tenant));
+      const { unmount } = renderHook(() =>
+        useDeprovisioningPoll(tenant, ENABLED),
+      );
 
       unmount();
 

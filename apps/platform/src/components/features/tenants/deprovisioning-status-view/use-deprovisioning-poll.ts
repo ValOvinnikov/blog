@@ -16,16 +16,14 @@ import {
   classifyProvisioningError,
   type TProvisioningErrorKind,
 } from '@platform/utils/provisioning-error/provisioning-error';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 
 export const STEP_ORDER = CORE_DEPROVISIONING_STEPS;
 
 const STEP_POLL_INTERVAL_MS = 4000;
-// A stuck run (a crashed runner that never reports a terminal step) would
-// otherwise poll forever for as long as the tab stays open — this caps how
-// long a non-terminal run keeps being polled, comfortably past any realistic
-// teardown duration.
-const STALE_RUN_MAX_TICKS = 75; // ~5 minutes at STEP_POLL_INTERVAL_MS
+// Bounds a run that never reports a terminal step (a crashed runner),
+// comfortably past any realistic teardown duration.
+const MAX_POLL_TICKS = 75; // ~5 minutes of visible polling at STEP_POLL_INTERVAL_MS
 
 const OVERALL_STATUS_PRIORITY: TTenantProvisioningStepStatus[] = [
   TENANT_PROVISIONING_STEP_STATUS.RUNNING,
@@ -54,6 +52,15 @@ const deriveOverallStatus = (
     TENANT_PROVISIONING_STEP_STATUS.IDLE
   );
 };
+
+const subscribeToVisibilityChange = (onChange: () => void) => {
+  document.addEventListener('visibilitychange', onChange);
+  return () => document.removeEventListener('visibilitychange', onChange);
+};
+
+const isDocumentVisible = () => document.visibilityState !== 'hidden';
+
+const isDocumentVisibleOnServer = () => true;
 
 const isTerminalOverallStatus = (
   status: TTenantProvisioningStepStatus,
@@ -85,6 +92,7 @@ export type TUseDeprovisioningPollResult = {
   run: TDeprovisioningRun | undefined;
   overallStatus: TTenantProvisioningStepStatus;
   isRunning: boolean;
+  isInProgress: boolean;
   isFailed: boolean;
   isDone: boolean;
   failedStep: TDeprovisioningStep | undefined;
@@ -92,29 +100,30 @@ export type TUseDeprovisioningPollResult = {
   errorKind: TProvisioningErrorKind | undefined;
 };
 
-/**
- * Owns `DeprovisioningStatusView`'s live behaviour: polling the tenant's
- * deprovisioning step map while a run is in progress, and the
- * derived overall-status/error values the view renders from it. There is no
- * start/retry dispatch to model here — re-dispatch happens through
- * `DeprovisionTenantControl`.
- */
+export type TUseDeprovisioningPollOptions = {
+  isEnabled: boolean;
+  deprovisionRequestedAt?: string;
+};
+
 export const useDeprovisioningPoll = (
   tenant: TTenant,
-  deprovisionRequestedAt?: string,
+  { isEnabled, deprovisionRequestedAt }: TUseDeprovisioningPollOptions,
 ): TUseDeprovisioningPollResult => {
   const [renderedTenant, setRenderedTenant] = useState(tenant);
   const [polledDeprovisioningSteps, setPolledDeprovisioningSteps] =
     useState<TTenantDeprovisioningState | null>(tenant.deprovisioningSteps);
-  const staleTicksRef = useRef(0);
+  const pollTicksRef = useRef(0);
+  const isVisible = useSyncExternalStore(
+    subscribeToVisibilityChange,
+    isDocumentVisible,
+    isDocumentVisibleOnServer,
+  );
 
   if (tenant !== renderedTenant) {
     setRenderedTenant(tenant);
     setPolledDeprovisioningSteps(tenant.deprovisioningSteps);
   }
 
-  // A pending retry is presented exactly like a first-ever dispatch — the
-  // pre-run "Starting…" state, never the prior run's stale terminal steps.
   const deprovisioningSteps = isRetryPending(
     deprovisionRequestedAt,
     polledDeprovisioningSteps?.run,
@@ -124,22 +133,24 @@ export const useDeprovisioningPoll = (
 
   const stepStatuses = stepStatusesFor(deprovisioningSteps);
   const overallStatus = deriveOverallStatus(stepStatuses);
-  const isRunning = !isTerminalOverallStatus(overallStatus);
+  const isRunning = overallStatus === TENANT_PROVISIONING_STEP_STATUS.RUNNING;
+  const isInProgress = isEnabled && !isTerminalOverallStatus(overallStatus);
+  const shouldPoll = isInProgress && isVisible;
 
   useEffect(() => {
-    staleTicksRef.current = 0;
+    pollTicksRef.current = 0;
   }, [tenant]);
 
   useEffect(() => {
-    if (!isRunning) {
+    if (!shouldPoll) {
       return;
     }
 
     let cancelled = false;
 
     const intervalId = setInterval(() => {
-      staleTicksRef.current += 1;
-      if (staleTicksRef.current > STALE_RUN_MAX_TICKS) {
+      pollTicksRef.current += 1;
+      if (pollTicksRef.current > MAX_POLL_TICKS) {
         clearInterval(intervalId);
         return;
       }
@@ -151,18 +162,15 @@ export const useDeprovisioningPoll = (
           }
           setPolledDeprovisioningSteps(result.deprovisioningSteps);
         })
-        .catch(() => {
-          // A rejected tick (e.g. an expired-session redirect thrown by
-          // `requireSuperAdmin()`) must not kill polling — the next
-          // interval tick retries on its own.
-        });
+        // A rejected tick (an expired-session redirect) leaves the next tick to retry.
+        .catch(() => {});
     }, STEP_POLL_INTERVAL_MS);
 
     return () => {
       cancelled = true;
       clearInterval(intervalId);
     };
-  }, [tenant.id, isRunning]);
+  }, [tenant.id, shouldPoll]);
 
   const stepUpdatedAt = stepUpdatedAtFor(deprovisioningSteps);
   const run = deprovisioningSteps?.run;
@@ -190,6 +198,7 @@ export const useDeprovisioningPoll = (
     run,
     overallStatus,
     isRunning,
+    isInProgress,
     isFailed,
     isDone,
     failedStep: failedStepEntry,

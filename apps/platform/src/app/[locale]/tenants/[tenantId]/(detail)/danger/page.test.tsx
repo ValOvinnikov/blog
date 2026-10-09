@@ -16,7 +16,7 @@ import {
 import TenantDangerPage from './page';
 
 const STEP_POLL_INTERVAL_MS = 4000;
-const STALE_RUN_MAX_TICKS = 75;
+const MAX_POLL_TICKS = 75;
 
 const {
   requireSuperAdminMock,
@@ -246,14 +246,14 @@ describe(TenantDangerPage, () => {
 
     await setup();
 
-    for (let tick = 0; tick < STALE_RUN_MAX_TICKS + 5; tick += 1) {
+    for (let tick = 0; tick < MAX_POLL_TICKS + 5; tick += 1) {
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
       });
     }
 
     expect(getTenantDeprovisioningStatusActionMock).toHaveBeenCalledTimes(
-      STALE_RUN_MAX_TICKS,
+      MAX_POLL_TICKS,
     );
   });
 
@@ -280,14 +280,14 @@ describe(TenantDangerPage, () => {
 
     await setup();
 
-    for (let tick = 0; tick < STALE_RUN_MAX_TICKS + 5; tick += 1) {
+    for (let tick = 0; tick < MAX_POLL_TICKS + 5; tick += 1) {
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
       });
     }
 
     expect(getTenantDeprovisioningStatusActionMock).toHaveBeenCalledTimes(
-      STALE_RUN_MAX_TICKS,
+      MAX_POLL_TICKS,
     );
   });
 
