@@ -241,12 +241,12 @@ values (`DetailList.Row isMono`).
 | Field hint                                                   | `FormField` `hint`, a plain string                      | 12px muted, under the label, above the control. **Not yet:** 11.5px below the control                        |
 | Lock reason                                                  | `SettingRow` `lockedReason`                             | 12px muted, the hint style                                                                                   |
 | Field error                                                  | `FormField` `error`                                     | 11.5px `admin-bad`, inline under the field                                                                   |
-| Body: primary content and values                             | `Text` plus a `text-[13.5px] text-admin-text` slot      | 13.5px `admin-text`. **Not yet:** `Text` alone is unsized, so 14px                                           |
+| Body: primary content and values                             | `Text`                                                  | 13.5px `admin-text`                                                                                          |
 | Read-only facts                                              | `DetailList` (`isMono` for domains, ids)                | 13.5px values, 12.5px muted terms, mono 12.5px                                                               |
 | Control text                                                 | `TextInput`, `Textarea`; `Button`                       | 13.5px (16px below `md`); 13px at `md`, 12px at `sm`                                                         |
 | Table header; table cell                                     | the table recipe's `head`; its `cell`                   | 11px, 700, uppercase, `tracking-[.06em]`, muted (not `faint`); 13.5px `admin-text`, a second line 12px muted |
 | Badge                                                        | `StatusBadge`                                           | 11.5px, 600                                                                                                  |
-| Caption, meta (a header count, a step time, a caption)       | `Text variant="meta"`                                   | 12px muted. **Not yet:** no `meta` variant; use `variant="muted"`                                            |
+| Caption, meta (a header count, a step time, a caption)       | `Text variant="meta"`                                   | 12px muted                                                                                                   |
 | Empty state                                                  | one sentence in `Card.Body`; `emptyMessage` for a table | 13.5px muted; centred in a table                                                                             |
 | Save status                                                  | `SettingsFormShell` only                                | 12px `admin-ok`                                                                                              |
 
@@ -254,8 +254,11 @@ values (`DetailList.Row isMono`).
   `text-meta`, …) never appear outside `site-preview/`. Admin sizes become
   `--text-admin-*` tokens in `styles/admin-theme.css`, each registered in
   `FONT_SIZE_TOKENS` in `utils/tv/tv.ts` or tailwind-merge drops it as a colour.
-  **Not yet:** they don't exist; write the pixel value (`text-[13.5px]`) and
-  invent no token names.
+  One token per size, named by its pixel value: `text-admin-11`,
+  `text-admin-11-5`, `text-admin-12`, `text-admin-12-5`, `text-admin-13`,
+  `text-admin-13-5`, `text-admin-14`, `text-admin-15`, `text-admin-16`,
+  `text-admin-24`. **Not yet:** most call sites still write the pixel value
+  (`text-[13.5px]`); new code uses the token, and invents no size off the scale.
 - A site preview applies the tenant's fonts by setting `--font-display-family`
   and `--font-body-family` on its root, never `--font-display`, `--font-read` or
   an inline `fontFamily`. **Not yet:** `voice-specimen.tsx` sets

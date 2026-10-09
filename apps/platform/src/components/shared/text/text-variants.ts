@@ -4,10 +4,11 @@ import type { VariantProps } from 'tailwind-variants';
 export const textVariants = tv({
   variants: {
     variant: {
-      body: 'text-admin-text',
-      muted: 'text-admin-muted text-[12.5px]',
-      supporting: 'text-admin-muted text-[13.5px]',
-      hint: 'text-admin-muted text-[12px]',
+      body: 'text-admin-text text-admin-13-5',
+      muted: 'text-admin-muted text-admin-12-5',
+      supporting: 'text-admin-muted text-admin-13-5',
+      hint: 'text-admin-muted text-admin-12',
+      meta: 'text-admin-muted text-admin-12',
     },
   },
   defaultVariants: { variant: 'body' },
