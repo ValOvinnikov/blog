@@ -57,6 +57,13 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
     vi.useRealTimers();
   });
 
+  it('says no run has started yet in the Run card before any run exists', () => {
+    const tenant = makeTenant({ deprovisioningSteps: null });
+    render(<Wrapper tenant={tenant} />);
+
+    expect(screen.getByText('No run has started yet.')).toBeVisible();
+  });
+
   it('shows the full step list under the Starting badge, not "Not started", when a teardown was requested but no run marker has appeared yet', () => {
     const tenant = makeTenant({ deprovisioningSteps: null });
     render(<Wrapper tenant={tenant} />);

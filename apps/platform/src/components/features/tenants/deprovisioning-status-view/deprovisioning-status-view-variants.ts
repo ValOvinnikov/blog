@@ -7,17 +7,5 @@ export const deprovisioningStatusViewVariants = tv({
     stepsCard: ['bg-admin-surface'],
     stepsSummary: ['flex items-center gap-2.5'],
     overallStatusLive: ['inline-flex items-center'],
-    errorCard: [
-      'flex flex-col gap-3 rounded-admin border p-[18px] shadow-admin',
-      'border-admin-bad/30 bg-admin-bad-weak',
-    ],
-    errorHeadingRow: ['flex items-center gap-2'],
-    errorHeadline: ['text-admin-bad'],
-    errorIcon: ['flex-none text-admin-bad'],
-    errorDetails: ['mt-1'],
-    errorDetailsText: [
-      'mt-2 rounded-admin-control bg-admin-surface-2 p-3',
-      'font-mono text-xs text-admin-muted whitespace-pre-wrap break-words',
-    ],
   },
 });

@@ -541,6 +541,15 @@ describe(ProvisioningStatusView, () => {
     ).toHaveLength(1);
   });
 
+  it('says no run has started yet in the Run card before any run exists', () => {
+    const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
+    render(
+      <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
+    );
+
+    expect(screen.getByText('No run has started yet.')).toBeVisible();
+  });
+
   it('hides the Start provisioning action once any step has progressed past idle', () => {
     const tenant = makeTenant({
       provisioningSteps: {
