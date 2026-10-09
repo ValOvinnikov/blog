@@ -18,10 +18,11 @@
   --admin-muted: #5b6472;
   --admin-faint: #8a93a3;
   --admin-brand: #4f46e5;
+  --admin-brand-strong: #3730a3;
   --admin-brand-weak: #eef2ff;
   --admin-ok: #16794d;
   --admin-ok-weak: #e7f6ee;
-  --admin-warn: #9a6a00;
+  --admin-warn: #8a5f00;
   --admin-warn-weak: #fbf3df;
   --admin-bad: #b42318;
   --admin-bad-weak: #fdeceb;
@@ -45,6 +46,7 @@
   --color-admin-muted: var(--admin-muted);
   --color-admin-faint: var(--admin-faint);
   --color-admin-brand: var(--admin-brand);
+  --color-admin-brand-strong: var(--admin-brand-strong);
   --color-admin-brand-weak: var(--admin-brand-weak);
   --color-admin-ok: var(--admin-ok);
   --color-admin-ok-weak: var(--admin-ok-weak);

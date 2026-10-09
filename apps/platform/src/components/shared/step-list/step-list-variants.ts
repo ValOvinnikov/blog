@@ -14,7 +14,7 @@ export const stepListVariants = tv({
     stepTitle: ['text-[13.5px] font-semibold text-admin-text'],
     stepStatusLive: ['inline-flex items-center'],
     stepWhen: [
-      'ml-auto flex-none whitespace-nowrap pt-0.5 text-[11.5px] text-admin-faint',
+      'ml-auto flex-none whitespace-nowrap pt-0.5 text-[12px] text-admin-muted',
     ],
     visuallyHidden: ['sr-only'],
   },
