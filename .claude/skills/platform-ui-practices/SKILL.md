@@ -54,7 +54,7 @@ class and prop it shows; the sections after the recipes give the rules.
   sentence, a count, a name). **Not yet:** `Text`'s body variant has no size,
   so `Text` without it renders at 16px. `variant="muted"` (12.5px) is only for
   a description or a secondary line, `supporting` only for a page description
-  (`PageHeader`'s, or the line under a pre-shell page's `h1`): never pick either
+  (`PageHeader`'s): never pick either
   to get a size.
 - The card's purpose is `supportingText`, never a paragraph opening `Card.Body`.
   `RefreshButton` is a `'use client'` leaf: a secondary `size={SIZE.SM}`
@@ -172,8 +172,11 @@ export const auditLogTableVariants = tv({
   Settings pages get it from `SettingsFormShell`, whose `description` is
   required. The main action goes in `actions`: a primary `LinkButton` for an
   in-app route, `ExternalLinkButton hasArrow` for an off-app one.
-- `PageHeader` carries no margin; the page root's `gap-6` sets
-  header-to-content at 24px. Don't add margin around it per page.
+- `PageHeader` is a band: `admin-surface` with an `admin-line` bottom rule,
+  painted out to the shell's edges and pulled up flush under the topbar by the
+  `--shell-gutter` `ShellFrame` sets. Status and controls sit in its right-hand
+  `actions` slot. The page root's `gap-6` sets header-to-content at 24px; don't
+  add margin, padding or a background around it per page.
 - Width: a single-column settings page keeps `SettingsFormShell`'s `max-w-3xl`;
   one with a preview, or list + editor + preview, passes `isWide`; every other
   page fills the shell.
@@ -186,10 +189,10 @@ export const auditLogTableVariants = tv({
   `xl`.
 - A grid inside a column sizes from that column: `@container` on the card body
   and `@sm:grid-cols-2` on the grid.
-- Pre-shell pages (workspace pending, tenant picker): a full-width
-  `min-h-dvh bg-admin-bg` root holding one `<main>`, a centred `max-w-sm`
-  column, a `Heading level={1} size="pageTitle"` with a supporting line, and the
-  content in a `Card`. Choices are visible light-surface link rows, none
+- Pre-shell pages (workspace pending, tenant picker) render `PreShellFrame`: a
+  full-width `min-h-dvh bg-admin-bg` root holding one `<main>`, a centred
+  `max-w-sm` column, and one `Card` whose top is the `PageHeader` band passed
+  as `header`, with the content in its body. Choices are visible light-surface link rows, none
   pre-selected; dark sidebar components never sit on a light page.
 - Full-bleed is for the mounted Studio only. Anything else on the Studio route
   (archived, not provisioned) renders in the normal padded column. **Not yet:**
@@ -228,7 +231,7 @@ values (`DetailList.Row isMono`).
 
 | Role                                                         | Write                                                   | Renders                                                                                                      |
 | ------------------------------------------------------------ | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| Page title                                                   | `PageHeader` `title`                                    | 22px, 700, `tracking-[-0.01em]`                                                                              |
+| Page title                                                   | `PageHeader` `title`                                    | 24px, 600, `tracking-[-0.01em]`                                                                              |
 | Page description                                             | `PageHeader` `description`                              | 13.5px muted (`Text variant="supporting"`, kept for page descriptions only)                                  |
 | Card title                                                   | `Card.Header` `title`                                   | 15px, 650 (`Heading size="cardTitle"`)                                                                       |
 | Dialog title                                                 | `AlertDialog.Title` at `cardTitle`                      | 15px, 650. **Not yet:** `ConfirmDialog`'s is 600                                                             |
@@ -575,7 +578,7 @@ tools you have are `loading.tsx`, `<Suspense>`, `cache`, `use`,
 
 ## Headings and landmarks
 
-- One `h1` per page (`PageHeader`, or the pre-shell page's own). Card titles are
+- One `h1` per page (`PageHeader`). Card titles are
   `h2`; a section inside one is `h3`. Nothing skipped, and what sits under a
   section heading nests below it.
 - A site preview's root is `inert`: its links and buttons take no focus and its
