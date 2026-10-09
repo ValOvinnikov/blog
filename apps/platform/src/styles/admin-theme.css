@@ -66,6 +66,17 @@
   --color-admin-side-raised: var(--admin-side-raised);
   --color-admin-side-accent: var(--admin-side-accent);
 
+  --text-admin-11: 11px;
+  --text-admin-11-5: 11.5px;
+  --text-admin-12: 12px;
+  --text-admin-12-5: 12.5px;
+  --text-admin-13: 13px;
+  --text-admin-13-5: 13.5px;
+  --text-admin-14: 14px;
+  --text-admin-15: 15px;
+  --text-admin-16: 16px;
+  --text-admin-24: 24px;
+
   --radius-admin: 6px;
   --radius-admin-control: 4px;
 

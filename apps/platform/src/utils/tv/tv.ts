@@ -26,6 +26,16 @@ const FONT_SIZE_TOKENS = [
   'meta',
   'label',
   'code',
+  'admin-11',
+  'admin-11-5',
+  'admin-12',
+  'admin-12-5',
+  'admin-13',
+  'admin-13-5',
+  'admin-14',
+  'admin-15',
+  'admin-16',
+  'admin-24',
 ];
 
 const FONT_FAMILY_TOKENS = ['display', 'body', 'read', 'mono', 'ui', 'admin'];
