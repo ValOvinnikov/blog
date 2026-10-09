@@ -371,7 +371,7 @@
   },
   "emailForm": {
     "pageHeading": "E-Mail",
-    "pageSubtitle": "Absenderidentität und Texte je Vorlage für jede E-Mail, die dieser Mandant versendet.",
+    "pageSubtitle": "Die E-Mails, die Ihre Leser und Ihr Team erhalten. Lassen Sie ein Feld leer, um den Standard zu verwenden.",
     "saveButton": "Änderungen speichern",
     "savingButton": "Wird gespeichert…",
     "alertSuccess": "E-Mail-Einstellungen gespeichert.",
@@ -413,14 +413,14 @@
   },
   "emailSettingsForm": {
     "heading": "E-Mail-Einstellungen",
-    "description": "Gilt für jede E-Mail, die dieser Mandant versendet. Leere Felder verwenden den Produktstandard.",
+    "description": "Gilt für jede E-Mail, die Ihre Website versendet. Lassen Sie ein Feld leer, um den angezeigten Text zu verwenden.",
     "senderNameLabel": "Absendername",
     "senderNameHint": "Der Anzeigename der Absenderadresse — unabhängig vom Website-Titel.",
     "senderNameInvalidError": "Das ist der Name, den Empfänger sehen, keine E-Mail-Adresse. Geben Sie einen Namen wie Acme Co ein, ohne < > \" , ; oder @.",
     "replyToLabel": "Antwortadresse",
-    "replyToHint": "Wohin Antworten auf E-Mails dieses Mandanten geleitet werden.",
+    "replyToHint": "Wohin Antworten auf die E-Mails Ihrer Website gehen.",
     "footerAddressLabel": "Postanschrift in der Fußzeile",
-    "footerAddressHint": "Für Massen-E-Mails gesetzlich vorgeschrieben — wird in der Fußzeile jeder E-Mail dieses Mandanten angezeigt.",
+    "footerAddressHint": "Für Massen-E-Mails gesetzlich vorgeschrieben — wird in der Fußzeile jeder E-Mail Ihrer Website angezeigt.",
     "logoLabel": "E-Mail-Logo",
     "logoHint": "Wird in jeder E-Mail und jeder Sprache verwendet. Eine Vorlage kann es mit einem eigenen Logo überschreiben."
   },

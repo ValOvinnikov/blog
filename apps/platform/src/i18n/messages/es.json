@@ -371,7 +371,7 @@
   },
   "emailForm": {
     "pageHeading": "Correo electrónico",
-    "pageSubtitle": "Identidad del remitente y textos por plantilla para cada correo que envía este cliente.",
+    "pageSubtitle": "Los correos que reciben sus lectores y su equipo. Deje un campo en blanco para usar el valor predeterminado.",
     "saveButton": "Guardar cambios",
     "savingButton": "Guardando…",
     "alertSuccess": "Configuración del correo guardada.",
@@ -413,14 +413,14 @@
   },
   "emailSettingsForm": {
     "heading": "Configuración del correo electrónico",
-    "description": "Se aplica a todos los correos que envía este cliente. Los campos en blanco usan el valor predeterminado del producto.",
+    "description": "Se aplica a todos los correos que envía su sitio. Deje un campo en blanco para usar el texto que se muestra.",
     "senderNameLabel": "Nombre del remitente",
     "senderNameHint": "El nombre visible en la dirección del remitente; no tiene relación con el título del sitio.",
     "senderNameInvalidError": "Es el nombre que ven los destinatarios, no una dirección de correo. Introduzca un nombre como Acme Co, sin < > \" , ; ni @.",
     "replyToLabel": "Dirección de respuesta",
-    "replyToHint": "Adónde se dirigen las respuestas a cualquier correo del cliente.",
+    "replyToHint": "Adónde van las respuestas a los correos de su sitio.",
     "footerAddressLabel": "Dirección postal del pie",
-    "footerAddressHint": "Un requisito legal para los envíos masivos: se muestra en el pie de todos los correos del cliente.",
+    "footerAddressHint": "Un requisito legal para los envíos masivos: se muestra en el pie de todos los correos que envía su sitio.",
     "logoLabel": "Logotipo del correo",
     "logoHint": "Se usa en todos los correos y en todos los idiomas. Una plantilla puede sustituirlo por su propio logotipo."
   },
