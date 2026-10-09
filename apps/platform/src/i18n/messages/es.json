@@ -469,7 +469,7 @@
     "heading": "Voz",
     "description": "Reformule los mensajes de página del sitio. Cada campo tiene un texto predeterminado: cambie solo lo que deba sonar como usted.",
     "fixedCopyNote": "Los botones, menús y etiquetas se traducen por usted y son iguales en todos los sitios, por eso no aparecen aquí.",
-    "editingLanguageNote": "Editando {language}: los demás idiomas conservan su propio texto.",
+    "editingLanguageNote": "Editando <strong>{language}</strong>: los demás idiomas conservan su propio texto.",
     "languageAriaLabel": "Idioma",
     "languageOption": "{language} · {count, plural, =0 {todo predeterminado} one {# personalizado} other {# personalizados}}",
     "surfaceCustomisedCount": "{count, plural, =0 {Todo predeterminado} one {# personalizado} other {# personalizados}}",

@@ -278,7 +278,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
         'placeholder',
         SITE_MESSAGES_BY_LOCALE.DE.notFound.heading,
       );
-      expect(screen.getByText(/Editing German/)).toBeVisible();
+      expect(screen.getByText('German', { selector: 'strong' })).toBeVisible();
     });
 
     it('breaks the unsaved count down by language', async () => {
@@ -394,7 +394,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
       expect(
         within(card('Empty lists')).getByRole('textbox', { name: 'Tag page' }),
       ).toBeVisible();
-      expect(screen.getByText(/Editing German/)).toBeVisible();
+      expect(screen.getByText('German', { selector: 'strong' })).toBeVisible();
     });
   });
 
