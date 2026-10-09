@@ -504,7 +504,7 @@
     "BOOKMARKS": "A reader's saved posts, before they save any"
   },
   "voiceSurfaceNotes": {
-    "NOT_FOUND": "Grey text is fixed and translated for you.",
+    "NOT_FOUND": "The return button is fixed and translated for you.",
     "ERROR": "The buttons are fixed and translated for you.",
     "ARCHIVE": "The heading comes from Studio; only the message is yours here.",
     "BOOKMARKS": "The page title and panel heading are fixed."
