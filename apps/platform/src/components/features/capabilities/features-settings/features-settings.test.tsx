@@ -170,16 +170,15 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       expect(screen.getAllByText('Growth plan')).toHaveLength(2);
     });
 
-    it('makes a locked toggle inert (unreachable and unclickable) while leaving an entitled toggle interactive, same as a provisioning-locked field', () => {
-      const lockedSwitch = screen.getByRole('switch', { name: 'Analytics' });
-      // eslint-disable-next-line testing-library/no-node-access
-      const lockedWrapper = lockedSwitch.closest('div');
-      expect(lockedWrapper?.getAttribute('inert')).toBe('');
-
-      const entitledSwitch = screen.getByRole('switch', { name: 'Bookmarks' });
-      // eslint-disable-next-line testing-library/no-node-access
-      const entitledWrapper = entitledSwitch.closest('div');
-      expect(entitledWrapper?.hasAttribute('inert')).toBe(false);
+    it('describes a locked toggle by its description and plan lock, and an entitled one by its description alone', () => {
+      expect(
+        screen.getByRole('switch', { name: 'Analytics' }),
+      ).toHaveAccessibleDescription(
+        'Enable on-site analytics tracking. Growth plan',
+      );
+      expect(
+        screen.getByRole('switch', { name: 'Bookmarks' }),
+      ).toHaveAccessibleDescription('Let readers save posts to read later.');
     });
   });
 

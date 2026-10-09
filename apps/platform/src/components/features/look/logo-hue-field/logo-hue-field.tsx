@@ -1,7 +1,7 @@
 'use client';
 
-import { Switch } from '@base-ui/react/switch';
 import { HueSlider } from '@platform/components/shared/hue-slider';
+import { Switch } from '@platform/components/shared/switch';
 import {
   accentHueGradient,
   buildLogoPreviewTokens,
@@ -40,9 +40,6 @@ export const LogoHueField = ({
 
   const {
     root,
-    switchRow,
-    switchTrack,
-    switchThumb,
     hueField,
     tones: tonesSlot,
     tone,
@@ -51,21 +48,14 @@ export const LogoHueField = ({
 
   return (
     <div className={root()}>
-      <div className={switchRow()}>
-        <Switch.Root
-          checked={follows}
-          onCheckedChange={(checked) =>
-            onChange(checked ? undefined : accentHue)
-          }
-          disabled={isDisabled}
-          aria-label={t('followAccentHue')}
-          aria-describedby={ariaDescribedBy}
-          className={switchTrack()}
-        >
-          <Switch.Thumb className={switchThumb()} />
-        </Switch.Root>
-        <span>{t('followAccentHue')}</span>
-      </div>
+      <Switch
+        isChecked={follows}
+        onCheckedChange={(checked) => onChange(checked ? undefined : accentHue)}
+        ariaLabel={t('followAccentHue')}
+        labels={{ caption: t('followAccentHue') }}
+        isDisabled={isDisabled}
+        aria-describedby={ariaDescribedBy}
+      />
 
       <div className={hueField()}>
         <span className={tonesSlot()} aria-hidden="true">
