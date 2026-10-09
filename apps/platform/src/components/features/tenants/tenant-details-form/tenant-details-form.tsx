@@ -54,26 +54,26 @@ export const TenantDetailsForm = () => {
     useState<TOwnerInviteConfirmation | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const { root, cardWrap, cardInert, overlay, fields, planControl } =
-    tenantDetailsFormVariants({ pending: isPending });
+  const {
+    root,
+    cardWrap,
+    cardInert,
+    overlay,
+    fields,
+    planControl,
+    footerActions,
+  } = tenantDetailsFormVariants({ pending: isPending });
 
   const updateField = <K extends keyof TFormValues>(
     key: K,
     value: TFormValues[K],
   ) => {
     setValues((prev) => ({ ...prev, [key]: value }));
-    // A changed owner email invalidates whatever confirmation was shown for
-    // the previous one — resubmitting now must re-check the new address
-    // rather than silently reuse an unrelated confirmation.
     if (key === 'ownerEmail') {
       setOwnerInviteConfirmation(null);
     }
   };
 
-  // `ownerInviteConfirmation.email` comes back normalized by the server's
-  // `z.string().trim().toLowerCase()`, so the raw form value must be
-  // normalized the same way before comparing — an email edited since the
-  // confirmation was shown must not silently reuse a stale token.
   const normalizedOwnerEmail = values.ownerEmail.trim().toLowerCase();
   const confirmedInvite =
     ownerInviteConfirmation?.email === normalizedOwnerEmail
@@ -165,19 +165,21 @@ export const TenantDetailsForm = () => {
               </div>
             </Card.Body>
             <Card.Footer>
-              <Button
-                type="button"
-                variant="primary"
-                onClick={handleSubmit}
-                isPending={isPending}
-                hasArrow={!isPending}
-              >
-                {isPending
-                  ? pendingLabel
-                  : ownerInviteConfirmation
-                    ? t('confirmOwnerInviteButton')
-                    : t('submitButton')}
-              </Button>
+              <div className={footerActions()}>
+                <Button
+                  type="button"
+                  variant="primary"
+                  onClick={handleSubmit}
+                  isPending={isPending}
+                  hasArrow={!isPending}
+                >
+                  {isPending
+                    ? pendingLabel
+                    : ownerInviteConfirmation
+                      ? t('confirmOwnerInviteButton')
+                      : t('submitButton')}
+                </Button>
+              </div>
             </Card.Footer>
           </Card>
         </div>
