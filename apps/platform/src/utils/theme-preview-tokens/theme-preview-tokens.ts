@@ -18,6 +18,13 @@ const HUE_MIN = 0;
 const HUE_MAX = 360;
 const HUE_GRADIENT_STEP = 20;
 
+// theme.css derives these in @theme, i.e. on :root, so they must be re-derived where the preview overrides their inputs.
+const DERIVED_RADIUS_DECLARATIONS: TThemeDeclarations = {
+  '--radius-card': 'var(--radius-md)',
+  '--radius-media': 'var(--radius-lg)',
+  '--radius-item': 'var(--item-radius)',
+};
+
 export const buildAccentPreviewTokens = (hue: number, isDark: boolean) => {
   return formatOklchRamp(isDark ? ACCENT_RAMP_DARK : ACCENT_RAMP_LIGHT, hue);
 };
@@ -35,6 +42,7 @@ const buildShapePreviewTokens = (
     ...RADIUS_DECLARATIONS[radiusScale],
     ...DENSITY_DECLARATIONS[density],
     ...CARD_STYLE_DECLARATIONS[cardStyle],
+    ...DERIVED_RADIUS_DECLARATIONS,
   };
 };
 
