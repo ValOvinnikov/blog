@@ -114,12 +114,34 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
     expect(within(section).getByText('Customised')).toBeVisible();
     expect(within(section).getByText('Unsaved')).toBeInTheDocument();
-    expect(within(section).getByText('1 customised')).toBeVisible();
+    expect(within(section).getByText('3 fields · 1 customised')).toBeVisible();
 
     await user.click(within(section).getByRole('button', { name: 'Reset' }));
 
     expect(notFoundHeading()).toHaveValue('');
-    expect(within(section).getByText('All default')).toBeVisible();
+    expect(within(section).getByText('3 fields · all default')).toBeVisible();
+  });
+
+  it('summarises each card with its field count and customised count', () => {
+    setupBilingual();
+
+    expect(
+      within(card('Page not found')).getByText('3 fields · 2 customised'),
+    ).toBeVisible();
+    expect(
+      within(card('Error page')).getByText('2 fields · all default'),
+    ).toBeVisible();
+    expect(
+      within(card('Bookmarks')).getByText('1 field · 1 customised'),
+    ).toBeVisible();
+  });
+
+  it('counts the empty-list card in lists', () => {
+    setup();
+
+    expect(
+      within(card('Empty lists')).getByText('5 lists · all default'),
+    ).toBeVisible();
   });
 
   describe('specimens', () => {

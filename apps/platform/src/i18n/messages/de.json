@@ -474,7 +474,7 @@
     "editingLanguageNote": "Sie bearbeiten <strong>{language}</strong> — andere Sprachen behalten ihren eigenen Text.",
     "languageAriaLabel": "Sprache",
     "languageOption": "{language} · {count, plural, =0 {alles Standard} other {# angepasst}}",
-    "surfaceCustomisedCount": "{count, plural, =0 {Alles Standard} other {# angepasst}}",
+    "surfaceSummary": "{unit, select, lists {{total, plural, one {# Liste} other {# Listen}}} other {{total, plural, one {# Feld} other {# Felder}}}} · {customised, plural, =0 {alles Standard} other {# angepasst}}",
     "saveButton": "Änderungen speichern",
     "savingButton": "Wird gespeichert…",
     "alertSuccess": "Tonalität gespeichert.",

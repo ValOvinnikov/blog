@@ -474,7 +474,7 @@
     "editingLanguageNote": "Vous modifiez : <strong>{language}</strong> — les autres langues gardent leur propre texte.",
     "languageAriaLabel": "Langue",
     "languageOption": "{language} · {count, plural, =0 {tout par défaut} one {# personnalisé} other {# personnalisés}}",
-    "surfaceCustomisedCount": "{count, plural, =0 {Tout par défaut} one {# personnalisé} other {# personnalisés}}",
+    "surfaceSummary": "{unit, select, lists {{total, plural, one {# liste} other {# listes}}} other {{total, plural, one {# champ} other {# champs}}}} · {customised, plural, =0 {tout par défaut} one {# personnalisé} other {# personnalisés}}",
     "saveButton": "Enregistrer les modifications",
     "savingButton": "Enregistrement…",
     "alertSuccess": "Voix enregistrée.",
