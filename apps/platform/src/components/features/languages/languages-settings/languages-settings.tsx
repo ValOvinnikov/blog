@@ -157,7 +157,13 @@ export const LanguagesSettings = ({
           })}
         />
         <Card.Body>
-          {notice && <Alert type={ALERT_TYPE.INFO} title={notice} />}
+          {notice && (
+            <Alert
+              type={ALERT_TYPE.INFO}
+              title={t('noticeTitle')}
+              description={notice}
+            />
+          )}
           {SUPPORTED_LOCALES.filter((locale) => locale !== defaultLocale).map(
             (locale) => {
               const isLive = values.includes(locale);

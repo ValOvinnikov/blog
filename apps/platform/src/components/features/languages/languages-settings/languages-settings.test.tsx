@@ -108,10 +108,10 @@ describe(`<${LanguagesSettings.name}/>`, () => {
   });
 
   describe('after a downgrade', () => {
-    it('asks which languages stay live and marks the rest as kept', () => {
+    it('says which languages stay live and marks the rest as kept', () => {
       setup({ locales: { stored: [NL, FR, DE], live: [NL, FR], limit: 2 } });
 
-      expect(screen.getByText(/Choose which stay live/)).toBeInTheDocument();
+      expect(screen.getByText(/The first 2 stay live/)).toBeInTheDocument();
       expect(screen.getByRole('switch', { name: 'German' })).toHaveAttribute(
         'data-unchecked',
         '',
