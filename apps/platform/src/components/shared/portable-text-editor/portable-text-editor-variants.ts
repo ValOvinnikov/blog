@@ -1,3 +1,5 @@
+import { CONTROL_MODE } from '@blog/config';
+import { DISABLED_READONLY_SURFACE_CLASSES } from '@platform/utils/disabled-state-classes/disabled-state-classes';
 import { INVALID_SURFACE_CLASSES } from '@platform/utils/invalid-state-classes/invalid-state-classes';
 import { tv } from '@platform/utils/tv/tv';
 
@@ -16,13 +18,20 @@ export const portableTextEditorVariants = tv({
     placeholder: ['text-admin-faint'],
   },
   variants: {
-    hasToolbar: {
-      true: { editable: ['rounded-t-none border-t-0'] },
-    },
-    isDisabled: {
-      true: {
-        editable: ['cursor-not-allowed text-admin-faint bg-admin-surface-2'],
+    mode: {
+      [CONTROL_MODE.EDITABLE]: { editable: ['rounded-t-none border-t-0'] },
+      [CONTROL_MODE.READ_ONLY]: {
+        editable: [DISABLED_READONLY_SURFACE_CLASSES, 'text-admin-muted'],
+      },
+      [CONTROL_MODE.DISABLED]: {
+        editable: [
+          DISABLED_READONLY_SURFACE_CLASSES,
+          'cursor-not-allowed text-admin-faint',
+        ],
       },
     },
+  },
+  defaultVariants: {
+    mode: CONTROL_MODE.EDITABLE,
   },
 });

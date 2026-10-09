@@ -1,6 +1,6 @@
 'use client';
 
-import { SIZE, type TEmailTemplateType } from '@blog/config';
+import { CONTROL_MODE, SIZE, type TEmailTemplateType } from '@blog/config';
 import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
 import { EmailLogoField } from '@platform/components/features/email/email-logo-field';
 import { Button } from '@platform/components/shared/button';
@@ -115,8 +115,8 @@ export const EmailTemplateEditor = ({
               key={bodyRevision}
               initialValue={copy.body ?? fallback.body}
               onChange={handleBodyChange}
-              ariaLabel={t('bodyLabel', { language: languageName })}
-              isDisabled={isDisabled}
+              field={{ label: t('bodyLabel', { language: languageName }) }}
+              mode={isDisabled ? CONTROL_MODE.DISABLED : CONTROL_MODE.EDITABLE}
               aria-describedby={[bodyHintId, archivedNoticeId]
                 .filter(Boolean)
                 .join(' ')}

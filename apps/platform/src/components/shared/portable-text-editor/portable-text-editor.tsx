@@ -1,5 +1,6 @@
 'use client';
 
+import { CONTROL_MODE, type TControlMode } from '@blog/config';
 import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
 import { sanitizeHref } from '@blog/email/html';
 import { EMAIL_PORTABLE_TEXT_SCHEMA } from '@platform/utils/portable-text-schema/portable-text-schema';
@@ -18,20 +19,24 @@ import {
 } from '@portabletext/editor';
 import { EventListenerPlugin, NodePlugin } from '@portabletext/editor/plugins';
 import * as selectors from '@portabletext/editor/selectors';
-import { useMemo, type AriaAttributes } from 'react';
+import type { AriaAttributes } from 'react';
 
 import { PortableTextEditorToolbar } from './components/toolbar/portable-text-editor-toolbar';
 import { portableTextEditorVariants } from './portable-text-editor-variants';
 
+type TPortableTextEditorField = {
+  label: string;
+  id?: string;
+  isInvalid?: boolean;
+};
+
 export type TPortableTextEditorProps<TBlock = TEmailTemplateBlock> = {
   initialValue: TBlock[];
   onChange: (value: TBlock[]) => void;
-  ariaLabel: string;
+  field: TPortableTextEditorField;
   schema?: SchemaDefinition;
-  id?: string;
   placeholder?: string;
-  isInvalid?: boolean;
-  isDisabled?: boolean;
+  mode?: TControlMode;
   'aria-describedby'?: AriaAttributes['aria-describedby'];
 };
 
@@ -131,53 +136,58 @@ const textBlock = defineTextBlock({
   render: (props) => <TextBlock {...props} />,
 });
 
+const linkClassName = portableTextEditorVariants().link();
+
+const nodes = [
+  strongDecorator,
+  emDecorator,
+  textBlock,
+  defineAnnotation({
+    type: 'link',
+    render: ({ annotation, children }) => {
+      const rawHref =
+        typeof annotation.href === 'string' ? annotation.href : '';
+      const safeHref = sanitizeHref(rawHref);
+      return (
+        <a
+          href={safeHref ?? undefined}
+          rel="noopener noreferrer"
+          className={safeHref ? linkClassName : undefined}
+        >
+          {children}
+        </a>
+      );
+    },
+  }),
+];
+
 export const PortableTextEditor = <TBlock = TEmailTemplateBlock,>({
   initialValue,
   onChange,
-  ariaLabel,
+  field,
   schema = EMAIL_PORTABLE_TEXT_SCHEMA,
-  id,
   placeholder,
-  isInvalid = false,
-  isDisabled = false,
+  mode = CONTROL_MODE.EDITABLE,
   'aria-describedby': ariaDescribedBy,
 }: TPortableTextEditorProps<TBlock>) => {
+  const { label, id, isInvalid = false } = field;
+  const isEditable = mode === CONTROL_MODE.EDITABLE;
   const {
     root,
     editable,
     placeholder: placeholderSlot,
-  } = portableTextEditorVariants({ isDisabled, hasToolbar: !isDisabled });
+  } = portableTextEditorVariants({ mode });
 
-  // @portabletext/editor drops role and aria-multiline entirely when readOnly; restore both so a disabled editor still announces as a (dimmed) text field instead of a nameless generic node.
-  const disabledFieldProps = isDisabled
-    ? { role: 'textbox', 'aria-multiline': true }
-    : {};
-
-  const nodes = useMemo(() => {
-    const linkClassName = portableTextEditorVariants({ isDisabled }).link();
-    return [
-      strongDecorator,
-      emDecorator,
-      textBlock,
-      defineAnnotation({
-        type: 'link',
-        render: ({ annotation, children }) => {
-          const rawHref =
-            typeof annotation.href === 'string' ? annotation.href : '';
-          const safeHref = sanitizeHref(rawHref);
-          return (
-            <a
-              href={safeHref ?? undefined}
-              rel="noopener noreferrer"
-              className={safeHref ? linkClassName : undefined}
-            >
-              {children}
-            </a>
-          );
-        },
-      }),
-    ];
-  }, [isDisabled]);
+  // @portabletext/editor drops role and aria-multiline entirely when readOnly; restore both so a non-editable editor still announces as a text field instead of a nameless generic node.
+  const nonEditableFieldProps = isEditable
+    ? {}
+    : {
+        role: 'textbox',
+        'aria-multiline': true,
+        ...(mode === CONTROL_MODE.DISABLED
+          ? { 'aria-disabled': true }
+          : { 'aria-readonly': true, tabIndex: 0 }),
+      };
 
   return (
     <div className={root()}>
@@ -188,7 +198,7 @@ export const PortableTextEditor = <TBlock = TEmailTemplateBlock,>({
             initialValue.length > 0
               ? (initialValue as PortableTextBlock[])
               : undefined,
-          readOnly: isDisabled,
+          readOnly: !isEditable,
         }}
       >
         <NodePlugin nodes={nodes} />
@@ -199,20 +209,19 @@ export const PortableTextEditor = <TBlock = TEmailTemplateBlock,>({
             }
           }}
         />
-        {!isDisabled && <PortableTextEditorToolbar schema={schema} />}
+        {isEditable && <PortableTextEditorToolbar schema={schema} />}
         <PortableTextEditable
           id={id}
-          aria-label={ariaLabel}
+          aria-label={label}
           aria-describedby={ariaDescribedBy}
           aria-invalid={isInvalid || undefined}
           data-invalid={isInvalid || undefined}
-          aria-disabled={isDisabled || undefined}
           renderPlaceholder={
             placeholder
               ? () => <span className={placeholderSlot()}>{placeholder}</span>
               : undefined
           }
-          {...disabledFieldProps}
+          {...nonEditableFieldProps}
           className={editable()}
         />
       </EditorProvider>
