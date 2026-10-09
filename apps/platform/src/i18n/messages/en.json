@@ -343,7 +343,6 @@
     "modeDark": "Dark",
     "previewColorSchemeAriaLabel": "Preview color scheme",
     "livePreviewHeading": "Live preview",
-    "livePreviewDescription": "Real @blog/ui primitives",
     "sampleHeading": "Reading the tide charts",
     "samplePara": "A short dispatch to show heading and body type, accent, logo tones, and radius together.",
     "subscribeButton": "Subscribe",
@@ -355,7 +354,7 @@
     "secondCardExcerpt": "A static card. Its frame follows your card style.",
     "outlinedCardHeading": "Newsletter",
     "outlinedCardBody": "An outlined card, as panels and pricing tiers render it.",
-    "previewNote": "Unsaved form state → CSS custom properties, matching production's OKLCH ramp. Nothing here is live until you save.",
+    "previewNote": "Built from the site's own components. Nothing is live until you save.",
     "widthDesktop": "Desktop",
     "widthMobile": "Mobile",
     "previewWidthAriaLabel": "Preview width"

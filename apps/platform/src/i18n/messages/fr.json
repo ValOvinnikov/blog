@@ -343,7 +343,6 @@
     "modeDark": "Sombre",
     "previewColorSchemeAriaLabel": "Jeu de couleurs de l'aperçu",
     "livePreviewHeading": "Aperçu en direct",
-    "livePreviewDescription": "Véritables primitives @blog/ui",
     "sampleHeading": "Lire les tables des marées",
     "samplePara": "Une courte chronique pour montrer ensemble la typographie des titres et du texte, l'accent, les nuances du logo et l'arrondi.",
     "subscribeButton": "S'abonner",
@@ -355,7 +354,7 @@
     "secondCardExcerpt": "Une carte statique. Son cadre suit votre style de carte.",
     "outlinedCardHeading": "Newsletter",
     "outlinedCardBody": "Une carte à contour, telle que l'affichent les panneaux et les offres tarifaires.",
-    "previewNote": "État du formulaire non enregistré → propriétés CSS personnalisées, selon la même rampe OKLCH qu'en production. Rien n'est publié avant l'enregistrement.",
+    "previewNote": "Construit à partir des composants du site. Rien n'est publié avant l'enregistrement.",
     "widthDesktop": "Ordinateur",
     "widthMobile": "Mobile",
     "previewWidthAriaLabel": "Largeur de l'aperçu"

@@ -343,7 +343,6 @@
     "modeDark": "Dunkel",
     "previewColorSchemeAriaLabel": "Farbschema der Vorschau",
     "livePreviewHeading": "Live-Vorschau",
-    "livePreviewDescription": "Echte @blog/ui-Primitive",
     "sampleHeading": "Gezeitentabellen lesen",
     "samplePara": "Ein kurzer Bericht, der Überschriften- und Fließtextschrift, Akzent, Logo-Töne und Eckenradius zusammen zeigt.",
     "subscribeButton": "Abonnieren",
@@ -355,7 +354,7 @@
     "secondCardExcerpt": "Eine statische Karte. Ihr Rahmen folgt Ihrem Kartenstil.",
     "outlinedCardHeading": "Newsletter",
     "outlinedCardBody": "Eine umrandete Karte, wie Panels und Preisstufen sie darstellen.",
-    "previewNote": "Ungespeicherter Formularzustand → CSS Custom Properties, passend zur OKLCH-Abstufung in Produktion. Hier ist nichts live, bis Sie speichern.",
+    "previewNote": "Aus den eigenen Komponenten der Website gebaut. Nichts ist live, bis Sie speichern.",
     "widthDesktop": "Desktop",
     "widthMobile": "Mobil",
     "previewWidthAriaLabel": "Vorschaubreite"
