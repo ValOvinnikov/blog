@@ -2,7 +2,7 @@ import { tv } from '@platform/utils/tv/tv';
 
 export const hueSliderVariants = tv({
   slots: {
-    root: ['min-w-40 flex-1 touch-none select-none'],
+    root: ['min-w-24 flex-1 touch-none select-none'],
     control: ['flex items-center py-2'],
     track: [
       'relative h-3 w-full grow rounded-full bg-admin-line-2',
