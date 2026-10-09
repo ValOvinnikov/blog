@@ -858,7 +858,9 @@
     "upgradeNotice": "Ihr Tarif veröffentlicht nur die Standardsprache. Führen Sie ein Upgrade durch, um weitere Sprachen hinzuzufügen.",
     "downgradeNotice": "Ihr Tarif veröffentlicht {allowed, plural, one {# zusätzliche Sprache} other {# zusätzliche Sprachen}}, gespeichert sind jedoch {stored}. Wählen Sie, welche live bleiben — die anderen bleiben erhalten, und nichts wird gelöscht.",
     "keptBadge": "Erhalten, in Ihrem Tarif nicht live",
-    "planLockedBadge": "Nicht in Ihrem Tarif"
+    "planLockedBadge": "Nicht in Ihrem Tarif",
+    "atLimitLockedReason": "Schalten Sie eine aus, um diese einzuschalten",
+    "overLimitLockedReason": "Führen Sie ein Tarif-Upgrade durch, um dies zu ändern"
   },
   "saveBar": {
     "regionLabel": "Ungespeicherte Änderungen",

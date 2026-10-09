@@ -858,7 +858,9 @@
     "upgradeNotice": "Votre formule ne publie que la langue par défaut. Passez à une formule supérieure pour ajouter d'autres langues.",
     "downgradeNotice": "Votre formule publie {allowed, plural, one {# langue supplémentaire} other {# langues supplémentaires}}, mais {stored} sont enregistrées. Choisissez celles qui restent en ligne — les autres sont conservées et rien n'est supprimé.",
     "keptBadge": "Conservée, non publiée avec votre formule",
-    "planLockedBadge": "Non incluse dans votre formule"
+    "planLockedBadge": "Non incluse dans votre formule",
+    "atLimitLockedReason": "Désactivez-en une pour activer celle-ci",
+    "overLimitLockedReason": "Passez à une formule supérieure pour modifier ceci"
   },
   "saveBar": {
     "regionLabel": "Modifications non enregistrées",
