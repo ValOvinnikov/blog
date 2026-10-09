@@ -21,6 +21,19 @@
     "heading": "Your workspace isn't ready yet",
     "description": "This can happen while a workspace is being set up, or if something went wrong along the way. Try refreshing in a few minutes, or contact whoever invited you if it keeps happening."
   },
+  "notFoundPage": {
+    "heading": "Page not found",
+    "description": "This page doesn't exist, or you don't have access to it.",
+    "backLink": "Back to home"
+  },
+  "errorPage": {
+    "heading": "Something went wrong",
+    "description": "This page couldn't load. Try again, and if it keeps happening, come back in a few minutes.",
+    "retry": "Try again"
+  },
+  "pageSkeleton": {
+    "label": "Loading page…"
+  },
   "sidebar": {
     "brandName": "Valstack",
     "brandTagline": "admin",
@@ -757,7 +770,8 @@
   "archivedTenantsToggle": {
     "ariaLabel": "Tenant visibility",
     "activeOption": "Active",
-    "allOption": "All"
+    "allOption": "All",
+    "loading": "Loading tenants…"
   },
   "deprovisionTenantControl": {
     "cardTitle": "Deprovision this tenant",

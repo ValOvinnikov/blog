@@ -11,6 +11,5 @@ export const findingsCardVariants = tv({
     kindText: ['block text-[13px] text-admin-text'],
     sourceText: ['block text-[12px] text-admin-muted'],
     time: ['flex-none pt-0.5 text-[12px] text-admin-muted'],
-    empty: ['text-[13px] text-admin-muted'],
   },
 });

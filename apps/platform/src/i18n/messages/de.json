@@ -21,6 +21,19 @@
     "heading": "Ihr Arbeitsbereich ist noch nicht bereit",
     "description": "Das kann passieren, während ein Arbeitsbereich eingerichtet wird oder wenn dabei etwas schiefgelaufen ist. Laden Sie die Seite in ein paar Minuten neu oder wenden Sie sich an die Person, die Sie eingeladen hat, falls das Problem bestehen bleibt."
   },
+  "notFoundPage": {
+    "heading": "Seite nicht gefunden",
+    "description": "Diese Seite existiert nicht, oder Sie haben keinen Zugriff darauf.",
+    "backLink": "Zur Startseite"
+  },
+  "errorPage": {
+    "heading": "Etwas ist schiefgelaufen",
+    "description": "Diese Seite konnte nicht geladen werden. Versuchen Sie es erneut, und falls das Problem bleibt, kommen Sie in ein paar Minuten wieder.",
+    "retry": "Erneut versuchen"
+  },
+  "pageSkeleton": {
+    "label": "Seite wird geladen…"
+  },
   "sidebar": {
     "brandName": "Valstack",
     "brandTagline": "admin",
@@ -757,7 +770,8 @@
   "archivedTenantsToggle": {
     "ariaLabel": "Sichtbarkeit der Mandanten",
     "activeOption": "Aktiv",
-    "allOption": "Alle"
+    "allOption": "Alle",
+    "loading": "Mandanten werden geladen…"
   },
   "deprovisionTenantControl": {
     "cardTitle": "Diesen Mandanten deprovisionieren",

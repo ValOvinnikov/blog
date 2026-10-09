@@ -55,14 +55,14 @@ export const DomainPageContent = ({
         />
         <Card.Body>
           {isVerified ? (
-            <Text variant="muted">{t('verifiedEmptyState')}</Text>
+            <Text variant="supporting">{t('verifiedEmptyState')}</Text>
           ) : (
             <>
               <Text variant="supporting">{t('bodyCopy')}</Text>
               {dnsRecords && dnsRecords.length > 0 ? (
                 <DnsRecordsTable records={dnsRecords} />
               ) : (
-                <Text variant="muted">{t('unavailableState')}</Text>
+                <Text variant="supporting">{t('unavailableState')}</Text>
               )}
             </>
           )}
