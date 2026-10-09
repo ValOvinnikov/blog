@@ -9,7 +9,7 @@ export const switchVariants = tv({
       ...HAS_DISABLED_DESCENDANT_AFFORDANCE_CLASSES,
     ],
     track: [
-      'relative h-5 w-9 shrink-0 cursor-pointer rounded-full bg-admin-line',
+      'relative h-5 w-9 shrink-0 cursor-pointer rounded-full bg-admin-control-line',
       'transition-colors duration-150',
       'data-[checked]:bg-admin-brand',
       'data-[disabled]:cursor-not-allowed',

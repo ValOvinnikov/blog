@@ -11,7 +11,7 @@ export const fontPickerVariants = tv({
       ...HAS_DISABLED_DESCENDANT_AFFORDANCE_CLASSES,
     ],
     radioRoot: [
-      'flex size-4 shrink-0 items-center justify-center rounded-full border-[1.5px] border-admin-line',
+      'flex size-4 shrink-0 items-center justify-center rounded-full border-[1.5px] border-admin-control-line',
       'data-[checked]:border-admin-brand',
       'outline-hidden focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
     ],
