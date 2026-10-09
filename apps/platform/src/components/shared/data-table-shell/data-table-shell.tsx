@@ -1,51 +1,50 @@
 import { Card } from '@platform/components/shared/card';
-import type { ReactNode } from 'react';
+import type { TCompoundComponent } from '@platform/lib/react';
+import type { ElementType, ReactNode } from 'react';
 
+import { DataTableShellCell } from './components/cell/data-table-shell-cell';
+import { DataTableShellRow } from './components/row/data-table-shell-row';
 import { dataTableShellVariants } from './data-table-shell-variants';
+
+const DataTableShellParts = {
+  Row: DataTableShellRow,
+  Cell: DataTableShellCell,
+} satisfies Record<string, ElementType>;
 
 type TDataTableShellColumn = {
   key: string;
   label: ReactNode;
 };
 
-type TDataTableShellClassNames = {
-  card: string;
-  table: string;
-  head: string;
-  empty: string;
-};
-
-export type TDataTableShellProps<TItem> = {
+type TDataTableShellProps<TItem> = {
   items: TItem[];
   emptyMessage: string;
   ariaLabel: string;
   columns: TDataTableShellColumn[];
   renderRow: (item: TItem) => ReactNode;
-  classNames: TDataTableShellClassNames;
 };
 
-export const DataTableShell = <TItem,>({
+const DataTableShellRoot = <TItem,>({
   items,
   emptyMessage,
   ariaLabel,
   columns,
   renderRow,
-  classNames,
 }: TDataTableShellProps<TItem>) => {
+  const { card, scrollRegion, table, head, empty } = dataTableShellVariants();
+
   if (items.length === 0) {
     return (
-      <Card className={classNames.card}>
+      <Card className={card()}>
         <Card.Body>
-          <p className={classNames.empty}>{emptyMessage}</p>
+          <p className={empty()}>{emptyMessage}</p>
         </Card.Body>
       </Card>
     );
   }
 
-  const { scrollRegion } = dataTableShellVariants();
-
   return (
-    <Card className={classNames.card}>
+    <Card className={card()}>
       {/* Focusable so Safari, which skips scroll containers, can scroll it by keyboard. */}
       <div
         className={scrollRegion()}
@@ -53,11 +52,11 @@ export const DataTableShell = <TItem,>({
         aria-label={ariaLabel}
         tabIndex={0}
       >
-        <table className={classNames.table}>
+        <table className={table()}>
           <thead>
             <tr>
               {columns.map((column) => (
-                <th className={classNames.head} scope="col" key={column.key}>
+                <th className={head()} scope="col" key={column.key}>
                   {column.label}
                 </th>
               ))}
@@ -69,3 +68,8 @@ export const DataTableShell = <TItem,>({
     </Card>
   );
 };
+
+export const DataTableShell: TCompoundComponent<
+  typeof DataTableShellRoot,
+  typeof DataTableShellParts
+> = Object.assign(DataTableShellRoot, DataTableShellParts);

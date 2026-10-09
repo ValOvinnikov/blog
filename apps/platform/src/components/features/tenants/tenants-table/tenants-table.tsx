@@ -25,30 +25,13 @@ export const TenantsTable = ({ tenants }: TTenantsTableProps) => {
   const t = useTranslations('tenantsTable');
   const tView = useTranslations('tenantsView');
   const locale = useLocale();
-  const {
-    card,
-    table,
-    head,
-    visuallyHidden,
-    row,
-    cell,
-    tname,
-    name,
-    domain,
-    empty,
-  } = tenantsTableVariants();
+  const { visuallyHidden, tname, name, domain } = tenantsTableVariants();
 
   return (
     <DataTableShell
       items={tenants}
       emptyMessage={t('empty')}
       ariaLabel={tView('title')}
-      classNames={{
-        card: card(),
-        table: table(),
-        head: head(),
-        empty: empty(),
-      }}
       columns={[
         { key: 'tenant', label: t('columnTenant') },
         { key: 'plan', label: t('columnPlan') },
@@ -60,8 +43,8 @@ export const TenantsTable = ({ tenants }: TTenantsTableProps) => {
         },
       ]}
       renderRow={(tenant) => (
-        <tr className={row()} key={tenant.id}>
-          <td className={cell()}>
+        <DataTableShell.Row key={tenant.id}>
+          <DataTableShell.Cell>
             <div className={tname()}>
               <Avatar name={tenant.name} variant="table" />
               <div>
@@ -69,23 +52,23 @@ export const TenantsTable = ({ tenants }: TTenantsTableProps) => {
                 <div className={domain()}>{tenant.primaryDomain}</div>
               </div>
             </div>
-          </td>
-          <td className={cell()}>
+          </DataTableShell.Cell>
+          <DataTableShell.Cell>
             <StatusBadge tone="plan" hasDot={false}>
               {t(`plan.${tenant.plan}`)}
             </StatusBadge>
-          </td>
-          <td className={cell()}>
+          </DataTableShell.Cell>
+          <DataTableShell.Cell>
             <StatusBadge tone={tenantStatusTone(tenant.status)}>
               {t(`status.${tenant.status}`)}
             </StatusBadge>
-          </td>
-          <td className={cell()}>
+          </DataTableShell.Cell>
+          <DataTableShell.Cell>
             <time dateTime={tenant.createdAt.toISOString()}>
               {formatDate(tenant.createdAt, locale)}
             </time>
-          </td>
-          <td className={cell()}>
+          </DataTableShell.Cell>
+          <DataTableShell.Cell>
             <LinkButton
               href={manageHrefFor(tenant)}
               variant="secondary"
@@ -95,8 +78,8 @@ export const TenantsTable = ({ tenants }: TTenantsTableProps) => {
             >
               {t('manage')}
             </LinkButton>
-          </td>
-        </tr>
+          </DataTableShell.Cell>
+        </DataTableShell.Row>
       )}
     />
   );
