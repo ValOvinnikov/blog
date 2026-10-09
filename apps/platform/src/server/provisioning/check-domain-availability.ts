@@ -14,9 +14,9 @@ import { fetchVercel, readVercelCredentials } from './vercel-domains-api';
 // entry per tenant and will genuinely paginate as the platform grows. Caps
 // the round trips a single tenant-creation submission can incur: if a
 // conclusive answer (a conflict, or the last page) isn't reached within
-// this many pages, the check returns 'ERROR' rather than guessing
-// 'AVAILABLE' — a false "no conflict" is worse than an inconclusive one,
-// since 'ERROR' still just degrades to "can't tell, let creation proceed."
+// this many pages, the check returns ERROR rather than guessing
+// AVAILABLE — a false "no conflict" is worse than an inconclusive one,
+// since ERROR still just degrades to "can't tell, let creation proceed."
 const MAX_PROJECT_DOMAINS_PAGES = 5;
 
 type TProjectDomainsPage = {

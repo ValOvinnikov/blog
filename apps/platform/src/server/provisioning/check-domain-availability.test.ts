@@ -1,3 +1,4 @@
+import { DOMAIN_AVAILABILITY } from '@blog/config';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 
@@ -36,14 +37,14 @@ describe(checkDomainAvailability, () => {
 
     const result = await checkDomainAvailability('example.com');
 
-    expect(result).toBe('NOT_CONFIGURED');
+    expect(result).toBe(DOMAIN_AVAILABILITY.NOT_CONFIGURED);
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it('rejects a domain containing path-traversal characters without making a request', async () => {
     const result = await checkDomainAvailability('../../v1/domains/other');
 
-    expect(result).toBe('ERROR');
+    expect(result).toBe(DOMAIN_AVAILABILITY.ERROR);
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
@@ -52,7 +53,7 @@ describe(checkDomainAvailability, () => {
 
     const result = await checkDomainAvailability('example.com');
 
-    expect(result).toBe('AVAILABLE');
+    expect(result).toBe(DOMAIN_AVAILABILITY.AVAILABLE);
   });
 
   it('returns AVAILABLE when the domain is attached only to the shared web project', async () => {
@@ -67,7 +68,7 @@ describe(checkDomainAvailability, () => {
 
     const result = await checkDomainAvailability('example.com');
 
-    expect(result).toBe('AVAILABLE');
+    expect(result).toBe(DOMAIN_AVAILABILITY.AVAILABLE);
   });
 
   it('returns IN_USE when the domain is attached to a different project', async () => {
@@ -82,7 +83,7 @@ describe(checkDomainAvailability, () => {
 
     const result = await checkDomainAvailability('example.com');
 
-    expect(result).toBe('IN_USE');
+    expect(result).toBe(DOMAIN_AVAILABILITY.IN_USE);
   });
 
   it('matches the response name case-insensitively and ignoring a trailing dot', async () => {
@@ -97,7 +98,7 @@ describe(checkDomainAvailability, () => {
 
     const result = await checkDomainAvailability('example.com');
 
-    expect(result).toBe('IN_USE');
+    expect(result).toBe(DOMAIN_AVAILABILITY.IN_USE);
   });
 
   it('requests the apex domain and matches the full domain in the response', async () => {
@@ -119,7 +120,7 @@ describe(checkDomainAvailability, () => {
   it('returns ERROR with no request, and logs, when the apex domain is undeterminable', async () => {
     const result = await checkDomainAvailability('co.uk');
 
-    expect(result).toBe('ERROR');
+    expect(result).toBe(DOMAIN_AVAILABILITY.ERROR);
     expect(fetchMock).not.toHaveBeenCalled();
     expect(loggerErrorMock).toHaveBeenCalledWith(
       'tenants.domain_availability_apex_undetermined',
@@ -130,7 +131,7 @@ describe(checkDomainAvailability, () => {
   it('returns ERROR with no request for an IP-literal host', async () => {
     const result = await checkDomainAvailability('1.2.3.4');
 
-    expect(result).toBe('ERROR');
+    expect(result).toBe(DOMAIN_AVAILABILITY.ERROR);
     expect(fetchMock).not.toHaveBeenCalled();
     expect(loggerErrorMock).toHaveBeenCalledWith(
       'tenants.domain_availability_apex_undetermined',
@@ -153,7 +154,7 @@ describe(checkDomainAvailability, () => {
 
     const result = await checkDomainAvailability('blog-dev.valstack.dev');
 
-    expect(result).toBe('IN_USE');
+    expect(result).toBe(DOMAIN_AVAILABILITY.IN_USE);
     const [calledUrl] = fetchMock.mock.calls[0] as [URL];
     expect(calledUrl.pathname).toBe('/v1/domains/valstack.dev/project-domains');
   });
@@ -172,7 +173,7 @@ describe(checkDomainAvailability, () => {
 
     const result = await checkDomainAvailability('blog-dev.valstack.dev');
 
-    expect(result).toBe('AVAILABLE');
+    expect(result).toBe(DOMAIN_AVAILABILITY.AVAILABLE);
     const [calledUrl] = fetchMock.mock.calls[0] as [URL];
     expect(calledUrl.pathname).toBe('/v1/domains/valstack.dev/project-domains');
   });
@@ -191,7 +192,7 @@ describe(checkDomainAvailability, () => {
 
     const result = await checkDomainAvailability('example.com');
 
-    expect(result).toBe('AVAILABLE');
+    expect(result).toBe(DOMAIN_AVAILABILITY.AVAILABLE);
   });
 
   it('follows the pagination cursor to a conflict that only appears on a later page', async () => {
@@ -224,7 +225,7 @@ describe(checkDomainAvailability, () => {
 
     const result = await checkDomainAvailability('blog-dev.valstack.dev');
 
-    expect(result).toBe('IN_USE');
+    expect(result).toBe(DOMAIN_AVAILABILITY.IN_USE);
     expect(fetchMock).toHaveBeenCalledTimes(2);
     const secondCall = fetchMock.mock.calls[1];
     const secondCalledUrl = secondCall?.[0] as URL;
@@ -246,7 +247,7 @@ describe(checkDomainAvailability, () => {
 
     const result = await checkDomainAvailability('blog-dev.valstack.dev');
 
-    expect(result).toBe('IN_USE');
+    expect(result).toBe(DOMAIN_AVAILABILITY.IN_USE);
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
@@ -270,7 +271,7 @@ describe(checkDomainAvailability, () => {
 
     const result = await checkDomainAvailability('blog-dev.valstack.dev');
 
-    expect(result).toBe('ERROR');
+    expect(result).toBe(DOMAIN_AVAILABILITY.ERROR);
     expect(fetchMock).toHaveBeenCalledTimes(5);
   });
 
@@ -279,7 +280,7 @@ describe(checkDomainAvailability, () => {
 
     const result = await checkDomainAvailability('example.com');
 
-    expect(result).toBe('ERROR');
+    expect(result).toBe(DOMAIN_AVAILABILITY.ERROR);
   });
 
   it('returns ERROR when the request throws or times out', async () => {
@@ -287,6 +288,6 @@ describe(checkDomainAvailability, () => {
 
     const result = await checkDomainAvailability('example.com');
 
-    expect(result).toBe('ERROR');
+    expect(result).toBe(DOMAIN_AVAILABILITY.ERROR);
   });
 });

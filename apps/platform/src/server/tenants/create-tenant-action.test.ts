@@ -1,4 +1,8 @@
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import {
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  DOMAIN_AVAILABILITY,
+} from '@blog/config';
 import { auth, signIn } from '@platform/server/auth/auth';
 import { createOwnerInviteToken } from '@platform/server/tenants/owner-invite-token';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
@@ -106,7 +110,9 @@ describe('createTenantAction', () => {
     getTenantByDomainMock.mockReset();
     getTenantByDomainMock.mockResolvedValue(undefined);
     checkDomainAvailabilityMock.mockReset();
-    checkDomainAvailabilityMock.mockResolvedValue('AVAILABLE');
+    checkDomainAvailabilityMock.mockResolvedValue(
+      DOMAIN_AVAILABILITY.AVAILABLE,
+    );
     createTenantDraftMock.mockReset();
     createTenantDraftMock.mockResolvedValue({
       ok: true,
@@ -283,7 +289,7 @@ describe('createTenantAction', () => {
   });
 
   it('returns a field error and blocks creation when another project uses the domain', async () => {
-    checkDomainAvailabilityMock.mockResolvedValue('IN_USE');
+    checkDomainAvailabilityMock.mockResolvedValue(DOMAIN_AVAILABILITY.IN_USE);
 
     const result = await createTenantAction(validInput);
 
@@ -295,7 +301,9 @@ describe('createTenantAction', () => {
   });
 
   it('proceeds with creation when the domain is free', async () => {
-    checkDomainAvailabilityMock.mockResolvedValue('AVAILABLE');
+    checkDomainAvailabilityMock.mockResolvedValue(
+      DOMAIN_AVAILABILITY.AVAILABLE,
+    );
 
     await expect(createTenantAction(validInput)).rejects.toThrow(
       'NEXT_REDIRECT',
@@ -305,7 +313,9 @@ describe('createTenantAction', () => {
   });
 
   it('proceeds with creation unchecked when Vercel credentials are absent', async () => {
-    checkDomainAvailabilityMock.mockResolvedValue('NOT_CONFIGURED');
+    checkDomainAvailabilityMock.mockResolvedValue(
+      DOMAIN_AVAILABILITY.NOT_CONFIGURED,
+    );
 
     await expect(createTenantAction(validInput)).rejects.toThrow(
       'NEXT_REDIRECT',
@@ -315,7 +325,7 @@ describe('createTenantAction', () => {
   });
 
   it('proceeds with creation when the domain-availability check errors or times out', async () => {
-    checkDomainAvailabilityMock.mockResolvedValue('ERROR');
+    checkDomainAvailabilityMock.mockResolvedValue(DOMAIN_AVAILABILITY.ERROR);
 
     await expect(createTenantAction(validInput)).rejects.toThrow(
       'NEXT_REDIRECT',

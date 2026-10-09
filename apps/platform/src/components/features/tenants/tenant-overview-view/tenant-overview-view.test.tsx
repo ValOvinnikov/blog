@@ -1,4 +1,8 @@
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import {
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  DOMAIN_VERIFICATION_STATUS,
+} from '@blog/config';
 import {
   FINDING_KIND,
   FINDING_SEVERITY,
@@ -90,7 +94,7 @@ const makeFinding = (overrides: Partial<TFinding> = {}): TFinding => ({
 
 const defaultProps: TTenantOverviewViewProps = {
   tenant: makeTenant(),
-  domainVerificationStatus: 'NOT_CONFIGURED',
+  domainVerificationStatus: DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED,
   ownerEmail: 'owner@example.com',
   ownerJoinedAt: 'Aug 12, 2026',
   ownerJoinedAtIso: '2026-08-12T00:00:00.000Z',
@@ -169,7 +173,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
           ]),
         ) as unknown as TTenantProvisioningState,
       }),
-      domainVerificationStatus: 'VERIFIED',
+      domainVerificationStatus: DOMAIN_VERIFICATION_STATUS.VERIFIED,
     });
 
     expect(screen.getByText('Provisioned')).toBeVisible();
@@ -311,7 +315,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
         primaryDomain: 'acme.example.com',
         sanityProjectId: 'proj-1',
       }),
-      domainVerificationStatus: 'VERIFIED',
+      domainVerificationStatus: DOMAIN_VERIFICATION_STATUS.VERIFIED,
       auditEvents: [makeEvent()],
       findings: [makeFinding()],
     });
