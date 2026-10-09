@@ -471,7 +471,7 @@
     "description": "Formulieren Sie die seitenweiten Hinweise der Website um. Jedes Feld hat einen Standardtext – ändern Sie nur, was nach Ihnen klingen soll.",
     "fixedCopyNote": "Schaltflächen, Menüs und Beschriftungen werden für Sie übersetzt und sind auf jeder Website gleich, deshalb sind sie hier nicht aufgeführt.",
     "editingLanguageNote": "Sie bearbeiten <strong>{language}</strong> — andere Sprachen behalten ihren eigenen Text.",
-    "surfaceCustomisedCount": "{count, plural, =0 {Alles Standard} other {# angepasst}}",
+    "surfaceSummary": "{unit, select, lists {{total, plural, one {# Liste} other {# Listen}}} other {{total, plural, one {# Feld} other {# Felder}}}} · {customised, plural, =0 {alles Standard} other {# angepasst}}",
     "saveButton": "Änderungen speichern",
     "savingButton": "Wird gespeichert…",
     "alertSuccess": "Tonalität gespeichert.",

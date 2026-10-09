@@ -11,7 +11,7 @@ export const voiceSurfaceCardVariants = tv({
       'font-mono text-[11px] font-bold uppercase tracking-[.06em] text-admin-muted',
     ],
     previewNote: ['text-[12px] text-admin-muted'],
-    customisedCount: ['text-[12px] font-medium text-admin-muted'],
+    summary: ['text-[12px] font-medium text-admin-muted'],
   },
   variants: {
     isPreviewOpen: {

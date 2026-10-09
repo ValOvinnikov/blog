@@ -75,7 +75,7 @@ export const VoiceSurfaceCard = ({
     preview,
     previewLabel,
     previewNote,
-    customisedCount,
+    summary,
   } = voiceSurfaceCardVariants({ isPreviewOpen });
   const fields = voiceFieldsOf(surface);
   const trackFocusOf = (id: TVoiceFieldId) => ({
@@ -103,9 +103,11 @@ export const VoiceSurfaceCard = ({
           supportingText={tDescriptions(surface)}
           headingLevel={2}
           actions={
-            <span className={customisedCount()}>
-              {t('surfaceCustomisedCount', {
-                count: countCustomisedVoiceFields(values, fields),
+            <span className={summary()}>
+              {t('surfaceSummary', {
+                unit: surface === VOICE_SURFACE.ARCHIVE ? 'lists' : 'fields',
+                total: fields.length,
+                customised: countCustomisedVoiceFields(values, fields),
               })}
             </span>
           }
