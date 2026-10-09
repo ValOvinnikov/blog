@@ -1,41 +1,56 @@
-import { customRender, screen } from '@platform/testing/custom-render';
-import userEvent from '@testing-library/user-event';
+import { VOICE_FIELDS } from '@blog/config';
+import { Accordion } from '@platform/components/shared/accordion';
+import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import type { ComponentProps } from 'react';
 
 import { VoiceListRow } from './voice-list-row';
 
-const setup = customRender(VoiceListRow, {
-  label: 'Tag page',
-  text: 'No posts tagged {name} yet.',
-  isCustomised: false,
-  isUnsaved: false,
-  hasError: false,
-  onOpen: vi.fn(),
-});
+const tagEmpty = VOICE_FIELDS.find(({ id }) => id === 'tagEmpty')!;
+
+const setup = (overrides: Partial<ComponentProps<typeof VoiceListRow>> = {}) =>
+  renderWithIntl(
+    <Accordion
+      openValue={overrides.isOpen ? 'tagEmpty' : undefined}
+      onOpenValueChange={vi.fn()}
+    >
+      <VoiceListRow
+        field={tagEmpty}
+        locale="EN"
+        value={null}
+        savedValue={null}
+        hasError={false}
+        isOpen={false}
+        {...overrides}
+      >
+        <p>Editor</p>
+      </VoiceListRow>
+    </Accordion>,
+  );
 
 describe(`<${VoiceListRow.name}/>`, () => {
-  it('summarises the list as a collapsed button with its current text and status', () => {
+  it('summarises a closed list with its route, default text and status', () => {
     setup();
 
     const row = screen.getByRole('button', { name: /Tag page/ });
     expect(row).toHaveAttribute('aria-expanded', 'false');
-    expect(row).toHaveTextContent('No posts tagged {name} yet.');
+    expect(row).toHaveTextContent('/tags/…');
     expect(row).toHaveTextContent('Default');
   });
 
-  it('announces an unsaved customised value', () => {
-    setup({ isCustomised: true, isUnsaved: true });
+  it('summarises a customised value and announces that it is unsaved', () => {
+    setup({ value: 'Nothing tagged {name}.' });
 
-    expect(screen.getByRole('button', { name: /Tag page/ })).toHaveTextContent(
-      'UnsavedCustomised',
-    );
+    const row = screen.getByRole('button', { name: /Tag page/ });
+    expect(row).toHaveTextContent('Nothing tagged {name}.');
+    expect(row).toHaveTextContent('UnsavedCustomised');
   });
 
-  it('opens the list when pressed', async () => {
-    const onOpen = vi.fn();
-    setup({ onOpen });
+  it('trades the summary for its editor when open', () => {
+    setup({ isOpen: true });
 
-    await userEvent.setup().click(screen.getByRole('button'));
-
-    expect(onOpen).toHaveBeenCalledTimes(1);
+    const row = screen.getByRole('button', { name: /Tag page/ });
+    expect(row).toHaveAttribute('aria-expanded', 'true');
+    expect(row).not.toHaveTextContent('Default');
+    expect(screen.getByText('Editor')).toBeVisible();
   });
 });

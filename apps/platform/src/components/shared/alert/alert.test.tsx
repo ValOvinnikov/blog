@@ -21,6 +21,15 @@ describe(Alert, () => {
     expect(screen.getByText('Provisioned')).toBeVisible();
   });
 
+  it('renders a description without a title', () => {
+    render(
+      <Alert type={ALERT_TYPE.INFO} description="Labels are translated." />,
+    );
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'Labels are translated.',
+    );
+  });
+
   it('renders rich content in its description', () => {
     render(
       <Alert

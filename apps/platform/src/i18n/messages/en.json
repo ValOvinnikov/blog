@@ -290,9 +290,8 @@
     "logoHueDescription": "Tints the wordmark's tonal steps (--logo-1/2/3). Follows the accent hue unless you set it.",
     "brandImagesDescription": "Stored in Vercel Blob — no on-the-fly transforms, so what you upload is what ships.",
     "logoFieldLabel": "Logo",
-    "logoFieldHint": "PNG, JPEG, WebP, or SVG · falls back to the polygon wordmark",
     "faviconFieldLabel": "Favicon",
-    "faviconFieldHint": "Pre-cropped square, please — Blob can't crop it for you (an SVG's viewBox counts as its shape). Non-square uploads are rejected.",
+    "brandFieldsHint": "Logo: PNG, JPEG, WebP or SVG. Favicon: a square image.",
     "optionalTag": "optional",
     "headingFontLabel": "Heading font",
     "bodyFontLabel": "Body font",
@@ -343,7 +342,6 @@
     "modeDark": "Dark",
     "previewColorSchemeAriaLabel": "Preview color scheme",
     "livePreviewHeading": "Live preview",
-    "livePreviewDescription": "Real @blog/ui primitives",
     "sampleHeading": "Reading the tide charts",
     "samplePara": "A short dispatch to show heading and body type, accent, logo tones, and radius together.",
     "subscribeButton": "Subscribe",
@@ -355,12 +353,13 @@
     "secondCardExcerpt": "A static card. Its frame follows your card style.",
     "outlinedCardHeading": "Newsletter",
     "outlinedCardBody": "An outlined card, as panels and pricing tiers render it.",
-    "previewNote": "Unsaved form state → CSS custom properties, matching production's OKLCH ramp. Nothing here is live until you save.",
+    "previewNote": "Built from the site's own components. Nothing is live until you save.",
     "widthDesktop": "Desktop",
     "widthMobile": "Mobile",
     "previewWidthAriaLabel": "Preview width"
   },
   "brandAssetField": {
+    "savesWithChanges": "Saves with changes",
     "unexpectedError": "Something went wrong — try again.",
     "currentAlt": "Current {label}",
     "uploading": "Uploading…",
@@ -371,7 +370,7 @@
   },
   "emailForm": {
     "pageHeading": "Email",
-    "pageSubtitle": "Sender identity and per-template copy for every email this tenant sends.",
+    "pageSubtitle": "The emails your readers and team receive. Leave a field blank to use the default.",
     "saveButton": "Save changes",
     "savingButton": "Saving…",
     "alertSuccess": "Saved email settings.",
@@ -413,14 +412,14 @@
   },
   "emailSettingsForm": {
     "heading": "Email settings",
-    "description": "Applies to every email this tenant sends. Blank fields fall back to the product default.",
+    "description": "Applies to every email your site sends. Leave a field blank to use the text shown.",
     "senderNameLabel": "Sender name",
     "senderNameHint": "The display name on the From address — unrelated to the site title.",
     "senderNameInvalidError": "This is the name recipients see, not an email address. Enter a name such as Acme Co, without < > \" , ; or @.",
     "replyToLabel": "Reply-to address",
-    "replyToHint": "Where a reply to any tenant email is routed.",
+    "replyToHint": "Where replies to your site's emails go.",
     "footerAddressLabel": "Footer postal address",
-    "footerAddressHint": "A legal requirement for bulk mail — shown in the footer of every tenant email.",
+    "footerAddressHint": "A legal requirement for bulk mail — shown in the footer of every email your site sends.",
     "logoLabel": "Email logo",
     "logoHint": "Used in every email, in every language. A template can override it with its own logo."
   },
@@ -469,7 +468,7 @@
     "heading": "Voice",
     "description": "Reword the site's page-level messages. Every field has a default, so change only what you want to sound like you.",
     "fixedCopyNote": "Buttons, menus and labels are translated for you and stay the same on every site, so they aren't listed here.",
-    "editingLanguageNote": "Editing {language} — other languages keep their own text.",
+    "editingLanguageNote": "Editing <strong>{language}</strong> — other languages keep their own text.",
     "languageAriaLabel": "Language",
     "languageOption": "{language} · {count, plural, =0 {all default} other {# customised}}",
     "surfaceCustomisedCount": "{count, plural, =0 {All default} other {# customised}}",
@@ -495,6 +494,12 @@
     "ERROR": "Shown when a page fails to load",
     "ARCHIVE": "Shown when a list has nothing in it yet. Pick one to edit it.",
     "BOOKMARKS": "A reader's saved posts, before they save any"
+  },
+  "voiceSurfaceNotes": {
+    "NOT_FOUND": "Grey text is fixed and translated for you.",
+    "ERROR": "The buttons are fixed and translated for you.",
+    "ARCHIVE": "The heading comes from Studio; only the message is yours here.",
+    "BOOKMARKS": "The page title and panel heading are fixed."
   },
   "voiceSpecimen": {
     "showPreview": "Show preview",

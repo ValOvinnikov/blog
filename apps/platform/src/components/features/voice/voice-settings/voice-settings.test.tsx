@@ -168,6 +168,26 @@ describe(`<${VoiceSettings.name}/>`, () => {
       ).toBeVisible();
     });
 
+    it.each([
+      ['Page not found', 'Grey text is fixed and translated for you.'],
+      ['Error page', 'The buttons are fixed and translated for you.'],
+      [
+        'Empty lists',
+        'The heading comes from Studio; only the message is yours here.',
+      ],
+      ['Bookmarks', 'The page title and panel heading are fixed.'],
+    ])(
+      'labels the %s preview and tells the editor which text is theirs',
+      (surface, note) => {
+        setup();
+        const preview = within(card(surface)).getByRole('group', {
+          name: 'Live preview',
+        });
+
+        expect(within(preview).getByText(note)).toBeInTheDocument();
+      },
+    );
+
     it('toggles each preview behind its own Show preview button', async () => {
       setup();
       const toggle = within(card('Bookmarks')).getByRole('button', {
@@ -226,6 +246,25 @@ describe(`<${VoiceSettings.name}/>`, () => {
       ).toHaveTextContent(SITE_MESSAGES_BY_LOCALE.EN.blogListPage.empty);
     });
 
+    it('closes the open list from its header', async () => {
+      setup();
+      const section = card('Empty lists');
+
+      await user.click(
+        within(section).getByRole('button', {
+          name: /Blog index/,
+          expanded: true,
+        }),
+      );
+
+      expect(
+        within(section).getByRole('button', {
+          name: /Blog index/,
+          expanded: false,
+        }),
+      ).toBeVisible();
+    });
+
     it('asks the editor to keep the name placeholder on a topic message', async () => {
       setup();
 
@@ -278,7 +317,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
         'placeholder',
         SITE_MESSAGES_BY_LOCALE.DE.notFound.heading,
       );
-      expect(screen.getByText(/Editing German/)).toBeVisible();
+      expect(screen.getByText('German', { selector: 'strong' })).toBeVisible();
     });
 
     it('breaks the unsaved count down by language', async () => {
@@ -394,7 +433,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
       expect(
         within(card('Empty lists')).getByRole('textbox', { name: 'Tag page' }),
       ).toBeVisible();
-      expect(screen.getByText(/Editing German/)).toBeVisible();
+      expect(screen.getByText('German', { selector: 'strong' })).toBeVisible();
     });
   });
 

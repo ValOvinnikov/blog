@@ -2,19 +2,16 @@ import { tv } from '@platform/utils/tv/tv';
 
 export const voiceListRowVariants = tv({
   slots: {
-    root: [
-      'flex min-h-11 w-full items-center gap-3',
-      'bg-admin-surface px-3 py-2 text-left',
-      'cursor-pointer hover:bg-admin-surface-2',
-      'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-admin-brand-weak',
+    labelGroup: ['flex w-[130px] shrink-0 flex-col gap-px max-sm:flex-1'],
+    label: ['text-[13.5px] font-semibold text-admin-text'],
+    routeHint: ['text-[12px] text-admin-muted'],
+    text: [
+      'min-w-0 flex-1 truncate text-[13.5px] text-admin-muted max-sm:hidden',
     ],
-    label: ['shrink-0 text-[13px] font-semibold text-admin-text'],
-    text: ['min-w-0 flex-1 truncate text-[12.5px] text-admin-muted'],
-    chevron: ['shrink-0 text-admin-faint'],
   },
   variants: {
     hasError: {
-      true: { root: ['ring-1 ring-admin-bad ring-inset'] },
+      true: { label: ['text-admin-bad'] },
     },
   },
 });

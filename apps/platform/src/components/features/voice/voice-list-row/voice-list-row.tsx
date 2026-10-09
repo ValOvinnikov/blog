@@ -1,45 +1,86 @@
-import { ICONS } from '@blog/config';
+import { routes, type TVoiceFieldId, type VOICE_SURFACE } from '@blog/config';
+import type { TLocaleIsoCode } from '@blog/config/constants';
 import { VoiceFieldStatus } from '@platform/components/features/voice/voice-field-status';
-import { Button } from '@platform/components/shared/button';
-import { Icon } from '@platform/components/shared/icon';
+import { Accordion } from '@platform/components/shared/accordion';
+import {
+  isSameVoiceValue,
+  isVoiceValueCustomised,
+  voiceDefaultText,
+  voiceValueAsText,
+  type TVoiceDraftValue,
+  type TVoiceField,
+} from '@platform/utils/voice-draft/voice-draft';
+import { useTranslations } from 'next-intl';
+import type { ReactNode } from 'react';
 
 import { voiceListRowVariants } from './voice-list-row-variants';
 
+type TVoiceListFieldId = Extract<
+  TVoiceField,
+  {
+    surface: typeof VOICE_SURFACE.ARCHIVE;
+  }
+>['id'];
+
+const LIST_ROUTE_HINTS: Partial<Record<TVoiceFieldId, string>> = {
+  blogListEmpty: routes.blogIndex(),
+  topicEmpty: routes.topic('…'),
+  tagEmpty: routes.tag('…'),
+  topicsEmpty: routes.topics(),
+  tagsEmpty: routes.tags(),
+} satisfies Record<TVoiceListFieldId, string>;
+
 export type TVoiceListRowProps = {
-  label: string;
-  text: string;
-  isCustomised: boolean;
-  isUnsaved: boolean;
+  field: TVoiceField;
+  locale: TLocaleIsoCode;
+  value: TVoiceDraftValue;
+  savedValue: TVoiceDraftValue;
   hasError: boolean;
-  onOpen: () => void;
+  isOpen: boolean;
+  children: ReactNode;
 };
 
 export const VoiceListRow = ({
-  label,
-  text,
-  isCustomised,
-  isUnsaved,
+  field,
+  locale,
+  value,
+  savedValue,
   hasError,
-  onOpen,
+  isOpen,
+  children,
 }: TVoiceListRowProps) => {
+  const tLabels = useTranslations('voiceFieldLabels');
   const {
-    root,
-    label: labelSlot,
-    text: textSlot,
-    chevron,
+    labelGroup,
+    label,
+    routeHint: routeHintSlot,
+    text,
   } = voiceListRowVariants({ hasError });
+  const isCustomised = isVoiceValueCustomised(value);
+  const routeHint = LIST_ROUTE_HINTS[field.id];
 
   return (
-    <Button
-      variant="unstyled"
-      aria-expanded={false}
-      onClick={onOpen}
-      className={root()}
-    >
-      <span className={labelSlot()}>{label}</span>
-      <span className={textSlot()}>{text}</span>
-      <VoiceFieldStatus isCustomised={isCustomised} isUnsaved={isUnsaved} />
-      <Icon name={ICONS.CHEVRON_DOWN} className={chevron()} />
-    </Button>
+    <Accordion.Item value={field.id}>
+      <Accordion.Trigger>
+        <span className={labelGroup()}>
+          <span className={label()}>{tLabels(field.id)}</span>
+          {routeHint && <span className={routeHintSlot()}>{routeHint}</span>}
+        </span>
+        {!isOpen && (
+          <>
+            <span className={text()}>
+              {isCustomised
+                ? voiceValueAsText(value)
+                : voiceDefaultText(locale, field)}
+            </span>
+            <VoiceFieldStatus
+              isCustomised={isCustomised}
+              isUnsaved={!isSameVoiceValue(value, savedValue)}
+            />
+          </>
+        )}
+      </Accordion.Trigger>
+      <Accordion.Panel>{children}</Accordion.Panel>
+    </Accordion.Item>
   );
 };

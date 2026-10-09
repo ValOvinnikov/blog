@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  ALERT_TYPE,
   VOICE_FIELDS,
   VOICE_SURFACE,
   type TFontChoice,
@@ -10,6 +11,7 @@ import type { TLocaleIsoCode } from '@blog/config/constants';
 import type { TVoiceOverridesByLocaleInput } from '@blog/db/queries/site-config';
 import type { TSaveVoiceOverridesResult } from '@platform/components/features/voice/voice-page-content/save-voice-overrides-action';
 import { VoiceSurfaceCard } from '@platform/components/features/voice/voice-surface-card';
+import { Alert } from '@platform/components/shared/alert';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { SettingsFormShell } from '@platform/components/shared/settings-form-shell';
 import { FONT_OPTIONS } from '@platform/config/fonts';
@@ -92,8 +94,9 @@ export const VoiceSettings = ({
   const isArchived = Boolean(archivedAt);
   const [saved, setSaved] = useState(initialDraft);
   const [selectedLocale, setSelectedLocale] = useState(defaultLocale);
-  const [openListFieldId, setOpenListFieldId] =
-    useState<TVoiceFieldId>('blogListEmpty');
+  const [openListFieldId, setOpenListFieldId] = useState<
+    TVoiceFieldId | undefined
+  >('blogListEmpty');
   const [fieldErrors, setFieldErrors] = useState<TVoiceFieldErrorsByLocale>({});
   const [revision, setRevision] = useState(0);
   const [previewMode, setPreviewMode] = useState<TPreviewMode>('light');
@@ -111,7 +114,10 @@ export const VoiceSettings = ({
     const listErrorId = erroringFieldIds(errors, locale).find((id) =>
       voiceFieldsOf(VOICE_SURFACE.ARCHIVE).some((field) => field.id === id),
     );
-    if (listErrorId && errors[locale]?.[openListFieldId] === undefined) {
+    const isOpenListErroring =
+      openListFieldId !== undefined &&
+      errors[locale]?.[openListFieldId] !== undefined;
+    if (listErrorId && !isOpenListErroring) {
       setOpenListFieldId(listErrorId);
     }
   };
@@ -136,7 +142,7 @@ export const VoiceSettings = ({
       },
     });
 
-  const { intro, controls, note, cards } = voiceSettingsVariants();
+  const { intro, controls, languageEmphasis, cards } = voiceSettingsVariants();
   const isDark = previewMode === 'dark';
   const specimenTheme = {
     tokenStyle: buildThemePreviewStyle(previewTheme, isDark),
@@ -254,11 +260,25 @@ export const VoiceSettings = ({
             ariaLabel={tPreview('previewColorSchemeAriaLabel')}
           />
         </div>
-        <p className={note()}>
-          {t('fixedCopyNote')}
-          {liveLocales.length > 1 &&
-            ` ${t('editingLanguageNote', { language: languageName })}`}
-        </p>
+        <Alert
+          type={ALERT_TYPE.INFO}
+          description={
+            <>
+              {t('fixedCopyNote')}
+              {liveLocales.length > 1 && (
+                <>
+                  {' '}
+                  {t.rich('editingLanguageNote', {
+                    language: languageName,
+                    strong: (chunks) => (
+                      <strong className={languageEmphasis()}>{chunks}</strong>
+                    ),
+                  })}
+                </>
+              )}
+            </>
+          }
+        />
       </div>
       <div
         key={`${selectedLocale}-${revision}`}

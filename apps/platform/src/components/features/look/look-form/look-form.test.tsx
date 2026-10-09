@@ -181,14 +181,16 @@ describe(`<${LookForm.name}/>`, () => {
     ).toBeVisible();
   });
 
-  it('shows the favicon square requirement before any file is chosen', () => {
+  it('describes both brand uploads with one shared hint', () => {
     setup();
 
-    expect(screen.getByRole('button', { name: 'Upload logo' })).toBeVisible();
+    const hint = 'Logo: PNG, JPEG, WebP or SVG. Favicon: a square image.';
+    expect(
+      screen.getByRole('button', { name: 'Upload logo' }),
+    ).toHaveAccessibleDescription(hint);
     expect(
       screen.getByRole('button', { name: 'Upload favicon' }),
-    ).toBeVisible();
-    expect(screen.getByText(/Pre-cropped square, please/)).toBeVisible();
+    ).toHaveAccessibleDescription(hint);
   });
 
   it("choosing a preset doesn't clear an already-saved brand image", async () => {

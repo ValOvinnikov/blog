@@ -290,9 +290,8 @@
     "logoHueDescription": "Colore les nuances du logotype (--logo-1/2/3). Suit la teinte d'accent sauf si vous la définissez.",
     "brandImagesDescription": "Stockées dans Vercel Blob — aucune transformation à la volée : le fichier envoyé est celui qui est publié.",
     "logoFieldLabel": "Logo",
-    "logoFieldHint": "PNG, JPEG, WebP ou SVG · à défaut, le logotype polygonal est utilisé",
     "faviconFieldLabel": "Favicon",
-    "faviconFieldHint": "Merci de fournir une image carrée déjà recadrée — Blob ne peut pas la recadrer pour vous (la viewBox d'un SVG définit sa forme). Les images non carrées sont refusées.",
+    "brandFieldsHint": "Logo : PNG, JPEG, WebP ou SVG. Favicon : une image carrée.",
     "optionalTag": "facultatif",
     "headingFontLabel": "Police des titres",
     "bodyFontLabel": "Police du texte",
@@ -343,7 +342,6 @@
     "modeDark": "Sombre",
     "previewColorSchemeAriaLabel": "Jeu de couleurs de l'aperçu",
     "livePreviewHeading": "Aperçu en direct",
-    "livePreviewDescription": "Véritables primitives @blog/ui",
     "sampleHeading": "Lire les tables des marées",
     "samplePara": "Une courte chronique pour montrer ensemble la typographie des titres et du texte, l'accent, les nuances du logo et l'arrondi.",
     "subscribeButton": "S'abonner",
@@ -355,12 +353,13 @@
     "secondCardExcerpt": "Une carte statique. Son cadre suit votre style de carte.",
     "outlinedCardHeading": "Newsletter",
     "outlinedCardBody": "Une carte à contour, telle que l'affichent les panneaux et les offres tarifaires.",
-    "previewNote": "État du formulaire non enregistré → propriétés CSS personnalisées, selon la même rampe OKLCH qu'en production. Rien n'est publié avant l'enregistrement.",
+    "previewNote": "Construit à partir des composants du site. Rien n'est publié avant l'enregistrement.",
     "widthDesktop": "Ordinateur",
     "widthMobile": "Mobile",
     "previewWidthAriaLabel": "Largeur de l'aperçu"
   },
   "brandAssetField": {
+    "savesWithChanges": "Enregistré avec les modifications",
     "unexpectedError": "Une erreur s'est produite — veuillez réessayer.",
     "currentAlt": "{label} actuel",
     "uploading": "Envoi…",
@@ -371,7 +370,7 @@
   },
   "emailForm": {
     "pageHeading": "E-mail",
-    "pageSubtitle": "Identité de l'expéditeur et textes de chaque modèle pour tous les e-mails envoyés par ce locataire.",
+    "pageSubtitle": "Les e-mails que reçoivent vos lecteurs et votre équipe. Laissez un champ vide pour utiliser la valeur par défaut.",
     "saveButton": "Enregistrer les modifications",
     "savingButton": "Enregistrement…",
     "alertSuccess": "Paramètres d'e-mail enregistrés.",
@@ -413,14 +412,14 @@
   },
   "emailSettingsForm": {
     "heading": "Paramètres d'e-mail",
-    "description": "S'applique à tous les e-mails envoyés par ce locataire. Les champs vides reprennent la valeur par défaut du produit.",
+    "description": "S'applique à tous les e-mails envoyés par votre site. Laissez un champ vide pour utiliser le texte affiché.",
     "senderNameLabel": "Nom de l'expéditeur",
     "senderNameHint": "Le nom affiché dans l'adresse d'expédition — indépendant du titre du site.",
     "senderNameInvalidError": "C'est le nom que voient les destinataires, pas une adresse e-mail. Saisissez un nom comme Acme Co, sans < > \" , ; ni @.",
     "replyToLabel": "Adresse de réponse",
-    "replyToHint": "L'adresse vers laquelle sont dirigées les réponses aux e-mails du locataire.",
+    "replyToHint": "L'adresse où arrivent les réponses aux e-mails de votre site.",
     "footerAddressLabel": "Adresse postale du pied de page",
-    "footerAddressHint": "Une obligation légale pour les envois en masse — affichée dans le pied de page de chaque e-mail du locataire.",
+    "footerAddressHint": "Une obligation légale pour les envois en masse — affichée dans le pied de page de chaque e-mail envoyé par votre site.",
     "logoLabel": "Logo des e-mails",
     "logoHint": "Utilisé dans chaque e-mail, dans toutes les langues. Un modèle peut le remplacer par son propre logo."
   },
@@ -469,7 +468,7 @@
     "heading": "Voix",
     "description": "Reformulez les messages de page du site. Chaque champ a un texte par défaut : ne modifiez que ce qui doit vous ressembler.",
     "fixedCopyNote": "Les boutons, menus et libellés sont traduits pour vous et restent identiques sur tous les sites ; ils ne figurent donc pas ici.",
-    "editingLanguageNote": "Vous modifiez : {language} — les autres langues gardent leur propre texte.",
+    "editingLanguageNote": "Vous modifiez : <strong>{language}</strong> — les autres langues gardent leur propre texte.",
     "languageAriaLabel": "Langue",
     "languageOption": "{language} · {count, plural, =0 {tout par défaut} one {# personnalisé} other {# personnalisés}}",
     "surfaceCustomisedCount": "{count, plural, =0 {Tout par défaut} one {# personnalisé} other {# personnalisés}}",
@@ -495,6 +494,12 @@
     "ERROR": "Affichée quand une page ne se charge pas",
     "ARCHIVE": "Affichées quand une liste est encore vide. Choisissez-en une pour la modifier.",
     "BOOKMARKS": "Les articles enregistrés d'un lecteur, avant qu'il en enregistre"
+  },
+  "voiceSurfaceNotes": {
+    "NOT_FOUND": "Le texte gris est fixe et traduit pour vous.",
+    "ERROR": "Les boutons sont fixes et traduits pour vous.",
+    "ARCHIVE": "Le titre vient de Studio ; seul le message vous appartient ici.",
+    "BOOKMARKS": "Le titre de la page et celui du panneau sont fixes."
   },
   "voiceSpecimen": {
     "showPreview": "Afficher l'aperçu",

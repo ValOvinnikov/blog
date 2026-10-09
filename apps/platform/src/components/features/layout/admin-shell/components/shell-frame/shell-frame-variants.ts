@@ -3,7 +3,7 @@ import { tv } from '@platform/utils/tv/tv';
 export const shellFrameVariants = tv({
   slots: {
     root: ['flex min-h-dvh flex-col bg-admin-bg text-admin-text md:flex-row'],
-    main: ['flex min-h-0 min-w-0 flex-1 flex-col'],
+    main: ['flex min-h-0 min-w-0 flex-1 flex-col overflow-x-clip'],
     content: ['flex-1'],
   },
   variants: {
@@ -21,7 +21,10 @@ export const shellFrameVariants = tv({
         content: ['min-h-0 overflow-hidden'],
       },
       false: {
-        content: ['mx-auto w-full max-w-[1180px] p-4 md:p-[26px]'],
+        content: [
+          'mx-auto w-full max-w-[1180px] p-4 md:p-[26px]',
+          '[--shell-gutter:--spacing(4)] md:[--shell-gutter:26px]',
+        ],
       },
     },
   },

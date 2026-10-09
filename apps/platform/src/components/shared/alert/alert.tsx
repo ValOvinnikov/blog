@@ -15,7 +15,7 @@ const ALERT_ICON = {
 
 export type TAlertProps = {
   type: TAlertType;
-  title: string;
+  title?: string;
   description?: ReactNode;
   action?: ReactNode;
   role?: 'status' | 'alert';
@@ -45,7 +45,7 @@ export const Alert = ({
     <div id={id} role={role} className={root({ class: className })}>
       <Icon name={ALERT_ICON[type]} size={SIZE.SM} className={icon()} />
       <div className={text()}>
-        <strong className={titleSlot()}>{title}</strong>
+        {title && <strong className={titleSlot()}>{title}</strong>}
         {description && <div className={descriptionSlot()}>{description}</div>}
       </div>
       {action && <div className={actionSlot()}>{action}</div>}

@@ -2,11 +2,10 @@ import { tv } from '@platform/utils/tv/tv';
 
 export const workspacePendingViewVariants = tv({
   slots: {
-    content: ['text-center'],
+    content: ['flex items-start gap-3'],
     iconWrap: [
-      'mx-auto mb-3 flex size-9 items-center justify-center rounded-full',
+      'flex size-9 shrink-0 items-center justify-center rounded-full',
       'bg-admin-warn-weak text-admin-warn',
     ],
-    description: ['mt-1.5'],
   },
 });

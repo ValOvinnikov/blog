@@ -290,9 +290,8 @@
     "logoHueDescription": "Kleurt de toonstappen van het woordmerk (--logo-1/2/3). Volgt de accenttint, tenzij u deze instelt.",
     "brandImagesDescription": "Opgeslagen in Vercel Blob — geen transformaties achteraf, dus wat u uploadt is wat er live gaat.",
     "logoFieldLabel": "Logo",
-    "logoFieldHint": "PNG, JPEG, WebP of SVG · valt terug op het polygoonwoordmerk",
     "faviconFieldLabel": "Favicon",
-    "faviconFieldHint": "Graag vooraf vierkant bijgesneden — Blob kan dat niet voor u doen (bij een SVG telt de viewBox als vorm). Niet-vierkante uploads worden geweigerd.",
+    "brandFieldsHint": "Logo: PNG, JPEG, WebP of SVG. Favicon: een vierkante afbeelding.",
     "optionalTag": "optioneel",
     "headingFontLabel": "Koplettertype",
     "bodyFontLabel": "Tekstlettertype",
@@ -343,7 +342,6 @@
     "modeDark": "Donker",
     "previewColorSchemeAriaLabel": "Kleurenschema van voorbeeld",
     "livePreviewHeading": "Live voorbeeld",
-    "livePreviewDescription": "Echte @blog/ui-primitieven",
     "sampleHeading": "De getijdentabellen lezen",
     "samplePara": "Een kort bericht om kop- en tekstletter, accent, logotinten en afronding samen te tonen.",
     "subscribeButton": "Abonneren",
@@ -355,12 +353,13 @@
     "secondCardExcerpt": "Een statische kaart. De omlijsting volgt uw kaartstijl.",
     "outlinedCardHeading": "Nieuwsbrief",
     "outlinedCardBody": "Een omlijnde kaart, zoals panelen en prijsniveaus hem tonen.",
-    "previewNote": "Niet-opgeslagen formulierstatus → CSS custom properties, volgens dezelfde OKLCH-schaal als in productie. Niets hier is live totdat u opslaat.",
+    "previewNote": "Gebouwd met de eigen componenten van de site. Niets is live totdat u opslaat.",
     "widthDesktop": "Desktop",
     "widthMobile": "Mobiel",
     "previewWidthAriaLabel": "Breedte voorbeeld"
   },
   "brandAssetField": {
+    "savesWithChanges": "Wordt opgeslagen met de wijzigingen",
     "unexpectedError": "Er is iets misgegaan. Probeer het opnieuw.",
     "currentAlt": "Huidige {label}",
     "uploading": "Uploaden…",
@@ -371,7 +370,7 @@
   },
   "emailForm": {
     "pageHeading": "E-mail",
-    "pageSubtitle": "Afzenderidentiteit en tekst per sjabloon voor elke e-mail die deze tenant verstuurt.",
+    "pageSubtitle": "De e-mails die je lezers en team ontvangen. Laat een veld leeg om de standaard te gebruiken.",
     "saveButton": "Wijzigingen opslaan",
     "savingButton": "Opslaan…",
     "alertSuccess": "E-mailinstellingen opgeslagen.",
@@ -413,14 +412,14 @@
   },
   "emailSettingsForm": {
     "heading": "E-mailinstellingen",
-    "description": "Geldt voor elke e-mail die deze tenant verstuurt. Lege velden vallen terug op de productstandaard.",
+    "description": "Geldt voor elke e-mail die je site verstuurt. Laat een veld leeg om de getoonde tekst te gebruiken.",
     "senderNameLabel": "Naam afzender",
     "senderNameHint": "De weergavenaam bij het Van-adres — staat los van de sitetitel.",
     "senderNameInvalidError": "Dit is de naam die ontvangers zien, geen e-mailadres. Vul een naam in zoals Acme Co, zonder < > \" , ; of @.",
     "replyToLabel": "Antwoordadres",
-    "replyToHint": "Waar een antwoord op een e-mail van de tenant naartoe gaat.",
+    "replyToHint": "Waar antwoorden op de e-mails van je site naartoe gaan.",
     "footerAddressLabel": "Postadres in voettekst",
-    "footerAddressHint": "Wettelijk verplicht voor bulkmail — wordt getoond in de voettekst van elke e-mail van de tenant.",
+    "footerAddressHint": "Wettelijk verplicht voor bulkmail — wordt getoond in de voettekst van elke e-mail die je site verstuurt.",
     "logoLabel": "E-maillogo",
     "logoHint": "Gebruikt in elke e-mail, in elke taal. Een sjabloon kan het vervangen door een eigen logo."
   },
@@ -469,7 +468,7 @@
     "heading": "Toon",
     "description": "Herformuleer de paginaberichten van de site. Elk veld heeft een standaardtekst, dus pas alleen aan wat naar jou moet klinken.",
     "fixedCopyNote": "Knoppen, menu’s en labels worden voor je vertaald en zijn op elke site hetzelfde, dus ze staan hier niet.",
-    "editingLanguageNote": "Je bewerkt {language} — andere talen houden hun eigen tekst.",
+    "editingLanguageNote": "Je bewerkt <strong>{language}</strong> — andere talen houden hun eigen tekst.",
     "languageAriaLabel": "Taal",
     "languageOption": "{language} · {count, plural, =0 {alles standaard} other {# aangepast}}",
     "surfaceCustomisedCount": "{count, plural, =0 {Alles standaard} other {# aangepast}}",
@@ -495,6 +494,12 @@
     "ERROR": "Verschijnt als een pagina niet laadt",
     "ARCHIVE": "Verschijnen zolang een lijst nog leeg is. Kies er een om te bewerken.",
     "BOOKMARKS": "De bewaarde berichten van een lezer, voordat die iets bewaart"
+  },
+  "voiceSurfaceNotes": {
+    "NOT_FOUND": "Grijze tekst staat vast en wordt voor je vertaald.",
+    "ERROR": "De knoppen staan vast en worden voor je vertaald.",
+    "ARCHIVE": "De kop komt uit Studio; alleen het bericht is hier van jou.",
+    "BOOKMARKS": "De paginatitel en de paneelkop staan vast."
   },
   "voiceSpecimen": {
     "showPreview": "Voorbeeld tonen",
