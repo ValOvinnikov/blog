@@ -1,6 +1,10 @@
 'use client';
 
 import {
+  DOMAIN_VERIFICATION_STATUS,
+  type TDomainVerificationStatus,
+} from '@blog/config/constants';
+import {
   CORE_PROVISIONING_STEPS,
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
@@ -15,7 +19,6 @@ import type {
   TTenantProvisioningState,
 } from '@blog/db/schema/tenants';
 import { useToast } from '@platform/context/toast-provider';
-import type { TDomainVerificationStatus } from '@platform/server/provisioning/get-domain-verification-status';
 import { getDomainVerificationStatusAction } from '@platform/server/provisioning/get-domain-verification-status-action';
 import { getTenantProvisioningStatusAction } from '@platform/server/provisioning/get-tenant-provisioning-status-action';
 import { retryProvisioningStepAction } from '@platform/server/provisioning/retry-provisioning-step-action';
@@ -109,7 +112,10 @@ const stepStatusesEqual = (
 const isTerminalDomainVerificationStatus = (
   status: TDomainVerificationStatus,
 ): boolean => {
-  return status === 'VERIFIED' || status === 'NOT_CONFIGURED';
+  return (
+    status === DOMAIN_VERIFICATION_STATUS.VERIFIED ||
+    status === DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED
+  );
 };
 
 type TDispatchNoticeKind =
@@ -152,7 +158,7 @@ export const useProvisioningPoll = (
   // `ProvisioningStatusView`, which no longer renders a domain card) —
   // `NOT_CONFIGURED` is a terminal status, so the domain poll effect below
   // never actually starts for it.
-  domainVerificationStatus: TDomainVerificationStatus = 'NOT_CONFIGURED',
+  domainVerificationStatus: TDomainVerificationStatus = DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED,
 ): TUseProvisioningPollResult => {
   const router = useRouter();
   const toast = useToast();

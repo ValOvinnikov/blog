@@ -1,3 +1,4 @@
+import { DOMAIN_VERIFICATION_STATUS } from '@blog/config';
 import { DnsRecordsTable } from '@platform/components/features/tenants/domain-page-content/components/dns-records-table/dns-records-table';
 import { Card } from '@platform/components/shared/card';
 import { StatusBadge } from '@platform/components/shared/status-badge';
@@ -35,7 +36,7 @@ export const DomainVerificationCard = ({
         }
       />
       <Card.Body>
-        {status === 'VERIFIED' ? (
+        {status === DOMAIN_VERIFICATION_STATUS.VERIFIED ? (
           <Text variant="supporting">{t('verifiedEmptyState')}</Text>
         ) : (
           <>

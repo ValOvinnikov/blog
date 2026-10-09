@@ -1,3 +1,4 @@
+import { DOMAIN_VERIFICATION_STATUS } from '@blog/config';
 import { auth } from '@platform/server/auth/auth';
 import {
   act,
@@ -55,7 +56,7 @@ describe(`<${DashboardDomainPage.name}/>`, () => {
     getAdminByUserIdMock.mockResolvedValue(undefined);
     getProjectDomainMock.mockReset();
     getProjectDomainMock.mockResolvedValue({
-      status: 'PENDING',
+      status: DOMAIN_VERIFICATION_STATUS.PENDING,
       dnsRecords: [{ type: 'A', name: '@', value: '76.76.21.21' }],
     });
   });

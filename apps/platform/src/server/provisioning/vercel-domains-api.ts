@@ -1,9 +1,10 @@
-import { DOMAIN_PATTERN } from '@blog/config';
+import {
+  DOMAIN_PATTERN,
+  DOMAIN_VERIFICATION_STATUS,
+  type TDomainVerificationStatus,
+} from '@blog/config';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
-
-export type TDomainVerificationStatus =
-  'NOT_CONFIGURED' | 'NOT_ADDED' | 'PENDING' | 'VERIFIED' | 'ERROR';
 
 export type TDomainDnsRecord = {
   type: string;
@@ -68,11 +69,12 @@ export const getProjectDomain = async (
 ): Promise<TProjectDomain> => {
   const credentials = readVercelCredentials();
 
-  if (!credentials) return projectDomain('NOT_CONFIGURED');
+  if (!credentials)
+    return projectDomain(DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED);
 
   if (!DOMAIN_PATTERN.test(domain)) {
     logger.error('provisioning.domain_check_invalid_domain', { domain });
-    return projectDomain('ERROR');
+    return projectDomain(DOMAIN_VERIFICATION_STATUS.ERROR);
   }
 
   try {
@@ -81,23 +83,24 @@ export const getProjectDomain = async (
       `/v9/projects/${credentials.projectId}/domains/${encodeURIComponent(domain)}`,
     );
 
-    if (response.status === 404) return projectDomain('NOT_ADDED');
+    if (response.status === 404)
+      return projectDomain(DOMAIN_VERIFICATION_STATUS.NOT_ADDED);
 
     if (!response.ok) {
       logger.error('provisioning.domain_check_failed', {
         domain,
         responseStatus: response.status,
       });
-      return projectDomain('ERROR');
+      return projectDomain(DOMAIN_VERIFICATION_STATUS.ERROR);
     }
 
     const { verified, verification = [] } =
       (await response.json()) as TVercelProjectDomainResponse;
 
-    if (verified) return projectDomain('VERIFIED');
+    if (verified) return projectDomain(DOMAIN_VERIFICATION_STATUS.VERIFIED);
 
     return projectDomain(
-      'PENDING',
+      DOMAIN_VERIFICATION_STATUS.PENDING,
       verification.map(({ type, domain: name, value }) => ({
         type,
         name,
@@ -106,6 +109,6 @@ export const getProjectDomain = async (
     );
   } catch (error) {
     logger.error('provisioning.domain_check_error', { domain, error });
-    return projectDomain('ERROR');
+    return projectDomain(DOMAIN_VERIFICATION_STATUS.ERROR);
   }
 };

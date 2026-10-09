@@ -1,9 +1,6 @@
-import {
-  getProjectDomain,
-  type TDomainVerificationStatus,
-} from './vercel-domains-api';
+import type { TDomainVerificationStatus } from '@blog/config';
 
-export type { TDomainVerificationStatus } from './vercel-domains-api';
+import { getProjectDomain } from './vercel-domains-api';
 
 /**
  * Informational only: a tenant counts as provisioned once its domain is added

@@ -1,3 +1,4 @@
+import { DOMAIN_VERIFICATION_STATUS } from '@blog/config';
 import { env } from '@platform/utils/env/env';
 
 import { getProjectDomain } from './vercel-domains-api';
@@ -42,7 +43,10 @@ describe(getProjectDomain, () => {
 
     const result = await getProjectDomain('example.com');
 
-    expect(result).toEqual({ status: 'NOT_CONFIGURED', dnsRecords: [] });
+    expect(result).toEqual({
+      status: DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED,
+      dnsRecords: [],
+    });
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
@@ -51,7 +55,10 @@ describe(getProjectDomain, () => {
 
     const result = await getProjectDomain('example.com');
 
-    expect(result).toEqual({ status: 'NOT_ADDED', dnsRecords: [] });
+    expect(result).toEqual({
+      status: DOMAIN_VERIFICATION_STATUS.NOT_ADDED,
+      dnsRecords: [],
+    });
   });
 
   it('returns ERROR with no records when the request throws', async () => {
@@ -59,7 +66,10 @@ describe(getProjectDomain, () => {
 
     const result = await getProjectDomain('example.com');
 
-    expect(result).toEqual({ status: 'ERROR', dnsRecords: [] });
+    expect(result).toEqual({
+      status: DOMAIN_VERIFICATION_STATUS.ERROR,
+      dnsRecords: [],
+    });
   });
 
   it('returns VERIFIED with no records even if Vercel still lists challenges', async () => {
@@ -74,7 +84,10 @@ describe(getProjectDomain, () => {
 
     const result = await getProjectDomain('example.com');
 
-    expect(result).toEqual({ status: 'VERIFIED', dnsRecords: [] });
+    expect(result).toEqual({
+      status: DOMAIN_VERIFICATION_STATUS.VERIFIED,
+      dnsRecords: [],
+    });
   });
 
   it('returns PENDING with the verification challenges as type/name/value records', async () => {
@@ -95,7 +108,7 @@ describe(getProjectDomain, () => {
     const result = await getProjectDomain('example.com');
 
     expect(result).toEqual({
-      status: 'PENDING',
+      status: DOMAIN_VERIFICATION_STATUS.PENDING,
       dnsRecords: [
         {
           type: 'TXT',
@@ -111,6 +124,9 @@ describe(getProjectDomain, () => {
 
     const result = await getProjectDomain('example.com');
 
-    expect(result).toEqual({ status: 'PENDING', dnsRecords: [] });
+    expect(result).toEqual({
+      status: DOMAIN_VERIFICATION_STATUS.PENDING,
+      dnsRecords: [],
+    });
   });
 });

@@ -1,3 +1,4 @@
+import { DOMAIN_VERIFICATION_STATUS } from '@blog/config';
 import { getProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
 import { act, renderWithIntl, screen } from '@platform/testing/custom-render';
 import { makeTenant } from '@platform/testing/tenants/fixtures';
@@ -23,7 +24,7 @@ describe(DomainPageContent, () => {
   beforeEach(() => {
     getProjectDomainMock.mockReset();
     getProjectDomainMock.mockResolvedValue({
-      status: 'PENDING',
+      status: DOMAIN_VERIFICATION_STATUS.PENDING,
       dnsRecords: [{ type: 'A', name: '@', value: '76.76.21.21' }],
     });
   });

@@ -1,5 +1,6 @@
 'use client';
 
+import type { TDomainVerificationStatus } from '@blog/config';
 import type { TAuditEvent } from '@blog/db/schema/audit-events';
 import type { TFinding } from '@blog/db/schema/findings';
 import type { TTenant } from '@blog/db/schema/tenants';
@@ -15,7 +16,6 @@ import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenan
 import { ExternalLinkButton } from '@platform/components/shared/external-link-button';
 import { PageHeader } from '@platform/components/shared/page-header';
 import { StatusBadge } from '@platform/components/shared/status-badge';
-import type { TDomainVerificationStatus } from '@platform/server/provisioning/get-domain-verification-status';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { tenantStatusTone } from '@platform/utils/status-tone/status-tone';
 import { computeTenantFieldLocks } from '@platform/utils/tenant-field-locks/tenant-field-locks';

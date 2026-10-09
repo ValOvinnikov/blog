@@ -3,6 +3,7 @@
 import {
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
+  DOMAIN_AVAILABILITY,
   DOMAIN_PATTERN,
   ERROR_CODE,
 } from '@blog/config';
@@ -101,9 +102,9 @@ export const createTenantAction = async (
     };
   }
 
-  // Advisory only: 'NOT_CONFIGURED'/'ERROR' both mean "can't tell" and fall
+  // Advisory only: NOT_CONFIGURED/ERROR both mean "can't tell" and fall
   // through unchecked.
-  if (domainAvailability === 'IN_USE') {
+  if (domainAvailability === DOMAIN_AVAILABILITY.IN_USE) {
     return {
       ok: false,
       fieldErrors: {

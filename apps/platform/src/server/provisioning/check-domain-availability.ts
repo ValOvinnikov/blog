@@ -1,11 +1,12 @@
-import { DOMAIN_PATTERN } from '@blog/config';
+import {
+  DOMAIN_AVAILABILITY,
+  DOMAIN_PATTERN,
+  type TDomainAvailability,
+} from '@blog/config';
 import { logger } from '@platform/utils/logger/logger';
 import { getDomain } from 'tldts';
 
 import { fetchVercel, readVercelCredentials } from './vercel-domains-api';
-
-export type TDomainAvailability =
-  'NOT_CONFIGURED' | 'AVAILABLE' | 'IN_USE' | 'ERROR';
 
 // Every tenant domain on this platform lives under the same shared apex
 // (map-domain.ts attaches all of them to the one shared apps/web Vercel
@@ -55,18 +56,18 @@ export const checkDomainAvailability = async (
 ): Promise<TDomainAvailability> => {
   const credentials = readVercelCredentials();
 
-  if (!credentials) return 'NOT_CONFIGURED';
+  if (!credentials) return DOMAIN_AVAILABILITY.NOT_CONFIGURED;
 
   if (!DOMAIN_PATTERN.test(domain)) {
     logger.error('tenants.domain_availability_invalid_domain', { domain });
-    return 'ERROR';
+    return DOMAIN_AVAILABILITY.ERROR;
   }
 
   const apexDomain = deriveApexDomain(domain);
 
   if (!apexDomain) {
     logger.error('tenants.domain_availability_apex_undetermined', { domain });
-    return 'ERROR';
+    return DOMAIN_AVAILABILITY.ERROR;
   }
 
   const normalizedDomain = normalizeDomainName(domain);
@@ -84,14 +85,14 @@ export const checkDomainAvailability = async (
       // A 404 means the apex itself is unknown to the team's Vercel
       // account — no project can have a domain registered under an apex
       // the account doesn't hold, so no conflict is possible.
-      if (response.status === 404) return 'AVAILABLE';
+      if (response.status === 404) return DOMAIN_AVAILABILITY.AVAILABLE;
 
       if (!response.ok) {
         logger.error('tenants.domain_availability_check_failed', {
           domain,
           responseStatus: response.status,
         });
-        return 'ERROR';
+        return DOMAIN_AVAILABILITY.ERROR;
       }
 
       const data = (await response.json()) as TProjectDomainsPage;
@@ -102,9 +103,9 @@ export const checkDomainAvailability = async (
           projectDomain.projectId !== credentials.projectId,
       );
 
-      if (attachedElsewhere) return 'IN_USE';
+      if (attachedElsewhere) return DOMAIN_AVAILABILITY.IN_USE;
 
-      if (!data.pagination?.next) return 'AVAILABLE';
+      if (!data.pagination?.next) return DOMAIN_AVAILABILITY.AVAILABLE;
 
       until = data.pagination.next;
     }
@@ -113,12 +114,12 @@ export const checkDomainAvailability = async (
       domain,
       maxPages: MAX_PROJECT_DOMAINS_PAGES,
     });
-    return 'ERROR';
+    return DOMAIN_AVAILABILITY.ERROR;
   } catch (error) {
     logger.error('tenants.domain_availability_check_error', {
       domain,
       error,
     });
-    return 'ERROR';
+    return DOMAIN_AVAILABILITY.ERROR;
   }
 };

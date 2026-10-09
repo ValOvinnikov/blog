@@ -1,5 +1,7 @@
 import {
+  DOMAIN_VERIFICATION_STATUS,
   FINDING_SEVERITY,
+  type TDomainVerificationStatus,
   type TFindingSeverity,
 } from '@blog/config/constants';
 import {
@@ -8,7 +10,6 @@ import {
   type TTenantStatus,
   type TTenantProvisioningStepStatus,
 } from '@blog/db/constants';
-import type { TDomainVerificationStatus } from '@platform/server/provisioning/get-domain-verification-status';
 import type { TEmailItemStatus } from '@platform/utils/email-draft/email-draft';
 
 type TBadgeTone = 'ok' | 'warn' | 'bad' | 'neutral' | 'brand';
@@ -33,11 +34,11 @@ const PROVISIONING_STEP_TONE: Record<
 
 const DOMAIN_VERIFICATION_TONE: Record<TDomainVerificationStatus, TBadgeTone> =
   {
-    NOT_CONFIGURED: 'neutral',
-    NOT_ADDED: 'neutral',
-    PENDING: 'warn',
-    VERIFIED: 'ok',
-    ERROR: 'warn',
+    [DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED]: 'neutral',
+    [DOMAIN_VERIFICATION_STATUS.NOT_ADDED]: 'neutral',
+    [DOMAIN_VERIFICATION_STATUS.PENDING]: 'warn',
+    [DOMAIN_VERIFICATION_STATUS.VERIFIED]: 'ok',
+    [DOMAIN_VERIFICATION_STATUS.ERROR]: 'warn',
   };
 
 const FINDING_SEVERITY_TONE: Record<TFindingSeverity, TBadgeTone> = {

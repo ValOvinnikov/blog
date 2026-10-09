@@ -11,6 +11,7 @@ export * from './control-mode';
 export * from './cta';
 export * from './depth';
 export * from './display-mode';
+export * from './domain';
 export * from './email-template';
 export * from './error';
 export * from './finding';
