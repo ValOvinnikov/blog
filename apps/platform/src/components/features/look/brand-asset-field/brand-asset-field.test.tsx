@@ -79,8 +79,12 @@ describe(`<${BrandAssetField.name}/>`, () => {
   it('asks for the file to be picked again when a recovered draft lost it', () => {
     setup({ isRepickNeeded: true });
 
-    expect(screen.getByRole('status')).toHaveTextContent(
-      "Your recovered draft had a new logo that couldn't be kept — pick it again.",
+    expect(
+      screen.getAllByRole('status').map((region) => region.textContent),
+    ).toContainEqual(
+      expect.stringContaining(
+        "Your recovered draft had a new logo that couldn't be kept — pick it again.",
+      ),
     );
   });
 });
