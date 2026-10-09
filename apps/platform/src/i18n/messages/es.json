@@ -99,7 +99,7 @@
   "tenantsView": {
     "title": "Clientes",
     "description": "Todos los sitios de la plataforma, leídos de la tabla real <code>tenants</code>.",
-    "addTenant": "+ Añadir cliente"
+    "addTenant": "Añadir cliente"
   },
   "emailAlertsBanner": {
     "title": "Alertas por correo electrónico sin configurar",

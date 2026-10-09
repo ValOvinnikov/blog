@@ -2,10 +2,7 @@ import { tv } from '@platform/utils/tv/tv';
 
 export const wizardRailVariants = tv({
   slots: {
-    root: [
-      'flex h-full flex-col',
-      'rounded-admin border border-admin-line bg-admin-surface p-[18px] shadow-admin',
-    ],
+    root: ['h-full'],
     list: ['flex flex-col'],
     item: ['flex flex-1 flex-wrap gap-2.5'],
     indicatorCol: ['flex flex-none flex-col items-center self-stretch'],
@@ -15,7 +12,7 @@ export const wizardRailVariants = tv({
     ],
     connector: ['my-1 w-0.5 flex-1 bg-admin-line-2'],
     stepBody: ['flex min-w-0 flex-1 flex-col pb-[9px]'],
-    stepTitle: ['text-[13px] font-semibold text-admin-text'],
+    stepTitle: ['text-[13.5px] font-semibold text-admin-text'],
     stepDescription: ['text-[12px] text-admin-muted'],
   },
   variants: {

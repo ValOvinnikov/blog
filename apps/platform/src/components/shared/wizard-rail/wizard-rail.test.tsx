@@ -37,7 +37,8 @@ describe(WizardRail, () => {
     );
 
     expect(
-      screen.getByRole('navigation', { name: 'Provisioning steps' }),
+      screen.getByRole('list', { name: 'Provisioning steps' }),
     ).toBeVisible();
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
   });
 });
