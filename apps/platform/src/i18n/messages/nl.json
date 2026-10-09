@@ -356,7 +356,10 @@
     "previewNote": "Gebouwd met de eigen componenten van de site. Niets is live totdat u opslaat.",
     "widthDesktop": "Desktop",
     "widthMobile": "Mobiel",
-    "previewWidthAriaLabel": "Breedte voorbeeld"
+    "previewWidthAriaLabel": "Breedte voorbeeld",
+    "navPosts": "Berichten",
+    "navAbout": "Over",
+    "switcherMenuAriaLabel": "Taal: {language}"
   },
   "brandAssetField": {
     "savesWithChanges": "Wordt opgeslagen met de wijzigingen",

@@ -4,6 +4,7 @@ import {
   isAccentHueAccessible,
   PRESET_ID,
   PRESET_REGISTRY,
+  type TLocaleIsoCode,
   type TPresetId,
 } from '@blog/config';
 import { BrandCard } from '@platform/components/features/look/look-form/components/brand-card';
@@ -46,7 +47,7 @@ export type TLookFormProps = {
   tenantId: string;
   tenantName: string;
   initialValues: TLookFormValues;
-  hasMultipleLanguages: boolean;
+  liveLocales: readonly TLocaleIsoCode[];
   savedAt?: Date;
   archivedAt?: Date;
 };
@@ -130,11 +131,12 @@ export const LookForm = ({
   tenantId,
   tenantName,
   initialValues,
-  hasMultipleLanguages,
+  liveLocales,
   savedAt,
   archivedAt,
 }: TLookFormProps) => {
   const isArchived = Boolean(archivedAt);
+  const hasMultipleLanguages = liveLocales.length > 1;
   const archivedNoticeId = useId();
   const accentHueFieldId = useId();
   const viewIds = {
@@ -421,6 +423,8 @@ export const LookForm = ({
             density={values.density}
             cardStyle={values.cardStyle}
             logoSrc={values.logo.url}
+            liveLocales={liveLocales}
+            languageSwitcherStyle={values.languageSwitcherStyle}
           />
         </div>
       </div>

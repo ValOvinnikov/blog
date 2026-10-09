@@ -25,7 +25,7 @@ export const LookPageContent = async ({ tenant }: TLookPageContentProps) => {
       tenantId={tenant.id}
       tenantName={tenant.name}
       initialValues={initialValues}
-      hasMultipleLanguages={(liveLocales?.length ?? 0) > 1}
+      liveLocales={liveLocales ?? []}
       savedAt={siteConfig?.updatedAt}
       archivedAt={tenant.deprovisionedAt ?? undefined}
     />

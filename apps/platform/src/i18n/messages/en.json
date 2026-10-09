@@ -356,7 +356,10 @@
     "previewNote": "Built from the site's own components. Nothing is live until you save.",
     "widthDesktop": "Desktop",
     "widthMobile": "Mobile",
-    "previewWidthAriaLabel": "Preview width"
+    "previewWidthAriaLabel": "Preview width",
+    "navPosts": "Posts",
+    "navAbout": "About",
+    "switcherMenuAriaLabel": "Language: {language}"
   },
   "brandAssetField": {
     "savesWithChanges": "Saves with changes",

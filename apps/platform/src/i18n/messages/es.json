@@ -356,7 +356,10 @@
     "previewNote": "Creada con los propios componentes del sitio. Nada se publica hasta que guarde.",
     "widthDesktop": "Escritorio",
     "widthMobile": "Móvil",
-    "previewWidthAriaLabel": "Ancho de la vista previa"
+    "previewWidthAriaLabel": "Ancho de la vista previa",
+    "navPosts": "Entradas",
+    "navAbout": "Acerca de",
+    "switcherMenuAriaLabel": "Idioma: {language}"
   },
   "brandAssetField": {
     "savesWithChanges": "Se guarda con los cambios",

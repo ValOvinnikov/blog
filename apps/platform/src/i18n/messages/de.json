@@ -356,7 +356,10 @@
     "previewNote": "Aus den eigenen Komponenten der Website gebaut. Nichts ist live, bis Sie speichern.",
     "widthDesktop": "Desktop",
     "widthMobile": "Mobil",
-    "previewWidthAriaLabel": "Vorschaubreite"
+    "previewWidthAriaLabel": "Vorschaubreite",
+    "navPosts": "Beiträge",
+    "navAbout": "Über uns",
+    "switcherMenuAriaLabel": "Sprache: {language}"
   },
   "brandAssetField": {
     "savesWithChanges": "Wird mit den Änderungen gespeichert",

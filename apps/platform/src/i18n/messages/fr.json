@@ -356,7 +356,10 @@
     "previewNote": "Construit à partir des composants du site. Rien n'est publié avant l'enregistrement.",
     "widthDesktop": "Ordinateur",
     "widthMobile": "Mobile",
-    "previewWidthAriaLabel": "Largeur de l'aperçu"
+    "previewWidthAriaLabel": "Largeur de l'aperçu",
+    "navPosts": "Articles",
+    "navAbout": "À propos",
+    "switcherMenuAriaLabel": "Langue : {language}"
   },
   "brandAssetField": {
     "savesWithChanges": "Enregistré avec les modifications",
