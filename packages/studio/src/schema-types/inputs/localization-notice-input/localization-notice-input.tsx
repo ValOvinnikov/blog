@@ -33,7 +33,7 @@ const Notice = ({ children }: { children: string }) => (
 
 const documentNotices = (
   value: unknown,
-  liveLocales: readonly TLocaleIsoCode[],
+  { liveLocales, defaultLocale }: TLocalizationNoticeOptions,
 ): string[] => {
   const notices: string[] = [];
   const language =
@@ -51,7 +51,7 @@ const documentNotices = (
     );
   }
 
-  const missing = collectMissingLocales(value, liveLocales);
+  const missing = collectMissingLocales(value, liveLocales, defaultLocale);
   if (missing.length > 0) {
     notices.push(
       `Missing translations: ${formatLocaleList(missing)}. The default language is shown instead.`,
@@ -63,9 +63,9 @@ const documentNotices = (
 
 const fieldNotices = (
   value: unknown,
-  liveLocales: readonly TLocaleIsoCode[],
+  { liveLocales, defaultLocale }: TLocalizationNoticeOptions,
 ): string[] => {
-  const missing = getMissingTranslations(value, liveLocales);
+  const missing = getMissingTranslations(value, liveLocales, defaultLocale);
 
   return missing.length > 0 ? [`Missing: ${formatLocaleList(missing)}.`] : [];
 };
@@ -146,10 +146,7 @@ const LinkDocumentNotices = ({
 
   return (
     <NoticeStack
-      notices={[
-        ...documentNotices(props.value, options.liveLocales),
-        ...targetNotices,
-      ]}
+      notices={[...documentNotices(props.value, options), ...targetNotices]}
     >
       {props.renderDefault(props)}
     </NoticeStack>
@@ -159,8 +156,6 @@ const LinkDocumentNotices = ({
 export const createLocalizationNoticeInput = (
   options: TLocalizationNoticeOptions,
 ) => {
-  const { liveLocales } = options;
-
   return function LocalizationNoticeInput(props: InputProps) {
     if (props.path.length === 0 && props.schemaType.name === LINK_TYPE_NAME) {
       return <LinkDocumentNotices props={props} options={options} />;
@@ -168,9 +163,9 @@ export const createLocalizationNoticeInput = (
 
     const notices =
       props.path.length === 0
-        ? documentNotices(props.value, liveLocales)
+        ? documentNotices(props.value, options)
         : isLocalizedSchemaType(props.schemaType)
-          ? fieldNotices(props.value, liveLocales)
+          ? fieldNotices(props.value, options)
           : [];
 
     return (

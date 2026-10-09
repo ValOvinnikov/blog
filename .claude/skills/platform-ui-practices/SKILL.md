@@ -227,27 +227,27 @@ through to the site's Newsreader serif (Space Grotesk on `h1`–`h4`), and
 inline `fontFamily` or `tracking-*`. `font-mono` is for domains, ids and DNS
 values (`DetailList.Row isMono`).
 
-| Role                                                         | Write                                                   | Renders                                                                                                                 |
-| ------------------------------------------------------------ | ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Page title                                                   | `PageHeader` `title`                                    | 22px, 700, `tracking-[-0.01em]`                                                                                         |
-| Page description                                             | `PageHeader` `description`                              | 13.5px muted (`Text variant="supporting"`, kept for page descriptions only)                                             |
-| Card title                                                   | `Card.Header` `title`                                   | 15px, 650 (`Heading size="cardTitle"`)                                                                                  |
-| Dialog title                                                 | `AlertDialog.Title` at `cardTitle`                      | 15px, 650. **Not yet:** `ConfirmDialog`'s is 600                                                                        |
-| Card description                                             | `Card.Header` `supportingText`                          | 12.5px muted                                                                                                            |
-| Description or prose inside a card                           | `Text variant="muted"`                                  | 12.5px muted, never larger than the label above it                                                                      |
-| Small title inside a card (step, notice, list item, summary) | the primitive's title slot                              | 13.5px, 600                                                                                                             |
-| Field label                                                  | `FormField` `label`                                     | 13px, 600, field labels only                                                                                            |
-| Field hint                                                   | `FormField` `hint`, a plain string                      | 12px muted, under the label, above the control. **Not yet:** 11.5px below the control                                   |
-| Lock reason                                                  | `SettingRow` `lockedReason`                             | 12px muted, the hint style                                                                                              |
-| Field error                                                  | `FormField` `error`                                     | 11.5px `admin-bad`, inline under the field                                                                              |
-| Body: primary content and values                             | `Text` plus a `text-[13.5px] text-admin-text` slot      | 13.5px `admin-text`. **Not yet:** `Text` alone is unsized, so 16px                                                      |
-| Read-only facts                                              | `DetailList` (`isMono` for domains, ids)                | 13.5px values, 12.5px muted terms, mono 12.5px                                                                          |
-| Control text                                                 | `TextInput`, `Textarea`; `Button`                       | 13.5px (16px below `md`); 13px at `md`, 12px at `sm`. **Not yet:** `TextInput` and `Textarea` are 13.5px at every width |
-| Table header; table cell                                     | the table recipe's `head`; its `cell`                   | 11px, 700, uppercase, `tracking-[.06em]`, muted (not `faint`); 13.5px `admin-text`, a second line 12px muted            |
-| Badge                                                        | `StatusBadge`                                           | 11.5px, 600                                                                                                             |
-| Caption, meta (a header count, a step time, a caption)       | `Text variant="meta"`                                   | 12px muted. **Not yet:** no `meta` variant; use `variant="muted"`                                                       |
-| Empty state                                                  | one sentence in `Card.Body`; `emptyMessage` for a table | 13.5px muted; centred in a table                                                                                        |
-| Save status                                                  | `SettingsFormShell` only                                | 12px `admin-ok`                                                                                                         |
+| Role                                                         | Write                                                   | Renders                                                                                                      |
+| ------------------------------------------------------------ | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Page title                                                   | `PageHeader` `title`                                    | 22px, 700, `tracking-[-0.01em]`                                                                              |
+| Page description                                             | `PageHeader` `description`                              | 13.5px muted (`Text variant="supporting"`, kept for page descriptions only)                                  |
+| Card title                                                   | `Card.Header` `title`                                   | 15px, 650 (`Heading size="cardTitle"`)                                                                       |
+| Dialog title                                                 | `AlertDialog.Title` at `cardTitle`                      | 15px, 650. **Not yet:** `ConfirmDialog`'s is 600                                                             |
+| Card description                                             | `Card.Header` `supportingText`                          | 12.5px muted                                                                                                 |
+| Description or prose inside a card                           | `Text variant="muted"`                                  | 12.5px muted, never larger than the label above it                                                           |
+| Small title inside a card (step, notice, list item, summary) | the primitive's title slot                              | 13.5px, 600                                                                                                  |
+| Field label                                                  | `FormField` `label`                                     | 13px, 600, field labels only                                                                                 |
+| Field hint                                                   | `FormField` `hint`, a plain string                      | 12px muted, under the label, above the control. **Not yet:** 11.5px below the control                        |
+| Lock reason                                                  | `SettingRow` `lockedReason`                             | 12px muted, the hint style                                                                                   |
+| Field error                                                  | `FormField` `error`                                     | 11.5px `admin-bad`, inline under the field                                                                   |
+| Body: primary content and values                             | `Text` plus a `text-[13.5px] text-admin-text` slot      | 13.5px `admin-text`. **Not yet:** `Text` alone is unsized, so 16px                                           |
+| Read-only facts                                              | `DetailList` (`isMono` for domains, ids)                | 13.5px values, 12.5px muted terms, mono 12.5px                                                               |
+| Control text                                                 | `TextInput`, `Textarea`; `Button`                       | 13.5px (16px below `md`); 13px at `md`, 12px at `sm`                                                         |
+| Table header; table cell                                     | the table recipe's `head`; its `cell`                   | 11px, 700, uppercase, `tracking-[.06em]`, muted (not `faint`); 13.5px `admin-text`, a second line 12px muted |
+| Badge                                                        | `StatusBadge`                                           | 11.5px, 600                                                                                                  |
+| Caption, meta (a header count, a step time, a caption)       | `Text variant="meta"`                                   | 12px muted. **Not yet:** no `meta` variant; use `variant="muted"`                                            |
+| Empty state                                                  | one sentence in `Card.Body`; `emptyMessage` for a table | 13.5px muted; centred in a table                                                                             |
+| Save status                                                  | `SettingsFormShell` only                                | 12px `admin-ok`                                                                                              |
 
 - The site's named sizes (`text-xs`, `text-sm`, `text-base`, `text-label`,
   `text-meta`, …) never appear outside `site-preview/`. Admin sizes become
@@ -557,8 +557,7 @@ tools you have are `loading.tsx`, `<Suspense>`, `cache`, `use`,
 
 - Text fields are at least 16px (`text-[16px] md:text-[13.5px]`) so iOS doesn't
   zoom, and touch targets at least 44px (`min-h-11 md:min-h-0`). Both live in
-  the primitives. **Not yet:** they don't; Voice and the save bar add them at
-  call sites. Add no more call-site overrides to a shared primitive; a control
+  the primitives; add no call-site overrides to a shared primitive. A control
   you build yourself carries both.
 - A page with an editor beside a preview gives phones Edit/Preview tabs below
   `lg` and renders only the active pane, whose `tabpanel` role applies below
@@ -570,8 +569,9 @@ tools you have are `loading.tsx`, `<Suspense>`, `cache`, `use`,
 - A dialog keeps a 16px gutter (`w-[calc(100%-2rem)] max-w-md`). **Not yet:**
   `ConfirmDialog`'s popup is `w-full max-w-md`; only `LeavePageDialog` has it.
 - Tables scroll sideways inside their card, and fact lists stack the term above
-  the value. **Not yet:** `DataTableShell` has no scroll wrapper and
-  `DetailList` keeps its 132px term column; fix them there, not per page.
+  the value below `md`. `DataTableShell` and `DetailList` own both; never
+  add them per page. The shell's scroll region is named by its `ariaLabel`,
+  the page's own title.
 - A Desktop/Mobile preview toggle is offered only where it changes what renders;
   an email's Desktop preview is a real 600px frame.
 - Check in a browser at 375, 768, 1024 and 1280px, sidebar open and collapsed,

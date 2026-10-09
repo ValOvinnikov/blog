@@ -2,39 +2,24 @@
 
 import { Menu } from '@base-ui/react/menu';
 import { ICONS, SIZE } from '@blog/config';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { Avatar } from '@platform/components/shared/avatar';
 import { Icon } from '@platform/components/shared/icon';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Link } from '@platform/i18n/navigation';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import type { TTenantSwitcherItem } from '@platform/utils/tenant-switcher-items/tenant-switcher-items';
 import { useTranslations } from 'next-intl';
 
 import { tenantSwitcherVariants } from './tenant-switcher-variants';
 
 export type TTenantSwitcherProps = {
-  /** Every tenant the signed-in user can switch into. */
-  tenants: TTenant[];
+  tenants: TTenantSwitcherItem[];
   activeTenantId: string;
-  /**
-   * Builds each list item's link target. Defaults to the id-routed
-   * `/tenants/{id}` tenant overview page the sidebar's own switcher uses;
-   * the `/dashboard` tree passes its own tenant-select endpoint instead,
-   * reusing this same list-rendering rather than a second tenant picker.
-   */
-  hrefFor?: (tenant: TTenant) => string;
 };
 
-/**
- * The tenant picker in the sidebar. Behaviour (open state, focus, dismissal)
- * comes entirely from Base UI's `Menu` — nothing hand-rolled here. Renders
- * correctly with a single tenant today; adding more is a matter of the
- * caller passing a longer `tenants` list, not a change to this component.
- */
 export const TenantSwitcher = ({
   tenants,
   activeTenantId,
-  hrefFor = (tenant) => adminRoutes.tenantOverview(tenant.id),
 }: TTenantSwitcherProps) => {
   const active =
     tenants.find((tenant) => tenant.id === activeTenantId) ?? tenants[0];
@@ -68,7 +53,7 @@ export const TenantSwitcher = ({
         <span className={meta()}>
           <span className={nameRow()}>
             <span className={name()}>{active.name}</span>
-            {Boolean(active.deprovisionedAt) && (
+            {active.isArchived && (
               <StatusBadge tone="neutral" hasDot={false} className={badge()}>
                 {t('archived')}
               </StatusBadge>
@@ -88,11 +73,15 @@ export const TenantSwitcher = ({
               <Menu.LinkItem
                 key={tenant.id}
                 className={item()}
-                render={<Link href={hrefFor(tenant)} />}
+                render={
+                  <Link
+                    href={adminRoutes.dashboardSelectTenantHref(tenant.id)}
+                  />
+                }
               >
                 <span className={itemNameRow()}>
                   <span className={itemName()}>{tenant.name}</span>
-                  {Boolean(tenant.deprovisionedAt) && (
+                  {tenant.isArchived && (
                     <StatusBadge
                       tone="neutral"
                       hasDot={false}

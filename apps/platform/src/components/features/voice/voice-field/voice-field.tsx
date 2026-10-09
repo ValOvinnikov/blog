@@ -57,8 +57,6 @@ export const VoiceField = ({
     label: labelSlot,
     hint: hintSlot,
     actions,
-    resetButton,
-    input,
     note,
     token,
     error: errorSlot,
@@ -108,12 +106,7 @@ export const VoiceField = ({
             isUnsaved={!isSameVoiceValue(value, savedValue)}
           />
           {isCustomised && !isReadOnly && (
-            <Button
-              size={SIZE.SM}
-              variant="secondary"
-              onClick={reset}
-              className={resetButton()}
-            >
+            <Button size={SIZE.SM} variant="secondary" onClick={reset}>
               {t('reset')}
             </Button>
           )}
@@ -142,7 +135,6 @@ export const VoiceField = ({
           placeholder={placeholder}
           isReadOnly={isReadOnly}
           rows={3}
-          className={input()}
         />
       ) : (
         <TextInput
@@ -152,7 +144,6 @@ export const VoiceField = ({
           placeholder={placeholder}
           isInvalid={Boolean(error)}
           isReadOnly={isReadOnly}
-          className={input()}
         />
       )}
       {placeholderToken !== undefined && (

@@ -20,7 +20,7 @@ export const saveBarVariants = tv({
       'hidden md:inline',
       'rounded-admin-sm border border-admin-line px-1.5 py-0.5 font-mono text-[11px] text-admin-muted',
     ],
-    button: ['min-h-11 justify-center md:min-h-0'],
+    button: ['justify-center'],
   },
   variants: {
     hasErrors: {

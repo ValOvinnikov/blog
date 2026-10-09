@@ -91,6 +91,7 @@
     "columnPlan": "Tarif",
     "columnStatus": "Status",
     "columnCreated": "Erstellt",
+    "columnActions": "Aktionen",
     "status": {
       "ACTIVE": "Aktiv",
       "SUSPENDED": "Gesperrt",

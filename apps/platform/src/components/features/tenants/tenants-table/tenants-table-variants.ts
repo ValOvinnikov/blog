@@ -8,6 +8,7 @@ export const tenantsTableVariants = tv({
       'border-b border-admin-line-2 px-[14px] py-2.5',
       'text-left text-[11px] font-bold text-admin-muted uppercase tracking-[.06em]',
     ],
+    visuallyHidden: ['sr-only'],
     row: [
       'border-b border-admin-line-2 last:border-b-0 hover:bg-admin-surface-2',
     ],
