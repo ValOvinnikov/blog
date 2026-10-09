@@ -16,7 +16,6 @@ export type TTextInputProps = {
   type?: string;
   placeholder?: string;
   isRequired?: boolean;
-  isInvalid?: TTextInputVariants['isInvalid'];
   isDisabled?: TTextInputVariants['isDisabled'];
   isReadOnly?: TTextInputVariants['isReadOnly'];
   'aria-describedby'?: AriaAttributes['aria-describedby'];
@@ -31,7 +30,6 @@ export const TextInput = ({
   type,
   placeholder,
   isRequired,
-  isInvalid,
   isDisabled,
   isReadOnly,
   'aria-describedby': ariaDescribedBy,
@@ -48,10 +46,8 @@ export const TextInput = ({
       value={value}
       onValueChange={(nextValue) => onChange(nextValue)}
       aria-label={ariaLabel}
-      aria-invalid={isInvalid || undefined}
       aria-describedby={ariaDescribedBy}
       className={textInputVariants({
-        isInvalid,
         isDisabled,
         isReadOnly,
         class: className,

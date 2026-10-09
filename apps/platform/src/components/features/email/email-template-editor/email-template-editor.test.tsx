@@ -1,5 +1,9 @@
 import { EMAIL_TEMPLATE_TYPE } from '@blog/config';
-import { customRender, screen } from '@platform/testing/custom-render';
+import {
+  customRender,
+  renderWithIntl,
+  screen,
+} from '@platform/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { EmailTemplateEditor } from './email-template-editor';
@@ -75,5 +79,40 @@ describe(`<${EmailTemplateEditor.name}/>`, () => {
     expect(
       screen.getByRole('button', { name: 'Upload template logo' }),
     ).toBeDisabled();
+  });
+
+  it('describes the message editor with its hint', async () => {
+    setup();
+
+    expect(
+      await screen.findByRole('textbox', { name: 'Message (French)' }),
+    ).toHaveAccessibleDescription(
+      "The sign-in button, invite link or unsubscribe link always renders below this — it can't be removed from here.",
+    );
+  });
+
+  it('describes the message editor with the archived notice while archived', () => {
+    renderWithIntl(
+      <>
+        <p id="archived-notice">This tenant is archived</p>
+        <EmailTemplateEditor
+          templateType={EMAIL_TEMPLATE_TYPE.MAGIC_LINK}
+          languageName="French"
+          copy={{ subject: '', body: null }}
+          fallback={{ subject: 'Connectez-vous', body: FALLBACK_BODY }}
+          logo={{ url: undefined }}
+          onCopyChange={vi.fn()}
+          onLogoStage={vi.fn()}
+          isDisabled={true}
+          archivedNoticeId="archived-notice"
+        />
+      </>,
+    );
+
+    expect(
+      screen.getByRole('textbox', { name: 'Message (French)' }),
+    ).toHaveAccessibleDescription(
+      expect.stringContaining('This tenant is archived'),
+    );
   });
 });

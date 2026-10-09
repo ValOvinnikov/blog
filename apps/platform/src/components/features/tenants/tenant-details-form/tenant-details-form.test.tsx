@@ -106,6 +106,23 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
     ).toBeVisible();
   });
 
+  it('marks the field with a returned error invalid and describes it by that error', async () => {
+    createTenantActionMock.mockResolvedValue({
+      ok: false,
+      fieldErrors: { ownerEmail: 'No registered user matches this email.' },
+    });
+
+    await fillValidForm(user);
+    await clickBeginProvisioning(user);
+    await screen.findByText('No registered user matches this email.');
+
+    const ownerEmail = screen.getByRole('textbox', { name: 'Owner email' });
+    expect(ownerEmail).toHaveAttribute('aria-invalid', 'true');
+    expect(ownerEmail).toHaveAccessibleDescription(
+      expect.stringContaining('No registered user matches this email.'),
+    );
+  });
+
   it('shows a full-form loading overlay with a "Beginning provisioning…" label for the initial submit', async () => {
     let resolveAction: (value: { ok: boolean }) => void = () => {};
     createTenantActionMock.mockImplementation(

@@ -1,4 +1,5 @@
 import { DISABLED_READONLY_SURFACE_CLASSES } from '@platform/utils/disabled-state-classes/disabled-state-classes';
+import { INVALID_SURFACE_CLASSES } from '@platform/utils/invalid-state-classes/invalid-state-classes';
 import { tv } from '@platform/utils/tv/tv';
 import type { VariantProps } from 'tailwind-variants';
 
@@ -7,6 +8,7 @@ export const textareaVariants = tv({
     'w-full rounded-[9px] border px-[11px] py-[9px]',
     'text-[16px] md:text-[13.5px] text-admin-text bg-admin-surface border-admin-control-line',
     'focus-visible:outline-2 focus-visible:outline-admin-brand-weak focus-visible:border-admin-brand',
+    INVALID_SURFACE_CLASSES,
   ],
   variants: {
     isDisabled: {

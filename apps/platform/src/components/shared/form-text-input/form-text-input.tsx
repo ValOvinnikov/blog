@@ -11,7 +11,6 @@ export type TFormTextInputProps = {
   onChange: (value: string) => void;
   type?: string;
   placeholder?: string;
-  isInvalid?: boolean;
   isDisabled?: boolean;
   'aria-describedby'?: AriaAttributes['aria-describedby'];
 };
@@ -25,7 +24,6 @@ export const FormTextInput = ({
   onChange,
   type,
   placeholder,
-  isInvalid,
   isDisabled,
   'aria-describedby': ariaDescribedBy,
 }: TFormTextInputProps) => {
@@ -36,7 +34,6 @@ export const FormTextInput = ({
         placeholder={placeholder}
         value={value}
         onChange={onChange}
-        isInvalid={isInvalid}
         isDisabled={isDisabled}
         aria-describedby={ariaDescribedBy}
       />

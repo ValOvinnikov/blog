@@ -13,7 +13,7 @@ import type { TEmailCopyDraft } from '@platform/utils/email-draft/email-draft';
 import { isBlankPortableTextValue } from '@platform/utils/portable-text-schema/portable-text-schema';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 
 import { emailTemplateEditorVariants } from './email-template-editor-variants';
 
@@ -46,6 +46,7 @@ export const EmailTemplateEditor = ({
   const t = useTranslations('emailTemplateEditor');
   const tStatus = useTranslations('emailItemStatus');
   const [bodyRevision, setBodyRevision] = useState(0);
+  const bodyHintId = useId();
   const { stack, fieldStatus } = emailTemplateEditorVariants();
 
   const isSubjectCustomised = copy.subject !== '';
@@ -108,7 +109,7 @@ export const EmailTemplateEditor = ({
           <FormField
             label={t('bodyLabel', { language: languageName })}
             hasOwnAccessibleName={true}
-            hint={t('bodyHint')}
+            hint={<span id={bodyHintId}>{t('bodyHint')}</span>}
             footer={renderFieldStatus(isBodyCustomised, resetBody)}
           >
             <PortableTextEditor
@@ -117,6 +118,9 @@ export const EmailTemplateEditor = ({
               onChange={handleBodyChange}
               ariaLabel={t('bodyLabel', { language: languageName })}
               isDisabled={isDisabled}
+              aria-describedby={[bodyHintId, archivedNoticeId]
+                .filter(Boolean)
+                .join(' ')}
             />
           </FormField>
           <EmailLogoField
