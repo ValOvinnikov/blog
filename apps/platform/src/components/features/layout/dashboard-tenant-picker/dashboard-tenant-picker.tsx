@@ -1,8 +1,7 @@
 import type { TTenant } from '@blog/db/schema/tenants';
 import { PreShellFrame } from '@platform/components/features/layout/pre-shell-frame';
-import { Heading } from '@platform/components/shared/heading';
+import { PageHeader } from '@platform/components/shared/page-header';
 import { StatusBadge } from '@platform/components/shared/status-badge';
-import { Text } from '@platform/components/shared/text';
 import { Link } from '@platform/i18n/navigation';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { toTenantSwitcherItems } from '@platform/utils/tenant-switcher-items/tenant-switcher-items';
@@ -19,7 +18,7 @@ export const DashboardTenantPicker = ({
 }: TDashboardTenantPickerProps) => {
   const t = useTranslations('dashboardTenantPicker');
   const tSwitcher = useTranslations('tenantSwitcher');
-  const { description, list, row, nameRow, name, domain, badge } =
+  const { list, row, nameRow, name, domain, badge } =
     dashboardTenantPickerVariants();
 
   if (tenants.length === 0) {
@@ -27,13 +26,11 @@ export const DashboardTenantPicker = ({
   }
 
   return (
-    <PreShellFrame>
-      <Heading level={1} size="pageTitle">
-        {t('heading')}
-      </Heading>
-      <Text variant="supporting" className={description()}>
-        {t('description')}
-      </Text>
+    <PreShellFrame
+      header={
+        <PageHeader title={t('heading')} description={t('description')} />
+      }
+    >
       <ul className={list()}>
         {toTenantSwitcherItems(tenants).map((tenant) => (
           <li key={tenant.id}>

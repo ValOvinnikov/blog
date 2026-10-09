@@ -7,17 +7,17 @@ import {
 import { PreShellFrame } from './pre-shell-frame';
 
 describe(PreShellFrame, () => {
-  it('renders its content inside a single main landmark', () => {
+  it('renders its header and content inside a single main landmark', () => {
     renderWithIntl(
-      <PreShellFrame>
-        <h1>Page title</h1>
+      <PreShellFrame header={<h1>Page title</h1>}>
+        <p>Page content</p>
       </PreShellFrame>,
     );
 
+    const main = screen.getByRole('main');
     expect(
-      within(screen.getByRole('main')).getByRole('heading', {
-        name: 'Page title',
-      }),
+      within(main).getByRole('heading', { name: 'Page title' }),
     ).toBeVisible();
+    expect(within(main).getByText('Page content')).toBeVisible();
   });
 });
