@@ -180,7 +180,7 @@ describe(ProvisioningStatusView, () => {
 
     const sidebar = screen.getByRole('complementary');
     expect(
-      within(sidebar).getByRole('heading', { level: 2, name: 'Steps' }),
+      within(sidebar).getByRole('heading', { level: 2, name: /^Steps/ }),
     ).toBeVisible();
     expect(within(sidebar).getByText('0 of 6 done')).toBeVisible();
   });

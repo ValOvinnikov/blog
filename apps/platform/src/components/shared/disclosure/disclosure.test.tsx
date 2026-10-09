@@ -25,18 +25,46 @@ describe(Disclosure, () => {
     expect(screen.getByText('Curated overrides live here.')).not.toBeVisible();
   });
 
-  it('opens by default when isDefaultOpen is set', () => {
+  it('renders the trigger inside a heading of the given level', () => {
     render(
-      <Disclosure summary="Advanced" isDefaultOpen={true}>
+      <Disclosure summary="Steps" headingLevel={2}>
         <p>Body</p>
       </Disclosure>,
     );
 
-    expect(screen.getByRole('button', { name: 'Advanced' })).toHaveAttribute(
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Steps' }),
+    ).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Steps' })).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    );
+  });
+
+  it('toggles from inside its heading', async () => {
+    render(
+      <Disclosure summary="Steps" headingLevel={3}>
+        <p>Body</p>
+      </Disclosure>,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Steps' }));
+
+    expect(screen.getByRole('button', { name: 'Steps' })).toHaveAttribute(
       'aria-expanded',
       'true',
     );
     expect(screen.getByText('Body')).toBeVisible();
+  });
+
+  it('renders no heading without a headingLevel', () => {
+    render(
+      <Disclosure summary="Advanced">
+        <p>Body</p>
+      </Disclosure>,
+    );
+
+    expect(screen.queryByRole('heading')).not.toBeInTheDocument();
   });
 
   it('toggles open and closed on click', async () => {

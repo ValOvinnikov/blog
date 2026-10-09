@@ -140,7 +140,7 @@ describe(TenantDangerPage, () => {
       'tenant-1',
     );
     expect(
-      screen.queryByRole('heading', { name: 'Deprovisioning progress' }),
+      screen.queryByRole('heading', { name: /^Deprovisioning progress/ }),
     ).not.toBeInTheDocument();
   });
 
@@ -167,7 +167,7 @@ describe(TenantDangerPage, () => {
     await setup();
 
     expect(
-      screen.getByRole('heading', { name: 'Deprovisioning progress' }),
+      screen.getByRole('heading', { name: /^Deprovisioning progress/ }),
     ).toBeVisible();
     expect(screen.queryByText('Starting…')).not.toBeInTheDocument();
     expect(screen.getAllByText('Failed').length).toBeGreaterThan(0);
@@ -201,7 +201,7 @@ describe(TenantDangerPage, () => {
     await setup();
 
     expect(
-      screen.getByRole('heading', { name: 'Deprovisioning progress' }),
+      screen.getByRole('heading', { name: /^Deprovisioning progress/ }),
     ).toBeVisible();
     expect(screen.getByText('Starting…')).toBeVisible();
     expect(screen.getAllByText('Queued').length).toBe(7);
@@ -223,7 +223,7 @@ describe(TenantDangerPage, () => {
     await setup();
 
     expect(
-      screen.getByRole('heading', { name: 'Deprovisioning progress' }),
+      screen.getByRole('heading', { name: /^Deprovisioning progress/ }),
     ).toBeVisible();
     expect(screen.getByText('Starting…')).toBeVisible();
     expect(screen.getByText('Remove domain')).toBeVisible();
@@ -304,7 +304,7 @@ describe(TenantDangerPage, () => {
     await setup();
 
     expect(
-      screen.getByRole('heading', { name: 'Deprovisioning progress' }),
+      screen.getByRole('heading', { name: /^Deprovisioning progress/ }),
     ).toBeVisible();
   });
 
@@ -316,7 +316,7 @@ describe(TenantDangerPage, () => {
     await setup();
 
     expect(
-      screen.queryByRole('heading', { name: 'Deprovisioning progress' }),
+      screen.queryByRole('heading', { name: /^Deprovisioning progress/ }),
     ).not.toBeInTheDocument();
   });
 
@@ -377,7 +377,7 @@ describe(TenantDangerPage, () => {
         screen.getByRole('heading', { name: 'Teardown history' }),
       ).toBeVisible();
       expect(
-        screen.getByRole('heading', { name: 'Deprovisioning progress' }),
+        screen.getByRole('heading', { name: /^Deprovisioning progress/ }),
       ).toBeVisible();
     });
 

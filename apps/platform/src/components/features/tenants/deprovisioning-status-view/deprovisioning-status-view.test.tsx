@@ -106,7 +106,7 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
     expect(
       screen.getByRole('heading', {
         level: 2,
-        name: 'Deprovisioning progress',
+        name: /^Deprovisioning progress/,
       }),
     ).toBeVisible();
     expect(screen.getByText('Remove domain')).toBeVisible();
