@@ -444,7 +444,7 @@ describe(`<${LookForm.name}/>`, () => {
       expect(screen.getByRole('slider', { name: 'Accent hue' })).toBeDisabled();
       expect(
         screen.getByRole('switch', { name: 'Follow accent hue' }),
-      ).toHaveAttribute('aria-disabled', 'true');
+      ).toBeDisabled();
       expect(
         screen.getByRole('button', { name: 'Upload logo' }),
       ).toBeDisabled();

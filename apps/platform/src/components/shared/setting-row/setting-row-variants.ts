@@ -1,5 +1,4 @@
 import { tv } from '@platform/utils/tv/tv';
-import type { VariantProps } from 'tailwind-variants';
 
 export const settingRowVariants = tv({
   slots: {
@@ -17,13 +16,4 @@ export const settingRowVariants = tv({
     ],
     control: ['flex shrink-0 items-center gap-2'],
   },
-  variants: {
-    isLocked: {
-      true: {
-        control: ['cursor-not-allowed opacity-[.55]'],
-      },
-    },
-  },
 });
-
-export type TSettingRowVariants = VariantProps<typeof settingRowVariants>;

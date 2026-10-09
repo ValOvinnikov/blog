@@ -1,3 +1,4 @@
+import { Switch } from '@platform/components/shared/switch';
 import { render, screen } from '@platform/testing/custom-render';
 
 import { SettingRow } from './setting-row';
@@ -80,29 +81,49 @@ describe(SettingRow, () => {
     expect(screen.queryByText('🔒')).not.toBeInTheDocument();
   });
 
-  it('honours the locked state by making the control slot inert', () => {
+  it('describes its switch by the description and the locked reason', () => {
     render(
-      <SettingRow label="Custom domains" isLocked={true} lockedReason="Locked">
-        <button type="button">Upgrade</button>
+      <SettingRow
+        label="Analytics"
+        description="Enable on-site analytics tracking."
+        isLocked={true}
+        lockedReason="Growth plan"
+      >
+        <Switch
+          isChecked={false}
+          onCheckedChange={vi.fn()}
+          ariaLabel="Analytics"
+          labels={{ on: 'On', off: 'Off' }}
+          isDisabled={true}
+          aria-describedby="archived-notice"
+        />
       </SettingRow>,
     );
 
-    const button = screen.getByRole('button', { name: 'Upgrade' });
-    const wrapper = button.closest('div');
-
-    expect(wrapper?.getAttribute('inert')).toBe('');
+    expect(screen.getByRole('switch', { name: 'Analytics' })).toHaveAttribute(
+      'aria-describedby',
+      expect.stringMatching(/^archived-notice \S+ \S+$/),
+    );
+    expect(
+      screen.getByRole('switch', { name: 'Analytics' }),
+    ).toHaveAccessibleDescription(
+      'Enable on-site analytics tracking. Growth plan',
+    );
   });
 
-  it('does not mark the control slot inert when not locked', () => {
+  it('keeps a locked switch in the accessibility tree as disabled', () => {
     render(
-      <SettingRow label="Custom domains">
-        <button type="button">Upgrade</button>
+      <SettingRow label="Analytics" isLocked={true} lockedReason="Growth plan">
+        <Switch
+          isChecked={false}
+          onCheckedChange={vi.fn()}
+          ariaLabel="Analytics"
+          labels={{ on: 'On', off: 'Off' }}
+          isDisabled={true}
+        />
       </SettingRow>,
     );
 
-    const button = screen.getByRole('button', { name: 'Upgrade' });
-    const wrapper = button.closest('div');
-
-    expect(wrapper?.hasAttribute('inert')).toBe(false);
+    expect(screen.getByRole('switch', { name: 'Analytics' })).toBeDisabled();
   });
 });

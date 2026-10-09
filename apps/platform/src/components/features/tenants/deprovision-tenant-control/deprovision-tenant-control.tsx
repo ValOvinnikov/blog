@@ -1,9 +1,9 @@
 'use client';
 
-import { Switch } from '@base-ui/react/switch';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { Card } from '@platform/components/shared/card';
 import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
+import { Switch } from '@platform/components/shared/switch';
 import { Text } from '@platform/components/shared/text';
 import { deleteTenantAction } from '@platform/server/provisioning/delete-tenant-action';
 import { deprovisionTenantAction } from '@platform/server/provisioning/deprovision-tenant-action';
@@ -19,15 +19,6 @@ export type TDeprovisionTenantControlProps = {
   isDeprovisioningInProgress?: boolean;
 };
 
-/**
- * The tenant status page's danger-zone control. A live tenant gets a
- * confirm-dialog trigger requiring its name to be typed exactly, same
- * confirm-before-destructive-action posture as `deprovision-tenant.yml`
- * itself — `DeprovisioningStatusView`, rendered below this once a run
- * exists, is what shows the dispatched workflow's live progress. An
- * already-archived tenant instead gets the hard-delete escape hatch,
- * confirmed the same way.
- */
 export const DeprovisionTenantControl = ({
   tenant,
   isDeprovisioningInProgress = false,
@@ -41,15 +32,8 @@ export const DeprovisionTenantControl = ({
   const [isPending, startTransition] = useTransition();
   const inProgressHintId = useId();
 
-  const {
-    cardBorder,
-    cardHeader,
-    cardTitle,
-    content,
-    switchRow,
-    switchTrack,
-    switchThumb,
-  } = deprovisionTenantControlVariants();
+  const { cardBorder, cardHeader, cardTitle, content } =
+    deprovisionTenantControlVariants();
 
   const handleOpenChange = (next: boolean) => {
     setOpen(next);
@@ -127,17 +111,12 @@ export const DeprovisionTenantControl = ({
               isDeprovisioningInProgress ? inProgressHintId : undefined
             }
           >
-            <div className={switchRow()}>
-              <Switch.Root
-                checked={dryRun}
-                onCheckedChange={setDryRun}
-                aria-label={t('dryRunLabel')}
-                className={switchTrack()}
-              >
-                <Switch.Thumb className={switchThumb()} />
-              </Switch.Root>
-              <span>{t('dryRunLabel')}</span>
-            </div>
+            <Switch
+              isChecked={dryRun}
+              onCheckedChange={setDryRun}
+              ariaLabel={t('dryRunLabel')}
+              labels={{ caption: t('dryRunLabel') }}
+            />
           </ConfirmDialog>
 
           {isDeprovisioningInProgress && (
@@ -151,12 +130,6 @@ export const DeprovisionTenantControl = ({
   );
 };
 
-/**
- * The archived branch's own trigger + confirm dialog, kept as a sibling
- * rather than folded into `DeprovisionTenantControl` itself so its
- * independent dialog/confirm state doesn't have to live alongside the
- * live-tenant dialog's.
- */
 const DeleteTenantPermanentlyControl = ({ tenant }: { tenant: TTenant }) => {
   const t = useTranslations('deprovisionTenantControl');
   const router = useRouter();

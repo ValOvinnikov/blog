@@ -1,14 +1,12 @@
+import { Field } from '@base-ui/react/field';
 import type { ReactNode } from 'react';
 
-import {
-  settingRowVariants,
-  type TSettingRowVariants,
-} from './setting-row-variants';
+import { settingRowVariants } from './setting-row-variants';
 
 export type TSettingRowProps = {
   label: string;
   description?: string;
-  isLocked?: TSettingRowVariants['isLocked'];
+  isLocked?: boolean;
   lockedReason?: string;
   children: ReactNode;
   className?: string;
@@ -17,7 +15,7 @@ export type TSettingRowProps = {
 export const SettingRow = ({
   label,
   description,
-  isLocked,
+  isLocked = false,
   lockedReason,
   children,
   className,
@@ -29,25 +27,25 @@ export const SettingRow = ({
     description: descriptionSlot,
     reason,
     control,
-  } = settingRowVariants({ isLocked });
+  } = settingRowVariants();
 
   return (
-    <div className={root({ class: className })}>
+    <Field.Root className={root({ class: className })}>
       <div className={content()}>
         <span className={labelSlot()}>{label}</span>
         {description && (
-          <span className={descriptionSlot()}>{description}</span>
+          <Field.Description className={descriptionSlot()}>
+            {description}
+          </Field.Description>
         )}
         {isLocked && lockedReason && (
-          <span className={reason()}>
+          <Field.Description className={reason()}>
             <span aria-hidden="true">🔒</span>
             <span>{lockedReason}</span>
-          </span>
+          </Field.Description>
         )}
       </div>
-      <div className={control()} inert={isLocked || undefined}>
-        {children}
-      </div>
-    </div>
+      <div className={control()}>{children}</div>
+    </Field.Root>
   );
 };

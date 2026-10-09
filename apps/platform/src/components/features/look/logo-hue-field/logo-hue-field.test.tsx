@@ -96,7 +96,7 @@ describe(LogoHueField, () => {
     const followSwitch = screen.getByRole('switch', {
       name: 'Follow accent hue',
     });
-    expect(followSwitch).toHaveAttribute('aria-disabled', 'true');
+    expect(followSwitch).toBeDisabled();
     expect(followSwitch).toHaveAttribute('aria-describedby', 'archived-notice');
     expect(screen.getByRole('slider', { name: 'Logo hue' })).toBeDisabled();
   });
