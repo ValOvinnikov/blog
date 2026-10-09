@@ -358,7 +358,10 @@
     "previewNote": "Unsaved form state → CSS custom properties, matching production's OKLCH ramp. Nothing here is live until you save.",
     "widthDesktop": "Desktop",
     "widthMobile": "Mobile",
-    "previewWidthAriaLabel": "Preview width"
+    "previewWidthAriaLabel": "Preview width",
+    "navPosts": "Posts",
+    "navAbout": "About",
+    "switcherMenuAriaLabel": "Language: {language}"
   },
   "brandAssetField": {
     "unexpectedError": "Something went wrong — try again.",

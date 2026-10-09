@@ -358,7 +358,10 @@
     "previewNote": "Ungespeicherter Formularzustand → CSS Custom Properties, passend zur OKLCH-Abstufung in Produktion. Hier ist nichts live, bis Sie speichern.",
     "widthDesktop": "Desktop",
     "widthMobile": "Mobil",
-    "previewWidthAriaLabel": "Vorschaubreite"
+    "previewWidthAriaLabel": "Vorschaubreite",
+    "navPosts": "Beiträge",
+    "navAbout": "Über uns",
+    "switcherMenuAriaLabel": "Sprache: {language}"
   },
   "brandAssetField": {
     "unexpectedError": "Etwas ist schiefgelaufen — bitte erneut versuchen.",

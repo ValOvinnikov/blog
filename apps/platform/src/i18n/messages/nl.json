@@ -358,7 +358,10 @@
     "previewNote": "Niet-opgeslagen formulierstatus → CSS custom properties, volgens dezelfde OKLCH-schaal als in productie. Niets hier is live totdat u opslaat.",
     "widthDesktop": "Desktop",
     "widthMobile": "Mobiel",
-    "previewWidthAriaLabel": "Breedte voorbeeld"
+    "previewWidthAriaLabel": "Breedte voorbeeld",
+    "navPosts": "Berichten",
+    "navAbout": "Over",
+    "switcherMenuAriaLabel": "Taal: {language}"
   },
   "brandAssetField": {
     "unexpectedError": "Er is iets misgegaan. Probeer het opnieuw.",

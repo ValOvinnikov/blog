@@ -358,7 +358,10 @@
     "previewNote": "État du formulaire non enregistré → propriétés CSS personnalisées, selon la même rampe OKLCH qu'en production. Rien n'est publié avant l'enregistrement.",
     "widthDesktop": "Ordinateur",
     "widthMobile": "Mobile",
-    "previewWidthAriaLabel": "Largeur de l'aperçu"
+    "previewWidthAriaLabel": "Largeur de l'aperçu",
+    "navPosts": "Articles",
+    "navAbout": "À propos",
+    "switcherMenuAriaLabel": "Langue : {language}"
   },
   "brandAssetField": {
     "unexpectedError": "Une erreur s'est produite — veuillez réessayer.",

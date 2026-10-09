@@ -358,7 +358,10 @@
     "previewNote": "Estado del formulario sin guardar → propiedades personalizadas de CSS, con la misma rampa OKLCH que producción. Nada de esto se publica hasta que guarde.",
     "widthDesktop": "Escritorio",
     "widthMobile": "Móvil",
-    "previewWidthAriaLabel": "Ancho de la vista previa"
+    "previewWidthAriaLabel": "Ancho de la vista previa",
+    "navPosts": "Entradas",
+    "navAbout": "Acerca de",
+    "switcherMenuAriaLabel": "Idioma: {language}"
   },
   "brandAssetField": {
     "unexpectedError": "Algo ha salido mal. Vuelva a intentarlo.",

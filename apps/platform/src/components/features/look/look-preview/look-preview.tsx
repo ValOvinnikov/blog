@@ -4,6 +4,8 @@ import type {
   TCardStyle,
   TDensity,
   TFontChoice,
+  TLanguageSwitcherStyle,
+  TLocaleIsoCode,
   TRadiusScale,
 } from '@blog/config';
 import { LookSample } from '@platform/components/features/site-preview/look-sample';
@@ -30,6 +32,8 @@ export type TLookPreviewProps = {
   density: TDensity;
   cardStyle: TCardStyle;
   logoSrc: string | undefined;
+  liveLocales: readonly TLocaleIsoCode[];
+  languageSwitcherStyle: TLanguageSwitcherStyle;
 };
 
 /**
@@ -46,6 +50,8 @@ export const LookPreview = ({
   density,
   cardStyle,
   logoSrc,
+  liveLocales,
+  languageSwitcherStyle,
 }: TLookPreviewProps) => {
   const t = useTranslations('lookPreview');
   const [mode, setMode] = useState<TPreviewMode>('light');
@@ -106,6 +112,8 @@ export const LookPreview = ({
             isDark={isDark}
             headingFontFamily={heading.fontFamily}
             bodyFontFamily={body.fontFamily}
+            liveLocales={liveLocales}
+            languageSwitcherStyle={languageSwitcherStyle}
           />
         </div>
         <p className={note()}>{t('previewNote')}</p>

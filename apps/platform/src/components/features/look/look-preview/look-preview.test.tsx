@@ -1,4 +1,11 @@
-import { CARD_STYLE, DENSITY, FONT_CHOICE, RADIUS_SCALE } from '@blog/config';
+import {
+  CARD_STYLE,
+  DENSITY,
+  FONT_CHOICE,
+  LANGUAGE_SWITCHER_STYLE,
+  LOCALE_ISO_CODES,
+  RADIUS_SCALE,
+} from '@blog/config';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import userEvent from '@testing-library/user-event';
 
@@ -16,6 +23,8 @@ const BASE_PROPS = {
   density: DENSITY.DEFAULT,
   cardStyle: CARD_STYLE.ACCENT_BAR,
   logoSrc: undefined,
+  liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR],
+  languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
 };
 
 describe(LookPreview, () => {

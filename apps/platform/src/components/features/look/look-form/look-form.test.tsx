@@ -4,6 +4,7 @@ import {
   FONT_CHOICE,
   isAccentHueAccessible,
   LANGUAGE_SWITCHER_STYLE,
+  LOCALE_ISO_CODES,
   PRESET_ID,
   RADIUS_SCALE,
 } from '@blog/config';
@@ -65,7 +66,7 @@ const setup = customRender(LookForm, {
   tenantId: 'tenant-1',
   tenantName: 'Acme Inc.',
   initialValues: defaultLookFormValues(),
-  hasMultipleLanguages: true,
+  liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR],
 });
 
 describe(`<${LookForm.name}/>`, () => {
@@ -251,7 +252,7 @@ describe(`<${LookForm.name}/>`, () => {
   });
 
   it('shows a note instead of the language switcher choice with one live language', () => {
-    setup({ hasMultipleLanguages: false });
+    setup({ liveLocales: [LOCALE_ISO_CODES.EN] });
 
     expect(
       screen.getByText(
