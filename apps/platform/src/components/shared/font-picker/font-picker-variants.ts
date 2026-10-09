@@ -5,7 +5,7 @@ export const fontPickerVariants = tv({
   slots: {
     root: ['flex flex-col gap-2'],
     option: [
-      'flex cursor-pointer items-center gap-3 rounded-[10px] border-[1.5px] border-admin-line bg-admin-surface px-[13px] py-[11px]',
+      'flex cursor-pointer items-center gap-3 rounded-admin-control border-[1.5px] border-admin-line bg-admin-surface px-[13px] py-[11px]',
       'transition-colors',
       'has-[[data-checked]]:border-admin-brand has-[[data-checked]]:shadow-[0_0_0_3px_var(--admin-brand-weak)]',
       ...HAS_DISABLED_DESCENDANT_AFFORDANCE_CLASSES,

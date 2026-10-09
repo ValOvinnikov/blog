@@ -49,7 +49,7 @@ export const buttonVariants = tv({
       class: {
         root: [
           'inline-flex items-center gap-[7px]',
-          'rounded-[9px] border font-medium no-underline',
+          'rounded-admin-control border font-medium no-underline',
           'cursor-pointer',
           'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-[.45]',
           'outline-hidden focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',

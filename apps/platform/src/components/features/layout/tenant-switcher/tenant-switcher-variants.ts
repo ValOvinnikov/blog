@@ -3,7 +3,7 @@ import { tv } from '@platform/utils/tv/tv';
 export const tenantSwitcherVariants = tv({
   slots: {
     trigger: [
-      'flex w-full items-center gap-[9px] rounded-[10px] border border-admin-side-line',
+      'flex w-full items-center gap-[9px] rounded-admin-control border border-admin-side-line',
       'bg-admin-side-raised px-2.5 py-2 text-left',
       'transition-colors duration-base ease-smooth',
       'hover:border-admin-side-accent/40',
@@ -22,7 +22,7 @@ export const tenantSwitcherVariants = tv({
       'bg-admin-side p-1 shadow-admin-lg outline-none',
     ],
     item: [
-      'flex cursor-pointer flex-col rounded-admin-sm px-2 py-1.5 outline-none',
+      'flex cursor-pointer flex-col rounded-admin-control px-2 py-1.5 outline-none',
       'data-[highlighted]:bg-admin-side-raised',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-side-accent',
       'focus-visible:ring-offset-2 focus-visible:ring-offset-admin-side',
