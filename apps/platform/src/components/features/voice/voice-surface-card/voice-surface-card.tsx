@@ -73,6 +73,7 @@ export const VoiceSurfaceCard = ({
     body,
     fields: fieldsSlot,
     previewColumn,
+    previewContent,
     previewToggle,
     preview,
     previewLabel,
@@ -144,33 +145,35 @@ export const VoiceSurfaceCard = ({
             )}
           </div>
           <div className={previewColumn()}>
-            <Button
-              className={previewToggle()}
-              aria-expanded={isPreviewOpen}
-              aria-controls={previewId}
-              onClick={() => setIsPreviewOpen((open) => !open)}
-            >
-              {tSpecimen(isPreviewOpen ? 'hidePreview' : 'showPreview')}
-            </Button>
-            <div
-              id={previewId}
-              role="group"
-              aria-labelledby={previewLabelId}
-              className={preview()}
-            >
-              <p id={previewLabelId} className={previewLabel()}>
-                {tPreview('livePreviewHeading')}
-              </p>
-              <VoiceSpecimen
-                surface={surface}
-                locale={locale}
-                values={values}
-                listSamples={listSamples}
-                openListFieldId={openFieldId}
-                focusedFieldId={focusedFieldId}
-                theme={specimenTheme}
-              />
-              <p className={previewNote()}>{tNotes(surface)}</p>
+            <div className={previewContent()}>
+              <Button
+                className={previewToggle()}
+                aria-expanded={isPreviewOpen}
+                aria-controls={previewId}
+                onClick={() => setIsPreviewOpen((open) => !open)}
+              >
+                {tSpecimen(isPreviewOpen ? 'hidePreview' : 'showPreview')}
+              </Button>
+              <div
+                id={previewId}
+                role="group"
+                aria-labelledby={previewLabelId}
+                className={preview()}
+              >
+                <p id={previewLabelId} className={previewLabel()}>
+                  {tPreview('livePreviewHeading')}
+                </p>
+                <VoiceSpecimen
+                  surface={surface}
+                  locale={locale}
+                  values={values}
+                  listSamples={listSamples}
+                  openListFieldId={openFieldId}
+                  focusedFieldId={focusedFieldId}
+                  theme={specimenTheme}
+                />
+                <p className={previewNote()}>{tNotes(surface)}</p>
+              </div>
             </div>
           </div>
         </Card.Body>
