@@ -65,7 +65,7 @@ export const EmailPreview = ({
           isPending={isSendingTest}
           pendingLabel={t('sendingTest')}
         >
-          <Icon name={ICONS.MAIL} size={SIZE.SM} />
+          <Icon name={ICONS.SEND} size={SIZE.SM} />
           {t('sendTest')}
         </Button>
       }
