@@ -226,6 +226,25 @@ describe(`<${VoiceSettings.name}/>`, () => {
       ).toHaveTextContent(SITE_MESSAGES_BY_LOCALE.EN.blogListPage.empty);
     });
 
+    it('closes the open list from its header', async () => {
+      setup();
+      const section = card('Empty lists');
+
+      await user.click(
+        within(section).getByRole('button', {
+          name: /Blog index/,
+          expanded: true,
+        }),
+      );
+
+      expect(
+        within(section).getByRole('button', {
+          name: /Blog index/,
+          expanded: false,
+        }),
+      ).toBeVisible();
+    });
+
     it('asks the editor to keep the name placeholder on a topic message', async () => {
       setup();
 

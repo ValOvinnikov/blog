@@ -92,8 +92,9 @@ export const VoiceSettings = ({
   const isArchived = Boolean(archivedAt);
   const [saved, setSaved] = useState(initialDraft);
   const [selectedLocale, setSelectedLocale] = useState(defaultLocale);
-  const [openListFieldId, setOpenListFieldId] =
-    useState<TVoiceFieldId>('blogListEmpty');
+  const [openListFieldId, setOpenListFieldId] = useState<
+    TVoiceFieldId | undefined
+  >('blogListEmpty');
   const [fieldErrors, setFieldErrors] = useState<TVoiceFieldErrorsByLocale>({});
   const [revision, setRevision] = useState(0);
   const [previewMode, setPreviewMode] = useState<TPreviewMode>('light');
@@ -111,7 +112,10 @@ export const VoiceSettings = ({
     const listErrorId = erroringFieldIds(errors, locale).find((id) =>
       voiceFieldsOf(VOICE_SURFACE.ARCHIVE).some((field) => field.id === id),
     );
-    if (listErrorId && errors[locale]?.[openListFieldId] === undefined) {
+    const isOpenListErroring =
+      openListFieldId !== undefined &&
+      errors[locale]?.[openListFieldId] !== undefined;
+    if (listErrorId && !isOpenListErroring) {
       setOpenListFieldId(listErrorId);
     }
   };
