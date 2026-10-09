@@ -18,6 +18,7 @@ import Menu from '@platform/assets/icons/menu.svg';
 import Palette from '@platform/assets/icons/palette.svg';
 import Plus from '@platform/assets/icons/plus.svg';
 import Quote from '@platform/assets/icons/quote.svg';
+import Send from '@platform/assets/icons/send.svg';
 import Settings from '@platform/assets/icons/settings.svg';
 import Studio from '@platform/assets/icons/studio.svg';
 import Users from '@platform/assets/icons/users.svg';
@@ -47,6 +48,7 @@ export const ICON_REGISTRY: Partial<Record<TIconName, TGlyph>> = {
   [ICONS.PALETTE]: Palette,
   [ICONS.PLUS]: Plus,
   [ICONS.QUOTE]: Quote,
+  [ICONS.SEND]: Send,
   [ICONS.SETTINGS]: Settings,
   [ICONS.STUDIO]: Studio,
   [ICONS.USERS]: Users,

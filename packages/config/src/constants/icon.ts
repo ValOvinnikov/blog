@@ -70,6 +70,7 @@ export const ICONS = {
   BOLD: 'BOLD',
   ITALIC: 'ITALIC',
   LINK: 'LINK',
+  SEND: 'SEND',
 } as const;
 
 export type TIconName = TValueOf<typeof ICONS>;

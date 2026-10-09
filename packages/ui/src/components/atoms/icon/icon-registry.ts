@@ -105,6 +105,8 @@ import RssComponent from '@blog/ui/assets/icons/rss.svg';
 import RssUrl from '@blog/ui/assets/icons/rss.svg?url';
 import SearchComponent from '@blog/ui/assets/icons/search.svg';
 import SearchUrl from '@blog/ui/assets/icons/search.svg?url';
+import SendComponent from '@blog/ui/assets/icons/send.svg';
+import SendUrl from '@blog/ui/assets/icons/send.svg?url';
 import SettingsComponent from '@blog/ui/assets/icons/settings.svg';
 import SettingsUrl from '@blog/ui/assets/icons/settings.svg?url';
 import ShareComponent from '@blog/ui/assets/icons/share.svg';
@@ -231,4 +233,5 @@ export const ICON_REGISTRY: Record<TIconName, TIconRegistryEntry> = {
   [ICONS.ITALIC]: { component: ItalicComponent, url: ItalicUrl },
   [ICONS.LINK]: { component: LinkComponent, url: LinkUrl },
   [ICONS.SMILE]: { component: SmileComponent, url: SmileUrl },
+  [ICONS.SEND]: { component: SendComponent, url: SendUrl },
 };

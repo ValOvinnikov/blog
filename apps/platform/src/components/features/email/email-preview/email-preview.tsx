@@ -1,13 +1,14 @@
 'use client';
 
-import { SIZE } from '@blog/config';
+import { ICONS, SIZE } from '@blog/config';
 import {
   EmailTemplatePreview,
   type TEmailPreviewWidth,
 } from '@platform/components/features/email/email-template-preview';
 import { Button } from '@platform/components/shared/button';
-import { Card } from '@platform/components/shared/card';
 import { DetailList } from '@platform/components/shared/detail-list';
+import { Icon } from '@platform/components/shared/icon';
+import { PreviewFrame } from '@platform/components/shared/preview-frame';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
@@ -37,27 +38,46 @@ export const EmailPreview = ({
 }: TEmailPreviewProps) => {
   const t = useTranslations('emailPreview');
   const [width, setWidth] = useState<TEmailPreviewWidth>('desktop');
-  const { root, body, note, footer } = emailPreviewVariants();
+  const { message, envelope } = emailPreviewVariants();
 
   return (
-    <section className={root()} aria-label={t('heading')}>
-      <Card>
-        <Card.Header
-          title={t('heading')}
-          headingLevel={2}
-          actions={
-            <SegmentedControl
-              options={[
-                { value: 'desktop', label: t('desktop') },
-                { value: 'mobile', label: t('mobile') },
-              ]}
-              value={width}
-              onChange={setWidth}
-              ariaLabel={t('widthAriaLabel')}
-            />
-          }
+    <PreviewFrame
+      ariaLabel={t('heading')}
+      isNarrow={width === 'mobile'}
+      controls={
+        <SegmentedControl
+          options={[
+            { value: 'desktop', label: t('desktop') },
+            { value: 'mobile', label: t('mobile') },
+          ]}
+          value={width}
+          onChange={setWidth}
+          ariaLabel={t('widthAriaLabel')}
         />
-        <Card.Body className={body()}>
+      }
+      actions={
+        <Button
+          type="button"
+          size={SIZE.SM}
+          variant="secondary"
+          onClick={onSendTest}
+          isDisabled={isSendTestDisabled}
+          isPending={isSendingTest}
+          pendingLabel={t('sendingTest')}
+        >
+          <Icon name={ICONS.SEND} size={SIZE.SM} />
+          {t('sendTest')}
+        </Button>
+      }
+      notes={
+        <>
+          <p>{t('actionLockedNote')}</p>
+          {hasUnsavedLogo && <p>{t('unsavedLogoNote')}</p>}
+        </>
+      }
+    >
+      <div className={message()}>
+        <div className={envelope()}>
           <DetailList>
             <DetailList.Row label={t('fromLabel')}>
               {from || t('defaultSender')}
@@ -67,28 +87,13 @@ export const EmailPreview = ({
             </DetailList.Row>
             <DetailList.Row label={t('subjectLabel')}>{subject}</DetailList.Row>
           </DetailList>
-          <EmailTemplatePreview
-            html={html}
-            title={t('iframeTitle')}
-            width={width}
-          />
-          <p className={note()}>{t('actionLockedNote')}</p>
-          <div className={footer()}>
-            <Button
-              type="button"
-              size={SIZE.SM}
-              variant="secondary"
-              onClick={onSendTest}
-              isDisabled={isSendTestDisabled}
-              isPending={isSendingTest}
-              pendingLabel={t('sendingTest')}
-            >
-              {t('sendTest')}
-            </Button>
-            {hasUnsavedLogo && <p className={note()}>{t('unsavedLogoNote')}</p>}
-          </div>
-        </Card.Body>
-      </Card>
-    </section>
+        </div>
+        <EmailTemplatePreview
+          html={html}
+          title={t('iframeTitle')}
+          width={width}
+        />
+      </div>
+    </PreviewFrame>
   );
 };
