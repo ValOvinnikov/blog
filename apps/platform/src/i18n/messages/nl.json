@@ -55,6 +55,7 @@
     "breadcrumbAriaLabel": "Kruimelpad"
   },
   "navSections": {
+    "yourSiteLabel": "Uw site",
     "platformLabel": "Platform",
     "platformSectionLabel": "Platformacties",
     "contentSectionLabel": "Content",
@@ -81,9 +82,6 @@
   },
   "tenantLayout": {
     "scopeLabel": "Tenant"
-  },
-  "dashboardLayout": {
-    "yourSiteLabel": "Uw site"
   },
   "dashboardTenantPicker": {
     "heading": "Kies een werkruimte",

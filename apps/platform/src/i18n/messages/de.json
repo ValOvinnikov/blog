@@ -55,6 +55,7 @@
     "breadcrumbAriaLabel": "Brotkrumennavigation"
   },
   "navSections": {
+    "yourSiteLabel": "Ihre Website",
     "platformLabel": "Plattform",
     "platformSectionLabel": "Plattformaktionen",
     "contentSectionLabel": "Inhalte",
@@ -81,9 +82,6 @@
   },
   "tenantLayout": {
     "scopeLabel": "Mandant"
-  },
-  "dashboardLayout": {
-    "yourSiteLabel": "Ihre Website"
   },
   "dashboardTenantPicker": {
     "heading": "Arbeitsbereich wählen",

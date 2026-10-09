@@ -199,13 +199,22 @@ const NO_PAGE: TPlanPageAccess = {
 };
 
 const configurationLabels = (access: TPlanPageAccess) => {
-  const [, configuration] = dashboardNavSections(t, access);
+  const [, , configuration] = dashboardNavSections(t, access);
   return configuration!.items.map((item) => item.label);
 };
 
 describe('dashboardNavSections', () => {
+  it('opens with a "Your site" section whose only item is Overview, linking to /dashboard', () => {
+    const [yourSite] = dashboardNavSections(t, EVERY_PAGE);
+
+    expect(yourSite!.label).toBe('Your site');
+    expect(yourSite!.items).toEqual([
+      expect.objectContaining({ label: 'Overview', href: '/dashboard' }),
+    ]);
+  });
+
   it('lists Content (Studio) and Configuration, with every page the plan can use', () => {
-    const [content, configuration] = dashboardNavSections(t, EVERY_PAGE);
+    const [, content, configuration] = dashboardNavSections(t, EVERY_PAGE);
 
     expect(content!.label).toBe('Content');
     expect(configuration!.label).toBe('Configuration');
@@ -246,7 +255,7 @@ describe('dashboardNavSections', () => {
   });
 
   it('shows Subscribers, Comments and Team as non-interactive "Coming soon" entries', () => {
-    const [, configuration] = dashboardNavSections(t, EVERY_PAGE);
+    const [, , configuration] = dashboardNavSections(t, EVERY_PAGE);
     const comingSoon = configuration!.items.filter(
       (item) => item.badge?.label === 'Coming soon',
     );
@@ -262,7 +271,7 @@ describe('dashboardNavSections', () => {
   });
 
   it('gives Look, Voice, Features, Languages, Domain, Email and Studio their /dashboard hrefs', () => {
-    const [content, configuration] = dashboardNavSections(t, EVERY_PAGE);
+    const [, content, configuration] = dashboardNavSections(t, EVERY_PAGE);
     const hrefOf = (label: string) =>
       configuration!.items.find((item) => item.label === label)?.href;
 
@@ -276,14 +285,16 @@ describe('dashboardNavSections', () => {
     expect(content!.items[0]?.badge).toBeUndefined();
   });
 
-  it('never includes Overview, Provisioning or Danger zone — those are platform-only', () => {
-    const labels = dashboardNavSections(t, EVERY_PAGE).flatMap((section) =>
-      section.items.map((item) => item.label),
-    );
+  it('never includes Provisioning, Danger zone or a "Tenant · …" label', () => {
+    const sections = dashboardNavSections(t, EVERY_PAGE);
+    const labels = [
+      ...sections.map((section) => section.label),
+      ...sections.flatMap((section) => section.items.map((item) => item.label)),
+    ];
 
-    expect(labels).not.toContain('Overview');
     expect(labels).not.toContain('Provisioning');
     expect(labels).not.toContain('Danger zone');
+    expect(labels.filter((label) => label.startsWith('Tenant'))).toEqual([]);
   });
 });
 
@@ -292,6 +303,7 @@ describe('nav section icons', () => {
     const items = [
       ...operatorNavSections(t),
       ...tenantNavSections(t, 'tenant-1', 'Acme'),
+      ...dashboardNavSections(t, EVERY_PAGE),
     ].flatMap((section) => section.items);
 
     const missing = items

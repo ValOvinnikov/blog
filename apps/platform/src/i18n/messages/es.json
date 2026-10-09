@@ -55,6 +55,7 @@
     "breadcrumbAriaLabel": "Ruta de navegación"
   },
   "navSections": {
+    "yourSiteLabel": "Su sitio",
     "platformLabel": "Plataforma",
     "platformSectionLabel": "Acciones de la plataforma",
     "contentSectionLabel": "Contenido",
@@ -81,9 +82,6 @@
   },
   "tenantLayout": {
     "scopeLabel": "Cliente"
-  },
-  "dashboardLayout": {
-    "yourSiteLabel": "Su sitio"
   },
   "dashboardTenantPicker": {
     "heading": "Elija un espacio de trabajo",

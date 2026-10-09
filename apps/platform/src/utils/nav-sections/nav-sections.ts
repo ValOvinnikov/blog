@@ -181,6 +181,16 @@ export const dashboardNavSections = (
 
   return [
     {
+      label: t('yourSiteLabel'),
+      items: [
+        {
+          label: t('overview'),
+          icon: ICONS.HOUSE,
+          href: adminRoutes.dashboard(),
+        },
+      ],
+    },
+    {
       label: t('contentSectionLabel'),
       items: [studioNavItem(t, hrefs.studio)],
     },

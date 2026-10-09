@@ -55,6 +55,7 @@
     "breadcrumbAriaLabel": "Fil d'Ariane"
   },
   "navSections": {
+    "yourSiteLabel": "Votre site",
     "platformLabel": "Plateforme",
     "platformSectionLabel": "Actions de la plateforme",
     "contentSectionLabel": "Contenu",
@@ -81,9 +82,6 @@
   },
   "tenantLayout": {
     "scopeLabel": "Locataire"
-  },
-  "dashboardLayout": {
-    "yourSiteLabel": "Votre site"
   },
   "dashboardTenantPicker": {
     "heading": "Choisir un espace de travail",

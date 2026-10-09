@@ -55,6 +55,7 @@
     "breadcrumbAriaLabel": "Breadcrumb"
   },
   "navSections": {
+    "yourSiteLabel": "Your site",
     "platformLabel": "Platform",
     "platformSectionLabel": "Platform actions",
     "contentSectionLabel": "Content",
@@ -81,9 +82,6 @@
   },
   "tenantLayout": {
     "scopeLabel": "Tenant"
-  },
-  "dashboardLayout": {
-    "yourSiteLabel": "Your site"
   },
   "dashboardTenantPicker": {
     "heading": "Choose a workspace",
