@@ -468,7 +468,7 @@
     "heading": "Voice",
     "description": "Reword the site's page-level messages. Every field has a default, so change only what you want to sound like you.",
     "fixedCopyNote": "Buttons, menus and labels are translated for you and stay the same on every site, so they aren't listed here.",
-    "editingLanguageNote": "Editing {language} — other languages keep their own text.",
+    "editingLanguageNote": "Editing <strong>{language}</strong> — other languages keep their own text.",
     "languageAriaLabel": "Language",
     "languageOption": "{language} · {count, plural, =0 {all default} other {# customised}}",
     "surfaceCustomisedCount": "{count, plural, =0 {All default} other {# customised}}",
