@@ -7,7 +7,7 @@ import { tv } from '@platform/utils/tv/tv';
 export const lookSampleVariants = tv({
   slots: {
     root: [
-      'flex flex-col gap-3 rounded-md border border-border bg-primary px-card-x py-card-y font-read text-text',
+      'flex flex-col gap-3 rounded-md border border-border bg-primary px-card-x py-card-y font-read text-[1rem] text-text',
     ],
     actionsRow: ['flex flex-wrap items-center gap-2 pt-1'],
     chip: [
