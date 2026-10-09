@@ -11,13 +11,11 @@ const {
   listMembershipsForUserMock,
   listTenantsByIdsMock,
   getAdminByUserIdMock,
-  getTenantSanityCredentialsMock,
   studioMountMock,
 } = vi.hoisted(() => ({
   listMembershipsForUserMock: vi.fn(),
   listTenantsByIdsMock: vi.fn(),
   getAdminByUserIdMock: vi.fn(),
-  getTenantSanityCredentialsMock: vi.fn(),
   studioMountMock: vi.fn(),
 }));
 
@@ -33,8 +31,7 @@ vi.mock('@blog/db', async () => ({
     memberships: { listMembershipsForUser: listMembershipsForUserMock },
     tenants: {
       listTenantsByIds: listTenantsByIdsMock,
-      getTenantSanityCredentials: getTenantSanityCredentialsMock,
-      getTenantLiveLocales: vi.fn().mockResolvedValue([]),
+      selectLiveLocales: vi.fn().mockReturnValue([]),
     },
     admins: { getAdminByUserId: getAdminByUserIdMock },
   },
@@ -62,31 +59,30 @@ describe(`<${DashboardStudioPage.name}/>`, () => {
     listTenantsByIdsMock.mockReset();
     getAdminByUserIdMock.mockReset();
     getAdminByUserIdMock.mockResolvedValue(undefined);
-    getTenantSanityCredentialsMock.mockReset();
   });
 
-  it('redirects to sign-in without resolving credentials when there is no session', async () => {
+  it('redirects to sign-in without resolving the tenant when there is no session', async () => {
     authMock.mockResolvedValue(null);
 
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
 
     expect(redirect).toHaveBeenCalledWith('/api/auth/signin');
-    expect(getTenantSanityCredentialsMock).not.toHaveBeenCalled();
+    expect(listTenantsByIdsMock).not.toHaveBeenCalled();
   });
 
   it("mounts Studio with the session tenant's coordinates and a locale-free basePath", async () => {
     listTenantsByIdsMock.mockResolvedValue([
-      makeTenant({ id: 'tenant-1', name: 'Acme Inc.' }),
+      makeTenant({
+        id: 'tenant-1',
+        name: 'Acme Inc.',
+        sanityProjectId: 'proj-acme',
+        sanityDataset: 'production',
+        sanityReadTokenEncrypted: 'encrypted-token',
+      }),
     ]);
-    getTenantSanityCredentialsMock.mockResolvedValue({
-      projectId: 'proj-acme',
-      dataset: 'production',
-      token: 'secret-token',
-    });
 
     await setup();
 
-    expect(getTenantSanityCredentialsMock).toHaveBeenCalledWith('tenant-1');
     expect(screen.getByTestId('studio-mount')).toBeVisible();
     expect(studioMountMock).toHaveBeenCalledWith(
       expect.objectContaining({

@@ -6,16 +6,16 @@ import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
 
 import { LookPageContent } from './look-page-content';
 
-const { getSiteConfigMock, getTenantLiveLocalesMock } = vi.hoisted(() => ({
+const { getSiteConfigMock, selectLiveLocalesMock } = vi.hoisted(() => ({
   getSiteConfigMock: vi.fn(),
-  getTenantLiveLocalesMock: vi.fn(),
+  selectLiveLocalesMock: vi.fn(),
 }));
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     siteConfig: { getSiteConfig: getSiteConfigMock },
-    tenants: { getTenantLiveLocales: getTenantLiveLocalesMock },
+    tenants: { selectLiveLocales: selectLiveLocalesMock },
   },
 }));
 
@@ -28,7 +28,7 @@ const setup = customRenderAsync(LookPageContent, { tenant });
 describe(`<${LookPageContent.name}/>`, () => {
   beforeEach(() => {
     getSiteConfigMock.mockReset();
-    getTenantLiveLocalesMock.mockResolvedValue(['EN']);
+    selectLiveLocalesMock.mockReturnValue(['EN']);
   });
 
   it('renders Console defaults when the tenant has no saved site_config row yet', async () => {

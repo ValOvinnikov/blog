@@ -1,27 +1,19 @@
 import { CAPABILITY, LOCALE_ISO_CODES } from '@blog/config';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
-import { makeTenant } from '@platform/testing/tenants/fixtures';
+import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
 
 import { StudioMountView } from './studio-mount-view';
 
-const {
-  getTenantSanityCredentialsMock,
-  studioMountMock,
-  getEnabledCapabilitiesMock,
-  getTenantLiveLocalesMock,
-} = vi.hoisted(() => ({
-  getTenantLiveLocalesMock: vi.fn(),
-  getEnabledCapabilitiesMock: vi.fn(),
-  getTenantSanityCredentialsMock: vi.fn(),
-  studioMountMock: vi.fn(),
-}));
+const { studioMountMock, getEnabledCapabilitiesMock, selectLiveLocalesMock } =
+  vi.hoisted(() => ({
+    selectLiveLocalesMock: vi.fn(),
+    getEnabledCapabilitiesMock: vi.fn(),
+    studioMountMock: vi.fn(),
+  }));
 
 vi.mock('@blog/db', () => ({
   queries: {
-    tenants: {
-      getTenantSanityCredentials: getTenantSanityCredentialsMock,
-      getTenantLiveLocales: getTenantLiveLocalesMock,
-    },
+    tenants: { selectLiveLocales: selectLiveLocalesMock },
   },
 }));
 
@@ -36,16 +28,25 @@ vi.mock('@blog/studio', () => ({
   },
 }));
 
+const makeProvisionedTenant = (
+  overrides: Parameters<typeof makeReadyTenant>[0] = {},
+) =>
+  makeReadyTenant({
+    sanityReadTokenEncrypted: 'encrypted-token',
+    ...overrides,
+  });
+
 describe(`<${StudioMountView.name}/>`, () => {
   beforeEach(() => {
-    getTenantSanityCredentialsMock.mockReset();
     studioMountMock.mockReset();
     getEnabledCapabilitiesMock.mockReset();
     getEnabledCapabilitiesMock.mockResolvedValue([]);
+    selectLiveLocalesMock.mockReset();
+    selectLiveLocalesMock.mockReturnValue([LOCALE_ISO_CODES.EN]);
   });
 
-  it('shows the archived notice instead of mounting Studio for a deprovisioned tenant, without checking credentials', async () => {
-    const tenant = makeTenant({
+  it('shows the archived notice instead of mounting Studio for a deprovisioned tenant', async () => {
+    const tenant = makeProvisionedTenant({
       deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
     });
 
@@ -57,31 +58,38 @@ describe(`<${StudioMountView.name}/>`, () => {
       screen.getByRole('heading', { level: 1, name: 'Studio' }),
     ).toBeVisible();
     expect(screen.getByText('This tenant is archived')).toBeVisible();
-    expect(getTenantSanityCredentialsMock).not.toHaveBeenCalled();
+    expect(getEnabledCapabilitiesMock).not.toHaveBeenCalled();
     expect(screen.queryByTestId('studio-mount')).not.toBeInTheDocument();
   });
 
-  it("shows a not-ready alert instead of mounting Studio when the tenant's Sanity project isn't provisioned", async () => {
-    const tenant = makeTenant();
-    getTenantSanityCredentialsMock.mockResolvedValue(undefined);
+  it.each([
+    'sanityProjectId',
+    'sanityDataset',
+    'sanityReadTokenEncrypted',
+  ] as const)(
+    'shows a not-ready alert instead of mounting Studio when the tenant has no %s',
+    async (field) => {
+      const tenant = makeProvisionedTenant({ [field]: null });
 
-    renderWithIntl(
-      await StudioMountView({ tenant, basePath: '/dashboard/studio' }),
-    );
+      renderWithIntl(
+        await StudioMountView({ tenant, basePath: '/dashboard/studio' }),
+      );
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Studio' }),
-    ).toBeVisible();
-    expect(screen.getByText("Studio isn't ready yet")).toBeVisible();
-    expect(screen.queryByTestId('studio-mount')).not.toBeInTheDocument();
-  });
+      expect(
+        screen.getByRole('heading', { level: 1, name: 'Studio' }),
+      ).toBeVisible();
+      expect(screen.getByText("Studio isn't ready yet")).toBeVisible();
+      expect(getEnabledCapabilitiesMock).not.toHaveBeenCalled();
+      expect(screen.queryByTestId('studio-mount')).not.toBeInTheDocument();
+    },
+  );
 
-  it('mounts Studio with the resolved credentials and the given basePath', async () => {
-    const tenant = makeTenant({ id: 'tenant-2', name: 'Globex Corp.' });
-    getTenantSanityCredentialsMock.mockResolvedValue({
-      projectId: 'proj-globex',
-      dataset: 'production',
-      token: 'secret-token',
+  it("mounts Studio with the tenant's project and dataset and the given basePath", async () => {
+    const tenant = makeProvisionedTenant({
+      id: 'tenant-2',
+      name: 'Globex Corp.',
+      sanityProjectId: 'proj-globex',
+      sanityDataset: 'staging',
     });
 
     renderWithIntl(
@@ -91,12 +99,11 @@ describe(`<${StudioMountView.name}/>`, () => {
       }),
     );
 
-    expect(getTenantSanityCredentialsMock).toHaveBeenCalledWith('tenant-2');
     expect(screen.getByTestId('studio-mount')).toBeVisible();
     expect(studioMountMock).toHaveBeenCalledWith(
       expect.objectContaining({
         projectId: 'proj-globex',
-        dataset: 'production',
+        dataset: 'staging',
         basePath: '/tenants/tenant-2/studio',
         title: 'Globex Corp.',
       }),
@@ -104,12 +111,7 @@ describe(`<${StudioMountView.name}/>`, () => {
   });
 
   it("passes the tenant's effective capabilities to Studio", async () => {
-    const tenant = makeTenant();
-    getTenantSanityCredentialsMock.mockResolvedValue({
-      projectId: 'proj',
-      dataset: 'production',
-      token: 't',
-    });
+    const tenant = makeProvisionedTenant();
     getEnabledCapabilitiesMock.mockResolvedValue([CAPABILITY.COMMENTS]);
 
     renderWithIntl(
@@ -123,14 +125,8 @@ describe(`<${StudioMountView.name}/>`, () => {
   });
 
   it("passes the tenant's default and live languages to Studio", async () => {
-    const tenant = makeTenant({ locale: LOCALE_ISO_CODES.NL });
-    getTenantSanityCredentialsMock.mockResolvedValue({
-      projectId: 'proj',
-      dataset: 'production',
-      token: 't',
-    });
-    getEnabledCapabilitiesMock.mockResolvedValue([]);
-    getTenantLiveLocalesMock.mockResolvedValue([
+    const tenant = makeProvisionedTenant({ locale: LOCALE_ISO_CODES.NL });
+    selectLiveLocalesMock.mockReturnValue([
       LOCALE_ISO_CODES.NL,
       LOCALE_ISO_CODES.EN,
     ]);
@@ -139,6 +135,7 @@ describe(`<${StudioMountView.name}/>`, () => {
       await StudioMountView({ tenant, basePath: '/dashboard/studio' }),
     );
 
+    expect(selectLiveLocalesMock).toHaveBeenCalledWith(tenant);
     expect(studioMountMock).toHaveBeenCalledWith(
       expect.objectContaining({
         defaultLocale: LOCALE_ISO_CODES.NL,

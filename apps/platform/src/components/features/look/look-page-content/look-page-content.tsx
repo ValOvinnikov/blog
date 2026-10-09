@@ -11,10 +11,8 @@ export type TLookPageContentProps = {
 };
 
 export const LookPageContent = async ({ tenant }: TLookPageContentProps) => {
-  const [siteConfig, liveLocales] = await Promise.all([
-    queries.siteConfig.getSiteConfig(tenant.id),
-    queries.tenants.getTenantLiveLocales(tenant.id),
-  ]);
+  const siteConfig = await queries.siteConfig.getSiteConfig(tenant.id);
+  const liveLocales = queries.tenants.selectLiveLocales(tenant);
 
   const initialValues = siteConfig
     ? toLookFormValues(siteConfig)
@@ -25,7 +23,7 @@ export const LookPageContent = async ({ tenant }: TLookPageContentProps) => {
       tenantId={tenant.id}
       tenantName={tenant.name}
       initialValues={initialValues}
-      liveLocales={liveLocales ?? []}
+      liveLocales={liveLocales}
       savedAt={siteConfig?.updatedAt}
       archivedAt={tenant.deprovisionedAt ?? undefined}
     />

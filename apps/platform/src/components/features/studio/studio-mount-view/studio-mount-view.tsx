@@ -15,10 +15,6 @@ export type TStudioMountViewProps = {
   basePath: string;
 };
 
-/**
- * Studio owns everything under its catch-all route with its own
- * client-side router.
- */
 export const StudioMountView = async ({
   tenant,
   basePath,
@@ -35,11 +31,9 @@ export const StudioMountView = async ({
     );
   }
 
-  const credentials = await queries.tenants.getTenantSanityCredentials(
-    tenant.id,
-  );
+  const { sanityProjectId, sanityDataset, sanityReadTokenEncrypted } = tenant;
 
-  if (!credentials) {
+  if (!sanityProjectId || !sanityDataset || !sanityReadTokenEncrypted) {
     return (
       <div className={root()}>
         <PageHeader title={t('title')} />
@@ -53,12 +47,12 @@ export const StudioMountView = async ({
   }
 
   const enabledCapabilities = await getEnabledCapabilities(tenant);
-  const liveLocales = await queries.tenants.getTenantLiveLocales(tenant.id);
+  const liveLocales = queries.tenants.selectLiveLocales(tenant);
 
   return (
     <StudioMount
-      projectId={credentials.projectId}
-      dataset={credentials.dataset}
+      projectId={sanityProjectId}
+      dataset={sanityDataset}
       basePath={basePath}
       title={tenant.name}
       enabledCapabilities={enabledCapabilities}

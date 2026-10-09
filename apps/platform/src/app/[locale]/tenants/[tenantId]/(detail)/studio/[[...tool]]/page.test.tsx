@@ -6,17 +6,13 @@ import type { Session } from 'next-auth';
 
 import TenantStudioPage from './page';
 
-const {
-  getAdminByUserIdMock,
-  getTenantByIdMock,
-  getTenantSanityCredentialsMock,
-  studioMountMock,
-} = vi.hoisted(() => ({
-  getAdminByUserIdMock: vi.fn(),
-  getTenantByIdMock: vi.fn(),
-  getTenantSanityCredentialsMock: vi.fn(),
-  studioMountMock: vi.fn(),
-}));
+const { getAdminByUserIdMock, getTenantByIdMock, studioMountMock } = vi.hoisted(
+  () => ({
+    getAdminByUserIdMock: vi.fn(),
+    getTenantByIdMock: vi.fn(),
+    studioMountMock: vi.fn(),
+  }),
+);
 
 vi.mock('@platform/server/auth/auth');
 
@@ -30,8 +26,7 @@ vi.mock('@blog/db', async () => ({
     admins: { getAdminByUserId: getAdminByUserIdMock },
     tenants: {
       getTenantById: getTenantByIdMock,
-      getTenantSanityCredentials: getTenantSanityCredentialsMock,
-      getTenantLiveLocales: vi.fn().mockResolvedValue([]),
+      selectLiveLocales: vi.fn().mockReturnValue([]),
     },
   },
 }));
@@ -56,7 +51,6 @@ describe(`<${TenantStudioPage.name}/>`, () => {
     getAdminByUserIdMock.mockReset();
     getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });
     getTenantByIdMock.mockReset();
-    getTenantSanityCredentialsMock.mockReset();
   });
 
   it('redirects to sign-in without querying the tenant when there is no session', async () => {
@@ -72,7 +66,6 @@ describe(`<${TenantStudioPage.name}/>`, () => {
     await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(getTenantByIdMock).not.toHaveBeenCalled();
-    expect(getTenantSanityCredentialsMock).not.toHaveBeenCalled();
   });
 
   it('404s for an unknown tenant id', async () => {
@@ -86,18 +79,15 @@ describe(`<${TenantStudioPage.name}/>`, () => {
       makeTenant({
         id: 'tenant-2',
         name: 'Globex Corp.',
+        sanityProjectId: 'proj-globex',
+        sanityDataset: 'production',
+        sanityReadTokenEncrypted: 'encrypted-token',
         deprovisionedAt: null,
       }),
     );
-    getTenantSanityCredentialsMock.mockResolvedValue({
-      projectId: 'proj-globex',
-      dataset: 'production',
-      token: 'secret-token',
-    });
 
     await setup();
 
-    expect(getTenantSanityCredentialsMock).toHaveBeenCalledWith('tenant-2');
     expect(screen.getByTestId('studio-mount')).toBeVisible();
     expect(studioMountMock).toHaveBeenCalledWith(
       expect.objectContaining({

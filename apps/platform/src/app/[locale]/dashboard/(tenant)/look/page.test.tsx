@@ -26,7 +26,7 @@ vi.mock('@blog/db', async () => ({
     memberships: { listMembershipsForUser: listMembershipsForUserMock },
     tenants: {
       listTenantsByIds: listTenantsByIdsMock,
-      getTenantLiveLocales: vi.fn().mockResolvedValue(['EN']),
+      selectLiveLocales: vi.fn().mockReturnValue(['EN']),
     },
     admins: { getAdminByUserId: getAdminByUserIdMock },
     siteConfig: { getSiteConfig: getSiteConfigMock },
