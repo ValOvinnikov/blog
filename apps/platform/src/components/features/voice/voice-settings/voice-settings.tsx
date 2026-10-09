@@ -136,7 +136,7 @@ export const VoiceSettings = ({
       },
     });
 
-  const { intro, controls, segmented, note, cards } = voiceSettingsVariants();
+  const { intro, controls, note, cards } = voiceSettingsVariants();
   const isDark = previewMode === 'dark';
   const specimenTheme = {
     tokenStyle: buildThemePreviewStyle(previewTheme, isDark),
@@ -230,7 +230,6 @@ export const VoiceSettings = ({
         <div className={controls()}>
           {liveLocales.length > 1 && (
             <SegmentedControl
-              className={segmented()}
               options={liveLocales.map((locale) => ({
                 value: locale,
                 label: t('languageOption', {
@@ -246,7 +245,6 @@ export const VoiceSettings = ({
             />
           )}
           <SegmentedControl
-            className={segmented()}
             options={[
               { value: 'light', label: tPreview('modeLight') },
               { value: 'dark', label: tPreview('modeDark') },

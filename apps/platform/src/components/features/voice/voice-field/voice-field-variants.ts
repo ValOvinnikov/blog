@@ -8,8 +8,6 @@ export const voiceFieldVariants = tv({
     label: ['text-[13px] font-semibold text-admin-text'],
     hint: ['text-[11.5px] text-admin-muted'],
     actions: ['flex items-center gap-2'],
-    resetButton: ['min-h-11 md:min-h-0'],
-    input: ['max-md:text-[16px]'],
     note: ['text-[11.5px] text-admin-muted'],
     token: ['font-mono text-[11px] text-admin-text'],
     error: ['text-[11.5px] text-admin-bad'],
