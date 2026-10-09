@@ -41,10 +41,13 @@ export const getMissingLocales = (
 export const getMissingTranslations = (
   value: unknown,
   liveLocales: readonly TLocaleIsoCode[],
+  defaultLocale: TLocaleIsoCode,
 ): TLocaleIsoCode[] => {
   const missing = getMissingLocales(value, liveLocales);
 
-  return missing.length === liveLocales.length ? [] : missing;
+  return missing.length === liveLocales.length
+    ? []
+    : missing.filter((locale) => locale !== defaultLocale);
 };
 
 const findLocalizedArrays = (value: unknown): TLocalizedItem[][] => {
@@ -63,10 +66,11 @@ const findLocalizedArrays = (value: unknown): TLocalizedItem[][] => {
 export const collectMissingLocales = (
   document: unknown,
   liveLocales: readonly TLocaleIsoCode[],
+  defaultLocale: TLocaleIsoCode,
 ): TLocaleIsoCode[] => {
   const missing = new Set(
     findLocalizedArrays(document).flatMap((items) =>
-      getMissingLocales(items, liveLocales),
+      getMissingTranslations(items, liveLocales, defaultLocale),
     ),
   );
 
