@@ -7,6 +7,8 @@ import ArrowComponent from '@blog/ui/assets/icons/arrow.svg';
 import ArrowUrl from '@blog/ui/assets/icons/arrow.svg?url';
 import BlueskyComponent from '@blog/ui/assets/icons/bluesky.svg';
 import BlueskyUrl from '@blog/ui/assets/icons/bluesky.svg?url';
+import BoldComponent from '@blog/ui/assets/icons/bold.svg';
+import BoldUrl from '@blog/ui/assets/icons/bold.svg?url';
 import BookComponent from '@blog/ui/assets/icons/book.svg';
 import BookUrl from '@blog/ui/assets/icons/book.svg?url';
 import BookmarkComponent from '@blog/ui/assets/icons/bookmark.svg';
@@ -61,10 +63,14 @@ import InfoComponent from '@blog/ui/assets/icons/info.svg';
 import InfoUrl from '@blog/ui/assets/icons/info.svg?url';
 import InstagramComponent from '@blog/ui/assets/icons/instagram.svg';
 import InstagramUrl from '@blog/ui/assets/icons/instagram.svg?url';
+import ItalicComponent from '@blog/ui/assets/icons/italic.svg';
+import ItalicUrl from '@blog/ui/assets/icons/italic.svg?url';
 import LayersComponent from '@blog/ui/assets/icons/layers.svg';
 import LayersUrl from '@blog/ui/assets/icons/layers.svg?url';
 import LightbulbComponent from '@blog/ui/assets/icons/lightbulb.svg';
 import LightbulbUrl from '@blog/ui/assets/icons/lightbulb.svg?url';
+import LinkComponent from '@blog/ui/assets/icons/link.svg';
+import LinkUrl from '@blog/ui/assets/icons/link.svg?url';
 import LinkedInComponent from '@blog/ui/assets/icons/linkedin.svg';
 import LinkedInUrl from '@blog/ui/assets/icons/linkedin.svg?url';
 import LockComponent from '@blog/ui/assets/icons/lock.svg';
@@ -221,5 +227,8 @@ export const ICON_REGISTRY: Record<TIconName, TIconRegistryEntry> = {
   [ICONS.MAP_PIN]: { component: MapPinComponent, url: MapPinUrl },
   [ICONS.PHONE]: { component: PhoneComponent, url: PhoneUrl },
   [ICONS.TRENDING_UP]: { component: TrendingUpComponent, url: TrendingUpUrl },
+  [ICONS.BOLD]: { component: BoldComponent, url: BoldUrl },
+  [ICONS.ITALIC]: { component: ItalicComponent, url: ItalicUrl },
+  [ICONS.LINK]: { component: LinkComponent, url: LinkUrl },
   [ICONS.SMILE]: { component: SmileComponent, url: SmileUrl },
 };

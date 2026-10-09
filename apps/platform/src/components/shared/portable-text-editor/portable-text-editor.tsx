@@ -146,7 +146,7 @@ export const PortableTextEditor = <TBlock = TEmailTemplateBlock,>({
     root,
     editable,
     placeholder: placeholderSlot,
-  } = portableTextEditorVariants({ isDisabled });
+  } = portableTextEditorVariants({ isDisabled, hasToolbar: !isDisabled });
 
   // @portabletext/editor drops role and aria-multiline entirely when readOnly; restore both so a disabled editor still announces as a (dimmed) text field instead of a nameless generic node.
   const disabledFieldProps = isDisabled

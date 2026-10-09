@@ -3,12 +3,12 @@ import { tv } from '@platform/utils/tv/tv';
 
 export const portableTextEditorVariants = tv({
   slots: {
-    root: ['flex', 'flex-col', 'gap-2'],
+    root: ['flex', 'flex-col'],
     editable: [
       'min-h-[140px] w-full rounded-[9px] border px-[11px] py-[9px]',
       'text-[16px] md:text-[13.5px] text-admin-text bg-admin-surface border-admin-control-line',
       'focus-visible:outline-2 focus-visible:outline-admin-brand-weak focus-visible:border-admin-brand',
-      '[&_p]:m-0 [&_h2]:m-0 [&_h2]:text-[16px] [&_h2]:font-semibold',
+      '[&_p]:relative [&_h2]:relative [&_p]:m-0 [&_h2]:m-0 [&_h2]:text-[16px] [&_h2]:font-semibold',
       '[&_ul]:m-0 [&_ul]:pl-5 [&_ol]:m-0 [&_ol]:pl-5',
       INVALID_SURFACE_CLASSES,
     ],
@@ -16,6 +16,9 @@ export const portableTextEditorVariants = tv({
     placeholder: ['text-admin-faint'],
   },
   variants: {
+    hasToolbar: {
+      true: { editable: ['rounded-t-none border-t-0'] },
+    },
     isDisabled: {
       true: {
         editable: ['cursor-not-allowed text-admin-faint bg-admin-surface-2'],
