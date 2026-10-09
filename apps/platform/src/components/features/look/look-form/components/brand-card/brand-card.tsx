@@ -4,6 +4,7 @@ import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-a
 import type { TLookFormFieldSetter } from '@platform/utils/default-look-values/default-look-values';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 import { useTranslations } from 'next-intl';
+import { useId } from 'react';
 
 import { brandCardVariants } from './brand-card-variants';
 
@@ -27,8 +28,9 @@ export const BrandCard = ({
   archivedNoticeId,
 }: TBrandCardProps) => {
   const t = useTranslations('lookForm');
-  const archivedDescribedBy = isArchived ? archivedNoticeId : undefined;
-  const { uploads } = brandCardVariants();
+  const hintId = useId();
+  const describedBy = isArchived ? `${hintId} ${archivedNoticeId}` : hintId;
+  const { uploads, rows, hint } = brandCardVariants();
 
   return (
     <LookCard
@@ -37,26 +39,29 @@ export const BrandCard = ({
       hasUnsavedChanges={hasUnsavedChanges}
     >
       <div className={uploads()}>
-        <BrandAssetField
-          kind="logo"
-          label={t('logoFieldLabel')}
-          hint={t('logoFieldHint')}
-          image={logo}
-          onStage={(image) => onFieldChange('logo', image)}
-          isRepickNeeded={repickKinds.includes('logo')}
-          isDisabled={isArchived}
-          aria-describedby={archivedDescribedBy}
-        />
-        <BrandAssetField
-          kind="favicon"
-          label={t('faviconFieldLabel')}
-          hint={t('faviconFieldHint')}
-          image={favicon}
-          onStage={(image) => onFieldChange('favicon', image)}
-          isRepickNeeded={repickKinds.includes('favicon')}
-          isDisabled={isArchived}
-          aria-describedby={archivedDescribedBy}
-        />
+        <div className={rows()}>
+          <BrandAssetField
+            kind="logo"
+            label={t('logoFieldLabel')}
+            image={logo}
+            onStage={(image) => onFieldChange('logo', image)}
+            isRepickNeeded={repickKinds.includes('logo')}
+            isDisabled={isArchived}
+            aria-describedby={describedBy}
+          />
+          <BrandAssetField
+            kind="favicon"
+            label={t('faviconFieldLabel')}
+            image={favicon}
+            onStage={(image) => onFieldChange('favicon', image)}
+            isRepickNeeded={repickKinds.includes('favicon')}
+            isDisabled={isArchived}
+            aria-describedby={describedBy}
+          />
+        </div>
+        <p id={hintId} className={hint()}>
+          {t('brandFieldsHint')}
+        </p>
       </div>
     </LookCard>
   );

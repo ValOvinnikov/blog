@@ -9,7 +9,6 @@ const STORED_URL = 'https://example.blob.vercel-storage.com/logo.png';
 const setup = customRender(BrandAssetField, {
   kind: 'logo',
   label: 'Logo',
-  hint: 'PNG, JPEG, or WebP.',
   image: { url: undefined },
   onStage: vi.fn(),
 });
@@ -23,17 +22,27 @@ describe(`<${BrandAssetField.name}/>`, () => {
     vi.restoreAllMocks();
   });
 
-  it('shows the hint and the label for the given kind before any file is chosen', () => {
-    setup({
-      kind: 'favicon',
-      label: 'Favicon',
-      hint: 'Pre-cropped square, please — non-square uploads are rejected.',
-    });
+  it('shows the upload label for the given kind before any file is chosen', () => {
+    setup({ kind: 'favicon', label: 'Favicon' });
 
-    expect(screen.getByText(/Pre-cropped square, please/)).toBeVisible();
     expect(
       screen.getByRole('button', { name: 'Upload favicon' }),
     ).toBeVisible();
+  });
+
+  it('names the stored file without marking it as saving with changes', () => {
+    setup({ image: { url: `${STORED_URL}?v=2` } });
+
+    expect(screen.getByText('logo.png')).toBeVisible();
+    expect(screen.queryByText('Saves with changes')).not.toBeInTheDocument();
+  });
+
+  it('names a staged file and marks it as saving with changes', () => {
+    const file = new File(['bytes'], 'new-logo.png', { type: 'image/png' });
+    setup({ image: { url: 'blob:staged-logo', file } });
+
+    expect(screen.getByText('new-logo.png')).toBeVisible();
+    expect(screen.getByText('Saves with changes')).toBeVisible();
   });
 
   it('shows the current alt text and the replace label once a value is set', () => {

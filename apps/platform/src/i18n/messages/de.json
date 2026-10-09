@@ -290,9 +290,8 @@
     "logoHueDescription": "Färbt die Tonstufen der Wortmarke (--logo-1/2/3). Folgt dem Akzentfarbton, sofern Sie ihn nicht festlegen.",
     "brandImagesDescription": "Gespeichert in Vercel Blob — ohne Transformationen zur Laufzeit, also wird genau das ausgeliefert, was Sie hochladen.",
     "logoFieldLabel": "Logo",
-    "logoFieldHint": "PNG, JPEG, WebP oder SVG · ersatzweise wird die Polygon-Wortmarke verwendet",
     "faviconFieldLabel": "Favicon",
-    "faviconFieldHint": "Bitte bereits quadratisch zuschneiden — Blob kann das nicht für Sie übernehmen (bei einem SVG zählt die viewBox als Form). Nicht quadratische Uploads werden abgelehnt.",
+    "brandFieldsHint": "Logo: PNG, JPEG, WebP oder SVG. Favicon: ein quadratisches Bild.",
     "optionalTag": "optional",
     "headingFontLabel": "Überschriftenschrift",
     "bodyFontLabel": "Fließtextschrift",
@@ -360,6 +359,7 @@
     "previewWidthAriaLabel": "Vorschaubreite"
   },
   "brandAssetField": {
+    "savesWithChanges": "Wird mit den Änderungen gespeichert",
     "unexpectedError": "Etwas ist schiefgelaufen — bitte erneut versuchen.",
     "currentAlt": "Aktuelles {label}",
     "uploading": "Wird hochgeladen…",

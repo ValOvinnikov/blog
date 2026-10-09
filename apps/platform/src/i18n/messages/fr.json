@@ -290,9 +290,8 @@
     "logoHueDescription": "Colore les nuances du logotype (--logo-1/2/3). Suit la teinte d'accent sauf si vous la définissez.",
     "brandImagesDescription": "Stockées dans Vercel Blob — aucune transformation à la volée : le fichier envoyé est celui qui est publié.",
     "logoFieldLabel": "Logo",
-    "logoFieldHint": "PNG, JPEG, WebP ou SVG · à défaut, le logotype polygonal est utilisé",
     "faviconFieldLabel": "Favicon",
-    "faviconFieldHint": "Merci de fournir une image carrée déjà recadrée — Blob ne peut pas la recadrer pour vous (la viewBox d'un SVG définit sa forme). Les images non carrées sont refusées.",
+    "brandFieldsHint": "Logo : PNG, JPEG, WebP ou SVG. Favicon : une image carrée.",
     "optionalTag": "facultatif",
     "headingFontLabel": "Police des titres",
     "bodyFontLabel": "Police du texte",
@@ -360,6 +359,7 @@
     "previewWidthAriaLabel": "Largeur de l'aperçu"
   },
   "brandAssetField": {
+    "savesWithChanges": "Enregistré avec les modifications",
     "unexpectedError": "Une erreur s'est produite — veuillez réessayer.",
     "currentAlt": "{label} actuel",
     "uploading": "Envoi…",

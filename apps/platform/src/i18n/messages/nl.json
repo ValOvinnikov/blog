@@ -290,9 +290,8 @@
     "logoHueDescription": "Kleurt de toonstappen van het woordmerk (--logo-1/2/3). Volgt de accenttint, tenzij u deze instelt.",
     "brandImagesDescription": "Opgeslagen in Vercel Blob — geen transformaties achteraf, dus wat u uploadt is wat er live gaat.",
     "logoFieldLabel": "Logo",
-    "logoFieldHint": "PNG, JPEG, WebP of SVG · valt terug op het polygoonwoordmerk",
     "faviconFieldLabel": "Favicon",
-    "faviconFieldHint": "Graag vooraf vierkant bijgesneden — Blob kan dat niet voor u doen (bij een SVG telt de viewBox als vorm). Niet-vierkante uploads worden geweigerd.",
+    "brandFieldsHint": "Logo: PNG, JPEG, WebP of SVG. Favicon: een vierkante afbeelding.",
     "optionalTag": "optioneel",
     "headingFontLabel": "Koplettertype",
     "bodyFontLabel": "Tekstlettertype",
@@ -360,6 +359,7 @@
     "previewWidthAriaLabel": "Breedte voorbeeld"
   },
   "brandAssetField": {
+    "savesWithChanges": "Wordt opgeslagen met de wijzigingen",
     "unexpectedError": "Er is iets misgegaan. Probeer het opnieuw.",
     "currentAlt": "Huidige {label}",
     "uploading": "Uploaden…",

@@ -290,9 +290,8 @@
     "logoHueDescription": "Tiñe los pasos tonales del logotipo (--logo-1/2/3). Sigue el tono de acento salvo que lo defina usted.",
     "brandImagesDescription": "Se almacenan en Vercel Blob, sin transformaciones al vuelo: lo que suba es lo que se publica.",
     "logoFieldLabel": "Logotipo",
-    "logoFieldHint": "PNG, JPEG, WebP o SVG · si no hay, se usa el logotipo poligonal",
     "faviconFieldLabel": "Favicon",
-    "faviconFieldHint": "Súbalo ya recortado en cuadrado: Blob no puede recortarlo por usted (en un SVG, su viewBox determina la forma). Las imágenes que no sean cuadradas se rechazan.",
+    "brandFieldsHint": "Logotipo: PNG, JPEG, WebP o SVG. Favicon: una imagen cuadrada.",
     "optionalTag": "opcional",
     "headingFontLabel": "Fuente de títulos",
     "bodyFontLabel": "Fuente del texto",
@@ -360,6 +359,7 @@
     "previewWidthAriaLabel": "Ancho de la vista previa"
   },
   "brandAssetField": {
+    "savesWithChanges": "Se guarda con los cambios",
     "unexpectedError": "Algo ha salido mal. Vuelva a intentarlo.",
     "currentAlt": "{label} actual",
     "uploading": "Subiendo…",

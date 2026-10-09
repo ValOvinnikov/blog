@@ -2,6 +2,8 @@ import { tv } from '@platform/utils/tv/tv';
 
 export const brandCardVariants = tv({
   slots: {
-    uploads: ['grid grid-cols-1 gap-3 sm:grid-cols-2'],
+    uploads: ['flex flex-col gap-[5px]'],
+    rows: ['flex flex-col gap-2'],
+    hint: ['text-[11.5px] text-admin-muted'],
   },
 });
