@@ -52,7 +52,16 @@
     "triggerLabel": "Menu"
   },
   "topbar": {
-    "breadcrumbAriaLabel": "Fil d'Ariane"
+    "breadcrumbAriaLabel": "Fil d'Ariane",
+    "roleChip": "{role} · {scope}"
+  },
+  "roleLabel": {
+    "SUPERADMIN": "Super-administrateur",
+    "ADMIN": "Administrateur",
+    "MODERATOR": "Modérateur",
+    "OWNER": "Propriétaire",
+    "EDITOR": "Éditeur",
+    "READER": "Lecteur"
   },
   "navSections": {
     "platformLabel": "Plateforme",
@@ -217,7 +226,6 @@
     "ownerCardTitle": "Propriétaire",
     "emailLabel": "E-mail",
     "roleLabel": "Rôle",
-    "ownerRoleBadge": "PROPRIÉTAIRE",
     "ownerInvitedPendingBadge": "Invité, en attente",
     "joinedLabel": "Inscrit le",
     "contentWorkspaceCardTitle": "Espace de contenu",

@@ -89,7 +89,7 @@ export const Sidebar = ({ sections, switcher }: TSidebarProps) => {
                   if (item.href) {
                     return (
                       <li key={item.label}>
-                        <SidebarNavLink href={item.href}>
+                        <SidebarNavLink href={item.href} title={item.label}>
                           <NavItemContent
                             icon={item.icon}
                             label={item.label}
@@ -102,7 +102,10 @@ export const Sidebar = ({ sections, switcher }: TSidebarProps) => {
 
                   return (
                     <li key={item.label}>
-                      <div className={row({ state: 'inert' })}>
+                      <div
+                        className={row({ state: 'inert' })}
+                        title={item.label}
+                      >
                         <NavItemContent
                           icon={item.icon}
                           label={item.label}

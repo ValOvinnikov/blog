@@ -257,9 +257,33 @@ describe(`<${Sidebar.name}/>`, () => {
       </SidebarCollapseProvider>,
     );
 
-    expect(screen.getByRole('link', { name: 'Tenants' })).toHaveAttribute(
-      'href',
-      '/tenants',
+    const link = screen.getByRole('link', { name: 'Tenants' });
+    expect(link).toHaveAttribute('href', '/tenants');
+    expect(link).toHaveAttribute('title', 'Tenants');
+  });
+
+  it('keeps an inert row named and its badge announced when the sidebar starts collapsed', () => {
+    renderWithIntl(
+      <SidebarCollapseProvider isInitiallyCollapsed={true}>
+        <Sidebar
+          sections={[
+            {
+              label: 'Tenant · acme',
+              items: [
+                {
+                  label: 'Analytics',
+                  icon: ICONS.GLOBE,
+                  badge: { label: 'Coming soon', tone: 'neutral' },
+                },
+              ],
+            },
+          ]}
+        />
+      </SidebarCollapseProvider>,
+    );
+
+    expect(screen.getByTitle('Analytics')).toHaveTextContent(
+      'AnalyticsComing soon',
     );
   });
 });

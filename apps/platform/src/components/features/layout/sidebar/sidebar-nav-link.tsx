@@ -7,6 +7,7 @@ import { sidebarVariants } from './sidebar-variants';
 
 export type TSidebarNavLinkProps = {
   href: string;
+  title: string;
   children: ReactNode;
 };
 
@@ -15,7 +16,11 @@ export type TSidebarNavLinkProps = {
  * active state. `Sidebar` itself, and every inert row it renders, stay
  * server components.
  */
-export const SidebarNavLink = ({ href, children }: TSidebarNavLinkProps) => {
+export const SidebarNavLink = ({
+  href,
+  title,
+  children,
+}: TSidebarNavLinkProps) => {
   const pathname = usePathname();
   const isActive = pathname === href;
   const { row } = sidebarVariants();
@@ -23,6 +28,7 @@ export const SidebarNavLink = ({ href, children }: TSidebarNavLinkProps) => {
   return (
     <Link
       href={href}
+      title={title}
       aria-current={isActive ? 'page' : undefined}
       className={row({ state: isActive ? 'active' : 'resting' })}
     >

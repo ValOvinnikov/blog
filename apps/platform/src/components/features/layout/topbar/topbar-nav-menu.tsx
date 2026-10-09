@@ -30,7 +30,7 @@ export type TTopbarNavMenuProps = {
 export const TopbarNavMenu = ({ sections, switcher }: TTopbarNavMenuProps) => {
   const t = useTranslations('topbarNavMenu');
   const pathname = usePathname();
-  const { trigger, popup } = topbarNavMenuVariants();
+  const { trigger, popup, row: phoneRow } = topbarNavMenuVariants();
   const { switcherSlot, section, sectionLabel, row, note } = sidebarVariants();
 
   return (
@@ -69,6 +69,7 @@ export const TopbarNavMenu = ({ sections, switcher }: TTopbarNavMenuProps) => {
                             }
                             className={row({
                               state: isActive ? 'active' : 'resting',
+                              class: phoneRow(),
                             })}
                           >
                             <NavItemContent
@@ -83,7 +84,10 @@ export const TopbarNavMenu = ({ sections, switcher }: TTopbarNavMenuProps) => {
                       return (
                         <div
                           key={item.label}
-                          className={row({ state: 'inert' })}
+                          className={row({
+                            state: 'inert',
+                            class: phoneRow(),
+                          })}
                         >
                           <NavItemContent
                             icon={item.icon}

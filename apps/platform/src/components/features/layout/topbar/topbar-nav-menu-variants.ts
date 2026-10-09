@@ -19,5 +19,6 @@ export const topbarNavMenuVariants = tv({
       'border-admin-side-line bg-admin-side py-2 shadow-admin-lg outline-none',
       'max-h-[var(--available-height)]',
     ],
+    row: ['min-h-11 md:min-h-0'],
   },
 });

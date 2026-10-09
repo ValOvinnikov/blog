@@ -58,11 +58,7 @@ export default async function DashboardTenantLayout({ children }: TProps) {
       }
       crumb={<DashboardBreadcrumb />}
       roleChip={{
-        name:
-          session?.user?.name ??
-          session?.user?.email ??
-          admin?.role ??
-          membership.role,
+        name: session?.user?.name ?? session?.user?.email ?? undefined,
         role: admin?.role ?? membership.role,
         scope: admin ? tNavSections('platformLabel') : tenant.name,
       }}

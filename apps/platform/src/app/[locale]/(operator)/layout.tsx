@@ -39,7 +39,7 @@ export default async function OperatorLayout({ children }: TProps) {
       sections={operatorNavSections(tNavSections)}
       crumb={<OperatorBreadcrumb />}
       roleChip={{
-        name: session?.user?.name ?? session?.user?.email ?? admin.role,
+        name: session?.user?.name ?? session?.user?.email ?? undefined,
         role: admin.role,
         scope: tNavSections('platformLabel'),
       }}

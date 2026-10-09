@@ -14,7 +14,9 @@ export const navItemContentVariants = tv({
     ],
     rowLabel: ['truncate'],
     rowReason: ['truncate text-[11px] text-admin-faint'],
-    // Hidden outright (not sr-only) — the badge has no room on the collapsed rail.
-    badgeSlot: ['ml-auto shrink-0', 'group-data-[collapsed=true]/shell:hidden'],
+    badgeSlot: [
+      'ml-auto shrink-0',
+      'group-data-[collapsed=true]/shell:sr-only',
+    ],
   },
 });

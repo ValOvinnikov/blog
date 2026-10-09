@@ -22,6 +22,11 @@ describe(OwnerCard, () => {
       ).toBeVisible();
     });
 
+    it('shows the owner role with its translated label', () => {
+      expect(screen.getByText('Role')).toBeVisible();
+      expect(screen.getByText('Owner', { selector: 'span' })).toBeVisible();
+    });
+
     it('shows the Joined row with the formatted date once the owner has a real membership', () => {
       expect(screen.getByText('Joined')).toBeVisible();
       const joinedTime = screen.getByText('Aug 12, 2026');
