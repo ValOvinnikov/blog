@@ -1,4 +1,4 @@
-import { tv } from 'tailwind-variants';
+import { tv } from '@platform/utils/tv/tv';
 
 export const breadcrumbsVariants = tv({
   slots: {
@@ -9,7 +9,7 @@ export const breadcrumbsVariants = tv({
     item: ['flex items-center gap-[7px]'],
     sep: ['text-xs text-admin-faint'],
     link: [
-      'rounded-admin-control px-1 py-0.5 text-admin-muted no-underline',
+      'inline-flex min-h-11 items-center rounded-admin-control px-1 py-0.5 text-admin-muted no-underline md:min-h-0',
       'hover:bg-admin-line-2 hover:text-admin-text',
     ],
     current: ['max-w-[280px] truncate font-semibold text-admin-text'],

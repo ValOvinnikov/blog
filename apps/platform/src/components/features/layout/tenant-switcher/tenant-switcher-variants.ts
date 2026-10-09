@@ -28,7 +28,9 @@ export const tenantSwitcherVariants = tv({
       'focus-visible:ring-offset-2 focus-visible:ring-offset-admin-side',
     ],
     itemNameRow: ['flex min-w-0 items-center gap-1.5'],
-    itemName: ['min-w-0 flex-1 truncate text-sm text-admin-side-text'],
+    itemName: [
+      'min-w-0 flex-1 truncate text-[13px] font-medium text-admin-side-text',
+    ],
     itemDomain: ['font-mono text-[11px] text-admin-faint'],
     itemBadge: ['shrink-0'],
   },

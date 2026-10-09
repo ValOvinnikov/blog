@@ -1,4 +1,5 @@
 import { ICONS } from '@blog/config';
+import { ADMIN_ROLE, MEMBERSHIP_ROLE } from '@blog/db/constants';
 import {
   renderWithIntl,
   screen,
@@ -12,7 +13,11 @@ vi.mock('@platform/i18n/navigation');
 
 const render = renderWithIntl;
 
-const roleChip = { name: 'Jane Doe', role: 'ADMIN', scope: 'Platform' };
+const roleChip = {
+  name: 'Jane Doe',
+  role: ADMIN_ROLE.SUPERADMIN,
+  scope: 'Platform',
+};
 
 describe(Topbar, () => {
   let user: UserEvent;
@@ -21,12 +26,28 @@ describe(Topbar, () => {
     user = userEvent.setup();
   });
 
-  it('renders the given crumb node and the role chip', () => {
+  it('renders the given crumb node and the role chip with a translated role', () => {
     render(<Topbar crumb={<p>Platform</p>} roleChip={roleChip} />);
 
     expect(screen.getByText('Platform')).toBeVisible();
-    expect(screen.getByText('ADMIN')).toBeVisible();
-    expect(screen.getByText('· Platform')).toBeVisible();
+    expect(screen.getByText('Super admin · Platform')).toBeVisible();
+    expect(screen.queryByText(/SUPERADMIN/)).not.toBeInTheDocument();
+  });
+
+  it('never derives avatar initials from the role when the user has no name', () => {
+    render(
+      <Topbar
+        crumb={<p>Platform</p>}
+        roleChip={{
+          name: undefined,
+          role: MEMBERSHIP_ROLE.OWNER,
+          scope: 'Acme',
+        }}
+      />,
+    );
+
+    expect(screen.getByText('Owner · Acme')).toBeVisible();
+    expect(screen.queryByText('OW')).not.toBeInTheDocument();
   });
 
   it('renders no nav menu trigger when no sections are passed', () => {

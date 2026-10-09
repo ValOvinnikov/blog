@@ -52,7 +52,16 @@
     "triggerLabel": "Menu"
   },
   "topbar": {
-    "breadcrumbAriaLabel": "Kruimelpad"
+    "breadcrumbAriaLabel": "Kruimelpad",
+    "roleChip": "{role} · {scope}"
+  },
+  "roleLabel": {
+    "SUPERADMIN": "Superbeheerder",
+    "ADMIN": "Beheerder",
+    "MODERATOR": "Moderator",
+    "OWNER": "Eigenaar",
+    "EDITOR": "Redacteur",
+    "READER": "Lezer"
   },
   "navSections": {
     "platformLabel": "Platform",
@@ -217,7 +226,6 @@
     "ownerCardTitle": "Eigenaar",
     "emailLabel": "E-mail",
     "roleLabel": "Rol",
-    "ownerRoleBadge": "OWNER",
     "ownerInvitedPendingBadge": "Uitgenodigd, in afwachting",
     "joinedLabel": "Lid sinds",
     "contentWorkspaceCardTitle": "Contentwerkruimte",

@@ -4,7 +4,7 @@ export const sidebarVariants = tv({
   slots: {
     root: [
       'hidden w-full shrink-0 flex-col border-b border-admin-side-line bg-admin-side text-admin-side-text',
-      'md:flex md:min-h-dvh md:w-[264px] md:border-r md:border-b-0',
+      'md:flex md:h-dvh md:w-[264px] md:overflow-y-auto md:border-r md:border-b-0',
       'md:sticky md:top-0 md:self-start',
       'group-data-[collapsed=true]/shell:md:w-[76px]',
     ],
@@ -25,7 +25,7 @@ export const sidebarVariants = tv({
     ],
     section: ['flex flex-col gap-1.5 px-3 pt-[14px]'],
     sectionLabel: [
-      'px-2.5 pb-1.5 text-[10.5px] font-bold tracking-[0.09em] text-admin-muted uppercase',
+      'px-2.5 pb-1.5 text-[11px] font-bold tracking-[0.09em] text-admin-side-muted uppercase',
       'group-data-[collapsed=true]/shell:hidden',
     ],
     list: ['flex flex-col gap-0.5'],
@@ -49,8 +49,13 @@ export const sidebarVariants = tv({
       resting: {
         row: ['text-admin-side-text', 'hover:bg-admin-side-line'],
       },
-      // Not dimmed: the label is the destination's only name; the badge signals "not available yet".
-      inert: { row: ['text-admin-side-text'] },
+      // Dimmed only when collapsed, where the badge that marks it unavailable is hidden.
+      inert: {
+        row: [
+          'text-admin-side-text',
+          'group-data-[collapsed=true]/shell:opacity-50',
+        ],
+      },
     },
   },
   defaultVariants: {

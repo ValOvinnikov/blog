@@ -192,8 +192,7 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
 
     expect(screen.getByText('dashboard content')).toBeVisible();
     expect(listMembershipsForUserMock).not.toHaveBeenCalled();
-    expect(screen.getByText('SUPERADMIN')).toBeVisible();
-    expect(screen.queryByText('OWNER')).not.toBeInTheDocument();
-    expect(screen.getByText('· Platform')).toBeVisible();
+    expect(screen.getByText('Super admin · Platform')).toBeVisible();
+    expect(screen.queryByText(/Owner/)).not.toBeInTheDocument();
   });
 });

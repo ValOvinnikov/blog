@@ -1,4 +1,5 @@
 import { ICONS } from '@blog/config';
+import { ADMIN_ROLE } from '@blog/db/constants';
 import {
   renderWithIntl,
   screen,
@@ -13,7 +14,11 @@ vi.mock('@platform/i18n/navigation');
 
 const render = renderWithIntl;
 
-const roleChip = { name: 'Jane Doe', role: 'ADMIN', scope: 'Platform' };
+const roleChip = {
+  name: 'Jane Doe',
+  role: ADMIN_ROLE.ADMIN,
+  scope: 'Platform',
+};
 
 describe(AdminShell, () => {
   afterEach(() => {
@@ -39,7 +44,7 @@ describe(AdminShell, () => {
     expect(screen.getByRole('link', { name: 'Tenants' })).toBeVisible();
     expect(screen.getByText('Platform section')).toBeVisible();
     expect(screen.getByText('Platform', { selector: 'p' })).toBeVisible();
-    expect(screen.getByText('ADMIN')).toBeVisible();
+    expect(screen.getByText('Admin · Platform')).toBeVisible();
     expect(screen.getByText('Tenants page')).toBeVisible();
   });
 

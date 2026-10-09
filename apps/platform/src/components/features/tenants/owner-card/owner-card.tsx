@@ -1,3 +1,4 @@
+import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { Card } from '@platform/components/shared/card';
 import { DetailList } from '@platform/components/shared/detail-list';
 import { StatusBadge } from '@platform/components/shared/status-badge';
@@ -15,6 +16,7 @@ export const OwnerCard = ({
   ownerJoinedAtIso,
 }: TOwnerCardProps) => {
   const t = useTranslations('tenantOverviewPage');
+  const tRole = useTranslations('roleLabel');
 
   return (
     <Card>
@@ -35,7 +37,9 @@ export const OwnerCard = ({
             {ownerEmail ?? '—'}
           </DetailList.Row>
           <DetailList.Row label={t('roleLabel')}>
-            <StatusBadge tone="neutral">{t('ownerRoleBadge')}</StatusBadge>
+            <StatusBadge tone="neutral">
+              {tRole(MEMBERSHIP_ROLE.OWNER)}
+            </StatusBadge>
           </DetailList.Row>
           {ownerJoinedAt && ownerJoinedAtIso && (
             <DetailList.Row label={t('joinedLabel')}>

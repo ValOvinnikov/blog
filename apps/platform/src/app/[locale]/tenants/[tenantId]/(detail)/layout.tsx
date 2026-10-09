@@ -40,7 +40,7 @@ export default async function TenantDetailLayout({ children, params }: TProps) {
       ]}
       crumb={<TenantBreadcrumb tenantId={tenant.id} tenantName={tenant.name} />}
       roleChip={{
-        name: session?.user?.name ?? session?.user?.email ?? admin.role,
+        name: session?.user?.name ?? session?.user?.email ?? undefined,
         role: admin.role,
         scope: t('scopeLabel'),
       }}
