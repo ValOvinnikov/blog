@@ -1,5 +1,8 @@
-import { SIZE, type TIconName } from '@blog/config';
-import { Icon } from '@platform/components/shared/icon';
+import { SIZE } from '@blog/config';
+import {
+  Icon,
+  type TRegisteredIconName,
+} from '@platform/components/shared/icon';
 import {
   StatusBadge,
   type TStatusBadgeProps,
@@ -8,7 +11,7 @@ import {
 import { navItemContentVariants } from './nav-item-content-variants';
 
 export type TNavItemContentProps = {
-  icon: TIconName;
+  icon: TRegisteredIconName;
   label: string;
   disabledReason?: string;
   badge?: {

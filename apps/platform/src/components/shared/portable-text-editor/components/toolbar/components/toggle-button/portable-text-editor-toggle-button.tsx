@@ -1,8 +1,11 @@
 import { Toggle } from '@base-ui/react/toggle';
 import { Toolbar } from '@base-ui/react/toolbar';
 import { Tooltip } from '@base-ui/react/tooltip';
-import { SIZE, type TIconName } from '@blog/config';
-import { Icon } from '@platform/components/shared/icon';
+import { SIZE } from '@blog/config';
+import {
+  Icon,
+  type TRegisteredIconName,
+} from '@platform/components/shared/icon';
 
 import { portableTextEditorToggleButtonVariants } from './portable-text-editor-toggle-button-variants';
 
@@ -10,7 +13,7 @@ export type TPortableTextEditorToggleButtonProps = {
   label: string;
   isActive: boolean;
   onToggle: () => void;
-  icon?: TIconName;
+  icon?: TRegisteredIconName;
   isExpanded?: boolean;
   ariaControls?: string;
 };
