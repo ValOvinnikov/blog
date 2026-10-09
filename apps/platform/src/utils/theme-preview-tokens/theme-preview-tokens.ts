@@ -9,9 +9,11 @@ import {
   RADIUS_DECLARATIONS,
   type TCardStyle,
   type TDensity,
+  type TFontChoice,
   type TRadiusScale,
   type TThemeDeclarations,
 } from '@blog/config';
+import { FONT_OPTIONS } from '@platform/config/fonts';
 import type { CSSProperties } from 'react';
 
 const HUE_MIN = 0;
@@ -63,6 +65,28 @@ export const buildThemePreviewStyle = (
     ...buildLogoPreviewTokens(logoHue ?? accentHue, isDark),
     ...buildShapePreviewTokens(radiusScale, density, cardStyle),
   }) as CSSProperties;
+
+export type TSitePreviewThemeValues = TThemePreviewValues & {
+  headingFont: TFontChoice;
+  bodyFont: TFontChoice;
+};
+
+export type TSitePreviewTheme = {
+  tokenStyle: CSSProperties;
+  isDark: boolean;
+  headingFontFamily: string;
+  bodyFontFamily: string;
+};
+
+export const buildSitePreviewTheme = (
+  values: TSitePreviewThemeValues,
+  isDark: boolean,
+): TSitePreviewTheme => ({
+  tokenStyle: buildThemePreviewStyle(values, isDark),
+  isDark,
+  headingFontFamily: FONT_OPTIONS[values.headingFont].fontFamily,
+  bodyFontFamily: FONT_OPTIONS[values.bodyFont].fontFamily,
+});
 
 /**
  * The accent-hue slider's track gradient, sampled from the light-mode swatch

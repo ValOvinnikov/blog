@@ -157,6 +157,16 @@ describe(`<${VoiceSettings.name}/>`, () => {
   });
 
   describe('specimens', () => {
+    it('switches every specimen to the dark ramp from the colour scheme control', async () => {
+      setup({ previewTheme: { ...defaultLookFormValues(), accentHue: 28 } });
+
+      await user.click(screen.getByRole('button', { name: 'Dark' }));
+
+      expect(screen.getByTestId('voice-specimen-NOT_FOUND')).toHaveStyle({
+        '--brand-primary-solid': 'oklch(0.7 0.16 28)',
+      });
+    });
+
     it('re-renders the specimen beside a field as the editor types', async () => {
       setup();
 

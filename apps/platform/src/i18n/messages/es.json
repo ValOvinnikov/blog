@@ -356,11 +356,13 @@
     "brandImagePicked": "Imagen nueva, aún sin subir",
     "brandImageUnchanged": "Ninguna imagen nueva"
   },
-  "lookPreview": {
+  "previewModeControl": {
     "modeLight": "Claro",
     "modeDark": "Oscuro",
-    "previewColorSchemeAriaLabel": "Esquema de color de la vista previa",
     "livePreviewHeading": "Vista previa en directo",
+    "previewColorSchemeAriaLabel": "Esquema de color de la vista previa"
+  },
+  "lookPreview": {
     "sampleHeading": "Leyendo las tablas de mareas",
     "samplePara": "Una breve crónica para mostrar juntos la tipografía de títulos y de texto, el acento, los tonos del logotipo y el radio.",
     "subscribeButton": "Suscribirse",

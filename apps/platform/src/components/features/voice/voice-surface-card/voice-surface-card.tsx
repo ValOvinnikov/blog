@@ -6,16 +6,14 @@ import {
   type TVoiceSurface,
 } from '@blog/config';
 import type { TLocaleIsoCode } from '@blog/config/constants';
-import {
-  VoiceSpecimen,
-  type TVoiceSpecimenTheme,
-} from '@platform/components/features/site-preview/voice-specimen';
+import { VoiceSpecimen } from '@platform/components/features/site-preview/voice-specimen';
 import { VoiceField } from '@platform/components/features/voice/voice-field';
 import { VoiceListRow } from '@platform/components/features/voice/voice-list-row';
 import { useVoiceListSamples } from '@platform/components/features/voice/voice-list-samples-provider';
 import { Accordion } from '@platform/components/shared/accordion';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
+import type { TSitePreviewTheme } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import {
   countCustomisedVoiceFields,
   voiceDefaultText,
@@ -42,7 +40,7 @@ export type TVoiceSurfaceCardProps = {
   onOpenField: (id: TVoiceFieldId | undefined) => void;
   onFieldChange: (id: TVoiceFieldId, value: TVoiceDraftValue) => void;
   isReadOnly: boolean;
-  specimenTheme: TVoiceSpecimenTheme;
+  specimenTheme: TSitePreviewTheme;
 };
 
 export const VoiceSurfaceCard = ({
@@ -63,7 +61,7 @@ export const VoiceSurfaceCard = ({
   const tDescriptions = useTranslations('voiceSurfaceDescriptions');
   const tSpecimen = useTranslations('voiceSpecimen');
   const tNotes = useTranslations('voiceSurfaceNotes');
-  const tPreview = useTranslations('lookPreview');
+  const tPreview = useTranslations('previewModeControl');
   const listSamples = useVoiceListSamples(locale);
   const previewId = useId();
   const previewLabelId = useId();

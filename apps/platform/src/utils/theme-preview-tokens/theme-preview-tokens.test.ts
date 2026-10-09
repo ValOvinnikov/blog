@@ -1,7 +1,11 @@
+import { FONT_OPTIONS } from '@platform/config/fonts';
+import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+
 import {
   accentHueGradient,
   buildAccentPreviewTokens,
   buildLogoPreviewTokens,
+  buildSitePreviewTheme,
   buildThemePreviewStyle,
 } from './theme-preview-tokens';
 
@@ -89,6 +93,19 @@ describe('buildThemePreviewStyle', () => {
     expect(style).toMatchObject({
       ...buildAccentPreviewTokens(250, true),
       ...buildLogoPreviewTokens(120, true),
+    });
+  });
+});
+
+describe(buildSitePreviewTheme, () => {
+  it('resolves both fonts and the dark ramp for the chosen mode', () => {
+    const values = defaultLookFormValues();
+
+    expect(buildSitePreviewTheme(values, true)).toEqual({
+      tokenStyle: buildThemePreviewStyle(values, true),
+      isDark: true,
+      headingFontFamily: FONT_OPTIONS[values.headingFont].fontFamily,
+      bodyFontFamily: FONT_OPTIONS[values.bodyFont].fontFamily,
     });
   });
 });

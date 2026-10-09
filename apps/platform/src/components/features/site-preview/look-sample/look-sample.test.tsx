@@ -1,5 +1,6 @@
 import { LANGUAGE_SWITCHER_STYLE, LOCALE_ISO_CODES } from '@blog/config';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { SITE_PREVIEW_THEME } from '@platform/testing/site-preview-theme';
 import type { CSSProperties } from 'react';
 
 import { LookSample } from './look-sample';
@@ -9,12 +10,7 @@ const render = renderWithIntl;
 const BASE_PROPS = {
   tenantName: 'Acme Inc.',
   logoSrc: undefined,
-  tokenStyle: {
-    '--brand-primary': 'oklch(0.53 0.17 28)',
-  } as CSSProperties,
-  isDark: false,
-  headingFontFamily: 'mock-space-grotesk-font-family',
-  bodyFontFamily: 'mock-newsreader-font-family',
+  theme: SITE_PREVIEW_THEME,
   liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR],
   languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
 };
@@ -50,10 +46,13 @@ describe(LookSample, () => {
     render(
       <LookSample
         {...BASE_PROPS}
-        isDark={true}
-        tokenStyle={
-          { '--brand-primary': 'oklch(0.7 0.16 28)' } as CSSProperties
-        }
+        theme={{
+          ...SITE_PREVIEW_THEME,
+          isDark: true,
+          tokenStyle: {
+            '--brand-primary': 'oklch(0.7 0.16 28)',
+          } as CSSProperties,
+        }}
       />,
     );
 

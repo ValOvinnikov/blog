@@ -397,13 +397,7 @@ export const LookForm = ({
         >
           <LookPreview
             tenantName={tenantName}
-            accentHue={values.accentHue}
-            logoHue={values.logoHue}
-            headingFont={values.headingFont}
-            bodyFont={values.bodyFont}
-            radiusScale={values.radiusScale}
-            density={values.density}
-            cardStyle={values.cardStyle}
+            theme={values}
             logoSrc={values.logo.url}
             liveLocales={liveLocales}
             languageSwitcherStyle={values.languageSwitcherStyle}

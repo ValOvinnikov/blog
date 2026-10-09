@@ -356,11 +356,13 @@
     "brandImagePicked": "New image, not uploaded yet",
     "brandImageUnchanged": "No new image"
   },
-  "lookPreview": {
+  "previewModeControl": {
     "modeLight": "Light",
     "modeDark": "Dark",
-    "previewColorSchemeAriaLabel": "Preview colour scheme",
     "livePreviewHeading": "Live preview",
+    "previewColorSchemeAriaLabel": "Preview colour scheme"
+  },
+  "lookPreview": {
     "sampleHeading": "Reading the tide charts",
     "samplePara": "A short dispatch to show heading and body type, accent, logo tones, and radius together.",
     "subscribeButton": "Subscribe",
