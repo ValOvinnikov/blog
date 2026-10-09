@@ -1,3 +1,4 @@
+import { FormField } from '@platform/components/shared/form-field';
 import { render, screen } from '@platform/testing/custom-render';
 import userEvent from '@testing-library/user-event';
 
@@ -74,5 +75,17 @@ describe(Textarea, () => {
 
     await user.type(textarea, 'x');
     expect(handleChange).not.toHaveBeenCalled();
+  });
+
+  it('is marked invalid and described by the error of the field it sits in', () => {
+    render(
+      <FormField label="Bio" error="Too long">
+        <Textarea value="" onChange={vi.fn()} />
+      </FormField>,
+    );
+
+    const textarea = screen.getByRole('textbox', { name: 'Bio' });
+    expect(textarea).toHaveAttribute('aria-invalid', 'true');
+    expect(textarea).toHaveAccessibleDescription('Too long');
   });
 });

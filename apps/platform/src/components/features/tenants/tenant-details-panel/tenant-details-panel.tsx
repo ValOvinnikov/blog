@@ -148,7 +148,6 @@ export const TenantDetailsPanel = ({
   const {
     bodyStack,
     fields,
-    fieldLockReason,
     lockAnnouncementLive,
     planControl,
     footerActions,
@@ -270,18 +269,11 @@ export const TenantDetailsPanel = ({
                   <FormTextInput
                     key={key}
                     label={labelText}
-                    hint={
-                      lock && (
-                        <span className={fieldLockReason()}>
-                          {lockReasonText(lock)}
-                        </span>
-                      )
-                    }
+                    hint={lock && lockReasonText(lock)}
                     error={errorMessage}
                     type={TEXT_FIELD_TYPE[key]}
                     value={values[key]}
                     onChange={(nextValue) => updateField(key, nextValue)}
-                    isInvalid={Boolean(errorMessage)}
                     isDisabled={Boolean(lock)}
                   />
                 );
@@ -292,7 +284,7 @@ export const TenantDetailsPanel = ({
                 hasOwnAccessibleName={true}
                 hint={
                   localeLock && (
-                    <span id={localeLockReasonId} className={fieldLockReason()}>
+                    <span id={localeLockReasonId}>
                       {lockReasonText(localeLock)}
                     </span>
                   )
@@ -314,7 +306,7 @@ export const TenantDetailsPanel = ({
                 hasOwnAccessibleName={true}
                 hint={
                   planLock && (
-                    <span id={planLockReasonId} className={fieldLockReason()}>
+                    <span id={planLockReasonId}>
                       {lockReasonText(planLock)}
                     </span>
                   )
