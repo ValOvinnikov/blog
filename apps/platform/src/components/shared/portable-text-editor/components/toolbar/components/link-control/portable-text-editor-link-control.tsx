@@ -1,9 +1,10 @@
 'use client';
 
+import { Field } from '@base-ui/react/field';
 import { SIZE } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import { useTranslations } from 'next-intl';
-import { useId, useState, type FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 
 import { portableTextEditorLinkControlVariants } from './portable-text-editor-link-control-variants';
 
@@ -30,7 +31,6 @@ export const PortableTextEditorLinkControl = ({
   onCancel,
 }: TPortableTextEditorLinkControlProps) => {
   const t = useTranslations('portableTextEditorToolbar');
-  const inputId = useId();
   const [href, setHref] = useState(initialHref);
   const { root, input } = portableTextEditorLinkControlVariants();
 
@@ -42,18 +42,17 @@ export const PortableTextEditorLinkControl = ({
 
   return (
     <form id={id} className={root()} onSubmit={handleSubmit}>
-      <label className="sr-only" htmlFor={inputId}>
-        {t('linkUrlLabel')}
-      </label>
-      <input
-        id={inputId}
-        type="url"
-        required={true}
-        placeholder="https://…"
-        value={href}
-        onChange={(event) => setHref(event.target.value)}
-        className={input()}
-      />
+      <Field.Root className="contents">
+        <Field.Label className="sr-only">{t('linkUrlLabel')}</Field.Label>
+        <Field.Control
+          type="url"
+          required={true}
+          placeholder="https://…"
+          value={href}
+          onValueChange={(nextHref) => setHref(nextHref)}
+          className={input()}
+        />
+      </Field.Root>
       <Button type="submit" variant="secondary" size={SIZE.SM}>
         {t('linkApply')}
       </Button>

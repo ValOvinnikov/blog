@@ -88,6 +88,7 @@ export const VoiceSettings = ({
   const toast = useToast();
   const router = useRouter();
   const archivedNoticeId = useId();
+  const fieldIdPrefix = useId();
   const isArchived = Boolean(archivedAt);
   const [saved, setSaved] = useState(initialDraft);
   const [selectedLocale, setSelectedLocale] = useState(defaultLocale);
@@ -156,7 +157,9 @@ export const VoiceSettings = ({
         selectedLocale,
         ...liveLocales.filter((locale) => locale !== selectedLocale),
       ].flatMap((locale) =>
-        erroringFieldIds(fieldErrors, locale).map(voiceFieldInputId),
+        erroringFieldIds(fieldErrors, locale).map((id) =>
+          voiceFieldInputId(fieldIdPrefix, id),
+        ),
       ),
     ),
   ];
@@ -269,6 +272,7 @@ export const VoiceSettings = ({
             key={surface}
             surface={surface}
             locale={selectedLocale}
+            fieldIdPrefix={fieldIdPrefix}
             values={draftValues}
             savedValues={savedValues}
             errors={localeErrors}

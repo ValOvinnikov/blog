@@ -15,6 +15,7 @@ import {
   isSameVoiceValue,
   isVoiceValueCustomised,
   voiceDefaultText,
+  voiceFieldInputId,
   voiceFieldsOf,
   voiceValueAsText,
   type TVoiceDraftValue,
@@ -29,6 +30,7 @@ import { voiceSurfaceCardVariants } from './voice-surface-card-variants';
 export type TVoiceSurfaceCardProps = {
   surface: TVoiceSurface;
   locale: TLocaleIsoCode;
+  fieldIdPrefix: string;
   values: TVoiceLocaleDraft;
   savedValues: TVoiceLocaleDraft;
   errors: TVoiceFieldErrors;
@@ -42,6 +44,7 @@ export type TVoiceSurfaceCardProps = {
 export const VoiceSurfaceCard = ({
   surface,
   locale,
+  fieldIdPrefix,
   values,
   savedValues,
   errors,
@@ -120,6 +123,7 @@ export const VoiceSurfaceCard = ({
               return (
                 <div key={field.id} {...trackFocus}>
                   <VoiceField
+                    inputId={voiceFieldInputId(fieldIdPrefix, field.id)}
                     field={field}
                     value={value}
                     savedValue={savedValues[field.id]}

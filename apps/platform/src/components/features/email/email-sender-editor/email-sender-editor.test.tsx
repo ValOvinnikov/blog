@@ -36,7 +36,7 @@ describe(`<${EmailSenderEditor.name}/>`, () => {
     setup({ senderNameError: 'Enter a name.' });
 
     expect(screen.getByLabelText('Sender name')).toHaveAccessibleDescription(
-      'Enter a name.',
+      'The display name on the From address — unrelated to the site title. Enter a name.',
     );
   });
 

@@ -112,7 +112,6 @@ export const DeprovisionTenantControl = ({
             title={t('dialogTitle', { name: tenant.name })}
             description={t('dialogDescription')}
             error={error}
-            confirmFieldId="deprovision-confirm"
             confirmLabel={t('confirmLabel', { name: tenant.name })}
             confirmHint={t('confirmHint')}
             confirmValue={confirm}
@@ -194,7 +193,6 @@ const DeleteTenantPermanentlyControl = ({ tenant }: { tenant: TTenant }) => {
       title={t('deleteDialogTitle', { name: tenant.name })}
       description={t('deleteDialogDescription')}
       error={error}
-      confirmFieldId="delete-tenant-confirm"
       confirmLabel={t('deleteConfirmLabel', { name: tenant.name })}
       confirmHint={t('deleteConfirmHint')}
       confirmValue={confirm}

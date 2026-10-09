@@ -13,7 +13,7 @@ import type { TEmailCopyDraft } from '@platform/utils/email-draft/email-draft';
 import { isBlankPortableTextValue } from '@platform/utils/portable-text-schema/portable-text-schema';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 import { useTranslations } from 'next-intl';
-import { useId, useState } from 'react';
+import { useState } from 'react';
 
 import { emailTemplateEditorVariants } from './email-template-editor-variants';
 
@@ -45,7 +45,6 @@ export const EmailTemplateEditor = ({
 }: TEmailTemplateEditorProps) => {
   const t = useTranslations('emailTemplateEditor');
   const tStatus = useTranslations('emailItemStatus');
-  const subjectId = useId();
   const [bodyRevision, setBodyRevision] = useState(0);
   const { stack, fieldStatus } = emailTemplateEditorVariants();
 
@@ -96,7 +95,6 @@ export const EmailTemplateEditor = ({
         <div className={stack()}>
           <FormTextInput
             label={t('subjectLabel', { language: languageName })}
-            htmlFor={subjectId}
             hint={t('subjectHint')}
             placeholder={fallback.subject}
             value={copy.subject}
@@ -109,6 +107,7 @@ export const EmailTemplateEditor = ({
           />
           <FormField
             label={t('bodyLabel', { language: languageName })}
+            hasOwnAccessibleName={true}
             hint={t('bodyHint')}
             footer={renderFieldStatus(isBodyCustomised, resetBody)}
           >

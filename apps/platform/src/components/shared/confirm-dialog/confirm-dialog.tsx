@@ -17,7 +17,6 @@ export type TConfirmDialogProps = {
   title: ReactNode;
   description: ReactNode;
   error?: string;
-  confirmFieldId: string;
   confirmLabel: string;
   confirmHint: string;
   confirmValue: string;
@@ -41,7 +40,6 @@ export const ConfirmDialog = ({
   title,
   description,
   error,
-  confirmFieldId,
   confirmLabel,
   confirmHint,
   confirmValue,
@@ -89,16 +87,8 @@ export const ConfirmDialog = ({
 
           {error && <Alert type={ALERT_TYPE.ERROR} title={error} />}
 
-          <FormField
-            label={confirmLabel}
-            htmlFor={confirmFieldId}
-            hint={confirmHint}
-          >
-            <TextInput
-              id={confirmFieldId}
-              value={confirmValue}
-              onChange={onConfirmValueChange}
-            />
+          <FormField label={confirmLabel} hint={confirmHint}>
+            <TextInput value={confirmValue} onChange={onConfirmValueChange} />
           </FormField>
 
           {children}

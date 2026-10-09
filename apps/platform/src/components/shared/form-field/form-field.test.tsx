@@ -1,21 +1,22 @@
+import { TextInput } from '@platform/components/shared/text-input';
 import { render, screen } from '@testing-library/react';
 
 import { FormField } from './form-field';
 
 describe(FormField, () => {
-  it('associates the label with the control via htmlFor', () => {
+  it('names the control by its label', () => {
     render(
-      <FormField label="Tenant name" htmlFor="tenant-name">
-        <input id="tenant-name" />
+      <FormField label="Tenant name">
+        <TextInput value="" onChange={vi.fn()} />
       </FormField>,
     );
 
-    expect(screen.getByLabelText('Tenant name')).toBeVisible();
+    expect(screen.getByRole('textbox', { name: 'Tenant name' })).toBeVisible();
   });
 
-  it('renders a plain label-styled span when htmlFor is omitted', () => {
+  it('renders the label as a plain span when the control names itself', () => {
     render(
-      <FormField label="Plan">
+      <FormField label="Plan" hasOwnAccessibleName={true}>
         <input aria-label="Plan" />
       </FormField>,
     );
@@ -23,52 +24,55 @@ describe(FormField, () => {
     expect(screen.getByText('Plan').tagName).toBe('SPAN');
   });
 
-  it('renders the hint node between the control and the error message', () => {
+  it('describes the control with its hint, then its error', () => {
     render(
-      <FormField
-        label="Slug"
-        htmlFor="tenant-slug"
-        hint={<span data-testid="hint">Used in the URL</span>}
-        error="Already in use"
-      >
-        <input id="tenant-slug" />
+      <FormField label="Slug" hint="Used in the URL" error="Already in use">
+        <TextInput value="" onChange={vi.fn()} />
       </FormField>,
     );
 
-    expect(screen.getByTestId('hint')).toBeVisible();
-    expect(screen.getByText('Already in use')).toBeVisible();
+    const input = screen.getByRole('textbox', { name: 'Slug' });
+    expect(input).toHaveAccessibleDescription('Used in the URL Already in use');
+    expect(input).toHaveAttribute('aria-invalid', 'true');
   });
 
-  it('omits the error message and its id when there is no error', () => {
+  it('leaves the control undescribed and valid when there is no hint or error', () => {
     render(
-      <FormField label="Slug" htmlFor="tenant-slug">
-        <input id="tenant-slug" />
+      <FormField label="Slug">
+        <TextInput value="" onChange={vi.fn()} />
       </FormField>,
     );
 
-    expect(screen.getByRole('textbox')).toHaveAccessibleDescription('');
+    const input = screen.getByRole('textbox', { name: 'Slug' });
+    expect(input).toHaveAccessibleDescription('');
+    expect(input).not.toHaveAttribute('aria-invalid');
   });
 
-  it('renders the error with a predictable id derived from htmlFor, for aria-describedby wiring', () => {
+  it('gives two fields with the same label distinct controls', () => {
     render(
-      <FormField label="Slug" htmlFor="tenant-slug" error="Already in use">
-        <input id="tenant-slug" aria-describedby="tenant-slug-error" />
-      </FormField>,
+      <>
+        <FormField label="Slug" error="Already in use">
+          <TextInput value="" onChange={vi.fn()} />
+        </FormField>
+        <FormField label="Slug">
+          <TextInput value="" onChange={vi.fn()} />
+        </FormField>
+      </>,
     );
 
-    const input = screen.getByRole('textbox');
-    expect(input).toHaveAccessibleDescription('Already in use');
+    const [first, second] = screen.getAllByRole('textbox', { name: 'Slug' });
+    expect(first).toHaveAccessibleDescription('Already in use');
+    expect(second).toHaveAccessibleDescription('');
   });
 
   it('renders footer content after the error message', () => {
     render(
       <FormField
         label="Owner email"
-        htmlFor="owner-email"
         error="Invalid email"
         footer={<span data-testid="footer">Confirmation sent</span>}
       >
-        <input id="owner-email" />
+        <TextInput value="" onChange={vi.fn()} />
       </FormField>,
     );
 

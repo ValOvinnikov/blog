@@ -124,7 +124,6 @@ export const TenantDetailsForm = () => {
               <div className={fields()}>
                 <FormTextInput
                   label={t('nameLabel')}
-                  htmlFor="tenant-name"
                   error={fieldErrors.name}
                   value={values.name}
                   onChange={(value) => updateField('name', value)}
@@ -132,14 +131,13 @@ export const TenantDetailsForm = () => {
 
                 <FormTextInput
                   label={t('domainLabel')}
-                  htmlFor="tenant-domain"
                   hint={t('domainHint')}
                   error={fieldErrors.domain}
                   value={values.domain}
                   onChange={(value) => updateField('domain', value)}
                 />
 
-                <FormField label={t('planLabel')}>
+                <FormField label={t('planLabel')} hasOwnAccessibleName={true}>
                   <SegmentedControl<TTenantPlan>
                     ariaLabel={t('planLabel')}
                     options={planOptions}
@@ -151,7 +149,6 @@ export const TenantDetailsForm = () => {
 
                 <FormTextInput
                   label={t('ownerEmailLabel')}
-                  htmlFor="tenant-owner-email"
                   hint={t('ownerEmailHint')}
                   error={fieldErrors.ownerEmail}
                   footer={

@@ -39,8 +39,10 @@ export const VOICE_SURFACES_IN_PAGE_ORDER = [
 export const voiceFieldsOf = (surface: TVoiceSurface): TVoiceField[] =>
   VOICE_FIELDS.filter((field) => field.surface === surface);
 
-export const voiceFieldInputId = (id: TVoiceFieldId): string =>
-  `voice-field-${id}`;
+export const voiceFieldInputId = (
+  idPrefix: string,
+  id: TVoiceFieldId,
+): string => `${idPrefix}-${id}`;
 
 const toParagraph = (id: TVoiceFieldId, text: string): TVoicePortableText => [
   {

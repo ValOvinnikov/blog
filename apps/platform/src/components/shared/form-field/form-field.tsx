@@ -1,23 +1,26 @@
+'use client';
+
+import { Field } from '@base-ui/react/field';
 import type { ReactNode } from 'react';
 
 import { formFieldVariants } from './form-field-variants';
 
 export type TFormFieldProps = {
   label: string;
-  htmlFor?: string;
   hint?: ReactNode;
   error?: string;
   children: ReactNode;
   footer?: ReactNode;
+  hasOwnAccessibleName?: boolean;
 };
 
 export const FormField = ({
   label,
-  htmlFor,
   hint,
   error,
   children,
   footer,
+  hasOwnAccessibleName = false,
 }: TFormFieldProps) => {
   const {
     root,
@@ -25,25 +28,24 @@ export const FormField = ({
     hint: hintSlot,
     error: errorSlot,
   } = formFieldVariants();
-  const errorId = htmlFor ? `${htmlFor}-error` : undefined;
 
   return (
-    <div className={root()}>
-      {htmlFor ? (
-        <label className={labelSlot()} htmlFor={htmlFor}>
-          {label}
-        </label>
-      ) : (
+    <Field.Root className={root()} invalid={Boolean(error)}>
+      {hasOwnAccessibleName ? (
         <span className={labelSlot()}>{label}</span>
+      ) : (
+        <Field.Label className={labelSlot()}>{label}</Field.Label>
       )}
       {children}
-      {hint && <span className={hintSlot()}>{hint}</span>}
+      {hint && (
+        <Field.Description className={hintSlot()}>{hint}</Field.Description>
+      )}
       {error && (
-        <span id={errorId} className={errorSlot()}>
+        <Field.Error match={true} className={errorSlot()}>
           {error}
-        </span>
+        </Field.Error>
       )}
       {footer}
-    </div>
+    </Field.Root>
   );
 };

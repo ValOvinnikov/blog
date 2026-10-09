@@ -6,7 +6,6 @@ import { FormTextInput } from '@platform/components/shared/form-text-input';
 import type { TEmailSenderDraft } from '@platform/utils/email-draft/email-draft';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 import { useTranslations } from 'next-intl';
-import { useId } from 'react';
 
 import { emailSenderEditorVariants } from './email-sender-editor-variants';
 
@@ -30,15 +29,7 @@ export const EmailSenderEditor = ({
   archivedNoticeId,
 }: TEmailSenderEditorProps) => {
   const t = useTranslations('emailSettingsForm');
-  const senderNameId = useId();
-  const replyToId = useId();
-  const footerAddressId = useId();
   const { stack } = emailSenderEditorVariants();
-
-  const senderNameDescribedBy =
-    [archivedNoticeId, senderNameError ? `${senderNameId}-error` : null]
-      .filter(Boolean)
-      .join(' ') || undefined;
 
   const updateField = (field: keyof TEmailSenderDraft, value: string) =>
     onSenderChange({ ...sender, [field]: value });
@@ -54,18 +45,16 @@ export const EmailSenderEditor = ({
         <div className={stack()}>
           <FormTextInput
             label={t('senderNameLabel')}
-            htmlFor={senderNameId}
             hint={t('senderNameHint')}
             error={senderNameError}
             isInvalid={senderNameError !== undefined}
             value={sender.senderName}
             onChange={(value) => updateField('senderName', value)}
             isDisabled={isDisabled}
-            aria-describedby={senderNameDescribedBy}
+            aria-describedby={archivedNoticeId}
           />
           <FormTextInput
             label={t('replyToLabel')}
-            htmlFor={replyToId}
             hint={t('replyToHint')}
             type="email"
             value={sender.replyToAddress}
@@ -75,7 +64,6 @@ export const EmailSenderEditor = ({
           />
           <FormTextInput
             label={t('footerAddressLabel')}
-            htmlFor={footerAddressId}
             hint={t('footerAddressHint')}
             value={sender.footerPostalAddress}
             onChange={(value) => updateField('footerPostalAddress', value)}

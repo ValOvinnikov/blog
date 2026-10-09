@@ -67,7 +67,6 @@ export const ReactivateTenantControl = ({
             title={t('dialogTitle', { name: tenant.name })}
             description={t('dialogDescription')}
             error={error}
-            confirmFieldId="reactivate-confirm"
             confirmLabel={t('confirmLabel', { name: tenant.name })}
             confirmHint={t('confirmHint')}
             confirmValue={confirm}

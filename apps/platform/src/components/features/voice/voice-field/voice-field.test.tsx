@@ -7,6 +7,7 @@ const fieldById = (id: string) =>
   VOICE_FIELDS.find((field) => field.id === id)!;
 
 const setup = customRender(VoiceField, {
+  inputId: 'voice-field-test',
   field: fieldById('notFoundHeading'),
   value: '',
   savedValue: '',
