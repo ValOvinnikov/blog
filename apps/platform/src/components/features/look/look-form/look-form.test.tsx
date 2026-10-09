@@ -600,6 +600,60 @@ describe(`<${LookForm.name}/>`, () => {
       );
     });
 
+    it('locks the edit panel while a save is running', async () => {
+      let resolveUpload: (value: { ok: true; url: string }) => void = () => {};
+      uploadBrandAssetActionMock.mockImplementation(
+        () =>
+          new Promise((resolve) => {
+            resolveUpload = resolve;
+          }),
+      );
+      setup();
+
+      await pickLogo(user);
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      expect(await screen.findByTestId('look-form-edit-panel')).toHaveAttribute(
+        'inert',
+      );
+
+      resolveUpload({ ok: true, url: UPLOADED_LOGO_URL });
+      await waitFor(() => {
+        expect(screen.getByTestId('look-form-edit-panel')).not.toHaveAttribute(
+          'inert',
+        );
+      });
+    });
+
+    it('keeps an edit made while the logo uploads as an unsaved change', async () => {
+      let resolveUpload: (value: { ok: true; url: string }) => void = () => {};
+      uploadBrandAssetActionMock.mockImplementation(
+        () =>
+          new Promise((resolve) => {
+            resolveUpload = resolve;
+          }),
+      );
+      setup();
+
+      await pickLogo(user);
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+      await screen.findByRole('button', { name: 'Saving…' });
+      screen.getByRole('slider', { name: 'Accent hue' }).focus();
+      await user.keyboard('{ArrowRight}');
+      resolveUpload({ ok: true, url: UPLOADED_LOGO_URL });
+
+      await waitFor(() => {
+        expect(
+          screen.getByRole('region', { name: 'Unsaved changes' }),
+        ).toHaveTextContent('1 unsaved change');
+      });
+      expect(screen.getByText('251°')).toBeVisible();
+      expect(screen.getByAltText('Current logo')).toHaveAttribute(
+        'src',
+        expect.stringContaining(encodeURIComponent(UPLOADED_LOGO_URL)),
+      );
+    });
+
     it('clears a staged removal on Save', async () => {
       setup({
         initialValues: {
