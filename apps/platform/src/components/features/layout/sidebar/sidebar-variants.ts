@@ -3,19 +3,9 @@ import { tv } from '@platform/utils/tv/tv';
 export const sidebarVariants = tv({
   slots: {
     root: [
-      // The rail's dark surface is a deliberate component treatment (its own
-      // `--admin-side*` token family), not the app-wide light theme flipped —
-      // admin ships one light theme with no `.dark` root class.
-      // Hidden below `md:` — mobile nav lives in Topbar's compact menu
-      // instead (TopbarNavMenu), never this unbounded full-height stack.
       'hidden w-full shrink-0 flex-col border-b border-admin-side-line bg-admin-side text-admin-side-text',
       'md:flex md:min-h-dvh md:w-[264px] md:border-r md:border-b-0',
       'md:sticky md:top-0 md:self-start',
-      // `Sidebar` never reads collapse state itself — `SidebarCollapseProvider`
-      // (a `ShellFrame`-owned client ancestor) carries `data-collapsed` on
-      // the `group/shell` element wrapping this whole subtree, and every
-      // collapse-aware class below is a `group-data-*/shell` selector reacting
-      // to it purely in CSS.
       'group-data-[collapsed=true]/shell:md:w-[76px]',
     ],
     brand: [
@@ -42,7 +32,8 @@ export const sidebarVariants = tv({
     row: [
       'group flex items-center gap-2.5 rounded-admin-control px-2.5 py-2 text-[13px]',
       'transition-colors duration-base ease-smooth',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-brand',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-side-accent',
+      'focus-visible:ring-offset-2 focus-visible:ring-offset-admin-side',
       'group-data-[collapsed=true]/shell:justify-center group-data-[collapsed=true]/shell:px-0',
     ],
     note: [
@@ -58,9 +49,7 @@ export const sidebarVariants = tv({
       resting: {
         row: ['text-admin-side-text', 'hover:bg-admin-side-line'],
       },
-      // Not dimmed: the label is the only way to learn this destination's
-      // name, so it stays at full legibility — the badge carries the
-      // "not available yet" signal instead.
+      // Not dimmed: the label is the destination's only name; the badge signals "not available yet".
       inert: { row: ['text-admin-side-text'] },
     },
   },
