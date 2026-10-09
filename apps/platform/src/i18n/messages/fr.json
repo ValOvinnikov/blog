@@ -370,7 +370,7 @@
   },
   "emailForm": {
     "pageHeading": "E-mail",
-    "pageSubtitle": "Identité de l'expéditeur et textes de chaque modèle pour tous les e-mails envoyés par ce locataire.",
+    "pageSubtitle": "Les e-mails que reçoivent vos lecteurs et votre équipe. Laissez un champ vide pour utiliser la valeur par défaut.",
     "saveButton": "Enregistrer les modifications",
     "savingButton": "Enregistrement…",
     "alertSuccess": "Paramètres d'e-mail enregistrés.",
@@ -412,14 +412,14 @@
   },
   "emailSettingsForm": {
     "heading": "Paramètres d'e-mail",
-    "description": "S'applique à tous les e-mails envoyés par ce locataire. Les champs vides reprennent la valeur par défaut du produit.",
+    "description": "S'applique à tous les e-mails envoyés par votre site. Laissez un champ vide pour utiliser le texte affiché.",
     "senderNameLabel": "Nom de l'expéditeur",
     "senderNameHint": "Le nom affiché dans l'adresse d'expédition — indépendant du titre du site.",
     "senderNameInvalidError": "C'est le nom que voient les destinataires, pas une adresse e-mail. Saisissez un nom comme Acme Co, sans < > \" , ; ni @.",
     "replyToLabel": "Adresse de réponse",
-    "replyToHint": "L'adresse vers laquelle sont dirigées les réponses aux e-mails du locataire.",
+    "replyToHint": "L'adresse où arrivent les réponses aux e-mails de votre site.",
     "footerAddressLabel": "Adresse postale du pied de page",
-    "footerAddressHint": "Une obligation légale pour les envois en masse — affichée dans le pied de page de chaque e-mail du locataire.",
+    "footerAddressHint": "Une obligation légale pour les envois en masse — affichée dans le pied de page de chaque e-mail envoyé par votre site.",
     "logoLabel": "Logo des e-mails",
     "logoHint": "Utilisé dans chaque e-mail, dans toutes les langues. Un modèle peut le remplacer par son propre logo."
   },

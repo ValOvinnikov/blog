@@ -370,7 +370,7 @@
   },
   "emailForm": {
     "pageHeading": "Email",
-    "pageSubtitle": "Sender identity and per-template copy for every email this tenant sends.",
+    "pageSubtitle": "The emails your readers and team receive. Leave a field blank to use the default.",
     "saveButton": "Save changes",
     "savingButton": "Saving…",
     "alertSuccess": "Saved email settings.",
@@ -412,14 +412,14 @@
   },
   "emailSettingsForm": {
     "heading": "Email settings",
-    "description": "Applies to every email this tenant sends. Blank fields fall back to the product default.",
+    "description": "Applies to every email your site sends. Leave a field blank to use the text shown.",
     "senderNameLabel": "Sender name",
     "senderNameHint": "The display name on the From address — unrelated to the site title.",
     "senderNameInvalidError": "This is the name recipients see, not an email address. Enter a name such as Acme Co, without < > \" , ; or @.",
     "replyToLabel": "Reply-to address",
-    "replyToHint": "Where a reply to any tenant email is routed.",
+    "replyToHint": "Where replies to your site's emails go.",
     "footerAddressLabel": "Footer postal address",
-    "footerAddressHint": "A legal requirement for bulk mail — shown in the footer of every tenant email.",
+    "footerAddressHint": "A legal requirement for bulk mail — shown in the footer of every email your site sends.",
     "logoLabel": "Email logo",
     "logoHint": "Used in every email, in every language. A template can override it with its own logo."
   },

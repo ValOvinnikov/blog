@@ -370,7 +370,7 @@
   },
   "emailForm": {
     "pageHeading": "E-mail",
-    "pageSubtitle": "Afzenderidentiteit en tekst per sjabloon voor elke e-mail die deze tenant verstuurt.",
+    "pageSubtitle": "De e-mails die je lezers en team ontvangen. Laat een veld leeg om de standaard te gebruiken.",
     "saveButton": "Wijzigingen opslaan",
     "savingButton": "Opslaan…",
     "alertSuccess": "E-mailinstellingen opgeslagen.",
@@ -412,14 +412,14 @@
   },
   "emailSettingsForm": {
     "heading": "E-mailinstellingen",
-    "description": "Geldt voor elke e-mail die deze tenant verstuurt. Lege velden vallen terug op de productstandaard.",
+    "description": "Geldt voor elke e-mail die je site verstuurt. Laat een veld leeg om de getoonde tekst te gebruiken.",
     "senderNameLabel": "Naam afzender",
     "senderNameHint": "De weergavenaam bij het Van-adres — staat los van de sitetitel.",
     "senderNameInvalidError": "Dit is de naam die ontvangers zien, geen e-mailadres. Vul een naam in zoals Acme Co, zonder < > \" , ; of @.",
     "replyToLabel": "Antwoordadres",
-    "replyToHint": "Waar een antwoord op een e-mail van de tenant naartoe gaat.",
+    "replyToHint": "Waar antwoorden op de e-mails van je site naartoe gaan.",
     "footerAddressLabel": "Postadres in voettekst",
-    "footerAddressHint": "Wettelijk verplicht voor bulkmail — wordt getoond in de voettekst van elke e-mail van de tenant.",
+    "footerAddressHint": "Wettelijk verplicht voor bulkmail — wordt getoond in de voettekst van elke e-mail die je site verstuurt.",
     "logoLabel": "E-maillogo",
     "logoHint": "Gebruikt in elke e-mail, in elke taal. Een sjabloon kan het vervangen door een eigen logo."
   },
