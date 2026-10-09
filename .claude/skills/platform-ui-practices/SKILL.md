@@ -491,9 +491,8 @@ tools you have are `loading.tsx`, `<Suspense>`, `cache`, `use`,
     route.
   - A Suspense fallback for a card, table or list is a `Skeleton`
     (`components/shared/skeleton/`) shaped like the content it stands in for,
-    with the same size and the same number of rows. **Not yet:** there is no
-    `Skeleton`; until it lands, the fallback is the shared `Spinner` with a
-    `label`.
+    with the same size and the same number of rows. A route's `loading.tsx`
+    renders `PageSkeleton` (`components/features/layout/page-skeleton/`).
   - Small or inline waits use the shared `Spinner` with a `label`: a button, the
     body of a disclosure or menu, or a control whose page is re-fetching. A link
     that navigates without a `loading.tsx` shows its pending state with
@@ -545,12 +544,12 @@ tools you have are `loading.tsx`, `<Suspense>`, `cache`, `use`,
 - An empty state never removes the card or the header. A card whose data doesn't
   exist yet says so in one body sentence, never a header alone.
 - Loading uses `Spinner` with its `label`. A card waiting on a slow external
-  call (Vercel) streams behind `Suspense` with a `Skeleton` fallback (**Not
-  yet:** a `Spinner` until `Skeleton` lands), so `PageHeader` renders at once.
+  call (Vercel) streams behind `Suspense` with a `Skeleton` fallback, so
+  `PageHeader` renders at once.
 - A status line states only what happened: no "Checked just now" for a check
   that failed or never ran, and nothing is polled that the page doesn't show.
-- `app/[locale]/not-found.tsx` and `error.tsx` render on the pre-shell `Card`
-  layout. **Not yet:** neither exists; don't add per-page fallbacks.
+- `app/[locale]/not-found.tsx` and `error.tsx` render `DeadEndView` on the
+  pre-shell `Card` layout. Don't add per-page fallbacks.
 
 ## Phones (below `md`)
 
@@ -660,7 +659,7 @@ panes.
 | `const a = await x(); const b = await y();` where `y` doesn't use `a`                                            | `const [a, b] = await Promise.all([x(), y()])`                                                                                                                       |
 | Calling `auth()`, `requireAdmin()` or a tenant query again in a layout or page                                   | The `cache()`-wrapped resolver the gate already used (`requireTenantById`, `resolveDashboardTenant`, `listSessionTenants`)                                           |
 | `queries.tenants.getX(tenant.id)` when `tenant` is already in hand                                               | Derive it from the row, e.g. `queries.tenants.selectLiveLocales(tenant)`                                                                                             |
-| Awaiting a slow external call (the Vercel API) in a page's top-level `Promise.all`                               | An async section inside `<Suspense>`, fallback `Skeleton` (**Not yet:** `Spinner`)                                                                                   |
+| Awaiting a slow external call (the Vercel API) in a page's top-level `Promise.all`                               | An async section inside `<Suspense>`, fallback `Skeleton`                                                                                                            |
 | Loading data that only a closed Disclosure, Menu or inactive tab shows                                           | A Server Action called on first open with a `Spinner`, or a route segment per tab                                                                                    |
 | `tenant={row}` or `hrefFor={() => …}` passed to a `'use client'` component                                       | A server-side projection of only the fields it renders, with hrefs computed on the server                                                                            |
 | A `setInterval` poll inside a hook that runs on every render path                                                | Gate it on the condition that renders its view, stop at a terminal state, cap ticks, and pause while the tab is hidden                                               |

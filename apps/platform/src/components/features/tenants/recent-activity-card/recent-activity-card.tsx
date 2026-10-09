@@ -34,7 +34,6 @@ export const RecentActivityCard = ({ events }: TRecentActivityCardProps) => {
     activityMessage,
     activitySub,
     activityTime,
-    activityEmpty,
   } = recentActivityCardVariants();
 
   return (
@@ -49,7 +48,7 @@ export const RecentActivityCard = ({ events }: TRecentActivityCardProps) => {
       />
       <Card.Body>
         {events.length === 0 ? (
-          <p className={activityEmpty()}>{t('activityEmpty')}</p>
+          <Text variant="supporting">{t('activityEmpty')}</Text>
         ) : (
           <div className={activityList()}>
             {events.map((event) => (

@@ -1,6 +1,7 @@
 import type { TFinding } from '@blog/db/schema/findings';
 import { Card } from '@platform/components/shared/card';
 import { StatusBadge } from '@platform/components/shared/status-badge';
+import { Text } from '@platform/components/shared/text';
 import { formatDate } from '@platform/utils/format-date/format-date';
 import { findingSeverityTone } from '@platform/utils/status-tone/status-tone';
 import { useLocale, useTranslations } from 'next-intl';
@@ -18,7 +19,7 @@ export const FindingsCard = ({ findings }: TFindingsCardProps) => {
   const tSeverity = useTranslations('findingSeverityLabel');
   const tSource = useTranslations('findingSourceLabel');
   const tKind = useTranslations('findingKindLabel');
-  const { list, row, body, kindText, sourceText, time, empty } =
+  const { list, row, body, kindText, sourceText, time } =
     findingsCardVariants();
 
   return (
@@ -26,7 +27,7 @@ export const FindingsCard = ({ findings }: TFindingsCardProps) => {
       <Card.Header title={t('title')} />
       <Card.Body>
         {findings.length === 0 ? (
-          <p className={empty()}>{t('empty')}</p>
+          <Text variant="supporting">{t('empty')}</Text>
         ) : (
           <div className={list()}>
             {findings.map((finding) => (

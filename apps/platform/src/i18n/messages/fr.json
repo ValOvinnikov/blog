@@ -21,6 +21,19 @@
     "heading": "Votre espace de travail n'est pas encore prêt",
     "description": "Cela peut arriver pendant la configuration d'un espace de travail, ou si un problème est survenu en cours de route. Actualisez la page dans quelques minutes, ou contactez la personne qui vous a invité si le problème persiste."
   },
+  "notFoundPage": {
+    "heading": "Page introuvable",
+    "description": "Cette page n'existe pas, ou vous n'y avez pas accès.",
+    "backLink": "Retour à l'accueil"
+  },
+  "errorPage": {
+    "heading": "Une erreur s'est produite",
+    "description": "Cette page n'a pas pu se charger. Réessayez, et si le problème persiste, revenez dans quelques minutes.",
+    "retry": "Réessayer"
+  },
+  "pageSkeleton": {
+    "label": "Chargement de la page…"
+  },
   "sidebar": {
     "brandName": "Valstack",
     "brandTagline": "admin",
@@ -757,7 +770,8 @@
   "archivedTenantsToggle": {
     "ariaLabel": "Visibilité des locataires",
     "activeOption": "Actifs",
-    "allOption": "Tous"
+    "allOption": "Tous",
+    "loading": "Chargement des locataires…"
   },
   "deprovisionTenantControl": {
     "cardTitle": "Déprovisionner ce locataire",
