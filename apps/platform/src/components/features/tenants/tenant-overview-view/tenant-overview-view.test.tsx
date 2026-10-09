@@ -1,8 +1,4 @@
-import {
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  DOMAIN_VERIFICATION_STATUS,
-} from '@blog/config';
+import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import {
   FINDING_KIND,
   FINDING_SEVERITY,
@@ -17,6 +13,7 @@ import {
 import type { TAuditEvent } from '@blog/db/schema/audit-events';
 import type { TFinding } from '@blog/db/schema/findings';
 import type { TTenantProvisioningState } from '@blog/db/schema/tenants';
+import { DomainCard } from '@platform/components/features/tenants/domain-card';
 import {
   act,
   customRender,
@@ -54,13 +51,6 @@ vi.mock(
   }),
 );
 
-vi.mock(
-  '@platform/server/provisioning/get-domain-verification-status-action',
-  () => ({
-    getDomainVerificationStatusAction: vi.fn(),
-  }),
-);
-
 vi.mock('@platform/server/tenants/update-tenant-details-action', () => ({
   updateTenantDetailsAction: vi.fn(),
 }));
@@ -94,7 +84,13 @@ const makeFinding = (overrides: Partial<TFinding> = {}): TFinding => ({
 
 const defaultProps: TTenantOverviewViewProps = {
   tenant: makeTenant(),
-  domainVerificationStatus: DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED,
+  domainCard: (
+    <DomainCard
+      tenant={makeTenant()}
+      domainVerificationStatus="NOT_CONFIGURED"
+      dnsHref="/tenants/tenant-1/domain"
+    />
+  ),
   ownerEmail: 'owner@example.com',
   ownerJoinedAt: 'Aug 12, 2026',
   ownerJoinedAtIso: '2026-08-12T00:00:00.000Z',
@@ -105,10 +101,6 @@ const defaultProps: TTenantOverviewViewProps = {
 const setup = customRender(TenantOverviewView, defaultProps);
 
 describe(`<${TenantOverviewView.name}/>`, () => {
-  // Rendering a non-terminal `provisioningStatus` starts a real
-  // `setInterval` poll loop that can outlive a test's own cleanup under
-  // parallel load — faking setInterval/clearInterval closes that off, same
-  // as `provisioning-status-view.test.tsx`.
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
     retryProvisioningStepActionMock.mockReset();
@@ -131,8 +123,6 @@ describe(`<${TenantOverviewView.name}/>`, () => {
       name: 'Acme Inc.',
     });
     expect(heading).toBeVisible();
-    // Scoped to the heading's own row — `TenantDetailsPanel`'s plan
-    // segmented control on this same page also has a "Free" option.
     const titleRow = heading.parentElement as HTMLElement;
     expect(within(titleRow).getByText('Active')).toBeVisible();
     expect(within(titleRow).getByText('Free')).toBeVisible();
@@ -173,7 +163,6 @@ describe(`<${TenantOverviewView.name}/>`, () => {
           ]),
         ) as unknown as TTenantProvisioningState,
       }),
-      domainVerificationStatus: DOMAIN_VERIFICATION_STATUS.VERIFIED,
     });
 
     expect(screen.getByText('Provisioned')).toBeVisible();
@@ -245,9 +234,6 @@ describe(`<${TenantOverviewView.name}/>`, () => {
   });
 
   it('locks every field immediately once a dispatch has begun, before any step has reported', () => {
-    // Provisioning was just (re)started — `provisioningStatus` already
-    // moved to PROVISIONING but every step is still IDLE, since a runner
-    // hasn't picked the workflow up yet.
     setup({
       tenant: makeTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
@@ -295,9 +281,6 @@ describe(`<${TenantOverviewView.name}/>`, () => {
       await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
     });
 
-    // Both the banner and the details panel moved together off the same
-    // poll tick — neither is left showing a stale RUNNING state while the
-    // other has already caught up to READY/SUCCEEDED.
     expect(screen.getByText('Provisioned')).toBeVisible();
     expect(
       screen.getByRole('textbox', { name: 'Name' }),
@@ -307,15 +290,19 @@ describe(`<${TenantOverviewView.name}/>`, () => {
   });
 
   it('wires each of the four fact cards with the data passed into the view', () => {
-    // Each card's own rendering is covered by its own co-located test —
-    // this only confirms `TenantOverviewView` actually threads the right
-    // prop through to each one.
+    const tenant = makeTenant({
+      primaryDomain: 'acme.example.com',
+      sanityProjectId: 'proj-1',
+    });
     setup({
-      tenant: makeTenant({
-        primaryDomain: 'acme.example.com',
-        sanityProjectId: 'proj-1',
-      }),
-      domainVerificationStatus: DOMAIN_VERIFICATION_STATUS.VERIFIED,
+      tenant,
+      domainCard: (
+        <DomainCard
+          tenant={tenant}
+          domainVerificationStatus="VERIFIED"
+          dnsHref={`/tenants/${tenant.id}/domain`}
+        />
+      ),
       auditEvents: [makeEvent()],
       findings: [makeFinding()],
     });
