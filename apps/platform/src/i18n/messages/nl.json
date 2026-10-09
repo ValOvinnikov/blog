@@ -2,7 +2,7 @@
   "pageMetadata": {
     "root": "Admin",
     "tenants": "Tenants · Admin",
-    "tenant": "Tenant · Admin",
+    "tenant": "Overzicht · Admin",
     "look": "Uiterlijk · Admin",
     "voice": "Toon · Admin",
     "selectTenant": "Kies een werkruimte · Admin",
@@ -282,7 +282,7 @@
     "alertSuccess": "Opgeslagen in site_config.",
     "alertError": "Uiterlijk-instellingen konden niet worden opgeslagen. Probeer het opnieuw.",
     "presetLabel": "Voorinstelling",
-    "presetDescription": "Het startpunt dat bijna elke tenant kiest. Stelt accenttint, kop- en tekstlettertype, afronding en dichtheid in.",
+    "presetDescription": "Het startpunt dat bijna elke site kiest. Stelt accenttint, kop- en tekstlettertype, afronding en dichtheid in.",
     "accentHueLabel": "Accenttint",
     "accentHueDescription": "Alleen de tint verandert — lichtheid en chroma liggen vast (OKLCH), zodat het contrast WCAG-geverifieerd blijft.",
     "accentHueInaccessible": "Met deze tint blijft lopende tekst op de getinte vlakken niet leesbaar, dus de site zou hem vervangen. Kies een andere tint.",
@@ -415,7 +415,7 @@
   },
   "emailSettingsForm": {
     "heading": "E-mailinstellingen",
-    "description": "Geldt voor elke e-mail die je site verstuurt. Laat een veld leeg om de getoonde tekst te gebruiken.",
+    "description": "Geldt voor elke e-mail die je site verstuurt. Laat een veld leeg om de standaardwaarde te gebruiken.",
     "senderNameLabel": "Naam afzender",
     "senderNameHint": "De weergavenaam bij het Van-adres — staat los van de sitetitel.",
     "senderNameInvalidError": "Dit is de naam die ontvangers zien, geen e-mailadres. Vul een naam in zoals Acme Co, zonder < > \" , ; of @.",
@@ -449,8 +449,8 @@
       "NEWSLETTER_CONFIRMATION": "Bevestiging nieuwsbrief"
     },
     "templateTypeDescription": {
-      "MAGIC_LINK": "Verstuurd wanneer iemand inlogt op de site van deze tenant.",
-      "TENANT_INVITE": "Verstuurd wanneer iemand wordt uitgenodigd voor het team van deze tenant.",
+      "MAGIC_LINK": "Verstuurd wanneer iemand inlogt op je site.",
+      "TENANT_INVITE": "Verstuurd wanneer iemand wordt uitgenodigd voor je team.",
       "NEWSLETTER_CONFIRMATION": "Verstuurd om een nieuwsbriefabonnement te bevestigen."
     },
     "useDefault": "Standaard gebruiken"
@@ -724,7 +724,7 @@
   "studioPage": {
     "title": "Studio",
     "notProvisionedTitle": "Studio is nog niet klaar",
-    "notProvisionedDescription": "Het Sanity-project van deze tenant is nog niet volledig ingericht. Probeer het opnieuw zodra de inrichting is voltooid."
+    "notProvisionedDescription": "Het Sanity-project van deze site is nog niet klaar. Probeer het over een paar minuten opnieuw."
   },
   "tenantDetailsPanel": {
     "heading": "Tenantgegevens",
@@ -799,7 +799,7 @@
   },
   "featuresSettings": {
     "heading": "Functies",
-    "description": "Zet functies voor de tenant aan of uit. Vergrendelde schakelaars vereisen het Growth-abonnement.",
+    "description": "Zet de functies van je site aan of uit. Vergrendelde schakelaars vereisen het Growth-abonnement.",
     "saveButton": "Wijzigingen opslaan",
     "savingButton": "Opslaan…",
     "alertSuccess": "Functies opgeslagen.",
@@ -843,7 +843,7 @@
     "switchOn": "Aan",
     "switchOff": "Uit",
     "defaultHeading": "Standaardtaal",
-    "defaultDescription": "Elke pagina wordt eerst in deze taal geschreven; stel deze in bij de tenantgegevens.",
+    "defaultDescription": "Elke pagina wordt eerst in deze taal geschreven.",
     "additionalHeading": "Extra talen",
     "allowance": "{used} van {allowed} extra talen in gebruik binnen uw abonnement.",
     "upgradeNotice": "Uw abonnement publiceert alleen de standaardtaal. Upgrade om meer talen toe te voegen.",

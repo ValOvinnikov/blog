@@ -29,9 +29,7 @@ describe(`<${LanguagesSettings.name}/>`, () => {
 
     expect(screen.getByText('Dutch')).toBeVisible();
     expect(
-      screen.getByText(
-        'Every page is written in it first; set it in the tenant details.',
-      ),
+      screen.getByText('Every page is written in it first.'),
     ).toBeVisible();
   });
 
