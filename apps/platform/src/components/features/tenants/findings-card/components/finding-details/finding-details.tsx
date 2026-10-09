@@ -9,14 +9,13 @@ export type TFindingDetailsProps = {
   details: Record<string, unknown>;
 };
 
-/** A finding's `details` disclosure — a recognized shape renders as a table; anything else falls back to a raw dump. */
 export const FindingDetails = ({ details }: TFindingDetailsProps) => {
   const t = useTranslations('findingsCard');
   const { pre } = findingDetailsVariants();
   const parsed = parseDocumentValidationDetails(details);
 
   return (
-    <Disclosure summary={t('detailsToggle')}>
+    <Disclosure variant="inline" summary={t('detailsToggle')}>
       {parsed ? (
         <DocumentValidationTable documents={parsed.documents} />
       ) : (

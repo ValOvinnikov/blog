@@ -139,6 +139,7 @@ export const TenantDetailsPanel = ({
     bodyStack,
     fields,
     lockAnnouncementLive,
+    wideField,
     planControl,
     footerActions,
   } = tenantDetailsPanelVariants();
@@ -278,27 +279,31 @@ export const TenantDetailsPanel = ({
                 );
               })}
 
-              <FormField
-                label={t('localeLabel')}
-                hasOwnAccessibleName={true}
-                hint={
-                  localeLock && (
-                    <span id={localeLockReasonId}>
-                      {lockReasonText(localeLock)}
-                    </span>
-                  )
-                }
-              >
-                <SegmentedControl<string>
-                  ariaLabel={t('localeLabel')}
-                  options={localeOptions}
-                  value={values.locale}
-                  onChange={(locale) => updateField('locale', locale)}
-                  className={planControl()}
-                  isDisabled={Boolean(localeLock)}
-                  aria-describedby={localeLock ? localeLockReasonId : undefined}
-                />
-              </FormField>
+              <div className={wideField()}>
+                <FormField
+                  label={t('localeLabel')}
+                  hasOwnAccessibleName={true}
+                  hint={
+                    localeLock && (
+                      <span id={localeLockReasonId}>
+                        {lockReasonText(localeLock)}
+                      </span>
+                    )
+                  }
+                >
+                  <SegmentedControl<string>
+                    ariaLabel={t('localeLabel')}
+                    options={localeOptions}
+                    value={values.locale}
+                    onChange={(locale) => updateField('locale', locale)}
+                    className={planControl()}
+                    isDisabled={Boolean(localeLock)}
+                    aria-describedby={
+                      localeLock ? localeLockReasonId : undefined
+                    }
+                  />
+                </FormField>
+              </div>
 
               <FormField
                 label={t('planLabel')}
