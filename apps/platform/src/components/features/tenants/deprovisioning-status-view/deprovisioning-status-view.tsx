@@ -1,15 +1,11 @@
 'use client';
 
-import { ICONS } from '@blog/config';
 import { TENANT_PROVISIONING_STEP_STATUS } from '@blog/db/constants';
+import { RunErrorCard } from '@platform/components/features/tenants/run-error-card';
 import { Card } from '@platform/components/shared/card';
 import { Disclosure } from '@platform/components/shared/disclosure';
-import {
-  Heading,
-  type THeadingLevel,
-} from '@platform/components/shared/heading';
+import type { THeadingLevel } from '@platform/components/shared/heading';
 import { headingVariants } from '@platform/components/shared/heading/heading-variants';
-import { Icon } from '@platform/components/shared/icon';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { StepList } from '@platform/components/shared/step-list';
 import { Text } from '@platform/components/shared/text';
@@ -59,19 +55,8 @@ export const DeprovisioningStatusView = ({
     (status) => status === TENANT_PROVISIONING_STEP_STATUS.DONE,
   ).length;
 
-  const {
-    root,
-    cardsRow,
-    stepsCard,
-    stepsSummary,
-    overallStatusLive,
-    errorCard,
-    errorHeadingRow,
-    errorHeadline,
-    errorIcon,
-    errorDetails,
-    errorDetailsText,
-  } = deprovisioningStatusViewVariants();
+  const { root, cardsRow, stepsCard, stepsSummary, overallStatusLive } =
+    deprovisioningStatusViewVariants();
 
   const stepListSteps = STEP_ORDER.map((stepKey, index) => {
     const status = stepStatuses[index] ?? TENANT_PROVISIONING_STEP_STATUS.IDLE;
@@ -151,37 +136,25 @@ export const DeprovisioningStatusView = ({
               headingLevel={headingLevel}
               actions={overallStatusBadgeLive}
             />
+            <Card.Body>
+              <Text variant="supporting">{t('runCardEmpty')}</Text>
+            </Card.Body>
           </Card>
         )}
       </div>
 
       {isFailed && errorKind && failedStep && (
-        <div className={errorCard()} role="alert">
-          <div className={errorHeadingRow()}>
-            <Icon name={ICONS.WARNING} className={errorIcon()} />
-            <Heading
-              level={headingLevel}
-              size="cardTitle"
-              className={errorHeadline()}
-            >
-              {t(`errorKind.${errorKind}.headline`)}
-            </Heading>
-          </div>
-          <Text variant="supporting">{t(`errorKind.${errorKind}.body`)}</Text>
-          <Text variant="hint">
-            {t('failedStepLabel', { step: t(`stepLabel.${failedStep}`) })}
-          </Text>
-          <Text variant="hint">{t(`errorKind.${errorKind}.nextStep`)}</Text>
-          {failedStepError && (
-            <Disclosure
-              variant="inline"
-              className={errorDetails()}
-              summary={t('technicalDetailsToggle')}
-            >
-              <pre className={errorDetailsText()}>{failedStepError}</pre>
-            </Disclosure>
-          )}
-        </div>
+        <RunErrorCard
+          headline={t(`errorKind.${errorKind}.headline`)}
+          body={t(`errorKind.${errorKind}.body`)}
+          failedStepLine={t('failedStepLabel', {
+            step: t(`stepLabel.${failedStep}`),
+          })}
+          nextStep={t(`errorKind.${errorKind}.nextStep`)}
+          technicalDetails={failedStepError}
+          technicalDetailsLabel={t('technicalDetailsToggle')}
+          headingLevel={headingLevel}
+        />
       )}
     </div>
   );

@@ -1,16 +1,15 @@
 'use client';
 
-import { ALERT_TYPE, ICONS } from '@blog/config';
+import { ALERT_TYPE, SIZE } from '@blog/config';
 import { TENANT_PROVISIONING_STEP_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { RunErrorCard } from '@platform/components/features/tenants/run-error-card';
 import { Alert } from '@platform/components/shared/alert';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
 import { Disclosure } from '@platform/components/shared/disclosure';
-import { Heading } from '@platform/components/shared/heading';
 import { headingVariants } from '@platform/components/shared/heading/heading-variants';
-import { Icon } from '@platform/components/shared/icon';
 import { PageHeader } from '@platform/components/shared/page-header';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { StepList } from '@platform/components/shared/step-list';
@@ -70,17 +69,10 @@ export const ProvisioningStatusView = ({
   const {
     root,
     ownerRow,
-    startAction,
     cardsRow,
     stepsCard,
     stepsSummary,
     overallStatusLive,
-    errorCard,
-    errorHeadingRow,
-    errorHeadline,
-    errorIcon,
-    errorDetails,
-    errorDetailsText,
   } = provisioningStatusViewVariants();
 
   const stepListSteps = STEP_ORDER.map((stepKey, index) => {
@@ -130,6 +122,7 @@ export const ProvisioningStatusView = ({
     <Button
       type="button"
       variant="secondary"
+      size={SIZE.SM}
       onClick={handleRetry}
       isDisabled={isRetrying || isArchived || isProvisioningRunning}
       aria-describedby={isArchived ? archivedNoticeId : undefined}
@@ -137,6 +130,19 @@ export const ProvisioningStatusView = ({
       {isRetrying ? t('retryingButton') : t('retryButton')}
     </Button>
   ) : null;
+
+  const startButtonNode =
+    allIdle && !isProvisioningRunning ? (
+      <Button
+        type="button"
+        variant="primary"
+        onClick={handleStart}
+        isDisabled={isStarting || isArchived}
+        aria-describedby={isArchived ? archivedNoticeId : undefined}
+      >
+        {isStarting ? t('startingButton') : t('startButton')}
+      </Button>
+    ) : null;
 
   const runCardActions = (
     <>
@@ -150,6 +156,7 @@ export const ProvisioningStatusView = ({
       <PageHeader
         title={t('pageTitle')}
         description={t('description', { tenantName: tenant.name })}
+        actions={startButtonNode}
       />
 
       {tenant.deprovisionedAt && (
@@ -185,20 +192,6 @@ export const ProvisioningStatusView = ({
         />
       )}
 
-      {allIdle && !isProvisioningRunning && (
-        <div className={startAction()}>
-          <Button
-            type="button"
-            variant="primary"
-            onClick={handleStart}
-            isDisabled={isStarting || isArchived || isProvisioningRunning}
-            aria-describedby={isArchived ? archivedNoticeId : undefined}
-          >
-            {isStarting ? t('startingButton') : t('startButton')}
-          </Button>
-        </div>
-      )}
-
       <div className={cardsRow()}>
         <div data-testid="provisioning-steps">
           <Disclosure
@@ -229,30 +222,21 @@ export const ProvisioningStatusView = ({
         ) : (
           <Card>
             <Card.Header title={t('runCardTitle')} actions={runCardActions} />
+            <Card.Body>
+              <Text variant="supporting">{t('runCardEmpty')}</Text>
+            </Card.Body>
           </Card>
         )}
       </div>
 
       {isOverallFailed && errorKind && (
-        <div className={errorCard()} role="alert">
-          <div className={errorHeadingRow()}>
-            <Icon name={ICONS.WARNING} className={errorIcon()} />
-            <Heading level={2} size="cardTitle" className={errorHeadline()}>
-              {t(`errorKind.${errorKind}.headline`)}
-            </Heading>
-          </div>
-          <Text variant="supporting">{t(`errorKind.${errorKind}.body`)}</Text>
-          <Text variant="hint">{t(`errorKind.${errorKind}.nextStep`)}</Text>
-          {failedStepError && (
-            <Disclosure
-              variant="inline"
-              className={errorDetails()}
-              summary={t('technicalDetailsToggle')}
-            >
-              <pre className={errorDetailsText()}>{failedStepError}</pre>
-            </Disclosure>
-          )}
-        </div>
+        <RunErrorCard
+          headline={t(`errorKind.${errorKind}.headline`)}
+          body={t(`errorKind.${errorKind}.body`)}
+          nextStep={t(`errorKind.${errorKind}.nextStep`)}
+          technicalDetails={failedStepError}
+          technicalDetailsLabel={t('technicalDetailsToggle')}
+        />
       )}
     </div>
   );
