@@ -10,7 +10,7 @@ import NextAuth from 'next-auth';
 // otherwise crash Next's build-time "Collecting page data" step against a
 // `DATABASE_URL` that's legitimately unset in CI. Same reasoning as
 // `apps/web/src/server/auth/auth.ts`.
-const { handlers, auth, signIn } = NextAuth(() => buildAuthConfig());
+const { handlers, auth, signIn, signOut } = NextAuth(() => buildAuthConfig());
 
 export const { GET, POST } = handlers;
-export { auth, signIn };
+export { auth, signIn, signOut };

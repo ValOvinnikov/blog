@@ -1,5 +1,6 @@
 import type { TTenant } from '@blog/db/schema/tenants';
 import { PreShellFrame } from '@platform/components/features/layout/pre-shell-frame';
+import { SignOutButton } from '@platform/components/features/layout/sign-out-button';
 import { PageHeader } from '@platform/components/shared/page-header';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Link } from '@platform/i18n/navigation';
@@ -28,7 +29,11 @@ export const DashboardTenantPicker = ({
   return (
     <PreShellFrame
       header={
-        <PageHeader title={t('heading')} description={t('description')} />
+        <PageHeader
+          title={t('heading')}
+          description={t('description')}
+          actions={<SignOutButton />}
+        />
       }
     >
       <ul className={list()}>

@@ -19,7 +19,8 @@
   },
   "workspacePendingPage": {
     "heading": "Su espacio de trabajo aún no está listo",
-    "description": "Esto puede ocurrir mientras se configura un espacio de trabajo o si algo ha fallado durante el proceso. Vuelva a cargar la página en unos minutos o, si el problema persiste, contacte con quien le invitó."
+    "description": "Esto puede ocurrir mientras se configura un espacio de trabajo o si algo ha fallado durante el proceso. Vuelva a cargar la página en unos minutos o, si el problema persiste, contacte con quien le invitó.",
+    "tryAgain": "Volver a intentarlo"
   },
   "notFoundPage": {
     "heading": "Página no encontrada",
@@ -54,6 +55,9 @@
   "topbar": {
     "breadcrumbAriaLabel": "Ruta de navegación",
     "roleChip": "{role} · {scope}"
+  },
+  "account": {
+    "signOut": "Cerrar sesión"
   },
   "roleLabel": {
     "SUPERADMIN": "Superadministrador",

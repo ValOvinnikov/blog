@@ -125,7 +125,7 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
     await setup();
 
     expect(screen.getByText('dashboard content')).toBeVisible();
-    expect(screen.getByRole('button', { name: /globex/i })).toBeVisible();
+    expect(screen.getByRole('button', { name: /globex\.com/i })).toBeVisible();
   });
 
   describe('with one membership', () => {
@@ -140,7 +140,7 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
       expect(screen.getByText('dashboard content')).toBeVisible();
       expect(redirect).not.toHaveBeenCalled();
       expect(
-        screen.queryByRole('button', { name: /acme/i }),
+        screen.queryByRole('button', { name: /acme\.com/i }),
       ).not.toBeInTheDocument();
     });
 

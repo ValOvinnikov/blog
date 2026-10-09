@@ -1,9 +1,9 @@
 import type { TAdminRole, TMembershipRole } from '@blog/db/constants';
 import type { TSidebarNavSection } from '@platform/components/features/layout/sidebar';
-import { Avatar } from '@platform/components/shared/avatar';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
+import { AccountMenu } from './components/account-menu';
 import { TopbarNavMenu } from './topbar-nav-menu';
 import { topbarVariants } from './topbar-variants';
 
@@ -29,19 +29,16 @@ export const Topbar = ({
   const t = useTranslations('topbar');
   const tRole = useTranslations('roleLabel');
   const { name, role, scope } = roleChip;
-  const { root, chip, chipDot, chipText } = topbarVariants();
+  const { root } = topbarVariants();
 
   return (
     <header className={root()}>
       {sections && <TopbarNavMenu sections={sections} switcher={switcher} />}
       {crumb}
-      <span className={chip()}>
-        <Avatar name={name ?? ''} variant="chip" />
-        <span aria-hidden="true" className={chipDot()} />
-        <span className={chipText()}>
-          {t('roleChip', { role: tRole(role), scope })}
-        </span>
-      </span>
+      <AccountMenu
+        name={name}
+        label={t('roleChip', { role: tRole(role), scope })}
+      />
     </header>
   );
 };

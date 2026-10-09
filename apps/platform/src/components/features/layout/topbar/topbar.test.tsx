@@ -10,6 +10,7 @@ import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { Topbar } from './topbar';
 
 vi.mock('@platform/i18n/navigation');
+vi.mock('@platform/server/auth/sign-out-action');
 
 const render = renderWithIntl;
 

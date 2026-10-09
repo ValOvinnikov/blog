@@ -19,7 +19,8 @@
   },
   "workspacePendingPage": {
     "heading": "Votre espace de travail n'est pas encore prêt",
-    "description": "Cela peut arriver pendant la configuration d'un espace de travail, ou si un problème est survenu en cours de route. Actualisez la page dans quelques minutes, ou contactez la personne qui vous a invité si le problème persiste."
+    "description": "Cela peut arriver pendant la configuration d'un espace de travail, ou si un problème est survenu en cours de route. Actualisez la page dans quelques minutes, ou contactez la personne qui vous a invité si le problème persiste.",
+    "tryAgain": "Réessayer"
   },
   "notFoundPage": {
     "heading": "Page introuvable",
@@ -54,6 +55,9 @@
   "topbar": {
     "breadcrumbAriaLabel": "Fil d'Ariane",
     "roleChip": "{role} · {scope}"
+  },
+  "account": {
+    "signOut": "Se déconnecter"
   },
   "roleLabel": {
     "SUPERADMIN": "Super-administrateur",
