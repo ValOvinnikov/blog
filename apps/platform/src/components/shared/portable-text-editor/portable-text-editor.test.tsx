@@ -1,4 +1,4 @@
-import { VOICE_PORTABLE_TEXT_SCHEMA } from '@blog/config';
+import { CONTROL_MODE, VOICE_PORTABLE_TEXT_SCHEMA } from '@blog/config';
 import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
 import {
   renderWithIntl,
@@ -130,7 +130,7 @@ describe(PortableTextEditor, () => {
       <PortableTextEditor
         initialValue={[]}
         onChange={() => {}}
-        ariaLabel="Body"
+        field={{ label: 'Body' }}
       />,
     );
 
@@ -142,7 +142,7 @@ describe(PortableTextEditor, () => {
       <PortableTextEditor
         initialValue={[]}
         onChange={() => {}}
-        ariaLabel="Body"
+        field={{ label: 'Body' }}
       />,
     );
 
@@ -154,7 +154,7 @@ describe(PortableTextEditor, () => {
       <PortableTextEditor
         initialValue={[]}
         onChange={() => {}}
-        ariaLabel="Body"
+        field={{ label: 'Body' }}
         schema={VOICE_PORTABLE_TEXT_SCHEMA}
       />,
     );
@@ -171,7 +171,7 @@ describe(PortableTextEditor, () => {
       <PortableTextEditor
         initialValue={[]}
         onChange={() => {}}
-        ariaLabel="Body"
+        field={{ label: 'Body' }}
         schema={VOICE_PORTABLE_TEXT_SCHEMA}
       />,
     );
@@ -193,7 +193,7 @@ describe(PortableTextEditor, () => {
       <PortableTextEditor
         initialValue={[]}
         onChange={() => {}}
-        ariaLabel="Body"
+        field={{ label: 'Body' }}
         schema={VOICE_PORTABLE_TEXT_SCHEMA}
       />,
     );
@@ -213,7 +213,7 @@ describe(PortableTextEditor, () => {
       <PortableTextEditor
         initialValue={[]}
         onChange={() => {}}
-        ariaLabel="Body"
+        field={{ label: 'Body' }}
       />,
     );
 
@@ -226,7 +226,7 @@ describe(PortableTextEditor, () => {
       <PortableTextEditor
         initialValue={[]}
         onChange={() => {}}
-        ariaLabel="Body"
+        field={{ label: 'Body' }}
         placeholder="No posts yet."
       />,
     );
@@ -239,8 +239,7 @@ describe(PortableTextEditor, () => {
       <PortableTextEditor
         initialValue={[]}
         onChange={() => {}}
-        ariaLabel="Body"
-        isInvalid={true}
+        field={{ label: 'Body', isInvalid: true }}
         aria-describedby="body-error"
       />,
     );
@@ -255,8 +254,8 @@ describe(PortableTextEditor, () => {
       <PortableTextEditor
         initialValue={[]}
         onChange={() => {}}
-        ariaLabel="Body"
-        isDisabled={true}
+        field={{ label: 'Body' }}
+        mode={CONTROL_MODE.DISABLED}
       />,
     );
 
@@ -270,8 +269,8 @@ describe(PortableTextEditor, () => {
       <PortableTextEditor
         initialValue={[]}
         onChange={() => {}}
-        ariaLabel="Body"
-        isDisabled={true}
+        field={{ label: 'Body' }}
+        mode={CONTROL_MODE.DISABLED}
       />,
     );
 
@@ -281,12 +280,29 @@ describe(PortableTextEditor, () => {
     expect(field).not.toHaveAttribute('tabindex');
   });
 
+  it('announces a read-only editor as a focusable, read-only text field with no toolbar', () => {
+    render(
+      <PortableTextEditor
+        initialValue={[]}
+        onChange={() => {}}
+        field={{ label: 'Body' }}
+        mode={CONTROL_MODE.READ_ONLY}
+      />,
+    );
+
+    const field = screen.getByRole('textbox', { name: 'Body' });
+    expect(field).toHaveAttribute('aria-readonly', 'true');
+    expect(field).not.toHaveAttribute('aria-disabled');
+    expect(field).toHaveAttribute('tabindex', '0');
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+  });
+
   it('keeps its own multiline textbox role and carries no aria-disabled attribute when enabled', () => {
     render(
       <PortableTextEditor
         initialValue={[]}
         onChange={() => {}}
-        ariaLabel="Body"
+        field={{ label: 'Body' }}
       />,
     );
 
@@ -300,7 +316,7 @@ describe(PortableTextEditor, () => {
       <PortableTextEditor
         initialValue={linkBody('https://example.com')}
         onChange={() => {}}
-        ariaLabel="Body"
+        field={{ label: 'Body' }}
       />,
     );
 
@@ -317,7 +333,7 @@ describe(PortableTextEditor, () => {
       <PortableTextEditor
         initialValue={linkBody('javascript:alert(1)')}
         onChange={() => {}}
-        ariaLabel="Body"
+        field={{ label: 'Body' }}
       />,
     );
 
@@ -332,7 +348,7 @@ describe(PortableTextEditor, () => {
       <PortableTextEditor
         initialValue={linkBody('data:text/html,<script>alert(1)</script>')}
         onChange={() => {}}
-        ariaLabel="Body"
+        field={{ label: 'Body' }}
       />,
     );
 
@@ -347,7 +363,7 @@ describe(PortableTextEditor, () => {
       <PortableTextEditor
         initialValue={linkBody('  JaVaScRiPt:alert(1)')}
         onChange={() => {}}
-        ariaLabel="Body"
+        field={{ label: 'Body' }}
       />,
     );
 
@@ -362,7 +378,7 @@ describe(PortableTextEditor, () => {
       <PortableTextEditor
         initialValue={listBody}
         onChange={() => {}}
-        ariaLabel="Body"
+        field={{ label: 'Body' }}
       />,
     );
 
@@ -394,7 +410,7 @@ describe(PortableTextEditor, () => {
       <PortableTextEditor
         initialValue={fourItemBulletBody}
         onChange={() => {}}
-        ariaLabel="Body"
+        field={{ label: 'Body' }}
       />,
     );
 
@@ -415,7 +431,7 @@ describe(PortableTextEditor, () => {
       <PortableTextEditor
         initialValue={numberedListWithNestedBulletBody}
         onChange={() => {}}
-        ariaLabel="Body"
+        field={{ label: 'Body' }}
       />,
     );
 

@@ -7,6 +7,7 @@ export * from './capability';
 export * from './card-image-shape';
 export * from './card-style';
 export * from './consent-category';
+export * from './control-mode';
 export * from './cta';
 export * from './depth';
 export * from './display-mode';

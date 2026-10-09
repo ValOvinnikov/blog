@@ -78,4 +78,28 @@ describe(`<${VoiceField.name}/>`, () => {
 
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
+
+  it('announces a read-only rich field as read-only rather than disabled', () => {
+    setup({
+      field: fieldById('notFoundSupportingText'),
+      value: null,
+      isReadOnly: true,
+    });
+
+    const editor = screen.getByRole('textbox', { name: 'Supporting text' });
+    expect(editor).toHaveAttribute('aria-readonly', 'true');
+    expect(editor).not.toHaveAttribute('aria-disabled');
+  });
+
+  it('gives an invalid rich field its input id so the save bar can focus it', () => {
+    setup({
+      field: fieldById('notFoundSupportingText'),
+      value: null,
+      error: 'Must be 300 characters or fewer.',
+    });
+
+    const editor = screen.getByRole('textbox', { name: 'Supporting text' });
+    expect(editor).toHaveAttribute('id', 'voice-field-test');
+    expect(editor).toHaveAttribute('aria-invalid', 'true');
+  });
 });
