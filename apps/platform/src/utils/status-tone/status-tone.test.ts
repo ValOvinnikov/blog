@@ -1,43 +1,6 @@
 import { FINDING_SEVERITY } from '@blog/config/constants';
-import { ELEVATE_TENANT_OWNER_OUTCOME } from '@blog/db/constants';
 
-import {
-  findingSeverityTone,
-  ownerElevationTone,
-  sanityValidationMarkerTone,
-} from './status-tone';
-
-describe(ownerElevationTone, () => {
-  it('is "ok" for ELEVATED', () => {
-    expect(ownerElevationTone(ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED)).toBe(
-      'ok',
-    );
-  });
-
-  it('is "ok" for ALREADY_ADMINISTRATOR', () => {
-    expect(
-      ownerElevationTone(ELEVATE_TENANT_OWNER_OUTCOME.ALREADY_ADMINISTRATOR),
-    ).toBe('ok');
-  });
-
-  it('is "neutral" for PENDING_ACCEPTANCE', () => {
-    expect(
-      ownerElevationTone(ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE),
-    ).toBe('neutral');
-  });
-
-  it('is "warn" for STALLED', () => {
-    expect(ownerElevationTone(ELEVATE_TENANT_OWNER_OUTCOME.STALLED)).toBe(
-      'warn',
-    );
-  });
-
-  it('is "warn" for AMBIGUOUS_MEMBERSHIP', () => {
-    expect(
-      ownerElevationTone(ELEVATE_TENANT_OWNER_OUTCOME.AMBIGUOUS_MEMBERSHIP),
-    ).toBe('warn');
-  });
-});
+import { findingSeverityTone, sanityValidationMarkerTone } from './status-tone';
 
 describe(findingSeverityTone, () => {
   it('is "neutral" for INFO', () => {

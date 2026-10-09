@@ -17,12 +17,15 @@ describe(Icon, () => {
   it('renders a glyph for every icon admin references', () => {
     const used = [
       ICONS.BOOK,
+      ICONS.CHECK,
       ICONS.CHECK_SHEET,
       ICONS.CHEVRON_RIGHT,
+      ICONS.CLOSE,
       ICONS.COMMENT,
       ICONS.GLOBE,
       ICONS.GRID,
       ICONS.HOUSE,
+      ICONS.INFO,
       ICONS.MAIL,
       ICONS.MENU,
       ICONS.MENU_ROWS,

@@ -316,8 +316,7 @@ No other value between those things: no `gap-5`, `gap-[18px]`, `mb-[18px]`, or
   `-lg`, `-xl`) or 5, 7 or 10px.
 - Elevation: `shadow-admin` on resting surfaces and controls, `shadow-admin-lg`
   on floating layers only (save bar, dialog, toast, popup). A notice nested in a
-  card has no shadow. **Not yet:** `Alert` always carries one; don't override it
-  per call site.
+  card has no shadow.
 
 ## Forms and settings
 
@@ -538,10 +537,8 @@ tools you have are `loading.tsx`, `<Suspense>`, `cache`, `use`,
 ## Notices and states
 
 - One notice primitive renders page notices and form results: `Alert` with an
-  optional `action` and `role`. **Not yet:** `Alert` and `BannerState` are still
-  separate. Use `Alert` for form and save results, and `BannerState` (or
-  `ArchivedTenantNotice`) for a page notice with an action, directly under
-  `PageHeader`. Never hand-build a tone box or add another notice style.
+  optional `action` and `role`. Never hand-build a tone box or add another
+  notice style.
 - A notice's title is a short phrase; the explanation is its description, at
   regular weight. Weight marks a title, never a sentence.
 - An empty state never removes the card or the header. A card whose data doesn't
@@ -625,7 +622,7 @@ panes.
 | Table classes of your own: 18px cell padding, no row hover, a left-aligned empty line                            | The table recipe's variants, unchanged                                                                                                                               |
 | A `div` with `rounded-admin border p-[18px] shadow-admin`                                                        | `<Card>` with `Card.Header` and `Card.Body`                                                                                                                          |
 | A paragraph opening `Card.Body` that says what the card is for                                                   | `Card.Header` `supportingText`                                                                                                                                       |
-| A hand-built tinted box with a glyph                                                                             | `Alert` or `BannerState`; a failure card is a `Card` with a bad header                                                                                               |
+| A hand-built tinted box with a glyph                                                                             | `Alert`; a failure card is a `Card` with a bad header                                                                                                                |
 | A second `h1`, or `<Heading level={1}>` in a page body                                                           | `PageHeader` `title`, once per page                                                                                                                                  |
 | `<h2>`, `<h3>` or a `font-semibold` span as a section title                                                      | `Card.Header` `title`                                                                                                                                                |
 | `<Card.Header title={…}>` with no `headingLevel`                                                                 | `headingLevel={2}`                                                                                                                                                   |
