@@ -8,10 +8,12 @@ import {
 import type { TLocaleIsoCode } from '@blog/config/constants';
 import { Button } from '@blog/ui/components/atoms/button';
 import { Eyebrow } from '@blog/ui/components/atoms/eyebrow';
-import { Heading } from '@blog/ui/components/atoms/heading';
+import { headingVariants } from '@blog/ui/components/atoms/heading/heading-variants';
 import { Text } from '@blog/ui/components/atoms/text';
 import { LinkButton } from '@blog/ui/components/molecules/link-button';
 import { Panel } from '@blog/ui/components/molecules/panel';
+import { panelHeaderVariants } from '@blog/ui/components/molecules/panel/components/header/panel-header-variants';
+import { panelVariants } from '@blog/ui/components/molecules/panel/panel-variants';
 import { BookmarksList } from '@blog/ui/components/organisms/bookmarks-list';
 import { VoiceKeyFrame } from '@platform/components/features/site-preview/voice-key-frame';
 import { VoiceRichText } from '@platform/components/features/site-preview/voice-rich-text';
@@ -112,9 +114,9 @@ export const VoiceSpecimen = ({
         {heading &&
           framed(
             heading,
-            <Heading level={3} visual="hero">
+            <p className={headingVariants({ visual: 'hero' })}>
               <VoiceRichText value={valueOf(heading)} />
-            </Heading>,
+            </p>,
           )}
         {body && (
           <Text className={s.copy()}>
@@ -137,9 +139,7 @@ export const VoiceSpecimen = ({
     return (
       <div className={s.listPage()}>
         <Eyebrow>{t(`lists.${placement.sample}.eyebrow`)}</Eyebrow>
-        <Heading level={3} visual="section">
-          {heading}
-        </Heading>
+        <p className={headingVariants({ visual: 'section' })}>{heading}</p>
         <Text variant="meta">{t(`lists.${placement.sample}.count`)}</Text>
         <p className={s.emptyMessage()}>
           {framed(
@@ -158,13 +158,13 @@ export const VoiceSpecimen = ({
 
     return (
       <div className={s.bookmarksPage()}>
-        <Heading level={3} visual="page">
+        <p className={headingVariants({ visual: 'page' })}>
           {site.bookmarksPage.title}
-        </Heading>
-        <Panel>
-          <Panel.Header headingLevel={4}>
+        </p>
+        <div className={panelVariants()}>
+          <p className={panelHeaderVariants()}>
             {site.bookmarksPage.listHeading}
-          </Panel.Header>
+          </p>
           <Panel.Body>
             <BookmarksList
               rows={[]}
@@ -175,7 +175,7 @@ export const VoiceSpecimen = ({
               )}
             />
           </Panel.Body>
-        </Panel>
+        </div>
       </div>
     );
   };

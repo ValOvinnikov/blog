@@ -118,12 +118,8 @@ describe(VoiceSpecimen, () => {
     );
 
     const { bookmarksPage } = SITE_MESSAGES_BY_LOCALE.EN;
-    expect(
-      screen.getByRole('heading', { name: bookmarksPage.title }),
-    ).toBeVisible();
-    expect(
-      screen.getByRole('heading', { name: bookmarksPage.listHeading }),
-    ).toBeVisible();
+    expect(screen.getByText(bookmarksPage.title)).toBeVisible();
+    expect(screen.getByText(bookmarksPage.listHeading)).toBeVisible();
     expect(screen.getByText(bookmarksPage.empty)).toBeVisible();
   });
 
