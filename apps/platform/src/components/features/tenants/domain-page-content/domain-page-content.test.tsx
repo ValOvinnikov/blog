@@ -1,114 +1,87 @@
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { DOMAIN_VERIFICATION_STATUS } from '@blog/config';
+import { getProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
+import { act, renderWithIntl, screen } from '@platform/testing/custom-render';
 import { makeTenant } from '@platform/testing/tenants/fixtures';
 
 import { DomainPageContent } from './domain-page-content';
 
-const render = renderWithIntl;
+vi.mock('@platform/server/provisioning/vercel-domains-api', () => ({
+  getProjectDomain: vi.fn(),
+}));
+
+const getProjectDomainMock = vi.mocked(getProjectDomain);
+
+const render = async (
+  tenant = makeTenant({ primaryDomain: 'northwind.dev' }),
+) => {
+  const ui = await DomainPageContent({ tenant });
+  await act(async () => {
+    renderWithIntl(ui);
+  });
+};
 
 describe(DomainPageContent, () => {
-  it('renders the literal "Domain" page heading, with a live status badge', () => {
-    const tenant = makeTenant({ primaryDomain: 'northwind.dev' });
-    render(
-      <DomainPageContent
-        tenant={tenant}
-        domainVerificationStatus="PENDING"
-        dnsRecords={[{ type: 'A', name: '@', value: '76.76.21.21' }]}
-      />,
-    );
+  beforeEach(() => {
+    getProjectDomainMock.mockReset();
+    getProjectDomainMock.mockResolvedValue({
+      status: DOMAIN_VERIFICATION_STATUS.PENDING,
+      dnsRecords: [{ type: 'A', name: '@', value: '76.76.21.21' }],
+    });
+  });
+
+  it('shows the title, description and a card skeleton while Vercel has not answered', async () => {
+    getProjectDomainMock.mockReturnValue(new Promise(() => {}));
+
+    await render();
 
     expect(
       screen.getByRole('heading', { level: 1, name: 'Domain' }),
     ).toBeVisible();
-    expect(screen.getByText('Awaiting DNS')).toBeVisible();
-  });
-
-  it('renders the DNS records table when pending with known records', () => {
-    const tenant = makeTenant({ primaryDomain: 'northwind.dev' });
-    render(
-      <DomainPageContent
-        tenant={tenant}
-        domainVerificationStatus="PENDING"
-        dnsRecords={[
-          { type: 'A', name: '@', value: '76.76.21.21' },
-          { type: 'CNAME', name: 'www', value: 'cname.vercel-dns.com' },
-        ]}
-      />,
-    );
-
-    const heading = screen.getByRole('heading', {
-      level: 2,
-      name: 'Point northwind.dev at us',
-    });
-    expect(heading).toBeVisible();
-    expect(screen.getByText('Checked just now')).toBeVisible();
-    expect(heading.textContent).not.toContain('Checked just now');
-    expect(screen.getByRole('table')).toBeVisible();
-    expect(screen.getByText('76.76.21.21')).toBeVisible();
-    expect(screen.getByText('cname.vercel-dns.com')).toBeVisible();
-  });
-
-  it('shows the verified empty state instead of the table once verified', () => {
-    const tenant = makeTenant({ primaryDomain: 'northwind.dev' });
-    render(
-      <DomainPageContent
-        tenant={tenant}
-        domainVerificationStatus="VERIFIED"
-        dnsRecords={undefined}
-      />,
-    );
-
-    expect(screen.getByText('Verified')).toBeVisible();
     expect(
       screen.getByText(
-        "This domain is verified — there's nothing left to configure.",
+        'The one piece of setup that is genuinely yours to finish.',
       ),
     ).toBeVisible();
-    expect(screen.queryByRole('table')).toBeNull();
+    expect(screen.getAllByTestId('skeleton').length).toBeGreaterThan(0);
+    expect(screen.queryByRole('heading', { level: 2 })).toBeNull();
   });
 
-  it('shows a graceful fallback when pending but the records are unknown', () => {
-    const tenant = makeTenant({ primaryDomain: 'northwind.dev' });
-    render(
-      <DomainPageContent
-        tenant={tenant}
-        domainVerificationStatus="PENDING"
-        dnsRecords={undefined}
-      />,
-    );
+  it('replaces the skeleton with the domain card once Vercel answers', async () => {
+    await render();
 
     expect(
-      screen.getByText("DNS records aren't available right now."),
+      await screen.findByRole('heading', {
+        level: 2,
+        name: 'Point northwind.dev at us',
+      }),
     ).toBeVisible();
-    expect(screen.queryByRole('table')).toBeNull();
+    expect(screen.getByText('Awaiting DNS')).toBeVisible();
+    expect(screen.queryByTestId('skeleton')).toBeNull();
   });
 
-  it('shows the archived notice for a deprovisioned tenant, and nothing for a live one', () => {
-    const archivedTenant = makeTenant({
-      primaryDomain: 'northwind.dev',
-      deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
-    });
-    render(
-      <DomainPageContent
-        tenant={archivedTenant}
-        domainVerificationStatus="PENDING"
-        dnsRecords={undefined}
-      />,
+  it('loads the domain from Vercel exactly once', async () => {
+    await render();
+    await screen.findByRole('table');
+
+    expect(getProjectDomainMock).toHaveBeenCalledExactlyOnceWith(
+      'northwind.dev',
+    );
+  });
+
+  it('shows the archived notice for a deprovisioned tenant', async () => {
+    await render(
+      makeTenant({
+        primaryDomain: 'northwind.dev',
+        deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
+      }),
     );
 
     expect(screen.getByText('This tenant is archived')).toBeVisible();
   });
 
-  it('does not show the archived notice for a live tenant', () => {
-    const liveTenant = makeTenant({
-      primaryDomain: 'northwind.dev',
-      deprovisionedAt: null,
-    });
-    render(
-      <DomainPageContent
-        tenant={liveTenant}
-        domainVerificationStatus="PENDING"
-        dnsRecords={undefined}
-      />,
+  it('does not show the archived notice for a live tenant', async () => {
+    await render(
+      makeTenant({ primaryDomain: 'northwind.dev', deprovisionedAt: null }),
     );
 
     expect(

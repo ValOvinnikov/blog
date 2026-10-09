@@ -1,72 +1,38 @@
 import type { TTenant } from '@blog/db/schema/tenants';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
-import { Card } from '@platform/components/shared/card';
 import { PageHeader } from '@platform/components/shared/page-header';
-import { StatusBadge } from '@platform/components/shared/status-badge';
-import { Text } from '@platform/components/shared/text';
-import type { TDomainDnsRecord } from '@platform/server/provisioning/get-domain-dns-records';
-import type { TDomainVerificationStatus } from '@platform/server/provisioning/get-domain-verification-status';
-import { domainVerificationTone } from '@platform/utils/status-tone/status-tone';
-import { useTranslations } from 'next-intl';
+import { getProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
+import { getTranslations } from 'next-intl/server';
+import { Suspense } from 'react';
 
-import { DnsRecordsTable } from './components/dns-records-table/dns-records-table';
+import { DomainVerificationCard } from './components/domain-verification-card/domain-verification-card';
+import { DomainVerificationCardSkeleton } from './components/domain-verification-card-skeleton/domain-verification-card-skeleton';
 import { domainPageContentVariants } from './domain-page-content-variants';
 
 export type TDomainPageContentProps = {
   tenant: TTenant;
-  domainVerificationStatus: TDomainVerificationStatus;
-  dnsRecords: TDomainDnsRecord[] | undefined;
 };
 
-export const DomainPageContent = ({
+export const DomainPageContent = async ({
   tenant,
-  domainVerificationStatus,
-  dnsRecords,
 }: TDomainPageContentProps) => {
-  const t = useTranslations('tenantDomainPage');
+  const { primaryDomain, deprovisionedAt } = tenant;
+  const projectDomain = getProjectDomain(primaryDomain);
+  const t = await getTranslations('tenantDomainPage');
   const { root } = domainPageContentVariants();
-  const isVerified = domainVerificationStatus === 'VERIFIED';
 
   return (
     <div className={root()}>
-      <PageHeader
-        title={t('pageTitle')}
-        description={t('subCopy')}
-        badges={
-          <StatusBadge tone={domainVerificationTone(domainVerificationStatus)}>
-            {t(`dnsStatus.${domainVerificationStatus}`)}
-          </StatusBadge>
-        }
-      />
+      <PageHeader title={t('pageTitle')} description={t('subCopy')} />
 
-      {tenant.deprovisionedAt && (
-        <ArchivedTenantNotice archivedAt={tenant.deprovisionedAt} />
-      )}
+      {deprovisionedAt && <ArchivedTenantNotice archivedAt={deprovisionedAt} />}
 
-      <Card>
-        <Card.Header
-          title={t('cardTitle', { domain: tenant.primaryDomain })}
-          actions={
-            <Text variant="hint" as="span">
-              {t('checkedHint')}
-            </Text>
-          }
+      <Suspense fallback={<DomainVerificationCardSkeleton />}>
+        <DomainVerificationCard
+          domain={primaryDomain}
+          projectDomain={projectDomain}
         />
-        <Card.Body>
-          {isVerified ? (
-            <Text variant="supporting">{t('verifiedEmptyState')}</Text>
-          ) : (
-            <>
-              <Text variant="supporting">{t('bodyCopy')}</Text>
-              {dnsRecords && dnsRecords.length > 0 ? (
-                <DnsRecordsTable records={dnsRecords} />
-              ) : (
-                <Text variant="supporting">{t('unavailableState')}</Text>
-              )}
-            </>
-          )}
-        </Card.Body>
-      </Card>
+      </Suspense>
     </div>
   );
 };

@@ -1,3 +1,4 @@
+import { DOMAIN_VERIFICATION_STATUS } from '@blog/config';
 import { env } from '@platform/utils/env/env';
 
 import { getDomainVerificationStatus } from './get-domain-verification-status';
@@ -23,14 +24,14 @@ describe(getDomainVerificationStatus, () => {
 
     const result = await getDomainVerificationStatus('example.com');
 
-    expect(result).toBe('NOT_CONFIGURED');
+    expect(result).toBe(DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED);
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it('rejects a domain containing path-traversal characters without making a request', async () => {
     const result = await getDomainVerificationStatus('../../v9/projects/other');
 
-    expect(result).toBe('ERROR');
+    expect(result).toBe(DOMAIN_VERIFICATION_STATUS.ERROR);
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
@@ -50,7 +51,7 @@ describe(getDomainVerificationStatus, () => {
 
     const result = await getDomainVerificationStatus('example.com');
 
-    expect(result).toBe('NOT_ADDED');
+    expect(result).toBe(DOMAIN_VERIFICATION_STATUS.NOT_ADDED);
   });
 
   it('returns VERIFIED when the API reports verified: true', async () => {
@@ -60,7 +61,7 @@ describe(getDomainVerificationStatus, () => {
 
     const result = await getDomainVerificationStatus('example.com');
 
-    expect(result).toBe('VERIFIED');
+    expect(result).toBe(DOMAIN_VERIFICATION_STATUS.VERIFIED);
   });
 
   it('returns PENDING when the API reports verified: false', async () => {
@@ -70,7 +71,7 @@ describe(getDomainVerificationStatus, () => {
 
     const result = await getDomainVerificationStatus('example.com');
 
-    expect(result).toBe('PENDING');
+    expect(result).toBe(DOMAIN_VERIFICATION_STATUS.PENDING);
   });
 
   it('returns ERROR for an unexpected non-2xx response', async () => {
@@ -78,7 +79,7 @@ describe(getDomainVerificationStatus, () => {
 
     const result = await getDomainVerificationStatus('example.com');
 
-    expect(result).toBe('ERROR');
+    expect(result).toBe(DOMAIN_VERIFICATION_STATUS.ERROR);
   });
 
   it('returns ERROR when the request throws', async () => {
@@ -86,6 +87,6 @@ describe(getDomainVerificationStatus, () => {
 
     const result = await getDomainVerificationStatus('example.com');
 
-    expect(result).toBe('ERROR');
+    expect(result).toBe(DOMAIN_VERIFICATION_STATUS.ERROR);
   });
 });

@@ -1,12 +1,12 @@
-import { DOMAIN_PATTERN } from '@blog/config';
-import { env } from '@platform/utils/env/env';
+import {
+  DOMAIN_AVAILABILITY,
+  DOMAIN_PATTERN,
+  type TDomainAvailability,
+} from '@blog/config';
 import { logger } from '@platform/utils/logger/logger';
 import { getDomain } from 'tldts';
 
-export type TDomainAvailability =
-  'NOT_CONFIGURED' | 'AVAILABLE' | 'IN_USE' | 'ERROR';
-
-const VERCEL_TIMEOUT_MS = 5000;
+import { fetchVercel, readVercelCredentials } from './vercel-domains-api';
 
 // Every tenant domain on this platform lives under the same shared apex
 // (map-domain.ts attaches all of them to the one shared apps/web Vercel
@@ -14,9 +14,9 @@ const VERCEL_TIMEOUT_MS = 5000;
 // entry per tenant and will genuinely paginate as the platform grows. Caps
 // the round trips a single tenant-creation submission can incur: if a
 // conclusive answer (a conflict, or the last page) isn't reached within
-// this many pages, the check returns 'ERROR' rather than guessing
-// 'AVAILABLE' — a false "no conflict" is worse than an inconclusive one,
-// since 'ERROR' still just degrades to "can't tell, let creation proceed."
+// this many pages, the check returns ERROR rather than guessing
+// AVAILABLE — a false "no conflict" is worse than an inconclusive one,
+// since ERROR still just degrades to "can't tell, let creation proceed."
 const MAX_PROJECT_DOMAINS_PAGES = 5;
 
 type TProjectDomainsPage = {
@@ -41,19 +41,6 @@ const deriveApexDomain = (domain: string): string | null => getDomain(domain);
 const normalizeDomainName = (name: string): string =>
   name.toLowerCase().replace(/\.$/, '');
 
-const buildProjectDomainsUrl = (
-  apexDomain: string,
-  teamId: string | undefined,
-  until: number | undefined,
-): URL => {
-  const url = new URL(
-    `https://api.vercel.com/v1/domains/${encodeURIComponent(apexDomain)}/project-domains`,
-  );
-  if (teamId) url.searchParams.set('teamId', teamId);
-  if (until !== undefined) url.searchParams.set('until', String(until));
-  return url;
-};
-
 /**
  * Advisory pre-check run at tenant-creation time, before provisioning ever
  * starts. Mirrors the rule `mapTenantDomain` (`packages/db`) enforces at
@@ -67,24 +54,20 @@ const buildProjectDomainsUrl = (
 export const checkDomainAvailability = async (
   domain: string,
 ): Promise<TDomainAvailability> => {
-  const {
-    VERCEL_API_TOKEN: token,
-    VERCEL_PROJECT_ID_WEB: webProjectId,
-    VERCEL_TEAM_ID: teamId,
-  } = env;
+  const credentials = readVercelCredentials();
 
-  if (!token || !webProjectId) return 'NOT_CONFIGURED';
+  if (!credentials) return DOMAIN_AVAILABILITY.NOT_CONFIGURED;
 
   if (!DOMAIN_PATTERN.test(domain)) {
     logger.error('tenants.domain_availability_invalid_domain', { domain });
-    return 'ERROR';
+    return DOMAIN_AVAILABILITY.ERROR;
   }
 
   const apexDomain = deriveApexDomain(domain);
 
   if (!apexDomain) {
     logger.error('tenants.domain_availability_apex_undetermined', { domain });
-    return 'ERROR';
+    return DOMAIN_AVAILABILITY.ERROR;
   }
 
   const normalizedDomain = normalizeDomainName(domain);
@@ -93,24 +76,23 @@ export const checkDomainAvailability = async (
 
   try {
     for (let page = 0; page < MAX_PROJECT_DOMAINS_PAGES; page++) {
-      const url = buildProjectDomainsUrl(apexDomain, teamId, until);
-
-      const response = await fetch(url, {
-        headers: { Authorization: `Bearer ${token}` },
-        signal: AbortSignal.timeout(VERCEL_TIMEOUT_MS),
-      });
+      const response = await fetchVercel(
+        credentials,
+        `/v1/domains/${encodeURIComponent(apexDomain)}/project-domains`,
+        until === undefined ? {} : { until: String(until) },
+      );
 
       // A 404 means the apex itself is unknown to the team's Vercel
       // account — no project can have a domain registered under an apex
       // the account doesn't hold, so no conflict is possible.
-      if (response.status === 404) return 'AVAILABLE';
+      if (response.status === 404) return DOMAIN_AVAILABILITY.AVAILABLE;
 
       if (!response.ok) {
         logger.error('tenants.domain_availability_check_failed', {
           domain,
           responseStatus: response.status,
         });
-        return 'ERROR';
+        return DOMAIN_AVAILABILITY.ERROR;
       }
 
       const data = (await response.json()) as TProjectDomainsPage;
@@ -118,12 +100,12 @@ export const checkDomainAvailability = async (
       const attachedElsewhere = data.projectDomains?.some(
         (projectDomain) =>
           normalizeDomainName(projectDomain.name) === normalizedDomain &&
-          projectDomain.projectId !== webProjectId,
+          projectDomain.projectId !== credentials.projectId,
       );
 
-      if (attachedElsewhere) return 'IN_USE';
+      if (attachedElsewhere) return DOMAIN_AVAILABILITY.IN_USE;
 
-      if (!data.pagination?.next) return 'AVAILABLE';
+      if (!data.pagination?.next) return DOMAIN_AVAILABILITY.AVAILABLE;
 
       until = data.pagination.next;
     }
@@ -132,12 +114,12 @@ export const checkDomainAvailability = async (
       domain,
       maxPages: MAX_PROJECT_DOMAINS_PAGES,
     });
-    return 'ERROR';
+    return DOMAIN_AVAILABILITY.ERROR;
   } catch (error) {
     logger.error('tenants.domain_availability_check_error', {
       domain,
       error,
     });
-    return 'ERROR';
+    return DOMAIN_AVAILABILITY.ERROR;
   }
 };

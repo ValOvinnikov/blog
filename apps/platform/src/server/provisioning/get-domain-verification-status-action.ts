@@ -1,13 +1,14 @@
 'use server';
 
+import {
+  DOMAIN_VERIFICATION_STATUS,
+  type TDomainVerificationStatus,
+} from '@blog/config';
 import { queries } from '@blog/db';
 import { requireAdmin } from '@platform/server/auth/require-admin';
 import { logger } from '@platform/utils/logger/logger';
 
-import {
-  getDomainVerificationStatus,
-  type TDomainVerificationStatus,
-} from './get-domain-verification-status';
+import { getDomainVerificationStatus } from './get-domain-verification-status';
 
 /**
  * Polled by `ProvisioningStatusView` on its own, slower interval — this
@@ -26,7 +27,7 @@ export const getDomainVerificationStatusAction = async (
   const [tenant] = await queries.tenants.listTenantsByIds([tenantId]);
   if (!tenant) {
     logger.error('provisioning.domain_check_tenant_not_found', { tenantId });
-    return 'ERROR';
+    return DOMAIN_VERIFICATION_STATUS.ERROR;
   }
 
   return getDomainVerificationStatus(tenant.primaryDomain);

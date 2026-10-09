@@ -1,4 +1,4 @@
-import { AUDIT_TARGET_TYPE } from '@blog/config';
+import { AUDIT_TARGET_TYPE, DOMAIN_VERIFICATION_STATUS } from '@blog/config';
 import {
   FINDING_KIND,
   FINDING_SEVERITY,
@@ -105,7 +105,9 @@ describe(TenantOverviewPage, () => {
     listFindingsForTenantMock.mockReset();
     listFindingsForTenantMock.mockResolvedValue([]);
     getDomainVerificationStatusMock.mockReset();
-    getDomainVerificationStatusMock.mockResolvedValue('NOT_CONFIGURED');
+    getDomainVerificationStatusMock.mockResolvedValue(
+      DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED,
+    );
   });
 
   it('renders the overview for the resolved tenant', async () => {

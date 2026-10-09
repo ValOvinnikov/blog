@@ -1,22 +1,22 @@
+import { DOMAIN_VERIFICATION_STATUS } from '@blog/config';
 import { auth } from '@platform/server/auth/auth';
-import { customRenderAsync, screen } from '@platform/testing/custom-render';
+import {
+  act,
+  customRenderAsync,
+  screen,
+} from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { makeTenant } from '@platform/testing/tenants/fixtures';
 import type { Session } from 'next-auth';
 
 import TenantDomainPage from './page';
 
-const {
-  getAdminByUserIdMock,
-  getTenantByIdMock,
-  getDomainVerificationStatusMock,
-  getDomainDnsRecordsMock,
-} = vi.hoisted(() => ({
-  getAdminByUserIdMock: vi.fn(),
-  getTenantByIdMock: vi.fn(),
-  getDomainVerificationStatusMock: vi.fn(),
-  getDomainDnsRecordsMock: vi.fn(),
-}));
+const { getAdminByUserIdMock, getTenantByIdMock, getProjectDomainMock } =
+  vi.hoisted(() => ({
+    getAdminByUserIdMock: vi.fn(),
+    getTenantByIdMock: vi.fn(),
+    getProjectDomainMock: vi.fn(),
+  }));
 
 vi.mock('@platform/server/auth/auth');
 
@@ -28,12 +28,8 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-vi.mock('@platform/server/provisioning/get-domain-verification-status', () => ({
-  getDomainVerificationStatus: getDomainVerificationStatusMock,
-}));
-
-vi.mock('@platform/server/provisioning/get-domain-dns-records', () => ({
-  getDomainDnsRecords: getDomainDnsRecordsMock,
+vi.mock('@platform/server/provisioning/vercel-domains-api', () => ({
+  getProjectDomain: getProjectDomainMock,
 }));
 
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
@@ -49,12 +45,11 @@ describe(`<${TenantDomainPage.name}/>`, () => {
     getAdminByUserIdMock.mockReset();
     getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });
     getTenantByIdMock.mockReset();
-    getDomainVerificationStatusMock.mockReset();
-    getDomainVerificationStatusMock.mockResolvedValue('PENDING');
-    getDomainDnsRecordsMock.mockReset();
-    getDomainDnsRecordsMock.mockResolvedValue([
-      { type: 'A', name: '@', value: '76.76.21.21' },
-    ]);
+    getProjectDomainMock.mockReset();
+    getProjectDomainMock.mockResolvedValue({
+      status: DOMAIN_VERIFICATION_STATUS.PENDING,
+      dnsRecords: [{ type: 'A', name: '@', value: '76.76.21.21' }],
+    });
   });
 
   it('redirects to sign-in without querying the tenant when there is no session', async () => {
@@ -84,12 +79,13 @@ describe(`<${TenantDomainPage.name}/>`, () => {
     });
     getTenantByIdMock.mockResolvedValue(tenant);
 
-    await setup();
+    await act(async () => {
+      await setup();
+    });
 
-    expect(getDomainVerificationStatusMock).toHaveBeenCalledWith(
+    expect(getProjectDomainMock).toHaveBeenCalledExactlyOnceWith(
       'northwind.dev',
     );
-    expect(getDomainDnsRecordsMock).toHaveBeenCalledWith('northwind.dev');
     expect(
       screen.getByRole('heading', { level: 1, name: 'Domain' }),
     ).toBeVisible();

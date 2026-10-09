@@ -1,10 +1,9 @@
-import { SIZE } from '@blog/config';
+import { SIZE, type TDomainVerificationStatus } from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { Card } from '@platform/components/shared/card';
 import { DetailList } from '@platform/components/shared/detail-list';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { StatusBadge } from '@platform/components/shared/status-badge';
-import type { TDomainVerificationStatus } from '@platform/server/provisioning/get-domain-verification-status';
 import { domainVerificationTone } from '@platform/utils/status-tone/status-tone';
 import { useTranslations } from 'next-intl';
 

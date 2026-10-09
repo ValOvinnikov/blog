@@ -1,3 +1,4 @@
+import { DOMAIN_VERIFICATION_STATUS } from '@blog/config';
 import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
@@ -65,7 +66,9 @@ describe(`<${DashboardOverviewPage.name}/>`, () => {
       joinedAt: new Date('2026-08-12T00:00:00.000Z'),
     });
     getDomainVerificationStatusMock.mockReset();
-    getDomainVerificationStatusMock.mockResolvedValue('VERIFIED');
+    getDomainVerificationStatusMock.mockResolvedValue(
+      DOMAIN_VERIFICATION_STATUS.VERIFIED,
+    );
     cookiesMock.mockReset();
   });
 

@@ -1,3 +1,4 @@
+import { DOMAIN_VERIFICATION_STATUS } from '@blog/config';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { makeTenant } from '@platform/testing/tenants/fixtures';
 
@@ -50,7 +51,9 @@ describe('getDomainVerificationStatusAction', () => {
     listTenantsByIdsMock.mockResolvedValue([
       makeTenant({ id: 'tenant-1', primaryDomain: 'acme.example.com' }),
     ]);
-    getDomainVerificationStatusMock.mockResolvedValue('VERIFIED');
+    getDomainVerificationStatusMock.mockResolvedValue(
+      DOMAIN_VERIFICATION_STATUS.VERIFIED,
+    );
     const { getDomainVerificationStatusAction } =
       await import('./get-domain-verification-status-action');
 
@@ -63,7 +66,7 @@ describe('getDomainVerificationStatusAction', () => {
     expect(getDomainVerificationStatusMock).not.toHaveBeenCalledWith(
       'tenant-1',
     );
-    expect(result).toBe('VERIFIED');
+    expect(result).toBe(DOMAIN_VERIFICATION_STATUS.VERIFIED);
   });
 
   it('returns ERROR without checking any domain when the tenant id resolves to no row', async () => {
@@ -73,7 +76,7 @@ describe('getDomainVerificationStatusAction', () => {
 
     const result = await getDomainVerificationStatusAction('unknown-tenant');
 
-    expect(result).toBe('ERROR');
+    expect(result).toBe(DOMAIN_VERIFICATION_STATUS.ERROR);
     expect(getDomainVerificationStatusMock).not.toHaveBeenCalled();
   });
 });
