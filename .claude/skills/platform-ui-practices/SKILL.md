@@ -604,6 +604,9 @@ tools you have are `loading.tsx`, `<Suspense>`, `cache`, `use`,
 - A settings page's success toast reads "{Page} saved." Copy on the owner tree
   (`/dashboard`) never mentions tenants, tables, packages, CSS variables, colour
   spaces or vendors.
+- Owner pages say "your site" or nothing; "tenant" is operator-only. A string
+  a shared component renders on both trees follows the owner rule ("this
+  site"), since `/tenants/...` reads fine either way.
 
 ## File size
 

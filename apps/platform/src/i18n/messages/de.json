@@ -2,7 +2,7 @@
   "pageMetadata": {
     "root": "Admin",
     "tenants": "Mandanten · Admin",
-    "tenant": "Mandant · Admin",
+    "tenant": "Übersicht · Admin",
     "look": "Erscheinungsbild · Admin",
     "voice": "Tonalität · Admin",
     "selectTenant": "Arbeitsbereich wählen · Admin",
@@ -282,7 +282,7 @@
     "alertSuccess": "In site_config gespeichert.",
     "alertError": "Die Einstellungen zum Erscheinungsbild konnten nicht gespeichert werden — bitte erneut versuchen.",
     "presetLabel": "Vorlage",
-    "presetDescription": "Der Ausgangspunkt, den fast jeder Mandant wählt. Legt Akzentfarbton, Überschriften- und Fließtextschrift, Eckenradius und Dichte fest.",
+    "presetDescription": "Der Ausgangspunkt, den fast jede Website wählt. Legt Akzentfarbton, Überschriften- und Fließtextschrift, Eckenradius und Dichte fest.",
     "accentHueLabel": "Akzentfarbton",
     "accentHueDescription": "Nur der Farbton ändert sich — Helligkeit und Chroma sind fest (OKLCH), sodass der Kontrast WCAG-geprüft bleibt.",
     "accentHueInaccessible": "Mit diesem Farbton bleibt Fließtext auf seinen getönten Flächen nicht lesbar, daher würde die Website ihn ersetzen. Wählen Sie einen anderen Farbton.",
@@ -414,7 +414,7 @@
   },
   "emailSettingsForm": {
     "heading": "E-Mail-Einstellungen",
-    "description": "Gilt für jede E-Mail, die Ihre Website versendet. Lassen Sie ein Feld leer, um den angezeigten Text zu verwenden.",
+    "description": "Gilt für jede E-Mail, die Ihre Website versendet. Lassen Sie ein Feld leer, um den Standard zu verwenden.",
     "senderNameLabel": "Absendername",
     "senderNameHint": "Der Anzeigename der Absenderadresse — unabhängig vom Website-Titel.",
     "senderNameInvalidError": "Das ist der Name, den Empfänger sehen, keine E-Mail-Adresse. Geben Sie einen Namen wie Acme Co ein, ohne < > \" , ; oder @.",
@@ -448,8 +448,8 @@
       "NEWSLETTER_CONFIRMATION": "Newsletter-Bestätigung"
     },
     "templateTypeDescription": {
-      "MAGIC_LINK": "Wird gesendet, wenn sich jemand auf der Website dieses Mandanten anmeldet.",
-      "TENANT_INVITE": "Wird gesendet, wenn jemand in das Team dieses Mandanten eingeladen wird.",
+      "MAGIC_LINK": "Wird gesendet, wenn sich jemand auf Ihrer Website anmeldet.",
+      "TENANT_INVITE": "Wird gesendet, wenn jemand in Ihr Team eingeladen wird.",
       "NEWSLETTER_CONFIRMATION": "Wird gesendet, um ein Newsletter-Abonnement zu bestätigen."
     },
     "useDefault": "Standard verwenden"
@@ -721,7 +721,7 @@
   "studioPage": {
     "title": "Studio",
     "notProvisionedTitle": "Studio ist noch nicht bereit",
-    "notProvisionedDescription": "Die Bereitstellung des Sanity-Projekts dieses Mandanten ist noch nicht abgeschlossen. Versuchen Sie es erneut, sobald die Bereitstellung fertig ist."
+    "notProvisionedDescription": "Das Sanity-Projekt dieser Website ist noch nicht fertig eingerichtet. Versuchen Sie es in ein paar Minuten erneut."
   },
   "tenantDetailsPanel": {
     "heading": "Mandantendetails",
@@ -796,7 +796,7 @@
   },
   "featuresSettings": {
     "heading": "Funktionen",
-    "description": "Schalten Sie Funktionen für Mandanten ein oder aus. Gesperrte Schalter erfordern den Growth-Tarif.",
+    "description": "Schalten Sie Funktionen Ihrer Website ein oder aus. Gesperrte Schalter erfordern den Growth-Tarif.",
     "saveButton": "Änderungen speichern",
     "savingButton": "Wird gespeichert…",
     "alertSuccess": "Funktionen gespeichert.",
@@ -844,7 +844,7 @@
     "switchOn": "An",
     "switchOff": "Aus",
     "defaultHeading": "Standardsprache",
-    "defaultDescription": "Jede Seite wird zuerst in dieser Sprache verfasst; festgelegt wird sie in den Mandantendetails.",
+    "defaultDescription": "Jede Seite wird zuerst in dieser Sprache verfasst.",
     "additionalHeading": "Zusätzliche Sprachen",
     "allowance": "{used} von {allowed} zusätzlichen Sprachen Ihres Tarifs in Verwendung.",
     "upgradeNotice": "Ihr Tarif veröffentlicht nur die Standardsprache. Führen Sie ein Upgrade durch, um weitere Sprachen hinzuzufügen.",

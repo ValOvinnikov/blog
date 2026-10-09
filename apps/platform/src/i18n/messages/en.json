@@ -2,7 +2,7 @@
   "pageMetadata": {
     "root": "Admin",
     "tenants": "Tenants · Admin",
-    "tenant": "Tenant · Admin",
+    "tenant": "Overview · Admin",
     "look": "Look · Admin",
     "voice": "Voice · Admin",
     "selectTenant": "Choose a workspace · Admin",
@@ -282,7 +282,7 @@
     "alertSuccess": "Saved to site_config.",
     "alertError": "Couldn't save Look settings — try again.",
     "presetLabel": "Preset",
-    "presetDescription": "The starting point nearly every tenant picks. Sets accent hue, heading and body fonts, radius, and density.",
+    "presetDescription": "The starting point nearly every site picks. Sets accent hue, heading and body fonts, radius, and density.",
     "accentHueLabel": "Accent hue",
     "accentHueDescription": "Only the hue changes — lightness & chroma are fixed (OKLCH), so contrast stays WCAG-verified.",
     "accentHueInaccessible": "This hue doesn't keep body text readable on its tinted surfaces, so the site would replace it. Choose another hue.",
@@ -414,7 +414,7 @@
   },
   "emailSettingsForm": {
     "heading": "Email settings",
-    "description": "Applies to every email your site sends. Leave a field blank to use the text shown.",
+    "description": "Applies to every email your site sends. Leave a field blank to use the default.",
     "senderNameLabel": "Sender name",
     "senderNameHint": "The display name on the From address — unrelated to the site title.",
     "senderNameInvalidError": "This is the name recipients see, not an email address. Enter a name such as Acme Co, without < > \" , ; or @.",
@@ -448,8 +448,8 @@
       "NEWSLETTER_CONFIRMATION": "Newsletter confirmation"
     },
     "templateTypeDescription": {
-      "MAGIC_LINK": "Sent when someone signs in to this tenant's site.",
-      "TENANT_INVITE": "Sent when someone is invited to join this tenant's team.",
+      "MAGIC_LINK": "Sent when someone signs in to your site.",
+      "TENANT_INVITE": "Sent when someone is invited to join your team.",
       "NEWSLETTER_CONFIRMATION": "Sent to confirm a newsletter subscription."
     },
     "useDefault": "Use default"
@@ -721,7 +721,7 @@
   "studioPage": {
     "title": "Studio",
     "notProvisionedTitle": "Studio isn't ready yet",
-    "notProvisionedDescription": "This tenant's Sanity project hasn't finished provisioning. Try again once provisioning completes."
+    "notProvisionedDescription": "This site's Sanity project hasn't finished setting up. Try again in a few minutes."
   },
   "tenantDetailsPanel": {
     "heading": "Tenant details",
@@ -796,7 +796,7 @@
   },
   "featuresSettings": {
     "heading": "Features",
-    "description": "Turn tenant-facing capabilities on or off. Locked toggles require the Growth plan.",
+    "description": "Turn your site's features on or off. Locked toggles require the Growth plan.",
     "saveButton": "Save changes",
     "savingButton": "Saving…",
     "alertSuccess": "Features saved.",
@@ -844,7 +844,7 @@
     "switchOn": "On",
     "switchOff": "Off",
     "defaultHeading": "Default language",
-    "defaultDescription": "Every page is written in it first; set it in the tenant details.",
+    "defaultDescription": "Every page is written in it first.",
     "additionalHeading": "Additional languages",
     "allowance": "{used} of {allowed} additional languages in use on your plan.",
     "upgradeNotice": "Your plan publishes the default language only. Upgrade to add more languages.",

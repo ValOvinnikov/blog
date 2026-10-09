@@ -2,7 +2,7 @@
   "pageMetadata": {
     "root": "Administración",
     "tenants": "Clientes · Administración",
-    "tenant": "Cliente · Administración",
+    "tenant": "Resumen · Administración",
     "look": "Aspecto · Administración",
     "voice": "Voz · Administración",
     "selectTenant": "Elija un espacio de trabajo · Administración",
@@ -282,7 +282,7 @@
     "alertSuccess": "Guardado en site_config.",
     "alertError": "No se pudo guardar la configuración de Aspecto. Vuelva a intentarlo.",
     "presetLabel": "Ajuste predefinido",
-    "presetDescription": "El punto de partida que elige casi todo cliente. Define el tono de acento, las fuentes de títulos y de texto, el radio y la densidad.",
+    "presetDescription": "El punto de partida que elige casi todo sitio. Define el tono de acento, las fuentes de títulos y de texto, el radio y la densidad.",
     "accentHueLabel": "Tono de acento",
     "accentHueDescription": "Solo cambia el tono: la luminosidad y el croma son fijos (OKLCH), por lo que el contraste sigue verificado según WCAG.",
     "accentHueInaccessible": "Este tono no mantiene legible el texto sobre sus superficies tintadas, así que el sitio lo sustituiría. Elija otro tono.",
@@ -414,7 +414,7 @@
   },
   "emailSettingsForm": {
     "heading": "Configuración del correo electrónico",
-    "description": "Se aplica a todos los correos que envía su sitio. Deje un campo en blanco para usar el texto que se muestra.",
+    "description": "Se aplica a todos los correos que envía su sitio. Deje un campo en blanco para usar el valor predeterminado.",
     "senderNameLabel": "Nombre del remitente",
     "senderNameHint": "El nombre visible en la dirección del remitente; no tiene relación con el título del sitio.",
     "senderNameInvalidError": "Es el nombre que ven los destinatarios, no una dirección de correo. Introduzca un nombre como Acme Co, sin < > \" , ; ni @.",
@@ -448,8 +448,8 @@
       "NEWSLETTER_CONFIRMATION": "Confirmación del boletín"
     },
     "templateTypeDescription": {
-      "MAGIC_LINK": "Se envía cuando alguien inicia sesión en el sitio de este cliente.",
-      "TENANT_INVITE": "Se envía cuando se invita a alguien a unirse al equipo de este cliente.",
+      "MAGIC_LINK": "Se envía cuando alguien inicia sesión en su sitio.",
+      "TENANT_INVITE": "Se envía cuando se invita a alguien a unirse a su equipo.",
       "NEWSLETTER_CONFIRMATION": "Se envía para confirmar una suscripción al boletín."
     },
     "useDefault": "Usar el predeterminado"
@@ -721,7 +721,7 @@
   "studioPage": {
     "title": "Studio",
     "notProvisionedTitle": "Studio aún no está listo",
-    "notProvisionedDescription": "El proyecto de Sanity de este cliente no ha terminado de aprovisionarse. Vuelva a intentarlo cuando finalice el aprovisionamiento."
+    "notProvisionedDescription": "El proyecto de Sanity de este sitio aún no está listo. Vuelva a intentarlo en unos minutos."
   },
   "tenantDetailsPanel": {
     "heading": "Detalles del cliente",
@@ -796,7 +796,7 @@
   },
   "featuresSettings": {
     "heading": "Funciones",
-    "description": "Active o desactive las funciones de cara al cliente. Las opciones bloqueadas requieren el plan Growth.",
+    "description": "Active o desactive las funciones de su sitio. Las opciones bloqueadas requieren el plan Growth.",
     "saveButton": "Guardar cambios",
     "savingButton": "Guardando…",
     "alertSuccess": "Funciones guardadas.",
@@ -844,7 +844,7 @@
     "switchOn": "Activado",
     "switchOff": "Desactivado",
     "defaultHeading": "Idioma predeterminado",
-    "defaultDescription": "Todas las páginas se escriben primero en este idioma; puede cambiarlo en los detalles del cliente.",
+    "defaultDescription": "Todas las páginas se escriben primero en este idioma.",
     "additionalHeading": "Idiomas adicionales",
     "allowance": "{used} de {allowed} idiomas adicionales en uso en su plan.",
     "upgradeNotice": "Su plan solo publica el idioma predeterminado. Mejore su plan para añadir más idiomas.",

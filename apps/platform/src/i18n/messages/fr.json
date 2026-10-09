@@ -2,7 +2,7 @@
   "pageMetadata": {
     "root": "Administration",
     "tenants": "Locataires · Administration",
-    "tenant": "Locataire · Administration",
+    "tenant": "Aperçu · Administration",
     "look": "Apparence · Administration",
     "voice": "Voix · Administration",
     "selectTenant": "Choisir un espace de travail · Administration",
@@ -282,7 +282,7 @@
     "alertSuccess": "Enregistré dans site_config.",
     "alertError": "Impossible d'enregistrer les paramètres d'apparence — veuillez réessayer.",
     "presetLabel": "Préréglage",
-    "presetDescription": "Le point de départ choisi par presque tous les locataires. Définit la teinte d'accent, les polices des titres et du texte, l'arrondi et la densité.",
+    "presetDescription": "Le point de départ choisi par presque tous les sites. Définit la teinte d'accent, les polices des titres et du texte, l'arrondi et la densité.",
     "accentHueLabel": "Teinte d'accent",
     "accentHueDescription": "Seule la teinte change — la luminosité et la chroma sont fixes (OKLCH), le contraste reste donc conforme aux WCAG.",
     "accentHueInaccessible": "Cette teinte ne garde pas le texte lisible sur ses surfaces teintées ; le site la remplacerait. Choisissez une autre teinte.",
@@ -414,7 +414,7 @@
   },
   "emailSettingsForm": {
     "heading": "Paramètres d'e-mail",
-    "description": "S'applique à tous les e-mails envoyés par votre site. Laissez un champ vide pour utiliser le texte affiché.",
+    "description": "S'applique à tous les e-mails envoyés par votre site. Laissez un champ vide pour utiliser la valeur par défaut.",
     "senderNameLabel": "Nom de l'expéditeur",
     "senderNameHint": "Le nom affiché dans l'adresse d'expédition — indépendant du titre du site.",
     "senderNameInvalidError": "C'est le nom que voient les destinataires, pas une adresse e-mail. Saisissez un nom comme Acme Co, sans < > \" , ; ni @.",
@@ -448,8 +448,8 @@
       "NEWSLETTER_CONFIRMATION": "Confirmation de newsletter"
     },
     "templateTypeDescription": {
-      "MAGIC_LINK": "Envoyé lorsqu'une personne se connecte au site de ce locataire.",
-      "TENANT_INVITE": "Envoyé lorsqu'une personne est invitée à rejoindre l'équipe de ce locataire.",
+      "MAGIC_LINK": "Envoyé lorsqu'une personne se connecte à votre site.",
+      "TENANT_INVITE": "Envoyé lorsqu'une personne est invitée à rejoindre votre équipe.",
       "NEWSLETTER_CONFIRMATION": "Envoyé pour confirmer un abonnement à la newsletter."
     },
     "useDefault": "Utiliser la valeur par défaut"
@@ -721,7 +721,7 @@
   "studioPage": {
     "title": "Studio",
     "notProvisionedTitle": "Studio n'est pas encore prêt",
-    "notProvisionedDescription": "Le provisionnement du projet Sanity de ce locataire n'est pas terminé. Réessayez une fois le provisionnement achevé."
+    "notProvisionedDescription": "Le projet Sanity de ce site n'est pas encore prêt. Réessayez dans quelques minutes."
   },
   "tenantDetailsPanel": {
     "heading": "Détails du locataire",
@@ -796,7 +796,7 @@
   },
   "featuresSettings": {
     "heading": "Fonctionnalités",
-    "description": "Activez ou désactivez les fonctionnalités proposées par le locataire. Les options verrouillées nécessitent la formule Growth.",
+    "description": "Activez ou désactivez les fonctionnalités de votre site. Les options verrouillées nécessitent la formule Growth.",
     "saveButton": "Enregistrer les modifications",
     "savingButton": "Enregistrement…",
     "alertSuccess": "Fonctionnalités enregistrées.",
@@ -844,7 +844,7 @@
     "switchOn": "Activée",
     "switchOff": "Désactivée",
     "defaultHeading": "Langue par défaut",
-    "defaultDescription": "Chaque page est d'abord rédigée dans cette langue ; vous pouvez la définir dans les détails du locataire.",
+    "defaultDescription": "Chaque page est d'abord rédigée dans cette langue.",
     "additionalHeading": "Langues supplémentaires",
     "allowance": "{used} sur {allowed} langues supplémentaires utilisées avec votre formule.",
     "upgradeNotice": "Votre formule ne publie que la langue par défaut. Passez à une formule supérieure pour ajouter d'autres langues.",
