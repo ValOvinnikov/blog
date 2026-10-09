@@ -495,6 +495,12 @@
     "ARCHIVE": "Se muestran cuando una lista aún está vacía. Elija una para editarla.",
     "BOOKMARKS": "Las entradas guardadas de un lector, antes de que guarde alguna"
   },
+  "voiceSurfaceNotes": {
+    "NOT_FOUND": "El texto gris es fijo y se traduce por usted.",
+    "ERROR": "Los botones son fijos y se traducen por usted.",
+    "ARCHIVE": "El encabezado viene de Studio; aquí solo el mensaje es suyo.",
+    "BOOKMARKS": "El título de la página y el encabezado del panel son fijos."
+  },
   "voiceSpecimen": {
     "showPreview": "Mostrar vista previa",
     "hidePreview": "Ocultar vista previa",

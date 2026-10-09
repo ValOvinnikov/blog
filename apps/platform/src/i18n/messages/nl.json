@@ -495,6 +495,12 @@
     "ARCHIVE": "Verschijnen zolang een lijst nog leeg is. Kies er een om te bewerken.",
     "BOOKMARKS": "De bewaarde berichten van een lezer, voordat die iets bewaart"
   },
+  "voiceSurfaceNotes": {
+    "NOT_FOUND": "Grijze tekst staat vast en wordt voor je vertaald.",
+    "ERROR": "De knoppen staan vast en worden voor je vertaald.",
+    "ARCHIVE": "De kop komt uit Studio; alleen het bericht is hier van jou.",
+    "BOOKMARKS": "De paginatitel en de paneelkop staan vast."
+  },
   "voiceSpecimen": {
     "showPreview": "Voorbeeld tonen",
     "hidePreview": "Voorbeeld verbergen",
