@@ -2,6 +2,7 @@ import { tv } from '@platform/utils/tv/tv';
 
 export const assetUploadFieldVariants = tv({
   slots: {
+    field: ['flex flex-col gap-[5px]'],
     root: [
       'flex flex-col rounded-admin border-[1.5px] border-dashed border-admin-line bg-admin-surface-2 p-[14px]',
     ],
@@ -16,6 +17,7 @@ export const assetUploadFieldVariants = tv({
     hint: ['mt-0.5 text-[11.5px] text-admin-muted'],
     actions: ['mt-[11px] flex flex-wrap items-center gap-2'],
     input: ['sr-only'],
+    error: ['text-[11.5px] text-admin-bad'],
   },
   variants: {
     size: {

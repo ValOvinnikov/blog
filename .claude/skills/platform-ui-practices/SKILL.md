@@ -108,8 +108,7 @@ Binary settings, one `SettingRow` per switch, all in one `Card.Body`:
     onCheckedChange={(checked) => handleToggle(field, checked)}
     isDisabled={lockReason !== undefined || isPending || isArchived}
     ariaLabel={label}
-    onLabel={t('switchOn')}
-    offLabel={t('switchOff')}
+    labels={{ on: t('switchOn'), off: t('switchOff') }}
     aria-describedby={isArchived ? archivedNoticeId : undefined}
   />
 </SettingRow>
@@ -289,8 +288,7 @@ values (`DetailList.Row isMono`).
   `focus-visible:ring-admin-brand`, `focus-visible:ring-offset-2`, with
   `outline-hidden`); on the dark sidebar `ring-admin-side-accent` with
   `ring-offset-admin-side`. A text field turns its border `admin-brand`.
-  `outline-admin-brand-weak` (1.12:1) is not a focus indicator. **Not yet:** it
-  is still `Switch`'s only cue.
+  `outline-admin-brand-weak` (1.12:1) is not a focus indicator.
 - **Not yet:** the sidebar section labels (3.16:1) fail. Their fix is a token
   change; don't override them per call site.
 - `plan` is for plan tiers only.
@@ -335,11 +333,12 @@ No other value between those things: no `gap-5`, `gap-[18px]`, `mb-[18px]`, or
   and shows its save error above the card. **Not yet:** `tenant-details-panel.tsx`
   calls no `useUnsavedChangesGuard` and renders its error `Alert` inside
   `Card.Body`.
-- **Not yet:** `FormField` gives the hint no id, `FormTextInput` never links its
-  error, and `SettingRow` gives its description and lock reason no id, so none
-  is announced. That is fixed inside those primitives; don't wire it per call
-  site (no `` `${id}-error` `` strings, no id'd span in `hint`, no ids threaded
-  past `SettingRow`). Name the gap in your report.
+- `SettingRow` describes a Base UI control in its slot by its description and
+  lock reason, through `Field`. **Not yet:** `FormField` gives the hint no id
+  and `FormTextInput` never links its error, so neither is announced. That is
+  fixed inside those primitives; don't wire it per call site (no
+  `` `${id}-error` `` strings, no id'd span in `hint`, no ids threaded past
+  `SettingRow`). Name the gap in your report.
 - Use the shared controls (`Switch`, `SegmentedControl` for a small either/or,
   `TextInput`, `Textarea`, `PortableTextEditor`, `AssetUploadField`,
   `PresetPicker`, `FontPicker`, `HueSlider`). A mode one of them lacks belongs

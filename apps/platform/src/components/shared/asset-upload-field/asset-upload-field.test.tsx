@@ -188,7 +188,60 @@ describe(`<${AssetUploadField.name}/>`, () => {
 
     const uploadButton = screen.getByRole('button', { name: 'Upload logo' });
     expect(uploadButton).toBeDisabled();
-    expect(uploadButton).toHaveAttribute('aria-describedby', 'archived-notice');
+    expect(uploadButton).toHaveAttribute(
+      'aria-describedby',
+      expect.stringContaining('archived-notice'),
+    );
     expect(screen.getByRole('button', { name: 'Remove' })).toBeDisabled();
+  });
+
+  it('describes the upload and remove controls with the hint', () => {
+    render(
+      <AssetUploadField
+        {...baseProps}
+        currentUrl="https://example.com/logo.png"
+      />,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Upload logo' }),
+    ).toHaveAccessibleDescription('PNG, JPEG, or WebP.');
+    expect(
+      screen.getByRole('button', { name: 'Remove' }),
+    ).toHaveAccessibleDescription('PNG, JPEG, or WebP.');
+  });
+
+  it('announces a rejected file and describes the upload control with it', async () => {
+    render(
+      <AssetUploadField
+        {...baseProps}
+        onValidateFile={() => 'Choose a PNG, JPEG, or WebP image.'}
+      />,
+    );
+
+    await selectFile(pngFile());
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Choose a PNG, JPEG, or WebP image.',
+    );
+    expect(
+      screen.getByRole('button', { name: 'Upload logo' }),
+    ).toHaveAccessibleDescription(
+      'PNG, JPEG, or WebP. Choose a PNG, JPEG, or WebP image.',
+    );
+  });
+
+  it('announces the uploading label while the file is being processed', async () => {
+    render(
+      <AssetUploadField
+        {...baseProps}
+        onUpload={() => new Promise(() => undefined)}
+      />,
+    );
+
+    await selectFile(pngFile());
+
+    expect(await screen.findByRole('status')).toHaveTextContent('Uploading…');
+    expect(screen.getByRole('button', { name: 'Uploading…' })).toBeDisabled();
   });
 });

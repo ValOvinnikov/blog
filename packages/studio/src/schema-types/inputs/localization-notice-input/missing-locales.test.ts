@@ -50,25 +50,24 @@ describe(getMissingLocales, () => {
 
 describe(getMissingTranslations, () => {
   it('lists the languages a partly translated field is missing', () => {
-    expect(
-      getMissingTranslations([item(EN, 'Hello')], [EN, NL, FR], EN),
-    ).toEqual([NL, FR]);
+    expect(getMissingTranslations([item(EN, 'Hello')], [EN, NL, FR])).toEqual([
+      NL,
+      FR,
+    ]);
   });
 
   it('reports nothing for a field left empty in every language', () => {
-    expect(getMissingTranslations(undefined, [EN, NL], EN)).toEqual([]);
+    expect(getMissingTranslations(undefined, [EN, NL])).toEqual([]);
   });
 
   it('reports nothing for a field whose every language is blank', () => {
     expect(
-      getMissingTranslations([item(EN, ''), item(NL, '  ')], [EN, NL], EN),
+      getMissingTranslations([item(EN, ''), item(NL, '  ')], [EN, NL]),
     ).toEqual([]);
   });
 
-  it('never lists the default language', () => {
-    expect(
-      getMissingTranslations([item(NL, 'Hallo')], [EN, NL, FR], EN),
-    ).toEqual([FR]);
+  it('lists the default language when only a translation is filled', () => {
+    expect(getMissingTranslations([item(NL, 'Hallo')], [EN, NL])).toEqual([EN]);
   });
 });
 

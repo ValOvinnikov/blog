@@ -5,12 +5,13 @@ import type { AriaAttributes } from 'react';
 
 import { switchVariants } from './switch-variants';
 
+type TSwitchLabels = { on: string; off: string } | { caption: string };
+
 export type TSwitchProps = {
   isChecked: boolean;
   onCheckedChange: (checked: boolean) => void;
   ariaLabel: string;
-  onLabel: string;
-  offLabel: string;
+  labels: TSwitchLabels;
   isDisabled?: boolean;
   'aria-describedby'?: AriaAttributes['aria-describedby'];
 };
@@ -19,26 +20,39 @@ export const Switch = ({
   isChecked,
   onCheckedChange,
   ariaLabel,
-  onLabel,
-  offLabel,
+  labels,
   isDisabled = false,
   'aria-describedby': ariaDescribedBy,
 }: TSwitchProps) => {
-  const { track, thumb, label } = switchVariants();
+  const { root, track, thumb, stateText, stateOption } = switchVariants();
 
   return (
-    <>
+    <label className={root()}>
+      {/* A native button keeps `ariaLabel` as the name; a span would be renamed after the wrapping label. */}
       <BaseSwitch.Root
         checked={isChecked}
         onCheckedChange={onCheckedChange}
         disabled={isDisabled}
         aria-label={ariaLabel}
         aria-describedby={ariaDescribedBy}
+        nativeButton={true}
+        render={<button type="button" />}
         className={track()}
       >
         <BaseSwitch.Thumb className={thumb()} />
       </BaseSwitch.Root>
-      <span className={label()}>{isChecked ? onLabel : offLabel}</span>
-    </>
+      {'caption' in labels ? (
+        <span>{labels.caption}</span>
+      ) : (
+        <span className={stateText()}>
+          <span className={stateOption({ isShown: isChecked })}>
+            {labels.on}
+          </span>
+          <span className={stateOption({ isShown: !isChecked })}>
+            {labels.off}
+          </span>
+        </span>
+      )}
+    </label>
   );
 };

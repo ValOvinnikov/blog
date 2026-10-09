@@ -139,8 +139,7 @@ export const FeaturesSettings = ({
                   onCheckedChange={(checked) => handleToggle(field, checked)}
                   isDisabled={isLocked || isPending || isArchived}
                   ariaLabel={label}
-                  onLabel={t('switchOn')}
-                  offLabel={t('switchOff')}
+                  labels={{ on: t('switchOn'), off: t('switchOff') }}
                   aria-describedby={isArchived ? archivedNoticeId : undefined}
                 />
               </SettingRow>

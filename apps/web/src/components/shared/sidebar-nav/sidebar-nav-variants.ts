@@ -8,11 +8,7 @@ export const sidebarNavVariants = tv({
       'sticky top-[var(--site-header-height,5rem)] z-10',
       'lg:static lg:top-auto lg:z-auto',
     ],
-    desktop: [
-      'hidden lg:block',
-      'lg:sticky lg:top-24',
-      'lg:border-r lg:border-border lg:pr-6',
-    ],
+    desktop: ['hidden lg:block', 'lg:sticky lg:top-24', 'lg:pr-6'],
     // `shadow-md`: this bar shares `Header`'s background and border, so the hairline alone doesn't read as a seam once it sticks beneath it.
     mobile: [
       'relative',
@@ -30,9 +26,9 @@ export const sidebarNavVariants = tv({
       'focus-visible:ring-offset-2 focus-visible:ring-offset-ambient',
     ],
     backArrow: ['size-3.5 shrink-0 rotate-180'],
-    desktopLabel: [
-      'mb-3 block',
-      'font-mono text-label tracking-label uppercase text-text',
+    title: [
+      'mb-4 block',
+      'font-display font-medium text-lg leading-tight tracking-tight-card text-text',
     ],
     selectorRow: [
       'flex flex-col gap-1.5',
@@ -64,12 +60,18 @@ export const sidebarNavVariants = tv({
       'bg-primary border-b border-border shadow-lg',
       'max-h-[70vh] overflow-y-auto p-4',
     ],
-    list: ['flex flex-col gap-1', 'font-mono text-copy', 'm-0 list-none p-0'],
-    item: [],
+    list: [
+      'flex flex-col gap-0.5',
+      'border-l border-border',
+      'font-mono text-copy',
+      'm-0 list-none p-0',
+    ],
+    // `-ml-px` lays the 2px bar over the list's 1px rail rather than beside it.
     link: [
-      'block rounded-md px-2 py-1 text-subtle no-underline',
+      '-ml-px block rounded-r-md border-l-2 border-transparent',
+      'py-1 pr-2 pl-3 text-subtle no-underline',
       'transition-colors duration-base ease-smooth',
-      'hover:bg-surface-2 hover:text-text',
+      'hover:border-border-strong hover:text-text',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
       'focus-visible:ring-offset-2 focus-visible:ring-offset-ambient',
     ],
@@ -79,19 +81,19 @@ export const sidebarNavVariants = tv({
       true: { chevron: ['-rotate-135'] },
     },
     inPanel: {
-      true: { link: ['flex items-center px-3 py-2'] },
+      true: { link: ['flex items-center py-2'] },
     },
     // Declared before `isActive` so the active colour wins over a root item's `text-text`.
     isNested: {
-      true: { item: ['pl-3'] },
+      true: { link: ['pl-6'] },
       false: { link: ['font-semibold text-text'] },
     },
     // Last, so its hover classes win: hovering the current item leaves it unchanged.
     isActive: {
       true: {
         link: [
-          'bg-brand-primary-muted text-brand-primary',
-          'hover:bg-brand-primary-muted hover:text-brand-primary',
+          'border-brand-primary text-brand-primary',
+          'hover:border-brand-primary hover:text-brand-primary',
         ],
       },
     },

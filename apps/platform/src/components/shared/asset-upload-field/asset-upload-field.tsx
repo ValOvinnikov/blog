@@ -1,13 +1,13 @@
 'use client';
 
-import { ALERT_TYPE, SIZE } from '@blog/config';
-import { Alert } from '@platform/components/shared/alert';
+import { SIZE } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import Image from 'next/image';
 import { unstable_rethrow } from 'next/navigation';
 import {
   type AriaAttributes,
   type ChangeEvent,
+  useId,
   useRef,
   useState,
   useTransition,
@@ -62,8 +62,14 @@ export const AssetUploadField = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | undefined>(undefined);
   const [isPending, startTransition] = useTransition();
+  const hintId = useId();
+  const errorId = useId();
+  const describedBy = [hintId, ariaDescribedBy, error && errorId]
+    .filter(Boolean)
+    .join(' ');
 
   const {
+    field,
     root,
     top,
     thumb,
@@ -73,6 +79,7 @@ export const AssetUploadField = ({
     hint: hintSlot,
     actions,
     input,
+    error: errorSlot,
   } = assetUploadFieldVariants({ size });
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -123,65 +130,74 @@ export const AssetUploadField = ({
   };
 
   return (
-    <div className={root()}>
-      <div className={top()}>
-        <span className={thumb()}>
-          {currentUrl ? (
-            <Image
-              src={currentUrl}
-              alt={currentAlt}
-              fill={true}
-              sizes="48px"
-              className={thumbImage()}
-              // A vector source has no raster grid to resample, and skipping it avoids needing `images.dangerouslyAllowSVG` in next.config.ts.
-              unoptimized={currentUrl.endsWith('.svg')}
-            />
-          ) : (
-            <span aria-hidden="true">—</span>
-          )}
-        </span>
-        <div className={text()}>
-          <p className={title()}>{label}</p>
-          <p className={hintSlot()}>{hint}</p>
+    <div className={field()}>
+      <div className={root()}>
+        <div className={top()}>
+          <span className={thumb()}>
+            {currentUrl ? (
+              <Image
+                src={currentUrl}
+                alt={currentAlt}
+                fill={true}
+                sizes="48px"
+                className={thumbImage()}
+                // A vector source has no raster grid to resample, and skipping it avoids needing `images.dangerouslyAllowSVG` in next.config.ts.
+                unoptimized={currentUrl.endsWith('.svg')}
+              />
+            ) : (
+              <span aria-hidden="true">—</span>
+            )}
+          </span>
+          <div className={text()}>
+            <p className={title()}>{label}</p>
+            <p id={hintId} className={hintSlot()}>
+              {hint}
+            </p>
+          </div>
         </div>
-      </div>
 
-      <div className={actions()}>
-        <input
-          ref={inputRef}
-          type="file"
-          accept={acceptedMimeTypes.join(',')}
-          className={input()}
-          onChange={handleFileChange}
-          tabIndex={-1}
-          aria-hidden="true"
-          data-testid="asset-upload-field-input"
-        />
-        <Button
-          type="button"
-          size={SIZE.SM}
-          variant="secondary"
-          onClick={() => inputRef.current?.click()}
-          isDisabled={isPending || isDisabled}
-          aria-describedby={ariaDescribedBy}
-        >
-          {isPending ? uploadingLabel : uploadLabel}
-        </Button>
-        {currentUrl && (
+        <div className={actions()}>
+          <input
+            ref={inputRef}
+            type="file"
+            accept={acceptedMimeTypes.join(',')}
+            className={input()}
+            onChange={handleFileChange}
+            tabIndex={-1}
+            aria-hidden="true"
+            data-testid="asset-upload-field-input"
+          />
           <Button
             type="button"
             size={SIZE.SM}
-            variant="ghost"
-            onClick={handleRemove}
-            isDisabled={isPending || isDisabled}
-            aria-describedby={ariaDescribedBy}
+            variant="secondary"
+            onClick={() => inputRef.current?.click()}
+            isDisabled={isDisabled}
+            isPending={isPending}
+            pendingLabel={uploadingLabel}
+            aria-describedby={describedBy}
           >
-            {removeLabel}
+            {uploadLabel}
           </Button>
-        )}
+          {currentUrl && (
+            <Button
+              type="button"
+              size={SIZE.SM}
+              variant="ghost"
+              onClick={handleRemove}
+              isDisabled={isPending || isDisabled}
+              aria-describedby={describedBy}
+            >
+              {removeLabel}
+            </Button>
+          )}
+        </div>
       </div>
-
-      {error && <Alert type={ALERT_TYPE.ERROR} title={error} />}
+      {error && (
+        <p id={errorId} className={errorSlot()} role="alert">
+          {error}
+        </p>
+      )}
     </div>
   );
 };

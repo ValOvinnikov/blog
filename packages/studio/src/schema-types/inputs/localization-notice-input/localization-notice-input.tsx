@@ -63,9 +63,9 @@ const documentNotices = (
 
 const fieldNotices = (
   value: unknown,
-  { liveLocales, defaultLocale }: TLocalizationNoticeOptions,
+  liveLocales: readonly TLocaleIsoCode[],
 ): string[] => {
-  const missing = getMissingTranslations(value, liveLocales, defaultLocale);
+  const missing = getMissingTranslations(value, liveLocales);
 
   return missing.length > 0 ? [`Missing: ${formatLocaleList(missing)}.`] : [];
 };
@@ -165,7 +165,7 @@ export const createLocalizationNoticeInput = (
       props.path.length === 0
         ? documentNotices(props.value, options)
         : isLocalizedSchemaType(props.schemaType)
-          ? fieldNotices(props.value, options)
+          ? fieldNotices(props.value, options.liveLocales)
           : [];
 
     return (
