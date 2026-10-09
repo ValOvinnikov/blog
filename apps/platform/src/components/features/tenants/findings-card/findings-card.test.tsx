@@ -4,14 +4,20 @@ import {
   FINDING_SOURCE,
   FINDING_STATUS,
 } from '@blog/config/constants';
-import type { TFinding } from '@blog/db/schema/findings';
+import type { TFindingSummary } from '@blog/db/schema/findings';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 
 import { FindingsCard } from './findings-card';
 
+vi.mock('@platform/server/findings/get-finding-details-action', () => ({
+  getFindingDetailsAction: vi.fn(),
+}));
+
 const render = renderWithIntl;
 
-const makeFinding = (overrides: Partial<TFinding> = {}): TFinding => ({
+const makeFinding = (
+  overrides: Partial<TFindingSummary> = {},
+): TFindingSummary => ({
   id: 'finding-1',
   tenantId: 'tenant-1',
   source: FINDING_SOURCE.TENANT_PROVISIONING,
@@ -19,7 +25,7 @@ const makeFinding = (overrides: Partial<TFinding> = {}): TFinding => ({
   severity: FINDING_SEVERITY.CRITICAL,
   status: FINDING_STATUS.OPEN,
   dedupeKey: 'dedupe-1',
-  details: null,
+  hasDetails: false,
   firstSeenAt: new Date('2026-04-01T00:00:00.000Z'),
   lastSeenAt: new Date('2026-04-02T00:00:00.000Z'),
   resolvedAt: null,
@@ -29,7 +35,7 @@ const makeFinding = (overrides: Partial<TFinding> = {}): TFinding => ({
 describe(FindingsCard, () => {
   describe('with no findings', () => {
     beforeEach(() => {
-      render(<FindingsCard findings={[]} />);
+      render(<FindingsCard tenantId="tenant-1" findings={[]} />);
     });
 
     it("nests the card's title one level under the page's own h1", () => {
@@ -48,7 +54,7 @@ describe(FindingsCard, () => {
   });
 
   it('renders a finding with its source, kind and severity', () => {
-    render(<FindingsCard findings={[makeFinding()]} />);
+    render(<FindingsCard tenantId="tenant-1" findings={[makeFinding()]} />);
 
     expect(screen.getByText('Tenant provisioning')).toBeVisible();
     expect(screen.getByText('Provisioning step failed')).toBeVisible();
@@ -58,9 +64,10 @@ describe(FindingsCard, () => {
   it('renders a Details disclosure only when the finding carries details', () => {
     render(
       <FindingsCard
+        tenantId="tenant-1"
         findings={[
-          makeFinding({ id: 'finding-1', details: { step: 'MAP_DOMAIN' } }),
-          makeFinding({ id: 'finding-2', details: null }),
+          makeFinding({ id: 'finding-1', hasDetails: true }),
+          makeFinding({ id: 'finding-2', hasDetails: false }),
         ]}
       />,
     );

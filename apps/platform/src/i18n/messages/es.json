@@ -145,6 +145,7 @@
     "title": "Incidencias abiertas",
     "empty": "No hay incidencias abiertas para este cliente: todo funciona correctamente.",
     "detailsToggle": "Detalles",
+    "detailsLoading": "Cargando detalles…",
     "columnLevel": "Nivel",
     "columnDocument": "Documento",
     "columnMessage": "Mensaje"

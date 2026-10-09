@@ -2,7 +2,7 @@
 
 import type { TDomainVerificationStatus } from '@blog/config';
 import type { TAuditEvent } from '@blog/db/schema/audit-events';
-import type { TFinding } from '@blog/db/schema/findings';
+import type { TFindingSummary } from '@blog/db/schema/findings';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { ContentWorkspaceCard } from '@platform/components/features/tenants/content-workspace-card';
 import { DomainCard } from '@platform/components/features/tenants/domain-card';
@@ -31,7 +31,7 @@ export type TTenantOverviewViewProps = {
   ownerJoinedAt: string | undefined;
   ownerJoinedAtIso: string | undefined;
   auditEvents: TAuditEvent[];
-  findings: TFinding[];
+  findings: TFindingSummary[];
 };
 
 /**
@@ -117,7 +117,7 @@ export const TenantOverviewView = ({
         archivedNoticeId={archivedNoticeId}
       />
 
-      <FindingsCard findings={findings} />
+      <FindingsCard tenantId={tenant.id} findings={findings} />
 
       <div className={cardsGrid()}>
         <div className={cardsColumn()}>

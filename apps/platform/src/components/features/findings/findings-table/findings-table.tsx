@@ -1,5 +1,5 @@
 import { SIZE } from '@blog/config';
-import type { TFinding } from '@blog/db/schema/findings';
+import type { TOpenFinding } from '@blog/db/queries/findings';
 import { DataTableShell } from '@platform/components/shared/data-table-shell';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { StatusBadge } from '@platform/components/shared/status-badge';
@@ -11,14 +11,10 @@ import { useLocale, useTranslations } from 'next-intl';
 import { findingsTableVariants } from './findings-table-variants';
 
 export type TFindingsTableProps = {
-  findings: TFinding[];
-  tenantNamesById: Record<string, string>;
+  findings: TOpenFinding[];
 };
 
-export const FindingsTable = ({
-  findings,
-  tenantNamesById,
-}: TFindingsTableProps) => {
+export const FindingsTable = ({ findings }: TFindingsTableProps) => {
   const t = useTranslations('findingsTable');
   const tView = useTranslations('findingsView');
   const locale = useLocale();
@@ -55,7 +51,7 @@ export const FindingsTable = ({
                 variant="secondary"
                 size={SIZE.SM}
               >
-                {tenantNamesById[finding.tenantId] ?? finding.tenantId}
+                {finding.tenantName ?? finding.tenantId}
               </LinkButton>
             ) : (
               <span className={noTenant()}>{t('noTenant')}</span>

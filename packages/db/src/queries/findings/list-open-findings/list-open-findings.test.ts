@@ -59,6 +59,42 @@ describe(listOpenFindings, () => {
     ).toBe(false);
   });
 
+  it('joins each finding to its tenant name and leaves details out', async () => {
+    const { id: tenantId } = await insertTestTenant(db(), { name: 'Acme' });
+    await openFinding({
+      tenantId,
+      source: FINDING_SOURCE.DOCUMENT_VALIDATION,
+      kind: FINDING_KIND.SCHEMA_VALIDATION_ERROR,
+      severity: FINDING_SEVERITY.WARNING,
+      identifier: 'tenant-scoped',
+      details: { invalidDocumentCount: 1 },
+    });
+    await openFinding({
+      source: FINDING_SOURCE.RECHECK_TENANT_OWNERS,
+      kind: FINDING_KIND.OWNER_CHECK_AMBIGUOUS,
+      severity: FINDING_SEVERITY.INFO,
+      identifier: 'platform-wide',
+    });
+
+    const result = await listOpenFindings();
+
+    expect(result).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          tenantId,
+          tenantName: 'Acme',
+          hasDetails: true,
+        }),
+        expect.objectContaining({
+          tenantId: null,
+          tenantName: null,
+          hasDetails: false,
+        }),
+      ]),
+    );
+    expect(result.every((finding) => !('details' in finding))).toBe(true);
+  });
+
   it('returns an empty array when nothing is open', async () => {
     const result = await listOpenFindings();
 
