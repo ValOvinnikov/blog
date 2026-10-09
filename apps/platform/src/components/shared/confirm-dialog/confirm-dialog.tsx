@@ -25,7 +25,7 @@ export type TConfirmDialogProps = {
   onConfirm: () => void;
   isPending: boolean;
   confirmButtonLabel: ReactNode;
-  confirmingButtonLabel: ReactNode;
+  confirmingButtonLabel: string;
   cancelLabel: ReactNode;
   children?: ReactNode;
   tone?: 'danger' | 'primary';
@@ -103,9 +103,11 @@ export const ConfirmDialog = ({
               type="button"
               variant={tone}
               onClick={onConfirm}
-              isDisabled={isPending || confirmValue !== expectedValue}
+              isDisabled={confirmValue !== expectedValue}
+              isPending={isPending}
+              pendingLabel={confirmingButtonLabel}
             >
-              {isPending ? confirmingButtonLabel : confirmButtonLabel}
+              {confirmButtonLabel}
             </Button>
           </div>
         </AlertDialog.Popup>

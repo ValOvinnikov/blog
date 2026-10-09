@@ -120,7 +120,16 @@ describe(ConfirmDialog, () => {
       'acme',
     );
 
-    expect(screen.getByRole('button', { name: 'Confirming…' })).toBeDisabled();
+    const confirmButton = screen.getByRole('button', { name: 'Confirming…' });
+    expect(confirmButton).toBeDisabled();
+    expect(confirmButton).toHaveAttribute('aria-busy', 'true');
+  });
+
+  it('announces the pending label in a status region while isPending', async () => {
+    render(<ControlledConfirmDialog isPending={true} />);
+    await user.click(screen.getByRole('button', { name: 'Open dialog' }));
+
+    expect(screen.getByRole('status')).toHaveTextContent('Confirming…');
   });
 
   it('renders extra content passed as children between the field and the actions', async () => {
