@@ -21,6 +21,15 @@ export const sidebarNavVariants = tv({
       'mb-6',
       'lg:hidden',
     ],
+    backLink: [
+      'mb-4 flex w-fit items-center gap-1.5 rounded-md',
+      'font-mono text-caption text-subtle no-underline',
+      'transition-colors duration-base ease-smooth',
+      'hover:text-text',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary',
+      'focus-visible:ring-offset-2 focus-visible:ring-offset-ambient',
+    ],
+    backArrow: ['size-3.5 shrink-0 rotate-180'],
     desktopLabel: [
       'mb-3 block',
       'font-mono text-label tracking-label uppercase text-text',

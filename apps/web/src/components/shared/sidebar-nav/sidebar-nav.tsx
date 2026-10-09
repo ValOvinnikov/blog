@@ -1,6 +1,7 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
+import { ICONS, type TMaybeUndefined } from '@blog/config';
+import { Icon } from '@blog/ui/components/atoms/icon';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { usePopover } from '@web/hooks/use-popover';
 import { useId } from 'react';
@@ -13,11 +14,18 @@ export type TSidebarNavItem = {
   level: 1 | 2;
 };
 
+type TSidebarNavBackLink = {
+  label: string;
+  href: string;
+  ariaLabel: string;
+};
+
 type TSidebarNavProps = {
   items: TSidebarNavItem[];
   activeKey: TMaybeUndefined<string>;
   label: string;
   ariaCurrent: 'location' | 'page';
+  backLink?: TSidebarNavBackLink;
   className?: string;
 };
 
@@ -29,6 +37,7 @@ export const SidebarNav = ({
   activeKey,
   label,
   ariaCurrent,
+  backLink,
   className,
 }: TSidebarNavProps) => {
   const labelId = useId();
@@ -41,6 +50,19 @@ export const SidebarNav = ({
     closeOnFocusOut: true,
   });
   const activeItem = items.find(({ href }) => href === activeKey);
+
+  const renderBackLink = (onNavigate?: () => void) =>
+    backLink && (
+      <SmartLink
+        href={backLink.href}
+        className={s.backLink()}
+        aria-label={backLink.ariaLabel}
+        onClick={onNavigate}
+      >
+        <Icon name={ICONS.ARROW} className={s.backArrow()} />
+        {backLink.label}
+      </SmartLink>
+    );
 
   // A click leaves focus on the link, so `closeOnFocusOut` never fires and `onNavigate` closes the panel instead.
   const renderList = (onNavigate?: () => void, inPanel = false) => (
@@ -68,6 +90,7 @@ export const SidebarNav = ({
   return (
     <nav aria-labelledby={labelId} className={s.root({ class: className })}>
       <div className={s.desktop()}>
+        {renderBackLink()}
         <h2 id={labelId} className={s.desktopLabel()}>
           {label}
         </h2>
@@ -95,6 +118,7 @@ export const SidebarNav = ({
           </button>
         </div>
         <div ref={panelRef} id={panelId} hidden={!open} className={s.panel()}>
+          {renderBackLink(close)}
           {renderList(close, true)}
         </div>
       </div>

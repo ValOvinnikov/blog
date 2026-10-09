@@ -77,7 +77,8 @@
     "label": "Contents"
   },
   "sectionNavigation": {
-    "label": "In this section"
+    "label": "In this section",
+    "backTo": "Back to {title}"
   },
   "topicPage": {
     "empty": "No posts in {name} yet.",

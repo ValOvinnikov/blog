@@ -88,4 +88,38 @@ describe(`<${SectionNavigation.name}/>`, () => {
       ).not.toBeInTheDocument();
     });
   });
+
+  describe('in a section nested inside another section', () => {
+    beforeEach(() => {
+      setup({
+        sectionNavigation: makeLandingSectionNavigation({
+          parentSection: { title: 'Library', path: 'library' },
+        }),
+      });
+    });
+
+    it('starts with a back link to the parent section', () => {
+      expect(screen.getAllByRole('link').at(0)).toBe(
+        screen.getByRole('link', { name: 'Back to Library' }),
+      );
+    });
+
+    it("points the back link at the parent section's path", () => {
+      expect(
+        screen.getByRole('link', { name: 'Back to Library' }),
+      ).toHaveAttribute('href', '/library');
+    });
+  });
+
+  describe('in a top-level section', () => {
+    beforeEach(() => {
+      setup();
+    });
+
+    it('renders no back link', () => {
+      expect(
+        screen.queryByRole('link', { name: /^Back to/ }),
+      ).not.toBeInTheDocument();
+    });
+  });
 });

@@ -77,7 +77,8 @@
     "label": "Inhalt"
   },
   "sectionNavigation": {
-    "label": "In diesem Bereich"
+    "label": "In diesem Bereich",
+    "backTo": "Zurück zu {title}"
   },
   "topicPage": {
     "empty": "Noch keine Beiträge zu {name}.",

@@ -77,7 +77,8 @@
     "label": "Inhoud"
   },
   "sectionNavigation": {
-    "label": "In deze sectie"
+    "label": "In deze sectie",
+    "backTo": "Terug naar {title}"
   },
   "topicPage": {
     "empty": "Nog geen berichten over {name}.",

@@ -146,6 +146,7 @@ export const VOICE_FIXED_KEYS = [
   'blogPostPage.skimPanel.readFullArticle',
   'postContentsRail.label',
   'sectionNavigation.label',
+  'sectionNavigation.backTo',
   'postShare.copyLink',
   'postShare.copied',
   'postShare.linkCopied',
