@@ -5,6 +5,7 @@ import type {
   TEmailItemStatus,
   TEmailPageItem,
 } from '@platform/utils/email-draft/email-draft';
+import { fieldStatusTone } from '@platform/utils/status-tone/status-tone';
 
 import { itemListVariants } from './item-list-variants';
 
@@ -22,12 +23,6 @@ export type TItemListProps = {
   onSelect: (item: TEmailPageItem) => void;
   ariaLabel: string;
 };
-
-const STATUS_TONE = {
-  default: 'neutral',
-  customised: 'plan',
-  unsaved: 'warn',
-} as const satisfies Record<TEmailItemStatus, string>;
 
 export const ItemList = ({
   items,
@@ -50,7 +45,7 @@ export const ItemList = ({
           >
             <span className={label()}>{option.label}</span>
             <span className={description()}>{option.description}</span>
-            <StatusBadge tone={STATUS_TONE[option.status]}>
+            <StatusBadge tone={fieldStatusTone(option.status)} hasDot={false}>
               {option.statusLabel}
             </StatusBadge>
           </Button>

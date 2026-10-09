@@ -323,7 +323,6 @@
       "MENU_GLOBE": "Menu avec globe",
       "CODES": "Codes compacts"
     },
-    "unsavedCard": "Modifications non enregistrées",
     "colourHeading": "Couleur",
     "colourDescription": "Seule la teinte change, pour que le texte reste lisible.",
     "typeHeading": "Typographie",
@@ -386,10 +385,11 @@
     "editTab": "Modifier",
     "previewTab": "Aperçu"
   },
-  "emailItemStatus": {
+  "fieldStatus": {
     "default": "Par défaut",
     "customised": "Personnalisé",
-    "unsaved": "Non enregistré"
+    "unsaved": "Non enregistré",
+    "reset": "Réinitialiser"
   },
   "emailPreview": {
     "heading": "Aperçu",
@@ -451,8 +451,7 @@
       "MAGIC_LINK": "Envoyé lorsqu'une personne se connecte à votre site.",
       "TENANT_INVITE": "Envoyé lorsqu'une personne est invitée à rejoindre votre équipe.",
       "NEWSLETTER_CONFIRMATION": "Envoyé pour confirmer un abonnement à la newsletter."
-    },
-    "useDefault": "Utiliser la valeur par défaut"
+    }
   },
   "portableTextEditorToolbar": {
     "bold": "Gras",
@@ -476,10 +475,6 @@
     "savingButton": "Enregistrement…",
     "alertSuccess": "Voix enregistrée.",
     "alertError": "Impossible d'enregistrer — veuillez réessayer.",
-    "badgeDefault": "Par défaut",
-    "badgeCustomised": "Personnalisé",
-    "unsaved": "Non enregistré",
-    "reset": "Réinitialiser",
     "keepPlaceholder": "Conservez <code>{token}</code> — le site le remplit.",
     "draftFieldLabel": "{surface} — {field} ({language})"
   },

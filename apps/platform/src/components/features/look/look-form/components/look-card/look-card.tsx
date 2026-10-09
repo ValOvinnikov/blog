@@ -1,5 +1,5 @@
 import { Card } from '@platform/components/shared/card';
-import { useTranslations } from 'next-intl';
+import { UnsavedDot } from '@platform/components/shared/unsaved-dot';
 import type { ReactNode } from 'react';
 
 import { lookCardVariants } from './look-card-variants';
@@ -19,8 +19,7 @@ export const LookCard = ({
   actions,
   children,
 }: TLookCardProps) => {
-  const t = useTranslations('lookForm');
-  const { title: titleSlot, dot, srOnly, body } = lookCardVariants();
+  const { title: titleSlot, body } = lookCardVariants();
 
   return (
     <Card>
@@ -31,9 +30,7 @@ export const LookCard = ({
             {hasUnsavedChanges && (
               <>
                 {' '}
-                <span className={dot()}>
-                  <span className={srOnly()}>{t('unsavedCard')}</span>
-                </span>
+                <UnsavedDot />
               </>
             )}
           </span>

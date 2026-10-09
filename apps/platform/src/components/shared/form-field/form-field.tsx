@@ -11,6 +11,7 @@ export type TFormFieldProps = {
   error?: string;
   children: ReactNode;
   footer?: ReactNode;
+  actions?: ReactNode;
   hasOwnAccessibleName?: boolean;
 };
 
@@ -20,10 +21,12 @@ export const FormField = ({
   error,
   children,
   footer,
+  actions,
   hasOwnAccessibleName = false,
 }: TFormFieldProps) => {
   const {
     root,
+    header,
     label: labelSlot,
     hint: hintSlot,
     error: errorSlot,
@@ -31,11 +34,14 @@ export const FormField = ({
 
   return (
     <Field.Root className={root()} invalid={Boolean(error)}>
-      {hasOwnAccessibleName ? (
-        <span className={labelSlot()}>{label}</span>
-      ) : (
-        <Field.Label className={labelSlot()}>{label}</Field.Label>
-      )}
+      <div className={header()}>
+        {hasOwnAccessibleName ? (
+          <span className={labelSlot()}>{label}</span>
+        ) : (
+          <Field.Label className={labelSlot()}>{label}</Field.Label>
+        )}
+        {actions}
+      </div>
       {children}
       {hint && (
         <Field.Description className={hintSlot()}>{hint}</Field.Description>

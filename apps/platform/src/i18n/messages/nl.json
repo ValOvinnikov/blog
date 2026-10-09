@@ -323,7 +323,6 @@
       "MENU_GLOBE": "Menu met wereldbol",
       "CODES": "Compacte codes"
     },
-    "unsavedCard": "Niet-opgeslagen wijzigingen",
     "colourHeading": "Kleur",
     "colourDescription": "Alleen de tint verandert, zodat tekst leesbaar blijft.",
     "typeHeading": "Lettertype",
@@ -386,10 +385,11 @@
     "editTab": "Bewerken",
     "previewTab": "Voorbeeld"
   },
-  "emailItemStatus": {
+  "fieldStatus": {
     "default": "Standaard",
     "customised": "Aangepast",
-    "unsaved": "Niet opgeslagen"
+    "unsaved": "Niet opgeslagen",
+    "reset": "Herstellen"
   },
   "emailPreview": {
     "heading": "Voorbeeld",
@@ -451,8 +451,7 @@
       "MAGIC_LINK": "Verstuurd wanneer iemand inlogt op je site.",
       "TENANT_INVITE": "Verstuurd wanneer iemand wordt uitgenodigd voor je team.",
       "NEWSLETTER_CONFIRMATION": "Verstuurd om een nieuwsbriefabonnement te bevestigen."
-    },
-    "useDefault": "Standaard gebruiken"
+    }
   },
   "portableTextEditorToolbar": {
     "bold": "Vet",
@@ -476,10 +475,6 @@
     "savingButton": "Opslaan…",
     "alertSuccess": "Toon opgeslagen.",
     "alertError": "Opslaan mislukt. Probeer het opnieuw.",
-    "badgeDefault": "Standaard",
-    "badgeCustomised": "Aangepast",
-    "unsaved": "Niet opgeslagen",
-    "reset": "Herstellen",
     "keepPlaceholder": "Laat <code>{token}</code> staan — de site vult het in.",
     "draftFieldLabel": "{surface} — {field} ({language})"
   },

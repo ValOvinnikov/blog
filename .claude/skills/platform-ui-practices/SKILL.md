@@ -351,10 +351,9 @@ No other value between those things: no `gap-5`, `gap-[18px]`, `mb-[18px]`, or
   `aria-describedby` includes the notice's id, joined with its hint and error
   ids, never replaced by them.
 - Per-field status on Look, Voice and Email (unsaved dot, Default/Customised
-  badge, Reset) sits in the field header; Reset is hidden when read-only. **Not
-  yet:** there is no shared field-status component; follow
-  `components/features/voice/voice-field-status/` (dot, badge) and `voice-field/`
-  (Reset), except its `tone="plan"` Customised badge, which `plan` is not for.
+  badge, Reset) sits in the field header, through `FieldStatus`
+  (`FormField`'s `actions` slot) or, for a card title, `UnsavedDot`; Reset is
+  hidden when read-only.
 - Buttons: one primary per surface; `md` by default; `sm` in `Card.Header`
   actions, a field's Reset and toolbars. A pending button uses `isPending` +
   `pendingLabel`. A destructive action goes through `ConfirmDialog`.

@@ -69,7 +69,7 @@ export const EmailSettings = ({
   archivedAt,
 }: TEmailSettingsProps) => {
   const t = useTranslations('emailForm');
-  const tStatus = useTranslations('emailItemStatus');
+  const tStatus = useTranslations('fieldStatus');
   const tTemplate = useTranslations('emailTemplateEditor');
   const tLanguage = useTranslations('languageNames');
   const tSender = useTranslations('emailSettingsForm');
@@ -287,13 +287,16 @@ export const EmailSettings = ({
                 key={`${selectedItem}-${selectedLocale}-${discardCount}`}
                 templateType={selectedItem}
                 languageName={tLanguage(selectedLocale)}
-                copy={draft.copies[selectedItem][selectedLocale]}
-                fallback={resolveFallbackCopy(
-                  draft,
-                  selectedItem,
-                  selectedLocale,
-                  defaultLocale,
-                )}
+                copy={{
+                  draft: draft.copies[selectedItem][selectedLocale],
+                  saved: saved.copies[selectedItem][selectedLocale],
+                  fallback: resolveFallbackCopy(
+                    draft,
+                    selectedItem,
+                    selectedLocale,
+                    defaultLocale,
+                  ),
+                }}
                 logo={draft.templateLogos[selectedItem]}
                 onCopyChange={(copy) =>
                   setDraft((prev) =>
