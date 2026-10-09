@@ -74,21 +74,21 @@ export const LookPreview = ({
     <PreviewFrame
       ariaLabel={t('livePreviewHeading')}
       isNarrow={width === 'mobile'}
+      widthControl={
+        <SegmentedControl
+          ariaLabel={t('previewWidthAriaLabel')}
+          options={widthOptions}
+          value={width}
+          onChange={setWidth}
+        />
+      }
       controls={
-        <>
-          <SegmentedControl
-            ariaLabel={t('previewWidthAriaLabel')}
-            options={widthOptions}
-            value={width}
-            onChange={setWidth}
-          />
-          <SegmentedControl
-            ariaLabel={t('previewColorSchemeAriaLabel')}
-            options={modeOptions}
-            value={mode}
-            onChange={setMode}
-          />
-        </>
+        <SegmentedControl
+          ariaLabel={t('previewColorSchemeAriaLabel')}
+          options={modeOptions}
+          value={mode}
+          onChange={setMode}
+        />
       }
       notes={<p>{t('previewNote')}</p>}
     >
