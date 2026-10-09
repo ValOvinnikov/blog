@@ -4,7 +4,10 @@ import { ICONS } from '@blog/config';
 import { TENANT_PROVISIONING_STEP_STATUS } from '@blog/db/constants';
 import { Card } from '@platform/components/shared/card';
 import { Disclosure } from '@platform/components/shared/disclosure';
-import { Heading } from '@platform/components/shared/heading';
+import {
+  Heading,
+  type THeadingLevel,
+} from '@platform/components/shared/heading';
 import { headingVariants } from '@platform/components/shared/heading/heading-variants';
 import { Icon } from '@platform/components/shared/icon';
 import { StatusBadge } from '@platform/components/shared/status-badge';
@@ -25,11 +28,13 @@ import {
 
 export type TDeprovisioningStatusViewProps = {
   poll: TUseDeprovisioningPollResult;
+  headingLevel?: Exclude<THeadingLevel, 1>;
 };
 
 /** No retry control: a failed run is re-dispatched through `DeprovisionTenantControl`, which the page renders above this. */
 export const DeprovisioningStatusView = ({
   poll,
+  headingLevel = 2,
 }: TDeprovisioningStatusViewProps) => {
   const t = useTranslations('deprovisioningStatusView');
   const locale = useLocale();
@@ -115,7 +120,7 @@ export const DeprovisioningStatusView = ({
           className={stepsCard()}
           isOpen={isStepsOpen}
           onOpenChange={setIsStepsOpen}
-          headingLevel={2}
+          headingLevel={headingLevel}
           summary={
             <span className={stepsSummary()}>
               <span className={headingVariants({ size: 'cardTitle' })}>
@@ -134,12 +139,16 @@ export const DeprovisioningStatusView = ({
         </Disclosure>
 
         {run ? (
-          <RunCard run={run} actions={overallStatusBadgeLive} />
+          <RunCard
+            run={run}
+            actions={overallStatusBadgeLive}
+            headingLevel={headingLevel}
+          />
         ) : (
           <Card>
             <Card.Header
               title={t('runCardTitle')}
-              headingLevel={2}
+              headingLevel={headingLevel}
               actions={overallStatusBadgeLive}
             />
           </Card>
@@ -150,7 +159,11 @@ export const DeprovisioningStatusView = ({
         <div className={errorCard()} role="alert">
           <div className={errorHeadingRow()}>
             <Icon name={ICONS.WARNING} className={errorIcon()} />
-            <Heading level={2} size="cardTitle" className={errorHeadline()}>
+            <Heading
+              level={headingLevel}
+              size="cardTitle"
+              className={errorHeadline()}
+            >
               {t(`errorKind.${errorKind}.headline`)}
             </Heading>
           </div>

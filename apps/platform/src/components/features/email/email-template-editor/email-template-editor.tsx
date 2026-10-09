@@ -68,7 +68,6 @@ export const EmailTemplateEditor = ({
       <Card.Header
         title={t(`templateTypeLabel.${templateType}`)}
         supportingText={t(`templateTypeDescription.${templateType}`)}
-        headingLevel={2}
       />
       <Card.Body>
         <div className={stack()}>

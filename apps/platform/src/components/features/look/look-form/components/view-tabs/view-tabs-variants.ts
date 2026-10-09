@@ -7,7 +7,7 @@ export const viewTabsVariants = tv({
     tab: [
       'min-h-11 cursor-pointer rounded-[8px] px-[14px] py-[7px] md:min-h-0',
       'text-[13px] font-medium text-admin-muted',
-      'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-admin-brand',
+      'outline-hidden focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
       'data-[active]:bg-admin-surface data-[active]:text-admin-text data-[active]:shadow-admin',
     ],
   },

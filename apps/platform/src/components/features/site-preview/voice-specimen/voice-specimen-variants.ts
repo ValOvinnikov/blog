@@ -7,7 +7,7 @@ import { tv } from '@platform/utils/tv/tv';
 export const voiceSpecimenVariants = tv({
   slots: {
     root: [
-      'rounded-md border border-border bg-primary px-card-x py-card-y text-text shadow-card',
+      'rounded-md border border-border bg-primary px-card-x py-card-y font-read text-text shadow-card',
     ],
     page: ['flex flex-col items-center gap-5 py-6 text-center'],
     copy: ['max-w-copy mx-auto'],

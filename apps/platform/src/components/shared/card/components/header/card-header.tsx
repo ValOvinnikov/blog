@@ -18,7 +18,7 @@ export const CardHeader = ({
   title,
   supportingText,
   actions,
-  headingLevel = 3,
+  headingLevel = 2,
   className,
 }: TCardHeaderProps) => {
   const { header, headerTitleGroup, headerDescription, headerActions } =

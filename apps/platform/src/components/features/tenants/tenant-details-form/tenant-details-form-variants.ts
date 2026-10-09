@@ -11,6 +11,7 @@ export const tenantDetailsFormVariants = tv({
     ],
     fields: ['flex flex-col gap-4'],
     planControl: ['self-start'],
+    footerActions: ['ml-auto flex items-center gap-2.5'],
   },
   variants: {
     pending: {

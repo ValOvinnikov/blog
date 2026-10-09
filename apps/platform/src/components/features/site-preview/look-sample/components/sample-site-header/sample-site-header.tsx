@@ -13,7 +13,6 @@ import { sampleSiteHeaderVariants } from './sample-site-header-variants';
 export type TSampleSiteHeaderProps = {
   tenantName: string;
   logoSrc: string | undefined;
-  headingFontFamily: string;
   liveLocales: readonly TLocaleIsoCode[];
   languageSwitcherStyle: TLanguageSwitcherStyle;
 };
@@ -21,7 +20,6 @@ export type TSampleSiteHeaderProps = {
 export const SampleSiteHeader = ({
   tenantName,
   logoSrc,
-  headingFontFamily,
   liveLocales,
   languageSwitcherStyle,
 }: TSampleSiteHeaderProps) => {
@@ -32,9 +30,7 @@ export const SampleSiteHeader = ({
     <header className={root()}>
       <div className={brand()}>
         <BrandMark size={SIZE.SM} title={tenantName} src={logoSrc} />
-        <span className={brandName()} style={{ fontFamily: headingFontFamily }}>
-          {tenantName}
-        </span>
+        <span className={brandName()}>{tenantName}</span>
       </div>
       <div className={nav()}>
         <NavLink href="#" isActive={true}>

@@ -37,7 +37,6 @@ export const LookCard = ({
         }
         supportingText={description}
         actions={actions}
-        headingLevel={2}
       />
       <Card.Body className={body()}>{children}</Card.Body>
     </Card>

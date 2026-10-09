@@ -21,6 +21,19 @@
     "heading": "Su espacio de trabajo aún no está listo",
     "description": "Esto puede ocurrir mientras se configura un espacio de trabajo o si algo ha fallado durante el proceso. Vuelva a cargar la página en unos minutos o, si el problema persiste, contacte con quien le invitó."
   },
+  "notFoundPage": {
+    "heading": "Página no encontrada",
+    "description": "Esta página no existe o no tienes acceso a ella.",
+    "backLink": "Volver al inicio"
+  },
+  "errorPage": {
+    "heading": "Algo salió mal",
+    "description": "No se pudo cargar esta página. Inténtalo de nuevo y, si sigue ocurriendo, vuelve en unos minutos.",
+    "retry": "Reintentar"
+  },
+  "pageSkeleton": {
+    "label": "Cargando la página…"
+  },
   "sidebar": {
     "brandName": "Valstack",
     "brandTagline": "admin",
@@ -752,7 +765,8 @@
   "archivedTenantsToggle": {
     "ariaLabel": "Visibilidad de clientes",
     "activeOption": "Activos",
-    "allOption": "Todos"
+    "allOption": "Todos",
+    "loading": "Cargando clientes…"
   },
   "deprovisionTenantControl": {
     "cardTitle": "Desaprovisionar este cliente",

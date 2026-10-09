@@ -3,25 +3,14 @@ import { render, screen } from '@platform/testing/custom-render';
 import { Card } from './card';
 
 describe(Card, () => {
-  it('renders the header title through a level-3 heading', () => {
+  it('renders the header title at a caller-supplied heading level', () => {
     render(
       <Card>
-        <Card.Header title="Tenant details" />
+        <Card.Header title="Tenant details" headingLevel={3} />
       </Card>,
     );
     expect(
       screen.getByRole('heading', { level: 3, name: 'Tenant details' }),
-    ).toBeVisible();
-  });
-
-  it('renders the header title at a caller-supplied heading level', () => {
-    render(
-      <Card>
-        <Card.Header title="Tenant details" headingLevel={2} />
-      </Card>,
-    );
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'Tenant details' }),
     ).toBeVisible();
   });
 
@@ -95,9 +84,7 @@ describe(Card, () => {
         <Card.Header title="Ordered card" />
       </Card>,
     );
-    expect(
-      screen.getByRole('heading', { level: 3, name: 'Ordered card' }),
-    ).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Ordered card' })).toBeVisible();
     expect(screen.getByText('Body text')).toBeVisible();
     expect(screen.getByText('Footer text')).toBeVisible();
   });

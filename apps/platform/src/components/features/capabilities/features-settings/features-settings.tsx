@@ -105,7 +105,7 @@ export const FeaturesSettings = ({
       }}
     >
       <Card>
-        <Card.Header title={t('capabilitiesHeading')} headingLevel={2} />
+        <Card.Header title={t('capabilitiesHeading')} />
         <Card.Body>
           {CAPABILITY_TOGGLES.map(({ capability, field, isComingSoon }) => {
             const isLocked = !entitledCapabilities.includes(capability);

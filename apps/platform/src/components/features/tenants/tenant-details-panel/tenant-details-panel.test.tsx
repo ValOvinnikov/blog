@@ -1,6 +1,9 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { TENANT_PLAN, TENANT_PROVISIONING_STEP } from '@blog/db';
+import { GuardedLink } from '@platform/components/shared/guarded-link';
 import { ToastProvider } from '@platform/context/toast-provider';
+import { UnsavedChangesProvider } from '@platform/context/unsaved-changes-provider';
+import { useRouter as useGuardRouter } from '@platform/i18n/base-navigation';
 import messages from '@platform/i18n/messages/en.json';
 import {
   renderWithIntl,
@@ -54,6 +57,8 @@ const PanelWithOutsideControl = (props: TTenantDetailsPanelProps) => {
 const { updateTenantDetailsActionMock } = vi.hoisted(() => ({
   updateTenantDetailsActionMock: vi.fn(),
 }));
+
+vi.mock('@platform/i18n/base-navigation');
 
 vi.mock('@platform/server/tenants/update-tenant-details-action', () => ({
   updateTenantDetailsAction: updateTenantDetailsActionMock,
@@ -1146,6 +1151,95 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       );
 
       expect(nameInput).toHaveFocus();
+    });
+  });
+
+  describe('leaving with unsaved edits', () => {
+    const push = vi.mocked(vi.mocked(useGuardRouter)().push);
+
+    const renderGuardedPanel = () =>
+      render(
+        <UnsavedChangesProvider>
+          <TenantDetailsPanel
+            tenant={makeTenant({ name: 'Acme Inc.' })}
+            fieldLocks={NO_LOCKS}
+            ownerEmail="owner@example.com"
+          />
+          <GuardedLink href="/tenants">Tenants</GuardedLink>
+        </UnsavedChangesProvider>,
+      );
+
+    beforeEach(() => {
+      push.mockReset();
+    });
+
+    it('navigates without asking when nothing is edited', async () => {
+      renderGuardedPanel();
+
+      await user.click(screen.getByRole('link', { name: 'Tenants' }));
+
+      expect(push).toHaveBeenCalledWith('/tenants');
+      expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+    });
+
+    it('asks first, then restores the saved values on Discard and leave', async () => {
+      renderGuardedPanel();
+      const nameInput = screen.getByRole('textbox', { name: 'Name' });
+      await user.clear(nameInput);
+      await user.type(nameInput, 'Acme Ltd');
+
+      await user.click(screen.getByRole('link', { name: 'Tenants' }));
+
+      expect(
+        screen.getByRole('alertdialog', { name: 'Leave without saving?' }),
+      ).toHaveAccessibleDescription(
+        'You have 1 unsaved change on Tenant details.',
+      );
+      expect(push).not.toHaveBeenCalled();
+
+      await user.click(
+        screen.getByRole('button', { name: 'Discard and leave' }),
+      );
+
+      expect(push).toHaveBeenCalledWith('/tenants');
+      expect(nameInput).toHaveValue('Acme Inc.');
+    });
+
+    it('saves the edits before leaving on Save and leave', async () => {
+      updateTenantDetailsActionMock.mockResolvedValue({ ok: true });
+      renderGuardedPanel();
+      const nameInput = screen.getByRole('textbox', { name: 'Name' });
+      await user.clear(nameInput);
+      await user.type(nameInput, 'Acme Ltd');
+
+      await user.click(screen.getByRole('link', { name: 'Tenants' }));
+      await user.click(screen.getByRole('button', { name: 'Save and leave' }));
+
+      await waitFor(() => expect(push).toHaveBeenCalledWith('/tenants'));
+      expect(updateTenantDetailsActionMock).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ name: 'Acme Ltd' }),
+      );
+    });
+
+    it('stays on the page with the save error shown when Save and leave fails', async () => {
+      updateTenantDetailsActionMock.mockResolvedValue({
+        ok: false,
+        error: "Couldn't save — try again.",
+      });
+      renderGuardedPanel();
+      const nameInput = screen.getByRole('textbox', { name: 'Name' });
+      await user.clear(nameInput);
+      await user.type(nameInput, 'Acme Ltd');
+
+      await user.click(screen.getByRole('link', { name: 'Tenants' }));
+      await user.click(screen.getByRole('button', { name: 'Save and leave' }));
+
+      expect(
+        await screen.findByText("Couldn't save — try again."),
+      ).toBeVisible();
+      expect(push).not.toHaveBeenCalled();
+      expect(nameInput).toHaveValue('Acme Ltd');
     });
   });
 });

@@ -3,7 +3,7 @@ import { tv } from '@platform/utils/tv/tv';
 
 export const presetPickerVariants = tv({
   slots: {
-    root: ['grid grid-cols-1 gap-3 sm:grid-cols-2'],
+    root: ['grid grid-cols-1 gap-3 @sm:grid-cols-2'],
     card: [
       'relative cursor-pointer rounded-xl border-[1.5px] border-admin-line bg-admin-surface p-[14px]',
       'outline-hidden',

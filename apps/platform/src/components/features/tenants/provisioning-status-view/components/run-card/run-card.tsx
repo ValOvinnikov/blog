@@ -23,11 +23,7 @@ export const RunCard = ({ run, actions }: TRunCardProps) => {
 
   return (
     <Card>
-      <Card.Header
-        title={t('runCardTitle')}
-        headingLevel={2}
-        actions={actions}
-      />
+      <Card.Header title={t('runCardTitle')} actions={actions} />
       <Card.Body>
         <DetailList>
           <DetailList.Row label={t('runStartedLabel')}>

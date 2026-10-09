@@ -44,7 +44,7 @@ export const EmailPreview = ({
     <PreviewFrame
       ariaLabel={t('heading')}
       isNarrow={width === 'mobile'}
-      controls={
+      widthControl={
         <SegmentedControl
           options={[
             { value: 'desktop', label: t('desktop') },
