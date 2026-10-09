@@ -6,7 +6,7 @@ export const sampleSiteHeaderVariants = tv({
       'flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3',
     ],
     brand: ['flex items-center gap-2'],
-    brandName: ['text-base font-semibold text-text'],
+    brandName: ['font-display text-base font-semibold text-text'],
     nav: ['flex items-center gap-4'],
   },
 });
