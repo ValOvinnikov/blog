@@ -9,7 +9,6 @@ import {
 import type { TTenantEmailBrand } from '@blog/email/html';
 import { EmailPreview } from '@platform/components/features/email/email-preview';
 import { EmailSenderEditor } from '@platform/components/features/email/email-sender-editor';
-import { ItemList } from '@platform/components/features/email/email-settings/components/item-list';
 import { ItemSelect } from '@platform/components/features/email/email-settings/components/item-select';
 import { EmailTemplateEditor } from '@platform/components/features/email/email-template-editor';
 import { LanguagePicker } from '@platform/components/shared/language-picker';
@@ -104,7 +103,7 @@ export const EmailSettings = ({
     },
   });
 
-  const { layout, main, editPane, previewPane } = emailSettingsVariants({
+  const { root, editPane, previewPane } = emailSettingsVariants({
     view,
   });
 
@@ -144,6 +143,7 @@ export const EmailSettings = ({
         item === EMAIL_SENDER_ITEM
           ? t('senderItemLabel')
           : tTemplate(`templateTypeLabel.${item}`),
+      group: item === EMAIL_SENDER_ITEM ? undefined : t('templateGroupLabel'),
       description:
         item === EMAIL_SENDER_ITEM
           ? t('senderItemDescription')
@@ -219,17 +219,25 @@ export const EmailSettings = ({
       errorTitle={t('alertError')}
       isWide={true}
       headerActions={
-        liveLocales.length > 1 && (
-          <LanguagePicker
-            locales={liveLocales}
-            defaultLocale={defaultLocale}
-            value={selectedLocale}
-            onChange={setSelectedLocale}
-            countCustomised={(locale) =>
-              countCustomisedTemplates(draft, locale)
-            }
+        <>
+          <ItemSelect
+            items={items}
+            selected={selectedItem}
+            onSelect={selectItem}
+            label={t('editingLabel')}
           />
-        )
+          {liveLocales.length > 1 && (
+            <LanguagePicker
+              locales={liveLocales}
+              defaultLocale={defaultLocale}
+              value={selectedLocale}
+              onChange={setSelectedLocale}
+              countCustomised={(locale) =>
+                countCustomisedTemplates(draft, locale)
+              }
+            />
+          )}
+        </>
       }
       draft={{
         tenantId,
@@ -241,89 +249,75 @@ export const EmailSettings = ({
         onRestore: restoreDraft,
       }}
     >
-      <div className={layout()}>
-        <ItemList
-          items={items}
-          selected={selectedItem}
-          onSelect={selectItem}
-          ariaLabel={t('itemsAriaLabel')}
-        />
-        <div className={main()}>
-          <ItemSelect
-            items={items}
-            selected={selectedItem}
-            onSelect={selectItem}
-            label={t('editingLabel')}
-          />
-          <ViewTabs {...tabsProps} />
-          <div {...panelProps('edit')} className={editPane()}>
-            {selectedItem === EMAIL_SENDER_ITEM ? (
-              <EmailSenderEditor
-                sender={draft.sender}
-                logo={draft.senderLogo}
-                onSenderChange={(sender) => {
-                  setSenderNameError(undefined);
-                  setDraft((prev) => ({ ...prev, sender }));
-                }}
-                onLogoStage={(logo) =>
-                  setDraft((prev) => withLogo(prev, EMAIL_SENDER_ITEM, logo))
-                }
-                senderNameError={senderNameError}
-                isDisabled={isDisabled}
-                archivedNoticeId={archivedDescribedBy}
-              />
-            ) : (
-              <EmailTemplateEditor
-                key={`${selectedItem}-${selectedLocale}-${discardCount}`}
-                templateType={selectedItem}
-                languageName={tLanguage(selectedLocale)}
-                copy={{
-                  draft: draft.copies[selectedItem][selectedLocale],
-                  saved: saved.copies[selectedItem][selectedLocale],
-                  fallback: resolveFallbackCopy(
-                    draft,
-                    selectedItem,
-                    selectedLocale,
-                    defaultLocale,
-                  ),
-                }}
-                logo={draft.templateLogos[selectedItem]}
-                onCopyChange={(copy) =>
-                  setDraft((prev) =>
-                    withCopy(
-                      prev,
-                      { templateType: selectedItem, locale: selectedLocale },
-                      copy,
-                    ),
-                  )
-                }
-                onLogoStage={(logo) =>
-                  setDraft((prev) => withLogo(prev, selectedItem, logo))
-                }
-                isDisabled={isDisabled}
-                archivedNoticeId={archivedDescribedBy}
-              />
-            )}
-          </div>
-          <div {...panelProps('preview')} className={previewPane()}>
-            <EmailPreview
-              html={previewHtml}
-              from={draft.sender.senderName.trim() || undefined}
-              replyTo={draft.sender.replyToAddress.trim() || undefined}
-              subject={previewSubject}
-              onSendTest={() =>
-                sendTest({
-                  templateType: previewTemplate,
-                  subject: previewSubject,
-                  body: previewBody,
-                  sender: draft.sender,
-                })
+      <div className={root()}>
+        <ViewTabs {...tabsProps} />
+        <div {...panelProps('edit')} className={editPane()}>
+          {selectedItem === EMAIL_SENDER_ITEM ? (
+            <EmailSenderEditor
+              sender={draft.sender}
+              logo={draft.senderLogo}
+              onSenderChange={(sender) => {
+                setSenderNameError(undefined);
+                setDraft((prev) => ({ ...prev, sender }));
+              }}
+              onLogoStage={(logo) =>
+                setDraft((prev) => withLogo(prev, EMAIL_SENDER_ITEM, logo))
               }
-              isSendingTest={isSending}
-              isSendTestDisabled={isArchived}
-              hasUnsavedLogo={previewLogo.file !== undefined}
+              senderNameError={senderNameError}
+              isDisabled={isDisabled}
+              archivedNoticeId={archivedDescribedBy}
             />
-          </div>
+          ) : (
+            <EmailTemplateEditor
+              key={`${selectedItem}-${selectedLocale}-${discardCount}`}
+              templateType={selectedItem}
+              languageName={tLanguage(selectedLocale)}
+              copy={{
+                draft: draft.copies[selectedItem][selectedLocale],
+                saved: saved.copies[selectedItem][selectedLocale],
+                fallback: resolveFallbackCopy(
+                  draft,
+                  selectedItem,
+                  selectedLocale,
+                  defaultLocale,
+                ),
+              }}
+              logo={draft.templateLogos[selectedItem]}
+              onCopyChange={(copy) =>
+                setDraft((prev) =>
+                  withCopy(
+                    prev,
+                    { templateType: selectedItem, locale: selectedLocale },
+                    copy,
+                  ),
+                )
+              }
+              onLogoStage={(logo) =>
+                setDraft((prev) => withLogo(prev, selectedItem, logo))
+              }
+              isDisabled={isDisabled}
+              archivedNoticeId={archivedDescribedBy}
+            />
+          )}
+        </div>
+        <div {...panelProps('preview')} className={previewPane()}>
+          <EmailPreview
+            html={previewHtml}
+            from={draft.sender.senderName.trim() || undefined}
+            replyTo={draft.sender.replyToAddress.trim() || undefined}
+            subject={previewSubject}
+            onSendTest={() =>
+              sendTest({
+                templateType: previewTemplate,
+                subject: previewSubject,
+                body: previewBody,
+                sender: draft.sender,
+              })
+            }
+            isSendingTest={isSending}
+            isSendTestDisabled={isArchived}
+            hasUnsavedLogo={previewLogo.file !== undefined}
+          />
         </div>
       </div>
     </SettingsFormShell>

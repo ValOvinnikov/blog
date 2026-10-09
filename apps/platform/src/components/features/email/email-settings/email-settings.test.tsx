@@ -78,8 +78,17 @@ const setup = customRender(EmailSettings, {
   brandName: 'Acme Co',
 });
 
-const openSignInTemplate = (user: UserEvent) =>
-  user.click(screen.getByRole('button', { name: /^Sign-in link/ }));
+const picker = () => screen.getByRole('combobox', { name: 'Editing' });
+
+const openPicker = async (user: UserEvent) => {
+  await user.click(picker());
+  return screen.findByRole('listbox');
+};
+
+const openSignInTemplate = async (user: UserEvent) => {
+  const list = await openPicker(user);
+  await user.click(within(list).getByRole('option', { name: /^Sign-in link/ }));
+};
 
 const chooseLanguage = (user: UserEvent, name: string) =>
   user.click(screen.getByRole('button', { name }));
@@ -110,16 +119,32 @@ describe(`<${EmailSettings.name}/>`, () => {
     window.localStorage.clear();
   });
 
-  it('opens on Sender & footer, with each template marked for the default language', () => {
+  it('opens on Sender & footer, with each template marked for the default language', async () => {
     setup();
 
     expect(screen.getByLabelText('Sender name')).toBeVisible();
+    expect(picker()).toHaveTextContent(/^Sender & footer/);
+
+    const list = await openPicker(user);
+
     expect(
-      screen.getByRole('button', { name: /^Sign-in link.*Customised$/ }),
+      within(list).getByRole('option', { name: /^Sign-in link.*Customised$/ }),
     ).toBeVisible();
     expect(
-      screen.getByRole('button', { name: /^Team invite.*Default$/ }),
+      within(list).getByRole('option', { name: /^Team invite.*Default$/ }),
     ).toBeVisible();
+  });
+
+  it('opens the email chosen from the picker in the editor', async () => {
+    setup();
+
+    await openSignInTemplate(user);
+
+    expect(screen.getByLabelText('Subject (English)')).toHaveValue(
+      'Sign in to Acme',
+    );
+    expect(screen.queryByLabelText('Sender name')).not.toBeInTheDocument();
+    expect(picker()).toHaveTextContent('Sign-in linkTemplate · Customised');
   });
 
   it('switches between the Edit and Preview tabs', async () => {
@@ -186,9 +211,7 @@ describe(`<${EmailSettings.name}/>`, () => {
       expect(screen.getByLabelText('Subject (French)')).toHaveValue(
         'Connexion',
       );
-      expect(
-        screen.getByRole('button', { name: /^Sign-in link.*Unsaved$/ }),
-      ).toBeVisible();
+      expect(picker()).toHaveTextContent(/^Sign-in link.*Unsaved$/);
     });
 
     it('saves only the language that changed', async () => {
@@ -276,11 +299,9 @@ describe(`<${EmailSettings.name}/>`, () => {
     });
 
     it('is not uploaded when picked', async () => {
-      expect(
-        await screen.findByRole('button', {
-          name: /^Sender & footer.*Unsaved$/,
-        }),
-      ).toBeVisible();
+      await waitFor(() =>
+        expect(picker()).toHaveTextContent(/^Sender & footer.*Unsaved$/),
+      );
       expect(uploadEmailLogoActionMock).not.toHaveBeenCalled();
     });
 
@@ -331,7 +352,9 @@ describe(`<${EmailSettings.name}/>`, () => {
 
     expect(screen.getByLabelText('Subject (French)')).toHaveValue('Connexion');
     expect(
-      screen.getByRole('button', { name: /^Sender & footer.*Default$/ }),
+      within(await openPicker(user)).getByRole('option', {
+        name: /^Sender & footer.*Default$/,
+      }),
     ).toBeVisible();
   });
 

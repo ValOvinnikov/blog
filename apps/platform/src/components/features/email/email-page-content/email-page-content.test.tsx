@@ -141,9 +141,11 @@ describe(`<${EmailPageContent.name}/>`, () => {
   it("shows each template's authored copy in the tenant's default language", async () => {
     await setup();
 
-    await userEvent
-      .setup()
-      .click(screen.getByRole('button', { name: /^Team invite/ }));
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('combobox', { name: 'Editing' }));
+    await user.click(
+      await screen.findByRole('option', { name: /^Team invite/ }),
+    );
 
     expect(screen.getByDisplayValue("You're invited to Acme Co")).toBeVisible();
   });

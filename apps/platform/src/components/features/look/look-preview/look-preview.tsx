@@ -75,7 +75,9 @@ export const LookPreview = ({
       ariaLabel={t('livePreviewHeading')}
       isNarrow={width === 'mobile'}
       widthControl={
+        // Below 27.5rem the stage leaves the frame no wider than its 390px mobile width.
         <SegmentedControl
+          className="@max-[27.5rem]:hidden"
           ariaLabel={t('previewWidthAriaLabel')}
           options={widthOptions}
           value={width}

@@ -389,8 +389,8 @@
     "alertError": "Niet alle wijzigingen zijn opgeslagen — wat nog als ‘Niet opgeslagen’ is gemarkeerd, is niet opgeslagen. Probeer het opnieuw.",
     "senderItemLabel": "Afzender en voettekst",
     "senderItemDescription": "Naam, antwoordadres, postadres en logo, in elke taal hetzelfde.",
-    "itemsAriaLabel": "E-mails om te bewerken",
-    "editingLabel": "Bewerken"
+    "editingLabel": "Bewerken",
+    "templateGroupLabel": "Sjabloon"
   },
   "fieldStatus": {
     "default": "Standaard",
