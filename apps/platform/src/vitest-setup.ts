@@ -1,18 +1,22 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
+import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config';
 import { createTranslator } from 'next-intl';
 
 import '@testing-library/jest-dom/vitest';
 
 import messages from './i18n/messages/en.json';
 
-type TGetTranslationsArg = string | { namespace?: string } | undefined;
+type TGetTranslationsArg =
+  string | { locale?: TLocaleIsoCode; namespace?: string } | undefined;
 type TTranslationValues = Record<string, string | number>;
 
 const toNamespace = (arg: TGetTranslationsArg): string | undefined =>
   typeof arg === 'string' ? arg : arg?.namespace;
 
 // createTranslator's const-generic namespace rejects the runtime string one.
-type TLooseTranslator = (key: string, values?: TTranslationValues) => string;
+type TLooseTranslator = ((
+  key: string,
+  values?: TTranslationValues,
+) => string) & { raw: (key: string) => unknown };
 const createLooseTranslator = createTranslator as unknown as (config: {
   locale: string;
   messages: typeof messages;
@@ -25,7 +29,11 @@ vi.mock('next-intl/server', () => ({
   getTranslations: vi.fn(async (arg?: TGetTranslationsArg) =>
     createLooseTranslator({
       locale: 'en',
-      messages,
+      messages:
+        typeof arg === 'object' && arg.locale
+          ? (await import(`./i18n/messages/${arg.locale.toLowerCase()}.json`))
+              .default
+          : messages,
       namespace: toNamespace(arg),
     }),
   ),

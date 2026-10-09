@@ -1,5 +1,8 @@
 import { SITE_MESSAGES_BY_LOCALE, type TVoicePortableText } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { VoiceListSamplesProvider } from '@platform/components/features/voice/voice-list-samples-provider';
+import de from '@platform/i18n/messages/de.json';
+import en from '@platform/i18n/messages/en.json';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
@@ -7,7 +10,7 @@ import { defaultLookFormValues } from '@platform/utils/default-look-values/defau
 import { buildVoiceDraft } from '@platform/utils/voice-draft/voice-draft';
 import userEvent from '@testing-library/user-event';
 
-import { VoiceSettings } from './voice-settings';
+import { VoiceSettings, type TVoiceSettingsProps } from './voice-settings';
 
 mockRouterRefresh();
 
@@ -36,7 +39,18 @@ const storedOverrides = {
   [DE]: { localeErrorDescription: richText('Hoppla', 'de-err') },
 };
 
-const setup = customRender(VoiceSettings, {
+const VoiceSettingsWithListSamples = (props: TVoiceSettingsProps) => (
+  <VoiceListSamplesProvider
+    samplesByLocale={{
+      [EN]: en.voiceSpecimen.lists,
+      [DE]: de.voiceSpecimen.lists,
+    }}
+  >
+    <VoiceSettings {...props} />
+  </VoiceListSamplesProvider>
+);
+
+const setup = customRender(VoiceSettingsWithListSamples, {
   tenantId: 'tenant-1',
   initialDraft: buildVoiceDraft({}, [EN]),
   defaultLocale: EN,
@@ -45,9 +59,7 @@ const setup = customRender(VoiceSettings, {
   saveAction: vi.fn(),
 });
 
-const setupBilingual = (
-  overrides: Partial<Parameters<typeof VoiceSettings>[0]> = {},
-) =>
+const setupBilingual = (overrides: Partial<TVoiceSettingsProps> = {}) =>
   setup({
     initialDraft: buildVoiceDraft(storedOverrides, [EN, DE]),
     liveLocales: [EN, DE],

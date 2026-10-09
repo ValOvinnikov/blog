@@ -1,5 +1,7 @@
 import { SITE_MESSAGES_BY_LOCALE, VOICE_SURFACE } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import de from '@platform/i18n/messages/de.json';
+import en from '@platform/i18n/messages/en.json';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import {
   buildVoiceDraft,
@@ -41,6 +43,7 @@ describe(VoiceSpecimen, () => {
         surface={VOICE_SURFACE.NOT_FOUND}
         locale={EN}
         values={valuesFor(EN)}
+        listSamples={en.voiceSpecimen.lists}
         theme={THEME}
       />,
     );
@@ -60,6 +63,7 @@ describe(VoiceSpecimen, () => {
         surface={VOICE_SURFACE.NOT_FOUND}
         locale={EN}
         values={valuesFor(EN, { notFoundHeading: 'Lost at sea' })}
+        listSamples={en.voiceSpecimen.lists}
         theme={THEME}
       />,
     );
@@ -76,6 +80,7 @@ describe(VoiceSpecimen, () => {
         surface={VOICE_SURFACE.ERROR}
         locale={DE}
         values={valuesFor(DE)}
+        listSamples={de.voiceSpecimen.lists}
         theme={THEME}
       />,
     );
@@ -96,6 +101,7 @@ describe(VoiceSpecimen, () => {
         surface={VOICE_SURFACE.ARCHIVE}
         locale={EN}
         values={valuesFor(EN)}
+        listSamples={en.voiceSpecimen.lists}
         openListFieldId="topicEmpty"
         theme={THEME}
       />,
@@ -113,6 +119,7 @@ describe(VoiceSpecimen, () => {
         surface={VOICE_SURFACE.BOOKMARKS}
         locale={EN}
         values={valuesFor(EN)}
+        listSamples={en.voiceSpecimen.lists}
         theme={THEME}
       />,
     );
@@ -129,6 +136,7 @@ describe(VoiceSpecimen, () => {
         surface={VOICE_SURFACE.NOT_FOUND}
         locale={EN}
         values={valuesFor(EN)}
+        listSamples={en.voiceSpecimen.lists}
         focusedFieldId="notFoundHeading"
         theme={THEME}
       />,
@@ -149,6 +157,7 @@ describe(VoiceSpecimen, () => {
         surface={VOICE_SURFACE.NOT_FOUND}
         locale={EN}
         values={valuesFor(EN)}
+        listSamples={en.voiceSpecimen.lists}
         theme={THEME}
       />,
     );

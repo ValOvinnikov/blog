@@ -1,1 +1,5 @@
-export { VoiceSpecimen, type TVoiceSpecimenTheme } from './voice-specimen';
+export {
+  VoiceSpecimen,
+  type TVoiceListSamples,
+  type TVoiceSpecimenTheme,
+} from './voice-specimen';
