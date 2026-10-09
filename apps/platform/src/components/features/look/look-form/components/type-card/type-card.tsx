@@ -34,9 +34,8 @@ export const TypeCard = ({
       description={t('typeDescription')}
       hasUnsavedChanges={hasUnsavedChanges}
     >
-      <LookField label={headingFontLabel}>
+      <LookField label={headingFontLabel} isGroup={true}>
         <FontPicker
-          ariaLabel={headingFontLabel}
           value={headingFont}
           onChange={(font) => onFieldChange('headingFont', font)}
           isDisabled={isArchived}
@@ -44,9 +43,8 @@ export const TypeCard = ({
         />
       </LookField>
 
-      <LookField label={bodyFontLabel}>
+      <LookField label={bodyFontLabel} isGroup={true}>
         <FontPicker
-          ariaLabel={bodyFontLabel}
           value={bodyFont}
           onChange={(font) => onFieldChange('bodyFont', font)}
           isDisabled={isArchived}

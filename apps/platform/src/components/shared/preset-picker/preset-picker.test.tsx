@@ -26,6 +26,14 @@ describe(PresetPicker, () => {
     );
   });
 
+  it('names each preset by its name alone and describes it with its description', () => {
+    render(<PresetPicker value={PRESET_ID.EDITORIAL} onChange={vi.fn()} />);
+
+    expect(
+      screen.getByRole('radio', { name: 'Editorial' }),
+    ).toHaveAccessibleDescription('Serif, warm and magazine-like.');
+  });
+
   it('reports the newly picked preset on click', async () => {
     const handleChange = vi.fn();
     render(<PresetPicker value={PRESET_ID.CONSOLE} onChange={handleChange} />);
