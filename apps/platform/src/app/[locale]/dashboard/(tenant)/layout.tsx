@@ -11,7 +11,7 @@ import {
   type TNavTranslator,
 } from '@platform/utils/nav-sections/nav-sections';
 import { planPageAccess } from '@platform/utils/plan-page-access/plan-page-access';
-import { adminRoutes } from '@platform/utils/routes/routes';
+import { toTenantSwitcherItems } from '@platform/utils/tenant-switcher-items/tenant-switcher-items';
 import { getTranslations } from 'next-intl/server';
 
 type TProps = {
@@ -51,11 +51,8 @@ export default async function DashboardTenantLayout({ children }: TProps) {
       switcher={
         tenants.length > 1 ? (
           <TenantSwitcher
-            tenants={tenants}
+            tenants={toTenantSwitcherItems(tenants)}
             activeTenantId={tenant.id}
-            hrefFor={(candidate) =>
-              adminRoutes.dashboardSelectTenantHref(candidate.id)
-            }
           />
         ) : undefined
       }
