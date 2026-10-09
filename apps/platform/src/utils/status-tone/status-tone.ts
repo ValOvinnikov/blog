@@ -9,8 +9,9 @@ import {
   type TTenantProvisioningStepStatus,
 } from '@blog/db/constants';
 import type { TDomainVerificationStatus } from '@platform/server/provisioning/get-domain-verification-status';
+import type { TEmailItemStatus } from '@platform/utils/email-draft/email-draft';
 
-type TBadgeTone = 'ok' | 'warn' | 'bad' | 'neutral';
+type TBadgeTone = 'ok' | 'warn' | 'bad' | 'neutral' | 'brand';
 
 // Tone is a design-system concern, not display text — the visible label for
 // each status/plan lives in `i18n/messages/en.json` under `tenantsTable`,
@@ -58,6 +59,12 @@ const SANITY_VALIDATION_MARKER_TONE: Record<
   info: 'neutral',
 };
 
+const FIELD_STATUS_TONE: Record<TEmailItemStatus, TBadgeTone> = {
+  default: 'neutral',
+  customised: 'brand',
+  unsaved: 'warn',
+};
+
 export const tenantStatusTone = (status: TTenantStatus) =>
   TENANT_STATUS_TONE[status];
 
@@ -74,3 +81,6 @@ export const domainVerificationTone = (status: TDomainVerificationStatus) =>
 export const sanityValidationMarkerTone = (
   level: TSanityValidationMarkerLevel,
 ) => SANITY_VALIDATION_MARKER_TONE[level];
+
+export const fieldStatusTone = (status: TEmailItemStatus) =>
+  FIELD_STATUS_TONE[status];

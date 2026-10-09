@@ -133,7 +133,7 @@ describe(`<${LookForm.name}/>`, () => {
     await user.keyboard('{ArrowRight}');
 
     expect(
-      screen.getByRole('heading', { name: 'Colour Unsaved changes' }),
+      screen.getByRole('heading', { name: 'Colour Unsaved' }),
     ).toBeVisible();
     expect(screen.getByRole('heading', { name: 'Type' })).toBeVisible();
   });
@@ -572,7 +572,7 @@ describe(`<${LookForm.name}/>`, () => {
       await pickLogo(user);
 
       expect(
-        screen.getByRole('heading', { name: 'Brand Unsaved changes' }),
+        screen.getByRole('heading', { name: 'Brand Unsaved' }),
       ).toBeVisible();
       expect(screen.getByAltText('Current logo')).toHaveAttribute(
         'src',

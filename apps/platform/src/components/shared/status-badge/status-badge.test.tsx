@@ -18,7 +18,7 @@ describe(StatusBadge, () => {
   });
 
   it('renders every tone without throwing', () => {
-    const tones = ['ok', 'warn', 'bad', 'neutral', 'plan'] as const;
+    const tones = ['ok', 'warn', 'bad', 'neutral', 'brand', 'plan'] as const;
     for (const tone of tones) {
       expect(() =>
         render(<StatusBadge tone={tone}>Label</StatusBadge>),

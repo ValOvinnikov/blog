@@ -1,15 +1,18 @@
 'use client';
 
-import { CONTROL_MODE, SIZE, type TEmailTemplateType } from '@blog/config';
+import { CONTROL_MODE, type TEmailTemplateType } from '@blog/config';
 import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
 import { EmailLogoField } from '@platform/components/features/email/email-logo-field';
-import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
+import { FieldStatus } from '@platform/components/shared/field-status';
 import { FormField } from '@platform/components/shared/form-field';
-import { FormTextInput } from '@platform/components/shared/form-text-input';
 import { PortableTextEditor } from '@platform/components/shared/portable-text-editor';
-import { StatusBadge } from '@platform/components/shared/status-badge';
-import type { TEmailCopyDraft } from '@platform/utils/email-draft/email-draft';
+import { TextInput } from '@platform/components/shared/text-input';
+import {
+  isSameBody,
+  type TEmailCopyDraft,
+  type TEmailCopyEdit,
+} from '@platform/utils/email-draft/email-draft';
 import { isBlankPortableTextValue } from '@platform/utils/portable-text-schema/portable-text-schema';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 import { useTranslations } from 'next-intl';
@@ -20,8 +23,7 @@ import { emailTemplateEditorVariants } from './email-template-editor-variants';
 export type TEmailTemplateEditorProps = {
   templateType: TEmailTemplateType;
   languageName: string;
-  copy: TEmailCopyDraft;
-  fallback: { subject: string; body: TEmailTemplateBlock[] };
+  copy: TEmailCopyEdit;
   logo: TStagedImage;
   onCopyChange: (copy: TEmailCopyDraft) => void;
   onLogoStage: (logo: TStagedImage) => void;
@@ -29,14 +31,10 @@ export type TEmailTemplateEditorProps = {
   archivedNoticeId?: string;
 };
 
-const isSameBody = (a: TEmailTemplateBlock[], b: TEmailTemplateBlock[]) =>
-  JSON.stringify(a) === JSON.stringify(b);
-
 export const EmailTemplateEditor = ({
   templateType,
   languageName,
   copy,
-  fallback,
   logo,
   onCopyChange,
   onLogoStage,
@@ -44,46 +42,26 @@ export const EmailTemplateEditor = ({
   archivedNoticeId,
 }: TEmailTemplateEditorProps) => {
   const t = useTranslations('emailTemplateEditor');
-  const tStatus = useTranslations('emailItemStatus');
   const [bodyRevision, setBodyRevision] = useState(0);
   const bodyHintId = useId();
-  const { stack, fieldStatus } = emailTemplateEditorVariants();
-
-  const isSubjectCustomised = copy.subject !== '';
-  const isBodyCustomised = copy.body !== null;
+  const { stack } = emailTemplateEditorVariants();
+  const { draft, saved, fallback } = copy;
 
   const handleBodyChange = (body: TEmailTemplateBlock[]) =>
     onCopyChange({
-      ...copy,
+      ...draft,
       body:
         isBlankPortableTextValue(body) || isSameBody(body, fallback.body)
           ? null
           : body,
     });
 
+  const resetSubject = () => onCopyChange({ ...draft, subject: '' });
+
   const resetBody = () => {
-    onCopyChange({ ...copy, body: null });
+    onCopyChange({ ...draft, body: null });
     setBodyRevision((revision) => revision + 1);
   };
-
-  const renderFieldStatus = (isCustomised: boolean, onReset: () => void) => (
-    <div className={fieldStatus()}>
-      <StatusBadge tone={isCustomised ? 'plan' : 'neutral'} hasDot={false}>
-        {isCustomised ? tStatus('customised') : tStatus('default')}
-      </StatusBadge>
-      {isCustomised && (
-        <Button
-          type="button"
-          size={SIZE.SM}
-          variant="secondary"
-          onClick={onReset}
-          isDisabled={isDisabled}
-        >
-          {t('useDefault')}
-        </Button>
-      )}
-    </div>
-  );
 
   return (
     <Card>
@@ -93,27 +71,40 @@ export const EmailTemplateEditor = ({
       />
       <Card.Body>
         <div className={stack()}>
-          <FormTextInput
+          <FormField
             label={t('subjectLabel', { language: languageName })}
             hint={t('subjectHint')}
-            placeholder={fallback.subject}
-            value={copy.subject}
-            onChange={(subject) => onCopyChange({ ...copy, subject })}
-            isDisabled={isDisabled}
-            aria-describedby={archivedNoticeId}
-            footer={renderFieldStatus(isSubjectCustomised, () =>
-              onCopyChange({ ...copy, subject: '' }),
-            )}
-          />
+            actions={
+              <FieldStatus
+                isCustomised={draft.subject !== ''}
+                isUnsaved={draft.subject !== saved.subject}
+                onReset={isDisabled ? undefined : resetSubject}
+              />
+            }
+          >
+            <TextInput
+              placeholder={fallback.subject}
+              value={draft.subject}
+              onChange={(subject) => onCopyChange({ ...draft, subject })}
+              isDisabled={isDisabled}
+              aria-describedby={archivedNoticeId}
+            />
+          </FormField>
           <FormField
             label={t('bodyLabel', { language: languageName })}
             hasOwnAccessibleName={true}
             hint={<span id={bodyHintId}>{t('bodyHint')}</span>}
-            footer={renderFieldStatus(isBodyCustomised, resetBody)}
+            actions={
+              <FieldStatus
+                isCustomised={draft.body !== null}
+                isUnsaved={!isSameBody(draft.body, saved.body)}
+                onReset={isDisabled ? undefined : resetBody}
+              />
+            }
           >
             <PortableTextEditor
               key={bodyRevision}
-              initialValue={copy.body ?? fallback.body}
+              initialValue={draft.body ?? fallback.body}
               onChange={handleBodyChange}
               field={{ label: t('bodyLabel', { language: languageName }) }}
               mode={isDisabled ? CONTROL_MODE.DISABLED : CONTROL_MODE.EDITABLE}

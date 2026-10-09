@@ -5,12 +5,10 @@ import {
   CONTROL_MODE,
   VOICE_FIELD_KIND,
   VOICE_PORTABLE_TEXT_SCHEMA,
-  SIZE,
   type TVoiceFieldKind,
   type TVoicePortableText,
 } from '@blog/config';
-import { VoiceFieldStatus } from '@platform/components/features/voice/voice-field-status';
-import { Button } from '@platform/components/shared/button';
+import { FieldStatus } from '@platform/components/shared/field-status';
 import { PortableTextEditor } from '@platform/components/shared/portable-text-editor';
 import { TextInput } from '@platform/components/shared/text-input';
 import { Textarea } from '@platform/components/shared/textarea';
@@ -57,7 +55,6 @@ export const VoiceField = ({
     labelGroup,
     label: labelSlot,
     hint: hintSlot,
-    actions,
     note,
     token,
     error: errorSlot,
@@ -69,7 +66,6 @@ export const VoiceField = ({
   const label = tLabels(field.id);
   const isRich = field.kind === VOICE_FIELD_KIND.RICH;
   const textValue = typeof value === 'string' ? value : '';
-  const isCustomised = isVoiceValueCustomised(value);
   const [placeholderToken] = field.placeholders;
   const richDescribedBy = [
     hintId,
@@ -101,17 +97,11 @@ export const VoiceField = ({
             {tHints(field.id)}
           </Field.Description>
         </div>
-        <div className={actions()}>
-          <VoiceFieldStatus
-            isCustomised={isCustomised}
-            isUnsaved={!isSameVoiceValue(value, savedValue)}
-          />
-          {isCustomised && !isReadOnly && (
-            <Button size={SIZE.SM} variant="secondary" onClick={reset}>
-              {t('reset')}
-            </Button>
-          )}
-        </div>
+        <FieldStatus
+          isCustomised={isVoiceValueCustomised(value)}
+          isUnsaved={!isSameVoiceValue(value, savedValue)}
+          onReset={isReadOnly ? undefined : reset}
+        />
       </div>
       {isRich ? (
         <PortableTextEditor<TVoicePortableText[number]>

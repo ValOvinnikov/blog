@@ -1,7 +1,7 @@
 import { routes, type TVoiceFieldId, type VOICE_SURFACE } from '@blog/config';
 import type { TLocaleIsoCode } from '@blog/config/constants';
-import { VoiceFieldStatus } from '@platform/components/features/voice/voice-field-status';
 import { Accordion } from '@platform/components/shared/accordion';
+import { FieldStatus } from '@platform/components/shared/field-status';
 import {
   isSameVoiceValue,
   isVoiceValueCustomised,
@@ -73,7 +73,7 @@ export const VoiceListRow = ({
                 ? voiceValueAsText(value)
                 : voiceDefaultText(locale, field)}
             </span>
-            <VoiceFieldStatus
+            <FieldStatus
               isCustomised={isCustomised}
               isUnsaved={!isSameVoiceValue(value, savedValue)}
             />
