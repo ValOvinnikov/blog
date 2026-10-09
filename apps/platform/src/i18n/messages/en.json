@@ -389,8 +389,8 @@
     "alertError": "Couldn't save every change — the ones still marked Unsaved weren't saved. Try again.",
     "senderItemLabel": "Sender & footer",
     "senderItemDescription": "Name, reply-to, address and logo, the same in every language.",
-    "itemsAriaLabel": "Emails to edit",
-    "editingLabel": "Editing"
+    "editingLabel": "Editing",
+    "templateGroupLabel": "Template"
   },
   "fieldStatus": {
     "default": "Default",

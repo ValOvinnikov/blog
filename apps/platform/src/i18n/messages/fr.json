@@ -389,8 +389,8 @@
     "alertError": "Certaines modifications n'ont pas été enregistrées — celles encore marquées « Non enregistré ». Veuillez réessayer.",
     "senderItemLabel": "Expéditeur et pied de page",
     "senderItemDescription": "Nom, adresse de réponse, adresse postale et logo, identiques dans toutes les langues.",
-    "itemsAriaLabel": "E-mails à modifier",
-    "editingLabel": "Modification"
+    "editingLabel": "Modification",
+    "templateGroupLabel": "Modèle"
   },
   "fieldStatus": {
     "default": "Par défaut",

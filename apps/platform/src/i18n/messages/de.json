@@ -389,8 +389,8 @@
     "alertError": "Nicht alle Änderungen konnten gespeichert werden — was noch als „Nicht gespeichert“ markiert ist, wurde nicht gespeichert. Bitte erneut versuchen.",
     "senderItemLabel": "Absender & Fußzeile",
     "senderItemDescription": "Name, Antwortadresse, Anschrift und Logo, in jeder Sprache gleich.",
-    "itemsAriaLabel": "Zu bearbeitende E-Mails",
-    "editingLabel": "Bearbeiten"
+    "editingLabel": "Bearbeiten",
+    "templateGroupLabel": "Vorlage"
   },
   "fieldStatus": {
     "default": "Standard",

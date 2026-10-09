@@ -10,6 +10,7 @@ const setup = customRender(ItemSelect, {
     {
       value: EMAIL_SENDER_ITEM,
       label: 'Sender',
+      group: undefined,
       description: 'Who emails come from',
       status: 'default',
       statusLabel: 'Default',
@@ -17,6 +18,7 @@ const setup = customRender(ItemSelect, {
     {
       value: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
       label: 'Sign-in link',
+      group: 'Template',
       description: 'The magic link email',
       status: 'unsaved',
       statusLabel: 'Unsaved',
@@ -38,8 +40,33 @@ describe(`<${ItemSelect.name}/>`, () => {
     setup();
 
     expect(screen.getByRole('combobox', { name: 'Editing' })).toHaveTextContent(
-      'Sender — Default',
+      'SenderDefault',
     );
+  });
+
+  it('shows the group of a selected template beside its status', () => {
+    setup({ selected: EMAIL_TEMPLATE_TYPE.MAGIC_LINK });
+
+    expect(screen.getByRole('combobox', { name: 'Editing' })).toHaveTextContent(
+      'Sign-in linkTemplate · Unsaved',
+    );
+  });
+
+  it('lists every item with its description and status, marking the selected one', async () => {
+    setup();
+
+    await user.click(screen.getByRole('combobox', { name: 'Editing' }));
+
+    expect(
+      await screen.findByRole('option', {
+        name: /^Sender.*Who emails come from.*Default$/,
+      }),
+    ).toHaveAttribute('aria-selected', 'true');
+    expect(
+      screen.getByRole('option', {
+        name: /^Sign-in link.*The magic link email.*Unsaved$/,
+      }),
+    ).toHaveAttribute('aria-selected', 'false');
   });
 
   it('selects an item by pointer', async () => {
@@ -48,7 +75,7 @@ describe(`<${ItemSelect.name}/>`, () => {
 
     await user.click(screen.getByRole('combobox', { name: 'Editing' }));
     await user.click(
-      await screen.findByRole('option', { name: 'Sign-in link — Unsaved' }),
+      await screen.findByRole('option', { name: /^Sign-in link/ }),
     );
 
     expect(onSelect).toHaveBeenCalledWith(EMAIL_TEMPLATE_TYPE.MAGIC_LINK);

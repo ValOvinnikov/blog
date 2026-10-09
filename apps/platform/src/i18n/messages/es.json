@@ -389,8 +389,8 @@
     "alertError": "No se guardaron todos los cambios: los que siguen marcados como «Sin guardar» no se guardaron. Vuelva a intentarlo.",
     "senderItemLabel": "Remitente y pie",
     "senderItemDescription": "Nombre, dirección de respuesta, dirección postal y logotipo, iguales en todos los idiomas.",
-    "itemsAriaLabel": "Correos para editar",
-    "editingLabel": "Editando"
+    "editingLabel": "Editando",
+    "templateGroupLabel": "Plantilla"
   },
   "fieldStatus": {
     "default": "Predeterminado",
