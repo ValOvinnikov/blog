@@ -1,15 +1,24 @@
 import { customRender, screen, within } from '@platform/testing/custom-render';
-import {
-  makeReadyTenant,
-  makeTenant,
-} from '@platform/testing/tenants/fixtures';
+import type { TTenantSwitcherItem } from '@platform/utils/tenant-switcher-items/tenant-switcher-items';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { TenantSwitcher } from './tenant-switcher';
 
 vi.mock('@platform/i18n/navigation');
 
-const tenant = makeReadyTenant();
+const tenant: TTenantSwitcherItem = {
+  id: 'tenant-1',
+  name: 'Acme Inc.',
+  primaryDomain: 'acme.example.com',
+  isArchived: false,
+};
+
+const archivedTenant: TTenantSwitcherItem = {
+  id: 'tenant-2',
+  name: 'Globex Corp',
+  primaryDomain: 'globex.example.com',
+  isArchived: true,
+};
 
 const setup = customRender(TenantSwitcher, {
   tenants: [tenant],
@@ -31,38 +40,21 @@ describe(`<${TenantSwitcher.name}/>`, () => {
     ).toHaveTextContent('acme.example.com');
   });
 
-  it('opens a menu named for the active tenant, linking every switchable tenant', async () => {
-    setup();
+  it('opens a menu named for the active tenant, linking every tenant through the select-tenant endpoint', async () => {
+    setup({ tenants: [tenant, archivedTenant] });
 
     await user.click(screen.getByRole('button', { name: /acme inc\./i }));
 
     const menu = await screen.findByRole('menu', { name: /acme inc\./i });
-    const link = within(menu).getByRole('menuitem', { name: /acme inc\./i });
-    expect(link).toHaveAttribute('href', '/tenants/tenant-1');
-  });
-
-  it('links each tenant through a caller-supplied hrefFor instead of /tenants/{id}', async () => {
-    setup({
-      hrefFor: (t) => `/dashboard/select-tenant?tenantId=${t.id}`,
-    });
-
-    await user.click(screen.getByRole('button', { name: /acme inc\./i }));
-
-    const menu = await screen.findByRole('menu', { name: /acme inc\./i });
-    const link = within(menu).getByRole('menuitem', { name: /acme inc\./i });
-    expect(link).toHaveAttribute(
-      'href',
-      '/dashboard/select-tenant?tenantId=tenant-1',
-    );
+    expect(
+      within(menu).getByRole('menuitem', { name: /acme inc\./i }),
+    ).toHaveAttribute('href', '/api/dashboard/select-tenant?tenantId=tenant-1');
+    expect(
+      within(menu).getByRole('menuitem', { name: /globex corp/i }),
+    ).toHaveAttribute('href', '/api/dashboard/select-tenant?tenantId=tenant-2');
   });
 
   it('marks an archived tenant in its accessible name and leaves others unmarked', async () => {
-    const archivedTenant = makeTenant({
-      id: 'tenant-2',
-      name: 'Globex Corp',
-      primaryDomain: 'globex.example.com',
-      deprovisionedAt: new Date('2026-02-01T00:00:00.000Z'),
-    });
     setup({ tenants: [tenant, archivedTenant] });
 
     await user.click(screen.getByRole('button', { name: /acme inc\./i }));
@@ -77,12 +69,6 @@ describe(`<${TenantSwitcher.name}/>`, () => {
   });
 
   it('shows the archived marker on the trigger when the active tenant is archived', () => {
-    const archivedTenant = makeTenant({
-      id: 'tenant-2',
-      name: 'Globex Corp',
-      primaryDomain: 'globex.example.com',
-      deprovisionedAt: new Date('2026-02-01T00:00:00.000Z'),
-    });
     setup({ tenants: [tenant, archivedTenant], activeTenantId: 'tenant-2' });
 
     expect(
