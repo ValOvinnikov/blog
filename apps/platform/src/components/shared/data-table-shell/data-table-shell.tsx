@@ -1,6 +1,8 @@
 import { Card } from '@platform/components/shared/card';
 import type { ReactNode } from 'react';
 
+import { dataTableShellVariants } from './data-table-shell-variants';
+
 type TDataTableShellColumn = {
   key: string;
   label: ReactNode;
@@ -16,6 +18,7 @@ type TDataTableShellClassNames = {
 export type TDataTableShellProps<TItem> = {
   items: TItem[];
   emptyMessage: string;
+  ariaLabel: string;
   columns: TDataTableShellColumn[];
   renderRow: (item: TItem) => ReactNode;
   classNames: TDataTableShellClassNames;
@@ -24,6 +27,7 @@ export type TDataTableShellProps<TItem> = {
 export const DataTableShell = <TItem,>({
   items,
   emptyMessage,
+  ariaLabel,
   columns,
   renderRow,
   classNames,
@@ -38,20 +42,30 @@ export const DataTableShell = <TItem,>({
     );
   }
 
+  const { scrollRegion } = dataTableShellVariants();
+
   return (
     <Card className={classNames.card}>
-      <table className={classNames.table}>
-        <thead>
-          <tr>
-            {columns.map((column) => (
-              <th className={classNames.head} scope="col" key={column.key}>
-                {column.label}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>{items.map(renderRow)}</tbody>
-      </table>
+      {/* Focusable so Safari, which skips scroll containers, can scroll it by keyboard. */}
+      <div
+        className={scrollRegion()}
+        role="region"
+        aria-label={ariaLabel}
+        tabIndex={0}
+      >
+        <table className={classNames.table}>
+          <thead>
+            <tr>
+              {columns.map((column) => (
+                <th className={classNames.head} scope="col" key={column.key}>
+                  {column.label}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>{items.map(renderRow)}</tbody>
+        </table>
+      </div>
     </Card>
   );
 };

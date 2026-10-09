@@ -91,6 +91,7 @@
     "columnPlan": "Formule",
     "columnStatus": "Statut",
     "columnCreated": "Création",
+    "columnActions": "Actions",
     "status": {
       "ACTIVE": "Actif",
       "SUSPENDED": "Suspendu",

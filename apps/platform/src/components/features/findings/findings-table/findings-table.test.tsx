@@ -44,6 +44,19 @@ describe(FindingsTable, () => {
     );
   });
 
+  it('names the scrollable table region after the page', () => {
+    render(
+      <FindingsTable
+        findings={[makeFinding()]}
+        tenantNamesById={{ 'tenant-1': 'Acme Inc.' }}
+      />,
+    );
+
+    expect(screen.getByRole('region', { name: 'Findings' })).toContainElement(
+      screen.getByRole('table'),
+    );
+  });
+
   it("links a finding's tenant name to that tenant's overview page", () => {
     render(
       <FindingsTable

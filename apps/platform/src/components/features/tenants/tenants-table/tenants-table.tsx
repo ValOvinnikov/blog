@@ -16,9 +16,6 @@ export type TTenantsTableProps = {
   tenants: TTenant[];
 };
 
-// A tenant only lands on its overview once provisioning has actually
-// finished — anything else (never started, still running, or stuck on a
-// failure) sends the operator straight to where they need to act instead.
 const manageHrefFor = (tenant: TTenant): string =>
   tenant.provisioningStatus === TENANT_PROVISIONING_STATUS.READY
     ? adminRoutes.tenantOverview(tenant.id)
@@ -26,14 +23,26 @@ const manageHrefFor = (tenant: TTenant): string =>
 
 export const TenantsTable = ({ tenants }: TTenantsTableProps) => {
   const t = useTranslations('tenantsTable');
+  const tView = useTranslations('tenantsView');
   const locale = useLocale();
-  const { card, table, head, row, cell, tname, name, domain, empty } =
-    tenantsTableVariants();
+  const {
+    card,
+    table,
+    head,
+    visuallyHidden,
+    row,
+    cell,
+    tname,
+    name,
+    domain,
+    empty,
+  } = tenantsTableVariants();
 
   return (
     <DataTableShell
       items={tenants}
       emptyMessage={t('empty')}
+      ariaLabel={tView('title')}
       classNames={{
         card: card(),
         table: table(),
@@ -45,7 +54,10 @@ export const TenantsTable = ({ tenants }: TTenantsTableProps) => {
         { key: 'plan', label: t('columnPlan') },
         { key: 'status', label: t('columnStatus') },
         { key: 'created', label: t('columnCreated') },
-        { key: 'actions', label: null },
+        {
+          key: 'actions',
+          label: <span className={visuallyHidden()}>{t('columnActions')}</span>,
+        },
       ]}
       renderRow={(tenant) => (
         <tr className={row()} key={tenant.id}>
@@ -68,7 +80,11 @@ export const TenantsTable = ({ tenants }: TTenantsTableProps) => {
               {t(`status.${tenant.status}`)}
             </StatusBadge>
           </td>
-          <td className={cell()}>{formatDate(tenant.createdAt, locale)}</td>
+          <td className={cell()}>
+            <time dateTime={tenant.createdAt.toISOString()}>
+              {formatDate(tenant.createdAt, locale)}
+            </time>
+          </td>
           <td className={cell()}>
             <LinkButton
               href={manageHrefFor(tenant)}

@@ -4,12 +4,13 @@ import type { VariantProps } from 'tailwind-variants';
 export const detailListVariants = tv({
   slots: {
     root: [
-      'grid grid-cols-[132px_1fr] items-baseline gap-x-3.5 gap-y-2.5',
+      'grid grid-cols-1 items-baseline gap-x-3.5 gap-y-1',
+      'md:grid-cols-[132px_1fr] md:gap-y-2.5',
       'text-[13.5px]',
     ],
-    term: ['text-[12.5px] text-admin-muted'],
+    term: ['text-[12.5px] text-admin-muted max-md:not-first:mt-2'],
     description: ['m-0 flex min-w-0 flex-wrap items-center gap-2'],
-    value: ['min-w-0 overflow-hidden text-ellipsis'],
+    value: ['min-w-0 overflow-hidden text-ellipsis max-md:wrap-anywhere'],
   },
   variants: {
     isMono: {

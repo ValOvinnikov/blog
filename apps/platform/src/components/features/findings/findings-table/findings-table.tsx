@@ -20,6 +20,7 @@ export const FindingsTable = ({
   tenantNamesById,
 }: TFindingsTableProps) => {
   const t = useTranslations('findingsTable');
+  const tView = useTranslations('findingsView');
   const locale = useLocale();
   const tSeverity = useTranslations('findingSeverityLabel');
   const tSource = useTranslations('findingSourceLabel');
@@ -31,6 +32,7 @@ export const FindingsTable = ({
     <DataTableShell
       items={findings}
       emptyMessage={t('empty')}
+      ariaLabel={tView('title')}
       classNames={{
         card: card(),
         table: table(),
