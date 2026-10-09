@@ -2,6 +2,7 @@
 
 import { Field } from '@base-ui/react/field';
 import {
+  CONTROL_MODE,
   VOICE_FIELD_KIND,
   VOICE_PORTABLE_TEXT_SCHEMA,
   SIZE,
@@ -115,16 +116,14 @@ export const VoiceField = ({
       {isRich ? (
         <PortableTextEditor<TVoicePortableText[number]>
           key={editorRevision}
-          id={inputId}
+          field={{ label, id: inputId, isInvalid: Boolean(error) }}
           schema={VOICE_PORTABLE_TEXT_SCHEMA}
           initialValue={Array.isArray(value) ? value : []}
           onChange={(next) =>
             onChange(isBlankPortableTextValue(next) ? null : next)
           }
-          ariaLabel={label}
           placeholder={placeholder}
-          isInvalid={Boolean(error)}
-          isDisabled={isReadOnly}
+          mode={isReadOnly ? CONTROL_MODE.READ_ONLY : CONTROL_MODE.EDITABLE}
           aria-describedby={richDescribedBy}
         />
       ) : field.kind === VOICE_FIELD_KIND.MULTILINE ? (
