@@ -264,6 +264,7 @@
     "pageTitle": "Domain",
     "subCopy": "The one piece of setup that is genuinely yours to finish.",
     "cardTitle": "Point {domain} at us",
+    "verifiedCardTitle": "{domain} is connected",
     "checkedHint": "Checked just now",
     "bodyCopy": "Add these records at your DNS provider. Verification usually completes within an hour.",
     "columnType": "Type",

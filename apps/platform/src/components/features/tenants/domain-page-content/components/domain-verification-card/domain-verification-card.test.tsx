@@ -60,13 +60,38 @@ describe(DomainVerificationCard, () => {
     expect(screen.queryByRole('table')).toBeNull();
   });
 
+  it('titles a verified domain as connected', async () => {
+    await render({
+      status: DOMAIN_VERIFICATION_STATUS.VERIFIED,
+      dnsRecords: [],
+    });
+
+    expect(
+      await screen.findByRole('heading', {
+        level: 2,
+        name: 'northwind.dev is connected',
+      }),
+    ).toBeVisible();
+  });
+
+  it('asks for the records only alongside the table', async () => {
+    await render({
+      status: DOMAIN_VERIFICATION_STATUS.PENDING,
+      dnsRecords: [{ type: 'A', name: '@', value: '76.76.21.21' }],
+    });
+
+    expect(
+      await screen.findByText(/Add these records at your DNS provider/),
+    ).toBeVisible();
+  });
+
   it.each([
     [DOMAIN_VERIFICATION_STATUS.PENDING, 'Awaiting DNS'],
     [DOMAIN_VERIFICATION_STATUS.NOT_ADDED, 'Not added yet'],
     [DOMAIN_VERIFICATION_STATUS.ERROR, "Couldn't check"],
     [DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED, 'Unavailable'],
   ] as const)(
-    'shows the %s badge and the records fallback when no records are known',
+    'shows the %s badge and only the records fallback when no records are known',
     async (status, badge) => {
       await render({ status, dnsRecords: [] });
 
@@ -74,7 +99,20 @@ describe(DomainVerificationCard, () => {
       expect(
         screen.getByText("DNS records aren't available right now."),
       ).toBeVisible();
+      expect(
+        screen.queryByText(/Add these records at your DNS provider/),
+      ).toBeNull();
       expect(screen.queryByRole('table')).toBeNull();
     },
   );
+
+  it.each([
+    DOMAIN_VERIFICATION_STATUS.ERROR,
+    DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED,
+  ])('claims no check for %s', async (status) => {
+    await render({ status, dnsRecords: [] });
+
+    expect(await screen.findByRole('heading', { level: 2 })).toBeVisible();
+    expect(screen.queryByText('Checked just now')).toBeNull();
+  });
 });

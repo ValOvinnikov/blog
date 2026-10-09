@@ -264,6 +264,7 @@
     "pageTitle": "Domaine",
     "subCopy": "La seule étape de configuration qu'il vous revient réellement de terminer.",
     "cardTitle": "Faites pointer {domain} vers nous",
+    "verifiedCardTitle": "{domain} est connecté",
     "checkedHint": "Vérifié à l'instant",
     "bodyCopy": "Ajoutez ces enregistrements chez votre fournisseur DNS. La vérification aboutit généralement en moins d'une heure.",
     "columnType": "Type",
