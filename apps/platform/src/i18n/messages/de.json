@@ -332,10 +332,7 @@
     "shapeDescription": "Ecken, Abstände und wie Karten gerahmt sind.",
     "brandHeading": "Marke",
     "brandImagePicked": "Neues Bild, noch nicht hochgeladen",
-    "brandImageUnchanged": "Kein neues Bild",
-    "editTab": "Bearbeiten",
-    "previewTab": "Vorschau",
-    "viewTabsAriaLabel": "Ansicht"
+    "brandImageUnchanged": "Kein neues Bild"
   },
   "lookPreview": {
     "modeLight": "Hell",
@@ -381,10 +378,7 @@
     "senderItemLabel": "Absender & Fußzeile",
     "senderItemDescription": "Name, Antwortadresse, Anschrift und Logo, in jeder Sprache gleich.",
     "itemsAriaLabel": "Zu bearbeitende E-Mails",
-    "editingLabel": "Bearbeiten",
-    "viewAriaLabel": "Bearbeiten oder Vorschau",
-    "editTab": "Bearbeiten",
-    "previewTab": "Vorschau"
+    "editingLabel": "Bearbeiten"
   },
   "emailItemStatus": {
     "default": "Standard",
@@ -826,6 +820,11 @@
   "languagePicker": {
     "ariaLabel": "Sprache",
     "optionDescription": "{isDefault, select, true {Standardsprache · } other {}}{count, plural, =0 {Alles Standard} other {# angepasst}}"
+  },
+  "viewTabs": {
+    "ariaLabel": "Bearbeiten oder Vorschau",
+    "editTab": "Bearbeiten",
+    "previewTab": "Vorschau"
   },
   "languageNames": {
     "EN": "Englisch",

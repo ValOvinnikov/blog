@@ -332,10 +332,7 @@
     "shapeDescription": "Coins, espacement et encadrement des cartes.",
     "brandHeading": "Marque",
     "brandImagePicked": "Nouvelle image, pas encore importée",
-    "brandImageUnchanged": "Aucune nouvelle image",
-    "editTab": "Modifier",
-    "previewTab": "Aperçu",
-    "viewTabsAriaLabel": "Affichage"
+    "brandImageUnchanged": "Aucune nouvelle image"
   },
   "lookPreview": {
     "modeLight": "Clair",
@@ -381,10 +378,7 @@
     "senderItemLabel": "Expéditeur et pied de page",
     "senderItemDescription": "Nom, adresse de réponse, adresse postale et logo, identiques dans toutes les langues.",
     "itemsAriaLabel": "E-mails à modifier",
-    "editingLabel": "Modification",
-    "viewAriaLabel": "Modifier ou prévisualiser",
-    "editTab": "Modifier",
-    "previewTab": "Aperçu"
+    "editingLabel": "Modification"
   },
   "emailItemStatus": {
     "default": "Par défaut",
@@ -826,6 +820,11 @@
   "languagePicker": {
     "ariaLabel": "Langue",
     "optionDescription": "{isDefault, select, true {Langue par défaut · } other {}}{count, plural, =0 {Tout par défaut} one {# personnalisé} other {# personnalisés}}"
+  },
+  "viewTabs": {
+    "ariaLabel": "Modifier ou prévisualiser",
+    "editTab": "Modifier",
+    "previewTab": "Aperçu"
   },
   "languageNames": {
     "EN": "Anglais",
