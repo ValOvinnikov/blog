@@ -866,7 +866,9 @@
     "upgradeNotice": "Your plan publishes the default language only. Upgrade to add more languages.",
     "downgradeNotice": "Your plan publishes {allowed, plural, one {# additional language} other {# additional languages}}, but {stored} are saved. Choose which stay live — the others are kept and nothing is deleted.",
     "keptBadge": "Kept, not live on your plan",
-    "planLockedBadge": "Not on your plan"
+    "planLockedBadge": "Not on your plan",
+    "atLimitLockedReason": "Turn one off to switch this on",
+    "overLimitLockedReason": "Upgrade your plan to change this"
   },
   "saveBar": {
     "regionLabel": "Unsaved changes",

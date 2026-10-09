@@ -12,6 +12,7 @@ import { SettingsFormShell } from '@platform/components/shared/settings-form-she
 import { Switch } from '@platform/components/shared/switch';
 import { Text } from '@platform/components/shared/text';
 import { useToast } from '@platform/context/toast-provider';
+import { additionalLocalesToSave } from '@platform/utils/additional-locales-to-save/additional-locales-to-save';
 import { useFormSubmission } from '@platform/utils/use-form-submission/use-form-submission';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -21,32 +22,14 @@ import { languagesSettingsVariants } from './languages-settings-variants';
 
 const SUPPORTED_LOCALES = Object.values(LOCALE_ISO_CODES);
 
-// Past the limit nothing is dropped: switched-off stored locales stay after
-// the live ones, since only the first ones within the limit are served.
-const additionalLocalesToSave = (
-  liveLocales: TLocaleIsoCode[],
-  storedLocales: TLocaleIsoCode[],
-  isOverLimit: boolean,
-): TLocaleIsoCode[] => {
-  const orderedLive = SUPPORTED_LOCALES.filter((locale) =>
-    liveLocales.includes(locale),
-  );
-
-  if (!isOverLimit) {
-    return orderedLive;
-  }
-
-  return [
-    ...orderedLive,
-    ...storedLocales.filter((locale) => !liveLocales.includes(locale)),
-  ];
-};
-
 export type TLanguagesSettingsProps = {
   tenantId: string;
   defaultLocale: TLocaleIsoCode;
-  storedLocales: TLocaleIsoCode[];
-  additionalLocaleLimit: number;
+  locales: {
+    stored: TLocaleIsoCode[];
+    live: TLocaleIsoCode[];
+    limit: number;
+  };
   saveAction: (
     tenantId: string,
     additionalLocales: TLocaleIsoCode[],
@@ -58,12 +41,12 @@ export type TLanguagesSettingsProps = {
 export const LanguagesSettings = ({
   tenantId,
   defaultLocale,
-  storedLocales,
-  additionalLocaleLimit,
+  locales,
   saveAction,
   savedAt,
   archivedAt,
 }: TLanguagesSettingsProps) => {
+  const { stored, live, limit: additionalLocaleLimit } = locales;
   const isArchived = Boolean(archivedAt);
   const archivedNoticeId = useId();
   const t = useTranslations('languagesSettings');
@@ -71,10 +54,8 @@ export const LanguagesSettings = ({
   const { defaultLanguage } = languagesSettingsVariants();
   const toast = useToast();
   const router = useRouter();
-  const [savedLocales, setSavedLocales] = useState(storedLocales);
-  const [savedLiveLocales, setSavedLiveLocales] = useState(() =>
-    storedLocales.slice(0, additionalLocaleLimit),
-  );
+  const [savedLocales, setSavedLocales] = useState(stored);
+  const [savedLiveLocales, setSavedLiveLocales] = useState(live);
   const isOverLimit = savedLocales.length > additionalLocaleLimit;
   const { values, setValues, status, isPending, handleSubmit } =
     useFormSubmission<TLocaleIsoCode[], { ok: boolean }>({
@@ -104,6 +85,16 @@ export const LanguagesSettings = ({
       checked ? [...prev, locale] : prev.filter((live) => live !== locale),
     );
   };
+
+  const lockedReason = (() => {
+    if (additionalLocaleLimit === 0) {
+      return t('planLockedBadge');
+    }
+    if (isOverLimit) {
+      return t('overLimitLockedReason');
+    }
+    return t('atLimitLockedReason');
+  })();
 
   const notice = (() => {
     if (additionalLocaleLimit === 0) {
@@ -171,8 +162,9 @@ export const LanguagesSettings = ({
             (locale) => {
               const isLive = values.includes(locale);
               const isStored = savedLocales.includes(locale);
-              const isLocked =
-                !isLive && (isAtLimit || (isOverLimit && !isStored));
+              const isLocked = isLive
+                ? isOverLimit
+                : isAtLimit || (isOverLimit && !isStored);
               const label = tLanguage(locale);
 
               return (
@@ -184,8 +176,8 @@ export const LanguagesSettings = ({
                       ? t('keptBadge')
                       : undefined
                   }
-                  isLocked={isLocked && additionalLocaleLimit === 0}
-                  lockedReason={t('planLockedBadge')}
+                  isLocked={isLocked}
+                  lockedReason={lockedReason}
                 >
                   <Switch
                     isChecked={isLive}

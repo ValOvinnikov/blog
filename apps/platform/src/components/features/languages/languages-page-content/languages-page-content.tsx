@@ -1,3 +1,4 @@
+import { queries } from '@blog/db';
 import { PLAN_LOCALE_LIMIT } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { LanguagesSettings } from '@platform/components/features/languages/languages-settings';
@@ -13,12 +14,18 @@ export const LanguagesPageContent = async ({
   const { id, locale, additionalLocales, plan, updatedAt, deprovisionedAt } =
     tenant;
 
+  const [, ...liveAdditionalLocales] =
+    queries.tenants.selectLiveLocales(tenant);
+
   return (
     <LanguagesSettings
       tenantId={id}
       defaultLocale={locale}
-      storedLocales={additionalLocales}
-      additionalLocaleLimit={PLAN_LOCALE_LIMIT[plan] - 1}
+      locales={{
+        stored: additionalLocales,
+        live: liveAdditionalLocales,
+        limit: PLAN_LOCALE_LIMIT[plan] - 1,
+      }}
       saveAction={updateTenantLanguagesAction}
       savedAt={updatedAt}
       archivedAt={deprovisionedAt ?? undefined}

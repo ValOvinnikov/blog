@@ -866,7 +866,9 @@
     "upgradeNotice": "Uw abonnement publiceert alleen de standaardtaal. Upgrade om meer talen toe te voegen.",
     "downgradeNotice": "Uw abonnement publiceert {allowed, plural, one {# extra taal} other {# extra talen}}, maar er zijn er {stored} opgeslagen. Kies welke live blijven — de andere worden bewaard en er wordt niets verwijderd.",
     "keptBadge": "Bewaard, niet live binnen uw abonnement",
-    "planLockedBadge": "Niet in uw abonnement"
+    "planLockedBadge": "Niet in uw abonnement",
+    "atLimitLockedReason": "Zet er een uit om deze aan te zetten",
+    "overLimitLockedReason": "Upgrade uw abonnement om dit te wijzigen"
   },
   "saveBar": {
     "regionLabel": "Niet-opgeslagen wijzigingen",

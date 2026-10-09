@@ -12,8 +12,7 @@ const { EN, NL, FR, DE, ES } = LOCALE_ISO_CODES;
 const setup = customRender(LanguagesSettings, {
   tenantId: 'tenant-1',
   defaultLocale: EN,
-  storedLocales: [],
-  additionalLocaleLimit: 2,
+  locales: { stored: [], live: [], limit: 2 },
   saveAction: vi.fn(),
 });
 
@@ -70,8 +69,33 @@ describe(`<${LanguagesSettings.name}/>`, () => {
     });
   });
 
+  it('says why each language past the allowance cannot be switched on', () => {
+    setup({ locales: { stored: [NL, FR], live: [NL, FR], limit: 2 } });
+
+    expect(screen.getByRole('switch', { name: 'German' })).toHaveAttribute(
+      'data-disabled',
+      '',
+    );
+    expect(screen.getAllByText('Turn one off to switch this on')).toHaveLength(
+      2,
+    );
+  });
+
+  it('shows the languages the site serves as live', () => {
+    setup({ locales: { stored: [NL, FR, DE], live: [NL, DE], limit: 2 } });
+
+    expect(screen.getByRole('switch', { name: 'German' })).toHaveAttribute(
+      'data-checked',
+      '',
+    );
+    expect(screen.getByRole('switch', { name: 'French' })).toHaveAttribute(
+      'data-unchecked',
+      '',
+    );
+  });
+
   it('explains the upgrade and offers nothing when the plan allows only the default', () => {
-    setup({ additionalLocaleLimit: 0 });
+    setup({ locales: { stored: [], live: [], limit: 0 } });
 
     expect(
       screen.getByText(
@@ -85,7 +109,7 @@ describe(`<${LanguagesSettings.name}/>`, () => {
 
   describe('after a downgrade', () => {
     it('asks which languages stay live and marks the rest as kept', () => {
-      setup({ storedLocales: [NL, FR, DE], additionalLocaleLimit: 2 });
+      setup({ locales: { stored: [NL, FR, DE], live: [NL, FR], limit: 2 } });
 
       expect(screen.getByText(/Choose which stay live/)).toBeInTheDocument();
       expect(screen.getByRole('switch', { name: 'German' })).toHaveAttribute(
@@ -97,25 +121,22 @@ describe(`<${LanguagesSettings.name}/>`, () => {
       ).toBeInTheDocument();
     });
 
-    it('keeps every stored language when a different one is chosen to stay live', async () => {
-      const saveAction = vi.fn().mockResolvedValue({ ok: true });
-      setup({
-        storedLocales: [NL, FR, DE],
-        additionalLocaleLimit: 2,
-        saveAction,
-      });
+    it('locks every live language and says why', () => {
+      setup({ locales: { stored: [NL, FR, DE], live: [NL, FR], limit: 2 } });
 
-      await user.click(screen.getByRole('switch', { name: 'French' }));
-      await user.click(screen.getByRole('switch', { name: 'German' }));
-      await user.click(screen.getByRole('button', { name: 'Save changes' }));
-
-      await waitFor(() => {
-        expect(saveAction).toHaveBeenCalledWith('tenant-1', [NL, DE, FR]);
-      });
+      for (const name of ['Dutch', 'French']) {
+        expect(screen.getByRole('switch', { name })).toHaveAttribute(
+          'data-disabled',
+          '',
+        );
+      }
+      expect(
+        screen.getAllByText('Upgrade your plan to change this'),
+      ).toHaveLength(4);
     });
 
     it('does not offer a language that was never saved', () => {
-      setup({ storedLocales: [NL, FR, DE], additionalLocaleLimit: 2 });
+      setup({ locales: { stored: [NL, FR, DE], live: [NL, FR], limit: 2 } });
 
       expect(screen.getByRole('switch', { name: 'Spanish' })).toHaveAttribute(
         'data-disabled',
@@ -125,7 +146,7 @@ describe(`<${LanguagesSettings.name}/>`, () => {
   });
 
   it('offers no Save until something changes', () => {
-    setup({ storedLocales: [ES] });
+    setup({ locales: { stored: [ES], live: [ES], limit: 2 } });
 
     expect(
       screen.queryByRole('button', { name: 'Save changes' }),
@@ -134,7 +155,7 @@ describe(`<${LanguagesSettings.name}/>`, () => {
   });
 
   it('counts each toggled language and restores the saved ones on Discard', async () => {
-    setup({ storedLocales: [ES] });
+    setup({ locales: { stored: [ES], live: [ES], limit: 2 } });
 
     await user.click(screen.getByRole('switch', { name: 'Spanish' }));
     await user.click(screen.getByRole('switch', { name: 'Dutch' }));
