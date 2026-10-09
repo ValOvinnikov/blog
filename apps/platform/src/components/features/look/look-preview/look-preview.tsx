@@ -35,10 +35,6 @@ export type TLookPreviewProps = {
   languageSwitcherStyle: TLanguageSwitcherStyle;
 };
 
-/**
- * Light/dark is the preview's own toggle rather than tenant config, since a
- * reader's `prefers-color-scheme` picks the ramp on the live site.
- */
 export const LookPreview = ({
   tenantName,
   accentHue,
