@@ -33,12 +33,14 @@ vi.mock(
 const Wrapper = ({
   tenant,
   deprovisionRequestedAt,
+  headingLevel,
 }: {
   tenant: TTenant;
   deprovisionRequestedAt?: string;
+  headingLevel?: 3;
 }) => {
   const poll = useDeprovisioningPoll(tenant, deprovisionRequestedAt);
-  return <DeprovisioningStatusView poll={poll} />;
+  return <DeprovisioningStatusView poll={poll} headingLevel={headingLevel} />;
 };
 
 describe(`<${DeprovisioningStatusView.name}/>`, () => {
@@ -174,6 +176,27 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
     expect(
       screen.getByRole('heading', { level: 2, name: 'Run' }),
     ).toBeVisible();
+  });
+
+  it('nests the steps and run headings at a caller-supplied level', () => {
+    const tenant = makeTenant({
+      deprovisioningSteps: {
+        ...idleDeprovisioningSteps(),
+        run: { startedAt: '2026-08-12T14:18:00.000Z' },
+      },
+    });
+    render(<Wrapper tenant={tenant} headingLevel={3} />);
+
+    expect(
+      screen.getByRole('heading', {
+        level: 3,
+        name: /^Deprovisioning progress/,
+      }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole('heading', { level: 3, name: 'Run' }),
+    ).toBeVisible();
+    expect(screen.queryByRole('heading', { level: 2 })).not.toBeInTheDocument();
   });
 
   it('renders a fallback Run card header carrying the overall status badge when no run exists yet', () => {

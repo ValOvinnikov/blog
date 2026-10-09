@@ -21,6 +21,19 @@
     "heading": "Your workspace isn't ready yet",
     "description": "This can happen while a workspace is being set up, or if something went wrong along the way. Try refreshing in a few minutes, or contact whoever invited you if it keeps happening."
   },
+  "notFoundPage": {
+    "heading": "Page not found",
+    "description": "This page doesn't exist, or you don't have access to it.",
+    "backLink": "Back to home"
+  },
+  "errorPage": {
+    "heading": "Something went wrong",
+    "description": "This page couldn't load. Try again, and if it keeps happening, come back in a few minutes.",
+    "retry": "Try again"
+  },
+  "pageSkeleton": {
+    "label": "Loading page…"
+  },
   "sidebar": {
     "brandName": "Valstack",
     "brandTagline": "admin",
@@ -332,10 +345,7 @@
     "shapeDescription": "Corners, spacing and how cards are framed.",
     "brandHeading": "Brand",
     "brandImagePicked": "New image, not uploaded yet",
-    "brandImageUnchanged": "No new image",
-    "editTab": "Edit",
-    "previewTab": "Preview",
-    "viewTabsAriaLabel": "View"
+    "brandImageUnchanged": "No new image"
   },
   "lookPreview": {
     "modeLight": "Light",
@@ -381,10 +391,7 @@
     "senderItemLabel": "Sender & footer",
     "senderItemDescription": "Name, reply-to, address and logo, the same in every language.",
     "itemsAriaLabel": "Emails to edit",
-    "editingLabel": "Editing",
-    "viewAriaLabel": "Edit or preview",
-    "editTab": "Edit",
-    "previewTab": "Preview"
+    "editingLabel": "Editing"
   },
   "emailItemStatus": {
     "default": "Default",
@@ -757,7 +764,8 @@
   "archivedTenantsToggle": {
     "ariaLabel": "Tenant visibility",
     "activeOption": "Active",
-    "allOption": "All"
+    "allOption": "All",
+    "loading": "Loading tenants…"
   },
   "deprovisionTenantControl": {
     "cardTitle": "Deprovision this tenant",
@@ -826,6 +834,11 @@
   "languagePicker": {
     "ariaLabel": "Language",
     "optionDescription": "{isDefault, select, true {Default language · } other {}}{count, plural, =0 {All default} other {# customised}}"
+  },
+  "viewTabs": {
+    "ariaLabel": "Edit or preview",
+    "editTab": "Edit",
+    "previewTab": "Preview"
   },
   "languageNames": {
     "EN": "English",

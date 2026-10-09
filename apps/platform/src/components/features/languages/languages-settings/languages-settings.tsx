@@ -150,7 +150,7 @@ export const LanguagesSettings = ({
       }}
     >
       <Card>
-        <Card.Header title={t('defaultHeading')} headingLevel={2} />
+        <Card.Header title={t('defaultHeading')} />
         <Card.Body>
           <Text className={defaultLanguage()}>{tLanguage(defaultLocale)}</Text>
           <Text variant="supporting">{t('defaultDescription')}</Text>
@@ -160,7 +160,6 @@ export const LanguagesSettings = ({
       <Card>
         <Card.Header
           title={t('additionalHeading')}
-          headingLevel={2}
           supportingText={t('allowance', {
             used: values.length,
             allowed: additionalLocaleLimit,

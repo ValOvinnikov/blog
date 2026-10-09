@@ -9,7 +9,12 @@ import {
   RADIUS_SCALE,
 } from '@blog/config';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
-import { customRender, screen, waitFor } from '@platform/testing/custom-render';
+import {
+  customRender,
+  screen,
+  waitFor,
+  within,
+} from '@platform/testing/custom-render';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -136,7 +141,9 @@ describe(`<${LookForm.name}/>`, () => {
   it('switches between the Edit and Preview tabs', async () => {
     setup();
 
-    const editTab = screen.getByRole('tab', { name: 'Edit' });
+    const editTab = within(
+      screen.getByRole('tablist', { name: 'Edit or preview' }),
+    ).getByRole('tab', { name: 'Edit' });
     const previewTab = screen.getByRole('tab', { name: 'Preview' });
     expect(editTab).toHaveAttribute('aria-selected', 'true');
 

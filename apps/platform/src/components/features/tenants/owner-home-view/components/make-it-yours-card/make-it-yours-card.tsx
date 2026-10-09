@@ -15,7 +15,6 @@ export const MakeItYoursCard = () => {
       <Card.Header
         title={t('makeItYoursCardTitle')}
         supportingText={t('makeItYoursSupportingText')}
-        headingLevel={2}
       />
       <Card.Body>
         <div className={grid()}>

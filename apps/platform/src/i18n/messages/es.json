@@ -21,6 +21,19 @@
     "heading": "Su espacio de trabajo aún no está listo",
     "description": "Esto puede ocurrir mientras se configura un espacio de trabajo o si algo ha fallado durante el proceso. Vuelva a cargar la página en unos minutos o, si el problema persiste, contacte con quien le invitó."
   },
+  "notFoundPage": {
+    "heading": "Página no encontrada",
+    "description": "Esta página no existe o no tienes acceso a ella.",
+    "backLink": "Volver al inicio"
+  },
+  "errorPage": {
+    "heading": "Algo salió mal",
+    "description": "No se pudo cargar esta página. Inténtalo de nuevo y, si sigue ocurriendo, vuelve en unos minutos.",
+    "retry": "Reintentar"
+  },
+  "pageSkeleton": {
+    "label": "Cargando la página…"
+  },
   "sidebar": {
     "brandName": "Valstack",
     "brandTagline": "admin",
@@ -332,10 +345,7 @@
     "shapeDescription": "Esquinas, espaciado y el marco de las tarjetas.",
     "brandHeading": "Marca",
     "brandImagePicked": "Imagen nueva, aún sin subir",
-    "brandImageUnchanged": "Ninguna imagen nueva",
-    "editTab": "Editar",
-    "previewTab": "Vista previa",
-    "viewTabsAriaLabel": "Vista"
+    "brandImageUnchanged": "Ninguna imagen nueva"
   },
   "lookPreview": {
     "modeLight": "Claro",
@@ -381,10 +391,7 @@
     "senderItemLabel": "Remitente y pie",
     "senderItemDescription": "Nombre, dirección de respuesta, dirección postal y logotipo, iguales en todos los idiomas.",
     "itemsAriaLabel": "Correos para editar",
-    "editingLabel": "Editando",
-    "viewAriaLabel": "Editar o previsualizar",
-    "editTab": "Editar",
-    "previewTab": "Vista previa"
+    "editingLabel": "Editando"
   },
   "emailItemStatus": {
     "default": "Predeterminado",
@@ -757,7 +764,8 @@
   "archivedTenantsToggle": {
     "ariaLabel": "Visibilidad de clientes",
     "activeOption": "Activos",
-    "allOption": "Todos"
+    "allOption": "Todos",
+    "loading": "Cargando clientes…"
   },
   "deprovisionTenantControl": {
     "cardTitle": "Desaprovisionar este cliente",
@@ -826,6 +834,11 @@
   "languagePicker": {
     "ariaLabel": "Idioma",
     "optionDescription": "{isDefault, select, true {Idioma predeterminado · } other {}}{count, plural, =0 {Todo predeterminado} one {# personalizado} other {# personalizados}}"
+  },
+  "viewTabs": {
+    "ariaLabel": "Editar o previsualizar",
+    "editTab": "Editar",
+    "previewTab": "Vista previa"
   },
   "languageNames": {
     "EN": "Inglés",

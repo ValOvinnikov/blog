@@ -26,7 +26,6 @@ export const DomainCard = ({
     <Card>
       <Card.Header
         title={t('domainCardTitle')}
-        headingLevel={2}
         actions={
           <>
             <StatusBadge

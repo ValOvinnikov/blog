@@ -4,7 +4,8 @@ import { previewFrameVariants } from './preview-frame-variants';
 
 export type TPreviewFrameProps = {
   ariaLabel: string;
-  controls: ReactNode;
+  widthControl: ReactNode;
+  controls?: ReactNode;
   actions?: ReactNode;
   isNarrow?: boolean;
   notes?: ReactNode;
@@ -13,6 +14,7 @@ export type TPreviewFrameProps = {
 
 export const PreviewFrame = ({
   ariaLabel,
+  widthControl,
   controls,
   actions,
   isNarrow = false,
@@ -22,6 +24,7 @@ export const PreviewFrame = ({
   const {
     root,
     toolbar,
+    widthControl: widthControlSlot,
     actions: actionsSlot,
     stage,
     frame,
@@ -31,6 +34,7 @@ export const PreviewFrame = ({
   return (
     <section aria-label={ariaLabel} className={root()}>
       <div className={toolbar()}>
+        <div className={widthControlSlot()}>{widthControl}</div>
         {controls}
         {actions && <div className={actionsSlot()}>{actions}</div>}
       </div>

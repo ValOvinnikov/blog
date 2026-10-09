@@ -18,7 +18,7 @@ export const OwnerCard = ({
 
   return (
     <Card>
-      <Card.Header title={t('ownerCardTitle')} headingLevel={2} />
+      <Card.Header title={t('ownerCardTitle')} />
       <Card.Body>
         <DetailList>
           <DetailList.Row

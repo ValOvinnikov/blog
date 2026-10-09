@@ -13,8 +13,8 @@ import { ItemList } from '@platform/components/features/email/email-settings/com
 import { ItemSelect } from '@platform/components/features/email/email-settings/components/item-select';
 import { EmailTemplateEditor } from '@platform/components/features/email/email-template-editor';
 import { LanguagePicker } from '@platform/components/shared/language-picker';
-import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { SettingsFormShell } from '@platform/components/shared/settings-form-shell';
+import { useViewTabs, ViewTabs } from '@platform/components/shared/view-tabs';
 import { useToast } from '@platform/context/toast-provider';
 import {
   countCustomisedTemplates,
@@ -38,8 +38,6 @@ import { useId, useState } from 'react';
 import { emailSettingsVariants } from './email-settings-variants';
 import { useEmailDraft } from './use-email-draft';
 import { useSendTestEmail } from './use-send-test-email';
-
-type TPhoneView = 'edit' | 'preview';
 
 const SENDER_FIELD_LABEL_KEYS = {
   senderName: 'senderNameLabel',
@@ -84,7 +82,7 @@ export const EmailSettings = ({
   const [previewTemplate, setPreviewTemplate] = useState<TEmailTemplateType>(
     EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
   );
-  const [phoneView, setPhoneView] = useState<TPhoneView>('edit');
+  const { view, tabsProps, panelProps } = useViewTabs();
   const { sendTest, isSending } = useSendTestEmail(tenantId);
 
   const {
@@ -106,8 +104,9 @@ export const EmailSettings = ({
     },
   });
 
-  const { layout, main, phoneTabs, editPane, previewPane } =
-    emailSettingsVariants({ phoneView });
+  const { layout, main, editPane, previewPane } = emailSettingsVariants({
+    view,
+  });
 
   const selectItem = (item: TEmailPageItem) => {
     setSelectedItem(item);
@@ -256,17 +255,8 @@ export const EmailSettings = ({
             onSelect={selectItem}
             label={t('editingLabel')}
           />
-          <SegmentedControl
-            className={phoneTabs()}
-            options={[
-              { value: 'edit', label: t('editTab') },
-              { value: 'preview', label: t('previewTab') },
-            ]}
-            value={phoneView}
-            onChange={setPhoneView}
-            ariaLabel={t('viewAriaLabel')}
-          />
-          <div className={editPane()}>
+          <ViewTabs {...tabsProps} />
+          <div {...panelProps('edit')} className={editPane()}>
             {selectedItem === EMAIL_SENDER_ITEM ? (
               <EmailSenderEditor
                 sender={draft.sender}
@@ -312,7 +302,7 @@ export const EmailSettings = ({
               />
             )}
           </div>
-          <div className={previewPane()}>
+          <div {...panelProps('preview')} className={previewPane()}>
             <EmailPreview
               html={previewHtml}
               from={draft.sender.senderName.trim() || undefined}

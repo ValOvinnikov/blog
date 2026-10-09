@@ -21,6 +21,19 @@
     "heading": "Uw werkruimte is nog niet klaar",
     "description": "Dit kan gebeuren terwijl een werkruimte wordt ingericht, of als er onderweg iets is misgegaan. Vernieuw de pagina over een paar minuten, of neem contact op met degene die u heeft uitgenodigd als het probleem aanhoudt."
   },
+  "notFoundPage": {
+    "heading": "Pagina niet gevonden",
+    "description": "Deze pagina bestaat niet, of je hebt er geen toegang toe.",
+    "backLink": "Terug naar start"
+  },
+  "errorPage": {
+    "heading": "Er ging iets mis",
+    "description": "Deze pagina kon niet worden geladen. Probeer het opnieuw, en kom over een paar minuten terug als het blijft gebeuren.",
+    "retry": "Opnieuw proberen"
+  },
+  "pageSkeleton": {
+    "label": "Pagina wordt geladen…"
+  },
   "sidebar": {
     "brandName": "Valstack",
     "brandTagline": "admin",
@@ -332,10 +345,7 @@
     "shapeDescription": "Hoeken, ruimte en hoe kaarten zijn omlijst.",
     "brandHeading": "Merk",
     "brandImagePicked": "Nieuwe afbeelding, nog niet geüpload",
-    "brandImageUnchanged": "Geen nieuwe afbeelding",
-    "editTab": "Bewerken",
-    "previewTab": "Voorbeeld",
-    "viewTabsAriaLabel": "Weergave"
+    "brandImageUnchanged": "Geen nieuwe afbeelding"
   },
   "lookPreview": {
     "modeLight": "Licht",
@@ -381,10 +391,7 @@
     "senderItemLabel": "Afzender en voettekst",
     "senderItemDescription": "Naam, antwoordadres, postadres en logo, in elke taal hetzelfde.",
     "itemsAriaLabel": "E-mails om te bewerken",
-    "editingLabel": "Bewerken",
-    "viewAriaLabel": "Bewerken of voorbeeld",
-    "editTab": "Bewerken",
-    "previewTab": "Voorbeeld"
+    "editingLabel": "Bewerken"
   },
   "emailItemStatus": {
     "default": "Standaard",
@@ -757,7 +764,8 @@
   "archivedTenantsToggle": {
     "ariaLabel": "Zichtbaarheid tenants",
     "activeOption": "Actief",
-    "allOption": "Alle"
+    "allOption": "Alle",
+    "loading": "Tenants worden geladen…"
   },
   "deprovisionTenantControl": {
     "cardTitle": "Deze tenant ontmantelen",
@@ -826,6 +834,11 @@
   "languagePicker": {
     "ariaLabel": "Taal",
     "optionDescription": "{isDefault, select, true {Standaardtaal · } other {}}{count, plural, =0 {Alles standaard} other {# aangepast}}"
+  },
+  "viewTabs": {
+    "ariaLabel": "Bewerken of voorbeeld",
+    "editTab": "Bewerken",
+    "previewTab": "Voorbeeld"
   },
   "languageNames": {
     "EN": "Engels",

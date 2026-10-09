@@ -16,6 +16,6 @@ export const tenantsTableVariants = tv({
     tname: ['flex items-center gap-2.5'],
     name: ['text-admin-text'],
     domain: ['text-[12px] text-admin-muted'],
-    empty: ['p-8 text-center text-sm text-admin-muted'],
+    empty: ['p-8 text-center text-[13.5px] text-admin-muted'],
   },
 });

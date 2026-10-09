@@ -13,6 +13,6 @@ export const findingsTableVariants = tv({
     ],
     cell: ['px-[14px] py-3 align-middle text-[13.5px] text-admin-text'],
     noTenant: ['text-[12px] text-admin-muted'],
-    empty: ['p-8 text-center text-sm text-admin-muted'],
+    empty: ['p-8 text-center text-[13.5px] text-admin-muted'],
   },
 });

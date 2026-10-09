@@ -1807,8 +1807,10 @@ builder the sender uses, with From, Reply-to and Subject above it, a
 Desktop/Mobile width toggle, and **Send test to me**: it mails the current
 draft (saved logos only) to the signed-in user from the platform's own
 sender address, limited to five sends per user per ten minutes on each
-server instance. On a phone, an "Editing" select replaces the list and
-Edit/Preview tabs switch between the editor and the preview.
+server instance. On a phone, an "Editing" select replaces the list, and
+the shared `ViewTabs` ("Edit or preview" tabs, the same control the Look page
+uses) switch between the editor and the preview; Voice keeps its per-card
+preview toggle instead.
 
 **Studio capability warning.** `@blog/studio`'s `StudioMount` takes an optional
 `enabledCapabilities?: readonly TCapability[]`. When it is supplied, a

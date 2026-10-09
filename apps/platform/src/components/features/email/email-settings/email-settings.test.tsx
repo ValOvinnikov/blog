@@ -122,6 +122,26 @@ describe(`<${EmailSettings.name}/>`, () => {
     ).toBeVisible();
   });
 
+  it('switches between the Edit and Preview tabs', async () => {
+    setup();
+
+    const editTab = within(
+      screen.getByRole('tablist', { name: 'Edit or preview' }),
+    ).getByRole('tab', { name: 'Edit' });
+    const previewTab = screen.getByRole('tab', { name: 'Preview' });
+    expect(editTab).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tabpanel', { name: 'Edit' })).toContainElement(
+      screen.getByLabelText('Sender name'),
+    );
+
+    await user.click(previewTab);
+
+    expect(previewTab).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tabpanel', { name: 'Preview' })).toContainElement(
+      screen.getByRole('region', { name: 'Preview' }),
+    );
+  });
+
   it("shows the language picker on Sender & footer, describing each language's customised templates", async () => {
     setup();
 
