@@ -12,6 +12,7 @@ import {
 } from '@platform/components/features/site-preview/voice-specimen';
 import { VoiceField } from '@platform/components/features/voice/voice-field';
 import { VoiceListRow } from '@platform/components/features/voice/voice-list-row';
+import { useVoiceListSamples } from '@platform/components/features/voice/voice-list-samples-provider';
 import { Accordion } from '@platform/components/shared/accordion';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
@@ -63,6 +64,7 @@ export const VoiceSurfaceCard = ({
   const tSpecimen = useTranslations('voiceSpecimen');
   const tNotes = useTranslations('voiceSurfaceNotes');
   const tPreview = useTranslations('lookPreview');
+  const listSamples = useVoiceListSamples(locale);
   const previewId = useId();
   const previewLabelId = useId();
   const [focusedFieldId, setFocusedFieldId] = useState<TVoiceFieldId>();
@@ -163,6 +165,7 @@ export const VoiceSurfaceCard = ({
                 surface={surface}
                 locale={locale}
                 values={values}
+                listSamples={listSamples}
                 openListFieldId={openFieldId}
                 focusedFieldId={focusedFieldId}
                 theme={specimenTheme}

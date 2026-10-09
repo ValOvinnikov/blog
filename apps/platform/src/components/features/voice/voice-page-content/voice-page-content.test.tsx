@@ -1,4 +1,5 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import de from '@platform/i18n/messages/de.json';
 import {
   customRenderAsync,
   screen,
@@ -7,6 +8,7 @@ import {
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+import userEvent from '@testing-library/user-event';
 
 import { VoicePageContent } from './voice-page-content';
 
@@ -74,6 +76,21 @@ describe(`<${VoicePageContent.name}/>`, () => {
     await setup();
 
     expect(screen.getByRole('group', { name: 'Language' })).toBeVisible();
+  });
+
+  it('renders the empty-list specimen in the language being edited', async () => {
+    getSiteConfigMock.mockResolvedValue(undefined);
+    selectLiveLocalesMock.mockReturnValue([EN, DE]);
+    const user = userEvent.setup();
+
+    await setup();
+    await user.click(screen.getByRole('button', { name: 'German' }));
+
+    const { eyebrow, heading, count } = de.voiceSpecimen.lists.blogList;
+    const specimen = within(screen.getByTestId('voice-specimen-ARCHIVE'));
+    expect(specimen.getByText(eyebrow)).toBeInTheDocument();
+    expect(specimen.getByText(heading)).toBeInTheDocument();
+    expect(specimen.getByText(count)).toBeInTheDocument();
   });
 
   it('passes the archived date through for a deprovisioned tenant', async () => {

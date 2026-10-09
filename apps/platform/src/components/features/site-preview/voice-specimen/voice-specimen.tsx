@@ -23,7 +23,6 @@ import {
   type TVoiceField,
   type TVoiceLocaleDraft,
 } from '@platform/utils/voice-draft/voice-draft';
-import { useTranslations } from 'next-intl';
 import type { CSSProperties, ReactNode } from 'react';
 
 import { voiceSpecimenVariants } from './voice-specimen-variants';
@@ -35,16 +34,22 @@ export type TVoiceSpecimenTheme = {
   bodyFontFamily: string;
 };
 
+type TListSample = 'blogList' | 'topic' | 'tag' | 'topics' | 'tags';
+
+export type TVoiceListSamples = Record<
+  TListSample,
+  { eyebrow: string; heading: string; count: string }
+>;
+
 export type TVoiceSpecimenProps = {
   surface: TVoiceSurface;
   locale: TLocaleIsoCode;
   values: TVoiceLocaleDraft;
+  listSamples: TVoiceListSamples;
   openListFieldId?: TVoiceFieldId;
   focusedFieldId?: TVoiceFieldId;
   theme: TVoiceSpecimenTheme;
 };
-
-type TListSample = 'blogList' | 'topic' | 'tag' | 'topics' | 'tags';
 
 type TSpecimenPlacement =
   | { slot: 'eyebrow' | 'heading' | 'body' }
@@ -69,11 +74,11 @@ export const VoiceSpecimen = ({
   surface,
   locale,
   values,
+  listSamples,
   openListFieldId,
   focusedFieldId,
   theme,
 }: TVoiceSpecimenProps) => {
-  const t = useTranslations('voiceSpecimen');
   const site = SITE_MESSAGES_BY_LOCALE[locale];
   const { tokenStyle, isDark, headingFontFamily, bodyFontFamily } = theme;
   const s = voiceSpecimenVariants({ isDark });
@@ -134,13 +139,13 @@ export const VoiceSpecimen = ({
     if (!field) return null;
     const placement = SPECIMEN_PLACEMENT[field.id];
     if (placement.slot !== 'list') return null;
-    const heading = t(`lists.${placement.sample}.heading`);
+    const { eyebrow, heading, count } = listSamples[placement.sample];
 
     return (
       <div className={s.listPage()}>
-        <Eyebrow>{t(`lists.${placement.sample}.eyebrow`)}</Eyebrow>
+        <Eyebrow>{eyebrow}</Eyebrow>
         <p className={headingVariants({ visual: 'section' })}>{heading}</p>
-        <Text variant="meta">{t(`lists.${placement.sample}.count`)}</Text>
+        <Text variant="meta">{count}</Text>
         <p className={s.emptyMessage()}>
           {framed(
             field,
