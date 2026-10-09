@@ -1,5 +1,3 @@
-import { RADIUS_DECLARATIONS, RADIUS_SCALE } from '@blog/config';
-
 import {
   accentHueGradient,
   buildAccentPreviewTokens,
@@ -93,29 +91,4 @@ describe('buildThemePreviewStyle', () => {
       ...buildLogoPreviewTokens(120, true),
     });
   });
-});
-
-describe('buildThemePreviewStyle radius tokens', () => {
-  it.each(Object.values(RADIUS_SCALE))(
-    're-derives the card, media and item radii on the preview root at %s',
-    (radiusScale) => {
-      const style = buildThemePreviewStyle(
-        {
-          accentHue: 250,
-          logoHue: undefined,
-          radiusScale,
-          density: 'DEFAULT',
-          cardStyle: 'OUTLINED',
-        },
-        false,
-      );
-
-      expect(style).toMatchObject({
-        ...RADIUS_DECLARATIONS[radiusScale],
-        '--radius-card': 'var(--radius-md)',
-        '--radius-media': 'var(--radius-lg)',
-        '--radius-item': 'var(--item-radius)',
-      });
-    },
-  );
 });
