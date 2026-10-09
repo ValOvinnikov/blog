@@ -4,7 +4,6 @@ import {
   screen,
   within,
 } from '@platform/testing/custom-render';
-import userEvent from '@testing-library/user-event';
 
 import { DashboardTenantPicker } from './dashboard-tenant-picker';
 
@@ -15,47 +14,65 @@ const tenants = [
     id: 'tenant-1',
     name: 'Acme Inc.',
     primaryDomain: 'acme.example.com',
+    deprovisionedAt: null,
   },
   {
     id: 'tenant-2',
     name: 'Globex Corp.',
     primaryDomain: 'globex.example.com',
+    deprovisionedAt: new Date('2026-01-01'),
   },
 ] as TTenant[];
 
 describe(DashboardTenantPicker, () => {
-  it('renders a heading and every tenant, linked through the select-tenant endpoint', async () => {
-    const user = userEvent.setup();
+  it('renders a heading and every tenant as a visible link through the select-tenant endpoint', () => {
     render(<DashboardTenantPicker tenants={tenants} />);
 
+    const main = screen.getByRole('main');
     expect(
-      screen.getByRole('heading', { name: 'Choose a workspace' }),
+      within(main).getByRole('heading', { name: 'Choose a workspace' }),
     ).toBeVisible();
 
-    await user.click(screen.getByRole('button', { name: /acme/i }));
-    const menu = await screen.findByRole('menu');
-
-    const acmeLink = within(menu).getByRole('menuitem', { name: /acme/i });
-    const globexLink = within(menu).getByRole('menuitem', {
-      name: /globex/i,
-    });
+    const acmeLink = within(main).getByRole('link', { name: /acme/i });
+    const globexLink = within(main).getByRole('link', { name: /globex/i });
+    expect(acmeLink).toBeVisible();
     expect(acmeLink).toHaveAttribute(
       'href',
       '/api/dashboard/select-tenant?tenantId=tenant-1',
     );
+    expect(globexLink).toBeVisible();
     expect(globexLink).toHaveAttribute(
       'href',
       '/api/dashboard/select-tenant?tenantId=tenant-2',
     );
   });
 
+  it('marks no tenant as the current one', () => {
+    render(<DashboardTenantPicker tenants={tenants} />);
+
+    for (const link of screen.getAllByRole('link')) {
+      expect(link).not.toHaveAttribute('aria-current');
+    }
+  });
+
+  it('labels an archived tenant', () => {
+    render(<DashboardTenantPicker tenants={tenants} />);
+
+    expect(
+      within(screen.getByRole('link', { name: /globex/i })).getByText(
+        'Archived',
+      ),
+    ).toBeVisible();
+    expect(
+      within(screen.getByRole('link', { name: /acme/i })).queryByText(
+        'Archived',
+      ),
+    ).not.toBeInTheDocument();
+  });
+
   it('renders nothing for an empty tenant list', () => {
     render(<DashboardTenantPicker tenants={[]} />);
 
-    // Not `container` — `renderWithIntl` always mounts the app's
-    // `ToastProvider` alongside whatever the component under test renders,
-    // so an empty-render assertion has to target the component's own
-    // output, not the whole render tree.
-    expect(screen.queryByRole('heading')).not.toBeInTheDocument();
+    expect(screen.queryByRole('main')).not.toBeInTheDocument();
   });
 });

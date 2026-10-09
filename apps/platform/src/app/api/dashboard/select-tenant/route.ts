@@ -8,15 +8,10 @@ import { NextResponse } from 'next/server';
 const ACTIVE_TENANT_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
 
 /**
- * `GET /api/dashboard/select-tenant?tenantId=…` — `/dashboard`'s
- * tenant-picker link target (`DashboardTenantPicker`, reused from the
- * sidebar's `TenantSwitcher`). Re-verifies `tenantId` against the signed-in
- * user's own `memberships` before trusting it — never a client-supplied
- * value taken at face value — or, for a platform SUPERADMIN with no real
- * membership on that tenant, that the tenant actually exists. Then sets the
- * "active tenant" cookie `resolveDashboardTenant` reads on every subsequent
- * `/dashboard/**` request. Sits under `/api` (not `[locale]`) alongside this
- * app's other Route Handlers, matching `localePrefix: 'never'`.
+ * Sets the active-tenant cookie after re-verifying `tenantId` against the
+ * user's own memberships, or that the tenant exists for a SUPERADMIN. Every
+ * link here must pass `prefetch={false}`: a prefetch is a GET and would select
+ * the tenant.
  */
 export async function GET(request: Request): Promise<NextResponse> {
   const url = new URL(request.url);
