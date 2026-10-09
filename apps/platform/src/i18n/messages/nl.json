@@ -19,7 +19,8 @@
   },
   "workspacePendingPage": {
     "heading": "Uw werkruimte is nog niet klaar",
-    "description": "Dit kan gebeuren terwijl een werkruimte wordt ingericht, of als er onderweg iets is misgegaan. Vernieuw de pagina over een paar minuten, of neem contact op met degene die u heeft uitgenodigd als het probleem aanhoudt."
+    "description": "Dit kan gebeuren terwijl een werkruimte wordt ingericht, of als er onderweg iets is misgegaan. Vernieuw de pagina over een paar minuten, of neem contact op met degene die u heeft uitgenodigd als het probleem aanhoudt.",
+    "tryAgain": "Opnieuw proberen"
   },
   "notFoundPage": {
     "heading": "Pagina niet gevonden",
@@ -54,6 +55,9 @@
   "topbar": {
     "breadcrumbAriaLabel": "Kruimelpad",
     "roleChip": "{role} · {scope}"
+  },
+  "account": {
+    "signOut": "Uitloggen"
   },
   "roleLabel": {
     "SUPERADMIN": "Superbeheerder",

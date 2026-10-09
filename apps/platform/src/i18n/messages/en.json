@@ -19,7 +19,8 @@
   },
   "workspacePendingPage": {
     "heading": "Your workspace isn't ready yet",
-    "description": "This can happen while a workspace is being set up, or if something went wrong along the way. Try refreshing in a few minutes, or contact whoever invited you if it keeps happening."
+    "description": "This can happen while a workspace is being set up, or if something went wrong along the way. Try refreshing in a few minutes, or contact whoever invited you if it keeps happening.",
+    "tryAgain": "Try again"
   },
   "notFoundPage": {
     "heading": "Page not found",
@@ -54,6 +55,9 @@
   "topbar": {
     "breadcrumbAriaLabel": "Breadcrumb",
     "roleChip": "{role} · {scope}"
+  },
+  "account": {
+    "signOut": "Sign out"
   },
   "roleLabel": {
     "SUPERADMIN": "Super admin",

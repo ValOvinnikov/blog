@@ -7,6 +7,8 @@ import {
 
 import { DashboardTenantPicker } from './dashboard-tenant-picker';
 
+vi.mock('@platform/server/auth/sign-out-action');
+
 const render = renderWithIntl;
 
 const tenants = [
@@ -74,5 +76,11 @@ describe(DashboardTenantPicker, () => {
     render(<DashboardTenantPicker tenants={[]} />);
 
     expect(screen.queryByRole('main')).not.toBeInTheDocument();
+  });
+
+  it('offers a sign out', () => {
+    render(<DashboardTenantPicker tenants={tenants} />);
+
+    expect(screen.getByRole('button', { name: 'Sign out' })).toBeVisible();
   });
 });

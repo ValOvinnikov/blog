@@ -11,6 +11,7 @@ import { useSelectedLayoutSegment } from 'next/navigation';
 import { AdminShell } from './admin-shell';
 
 vi.mock('@platform/i18n/navigation');
+vi.mock('@platform/server/auth/sign-out-action');
 
 const render = renderWithIntl;
 

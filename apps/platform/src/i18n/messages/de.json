@@ -19,7 +19,8 @@
   },
   "workspacePendingPage": {
     "heading": "Ihr Arbeitsbereich ist noch nicht bereit",
-    "description": "Das kann passieren, während ein Arbeitsbereich eingerichtet wird oder wenn dabei etwas schiefgelaufen ist. Laden Sie die Seite in ein paar Minuten neu oder wenden Sie sich an die Person, die Sie eingeladen hat, falls das Problem bestehen bleibt."
+    "description": "Das kann passieren, während ein Arbeitsbereich eingerichtet wird oder wenn dabei etwas schiefgelaufen ist. Laden Sie die Seite in ein paar Minuten neu oder wenden Sie sich an die Person, die Sie eingeladen hat, falls das Problem bestehen bleibt.",
+    "tryAgain": "Erneut versuchen"
   },
   "notFoundPage": {
     "heading": "Seite nicht gefunden",
@@ -54,6 +55,9 @@
   "topbar": {
     "breadcrumbAriaLabel": "Brotkrumennavigation",
     "roleChip": "{role} · {scope}"
+  },
+  "account": {
+    "signOut": "Abmelden"
   },
   "roleLabel": {
     "SUPERADMIN": "Superadmin",

@@ -7,6 +7,8 @@ export const auth = vi.fn(async (): Promise<Session | null> => ({
 
 export const signIn = vi.fn();
 
+export const signOut = vi.fn();
+
 export const GET = vi.fn();
 
 export const POST = vi.fn();
