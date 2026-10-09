@@ -20,7 +20,7 @@ export const LookCard = ({
   children,
 }: TLookCardProps) => {
   const t = useTranslations('lookForm');
-  const { title: titleSlot, dot } = lookCardVariants();
+  const { title: titleSlot, dot, body } = lookCardVariants();
 
   return (
     <Card>
@@ -42,7 +42,7 @@ export const LookCard = ({
         actions={actions}
         headingLevel={2}
       />
-      <Card.Body>{children}</Card.Body>
+      <Card.Body className={body()}>{children}</Card.Body>
     </Card>
   );
 };

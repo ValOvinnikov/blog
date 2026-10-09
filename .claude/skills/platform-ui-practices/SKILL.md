@@ -172,8 +172,8 @@ export const auditLogTableVariants = tv({
   Settings pages get it from `SettingsFormShell`, whose `description` is
   required. The main action goes in `actions`: a primary `LinkButton` for an
   in-app route, `ExternalLinkButton hasArrow` for an off-app one.
-- **Not yet:** `PageHeader` adds its own `mb-5`, so header-to-content is 44px.
-  Keep the parent's `gap-6`; don't add or remove margin around it per page.
+- `PageHeader` carries no margin; the page root's `gap-6` sets
+  header-to-content at 24px. Don't add margin around it per page.
 - Width: a single-column settings page keeps `SettingsFormShell`'s `max-w-3xl`;
   one with a preview, or list + editor + preview, passes `isWide`; every other
   page fills the shell.

@@ -26,7 +26,7 @@ export const TenantsView = ({
   isEmailAlertingConfigured,
 }: TTenantsViewProps) => {
   const t = useTranslations('tenantsView');
-  const { root, toolbar, emailAlertsBanner, codeChunk } = tenantsViewVariants();
+  const { root, toolbar, codeChunk } = tenantsViewVariants();
 
   return (
     <div className={root()}>
@@ -44,11 +44,7 @@ export const TenantsView = ({
       <div className={toolbar()}>
         <ArchivedTenantsToggle shouldShowArchived={shouldShowArchived} />
       </div>
-      {!isEmailAlertingConfigured && (
-        <div className={emailAlertsBanner()}>
-          <EmailAlertsBanner />
-        </div>
-      )}
+      {!isEmailAlertingConfigured && <EmailAlertsBanner />}
       <TenantsTable tenants={tenants} />
     </div>
   );

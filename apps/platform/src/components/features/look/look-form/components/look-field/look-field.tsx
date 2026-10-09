@@ -19,15 +19,10 @@ export const LookField = ({
   children,
 }: TLookFieldProps) => {
   const t = useTranslations('lookForm');
-  const {
-    root,
-    label: labelSlot,
-    optionalTag,
-    hint: hintSlot,
-  } = lookFieldVariants();
+  const { label: labelSlot, optionalTag, hint: hintSlot } = lookFieldVariants();
 
   return (
-    <div id={id} className={root()}>
+    <div id={id}>
       <span className={labelSlot()}>
         {label}
         {isOptional && (
