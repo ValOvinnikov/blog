@@ -496,6 +496,12 @@
     "ARCHIVE": "Affichées quand une liste est encore vide. Choisissez-en une pour la modifier.",
     "BOOKMARKS": "Les articles enregistrés d'un lecteur, avant qu'il en enregistre"
   },
+  "voiceSurfaceNotes": {
+    "NOT_FOUND": "Le texte gris est fixe et traduit pour vous.",
+    "ERROR": "Les boutons sont fixes et traduits pour vous.",
+    "ARCHIVE": "Le titre vient de Studio ; seul le message vous appartient ici.",
+    "BOOKMARKS": "Le titre de la page et celui du panneau sont fixes."
+  },
   "voiceSpecimen": {
     "showPreview": "Afficher l'aperçu",
     "hidePreview": "Masquer l'aperçu",

@@ -80,7 +80,10 @@ export const VoiceSurfaceCard = ({
   const tDescriptions = useTranslations('voiceSurfaceDescriptions');
   const tLabels = useTranslations('voiceFieldLabels');
   const tSpecimen = useTranslations('voiceSpecimen');
+  const tNotes = useTranslations('voiceSurfaceNotes');
+  const tPreview = useTranslations('lookPreview');
   const previewId = useId();
+  const previewLabelId = useId();
   const [focusedFieldId, setFocusedFieldId] = useState<TVoiceFieldId>();
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const {
@@ -90,6 +93,8 @@ export const VoiceSurfaceCard = ({
     previewColumn,
     previewToggle,
     preview,
+    previewLabel,
+    previewNote,
     customisedCount,
   } = voiceSurfaceCardVariants({ isPreviewOpen });
   const fields = voiceFieldsOf(surface);
@@ -170,7 +175,15 @@ export const VoiceSurfaceCard = ({
             >
               {tSpecimen(isPreviewOpen ? 'hidePreview' : 'showPreview')}
             </Button>
-            <div id={previewId} className={preview()}>
+            <div
+              id={previewId}
+              role="group"
+              aria-labelledby={previewLabelId}
+              className={preview()}
+            >
+              <p id={previewLabelId} className={previewLabel()}>
+                {tPreview('livePreviewHeading')}
+              </p>
               <VoiceSpecimen
                 surface={surface}
                 locale={locale}
@@ -179,6 +192,7 @@ export const VoiceSurfaceCard = ({
                 focusedFieldId={focusedFieldId}
                 theme={specimenTheme}
               />
+              <p className={previewNote()}>{tNotes(surface)}</p>
             </div>
           </div>
         </Card.Body>

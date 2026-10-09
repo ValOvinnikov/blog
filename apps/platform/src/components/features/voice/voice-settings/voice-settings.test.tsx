@@ -168,6 +168,26 @@ describe(`<${VoiceSettings.name}/>`, () => {
       ).toBeVisible();
     });
 
+    it.each([
+      ['Page not found', 'Grey text is fixed and translated for you.'],
+      ['Error page', 'The buttons are fixed and translated for you.'],
+      [
+        'Empty lists',
+        'The heading comes from Studio; only the message is yours here.',
+      ],
+      ['Bookmarks', 'The page title and panel heading are fixed.'],
+    ])(
+      'labels the %s preview and tells the editor which text is theirs',
+      (surface, note) => {
+        setup();
+        const preview = within(card(surface)).getByRole('group', {
+          name: 'Live preview',
+        });
+
+        expect(within(preview).getByText(note)).toBeInTheDocument();
+      },
+    );
+
     it('toggles each preview behind its own Show preview button', async () => {
       setup();
       const toggle = within(card('Bookmarks')).getByRole('button', {

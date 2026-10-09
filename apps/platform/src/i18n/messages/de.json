@@ -496,6 +496,12 @@
     "ARCHIVE": "Erscheint, solange eine Liste noch leer ist. Wählen Sie eine aus, um sie zu bearbeiten.",
     "BOOKMARKS": "Die gemerkten Beiträge eines Lesers, bevor er welche merkt"
   },
+  "voiceSurfaceNotes": {
+    "NOT_FOUND": "Grauer Text ist fest und wird für Sie übersetzt.",
+    "ERROR": "Die Schaltflächen sind fest und werden für Sie übersetzt.",
+    "ARCHIVE": "Die Überschrift kommt aus Studio; nur die Nachricht gehört hier Ihnen.",
+    "BOOKMARKS": "Seitentitel und Bereichsüberschrift sind fest."
+  },
   "voiceSpecimen": {
     "showPreview": "Vorschau anzeigen",
     "hidePreview": "Vorschau ausblenden",
