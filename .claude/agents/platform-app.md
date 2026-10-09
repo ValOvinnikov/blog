@@ -177,6 +177,10 @@ When invoked, before writing any code:
 
 ## Base UI is this app's behavior layer
 
+How a page, card, field, notice and state look — with the decided values —
+is `.claude/skills/platform-ui-practices/SKILL.md` (read it with Read before
+any UI change). This section covers the behaviour layer only.
+
 Interactive primitives come from **Base UI** (`@base-ui/react`), installed in
 `apps/platform` and styled with Tailwind directly: `tabs`, `slider`, `switch`,
 `select`, `radio-group`, `dialog`, `alert-dialog`, `toggle-group`,
@@ -189,13 +193,11 @@ because this app is almost entirely forms.
 </Switch.Root>
 ```
 
-- **Style Base UI parts directly. Do not build wrapper components around them**
-  whose only content is a class string, and **do not add anything to
-  `@blog/ui`** for this app. That approach was designed, built, reviewed, and
-  withdrawn — a component with one consumer isn't shared, it's misfiled, which
-  is the same call this repo already made in #1157. If a control genuinely
-  repeats across admin pages later, extracting it then is mechanical; predicting
-  it now is not.
+- **Build reusable blocks on Base UI in `components/shared/`, and compose
+  pages from them** (`platform-ui-practices` → "Reusable blocks"). A pattern
+  another domain's page needs becomes a block, not a copy (the File
+  organisation rule). **Never add anything to
+  `@blog/ui` for this app.**
 - **A control uses its Base UI part when one exists,** directly or through
   the shared primitive built on it (`FormField`, `Disclosure`, `Button`). A
   labelled input is a `Field` (Label, Description, Error) around `Input` or

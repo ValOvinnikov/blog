@@ -208,6 +208,10 @@ CI-enforced guard was deliberately not added.
   `hero: ['mb-8 aspect-video ...']`, not `hero: 'mb-8 aspect-video ...'`.
 - Responsive classes are mobile-first, using only `md:`/`lg:` as the primary
   tiers (no custom `--breakpoint-*`).
+- `apps/platform` UI follows `platform-ui-practices`: every row of its "Red
+  flags — stop" table that the diff writes is a finding, and so is a value
+  that differs from its Type or Spacing table or its colour, radius or
+  elevation rules.
 
 ## 6. Tests & stories
 

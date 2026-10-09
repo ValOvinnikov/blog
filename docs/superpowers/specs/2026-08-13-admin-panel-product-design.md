@@ -218,9 +218,11 @@ a section organism built in `packages/ui` for `apps/web` page sections,
 rejected and closed unshipped, with the app composing primitives directly
 instead.
 
-If a control genuinely repeats across admin pages later, extract it to
-`@blog/ui` **then**. Moving a component out of an app is mechanical; predicting
-which ones deserve it is not.
+**Superseded 2026-10-08 (owner decision):** reusable blocks are built on Base
+UI inside `apps/platform/src/components/shared/`, and pages compose them; a
+pattern another domain's page needs becomes a block. Nothing goes into
+`@blog/ui` for this app. `.claude/skills/platform-ui-practices/SKILL.md` →
+"Reusable blocks" is the rule.
 
 **What `@blog/ui` keeps giving you here** is the token vocabulary — the same
 Tailwind theme tokens (`brand-primary-solid`, `border`, `duration-base`, …)

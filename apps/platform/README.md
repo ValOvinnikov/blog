@@ -19,7 +19,8 @@ Sanity-fetching concerns.
 - **Never imports:** `sanity`/`next-sanity`/`@sanity/*` or `@blog/service`.
   All relational reads and writes go through `@blog/db`'s exported query and
   mutation functions — no Drizzle, no Neon client, no SQL here. Nothing is
-  added to `@blog/ui` for this app; Base UI parts are styled in place instead.
+  added to `@blog/ui` for this app; Base UI parts become reusable blocks in
+  `src/components/shared/` (see `platform-ui-practices`).
 
 Authorization is this app's own responsibility, layered on top of the shared
 session `@blog/auth` provides: a Platform route requires an `admins` row, a
