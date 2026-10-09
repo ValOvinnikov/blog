@@ -24,7 +24,7 @@ describe(AddTenantWizard, () => {
   });
 
   it('renders a rail item for Details plus every core provisioning step, with Details active', () => {
-    const rail = screen.getByRole('navigation', {
+    const rail = screen.getByRole('list', {
       name: 'Provisioning steps',
     });
     const items = screen.getAllByRole('listitem');

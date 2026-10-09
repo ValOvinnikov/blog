@@ -30,7 +30,7 @@ describe(TenantsView, () => {
     });
 
     it('links add-tenant to the wizard', () => {
-      const addTenant = screen.getByRole('link', { name: /add tenant/i });
+      const addTenant = screen.getByRole('link', { name: 'Add tenant' });
       expect(addTenant).toHaveAttribute('href', '/tenants/new');
     });
 

@@ -99,7 +99,7 @@
   "tenantsView": {
     "title": "Locataires",
     "description": "Tous les sites de la plateforme, lus depuis la table <code>tenants</code> réelle.",
-    "addTenant": "+ Ajouter un locataire"
+    "addTenant": "Ajouter un locataire"
   },
   "emailAlertsBanner": {
     "title": "Alertes par e-mail non configurées",

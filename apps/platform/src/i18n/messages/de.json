@@ -99,7 +99,7 @@
   "tenantsView": {
     "title": "Mandanten",
     "description": "Jede Website der Plattform, gelesen aus der echten Tabelle <code>tenants</code>.",
-    "addTenant": "+ Mandant hinzufügen"
+    "addTenant": "Mandant hinzufügen"
   },
   "emailAlertsBanner": {
     "title": "E-Mail-Benachrichtigungen nicht eingerichtet",

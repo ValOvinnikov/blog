@@ -99,7 +99,7 @@
   "tenantsView": {
     "title": "Tenants",
     "description": "Every site on the platform, read from the real <code>tenants</code> table.",
-    "addTenant": "+ Add tenant"
+    "addTenant": "Add tenant"
   },
   "emailAlertsBanner": {
     "title": "Email alerts not configured",

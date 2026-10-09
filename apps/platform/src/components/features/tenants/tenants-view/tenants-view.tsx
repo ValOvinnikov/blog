@@ -1,7 +1,9 @@
+import { ICONS } from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { ArchivedTenantsToggle } from '@platform/components/features/tenants/archived-tenants-toggle';
 import { EmailAlertsBanner } from '@platform/components/features/tenants/email-alerts-banner';
 import { TenantsTable } from '@platform/components/features/tenants/tenants-table';
+import { Icon } from '@platform/components/shared/icon';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { PageHeader } from '@platform/components/shared/page-header';
 import { adminRoutes } from '@platform/utils/routes/routes';
@@ -15,11 +17,6 @@ export type TTenantsViewProps = {
   isEmailAlertingConfigured: boolean;
 };
 
-/**
- * The Tenants page body: heading, the add-tenant entry point, and the real
- * tenant list. Ships from day one — with one tenant it's still a finished
- * page, not a placeholder.
- */
 export const TenantsView = ({
   tenants,
   shouldShowArchived,
@@ -37,14 +34,15 @@ export const TenantsView = ({
         })}
         actions={
           <LinkButton href={adminRoutes.newTenant()} variant="primary">
+            <Icon name={ICONS.PLUS} />
             {t('addTenant')}
           </LinkButton>
         }
       />
+      {!isEmailAlertingConfigured && <EmailAlertsBanner />}
       <div className={toolbar()}>
         <ArchivedTenantsToggle shouldShowArchived={shouldShowArchived} />
       </div>
-      {!isEmailAlertingConfigured && <EmailAlertsBanner />}
       <TenantsTable tenants={tenants} />
     </div>
   );

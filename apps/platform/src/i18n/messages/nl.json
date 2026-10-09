@@ -99,7 +99,7 @@
   "tenantsView": {
     "title": "Tenants",
     "description": "Elke site op het platform, gelezen uit de echte <code>tenants</code>-tabel.",
-    "addTenant": "+ Tenant toevoegen"
+    "addTenant": "Tenant toevoegen"
   },
   "emailAlertsBanner": {
     "title": "E-mailmeldingen niet geconfigureerd",
