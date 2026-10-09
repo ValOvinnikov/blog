@@ -8,6 +8,8 @@ import { PageHeader } from '@platform/components/shared/page-header';
 import { getEnabledCapabilities } from '@platform/server/settings-features/get-enabled-capabilities';
 import { getTranslations } from 'next-intl/server';
 
+import { studioMountViewVariants } from './studio-mount-view-variants';
+
 export type TStudioMountViewProps = {
   tenant: TTenant;
   basePath: string;
@@ -22,13 +24,14 @@ export const StudioMountView = async ({
   basePath,
 }: TStudioMountViewProps) => {
   const t = await getTranslations('studioPage');
+  const { root } = studioMountViewVariants();
 
   if (tenant.deprovisionedAt) {
     return (
-      <>
+      <div className={root()}>
         <PageHeader title={t('title')} />
         <ArchivedTenantNotice archivedAt={tenant.deprovisionedAt} />
-      </>
+      </div>
     );
   }
 
@@ -38,14 +41,14 @@ export const StudioMountView = async ({
 
   if (!credentials) {
     return (
-      <>
+      <div className={root()}>
         <PageHeader title={t('title')} />
         <Alert
           type={ALERT_TYPE.WARNING}
           title={t('notProvisionedTitle')}
           description={t('notProvisionedDescription')}
         />
-      </>
+      </div>
     );
   }
 

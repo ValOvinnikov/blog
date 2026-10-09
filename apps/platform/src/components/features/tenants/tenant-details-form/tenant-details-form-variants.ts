@@ -9,7 +9,7 @@ export const tenantDetailsFormVariants = tv({
       'absolute inset-0 z-10 flex items-center justify-center gap-2',
       'rounded-admin bg-admin-surface/80 backdrop-blur-sm',
     ],
-    fields: ['flex flex-col gap-5'],
+    fields: ['flex flex-col gap-4'],
     planControl: ['self-start'],
   },
   variants: {

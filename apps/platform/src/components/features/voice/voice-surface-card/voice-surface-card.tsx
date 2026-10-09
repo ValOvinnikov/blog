@@ -19,6 +19,7 @@ import {
   voiceFieldsOf,
   voiceValueAsText,
   type TVoiceDraftValue,
+  type TVoiceField,
   type TVoiceFieldErrors,
   type TVoiceLocaleDraft,
 } from '@platform/utils/voice-draft/voice-draft';
@@ -40,6 +41,22 @@ export type TVoiceSurfaceCardProps = {
   isReadOnly: boolean;
   specimenTheme: TVoiceSpecimenTheme;
 };
+
+type TVoiceFieldGroup = { isCollapsed: boolean; fields: TVoiceField[] };
+
+const groupCollapsedFields = (
+  fields: TVoiceField[],
+  openFieldId: TVoiceFieldId | undefined,
+): TVoiceFieldGroup[] =>
+  fields.reduce<TVoiceFieldGroup[]>((groups, field) => {
+    const isCollapsed = openFieldId !== undefined && openFieldId !== field.id;
+    const last = groups.at(-1);
+    if (last?.isCollapsed === isCollapsed) {
+      last.fields.push(field);
+      return groups;
+    }
+    return [...groups, { isCollapsed, fields: [field] }];
+  }, []);
 
 export const VoiceSurfaceCard = ({
   surface,
@@ -65,12 +82,17 @@ export const VoiceSurfaceCard = ({
   const {
     body,
     fields: fieldsSlot,
+    collapsedList,
     previewColumn,
     previewToggle,
     preview,
     customisedCount,
   } = voiceSurfaceCardVariants({ isPreviewOpen });
   const fields = voiceFieldsOf(surface);
+  const trackFocusOf = (id: TVoiceFieldId) => ({
+    onFocus: () => setFocusedFieldId(id),
+    onBlur: () => setFocusedFieldId(undefined),
+  });
 
   return (
     <section aria-label={tSurfaces(surface)}>
@@ -89,51 +111,50 @@ export const VoiceSurfaceCard = ({
         />
         <Card.Body className={body()}>
           <div className={fieldsSlot()}>
-            {fields.map((field) => {
-              const value = values[field.id];
-              const defaultText = voiceDefaultText(locale, field);
-              const isOpen =
-                openFieldId === undefined || openFieldId === field.id;
-
-              const trackFocus = {
-                onFocus: () => setFocusedFieldId(field.id),
-                onBlur: () => setFocusedFieldId(undefined),
-              };
-
-              if (!isOpen) {
-                const isCustomised = isVoiceValueCustomised(value);
+            {groupCollapsedFields(fields, openFieldId).flatMap((group) => {
+              if (group.isCollapsed) {
                 return (
-                  <div key={field.id} {...trackFocus}>
-                    <VoiceListRow
-                      label={tLabels(field.id)}
-                      text={
-                        isCustomised ? voiceValueAsText(value) : defaultText
-                      }
-                      isCustomised={isCustomised}
-                      isUnsaved={
-                        !isSameVoiceValue(value, savedValues[field.id])
-                      }
-                      hasError={errors[field.id] !== undefined}
-                      onOpen={() => onOpenField(field.id)}
-                    />
+                  <div key={group.fields[0].id} className={collapsedList()}>
+                    {group.fields.map((field) => {
+                      const value = values[field.id];
+                      const isCustomised = isVoiceValueCustomised(value);
+                      return (
+                        <div key={field.id} {...trackFocusOf(field.id)}>
+                          <VoiceListRow
+                            label={tLabels(field.id)}
+                            text={
+                              isCustomised
+                                ? voiceValueAsText(value)
+                                : voiceDefaultText(locale, field)
+                            }
+                            isCustomised={isCustomised}
+                            isUnsaved={
+                              !isSameVoiceValue(value, savedValues[field.id])
+                            }
+                            hasError={errors[field.id] !== undefined}
+                            onOpen={() => onOpenField(field.id)}
+                          />
+                        </div>
+                      );
+                    })}
                   </div>
                 );
               }
 
-              return (
-                <div key={field.id} {...trackFocus}>
+              return group.fields.map((field) => (
+                <div key={field.id} {...trackFocusOf(field.id)}>
                   <VoiceField
                     inputId={voiceFieldInputId(fieldIdPrefix, field.id)}
                     field={field}
-                    value={value}
+                    value={values[field.id]}
                     savedValue={savedValues[field.id]}
-                    placeholder={defaultText}
+                    placeholder={voiceDefaultText(locale, field)}
                     error={errors[field.id]}
                     onChange={(next) => onFieldChange(field.id, next)}
                     isReadOnly={isReadOnly}
                   />
                 </div>
-              );
+              ));
             })}
           </div>
           <div className={previewColumn()}>
