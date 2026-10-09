@@ -400,7 +400,8 @@
     "senderItemLabel": "Sender & footer",
     "senderItemDescription": "Name, reply-to, address and logo, the same in every language.",
     "editingLabel": "Editing",
-    "templateGroupLabel": "Template"
+    "templateGroupLabel": "Template",
+    "allLanguagesChanges": "All languages"
   },
   "fieldStatus": {
     "default": "Default",
@@ -430,8 +431,6 @@
     "unsavedLogoNote": "A logo you haven't saved yet isn't included in the test."
   },
   "emailSettingsForm": {
-    "heading": "Email settings",
-    "description": "Applies to every email your site sends. Leave a field blank to use the default.",
     "senderNameLabel": "Sender name",
     "senderNameHint": "The display name on the From address — unrelated to the site title.",
     "senderNameInvalidError": "This is the name recipients see, not an email address. Enter a name such as Acme Co, without < > \" , ; or @.",

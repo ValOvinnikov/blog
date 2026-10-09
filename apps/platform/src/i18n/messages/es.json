@@ -400,7 +400,8 @@
     "senderItemLabel": "Remitente y pie",
     "senderItemDescription": "Nombre, dirección de respuesta, dirección postal y logotipo, iguales en todos los idiomas.",
     "editingLabel": "Editando",
-    "templateGroupLabel": "Plantilla"
+    "templateGroupLabel": "Plantilla",
+    "allLanguagesChanges": "Todos los idiomas"
   },
   "fieldStatus": {
     "default": "Predeterminado",
@@ -430,8 +431,6 @@
     "unsavedLogoNote": "Un logotipo que aún no ha guardado no se incluye en la prueba."
   },
   "emailSettingsForm": {
-    "heading": "Configuración del correo electrónico",
-    "description": "Se aplica a todos los correos que envía su sitio. Deje un campo en blanco para usar el valor predeterminado.",
     "senderNameLabel": "Nombre del remitente",
     "senderNameHint": "El nombre visible en la dirección del remitente; no tiene relación con el título del sitio.",
     "senderNameInvalidError": "Es el nombre que ven los destinatarios, no una dirección de correo. Introduzca un nombre como Acme Co, sin < > \" , ; ni @.",

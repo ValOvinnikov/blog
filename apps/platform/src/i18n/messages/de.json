@@ -400,7 +400,8 @@
     "senderItemLabel": "Absender & Fußzeile",
     "senderItemDescription": "Name, Antwortadresse, Anschrift und Logo, in jeder Sprache gleich.",
     "editingLabel": "Bearbeiten",
-    "templateGroupLabel": "Vorlage"
+    "templateGroupLabel": "Vorlage",
+    "allLanguagesChanges": "Alle Sprachen"
   },
   "fieldStatus": {
     "default": "Standard",
@@ -430,8 +431,6 @@
     "unsavedLogoNote": "Ein noch nicht gespeichertes Logo ist im Test nicht enthalten."
   },
   "emailSettingsForm": {
-    "heading": "E-Mail-Einstellungen",
-    "description": "Gilt für jede E-Mail, die Ihre Website versendet. Lassen Sie ein Feld leer, um den Standard zu verwenden.",
     "senderNameLabel": "Absendername",
     "senderNameHint": "Der Anzeigename der Absenderadresse — unabhängig vom Website-Titel.",
     "senderNameInvalidError": "Das ist der Name, den Empfänger sehen, keine E-Mail-Adresse. Geben Sie einen Namen wie Acme Co ein, ohne < > \" , ; oder @.",

@@ -19,6 +19,7 @@ import {
   countCustomisedTemplates,
   countEmailDraftChanges,
   countLanguageChanges,
+  countSharedChanges,
   EMAIL_SENDER_ITEM,
   EMAIL_TEMPLATE_TYPES,
   resolveFallbackCopy,
@@ -208,10 +209,20 @@ export const EmailSettings = ({
       onSave={handleSubmit}
       onDiscard={() => replaceDraft(() => saved)}
       changeCount={countEmailDraftChanges(saved, draft, liveLocales)}
-      changesByLanguage={liveLocales.map((locale) => ({
-        language: tLanguage(locale),
-        count: countLanguageChanges(saved, draft, locale),
-      }))}
+      changesByLanguage={
+        liveLocales.length > 1
+          ? [
+              {
+                language: t('allLanguagesChanges'),
+                count: countSharedChanges(saved, draft),
+              },
+              ...liveLocales.map((locale) => ({
+                language: tLanguage(locale),
+                count: countLanguageChanges(saved, draft, locale),
+              })),
+            ]
+          : []
+      }
       isPending={isPending}
       archivedAt={archivedAt}
       archivedNoticeId={archivedNoticeId}
