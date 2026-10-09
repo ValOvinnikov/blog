@@ -1,38 +1,47 @@
 'use server';
 
-import { PRESET_ID, PRESET_REGISTRY } from '@blog/config/constants';
+import { VOICE_FIELDS } from '@blog/config';
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { queries } from '@blog/db';
 import type { TVoiceOverridesByLocaleInput } from '@blog/db/queries/site-config';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
+import { getSiteConfigOrDefaults } from '@platform/server/site-config/site-config-or-defaults';
 import { logger } from '@platform/utils/logger/logger';
 import type { TVoiceFieldErrorsByLocale } from '@platform/utils/voice-draft/voice-draft';
+import { z } from 'zod';
+
+const voiceFieldIdSchema = z.enum(VOICE_FIELDS.map(({ id }) => id));
+
+const voiceOverridesByLocaleSchema = z.partialRecord(
+  z.enum(LOCALE_ISO_CODES),
+  z.partialRecord(voiceFieldIdSchema, z.unknown()),
+);
 
 export type TSaveVoiceOverridesResult =
   { ok: true } | { ok: false; fieldErrorsByLocale?: TVoiceFieldErrorsByLocale };
 
-// A Voice-only save round-trips the theme columns, which upsertSiteConfig writes on every call.
 export const saveVoiceOverridesAction = async (
   tenantId: string,
   overridesByLocale: TVoiceOverridesByLocaleInput,
 ): Promise<TSaveVoiceOverridesResult> => {
+  const parsed = voiceOverridesByLocaleSchema.safeParse(overridesByLocale);
+  if (!parsed.success) return { ok: false };
+
   const { tenant } = await requireTenantMembership(tenantId);
 
-  const existing = await queries.siteConfig.getSiteConfig(tenant.id);
-  const theme = existing ?? PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens;
-
   try {
+    const { preset, accentHue, headingFont, bodyFont, radiusScale, density } =
+      await getSiteConfigOrDefaults(tenant.id);
+
     const result = await queries.siteConfig.upsertSiteConfig(tenant.id, {
-      preset: existing?.preset ?? PRESET_ID.CONSOLE,
-      accentHue: theme.accentHue,
-      logoHue: existing?.logoHue,
-      headingFont: theme.headingFont,
-      bodyFont: theme.bodyFont,
-      radiusScale: theme.radiusScale,
-      density: theme.density,
-      logoAssetUrl: existing?.logoAssetUrl,
-      faviconAssetUrl: existing?.faviconAssetUrl,
-      voiceOverridesByLocale: overridesByLocale,
+      preset,
+      accentHue,
+      headingFont,
+      bodyFont,
+      radiusScale,
+      density,
+      voiceOverridesByLocale: parsed.data,
     });
 
     if (!result.ok) {

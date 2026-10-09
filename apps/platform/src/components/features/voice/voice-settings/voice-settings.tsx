@@ -9,7 +9,6 @@ import {
 } from '@blog/config';
 import type { TLocaleIsoCode } from '@blog/config/constants';
 import type { TVoiceOverridesByLocaleInput } from '@blog/db/queries/site-config';
-import type { TSaveVoiceOverridesResult } from '@platform/components/features/voice/voice-page-content/save-voice-overrides-action';
 import { VoiceSurfaceCard } from '@platform/components/features/voice/voice-surface-card';
 import { Alert } from '@platform/components/shared/alert';
 import { LanguagePicker } from '@platform/components/shared/language-picker';
@@ -17,6 +16,7 @@ import { SegmentedControl } from '@platform/components/shared/segmented-control'
 import { SettingsFormShell } from '@platform/components/shared/settings-form-shell';
 import { FONT_OPTIONS } from '@platform/config/fonts';
 import { useToast } from '@platform/context/toast-provider';
+import type { TSaveVoiceOverridesResult } from '@platform/server/site-config/save-voice-overrides-action';
 import {
   buildThemePreviewStyle,
   type TThemePreviewValues,
