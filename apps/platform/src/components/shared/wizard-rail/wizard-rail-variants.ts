@@ -16,7 +16,7 @@ export const wizardRailVariants = tv({
     connector: ['my-1 w-0.5 flex-1 bg-admin-line-2'],
     stepBody: ['flex min-w-0 flex-1 flex-col pb-[9px]'],
     stepTitle: ['text-[13px] font-semibold text-admin-text'],
-    stepDescription: ['text-[11.5px] text-admin-faint'],
+    stepDescription: ['text-[12px] text-admin-muted'],
   },
   variants: {
     isActive: {

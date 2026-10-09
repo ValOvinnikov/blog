@@ -12,7 +12,7 @@ export const settingRowVariants = tv({
     description: ['mt-0.5 block text-[12.5px] text-admin-muted'],
     reason: [
       'mt-[5px] flex items-start gap-[5px]',
-      'text-[11.5px] leading-[1.45] text-admin-faint',
+      'text-[12px] leading-[1.45] text-admin-muted',
     ],
     control: ['flex shrink-0 items-center gap-2'],
   },
