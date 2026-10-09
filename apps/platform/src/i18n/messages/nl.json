@@ -91,6 +91,7 @@
     "columnPlan": "Abonnement",
     "columnStatus": "Status",
     "columnCreated": "Aangemaakt",
+    "columnActions": "Acties",
     "status": {
       "ACTIVE": "Actief",
       "SUSPENDED": "Opgeschort",

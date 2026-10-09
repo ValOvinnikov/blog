@@ -572,8 +572,9 @@ tools you have are `loading.tsx`, `<Suspense>`, `cache`, `use`,
 - A dialog keeps a 16px gutter (`w-[calc(100%-2rem)] max-w-md`). **Not yet:**
   `ConfirmDialog`'s popup is `w-full max-w-md`; only `LeavePageDialog` has it.
 - Tables scroll sideways inside their card, and fact lists stack the term above
-  the value. **Not yet:** `DataTableShell` has no scroll wrapper and
-  `DetailList` keeps its 132px term column; fix them there, not per page.
+  the value below `md`. `DataTableShell` and `DetailList` own both; never
+  add them per page. The shell's scroll region is named by its `ariaLabel`,
+  the page's own title.
 - A Desktop/Mobile preview toggle is offered only where it changes what renders;
   an email's Desktop preview is a real 600px frame.
 - Check in a browser at 375, 768, 1024 and 1280px, sidebar open and collapsed,

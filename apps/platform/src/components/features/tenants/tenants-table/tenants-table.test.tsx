@@ -87,6 +87,24 @@ describe(TenantsTable, () => {
     ).toHaveAttribute('href', '/tenants/tenant-2/provisioning');
   });
 
+  it('names the scrollable table region and the actions column for screen readers', () => {
+    render(<TenantsTable tenants={[buildTenant()]} />);
+
+    expect(screen.getByRole('region', { name: 'Tenants' })).toContainElement(
+      screen.getByRole('table'),
+    );
+    expect(screen.getByRole('columnheader', { name: 'Actions' })).toBeVisible();
+  });
+
+  it('renders the created date as a machine-readable time', () => {
+    render(<TenantsTable tenants={[buildTenant()]} />);
+
+    expect(screen.getByText('Apr 2, 2026')).toHaveAttribute(
+      'dateTime',
+      '2026-04-02T00:00:00.000Z',
+    );
+  });
+
   it('renders an empty state instead of an empty table when there are no tenants', () => {
     render(<TenantsTable tenants={[]} />);
 

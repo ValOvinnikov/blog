@@ -23,6 +23,7 @@ describe(`<${DataTableShell.name}/>`, () => {
       <DataTableShell
         items={noItems}
         emptyMessage="No rows yet."
+        ariaLabel="Accounts"
         classNames={classNames}
         columns={[{ key: 'name', label: 'Name' }]}
         renderRow={(item) => <tr key={item.id}>{item.name}</tr>}
@@ -38,6 +39,7 @@ describe(`<${DataTableShell.name}/>`, () => {
       <DataTableShell
         items={twoItems}
         emptyMessage="No rows yet."
+        ariaLabel="Accounts"
         classNames={classNames}
         columns={[
           { key: 'name', label: 'Name' },
@@ -55,5 +57,27 @@ describe(`<${DataTableShell.name}/>`, () => {
     expect(screen.getByText('Acme')).toBeVisible();
     expect(screen.getByText('Globex')).toBeVisible();
     expect(screen.queryByText('No rows yet.')).not.toBeInTheDocument();
+  });
+
+  it('puts the table in a named, keyboard-focusable region so it can scroll sideways', () => {
+    render(
+      <DataTableShell
+        items={twoItems}
+        emptyMessage="No rows yet."
+        ariaLabel="Accounts"
+        classNames={classNames}
+        columns={[{ key: 'name', label: 'Name' }]}
+        renderRow={(item) => (
+          <tr key={item.id}>
+            <td>{item.name}</td>
+          </tr>
+        )}
+      />,
+    );
+
+    const region = screen.getByRole('region', { name: 'Accounts' });
+
+    expect(region).toContainElement(screen.getByRole('table'));
+    expect(region).toHaveAttribute('tabindex', '0');
   });
 });
