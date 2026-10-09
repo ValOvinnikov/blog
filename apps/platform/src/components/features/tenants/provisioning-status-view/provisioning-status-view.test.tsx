@@ -44,13 +44,6 @@ vi.mock(
   }),
 );
 
-vi.mock(
-  '@platform/server/provisioning/get-domain-verification-status-action',
-  () => ({
-    getDomainVerificationStatusAction: vi.fn(),
-  }),
-);
-
 describe(ProvisioningStatusView, () => {
   let user: UserEvent;
 

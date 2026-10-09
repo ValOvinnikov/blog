@@ -1,4 +1,4 @@
-import { DOMAIN_VERIFICATION_STATUS, LOCALE_ISO_CODES } from '@blog/config';
+import { LOCALE_ISO_CODES } from '@blog/config';
 import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
@@ -22,7 +22,6 @@ import type { ReactNode } from 'react';
 import { STEP_ORDER, useProvisioningPoll } from './use-provisioning-poll';
 
 const STEP_POLL_INTERVAL_MS = 4000;
-const DOMAIN_POLL_INTERVAL_MS = 10000;
 const TOAST_EXIT_BUFFER_MS = 1000;
 const RETRY_BASELINE_MAX_TICKS = 75;
 
@@ -38,11 +37,9 @@ const renderHook: typeof rtlRenderHook = (callback, options) =>
 const {
   retryProvisioningStepActionMock,
   getTenantProvisioningStatusActionMock,
-  getDomainVerificationStatusActionMock,
 } = vi.hoisted(() => ({
   retryProvisioningStepActionMock: vi.fn(),
   getTenantProvisioningStatusActionMock: vi.fn(),
-  getDomainVerificationStatusActionMock: vi.fn(),
 }));
 
 vi.mock('@platform/server/provisioning/retry-provisioning-step-action', () => ({
@@ -56,13 +53,6 @@ vi.mock(
   }),
 );
 
-vi.mock(
-  '@platform/server/provisioning/get-domain-verification-status-action',
-  () => ({
-    getDomainVerificationStatusAction: getDomainVerificationStatusActionMock,
-  }),
-);
-
 describe(useProvisioningPoll, () => {
   beforeEach(() => {
     retryProvisioningStepActionMock.mockReset();
@@ -71,10 +61,6 @@ describe(useProvisioningPoll, () => {
     });
     getTenantProvisioningStatusActionMock.mockReset();
     getTenantProvisioningStatusActionMock.mockResolvedValue(undefined);
-    getDomainVerificationStatusActionMock.mockReset();
-    getDomainVerificationStatusActionMock.mockResolvedValue(
-      DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED,
-    );
   });
 
   describe('STEP_ORDER', () => {
@@ -89,18 +75,14 @@ describe(useProvisioningPoll, () => {
   describe('ownerElevationOutcome', () => {
     it('is undefined when the OWNER_ELEVATION step has not reported yet', () => {
       const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
-      const { result } = renderHook(() =>
-        useProvisioningPoll(tenant, DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED),
-      );
+      const { result } = renderHook(() => useProvisioningPoll(tenant));
 
       expect(result.current.ownerElevationOutcome).toBeUndefined();
     });
 
     it('is undefined when provisioningSteps itself is null', () => {
       const tenant = makeTenant({ provisioningSteps: null });
-      const { result } = renderHook(() =>
-        useProvisioningPoll(tenant, DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED),
-      );
+      const { result } = renderHook(() => useProvisioningPoll(tenant));
 
       expect(result.current.ownerElevationOutcome).toBeUndefined();
     });
@@ -115,9 +97,7 @@ describe(useProvisioningPoll, () => {
           },
         },
       });
-      const { result } = renderHook(() =>
-        useProvisioningPoll(tenant, DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED),
-      );
+      const { result } = renderHook(() => useProvisioningPoll(tenant));
 
       expect(result.current.ownerElevationOutcome).toBe('STALLED');
     });
@@ -152,10 +132,7 @@ describe(useProvisioningPoll, () => {
         provisioningSteps: allStepsDone,
       });
       const { result: withoutResult } = renderHook(() =>
-        useProvisioningPoll(
-          withoutOwnerElevation,
-          DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED,
-        ),
+        useProvisioningPoll(withoutOwnerElevation),
       );
 
       const withStalledOwnerElevation = makeTenant({
@@ -169,10 +146,7 @@ describe(useProvisioningPoll, () => {
         },
       });
       const { result: withResult } = renderHook(() =>
-        useProvisioningPoll(
-          withStalledOwnerElevation,
-          DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED,
-        ),
+        useProvisioningPoll(withStalledOwnerElevation),
       );
 
       expect(withResult.current.ownerElevationOutcome).toBe('STALLED');
@@ -198,10 +172,7 @@ describe(useProvisioningPoll, () => {
         provisioningSteps: idleProvisioningSteps(),
       });
       const { result: withoutResult } = renderHook(() =>
-        useProvisioningPoll(
-          withoutRun,
-          DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED,
-        ),
+        useProvisioningPoll(withoutRun),
       );
       expect(withoutResult.current.provisioningRun).toBeUndefined();
 
@@ -215,7 +186,7 @@ describe(useProvisioningPoll, () => {
         },
       });
       const { result: withResult } = renderHook(() =>
-        useProvisioningPoll(withRun, DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED),
+        useProvisioningPoll(withRun),
       );
       expect(withResult.current.provisioningRun).toEqual({
         startedAt: '2026-08-12T14:18:00.000Z',
@@ -233,9 +204,7 @@ describe(useProvisioningPoll, () => {
           },
         },
       });
-      const { result } = renderHook(() =>
-        useProvisioningPoll(tenant, DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED),
-      );
+      const { result } = renderHook(() => useProvisioningPoll(tenant));
 
       expect(result.current.stepUpdatedAt[0]).toBe('2026-08-12T14:19:00.000Z');
       expect(result.current.stepUpdatedAt[1]).toBeUndefined();
@@ -243,9 +212,7 @@ describe(useProvisioningPoll, () => {
 
     it('reports allIdle and IDLE overall status when every step is idle', () => {
       const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
-      const { result } = renderHook(() =>
-        useProvisioningPoll(tenant, DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED),
-      );
+      const { result } = renderHook(() => useProvisioningPoll(tenant));
 
       expect(result.current.allIdle).toBe(true);
       expect(result.current.isOverallFailed).toBe(false);
@@ -265,9 +232,7 @@ describe(useProvisioningPoll, () => {
           },
         },
       });
-      const { result } = renderHook(() =>
-        useProvisioningPoll(tenant, DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED),
-      );
+      const { result } = renderHook(() => useProvisioningPoll(tenant));
 
       expect(result.current.isOverallFailed).toBe(true);
       expect(result.current.failedStepError).toBe('fetch failed');
@@ -285,9 +250,7 @@ describe(useProvisioningPoll, () => {
           },
         },
       });
-      const { result } = renderHook(() =>
-        useProvisioningPoll(tenant, DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED),
-      );
+      const { result } = renderHook(() => useProvisioningPoll(tenant));
 
       expect(result.current.overallStepStatus).toBe(
         TENANT_PROVISIONING_STEP_STATUS.FAILED,
@@ -308,17 +271,13 @@ describe(useProvisioningPoll, () => {
           },
         },
       });
-      const { result } = renderHook(() =>
-        useProvisioningPoll(tenant, DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED),
-      );
+      const { result } = renderHook(() => useProvisioningPoll(tenant));
 
       expect(result.current.isProvisioningRunning).toBe(true);
       expect(result.current.isOverallFailed).toBe(false);
       expect(result.current.displayOverallStatus).toBe(
         TENANT_PROVISIONING_STEP_STATUS.RUNNING,
       );
-      // The raw array still carries the real FAILED entry — only the
-      // display-facing one is masked.
       expect(result.current.stepStatuses[3]).toBe(
         TENANT_PROVISIONING_STEP_STATUS.FAILED,
       );
@@ -338,9 +297,7 @@ describe(useProvisioningPoll, () => {
           },
         },
       });
-      const { result } = renderHook(() =>
-        useProvisioningPoll(tenant, DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED),
-      );
+      const { result } = renderHook(() => useProvisioningPoll(tenant));
 
       expect(result.current.isOverallFailed).toBe(true);
       expect(result.current.displayStepStatuses[3]).toBe(
@@ -361,9 +318,7 @@ describe(useProvisioningPoll, () => {
           },
         },
       });
-      const { result } = renderHook(() =>
-        useProvisioningPoll(tenant, DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED),
-      );
+      const { result } = renderHook(() => useProvisioningPoll(tenant));
 
       expect(result.current.overallStepStatus).toBe(
         TENANT_PROVISIONING_STEP_STATUS.FAILED,
@@ -373,9 +328,7 @@ describe(useProvisioningPoll, () => {
     it('treats an in-flight dispatch on an all-idle tenant as RUNNING for display, without marking any individual step failed', async () => {
       const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
       retryProvisioningStepActionMock.mockReturnValue(new Promise(() => {}));
-      const { result } = renderHook(() =>
-        useProvisioningPoll(tenant, DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED),
-      );
+      const { result } = renderHook(() => useProvisioningPoll(tenant));
 
       act(() => {
         result.current.handleStart();
@@ -419,9 +372,7 @@ describe(useProvisioningPoll, () => {
           },
         },
       });
-      const { result } = renderHook(() =>
-        useProvisioningPoll(tenant, DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED),
-      );
+      const { result } = renderHook(() => useProvisioningPoll(tenant));
 
       expect(result.current.stepStatuses[0]).toBe(
         TENANT_PROVISIONING_STEP_STATUS.RUNNING,
@@ -443,9 +394,7 @@ describe(useProvisioningPoll, () => {
       const tenant = makeTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
       });
-      renderHook(() =>
-        useProvisioningPoll(tenant, DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED),
-      );
+      renderHook(() => useProvisioningPoll(tenant));
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS * 2);
@@ -462,9 +411,7 @@ describe(useProvisioningPoll, () => {
         provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
         provisioningSteps: idleProvisioningSteps(),
       });
-      renderHook(() =>
-        useProvisioningPoll(tenant, DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED),
-      );
+      renderHook(() => useProvisioningPoll(tenant));
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
@@ -497,9 +444,7 @@ describe(useProvisioningPoll, () => {
           },
         },
       });
-      renderHook(() =>
-        useProvisioningPoll(tenant, DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED),
-      );
+      renderHook(() => useProvisioningPoll(tenant));
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
@@ -524,11 +469,8 @@ describe(useProvisioningPoll, () => {
         provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
         provisioningSteps: failedSteps,
       });
-      const { result } = renderHook(() =>
-        useProvisioningPoll(tenant, DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED),
-      );
+      const { result } = renderHook(() => useProvisioningPoll(tenant));
 
-      // Confirm it's genuinely stopped on mount.
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS * 2);
       });
@@ -552,14 +494,11 @@ describe(useProvisioningPoll, () => {
         result.current.handleRetry();
       });
 
-      // First tick after Retry: still the stale, unchanged snapshot — must
-      // not stop polling on it.
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
       });
       expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledTimes(1);
 
-      // Second tick: the retried workflow has now actually started.
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
       });
@@ -581,50 +520,34 @@ describe(useProvisioningPoll, () => {
         provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
         provisioningSteps: failedSteps,
       });
-      // Models a retry whose dispatched workflow never actually starts —
-      // every tick reports the exact same failed-and-nothing-running
-      // snapshot forever.
       getTenantProvisioningStatusActionMock.mockResolvedValue({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
         provisioningSteps: failedSteps,
       });
-      const { result } = renderHook(() =>
-        useProvisioningPoll(tenant, DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED),
-      );
+      const { result } = renderHook(() => useProvisioningPoll(tenant));
 
       act(() => {
         result.current.handleRetry();
       });
 
-      // Advance well past the cap, one tick's worth of real time at a time
-      // (rather than in a single large jump) so each tick's resulting state
-      // change — including the interval being torn down once the cap
-      // fires — is actually committed before the next tick is simulated.
       for (let tick = 0; tick < RETRY_BASELINE_MAX_TICKS + 5; tick += 1) {
         await act(async () => {
           await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
         });
       }
 
-      // Polling must have stopped once the cap was reached — it never grew
-      // past that regardless of how much further time was simulated.
       expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledTimes(
         RETRY_BASELINE_MAX_TICKS,
       );
     });
 
     it('stops polling once the retry-baseline wait is exhausted after Start, when every step stays idle', async () => {
-      // Models pressing Start (not Retry) whose dispatched workflow never
-      // actually starts — every tick reports the same all-idle snapshot
-      // forever, so `shouldContinuePolling` alone would never stop it.
       const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
       getTenantProvisioningStatusActionMock.mockResolvedValue({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
         provisioningSteps: idleProvisioningSteps(),
       });
-      const { result } = renderHook(() =>
-        useProvisioningPoll(tenant, DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED),
-      );
+      const { result } = renderHook(() => useProvisioningPoll(tenant));
 
       act(() => {
         result.current.handleStart();
@@ -636,8 +559,6 @@ describe(useProvisioningPoll, () => {
         });
       }
 
-      // Polling must have stopped once the cap was reached — it never grew
-      // past that regardless of how much further time was simulated.
       expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledTimes(
         RETRY_BASELINE_MAX_TICKS,
       );
@@ -651,9 +572,7 @@ describe(useProvisioningPoll, () => {
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
         provisioningSteps: idleProvisioningSteps(),
       });
-      const { unmount } = renderHook(() =>
-        useProvisioningPoll(tenant, DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED),
-      );
+      const { unmount } = renderHook(() => useProvisioningPoll(tenant));
 
       unmount();
 
@@ -671,9 +590,7 @@ describe(useProvisioningPoll, () => {
       getTenantProvisioningStatusActionMock.mockRejectedValueOnce(
         new Error('NEXT_REDIRECT'),
       );
-      renderHook(() =>
-        useProvisioningPoll(tenant, DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED),
-      );
+      renderHook(() => useProvisioningPoll(tenant));
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
@@ -702,80 +619,10 @@ describe(useProvisioningPoll, () => {
     });
   });
 
-  describe('domain verification polling', () => {
-    beforeEach(() => {
-      vi.useFakeTimers();
-    });
-
-    afterEach(() => {
-      vi.useRealTimers();
-    });
-
-    it('polls for domain status on its own interval and applies a fresh result', async () => {
-      const tenant = makeTenant();
-      getDomainVerificationStatusActionMock.mockResolvedValue(
-        DOMAIN_VERIFICATION_STATUS.VERIFIED,
-      );
-      const { result } = renderHook(() =>
-        useProvisioningPoll(tenant, DOMAIN_VERIFICATION_STATUS.PENDING),
-      );
-
-      expect(result.current.domainStatus).toBe(
-        DOMAIN_VERIFICATION_STATUS.PENDING,
-      );
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(DOMAIN_POLL_INTERVAL_MS);
-      });
-
-      expect(getDomainVerificationStatusActionMock).toHaveBeenCalledWith(
-        tenant.id,
-      );
-      expect(result.current.domainStatus).toBe(
-        DOMAIN_VERIFICATION_STATUS.VERIFIED,
-      );
-    });
-
-    it('does not poll the domain when it is already NOT_CONFIGURED', async () => {
-      const tenant = makeTenant();
-      renderHook(() =>
-        useProvisioningPoll(tenant, DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED),
-      );
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(DOMAIN_POLL_INTERVAL_MS * 2);
-      });
-
-      expect(getDomainVerificationStatusActionMock).not.toHaveBeenCalled();
-    });
-
-    it('stops polling the domain once it reaches VERIFIED', async () => {
-      const tenant = makeTenant();
-      getDomainVerificationStatusActionMock.mockResolvedValue(
-        DOMAIN_VERIFICATION_STATUS.VERIFIED,
-      );
-      renderHook(() =>
-        useProvisioningPoll(tenant, DOMAIN_VERIFICATION_STATUS.PENDING),
-      );
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(DOMAIN_POLL_INTERVAL_MS);
-      });
-      expect(getDomainVerificationStatusActionMock).toHaveBeenCalledTimes(1);
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(DOMAIN_POLL_INTERVAL_MS * 2);
-      });
-      expect(getDomainVerificationStatusActionMock).toHaveBeenCalledTimes(1);
-    });
-  });
-
   describe('retry/start dispatch', () => {
     it('dispatches a retry and reports no error on success', async () => {
       const tenant = makeTenant({ id: 'tenant-1' });
-      const { result } = renderHook(() =>
-        useProvisioningPoll(tenant, DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED),
-      );
+      const { result } = renderHook(() => useProvisioningPoll(tenant));
 
       act(() => {
         result.current.handleRetry();
@@ -797,9 +644,7 @@ describe(useProvisioningPoll, () => {
       retryProvisioningStepActionMock.mockResolvedValue({
         outcome: 'not-found',
       });
-      const { result } = renderHook(() =>
-        useProvisioningPoll(tenant, DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED),
-      );
+      const { result } = renderHook(() => useProvisioningPoll(tenant));
 
       act(() => {
         result.current.handleStart();
@@ -815,9 +660,7 @@ describe(useProvisioningPoll, () => {
       retryProvisioningStepActionMock.mockResolvedValue({
         outcome: 'archived',
       });
-      const { result } = renderHook(() =>
-        useProvisioningPoll(tenant, DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED),
-      );
+      const { result } = renderHook(() => useProvisioningPoll(tenant));
 
       act(() => {
         result.current.handleStart();
@@ -833,9 +676,7 @@ describe(useProvisioningPoll, () => {
       retryProvisioningStepActionMock.mockResolvedValue({
         outcome: 'dispatch-error',
       });
-      const { result } = renderHook(() =>
-        useProvisioningPoll(tenant, DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED),
-      );
+      const { result } = renderHook(() => useProvisioningPoll(tenant));
 
       act(() => {
         result.current.handleStart();
@@ -851,9 +692,7 @@ describe(useProvisioningPoll, () => {
       retryProvisioningStepActionMock.mockResolvedValue({
         outcome: 'already-in-progress',
       });
-      const { result } = renderHook(() =>
-        useProvisioningPoll(tenant, DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED),
-      );
+      const { result } = renderHook(() => useProvisioningPoll(tenant));
 
       act(() => {
         result.current.handleStart();

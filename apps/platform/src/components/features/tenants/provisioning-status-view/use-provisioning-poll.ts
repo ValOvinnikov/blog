@@ -1,10 +1,6 @@
 'use client';
 
 import {
-  DOMAIN_VERIFICATION_STATUS,
-  type TDomainVerificationStatus,
-} from '@blog/config/constants';
-import {
   CORE_PROVISIONING_STEPS,
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
@@ -19,7 +15,6 @@ import type {
   TTenantProvisioningState,
 } from '@blog/db/schema/tenants';
 import { useToast } from '@platform/context/toast-provider';
-import { getDomainVerificationStatusAction } from '@platform/server/provisioning/get-domain-verification-status-action';
 import { getTenantProvisioningStatusAction } from '@platform/server/provisioning/get-tenant-provisioning-status-action';
 import { retryProvisioningStepAction } from '@platform/server/provisioning/retry-provisioning-step-action';
 import {
@@ -46,11 +41,6 @@ const OVERALL_STATUS_PRIORITY: TTenantProvisioningStepStatus[] = [
 ];
 
 const STEP_POLL_INTERVAL_MS = 4000;
-// The domain check makes a live Vercel API call with its own 5s timeout —
-// slower and less urgent than step polling — so it runs on a longer,
-// independent interval rather than sharing the step interval and risking
-// overlapping in-flight requests.
-const DOMAIN_POLL_INTERVAL_MS = 10000;
 // A GitHub Actions dispatch-to-runner-pickup normally resolves in well under
 // a minute, but during an outage, a disabled workflow, or a permissions
 // failure it may never resolve at all — this caps how long a retry/start
@@ -109,15 +99,6 @@ const stepStatusesEqual = (
   b: TTenantProvisioningStepStatus[],
 ): boolean => a.length === b.length && a.every((status, i) => status === b[i]);
 
-const isTerminalDomainVerificationStatus = (
-  status: TDomainVerificationStatus,
-): boolean => {
-  return (
-    status === DOMAIN_VERIFICATION_STATUS.VERIFIED ||
-    status === DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED
-  );
-};
-
 type TDispatchNoticeKind =
   'not-found' | 'archived' | 'already-in-progress' | 'other';
 
@@ -141,24 +122,11 @@ export type TUseProvisioningPollResult = {
   displayOverallStatus: Exclude<TTenantProvisioningStepStatus, 'FAILED'>;
   failedStepError: string | undefined;
   errorKind: TProvisioningErrorKind | undefined;
-  domainStatus: TDomainVerificationStatus;
   ownerElevationOutcome: TElevateTenantOwnerOutcome | undefined;
 };
 
-/**
- * Owns the status page's live behaviour: step-status polling (with its own
- * stop/continue rules), the slower independent domain-verification poll,
- * the Start/Retry dispatch flow, and the derived overall-status/error-kind
- * values every one of those feeds into. The component consuming this only
- * renders what it returns.
- */
 export const useProvisioningPoll = (
   tenant: TTenant,
-  // Optional for a caller with nothing to say about the domain (e.g.
-  // `ProvisioningStatusView`, which no longer renders a domain card) —
-  // `NOT_CONFIGURED` is a terminal status, so the domain poll effect below
-  // never actually starts for it.
-  domainVerificationStatus: TDomainVerificationStatus = DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED,
 ): TUseProvisioningPollResult => {
   const router = useRouter();
   const toast = useToast();
@@ -198,17 +166,11 @@ export const useProvisioningPoll = (
   // or reset the poll interval; it only gates whether the cap below has
   // been reached. Reset whenever a fresh baseline is recorded.
   const pendingRetryTicksRef = useRef(0);
-  const [renderedDomainStatus, setRenderedDomainStatus] = useState(
-    domainVerificationStatus,
-  );
-  const [domainStatus, setDomainStatus] = useState<TDomainVerificationStatus>(
-    domainVerificationStatus,
-  );
 
-  // A fresh `tenant`/`domainVerificationStatus` argument (e.g. after a
-  // Retry, Start, or details save's own `router.refresh()`) should win over
-  // whatever polling last saw — adjusted during render, per React's
-  // guidance for state derived from props, rather than in an effect.
+  // A fresh `tenant` argument (e.g. after a Retry, Start, or details save's
+  // own `router.refresh()`) should win over whatever polling last saw —
+  // adjusted during render, per React's guidance for state derived from
+  // props, rather than in an effect.
   if (tenant !== renderedTenant) {
     setRenderedTenant(tenant);
     setProvisioningStatus(tenant.provisioningStatus);
@@ -221,10 +183,6 @@ export const useProvisioningPoll = (
           tenant.provisioningSteps,
         ),
     );
-  }
-  if (domainVerificationStatus !== renderedDomainStatus) {
-    setRenderedDomainStatus(domainVerificationStatus);
-    setDomainStatus(domainVerificationStatus);
   }
 
   useEffect(() => {
@@ -303,28 +261,6 @@ export const useProvisioningPoll = (
       clearInterval(intervalId);
     };
   }, [tenant.id, isPollingActive, pendingRetryBaseline, toast, t]);
-
-  useEffect(() => {
-    if (isTerminalDomainVerificationStatus(domainStatus)) {
-      return;
-    }
-
-    let cancelled = false;
-
-    const intervalId = setInterval(() => {
-      void getDomainVerificationStatusAction(tenant.id).then((result) => {
-        if (cancelled) {
-          return;
-        }
-        setDomainStatus(result);
-      });
-    }, DOMAIN_POLL_INTERVAL_MS);
-
-    return () => {
-      cancelled = true;
-      clearInterval(intervalId);
-    };
-  }, [tenant.id, domainStatus]);
 
   const stepStatuses = stepStatusesFor(provisioningSteps);
   const stepUpdatedAt = stepUpdatedAtFor(provisioningSteps);
@@ -454,7 +390,6 @@ export const useProvisioningPoll = (
     displayOverallStatus,
     failedStepError,
     errorKind,
-    domainStatus,
     ownerElevationOutcome,
   };
 };

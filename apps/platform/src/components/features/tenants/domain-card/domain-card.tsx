@@ -1,4 +1,8 @@
-import { SIZE, type TDomainVerificationStatus } from '@blog/config';
+import {
+  DOMAIN_VERIFICATION_STATUS,
+  SIZE,
+  type TDomainVerificationStatus,
+} from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { Card } from '@platform/components/shared/card';
 import { DetailList } from '@platform/components/shared/detail-list';
@@ -10,9 +14,14 @@ import { useTranslations } from 'next-intl';
 export type TDomainCardProps = {
   tenant: TTenant;
   domainVerificationStatus: TDomainVerificationStatus;
-  /** Where the "DNS" link goes — `/tenants/{id}/domain` on the platform tree, `/dashboard/domain` on the owner tree. */
   dnsHref: string;
 };
+
+const CHECKED_STATUSES: TDomainVerificationStatus[] = [
+  DOMAIN_VERIFICATION_STATUS.NOT_ADDED,
+  DOMAIN_VERIFICATION_STATUS.PENDING,
+  DOMAIN_VERIFICATION_STATUS.VERIFIED,
+];
 
 export const DomainCard = ({
   tenant,
@@ -48,9 +57,11 @@ export const DomainCard = ({
           <DetailList.Row label={t('publicDomainLabel')} isMono={true}>
             {tenant.primaryDomain}
           </DetailList.Row>
-          <DetailList.Row label={t('lastCheckedLabel')}>
-            {t('lastCheckedJustNow')}
-          </DetailList.Row>
+          {CHECKED_STATUSES.includes(domainVerificationStatus) && (
+            <DetailList.Row label={t('lastCheckedLabel')}>
+              {t('lastCheckedJustNow')}
+            </DetailList.Row>
+          )}
         </DetailList>
       </Card.Body>
     </Card>
