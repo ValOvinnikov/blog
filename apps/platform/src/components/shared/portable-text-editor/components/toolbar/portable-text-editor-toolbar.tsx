@@ -1,6 +1,8 @@
 'use client';
 
 import { Toolbar } from '@base-ui/react/toolbar';
+import { Tooltip } from '@base-ui/react/tooltip';
+import { ICONS } from '@blog/config';
 import {
   useEditor,
   useEditorSelector,
@@ -68,7 +70,7 @@ export const PortableTextEditorToolbar = ({
     selectors.getActiveAnnotations,
   );
 
-  const { root, divider } = portableTextEditorToolbarVariants();
+  const { root, bar, divider } = portableTextEditorToolbarVariants();
   const hasBold = hasName(schema.decorators, 'strong');
   const hasItalic = hasName(schema.decorators, 'em');
   const hasHeading = hasName(schema.styles, 'h2');
@@ -98,93 +100,96 @@ export const PortableTextEditorToolbar = ({
   };
 
   return (
-    <div>
-      <Toolbar.Root className={root()}>
-        {hasBold && (
-          <PortableTextEditorToggleButton
-            label={t('bold')}
-            isActive={isBoldActive}
-            isBold={true}
-            onToggle={() => {
-              editor.send({ type: 'decorator.toggle', decorator: 'strong' });
-              focusEditor();
-            }}
-          />
-        )}
-        {hasItalic && (
-          <PortableTextEditorToggleButton
-            label={t('italic')}
-            isActive={isItalicActive}
-            isItalic={true}
-            onToggle={() => {
-              editor.send({ type: 'decorator.toggle', decorator: 'em' });
-              focusEditor();
-            }}
-          />
-        )}
-        {hasHeading && (
-          <>
-            <Toolbar.Separator className={divider()} />
+    <Tooltip.Provider>
+      <div className={root()}>
+        <Toolbar.Root className={bar()}>
+          {hasBold && (
             <PortableTextEditorToggleButton
-              label={t('heading')}
-              isActive={isHeadingActive}
+              label={t('bold')}
+              isActive={isBoldActive}
+              icon={ICONS.BOLD}
               onToggle={() => {
-                editor.send({
-                  type: 'style.toggle',
-                  style: isHeadingActive ? 'normal' : 'h2',
-                });
+                editor.send({ type: 'decorator.toggle', decorator: 'strong' });
                 focusEditor();
               }}
             />
-          </>
-        )}
-        {hasLists && <Toolbar.Separator className={divider()} />}
-        {hasBulletList && (
-          <PortableTextEditorToggleButton
-            label={t('bulletList')}
-            isActive={isBulletListActive}
-            onToggle={() => {
-              editor.send({ type: 'list item.toggle', listItem: 'bullet' });
-              focusEditor();
-            }}
-          />
-        )}
-        {hasNumberedList && (
-          <PortableTextEditorToggleButton
-            label={t('numberedList')}
-            isActive={isNumberedListActive}
-            onToggle={() => {
-              editor.send({ type: 'list item.toggle', listItem: 'number' });
-              focusEditor();
-            }}
-          />
-        )}
-        {hasLink && (
-          <>
-            <Toolbar.Separator className={divider()} />
+          )}
+          {hasItalic && (
             <PortableTextEditorToggleButton
-              label={t('link')}
-              isActive={isLinkActive}
-              isExpanded={isLinkControlOpen}
-              ariaControls={linkControlId}
-              onToggle={() => setIsLinkControlOpen((open) => !open)}
+              label={t('italic')}
+              isActive={isItalicActive}
+              icon={ICONS.ITALIC}
+              onToggle={() => {
+                editor.send({ type: 'decorator.toggle', decorator: 'em' });
+                focusEditor();
+              }}
             />
-          </>
+          )}
+          {hasHeading && (
+            <>
+              <Toolbar.Separator className={divider()} />
+              <PortableTextEditorToggleButton
+                label={t('heading')}
+                isActive={isHeadingActive}
+                onToggle={() => {
+                  editor.send({
+                    type: 'style.toggle',
+                    style: isHeadingActive ? 'normal' : 'h2',
+                  });
+                  focusEditor();
+                }}
+              />
+            </>
+          )}
+          {hasLists && <Toolbar.Separator className={divider()} />}
+          {hasBulletList && (
+            <PortableTextEditorToggleButton
+              label={t('bulletList')}
+              isActive={isBulletListActive}
+              onToggle={() => {
+                editor.send({ type: 'list item.toggle', listItem: 'bullet' });
+                focusEditor();
+              }}
+            />
+          )}
+          {hasNumberedList && (
+            <PortableTextEditorToggleButton
+              label={t('numberedList')}
+              isActive={isNumberedListActive}
+              onToggle={() => {
+                editor.send({ type: 'list item.toggle', listItem: 'number' });
+                focusEditor();
+              }}
+            />
+          )}
+          {hasLink && (
+            <>
+              <Toolbar.Separator className={divider()} />
+              <PortableTextEditorToggleButton
+                label={t('link')}
+                icon={ICONS.LINK}
+                isActive={isLinkActive}
+                isExpanded={isLinkControlOpen}
+                ariaControls={linkControlId}
+                onToggle={() => setIsLinkControlOpen((open) => !open)}
+              />
+            </>
+          )}
+        </Toolbar.Root>
+        {isLinkControlOpen && (
+          <PortableTextEditorLinkControl
+            id={linkControlId}
+            initialHref={findActiveLinkHref(activeAnnotations)}
+            hasExistingLink={isLinkActive}
+            onApply={handleLinkApply}
+            onRemove={handleLinkRemove}
+            onCancel={() => {
+              setIsLinkControlOpen(false);
+              focusEditor();
+            }}
+          />
         )}
-      </Toolbar.Root>
-      {isLinkControlOpen && (
-        <PortableTextEditorLinkControl
-          id={linkControlId}
-          initialHref={findActiveLinkHref(activeAnnotations)}
-          hasExistingLink={isLinkActive}
-          onApply={handleLinkApply}
-          onRemove={handleLinkRemove}
-          onCancel={() => {
-            setIsLinkControlOpen(false);
-            focusEditor();
-          }}
-        />
-      )}
-    </div>
+      </div>
+    </Tooltip.Provider>
   );
 };

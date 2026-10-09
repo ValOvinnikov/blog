@@ -67,6 +67,9 @@ export const ICONS = {
   PHONE: 'PHONE',
   TRENDING_UP: 'TRENDING_UP',
   SMILE: 'SMILE',
+  BOLD: 'BOLD',
+  ITALIC: 'ITALIC',
+  LINK: 'LINK',
 } as const;
 
 export type TIconName = TValueOf<typeof ICONS>;
