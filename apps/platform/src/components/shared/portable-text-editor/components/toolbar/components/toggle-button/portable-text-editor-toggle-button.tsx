@@ -1,3 +1,6 @@
+import { Toggle } from '@base-ui/react/toggle';
+import { Toolbar } from '@base-ui/react/toolbar';
+
 import { portableTextEditorToggleButtonVariants } from './portable-text-editor-toggle-button-variants';
 
 export type TPortableTextEditorToggleButtonProps = {
@@ -10,7 +13,6 @@ export type TPortableTextEditorToggleButtonProps = {
   ariaControls?: string;
 };
 
-/** One toolbar control shared by every decorator/style/list toggle — a bold/italic/heading/list button differs only in label, active state and the event it sends. */
 export const PortableTextEditorToggleButton = ({
   label,
   isActive,
@@ -21,12 +23,10 @@ export const PortableTextEditorToggleButton = ({
   ariaControls,
 }: TPortableTextEditorToggleButtonProps) => {
   return (
-    <button
-      type="button"
-      aria-pressed={isActive}
+    <Toolbar.Button
+      render={<Toggle pressed={isActive} onPressedChange={onToggle} />}
       aria-expanded={isExpanded}
       aria-controls={ariaControls}
-      onClick={onToggle}
       className={portableTextEditorToggleButtonVariants({
         isActive,
         isBold,
@@ -34,6 +34,6 @@ export const PortableTextEditorToggleButton = ({
       })}
     >
       {label}
-    </button>
+    </Toolbar.Button>
   );
 };

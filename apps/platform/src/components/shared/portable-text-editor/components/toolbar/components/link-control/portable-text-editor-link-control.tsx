@@ -1,6 +1,7 @@
 'use client';
 
 import { Field } from '@base-ui/react/field';
+import { Form } from '@base-ui/react/form';
 import { SIZE } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import { useTranslations } from 'next-intl';
@@ -17,11 +18,6 @@ export type TPortableTextEditorLinkControlProps = {
   onCancel: () => void;
 };
 
-/**
- * The small inline form the toolbar's Link button opens — applying an
- * annotation needs a URL from the operator, which a plain toggle button
- * can't collect on its own.
- */
 export const PortableTextEditorLinkControl = ({
   id,
   initialHref,
@@ -32,7 +28,7 @@ export const PortableTextEditorLinkControl = ({
 }: TPortableTextEditorLinkControlProps) => {
   const t = useTranslations('portableTextEditorToolbar');
   const [href, setHref] = useState(initialHref);
-  const { root, input } = portableTextEditorLinkControlVariants();
+  const { root, input, error } = portableTextEditorLinkControlVariants();
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -41,7 +37,7 @@ export const PortableTextEditorLinkControl = ({
   };
 
   return (
-    <form id={id} className={root()} onSubmit={handleSubmit}>
+    <Form id={id} className={root()} onSubmit={handleSubmit}>
       <Field.Root className="contents">
         <Field.Label className="sr-only">{t('linkUrlLabel')}</Field.Label>
         <Field.Control
@@ -52,6 +48,7 @@ export const PortableTextEditorLinkControl = ({
           onValueChange={(nextHref) => setHref(nextHref)}
           className={input()}
         />
+        <Field.Error className={error()} />
       </Field.Root>
       <Button type="submit" variant="secondary" size={SIZE.SM}>
         {t('linkApply')}
@@ -64,6 +61,6 @@ export const PortableTextEditorLinkControl = ({
       <Button type="button" variant="ghost" size={SIZE.SM} onClick={onCancel}>
         {t('linkCancel')}
       </Button>
-    </form>
+    </Form>
   );
 };

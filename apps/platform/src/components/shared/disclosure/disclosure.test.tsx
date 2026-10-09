@@ -11,25 +11,18 @@ describe(Disclosure, () => {
     user = userEvent.setup();
   });
 
-  it('renders the summary and content', () => {
+  it('renders the summary as a collapsed button and hides the content', () => {
     render(
       <Disclosure summary="Advanced">
         <p>Curated overrides live here.</p>
       </Disclosure>,
     );
 
-    expect(screen.getByText('Advanced')).toBeVisible();
-    expect(screen.getByText('Curated overrides live here.')).not.toBeVisible();
-  });
-
-  it('is closed by default', () => {
-    render(
-      <Disclosure summary="Advanced">
-        <p>Body</p>
-      </Disclosure>,
+    expect(screen.getByRole('button', { name: 'Advanced' })).toHaveAttribute(
+      'aria-expanded',
+      'false',
     );
-
-    expect(screen.getByRole('group')).not.toHaveAttribute('open');
+    expect(screen.getByText('Curated overrides live here.')).not.toBeVisible();
   });
 
   it('opens by default when isDefaultOpen is set', () => {
@@ -39,41 +32,56 @@ describe(Disclosure, () => {
       </Disclosure>,
     );
 
-    expect(screen.getByRole('group')).toHaveAttribute('open');
+    expect(screen.getByRole('button', { name: 'Advanced' })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    );
+    expect(screen.getByText('Body')).toBeVisible();
   });
 
-  it('toggles open on click, keeping the state announced via the native open attribute', async () => {
+  it('toggles open and closed on click', async () => {
     render(
       <Disclosure summary="Advanced">
         <p>Body</p>
       </Disclosure>,
     );
+    const trigger = screen.getByRole('button', { name: 'Advanced' });
 
-    expect(screen.getByRole('group')).not.toHaveAttribute('open');
+    await user.click(trigger);
 
-    await user.click(screen.getByText('Advanced'));
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByText('Body')).toBeVisible();
 
-    expect(screen.getByRole('group')).toHaveAttribute('open');
+    await user.click(trigger);
+
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByText('Body')).not.toBeVisible();
   });
 
-  it('renders a native summary that receives focus without any extra tabIndex wiring', () => {
+  it.each(['{Enter}', ' '])('toggles with the %s key', async (key) => {
     render(
-      <Disclosure summary="Advanced">
+      <Disclosure summary="Advanced" variant="inline">
         <p>Body</p>
       </Disclosure>,
     );
 
-    const summary = screen.getByText('Advanced');
-    summary.focus();
+    await user.tab();
+    expect(screen.getByRole('button', { name: 'Advanced' })).toHaveFocus();
 
-    expect(summary).toHaveFocus();
+    await user.keyboard(key);
+
+    expect(screen.getByRole('button', { name: 'Advanced' })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    );
+    expect(screen.getByText('Body')).toBeVisible();
   });
 
   it('renders with no children without throwing', () => {
     expect(() =>
       render(<Disclosure summary="Advanced">{null}</Disclosure>),
     ).not.toThrow();
-    expect(screen.getByText('Advanced')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Advanced' })).toBeVisible();
   });
 
   it('accepts a non-text ReactNode as the summary', () => {
@@ -100,7 +108,10 @@ describe(Disclosure, () => {
         </Disclosure>,
       );
 
-      expect(screen.getByRole('group')).not.toHaveAttribute('open');
+      expect(screen.getByRole('button', { name: 'Advanced' })).toHaveAttribute(
+        'aria-expanded',
+        'false',
+      );
 
       rerender(
         <Disclosure summary="Advanced" isOpen={true} onOpenChange={vi.fn()}>
@@ -108,10 +119,13 @@ describe(Disclosure, () => {
         </Disclosure>,
       );
 
-      expect(screen.getByRole('group')).toHaveAttribute('open');
+      expect(screen.getByRole('button', { name: 'Advanced' })).toHaveAttribute(
+        'aria-expanded',
+        'true',
+      );
     });
 
-    it('calls onOpenChange with the next value when toggled', async () => {
+    it('calls onOpenChange with the next value without opening on its own', async () => {
       const onOpenChange = vi.fn();
       render(
         <Disclosure
@@ -123,9 +137,10 @@ describe(Disclosure, () => {
         </Disclosure>,
       );
 
-      await user.click(screen.getByText('Advanced'));
+      await user.click(screen.getByRole('button', { name: 'Advanced' }));
 
       expect(onOpenChange).toHaveBeenCalledWith(true);
+      expect(screen.getByText('Body')).not.toBeVisible();
     });
 
     it('round-trips through a caller that feeds onOpenChange back in as isOpen', async () => {
@@ -142,11 +157,13 @@ describe(Disclosure, () => {
         );
       };
       render(<ControlledDisclosure />);
-      expect(screen.getByRole('group')).not.toHaveAttribute('open');
 
-      await user.click(screen.getByText('Advanced'));
+      await user.click(screen.getByRole('button', { name: 'Advanced' }));
 
-      expect(screen.getByRole('group')).toHaveAttribute('open');
+      expect(screen.getByRole('button', { name: 'Advanced' })).toHaveAttribute(
+        'aria-expanded',
+        'true',
+      );
     });
   });
 });

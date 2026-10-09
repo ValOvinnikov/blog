@@ -2,15 +2,16 @@ import { SIZE } from '@blog/config';
 import { tv } from '@platform/utils/tv/tv';
 import type { VariantProps } from 'tailwind-variants';
 
+const STYLED_VARIANTS: ('primary' | 'secondary' | 'ghost' | 'danger')[] = [
+  'primary',
+  'secondary',
+  'ghost',
+  'danger',
+];
+
 export const buttonVariants = tv({
   slots: {
-    root: [
-      'inline-flex items-center gap-[7px]',
-      'rounded-[9px] border font-medium no-underline',
-      'cursor-pointer',
-      'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-[.45]',
-      'outline-hidden focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
-    ],
+    root: [],
     srOnlyStatus: ['sr-only'],
   },
   variants: {
@@ -33,16 +34,43 @@ export const buttonVariants = tv({
           'border-admin-bad-line bg-admin-bad-weak text-admin-bad shadow-admin',
         ],
       },
+      unstyled: {
+        root: [],
+      },
     },
     size: {
-      [SIZE.SM]: {
+      [SIZE.SM]: {},
+      [SIZE.MD]: {},
+    },
+  },
+  compoundVariants: [
+    {
+      variant: STYLED_VARIANTS,
+      class: {
+        root: [
+          'inline-flex items-center gap-[7px]',
+          'rounded-[9px] border font-medium no-underline',
+          'cursor-pointer',
+          'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-[.45]',
+          'outline-hidden focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
+        ],
+      },
+    },
+    {
+      variant: STYLED_VARIANTS,
+      size: SIZE.SM,
+      class: {
         root: ['min-h-11 px-[9px] py-[5px] text-[12px] md:min-h-0'],
       },
-      [SIZE.MD]: {
+    },
+    {
+      variant: STYLED_VARIANTS,
+      size: SIZE.MD,
+      class: {
         root: ['min-h-11 px-[13px] py-[8px] text-[13px] md:min-h-0'],
       },
     },
-  },
+  ],
   defaultVariants: {
     variant: 'secondary',
     size: SIZE.MD,

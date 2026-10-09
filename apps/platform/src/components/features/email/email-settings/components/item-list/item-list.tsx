@@ -1,3 +1,4 @@
+import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import type {
@@ -40,9 +41,9 @@ export const ItemList = ({
     <Card className={root()}>
       <nav aria-label={ariaLabel} className={list()}>
         {items.map((option) => (
-          <button
+          <Button
             key={option.value}
-            type="button"
+            variant="unstyled"
             className={item()}
             aria-current={option.value === selected}
             onClick={() => onSelect(option.value)}
@@ -52,7 +53,7 @@ export const ItemList = ({
             <StatusBadge tone={STATUS_TONE[option.status]}>
               {option.statusLabel}
             </StatusBadge>
-          </button>
+          </Button>
         ))}
       </nav>
     </Card>

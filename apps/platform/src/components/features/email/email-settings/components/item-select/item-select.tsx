@@ -1,5 +1,9 @@
-import { Field } from '@base-ui/react/field';
+'use client';
+
+import { Select } from '@base-ui/react/select';
+import { ICONS, SIZE } from '@blog/config';
 import type { TEmailPageItemOption } from '@platform/components/features/email/email-settings/components/item-list';
+import { Icon } from '@platform/components/shared/icon';
 import type { TEmailPageItem } from '@platform/utils/email-draft/email-draft';
 
 import { itemSelectVariants } from './item-select-variants';
@@ -17,26 +21,60 @@ export const ItemSelect = ({
   onSelect,
   label,
 }: TItemSelectProps) => {
-  const { root, label: labelSlot, select } = itemSelectVariants();
+  const {
+    root,
+    label: labelSlot,
+    trigger,
+    value,
+    icon,
+    popup,
+    item,
+    indicator,
+  } = itemSelectVariants();
+  const selectItems = items.map((option) => ({
+    value: option.value,
+    label: `${option.label} — ${option.statusLabel}`,
+  }));
 
   return (
-    <Field.Root className={root()}>
-      <Field.Label className={labelSlot()}>{label}</Field.Label>
-      <Field.Control
-        render={<select />}
-        className={select()}
+    <div className={root()}>
+      <Select.Root
+        items={selectItems}
         value={selected}
-        onValueChange={(value) => {
-          const next = items.find((option) => option.value === value);
-          if (next) onSelect(next.value);
+        onValueChange={(next) => {
+          if (next) onSelect(next);
         }}
       >
-        {items.map((option) => (
-          <option key={option.value} value={option.value}>
-            {`${option.label} — ${option.statusLabel}`}
-          </option>
-        ))}
-      </Field.Control>
-    </Field.Root>
+        <Select.Label className={labelSlot()}>{label}</Select.Label>
+        <Select.Trigger className={trigger()}>
+          <Select.Value className={value()} />
+          <Select.Icon className={icon()}>
+            <Icon name={ICONS.CHEVRON_DOWN} size={SIZE.SM} />
+          </Select.Icon>
+        </Select.Trigger>
+        <Select.Portal>
+          <Select.Positioner sideOffset={4}>
+            <Select.Popup className={popup()}>
+              <Select.List>
+                {selectItems.map((option) => (
+                  <Select.Item
+                    key={option.value}
+                    value={option.value}
+                    className={item()}
+                  >
+                    <span className={indicator()}>
+                      <Select.ItemIndicator>
+                        <Icon name={ICONS.CHECK} size={SIZE.SM} />
+                      </Select.ItemIndicator>
+                    </span>
+                    <Select.ItemText>{option.label}</Select.ItemText>
+                  </Select.Item>
+                ))}
+              </Select.List>
+            </Select.Popup>
+          </Select.Positioner>
+        </Select.Portal>
+      </Select.Root>
+    </div>
   );
 };

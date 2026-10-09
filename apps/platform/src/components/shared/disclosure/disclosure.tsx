@@ -1,12 +1,19 @@
+'use client';
+
+import { Collapsible } from '@base-ui/react/collapsible';
 import { ICONS } from '@blog/config';
 import { Icon } from '@platform/components/shared/icon';
-import { useState, type ReactNode, type SyntheticEvent } from 'react';
+import type { ReactNode } from 'react';
 
-import { disclosureVariants } from './disclosure-variants';
+import {
+  disclosureVariants,
+  type TDisclosureVariants,
+} from './disclosure-variants';
 
 export type TDisclosureProps = {
   summary: ReactNode;
   children: ReactNode;
+  variant?: TDisclosureVariants['variant'];
   isDefaultOpen?: boolean;
   isOpen?: boolean;
   onOpenChange?: (isOpen: boolean) => void;
@@ -16,37 +23,28 @@ export type TDisclosureProps = {
 export const Disclosure = ({
   summary,
   children,
+  variant,
   isDefaultOpen = false,
   isOpen,
   onOpenChange,
   className,
 }: TDisclosureProps) => {
-  const isControlled = isOpen !== undefined;
-  const [uncontrolledOpen, setUncontrolledOpen] = useState(isDefaultOpen);
-  const open = isControlled ? isOpen : uncontrolledOpen;
-  const { root, summary: summarySlot, chevron, inner } = disclosureVariants();
-
-  const handleToggle = (event: SyntheticEvent<HTMLDetailsElement>) => {
-    const nextOpen = event.currentTarget.open;
-    if (isControlled) {
-      onOpenChange?.(nextOpen);
-    } else {
-      setUncontrolledOpen(nextOpen);
-    }
-  };
+  const { root, trigger, chevron, inner } = disclosureVariants({ variant });
 
   return (
-    <details
+    <Collapsible.Root
       className={root({ class: className })}
-      open={open}
-      onToggle={handleToggle}
-      data-testid="disclosure"
+      defaultOpen={isDefaultOpen}
+      open={isOpen}
+      onOpenChange={(nextOpen) => onOpenChange?.(nextOpen)}
     >
-      <summary className={summarySlot()}>
+      <Collapsible.Trigger className={trigger()}>
         {summary}
         <Icon name={ICONS.CHEVRON_RIGHT} className={chevron()} />
-      </summary>
-      <div className={inner()}>{children}</div>
-    </details>
+      </Collapsible.Trigger>
+      <Collapsible.Panel keepMounted={true} className={inner()}>
+        {children}
+      </Collapsible.Panel>
+    </Collapsible.Root>
   );
 };

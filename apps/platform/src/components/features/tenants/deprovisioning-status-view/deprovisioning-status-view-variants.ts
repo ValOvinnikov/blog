@@ -15,10 +15,6 @@ export const deprovisioningStatusViewVariants = tv({
     errorHeadline: ['text-admin-bad'],
     errorIcon: ['flex-none text-admin-bad'],
     errorDetails: ['mt-1'],
-    errorDetailsSummary: [
-      'cursor-pointer text-[13px] font-medium text-admin-text',
-      'underline-offset-2 hover:underline',
-    ],
     errorDetailsText: [
       'mt-2 rounded-admin-sm bg-admin-surface-2 p-3',
       'font-mono text-xs text-admin-muted whitespace-pre-wrap break-words',

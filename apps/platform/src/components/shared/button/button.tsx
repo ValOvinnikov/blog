@@ -18,6 +18,9 @@ export type TButtonProps = {
   'aria-describedby'?: AriaAttributes['aria-describedby'];
   'aria-expanded'?: AriaAttributes['aria-expanded'];
   'aria-controls'?: AriaAttributes['aria-controls'];
+  'aria-current'?: AriaAttributes['aria-current'];
+  'aria-label'?: AriaAttributes['aria-label'];
+  title?: string;
   hasArrow?: boolean;
 };
 
@@ -35,6 +38,9 @@ export const Button = ({
   'aria-describedby': ariaDescribedBy,
   'aria-expanded': ariaExpanded,
   'aria-controls': ariaControls,
+  'aria-current': ariaCurrent,
+  'aria-label': ariaLabel,
+  title,
   hasArrow,
 }: TButtonProps) => {
   const { root, srOnlyStatus } = buttonVariants({ variant, size });
@@ -62,6 +68,9 @@ export const Button = ({
         aria-describedby={ariaDescribedBy}
         aria-expanded={ariaExpanded}
         aria-controls={ariaControls}
+        aria-current={ariaCurrent}
+        aria-label={ariaLabel}
+        title={title}
       >
         {isPending && (
           <span aria-hidden="true">
