@@ -37,6 +37,7 @@ export type TSettingsFormShellProps<TValues> = {
   errorTitle: string;
   draft: TSettingsFormDraft<TValues>;
   isWide?: boolean;
+  headerActions?: ReactNode;
   children: ReactNode;
 };
 
@@ -60,6 +61,7 @@ export const SettingsFormShell = <TValues,>({
   errorTitle,
   draft,
   isWide = false,
+  headerActions,
   children,
 }: TSettingsFormShellProps<TValues>) => {
   const t = useTranslations('saveBar');
@@ -75,6 +77,7 @@ export const SettingsFormShell = <TValues,>({
     setWasDirty(isDirty);
     if (isDirty) setHasSavedSinceEdit(false);
   }
+  const isSavedStatusShown = !isDirty && hasSavedSinceEdit;
   const breakdown = formatLanguageChanges(changesByLanguage);
   const {
     offer,
@@ -136,9 +139,13 @@ export const SettingsFormShell = <TValues,>({
         title={title}
         description={description}
         actions={
-          !isDirty &&
-          hasSavedSinceEdit && (
-            <span className={savedStatus()}>{t('allSaved')}</span>
+          (isSavedStatusShown || headerActions) && (
+            <>
+              {isSavedStatusShown && (
+                <span className={savedStatus()}>{t('allSaved')}</span>
+              )}
+              {headerActions}
+            </>
           )
         }
       />

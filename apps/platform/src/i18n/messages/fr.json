@@ -382,7 +382,6 @@
     "senderItemDescription": "Nom, adresse de réponse, adresse postale et logo, identiques dans toutes les langues.",
     "itemsAriaLabel": "E-mails à modifier",
     "editingLabel": "Modification",
-    "languageAriaLabel": "Langue à modifier",
     "viewAriaLabel": "Modifier ou prévisualiser",
     "editTab": "Modifier",
     "previewTab": "Aperçu"
@@ -472,8 +471,6 @@
     "description": "Reformulez les messages de page du site. Chaque champ a un texte par défaut : ne modifiez que ce qui doit vous ressembler.",
     "fixedCopyNote": "Les boutons, menus et libellés sont traduits pour vous et restent identiques sur tous les sites ; ils ne figurent donc pas ici.",
     "editingLanguageNote": "Vous modifiez : <strong>{language}</strong> — les autres langues gardent leur propre texte.",
-    "languageAriaLabel": "Langue",
-    "languageOption": "{language} · {count, plural, =0 {tout par défaut} one {# personnalisé} other {# personnalisés}}",
     "surfaceCustomisedCount": "{count, plural, =0 {Tout par défaut} one {# personnalisé} other {# personnalisés}}",
     "saveButton": "Enregistrer les modifications",
     "savingButton": "Enregistrement…",
@@ -825,6 +822,10 @@
       "ANALYTICS": "Activer le suivi statistique sur le site.",
       "CONSENT_BANNER": "Afficher aux visiteurs une bannière de consentement aux cookies avant le chargement des cookies ou scripts non essentiels."
     }
+  },
+  "languagePicker": {
+    "ariaLabel": "Langue",
+    "optionDescription": "{isDefault, select, true {Langue par défaut · } other {}}{count, plural, =0 {Tout par défaut} one {# personnalisé} other {# personnalisés}}"
   },
   "languageNames": {
     "EN": "Anglais",

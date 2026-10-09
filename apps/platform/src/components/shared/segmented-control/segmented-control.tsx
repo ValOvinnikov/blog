@@ -2,13 +2,14 @@
 
 import { Toggle } from '@base-ui/react/toggle';
 import { ToggleGroup } from '@base-ui/react/toggle-group';
-import type { AriaAttributes } from 'react';
+import { useId, type AriaAttributes } from 'react';
 
 import { segmentedControlVariants } from './segmented-control-variants';
 
 type TSegmentedControlOption<TValue extends string> = {
   value: TValue;
   label: string;
+  description?: string;
 };
 
 export type TSegmentedControlProps<TValue extends string> = {
@@ -37,7 +38,14 @@ export const SegmentedControl = <TValue extends string>({
   className,
   'aria-describedby': ariaDescribedBy,
 }: TSegmentedControlProps<TValue>) => {
-  const { root, option } = segmentedControlVariants();
+  const idPrefix = useId();
+  const hasDescriptions = options.some(({ description }) => description);
+  const {
+    root,
+    option,
+    optionLabel,
+    optionDescription: optionDescriptionSlot,
+  } = segmentedControlVariants({ hasDescriptions });
 
   return (
     <ToggleGroup
@@ -53,11 +61,33 @@ export const SegmentedControl = <TValue extends string>({
       aria-describedby={ariaDescribedBy}
       className={root({ class: className })}
     >
-      {options.map((opt) => (
-        <Toggle key={opt.value} value={opt.value} className={option()}>
-          {opt.label}
-        </Toggle>
-      ))}
+      {options.map(({ value: optionValue, label, description }) => {
+        const labelId = `${idPrefix}-${optionValue}-label`;
+        const descriptionId = `${idPrefix}-${optionValue}-description`;
+
+        return (
+          <Toggle
+            key={optionValue}
+            value={optionValue}
+            aria-labelledby={description ? labelId : undefined}
+            aria-describedby={description ? descriptionId : undefined}
+            className={option()}
+          >
+            {description ? (
+              <>
+                <span id={labelId} className={optionLabel()}>
+                  {label}
+                </span>
+                <span id={descriptionId} className={optionDescriptionSlot()}>
+                  {description}
+                </span>
+              </>
+            ) : (
+              label
+            )}
+          </Toggle>
+        );
+      })}
     </ToggleGroup>
   );
 };

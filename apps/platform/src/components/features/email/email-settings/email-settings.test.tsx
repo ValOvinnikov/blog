@@ -1,6 +1,11 @@
 import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@blog/config';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
-import { customRender, screen, waitFor } from '@platform/testing/custom-render';
+import {
+  customRender,
+  screen,
+  waitFor,
+  within,
+} from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import { selectFile } from '@platform/testing/select-file';
 import { TENANT_EMAIL_BRAND as BRAND } from '@platform/testing/tenant-email-brand';
@@ -115,6 +120,26 @@ describe(`<${EmailSettings.name}/>`, () => {
     expect(
       screen.getByRole('button', { name: /^Team invite.*Default$/ }),
     ).toBeVisible();
+  });
+
+  it("shows the language picker on Sender & footer, describing each language's customised templates", async () => {
+    setup();
+
+    const picker = screen.getByRole('group', { name: 'Language' });
+    expect(
+      within(picker).getByRole('button', { name: 'English' }),
+    ).toHaveAccessibleDescription('Default language · 1 customised');
+    expect(
+      within(picker).getByRole('button', { name: 'French' }),
+    ).toHaveAccessibleDescription('All default');
+
+    await openSignInTemplate(user);
+    await chooseLanguage(user, 'French');
+    await user.type(screen.getByLabelText('Subject (French)'), 'Connexion');
+
+    expect(
+      within(picker).getByRole('button', { name: 'French' }),
+    ).toHaveAccessibleDescription('1 customised');
   });
 
   describe('editing a template in two languages', () => {

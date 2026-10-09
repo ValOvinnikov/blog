@@ -13,5 +13,18 @@ export const segmentedControlVariants = tv({
       'cursor-pointer disabled:cursor-not-allowed',
       'data-[pressed]:bg-admin-surface data-[pressed]:text-admin-text data-[pressed]:shadow-admin',
     ],
+    optionLabel: ['font-semibold'],
+    optionDescription: ['font-mono text-[11px] font-normal text-admin-muted'],
+  },
+  variants: {
+    hasDescriptions: {
+      true: {
+        root: ['items-stretch'],
+        option: ['flex flex-col items-start gap-px text-left'],
+      },
+    },
+  },
+  defaultVariants: {
+    hasDescriptions: false,
   },
 });

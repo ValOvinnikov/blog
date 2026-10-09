@@ -185,6 +185,9 @@ export const countEmailDraftChanges = (
     0,
   );
 
+const isCopyCustomised = (copy: TEmailCopyDraft) =>
+  copy.subject !== '' || copy.body !== null;
+
 export const resolveItemStatus = (
   saved: TEmailDraft,
   draft: TEmailDraft,
@@ -212,11 +215,17 @@ export const resolveItemStatus = (
     return 'unsaved';
   }
   const isCustomised =
-    copy.subject !== '' ||
-    copy.body !== null ||
-    draft.templateLogos[item].url !== undefined;
+    isCopyCustomised(copy) || draft.templateLogos[item].url !== undefined;
   return isCustomised ? 'customised' : 'default';
 };
+
+export const countCustomisedTemplates = (
+  draft: TEmailDraft,
+  locale: TLocaleIsoCode,
+): number =>
+  EMAIL_TEMPLATE_TYPES.filter((templateType) =>
+    isCopyCustomised(draft.copies[templateType][locale]),
+  ).length;
 
 export const withLogo = (
   draft: TEmailDraft,

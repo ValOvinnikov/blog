@@ -382,7 +382,6 @@
     "senderItemDescription": "Nombre, dirección de respuesta, dirección postal y logotipo, iguales en todos los idiomas.",
     "itemsAriaLabel": "Correos para editar",
     "editingLabel": "Editando",
-    "languageAriaLabel": "Idioma para editar",
     "viewAriaLabel": "Editar o previsualizar",
     "editTab": "Editar",
     "previewTab": "Vista previa"
@@ -472,8 +471,6 @@
     "description": "Reformule los mensajes de página del sitio. Cada campo tiene un texto predeterminado: cambie solo lo que deba sonar como usted.",
     "fixedCopyNote": "Los botones, menús y etiquetas se traducen por usted y son iguales en todos los sitios, por eso no aparecen aquí.",
     "editingLanguageNote": "Editando <strong>{language}</strong>: los demás idiomas conservan su propio texto.",
-    "languageAriaLabel": "Idioma",
-    "languageOption": "{language} · {count, plural, =0 {todo predeterminado} one {# personalizado} other {# personalizados}}",
     "surfaceCustomisedCount": "{count, plural, =0 {Todo predeterminado} one {# personalizado} other {# personalizados}}",
     "saveButton": "Guardar cambios",
     "savingButton": "Guardando…",
@@ -825,6 +822,10 @@
       "ANALYTICS": "Activa el seguimiento analítico en el sitio.",
       "CONSENT_BANNER": "Muestra a los visitantes un banner de consentimiento de cookies antes de cargar cookies o scripts no esenciales."
     }
+  },
+  "languagePicker": {
+    "ariaLabel": "Idioma",
+    "optionDescription": "{isDefault, select, true {Idioma predeterminado · } other {}}{count, plural, =0 {Todo predeterminado} one {# personalizado} other {# personalizados}}"
   },
   "languageNames": {
     "EN": "Inglés",
