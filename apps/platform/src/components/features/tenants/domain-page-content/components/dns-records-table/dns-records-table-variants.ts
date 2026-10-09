@@ -5,7 +5,7 @@ export const dnsRecordsTableVariants = tv({
     table: ['mt-3.5 w-full border-collapse text-left font-mono text-[12px]'],
     head: [
       'border-b border-admin-line-2 px-[10px] py-2',
-      'font-ui text-[11px] font-bold text-admin-muted uppercase tracking-[.06em]',
+      'text-[11px] font-bold text-admin-muted uppercase tracking-[.06em]',
     ],
     row: ['border-b border-admin-line-2 last:border-b-0'],
     cell: ['break-all px-[10px] py-2.5 align-middle text-admin-text'],

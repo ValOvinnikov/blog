@@ -36,6 +36,8 @@
 }
 
 @theme inline {
+  --font-admin: var(--font-admin-family, 'Inter', system-ui, sans-serif);
+
   --color-admin-bg: var(--admin-bg);
   --color-admin-surface: var(--admin-surface);
   --color-admin-surface-2: var(--admin-surface-2);

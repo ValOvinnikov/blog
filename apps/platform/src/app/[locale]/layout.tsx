@@ -1,6 +1,7 @@
 import '../../../index.css';
 
 import { LOCALE_BCP47_TAGS } from '@blog/config';
+import { inter } from '@platform/config/font-loaders/inter-font';
 import { ToastProvider } from '@platform/context/toast-provider';
 import { UnsavedChangesProvider } from '@platform/context/unsaved-changes-provider';
 import { routing } from '@platform/i18n/routing';
@@ -40,7 +41,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
 
   return (
     <html lang={LOCALE_BCP47_TAGS[locale]}>
-      <body>
+      <body className={`${inter.variable} font-admin text-[14px]`}>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ToastProvider>
             <UnsavedChangesProvider>{children}</UnsavedChangesProvider>

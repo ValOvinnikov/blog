@@ -28,7 +28,7 @@ const FONT_SIZE_TOKENS = [
   'code',
 ];
 
-const FONT_FAMILY_TOKENS = ['display', 'body', 'read', 'mono', 'ui'];
+const FONT_FAMILY_TOKENS = ['display', 'body', 'read', 'mono', 'ui', 'admin'];
 
 const TRACKING_TOKENS = [
   'tight-display',

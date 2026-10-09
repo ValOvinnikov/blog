@@ -52,7 +52,7 @@ class and prop it shows; the sections after the recipes give the rules.
 - Variants: `root` is `flex flex-col gap-6`; `summary` is
   `text-[13.5px] text-admin-text`, the slot for primary content and values (a
   sentence, a count, a name). **Not yet:** `Text`'s body variant has no size,
-  so `Text` without it renders at 16px. `variant="muted"` (12.5px) is only for
+  so `Text` without it renders at the 14px body base. `variant="muted"` (12.5px) is only for
   a description or a secondary line, `supporting` only for a page description
   (`PageHeader`'s): never pick either
   to get a size.
@@ -222,11 +222,10 @@ export const auditLogTableVariants = tv({
 ## Type
 
 **Font:** Inter at a 14px base, set once on `<body>` in
-`app/[locale]/layout.tsx`. **Not yet:** nothing sets it, so admin text falls
-through to the site's Newsreader serif (Space Grotesk on `h1`–`h4`), and
-`config/font-loaders/inter-font.ts` ships 400–500 only while the primitives use
-600, 650 and 700. Don't compensate in a component: no `font-sans`, `font-ui`,
-inline `fontFamily` or `tracking-*`. `font-mono` is for domains, ids and DNS
+`app/[locale]/layout.tsx` through the `font-admin` utility. `Heading` and the
+editor's `h2` set `font-admin` themselves, because the site's base layer puts
+its display font on `h1`–`h4`. Nothing else names a family: no `font-sans`,
+`font-ui`, inline `fontFamily` or `tracking-*`. `font-mono` is for domains, ids and DNS
 values (`DetailList.Row isMono`).
 
 | Role                                                         | Write                                                   | Renders                                                                                                      |
@@ -242,7 +241,7 @@ values (`DetailList.Row isMono`).
 | Field hint                                                   | `FormField` `hint`, a plain string                      | 12px muted, under the label, above the control. **Not yet:** 11.5px below the control                        |
 | Lock reason                                                  | `SettingRow` `lockedReason`                             | 12px muted, the hint style                                                                                   |
 | Field error                                                  | `FormField` `error`                                     | 11.5px `admin-bad`, inline under the field                                                                   |
-| Body: primary content and values                             | `Text` plus a `text-[13.5px] text-admin-text` slot      | 13.5px `admin-text`. **Not yet:** `Text` alone is unsized, so 16px                                           |
+| Body: primary content and values                             | `Text` plus a `text-[13.5px] text-admin-text` slot      | 13.5px `admin-text`. **Not yet:** `Text` alone is unsized, so 14px                                           |
 | Read-only facts                                              | `DetailList` (`isMono` for domains, ids)                | 13.5px values, 12.5px muted terms, mono 12.5px                                                               |
 | Control text                                                 | `TextInput`, `Textarea`; `Button`                       | 13.5px (16px below `md`); 13px at `md`, 12px at `sm`                                                         |
 | Table header; table cell                                     | the table recipe's `head`; its `cell`                   | 11px, 700, uppercase, `tracking-[.06em]`, muted (not `faint`); 13.5px `admin-text`, a second line 12px muted |
