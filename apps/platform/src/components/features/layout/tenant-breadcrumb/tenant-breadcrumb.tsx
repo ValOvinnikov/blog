@@ -5,6 +5,10 @@ import {
   type TBreadcrumbItem,
 } from '@platform/components/shared/breadcrumbs';
 import { usePathname } from '@platform/i18n/navigation';
+import {
+  navLabelForPathname,
+  tenantNavSections,
+} from '@platform/utils/nav-sections/nav-sections';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { useTranslations } from 'next-intl';
 
@@ -13,14 +17,6 @@ export type TTenantBreadcrumbProps = {
   tenantName: string;
 };
 
-/**
- * `tenants/[tenantId]/layout.tsx`'s breadcrumb — wraps every page under it:
- * the overview itself (tenant name is the current leaf, with no href), and
- * Look/Voice/Features/Domain/Studio/Provisioning/Danger zone (an extra leaf
- * beyond the linked tenant name). A route with no entry in
- * `leafLabelKeyByPathname` omits the leaf entirely rather than guessing a
- * label — add the route there when adding its page.
- */
 export const TenantBreadcrumb = ({
   tenantId,
   tenantName,
@@ -30,26 +26,15 @@ export const TenantBreadcrumb = ({
   const tTopbar = useTranslations('topbar');
 
   const isOverview = pathname === adminRoutes.tenantOverview(tenantId);
-
-  const leafLabelKeyByPathname: Record<string, string> = {
-    [adminRoutes.look(tenantId)]: 'look',
-    [adminRoutes.voice(tenantId)]: 'voice',
-    [adminRoutes.features(tenantId)]: 'features',
-    [adminRoutes.languages(tenantId)]: 'languages',
-    [adminRoutes.tenantDomain(tenantId)]: 'domain',
-    [adminRoutes.tenantStudio(tenantId)]: 'studio',
-    [adminRoutes.tenantProvisioning(tenantId)]: 'provisioning',
-    [adminRoutes.tenantDanger(tenantId)]: 'dangerZone',
-  };
-  const leafLabelKey = leafLabelKeyByPathname[pathname];
+  const leafLabel = isOverview
+    ? undefined
+    : navLabelForPathname(tenantNavSections(t, tenantId, tenantName), pathname);
 
   const items: TBreadcrumbItem[] = [
     { label: t('platformLabel') },
     { label: t('tenants'), href: adminRoutes.tenants() },
-    isOverview
-      ? { label: tenantName }
-      : { label: tenantName, href: adminRoutes.tenantOverview(tenantId) },
-    ...(leafLabelKey ? [{ label: t(leafLabelKey) }] : []),
+    { label: tenantName, href: adminRoutes.tenantOverview(tenantId) },
+    ...(leafLabel ? [{ label: leafLabel }] : []),
   ];
 
   return (

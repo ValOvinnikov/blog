@@ -103,4 +103,35 @@ describe(TenantBreadcrumb, () => {
     expect(screen.queryByRole('link', { name: 'Acme Inc.' })).toBeNull();
     expect(screen.queryByText('Features')).not.toBeInTheDocument();
   });
+
+  it('shows Email as the current item on the email route, with the tenant name linked', () => {
+    vi.mocked(usePathname).mockReturnValue('/tenants/tenant-1/email');
+
+    render(<TenantBreadcrumb tenantId="tenant-1" tenantName="Acme Inc." />);
+
+    expect(screen.getByText('Email')).toBeVisible();
+    expect(screen.getByRole('link', { name: 'Acme Inc.' })).toHaveAttribute(
+      'href',
+      '/tenants/tenant-1',
+    );
+  });
+
+  it('shows Studio as the current item on a Studio sub-route', () => {
+    vi.mocked(usePathname).mockReturnValue(
+      '/tenants/tenant-1/studio/structure/post',
+    );
+
+    render(<TenantBreadcrumb tenantId="tenant-1" tenantName="Acme Inc." />);
+
+    expect(screen.getByText('Studio')).toBeVisible();
+    expect(screen.getByRole('link', { name: 'Acme Inc.' })).toBeVisible();
+  });
+
+  it('adds no Overview crumb on the overview route', () => {
+    vi.mocked(usePathname).mockReturnValue('/tenants/tenant-1');
+
+    render(<TenantBreadcrumb tenantId="tenant-1" tenantName="Acme Inc." />);
+
+    expect(screen.queryByText('Overview')).not.toBeInTheDocument();
+  });
 });

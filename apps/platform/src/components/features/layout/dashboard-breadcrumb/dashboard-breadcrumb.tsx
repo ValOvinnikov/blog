@@ -5,14 +5,15 @@ import {
   type TBreadcrumbItem,
 } from '@platform/components/shared/breadcrumbs';
 import { usePathname } from '@platform/i18n/navigation';
+import {
+  dashboardNavSections,
+  EVERY_PLAN_PAGE,
+  navLabelForPathname,
+} from '@platform/utils/nav-sections/nav-sections';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { useTranslations } from 'next-intl';
 
-/**
- * `dashboard/(tenant)/layout.tsx`'s breadcrumb — the owner tree's
- * counterpart to `TenantBreadcrumb`. Deliberately never names the tenant:
- * this tree exists so an owner never sees that the platform is multi-tenant.
- */
+/** Never names the tenant: this tree exists so an owner never sees that the platform is multi-tenant. */
 export const DashboardBreadcrumb = () => {
   const pathname = usePathname();
   const t = useTranslations('navSections');
@@ -31,22 +32,14 @@ export const DashboardBreadcrumb = () => {
     );
   }
 
-  const leafLabel = (() => {
-    if (pathname === adminRoutes.dashboardLook()) {
-      return t('look');
-    }
-    if (pathname === adminRoutes.dashboardVoice()) {
-      return t('voice');
-    }
-    if (pathname === adminRoutes.dashboardLanguages()) {
-      return t('languages');
-    }
-    return t('features');
-  })();
+  const leafLabel = navLabelForPathname(
+    dashboardNavSections(t, EVERY_PLAN_PAGE),
+    pathname,
+  );
 
   const items: TBreadcrumbItem[] = [
     { ...yourSite, href: homeHref },
-    { label: leafLabel },
+    ...(leafLabel ? [{ label: leafLabel }] : []),
   ];
 
   return (

@@ -40,4 +40,13 @@ describe(OperatorBreadcrumb, () => {
     expect(screen.getByText('Findings')).toBeVisible();
     expect(screen.queryByRole('link', { name: 'Findings' })).toBeNull();
   });
+
+  it('shows no leaf on a route the nav does not list', () => {
+    vi.mocked(usePathname).mockReturnValue('/unlisted');
+
+    render(<OperatorBreadcrumb />);
+
+    expect(screen.getByText('Platform')).toBeVisible();
+    expect(screen.queryByText('Tenants')).not.toBeInTheDocument();
+  });
 });
