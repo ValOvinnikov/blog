@@ -42,7 +42,11 @@ export type TVoiceSurfaceCardProps = {
   specimenTheme: TVoiceSpecimenTheme;
 };
 
-type TVoiceFieldGroup = { isCollapsed: boolean; fields: TVoiceField[] };
+type TVoiceFieldGroup = {
+  key: TVoiceFieldId;
+  isCollapsed: boolean;
+  fields: TVoiceField[];
+};
 
 const groupCollapsedFields = (
   fields: TVoiceField[],
@@ -55,7 +59,7 @@ const groupCollapsedFields = (
       last.fields.push(field);
       return groups;
     }
-    return [...groups, { isCollapsed, fields: [field] }];
+    return [...groups, { key: field.id, isCollapsed, fields: [field] }];
   }, []);
 
 export const VoiceSurfaceCard = ({
@@ -114,7 +118,7 @@ export const VoiceSurfaceCard = ({
             {groupCollapsedFields(fields, openFieldId).flatMap((group) => {
               if (group.isCollapsed) {
                 return (
-                  <div key={group.fields[0].id} className={collapsedList()}>
+                  <div key={group.key} className={collapsedList()}>
                     {group.fields.map((field) => {
                       const value = values[field.id];
                       const isCustomised = isVoiceValueCustomised(value);
