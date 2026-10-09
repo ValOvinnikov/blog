@@ -69,6 +69,22 @@ describe(`<${NewsletterModuleView.name}/>`, () => {
     });
   });
 
+  it('gives two instances of the same module distinct heading ids', () => {
+    setup();
+    setup();
+
+    const headingIds = screen
+      .getAllByRole('heading', {
+        level: 2,
+        name: 'Get new posts',
+      })
+      .map(({ id }) => id);
+    expect(new Set(headingIds).size).toBe(2);
+    expect(
+      screen.getAllByRole('region', { name: 'Get new posts' }),
+    ).toHaveLength(2);
+  });
+
   it('renders a COMPACT module without supporting text or trust cues', () => {
     setup({ variant: NEWSLETTER_VARIANT.COMPACT });
 

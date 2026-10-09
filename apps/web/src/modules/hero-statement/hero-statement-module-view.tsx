@@ -1,5 +1,6 @@
 import type { THeroStatementModule } from '@blog/service';
 import { HeroModuleShell } from '@web/modules/hero-shared';
+import { useId } from 'react';
 
 export interface IHeroStatementModuleViewProps extends THeroStatementModule {
   id: string;
@@ -18,7 +19,7 @@ export const HeroStatementModuleView = ({
   mediaOrder,
   layout,
 }: IHeroStatementModuleViewProps) => {
-  const titleId = `hero-statement-${id}`;
+  const titleId = useId();
   const { heading, supportingText } = headingBlock;
 
   return (

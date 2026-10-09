@@ -19,20 +19,33 @@ const setup = customRender(HeroStatementModuleView, {
 });
 
 describe(`<${HeroStatementModuleView.name}/>`, () => {
-  it('renders the heading as the top-level heading, labelling the Section via a unique id derived from the module id', () => {
+  it('names the section by its top-level heading', () => {
     setup();
 
-    const heading = screen.getByRole('heading', {
-      level: 1,
-      name: 'Build faster, ship sooner',
-    });
-    expect(heading).toBeVisible();
-    expect(heading).toHaveAttribute('id', 'hero-statement-hero-statement-1');
+    expect(
+      screen.getByRole('heading', {
+        level: 1,
+        name: 'Build faster, ship sooner',
+      }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole('region', { name: 'Build faster, ship sooner' }),
+    ).toBeVisible();
+  });
 
-    const section = heading.closest('section');
-    expect(section).toHaveAttribute(
-      'aria-labelledby',
-      'hero-statement-hero-statement-1',
-    );
+  it('gives two instances of the same module distinct heading ids', () => {
+    setup();
+    setup();
+
+    const headingIds = screen
+      .getAllByRole('heading', {
+        level: 1,
+        name: 'Build faster, ship sooner',
+      })
+      .map(({ id }) => id);
+    expect(new Set(headingIds).size).toBe(2);
+    expect(
+      screen.getAllByRole('region', { name: 'Build faster, ship sooner' }),
+    ).toHaveLength(2);
   });
 });

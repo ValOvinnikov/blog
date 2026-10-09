@@ -1,5 +1,6 @@
 import type { THeroBlogModule } from '@blog/service';
 import { HeroModuleShell } from '@web/modules/hero-shared';
+import { useId } from 'react';
 
 export interface IHeroBlogModuleViewProps extends Extract<
   THeroBlogModule,
@@ -22,7 +23,7 @@ export const HeroBlogModuleView = ({
   mediaOrder,
   layout,
 }: IHeroBlogModuleViewProps) => {
-  const titleId = `hero-blog-${id}`;
+  const titleId = useId();
 
   return (
     <HeroModuleShell

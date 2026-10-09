@@ -4,7 +4,6 @@ import {
   ctaContentDemo,
   makeCtaModuleData,
 } from '@web/testing/modules/cta/fixtures';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { CtaModuleView } from './cta-module-view';
 
@@ -21,13 +20,7 @@ describe(`<${CtaModuleView.name}/>`, () => {
       setup();
     });
 
-    it('labels the section by a heading whose id derives from the module id', () => {
-      const heading = screen.getByRole('heading', {
-        level: 2,
-        name: 'Get started',
-      });
-      expect(heading).toHaveAttribute('id', 'cta-cta-1');
-
+    it('labels the section by its heading', () => {
       expect(screen.getByRole('region', { name: 'Get started' })).toBeVisible();
     });
 
@@ -36,16 +29,20 @@ describe(`<${CtaModuleView.name}/>`, () => {
     });
   });
 
-  it('derives a distinct heading id from a distinct module id', () => {
-    setup({
-      id: 'cta-2',
-      headingBlock: makeHeadingBlock({
-        heading: 'Join us',
-      }),
-    });
+  it('gives two instances of the same module distinct heading ids', () => {
+    setup();
+    setup();
 
-    const heading = screen.getByRole('heading', { level: 2, name: 'Join us' });
-    expect(heading).toHaveAttribute('id', 'cta-cta-2');
+    const headingIds = screen
+      .getAllByRole('heading', {
+        level: 2,
+        name: 'Get started',
+      })
+      .map(({ id }) => id);
+    expect(new Set(headingIds).size).toBe(2);
+    expect(screen.getAllByRole('region', { name: 'Get started' })).toHaveLength(
+      2,
+    );
   });
 
   it('renders the authored ctaButtons as links, in order', () => {
