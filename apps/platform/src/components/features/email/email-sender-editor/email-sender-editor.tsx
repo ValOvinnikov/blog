@@ -47,7 +47,6 @@ export const EmailSenderEditor = ({
             label={t('senderNameLabel')}
             hint={t('senderNameHint')}
             error={senderNameError}
-            isInvalid={senderNameError !== undefined}
             value={sender.senderName}
             onChange={(value) => updateField('senderName', value)}
             isDisabled={isDisabled}

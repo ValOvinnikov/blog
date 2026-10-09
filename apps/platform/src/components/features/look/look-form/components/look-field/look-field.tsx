@@ -28,7 +28,6 @@ export const LookField = ({
   const t = useTranslations('lookForm');
   const hintId = useId();
   const {
-    root,
     group,
     label: labelSlot,
     hint: hintSlot,
@@ -53,7 +52,7 @@ export const LookField = ({
   );
 
   return (
-    <Field.Root id={id} className={root()} invalid={Boolean(error)}>
+    <Field.Root id={id} invalid={Boolean(error)}>
       {isGroup ? (
         // ToggleGroup ignores Field's description ids, so the group carries the hint.
         <Fieldset.Root

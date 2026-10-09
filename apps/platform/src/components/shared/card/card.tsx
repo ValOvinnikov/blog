@@ -26,7 +26,7 @@ const CardRoot = ({ children, className }: TCardProps) => {
   const { slots, unmatched } = mapCompoundSlots(children, CardParts);
 
   return (
-    <div className={root({ class: className })}>
+    <div data-slot="card" className={root({ class: className })}>
       {slots.Header}
       {slots.Body}
       {slots.Footer}

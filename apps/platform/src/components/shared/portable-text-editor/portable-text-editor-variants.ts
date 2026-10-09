@@ -1,3 +1,4 @@
+import { INVALID_SURFACE_CLASSES } from '@platform/utils/invalid-state-classes/invalid-state-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const portableTextEditorVariants = tv({
@@ -5,18 +6,16 @@ export const portableTextEditorVariants = tv({
     root: ['flex', 'flex-col', 'gap-2'],
     editable: [
       'min-h-[140px] w-full rounded-[9px] border px-[11px] py-[9px]',
-      'text-[16px] md:text-[13.5px] text-admin-text bg-admin-surface border-admin-line',
+      'text-[16px] md:text-[13.5px] text-admin-text bg-admin-surface border-admin-control-line',
       'focus-visible:outline-2 focus-visible:outline-admin-brand-weak focus-visible:border-admin-brand',
       '[&_p]:m-0 [&_h2]:m-0 [&_h2]:text-[16px] [&_h2]:font-semibold',
       '[&_ul]:m-0 [&_ul]:pl-5 [&_ol]:m-0 [&_ol]:pl-5',
+      INVALID_SURFACE_CLASSES,
     ],
     link: ['text-admin-brand underline'],
     placeholder: ['text-admin-faint'],
   },
   variants: {
-    isInvalid: {
-      true: { editable: ['border-admin-bad'] },
-    },
     isDisabled: {
       true: {
         editable: ['cursor-not-allowed text-admin-faint bg-admin-surface-2'],

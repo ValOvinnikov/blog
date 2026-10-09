@@ -1,4 +1,5 @@
-import { BannerState } from '@platform/components/shared/banner-state';
+import { ALERT_TYPE } from '@blog/config';
+import { Alert } from '@platform/components/shared/alert';
 import { formatDate } from '@platform/utils/format-date/format-date';
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -15,13 +16,11 @@ export const ArchivedTenantNotice = ({
   const locale = useLocale();
 
   return (
-    <BannerState
+    <Alert
       id={id}
-      tone="warn"
-      role="status"
+      type={ALERT_TYPE.WARNING}
       title={t('title')}
       description={t('description', { date: formatDate(archivedAt, locale) })}
-      action={null}
     />
   );
 };

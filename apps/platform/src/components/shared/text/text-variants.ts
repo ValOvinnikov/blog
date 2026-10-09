@@ -7,7 +7,7 @@ export const textVariants = tv({
       body: 'text-admin-text',
       muted: 'text-admin-muted text-[12.5px]',
       supporting: 'text-admin-muted text-[13.5px]',
-      hint: 'text-admin-faint text-xs',
+      hint: 'text-admin-muted text-[12px]',
     },
   },
   defaultVariants: { variant: 'body' },

@@ -297,8 +297,8 @@ page-builder and no SEO surface to justify them. What carries over:
   consumer outside its parent still gets its own `components/<child-name>/`
   sub-folder (component + its own `*-variants.ts`, never importing the
   parent's) next to the parent — mirroring `packages/ui`'s own
-  `ui-library-practices` convention (see `provisioning-banner/components/
-banner-state/` for this app's own instance). Never inline a second component
+  `ui-library-practices` convention (see `settings-form-shell/components/
+draft-recovery-banner/` for this app's own instance). Never inline a second component
   in the parent's file, however small or narrowly-scoped it looks. Note
   `Card`'s compound slots (`Card.Header` etc.) are a different case — they're
   exported parts a consumer writes directly, not private children, and

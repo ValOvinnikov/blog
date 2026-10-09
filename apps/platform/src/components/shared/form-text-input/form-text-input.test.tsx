@@ -55,24 +55,25 @@ describe(FormTextInput, () => {
     expect(handleChange).toHaveBeenCalledWith('a');
   });
 
-  it('passes isInvalid, isDisabled and aria-describedby through to the input', () => {
+  it('disables the input and keeps an outside description alongside its hint', () => {
     render(
-      <FormTextInput
-        label="Slug"
-        value=""
-        onChange={vi.fn()}
-        isInvalid={true}
-        isDisabled={true}
-        aria-describedby="tenant-slug-lock-reason"
-      />,
+      <>
+        <p id="archived-notice">This tenant is archived</p>
+        <FormTextInput
+          label="Slug"
+          hint="Used in the URL"
+          value=""
+          onChange={vi.fn()}
+          isDisabled={true}
+          aria-describedby="archived-notice"
+        />
+      </>,
     );
 
-    const input = screen.getByLabelText('Slug');
+    const input = screen.getByRole('textbox', { name: 'Slug' });
     expect(input).toBeDisabled();
-    expect(input).toHaveAttribute('aria-invalid', 'true');
-    expect(input).toHaveAttribute(
-      'aria-describedby',
-      'tenant-slug-lock-reason',
+    expect(input).toHaveAccessibleDescription(
+      'This tenant is archived Used in the URL',
     );
   });
 });

@@ -1,6 +1,6 @@
 'use client';
 
-import { SIZE } from '@blog/config';
+import { ALERT_TYPE, SIZE } from '@blog/config';
 import {
   ELEVATE_TENANT_OWNER_OUTCOME,
   TENANT_PROVISIONING_STATUS,
@@ -9,12 +9,10 @@ import {
   type TTenantProvisioningStatus,
   type TTenantProvisioningStepStatus,
 } from '@blog/db/constants';
-import { BannerState } from '@platform/components/shared/banner-state';
+import { Alert } from '@platform/components/shared/alert';
 import { LinkButton } from '@platform/components/shared/link-button';
-import { StatusBadge } from '@platform/components/shared/status-badge';
 import type { TProvisioningErrorKind } from '@platform/utils/provisioning-error/provisioning-error';
 import { adminRoutes } from '@platform/utils/routes/routes';
-import { ownerElevationTone } from '@platform/utils/status-tone/status-tone';
 import { useTranslations } from 'next-intl';
 
 import { STEP_ORDER } from '../provisioning-status-view/use-provisioning-poll';
@@ -36,14 +34,6 @@ const ACTIONABLE_OWNER_ELEVATION_OUTCOMES: TElevateTenantOwnerOutcome[] = [
   ELEVATE_TENANT_OWNER_OUTCOME.AMBIGUOUS_MEMBERSHIP,
 ];
 
-/**
- * The overview page's own provisioning signal — renders from the same
- * `useProvisioningPoll` instance the page lifts up for the details panel,
- * rather than polling independently, so the two never disagree about
- * provisioning status. Renders nothing for a tenant that hasn't started
- * provisioning yet — that state isn't reachable from this route in
- * practice.
- */
 export const ProvisioningBanner = ({
   tenantId,
   provisioningStatus,
@@ -55,8 +45,7 @@ export const ProvisioningBanner = ({
 }: TProvisioningBannerProps) => {
   const t = useTranslations('provisioningBanner');
   const tSteps = useTranslations('provisioningStatusView');
-  const { root, ownerElevationRow, ownerElevationDescription } =
-    provisioningBannerVariants();
+  const { root } = provisioningBannerVariants();
 
   const viewStepsButton = (
     <LinkButton
@@ -76,22 +65,20 @@ export const ProvisioningBanner = ({
 
     return (
       <div className={root()}>
-        <BannerState
-          tone="ok"
-          role="status"
+        <Alert
+          type={ALERT_TYPE.SUCCESS}
           title={t('readyTitle')}
           description={t('readyDescription')}
           action={viewStepsButton}
         />
         {showOwnerElevationNotice && ownerElevationOutcome && (
-          <div className={ownerElevationRow()} role="status">
-            <StatusBadge tone={ownerElevationTone(ownerElevationOutcome)}>
-              {t(`ownerElevationBadge.${ownerElevationOutcome}`)}
-            </StatusBadge>
-            <span className={ownerElevationDescription()}>
-              {t(`ownerElevationDescription.${ownerElevationOutcome}`)}
-            </span>
-          </div>
+          <Alert
+            type={ALERT_TYPE.WARNING}
+            title={t(`ownerElevationBadge.${ownerElevationOutcome}`)}
+            description={t(
+              `ownerElevationDescription.${ownerElevationOutcome}`,
+            )}
+          />
         )}
       </div>
     );
@@ -111,9 +98,8 @@ export const ProvisioningBanner = ({
         : t('failedDescriptionFallback');
 
     return (
-      <BannerState
-        tone="bad"
-        role="alert"
+      <Alert
+        type={ALERT_TYPE.ERROR}
         title={t('failedTitle', {
           step: failedIndex + 1,
           total: STEP_ORDER.length,
@@ -131,9 +117,8 @@ export const ProvisioningBanner = ({
     const currentStep = runningIndex === -1 ? 1 : runningIndex + 1;
 
     return (
-      <BannerState
-        tone="warn"
-        role="status"
+      <Alert
+        type={ALERT_TYPE.WARNING}
         title={t('runningTitle', {
           step: currentStep,
           total: STEP_ORDER.length,

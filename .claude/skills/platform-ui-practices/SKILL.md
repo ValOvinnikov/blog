@@ -143,8 +143,7 @@ export const auditLogTableVariants = tv({
 ```
 
 - This is `tenants-table-variants.ts` without the drift it and
-  `findings-table-variants.ts` still carry (`text-label`, `text-meta`,
-  `text-admin-faint`, `text-sm`): copy this, not them. Cells pad 14px, not the card's 18px.
+  `findings-table-variants.ts` still carry (`text-sm`): copy this, not them. Cells pad 14px, not the card's 18px.
 - Render through `DataTableShell`: `classNames` from `card`, `table`, `head`
   and `empty`; `row()` and `cell()` in `renderRow`; a translated label on every
   column (`sr-only` for actions); `<time dateTime>` for dates; `emptyMessage`
@@ -173,8 +172,8 @@ export const auditLogTableVariants = tv({
   Settings pages get it from `SettingsFormShell`, whose `description` is
   required. The main action goes in `actions`: a primary `LinkButton` for an
   in-app route, `ExternalLinkButton hasArrow` for an off-app one.
-- **Not yet:** `PageHeader` adds its own `mb-5`, so header-to-content is 44px.
-  Keep the parent's `gap-6`; don't add or remove margin around it per page.
+- `PageHeader` carries no margin; the page root's `gap-6` sets
+  header-to-content at 24px. Don't add margin around it per page.
 - Width: a single-column settings page keeps `SettingsFormShell`'s `max-w-3xl`;
   one with a preview, or list + editor + preview, passes `isWide`; every other
   page fills the shell.
@@ -238,7 +237,7 @@ values (`DetailList.Row isMono`).
 | Small title inside a card (step, notice, list item, summary) | the primitive's title slot                              | 13.5px, 600                                                                                                  |
 | Field label                                                  | `FormField` `label`                                     | 13px, 600, field labels only                                                                                 |
 | Field hint                                                   | `FormField` `hint`, a plain string                      | 12px muted, under the label, above the control. **Not yet:** 11.5px below the control                        |
-| Lock reason                                                  | `SettingRow` `lockedReason`                             | 12px muted, the hint style. **Not yet:** 11.5px `admin-faint`                                                |
+| Lock reason                                                  | `SettingRow` `lockedReason`                             | 12px muted, the hint style                                                                                   |
 | Field error                                                  | `FormField` `error`                                     | 11.5px `admin-bad`, inline under the field                                                                   |
 | Body: primary content and values                             | `Text` plus a `text-[13.5px] text-admin-text` slot      | 13.5px `admin-text`. **Not yet:** `Text` alone is unsized, so 16px                                           |
 | Read-only facts                                              | `DetailList` (`isMono` for domains, ids)                | 13.5px values, 12.5px muted terms, mono 12.5px                                                               |
@@ -290,10 +289,9 @@ values (`DetailList.Row isMono`).
   `outline-hidden`); on the dark sidebar `ring-admin-side-accent` with
   `ring-offset-admin-side`. A text field turns its border `admin-brand`.
   `outline-admin-brand-weak` (1.12:1) is not a focus indicator.
-- **Not yet:** the `warn` badge tone (4.28:1), the `plan` tone's raw
-  `text-indigo-800` and the sidebar section labels (3.16:1) fail. Their fix is a
-  token change; don't override them per call site. `plan` is for plan tiers
-  only.
+- **Not yet:** the sidebar section labels (3.16:1) fail. Their fix is a token
+  change; don't override them per call site.
+- `plan` is for plan tiers only.
 
 ## Spacing, radius, elevation
 
@@ -316,8 +314,7 @@ No other value between those things: no `gap-5`, `gap-[18px]`, `mb-[18px]`, or
   `-lg`, `-xl`) or 5, 7 or 10px.
 - Elevation: `shadow-admin` on resting surfaces and controls, `shadow-admin-lg`
   on floating layers only (save bar, dialog, toast, popup). A notice nested in a
-  card has no shadow. **Not yet:** `Alert` always carries one; don't override it
-  per call site.
+  card has no shadow.
 
 ## Forms and settings
 
@@ -538,10 +535,8 @@ tools you have are `loading.tsx`, `<Suspense>`, `cache`, `use`,
 ## Notices and states
 
 - One notice primitive renders page notices and form results: `Alert` with an
-  optional `action` and `role`. **Not yet:** `Alert` and `BannerState` are still
-  separate. Use `Alert` for form and save results, and `BannerState` (or
-  `ArchivedTenantNotice`) for a page notice with an action, directly under
-  `PageHeader`. Never hand-build a tone box or add another notice style.
+  optional `action` and `role`. Never hand-build a tone box or add another
+  notice style.
 - A notice's title is a short phrase; the explanation is its description, at
   regular weight. Weight marks a title, never a sentence.
 - An empty state never removes the card or the header. A card whose data doesn't
@@ -625,7 +620,7 @@ panes.
 | Table classes of your own: 18px cell padding, no row hover, a left-aligned empty line                            | The table recipe's variants, unchanged                                                                                                                               |
 | A `div` with `rounded-admin border p-[18px] shadow-admin`                                                        | `<Card>` with `Card.Header` and `Card.Body`                                                                                                                          |
 | A paragraph opening `Card.Body` that says what the card is for                                                   | `Card.Header` `supportingText`                                                                                                                                       |
-| A hand-built tinted box with a glyph                                                                             | `Alert` or `BannerState`; a failure card is a `Card` with a bad header                                                                                               |
+| A hand-built tinted box with a glyph                                                                             | `Alert`; a failure card is a `Card` with a bad header                                                                                                                |
 | A second `h1`, or `<Heading level={1}>` in a page body                                                           | `PageHeader` `title`, once per page                                                                                                                                  |
 | `<h2>`, `<h3>` or a `font-semibold` span as a section title                                                      | `Card.Header` `title`                                                                                                                                                |
 | `<Card.Header title={…}>` with no `headingLevel`                                                                 | `headingLevel={2}`                                                                                                                                                   |

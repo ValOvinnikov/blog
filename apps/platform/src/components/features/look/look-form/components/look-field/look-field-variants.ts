@@ -2,7 +2,6 @@ import { tv } from '@platform/utils/tv/tv';
 
 export const lookFieldVariants = tv({
   slots: {
-    root: ['mb-[18px] last:mb-0'],
     group: ['min-w-0'],
     label: [
       'mb-[5px] flex items-center gap-2 text-[13px] font-semibold text-admin-text',

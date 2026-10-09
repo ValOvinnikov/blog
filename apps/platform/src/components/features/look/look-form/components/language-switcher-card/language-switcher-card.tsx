@@ -27,7 +27,7 @@ export const LanguageSwitcherCard = ({
   archivedNoticeId,
 }: TLanguageSwitcherCardProps) => {
   const t = useTranslations('lookForm');
-  const { note } = languageSwitcherCardVariants();
+  const { switcher, note } = languageSwitcherCardVariants();
 
   const languageSwitcherLabel = t('languageSwitcherLabel');
 
@@ -46,6 +46,7 @@ export const LanguageSwitcherCard = ({
     >
       {hasMultipleLanguages ? (
         <SegmentedControl<TLanguageSwitcherStyle>
+          className={switcher()}
           ariaLabel={languageSwitcherLabel}
           options={languageSwitcherOptions}
           value={languageSwitcherStyle}

@@ -12,6 +12,6 @@ export const topbarVariants = tv({
       'bg-admin-surface py-1 pr-[11px] pl-1.5 text-xs whitespace-nowrap text-admin-muted shadow-admin',
     ],
     roleDot: ['size-[7px] shrink-0 rounded-full bg-admin-ok'],
-    roleScope: ['text-admin-faint'],
+    roleScope: ['text-admin-muted'],
   },
 });

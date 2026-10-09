@@ -142,7 +142,6 @@ export const VoiceField = ({
           value={textValue}
           onChange={onChange}
           placeholder={placeholder}
-          isInvalid={Boolean(error)}
           isReadOnly={isReadOnly}
         />
       )}

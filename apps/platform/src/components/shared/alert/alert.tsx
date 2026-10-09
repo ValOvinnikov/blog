@@ -1,42 +1,54 @@
-import { ALERT_TYPE } from '@blog/config';
+import { ALERT_TYPE, ICONS, SIZE, type TIconName } from '@blog/config';
+import { Icon } from '@platform/components/shared/icon';
+import type { ReactNode } from 'react';
 
 import { alertVariants, type TAlertVariants } from './alert-variants';
 
-const ALERT_GLYPH: Record<NonNullable<TAlertVariants['type']>, string> = {
-  [ALERT_TYPE.SUCCESS]: '✓',
-  [ALERT_TYPE.WARNING]: '◐',
-  [ALERT_TYPE.ERROR]: '!',
-  [ALERT_TYPE.INFO]: 'i',
-};
+type TAlertType = NonNullable<TAlertVariants['type']>;
+
+const ALERT_ICON = {
+  [ALERT_TYPE.SUCCESS]: ICONS.CHECK,
+  [ALERT_TYPE.WARNING]: ICONS.WARNING,
+  [ALERT_TYPE.ERROR]: ICONS.CLOSE,
+  [ALERT_TYPE.INFO]: ICONS.INFO,
+} as const satisfies Record<TAlertType, TIconName>;
 
 export type TAlertProps = {
-  type: NonNullable<TAlertVariants['type']>;
+  type: TAlertType;
   title: string;
-  description?: string;
+  description?: ReactNode;
+  action?: ReactNode;
+  role?: 'status' | 'alert';
+  id?: string;
   className?: string;
 };
 
-export const Alert = ({ type, title, description, className }: TAlertProps) => {
+export const Alert = ({
+  type,
+  title,
+  description,
+  action,
+  role = type === ALERT_TYPE.ERROR ? 'alert' : 'status',
+  id,
+  className,
+}: TAlertProps) => {
   const {
     root,
-    glyph,
+    icon,
     text,
     title: titleSlot,
     description: descriptionSlot,
+    action: actionSlot,
   } = alertVariants({ type });
-  const role = type === ALERT_TYPE.ERROR ? 'alert' : 'status';
 
   return (
-    <div role={role} className={root({ class: className })}>
-      <span className={glyph()} aria-hidden="true">
-        {ALERT_GLYPH[type]}
-      </span>
+    <div id={id} role={role} className={root({ class: className })}>
+      <Icon name={ALERT_ICON[type]} size={SIZE.SM} className={icon()} />
       <div className={text()}>
         <strong className={titleSlot()}>{title}</strong>
-        {description && (
-          <span className={descriptionSlot()}>{description}</span>
-        )}
+        {description && <div className={descriptionSlot()}>{description}</div>}
       </div>
+      {action && <div className={actionSlot()}>{action}</div>}
     </div>
   );
 };
