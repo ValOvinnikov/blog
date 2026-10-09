@@ -16,7 +16,7 @@ export const SectionNavigation = ({
   className,
 }: TSectionNavigationProps) => {
   const t = useTranslations('sectionNavigation');
-  const { title: sectionTitle, root, pages } = sectionNavigation;
+  const { title: sectionTitle, root, pages, parentSection } = sectionNavigation;
   const sectionPages = [
     { ...root, level: 1 as const },
     ...pages.map((page) => ({ ...page, level: 2 as const })),
@@ -29,6 +29,11 @@ export const SectionNavigation = ({
     }),
   );
   const currentPage = sectionPages.find(({ isCurrent }) => isCurrent);
+  const backLink = parentSection && {
+    label: parentSection.title,
+    href: routes.landingPage(parentSection.path),
+    ariaLabel: t('backTo', { title: parentSection.title }),
+  };
 
   return (
     <SidebarNav
@@ -37,6 +42,7 @@ export const SectionNavigation = ({
       activeKey={currentPage && routes.landingPage(currentPage.path)}
       label={sectionTitle ?? t('label')}
       ariaCurrent="page"
+      backLink={backLink}
     />
   );
 };

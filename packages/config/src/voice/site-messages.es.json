@@ -77,7 +77,8 @@
     "label": "Contenido"
   },
   "sectionNavigation": {
-    "label": "En esta sección"
+    "label": "En esta sección",
+    "backTo": "Volver a {title}"
   },
   "topicPage": {
     "empty": "Todavía no hay artículos sobre {name}.",

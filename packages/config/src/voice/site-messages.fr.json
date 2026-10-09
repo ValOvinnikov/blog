@@ -77,7 +77,8 @@
     "label": "Sommaire"
   },
   "sectionNavigation": {
-    "label": "Dans cette section"
+    "label": "Dans cette section",
+    "backTo": "Retour à {title}"
   },
   "topicPage": {
     "empty": "Aucun article sur {name} pour le moment.",
