@@ -1,5 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { mockSidebarNavItems } from '@web/testing/shared/sidebar-nav/fixtures';
+import {
+  mockSidebarNavBackLink,
+  mockSidebarNavContentsItems,
+  mockSidebarNavItems,
+  mockSidebarNavNestedItems,
+} from '@web/testing/shared/sidebar-nav/fixtures';
 import { userEvent, within } from 'storybook/test';
 
 import { SidebarNav } from './sidebar-nav';
@@ -24,6 +29,24 @@ export const Desktop: TStory = {};
 
 export const DesktopRootActive: TStory = {
   args: { activeKey: '/modules' },
+};
+
+export const DesktopNestedSection: TStory = {
+  args: {
+    items: mockSidebarNavNestedItems,
+    activeKey: '/modules/blog-hero/split-left',
+    label: 'Blog hero layouts',
+    backLink: mockSidebarNavBackLink,
+  },
+};
+
+export const DesktopPostContents: TStory = {
+  args: {
+    items: mockSidebarNavContentsItems,
+    activeKey: '#configuration',
+    label: 'Contents',
+    ariaCurrent: 'location',
+  },
 };
 
 export const DesktopItemHover: TStory = {
@@ -55,6 +78,26 @@ export const MobileOpen: TStory = {
     await userEvent.click(
       canvas.getByRole('button', { name: /In this section/ }),
     );
+  },
+};
+
+export const MobileOpenNestedSection: TStory = {
+  globals: { viewport: 'mobile' },
+  args: DesktopNestedSection.args,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(
+      canvas.getByRole('button', { name: /Blog hero layouts/ }),
+    );
+  },
+};
+
+export const MobileOpenPostContents: TStory = {
+  globals: { viewport: 'mobile' },
+  args: DesktopPostContents.args,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('button', { name: /Contents/ }));
   },
 };
 

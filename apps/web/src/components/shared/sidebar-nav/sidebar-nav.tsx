@@ -72,7 +72,7 @@ export const SidebarNav = ({
         const isNested = item.level === 2;
 
         return (
-          <li key={item.href} className={s.item({ isNested })}>
+          <li key={item.href}>
             <SmartLink
               href={item.href}
               className={s.link({ isActive, isNested, inPanel })}
@@ -91,7 +91,7 @@ export const SidebarNav = ({
     <nav aria-labelledby={labelId} className={s.root({ class: className })}>
       <div className={s.desktop()}>
         {renderBackLink()}
-        <h2 id={labelId} className={s.desktopLabel()}>
+        <h2 id={labelId} className={s.title()}>
           {label}
         </h2>
         {renderList()}
@@ -119,6 +119,7 @@ export const SidebarNav = ({
         </div>
         <div ref={panelRef} id={panelId} hidden={!open} className={s.panel()}>
           {renderBackLink(close)}
+          <h2 className={s.title()}>{label}</h2>
           {renderList(close, true)}
         </div>
       </div>
