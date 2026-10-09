@@ -343,7 +343,6 @@
     "modeDark": "Oscuro",
     "previewColorSchemeAriaLabel": "Esquema de color de la vista previa",
     "livePreviewHeading": "Vista previa en directo",
-    "livePreviewDescription": "Primitivas reales de @blog/ui",
     "sampleHeading": "Leyendo las tablas de mareas",
     "samplePara": "Una breve crónica para mostrar juntos la tipografía de títulos y de texto, el acento, los tonos del logotipo y el radio.",
     "subscribeButton": "Suscribirse",
@@ -355,7 +354,7 @@
     "secondCardExcerpt": "Una tarjeta estática. Su marco sigue su estilo de tarjeta.",
     "outlinedCardHeading": "Boletín",
     "outlinedCardBody": "Una tarjeta con contorno, como la muestran los paneles y los planes de precios.",
-    "previewNote": "Estado del formulario sin guardar → propiedades personalizadas de CSS, con la misma rampa OKLCH que producción. Nada de esto se publica hasta que guarde.",
+    "previewNote": "Creada con los propios componentes del sitio. Nada se publica hasta que guarde.",
     "widthDesktop": "Escritorio",
     "widthMobile": "Móvil",
     "previewWidthAriaLabel": "Ancho de la vista previa"

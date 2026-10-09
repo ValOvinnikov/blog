@@ -343,7 +343,6 @@
     "modeDark": "Donker",
     "previewColorSchemeAriaLabel": "Kleurenschema van voorbeeld",
     "livePreviewHeading": "Live voorbeeld",
-    "livePreviewDescription": "Echte @blog/ui-primitieven",
     "sampleHeading": "De getijdentabellen lezen",
     "samplePara": "Een kort bericht om kop- en tekstletter, accent, logotinten en afronding samen te tonen.",
     "subscribeButton": "Abonneren",
@@ -355,7 +354,7 @@
     "secondCardExcerpt": "Een statische kaart. De omlijsting volgt uw kaartstijl.",
     "outlinedCardHeading": "Nieuwsbrief",
     "outlinedCardBody": "Een omlijnde kaart, zoals panelen en prijsniveaus hem tonen.",
-    "previewNote": "Niet-opgeslagen formulierstatus → CSS custom properties, volgens dezelfde OKLCH-schaal als in productie. Niets hier is live totdat u opslaat.",
+    "previewNote": "Gebouwd met de eigen componenten van de site. Niets is live totdat u opslaat.",
     "widthDesktop": "Desktop",
     "widthMobile": "Mobiel",
     "previewWidthAriaLabel": "Breedte voorbeeld"

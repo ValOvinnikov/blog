@@ -7,7 +7,6 @@ import type {
   TRadiusScale,
 } from '@blog/config';
 import { LookSample } from '@platform/components/features/site-preview/look-sample';
-import { Card } from '@platform/components/shared/card';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { FONT_OPTIONS } from '@platform/config/fonts';
 import { buildThemePreviewStyle } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
@@ -70,34 +69,27 @@ export const LookPreview = ({
   const heading = FONT_OPTIONS[headingFont];
   const body = FONT_OPTIONS[bodyFont];
 
-  const { actions, frame, note } = lookPreviewVariants({
+  const { root, toolbar, stage, frame, note } = lookPreviewVariants({
     isMobile: width === 'mobile',
   });
 
   return (
-    <Card>
-      <Card.Header
-        title={t('livePreviewHeading')}
-        supportingText={t('livePreviewDescription')}
-        headingLevel={2}
-        actions={
-          <div className={actions()}>
-            <SegmentedControl
-              ariaLabel={t('previewWidthAriaLabel')}
-              options={widthOptions}
-              value={width}
-              onChange={setWidth}
-            />
-            <SegmentedControl
-              ariaLabel={t('previewColorSchemeAriaLabel')}
-              options={modeOptions}
-              value={mode}
-              onChange={setMode}
-            />
-          </div>
-        }
-      />
-      <Card.Body>
+    <section aria-label={t('livePreviewHeading')} className={root()}>
+      <div className={toolbar()}>
+        <SegmentedControl
+          ariaLabel={t('previewWidthAriaLabel')}
+          options={widthOptions}
+          value={width}
+          onChange={setWidth}
+        />
+        <SegmentedControl
+          ariaLabel={t('previewColorSchemeAriaLabel')}
+          options={modeOptions}
+          value={mode}
+          onChange={setMode}
+        />
+      </div>
+      <div className={stage()}>
         <div className={frame()}>
           <LookSample
             tenantName={tenantName}
@@ -108,8 +100,8 @@ export const LookPreview = ({
             bodyFontFamily={body.fontFamily}
           />
         </div>
-        <p className={note()}>{t('previewNote')}</p>
-      </Card.Body>
-    </Card>
+      </div>
+      <p className={note()}>{t('previewNote')}</p>
+    </section>
   );
 };
