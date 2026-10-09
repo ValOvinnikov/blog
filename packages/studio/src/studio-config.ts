@@ -38,7 +38,7 @@ import { orderLocales } from '@blog/studio/structure/locales/order-locales';
 import { codeInput } from '@sanity/code-input';
 import { documentInternationalization } from '@sanity/document-internationalization';
 import { visionTool } from '@sanity/vision';
-import { defineConfig, definePlugin } from 'sanity';
+import { defineConfig, defineField, definePlugin } from 'sanity';
 import { structureTool } from 'sanity/structure';
 import { internationalizedArray } from 'sanity-plugin-internationalized-array';
 import { media, mediaAssetSource } from 'sanity-plugin-media';
@@ -153,7 +153,7 @@ export const buildStudioConfig = ({
         defaultLanguages: [defaultLocale],
         fieldTypes: [
           'string',
-          'text',
+          defineField({ name: 'text', type: 'text', rows: 3 }),
           listedTextSchema.name,
           paragraphTextSchema.name,
           articleTextSchema.name,

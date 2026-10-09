@@ -50,14 +50,25 @@ describe(getMissingLocales, () => {
 
 describe(getMissingTranslations, () => {
   it('lists the languages a partly translated field is missing', () => {
-    expect(getMissingTranslations([item(EN, 'Hello')], [EN, NL, FR])).toEqual([
-      NL,
-      FR,
-    ]);
+    expect(
+      getMissingTranslations([item(EN, 'Hello')], [EN, NL, FR], EN),
+    ).toEqual([NL, FR]);
   });
 
   it('reports nothing for a field left empty in every language', () => {
-    expect(getMissingTranslations(undefined, [EN, NL])).toEqual([]);
+    expect(getMissingTranslations(undefined, [EN, NL], EN)).toEqual([]);
+  });
+
+  it('reports nothing for a field whose every language is blank', () => {
+    expect(
+      getMissingTranslations([item(EN, ''), item(NL, '  ')], [EN, NL], EN),
+    ).toEqual([]);
+  });
+
+  it('never lists the default language', () => {
+    expect(
+      getMissingTranslations([item(NL, 'Hallo')], [EN, NL, FR], EN),
+    ).toEqual([FR]);
   });
 });
 
@@ -71,12 +82,32 @@ describe(collectMissingLocales, () => {
       ],
     };
 
-    expect(collectMissingLocales(document, [EN, NL, FR])).toEqual([NL, FR]);
+    expect(collectMissingLocales(document, [EN, NL, FR], EN)).toEqual([NL, FR]);
   });
 
   it('reports nothing for a document without localized fields', () => {
     expect(
-      collectMissingLocales({ _type: 'page', title: 'About' }, [EN, NL]),
+      collectMissingLocales({ _type: 'page', title: 'About' }, [EN, NL], EN),
     ).toEqual([]);
+  });
+
+  it('ignores a localized field left empty in every language', () => {
+    const document = {
+      _type: 'module_heroStatement',
+      heading: [item(EN, 'Hi'), item(NL, 'Hoi')],
+      supportingText: [item(EN, ''), item(NL, '')],
+    };
+
+    expect(collectMissingLocales(document, [EN, NL], EN)).toEqual([]);
+  });
+
+  it('never lists the default language', () => {
+    const document = {
+      _type: 'module_cta',
+      heading: [item(EN, 'Hi')],
+      label: [item(NL, 'Hoi')],
+    };
+
+    expect(collectMissingLocales(document, [EN, NL], EN)).toEqual([NL]);
   });
 });
