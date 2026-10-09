@@ -5,7 +5,7 @@ export const itemListVariants = tv({
     root: ['hidden', 'lg:block'],
     list: ['flex', 'flex-col', 'gap-1', 'p-2'],
     item: [
-      'flex w-full flex-col items-start gap-1 rounded-admin px-3 py-2.5 text-left',
+      'flex w-full flex-col items-start gap-1 rounded-admin-control px-3 py-2.5 text-left',
       'border border-transparent',
       'hover:bg-admin-surface-2',
       'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-admin-brand',

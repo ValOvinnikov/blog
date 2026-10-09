@@ -6,7 +6,7 @@ export const avatarVariants = tv({
   variants: {
     variant: {
       table: [
-        'size-7.5 rounded-admin-sm text-xs font-bold',
+        'size-7.5 rounded-admin-control text-xs font-bold',
         'bg-admin-brand text-white',
       ],
       chip: [
@@ -14,7 +14,7 @@ export const avatarVariants = tv({
         'bg-admin-line-2 text-admin-muted',
       ],
       switcher: [
-        'size-[22px] rounded-[6px] text-[11px] font-semibold',
+        'size-[22px] rounded-admin-control text-[11px] font-semibold',
         'bg-admin-side-raised text-admin-side-text',
       ],
     },

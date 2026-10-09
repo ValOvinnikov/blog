@@ -5,7 +5,7 @@ export const presetPickerVariants = tv({
   slots: {
     root: ['grid grid-cols-1 gap-3 @sm:grid-cols-2'],
     card: [
-      'relative cursor-pointer rounded-xl border-[1.5px] border-admin-line bg-admin-surface p-[14px]',
+      'relative cursor-pointer rounded-admin-control border-[1.5px] border-admin-line bg-admin-surface p-[14px]',
       'outline-hidden',
       'focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
       ...DISABLED_AFFORDANCE_CLASSES,
@@ -17,7 +17,7 @@ export const presetPickerVariants = tv({
     name: ['flex items-center gap-2 text-[14px] font-semibold text-admin-text'],
     description: ['mt-[3px] block text-[12px] text-admin-muted'],
     mini: [
-      'mt-[11px] flex h-[52px] flex-col justify-center gap-1 rounded-md px-[9px]',
+      'mt-[11px] flex h-[52px] flex-col justify-center gap-1 rounded-admin-control px-[9px]',
     ],
     miniPrimary: ['text-[11px]'],
     miniSecondary: ['text-[10px] not-italic'],

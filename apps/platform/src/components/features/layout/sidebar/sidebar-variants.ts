@@ -30,7 +30,7 @@ export const sidebarVariants = tv({
     ],
     list: ['flex flex-col gap-0.5'],
     row: [
-      'group flex items-center gap-2.5 rounded-admin-sm px-2.5 py-2 text-[13px]',
+      'group flex items-center gap-2.5 rounded-admin-control px-2.5 py-2 text-[13px]',
       'transition-colors duration-base ease-smooth',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-side-accent',
       'focus-visible:ring-offset-2 focus-visible:ring-offset-admin-side',

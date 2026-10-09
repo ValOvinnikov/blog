@@ -9,7 +9,7 @@ export const breadcrumbsVariants = tv({
     item: ['flex items-center gap-[7px]'],
     sep: ['text-xs text-admin-faint'],
     link: [
-      'rounded-[5px] px-1 py-0.5 text-admin-muted no-underline',
+      'rounded-admin-control px-1 py-0.5 text-admin-muted no-underline',
       'hover:bg-admin-line-2 hover:text-admin-text',
     ],
     current: ['max-w-[280px] truncate font-semibold text-admin-text'],

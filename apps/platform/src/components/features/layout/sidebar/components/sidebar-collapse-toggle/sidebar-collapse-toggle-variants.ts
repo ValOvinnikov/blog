@@ -3,7 +3,7 @@ import { tv } from '@platform/utils/tv/tv';
 export const sidebarCollapseToggleVariants = tv({
   slots: {
     root: [
-      'inline-flex shrink-0 items-center justify-center rounded-admin-sm p-1.5',
+      'inline-flex shrink-0 items-center justify-center rounded-admin-control p-1.5',
       'text-admin-side-text/75 transition-colors duration-base ease-smooth',
       'hover:bg-admin-side-line hover:text-white',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-side-accent',

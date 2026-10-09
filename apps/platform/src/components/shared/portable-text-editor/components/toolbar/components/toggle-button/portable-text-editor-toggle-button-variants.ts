@@ -4,7 +4,7 @@ export const portableTextEditorToggleButtonVariants = tv({
   slots: {
     button: [
       'inline-flex items-center justify-center',
-      'rounded-[7px] border border-transparent px-2 py-1',
+      'rounded-admin-control border border-transparent px-2 py-1',
       'min-h-11 min-w-11 md:min-h-0 md:min-w-0',
       'text-[12.5px] text-admin-text',
       'hover:bg-admin-line-2',
@@ -12,7 +12,7 @@ export const portableTextEditorToggleButtonVariants = tv({
       'cursor-pointer',
     ],
     tooltip: [
-      'rounded-[6px] bg-admin-text px-2 py-1',
+      'rounded-admin-control bg-admin-text px-2 py-1',
       'text-[11.5px] text-admin-surface shadow-admin-lg',
     ],
   },

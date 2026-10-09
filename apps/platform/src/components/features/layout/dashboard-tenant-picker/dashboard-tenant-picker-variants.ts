@@ -4,7 +4,7 @@ export const dashboardTenantPickerVariants = tv({
   slots: {
     list: ['flex flex-col divide-y divide-admin-line-2'],
     row: [
-      'flex flex-col rounded-admin-sm px-2.5 py-2 no-underline',
+      'flex flex-col rounded-admin-control px-2.5 py-2 no-underline',
       'transition-colors duration-base ease-smooth hover:bg-admin-surface-2',
       'outline-hidden focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
     ],

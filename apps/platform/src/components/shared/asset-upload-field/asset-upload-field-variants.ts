@@ -21,8 +21,8 @@ export const assetUploadFieldVariants = tv({
   },
   variants: {
     size: {
-      md: { thumb: ['size-12 rounded-[10px]'] },
-      sm: { thumb: ['size-10 rounded-[8px]'] },
+      md: { thumb: ['size-12 rounded-admin-control'] },
+      sm: { thumb: ['size-10 rounded-admin-control'] },
     },
     layout: {
       box: {
@@ -34,7 +34,7 @@ export const assetUploadFieldVariants = tv({
       row: {
         field: ['@container'],
         root: [
-          'flex-wrap items-center gap-3 rounded-admin-sm border border-admin-line px-3 py-2.5',
+          'flex-wrap items-center gap-3 rounded-admin border border-admin-line px-3 py-2.5',
         ],
         top: ['min-w-0 flex-1'],
         titleRow: ['flex-wrap'],
