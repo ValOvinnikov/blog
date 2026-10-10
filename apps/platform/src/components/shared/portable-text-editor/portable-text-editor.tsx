@@ -1,7 +1,6 @@
 'use client';
 
 import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
-import { sanitizeHref } from '@blog/email/html';
 import {
   CONTROL_MODE,
   type TControlMode,
@@ -13,17 +12,14 @@ import {
   defineTextBlock,
   EditorProvider,
   PortableTextEditable,
-  useEditor,
-  useEditorSelector,
   type PortableTextBlock,
-  type PortableTextTextBlock,
   type SchemaDefinition,
-  type TextBlockRenderProps,
 } from '@portabletext/editor';
 import { EventListenerPlugin, NodePlugin } from '@portabletext/editor/plugins';
-import * as selectors from '@portabletext/editor/selectors';
 import type { AriaAttributes } from 'react';
 
+import { PortableTextEditorLinkAnnotation } from './components/link-annotation/portable-text-editor-link-annotation';
+import { PortableTextEditorTextBlock } from './components/text-block/portable-text-editor-text-block';
 import { PortableTextEditorToolbar } from './components/toolbar/portable-text-editor-toolbar';
 import { portableTextEditorVariants } from './portable-text-editor-variants';
 
@@ -53,116 +49,17 @@ const emDecorator = defineDecorator({
   render: ({ children }) => <em>{children}</em>,
 });
 
-const isListItemBlock = (
-  entry: PortableTextBlock,
-): entry is PortableTextTextBlock =>
-  entry._type === 'block' &&
-  (entry as PortableTextTextBlock).listItem !== undefined;
-
-const countRunNeighbors = (
-  value: PortableTextBlock[],
-  fromIndex: number,
-  step: 1 | -1,
-  listItem: string,
-  level: number,
-): number => {
-  let count = 0;
-  for (let i = fromIndex; i >= 0 && i < value.length; i += step) {
-    const entry = value[i];
-    if (!entry || !isListItemBlock(entry)) break;
-    if ((entry.level ?? 1) !== level) continue;
-    if (entry.listItem !== listItem) break;
-    count += 1;
-  }
-  return count;
-};
-
-const getListItemPosition = (
-  value: PortableTextBlock[],
-  block: PortableTextTextBlock,
-): number => {
-  const index = value.findIndex((entry) => entry._key === block._key);
-  if (index === -1 || block.listItem === undefined) return 1;
-
-  return (
-    1 +
-    countRunNeighbors(value, index - 1, -1, block.listItem, block.level ?? 1)
-  );
-};
-
-const getListItemRunSize = (
-  value: PortableTextBlock[],
-  block: PortableTextTextBlock,
-): number => {
-  const index = value.findIndex((entry) => entry._key === block._key);
-  if (index === -1 || block.listItem === undefined) return 1;
-
-  const level = block.level ?? 1;
-  return (
-    1 +
-    countRunNeighbors(value, index - 1, -1, block.listItem, level) +
-    countRunNeighbors(value, index + 1, 1, block.listItem, level)
-  );
-};
-
-const TextBlock = ({ attributes, children, node }: TextBlockRenderProps) => {
-  const editor = useEditor();
-  const value = useEditorSelector(editor, selectors.getValue);
-
-  const styled = node.style === 'h2' ? <h2>{children}</h2> : <p>{children}</p>;
-
-  if (node.listItem === undefined) {
-    return <div {...attributes}>{styled}</div>;
-  }
-
-  const position = getListItemPosition(value, node);
-  const setSize = getListItemRunSize(value, node);
-  const listItem = (
-    <li aria-posinset={position} aria-setsize={setSize}>
-      {styled}
-    </li>
-  );
-
-  return (
-    <div {...attributes}>
-      {node.listItem === 'number' ? (
-        <ol start={position}>{listItem}</ol>
-      ) : (
-        <ul>{listItem}</ul>
-      )}
-    </div>
-  );
-};
-
 const textBlock = defineTextBlock({
   type: 'block',
-  render: (props) => <TextBlock {...props} />,
+  render: (props) => <PortableTextEditorTextBlock {...props} />,
 });
 
-const linkClassName = portableTextEditorVariants().link();
+const linkAnnotation = defineAnnotation({
+  type: 'link',
+  render: (props) => <PortableTextEditorLinkAnnotation {...props} />,
+});
 
-const nodes = [
-  strongDecorator,
-  emDecorator,
-  textBlock,
-  defineAnnotation({
-    type: 'link',
-    render: ({ annotation, children }) => {
-      const rawHref =
-        typeof annotation.href === 'string' ? annotation.href : '';
-      const safeHref = sanitizeHref(rawHref);
-      return (
-        <a
-          href={safeHref ?? undefined}
-          rel="noopener noreferrer"
-          className={safeHref ? linkClassName : undefined}
-        >
-          {children}
-        </a>
-      );
-    },
-  }),
-];
+const nodes = [strongDecorator, emDecorator, textBlock, linkAnnotation];
 
 export const PortableTextEditor = <TBlock = TEmailTemplateBlock,>({
   initialValue,
