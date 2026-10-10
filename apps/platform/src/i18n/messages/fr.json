@@ -356,11 +356,13 @@
     "brandImagePicked": "Nouvelle image, pas encore importée",
     "brandImageUnchanged": "Aucune nouvelle image"
   },
-  "lookPreview": {
+  "previewModeControl": {
     "modeLight": "Clair",
     "modeDark": "Sombre",
-    "previewColorSchemeAriaLabel": "Jeu de couleurs de l'aperçu",
     "livePreviewHeading": "Aperçu en direct",
+    "previewColorSchemeAriaLabel": "Jeu de couleurs de l'aperçu"
+  },
+  "lookPreview": {
     "sampleHeading": "Lire les tables des marées",
     "samplePara": "Une courte chronique pour montrer ensemble la typographie des titres et du texte, l'accent, les nuances du logo et l'arrondi.",
     "subscribeButton": "S'abonner",

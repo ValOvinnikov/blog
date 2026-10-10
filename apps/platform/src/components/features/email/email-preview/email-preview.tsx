@@ -1,15 +1,13 @@
 'use client';
 
 import { ICONS, SIZE } from '@blog/config';
-import {
-  EmailTemplatePreview,
-  type TEmailPreviewWidth,
-} from '@platform/components/features/email/email-template-preview';
+import { EmailTemplatePreview } from '@platform/components/features/email/email-template-preview';
 import { Button } from '@platform/components/shared/button';
 import { DetailList } from '@platform/components/shared/detail-list';
 import { Icon } from '@platform/components/shared/icon';
 import { PreviewFrame } from '@platform/components/shared/preview-frame';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
+import { PREVIEW_WIDTH, type TPreviewWidth } from '@platform/constants/preview';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
@@ -37,18 +35,18 @@ export const EmailPreview = ({
   hasUnsavedLogo,
 }: TEmailPreviewProps) => {
   const t = useTranslations('emailPreview');
-  const [width, setWidth] = useState<TEmailPreviewWidth>('desktop');
+  const [width, setWidth] = useState<TPreviewWidth>(PREVIEW_WIDTH.DESKTOP);
   const { message, envelope } = emailPreviewVariants();
 
   return (
     <PreviewFrame
       ariaLabel={t('heading')}
-      isNarrow={width === 'mobile'}
+      isNarrow={width === PREVIEW_WIDTH.MOBILE}
       widthControl={
         <SegmentedControl
           options={[
-            { value: 'desktop', label: t('desktop') },
-            { value: 'mobile', label: t('mobile') },
+            { value: PREVIEW_WIDTH.DESKTOP, label: t('desktop') },
+            { value: PREVIEW_WIDTH.MOBILE, label: t('mobile') },
           ]}
           value={width}
           onChange={setWidth}

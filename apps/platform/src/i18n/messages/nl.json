@@ -356,11 +356,13 @@
     "brandImagePicked": "Nieuwe afbeelding, nog niet geüpload",
     "brandImageUnchanged": "Geen nieuwe afbeelding"
   },
-  "lookPreview": {
+  "previewModeControl": {
     "modeLight": "Licht",
     "modeDark": "Donker",
-    "previewColorSchemeAriaLabel": "Kleurenschema van voorbeeld",
     "livePreviewHeading": "Live voorbeeld",
+    "previewColorSchemeAriaLabel": "Kleurenschema van voorbeeld"
+  },
+  "lookPreview": {
     "sampleHeading": "De getijdentabellen lezen",
     "samplePara": "Een kort bericht om kop- en tekstletter, accent, logotinten en afronding samen te tonen.",
     "subscribeButton": "Abonneren",

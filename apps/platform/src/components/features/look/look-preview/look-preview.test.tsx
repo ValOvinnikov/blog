@@ -13,8 +13,7 @@ import { LookPreview } from './look-preview';
 
 const render = renderWithIntl;
 
-const BASE_PROPS = {
-  tenantName: 'Acme Inc.',
+const THEME = {
   accentHue: 250,
   logoHue: undefined,
   headingFont: FONT_CHOICE.SPACE_GROTESK,
@@ -22,6 +21,11 @@ const BASE_PROPS = {
   radiusScale: RADIUS_SCALE.MD,
   density: DENSITY.DEFAULT,
   cardStyle: CARD_STYLE.ACCENT_BAR,
+};
+
+const BASE_PROPS = {
+  tenantName: 'Acme Inc.',
+  theme: THEME,
   logoSrc: undefined,
   liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR],
   languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
@@ -36,7 +40,7 @@ describe(LookPreview, () => {
   });
 
   it('applies the accent hue as a live CSS custom property on the preview surface', () => {
-    render(<LookPreview {...BASE_PROPS} accentHue={28} />);
+    render(<LookPreview {...BASE_PROPS} theme={{ ...THEME, accentHue: 28 }} />);
 
     expect(screen.getByTestId('look-sample-tokens')).toHaveStyle({
       '--brand-primary-solid': 'oklch(0.55 0.17 28)',
@@ -47,8 +51,11 @@ describe(LookPreview, () => {
     render(
       <LookPreview
         {...BASE_PROPS}
-        radiusScale={RADIUS_SCALE.XL}
-        density={DENSITY.COMPACT}
+        theme={{
+          ...THEME,
+          radiusScale: RADIUS_SCALE.XL,
+          density: DENSITY.COMPACT,
+        }}
       />,
     );
 
@@ -59,7 +66,12 @@ describe(LookPreview, () => {
   });
 
   it('carries the outlined card style onto the preview surface', () => {
-    render(<LookPreview {...BASE_PROPS} cardStyle={CARD_STYLE.OUTLINED} />);
+    render(
+      <LookPreview
+        {...BASE_PROPS}
+        theme={{ ...THEME, cardStyle: CARD_STYLE.OUTLINED }}
+      />,
+    );
 
     expect(screen.getByTestId('look-sample-tokens')).toHaveStyle({
       '--item-border-width': '1px',
@@ -86,7 +98,7 @@ describe(LookPreview, () => {
 
   it('re-derives the swatch color when the preview mode toggles to dark, independent of preset', async () => {
     const user = userEvent.setup();
-    render(<LookPreview {...BASE_PROPS} accentHue={28} />);
+    render(<LookPreview {...BASE_PROPS} theme={{ ...THEME, accentHue: 28 }} />);
 
     await user.click(screen.getByRole('button', { name: 'Dark' }));
 

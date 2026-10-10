@@ -1,4 +1,1 @@
-export {
-  EmailTemplatePreview,
-  type TEmailPreviewWidth,
-} from './email-template-preview';
+export { EmailTemplatePreview } from './email-template-preview';

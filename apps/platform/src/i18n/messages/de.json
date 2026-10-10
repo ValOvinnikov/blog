@@ -356,11 +356,13 @@
     "brandImagePicked": "Neues Bild, noch nicht hochgeladen",
     "brandImageUnchanged": "Kein neues Bild"
   },
-  "lookPreview": {
+  "previewModeControl": {
     "modeLight": "Hell",
     "modeDark": "Dunkel",
-    "previewColorSchemeAriaLabel": "Farbschema der Vorschau",
     "livePreviewHeading": "Live-Vorschau",
+    "previewColorSchemeAriaLabel": "Farbschema der Vorschau"
+  },
+  "lookPreview": {
     "sampleHeading": "Gezeitentabellen lesen",
     "samplePara": "Ein kurzer Bericht, der Überschriften- und Fließtextschrift, Akzent, Logo-Töne und Eckenradius zusammen zeigt.",
     "subscribeButton": "Abonnieren",
