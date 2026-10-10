@@ -1,5 +1,7 @@
+import type { TMaybeUndefined } from '@blog/config';
+
 interface ITimerEntry {
-  timeoutId: ReturnType<typeof setTimeout> | undefined;
+  timeoutId: TMaybeUndefined<ReturnType<typeof setTimeout>>;
   remainingMs: number;
   startedAt: number;
   onExpire: () => void;
