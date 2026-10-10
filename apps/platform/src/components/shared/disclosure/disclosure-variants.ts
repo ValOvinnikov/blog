@@ -17,7 +17,7 @@ export const disclosureVariants = tv({
           'overflow-hidden rounded-admin border border-admin-line shadow-admin',
         ],
         trigger: [
-          'w-full gap-2.5 bg-admin-surface px-[18px] py-[14px] text-sm font-semibold text-admin-text',
+          'w-full gap-2.5 bg-admin-surface px-[18px] py-[14px] text-admin-13-5 font-semibold text-admin-text',
         ],
         chevron: ['ml-auto text-admin-faint'],
         inner: ['border-t border-admin-line-2 p-[18px]'],

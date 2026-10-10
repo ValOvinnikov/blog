@@ -5,6 +5,7 @@ import { ALERT_TYPE } from '@blog/config';
 import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
 import { FormField } from '@platform/components/shared/form-field';
+import { headingVariants } from '@platform/components/shared/heading/heading-variants';
 import { TextInput } from '@platform/components/shared/text-input';
 import type { ReactNode } from 'react';
 
@@ -58,7 +59,6 @@ export const ConfirmDialog = ({
   const {
     backdrop,
     popup,
-    title: titleSlot,
     description: descriptionSlot,
     actions,
   } = confirmDialogVariants();
@@ -80,7 +80,9 @@ export const ConfirmDialog = ({
       <AlertDialog.Portal>
         <AlertDialog.Backdrop className={backdrop()} />
         <AlertDialog.Popup className={popup()}>
-          <AlertDialog.Title className={titleSlot()}>{title}</AlertDialog.Title>
+          <AlertDialog.Title className={headingVariants({ size: 'cardTitle' })}>
+            {title}
+          </AlertDialog.Title>
           <AlertDialog.Description className={descriptionSlot()}>
             {description}
           </AlertDialog.Description>

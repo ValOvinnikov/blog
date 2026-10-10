@@ -13,7 +13,6 @@ export const confirmDialogVariants = tv({
       'data-[starting-style]:opacity-0 data-[ending-style]:opacity-0',
       'transition-opacity duration-base ease-smooth',
     ],
-    title: ['text-[15px] font-semibold text-admin-text'],
     description: ['text-[13px] text-admin-muted'],
     actions: ['flex flex-wrap justify-end gap-2'],
   },
