@@ -5,7 +5,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./react": "./src/react/index.ts",
+    "./react": "./src/react/polymorphic.ts",
     "./constants": "./src/constants/index.ts",
     "./utils": "./src/utils.ts"
   },
@@ -20,9 +20,6 @@
     "@blog/utils": "workspace:*",
     "@portabletext/types": "^4.0.2"
   },
-  "peerDependencies": {
-    "react": "catalog:"
-  },
   "devDependencies": {
     "@blog/eslint-config": "workspace:*",
     "@blog/prettier-config": "workspace:*",
@@ -31,7 +28,6 @@
     "@types/react": "^19.0.0",
     "eslint": "catalog:",
     "prettier": "catalog:",
-    "react": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }
