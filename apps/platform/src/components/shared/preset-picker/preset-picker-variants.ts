@@ -14,7 +14,9 @@ export const presetPickerVariants = tv({
       'absolute right-[11px] top-[11px] flex size-[18px] items-center justify-center',
       'rounded-full border-[1.5px] border-admin-control-line text-[11px] text-transparent',
     ],
-    name: ['flex items-center gap-2 text-[14px] font-semibold text-admin-text'],
+    name: [
+      'flex items-center gap-2 text-admin-13-5 font-semibold text-admin-text',
+    ],
     description: ['mt-[3px] block text-[12px] text-admin-muted'],
     mini: [
       'mt-[11px] flex h-[52px] flex-col justify-center gap-1 rounded-admin-control px-[9px]',
