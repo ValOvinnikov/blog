@@ -76,6 +76,7 @@ export const TenantSwitcher = ({
                 render={
                   <Link
                     href={adminRoutes.dashboardSelectTenantHref(tenant.id)}
+                    prefetch={false}
                   />
                 }
               >
