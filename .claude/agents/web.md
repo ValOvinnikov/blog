@@ -154,7 +154,9 @@ When invoked, before writing any code:
   file, same UPPERCASE `as const` shape as `@blog/config`'s, imported as
   `@web/constants/<file>`. A const a package or the other app also reads
   stays in `@blog/config`; one of yours moves there in the change that gives
-  it a second reader (CLAUDE.md, "Key/value-pair consts").
+  it a second reader (CLAUDE.md, "Key/value-pair consts"). `src/constants/`
+  holds plain key/value vocabularies only; app setup built from runtime values
+  (for example the `next/font` loaders in `config/fonts.ts`) stays in `src/config/`.
 - **Components** live in `src/components/`, split into three subtrees:
   - `src/components/pages/` — page-level compositions: the one component a
     route's `page.tsx` (or `not-found.tsx`) renders directly to produce the
