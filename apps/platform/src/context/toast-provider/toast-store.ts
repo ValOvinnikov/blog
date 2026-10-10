@@ -2,6 +2,8 @@ import { TOAST_TYPE, type TToastType } from '@blog/config';
 import type { IToastAction } from '@platform/components/shared/toast';
 import type { ReactNode } from 'react';
 
+import { createToastTimers } from './toast-timers';
+
 const TOAST_QUEUE_CAP = 4;
 
 const TOAST_DEFAULT_LIFE_MS: Partial<Record<TToastType, number>> = {
@@ -35,16 +37,10 @@ export interface IToastPromiseMessages<T> {
 
 type TToastPhase = 'entering' | 'visible' | 'leaving';
 
-export interface IToastRecord {
+export interface IToastRecord extends IToastPayload {
   id: string;
   type: TToastType;
   isLoading?: boolean;
-  title?: string;
-  message: ReactNode;
-  time?: string;
-  action?: IToastAction;
-  durationMs?: number;
-  coalesceKey?: string;
   phase: TToastPhase;
   paused: boolean;
   count?: number;
@@ -54,12 +50,6 @@ export interface IToastRecord {
 export interface IToastQueueState {
   visible: IToastRecord[];
   pending: IToastRecord[];
-}
-
-interface ITimerEntry {
-  timeoutId: ReturnType<typeof setTimeout>;
-  remainingMs: number;
-  startedAt: number;
 }
 
 const EMPTY_STATE: IToastQueueState = { visible: [], pending: [] };
@@ -75,23 +65,24 @@ const resolvePayload = <T>(
 const isMergeableType = (type: TToastType) =>
   type === TOAST_TYPE.SUCCESS || type === TOAST_TYPE.INFO;
 
-/**
- * The framework-free state machine behind `ToastProvider`:
- * the visible/pending queue, per-toast auto-dismiss timers (with
- * pause/resume tracking exact remaining time), coalescing (toggle-collapse +
- * counter-merge), the cap/eviction policy, and `toast.promise` in-place
- * swapping. No React, no DOM/rAF — `ToastProvider` subscribes to it via
- * `useSyncExternalStore` and separately owns the enter-transition's
- * double-`requestAnimationFrame` paint timing (a rendering, not a queueing,
- * concern) by calling `markEntered` once the browser has painted the
- * off-screen start state.
- */
+const resolveDurationMs = (type: TToastType, durationMs?: number) =>
+  durationMs ?? TOAST_DEFAULT_LIFE_MS[type];
+
+const applyPayload = (type: TToastType, payload: IToastPayload) => ({
+  type,
+  title: payload.title,
+  message: payload.message,
+  time: payload.time,
+  action: payload.action,
+  durationMs: resolveDurationMs(type, payload.durationMs),
+});
+
 export const createToastStore = () => {
   let state: IToastQueueState = EMPTY_STATE;
   const listeners = new Set<() => void>();
-  const timers = new Map<string, ITimerEntry>();
-  const removalTimers = new Map<string, ReturnType<typeof setTimeout>>();
-  const graceTimers = new Set<ReturnType<typeof setTimeout>>();
+  const lifeTimers = createToastTimers();
+  const removalTimers = createToastTimers();
+  const graceTimers = createToastTimers();
 
   const notify = () => {
     for (const listener of listeners) listener();
@@ -106,22 +97,6 @@ export const createToastStore = () => {
   const isVisible = (id: string) => Boolean(findVisible(id));
   const findAny = (id: string) =>
     findVisible(id) ?? state.pending.find((t) => t.id === id);
-
-  const clearTimer = (id: string) => {
-    const timer = timers.get(id);
-    if (timer) {
-      clearTimeout(timer.timeoutId);
-      timers.delete(id);
-    }
-  };
-
-  const clearRemovalTimer = (id: string) => {
-    const timeoutId = removalTimers.get(id);
-    if (timeoutId !== undefined) {
-      clearTimeout(timeoutId);
-      removalTimers.delete(id);
-    }
-  };
 
   const patchRecord = (
     id: string,
@@ -146,34 +121,23 @@ export const createToastStore = () => {
   const startTimer = (id: string, durationMs: number | undefined) => {
     if (durationMs === undefined) return;
 
-    const timeoutId = setTimeout(() => leave(id), durationMs);
-    timers.set(id, {
-      timeoutId,
-      remainingMs: durationMs,
-      startedAt: Date.now(),
-    });
+    lifeTimers.start(id, durationMs, () => leave(id));
   };
 
   const restartTimer = (id: string, durationMs: number | undefined) => {
-    clearTimer(id);
+    lifeTimers.clear(id);
     if (isVisible(id)) startTimer(id, durationMs);
   };
 
   const leave = (id: string) => {
-    clearTimer(id);
+    lifeTimers.clear(id);
     if (!isVisible(id)) return;
 
     patchRecord(id, (record) => ({ ...record, phase: 'leaving' }));
-    clearRemovalTimer(id);
-    const removalTimeoutId = setTimeout(
-      () => remove(id),
-      TOAST_EXIT_ANIMATION_MS,
-    );
-    removalTimers.set(id, removalTimeoutId);
+    removalTimers.start(id, TOAST_EXIT_ANIMATION_MS, () => remove(id));
   };
 
   const remove = (id: string) => {
-    removalTimers.delete(id);
     const nextVisible = state.visible.filter((t) => t.id !== id);
     if (nextVisible.length === state.visible.length) return;
 
@@ -213,8 +177,8 @@ export const createToastStore = () => {
     }
 
     const evicted = state.visible[oldestNonErrorIndex]!;
-    clearTimer(evicted.id);
-    clearRemovalTimer(evicted.id);
+    lifeTimers.clear(evicted.id);
+    removalTimers.clear(evicted.id);
     const nextVisible = state.visible.filter(
       (_, i) => i !== oldestNonErrorIndex,
     );
@@ -229,12 +193,7 @@ export const createToastStore = () => {
     now: number,
   ): IToastRecord => ({
     id: generateId(),
-    type,
-    title: payload.title,
-    message: payload.message,
-    time: payload.time,
-    action: payload.action,
-    durationMs: payload.durationMs ?? TOAST_DEFAULT_LIFE_MS[type],
+    ...applyPayload(type, payload),
     coalesceKey: payload.coalesceKey,
     phase: 'entering',
     paused: false,
@@ -269,20 +228,12 @@ export const createToastStore = () => {
       if (existing) {
         patchRecord(existing.id, () => ({
           ...existing,
-          type,
-          title: payload.title,
-          message: payload.message,
-          time: payload.time,
-          action: payload.action,
-          durationMs: payload.durationMs ?? TOAST_DEFAULT_LIFE_MS[type],
+          ...applyPayload(type, payload),
           count: undefined,
           paused: false,
           createdAt: now,
         }));
-        restartTimer(
-          existing.id,
-          payload.durationMs ?? TOAST_DEFAULT_LIFE_MS[type],
-        );
+        restartTimer(existing.id, resolveDurationMs(type, payload.durationMs));
         return existing.id;
       }
     }
@@ -294,12 +245,7 @@ export const createToastStore = () => {
         patchRecord(existing.id, () => ({
           ...existing,
           count: nextCount,
-          // A repeat within the merge window is a fresh "same thing
-          // happened again" signal — like the coalesce-key branch above,
-          // it un-pauses and re-arms a full-duration timer rather than
-          // leaving a stale `paused: true` record with a new timer that
-          // continued hovering can no longer stop (`pause()` no-ops once
-          // already paused).
+          // A kept paused: true would leave the new timer unpausable.
           paused: false,
           createdAt: now,
         }));
@@ -332,16 +278,7 @@ export const createToastStore = () => {
     const record = findVisible(id);
     if (!record || record.paused) return;
 
-    const timer = timers.get(id);
-    if (timer) {
-      clearTimeout(timer.timeoutId);
-      const elapsed = Date.now() - timer.startedAt;
-      timers.set(id, {
-        ...timer,
-        remainingMs: Math.max(timer.remainingMs - elapsed, 0),
-      });
-    }
-
+    lifeTimers.pause(id);
     patchRecord(id, (r) => ({ ...r, paused: true }));
   };
 
@@ -349,12 +286,7 @@ export const createToastStore = () => {
     const record = findVisible(id);
     if (!record || !record.paused) return;
 
-    const timer = timers.get(id);
-    if (timer) {
-      const timeoutId = setTimeout(() => leave(id), timer.remainingMs);
-      timers.set(id, { ...timer, timeoutId, startedAt: Date.now() });
-    }
-
+    lifeTimers.resume(id);
     patchRecord(id, (r) => ({ ...r, paused: false }));
   };
 
@@ -371,8 +303,7 @@ export const createToastStore = () => {
     const id = generateId();
     let shown = false;
 
-    const graceTimeoutId = setTimeout(() => {
-      graceTimers.delete(graceTimeoutId);
+    graceTimers.start(id, TOAST_PROMISE_GRACE_MS, () => {
       shown = true;
       enqueue({
         id,
@@ -385,12 +316,10 @@ export const createToastStore = () => {
         paused: false,
         createdAt: Date.now(),
       });
-    }, TOAST_PROMISE_GRACE_MS);
-    graceTimers.add(graceTimeoutId);
+    });
 
     const settle = (type: TToastType, payload: IToastPayload) => {
-      graceTimers.delete(graceTimeoutId);
-      clearTimeout(graceTimeoutId);
+      graceTimers.clear(id);
 
       if (!shown) {
         enqueue(buildRecord(type, payload, Date.now()));
@@ -399,17 +328,12 @@ export const createToastStore = () => {
 
       if (!findAny(id)) return;
 
-      const nextDurationMs = payload.durationMs ?? TOAST_DEFAULT_LIFE_MS[type];
-      clearTimer(id);
+      const nextDurationMs = resolveDurationMs(type, payload.durationMs);
+      lifeTimers.clear(id);
       patchRecord(id, (r) => ({
         ...r,
-        type,
+        ...applyPayload(type, payload),
         isLoading: false,
-        title: payload.title,
-        message: payload.message,
-        time: payload.time,
-        action: payload.action,
-        durationMs: nextDurationMs,
         paused: false,
         createdAt: Date.now(),
       }));
@@ -428,12 +352,9 @@ export const createToastStore = () => {
   };
 
   const destroy = () => {
-    for (const timer of timers.values()) clearTimeout(timer.timeoutId);
-    timers.clear();
-    for (const timeoutId of removalTimers.values()) clearTimeout(timeoutId);
-    removalTimers.clear();
-    for (const timeoutId of graceTimers) clearTimeout(timeoutId);
-    graceTimers.clear();
+    lifeTimers.clearAll();
+    removalTimers.clearAll();
+    graceTimers.clearAll();
     listeners.clear();
   };
 
