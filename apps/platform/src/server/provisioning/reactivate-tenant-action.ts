@@ -1,13 +1,12 @@
 'use server';
 
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE, ERROR_CODE } from '@blog/config';
+import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { queries } from '@blog/db';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
-import { logger } from '@platform/utils/logger/logger';
 import { z } from 'zod';
 
-import { dispatchProvisioningWorkflow } from './dispatch-provisioning-workflow';
+import { startProvisioning } from './start-provisioning';
 
 const reactivateTenantInputSchema = z.object({
   confirm: z.string().trim().min(1, 'Type the tenant name to confirm.'),
@@ -56,35 +55,15 @@ export const reactivateTenantAction = async (
     return { ok: false, error: "Doesn't match the tenant's name." };
   }
 
-  const began = await queries.tenants.beginTenantProvisioning(tenantId);
+  const { outcome } = await startProvisioning(tenantId);
 
-  if (!began.ok) {
-    if (began.error === ERROR_CODE.DB_ALREADY_PROVISIONING) {
-      return { ok: false, error: 'Provisioning is already running.' };
-    }
-
-    logger.error('provisioning.reactivate_begin_failed', {
-      tenantId,
-      error: began.error,
-    });
+  if (outcome === 'already-in-progress') {
+    return { ok: false, error: 'Provisioning is already running.' };
+  }
+  if (outcome === 'not-found') {
     return { ok: false, error: 'Tenant not found.' };
   }
-
-  const dispatched = await dispatchProvisioningWorkflow(tenantId);
-
-  if (!dispatched) {
-    const reverted = await queries.tenants.setTenantProvisioningStatus(
-      tenantId,
-      began.data.previousProvisioningStatus,
-    );
-
-    if (!reverted.ok) {
-      logger.error('provisioning.reactivate_revert_failed', {
-        tenantId,
-        error: reverted.error,
-      });
-    }
-
+  if (outcome === 'dispatch-error') {
     return { ok: false, error: "Couldn't start reactivation — try again." };
   }
 

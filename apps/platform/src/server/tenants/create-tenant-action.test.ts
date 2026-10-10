@@ -14,22 +14,18 @@ const validOwnerInviteToken = createOwnerInviteToken('owner@example.com');
 
 const {
   requireAdminMock,
-  dispatchProvisioningWorkflowMock,
+  startProvisioningMock,
   getUserByEmailMock,
   getTenantByDomainMock,
   createTenantDraftMock,
-  beginTenantProvisioningMock,
-  setTenantProvisioningStatusMock,
   insertAuditEventMock,
   checkDomainAvailabilityMock,
 } = vi.hoisted(() => ({
   requireAdminMock: vi.fn(),
-  dispatchProvisioningWorkflowMock: vi.fn(),
+  startProvisioningMock: vi.fn(),
   getUserByEmailMock: vi.fn(),
   getTenantByDomainMock: vi.fn(),
   createTenantDraftMock: vi.fn(),
-  beginTenantProvisioningMock: vi.fn(),
-  setTenantProvisioningStatusMock: vi.fn(),
   insertAuditEventMock: vi.fn(),
   checkDomainAvailabilityMock: vi.fn(),
 }));
@@ -40,8 +36,8 @@ vi.mock('@platform/server/auth/require-admin', () => ({
 
 vi.mock('@platform/server/auth/auth');
 
-vi.mock('@platform/server/provisioning/dispatch-provisioning-workflow', () => ({
-  dispatchProvisioningWorkflow: dispatchProvisioningWorkflowMock,
+vi.mock('@platform/server/provisioning/start-provisioning', () => ({
+  startProvisioning: startProvisioningMock,
 }));
 
 vi.mock('@platform/server/provisioning/check-domain-availability', () => ({
@@ -58,8 +54,6 @@ vi.mock('@blog/db', async () => ({
     users: { getUserByEmail: getUserByEmailMock },
     tenants: {
       createTenantDraft: createTenantDraftMock,
-      beginTenantProvisioning: beginTenantProvisioningMock,
-      setTenantProvisioningStatus: setTenantProvisioningStatusMock,
     },
     tenantDomains: { getTenantByDomain: getTenantByDomainMock },
     auditEvents: { insertAuditEvent: insertAuditEventMock },
@@ -88,18 +82,8 @@ describe('createTenantAction', () => {
     authMock.mockResolvedValue({
       user: { id: 'operator-1', email: 'operator@example.com' },
     });
-    dispatchProvisioningWorkflowMock.mockReset();
-    dispatchProvisioningWorkflowMock.mockResolvedValue(true);
-    beginTenantProvisioningMock.mockReset();
-    beginTenantProvisioningMock.mockResolvedValue({
-      ok: true,
-      data: { tenant: { id: 'tenant-1' }, previousProvisioningStatus: null },
-    });
-    setTenantProvisioningStatusMock.mockReset();
-    setTenantProvisioningStatusMock.mockResolvedValue({
-      ok: true,
-      data: { id: 'tenant-1' },
-    });
+    startProvisioningMock.mockReset();
+    startProvisioningMock.mockResolvedValue({ outcome: 'dispatched' });
     signInMock.mockReset();
     signInMock.mockResolvedValue({ ok: true });
     getUserByEmailMock.mockReset();
@@ -219,7 +203,7 @@ describe('createTenantAction', () => {
       email: 'owner@example.com',
       redirect: false,
     });
-    expect(dispatchProvisioningWorkflowMock).toHaveBeenCalledWith('tenant-1');
+    expect(startProvisioningMock).toHaveBeenCalledWith('tenant-1');
     expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1/provisioning');
   });
 
@@ -241,7 +225,7 @@ describe('createTenantAction', () => {
         ownerEmail: 'owner@example.com',
       }),
     );
-    expect(dispatchProvisioningWorkflowMock).toHaveBeenCalledWith('tenant-1');
+    expect(startProvisioningMock).toHaveBeenCalledWith('tenant-1');
     expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1/provisioning');
   });
 
@@ -264,7 +248,7 @@ describe('createTenantAction', () => {
         error: expect.any(Error),
       }),
     );
-    expect(dispatchProvisioningWorkflowMock).toHaveBeenCalledWith('tenant-1');
+    expect(startProvisioningMock).toHaveBeenCalledWith('tenant-1');
     expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1/provisioning');
   });
 
@@ -340,7 +324,7 @@ describe('createTenantAction', () => {
     const result = await createTenantAction(validInput);
 
     expect(result).toEqual({ ok: false, error: expect.any(String) });
-    expect(dispatchProvisioningWorkflowMock).not.toHaveBeenCalled();
+    expect(startProvisioningMock).not.toHaveBeenCalled();
     expect(redirect).not.toHaveBeenCalled();
     expect(loggerErrorMock).toHaveBeenCalledWith(
       'tenants.create_draft_failed',
@@ -357,7 +341,7 @@ describe('createTenantAction', () => {
     const result = await createTenantAction(validInput);
 
     expect(result).toEqual({ ok: false, error: expect.any(String) });
-    expect(dispatchProvisioningWorkflowMock).not.toHaveBeenCalled();
+    expect(startProvisioningMock).not.toHaveBeenCalled();
     expect(redirect).not.toHaveBeenCalled();
     expect(loggerErrorMock).toHaveBeenCalledWith(
       'tenants.create_draft_failed',
@@ -383,53 +367,27 @@ describe('createTenantAction', () => {
     });
   });
 
-  it('begins provisioning before dispatching, then redirects to the status page', async () => {
+  it('starts provisioning, then redirects to the status page', async () => {
     await expect(createTenantAction(validInput)).rejects.toThrow(
       'NEXT_REDIRECT',
     );
 
-    expect(beginTenantProvisioningMock).toHaveBeenCalledWith('tenant-1');
-    expect(dispatchProvisioningWorkflowMock).toHaveBeenCalledWith('tenant-1');
-    expect(setTenantProvisioningStatusMock).not.toHaveBeenCalled();
+    expect(startProvisioningMock).toHaveBeenCalledWith('tenant-1');
     expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1/provisioning');
   });
 
-  it('reverts the PROVISIONING transition but still redirects when the dispatch fails', async () => {
-    beginTenantProvisioningMock.mockResolvedValue({
-      ok: true,
-      data: { tenant: { id: 'tenant-1' }, previousProvisioningStatus: null },
-    });
-    dispatchProvisioningWorkflowMock.mockResolvedValue(false);
+  it.each(['already-in-progress', 'not-found', 'dispatch-error'])(
+    'still redirects to the status page when provisioning reports %s',
+    async (outcome) => {
+      startProvisioningMock.mockResolvedValue({ outcome });
 
-    await expect(createTenantAction(validInput)).rejects.toThrow(
-      'NEXT_REDIRECT',
-    );
+      await expect(createTenantAction(validInput)).rejects.toThrow(
+        'NEXT_REDIRECT',
+      );
 
-    expect(setTenantProvisioningStatusMock).toHaveBeenCalledWith(
-      'tenant-1',
-      null,
-    );
-    expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1/provisioning');
-  });
-
-  it('skips the dispatch but still redirects when a concurrent dispatch is reported', async () => {
-    beginTenantProvisioningMock.mockResolvedValue({
-      ok: false,
-      error: 'DB_ALREADY_PROVISIONING',
-    });
-
-    await expect(createTenantAction(validInput)).rejects.toThrow(
-      'NEXT_REDIRECT',
-    );
-
-    expect(dispatchProvisioningWorkflowMock).not.toHaveBeenCalled();
-    expect(setTenantProvisioningStatusMock).not.toHaveBeenCalled();
-    expect(loggerErrorMock).not.toHaveBeenCalledWith(
-      'provisioning.begin_failed',
-      expect.anything(),
-    );
-    expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1/provisioning');
-  });
+      expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1/provisioning');
+    },
+  );
 
   it('records a CREATED audit event for the new tenant, with the operator as actor', async () => {
     await expect(createTenantAction(validInput)).rejects.toThrow(
@@ -458,7 +416,7 @@ describe('createTenantAction', () => {
       'NEXT_REDIRECT',
     );
 
-    expect(dispatchProvisioningWorkflowMock).toHaveBeenCalledWith('tenant-1');
+    expect(startProvisioningMock).toHaveBeenCalledWith('tenant-1');
     expect(redirect).toHaveBeenCalledWith('/tenants/tenant-1/provisioning');
     expect(loggerErrorMock).toHaveBeenCalledWith(
       'tenants.create_audit_failed',

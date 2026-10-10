@@ -5,7 +5,6 @@ import {
   AUDIT_TARGET_TYPE,
   DOMAIN_AVAILABILITY,
   DOMAIN_PATTERN,
-  ERROR_CODE,
 } from '@blog/config';
 import { queries, TENANT_PLAN, type TTenantPlan } from '@blog/db';
 import { routing } from '@platform/i18n/routing';
@@ -13,7 +12,7 @@ import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { signIn } from '@platform/server/auth/auth';
 import { requireAdmin } from '@platform/server/auth/require-admin';
 import { checkDomainAvailability } from '@platform/server/provisioning/check-domain-availability';
-import { dispatchProvisioningWorkflow } from '@platform/server/provisioning/dispatch-provisioning-workflow';
+import { startProvisioning } from '@platform/server/provisioning/start-provisioning';
 import {
   createOwnerInviteToken,
   verifyOwnerInviteToken,
@@ -49,14 +48,7 @@ export type TCreateTenantResult = {
 };
 
 /**
- * The Details step's submit handler — resolves the owner email to an
- * existing user when one exists, or (once the operator has confirmed)
- * proceeds down the invite path for one that doesn't — inserts the draft
- * tenant row, kicks off provisioning, and redirects straight to the
- * tenant's status page. There is no `{ ok: true }` return: `redirect()`
- * throws before this function can return normally, so every value this
- * resolves to is a failure, or a pending confirmation, for the Details form
- * to show inline.
+ * Never resolves `{ ok: true }`: success ends in `redirect()`, which throws.
  */
 export const createTenantAction = async (
   input: TCreateTenantInput,
@@ -173,33 +165,9 @@ export const createTenantAction = async (
     }
   }
 
-  // A hit on beginTenantProvisioning's already-provisioning guard here is a
-  // legitimate no-op, not an error; a failed dispatch reverts the status
-  // transition below instead of leaving it stuck.
-  const began = await queries.tenants.beginTenantProvisioning(tenantId);
-
-  if (!began.ok && began.error !== ERROR_CODE.DB_ALREADY_PROVISIONING) {
-    logger.error('provisioning.begin_failed', {
-      tenantId,
-      error: began.error,
-    });
-  } else if (began.ok) {
-    const dispatched = await dispatchProvisioningWorkflow(tenantId);
-
-    if (!dispatched) {
-      const reverted = await queries.tenants.setTenantProvisioningStatus(
-        tenantId,
-        began.data.previousProvisioningStatus,
-      );
-
-      if (!reverted.ok) {
-        logger.error('provisioning.revert_failed', {
-          tenantId,
-          error: reverted.error,
-        });
-      }
-    }
-  }
+  // The status page reports whatever state provisioning landed in, so every
+  // outcome redirects there.
+  await startProvisioning(tenantId);
 
   redirect(adminRoutes.tenantProvisioning(tenantId));
 };
