@@ -9,7 +9,7 @@ export const settingRowVariants = tv({
     ],
     content: ['min-w-0 flex-1'],
     label: ['block text-[13px] font-semibold text-admin-text'],
-    description: ['mt-0.5 block text-[12.5px] text-admin-muted'],
+    description: ['mt-0.5 block'],
     reason: [
       'mt-[5px] flex items-start gap-[5px]',
       'text-[12px] leading-[1.45] text-admin-muted',

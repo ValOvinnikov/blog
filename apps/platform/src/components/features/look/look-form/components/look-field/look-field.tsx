@@ -1,6 +1,7 @@
 import { Field } from '@base-ui/react/field';
 import { Fieldset } from '@base-ui/react/fieldset';
 import { StatusBadge } from '@platform/components/shared/status-badge';
+import { textVariants } from '@platform/components/shared/text/text-variants';
 import { useTranslations } from 'next-intl';
 import { useId, type ReactNode } from 'react';
 
@@ -46,7 +47,10 @@ export const LookField = ({
     </>
   );
   const description = hint && (
-    <Field.Description id={hintId} className={hintSlot()}>
+    <Field.Description
+      id={hintId}
+      className={textVariants({ variant: 'hint', class: hintSlot() })}
+    >
       {hint}
     </Field.Description>
   );

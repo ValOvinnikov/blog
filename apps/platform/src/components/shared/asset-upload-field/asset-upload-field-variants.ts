@@ -14,7 +14,7 @@ export const assetUploadFieldVariants = tv({
     titleRow: ['flex min-w-0 items-center gap-2'],
     title: ['truncate text-[13px] font-semibold text-admin-text'],
     fileName: ['mt-0.5 truncate text-[11.5px] text-admin-muted'],
-    hint: ['mt-0.5 text-[11.5px] text-admin-muted'],
+    hint: ['mt-0.5'],
     actions: ['flex items-center gap-2'],
     input: ['sr-only'],
     error: ['text-[11.5px] text-admin-bad'],
