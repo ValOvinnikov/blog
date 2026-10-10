@@ -1,6 +1,10 @@
 'use client';
 
-import { ALERT_TYPE, LOCALE_ISO_CODES } from '@blog/config';
+import {
+  ALERT_TYPE,
+  LOCALE_ISO_CODES,
+  type TMaybeUndefined,
+} from '@blog/config';
 import { TENANT_PLAN, type TTenantPlan } from '@blog/db/constants';
 import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
@@ -32,7 +36,7 @@ import { useLockStateChange } from './use-lock-state-change';
 export type TTenantDetailsPanelProps = {
   tenant: TClientTenant;
   fieldLocks: TTenantFieldLocks;
-  ownerEmail: string | undefined;
+  ownerEmail: TMaybeUndefined<string>;
   archivedNoticeId?: string;
 };
 
@@ -52,7 +56,7 @@ const TEXT_FIELD_TYPE: Partial<Record<TTextFieldKey, string>> = {
 
 const valuesFromProps = (
   tenant: TClientTenant,
-  ownerEmail: string | undefined,
+  ownerEmail: TMaybeUndefined<string>,
 ): TFormValues => {
   return {
     name: tenant.name,
@@ -101,7 +105,8 @@ export const TenantDetailsPanel = ({
   );
   const [fieldErrors, setFieldErrors] =
     useState<TUpdateTenantDetailsFieldErrors>({});
-  const [formError, setFormError] = useState<string | undefined>(undefined);
+  const [formError, setFormError] =
+    useState<TMaybeUndefined<string>>(undefined);
   const [isPending, startTransition] = useTransition();
   const isArchived = Boolean(tenant.deprovisionedAt);
 

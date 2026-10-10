@@ -1,5 +1,6 @@
 'use client';
 
+import type { TMaybeUndefined } from '@blog/config';
 import type { TAuditEvent } from '@blog/db/schema/audit-events';
 import type { TFindingSummary } from '@blog/db/schema/findings';
 import { ContentWorkspaceCard } from '@platform/components/features/tenants/content-workspace-card';
@@ -24,9 +25,9 @@ import { tenantOverviewViewVariants } from './tenant-overview-view-variants';
 export type TTenantOverviewViewProps = {
   tenant: TClientTenant;
   domainCard: ReactNode;
-  ownerEmail: string | undefined;
-  ownerJoinedAt: string | undefined;
-  ownerJoinedAtIso: string | undefined;
+  ownerEmail: TMaybeUndefined<string>;
+  ownerJoinedAt: TMaybeUndefined<string>;
+  ownerJoinedAtIso: TMaybeUndefined<string>;
   auditEvents: TAuditEvent[];
   findings: TFindingSummary[];
 };

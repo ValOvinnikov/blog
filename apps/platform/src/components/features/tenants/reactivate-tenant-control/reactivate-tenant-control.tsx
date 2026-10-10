@@ -1,5 +1,6 @@
 'use client';
 
+import type { TMaybeUndefined } from '@blog/config';
 import { Card } from '@platform/components/shared/card';
 import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
 import { Text } from '@platform/components/shared/text';
@@ -26,7 +27,7 @@ export const ReactivateTenantControl = ({
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [confirm, setConfirm] = useState('');
-  const [error, setError] = useState<string | undefined>(undefined);
+  const [error, setError] = useState<TMaybeUndefined<string>>(undefined);
   const [isPending, startTransition] = useTransition();
 
   const { content } = reactivateTenantControlVariants();

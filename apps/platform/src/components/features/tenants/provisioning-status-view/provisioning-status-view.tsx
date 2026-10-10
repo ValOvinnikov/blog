@@ -1,6 +1,6 @@
 'use client';
 
-import { ALERT_TYPE, SIZE } from '@blog/config';
+import { ALERT_TYPE, SIZE, type TMaybeUndefined } from '@blog/config';
 import { TENANT_PROVISIONING_STEP_STATUS } from '@blog/db/constants';
 import { RunErrorCard } from '@platform/components/features/tenants/run-error-card';
 import { Alert } from '@platform/components/shared/alert';
@@ -27,7 +27,7 @@ import { STEP_ORDER, useProvisioningPoll } from './use-provisioning-poll';
 
 type TProvisioningStatusViewProps = {
   tenant: TClientTenant;
-  ownerEmail: string | undefined;
+  ownerEmail: TMaybeUndefined<string>;
 };
 
 export const ProvisioningStatusView = ({

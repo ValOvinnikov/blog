@@ -1,5 +1,6 @@
 'use client';
 
+import type { TMaybeUndefined } from '@blog/config';
 import { Card } from '@platform/components/shared/card';
 import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
 import { Switch } from '@platform/components/shared/switch';
@@ -28,7 +29,7 @@ export const DeprovisionTenantControl = ({
   const [open, setOpen] = useState(false);
   const [confirm, setConfirm] = useState('');
   const [dryRun, setDryRun] = useState(true);
-  const [error, setError] = useState<string | undefined>(undefined);
+  const [error, setError] = useState<TMaybeUndefined<string>>(undefined);
   const [isPending, startTransition] = useTransition();
   const inProgressHintId = useId();
 
@@ -137,7 +138,7 @@ const DeleteTenantPermanentlyControl = ({
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [confirm, setConfirm] = useState('');
-  const [error, setError] = useState<string | undefined>(undefined);
+  const [error, setError] = useState<TMaybeUndefined<string>>(undefined);
   const [isPending, startTransition] = useTransition();
 
   const handleOpenChange = (next: boolean) => {

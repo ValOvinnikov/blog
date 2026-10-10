@@ -1,5 +1,6 @@
 'use client';
 
+import type { TMaybeUndefined } from '@blog/config';
 import {
   CORE_DEPROVISIONING_STEPS,
   TENANT_PROVISIONING_STEP_STATUS,
@@ -41,7 +42,7 @@ const stepStatusesFor = (
 
 const stepUpdatedAtFor = (
   steps: TTenantDeprovisioningState | null,
-): (string | undefined)[] =>
+): TMaybeUndefined<string>[] =>
   STEP_ORDER.map((stepKey) => steps?.[stepKey]?.updatedAt);
 
 const deriveOverallStatus = (
@@ -72,8 +73,8 @@ const isTerminalOverallStatus = (
 // `startedAt` for one still in flight) is a retry the workflow hasn't
 // reported in on yet — including one dispatched over a stale FAILED run.
 const isRetryPending = (
-  deprovisionRequestedAt: string | undefined,
-  run: TDeprovisioningRun | undefined,
+  deprovisionRequestedAt: TMaybeUndefined<string>,
+  run: TMaybeUndefined<TDeprovisioningRun>,
 ): boolean => {
   if (!deprovisionRequestedAt) {
     return false;
@@ -88,16 +89,16 @@ const isRetryPending = (
 export type TUseDeprovisioningPollResult = {
   deprovisioningSteps: TTenantDeprovisioningState | null;
   stepStatuses: TTenantProvisioningStepStatus[];
-  stepUpdatedAt: (string | undefined)[];
-  run: TDeprovisioningRun | undefined;
+  stepUpdatedAt: TMaybeUndefined<string>[];
+  run: TMaybeUndefined<TDeprovisioningRun>;
   overallStatus: TTenantProvisioningStepStatus;
   isRunning: boolean;
   isInProgress: boolean;
   isFailed: boolean;
   isDone: boolean;
-  failedStep: TDeprovisioningStep | undefined;
-  failedStepError: string | undefined;
-  errorKind: TProvisioningErrorKind | undefined;
+  failedStep: TMaybeUndefined<TDeprovisioningStep>;
+  failedStepError: TMaybeUndefined<string>;
+  errorKind: TMaybeUndefined<TProvisioningErrorKind>;
 };
 
 export type TUseDeprovisioningPollOptions = {

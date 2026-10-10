@@ -1,3 +1,4 @@
+import type { TMaybeUndefined } from '@blog/config';
 import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
@@ -590,8 +591,9 @@ describe(ProvisioningStatusView, () => {
     const tenant = makeClientTenant({
       provisioningSteps: idleProvisioningSteps(),
     });
-    let resolveDispatch:
-      ((result: { outcome: 'dispatched' }) => void) | undefined;
+    let resolveDispatch: TMaybeUndefined<
+      (result: { outcome: 'dispatched' }) => void
+    >;
     retryProvisioningStepActionMock.mockReturnValue(
       new Promise((resolve) => {
         resolveDispatch = resolve;
@@ -620,8 +622,9 @@ describe(ProvisioningStatusView, () => {
     const tenant = makeClientTenant({
       provisioningSteps: idleProvisioningSteps(),
     });
-    let resolveDispatch:
-      ((result: { outcome: 'dispatched' }) => void) | undefined;
+    let resolveDispatch: TMaybeUndefined<
+      (result: { outcome: 'dispatched' }) => void
+    >;
     retryProvisioningStepActionMock.mockReturnValue(
       new Promise((resolve) => {
         resolveDispatch = resolve;
