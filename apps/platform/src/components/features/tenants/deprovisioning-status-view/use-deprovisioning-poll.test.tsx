@@ -5,7 +5,7 @@ import {
 import {
   doneDeprovisioningSteps,
   idleDeprovisioningSteps,
-  makeTenant,
+  makeClientTenant,
 } from '@platform/testing/tenants/fixtures';
 import { act, renderHook } from '@testing-library/react';
 
@@ -28,7 +28,7 @@ vi.mock(
 );
 
 const makeFailedRevokeTenant = () =>
-  makeTenant({
+  makeClientTenant({
     deprovisioningSteps: {
       ...idleDeprovisioningSteps(),
       [DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS]: {
@@ -64,7 +64,7 @@ describe(useDeprovisioningPoll, () => {
 
   describe('status derivation', () => {
     it('reports IDLE, in progress but not running, when every step is idle', () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         deprovisioningSteps: {
           ...idleDeprovisioningSteps(),
           run: { startedAt: '2026-08-12T14:18:00.000Z' },
@@ -84,7 +84,7 @@ describe(useDeprovisioningPoll, () => {
     });
 
     it('reports RUNNING when any step is running, even alongside a stale FAILED entry from a prior attempt', () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         deprovisioningSteps: {
           ...idleDeprovisioningSteps(),
           [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
@@ -163,7 +163,7 @@ describe(useDeprovisioningPoll, () => {
     });
 
     it('reports DONE only once every step is done', () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         deprovisioningSteps: {
           ...doneDeprovisioningSteps(),
           run: {
@@ -185,7 +185,7 @@ describe(useDeprovisioningPoll, () => {
     });
 
     it('exposes run and stepUpdatedAt read off deprovisioningSteps', () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         deprovisioningSteps: {
           ...idleDeprovisioningSteps(),
           [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
@@ -217,7 +217,7 @@ describe(useDeprovisioningPoll, () => {
     });
 
     it('polls while the run is in progress and applies a fresh result', async () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         deprovisioningSteps: {
           ...idleDeprovisioningSteps(),
           [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
@@ -271,7 +271,7 @@ describe(useDeprovisioningPoll, () => {
           finishedAt: '2026-08-12T14:20:00.000Z',
         },
       };
-      const tenant = makeTenant({ deprovisioningSteps: runningSteps });
+      const tenant = makeClientTenant({ deprovisioningSteps: runningSteps });
       getTenantDeprovisioningStatusActionMock.mockResolvedValue({
         deprovisioningSteps: doneSteps,
         deprovisionedAt: new Date('2026-08-12T14:20:00.000Z'),
@@ -296,7 +296,7 @@ describe(useDeprovisioningPoll, () => {
     });
 
     it('does not poll at all when the run is already terminal on mount', async () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         deprovisioningSteps: {
           ...idleDeprovisioningSteps(),
           [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
@@ -319,7 +319,7 @@ describe(useDeprovisioningPoll, () => {
     });
 
     it('resumes polling for a retry dispatched over a stale FAILED run, and adopts the new run once it reports in', async () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         deprovisioningSteps: {
           ...idleDeprovisioningSteps(),
           [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
@@ -369,7 +369,7 @@ describe(useDeprovisioningPoll, () => {
     });
 
     it('stops polling once the tenant reaches a failed terminal state', async () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         deprovisioningSteps: {
           ...idleDeprovisioningSteps(),
           [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
@@ -406,7 +406,7 @@ describe(useDeprovisioningPoll, () => {
     });
 
     it('stops polling once a stale, never-finishing run exceeds the polling cap', async () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         deprovisioningSteps: {
           ...idleDeprovisioningSteps(),
           [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
@@ -439,7 +439,7 @@ describe(useDeprovisioningPoll, () => {
     });
 
     it('bounds a pending retry starting state by the same stale-run cap when the workflow never reports in', async () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         deprovisioningSteps: {
           ...idleDeprovisioningSteps(),
           [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
@@ -473,7 +473,7 @@ describe(useDeprovisioningPoll, () => {
 
     it('reports nothing in progress and never polls while disabled', async () => {
       const { result } = renderHook(() =>
-        useDeprovisioningPoll(makeTenant({ deprovisioningSteps: null }), {
+        useDeprovisioningPoll(makeClientTenant({ deprovisioningSteps: null }), {
           isEnabled: false,
         }),
       );
@@ -487,7 +487,7 @@ describe(useDeprovisioningPoll, () => {
     });
 
     it('pauses polling while the tab is hidden and resumes once it is visible again', async () => {
-      const tenant = makeTenant({ deprovisioningSteps: null });
+      const tenant = makeClientTenant({ deprovisioningSteps: null });
       const visibility = vi.spyOn(document, 'visibilityState', 'get');
       visibility.mockReturnValue('hidden');
       renderHook(() => useDeprovisioningPoll(tenant, ENABLED));
@@ -508,7 +508,7 @@ describe(useDeprovisioningPoll, () => {
     });
 
     it('stops polling once the hook unmounts', async () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         deprovisioningSteps: {
           ...idleDeprovisioningSteps(),
           [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {

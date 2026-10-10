@@ -1,5 +1,5 @@
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
-import { makeTenant } from '@platform/testing/tenants/fixtures';
+import { makeClientTenant } from '@platform/testing/tenants/fixtures';
 
 import { ContentWorkspaceCard } from './content-workspace-card';
 
@@ -7,7 +7,7 @@ const render = renderWithIntl;
 
 describe(ContentWorkspaceCard, () => {
   it("nests the card's title one level under the page's own h1", () => {
-    render(<ContentWorkspaceCard tenant={makeTenant()} />);
+    render(<ContentWorkspaceCard tenant={makeClientTenant()} />);
 
     expect(
       screen.getByRole('heading', { level: 2, name: 'Content workspace' }),
@@ -15,7 +15,7 @@ describe(ContentWorkspaceCard, () => {
   });
 
   it("shows 'Not set' for content-workspace fields the tenant has not been provisioned with yet", () => {
-    const tenant = makeTenant({
+    const tenant = makeClientTenant({
       sanityProjectId: null,
       sanityDataset: null,
       sanityReadTokenEncrypted: null,
@@ -28,7 +28,7 @@ describe(ContentWorkspaceCard, () => {
   });
 
   it('shows Stored/Active badges once the token and webhook exist', () => {
-    const tenant = makeTenant({
+    const tenant = makeClientTenant({
       sanityProjectId: 'proj-1',
       sanityDataset: 'production',
       sanityReadTokenEncrypted: 'encrypted-value',

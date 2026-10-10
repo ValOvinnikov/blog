@@ -14,6 +14,10 @@ import type {
   TTenantDeprovisioningState,
   TTenantProvisioningState,
 } from '@blog/db/schema/tenants';
+import {
+  toClientTenant,
+  type TClientTenant,
+} from '@platform/server/tenants/to-client-tenant';
 
 export const idleProvisioningSteps = (): TTenantProvisioningState => {
   const idle: TProvisioningStepState = {
@@ -124,3 +128,7 @@ export const makeReadyTenant = (overrides: Partial<TTenant> = {}): TTenant => {
     ...overrides,
   });
 };
+
+export const makeClientTenant = (
+  overrides: Partial<TTenant> = {},
+): TClientTenant => toClientTenant(makeTenant(overrides));

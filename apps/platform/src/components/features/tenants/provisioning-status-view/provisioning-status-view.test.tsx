@@ -13,7 +13,7 @@ import {
 } from '@platform/testing/custom-render';
 import {
   idleProvisioningSteps,
-  makeTenant,
+  makeClientTenant,
 } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -63,7 +63,7 @@ describe(ProvisioningStatusView, () => {
   });
 
   it('never lets a rendered poll loop schedule a real setInterval, even for a test that never advances timers', () => {
-    const tenant = makeTenant();
+    const tenant = makeClientTenant();
     expect(vi.getTimerCount()).toBe(0);
 
     const { unmount } = render(
@@ -79,7 +79,7 @@ describe(ProvisioningStatusView, () => {
   });
 
   it('titles the page "Provisioning" and names the tenant in the description', () => {
-    const tenant = makeTenant({ name: 'Acme Inc.' });
+    const tenant = makeClientTenant({ name: 'Acme Inc.' });
     render(
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
@@ -93,7 +93,7 @@ describe(ProvisioningStatusView, () => {
   });
 
   it('shows the archived notice for a deprovisioned tenant', () => {
-    const tenant = makeTenant({
+    const tenant = makeClientTenant({
       deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
     });
     render(
@@ -104,7 +104,7 @@ describe(ProvisioningStatusView, () => {
   });
 
   it('does not show the archived notice for a live tenant', () => {
-    const tenant = makeTenant({ deprovisionedAt: null });
+    const tenant = makeClientTenant({ deprovisionedAt: null });
     render(
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
@@ -115,7 +115,7 @@ describe(ProvisioningStatusView, () => {
   });
 
   it('renders the overall status badge in the Run card header, not the page header', () => {
-    const tenant = makeTenant({
+    const tenant = makeClientTenant({
       provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
       provisioningSteps: {
         ...idleProvisioningSteps(),
@@ -140,7 +140,7 @@ describe(ProvisioningStatusView, () => {
   });
 
   it('shows the invited-pending owner badge when the tenant has no resolved owner email', () => {
-    const tenant = makeTenant();
+    const tenant = makeClientTenant();
     render(<ProvisioningStatusView tenant={tenant} ownerEmail={undefined} />);
 
     expect(screen.getByText('Owner')).toBeVisible();
@@ -148,7 +148,7 @@ describe(ProvisioningStatusView, () => {
   });
 
   it('hides the invited-pending owner badge once the tenant has a resolved owner email', () => {
-    const tenant = makeTenant();
+    const tenant = makeClientTenant();
     render(
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
@@ -157,7 +157,7 @@ describe(ProvisioningStatusView, () => {
   });
 
   it('renders no complementary landmark around the main content', () => {
-    const tenant = makeTenant();
+    const tenant = makeClientTenant();
     render(
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
@@ -166,7 +166,9 @@ describe(ProvisioningStatusView, () => {
   });
 
   it('titles the steps card "Steps" and shows a 0-of-6-done badge when every step is idle', () => {
-    const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
+    const tenant = makeClientTenant({
+      provisioningSteps: idleProvisioningSteps(),
+    });
     render(
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
@@ -179,7 +181,7 @@ describe(ProvisioningStatusView, () => {
   });
 
   it("reflects the steps card's completion badge count from the tenant's actual step statuses", () => {
-    const tenant = makeTenant({
+    const tenant = makeClientTenant({
       provisioningSteps: {
         ...idleProvisioningSteps(),
         [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
@@ -200,7 +202,7 @@ describe(ProvisioningStatusView, () => {
   });
 
   it('lists all six provisioning steps in order, in operator language', () => {
-    const tenant = makeTenant();
+    const tenant = makeClientTenant();
     render(
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
@@ -219,7 +221,7 @@ describe(ProvisioningStatusView, () => {
   });
 
   it('shows the current status for a running step', () => {
-    const tenant = makeTenant({
+    const tenant = makeClientTenant({
       provisioningSteps: {
         ...idleProvisioningSteps(),
         [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
@@ -235,7 +237,7 @@ describe(ProvisioningStatusView, () => {
   });
 
   it("shows a running step's number in its circle instead of a spinner", () => {
-    const tenant = makeTenant({
+    const tenant = makeClientTenant({
       provisioningSteps: {
         ...idleProvisioningSteps(),
         [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
@@ -254,7 +256,7 @@ describe(ProvisioningStatusView, () => {
   });
 
   it('exposes exactly one accessible announcement per step across all four statuses', () => {
-    const tenant = makeTenant({
+    const tenant = makeClientTenant({
       provisioningSteps: {
         [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
           status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
@@ -307,7 +309,7 @@ describe(ProvisioningStatusView, () => {
   });
 
   it('shows a single Retry button in the Run card header for a failed step, with no per-step Retry buttons in the sidebar', () => {
-    const tenant = makeTenant({
+    const tenant = makeClientTenant({
       provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
       provisioningSteps: {
         ...idleProvisioningSteps(),
@@ -334,7 +336,7 @@ describe(ProvisioningStatusView, () => {
   });
 
   it("no longer renders a step's raw error text inline in the sidebar", () => {
-    const tenant = makeTenant({
+    const tenant = makeClientTenant({
       provisioningSteps: {
         ...idleProvisioningSteps(),
         [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
@@ -356,7 +358,9 @@ describe(ProvisioningStatusView, () => {
   });
 
   it('does not render a parsed error card when no step has failed', () => {
-    const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
+    const tenant = makeClientTenant({
+      provisioningSteps: idleProvisioningSteps(),
+    });
     render(
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
@@ -366,7 +370,7 @@ describe(ProvisioningStatusView, () => {
 
   describe('parsed provisioning error card', () => {
     const renderFailed = (error: string) => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
         provisioningSteps: {
           ...idleProvisioningSteps(),
@@ -445,7 +449,7 @@ describe(ProvisioningStatusView, () => {
 
   describe('a stale FAILED step while a retried run is genuinely in progress', () => {
     const staleFailedTenant = () =>
-      makeTenant({
+      makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
         provisioningSteps: {
           ...idleProvisioningSteps(),
@@ -500,7 +504,7 @@ describe(ProvisioningStatusView, () => {
   });
 
   it('re-dispatches the workflow for this tenant when Retry is clicked', async () => {
-    const tenant = makeTenant({
+    const tenant = makeClientTenant({
       provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
       provisioningSteps: {
         ...idleProvisioningSteps(),
@@ -524,7 +528,9 @@ describe(ProvisioningStatusView, () => {
   });
 
   it('shows a Start provisioning action when every step is idle', () => {
-    const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
+    const tenant = makeClientTenant({
+      provisioningSteps: idleProvisioningSteps(),
+    });
     render(
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
@@ -535,7 +541,9 @@ describe(ProvisioningStatusView, () => {
   });
 
   it('says no run has started yet in the Run card before any run exists', () => {
-    const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
+    const tenant = makeClientTenant({
+      provisioningSteps: idleProvisioningSteps(),
+    });
     render(
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
@@ -544,7 +552,7 @@ describe(ProvisioningStatusView, () => {
   });
 
   it('hides the Start provisioning action once any step has progressed past idle', () => {
-    const tenant = makeTenant({
+    const tenant = makeClientTenant({
       provisioningSteps: {
         ...idleProvisioningSteps(),
         [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
@@ -562,7 +570,9 @@ describe(ProvisioningStatusView, () => {
   });
 
   it('re-dispatches the workflow for this tenant when Start provisioning is clicked', async () => {
-    const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
+    const tenant = makeClientTenant({
+      provisioningSteps: idleProvisioningSteps(),
+    });
     render(
       <ProvisioningStatusView tenant={tenant} ownerEmail="owner@example.com" />,
     );
@@ -577,7 +587,9 @@ describe(ProvisioningStatusView, () => {
   });
 
   it('immediately hides Start and shows the running badge before the dispatch resolves', async () => {
-    const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
+    const tenant = makeClientTenant({
+      provisioningSteps: idleProvisioningSteps(),
+    });
     let resolveDispatch:
       ((result: { outcome: 'dispatched' }) => void) | undefined;
     retryProvisioningStepActionMock.mockReturnValue(
@@ -605,7 +617,9 @@ describe(ProvisioningStatusView, () => {
   });
 
   it('mounts the overall status live region before Start is ever clicked, so the first status change is announced', async () => {
-    const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
+    const tenant = makeClientTenant({
+      provisioningSteps: idleProvisioningSteps(),
+    });
     let resolveDispatch:
       ((result: { outcome: 'dispatched' }) => void) | undefined;
     retryProvisioningStepActionMock.mockReturnValue(
@@ -633,7 +647,9 @@ describe(ProvisioningStatusView, () => {
   });
 
   it('shows a distinguishable error and re-enables Start when the dispatch fails, reverting the optimistic running state', async () => {
-    const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
+    const tenant = makeClientTenant({
+      provisioningSteps: idleProvisioningSteps(),
+    });
     retryProvisioningStepActionMock.mockResolvedValue({
       outcome: 'dispatch-error',
     });
@@ -654,7 +670,9 @@ describe(ProvisioningStatusView, () => {
   });
 
   it('shows a not-found-specific error when the tenant no longer exists server-side', async () => {
-    const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
+    const tenant = makeClientTenant({
+      provisioningSteps: idleProvisioningSteps(),
+    });
     retryProvisioningStepActionMock.mockResolvedValue({
       outcome: 'not-found',
     });
@@ -674,7 +692,9 @@ describe(ProvisioningStatusView, () => {
   });
 
   it('shows a distinct, non-error notice when a run is already in progress', async () => {
-    const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
+    const tenant = makeClientTenant({
+      provisioningSteps: idleProvisioningSteps(),
+    });
     retryProvisioningStepActionMock.mockResolvedValue({
       outcome: 'already-in-progress',
     });
@@ -695,7 +715,7 @@ describe(ProvisioningStatusView, () => {
   });
 
   it('disables Start provisioning for an archived tenant, and never dispatches on click', async () => {
-    const tenant = makeTenant({
+    const tenant = makeClientTenant({
       provisioningSteps: idleProvisioningSteps(),
       deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
     });
@@ -713,7 +733,7 @@ describe(ProvisioningStatusView, () => {
   });
 
   it('disables Retry provisioning for an archived tenant, and never dispatches on click', async () => {
-    const tenant = makeTenant({
+    const tenant = makeClientTenant({
       provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
       deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
       provisioningSteps: {
@@ -738,7 +758,7 @@ describe(ProvisioningStatusView, () => {
   });
 
   it('describes the disabled Start button with the archived notice, for a screen-reader user', () => {
-    const tenant = makeTenant({
+    const tenant = makeClientTenant({
       provisioningSteps: idleProvisioningSteps(),
       deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
     });
@@ -752,7 +772,7 @@ describe(ProvisioningStatusView, () => {
   });
 
   it('describes the disabled Retry button with the archived notice, for a screen-reader user', () => {
-    const tenant = makeTenant({
+    const tenant = makeClientTenant({
       provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
       deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
       provisioningSteps: {
@@ -773,7 +793,9 @@ describe(ProvisioningStatusView, () => {
   });
 
   it('shows an archived-specific error if a dispatch is somehow still attempted against an archived tenant', async () => {
-    const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
+    const tenant = makeClientTenant({
+      provisioningSteps: idleProvisioningSteps(),
+    });
     retryProvisioningStepActionMock.mockResolvedValue({
       outcome: 'archived',
     });
@@ -802,7 +824,7 @@ describe(ProvisioningStatusView, () => {
     });
 
     it('polls for fresh status while provisioning is not terminal, and re-renders on a new result', async () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
         provisioningSteps: {
           ...idleProvisioningSteps(),
@@ -842,7 +864,7 @@ describe(ProvisioningStatusView, () => {
     });
 
     it('announces a polled step-status transition through a stable aria-live region', async () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
         provisioningSteps: {
           ...idleProvisioningSteps(),
@@ -880,7 +902,7 @@ describe(ProvisioningStatusView, () => {
     });
 
     it('stops polling once the tenant reaches a terminal status', async () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
       });
       getTenantProvisioningStatusActionMock.mockResolvedValue({
@@ -907,7 +929,7 @@ describe(ProvisioningStatusView, () => {
     });
 
     it('does not poll at all when the tenant is already at a terminal status', async () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
       });
       render(
@@ -925,7 +947,7 @@ describe(ProvisioningStatusView, () => {
     });
 
     it('stops polling once an early step fails with nothing else running, even though provisioningStatus stays non-terminal', async () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
         provisioningSteps: {
           ...idleProvisioningSteps(),
@@ -964,7 +986,7 @@ describe(ProvisioningStatusView, () => {
     });
 
     it('keeps polling, unchanged, while a step is RUNNING', async () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
         provisioningSteps: {
           ...idleProvisioningSteps(),
@@ -1004,7 +1026,7 @@ describe(ProvisioningStatusView, () => {
           error: 'fetch failed',
         },
       };
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
         provisioningSteps: failedSteps,
       });
@@ -1061,7 +1083,7 @@ describe(ProvisioningStatusView, () => {
           error: 'fetch failed',
         },
       };
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
         provisioningSteps: failedSteps,
       });
@@ -1094,7 +1116,9 @@ describe(ProvisioningStatusView, () => {
     });
 
     it('stops polling once the retry-baseline wait is exhausted after Start, when every step stays idle', async () => {
-      const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
+      const tenant = makeClientTenant({
+        provisioningSteps: idleProvisioningSteps(),
+      });
       getTenantProvisioningStatusActionMock.mockResolvedValue({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
         provisioningSteps: idleProvisioningSteps(),
@@ -1131,7 +1155,7 @@ describe(ProvisioningStatusView, () => {
           error: 'fetch failed',
         },
       };
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
         provisioningSteps: failedSteps,
       });
@@ -1184,7 +1208,7 @@ describe(ProvisioningStatusView, () => {
     });
 
     it('stops polling once the component unmounts', async () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
       });
       getTenantProvisioningStatusActionMock.mockResolvedValue({
@@ -1208,7 +1232,7 @@ describe(ProvisioningStatusView, () => {
     });
 
     it('surfaces a stalled-poll indicator, keeps the last-known state visible, and keeps retrying when a poll tick rejects', async () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
         provisioningSteps: {
           ...idleProvisioningSteps(),
@@ -1273,7 +1297,7 @@ describe(ProvisioningStatusView, () => {
       });
 
     it('is expanded while the run is not done', () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
         provisioningSteps: {
           ...idleProvisioningSteps(),
@@ -1294,7 +1318,7 @@ describe(ProvisioningStatusView, () => {
 
     it('is collapsed by default once every step is already done on mount', () => {
       const done = { status: TENANT_PROVISIONING_STEP_STATUS.DONE };
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
         provisioningSteps: {
           ...idleProvisioningSteps(),
@@ -1318,7 +1342,7 @@ describe(ProvisioningStatusView, () => {
 
     it('auto-collapses once the run completes, and a later re-render does not undo a user-initiated reopen', async () => {
       const done = { status: TENANT_PROVISIONING_STEP_STATUS.DONE };
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
         provisioningSteps: {
           ...idleProvisioningSteps(),
@@ -1377,7 +1401,7 @@ describe(ProvisioningStatusView, () => {
 
     it("shows a done step's updatedAt as relative time, keeping the full ISO in dateTime", () => {
       vi.setSystemTime(new Date('2026-08-12T14:25:00.000Z'));
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningSteps: {
           ...idleProvisioningSteps(),
           [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
@@ -1400,7 +1424,7 @@ describe(ProvisioningStatusView, () => {
 
     it("keeps a step's timestamp outside the aria-live status region", () => {
       vi.setSystemTime(new Date('2026-08-12T14:25:00.000Z'));
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningSteps: {
           ...idleProvisioningSteps(),
           [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
@@ -1428,7 +1452,7 @@ describe(ProvisioningStatusView, () => {
 
     it("shows a failed step's updatedAt as relative time, keeping the full ISO in dateTime", () => {
       vi.setSystemTime(new Date('2026-08-12T14:25:00.000Z'));
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningSteps: {
           ...idleProvisioningSteps(),
           [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
@@ -1451,7 +1475,7 @@ describe(ProvisioningStatusView, () => {
     });
 
     it('shows "now" for a running step instead of a timestamp', () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningSteps: {
           ...idleProvisioningSteps(),
           [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
@@ -1472,7 +1496,7 @@ describe(ProvisioningStatusView, () => {
     });
 
     it('shows no timestamp for a done step with no recorded updatedAt', () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningSteps: {
           ...idleProvisioningSteps(),
           [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
@@ -1491,7 +1515,9 @@ describe(ProvisioningStatusView, () => {
     });
 
     it('renders a Run card header with no run details for a tenant with no run', () => {
-      const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
+      const tenant = makeClientTenant({
+        provisioningSteps: idleProvisioningSteps(),
+      });
       render(
         <ProvisioningStatusView
           tenant={tenant}
@@ -1508,7 +1534,7 @@ describe(ProvisioningStatusView, () => {
 
     it('renders a Run card with Started/Finished/Registry when the run exists, each showing relative and absolute UTC time together', () => {
       vi.setSystemTime(new Date('2026-08-12T14:24:00.000Z'));
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningSteps: {
           ...idleProvisioningSteps(),
           run: {

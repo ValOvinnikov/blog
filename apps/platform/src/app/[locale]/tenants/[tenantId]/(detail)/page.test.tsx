@@ -30,14 +30,14 @@ const makeFinding = (
 });
 
 const {
-  listTenantsByIdsMock,
+  requireTenantByIdMock,
   getTenantOwnerEmailMock,
   getTenantOwnerMembershipMock,
   listAuditEventsForTargetMock,
   listFindingsForTenantMock,
   getDomainVerificationStatusMock,
 } = vi.hoisted(() => ({
-  listTenantsByIdsMock: vi.fn(),
+  requireTenantByIdMock: vi.fn(),
   getTenantOwnerEmailMock: vi.fn(),
   getTenantOwnerMembershipMock: vi.fn(),
   listAuditEventsForTargetMock: vi.fn(),
@@ -45,10 +45,13 @@ const {
   getDomainVerificationStatusMock: vi.fn(),
 }));
 
+vi.mock('@platform/server/auth/require-tenant-by-id', () => ({
+  requireTenantById: requireTenantByIdMock,
+}));
+
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
-    tenants: { listTenantsByIds: listTenantsByIdsMock },
     memberships: {
       getTenantOwnerEmail: getTenantOwnerEmailMock,
       getTenantOwnerMembership: getTenantOwnerMembershipMock,
@@ -96,9 +99,9 @@ describe(TenantOverviewPage, () => {
   let tenant: ReturnType<typeof makeTenant>;
 
   beforeEach(() => {
-    listTenantsByIdsMock.mockReset();
+    requireTenantByIdMock.mockReset();
     tenant = makeTenant();
-    listTenantsByIdsMock.mockResolvedValue([tenant]);
+    requireTenantByIdMock.mockResolvedValue({ tenant: tenant });
     getTenantOwnerEmailMock.mockReset();
     getTenantOwnerEmailMock.mockResolvedValue('owner@example.com');
     getTenantOwnerMembershipMock.mockReset();
@@ -119,7 +122,7 @@ describe(TenantOverviewPage, () => {
   it('renders the overview for the resolved tenant', async () => {
     await setup();
 
-    expect(listTenantsByIdsMock).toHaveBeenCalledWith(['tenant-1']);
+    expect(requireTenantByIdMock).toHaveBeenCalledWith('tenant-1');
     expect(getTenantOwnerEmailMock).toHaveBeenCalledWith(tenant.id);
     expect(getTenantOwnerMembershipMock).toHaveBeenCalledWith(tenant.id);
     expect(getDomainVerificationStatusMock).toHaveBeenCalledWith(
@@ -155,16 +158,10 @@ describe(TenantOverviewPage, () => {
     expect(screen.getByText('Invited, pending')).toBeVisible();
   });
 
-  it('404s for an unknown tenant id', async () => {
-    listTenantsByIdsMock.mockResolvedValue([]);
-
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
-  });
-
   it('always shows "Open site", pointing at the tenant\'s live domain', async () => {
-    listTenantsByIdsMock.mockResolvedValue([
-      makeTenant({ primaryDomain: 'acme.example.com' }),
-    ]);
+    requireTenantByIdMock.mockResolvedValue({
+      tenant: makeTenant({ primaryDomain: 'acme.example.com' }),
+    });
 
     await setup();
 

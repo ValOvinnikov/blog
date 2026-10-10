@@ -5,7 +5,7 @@ import {
 import { act, renderWithIntl, screen } from '@platform/testing/custom-render';
 import {
   idleDeprovisioningSteps,
-  makeTenant,
+  makeClientTenant,
 } from '@platform/testing/tenants/fixtures';
 
 import { TenantDangerPageContent } from './tenant-danger-page-content';
@@ -71,7 +71,7 @@ describe(TenantDangerPageContent, () => {
   it('sends no status requests and shows no progress for a tenant that has never been deprovisioned', async () => {
     render(
       <TenantDangerPageContent
-        tenant={makeTenant({ deprovisionedAt: null })}
+        tenant={makeClientTenant({ deprovisionedAt: null })}
       />,
     );
 
@@ -86,7 +86,7 @@ describe(TenantDangerPageContent, () => {
   it('shows the starting state and keeps the trigger aria-disabled while a pending request has no run yet', async () => {
     render(
       <TenantDangerPageContent
-        tenant={makeTenant({
+        tenant={makeClientTenant({
           deprovisionedAt: null,
           deprovisioningSteps: null,
         })}
@@ -113,7 +113,7 @@ describe(TenantDangerPageContent, () => {
     });
     render(
       <TenantDangerPageContent
-        tenant={makeTenant({
+        tenant={makeClientTenant({
           deprovisionedAt: null,
           deprovisioningSteps: {
             ...idleDeprovisioningSteps(),
@@ -134,7 +134,7 @@ describe(TenantDangerPageContent, () => {
   it('keeps the trigger enabled and does not poll for a run that had already failed', async () => {
     render(
       <TenantDangerPageContent
-        tenant={makeTenant({
+        tenant={makeClientTenant({
           deprovisionedAt: null,
           deprovisioningSteps: failedSteps,
         })}

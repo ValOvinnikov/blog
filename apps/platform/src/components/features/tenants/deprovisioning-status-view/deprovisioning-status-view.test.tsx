@@ -2,12 +2,12 @@ import {
   DEPROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
+import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { act, renderWithIntl, screen } from '@platform/testing/custom-render';
 import {
   doneDeprovisioningSteps,
   idleDeprovisioningSteps,
-  makeTenant,
+  makeClientTenant,
 } from '@platform/testing/tenants/fixtures';
 import userEvent from '@testing-library/user-event';
 
@@ -35,7 +35,7 @@ const Wrapper = ({
   deprovisionRequestedAt,
   headingLevel,
 }: {
-  tenant: TTenant;
+  tenant: TClientTenant;
   deprovisionRequestedAt?: string;
   headingLevel?: 3;
 }) => {
@@ -58,14 +58,14 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
   });
 
   it('says no run has started yet in the Run card before any run exists', () => {
-    const tenant = makeTenant({ deprovisioningSteps: null });
+    const tenant = makeClientTenant({ deprovisioningSteps: null });
     render(<Wrapper tenant={tenant} />);
 
     expect(screen.getByText('No run has started yet.')).toBeVisible();
   });
 
   it('shows the full step list under the Starting badge, not "Not started", when a teardown was requested but no run marker has appeared yet', () => {
-    const tenant = makeTenant({ deprovisioningSteps: null });
+    const tenant = makeClientTenant({ deprovisioningSteps: null });
     render(<Wrapper tenant={tenant} />);
 
     expect(screen.getByText('Starting…')).toBeVisible();
@@ -81,7 +81,7 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
   });
 
   it('shows the Starting badge and full step list, not the old failure, for a retry dispatched after a FAILED run', () => {
-    const tenant = makeTenant({
+    const tenant = makeClientTenant({
       deprovisioningSteps: {
         ...idleDeprovisioningSteps(),
         [DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS]: {
@@ -107,7 +107,7 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
   });
 
   it('titles the card "Deprovisioning progress" and renders every step in order', () => {
-    const tenant = makeTenant({
+    const tenant = makeClientTenant({
       deprovisioningSteps: {
         ...idleDeprovisioningSteps(),
         run: { startedAt: '2026-08-12T14:18:00.000Z' },
@@ -131,7 +131,7 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
   });
 
   it('shows a 0 of 7 done badge in the steps card summary when nothing has completed yet', () => {
-    const tenant = makeTenant({
+    const tenant = makeClientTenant({
       deprovisioningSteps: {
         ...idleDeprovisioningSteps(),
         run: { startedAt: '2026-08-12T14:18:00.000Z' },
@@ -143,7 +143,7 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
   });
 
   it('shows the Running badge while a step is in progress, with no error card', () => {
-    const tenant = makeTenant({
+    const tenant = makeClientTenant({
       deprovisioningSteps: {
         ...idleDeprovisioningSteps(),
         [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
@@ -159,7 +159,7 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
   });
 
   it('shows the Complete badge once every step is done', () => {
-    const tenant = makeTenant({
+    const tenant = makeClientTenant({
       deprovisioningSteps: {
         ...doneDeprovisioningSteps(),
         run: {
@@ -175,7 +175,7 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
   });
 
   it('renders the run card once a run exists', () => {
-    const tenant = makeTenant({
+    const tenant = makeClientTenant({
       deprovisioningSteps: {
         ...idleDeprovisioningSteps(),
         run: { startedAt: '2026-08-12T14:18:00.000Z' },
@@ -189,7 +189,7 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
   });
 
   it('nests the steps and run headings at a caller-supplied level', () => {
-    const tenant = makeTenant({
+    const tenant = makeClientTenant({
       deprovisioningSteps: {
         ...idleDeprovisioningSteps(),
         run: { startedAt: '2026-08-12T14:18:00.000Z' },
@@ -210,7 +210,7 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
   });
 
   it('renders a fallback Run card header carrying the overall status badge when no run exists yet', () => {
-    const tenant = makeTenant({ deprovisioningSteps: null });
+    const tenant = makeClientTenant({ deprovisioningSteps: null });
     render(<Wrapper tenant={tenant} />);
 
     expect(
@@ -221,7 +221,7 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
 
   describe('a failed step', () => {
     const renderFailed = (error: string) => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         deprovisioningSteps: {
           ...idleDeprovisioningSteps(),
           [DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS]: {
@@ -277,7 +277,7 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
       screen.getByRole('button', { name: /Deprovisioning progress/ });
 
     it('is expanded while the run is not done', () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         deprovisioningSteps: {
           ...idleDeprovisioningSteps(),
           [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
@@ -292,7 +292,7 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
     });
 
     it('is collapsed by default once every step is already done on mount', () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         deprovisioningSteps: {
           ...doneDeprovisioningSteps(),
           run: {
@@ -314,7 +314,7 @@ describe(`<${DeprovisioningStatusView.name}/>`, () => {
         },
         run: { startedAt: '2026-08-12T14:18:00.000Z' },
       };
-      const tenant = makeTenant({ deprovisioningSteps: runningSteps });
+      const tenant = makeClientTenant({ deprovisioningSteps: runningSteps });
       getTenantDeprovisioningStatusActionMock.mockResolvedValue({
         deprovisioningSteps: {
           ...doneDeprovisioningSteps(),

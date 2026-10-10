@@ -1,6 +1,6 @@
 import { DOMAIN_VERIFICATION_STATUS } from '@blog/config';
 import { act, renderWithIntl, screen } from '@platform/testing/custom-render';
-import { makeTenant } from '@platform/testing/tenants/fixtures';
+import { makeClientTenant } from '@platform/testing/tenants/fixtures';
 import { Suspense } from 'react';
 
 import { LiveDomainCard } from './live-domain-card';
@@ -19,7 +19,7 @@ vi.mock(
 );
 
 const render = async () => {
-  const tenant = makeTenant({ id: 'tenant-1' });
+  const tenant = makeClientTenant({ id: 'tenant-1' });
   await act(async () => {
     renderWithIntl(
       <Suspense>

@@ -1,11 +1,11 @@
-import type { TTenant } from '@blog/db/schema/tenants';
 import { Card } from '@platform/components/shared/card';
 import { DetailList } from '@platform/components/shared/detail-list';
 import { StatusBadge } from '@platform/components/shared/status-badge';
+import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { useTranslations } from 'next-intl';
 
 export type TContentWorkspaceCardProps = {
-  tenant: TTenant;
+  tenant: TClientTenant;
 };
 
 export const ContentWorkspaceCard = ({
@@ -32,10 +32,8 @@ export const ContentWorkspaceCard = ({
             {tenant.sanityDataset ?? t('notSetValue')}
           </DetailList.Row>
           <DetailList.Row label={t('readTokenLabel')}>
-            <StatusBadge
-              tone={tenant.sanityReadTokenEncrypted ? 'ok' : 'neutral'}
-            >
-              {tenant.sanityReadTokenEncrypted
+            <StatusBadge tone={tenant.hasSanityReadToken ? 'ok' : 'neutral'}>
+              {tenant.hasSanityReadToken
                 ? t('readTokenStored')
                 : t('readTokenNotSet')}
             </StatusBadge>
