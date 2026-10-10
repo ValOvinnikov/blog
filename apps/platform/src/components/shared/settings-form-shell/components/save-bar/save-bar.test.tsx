@@ -1,11 +1,13 @@
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import userEvent from '@testing-library/user-event';
+import { useState } from 'react';
 
 import { SaveBar, type TSaveBarProps } from './save-bar';
 
 const baseProps: TSaveBarProps = {
   changeCount: 3,
   breakdown: '',
-  invalidFieldIds: [],
+  invalidFields: { ids: [] },
   saveButtonLabel: 'Save changes',
   savingButtonLabel: 'Saving…',
   isPending: false,
@@ -15,6 +17,23 @@ const baseProps: TSaveBarProps = {
 
 const renderBar = (overrides: Partial<TSaveBarProps> = {}) =>
   renderWithIntl(<SaveBar {...baseProps} {...overrides} />);
+
+const BarWithHiddenField = () => {
+  const [isRevealed, setIsRevealed] = useState(false);
+
+  return (
+    <>
+      {isRevealed && <input id="field-heading" aria-label="Heading" />}
+      <SaveBar
+        {...baseProps}
+        invalidFields={{
+          ids: ['field-heading'],
+          revealFirst: () => setIsRevealed(true),
+        }}
+      />
+    </>
+  );
+};
 
 describe(`<${SaveBar.name}/>`, () => {
   it('shows a single change in the singular', () => {
@@ -39,7 +58,7 @@ describe(`<${SaveBar.name}/>`, () => {
 
   describe('after a save with field errors', () => {
     beforeEach(() => {
-      renderBar({ invalidFieldIds: ['field-heading', 'field-body'] });
+      renderBar({ invalidFields: { ids: ['field-heading', 'field-body'] } });
     });
 
     it('counts the fields that need attention in place of the change count', () => {
@@ -53,11 +72,31 @@ describe(`<${SaveBar.name}/>`, () => {
       ).toHaveAttribute('href', '#field-heading');
     });
 
+    it('focuses the first field from the link', async () => {
+      renderWithIntl(<input id="field-heading" aria-label="Heading" />);
+
+      await userEvent.click(
+        screen.getByRole('link', { name: 'Go to the first one' }),
+      );
+
+      expect(screen.getByRole('textbox', { name: 'Heading' })).toHaveFocus();
+    });
+
     it('keeps Save and Discard available', () => {
       expect(
         screen.getByRole('button', { name: 'Save changes' }),
       ).toBeEnabled();
       expect(screen.getByRole('button', { name: 'Discard' })).toBeEnabled();
     });
+  });
+
+  it('lets the page reveal the first field before focusing it', async () => {
+    renderWithIntl(<BarWithHiddenField />);
+
+    await userEvent.click(
+      screen.getByRole('link', { name: 'Go to the first one' }),
+    );
+
+    expect(screen.getByRole('textbox', { name: 'Heading' })).toHaveFocus();
   });
 });
