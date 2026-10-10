@@ -265,6 +265,7 @@
     "pageTitle": "Dominio",
     "subCopy": "El único paso de la configuración que realmente le corresponde completar a usted.",
     "cardTitle": "Apunte {domain} hacia nosotros",
+    "verifiedCardTitle": "{domain} está conectado",
     "checkedHint": "Comprobado ahora mismo",
     "bodyCopy": "Añada estos registros en su proveedor de DNS. La verificación suele completarse en menos de una hora.",
     "columnType": "Tipo",
@@ -357,11 +358,13 @@
     "brandImagePicked": "Imagen nueva, aún sin subir",
     "brandImageUnchanged": "Ninguna imagen nueva"
   },
-  "lookPreview": {
+  "previewModeControl": {
     "modeLight": "Claro",
     "modeDark": "Oscuro",
-    "previewColorSchemeAriaLabel": "Esquema de color de la vista previa",
     "livePreviewHeading": "Vista previa en directo",
+    "previewColorSchemeAriaLabel": "Esquema de color de la vista previa"
+  },
+  "lookPreview": {
     "sampleHeading": "Leyendo las tablas de mareas",
     "samplePara": "Una breve crónica para mostrar juntos la tipografía de títulos y de texto, el acento, los tonos del logotipo y el radio.",
     "subscribeButton": "Suscribirse",
@@ -401,7 +404,8 @@
     "senderItemLabel": "Remitente y pie",
     "senderItemDescription": "Nombre, dirección de respuesta, dirección postal y logotipo, iguales en todos los idiomas.",
     "editingLabel": "Editando",
-    "templateGroupLabel": "Plantilla"
+    "templateGroupLabel": "Plantilla",
+    "allLanguagesChanges": "Todos los idiomas"
   },
   "fieldStatus": {
     "default": "Predeterminado",
@@ -431,8 +435,6 @@
     "unsavedLogoNote": "Un logotipo que aún no ha guardado no se incluye en la prueba."
   },
   "emailSettingsForm": {
-    "heading": "Configuración del correo electrónico",
-    "description": "Se aplica a todos los correos que envía su sitio. Deje un campo en blanco para usar el valor predeterminado.",
     "senderNameLabel": "Nombre del remitente",
     "senderNameHint": "El nombre visible en la dirección del remitente; no tiene relación con el título del sitio.",
     "senderNameInvalidError": "Es el nombre que ven los destinatarios, no una dirección de correo. Introduzca un nombre como Acme Co, sin < > \" , ; ni @.",
@@ -494,7 +496,8 @@
     "alertSuccess": "Voz guardada.",
     "alertError": "No se pudo guardar. Vuelva a intentarlo.",
     "keepPlaceholder": "Conserve <code>{token}</code>: el sitio lo rellena.",
-    "draftFieldLabel": "{surface} — {field} ({language})"
+    "draftFieldLabel": "{surface} — {field} ({language})",
+    "listRoute": "Se muestra en {path}"
   },
   "voiceSurfaces": {
     "NOT_FOUND": "Página no encontrada",
@@ -546,11 +549,11 @@
     }
   },
   "voiceFieldLabels": {
-    "blogListEmpty": "Índice del blog",
+    "blogListEmpty": "Página índice del blog",
     "topicEmpty": "Página de tema",
     "tagEmpty": "Página de etiqueta",
-    "topicsEmpty": "Índice de temas",
-    "tagsEmpty": "Índice de etiquetas",
+    "topicsEmpty": "Página índice de temas",
+    "tagsEmpty": "Página índice de etiquetas",
     "notFoundEyebrow": "Antetítulo",
     "notFoundHeading": "Título",
     "notFoundSupportingText": "Texto de apoyo",
@@ -559,11 +562,11 @@
     "bookmarksEmpty": "Marcadores vacíos"
   },
   "voiceFieldHints": {
-    "blogListEmpty": "El índice del blog, antes de publicar nada",
+    "blogListEmpty": "Antes de publicar nada",
     "topicEmpty": "Un tema que aún no tiene entradas",
     "tagEmpty": "Una etiqueta que aún no tiene entradas",
-    "topicsEmpty": "El índice de temas, antes de que exista ninguno",
-    "tagsEmpty": "El índice de etiquetas, antes de que exista ninguna",
+    "topicsEmpty": "Antes de que exista ningún tema",
+    "tagsEmpty": "Antes de que exista ninguna etiqueta",
     "notFoundEyebrow": "Etiqueta pequeña sobre el título",
     "notFoundHeading": "También el título de la pestaña del navegador",
     "notFoundSupportingText": "Debajo del título",

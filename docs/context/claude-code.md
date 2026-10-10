@@ -11,7 +11,8 @@ contracts:
 - **Scoped subagents** (`.claude/agents/`) — one per layer, primed with that
   layer's rules:
   - `config` — `packages/config`, `packages/utils`, `configs/*`: UPPERCASE
-    constants, the `routes` URL builder, shared config packages, cross-workspace
+    constants shared by more than one workspace (a const only one app reads
+    lives in that app's `src/constants/`), the `routes` URL builder, shared config packages, cross-workspace
     alias wiring, guards `src/sanity/generated/` (typegen-only).
   - `studio` — Sanity schemas, content modelling, typegen, and the `StudioMount` component `apps/platform` renders.
   - `service` — Sanity client, GROQ, typed fetchers (no React).

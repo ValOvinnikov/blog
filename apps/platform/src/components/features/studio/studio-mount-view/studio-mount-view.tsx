@@ -2,6 +2,7 @@ import { ALERT_TYPE } from '@blog/config';
 import { queries } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { StudioMount } from '@blog/studio';
+import { shellFrameVariants } from '@platform/components/features/layout/admin-shell/components/shell-frame/shell-frame-variants';
 import { Alert } from '@platform/components/shared/alert';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { PageHeader } from '@platform/components/shared/page-header';
@@ -21,12 +22,15 @@ export const StudioMountView = async ({
 }: TStudioMountViewProps) => {
   const t = await getTranslations('studioPage');
   const { root } = studioMountViewVariants();
+  const { content: paddedColumn } = shellFrameVariants({ isFullBleed: false });
 
   if (tenant.deprovisionedAt) {
     return (
-      <div className={root()}>
-        <PageHeader title={t('title')} />
-        <ArchivedTenantNotice archivedAt={tenant.deprovisionedAt} />
+      <div className={paddedColumn()}>
+        <div className={root()}>
+          <PageHeader title={t('title')} />
+          <ArchivedTenantNotice archivedAt={tenant.deprovisionedAt} />
+        </div>
       </div>
     );
   }
@@ -35,13 +39,15 @@ export const StudioMountView = async ({
 
   if (!sanityProjectId || !sanityDataset || !sanityReadTokenEncrypted) {
     return (
-      <div className={root()}>
-        <PageHeader title={t('title')} />
-        <Alert
-          type={ALERT_TYPE.WARNING}
-          title={t('notProvisionedTitle')}
-          description={t('notProvisionedDescription')}
-        />
+      <div className={paddedColumn()}>
+        <div className={root()}>
+          <PageHeader title={t('title')} />
+          <Alert
+            type={ALERT_TYPE.WARNING}
+            title={t('notProvisionedTitle')}
+            description={t('notProvisionedDescription')}
+          />
+        </div>
       </div>
     );
   }

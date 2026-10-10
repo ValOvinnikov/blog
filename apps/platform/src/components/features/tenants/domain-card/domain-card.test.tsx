@@ -53,4 +53,35 @@ describe(DomainCard, () => {
       screen.getByRole('heading', { level: 2, name: 'Domain' }),
     ).toBeVisible();
   });
+
+  it.each(['NOT_ADDED', 'PENDING', 'VERIFIED'] as const)(
+    'claims a recent check for a %s status Vercel reported',
+    (status) => {
+      render(
+        <DomainCard
+          tenant={makeTenant()}
+          domainVerificationStatus={status}
+          dnsHref="/dashboard/domain"
+        />,
+      );
+
+      expect(screen.getByText('Just now')).toBeVisible();
+    },
+  );
+
+  it.each(['NOT_CONFIGURED', 'ERROR'] as const)(
+    'claims no recent check for a %s status',
+    (status) => {
+      render(
+        <DomainCard
+          tenant={makeTenant()}
+          domainVerificationStatus={status}
+          dnsHref="/dashboard/domain"
+        />,
+      );
+
+      expect(screen.queryByText('Last checked')).toBeNull();
+      expect(screen.queryByText('Just now')).toBeNull();
+    },
+  );
 });

@@ -265,6 +265,7 @@
     "pageTitle": "Domain",
     "subCopy": "Der einzige Teil der Einrichtung, den Sie selbst abschließen müssen.",
     "cardTitle": "{domain} auf uns verweisen",
+    "verifiedCardTitle": "{domain} ist verbunden",
     "checkedHint": "Gerade eben geprüft",
     "bodyCopy": "Fügen Sie diese Einträge bei Ihrem DNS-Anbieter hinzu. Die Verifizierung ist in der Regel innerhalb einer Stunde abgeschlossen.",
     "columnType": "Typ",
@@ -357,11 +358,13 @@
     "brandImagePicked": "Neues Bild, noch nicht hochgeladen",
     "brandImageUnchanged": "Kein neues Bild"
   },
-  "lookPreview": {
+  "previewModeControl": {
     "modeLight": "Hell",
     "modeDark": "Dunkel",
-    "previewColorSchemeAriaLabel": "Farbschema der Vorschau",
     "livePreviewHeading": "Live-Vorschau",
+    "previewColorSchemeAriaLabel": "Farbschema der Vorschau"
+  },
+  "lookPreview": {
     "sampleHeading": "Gezeitentabellen lesen",
     "samplePara": "Ein kurzer Bericht, der Überschriften- und Fließtextschrift, Akzent, Logo-Töne und Eckenradius zusammen zeigt.",
     "subscribeButton": "Abonnieren",
@@ -401,7 +404,8 @@
     "senderItemLabel": "Absender & Fußzeile",
     "senderItemDescription": "Name, Antwortadresse, Anschrift und Logo, in jeder Sprache gleich.",
     "editingLabel": "Bearbeiten",
-    "templateGroupLabel": "Vorlage"
+    "templateGroupLabel": "Vorlage",
+    "allLanguagesChanges": "Alle Sprachen"
   },
   "fieldStatus": {
     "default": "Standard",
@@ -431,8 +435,6 @@
     "unsavedLogoNote": "Ein noch nicht gespeichertes Logo ist im Test nicht enthalten."
   },
   "emailSettingsForm": {
-    "heading": "E-Mail-Einstellungen",
-    "description": "Gilt für jede E-Mail, die Ihre Website versendet. Lassen Sie ein Feld leer, um den Standard zu verwenden.",
     "senderNameLabel": "Absendername",
     "senderNameHint": "Der Anzeigename der Absenderadresse — unabhängig vom Website-Titel.",
     "senderNameInvalidError": "Das ist der Name, den Empfänger sehen, keine E-Mail-Adresse. Geben Sie einen Namen wie Acme Co ein, ohne < > \" , ; oder @.",
@@ -494,7 +496,8 @@
     "alertSuccess": "Tonalität gespeichert.",
     "alertError": "Speichern fehlgeschlagen — bitte erneut versuchen.",
     "keepPlaceholder": "<code>{token}</code> beibehalten — die Website setzt den Wert ein.",
-    "draftFieldLabel": "{surface} — {field} ({language})"
+    "draftFieldLabel": "{surface} — {field} ({language})",
+    "listRoute": "Angezeigt unter {path}"
   },
   "voiceSurfaces": {
     "NOT_FOUND": "Seite nicht gefunden",
@@ -546,11 +549,11 @@
     }
   },
   "voiceFieldLabels": {
-    "blogListEmpty": "Blog-Übersicht",
+    "blogListEmpty": "Blog-Übersichtsseite",
     "topicEmpty": "Themenseite",
     "tagEmpty": "Schlagwortseite",
-    "topicsEmpty": "Themenübersicht",
-    "tagsEmpty": "Schlagwortübersicht",
+    "topicsEmpty": "Themenübersichtsseite",
+    "tagsEmpty": "Schlagwortübersichtsseite",
     "notFoundEyebrow": "Kennzeile",
     "notFoundHeading": "Überschrift",
     "notFoundSupportingText": "Begleittext",
@@ -559,11 +562,11 @@
     "bookmarksEmpty": "Leere Lesezeichen"
   },
   "voiceFieldHints": {
-    "blogListEmpty": "Die Blog-Übersicht, bevor etwas veröffentlicht ist",
+    "blogListEmpty": "Bevor etwas veröffentlicht ist",
     "topicEmpty": "Ein Thema ohne Beiträge",
     "tagEmpty": "Ein Schlagwort ohne Beiträge",
-    "topicsEmpty": "Die Themenübersicht, bevor es Themen gibt",
-    "tagsEmpty": "Die Schlagwortübersicht, bevor es Schlagwörter gibt",
+    "topicsEmpty": "Bevor es Themen gibt",
+    "tagsEmpty": "Bevor es Schlagwörter gibt",
     "notFoundEyebrow": "Kleine Zeile über der Überschrift",
     "notFoundHeading": "Auch der Titel im Browser-Tab",
     "notFoundSupportingText": "Unter der Überschrift",

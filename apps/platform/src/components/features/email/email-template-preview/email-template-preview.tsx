@@ -1,18 +1,18 @@
-import { emailTemplatePreviewVariants } from './email-template-preview-variants';
+import { PREVIEW_WIDTH, type TPreviewWidth } from '@platform/constants/preview';
 
-export type TEmailPreviewWidth = 'desktop' | 'mobile';
+import { emailTemplatePreviewVariants } from './email-template-preview-variants';
 
 export type TEmailTemplatePreviewProps = {
   html: string;
   title: string;
-  width?: TEmailPreviewWidth;
+  width?: TPreviewWidth;
 };
 
 // Sandboxed: the HTML is a full document with its own inline styles.
 export const EmailTemplatePreview = ({
   html,
   title,
-  width = 'desktop',
+  width = PREVIEW_WIDTH.DESKTOP,
 }: TEmailTemplatePreviewProps) => {
   const { root, frame } = emailTemplatePreviewVariants({ width });
 

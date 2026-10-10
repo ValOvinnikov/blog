@@ -691,10 +691,20 @@ silently unindexed). Never hand-edit it; fix the source and regenerate. A future
   The uppercase value is the stored/serialized value, so schema `options.list`
   and migrations use it too; derive unions with `(typeof C)[keyof typeof C]`.
 
-  **The exception is a storage layer's own vocabulary** — a const whose values
-  that layer persists, read _only_ by that layer and the app on top of it.
-  Those live with the layer that stores them. Everything else stays in
-  `@blog/config`, which remains the default.
+  **Two exceptions, both decided by who reads the const.**
+
+  **An app's own vocabulary lives in that app.** A const read by exactly one
+  app (`apps/web` or `apps/platform`) and by no package lives in that app's
+  `src/constants/`, one domain per file, imported through the app's alias
+  (`@platform/constants/preview`) — for example the platform's preview mode
+  and width, which only its preview frames read. The day a second
+  workspace needs one, it moves to `@blog/config` in the change that adds that
+  reader. Adopted 2026-10-10, after `@blog/config` had collected constants no
+  package and no other app ever read.
+
+  **A storage layer's own vocabulary lives with that layer** — a const whose
+  values that layer persists, read _only_ by that layer and the app on top of
+  it. Everything else stays in `@blog/config`, which remains the default.
 
   `@blog/db` owns `TENANT_STATUS`, `TENANT_PLAN`, `MEMBERSHIP_ROLE`,
   `ADMIN_ROLE`, `GRANTED_VIA` and `TENANT_PROVISIONING_*` on that basis.
@@ -721,8 +731,9 @@ silently unindexed). Never hand-edit it; fix the source and regenerate. A future
   migration appears.
 
   Shape and casing rules are unchanged wherever a const lives; only the home
-  moves. "Only one app happens to use it today" is not enough — the layer has
-  to be where the values are actually persisted.
+  moves. For the storage-layer exception, "only one app happens to use it
+  today" is not enough — the layer has to be where the values are actually
+  persisted. A const a package reads never lives in an app.
 
 - `'use client'` never in `@blog/ui` (it stays pure and prop-driven). One
   component there, `Carousel`, is nonetheless client-only — it owns

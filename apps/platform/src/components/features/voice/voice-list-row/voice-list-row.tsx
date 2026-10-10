@@ -49,12 +49,14 @@ export const VoiceListRow = ({
   isOpen,
   children,
 }: TVoiceListRowProps) => {
+  const t = useTranslations('voiceSettings');
   const tLabels = useTranslations('voiceFieldLabels');
   const {
     labelGroup,
     label,
     routeHint: routeHintSlot,
     text,
+    status,
   } = voiceListRowVariants({ hasError });
   const isCustomised = isVoiceValueCustomised(value);
   const routeHint = LIST_ROUTE_HINTS[field.id];
@@ -64,7 +66,11 @@ export const VoiceListRow = ({
       <Accordion.Trigger>
         <span className={labelGroup()}>
           <span className={label()}>{tLabels(field.id)}</span>
-          {routeHint && <span className={routeHintSlot()}>{routeHint}</span>}
+          {routeHint && (
+            <span className={routeHintSlot()}>
+              {t('listRoute', { path: routeHint })}
+            </span>
+          )}
         </span>
         {!isOpen && (
           <>
@@ -73,10 +79,12 @@ export const VoiceListRow = ({
                 ? voiceValueAsText(value)
                 : voiceDefaultText(locale, field)}
             </span>
-            <FieldStatus
-              isCustomised={isCustomised}
-              isUnsaved={!isSameVoiceValue(value, savedValue)}
-            />
+            <span className={status()}>
+              <FieldStatus
+                isCustomised={isCustomised}
+                isUnsaved={!isSameVoiceValue(value, savedValue)}
+              />
+            </span>
           </>
         )}
       </Accordion.Trigger>

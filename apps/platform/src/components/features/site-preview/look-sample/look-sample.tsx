@@ -9,18 +9,16 @@ import { Text } from '@blog/ui/components/atoms/text';
 import { MediaCard } from '@blog/ui/components/molecules/media-card';
 import { Panel } from '@blog/ui/components/molecules/panel';
 import { SampleSiteHeader } from '@platform/components/features/site-preview/look-sample/components/sample-site-header';
+import { SiteThemeFrame } from '@platform/components/features/site-preview/site-theme-frame';
+import type { TSitePreviewTheme } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import { useTranslations } from 'next-intl';
-import type { CSSProperties } from 'react';
 
 import { lookSampleVariants } from './look-sample-variants';
 
 export type TLookSampleProps = {
   tenantName: string;
   logoSrc: string | undefined;
-  tokenStyle: CSSProperties;
-  isDark: boolean;
-  headingFontFamily: string;
-  bodyFontFamily: string;
+  theme: TSitePreviewTheme;
   liveLocales: readonly TLocaleIsoCode[];
   languageSwitcherStyle: TLanguageSwitcherStyle;
 };
@@ -28,31 +26,19 @@ export type TLookSampleProps = {
 export const LookSample = ({
   tenantName,
   logoSrc,
-  tokenStyle,
-  isDark,
-  headingFontFamily,
-  bodyFontFamily,
+  theme,
   liveLocales,
   languageSwitcherStyle,
 }: TLookSampleProps) => {
   const t = useTranslations('lookPreview');
 
-  const { root, actionsRow, chip, cards, outlinedCard } = lookSampleVariants({
-    isDark,
-  });
+  const { root, actionsRow, chip, cards, outlinedCard } = lookSampleVariants();
 
   return (
-    <div
-      inert={true}
+    <SiteThemeFrame
+      theme={theme}
       className={root()}
-      style={
-        {
-          ...tokenStyle,
-          '--font-display-family': headingFontFamily,
-          '--font-body-family': bodyFontFamily,
-        } as CSSProperties
-      }
-      data-testid="look-sample-tokens"
+      testId="look-sample-tokens"
     >
       <SampleSiteHeader
         tenantName={tenantName}
@@ -91,6 +77,6 @@ export const LookSample = ({
           </Panel.Body>
         </Panel>
       </div>
-    </div>
+    </SiteThemeFrame>
   );
 };

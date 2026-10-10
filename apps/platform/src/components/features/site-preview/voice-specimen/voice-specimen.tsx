@@ -15,24 +15,19 @@ import { Panel } from '@blog/ui/components/molecules/panel';
 import { panelHeaderVariants } from '@blog/ui/components/molecules/panel/components/header/panel-header-variants';
 import { panelVariants } from '@blog/ui/components/molecules/panel/panel-variants';
 import { BookmarksList } from '@blog/ui/components/organisms/bookmarks-list';
+import { SiteThemeFrame } from '@platform/components/features/site-preview/site-theme-frame';
 import { VoiceKeyFrame } from '@platform/components/features/site-preview/voice-key-frame';
 import { VoiceRichText } from '@platform/components/features/site-preview/voice-rich-text';
+import type { TSitePreviewTheme } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import {
   resolveVoiceValue,
   voiceFieldsOf,
   type TVoiceField,
   type TVoiceLocaleDraft,
 } from '@platform/utils/voice-draft/voice-draft';
-import type { CSSProperties, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 import { voiceSpecimenVariants } from './voice-specimen-variants';
-
-export type TVoiceSpecimenTheme = {
-  tokenStyle: CSSProperties;
-  isDark: boolean;
-  headingFontFamily: string;
-  bodyFontFamily: string;
-};
 
 type TListSample = 'blogList' | 'topic' | 'tag' | 'topics' | 'tags';
 
@@ -48,7 +43,7 @@ export type TVoiceSpecimenProps = {
   listSamples: TVoiceListSamples;
   openListFieldId?: TVoiceFieldId;
   focusedFieldId?: TVoiceFieldId;
-  theme: TVoiceSpecimenTheme;
+  theme: TSitePreviewTheme;
 };
 
 type TSpecimenPlacement =
@@ -80,8 +75,7 @@ export const VoiceSpecimen = ({
   theme,
 }: TVoiceSpecimenProps) => {
   const site = SITE_MESSAGES_BY_LOCALE[locale];
-  const { tokenStyle, isDark, headingFontFamily, bodyFontFamily } = theme;
-  const s = voiceSpecimenVariants({ isDark });
+  const s = voiceSpecimenVariants();
   const fields = voiceFieldsOf(surface);
 
   const valueOf = (field: TVoiceField) =>
@@ -208,19 +202,12 @@ export const VoiceSpecimen = ({
   };
 
   return (
-    <div
-      inert={true}
+    <SiteThemeFrame
+      theme={theme}
       className={s.root()}
-      style={
-        {
-          ...tokenStyle,
-          '--font-display-family': headingFontFamily,
-          '--font-body-family': bodyFontFamily,
-        } as CSSProperties
-      }
-      data-testid={`voice-specimen-${surface}`}
+      testId={`voice-specimen-${surface}`}
     >
       {SPECIMEN_BY_SURFACE[surface]()}
-    </div>
+    </SiteThemeFrame>
   );
 };

@@ -5,6 +5,7 @@ import {
   buildEmailDraft,
   countEmailDraftChanges,
   countLanguageChanges,
+  countSharedChanges,
   EMAIL_SENDER_ITEM,
   listCopyChanges,
   resolveFallbackCopy,
@@ -126,6 +127,21 @@ describe('change tracking', () => {
     );
 
     expect(countEmailDraftChanges(saved, draft, LIVE_LOCALES)).toBe(2);
+  });
+
+  it('adds up shared and per-language changes to the total', () => {
+    const draft = withCopy(
+      { ...saved, sender: { ...saved.sender, senderName: 'Acme' } },
+      { templateType: TENANT_INVITE, locale: FR },
+      { subject: 'Invitation', body: null },
+    );
+
+    expect(countSharedChanges(saved, draft)).toBe(1);
+    expect(
+      countSharedChanges(saved, draft) +
+        countLanguageChanges(saved, draft, EN) +
+        countLanguageChanges(saved, draft, FR),
+    ).toBe(countEmailDraftChanges(saved, draft, LIVE_LOCALES));
   });
 });
 

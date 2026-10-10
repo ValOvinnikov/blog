@@ -29,6 +29,7 @@ export const EmailSenderEditor = ({
   archivedNoticeId,
 }: TEmailSenderEditorProps) => {
   const t = useTranslations('emailSettingsForm');
+  const tItem = useTranslations('emailForm');
   const tPreview = useTranslations('emailPreview');
   const { stack } = emailSenderEditorVariants();
 
@@ -37,7 +38,10 @@ export const EmailSenderEditor = ({
 
   return (
     <Card>
-      <Card.Header title={t('heading')} supportingText={t('description')} />
+      <Card.Header
+        title={tItem('senderItemLabel')}
+        supportingText={tItem('senderItemDescription')}
+      />
       <Card.Body>
         <div className={stack()}>
           <FormTextInput

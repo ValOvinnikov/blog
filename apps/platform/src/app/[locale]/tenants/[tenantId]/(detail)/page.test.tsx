@@ -200,4 +200,24 @@ describe(TenantOverviewPage, () => {
       ),
     ).toBeVisible();
   });
+
+  it('renders the overview without waiting for the Vercel domain status', async () => {
+    getDomainVerificationStatusMock.mockReturnValue(new Promise(() => {}));
+
+    await setup();
+
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Acme Inc.' }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Owner' }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Recent activity' }),
+    ).toBeVisible();
+    expect(
+      screen.queryByRole('heading', { level: 2, name: 'Domain' }),
+    ).toBeNull();
+    expect(screen.getAllByTestId('skeleton').length).toBeGreaterThan(0);
+  });
 });

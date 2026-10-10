@@ -1,11 +1,15 @@
 import { AUDIT_TARGET_TYPE, FINDING_STATUS } from '@blog/config';
 import { queries } from '@blog/db';
+import { DomainCardSkeleton } from '@platform/components/features/tenants/domain-card-skeleton';
+import { LiveDomainCard } from '@platform/components/features/tenants/live-domain-card';
 import { TenantOverviewView } from '@platform/components/features/tenants/tenant-overview-view';
 import { getDomainVerificationStatus } from '@platform/server/provisioning/get-domain-verification-status';
 import { formatDate } from '@platform/utils/format-date/format-date';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
+import { Suspense } from 'react';
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('pageMetadata');
@@ -25,30 +29,34 @@ export default async function TenantOverviewPage({ params }: TProps) {
     notFound();
   }
 
-  const [
-    domainVerificationStatus,
-    ownerEmail,
-    ownerMembership,
-    auditEvents,
-    findings,
-    locale,
-  ] = await Promise.all([
-    getDomainVerificationStatus(tenant.primaryDomain),
-    queries.memberships.getTenantOwnerEmail(tenant.id),
-    queries.memberships.getTenantOwnerMembership(tenant.id),
-    queries.auditEvents.listAuditEventsForTarget(
-      AUDIT_TARGET_TYPE.TENANT,
-      tenant.id,
-      { limit: 5 },
-    ),
-    queries.findings.listFindingsForTenant(tenant.id, FINDING_STATUS.OPEN),
-    getLocale(),
-  ]);
+  const domainVerificationStatus = getDomainVerificationStatus(
+    tenant.primaryDomain,
+  );
+  const [ownerEmail, ownerMembership, auditEvents, findings, locale] =
+    await Promise.all([
+      queries.memberships.getTenantOwnerEmail(tenant.id),
+      queries.memberships.getTenantOwnerMembership(tenant.id),
+      queries.auditEvents.listAuditEventsForTarget(
+        AUDIT_TARGET_TYPE.TENANT,
+        tenant.id,
+        { limit: 5 },
+      ),
+      queries.findings.listFindingsForTenant(tenant.id, FINDING_STATUS.OPEN),
+      getLocale(),
+    ]);
 
   return (
     <TenantOverviewView
       tenant={tenant}
-      domainVerificationStatus={domainVerificationStatus}
+      domainCard={
+        <Suspense fallback={<DomainCardSkeleton />}>
+          <LiveDomainCard
+            tenant={tenant}
+            domainVerificationStatus={domainVerificationStatus}
+            dnsHref={adminRoutes.tenantDomain(tenant.id)}
+          />
+        </Suspense>
+      }
       ownerEmail={ownerEmail}
       ownerJoinedAt={
         ownerMembership

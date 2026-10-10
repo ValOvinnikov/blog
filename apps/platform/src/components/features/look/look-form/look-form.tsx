@@ -18,9 +18,6 @@ import { SettingsFormShell } from '@platform/components/shared/settings-form-she
 import { useViewTabs, ViewTabs } from '@platform/components/shared/view-tabs';
 import { FONT_OPTIONS } from '@platform/config/fonts';
 import { useToast } from '@platform/context/toast-provider';
-import { clearBrandAssetAction } from '@platform/server/site-config/clear-brand-asset-action';
-import { updateLookAction } from '@platform/server/site-config/update-look-action';
-import { uploadBrandAssetAction } from '@platform/server/site-config/upload-brand-asset-action';
 import {
   brandAssetKindSchema,
   type TBrandAssetKind,
@@ -33,11 +30,11 @@ import {
   isSameStagedImage,
   type TStagedImage,
 } from '@platform/utils/staged-image/staged-image';
-import { useFormSubmission } from '@platform/utils/use-form-submission/use-form-submission';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
 
 import { lookFormVariants } from './look-form-variants';
+import { useLookSave } from './use-look-save';
 
 export type TLookFormProps = {
   tenantId: string;
@@ -106,23 +103,6 @@ const countChanges = (a: TLookFormValues, b: TLookFormValues): number =>
 const listLostStagedFiles = (draftValues: TLookFormValues): TBrandAssetKind[] =>
   BRAND_ASSET_KINDS.filter((kind) => draftValues[kind].file !== undefined);
 
-const saveBrandImage = async (
-  tenantId: string,
-  kind: TBrandAssetKind,
-  image: TStagedImage,
-): Promise<
-  { ok: true; image: TStagedImage } | { ok: false; error: string }
-> => {
-  if (!image.file) {
-    const result = await clearBrandAssetAction(tenantId, kind);
-    return result.ok ? { ok: true, image: { url: undefined } } : result;
-  }
-  const formData = new FormData();
-  formData.append('file', image.file);
-  const result = await uploadBrandAssetAction(tenantId, kind, formData);
-  return result.ok ? { ok: true, image: { url: result.url } } : result;
-};
-
 export const LookForm = ({
   tenantId,
   tenantName,
@@ -140,55 +120,25 @@ export const LookForm = ({
   const t = useTranslations('lookForm');
   const tPreset = useTranslations('presetPicker');
   const tHue = useTranslations('logoHueField');
-  const [savedValues, setSavedValues] =
-    useState<TLookFormValues>(initialValues);
   const [repickKinds, setRepickKinds] = useState<TBrandAssetKind[]>([]);
-  const [brandImageError, setBrandImageError] = useState<string>();
-  const { values, setValues, status, isPending, handleSubmit } =
-    useFormSubmission<TLookFormValues, { ok: boolean }>({
-      initialValues,
-      onSubmit: async (vals) => {
-        const savedImages: Partial<Record<TBrandAssetKind, TStagedImage>> = {};
-
-        const finish = (ok: boolean) => {
-          setSavedValues((prev) =>
-            ok ? { ...vals, ...savedImages } : { ...prev, ...savedImages },
-          );
-          setValues((prev) => ({ ...prev, ...savedImages }));
-          return { ok };
-        };
-
-        setBrandImageError(undefined);
-        for (const kind of BRAND_ASSET_KINDS) {
-          if (isSameStagedImage(vals[kind], savedValues[kind])) continue;
-          const result = await saveBrandImage(tenantId, kind, vals[kind]);
-          if (!result.ok) {
-            setBrandImageError(result.error);
-            return finish(false);
-          }
-          savedImages[kind] = result.image;
-        }
-
-        const result = await updateLookAction(tenantId, {
-          preset: vals.preset,
-          accentHue: vals.accentHue,
-          logoHue: vals.logoHue ?? null,
-          headingFont: vals.headingFont,
-          bodyFont: vals.bodyFont,
-          radiusScale: vals.radiusScale,
-          density: vals.density,
-          cardStyle: vals.cardStyle,
-          languageSwitcherStyle: vals.languageSwitcherStyle,
-        });
-        return finish(result.ok);
-      },
-      onSuccess: () => {
-        setRepickKinds([]);
-        toast.success({
-          message: t('alertSuccess'),
-        });
-      },
-    });
+  const {
+    values,
+    setValues,
+    status,
+    isPending,
+    handleSubmit,
+    savedValues,
+    brandImageError,
+  } = useLookSave({
+    tenantId,
+    initialValues,
+    onSaved: () => {
+      setRepickKinds([]);
+      toast.success({
+        message: t('alertSuccess'),
+      });
+    },
+  });
 
   const changeCount = countChanges(values, savedValues);
   const isDivergedFromPreset =
@@ -397,13 +347,7 @@ export const LookForm = ({
         >
           <LookPreview
             tenantName={tenantName}
-            accentHue={values.accentHue}
-            logoHue={values.logoHue}
-            headingFont={values.headingFont}
-            bodyFont={values.bodyFont}
-            radiusScale={values.radiusScale}
-            density={values.density}
-            cardStyle={values.cardStyle}
+            theme={values}
             logoSrc={values.logo.url}
             liveLocales={liveLocales}
             languageSwitcherStyle={values.languageSwitcherStyle}

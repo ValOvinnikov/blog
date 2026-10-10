@@ -1,11 +1,9 @@
 'use client';
 
-import type { TDomainVerificationStatus } from '@blog/config';
 import type { TAuditEvent } from '@blog/db/schema/audit-events';
 import type { TFindingSummary } from '@blog/db/schema/findings';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { ContentWorkspaceCard } from '@platform/components/features/tenants/content-workspace-card';
-import { DomainCard } from '@platform/components/features/tenants/domain-card';
 import { FindingsCard } from '@platform/components/features/tenants/findings-card';
 import { OwnerCard } from '@platform/components/features/tenants/owner-card';
 import { ProvisioningBanner } from '@platform/components/features/tenants/provisioning-banner';
@@ -16,17 +14,16 @@ import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenan
 import { ExternalLinkButton } from '@platform/components/shared/external-link-button';
 import { PageHeader } from '@platform/components/shared/page-header';
 import { StatusBadge } from '@platform/components/shared/status-badge';
-import { adminRoutes } from '@platform/utils/routes/routes';
 import { tenantStatusTone } from '@platform/utils/status-tone/status-tone';
 import { computeTenantFieldLocks } from '@platform/utils/tenant-field-locks/tenant-field-locks';
 import { useTranslations } from 'next-intl';
-import { useId } from 'react';
+import { useId, type ReactNode } from 'react';
 
 import { tenantOverviewViewVariants } from './tenant-overview-view-variants';
 
 export type TTenantOverviewViewProps = {
   tenant: TTenant;
-  domainVerificationStatus: TDomainVerificationStatus;
+  domainCard: ReactNode;
   ownerEmail: string | undefined;
   ownerJoinedAt: string | undefined;
   ownerJoinedAtIso: string | undefined;
@@ -34,17 +31,10 @@ export type TTenantOverviewViewProps = {
   findings: TFindingSummary[];
 };
 
-/**
- * The platform operator's landing page for a single tenant: the
- * provisioning banner, the editable details panel (moved here from the
- * provisioning page), and four read-only fact cards. A single
- * `useProvisioningPoll` instance is lifted up here and shared by the banner
- * and the details panel's field locks, so the two never disagree about
- * provisioning status the way two independent poll instances could.
- */
+// One poll instance feeds both the banner and the field locks so they never disagree.
 export const TenantOverviewView = ({
   tenant,
-  domainVerificationStatus,
+  domainCard,
   ownerEmail,
   ownerJoinedAt,
   ownerJoinedAtIso,
@@ -64,7 +54,7 @@ export const TenantOverviewView = ({
     isProvisioningRunning,
     errorKind,
     ownerElevationOutcome,
-  } = useProvisioningPoll(tenant, domainVerificationStatus);
+  } = useProvisioningPoll(tenant);
 
   return (
     <div className={root()}>
@@ -121,11 +111,7 @@ export const TenantOverviewView = ({
 
       <div className={cardsGrid()}>
         <div className={cardsColumn()}>
-          <DomainCard
-            tenant={tenant}
-            domainVerificationStatus={domainVerificationStatus}
-            dnsHref={adminRoutes.tenantDomain(tenant.id)}
-          />
+          {domainCard}
           <OwnerCard
             ownerEmail={ownerEmail}
             ownerJoinedAt={ownerJoinedAt}
