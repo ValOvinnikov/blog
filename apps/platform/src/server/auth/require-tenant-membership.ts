@@ -3,11 +3,10 @@ import 'server-only';
 import { queries } from '@blog/db';
 import type { TMembership } from '@blog/db/schema/memberships';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { adminRoutes } from '@platform/utils/routes/routes';
-import { notFound, redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 
-import { auth } from './auth';
 import { buildVirtualAdminMembership } from './build-virtual-admin-membership';
+import { requireSessionUserId } from './require-session-user-id';
 
 export type TTenantMembershipContext = {
   tenant: TTenant;
@@ -28,13 +27,7 @@ export type TTenantMembershipContext = {
 export const requireTenantMembership = async (
   tenantId: string,
 ): Promise<TTenantMembershipContext> => {
-  const session = await auth();
-  const userId = session?.user?.id;
-
-  if (!userId) {
-    redirect(adminRoutes.signIn());
-  }
-
+  const userId = await requireSessionUserId();
   const tenant = await queries.tenants.getTenantById(tenantId);
 
   if (!tenant) {

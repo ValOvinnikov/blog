@@ -7,15 +7,13 @@ import type { Session } from 'next-auth';
 import DashboardTenantLayout from './layout';
 
 const {
-  listMembershipsForUserMock,
-  listTenantsByIdsMock,
+  listMembershipsWithTenantsForUserMock,
   listTenantsMock,
   getAdminByUserIdMock,
   cookiesMock,
   resolveIsSidebarCollapsedMock,
 } = vi.hoisted(() => ({
-  listMembershipsForUserMock: vi.fn(),
-  listTenantsByIdsMock: vi.fn(),
+  listMembershipsWithTenantsForUserMock: vi.fn(),
   listTenantsMock: vi.fn(),
   getAdminByUserIdMock: vi.fn(),
   cookiesMock: vi.fn(),
@@ -31,9 +29,10 @@ vi.mock('@platform/server/layout/resolve-is-sidebar-collapsed', () => ({
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
-    memberships: { listMembershipsForUser: listMembershipsForUserMock },
+    memberships: {
+      listMembershipsWithTenantsForUser: listMembershipsWithTenantsForUserMock,
+    },
     tenants: {
-      listTenantsByIds: listTenantsByIdsMock,
       listTenants: listTenantsMock,
     },
     admins: { getAdminByUserId: getAdminByUserIdMock },
@@ -82,8 +81,7 @@ const setup = customRenderAsync(DashboardTenantLayout, {
 describe(`<${DashboardTenantLayout.name}/>`, () => {
   beforeEach(() => {
     authMock.mockReset();
-    listMembershipsForUserMock.mockReset();
-    listTenantsByIdsMock.mockReset();
+    listMembershipsWithTenantsForUserMock.mockReset();
     listTenantsMock.mockReset();
     getAdminByUserIdMock.mockReset();
     getAdminByUserIdMock.mockResolvedValue(undefined);
@@ -91,8 +89,10 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
     resolveIsSidebarCollapsedMock.mockReset();
     resolveIsSidebarCollapsedMock.mockResolvedValue(false);
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    listMembershipsForUserMock.mockResolvedValue([membership1, membership2]);
-    listTenantsByIdsMock.mockResolvedValue([tenant1, tenant2]);
+    listMembershipsWithTenantsForUserMock.mockResolvedValue([
+      { membership: membership1, tenant: tenant1 },
+      { membership: membership2, tenant: tenant2 },
+    ]);
     mockCookie('tenant-2');
   });
 
@@ -102,11 +102,11 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
 
     expect(redirect).toHaveBeenCalledWith('/api/auth/signin');
-    expect(listMembershipsForUserMock).not.toHaveBeenCalled();
+    expect(listMembershipsWithTenantsForUserMock).not.toHaveBeenCalled();
   });
 
   it('redirects to /workspace-pending when the signed-in user has zero memberships', async () => {
-    listMembershipsForUserMock.mockResolvedValue([]);
+    listMembershipsWithTenantsForUserMock.mockResolvedValue([]);
 
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
 
@@ -130,8 +130,9 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
 
   describe('with one membership', () => {
     beforeEach(() => {
-      listMembershipsForUserMock.mockResolvedValue([membership1]);
-      listTenantsByIdsMock.mockResolvedValue([tenant1]);
+      listMembershipsWithTenantsForUserMock.mockResolvedValue([
+        { membership: membership1, tenant: tenant1 },
+      ]);
     });
 
     it('renders the gated content with no switcher for a user with one membership', async () => {
@@ -191,7 +192,6 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
     await setup();
 
     expect(screen.getByText('dashboard content')).toBeVisible();
-    expect(listMembershipsForUserMock).not.toHaveBeenCalled();
     expect(screen.getByText('Super admin · Platform')).toBeVisible();
     expect(screen.queryByText(/Owner/)).not.toBeInTheDocument();
   });

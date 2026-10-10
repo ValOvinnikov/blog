@@ -1,9 +1,9 @@
-import { queries } from '@blog/db';
 import { AdminShell } from '@platform/components/features/layout/admin-shell';
 import { DashboardBreadcrumb } from '@platform/components/features/layout/dashboard-breadcrumb';
 import { TenantSwitcher } from '@platform/components/features/layout/tenant-switcher';
-import { auth } from '@platform/server/auth/auth';
+import { getSession } from '@platform/server/auth/auth';
 import { isVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
+import { listSessionTenants } from '@platform/server/auth/list-session-tenants';
 import { resolveDashboardTenant } from '@platform/server/auth/resolve-dashboard-tenant';
 import { resolveIsSidebarCollapsed } from '@platform/server/layout/resolve-is-sidebar-collapsed';
 import {
@@ -30,19 +30,16 @@ type TProps = {
  */
 export default async function DashboardTenantLayout({ children }: TProps) {
   const { tenant, membership, tenants } = await resolveDashboardTenant();
-  const session = await auth();
+  const { admin: sessionAdmin } = await listSessionTenants();
+  const session = await getSession();
   const isSidebarInitiallyCollapsed = await resolveIsSidebarCollapsed();
   const tNavSections = (await getTranslations(
     'navSections',
   )) as unknown as TNavTranslator;
 
-  // A SUPERADMIN browsing here holds no real `memberships` row — `membership`
-  // is `buildVirtualAdminMembership`'s virtual, OWNER-level stand-in, correct
-  // for authorization but never a correct identity label.
-  const isVirtual = isVirtualAdminMembership(membership);
-  const admin = isVirtual
-    ? await queries.admins.getAdminByUserId(membership.userId)
-    : undefined;
+  // A virtual membership is correct for authorization but never a correct
+  // identity label, so the role chip shows the admin role behind it instead.
+  const admin = isVirtualAdminMembership(membership) ? sessionAdmin : undefined;
 
   return (
     <AdminShell

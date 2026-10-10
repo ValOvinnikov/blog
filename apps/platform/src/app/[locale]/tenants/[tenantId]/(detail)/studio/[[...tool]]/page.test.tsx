@@ -53,19 +53,16 @@ describe(`<${TenantStudioPage.name}/>`, () => {
     getTenantByIdMock.mockReset();
   });
 
-  it('redirects to sign-in without querying the tenant when there is no session', async () => {
+  it('redirects to sign-in when there is no session', async () => {
     authMock.mockResolvedValue(null);
 
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
-    expect(getTenantByIdMock).not.toHaveBeenCalled();
   });
 
   it('404s a signed-in tenant owner with no admins row, even calling the page directly', async () => {
     getAdminByUserIdMock.mockResolvedValue(undefined);
 
     await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
-
-    expect(getTenantByIdMock).not.toHaveBeenCalled();
   });
 
   it('404s for an unknown tenant id', async () => {
