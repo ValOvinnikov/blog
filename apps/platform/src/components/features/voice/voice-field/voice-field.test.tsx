@@ -1,5 +1,9 @@
 import { VOICE_FIELD_KIND, VOICE_FIELDS } from '@blog/config';
-import { customRender, screen } from '@platform/testing/custom-render';
+import {
+  customRender,
+  renderWithIntl,
+  screen,
+} from '@platform/testing/custom-render';
 
 import { VoiceField } from './voice-field';
 
@@ -115,7 +119,7 @@ describe(`<${VoiceField.name}/>`, () => {
   ])(
     'describes a read-only %s field with the archived notice',
     (_kind, id, name) => {
-      customRender(() => (
+      renderWithIntl(
         <>
           <p id="archived-notice">This tenant is archived</p>
           <VoiceField
@@ -127,8 +131,8 @@ describe(`<${VoiceField.name}/>`, () => {
             onChange={vi.fn()}
             archivedNoticeId="archived-notice"
           />
-        </>
-      ))();
+        </>,
+      );
 
       expect(screen.getByRole('textbox', { name })).toHaveAccessibleDescription(
         /This tenant is archived$/,
