@@ -39,7 +39,7 @@ export type TVoiceSurfaceCardProps = {
   openFieldId?: TVoiceFieldId;
   onOpenField: (id: TVoiceFieldId | undefined) => void;
   onFieldChange: (id: TVoiceFieldId, value: TVoiceDraftValue) => void;
-  isReadOnly: boolean;
+  archivedNoticeId?: string;
   specimenTheme: TSitePreviewTheme;
 };
 
@@ -53,7 +53,7 @@ export const VoiceSurfaceCard = ({
   openFieldId,
   onOpenField,
   onFieldChange,
-  isReadOnly,
+  archivedNoticeId,
   specimenTheme,
 }: TVoiceSurfaceCardProps) => {
   const t = useTranslations('voiceSettings');
@@ -92,7 +92,7 @@ export const VoiceSurfaceCard = ({
       placeholder={voiceDefaultText(locale, field)}
       error={errors[field.id]}
       onChange={(next) => onFieldChange(field.id, next)}
-      isReadOnly={isReadOnly}
+      archivedNoticeId={archivedNoticeId}
       hasVisibleLabel={surface !== VOICE_SURFACE.ARCHIVE}
     />
   );
@@ -127,7 +127,7 @@ export const VoiceSurfaceCard = ({
                       locale={locale}
                       value={values[field.id]}
                       savedValue={savedValues[field.id]}
-                      hasError={errors[field.id] !== undefined}
+                      error={errors[field.id]}
                       isOpen={openFieldId === field.id}
                     >
                       {renderField(field)}

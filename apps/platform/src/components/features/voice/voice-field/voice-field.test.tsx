@@ -13,7 +13,6 @@ const setup = customRender(VoiceField, {
   savedValue: '',
   placeholder: 'Page not found',
   onChange: vi.fn(),
-  isReadOnly: false,
 });
 
 describe(`<${VoiceField.name}/>`, () => {
@@ -92,7 +91,7 @@ describe(`<${VoiceField.name}/>`, () => {
     setup({
       field: fieldById('notFoundSupportingText'),
       value: null,
-      isReadOnly: true,
+      archivedNoticeId: 'archived-notice',
     });
 
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
@@ -102,13 +101,40 @@ describe(`<${VoiceField.name}/>`, () => {
     setup({
       field: fieldById('notFoundSupportingText'),
       value: null,
-      isReadOnly: true,
+      archivedNoticeId: 'archived-notice',
     });
 
     const editor = screen.getByRole('textbox', { name: 'Supporting text' });
     expect(editor).toHaveAttribute('aria-readonly', 'true');
     expect(editor).not.toHaveAttribute('aria-disabled');
   });
+
+  it.each([
+    ['text', 'notFoundHeading', 'Heading'],
+    ['rich', 'notFoundSupportingText', 'Supporting text'],
+  ])(
+    'describes a read-only %s field with the archived notice',
+    (_kind, id, name) => {
+      customRender(() => (
+        <>
+          <p id="archived-notice">This tenant is archived</p>
+          <VoiceField
+            inputId="voice-field-test"
+            field={fieldById(id)}
+            value={null}
+            savedValue={null}
+            placeholder=""
+            onChange={vi.fn()}
+            archivedNoticeId="archived-notice"
+          />
+        </>
+      ))();
+
+      expect(screen.getByRole('textbox', { name })).toHaveAccessibleDescription(
+        /This tenant is archived$/,
+      );
+    },
+  );
 
   it('gives an invalid rich field its input id so the save bar can focus it', () => {
     setup({
