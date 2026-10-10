@@ -2,54 +2,48 @@ import { PRESET_ID } from '@blog/config';
 
 import { getSettingsFeaturesOrDefaults } from './settings-features-or-defaults';
 
-const { getSettingsFeaturesMock, getSiteConfigMock } = vi.hoisted(() => ({
-  getSettingsFeaturesMock: vi.fn(),
-  getSiteConfigMock: vi.fn(),
+const { getSettingsFeaturesAndPresetMock } = vi.hoisted(() => ({
+  getSettingsFeaturesAndPresetMock: vi.fn(),
 }));
 
 vi.mock('@blog/db', () => ({
   queries: {
-    settingsFeatures: { getSettingsFeatures: getSettingsFeaturesMock },
-    siteConfig: { getSiteConfig: getSiteConfigMock },
+    settingsFeatures: {
+      getSettingsFeaturesAndPreset: getSettingsFeaturesAndPresetMock,
+    },
   },
 }));
 
 describe(getSettingsFeaturesOrDefaults, () => {
   beforeEach(() => {
-    getSettingsFeaturesMock.mockReset();
-    getSiteConfigMock.mockReset();
+    getSettingsFeaturesAndPresetMock.mockReset();
   });
 
-  it('returns the six toggle columns from an existing row, without touching site_config', async () => {
-    getSettingsFeaturesMock.mockResolvedValue({
-      id: 'row-1',
-      tenantId: 'tenant-1',
+  it('returns the saved toggles when the tenant has saved Features', async () => {
+    const saved = {
       commentsEnabled: false,
       ratingsEnabled: true,
       bookmarksEnabled: true,
       newsletterEnabled: true,
       analyticsEnabled: false,
       consentBannerEnabled: true,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+    };
+    getSettingsFeaturesAndPresetMock.mockResolvedValue({
+      features: saved,
+      preset: PRESET_ID.EDITORIAL,
     });
 
     const result = await getSettingsFeaturesOrDefaults('tenant-1');
 
-    expect(result).toEqual({
-      commentsEnabled: false,
-      ratingsEnabled: true,
-      bookmarksEnabled: true,
-      newsletterEnabled: true,
-      analyticsEnabled: false,
-      consentBannerEnabled: true,
-    });
-    expect(getSiteConfigMock).not.toHaveBeenCalled();
+    expect(getSettingsFeaturesAndPresetMock).toHaveBeenCalledWith('tenant-1');
+    expect(result).toEqual(saved);
   });
 
-  it('falls back to the CONSOLE preset featureDefaults when no row and no site_config exists', async () => {
-    getSettingsFeaturesMock.mockResolvedValue(undefined);
-    getSiteConfigMock.mockResolvedValue(undefined);
+  it("falls back to the saved preset's featureDefaults when Features was never saved", async () => {
+    getSettingsFeaturesAndPresetMock.mockResolvedValue({
+      features: undefined,
+      preset: PRESET_ID.EDITORIAL,
+    });
 
     const result = await getSettingsFeaturesOrDefaults('tenant-1');
 
@@ -63,24 +57,14 @@ describe(getSettingsFeaturesOrDefaults, () => {
     });
   });
 
-  it("falls back to the tenant's currently-saved preset's featureDefaults, not always CONSOLE", async () => {
-    getSettingsFeaturesMock.mockResolvedValue(undefined);
-    getSiteConfigMock.mockResolvedValue({
-      preset: PRESET_ID.EDITORIAL,
-      accentHue: 28,
-      logoHue: undefined,
-      headingFont: 'FRAUNCES',
-      bodyFont: 'INTER',
-      radiusScale: 'SM',
-      density: 'COMPACT',
-      logoAssetUrl: undefined,
-      faviconAssetUrl: undefined,
-      voiceOverrides: {},
+  it('falls back to the CONSOLE preset featureDefaults when neither Features nor Look was saved', async () => {
+    getSettingsFeaturesAndPresetMock.mockResolvedValue({
+      features: undefined,
+      preset: undefined,
     });
 
     const result = await getSettingsFeaturesOrDefaults('tenant-1');
 
-    expect(getSiteConfigMock).toHaveBeenCalledWith('tenant-1');
     expect(result).toEqual({
       commentsEnabled: true,
       ratingsEnabled: true,

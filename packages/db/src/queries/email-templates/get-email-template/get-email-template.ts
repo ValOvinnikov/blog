@@ -30,7 +30,7 @@ type TAuthoredEmailTemplateFields = Pick<
 // Subject and body each resolve on their own: the requested language's row,
 // then the tenant's default-language row, then the product default in the
 // requested language.
-export function mergeEmailTemplateCopy(
+function mergeEmailTemplateCopy(
   tenantId: string,
   templateType: TEmailTemplateType,
   locale: TLocaleIsoCode,

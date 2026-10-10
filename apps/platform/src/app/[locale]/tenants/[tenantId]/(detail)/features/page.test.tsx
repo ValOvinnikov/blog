@@ -9,13 +9,11 @@ import FeaturesPage from './page';
 const {
   getAdminByUserIdMock,
   getTenantByIdMock,
-  getSettingsFeaturesMock,
-  getSiteConfigMock,
+  getSettingsFeaturesAndPresetMock,
 } = vi.hoisted(() => ({
   getAdminByUserIdMock: vi.fn(),
   getTenantByIdMock: vi.fn(),
-  getSettingsFeaturesMock: vi.fn(),
-  getSiteConfigMock: vi.fn(),
+  getSettingsFeaturesAndPresetMock: vi.fn(),
 }));
 
 vi.mock('@platform/server/auth/auth');
@@ -25,8 +23,9 @@ vi.mock('@blog/db', async () => ({
   queries: {
     admins: { getAdminByUserId: getAdminByUserIdMock },
     tenants: { getTenantById: getTenantByIdMock },
-    settingsFeatures: { getSettingsFeatures: getSettingsFeaturesMock },
-    siteConfig: { getSiteConfig: getSiteConfigMock },
+    settingsFeatures: {
+      getSettingsFeaturesAndPreset: getSettingsFeaturesAndPresetMock,
+    },
   },
 }));
 
@@ -41,12 +40,13 @@ describe(`<${FeaturesPage.name}/>`, () => {
     authMock.mockReset();
     getAdminByUserIdMock.mockReset();
     getTenantByIdMock.mockReset();
-    getSettingsFeaturesMock.mockReset();
-    getSiteConfigMock.mockReset();
+    getSettingsFeaturesAndPresetMock.mockReset();
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' });
-    getSettingsFeaturesMock.mockResolvedValue(undefined);
-    getSiteConfigMock.mockResolvedValue(undefined);
+    getSettingsFeaturesAndPresetMock.mockResolvedValue({
+      features: undefined,
+      preset: undefined,
+    });
   });
 
   it('redirects to sign-in without querying the tenant when there is no session', async () => {
@@ -64,7 +64,7 @@ describe(`<${FeaturesPage.name}/>`, () => {
     await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(redirect).not.toHaveBeenCalled();
-    expect(getSettingsFeaturesMock).not.toHaveBeenCalled();
+    expect(getSettingsFeaturesAndPresetMock).not.toHaveBeenCalled();
   });
 
   it('renders preset featureDefaults for an operator with no settings_features row', async () => {
@@ -75,7 +75,7 @@ describe(`<${FeaturesPage.name}/>`, () => {
 
     await setup();
 
-    expect(getSettingsFeaturesMock).toHaveBeenCalledWith('tenant-1');
+    expect(getSettingsFeaturesAndPresetMock).toHaveBeenCalledWith('tenant-1');
     expect(screen.getByRole('heading', { name: 'Features' })).toBeVisible();
     expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(
       'data-checked',
