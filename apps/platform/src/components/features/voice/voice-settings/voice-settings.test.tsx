@@ -262,13 +262,13 @@ describe(`<${VoiceSettings.name}/>`, () => {
       const section = card('Empty lists');
 
       expect(
-        within(section).getByRole('textbox', { name: 'Blog index' }),
+        within(section).getByRole('textbox', { name: 'Blog index page' }),
       ).toBeVisible();
       for (const name of [
         /Topic page/,
         /Tag page/,
-        /Topics index/,
-        /Tags index/,
+        /Topics index page/,
+        /Tags index page/,
       ]) {
         expect(
           within(section).getByRole('button', { name, expanded: false }),
@@ -283,11 +283,19 @@ describe(`<${VoiceSettings.name}/>`, () => {
         within(section).getByRole('textbox', { name: 'Tag page' }),
       ).toBeVisible();
       expect(
-        within(section).queryByRole('textbox', { name: 'Blog index' }),
+        within(section).queryByRole('textbox', { name: 'Blog index page' }),
       ).not.toBeInTheDocument();
       expect(
-        within(section).getByRole('button', { name: /Blog index/ }),
+        within(section).getByRole('button', { name: /Blog index page/ }),
       ).toHaveTextContent(SITE_MESSAGES_BY_LOCALE.EN.blogListPage.empty);
+    });
+
+    it('titles the open list once, in its header', () => {
+      setup();
+
+      expect(
+        within(card('Empty lists')).getAllByText('Blog index page'),
+      ).toHaveLength(1);
     });
 
     it('closes the open list from its header', async () => {
@@ -296,14 +304,14 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
       await user.click(
         within(section).getByRole('button', {
-          name: /Blog index/,
+          name: /Blog index page/,
           expanded: true,
         }),
       );
 
       expect(
         within(section).getByRole('button', {
-          name: /Blog index/,
+          name: /Blog index page/,
           expanded: false,
         }),
       ).toBeVisible();

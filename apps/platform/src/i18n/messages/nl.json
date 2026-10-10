@@ -495,7 +495,8 @@
     "alertSuccess": "Toon opgeslagen.",
     "alertError": "Opslaan mislukt. Probeer het opnieuw.",
     "keepPlaceholder": "Laat <code>{token}</code> staan — de site vult het in.",
-    "draftFieldLabel": "{surface} — {field} ({language})"
+    "draftFieldLabel": "{surface} — {field} ({language})",
+    "listRoute": "Getoond op {path}"
   },
   "voiceSurfaces": {
     "NOT_FOUND": "Pagina niet gevonden",
@@ -547,11 +548,11 @@
     }
   },
   "voiceFieldLabels": {
-    "blogListEmpty": "Blogoverzicht",
+    "blogListEmpty": "Blogoverzichtspagina",
     "topicEmpty": "Onderwerppagina",
     "tagEmpty": "Tagpagina",
-    "topicsEmpty": "Onderwerpenoverzicht",
-    "tagsEmpty": "Tagoverzicht",
+    "topicsEmpty": "Onderwerpenoverzichtspagina",
+    "tagsEmpty": "Tagoverzichtspagina",
     "notFoundEyebrow": "Bovenregel",
     "notFoundHeading": "Kop",
     "notFoundSupportingText": "Begeleidende tekst",
@@ -560,11 +561,11 @@
     "bookmarksEmpty": "Lege bladwijzers"
   },
   "voiceFieldHints": {
-    "blogListEmpty": "Het blogoverzicht, voordat er iets is gepubliceerd",
+    "blogListEmpty": "Voordat er iets is gepubliceerd",
     "topicEmpty": "Een onderwerp zonder berichten",
     "tagEmpty": "Een tag zonder berichten",
-    "topicsEmpty": "Het onderwerpenoverzicht, voordat er onderwerpen zijn",
-    "tagsEmpty": "Het tagoverzicht, voordat er tags zijn",
+    "topicsEmpty": "Voordat er onderwerpen zijn",
+    "tagsEmpty": "Voordat er tags zijn",
     "notFoundEyebrow": "Klein label boven de kop",
     "notFoundHeading": "Ook de titel van het browsertabblad",
     "notFoundSupportingText": "Onder de kop",

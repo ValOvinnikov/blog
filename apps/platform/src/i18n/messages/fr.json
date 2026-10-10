@@ -495,7 +495,8 @@
     "alertSuccess": "Voix enregistrée.",
     "alertError": "Impossible d'enregistrer — veuillez réessayer.",
     "keepPlaceholder": "Conservez <code>{token}</code> — le site le remplit.",
-    "draftFieldLabel": "{surface} — {field} ({language})"
+    "draftFieldLabel": "{surface} — {field} ({language})",
+    "listRoute": "Affichée sur {path}"
   },
   "voiceSurfaces": {
     "NOT_FOUND": "Page introuvable",
@@ -547,11 +548,11 @@
     }
   },
   "voiceFieldLabels": {
-    "blogListEmpty": "Index du blog",
+    "blogListEmpty": "Page d'index du blog",
     "topicEmpty": "Page de thème",
     "tagEmpty": "Page d'étiquette",
-    "topicsEmpty": "Index des thèmes",
-    "tagsEmpty": "Index des étiquettes",
+    "topicsEmpty": "Page d'index des thèmes",
+    "tagsEmpty": "Page d'index des étiquettes",
     "notFoundEyebrow": "Surtitre",
     "notFoundHeading": "Titre",
     "notFoundSupportingText": "Texte d'accompagnement",
@@ -560,11 +561,11 @@
     "bookmarksEmpty": "Favoris vides"
   },
   "voiceFieldHints": {
-    "blogListEmpty": "L'index du blog, avant toute publication",
+    "blogListEmpty": "Avant toute publication",
     "topicEmpty": "Un thème sans article pour l'instant",
     "tagEmpty": "Une étiquette sans article pour l'instant",
-    "topicsEmpty": "L'index des thèmes, avant qu'un thème existe",
-    "tagsEmpty": "L'index des étiquettes, avant qu'une étiquette existe",
+    "topicsEmpty": "Avant qu'un thème existe",
+    "tagsEmpty": "Avant qu'une étiquette existe",
     "notFoundEyebrow": "Petit libellé au-dessus du titre",
     "notFoundHeading": "Aussi le titre de l'onglet du navigateur",
     "notFoundSupportingText": "Sous le titre",

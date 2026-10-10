@@ -495,7 +495,8 @@
     "alertSuccess": "Tonalität gespeichert.",
     "alertError": "Speichern fehlgeschlagen — bitte erneut versuchen.",
     "keepPlaceholder": "<code>{token}</code> beibehalten — die Website setzt den Wert ein.",
-    "draftFieldLabel": "{surface} — {field} ({language})"
+    "draftFieldLabel": "{surface} — {field} ({language})",
+    "listRoute": "Angezeigt unter {path}"
   },
   "voiceSurfaces": {
     "NOT_FOUND": "Seite nicht gefunden",
@@ -547,11 +548,11 @@
     }
   },
   "voiceFieldLabels": {
-    "blogListEmpty": "Blog-Übersicht",
+    "blogListEmpty": "Blog-Übersichtsseite",
     "topicEmpty": "Themenseite",
     "tagEmpty": "Schlagwortseite",
-    "topicsEmpty": "Themenübersicht",
-    "tagsEmpty": "Schlagwortübersicht",
+    "topicsEmpty": "Themenübersichtsseite",
+    "tagsEmpty": "Schlagwortübersichtsseite",
     "notFoundEyebrow": "Kennzeile",
     "notFoundHeading": "Überschrift",
     "notFoundSupportingText": "Begleittext",
@@ -560,11 +561,11 @@
     "bookmarksEmpty": "Leere Lesezeichen"
   },
   "voiceFieldHints": {
-    "blogListEmpty": "Die Blog-Übersicht, bevor etwas veröffentlicht ist",
+    "blogListEmpty": "Bevor etwas veröffentlicht ist",
     "topicEmpty": "Ein Thema ohne Beiträge",
     "tagEmpty": "Ein Schlagwort ohne Beiträge",
-    "topicsEmpty": "Die Themenübersicht, bevor es Themen gibt",
-    "tagsEmpty": "Die Schlagwortübersicht, bevor es Schlagwörter gibt",
+    "topicsEmpty": "Bevor es Themen gibt",
+    "tagsEmpty": "Bevor es Schlagwörter gibt",
     "notFoundEyebrow": "Kleine Zeile über der Überschrift",
     "notFoundHeading": "Auch der Titel im Browser-Tab",
     "notFoundSupportingText": "Unter der Überschrift",
