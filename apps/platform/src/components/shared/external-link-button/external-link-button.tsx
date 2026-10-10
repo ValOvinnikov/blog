@@ -15,7 +15,6 @@ export type TExternalLinkButtonProps = {
   className?: string;
   ariaLabel?: string;
   title?: string;
-  hasArrow?: boolean;
 };
 
 export const ExternalLinkButton = ({
@@ -26,7 +25,6 @@ export const ExternalLinkButton = ({
   className,
   ariaLabel,
   title,
-  hasArrow,
 }: TExternalLinkButtonProps) => {
   const t = useTranslations('externalLinkButton');
 
@@ -40,12 +38,8 @@ export const ExternalLinkButton = ({
       title={title}
     >
       {children}
-      {hasArrow && (
-        <>
-          <span aria-hidden="true"> ↗</span>{' '}
-          <span className={newTabHintVariants()}>{t('newTabHint')}</span>
-        </>
-      )}
+      <span aria-hidden="true"> ↗</span>{' '}
+      <span className={newTabHintVariants()}>{t('newTabHint')}</span>
     </a>
   );
 };
