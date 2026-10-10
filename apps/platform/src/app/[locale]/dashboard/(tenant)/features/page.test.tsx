@@ -7,14 +7,12 @@ import type { Session } from 'next-auth';
 import DashboardFeaturesPage from './page';
 
 const {
-  listMembershipsForUserMock,
-  listTenantsByIdsMock,
+  listMembershipsWithTenantsForUserMock,
   getAdminByUserIdMock,
   getSettingsFeaturesMock,
   getSiteConfigMock,
 } = vi.hoisted(() => ({
-  listMembershipsForUserMock: vi.fn(),
-  listTenantsByIdsMock: vi.fn(),
+  listMembershipsWithTenantsForUserMock: vi.fn(),
   getAdminByUserIdMock: vi.fn(),
   getSettingsFeaturesMock: vi.fn(),
   getSiteConfigMock: vi.fn(),
@@ -25,8 +23,9 @@ vi.mock('@platform/server/auth/auth');
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
-    memberships: { listMembershipsForUser: listMembershipsForUserMock },
-    tenants: { listTenantsByIds: listTenantsByIdsMock },
+    memberships: {
+      listMembershipsWithTenantsForUser: listMembershipsWithTenantsForUserMock,
+    },
     admins: { getAdminByUserId: getAdminByUserIdMock },
     settingsFeatures: { getSettingsFeatures: getSettingsFeaturesMock },
     siteConfig: { getSiteConfig: getSiteConfigMock },
@@ -35,23 +34,28 @@ vi.mock('@blog/db', async () => ({
 
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
+const membership = {
+  id: 'm-1',
+  userId: 'user-1',
+  tenantId: 'tenant-1',
+  role: 'OWNER',
+};
+
 const setup = customRenderAsync(DashboardFeaturesPage, {});
 
 describe(`<${DashboardFeaturesPage.name}/>`, () => {
   beforeEach(() => {
     authMock.mockReset();
-    listMembershipsForUserMock.mockReset();
-    listTenantsByIdsMock.mockReset();
+    listMembershipsWithTenantsForUserMock.mockReset();
     getAdminByUserIdMock.mockReset();
     getSettingsFeaturesMock.mockReset();
     getSiteConfigMock.mockReset();
 
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue(undefined);
-    listMembershipsForUserMock.mockResolvedValue([
-      { id: 'm-1', userId: 'user-1', tenantId: 'tenant-1', role: 'OWNER' },
+    listMembershipsWithTenantsForUserMock.mockResolvedValue([
+      { membership, tenant: { id: 'tenant-1', plan: 'FREE' } },
     ]);
-    listTenantsByIdsMock.mockResolvedValue([{ id: 'tenant-1', plan: 'FREE' }]);
   });
 
   it('redirects to sign-in without a session', async () => {

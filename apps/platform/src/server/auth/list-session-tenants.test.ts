@@ -6,13 +6,11 @@ import { auth } from './auth';
 import { listSessionTenants } from './list-session-tenants';
 
 const {
-  listMembershipsForUserMock,
-  listTenantsByIdsMock,
+  listMembershipsWithTenantsForUserMock,
   listTenantsMock,
   getAdminByUserIdMock,
 } = vi.hoisted(() => ({
-  listMembershipsForUserMock: vi.fn(),
-  listTenantsByIdsMock: vi.fn(),
+  listMembershipsWithTenantsForUserMock: vi.fn(),
   listTenantsMock: vi.fn(),
   getAdminByUserIdMock: vi.fn(),
 }));
@@ -22,11 +20,10 @@ vi.mock('./auth');
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
-    memberships: { listMembershipsForUser: listMembershipsForUserMock },
-    tenants: {
-      listTenantsByIds: listTenantsByIdsMock,
-      listTenants: listTenantsMock,
+    memberships: {
+      listMembershipsWithTenantsForUser: listMembershipsWithTenantsForUserMock,
     },
+    tenants: { listTenants: listTenantsMock },
     admins: { getAdminByUserId: getAdminByUserIdMock },
   },
 }));
@@ -36,12 +33,12 @@ const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 describe(listSessionTenants, () => {
   beforeEach(() => {
     authMock.mockReset();
-    listMembershipsForUserMock.mockReset();
-    listTenantsByIdsMock.mockReset();
+    listMembershipsWithTenantsForUserMock.mockReset();
     listTenantsMock.mockReset();
     getAdminByUserIdMock.mockReset();
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue(undefined);
+    listMembershipsWithTenantsForUserMock.mockResolvedValue([]);
   });
 
   it('redirects to sign-in without querying memberships when there is no session', async () => {
@@ -50,23 +47,19 @@ describe(listSessionTenants, () => {
     await expect(listSessionTenants()).rejects.toThrow('NEXT_REDIRECT');
 
     expect(redirect).toHaveBeenCalledWith('/api/auth/signin');
-    expect(listMembershipsForUserMock).not.toHaveBeenCalled();
+    expect(listMembershipsWithTenantsForUserMock).not.toHaveBeenCalled();
   });
 
   it('redirects to /workspace-pending for a non-SUPERADMIN with zero memberships', async () => {
-    listMembershipsForUserMock.mockResolvedValue([]);
-
     await expect(listSessionTenants()).rejects.toThrow('NEXT_REDIRECT');
 
     expect(redirect).toHaveBeenCalledWith('/workspace-pending');
-    expect(listTenantsByIdsMock).not.toHaveBeenCalled();
   });
 
   it.each(['ADMIN', 'MODERATOR'])(
     'redirects to /workspace-pending for a %s admins row with zero memberships',
     async (role) => {
       getAdminByUserIdMock.mockResolvedValue({ id: 'admin-1', role });
-      listMembershipsForUserMock.mockResolvedValue([]);
 
       await expect(listSessionTenants()).rejects.toThrow('NEXT_REDIRECT');
 
@@ -80,24 +73,45 @@ describe(listSessionTenants, () => {
       { id: 'm-1', userId: 'user-1', tenantId: 'tenant-1', role: 'OWNER' },
       { id: 'm-2', userId: 'user-1', tenantId: 'tenant-2', role: 'OWNER' },
     ];
-    listMembershipsForUserMock.mockResolvedValue(memberships);
     const tenants = [{ id: 'tenant-1' }, { id: 'tenant-2' }];
-    listTenantsByIdsMock.mockResolvedValue(tenants);
+    listMembershipsWithTenantsForUserMock.mockResolvedValue([
+      { membership: memberships[0], tenant: tenants[0] },
+      { membership: memberships[1], tenant: tenants[1] },
+    ]);
 
     const result = await listSessionTenants();
 
-    expect(listMembershipsForUserMock).toHaveBeenCalledWith('user-1');
-    expect(listTenantsByIdsMock).toHaveBeenCalledWith(['tenant-1', 'tenant-2']);
-    expect(result).toEqual({ userId: 'user-1', memberships, tenants });
+    expect(listMembershipsWithTenantsForUserMock).toHaveBeenCalledWith(
+      'user-1',
+    );
+    expect(result).toEqual({
+      userId: 'user-1',
+      admin: undefined,
+      memberships,
+      tenants,
+    });
     expect(redirect).not.toHaveBeenCalled();
+  });
+
+  it('returns the admins row it read alongside real memberships', async () => {
+    const admin = { id: 'admin-1', role: 'ADMIN' };
+    getAdminByUserIdMock.mockResolvedValue(admin);
+    listMembershipsWithTenantsForUserMock.mockResolvedValue([
+      {
+        membership: { id: 'm-1', userId: 'user-1', tenantId: 'tenant-1' },
+        tenant: { id: 'tenant-1' },
+      },
+    ]);
+
+    const result = await listSessionTenants();
+
+    expect(result.admin).toEqual(admin);
   });
 
   it('resolves every tenant for a SUPERADMIN, regardless of their own memberships', async () => {
     authMock.mockResolvedValue({ user: { id: 'super-1' } });
-    getAdminByUserIdMock.mockResolvedValue({
-      id: 'admin-1',
-      role: 'SUPERADMIN',
-    });
+    const admin = { id: 'admin-1', role: 'SUPERADMIN' };
+    getAdminByUserIdMock.mockResolvedValue(admin);
     const tenants = [
       { id: 'tenant-1' },
       { id: 'tenant-2' },
@@ -108,8 +122,8 @@ describe(listSessionTenants, () => {
     const result = await listSessionTenants();
 
     expect(listTenantsMock).toHaveBeenCalledWith({ includeArchived: true });
-    expect(listMembershipsForUserMock).not.toHaveBeenCalled();
     expect(result.userId).toBe('super-1');
+    expect(result.admin).toEqual(admin);
     expect(result.tenants).toEqual(tenants);
     expect(result.memberships).toHaveLength(3);
     expect(

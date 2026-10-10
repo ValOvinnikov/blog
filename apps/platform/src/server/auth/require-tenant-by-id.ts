@@ -22,15 +22,27 @@ export type TTenantByIdContext = {
  */
 export const requireTenantById = cache(
   async (tenantId: string): Promise<TTenantByIdContext> => {
-    const admin = await requireAdmin();
-    const tenant = await queries.tenants.getTenantById(tenantId, {
-      includeArchived: true,
-    });
+    // Settled, not `Promise.all`: a malformed id rejects the tenant read, and
+    // the gate's redirect or 404 must still win over that error.
+    const [adminResult, tenantResult] = await Promise.allSettled([
+      requireAdmin(),
+      queries.tenants.getTenantById(tenantId, { includeArchived: true }),
+    ]);
+
+    if (adminResult.status === 'rejected') {
+      throw adminResult.reason;
+    }
+
+    if (tenantResult.status === 'rejected') {
+      throw tenantResult.reason;
+    }
+
+    const tenant = tenantResult.value;
 
     if (!tenant) {
       notFound();
     }
 
-    return { tenant, admin };
+    return { tenant, admin: adminResult.value };
   },
 );

@@ -8,13 +8,11 @@ import type { Session } from 'next-auth';
 import DashboardStudioPage from './page';
 
 const {
-  listMembershipsForUserMock,
-  listTenantsByIdsMock,
+  listMembershipsWithTenantsForUserMock,
   getAdminByUserIdMock,
   studioMountMock,
 } = vi.hoisted(() => ({
-  listMembershipsForUserMock: vi.fn(),
-  listTenantsByIdsMock: vi.fn(),
+  listMembershipsWithTenantsForUserMock: vi.fn(),
   getAdminByUserIdMock: vi.fn(),
   studioMountMock: vi.fn(),
 }));
@@ -28,9 +26,10 @@ vi.mock('@platform/server/settings-features/get-enabled-capabilities', () => ({
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
-    memberships: { listMembershipsForUser: listMembershipsForUserMock },
+    memberships: {
+      listMembershipsWithTenantsForUser: listMembershipsWithTenantsForUserMock,
+    },
     tenants: {
-      listTenantsByIds: listTenantsByIdsMock,
       selectLiveLocales: vi.fn().mockReturnValue([]),
     },
     admins: { getAdminByUserId: getAdminByUserIdMock },
@@ -46,17 +45,20 @@ vi.mock('@blog/studio', () => ({
 
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
+const membership = {
+  id: 'm-1',
+  userId: 'user-1',
+  tenantId: 'tenant-1',
+  role: 'OWNER',
+};
+
 const setup = customRenderAsync(DashboardStudioPage, {});
 
 describe(`<${DashboardStudioPage.name}/>`, () => {
   beforeEach(() => {
     authMock.mockReset();
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    listMembershipsForUserMock.mockReset();
-    listMembershipsForUserMock.mockResolvedValue([
-      { id: 'm-1', userId: 'user-1', tenantId: 'tenant-1', role: 'OWNER' },
-    ]);
-    listTenantsByIdsMock.mockReset();
+    listMembershipsWithTenantsForUserMock.mockReset();
     getAdminByUserIdMock.mockReset();
     getAdminByUserIdMock.mockResolvedValue(undefined);
   });
@@ -67,18 +69,21 @@ describe(`<${DashboardStudioPage.name}/>`, () => {
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
 
     expect(redirect).toHaveBeenCalledWith('/api/auth/signin');
-    expect(listTenantsByIdsMock).not.toHaveBeenCalled();
+    expect(listMembershipsWithTenantsForUserMock).not.toHaveBeenCalled();
   });
 
   it("mounts Studio with the session tenant's coordinates and a locale-free basePath", async () => {
-    listTenantsByIdsMock.mockResolvedValue([
-      makeTenant({
-        id: 'tenant-1',
-        name: 'Acme Inc.',
-        sanityProjectId: 'proj-acme',
-        sanityDataset: 'production',
-        sanityReadTokenEncrypted: 'encrypted-token',
-      }),
+    listMembershipsWithTenantsForUserMock.mockResolvedValue([
+      {
+        membership,
+        tenant: makeTenant({
+          id: 'tenant-1',
+          name: 'Acme Inc.',
+          sanityProjectId: 'proj-acme',
+          sanityDataset: 'production',
+          sanityReadTokenEncrypted: 'encrypted-token',
+        }),
+      },
     ]);
 
     await setup();

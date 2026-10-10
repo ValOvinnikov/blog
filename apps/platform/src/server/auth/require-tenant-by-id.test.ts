@@ -50,7 +50,7 @@ describe(requireTenantById, () => {
     getAdminByUserIdMock.mockResolvedValue(admin);
   });
 
-  it('redirects to sign-in without querying admins or the tenant when signed out', async () => {
+  it('redirects to sign-in without querying admins when signed out', async () => {
     authMock.mockResolvedValue(null);
 
     await expect(requireTenantById('tenant-1')).rejects.toThrow(
@@ -59,10 +59,20 @@ describe(requireTenantById, () => {
 
     expect(redirect).toHaveBeenCalledWith('/api/auth/signin');
     expect(getAdminByUserIdMock).not.toHaveBeenCalled();
-    expect(getTenantByIdMock).not.toHaveBeenCalled();
   });
 
-  it('404s without querying the tenant when the signed-in user has no admins row', async () => {
+  it('redirects to sign-in when signed out, even for a malformed tenant id', async () => {
+    authMock.mockResolvedValue(null);
+    getTenantByIdMock.mockRejectedValue(new Error('invalid input syntax'));
+
+    await expect(requireTenantById('not-a-uuid')).rejects.toThrow(
+      'NEXT_REDIRECT',
+    );
+
+    expect(redirect).toHaveBeenCalledWith('/api/auth/signin');
+  });
+
+  it('404s when the signed-in user has no admins row', async () => {
     getAdminByUserIdMock.mockResolvedValue(undefined);
 
     await expect(requireTenantById('tenant-1')).rejects.toThrow(
@@ -71,7 +81,23 @@ describe(requireTenantById, () => {
 
     expect(getAdminByUserIdMock).toHaveBeenCalledWith('user-1');
     expect(redirect).not.toHaveBeenCalled();
-    expect(getTenantByIdMock).not.toHaveBeenCalled();
+  });
+
+  it('404s a signed-in user with no admins row, even for a malformed tenant id', async () => {
+    getAdminByUserIdMock.mockResolvedValue(undefined);
+    getTenantByIdMock.mockRejectedValue(new Error('invalid input syntax'));
+
+    await expect(requireTenantById('not-a-uuid')).rejects.toThrow(
+      'NEXT_NOT_FOUND',
+    );
+  });
+
+  it('surfaces a failed tenant read for an admin', async () => {
+    getTenantByIdMock.mockRejectedValue(new Error('invalid input syntax'));
+
+    await expect(requireTenantById('not-a-uuid')).rejects.toThrow(
+      'invalid input syntax',
+    );
   });
 
   it('404s for an unknown tenant id', async () => {

@@ -1,8 +1,6 @@
 import { WorkspacePendingView } from '@platform/components/features/layout/workspace-pending-view';
-import { auth } from '@platform/server/auth/auth';
-import { adminRoutes } from '@platform/utils/routes/routes';
+import { requireSessionUserId } from '@platform/server/auth/require-session-user-id';
 import type { Metadata } from 'next';
-import { redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -15,11 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
  * request redirects to sign-in before any status copy renders.
  */
 export default async function WorkspacePendingPage() {
-  const session = await auth();
-
-  if (!session?.user?.id) {
-    redirect(adminRoutes.signIn());
-  }
+  await requireSessionUserId();
 
   return <WorkspacePendingView />;
 }

@@ -1,18 +1,20 @@
 import 'server-only';
 
 import { queries } from '@blog/db';
+import { ADMIN_ROLE } from '@blog/db/constants';
+import type { TAdmin } from '@blog/db/schema/admins';
 import type { TMembership } from '@blog/db/schema/memberships';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
 import { cache } from 'react';
 
-import { auth } from './auth';
 import { buildVirtualAdminMembership } from './build-virtual-admin-membership';
-import { isSuperAdmin } from './is-super-admin';
+import { requireSessionUserId } from './require-session-user-id';
 
 export type TSessionTenants = {
   userId: string;
+  admin: TAdmin | undefined;
   memberships: TMembership[];
   tenants: TTenant[];
 };
@@ -29,20 +31,20 @@ export type TSessionTenants = {
  * per request instead of each resolving it separately.
  */
 export const listSessionTenants = cache(async (): Promise<TSessionTenants> => {
-  const session = await auth();
-  const userId = session?.user?.id;
+  const userId = await requireSessionUserId();
+  const [admin, membershipsWithTenants] = await Promise.all([
+    queries.admins.getAdminByUserId(userId),
+    queries.memberships.listMembershipsWithTenantsForUser(userId),
+  ]);
 
-  if (!userId) {
-    redirect(adminRoutes.signIn());
-  }
-
-  if (await isSuperAdmin(userId)) {
+  if (admin?.role === ADMIN_ROLE.SUPERADMIN) {
     const tenants = await queries.tenants.listTenants({
       includeArchived: true,
     });
 
     return {
       userId,
+      admin,
       memberships: tenants.map((tenant) =>
         buildVirtualAdminMembership(userId, tenant.id),
       ),
@@ -50,15 +52,14 @@ export const listSessionTenants = cache(async (): Promise<TSessionTenants> => {
     };
   }
 
-  const memberships = await queries.memberships.listMembershipsForUser(userId);
-
-  if (memberships.length === 0) {
+  if (membershipsWithTenants.length === 0) {
     redirect(adminRoutes.workspacePending());
   }
 
-  const tenants = await queries.tenants.listTenantsByIds(
-    memberships.map((membership) => membership.tenantId),
-  );
-
-  return { userId, memberships, tenants };
+  return {
+    userId,
+    admin,
+    memberships: membershipsWithTenants.map(({ membership }) => membership),
+    tenants: membershipsWithTenants.map(({ tenant }) => tenant),
+  };
 });
