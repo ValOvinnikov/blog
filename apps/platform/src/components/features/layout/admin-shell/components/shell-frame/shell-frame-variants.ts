@@ -2,7 +2,11 @@ import { tv } from '@platform/utils/tv/tv';
 
 export const shellFrameVariants = tv({
   slots: {
-    root: ['flex min-h-dvh flex-col bg-admin-bg text-admin-text md:flex-row'],
+    root: [
+      'flex min-h-dvh flex-col bg-admin-bg text-admin-text md:flex-row',
+      // 68px clears the sticky topbar when the document scrolls to a target.
+      '[html:has(&)]:scroll-pt-[68px]',
+    ],
     main: ['flex min-h-0 min-w-0 flex-1 flex-col overflow-x-clip'],
     content: ['flex-1'],
   },

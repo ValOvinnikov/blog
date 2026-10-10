@@ -14,7 +14,7 @@ import { useTranslations } from 'next-intl';
 import { useEffect, useEffectEvent, useState, type ReactNode } from 'react';
 
 import { DraftRecoveryBanner } from './components/draft-recovery-banner/draft-recovery-banner';
-import { SaveBar } from './components/save-bar/save-bar';
+import { SaveBar, type TInvalidFields } from './components/save-bar/save-bar';
 import { settingsFormShellVariants } from './settings-form-shell-variants';
 import {
   useSettingsDraft,
@@ -30,7 +30,7 @@ export type TSettingsFormShellProps<TValues> = {
   onDiscard: () => void;
   changeCount: number;
   changesByLanguage?: TLanguageChangeCount[];
-  invalidFieldIds?: string[];
+  invalidFields?: TInvalidFields;
   isPending: boolean;
   archivedAt?: Date;
   archivedNoticeId: string;
@@ -41,6 +41,8 @@ export type TSettingsFormShellProps<TValues> = {
   headerActions?: ReactNode;
   children: ReactNode;
 };
+
+const NO_INVALID_FIELDS: TInvalidFields = { ids: [] };
 
 const isSaveShortcut = (event: KeyboardEvent) =>
   (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's';
@@ -54,7 +56,7 @@ export const SettingsFormShell = <TValues,>({
   onDiscard,
   changeCount,
   changesByLanguage = [],
-  invalidFieldIds = [],
+  invalidFields = NO_INVALID_FIELDS,
   isPending,
   archivedAt,
   archivedNoticeId,
@@ -190,7 +192,7 @@ export const SettingsFormShell = <TValues,>({
         <SaveBar
           changeCount={changeCount}
           breakdown={breakdown}
-          invalidFieldIds={invalidFieldIds}
+          invalidFields={invalidFields}
           saveButtonLabel={saveButtonLabel}
           savingButtonLabel={savingButtonLabel}
           isPending={isPending}

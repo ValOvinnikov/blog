@@ -40,6 +40,28 @@ export const VOICE_SURFACES_IN_PAGE_ORDER = [
 export const voiceFieldsOf = (surface: TVoiceSurface): TVoiceField[] =>
   VOICE_FIELDS.filter((field) => field.surface === surface);
 
+export type TVoiceFieldError = {
+  locale: TLocaleIsoCode;
+  fieldId: TVoiceFieldId;
+};
+
+const VOICE_FIELDS_IN_PAGE_ORDER =
+  VOICE_SURFACES_IN_PAGE_ORDER.flatMap(voiceFieldsOf);
+
+export const voiceErrorsInOrder = (
+  errors: TVoiceFieldErrorsByLocale,
+  selectedLocale: TLocaleIsoCode,
+  liveLocales: TLocaleIsoCode[],
+): TVoiceFieldError[] =>
+  [
+    selectedLocale,
+    ...liveLocales.filter((locale) => locale !== selectedLocale),
+  ].flatMap((locale) =>
+    VOICE_FIELDS_IN_PAGE_ORDER.filter(
+      ({ id }) => errors[locale]?.[id] !== undefined,
+    ).map(({ id }) => ({ locale, fieldId: id })),
+  );
+
 export const voiceFieldInputId = (
   idPrefix: string,
   id: TVoiceFieldId,
