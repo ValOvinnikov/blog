@@ -48,7 +48,6 @@ export const TenantOverviewView = ({
   const {
     provisioningStatus,
     provisioningSteps,
-    effectiveProvisioningStatus,
     stepStatuses,
     isOverallFailed,
     isProvisioningRunning,
@@ -101,7 +100,7 @@ export const TenantOverviewView = ({
         tenant={tenant}
         fieldLocks={computeTenantFieldLocks(
           provisioningSteps,
-          effectiveProvisioningStatus,
+          provisioningStatus,
         )}
         ownerEmail={ownerEmail}
         archivedNoticeId={archivedNoticeId}

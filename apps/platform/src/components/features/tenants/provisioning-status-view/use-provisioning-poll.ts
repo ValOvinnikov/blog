@@ -21,18 +21,13 @@ import {
   classifyProvisioningError,
   type TProvisioningErrorKind,
 } from '@platform/utils/provisioning-error/provisioning-error';
+import { useDocumentVisible } from '@platform/utils/use-document-visible/use-document-visible';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useState, useEffect, useRef, useTransition } from 'react';
 
 export const STEP_ORDER = CORE_PROVISIONING_STEPS;
 
-// Highest-priority status wins: any FAILED step outranks a RUNNING one, which
-// outranks a still-IDLE one, so the overall status always reflects the most
-// urgent thing happening across the whole run rather than the last step
-// polled. `provisioningStatus` itself can't be used for this — the DB column
-// only settles to READY/FAILED once the *last* step finishes, so a failure
-// partway through the sequence would otherwise never surface here.
 const OVERALL_STATUS_PRIORITY: TTenantProvisioningStepStatus[] = [
   TENANT_PROVISIONING_STEP_STATUS.FAILED,
   TENANT_PROVISIONING_STEP_STATUS.RUNNING,
@@ -41,45 +36,9 @@ const OVERALL_STATUS_PRIORITY: TTenantProvisioningStepStatus[] = [
 ];
 
 const STEP_POLL_INTERVAL_MS = 4000;
-// A GitHub Actions dispatch-to-runner-pickup normally resolves in well under
-// a minute, but during an outage, a disabled workflow, or a permissions
-// failure it may never resolve at all — this caps how long a retry/start
-// keeps polling against an unchanged pre-retry snapshot before giving up on
-// it, comfortably exceeding realistic pickup latency.
-const RETRY_BASELINE_MAX_TICKS = 75; // ~5 minutes at STEP_POLL_INTERVAL_MS
-
-const isTerminalProvisioningStatus = (
-  status: TTenantProvisioningStatus | null,
-): boolean => {
-  return (
-    status === TENANT_PROVISIONING_STATUS.READY ||
-    status === TENANT_PROVISIONING_STATUS.FAILED
-  );
-};
-
-const shouldContinuePolling = (
-  status: TTenantProvisioningStatus | null,
-  steps: TTenantProvisioningState | null,
-): boolean => {
-  if (isTerminalProvisioningStatus(status)) {
-    return false;
-  }
-
-  const statuses = stepStatusesFor(steps);
-  const hasRunningStep = statuses.includes(
-    TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-  );
-  const hasFailedStep = statuses.includes(
-    TENANT_PROVISIONING_STEP_STATUS.FAILED,
-  );
-
-  // A failed step with nothing else running means the run is stuck and
-  // nothing further will happen until an operator retries —
-  // `provisioningStatus` never reflects this on its own (it only settles to
-  // FAILED once the *last* step fails), so it has to be read off the steps
-  // directly rather than off the column.
-  return !(hasFailedStep && !hasRunningStep);
-};
+// Outlasts the workflow's 20-minute job timeout plus runner pickup, so only a
+// runner that stopped reporting reaches it.
+const MAX_POLL_TICKS = 375; // 25 minutes of visible polling at STEP_POLL_INTERVAL_MS
 
 const stepStatusesFor = (
   steps: TTenantProvisioningState | null,
@@ -94,11 +53,6 @@ const stepUpdatedAtFor = (
 ): (string | undefined)[] =>
   STEP_ORDER.map((stepKey) => steps?.[stepKey]?.updatedAt);
 
-const stepStatusesEqual = (
-  a: TTenantProvisioningStepStatus[],
-  b: TTenantProvisioningStepStatus[],
-): boolean => a.length === b.length && a.every((status, i) => status === b[i]);
-
 type TDispatchNoticeKind =
   'not-found' | 'archived' | 'already-in-progress' | 'other';
 
@@ -110,14 +64,12 @@ export type TUseProvisioningPollResult = {
   handleRetry: () => void;
   provisioningStatus: TTenantProvisioningStatus | null;
   provisioningSteps: TTenantProvisioningState | null;
-  effectiveProvisioningStatus: TTenantProvisioningStatus | null;
   stepStatuses: TTenantProvisioningStepStatus[];
   displayStepStatuses: TTenantProvisioningStepStatus[];
   stepUpdatedAt: (string | undefined)[];
   provisioningRun: TProvisioningRun | undefined;
   allIdle: boolean;
   isProvisioningRunning: boolean;
-  overallStepStatus: TTenantProvisioningStepStatus;
   isOverallFailed: boolean;
   displayOverallStatus: Exclude<TTenantProvisioningStepStatus, 'FAILED'>;
   failedStepError: string | undefined;
@@ -131,9 +83,8 @@ export const useProvisioningPoll = (
   const router = useRouter();
   const toast = useToast();
   const t = useTranslations('provisioningStatusView');
-  // Non-null while the current pollErrorWarning toast is showing — lets a
-  // later recovering tick dismiss the exact toast a failing one raised,
-  // rather than leaving it to its own auto-dismiss timer.
+  // Non-null while the current pollErrorWarning toast is showing, so a
+  // recovering tick dismisses the exact toast a failing one raised.
   const pollErrorToastIdRef = useRef<string | null>(null);
   const [isRetrying, setIsRetrying] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
@@ -142,57 +93,41 @@ export const useProvisioningPoll = (
   >(undefined);
   const [, startTransition] = useTransition();
   const [renderedTenant, setRenderedTenant] = useState(tenant);
-  const [provisioningStatus, setProvisioningStatus] =
+  const [polledProvisioningStatus, setPolledProvisioningStatus] =
     useState<TTenantProvisioningStatus | null>(tenant.provisioningStatus);
   const [provisioningSteps, setProvisioningSteps] =
     useState<TTenantProvisioningState | null>(tenant.provisioningSteps);
-  // The poll loop's own on/off switch — only a poll tick may turn it off.
-  const [isPollingActive, setIsPollingActive] = useState(() =>
-    shouldContinuePolling(tenant.provisioningStatus, tenant.provisioningSteps),
-  );
-  // Non-null while waiting to see the retried/started workflow actually take
-  // effect: the snapshot of step statuses as of the moment Retry/Start was
-  // pressed. A dispatch only acknowledges GitHub's receipt of the request,
-  // not a runner picking it up — often well past one poll interval — so the
-  // very next tick usually still reflects this same pre-retry snapshot. The
-  // poll tick keeps polling active against an unchanged snapshot and only
-  // resumes normal stop/continue decisions once the fetched steps genuinely
-  // differ from it.
-  const [pendingRetryBaseline, setPendingRetryBaseline] = useState<
-    TTenantProvisioningStepStatus[] | null
-  >(null);
-  // Consecutive poll ticks that have matched `pendingRetryBaseline` so far —
-  // a ref rather than state because it must not itself trigger a re-render
-  // or reset the poll interval; it only gates whether the cap below has
-  // been reached. Reset whenever a fresh baseline is recorded.
-  const pendingRetryTicksRef = useRef(0);
+  const [pollTicks, setPollTicks] = useState(0);
+  const isVisible = useDocumentVisible();
 
-  // A fresh `tenant` argument (e.g. after a Retry, Start, or details save's
-  // own `router.refresh()`) should win over whatever polling last saw —
-  // adjusted during render, per React's guidance for state derived from
-  // props, rather than in an effect.
   if (tenant !== renderedTenant) {
     setRenderedTenant(tenant);
-    setProvisioningStatus(tenant.provisioningStatus);
+    setPolledProvisioningStatus(tenant.provisioningStatus);
     setProvisioningSteps(tenant.provisioningSteps);
-    setIsPollingActive(
-      (prev) =>
-        prev ||
-        shouldContinuePolling(
-          tenant.provisioningStatus,
-          tenant.provisioningSteps,
-        ),
-    );
+    setPollTicks(0);
   }
 
+  // The status only turns PROVISIONING once the dispatch's own round trip
+  // resolves, so the in-flight click stands in for it until then.
+  const isDispatchPending = isStarting || isRetrying;
+  const provisioningStatus = isDispatchPending
+    ? TENANT_PROVISIONING_STATUS.PROVISIONING
+    : polledProvisioningStatus;
+  const isProvisioningRunning =
+    provisioningStatus === TENANT_PROVISIONING_STATUS.PROVISIONING;
+  const shouldPoll =
+    isProvisioningRunning && isVisible && pollTicks < MAX_POLL_TICKS;
+
   useEffect(() => {
-    if (!isPollingActive) {
+    if (!shouldPoll) {
       return;
     }
 
     let cancelled = false;
 
     const intervalId = setInterval(() => {
+      setPollTicks((ticks) => ticks + 1);
+
       void getTenantProvisioningStatusAction(tenant.id)
         .then((result) => {
           if (cancelled || !result) {
@@ -202,49 +137,10 @@ export const useProvisioningPoll = (
             toast.dismiss(pollErrorToastIdRef.current);
             pollErrorToastIdRef.current = null;
           }
-          setProvisioningStatus(result.provisioningStatus);
+          setPolledProvisioningStatus(result.provisioningStatus);
           setProvisioningSteps(result.provisioningSteps);
-
-          const freshStatuses = stepStatusesFor(result.provisioningSteps);
-          if (
-            pendingRetryBaseline &&
-            stepStatusesEqual(freshStatuses, pendingRetryBaseline)
-          ) {
-            pendingRetryTicksRef.current += 1;
-            if (pendingRetryTicksRef.current < RETRY_BASELINE_MAX_TICKS) {
-              // Unchanged since Retry/Start was pressed — the dispatch only
-              // confirms GitHub received the request, not that a runner has
-              // picked it up yet, so this read alone can't tell "never"
-              // apart from "not yet". Keep watching rather than stop on a
-              // snapshot that predates the retry, up to the cap above.
-              return;
-            }
-            // Cap reached — that alone is proof nothing is happening, so
-            // stop unconditionally rather than deferring to
-            // `shouldContinuePolling`, which never stops on an all-IDLE
-            // snapshot (the pre-Start case) and would otherwise poll
-            // forever.
-            setPendingRetryBaseline(null);
-            setIsPollingActive(false);
-            return;
-          }
-
-          setPendingRetryBaseline(null);
-          setIsPollingActive(
-            shouldContinuePolling(
-              result.provisioningStatus,
-              result.provisioningSteps,
-            ),
-          );
         })
         .catch(() => {
-          // A rejected tick (e.g. an expired-session redirect thrown by
-          // `requireAdmin()`) must not silently kill polling — the interval
-          // itself already retries on its own next tick; this only makes
-          // the stall visible instead of leaving the last-known state
-          // looking current. A toast — not layout — carries this: it's
-          // transient and self-correcting, and one already showing isn't
-          // replaced by a repeat.
           if (cancelled) {
             return;
           }
@@ -260,7 +156,7 @@ export const useProvisioningPoll = (
       cancelled = true;
       clearInterval(intervalId);
     };
-  }, [tenant.id, isPollingActive, pendingRetryBaseline, toast, t]);
+  }, [tenant.id, shouldPoll, toast, t]);
 
   const stepStatuses = stepStatusesFor(provisioningSteps);
   const stepUpdatedAt = stepUpdatedAtFor(provisioningSteps);
@@ -268,31 +164,13 @@ export const useProvisioningPoll = (
   const allIdle = stepStatuses.every(
     (status) => status === TENANT_PROVISIONING_STEP_STATUS.IDLE,
   );
-  // `OVERALL_STATUS_PRIORITY` covers every possible step status, so this
-  // always matches — there is no real "not found" case to fall back from.
+  // `OVERALL_STATUS_PRIORITY` covers every step status, so this always matches.
   const overallStepStatus = OVERALL_STATUS_PRIORITY.find((candidate) =>
     stepStatuses.includes(candidate),
   ) as TTenantProvisioningStepStatus;
 
-  // A dispatch has been requested but the runner hasn't reported a step yet
-  // — `provisioningStatus` itself won't reflect this until the Server
-  // Action's own `beginTenantProvisioning` call resolves and a refresh (or
-  // poll) picks it up, which can lag a slow GitHub dispatch by seconds.
-  // Treating the in-flight click itself as "running" is what makes the
-  // badge, the field locks, and the Start button react immediately instead
-  // of only once the round trip completes.
-  const isDispatchPending = isStarting || isRetrying;
-  const effectiveProvisioningStatus = isDispatchPending
-    ? TENANT_PROVISIONING_STATUS.PROVISIONING
-    : provisioningStatus;
-  const isProvisioningRunning =
-    effectiveProvisioningStatus === TENANT_PROVISIONING_STATUS.PROVISIONING;
-
-  // `beginTenantProvisioning` deliberately never clears a step's FAILED entry
-  // when it admits a retry — it isn't overwritten until `run.ts`'s loop
-  // reaches that step again. While a run is genuinely live, that leftover
-  // FAILED entry must not read as a current failure, so it's masked back to
-  // IDLE rather than re-deriving per-step recency client-side.
+  // A retry leaves the previous run's FAILED entry in place until the runner
+  // reaches that step again, so it must not read as a current failure.
   const displayStepStatuses = isProvisioningRunning
     ? stepStatuses.map((status) =>
         status === TENANT_PROVISIONING_STEP_STATUS.FAILED
@@ -301,12 +179,9 @@ export const useProvisioningPoll = (
       )
     : stepStatuses;
 
-  // `effectiveProvisioningStatus` is the authoritative "is this failure
-  // current" signal (it settles to FAILED the moment any step actually
-  // fails) — a stale per-step FAILED entry alone must not count.
   const isOverallFailed =
     overallStepStatus === TENANT_PROVISIONING_STEP_STATUS.FAILED &&
-    effectiveProvisioningStatus === TENANT_PROVISIONING_STATUS.FAILED;
+    provisioningStatus === TENANT_PROVISIONING_STATUS.FAILED;
   const failedStepError = isOverallFailed
     ? STEP_ORDER.map((stepKey) => provisioningSteps?.[stepKey]).find(
         (stepState) =>
@@ -320,9 +195,6 @@ export const useProvisioningPoll = (
   const ownerElevationOutcome =
     provisioningSteps?.[TENANT_PROVISIONING_STEP.OWNER_ELEVATION]?.detail;
 
-  // A run in progress always displays as RUNNING, regardless of `allIdle` —
-  // a stale FAILED step can coexist with a genuinely live run (this is the
-  // retry-in-progress case), and must not keep the badge stuck on it.
   const displayOverallStatus = (
     isProvisioningRunning
       ? TENANT_PROVISIONING_STEP_STATUS.RUNNING
@@ -332,34 +204,20 @@ export const useProvisioningPoll = (
   const runProvisioningDispatch = (setPending: (pending: boolean) => void) => {
     setDispatchNotice(undefined);
     setPending(true);
-    // Force polling back on immediately, and record what the steps look
-    // like right now — the re-dispatched workflow hasn't actually started
-    // yet, so the poll tick needs this snapshot to recognise "no change
-    // observed yet" and keep watching instead of stopping again on it.
-    setIsPollingActive(true);
-    setPendingRetryBaseline(stepStatuses);
-    pendingRetryTicksRef.current = 0;
+    setPollTicks(0);
     startTransition(async () => {
       const result = await retryProvisioningStepAction(tenant.id);
 
-      if (result.outcome === 'dispatched') {
+      if (
+        result.outcome === 'dispatched' ||
+        result.outcome === 'already-in-progress'
+      ) {
+        setPolledProvisioningStatus(TENANT_PROVISIONING_STATUS.PROVISIONING);
         router.refresh();
-      } else if (result.outcome === 'already-in-progress') {
-        // A run is genuinely in flight server-side — keep watching the
-        // pending-retry baseline (unlike the real failures below) and still
-        // refresh, but tell the operator why this click didn't start a new
-        // one instead of leaving the button looking broken.
-        router.refresh();
-        setDispatchNotice('already-in-progress');
-      } else {
-        // Nothing was actually dispatched (or it was reverted server-side)
-        // — stop waiting for a change that predates a retry that never
-        // took effect, and let the operator see and act on the failure.
-        setPendingRetryBaseline(null);
+      }
+      if (result.outcome !== 'dispatched') {
         setDispatchNotice(
-          result.outcome === 'not-found' || result.outcome === 'archived'
-            ? result.outcome
-            : 'other',
+          result.outcome === 'dispatch-error' ? 'other' : result.outcome,
         );
       }
 
@@ -378,14 +236,12 @@ export const useProvisioningPoll = (
     handleRetry,
     provisioningStatus,
     provisioningSteps,
-    effectiveProvisioningStatus,
     stepStatuses,
     displayStepStatuses,
     stepUpdatedAt,
     provisioningRun,
     allIdle,
     isProvisioningRunning,
-    overallStepStatus,
     isOverallFailed,
     displayOverallStatus,
     failedStepError,

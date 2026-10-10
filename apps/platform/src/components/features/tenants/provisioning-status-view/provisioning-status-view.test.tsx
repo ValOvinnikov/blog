@@ -23,7 +23,6 @@ const render = renderWithIntl;
 
 const STEP_POLL_INTERVAL_MS = 4000;
 const TOAST_EXIT_BUFFER_MS = 1000;
-const RETRY_BASELINE_MAX_TICKS = 75;
 
 const {
   retryProvisioningStepActionMock,
@@ -924,45 +923,6 @@ describe(ProvisioningStatusView, () => {
       expect(getTenantProvisioningStatusActionMock).not.toHaveBeenCalled();
     });
 
-    it('stops polling once an early step fails with nothing else running, even though provisioningStatus stays non-terminal', async () => {
-      const tenant = makeTenant({
-        provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
-        provisioningSteps: {
-          ...idleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-          },
-        },
-      });
-      getTenantProvisioningStatusActionMock.mockResolvedValue({
-        provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
-        provisioningSteps: {
-          ...idleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-            error: 'fetch failed',
-          },
-        },
-      });
-      render(
-        <ProvisioningStatusView
-          tenant={tenant}
-          ownerEmail="owner@example.com"
-        />,
-      );
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
-      });
-      expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledTimes(1);
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS * 3);
-      });
-
-      expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledTimes(1);
-    });
-
     it('keeps polling, unchanged, while a step is RUNNING', async () => {
       const tenant = makeTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
@@ -996,7 +956,7 @@ describe(ProvisioningStatusView, () => {
       expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledTimes(3);
     });
 
-    it('keeps polling across a Retry even when the first post-retry tick still reflects the pre-retry snapshot', async () => {
+    it('keeps polling through a Retry while the runner has not reported a step yet', async () => {
       const failedSteps = {
         ...idleProvisioningSteps(),
         [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
@@ -1021,11 +981,11 @@ describe(ProvisioningStatusView, () => {
       expect(getTenantProvisioningStatusActionMock).not.toHaveBeenCalled();
 
       getTenantProvisioningStatusActionMock.mockResolvedValueOnce({
-        provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
         provisioningSteps: failedSteps,
       });
       getTenantProvisioningStatusActionMock.mockResolvedValue({
-        provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
         provisioningSteps: {
           ...idleProvisioningSteps(),
           [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
@@ -1051,136 +1011,6 @@ describe(ProvisioningStatusView, () => {
       expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledTimes(2);
       const sidebar = screen.getByTestId('provisioning-steps');
       expect(within(sidebar).getByText('Running…')).toBeVisible();
-    });
-
-    it('stops polling once the retry-baseline wait is exhausted, even though the fetched steps never change', async () => {
-      const failedSteps = {
-        ...idleProvisioningSteps(),
-        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-          error: 'fetch failed',
-        },
-      };
-      const tenant = makeTenant({
-        provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
-        provisioningSteps: failedSteps,
-      });
-      getTenantProvisioningStatusActionMock.mockResolvedValue({
-        provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
-        provisioningSteps: failedSteps,
-      });
-      render(
-        <ProvisioningStatusView
-          tenant={tenant}
-          ownerEmail="owner@example.com"
-        />,
-      );
-
-      await act(async () => {
-        fireEvent.click(
-          screen.getByRole('button', { name: 'Retry provisioning' }),
-        );
-      });
-
-      for (let tick = 0; tick < RETRY_BASELINE_MAX_TICKS + 5; tick += 1) {
-        await act(async () => {
-          await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
-        });
-      }
-
-      expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledTimes(
-        RETRY_BASELINE_MAX_TICKS,
-      );
-    });
-
-    it('stops polling once the retry-baseline wait is exhausted after Start, when every step stays idle', async () => {
-      const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
-      getTenantProvisioningStatusActionMock.mockResolvedValue({
-        provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
-        provisioningSteps: idleProvisioningSteps(),
-      });
-      render(
-        <ProvisioningStatusView
-          tenant={tenant}
-          ownerEmail="owner@example.com"
-        />,
-      );
-
-      await act(async () => {
-        fireEvent.click(
-          screen.getByRole('button', { name: 'Start provisioning' }),
-        );
-      });
-
-      for (let tick = 0; tick < RETRY_BASELINE_MAX_TICKS + 5; tick += 1) {
-        await act(async () => {
-          await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
-        });
-      }
-
-      expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledTimes(
-        RETRY_BASELINE_MAX_TICKS,
-      );
-    });
-
-    it('clears the retry baseline as soon as a real transition arrives, without waiting for the cap', async () => {
-      const failedSteps = {
-        ...idleProvisioningSteps(),
-        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-          status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-          error: 'fetch failed',
-        },
-      };
-      const tenant = makeTenant({
-        provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
-        provisioningSteps: failedSteps,
-      });
-      render(
-        <ProvisioningStatusView
-          tenant={tenant}
-          ownerEmail="owner@example.com"
-        />,
-      );
-
-      getTenantProvisioningStatusActionMock.mockResolvedValue({
-        provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
-        provisioningSteps: failedSteps,
-      });
-
-      await act(async () => {
-        fireEvent.click(
-          screen.getByRole('button', { name: 'Retry provisioning' }),
-        );
-      });
-
-      for (let tick = 0; tick < 3; tick += 1) {
-        await act(async () => {
-          await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
-        });
-      }
-      expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledTimes(3);
-
-      getTenantProvisioningStatusActionMock.mockResolvedValue({
-        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
-        provisioningSteps: {
-          ...idleProvisioningSteps(),
-          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-          },
-        },
-      });
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
-      });
-
-      const sidebar = screen.getByTestId('provisioning-steps');
-      expect(within(sidebar).getByText('Running…')).toBeVisible();
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS * 2);
-      });
-      expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledTimes(6);
     });
 
     it('stops polling once the component unmounts', async () => {

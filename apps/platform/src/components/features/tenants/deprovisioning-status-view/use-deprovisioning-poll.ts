@@ -16,7 +16,8 @@ import {
   classifyProvisioningError,
   type TProvisioningErrorKind,
 } from '@platform/utils/provisioning-error/provisioning-error';
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { useDocumentVisible } from '@platform/utils/use-document-visible/use-document-visible';
+import { useEffect, useRef, useState } from 'react';
 
 export const STEP_ORDER = CORE_DEPROVISIONING_STEPS;
 
@@ -52,15 +53,6 @@ const deriveOverallStatus = (
     TENANT_PROVISIONING_STEP_STATUS.IDLE
   );
 };
-
-const subscribeToVisibilityChange = (onChange: () => void) => {
-  document.addEventListener('visibilitychange', onChange);
-  return () => document.removeEventListener('visibilitychange', onChange);
-};
-
-const isDocumentVisible = () => document.visibilityState !== 'hidden';
-
-const isDocumentVisibleOnServer = () => true;
 
 const isTerminalOverallStatus = (
   status: TTenantProvisioningStepStatus,
@@ -113,11 +105,7 @@ export const useDeprovisioningPoll = (
   const [polledDeprovisioningSteps, setPolledDeprovisioningSteps] =
     useState<TTenantDeprovisioningState | null>(tenant.deprovisioningSteps);
   const pollTicksRef = useRef(0);
-  const isVisible = useSyncExternalStore(
-    subscribeToVisibilityChange,
-    isDocumentVisible,
-    isDocumentVisibleOnServer,
-  );
+  const isVisible = useDocumentVisible();
 
   if (tenant !== renderedTenant) {
     setRenderedTenant(tenant);
