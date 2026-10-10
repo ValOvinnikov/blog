@@ -1,4 +1,4 @@
-import { PREVIEW_WIDTH } from '@blog/config';
+import { PREVIEW_WIDTH } from '@platform/constants/preview';
 import { tv } from '@platform/utils/tv/tv';
 
 export const emailTemplatePreviewVariants = tv({

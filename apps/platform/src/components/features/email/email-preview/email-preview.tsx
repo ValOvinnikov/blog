@@ -1,12 +1,13 @@
 'use client';
 
-import { ICONS, PREVIEW_WIDTH, SIZE, type TPreviewWidth } from '@blog/config';
+import { ICONS, SIZE } from '@blog/config';
 import { EmailTemplatePreview } from '@platform/components/features/email/email-template-preview';
 import { Button } from '@platform/components/shared/button';
 import { DetailList } from '@platform/components/shared/detail-list';
 import { Icon } from '@platform/components/shared/icon';
 import { PreviewFrame } from '@platform/components/shared/preview-frame';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
+import { PREVIEW_WIDTH, type TPreviewWidth } from '@platform/constants/preview';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 

@@ -1,4 +1,4 @@
-import { PREVIEW_WIDTH, type TPreviewWidth } from '@blog/config';
+import { PREVIEW_WIDTH, type TPreviewWidth } from '@platform/constants/preview';
 
 import { emailTemplatePreviewVariants } from './email-template-preview-variants';
 

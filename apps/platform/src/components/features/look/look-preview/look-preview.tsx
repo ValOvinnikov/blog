@@ -1,15 +1,11 @@
 'use client';
 
-import {
-  PREVIEW_WIDTH,
-  type TLanguageSwitcherStyle,
-  type TLocaleIsoCode,
-  type TPreviewWidth,
-} from '@blog/config';
+import type { TLanguageSwitcherStyle, TLocaleIsoCode } from '@blog/config';
 import { LookSample } from '@platform/components/features/site-preview/look-sample';
 import { PreviewFrame } from '@platform/components/shared/preview-frame';
 import { PreviewModeControl } from '@platform/components/shared/preview-mode-control';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
+import { PREVIEW_WIDTH, type TPreviewWidth } from '@platform/constants/preview';
 import {
   buildSitePreviewTheme,
   type TSitePreviewThemeValues,

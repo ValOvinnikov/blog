@@ -1,7 +1,7 @@
 'use client';
 
-import { PREVIEW_MODE, type TPreviewMode } from '@blog/config';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
+import { PREVIEW_MODE, type TPreviewMode } from '@platform/constants/preview';
 import { useTranslations } from 'next-intl';
 
 export type TPreviewModeControlProps = {

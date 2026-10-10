@@ -1,4 +1,4 @@
-import { PREVIEW_WIDTH } from '@blog/config';
+import { PREVIEW_WIDTH } from '@platform/constants/preview';
 import { customRender, screen } from '@platform/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 

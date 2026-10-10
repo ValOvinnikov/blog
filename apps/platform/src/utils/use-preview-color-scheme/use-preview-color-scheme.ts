@@ -1,4 +1,4 @@
-import { PREVIEW_MODE, type TPreviewMode } from '@blog/config';
+import { PREVIEW_MODE, type TPreviewMode } from '@platform/constants/preview';
 import { useState } from 'react';
 
 export const usePreviewColorScheme = () => {
