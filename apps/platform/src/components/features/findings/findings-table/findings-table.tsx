@@ -25,20 +25,13 @@ export const FindingsTable = ({
   const tSeverity = useTranslations('findingSeverityLabel');
   const tSource = useTranslations('findingSourceLabel');
   const tKind = useTranslations('findingKindLabel');
-  const { card, table, head, row, cell, noTenant, empty } =
-    findingsTableVariants();
+  const { noTenant } = findingsTableVariants();
 
   return (
     <DataTableShell
       items={findings}
       emptyMessage={t('empty')}
       ariaLabel={tView('title')}
-      classNames={{
-        card: card(),
-        table: table(),
-        head: head(),
-        empty: empty(),
-      }}
       columns={[
         { key: 'tenant', label: t('columnTenant') },
         { key: 'source', label: t('columnSource') },
@@ -47,8 +40,8 @@ export const FindingsTable = ({
         { key: 'lastSeen', label: t('columnLastSeen') },
       ]}
       renderRow={(finding) => (
-        <tr className={row()} key={finding.id}>
-          <td className={cell()}>
+        <DataTableShell.Row key={finding.id}>
+          <DataTableShell.Cell>
             {finding.tenantId ? (
               <LinkButton
                 href={adminRoutes.tenantOverview(finding.tenantId)}
@@ -60,20 +53,20 @@ export const FindingsTable = ({
             ) : (
               <span className={noTenant()}>{t('noTenant')}</span>
             )}
-          </td>
-          <td className={cell()}>{tSource(finding.source)}</td>
-          <td className={cell()}>{tKind(finding.kind)}</td>
-          <td className={cell()}>
+          </DataTableShell.Cell>
+          <DataTableShell.Cell>{tSource(finding.source)}</DataTableShell.Cell>
+          <DataTableShell.Cell>{tKind(finding.kind)}</DataTableShell.Cell>
+          <DataTableShell.Cell>
             <StatusBadge tone={findingSeverityTone(finding.severity)}>
               {tSeverity(finding.severity)}
             </StatusBadge>
-          </td>
-          <td className={cell()}>
+          </DataTableShell.Cell>
+          <DataTableShell.Cell>
             <time dateTime={finding.lastSeenAt.toISOString()}>
               {formatDate(finding.lastSeenAt, locale)}
             </time>
-          </td>
-        </tr>
+          </DataTableShell.Cell>
+        </DataTableShell.Row>
       )}
     />
   );

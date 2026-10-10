@@ -2,13 +2,6 @@ import { render, screen } from '@platform/testing/custom-render';
 
 import { DataTableShell } from './data-table-shell';
 
-const classNames = {
-  card: 'card-class',
-  table: 'table-class',
-  head: 'head-class',
-  empty: 'empty-class',
-};
-
 type TItem = { id: string; name: string };
 
 const noItems: TItem[] = [];
@@ -24,7 +17,6 @@ describe(`<${DataTableShell.name}/>`, () => {
         items={noItems}
         emptyMessage="No rows yet."
         ariaLabel="Accounts"
-        classNames={classNames}
         columns={[{ key: 'name', label: 'Name' }]}
         renderRow={(item) => <tr key={item.id}>{item.name}</tr>}
       />,
@@ -40,7 +32,6 @@ describe(`<${DataTableShell.name}/>`, () => {
         items={twoItems}
         emptyMessage="No rows yet."
         ariaLabel="Accounts"
-        classNames={classNames}
         columns={[
           { key: 'name', label: 'Name' },
           { key: 'actions', label: null },
@@ -65,7 +56,6 @@ describe(`<${DataTableShell.name}/>`, () => {
         items={twoItems}
         emptyMessage="No rows yet."
         ariaLabel="Accounts"
-        classNames={classNames}
         columns={[{ key: 'name', label: 'Name' }]}
         renderRow={(item) => (
           <tr key={item.id}>
