@@ -51,9 +51,9 @@ export const RunErrorCard = ({
         />
         <Card.Body>
           <div className={content()}>
-            <Text variant="supporting">{body}</Text>
-            {failedStepLine && <Text variant="hint">{failedStepLine}</Text>}
-            <Text variant="hint">{nextStep}</Text>
+            <Text variant="muted">{body}</Text>
+            {failedStepLine && <Text variant="meta">{failedStepLine}</Text>}
+            <Text variant="meta">{nextStep}</Text>
             {technicalDetails && (
               <Disclosure
                 variant="inline"
