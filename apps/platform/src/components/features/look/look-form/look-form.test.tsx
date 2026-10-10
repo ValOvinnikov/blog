@@ -107,7 +107,7 @@ describe(`<${LookForm.name}/>`, () => {
         'aria-checked',
         'true',
       );
-      expect(screen.getByText('250°')).toBeVisible();
+      expect(screen.getByText('hue 250°')).toBeVisible();
     },
   );
 
@@ -219,7 +219,7 @@ describe(`<${LookForm.name}/>`, () => {
 
     await user.click(screen.getByRole('radio', { name: 'Editorial' }));
 
-    expect(screen.getByText('28°')).toBeVisible();
+    expect(screen.getByText('hue 28°')).toBeVisible();
   });
 
   it('saves the current form state through updateLookAction', async () => {
@@ -348,7 +348,7 @@ describe(`<${LookForm.name}/>`, () => {
 
     await user.click(screen.getByRole('button', { name: 'Reset to preset' }));
 
-    expect(screen.getByText('250°')).toBeVisible();
+    expect(screen.getByText('hue 250°')).toBeVisible();
     expect(
       screen.queryByRole('button', { name: 'Reset to preset' }),
     ).not.toBeInTheDocument();
@@ -361,7 +361,7 @@ describe(`<${LookForm.name}/>`, () => {
     await user.keyboard('{ArrowRight}');
     await user.click(screen.getByRole('button', { name: 'Discard' }));
 
-    expect(screen.getByText('250°')).toBeVisible();
+    expect(screen.getByText('hue 250°')).toBeVisible();
     expect(
       screen.queryByRole('button', { name: 'Save changes' }),
     ).not.toBeInTheDocument();
@@ -445,11 +445,11 @@ describe(`<${LookForm.name}/>`, () => {
     const slider = screen.getByRole('slider', { name: 'Accent hue' });
     slider.focus();
     await user.keyboard('{ArrowRight}');
-    expect(screen.getByText('251°')).toBeVisible();
+    expect(screen.getByText('hue 251°')).toBeVisible();
 
     await user.click(screen.getByRole('button', { name: 'Reset to preset' }));
 
-    expect(screen.getByText('250°')).toBeVisible();
+    expect(screen.getByText('hue 250°')).toBeVisible();
   });
 
   it('resets to the preset in the draft only, so Discard brings the saved values back', async () => {
@@ -458,12 +458,12 @@ describe(`<${LookForm.name}/>`, () => {
     await user.click(screen.getByRole('button', { name: 'Compact' }));
     await user.click(screen.getByRole('button', { name: 'Reset to preset' }));
 
-    expect(screen.getByText('250°')).toBeVisible();
+    expect(screen.getByText('hue 250°')).toBeVisible();
     expect(updateLookActionMock).not.toHaveBeenCalled();
 
     await user.click(screen.getByRole('button', { name: 'Discard' }));
 
-    expect(screen.getByText('260°')).toBeVisible();
+    expect(screen.getByText('hue 260°')).toBeVisible();
   });
 
   describe('archived tenant', () => {
@@ -562,7 +562,7 @@ describe(`<${LookForm.name}/>`, () => {
     );
 
     expect(screen.getByRole('radio', { name: 'Editorial' })).toBeChecked();
-    expect(screen.getByText('28°')).toBeVisible();
+    expect(screen.getByText('hue 28°')).toBeVisible();
     expect(screen.getByAltText('Current logo')).toBeVisible();
   });
   describe('brand images', () => {
@@ -647,7 +647,7 @@ describe(`<${LookForm.name}/>`, () => {
           screen.getByRole('region', { name: 'Unsaved changes' }),
         ).toHaveTextContent('1 unsaved change');
       });
-      expect(screen.getByText('251°')).toBeVisible();
+      expect(screen.getByText('hue 251°')).toBeVisible();
       expect(screen.getByAltText('Current logo')).toHaveAttribute(
         'src',
         expect.stringContaining(encodeURIComponent(UPLOADED_LOGO_URL)),
@@ -715,7 +715,7 @@ describe(`<${LookForm.name}/>`, () => {
       expect(
         await screen.findByRole('button', { name: 'Save changes' }),
       ).toBeEnabled();
-      expect(screen.getByText('251°')).toBeVisible();
+      expect(screen.getByText('hue 251°')).toBeVisible();
     });
 
     it('restores a draft without its staged logo and asks for it to be picked again', async () => {

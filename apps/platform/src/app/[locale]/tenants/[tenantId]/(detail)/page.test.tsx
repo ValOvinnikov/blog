@@ -1,4 +1,4 @@
-import { AUDIT_TARGET_TYPE, DOMAIN_VERIFICATION_STATUS } from '@blog/config';
+import { AUDIT_TARGET_TYPE } from '@blog/config';
 import {
   FINDING_KIND,
   FINDING_SEVERITY,
@@ -6,6 +6,7 @@ import {
   FINDING_STATUS,
 } from '@blog/config/constants';
 import type { TFindingSummary } from '@blog/db/schema/findings';
+import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { makeTenant } from '@platform/testing/tenants/fixtures';

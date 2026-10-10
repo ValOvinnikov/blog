@@ -45,12 +45,19 @@ export const BrandAssetField = ({
   'aria-describedby': ariaDescribedBy,
 }: TBrandAssetFieldProps) => {
   const t = useTranslations('brandAssetField');
-  const lowerLabel = label.toLowerCase();
   const { onUpload, onClear } = createStagingHandlers(
     onStage,
     t('unexpectedError'),
   );
   const { root } = brandAssetFieldVariants();
+
+  const validateFile = (file: File): string | undefined => {
+    const quickError = quickClientImageCheck(file, kind);
+    if (!quickError) return undefined;
+    return quickError.key === 'unsupportedType'
+      ? t('unsupportedType')
+      : t('tooLarge', { limit: quickError.limit });
+  };
 
   return (
     <div className={root()}>
@@ -67,17 +74,13 @@ export const BrandAssetField = ({
           )
         }
         currentUrl={image.url}
-        currentAlt={t('currentAlt', { label: lowerLabel })}
+        currentAlt={t(`${kind}.currentAlt`)}
         acceptedMimeTypes={ACCEPTED_IMAGE_MIME_TYPES}
-        uploadLabel={
-          image.url
-            ? t('replace', { label: lowerLabel })
-            : t('upload', { label: lowerLabel })
-        }
+        uploadLabel={image.url ? t(`${kind}.replace`) : t(`${kind}.upload`)}
         uploadingLabel={t('uploading')}
         removeLabel={t('remove')}
         unexpectedErrorLabel={t('unexpectedError')}
-        onValidateFile={(file) => quickClientImageCheck(file, kind)}
+        onValidateFile={validateFile}
         onUpload={onUpload}
         onClear={onClear}
         onChange={() => undefined}
@@ -85,10 +88,7 @@ export const BrandAssetField = ({
         aria-describedby={ariaDescribedBy}
       />
       {isRepickNeeded && (
-        <Alert
-          type={ALERT_TYPE.WARNING}
-          title={t('pickAgain', { label: lowerLabel })}
-        />
+        <Alert type={ALERT_TYPE.WARNING} title={t(`${kind}.pickAgain`)} />
       )}
     </div>
   );

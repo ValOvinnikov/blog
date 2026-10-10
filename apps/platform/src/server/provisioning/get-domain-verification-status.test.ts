@@ -1,4 +1,4 @@
-import { DOMAIN_VERIFICATION_STATUS } from '@blog/config';
+import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { env } from '@platform/utils/env/env';
 
 import { getDomainVerificationStatus } from './get-domain-verification-status';

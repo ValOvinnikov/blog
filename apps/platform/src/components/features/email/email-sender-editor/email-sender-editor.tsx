@@ -3,6 +3,7 @@
 import { EmailLogoField } from '@platform/components/features/email/email-logo-field';
 import { Card } from '@platform/components/shared/card';
 import { FormTextInput } from '@platform/components/shared/form-text-input';
+import { EMAIL_LOGO_KIND } from '@platform/constants/email-logo';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import type { TEmailSenderDraft } from '@platform/utils/email-draft/email-draft';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
@@ -72,6 +73,7 @@ export const EmailSenderEditor = ({
             aria-describedby={archivedDescribedBy}
           />
           <EmailLogoField
+            kind={EMAIL_LOGO_KIND.SENDER}
             label={t('logoLabel')}
             hint={t('logoHint')}
             logo={logo}

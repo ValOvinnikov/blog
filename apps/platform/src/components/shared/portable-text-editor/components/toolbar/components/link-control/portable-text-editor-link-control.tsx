@@ -43,7 +43,7 @@ export const PortableTextEditorLinkControl = ({
         <Field.Control
           type="url"
           required={true}
-          placeholder="https://…"
+          placeholder={t('linkUrlPlaceholder')}
           value={href}
           onValueChange={(nextHref) => setHref(nextHref)}
           className={input()}

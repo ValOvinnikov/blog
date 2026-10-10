@@ -31,6 +31,7 @@ export const ColourCard = ({
 }: TColourCardProps) => {
   const { isArchived, archivedDescribedBy } = useSettingsFormState();
   const t = useTranslations('lookForm');
+  const tHue = useTranslations('logoHueField');
   const { hueField, swatch, hueValue } = colourCardVariants();
 
   const accentHueLabel = t('accentHueLabel');
@@ -64,7 +65,9 @@ export const ColourCard = ({
             aria-describedby={archivedDescribedBy}
             trackStyle={{ background: accentHueGradient() }}
           />
-          <span className={hueValue()}>{accentHue}°</span>
+          <span className={hueValue()}>
+            {tHue('hueValue', { hue: accentHue })}
+          </span>
         </div>
       </LookField>
 

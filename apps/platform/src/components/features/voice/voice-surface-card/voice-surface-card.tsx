@@ -124,7 +124,7 @@ export const VoiceSurfaceCard = ({
                       locale={locale}
                       value={values[field.id]}
                       savedValue={savedValues[field.id]}
-                      hasError={errors[field.id] !== undefined}
+                      error={errors[field.id]}
                       isOpen={openFieldId === field.id}
                     >
                       {renderField(field)}

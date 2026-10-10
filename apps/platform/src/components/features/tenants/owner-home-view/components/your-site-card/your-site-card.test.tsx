@@ -20,7 +20,7 @@ describe(YourSiteCard, () => {
     expect(screen.getByText('Northwind Field Notes')).toBeVisible();
     expect(screen.getByText('northwind.dev')).toBeVisible();
     expect(screen.getByText('Growth')).toBeVisible();
-    expect(screen.getByText(LOCALE_ISO_CODES.EN)).toBeVisible();
+    expect(screen.getByText('English')).toBeVisible();
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
   });
 

@@ -166,13 +166,19 @@ export const EmailSettings = ({
       return [
         {
           id: `${templateType}.${locale}.subject`,
-          label: `${template} — ${tTemplate('subjectLabel', { language })}`,
+          label: t('draftFieldLabel', {
+            template,
+            field: tTemplate('subjectLabel', { language }),
+          }),
           display: (values: TEmailDraft) =>
             values.copies[templateType][locale].subject,
         },
         {
           id: `${templateType}.${locale}.body`,
-          label: `${template} — ${tTemplate('bodyLabel', { language })}`,
+          label: t('draftFieldLabel', {
+            template,
+            field: tTemplate('bodyLabel', { language }),
+          }),
           display: (values: TEmailDraft) =>
             portableTextToPlainText(
               values.copies[templateType][locale].body as Parameters<

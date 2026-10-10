@@ -1,6 +1,9 @@
 import { VOICE_FIELD_KIND, VOICE_FIELDS } from '@blog/config';
 import { screen } from '@platform/testing/custom-render';
-import { customRenderInSettingsForm } from '@platform/testing/render-in-settings-form';
+import {
+  ARCHIVED_NOTICE_TEXT,
+  customRenderInSettingsForm,
+} from '@platform/testing/render-in-settings-form';
 
 import { VoiceField } from './voice-field';
 
@@ -113,6 +116,20 @@ describe(`<${VoiceField.name}/>`, () => {
     expect(editor).toHaveAttribute('aria-readonly', 'true');
     expect(editor).not.toHaveAttribute('aria-disabled');
   });
+
+  it.each([
+    ['text', 'notFoundHeading', 'Heading'],
+    ['rich', 'notFoundSupportingText', 'Supporting text'],
+  ])(
+    'describes a read-only %s field with the archived notice',
+    (_kind, id, name) => {
+      setup({ field: fieldById(id), value: null }, { isArchived: true });
+
+      expect(screen.getByRole('textbox', { name })).toHaveAccessibleDescription(
+        new RegExp(`${ARCHIVED_NOTICE_TEXT}$`),
+      );
+    },
+  );
 
   it('gives an invalid rich field its input id so the save bar can focus it', () => {
     setup({

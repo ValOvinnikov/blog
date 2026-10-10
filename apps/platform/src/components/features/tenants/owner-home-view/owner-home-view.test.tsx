@@ -1,8 +1,8 @@
+import { TENANT_PLAN } from '@blog/db';
 import {
   DOMAIN_VERIFICATION_STATUS,
   type TDomainVerificationStatus,
-} from '@blog/config';
-import { TENANT_PLAN } from '@blog/db';
+} from '@platform/constants/domain';
 import { act, customRender, screen } from '@platform/testing/custom-render';
 import { makeTenant } from '@platform/testing/tenants/fixtures';
 

@@ -2,10 +2,11 @@
   "pageMetadata": {
     "root": "Admin",
     "tenants": "Tenants · Admin",
-    "tenant": "Overview · Admin",
+    "ownerHome": "Your site · Admin",
     "look": "Look · Admin",
     "voice": "Voice · Admin",
     "selectTenant": "Choose a workspace · Admin",
+    "workspacePending": "Workspace not ready · Admin",
     "addTenant": "Add tenant · Admin",
     "tenantOverview": "Tenant overview · Admin",
     "tenantProvisioning": "Provisioning · Admin",
@@ -182,7 +183,7 @@
     "nameLabel": "Name",
     "publicDomainLabel": "Public domain",
     "planLabel": "Plan",
-    "localeLabel": "Locale",
+    "localeLabel": "Language",
     "openPublicDomainAriaLabel": "Open {domain} in a new tab",
     "readOnlyHint": "Need one of these changed? Ask your platform contact — these values are wired into your site's hosting.",
     "makeItYoursCardTitle": "Make it yours",
@@ -387,12 +388,22 @@
   "brandAssetField": {
     "savesWithChanges": "Saves with changes",
     "unexpectedError": "Something went wrong — try again.",
-    "currentAlt": "Current {label}",
     "uploading": "Uploading…",
-    "replace": "Replace {label}",
-    "upload": "Upload {label}",
     "remove": "Remove",
-    "pickAgain": "Your recovered draft had a new {label} that couldn't be kept — pick it again."
+    "logo": {
+      "currentAlt": "Current logo",
+      "upload": "Upload logo",
+      "replace": "Replace logo",
+      "pickAgain": "Your recovered draft had a new logo that couldn't be kept — pick it again."
+    },
+    "favicon": {
+      "currentAlt": "Current favicon",
+      "upload": "Upload favicon",
+      "replace": "Replace favicon",
+      "pickAgain": "Your recovered draft had a new favicon that couldn't be kept — pick it again."
+    },
+    "unsupportedType": "Choose a PNG, JPEG, WebP, or SVG image.",
+    "tooLarge": "That file is too large — the limit is {limit}."
   },
   "emailForm": {
     "pageHeading": "Email",
@@ -405,7 +416,8 @@
     "senderItemDescription": "Name, reply-to, address and logo, the same in every language.",
     "editingLabel": "Editing",
     "templateGroupLabel": "Template",
-    "allLanguagesChanges": "All languages"
+    "allLanguagesChanges": "All languages",
+    "draftFieldLabel": "{template} — {field}"
   },
   "fieldStatus": {
     "default": "Default",
@@ -447,13 +459,20 @@
   },
   "emailLogoField": {
     "unexpectedError": "Something went wrong — try again.",
-    "currentAlt": "Current {label}",
     "uploading": "Uploading…",
-    "replace": "Replace {label}",
-    "upload": "Upload {label}",
     "remove": "Remove",
     "unsupportedType": "Choose a PNG, JPEG, or GIF image — SVG and WebP are not supported by major email clients.",
-    "tooLarge": "That file is too large — the limit is {limit}."
+    "tooLarge": "That file is too large — the limit is {limit}.",
+    "SENDER": {
+      "currentAlt": "Current email logo",
+      "upload": "Upload email logo",
+      "replace": "Replace email logo"
+    },
+    "TEMPLATE": {
+      "currentAlt": "Current template logo",
+      "upload": "Upload template logo",
+      "replace": "Replace template logo"
+    }
   },
   "emailTemplateEditor": {
     "subjectLabel": "Subject ({language})",
@@ -483,7 +502,8 @@
     "removeLink": "Remove link",
     "linkUrlLabel": "Link URL",
     "linkApply": "Apply",
-    "linkCancel": "Cancel"
+    "linkCancel": "Cancel",
+    "linkUrlPlaceholder": "https://…"
   },
   "voiceSettings": {
     "heading": "Voice",
@@ -913,5 +933,8 @@
     "savedColumn": "Saved",
     "draftColumn": "Your draft",
     "emptyValue": "Empty"
+  },
+  "externalLinkButton": {
+    "newTabHint": "(opens in new tab)"
   }
 }

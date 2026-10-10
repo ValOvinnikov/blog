@@ -1,4 +1,4 @@
-import { DOMAIN_VERIFICATION_STATUS } from '@blog/config';
+import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { getProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
 import { act, renderWithIntl, screen } from '@platform/testing/custom-render';
 import { makeTenant } from '@platform/testing/tenants/fixtures';
