@@ -1,18 +1,17 @@
 import type { TFindingStatus } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
-import { findings, type TFinding } from '@blog/db/schema/findings';
+import { findingSummaryColumns } from '@blog/db/queries/findings/finding-summary-columns';
+import { findings, type TFindingSummary } from '@blog/db/schema/findings';
 import { and, desc, eq } from 'drizzle-orm';
 
-// Every finding recorded for one tenant, most recently seen first, optionally
-// narrowed to OPEN or RESOLVED.
 export async function listFindingsForTenant(
   tenantId: string,
   status?: TFindingStatus,
-): Promise<TFinding[]> {
+): Promise<TFindingSummary[]> {
   const db = getDb();
 
   return db
-    .select()
+    .select(findingSummaryColumns)
     .from(findings)
     .where(
       status

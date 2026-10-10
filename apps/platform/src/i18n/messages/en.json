@@ -145,6 +145,7 @@
     "title": "Open findings",
     "empty": "No open findings for this tenant — everything's healthy.",
     "detailsToggle": "Details",
+    "detailsLoading": "Loading details…",
     "columnLevel": "Level",
     "columnDocument": "Document",
     "columnMessage": "Message"

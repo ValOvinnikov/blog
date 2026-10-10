@@ -1,7 +1,7 @@
 'use client';
 
 import type { TAuditEvent } from '@blog/db/schema/audit-events';
-import type { TFinding } from '@blog/db/schema/findings';
+import type { TFindingSummary } from '@blog/db/schema/findings';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { ContentWorkspaceCard } from '@platform/components/features/tenants/content-workspace-card';
 import { FindingsCard } from '@platform/components/features/tenants/findings-card';
@@ -28,7 +28,7 @@ export type TTenantOverviewViewProps = {
   ownerJoinedAt: string | undefined;
   ownerJoinedAtIso: string | undefined;
   auditEvents: TAuditEvent[];
-  findings: TFinding[];
+  findings: TFindingSummary[];
 };
 
 // One poll instance feeds both the banner and the field locks so they never disagree.
@@ -107,7 +107,7 @@ export const TenantOverviewView = ({
         archivedNoticeId={archivedNoticeId}
       />
 
-      <FindingsCard findings={findings} />
+      <FindingsCard tenantId={tenant.id} findings={findings} />
 
       <div className={cardsGrid()}>
         <div className={cardsColumn()}>
