@@ -1,93 +1,33 @@
 import {
-  CORE_PROVISIONING_STEPS,
-  TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantProvisioningStatus,
   type TTenantProvisioningStep,
 } from '@blog/db/constants';
 import type { TTenantProvisioningState } from '@blog/db/schema/tenants';
+import { deriveProvisioningState } from '@blog/db/utils/derive-provisioning-state/derive-provisioning-state';
 
-export type TTenantFieldKey =
-  'name' | 'primaryDomain' | 'plan' | 'locale' | 'ownerEmail';
+export const ALL_FIELD_KEYS = [
+  'name',
+  'primaryDomain',
+  'plan',
+  'locale',
+  'ownerEmail',
+] as const;
+
+export type TTenantFieldKey = (typeof ALL_FIELD_KEYS)[number];
 
 export type TTenantFieldLockReason =
   | { kind: 'step'; step: TTenantProvisioningStep }
   | { kind: 'running' }
   | { kind: 'succeeded' }
-  // Never produced by `computeTenantFieldLocks` itself — the tenant's
-  // archived state is a separate, stronger lock `TenantDetailsPanel`
-  // overlays on top, reusing this same reason vocabulary.
+  // Never returned by computeTenantFieldLocks; TenantDetailsPanel overlays it.
   | { kind: 'archived' };
 
 export type TTenantFieldLocks = Partial<
   Record<TTenantFieldKey, TTenantFieldLockReason>
 >;
 
-export const ALL_FIELD_KEYS: TTenantFieldKey[] = [
-  'name',
-  'primaryDomain',
-  'plan',
-  'locale',
-  'ownerEmail',
-];
-
-// Mirrors `packages/db`'s own (unexported) `deriveProvisioningState` —
-// provisioning never revisits a step once it moves past it, so at most one
-// step is ever FAILED at a time and every step after it stays IDLE. A
-// workflow can be dispatched (`provisioningStatus` moved to PROVISIONING by
-// `beginTenantProvisioning`) before its runner reports its first step —
-// every step is still IDLE for that whole window, so the column, not the
-// steps map, is the only signal a workflow is already running; first match
-// wins, same as the db-side function.
-const deriveProvisioningState = (
-  provisioningStatus: TTenantProvisioningStatus | null,
-  steps: TTenantProvisioningState | null,
-): 'IDLE' | 'RUNNING' | 'FAILED' | 'SUCCEEDED' => {
-  if (provisioningStatus === TENANT_PROVISIONING_STATUS.PROVISIONING) {
-    return 'RUNNING';
-  }
-
-  const stepStates = CORE_PROVISIONING_STEPS.map(
-    (step) => steps?.[step],
-  ).filter((state) => state !== undefined);
-
-  if (
-    stepStates.length === 0 ||
-    stepStates.every(
-      (step) => step.status === TENANT_PROVISIONING_STEP_STATUS.IDLE,
-    )
-  ) {
-    return 'IDLE';
-  }
-
-  if (
-    stepStates.some(
-      (step) => step.status === TENANT_PROVISIONING_STEP_STATUS.FAILED,
-    )
-  ) {
-    return 'FAILED';
-  }
-
-  if (
-    stepStates.every(
-      (step) => step.status === TENANT_PROVISIONING_STEP_STATUS.DONE,
-    )
-  ) {
-    return 'SUCCEEDED';
-  }
-
-  return 'RUNNING';
-};
-
-/**
- * The client-side mirror of `packages/db`'s `updateTenantDetails` per-field
- * lock rules: while provisioning is FAILED, only a field an already-completed
- * step baked into an external resource locks (`primaryDomain` once
- * `MAP_DOMAIN` is DONE) — the field that actually caused the failure stays
- * editable. RUNNING/SUCCEEDED lock every field, matching that function's
- * blanket `provisioning-started` rejection.
- */
 export const computeTenantFieldLocks = (
   steps: TTenantProvisioningState | null,
   provisioningStatus: TTenantProvisioningStatus | null,
