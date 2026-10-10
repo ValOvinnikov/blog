@@ -1,5 +1,6 @@
 import 'server-only';
 
+import type { TMaybeUndefined } from '@blog/config/types';
 import { imageSize } from 'image-size';
 
 export type TImageFormat = { contentType: string; extension: string };
@@ -13,7 +14,7 @@ type TReadImageUploadResult =
       ok: true;
       image: {
         buffer: Buffer;
-        type: string | undefined;
+        type: TMaybeUndefined<string>;
         width: number;
         height: number;
       };
