@@ -329,6 +329,31 @@ describe(`<${EmailSettings.name}/>`, () => {
     });
   });
 
+  describe('the save bar', () => {
+    const saveBar = () =>
+      screen.getByRole('region', { name: 'Unsaved changes' });
+
+    it('breaks the changes down so the parts add up to the total', async () => {
+      setup();
+      await user.type(screen.getByLabelText('Sender name'), 'Acme');
+      await openSignInTemplate(user);
+      await chooseLanguage(user, 'French');
+      await user.type(screen.getByLabelText('Subject (French)'), 'Connexion');
+
+      expect(saveBar()).toHaveTextContent(
+        '2 unsaved changesAll languages 1 · French 1',
+      );
+    });
+
+    it('shows no language breakdown with one live language', async () => {
+      setup({ liveLocales: [EN] });
+      await user.type(screen.getByLabelText('Sender name'), 'Acme');
+
+      expect(saveBar()).toHaveTextContent('1 unsaved change');
+      expect(saveBar()).not.toHaveTextContent(/All languages|English/);
+    });
+  });
+
   it('shows the sender-name error the save returns', async () => {
     updateEmailConfigActionMock.mockResolvedValue({
       ok: false,

@@ -402,7 +402,8 @@
     "senderItemLabel": "Afzender en voettekst",
     "senderItemDescription": "Naam, antwoordadres, postadres en logo, in elke taal hetzelfde.",
     "editingLabel": "Bewerken",
-    "templateGroupLabel": "Sjabloon"
+    "templateGroupLabel": "Sjabloon",
+    "allLanguagesChanges": "Alle talen"
   },
   "fieldStatus": {
     "default": "Standaard",
@@ -432,8 +433,6 @@
     "unsavedLogoNote": "Een logo dat je nog niet hebt opgeslagen, zit niet in de test."
   },
   "emailSettingsForm": {
-    "heading": "E-mailinstellingen",
-    "description": "Geldt voor elke e-mail die je site verstuurt. Laat een veld leeg om de standaardwaarde te gebruiken.",
     "senderNameLabel": "Naam afzender",
     "senderNameHint": "De weergavenaam bij het Van-adres — staat los van de sitetitel.",
     "senderNameInvalidError": "Dit is de naam die ontvangers zien, geen e-mailadres. Vul een naam in zoals Acme Co, zonder < > \" , ; of @.",

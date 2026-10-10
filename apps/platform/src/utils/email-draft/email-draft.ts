@@ -183,14 +183,19 @@ export const countLanguageChanges = (
     0,
   );
 
+export const countSharedChanges = (
+  saved: TEmailDraft,
+  draft: TEmailDraft,
+): number =>
+  SENDER_FIELDS.filter((field) => saved.sender[field] !== draft.sender[field])
+    .length + listLogoChanges(saved, draft).length;
+
 export const countEmailDraftChanges = (
   saved: TEmailDraft,
   draft: TEmailDraft,
   liveLocales: TLocaleIsoCode[],
 ): number =>
-  SENDER_FIELDS.filter((field) => saved.sender[field] !== draft.sender[field])
-    .length +
-  listLogoChanges(saved, draft).length +
+  countSharedChanges(saved, draft) +
   liveLocales.reduce(
     (total, locale) => total + countLanguageChanges(saved, draft, locale),
     0,

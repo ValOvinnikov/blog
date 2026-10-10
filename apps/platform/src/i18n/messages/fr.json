@@ -402,7 +402,8 @@
     "senderItemLabel": "Expéditeur et pied de page",
     "senderItemDescription": "Nom, adresse de réponse, adresse postale et logo, identiques dans toutes les langues.",
     "editingLabel": "Modification",
-    "templateGroupLabel": "Modèle"
+    "templateGroupLabel": "Modèle",
+    "allLanguagesChanges": "Toutes les langues"
   },
   "fieldStatus": {
     "default": "Par défaut",
@@ -432,8 +433,6 @@
     "unsavedLogoNote": "Un logo non encore enregistré n'est pas inclus dans le test."
   },
   "emailSettingsForm": {
-    "heading": "Paramètres d'e-mail",
-    "description": "S'applique à tous les e-mails envoyés par votre site. Laissez un champ vide pour utiliser la valeur par défaut.",
     "senderNameLabel": "Nom de l'expéditeur",
     "senderNameHint": "Le nom affiché dans l'adresse d'expédition — indépendant du titre du site.",
     "senderNameInvalidError": "C'est le nom que voient les destinataires, pas une adresse e-mail. Saisissez un nom comme Acme Co, sans < > \" , ; ni @.",
