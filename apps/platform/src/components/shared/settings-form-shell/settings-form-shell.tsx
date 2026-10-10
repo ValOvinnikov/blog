@@ -4,6 +4,7 @@ import { ALERT_TYPE } from '@blog/config';
 import { Alert } from '@platform/components/shared/alert';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { PageHeader } from '@platform/components/shared/page-header';
+import { SettingsFormProvider } from '@platform/context/settings-form-provider';
 import { useUnsavedChangesGuard } from '@platform/context/unsaved-changes-provider';
 import {
   formatLanguageChanges,
@@ -169,7 +170,13 @@ export const SettingsFormShell = <TValues,>({
         />
       )}
 
-      {children}
+      <SettingsFormProvider
+        isArchived={Boolean(archivedAt)}
+        isPending={isPending}
+        archivedNoticeId={archivedNoticeId}
+      >
+        {children}
+      </SettingsFormProvider>
 
       <span
         role="status"

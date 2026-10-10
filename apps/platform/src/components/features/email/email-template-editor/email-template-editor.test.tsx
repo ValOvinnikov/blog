@@ -1,9 +1,9 @@
 import { EMAIL_TEMPLATE_TYPE } from '@blog/config';
+import { screen } from '@platform/testing/custom-render';
 import {
-  customRender,
-  renderWithIntl,
-  screen,
-} from '@platform/testing/custom-render';
+  ARCHIVED_NOTICE_TEXT,
+  customRenderInSettingsForm,
+} from '@platform/testing/render-in-settings-form';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { EmailTemplateEditor } from './email-template-editor';
@@ -18,7 +18,7 @@ const FALLBACK_BODY = [
   },
 ];
 
-const setup = customRender(EmailTemplateEditor, {
+const setup = customRenderInSettingsForm(EmailTemplateEditor, {
   templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
   languageName: 'French',
   copy: {
@@ -29,7 +29,6 @@ const setup = customRender(EmailTemplateEditor, {
   logo: { url: undefined },
   onCopyChange: vi.fn(),
   onLogoStage: vi.fn(),
-  isDisabled: false,
 });
 
 describe(`<${EmailTemplateEditor.name}/>`, () => {
@@ -94,15 +93,17 @@ describe(`<${EmailTemplateEditor.name}/>`, () => {
     expect(screen.getByText('Unsaved')).toBeInTheDocument();
   });
 
-  it('offers no reset while disabled', () => {
-    setup({
-      copy: {
-        draft: { subject: 'Bonjour', body: null },
-        saved: { subject: 'Bonjour', body: null },
-        fallback: { subject: 'Connectez-vous', body: FALLBACK_BODY },
+  it('offers no reset while archived', () => {
+    setup(
+      {
+        copy: {
+          draft: { subject: 'Bonjour', body: null },
+          saved: { subject: 'Bonjour', body: null },
+          fallback: { subject: 'Connectez-vous', body: FALLBACK_BODY },
+        },
       },
-      isDisabled: true,
-    });
+      { isArchived: true },
+    );
 
     expect(screen.getByText('Customised')).toBeVisible();
     expect(
@@ -110,8 +111,23 @@ describe(`<${EmailTemplateEditor.name}/>`, () => {
     ).not.toBeInTheDocument();
   });
 
-  it('locks every field while disabled', () => {
-    setup({ isDisabled: true });
+  it('locks every field and describes it with the notice while archived', () => {
+    setup({}, { isArchived: true });
+
+    const fields = [
+      screen.getByLabelText('Subject (French)'),
+      screen.getByRole('button', { name: 'Upload template logo' }),
+    ];
+    for (const field of fields) {
+      expect(field).toBeDisabled();
+      expect(field).toHaveAccessibleDescription(
+        expect.stringContaining(ARCHIVED_NOTICE_TEXT),
+      );
+    }
+  });
+
+  it('locks every field while a save is pending', () => {
+    setup({}, { isPending: true });
 
     expect(screen.getByLabelText('Subject (French)')).toBeDisabled();
     expect(
@@ -130,30 +146,12 @@ describe(`<${EmailTemplateEditor.name}/>`, () => {
   });
 
   it('describes the message editor with the archived notice while archived', () => {
-    renderWithIntl(
-      <>
-        <p id="archived-notice">This tenant is archived</p>
-        <EmailTemplateEditor
-          templateType={EMAIL_TEMPLATE_TYPE.MAGIC_LINK}
-          languageName="French"
-          copy={{
-            draft: { subject: '', body: null },
-            saved: { subject: '', body: null },
-            fallback: { subject: 'Connectez-vous', body: FALLBACK_BODY },
-          }}
-          logo={{ url: undefined }}
-          onCopyChange={vi.fn()}
-          onLogoStage={vi.fn()}
-          isDisabled={true}
-          archivedNoticeId="archived-notice"
-        />
-      </>,
-    );
+    setup({}, { isArchived: true });
 
     expect(
       screen.getByRole('textbox', { name: 'Message (French)' }),
     ).toHaveAccessibleDescription(
-      expect.stringContaining('This tenant is archived'),
+      expect.stringContaining(ARCHIVED_NOTICE_TEXT),
     );
   });
 });

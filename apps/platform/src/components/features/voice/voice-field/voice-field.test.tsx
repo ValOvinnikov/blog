@@ -1,16 +1,16 @@
 import { VOICE_FIELD_KIND, VOICE_FIELDS } from '@blog/config';
+import { screen } from '@platform/testing/custom-render';
 import {
-  customRender,
-  renderWithIntl,
-  screen,
-} from '@platform/testing/custom-render';
+  ARCHIVED_NOTICE_TEXT,
+  customRenderInSettingsForm,
+} from '@platform/testing/render-in-settings-form';
 
 import { VoiceField } from './voice-field';
 
 const fieldById = (id: string) =>
   VOICE_FIELDS.find((field) => field.id === id)!;
 
-const setup = customRender(VoiceField, {
+const setup = customRenderInSettingsForm(VoiceField, {
   inputId: 'voice-field-test',
   field: fieldById('notFoundHeading'),
   value: '',
@@ -92,21 +92,25 @@ describe(`<${VoiceField.name}/>`, () => {
   });
 
   it('offers no editing controls on a read-only rich field', () => {
-    setup({
-      field: fieldById('notFoundSupportingText'),
-      value: null,
-      archivedNoticeId: 'archived-notice',
-    });
+    setup(
+      {
+        field: fieldById('notFoundSupportingText'),
+        value: null,
+      },
+      { isArchived: true },
+    );
 
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
   it('announces a read-only rich field as read-only rather than disabled', () => {
-    setup({
-      field: fieldById('notFoundSupportingText'),
-      value: null,
-      archivedNoticeId: 'archived-notice',
-    });
+    setup(
+      {
+        field: fieldById('notFoundSupportingText'),
+        value: null,
+      },
+      { isArchived: true },
+    );
 
     const editor = screen.getByRole('textbox', { name: 'Supporting text' });
     expect(editor).toHaveAttribute('aria-readonly', 'true');
@@ -119,23 +123,10 @@ describe(`<${VoiceField.name}/>`, () => {
   ])(
     'describes a read-only %s field with the archived notice',
     (_kind, id, name) => {
-      renderWithIntl(
-        <>
-          <p id="archived-notice">This tenant is archived</p>
-          <VoiceField
-            inputId="voice-field-test"
-            field={fieldById(id)}
-            value={null}
-            savedValue={null}
-            placeholder=""
-            onChange={vi.fn()}
-            archivedNoticeId="archived-notice"
-          />
-        </>,
-      );
+      setup({ field: fieldById(id), value: null }, { isArchived: true });
 
       expect(screen.getByRole('textbox', { name })).toHaveAccessibleDescription(
-        /This tenant is archived$/,
+        new RegExp(`${ARCHIVED_NOTICE_TEXT}$`),
       );
     },
   );

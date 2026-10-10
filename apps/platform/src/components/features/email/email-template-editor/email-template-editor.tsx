@@ -10,6 +10,7 @@ import { PortableTextEditor } from '@platform/components/shared/portable-text-ed
 import { TextInput } from '@platform/components/shared/text-input';
 import { CONTROL_MODE } from '@platform/constants/control-mode';
 import { EMAIL_LOGO_KIND } from '@platform/constants/email-logo';
+import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import type {
   TEmailCopyDraft,
   TEmailCopyEdit,
@@ -29,8 +30,6 @@ export type TEmailTemplateEditorProps = {
   logo: TStagedImage;
   onCopyChange: (copy: TEmailCopyDraft) => void;
   onLogoStage: (logo: TStagedImage) => void;
-  isDisabled: boolean;
-  archivedNoticeId?: string;
 };
 
 export const EmailTemplateEditor = ({
@@ -40,10 +39,10 @@ export const EmailTemplateEditor = ({
   logo,
   onCopyChange,
   onLogoStage,
-  isDisabled,
-  archivedNoticeId,
 }: TEmailTemplateEditorProps) => {
   const t = useTranslations('emailTemplateEditor');
+  const { isArchived, isPending, archivedDescribedBy } = useSettingsFormState();
+  const isDisabled = isArchived || isPending;
   const [bodyRevision, setBodyRevision] = useState(0);
   const bodyHintId = useId();
   const { stack } = emailTemplateEditorVariants();
@@ -89,7 +88,7 @@ export const EmailTemplateEditor = ({
               value={draft.subject}
               onChange={(subject) => onCopyChange({ ...draft, subject })}
               isDisabled={isDisabled}
-              aria-describedby={archivedNoticeId}
+              aria-describedby={archivedDescribedBy}
             />
           </FormField>
           <FormField
@@ -110,7 +109,7 @@ export const EmailTemplateEditor = ({
               onChange={handleBodyChange}
               field={{ label: t('bodyLabel', { language: languageName }) }}
               mode={isDisabled ? CONTROL_MODE.DISABLED : CONTROL_MODE.EDITABLE}
-              aria-describedby={[bodyHintId, archivedNoticeId]
+              aria-describedby={[bodyHintId, archivedDescribedBy]
                 .filter(Boolean)
                 .join(' ')}
             />
@@ -121,8 +120,6 @@ export const EmailTemplateEditor = ({
             hint={t('logoHint')}
             logo={logo}
             onStage={onLogoStage}
-            isDisabled={isDisabled}
-            aria-describedby={archivedNoticeId}
           />
         </div>
       </Card.Body>
