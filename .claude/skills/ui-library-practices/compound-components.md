@@ -19,7 +19,7 @@ children-introspection** pattern instead: the root scans its `children` at
 render time and matches each one against a map of known slot components — no
 shared runtime state, works identically in RSC and client components.
 
-## The shared primitives — `@blog/ui/src/lib/compound.tsx`
+## The shared primitives — `packages/ui/src/lib/react/compound.tsx`
 
 - `mapCompoundSlots(children, componentTypes)` — the runtime resolver.
   Takes `children` and a `{ SlotName: Component }` map; returns
@@ -43,8 +43,12 @@ shared runtime state, works identically in RSC and client components.
   `mapCompoundSlots`'s `unmatched` output is the runtime backstop for
   exactly that gap.
 
-Import both from `@blog/ui/lib/compound` — never re-derive this mechanism per
+Import them from `@blog/ui/lib/react` — never re-derive this mechanism per
 component.
+
+## When to use the helper
+
+Use `mapCompoundSlots` when the root places each named part in a fixed position or wrapper, or must catch unknown children. A compound whose parts are a repeated list (items, rows, cells) renders `children` directly; a slot-shaped sub-part of it uses the helper.
 
 ## Authoring a compound component
 
@@ -91,7 +95,7 @@ import {
   mapCompoundSlots,
   type TCompoundChildren,
   type TCompoundComponent,
-} from '@blog/ui/lib/compound';
+} from '@blog/ui/lib/react';
 
 import { HeaderBrand } from './components/brand/header-brand';
 import { HeaderNav } from './components/nav/header-nav';

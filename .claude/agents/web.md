@@ -333,6 +333,7 @@ Node/TypeScript idiom — so never "fix" a declaration you see there.
   pass framework-coupled pieces directly into them (`SmartLink`,
   `SanityImage`). Never deep-import sub-components — always use dot-notation on the assembled
   export (`Header.Brand`, `PostCard.Title`).
+- **Authoring a compound component here.** Use `mapCompoundSlots` when the root places each named part in a fixed position or wrapper, or must catch unknown children. A compound whose parts are a repeated list (items, rows, cells) renders `children` directly; a slot-shaped sub-part of it uses the helper.
 - **Interactive components** (popover, dropdown, menu, disclosure, tabs,
   clipboard, focus trap, outside-click / Escape) — follow the
   `web-component-practices` skill

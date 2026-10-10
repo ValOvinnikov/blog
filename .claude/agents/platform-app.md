@@ -358,10 +358,12 @@ reference shape (read it with Read before building the next one):
   imports each part, defines the `<X>Parts` map, and composes
   `Card = Object.assign(CardRoot, CardParts)` — it is not where a part's JSX
   or props type lives.
+- **When to use the helper.** Use `mapCompoundSlots` when the root places each named part in a fixed position or wrapper, or must catch unknown children. A compound whose parts are a repeated list (items, rows, cells) renders `children` directly; a slot-shaped sub-part of it uses the helper.
 - **The slot-matching logic is never hand-rolled per component.** `@blog/ui`
-  centralizes its order-independent, first-match-wins resolution (unmatched
-  children wrapped in keyed `Fragment`s) as `mapCompoundSlots` in
-  `packages/ui/src/lib/react/compound.tsx`. This app cannot import that (no
+  centralizes its order-independent, first-match-wins resolution as
+  `mapCompoundSlots` in `packages/ui/src/lib/react/compound.tsx`; the root,
+  not the helper, renders the `unmatched` children it returns in keyed
+  `Fragment`s. This app cannot import that (no
   `@blog/ui` import, ever) — the _first_ admin compound component creates its
   own equivalent at `apps/platform/src/lib/react/compound.ts`, and every
   compound component after it imports that one instead of reimplementing
