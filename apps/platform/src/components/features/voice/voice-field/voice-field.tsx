@@ -12,6 +12,7 @@ import { FieldStatus } from '@platform/components/shared/field-status';
 import { PortableTextEditor } from '@platform/components/shared/portable-text-editor';
 import { TextInput } from '@platform/components/shared/text-input';
 import { Textarea } from '@platform/components/shared/textarea';
+import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import { isBlankPortableTextValue } from '@platform/utils/portable-text-schema/portable-text-schema';
 import {
   isSameVoiceValue,
@@ -32,7 +33,6 @@ export type TVoiceFieldProps = {
   placeholder: string;
   error?: string;
   onChange: (value: TVoiceDraftValue) => void;
-  isReadOnly: boolean;
   hasVisibleLabel?: boolean;
 };
 
@@ -44,10 +44,10 @@ export const VoiceField = ({
   placeholder,
   error,
   onChange,
-  isReadOnly,
   hasVisibleLabel = true,
 }: TVoiceFieldProps) => {
   const t = useTranslations('voiceSettings');
+  const { isArchived: isReadOnly } = useSettingsFormState();
   const tLabels = useTranslations('voiceFieldLabels');
   const tHints = useTranslations('voiceFieldHints');
   const [editorRevision, setEditorRevision] = useState(0);

@@ -9,6 +9,7 @@ import {
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
+import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import type { TLookFormFieldSetter } from '@platform/utils/default-look-values/default-look-values';
 import { useTranslations } from 'next-intl';
 
@@ -18,8 +19,6 @@ export type TShapeCardProps = {
   cardStyle: TCardStyle;
   onFieldChange: TLookFormFieldSetter;
   hasUnsavedChanges: boolean;
-  isArchived: boolean;
-  archivedNoticeId: string;
 };
 
 export const ShapeCard = ({
@@ -28,11 +27,9 @@ export const ShapeCard = ({
   cardStyle,
   onFieldChange,
   hasUnsavedChanges,
-  isArchived,
-  archivedNoticeId,
 }: TShapeCardProps) => {
+  const { isArchived, archivedDescribedBy } = useSettingsFormState();
   const t = useTranslations('lookForm');
-  const archivedDescribedBy = isArchived ? archivedNoticeId : undefined;
 
   const radiusOptions = Object.values(RADIUS_SCALE).map((scale) => ({
     value: scale,

@@ -39,7 +39,6 @@ export type TVoiceSurfaceCardProps = {
   openFieldId?: TVoiceFieldId;
   onOpenField: (id: TVoiceFieldId | undefined) => void;
   onFieldChange: (id: TVoiceFieldId, value: TVoiceDraftValue) => void;
-  isReadOnly: boolean;
   specimenTheme: TSitePreviewTheme;
 };
 
@@ -53,7 +52,6 @@ export const VoiceSurfaceCard = ({
   openFieldId,
   onOpenField,
   onFieldChange,
-  isReadOnly,
   specimenTheme,
 }: TVoiceSurfaceCardProps) => {
   const t = useTranslations('voiceSettings');
@@ -92,7 +90,6 @@ export const VoiceSurfaceCard = ({
       placeholder={voiceDefaultText(locale, field)}
       error={errors[field.id]}
       onChange={(next) => onFieldChange(field.id, next)}
-      isReadOnly={isReadOnly}
       hasVisibleLabel={surface !== VOICE_SURFACE.ARCHIVE}
     />
   );

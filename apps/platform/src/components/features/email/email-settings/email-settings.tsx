@@ -74,7 +74,6 @@ export const EmailSettings = ({
   const toast = useToast();
   const router = useRouter();
   const archivedNoticeId = useId();
-  const isArchived = Boolean(archivedAt);
   const [selectedItem, setSelectedItem] =
     useState<TEmailPageItem>(EMAIL_SENDER_ITEM);
   const [selectedLocale, setSelectedLocale] = useState(defaultLocale);
@@ -133,8 +132,6 @@ export const EmailSettings = ({
     logoImageUrl: previewLogo.url,
     footerPostalAddress: draft.sender.footerPostalAddress.trim() || undefined,
   });
-  const isDisabled = isPending || isArchived;
-  const archivedDescribedBy = isArchived ? archivedNoticeId : undefined;
 
   const items = [EMAIL_SENDER_ITEM, ...EMAIL_TEMPLATE_TYPES].map((item) => {
     const itemStatus = resolveItemStatus(saved, draft, item, selectedLocale);
@@ -275,8 +272,6 @@ export const EmailSettings = ({
                 setDraft((prev) => withLogo(prev, EMAIL_SENDER_ITEM, logo))
               }
               senderNameError={senderNameError}
-              isDisabled={isDisabled}
-              archivedNoticeId={archivedDescribedBy}
             />
           ) : (
             <EmailTemplateEditor
@@ -306,8 +301,6 @@ export const EmailSettings = ({
               onLogoStage={(logo) =>
                 setDraft((prev) => withLogo(prev, selectedItem, logo))
               }
-              isDisabled={isDisabled}
-              archivedNoticeId={archivedDescribedBy}
             />
           )}
         </div>
@@ -326,7 +319,6 @@ export const EmailSettings = ({
               })
             }
             isSendingTest={isSending}
-            isSendTestDisabled={isArchived}
             hasUnsavedLogo={previewLogo.file !== undefined}
           />
         </div>

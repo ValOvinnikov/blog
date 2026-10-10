@@ -1,5 +1,6 @@
 import { BrandAssetField } from '@platform/components/features/look/brand-asset-field';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
+import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import type { TLookFormFieldSetter } from '@platform/utils/default-look-values/default-look-values';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
@@ -14,8 +15,6 @@ export type TBrandCardProps = {
   repickKinds: readonly TBrandAssetKind[];
   onFieldChange: TLookFormFieldSetter;
   hasUnsavedChanges: boolean;
-  isArchived: boolean;
-  archivedNoticeId: string;
 };
 
 export const BrandCard = ({
@@ -24,12 +23,11 @@ export const BrandCard = ({
   repickKinds,
   onFieldChange,
   hasUnsavedChanges,
-  isArchived,
-  archivedNoticeId,
 }: TBrandCardProps) => {
+  const { isArchived, archivedDescribedBy } = useSettingsFormState();
   const t = useTranslations('lookForm');
   const hintId = useId();
-  const describedBy = isArchived ? `${hintId} ${archivedNoticeId}` : hintId;
+  const describedBy = [hintId, archivedDescribedBy].filter(Boolean).join(' ');
   const { uploads, rows, hint } = brandCardVariants();
 
   return (
