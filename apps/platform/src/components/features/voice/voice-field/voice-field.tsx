@@ -10,6 +10,7 @@ import {
 } from '@blog/config';
 import { FieldStatus } from '@platform/components/shared/field-status';
 import { PortableTextEditor } from '@platform/components/shared/portable-text-editor';
+import { textVariants } from '@platform/components/shared/text/text-variants';
 import { TextInput } from '@platform/components/shared/text-input';
 import { Textarea } from '@platform/components/shared/textarea';
 import { isBlankPortableTextValue } from '@platform/utils/portable-text-schema/portable-text-schema';
@@ -56,8 +57,6 @@ export const VoiceField = ({
     header,
     labelGroup,
     label: labelSlot,
-    hint: hintSlot,
-    note,
     token,
     error: errorSlot,
   } = voiceFieldVariants();
@@ -95,7 +94,7 @@ export const VoiceField = ({
           <Field.Description
             id={hintId}
             render={<span />}
-            className={hintSlot()}
+            className={textVariants({ variant: 'hint' })}
           >
             {tHints(field.id)}
           </Field.Description>
@@ -140,7 +139,11 @@ export const VoiceField = ({
         />
       )}
       {placeholderToken !== undefined && (
-        <Field.Description id={noteId} render={<span />} className={note()}>
+        <Field.Description
+          id={noteId}
+          render={<span />}
+          className={textVariants({ variant: 'hint' })}
+        >
           {t.rich('keepPlaceholder', {
             token: `{${placeholderToken}}`,
             code: (chunks) => <code className={token()}>{chunks}</code>,

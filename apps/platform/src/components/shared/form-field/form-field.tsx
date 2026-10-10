@@ -1,6 +1,7 @@
 'use client';
 
 import { Field } from '@base-ui/react/field';
+import { textVariants } from '@platform/components/shared/text/text-variants';
 import type { ReactNode } from 'react';
 
 import { formFieldVariants } from './form-field-variants';
@@ -28,7 +29,6 @@ export const FormField = ({
     root,
     header,
     label: labelSlot,
-    hint: hintSlot,
     error: errorSlot,
   } = formFieldVariants();
 
@@ -42,10 +42,12 @@ export const FormField = ({
         )}
         {actions}
       </div>
-      {children}
       {hint && (
-        <Field.Description className={hintSlot()}>{hint}</Field.Description>
+        <Field.Description className={textVariants({ variant: 'hint' })}>
+          {hint}
+        </Field.Description>
       )}
+      {children}
       {error && (
         <Field.Error match={true} className={errorSlot()}>
           {error}

@@ -1,4 +1,5 @@
 import { Field } from '@base-ui/react/field';
+import { textVariants } from '@platform/components/shared/text/text-variants';
 import type { ReactNode } from 'react';
 
 import { settingRowVariants } from './setting-row-variants';
@@ -34,7 +35,12 @@ export const SettingRow = ({
       <div className={content()}>
         <span className={labelSlot()}>{label}</span>
         {description && (
-          <Field.Description className={descriptionSlot()}>
+          <Field.Description
+            className={textVariants({
+              variant: 'hint',
+              class: descriptionSlot(),
+            })}
+          >
             {description}
           </Field.Description>
         )}
