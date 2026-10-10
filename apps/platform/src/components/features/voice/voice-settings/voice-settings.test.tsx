@@ -290,17 +290,22 @@ describe(`<${VoiceSettings.name}/>`, () => {
       ).toHaveTextContent(SITE_MESSAGES_BY_LOCALE.EN.blogListPage.empty);
     });
 
-    it('keeps keyboard focus on a list row as it opens', async () => {
+    it('keeps keyboard focus on a list row as it opens, then tabs into its field', async () => {
       setup();
-      const row = within(card('Empty lists')).getByRole('button', {
-        name: /Tag page/,
-      });
+      const section = card('Empty lists');
+      const row = within(section).getByRole('button', { name: /Tag page/ });
 
       row.focus();
       await user.keyboard('{Enter}');
 
       expect(row).toHaveFocus();
       expect(row).toHaveAttribute('aria-expanded', 'true');
+
+      await user.tab();
+
+      expect(
+        within(section).getByRole('button', { name: 'Bold' }),
+      ).toHaveFocus();
     });
 
     it('titles the open list once, in its header', () => {
