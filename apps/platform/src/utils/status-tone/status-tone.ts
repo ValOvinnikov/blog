@@ -12,7 +12,7 @@ import {
   DOMAIN_VERIFICATION_STATUS,
   type TDomainVerificationStatus,
 } from '@platform/constants/domain';
-import type { TEmailItemStatus } from '@platform/utils/email-draft/email-draft';
+import type { TEmailItemStatus } from '@platform/utils/email-draft-changes/email-draft-changes';
 
 type TBadgeTone = 'ok' | 'warn' | 'bad' | 'neutral' | 'brand';
 

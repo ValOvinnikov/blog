@@ -2,8 +2,8 @@ import { routes, type TVoiceFieldId, type VOICE_SURFACE } from '@blog/config';
 import type { TLocaleIsoCode } from '@blog/config/constants';
 import { Accordion } from '@platform/components/shared/accordion';
 import { FieldStatus } from '@platform/components/shared/field-status';
+import { isSameJson } from '@platform/utils/is-same-json/is-same-json';
 import {
-  isSameVoiceValue,
   isVoiceValueCustomised,
   voiceDefaultText,
   voiceValueAsText,
@@ -87,7 +87,7 @@ export const VoiceListRow = ({
             <span className={status()}>
               <FieldStatus
                 isCustomised={isCustomised}
-                isUnsaved={!isSameVoiceValue(value, savedValue)}
+                isUnsaved={!isSameJson(value, savedValue)}
               />
             </span>
           </>

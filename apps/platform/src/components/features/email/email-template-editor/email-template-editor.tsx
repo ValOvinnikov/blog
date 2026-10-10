@@ -11,11 +11,11 @@ import { TextInput } from '@platform/components/shared/text-input';
 import { CONTROL_MODE } from '@platform/constants/control-mode';
 import { EMAIL_LOGO_KIND } from '@platform/constants/email-logo';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
-import {
-  isSameBody,
-  type TEmailCopyDraft,
-  type TEmailCopyEdit,
+import type {
+  TEmailCopyDraft,
+  TEmailCopyEdit,
 } from '@platform/utils/email-draft/email-draft';
+import { isSameJson } from '@platform/utils/is-same-json/is-same-json';
 import { isBlankPortableTextValue } from '@platform/utils/portable-text-schema/portable-text-schema';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 import { useTranslations } from 'next-intl';
@@ -52,7 +52,7 @@ export const EmailTemplateEditor = ({
     onCopyChange({
       ...draft,
       body:
-        isBlankPortableTextValue(body) || isSameBody(body, fallback.body)
+        isBlankPortableTextValue(body) || isSameJson(body, fallback.body)
           ? null
           : body,
     });
@@ -98,7 +98,7 @@ export const EmailTemplateEditor = ({
             actions={
               <FieldStatus
                 isCustomised={draft.body !== null}
-                isUnsaved={!isSameBody(draft.body, saved.body)}
+                isUnsaved={!isSameJson(draft.body, saved.body)}
                 onReset={isDisabled ? undefined : resetBody}
               />
             }

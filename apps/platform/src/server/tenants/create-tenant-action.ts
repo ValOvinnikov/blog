@@ -1,10 +1,6 @@
 'use server';
 
-import {
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  DOMAIN_PATTERN,
-} from '@blog/config';
+import { AUDIT_ACTION, AUDIT_TARGET_TYPE, DOMAIN_PATTERN } from '@blog/config';
 import { queries, TENANT_PLAN, type TTenantPlan } from '@blog/db';
 import { DOMAIN_AVAILABILITY } from '@platform/constants/domain';
 import { routing } from '@platform/i18n/routing';
