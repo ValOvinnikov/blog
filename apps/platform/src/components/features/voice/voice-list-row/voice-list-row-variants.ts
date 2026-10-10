@@ -9,6 +9,7 @@ export const voiceListRowVariants = tv({
       'min-w-0 flex-1 truncate text-[13.5px] leading-5 text-admin-muted max-sm:hidden',
     ],
     status: ['flex h-5 shrink-0 items-center'],
+    error: ['-mt-1.5 px-2.5 pb-3 text-[11.5px] text-admin-bad'],
   },
   variants: {
     hasError: {

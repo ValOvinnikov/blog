@@ -3,11 +3,11 @@
 import {
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
-  DOMAIN_AVAILABILITY,
   DOMAIN_PATTERN,
   ERROR_CODE,
 } from '@blog/config';
 import { queries, TENANT_PLAN, type TTenantPlan } from '@blog/db';
+import { DOMAIN_AVAILABILITY } from '@platform/constants/domain';
 import { routing } from '@platform/i18n/routing';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { signIn } from '@platform/server/auth/auth';

@@ -1,8 +1,11 @@
 'use client';
 
-import { CONTROL_MODE, type TControlMode } from '@blog/config';
 import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
 import { sanitizeHref } from '@blog/email/html';
+import {
+  CONTROL_MODE,
+  type TControlMode,
+} from '@platform/constants/control-mode';
 import { EMAIL_PORTABLE_TEXT_SCHEMA } from '@platform/utils/portable-text-schema/portable-text-schema';
 import {
   defineAnnotation,

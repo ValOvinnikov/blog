@@ -1,11 +1,11 @@
-import {
-  DOMAIN_VERIFICATION_STATUS,
-  type TDomainVerificationStatus,
-} from '@blog/config';
 import { DnsRecordsTable } from '@platform/components/features/tenants/domain-page-content/components/dns-records-table/dns-records-table';
 import { Card } from '@platform/components/shared/card';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
+import {
+  DOMAIN_VERIFICATION_STATUS,
+  type TDomainVerificationStatus,
+} from '@platform/constants/domain';
 import type { TProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
 import { domainVerificationTone } from '@platform/utils/status-tone/status-tone';
 import { useTranslations } from 'next-intl';

@@ -1,8 +1,8 @@
+import { DOMAIN_PATTERN } from '@blog/config';
 import {
-  DOMAIN_PATTERN,
   DOMAIN_VERIFICATION_STATUS,
   type TDomainVerificationStatus,
-} from '@blog/config';
+} from '@platform/constants/domain';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 
