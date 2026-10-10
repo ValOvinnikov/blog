@@ -74,7 +74,7 @@ src/components/atoms/theme-toggle/
   `*-variants.ts`. Extract the relevant slot classes into the child's own file.
 - **Every child lives in its own sub-folder** inside `components/`.
 - **Use absolute package paths for cross-folder imports** —
-  `@blog/ui/components/atoms/heading`, `@blog/ui/lib/compound`, never `../../atoms/heading`.
+  `@blog/ui/components/atoms/heading`, `@blog/ui/lib/react`, never `../../atoms/heading`.
   The `@blog/ui/*` alias is configured in `tsconfig.json` (paths),
   `vitest.config.ts` (resolve.alias), and `.storybook/main.ts`. Same-folder
   imports (`./header-variants`) stay relative.
@@ -357,7 +357,7 @@ Use when a component owns **more than one** framework-coupled seam (renders both
 a link and an image, or a family of swappable children). A single `as` swaps one
 seam; compound splits into named slots (`Header.Brand`/`Header.Nav`, `PostCard`,
 `Hero`). The repo uses a **context-free children-introspection** pattern
-(`mapCompoundSlots` from `@blog/ui/lib/compound`), **not** React Context — which
+(`mapCompoundSlots` from `@blog/ui/lib/react`), **not** React Context — which
 needs a client boundary `@blog/ui` can't have. If a component only ever swaps
 **one** element, don't build compound — use `as`.
 

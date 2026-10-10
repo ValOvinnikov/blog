@@ -88,6 +88,29 @@ describe(listFindingsForTenant, () => {
     expect(resolvedOnly[0]?.id).toBe(opened.data.finding.id);
   });
 
+  it('leaves details out and reports whether each finding has them', async () => {
+    const base = {
+      tenantId,
+      source: FINDING_SOURCE.DOCUMENT_VALIDATION,
+      kind: FINDING_KIND.SCHEMA_VALIDATION_ERROR,
+      severity: FINDING_SEVERITY.WARNING,
+    };
+    await openFinding({
+      ...base,
+      identifier: 'with-details',
+      details: { invalidDocumentCount: 1 },
+    });
+    await openFinding({ ...base, identifier: 'without-details' });
+
+    const result = await listFindingsForTenant(tenantId);
+
+    expect(result.every((finding) => !('details' in finding))).toBe(true);
+    expect(result.map((finding) => finding.hasDetails).sort()).toEqual([
+      false,
+      true,
+    ]);
+  });
+
   it('returns an empty array for a tenant with no findings', async () => {
     const result = await listFindingsForTenant(tenantId);
 
