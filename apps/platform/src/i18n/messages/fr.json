@@ -44,9 +44,11 @@
   "tenantSwitcher": {
     "archived": "Archivé"
   },
+  "toast": {
+    "dismissLabel": "Fermer la notification"
+  },
   "toastProvider": {
     "viewportAriaLabel": "Notifications",
-    "dismissLabel": "Fermer la notification",
     "mergeCountSuffix": " ×{count}"
   },
   "topbarNavMenu": {

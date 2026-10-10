@@ -1,1 +1,2 @@
-export { Toast, type IToastAction } from './toast';
+export { Toast } from './toast';
+export type { IToastPayload, IToastRecord } from './toast-record';

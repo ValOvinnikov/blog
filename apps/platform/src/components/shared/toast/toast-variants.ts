@@ -1,6 +1,5 @@
 import { TOAST_TYPE } from '@blog/config';
 import { tv } from '@platform/utils/tv/tv';
-import type { VariantProps } from 'tailwind-variants';
 
 export const toastVariants = tv({
   slots: {
@@ -49,5 +48,3 @@ export const toastVariants = tv({
     phase: 'visible',
   },
 });
-
-export type TToastVariants = VariantProps<typeof toastVariants>;
