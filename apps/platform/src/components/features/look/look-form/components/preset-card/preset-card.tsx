@@ -2,6 +2,7 @@ import { SIZE, type TPresetId } from '@blog/config';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { Button } from '@platform/components/shared/button';
 import { PresetPicker } from '@platform/components/shared/preset-picker';
+import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import { useTranslations } from 'next-intl';
 
 export type TPresetCardProps = {
@@ -10,8 +11,6 @@ export type TPresetCardProps = {
   onReset: () => void;
   isResetVisible: boolean;
   hasUnsavedChanges: boolean;
-  isArchived: boolean;
-  archivedNoticeId: string;
 };
 
 export const PresetCard = ({
@@ -20,11 +19,9 @@ export const PresetCard = ({
   onReset,
   isResetVisible,
   hasUnsavedChanges,
-  isArchived,
-  archivedNoticeId,
 }: TPresetCardProps) => {
+  const { isArchived, archivedDescribedBy } = useSettingsFormState();
   const t = useTranslations('lookForm');
-  const archivedDescribedBy = isArchived ? archivedNoticeId : undefined;
 
   return (
     <LookCard

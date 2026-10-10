@@ -8,6 +8,7 @@ import { Icon } from '@platform/components/shared/icon';
 import { PreviewFrame } from '@platform/components/shared/preview-frame';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { PREVIEW_WIDTH, type TPreviewWidth } from '@platform/constants/preview';
+import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
@@ -20,7 +21,6 @@ export type TEmailPreviewProps = {
   subject: string;
   onSendTest: () => void;
   isSendingTest: boolean;
-  isSendTestDisabled: boolean;
   hasUnsavedLogo: boolean;
 };
 
@@ -31,10 +31,10 @@ export const EmailPreview = ({
   subject,
   onSendTest,
   isSendingTest,
-  isSendTestDisabled,
   hasUnsavedLogo,
 }: TEmailPreviewProps) => {
   const t = useTranslations('emailPreview');
+  const { isArchived } = useSettingsFormState();
   const [width, setWidth] = useState<TPreviewWidth>(PREVIEW_WIDTH.DESKTOP);
   const { message, envelope } = emailPreviewVariants();
 
@@ -59,7 +59,7 @@ export const EmailPreview = ({
           size={SIZE.SM}
           variant="secondary"
           onClick={onSendTest}
-          isDisabled={isSendTestDisabled}
+          isDisabled={isArchived}
           isPending={isSendingTest}
           pendingLabel={t('sendingTest')}
         >

@@ -12,6 +12,7 @@ import { PortableTextEditor } from '@platform/components/shared/portable-text-ed
 import { TextInput } from '@platform/components/shared/text-input';
 import { Textarea } from '@platform/components/shared/textarea';
 import { CONTROL_MODE } from '@platform/constants/control-mode';
+import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import { isBlankPortableTextValue } from '@platform/utils/portable-text-schema/portable-text-schema';
 import {
   isSameVoiceValue,
@@ -32,7 +33,6 @@ export type TVoiceFieldProps = {
   placeholder: string;
   error?: string;
   onChange: (value: TVoiceDraftValue) => void;
-  archivedNoticeId?: string;
   hasVisibleLabel?: boolean;
 };
 
@@ -44,10 +44,11 @@ export const VoiceField = ({
   placeholder,
   error,
   onChange,
-  archivedNoticeId,
   hasVisibleLabel = true,
 }: TVoiceFieldProps) => {
   const t = useTranslations('voiceSettings');
+  const { isArchived: isReadOnly, archivedDescribedBy } =
+    useSettingsFormState();
   const tLabels = useTranslations('voiceFieldLabels');
   const tHints = useTranslations('voiceFieldHints');
   const [editorRevision, setEditorRevision] = useState(0);
@@ -66,7 +67,6 @@ export const VoiceField = ({
   const noteId = `${inputId}-note`;
   const errorId = `${inputId}-error`;
   const label = tLabels(field.id);
-  const isReadOnly = archivedNoticeId !== undefined;
   const isRich = field.kind === VOICE_FIELD_KIND.RICH;
   const textValue = typeof value === 'string' ? value : '';
   const [placeholderToken] = field.placeholders;
@@ -74,7 +74,7 @@ export const VoiceField = ({
     hintId,
     placeholderToken !== undefined && noteId,
     error && errorId,
-    archivedNoticeId,
+    archivedDescribedBy,
   ]
     .filter(Boolean)
     .join(' ');

@@ -1,4 +1,8 @@
-import { customRender, screen } from '@platform/testing/custom-render';
+import { screen } from '@platform/testing/custom-render';
+import {
+  ARCHIVED_NOTICE_TEXT,
+  customRenderInSettingsForm,
+} from '@platform/testing/render-in-settings-form';
 import userEvent from '@testing-library/user-event';
 
 import { EmailSenderEditor } from './email-sender-editor';
@@ -9,12 +13,11 @@ const SENDER = {
   footerPostalAddress: '',
 };
 
-const setup = customRender(EmailSenderEditor, {
+const setup = customRenderInSettingsForm(EmailSenderEditor, {
   sender: SENDER,
   logo: { url: undefined },
   onSenderChange: vi.fn(),
   onLogoStage: vi.fn(),
-  isDisabled: false,
 });
 
 describe(`<${EmailSenderEditor.name}/>`, () => {
@@ -61,8 +64,24 @@ describe(`<${EmailSenderEditor.name}/>`, () => {
     );
   });
 
-  it('locks every field while disabled', () => {
-    setup({ isDisabled: true });
+  it('locks every field and describes it with the notice while archived', () => {
+    setup({}, { isArchived: true });
+
+    const fields = [
+      screen.getByLabelText('Sender name'),
+      screen.getByLabelText('Footer postal address'),
+      screen.getByRole('button', { name: 'Upload email logo' }),
+    ];
+    for (const field of fields) {
+      expect(field).toBeDisabled();
+      expect(field).toHaveAccessibleDescription(
+        expect.stringContaining(ARCHIVED_NOTICE_TEXT),
+      );
+    }
+  });
+
+  it('locks every field while a save is pending', () => {
+    setup({}, { isPending: true });
 
     expect(screen.getByLabelText('Sender name')).toBeDisabled();
     expect(screen.getByLabelText('Footer postal address')).toBeDisabled();

@@ -1,17 +1,17 @@
 import { PREVIEW_WIDTH } from '@platform/constants/preview';
-import { customRender, screen } from '@platform/testing/custom-render';
+import { screen } from '@platform/testing/custom-render';
+import { customRenderInSettingsForm } from '@platform/testing/render-in-settings-form';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { EmailPreview } from './email-preview';
 
-const setup = customRender(EmailPreview, {
+const setup = customRenderInSettingsForm(EmailPreview, {
   html: '<p>Bonjour</p>',
   from: 'Acme Co',
   replyTo: 'hello@acme.example',
   subject: 'Connexion',
   onSendTest: vi.fn(),
   isSendingTest: false,
-  isSendTestDisabled: false,
   hasUnsavedLogo: false,
 });
 
@@ -54,6 +54,14 @@ describe(`<${EmailPreview.name}/>`, () => {
     await user.click(screen.getByRole('button', { name: 'Send test to me' }));
 
     expect(onSendTest).toHaveBeenCalledOnce();
+  });
+
+  it('offers no test send for an archived tenant', () => {
+    setup({}, { isArchived: true });
+
+    expect(
+      screen.getByRole('button', { name: 'Send test to me' }),
+    ).toBeDisabled();
   });
 
   it('says a staged logo is left out of the test', () => {

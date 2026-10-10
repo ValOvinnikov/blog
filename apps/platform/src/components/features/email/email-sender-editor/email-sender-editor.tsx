@@ -4,6 +4,7 @@ import { EmailLogoField } from '@platform/components/features/email/email-logo-f
 import { Card } from '@platform/components/shared/card';
 import { FormTextInput } from '@platform/components/shared/form-text-input';
 import { EMAIL_LOGO_KIND } from '@platform/constants/email-logo';
+import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import type { TEmailSenderDraft } from '@platform/utils/email-draft/email-draft';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 import { useTranslations } from 'next-intl';
@@ -16,8 +17,6 @@ export type TEmailSenderEditorProps = {
   onSenderChange: (sender: TEmailSenderDraft) => void;
   onLogoStage: (logo: TStagedImage) => void;
   senderNameError?: string;
-  isDisabled: boolean;
-  archivedNoticeId?: string;
 };
 
 export const EmailSenderEditor = ({
@@ -26,9 +25,9 @@ export const EmailSenderEditor = ({
   onSenderChange,
   onLogoStage,
   senderNameError,
-  isDisabled,
-  archivedNoticeId,
 }: TEmailSenderEditorProps) => {
+  const { isArchived, isPending, archivedDescribedBy } = useSettingsFormState();
+  const isDisabled = isArchived || isPending;
   const t = useTranslations('emailSettingsForm');
   const tItem = useTranslations('emailForm');
   const tPreview = useTranslations('emailPreview');
@@ -53,7 +52,7 @@ export const EmailSenderEditor = ({
             value={sender.senderName}
             onChange={(value) => updateField('senderName', value)}
             isDisabled={isDisabled}
-            aria-describedby={archivedNoticeId}
+            aria-describedby={archivedDescribedBy}
           />
           <FormTextInput
             label={t('replyToLabel')}
@@ -63,7 +62,7 @@ export const EmailSenderEditor = ({
             value={sender.replyToAddress}
             onChange={(value) => updateField('replyToAddress', value)}
             isDisabled={isDisabled}
-            aria-describedby={archivedNoticeId}
+            aria-describedby={archivedDescribedBy}
           />
           <FormTextInput
             label={t('footerAddressLabel')}
@@ -71,7 +70,7 @@ export const EmailSenderEditor = ({
             value={sender.footerPostalAddress}
             onChange={(value) => updateField('footerPostalAddress', value)}
             isDisabled={isDisabled}
-            aria-describedby={archivedNoticeId}
+            aria-describedby={archivedDescribedBy}
           />
           <EmailLogoField
             kind={EMAIL_LOGO_KIND.SENDER}
@@ -79,8 +78,6 @@ export const EmailSenderEditor = ({
             hint={t('logoHint')}
             logo={logo}
             onStage={onLogoStage}
-            isDisabled={isDisabled}
-            aria-describedby={archivedNoticeId}
           />
         </div>
       </Card.Body>
