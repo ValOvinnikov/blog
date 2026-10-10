@@ -4,10 +4,8 @@ import { Select } from '@base-ui/react/select';
 import { ICONS, SIZE } from '@blog/config';
 import { Icon } from '@platform/components/shared/icon';
 import { StatusBadge } from '@platform/components/shared/status-badge';
-import type {
-  TEmailItemStatus,
-  TEmailPageItem,
-} from '@platform/utils/email-draft/email-draft';
+import type { TEmailPageItem } from '@platform/utils/email-draft/email-draft';
+import type { TEmailItemStatus } from '@platform/utils/email-draft-changes/email-draft-changes';
 import { fieldStatusTone } from '@platform/utils/status-tone/status-tone';
 
 import { itemSelectVariants } from './item-select-variants';

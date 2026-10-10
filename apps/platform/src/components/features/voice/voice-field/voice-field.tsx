@@ -12,9 +12,9 @@ import { FieldStatus } from '@platform/components/shared/field-status';
 import { PortableTextEditor } from '@platform/components/shared/portable-text-editor';
 import { TextInput } from '@platform/components/shared/text-input';
 import { Textarea } from '@platform/components/shared/textarea';
+import { isSameJson } from '@platform/utils/is-same-json/is-same-json';
 import { isBlankPortableTextValue } from '@platform/utils/portable-text-schema/portable-text-schema';
 import {
-  isSameVoiceValue,
   isVoiceValueCustomised,
   type TVoiceDraftValue,
   type TVoiceField,
@@ -102,7 +102,7 @@ export const VoiceField = ({
         </div>
         <FieldStatus
           isCustomised={isVoiceValueCustomised(value)}
-          isUnsaved={!isSameVoiceValue(value, savedValue)}
+          isUnsaved={!isSameJson(value, savedValue)}
           onReset={isReadOnly ? undefined : reset}
         />
       </div>

@@ -16,20 +16,22 @@ import { SettingsFormShell } from '@platform/components/shared/settings-form-she
 import { useViewTabs, ViewTabs } from '@platform/components/shared/view-tabs';
 import { useToast } from '@platform/context/toast-provider';
 import {
-  countCustomisedTemplates,
-  countEmailDraftChanges,
-  countLanguageChanges,
-  countSharedChanges,
   EMAIL_SENDER_ITEM,
   EMAIL_TEMPLATE_TYPES,
-  resolveFallbackCopy,
-  resolveItemStatus,
   withCopy,
   withLogo,
   type TEmailDraft,
   type TEmailPageItem,
   type TEmailSenderDraft,
 } from '@platform/utils/email-draft/email-draft';
+import {
+  countCustomisedTemplates,
+  countEmailDraftChanges,
+  countLanguageChanges,
+  countSharedChanges,
+  resolveItemStatus,
+} from '@platform/utils/email-draft-changes/email-draft-changes';
+import { resolveFallbackCopy } from '@platform/utils/email-fallback-copy/email-fallback-copy';
 import { buildEmailTemplatePreviewHtml } from '@platform/utils/email-template-preview-builder/email-template-preview-builder';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';

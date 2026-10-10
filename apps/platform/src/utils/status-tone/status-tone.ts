@@ -10,7 +10,7 @@ import {
   type TTenantStatus,
   type TTenantProvisioningStepStatus,
 } from '@blog/db/constants';
-import type { TEmailItemStatus } from '@platform/utils/email-draft/email-draft';
+import type { TEmailItemStatus } from '@platform/utils/email-draft-changes/email-draft-changes';
 
 type TBadgeTone = 'ok' | 'warn' | 'bad' | 'neutral' | 'brand';
 

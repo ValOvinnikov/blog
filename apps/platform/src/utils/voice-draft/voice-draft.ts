@@ -10,6 +10,7 @@ import {
 } from '@blog/config';
 import type { TLocaleIsoCode } from '@blog/config/constants';
 import type { TVoiceOverridesByLocaleInput } from '@blog/db/queries/site-config';
+import { isSameJson } from '@platform/utils/is-same-json/is-same-json';
 
 export type TVoiceField = (typeof VOICE_FIELDS)[number];
 
@@ -109,11 +110,6 @@ export const withVoiceValue = (
 export const isVoiceValueCustomised = (value: TVoiceDraftValue): boolean =>
   typeof value === 'string' ? value.trim() !== '' : value !== null;
 
-export const isSameVoiceValue = (
-  a: TVoiceDraftValue,
-  b: TVoiceDraftValue,
-): boolean => JSON.stringify(a) === JSON.stringify(b);
-
 export const voiceValueAsText = (value: TVoiceDraftValue): string => {
   if (value === null) return '';
   return typeof value === 'string' ? value : portableTextToPlainText(value);
@@ -127,7 +123,7 @@ export const countLanguageVoiceChanges = (
   const savedValues = localeDraftOf(saved, locale);
   const draftValues = localeDraftOf(draft, locale);
   return VOICE_FIELDS.filter(
-    ({ id }) => !isSameVoiceValue(savedValues[id], draftValues[id]),
+    ({ id }) => !isSameJson(savedValues[id], draftValues[id]),
   ).length;
 };
 

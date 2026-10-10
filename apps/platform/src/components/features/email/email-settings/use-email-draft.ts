@@ -8,14 +8,17 @@ import { updateEmailTemplateAction } from '@platform/server/email-templates/upda
 import {
   blankToNull,
   EMAIL_SENDER_ITEM,
-  isSenderChanged,
-  listCopyChanges,
-  listLogoChanges,
   withCopy,
   toSenderInput,
   withLogo,
   type TEmailDraft,
+  type TEmailPageItem,
 } from '@platform/utils/email-draft/email-draft';
+import {
+  isSenderChanged,
+  listCopyChanges,
+  listLogoChanges,
+} from '@platform/utils/email-draft-changes/email-draft-changes';
 import type { TEmailLogoTarget } from '@platform/utils/email-logo-target/email-logo-target';
 import { persistStagedImage } from '@platform/utils/staged-image/staged-image';
 import { useFormSubmission } from '@platform/utils/use-form-submission/use-form-submission';
@@ -28,9 +31,7 @@ type TUseEmailDraftArgs = {
   onSaved: () => void;
 };
 
-const toLogoTarget = (
-  target: ReturnType<typeof listLogoChanges>[number],
-): TEmailLogoTarget =>
+const toLogoTarget = (target: TEmailPageItem): TEmailLogoTarget =>
   target === EMAIL_SENDER_ITEM
     ? { type: 'tenant' }
     : { type: 'template', templateType: target };
