@@ -1,10 +1,10 @@
 'use server';
 
+import { queries } from '@blog/db';
 import {
   DOMAIN_VERIFICATION_STATUS,
   type TDomainVerificationStatus,
-} from '@blog/config';
-import { queries } from '@blog/db';
+} from '@platform/constants/domain';
 import { requireAdmin } from '@platform/server/auth/require-admin';
 import { logger } from '@platform/utils/logger/logger';
 

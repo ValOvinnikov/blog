@@ -1,4 +1,4 @@
-import { DOMAIN_AVAILABILITY } from '@blog/config';
+import { DOMAIN_AVAILABILITY } from '@platform/constants/domain';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 

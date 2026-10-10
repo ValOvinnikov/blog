@@ -3,7 +3,7 @@
 import {
   DOMAIN_VERIFICATION_STATUS,
   type TDomainVerificationStatus,
-} from '@blog/config';
+} from '@platform/constants/domain';
 import { getDomainVerificationStatusAction } from '@platform/server/provisioning/get-domain-verification-status-action';
 import { useEffect, useState } from 'react';
 
