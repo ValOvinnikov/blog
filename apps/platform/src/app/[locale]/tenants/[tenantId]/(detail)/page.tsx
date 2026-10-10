@@ -3,11 +3,12 @@ import { queries } from '@blog/db';
 import { DomainCardSkeleton } from '@platform/components/features/tenants/domain-card-skeleton';
 import { LiveDomainCard } from '@platform/components/features/tenants/live-domain-card';
 import { TenantOverviewView } from '@platform/components/features/tenants/tenant-overview-view';
+import { requireTenantById } from '@platform/server/auth/require-tenant-by-id';
 import { getDomainVerificationStatus } from '@platform/server/provisioning/get-domain-verification-status';
+import { toClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { formatDate } from '@platform/utils/format-date/format-date';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { Suspense } from 'react';
 
@@ -23,12 +24,8 @@ type TProps = {
 export default async function TenantOverviewPage({ params }: TProps) {
   const { tenantId } = await params;
 
-  const [tenant] = await queries.tenants.listTenantsByIds([tenantId]);
-
-  if (!tenant) {
-    notFound();
-  }
-
+  const { tenant } = await requireTenantById(tenantId);
+  const clientTenant = toClientTenant(tenant);
   const domainVerificationStatus = getDomainVerificationStatus(
     tenant.primaryDomain,
   );
@@ -47,11 +44,11 @@ export default async function TenantOverviewPage({ params }: TProps) {
 
   return (
     <TenantOverviewView
-      tenant={tenant}
+      tenant={clientTenant}
       domainCard={
         <Suspense fallback={<DomainCardSkeleton />}>
           <LiveDomainCard
-            tenant={tenant}
+            tenant={clientTenant}
             domainVerificationStatus={domainVerificationStatus}
             dnsHref={adminRoutes.tenantDomain(tenant.id)}
           />

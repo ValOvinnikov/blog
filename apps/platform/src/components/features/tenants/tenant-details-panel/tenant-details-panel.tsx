@@ -1,8 +1,11 @@
 'use client';
 
-import { ALERT_TYPE, LOCALE_ISO_CODES } from '@blog/config';
+import {
+  ALERT_TYPE,
+  LOCALE_ISO_CODES,
+  type TMaybeUndefined,
+} from '@blog/config';
 import { TENANT_PLAN, type TTenantPlan } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
@@ -11,6 +14,7 @@ import { FormTextInput } from '@platform/components/shared/form-text-input';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { useToast } from '@platform/context/toast-provider';
 import { useUnsavedChangesGuard } from '@platform/context/unsaved-changes-provider';
+import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import {
   updateTenantDetailsAction,
   type TUpdateTenantDetailsActionInput,
@@ -30,9 +34,9 @@ import { tenantDetailsPanelVariants } from './tenant-details-panel-variants';
 import { useLockStateChange } from './use-lock-state-change';
 
 export type TTenantDetailsPanelProps = {
-  tenant: TTenant;
+  tenant: TClientTenant;
   fieldLocks: TTenantFieldLocks;
-  ownerEmail: string | undefined;
+  ownerEmail: TMaybeUndefined<string>;
   archivedNoticeId?: string;
 };
 
@@ -51,8 +55,8 @@ const TEXT_FIELD_TYPE: Partial<Record<TTextFieldKey, string>> = {
 };
 
 const valuesFromProps = (
-  tenant: TTenant,
-  ownerEmail: string | undefined,
+  tenant: TClientTenant,
+  ownerEmail: TMaybeUndefined<string>,
 ): TFormValues => {
   return {
     name: tenant.name,
@@ -101,7 +105,8 @@ export const TenantDetailsPanel = ({
   );
   const [fieldErrors, setFieldErrors] =
     useState<TUpdateTenantDetailsFieldErrors>({});
-  const [formError, setFormError] = useState<string | undefined>(undefined);
+  const [formError, setFormError] =
+    useState<TMaybeUndefined<string>>(undefined);
   const [isPending, startTransition] = useTransition();
   const isArchived = Boolean(tenant.deprovisionedAt);
 

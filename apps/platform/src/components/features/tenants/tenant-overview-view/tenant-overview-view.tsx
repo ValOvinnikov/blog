@@ -1,8 +1,8 @@
 'use client';
 
+import type { TMaybeUndefined } from '@blog/config';
 import type { TAuditEvent } from '@blog/db/schema/audit-events';
 import type { TFindingSummary } from '@blog/db/schema/findings';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { ContentWorkspaceCard } from '@platform/components/features/tenants/content-workspace-card';
 import { FindingsCard } from '@platform/components/features/tenants/findings-card';
 import { OwnerCard } from '@platform/components/features/tenants/owner-card';
@@ -14,6 +14,7 @@ import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenan
 import { ExternalLinkButton } from '@platform/components/shared/external-link-button';
 import { PageHeader } from '@platform/components/shared/page-header';
 import { StatusBadge } from '@platform/components/shared/status-badge';
+import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { tenantStatusTone } from '@platform/utils/status-tone/status-tone';
 import { computeTenantFieldLocks } from '@platform/utils/tenant-field-locks/tenant-field-locks';
 import { useTranslations } from 'next-intl';
@@ -22,11 +23,11 @@ import { useId, type ReactNode } from 'react';
 import { tenantOverviewViewVariants } from './tenant-overview-view-variants';
 
 export type TTenantOverviewViewProps = {
-  tenant: TTenant;
+  tenant: TClientTenant;
   domainCard: ReactNode;
-  ownerEmail: string | undefined;
-  ownerJoinedAt: string | undefined;
-  ownerJoinedAtIso: string | undefined;
+  ownerEmail: TMaybeUndefined<string>;
+  ownerJoinedAt: TMaybeUndefined<string>;
+  ownerJoinedAtIso: TMaybeUndefined<string>;
   auditEvents: TAuditEvent[];
   findings: TFindingSummary[];
 };

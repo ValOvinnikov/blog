@@ -12,7 +12,7 @@ import { domainVerificationTone } from '@platform/utils/status-tone/status-tone'
 import { useTranslations } from 'next-intl';
 
 export type TDomainCardProps = {
-  tenant: TTenant;
+  tenant: Pick<TTenant, 'primaryDomain'>;
   domainVerificationStatus: TDomainVerificationStatus;
   dnsHref: string;
 };

@@ -1,10 +1,11 @@
 'use client';
 
-import type { TTenant } from '@blog/db/schema/tenants';
+import type { TMaybeUndefined } from '@blog/config';
 import { Card } from '@platform/components/shared/card';
 import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
 import { Text } from '@platform/components/shared/text';
 import { reactivateTenantAction } from '@platform/server/provisioning/reactivate-tenant-action';
+import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';
@@ -12,7 +13,7 @@ import { useState, useTransition } from 'react';
 import { reactivateTenantControlVariants } from './reactivate-tenant-control-variants';
 
 export type TReactivateTenantControlProps = {
-  tenant: TTenant;
+  tenant: TClientTenant;
 };
 
 /**
@@ -26,7 +27,7 @@ export const ReactivateTenantControl = ({
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [confirm, setConfirm] = useState('');
-  const [error, setError] = useState<string | undefined>(undefined);
+  const [error, setError] = useState<TMaybeUndefined<string>>(undefined);
   const [isPending, startTransition] = useTransition();
 
   const { content } = reactivateTenantControlVariants();

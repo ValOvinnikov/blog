@@ -1,8 +1,7 @@
 'use client';
 
-import { ALERT_TYPE, SIZE } from '@blog/config';
+import { ALERT_TYPE, SIZE, type TMaybeUndefined } from '@blog/config';
 import { TENANT_PROVISIONING_STEP_STATUS } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { RunErrorCard } from '@platform/components/features/tenants/run-error-card';
 import { Alert } from '@platform/components/shared/alert';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
@@ -14,6 +13,7 @@ import { PageHeader } from '@platform/components/shared/page-header';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { StepList } from '@platform/components/shared/step-list';
 import { Text } from '@platform/components/shared/text';
+import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { formatRelativeTime } from '@platform/utils/format-relative-time/format-relative-time';
 import { provisioningStepTone } from '@platform/utils/status-tone/status-tone';
 import { useCollapseOnDone } from '@platform/utils/use-collapse-on-done/use-collapse-on-done';
@@ -26,8 +26,8 @@ import { provisioningStatusViewVariants } from './provisioning-status-view-varia
 import { STEP_ORDER, useProvisioningPoll } from './use-provisioning-poll';
 
 type TProvisioningStatusViewProps = {
-  tenant: TTenant;
-  ownerEmail: string | undefined;
+  tenant: TClientTenant;
+  ownerEmail: TMaybeUndefined<string>;
 };
 
 export const ProvisioningStatusView = ({

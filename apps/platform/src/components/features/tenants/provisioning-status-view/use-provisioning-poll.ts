@@ -1,5 +1,6 @@
 'use client';
 
+import type { TMaybeUndefined } from '@blog/config';
 import {
   CORE_PROVISIONING_STEPS,
   TENANT_PROVISIONING_STATUS,
@@ -11,12 +12,12 @@ import {
 } from '@blog/db/constants';
 import type {
   TProvisioningRun,
-  TTenant,
   TTenantProvisioningState,
 } from '@blog/db/schema/tenants';
 import { useToast } from '@platform/context/toast-provider';
 import { getTenantProvisioningStatusAction } from '@platform/server/provisioning/get-tenant-provisioning-status-action';
 import { retryProvisioningStepAction } from '@platform/server/provisioning/retry-provisioning-step-action';
+import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import {
   classifyProvisioningError,
   type TProvisioningErrorKind,
@@ -91,7 +92,7 @@ const stepStatusesFor = (
 
 const stepUpdatedAtFor = (
   steps: TTenantProvisioningState | null,
-): (string | undefined)[] =>
+): TMaybeUndefined<string>[] =>
   STEP_ORDER.map((stepKey) => steps?.[stepKey]?.updatedAt);
 
 const stepStatusesEqual = (
@@ -103,7 +104,7 @@ type TDispatchNoticeKind =
   'not-found' | 'archived' | 'already-in-progress' | 'other';
 
 export type TUseProvisioningPollResult = {
-  dispatchNotice: TDispatchNoticeKind | undefined;
+  dispatchNotice: TMaybeUndefined<TDispatchNoticeKind>;
   isStarting: boolean;
   isRetrying: boolean;
   handleStart: () => void;
@@ -113,20 +114,20 @@ export type TUseProvisioningPollResult = {
   effectiveProvisioningStatus: TTenantProvisioningStatus | null;
   stepStatuses: TTenantProvisioningStepStatus[];
   displayStepStatuses: TTenantProvisioningStepStatus[];
-  stepUpdatedAt: (string | undefined)[];
-  provisioningRun: TProvisioningRun | undefined;
+  stepUpdatedAt: TMaybeUndefined<string>[];
+  provisioningRun: TMaybeUndefined<TProvisioningRun>;
   allIdle: boolean;
   isProvisioningRunning: boolean;
   overallStepStatus: TTenantProvisioningStepStatus;
   isOverallFailed: boolean;
   displayOverallStatus: Exclude<TTenantProvisioningStepStatus, 'FAILED'>;
-  failedStepError: string | undefined;
-  errorKind: TProvisioningErrorKind | undefined;
-  ownerElevationOutcome: TElevateTenantOwnerOutcome | undefined;
+  failedStepError: TMaybeUndefined<string>;
+  errorKind: TMaybeUndefined<TProvisioningErrorKind>;
+  ownerElevationOutcome: TMaybeUndefined<TElevateTenantOwnerOutcome>;
 };
 
 export const useProvisioningPoll = (
-  tenant: TTenant,
+  tenant: TClientTenant,
 ): TUseProvisioningPollResult => {
   const router = useRouter();
   const toast = useToast();
@@ -137,9 +138,8 @@ export const useProvisioningPoll = (
   const pollErrorToastIdRef = useRef<string | null>(null);
   const [isRetrying, setIsRetrying] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
-  const [dispatchNotice, setDispatchNotice] = useState<
-    TDispatchNoticeKind | undefined
-  >(undefined);
+  const [dispatchNotice, setDispatchNotice] =
+    useState<TMaybeUndefined<TDispatchNoticeKind>>(undefined);
   const [, startTransition] = useTransition();
   const [renderedTenant, setRenderedTenant] = useState(tenant);
   const [provisioningStatus, setProvisioningStatus] =

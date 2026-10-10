@@ -8,7 +8,7 @@ import { ToastProvider } from '@platform/context/toast-provider';
 import messages from '@platform/i18n/messages/en.json';
 import {
   idleProvisioningSteps,
-  makeTenant,
+  makeClientTenant,
 } from '@platform/testing/tenants/fixtures';
 import {
   act,
@@ -74,21 +74,23 @@ describe(useProvisioningPoll, () => {
 
   describe('ownerElevationOutcome', () => {
     it('is undefined when the OWNER_ELEVATION step has not reported yet', () => {
-      const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
+      const tenant = makeClientTenant({
+        provisioningSteps: idleProvisioningSteps(),
+      });
       const { result } = renderHook(() => useProvisioningPoll(tenant));
 
       expect(result.current.ownerElevationOutcome).toBeUndefined();
     });
 
     it('is undefined when provisioningSteps itself is null', () => {
-      const tenant = makeTenant({ provisioningSteps: null });
+      const tenant = makeClientTenant({ provisioningSteps: null });
       const { result } = renderHook(() => useProvisioningPoll(tenant));
 
       expect(result.current.ownerElevationOutcome).toBeUndefined();
     });
 
     it('reads the detail off the OWNER_ELEVATION step once reported', () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningSteps: {
           ...idleProvisioningSteps(),
           [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: {
@@ -127,7 +129,7 @@ describe(useProvisioningPoll, () => {
         },
       };
 
-      const withoutOwnerElevation = makeTenant({
+      const withoutOwnerElevation = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
         provisioningSteps: allStepsDone,
       });
@@ -135,7 +137,7 @@ describe(useProvisioningPoll, () => {
         useProvisioningPoll(withoutOwnerElevation),
       );
 
-      const withStalledOwnerElevation = makeTenant({
+      const withStalledOwnerElevation = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
         provisioningSteps: {
           ...allStepsDone,
@@ -168,7 +170,7 @@ describe(useProvisioningPoll, () => {
 
   describe('status derivation', () => {
     it('exposes provisioningRun read off provisioningSteps.run, and undefined when absent', () => {
-      const withoutRun = makeTenant({
+      const withoutRun = makeClientTenant({
         provisioningSteps: idleProvisioningSteps(),
       });
       const { result: withoutResult } = renderHook(() =>
@@ -176,7 +178,7 @@ describe(useProvisioningPoll, () => {
       );
       expect(withoutResult.current.provisioningRun).toBeUndefined();
 
-      const withRun = makeTenant({
+      const withRun = makeClientTenant({
         provisioningSteps: {
           ...idleProvisioningSteps(),
           run: {
@@ -195,7 +197,7 @@ describe(useProvisioningPoll, () => {
     });
 
     it('exposes stepUpdatedAt parallel to STEP_ORDER, undefined for a step with none recorded', () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningSteps: {
           ...idleProvisioningSteps(),
           [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
@@ -211,7 +213,9 @@ describe(useProvisioningPoll, () => {
     });
 
     it('reports allIdle and IDLE overall status when every step is idle', () => {
-      const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
+      const tenant = makeClientTenant({
+        provisioningSteps: idleProvisioningSteps(),
+      });
       const { result } = renderHook(() => useProvisioningPoll(tenant));
 
       expect(result.current.allIdle).toBe(true);
@@ -222,7 +226,7 @@ describe(useProvisioningPoll, () => {
     });
 
     it('surfaces a FAILED step as the overall status even with other steps still idle, and classifies its error', () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
         provisioningSteps: {
           ...idleProvisioningSteps(),
@@ -240,7 +244,7 @@ describe(useProvisioningPoll, () => {
     });
 
     it('does not treat a stale FAILED step as a current failure while provisioningStatus is still non-terminal', () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
         provisioningSteps: {
           ...idleProvisioningSteps(),
@@ -261,7 +265,7 @@ describe(useProvisioningPoll, () => {
     });
 
     it('masks a stale FAILED step to IDLE and reports RUNNING, not FAILED, once a retried run is genuinely PROVISIONING', () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
         provisioningSteps: {
           ...idleProvisioningSteps(),
@@ -287,7 +291,7 @@ describe(useProvisioningPoll, () => {
     });
 
     it('still reports a step as FAILED in displayStepStatuses once the tenant is genuinely, currently FAILED', () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
         provisioningSteps: {
           ...idleProvisioningSteps(),
@@ -306,7 +310,7 @@ describe(useProvisioningPoll, () => {
     });
 
     it('prioritises FAILED over RUNNING across steps for the overall status', () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningSteps: {
           ...idleProvisioningSteps(),
           [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
@@ -326,7 +330,9 @@ describe(useProvisioningPoll, () => {
     });
 
     it('treats an in-flight dispatch on an all-idle tenant as RUNNING for display, without marking any individual step failed', async () => {
-      const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
+      const tenant = makeClientTenant({
+        provisioningSteps: idleProvisioningSteps(),
+      });
       retryProvisioningStepActionMock.mockReturnValue(new Promise(() => {}));
       const { result } = renderHook(() => useProvisioningPoll(tenant));
 
@@ -354,7 +360,7 @@ describe(useProvisioningPoll, () => {
     });
 
     it('polls while provisioning is non-terminal and applies a fresh result', async () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
         provisioningSteps: {
           ...idleProvisioningSteps(),
@@ -391,7 +397,7 @@ describe(useProvisioningPoll, () => {
     });
 
     it('does not poll at all when already at a terminal status', async () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
       });
       renderHook(() => useProvisioningPoll(tenant));
@@ -404,7 +410,7 @@ describe(useProvisioningPoll, () => {
     });
 
     it('stops polling once the tenant reaches a terminal status', async () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
       });
       getTenantProvisioningStatusActionMock.mockResolvedValue({
@@ -425,7 +431,7 @@ describe(useProvisioningPoll, () => {
     });
 
     it('stops polling once an early step fails with nothing else running, even though provisioningStatus stays non-terminal', async () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
         provisioningSteps: {
           ...idleProvisioningSteps(),
@@ -465,7 +471,7 @@ describe(useProvisioningPoll, () => {
           error: 'fetch failed',
         },
       };
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
         provisioningSteps: failedSteps,
       });
@@ -516,7 +522,7 @@ describe(useProvisioningPoll, () => {
           error: 'fetch failed',
         },
       };
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
         provisioningSteps: failedSteps,
       });
@@ -542,7 +548,9 @@ describe(useProvisioningPoll, () => {
     });
 
     it('stops polling once the retry-baseline wait is exhausted after Start, when every step stays idle', async () => {
-      const tenant = makeTenant({ provisioningSteps: idleProvisioningSteps() });
+      const tenant = makeClientTenant({
+        provisioningSteps: idleProvisioningSteps(),
+      });
       getTenantProvisioningStatusActionMock.mockResolvedValue({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
         provisioningSteps: idleProvisioningSteps(),
@@ -565,7 +573,7 @@ describe(useProvisioningPoll, () => {
     });
 
     it('stops polling once the hook unmounts', async () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
       });
       getTenantProvisioningStatusActionMock.mockResolvedValue({
@@ -584,7 +592,7 @@ describe(useProvisioningPoll, () => {
     });
 
     it('surfaces a poll-error toast and keeps retrying automatically when a tick rejects, dismissing it once a tick recovers', async () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
       });
       getTenantProvisioningStatusActionMock.mockRejectedValueOnce(
@@ -621,7 +629,7 @@ describe(useProvisioningPoll, () => {
 
   describe('retry/start dispatch', () => {
     it('dispatches a retry and reports no error on success', async () => {
-      const tenant = makeTenant({ id: 'tenant-1' });
+      const tenant = makeClientTenant({ id: 'tenant-1' });
       const { result } = renderHook(() => useProvisioningPoll(tenant));
 
       act(() => {
@@ -640,7 +648,7 @@ describe(useProvisioningPoll, () => {
     });
 
     it('reports a not-found dispatch error distinctly from a generic one', async () => {
-      const tenant = makeTenant();
+      const tenant = makeClientTenant();
       retryProvisioningStepActionMock.mockResolvedValue({
         outcome: 'not-found',
       });
@@ -656,7 +664,7 @@ describe(useProvisioningPoll, () => {
     });
 
     it('reports an archived dispatch error distinctly from a generic one', async () => {
-      const tenant = makeTenant();
+      const tenant = makeClientTenant();
       retryProvisioningStepActionMock.mockResolvedValue({
         outcome: 'archived',
       });
@@ -672,7 +680,7 @@ describe(useProvisioningPoll, () => {
     });
 
     it('reports a generic dispatch error for a dispatch failure', async () => {
-      const tenant = makeTenant();
+      const tenant = makeClientTenant();
       retryProvisioningStepActionMock.mockResolvedValue({
         outcome: 'dispatch-error',
       });
@@ -688,7 +696,7 @@ describe(useProvisioningPoll, () => {
     });
 
     it('reports already-in-progress distinctly from a real failure, and still refreshes', async () => {
-      const tenant = makeTenant();
+      const tenant = makeClientTenant();
       retryProvisioningStepActionMock.mockResolvedValue({
         outcome: 'already-in-progress',
       });

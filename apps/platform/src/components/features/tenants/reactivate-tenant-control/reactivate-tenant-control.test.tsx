@@ -1,6 +1,6 @@
 import { customRender, screen } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
-import { makeTenant } from '@platform/testing/tenants/fixtures';
+import { makeClientTenant } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { ReactivateTenantControl } from './reactivate-tenant-control';
@@ -13,7 +13,7 @@ vi.mock('@platform/server/provisioning/reactivate-tenant-action', () => ({
   reactivateTenantAction: reactivateTenantActionMock,
 }));
 
-const ARCHIVED_TENANT = makeTenant({
+const ARCHIVED_TENANT = makeClientTenant({
   deprovisionedAt: new Date('2026-04-10T00:00:00.000Z'),
 });
 

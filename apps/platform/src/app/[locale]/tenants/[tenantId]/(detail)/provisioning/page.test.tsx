@@ -4,15 +4,18 @@ import { makeTenant } from '@platform/testing/tenants/fixtures';
 
 import TenantProvisioningPage from './page';
 
-const { listTenantsByIdsMock, getTenantOwnerEmailMock } = vi.hoisted(() => ({
-  listTenantsByIdsMock: vi.fn(),
+const { requireTenantByIdMock, getTenantOwnerEmailMock } = vi.hoisted(() => ({
+  requireTenantByIdMock: vi.fn(),
   getTenantOwnerEmailMock: vi.fn(),
+}));
+
+vi.mock('@platform/server/auth/require-tenant-by-id', () => ({
+  requireTenantById: requireTenantByIdMock,
 }));
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
-    tenants: { listTenantsByIds: listTenantsByIdsMock },
     memberships: { getTenantOwnerEmail: getTenantOwnerEmailMock },
   },
 }));
@@ -36,9 +39,9 @@ describe(TenantProvisioningPage, () => {
   let tenant: ReturnType<typeof makeTenant>;
 
   beforeEach(() => {
-    listTenantsByIdsMock.mockReset();
+    requireTenantByIdMock.mockReset();
     tenant = makeTenant();
-    listTenantsByIdsMock.mockResolvedValue([tenant]);
+    requireTenantByIdMock.mockResolvedValue({ tenant: tenant });
     getTenantOwnerEmailMock.mockReset();
     getTenantOwnerEmailMock.mockResolvedValue('owner@example.com');
   });
@@ -46,7 +49,7 @@ describe(TenantProvisioningPage, () => {
   it('renders the provisioning status view for the resolved tenant, with no deprovisioning control', async () => {
     await setup();
 
-    expect(listTenantsByIdsMock).toHaveBeenCalledWith(['tenant-1']);
+    expect(requireTenantByIdMock).toHaveBeenCalledWith('tenant-1');
     expect(getTenantOwnerEmailMock).toHaveBeenCalledWith(tenant.id);
     expect(
       screen.getByRole('heading', { level: 1, name: 'Provisioning' }),
@@ -62,11 +65,5 @@ describe(TenantProvisioningPage, () => {
     await setup();
 
     expect(screen.getByText('Invited, pending')).toBeVisible();
-  });
-
-  it('404s for an unknown tenant id', async () => {
-    listTenantsByIdsMock.mockResolvedValue([]);
-
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
   });
 });
