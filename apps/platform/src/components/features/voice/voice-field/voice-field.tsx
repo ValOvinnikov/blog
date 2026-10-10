@@ -8,6 +8,7 @@ import {
   type TVoicePortableText,
 } from '@blog/config';
 import { FieldStatus } from '@platform/components/shared/field-status';
+import { FormFieldControlProvider } from '@platform/components/shared/form-field';
 import { PortableTextEditor } from '@platform/components/shared/portable-text-editor';
 import { textVariants } from '@platform/components/shared/text/text-variants';
 import { TextInput } from '@platform/components/shared/text-input';
@@ -60,7 +61,7 @@ export const VoiceField = ({
     label: labelSlot,
     token,
     error: errorSlot,
-  } = voiceFieldVariants();
+  } = voiceFieldVariants({ hasVisibleLabel });
 
   const hintId = `${inputId}-hint`;
   const noteId = `${inputId}-note`;
@@ -69,11 +70,11 @@ export const VoiceField = ({
   const isRich = field.kind === VOICE_FIELD_KIND.RICH;
   const textValue = typeof value === 'string' ? value : '';
   const [placeholderToken] = field.placeholders;
-  const describedBy = [
+  const richDescribedBy = [
+    archivedDescribedBy,
     hintId,
     placeholderToken !== undefined && noteId,
     error && errorId,
-    archivedDescribedBy,
   ]
     .filter(Boolean)
     .join(' ');
@@ -87,12 +88,11 @@ export const VoiceField = ({
     <Field.Root className={root()} invalid={Boolean(error)}>
       <div className={header()}>
         <div className={labelGroup()}>
-          {hasVisibleLabel &&
-            (isRich ? (
-              <span className={labelSlot()}>{label}</span>
-            ) : (
-              <Field.Label className={labelSlot()}>{label}</Field.Label>
-            ))}
+          {isRich ? (
+            hasVisibleLabel && <span className={labelSlot()}>{label}</span>
+          ) : (
+            <Field.Label className={labelSlot()}>{label}</Field.Label>
+          )}
           <Field.Description
             id={hintId}
             render={<span />}
@@ -118,29 +118,30 @@ export const VoiceField = ({
           }
           placeholder={placeholder}
           mode={isReadOnly ? CONTROL_MODE.READ_ONLY : CONTROL_MODE.EDITABLE}
-          aria-describedby={describedBy}
-        />
-      ) : field.kind === VOICE_FIELD_KIND.MULTILINE ? (
-        <Textarea
-          id={inputId}
-          value={textValue}
-          onChange={onChange}
-          placeholder={placeholder}
-          isReadOnly={isReadOnly}
-          ariaLabel={hasVisibleLabel ? undefined : label}
-          aria-describedby={describedBy}
-          rows={3}
+          aria-describedby={richDescribedBy}
         />
       ) : (
-        <TextInput
+        <FormFieldControlProvider
           id={inputId}
-          value={textValue}
-          onChange={onChange}
-          placeholder={placeholder}
-          isReadOnly={isReadOnly}
-          ariaLabel={hasVisibleLabel ? undefined : label}
-          aria-describedby={describedBy}
-        />
+          describedBy={archivedDescribedBy}
+        >
+          {field.kind === VOICE_FIELD_KIND.MULTILINE ? (
+            <Textarea
+              value={textValue}
+              onChange={onChange}
+              placeholder={placeholder}
+              isReadOnly={isReadOnly}
+              rows={3}
+            />
+          ) : (
+            <TextInput
+              value={textValue}
+              onChange={onChange}
+              placeholder={placeholder}
+              isReadOnly={isReadOnly}
+            />
+          )}
+        </FormFieldControlProvider>
       )}
       {placeholderToken !== undefined && (
         <Field.Description

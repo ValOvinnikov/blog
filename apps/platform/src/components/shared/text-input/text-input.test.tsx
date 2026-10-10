@@ -1,3 +1,4 @@
+import { FormField } from '@platform/components/shared/form-field';
 import { render, screen } from '@platform/testing/custom-render';
 import userEvent from '@testing-library/user-event';
 
@@ -12,7 +13,9 @@ describe(TextInput, () => {
 
   it('renders the given value', () => {
     render(
-      <TextInput ariaLabel="Tenant name" value="Acme" onChange={vi.fn()} />,
+      <FormField label="Tenant name">
+        <TextInput value="Acme" onChange={vi.fn()} />
+      </FormField>,
     );
 
     expect(screen.getByLabelText('Tenant name')).toHaveValue('Acme');
@@ -22,7 +25,9 @@ describe(TextInput, () => {
     const handleChange = vi.fn();
 
     render(
-      <TextInput ariaLabel="Tenant name" value="" onChange={handleChange} />,
+      <FormField label="Tenant name">
+        <TextInput value="" onChange={handleChange} />
+      </FormField>,
     );
 
     await user.type(screen.getByLabelText('Tenant name'), 'a');
@@ -30,29 +35,26 @@ describe(TextInput, () => {
     expect(handleChange).toHaveBeenCalledWith('a');
   });
 
-  it('disables the input when isDisabled is true', () => {
+  it('is disabled when the field it sits in is disabled', () => {
     render(
-      <TextInput
-        ariaLabel="Slug"
-        value="locked-slug"
-        onChange={vi.fn()}
-        isDisabled={true}
-      />,
+      <FormField label="Slug" control={{ isDisabled: true }}>
+        <TextInput value="locked-slug" onChange={vi.fn()} />
+      </FormField>,
     );
 
-    const input = screen.getByLabelText('Slug');
-    expect(input).toBeDisabled();
+    expect(screen.getByLabelText('Slug')).toBeDisabled();
   });
 
   it('makes the input read-only, not disabled, when isReadOnly is true', async () => {
     const handleChange = vi.fn();
     render(
-      <TextInput
-        ariaLabel="Archived field"
-        value="authored value"
-        onChange={handleChange}
-        isReadOnly={true}
-      />,
+      <FormField label="Archived field">
+        <TextInput
+          value="authored value"
+          onChange={handleChange}
+          isReadOnly={true}
+        />
+      </FormField>,
     );
 
     const input = screen.getByLabelText('Archived field');

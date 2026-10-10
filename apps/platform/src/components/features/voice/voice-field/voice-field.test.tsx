@@ -32,7 +32,6 @@ describe(`<${VoiceField.name}/>`, () => {
     setup({ hasVisibleLabel: false });
 
     expect(screen.getByRole('textbox', { name: 'Heading' })).toBeVisible();
-    expect(screen.queryByText('Heading')).not.toBeInTheDocument();
   });
 
   it('names a rich field without a visible label for screen readers', () => {
@@ -126,10 +125,18 @@ describe(`<${VoiceField.name}/>`, () => {
       setup({ field: fieldById(id), value: null }, { isArchived: true });
 
       expect(screen.getByRole('textbox', { name })).toHaveAccessibleDescription(
-        new RegExp(`${ARCHIVED_NOTICE_TEXT}$`),
+        new RegExp(`^${ARCHIVED_NOTICE_TEXT}`),
       );
     },
   );
+
+  it('gives an invalid text field its input id so the save bar can focus it', () => {
+    setup({ error: 'Must be 80 characters or fewer.' });
+
+    const input = screen.getByRole('textbox', { name: 'Heading' });
+    expect(input).toHaveAttribute('id', 'voice-field-test');
+    expect(input).toHaveAttribute('aria-invalid', 'true');
+  });
 
   it('gives an invalid rich field its input id so the save bar can focus it', () => {
     setup({

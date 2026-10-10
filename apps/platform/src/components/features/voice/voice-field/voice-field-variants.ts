@@ -9,4 +9,9 @@ export const voiceFieldVariants = tv({
     token: ['font-mono text-[11px] text-admin-text'],
     error: ['text-[11.5px] text-admin-bad'],
   },
+  variants: {
+    hasVisibleLabel: {
+      false: { label: 'sr-only' },
+    },
+  },
 });

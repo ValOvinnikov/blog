@@ -10,8 +10,8 @@ import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
 import { FormField } from '@platform/components/shared/form-field';
-import { FormTextInput } from '@platform/components/shared/form-text-input';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
+import { TextInput } from '@platform/components/shared/text-input';
 import { useToast } from '@platform/context/toast-provider';
 import { useUnsavedChangesGuard } from '@platform/context/unsaved-changes-provider';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
@@ -271,23 +271,26 @@ export const TenantDetailsPanel = ({
                 const lock = effectiveFieldLocks[key];
 
                 return (
-                  <FormTextInput
+                  <FormField
                     key={key}
                     label={labelText}
                     hint={lock && lockReasonText(lock)}
                     error={errorMessage}
-                    type={TEXT_FIELD_TYPE[key]}
-                    value={values[key]}
-                    onChange={(nextValue) => updateField(key, nextValue)}
-                    isDisabled={Boolean(lock)}
-                  />
+                    control={{ isDisabled: Boolean(lock) }}
+                  >
+                    <TextInput
+                      type={TEXT_FIELD_TYPE[key]}
+                      value={values[key]}
+                      onChange={(nextValue) => updateField(key, nextValue)}
+                    />
+                  </FormField>
                 );
               })}
 
               <div className={wideField()}>
                 <FormField
                   label={t('localeLabel')}
-                  hasOwnAccessibleName={true}
+                  control={{ hasOwnAccessibleName: true }}
                   hint={
                     localeLock && (
                       <span id={localeLockReasonId}>
@@ -312,7 +315,7 @@ export const TenantDetailsPanel = ({
 
               <FormField
                 label={t('planLabel')}
-                hasOwnAccessibleName={true}
+                control={{ hasOwnAccessibleName: true }}
                 hint={
                   planLock && (
                     <span id={planLockReasonId}>
