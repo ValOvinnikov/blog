@@ -2,7 +2,6 @@
 
 import { Field } from '@base-ui/react/field';
 import {
-  CONTROL_MODE,
   VOICE_FIELD_KIND,
   VOICE_PORTABLE_TEXT_SCHEMA,
   type TVoiceFieldKind,
@@ -12,6 +11,7 @@ import { FieldStatus } from '@platform/components/shared/field-status';
 import { PortableTextEditor } from '@platform/components/shared/portable-text-editor';
 import { TextInput } from '@platform/components/shared/text-input';
 import { Textarea } from '@platform/components/shared/textarea';
+import { CONTROL_MODE } from '@platform/constants/control-mode';
 import { isBlankPortableTextValue } from '@platform/utils/portable-text-schema/portable-text-schema';
 import {
   isSameVoiceValue,

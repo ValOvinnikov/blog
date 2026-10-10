@@ -1,4 +1,4 @@
-import { DOMAIN_VERIFICATION_STATUS } from '@blog/config';
+import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { auth } from '@platform/server/auth/auth';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';

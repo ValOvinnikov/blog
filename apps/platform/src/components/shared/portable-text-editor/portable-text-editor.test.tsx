@@ -1,5 +1,6 @@
-import { CONTROL_MODE, VOICE_PORTABLE_TEXT_SCHEMA } from '@blog/config';
+import { VOICE_PORTABLE_TEXT_SCHEMA } from '@blog/config';
 import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
+import { CONTROL_MODE } from '@platform/constants/control-mode';
 import {
   renderWithIntl,
   screen,
