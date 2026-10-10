@@ -1,5 +1,6 @@
 'use client';
 
+import type { TMaybeUndefined } from '@blog/config';
 import {
   CORE_PROVISIONING_STEPS,
   TENANT_PROVISIONING_STATUS,
@@ -50,14 +51,14 @@ const stepStatusesFor = (
 
 const stepUpdatedAtFor = (
   steps: TTenantProvisioningState | null,
-): (string | undefined)[] =>
+): TMaybeUndefined<string>[] =>
   STEP_ORDER.map((stepKey) => steps?.[stepKey]?.updatedAt);
 
 type TDispatchNoticeKind =
   'not-found' | 'archived' | 'already-in-progress' | 'other';
 
 export type TUseProvisioningPollResult = {
-  dispatchNotice: TDispatchNoticeKind | undefined;
+  dispatchNotice: TMaybeUndefined<TDispatchNoticeKind>;
   isStarting: boolean;
   isRetrying: boolean;
   handleStart: () => void;
@@ -66,15 +67,15 @@ export type TUseProvisioningPollResult = {
   provisioningSteps: TTenantProvisioningState | null;
   stepStatuses: TTenantProvisioningStepStatus[];
   displayStepStatuses: TTenantProvisioningStepStatus[];
-  stepUpdatedAt: (string | undefined)[];
-  provisioningRun: TProvisioningRun | undefined;
+  stepUpdatedAt: TMaybeUndefined<string>[];
+  provisioningRun: TMaybeUndefined<TProvisioningRun>;
   allIdle: boolean;
   isProvisioningRunning: boolean;
   isOverallFailed: boolean;
   displayOverallStatus: Exclude<TTenantProvisioningStepStatus, 'FAILED'>;
-  failedStepError: string | undefined;
-  errorKind: TProvisioningErrorKind | undefined;
-  ownerElevationOutcome: TElevateTenantOwnerOutcome | undefined;
+  failedStepError: TMaybeUndefined<string>;
+  errorKind: TMaybeUndefined<TProvisioningErrorKind>;
+  ownerElevationOutcome: TMaybeUndefined<TElevateTenantOwnerOutcome>;
 };
 
 export const useProvisioningPoll = (
@@ -88,9 +89,8 @@ export const useProvisioningPoll = (
   const pollErrorToastIdRef = useRef<string | null>(null);
   const [isRetrying, setIsRetrying] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
-  const [dispatchNotice, setDispatchNotice] = useState<
-    TDispatchNoticeKind | undefined
-  >(undefined);
+  const [dispatchNotice, setDispatchNotice] =
+    useState<TMaybeUndefined<TDispatchNoticeKind>>(undefined);
   const [, startTransition] = useTransition();
   const [renderedTenant, setRenderedTenant] = useState(tenant);
   const [polledProvisioningStatus, setPolledProvisioningStatus] =
