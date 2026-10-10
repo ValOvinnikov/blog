@@ -1,69 +1,27 @@
 'use server';
 
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
-import { queries } from '@blog/db';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { deleteBlobBestEffort } from '@platform/server/blob/delete-blob-best-effort';
+import { readUploadedFile } from '@platform/server/blob/read-uploaded-file';
+import { UNRECOGNIZED_UPLOAD_TARGET_RESULT } from '@platform/server/blob/unrecognized-upload-target';
+import {
+  getEmailLogoUrl,
+  setEmailLogoUrl,
+} from '@platform/server/email/email-logo-store';
 import { validateEmailLogoUpload } from '@platform/server/email/validate-email-logo';
 import { buildEmailLogoBlobPath } from '@platform/utils/email-logo-blob-path/email-logo-blob-path';
 import {
   emailLogoTargetSchema,
   type TEmailLogoTarget,
 } from '@platform/utils/email-logo-target/email-logo-target';
-import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
-import { del, put } from '@vercel/blob';
+import { put } from '@vercel/blob';
 
 export type TUploadEmailLogoResult =
   { ok: true; url: string } | { ok: false; error: string };
 
-const getPreviousLogoUrl = async (
-  tenantId: string,
-  target: TEmailLogoTarget,
-): Promise<string | undefined> => {
-  if (target.type === 'tenant') {
-    const config = await queries.emailConfig.getEmailConfig(tenantId);
-    return config?.logoAssetUrl;
-  }
-
-  const template = await queries.emailTemplates.getEmailTemplate(
-    tenantId,
-    target.templateType,
-  );
-  return template.logoAssetUrl;
-};
-
-const persistLogoUrl = async (
-  tenantId: string,
-  target: TEmailLogoTarget,
-  url: string | null,
-): Promise<void> => {
-  if (target.type === 'tenant') {
-    await queries.emailConfig.upsertEmailConfig(tenantId, {
-      logoAssetUrl: url,
-    });
-    return;
-  }
-
-  await queries.emailTemplates.upsertEmailTemplate(
-    tenantId,
-    target.templateType,
-    {
-      logoAssetUrl: url,
-    },
-  );
-};
-
-/**
- * Uploads and persists the tenant's own email logo, or one template's own
- * logo, resolved by `target`. Reuses the site logo's
- * upload transport (`FormData` with a `File`, `put()` to Vercel Blob with
- * `access: 'public'` — recipients fetch this with no session) but never its
- * validator: `validateEmailLogoUpload` enforces email-specific limits.
- * `requireTenantMembership` re-checks the session against `tenantId` here
- * too, and `target` is re-validated even though the client only ever sends
- * a value its own types allow.
- */
 export const uploadEmailLogoAction = async (
   tenantId: string,
   target: TEmailLogoTarget,
@@ -72,21 +30,12 @@ export const uploadEmailLogoAction = async (
   const { tenant } = await requireTenantMembership(tenantId);
 
   const parsedTarget = emailLogoTargetSchema.safeParse(target);
-  if (!parsedTarget.success) {
-    return { ok: false, error: 'Unrecognized upload target.' };
-  }
+  if (!parsedTarget.success) return UNRECOGNIZED_UPLOAD_TARGET_RESULT;
+  const logoTarget = parsedTarget.data;
 
-  if (!env.BLOB_READ_WRITE_TOKEN) {
-    return {
-      ok: false,
-      error: 'File uploads are not configured for this environment yet.',
-    };
-  }
-
-  const file = formData.get('file');
-  if (!(file instanceof File)) {
-    return { ok: false, error: 'Choose a file to upload.' };
-  }
+  const upload = readUploadedFile(formData);
+  if (!upload.ok) return upload;
+  const { file, token } = upload;
 
   const validation = await validateEmailLogoUpload(file);
   if (!validation.ok) {
@@ -94,33 +43,24 @@ export const uploadEmailLogoAction = async (
   }
 
   const { buffer, contentType, extension } = validation.asset;
-  const pathname = buildEmailLogoBlobPath(
-    tenant.id,
-    parsedTarget.data,
-    extension,
-  );
+  const pathname = buildEmailLogoBlobPath(tenant.id, logoTarget, extension);
 
   try {
-    const previousUrl = await getPreviousLogoUrl(tenant.id, parsedTarget.data);
+    const previousUrl = await getEmailLogoUrl(tenant.id, logoTarget);
 
     const blob = await put(pathname, buffer, {
       access: 'public',
       contentType,
-      token: env.BLOB_READ_WRITE_TOKEN,
+      token,
     });
 
-    await persistLogoUrl(tenant.id, parsedTarget.data, blob.url);
+    await setEmailLogoUrl(tenant.id, logoTarget, blob.url);
 
     if (previousUrl && previousUrl !== blob.url) {
-      try {
-        await del(previousUrl, { token: env.BLOB_READ_WRITE_TOKEN });
-      } catch (error) {
-        logger.error('email_logo.delete_failed', {
-          tenantId: tenant.id,
-          target: parsedTarget.data,
-          error,
-        });
-      }
+      await deleteBlobBestEffort(previousUrl, 'email_logo.delete_failed', {
+        tenantId: tenant.id,
+        target: logoTarget,
+      });
     }
 
     await recordAuditEvent({
@@ -128,18 +68,14 @@ export const uploadEmailLogoAction = async (
       action: AUDIT_ACTION.SETTINGS_UPDATED,
       targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
       targetId: tenant.id,
-      details: {
-        target: parsedTarget.data,
-        operation: 'upload',
-        url: blob.url,
-      },
+      details: { target: logoTarget, operation: 'upload', url: blob.url },
     });
 
     return { ok: true, url: blob.url };
   } catch (error) {
     logger.error('email_logo.upload_failed', {
       tenantId: tenant.id,
-      target: parsedTarget.data,
+      target: logoTarget,
       error,
     });
     return { ok: false, error: "Couldn't upload the logo — try again." };
