@@ -1,13 +1,13 @@
-import {
-  DOMAIN_VERIFICATION_STATUS,
-  SIZE,
-  type TDomainVerificationStatus,
-} from '@blog/config';
+import { SIZE } from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { Card } from '@platform/components/shared/card';
 import { DetailList } from '@platform/components/shared/detail-list';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { StatusBadge } from '@platform/components/shared/status-badge';
+import {
+  DOMAIN_VERIFICATION_STATUS,
+  type TDomainVerificationStatus,
+} from '@platform/constants/domain';
 import { domainVerificationTone } from '@platform/utils/status-tone/status-tone';
 import { useTranslations } from 'next-intl';
 

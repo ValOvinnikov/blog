@@ -274,7 +274,7 @@ export const VoiceSettings = ({
             }
             onOpenField={setOpenListFieldId}
             onFieldChange={changeField}
-            isReadOnly={isArchived}
+            archivedNoticeId={isArchived ? archivedNoticeId : undefined}
             specimenTheme={specimenTheme}
           />
         ))}

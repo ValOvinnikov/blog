@@ -1,7 +1,7 @@
 'use client';
 
-import type { TDomainVerificationStatus } from '@blog/config';
 import { DomainCard } from '@platform/components/features/tenants/domain-card';
+import type { TDomainVerificationStatus } from '@platform/constants/domain';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { use } from 'react';
 
