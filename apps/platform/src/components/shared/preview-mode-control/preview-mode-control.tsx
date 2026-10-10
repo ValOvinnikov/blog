@@ -1,7 +1,7 @@
 'use client';
 
+import { PREVIEW_MODE, type TPreviewMode } from '@blog/config';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
-import type { TPreviewMode } from '@platform/utils/use-preview-color-scheme/use-preview-color-scheme';
 import { useTranslations } from 'next-intl';
 
 export type TPreviewModeControlProps = {
@@ -19,8 +19,8 @@ export const PreviewModeControl = ({
     <SegmentedControl
       ariaLabel={t('previewColorSchemeAriaLabel')}
       options={[
-        { value: 'light', label: t('modeLight') },
-        { value: 'dark', label: t('modeDark') },
+        { value: PREVIEW_MODE.LIGHT, label: t('modeLight') },
+        { value: PREVIEW_MODE.DARK, label: t('modeDark') },
       ]}
       value={value}
       onChange={onChange}

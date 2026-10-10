@@ -1,3 +1,4 @@
+import { PREVIEW_WIDTH } from '@blog/config';
 import { tv } from '@platform/utils/tv/tv';
 
 export const emailTemplatePreviewVariants = tv({
@@ -9,9 +10,9 @@ export const emailTemplatePreviewVariants = tv({
   },
   variants: {
     width: {
-      desktop: { frame: ['w-[600px]'] },
-      mobile: { frame: ['w-[375px]'] },
+      [PREVIEW_WIDTH.DESKTOP]: { frame: ['w-[600px]'] },
+      [PREVIEW_WIDTH.MOBILE]: { frame: ['w-[375px]'] },
     },
   },
-  defaultVariants: { width: 'desktop' },
+  defaultVariants: { width: PREVIEW_WIDTH.DESKTOP },
 });

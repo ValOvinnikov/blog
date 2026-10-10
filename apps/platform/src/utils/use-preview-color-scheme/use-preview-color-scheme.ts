@@ -1,9 +1,8 @@
+import { PREVIEW_MODE, type TPreviewMode } from '@blog/config';
 import { useState } from 'react';
 
-export type TPreviewMode = 'light' | 'dark';
-
 export const usePreviewColorScheme = () => {
-  const [mode, setMode] = useState<TPreviewMode>('light');
+  const [mode, setMode] = useState<TPreviewMode>(PREVIEW_MODE.LIGHT);
 
-  return { mode, setMode, isDark: mode === 'dark' };
+  return { mode, setMode, isDark: mode === PREVIEW_MODE.DARK };
 };

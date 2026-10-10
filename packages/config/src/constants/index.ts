@@ -27,6 +27,7 @@ export * from './operator-alert';
 export * from './path';
 export * from './portable-text-block-type';
 export * from './preset';
+export * from './preview';
 export * from './price-period';
 export * from './reserved-slug';
 export * from './size';

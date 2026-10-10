@@ -1,6 +1,11 @@
 'use client';
 
-import type { TLanguageSwitcherStyle, TLocaleIsoCode } from '@blog/config';
+import {
+  PREVIEW_WIDTH,
+  type TLanguageSwitcherStyle,
+  type TLocaleIsoCode,
+  type TPreviewWidth,
+} from '@blog/config';
 import { LookSample } from '@platform/components/features/site-preview/look-sample';
 import { PreviewFrame } from '@platform/components/shared/preview-frame';
 import { PreviewModeControl } from '@platform/components/shared/preview-mode-control';
@@ -12,8 +17,6 @@ import {
 import { usePreviewColorScheme } from '@platform/utils/use-preview-color-scheme/use-preview-color-scheme';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-
-type TPreviewWidth = 'desktop' | 'mobile';
 
 export type TLookPreviewProps = {
   tenantName: string;
@@ -33,17 +36,17 @@ export const LookPreview = ({
   const t = useTranslations('lookPreview');
   const tPreview = useTranslations('previewModeControl');
   const { mode, setMode, isDark } = usePreviewColorScheme();
-  const [width, setWidth] = useState<TPreviewWidth>('desktop');
+  const [width, setWidth] = useState<TPreviewWidth>(PREVIEW_WIDTH.DESKTOP);
 
   const widthOptions: { value: TPreviewWidth; label: string }[] = [
-    { value: 'desktop', label: t('widthDesktop') },
-    { value: 'mobile', label: t('widthMobile') },
+    { value: PREVIEW_WIDTH.DESKTOP, label: t('widthDesktop') },
+    { value: PREVIEW_WIDTH.MOBILE, label: t('widthMobile') },
   ];
 
   return (
     <PreviewFrame
       ariaLabel={tPreview('livePreviewHeading')}
-      isNarrow={width === 'mobile'}
+      isNarrow={width === PREVIEW_WIDTH.MOBILE}
       widthControl={
         // Below 27.5rem the stage leaves the frame no wider than its 390px mobile width.
         <SegmentedControl
