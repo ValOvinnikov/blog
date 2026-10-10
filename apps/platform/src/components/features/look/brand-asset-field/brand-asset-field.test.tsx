@@ -8,7 +8,6 @@ const STORED_URL = 'https://example.blob.vercel-storage.com/logo.png';
 
 const setup = customRender(BrandAssetField, {
   kind: 'logo',
-  label: 'Logo',
   image: { url: undefined },
   onStage: vi.fn(),
 });
@@ -22,9 +21,10 @@ describe(`<${BrandAssetField.name}/>`, () => {
     vi.restoreAllMocks();
   });
 
-  it('shows the upload label for the given kind before any file is chosen', () => {
-    setup({ kind: 'favicon', label: 'Favicon' });
+  it('names the field and its upload control after the given kind before any file is chosen', () => {
+    setup({ kind: 'favicon' });
 
+    expect(screen.getByText('Favicon')).toBeVisible();
     expect(
       screen.getByRole('button', { name: 'Upload favicon' }),
     ).toBeVisible();

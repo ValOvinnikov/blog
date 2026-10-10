@@ -5,21 +5,9 @@ export const isSameStagedImage = (a: TStagedImage, b: TStagedImage): boolean =>
 
 export const createStagingHandlers = (
   onStage: (image: TStagedImage) => void,
-  unexpectedErrorLabel: string,
 ) => ({
-  onUpload: async (formData: FormData) => {
-    const file = formData.get('file');
-    if (!(file instanceof File)) {
-      return { ok: false as const, error: unexpectedErrorLabel };
-    }
-    const url = URL.createObjectURL(file);
-    onStage({ url, file });
-    return { ok: true as const, url };
-  },
-  onClear: async () => {
-    onStage({ url: undefined });
-    return { ok: true as const };
-  },
+  onPick: (file: File) => onStage({ url: URL.createObjectURL(file), file }),
+  onClear: () => onStage({ url: undefined }),
 });
 
 type TPersistStagedImageResult =
