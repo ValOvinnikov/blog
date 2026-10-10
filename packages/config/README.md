@@ -34,16 +34,19 @@ hand-redeclaring them.
 - `types/` — shared TS types with no runtime behaviour.
 - `client/objects.ts` — shared plain-object helpers.
 - `utils.ts` — small standalone type helpers (e.g. `TValueOf<Obj>`).
-- `react/polymorphic.ts` — the `TPolymorphicProps<C, OwnProps>` generic,
-  exposed only via the `@blog/config/react` subpath so non-React consumers
-  (like `@blog/service`) stay React-free.
+- `react/` — the `TPolymorphicProps<C, OwnProps>` generic
+  (`polymorphic.ts`) and the `mapCompoundSlots` compound-component helper
+  (`compound.ts`), re-exported by `react/index.ts` and exposed only via the
+  `@blog/config/react` subpath so non-React consumers (like `@blog/service`)
+  stay React-free. `react` is a peer dependency for the compound helper's
+  runtime calls.
 - `sanity/generated/` — `schema.json` and `types.ts`, produced by
   `pnpm --filter @blog/studio typegen`. Never hand-edited — the next typegen run
   reverts a manual edit, and CI's typegen drift guard catches it.
 
 Three `package.json` `exports` subpaths: `.` (the `src/index.ts` barrel —
 constants, `routes`, generated Sanity types, shared types, `client/objects`,
-`utils`), `./react` (the polymorphic helper, kept off the barrel), and
+`utils`), `./react` (the polymorphic and compound helpers, kept off the barrel), and
 `./constants` (`constants/index.ts` directly).
 
 ## Scripts
