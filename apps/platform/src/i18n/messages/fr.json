@@ -387,21 +387,35 @@
     "navAbout": "À propos",
     "switcherMenuAriaLabel": "Langue : {language}"
   },
-  "brandAssetField": {
-    "savesWithChanges": "Enregistré avec les modifications",
-    "unexpectedError": "Une erreur s'est produite — veuillez réessayer.",
-    "uploading": "Envoi…",
+  "assetUploadField": {
     "remove": "Supprimer",
     "logo": {
       "currentAlt": "Logo actuel",
       "upload": "Importer le logo",
-      "replace": "Remplacer le logo",
-      "pickAgain": "Votre brouillon restauré contenait un nouveau logo qui n'a pas pu être conservé — choisissez-le à nouveau."
+      "replace": "Remplacer le logo"
     },
     "favicon": {
       "currentAlt": "Favicon actuel",
       "upload": "Importer le favicon",
-      "replace": "Remplacer le favicon",
+      "replace": "Remplacer le favicon"
+    },
+    "SENDER": {
+      "currentAlt": "Logo des e-mails actuel",
+      "upload": "Importer le logo des e-mails",
+      "replace": "Remplacer le logo des e-mails"
+    },
+    "TEMPLATE": {
+      "currentAlt": "Logo du modèle actuel",
+      "upload": "Importer le logo du modèle",
+      "replace": "Remplacer le logo du modèle"
+    }
+  },
+  "brandAssetField": {
+    "savesWithChanges": "Enregistré avec les modifications",
+    "logo": {
+      "pickAgain": "Votre brouillon restauré contenait un nouveau logo qui n'a pas pu être conservé — choisissez-le à nouveau."
+    },
+    "favicon": {
       "pickAgain": "Votre brouillon restauré contenait un nouveau favicon qui n'a pas pu être conservé — choisissez-le à nouveau."
     },
     "unsupportedType": "Choisissez une image PNG, JPEG, WebP ou SVG.",
@@ -460,21 +474,8 @@
     "logoHint": "Utilisé dans chaque e-mail, dans toutes les langues. Un modèle peut le remplacer par son propre logo."
   },
   "emailLogoField": {
-    "unexpectedError": "Une erreur s'est produite — veuillez réessayer.",
-    "uploading": "Envoi…",
-    "remove": "Supprimer",
     "unsupportedType": "Choisissez une image PNG, JPEG ou GIF — les formats SVG et WebP ne sont pas pris en charge par les principaux clients de messagerie.",
-    "tooLarge": "Ce fichier est trop volumineux — la limite est de {limit}.",
-    "SENDER": {
-      "currentAlt": "Logo des e-mails actuel",
-      "upload": "Importer le logo des e-mails",
-      "replace": "Remplacer le logo des e-mails"
-    },
-    "TEMPLATE": {
-      "currentAlt": "Logo du modèle actuel",
-      "upload": "Importer le logo du modèle",
-      "replace": "Remplacer le logo du modèle"
-    }
+    "tooLarge": "Ce fichier est trop volumineux — la limite est de {limit}."
   },
   "emailTemplateEditor": {
     "subjectLabel": "Objet ({language})",

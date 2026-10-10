@@ -387,21 +387,35 @@
     "navAbout": "About",
     "switcherMenuAriaLabel": "Language: {language}"
   },
-  "brandAssetField": {
-    "savesWithChanges": "Saves with changes",
-    "unexpectedError": "Something went wrong — try again.",
-    "uploading": "Uploading…",
+  "assetUploadField": {
     "remove": "Remove",
     "logo": {
       "currentAlt": "Current logo",
       "upload": "Upload logo",
-      "replace": "Replace logo",
-      "pickAgain": "Your recovered draft had a new logo that couldn't be kept — pick it again."
+      "replace": "Replace logo"
     },
     "favicon": {
       "currentAlt": "Current favicon",
       "upload": "Upload favicon",
-      "replace": "Replace favicon",
+      "replace": "Replace favicon"
+    },
+    "SENDER": {
+      "currentAlt": "Current email logo",
+      "upload": "Upload email logo",
+      "replace": "Replace email logo"
+    },
+    "TEMPLATE": {
+      "currentAlt": "Current template logo",
+      "upload": "Upload template logo",
+      "replace": "Replace template logo"
+    }
+  },
+  "brandAssetField": {
+    "savesWithChanges": "Saves with changes",
+    "logo": {
+      "pickAgain": "Your recovered draft had a new logo that couldn't be kept — pick it again."
+    },
+    "favicon": {
       "pickAgain": "Your recovered draft had a new favicon that couldn't be kept — pick it again."
     },
     "unsupportedType": "Choose a PNG, JPEG, WebP, or SVG image.",
@@ -460,21 +474,8 @@
     "logoHint": "Used in every email, in every language. A template can override it with its own logo."
   },
   "emailLogoField": {
-    "unexpectedError": "Something went wrong — try again.",
-    "uploading": "Uploading…",
-    "remove": "Remove",
     "unsupportedType": "Choose a PNG, JPEG, or GIF image — SVG and WebP are not supported by major email clients.",
-    "tooLarge": "That file is too large — the limit is {limit}.",
-    "SENDER": {
-      "currentAlt": "Current email logo",
-      "upload": "Upload email logo",
-      "replace": "Replace email logo"
-    },
-    "TEMPLATE": {
-      "currentAlt": "Current template logo",
-      "upload": "Upload template logo",
-      "replace": "Replace template logo"
-    }
+    "tooLarge": "That file is too large — the limit is {limit}."
   },
   "emailTemplateEditor": {
     "subjectLabel": "Subject ({language})",

@@ -387,21 +387,35 @@
     "navAbout": "Über uns",
     "switcherMenuAriaLabel": "Sprache: {language}"
   },
-  "brandAssetField": {
-    "savesWithChanges": "Wird mit den Änderungen gespeichert",
-    "unexpectedError": "Etwas ist schiefgelaufen — bitte erneut versuchen.",
-    "uploading": "Wird hochgeladen…",
+  "assetUploadField": {
     "remove": "Entfernen",
     "logo": {
       "currentAlt": "Aktuelles Logo",
       "upload": "Logo hochladen",
-      "replace": "Logo ersetzen",
-      "pickAgain": "Ihr wiederhergestellter Entwurf enthielt ein neues Logo, das nicht erhalten blieb — bitte wählen Sie es erneut aus."
+      "replace": "Logo ersetzen"
     },
     "favicon": {
       "currentAlt": "Aktuelles Favicon",
       "upload": "Favicon hochladen",
-      "replace": "Favicon ersetzen",
+      "replace": "Favicon ersetzen"
+    },
+    "SENDER": {
+      "currentAlt": "Aktuelles E-Mail-Logo",
+      "upload": "E-Mail-Logo hochladen",
+      "replace": "E-Mail-Logo ersetzen"
+    },
+    "TEMPLATE": {
+      "currentAlt": "Aktuelles Vorlagen-Logo",
+      "upload": "Vorlagen-Logo hochladen",
+      "replace": "Vorlagen-Logo ersetzen"
+    }
+  },
+  "brandAssetField": {
+    "savesWithChanges": "Wird mit den Änderungen gespeichert",
+    "logo": {
+      "pickAgain": "Ihr wiederhergestellter Entwurf enthielt ein neues Logo, das nicht erhalten blieb — bitte wählen Sie es erneut aus."
+    },
+    "favicon": {
       "pickAgain": "Ihr wiederhergestellter Entwurf enthielt ein neues Favicon, das nicht erhalten blieb — bitte wählen Sie es erneut aus."
     },
     "unsupportedType": "Wählen Sie ein PNG-, JPEG-, WebP- oder SVG-Bild.",
@@ -460,21 +474,8 @@
     "logoHint": "Wird in jeder E-Mail und jeder Sprache verwendet. Eine Vorlage kann es mit einem eigenen Logo überschreiben."
   },
   "emailLogoField": {
-    "unexpectedError": "Etwas ist schiefgelaufen — bitte erneut versuchen.",
-    "uploading": "Wird hochgeladen…",
-    "remove": "Entfernen",
     "unsupportedType": "Wählen Sie ein PNG-, JPEG- oder GIF-Bild — SVG und WebP werden von gängigen E-Mail-Programmen nicht unterstützt.",
-    "tooLarge": "Diese Datei ist zu groß — die Grenze liegt bei {limit}.",
-    "SENDER": {
-      "currentAlt": "Aktuelles E-Mail-Logo",
-      "upload": "E-Mail-Logo hochladen",
-      "replace": "E-Mail-Logo ersetzen"
-    },
-    "TEMPLATE": {
-      "currentAlt": "Aktuelles Vorlagen-Logo",
-      "upload": "Vorlagen-Logo hochladen",
-      "replace": "Vorlagen-Logo ersetzen"
-    }
+    "tooLarge": "Diese Datei ist zu groß — die Grenze liegt bei {limit}."
   },
   "emailTemplateEditor": {
     "subjectLabel": "Betreff ({language})",

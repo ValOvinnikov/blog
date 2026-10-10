@@ -21,22 +21,20 @@ export const assetUploadFieldVariants = tv({
   },
   variants: {
     size: {
-      md: { thumb: ['size-12 rounded-admin-control'] },
-      sm: { thumb: ['size-10 rounded-admin-control'] },
-    },
-    layout: {
-      box: {
+      md: {
         root: [
           'flex-col rounded-admin border-[1.5px] border-dashed border-admin-line p-[14px]',
         ],
+        thumb: ['size-12 rounded-admin-control'],
         actions: ['mt-[11px] flex-wrap'],
       },
-      row: {
+      sm: {
         field: ['@container'],
         root: [
           'flex-wrap items-center gap-3 rounded-admin border border-admin-line px-3 py-2.5',
         ],
         top: ['min-w-0 flex-1'],
+        thumb: ['size-10 rounded-admin-control'],
         titleRow: ['flex-wrap'],
         actions: ['shrink-0 @max-lg:basis-full'],
       },
@@ -44,6 +42,5 @@ export const assetUploadFieldVariants = tv({
   },
   defaultVariants: {
     size: 'md',
-    layout: 'box',
   },
 });
