@@ -1,6 +1,7 @@
 'use client';
 
 import { AssetUploadField } from '@platform/components/shared/asset-upload-field';
+import type { TEmailLogoKind } from '@platform/constants/email-logo';
 import {
   ACCEPTED_EMAIL_LOGO_MIME_TYPES,
   quickClientEmailLogoCheck,
@@ -11,8 +12,6 @@ import {
 } from '@platform/utils/staged-image/staged-image';
 import { useTranslations } from 'next-intl';
 import type { AriaAttributes } from 'react';
-
-type TEmailLogoKind = 'sender' | 'template';
 
 export type TEmailLogoFieldProps = {
   kind: TEmailLogoKind;

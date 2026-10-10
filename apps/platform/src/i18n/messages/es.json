@@ -462,12 +462,12 @@
     "remove": "Quitar",
     "unsupportedType": "Elija una imagen PNG, JPEG o GIF: los principales clientes de correo no admiten SVG ni WebP.",
     "tooLarge": "El archivo es demasiado grande: el límite es {limit}.",
-    "sender": {
+    "SENDER": {
       "currentAlt": "Logotipo del correo actual",
       "upload": "Subir el logotipo del correo",
       "replace": "Sustituir el logotipo del correo"
     },
-    "template": {
+    "TEMPLATE": {
       "currentAlt": "Logotipo de la plantilla actual",
       "upload": "Subir el logotipo de la plantilla",
       "replace": "Sustituir el logotipo de la plantilla"

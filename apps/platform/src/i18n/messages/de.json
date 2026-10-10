@@ -462,12 +462,12 @@
     "remove": "Entfernen",
     "unsupportedType": "Wählen Sie ein PNG-, JPEG- oder GIF-Bild — SVG und WebP werden von gängigen E-Mail-Programmen nicht unterstützt.",
     "tooLarge": "Diese Datei ist zu groß — die Grenze liegt bei {limit}.",
-    "sender": {
+    "SENDER": {
       "currentAlt": "Aktuelles E-Mail-Logo",
       "upload": "E-Mail-Logo hochladen",
       "replace": "E-Mail-Logo ersetzen"
     },
-    "template": {
+    "TEMPLATE": {
       "currentAlt": "Aktuelles Vorlagen-Logo",
       "upload": "Vorlagen-Logo hochladen",
       "replace": "Vorlagen-Logo ersetzen"

@@ -8,6 +8,7 @@ import { FieldStatus } from '@platform/components/shared/field-status';
 import { FormField } from '@platform/components/shared/form-field';
 import { PortableTextEditor } from '@platform/components/shared/portable-text-editor';
 import { TextInput } from '@platform/components/shared/text-input';
+import { EMAIL_LOGO_KIND } from '@platform/constants/email-logo';
 import {
   isSameBody,
   type TEmailCopyDraft,
@@ -114,7 +115,7 @@ export const EmailTemplateEditor = ({
             />
           </FormField>
           <EmailLogoField
-            kind="template"
+            kind={EMAIL_LOGO_KIND.TEMPLATE}
             label={t('logoLabel')}
             hint={t('logoHint')}
             logo={logo}

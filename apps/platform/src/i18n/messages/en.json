@@ -462,12 +462,12 @@
     "remove": "Remove",
     "unsupportedType": "Choose a PNG, JPEG, or GIF image — SVG and WebP are not supported by major email clients.",
     "tooLarge": "That file is too large — the limit is {limit}.",
-    "sender": {
+    "SENDER": {
       "currentAlt": "Current email logo",
       "upload": "Upload email logo",
       "replace": "Replace email logo"
     },
-    "template": {
+    "TEMPLATE": {
       "currentAlt": "Current template logo",
       "upload": "Upload template logo",
       "replace": "Replace template logo"

@@ -462,12 +462,12 @@
     "remove": "Supprimer",
     "unsupportedType": "Choisissez une image PNG, JPEG ou GIF — les formats SVG et WebP ne sont pas pris en charge par les principaux clients de messagerie.",
     "tooLarge": "Ce fichier est trop volumineux — la limite est de {limit}.",
-    "sender": {
+    "SENDER": {
       "currentAlt": "Logo des e-mails actuel",
       "upload": "Importer le logo des e-mails",
       "replace": "Remplacer le logo des e-mails"
     },
-    "template": {
+    "TEMPLATE": {
       "currentAlt": "Logo du modèle actuel",
       "upload": "Importer le logo du modèle",
       "replace": "Remplacer le logo du modèle"

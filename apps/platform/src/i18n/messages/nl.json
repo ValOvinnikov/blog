@@ -462,12 +462,12 @@
     "remove": "Verwijderen",
     "unsupportedType": "Kies een PNG-, JPEG- of GIF-afbeelding — SVG en WebP worden niet ondersteund door grote e-mailprogramma's.",
     "tooLarge": "Dat bestand is te groot — de limiet is {limit}.",
-    "sender": {
+    "SENDER": {
       "currentAlt": "Huidig e-maillogo",
       "upload": "E-maillogo uploaden",
       "replace": "E-maillogo vervangen"
     },
-    "template": {
+    "TEMPLATE": {
       "currentAlt": "Huidig sjabloonlogo",
       "upload": "Sjabloonlogo uploaden",
       "replace": "Sjabloonlogo vervangen"
