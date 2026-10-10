@@ -1,18 +1,15 @@
 'use server';
 
-import { ERROR_CODE } from '@blog/config/constants';
 import { queries } from '@blog/db';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
-import { logger } from '@platform/utils/logger/logger';
 
-import { dispatchProvisioningWorkflow } from './dispatch-provisioning-workflow';
+import {
+  startProvisioning,
+  type TStartProvisioningResult,
+} from './start-provisioning';
 
 export type TRetryProvisioningStepResult =
-  | { outcome: 'dispatched' }
-  | { outcome: 'already-in-progress' }
-  | { outcome: 'not-found' }
-  | { outcome: 'archived' }
-  | { outcome: 'dispatch-error' };
+  TStartProvisioningResult | { outcome: 'archived' };
 
 /**
  * Backs both the status page's per-step Retry button and its all-idle Start
@@ -37,37 +34,5 @@ export const retryProvisioningStepAction = async (
     return { outcome: 'archived' };
   }
 
-  const began = await queries.tenants.beginTenantProvisioning(tenantId);
-
-  if (!began.ok) {
-    if (began.error === ERROR_CODE.DB_ALREADY_PROVISIONING) {
-      return { outcome: 'already-in-progress' };
-    }
-
-    logger.error('provisioning.begin_failed', {
-      tenantId,
-      error: began.error,
-    });
-    return { outcome: 'not-found' };
-  }
-
-  const dispatched = await dispatchProvisioningWorkflow(tenantId);
-
-  if (!dispatched) {
-    const reverted = await queries.tenants.setTenantProvisioningStatus(
-      tenantId,
-      began.data.previousProvisioningStatus,
-    );
-
-    if (!reverted.ok) {
-      logger.error('provisioning.revert_failed', {
-        tenantId,
-        error: reverted.error,
-      });
-    }
-
-    return { outcome: 'dispatch-error' };
-  }
-
-  return { outcome: 'dispatched' };
+  return startProvisioning(tenantId);
 };

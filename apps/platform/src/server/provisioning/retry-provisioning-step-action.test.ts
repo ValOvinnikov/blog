@@ -1,33 +1,24 @@
 import { notFound, redirect } from 'next/navigation';
 
-const {
-  requireSuperAdminMock,
-  dispatchProvisioningWorkflowMock,
-  getTenantByIdMock,
-  beginTenantProvisioningMock,
-  setTenantProvisioningStatusMock,
-} = vi.hoisted(() => ({
-  requireSuperAdminMock: vi.fn(),
-  dispatchProvisioningWorkflowMock: vi.fn(),
-  getTenantByIdMock: vi.fn(),
-  beginTenantProvisioningMock: vi.fn(),
-  setTenantProvisioningStatusMock: vi.fn(),
-}));
+const { requireSuperAdminMock, startProvisioningMock, getTenantByIdMock } =
+  vi.hoisted(() => ({
+    requireSuperAdminMock: vi.fn(),
+    startProvisioningMock: vi.fn(),
+    getTenantByIdMock: vi.fn(),
+  }));
 
 vi.mock('@platform/server/auth/require-super-admin', () => ({
   requireSuperAdmin: requireSuperAdminMock,
 }));
 
-vi.mock('./dispatch-provisioning-workflow', () => ({
-  dispatchProvisioningWorkflow: dispatchProvisioningWorkflowMock,
+vi.mock('./start-provisioning', () => ({
+  startProvisioning: startProvisioningMock,
 }));
 
 vi.mock('@blog/db', () => ({
   queries: {
     tenants: {
       getTenantById: getTenantByIdMock,
-      beginTenantProvisioning: beginTenantProvisioningMock,
-      setTenantProvisioningStatus: setTenantProvisioningStatusMock,
     },
   },
 }));
@@ -41,25 +32,12 @@ describe('retryProvisioningStepAction', () => {
       id: 'admin-1',
       role: 'SUPERADMIN',
     });
-    dispatchProvisioningWorkflowMock.mockReset();
-    dispatchProvisioningWorkflowMock.mockResolvedValue(true);
+    startProvisioningMock.mockReset();
+    startProvisioningMock.mockResolvedValue({ outcome: 'dispatched' });
     getTenantByIdMock.mockReset();
     getTenantByIdMock.mockResolvedValue({
       id: 'tenant-1',
       deprovisionedAt: null,
-    });
-    beginTenantProvisioningMock.mockReset();
-    beginTenantProvisioningMock.mockResolvedValue({
-      ok: true,
-      data: {
-        tenant: { id: 'tenant-1' },
-        previousProvisioningStatus: 'PENDING',
-      },
-    });
-    setTenantProvisioningStatusMock.mockReset();
-    setTenantProvisioningStatusMock.mockResolvedValue({
-      ok: true,
-      data: { id: 'tenant-1' },
     });
     ({ retryProvisioningStepAction } =
       await import('./retry-provisioning-step-action'));
@@ -73,8 +51,7 @@ describe('retryProvisioningStepAction', () => {
     await expect(retryProvisioningStepAction('tenant-1')).rejects.toThrow(
       'NEXT_REDIRECT',
     );
-    expect(beginTenantProvisioningMock).not.toHaveBeenCalled();
-    expect(dispatchProvisioningWorkflowMock).not.toHaveBeenCalled();
+    expect(startProvisioningMock).not.toHaveBeenCalled();
   });
 
   it("rejects an ADMIN-role caller via requireSuperAdmin's 404, before touching provisioning", async () => {
@@ -87,45 +64,22 @@ describe('retryProvisioningStepAction', () => {
     );
 
     expect(redirect).not.toHaveBeenCalled();
-    expect(beginTenantProvisioningMock).not.toHaveBeenCalled();
-    expect(dispatchProvisioningWorkflowMock).not.toHaveBeenCalled();
+    expect(startProvisioningMock).not.toHaveBeenCalled();
   });
 
-  it('begins provisioning then dispatches the workflow, returning "dispatched" on success', async () => {
-    const result = await retryProvisioningStepAction('tenant-1');
+  it.each(['dispatched', 'already-in-progress', 'not-found', 'dispatch-error'])(
+    'starts provisioning and returns its %s outcome',
+    async (outcome) => {
+      startProvisioningMock.mockResolvedValue({ outcome });
 
-    expect(beginTenantProvisioningMock).toHaveBeenCalledWith('tenant-1');
-    expect(dispatchProvisioningWorkflowMock).toHaveBeenCalledWith('tenant-1');
-    expect(setTenantProvisioningStatusMock).not.toHaveBeenCalled();
-    expect(result).toEqual({ outcome: 'dispatched' });
-  });
+      const result = await retryProvisioningStepAction('tenant-1');
 
-  it('returns "already-in-progress" without dispatching when the atomic guard reports a concurrent dispatch', async () => {
-    beginTenantProvisioningMock.mockResolvedValue({
-      ok: false,
-      error: 'DB_ALREADY_PROVISIONING',
-    });
+      expect(startProvisioningMock).toHaveBeenCalledWith('tenant-1');
+      expect(result).toEqual({ outcome });
+    },
+  );
 
-    const result = await retryProvisioningStepAction('tenant-1');
-
-    expect(dispatchProvisioningWorkflowMock).not.toHaveBeenCalled();
-    expect(setTenantProvisioningStatusMock).not.toHaveBeenCalled();
-    expect(result).toEqual({ outcome: 'already-in-progress' });
-  });
-
-  it('returns "not-found" without dispatching when the tenant does not exist', async () => {
-    beginTenantProvisioningMock.mockResolvedValue({
-      ok: false,
-      error: 'DB_NOT_FOUND',
-    });
-
-    const result = await retryProvisioningStepAction('tenant-1');
-
-    expect(dispatchProvisioningWorkflowMock).not.toHaveBeenCalled();
-    expect(result).toEqual({ outcome: 'not-found' });
-  });
-
-  it('returns "not-found" without touching beginTenantProvisioning when the tenant does not exist', async () => {
+  it('returns "not-found" without starting provisioning when the tenant does not exist', async () => {
     getTenantByIdMock.mockResolvedValue(undefined);
 
     const result = await retryProvisioningStepAction('ghost');
@@ -133,12 +87,11 @@ describe('retryProvisioningStepAction', () => {
     expect(getTenantByIdMock).toHaveBeenCalledWith('ghost', {
       includeArchived: true,
     });
-    expect(beginTenantProvisioningMock).not.toHaveBeenCalled();
-    expect(dispatchProvisioningWorkflowMock).not.toHaveBeenCalled();
+    expect(startProvisioningMock).not.toHaveBeenCalled();
     expect(result).toEqual({ outcome: 'not-found' });
   });
 
-  it('rejects a start/retry against an archived tenant server-side, without touching beginTenantProvisioning or dispatching', async () => {
+  it('rejects a start/retry against an archived tenant server-side, without starting provisioning', async () => {
     getTenantByIdMock.mockResolvedValue({
       id: 'tenant-1',
       deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
@@ -146,27 +99,7 @@ describe('retryProvisioningStepAction', () => {
 
     const result = await retryProvisioningStepAction('tenant-1');
 
-    expect(beginTenantProvisioningMock).not.toHaveBeenCalled();
-    expect(dispatchProvisioningWorkflowMock).not.toHaveBeenCalled();
+    expect(startProvisioningMock).not.toHaveBeenCalled();
     expect(result).toEqual({ outcome: 'archived' });
-  });
-
-  it('reverts the PROVISIONING transition and returns "dispatch-error" when the GitHub dispatch fails', async () => {
-    beginTenantProvisioningMock.mockResolvedValue({
-      ok: true,
-      data: {
-        tenant: { id: 'tenant-1' },
-        previousProvisioningStatus: 'FAILED',
-      },
-    });
-    dispatchProvisioningWorkflowMock.mockResolvedValue(false);
-
-    const result = await retryProvisioningStepAction('tenant-1');
-
-    expect(setTenantProvisioningStatusMock).toHaveBeenCalledWith(
-      'tenant-1',
-      'FAILED',
-    );
-    expect(result).toEqual({ outcome: 'dispatch-error' });
   });
 });
