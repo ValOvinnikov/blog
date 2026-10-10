@@ -7,6 +7,7 @@ import { EmailLogoField } from './email-logo-field';
 const STORED_URL = 'https://example.blob.vercel-storage.com/email-logo.png';
 
 const setup = customRender(EmailLogoField, {
+  kind: 'sender',
   label: 'Email logo',
   hint: 'PNG, JPEG, or GIF.',
   logo: { url: undefined },

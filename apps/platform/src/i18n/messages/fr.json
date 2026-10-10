@@ -2,10 +2,11 @@
   "pageMetadata": {
     "root": "Administration",
     "tenants": "Locataires · Administration",
-    "tenant": "Aperçu · Administration",
+    "ownerHome": "Votre site · Administration",
     "look": "Apparence · Administration",
     "voice": "Voix · Administration",
     "selectTenant": "Choisir un espace de travail · Administration",
+    "workspacePending": "Espace de travail pas encore prêt · Administration",
     "addTenant": "Ajouter un locataire · Administration",
     "tenantOverview": "Aperçu du locataire · Administration",
     "tenantProvisioning": "Provisionnement · Administration",
@@ -386,12 +387,22 @@
   "brandAssetField": {
     "savesWithChanges": "Enregistré avec les modifications",
     "unexpectedError": "Une erreur s'est produite — veuillez réessayer.",
-    "currentAlt": "{label} actuel",
     "uploading": "Envoi…",
-    "replace": "Remplacer : {label}",
-    "upload": "Importer : {label}",
     "remove": "Supprimer",
-    "pickAgain": "Votre brouillon restauré contenait une nouvelle image ({label}) qui n'a pas pu être conservée — choisissez-la à nouveau."
+    "logo": {
+      "currentAlt": "Logo actuel",
+      "upload": "Importer le logo",
+      "replace": "Remplacer le logo",
+      "pickAgain": "Votre brouillon restauré contenait un nouveau logo qui n'a pas pu être conservé — choisissez-le à nouveau."
+    },
+    "favicon": {
+      "currentAlt": "Favicon actuel",
+      "upload": "Importer le favicon",
+      "replace": "Remplacer le favicon",
+      "pickAgain": "Votre brouillon restauré contenait un nouveau favicon qui n'a pas pu être conservé — choisissez-le à nouveau."
+    },
+    "unsupportedType": "Choisissez une image PNG, JPEG, WebP ou SVG.",
+    "tooLarge": "Ce fichier est trop volumineux — la limite est de {limit}."
   },
   "emailForm": {
     "pageHeading": "E-mail",
@@ -404,7 +415,8 @@
     "senderItemDescription": "Nom, adresse de réponse, adresse postale et logo, identiques dans toutes les langues.",
     "editingLabel": "Modification",
     "templateGroupLabel": "Modèle",
-    "allLanguagesChanges": "Toutes les langues"
+    "allLanguagesChanges": "Toutes les langues",
+    "draftFieldLabel": "{template} — {field}"
   },
   "fieldStatus": {
     "default": "Par défaut",
@@ -446,13 +458,20 @@
   },
   "emailLogoField": {
     "unexpectedError": "Une erreur s'est produite — veuillez réessayer.",
-    "currentAlt": "{label} actuel",
     "uploading": "Envoi…",
-    "replace": "Remplacer : {label}",
-    "upload": "Importer : {label}",
     "remove": "Supprimer",
     "unsupportedType": "Choisissez une image PNG, JPEG ou GIF — les formats SVG et WebP ne sont pas pris en charge par les principaux clients de messagerie.",
-    "tooLarge": "Ce fichier est trop volumineux — la limite est de {limit}."
+    "tooLarge": "Ce fichier est trop volumineux — la limite est de {limit}.",
+    "sender": {
+      "currentAlt": "Logo des e-mails actuel",
+      "upload": "Importer le logo des e-mails",
+      "replace": "Remplacer le logo des e-mails"
+    },
+    "template": {
+      "currentAlt": "Logo du modèle actuel",
+      "upload": "Importer le logo du modèle",
+      "replace": "Remplacer le logo du modèle"
+    }
   },
   "emailTemplateEditor": {
     "subjectLabel": "Objet ({language})",
@@ -482,7 +501,8 @@
     "removeLink": "Supprimer le lien",
     "linkUrlLabel": "URL du lien",
     "linkApply": "Appliquer",
-    "linkCancel": "Annuler"
+    "linkCancel": "Annuler",
+    "linkUrlPlaceholder": "https://…"
   },
   "voiceSettings": {
     "heading": "Voix",
@@ -912,5 +932,8 @@
     "savedColumn": "Enregistré",
     "draftColumn": "Votre brouillon",
     "emptyValue": "Vide"
+  },
+  "externalLinkButton": {
+    "newTabHint": "(s'ouvre dans un nouvel onglet)"
   }
 }

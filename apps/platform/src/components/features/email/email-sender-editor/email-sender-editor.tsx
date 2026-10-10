@@ -73,6 +73,7 @@ export const EmailSenderEditor = ({
             aria-describedby={archivedNoticeId}
           />
           <EmailLogoField
+            kind="sender"
             label={t('logoLabel')}
             hint={t('logoHint')}
             logo={logo}

@@ -114,6 +114,7 @@ export const EmailTemplateEditor = ({
             />
           </FormField>
           <EmailLogoField
+            kind="template"
             label={t('logoLabel')}
             hint={t('logoHint')}
             logo={logo}
