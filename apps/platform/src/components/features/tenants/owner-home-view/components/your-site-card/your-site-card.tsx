@@ -66,7 +66,7 @@ export const YourSiteCard = ({ tenant }: TYourSiteCardProps) => {
             {tLanguage(tenant.locale)}
           </DetailList.Row>
         </DetailList>
-        <Text variant="hint" className={hint()}>
+        <Text variant="meta" className={hint()}>
           {t('readOnlyHint')}
         </Text>
       </Card.Body>
