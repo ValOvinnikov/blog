@@ -1,6 +1,8 @@
 'use client';
 
 import { AssetUploadField } from '@platform/components/shared/asset-upload-field';
+import type { TEmailLogoKind } from '@platform/constants/email-logo';
+import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import {
   ACCEPTED_EMAIL_LOGO_MIME_TYPES,
   quickClientEmailLogoCheck,
@@ -10,28 +12,25 @@ import {
   type TStagedImage,
 } from '@platform/utils/staged-image/staged-image';
 import { useTranslations } from 'next-intl';
-import type { AriaAttributes } from 'react';
 
 export type TEmailLogoFieldProps = {
+  kind: TEmailLogoKind;
   label: string;
   hint: string;
   logo: TStagedImage;
   onStage: (logo: TStagedImage) => void;
-  isDisabled?: boolean;
-  'aria-describedby'?: AriaAttributes['aria-describedby'];
 };
 
 // Picking or removing a file only stages it; the page's Save uploads it.
 export const EmailLogoField = ({
+  kind,
   label,
   hint,
   logo,
   onStage,
-  isDisabled = false,
-  'aria-describedby': ariaDescribedBy,
 }: TEmailLogoFieldProps) => {
   const t = useTranslations('emailLogoField');
-  const lowerLabel = label.toLowerCase();
+  const { isArchived, isPending, archivedDescribedBy } = useSettingsFormState();
 
   const validateFile = (file: File): string | undefined => {
     const quickError = quickClientEmailLogoCheck(file);
@@ -51,13 +50,9 @@ export const EmailLogoField = ({
       label={label}
       hint={hint}
       currentUrl={logo.url}
-      currentAlt={t('currentAlt', { label: lowerLabel })}
+      currentAlt={t(`${kind}.currentAlt`)}
       acceptedMimeTypes={ACCEPTED_EMAIL_LOGO_MIME_TYPES}
-      uploadLabel={
-        logo.url
-          ? t('replace', { label: lowerLabel })
-          : t('upload', { label: lowerLabel })
-      }
+      uploadLabel={logo.url ? t(`${kind}.replace`) : t(`${kind}.upload`)}
       uploadingLabel={t('uploading')}
       removeLabel={t('remove')}
       unexpectedErrorLabel={t('unexpectedError')}
@@ -65,8 +60,8 @@ export const EmailLogoField = ({
       onUpload={onUpload}
       onClear={onClear}
       onChange={() => undefined}
-      isDisabled={isDisabled}
-      aria-describedby={ariaDescribedBy}
+      isDisabled={isArchived || isPending}
+      aria-describedby={archivedDescribedBy}
     />
   );
 };

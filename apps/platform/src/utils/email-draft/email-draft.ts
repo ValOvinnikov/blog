@@ -3,21 +3,15 @@ import {
   type TEmailTemplateType,
   type TLocaleIsoCode,
 } from '@blog/config';
-import { EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE } from '@blog/db/constants/email-template-defaults';
 import type { TAuthoredEmailTemplateCopy } from '@blog/db/queries/email-templates';
 import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
-import {
-  isSameStagedImage,
-  type TStagedImage,
-} from '@platform/utils/staged-image/staged-image';
+import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 
 export const EMAIL_SENDER_ITEM = 'SENDER' as const;
 
 export const EMAIL_TEMPLATE_TYPES = Object.values(EMAIL_TEMPLATE_TYPE);
 
 export type TEmailPageItem = typeof EMAIL_SENDER_ITEM | TEmailTemplateType;
-
-export type TEmailItemStatus = 'default' | 'customised' | 'unsaved';
 
 export type TEmailSenderDraft = {
   senderName: string;
@@ -61,21 +55,10 @@ type TBuildEmailDraftInput = {
   liveLocales: TLocaleIsoCode[];
 };
 
-const SENDER_FIELDS = [
-  'senderName',
-  'replyToAddress',
-  'footerPostalAddress',
-] as const satisfies (keyof TEmailSenderDraft)[];
-
 const mapTemplateTypes = <T>(build: (type: TEmailTemplateType) => T) =>
   Object.fromEntries(
     EMAIL_TEMPLATE_TYPES.map((type) => [type, build(type)]),
   ) as Record<TEmailTemplateType, T>;
-
-export const isSameBody = (
-  a: TEmailTemplateBlock[] | null,
-  b: TEmailTemplateBlock[] | null,
-): boolean => JSON.stringify(a) === JSON.stringify(b);
 
 export const buildEmailDraft = ({
   sender,
@@ -106,146 +89,9 @@ export const buildEmailDraft = ({
   })),
 });
 
-export const resolveFallbackCopy = (
-  draft: TEmailDraft,
-  templateType: TEmailTemplateType,
-  locale: TLocaleIsoCode,
-  defaultLocale: TLocaleIsoCode,
-): TEmailFallbackCopy => {
-  const productDefault =
-    EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE[locale][templateType];
-  const tenantDefault =
-    locale === defaultLocale
-      ? undefined
-      : draft.copies[templateType][defaultLocale];
-
-  return {
-    subject: tenantDefault?.subject || productDefault.subject,
-    body: tenantDefault?.body ?? productDefault.body,
-  };
-};
-
-const countCopyFieldChanges = (
-  saved: TEmailCopyDraft,
-  draft: TEmailCopyDraft,
-): number =>
-  Number(saved.subject !== draft.subject) +
-  Number(!isSameBody(saved.body, draft.body));
-
-export const listCopyChanges = (
-  saved: TEmailDraft,
-  draft: TEmailDraft,
-  liveLocales: TLocaleIsoCode[],
-): TEmailCopyChange[] =>
-  EMAIL_TEMPLATE_TYPES.flatMap((templateType) =>
-    liveLocales
-      .filter(
-        (locale) =>
-          countCopyFieldChanges(
-            saved.copies[templateType][locale],
-            draft.copies[templateType][locale],
-          ) > 0,
-      )
-      .map((locale) => ({ templateType, locale })),
-  );
-
-export const isSenderChanged = (
-  saved: TEmailDraft,
-  draft: TEmailDraft,
-): boolean =>
-  SENDER_FIELDS.some((field) => saved.sender[field] !== draft.sender[field]);
-
-export const listLogoChanges = (
-  saved: TEmailDraft,
-  draft: TEmailDraft,
-): (typeof EMAIL_SENDER_ITEM | TEmailTemplateType)[] => [
-  ...(isSameStagedImage(saved.senderLogo, draft.senderLogo)
-    ? []
-    : [EMAIL_SENDER_ITEM]),
-  ...EMAIL_TEMPLATE_TYPES.filter(
-    (type) =>
-      !isSameStagedImage(saved.templateLogos[type], draft.templateLogos[type]),
-  ),
-];
-
-export const countLanguageChanges = (
-  saved: TEmailDraft,
-  draft: TEmailDraft,
-  locale: TLocaleIsoCode,
-): number =>
-  EMAIL_TEMPLATE_TYPES.reduce(
-    (total, type) =>
-      total +
-      countCopyFieldChanges(
-        saved.copies[type][locale],
-        draft.copies[type][locale],
-      ),
-    0,
-  );
-
-export const countSharedChanges = (
-  saved: TEmailDraft,
-  draft: TEmailDraft,
-): number =>
-  SENDER_FIELDS.filter((field) => saved.sender[field] !== draft.sender[field])
-    .length + listLogoChanges(saved, draft).length;
-
-export const countEmailDraftChanges = (
-  saved: TEmailDraft,
-  draft: TEmailDraft,
-  liveLocales: TLocaleIsoCode[],
-): number =>
-  countSharedChanges(saved, draft) +
-  liveLocales.reduce(
-    (total, locale) => total + countLanguageChanges(saved, draft, locale),
-    0,
-  );
-
-const isCopyCustomised = (copy: TEmailCopyDraft) =>
-  copy.subject !== '' || copy.body !== null;
-
-export const resolveItemStatus = (
-  saved: TEmailDraft,
-  draft: TEmailDraft,
-  item: TEmailPageItem,
-  locale: TLocaleIsoCode,
-): TEmailItemStatus => {
-  if (item === EMAIL_SENDER_ITEM) {
-    if (
-      isSenderChanged(saved, draft) ||
-      !isSameStagedImage(saved.senderLogo, draft.senderLogo)
-    ) {
-      return 'unsaved';
-    }
-    const isCustomised =
-      SENDER_FIELDS.some((field) => draft.sender[field] !== '') ||
-      draft.senderLogo.url !== undefined;
-    return isCustomised ? 'customised' : 'default';
-  }
-
-  const copy = draft.copies[item][locale];
-  if (
-    countCopyFieldChanges(saved.copies[item][locale], copy) > 0 ||
-    !isSameStagedImage(saved.templateLogos[item], draft.templateLogos[item])
-  ) {
-    return 'unsaved';
-  }
-  const isCustomised =
-    isCopyCustomised(copy) || draft.templateLogos[item].url !== undefined;
-  return isCustomised ? 'customised' : 'default';
-};
-
-export const countCustomisedTemplates = (
-  draft: TEmailDraft,
-  locale: TLocaleIsoCode,
-): number =>
-  EMAIL_TEMPLATE_TYPES.filter((templateType) =>
-    isCopyCustomised(draft.copies[templateType][locale]),
-  ).length;
-
 export const withLogo = (
   draft: TEmailDraft,
-  target: typeof EMAIL_SENDER_ITEM | TEmailTemplateType,
+  target: TEmailPageItem,
   logo: TStagedImage,
 ): TEmailDraft =>
   target === EMAIL_SENDER_ITEM

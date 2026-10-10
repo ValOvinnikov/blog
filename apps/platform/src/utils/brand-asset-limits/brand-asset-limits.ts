@@ -36,25 +36,27 @@ export const maxUploadMbLabel = (kind: TBrandAssetKind): string => {
   return `${(MAX_UPLOAD_BYTES[kind] / MB).toFixed(1)} MB`;
 };
 
+export type TBrandAssetQuickCheckError =
+  { key: 'unsupportedType' } | { key: 'tooLarge'; limit: string };
+
 /**
- * Client-side convenience only — catches an obviously wrong file (wrong
- * type, way too large) before a round trip. `validateBrandAssetUpload` on
- * the server is the actual gate: it sniffs the real bytes and enforces
- * favicon square-ness, neither of which a browser-reported `File.type`/
- * `.size` can prove.
+ * Client-side convenience only — `validateBrandAssetUpload` on the server is
+ * the actual gate, since it sniffs the real bytes and enforces favicon
+ * square-ness, neither of which a browser-reported `File.type`/`.size` can
+ * prove.
  */
 export const quickClientImageCheck = (
   file: File,
   kind: TBrandAssetKind,
-): string | undefined => {
+): TBrandAssetQuickCheckError | undefined => {
   if (
     !ACCEPTED_IMAGE_MIME_TYPES.includes(file.type as TAcceptedImageMimeType)
   ) {
-    return 'Choose a PNG, JPEG, WebP, or SVG image.';
+    return { key: 'unsupportedType' };
   }
 
   if (file.size > MAX_UPLOAD_BYTES[kind]) {
-    return `That file is too large — the limit is ${maxUploadMbLabel(kind)}.`;
+    return { key: 'tooLarge', limit: maxUploadMbLabel(kind) };
   }
 
   return undefined;

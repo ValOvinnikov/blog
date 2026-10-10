@@ -2,6 +2,7 @@
 
 import { SIZE } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
+import { Text } from '@platform/components/shared/text';
 import Image from 'next/image';
 import { unstable_rethrow } from 'next/navigation';
 import {
@@ -166,9 +167,9 @@ export const AssetUploadField = ({
             </div>
             {fileName && <p className={fileNameSlot()}>{fileName}</p>}
             {hint && (
-              <p id={hintId} className={hintSlot()}>
+              <Text id={hintId} variant="hint" className={hintSlot()}>
                 {hint}
-              </p>
+              </Text>
             )}
           </div>
         </div>

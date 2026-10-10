@@ -12,12 +12,12 @@ import {
 } from '@blog/db/constants';
 import type {
   TProvisioningRun,
-  TTenant,
   TTenantProvisioningState,
 } from '@blog/db/schema/tenants';
 import { useToast } from '@platform/context/toast-provider';
 import { getTenantProvisioningStatusAction } from '@platform/server/provisioning/get-tenant-provisioning-status-action';
 import { retryProvisioningStepAction } from '@platform/server/provisioning/retry-provisioning-step-action';
+import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import {
   classifyProvisioningError,
   type TProvisioningErrorKind,
@@ -79,7 +79,7 @@ export type TUseProvisioningPollResult = {
 };
 
 export const useProvisioningPoll = (
-  tenant: TTenant,
+  tenant: TClientTenant,
 ): TUseProvisioningPollResult => {
   const router = useRouter();
   const toast = useToast();

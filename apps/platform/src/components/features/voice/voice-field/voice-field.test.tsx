@@ -1,19 +1,22 @@
 import { VOICE_FIELD_KIND, VOICE_FIELDS } from '@blog/config';
-import { customRender, screen } from '@platform/testing/custom-render';
+import { screen } from '@platform/testing/custom-render';
+import {
+  ARCHIVED_NOTICE_TEXT,
+  customRenderInSettingsForm,
+} from '@platform/testing/render-in-settings-form';
 
 import { VoiceField } from './voice-field';
 
 const fieldById = (id: string) =>
   VOICE_FIELDS.find((field) => field.id === id)!;
 
-const setup = customRender(VoiceField, {
+const setup = customRenderInSettingsForm(VoiceField, {
   inputId: 'voice-field-test',
   field: fieldById('notFoundHeading'),
   value: '',
   savedValue: '',
   placeholder: 'Page not found',
   onChange: vi.fn(),
-  isReadOnly: false,
 });
 
 describe(`<${VoiceField.name}/>`, () => {
@@ -89,26 +92,44 @@ describe(`<${VoiceField.name}/>`, () => {
   });
 
   it('offers no editing controls on a read-only rich field', () => {
-    setup({
-      field: fieldById('notFoundSupportingText'),
-      value: null,
-      isReadOnly: true,
-    });
+    setup(
+      {
+        field: fieldById('notFoundSupportingText'),
+        value: null,
+      },
+      { isArchived: true },
+    );
 
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
   it('announces a read-only rich field as read-only rather than disabled', () => {
-    setup({
-      field: fieldById('notFoundSupportingText'),
-      value: null,
-      isReadOnly: true,
-    });
+    setup(
+      {
+        field: fieldById('notFoundSupportingText'),
+        value: null,
+      },
+      { isArchived: true },
+    );
 
     const editor = screen.getByRole('textbox', { name: 'Supporting text' });
     expect(editor).toHaveAttribute('aria-readonly', 'true');
     expect(editor).not.toHaveAttribute('aria-disabled');
   });
+
+  it.each([
+    ['text', 'notFoundHeading', 'Heading'],
+    ['rich', 'notFoundSupportingText', 'Supporting text'],
+  ])(
+    'describes a read-only %s field with the archived notice',
+    (_kind, id, name) => {
+      setup({ field: fieldById(id), value: null }, { isArchived: true });
+
+      expect(screen.getByRole('textbox', { name })).toHaveAccessibleDescription(
+        new RegExp(`${ARCHIVED_NOTICE_TEXT}$`),
+      );
+    },
+  );
 
   it('gives an invalid rich field its input id so the save bar can focus it', () => {
     setup({

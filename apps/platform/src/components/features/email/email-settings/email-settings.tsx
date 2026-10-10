@@ -16,20 +16,22 @@ import { SettingsFormShell } from '@platform/components/shared/settings-form-she
 import { useViewTabs, ViewTabs } from '@platform/components/shared/view-tabs';
 import { useToast } from '@platform/context/toast-provider';
 import {
-  countCustomisedTemplates,
-  countEmailDraftChanges,
-  countLanguageChanges,
-  countSharedChanges,
   EMAIL_SENDER_ITEM,
   EMAIL_TEMPLATE_TYPES,
-  resolveFallbackCopy,
-  resolveItemStatus,
   withCopy,
   withLogo,
   type TEmailDraft,
   type TEmailPageItem,
   type TEmailSenderDraft,
 } from '@platform/utils/email-draft/email-draft';
+import {
+  countCustomisedTemplates,
+  countEmailDraftChanges,
+  countLanguageChanges,
+  countSharedChanges,
+  resolveItemStatus,
+} from '@platform/utils/email-draft-changes/email-draft-changes';
+import { resolveFallbackCopy } from '@platform/utils/email-fallback-copy/email-fallback-copy';
 import { buildEmailTemplatePreviewHtml } from '@platform/utils/email-template-preview-builder/email-template-preview-builder';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -74,7 +76,6 @@ export const EmailSettings = ({
   const toast = useToast();
   const router = useRouter();
   const archivedNoticeId = useId();
-  const isArchived = Boolean(archivedAt);
   const [selectedItem, setSelectedItem] =
     useState<TEmailPageItem>(EMAIL_SENDER_ITEM);
   const [selectedLocale, setSelectedLocale] = useState(defaultLocale);
@@ -133,8 +134,6 @@ export const EmailSettings = ({
     logoImageUrl: previewLogo.url,
     footerPostalAddress: draft.sender.footerPostalAddress.trim() || undefined,
   });
-  const isDisabled = isPending || isArchived;
-  const archivedDescribedBy = isArchived ? archivedNoticeId : undefined;
 
   const items = [EMAIL_SENDER_ITEM, ...EMAIL_TEMPLATE_TYPES].map((item) => {
     const itemStatus = resolveItemStatus(saved, draft, item, selectedLocale);
@@ -169,13 +168,19 @@ export const EmailSettings = ({
       return [
         {
           id: `${templateType}.${locale}.subject`,
-          label: `${template} — ${tTemplate('subjectLabel', { language })}`,
+          label: t('draftFieldLabel', {
+            template,
+            field: tTemplate('subjectLabel', { language }),
+          }),
           display: (values: TEmailDraft) =>
             values.copies[templateType][locale].subject,
         },
         {
           id: `${templateType}.${locale}.body`,
-          label: `${template} — ${tTemplate('bodyLabel', { language })}`,
+          label: t('draftFieldLabel', {
+            template,
+            field: tTemplate('bodyLabel', { language }),
+          }),
           display: (values: TEmailDraft) =>
             portableTextToPlainText(
               values.copies[templateType][locale].body as Parameters<
@@ -275,8 +280,6 @@ export const EmailSettings = ({
                 setDraft((prev) => withLogo(prev, EMAIL_SENDER_ITEM, logo))
               }
               senderNameError={senderNameError}
-              isDisabled={isDisabled}
-              archivedNoticeId={archivedDescribedBy}
             />
           ) : (
             <EmailTemplateEditor
@@ -306,8 +309,6 @@ export const EmailSettings = ({
               onLogoStage={(logo) =>
                 setDraft((prev) => withLogo(prev, selectedItem, logo))
               }
-              isDisabled={isDisabled}
-              archivedNoticeId={archivedDescribedBy}
             />
           )}
         </div>
@@ -326,7 +327,6 @@ export const EmailSettings = ({
               })
             }
             isSendingTest={isSending}
-            isSendTestDisabled={isArchived}
             hasUnsavedLogo={previewLogo.file !== undefined}
           />
         </div>

@@ -1,4 +1,6 @@
-import { customRender, screen } from '@platform/testing/custom-render';
+import { EMAIL_LOGO_KIND } from '@platform/constants/email-logo';
+import { screen } from '@platform/testing/custom-render';
+import { customRenderInSettingsForm } from '@platform/testing/render-in-settings-form';
 import { selectFile } from '@platform/testing/select-file';
 import userEvent from '@testing-library/user-event';
 
@@ -6,7 +8,8 @@ import { EmailLogoField } from './email-logo-field';
 
 const STORED_URL = 'https://example.blob.vercel-storage.com/email-logo.png';
 
-const setup = customRender(EmailLogoField, {
+const setup = customRenderInSettingsForm(EmailLogoField, {
+  kind: EMAIL_LOGO_KIND.SENDER,
   label: 'Email logo',
   hint: 'PNG, JPEG, or GIF.',
   logo: { url: undefined },

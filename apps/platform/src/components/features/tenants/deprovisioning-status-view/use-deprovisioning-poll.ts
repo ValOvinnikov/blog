@@ -9,10 +9,10 @@ import {
 } from '@blog/db/constants';
 import type {
   TDeprovisioningRun,
-  TTenant,
   TTenantDeprovisioningState,
 } from '@blog/db/schema/tenants';
 import { getTenantDeprovisioningStatusAction } from '@platform/server/provisioning/get-tenant-deprovisioning-status-action';
+import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import {
   classifyProvisioningError,
   type TProvisioningErrorKind,
@@ -99,7 +99,7 @@ export type TUseDeprovisioningPollOptions = {
 };
 
 export const useDeprovisioningPoll = (
-  tenant: TTenant,
+  tenant: TClientTenant,
   { isEnabled, deprovisionRequestedAt }: TUseDeprovisioningPollOptions,
 ): TUseDeprovisioningPollResult => {
   const [renderedTenant, setRenderedTenant] = useState(tenant);

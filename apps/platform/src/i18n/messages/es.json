@@ -2,10 +2,11 @@
   "pageMetadata": {
     "root": "Administración",
     "tenants": "Clientes · Administración",
-    "tenant": "Resumen · Administración",
+    "ownerHome": "Su sitio · Administración",
     "look": "Aspecto · Administración",
     "voice": "Voz · Administración",
     "selectTenant": "Elija un espacio de trabajo · Administración",
+    "workspacePending": "Espacio de trabajo no listo · Administración",
     "addTenant": "Añadir cliente · Administración",
     "tenantOverview": "Resumen del cliente · Administración",
     "tenantProvisioning": "Aprovisionamiento · Administración",
@@ -44,9 +45,11 @@
   "tenantSwitcher": {
     "archived": "Archivado"
   },
+  "toast": {
+    "dismissLabel": "Cerrar notificación"
+  },
   "toastProvider": {
     "viewportAriaLabel": "Notificaciones",
-    "dismissLabel": "Cerrar notificación",
     "mergeCountSuffix": " ×{count}"
   },
   "topbarNavMenu": {
@@ -145,6 +148,7 @@
     "title": "Incidencias abiertas",
     "empty": "No hay incidencias abiertas para este cliente: todo funciona correctamente.",
     "detailsToggle": "Detalles",
+    "detailsLoading": "Cargando detalles…",
     "columnLevel": "Nivel",
     "columnDocument": "Documento",
     "columnMessage": "Mensaje"
@@ -386,12 +390,22 @@
   "brandAssetField": {
     "savesWithChanges": "Se guarda con los cambios",
     "unexpectedError": "Algo ha salido mal. Vuelva a intentarlo.",
-    "currentAlt": "{label} actual",
     "uploading": "Subiendo…",
-    "replace": "Sustituir {label}",
-    "upload": "Subir {label}",
     "remove": "Quitar",
-    "pickAgain": "El borrador recuperado tenía una imagen nueva ({label}) que no se pudo conservar: vuelva a elegirla."
+    "logo": {
+      "currentAlt": "Logotipo actual",
+      "upload": "Subir logotipo",
+      "replace": "Sustituir logotipo",
+      "pickAgain": "El borrador recuperado tenía un logotipo nuevo que no se pudo conservar: vuelva a elegirlo."
+    },
+    "favicon": {
+      "currentAlt": "Favicon actual",
+      "upload": "Subir favicon",
+      "replace": "Sustituir favicon",
+      "pickAgain": "El borrador recuperado tenía un favicon nuevo que no se pudo conservar: vuelva a elegirlo."
+    },
+    "unsupportedType": "Elija una imagen PNG, JPEG, WebP o SVG.",
+    "tooLarge": "El archivo es demasiado grande: el límite es {limit}."
   },
   "emailForm": {
     "pageHeading": "Correo electrónico",
@@ -404,7 +418,8 @@
     "senderItemDescription": "Nombre, dirección de respuesta, dirección postal y logotipo, iguales en todos los idiomas.",
     "editingLabel": "Editando",
     "templateGroupLabel": "Plantilla",
-    "allLanguagesChanges": "Todos los idiomas"
+    "allLanguagesChanges": "Todos los idiomas",
+    "draftFieldLabel": "{template} — {field}"
   },
   "fieldStatus": {
     "default": "Predeterminado",
@@ -446,13 +461,20 @@
   },
   "emailLogoField": {
     "unexpectedError": "Algo ha salido mal. Vuelva a intentarlo.",
-    "currentAlt": "{label} actual",
     "uploading": "Subiendo…",
-    "replace": "Sustituir {label}",
-    "upload": "Subir {label}",
     "remove": "Quitar",
     "unsupportedType": "Elija una imagen PNG, JPEG o GIF: los principales clientes de correo no admiten SVG ni WebP.",
-    "tooLarge": "El archivo es demasiado grande: el límite es {limit}."
+    "tooLarge": "El archivo es demasiado grande: el límite es {limit}.",
+    "SENDER": {
+      "currentAlt": "Logotipo del correo actual",
+      "upload": "Subir el logotipo del correo",
+      "replace": "Sustituir el logotipo del correo"
+    },
+    "TEMPLATE": {
+      "currentAlt": "Logotipo de la plantilla actual",
+      "upload": "Subir el logotipo de la plantilla",
+      "replace": "Sustituir el logotipo de la plantilla"
+    }
   },
   "emailTemplateEditor": {
     "subjectLabel": "Asunto ({language})",
@@ -482,7 +504,8 @@
     "removeLink": "Quitar enlace",
     "linkUrlLabel": "URL del enlace",
     "linkApply": "Aplicar",
-    "linkCancel": "Cancelar"
+    "linkCancel": "Cancelar",
+    "linkUrlPlaceholder": "https://…"
   },
   "voiceSettings": {
     "heading": "Voz",
@@ -912,5 +935,8 @@
     "savedColumn": "Guardado",
     "draftColumn": "Tu borrador",
     "emptyValue": "Vacío"
+  },
+  "externalLinkButton": {
+    "newTabHint": "(se abre en una pestaña nueva)"
   }
 }

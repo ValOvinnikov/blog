@@ -11,7 +11,7 @@ import {
   waitFor,
 } from '@platform/testing/custom-render';
 import { mockRouter } from '@platform/testing/mock-router';
-import { makeTenant } from '@platform/testing/tenants/fixtures';
+import { makeClientTenant } from '@platform/testing/tenants/fixtures';
 import type { TTenantFieldLocks } from '@platform/utils/tenant-field-locks/tenant-field-locks';
 import { render as rtlRender } from '@testing-library/react';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -77,7 +77,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
   describe('every field unlocked (fieldLocks={})', () => {
     it('renders every field, including owner email, as an editable, enabled control, pre-filled from props — and starts with Save disabled', () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         name: 'Acme Inc.',
         primaryDomain: 'acme.example.com',
         plan: TENANT_PLAN.FREE,
@@ -119,7 +119,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     });
 
     it('renders the plan field label as a plain span, not a <label htmlFor> pointing nowhere, while still exposing the accessible name via ariaLabel', () => {
-      const tenant = makeTenant({ plan: TENANT_PLAN.FREE });
+      const tenant = makeClientTenant({ plan: TENANT_PLAN.FREE });
       render(
         <TenantDetailsPanel
           tenant={tenant}
@@ -136,7 +136,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     });
 
     it('enables Save when only the owner email is edited', async () => {
-      const tenant = makeTenant();
+      const tenant = makeClientTenant();
       render(
         <TenantDetailsPanel
           tenant={tenant}
@@ -163,9 +163,9 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     it('saves the edited values and refreshes on success, sending the unchanged owner email as an ordinary field', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         ok: true,
-        tenant: makeTenant({ name: 'Acme Renamed' }),
+        tenant: makeClientTenant({ name: 'Acme Renamed' }),
       });
-      const tenant = makeTenant({ id: 'tenant-1', name: 'Acme Inc.' });
+      const tenant = makeClientTenant({ id: 'tenant-1', name: 'Acme Inc.' });
       render(
         <TenantDetailsPanel
           tenant={tenant}
@@ -196,9 +196,9 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     it('submits the edited owner email value', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         ok: true,
-        tenant: makeTenant(),
+        tenant: makeClientTenant(),
       });
-      const tenant = makeTenant({ id: 'tenant-1' });
+      const tenant = makeClientTenant({ id: 'tenant-1' });
       render(
         <TenantDetailsPanel
           tenant={tenant}
@@ -227,7 +227,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         ok: false,
         fieldErrors: { primaryDomain: 'This domain is already in use.' },
       });
-      const tenant = makeTenant();
+      const tenant = makeClientTenant();
       render(
         <TenantDetailsPanel
           tenant={tenant}
@@ -257,7 +257,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
           primaryDomain: 'Enter a valid domain.',
         },
       });
-      const tenant = makeTenant();
+      const tenant = makeClientTenant();
       render(
         <TenantDetailsPanel
           tenant={tenant}
@@ -284,9 +284,9 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     it('shows a save-confirmation toast after a successful save, independent of further edits', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         ok: true,
-        tenant: makeTenant({ id: 'tenant-1', name: 'Acme Renamed' }),
+        tenant: makeClientTenant({ id: 'tenant-1', name: 'Acme Renamed' }),
       });
-      const tenant = makeTenant({ id: 'tenant-1', name: 'Acme Inc.' });
+      const tenant = makeClientTenant({ id: 'tenant-1', name: 'Acme Inc.' });
       render(
         <TenantDetailsPanel
           tenant={tenant}
@@ -313,7 +313,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         ok: false,
         fieldErrors: { primaryDomain: 'This domain is already in use.' },
       });
-      const tenant = makeTenant();
+      const tenant = makeClientTenant();
       render(
         <TenantDetailsPanel
           tenant={tenant}
@@ -339,7 +339,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         error:
           "This tenant's provisioning has already started; its details can no longer be edited.",
       });
-      const tenant = makeTenant();
+      const tenant = makeClientTenant();
       render(
         <TenantDetailsPanel
           tenant={tenant}
@@ -365,7 +365,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
         error:
           "This tenant's owner has already signed in, so their email can no longer be corrected here — this would transfer ownership instead.",
       });
-      const tenant = makeTenant({ id: 'tenant-1' });
+      const tenant = makeClientTenant({ id: 'tenant-1' });
       render(
         <TenantDetailsPanel
           tenant={tenant}
@@ -396,7 +396,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
           ownerEmail: 'This email already has a pending invite on this tenant.',
         },
       });
-      const tenant = makeTenant();
+      const tenant = makeClientTenant();
       render(
         <TenantDetailsPanel
           tenant={tenant}
@@ -425,7 +425,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
   describe('per-field locking', () => {
     it('renders a field whose consuming step already completed as disabled, stating why', () => {
-      const tenant = makeTenant({ primaryDomain: 'acme.example.com' });
+      const tenant = makeClientTenant({ primaryDomain: 'acme.example.com' });
       render(
         <TenantDetailsPanel
           tenant={tenant}
@@ -445,7 +445,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     });
 
     it('renders every other field as editable when only one field is locked', () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         name: 'Acme Inc.',
         primaryDomain: 'acme.example.com',
         plan: TENANT_PLAN.FREE,
@@ -472,12 +472,12 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     it('lets the operator correct the unlocked field that caused the failure and save it', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         ok: true,
-        tenant: makeTenant({
+        tenant: makeClientTenant({
           id: 'tenant-1',
           primaryDomain: 'new-domain.example.com',
         }),
       });
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         id: 'tenant-1',
         name: 'Acme Inc.',
         primaryDomain: 'taken-domain.example.com',
@@ -513,7 +513,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     });
 
     it('renders the plan control locked with a "provisioning succeeded" reason once every step is DONE', () => {
-      const tenant = makeTenant({ plan: TENANT_PLAN.GROWTH });
+      const tenant = makeClientTenant({ plan: TENANT_PLAN.GROWTH });
       render(
         <TenantDetailsPanel
           tenant={tenant}
@@ -536,11 +536,14 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     it('saves the default language chosen from the supported list', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         ok: true,
-        tenant: makeTenant({ locale: LOCALE_ISO_CODES.NL }),
+        tenant: makeClientTenant({ locale: LOCALE_ISO_CODES.NL }),
       });
       render(
         <TenantDetailsPanel
-          tenant={makeTenant({ id: 'tenant-1', locale: LOCALE_ISO_CODES.EN })}
+          tenant={makeClientTenant({
+            id: 'tenant-1',
+            locale: LOCALE_ISO_CODES.EN,
+          })}
           fieldLocks={NO_LOCKS}
           ownerEmail="owner@example.com"
         />,
@@ -565,7 +568,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
             'Locked — the "Connect domain" step has already completed and used this value.',
         },
       });
-      const tenant = makeTenant({ id: 'tenant-1' });
+      const tenant = makeClientTenant({ id: 'tenant-1' });
       render(
         <TenantDetailsPanel
           tenant={tenant}
@@ -594,7 +597,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
   describe('every field locked (RUNNING/SUCCEEDED)', () => {
     it('disables every control and disables Save, since nothing can become dirty', () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         name: 'Acme Inc.',
         primaryDomain: 'acme.example.com',
         plan: TENANT_PLAN.GROWTH,
@@ -625,7 +628,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
   describe('fields container', () => {
     it('exposes a group role with an accessible name, so a forced-focus landing announces something', () => {
-      const tenant = makeTenant();
+      const tenant = makeClientTenant();
       render(
         <TenantDetailsPanel
           tenant={tenant}
@@ -642,7 +645,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
   describe('mid-edit lock transition', () => {
     it('discards an unsaved edit and reverts to the server value when the field being edited newly locks', async () => {
-      const tenant = makeTenant({ primaryDomain: 'acme.example.com' });
+      const tenant = makeClientTenant({ primaryDomain: 'acme.example.com' });
       const { rerender } = rtlRender(
         withIntl(
           <TenantDetailsPanel
@@ -681,7 +684,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     });
 
     it('leaves an unrelated field’s unsaved edit alone when a different field newly locks', async () => {
-      const tenant = makeTenant({ name: 'Acme Inc.' });
+      const tenant = makeClientTenant({ name: 'Acme Inc.' });
       const { rerender } = rtlRender(
         withIntl(
           <TenantDetailsPanel
@@ -714,7 +717,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
   describe('Save button dirty-state gating', () => {
     it('is disabled when the form is pristine', () => {
-      const tenant = makeTenant();
+      const tenant = makeClientTenant();
       render(
         <TenantDetailsPanel
           tenant={tenant}
@@ -729,7 +732,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     });
 
     it('enables once a field is edited, and disables again once edited back to the original value', async () => {
-      const tenant = makeTenant({ name: 'Acme Inc.' });
+      const tenant = makeClientTenant({ name: 'Acme Inc.' });
       render(
         <TenantDetailsPanel
           tenant={tenant}
@@ -756,7 +759,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     it('stays disabled and announces the pending state to assistive tech while a save is in flight, even with dirty values', async () => {
       let resolveAction: (value: {
         ok: true;
-        tenant: ReturnType<typeof makeTenant>;
+        tenant: ReturnType<typeof makeClientTenant>;
       }) => void = () => {};
       updateTenantDetailsActionMock.mockImplementation(
         () =>
@@ -764,7 +767,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
             resolveAction = resolve;
           }),
       );
-      const tenant = makeTenant({ id: 'tenant-1', name: 'Acme Inc.' });
+      const tenant = makeClientTenant({ id: 'tenant-1', name: 'Acme Inc.' });
       render(
         <TenantDetailsPanel
           tenant={tenant}
@@ -789,7 +792,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
       resolveAction({
         ok: true,
-        tenant: makeTenant({ id: 'tenant-1', name: 'Acme Renamed' }),
+        tenant: makeClientTenant({ id: 'tenant-1', name: 'Acme Renamed' }),
       });
       await waitFor(() => expect(refreshMock).toHaveBeenCalled());
     });
@@ -797,9 +800,9 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     it('returns to disabled after a successful save applies the refreshed tenant', async () => {
       updateTenantDetailsActionMock.mockResolvedValue({
         ok: true,
-        tenant: makeTenant({ id: 'tenant-1', name: 'Acme Renamed' }),
+        tenant: makeClientTenant({ id: 'tenant-1', name: 'Acme Renamed' }),
       });
-      const tenant = makeTenant({ id: 'tenant-1', name: 'Acme Inc.' });
+      const tenant = makeClientTenant({ id: 'tenant-1', name: 'Acme Inc.' });
       const { rerender } = rtlRender(
         withIntl(
           <TenantDetailsPanel
@@ -822,7 +825,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       rerender(
         withIntl(
           <TenantDetailsPanel
-            tenant={makeTenant({ id: 'tenant-1', name: 'Acme Renamed' })}
+            tenant={makeClientTenant({ id: 'tenant-1', name: 'Acme Renamed' })}
             fieldLocks={NO_LOCKS}
             ownerEmail="owner@example.com"
           />,
@@ -837,7 +840,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
   describe('lock transition announcement', () => {
     it('announces a lock once a field newly locks — not on mount, not on an unrelated re-render', () => {
-      const tenant = makeTenant();
+      const tenant = makeClientTenant();
       const { rerender } = rtlRender(
         withIntl(
           <TenantDetailsPanel
@@ -854,7 +857,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       rerender(
         withIntl(
           <TenantDetailsPanel
-            tenant={makeTenant({ name: 'Acme Renamed' })}
+            tenant={makeClientTenant({ name: 'Acme Renamed' })}
             fieldLocks={NO_LOCKS}
             ownerEmail="owner@example.com"
           />,
@@ -878,7 +881,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       rerender(
         withIntl(
           <TenantDetailsPanel
-            tenant={makeTenant({ name: 'Acme Again' })}
+            tenant={makeClientTenant({ name: 'Acme Again' })}
             fieldLocks={DOMAIN_LOCKED}
             ownerEmail="owner@example.com"
           />,
@@ -890,7 +893,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     });
 
     it('announces an unlock once a field becomes editable again', () => {
-      const tenant = makeTenant();
+      const tenant = makeClientTenant();
       const { rerender } = rtlRender(
         withIntl(
           <TenantDetailsPanel
@@ -922,7 +925,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       const NAME_LOCKED: TTenantFieldLocks = {
         name: { kind: 'step', step: TENANT_PROVISIONING_STEP.SANITY_PROJECT },
       };
-      const tenant = makeTenant();
+      const tenant = makeClientTenant();
       const { rerender } = rtlRender(
         withIntl(
           <TenantDetailsPanel
@@ -954,7 +957,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
   describe('archived tenant', () => {
     it('disables every field and the Save button, regardless of edits or field locks', async () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         name: 'Acme Inc.',
         deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
       });
@@ -984,7 +987,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     });
 
     it('exposes an accessible hint for an archived field, reusing the same lock convention as a step/succeeded/running lock', () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
       });
       render(
@@ -1007,7 +1010,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     });
 
     it('describes the disabled Save button with the page-level archived notice when an archivedNoticeId is supplied', () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
       });
       render(
@@ -1028,7 +1031,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     });
 
     it('leaves the Save button without a description when no archivedNoticeId is supplied', () => {
-      const tenant = makeTenant({
+      const tenant = makeClientTenant({
         deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
       });
       render(
@@ -1047,7 +1050,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
 
   describe('focus management on a locking transition', () => {
     it('does not move focus away from document.body on mount', () => {
-      const tenant = makeTenant();
+      const tenant = makeClientTenant();
       rtlRender(
         withIntl(
           <TenantDetailsPanel
@@ -1062,7 +1065,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     });
 
     it('moves focus to the fields container when a field newly locks while focus was inside the panel', () => {
-      const tenant = makeTenant({ name: 'Acme Inc.' });
+      const tenant = makeClientTenant({ name: 'Acme Inc.' });
       const { rerender } = rtlRender(
         withIntl(
           <TenantDetailsPanel
@@ -1094,7 +1097,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     });
 
     it('does not steal focus when a locking transition fires while focus was outside the panel', () => {
-      const tenant = makeTenant({ name: 'Acme Inc.' });
+      const tenant = makeClientTenant({ name: 'Acme Inc.' });
       const { rerender } = rtlRender(
         withIntl(
           <PanelWithOutsideControl
@@ -1125,7 +1128,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     });
 
     it('does not move focus on an unrelated re-render while the locked field set stays the same', () => {
-      const tenant = makeTenant({ name: 'Acme Inc.' });
+      const tenant = makeClientTenant({ name: 'Acme Inc.' });
       const { rerender } = rtlRender(
         withIntl(
           <TenantDetailsPanel
@@ -1143,7 +1146,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       rerender(
         withIntl(
           <TenantDetailsPanel
-            tenant={makeTenant({ name: 'Acme Renamed' })}
+            tenant={makeClientTenant({ name: 'Acme Renamed' })}
             fieldLocks={NO_LOCKS}
             ownerEmail="owner@example.com"
           />,
@@ -1161,7 +1164,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       render(
         <UnsavedChangesProvider>
           <TenantDetailsPanel
-            tenant={makeTenant({ name: 'Acme Inc.' })}
+            tenant={makeClientTenant({ name: 'Acme Inc.' })}
             fieldLocks={NO_LOCKS}
             ownerEmail="owner@example.com"
           />

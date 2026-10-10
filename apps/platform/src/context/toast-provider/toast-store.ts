@@ -1,6 +1,8 @@
 import { TOAST_TYPE, type TToastType } from '@blog/config';
-import type { IToastAction } from '@platform/components/shared/toast';
-import type { ReactNode } from 'react';
+import type {
+  IToastPayload,
+  IToastRecord,
+} from '@platform/components/shared/toast';
 
 import { createToastTimers } from './toast-timers';
 
@@ -18,33 +20,12 @@ const TOAST_MERGE_WINDOW_MS = 1000;
 
 const TOAST_EXIT_ANIMATION_MS = 360;
 
-export interface IToastPayload {
-  title?: string;
-  message: ReactNode;
-  time?: string;
-  action?: IToastAction;
-  durationMs?: number;
-  coalesceKey?: string;
-}
-
 type TToastPromiseMessage<T> = IToastPayload | ((value: T) => IToastPayload);
 
 export interface IToastPromiseMessages<T> {
   loading: Pick<IToastPayload, 'title' | 'message'>;
   success: TToastPromiseMessage<T>;
   error: TToastPromiseMessage<unknown>;
-}
-
-type TToastPhase = 'entering' | 'visible' | 'leaving';
-
-export interface IToastRecord extends IToastPayload {
-  id: string;
-  type: TToastType;
-  isLoading?: boolean;
-  phase: TToastPhase;
-  paused: boolean;
-  count?: number;
-  createdAt: number;
 }
 
 export interface IToastQueueState {

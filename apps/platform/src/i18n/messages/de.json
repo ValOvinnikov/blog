@@ -2,10 +2,11 @@
   "pageMetadata": {
     "root": "Admin",
     "tenants": "Mandanten · Admin",
-    "tenant": "Übersicht · Admin",
+    "ownerHome": "Ihre Website · Admin",
     "look": "Erscheinungsbild · Admin",
     "voice": "Tonalität · Admin",
     "selectTenant": "Arbeitsbereich wählen · Admin",
+    "workspacePending": "Arbeitsbereich nicht bereit · Admin",
     "addTenant": "Mandant hinzufügen · Admin",
     "tenantOverview": "Mandantenübersicht · Admin",
     "tenantProvisioning": "Bereitstellung · Admin",
@@ -44,9 +45,11 @@
   "tenantSwitcher": {
     "archived": "Archiviert"
   },
+  "toast": {
+    "dismissLabel": "Benachrichtigung schließen"
+  },
   "toastProvider": {
     "viewportAriaLabel": "Benachrichtigungen",
-    "dismissLabel": "Benachrichtigung schließen",
     "mergeCountSuffix": " ×{count}"
   },
   "topbarNavMenu": {
@@ -145,6 +148,7 @@
     "title": "Offene Befunde",
     "empty": "Keine offenen Befunde für diesen Mandanten — alles in Ordnung.",
     "detailsToggle": "Details",
+    "detailsLoading": "Details werden geladen…",
     "columnLevel": "Stufe",
     "columnDocument": "Dokument",
     "columnMessage": "Meldung"
@@ -386,12 +390,22 @@
   "brandAssetField": {
     "savesWithChanges": "Wird mit den Änderungen gespeichert",
     "unexpectedError": "Etwas ist schiefgelaufen — bitte erneut versuchen.",
-    "currentAlt": "Aktuelles {label}",
     "uploading": "Wird hochgeladen…",
-    "replace": "{label} ersetzen",
-    "upload": "{label} hochladen",
     "remove": "Entfernen",
-    "pickAgain": "Ihr wiederhergestellter Entwurf enthielt ein neues Bild ({label}), das nicht erhalten blieb — bitte wählen Sie es erneut aus."
+    "logo": {
+      "currentAlt": "Aktuelles Logo",
+      "upload": "Logo hochladen",
+      "replace": "Logo ersetzen",
+      "pickAgain": "Ihr wiederhergestellter Entwurf enthielt ein neues Logo, das nicht erhalten blieb — bitte wählen Sie es erneut aus."
+    },
+    "favicon": {
+      "currentAlt": "Aktuelles Favicon",
+      "upload": "Favicon hochladen",
+      "replace": "Favicon ersetzen",
+      "pickAgain": "Ihr wiederhergestellter Entwurf enthielt ein neues Favicon, das nicht erhalten blieb — bitte wählen Sie es erneut aus."
+    },
+    "unsupportedType": "Wählen Sie ein PNG-, JPEG-, WebP- oder SVG-Bild.",
+    "tooLarge": "Diese Datei ist zu groß — die Grenze liegt bei {limit}."
   },
   "emailForm": {
     "pageHeading": "E-Mail",
@@ -404,7 +418,8 @@
     "senderItemDescription": "Name, Antwortadresse, Anschrift und Logo, in jeder Sprache gleich.",
     "editingLabel": "Bearbeiten",
     "templateGroupLabel": "Vorlage",
-    "allLanguagesChanges": "Alle Sprachen"
+    "allLanguagesChanges": "Alle Sprachen",
+    "draftFieldLabel": "{template} — {field}"
   },
   "fieldStatus": {
     "default": "Standard",
@@ -446,13 +461,20 @@
   },
   "emailLogoField": {
     "unexpectedError": "Etwas ist schiefgelaufen — bitte erneut versuchen.",
-    "currentAlt": "Aktuelles {label}",
     "uploading": "Wird hochgeladen…",
-    "replace": "{label} ersetzen",
-    "upload": "{label} hochladen",
     "remove": "Entfernen",
     "unsupportedType": "Wählen Sie ein PNG-, JPEG- oder GIF-Bild — SVG und WebP werden von gängigen E-Mail-Programmen nicht unterstützt.",
-    "tooLarge": "Diese Datei ist zu groß — die Grenze liegt bei {limit}."
+    "tooLarge": "Diese Datei ist zu groß — die Grenze liegt bei {limit}.",
+    "SENDER": {
+      "currentAlt": "Aktuelles E-Mail-Logo",
+      "upload": "E-Mail-Logo hochladen",
+      "replace": "E-Mail-Logo ersetzen"
+    },
+    "TEMPLATE": {
+      "currentAlt": "Aktuelles Vorlagen-Logo",
+      "upload": "Vorlagen-Logo hochladen",
+      "replace": "Vorlagen-Logo ersetzen"
+    }
   },
   "emailTemplateEditor": {
     "subjectLabel": "Betreff ({language})",
@@ -482,7 +504,8 @@
     "removeLink": "Link entfernen",
     "linkUrlLabel": "Link-URL",
     "linkApply": "Übernehmen",
-    "linkCancel": "Abbrechen"
+    "linkCancel": "Abbrechen",
+    "linkUrlPlaceholder": "https://…"
   },
   "voiceSettings": {
     "heading": "Tonalität",
@@ -823,7 +846,7 @@
     "comingSoonBadge": "Demnächst",
     "switchOn": "An",
     "switchOff": "Aus",
-    "capabilitiesHeading": "Funktionen",
+    "capabilitiesHeading": "Verfügbare Funktionen",
     "toggleLabel": {
       "COMMENTS": "Kommentare",
       "RATINGS": "Bewertungen",
@@ -912,5 +935,8 @@
     "savedColumn": "Gespeichert",
     "draftColumn": "Dein Entwurf",
     "emptyValue": "Leer"
+  },
+  "externalLinkButton": {
+    "newTabHint": "(öffnet in neuem Tab)"
   }
 }

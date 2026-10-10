@@ -11,7 +11,7 @@ import {
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db';
 import type { TAuditEvent } from '@blog/db/schema/audit-events';
-import type { TFinding } from '@blog/db/schema/findings';
+import type { TFindingSummary } from '@blog/db/schema/findings';
 import type { TTenantProvisioningState } from '@blog/db/schema/tenants';
 import { DomainCard } from '@platform/components/features/tenants/domain-card';
 import {
@@ -22,7 +22,7 @@ import {
 } from '@platform/testing/custom-render';
 import {
   idleProvisioningSteps,
-  makeTenant,
+  makeClientTenant,
 } from '@platform/testing/tenants/fixtures';
 
 import {
@@ -51,6 +51,10 @@ vi.mock(
   }),
 );
 
+vi.mock('@platform/server/findings/get-finding-details-action', () => ({
+  getFindingDetailsAction: vi.fn(),
+}));
+
 vi.mock('@platform/server/tenants/update-tenant-details-action', () => ({
   updateTenantDetailsAction: vi.fn(),
 }));
@@ -67,7 +71,9 @@ const makeEvent = (overrides: Partial<TAuditEvent> = {}): TAuditEvent => ({
   ...overrides,
 });
 
-const makeFinding = (overrides: Partial<TFinding> = {}): TFinding => ({
+const makeFinding = (
+  overrides: Partial<TFindingSummary> = {},
+): TFindingSummary => ({
   id: 'finding-1',
   tenantId: 'tenant-1',
   source: FINDING_SOURCE.TENANT_PROVISIONING,
@@ -75,7 +81,7 @@ const makeFinding = (overrides: Partial<TFinding> = {}): TFinding => ({
   severity: FINDING_SEVERITY.CRITICAL,
   status: FINDING_STATUS.OPEN,
   dedupeKey: 'dedupe-1',
-  details: null,
+  hasDetails: false,
   firstSeenAt: new Date('2026-04-01T00:00:00.000Z'),
   lastSeenAt: new Date('2026-04-02T00:00:00.000Z'),
   resolvedAt: null,
@@ -83,10 +89,10 @@ const makeFinding = (overrides: Partial<TFinding> = {}): TFinding => ({
 });
 
 const defaultProps: TTenantOverviewViewProps = {
-  tenant: makeTenant(),
+  tenant: makeClientTenant(),
   domainCard: (
     <DomainCard
-      tenant={makeTenant()}
+      tenant={makeClientTenant()}
       domainVerificationStatus="NOT_CONFIGURED"
       dnsHref="/tenants/tenant-1/domain"
     />
@@ -116,7 +122,9 @@ describe(`<${TenantOverviewView.name}/>`, () => {
   });
 
   it('renders the tenant name and status/plan badges', () => {
-    setup({ tenant: makeTenant({ name: 'Acme Inc.', status: 'ACTIVE' }) });
+    setup({
+      tenant: makeClientTenant({ name: 'Acme Inc.', status: 'ACTIVE' }),
+    });
 
     const heading = screen.getByRole('heading', {
       level: 1,
@@ -154,7 +162,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
 
   it('renders the provisioning banner', () => {
     setup({
-      tenant: makeTenant({
+      tenant: makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
         provisioningSteps: Object.fromEntries(
           Object.values(TENANT_PROVISIONING_STEP).map((step) => [
@@ -169,7 +177,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
   });
 
   it('relocates the tenant details panel here as the Identity card', () => {
-    setup({ tenant: makeTenant({ name: 'Acme Inc.' }) });
+    setup({ tenant: makeClientTenant({ name: 'Acme Inc.' }) });
 
     expect(screen.getByText('Tenant details')).toBeVisible();
     expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue(
@@ -179,7 +187,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
 
   it('locks every tenant details field while a step is running, stating why', () => {
     setup({
-      tenant: makeTenant({
+      tenant: makeClientTenant({
         provisioningSteps: {
           ...idleProvisioningSteps(),
           [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
@@ -199,7 +207,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
 
   it('locks primaryDomain once MAP_DOMAIN has completed and a later step failed, leaving the field that caused the failure editable', () => {
     setup({
-      tenant: makeTenant({
+      tenant: makeClientTenant({
         provisioningSteps: {
           ...idleProvisioningSteps(),
           [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
@@ -235,7 +243,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
 
   it('locks every field immediately once a dispatch has begun, before any step has reported', () => {
     setup({
-      tenant: makeTenant({
+      tenant: makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
         provisioningSteps: idleProvisioningSteps(),
       }),
@@ -248,7 +256,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
   });
 
   it('keeps the provisioning banner and the details panel in sync off a single shared poll', async () => {
-    const tenant = makeTenant({
+    const tenant = makeClientTenant({
       provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
       provisioningSteps: {
         ...idleProvisioningSteps(),
@@ -290,7 +298,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
   });
 
   it('wires each of the four fact cards with the data passed into the view', () => {
-    const tenant = makeTenant({
+    const tenant = makeClientTenant({
       primaryDomain: 'acme.example.com',
       sanityProjectId: 'proj-1',
     });
@@ -315,7 +323,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
   });
 
   it('always renders "Open site", linking to the tenant\'s live domain', () => {
-    setup({ tenant: makeTenant({ primaryDomain: 'acme.example.com' }) });
+    setup({ tenant: makeClientTenant({ primaryDomain: 'acme.example.com' }) });
 
     const link = screen.getByRole('link', {
       name: 'Open site (opens in new tab)',
@@ -333,7 +341,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
   });
 
   describe('archived tenant', () => {
-    const archivedTenant = makeTenant({
+    const archivedTenant = makeClientTenant({
       deprovisionedAt: new Date('2026-08-26T00:00:00.000Z'),
     });
 
@@ -353,7 +361,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
   });
 
   it('does not show the archived notice for a live tenant', () => {
-    setup({ tenant: makeTenant({ deprovisionedAt: null }) });
+    setup({ tenant: makeClientTenant({ deprovisionedAt: null }) });
 
     expect(
       screen.queryByText('This tenant is archived'),

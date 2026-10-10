@@ -1,6 +1,6 @@
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { mockRouter } from '@platform/testing/mock-router';
-import { makeTenant } from '@platform/testing/tenants/fixtures';
+import { makeClientTenant } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -22,7 +22,7 @@ vi.mock('@platform/server/provisioning/delete-tenant-action', () => ({
 }));
 
 const setup = customRender(DeprovisionTenantControl, {
-  tenant: makeTenant(),
+  tenant: makeClientTenant(),
 });
 
 describe(`<${DeprovisionTenantControl.name}/>`, () => {
@@ -43,7 +43,7 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
   });
 
   it('titles the card "Deprovision this tenant" for a live tenant', () => {
-    setup({ tenant: makeTenant({ deprovisionedAt: null }) });
+    setup({ tenant: makeClientTenant({ deprovisionedAt: null }) });
 
     expect(
       screen.getByRole('heading', {
@@ -55,7 +55,7 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
 
   it('titles the card "Delete this tenant permanently" for an already-deprovisioned tenant', () => {
     setup({
-      tenant: makeTenant({
+      tenant: makeClientTenant({
         deprovisionedAt: new Date('2026-04-10T00:00:00.000Z'),
       }),
     });
@@ -69,14 +69,14 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
   });
 
   it('does not duplicate a "Danger zone" heading inside the card', () => {
-    setup({ tenant: makeTenant({ deprovisionedAt: null }) });
+    setup({ tenant: makeClientTenant({ deprovisionedAt: null }) });
 
     expect(screen.queryByText('Danger zone')).not.toBeInTheDocument();
   });
 
   it('never renders the live-tenant trigger, or a Deprovisioned badge of its own, for an already-deprovisioned tenant', () => {
     setup({
-      tenant: makeTenant({
+      tenant: makeClientTenant({
         deprovisionedAt: new Date('2026-04-10T00:00:00.000Z'),
       }),
     });
@@ -88,7 +88,7 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
   });
 
   it('does not render the delete-permanently trigger for a live tenant', () => {
-    setup({ tenant: makeTenant({ deprovisionedAt: null }) });
+    setup({ tenant: makeClientTenant({ deprovisionedAt: null }) });
 
     expect(
       screen.queryByRole('button', { name: 'Delete tenant permanently' }),
@@ -110,7 +110,7 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
   });
 
   it('enables the confirm button only once the typed name matches, and calls the action on confirm', async () => {
-    const tenant = makeTenant();
+    const tenant = makeClientTenant();
     setup({ tenant });
 
     await user.click(screen.getByRole('button', { name: 'Deprovision' }));
@@ -159,7 +159,7 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
 
   it('opens a delete-permanently confirm dialog requiring the tenant name, disabled until it matches', async () => {
     setup({
-      tenant: makeTenant({
+      tenant: makeClientTenant({
         deprovisionedAt: new Date('2026-04-10T00:00:00.000Z'),
       }),
     });
@@ -175,7 +175,7 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
   });
 
   it('enables the delete confirm button only once the typed name matches, calls the action, and redirects to the tenant list', async () => {
-    const tenant = makeTenant({
+    const tenant = makeClientTenant({
       deprovisionedAt: new Date('2026-04-10T00:00:00.000Z'),
     });
     setup({ tenant });
@@ -205,7 +205,7 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
       error: "Doesn't match the tenant's name.",
     });
     setup({
-      tenant: makeTenant({
+      tenant: makeClientTenant({
         deprovisionedAt: new Date('2026-04-10T00:00:00.000Z'),
       }),
     });
@@ -227,7 +227,7 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
 
   describe('isDeprovisioningInProgress', () => {
     it('renders the trigger enabled by default, with no in-progress hint', () => {
-      setup({ tenant: makeTenant({ deprovisionedAt: null }) });
+      setup({ tenant: makeClientTenant({ deprovisionedAt: null }) });
 
       expect(screen.getByRole('button', { name: 'Deprovision' })).toBeEnabled();
       expect(
@@ -239,7 +239,7 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
 
     it('disables the trigger and shows the hint while a run is in progress', () => {
       setup({
-        tenant: makeTenant({ deprovisionedAt: null }),
+        tenant: makeClientTenant({ deprovisionedAt: null }),
         isDeprovisioningInProgress: true,
       });
 

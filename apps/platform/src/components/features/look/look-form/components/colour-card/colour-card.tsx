@@ -2,6 +2,7 @@ import { LogoHueField } from '@platform/components/features/look/logo-hue-field'
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
 import { HueSlider } from '@platform/components/shared/hue-slider';
+import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import type { TLookFormFieldSetter } from '@platform/utils/default-look-values/default-look-values';
 import {
   accentHueGradient,
@@ -18,8 +19,6 @@ export type TColourCardProps = {
   logoHue: number | undefined;
   onFieldChange: TLookFormFieldSetter;
   hasUnsavedChanges: boolean;
-  isArchived: boolean;
-  archivedNoticeId: string;
 };
 
 export const ColourCard = ({
@@ -29,11 +28,10 @@ export const ColourCard = ({
   logoHue,
   onFieldChange,
   hasUnsavedChanges,
-  isArchived,
-  archivedNoticeId,
 }: TColourCardProps) => {
+  const { isArchived, archivedDescribedBy } = useSettingsFormState();
   const t = useTranslations('lookForm');
-  const archivedDescribedBy = isArchived ? archivedNoticeId : undefined;
+  const tHue = useTranslations('logoHueField');
   const { hueField, swatch, hueValue } = colourCardVariants();
 
   const accentHueLabel = t('accentHueLabel');
@@ -67,7 +65,9 @@ export const ColourCard = ({
             aria-describedby={archivedDescribedBy}
             trackStyle={{ background: accentHueGradient() }}
           />
-          <span className={hueValue()}>{accentHue}°</span>
+          <span className={hueValue()}>
+            {tHue('hueValue', { hue: accentHue })}
+          </span>
         </div>
       </LookField>
 

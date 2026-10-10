@@ -1,7 +1,7 @@
 import {
   DOMAIN_VERIFICATION_STATUS,
   type TDomainVerificationStatus,
-} from '@blog/config';
+} from '@platform/constants/domain';
 import { act, renderHook } from '@platform/testing/custom-render';
 
 import { useDomainStatusPoll } from './use-domain-status-poll';

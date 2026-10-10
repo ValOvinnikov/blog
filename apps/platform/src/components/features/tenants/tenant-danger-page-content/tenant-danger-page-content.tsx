@@ -1,6 +1,5 @@
 'use client';
 
-import type { TTenant } from '@blog/db/schema/tenants';
 import { DeprovisionTenantControl } from '@platform/components/features/tenants/deprovision-tenant-control';
 import {
   DeprovisioningStatusView,
@@ -10,12 +9,13 @@ import { ReactivateTenantControl } from '@platform/components/features/tenants/r
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { Heading } from '@platform/components/shared/heading';
 import { PageHeader } from '@platform/components/shared/page-header';
+import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { useTranslations } from 'next-intl';
 
 import { tenantDangerPageContentVariants } from './tenant-danger-page-content-variants';
 
 export type TTenantDangerPageContentProps = {
-  tenant: TTenant;
+  tenant: TClientTenant;
   deprovisionRequestedAt?: string;
 };
 

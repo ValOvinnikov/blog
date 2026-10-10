@@ -3,17 +3,13 @@ import { notFound } from 'next/navigation';
 
 const {
   requireSuperAdminMock,
-  dispatchProvisioningWorkflowMock,
+  startProvisioningMock,
   getTenantByIdMock,
-  beginTenantProvisioningMock,
-  setTenantProvisioningStatusMock,
   recordAuditEventMock,
 } = vi.hoisted(() => ({
   requireSuperAdminMock: vi.fn(),
-  dispatchProvisioningWorkflowMock: vi.fn(),
+  startProvisioningMock: vi.fn(),
   getTenantByIdMock: vi.fn(),
-  beginTenantProvisioningMock: vi.fn(),
-  setTenantProvisioningStatusMock: vi.fn(),
   recordAuditEventMock: vi.fn(),
 }));
 
@@ -25,16 +21,14 @@ vi.mock('@platform/server/audit/record-audit-event', () => ({
   recordAuditEvent: recordAuditEventMock,
 }));
 
-vi.mock('./dispatch-provisioning-workflow', () => ({
-  dispatchProvisioningWorkflow: dispatchProvisioningWorkflowMock,
+vi.mock('./start-provisioning', () => ({
+  startProvisioning: startProvisioningMock,
 }));
 
 vi.mock('@blog/db', () => ({
   queries: {
     tenants: {
       getTenantById: getTenantByIdMock,
-      beginTenantProvisioning: beginTenantProvisioningMock,
-      setTenantProvisioningStatus: setTenantProvisioningStatusMock,
     },
   },
 }));
@@ -54,23 +48,10 @@ describe('reactivateTenantAction', () => {
       id: 'admin-1',
       role: 'SUPERADMIN',
     });
-    dispatchProvisioningWorkflowMock.mockReset();
-    dispatchProvisioningWorkflowMock.mockResolvedValue(true);
+    startProvisioningMock.mockReset();
+    startProvisioningMock.mockResolvedValue({ outcome: 'dispatched' });
     getTenantByIdMock.mockReset();
     getTenantByIdMock.mockResolvedValue(ARCHIVED_TENANT);
-    beginTenantProvisioningMock.mockReset();
-    beginTenantProvisioningMock.mockResolvedValue({
-      ok: true,
-      data: {
-        tenant: ARCHIVED_TENANT,
-        previousProvisioningStatus: 'READY',
-      },
-    });
-    setTenantProvisioningStatusMock.mockReset();
-    setTenantProvisioningStatusMock.mockResolvedValue({
-      ok: true,
-      data: ARCHIVED_TENANT,
-    });
     recordAuditEventMock.mockReset();
     recordAuditEventMock.mockResolvedValue(undefined);
     ({ reactivateTenantAction } = await import('./reactivate-tenant-action'));
@@ -86,10 +67,10 @@ describe('reactivateTenantAction', () => {
     ).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(getTenantByIdMock).not.toHaveBeenCalled();
-    expect(dispatchProvisioningWorkflowMock).not.toHaveBeenCalled();
+    expect(startProvisioningMock).not.toHaveBeenCalled();
   });
 
-  it('dispatches the provisioning workflow and records a REACTIVATED audit event', async () => {
+  it('starts provisioning and records a REACTIVATED audit event', async () => {
     const result = await reactivateTenantAction('tenant-1', {
       confirm: 'Acme',
     });
@@ -97,9 +78,7 @@ describe('reactivateTenantAction', () => {
     expect(getTenantByIdMock).toHaveBeenCalledWith('tenant-1', {
       includeArchived: true,
     });
-    expect(beginTenantProvisioningMock).toHaveBeenCalledWith('tenant-1');
-    expect(dispatchProvisioningWorkflowMock).toHaveBeenCalledWith('tenant-1');
-    expect(setTenantProvisioningStatusMock).not.toHaveBeenCalled();
+    expect(startProvisioningMock).toHaveBeenCalledWith('tenant-1');
     expect(recordAuditEventMock).toHaveBeenCalledWith(
       expect.objectContaining({
         action: AUDIT_ACTION.REACTIVATED,
@@ -115,7 +94,7 @@ describe('reactivateTenantAction', () => {
     const result = await reactivateTenantAction('tenant-1', { confirm: '  ' });
 
     expect(getTenantByIdMock).not.toHaveBeenCalled();
-    expect(dispatchProvisioningWorkflowMock).not.toHaveBeenCalled();
+    expect(startProvisioningMock).not.toHaveBeenCalled();
     expect(result).toEqual({
       ok: false,
       error: 'Type the tenant name to confirm.',
@@ -127,8 +106,7 @@ describe('reactivateTenantAction', () => {
       confirm: 'acme',
     });
 
-    expect(beginTenantProvisioningMock).not.toHaveBeenCalled();
-    expect(dispatchProvisioningWorkflowMock).not.toHaveBeenCalled();
+    expect(startProvisioningMock).not.toHaveBeenCalled();
     expect(recordAuditEventMock).not.toHaveBeenCalled();
     expect(result).toEqual({
       ok: false,
@@ -146,8 +124,7 @@ describe('reactivateTenantAction', () => {
       confirm: 'Acme',
     });
 
-    expect(beginTenantProvisioningMock).not.toHaveBeenCalled();
-    expect(dispatchProvisioningWorkflowMock).not.toHaveBeenCalled();
+    expect(startProvisioningMock).not.toHaveBeenCalled();
     expect(result).toEqual({
       ok: false,
       error: 'This tenant is not deprovisioned.',
@@ -159,43 +136,25 @@ describe('reactivateTenantAction', () => {
 
     const result = await reactivateTenantAction('ghost', { confirm: 'Acme' });
 
-    expect(beginTenantProvisioningMock).not.toHaveBeenCalled();
+    expect(startProvisioningMock).not.toHaveBeenCalled();
     expect(result).toEqual({ ok: false, error: 'Tenant not found.' });
   });
 
-  it('refuses without dispatching when a provisioning run is already in flight', async () => {
-    beginTenantProvisioningMock.mockResolvedValue({
-      ok: false,
-      error: 'DB_ALREADY_PROVISIONING',
-    });
+  it.each([
+    ['already-in-progress', 'Provisioning is already running.'],
+    ['not-found', 'Tenant not found.'],
+    ['dispatch-error', "Couldn't start reactivation — try again."],
+  ])(
+    'records nothing and refuses when provisioning reports %s',
+    async (outcome, error) => {
+      startProvisioningMock.mockResolvedValue({ outcome });
 
-    const result = await reactivateTenantAction('tenant-1', {
-      confirm: 'Acme',
-    });
+      const result = await reactivateTenantAction('tenant-1', {
+        confirm: 'Acme',
+      });
 
-    expect(dispatchProvisioningWorkflowMock).not.toHaveBeenCalled();
-    expect(recordAuditEventMock).not.toHaveBeenCalled();
-    expect(result).toEqual({
-      ok: false,
-      error: 'Provisioning is already running.',
-    });
-  });
-
-  it('reverts the PROVISIONING transition and records nothing when the dispatch fails', async () => {
-    dispatchProvisioningWorkflowMock.mockResolvedValue(false);
-
-    const result = await reactivateTenantAction('tenant-1', {
-      confirm: 'Acme',
-    });
-
-    expect(setTenantProvisioningStatusMock).toHaveBeenCalledWith(
-      'tenant-1',
-      'READY',
-    );
-    expect(recordAuditEventMock).not.toHaveBeenCalled();
-    expect(result).toEqual({
-      ok: false,
-      error: "Couldn't start reactivation — try again.",
-    });
-  });
+      expect(recordAuditEventMock).not.toHaveBeenCalled();
+      expect(result).toEqual({ ok: false, error });
+    },
+  );
 });

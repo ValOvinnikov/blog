@@ -69,7 +69,7 @@ describe(`<${LookPageContent.name}/>`, () => {
       'aria-checked',
       'true',
     );
-    expect(screen.getByText('28°')).toBeVisible();
+    expect(screen.getByText('hue 28°')).toBeVisible();
   });
 
   it('passes the archived date through for a deprovisioned tenant', async () => {

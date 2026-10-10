@@ -1,8 +1,9 @@
 import { queries } from '@blog/db';
 import { TenantDangerPageContent } from '@platform/components/features/tenants/tenant-danger-page-content';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
+import { requireTenantById } from '@platform/server/auth/require-tenant-by-id';
+import { toClientTenant } from '@platform/server/tenants/to-client-tenant';
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -23,11 +24,7 @@ export default async function TenantDangerPage({ params }: TProps) {
   await requireSuperAdmin();
   const { tenantId } = await params;
 
-  const [tenant] = await queries.tenants.listTenantsByIds([tenantId]);
-
-  if (!tenant) {
-    notFound();
-  }
+  const { tenant } = await requireTenantById(tenantId);
 
   // Queried unconditionally: a request newer than the tenant's existing run
   // (even a stale FAILED one) is how a retry re-enters the starting state.
@@ -36,7 +33,7 @@ export default async function TenantDangerPage({ params }: TProps) {
 
   return (
     <TenantDangerPageContent
-      tenant={tenant}
+      tenant={toClientTenant(tenant)}
       deprovisionRequestedAt={deprovisionRequestedAt?.toISOString()}
     />
   );

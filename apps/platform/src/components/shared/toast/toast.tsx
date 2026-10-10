@@ -1,27 +1,13 @@
 import { TOAST_TYPE, type TToastType } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
-import type { ReactNode } from 'react';
+import { useTranslations } from 'next-intl';
 
-import { toastVariants, type TToastVariants } from './toast-variants';
+import type { IToastRecord } from './toast-record';
+import { toastVariants } from './toast-variants';
 
-export interface IToastAction {
-  label: string;
-  onAct: () => void;
-  keyHint?: string;
-}
-
-export type TToastProps = {
-  type: TToastType;
-  isLoading?: boolean;
-  title?: ReactNode;
-  message: ReactNode;
-  time?: string;
-  action?: IToastAction;
-  dismissLabel: string;
+type TToastProps = {
+  record: IToastRecord;
   onDismiss: () => void;
-  phase: NonNullable<TToastVariants['phase']>;
-  className?: string;
-  dataTestId?: string;
 };
 
 const TOAST_GLYPH: Record<TToastType, string> = {
@@ -38,27 +24,14 @@ const TOAST_ROLE: Record<TToastType, 'status' | 'alert'> = {
   [TOAST_TYPE.ERROR]: 'alert',
 };
 
-export const Toast = ({
-  type,
-  isLoading = false,
-  title,
-  message,
-  time,
-  action,
-  dismissLabel,
-  onDismiss,
-  phase,
-  className,
-  dataTestId,
-}: TToastProps) => {
+export const Toast = ({ record, onDismiss }: TToastProps) => {
+  const { type, isLoading, title, message, time, action, phase } = record;
+  const t = useTranslations('toast');
   const s = toastVariants({ type, phase });
+  const dismissLabel = t('dismissLabel');
 
   return (
-    <div
-      role={TOAST_ROLE[type]}
-      className={s.root({ class: className })}
-      data-testid={dataTestId}
-    >
+    <div role={TOAST_ROLE[type]} className={s.root()}>
       {isLoading ? (
         <span className={s.spinner()} aria-hidden="true" />
       ) : (

@@ -83,7 +83,6 @@ export const VoiceSettings = ({
   const router = useRouter();
   const archivedNoticeId = useId();
   const fieldIdPrefix = useId();
-  const isArchived = Boolean(archivedAt);
   const [saved, setSaved] = useState(initialDraft);
   const [selectedLocale, setSelectedLocale] = useState(defaultLocale);
   const [openListFieldId, setOpenListFieldId] = useState<
@@ -274,7 +273,6 @@ export const VoiceSettings = ({
             }
             onOpenField={setOpenListFieldId}
             onFieldChange={changeField}
-            isReadOnly={isArchived}
             specimenTheme={specimenTheme}
           />
         ))}

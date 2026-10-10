@@ -1,18 +1,21 @@
-import { AUDIT_TARGET_TYPE, DOMAIN_VERIFICATION_STATUS } from '@blog/config';
+import { AUDIT_TARGET_TYPE } from '@blog/config';
 import {
   FINDING_KIND,
   FINDING_SEVERITY,
   FINDING_SOURCE,
   FINDING_STATUS,
 } from '@blog/config/constants';
-import type { TFinding } from '@blog/db/schema/findings';
+import type { TFindingSummary } from '@blog/db/schema/findings';
+import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { makeTenant } from '@platform/testing/tenants/fixtures';
 
 import TenantOverviewPage from './page';
 
-const makeFinding = (overrides: Partial<TFinding> = {}): TFinding => ({
+const makeFinding = (
+  overrides: Partial<TFindingSummary> = {},
+): TFindingSummary => ({
   id: 'finding-1',
   tenantId: 'tenant-1',
   source: FINDING_SOURCE.TENANT_PROVISIONING,
@@ -20,7 +23,7 @@ const makeFinding = (overrides: Partial<TFinding> = {}): TFinding => ({
   severity: FINDING_SEVERITY.CRITICAL,
   status: FINDING_STATUS.OPEN,
   dedupeKey: 'dedupe-1',
-  details: null,
+  hasDetails: false,
   firstSeenAt: new Date('2026-04-01T00:00:00.000Z'),
   lastSeenAt: new Date('2026-04-02T00:00:00.000Z'),
   resolvedAt: null,
@@ -28,14 +31,14 @@ const makeFinding = (overrides: Partial<TFinding> = {}): TFinding => ({
 });
 
 const {
-  listTenantsByIdsMock,
+  requireTenantByIdMock,
   getTenantOwnerEmailMock,
   getTenantOwnerMembershipMock,
   listAuditEventsForTargetMock,
   listFindingsForTenantMock,
   getDomainVerificationStatusMock,
 } = vi.hoisted(() => ({
-  listTenantsByIdsMock: vi.fn(),
+  requireTenantByIdMock: vi.fn(),
   getTenantOwnerEmailMock: vi.fn(),
   getTenantOwnerMembershipMock: vi.fn(),
   listAuditEventsForTargetMock: vi.fn(),
@@ -43,10 +46,13 @@ const {
   getDomainVerificationStatusMock: vi.fn(),
 }));
 
+vi.mock('@platform/server/auth/require-tenant-by-id', () => ({
+  requireTenantById: requireTenantByIdMock,
+}));
+
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
-    tenants: { listTenantsByIds: listTenantsByIdsMock },
     memberships: {
       getTenantOwnerEmail: getTenantOwnerEmailMock,
       getTenantOwnerMembership: getTenantOwnerMembershipMock,
@@ -78,6 +84,10 @@ vi.mock(
   }),
 );
 
+vi.mock('@platform/server/findings/get-finding-details-action', () => ({
+  getFindingDetailsAction: vi.fn(),
+}));
+
 vi.mock('@platform/server/tenants/update-tenant-details-action', () => ({
   updateTenantDetailsAction: vi.fn(),
 }));
@@ -90,9 +100,9 @@ describe(TenantOverviewPage, () => {
   let tenant: ReturnType<typeof makeTenant>;
 
   beforeEach(() => {
-    listTenantsByIdsMock.mockReset();
+    requireTenantByIdMock.mockReset();
     tenant = makeTenant();
-    listTenantsByIdsMock.mockResolvedValue([tenant]);
+    requireTenantByIdMock.mockResolvedValue({ tenant: tenant });
     getTenantOwnerEmailMock.mockReset();
     getTenantOwnerEmailMock.mockResolvedValue('owner@example.com');
     getTenantOwnerMembershipMock.mockReset();
@@ -113,7 +123,7 @@ describe(TenantOverviewPage, () => {
   it('renders the overview for the resolved tenant', async () => {
     await setup();
 
-    expect(listTenantsByIdsMock).toHaveBeenCalledWith(['tenant-1']);
+    expect(requireTenantByIdMock).toHaveBeenCalledWith('tenant-1');
     expect(getTenantOwnerEmailMock).toHaveBeenCalledWith(tenant.id);
     expect(getTenantOwnerMembershipMock).toHaveBeenCalledWith(tenant.id);
     expect(getDomainVerificationStatusMock).toHaveBeenCalledWith(
@@ -149,16 +159,10 @@ describe(TenantOverviewPage, () => {
     expect(screen.getByText('Invited, pending')).toBeVisible();
   });
 
-  it('404s for an unknown tenant id', async () => {
-    listTenantsByIdsMock.mockResolvedValue([]);
-
-    await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
-  });
-
   it('always shows "Open site", pointing at the tenant\'s live domain', async () => {
-    listTenantsByIdsMock.mockResolvedValue([
-      makeTenant({ primaryDomain: 'acme.example.com' }),
-    ]);
+    requireTenantByIdMock.mockResolvedValue({
+      tenant: makeTenant({ primaryDomain: 'acme.example.com' }),
+    });
 
     await setup();
 

@@ -1,12 +1,13 @@
 'use client';
 
-import type { TTenant } from '@blog/db/schema/tenants';
+import type { TMaybeUndefined } from '@blog/config';
 import { Card } from '@platform/components/shared/card';
 import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
 import { Switch } from '@platform/components/shared/switch';
 import { Text } from '@platform/components/shared/text';
 import { deleteTenantAction } from '@platform/server/provisioning/delete-tenant-action';
 import { deprovisionTenantAction } from '@platform/server/provisioning/deprovision-tenant-action';
+import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -15,7 +16,7 @@ import { useId, useState, useTransition } from 'react';
 import { deprovisionTenantControlVariants } from './deprovision-tenant-control-variants';
 
 export type TDeprovisionTenantControlProps = {
-  tenant: TTenant;
+  tenant: TClientTenant;
   isDeprovisioningInProgress?: boolean;
 };
 
@@ -28,7 +29,7 @@ export const DeprovisionTenantControl = ({
   const [open, setOpen] = useState(false);
   const [confirm, setConfirm] = useState('');
   const [dryRun, setDryRun] = useState(true);
-  const [error, setError] = useState<string | undefined>(undefined);
+  const [error, setError] = useState<TMaybeUndefined<string>>(undefined);
   const [isPending, startTransition] = useTransition();
   const inProgressHintId = useId();
 
@@ -128,12 +129,16 @@ export const DeprovisionTenantControl = ({
   );
 };
 
-const DeleteTenantPermanentlyControl = ({ tenant }: { tenant: TTenant }) => {
+const DeleteTenantPermanentlyControl = ({
+  tenant,
+}: {
+  tenant: TClientTenant;
+}) => {
   const t = useTranslations('deprovisionTenantControl');
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [confirm, setConfirm] = useState('');
-  const [error, setError] = useState<string | undefined>(undefined);
+  const [error, setError] = useState<TMaybeUndefined<string>>(undefined);
   const [isPending, startTransition] = useTransition();
 
   const handleOpenChange = (next: boolean) => {

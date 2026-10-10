@@ -1,9 +1,9 @@
-import type { ReactNode } from 'react';
-
 import {
   buttonVariants,
   type TButtonVariants,
-} from '../button/button-variants';
+} from '@platform/components/shared/button/button-variants';
+import { useTranslations } from 'next-intl';
+import type { ReactNode } from 'react';
 
 import { newTabHintVariants } from './external-link-button-variants';
 
@@ -18,13 +18,6 @@ export type TExternalLinkButtonProps = {
   hasArrow?: boolean;
 };
 
-/**
- * A button-styled link to a destination this app doesn't control — the
- * tenant's live site — as opposed to `LinkButton`, which navigates within
- * this app. Always opens in a new tab with `rel="noopener noreferrer"`,
- * matching this repo's other genuine external-link components (e.g.
- * `packages/ui`'s `ShareLink`).
- */
 export const ExternalLinkButton = ({
   href,
   variant,
@@ -35,6 +28,8 @@ export const ExternalLinkButton = ({
   title,
   hasArrow,
 }: TExternalLinkButtonProps) => {
+  const t = useTranslations('externalLinkButton');
+
   return (
     <a
       href={href}
@@ -48,7 +43,7 @@ export const ExternalLinkButton = ({
       {hasArrow && (
         <>
           <span aria-hidden="true"> ↗</span>{' '}
-          <span className={newTabHintVariants()}>(opens in new tab)</span>
+          <span className={newTabHintVariants()}>{t('newTabHint')}</span>
         </>
       )}
     </a>

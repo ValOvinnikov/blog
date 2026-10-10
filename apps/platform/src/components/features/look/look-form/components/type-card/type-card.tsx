@@ -2,6 +2,7 @@ import type { TFontChoice } from '@blog/config';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
 import { FontPicker } from '@platform/components/shared/font-picker';
+import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import type { TLookFormFieldSetter } from '@platform/utils/default-look-values/default-look-values';
 import { useTranslations } from 'next-intl';
 
@@ -10,8 +11,6 @@ export type TTypeCardProps = {
   bodyFont: TFontChoice;
   onFieldChange: TLookFormFieldSetter;
   hasUnsavedChanges: boolean;
-  isArchived: boolean;
-  archivedNoticeId: string;
 };
 
 export const TypeCard = ({
@@ -19,11 +18,9 @@ export const TypeCard = ({
   bodyFont,
   onFieldChange,
   hasUnsavedChanges,
-  isArchived,
-  archivedNoticeId,
 }: TTypeCardProps) => {
+  const { isArchived, archivedDescribedBy } = useSettingsFormState();
   const t = useTranslations('lookForm');
-  const archivedDescribedBy = isArchived ? archivedNoticeId : undefined;
 
   const headingFontLabel = t('headingFontLabel');
   const bodyFontLabel = t('bodyFontLabel');

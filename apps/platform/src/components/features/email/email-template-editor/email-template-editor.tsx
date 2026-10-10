@@ -1,6 +1,6 @@
 'use client';
 
-import { CONTROL_MODE, type TEmailTemplateType } from '@blog/config';
+import { type TEmailTemplateType } from '@blog/config';
 import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
 import { EmailLogoField } from '@platform/components/features/email/email-logo-field';
 import { Card } from '@platform/components/shared/card';
@@ -8,11 +8,14 @@ import { FieldStatus } from '@platform/components/shared/field-status';
 import { FormField } from '@platform/components/shared/form-field';
 import { PortableTextEditor } from '@platform/components/shared/portable-text-editor';
 import { TextInput } from '@platform/components/shared/text-input';
-import {
-  isSameBody,
-  type TEmailCopyDraft,
-  type TEmailCopyEdit,
+import { CONTROL_MODE } from '@platform/constants/control-mode';
+import { EMAIL_LOGO_KIND } from '@platform/constants/email-logo';
+import { useSettingsFormState } from '@platform/context/settings-form-provider';
+import type {
+  TEmailCopyDraft,
+  TEmailCopyEdit,
 } from '@platform/utils/email-draft/email-draft';
+import { isSameJson } from '@platform/utils/is-same-json/is-same-json';
 import { isBlankPortableTextValue } from '@platform/utils/portable-text-schema/portable-text-schema';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 import { useTranslations } from 'next-intl';
@@ -27,8 +30,6 @@ export type TEmailTemplateEditorProps = {
   logo: TStagedImage;
   onCopyChange: (copy: TEmailCopyDraft) => void;
   onLogoStage: (logo: TStagedImage) => void;
-  isDisabled: boolean;
-  archivedNoticeId?: string;
 };
 
 export const EmailTemplateEditor = ({
@@ -38,10 +39,10 @@ export const EmailTemplateEditor = ({
   logo,
   onCopyChange,
   onLogoStage,
-  isDisabled,
-  archivedNoticeId,
 }: TEmailTemplateEditorProps) => {
   const t = useTranslations('emailTemplateEditor');
+  const { isArchived, isPending, archivedDescribedBy } = useSettingsFormState();
+  const isDisabled = isArchived || isPending;
   const [bodyRevision, setBodyRevision] = useState(0);
   const bodyHintId = useId();
   const { stack } = emailTemplateEditorVariants();
@@ -51,7 +52,7 @@ export const EmailTemplateEditor = ({
     onCopyChange({
       ...draft,
       body:
-        isBlankPortableTextValue(body) || isSameBody(body, fallback.body)
+        isBlankPortableTextValue(body) || isSameJson(body, fallback.body)
           ? null
           : body,
     });
@@ -87,7 +88,7 @@ export const EmailTemplateEditor = ({
               value={draft.subject}
               onChange={(subject) => onCopyChange({ ...draft, subject })}
               isDisabled={isDisabled}
-              aria-describedby={archivedNoticeId}
+              aria-describedby={archivedDescribedBy}
             />
           </FormField>
           <FormField
@@ -97,7 +98,7 @@ export const EmailTemplateEditor = ({
             actions={
               <FieldStatus
                 isCustomised={draft.body !== null}
-                isUnsaved={!isSameBody(draft.body, saved.body)}
+                isUnsaved={!isSameJson(draft.body, saved.body)}
                 onReset={isDisabled ? undefined : resetBody}
               />
             }
@@ -108,18 +109,17 @@ export const EmailTemplateEditor = ({
               onChange={handleBodyChange}
               field={{ label: t('bodyLabel', { language: languageName }) }}
               mode={isDisabled ? CONTROL_MODE.DISABLED : CONTROL_MODE.EDITABLE}
-              aria-describedby={[bodyHintId, archivedNoticeId]
+              aria-describedby={[bodyHintId, archivedDescribedBy]
                 .filter(Boolean)
                 .join(' ')}
             />
           </FormField>
           <EmailLogoField
+            kind={EMAIL_LOGO_KIND.TEMPLATE}
             label={t('logoLabel')}
             hint={t('logoHint')}
             logo={logo}
             onStage={onLogoStage}
-            isDisabled={isDisabled}
-            aria-describedby={archivedNoticeId}
           />
         </div>
       </Card.Body>

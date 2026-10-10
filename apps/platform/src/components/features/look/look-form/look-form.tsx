@@ -111,7 +111,6 @@ export const LookForm = ({
   savedAt,
   archivedAt,
 }: TLookFormProps) => {
-  const isArchived = Boolean(archivedAt);
   const hasMultipleLanguages = liveLocales.length > 1;
   const archivedNoticeId = useId();
   const accentHueFieldId = useId();
@@ -292,8 +291,6 @@ export const LookForm = ({
             onReset={handleReset}
             isResetVisible={isDivergedFromPreset}
             hasUnsavedChanges={hasCardChanges('preset')}
-            isArchived={isArchived}
-            archivedNoticeId={archivedNoticeId}
           />
           <ColourCard
             accentHue={values.accentHue}
@@ -302,16 +299,12 @@ export const LookForm = ({
             logoHue={values.logoHue}
             onFieldChange={updateField}
             hasUnsavedChanges={hasCardChanges('colour')}
-            isArchived={isArchived}
-            archivedNoticeId={archivedNoticeId}
           />
           <TypeCard
             headingFont={values.headingFont}
             bodyFont={values.bodyFont}
             onFieldChange={updateField}
             hasUnsavedChanges={hasCardChanges('type')}
-            isArchived={isArchived}
-            archivedNoticeId={archivedNoticeId}
           />
           <ShapeCard
             radiusScale={values.radiusScale}
@@ -319,8 +312,6 @@ export const LookForm = ({
             cardStyle={values.cardStyle}
             onFieldChange={updateField}
             hasUnsavedChanges={hasCardChanges('shape')}
-            isArchived={isArchived}
-            archivedNoticeId={archivedNoticeId}
           />
           <BrandCard
             logo={values.logo}
@@ -328,16 +319,12 @@ export const LookForm = ({
             repickKinds={repickKinds}
             onFieldChange={updateField}
             hasUnsavedChanges={hasCardChanges('brand')}
-            isArchived={isArchived}
-            archivedNoticeId={archivedNoticeId}
           />
           <LanguageSwitcherCard
             languageSwitcherStyle={values.languageSwitcherStyle}
             hasMultipleLanguages={hasMultipleLanguages}
             onFieldChange={updateField}
             hasUnsavedChanges={hasCardChanges('languageSwitcher')}
-            isArchived={isArchived}
-            archivedNoticeId={archivedNoticeId}
           />
         </div>
 

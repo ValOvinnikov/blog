@@ -290,6 +290,24 @@ describe(`<${VoiceSettings.name}/>`, () => {
       ).toHaveTextContent(SITE_MESSAGES_BY_LOCALE.EN.blogListPage.empty);
     });
 
+    it('keeps keyboard focus on a list row as it opens, then tabs into its field', async () => {
+      setup();
+      const section = card('Empty lists');
+      const row = within(section).getByRole('button', { name: /Tag page/ });
+
+      row.focus();
+      await user.keyboard('{Enter}');
+
+      expect(row).toHaveFocus();
+      expect(row).toHaveAttribute('aria-expanded', 'true');
+
+      await user.tab();
+
+      expect(
+        within(section).getByRole('button', { name: 'Bold' }),
+      ).toHaveFocus();
+    });
+
     it('titles the open list once, in its header', () => {
       setup();
 
@@ -502,6 +520,18 @@ describe(`<${VoiceSettings.name}/>`, () => {
       setup({ archivedAt: ARCHIVED_AT });
 
       expectArchivedOffersNoSave();
+    });
+
+    it('describes every control with the archived notice', async () => {
+      setup({ archivedAt: ARCHIVED_AT });
+
+      await user.click(
+        within(card('Empty lists')).getByRole('button', { name: /Tag page/ }),
+      );
+
+      for (const textbox of screen.getAllByRole('textbox')) {
+        expect(textbox).toHaveAccessibleDescription(/This tenant is archived/);
+      }
     });
 
     it('makes the text fields read-only and offers no Reset', () => {

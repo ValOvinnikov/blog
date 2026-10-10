@@ -1,14 +1,14 @@
 'use client';
 
-import type { TDomainVerificationStatus } from '@blog/config';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { DomainCard } from '@platform/components/features/tenants/domain-card';
+import type { TDomainVerificationStatus } from '@platform/constants/domain';
+import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { use } from 'react';
 
 import { useDomainStatusPoll } from './use-domain-status-poll';
 
 export type TLiveDomainCardProps = {
-  tenant: TTenant;
+  tenant: TClientTenant;
   domainVerificationStatus: Promise<TDomainVerificationStatus>;
   dnsHref: string;
 };
