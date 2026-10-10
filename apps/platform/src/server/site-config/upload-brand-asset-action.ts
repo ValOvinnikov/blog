@@ -1,18 +1,22 @@
 'use server';
 
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
-import { queries } from '@blog/db';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
-import { getSiteConfigOrDefaults } from '@platform/server/site-config/site-config-or-defaults';
+import { deleteBlobBestEffort } from '@platform/server/blob/delete-blob-best-effort';
+import { readUploadedFile } from '@platform/server/blob/read-uploaded-file';
+import { UNRECOGNIZED_UPLOAD_TARGET_RESULT } from '@platform/server/blob/unrecognized-upload-target';
+import {
+  getBrandAssetUrl,
+  setBrandAssetUrl,
+} from '@platform/server/site-config/brand-asset-store';
 import { validateBrandAssetUpload } from '@platform/server/site-config/validate-brand-asset';
 import {
   brandAssetKindSchema,
   type TBrandAssetKind,
 } from '@platform/utils/brand-asset-limits/brand-asset-limits';
-import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
-import { del, put } from '@vercel/blob';
+import { put } from '@vercel/blob';
 
 export type TUploadBrandAssetResult =
   { ok: true; url: string } | { ok: false; error: string };
@@ -26,22 +30,12 @@ export const uploadBrandAssetAction = async (
   const { tenant } = await requireTenantMembership(tenantId);
 
   const parsedKind = brandAssetKindSchema.safeParse(kind);
-  if (!parsedKind.success) {
-    return { ok: false, error: 'Unrecognized upload target.' };
-  }
+  if (!parsedKind.success) return UNRECOGNIZED_UPLOAD_TARGET_RESULT;
   const targetKind = parsedKind.data;
 
-  if (!env.BLOB_READ_WRITE_TOKEN) {
-    return {
-      ok: false,
-      error: 'File uploads are not configured for this environment yet.',
-    };
-  }
-
-  const file = formData.get('file');
-  if (!(file instanceof File)) {
-    return { ok: false, error: 'Choose a file to upload.' };
-  }
+  const upload = readUploadedFile(formData);
+  if (!upload.ok) return upload;
+  const { file, token } = upload;
 
   const validation = await validateBrandAssetUpload(file, targetKind);
   if (!validation.ok) {
@@ -52,41 +46,22 @@ export const uploadBrandAssetAction = async (
   const pathname = `tenants/${tenant.id}/${targetKind}.${extension}`;
 
   try {
-    const current = await getSiteConfigOrDefaults(tenant.id);
-    const previousUrl =
-      targetKind === 'logo' ? current.logoAssetUrl : current.faviconAssetUrl;
+    const previousUrl = await getBrandAssetUrl(tenant.id, targetKind);
 
     const blob = await put(pathname, buffer, {
       access: 'public',
       contentType,
-      token: env.BLOB_READ_WRITE_TOKEN,
+      token,
     });
 
-    const assetUpdate =
-      targetKind === 'logo'
-        ? { logoAssetUrl: blob.url }
-        : { faviconAssetUrl: blob.url };
-
-    await queries.siteConfig.upsertSiteConfig(tenant.id, {
-      preset: current.preset,
-      accentHue: current.accentHue,
-      headingFont: current.headingFont,
-      bodyFont: current.bodyFont,
-      radiusScale: current.radiusScale,
-      density: current.density,
-      ...assetUpdate,
-    });
+    await setBrandAssetUrl(tenant.id, targetKind, blob.url);
 
     if (previousUrl && previousUrl !== blob.url) {
-      try {
-        await del(previousUrl, { token: env.BLOB_READ_WRITE_TOKEN });
-      } catch (error) {
-        logger.error('site_config.brand_asset_delete_failed', {
-          tenantId: tenant.id,
-          kind: targetKind,
-          error,
-        });
-      }
+      await deleteBlobBestEffort(
+        previousUrl,
+        'site_config.brand_asset_delete_failed',
+        { tenantId: tenant.id, kind: targetKind },
+      );
     }
 
     await recordAuditEvent({
