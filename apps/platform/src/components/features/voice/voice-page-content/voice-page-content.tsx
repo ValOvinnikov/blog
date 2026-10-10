@@ -3,14 +3,13 @@ import type { TTenant } from '@blog/db/schema/tenants';
 import type { TVoiceListSamples } from '@platform/components/features/site-preview/voice-specimen';
 import { VoiceListSamplesProvider } from '@platform/components/features/voice/voice-list-samples-provider';
 import { VoiceSettings } from '@platform/components/features/voice/voice-settings';
+import { saveVoiceOverridesAction } from '@platform/server/site-config/save-voice-overrides-action';
 import {
   defaultLookFormValues,
   toLookFormValues,
 } from '@platform/utils/default-look-values/default-look-values';
 import { buildVoiceDraft } from '@platform/utils/voice-draft/voice-draft';
 import { getTranslations } from 'next-intl/server';
-
-import { saveVoiceOverridesAction } from './save-voice-overrides-action';
 
 export type TVoicePageContentProps = {
   tenant: TTenant;
