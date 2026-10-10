@@ -1,4 +1,4 @@
-import type { TFinding } from '@blog/db/schema/findings';
+import type { TFindingSummary } from '@blog/db/schema/findings';
 import { Card } from '@platform/components/shared/card';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
@@ -10,10 +10,11 @@ import { FindingDetails } from './components/finding-details/finding-details';
 import { findingsCardVariants } from './findings-card-variants';
 
 export type TFindingsCardProps = {
-  findings: TFinding[];
+  tenantId: string;
+  findings: TFindingSummary[];
 };
 
-export const FindingsCard = ({ findings }: TFindingsCardProps) => {
+export const FindingsCard = ({ tenantId, findings }: TFindingsCardProps) => {
   const t = useTranslations('findingsCard');
   const locale = useLocale();
   const tSeverity = useTranslations('findingSeverityLabel');
@@ -40,8 +41,11 @@ export const FindingsCard = ({ findings }: TFindingsCardProps) => {
                   <span className={sourceText()}>
                     {tSource(finding.source)}
                   </span>
-                  {finding.details && (
-                    <FindingDetails details={finding.details} />
+                  {finding.hasDetails && (
+                    <FindingDetails
+                      tenantId={tenantId}
+                      findingId={finding.id}
+                    />
                   )}
                 </div>
                 <time

@@ -1,6 +1,6 @@
 'use client';
 
-import { CONTROL_MODE, type TEmailTemplateType } from '@blog/config';
+import { type TEmailTemplateType } from '@blog/config';
 import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
 import { EmailLogoField } from '@platform/components/features/email/email-logo-field';
 import { Card } from '@platform/components/shared/card';
@@ -8,6 +8,7 @@ import { FieldStatus } from '@platform/components/shared/field-status';
 import { FormField } from '@platform/components/shared/form-field';
 import { PortableTextEditor } from '@platform/components/shared/portable-text-editor';
 import { TextInput } from '@platform/components/shared/text-input';
+import { CONTROL_MODE } from '@platform/constants/control-mode';
 import { EMAIL_LOGO_KIND } from '@platform/constants/email-logo';
 import {
   isSameBody,

@@ -2,7 +2,6 @@
 
 import { Field } from '@base-ui/react/field';
 import {
-  CONTROL_MODE,
   VOICE_FIELD_KIND,
   VOICE_PORTABLE_TEXT_SCHEMA,
   type TVoiceFieldKind,
@@ -12,6 +11,7 @@ import { FieldStatus } from '@platform/components/shared/field-status';
 import { PortableTextEditor } from '@platform/components/shared/portable-text-editor';
 import { TextInput } from '@platform/components/shared/text-input';
 import { Textarea } from '@platform/components/shared/textarea';
+import { CONTROL_MODE } from '@platform/constants/control-mode';
 import { isBlankPortableTextValue } from '@platform/utils/portable-text-schema/portable-text-schema';
 import {
   isSameVoiceValue,
@@ -32,7 +32,7 @@ export type TVoiceFieldProps = {
   placeholder: string;
   error?: string;
   onChange: (value: TVoiceDraftValue) => void;
-  isReadOnly: boolean;
+  archivedNoticeId?: string;
   hasVisibleLabel?: boolean;
 };
 
@@ -44,7 +44,7 @@ export const VoiceField = ({
   placeholder,
   error,
   onChange,
-  isReadOnly,
+  archivedNoticeId,
   hasVisibleLabel = true,
 }: TVoiceFieldProps) => {
   const t = useTranslations('voiceSettings');
@@ -66,13 +66,15 @@ export const VoiceField = ({
   const noteId = `${inputId}-note`;
   const errorId = `${inputId}-error`;
   const label = tLabels(field.id);
+  const isReadOnly = archivedNoticeId !== undefined;
   const isRich = field.kind === VOICE_FIELD_KIND.RICH;
   const textValue = typeof value === 'string' ? value : '';
   const [placeholderToken] = field.placeholders;
-  const richDescribedBy = [
+  const describedBy = [
     hintId,
     placeholderToken !== undefined && noteId,
     error && errorId,
+    archivedNoticeId,
   ]
     .filter(Boolean)
     .join(' ');
@@ -117,7 +119,7 @@ export const VoiceField = ({
           }
           placeholder={placeholder}
           mode={isReadOnly ? CONTROL_MODE.READ_ONLY : CONTROL_MODE.EDITABLE}
-          aria-describedby={richDescribedBy}
+          aria-describedby={describedBy}
         />
       ) : field.kind === VOICE_FIELD_KIND.MULTILINE ? (
         <Textarea
@@ -127,6 +129,7 @@ export const VoiceField = ({
           placeholder={placeholder}
           isReadOnly={isReadOnly}
           ariaLabel={hasVisibleLabel ? undefined : label}
+          aria-describedby={describedBy}
           rows={3}
         />
       ) : (
@@ -137,6 +140,7 @@ export const VoiceField = ({
           placeholder={placeholder}
           isReadOnly={isReadOnly}
           ariaLabel={hasVisibleLabel ? undefined : label}
+          aria-describedby={describedBy}
         />
       )}
       {placeholderToken !== undefined && (

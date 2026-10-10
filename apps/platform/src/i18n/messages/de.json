@@ -146,6 +146,7 @@
     "title": "Offene Befunde",
     "empty": "Keine offenen Befunde für diesen Mandanten — alles in Ordnung.",
     "detailsToggle": "Details",
+    "detailsLoading": "Details werden geladen…",
     "columnLevel": "Stufe",
     "columnDocument": "Dokument",
     "columnMessage": "Meldung"

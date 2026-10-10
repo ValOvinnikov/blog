@@ -1,4 +1,4 @@
-import type { TDomainVerificationStatus } from '@blog/config';
+import type { TDomainVerificationStatus } from '@platform/constants/domain';
 
 import { getProjectDomain } from './vercel-domains-api';
 

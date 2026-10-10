@@ -53,3 +53,7 @@ export const findings = pgTable(
 );
 
 export type TFinding = typeof findings.$inferSelect;
+
+export type TFindingSummary = Omit<TFinding, 'details'> & {
+  hasDetails: boolean;
+};

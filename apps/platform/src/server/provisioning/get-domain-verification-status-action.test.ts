@@ -1,4 +1,4 @@
-import { DOMAIN_VERIFICATION_STATUS } from '@blog/config';
+import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { makeTenant } from '@platform/testing/tenants/fixtures';
 

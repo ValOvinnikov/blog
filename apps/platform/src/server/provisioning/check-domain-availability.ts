@@ -1,8 +1,8 @@
+import { DOMAIN_PATTERN } from '@blog/config';
 import {
   DOMAIN_AVAILABILITY,
-  DOMAIN_PATTERN,
   type TDomainAvailability,
-} from '@blog/config';
+} from '@platform/constants/domain';
 import { logger } from '@platform/utils/logger/logger';
 import { getDomain } from 'tldts';
 

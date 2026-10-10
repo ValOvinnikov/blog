@@ -1,8 +1,5 @@
-import {
-  AUDIT_ACTION,
-  AUDIT_TARGET_TYPE,
-  DOMAIN_AVAILABILITY,
-} from '@blog/config';
+import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import { DOMAIN_AVAILABILITY } from '@platform/constants/domain';
 import { auth, signIn } from '@platform/server/auth/auth';
 import { createOwnerInviteToken } from '@platform/server/tenants/owner-invite-token';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';

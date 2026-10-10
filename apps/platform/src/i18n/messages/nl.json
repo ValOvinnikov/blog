@@ -146,6 +146,7 @@
     "title": "Openstaande bevindingen",
     "empty": "Geen openstaande bevindingen voor deze tenant — alles is in orde.",
     "detailsToggle": "Details",
+    "detailsLoading": "Details laden…",
     "columnLevel": "Niveau",
     "columnDocument": "Document",
     "columnMessage": "Bericht"

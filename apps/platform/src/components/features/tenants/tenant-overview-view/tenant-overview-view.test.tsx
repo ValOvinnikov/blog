@@ -11,7 +11,7 @@ import {
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db';
 import type { TAuditEvent } from '@blog/db/schema/audit-events';
-import type { TFinding } from '@blog/db/schema/findings';
+import type { TFindingSummary } from '@blog/db/schema/findings';
 import type { TTenantProvisioningState } from '@blog/db/schema/tenants';
 import { DomainCard } from '@platform/components/features/tenants/domain-card';
 import {
@@ -51,6 +51,10 @@ vi.mock(
   }),
 );
 
+vi.mock('@platform/server/findings/get-finding-details-action', () => ({
+  getFindingDetailsAction: vi.fn(),
+}));
+
 vi.mock('@platform/server/tenants/update-tenant-details-action', () => ({
   updateTenantDetailsAction: vi.fn(),
 }));
@@ -67,7 +71,9 @@ const makeEvent = (overrides: Partial<TAuditEvent> = {}): TAuditEvent => ({
   ...overrides,
 });
 
-const makeFinding = (overrides: Partial<TFinding> = {}): TFinding => ({
+const makeFinding = (
+  overrides: Partial<TFindingSummary> = {},
+): TFindingSummary => ({
   id: 'finding-1',
   tenantId: 'tenant-1',
   source: FINDING_SOURCE.TENANT_PROVISIONING,
@@ -75,7 +81,7 @@ const makeFinding = (overrides: Partial<TFinding> = {}): TFinding => ({
   severity: FINDING_SEVERITY.CRITICAL,
   status: FINDING_STATUS.OPEN,
   dedupeKey: 'dedupe-1',
-  details: null,
+  hasDetails: false,
   firstSeenAt: new Date('2026-04-01T00:00:00.000Z'),
   lastSeenAt: new Date('2026-04-02T00:00:00.000Z'),
   resolvedAt: null,
