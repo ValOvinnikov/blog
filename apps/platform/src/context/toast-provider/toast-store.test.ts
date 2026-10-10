@@ -1,6 +1,7 @@
 import { TOAST_TYPE, type TToastType } from '@blog/config';
+import type { IToastPayload } from '@platform/components/shared/toast';
 
-import { createToastStore, type IToastPayload } from './toast-store';
+import { createToastStore } from './toast-store';
 
 const buildPayload = (overrides?: Partial<IToastPayload>): IToastPayload => ({
   title: 'Bookmark saved',

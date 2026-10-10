@@ -1,8 +1,19 @@
 import { TOAST_TYPE } from '@blog/config';
-import { render, screen } from '@platform/testing/custom-render';
+import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import userEvent from '@testing-library/user-event';
 
 import { Toast } from './toast';
+import type { IToastRecord } from './toast-record';
+
+const buildRecord = (overrides?: Partial<IToastRecord>): IToastRecord => ({
+  id: 'toast-1',
+  type: TOAST_TYPE.SUCCESS,
+  message: 'Saved',
+  phase: 'visible',
+  paused: false,
+  createdAt: 0,
+  ...overrides,
+});
 
 describe(Toast, () => {
   let user: ReturnType<typeof userEvent.setup>;
@@ -12,27 +23,18 @@ describe(Toast, () => {
   });
 
   it('renders its message', () => {
-    render(
-      <Toast
-        type={TOAST_TYPE.SUCCESS}
-        message="Saved"
-        dismissLabel="Dismiss"
-        onDismiss={vi.fn()}
-        phase="visible"
-      />,
-    );
+    renderWithIntl(<Toast record={buildRecord()} onDismiss={vi.fn()} />);
     expect(screen.getByText('Saved')).toBeVisible();
   });
 
   it('renders a bolded title ahead of the message when given', () => {
-    render(
+    renderWithIntl(
       <Toast
-        type={TOAST_TYPE.SUCCESS}
-        title="Bookmark"
-        message="Saved to bookmarks"
-        dismissLabel="Dismiss"
+        record={buildRecord({
+          title: 'Bookmark',
+          message: 'Saved to bookmarks',
+        })}
         onDismiss={vi.fn()}
-        phase="visible"
       />,
     );
     expect(screen.getByText('Bookmark').tagName).toBe('STRONG');
@@ -40,26 +42,25 @@ describe(Toast, () => {
   });
 
   it('renders no title element when none is given', () => {
-    render(
-      <Toast
-        type={TOAST_TYPE.SUCCESS}
-        message="Saved"
-        dismissLabel="Dismiss"
-        onDismiss={vi.fn()}
-        phase="visible"
-      />,
-    );
+    renderWithIntl(<Toast record={buildRecord()} onDismiss={vi.fn()} />);
     expect(screen.getByRole('status')).toHaveTextContent(/^✓Saved×$/);
   });
 
+  it('renders the time when given', () => {
+    renderWithIntl(
+      <Toast record={buildRecord({ time: '12:04' })} onDismiss={vi.fn()} />,
+    );
+    expect(screen.getByText('12:04')).toBeVisible();
+  });
+
   it('renders an assertive alert role for the ERROR type', () => {
-    render(
+    renderWithIntl(
       <Toast
-        type={TOAST_TYPE.ERROR}
-        message="Couldn't save"
-        dismissLabel="Dismiss"
+        record={buildRecord({
+          type: TOAST_TYPE.ERROR,
+          message: "Couldn't save",
+        })}
         onDismiss={vi.fn()}
-        phase="visible"
       />,
     );
     expect(screen.getByRole('alert')).toHaveTextContent("Couldn't save");
@@ -68,30 +69,19 @@ describe(Toast, () => {
   it.each([TOAST_TYPE.SUCCESS, TOAST_TYPE.WARNING, TOAST_TYPE.INFO])(
     'renders a polite status role for the %s type',
     (type) => {
-      render(
+      renderWithIntl(
         <Toast
-          type={type}
-          message="Status update"
-          dismissLabel="Dismiss"
+          record={buildRecord({ type, message: 'Status update' })}
           onDismiss={vi.fn()}
-          phase="visible"
         />,
       );
       expect(screen.getByRole('status')).toHaveTextContent('Status update');
     },
   );
 
-  it('calls onDismiss when the dismiss button is clicked', async () => {
+  it('labels the dismiss button from its own catalogue and calls onDismiss when clicked', async () => {
     const onDismiss = vi.fn();
-    render(
-      <Toast
-        type={TOAST_TYPE.SUCCESS}
-        message="Saved"
-        dismissLabel="Dismiss notification"
-        onDismiss={onDismiss}
-        phase="visible"
-      />,
-    );
+    renderWithIntl(<Toast record={buildRecord()} onDismiss={onDismiss} />);
 
     await user.click(
       screen.getByRole('button', { name: 'Dismiss notification' }),
@@ -101,14 +91,10 @@ describe(Toast, () => {
 
   it('renders an action button and calls its handler', async () => {
     const onAct = vi.fn();
-    render(
+    renderWithIntl(
       <Toast
-        type={TOAST_TYPE.SUCCESS}
-        message="Saved"
-        dismissLabel="Dismiss"
+        record={buildRecord({ action: { label: 'Undo', onAct } })}
         onDismiss={vi.fn()}
-        phase="visible"
-        action={{ label: 'Undo', onAct }}
       />,
     );
 
@@ -117,14 +103,14 @@ describe(Toast, () => {
   });
 
   it('renders a spinner instead of the type glyph while loading', () => {
-    render(
+    renderWithIntl(
       <Toast
-        type={TOAST_TYPE.INFO}
-        message="Saving…"
-        dismissLabel="Dismiss"
+        record={buildRecord({
+          type: TOAST_TYPE.INFO,
+          message: 'Saving…',
+          isLoading: true,
+        })}
         onDismiss={vi.fn()}
-        phase="visible"
-        isLoading={true}
       />,
     );
     expect(screen.getByText('Saving…')).toBeVisible();
@@ -135,13 +121,10 @@ describe(Toast, () => {
     for (const type of Object.values(TOAST_TYPE)) {
       for (const phase of ['entering', 'visible', 'leaving'] as const) {
         expect(() =>
-          render(
+          renderWithIntl(
             <Toast
-              type={type}
-              message="Label"
-              dismissLabel="Dismiss"
+              record={buildRecord({ type, phase, message: 'Label' })}
               onDismiss={vi.fn()}
-              phase={phase}
             />,
           ),
         ).not.toThrow();

@@ -78,6 +78,7 @@ describe(ToastProvider, () => {
       callback(0);
       return 0;
     });
+    vi.stubGlobal('cancelAnimationFrame', vi.fn());
   });
 
   afterEach(() => {
@@ -231,7 +232,7 @@ describe(ToastProvider, () => {
       act(() => {
         errorDismiss.focus();
       });
-      fireEvent.keyDown(document, { key: 'Escape' });
+      fireEvent.keyDown(errorDismiss, { key: 'Escape' });
       act(() => {
         vi.advanceTimersByTime(TOAST_EXIT_BUFFER_MS);
       });
@@ -250,6 +251,35 @@ describe(ToastProvider, () => {
       expect(screen.getByText('Saved to bookmarks')).toBeVisible();
       expect(screen.queryByText('saving…')).not.toBeInTheDocument();
     });
+  });
+
+  it("cancels a toast's pending enter frames once it is dismissed", () => {
+    const pendingFrames = new Map<number, FrameRequestCallback>();
+    let nextFrameId = 1;
+    vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+      const frameId = nextFrameId++;
+      pendingFrames.set(frameId, callback);
+      return frameId;
+    });
+    vi.stubGlobal('cancelAnimationFrame', (frameId: number) => {
+      pendingFrames.delete(frameId);
+    });
+    withIntl(
+      <ToastProvider>
+        <ToastHarness />
+      </ToastProvider>,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'fire-success' }));
+    expect(pendingFrames.size).toBeGreaterThan(0);
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+    act(() => {
+      vi.advanceTimersByTime(TOAST_EXIT_BUFFER_MS);
+    });
+
+    expect(screen.queryByText('Saved to bookmarks')).not.toBeInTheDocument();
+    expect(pendingFrames.size).toBe(0);
   });
 
   it('useToast throws when called outside a ToastProvider', () => {

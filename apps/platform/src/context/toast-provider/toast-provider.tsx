@@ -1,7 +1,10 @@
 'use client';
 
 import { TOAST_TYPE } from '@blog/config';
-import { Toast } from '@platform/components/shared/toast';
+import type {
+  IToastPayload,
+  IToastRecord,
+} from '@platform/components/shared/toast';
 import { ToastViewport } from '@platform/components/shared/toast-viewport';
 import { useTranslations } from 'next-intl';
 import {
@@ -9,19 +12,13 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
   useSyncExternalStore,
   type ReactNode,
 } from 'react';
 
-import { toastProviderVariants } from './toast-provider-variants';
-import {
-  createToastStore,
-  type IToastPayload,
-  type IToastPromiseMessages,
-} from './toast-store';
-import { useToastRowPause } from './use-toast-row-pause';
+import { ToastRow } from './components/toast-row/toast-row';
+import { createToastStore, type IToastPromiseMessages } from './toast-store';
 
 interface IUseToast {
   success: (payload: IToastPayload) => string;
@@ -41,27 +38,27 @@ type TToastProviderProps = {
   children: ReactNode;
 };
 
-const s = toastProviderVariants();
+const withDismissingAction = (
+  record: IToastRecord,
+  dismiss: (id: string) => void,
+): IToastRecord => {
+  const { id, action } = record;
+  if (!action) return record;
 
-/**
- * Mounted once near the app root (`[locale]/layout.tsx`).
- * Owns the toast queue through a framework-free `createToastStore` instance
- * (subscribed via `useSyncExternalStore`, so it renders an always-empty
- * queue on the server and never ships a toast in the static HTML), the
- * enter-transition's double-`requestAnimationFrame` paint timing, per-toast
- * hover/focus-within pause–resume, and the global `Esc`-dismisses-the-
- * focused-or-newest-toast shortcut. Renders `ToastViewport` + `Toast`
- * (admin's own primitives) fed entirely by this state — those stay pure and
- * prop-driven.
- *
- * @example
- * <ToastProvider>
- *   <App />
- * </ToastProvider>
- */
+  return {
+    ...record,
+    action: {
+      ...action,
+      onAct: () => {
+        action.onAct();
+        dismiss(id);
+      },
+    },
+  };
+};
+
 export const ToastProvider = ({ children }: TToastProviderProps) => {
-  // Lazy `useState` initializer (not `useRef`) — a stable, once-per-mount
-  // store instance that's safe to read during render, unlike a ref.
+  // A lazy useState initialiser, not a ref, so the store is safe to read during render.
   const [store] = useState(() => createToastStore());
   const t = useTranslations('toastProvider');
 
@@ -70,6 +67,7 @@ export const ToastProvider = ({ children }: TToastProviderProps) => {
     store.getState,
     store.getServerState,
   );
+  const hasVisibleToasts = state.visible.length > 0;
 
   useEffect(() => () => store.destroy(), [store]);
 
@@ -85,50 +83,16 @@ export const ToastProvider = ({ children }: TToastProviderProps) => {
     [store],
   );
 
-  const rowPause = useToastRowPause(store.actions.pause, store.actions.resume);
-  const scheduledEnterIds = useRef(new Set<string>());
-
-  // Double-rAF before flipping `entering` -> `visible` so the browser paints
-  // the off-screen start state first (no first-frame jump) — a rendering
-  // concern the store itself stays free of.
   useEffect(() => {
-    const currentIds = new Set(state.visible.map((record) => record.id));
-
-    for (const id of scheduledEnterIds.current) {
-      if (!currentIds.has(id)) scheduledEnterIds.current.delete(id);
-    }
-
-    for (const record of state.visible) {
-      if (
-        record.phase !== 'entering' ||
-        scheduledEnterIds.current.has(record.id)
-      ) {
-        continue;
-      }
-
-      scheduledEnterIds.current.add(record.id);
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          store.actions.markEntered(record.id);
-          scheduledEnterIds.current.delete(record.id);
-        });
-      });
-    }
-  }, [state.visible, store]);
-
-  useEffect(() => {
-    if (state.visible.length === 0) return;
+    if (!hasVisibleToasts) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') return;
-
-      const focusedId = rowPause.getFocusedRowId(document.activeElement);
-      store.actions.dismiss(focusedId);
+      if (event.key === 'Escape') store.actions.dismiss();
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [state.visible.length, store, rowPause]);
+  }, [hasVisibleToasts, store]);
 
   return (
     <ToastContext.Provider value={toast}>
@@ -138,56 +102,20 @@ export const ToastProvider = ({ children }: TToastProviderProps) => {
         dataTestId="toast-viewport"
       >
         {state.visible.map((record) => (
-          <div
+          <ToastRow
             key={record.id}
-            ref={rowPause.registerRow(record.id)}
-            className={s.row()}
-            onMouseEnter={() => rowPause.handleMouseEnter(record.id)}
-            onMouseLeave={() => rowPause.handleMouseLeave(record.id)}
-            onFocus={() => rowPause.handleFocus(record.id)}
-            onBlur={(event) =>
-              rowPause.handleBlur(
-                record.id,
-                event.currentTarget,
-                event.relatedTarget as Node | null,
-              )
-            }
-          >
-            <Toast
-              type={record.type}
-              isLoading={record.isLoading}
-              title={record.title}
-              message={
-                record.count &&
-                record.count > 1 &&
-                typeof record.message === 'string'
-                  ? `${record.message}${t('mergeCountSuffix', { count: record.count })}`
-                  : record.message
-              }
-              time={record.time}
-              action={
-                record.action && {
-                  label: record.action.label,
-                  keyHint: record.action.keyHint,
-                  onAct: () => {
-                    record.action?.onAct();
-                    store.actions.dismiss(record.id);
-                  },
-                }
-              }
-              dismissLabel={t('dismissLabel')}
-              onDismiss={() => store.actions.dismiss(record.id)}
-              phase={record.phase}
-              dataTestId={`toast-${record.id}`}
-            />
-          </div>
+            record={withDismissingAction(record, store.actions.dismiss)}
+            onEntered={store.actions.markEntered}
+            onPause={store.actions.pause}
+            onResume={store.actions.resume}
+            onDismiss={store.actions.dismiss}
+          />
         ))}
       </ToastViewport>
     </ToastContext.Provider>
   );
 };
 
-/** Reads the imperative toast API — throws outside a `ToastProvider`. */
 export const useToast = (): IUseToast => {
   const context = useContext(ToastContext);
   if (!context) {
