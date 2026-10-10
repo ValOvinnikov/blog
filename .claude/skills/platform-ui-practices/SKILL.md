@@ -69,18 +69,15 @@ Text fields, in a card as above inside `SettingsFormShell` (`fields` is
 <div className={fields()}>
   <FormField
     label={t('mastodonLabel')}
-    htmlFor={mastodonId}
     hint={t('mastodonHint')}
     error={mastodonError && t(`fieldError.${mastodonError}`)}
+    control={{ id: mastodonId, describedBy: archivedDescribedBy }}
   >
     <TextInput
-      id={mastodonId}
       type="url"
       value={values.mastodonUrl}
       onChange={(mastodonUrl) => onFieldChange({ mastodonUrl })}
-      isInvalid={Boolean(mastodonError)}
       isReadOnly={isArchived}
-      aria-describedby={isArchived ? archivedNoticeId : undefined}
     />
   </FormField>
 </div>
@@ -92,7 +89,10 @@ Text fields, in a card as above inside `SettingsFormShell` (`fields` is
   in state; it passes the translated `error` and `isInvalid`; and the page
   passes `invalidFieldIds={mastodonError ? [mastodonId] : []}` to the shell.
 - Compose `FormField` around `TextInput`, as here: `FormTextInput` has no
-  `isReadOnly` and is past seven props, so it takes no new one.
+  `isReadOnly` or `control` and is at seven props, so it takes no new one.
+  `FormField` gives its `TextInput` or `Textarea` the id, label, hint, error,
+  invalid and disabled state, and `control.describedBy` adds one outside
+  description, such as the archived notice, ahead of the hint.
 
 Binary settings, one `SettingRow` per switch, all in one `Card.Body`:
 
@@ -652,7 +652,7 @@ panes.
 | `min-h-11` or `text-[16px]` at a shared primitive's call site                                                    | Nothing; the primitive owns phone sizing                                                                                                                             |
 | More code in a 200+ line component that does more than one job                                                   | Split it first                                                                                                                                                       |
 | A feature component styling a Base UI part another page also uses                                                | A block in `components/shared/`, used from both pages                                                                                                                |
-| An eighth prop, or any new prop on a component already at seven or more (`FormTextInput` has 12, `TextInput` 13) | Restructure first (drop, group, slot, hook or context), or compose its parts, as `FormField` around `TextInput`                                                      |
+| An eighth prop, or any new prop on a component already at seven or more (`FormField`, `FormTextInput`)           | Restructure first (drop, group, slot, hook or context), or compose its parts, as `FormField` around `TextInput`                                                      |
 | A prop every caller fills the same way, derives one-to-one from another prop, or that only a test passes         | Own it inside the component (`useTranslations`, import the action, derive it); the test uses `vi.mock`                                                               |
 | `isArchived` + `archivedNoticeId`, or the same set of values, passed to every card in a list                     | Read them from the form's context once `SettingsFormProvider` lands. **Not yet:** it doesn't exist; pass them as props and don't build a page-local context for them |
 | Copying `useState` for open/value/error, `useTransition` and reset-on-close into another caller                  | One `use<Name>` hook; the component owns that state                                                                                                                  |

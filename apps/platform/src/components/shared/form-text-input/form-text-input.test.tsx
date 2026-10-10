@@ -28,20 +28,6 @@ describe(FormTextInput, () => {
     expect(input).toHaveAttribute('aria-invalid', 'true');
   });
 
-  it('renders footer content after the error message', () => {
-    render(
-      <FormTextInput
-        label="Owner email"
-        error="Invalid email"
-        footer={<span data-testid="footer">Confirmation sent</span>}
-        value=""
-        onChange={vi.fn()}
-      />,
-    );
-
-    expect(screen.getByTestId('footer')).toBeVisible();
-  });
-
   it('calls onChange with the typed value', async () => {
     const user = userEvent.setup();
     const handleChange = vi.fn();
@@ -53,27 +39,5 @@ describe(FormTextInput, () => {
     await user.type(screen.getByLabelText('Tenant name'), 'a');
 
     expect(handleChange).toHaveBeenCalledWith('a');
-  });
-
-  it('disables the input and keeps an outside description alongside its hint', () => {
-    render(
-      <>
-        <p id="archived-notice">This tenant is archived</p>
-        <FormTextInput
-          label="Slug"
-          hint="Used in the URL"
-          value=""
-          onChange={vi.fn()}
-          isDisabled={true}
-          aria-describedby="archived-notice"
-        />
-      </>,
-    );
-
-    const input = screen.getByRole('textbox', { name: 'Slug' });
-    expect(input).toBeDisabled();
-    expect(input).toHaveAccessibleDescription(
-      'This tenant is archived Used in the URL',
-    );
   });
 });

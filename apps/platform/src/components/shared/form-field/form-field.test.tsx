@@ -16,7 +16,7 @@ describe(FormField, () => {
 
   it('renders the label as a plain span when the control names itself', () => {
     render(
-      <FormField label="Plan" hasOwnAccessibleName={true}>
+      <FormField label="Plan" control={{ hasOwnAccessibleName: true }}>
         <input aria-label="Plan" />
       </FormField>,
     );
@@ -63,6 +63,40 @@ describe(FormField, () => {
     const [first, second] = screen.getAllByRole('textbox', { name: 'Slug' });
     expect(first).toHaveAccessibleDescription('Already in use');
     expect(second).toHaveAccessibleDescription('');
+  });
+
+  it('disables its control and describes it with an outside description before its hint', () => {
+    render(
+      <>
+        <p id="archived-notice">This tenant is archived</p>
+        <FormField
+          label="Slug"
+          hint="Used in the URL"
+          control={{ isDisabled: true, describedBy: 'archived-notice' }}
+        >
+          <TextInput value="" onChange={vi.fn()} />
+        </FormField>
+      </>,
+    );
+
+    const input = screen.getByRole('textbox', { name: 'Slug' });
+    expect(input).toBeDisabled();
+    expect(input).toHaveAccessibleDescription(
+      'This tenant is archived Used in the URL',
+    );
+  });
+
+  it('gives its control the id it is given', () => {
+    render(
+      <FormField label="Slug" control={{ id: 'slug-field' }}>
+        <TextInput value="" onChange={vi.fn()} />
+      </FormField>,
+    );
+
+    expect(screen.getByRole('textbox', { name: 'Slug' })).toHaveAttribute(
+      'id',
+      'slug-field',
+    );
   });
 
   it('renders actions in the label row', () => {

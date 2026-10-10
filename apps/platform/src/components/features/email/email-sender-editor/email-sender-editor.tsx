@@ -2,7 +2,8 @@
 
 import { EmailLogoField } from '@platform/components/features/email/email-logo-field';
 import { Card } from '@platform/components/shared/card';
-import { FormTextInput } from '@platform/components/shared/form-text-input';
+import { FormField } from '@platform/components/shared/form-field';
+import { TextInput } from '@platform/components/shared/text-input';
 import { EMAIL_LOGO_KIND } from '@platform/constants/email-logo';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import type { TEmailSenderDraft } from '@platform/utils/email-draft/email-draft';
@@ -27,7 +28,10 @@ export const EmailSenderEditor = ({
   senderNameError,
 }: TEmailSenderEditorProps) => {
   const { isArchived, isPending, archivedDescribedBy } = useSettingsFormState();
-  const isDisabled = isArchived || isPending;
+  const control = {
+    isDisabled: isArchived || isPending,
+    describedBy: archivedDescribedBy,
+  };
   const t = useTranslations('emailSettingsForm');
   const tItem = useTranslations('emailForm');
   const tPreview = useTranslations('emailPreview');
@@ -44,34 +48,40 @@ export const EmailSenderEditor = ({
       />
       <Card.Body>
         <div className={stack()}>
-          <FormTextInput
+          <FormField
             label={t('senderNameLabel')}
             hint={t('senderNameHint')}
             error={senderNameError}
-            placeholder={tPreview('defaultSender')}
-            value={sender.senderName}
-            onChange={(value) => updateField('senderName', value)}
-            isDisabled={isDisabled}
-            aria-describedby={archivedDescribedBy}
-          />
-          <FormTextInput
+            control={control}
+          >
+            <TextInput
+              placeholder={tPreview('defaultSender')}
+              value={sender.senderName}
+              onChange={(value) => updateField('senderName', value)}
+            />
+          </FormField>
+          <FormField
             label={t('replyToLabel')}
             hint={t('replyToHint')}
-            type="email"
-            placeholder={tPreview('noReplyTo')}
-            value={sender.replyToAddress}
-            onChange={(value) => updateField('replyToAddress', value)}
-            isDisabled={isDisabled}
-            aria-describedby={archivedDescribedBy}
-          />
-          <FormTextInput
+            control={control}
+          >
+            <TextInput
+              type="email"
+              placeholder={tPreview('noReplyTo')}
+              value={sender.replyToAddress}
+              onChange={(value) => updateField('replyToAddress', value)}
+            />
+          </FormField>
+          <FormField
             label={t('footerAddressLabel')}
             hint={t('footerAddressHint')}
-            value={sender.footerPostalAddress}
-            onChange={(value) => updateField('footerPostalAddress', value)}
-            isDisabled={isDisabled}
-            aria-describedby={archivedDescribedBy}
-          />
+            control={control}
+          >
+            <TextInput
+              value={sender.footerPostalAddress}
+              onChange={(value) => updateField('footerPostalAddress', value)}
+            />
+          </FormField>
           <EmailLogoField
             kind={EMAIL_LOGO_KIND.SENDER}
             label={t('logoLabel')}

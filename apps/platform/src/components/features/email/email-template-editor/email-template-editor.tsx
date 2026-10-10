@@ -75,6 +75,7 @@ export const EmailTemplateEditor = ({
           <FormField
             label={t('subjectLabel', { language: languageName })}
             hint={t('subjectHint')}
+            control={{ isDisabled, describedBy: archivedDescribedBy }}
             actions={
               <FieldStatus
                 isCustomised={draft.subject !== ''}
@@ -87,13 +88,11 @@ export const EmailTemplateEditor = ({
               placeholder={fallback.subject}
               value={draft.subject}
               onChange={(subject) => onCopyChange({ ...draft, subject })}
-              isDisabled={isDisabled}
-              aria-describedby={archivedDescribedBy}
             />
           </FormField>
           <FormField
             label={t('bodyLabel', { language: languageName })}
-            hasOwnAccessibleName={true}
+            control={{ hasOwnAccessibleName: true }}
             hint={<span id={bodyHintId}>{t('bodyHint')}</span>}
             actions={
               <FieldStatus
