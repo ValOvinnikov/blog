@@ -48,7 +48,6 @@ export const ProvisioningStatusView = ({
     provisioningRun,
     allIdle,
     isProvisioningRunning,
-    overallStepStatus,
     isOverallFailed,
     displayOverallStatus,
     failedStepError,
@@ -100,7 +99,7 @@ export const ProvisioningStatusView = ({
 
   const overallStatusBadge = isOverallFailed ? (
     <StatusBadge tone="bad">
-      {t(`statusLabel.${overallStepStatus}`)}
+      {t(`statusLabel.${TENANT_PROVISIONING_STEP_STATUS.FAILED}`)}
     </StatusBadge>
   ) : (
     <StatusBadge tone={provisioningStepTone(displayOverallStatus)}>
