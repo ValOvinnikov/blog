@@ -1,6 +1,6 @@
 'use client';
 
-import { SIZE } from '@blog/config';
+import { SIZE, type TMaybeUndefined } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
@@ -26,7 +26,7 @@ export type TAssetUploadSpec = {
   kind: TBrandAssetKind | TEmailLogoKind;
   size: 'sm' | 'md';
   acceptedMimeTypes: readonly string[];
-  validateFile: (file: File) => string | undefined;
+  validateFile: (file: File) => TMaybeUndefined<string>;
   stagedBadgeLabel?: string;
 };
 
@@ -40,7 +40,7 @@ export type TAssetUploadFieldProps = {
   'aria-describedby'?: AriaAttributes['aria-describedby'];
 };
 
-const getFileName = ({ url, file }: TStagedImage): string | undefined => {
+const getFileName = ({ url, file }: TStagedImage): TMaybeUndefined<string> => {
   if (file) return file.name;
   if (!url) return undefined;
   return url.split(/[?#]/)[0]?.split('/').at(-1) || undefined;
@@ -61,7 +61,7 @@ export const AssetUploadField = ({
   const { url, file: stagedFile } = image;
   const t = useTranslations('assetUploadField');
   const inputRef = useRef<HTMLInputElement>(null);
-  const [error, setError] = useState<string | undefined>(undefined);
+  const [error, setError] = useState<TMaybeUndefined<string>>(undefined);
   const hintId = useId();
   const errorId = useId();
   const describedBy = [hint && hintId, ariaDescribedBy, error && errorId]

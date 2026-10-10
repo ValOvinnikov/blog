@@ -1,4 +1,6 @@
-export type TStagedImage = { url: string | undefined; file?: File };
+import type { TMaybeUndefined } from '@blog/config';
+
+export type TStagedImage = { url: TMaybeUndefined<string>; file?: File };
 
 export const isSameStagedImage = (a: TStagedImage, b: TStagedImage): boolean =>
   a.url === b.url && a.file === b.file;
