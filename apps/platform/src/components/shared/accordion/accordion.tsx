@@ -2,6 +2,7 @@
 
 import { Accordion as BaseAccordion } from '@base-ui/react/accordion';
 import { AccordionItem } from '@platform/components/shared/accordion/components/item/accordion-item';
+import { AccordionNote } from '@platform/components/shared/accordion/components/note/accordion-note';
 import { AccordionPanel } from '@platform/components/shared/accordion/components/panel/accordion-panel';
 import { AccordionTrigger } from '@platform/components/shared/accordion/components/trigger/accordion-trigger';
 import type { TCompoundComponent } from '@platform/lib/react';
@@ -12,6 +13,7 @@ import { accordionVariants } from './accordion-variants';
 const AccordionParts = {
   Item: AccordionItem,
   Trigger: AccordionTrigger,
+  Note: AccordionNote,
   Panel: AccordionPanel,
 } satisfies Record<string, ElementType>;
 

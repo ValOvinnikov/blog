@@ -94,9 +94,9 @@ export const VoiceListRow = ({
         )}
       </Accordion.Trigger>
       {collapsedError !== undefined && (
-        <p id={errorId} className={errorSlot()}>
+        <Accordion.Note id={errorId} className={errorSlot()}>
           {collapsedError}
-        </p>
+        </Accordion.Note>
       )}
       <Accordion.Panel>{children}</Accordion.Panel>
     </Accordion.Item>
