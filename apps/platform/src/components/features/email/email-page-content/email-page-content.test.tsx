@@ -9,13 +9,13 @@ import { EmailPageContent } from './email-page-content';
 const {
   getSiteConfigMock,
   getEmailConfigMock,
-  listEmailTemplatesMock,
+  listEmailTemplateLogoUrlsMock,
   listAuthoredEmailTemplatesMock,
   selectLiveLocalesMock,
 } = vi.hoisted(() => ({
   getSiteConfigMock: vi.fn(),
   getEmailConfigMock: vi.fn(),
-  listEmailTemplatesMock: vi.fn(),
+  listEmailTemplateLogoUrlsMock: vi.fn(),
   listAuthoredEmailTemplatesMock: vi.fn(),
   selectLiveLocalesMock: vi.fn(),
 }));
@@ -26,7 +26,7 @@ vi.mock('@blog/db', async () => ({
     siteConfig: { getSiteConfig: getSiteConfigMock },
     emailConfig: { getEmailConfig: getEmailConfigMock },
     emailTemplates: {
-      listEmailTemplates: listEmailTemplatesMock,
+      listEmailTemplateLogoUrls: listEmailTemplateLogoUrlsMock,
       listAuthoredEmailTemplates: listAuthoredEmailTemplatesMock,
     },
     tenants: { selectLiveLocales: selectLiveLocalesMock },
@@ -60,29 +60,11 @@ vi.mock('@platform/server/email/send-test-email-action', () => ({
 
 const tenant = makeReadyTenant();
 
-const TEMPLATE_RESULTS = [
-  {
-    tenantId: 'tenant-1',
-    templateType: EMAIL_TEMPLATE_TYPE.MAGIC_LINK,
-    subject: 'Sign in to Acme Co',
-    body: [],
-    logoAssetUrl: undefined,
-  },
-  {
-    tenantId: 'tenant-1',
-    templateType: EMAIL_TEMPLATE_TYPE.TENANT_INVITE,
-    subject: "You're invited to Acme Co",
-    body: [],
-    logoAssetUrl: undefined,
-  },
-  {
-    tenantId: 'tenant-1',
-    templateType: EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION,
-    subject: 'Confirm your subscription',
-    body: [],
-    logoAssetUrl: undefined,
-  },
-];
+const TEMPLATE_LOGO_URLS = {
+  [EMAIL_TEMPLATE_TYPE.MAGIC_LINK]: undefined,
+  [EMAIL_TEMPLATE_TYPE.TENANT_INVITE]: undefined,
+  [EMAIL_TEMPLATE_TYPE.NEWSLETTER_CONFIRMATION]: undefined,
+};
 
 const setup = customRenderAsync(EmailPageContent, { tenant });
 
@@ -90,10 +72,10 @@ describe(`<${EmailPageContent.name}/>`, () => {
   beforeEach(() => {
     getSiteConfigMock.mockReset();
     getEmailConfigMock.mockReset();
-    listEmailTemplatesMock.mockReset();
+    listEmailTemplateLogoUrlsMock.mockReset();
     getSiteConfigMock.mockResolvedValue(undefined);
     getEmailConfigMock.mockResolvedValue(undefined);
-    listEmailTemplatesMock.mockResolvedValue(TEMPLATE_RESULTS);
+    listEmailTemplateLogoUrlsMock.mockResolvedValue(TEMPLATE_LOGO_URLS);
     listAuthoredEmailTemplatesMock.mockReset();
     listAuthoredEmailTemplatesMock.mockResolvedValue([
       {

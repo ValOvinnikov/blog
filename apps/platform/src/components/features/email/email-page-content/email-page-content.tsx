@@ -1,4 +1,3 @@
-import type { TEmailTemplateType } from '@blog/config';
 import { queries } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { EmailSettings } from '@platform/components/features/email/email-settings';
@@ -10,10 +9,10 @@ export type TEmailPageContentProps = {
 };
 
 export const EmailPageContent = async ({ tenant }: TEmailPageContentProps) => {
-  const [brand, emailConfig, templates, authored] = await Promise.all([
+  const [brand, emailConfig, templateLogoUrls, authored] = await Promise.all([
     loadTenantEmailBrand(tenant.id),
     queries.emailConfig.getEmailConfig(tenant.id),
-    queries.emailTemplates.listEmailTemplates(tenant.id),
+    queries.emailTemplates.listEmailTemplateLogoUrls(tenant.id),
     queries.emailTemplates.listAuthoredEmailTemplates(tenant.id),
   ]);
 
@@ -27,12 +26,7 @@ export const EmailPageContent = async ({ tenant }: TEmailPageContentProps) => {
     },
     senderLogoUrl: emailConfig?.logoAssetUrl,
     authored,
-    templateLogoUrls: Object.fromEntries(
-      templates.map(({ templateType, logoAssetUrl }) => [
-        templateType,
-        logoAssetUrl,
-      ]),
-    ) as Record<TEmailTemplateType, string | undefined>,
+    templateLogoUrls,
     liveLocales,
   });
 
