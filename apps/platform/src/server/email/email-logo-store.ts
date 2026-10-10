@@ -1,12 +1,13 @@
 import 'server-only';
 
+import type { TMaybeUndefined } from '@blog/config';
 import { queries } from '@blog/db';
 import type { TEmailLogoTarget } from '@platform/utils/email-logo-target/email-logo-target';
 
 export const getEmailLogoUrl = async (
   tenantId: string,
   target: TEmailLogoTarget,
-): Promise<string | undefined> => {
+): Promise<TMaybeUndefined<string>> => {
   if (target.type === 'tenant') {
     const config = await queries.emailConfig.getEmailConfig(tenantId);
     return config?.logoAssetUrl;

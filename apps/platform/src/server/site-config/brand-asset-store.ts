@@ -1,5 +1,6 @@
 import 'server-only';
 
+import type { TMaybeUndefined } from '@blog/config';
 import { queries } from '@blog/db';
 import { getSiteConfigOrDefaults } from '@platform/server/site-config/site-config-or-defaults';
 import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-asset-limits';
@@ -10,7 +11,7 @@ const assetColumn = (kind: TBrandAssetKind) =>
 export const getBrandAssetUrl = async (
   tenantId: string,
   kind: TBrandAssetKind,
-): Promise<string | undefined> => {
+): Promise<TMaybeUndefined<string>> => {
   const current = await getSiteConfigOrDefaults(tenantId);
   return current[assetColumn(kind)];
 };
