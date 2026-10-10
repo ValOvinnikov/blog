@@ -20,21 +20,27 @@ describe(quickClientImageCheck, () => {
   it('rejects an unsupported MIME type', () => {
     const file = makeFile('image/gif', 1024);
 
-    expect(quickClientImageCheck(file, 'logo')).toBe(
-      'Choose a PNG, JPEG, WebP, or SVG image.',
-    );
+    expect(quickClientImageCheck(file, 'logo')).toEqual({
+      key: 'unsupportedType',
+    });
   });
 
   it('rejects a logo file over the logo size limit', () => {
     const file = makeFile('image/png', MAX_UPLOAD_BYTES.logo + 1);
 
-    expect(quickClientImageCheck(file, 'logo')).toContain('too large');
+    expect(quickClientImageCheck(file, 'logo')).toEqual({
+      key: 'tooLarge',
+      limit: '4.0 MB',
+    });
   });
 
   it("enforces the favicon's tighter size limit independently of the logo's", () => {
     const file = makeFile('image/png', MAX_UPLOAD_BYTES.favicon + 1);
 
-    expect(quickClientImageCheck(file, 'favicon')).toContain('too large');
+    expect(quickClientImageCheck(file, 'favicon')).toEqual({
+      key: 'tooLarge',
+      limit: '1.0 MB',
+    });
     expect(MAX_UPLOAD_BYTES.favicon).toBeLessThan(MAX_UPLOAD_BYTES.logo);
   });
 });

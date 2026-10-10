@@ -21,6 +21,7 @@ export type TYourSiteCardProps = {
 export const YourSiteCard = ({ tenant }: TYourSiteCardProps) => {
   const t = useTranslations('ownerHomePage');
   const tTenantsTable = useTranslations('tenantsTable');
+  const tLanguage = useTranslations('languageNames');
   const { hint } = yourSiteCardVariants();
   const openDomainLabel = t('openPublicDomainAriaLabel', {
     domain: tenant.primaryDomain,
@@ -62,7 +63,7 @@ export const YourSiteCard = ({ tenant }: TYourSiteCardProps) => {
             </StatusBadge>
           </DetailList.Row>
           <DetailList.Row label={t('localeLabel')}>
-            {tenant.locale}
+            {tLanguage(tenant.locale)}
           </DetailList.Row>
         </DetailList>
         <Text variant="hint" className={hint()}>

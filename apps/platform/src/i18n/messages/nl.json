@@ -2,10 +2,11 @@
   "pageMetadata": {
     "root": "Admin",
     "tenants": "Tenants · Admin",
-    "tenant": "Overzicht · Admin",
+    "ownerHome": "Uw site · Admin",
     "look": "Uiterlijk · Admin",
     "voice": "Toon · Admin",
     "selectTenant": "Kies een werkruimte · Admin",
+    "workspacePending": "Werkruimte niet klaar · Admin",
     "addTenant": "Tenant toevoegen · Admin",
     "tenantOverview": "Tenantoverzicht · Admin",
     "tenantProvisioning": "Inrichting · Admin",
@@ -387,12 +388,22 @@
   "brandAssetField": {
     "savesWithChanges": "Wordt opgeslagen met de wijzigingen",
     "unexpectedError": "Er is iets misgegaan. Probeer het opnieuw.",
-    "currentAlt": "Huidige {label}",
     "uploading": "Uploaden…",
-    "replace": "{label} vervangen",
-    "upload": "{label} uploaden",
     "remove": "Verwijderen",
-    "pickAgain": "Uw herstelde concept bevatte een nieuwe afbeelding ({label}) die niet bewaard kon worden — kies deze opnieuw."
+    "logo": {
+      "currentAlt": "Huidig logo",
+      "upload": "Logo uploaden",
+      "replace": "Logo vervangen",
+      "pickAgain": "Uw herstelde concept bevatte een nieuw logo dat niet bewaard kon worden — kies het opnieuw."
+    },
+    "favicon": {
+      "currentAlt": "Huidige favicon",
+      "upload": "Favicon uploaden",
+      "replace": "Favicon vervangen",
+      "pickAgain": "Uw herstelde concept bevatte een nieuwe favicon die niet bewaard kon worden — kies deze opnieuw."
+    },
+    "unsupportedType": "Kies een PNG-, JPEG-, WebP- of SVG-afbeelding.",
+    "tooLarge": "Dat bestand is te groot — de limiet is {limit}."
   },
   "emailForm": {
     "pageHeading": "E-mail",
@@ -405,7 +416,8 @@
     "senderItemDescription": "Naam, antwoordadres, postadres en logo, in elke taal hetzelfde.",
     "editingLabel": "Bewerken",
     "templateGroupLabel": "Sjabloon",
-    "allLanguagesChanges": "Alle talen"
+    "allLanguagesChanges": "Alle talen",
+    "draftFieldLabel": "{template} — {field}"
   },
   "fieldStatus": {
     "default": "Standaard",
@@ -447,13 +459,20 @@
   },
   "emailLogoField": {
     "unexpectedError": "Er is iets misgegaan. Probeer het opnieuw.",
-    "currentAlt": "Huidige {label}",
     "uploading": "Uploaden…",
-    "replace": "{label} vervangen",
-    "upload": "{label} uploaden",
     "remove": "Verwijderen",
     "unsupportedType": "Kies een PNG-, JPEG- of GIF-afbeelding — SVG en WebP worden niet ondersteund door grote e-mailprogramma's.",
-    "tooLarge": "Dat bestand is te groot — de limiet is {limit}."
+    "tooLarge": "Dat bestand is te groot — de limiet is {limit}.",
+    "SENDER": {
+      "currentAlt": "Huidig e-maillogo",
+      "upload": "E-maillogo uploaden",
+      "replace": "E-maillogo vervangen"
+    },
+    "TEMPLATE": {
+      "currentAlt": "Huidig sjabloonlogo",
+      "upload": "Sjabloonlogo uploaden",
+      "replace": "Sjabloonlogo vervangen"
+    }
   },
   "emailTemplateEditor": {
     "subjectLabel": "Onderwerp ({language})",
@@ -483,7 +502,8 @@
     "removeLink": "Link verwijderen",
     "linkUrlLabel": "Link-URL",
     "linkApply": "Toepassen",
-    "linkCancel": "Annuleren"
+    "linkCancel": "Annuleren",
+    "linkUrlPlaceholder": "https://…"
   },
   "voiceSettings": {
     "heading": "Toon",
@@ -913,5 +933,8 @@
     "savedColumn": "Opgeslagen",
     "draftColumn": "Jouw concept",
     "emptyValue": "Leeg"
+  },
+  "externalLinkButton": {
+    "newTabHint": "(opent in nieuw tabblad)"
   }
 }

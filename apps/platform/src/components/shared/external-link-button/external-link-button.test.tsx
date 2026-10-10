@@ -1,11 +1,11 @@
 import { SIZE } from '@blog/config';
-import { render, screen } from '@platform/testing/custom-render';
+import { renderWithIntl, screen } from '@platform/testing/custom-render';
 
 import { ExternalLinkButton } from './external-link-button';
 
 describe(ExternalLinkButton, () => {
   it('renders as an anchor with the given href, opening in a new tab safely', () => {
-    render(
+    renderWithIntl(
       <ExternalLinkButton href="https://acme.example.com">
         Open site
       </ExternalLinkButton>,
@@ -24,7 +24,7 @@ describe(ExternalLinkButton, () => {
     variants.forEach((variant) => {
       sizes.forEach((size) => {
         expect(() =>
-          render(
+          renderWithIntl(
             <ExternalLinkButton
               href="https://acme.example.com"
               variant={variant}
@@ -39,7 +39,7 @@ describe(ExternalLinkButton, () => {
   });
 
   it('applies the given ariaLabel as the accessible name', () => {
-    render(
+    renderWithIntl(
       <ExternalLinkButton
         href="https://acme.example.com"
         ariaLabel="Open Acme Inc.'s site"
@@ -54,7 +54,7 @@ describe(ExternalLinkButton, () => {
   });
 
   it('adds a visually-hidden "opens in new tab" hint to the accessible name when hasArrow is set', () => {
-    render(
+    renderWithIntl(
       <ExternalLinkButton href="https://acme.example.com" hasArrow={true}>
         Open site
       </ExternalLinkButton>,
@@ -66,7 +66,7 @@ describe(ExternalLinkButton, () => {
   });
 
   it('does not add the "opens in new tab" hint when hasArrow is unset', () => {
-    render(
+    renderWithIntl(
       <ExternalLinkButton href="https://acme.example.com">
         Open site
       </ExternalLinkButton>,
@@ -76,7 +76,7 @@ describe(ExternalLinkButton, () => {
   });
 
   it('applies the given title attribute alongside an icon-only ariaLabel', () => {
-    render(
+    renderWithIntl(
       <ExternalLinkButton
         href="https://acme.example.com"
         ariaLabel="Open acme.example.com in a new tab"
