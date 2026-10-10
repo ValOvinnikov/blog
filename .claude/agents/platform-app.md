@@ -293,6 +293,11 @@ page-builder and no SEO surface to justify them. What carries over:
 
 - **Pages and layouts stay clean** — no inline component definitions, no helper
   functions in `page.tsx`/`layout.tsx`. Extract everything.
+- **Constants only this app reads live in `src/constants/`**, one domain per
+  file, same UPPERCASE `as const` shape as `@blog/config`'s, imported as
+  `@platform/constants/<file>`. A const a package or the other app also reads
+  stays in `@blog/config`; one of yours moves there in the change that gives
+  it a second reader (CLAUDE.md, "Key/value-pair consts").
 - **One component per file, no exceptions.** A private sub-component with no
   consumer outside its parent still gets its own `components/<child-name>/`
   sub-folder (component + its own `*-variants.ts`, never importing the

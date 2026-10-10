@@ -150,6 +150,11 @@ When invoked, before writing any code:
 
 - **Pages and layouts must be clean.** No inline component definitions and no
   helper functions inside `page.tsx` or `layout.tsx` files. Extract everything.
+- **Constants only this app reads live in `src/constants/`**, one domain per
+  file, same UPPERCASE `as const` shape as `@blog/config`'s, imported as
+  `@web/constants/<file>`. A const a package or the other app also reads
+  stays in `@blog/config`; one of yours moves there in the change that gives
+  it a second reader (CLAUDE.md, "Key/value-pair consts").
 - **Components** live in `src/components/`, split into three subtrees:
   - `src/components/pages/` — page-level compositions: the one component a
     route's `page.tsx` (or `not-found.tsx`) renders directly to produce the
