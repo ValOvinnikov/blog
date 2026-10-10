@@ -264,6 +264,7 @@
     "pageTitle": "Domain",
     "subCopy": "Der einzige Teil der Einrichtung, den Sie selbst abschließen müssen.",
     "cardTitle": "{domain} auf uns verweisen",
+    "verifiedCardTitle": "{domain} ist verbunden",
     "checkedHint": "Gerade eben geprüft",
     "bodyCopy": "Fügen Sie diese Einträge bei Ihrem DNS-Anbieter hinzu. Die Verifizierung ist in der Regel innerhalb einer Stunde abgeschlossen.",
     "columnType": "Typ",

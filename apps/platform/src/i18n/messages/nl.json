@@ -264,6 +264,7 @@
     "pageTitle": "Domein",
     "subCopy": "Het enige onderdeel van de inrichting dat u echt zelf moet afronden.",
     "cardTitle": "Verwijs {domain} naar ons",
+    "verifiedCardTitle": "{domain} is verbonden",
     "checkedHint": "Zojuist gecontroleerd",
     "bodyCopy": "Voeg deze records toe bij uw DNS-provider. Verificatie is meestal binnen een uur voltooid.",
     "columnType": "Type",
