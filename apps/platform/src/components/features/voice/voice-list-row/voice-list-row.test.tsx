@@ -18,7 +18,6 @@ const setup = (overrides: Partial<ComponentProps<typeof VoiceListRow>> = {}) =>
         locale="EN"
         value={null}
         savedValue={null}
-        hasError={false}
         isOpen={false}
         {...overrides}
       >
@@ -43,6 +42,28 @@ describe(`<${VoiceListRow.name}/>`, () => {
     const row = screen.getByRole('button', { name: /Tag page/ });
     expect(row).toHaveTextContent('Nothing tagged {name}.');
     expect(row).toHaveTextContent('UnsavedCustomised');
+  });
+
+  it('describes a closed list with its error in text', () => {
+    setup({ error: 'Missing required placeholder {name}.' });
+
+    expect(
+      screen.getByRole('button', { name: /Tag page/ }),
+    ).toHaveAccessibleDescription('Missing required placeholder {name}.');
+    expect(
+      screen.getByText('Missing required placeholder {name}.'),
+    ).toBeVisible();
+  });
+
+  it('leaves the error to the open editor', () => {
+    setup({ isOpen: true, error: 'Missing required placeholder {name}.' });
+
+    expect(
+      screen.getByRole('button', { name: /Tag page/ }),
+    ).not.toHaveAccessibleDescription();
+    expect(
+      screen.queryByText('Missing required placeholder {name}.'),
+    ).not.toBeInTheDocument();
   });
 
   it('trades the summary for its editor when open', () => {
