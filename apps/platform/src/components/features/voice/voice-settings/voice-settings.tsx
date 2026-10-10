@@ -4,24 +4,23 @@ import {
   ALERT_TYPE,
   VOICE_FIELDS,
   VOICE_SURFACE,
-  type TFontChoice,
   type TVoiceFieldId,
 } from '@blog/config';
 import type { TLocaleIsoCode } from '@blog/config/constants';
 import type { TVoiceOverridesByLocaleInput } from '@blog/db/queries/site-config';
-import type { TSaveVoiceOverridesResult } from '@platform/components/features/voice/voice-page-content/save-voice-overrides-action';
 import { VoiceSurfaceCard } from '@platform/components/features/voice/voice-surface-card';
 import { Alert } from '@platform/components/shared/alert';
 import { LanguagePicker } from '@platform/components/shared/language-picker';
-import { SegmentedControl } from '@platform/components/shared/segmented-control';
+import { PreviewModeControl } from '@platform/components/shared/preview-mode-control';
 import { SettingsFormShell } from '@platform/components/shared/settings-form-shell';
-import { FONT_OPTIONS } from '@platform/config/fonts';
 import { useToast } from '@platform/context/toast-provider';
+import type { TSaveVoiceOverridesResult } from '@platform/server/site-config/save-voice-overrides-action';
 import {
-  buildThemePreviewStyle,
-  type TThemePreviewValues,
+  buildSitePreviewTheme,
+  type TSitePreviewThemeValues,
 } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import { useFormSubmission } from '@platform/utils/use-form-submission/use-form-submission';
+import { usePreviewColorScheme } from '@platform/utils/use-preview-color-scheme/use-preview-color-scheme';
 import {
   countCustomisedVoiceFields,
   countLanguageVoiceChanges,
@@ -44,19 +43,12 @@ import { useId, useState } from 'react';
 
 import { voiceSettingsVariants } from './voice-settings-variants';
 
-type TPreviewMode = 'light' | 'dark';
-
-type TVoicePreviewTheme = TThemePreviewValues & {
-  headingFont: TFontChoice;
-  bodyFont: TFontChoice;
-};
-
 export type TVoiceSettingsProps = {
   tenantId: string;
   initialDraft: TVoiceDraft;
   defaultLocale: TLocaleIsoCode;
   liveLocales: TLocaleIsoCode[];
-  previewTheme: TVoicePreviewTheme;
+  previewTheme: TSitePreviewThemeValues;
   saveAction: (
     tenantId: string,
     overridesByLocale: TVoiceOverridesByLocaleInput,
@@ -87,7 +79,6 @@ export const VoiceSettings = ({
   const tSurfaces = useTranslations('voiceSurfaces');
   const tLabels = useTranslations('voiceFieldLabels');
   const tLanguage = useTranslations('languageNames');
-  const tPreview = useTranslations('lookPreview');
   const toast = useToast();
   const router = useRouter();
   const archivedNoticeId = useId();
@@ -100,7 +91,7 @@ export const VoiceSettings = ({
   >('blogListEmpty');
   const [fieldErrors, setFieldErrors] = useState<TVoiceFieldErrorsByLocale>({});
   const [revision, setRevision] = useState(0);
-  const [previewMode, setPreviewMode] = useState<TPreviewMode>('light');
+  const { mode, setMode, isDark } = usePreviewColorScheme();
 
   const revealFirstError = (errors: TVoiceFieldErrorsByLocale) => {
     const locale =
@@ -144,13 +135,7 @@ export const VoiceSettings = ({
     });
 
   const { intro, controls, languageEmphasis, cards } = voiceSettingsVariants();
-  const isDark = previewMode === 'dark';
-  const specimenTheme = {
-    tokenStyle: buildThemePreviewStyle(previewTheme, isDark),
-    isDark,
-    headingFontFamily: FONT_OPTIONS[previewTheme.headingFont].fontFamily,
-    bodyFontFamily: FONT_OPTIONS[previewTheme.bodyFont].fontFamily,
-  };
+  const specimenTheme = buildSitePreviewTheme(previewTheme, isDark);
   const languageName = tLanguage(selectedLocale);
   const draftValues = localeDraftOf(values, selectedLocale);
   const savedValues = localeDraftOf(saved, selectedLocale);
@@ -248,15 +233,7 @@ export const VoiceSettings = ({
     >
       <div className={intro()}>
         <div className={controls()}>
-          <SegmentedControl
-            options={[
-              { value: 'light', label: tPreview('modeLight') },
-              { value: 'dark', label: tPreview('modeDark') },
-            ]}
-            value={previewMode}
-            onChange={setPreviewMode}
-            ariaLabel={tPreview('previewColorSchemeAriaLabel')}
-          />
+          <PreviewModeControl value={mode} onChange={setMode} />
         </div>
         <Alert
           type={ALERT_TYPE.INFO}

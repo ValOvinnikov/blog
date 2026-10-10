@@ -18,6 +18,14 @@ const setup = customRender(EmailSenderEditor, {
 });
 
 describe(`<${EmailSenderEditor.name}/>`, () => {
+  it('is titled like the item that opens it', () => {
+    setup();
+
+    expect(
+      screen.getByRole('heading', { name: 'Sender & footer' }),
+    ).toBeVisible();
+  });
+
   it('reports an edited field with the rest of the sender unchanged', async () => {
     const onSenderChange = vi.fn();
     setup({ onSenderChange });

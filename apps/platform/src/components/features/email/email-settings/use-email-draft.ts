@@ -17,6 +17,7 @@ import {
   type TEmailDraft,
 } from '@platform/utils/email-draft/email-draft';
 import type { TEmailLogoTarget } from '@platform/utils/email-logo-target/email-logo-target';
+import { persistStagedImage } from '@platform/utils/staged-image/staged-image';
 import { useFormSubmission } from '@platform/utils/use-form-submission/use-form-submission';
 import { useState } from 'react';
 
@@ -60,28 +61,16 @@ export const useEmailDraft = ({
           target === EMAIL_SENDER_ITEM
             ? draft.senderLogo
             : draft.templateLogos[target];
-        let url: string | undefined;
+        const logoTarget = toLogoTarget(target);
+        const result = await persistStagedImage(logo, {
+          upload: (formData) =>
+            uploadEmailLogoAction(tenantId, logoTarget, formData),
+          clear: () => clearEmailLogoAction(tenantId, logoTarget),
+        });
+        if (!result.ok) return finish(false);
 
-        if (logo.file) {
-          const formData = new FormData();
-          formData.append('file', logo.file);
-          const result = await uploadEmailLogoAction(
-            tenantId,
-            toLogoTarget(target),
-            formData,
-          );
-          if (!result.ok) return finish(false);
-          url = result.url;
-        } else {
-          const result = await clearEmailLogoAction(
-            tenantId,
-            toLogoTarget(target),
-          );
-          if (!result.ok) return finish(false);
-        }
-
-        nextSaved = withLogo(nextSaved, target, { url });
-        nextDraft = withLogo(nextDraft, target, { url });
+        nextSaved = withLogo(nextSaved, target, result.image);
+        nextDraft = withLogo(nextDraft, target, result.image);
       }
 
       if (isSenderChanged(saved, draft)) {

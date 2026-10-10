@@ -28,13 +28,6 @@ vi.mock(
   }),
 );
 
-vi.mock(
-  '@platform/server/provisioning/get-domain-verification-status-action',
-  () => ({
-    getDomainVerificationStatusAction: vi.fn(),
-  }),
-);
-
 const setup = customRenderAsync(TenantProvisioningPage, {
   params: Promise.resolve({ tenantId: 'tenant-1' }),
 });

@@ -21,13 +21,6 @@ vi.mock(
   }),
 );
 
-vi.mock(
-  '@platform/server/provisioning/get-domain-verification-status-action',
-  () => ({
-    getDomainVerificationStatusAction: vi.fn(),
-  }),
-);
-
 const idleStepStatuses = () =>
   Array(6).fill(TENANT_PROVISIONING_STEP_STATUS.IDLE);
 

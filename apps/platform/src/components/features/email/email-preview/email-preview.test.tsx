@@ -1,3 +1,4 @@
+import { PREVIEW_WIDTH } from '@platform/constants/preview';
 import { customRender, screen } from '@platform/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -39,11 +40,11 @@ describe(`<${EmailPreview.name}/>`, () => {
   it('switches the preview between desktop and mobile widths', async () => {
     setup();
     const frame = screen.getByTitle('Email preview');
-    expect(frame).toHaveAttribute('data-width', 'desktop');
+    expect(frame).toHaveAttribute('data-width', PREVIEW_WIDTH.DESKTOP);
 
     await user.click(screen.getByRole('button', { name: 'Mobile' }));
 
-    expect(frame).toHaveAttribute('data-width', 'mobile');
+    expect(frame).toHaveAttribute('data-width', PREVIEW_WIDTH.MOBILE);
   });
 
   it('sends a test on request', async () => {

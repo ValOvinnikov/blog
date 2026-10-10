@@ -1,6 +1,6 @@
 import type { TDomainVerificationStatus } from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { DomainCard } from '@platform/components/features/tenants/domain-card';
+import { DomainCardSkeleton } from '@platform/components/features/tenants/domain-card-skeleton';
 import { OwnerCard } from '@platform/components/features/tenants/owner-card';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { ExternalLinkButton } from '@platform/components/shared/external-link-button';
@@ -9,28 +9,21 @@ import { StatusBadge } from '@platform/components/shared/status-badge';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { tenantStatusTone } from '@platform/utils/status-tone/status-tone';
 import { useTranslations } from 'next-intl';
+import { Suspense } from 'react';
 
 import { MakeItYoursCard } from './components/make-it-yours-card/make-it-yours-card';
+import { StreamedDomainCard } from './components/streamed-domain-card/streamed-domain-card';
 import { YourSiteCard } from './components/your-site-card/your-site-card';
 import { ownerHomeViewVariants } from './owner-home-view-variants';
 
 export type TOwnerHomeViewProps = {
   tenant: TTenant;
-  domainVerificationStatus: TDomainVerificationStatus;
+  domainVerificationStatus: Promise<TDomainVerificationStatus>;
   ownerEmail: string | undefined;
   ownerJoinedAt: string | undefined;
   ownerJoinedAtIso: string | undefined;
 };
 
-/**
- * The owner-facing counterpart to `TenantOverviewView`: the same site-facts
- * cards (Domain, Owner), but a read-only identity card in place of the
- * editable details panel, no provisioning/platform cards, and a "Make it
- * yours" row routing on to Look, Voice and Features. Rendered on
- * `/dashboard` regardless of whether the viewer is a real `OWNER` member or
- * a platform SUPERADMIN browsing via their virtual membership — either way,
- * this is the owner tree's content.
- */
 export const OwnerHomeView = ({
   tenant,
   domainVerificationStatus,
@@ -75,11 +68,13 @@ export const OwnerHomeView = ({
       <YourSiteCard tenant={tenant} />
 
       <div className={cardsStack()}>
-        <DomainCard
-          tenant={tenant}
-          domainVerificationStatus={domainVerificationStatus}
-          dnsHref={adminRoutes.dashboardDomain()}
-        />
+        <Suspense fallback={<DomainCardSkeleton />}>
+          <StreamedDomainCard
+            tenant={tenant}
+            domainVerificationStatus={domainVerificationStatus}
+            dnsHref={adminRoutes.dashboardDomain()}
+          />
+        </Suspense>
         <OwnerCard
           ownerEmail={ownerEmail}
           ownerJoinedAt={ownerJoinedAt}

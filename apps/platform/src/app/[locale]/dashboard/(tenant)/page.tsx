@@ -14,13 +14,14 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function DashboardOverviewPage() {
   const { tenant } = await resolveDashboardTenant();
 
-  const [domainVerificationStatus, ownerEmail, ownerMembership, locale] =
-    await Promise.all([
-      getDomainVerificationStatus(tenant.primaryDomain),
-      queries.memberships.getTenantOwnerEmail(tenant.id),
-      queries.memberships.getTenantOwnerMembership(tenant.id),
-      getLocale(),
-    ]);
+  const domainVerificationStatus = getDomainVerificationStatus(
+    tenant.primaryDomain,
+  );
+  const [ownerEmail, ownerMembership, locale] = await Promise.all([
+    queries.memberships.getTenantOwnerEmail(tenant.id),
+    queries.memberships.getTenantOwnerMembership(tenant.id),
+    getLocale(),
+  ]);
 
   return (
     <OwnerHomeView

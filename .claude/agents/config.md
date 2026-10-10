@@ -137,7 +137,10 @@ When invoked, before writing any code:
 ## Conventions
 
 - **Constants**: both key and value UPPERCASE, `as const`, one domain per
-  file under `constants/`. The uppercase value is the stored/serialized value
+  file under `constants/`. A const only one app reads lives in that app's
+  `src/constants/` instead, and a storage layer's own vocabulary with that
+  layer (CLAUDE.md, "Key/value-pair consts"); one moves here in the change
+  that gives it a second reader. The uppercase value is the stored/serialized value
   — CMS schema `options.list` and migrations reference the same constant, so
   a rename here is a cross-layer change (check `packages/studio` and `service` for
   usages with Grep before renaming a value).

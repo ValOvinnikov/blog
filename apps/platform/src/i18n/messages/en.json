@@ -356,11 +356,13 @@
     "brandImagePicked": "New image, not uploaded yet",
     "brandImageUnchanged": "No new image"
   },
-  "lookPreview": {
+  "previewModeControl": {
     "modeLight": "Light",
     "modeDark": "Dark",
-    "previewColorSchemeAriaLabel": "Preview colour scheme",
     "livePreviewHeading": "Live preview",
+    "previewColorSchemeAriaLabel": "Preview colour scheme"
+  },
+  "lookPreview": {
     "sampleHeading": "Reading the tide charts",
     "samplePara": "A short dispatch to show heading and body type, accent, logo tones, and radius together.",
     "subscribeButton": "Subscribe",
@@ -400,7 +402,8 @@
     "senderItemLabel": "Sender & footer",
     "senderItemDescription": "Name, reply-to, address and logo, the same in every language.",
     "editingLabel": "Editing",
-    "templateGroupLabel": "Template"
+    "templateGroupLabel": "Template",
+    "allLanguagesChanges": "All languages"
   },
   "fieldStatus": {
     "default": "Default",
@@ -430,8 +433,6 @@
     "unsavedLogoNote": "A logo you haven't saved yet isn't included in the test."
   },
   "emailSettingsForm": {
-    "heading": "Email settings",
-    "description": "Applies to every email your site sends. Leave a field blank to use the default.",
     "senderNameLabel": "Sender name",
     "senderNameHint": "The display name on the From address — unrelated to the site title.",
     "senderNameInvalidError": "This is the name recipients see, not an email address. Enter a name such as Acme Co, without < > \" , ; or @.",
@@ -493,7 +494,8 @@
     "alertSuccess": "Voice saved.",
     "alertError": "Couldn't save — try again.",
     "keepPlaceholder": "Keep <code>{token}</code> — the site fills it in.",
-    "draftFieldLabel": "{surface} — {field} ({language})"
+    "draftFieldLabel": "{surface} — {field} ({language})",
+    "listRoute": "Shown at {path}"
   },
   "voiceSurfaces": {
     "NOT_FOUND": "Page not found",
@@ -545,11 +547,11 @@
     }
   },
   "voiceFieldLabels": {
-    "blogListEmpty": "Blog index",
+    "blogListEmpty": "Blog index page",
     "topicEmpty": "Topic page",
     "tagEmpty": "Tag page",
-    "topicsEmpty": "Topics index",
-    "tagsEmpty": "Tags index",
+    "topicsEmpty": "Topics index page",
+    "tagsEmpty": "Tags index page",
     "notFoundEyebrow": "Eyebrow",
     "notFoundHeading": "Heading",
     "notFoundSupportingText": "Supporting text",
@@ -558,11 +560,11 @@
     "bookmarksEmpty": "Empty bookmarks"
   },
   "voiceFieldHints": {
-    "blogListEmpty": "The blog index, before anything is published",
+    "blogListEmpty": "Before anything is published",
     "topicEmpty": "A topic with no posts yet",
     "tagEmpty": "A tag with no posts yet",
-    "topicsEmpty": "The topics index, before any topic exists",
-    "tagsEmpty": "The tags index, before any tag exists",
+    "topicsEmpty": "Before any topic exists",
+    "tagsEmpty": "Before any tag exists",
     "notFoundEyebrow": "Small label above the heading",
     "notFoundHeading": "Also the browser tab title",
     "notFoundSupportingText": "Below the heading",

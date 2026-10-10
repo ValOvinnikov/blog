@@ -33,7 +33,7 @@ describe(`<${VoiceListRow.name}/>`, () => {
 
     const row = screen.getByRole('button', { name: /Tag page/ });
     expect(row).toHaveAttribute('aria-expanded', 'false');
-    expect(row).toHaveTextContent('/tags/…');
+    expect(row).toHaveTextContent('Shown at /tags/…');
     expect(row).toHaveTextContent('Default');
   });
 

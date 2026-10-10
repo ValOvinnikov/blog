@@ -356,11 +356,13 @@
     "brandImagePicked": "Nieuwe afbeelding, nog niet geüpload",
     "brandImageUnchanged": "Geen nieuwe afbeelding"
   },
-  "lookPreview": {
+  "previewModeControl": {
     "modeLight": "Licht",
     "modeDark": "Donker",
-    "previewColorSchemeAriaLabel": "Kleurenschema van voorbeeld",
     "livePreviewHeading": "Live voorbeeld",
+    "previewColorSchemeAriaLabel": "Kleurenschema van voorbeeld"
+  },
+  "lookPreview": {
     "sampleHeading": "De getijdentabellen lezen",
     "samplePara": "Een kort bericht om kop- en tekstletter, accent, logotinten en afronding samen te tonen.",
     "subscribeButton": "Abonneren",
@@ -400,7 +402,8 @@
     "senderItemLabel": "Afzender en voettekst",
     "senderItemDescription": "Naam, antwoordadres, postadres en logo, in elke taal hetzelfde.",
     "editingLabel": "Bewerken",
-    "templateGroupLabel": "Sjabloon"
+    "templateGroupLabel": "Sjabloon",
+    "allLanguagesChanges": "Alle talen"
   },
   "fieldStatus": {
     "default": "Standaard",
@@ -430,8 +433,6 @@
     "unsavedLogoNote": "Een logo dat je nog niet hebt opgeslagen, zit niet in de test."
   },
   "emailSettingsForm": {
-    "heading": "E-mailinstellingen",
-    "description": "Geldt voor elke e-mail die je site verstuurt. Laat een veld leeg om de standaardwaarde te gebruiken.",
     "senderNameLabel": "Naam afzender",
     "senderNameHint": "De weergavenaam bij het Van-adres — staat los van de sitetitel.",
     "senderNameInvalidError": "Dit is de naam die ontvangers zien, geen e-mailadres. Vul een naam in zoals Acme Co, zonder < > \" , ; of @.",
@@ -493,7 +494,8 @@
     "alertSuccess": "Toon opgeslagen.",
     "alertError": "Opslaan mislukt. Probeer het opnieuw.",
     "keepPlaceholder": "Laat <code>{token}</code> staan — de site vult het in.",
-    "draftFieldLabel": "{surface} — {field} ({language})"
+    "draftFieldLabel": "{surface} — {field} ({language})",
+    "listRoute": "Getoond op {path}"
   },
   "voiceSurfaces": {
     "NOT_FOUND": "Pagina niet gevonden",
@@ -545,11 +547,11 @@
     }
   },
   "voiceFieldLabels": {
-    "blogListEmpty": "Blogoverzicht",
+    "blogListEmpty": "Blogoverzichtspagina",
     "topicEmpty": "Onderwerppagina",
     "tagEmpty": "Tagpagina",
-    "topicsEmpty": "Onderwerpenoverzicht",
-    "tagsEmpty": "Tagoverzicht",
+    "topicsEmpty": "Onderwerpenoverzichtspagina",
+    "tagsEmpty": "Tagoverzichtspagina",
     "notFoundEyebrow": "Bovenregel",
     "notFoundHeading": "Kop",
     "notFoundSupportingText": "Begeleidende tekst",
@@ -558,11 +560,11 @@
     "bookmarksEmpty": "Lege bladwijzers"
   },
   "voiceFieldHints": {
-    "blogListEmpty": "Het blogoverzicht, voordat er iets is gepubliceerd",
+    "blogListEmpty": "Voordat er iets is gepubliceerd",
     "topicEmpty": "Een onderwerp zonder berichten",
     "tagEmpty": "Een tag zonder berichten",
-    "topicsEmpty": "Het onderwerpenoverzicht, voordat er onderwerpen zijn",
-    "tagsEmpty": "Het tagoverzicht, voordat er tags zijn",
+    "topicsEmpty": "Voordat er onderwerpen zijn",
+    "tagsEmpty": "Voordat er tags zijn",
     "notFoundEyebrow": "Klein label boven de kop",
     "notFoundHeading": "Ook de titel van het browsertabblad",
     "notFoundSupportingText": "Onder de kop",

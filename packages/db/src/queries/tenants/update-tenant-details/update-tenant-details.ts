@@ -1,9 +1,7 @@
 import type { TLocaleIsoCode } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import {
-  CORE_PROVISIONING_STEPS,
   MEMBERSHIP_ROLE,
-  TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   type TTenantPlan,
@@ -14,6 +12,7 @@ import { membershipInvites } from '@blog/db/schema/membership-invites';
 import { memberships } from '@blog/db/schema/memberships';
 import { tenantDomains } from '@blog/db/schema/tenant-domains';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
+import { deriveProvisioningState } from '@blog/db/utils/derive-provisioning-state/derive-provisioning-state';
 import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
 import { normalizeEmail } from '@blog/db/utils/normalize-email/normalize-email';
 import { normalizeLocaleCode } from '@blog/db/utils/normalize-locale-code/normalize-locale-code';
@@ -55,53 +54,6 @@ export type TUpdateTenantDetailsResult =
   | { outcome: 'provisioning-started' }
   | { outcome: 'owner-already-joined' }
   | { outcome: 'owner-email-taken' };
-
-// A retry re-runs `run.ts` from `STEPS[0]`, so a stale FAILED entry can
-// sit alongside DONE entries for later-indexed steps left over from a prior
-// run — this only classifies the tenant as FAILED vs RUNNING/SUCCEEDED;
-// which field is actually locked is decided per-step in `lockedFieldOutcome`,
-// never by position in the sequence.
-type TProvisioningState = 'IDLE' | 'RUNNING' | 'FAILED' | 'SUCCEEDED';
-
-function deriveProvisioningState(
-  provisioningStatus: TTenant['provisioningStatus'],
-  steps: TTenant['provisioningSteps'],
-): TProvisioningState {
-  if (provisioningStatus === TENANT_PROVISIONING_STATUS.PROVISIONING) {
-    return 'RUNNING';
-  }
-
-  const stepStates = CORE_PROVISIONING_STEPS.map(
-    (step) => steps?.[step],
-  ).filter((state) => state !== undefined);
-
-  if (
-    stepStates.length === 0 ||
-    stepStates.every(
-      (step) => step.status === TENANT_PROVISIONING_STEP_STATUS.IDLE,
-    )
-  ) {
-    return 'IDLE';
-  }
-
-  if (
-    stepStates.some(
-      (step) => step.status === TENANT_PROVISIONING_STEP_STATUS.FAILED,
-    )
-  ) {
-    return 'FAILED';
-  }
-
-  if (
-    stepStates.every(
-      (step) => step.status === TENANT_PROVISIONING_STEP_STATUS.DONE,
-    )
-  ) {
-    return 'SUCCEEDED';
-  }
-
-  return 'RUNNING';
-}
 
 // Only primaryDomain (`MAP_DOMAIN`) gets baked into an external resource by
 // a completed step; name/plan/locale never lock.

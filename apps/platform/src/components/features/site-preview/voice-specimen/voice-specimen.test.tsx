@@ -3,24 +3,17 @@ import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import de from '@platform/i18n/messages/de.json';
 import en from '@platform/i18n/messages/en.json';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import { SITE_PREVIEW_THEME } from '@platform/testing/site-preview-theme';
 import {
   buildVoiceDraft,
   withVoiceValue,
 } from '@platform/utils/voice-draft/voice-draft';
-import type { CSSProperties } from 'react';
 
 import { VoiceSpecimen } from './voice-specimen';
 
 const { EN, DE } = LOCALE_ISO_CODES;
 
 const render = renderWithIntl;
-
-const THEME = {
-  tokenStyle: { '--brand-primary': 'oklch(0.53 0.17 28)' } as CSSProperties,
-  isDark: false,
-  headingFontFamily: 'mock-heading-font',
-  bodyFontFamily: 'mock-body-font',
-};
 
 const defaults = buildVoiceDraft({}, [EN, DE]);
 
@@ -44,7 +37,7 @@ describe(VoiceSpecimen, () => {
         locale={EN}
         values={valuesFor(EN)}
         listSamples={en.voiceSpecimen.lists}
-        theme={THEME}
+        theme={SITE_PREVIEW_THEME}
       />,
     );
 
@@ -64,7 +57,7 @@ describe(VoiceSpecimen, () => {
         locale={EN}
         values={valuesFor(EN, { notFoundHeading: 'Lost at sea' })}
         listSamples={en.voiceSpecimen.lists}
-        theme={THEME}
+        theme={SITE_PREVIEW_THEME}
       />,
     );
 
@@ -81,7 +74,7 @@ describe(VoiceSpecimen, () => {
         locale={DE}
         values={valuesFor(DE)}
         listSamples={de.voiceSpecimen.lists}
-        theme={THEME}
+        theme={SITE_PREVIEW_THEME}
       />,
     );
 
@@ -103,7 +96,7 @@ describe(VoiceSpecimen, () => {
         values={valuesFor(EN)}
         listSamples={en.voiceSpecimen.lists}
         openListFieldId="topicEmpty"
-        theme={THEME}
+        theme={SITE_PREVIEW_THEME}
       />,
     );
 
@@ -120,7 +113,7 @@ describe(VoiceSpecimen, () => {
         locale={EN}
         values={valuesFor(EN)}
         listSamples={en.voiceSpecimen.lists}
-        theme={THEME}
+        theme={SITE_PREVIEW_THEME}
       />,
     );
 
@@ -138,7 +131,7 @@ describe(VoiceSpecimen, () => {
         values={valuesFor(EN)}
         listSamples={en.voiceSpecimen.lists}
         focusedFieldId="notFoundHeading"
-        theme={THEME}
+        theme={SITE_PREVIEW_THEME}
       />,
     );
 
@@ -158,7 +151,7 @@ describe(VoiceSpecimen, () => {
         locale={EN}
         values={valuesFor(EN)}
         listSamples={en.voiceSpecimen.lists}
-        theme={THEME}
+        theme={SITE_PREVIEW_THEME}
       />,
     );
 

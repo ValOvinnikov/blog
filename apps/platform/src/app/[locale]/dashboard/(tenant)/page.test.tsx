@@ -105,4 +105,25 @@ describe(`<${DashboardOverviewPage.name}/>`, () => {
     ).toBeVisible();
     expect(redirect).not.toHaveBeenCalled();
   });
+
+  it('renders the owner home without waiting for the Vercel domain status', async () => {
+    authMock.mockResolvedValue({ user: { id: 'user-1' } });
+    listMembershipsForUserMock.mockResolvedValue([
+      { id: 'm-1', userId: 'user-1', tenantId: 'tenant-1', role: 'OWNER' },
+    ]);
+    listTenantsByIdsMock.mockResolvedValue([
+      makeTenant({ id: 'tenant-1', name: 'Acme Inc.' }),
+    ]);
+    getDomainVerificationStatusMock.mockReturnValue(new Promise(() => {}));
+
+    await setup();
+
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Acme Inc.' }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Owner' }),
+    ).toBeVisible();
+    expect(screen.getAllByTestId('skeleton').length).toBeGreaterThan(0);
+  });
 });

@@ -356,11 +356,13 @@
     "brandImagePicked": "Nouvelle image, pas encore importée",
     "brandImageUnchanged": "Aucune nouvelle image"
   },
-  "lookPreview": {
+  "previewModeControl": {
     "modeLight": "Clair",
     "modeDark": "Sombre",
-    "previewColorSchemeAriaLabel": "Jeu de couleurs de l'aperçu",
     "livePreviewHeading": "Aperçu en direct",
+    "previewColorSchemeAriaLabel": "Jeu de couleurs de l'aperçu"
+  },
+  "lookPreview": {
     "sampleHeading": "Lire les tables des marées",
     "samplePara": "Une courte chronique pour montrer ensemble la typographie des titres et du texte, l'accent, les nuances du logo et l'arrondi.",
     "subscribeButton": "S'abonner",
@@ -400,7 +402,8 @@
     "senderItemLabel": "Expéditeur et pied de page",
     "senderItemDescription": "Nom, adresse de réponse, adresse postale et logo, identiques dans toutes les langues.",
     "editingLabel": "Modification",
-    "templateGroupLabel": "Modèle"
+    "templateGroupLabel": "Modèle",
+    "allLanguagesChanges": "Toutes les langues"
   },
   "fieldStatus": {
     "default": "Par défaut",
@@ -430,8 +433,6 @@
     "unsavedLogoNote": "Un logo non encore enregistré n'est pas inclus dans le test."
   },
   "emailSettingsForm": {
-    "heading": "Paramètres d'e-mail",
-    "description": "S'applique à tous les e-mails envoyés par votre site. Laissez un champ vide pour utiliser la valeur par défaut.",
     "senderNameLabel": "Nom de l'expéditeur",
     "senderNameHint": "Le nom affiché dans l'adresse d'expédition — indépendant du titre du site.",
     "senderNameInvalidError": "C'est le nom que voient les destinataires, pas une adresse e-mail. Saisissez un nom comme Acme Co, sans < > \" , ; ni @.",
@@ -493,7 +494,8 @@
     "alertSuccess": "Voix enregistrée.",
     "alertError": "Impossible d'enregistrer — veuillez réessayer.",
     "keepPlaceholder": "Conservez <code>{token}</code> — le site le remplit.",
-    "draftFieldLabel": "{surface} — {field} ({language})"
+    "draftFieldLabel": "{surface} — {field} ({language})",
+    "listRoute": "Affichée sur {path}"
   },
   "voiceSurfaces": {
     "NOT_FOUND": "Page introuvable",
@@ -545,11 +547,11 @@
     }
   },
   "voiceFieldLabels": {
-    "blogListEmpty": "Index du blog",
+    "blogListEmpty": "Page d'index du blog",
     "topicEmpty": "Page de thème",
     "tagEmpty": "Page d'étiquette",
-    "topicsEmpty": "Index des thèmes",
-    "tagsEmpty": "Index des étiquettes",
+    "topicsEmpty": "Page d'index des thèmes",
+    "tagsEmpty": "Page d'index des étiquettes",
     "notFoundEyebrow": "Surtitre",
     "notFoundHeading": "Titre",
     "notFoundSupportingText": "Texte d'accompagnement",
@@ -558,11 +560,11 @@
     "bookmarksEmpty": "Favoris vides"
   },
   "voiceFieldHints": {
-    "blogListEmpty": "L'index du blog, avant toute publication",
+    "blogListEmpty": "Avant toute publication",
     "topicEmpty": "Un thème sans article pour l'instant",
     "tagEmpty": "Une étiquette sans article pour l'instant",
-    "topicsEmpty": "L'index des thèmes, avant qu'un thème existe",
-    "tagsEmpty": "L'index des étiquettes, avant qu'une étiquette existe",
+    "topicsEmpty": "Avant qu'un thème existe",
+    "tagsEmpty": "Avant qu'une étiquette existe",
     "notFoundEyebrow": "Petit libellé au-dessus du titre",
     "notFoundHeading": "Aussi le titre de l'onglet du navigateur",
     "notFoundSupportingText": "Sous le titre",

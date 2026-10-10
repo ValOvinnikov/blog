@@ -1,18 +1,20 @@
-import {
-  LOCALE_ISO_CODES,
-  PRESET_ID,
-  PRESET_REGISTRY,
-} from '@blog/config/constants';
+import { LOCALE_ISO_CODES, PRESET_ID } from '@blog/config/constants';
+import type { TVoiceOverridesByLocaleInput } from '@blog/db/queries/site-config';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 
 import { saveVoiceOverridesAction } from './save-voice-overrides-action';
 
-const { getSiteConfigMock, upsertSiteConfigMock, revalidateSiteConfigMock } =
-  vi.hoisted(() => ({
-    getSiteConfigMock: vi.fn(),
-    upsertSiteConfigMock: vi.fn(),
-    revalidateSiteConfigMock: vi.fn(),
-  }));
+const {
+  getSiteConfigOrDefaultsMock,
+  upsertSiteConfigMock,
+  revalidateSiteConfigMock,
+  loggerErrorMock,
+} = vi.hoisted(() => ({
+  getSiteConfigOrDefaultsMock: vi.fn(),
+  upsertSiteConfigMock: vi.fn(),
+  revalidateSiteConfigMock: vi.fn(),
+  loggerErrorMock: vi.fn(),
+}));
 
 vi.mock('@platform/server/auth/require-tenant-membership');
 
@@ -20,12 +22,17 @@ vi.mock('@platform/server/site-config/revalidate-site-config', () => ({
   revalidateSiteConfig: revalidateSiteConfigMock,
 }));
 
+vi.mock('@platform/server/site-config/site-config-or-defaults', () => ({
+  getSiteConfigOrDefaults: getSiteConfigOrDefaultsMock,
+}));
+
+vi.mock('@platform/utils/logger/logger', () => ({
+  logger: { error: loggerErrorMock },
+}));
+
 vi.mock('@blog/db', () => ({
   queries: {
-    siteConfig: {
-      getSiteConfig: getSiteConfigMock,
-      upsertSiteConfig: upsertSiteConfigMock,
-    },
+    siteConfig: { upsertSiteConfig: upsertSiteConfigMock },
   },
 }));
 
@@ -42,14 +49,28 @@ const overridesByLocale = {
   [LOCALE_ISO_CODES.DE]: { ...overrides, notFoundHeading: 'Nicht gefunden' },
 };
 
+const savedTheme = {
+  preset: PRESET_ID.EDITORIAL,
+  accentHue: 28,
+  headingFont: 'FRAUNCES',
+  bodyFont: 'INTER',
+  radiusScale: 'SM',
+  density: 'COMPACT',
+};
+
 describe(saveVoiceOverridesAction, () => {
   beforeEach(() => {
     requireTenantMembershipMock.mockReset();
-    getSiteConfigMock.mockReset();
+    getSiteConfigOrDefaultsMock.mockReset();
     upsertSiteConfigMock.mockReset();
     revalidateSiteConfigMock.mockReset();
+    loggerErrorMock.mockReset();
     revalidateSiteConfigMock.mockResolvedValue(undefined);
-    getSiteConfigMock.mockResolvedValue(undefined);
+    getSiteConfigOrDefaultsMock.mockResolvedValue({
+      ...savedTheme,
+      logoAssetUrl: 'https://blob.example.com/logo.png',
+      faviconAssetUrl: 'https://blob.example.com/favicon.png',
+    });
     upsertSiteConfigMock.mockResolvedValue({ ok: true });
     requireTenantMembershipMock.mockResolvedValue({
       tenant,
@@ -61,63 +82,43 @@ describe(saveVoiceOverridesAction, () => {
     await saveVoiceOverridesAction('tenant-1', overridesByLocale);
 
     expect(requireTenantMembershipMock).toHaveBeenCalledWith('tenant-1');
-    expect(getSiteConfigMock).toHaveBeenCalledWith('tenant-1');
+    expect(getSiteConfigOrDefaultsMock).toHaveBeenCalledWith('tenant-1');
     expect(upsertSiteConfigMock).toHaveBeenCalledWith(
       'tenant-1',
       expect.objectContaining({ voiceOverridesByLocale: overridesByLocale }),
     );
   });
 
-  it('falls back to CONSOLE preset defaults when the tenant has no site_config row', async () => {
+  it('round-trips the saved theme and never writes the logo or favicon columns', async () => {
     await saveVoiceOverridesAction('tenant-1', overridesByLocale);
 
-    const consoleTokens = PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens;
     expect(upsertSiteConfigMock).toHaveBeenCalledWith('tenant-1', {
-      preset: PRESET_ID.CONSOLE,
-      accentHue: consoleTokens.accentHue,
-      logoHue: undefined,
-      headingFont: consoleTokens.headingFont,
-      bodyFont: consoleTokens.bodyFont,
-      radiusScale: consoleTokens.radiusScale,
-      density: consoleTokens.density,
-      logoAssetUrl: undefined,
-      faviconAssetUrl: undefined,
+      ...savedTheme,
       voiceOverridesByLocale: overridesByLocale,
     });
   });
 
-  it('round-trips the existing theme fields so a Voice save never resets Look', async () => {
-    getSiteConfigMock.mockResolvedValue({
-      preset: PRESET_ID.EDITORIAL,
-      accentHue: 28,
-      logoHue: 200,
-      headingFont: 'FRAUNCES',
-      bodyFont: 'INTER',
-      radiusScale: 'SM',
-      density: 'COMPACT',
-      logoAssetUrl: 'https://blob.example.com/logo.png',
-      faviconAssetUrl: 'https://blob.example.com/favicon.png',
-      voiceOverrides: {},
-    });
-    upsertSiteConfigMock.mockResolvedValue({ ok: true });
+  it.each([
+    ['an unknown locale', { XX: overrides }],
+    ['an unknown field key', { [LOCALE_ISO_CODES.EN]: { notAField: 'x' } }],
+    ['a locale entry that is not an object', { [LOCALE_ISO_CODES.EN]: 'x' }],
+    ['a payload that is not an object', 'x'],
+  ])(
+    'rejects %s without touching the db or logging a failed save',
+    async (_, payload) => {
+      const result = await saveVoiceOverridesAction(
+        'tenant-1',
+        payload as TVoiceOverridesByLocaleInput,
+      );
 
-    await saveVoiceOverridesAction('tenant-1', overridesByLocale);
+      expect(result).toEqual({ ok: false });
+      expect(getSiteConfigOrDefaultsMock).not.toHaveBeenCalled();
+      expect(upsertSiteConfigMock).not.toHaveBeenCalled();
+      expect(loggerErrorMock).not.toHaveBeenCalled();
+    },
+  );
 
-    expect(upsertSiteConfigMock).toHaveBeenCalledWith('tenant-1', {
-      preset: PRESET_ID.EDITORIAL,
-      accentHue: 28,
-      logoHue: 200,
-      headingFont: 'FRAUNCES',
-      bodyFont: 'INTER',
-      radiusScale: 'SM',
-      density: 'COMPACT',
-      logoAssetUrl: 'https://blob.example.com/logo.png',
-      faviconAssetUrl: 'https://blob.example.com/favicon.png',
-      voiceOverridesByLocale: overridesByLocale,
-    });
-  });
-
-  it('returns ok:false without throwing when the upsert fails', async () => {
+  it('returns ok:false and logs when the upsert throws', async () => {
     upsertSiteConfigMock.mockRejectedValue(new Error('db down'));
 
     const result = await saveVoiceOverridesAction(
@@ -126,6 +127,10 @@ describe(saveVoiceOverridesAction, () => {
     );
 
     expect(result).toEqual({ ok: false });
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      'site_config.voice_save_failed',
+      expect.objectContaining({ tenantId: 'tenant-1' }),
+    );
     expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
   });
 
@@ -146,18 +151,13 @@ describe(saveVoiceOverridesAction, () => {
     expect(revalidateSiteConfigMock).not.toHaveBeenCalled();
   });
 
-  it('returns ok:true on a successful save', async () => {
+  it('returns ok:true and revalidates once on a successful save', async () => {
     const result = await saveVoiceOverridesAction(
       'tenant-1',
       overridesByLocale,
     );
 
     expect(result).toEqual({ ok: true });
-  });
-
-  it('calls the site-config revalidation webhook after a successful save', async () => {
-    await saveVoiceOverridesAction('tenant-1', overridesByLocale);
-
     expect(revalidateSiteConfigMock).toHaveBeenCalledTimes(1);
   });
 });
