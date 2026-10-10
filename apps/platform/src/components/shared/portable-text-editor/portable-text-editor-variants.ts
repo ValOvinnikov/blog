@@ -14,7 +14,6 @@ export const portableTextEditorVariants = tv({
       '[&_ul]:m-0 [&_ul]:pl-5 [&_ol]:m-0 [&_ol]:pl-5',
       INVALID_SURFACE_CLASSES,
     ],
-    link: ['text-admin-brand underline'],
     placeholder: ['text-admin-faint'],
   },
   variants: {
