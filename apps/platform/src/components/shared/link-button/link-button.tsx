@@ -1,21 +1,12 @@
-import { Link } from '@platform/i18n/navigation';
-import type { ComponentType, ReactNode } from 'react';
-
 import {
   buttonVariants,
   type TButtonVariants,
-} from '../button/button-variants';
-
-type TLinkComponentProps = {
-  href: string;
-  className?: string;
-  children?: ReactNode;
-  'aria-label'?: string;
-};
+} from '@platform/components/shared/button/button-variants';
+import { Link } from '@platform/i18n/navigation';
+import type { ReactNode } from 'react';
 
 export type TLinkButtonProps = {
   href: string;
-  as?: ComponentType<TLinkComponentProps>;
   variant?: TButtonVariants['variant'];
   size?: TButtonVariants['size'];
   children?: ReactNode;
@@ -26,7 +17,6 @@ export type TLinkButtonProps = {
 
 export const LinkButton = ({
   href,
-  as: Component = Link,
   variant,
   size,
   children,
@@ -35,13 +25,13 @@ export const LinkButton = ({
   hasArrow,
 }: TLinkButtonProps) => {
   return (
-    <Component
+    <Link
       href={href}
       className={buttonVariants({ variant, size }).root({ class: className })}
       aria-label={ariaLabel}
     >
       {children}
       {hasArrow && <span aria-hidden="true"> →</span>}
-    </Component>
+    </Link>
   );
 };
