@@ -145,6 +145,7 @@
     "title": "Constats ouverts",
     "empty": "Aucun constat ouvert pour ce locataire — tout fonctionne correctement.",
     "detailsToggle": "Détails",
+    "detailsLoading": "Chargement des détails…",
     "columnLevel": "Niveau",
     "columnDocument": "Document",
     "columnMessage": "Message"

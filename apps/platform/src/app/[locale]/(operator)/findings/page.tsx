@@ -11,20 +11,5 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function FindingsPage() {
   const findings = await queries.findings.listOpenFindings();
 
-  const tenantIds = [
-    ...new Set(
-      findings.flatMap((finding) =>
-        finding.tenantId ? [finding.tenantId] : [],
-      ),
-    ),
-  ];
-  const tenants =
-    tenantIds.length > 0
-      ? await queries.tenants.listTenantsByIds(tenantIds)
-      : [];
-  const tenantNamesById = Object.fromEntries(
-    tenants.map((tenant) => [tenant.id, tenant.name]),
-  );
-
-  return <FindingsView findings={findings} tenantNamesById={tenantNamesById} />;
+  return <FindingsView findings={findings} />;
 }
