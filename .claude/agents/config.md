@@ -66,11 +66,14 @@ When invoked, before writing any code:
   - `types/` — shared TS types with no runtime behaviour.
   - `client/objects.ts` — shared plain-object helpers.
   - `utils.ts` — small standalone type helpers (e.g. `TValueOf<Obj>`).
-  - `react/polymorphic.ts` — the `TPolymorphicProps<C, OwnProps>` generic,
-    exposed only via the `@blog/config/react` **subpath** (never the package
-    root) so `@blog/service` stays React-free. Any new React-coupled helper
-    goes in `src/react/` and gets its own subpath entry in `package.json`
-    `exports` if it's a distinct concern.
+  - `react/` — `polymorphic.ts` (the `TPolymorphicProps<C, OwnProps>`
+    generic) and `compound.ts` (`mapCompoundSlots`, `TCompoundComponent`,
+    `TCompoundChildren`), re-exported by `react/index.ts` and exposed only
+    via the `@blog/config/react` **subpath** (never the package root) so
+    `@blog/service` stays React-free. `react` is a peer dependency because
+    `compound.ts` calls `Children`/`isValidElement` at runtime. Any new
+    React-coupled helper goes in `src/react/` and is re-exported from
+    `react/index.ts`.
   - `sanity/generated/` — **typegen output only.** `schema.json` and
     `types.ts` are produced by `pnpm --filter @blog/studio typegen` from the `studio`
     agent's schema work. **Never hand-edit these files** — an Edit/Write
@@ -81,7 +84,7 @@ When invoked, before writing any code:
   - `package.json` `exports` declares three subpaths for consumers reaching
     in from outside the package: `.` (the `src/index.ts` barrel — re-exports
     `client/objects`, `constants`, `routes`, `sanity/generated/types`,
-    `types`, `utils`), `./react` (`react/polymorphic.ts`, kept off the barrel
+    `types`, `utils`), `./react` (`react/index.ts`, kept off the barrel
     to stay React-free), and `./constants` (`constants/index.ts` directly).
     Separately, every workspace's `tsconfig.json`/`vitest.config.ts` also
     wildcards `@blog/config/*` straight to `src/*` (see "Cross-workspace

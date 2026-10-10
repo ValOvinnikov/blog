@@ -1,6 +1,7 @@
 'use client';
 
 import { AssetUploadField } from '@platform/components/shared/asset-upload-field';
+import type { TEmailLogoKind } from '@platform/constants/email-logo';
 import {
   ACCEPTED_EMAIL_LOGO_MIME_TYPES,
   quickClientEmailLogoCheck,
@@ -13,6 +14,7 @@ import { useTranslations } from 'next-intl';
 import type { AriaAttributes } from 'react';
 
 export type TEmailLogoFieldProps = {
+  kind: TEmailLogoKind;
   label: string;
   hint: string;
   logo: TStagedImage;
@@ -23,6 +25,7 @@ export type TEmailLogoFieldProps = {
 
 // Picking or removing a file only stages it; the page's Save uploads it.
 export const EmailLogoField = ({
+  kind,
   label,
   hint,
   logo,
@@ -31,7 +34,6 @@ export const EmailLogoField = ({
   'aria-describedby': ariaDescribedBy,
 }: TEmailLogoFieldProps) => {
   const t = useTranslations('emailLogoField');
-  const lowerLabel = label.toLowerCase();
 
   const validateFile = (file: File): string | undefined => {
     const quickError = quickClientEmailLogoCheck(file);
@@ -51,13 +53,9 @@ export const EmailLogoField = ({
       label={label}
       hint={hint}
       currentUrl={logo.url}
-      currentAlt={t('currentAlt', { label: lowerLabel })}
+      currentAlt={t(`${kind}.currentAlt`)}
       acceptedMimeTypes={ACCEPTED_EMAIL_LOGO_MIME_TYPES}
-      uploadLabel={
-        logo.url
-          ? t('replace', { label: lowerLabel })
-          : t('upload', { label: lowerLabel })
-      }
+      uploadLabel={logo.url ? t(`${kind}.replace`) : t(`${kind}.upload`)}
       uploadingLabel={t('uploading')}
       removeLabel={t('remove')}
       unexpectedErrorLabel={t('unexpectedError')}

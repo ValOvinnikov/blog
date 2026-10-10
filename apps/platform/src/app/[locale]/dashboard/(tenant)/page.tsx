@@ -8,7 +8,7 @@ import { getLocale, getTranslations } from 'next-intl/server';
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('pageMetadata');
-  return { title: t('tenant') };
+  return { title: t('ownerHome') };
 }
 
 export default async function DashboardOverviewPage() {
