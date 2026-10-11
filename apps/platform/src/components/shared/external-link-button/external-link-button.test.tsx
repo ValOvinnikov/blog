@@ -4,14 +4,16 @@ import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import { ExternalLinkButton } from './external-link-button';
 
 describe(ExternalLinkButton, () => {
-  it('renders as an anchor with the given href, opening in a new tab safely', () => {
+  it('renders as an anchor opening in a new tab safely, announcing the new-tab hint', () => {
     renderWithIntl(
       <ExternalLinkButton href="https://acme.example.com">
         Open site
       </ExternalLinkButton>,
     );
 
-    const link = screen.getByRole('link', { name: 'Open site' });
+    const link = screen.getByRole('link', {
+      name: 'Open site (opens in new tab)',
+    });
     expect(link).toHaveAttribute('href', 'https://acme.example.com');
     expect(link).toHaveAttribute('target', '_blank');
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
@@ -53,37 +55,13 @@ describe(ExternalLinkButton, () => {
     ).toHaveAttribute('href', 'https://acme.example.com');
   });
 
-  it('adds a visually-hidden "opens in new tab" hint to the accessible name when hasArrow is set', () => {
-    renderWithIntl(
-      <ExternalLinkButton href="https://acme.example.com" hasArrow={true}>
-        Open site
-      </ExternalLinkButton>,
-    );
-
-    expect(
-      screen.getByRole('link', { name: 'Open site (opens in new tab)' }),
-    ).toHaveAttribute('href', 'https://acme.example.com');
-  });
-
-  it('does not add the "opens in new tab" hint when hasArrow is unset', () => {
-    renderWithIntl(
-      <ExternalLinkButton href="https://acme.example.com">
-        Open site
-      </ExternalLinkButton>,
-    );
-
-    expect(screen.queryByText('(opens in new tab)')).not.toBeInTheDocument();
-  });
-
   it('applies the given title attribute alongside an icon-only ariaLabel', () => {
     renderWithIntl(
       <ExternalLinkButton
         href="https://acme.example.com"
         ariaLabel="Open acme.example.com in a new tab"
         title="Open acme.example.com in a new tab"
-      >
-        ↗
-      </ExternalLinkButton>,
+      />,
     );
 
     expect(

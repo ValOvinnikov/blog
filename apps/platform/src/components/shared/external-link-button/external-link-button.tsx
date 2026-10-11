@@ -1,7 +1,9 @@
+import { ICONS, SIZE } from '@blog/config';
 import {
   buttonVariants,
   type TButtonVariants,
 } from '@platform/components/shared/button/button-variants';
+import { Icon } from '@platform/components/shared/icon';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
@@ -15,7 +17,6 @@ export type TExternalLinkButtonProps = {
   className?: string;
   ariaLabel?: string;
   title?: string;
-  hasArrow?: boolean;
 };
 
 export const ExternalLinkButton = ({
@@ -26,7 +27,6 @@ export const ExternalLinkButton = ({
   className,
   ariaLabel,
   title,
-  hasArrow,
 }: TExternalLinkButtonProps) => {
   const t = useTranslations('externalLinkButton');
 
@@ -40,12 +40,8 @@ export const ExternalLinkButton = ({
       title={title}
     >
       {children}
-      {hasArrow && (
-        <>
-          <span aria-hidden="true"> ↗</span>{' '}
-          <span className={newTabHintVariants()}>{t('newTabHint')}</span>
-        </>
-      )}
+      <Icon name={ICONS.EXTERNAL_LINK} size={SIZE.SM} />{' '}
+      <span className={newTabHintVariants()}>{t('newTabHint')}</span>
     </a>
   );
 };

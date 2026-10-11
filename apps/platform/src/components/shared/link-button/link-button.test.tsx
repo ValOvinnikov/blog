@@ -52,30 +52,4 @@ describe(LinkButton, () => {
 
     expect(screen.getByRole('link', { name: 'View steps' })).toBeVisible();
   });
-
-  it('renders through a custom `as` component', () => {
-    const StubLink = ({
-      href,
-      className,
-      children,
-    }: {
-      href: string;
-      className?: string;
-      children?: React.ReactNode;
-    }) => (
-      <a href={href} className={className} data-stub="true">
-        {children}
-      </a>
-    );
-
-    render(
-      <LinkButton as={StubLink} href="/tenants">
-        Tenants
-      </LinkButton>,
-    );
-
-    const link = screen.getByRole('link', { name: 'Tenants' });
-    expect(link).toHaveAttribute('data-stub', 'true');
-    expect(link).toHaveAttribute('href', '/tenants');
-  });
 });

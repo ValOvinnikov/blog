@@ -1,4 +1,5 @@
-import { SIZE } from '@blog/config';
+import { ICONS, SIZE } from '@blog/config';
+import { Icon } from '@platform/components/shared/icon';
 import { Spinner } from '@platform/components/shared/spinner';
 import type { AriaAttributes, MouseEventHandler, ReactNode } from 'react';
 
@@ -78,7 +79,7 @@ export const Button = ({
           </span>
         )}
         {label}
-        {hasArrow && <span aria-hidden="true"> →</span>}
+        {hasArrow && <Icon name={ICONS.ARROW} size={SIZE.SM} />}
       </button>
       {hasPendingLabel && (
         <span role="status" aria-live="polite" className={srOnlyStatus()}>

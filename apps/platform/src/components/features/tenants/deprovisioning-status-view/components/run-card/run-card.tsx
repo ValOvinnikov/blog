@@ -53,7 +53,6 @@ export const RunCard = ({ run, actions, headingLevel }: TRunCardProps) => {
             href={run.workflowRunUrl}
             variant="ghost"
             size={SIZE.SM}
-            hasArrow={true}
             className={workflowLogLink()}
           >
             {t('runWorkflowLogLink')}

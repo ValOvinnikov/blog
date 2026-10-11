@@ -50,9 +50,7 @@ export const YourSiteCard = ({ tenant }: TYourSiteCardProps) => {
                 size={SIZE.SM}
                 ariaLabel={openDomainLabel}
                 title={openDomainLabel}
-              >
-                ↗
-              </ExternalLinkButton>
+              />
             }
           >
             {tenant.primaryDomain}
