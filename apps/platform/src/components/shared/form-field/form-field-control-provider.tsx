@@ -1,5 +1,6 @@
 'use client';
 
+import type { TMaybeUndefined } from '@blog/config';
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
 
 type TFormFieldControlContext = {
@@ -7,9 +8,8 @@ type TFormFieldControlContext = {
   describedBy?: string;
 };
 
-const FormFieldControlContext = createContext<
-  TFormFieldControlContext | undefined
->(undefined);
+const FormFieldControlContext =
+  createContext<TMaybeUndefined<TFormFieldControlContext>>(undefined);
 
 type TFormFieldControlProviderProps = TFormFieldControlContext & {
   children: ReactNode;
