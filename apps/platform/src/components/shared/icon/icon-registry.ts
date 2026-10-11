@@ -1,4 +1,5 @@
 import { ICONS, type TIconName } from '@blog/config';
+import Arrow from '@platform/assets/icons/arrow.svg';
 import Bold from '@platform/assets/icons/bold.svg';
 import Book from '@platform/assets/icons/book.svg';
 import CheckCircle from '@platform/assets/icons/check-circle.svg';
@@ -7,6 +8,7 @@ import ChevronDown from '@platform/assets/icons/chevron-down.svg';
 import ChevronRight from '@platform/assets/icons/chevron-right.svg';
 import Comment from '@platform/assets/icons/comment.svg';
 import ErrorCircle from '@platform/assets/icons/error.svg';
+import ExternalLink from '@platform/assets/icons/external-link.svg';
 import Globe from '@platform/assets/icons/globe.svg';
 import Grid from '@platform/assets/icons/grid.svg';
 import House from '@platform/assets/icons/house.svg';
@@ -29,6 +31,7 @@ import type { FC, SVGProps } from 'react';
 type TGlyph = FC<SVGProps<SVGSVGElement>>;
 
 export const ICON_REGISTRY = {
+  [ICONS.ARROW]: Arrow,
   [ICONS.BOLD]: Bold,
   [ICONS.BOOK]: Book,
   [ICONS.CHECK]: CheckCircle,
@@ -38,6 +41,7 @@ export const ICON_REGISTRY = {
   // The error notice's circled cross, the same key @blog/ui's Alert uses for ERROR.
   [ICONS.CLOSE]: ErrorCircle,
   [ICONS.COMMENT]: Comment,
+  [ICONS.EXTERNAL_LINK]: ExternalLink,
   [ICONS.GLOBE]: Globe,
   [ICONS.GRID]: Grid,
   [ICONS.HOUSE]: House,

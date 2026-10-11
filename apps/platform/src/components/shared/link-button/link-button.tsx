@@ -1,7 +1,9 @@
+import { ICONS, SIZE } from '@blog/config';
 import {
   buttonVariants,
   type TButtonVariants,
 } from '@platform/components/shared/button/button-variants';
+import { Icon } from '@platform/components/shared/icon';
 import { Link } from '@platform/i18n/navigation';
 import type { ReactNode } from 'react';
 
@@ -31,7 +33,7 @@ export const LinkButton = ({
       aria-label={ariaLabel}
     >
       {children}
-      {hasArrow && <span aria-hidden="true"> →</span>}
+      {hasArrow && <Icon name={ICONS.ARROW} size={SIZE.SM} />}
     </Link>
   );
 };
