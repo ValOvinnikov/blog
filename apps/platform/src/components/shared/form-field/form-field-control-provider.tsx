@@ -7,7 +7,9 @@ type TFormFieldControlContext = {
   describedBy?: string;
 };
 
-const FormFieldControlContext = createContext<TFormFieldControlContext>({});
+const FormFieldControlContext = createContext<
+  TFormFieldControlContext | undefined
+>(undefined);
 
 type TFormFieldControlProviderProps = TFormFieldControlContext & {
   children: ReactNode;
@@ -27,4 +29,12 @@ export const FormFieldControlProvider = ({
   );
 };
 
-export const useFormFieldControl = () => useContext(FormFieldControlContext);
+export const useFormFieldControl = (): TFormFieldControlContext => {
+  const context = useContext(FormFieldControlContext);
+  if (!context) {
+    throw new Error(
+      'useFormFieldControl must be used within a FormField or FormFieldControlProvider',
+    );
+  }
+  return context;
+};
