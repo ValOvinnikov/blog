@@ -1,3 +1,4 @@
+import type { TMaybeUndefined } from '@blog/config';
 import type {
   PortableTextBlock,
   PortableTextTextBlock,
@@ -11,7 +12,7 @@ type TListItemRun = {
 };
 
 const isListItemBlock = (
-  entry: PortableTextBlock | undefined,
+  entry: TMaybeUndefined<PortableTextBlock>,
 ): entry is TListItemBlock =>
   entry?._type === 'block' &&
   (entry as PortableTextTextBlock).listItem !== undefined;
@@ -36,8 +37,8 @@ const countRunNeighbours = (
 
 export const getListItemRun = (
   value: PortableTextBlock[],
-  index: number | undefined,
-): TListItemRun | undefined => {
+  index: TMaybeUndefined<number>,
+): TMaybeUndefined<TListItemRun> => {
   if (index === undefined) return undefined;
 
   const block = value[index];
@@ -51,6 +52,6 @@ export const getListItemRun = (
 };
 
 export const isSameListItemRun = (
-  a: TListItemRun | undefined,
-  b: TListItemRun | undefined,
+  a: TMaybeUndefined<TListItemRun>,
+  b: TMaybeUndefined<TListItemRun>,
 ): boolean => a?.position === b?.position && a?.setSize === b?.setSize;
