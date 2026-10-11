@@ -1,9 +1,8 @@
-import type { ReactNode } from 'react';
-
 import {
   detailListVariants,
   type TDetailListVariants,
-} from '../../detail-list-variants';
+} from '@platform/components/shared/detail-list/detail-list-variants';
+import type { ReactNode } from 'react';
 
 export type TDetailListRowProps = {
   label: string;

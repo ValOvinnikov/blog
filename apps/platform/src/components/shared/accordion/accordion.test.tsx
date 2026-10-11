@@ -72,6 +72,29 @@ describe('Accordion', () => {
     );
   });
 
+  it('renders a row header before its body whatever order they are written in', () => {
+    render(
+      <Accordion openValue="only" onOpenValueChange={() => {}}>
+        <Accordion.Item value="only">
+          <Accordion.Panel>Only body</Accordion.Panel>
+          <Accordion.Note>Only note</Accordion.Note>
+          <Accordion.Trigger>Only row</Accordion.Trigger>
+        </Accordion.Item>
+      </Accordion>,
+    );
+
+    const trigger = screen.getByRole('button', { name: 'Only row' });
+    const note = screen.getByText('Only note');
+    const body = screen.getByText('Only body');
+
+    expect(trigger.compareDocumentPosition(note)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+    expect(note.compareDocumentPosition(body)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+  });
+
   it('opens a row with the keyboard', async () => {
     render(<ControlledAccordion />);
 

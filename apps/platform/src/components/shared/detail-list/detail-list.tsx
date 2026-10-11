@@ -1,9 +1,10 @@
-import type { ReactNode } from 'react';
+import type { TCompoundComponent } from '@platform/lib/react';
+import type { ElementType, ReactNode } from 'react';
 
 import { DetailListRow } from './components/row/detail-list-row';
 import { detailListVariants } from './detail-list-variants';
 
-export type TDetailListProps = {
+type TDetailListProps = {
   children: ReactNode;
   className?: string;
 };
@@ -14,6 +15,11 @@ const DetailListRoot = ({ children, className }: TDetailListProps) => {
   return <dl className={root({ class: className })}>{children}</dl>;
 };
 
-export const DetailList = Object.assign(DetailListRoot, {
+const DetailListParts = {
   Row: DetailListRow,
-});
+} satisfies Record<string, ElementType>;
+
+export const DetailList: TCompoundComponent<
+  typeof DetailListRoot,
+  typeof DetailListParts
+> = Object.assign(DetailListRoot, DetailListParts);
