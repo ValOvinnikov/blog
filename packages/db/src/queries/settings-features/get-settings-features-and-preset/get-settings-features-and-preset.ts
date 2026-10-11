@@ -1,4 +1,5 @@
 import type { TPresetId } from '@blog/config/constants';
+import type { TMaybeUndefined } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
 import {
   settingsFeatures,
@@ -19,8 +20,8 @@ export type TSettingsFeatureToggles = Pick<
 >;
 
 export type TSettingsFeaturesAndPreset = {
-  features: TSettingsFeatureToggles | undefined;
-  preset: TPresetId | undefined;
+  features: TMaybeUndefined<TSettingsFeatureToggles>;
+  preset: TMaybeUndefined<TPresetId>;
 };
 
 export async function getSettingsFeaturesAndPreset(

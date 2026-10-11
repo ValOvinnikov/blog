@@ -2,13 +2,14 @@ import {
   EMAIL_TEMPLATE_TYPE,
   type TEmailTemplateType,
 } from '@blog/config/constants';
+import type { TMaybeUndefined } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
 import { emailTemplateLogos } from '@blog/db/schema/email-templates';
 import { eq } from 'drizzle-orm';
 
 export type TEmailTemplateLogoUrls = Record<
   TEmailTemplateType,
-  string | undefined
+  TMaybeUndefined<string>
 >;
 
 export async function listEmailTemplateLogoUrls(
