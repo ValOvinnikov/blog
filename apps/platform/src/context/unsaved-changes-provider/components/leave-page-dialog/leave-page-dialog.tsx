@@ -2,6 +2,7 @@
 
 import { AlertDialog } from '@base-ui/react/alert-dialog';
 import { Button } from '@platform/components/shared/button';
+import { headingVariants } from '@platform/components/shared/heading/heading-variants';
 import { useTranslations } from 'next-intl';
 
 import { leavePageDialogVariants } from './leave-page-dialog-variants';
@@ -27,7 +28,6 @@ export const LeavePageDialog = ({
   const {
     backdrop,
     popup,
-    title,
     description: descriptionSlot,
     actions,
   } = leavePageDialogVariants();
@@ -42,7 +42,7 @@ export const LeavePageDialog = ({
       <AlertDialog.Portal>
         <AlertDialog.Backdrop className={backdrop()} />
         <AlertDialog.Popup className={popup()}>
-          <AlertDialog.Title className={title()}>
+          <AlertDialog.Title className={headingVariants({ size: 'cardTitle' })}>
             {t('title')}
           </AlertDialog.Title>
           <AlertDialog.Description className={descriptionSlot()}>
