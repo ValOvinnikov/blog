@@ -4,7 +4,15 @@ import { Field } from '@base-ui/react/field';
 import { textVariants } from '@platform/components/shared/text/text-variants';
 import type { ReactNode } from 'react';
 
+import { FormFieldControlProvider } from './form-field-control-provider';
 import { formFieldVariants } from './form-field-variants';
+
+type TFormFieldControl = {
+  id?: string;
+  isDisabled?: boolean;
+  describedBy?: string;
+  hasOwnAccessibleName?: boolean;
+};
 
 export type TFormFieldProps = {
   label: string;
@@ -13,7 +21,7 @@ export type TFormFieldProps = {
   children: ReactNode;
   footer?: ReactNode;
   actions?: ReactNode;
-  hasOwnAccessibleName?: boolean;
+  control?: TFormFieldControl;
 };
 
 export const FormField = ({
@@ -23,8 +31,9 @@ export const FormField = ({
   children,
   footer,
   actions,
-  hasOwnAccessibleName = false,
+  control = {},
 }: TFormFieldProps) => {
+  const { id, isDisabled = false, describedBy, hasOwnAccessibleName } = control;
   const {
     root,
     header,
@@ -33,7 +42,11 @@ export const FormField = ({
   } = formFieldVariants();
 
   return (
-    <Field.Root className={root()} invalid={Boolean(error)}>
+    <Field.Root
+      className={root()}
+      invalid={Boolean(error)}
+      disabled={isDisabled}
+    >
       <div className={header()}>
         {hasOwnAccessibleName ? (
           <span className={labelSlot()}>{label}</span>
@@ -47,7 +60,9 @@ export const FormField = ({
           {hint}
         </Field.Description>
       )}
-      {children}
+      <FormFieldControlProvider id={id} describedBy={describedBy}>
+        {children}
+      </FormFieldControlProvider>
       {error && (
         <Field.Error match={true} className={errorSlot()}>
           {error}

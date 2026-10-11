@@ -9,6 +9,7 @@ import { FormField } from '@platform/components/shared/form-field';
 import { FormTextInput } from '@platform/components/shared/form-text-input';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { Spinner } from '@platform/components/shared/spinner';
+import { TextInput } from '@platform/components/shared/text-input';
 import {
   createTenantAction,
   type TCreateTenantFieldErrors,
@@ -136,7 +137,10 @@ export const TenantDetailsForm = () => {
                   onChange={(value) => updateField('domain', value)}
                 />
 
-                <FormField label={t('planLabel')} hasOwnAccessibleName={true}>
+                <FormField
+                  label={t('planLabel')}
+                  control={{ hasOwnAccessibleName: true }}
+                >
                   <SegmentedControl<TTenantPlan>
                     ariaLabel={t('planLabel')}
                     options={planOptions}
@@ -146,7 +150,7 @@ export const TenantDetailsForm = () => {
                   />
                 </FormField>
 
-                <FormTextInput
+                <FormField
                   label={t('ownerEmailLabel')}
                   hint={t('ownerEmailHint')}
                   error={fieldErrors.ownerEmail}
@@ -158,10 +162,13 @@ export const TenantDetailsForm = () => {
                       />
                     )
                   }
-                  type="email"
-                  value={values.ownerEmail}
-                  onChange={(value) => updateField('ownerEmail', value)}
-                />
+                >
+                  <TextInput
+                    type="email"
+                    value={values.ownerEmail}
+                    onChange={(value) => updateField('ownerEmail', value)}
+                  />
+                </FormField>
               </div>
             </Card.Body>
             <Card.Footer>

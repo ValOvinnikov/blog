@@ -12,7 +12,11 @@ describe(Textarea, () => {
   });
 
   it('renders the given value', () => {
-    render(<Textarea ariaLabel="Notes" value="Hello" onChange={vi.fn()} />);
+    render(
+      <FormField label="Notes">
+        <Textarea value="Hello" onChange={vi.fn()} />
+      </FormField>,
+    );
 
     expect(screen.getByLabelText('Notes')).toHaveValue('Hello');
   });
@@ -20,39 +24,39 @@ describe(Textarea, () => {
   it('calls onChange with the new string value on input', async () => {
     const handleChange = vi.fn();
 
-    render(<Textarea ariaLabel="Notes" value="" onChange={handleChange} />);
+    render(
+      <FormField label="Notes">
+        <Textarea value="" onChange={handleChange} />
+      </FormField>,
+    );
 
     await user.type(screen.getByLabelText('Notes'), 'a');
 
     expect(handleChange).toHaveBeenCalledWith('a');
   });
 
-  it('passes rows, maxLength and placeholder through to the textarea', () => {
+  it('passes rows and placeholder through to the textarea', () => {
     render(
-      <Textarea
-        ariaLabel="Bio"
-        value=""
-        onChange={vi.fn()}
-        rows={6}
-        maxLength={200}
-        placeholder="Inherited from preset"
-      />,
+      <FormField label="Bio">
+        <Textarea
+          value=""
+          onChange={vi.fn()}
+          rows={6}
+          placeholder="Inherited from preset"
+        />
+      </FormField>,
     );
 
     const textarea = screen.getByLabelText('Bio');
     expect(textarea).toHaveAttribute('rows', '6');
-    expect(textarea).toHaveAttribute('maxlength', '200');
     expect(textarea).toHaveAttribute('placeholder', 'Inherited from preset');
   });
 
-  it('disables the textarea when isDisabled is true', () => {
+  it('is disabled when the field it sits in is disabled', () => {
     render(
-      <Textarea
-        ariaLabel="Locked field"
-        value="inherited value"
-        onChange={vi.fn()}
-        isDisabled={true}
-      />,
+      <FormField label="Locked field" control={{ isDisabled: true }}>
+        <Textarea value="inherited value" onChange={vi.fn()} />
+      </FormField>,
     );
 
     expect(screen.getByLabelText('Locked field')).toBeDisabled();
@@ -61,12 +65,13 @@ describe(Textarea, () => {
   it('makes the textarea read-only, not disabled, when isReadOnly is true', async () => {
     const handleChange = vi.fn();
     render(
-      <Textarea
-        ariaLabel="Archived field"
-        value="authored value"
-        onChange={handleChange}
-        isReadOnly={true}
-      />,
+      <FormField label="Archived field">
+        <Textarea
+          value="authored value"
+          onChange={handleChange}
+          isReadOnly={true}
+        />
+      </FormField>,
     );
 
     const textarea = screen.getByLabelText('Archived field');
