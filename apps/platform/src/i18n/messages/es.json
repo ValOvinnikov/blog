@@ -387,21 +387,35 @@
     "navAbout": "Acerca de",
     "switcherMenuAriaLabel": "Idioma: {language}"
   },
-  "brandAssetField": {
-    "savesWithChanges": "Se guarda con los cambios",
-    "unexpectedError": "Algo ha salido mal. Vuelva a intentarlo.",
-    "uploading": "Subiendo…",
+  "assetUploadField": {
     "remove": "Quitar",
     "logo": {
       "currentAlt": "Logotipo actual",
       "upload": "Subir logotipo",
-      "replace": "Sustituir logotipo",
-      "pickAgain": "El borrador recuperado tenía un logotipo nuevo que no se pudo conservar: vuelva a elegirlo."
+      "replace": "Sustituir logotipo"
     },
     "favicon": {
       "currentAlt": "Favicon actual",
       "upload": "Subir favicon",
-      "replace": "Sustituir favicon",
+      "replace": "Sustituir favicon"
+    },
+    "SENDER": {
+      "currentAlt": "Logotipo del correo actual",
+      "upload": "Subir el logotipo del correo",
+      "replace": "Sustituir el logotipo del correo"
+    },
+    "TEMPLATE": {
+      "currentAlt": "Logotipo de la plantilla actual",
+      "upload": "Subir el logotipo de la plantilla",
+      "replace": "Sustituir el logotipo de la plantilla"
+    }
+  },
+  "brandAssetField": {
+    "savesWithChanges": "Se guarda con los cambios",
+    "logo": {
+      "pickAgain": "El borrador recuperado tenía un logotipo nuevo que no se pudo conservar: vuelva a elegirlo."
+    },
+    "favicon": {
       "pickAgain": "El borrador recuperado tenía un favicon nuevo que no se pudo conservar: vuelva a elegirlo."
     },
     "unsupportedType": "Elija una imagen PNG, JPEG, WebP o SVG.",
@@ -460,21 +474,8 @@
     "logoHint": "Se usa en todos los correos y en todos los idiomas. Una plantilla puede sustituirlo por su propio logotipo."
   },
   "emailLogoField": {
-    "unexpectedError": "Algo ha salido mal. Vuelva a intentarlo.",
-    "uploading": "Subiendo…",
-    "remove": "Quitar",
     "unsupportedType": "Elija una imagen PNG, JPEG o GIF: los principales clientes de correo no admiten SVG ni WebP.",
-    "tooLarge": "El archivo es demasiado grande: el límite es {limit}.",
-    "SENDER": {
-      "currentAlt": "Logotipo del correo actual",
-      "upload": "Subir el logotipo del correo",
-      "replace": "Sustituir el logotipo del correo"
-    },
-    "TEMPLATE": {
-      "currentAlt": "Logotipo de la plantilla actual",
-      "upload": "Subir el logotipo de la plantilla",
-      "replace": "Sustituir el logotipo de la plantilla"
-    }
+    "tooLarge": "El archivo es demasiado grande: el límite es {limit}."
   },
   "emailTemplateEditor": {
     "subjectLabel": "Asunto ({language})",

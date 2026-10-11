@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@platform/testing/custom-render';
+import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import { selectFile } from '@platform/testing/select-file';
 import userEvent from '@testing-library/user-event';
 
@@ -10,30 +10,37 @@ import {
 const baseProps: TAssetUploadFieldProps = {
   label: 'Logo',
   hint: 'PNG, JPEG, or WebP.',
-  currentUrl: undefined,
-  currentAlt: 'Current logo',
-  acceptedMimeTypes: ['image/png', 'image/jpeg', 'image/webp'],
-  uploadLabel: 'Upload logo',
-  uploadingLabel: 'Uploading…',
-  removeLabel: 'Remove',
-  unexpectedErrorLabel: 'Something went wrong — try again.',
-  onValidateFile: () => undefined,
-  onUpload: vi.fn(),
-  onClear: vi.fn(),
-  onChange: vi.fn(),
+  image: { url: undefined },
+  onStage: vi.fn(),
+  asset: {
+    kind: 'logo',
+    size: 'md',
+    acceptedMimeTypes: ['image/png', 'image/jpeg', 'image/webp'],
+    validateFile: () => undefined,
+  },
 };
 
 const pngFile = () => new File(['bytes'], 'logo.png', { type: 'image/png' });
+
+const rejectingAsset = {
+  ...baseProps.asset,
+  validateFile: () => 'Choose a PNG, JPEG, or WebP image.',
+};
 
 describe(`<${AssetUploadField.name}/>`, () => {
   let user: ReturnType<typeof userEvent.setup>;
 
   beforeEach(() => {
     user = userEvent.setup();
+    vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:staged-logo');
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it('shows no thumbnail or Remove control before any value is set', () => {
-    render(<AssetUploadField {...baseProps} />);
+    renderWithIntl(<AssetUploadField {...baseProps} />);
 
     expect(screen.queryByAltText('Current logo')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Upload logo' })).toBeVisible();
@@ -43,10 +50,10 @@ describe(`<${AssetUploadField.name}/>`, () => {
   });
 
   it('shows the thumbnail and a Remove control once a value is set', () => {
-    render(
+    renderWithIntl(
       <AssetUploadField
         {...baseProps}
-        currentUrl="https://example.blob.vercel-storage.com/logo.png"
+        image={{ url: 'https://example.blob.vercel-storage.com/logo.png' }}
       />,
     );
 
@@ -54,15 +61,13 @@ describe(`<${AssetUploadField.name}/>`, () => {
     expect(screen.getByRole('button', { name: 'Remove' })).toBeVisible();
   });
 
-  it('rejects a file client-side without calling onUpload, showing onValidateFile’s message', async () => {
-    const onUpload = vi.fn();
-    const onChange = vi.fn();
-    render(
+  it('rejects a file client-side without staging it, showing validateFile’s message', async () => {
+    const onStage = vi.fn();
+    renderWithIntl(
       <AssetUploadField
         {...baseProps}
-        onValidateFile={() => 'Choose a PNG, JPEG, or WebP image.'}
-        onUpload={onUpload}
-        onChange={onChange}
+        asset={rejectingAsset}
+        onStage={onStage}
       />,
     );
 
@@ -71,122 +76,45 @@ describe(`<${AssetUploadField.name}/>`, () => {
     expect(
       await screen.findByText('Choose a PNG, JPEG, or WebP image.'),
     ).toBeVisible();
-    expect(onUpload).not.toHaveBeenCalled();
-    expect(onChange).not.toHaveBeenCalled();
+    expect(onStage).not.toHaveBeenCalled();
   });
 
-  it('uploads a chosen file and reports the saved URL back through onChange', async () => {
-    const onUpload = vi
-      .fn()
-      .mockResolvedValue({ ok: true, url: 'https://example.com/logo-new.png' });
-    const onChange = vi.fn();
-    render(
-      <AssetUploadField
-        {...baseProps}
-        onUpload={onUpload}
-        onChange={onChange}
-      />,
-    );
+  it('stages a chosen file with a local preview URL through onStage', async () => {
+    const onStage = vi.fn();
+    const file = pngFile();
+    renderWithIntl(<AssetUploadField {...baseProps} onStage={onStage} />);
 
-    await selectFile(pngFile());
+    await selectFile(file);
 
-    await waitFor(() => {
-      expect(onChange).toHaveBeenCalledWith('https://example.com/logo-new.png');
-    });
-    expect(onUpload).toHaveBeenCalledWith(expect.any(FormData));
+    expect(onStage).toHaveBeenCalledWith({ url: 'blob:staged-logo', file });
   });
 
-  it('shows the server error and keeps the previous value when the upload fails', async () => {
-    const onUpload = vi
-      .fn()
-      .mockResolvedValue({ ok: false, error: 'That file is too large.' });
-    const onChange = vi.fn();
-    render(
+  it('stages a removal through onStage when Remove is clicked', async () => {
+    const onStage = vi.fn();
+    renderWithIntl(
       <AssetUploadField
         {...baseProps}
-        currentUrl="https://example.com/logo.png"
-        onUpload={onUpload}
-        onChange={onChange}
-      />,
-    );
-
-    await selectFile(pngFile());
-
-    expect(await screen.findByText('That file is too large.')).toBeVisible();
-    expect(onChange).not.toHaveBeenCalled();
-    expect(screen.getByAltText('Current logo')).toBeVisible();
-  });
-
-  it('shows the unexpectedErrorLabel fallback, without crashing, when onUpload itself throws', async () => {
-    const onUpload = vi.fn().mockRejectedValue(new Error('network error'));
-    const onChange = vi.fn();
-    render(
-      <AssetUploadField
-        {...baseProps}
-        onUpload={onUpload}
-        onChange={onChange}
-      />,
-    );
-
-    await selectFile(pngFile());
-
-    expect(
-      await screen.findByText('Something went wrong — try again.'),
-    ).toBeVisible();
-    expect(onChange).not.toHaveBeenCalled();
-  });
-
-  it('clears the saved value through onClear when Remove is clicked', async () => {
-    const onClear = vi.fn().mockResolvedValue({ ok: true });
-    const onChange = vi.fn();
-    render(
-      <AssetUploadField
-        {...baseProps}
-        currentUrl="https://example.com/logo.png"
-        onClear={onClear}
-        onChange={onChange}
+        image={{ url: 'https://example.com/logo.png' }}
+        onStage={onStage}
       />,
     );
 
     await user.click(screen.getByRole('button', { name: 'Remove' }));
 
-    expect(onClear).toHaveBeenCalledTimes(1);
-    await waitFor(() => {
-      expect(onChange).toHaveBeenCalledWith(undefined);
-    });
-  });
-
-  it('shows the server error and keeps the value when onClear fails', async () => {
-    const onClear = vi
-      .fn()
-      .mockResolvedValue({ ok: false, error: 'Could not remove the logo.' });
-    const onChange = vi.fn();
-    render(
-      <AssetUploadField
-        {...baseProps}
-        currentUrl="https://example.com/logo.png"
-        onClear={onClear}
-        onChange={onChange}
-      />,
-    );
-
-    await user.click(screen.getByRole('button', { name: 'Remove' }));
-
-    expect(await screen.findByText('Could not remove the logo.')).toBeVisible();
-    expect(onChange).not.toHaveBeenCalled();
+    expect(onStage).toHaveBeenCalledWith({ url: undefined });
   });
 
   it('disables the upload and remove controls, and describes them, when isDisabled is true', () => {
-    render(
+    renderWithIntl(
       <AssetUploadField
         {...baseProps}
-        currentUrl="https://example.com/logo.png"
+        image={{ url: 'https://example.com/logo.png' }}
         isDisabled={true}
         aria-describedby="archived-notice"
       />,
     );
 
-    const uploadButton = screen.getByRole('button', { name: 'Upload logo' });
+    const uploadButton = screen.getByRole('button', { name: 'Replace logo' });
     expect(uploadButton).toBeDisabled();
     expect(uploadButton).toHaveAttribute(
       'aria-describedby',
@@ -196,15 +124,15 @@ describe(`<${AssetUploadField.name}/>`, () => {
   });
 
   it('describes the upload and remove controls with the hint', () => {
-    render(
+    renderWithIntl(
       <AssetUploadField
         {...baseProps}
-        currentUrl="https://example.com/logo.png"
+        image={{ url: 'https://example.com/logo.png' }}
       />,
     );
 
     expect(
-      screen.getByRole('button', { name: 'Upload logo' }),
+      screen.getByRole('button', { name: 'Replace logo' }),
     ).toHaveAccessibleDescription('PNG, JPEG, or WebP.');
     expect(
       screen.getByRole('button', { name: 'Remove' }),
@@ -212,12 +140,7 @@ describe(`<${AssetUploadField.name}/>`, () => {
   });
 
   it('announces a rejected file and describes the upload control with it', async () => {
-    render(
-      <AssetUploadField
-        {...baseProps}
-        onValidateFile={() => 'Choose a PNG, JPEG, or WebP image.'}
-      />,
-    );
+    renderWithIntl(<AssetUploadField {...baseProps} asset={rejectingAsset} />);
 
     await selectFile(pngFile());
 
@@ -229,19 +152,5 @@ describe(`<${AssetUploadField.name}/>`, () => {
     ).toHaveAccessibleDescription(
       'PNG, JPEG, or WebP. Choose a PNG, JPEG, or WebP image.',
     );
-  });
-
-  it('announces the uploading label while the file is being processed', async () => {
-    render(
-      <AssetUploadField
-        {...baseProps}
-        onUpload={() => new Promise(() => undefined)}
-      />,
-    );
-
-    await selectFile(pngFile());
-
-    expect(await screen.findByRole('status')).toHaveTextContent('Uploading…');
-    expect(screen.getByRole('button', { name: 'Uploading…' })).toBeDisabled();
   });
 });

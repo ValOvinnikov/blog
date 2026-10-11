@@ -40,7 +40,6 @@ export const BrandCard = ({
         <div className={rows()}>
           <BrandAssetField
             kind="logo"
-            label={t('logoFieldLabel')}
             image={logo}
             onStage={(image) => onFieldChange('logo', image)}
             isRepickNeeded={repickKinds.includes('logo')}
@@ -49,7 +48,6 @@ export const BrandCard = ({
           />
           <BrandAssetField
             kind="favicon"
-            label={t('faviconFieldLabel')}
             image={favicon}
             onStage={(image) => onFieldChange('favicon', image)}
             isRepickNeeded={repickKinds.includes('favicon')}

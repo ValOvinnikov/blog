@@ -1,82 +1,74 @@
 'use client';
 
-import { SIZE } from '@blog/config';
+import { SIZE, type TMaybeUndefined } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
+import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
+import type { TEmailLogoKind } from '@platform/constants/email-logo';
+import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-asset-limits';
+import {
+  createStagingHandlers,
+  type TStagedImage,
+} from '@platform/utils/staged-image/staged-image';
 import Image from 'next/image';
-import { unstable_rethrow } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import {
   type AriaAttributes,
   type ChangeEvent,
-  type ReactNode,
   useId,
   useRef,
   useState,
-  useTransition,
 } from 'react';
 
 import { assetUploadFieldVariants } from './asset-upload-field-variants';
 
-type TAssetUploadResult =
-  { ok: true; url: string } | { ok: false; error: string };
-
-type TAssetClearResult = { ok: true } | { ok: false; error: string };
-
-type TAssetUploadFieldSize = 'sm' | 'md';
-
-type TAssetUploadFieldLayout = 'box' | 'row';
+export type TAssetUploadSpec = {
+  kind: TBrandAssetKind | TEmailLogoKind;
+  size: 'sm' | 'md';
+  acceptedMimeTypes: readonly string[];
+  validateFile: (file: File) => TMaybeUndefined<string>;
+  stagedBadgeLabel?: string;
+};
 
 export type TAssetUploadFieldProps = {
-  size?: TAssetUploadFieldSize;
-  layout?: TAssetUploadFieldLayout;
   label: string;
   hint?: string;
-  fileName?: string;
-  badge?: ReactNode;
-  currentUrl: string | undefined;
-  currentAlt: string;
-  acceptedMimeTypes: readonly string[];
-  uploadLabel: string;
-  uploadingLabel: string;
-  removeLabel: string;
-  unexpectedErrorLabel: string;
-  onValidateFile: (file: File) => string | undefined;
-  onUpload: (formData: FormData) => Promise<TAssetUploadResult>;
-  onClear: () => Promise<TAssetClearResult>;
-  onChange: (url: string | undefined) => void;
+  image: TStagedImage;
+  onStage: (image: TStagedImage) => void;
+  asset: TAssetUploadSpec;
   isDisabled?: boolean;
   'aria-describedby'?: AriaAttributes['aria-describedby'];
 };
 
+const getFileName = ({ url, file }: TStagedImage): TMaybeUndefined<string> => {
+  if (file) return file.name;
+  if (!url) return undefined;
+  return url.split(/[?#]/)[0]?.split('/').at(-1) || undefined;
+};
+
+// Picking or removing a file only stages it; the page's Save uploads it.
 export const AssetUploadField = ({
-  size = 'md',
-  layout = 'box',
   label,
   hint,
-  fileName,
-  badge,
-  currentUrl,
-  currentAlt,
-  acceptedMimeTypes,
-  uploadLabel,
-  uploadingLabel,
-  removeLabel,
-  unexpectedErrorLabel,
-  onValidateFile,
-  onUpload,
-  onClear,
-  onChange,
+  image,
+  onStage,
+  asset,
   isDisabled = false,
   'aria-describedby': ariaDescribedBy,
 }: TAssetUploadFieldProps) => {
+  const { kind, size, acceptedMimeTypes, validateFile, stagedBadgeLabel } =
+    asset;
+  const { url, file: stagedFile } = image;
+  const t = useTranslations('assetUploadField');
   const inputRef = useRef<HTMLInputElement>(null);
-  const [error, setError] = useState<string | undefined>(undefined);
-  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<TMaybeUndefined<string>>(undefined);
   const hintId = useId();
   const errorId = useId();
   const describedBy = [hint && hintId, ariaDescribedBy, error && errorId]
     .filter(Boolean)
     .join(' ');
+  const { onPick, onClear } = createStagingHandlers(onStage);
+  const fileName = size === 'sm' ? getFileName(image) : undefined;
 
   const {
     field,
@@ -92,53 +84,21 @@ export const AssetUploadField = ({
     actions,
     input,
     error: errorSlot,
-  } = assetUploadFieldVariants({ size, layout });
+  } = assetUploadFieldVariants({ size });
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     event.target.value = '';
     if (!file) return;
 
-    const quickError = onValidateFile(file);
-    if (quickError) {
-      setError(quickError);
-      return;
-    }
-
-    setError(undefined);
-    const formData = new FormData();
-    formData.append('file', file);
-
-    startTransition(async () => {
-      try {
-        const result = await onUpload(formData);
-        if (result.ok) {
-          onChange(result.url);
-        } else {
-          setError(result.error);
-        }
-      } catch (thrownError) {
-        unstable_rethrow(thrownError);
-        setError(unexpectedErrorLabel);
-      }
-    });
+    const validationError = validateFile(file);
+    setError(validationError);
+    if (!validationError) onPick(file);
   };
 
   const handleRemove = () => {
     setError(undefined);
-    startTransition(async () => {
-      try {
-        const result = await onClear();
-        if (result.ok) {
-          onChange(undefined);
-        } else {
-          setError(result.error);
-        }
-      } catch (thrownError) {
-        unstable_rethrow(thrownError);
-        setError(unexpectedErrorLabel);
-      }
-    });
+    onClear();
   };
 
   return (
@@ -146,15 +106,15 @@ export const AssetUploadField = ({
       <div className={root()}>
         <div className={top()}>
           <span className={thumb()}>
-            {currentUrl ? (
+            {url ? (
               <Image
-                src={currentUrl}
-                alt={currentAlt}
+                src={url}
+                alt={t(`${kind}.currentAlt`)}
                 fill={true}
                 sizes="48px"
                 className={thumbImage()}
                 // A vector source has no raster grid to resample, and skipping it avoids needing `images.dangerouslyAllowSVG` in next.config.ts.
-                unoptimized={currentUrl.endsWith('.svg')}
+                unoptimized={url.endsWith('.svg')}
               />
             ) : (
               <span aria-hidden="true">—</span>
@@ -163,7 +123,11 @@ export const AssetUploadField = ({
           <div className={text()}>
             <div className={titleRow()}>
               <p className={title()}>{label}</p>
-              {badge}
+              {stagedFile && stagedBadgeLabel && (
+                <StatusBadge tone="plan" hasDot={false}>
+                  {stagedBadgeLabel}
+                </StatusBadge>
+              )}
             </div>
             {fileName && <p className={fileNameSlot()}>{fileName}</p>}
             {hint && (
@@ -191,22 +155,20 @@ export const AssetUploadField = ({
             variant="secondary"
             onClick={() => inputRef.current?.click()}
             isDisabled={isDisabled}
-            isPending={isPending}
-            pendingLabel={uploadingLabel}
             aria-describedby={describedBy}
           >
-            {uploadLabel}
+            {url ? t(`${kind}.replace`) : t(`${kind}.upload`)}
           </Button>
-          {currentUrl && (
+          {url && (
             <Button
               type="button"
               size={SIZE.SM}
               variant="ghost"
               onClick={handleRemove}
-              isDisabled={isPending || isDisabled}
+              isDisabled={isDisabled}
               aria-describedby={describedBy}
             >
-              {removeLabel}
+              {t('remove')}
             </Button>
           )}
         </div>

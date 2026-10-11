@@ -387,21 +387,35 @@
     "navAbout": "Over",
     "switcherMenuAriaLabel": "Taal: {language}"
   },
-  "brandAssetField": {
-    "savesWithChanges": "Wordt opgeslagen met de wijzigingen",
-    "unexpectedError": "Er is iets misgegaan. Probeer het opnieuw.",
-    "uploading": "Uploaden…",
+  "assetUploadField": {
     "remove": "Verwijderen",
     "logo": {
       "currentAlt": "Huidig logo",
       "upload": "Logo uploaden",
-      "replace": "Logo vervangen",
-      "pickAgain": "Uw herstelde concept bevatte een nieuw logo dat niet bewaard kon worden — kies het opnieuw."
+      "replace": "Logo vervangen"
     },
     "favicon": {
       "currentAlt": "Huidige favicon",
       "upload": "Favicon uploaden",
-      "replace": "Favicon vervangen",
+      "replace": "Favicon vervangen"
+    },
+    "SENDER": {
+      "currentAlt": "Huidig e-maillogo",
+      "upload": "E-maillogo uploaden",
+      "replace": "E-maillogo vervangen"
+    },
+    "TEMPLATE": {
+      "currentAlt": "Huidig sjabloonlogo",
+      "upload": "Sjabloonlogo uploaden",
+      "replace": "Sjabloonlogo vervangen"
+    }
+  },
+  "brandAssetField": {
+    "savesWithChanges": "Wordt opgeslagen met de wijzigingen",
+    "logo": {
+      "pickAgain": "Uw herstelde concept bevatte een nieuw logo dat niet bewaard kon worden — kies het opnieuw."
+    },
+    "favicon": {
       "pickAgain": "Uw herstelde concept bevatte een nieuwe favicon die niet bewaard kon worden — kies deze opnieuw."
     },
     "unsupportedType": "Kies een PNG-, JPEG-, WebP- of SVG-afbeelding.",
@@ -460,21 +474,8 @@
     "logoHint": "Gebruikt in elke e-mail, in elke taal. Een sjabloon kan het vervangen door een eigen logo."
   },
   "emailLogoField": {
-    "unexpectedError": "Er is iets misgegaan. Probeer het opnieuw.",
-    "uploading": "Uploaden…",
-    "remove": "Verwijderen",
     "unsupportedType": "Kies een PNG-, JPEG- of GIF-afbeelding — SVG en WebP worden niet ondersteund door grote e-mailprogramma's.",
-    "tooLarge": "Dat bestand is te groot — de limiet is {limit}.",
-    "SENDER": {
-      "currentAlt": "Huidig e-maillogo",
-      "upload": "E-maillogo uploaden",
-      "replace": "E-maillogo vervangen"
-    },
-    "TEMPLATE": {
-      "currentAlt": "Huidig sjabloonlogo",
-      "upload": "Sjabloonlogo uploaden",
-      "replace": "Sjabloonlogo vervangen"
-    }
+    "tooLarge": "Dat bestand is te groot — de limiet is {limit}."
   },
   "emailTemplateEditor": {
     "subjectLabel": "Onderwerp ({language})",
