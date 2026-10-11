@@ -1,5 +1,6 @@
 import 'server-only';
 
+import type { TMaybeUndefined } from '@blog/config/types';
 import { queries } from '@blog/db';
 import { ADMIN_ROLE } from '@blog/db/constants';
 import type { TAdmin } from '@blog/db/schema/admins';
@@ -14,7 +15,7 @@ import { requireSessionUserId } from './require-session-user-id';
 
 export type TSessionTenants = {
   userId: string;
-  admin: TAdmin | undefined;
+  admin: TMaybeUndefined<TAdmin>;
   memberships: TMembership[];
   tenants: TTenant[];
 };
