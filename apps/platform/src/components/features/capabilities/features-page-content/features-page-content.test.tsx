@@ -6,16 +6,16 @@ import { makeReadyTenant } from '@platform/testing/tenants/fixtures';
 
 import { FeaturesPageContent } from './features-page-content';
 
-const { getSettingsFeaturesMock, getSiteConfigMock } = vi.hoisted(() => ({
-  getSettingsFeaturesMock: vi.fn(),
-  getSiteConfigMock: vi.fn(),
+const { getSettingsFeaturesAndPresetMock } = vi.hoisted(() => ({
+  getSettingsFeaturesAndPresetMock: vi.fn(),
 }));
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
-    settingsFeatures: { getSettingsFeatures: getSettingsFeaturesMock },
-    siteConfig: { getSiteConfig: getSiteConfigMock },
+    settingsFeatures: {
+      getSettingsFeaturesAndPreset: getSettingsFeaturesAndPresetMock,
+    },
   },
 }));
 
@@ -30,16 +30,17 @@ const setup = customRenderAsync(FeaturesPageContent, {
 
 describe(`<${FeaturesPageContent.name}/>`, () => {
   beforeEach(() => {
-    getSettingsFeaturesMock.mockReset();
-    getSiteConfigMock.mockReset();
-    getSettingsFeaturesMock.mockResolvedValue(undefined);
-    getSiteConfigMock.mockResolvedValue(undefined);
+    getSettingsFeaturesAndPresetMock.mockReset();
+    getSettingsFeaturesAndPresetMock.mockResolvedValue({
+      features: undefined,
+      preset: undefined,
+    });
   });
 
   it('renders CONSOLE featureDefaults with no settings_features or site_config row', async () => {
     await setup({ tenant: buildTenant('GROWTH') });
 
-    expect(getSettingsFeaturesMock).toHaveBeenCalledWith('tenant-1');
+    expect(getSettingsFeaturesAndPresetMock).toHaveBeenCalledWith('tenant-1');
     expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(
       'data-checked',
       '',
@@ -51,21 +52,20 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
   });
 
   it("renders the tenant's saved settings_features row when one exists", async () => {
-    getSettingsFeaturesMock.mockResolvedValue({
-      id: 'row-1',
-      tenantId: 'tenant-1',
-      commentsEnabled: true,
-      ratingsEnabled: true,
-      bookmarksEnabled: false,
-      newsletterEnabled: true,
-      analyticsEnabled: true,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+    getSettingsFeaturesAndPresetMock.mockResolvedValue({
+      features: {
+        commentsEnabled: true,
+        ratingsEnabled: true,
+        bookmarksEnabled: false,
+        newsletterEnabled: true,
+        analyticsEnabled: true,
+        consentBannerEnabled: false,
+      },
+      preset: undefined,
     });
 
     await setup({ tenant: buildTenant('GROWTH') });
 
-    expect(getSiteConfigMock).not.toHaveBeenCalled();
     expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(
       'data-unchecked',
       '',
@@ -77,20 +77,13 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
   });
 
   it('falls back to EDITORIAL featureDefaults when site_config has that preset saved', async () => {
-    getSiteConfigMock.mockResolvedValue({
+    getSettingsFeaturesAndPresetMock.mockResolvedValue({
+      features: undefined,
       preset: PRESET_ID.EDITORIAL,
-      accentHue: 28,
-      headingFont: 'FRAUNCES',
-      bodyFont: 'INTER',
-      radiusScale: 'SM',
-      density: 'COMPACT',
-      logoAssetUrl: undefined,
-      faviconAssetUrl: undefined,
     });
 
     await setup({ tenant: buildTenant('GROWTH') });
 
-    expect(getSiteConfigMock).toHaveBeenCalledWith('tenant-1');
     expect(screen.getByRole('switch', { name: 'Bookmarks' })).toHaveAttribute(
       'data-checked',
       '',
@@ -107,16 +100,16 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
   });
 
   it('clamps a stale out-of-plan value to unchecked+disabled after a plan downgrade', async () => {
-    getSettingsFeaturesMock.mockResolvedValue({
-      id: 'row-1',
-      tenantId: 'tenant-1',
-      commentsEnabled: true,
-      ratingsEnabled: true,
-      bookmarksEnabled: true,
-      newsletterEnabled: false,
-      analyticsEnabled: true,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+    getSettingsFeaturesAndPresetMock.mockResolvedValue({
+      features: {
+        commentsEnabled: true,
+        ratingsEnabled: true,
+        bookmarksEnabled: true,
+        newsletterEnabled: false,
+        analyticsEnabled: true,
+        consentBannerEnabled: false,
+      },
+      preset: undefined,
     });
 
     await setup({ tenant: buildTenant('FREE') });

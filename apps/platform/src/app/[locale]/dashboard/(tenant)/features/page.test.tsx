@@ -10,14 +10,12 @@ const {
   listMembershipsForUserMock,
   listTenantsByIdsMock,
   getAdminByUserIdMock,
-  getSettingsFeaturesMock,
-  getSiteConfigMock,
+  getSettingsFeaturesAndPresetMock,
 } = vi.hoisted(() => ({
   listMembershipsForUserMock: vi.fn(),
   listTenantsByIdsMock: vi.fn(),
   getAdminByUserIdMock: vi.fn(),
-  getSettingsFeaturesMock: vi.fn(),
-  getSiteConfigMock: vi.fn(),
+  getSettingsFeaturesAndPresetMock: vi.fn(),
 }));
 
 vi.mock('@platform/server/auth/auth');
@@ -28,8 +26,9 @@ vi.mock('@blog/db', async () => ({
     memberships: { listMembershipsForUser: listMembershipsForUserMock },
     tenants: { listTenantsByIds: listTenantsByIdsMock },
     admins: { getAdminByUserId: getAdminByUserIdMock },
-    settingsFeatures: { getSettingsFeatures: getSettingsFeaturesMock },
-    siteConfig: { getSiteConfig: getSiteConfigMock },
+    settingsFeatures: {
+      getSettingsFeaturesAndPreset: getSettingsFeaturesAndPresetMock,
+    },
   },
 }));
 
@@ -43,8 +42,7 @@ describe(`<${DashboardFeaturesPage.name}/>`, () => {
     listMembershipsForUserMock.mockReset();
     listTenantsByIdsMock.mockReset();
     getAdminByUserIdMock.mockReset();
-    getSettingsFeaturesMock.mockReset();
-    getSiteConfigMock.mockReset();
+    getSettingsFeaturesAndPresetMock.mockReset();
 
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue(undefined);
@@ -60,16 +58,18 @@ describe(`<${DashboardFeaturesPage.name}/>`, () => {
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
 
     expect(redirect).toHaveBeenCalledWith('/api/auth/signin');
-    expect(getSettingsFeaturesMock).not.toHaveBeenCalled();
+    expect(getSettingsFeaturesAndPresetMock).not.toHaveBeenCalled();
   });
 
   it("renders the resolved tenant's Features form", async () => {
-    getSettingsFeaturesMock.mockResolvedValue(undefined);
-    getSiteConfigMock.mockResolvedValue(undefined);
+    getSettingsFeaturesAndPresetMock.mockResolvedValue({
+      features: undefined,
+      preset: undefined,
+    });
 
     await setup();
 
-    expect(getSettingsFeaturesMock).toHaveBeenCalledWith('tenant-1');
+    expect(getSettingsFeaturesAndPresetMock).toHaveBeenCalledWith('tenant-1');
     expect(screen.getByRole('heading', { name: 'Features' })).toBeVisible();
   });
 });
