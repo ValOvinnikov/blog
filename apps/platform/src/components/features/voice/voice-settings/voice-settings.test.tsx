@@ -499,6 +499,103 @@ describe(`<${VoiceSettings.name}/>`, () => {
       ).toBeVisible();
       expect(screen.getByText('German', { selector: 'strong' })).toBeVisible();
     });
+
+    describe('when fields are rejected', () => {
+      const saveBar = () =>
+        screen.getByRole('region', { name: 'Unsaved changes' });
+      const goToFirstField = () =>
+        user.click(
+          within(saveBar()).getByRole('link', { name: 'Go to the first one' }),
+        );
+
+      it('counts a field rejected in two languages once per language', async () => {
+        setupBilingual({
+          saveAction: vi.fn().mockResolvedValue({
+            ok: false,
+            fieldErrorsByLocale: {
+              [EN]: { notFoundHeading: 'Must be 100 characters or fewer.' },
+              [DE]: { notFoundHeading: 'Höchstens 100 Zeichen.' },
+            },
+          }),
+        });
+
+        await user.type(notFoundHeading(), '!');
+        await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+        expect(saveBar()).toHaveTextContent('2 fields need attention');
+      });
+
+      it('goes to the first rejected field in page order', async () => {
+        setup({
+          saveAction: vi.fn().mockResolvedValue({
+            ok: false,
+            fieldErrorsByLocale: {
+              [EN]: {
+                blogListEmpty: 'Missing required placeholder.',
+                notFoundHeading: 'Must be 100 characters or fewer.',
+              },
+            },
+          }),
+        });
+
+        await user.type(notFoundHeading(), 'Lost');
+        await user.click(screen.getByRole('button', { name: 'Save changes' }));
+        await goToFirstField();
+
+        expect(notFoundHeading()).toHaveFocus();
+      });
+
+      it('opens an earlier rejected list in place of the open one', async () => {
+        setup({
+          saveAction: vi.fn().mockResolvedValue({
+            ok: false,
+            fieldErrorsByLocale: {
+              [EN]: {
+                topicEmpty: 'Missing required placeholder {name}.',
+                tagEmpty: 'Missing required placeholder {name}.',
+              },
+            },
+          }),
+        });
+        const section = card('Empty lists');
+
+        await user.click(
+          within(section).getByRole('button', { name: /Tag page/ }),
+        );
+        await user.type(notFoundHeading(), 'Lost');
+        await user.click(screen.getByRole('button', { name: 'Save changes' }));
+        await goToFirstField();
+
+        expect(
+          within(section).getByRole('textbox', { name: 'Topic page' }),
+        ).toHaveFocus();
+      });
+
+      it('returns to the language that holds the first rejected field', async () => {
+        setupBilingual({
+          saveAction: vi.fn().mockResolvedValue({
+            ok: false,
+            fieldErrorsByLocale: {
+              [DE]: { tagEmpty: 'Missing required placeholder {name}.' },
+            },
+          }),
+        });
+
+        await user.type(notFoundHeading(), '!');
+        await user.click(screen.getByRole('button', { name: 'Save changes' }));
+        await user.click(screen.getByRole('button', { name: 'English' }));
+        await goToFirstField();
+
+        expect(
+          screen.getByText('German', { selector: 'strong' }),
+        ).toBeVisible();
+        expect(
+          within(card('Empty lists')).getByRole('textbox', {
+            name: 'Tag page',
+          }),
+        ).toHaveFocus();
+      });
+    });
   });
 
   it('restores the saved values on Discard', async () => {

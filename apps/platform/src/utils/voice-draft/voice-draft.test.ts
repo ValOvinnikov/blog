@@ -17,6 +17,7 @@ import {
   countVoiceChanges,
   toVoiceOverridesInput,
   voiceDefaultText,
+  voiceErrorsInOrder,
   withVoiceValue,
 } from './voice-draft';
 
@@ -153,4 +154,55 @@ describe('platform catalogs', () => {
       }
     },
   );
+});
+
+describe(voiceErrorsInOrder, () => {
+  it("lists one language's errors in the order the page shows its fields", () => {
+    expect(
+      voiceErrorsInOrder(
+        {
+          [EN]: {
+            bookmarksEmpty: 'Too long.',
+            blogListEmpty: 'Too long.',
+            notFoundHeading: 'Too long.',
+          },
+        },
+        EN,
+        [EN],
+      ),
+    ).toEqual([
+      { locale: EN, fieldId: 'notFoundHeading' },
+      { locale: EN, fieldId: 'blogListEmpty' },
+      { locale: EN, fieldId: 'bookmarksEmpty' },
+    ]);
+  });
+
+  it('lists the selected language first and counts a field once per language', () => {
+    expect(
+      voiceErrorsInOrder(
+        {
+          [EN]: { notFoundHeading: 'Too long.' },
+          [DE]: { notFoundHeading: 'Zu lang.' },
+        },
+        DE,
+        [EN, DE],
+      ),
+    ).toEqual([
+      { locale: DE, fieldId: 'notFoundHeading' },
+      { locale: EN, fieldId: 'notFoundHeading' },
+    ]);
+  });
+
+  it('skips cleared errors and languages that are not live', () => {
+    expect(
+      voiceErrorsInOrder(
+        {
+          [EN]: { notFoundHeading: undefined },
+          [FR]: { notFoundHeading: 'Trop long.' },
+        },
+        EN,
+        [EN, DE],
+      ),
+    ).toEqual([]);
+  });
 });

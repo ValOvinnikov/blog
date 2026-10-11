@@ -28,6 +28,7 @@ import {
   localeDraftOf,
   toVoiceOverridesInput,
   VOICE_SURFACES_IN_PAGE_ORDER,
+  voiceErrorsInOrder,
   voiceFieldInputId,
   voiceFieldsOf,
   voiceValueAsText,
@@ -35,6 +36,7 @@ import {
   buildVoiceDraft,
   type TVoiceDraft,
   type TVoiceDraftValue,
+  type TVoiceFieldError,
   type TVoiceFieldErrorsByLocale,
 } from '@platform/utils/voice-draft/voice-draft';
 import { useRouter } from 'next/navigation';
@@ -56,14 +58,6 @@ export type TVoiceSettingsProps = {
   savedAt?: Date;
   archivedAt?: Date;
 };
-
-const erroringFieldIds = (
-  errors: TVoiceFieldErrorsByLocale,
-  locale: TLocaleIsoCode,
-): TVoiceFieldId[] =>
-  VOICE_FIELDS.filter(({ id }) => errors[locale]?.[id] !== undefined).map(
-    ({ id }) => id,
-  );
 
 export const VoiceSettings = ({
   tenantId,
@@ -92,24 +86,12 @@ export const VoiceSettings = ({
   const [revision, setRevision] = useState(0);
   const { mode, setMode, isDark } = usePreviewColorScheme();
 
-  const revealFirstError = (errors: TVoiceFieldErrorsByLocale) => {
-    const locale =
-      erroringFieldIds(errors, selectedLocale).length > 0
-        ? selectedLocale
-        : liveLocales.find(
-            (candidate) => erroringFieldIds(errors, candidate).length > 0,
-          );
-    if (locale === undefined) return;
-
+  const revealError = ({ locale, fieldId }: TVoiceFieldError) => {
     setSelectedLocale(locale);
-    const listErrorId = erroringFieldIds(errors, locale).find((id) =>
-      voiceFieldsOf(VOICE_SURFACE.ARCHIVE).some((field) => field.id === id),
-    );
-    const isOpenListErroring =
-      openListFieldId !== undefined &&
-      errors[locale]?.[openListFieldId] !== undefined;
-    if (listErrorId && !isOpenListErroring) {
-      setOpenListFieldId(listErrorId);
+    if (
+      voiceFieldsOf(VOICE_SURFACE.ARCHIVE).some((field) => field.id === fieldId)
+    ) {
+      setOpenListFieldId(fieldId);
     }
   };
 
@@ -123,7 +105,12 @@ export const VoiceSettings = ({
         );
         const errors = result.ok ? {} : (result.fieldErrorsByLocale ?? {});
         setFieldErrors(errors);
-        revealFirstError(errors);
+        const [firstError] = voiceErrorsInOrder(
+          errors,
+          selectedLocale,
+          liveLocales,
+        );
+        if (firstError) revealError(firstError);
         return result;
       },
       onSuccess: (submitted) => {
@@ -139,21 +126,13 @@ export const VoiceSettings = ({
   const draftValues = localeDraftOf(values, selectedLocale);
   const savedValues = localeDraftOf(saved, selectedLocale);
   const localeErrors = fieldErrors[selectedLocale] ?? {};
-  const hasFieldErrors = liveLocales.some(
-    (locale) => erroringFieldIds(fieldErrors, locale).length > 0,
+  const errorsInOrder = voiceErrorsInOrder(
+    fieldErrors,
+    selectedLocale,
+    liveLocales,
   );
-  const invalidFieldIds = [
-    ...new Set(
-      [
-        selectedLocale,
-        ...liveLocales.filter((locale) => locale !== selectedLocale),
-      ].flatMap((locale) =>
-        erroringFieldIds(fieldErrors, locale).map((id) =>
-          voiceFieldInputId(fieldIdPrefix, id),
-        ),
-      ),
-    ),
-  ];
+  const [firstError] = errorsInOrder;
+  const hasFieldErrors = firstError !== undefined;
 
   const changeField = (id: TVoiceFieldId, value: TVoiceDraftValue) => {
     setValues((prev) => withVoiceValue(prev, selectedLocale, id, value));
@@ -200,7 +179,12 @@ export const VoiceSettings = ({
             }))
           : []
       }
-      invalidFieldIds={invalidFieldIds}
+      invalidFields={{
+        ids: errorsInOrder.map(({ fieldId }) =>
+          voiceFieldInputId(fieldIdPrefix, fieldId),
+        ),
+        revealFirst: firstError && (() => revealError(firstError)),
+      }}
       isPending={isPending}
       archivedAt={archivedAt}
       archivedNoticeId={archivedNoticeId}
