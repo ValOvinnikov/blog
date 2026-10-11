@@ -70,7 +70,7 @@ export const DeprovisionTenantControl = ({
         />
         <Card.Body>
           <div className={content()}>
-            <Text variant="supporting">{t('deleteDescription')}</Text>
+            <Text variant="muted">{t('deleteDescription')}</Text>
             <DeleteTenantPermanentlyControl tenant={tenant} />
           </div>
         </Card.Body>
@@ -86,7 +86,7 @@ export const DeprovisionTenantControl = ({
       />
       <Card.Body>
         <div className={content()}>
-          <Text variant="supporting">{t('description')}</Text>
+          <Text variant="muted">{t('description')}</Text>
 
           <ConfirmDialog
             isOpen={open}
@@ -119,7 +119,7 @@ export const DeprovisionTenantControl = ({
           </ConfirmDialog>
 
           {isDeprovisioningInProgress && (
-            <Text id={inProgressHintId} variant="hint">
+            <Text id={inProgressHintId} variant="meta">
               {t('inProgressHint')}
             </Text>
           )}

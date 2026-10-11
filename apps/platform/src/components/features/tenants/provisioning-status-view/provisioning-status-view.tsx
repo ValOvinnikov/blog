@@ -167,7 +167,7 @@ export const ProvisioningStatusView = ({
 
       {!ownerEmail && (
         <div className={ownerRow()}>
-          <Text variant="hint">{t('ownerLabel')}</Text>
+          <Text variant="meta">{t('ownerLabel')}</Text>
           <StatusBadge tone="warn">{t('ownerInvitedPendingBadge')}</StatusBadge>
         </div>
       )}

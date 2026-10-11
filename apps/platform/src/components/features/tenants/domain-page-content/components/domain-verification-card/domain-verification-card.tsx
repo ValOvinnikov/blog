@@ -40,7 +40,7 @@ export const DomainVerificationCard = ({
               {t(`dnsStatus.${status}`)}
             </StatusBadge>
             {wasChecked && (
-              <Text variant="hint" as="span">
+              <Text variant="meta" as="span">
                 {t('checkedHint')}
               </Text>
             )}
@@ -52,7 +52,7 @@ export const DomainVerificationCard = ({
           <Text variant="supporting">{t('verifiedEmptyState')}</Text>
         ) : dnsRecords.length > 0 ? (
           <>
-            <Text variant="supporting">{t('bodyCopy')}</Text>
+            <Text variant="muted">{t('bodyCopy')}</Text>
             <DnsRecordsTable records={dnsRecords} />
           </>
         ) : (

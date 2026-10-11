@@ -58,7 +58,7 @@ export const ReactivateTenantControl = ({
       <Card.Header title={t('cardTitle')} />
       <Card.Body>
         <div className={content()}>
-          <Text variant="supporting">{t('description')}</Text>
+          <Text variant="muted">{t('description')}</Text>
 
           <ConfirmDialog
             tone="primary"
