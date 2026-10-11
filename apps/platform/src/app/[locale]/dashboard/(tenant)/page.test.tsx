@@ -9,16 +9,14 @@ import type { Session } from 'next-auth';
 import DashboardOverviewPage from './page';
 
 const {
-  listMembershipsForUserMock,
-  listTenantsByIdsMock,
+  listMembershipsWithTenantsForUserMock,
   getAdminByUserIdMock,
   getTenantOwnerEmailMock,
   getTenantOwnerMembershipMock,
   getDomainVerificationStatusMock,
   cookiesMock,
 } = vi.hoisted(() => ({
-  listMembershipsForUserMock: vi.fn(),
-  listTenantsByIdsMock: vi.fn(),
+  listMembershipsWithTenantsForUserMock: vi.fn(),
   getAdminByUserIdMock: vi.fn(),
   getTenantOwnerEmailMock: vi.fn(),
   getTenantOwnerMembershipMock: vi.fn(),
@@ -32,11 +30,10 @@ vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
     memberships: {
-      listMembershipsForUser: listMembershipsForUserMock,
+      listMembershipsWithTenantsForUser: listMembershipsWithTenantsForUserMock,
       getTenantOwnerEmail: getTenantOwnerEmailMock,
       getTenantOwnerMembership: getTenantOwnerMembershipMock,
     },
-    tenants: { listTenantsByIds: listTenantsByIdsMock },
     admins: { getAdminByUserId: getAdminByUserIdMock },
   },
 }));
@@ -49,13 +46,19 @@ vi.mock('next/headers', () => ({ cookies: cookiesMock }));
 
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
+const membership = {
+  id: 'm-1',
+  userId: 'user-1',
+  tenantId: 'tenant-1',
+  role: 'OWNER',
+};
+
 const setup = customRenderAsync(DashboardOverviewPage, {});
 
 describe(`<${DashboardOverviewPage.name}/>`, () => {
   beforeEach(() => {
     authMock.mockReset();
-    listMembershipsForUserMock.mockReset();
-    listTenantsByIdsMock.mockReset();
+    listMembershipsWithTenantsForUserMock.mockReset();
     getAdminByUserIdMock.mockReset();
     getAdminByUserIdMock.mockResolvedValue(undefined);
     getTenantOwnerEmailMock.mockReset();
@@ -83,15 +86,14 @@ describe(`<${DashboardOverviewPage.name}/>`, () => {
 
   it('renders the owner home for a member with exactly one membership', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    listMembershipsForUserMock.mockResolvedValue([
-      { id: 'm-1', userId: 'user-1', tenantId: 'tenant-1', role: 'OWNER' },
-    ]);
     const tenant = makeTenant({
       id: 'tenant-1',
       name: 'Acme Inc.',
       primaryDomain: 'acme.example.com',
     });
-    listTenantsByIdsMock.mockResolvedValue([tenant]);
+    listMembershipsWithTenantsForUserMock.mockResolvedValue([
+      { membership, tenant },
+    ]);
 
     await setup();
 
@@ -108,11 +110,8 @@ describe(`<${DashboardOverviewPage.name}/>`, () => {
 
   it('renders the owner home without waiting for the Vercel domain status', async () => {
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    listMembershipsForUserMock.mockResolvedValue([
-      { id: 'm-1', userId: 'user-1', tenantId: 'tenant-1', role: 'OWNER' },
-    ]);
-    listTenantsByIdsMock.mockResolvedValue([
-      makeTenant({ id: 'tenant-1', name: 'Acme Inc.' }),
+    listMembershipsWithTenantsForUserMock.mockResolvedValue([
+      { membership, tenant: makeTenant({ id: 'tenant-1', name: 'Acme Inc.' }) },
     ]);
     getDomainVerificationStatusMock.mockReturnValue(new Promise(() => {}));
 

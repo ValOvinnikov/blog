@@ -7,13 +7,11 @@ import type { Session } from 'next-auth';
 import DashboardLookPage from './page';
 
 const {
-  listMembershipsForUserMock,
-  listTenantsByIdsMock,
+  listMembershipsWithTenantsForUserMock,
   getAdminByUserIdMock,
   getSiteConfigMock,
 } = vi.hoisted(() => ({
-  listMembershipsForUserMock: vi.fn(),
-  listTenantsByIdsMock: vi.fn(),
+  listMembershipsWithTenantsForUserMock: vi.fn(),
   getAdminByUserIdMock: vi.fn(),
   getSiteConfigMock: vi.fn(),
 }));
@@ -23,9 +21,10 @@ vi.mock('@platform/server/auth/auth');
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
-    memberships: { listMembershipsForUser: listMembershipsForUserMock },
+    memberships: {
+      listMembershipsWithTenantsForUser: listMembershipsWithTenantsForUserMock,
+    },
     tenants: {
-      listTenantsByIds: listTenantsByIdsMock,
       selectLiveLocales: vi.fn().mockReturnValue(['EN']),
     },
     admins: { getAdminByUserId: getAdminByUserIdMock },
@@ -35,22 +34,27 @@ vi.mock('@blog/db', async () => ({
 
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
+const membership = {
+  id: 'm-1',
+  userId: 'user-1',
+  tenantId: 'tenant-1',
+  role: 'OWNER',
+};
+
 const setup = customRenderAsync(DashboardLookPage, {});
 
 describe(`<${DashboardLookPage.name}/>`, () => {
   beforeEach(() => {
     authMock.mockReset();
-    listMembershipsForUserMock.mockReset();
-    listTenantsByIdsMock.mockReset();
+    listMembershipsWithTenantsForUserMock.mockReset();
     getAdminByUserIdMock.mockReset();
     getSiteConfigMock.mockReset();
 
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
     getAdminByUserIdMock.mockResolvedValue(undefined);
-    listMembershipsForUserMock.mockResolvedValue([
-      { id: 'm-1', userId: 'user-1', tenantId: 'tenant-1', role: 'OWNER' },
+    listMembershipsWithTenantsForUserMock.mockResolvedValue([
+      { membership, tenant: { id: 'tenant-1' } },
     ]);
-    listTenantsByIdsMock.mockResolvedValue([{ id: 'tenant-1' }]);
   });
 
   it('redirects to sign-in without a session', async () => {

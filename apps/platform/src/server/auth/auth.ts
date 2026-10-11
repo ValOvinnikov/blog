@@ -2,6 +2,7 @@ import 'server-only';
 
 import { buildAuthConfig } from '@blog/auth';
 import NextAuth from 'next-auth';
+import { cache } from 'react';
 
 // Config is a function — Auth.js v5's lazy-initialization form — so
 // `buildAuthConfig`'s `DrizzleAdapter(getDb(), …)`, and therefore
@@ -11,6 +12,9 @@ import NextAuth from 'next-auth';
 // `DATABASE_URL` that's legitimately unset in CI. Same reasoning as
 // `apps/web/src/server/auth/auth.ts`.
 const { handlers, auth, signIn, signOut } = NextAuth(() => buildAuthConfig());
+
+/** Server Components and gates read the session through this; `auth()` is a database lookup on every call. */
+export const getSession = cache(() => auth());
 
 export const { GET, POST } = handlers;
 export { auth, signIn, signOut };

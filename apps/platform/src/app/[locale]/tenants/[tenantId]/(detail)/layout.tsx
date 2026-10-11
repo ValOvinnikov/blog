@@ -1,6 +1,6 @@
 import { AdminShell } from '@platform/components/features/layout/admin-shell';
 import { TenantBreadcrumb } from '@platform/components/features/layout/tenant-breadcrumb';
-import { auth } from '@platform/server/auth/auth';
+import { getSession } from '@platform/server/auth/auth';
 import { requireTenantById } from '@platform/server/auth/require-tenant-by-id';
 import { resolveIsSidebarCollapsed } from '@platform/server/layout/resolve-is-sidebar-collapsed';
 import {
@@ -24,7 +24,7 @@ type TProps = {
 export default async function TenantDetailLayout({ children, params }: TProps) {
   const { tenantId } = await params;
   const { tenant, admin } = await requireTenantById(tenantId);
-  const session = await auth();
+  const session = await getSession();
   const isSidebarInitiallyCollapsed = await resolveIsSidebarCollapsed();
   const t = await getTranslations('tenantLayout');
   const tNavSections = (await getTranslations(

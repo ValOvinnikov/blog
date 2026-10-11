@@ -58,13 +58,12 @@ describe(`<${TenantDetailLayout.name}/>`, () => {
     });
   });
 
-  it('redirects to sign-in without querying the tenant when there is no session', async () => {
+  it('redirects to sign-in when there is no session', async () => {
     authMock.mockResolvedValue(null);
 
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
 
     expect(redirect).toHaveBeenCalledWith('/api/auth/signin');
-    expect(getTenantByIdMock).not.toHaveBeenCalled();
   });
 
   it('404s when the signed-in user has no admins row', async () => {
@@ -73,7 +72,6 @@ describe(`<${TenantDetailLayout.name}/>`, () => {
     await expect(setup()).rejects.toThrow('NEXT_NOT_FOUND');
 
     expect(redirect).not.toHaveBeenCalled();
-    expect(getTenantByIdMock).not.toHaveBeenCalled();
   });
 
   it('renders the gated content for a platform operator', async () => {

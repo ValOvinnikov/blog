@@ -6,23 +6,20 @@ import type { Session } from 'next-auth';
 
 import SelectTenantPage from './page';
 
-const {
-  listMembershipsForUserMock,
-  listTenantsByIdsMock,
-  getAdminByUserIdMock,
-} = vi.hoisted(() => ({
-  listMembershipsForUserMock: vi.fn(),
-  listTenantsByIdsMock: vi.fn(),
-  getAdminByUserIdMock: vi.fn(),
-}));
+const { listMembershipsWithTenantsForUserMock, getAdminByUserIdMock } =
+  vi.hoisted(() => ({
+    listMembershipsWithTenantsForUserMock: vi.fn(),
+    getAdminByUserIdMock: vi.fn(),
+  }));
 
 vi.mock('@platform/server/auth/auth');
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
-    memberships: { listMembershipsForUser: listMembershipsForUserMock },
-    tenants: { listTenantsByIds: listTenantsByIdsMock },
+    memberships: {
+      listMembershipsWithTenantsForUser: listMembershipsWithTenantsForUserMock,
+    },
     admins: { getAdminByUserId: getAdminByUserIdMock },
   },
 }));
@@ -34,8 +31,7 @@ const setup = customRenderAsync(SelectTenantPage, {});
 describe(`<${SelectTenantPage.name}/>`, () => {
   beforeEach(() => {
     authMock.mockReset();
-    listMembershipsForUserMock.mockReset();
-    listTenantsByIdsMock.mockReset();
+    listMembershipsWithTenantsForUserMock.mockReset();
     getAdminByUserIdMock.mockReset();
     getAdminByUserIdMock.mockResolvedValue(undefined);
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
@@ -50,7 +46,7 @@ describe(`<${SelectTenantPage.name}/>`, () => {
   });
 
   it('redirects to /workspace-pending with zero memberships', async () => {
-    listMembershipsForUserMock.mockResolvedValue([]);
+    listMembershipsWithTenantsForUserMock.mockResolvedValue([]);
 
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
 
@@ -58,10 +54,12 @@ describe(`<${SelectTenantPage.name}/>`, () => {
   });
 
   it('redirects straight to /dashboard for exactly one membership — nothing to pick', async () => {
-    listMembershipsForUserMock.mockResolvedValue([
-      { id: 'm-1', userId: 'user-1', tenantId: 'tenant-1', role: 'OWNER' },
+    listMembershipsWithTenantsForUserMock.mockResolvedValue([
+      {
+        membership: { id: 'm-1', userId: 'user-1', tenantId: 'tenant-1' },
+        tenant: { id: 'tenant-1' },
+      },
     ]);
-    listTenantsByIdsMock.mockResolvedValue([{ id: 'tenant-1' }]);
 
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
 
@@ -69,13 +67,15 @@ describe(`<${SelectTenantPage.name}/>`, () => {
   });
 
   it('renders the picker for multiple memberships', async () => {
-    listMembershipsForUserMock.mockResolvedValue([
-      { id: 'm-1', userId: 'user-1', tenantId: 'tenant-1', role: 'OWNER' },
-      { id: 'm-2', userId: 'user-1', tenantId: 'tenant-2', role: 'OWNER' },
-    ]);
-    listTenantsByIdsMock.mockResolvedValue([
-      { id: 'tenant-1', name: 'Acme Inc.' },
-      { id: 'tenant-2', name: 'Globex Corp.' },
+    listMembershipsWithTenantsForUserMock.mockResolvedValue([
+      {
+        membership: { id: 'm-1', userId: 'user-1', tenantId: 'tenant-1' },
+        tenant: { id: 'tenant-1', name: 'Acme Inc.' },
+      },
+      {
+        membership: { id: 'm-2', userId: 'user-1', tenantId: 'tenant-2' },
+        tenant: { id: 'tenant-2', name: 'Globex Corp.' },
+      },
     ]);
 
     await setup();

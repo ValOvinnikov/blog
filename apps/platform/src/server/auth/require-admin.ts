@@ -2,10 +2,10 @@ import 'server-only';
 
 import { queries } from '@blog/db';
 import type { TAdmin } from '@blog/db/schema/admins';
-import { adminRoutes } from '@platform/utils/routes/routes';
-import { notFound, redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
+import { cache } from 'react';
 
-import { auth } from './auth';
+import { requireSessionUserId } from './require-session-user-id';
 
 /**
  * The Platform-section gate: no session redirects to sign-in, a session with
@@ -18,14 +18,8 @@ import { auth } from './auth';
  * updating a tenant's details) — any admin role can reverse those. Actions
  * that are irreversible or reach outside this app require `requireSuperAdmin`.
  */
-export const requireAdmin = async (): Promise<TAdmin> => {
-  const session = await auth();
-  const userId = session?.user?.id;
-
-  if (!userId) {
-    redirect(adminRoutes.signIn());
-  }
-
+export const requireAdmin = cache(async (): Promise<TAdmin> => {
+  const userId = await requireSessionUserId();
   const admin = await queries.admins.getAdminByUserId(userId);
 
   if (!admin) {
@@ -33,4 +27,4 @@ export const requireAdmin = async (): Promise<TAdmin> => {
   }
 
   return admin;
-};
+});

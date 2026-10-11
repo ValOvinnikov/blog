@@ -6,9 +6,8 @@ import type { Session } from 'next-auth';
 
 import DashboardLayout from './layout';
 
-const { listMembershipsForUserMock, listTenantsByIdsMock } = vi.hoisted(() => ({
-  listMembershipsForUserMock: vi.fn(),
-  listTenantsByIdsMock: vi.fn(),
+const { listMembershipsWithTenantsForUserMock } = vi.hoisted(() => ({
+  listMembershipsWithTenantsForUserMock: vi.fn(),
 }));
 
 vi.mock('@platform/server/auth/auth');
@@ -16,8 +15,9 @@ vi.mock('@platform/server/auth/auth');
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
-    memberships: { listMembershipsForUser: listMembershipsForUserMock },
-    tenants: { listTenantsByIds: listTenantsByIdsMock },
+    memberships: {
+      listMembershipsWithTenantsForUser: listMembershipsWithTenantsForUserMock,
+    },
     admins: { getAdminByUserId: vi.fn().mockResolvedValue(undefined) },
   },
 }));
@@ -31,8 +31,7 @@ const setup = customRenderAsync(DashboardLayout, {
 describe(`<${DashboardLayout.name}/>`, () => {
   beforeEach(() => {
     authMock.mockReset();
-    listMembershipsForUserMock.mockReset();
-    listTenantsByIdsMock.mockReset();
+    listMembershipsWithTenantsForUserMock.mockReset();
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
   });
 
@@ -42,11 +41,11 @@ describe(`<${DashboardLayout.name}/>`, () => {
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
 
     expect(redirect).toHaveBeenCalledWith('/api/auth/signin');
-    expect(listMembershipsForUserMock).not.toHaveBeenCalled();
+    expect(listMembershipsWithTenantsForUserMock).not.toHaveBeenCalled();
   });
 
   it('redirects to /workspace-pending when the signed-in user has zero memberships', async () => {
-    listMembershipsForUserMock.mockResolvedValue([]);
+    listMembershipsWithTenantsForUserMock.mockResolvedValue([]);
 
     await expect(setup()).rejects.toThrow('NEXT_REDIRECT');
 
@@ -54,13 +53,15 @@ describe(`<${DashboardLayout.name}/>`, () => {
   });
 
   it('renders the gated content for any membership without resolving a single tenant', async () => {
-    listMembershipsForUserMock.mockResolvedValue([
-      { id: 'm-1', userId: 'user-1', tenantId: 'tenant-1', role: 'OWNER' },
-      { id: 'm-2', userId: 'user-1', tenantId: 'tenant-2', role: 'OWNER' },
-    ]);
-    listTenantsByIdsMock.mockResolvedValue([
-      { id: 'tenant-1' },
-      { id: 'tenant-2' },
+    listMembershipsWithTenantsForUserMock.mockResolvedValue([
+      {
+        membership: { id: 'm-1', userId: 'user-1', tenantId: 'tenant-1' },
+        tenant: { id: 'tenant-1' },
+      },
+      {
+        membership: { id: 'm-2', userId: 'user-1', tenantId: 'tenant-2' },
+        tenant: { id: 'tenant-2' },
+      },
     ]);
 
     await setup();

@@ -13,13 +13,11 @@ import type { Session } from 'next-auth';
 import DashboardDomainPage from './page';
 
 const {
-  listMembershipsForUserMock,
-  listTenantsByIdsMock,
+  listMembershipsWithTenantsForUserMock,
   getAdminByUserIdMock,
   getProjectDomainMock,
 } = vi.hoisted(() => ({
-  listMembershipsForUserMock: vi.fn(),
-  listTenantsByIdsMock: vi.fn(),
+  listMembershipsWithTenantsForUserMock: vi.fn(),
   getAdminByUserIdMock: vi.fn(),
   getProjectDomainMock: vi.fn(),
 }));
@@ -29,8 +27,9 @@ vi.mock('@platform/server/auth/auth');
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
-    memberships: { listMembershipsForUser: listMembershipsForUserMock },
-    tenants: { listTenantsByIds: listTenantsByIdsMock },
+    memberships: {
+      listMembershipsWithTenantsForUser: listMembershipsWithTenantsForUserMock,
+    },
     admins: { getAdminByUserId: getAdminByUserIdMock },
   },
 }));
@@ -41,17 +40,20 @@ vi.mock('@platform/server/provisioning/vercel-domains-api', () => ({
 
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 
+const membership = {
+  id: 'm-1',
+  userId: 'user-1',
+  tenantId: 'tenant-1',
+  role: 'OWNER',
+};
+
 const setup = customRenderAsync(DashboardDomainPage, {});
 
 describe(`<${DashboardDomainPage.name}/>`, () => {
   beforeEach(() => {
     authMock.mockReset();
     authMock.mockResolvedValue({ user: { id: 'user-1' } });
-    listMembershipsForUserMock.mockReset();
-    listMembershipsForUserMock.mockResolvedValue([
-      { id: 'm-1', userId: 'user-1', tenantId: 'tenant-1', role: 'OWNER' },
-    ]);
-    listTenantsByIdsMock.mockReset();
+    listMembershipsWithTenantsForUserMock.mockReset();
     getAdminByUserIdMock.mockReset();
     getAdminByUserIdMock.mockResolvedValue(undefined);
     getProjectDomainMock.mockReset();
@@ -75,7 +77,9 @@ describe(`<${DashboardDomainPage.name}/>`, () => {
       id: 'tenant-1',
       primaryDomain: 'northwind.dev',
     });
-    listTenantsByIdsMock.mockResolvedValue([tenant]);
+    listMembershipsWithTenantsForUserMock.mockResolvedValue([
+      { membership, tenant },
+    ]);
 
     await act(async () => {
       await setup();
