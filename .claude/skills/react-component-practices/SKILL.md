@@ -64,6 +64,16 @@ them repeat what is here. Tests for these components follow
   on mount to "initialise", not for chaining state updates.
 - A `ref` is for DOM access (focus, measurement, scroll) or a mutable value
   that must not cause a render. Never as a second state store.
+- **A context's `use<Name>()` hook throws outside its provider — every
+  one, no exceptions.** Create the context with `undefined` as its default
+  and throw `'use<Name> must be used within a <Name>Provider'` when
+  `useContext` returns it. Never give the context a fallback value, and
+  never read it through `?.` so the hook quietly does nothing: a missing
+  provider is a wiring bug, and a fallback hides it until a user meets the
+  wrong behaviour. When a component should also work without the provider,
+  its caller renders the provider (with the "nothing applies" value) — the
+  hook never decides that on its own. Tests and stories wrap the component
+  in its provider like any other caller.
 
 ## Composition over configuration
 
