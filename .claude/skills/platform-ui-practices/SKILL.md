@@ -427,8 +427,8 @@ No other value between those things: no `gap-5`, `gap-[18px]`, `mb-[18px]`, or
        (`toast-provider`, `unsaved-changes-provider`). A context for one domain
        goes in `src/components/features/<domain>/<name>-provider/`
        (`sidebar-collapse-provider`).
-     - The hook throws outside its provider, unless having no provider has a
-       safe meaning (for example, not archived and not pending).
+     - The hook throws outside its provider, with no fallback value
+       (`react-component-practices` → "State").
 - Never create a context for a single reader or to skip a single hop; pass the
   prop. A provider whose only consumer is its owner's direct child is just a
   prop with extra steps.
