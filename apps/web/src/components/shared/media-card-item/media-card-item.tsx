@@ -1,5 +1,4 @@
-import { ICONS, SIZE, type IWithDataTestId } from '@blog/config';
-import { Icon } from '@blog/ui/components/atoms/icon';
+import { type IWithDataTestId } from '@blog/config';
 import { MediaCard } from '@blog/ui/components/molecules/media-card';
 import type { THeadingLevel } from '@blog/ui/lib/react';
 import { SmartLink } from '@web/components/shared/smart-link';
@@ -59,15 +58,6 @@ export const MediaCardItem = ({
         {item.title}
       </MediaCard.Link>
     </MediaCard.Title>
-    <MediaCard.Footer
-      topic={item.topic.title}
-      trailingIcon={
-        <Icon
-          name={ICONS.ARROW}
-          size={SIZE.SM}
-          dataTestId="media-card-footer-arrow"
-        />
-      }
-    />
+    <MediaCard.Footer topic={item.topic.title} />
   </MediaCard>
 );
