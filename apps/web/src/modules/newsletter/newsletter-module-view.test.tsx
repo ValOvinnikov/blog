@@ -15,6 +15,7 @@ const setup = customRender(NewsletterModuleView, {
     heading: 'Get new posts',
     supportingText: 'Straight to inbox.',
   }),
+  content: undefined,
   variant: NEWSLETTER_VARIANT.FULL,
   layout: undefined,
   contentAlignment: undefined,
