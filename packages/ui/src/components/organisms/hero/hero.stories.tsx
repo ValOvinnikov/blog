@@ -324,6 +324,65 @@ export const BannerToneSecondary: TStory = {
   },
 };
 
+const bannerWithoutMediaContent = (
+  <Hero.Cta>
+    <NavLink href="/posts/design-system">Read more</NavLink>
+  </Hero.Cta>
+);
+
+export const BannerWithoutMediaTonePrimary: TStory = {
+  args: {
+    variant: HERO_VARIANT.BANNER,
+    tone: BRAND_VARIANT.PRIMARY,
+    children: bannerWithoutMediaContent,
+  },
+};
+
+export const BannerWithoutMediaToneSecondary: TStory = {
+  args: {
+    ...BannerWithoutMediaTonePrimary.args,
+    tone: BRAND_VARIANT.SECONDARY,
+  },
+};
+
+export const BannerWithoutMediaToneBrandPrimary: TStory = {
+  args: {
+    ...BannerWithoutMediaTonePrimary.args,
+    tone: BRAND_VARIANT.BRAND_PRIMARY,
+  },
+};
+
+export const BannerWithoutMediaTonePrimaryDark: TStory = {
+  ...BannerWithoutMediaTonePrimary,
+  globals: { theme: 'dark' },
+};
+
+export const BannerWithoutMediaToneSecondaryDark: TStory = {
+  ...BannerWithoutMediaToneSecondary,
+  globals: { theme: 'dark' },
+};
+
+export const BannerWithoutMediaToneBrandPrimaryDark: TStory = {
+  ...BannerWithoutMediaToneBrandPrimary,
+  globals: { theme: 'dark' },
+};
+
+export const BannerProfileWithoutMedia: TStory = {
+  args: {
+    variant: HERO_VARIANT.BANNER,
+    tone: BRAND_VARIANT.SECONDARY,
+    eyebrow: 'Platform engineering',
+    title: 'Jane Doe',
+    excerpt: 'Staff engineer',
+    children: profileContent,
+  },
+};
+
+export const BannerProfileWithoutMediaDark: TStory = {
+  ...BannerProfileWithoutMedia,
+  globals: { theme: 'dark' },
+};
+
 export const BannerSpacingNone: TStory = {
   args: {
     ...BannerContentLeft.args,

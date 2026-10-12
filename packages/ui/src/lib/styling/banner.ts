@@ -14,7 +14,7 @@ import { tv } from './tv';
 
 const NEUTRAL_TONES = [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY];
 
-/** The IMAGE_SCRIM surface: a full-bleed photo under a scrim, sized and padded by the band ladder. */
+/** The IMAGE_SCRIM surface: a full-bleed photo under a scrim, or the tone's band surface without one, sized and padded by the band ladder. */
 export const bannerVariants = tv({
   slots: {
     root: [
@@ -38,6 +38,15 @@ export const bannerVariants = tv({
       [BRAND_VARIANT.PRIMARY]: {},
       [BRAND_VARIANT.SECONDARY]: {},
       [BRAND_VARIANT.BRAND_PRIMARY]: {},
+    },
+    hasMedia: {
+      true: {},
+      // Slotted copy styled for a photo (`*-on-image`) takes the surface's ink when there is none.
+      false: {
+        root: [
+          '[--on-image:var(--text)] [--on-image-muted:var(--text-muted)]',
+        ],
+      },
     },
     position: {
       [CONTENT_ALIGNMENT.LEFT]: { root: ['items-center sm:items-start'] },
@@ -106,6 +115,16 @@ export const bannerVariants = tv({
   },
   compoundVariants: [
     {
+      tone: NEUTRAL_TONES,
+      hasMedia: false,
+      class: { root: ['bg-secondary surface-secondary'] },
+    },
+    {
+      tone: BRAND_VARIANT.BRAND_PRIMARY,
+      hasMedia: false,
+      class: { root: ['bg-brand-primary-muted surface-brand-primary'] },
+    },
+    {
       tone: BRAND_VARIANT.BRAND_PRIMARY,
       position: CONTENT_ALIGNMENT.LEFT,
       class: { overlay: [BRAND_SCRIM_CENTER, BRAND_SCRIM_LEFT_FROM_SM] },
@@ -146,6 +165,7 @@ export const bannerVariants = tv({
   ],
   defaultVariants: {
     tone: BRAND_VARIANT.PRIMARY,
+    hasMedia: true,
     position: CONTENT_ALIGNMENT.LEFT,
     spacingTop: SPACING_SCALE.MD,
     spacingBottom: SPACING_SCALE.MD,

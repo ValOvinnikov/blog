@@ -93,6 +93,7 @@ const HeroRoot = ({
   const banner = isBanner
     ? bannerVariants({
         tone,
+        hasMedia,
         position: resolvedPosition,
         spacingTop,
         spacingBottom,
@@ -172,7 +173,7 @@ const HeroRoot = ({
             )}
           </div>
         )}
-        {banner && (
+        {banner && hasMedia && (
           <div
             className={banner.overlay()}
             aria-hidden="true"
