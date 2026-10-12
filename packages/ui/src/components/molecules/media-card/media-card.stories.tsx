@@ -143,6 +143,78 @@ export const AsSecondLevelHeading: TStory = {
   },
 };
 
+const twoLineExcerpt =
+  'How a token-driven type scale keeps every card readable, from a narrow sidebar column to a full-width grid.';
+
+const titledCard = (title: string) => (
+  <>
+    <MediaCard.Meta
+      dateValue="2024-03-10"
+      dateLabel="March 10, 2024"
+      readingTime="9 min"
+    />
+    <MediaCard.Title level={3}>
+      <MediaCard.Link href="/posts/type-scale">{title}</MediaCard.Link>
+    </MediaCard.Title>
+    <MediaCard.Footer
+      topic="design-system"
+      trailingIcon={<Icon name={ICONS.ARROW} size={SIZE.SM} />}
+    />
+  </>
+);
+
+const shortTitle = 'Type scales';
+const longTitle =
+  'Why the title of a card should always read larger than the excerpt underneath it, whatever the width of the column it sits in';
+
+export const ShortTitle: TStory = {
+  args: {
+    excerpt: twoLineExcerpt,
+    tags: undefined,
+    children: titledCard(shortTitle),
+  },
+};
+
+export const LongTitle: TStory = {
+  args: {
+    excerpt: twoLineExcerpt,
+    tags: undefined,
+    children: titledCard(longTitle),
+  },
+};
+
+export const NarrowColumn: TStory = {
+  decorators: [
+    (Story) => (
+      <div className="w-[187px]">
+        <Story />
+      </div>
+    ),
+  ],
+  args: {
+    excerpt: twoLineExcerpt,
+    tags: undefined,
+    children: titledCard(longTitle),
+  },
+};
+
+export const ThreeAcross: TStory = {
+  decorators: [
+    (Story) => (
+      <div className="grid max-w-6xl grid-cols-3 gap-6">
+        <Story />
+        <Story />
+        <Story />
+      </div>
+    ),
+  ],
+  args: {
+    excerpt: twoLineExcerpt,
+    tags: undefined,
+    children: titledCard(longTitle),
+  },
+};
+
 export const Split: TStory = {
   args: {
     isSplit: true,

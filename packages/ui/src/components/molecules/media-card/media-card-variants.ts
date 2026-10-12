@@ -5,11 +5,11 @@ export const mediaCardVariants = tv({
   slots: {
     root: [
       'relative flex h-full flex-col overflow-hidden',
-      'item-card surface-card',
+      'item-card surface-card @container',
     ],
     media: [],
     content: ['flex flex-col flex-1', 'px-card-x py-card-y gap-2'],
-    excerpt: ['text-prose leading-[1.55]', 'text-muted line-clamp-2'],
+    excerpt: ['text-copy text-muted line-clamp-3'],
     tags: ['flex flex-wrap gap-1.5 mt-1'],
   },
   variants: {
@@ -28,7 +28,7 @@ export const mediaCardVariants = tv({
     },
     isLead: {
       true: {
-        excerpt: ['line-clamp-3'],
+        excerpt: ['text-prose leading-[1.55]'],
       },
     },
     align: {
