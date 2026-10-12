@@ -147,6 +147,10 @@ changes` above requires.
 
 **Report back to the orchestrator** with:
 
+- **Examined** (required): the files you read beyond the ones you changed,
+  what you fixed in passing in files the diff already touches, and what you
+  found and left, each with `file:line` (CLAUDE.md → "Examine before you
+  change"). Write "nothing found" only after reading them.
 - The exported surface — template builders, `escapeHtml`, `sendEmail`, and
   any supporting types
 - Exactly what each consuming app (and `@blog/auth`) must now do to use it,

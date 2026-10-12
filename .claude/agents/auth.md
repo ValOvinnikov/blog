@@ -171,6 +171,10 @@ Run these checks **once, after all work is complete**:
 
 **Report back to the orchestrator** with:
 
+- **Examined** (required): the files you read beyond the ones you changed,
+  what you fixed in passing in files the diff already touches, and what you
+  found and left, each with `file:line` (CLAUDE.md → "Examine before you
+  change"). Write "nothing found" only after reading them.
 - The exported surface — names, types, and what each piece configures
 - Exactly what each consuming app must now do to wire it up, precisely enough
   that the `web` and `platform-app` agents can act without re-reading this layer
