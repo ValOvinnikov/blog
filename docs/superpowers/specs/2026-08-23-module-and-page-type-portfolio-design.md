@@ -2,7 +2,7 @@
 
 **Status:** Living design doc for epic #1919 (`feat: module & page-type
 portfolio`). Extracted 2026-08-23 from
-[`2026-08-07-flexible-theming-and-page-builder-design.md`](./2026-08-07-flexible-theming-and-page-builder-design.md)'s
+the flexible-theming design's (since retired)
 Features 3–5, which specced this work as three fixed phases of the #1285
 configurability/multi-tenant program. That program is a closed set of
 rollout phases meant to finish; growing the page-builder module catalogue and
@@ -92,8 +92,7 @@ that #1285 already shipped.
   project; `apps/web` routes live under `app/[tenant]/[locale]/`, and every
   engagement table carries `tenantId`. The `leads` table this doc adds
   follows that shape; the tenancy mechanics themselves belong to
-  [`2026-08-07-multi-tenant-architecture-design.md`](./2026-08-07-multi-tenant-architecture-design.md)
-  and `SPEC.md`.
+  `SPEC.md` §4 ("Tenant scoping in `@blog/db`").
 - **CMS page architecture** — every public page is a CMS document with a
   required slot ([`2026-08-20-cms-page-architecture-design.md`](./2026-08-20-cms-page-architecture-design.md)).
   Its two settled patterns shape the portfolio strand below: a per-entity
@@ -2773,8 +2772,7 @@ point; the graph stays acyclic.
   express.
 - Multi-tenant tenancy mechanics — the `leads` table's `tenantId` and every
   other tenancy concern belongs to
-  [`2026-08-07-multi-tenant-architecture-design.md`](./2026-08-07-multi-tenant-architecture-design.md)
-  and `SPEC.md`, not this doc.
+  `SPEC.md` §4 ("Tenant scoping in `@blog/db`"), not this doc.
 
 ## How this is ticketed
 
