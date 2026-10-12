@@ -86,6 +86,23 @@ describe(`<${NewsletterModuleView.name}/>`, () => {
     ).toHaveLength(2);
   });
 
+  it("renders a FULL module's content text in the panel", () => {
+    setup({ content: 'A short note from the editor.' });
+
+    expect(screen.getByText('A short note from the editor.')).toBeVisible();
+  });
+
+  it('renders a COMPACT module without content text', () => {
+    setup({
+      variant: NEWSLETTER_VARIANT.COMPACT,
+      content: 'A short note from the editor.',
+    });
+
+    expect(
+      screen.queryByText('A short note from the editor.'),
+    ).not.toBeInTheDocument();
+  });
+
   it('renders a COMPACT module without supporting text or trust cues', () => {
     setup({ variant: NEWSLETTER_VARIANT.COMPACT });
 

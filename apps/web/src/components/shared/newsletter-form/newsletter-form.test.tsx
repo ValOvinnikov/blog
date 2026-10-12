@@ -222,6 +222,20 @@ describe(`<${NewsletterForm.name}/>`, () => {
     expect(screen.queryByRole('heading')).not.toBeInTheDocument();
   });
 
+  it('renders the content text in the full variant', () => {
+    setup({ content: 'A short note from the editor.' });
+
+    expect(screen.getByText('A short note from the editor.')).toBeVisible();
+  });
+
+  it('does not render the content text in the compact variant', () => {
+    setup({ variant: 'compact', content: 'A short note from the editor.' });
+
+    expect(
+      screen.queryByText('A short note from the editor.'),
+    ).not.toBeInTheDocument();
+  });
+
   it('renders the CMS-authored trust cues for the full variant', () => {
     setup({ trustCues: ['No spam', 'Unsubscribe anytime'] });
 

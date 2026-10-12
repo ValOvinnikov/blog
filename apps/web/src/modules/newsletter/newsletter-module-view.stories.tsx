@@ -26,7 +26,7 @@ const meta = {
       heading: 'Get new posts in your inbox',
       supportingText: 'One email a week, no spam, unsubscribe anytime.',
     }),
-    content: undefined,
+    content: 'Practical notes on building for the web, once a week.',
     variant: NEWSLETTER_VARIANT.FULL,
     layout: undefined,
     contentAlignment: undefined,
