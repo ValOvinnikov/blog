@@ -166,6 +166,25 @@ export const LeadSplit: TStory = {
   },
 };
 
+export const LeadSplitShortExcerpt: TStory = {
+  args: {
+    isLead: true,
+    isSplit: true,
+    excerpt: 'A short guide to design tokens.',
+    tags: undefined,
+  },
+};
+
+export const LeadSplitLongExcerpt: TStory = {
+  args: {
+    isLead: true,
+    isSplit: true,
+    excerpt:
+      'A step-by-step guide to building a scalable, token-driven design system using Tailwind CSS, tailwind-variants, and Atomic Design principles — from first primitives to a fully composed page, covering naming, theming, dark mode, density, documentation and the review habits that keep a library consistent as the team grows.',
+    tags: ['design-system', 'tailwind', 'react', 'tokens', 'theming'],
+  },
+};
+
 export const SplitWithoutExcerpt: TStory = {
   args: {
     isSplit: true,

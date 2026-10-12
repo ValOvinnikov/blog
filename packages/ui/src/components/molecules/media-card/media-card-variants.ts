@@ -16,12 +16,10 @@ export const mediaCardVariants = tv({
     isSplit: {
       true: {
         root: ['md:flex-row'],
-        // Stretches the media column to the text column's height by absolutely
-        // filling its wrapper, instead of `MediaCardMedia`'s own aspect-ratio
-        // (which would size it from its own width and leave a gap below).
+        // An absolute box keeps its aspect-ratio over its insets; drop it or a gap shows below.
         media: [
           'md:w-1/2 md:relative',
-          'md:[&>div]:absolute md:[&>div]:inset-0',
+          'md:[&>div]:absolute md:[&>div]:inset-0 md:[&>div]:aspect-auto',
         ],
         content: ['md:w-1/2 md:flex-none'],
       },
