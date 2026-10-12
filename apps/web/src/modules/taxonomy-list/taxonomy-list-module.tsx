@@ -81,6 +81,7 @@ export const TaxonomyListModule = async ({ id }: ITaxonomyListModuleProps) => {
       dataTestId={`taxonomy-list-module-${id}`}
       headingLevel={2}
       emptyMessage={<VoiceRichText value={emptyRich} />}
+      latestLabel={t('latestLabel')}
     />
   );
 };

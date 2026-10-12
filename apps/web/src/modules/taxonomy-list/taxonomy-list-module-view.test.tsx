@@ -38,6 +38,7 @@ const setup = customRender(TaxonomyListModuleView, {
   headingLevel: 2,
   emptyMessage: 'No topics yet.',
   showLatestPosts: true,
+  latestLabel: 'Latest',
 });
 
 describe(`<${TaxonomyListModuleView.name}/>`, () => {
@@ -88,6 +89,10 @@ describe(`<${TaxonomyListModuleView.name}/>`, () => {
         '/blog/shipping-the-new-build-pipeline',
       );
     });
+
+    it('shows the latest label above an entry’s latest posts', () => {
+      expect(screen.getByText('Latest')).toBeVisible();
+    });
   });
 
   it('renders the section heading at the given headingLevel', () => {
@@ -121,5 +126,6 @@ describe(`<${TaxonomyListModuleView.name}/>`, () => {
     expect(
       screen.queryByRole('list', { name: 'Latest in Engineering' }),
     ).not.toBeInTheDocument();
+    expect(screen.queryByText('Latest')).not.toBeInTheDocument();
   });
 });

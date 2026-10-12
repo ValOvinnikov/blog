@@ -92,11 +92,13 @@
     "topics": {
       "postsCount": "{count, plural, one {1 artículo} other {{count} artículos}}",
       "latestPostsLabel": "Lo último en {name}",
+      "latestLabel": "Lo último",
       "empty": "Todavía no hay temas."
     },
     "tags": {
       "postsCount": "{count, plural, one {1 artículo} other {{count} artículos}}",
       "latestPostsLabel": "Lo último en {name}",
+      "latestLabel": "Lo último",
       "empty": "Todavía no hay etiquetas."
     }
   },

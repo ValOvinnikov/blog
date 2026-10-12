@@ -34,6 +34,8 @@ export const VOICE_FIXED_KEYS = [
   'accountPage.identity.displayNameAriaLabel',
   'taxonomyListModule.topics.latestPostsLabel',
   'taxonomyListModule.tags.latestPostsLabel',
+  'taxonomyListModule.topics.latestLabel',
+  'taxonomyListModule.tags.latestLabel',
   'carousel.previousAriaLabel',
   'carousel.nextAriaLabel',
   'carousel.regionLabel',

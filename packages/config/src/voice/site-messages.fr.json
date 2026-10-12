@@ -92,11 +92,13 @@
     "topics": {
       "postsCount": "{count, plural, one {{count} article} other {{count} articles}}",
       "latestPostsLabel": "Derniers articles sur {name}",
+      "latestLabel": "Derniers",
       "empty": "Aucun thème pour le moment."
     },
     "tags": {
       "postsCount": "{count, plural, one {{count} article} other {{count} articles}}",
       "latestPostsLabel": "Derniers articles sur {name}",
+      "latestLabel": "Derniers",
       "empty": "Aucune étiquette pour le moment."
     }
   },

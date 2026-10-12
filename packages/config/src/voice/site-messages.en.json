@@ -92,11 +92,13 @@
     "topics": {
       "postsCount": "{count, plural, one {1 post} other {{count} posts}}",
       "latestPostsLabel": "Latest in {name}",
+      "latestLabel": "Latest",
       "empty": "No topics yet."
     },
     "tags": {
       "postsCount": "{count, plural, one {1 post} other {{count} posts}}",
       "latestPostsLabel": "Latest in {name}",
+      "latestLabel": "Latest",
       "empty": "No tags yet."
     }
   },
