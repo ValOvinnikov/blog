@@ -79,6 +79,22 @@ describe('toNewsletterModule', () => {
     expect(module.headingBlock.supportingText).toBeUndefined();
   });
 
+  it('maps content when authored', () => {
+    const raw = makeRawNewsletterModule({ content: 'A note from the editor.' });
+
+    const module = toNewsletterModule(raw);
+
+    expect(module.content).toBe('A note from the editor.');
+  });
+
+  it('leaves content undefined when not set (no faked default)', () => {
+    const raw = makeRawNewsletterModule({ content: null });
+
+    const module = toNewsletterModule(raw);
+
+    expect(module.content).toBeUndefined();
+  });
+
   it('leaves contentAlignment undefined when unset (no faked default)', () => {
     const raw = makeRawNewsletterModule({ contentAlignment: null });
 
