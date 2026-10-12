@@ -511,6 +511,10 @@ Run these checks **once, after all work is complete**:
 
 **Report back to the orchestrator** with:
 
+- **Examined** (required): the files you read beyond the ones you changed,
+  what you fixed in passing in files the diff already touches, and what you
+  found and left, each with `file:line` (CLAUDE.md → "Examine before you
+  change"). Write "nothing found" only after reading them.
 - Routes created or changed (e.g. `/blog/[slug]` page added)
 - Metadata wired (title, description, OG, canonical)
 - Any ISR tags consumed from the service layer

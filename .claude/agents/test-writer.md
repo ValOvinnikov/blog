@@ -176,6 +176,10 @@ Run, per package touched, **once after all test files are written**:
 
 **Report back to the orchestrator** with:
 
+- **Examined** (required): the files you read beyond the ones you changed,
+  what you fixed in passing in files the diff already touches, and what you
+  found and left, each with `file:line` (CLAUDE.md → "Examine before you
+  change"). Write "nothing found" only after reading them.
 - Test cases **added** and **removed**, as two counts, then one line per
   file on what it now covers. A removal names the rule the test failed.
 - Any gap you judged not worth a test (and why — declarative config, out of
