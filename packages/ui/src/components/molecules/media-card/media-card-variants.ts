@@ -4,7 +4,7 @@ import type { VariantProps } from 'tailwind-variants';
 export const mediaCardVariants = tv({
   slots: {
     root: [
-      'relative flex h-full flex-col overflow-hidden',
+      'relative isolate flex h-full flex-col overflow-hidden',
       'item-card surface-card @container',
     ],
     media: [],
