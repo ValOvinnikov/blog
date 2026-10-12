@@ -115,7 +115,12 @@ export const bannerVariants = tv({
   },
   compoundVariants: [
     {
-      tone: NEUTRAL_TONES,
+      tone: BRAND_VARIANT.PRIMARY,
+      hasMedia: false,
+      class: { root: ['bg-primary-subtle'] },
+    },
+    {
+      tone: BRAND_VARIANT.SECONDARY,
       hasMedia: false,
       class: { root: ['bg-secondary surface-secondary'] },
     },
