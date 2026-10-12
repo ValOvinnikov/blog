@@ -6,11 +6,11 @@ export const mediaCardFooterVariants = tv({
       'relative z-10 flex items-center gap-2',
       'pointer-events-none [&_a]:pointer-events-auto [&_button]:pointer-events-auto',
       'mt-auto pt-3',
-      'font-mono text-xs',
+      'font-mono text-meta',
     ],
     topic: [
       'inline-flex items-center gap-1 leading-none',
-      'text-brand-primary lowercase',
+      'text-subtle lowercase',
     ],
   },
 });

@@ -1,10 +1,4 @@
-import {
-  ICONS,
-  SIZE,
-  type IWithClassName,
-  type IWithDataTestId,
-} from '@blog/config';
-import { Icon } from '@blog/ui/components/atoms/icon';
+import { type IWithClassName, type IWithDataTestId } from '@blog/config';
 import { MetaSeparator } from '@blog/ui/components/atoms/meta-separator';
 
 import { cardMetaVariants } from './card-meta-variants';
@@ -27,12 +21,6 @@ export const CardMeta = ({
   dataTestId,
 }: TCardMetaProps) => (
   <div className={s.root({ class: className })} data-testid={dataTestId}>
-    <Icon
-      name={ICONS.CHEVRON_RIGHT}
-      size={SIZE.SM}
-      className={s.chevron()}
-      dataTestId="card-meta-chevron"
-    />
     <time dateTime={dateValue}>{dateLabel}</time>
     {readingTime && (
       <>
