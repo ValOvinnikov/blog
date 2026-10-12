@@ -59,6 +59,7 @@ export const WithTwoPosts: TStory = {
     <TaxonomyCard {...args}>
       <TaxonomyCard.Posts
         ariaLabel={`Latest posts in ${args.title}`}
+        label="Latest"
         posts={[
           {
             id: '1',
@@ -86,6 +87,7 @@ export const WithOnePost: TStory = {
     <TaxonomyCard {...args}>
       <TaxonomyCard.Posts
         ariaLabel={`Latest posts tagged ${args.title}`}
+        label="Latest"
         posts={[
           {
             id: '1',
@@ -125,6 +127,7 @@ export const Grid: TStory = {
       >
         <TaxonomyCard.Posts
           ariaLabel="Latest posts in Engineering"
+          label="Latest"
           posts={[
             {
               id: '1',
@@ -148,6 +151,7 @@ export const Grid: TStory = {
       >
         <TaxonomyCard.Posts
           ariaLabel="Latest posts in Design"
+          label="Latest"
           posts={[
             {
               id: '1',
