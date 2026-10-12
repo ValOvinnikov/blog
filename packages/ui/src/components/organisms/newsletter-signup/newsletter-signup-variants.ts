@@ -29,7 +29,10 @@ export const newsletterSignupVariants = tv({
     variant: {
       full: {
         root: ['w-full', '@container'],
-        submit: ['w-full'],
+        form: ['@md:flex-row @md:flex-wrap', '@3xl:flex-col @3xl:flex-nowrap'],
+        field: ['@md:min-w-0 @md:flex-1', '@3xl:flex-none'],
+        submit: ['w-full', '@md:w-auto @md:shrink-0', '@3xl:w-full'],
+        errorAlert: ['@md:basis-full', '@3xl:basis-auto'],
       },
       compact: {
         root: [
