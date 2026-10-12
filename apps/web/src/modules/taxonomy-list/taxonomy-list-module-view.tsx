@@ -34,6 +34,7 @@ export interface ITaxonomyListModuleViewProps extends Omit<
   dataTestId: string;
   headingLevel: THeadingLevel;
   emptyMessage: ReactNode;
+  latestLabel: string;
 }
 
 /**
@@ -51,6 +52,7 @@ export const TaxonomyListModuleView = ({
   emptyMessage,
   contentAlignment,
   showLatestPosts,
+  latestLabel,
 }: ITaxonomyListModuleViewProps) => {
   const isEmpty = items.length === 0;
   const s = taxonomyListModuleViewVariants();
@@ -88,6 +90,7 @@ export const TaxonomyListModuleView = ({
                 <TaxonomyCard.Posts
                   posts={item.posts}
                   ariaLabel={item.latestPostsLabel}
+                  label={latestLabel}
                 />
               )}
             </TaxonomyCard>

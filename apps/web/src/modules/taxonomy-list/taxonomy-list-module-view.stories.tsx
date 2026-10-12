@@ -39,6 +39,7 @@ const meta = {
     headingLevel: 2,
     emptyMessage: 'No topics yet.',
     showLatestPosts: true,
+    latestLabel: 'Latest',
   },
 } satisfies Meta<typeof TaxonomyListModuleView>;
 

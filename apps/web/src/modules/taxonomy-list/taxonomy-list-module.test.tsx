@@ -125,6 +125,10 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
         ).toBeVisible();
       });
 
+      it('shows the translated latest label above the entry’s latest posts', async () => {
+        expect(screen.getByText('Latest')).toBeVisible();
+      });
+
       it('derives titleId and dataTestId from the module id', async () => {
         const heading = screen.getByRole('heading', {
           level: 2,

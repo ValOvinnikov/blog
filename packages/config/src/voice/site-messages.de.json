@@ -92,11 +92,13 @@
     "topics": {
       "postsCount": "{count, plural, one {1 Beitrag} other {{count} Beiträge}}",
       "latestPostsLabel": "Neueste Beiträge zu {name}",
+      "latestLabel": "Neueste",
       "empty": "Noch keine Themen."
     },
     "tags": {
       "postsCount": "{count, plural, one {1 Beitrag} other {{count} Beiträge}}",
       "latestPostsLabel": "Neueste Beiträge zu {name}",
+      "latestLabel": "Neueste",
       "empty": "Noch keine Schlagwörter."
     }
   },
