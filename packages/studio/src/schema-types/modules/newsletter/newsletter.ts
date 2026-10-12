@@ -1,6 +1,7 @@
 import { NEWSLETTER_VARIANT } from '@blog/config/constants';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
+import { localizedMultilineTextField } from '@blog/studio/schema-types/fields/localized-multiline-text-field/localized-multiline-text-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { variantField } from '@blog/studio/schema-types/fields/variant-field/variant-field';
 import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
@@ -9,7 +10,16 @@ import { newsletterTrustCueSchema } from '@blog/studio/schema-types/objects/news
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { toTitleCase } from '@blog/utils/primitives';
 import { Mail } from 'lucide-react';
-import { defineArrayMember, defineField, defineType } from 'sanity';
+import {
+  defineArrayMember,
+  defineField,
+  defineType,
+  type ConditionalPropertyCallback,
+} from 'sanity';
+
+const isCompact: ConditionalPropertyCallback = ({ parent }) =>
+  (parent as { variant?: string } | undefined)?.variant ===
+  NEWSLETTER_VARIANT.COMPACT;
 
 export const newsletterSchema = defineType({
   name: 'module_newsletter',
@@ -29,15 +39,17 @@ export const newsletterSchema = defineType({
       isRequired: false,
     }),
     moduleHeadingBlockField(),
+    localizedMultilineTextField({
+      description: 'Copy shown inside the signup panel, above the trust cues.',
+      hidden: isCompact,
+    }),
     defineField({
       name: 'trustCues',
       title: 'Trust Cues',
       type: 'array',
       description: 'Short reassurances shown under the signup form.',
       of: [defineArrayMember({ type: newsletterTrustCueSchema.name })],
-      hidden: ({ parent }) =>
-        (parent as { variant?: string } | undefined)?.variant ===
-        NEWSLETTER_VARIANT.COMPACT,
+      hidden: isCompact,
       validation: (rule) => rule.max(2),
     }),
     ...alignmentFields([], { alignsItems: true }),
