@@ -17,15 +17,17 @@ export type TTaxonomyCardPostsProps = IWithClassName &
   IWithDataTestId & {
     posts: TTaxonomyCardPost[];
     ariaLabel: string;
+    label?: string;
     linkAs?: TAnchorElementType;
   };
 
 const s = taxonomyCardPostsVariants();
 
-/** The taxonomy's latest posts, listed between the card's description and its post count. */
+/** The topic or tag's latest posts, set apart from the card's description as their own list. */
 export const TaxonomyCardPosts = ({
   posts,
   ariaLabel,
+  label,
   linkAs,
   className,
   dataTestId,
@@ -35,18 +37,21 @@ export const TaxonomyCardPosts = ({
   const LinkComponent = linkAs ?? A_AS_CONST;
 
   return (
-    <ul
-      aria-label={ariaLabel}
-      className={s.root({ class: className })}
-      data-testid={dataTestId}
-    >
-      {posts.map((post) => (
-        <li key={post.id}>
-          <LinkComponent href={post.href} className={s.link()}>
-            {post.title}
-          </LinkComponent>
-        </li>
-      ))}
-    </ul>
+    <div className={s.root({ class: className })} data-testid={dataTestId}>
+      {label && (
+        <p aria-hidden="true" className={s.label()}>
+          {label}
+        </p>
+      )}
+      <ul aria-label={ariaLabel} className={s.list()}>
+        {posts.map((post) => (
+          <li key={post.id}>
+            <LinkComponent href={post.href} className={s.link()}>
+              {post.title}
+            </LinkComponent>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 };

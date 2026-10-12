@@ -318,13 +318,13 @@ Props: tags: (string | ITagListItem)[] · linkAs?: TAnchorElementType _(extends 
 
 ### TaxonomyCard — `components/molecules/taxonomy-card/taxonomy-card.tsx`
 
-Summary card for a taxonomy entry (topic or tag) in a listing: title, optional description, and post count, linking to the entry's archive.
+Summary card for a topic or tag in a listing, linking to its archive.
 Props: title: string · description?: string · postCountLabel: string · href: string · headingLevel: THeadingLevel · accessibleNameSeparator?: string · linkAs?: TAnchorElementType · isInteractive?: TTaxonomyCardVariants['isInteractive'] · children?: TCompoundChildren<typeof TaxonomyCardParts> _(extends IWithClassName, IWithDataTestId)_
 Variants: isInteractive: (boolean)
 
 Slots:
 
-- **TaxonomyCard.Posts** — The taxonomy's latest posts, listed between the card's description and its post count. Props: posts: TTaxonomyCardPost[] · ariaLabel: string · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
+- **TaxonomyCard.Posts** — The topic or tag's latest posts, set apart from the card's description as their own list. Props: posts: TTaxonomyCardPost[] · ariaLabel: string · label?: string · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
 
 ### Toast — `components/molecules/toast/toast.tsx`
 

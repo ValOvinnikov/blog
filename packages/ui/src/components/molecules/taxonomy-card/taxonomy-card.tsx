@@ -37,7 +37,7 @@ export type TTaxonomyCardProps = IWithClassName &
     children?: TCompoundChildren<typeof TaxonomyCardParts>;
   };
 
-/** Summary card for a taxonomy entry (topic or tag) in a listing: title, optional description, and post count, linking to the entry's archive. */
+/** Summary card for a topic or tag in a listing, linking to its archive. */
 const TaxonomyCardRoot = ({
   title,
   description,

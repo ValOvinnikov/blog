@@ -8,7 +8,10 @@ export const headingVariants = tv({
     visual: {
       hero: ['text-hero leading-[1.05] tracking-tight-hero'],
       post: ['text-post-title leading-[1.07] tracking-tight-display'],
-      card: ['text-card-title leading-[1.2] tracking-tight-card'],
+      // Steps up only inside an ancestor marked `@container/card`; elsewhere it stays `text-card-title`.
+      card: [
+        'text-card-title @3xs/card:text-lg leading-[1.2] tracking-tight-card',
+      ],
       page: ['text-title-2xl leading-[1.2] tracking-tight-display'],
       section: ['text-title-section leading-[1.2] tracking-tight-display'],
       // Deliberately smaller than `post` and `section` at every viewport width, so an in-article body h2 never outsizes the page's own post title, and a MediaCard lead title never outsizes the module heading above it.
