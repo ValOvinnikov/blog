@@ -646,7 +646,11 @@ post became modules in that array: related reading is `module_postRelated`
 `FULL`/`COMPACT`, coalesced to `FULL` at the query since the schema field is
 optional) selecting which form of the signup it renders, and its own
 `trustCues`: at most two `newsletterTrustCue` items, one list shared by every
-language with each item's `text` translated.
+language with each item's `text` translated. An optional, translated
+multi-line `content` (plain text, falling back to the default language) is the
+Full panel's own copy, shown in its left column above the trust cues; the
+module's `headingBlock` stays above the panel, and Compact shows neither
+`content` nor the trust cues.
 
 **A view model's nullability mirrors the schema's validation.** Where a
 `page_post` field is `required()` in the Studio, `@blog/service` projects it

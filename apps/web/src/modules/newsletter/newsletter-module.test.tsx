@@ -1,6 +1,9 @@
+import { NEWSLETTER_VARIANT } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
+import { makeNewsletterModule } from '@web/testing/modules/newsletter/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { DEFAULT_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
@@ -47,46 +50,35 @@ describe(`<${NewsletterModule.name}/>`, () => {
   });
 
   it("renders the module's own trust cues in the form", async () => {
+    const firstCue = faker.lorem.words(2);
+    const secondCue = faker.lorem.words(3);
     getNewsletterMock.mockResolvedValue({
       ok: true,
-      data: {
-        brandVariant: 'PRIMARY',
-        headingBlock: makeHeadingBlock({ heading: 'Get new posts' }),
-        variant: 'FULL',
-        trustCues: ['No spam', 'Unsubscribe anytime'],
-        layout: undefined,
-        contentAlignment: undefined,
-      },
+      data: makeNewsletterModule({ trustCues: [firstCue, secondCue] }),
     });
 
     await setup();
 
-    expect(screen.getByText('No spam')).toBeVisible();
-    expect(screen.getByText('Unsubscribe anytime')).toBeVisible();
+    expect(screen.getByText(firstCue)).toBeVisible();
+    expect(screen.getByText(secondCue)).toBeVisible();
   });
 
   it('renders the compact form (no supporting text) for a COMPACT module', async () => {
+    const heading = faker.company.catchPhrase();
+    const supportingText = faker.lorem.sentence();
     getNewsletterMock.mockResolvedValue({
       ok: true,
-      data: {
-        brandVariant: 'PRIMARY',
-        headingBlock: makeHeadingBlock({
-          heading: 'Get new posts',
-          supportingText: 'Only shown in the full form.',
-        }),
-        variant: 'COMPACT',
+      data: makeNewsletterModule({
+        headingBlock: makeHeadingBlock({ heading, supportingText }),
+        variant: NEWSLETTER_VARIANT.COMPACT,
         trustCues: undefined,
-        layout: undefined,
-        contentAlignment: undefined,
-      },
+      }),
     });
 
     await setup();
 
-    expect(screen.getByText('Get new posts')).toBeVisible();
-    expect(
-      screen.queryByText('Only shown in the full form.'),
-    ).not.toBeInTheDocument();
+    expect(screen.getByText(heading)).toBeVisible();
+    expect(screen.queryByText(supportingText)).not.toBeInTheDocument();
   });
 
   it('renders nothing, without fetching, when the NEWSLETTER capability is off', async () => {

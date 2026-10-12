@@ -1,6 +1,7 @@
 import { BRAND_VARIANT, NEWSLETTER_VARIANT } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { makeNewsletterModule } from '@web/testing/modules/newsletter/fixtures';
 
 import { NewsletterModuleView } from './newsletter-module-view';
 
@@ -21,16 +22,7 @@ const meta = {
   },
   args: {
     id: 'newsletter-1',
-    brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: makeHeadingBlock({
-      heading: 'Get new posts in your inbox',
-      supportingText: 'One email a week, no spam, unsubscribe anytime.',
-    }),
-    content: undefined,
-    variant: NEWSLETTER_VARIANT.FULL,
-    layout: undefined,
-    contentAlignment: undefined,
-    trustCues: ['No spam', 'Unsubscribe anytime'],
+    ...makeNewsletterModule({ content: faker.lorem.sentences(2) }),
   },
 } satisfies Meta<typeof NewsletterModuleView>;
 

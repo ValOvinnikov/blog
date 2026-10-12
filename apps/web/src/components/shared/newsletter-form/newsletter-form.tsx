@@ -2,9 +2,11 @@
 
 import {
   ICONS,
+  type IWithClassName,
   SIZE,
   type TContentAlignment,
   type TFormStatus,
+  type TMaybeUndefined,
 } from '@blog/config';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { NewsletterSignup } from '@blog/ui/components/organisms/newsletter-signup';
@@ -22,15 +24,16 @@ const ERROR_MESSAGE_KEYS = {
 
 const TRUST_CUE_ICONS = [ICONS.SHIELD_CHECK, ICONS.CLOSE];
 
-type TNewsletterFormProps = {
+type TNewsletterFormProps = IWithClassName & {
   variant: 'full' | 'compact';
+  content?: string;
   trustCues?: string[];
   align?: TContentAlignment;
-  className?: string;
 };
 
 export const NewsletterForm = ({
   variant,
+  content,
   trustCues,
   align,
   className,
@@ -38,9 +41,8 @@ export const NewsletterForm = ({
   const t = useTranslations('newsletterForm');
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<TFormStatus>('idle');
-  const [errorMessage, setErrorMessage] = useState<string | undefined>(
-    undefined,
-  );
+  const [errorMessage, setErrorMessage] =
+    useState<TMaybeUndefined<string>>(undefined);
   const errorMessageId = useId();
 
   const handleEmailChange = (value: string) => {
@@ -102,5 +104,11 @@ export const NewsletterForm = ({
     label,
   }));
 
-  return <NewsletterSignup.Full {...sharedProps} trustCues={trustCueItems} />;
+  return (
+    <NewsletterSignup.Full
+      {...sharedProps}
+      supportingText={content}
+      trustCues={trustCueItems}
+    />
+  );
 };

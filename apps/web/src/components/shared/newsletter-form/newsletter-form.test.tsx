@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import {
   customRender,
@@ -19,6 +20,11 @@ vi.mock('@web/server/newsletter/newsletter-actions/newsletter-actions', () => ({
 const setup = customRender(NewsletterForm, {
   variant: 'full' as const,
 });
+
+const email = faker.internet.email();
+const content = faker.lorem.sentences(2);
+const firstCue = faker.lorem.words(2);
+const secondCue = faker.lorem.words(3);
 
 const typeAndSubmit = async (
   user: ReturnType<typeof userEvent.setup>,
@@ -77,7 +83,7 @@ describe(`<${NewsletterForm.name}/>`, () => {
             resolveAction = resolve;
           }),
       );
-      await typeAndSubmit(user, 'reader@example.com');
+      await typeAndSubmit(user, email);
 
       const button = screen.getByRole('button', { name: 'Subscribe' });
       await waitFor(() => {
@@ -93,14 +99,12 @@ describe(`<${NewsletterForm.name}/>`, () => {
 
     it('shows the success message once the server action resolves "success"', async () => {
       subscribeToNewsletterActionMock.mockResolvedValue({ outcome: 'success' });
-      await typeAndSubmit(user, 'reader@example.com');
+      await typeAndSubmit(user, email);
 
       expect(await screen.findByRole('status')).toHaveTextContent(
         'Almost there — check your inbox to confirm.',
       );
-      expect(subscribeToNewsletterActionMock).toHaveBeenCalledWith(
-        'reader@example.com',
-      );
+      expect(subscribeToNewsletterActionMock).toHaveBeenCalledWith(email);
     });
 
     describe('when the email is already subscribed', () => {
@@ -111,7 +115,7 @@ describe(`<${NewsletterForm.name}/>`, () => {
       });
 
       it('shows the "already subscribed" error when the server action resolves "already-subscribed"', async () => {
-        await typeAndSubmit(user, 'reader@example.com');
+        await typeAndSubmit(user, email);
 
         expect(await screen.findByRole('alert')).toHaveTextContent(
           'That email is already subscribed.',
@@ -119,7 +123,7 @@ describe(`<${NewsletterForm.name}/>`, () => {
       });
 
       it('clears a server-returned error once the reader edits the email', async () => {
-        await typeAndSubmit(user, 'reader@example.com');
+        await typeAndSubmit(user, email);
         await screen.findByRole('alert');
 
         await user.type(
@@ -135,7 +139,7 @@ describe(`<${NewsletterForm.name}/>`, () => {
       subscribeToNewsletterActionMock.mockResolvedValue({
         outcome: 'server-error',
       });
-      await typeAndSubmit(user, 'reader@example.com');
+      await typeAndSubmit(user, email);
 
       expect(await screen.findByRole('alert')).toHaveTextContent(
         'Something went wrong. Please try again.',
@@ -146,7 +150,7 @@ describe(`<${NewsletterForm.name}/>`, () => {
       subscribeToNewsletterActionMock.mockResolvedValue({
         outcome: 'unavailable',
       });
-      await typeAndSubmit(user, 'reader@example.com');
+      await typeAndSubmit(user, email);
 
       expect(await screen.findByRole('alert')).toHaveTextContent(
         "This site isn't taking new subscriptions right now.",
@@ -222,34 +226,46 @@ describe(`<${NewsletterForm.name}/>`, () => {
     expect(screen.queryByRole('heading')).not.toBeInTheDocument();
   });
 
-  it('renders the CMS-authored trust cues for the full variant', () => {
-    setup({ trustCues: ['No spam', 'Unsubscribe anytime'] });
+  it('renders the content text in the full variant', () => {
+    setup({ content });
 
-    expect(screen.getByText('No spam')).toBeVisible();
-    expect(screen.getByText('Unsubscribe anytime')).toBeVisible();
+    expect(screen.getByText(content)).toBeVisible();
+  });
+
+  it('does not render the content text in the compact variant', () => {
+    setup({ variant: 'compact', content });
+
+    expect(screen.queryByText(content)).not.toBeInTheDocument();
+  });
+
+  it('renders the CMS-authored trust cues for the full variant', () => {
+    setup({ trustCues: [firstCue, secondCue] });
+
+    expect(screen.getByText(firstCue)).toBeVisible();
+    expect(screen.getByText(secondCue)).toBeVisible();
   });
 
   it('renders no trust cues when trustCues is undefined (not authored)', () => {
     setup({ trustCues: undefined });
 
-    expect(screen.queryByText('No spam')).not.toBeInTheDocument();
-    expect(screen.queryByText('Unsubscribe anytime')).not.toBeInTheDocument();
+    expect(screen.queryByText(firstCue)).not.toBeInTheDocument();
+    expect(screen.queryByText(secondCue)).not.toBeInTheDocument();
   });
 
   it('renders no trust cues when trustCues is an empty array (author cleared it)', () => {
     setup({ trustCues: [] });
 
-    expect(screen.queryByText('No spam')).not.toBeInTheDocument();
-    expect(screen.queryByText('Unsubscribe anytime')).not.toBeInTheDocument();
+    expect(screen.queryByText(firstCue)).not.toBeInTheDocument();
+    expect(screen.queryByText(secondCue)).not.toBeInTheDocument();
   });
 
   it('does not render trust cues for the compact variant even when authored', () => {
     setup({
       variant: 'compact',
-      trustCues: ['No spam', 'Unsubscribe anytime'],
+      trustCues: [firstCue, secondCue],
     });
 
-    expect(screen.queryByText('No spam')).not.toBeInTheDocument();
-    expect(screen.queryByText('Unsubscribe anytime')).not.toBeInTheDocument();
+    expect(screen.queryByText(firstCue)).not.toBeInTheDocument();
+    expect(screen.queryByText(secondCue)).not.toBeInTheDocument();
   });
 });
