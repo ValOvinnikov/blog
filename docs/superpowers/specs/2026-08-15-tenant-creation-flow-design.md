@@ -2,7 +2,7 @@
 
 **Status:** Design pass. Implements epic 5 ("Provisioning automation") **and**
 epic 6 ("Studio-per-tenant") of
-[`2026-08-07-multi-tenant-architecture-design.md`](./2026-08-07-multi-tenant-architecture-design.md)'s
+the multi-tenant architecture design's (since retired into `SPEC.md`)
 sequencing as one design — the next phase after per-tenant content reads
 (epic 2a, #1543, shipped). The parent spec lists those as separate epics but
 its own step-by-step provisioning narrative includes Studio deployment
@@ -237,8 +237,7 @@ covers retry; full teardown is a manual operator action, not built here).
 - `SPEC.md` **§13** — provisioning joins the deployment topology
   (per-tenant Sanity project + Studio + domain mapping, CI-triggered from
   `apps/platform`).
-- The parent design doc (`2026-08-07-multi-tenant-architecture-design.md`)
-  marks **both** epic 5 and epic 6 shipped once this lands (per the §4
+- `SPEC.md` records **both** epic 5 and epic 6 as shipped once this lands (per the §4
   resolution above — epic 6 ships as a side effect, not separately) and notes
   the per-project migration runner as the one piece of epic 5's original
   description still open, tracked as its own ticket. Per the design-doc

@@ -25,6 +25,24 @@ readers browse a fast, statically-rendered Next.js site. Content is fully typed
 end-to-end — a schema change in the CMS surfaces as a TypeScript error in the
 frontend if a consumer is out of date.
 
+**It is a multi-tenant platform.** One `apps/web` deployment serves every
+tenant, each with its own Sanity project under one organisation, and the
+operator/tenant admin panel (`apps/platform`) provisions and configures them.
+There is no in-house CMS; if Sanity's terms or pricing ever stopped fitting,
+moving to Payload is the escape hatch, not a plan. The Sanity limits the
+model lives within, as of 2026-08:
+
+- A free project holds 10,000 documents with no overage, so a tenant
+  approaching the cap upgrades before it hits it. Nothing enforces this in
+  code yet.
+- A free project has 20 billable seats; Viewer seats are free and unlimited;
+  Free has no scoped Editor role; Growth costs $15 per seat.
+- There is no cap on the number of projects. Sanity's fair-use terms become
+  a gray area at hundreds of projects.
+
+The public front door — a marketing site, self-serve signup and billing — is
+not built; its decided shape is epic #4840.
+
 **Primary surfaces** (status as of 2026-07-23):
 
 | Surface | Route                          | Status                                                                                                                                                                           |
@@ -155,6 +173,15 @@ origin keeps its own session and is signed into independently
 (`docs/context/environment-variables.md`).
 Full contract and migration mechanism: `.claude/agents/db.md`.
 
+**Tenant scoping in `@blog/db`.** Every engagement table a tenant's readers
+write carries a `tenantId` foreign key: bookmarks have it in their primary
+key, and subscribers are unique on `tenantId` plus email. Comments, ratings
+and leads take the same shape when they are built. The Auth.js tables stay
+global — a reader has one account across every tenant site, though each site still signs in separately. Isolation is by
+query, not by the database: every `@blog/db` function that touches tenant
+data takes an explicit `tenantId`, and there is no row-level security and no
+tenant-bound accessor.
+
 ¹ `@blog/db`'s Sanity-SDK prohibition has one scoped exception:
 `packages/db/scripts/provision-tenant/` talks to Sanity's Management API
 directly (via `@sanity/client` for content seeding, raw `fetch` for the
@@ -165,11 +192,19 @@ their OWNER `memberships` row, falling back to a pending OWNER
 content, and create a revalidation webhook (pointing at `apps/web`'s shared,
 already tenant-aware revalidate endpoint) during provisioning — the one
 place in this package that talks to Sanity rather than Neon. The invite role
-is `viewer` because `SANITY_MANAGEMENT_TOKEN` lacks permission to grant
-`administrator`, which is the role the owner actually needs; an operator
-raises it by hand in Sanity's Manage UI once the owner accepts. Invite
-failures are logged and do not fail the step — a membership problem must not
-cost the project, dataset, seeded content and webhook alongside it.
+is `viewer`, because an invite cannot carry `administrator`. Once the owner
+accepts, `elevateTenantOwner` grants `administrator` through the legacy
+`v2021-06-07` ACL endpoint, keyed on the owner's `projectUserId`. Each run
+records one of five outcomes as the `OWNER_ELEVATION` provisioning step —
+`ELEVATED`, `ALREADY_ADMINISTRATOR`, `PENDING_ACCEPTANCE`, `STALLED` (still
+un-accepted after three days) or `AMBIGUOUS_MEMBERSHIP` — and the last two
+raise an operator alert. The `recheck-tenant-owners` sweep re-runs it for
+owners still pending; its six-hour cron is parked until the production
+Environment has its database secret, so today it runs by manual dispatch. If
+Sanity ever closes that endpoint, the fallback is raising the role by hand
+in Sanity Manage. Invite failures are logged and do not fail the step — a
+membership problem must not cost the project, dataset, seeded content and
+webhook alongside it.
 
 Enforced by a dedicated `configs/eslint/db.js` override scoped to that
 directory; every other path in
@@ -1916,6 +1951,11 @@ The `migrationState` ledger is per dataset, which makes the fan-out idempotent,
 resumable, and self-catching-up for tenants added later; one tenant's failure
 never aborts the rest.
 
+**Schema changes are expand/contract.** N tenant projects reach a new schema
+independently, and there is no atomic cutover across them, so a change adds
+the new shape first, migrates every tenant, and removes the old shape in a
+later change — never both in one step.
+
 Two rules govern it. **A tenant whose ledger is empty is backfilled, not
 replayed** — such a tenant was seeded from starter content at the then-current
 schema, so executing migrations written for older shapes against it ranges from
@@ -2370,7 +2410,11 @@ and release runbook live in [`docs/DEPLOY.md`](./docs/DEPLOY.md); this is the sh
   never reach production. The Studio has no Vercel project, hostname or
   deploy job of its own: it ships as the `@blog/studio` package and is
   mounted by the admin panel, which is what lets one Studio serve every
-  tenant. Neither `*.sanity.studio` hosting nor `sanity deploy` is used.
+  tenant. Neither `*.sanity.studio` hosting nor `sanity deploy` is used. A
+  tenant owner's Studio is at `/[locale]/dashboard/(tenant)/studio/[[...tool]]`
+  and an operator's at `/[locale]/tenants/[tenantId]/(detail)/studio/[[...tool]]`,
+  both path-based on the admin panel's one origin — so each tenant project
+  needs a single CORS entry, the admin panel's base URL.
 - `@blog/ui`'s Storybook is hosted separately (`ui-library` Vercel
   project, `ui-library.{your-hosting}`) via Vercel's Git integration with PR
   previews — a deliberate exception to the CI-gated, no-preview pattern
@@ -2401,10 +2445,13 @@ inside the layer contracts above. Full roster and rationale for every piece:
 
 ## 15. Out of scope (for now)
 
-Multi-author dashboards, analytics beyond Vercel's built-in, semantic search,
-and the AI/differentiator feature track (agent-native endpoints, publish-time
+Multi-author dashboards, analytics beyond Vercel's built-in, a cross-tenant
+analytics dashboard, moving off Sanity, semantic search, and the
+AI/differentiator feature track (agent-native endpoints, publish-time
 generation — proposed in `docs/BACKLOG.md`). Each can be layered on without
-violating the contracts above. **No longer out of scope:** comments, ratings,
+violating the contracts above. The platform's public front door — marketing
+site, self-serve signup, billing and trials — is planned but not built
+(epic #4840). **No longer out of scope:** comments, ratings,
 bookmarks, newsletter signup, and user auth — these are the actively-roadmapped
 M5 engagement layer (`docs/BACKLOG.md`'s "M5 — Engagement layer" section,
 epics #1039–#1044), built on the new `@blog/db` layer (§3, §4, §8).
