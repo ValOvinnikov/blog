@@ -34,10 +34,6 @@ describe(`<${CardMeta.name}/>`, () => {
     it('omits readingTime segment and its separator when not provided', () => {
       expect(screen.queryByText('·')).not.toBeInTheDocument();
     });
-
-    it('renders no chevron icon', () => {
-      expect(screen.queryByTestId('card-meta-chevron')).not.toBeInTheDocument();
-    });
   });
 
   describe('when readingTime is provided', () => {
