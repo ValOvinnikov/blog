@@ -43,6 +43,7 @@ export const SectionNavigation = ({
       label={sectionTitle ?? t('label')}
       ariaCurrent="page"
       backLink={backLink}
+      hasRootItem={true}
     />
   );
 };

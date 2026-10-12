@@ -19,6 +19,7 @@ const meta = {
     activeKey: '/modules/pricing',
     label: 'In this section',
     ariaCurrent: 'page',
+    hasRootItem: true,
   },
 } satisfies Meta<typeof SidebarNav>;
 
@@ -46,7 +47,12 @@ export const DesktopPostContents: TStory = {
     activeKey: '#configuration',
     label: 'Contents',
     ariaCurrent: 'location',
+    hasRootItem: false,
   },
+};
+
+export const DesktopPostContentsNestedActive: TStory = {
+  args: { ...DesktopPostContents.args, activeKey: '#prerequisites' },
 };
 
 export const DesktopItemHover: TStory = {
