@@ -1,6 +1,7 @@
 import { ICONS, SIZE } from '@blog/config';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { objectKeys } from '@blog/utils/primitives';
+import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { MediaCard } from './media-card';
@@ -170,7 +171,7 @@ export const LeadSplitShortExcerpt: TStory = {
   args: {
     isLead: true,
     isSplit: true,
-    excerpt: 'A short guide to design tokens.',
+    excerpt: faker.lorem.sentence(4),
     tags: undefined,
   },
 };
@@ -179,9 +180,8 @@ export const LeadSplitLongExcerpt: TStory = {
   args: {
     isLead: true,
     isSplit: true,
-    excerpt:
-      'A step-by-step guide to building a scalable, token-driven design system using Tailwind CSS, tailwind-variants, and Atomic Design principles — from first primitives to a fully composed page, covering naming, theming, dark mode, density, documentation and the review habits that keep a library consistent as the team grows.',
-    tags: ['design-system', 'tailwind', 'react', 'tokens', 'theming'],
+    excerpt: faker.lorem.paragraph(6),
+    tags: faker.lorem.words(5).split(' '),
   },
 };
 
