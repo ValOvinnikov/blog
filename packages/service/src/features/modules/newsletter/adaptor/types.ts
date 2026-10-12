@@ -10,6 +10,7 @@ import type {
 export type TNewsletterModule = {
   brandVariant: TBrandVariant;
   headingBlock: THeadingBlock;
+  content?: string;
   variant: TNewsletterVariant;
   trustCues: TMaybeUndefined<string[]>;
   layout: TMaybeUndefined<TLayout>;

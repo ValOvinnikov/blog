@@ -357,6 +357,7 @@ export function makeRawNewsletterModule(
     headingBlock: makeRawHeadingBlock('Stay in the loop', {
       supportingText: 'Get new posts in your inbox.',
     }),
+    content: null,
     variant: NEWSLETTER_VARIANT.FULL,
     trustCues: null,
     layout: null,

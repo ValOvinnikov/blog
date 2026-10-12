@@ -22,6 +22,10 @@ const newsletterDocument = {
       [NL]: 'Wekelijks nieuwe berichten.',
     }),
   },
+  content: localizedValues('internationalizedArrayTextValue', {
+    [EN]: 'Practical notes on building for the web.',
+    [NL]: 'Praktische notities over bouwen voor het web.',
+  }),
   trustCues: [
     {
       _key: 'cue-1',
@@ -71,6 +75,7 @@ describe('newsletterModuleQuery', () => {
     const raw = {
       brandVariant: 'PRIMARY',
       headingBlock: makeRawHeadingBlock('Stay in the loop'),
+      content: null,
       variant: 'COMPACT',
       trustCues: null,
       layout: null,
@@ -96,6 +101,29 @@ describe('newsletterModuleQuery', () => {
       heading: 'Stay in the loop',
       supportingText: 'New posts weekly.',
     });
+  });
+
+  it('picks the content in the visitor language', async () => {
+    const newsletter = await runNewsletter(newsletterDocument, NL);
+
+    expect(newsletter.content).toBe(
+      'Praktische notities over bouwen voor het web.',
+    );
+  });
+
+  it('falls back to the default language for the content', async () => {
+    const newsletter = await runNewsletter(newsletterDocument, FR);
+
+    expect(newsletter.content).toBe('Practical notes on building for the web.');
+  });
+
+  it('returns no content when the module has none', async () => {
+    const newsletter = await runNewsletter(
+      { ...newsletterDocument, content: undefined },
+      NL,
+    );
+
+    expect(newsletter.content).toBeNull();
   });
 
   it('picks each trust cue in the visitor language, falling back to the default', async () => {

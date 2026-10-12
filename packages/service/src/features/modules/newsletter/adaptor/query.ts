@@ -23,6 +23,7 @@ export const newsletterModuleQuery = q
       .field('headingBlock')
       .project(moduleHeadingBlockFragment)
       .notNull(),
+    content: getLocalizedField(sub, 'content'),
     variant: sub.raw(NEWSLETTER_VARIANT_EXPRESSION, newsletterVariantParser),
     trustCues: sub
       .field('trustCues[]')
