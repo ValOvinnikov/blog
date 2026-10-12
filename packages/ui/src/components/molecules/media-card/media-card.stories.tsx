@@ -1,10 +1,42 @@
 import { ICONS, SIZE } from '@blog/config';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { objectKeys } from '@blog/utils/primitives';
+import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { MediaCard } from './media-card';
 import { mediaCardVariants } from './media-card-variants';
+
+const publishedAt = faker.date.past({ years: 2 });
+const dateValue = publishedAt.toISOString().slice(0, 10);
+const dateLabel = publishedAt.toLocaleDateString('en-GB', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+const readingTime = `${faker.number.int({ min: 2, max: 15 })} min`;
+
+const title = faker.lorem.sentence({ min: 4, max: 7 }).replace(/\.$/, '');
+const shortTitle = faker.lorem.words(2);
+const longTitle = faker.lorem.sentence(22).replace(/\.$/, '');
+const href = `/posts/${faker.lorem.slug(3)}`;
+const topic = faker.lorem.slug(2);
+const tags = faker.helpers.uniqueArray(() => faker.lorem.slug(1), 3);
+const excerpt = faker.lorem.sentences(2);
+const twoLineExcerpt = faker.lorem.sentence(16);
+const leadExcerpt = faker.lorem.sentences(3);
+const shortExcerpt = faker.lorem.sentence(10);
+
+const personName = faker.person.fullName();
+const personHref = `/team/${faker.lorem.slug(2)}`;
+const featureTitle = faker.company.buzzNoun();
+const featureHref = `/features/${faker.lorem.slug(2)}`;
+
+const imageAlt = faker.lorem.words(5);
+const picsum = (width: number, height: number) =>
+  faker.image.urlPicsumPhotos({ width, height });
+
+const arrowIcon = <Icon name={ICONS.ARROW} size={SIZE.SM} />;
 
 const meta = {
   title: 'Molecules/MediaCard',
@@ -19,32 +51,26 @@ const meta = {
   },
   args: {
     isInteractive: true,
-    excerpt:
-      'A step-by-step guide to building a scalable, token-driven design system using Tailwind CSS, tailwind-variants, and Atomic Design principles.',
-    tags: ['design-system', 'tailwind', 'react'],
+    excerpt,
+    tags,
     children: (
       <>
         <MediaCard.Media>
           <img
-            src="https://picsum.photos/seed/designsystem/800/450"
-            alt="Abstract design elements on a dark background"
+            src={picsum(800, 450)}
+            alt={imageAlt}
             className="size-full object-cover"
           />
         </MediaCard.Media>
         <MediaCard.Meta
-          dateValue="2024-03-10"
-          dateLabel="March 10, 2024"
-          readingTime="9 min"
+          dateValue={dateValue}
+          dateLabel={dateLabel}
+          readingTime={readingTime}
         />
         <MediaCard.Title level={3}>
-          <MediaCard.Link href="/posts/building-a-design-system">
-            Building a Design System from Scratch
-          </MediaCard.Link>
+          <MediaCard.Link href={href}>{title}</MediaCard.Link>
         </MediaCard.Title>
-        <MediaCard.Footer
-          topic="design-system"
-          trailingIcon={<Icon name={ICONS.ARROW} size={SIZE.SM} />}
-        />
+        <MediaCard.Footer topic={topic} trailingIcon={arrowIcon} />
       </>
     ),
   },
@@ -61,7 +87,7 @@ export const Minimal: TStory = {
     tags: undefined,
     children: (
       <MediaCard.Title level={3}>
-        <a href="/posts/minimal">A Minimal Post</a>
+        <a href={href}>{shortTitle}</a>
       </MediaCard.Title>
     ),
   },
@@ -72,14 +98,12 @@ export const WithoutFooter: TStory = {
     children: (
       <>
         <MediaCard.Meta
-          dateValue="2024-03-10"
-          dateLabel="March 10, 2024"
-          readingTime="9 min"
+          dateValue={dateValue}
+          dateLabel={dateLabel}
+          readingTime={readingTime}
         />
         <MediaCard.Title level={3}>
-          <a href="/posts/building-a-design-system">
-            Building a Design System from Scratch
-          </a>
+          <a href={href}>{title}</a>
         </MediaCard.Title>
       </>
     ),
@@ -88,18 +112,13 @@ export const WithoutFooter: TStory = {
 
 export const WithTags: TStory = {
   args: {
-    excerpt:
-      'A collection of practical TypeScript patterns that will level up your code.',
-    tags: ['typescript', 'javascript', 'tips'],
+    excerpt: shortExcerpt,
     children: (
       <>
         <MediaCard.Title level={3}>
-          <a href="/posts/typescript-tips">TypeScript Tips for 2024</a>
+          <a href={href}>{title}</a>
         </MediaCard.Title>
-        <MediaCard.Footer
-          topic="typescript"
-          trailingIcon={<Icon name={ICONS.ARROW} size={SIZE.SM} />}
-        />
+        <MediaCard.Footer topic={topic} trailingIcon={arrowIcon} />
       </>
     ),
   },
@@ -107,18 +126,16 @@ export const WithTags: TStory = {
 
 export const WithFooterLeadingIcon: TStory = {
   args: {
-    excerpt:
-      'A collection of practical TypeScript patterns that will level up your code.',
-    tags: ['typescript', 'javascript', 'tips'],
+    excerpt: shortExcerpt,
     children: (
       <>
         <MediaCard.Title level={3}>
-          <a href="/posts/typescript-tips">TypeScript Tips for 2024</a>
+          <a href={href}>{title}</a>
         </MediaCard.Title>
         <MediaCard.Footer
-          topic="typescript"
+          topic={topic}
           leadingIcon={<Icon name={ICONS.BOOKMARK} size={SIZE.SM} />}
-          trailingIcon={<Icon name={ICONS.ARROW} size={SIZE.SM} />}
+          trailingIcon={arrowIcon}
         />
       </>
     ),
@@ -130,42 +147,27 @@ export const AsSecondLevelHeading: TStory = {
     children: (
       <>
         <MediaCard.Title level={2}>
-          <a href="/posts/building-a-design-system">
-            Building a Design System from Scratch
-          </a>
+          <a href={href}>{title}</a>
         </MediaCard.Title>
-        <MediaCard.Footer
-          topic="design-system"
-          trailingIcon={<Icon name={ICONS.ARROW} size={SIZE.SM} />}
-        />
+        <MediaCard.Footer topic={topic} trailingIcon={arrowIcon} />
       </>
     ),
   },
 };
 
-const twoLineExcerpt =
-  'How a token-driven type scale keeps every card readable, from a narrow sidebar column to a full-width grid.';
-
-const titledCard = (title: string) => (
+const titledCard = (cardTitle: string) => (
   <>
     <MediaCard.Meta
-      dateValue="2024-03-10"
-      dateLabel="March 10, 2024"
-      readingTime="9 min"
+      dateValue={dateValue}
+      dateLabel={dateLabel}
+      readingTime={readingTime}
     />
     <MediaCard.Title level={3}>
-      <MediaCard.Link href="/posts/type-scale">{title}</MediaCard.Link>
+      <MediaCard.Link href={href}>{cardTitle}</MediaCard.Link>
     </MediaCard.Title>
-    <MediaCard.Footer
-      topic="design-system"
-      trailingIcon={<Icon name={ICONS.ARROW} size={SIZE.SM} />}
-    />
+    <MediaCard.Footer topic={topic} trailingIcon={arrowIcon} />
   </>
 );
-
-const shortTitle = 'Type scales';
-const longTitle =
-  'Why the title of a card should always read larger than the excerpt underneath it, whatever the width of the column it sits in';
 
 export const ShortTitle: TStory = {
   args: {
@@ -224,8 +226,7 @@ export const Split: TStory = {
 export const Lead: TStory = {
   args: {
     isLead: true,
-    excerpt:
-      'A step-by-step guide to building a scalable, token-driven design system using Tailwind CSS, tailwind-variants, and Atomic Design principles — from first primitives to a fully composed page.',
+    excerpt: leadExcerpt,
   },
 };
 
@@ -233,8 +234,7 @@ export const LeadSplit: TStory = {
   args: {
     isLead: true,
     isSplit: true,
-    excerpt:
-      'A step-by-step guide to building a scalable, token-driven design system using Tailwind CSS, tailwind-variants, and Atomic Design principles — from first primitives to a fully composed page.',
+    excerpt: leadExcerpt,
   },
 };
 
@@ -251,15 +251,13 @@ export const WithAuthorFooter: TStory = {
     children: (
       <>
         <MediaCard.Title level={3}>
-          <a href="/posts/building-a-design-system">
-            Building a Design System from Scratch
-          </a>
+          <a href={href}>{title}</a>
         </MediaCard.Title>
         <MediaCard.Footer
-          publishedAt="2024-03-10T09:00:00Z"
-          formattedDate="March 10, 2024"
-          authorName="Jane Doe"
-          authorAvatarSrc="https://i.pravatar.cc/150?img=1"
+          publishedAt={publishedAt.toISOString()}
+          formattedDate={dateLabel}
+          authorName={personName}
+          authorAvatarSrc={faker.image.avatar()}
         />
       </>
     ),
@@ -271,15 +269,10 @@ export const WideMedia: TStory = {
     children: (
       <>
         <MediaCard.Media shape="wide">
-          <img
-            src="https://picsum.photos/seed/wide/800/450"
-            alt="Abstract design elements on a dark background"
-          />
+          <img src={picsum(800, 450)} alt={imageAlt} />
         </MediaCard.Media>
         <MediaCard.Title level={3}>
-          <a href="/posts/building-a-design-system">
-            Building a Design System from Scratch
-          </a>
+          <a href={href}>{title}</a>
         </MediaCard.Title>
       </>
     ),
@@ -292,15 +285,13 @@ export const WideFlatMedia: TStory = {
       <>
         <MediaCard.Media shape="wideFlat">
           <img
-            src="https://picsum.photos/seed/wideflat/1200/600"
-            alt="Abstract design elements on a dark background"
+            src={picsum(1200, 600)}
+            alt={imageAlt}
             className="size-full object-cover"
           />
         </MediaCard.Media>
         <MediaCard.Title level={3}>
-          <a href="/posts/building-a-design-system">
-            Building a Design System from Scratch
-          </a>
+          <a href={href}>{title}</a>
         </MediaCard.Title>
       </>
     ),
@@ -312,15 +303,10 @@ export const SquareMedia: TStory = {
     children: (
       <>
         <MediaCard.Media shape="square">
-          <img
-            src="https://picsum.photos/seed/square/600/600"
-            alt="Abstract design elements on a dark background"
-          />
+          <img src={picsum(600, 600)} alt={imageAlt} />
         </MediaCard.Media>
         <MediaCard.Title level={3}>
-          <a href="/posts/building-a-design-system">
-            Building a Design System from Scratch
-          </a>
+          <a href={href}>{title}</a>
         </MediaCard.Title>
       </>
     ),
@@ -334,13 +320,10 @@ export const CircleMedia: TStory = {
     children: (
       <>
         <MediaCard.Media shape="circle">
-          <img
-            src="https://i.pravatar.cc/224?img=12"
-            alt="Portrait of the featured author"
-          />
+          <img src={faker.image.avatar()} alt={`Portrait of ${personName}`} />
         </MediaCard.Media>
         <MediaCard.Title level={3}>
-          <a href="/team/jane-doe">Jane Doe</a>
+          <a href={personHref}>{personName}</a>
         </MediaCard.Title>
       </>
     ),
@@ -349,7 +332,7 @@ export const CircleMedia: TStory = {
 
 export const IconMedia: TStory = {
   args: {
-    excerpt: 'Ship features faster with a shared, token-driven component set.',
+    excerpt: shortExcerpt,
     tags: undefined,
     children: (
       <>
@@ -357,7 +340,7 @@ export const IconMedia: TStory = {
           <Icon name={ICONS.ROCKET} size={SIZE.MD} />
         </MediaCard.Media>
         <MediaCard.Title level={3}>
-          <a href="/features/design-system">Built for speed</a>
+          <a href={featureHref}>{featureTitle}</a>
         </MediaCard.Title>
       </>
     ),
@@ -366,7 +349,7 @@ export const IconMedia: TStory = {
 
 export const IconPanelMedia: TStory = {
   args: {
-    excerpt: 'Ship features faster with a shared, token-driven component set.',
+    excerpt: shortExcerpt,
     tags: undefined,
     children: (
       <>
@@ -374,7 +357,7 @@ export const IconPanelMedia: TStory = {
           <Icon name={ICONS.ROCKET} size={SIZE.LG} />
         </MediaCard.Media>
         <MediaCard.Title level={3}>
-          <a href="/features/design-system">Built for speed</a>
+          <a href={featureHref}>{featureTitle}</a>
         </MediaCard.Title>
       </>
     ),
@@ -384,14 +367,14 @@ export const IconPanelMedia: TStory = {
 export const Static: TStory = {
   args: {
     isInteractive: false,
-    excerpt: 'Ship features faster with a shared, token-driven component set.',
+    excerpt: shortExcerpt,
     tags: undefined,
     children: (
       <>
         <MediaCard.Media shape="icon">
           <Icon name={ICONS.ROCKET} size={SIZE.MD} />
         </MediaCard.Media>
-        <MediaCard.Title level={3}>Built for speed</MediaCard.Title>
+        <MediaCard.Title level={3}>{featureTitle}</MediaCard.Title>
       </>
     ),
   },
@@ -399,14 +382,12 @@ export const Static: TStory = {
 
 export const WithFooterControls: TStory = {
   args: {
-    excerpt: 'Leads the platform team and owns the design system.',
+    excerpt: faker.person.jobTitle(),
     tags: undefined,
     children: (
       <>
         <MediaCard.Title level={3}>
-          <MediaCard.Link href="/team/ada-lovelace">
-            Ada Lovelace
-          </MediaCard.Link>
+          <MediaCard.Link href={personHref}>{personName}</MediaCard.Link>
         </MediaCard.Title>
         <MediaCard.Footer>
           <a href="https://github.com" aria-label="GitHub">
@@ -420,7 +401,7 @@ export const WithFooterControls: TStory = {
 
 export const IconHovered: TStory = {
   args: {
-    excerpt: 'Ship features faster with a shared, token-driven component set.',
+    excerpt: shortExcerpt,
     tags: undefined,
     children: (
       <>
@@ -428,8 +409,8 @@ export const IconHovered: TStory = {
           <Icon name={ICONS.ROCKET} size={SIZE.MD} />
         </MediaCard.Media>
         <MediaCard.Title level={3}>
-          <a href="/features/design-system" autoFocus={true}>
-            Built for speed
+          <a href={featureHref} autoFocus={true}>
+            {featureTitle}
           </a>
         </MediaCard.Title>
       </>
@@ -440,7 +421,7 @@ export const IconHovered: TStory = {
 export const CenterAligned: TStory = {
   args: {
     align: 'center',
-    excerpt: 'Ship features faster with a shared, token-driven component set.',
+    excerpt: shortExcerpt,
     tags: undefined,
     children: (
       <>
@@ -448,7 +429,7 @@ export const CenterAligned: TStory = {
           <Icon name={ICONS.ROCKET} size={SIZE.MD} />
         </MediaCard.Media>
         <MediaCard.Title level={3}>
-          <a href="/features/design-system">Built for speed</a>
+          <a href={featureHref}>{featureTitle}</a>
         </MediaCard.Title>
       </>
     ),
