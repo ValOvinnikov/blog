@@ -1,4 +1,5 @@
 import { DISPLAY_MODE } from '@blog/config/constants';
+import type { TMaybeUndefined } from '@blog/config/types';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { displayModeField } from '@blog/studio/schema-types/fields/display-mode-field/display-mode-field';
@@ -15,12 +16,12 @@ type TPostLatestDocument = {
 };
 
 const validateCarouselHasEnoughPosts = (
-  value: string | undefined,
+  value: TMaybeUndefined<string>,
   context: ValidationContext,
 ): string | true => {
   if (value !== DISPLAY_MODE.CAROUSEL) return true;
 
-  const parent = context.parent as TPostLatestDocument | undefined;
+  const parent = context.parent as TMaybeUndefined<TPostLatestDocument>;
 
   return (parent?.limit ?? 0) < 4
     ? 'Fewer than four posts fit on one row on wide screens, so this carousel has nothing to scroll there. Raise the limit, or use the grid.'
