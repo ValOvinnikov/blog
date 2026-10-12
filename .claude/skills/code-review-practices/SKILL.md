@@ -154,6 +154,10 @@ CI-enforced guard was deliberately not added.
 - If schemas changed, the generated types were regenerated (`pnpm typegen`) and
   committed, downstream `service` types updated, and — for existing-shape
   changes — a content migration is present or explicitly ruled out.
+- No hand-written type `@blog/config` already exports — `T | undefined` is
+  `TMaybeUndefined<T>` — outside the exempt workspaces (CLAUDE.md →
+  Conventions). Blocking on lines the diff adds; on other lines of a file the
+  diff touches, see "Drift left in a touched file" below.
 - **Every** groqd field's nullability is explicit — each `sub.field(...)` ends
   in `.notNull()` or `.nullable(true)`; no implicit/plain projected field. A
   schema-`.required()` field gets `.notNull()`; an optional one gets
@@ -264,6 +268,14 @@ CI-enforced guard was deliberately not added.
   before this review is dispatched — reviewer trusts that result rather than
   re-running the suite. `build` is CI-only (`ci.yml`'s `build` job gates every
   PR); it is not part of the local/review loop.
+- **Drift left in a touched file (blocking).** Read every file the diff
+  touches in full, not only its hunks. Mechanical drift anywhere in it — a
+  comment that fails the comment test, a hand-written type `@blog/config`
+  exports, a dead import or export, a pattern a later convention replaced —
+  is a finding, because CLAUDE.md → "Examine before you change" requires the
+  change to fix it. Drift in files the diff does not touch is not a finding.
+  Check too that the implementing agent's **Examined** section exists and that
+  what it says it left is reported, not quietly dropped.
 - **Voice candidates (listed, not blocking).** Under a "Voice candidates"
   heading, list:
   - every catalog key the diff adds or rewords in

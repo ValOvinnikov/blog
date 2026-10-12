@@ -180,6 +180,10 @@ Run these checks **once, after all work is complete**:
 
 **Report back to the orchestrator** with:
 
+- **Examined** (required): the files you read beyond the ones you changed,
+  what you fixed in passing in files the diff already touches, and what you
+  found and left, each with `file:line` (CLAUDE.md → "Examine before you
+  change"). Write "nothing found" only after reading them.
 - Component names and their export paths from `src/index.ts`
   (e.g. `PostCard` from `@blog/ui`)
 - Prop type names and their shapes (e.g. `TPostCardProps { title: string; excerpt?: string }`)

@@ -334,6 +334,10 @@ Run these checks **once, after all schema work is complete**:
 
 **Report back to the orchestrator** with:
 
+- **Examined** (required): the files you read beyond the ones you changed,
+  what you fixed in passing in files the diff already touches, and what you
+  found and left, each with `file:line` (CLAUDE.md → "Examine before you
+  change"). Write "nothing found" only after reading them.
 - The exact names of new/changed types as they appear in the generated
   `types.ts` (e.g. `Blog_post`, `Blog_author`, `Settings_site`)
 - A field-by-field breakdown for every new/changed type — field name, its type,

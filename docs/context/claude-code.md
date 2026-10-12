@@ -76,6 +76,11 @@ contracts:
     extend-vs-add-alongside call to the orchestrator as a question rather than
     settling it silently. It is duplicated per agent because agent definitions
     have no include mechanism — change one, change all eleven.
+  - The same eleven list a required **Examined** item first in their "Report
+    back" section: what they read beyond the files they changed, what they
+    fixed in passing, and what they found and left. The rule it reports on,
+    "Examine before you change", lives once in `CLAUDE.md`; the reviewer's
+    `code-review-practices` treats drift left in a touched file as blocking.
   - They no longer carry comment rules of their own. Each points at
     `CLAUDE.md`'s `## Conventions` → "Comments default to zero", the single
     source. **A dispatched subagent inherits both the project and the user
