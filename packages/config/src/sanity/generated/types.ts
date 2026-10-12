@@ -74,6 +74,7 @@ export type Module_newsletter = {
   brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   variant?: 'FULL' | 'COMPACT';
   headingBlock?: ModuleHeadingBlock;
+  content?: InternationalizedArrayText;
   trustCues?: Array<
     {
       _key: string;
@@ -82,6 +83,12 @@ export type Module_newsletter = {
   contentAlignment?: 'LEFT' | 'CENTER';
   layout?: Layout;
 };
+
+export type InternationalizedArrayText = Array<
+  {
+    _key: string;
+  } & InternationalizedArrayTextValue
+>;
 
 export type Module_cta = {
   _id: string;
@@ -1194,12 +1201,6 @@ export type InternationalizedArrayStringValue = {
   language?: string;
 };
 
-export type InternationalizedArrayText = Array<
-  {
-    _key: string;
-  } & InternationalizedArrayTextValue
->;
-
 export type TranslationMetadata = {
   _id: string;
   _type: 'translation.metadata';
@@ -2194,6 +2195,7 @@ export type AllSanitySchemaTypes =
   | Module_pricing
   | InternationalizedArrayString
   | Module_newsletter
+  | InternationalizedArrayText
   | Module_cta
   | CtaLayout
   | InternationalizedArrayListedText
@@ -2269,7 +2271,6 @@ export type AllSanitySchemaTypes =
   | InternationalizedArrayListedTextValue
   | InternationalizedArrayTextValue
   | InternationalizedArrayStringValue
-  | InternationalizedArrayText
   | TranslationMetadata
   | InternationalizedArrayReference
   | Page_homeReference
