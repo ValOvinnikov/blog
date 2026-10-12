@@ -1,8 +1,11 @@
 import { DISPLAY_MODE } from '@blog/config/constants';
 import { toTitleCase } from '@blog/utils/primitives';
-import { defineField } from 'sanity';
+import { defineField, type StringDefinition } from 'sanity';
 
-export const displayModeField = (options?: { description?: string }) =>
+export const displayModeField = (options?: {
+  description?: string;
+  validation?: StringDefinition['validation'];
+}) =>
   defineField({
     name: 'displayMode',
     title: 'Display Mode',
@@ -18,4 +21,5 @@ export const displayModeField = (options?: { description?: string }) =>
       })),
     },
     initialValue: DISPLAY_MODE.GRID,
+    validation: options?.validation,
   });
