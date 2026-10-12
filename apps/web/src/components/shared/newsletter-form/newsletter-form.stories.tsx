@@ -1,4 +1,5 @@
 import { CONTENT_ALIGNMENT } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { userEvent, within } from 'storybook/test';
 
@@ -17,7 +18,8 @@ const meta = {
   },
   args: {
     variant: 'full',
-    trustCues: ['No spam', 'Unsubscribe anytime'],
+    content: faker.lorem.sentences(2),
+    trustCues: [faker.lorem.words(2), faker.lorem.words(3)],
   },
 } satisfies Meta<typeof NewsletterForm>;
 

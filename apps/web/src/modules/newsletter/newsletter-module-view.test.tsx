@@ -1,5 +1,7 @@
-import { BRAND_VARIANT, NEWSLETTER_VARIANT } from '@blog/config';
+import { NEWSLETTER_VARIANT } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@web/testing/custom-render';
+import { makeNewsletterModule } from '@web/testing/modules/newsletter/fixtures';
 import { makeHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { NewsletterModuleView } from './newsletter-module-view';
@@ -8,18 +10,18 @@ vi.mock('@web/server/newsletter/newsletter-actions/newsletter-actions', () => ({
   subscribeToNewsletterAction: vi.fn(),
 }));
 
+const heading = faker.company.catchPhrase();
+const supportingText = faker.lorem.sentence();
+const firstCue = faker.lorem.words(2);
+const secondCue = faker.lorem.words(3);
+const content = faker.lorem.sentences(2);
+
 const setup = customRender(NewsletterModuleView, {
   id: 'newsletter-1',
-  brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: makeHeadingBlock({
-    heading: 'Get new posts',
-    supportingText: 'Straight to inbox.',
+  ...makeNewsletterModule({
+    headingBlock: makeHeadingBlock({ heading, supportingText }),
+    trustCues: [firstCue, secondCue],
   }),
-  content: undefined,
-  variant: NEWSLETTER_VARIANT.FULL,
-  layout: undefined,
-  contentAlignment: undefined,
-  trustCues: ['No spam', 'Unsubscribe anytime'],
 });
 
 describe(`<${NewsletterModuleView.name}/>`, () => {
@@ -33,10 +35,8 @@ describe(`<${NewsletterModuleView.name}/>`, () => {
     });
 
     it('renders the full signup with the authored heading and supporting text', () => {
-      expect(
-        screen.getByRole('heading', { name: 'Get new posts' }),
-      ).toBeVisible();
-      expect(screen.getByText('Straight to inbox.')).toBeVisible();
+      expect(screen.getByRole('heading', { name: heading })).toBeVisible();
+      expect(screen.getByText(supportingText)).toBeVisible();
       expect(
         screen.getByRole('textbox', { name: 'Email address' }),
       ).toBeVisible();
@@ -45,19 +45,17 @@ describe(`<${NewsletterModuleView.name}/>`, () => {
     it('renders the authored heading exactly once, as an h2', () => {
       expect(screen.getAllByRole('heading')).toHaveLength(1);
       expect(
-        screen.getByRole('heading', { level: 2, name: 'Get new posts' }),
+        screen.getByRole('heading', { level: 2, name: heading }),
       ).toBeVisible();
     });
 
     it('labels the section landmark by the rendered heading', () => {
-      expect(
-        screen.getByRole('region', { name: 'Get new posts' }),
-      ).toBeVisible();
+      expect(screen.getByRole('region', { name: heading })).toBeVisible();
     });
 
     it('renders the authored trust cues for a FULL module', () => {
-      expect(screen.getByText('No spam')).toBeVisible();
-      expect(screen.getByText('Unsubscribe anytime')).toBeVisible();
+      expect(screen.getByText(firstCue)).toBeVisible();
+      expect(screen.getByText(secondCue)).toBeVisible();
     });
 
     it('renders the band and the form together on first render without the cookie', () => {
@@ -77,46 +75,42 @@ describe(`<${NewsletterModuleView.name}/>`, () => {
     const headingIds = screen
       .getAllByRole('heading', {
         level: 2,
-        name: 'Get new posts',
+        name: heading,
       })
       .map(({ id }) => id);
     expect(new Set(headingIds).size).toBe(2);
-    expect(
-      screen.getAllByRole('region', { name: 'Get new posts' }),
-    ).toHaveLength(2);
+    expect(screen.getAllByRole('region', { name: heading })).toHaveLength(2);
   });
 
   it("renders a FULL module's content text in the panel", () => {
-    setup({ content: 'A short note from the editor.' });
+    setup({ content });
 
-    expect(screen.getByText('A short note from the editor.')).toBeVisible();
+    expect(screen.getByText(content)).toBeVisible();
   });
 
   it('renders a COMPACT module without content text', () => {
     setup({
       variant: NEWSLETTER_VARIANT.COMPACT,
-      content: 'A short note from the editor.',
+      content,
     });
 
-    expect(
-      screen.queryByText('A short note from the editor.'),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText(content)).not.toBeInTheDocument();
   });
 
   it('renders a COMPACT module without supporting text or trust cues', () => {
     setup({ variant: NEWSLETTER_VARIANT.COMPACT });
 
     expect(
-      screen.getByRole('heading', { level: 2, name: 'Get new posts' }),
+      screen.getByRole('heading', { level: 2, name: heading }),
     ).toBeVisible();
-    expect(screen.queryByText('Straight to inbox.')).not.toBeInTheDocument();
-    expect(screen.queryByText('No spam')).not.toBeInTheDocument();
+    expect(screen.queryByText(supportingText)).not.toBeInTheDocument();
+    expect(screen.queryByText(firstCue)).not.toBeInTheDocument();
   });
 
   it('renders no trust cues when the tenant never authored any', () => {
     setup({ trustCues: undefined });
 
-    expect(screen.queryByText('No spam')).not.toBeInTheDocument();
+    expect(screen.queryByText(firstCue)).not.toBeInTheDocument();
   });
 
   it('renders neither the band nor the form for a reader with the subscribed cookie', () => {
