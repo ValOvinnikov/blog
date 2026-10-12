@@ -110,6 +110,25 @@ export const NarrowContainer: TStory = {
   args: { trustCues },
 };
 
+export const SidebarColumn: TStory = {
+  decorators: [
+    (Story) => (
+      <div className="max-w-[37.5rem]">
+        <Story />
+      </div>
+    ),
+  ],
+  args: { trustCues },
+};
+
+export const SidebarColumnError: TStory = {
+  decorators: SidebarColumn.decorators,
+  args: {
+    ...Error.args,
+    trustCues,
+  },
+};
+
 export const WideContainer: TStory = {
   decorators: [
     (Story) => (
