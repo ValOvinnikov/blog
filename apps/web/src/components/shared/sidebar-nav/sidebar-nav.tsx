@@ -26,6 +26,7 @@ type TSidebarNavProps = {
   label: string;
   ariaCurrent: 'location' | 'page';
   backLink?: TSidebarNavBackLink;
+  hasRootItem?: boolean;
   className?: string;
 };
 
@@ -38,6 +39,7 @@ export const SidebarNav = ({
   label,
   ariaCurrent,
   backLink,
+  hasRootItem = false,
   className,
 }: TSidebarNavProps) => {
   const labelId = useId();
@@ -70,12 +72,13 @@ export const SidebarNav = ({
       {items.map((item) => {
         const isActive = item === activeItem;
         const isNested = item.level === 2;
+        const isRoot = hasRootItem && !isNested;
 
         return (
           <li key={item.href}>
             <SmartLink
               href={item.href}
-              className={s.link({ isActive, isNested, inPanel })}
+              className={s.link({ isActive, isNested, isRoot, inPanel })}
               aria-current={isActive ? ariaCurrent : undefined}
               onClick={onNavigate}
             >

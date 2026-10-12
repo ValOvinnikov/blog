@@ -83,10 +83,12 @@ export const sidebarNavVariants = tv({
     inPanel: {
       true: { link: ['flex items-center py-2'] },
     },
-    // Declared before `isActive` so the active colour wins over a root item's `text-text`.
     isNested: {
       true: { link: ['pl-6'] },
-      false: { link: ['font-semibold text-text'] },
+    },
+    // Declared before `isActive` so the active colour wins over a root item's `text-text`.
+    isRoot: {
+      true: { link: ['font-semibold text-text'] },
     },
     // Last, so its hover classes win: hovering the current item leaves it unchanged.
     isActive: {
@@ -99,6 +101,6 @@ export const sidebarNavVariants = tv({
     },
   },
   compoundVariants: [
-    { isActive: true, isNested: true, class: { link: ['font-medium'] } },
+    { isActive: true, isRoot: false, class: { link: ['font-medium'] } },
   ],
 });
