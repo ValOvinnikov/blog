@@ -20,7 +20,10 @@ describe(getPostFeatured, () => {
     mockRun.mockResolvedValueOnce(
       makeRawPostFeaturedModule({
         postSource: POST_SOURCE.PINNED,
-        posts: [makeRawPostCard({ _id: 'a' }), makeRawPostCard({ _id: 'b' })],
+        posts: [
+          { post: makeRawPostCard({ _id: 'a' }) },
+          { post: makeRawPostCard({ _id: 'b' }) },
+        ],
       }),
     );
 

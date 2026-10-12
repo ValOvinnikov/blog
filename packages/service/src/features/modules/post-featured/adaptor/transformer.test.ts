@@ -84,8 +84,18 @@ describe(toPostFeaturedModule, () => {
     const raw = makeRawPostFeaturedModule({
       postSource: POST_SOURCE.PINNED,
       posts: [
-        makeRawPostCard({ _id: 'b', publishedAt: '2026-01-01T00:00:00Z' }),
-        makeRawPostCard({ _id: 'a', publishedAt: '2026-02-01T00:00:00Z' }),
+        {
+          post: makeRawPostCard({
+            _id: 'b',
+            publishedAt: '2026-01-01T00:00:00Z',
+          }),
+        },
+        {
+          post: makeRawPostCard({
+            _id: 'a',
+            publishedAt: '2026-02-01T00:00:00Z',
+          }),
+        },
       ],
     });
 
@@ -97,7 +107,10 @@ describe(toPostFeaturedModule, () => {
   it('reflects a pin the query already dropped for being unpublished', () => {
     const raw = makeRawPostFeaturedModule({
       postSource: POST_SOURCE.PINNED,
-      posts: [makeRawPostCard({ _id: 'a' }), makeRawPostCard({ _id: 'c' })],
+      posts: [
+        { post: makeRawPostCard({ _id: 'a' }) },
+        { post: makeRawPostCard({ _id: 'c' }) },
+      ],
     });
 
     const module = toPostFeaturedModule(raw);
@@ -109,7 +122,10 @@ describe(toPostFeaturedModule, () => {
     const raw = makeRawPostFeaturedModule({
       postSource: POST_SOURCE.PINNED,
       limit: 1,
-      posts: [makeRawPostCard({ _id: 'a' }), makeRawPostCard({ _id: 'b' })],
+      posts: [
+        { post: makeRawPostCard({ _id: 'a' }) },
+        { post: makeRawPostCard({ _id: 'b' }) },
+      ],
     });
 
     const module = toPostFeaturedModule(raw);
@@ -122,9 +138,9 @@ describe(toPostFeaturedModule, () => {
       postSource: POST_SOURCE.NEWEST_FEATURED,
       limit: 1,
       posts: [
-        makeRawPostCard({ _id: 'a' }),
-        makeRawPostCard({ _id: 'b' }),
-        makeRawPostCard({ _id: 'c' }),
+        { post: makeRawPostCard({ _id: 'a' }) },
+        { post: makeRawPostCard({ _id: 'b' }) },
+        { post: makeRawPostCard({ _id: 'c' }) },
       ],
     });
 
@@ -138,9 +154,9 @@ describe(toPostFeaturedModule, () => {
       postSource: POST_SOURCE.NEWEST_FEATURED,
       limit: 3,
       posts: [
-        makeRawPostCard({ _id: 'a' }),
-        makeRawPostCard({ _id: 'b' }),
-        makeRawPostCard({ _id: 'c' }),
+        { post: makeRawPostCard({ _id: 'a' }) },
+        { post: makeRawPostCard({ _id: 'b' }) },
+        { post: makeRawPostCard({ _id: 'c' }) },
       ],
     });
 
