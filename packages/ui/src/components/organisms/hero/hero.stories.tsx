@@ -367,6 +367,43 @@ export const BannerWithoutMediaToneBrandPrimaryDark: TStory = {
   globals: { theme: 'dark' },
 };
 
+const bannerProfileContent = (hasMedia: boolean) => (
+  <>
+    {hasMedia && (
+      <Hero.Media>
+        <img
+          src="https://images.unsplash.com/photo-1500534623283-312aade485b7?w=1600&h=900&fit=crop"
+          alt=""
+          className="size-full object-cover"
+        />
+      </Hero.Media>
+    )}
+    <Hero.Cta>
+      <NavLink href="/posts/design-system">Read more</NavLink>
+    </Hero.Cta>
+    <Hero.Social>
+      <ul aria-label="Find Jane Doe elsewhere">
+        <li>
+          <ShareLink
+            href="https://github.com/janedoe"
+            label="GitHub"
+            icon={<Icon name={ICONS.GITHUB} size={SIZE.SM} />}
+            className="text-on-image"
+          />
+        </li>
+        <li>
+          <ShareLink
+            href="https://linkedin.com/in/janedoe"
+            label="LinkedIn"
+            icon={<Icon name={ICONS.LINKEDIN} size={SIZE.SM} />}
+            className="text-on-image"
+          />
+        </li>
+      </ul>
+    </Hero.Social>
+  </>
+);
+
 export const BannerProfileWithoutMedia: TStory = {
   args: {
     variant: HERO_VARIANT.BANNER,
@@ -374,13 +411,35 @@ export const BannerProfileWithoutMedia: TStory = {
     eyebrow: 'Platform engineering',
     title: 'Jane Doe',
     excerpt: 'Staff engineer',
-    children: profileContent,
+    children: bannerProfileContent(false),
   },
 };
 
 export const BannerProfileWithoutMediaDark: TStory = {
   ...BannerProfileWithoutMedia,
   globals: { theme: 'dark' },
+};
+
+export const BannerProfileWithMediaTonePrimary: TStory = {
+  args: {
+    ...BannerProfileWithoutMedia.args,
+    tone: BRAND_VARIANT.PRIMARY,
+    children: bannerProfileContent(true),
+  },
+};
+
+export const BannerProfileWithMediaToneSecondary: TStory = {
+  args: {
+    ...BannerProfileWithMediaTonePrimary.args,
+    tone: BRAND_VARIANT.SECONDARY,
+  },
+};
+
+export const BannerProfileWithMediaToneBrandPrimary: TStory = {
+  args: {
+    ...BannerProfileWithMediaTonePrimary.args,
+    tone: BRAND_VARIANT.BRAND_PRIMARY,
+  },
 };
 
 export const BannerSpacingNone: TStory = {
