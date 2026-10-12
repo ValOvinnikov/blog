@@ -125,6 +125,10 @@ delete-don't-shorten rule. It is not restated here; follow it as written.
 
 **Report back to the orchestrator** with:
 
+- **Examined** (required): the files you read beyond the ones you changed,
+  what you fixed in passing in files the diff already touches, and what you
+  found and left, each with `file:line` (CLAUDE.md → "Examine before you
+  change"). Write "nothing found" only after reading them.
 - The exported surface — `createLogger`, `LOG_LEVEL`, `sanitizeLogMessage`,
   and any supporting types
 - Confirmation the package has zero dependencies beyond its own

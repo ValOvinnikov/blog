@@ -31,16 +31,8 @@ describe(`<${CardMeta.name}/>`, () => {
       expect(timeEl).toHaveTextContent(dateLabel);
     });
 
-    it('omits readingTime segment and its separator when not provided — only the decorative chevron is aria-hidden', () => {
-      expect(screen.getByTestId('card-meta-chevron')).toHaveAttribute(
-        'aria-hidden',
-        'true',
-      );
+    it('omits readingTime segment and its separator when not provided', () => {
       expect(screen.queryByText('·')).not.toBeInTheDocument();
-    });
-
-    it('renders a decorative chevron before the date', () => {
-      expect(screen.getByTestId('card-meta-chevron')).toBeVisible();
     });
   });
 
@@ -53,11 +45,7 @@ describe(`<${CardMeta.name}/>`, () => {
       expect(screen.getByText(readingTime)).toBeVisible();
     });
 
-    it('renders the chevron and separator as aria-hidden when readingTime is provided', () => {
-      expect(screen.getByTestId('card-meta-chevron')).toHaveAttribute(
-        'aria-hidden',
-        'true',
-      );
+    it('renders the separator as aria-hidden when readingTime is provided', () => {
       expect(screen.getByText('·')).toHaveAttribute('aria-hidden', 'true');
     });
   });

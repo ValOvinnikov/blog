@@ -269,6 +269,43 @@ both, and git reports an add/add conflict at merge. It happened twice on
 a concurrent session). When a collision happens anyway, **whatever is on `main`
 wins and the branch adopts it**, regardless of which was written first.
 
+### Examine before you change
+
+**Whoever changes a file reads it, and what surrounds it, first** — the
+orchestrator writing a ticket, a layer agent implementing one, `test-writer`
+adding coverage. Read:
+
+- the whole file you will change, not only the lines the ticket names;
+- its callers and what it calls, wherever the change touches a signature or
+  a behaviour;
+- the other files in its folder, where the same pattern usually repeats.
+
+Read them against this file's Conventions, the layer's own skill, and the
+ticket itself. Then sort what you find:
+
+- **Mechanical drift in a file the diff already touches is fixed in the same
+  change** — a comment that fails the comment test, a type `@blog/config`
+  already exports, a dead import or export, a pattern a later convention
+  replaced. This is the steady-state rule comments already follow, applied
+  to every convention.
+- **Everything else is reported, not fixed** — drift in a file the diff does
+  not touch, a behaviour change, a design call. It goes in the agent's
+  **Examined** report section with `file:line`. The orchestrator lands it in
+  the same branch when it is the same layer and small ("Findings found
+  mid-work get fixed in the current work"), and otherwise puts it to the user
+  or files it. A diff never grows past its ticket silently.
+- **A ticket whose premise the code contradicts stops the work.** A moved
+  line reference is corrected without comment; a described behaviour that no
+  longer exists, or a fix another PR already made, is reported before
+  anything is built on it.
+
+Every implementing agent's report carries a required **Examined** section —
+what it read beyond the files it changed, what it fixed in passing, and what
+it found and left — so a skipped examination shows up in the report instead
+of passing silently. Adopted 2026-10-12, after a run of tickets in the admin
+design pass met code that had moved under them, and hand-written
+`T | undefined` types kept surviving next to every change.
+
 ## Mid-task decisions land in the ticket/spec before work continues
 
 When a design/scope/behavior decision gets settled in conversation — the user
@@ -673,6 +710,16 @@ silently unindexed). Never hand-edit it; fix the source and regenerate. A future
   — otherwise type-check/test/build fail. Unique per-workspace prefixes resolve
   cleanly in tsc (`Bundler`), Next/Turbopack, Sanity's esbuild extract, and vitest.
 - TypeScript `strict`; no `any`. Server Components by default.
+- **Use `@blog/config`'s shared types; never spell one out by hand.** Write
+  `TMaybeUndefined<T>`, never `T | undefined` — in a prop, a return type, a
+  `useState` or a `createContext` alike. The same goes for `IWithClassName`,
+  `IWithDataTestId`, `ILocalizedParams` and `ITenantLocalizedParams`. Before
+  writing a type, check `packages/config/src/types/` for one that already
+  says it, and add a missing one there rather than locally. Exempt are the
+  generated Sanity types and the workspaces below `@blog/config` in the
+  graph, which cannot import it: `@blog/utils`, `@blog/insight` and
+  `@blog/email`. The raw forms already in the repo are converted file by file
+  as each file is touched, the same steady-state rule as comments.
 - **Function style is decided per layer kind, and enforced by ESLint per
   workspace.** The React layers export _values_ — a component is a const
   holding a function — so `apps/web` and `packages/ui` use **arrow-function

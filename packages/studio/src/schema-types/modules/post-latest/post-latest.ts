@@ -1,4 +1,5 @@
-import { DISPLAY_MODE, type TDisplayMode } from '@blog/config/constants';
+import { DISPLAY_MODE } from '@blog/config/constants';
+import type { TMaybeUndefined } from '@blog/config/types';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { displayModeField } from '@blog/studio/schema-types/fields/display-mode-field/display-mode-field';
@@ -8,21 +9,21 @@ import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/modul
 import { wideLayoutField } from '@blog/studio/schema-types/objects/wide-layout/wide-layout-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { Clock } from 'lucide-react';
-import { defineField, defineType, type SanityDocument } from 'sanity';
+import { defineField, defineType, type ValidationContext } from 'sanity';
 
 type TPostLatestDocument = {
-  displayMode?: TDisplayMode;
   limit?: number;
 };
 
 const validateCarouselHasEnoughPosts = (
-  document: SanityDocument | undefined,
+  value: TMaybeUndefined<string>,
+  context: ValidationContext,
 ): string | true => {
-  const doc = document as TPostLatestDocument | undefined;
+  if (value !== DISPLAY_MODE.CAROUSEL) return true;
 
-  if (doc?.displayMode !== DISPLAY_MODE.CAROUSEL) return true;
+  const parent = context.parent as TMaybeUndefined<TPostLatestDocument>;
 
-  return (doc?.limit ?? 0) < 4
+  return (parent?.limit ?? 0) < 4
     ? 'Fewer than four posts fit on one row on wide screens, so this carousel has nothing to scroll there. Raise the limit, or use the grid.'
     : true;
 };
@@ -34,7 +35,6 @@ export const postLatestSchema = defineType({
   description:
     'A short list or carousel of the newest posts, used to surface recent content on any page.',
   icon: Clock,
-  validation: (rule) => rule.custom(validateCarouselHasEnoughPosts).warning(),
   fields: [
     titleField(),
     brandVariantField(),
@@ -47,7 +47,10 @@ export const postLatestSchema = defineType({
       validation: (rule) => rule.required().integer().min(1).max(12),
     }),
     showImagesField({ subject: 'post' }),
-    displayModeField(),
+    displayModeField({
+      validation: (rule) =>
+        rule.custom(validateCarouselHasEnoughPosts).warning(),
+    }),
     ...alignmentFields([]),
     wideLayoutField,
   ],

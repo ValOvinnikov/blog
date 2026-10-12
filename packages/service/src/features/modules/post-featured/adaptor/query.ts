@@ -23,7 +23,9 @@ const newestFeaturedPostsQuery = publishedPostsInLocale(
   .filterRaw(FEATURED_POST_FILTER)
   .order('publishedAt desc')
   .slice(0, 3)
-  .project(postCardFragment);
+  .project((post) => ({
+    post: post.field('@').project(postCardFragment),
+  }));
 
 export const postFeaturedModuleQuery = q
   .parameters<TModuleQueryParams>()

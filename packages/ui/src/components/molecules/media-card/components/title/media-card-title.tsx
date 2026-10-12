@@ -23,7 +23,7 @@ export const MediaCardTitle = ({
   <Heading
     level={level}
     visual={isLead ? 'prose-h2' : 'card'}
-    className={mediaCardTitleVariants({ class: className })}
+    className={mediaCardTitleVariants({ isLead, class: className })}
     dataTestId={dataTestId}
   >
     {children}

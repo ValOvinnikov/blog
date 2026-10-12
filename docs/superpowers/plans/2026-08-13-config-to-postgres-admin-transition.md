@@ -25,8 +25,7 @@ only, after this lands).
 - `docs/superpowers/specs/2026-08-13-tenant-config-postgres-admin-design.md`
 - `docs/superpowers/specs/2026-08-13-admin-panel-product-design.md`
 - `docs/design-reference/admin-panel-mock.html` + `-corrections.md`
-- `docs/superpowers/plans/2026-08-10-configurability-and-multitenant-rollout.md`
-  (program sequencing; this plan expands its Phase 0 + Phase 2–4 storage pivot)
+- `SPEC.md` §6 ("Theme-as-content", "Voice-as-content", "Feature-toggle layer") — the shipped shape of the program this plan expands
 
 ---
 
