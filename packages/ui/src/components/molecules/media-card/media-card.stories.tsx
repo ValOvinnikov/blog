@@ -238,6 +238,24 @@ export const LeadSplit: TStory = {
   },
 };
 
+export const LeadSplitShortExcerpt: TStory = {
+  args: {
+    isLead: true,
+    isSplit: true,
+    excerpt: faker.lorem.sentence(4),
+    tags: undefined,
+  },
+};
+
+export const LeadSplitLongExcerpt: TStory = {
+  args: {
+    isLead: true,
+    isSplit: true,
+    excerpt: faker.lorem.paragraph(6),
+    tags: faker.lorem.words(5).split(' '),
+  },
+};
+
 export const SplitWithoutExcerpt: TStory = {
   args: {
     isSplit: true,
