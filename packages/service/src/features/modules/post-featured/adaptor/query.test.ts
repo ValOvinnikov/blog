@@ -172,3 +172,62 @@ describe('postFeaturedModuleQuery language scoping', () => {
     expect(await runPosts(newest, NL)).toEqual(['design-nl']);
   });
 });
+
+describe('postFeaturedModuleQuery parsed posts', () => {
+  const topic = {
+    _id: 'topic-1',
+    _type: 'blog_topic',
+    title: localizedStrings({ [EN]: 'Design' }),
+  };
+  const author = { _id: 'person-1', _type: 'person', name: 'Ada' };
+
+  function postDocument(id: string, language: string, publishedAt: string) {
+    return {
+      _id: id,
+      _type: 'page_post',
+      language,
+      featured: true,
+      publishedAt,
+      slug: { current: id },
+      headingBlock: { _type: 'pageHeadingBlock', heading: id },
+      author: { _type: 'reference', _ref: 'person-1' },
+      topic: { _type: 'reference', _ref: 'topic-1' },
+    };
+  }
+
+  async function runParsedPosts(module: Record<string, unknown>) {
+    const raw = await evaluateGroqExpression(
+      postFeaturedModuleQuery.query,
+      [
+        { ...moduleDocument, ...module },
+        topic,
+        author,
+        postDocument('older-en', EN, '2026-01-01T00:00:00Z'),
+        postDocument('newer-en', EN, '2026-01-02T00:00:00Z'),
+        postDocument('newer-nl', NL, '2026-01-03T00:00:00Z'),
+      ],
+      undefined,
+      { id: 'module-1', locale: EN, defaultLocale: EN },
+    );
+
+    return postFeaturedModuleQuery
+      .parse(raw)
+      .posts?.map(({ post }) => post?._id);
+  }
+
+  it('keeps the newest featured posts through parsing', async () => {
+    expect(await runParsedPosts({ postSource: 'NEWEST_FEATURED' })).toEqual([
+      'newer-en',
+      'older-en',
+    ]);
+  });
+
+  it('keeps pinned posts through parsing', async () => {
+    expect(
+      await runParsedPosts({
+        postSource: 'PINNED',
+        posts: [{ _key: 'a', _type: 'reference', _ref: 'older-en' }],
+      }),
+    ).toEqual(['older-en']);
+  });
+});
