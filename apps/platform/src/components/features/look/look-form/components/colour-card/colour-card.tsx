@@ -1,13 +1,11 @@
+import type { TMaybeUndefined } from '@blog/config';
 import { LogoHueField } from '@platform/components/features/look/logo-hue-field';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
 import { HueSlider } from '@platform/components/shared/hue-slider';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import type { TLookFormFieldSetter } from '@platform/utils/default-look-values/default-look-values';
-import {
-  accentHueGradient,
-  buildAccentPreviewTokens,
-} from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
+import { buildAccentPreviewTokens } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import { useTranslations } from 'next-intl';
 
 import { colourCardVariants } from './colour-card-variants';
@@ -16,7 +14,7 @@ export type TColourCardProps = {
   accentHue: number;
   accentHueFieldId: string;
   isAccentHueRejected: boolean;
-  logoHue: number | undefined;
+  logoHue: TMaybeUndefined<number>;
   onFieldChange: TLookFormFieldSetter;
   hasUnsavedChanges: boolean;
 };
@@ -46,7 +44,6 @@ export const ColourCard = ({
       hasUnsavedChanges={hasUnsavedChanges}
     >
       <LookField
-        id={accentHueFieldId}
         label={accentHueLabel}
         hint={t('accentHueDescription')}
         error={isAccentHueRejected ? t('accentHueInaccessible') : undefined}
@@ -58,12 +55,12 @@ export const ColourCard = ({
             style={{ background: swatchColor }}
           />
           <HueSlider
+            id={accentHueFieldId}
             ariaLabel={accentHueLabel}
             value={accentHue}
             onChange={(value) => onFieldChange('accentHue', value)}
             isDisabled={isArchived}
             aria-describedby={archivedDescribedBy}
-            trackStyle={{ background: accentHueGradient() }}
           />
           <span className={hueValue()}>
             {tHue('hueValue', { hue: accentHue })}
