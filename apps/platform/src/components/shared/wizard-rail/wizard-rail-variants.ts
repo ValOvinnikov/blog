@@ -8,7 +8,7 @@ export const wizardRailVariants = tv({
     indicatorCol: ['flex flex-none flex-col items-center self-stretch'],
     circle: [
       'flex h-6 w-6 flex-none items-center justify-center',
-      'rounded-full text-xs font-bold',
+      'rounded-full text-admin-12-5 font-bold',
     ],
     connector: ['my-1 w-0.5 flex-1 bg-admin-line-2'],
     stepBody: ['flex min-w-0 flex-1 flex-col pb-[9px]'],

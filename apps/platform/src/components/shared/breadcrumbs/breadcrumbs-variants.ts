@@ -4,10 +4,10 @@ export const breadcrumbsVariants = tv({
   slots: {
     root: ['min-w-0 flex-1'],
     list: [
-      'flex list-none flex-wrap items-center gap-[7px] p-0 text-sm text-admin-muted',
+      'flex list-none flex-wrap items-center gap-[7px] p-0 text-admin-14 text-admin-muted',
     ],
     item: ['flex items-center gap-[7px]'],
-    sep: ['text-xs text-admin-faint'],
+    sep: ['text-admin-12-5 text-admin-faint'],
     link: [
       'inline-flex min-h-11 items-center rounded-admin-control px-1 py-0.5 text-admin-muted no-underline md:min-h-0',
       'hover:bg-admin-line-2 hover:text-admin-text',

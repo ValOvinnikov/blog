@@ -6,11 +6,11 @@ export const avatarVariants = tv({
   variants: {
     variant: {
       table: [
-        'size-7.5 rounded-admin-control text-xs font-bold',
+        'size-7.5 rounded-admin-control text-admin-12-5 font-bold',
         'bg-admin-brand text-white',
       ],
       chip: [
-        'size-5.5 rounded-full text-xs font-semibold',
+        'size-5.5 rounded-full text-admin-12-5 font-semibold',
         'bg-admin-line-2 text-admin-muted',
       ],
       switcher: [

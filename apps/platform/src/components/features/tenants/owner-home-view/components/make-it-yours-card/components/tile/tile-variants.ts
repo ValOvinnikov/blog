@@ -10,7 +10,7 @@ export const tileVariants = tv({
       'outline-hidden focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
     ],
     icon: ['text-admin-text'],
-    title: ['mt-1.5 text-sm font-semibold text-admin-text'],
-    description: ['text-xs text-admin-muted'],
+    title: ['mt-1.5 text-admin-13-5 font-semibold text-admin-text'],
+    description: ['text-admin-12-5 text-admin-muted'],
   },
 });

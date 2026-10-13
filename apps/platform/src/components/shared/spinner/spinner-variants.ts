@@ -10,7 +10,7 @@ export const spinnerVariants = tv({
       'border-2 border-current border-t-transparent',
       'animate-spin motion-reduce:animate-none',
     ],
-    text: ['text-sm'],
+    text: ['text-admin-14'],
   },
   variants: {
     size: {
