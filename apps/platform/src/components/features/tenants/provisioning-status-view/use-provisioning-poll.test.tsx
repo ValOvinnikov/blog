@@ -444,6 +444,33 @@ describe(useProvisioningPoll, () => {
       },
     );
 
+    it('keeps polling, unchanged, while a step is RUNNING', async () => {
+      const runningSteps = {
+        ...idleProvisioningSteps(),
+        [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+          status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+        },
+      };
+      const tenant = makeClientTenant({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+        provisioningSteps: runningSteps,
+      });
+      getTenantProvisioningStatusActionMock.mockResolvedValue({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+        provisioningSteps: runningSteps,
+      });
+      const { result } = renderHook(() => useProvisioningPoll(tenant));
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS * 3);
+      });
+
+      expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledTimes(3);
+      expect(result.current.stepStatuses[0]).toBe(
+        TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+      );
+    });
+
     it('keeps polling through a Retry while the runner has not reported a step yet', async () => {
       const failedSteps = {
         ...idleProvisioningSteps(),
@@ -597,18 +624,27 @@ describe(useProvisioningPoll, () => {
       expect(getTenantProvisioningStatusActionMock).not.toHaveBeenCalled();
     });
 
-    it('surfaces a poll-error toast and keeps retrying automatically when a tick rejects, dismissing it once a tick recovers', async () => {
+    it('surfaces a poll-error toast, keeps the last-known status, and keeps retrying automatically when a tick rejects, dismissing it once a tick recovers', async () => {
       const tenant = makeClientTenant({
         provisioningStatus: TENANT_PROVISIONING_STATUS.PROVISIONING,
+        provisioningSteps: {
+          ...idleProvisioningSteps(),
+          [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
+            status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+          },
+        },
       });
       getTenantProvisioningStatusActionMock.mockRejectedValueOnce(
         new Error('NEXT_REDIRECT'),
       );
-      renderHook(() => useProvisioningPoll(tenant));
+      const { result } = renderHook(() => useProvisioningPoll(tenant));
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
       });
+      expect(result.current.stepStatuses[0]).toBe(
+        TENANT_PROVISIONING_STEP_STATUS.RUNNING,
+      );
       expect(
         screen.getByText(
           "Couldn't refresh the latest status — retrying automatically.",

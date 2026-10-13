@@ -438,9 +438,10 @@ describe(useDeprovisioningPoll, () => {
       );
     });
 
-    it('bounds a pending retry starting state by the same stale-run cap when the workflow never reports in', async () => {
-      const tenant = makeClientTenant({
-        deprovisioningSteps: {
+    it.each([
+      [
+        'a retry over a failed prior run',
+        {
           ...idleDeprovisioningSteps(),
           [DEPROVISIONING_STEP.REMOVE_DOMAIN]: {
             status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
@@ -451,25 +452,31 @@ describe(useDeprovisioningPoll, () => {
             finishedAt: '2026-08-12T14:19:00.000Z',
           },
         },
-      });
-      getTenantDeprovisioningStatusActionMock.mockResolvedValue(undefined);
-      renderHook(() =>
-        useDeprovisioningPoll(tenant, {
-          isEnabled: true,
-          deprovisionRequestedAt: '2026-08-12T14:25:00.000Z',
-        }),
-      );
+      ],
+      ['a first request with no run marker yet', null],
+    ])(
+      'bounds the starting state of %s by the same stale-run cap when the workflow never reports in',
+      async (_label, deprovisioningSteps) => {
+        const tenant = makeClientTenant({ deprovisioningSteps });
+        getTenantDeprovisioningStatusActionMock.mockResolvedValue(undefined);
+        renderHook(() =>
+          useDeprovisioningPoll(tenant, {
+            isEnabled: true,
+            deprovisionRequestedAt: '2026-08-12T14:25:00.000Z',
+          }),
+        );
 
-      for (let tick = 0; tick < MAX_POLL_TICKS + 5; tick += 1) {
-        await act(async () => {
-          await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
-        });
-      }
+        for (let tick = 0; tick < MAX_POLL_TICKS + 5; tick += 1) {
+          await act(async () => {
+            await vi.advanceTimersByTimeAsync(STEP_POLL_INTERVAL_MS);
+          });
+        }
 
-      expect(getTenantDeprovisioningStatusActionMock).toHaveBeenCalledTimes(
-        MAX_POLL_TICKS,
-      );
-    });
+        expect(getTenantDeprovisioningStatusActionMock).toHaveBeenCalledTimes(
+          MAX_POLL_TICKS,
+        );
+      },
+    );
 
     it('reports nothing in progress and never polls while disabled', async () => {
       const { result } = renderHook(() =>
