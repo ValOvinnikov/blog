@@ -1,1 +1,1 @@
-export { StepList } from './step-list';
+export { StepList, type TStepListStep } from './step-list';

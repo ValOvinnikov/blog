@@ -635,7 +635,6 @@
     "pageTitle": "Inrichting",
     "description": "{tenantName} · elke stap kan afzonderlijk worden hervat.",
     "stepsCardTitle": "Stappen",
-    "stepsCompletionBadge": "{done} van {total} voltooid",
     "stepLabel": {
       "SANITY_PROJECT": "Werkruimte aanmaken",
       "SEED_CONTENT": "Startcontent toevoegen",
@@ -643,12 +642,6 @@
       "MAP_DOMAIN": "Domein koppelen",
       "CREATE_WEBHOOK": "CMS aan website koppelen",
       "VERIFY_CONTENT": "Controleren of content klaar is"
-    },
-    "statusLabel": {
-      "IDLE": "Niet gestart",
-      "RUNNING": "Bezig…",
-      "DONE": "Voltooid",
-      "FAILED": "Mislukt"
     },
     "retryButton": "Inrichting opnieuw proberen",
     "retryingButton": "Inrichting opnieuw proberen…",
@@ -683,26 +676,10 @@
     },
     "technicalDetailsToggle": "Technische details",
     "ownerLabel": "Eigenaar",
-    "ownerInvitedPendingBadge": "Uitgenodigd, in afwachting",
-    "stepRunningNow": "nu",
-    "relativeJustNow": "Zojuist",
-    "relativeMinutesAgo": "{minutes} min geleden",
-    "relativeHoursAgo": "{hours} uur geleden",
-    "relativeDaysAgo": "{days} d geleden",
-    "runCardTitle": "Run",
-    "runCardEmpty": "Er is nog geen run gestart.",
-    "runStartedLabel": "Gestart",
-    "runFinishedLabel": "Voltooid",
-    "runRegistryLabel": "Register",
-    "runStartedPending": "Wachten tot de run start…",
-    "runFinishedPending": "—",
-    "runWorkflowLogLink": "Workflowlog"
+    "ownerInvitedPendingBadge": "Uitgenodigd, in afwachting"
   },
   "deprovisioningStatusView": {
     "cardTitle": "Voortgang ontmanteling",
-    "stepsCompletionBadge": "{done} van {total} voltooid",
-    "startingBadge": "Starten…",
-    "preRunStepStatusLabel": "In wachtrij",
     "stepLabel": {
       "REMOVE_DOMAIN": "Domein verwijderen",
       "ARCHIVE_SANITY_PROJECT": "Sanity-project archiveren",
@@ -712,13 +689,6 @@
       "PURGE_READER_DATA": "Lezersgegevens wissen",
       "INVALIDATE_TENANT_CACHE": "Gecachte pagina's ongeldig maken"
     },
-    "statusLabel": {
-      "IDLE": "Niet gestart",
-      "RUNNING": "Bezig…",
-      "DONE": "Voltooid",
-      "FAILED": "Mislukt"
-    },
-    "stepRunningNow": "nu",
     "failedStepLabel": "Mislukt tijdens \"{step}\".",
     "errorKind": {
       "permission": {
@@ -742,7 +712,17 @@
         "nextStep": "Start de ontmanteling opnieuw, of bekijk de technische details voordat u om hulp vraagt."
       }
     },
-    "technicalDetailsToggle": "Technische details",
+    "technicalDetailsToggle": "Technische details"
+  },
+  "runStatus": {
+    "statusLabel": {
+      "IDLE": "Niet gestart",
+      "RUNNING": "Bezig…",
+      "DONE": "Voltooid",
+      "FAILED": "Mislukt"
+    },
+    "stepsCompletionBadge": "{done} van {total} voltooid",
+    "stepRunningNow": "nu",
     "relativeJustNow": "Zojuist",
     "relativeMinutesAgo": "{minutes} min geleden",
     "relativeHoursAgo": "{hours} uur geleden",
@@ -750,9 +730,13 @@
     "runCardTitle": "Run",
     "runCardEmpty": "Er is nog geen run gestart.",
     "runStartedLabel": "Gestart",
+    "runStartedPending": "Wachten tot de run start…",
     "runFinishedLabel": "Voltooid",
     "runFinishedPending": "—",
-    "runWorkflowLogLink": "Workflowlog"
+    "runRegistryLabel": "Register",
+    "runWorkflowLogLink": "Workflowlog",
+    "startingBadge": "Starten…",
+    "preRunStepStatusLabel": "In wachtrij"
   },
   "tenantDangerPage": {
     "title": "Gevarenzone",

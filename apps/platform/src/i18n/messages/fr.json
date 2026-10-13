@@ -635,7 +635,6 @@
     "pageTitle": "Provisionnement",
     "description": "{tenantName} · chaque étape peut être reprise indépendamment.",
     "stepsCardTitle": "Étapes",
-    "stepsCompletionBadge": "{done} sur {total} terminées",
     "stepLabel": {
       "SANITY_PROJECT": "Créer l'espace de travail",
       "SEED_CONTENT": "Ajouter le contenu initial",
@@ -643,12 +642,6 @@
       "MAP_DOMAIN": "Connecter le domaine",
       "CREATE_WEBHOOK": "Relier le CMS au site web",
       "VERIFY_CONTENT": "Vérifier que le contenu est prêt"
-    },
-    "statusLabel": {
-      "IDLE": "Non démarrée",
-      "RUNNING": "En cours…",
-      "DONE": "Terminée",
-      "FAILED": "Échec"
     },
     "retryButton": "Relancer le provisionnement",
     "retryingButton": "Relance du provisionnement…",
@@ -683,26 +676,10 @@
     },
     "technicalDetailsToggle": "Détails techniques",
     "ownerLabel": "Propriétaire",
-    "ownerInvitedPendingBadge": "Invité, en attente",
-    "stepRunningNow": "en cours",
-    "relativeJustNow": "À l'instant",
-    "relativeMinutesAgo": "il y a {minutes} min",
-    "relativeHoursAgo": "il y a {hours} h",
-    "relativeDaysAgo": "il y a {days} j",
-    "runCardTitle": "Exécution",
-    "runCardEmpty": "Aucune exécution n'a encore démarré.",
-    "runStartedLabel": "Démarrée",
-    "runFinishedLabel": "Terminée",
-    "runRegistryLabel": "Registre",
-    "runStartedPending": "En attente du démarrage de l'exécution…",
-    "runFinishedPending": "—",
-    "runWorkflowLogLink": "Journal du workflow"
+    "ownerInvitedPendingBadge": "Invité, en attente"
   },
   "deprovisioningStatusView": {
     "cardTitle": "Progression du déprovisionnement",
-    "stepsCompletionBadge": "{done} sur {total} terminées",
-    "startingBadge": "Démarrage…",
-    "preRunStepStatusLabel": "En file d'attente",
     "stepLabel": {
       "REMOVE_DOMAIN": "Supprimer le domaine",
       "ARCHIVE_SANITY_PROJECT": "Archiver le projet Sanity",
@@ -712,13 +689,6 @@
       "PURGE_READER_DATA": "Purger les données des lecteurs",
       "INVALIDATE_TENANT_CACHE": "Invalider les pages en cache"
     },
-    "statusLabel": {
-      "IDLE": "Non démarrée",
-      "RUNNING": "En cours…",
-      "DONE": "Terminée",
-      "FAILED": "Échec"
-    },
-    "stepRunningNow": "en cours",
     "failedStepLabel": "Échec pendant l'étape « {step} ».",
     "errorKind": {
       "permission": {
@@ -742,7 +712,17 @@
         "nextStep": "Relancez le démantèlement, ou consultez les détails techniques avant de demander de l'aide."
       }
     },
-    "technicalDetailsToggle": "Détails techniques",
+    "technicalDetailsToggle": "Détails techniques"
+  },
+  "runStatus": {
+    "statusLabel": {
+      "IDLE": "Non démarrée",
+      "RUNNING": "En cours…",
+      "DONE": "Terminée",
+      "FAILED": "Échec"
+    },
+    "stepsCompletionBadge": "{done} sur {total} terminées",
+    "stepRunningNow": "en cours",
     "relativeJustNow": "À l'instant",
     "relativeMinutesAgo": "il y a {minutes} min",
     "relativeHoursAgo": "il y a {hours} h",
@@ -750,9 +730,13 @@
     "runCardTitle": "Exécution",
     "runCardEmpty": "Aucune exécution n'a encore démarré.",
     "runStartedLabel": "Démarrée",
+    "runStartedPending": "En attente du démarrage de l'exécution…",
     "runFinishedLabel": "Terminée",
     "runFinishedPending": "—",
-    "runWorkflowLogLink": "Journal du workflow"
+    "runRegistryLabel": "Registre",
+    "runWorkflowLogLink": "Journal du workflow",
+    "startingBadge": "Démarrage…",
+    "preRunStepStatusLabel": "En file d'attente"
   },
   "tenantDangerPage": {
     "title": "Zone de danger",

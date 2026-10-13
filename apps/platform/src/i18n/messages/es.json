@@ -635,7 +635,6 @@
     "pageTitle": "Aprovisionamiento",
     "description": "{tenantName} · cada paso puede reanudarse de forma independiente.",
     "stepsCardTitle": "Pasos",
-    "stepsCompletionBadge": "{done} de {total} completados",
     "stepLabel": {
       "SANITY_PROJECT": "Crear espacio de trabajo",
       "SEED_CONTENT": "Cargar contenido inicial",
@@ -643,12 +642,6 @@
       "MAP_DOMAIN": "Conectar dominio",
       "CREATE_WEBHOOK": "Conectar el CMS con el sitio web",
       "VERIFY_CONTENT": "Confirmar que el contenido está listo"
-    },
-    "statusLabel": {
-      "IDLE": "Sin iniciar",
-      "RUNNING": "En curso…",
-      "DONE": "Completado",
-      "FAILED": "Fallido"
     },
     "retryButton": "Reintentar aprovisionamiento",
     "retryingButton": "Reintentando aprovisionamiento…",
@@ -683,26 +676,10 @@
     },
     "technicalDetailsToggle": "Detalles técnicos",
     "ownerLabel": "Propietario",
-    "ownerInvitedPendingBadge": "Invitado, pendiente",
-    "stepRunningNow": "ahora",
-    "relativeJustNow": "Ahora mismo",
-    "relativeMinutesAgo": "hace {minutes} min",
-    "relativeHoursAgo": "hace {hours} h",
-    "relativeDaysAgo": "hace {days} d",
-    "runCardTitle": "Ejecución",
-    "runCardEmpty": "Todavía no se ha iniciado ninguna ejecución.",
-    "runStartedLabel": "Iniciada",
-    "runFinishedLabel": "Finalizada",
-    "runRegistryLabel": "Registro",
-    "runStartedPending": "Esperando a que empiece la ejecución…",
-    "runFinishedPending": "—",
-    "runWorkflowLogLink": "Registro del flujo de trabajo"
+    "ownerInvitedPendingBadge": "Invitado, pendiente"
   },
   "deprovisioningStatusView": {
     "cardTitle": "Progreso del desaprovisionamiento",
-    "stepsCompletionBadge": "{done} de {total} completados",
-    "startingBadge": "Iniciando…",
-    "preRunStepStatusLabel": "En cola",
     "stepLabel": {
       "REMOVE_DOMAIN": "Quitar dominio",
       "ARCHIVE_SANITY_PROJECT": "Archivar proyecto de Sanity",
@@ -712,13 +689,6 @@
       "PURGE_READER_DATA": "Purgar datos de lectores",
       "INVALIDATE_TENANT_CACHE": "Invalidar páginas en caché"
     },
-    "statusLabel": {
-      "IDLE": "Sin iniciar",
-      "RUNNING": "En curso…",
-      "DONE": "Completado",
-      "FAILED": "Fallido"
-    },
-    "stepRunningNow": "ahora",
     "failedStepLabel": "Falló al ejecutar «{step}».",
     "errorKind": {
       "permission": {
@@ -742,7 +712,17 @@
         "nextStep": "Vuelva a lanzar el desmontaje o revise los detalles técnicos antes de pedir ayuda."
       }
     },
-    "technicalDetailsToggle": "Detalles técnicos",
+    "technicalDetailsToggle": "Detalles técnicos"
+  },
+  "runStatus": {
+    "statusLabel": {
+      "IDLE": "Sin iniciar",
+      "RUNNING": "En curso…",
+      "DONE": "Completado",
+      "FAILED": "Fallido"
+    },
+    "stepsCompletionBadge": "{done} de {total} completados",
+    "stepRunningNow": "ahora",
     "relativeJustNow": "Ahora mismo",
     "relativeMinutesAgo": "hace {minutes} min",
     "relativeHoursAgo": "hace {hours} h",
@@ -750,9 +730,13 @@
     "runCardTitle": "Ejecución",
     "runCardEmpty": "Todavía no se ha iniciado ninguna ejecución.",
     "runStartedLabel": "Iniciada",
+    "runStartedPending": "Esperando a que empiece la ejecución…",
     "runFinishedLabel": "Finalizada",
     "runFinishedPending": "—",
-    "runWorkflowLogLink": "Registro del flujo de trabajo"
+    "runRegistryLabel": "Registro",
+    "runWorkflowLogLink": "Registro del flujo de trabajo",
+    "startingBadge": "Iniciando…",
+    "preRunStepStatusLabel": "En cola"
   },
   "tenantDangerPage": {
     "title": "Zona de peligro",
