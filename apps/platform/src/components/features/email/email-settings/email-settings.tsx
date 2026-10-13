@@ -76,6 +76,7 @@ export const EmailSettings = ({
   const toast = useToast();
   const router = useRouter();
   const archivedNoticeId = useId();
+  const senderNameInputId = useId();
   const [selectedItem, setSelectedItem] =
     useState<TEmailPageItem>(EMAIL_SENDER_ITEM);
   const [selectedLocale, setSelectedLocale] = useState(defaultLocale);
@@ -198,6 +199,11 @@ export const EmailSettings = ({
     setRevision((current) => current + 1);
   };
 
+  const revealSenderName = () => {
+    setSelectedItem(EMAIL_SENDER_ITEM);
+    tabsProps.onChange('edit');
+  };
+
   const restoreDraft = (restored: TEmailDraft) =>
     replaceDraft((prev) => ({
       ...restored,
@@ -231,6 +237,10 @@ export const EmailSettings = ({
       isPending={isPending}
       archivedAt={archivedAt}
       archivedNoticeId={archivedNoticeId}
+      invalidFields={{
+        ids: senderNameError ? [senderNameInputId] : [],
+        revealFirst: revealSenderName,
+      }}
       hasError={status === 'error' && !senderNameError}
       errorTitle={t('alertError')}
       isWide={true}
@@ -279,6 +289,7 @@ export const EmailSettings = ({
               onLogoStage={(logo) =>
                 setDraft((prev) => withLogo(prev, EMAIL_SENDER_ITEM, logo))
               }
+              senderNameInputId={senderNameInputId}
               senderNameError={senderNameError}
             />
           ) : (
