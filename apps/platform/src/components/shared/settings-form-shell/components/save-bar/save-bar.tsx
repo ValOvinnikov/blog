@@ -59,10 +59,12 @@ export const SaveBar = ({
     event.preventDefault();
     if (revealFirst) flushSync(revealFirst);
     const target = document.getElementById(firstInvalidFieldId);
-    const control = target?.matches(FIELD_CONTROL)
-      ? target
-      : target?.querySelector<HTMLElement>(FIELD_CONTROL);
-    control?.focus({ preventScroll: true });
+    target?.focus({ preventScroll: true });
+    if (target && !target.contains(document.activeElement)) {
+      target
+        .querySelector<HTMLElement>(FIELD_CONTROL)
+        ?.focus({ preventScroll: true });
+    }
     target?.scrollIntoView({ block: 'center' });
   };
 
